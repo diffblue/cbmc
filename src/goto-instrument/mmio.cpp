@@ -8,20 +8,27 @@ Date: September 2011
 
 \*******************************************************************/
 
-#include <cprover_prefix.h>
+#include <util/cprover_prefix.h>
+
+#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_functions.h>
 
 #if 0
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <guard.h>
-#include <prefix.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/guard.h>
+#include <util/prefix.h>
 
 #include <goto-programs/remove_skip.h>
 #endif
 
 #include "interrupt.h"
 #include "rw_set.h"
+
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
 
 /*******************************************************************\
 
@@ -37,10 +44,17 @@ Function: mmio
 
 void mmio(
   value_setst &value_sets,
-  const contextt &context,
+  const symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
+
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -48,7 +62,11 @@ void mmio(
     
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+        , local_may
+#endif
+      );
       
       if(rw_set.empty()) continue;
   
@@ -146,7 +164,7 @@ Function: mmio
 
 void mmio(
   value_setst &value_sets,
-  class contextt &context,
+  class symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
   // we first figure out which objects are read/written by the ISR
@@ -157,8 +175,12 @@ void mmio(
 
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
-       f_it->first!=ID_main)
-      mmio(value_sets, context, f_it->second.body);
+       f_it->first!=goto_functionst::entry_point())
+      mmio(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+        f_it->second,
+#endif
+        f_it->second.body);
 
   goto_functions.update();
 }

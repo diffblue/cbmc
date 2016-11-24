@@ -44,7 +44,7 @@ public:
     return a.l<b.l;
   }
   
-  inline unsigned var_no() const
+  inline literalt::var_not var_no() const
   {
     return l.var_no();
   }
@@ -59,7 +59,7 @@ public:
     l=_l;
   }
   
-  inline void set(unsigned v, bool sign)
+  inline void set(literalt::var_not v, bool sign)
   {
     l.set(v, sign);
   }

@@ -193,7 +193,7 @@ void xml_goto_program_convertt::convert(const goto_programt &goto_program,
     if(ins_it->function!="")
     {
       xmlt &fnc=ins.new_element("function");
-      fnc.data=ins_it->function.as_string();
+      fnc.data=id2string(ins_it->function);
     }
   }
 }

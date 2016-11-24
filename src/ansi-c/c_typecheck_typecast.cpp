@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr_util.h>
-
 #include "c_typecast.h"
 #include "c_typecheck_base.h"
 #include "c_types.h"
@@ -26,13 +24,13 @@ Function: c_typecheck_baset::implicit_typecast
 
 void c_typecheck_baset::implicit_typecast(
   exprt &expr,
-  const typet &type)
+  const typet &dest_type)
 {
   c_typecastt c_typecast(*this);
   
-  typet original_expr_type(expr.type());
+  typet src_type=expr.type();
   
-  c_typecast.implicit_typecast(expr, type);
+  c_typecast.implicit_typecast(expr, dest_type);
 
   for(std::list<std::string>::const_iterator
       it=c_typecast.errors.begin();
@@ -42,10 +40,10 @@ void c_typecheck_baset::implicit_typecast(
     err_location(expr);
     str << "in expression `" << to_string(expr) << "':\n";
     str << "conversion from `"
-        << to_string(original_expr_type) << "' to `"
-        << to_string(type) << "': "
+        << to_string(src_type) << "' to `"
+        << to_string(dest_type) << "': "
         << *it;
-    error();
+    error_msg();
   }
   
   if(!c_typecast.errors.empty())
@@ -58,11 +56,11 @@ void c_typecheck_baset::implicit_typecast(
   {
     err_location(expr);
     str << "warning: conversion from `"
-        << to_string(original_expr_type)
+        << to_string(src_type)
         << "' to `"
-        << to_string(type)
+        << to_string(dest_type)
         << "': " << *it;
-    warning();
+    warning_msg();
   }
 }
 

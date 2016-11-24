@@ -1,6 +1,6 @@
 SRC = mode.cpp language_ui.cpp languages.cpp language_util.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common

@@ -9,9 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
 #define CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
 
-#include <namespace.h>
-#include <solvers/sat/cnf_clause_list.h>
+#include <util/namespace.h>
+
 #include <goto-symex/symex_target_equation.h>
+
+#include <solvers/flattening/bv_minimize.h>
 
 #include "bv_cbmc.h"
 
@@ -22,18 +24,27 @@ public:
   {
   }
 
+  void operator()(
+    bv_cbmct &bv_cbmc,
+    const symex_target_equationt &equation,
+    const namespacet &ns);
+
 protected:
-  typedef std::set<exprt> minimization_symbolst;
-
-  void get_minimization_symbols(
-    const bv_cbmct &bv_cbmc,
+  void get_minimization_list(
+    prop_convt &prop_conv,
     const symex_target_equationt &equation,        
-    const symex_target_equationt::SSA_stepst::const_iterator failed,
-    minimization_symbolst &minimization_symbols);
+    minimization_listt &minimization_list);
 
-  symex_target_equationt::SSA_stepst::const_iterator get_failed_claim(
-    const bv_cbmct &bv_cbmc,
+  void minimize(
+    const exprt &expr,
+    class prop_minimizet &prop_minimize);
+
+  symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
+    const prop_convt &prop_conv,
     const symex_target_equationt &equation);
+
+  // the failed property
+  symex_target_equationt::SSA_stepst::const_iterator failed;
 };
 
 #endif

@@ -7,9 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+#include <ostream>
 
 #include "rational.h"
-#include "gcd.h"
 
 /*******************************************************************\
 

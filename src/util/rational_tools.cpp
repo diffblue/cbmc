@@ -22,7 +22,7 @@ Function: power10
 
 \*******************************************************************/
 
-static mp_integer power10(unsigned i)
+static mp_integer power10(size_t i)
 {
   mp_integer result=1;
 
@@ -46,16 +46,18 @@ Function: to_rational
 
 bool to_rational(const exprt &expr, rationalt &rational_value)
 {
-  if(expr.id()!="constant") return true;
+  if(expr.id()!=ID_constant) return true;
 
-  const std::string &value=expr.get_string("value");
+  const std::string &value=expr.get_string(ID_value);
 
   std::string no1, no2;
   char mode=0;
 
-  for(unsigned i=0; i<value.size(); i++)
+  for(std::string::const_iterator it=value.begin();
+      it!=value.end();
+      ++it)
   {
-    char ch=value[i];
+    const char ch=*it;
 
     if(isdigit(ch))
     {
@@ -110,7 +112,7 @@ Function: from_rational
 
 \*******************************************************************/
 
-exprt from_rational(const rationalt &a)
+constant_exprt from_rational(const rationalt &a)
 {
   std::string d=integer2string(a.numerator);
   if(a.denominator!=1) d+="/"+integer2string(a.denominator);

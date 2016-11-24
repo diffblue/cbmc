@@ -18,21 +18,14 @@ Function: propt::set_equal
 
  Outputs:
 
- Purpose:
+ Purpose: asserts a==b in the propositional formula
 
 \*******************************************************************/
 
 void propt::set_equal(literalt a, literalt b)
 {
-  bvt bv;
-  bv.resize(2);
-  bv[0]=a;
-  bv[1]=lnot(b);
-  lcnf(bv);
-  
-  bv[0]=lnot(a);
-  bv[1]=b;
-  lcnf(bv);
+  lcnf(a, !b);
+  lcnf(!a, b);
 }
 
 /*******************************************************************\
@@ -75,9 +68,9 @@ Function: propt::is_in_conflict
 
   Inputs:
 
- Outputs:
+ Outputs: true iff the given literal is part of the final conflict
 
- Purpose:
+ Purpose:  
 
 \*******************************************************************/
 
@@ -89,39 +82,23 @@ bool propt::is_in_conflict(literalt l) const
 
 /*******************************************************************\
 
-Function: propt::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool propt::is_in_core(literalt l) const
-{
-  assert(false);
-  return false;
-}
-
-/*******************************************************************\
-
 Function: propt::new_variables
 
-  Inputs:
+  Inputs: width
 
- Outputs:
+ Outputs: bitvector 
 
- Purpose:
+ Purpose: generates a bitvector of given width with new variables 
 
 \*******************************************************************/
 
-bvt propt::new_variables(unsigned width)
+bvt propt::new_variables(std::size_t width)
 {
   bvt result;
   result.resize(width);
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     result[i]=new_variable();
   return result;
 }
+
+

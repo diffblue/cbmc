@@ -6,6 +6,7 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strcpy zero-termination of 2nd argument");
   __CPROVER_assert(__CPROVER_buffer_size(dst)>__CPROVER_zero_string_length(src), "strcpy buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==s, "builtin object size");
   dst[__CPROVER_zero_string_length(src)]=0;
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
@@ -18,7 +19,7 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
     dst[i]=ch;
     i++;
   }
-  while(ch!=(char)0);
+  while(i<s && ch!=(char)0);
   #endif
   return dst;
 }
@@ -32,6 +33,7 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   __CPROVER_size_t new_size;
   __CPROVER_assert(__CPROVER_is_zero_string(dst), "strcat zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strcat zero-termination of 2nd argument");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==s, "builtin object size");
   new_size=__CPROVER_zero_string_length(dst)+__CPROVER_zero_string_length(src);
   __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
                    "strcat buffer overflow");
@@ -54,7 +56,7 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
     i++;
     j++;
   }
-  while(ch!=(char)0);
+  while(i<s && ch!=(char)0);
   #endif
   return dst;
 }                        
@@ -62,9 +64,33 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
 /* FUNCTION: __builtin___strncat_chk */
 
 __inline char *__builtin___strncat_chk(
-  char *dest, const char *src, __CPROVER_size_t len, __CPROVER_size_t s)
+  char *dst, const char *src, __CPROVER_size_t n, __CPROVER_size_t s)
 {
-}                        
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_size_t additional, new_size;
+  __CPROVER_assert(__CPROVER_is_zero_string(dst), "strncat zero-termination of 1st argument");
+  __CPROVER_assert(__CPROVER_is_zero_string(src) || __CPROVER_buffer_size(src)>=n, "strncat zero-termination of 2nd argument");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==s, "builtin object size");
+  additional=(n<__CPROVER_zero_string_length(src))?n:__CPROVER_zero_string_length(src);
+  new_size=__CPROVER_is_zero_string(dst)+additional; 
+  __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
+                   "strncat buffer overflow");
+  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst); 
+  __CPROVER_size_t i;
+  for (i = 0 ; i < n && i<__CPROVER_zero_string_length(src) ; i++)
+    dst[dest_len + i] = src[i];
+  dst[dest_len + i] = 0;
+  __CPROVER_is_zero_string(dst)=1;
+  __CPROVER_zero_string_length(dst)=new_size;
+  #else
+  (void)*dst;
+  (void)*src;
+  (void)n;
+  (void)s;
+  #endif
+  return dst;
+}
 
 /* FUNCTION: strcpy */
 
@@ -118,12 +144,50 @@ inline char *strncpy(char *dst, const char *src, size_t n)
   #else
   __CPROVER_size_t i=0;
   char ch;
+  _Bool end;
 
-  for( ; i<n && (ch=src[i])!=(char)0; i++)
+  // We use a single loop to make bounds checking etc easier.
+  // Note that strncpy _always_ writes 'n' characters into 'dst'.
+  for(end=0; i<n; i++)
+  {
+    ch=end?0:src[i];
     dst[i]=ch;
+    end=end || ch==(char)0;
+  }
+  #endif
+  return dst;
+}
 
-  for( ; i<n ; i++)
-    dst[i]=0;
+/* FUNCTION: __builtin___strncpy_chk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "strncpy buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==object_size, "builtin object size");
+  __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
+  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);  
+  #else
+  __CPROVER_size_t i=0;
+  char ch;
+  _Bool end;
+  (void)object_size;
+
+  // We use a single loop to make bounds checking etc easier.
+  // Note that strncpy _always_ writes 'n' characters into 'dst'.
+  for(end=0; i<n; i++)
+  {
+    ch=end?0:src[i];
+    dst[i]=ch;
+    end=end || ch==(char)0;
+  }
   #endif
   return dst;
 }
@@ -199,6 +263,9 @@ inline char *strncat(char *dst, const char *src, size_t n)
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
   #else
+  (void)*dst;
+  (void)*src;
+  (void)n;
   #endif
   return dst;
 }
@@ -215,9 +282,9 @@ inline char *strncat(char *dst, const char *src, size_t n)
 inline int strcmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  int retval;
   if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
+  int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcmp zero-termination of 2nd argument");
   if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
@@ -257,9 +324,9 @@ inline int strcmp(const char *s1, const char *s2)
 inline int strcasecmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  int retval;
   if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
+  int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcasecmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strcasecmp zero-termination of 2nd argument");
   if(__CPROVER_zero_string_length(s1) != __CPROVER_zero_string_length(s2)) __CPROVER_assume(retval!=0);
@@ -341,9 +408,9 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 inline int strncasecmp(const char *s1, const char *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  int retval;
   if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
+  int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strncasecmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2), "strncasecmp zero-termination of 2nd argument");
   return retval;
@@ -455,6 +522,32 @@ inline void *memcpy(void *dst, const void *src, size_t n)
   return dst;
 }
 
+/* FUNCTION: __builtin___memcpy_chk */
+
+void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memcpy buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "memcpy buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dst)==s, "builtin object size");
+  //  for(size_t i=0; i<n ; i++) dst[i]=src[i];
+  if(__CPROVER_is_zero_string(src) &&
+     n > __CPROVER_zero_string_length(src))
+  {
+    __CPROVER_is_zero_string(dst)=1;
+    __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
+  }
+  else if(!(__CPROVER_is_zero_string(dst) &&
+            n <= __CPROVER_zero_string_length(dst)))
+    __CPROVER_is_zero_string(dst)=0;
+  #else
+  (void)size;
+  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  #endif
+  return dst;
+}
+
 /* FUNCTION: memset */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -466,7 +559,7 @@ inline void *memcpy(void *dst, const void *src, size_t n)
 
 inline void *memset(void *s, int c, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(s)>=n, "memset buffer overflow");
   //  for(size_t i=0; i<n ; i++) s[i]=c;
@@ -489,6 +582,35 @@ inline void *memset(void *s, int c, size_t n)
   return s;
 }
 
+/* FUNCTION: __builtin___memset_chk */
+
+void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_buffer_size(s)>=n, "memset buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(s)==size, "builtin object size");
+  //  for(size_t i=0; i<n ; i++) s[i]=c;
+  if(__CPROVER_is_zero_string(s) &&
+     n > __CPROVER_zero_string_length(s))
+  {
+    __CPROVER_is_zero_string(s)=1;
+  }
+  else if(c==0)
+  {
+    __CPROVER_is_zero_string(s)=1;
+    __CPROVER_zero_string_length(s)=0;
+  }
+  else
+    __CPROVER_is_zero_string(s)=0;
+  #else
+  (void)size;
+  char *sp=s;
+  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  #endif
+  return s;
+}
+
 /* FUNCTION: memmove */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -500,7 +622,7 @@ inline void *memset(void *s, int c, size_t n)
 
 inline void *memmove(void *dest, const void *src, size_t n)
 {
-  __CPROVER_HIDE:
+  __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memmove buffer overflow");
   // dst = src (with overlap allowed)
@@ -513,7 +635,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  if(dest-src>=n)
+  if((const char *)dest>=(const char *)src+n)
   {
     for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
   }
@@ -537,7 +659,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
 inline int memcmp(const void *s1, const void *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  int res;
+  int res=0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_buffer_size(s1)>=n, "memcmp buffer overflow of 1st argument");
   __CPROVER_assert(__CPROVER_buffer_size(s2)>=n, "memcmp buffer overflow of 2nd argument");
@@ -545,7 +667,7 @@ inline int memcmp(const void *s1, const void *s2, size_t n)
   const unsigned char *sc1=s1, *sc2=s2;
   for(; n!=0; n--)
   {
-    res = (s1++) - (s2++);
+    res = (*sc1++) - (*sc2++);
     if (res != 0)
       return res;
   }
@@ -567,7 +689,7 @@ inline char *strchr(const char *src, int c)
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strchr zero-termination of string argument");
-  _Bool found;
+  __CPROVER_bool found;
   __CPROVER_size_t i;
   return found?src+i:0;
   #else
@@ -593,7 +715,7 @@ inline char *strrchr(const char *src, int c)
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strrchr zero-termination of string argument");
-  _Bool found;
+  __CPROVER_bool found;
   __CPROVER_size_t i;
   return found?((char *)src)+i:0;
   #else

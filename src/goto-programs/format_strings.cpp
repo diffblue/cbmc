@@ -6,7 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <ctype.h>
+#include <cctype>
 
 #include "format_strings.h"
 
@@ -230,7 +230,7 @@ bool parse_format_string(
 
   if(format_arg.id()==ID_string_constant)
   {
-    const std::string &arg_string = format_arg.get(ID_value).as_string();
+    const std::string &arg_string = id2string(format_arg.get(ID_value));
 
     std::string::const_iterator it=arg_string.begin();
 

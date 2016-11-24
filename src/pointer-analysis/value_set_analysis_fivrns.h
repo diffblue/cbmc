@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com,
 #ifndef __CPROVER_VALUE_SET_ANALYSIS_FIVRNS_H_
 #define __CPROVER_VALUE_SET_ANALYSIS_FIVRNS_H_
 
-#include <goto-programs/flow_insensitive_analysis.h>
+#include <analyses/flow_insensitive_analysis.h>
 
 #include "value_set_domain_fivrns.h"
 #include "value_sets.h"
@@ -36,7 +36,9 @@ public:
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
-  void output(locationt l, std::ostream &out) 
+  using baset::output;
+
+  virtual void output(locationt l, std::ostream &out)
   {
     state.value_set.set_from(l->function, l->location_number);
     state.value_set.set_to(l->function, l->location_number);    
@@ -47,11 +49,11 @@ public:
   {
     forall_goto_program_instructions(it, goto_program)
     {
-      std::cout << "**** " << it->location << std::endl;      
+      out << "**** " << it->source_location << std::endl;      
       output(it, out);
-      std::cout << std::endl;
-      goto_program.output_instruction(ns, "", std::cout, it);
-      std::cout << std::endl;
+      out << std::endl;
+      goto_program.output_instruction(ns, "", out, it);
+      out << std::endl;
     }
   }
   

@@ -1,0 +1,133 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Hardware and Software Equivalence and Co-Verification</h2>
+
+<h3>Mapping Variables</h3>
+
+<h4>Mapping Variables within the Module Hierarchy</h4>
+
+<p class="justified">
+Verilog modules are hierarchical. The <code>extern</code> declarations shown above
+only allow reading the values of signals and registers that are in the top
+module. In order to read values from sub-modules, CBMC uses structures.
+</p>
+
+<p class="justified">
+As an example, consider the following Verilog file
+(<a href="hierarchy.v">hierarchy.v</a>):
+</p>
+
+<hr>
+<code>
+module counter(input clk, input [7:0] increment);<br>
+<br>
+&nbsp;&nbsp;reg [7:0] counter;<br>
+<br>
+&nbsp;&nbsp;initial counter=0;<br>
+<br>
+&nbsp;&nbsp;always @(posedge clk)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;counter=counter+increment;<br>
+<br>
+endmodule<br>
+<br>
+module top(input clk);<br>
+<br>
+&nbsp;&nbsp;counter c1(clk, 1);<br>
+&nbsp;&nbsp;counter c2(clk, 2);<br>
+<br>
+endmodule
+</code>
+<hr>
+
+<p class="justified">
+The file has two modules: a top module and a counter module. The counter
+module is instantiated twice within the top module. A reference to the
+register <code>counter</code> within the C program would be ambiguous, as the two
+module instances have separate instances of the register. CBMC and SATABS
+use the following data structures for this example:
+</p>
+
+<hr>
+<code>
+void next_timeframe();<br>
+extern const unsigned int bound;<br>
+<br>
+struct counter {<br>
+&nbsp;&nbsp;unsigned char increment;<br>
+&nbsp;&nbsp;unsigned char counter;<br>
+};<br>
+<br>
+struct module_top {<br>
+&nbsp;&nbsp;struct module_counter c1, c2;<br>
+};<br>
+<br>
+extern struct module_top top;<br>
+<br>
+int main() {<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;next_timeframe();<br>
+&nbsp;&nbsp;assert(top.c1.counter==3);<br>
+&nbsp;&nbsp;assert(top.c2.counter==6);<br>
+}
+</code>
+<hr>
+
+<p class="justified">
+The <code>main</code> function reads both counter values for cycle 3. A deeper
+hierarchy (modules in modules) is realized by using additional structure
+members. Writing these data structures for large Verilog designs is error
+prone, and thus, HW-CBMC can generate them automatically. The declarations
+above are generated using the command line
+</p>
+
+<center>
+<code>
+hw-cbmc --gen-interface --module top hierarchy.v
+</code>
+</center>
+
+<h4>Mapping Verilog Vectors to Arrays or Scalars</h4>
+
+<p class="justified">
+In Verilog, a definition such as
+</p>
+
+<code>
+&nbsp;&nbsp;wire [31:0] x;
+</code>
+
+<p class="justified">
+can be used for arithmetic (as in <code>x+10</code>) and as array of Booleans
+(as in <code>x[2]</code>). ANSI-C does not allow both, so when mapping variables
+from Verilog to C, the user has to choose one option for each such variable.
+As an example, the C declaration
+</p>
+
+<code>
+&nbsp;&nbsp;unsigned int x;
+</code>
+
+<p class="justified">
+will allow using <code>x</code> in arithmetic expressions, while the C declaration
+</p>
+
+<code>
+&nbsp;&nbsp;__CPROVER_bool x[32];
+</code>
+
+<p class="justified">
+will allow accessing the individual bits of <code>x</code> using the syntax
+<code>x[bit]</code>.  The <code>--gen-interface</code> option of HW-CBMC
+will generate the first variant if the vector has the same size as one of
+the standard integer types, and will use the __CPROVER_bitvector[] type if
+not so.  This choice can be changed by adjusting the declaration
+accordingly.  Note that both SpecC and SystemC offer bit-extraction
+operators, which means that it unnecessary to use the declaration as array
+in order to access individual bits of a vector.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

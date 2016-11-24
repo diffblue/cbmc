@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "typecheck.h"
-#include "strstream2string.h"
 
 /*******************************************************************\
 
@@ -28,19 +27,21 @@ bool typecheckt::typecheck_main()
     typecheck();
   }
 
-  catch(int e)
+  catch(int)
   {
-    error();
+    error_msg();
   }
 
   catch(const char *e)
   {
-    error(e);
+    str << e;
+    error_msg();
   }
 
   catch(const std::string &e)
   {
-    error(e);
+    str << e;
+    error_msg();
   }
 
   return error_found;

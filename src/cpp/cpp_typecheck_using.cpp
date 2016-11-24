@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <location.h>
+#include <util/source_location.h>
 
 #include "cpp_typecheck.h"
 
@@ -31,7 +31,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   cpp_typecheck_resolvet resolver(*this);
   cpp_save_scopet save_scope(this->cpp_scopes);
 
-  std::string base_name;
+  irep_idt base_name;
   cpp_template_args_non_tct template_args;
   resolver.resolve_scope(cpp_using.name(), base_name, template_args);
 
@@ -45,7 +45,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   if(id_set.empty())
   {
-    err_location(cpp_using.name().location());
+    err_location(cpp_using.name().source_location());
     str << "using "
         << (using_directive?"namespace":"identifier")
         << " `"
@@ -73,7 +73,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
     else // declaration
     {
       // we copy all 'normal' identifiers into the current scope
-      if((*it)->id_class!=cpp_idt::TEMPLATE_ARGUMENT &&
+      if((*it)->id_class!=cpp_idt::TEMPLATE_PARAMETER &&
          (*it)->id_class!=cpp_idt::NAMESPACE)
         cpp_scopes.current_scope().insert(**it);
     }

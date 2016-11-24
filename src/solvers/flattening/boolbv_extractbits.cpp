@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <i2string.h>
+#include <util/arith_tools.h>
+#include <util/i2string.h>
 
 #include "boolbv.h"
 
@@ -25,23 +25,25 @@ Function: boolbvt::convert_extractbits
 
 void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
 {
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
   
-  if(expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_bv)
+  const irep_idt &type_id=expr.type().id();
+  
+  if(type_id!=ID_signedbv &&
+     type_id!=ID_unsignedbv &&
+     type_id!=ID_c_enum &&
+     type_id!=ID_c_enum_tag &&
+     type_id!=ID_bv)
     return conversion_failed(expr, bv);
 
   if(expr.operands().size()!=3)
     throw "extractbits takes three operands";
 
   mp_integer o1, o2;
-  bvt bv0;
-
-  convert_bv(expr.op0(), bv0);
+  const bvt &bv0=convert_bv(expr.op0());
 
   // We only do constants for now.
   // Should implement a shift here.
@@ -64,10 +66,10 @@ void boolbvt::convert_extractbits(const extractbits_exprt &expr, bvt &bv)
           i2string(unsigned(integer2long(o1-o2+1)))+" but got "+
           i2string(width)+"): "+expr.to_string();
 
-  unsigned offset=integer2long(o2);
+  std::size_t offset=integer2unsigned(o2);
 
   bv.resize(width);
 
-  for(unsigned i=0; i<width; i++)
+  for(std::size_t i=0; i<width; i++)
     bv[i]=bv0[offset+i];
 }

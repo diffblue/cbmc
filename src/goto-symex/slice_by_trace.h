@@ -19,7 +19,7 @@ public:
   }
 
   void slice_by_trace(std::string trace_files,
-		      symex_target_equationt &equation);
+                      symex_target_equationt &equation);
 
  protected:
   const namespacet &ns;

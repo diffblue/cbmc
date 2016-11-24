@@ -80,7 +80,7 @@ void set_stack<T>::resize(list_size_type s)
   }
 }
  
-#include <hash_cont.h>
+#include "hash_cont.h"
 
 template <class T, class H>
 class hash_set_stack

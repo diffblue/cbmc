@@ -6,16 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <fstream>
 
-#include <i2string.h>
-#include <str_getline.h>
+#include <util/i2string.h>
+#include <util/string2int.h>
 
 #include "satcheck_zcore.h"
 
-#include <cstdlib>
 #include <cstring>
 
 /*******************************************************************\
@@ -65,7 +63,7 @@ Function: satcheck_zcoret::l_get
 tvt satcheck_zcoret::l_get(literalt a) const
 {
   assert(false);
-  return tvt(tvt::TV_UNKNOWN);
+  return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
 /*******************************************************************\
@@ -99,11 +97,12 @@ Function: satcheck_zcoret::prop_solve
 
 propt::resultt satcheck_zcoret::prop_solve()
 {
+  // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=
-      i2string(no_variables())+" variables, "+
+      i2string(no_variables()-1)+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   // get the core
@@ -132,7 +131,7 @@ propt::resultt satcheck_zcoret::prop_solve()
     while(true)
     {
       std::string line;
-      if(!str_getline(in, line)) break;
+      if(!std::getline(in, line)) break;
       
       if(!(line.substr(0,1)=="c" || line.substr(0,1)=="p"))
       {
@@ -140,7 +139,7 @@ propt::resultt satcheck_zcoret::prop_solve()
         
         while(true)
         {
-          int l=atoi(p);
+          int l=unsafe_str2int(p);
           if(l==0) break;
           
           if(l<0) l=-l;

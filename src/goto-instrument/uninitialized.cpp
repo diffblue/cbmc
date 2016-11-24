@@ -8,11 +8,11 @@ Date: January 2010
 
 \*******************************************************************/
 
-#include <std_code.h>
-#include <std_expr.h>
-#include <context.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
-#include "uninitialized_domain.h"
+#include <analyses/uninitialized_domain.h>
 
 /*******************************************************************\
 
@@ -25,9 +25,9 @@ Date: January 2010
 class uninitializedt
 {
 public:
-  uninitializedt(contextt &_context):
-    context(_context),
-    ns(_context),
+  uninitializedt(symbol_tablet &_symbol_table):
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
     uninitialized_analysis(ns)
   {
   }
@@ -35,7 +35,7 @@ public:
   void add_assertions(goto_programt &goto_program);
 
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
   uninitialized_analysist uninitialized_analysis;
 
@@ -116,12 +116,12 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     new_symbol.location=symbol.location;
     new_symbol.mode=symbol.mode;
     new_symbol.module=symbol.module;
-    new_symbol.thread_local=true;
-    new_symbol.static_lifetime=false;
-    new_symbol.file_local=true;
-    new_symbol.lvalue=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_static_lifetime=false;
+    new_symbol.is_file_local=true;
+    new_symbol.is_lvalue=true;
     
-    context.move(new_symbol);
+    symbol_table.move(new_symbol);
   }
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -149,11 +149,11 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
         symbol_expr.set_identifier(new_identifier);
         symbol_expr.type()=bool_typet();
         i1->type=DECL;
-        i1->location=instruction.location;
+        i1->source_location=instruction.source_location;
         i1->code=code_declt(symbol_expr);
 
         i2->type=ASSIGN;
-        i2->location=instruction.location;
+        i2->source_location=instruction.source_location;
         i2->code=code_assignt(symbol_expr, false_exprt());        
       }
     }
@@ -166,14 +166,16 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       //const code_function_callt &code_function_call=
       //  to_code_function_call(instruction.code);
 
+      assert(uninitialized_analysis.has_location(i_it));
+      const std::set<irep_idt> &uninitialized=
+        uninitialized_analysis[i_it].uninitialized;
+
       // check tracking variables
       forall_expr_list(it, read)
       {
         if(it->id()==ID_symbol)
         {
           const irep_idt &identifier=to_symbol_expr(*it).get_identifier();
-          const std::set<irep_idt> &uninitialized=
-            uninitialized_analysis[i_it].uninitialized;
 
           if(uninitialized.find(identifier)!=uninitialized.end())
           {
@@ -184,9 +186,9 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             goto_programt::instructiont assertion;
             assertion.type=ASSERT;
             assertion.guard=symbol_exprt(new_identifier, bool_typet());
-            assertion.location=instruction.location;
-            assertion.location.set_comment("use of uninitialized local variable");
-            assertion.location.set_property("uninitialized local");
+            assertion.source_location=instruction.source_location;
+            assertion.source_location.set_comment("use of uninitialized local variable");
+            assertion.source_location.set_property_class("uninitialized local");
             
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;
@@ -209,7 +211,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             assignment.type=ASSIGN;
             assignment.code=code_assignt(
               symbol_exprt(new_identifier, bool_typet()), true_exprt());
-            assignment.location=instruction.location;
+            assignment.source_location=instruction.source_location;
             
             goto_program.insert_before_swap(i_it, assignment);
             i_it++;
@@ -233,12 +235,12 @@ Function: add_uninitialized_locals_assertions
 \*******************************************************************/
 
 void add_uninitialized_locals_assertions(
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
-    uninitializedt uninitialized(context);
+    uninitializedt uninitialized(symbol_table);
 
     uninitialized.add_assertions(f_it->second.body);
   }
@@ -257,15 +259,15 @@ Function: show_uninitialized
 \*******************************************************************/
 
 void show_uninitialized(
-  const class contextt &context,
+  const class symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(f_it->second.body_available)
+    if(f_it->second.body_available())
     {
       out << "////" << std::endl;
       out << "//// Function: " << f_it->first << std::endl;

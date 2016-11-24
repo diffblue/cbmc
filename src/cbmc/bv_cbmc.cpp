@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <replace_expr.h>
+#include <util/arith_tools.h>
+#include <util/replace_expr.h>
 
 #include "bv_cbmc.h"
 

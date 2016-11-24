@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include "compute_called_functions.h"
 
@@ -127,7 +127,7 @@ void compute_called_functions(
   std::set<irep_idt> done;
   
   // start from entry point
-  working_queue.insert(goto_functions.main_id());
+  working_queue.insert(goto_functions.entry_point());
   
   while(!working_queue.empty())
   {

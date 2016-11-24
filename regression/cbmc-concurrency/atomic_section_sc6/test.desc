@@ -1,0 +1,8 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^start_thread in atomic section detected$
+--
+^warning: ignoring

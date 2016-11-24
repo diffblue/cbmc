@@ -9,7 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_CNF_CLAUSE_LIST_H
 #define CPROVER_PROP_CNF_CLAUSE_LIST_H
 
-#include <threeval.h>
+#include <list>
+
+#include <util/threeval.h>
 
 #include "cnf.h"
 
@@ -28,12 +30,12 @@ public:
    
   virtual tvt l_get(literalt literal) const
   {
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   }
 
   virtual resultt prop_solve() { return P_ERROR; }
   
-  virtual unsigned no_clauses() const { return clauses.size(); }
+  virtual size_t no_clauses() const { return clauses.size(); }
   
   typedef std::list<bvt> clausest;
   
@@ -79,7 +81,7 @@ class cnf_clause_list_assignmentt:public cnf_clause_listt
 public:
   typedef std::vector<tvt> assignmentt;
   
-  assignmentt &get_assignment()
+  inline assignmentt &get_assignment()
   {
     return assignment;
   }
@@ -92,7 +94,7 @@ public:
     unsigned v=literal.var_no();
 
     if(v==0 || v>=assignment.size())
-      return tvt(tvt::TV_UNKNOWN);
+      return tvt::unknown();
 
     tvt r=assignment[v];
     return literal.sign()?!r:r;

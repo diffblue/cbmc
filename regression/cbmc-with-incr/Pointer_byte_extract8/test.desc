@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--all-properties --bounds-check --32 --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.array_bounds\.5\] array.List upper bound: FAILED$
+^\*\* 1 of 9 failed (2 iterations)$
+--
+^warning: ignoring

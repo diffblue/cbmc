@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <std_code.h>
+#include <util/std_code.h>
 
 #include "goto_program_template.h"
 
@@ -50,6 +50,8 @@ extern inline bool operator<(const goto_programt::const_targett i1,
 {
   return order_const_target<codet, exprt>(i1, i2);
 }
+
+typedef struct const_target_hash_templatet<codet, exprt> const_target_hash;
 
 std::list<exprt> objects_read(const goto_programt::instructiont &);
 std::list<exprt> objects_written(const goto_programt::instructiont &);

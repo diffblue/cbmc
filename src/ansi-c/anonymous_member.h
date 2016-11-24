@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <namespace.h>
+#include <util/expr.h>
+#include <util/namespace.h>
 
 exprt get_component_rec(
   const exprt &struct_union,

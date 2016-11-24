@@ -42,48 +42,27 @@ void base_type_rec(
       return;
     }
   }
-  //else if(src.id()=="dependent")
-  //  dest=src.find("subtype");
-  else if(type.id()==ID_subtype)
-  {
-    typet tmp;
-    tmp.swap(type.subtype());
-    type.swap(tmp);
-  }
-  else if(type.id()=="predicate")
-  {
-    exprt &predicate=static_cast<exprt &>(type.add("predicate"));
-    base_type_rec(predicate.type(), ns, symb);
-    assert(predicate.type().id()=="mapping");
-    typet tmp;
-    tmp.swap(predicate.type().subtypes()[0]);
-    type.swap(tmp);
-    base_type_rec(type, ns, symb); // recursive call
-  }
-  else if(type.id()=="mapping")
-  {
-    assert(type.subtypes().size()==2);
-    base_type_rec(type.subtypes()[0], ns, symb);
-    base_type_rec(type.subtypes()[1], ns, symb);
-  }
   else if(type.id()==ID_array)
   {
-    base_type_rec(type.subtype(), ns, symb);
+    base_type_rec(to_array_type(type).subtype(), ns, symb);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    irept::subt &components=type.add(ID_components).get_sub();
+    struct_union_typet::componentst &components=
+      to_struct_union_type(type).components();
 
-    Forall_irep(it, components)
+    for(struct_union_typet::componentst::iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      typet &subtype=static_cast<typet &>(it->add(ID_type));
-      base_type_rec(subtype, ns, symb);
+      base_type_rec(it->type(), ns, symb);
     }
   }
   else if(type.id()==ID_pointer)
   {
-    typet &subtype=type.subtype();
+    typet &subtype=to_pointer_type(type).subtype();
 
     // we need to avoid running into an infinite loop
     if(subtype.id()==ID_symbol)
@@ -183,7 +162,7 @@ bool base_type_eqt::base_type_eq_rec(
       ns.lookup(to_symbol_type(type1).get_identifier());
 
     if(!symbol.is_type)
-      throw "symbol "+id2string(symbol.name)+" is not a type";
+      return false;
     
     return base_type_eq_rec(symbol.type, type2);
   }
@@ -194,7 +173,7 @@ bool base_type_eqt::base_type_eq_rec(
       ns.lookup(to_symbol_type(type2).get_identifier());
 
     if(!symbol.is_type)
-      throw "symbol "+id2string(symbol.name)+" is not a type";
+      return false;
 
     return base_type_eq_rec(type1, symbol.type);
   }
@@ -228,21 +207,25 @@ bool base_type_eqt::base_type_eq_rec(
   {
     return true;
   }
+  else if(type1.id()==ID_incomplete_union)
+  {
+    return true;
+  }
   else if(type1.id()==ID_code)
   {
-    const code_typet::argumentst &arguments1=
-      to_code_type(type1).arguments();
+    const code_typet::parameterst &parameters1=
+      to_code_type(type1).parameters();
 
-    const code_typet::argumentst &arguments2=
-      to_code_type(type2).arguments();
+    const code_typet::parameterst &parameters2=
+      to_code_type(type2).parameters();
     
-    if(arguments1.size()!=arguments2.size())
+    if(parameters1.size()!=parameters2.size())
       return false;
       
-    for(unsigned i=0; i<arguments1.size(); i++)
+    for(unsigned i=0; i<parameters1.size(); i++)
     {
-      const typet &subtype1=arguments1[i].type();
-      const typet &subtype2=arguments2[i].type();
+      const typet &subtype1=parameters1[i].type();
+      const typet &subtype2=parameters2[i].type();
       if(!base_type_eq_rec(subtype1, subtype2)) return false;
     }
     
@@ -256,11 +239,13 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_pointer)
   {
-    return base_type_eq_rec(type1.subtype(), type2.subtype());
+    return base_type_eq_rec(
+      to_pointer_type(type1).subtype(), to_pointer_type(type2).subtype());
   }
   else if(type1.id()==ID_array)
   {
-    if(!base_type_eq_rec(type1.subtype(), type2.subtype()))
+    if(!base_type_eq_rec(
+      to_array_type(type1).subtype(), to_array_type(type2).subtype()))
       return false;
 
     if(to_array_type(type1).size()!=to_array_type(type2).size())
@@ -270,9 +255,12 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_incomplete_array)
   {
-    return base_type_eq_rec(type1.subtype(), type2.subtype());
+    return base_type_eq_rec(
+      to_incomplete_array_type(type1).subtype(),
+      to_incomplete_array_type(type2).subtype());
   }
 
+  // the below will go away
   typet tmp1(type1), tmp2(type2);
 
   base_type(tmp1, ns);
@@ -308,6 +296,10 @@ bool base_type_eqt::base_type_eq_rec(
     
   for(unsigned i=0; i<expr1.operands().size(); i++)
     if(!base_type_eq(expr1.operands()[i], expr2.operands()[i]))
+      return false;
+
+  if(expr1.id()==ID_constant)
+    if(expr1.get(ID_value)!=expr2.get(ID_value))
       return false;
   
   return true;

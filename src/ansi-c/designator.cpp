@@ -6,11 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "designator.h"
 
 /*******************************************************************\
 
-Function: operator <<
+Function: designatort::print
 
   Inputs:
 
@@ -20,16 +22,13 @@ Function: operator <<
 
 \*******************************************************************/
 
-std::ostream &operator << (
-  std::ostream &out,
-  const designatort &designator)
+void designatort::print(std::ostream &out) const
 {
-  for(unsigned i=0; i<designator.size(); i++)
+  for(index_listt::const_iterator it=index_list.begin();
+      it!=index_list.end();
+      ++it)
   {
-    if(i!=0) out << ", ";
-    out << designator[i].type.id() << " "
-        << designator[i].index << "/" << designator[i].size;
+    if(it!=index_list.begin()) out << ", ";
+    out << it->type.id() << " " << it->index << "/" << it->size;
   }
-  
-  return out;
 }

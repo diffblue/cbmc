@@ -11,15 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // decision procedure wrapper for boolean propositional logics
 
-#include <message.h>
+#include <util/message.h>
+#include <util/threeval.h>
 
-#include "literal.h"
-
-class tvt;
+#include "prop_assignment.h"
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt:public messaget
+class propt:public messaget, public prop_assignmentt
 {
 public:
   propt() { }
@@ -30,7 +29,6 @@ public:
   virtual literalt lor(literalt a, literalt b)=0;
   virtual literalt land(const bvt &bv)=0;
   virtual literalt lor(const bvt &bv)=0;
-  virtual literalt lnot(literalt a)=0;
   virtual literalt lxor(literalt a, literalt b)=0;
   virtual literalt lxor(const bvt &bv)=0;
   virtual literalt lnand(literalt a, literalt b)=0;
@@ -51,8 +49,21 @@ public:
   { l_set_to(a, false); }
 
   // constraints
+  inline void lcnf(literalt l0, literalt l1)
+  { lcnf_bv.resize(2); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf(lcnf_bv); }
+
+  inline void lcnf(literalt l0, literalt l1, literalt l2)
+  { lcnf_bv.resize(3); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf(lcnf_bv); }
+
+  inline void lcnf(literalt l0, literalt l1, literalt l2, literalt l3)
+  { lcnf_bv.resize(4); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf_bv[3]=l3; lcnf(lcnf_bv); }
+
   virtual void lcnf(const bvt &bv)=0;
   virtual bool has_set_to() const { return true; }
+
+  // Some solvers (notably aig) prefer encodings that avoid raw CNF
+  // They overload this to return false and thus avoid some optimisations
+  virtual bool cnf_handled_well() const { return true; }
   
   // assumptions
   virtual void set_assumptions(const bvt &_assumptions) { }
@@ -61,26 +72,31 @@ public:
   // variables
   virtual literalt new_variable()=0;
   virtual void set_variable_name(literalt a, const std::string &name) { }
-  virtual unsigned no_variables() const=0;
-  bvt new_variables(unsigned width);
+  virtual size_t no_variables() const=0;
+  bvt new_variables(std::size_t width);
   
   // solving
   virtual const std::string solver_text()=0;
   typedef enum { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR } resultt;
   virtual resultt prop_solve()=0;  
   
-  // satisfying assignment
+  // satisfying assignment, from prop_assignmentt
   virtual tvt l_get(literalt a) const=0;
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_assignment_from(const propt &prop);
 
-  // returns true if an assumption is in the final conflict
+  // Returns true if an assumption is in the final conflict.
+  // Note that only literals that are assumptions (see set_assumptions)
+  // may be queried.
   virtual bool is_in_conflict(literalt l) const;  
   virtual bool has_is_in_conflict() const { return false; }
+  
+  // an incremental solver may remove any variables that aren't frozen
+  virtual void set_frozen(literalt a) { }
 
-  // cores -- will be removed
-  virtual bool is_in_core(literalt l) const;
-  virtual bool has_in_core() const { return false; }
+protected:
+  // to avoid a temporary for lcnf(...)
+  bvt lcnf_bv;
 };
 
 #endif

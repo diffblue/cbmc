@@ -7,12 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#include <assert.h>
-
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <xml_irep.h>
-#include <context.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/xml_irep.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 
@@ -249,9 +247,9 @@ void value_set_analysis_fivrt::get_globals(
   std::list<value_set_fivrt::entryt> &dest)
 {
   // static ones
-  forall_symbols(it, ns.get_context().symbols)
-    if(it->second.lvalue &&
-       it->second.static_lifetime)
+  forall_symbols(it, ns.get_symbol_table().symbols)
+    if(it->second.is_lvalue &&
+       it->second.is_static_lifetime)
       get_entries(it->second, dest);
 }    
 

@@ -7,24 +7,25 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <iostream>
 
-#include <context.h>
-#include <simplify_expr.h>
-#include <expr_util.h>
-#include <base_type.h>
-#include <std_expr.h>
-#include <i2string.h>
-#include <prefix.h>
-#include <std_code.h>
-#include <arith_tools.h>
+#include <util/symbol_table.h>
+#include <util/simplify_expr.h>
+#include <util/expr_util.h>
+#include <util/base_type.h>
+#include <util/std_expr.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
+#include <util/std_code.h>
+#include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
 #include <ansi-c/c_types.h>
 
 #include "value_set_fivrns.h"
 
-const value_set_fivrnst::object_map_dt value_set_fivrnst::object_map_dt::empty;
+const value_set_fivrnst::object_map_dt value_set_fivrnst::object_map_dt::blank;
 object_numberingt value_set_fivrnst::object_numbering;
 hash_numbering<irep_idt, irep_id_hash> value_set_fivrnst::function_numbering;
 
@@ -129,27 +130,27 @@ void value_set_fivrnst::output_entry(
 
     if(o.id()==ID_invalid)
     {
-      result+="#";
+      result+='#';
       result+=", *, "; // offset unknown
       if (o.type().id()==ID_unknown)
-        result+="*";
+        result+='*';
       else if (o.type().id()==ID_invalid)
-        result+="#";
+        result+='#';
       else
         result+=from_type(ns, identifier, o.type());        
-      result+=">";
+      result+='>';
     }
     else if (o.id()==ID_unknown)
     {
-      result+="*";
+      result+='*';
       result+=", *, "; // offset unknown
       if (o.type().id()==ID_unknown)
-        result+="*";
+        result+='*';
       else if (o.type().id()==ID_invalid)
-        result+="#";
+        result+='#';
       else
         result+=from_type(ns, identifier, o.type());        
-      result+=">";
+      result+='>';
     }
     else
     {
@@ -158,19 +159,19 @@ void value_set_fivrnst::output_entry(
       if(o_it->second.offset_is_set)
         result+=integer2string(o_it->second.offset)+"";
       else
-        result+="*";
+        result+='*';
       
       result+=", ";
       
       if (o.type().id()==ID_unknown)
-        result+="*";
+        result+='*';
       else
       {
         result+=from_type(ns, identifier, o.type());
       }
         
     
-      result+=">";
+      result+='>';
     }
 
     out << result << std::endl;
@@ -181,7 +182,7 @@ void value_set_fivrnst::output_entry(
     
     if (vr != object_map.read().validity_ranges.end())
     {
-      if (vr->second.size()==0)
+      if (vr->second.empty())
         std::cout << "        Empty validity record" << std::endl;
       else
         for (object_map_dt::vrange_listt::const_iterator vit =
@@ -453,21 +454,21 @@ void value_set_fivrnst::get_value_set_rec(
     // (if it exists)
     irep_idt ident = expr.get_string(ID_identifier)+suffix;
 
-		if(has_prefix(id2string(ident), alloc_adapter_prefix))
-		{
-			insert_from(dest, expr, 0);
-			return;
-		}
-		else
-		{
-			valuest::const_iterator v_it=values.find(ident);
-			
-			if(v_it!=values.end())
-			{
-			  copy_objects(dest, v_it->second.object_map);
-	      return;
-	    }
-		}
+    if(has_prefix(id2string(ident), alloc_adapter_prefix))
+    {
+      insert_from(dest, expr, 0);
+      return;
+    }
+    else
+    {
+      valuest::const_iterator v_it=values.find(ident);
+            
+      if(v_it!=values.end())
+      {
+        copy_objects(dest, v_it->second.object_map);
+        return;
+      }
+    }
   }
   else if(expr.id()==ID_if)
   {
@@ -490,8 +491,7 @@ void value_set_fivrnst::get_value_set_rec(
     
     return;
   }
-  else if(expr.id()==ID_dereference ||
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     object_mapt reference_set;
     get_reference_set(expr, reference_set, ns);
@@ -608,7 +608,7 @@ void value_set_fivrnst::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()==ID_sideeffect)
+  else if(expr.id()==ID_side_effect)
   {
     const irep_idt &statement=expr.get(ID_statement);
     
@@ -775,8 +775,7 @@ void value_set_fivrnst::get_reference_set_rec(
 
     return;
   }
-  else if(expr.id()==ID_dereference ||
-          expr.id()=="implicit_dereference")
+  else if(expr.id()==ID_dereference)
   {
     if(expr.operands().size()!=1)
       throw expr.id_string()+" expected to have one operand";
@@ -1234,8 +1233,7 @@ void value_set_fivrnst::assign_rec(
     
     make_union(temp_entry.object_map, values_rhs);
   }
-  else if(lhs.id()==ID_dereference ||
-          lhs.id()=="implicit_dereference")
+  else if(lhs.id()==ID_dereference)
   {
     if(lhs.operands().size()!=1)
       throw lhs.id_string()+" expected to have one operand";
@@ -1339,7 +1337,7 @@ void value_set_fivrnst::do_function_call(
   const symbolt &symbol=ns.lookup(function);
 
   const code_typet &type=to_code_type(symbol.type);
-  const code_typet::argumentst &argument_types=type.arguments();
+  const code_typet::parameterst &parameter_types=type.parameters();
 
   // these first need to be assigned to dummy, temporary arguments
   // and only thereafter to the actuals, in order
@@ -1355,7 +1353,7 @@ void value_set_fivrnst::do_function_call(
   
   for(unsigned i=0; i<arguments.size(); i++)
   {
-    const std::string identifier="value_set::" + function.as_string() + "::" +  
+    const std::string identifier="value_set::" + id2string(function) + "::" +  
                                  "argument$"+i2string(i);
     add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
@@ -1377,9 +1375,9 @@ void value_set_fivrnst::do_function_call(
 
   unsigned i=0;
 
-  for(code_typet::argumentst::const_iterator
-      it=argument_types.begin();
-      it!=argument_types.end();
+  for(code_typet::parameterst::const_iterator
+      it=parameter_types.begin();
+      it!=parameter_types.end();
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
@@ -1388,7 +1386,7 @@ void value_set_fivrnst::do_function_call(
     add_var(identifier, "");
   
     const exprt v_expr=
-      symbol_exprt("value_set::" + function.as_string() + "::" + 
+      symbol_exprt("value_set::" + id2string(function) + "::" + 
                    "argument$"+i2string(i), it->type());
     
     exprt actual_lhs=symbol_exprt(identifier, it->type());    

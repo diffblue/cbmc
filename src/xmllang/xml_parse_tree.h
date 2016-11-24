@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_XML_PARSE_TREE_H
 #define CPROVER_XML_PARSE_TREE_H
 
-#include "xml.h"
+#include <util/xml.h>
 
 class xml_parse_treet
 {

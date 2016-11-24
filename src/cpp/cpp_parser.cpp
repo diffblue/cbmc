@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <util/config.h>
+
 #include "cpp_parser.h"
 
 cpp_parsert cpp_parser;
@@ -26,25 +28,16 @@ bool cpp_parse();
 
 bool cpp_parsert::parse()
 {
+  // We use the ANSI-C scanner
+  ansi_c_parser.cpp98=true;
+  ansi_c_parser.cpp11=
+    config.cpp.cpp_standard==configt::cppt::cpp_standardt::CPP11 ||
+    config.cpp.cpp_standard==configt::cppt::cpp_standardt::CPP14;
+  ansi_c_parser.in=in;
+  ansi_c_parser.mode=mode;
+  ansi_c_parser.set_file(get_file());
+  ansi_c_parser.set_message_handler(get_message_handler());
+
   return cpp_parse();
 }
 
-/*******************************************************************\
-
-Function: yycpperror
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-extern char *yycpptext;
-
-int yycpperror(const std::string &error)
-{
-  cpp_parser.parse_error(error, yycpptext);
-  return error.size()+1;
-}

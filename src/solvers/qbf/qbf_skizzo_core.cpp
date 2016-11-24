@@ -6,12 +6,11 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <fstream>
 
 #include <util/i2string.h>
-#include <util/str_getline.h>
+#include <util/string2int.h>
 
 #include <cuddObj.hh> // CUDD Library
 
@@ -105,7 +104,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
       "Skizzo: "+
       i2string(no_variables())+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   std::string result_tmp_file="sKizzo.out";
@@ -136,7 +135,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -157,7 +156,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
     if(!result_found)
     {
-      messaget::error("Skizzo failed: unknown result");
+      messaget::error() << "Skizzo failed: unknown result" << messaget::eom;
       return P_ERROR;
     }
   }
@@ -167,7 +166,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
   if(result)
   {
-    messaget::status("Skizzo: TRUE");
+    messaget::status() << "Skizzo: TRUE" << messaget::eom;
 
     if(get_certificate())
       return P_ERROR;
@@ -176,7 +175,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
   }
   else
   {
-    messaget::status("Skizzo: FALSE");
+    messaget::status() << "Skizzo: FALSE" << messaget::eom;
     return P_UNSATISFIABLE;
   }
 }
@@ -246,7 +245,7 @@ bool qbf_skizzo_coret::get_certificate(void)
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -261,7 +260,7 @@ bool qbf_skizzo_coret::get_certificate(void)
 
   if(!result)
   {
-    messaget::error("Skizzo failed: unknown result");
+    messaget::error() << "Skizzo failed: unknown result" << messaget::eom;
     return true;
   }
 
@@ -281,13 +280,13 @@ bool qbf_skizzo_coret::get_certificate(void)
     std::string key="# existentials[";
 
     std::string line;
-    str_getline(in, line);
+    std::getline(in, line);
 
     assert(line=="# QBM file, 1.3");
 
     while(in)
     {
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -301,7 +300,7 @@ bool qbf_skizzo_coret::get_certificate(void)
 
     size_t ob=line.find('[');
     std::string n_es=line.substr(ob+1, line.find(']')-ob-1);
-    n_e=atoi(n_es.c_str());
+    n_e=unsafe_string2int(n_es);
     assert(n_e!=0);
 
     e_list.resize(n_e);
@@ -311,7 +310,7 @@ bool qbf_skizzo_coret::get_certificate(void)
     {
       size_t space=e_lists.find(' ');
 
-      int cur=atoi(e_lists.substr(0, space).c_str());
+      int cur=unsafe_string2int(e_lists.substr(0, space));
       assert(cur!=0);
 
       e_list[i]=cur;
@@ -360,9 +359,9 @@ bool qbf_skizzo_coret::get_certificate(void)
       DdNode *negNode = bdds[2*i+1];
 
       if(Cudd_DagSize(posNode) <= Cudd_DagSize(negNode))
-        model_bdds[cur]=new BDD(bdd_manager, posNode);
+        model_bdds[cur]=new BDD(*bdd_manager, posNode);
       else
-        model_bdds[cur]=new BDD(bdd_manager, Cudd_Not(negNode));
+        model_bdds[cur]=new BDD(*bdd_manager, Cudd_Not(negNode));
     }
 
     // tell CUDD that we don't need those BDDs anymore.

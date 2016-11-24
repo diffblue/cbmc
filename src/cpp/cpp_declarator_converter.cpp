@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <location.h>
-#include <std_types.h>
+#include <util/source_location.h>
+#include <util/std_types.h>
+
 #include <ansi-c/c_types.h>
 
 #include "cpp_type2name.h"
@@ -30,9 +31,9 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   class cpp_typecheckt &_cpp_typecheck):
   is_typedef(false),
   is_template(false),
-  is_template_argument(false),
+  is_template_parameter(false),
   is_friend(false),
-  mode(_cpp_typecheck.current_mode),
+  linkage_spec(_cpp_typecheck.current_linkage_spec),
   cpp_typecheck(_cpp_typecheck)
 {
 }
@@ -50,14 +51,14 @@ Function: cpp_declarator_convertert::convert
 \*******************************************************************/
 
 symbolt &cpp_declarator_convertert::convert(
-  const typet &type,
+  const typet &declaration_type,
   const cpp_storage_spect &storage_spec,
   const cpp_member_spect &member_spec,
   cpp_declaratort &declarator)
 {
-  assert(type.is_not_nil());
+  assert(declaration_type.is_not_nil());
 
-  if(type.id()=="cpp-cast-operator")
+  if(declaration_type.id()=="cpp-cast-operator")
   {
     typet type;
     type.swap(declarator.name().get_sub().back());
@@ -70,11 +71,12 @@ symbolt &cpp_declarator_convertert::convert(
   }
 
   assert(declarator.id()==ID_cpp_declarator);
-  final_type=declarator.merge_type(type);
+  final_type=declarator.merge_type(declaration_type);
   assert(final_type.is_not_nil());
   
   cpp_template_args_non_tct template_args;
-
+  
+  // run resolver on scope
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
 
@@ -84,13 +86,16 @@ symbolt &cpp_declarator_convertert::convert(
       declarator.name(), base_name, template_args);
 
     scope=&cpp_typecheck.cpp_scopes.current_scope();
+
+    // check the declarator-part of the type, in that scope
+    cpp_typecheck.typecheck_type(final_type);
   }
 
-  cpp_typecheck.typecheck_type(final_type);
   is_code=is_code_type(final_type);
 
+  // global-scope arrays must have fixed size
   if(scope->is_global_scope())
-    cpp_typecheck.check_array_types(final_type);
+    cpp_typecheck.check_fixed_size_array(final_type);
 
   get_final_identifier();
 
@@ -112,10 +117,10 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // try static first
-    contextt::symbolst::iterator c_it=
-      cpp_typecheck.context.symbols.find(final_identifier);
+    symbol_tablet::symbolst::iterator c_it=
+      cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-    if(c_it==cpp_typecheck.context.symbols.end())
+    if(c_it==cpp_typecheck.symbol_table.symbols.end())
     {
       // adjust type if it's a non-static member function
       if(final_type.id()==ID_code)
@@ -125,9 +130,9 @@ symbolt &cpp_declarator_convertert::convert(
       get_final_identifier();
 
       // try again
-      c_it = cpp_typecheck.context.symbols.find(final_identifier);
+      c_it=cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-      if(c_it==cpp_typecheck.context.symbols.end())
+      if(c_it==cpp_typecheck.symbol_table.symbols.end())
       {
         cpp_typecheck.err_location(declarator.name());
         cpp_typecheck.str << "member `" << base_name
@@ -137,11 +142,11 @@ symbolt &cpp_declarator_convertert::convert(
       }
     }
 
-    assert(c_it!=cpp_typecheck.context.symbols.end());
+    assert(c_it!=cpp_typecheck.symbol_table.symbols.end());
 
     symbolt &symbol=c_it->second;
 
-    combine_types(declarator.name().location(), final_type, symbol);
+    combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
 
     // If it is a constructor, we take care of the
@@ -159,7 +164,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(symbol_expr.id()!=ID_type ||
          symbol_expr.type().id()!=ID_symbol)
       {
-        cpp_typecheck.err_location(name.location());
+        cpp_typecheck.err_location(name.source_location());
         cpp_typecheck.str << "error: expected type";
         throw 0;
       }
@@ -198,27 +203,27 @@ symbolt &cpp_declarator_convertert::convert(
     if(final_type.id()==ID_code &&
        to_code_type(final_type).return_type().id()==ID_constructor)
     {
-      cpp_typecheck.err_location(declarator.name().location());
+      cpp_typecheck.err_location(declarator.name().source_location());
       cpp_typecheck.str << "function must have return type";
       throw 0;
     }
 
     // already there?
-    contextt::symbolst::iterator c_it=
-      cpp_typecheck.context.symbols.find(final_identifier);
+    symbol_tablet::symbolst::iterator c_it=
+      cpp_typecheck.symbol_table.symbols.find(final_identifier);
 
-    if(c_it==cpp_typecheck.context.symbols.end())
+    if(c_it==cpp_typecheck.symbol_table.symbols.end())
       return convert_new_symbol(storage_spec, member_spec, declarator);
 
     symbolt &symbol=c_it->second;
-
+    
     if(!storage_spec.is_extern())
       symbol.is_extern = false;
 
     if(declarator.get_bool("#template_case"))
       return symbol;
 
-    combine_types(declarator.name().location(), final_type, symbol);
+    combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
 
     // initializer?
@@ -228,13 +233,13 @@ symbolt &cpp_declarator_convertert::convert(
     {
       cpp_scopet::id_sett id_set;
 
-      scope->lookup_identifier(symbol.name, cpp_idt::TEMPLATE_ARGUMENT, id_set);
+      scope->lookup_identifier(symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
 
       if(id_set.empty())
       {
         cpp_idt &identifier=
           cpp_typecheck.cpp_scopes.put_into_scope(symbol,*scope);
-        identifier.id_class=cpp_idt::TEMPLATE_ARGUMENT;
+        identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
       }
     }
 
@@ -255,7 +260,7 @@ Function: cpp_declarator_convertert::combine_types
 \*******************************************************************/
 
 void cpp_declarator_convertert::combine_types(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &decl_type,
   symbolt &symbol)
 {
@@ -271,36 +276,36 @@ void cpp_declarator_convertert::combine_types(
       symbol_code_type.set_inlined(true);
 
     if(decl_code_type.return_type()==symbol_code_type.return_type() &&
-       decl_code_type.arguments().size()==symbol_code_type.arguments().size())
+       decl_code_type.parameters().size()==symbol_code_type.parameters().size())
     {
-      for(unsigned i=0; i<decl_code_type.arguments().size(); i++)
+      for(unsigned i=0; i<decl_code_type.parameters().size(); i++)
       {
-        const code_typet::argumentt &decl_argument=decl_code_type.arguments()[i];
-        code_typet::argumentt &symbol_argument=symbol_code_type.arguments()[i];
+        const code_typet::parametert &decl_parameter=decl_code_type.parameters()[i];
+        code_typet::parametert &symbol_parameter=symbol_code_type.parameters()[i];
 
         // first check type
-        if(decl_argument.type()!=symbol_argument.type())
+        if(decl_parameter.type()!=symbol_parameter.type())
         {
-          // The 'this' argument of virtual functions mismatches
+          // The 'this' parameter of virtual functions mismatches
           if(i!=0 || !symbol_code_type.get_bool("#is_virtual"))
           {
-            cpp_typecheck.err_location(location);
+            cpp_typecheck.err_location(source_location);
             cpp_typecheck.str << "symbol `" << symbol.display_name()
-                              << "': argument " << (i+1) << " type mismatch"
+                              << "': parameter " << (i+1) << " type mismatch"
                               << std::endl;
             cpp_typecheck.str << "previous type: "
-                              << cpp_typecheck.to_string(symbol_argument.type()) << std::endl;
+                              << cpp_typecheck.to_string(symbol_parameter.type()) << std::endl;
             cpp_typecheck.str << "new type: "
-                              << cpp_typecheck.to_string(decl_argument.type());
+                              << cpp_typecheck.to_string(decl_parameter.type());
             throw 0;
           }
         }
 
         if(symbol.value.is_nil())
         {
-          symbol_argument.set_base_name(decl_argument.get_base_name());
-          symbol_argument.set_identifier(decl_argument.get_identifier());
-          symbol_argument.location()=decl_argument.location();
+          symbol_parameter.set_base_name(decl_parameter.get_base_name());
+          symbol_parameter.set_identifier(decl_parameter.get_identifier());
+          symbol_parameter.add_source_location()=decl_parameter.source_location();
         }
       }
 
@@ -310,7 +315,8 @@ void cpp_declarator_convertert::combine_types(
   }
   else if(symbol.type==decl_type)
     return; // ok
-  else if(symbol.type.id()==ID_incomplete_array &&
+  else if(symbol.type.id()==ID_array &&
+          symbol.type.find(ID_size).is_nil() &&
           decl_type.id()==ID_array &&
           symbol.type.subtype()==decl_type.subtype())
   {
@@ -318,13 +324,13 @@ void cpp_declarator_convertert::combine_types(
     return; // ok
   }
 
-  cpp_typecheck.err_location(location);
+  cpp_typecheck.err_location(source_location);
   cpp_typecheck.str << "symbol `" << symbol.display_name()
-                    << "' already declared with different type"
+                    << "' already declared with different type:"
                     << std::endl;
-  cpp_typecheck.str << "previous type: "
+  cpp_typecheck.str << "original: "
                     << cpp_typecheck.to_string(symbol.type) << std::endl;
-  cpp_typecheck.str << "new type: "
+  cpp_typecheck.str << "     new: "
                     << cpp_typecheck.to_string(final_type);
   throw 0;
 }
@@ -383,7 +389,7 @@ void cpp_declarator_convertert::handle_initializer(
     // the symbol is really located here
     symbol.is_extern=false;
   }
-
+  
   if(symbol.value.is_nil())
   {
     // no initial value yet
@@ -428,22 +434,46 @@ Function: cpp_declarator_convertert::get_final_identifier
 
 void cpp_declarator_convertert::get_final_identifier()
 {
-  std::string identifier=base_name;
+  std::string identifier=id2string(base_name);
 
   // main is always "C" linkage, as a matter of principle
   if(is_code &&
-     base_name=="main" &&
+     base_name==ID_main &&
      scope->prefix=="")
   {
-    mode=ID_C;
+    linkage_spec=ID_C;
   }
 
-  if(is_code &&
-     mode!=ID_C)
-    identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+  if(is_code)
+  {
+    if(linkage_spec==ID_C)
+    {
+      // fine as is
+    }
+    else if(linkage_spec==ID_auto ||
+            linkage_spec==ID_cpp)
+    {
+      // Is there already an `extern "C"' function with the same name
+      // and the same signature?
+      symbol_tablet::symbolst::const_iterator
+        c_it=cpp_typecheck.symbol_table.symbols.find(identifier);
+        
+      if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
+         c_it->second.type.id()==ID_code &&
+         cpp_typecheck.function_identifier(final_type)==
+         cpp_typecheck.function_identifier(c_it->second.type))
+      {
+        // leave as is, no decoration
+      }
+      else
+      {
+        // add C++ decoration
+        identifier+=id2string(cpp_typecheck.function_identifier(final_type));
+      }
+    }
+  }
 
   final_identifier=
-    cpp_identifier_prefix(mode)+"::"+
     scope->prefix+
     identifier;
 }
@@ -471,33 +501,43 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   symbol.name=final_identifier;
   symbol.base_name=base_name;
-  symbol.value = declarator.value();
-  symbol.location=declarator.name().location();
-  symbol.mode=mode;
+  symbol.value=declarator.value();
+  symbol.location=declarator.name().source_location();
+  symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
-  symbol.type = final_type;
+  symbol.type=final_type;
   symbol.is_type=is_typedef;
-  symbol.is_macro=is_typedef && !is_template_argument;
+  symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
-  symbol.mode=cpp_typecheck.current_mode;
-
+  
+  // Constant? These are propagated.
+  if(symbol.type.get_bool(ID_C_constant) &&
+     symbol.value.is_not_nil())
+    symbol.is_macro=true;
+  
   if(member_spec.is_inline())
     symbol.type.set(ID_C_inlined, true);
 
   if(!symbol.is_type)
   {
-    if(!is_code)
+    if(is_code)
+    {
+      // it is a function
+      if(storage_spec.is_static())
+        symbol.is_file_local=true;
+    }
+    else
     {
       // it is a variable
-      symbol.is_statevar=true;
-      symbol.lvalue = !is_reference(symbol.type) &&
-                      !(symbol.type.get_bool(ID_C_constant) &&
-                        is_number(symbol.type) &&
-                        symbol.value.id() == ID_constant);
+      symbol.is_state_var=true;
+      symbol.is_lvalue = !is_reference(symbol.type) &&
+                         !(symbol.type.get_bool(ID_C_constant) &&
+                         is_number(symbol.type) &&
+                         symbol.value.id() == ID_constant);
 
       if(cpp_typecheck.cpp_scopes.current_scope().is_global_scope())
       {
-        symbol.static_lifetime=true;
+        symbol.is_static_lifetime=true;
 
         if(storage_spec.is_extern())
           symbol.is_extern=true;
@@ -506,8 +546,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       {
         if(storage_spec.is_static())
         {
-          symbol.static_lifetime=true;
-          symbol.file_local=true;
+          symbol.is_static_lifetime=true;
+          symbol.is_file_local=true;
         }
         else if(storage_spec.is_extern())
         {
@@ -516,18 +556,16 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         }
       }
     }
-    else
-      symbol.theorem=true;
   }
 
-  if(symbol.static_lifetime)
-    cpp_typecheck.dinis.push_back(symbol.name);
+  if(symbol.is_static_lifetime)
+    cpp_typecheck.dynamic_initializations.push_back(symbol.name);
 
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
 
-  if(cpp_typecheck.context.move(symbol, new_symbol))
-    throw "cpp_typecheckt::convert_declarator: context.move() failed";
+  if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
+    throw "cpp_typecheckt::convert_declarator: symbol_table.move() failed";
 
   if(!is_code)
   {
@@ -560,8 +598,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   if(is_template)
     identifier.id_class=cpp_idt::TEMPLATE;
-  else if(is_template_argument)
-    identifier.id_class=cpp_idt::TEMPLATE_ARGUMENT;
+  else if(is_template_parameter)
+    identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
   else if(is_typedef)
     identifier.id_class=cpp_idt::TYPEDEF;
   else
@@ -598,27 +636,27 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
 {
   if(is_code)
   {
-    const irept::subt &arguments=
-      final_type.find(ID_arguments).get_sub();
+    const irept::subt &parameters=
+      final_type.find(ID_parameters).get_sub();
 
-    std::string result=scope->prefix+base_name+"(";
+    std::string result=scope->prefix+id2string(base_name)+"(";
 
-    forall_irep(it, arguments)
+    forall_irep(it, parameters)
     {
-      const typet &argument_type=((exprt &)*it).type();
+      const typet &parameter_type=((exprt &)*it).type();
 
-      if(it!=arguments.begin())
+      if(it!=parameters.begin())
         result+=", ";
 
-      result+=cpp_typecheck.to_string(argument_type);
+      result+=cpp_typecheck.to_string(parameter_type);
     }
 
-    result+=")";
+    result+=')';
 
     return result;
   }
 
-  return scope->prefix+base_name;
+  return scope->prefix+id2string(base_name);
 }
 
 /*******************************************************************\
@@ -654,7 +692,7 @@ Function: cpp_declarator_convertert::main_function_rules
 void cpp_declarator_convertert::main_function_rules(
   const symbolt &symbol)
 {
-  if(symbol.name=="c::main")
+  if(symbol.name==ID_main)
   {
     if(symbol.type.id()!=ID_code)
     {
@@ -663,13 +701,14 @@ void cpp_declarator_convertert::main_function_rules(
     }
 
     const typet &return_type=
-      static_cast<const typet &>(
-        symbol.type.find(ID_return_type));
+      to_code_type(symbol.type).return_type();
 
-    if(return_type!=int_type())
+    if(return_type!=signed_int_type())
     {
-      cpp_typecheck.err_location(symbol.location);
-      throw "main must return int";
+      // Too many embedded compilers ignore this rule.
+      //
+      //cpp_typecheck.err_location(symbol.location);
+      //throw "main must return int";
     }
   }
 }

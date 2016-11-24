@@ -7,12 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#include <assert.h>
-
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <xml_irep.h>
-#include <context.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/xml_irep.h>
+#include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
 
@@ -158,7 +156,7 @@ void value_set_analysis_fit::get_entries_rec(
   if(t.id()==ID_struct ||
      t.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(t);
+    const struct_union_typet &struct_type=to_struct_union_type(t);
     
     const struct_typet::componentst &c=struct_type.components();
     
@@ -249,9 +247,9 @@ void value_set_analysis_fit::get_globals(
   std::list<value_set_fit::entryt> &dest)
 {
   // static ones
-  forall_symbols(it, ns.get_context().symbols)
-    if(it->second.lvalue &&
-       it->second.static_lifetime)
+  forall_symbols(it, ns.get_symbol_table().symbols)
+    if(it->second.is_lvalue &&
+       it->second.is_static_lifetime)
       get_entries(it->second, dest);
 }    
 
@@ -293,7 +291,7 @@ bool value_set_analysis_fit::check_type(const typet &type)
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_union_typet &struct_type=to_struct_union_type(type);
     
     const struct_typet::componentst &components=
       struct_type.components();

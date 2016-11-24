@@ -11,16 +11,16 @@ Date: January 2010
 #ifndef CPROVER_UNINITALIZED_H
 #define CPROVER_UNINITALIZED_H
 
-#include <iostream>
+#include <iosfwd>
 
 #include <goto-programs/goto_functions.h>
 
 void add_uninitialized_locals_assertions(
-  class contextt &context,
+  class symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
 void show_uninitialized(
-  const class contextt &context,
+  const class symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   std::ostream &out);
 

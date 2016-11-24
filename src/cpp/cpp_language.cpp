@@ -6,25 +6,25 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
 #include <sstream>
 #include <fstream>
 
-#include <config.h>
-#include <replace_symbol.h>
+#include <util/config.h>
+#include <util/replace_symbol.h>
+
+#include <linking/linking.h>
+#include <linking/entry_point.h>
 
 #include <ansi-c/c_preprocess.h>
-#include <ansi-c/c_link.h>
-#include <ansi-c/c_main.h>
 #include <ansi-c/trans_unit.h>
 
-#include "internal_additions.h"
+#include "cpp_internal_additions.h"
 #include "cpp_language.h"
 #include "expr2cpp.h"
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"
-#include "cpp_final.h"
+#include "cpp_type2name.h"
 
 /*******************************************************************\
 
@@ -43,8 +43,10 @@ std::set<std::string> cpp_languaget::extensions() const
   std::set<std::string> s;
   
   s.insert("cpp");
+  s.insert("CPP");
   s.insert("cc");
-  s.insert("ipp");
+  s.insert("c++");
+  s.insert("ii");
   s.insert("cxx");
   
   #ifndef _WIN32
@@ -86,11 +88,13 @@ Function: cpp_languaget::preprocess
 bool cpp_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
-  std::ostream &outstream,
-  message_handlert &message_handler)
+  std::ostream &outstream)
 {
+  if(config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C)
+    config.ansi_c.mode=configt::ansi_ct::flavourt::MODE_GCC_CPP;
+
   if(path=="")
-    return c_preprocess(instream, outstream, message_handler);
+    return c_preprocess(instream, outstream, get_message_handler());
 
   // check extension
 
@@ -107,7 +111,7 @@ bool cpp_languaget::preprocess(
     return false;
   }
 
-  return c_preprocess(path, outstream, message_handler);
+  return c_preprocess(path, outstream, get_message_handler());
 }
 
 /*******************************************************************\
@@ -124,8 +128,7 @@ Function: cpp_languaget::parse
 
 bool cpp_languaget::parse(
   std::istream &instream,
-  const std::string &path,
-  message_handlert &message_handler)
+  const std::string &path)
 {
   // store the path
 
@@ -137,7 +140,7 @@ bool cpp_languaget::parse(
 
   cpp_internal_additions(o_preprocessed);
 
-  if(preprocess(instream, path, o_preprocessed, message_handler))
+  if(preprocess(instream, path, o_preprocessed))
     return true;
 
   std::istringstream i_preprocessed(o_preprocessed.str());
@@ -145,17 +148,36 @@ bool cpp_languaget::parse(
   // parsing
 
   cpp_parser.clear();
-  cpp_parser.filename=path;
+  cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.set_message_handler(message_handler);
-  cpp_parser.grammar=cpp_parsert::LANGUAGE;
+  cpp_parser.set_message_handler(get_message_handler());
 
-  if(config.ansi_c.os==configt::ansi_ct::OS_WIN)
-    cpp_parser.mode=cpp_parsert::MSC;
-  else
-    cpp_parser.mode=cpp_parsert::GCC;
-
-  cpp_scanner_init();
+  switch(config.ansi_c.mode)
+  {
+  case configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP:
+    cpp_parser.mode=ansi_c_parsert::CW;
+    break;
+   
+  case configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP:
+    cpp_parser.mode=ansi_c_parsert::MSC;
+    break;
+    
+  case configt::ansi_ct::flavourt::MODE_ANSI_C_CPP:
+    cpp_parser.mode=ansi_c_parsert::ANSI;
+    break;
+    
+  case configt::ansi_ct::flavourt::MODE_GCC_C:
+  case configt::ansi_ct::flavourt::MODE_GCC_CPP:
+    cpp_parser.mode=ansi_c_parsert::GCC;
+    break;
+    
+  case configt::ansi_ct::flavourt::MODE_ARM_C_CPP:
+    cpp_parser.mode=ansi_c_parsert::ARM;
+    break;
+    
+  default:
+    assert(false);
+  }
 
   bool result=cpp_parser.parse();
 
@@ -181,18 +203,17 @@ Function: cpp_languaget::typecheck
 \*******************************************************************/
 
 bool cpp_languaget::typecheck(
-  contextt &context,
-  const std::string &module,
-  message_handlert &message_handler)
+  symbol_tablet &symbol_table,
+  const std::string &module)
 {
   if(module=="") return false;
 
-  contextt new_context;
+  symbol_tablet new_symbol_table;
 
-  if(cpp_typecheck(cpp_parse_tree, new_context, module, message_handler))
+  if(cpp_typecheck(cpp_parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
-  return c_link(context, new_context, message_handler);
+  return linking(symbol_table, new_symbol_table, get_message_handler());
 }
 
 /*******************************************************************\
@@ -207,12 +228,10 @@ Function: cpp_languaget::final
 
 \*******************************************************************/
 
-bool cpp_languaget::final(
-  contextt &context,
-  message_handlert &message_handler)
+bool cpp_languaget::final(symbol_tablet &symbol_table)
 {
-  if(cpp_final(context, message_handler)) return true;
-  if(c_main(context, "c::", "c::main", message_handler)) return true;
+  if(entry_point(symbol_table, "main", get_message_handler()))
+    return true;
 
   return false;
 }
@@ -365,6 +384,27 @@ bool cpp_languaget::from_type(
 
 /*******************************************************************\
 
+Function: cpp_languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool cpp_languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  name=cpp_type2name(type);
+  return false;
+}
+
+/*******************************************************************\
+
 Function: cpp_languaget::to_expr
 
   Inputs:
@@ -379,7 +419,6 @@ bool cpp_languaget::to_expr(
   const std::string &code,
   const std::string &module,
   exprt &expr,
-  message_handlert &message_handler,
   const namespacet &ns)
 {
   expr.make_nil();
@@ -391,11 +430,9 @@ bool cpp_languaget::to_expr(
   // parsing
 
   cpp_parser.clear();
-  cpp_parser.filename="";
+  cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.set_message_handler(message_handler);
-  cpp_parser.grammar=cpp_parsert::EXPRESSION;
-  cpp_scanner_init();
+  cpp_parser.set_message_handler(get_message_handler());
 
   bool result=cpp_parser.parse();
 
@@ -407,7 +444,7 @@ bool cpp_languaget::to_expr(
     //expr.swap(cpp_parser.parse_tree.declarations.front());
 
     // typecheck it
-    result=cpp_typecheck(expr, message_handler, ns);
+    result=cpp_typecheck(expr, get_message_handler(), ns);
   }
 
   // save some memory

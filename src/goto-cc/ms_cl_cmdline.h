@@ -20,7 +20,6 @@ public:
 
   ms_cl_cmdlinet()
   {
-    mode=VISUAL_STUDIO;
   }
   
   void parse_env();

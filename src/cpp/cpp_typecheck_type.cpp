@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <location.h>
+#include <util/source_location.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -75,7 +75,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
 
-     qualifiers.write(type);
+    qualifiers.write(type);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -103,42 +103,40 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
       typecheck_type(class_object);
 
-      // there may be arguments if this is a pointer to member function
+      // there may be parameters if this is a pointer to member function
       if(type.subtype().id()==ID_code)
       {
-        irept::subt &args=type.subtype().add(ID_arguments).get_sub();
+        irept::subt &parameters=type.subtype().add(ID_parameters).get_sub();
 
-        if(args.empty() ||
-           args.front().get(ID_C_base_name)!=ID_this)
+        if(parameters.empty() ||
+           parameters.front().get(ID_C_base_name)!=ID_this)
         {
-          // Add 'this' to the arguments
-          exprt a0(ID_argument);
+          // Add 'this' to the parameters
+          exprt a0(ID_parameter);
           a0.set(ID_C_base_name, ID_this);
           a0.type().id(ID_pointer);
           a0.type().subtype() = class_object;
-          args.insert(args.begin(),a0);
+          parameters.insert(parameters.begin(), a0);
         }
       }
     }
 
     // now do qualifier
-    if(type.find("#qualifier").is_not_nil())
+    if(type.find(ID_C_qualifier).is_not_nil())
     {
-      typet &t=static_cast<typet &>(type.add("#qualifier"));
+      typet &t=static_cast<typet &>(type.add(ID_C_qualifier));
       cpp_convert_plain_type(t);
       c_qualifierst q(t);
       q.write(type);
     }
 
-    type.remove("#qualifier");
+    type.remove(ID_C_qualifier);
   }
   else if(type.id()==ID_array)
   {
     exprt &size_expr=to_array_type(type).size();
 
-    if(size_expr.is_nil())
-      type.id(ID_incomplete_array);
-    else
+    if(size_expr.is_not_nil())
       typecheck_expr(size_expr);
 
     typecheck_type(type.subtype());
@@ -154,10 +152,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     code_typet &code_type=to_code_type(type);
     typecheck_type(code_type.return_type());
 
-    code_typet::argumentst &arguments=code_type.arguments();
+    code_typet::parameterst &parameters=code_type.parameters();
 
-    for(code_typet::argumentst::iterator it=arguments.begin();
-        it!=arguments.end();
+    for(code_typet::parameterst::iterator it=parameters.begin();
+        it!=parameters.end();
         it++)
     {
       typecheck_type(it->type());
@@ -177,6 +175,13 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id()==ID_c_enum)
   {
     typecheck_enum_type(type);
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+  }
+  else if(type.id()==ID_c_bit_field)
+  {
+    typecheck_c_bit_field_type(to_c_bit_field_type(type));
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -240,19 +245,26 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typecheck_expr(e);
     type=e.type();
   }
-  #ifdef CPP_SYSTEMC_EXTENSION
-  else if(type.id()==ID_verilogbv)
-  {
-  }
-  #endif
   else if(type.id()==ID_unassigned)
   {
-    // ignore, for template argument guessing
+    // ignore, for template parameter guessing
+  }
+  else if(type.id()==ID_template_class_instance)
+  {
+    // ok (internally generated)
+  }
+  else if(type.id()==ID_block_pointer)
+  {
+    // This is an Apple extension for lambda-like constructs.
+    // http://thirdcog.eu/pwcblocks/
+  }
+  else if(type.id()==ID_nullptr)
+  {
   }
   else
   {
     err_location(type);
-    str << "unexpected type: " << type.pretty();
+    str << "unexpected cpp type: " << type.pretty();
     throw 0;
   }
   

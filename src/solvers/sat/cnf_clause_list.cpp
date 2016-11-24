@@ -6,7 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <ostream>
 
 #include "cnf_clause_list.h"
 
@@ -47,7 +48,7 @@ Function: cnf_clause_list_assignmentt::print_assignment
 void cnf_clause_list_assignmentt::print_assignment(std::ostream &out) const
 {
   for(unsigned v=1; v<assignment.size(); v++)
-    out << "v" << v << "=" << assignment[v] << std::endl;
+    out << "v" << v << "=" << assignment[v] << "\n";
 }
 
 /*******************************************************************\

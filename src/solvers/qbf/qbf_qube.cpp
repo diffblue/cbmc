@@ -6,13 +6,9 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <fstream>
-
-#include <i2string.h>
-#include <str_getline.h>
 
 #include "qbf_qube.h"
 
@@ -104,11 +100,10 @@ propt::resultt qbf_qubet::prop_solve()
     return P_SATISFIABLE;
 
   {
-    std::string msg=
-      "QuBE: "+
-      i2string(no_variables())+" variables, "+
-      i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << 
+      "QuBE: " <<
+      no_variables() << " variables, " <<
+      no_clauses() << " clauses" << eom;
   }
 
   std::string qbf_tmp_file="qube.qdimacs";
@@ -125,9 +120,10 @@ propt::resultt qbf_qubet::prop_solve()
   std::string options="";
 
   // solve it
-  system(("QuBE "+qbf_tmp_file+
+  int res=system(("QuBE "+qbf_tmp_file+
          options+
          " > "+result_tmp_file).c_str());
+  assert(0 == res);
 
   bool result=false;
 
@@ -140,7 +136,7 @@ propt::resultt qbf_qubet::prop_solve()
     {
       std::string line;
 
-      str_getline(in, line);
+      std::getline(in, line);
 
       if(line!="" && line[line.size()-1]=='\r')
         line.resize(line.size()-1);
@@ -161,19 +157,19 @@ propt::resultt qbf_qubet::prop_solve()
 
     if(!result_found)
     {
-      messaget::error("QuBE failed: unknown result");
+      messaget::error() << "QuBE failed: unknown result" << eom;
       return P_ERROR;
     }
   }
 
   if(result)
   {
-    messaget::status("QuBE: TRUE");
+    messaget::status() << "QuBE: TRUE" << eom;
     return P_SATISFIABLE;
   }
   else
   {
-    messaget::status("QuBE: FALSE");
+    messaget::status() << "QuBE: FALSE" << eom;
     return P_UNSATISFIABLE;
   }
 

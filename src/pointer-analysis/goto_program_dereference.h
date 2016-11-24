@@ -9,24 +9,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H
 
-#include <namespace.h>
+#include <util/namespace.h>
+
 #include <goto-programs/goto_functions.h>
 
 #include "value_sets.h"
-#include "dereference.h"
+#include "value_set_dereference.h"
 
 class goto_program_dereferencet:protected dereference_callbackt
 {
 public:
   goto_program_dereferencet(
     const namespacet &_ns,
-    contextt &_new_context,
+    symbol_tablet &_new_symbol_table,
     const optionst &_options,
     value_setst &_value_sets):
     options(_options),
     ns(_ns),
     value_sets(_value_sets),
-    dereference(_ns, _new_context, _options, *this) { }
+    dereference(_ns, _new_symbol_table, _options, *this) { }
 
   void dereference_program(
     goto_programt &goto_program,
@@ -51,7 +52,7 @@ protected:
   const optionst &options;
   const namespacet &ns;
   value_setst &value_sets;
-  dereferencet dereference;
+  value_set_dereferencet dereference;
 
   virtual bool is_valid_object(const irep_idt &identifier);
 
@@ -71,11 +72,11 @@ protected:
     bool checks_only=false);
 
 protected:
-  void dereference_rec(exprt &expr, guardt &guard, const dereferencet::modet mode);
-  void dereference_expr(exprt &expr, const bool checks_only, const dereferencet::modet mode);
+  void dereference_rec(exprt &expr, guardt &guard, const value_set_dereferencet::modet mode);
+  void dereference_expr(exprt &expr, const bool checks_only, const value_set_dereferencet::modet mode);
   
   const std::set<irep_idt> *valid_local_variables;
-  locationt dereference_location;
+  source_locationt dereference_location;
   goto_programt::const_targett current_target;
   
   std::set<exprt> assertions;
@@ -90,23 +91,23 @@ void dereference(
 
 void remove_pointers(
   goto_programt &goto_program,
-  contextt &context,
+  symbol_tablet &symbol_table,
   value_setst &value_sets);
 
 void remove_pointers(
   goto_functionst &goto_functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   value_setst &value_sets);
 
 void pointer_checks(
   goto_programt &goto_program,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const optionst &options,
   value_setst &value_sets);
 
 void pointer_checks(
   goto_functionst &goto_functions,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const optionst &options,
   value_setst &value_sets);
 

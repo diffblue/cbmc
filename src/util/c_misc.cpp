@@ -6,9 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdio.h>
+#include <cstdio>
 
-#include <c_misc.h>
+#ifdef _WIN32
+#ifndef __MINGW32__
+#define snprintf sprintf_s
+#endif
+#endif
+
+#include "c_misc.h"
 
 /*******************************************************************\
 
@@ -24,17 +30,17 @@ Function: MetaChar
 
 void MetaChar(std::string &out, char c, bool inString)
 {
-  switch (c)
+  switch(c)
   {
   case '\'':
-    if (inString) 
+    if(inString) 
       out+="'";
     else
       out+="\\'";
     break;
 
   case '"':
-    if (inString) 
+    if(inString) 
       out+="\\\"";
     else
       out+="\"";
@@ -77,18 +83,41 @@ void MetaChar(std::string &out, char c, bool inString)
     break;
 
   default:
-    // Show low and high ascii as octal
-    if ((c < ' ') || (c >= 127))
+    // Show low and certain high ascii as octal
+    if(((unsigned char)c < ' ') || (c == 127))
     {
-        char octbuf[8];
-        sprintf(octbuf, "%03o", (unsigned char) c);
-        out+="\\";
-        out+=octbuf;
+      char octbuf[8];
+      snprintf(octbuf, sizeof(octbuf), "%03o", (unsigned char) c);
+      out+="\\";
+      out+=octbuf;
     }
     else
-        out+=c;
+    {
+      // leave everything else to permit UTF-8 and 8-bit codepages
+      out+=c;
+    }
+
     break;
   }
+}
+
+/*******************************************************************\
+
+Function: MetaChar
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::string MetaChar(char c)
+{
+  std::string result;
+  MetaChar(result, c, false);
+  return result;
 }
 
 /*******************************************************************\
@@ -103,8 +132,12 @@ Function: MetaString
 
 \*******************************************************************/
 
-void MetaString(std::string &out, const std::string &in)
+std::string MetaString(const std::string &in)
 {
+  std::string result;
+  
   for(unsigned i=0; i<in.size(); i++)
-    MetaChar(out, in[i], true);
+    MetaChar(result, in[i], true);
+  
+  return result;
 }

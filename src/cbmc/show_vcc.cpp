@@ -33,9 +33,8 @@ void bmct::show_vcc(std::ostream &out)
 {
   switch(ui)
   {
-  case ui_message_handlert::OLD_GUI:
   case ui_message_handlert::XML_UI:
-    error("not supported");
+    error() << "not supported" << eom;
     return;
     
   case ui_message_handlert::PLAIN:
@@ -45,42 +44,56 @@ void bmct::show_vcc(std::ostream &out)
     assert(false);
   }   
     
-  out << std::endl << "VERIFICATION CONDITIONS:" << std::endl << std::endl;
+  out << "\n" << "VERIFICATION CONDITIONS:" << "\n" << "\n";
 
   languagest languages(ns, new_ansi_c_language());
+  
+  bool has_threads=equation.has_threads();
 
   for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+      s_it=equation.SSA_steps.begin();
+      s_it!=equation.SSA_steps.end();
+      s_it++)
   {
-    if(!it->is_assert()) continue;
-
-    if(it->source.pc->location.is_not_nil())
-      out << it->source.pc->location << std::endl;
+    if(!s_it->is_assert()) continue;
     
-    if(it->comment!="")
-      out << it->comment << std::endl;
+    if(s_it->source.pc->source_location.is_not_nil())
+      out << s_it->source.pc->source_location << "\n";
+    
+    if(s_it->comment!="")
+      out << s_it->comment << "\n";
       
     symex_target_equationt::SSA_stepst::const_iterator
       p_it=equation.SSA_steps.begin();
+
+    // we show everything in case there are threads
+    symex_target_equationt::SSA_stepst::const_iterator
+      last_it=has_threads?equation.SSA_steps.end():s_it;
       
-    for(unsigned count=1; p_it!=it; p_it++)
-      if(p_it->is_assume() || p_it->is_assignment())
+    for(unsigned count=1; p_it!=last_it; p_it++)
+      if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
         if(!p_it->ignore)
         {
           std::string string_value;
           languages.from_expr(p_it->cond_expr, string_value);
-          out << "{-" << count << "} " << string_value << std::endl;
+          out << "{-" << count << "} " << string_value << "\n";
+
+          #if 0
+          languages.from_expr(p_it->guard_expr, string_value);
+          out << "GUARD: " << string_value << "\n";
+          out << "\n";
+          #endif
+          
           count++;
         }
 
-    out << "|--------------------------" << std::endl;
+    out << "|--------------------------" << "\n";
 
     std::string string_value;
-    languages.from_expr(it->cond_expr, string_value);
-    out << "{" << 1 << "} " << string_value << std::endl;
+    languages.from_expr(s_it->cond_expr, string_value);
+    out << "{" << 1 << "} " << string_value << "\n";
     
-    out << std::endl;
+    out << "\n";
   }
 }
 

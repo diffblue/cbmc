@@ -11,16 +11,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-class contextt;
+class symbol_tablet;
 class goto_functionst;
 class message_handlert;
+class goto_modelt;
 
 bool read_goto_binary(
   const std::string &filename,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &dest,
   message_handlert &message_handler);
   
+bool read_goto_binary(
+  const std::string &filename,
+  goto_modelt &dest,
+  message_handlert &message_handler);
+  
 bool is_goto_binary(const std::string &filename);
+
+class language_uit;
+
+bool read_object_and_link(
+  const std::string &file_name,
+  symbol_tablet &symbol_table,
+  goto_functionst &functions,
+  language_uit &language_ui);
 
 #endif

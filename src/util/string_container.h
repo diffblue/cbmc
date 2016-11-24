@@ -18,9 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 struct string_ptrt
 {
   const char *s;
-  unsigned len;
+  size_t len;
   
-  const char *c_str() const
+  inline const char *c_str() const
   {
     return s;
   }
@@ -45,29 +45,34 @@ public:
 class string_containert
 {
 public:
-  unsigned operator[](const char *s)
+  inline unsigned operator[](const char *s)
   {
     return get(s);
   }
   
-  unsigned operator[](const std::string &s)
+  inline unsigned operator[](const std::string &s)
   {
     return get(s);
   }
   
-  string_containert();
-  
-  const char *c_str(unsigned no) const
+  // constructor and destructor
+  string_containert();  
+  ~string_containert();
+
+  // the pointer is guaranteed to be stable  
+  inline const char *c_str(size_t no) const
   {
     return string_vector[no]->c_str();
   }
   
-  const std::string &get_string(unsigned no) const
+  // the reference is guaranteed to be stable
+  inline const std::string &get_string(size_t no) const
   {
     return *string_vector[no];
   }
   
 protected:
+  // the 'unsigned' ought to be size_t
   typedef hash_map_cont<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
   hash_tablet hash_table;
   

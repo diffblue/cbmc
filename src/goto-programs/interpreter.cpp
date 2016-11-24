@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cctype>
 #include <cstdio>
 #include <iostream>
+#include <algorithm>
 
-#include <std_types.h>
-#include <context.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
 
 #include "interpreter.h"
 #include "interpreter_class.h"
@@ -33,14 +34,14 @@ void interpretert::operator()()
   build_memory_map();
   
   const goto_functionst::function_mapt::const_iterator
-    main_it=goto_functions.function_map.find(ID_main);
+    main_it=goto_functions.function_map.find(goto_functionst::entry_point());
 
   if(main_it==goto_functions.function_map.end())
     throw "main not found";
   
   const goto_functionst::goto_functiont &goto_function=main_it->second;
   
-  if(!goto_function.body_available)
+  if(!goto_function.body_available())
     throw "main has no body";
 
   PC=goto_function.body.instructions.begin();
@@ -234,7 +235,7 @@ void interpretert::execute_goto()
 {
   if(evaluate_boolean(PC->guard))
   {
-    if(PC->targets.size()==0)
+    if(PC->targets.empty())
       throw "taken goto without target";
     
     if(PC->targets.size()>=2)
@@ -307,7 +308,7 @@ void interpretert::execute_assign()
   std::vector<mp_integer> rhs;
   evaluate(code_assign.rhs(), rhs);
   
-  if(rhs.size()!=0)
+  if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());  
     unsigned size=get_size(code_assign.lhs().type());
@@ -341,7 +342,7 @@ void interpretert::assign(
   {
     if(address<memory.size())
     {
-      memory_cellt &cell=memory[integer2long(address)];
+      memory_cellt &cell=memory[integer2unsigned(address)];
       std::cout << "** assigning " << cell.identifier
                 << "[" << cell.offset << "]:=" << rhs[i] << std::endl;
       cell.value=rhs[i];
@@ -433,12 +434,12 @@ void interpretert::execute_function_call()
   
   argument_values.resize(function_call.arguments().size());
   
-  for(unsigned i=0; i<function_call.arguments().size(); i++)
+  for(std::size_t i=0; i<function_call.arguments().size(); i++)
     evaluate(function_call.arguments()[i], argument_values[i]);
 
   // do the call
       
-  if(f_it->second.body_available)
+  if(f_it->second.body_available())
   {
     call_stack.push(stack_framet());
     stack_framet &frame=call_stack.top();
@@ -479,15 +480,15 @@ void interpretert::execute_function_call()
     }
         
     // assign the arguments
-    const code_typet::argumentst &arguments=
-      to_code_type(f_it->second.type).arguments();
+    const code_typet::parameterst &parameters=
+      to_code_type(f_it->second.type).parameters();
 
-    if(argument_values.size()<arguments.size())
+    if(argument_values.size()<parameters.size())
       throw "not enough arguments";
 
-    for(unsigned i=0; i<arguments.size(); i++)
+    for(unsigned i=0; i<parameters.size(); i++)
     {
-      const code_typet::argumentt &a=arguments[i];
+      const code_typet::parametert &a=parameters[i];
       exprt symbol_expr(ID_symbol, a.type());
       symbol_expr.set(ID_identifier, a.get_identifier());
       assert(i<argument_values.size());
@@ -522,9 +523,9 @@ void interpretert::build_memory_map()
   memory[0].identifier="NULL-OBJECT";
 
   // now do regular static symbols
-  for(contextt::symbolst::const_iterator
-      it=context.symbols.begin();
-      it!=context.symbols.end();
+  for(symbol_tablet::symbolst::const_iterator
+      it=symbol_table.symbols.begin();
+      it!=symbol_table.symbols.end();
       it++)
     build_memory_map(it->second);
     
@@ -552,7 +553,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
   {
     size=1;
   }
-  else if(symbol.static_lifetime)
+  else if(symbol.is_static_lifetime)
   {
     size=get_size(symbol.type);
   }
@@ -589,14 +590,17 @@ unsigned interpretert::get_size(const typet &type) const
 {
   if(type.id()==ID_struct)
   {
-    const irept::subt &components=
-      type.find(ID_components).get_sub();
+    const struct_typet::componentst &components=
+      to_struct_type(type).components();
 
     unsigned sum=0;
 
-    forall_irep(it, components)
+    for(struct_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
+      const typet &sub_type=it->type();
 
       if(sub_type.id()!=ID_code)
         sum+=get_size(sub_type);
@@ -606,14 +610,17 @@ unsigned interpretert::get_size(const typet &type) const
   }
   else if(type.id()==ID_union)
   {
-    const irept::subt &components=
-      type.find(ID_components).get_sub();
+    const union_typet::componentst &components=
+      to_union_type(type).components();
 
     unsigned max_size=0;
 
-    forall_irep(it, components)
+    for(union_typet::componentst::const_iterator
+        it=components.begin();
+        it!=components.end();
+        it++)
     {
-      const typet &sub_type=static_cast<const typet &>(it->find(ID_type));
+      const typet &sub_type=it->type();
 
       if(sub_type.id()!=ID_code)
         max_size=std::max(max_size, get_size(sub_type));
@@ -629,7 +636,7 @@ unsigned interpretert::get_size(const typet &type) const
 
     mp_integer i;
     if(!to_integer(size_expr, i))
-      return subtype_size*integer2long(i);
+      return subtype_size*integer2unsigned(i);
     else
       return subtype_size;
   }
@@ -654,9 +661,9 @@ Function: interpreter
 \*******************************************************************/
 
 void interpreter(
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions)
 {
-  interpretert interpreter(context, goto_functions);
+  interpretert interpreter(symbol_table, goto_functions);
   interpreter();
 }

@@ -1,5 +1,6 @@
 %option 8bit nodefault
 %option nounput
+%option noinput
 
 %{
 #ifdef _WIN32
@@ -12,7 +13,7 @@ static int isatty(int) { return 0; }
 #include <stdlib.h>
 
 #include "xml_parser.h"
-#include "y.tab.h"
+#include "xml_y.tab.h"
 
 #define PARSER xml_parser
 
@@ -78,7 +79,7 @@ string		\"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 <DTD>.   {/* skip */}
 <DTD>\]{close}    {BEGIN(INITIAL); /* skip */}
 
-.			{ yyxmlerror("unexpected charater"); }
+.			{ yyxmlerror("unexpected character"); }
 {nl}			{/* skip, must be an extra one at EOF */;}
 
 %%

@@ -9,16 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_BASE_TYPE_H
 #define CPROVER_BASE_TYPE_H
 
-#include <union_find.h>
-#include <irep.h>
+#include "union_find.h"
+#include "irep.h"
 
 class exprt;
 class typet;
 class namespacet;
-
-// these go away
-void __old_base_type(typet &type, const namespacet &ns);
-void __old_base_type(exprt &expr, const namespacet &ns);
 
 bool base_type_eq(
   const typet &type1,

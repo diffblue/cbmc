@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ctype.h>
-#include <stdio.h>
+#include <cassert>
+#include <cctype>
+#include <cstdio>
 
 #include "unescape_string.h"
 
@@ -34,9 +35,12 @@ void unescape_string(
   {
     char ch=src[i];
 
-    if(ch=='\\')
+    if(ch=='\\') // escape?
     {
+      // go to next character
       i++;
+      assert(i<src.size()); // backslash can't be last character
+      
       ch=src[i];
       switch(ch)
       {
@@ -48,6 +52,35 @@ void unescape_string(
       case 'r': dest+='\r'; break; /* CR (0x0d) */
       case 'f': dest+='\f'; break; /* FF (0x0c) */
       case 'a': dest+='\a'; break; /* BEL (0x07) */
+      case '"': dest+='"'; break;
+      case '\'': dest+='\''; break;
+
+      case 'u': // universal character
+      case 'U': // universal character
+        i++;
+
+        {
+          std::string hex;
+          
+          unsigned count=(ch=='u')?4:8;
+          hex.reserve(count);
+
+          for(; count!=0 && i<src.size(); i++, count--)
+            hex+=src[i];
+
+          // go back
+          i--;
+        
+          unsigned int result;
+          sscanf(hex.c_str(), "%x", &result);
+
+          // Universal characters in non-wide strings don't
+          // really work; gcc just issues a warning.
+          ch=result;
+        }
+
+        dest+=ch;
+        break;
       
       case 'x': // hex
         i++;
@@ -60,14 +93,16 @@ void unescape_string(
             hex+=src[i];
             i++;
           }
+
+          // go back
+          i--;
         
           unsigned int result;
           sscanf(hex.c_str(), "%x", &result);
           ch=result;
         }
         
-        dest+=ch;
-      
+        dest+=ch;      
         break;
       
       default:
@@ -81,6 +116,9 @@ void unescape_string(
             i++;
           }
           
+          // go back
+          i--;
+          
           unsigned int result;
           sscanf(octal.c_str(), "%o", &result);
           ch=result;
@@ -88,8 +126,9 @@ void unescape_string(
         }
         else
         {
-          dest+='\\';
-          dest+=ch;
+          // Unknown escape sequence.
+          // Both GCC and CL turn \% into %.
+          dest.push_back(ch);
         }
       }
     }
@@ -112,17 +151,19 @@ Function: unescape_wide_string
 
 void unescape_wide_string(
   const std::string &src,
-  std::vector<unsigned int> &dest)
+  std::basic_string<unsigned int> &dest)
 {
-  dest.reserve(src.size());
-
+  dest.reserve(src.size()); // about that long, but may be shorter
+  
   for(unsigned i=0; i<src.size(); i++)
   {
     unsigned int ch=(unsigned char)src[i];
-
-    if(ch=='\\')
+    
+    if(ch=='\\') // escape?
     {
       i++;
+      assert(i<src.size()); // backslash can't be last character
+
       ch=(unsigned char)src[i];
       switch(ch)
       {
@@ -134,7 +175,33 @@ void unescape_wide_string(
       case 'r': dest.push_back('\r'); break; /* CR (0x0d) */
       case 'f': dest.push_back('\f'); break; /* FF (0x0c) */
       case 'a': dest.push_back('\a'); break; /* BEL (0x07) */
+      case '"': dest.push_back('"'); break;
+      case '\'': dest.push_back('\''); break;
       
+      case 'u': // universal character
+      case 'U': // universal character
+        i++;
+
+        {
+          std::string hex;
+          
+          unsigned count=(ch=='u')?4:8;
+          hex.reserve(count);
+
+          for(; count!=0 && i<src.size(); i++, count--)
+            hex+=src[i];
+
+          // go back
+          i--;
+        
+          unsigned int result;
+          sscanf(hex.c_str(), "%x", &result);
+          ch=result;
+        }
+        
+        dest.push_back(ch);
+        break;
+
       case 'x': // hex
         i++;
 
@@ -146,13 +213,15 @@ void unescape_wide_string(
             i++;
           }
         
+          // go back
+          i--;
+
           unsigned int result;
           sscanf(hex.c_str(), "%x", &result);
           ch=result;
         }
         
-        dest.push_back(ch);
-      
+        dest.push_back(ch);      
         break;
       
       default:
@@ -166,6 +235,9 @@ void unescape_wide_string(
             i++;
           }
           
+          // go back
+          i--;
+          
           unsigned int result;
           sscanf(octal.c_str(), "%o", &result);
           ch=result;
@@ -173,7 +245,8 @@ void unescape_wide_string(
         }
         else
         {
-          dest.push_back('\\');
+          // Unknown escape sequence.
+          // Both GCC and CL turn \% into %.
           dest.push_back(ch);
         }
       }

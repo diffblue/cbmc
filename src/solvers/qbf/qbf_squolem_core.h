@@ -9,7 +9,7 @@ Author: CM Wintersteiger
 #ifndef CPROVER_QBF_SQUOLEM_CORE_H
 #define CPROVER_QBF_SQUOLEM_CORE_H
 
-#include <hash_cont.h>
+#include <util/hash_cont.h>
 #include <quannon/squolem2/squolem2.h>
 
 #include "qdimacs_core.h"
@@ -35,8 +35,8 @@ public:
   virtual void lcnf(const bvt &bv);
   virtual void add_quantifier(const quantifiert &quantifier);
   virtual void set_quantifier(const quantifiert::typet type, const literalt l);
-  virtual void set_no_variables(unsigned no);
-  virtual unsigned no_clauses() const { return squolem->clauses(); }
+  virtual void set_no_variables(size_t no);
+  virtual size_t no_clauses() const { return squolem->clauses(); }
 
   virtual modeltypet m_get(literalt a) const;
 

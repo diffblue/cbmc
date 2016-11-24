@@ -12,7 +12,7 @@ Date:
 
 #else
 #include <signal.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <csignal>
 #endif
@@ -39,7 +39,7 @@ void install_signal_catcher()
   #else
   // declare act to deal with action on signal set
   static struct sigaction act;
-	
+
   act.sa_handler=signal_catcher;
   act.sa_flags=0;
   sigemptyset(&(act.sa_mask));

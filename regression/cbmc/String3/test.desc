@@ -1,0 +1,9 @@
+KNOWNBUG
+main.c
+--pointer-check --bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^Counterexample:$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

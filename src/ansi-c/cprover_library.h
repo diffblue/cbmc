@@ -11,12 +11,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <context.h>
-#include <message.h>
+#include <util/symbol_table.h>
+#include <util/message.h>
+
+std::string get_cprover_library_text(
+  const std::set<irep_idt> &functions,
+  const symbol_tablet &);
+
+void add_library(
+  const std::string &src,
+  symbol_tablet &,
+  message_handlert &);
 
 void add_cprover_library(
   const std::set<irep_idt> &functions,
-  contextt &context,
-  message_handlert &message_handler);
+  symbol_tablet &,
+  message_handlert &);
 
 #endif

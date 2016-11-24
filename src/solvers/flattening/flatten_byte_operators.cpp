@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <expr.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <arith_tools.h>
-#include <pointer_offset_size.h>
+#include <util/expr.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/arith_tools.h>
+#include <util/pointer_offset_size.h>
 
 #include "flatten_byte_operators.h"
 
@@ -47,8 +47,12 @@ exprt flatten_byte_extract(
   if(src.id()==ID_byte_extract_big_endian) 
     throw "byte_extract flattening of big endian not done yet";
 
-  unsigned width=
-    integer2long(pointer_offset_size(ns, src.type()));
+  mp_integer size_bits=pointer_offset_bits(src.type(), ns);
+  if(size_bits<0)
+    throw "byte_extract flatting with non-constant size: "+src.pretty();
+  std::size_t width_bits=integer2unsigned(size_bits);
+
+  std::size_t width_bytes=width_bits/8+(width_bits%8==0?0:1);
   
   const typet &t=src.op0().type();
   
@@ -64,13 +68,13 @@ exprt flatten_byte_extract(
     {
       // get 'width'-many bytes, and concatenate
       exprt::operandst op;
-      op.resize(width);
+      op.resize(width_bytes);
       
-      for(unsigned i=0; i<width; i++)
+      for(std::size_t i=0; i<width_bytes; i++)
       {
         // the most significant byte comes first in the concatenation!
-        unsigned offset_i=
-          little_endian?(width-i-1):i;
+        std::size_t offset_i=
+          little_endian?(width_bytes-i-1):i;
         
         plus_exprt offset(from_integer(offset_i, src.op1().type()), src.op1());
         index_exprt index_expr(subtype);
@@ -79,9 +83,9 @@ exprt flatten_byte_extract(
         op[i]=index_expr;
       }
       
-      if(width==1)
+      if(width_bytes==1)
         return op[0];
-      else // width>=2
+      else // width_bytes>=2
       {
         concatenation_exprt concatenation(src.type());
         concatenation.operands().swap(op);
@@ -95,17 +99,17 @@ exprt flatten_byte_extract(
       const typet &array_type=ns.follow(root.type());
       const typet &offset_type=ns.follow(offset.type());
       const typet &element_type=ns.follow(array_type.subtype());
-      mp_integer element_width=pointer_offset_size(ns, element_type);
+      mp_integer element_width=pointer_offset_size(element_type, ns);
       
       if(element_width==-1) // failed
         throw "failed to flatten non-byte array with unknown element width";
 
-      mp_integer result_width=pointer_offset_size(ns, src.type());
+      mp_integer result_width=pointer_offset_size(src.type(), ns);
       mp_integer num_elements=(element_width+result_width-2)/element_width+1;
 
       // compute new root and offset
       concatenation_exprt concat(
-        unsignedbv_typet(integer2long(element_width*8*num_elements)));
+        unsignedbv_typet(integer2unsigned(element_width*8*num_elements)));
 
       exprt first_index=
         (element_width==1)?offset 
@@ -118,9 +122,12 @@ exprt flatten_byte_extract(
       }
 
       // the new offset is width%offset
-      exprt new_offset=
-        (element_width==1)?from_integer(0, offset_type):
-        mod_exprt(offset, from_integer(element_width, offset_type));
+      exprt new_offset;
+      
+      if(element_width==1)
+        new_offset=from_integer(0, offset_type);
+      else
+        new_offset=mod_exprt(offset, from_integer(element_width, offset_type));
 
       // build new byte-extract expression
       exprt tmp(src.id(), src.type());
@@ -137,14 +144,21 @@ exprt flatten_byte_extract(
     const typet &offset_type=ns.follow(offset.type());
 
     mult_exprt times_eight(offset, from_integer(8, offset_type));
-        
-    lshr_exprt left_shift(src.op0(), times_eight);
+
+    mp_integer op0_bits=pointer_offset_bits(src.op0().type(), ns);
+    if(op0_bits<0)
+      throw "byte_extract flatting of non-constant source size: "+src.pretty();
+
+    // cast to generic bit-vector
+    std::size_t op0_width=integer2unsigned(op0_bits);
+    typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
+    lshr_exprt left_shift(src_op0_tc, times_eight);
 
     extractbits_exprt extractbits;
     
     extractbits.src()=left_shift;
     extractbits.type()=src.type();
-    extractbits.upper()=from_integer(width*8-1, offset_type);
+    extractbits.upper()=from_integer(width_bits-1, offset_type);
     extractbits.lower()=from_integer(0, offset_type);
       
     return extractbits;
@@ -172,7 +186,7 @@ exprt flatten_byte_update(
   assert(src.operands().size()==3);
 
   mp_integer element_size=
-    pointer_offset_size(ns, src.op2().type());
+    pointer_offset_size(src.op2().type(), ns);
   
   const typet &t=ns.follow(src.op0().type());
   
@@ -186,7 +200,7 @@ exprt flatten_byte_update(
        subtype.id()==ID_signedbv ||
        subtype.id()==ID_floatbv)
     {
-      mp_integer sub_size=pointer_offset_size(ns, subtype);
+      mp_integer sub_size=pointer_offset_size(subtype, ns);
       
       if(sub_size==-1)
         throw "can't flatten byte_update for sub-type without size";
@@ -269,7 +283,7 @@ exprt flatten_byte_update(
           t.id()==ID_floatbv)
   {
     // do a shift, mask and OR
-    unsigned width=to_bitvector_type(t).get_width();
+    std::size_t width=to_bitvector_type(t).get_width();
     
     if(element_size*8>width)
       throw "flatten_byte_update to update element that is too large";
@@ -290,7 +304,7 @@ exprt flatten_byte_update(
 
     // zero-extend the value
     concatenation_exprt value_extended(
-      from_integer(0, unsignedbv_typet(width-integer2long(element_size)*8)), 
+      from_integer(0, unsignedbv_typet(width-integer2unsigned(element_size)*8)), 
       src.op2(), t);
     
     // shift the value

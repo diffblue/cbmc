@@ -1,26 +1,28 @@
+let
 nil
 type
 operands
 bool
 c_bool
+proper_bool
 signedbv
 unsignedbv
-verilogbv
+verilog_signedbv
+verilog_unsignedbv
 floatbv
 fixedbv
-C_location #location
+x86_extended
+C_source_location #source_location
 C_end_location #end_location
 C_is_padding #is_padding
-C_is_bit_field #is_bit_field
-C_bit_field_type #bit_field_type
 file
 line
 column
 comment
 property
+property_class
+property_id
 function
-subtype
-subtypes
 code
 typecast
 static_cast
@@ -32,8 +34,10 @@ index_range
 ptrmember
 member
 member_name
+C_member_name #member_name
 equal =
 implies =>
+iff <=>
 and
 nand
 or
@@ -57,13 +61,14 @@ predicate_symbol
 predicate_next_symbol
 nondet_bool
 empty
-sideeffect
+side_effect
 statement
 statement_expression
 value
 constant
 block
 decl
+dead
 assign
 assign_div
 assign_mult assign*
@@ -81,6 +86,7 @@ assume
 assert
 assertion
 goto
+gcc_computed_goto
 ifthenelse
 label
 break
@@ -89,11 +95,13 @@ function_call
 return
 skip
 arguments
-argument
 array
 size
 pointer
+block_pointer
 switch
+switch_case
+gcc_switch_case_range
 for
 while
 dowhile
@@ -106,19 +114,25 @@ complex
 signed
 unsigned
 asm
+gcc_asm_input
+gcc_asm_output
+gcc_asm_clobbered_register
 incomplete_array
-identifier
-name
-cpp_name
-C_id_class #id_class
-declaration
-declaration_list
-struct
 incomplete_struct
 incomplete_union
 incomplete_class
 incomplete_c_enum
-c_bitfield
+C_incomplete #incomplete
+identifier
+name
+cpp_name
+component_cpp_name
+C_id_class #id_class
+declaration
+declaration_list
+declarator
+struct
+c_bit_field
 union
 class
 merged_type
@@ -127,6 +141,8 @@ from
 to
 module
 module_instance
+macromodule
+primitive_module_instance
 module_items
 module_source
 parameter_decl
@@ -141,17 +157,23 @@ base_name
 C_base_name #base_name
 string
 C_string_constant #string_constant
-string_constant string-constant
+string_constant
 width
 components
 bv
 f
 ports
+port
 offset
 with
 trans
 throw
 catch
+try_catch
+noexcept
+CPROVER_throw
+CPROVER_try_catch
+CPROVER_try_finally
 protection
 private
 public
@@ -159,6 +181,7 @@ protected
 virtual
 volatile
 const
+constexpr
 inline
 forall
 exists
@@ -184,20 +207,27 @@ cpp_new
 cpp_delete
 cpp_new_array cpp_new[]
 cpp_delete_array cpp_delete[]
+java_new
+java_new_array
 printf
 input
 output
+output_register
 inout
 nondet
 NULL
+null
+nullptr
 c_enum
-enum
+enumeration
 elements
 unknown
+uninitialized
 invalid
+C_invalid_object #invalid_object
 pointer_offset
 pointer_object
-same_object same-object
+invalid_pointer invalid-pointer
 ieee_float_equal
 ieee_float_notequal
 isnan
@@ -207,10 +237,13 @@ array_equal
 array_set
 array_copy
 mod
+rem
 shr
 ashr
 lshr
 shl
+rol
+ror
 comma
 concatenation
 infinity
@@ -221,6 +254,9 @@ static
 auto
 register
 thread_local
+thread
+C_thread_local #thread_local
+C_static_lifetime #static_lifetime
 mutable
 void
 int8
@@ -235,6 +271,8 @@ long
 longlong
 float
 double
+byte
+boolean
 long_double
 signed_char
 unsigned_char
@@ -246,12 +284,15 @@ signed_short_int
 unsigned_short_int
 signed_long_long_int
 unsigned_long_long_int
+signed_int128
+unsigned_int128
 case
 casex
 casez
 case_item
 C_inlined #inlined
 C_hide #hide
+hide
 abs
 sign
 access
@@ -262,6 +303,7 @@ preincrement
 predecrement
 integer_bits
 KnR
+C_KnR #KnR
 constraint_select_one
 cond
 bv_literals
@@ -284,9 +326,17 @@ X
 continuous_assign
 blocking_assign
 non_blocking_assign
-builtin_alignof
+alignof
 gcc_builtin_va_arg
 gcc_builtin_types_compatible_p
+gcc_builtin_va_arg_next
+gcc_builtin_va_list
+gcc_float80
+gcc_float128
+gcc_int128
+gcc_decimal32
+gcc_decimal64
+gcc_decimal128
 builtin_offsetof
 0
 1
@@ -317,10 +367,13 @@ unary_minus unary-
 unary_plus unary+
 mult *
 div /
+power **
+factorial_power
 component
 pretty_name
 C_class #class
 C_interface #interface
+interface
 targets
 location
 labels
@@ -328,6 +381,9 @@ event
 guard
 designated_initializer
 designator
+member_designator
+index_designator
+offset_designator
 C_constant #constant
 C_volatile #volatile
 C_restricted #restricted
@@ -336,7 +392,8 @@ C_implicit #implicit
 C_qualifier #qualifier
 C_ptr32 #ptr32
 C_ptr64 #ptr64
-restricted
+C_atomic #atomic
+restrict
 byte_extract_big_endian
 byte_extract_little_endian
 byte_update_big_endian
@@ -344,11 +401,13 @@ byte_update_little_endian
 replication
 dummy
 init
+cprover_atomic
+atomic
+atomic_type_specifier
 atomic_begin
 atomic_end
 start_thread
 end_thread
-sync
 specc_notify
 specc_par
 specc_wait
@@ -362,12 +421,15 @@ instance
 cover
 initializer
 anonymous
+C_is_anonymous #is_anonymous
 is_macro
+is_enum_constant
 is_inline
 is_extern
 is_global
 is_thread_local
-is_argument
+is_parameter
+is_member
 is_type
 is_register
 is_typedef
@@ -375,10 +437,12 @@ is_static
 is_template
 is_static_assert
 is_virtual
+C_is_virtual #is_virtual
 literal
 member_initializers
 member_initializer
 method_qualifier
+methods
 constructor
 destructor
 bases
@@ -386,32 +450,49 @@ base
 from_base
 operator
 template
+template_class_instance
+template_function_instance
 template_type
 template_args
 template_parameter
+template_parameters
 C_template #template
 C_template_arguments #template_arguments
 typename
 C
 cpp
+java
 SpecC
 SystemC
 decl_block
 decl_type
 genvar
+realtime
+parameters
+parameter_assignments
+named_parameter_assignment
+specify
+pullup
+pulldown
+automatic
+rcmos
 cmos
 nmos
 pmos
 rnmos
 rpmos
 wchar_t
+char16_t
+char32_t
 size_t
 ssize_t
 inst
+inst_builtin
 always
 initial
 mode
 this
+C_this #this
 reduction_and
 reduction_or
 reduction_nand
@@ -420,6 +501,7 @@ reduction_xor
 reduction_xnor
 C_zero_initializer #zero_initializer
 body
+entity
 temporary_object
 overflow_plus overflow-+
 overflow_minus overflow--
@@ -427,8 +509,11 @@ overflow_mult overflow-*
 overflow_unary_minus overflow-unary-
 object_descriptor
 dynamic_object
+object_size
+good_pointer
 integer_address
 integer_address_object
+null_object
 static_object
 stack_object
 C_is_failed_symbol #is_failed_symbol
@@ -441,10 +526,12 @@ friend
 explicit
 storage_spec
 member_spec
+msc_declspec
 gcc_attribute
 packed
 C_packed #packed
 transparent_union
+C_transparent_union #transparent_union
 aligned
 C_alignment #alignment
 vector
@@ -471,8 +558,9 @@ cpp_namespace_spec
 cpp_storage_spec
 cpp_using
 cpp_declaration
+cpp_static_assert
 cpp_member_spec
-C_cpp_type #cpp_type
+C_c_type #c_type
 namespace
 linkage
 decltype
@@ -485,20 +573,47 @@ task
 C_little_endian #little_endian
 C_offset #offset
 C_tag_only_declaration #tag_only_declaration
-tag_symbol
+struct_tag
+union_tag
+c_enum_tag
+enum_constant
+bit_select
+part_select
+indexed_part_select_plus
+indexed_part_select_minus
 generate_block
+generate_assign
+generate_skip
 generate_case
 generate_if
 generate_for
 delay
+verilog_cycle_delay
+sva_cycle_delay
+sva_sequence_throughout
+sva_sequence_concatenation
+sva_sequence_first_match
+sva_always
+sva_nexttime
+sva_s_nexttime
+sva_eventually
+sva_s_eventually
+sva_until
+sva_s_until
+sva_until_with
+sva_s_until_with
+sva_overlapped_implication
+sva_non_overlapped_implication
 hierarchical_identifier
 named_port_connection
+named_block
 verilog_primitive_module
 verilog_module
+verilog_case_equality
+verilog_case_inequality
 event_guard
 posedge
 negedge
-task_enable
 pointer_and_address_pair
 user_specified_predicate
 user_specified_parameter_predicates
@@ -507,18 +622,24 @@ unassigned
 new_object
 complex_real
 complex_imag
+imag
 msc_try_except
 msc_try_finally
 msc_leave
 msc_uuidof
 msc_if_exists
 msc_if_not_exists
+msc_underlying_type
+msc_based
 alias
 auto_object
+ssa_object
+ptr_object
 C_c_sizeof_type #c_sizeof_type
 array_update
 struct_update
 union_update
+update
 float_debug1
 float_debug2
 static_assert
@@ -528,3 +649,69 @@ exception_list
 exception_id
 priority
 predicate_passive_symbol
+all
+when
+cw_va_arg_typeof
+fence
+sync
+lwsync
+isync
+WRfence
+RRfence
+RWfence
+WWfence
+RRcumul
+RWcumul
+WWcumul
+WRcumul
+claim
+generic_selection
+generic_associations
+generic_association
+floatbv_plus
+floatbv_minus
+floatbv_mult
+floatbv_div
+floatbv_rem
+floatbv_sin
+floatbv_cos
+floatbv_typecast
+read
+write
+native
+final
+_start
+compound_literal
+custom_bv
+custom_unsignedbv
+custom_signedbv
+custom_fixedbv
+custom_floatbv
+C_SSA_symbol #SSA_symbol
+C_full_identifier #full_identifier
+L0
+L1
+L2
+already_typechecked
+C_va_arg_type #va_arg_type
+smt2_symbol
+VHDL
+Verilog
+verilog_realtime
+onehot
+onehot0
+verilog_star_event
+verilog_attribute
+time
+fork
+disable
+wait
+deassign
+force
+release
+popcount
+function_type
+noreturn
+C_noreturn #noreturn
+process
+signal

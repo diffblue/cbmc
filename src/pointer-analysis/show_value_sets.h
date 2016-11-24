@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_VALUE_SETS_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_VALUE_SETS_H
 
-#include <ui_message.h>
+#include <util/ui_message.h>
 
 class goto_functionst;
 class goto_programt;

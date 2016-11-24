@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_QBF_QDIMACS_CNF_H
 
 #include <set>
-#include <iostream>
+#include <iosfwd>
 
 #include "../sat/dimacs_cnf.h"
 
@@ -64,9 +64,19 @@ public:
     quantifiers.push_back(quantifier);
   }
 
-  void add_quantifier(const quantifiert::typet type, const literalt l)
+  inline void add_quantifier(const quantifiert::typet type, const literalt l)
   {
     add_quantifier(quantifiert(type, l));
+  }
+
+  inline void add_existential_quantifier(const literalt l)
+  {
+    add_quantifier(quantifiert(quantifiert::EXISTENTIAL, l));
+  }
+
+  inline void add_universal_quantifier(const literalt l)
+  {
+    add_quantifier(quantifiert(quantifiert::UNIVERSAL, l));
   }
 
   bool is_quantified(const literalt l) const;

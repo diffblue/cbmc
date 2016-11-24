@@ -10,10 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CPP_CONVERT_INTEGER_LITERAL_H
 
 #include <string>
-#include <expr.h>
 
-exprt convert_integer_literal(
-  const std::string &src,
-  unsigned base);
+#include <util/expr.h>
+
+exprt convert_integer_literal(const std::string &src);
 
 #endif

@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_expr.h>
-#include <i2string.h>
+#include <ostream>
+
+#include <util/std_expr.h>
+#include <util/i2string.h>
 
 #include <langapi/language_util.h>
 
@@ -33,8 +35,8 @@ std::ostream& goto_programt::output_instruction(
 {
   out << "        // " << it->location_number << " ";
 
-  if(!it->location.is_nil())
-    out << it->location.as_string();
+  if(!it->source_location.is_nil())
+    out << it->source_location.as_string();
   else
     out << "no location";
 
@@ -106,7 +108,7 @@ std::ostream& goto_programt::output_instruction(
     {
       out << from_expr(ns, identifier, it->guard);
     
-      const irep_idt &comment=it->location.get(ID_comment);
+      const irep_idt &comment=it->source_location.get_comment();
       if(comment!="") out << " // " << comment;
     }
       
@@ -146,9 +148,10 @@ std::ostream& goto_programt::output_instruction(
     break;
     
   case CATCH:
-    out << "CATCH ";
-    
+    if(!it->targets.empty())
     {
+      out << "CATCH-PUSH ";
+    
       unsigned i=0;
       const irept::subt &exception_list=
         it->code.find(ID_exception_list).get_sub();
@@ -164,6 +167,8 @@ std::ostream& goto_programt::output_instruction(
             << (*gt_it)->target_number;
       }
     }
+    else
+      out << "CATCH-POP";
       
     out << std::endl;
     break;
@@ -528,8 +533,8 @@ std::string as_string(
     result+=from_expr(ns, i.function, i.guard);
 
     {
-      const irep_idt &comment=i.location.get(ID_comment);
-      if(comment!="") result+="/* "+id2string(comment)+" */";
+      const irep_idt &comment=i.source_location.get_comment();
+      if(comment!="") result+=" /* "+id2string(comment)+" */";
     }
     return result;
 

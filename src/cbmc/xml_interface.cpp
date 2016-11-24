@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <message.h>
+#include <util/message.h>
 
 #include <xmllang/xml_parser.h>
 

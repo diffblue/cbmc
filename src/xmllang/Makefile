@@ -1,12 +1,12 @@
-SRC = xml_language.cpp xml_parser.cpp y.tab.cpp lex.yy.cpp xml_typecheck.cpp \
-      xml_parse_tree.cpp
+SRC = xml_parser.cpp xml_y.tab.cpp xml_lex.yy.cpp xml_parse_tree.cpp graphml.cpp
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 include ../config.inc
 include ../common
 
-CLEANFILES =xmllang$(LIBEXT) y.tab.h y.tab.cpp lex.yy.cpp y.tab.cpp.output y.output
+CLEANFILES=xmllang$(LIBEXT) xml_y.tab.h xml_y.tab.cpp xml_lex.yy.cpp \
+           xml_y.tab.cpp.output xml_y.output
 
 all: xmllang$(LIBEXT)
 
@@ -15,17 +15,19 @@ all: xmllang$(LIBEXT)
 xmllang$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 
-y.tab.cpp: parser.y
-	$(YACC) $(YFLAGS) $$flags -pyyxml -d parser.y -o y.tab.cpp
+xml_y.tab.cpp: parser.y
+	$(YACC) $(YFLAGS) $$flags -pyyxml -d parser.y -o $@
 
-y.tab.h: y.tab.cpp
-	if [ -e y.tab.hpp ] ; then mv y.tab.hpp y.tab.h ; else \
-        mv y.tab.cpp.h y.tab.h ; fi
+xml_y.tab.h: xml_y.tab.cpp
+	if [ -e xml_y.tab.hpp ] ; then mv xml_y.tab.hpp $@ ; else \
+        mv xml_y.tab.cpp.h $@ ; fi
 
-lex.yy.cpp: scanner.l
-	$(LEX) -Pyyxml -olex.yy.cpp scanner.l
+xml_lex.yy.cpp: scanner.l
+	$(LEX) -Pyyxml -o$@ scanner.l
+
+generated_files: xml_lex.yy.cpp xml_y.tab.cpp xml_y.tab.h
 
 # extra dependencies
-y.tab$(OBJEXT): y.tab.cpp y.tab.h
-lex.yy$(OBJEXT): y.tab.cpp lex.yy.cpp y.tab.h
+xml_y.tab$(OBJEXT): xml_y.tab.cpp xml_y.tab.h
+xml_lex.yy$(OBJEXT): xml_y.tab.cpp xml_lex.yy.cpp xml_y.tab.h
 

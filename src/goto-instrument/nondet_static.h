@@ -1,6 +1,7 @@
 /*******************************************************************\
 
-Module: Nondeterministic initialization of vars with static lifetime
+Module: Nondeterministic initialization of certain global scope
+        variables
 
 Author: Daniel Kroening, Michael Tautschnig
 

@@ -8,11 +8,15 @@ Date: February 2006
 
 \*******************************************************************/
 
-#include <hash_cont.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <guard.h>
-#include <context.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
+#include <util/guard.h>
+#include <util/symbol_table.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+
+#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_functions.h>
 
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
@@ -20,10 +24,14 @@ Date: February 2006
 #include "race_check.h"
 #include "rw_set.h"
 
+#ifdef LOCAL_MAY
+#include <analyses/local_may_alias.h>
+#endif
+
 class w_guardst
 {
 public:
-  w_guardst(contextt &_context):context(_context)
+  w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
   {
   }
   
@@ -33,7 +41,7 @@ public:
   
   const exprt get_guard_symbol_expr(const irep_idt &object)
   {
-    return symbol_expr(get_guard_symbol(object));
+    return get_guard_symbol(object).symbol_expr();
   }
   
   const exprt get_w_guard_expr(const rw_set_baset::entryt &entry)
@@ -43,13 +51,13 @@ public:
   
   const exprt get_assertion(const rw_set_baset::entryt &entry)
   {
-    return gen_not(get_guard_symbol_expr(entry.object));
+    return not_exprt(get_guard_symbol_expr(entry.object));
   }
   
   void add_initialization(goto_programt &goto_program) const;
   
 protected:
-  contextt &context;
+  symbol_tablet &symbol_table;
 };
 
 /*******************************************************************\
@@ -68,10 +76,10 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
 
-  const contextt::symbolst::const_iterator it=
-    context.symbols.find(identifier);
+  const symbol_tablet::symbolst::const_iterator it=
+    symbol_table.symbols.find(identifier);
 
-  if(it!=context.symbols.end())
+  if(it!=symbol_table.symbols.end())
     return it->second;
     
   w_guards.push_back(identifier);
@@ -80,11 +88,11 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   new_symbol.name=identifier;
   new_symbol.base_name=identifier;
   new_symbol.type=bool_typet();
-  new_symbol.static_lifetime=true;
-  new_symbol.value.make_false();
+  new_symbol.is_static_lifetime=true;
+  new_symbol.value=false_exprt();
   
   symbolt *symbol_ptr;
-  context.move(new_symbol, symbol_ptr);
+  symbol_table.move(new_symbol, symbol_ptr);
   return *symbol_ptr;
 }
 
@@ -103,14 +111,14 @@ Function: w_guardst::add_initialization
 void w_guardst::add_initialization(goto_programt &goto_program) const
 {
   goto_programt::targett t=goto_program.instructions.begin();
-  const namespacet ns(context);
+  const namespacet ns(symbol_table);
 
   for(std::list<irep_idt>::const_iterator
       it=w_guards.begin();
       it!=w_guards.end();
       it++)
   {
-    exprt symbol=symbol_expr(ns.lookup(*it));
+    exprt symbol=ns.lookup(*it).symbol_expr();
   
     t=goto_program.insert_before(t);
     t->type=ASSIGN;
@@ -163,23 +171,18 @@ bool is_shared(
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
 
-  if(identifier=="c::__CPROVER_alloc" ||
-     identifier=="c::__CPROVER_alloc_size" ||
-     identifier=="c::stdin" ||
-     identifier=="c::stdout" ||
-     identifier=="c::stderr" ||
-     identifier=="c::sys_nerr")
+  if(identifier==CPROVER_PREFIX "alloc" ||
+     identifier==CPROVER_PREFIX "alloc_size" ||
+     identifier=="stdin" ||
+     identifier=="stdout" ||
+     identifier=="stderr" ||
+     identifier=="sys_nerr" ||
+     has_prefix(id2string(identifier), "symex::invalid_object") ||
+     has_prefix(id2string(identifier), "symex_dynamic::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
-
-  if(!symbol.static_lifetime)
-    return false; // these are local
-    
-  if(symbol.thread_local)
-    return false; // these are local
-    
-  return true;
+  return symbol.is_shared();
 }
 
 /*******************************************************************\
@@ -229,11 +232,18 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program,
   w_guardst &w_guards)
 {
-  namespacet ns(context);
+  namespacet ns(symbol_table);
+
+#ifdef LOCAL_MAY
+  local_may_aliast local_may(goto_function);
+#endif
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
@@ -241,7 +251,11 @@ void race_check(
     
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it);
+      rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+      );
       
       if(!has_shared_entries(ns, rw_set))
         continue;
@@ -264,7 +278,7 @@ void race_check(
           w_guards.get_w_guard_expr(e_it->second),
           e_it->second.guard);
 
-        t->location=original_instruction.location;
+        t->source_location=original_instruction.source_location;
         i_it=++t;
       }
 
@@ -287,7 +301,7 @@ void race_check(
           w_guards.get_w_guard_expr(e_it->second),
           false_exprt());
 
-        t->location=original_instruction.location;
+        t->source_location=original_instruction.source_location;
         i_it=++t;
       }
 
@@ -299,8 +313,8 @@ void race_check(
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->location=original_instruction.location;
-        t->location.set_comment(comment(e_it->second, false));
+        t->source_location=original_instruction.source_location;
+        t->source_location.set_comment(comment(e_it->second, false));
         i_it=++t;
       }
 
@@ -311,8 +325,8 @@ void race_check(
         goto_programt::targett t=goto_program.insert_before(i_it);
 
         t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->location=original_instruction.location;
-        t->location.set_comment(comment(e_it->second, true));
+        t->source_location=original_instruction.source_location;
+        t->source_location.set_comment(comment(e_it->second, true));
         i_it=++t;
       }
 
@@ -337,12 +351,19 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
   goto_programt &goto_program)
 {
-  w_guardst w_guards(context);
+  w_guardst w_guards(symbol_table);
 
-  race_check(value_sets, context, goto_program, w_guards);
+  race_check(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+    goto_function, 
+#endif
+    goto_program, w_guards);
 
   w_guards.add_initialization(goto_program);
   goto_program.update();
@@ -362,19 +383,23 @@ Function: race_check
 
 void race_check(
   value_setst &value_sets,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  w_guardst w_guards(context);
+  w_guardst w_guards(symbol_table);
 
   Forall_goto_functions(f_it, goto_functions)
-    if(f_it->first!=ID_main &&
-       f_it->first!="c::__CPROVER_initialize")
-      race_check(value_sets, context, f_it->second.body, w_guards);
+    if(f_it->first!=goto_functionst::entry_point() &&
+       f_it->first!=CPROVER_PREFIX "initialize")
+      race_check(value_sets, symbol_table, 
+#ifdef LOCAL_MAY
+        f_it->second, 
+#endif
+        f_it->second.body, w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator
-    m_it=goto_functions.function_map.find(goto_functions.main_id());
+    m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
     throw "Race check instrumentation needs an entry point";

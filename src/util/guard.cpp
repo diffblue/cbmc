@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "std_expr.h"
+#include <ostream>
 
+#include "std_expr.h"
+#include "simplify_utils.h"
 #include "guard.h"
 
 /*******************************************************************\
@@ -24,7 +26,7 @@ Function: guardt::as_expr
 
 void guardt::guard_expr(exprt &dest) const
 {
-  if(guard_list.empty())
+  if(is_true())
   {
     // do nothing
   }
@@ -45,6 +47,7 @@ void guardt::guard_expr(exprt &dest) const
   }
 }
 
+#if 0
 /*******************************************************************\
 
 Function: guardt::as_expr
@@ -76,6 +79,7 @@ exprt guardt::as_expr(guard_listt::const_iterator it) const
 
   return dest;
 }
+#endif
 
 /*******************************************************************\
 
@@ -91,19 +95,31 @@ Function: guardt::add
 
 void guardt::add(const exprt &expr)
 {
-  if(expr.id()==ID_and && expr.type().id()==ID_bool)
+  assert(expr.type().id()==ID_bool);
+
+  if(is_false() || expr.is_true())
+    return;
+  else if(is_true() || expr.is_false())
   {
-    forall_operands(it, expr)
-      add(*it);
+    *this=expr;
 
     return;
   }
-
-  if(expr.is_true())
+  else if(id()!=ID_and)
   {
+    and_exprt a;
+    a.copy_to_operands(*this);
+    *this=a;
   }
+
+  operandst &op=operands();
+
+  if(expr.id()==ID_and)
+    op.insert(op.end(),
+              expr.operands().begin(),
+              expr.operands().end());
   else
-    guard_list.push_back(expr);
+    op.push_back(expr);
 }
 
 /*******************************************************************\
@@ -120,15 +136,29 @@ Function: operator -=
 
 guardt &operator -= (guardt &g1, const guardt &g2)
 {
-  guardt::guard_listt::const_iterator it2=g2.guard_list.begin();
-  
-  while(!g1.guard_list.empty() &&
-        it2!=g2.guard_list.end() &&
-        g1.guard_list.front()==*it2)
+  if(g1.id()!=ID_and || g2.id()!=ID_and)
+    return g1;
+
+  sort_and_join(g1);
+  guardt g2_sorted=g2;
+  sort_and_join(g2_sorted);
+
+  exprt::operandst &op1=g1.operands();
+  const exprt::operandst &op2=g2_sorted.operands();
+
+  exprt::operandst::iterator it1=op1.begin();
+  for(exprt::operandst::const_iterator
+      it2=op2.begin();
+      it2!=op2.end();
+      ++it2)
   {
-    g1.guard_list.pop_front();
-    it2++;
+    while(it1!=op1.end() && *it1<*it2)
+      ++it1;
+    if(it1!=op1.end() && *it1==*it2)
+      it1=op1.erase(it1);
   }
+
+  g1=conjunction(op1);
 
   return g1;
 }
@@ -147,33 +177,65 @@ Function: operator |=
 
 guardt &operator |= (guardt &g1, const guardt &g2)
 {
-  if(g2.is_false()) return g1;
-  if(g1.is_false()) { g1.guard_list=g2.guard_list; return g1; }
+  if(g2.is_false() || g1.is_true()) return g1;
+  if(g1.is_false() || g2.is_true()) { g1=g2; return g1; }
+
+  if(g1.id()!=ID_and || g2.id()!=ID_and)
+  {
+    exprt tmp(g2);
+    tmp.make_not();
+
+    if(tmp==g1)
+      g1.make_true();
+    else
+      g1=or_exprt(g1, g2);
+
+    // TODO: make simplify more capable and apply here
+
+    return g1;
+  }
 
   // find common prefix  
-  guardt::guard_listt::iterator it1=g1.guard_list.begin();
-  guardt::guard_listt::const_iterator it2=g2.guard_list.begin();
-  
-  while(it1!=g1.guard_list.end())
-  {
-    if(it2==g2.guard_list.end())
-      break;
-      
-    if(*it1!=*it2)
-      break;
+  sort_and_join(g1);
+  guardt g2_sorted=g2;
+  sort_and_join(g2_sorted);
 
-    it1++;
-    it2++;
+  exprt::operandst &op1=g1.operands();
+  const exprt::operandst &op2=g2_sorted.operands();
+
+  exprt::operandst n_op1, n_op2;
+  n_op1.reserve(op1.size());
+  n_op2.reserve(op2.size());
+
+  exprt::operandst::iterator it1=op1.begin();
+  for(exprt::operandst::const_iterator
+      it2=op2.begin();
+      it2!=op2.end();
+      ++it2)
+  {
+    while(it1!=op1.end() && *it1<*it2)
+    {
+      n_op1.push_back(*it1);
+      it1=op1.erase(it1);
+    }
+    if(it1!=op1.end() && *it1==*it2)
+      ++it1;
+    else
+      n_op2.push_back(*it2);
+  }
+  while(it1!=op1.end())
+  {
+    n_op1.push_back(*it1);
+    it1=op1.erase(it1);
   }
   
-  if(it2==g2.guard_list.end()) return g1;
+  if(n_op2.empty()) return g1;
 
   // end of common prefix
-  exprt and_expr1, and_expr2;
-  and_expr1=g1.as_expr(it1);
-  and_expr2=g2.as_expr(it2);
+  exprt and_expr1=conjunction(n_op1);
+  exprt and_expr2=conjunction(n_op2);
   
-  g1.guard_list.erase(it1, g1.guard_list.end());
+  g1=conjunction(op1);
   
   exprt tmp(and_expr2);
   tmp.make_not();
@@ -184,12 +246,14 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     {
     }
     else
+      // TODO: make simplify more capable and apply here
       g1.add(or_exprt(and_expr1, and_expr2));
   }
   
   return g1;
 }
 
+#if 0
 /*******************************************************************\
 
 Function: operator <<
@@ -229,3 +293,24 @@ bool guardt::is_false() const
       
   return false;
 }
+
+/*******************************************************************\
+
+Function: guardt::make_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void guardt::make_false()
+{
+  guard_list.clear();
+  guard_list.push_back(exprt());
+  guard_list.back()=false_exprt();
+}
+#endif
+

@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <arith_tools.h>
+#include <util/arith_tools.h>
 
 #include <ansi-c/c_types.h>
 
@@ -18,21 +18,23 @@ Function: cpp_typecheckt::cpp_destructor
 
   Inputs:
 
- Outputs: NOT typechecked code
+ Outputs: typechecked code
 
  Purpose:
 
 \*******************************************************************/
 
 codet cpp_typecheckt::cpp_destructor(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &type,
   const exprt &object)
 {
   codet new_code;
-  new_code.location()=location;
+  new_code.add_source_location()=source_location;
 
-  typet tmp_type(type);
+  elaborate_class_template(object.type());
+
+  typet tmp_type(object.type());
   follow_symbol(tmp_type);
 
   assert(!is_reference(tmp_type));
@@ -55,33 +57,36 @@ codet cpp_typecheckt::cpp_destructor(
       new_code.make_nil();
       return new_code;
     }
+    
+    exprt tmp_size=size_expr;
+    make_constant_index(tmp_size);
 
     mp_integer s;
-    if(to_integer(size_expr, s))
+    if(to_integer(tmp_size, s))
     {
-      err_location(tmp_type);
+      err_location(source_location);
       str << "array size `" << to_string(size_expr)
           << "' is not a constant";
       throw 0;
     }
 
     new_code.type().id(ID_code);
-    new_code.location()=location;
+    new_code.add_source_location()=source_location;
     new_code.set_statement(ID_block);
 
     // for each element of the array, call the destructor
     for(mp_integer i = 0; i < s; ++i)
     {
-      exprt constant=from_integer(i, int_type());
-      constant.location()=location;
+      exprt constant=from_integer(i, index_type());
+      constant.add_source_location()=source_location;
 
       exprt index(ID_index);
       index.copy_to_operands(object);
       index.copy_to_operands(constant);
-      index.location()=location;
+      index.add_source_location()=source_location;
 
       exprt i_code =
-        cpp_destructor(location, tmp_type.subtype(), index);
+        cpp_destructor(source_location, tmp_type.subtype(), index);
 
       new_code.move_to_operands(i_code);
     }
@@ -90,6 +95,10 @@ codet cpp_typecheckt::cpp_destructor(
   {
     const struct_typet &struct_type=
       to_struct_type(tmp_type);
+
+    // enter struct scope
+    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_scopes.set_scope(struct_type.get(ID_name));
 
     // find name of destructor
     const struct_typet::componentst &components=
@@ -116,33 +125,37 @@ codet cpp_typecheckt::cpp_destructor(
     // there is always a destructor for non-PODs
     assert(dtor_name!="");
 
-    const symbolt &symb=lookup(struct_type.get(ID_name));
-
     irept cpp_name(ID_cpp_name);
-
-    cpp_name.get_sub().push_back(irept(ID_name));
-    cpp_name.get_sub().back().set(ID_identifier, symb.base_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
-
-    cpp_name.get_sub().push_back(irept("::"));
-
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, dtor_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
-
-    exprt member_expr(ID_member);
-    member_expr.copy_to_operands(object);
-    member_expr.op0().type().set(ID_C_constant, false);
-    member_expr.add("component_cpp_name").swap(cpp_name);
-    member_expr.location()=location;
+    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
 
     side_effect_expr_function_callt function_call;
-    function_call.function()=member_expr;
-    function_call.location()=location;
+    function_call.add_source_location()=source_location;
+    function_call.function().swap(static_cast<exprt&>(cpp_name));
 
-    new_code.set_statement(ID_expression);
-    new_code.location()=location;
-    new_code.move_to_operands(function_call);
+    typecheck_side_effect_function_call(function_call);
+    assert(function_call.get(ID_statement) == ID_temporary_object);
+
+    exprt &initializer =
+      static_cast<exprt &>(function_call.add(ID_initializer));
+
+    assert(initializer.id()==ID_code
+           && initializer.get(ID_statement)==ID_expression);
+
+    side_effect_expr_function_callt& func_ini =
+      to_side_effect_expr_function_call(initializer.op0());
+
+    exprt& tmp_this = func_ini.arguments().front();
+    assert(tmp_this.id() == ID_address_of
+           && tmp_this.op0().id() == "new_object");
+
+    exprt address_of(ID_address_of, typet(ID_pointer));
+    address_of.type().subtype() = object.type();
+    address_of.copy_to_operands(object);
+    tmp_this.swap(address_of);
+
+    new_code.swap(initializer);
   }
 
   return new_code;

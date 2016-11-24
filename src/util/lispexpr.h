@@ -6,11 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+// THIS HEADER IS DEPRECATED AND WILL GO AWAY
+
 #ifndef CPROVER_LISPEXPR_H
 #define CPROVER_LISPEXPR_H
 
-#ifdef _WIN32
-#include <cstring>
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include <string.h>
 #define strcasecmp _strcmpi
 #else
 #include <strings.h>
@@ -18,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 #include <vector>
-#include <ostream>
+#include <iosfwd>
 
 class lispsymbolt:public std::string
 {

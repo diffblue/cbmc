@@ -1,0 +1,10 @@
+CORE
+main.i
+--i386-win32
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+This is windows.h from MS Visual Studio 8 (2005) after preprocessing

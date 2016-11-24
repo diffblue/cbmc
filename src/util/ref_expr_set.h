@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <hash_cont.h>
-#include <expr.h>
-#include <reference_counting.h>
+#include "hash_cont.h"
+#include "expr.h"
+#include "reference_counting.h"
 
 extern const hash_set_cont<exprt, irep_hash> empty_expr_set;
 
@@ -23,7 +23,7 @@ struct ref_expr_set_dt
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
   
-  const static ref_expr_set_dt empty;
+  const static ref_expr_set_dt blank;
 };
 
 class ref_expr_sett:public reference_counting<ref_expr_set_dt>
@@ -65,7 +65,7 @@ public:
   bool make_union(const expr_sett &s2)
   {
     expr_sett tmp(read().expr_set);
-    unsigned old_size=tmp.size();
+    size_t old_size=tmp.size();
     tmp.insert(s2.begin(), s2.end());
     
     // anything new?

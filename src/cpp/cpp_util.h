@@ -9,8 +9,8 @@ Author:
 #ifndef CPROVER_CPP_UTIL_H
 #define CPROVER_CPP_UTIL_H
 
-#include <expr.h>
-#include <symbol.h>
+#include <util/expr.h>
+#include <util/symbol.h>
 
 /*******************************************************************\
 

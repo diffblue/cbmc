@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <mp_arith.h>
-#include <namespace.h>
-#include <reference_counting.h>
+#include <util/mp_arith.h>
+#include <util/namespace.h>
+#include <util/reference_counting.h>
 
 #include "object_numbering.h"
 
@@ -44,15 +44,6 @@ public:
 
   typedef irep_idt idt;
   
-  static const std::string &id2string(const idt &id)
-  {
-    #ifdef USE_DSTRING
-    return id.as_string();
-    #else
-    return id;
-    #endif
-  }
-
   class objectt
   {
   public:
@@ -76,7 +67,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt empty;    
+    const static object_map_dt blank;
   };
   
   exprt to_expr(object_map_dt::const_iterator it) const;

@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define __REFERENCE_COUNTING_H
 
 #include <cassert>
-#include <iostream>
 
 template<typename T>
 class reference_counting
@@ -63,7 +62,7 @@ public:
   
   inline const T &read() const
   {
-    if(d==NULL) return T::empty;
+    if(d==NULL) return T::blank;
     return *d;
   }
 

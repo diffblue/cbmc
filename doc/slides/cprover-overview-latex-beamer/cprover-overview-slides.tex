@@ -1,0 +1,154 @@
+\input{header}
+
+\title{CPROVER Overview}
+
+\date{Version 1.0, 2013}
+
+\begin{document}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\frame[plain]{\titlepage}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+%\begin{frame}
+%\frametitle{Outline}
+%\setcounter{tocdepth}{1}
+%\tableofcontents
+%\setcounter{tocdepth}{2}
+%\end{frame}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{High-level View}
+
+\begin{center}
+\begin{tikzpicture}[node distance=2cm]
+
+\node[rectangle,fill=tabutter!25!white, align=center] (n0) { Language \\ Front-end };
+\node[rectangle,fill=tabutter!25!white] (n1) [below of=n0] { Goto-binary };
+\node[rectangle,fill=taplum!50!white] (engine) [right of=n1,xshift=1.5cm,yshift=1cm]
+ { \begin{minipage}{1.8cm} \centering Analysis Engine \end{minipage}};
+\node (pass) [right of=n0,xshift=6cm] { 
+ \begin{minipage}{3cm} ~\\\mycheck~~Pass \end{minipage} };
+\node (fail) [right of=n1,xshift=6cm] {
+ \begin{minipage}{3cm} \myfail~~Fail \\ \small + Counterexample \end{minipage} };
+
+\draw[->,thick] (n0) -- (engine);
+\draw[->,thick] (n1) -- (engine);
+\draw[->,thick] (engine) -- (pass);
+\draw[->,thick] (engine) -- (fail);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Front-Ends for Asynchronous Languages}
+
+\begin{center}
+\begin{tikzpicture}
+
+\node[rectangle,fill=tabutter!25!white] (n0)               { ANSI-C };
+\node[rectangle,fill=tabutter!25!white] (n1) [below of=n0] { C++ };
+\node[rectangle,fill=tabutter!25!white,align=center] (n2) [below of=n1] { Java\\ Bytecode };
+\node[rectangle,fill=tabutter!50!white,align=center] (pt1) [right of=n0,xshift=1.2cm,yshift=-0.5cm] { parse-\\tree };
+\node[rectangle,fill=tabutter,align=center] (cfg) [right of=n1,xshift=4cm] { Control-Flow\\ Graph \\ \small (goto program) };
+
+\draw[->] (n0) -- (pt1);
+\draw[->] (n1) -- (pt1);
+\draw[->] (pt1) -- (cfg);
+\draw[->] (n2) -- (cfg);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Analysis Engines for Software}
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.2cm]
+
+\node[rectangle,fill=tabutter] (cfg)
+ { \begin{minipage}{3cm} \centering Control-Flow Graph \\ \small (goto program) \end{minipage}};
+
+\node[rectangle,fill=taplum!10!white] (engines) [right of=cfg,xshift=4cm] {
+\begin{tikzpicture}
+  \node[rectangle,text=white,fill=ta3plum] (engine1) [right of=cfg,xshift=2.5cm] { $k$-induction };
+  \node[rectangle,text=white,fill=ta3plum] (engine2) [below of=engine1] { BMC };
+  \node[rectangle,text=white,fill=ta3plum,align=center] (engine3) [below of=engine2]
+   { Abstract \\ Interpretation };
+  \node[rectangle,text=white,fill=ta3plum] (engine4) [above of=engine1] { Impact };
+  \node[rectangle,text=white,fill=ta3plum,align=center] (engine5) [above of=engine4]
+   { Predicate \\ Abstraction };
+  \node (enginetext) [below of=engine3] { \small analysis engine };
+
+  \node[rectangle,fill=tachameleon!25!white] (solvers) [right of=engine4,xshift=2cm,yshift=-0.5cm]
+   {\begin{tikzpicture}[node distance=0.75cm]
+    \node[rectangle,fill=tachameleon!50!white] (sat)                { SAT };
+    \node[rectangle,fill=tachameleon!50!white] (smt1) [below of=sat] { SMT1 };
+    \node[rectangle,fill=tachameleon!50!white] (smt2) [below of=smt1] { SMT2 };
+    \node (decproc) [below of=smt2] { \tiny decision procedure };
+    \end{tikzpicture}};
+
+  \draw[<->] (engine1) -- (solvers);
+  \draw[<->] (engine2) -- (solvers);
+  \draw[<->] (engine4) -- (solvers);
+  \draw[<->] (engine5) -- (solvers);
+\end{tikzpicture}};
+
+\draw[->] (cfg) -- (engines);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Front-Ends for Synchronous Languages}
+
+\begin{center}
+\begin{tikzpicture}
+
+\node[rectangle,fill=taskyblue!25!white] (n3) [below of=n2,yshift=-1cm] { Verilog };
+\node[rectangle,fill=taskyblue!25!white] (n4) [below of=n3] { SMV };
+\node[rectangle,fill=taskyblue!50!white,align=center] (pt2) [right of=n3,xshift=1.2cm,yshift=-0.5cm] { parse-\\tree };
+\node[rectangle,fill=taskyblue,align=center] (tr) [right of=pt2,xshift=1.75cm] { transition \\ system };
+
+\draw[->] (n3) -- (pt2);
+\draw[->] (n4) -- (pt2);
+\draw[->] (pt2) -- (tr);
+
+\end{tikzpicture}
+\end{center}
+
+\end{frame}
+
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+\end{document}

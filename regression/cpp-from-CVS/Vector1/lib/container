@@ -1,0 +1,43 @@
+/* C++ */
+
+#ifndef __STL_CONTAINER
+#define __STL_CONTAINER
+
+/**********************************************************
+*
+*
+*
+* Purpose:
+*
+* Common interface for containers.
+* This interface is used internally only, and to
+* abstract container modelisation. This class
+* is a uniform interface used by iterator.
+*
+* Authors:
+*
+*      Nicolas Blanc,
+*      Alex Groce,
+*      Daniel Kroening
+*
+**********************************************************/
+
+namespace std {
+  template <class T>
+  struct container {
+
+    virtual unsigned size() const
+    {__CPROVER_assert(0, "size() not overloaded");}
+
+    virtual T& data(unsigned i) const
+    {__CPROVER_assert(0, "data() not overloaded");}
+
+    virtual const T& const_data(unsigned i) const
+    {__CPROVER_assert(0, "data() not overloaded");}
+
+    virtual unsigned version(unsigned i) const
+    {__CPROVER_assert(0, "version() not overloaded");}
+  };
+}
+
+#endif

@@ -11,9 +11,9 @@ Date: July 2006
 #ifndef XML_IREP_HASHING_H_
 #define XML_IREP_HASHING_H_
 
-#include <xml.h>
-#include <irep.h>
-#include <hash_cont.h>
+#include <util/xml.h>
+#include <util/irep.h>
+#include <util/hash_cont.h>
 
 class xml_irep_convertt {
   private:

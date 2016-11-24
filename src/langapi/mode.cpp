@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <cstring>
 #endif
 
-#include <language.h>
+#include <util/language.h>
 
 #include "mode.h"
 
@@ -43,7 +43,7 @@ Function: register_language
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
-  std::auto_ptr<languaget> l(factory());
+  std::unique_ptr<languaget> l(factory());
   languages.back().factory=factory;
   languages.back().extensions=l->extensions();
   languages.back().mode=l->id();
@@ -105,7 +105,7 @@ languaget *get_language_from_filename(const std::string &filename)
         e_it=l_it->extensions.begin();
         e_it!=l_it->extensions.end();
         e_it++)
-      if(stricmp(extension.c_str(), e_it->c_str())==0)
+      if(_stricmp(extension.c_str(), e_it->c_str())==0)
         return l_it->factory();
     #else
     if(l_it->extensions.find(extension)!=l_it->extensions.end())

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_LOCATIONS_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_LOCATIONS_H
 
-#include <ui_message.h>
+#include <util/ui_message.h>
 
 #include <goto-programs/goto_functions.h>
 

@@ -8,6 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#define DEBUG
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include "equality.h"
 #include "bv_utils.h"
 
@@ -82,7 +86,7 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
 
   {
     std::pair<elementst::iterator, bool> result=
-      elements.insert(std::pair<exprt, unsigned>(e2, elements.size()));
+      elements.insert(elementst::value_type(e2, elements.size()));
 
     u.second=result.first->second;
 
@@ -98,7 +102,8 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
     if(result==equalities.end())
     {
       l=prop.new_variable();
-      equalities.insert(std::pair<std::pair<unsigned, unsigned>, literalt>(u, l));
+      if(freeze_all && !l.is_constant()) prop.set_frozen(l);
+      equalities.insert(equalitiest::value_type(u, l));
     }
     else
       l=result->second;
@@ -145,12 +150,12 @@ Function: equalityt::add_equality_constraints
 
 void equalityt::add_equality_constraints(const typestructt &typestruct)
 {
-  unsigned no_elements=typestruct.elements.size();
-  unsigned bits=0;
+  std::size_t no_elements=typestruct.elements.size();
+  std::size_t bits=0;
 
   // get number of necessary bits
 
-  for(unsigned i=no_elements; i!=0; bits++)
+  for(std::size_t i=no_elements; i!=0; bits++)
     i=(i>>1);
 
   // generate bit vectors
@@ -159,10 +164,10 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
 
   eq_bvs.resize(no_elements);
 
-  for(unsigned i=0; i<no_elements; i++)
+  for(std::size_t i=0; i<no_elements; i++)
   {
     eq_bvs[i].resize(bits);
-    for(unsigned j=0; j<bits; j++)
+    for(std::size_t j=0; j<bits; j++)
       eq_bvs[i][j]=prop.new_variable();
   }
 
@@ -181,3 +186,4 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
     prop.set_equal(bv_utils.equal(bv1, bv2), it->second);
   }
 }
+

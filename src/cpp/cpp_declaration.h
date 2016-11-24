@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_DECLARATION_H
 #define CPROVER_CPP_DECLARATION_H
 
-#include <assert.h>
+#include <cassert>
 
 #include "cpp_declarator.h"
 #include "cpp_storage_spec.h"
@@ -46,7 +46,7 @@ public:
     return get_bool(ID_is_template);
   }
   
-  inline bool is_template_class() const
+  inline bool is_class_template() const
   {
     return is_template() &&
            type().id()==ID_struct &&
@@ -116,8 +116,23 @@ public:
   {
     return get("specialization_of");
   }
+  
+  void set_is_typedef()
+  {
+    set(ID_is_typedef, true);
+  }
+  
+  bool is_typedef() const
+  {
+    return get_bool(ID_is_typedef);
+  }
 
   void output(std::ostream &out) const;
+
+  // for assigning a tag for struct/union in the type based on
+  // the name of the first declarator
+  void name_anon_struct_union() { name_anon_struct_union(type()); }
+  void name_anon_struct_union(typet &dest);
 };
 
 extern inline cpp_declarationt &to_cpp_declaration(irept &irep)

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_DECLARATOR_CONVERTER_H
 #define CPROVER_CPP_DECLARATOR_CONVERTER_H
 
-#include <symbol.h>
+#include <util/symbol.h>
 
 #include "cpp_declarator.h"
 #include "cpp_declaration.h"
@@ -27,9 +27,9 @@ public:
 
   bool is_typedef;
   bool is_template;
-  bool is_template_argument;
+  bool is_template_parameter;
   bool is_friend;
-  irep_idt mode;
+  irep_idt linkage_spec;
 
   symbolt &convert(
     const typet &type, // already typechecked
@@ -51,7 +51,7 @@ public:
   class cpp_typecheckt &cpp_typecheck;
 
 protected:
-  std::string base_name;
+  irep_idt base_name;
   typet final_type;
   cpp_scopet *scope;
   irep_idt final_identifier;
@@ -85,7 +85,7 @@ protected:
   }
 
   void combine_types(
-    const locationt &location,
+    const source_locationt &source_location,
     const typet &decl_type,
     symbolt &symbol);
 };

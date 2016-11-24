@@ -96,7 +96,7 @@ propt::resultt qbf_squolemt::prop_solve()
       "Squolem: "+
       i2string(no_variables())+" variables, "+
       i2string(no_clauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   if(early_decision) return P_UNSATISFIABLE;
@@ -113,12 +113,12 @@ propt::resultt qbf_squolemt::prop_solve()
 
   if(result)
   {
-    messaget::status("Squolem: VALID");
+    messaget::status() << "Squolem: VALID" << messaget::eom;
     return P_SATISFIABLE;
   }
   else
   {
-    messaget::status("Squolem: INVALID");
+    messaget::status() << "Squolem: INVALID" << messaget::eom;
     return P_UNSATISFIABLE;
   }
 
@@ -146,7 +146,7 @@ void qbf_squolemt::lcnf(const bvt &bv)
   if(process_clause(bv, new_bv))
     return;
 
-  if(new_bv.size()==0)
+  if(new_bv.empty())
   {
     early_decision=true;
     return;

@@ -30,8 +30,8 @@ public:
   virtual void lcnf(const bvt &bv);
   virtual void add_quantifier(const quantifiert &quantifier);
   virtual void set_quantifier(const quantifiert::typet type, const literalt l);
-  virtual void set_no_variables(unsigned no);
-  virtual unsigned no_clauses() const { return squolem.clauses(); }
+  virtual void set_no_variables(size_t no);
+  virtual size_t no_clauses() const { return squolem.clauses(); }
 };
 
 #endif /*_CPROVER_QBF_SQUOLEM_H_*/

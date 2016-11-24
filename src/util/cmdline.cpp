@@ -6,9 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
-
+#include <cassert>
+#include <cstdlib>
 #include <iostream>
 
 #include "cmdline.h"
@@ -104,7 +103,7 @@ bool cmdlinet::isset(const char *option) const
 
 /*******************************************************************\
 
-Function: cmdlinet::getval
+Function: cmdlinet::get_value
 
   Inputs:
 
@@ -114,12 +113,12 @@ Function: cmdlinet::getval
 
 \*******************************************************************/
 
-const char *cmdlinet::getval(char option) const
+std::string cmdlinet::get_value(char option) const
 {
   int i=getoptnr(option);
   if(i<0) return "";
   if(options[i].values.empty()) return "";
-  return options[i].values.front().c_str();
+  return options[i].values.front();
 }
 
 /*******************************************************************\
@@ -182,7 +181,7 @@ const std::list<std::string> &cmdlinet::get_values(char option) const
 
 /*******************************************************************\
 
-Function: cmdlinet::getval
+Function: cmdlinet::get_value
 
   Inputs:
 
@@ -192,12 +191,12 @@ Function: cmdlinet::getval
 
 \*******************************************************************/
 
-const char *cmdlinet::getval(const char *option) const
+std::string cmdlinet::get_value(const char *option) const
 {
   int i=getoptnr(option);
   if(i<0) return "";
   if(options[i].values.empty()) return "";
-  return options[i].values.front().c_str();
+  return options[i].values.front();
 }
 
 /*******************************************************************\
@@ -328,10 +327,19 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
     {
       int optnr;
 
-      if(argv[i][1]=='-')
-        optnr=getoptnr(argv[i]+2);
+      if(argv[i][1]!=0 && argv[i][2]==0)
+        optnr=getoptnr(argv[i][1]); // single-letter option -X
+      else if(argv[i][1]=='-')
+        optnr=getoptnr(argv[i]+2); // multi-letter option with --XXX
       else
+      {
+        // Multi-letter option -XXX, or single-letter with argument -Xval
+        // We first try single-letter.
         optnr=getoptnr(argv[i][1]);
+
+        if(optnr<0) // try multi-letter
+          optnr=getoptnr(argv[i]+1);
+      }
    
       if(optnr<0) return true;
       options[optnr].isset=true;

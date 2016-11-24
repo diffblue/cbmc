@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#define USE_DSTRING
+
 int main(int argc, const char **argv)
 {
   if(argc!=2) return 1;
@@ -26,6 +28,7 @@ int main(int argc, const char **argv)
 
       std::size_t pos=line.find(' ');
       
+#ifdef USE_DSTRING
       if(pos==std::string::npos)
         std::cout << line
                   << " dstring(" << count << ", 0)";
@@ -34,6 +37,16 @@ int main(int argc, const char **argv)
                   << " dstring(" << count << ", 0)"
                   << " // "
                   << std::string(line, pos+1, std::string::npos);
+#else
+      if(pos==std::string::npos)
+        std::cout << line
+                  << " \"" << line << "\"";
+      else
+        std::cout << std::string(line, 0, pos)
+                  << " \"" << std::string(line, 0, pos) << "\""
+                  << " // "
+                  << std::string(line, pos+1, std::string::npos);
+#endif
         
       std::cout << std::endl;
       

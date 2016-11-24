@@ -1,8 +1,14 @@
-# Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
+# Build platform
+# (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
+
 ifeq ($(BUILD_ENV),AUTO)
 uname = $(shell uname)
 ifeq ($(uname),windows32)
   BUILD_ENV_ := MSVC
+else ifeq ($(uname),Darwin)
+  BUILD_ENV_ := OSX
+else ifeq ($(uname),FreeBSD)
+  BUILD_ENV_ := FreeBSD
 else ifeq ($(filter-out MINGW32_%, $(uname)),)
   BUILD_ENV_ := MinGW
 else ifeq ($(filter-out CYGWIN_%, $(uname)),)
@@ -14,31 +20,65 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
-ifeq ($(filter-out Unix MinGW OSX_Universal,$(BUILD_ENV_)),)
-  # Linux etc.
+ifeq ($(filter-out Unix MinGW OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
+  # Linux-ish
   LIBEXT = .a
   OBJEXT = .o
+ifeq ($(BUILD_ENV_),MinGW)
+  EXEEXT = .exe
+else
   EXEEXT =
+endif
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD
-  CP_CXXFLAGS = -MMD -DSTL_HASH_TR1
+  CP_CFLAGS = -MMD -MP
+ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
+  CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++ -D STL_HASH_STD
+  LINKFLAGS += -mmacosx-version-min=10.9 -stdlib=libc++
+  LINKNATIVE += -mmacosx-version-min=10.9 -stdlib=libc++
+else
+  CP_CXXFLAGS = -MMD -MP -std=c++11
+endif
   #LINKFLAGS = -static
-ifeq ($(BUILD_ENV_),OSX_Universal)
-  # MacOS Fat Binaries
-  CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-  CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-  LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch ppc -arch x86_64
-endif
-  LINKLIB = ld -r -o $@ $^
+ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
+  ifeq ($(BUILD_ENV_),OSX_Universal)
+    # MacOS Fat Binaries
+    CP_CXXFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+    CP_CFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+    LINKFLAGS += -force_cpusubtype_ALL -arch i386 -arch x86_64
+  endif
+  LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
-ifeq ($(origin CC),default)
-  CC     = gcc
-  #CC     = icc
-endif
-ifeq ($(origin CXX),default)
-  CXX    = g++
-  #CXX    = icpc
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
+else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
+  CP_CXXFLAGS += -DSTL_HASH_STD
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = clang++
+  endif
+else
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
+  LINKNATIVE = $(HOSTCXX) -o $@ $^
+  ifeq ($(origin CC),default)
+    CC     = gcc
+    #CC     = icc
+  endif
+  ifeq ($(origin CXX),default)
+    CXX    = g++
+    #CXX    = icpc
+  endif
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y
@@ -53,23 +93,22 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   # use these for Cygwin:
   LIBEXT = .a
   OBJEXT = .o
-  EXEEXT =
+  EXEEXT = .exe
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
-  CP_CFLAGS = -MMD -mno-cygwin
-  CP_CXXFLAGS = -MMD -DSTL_HASH_GNU -mno-cygwin
-  LINKFLAGS = -static -mno-cygwin
-  LINKLIB = ld -r -o $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
+  CP_CFLAGS = -MMD -MP
+  CP_CXXFLAGS = -MMD -MP -std=c++11 -U__STRICT_ANSI__
+  LINKFLAGS = -static -std=c++11
+  LINKLIB = ar rcT $@ $^
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS) -static 
+  LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
-  CC     = gcc
-  #GCC 4.5.3 is broken
-	#CC = i686-pc-mingw32-gcc
+  #CC = gcc
+  CC = i686-pc-mingw32-gcc
 endif
 ifeq ($(origin CXX),default)
-  CXX    = g++
-  #GCC 4.5.3 is broken
-  #CXX = i686-pc-mingw32-g++
+  #CXX    = g++
+  CXX = i686-pc-mingw32-g++
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y
@@ -85,12 +124,13 @@ else ifeq ($(BUILD_ENV_),MSVC)
   LIBEXT = .lib
   OBJEXT = .obj
   EXEEXT = .exe
-  CFLAGS ?= /O2 /GF
-  CXXFLAGS ?= /O2 /GF
+  CFLAGS ?= /W3 /O2 /GF
+  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF
   CP_CFLAGS =
-  CP_CXXFLAGS = -DSTL_HASH_TR1
+  CP_CXXFLAGS = 
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ $^ $(LIBS)
+  LINKNATIVE = $(HOSTCXX) /Fe$@ $^
 ifeq ($(origin CC),default)
   CC = cl
 endif
@@ -112,6 +152,8 @@ endif
 
 
 first_target: all
+
+HOSTCXX ?= $(CXX)
 
 CP_CFLAGS += $(CFLAGS) $(INCLUDES)
 CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
@@ -148,6 +190,10 @@ clean:
 		$(CLEANFILES)
 
 .PHONY: first_target clean all
+.PHONY: sources generated_files
+
+sources: Makefile
+	@echo $(SRC)
 
 #
 # include a dependency file if one exists

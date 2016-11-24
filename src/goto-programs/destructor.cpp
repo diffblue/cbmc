@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <std_code.h>
+#include <util/std_types.h>
+#include <util/std_code.h>
 
 #include "destructor.h"
 
@@ -33,24 +33,18 @@ code_function_callt get_destructor(
   }
   else if(type.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const exprt &methods=static_cast<const exprt&>(type.find(ID_methods));
 
-    const struct_typet::componentst &components=
-      struct_type.components();
-
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    forall_operands(it, methods)
     {
       if(it->type().id()==ID_code)
       {
         const code_typet &code_type=to_code_type(it->type());
         
         if(code_type.return_type().id()==ID_destructor &&
-           code_type.arguments().size()==1)
+           code_type.parameters().size()==1)
         {
-          const typet &arg_type=code_type.arguments().front().type();
+          const typet &arg_type=code_type.parameters().front().type();
           
           if(arg_type.id()==ID_pointer &&
              ns.follow(arg_type.subtype())==type)

@@ -19,23 +19,30 @@ template <typename T>
 class numbering:public std::vector<T>
 {
 public:
-  unsigned number(const T &a)
+  typedef std::size_t number_type;
+
+  number_type number(const T &a)
   {
     std::pair<typename numberst::const_iterator, bool> result=
       numbers.insert(
-      std::pair<T, unsigned>
-      (a, numbers.size()));
+      std::pair<T, number_type>
+      (a, number_type(numbers.size())));
 
     if(result.second) // inserted?
     {
-      push_back(a);
+      this->push_back(a);
       assert(this->size()==numbers.size());
     }
     
     return (result.first)->second;
   }
   
-  bool get_number(const T &a, unsigned &n) const
+  inline number_type operator()(const T &a)
+  {
+    return number(a);
+  }
+  
+  bool get_number(const T &a, number_type &n) const
   {
     typename numberst::const_iterator it=numbers.find(a);
 
@@ -46,8 +53,16 @@ public:
     return false;
   }
 
+  void clear()
+  {
+    subt::clear();
+    numbers.clear();
+  }
+
 protected:
-  typedef std::map<T, unsigned> numberst;
+  typedef std::vector<T> subt;
+
+  typedef std::map<T, number_type> numberst;
   numberst numbers;  
 };
 
@@ -55,23 +70,25 @@ template <typename T, class hash_fkt>
 class hash_numbering:public std::vector<T>
 {
 public:
-  unsigned number(const T &a)
+  typedef unsigned int number_type;
+
+  number_type number(const T &a)
   {
     std::pair<typename numberst::const_iterator, bool> result=
       numbers.insert(
-      std::pair<T, unsigned>
-      (a, numbers.size()));
+      std::pair<T, number_type>
+      (a, number_type(numbers.size())));
 
     if(result.second) // inserted?
     {
-      push_back(a);
+      this->push_back(a);
       assert(this->size()==numbers.size());
     }
     
     return (result.first)->second;
   }
   
-  bool get_number(const T &a, unsigned &n) const
+  bool get_number(const T &a, number_type &n) const
   {
     typename numberst::const_iterator it=numbers.find(a);
 
@@ -82,8 +99,16 @@ public:
     return false;
   }
 
+  void clear()
+  {
+    subt::clear();
+    numbers.clear();
+  }
+
 protected:
-  typedef hash_map_cont<T, unsigned, hash_fkt> numberst;
+  typedef std::vector<T> subt;
+
+  typedef hash_map_cont<T, number_type, hash_fkt> numberst;
   numberst numbers;  
 };
 

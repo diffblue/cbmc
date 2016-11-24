@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LANGUAGE_FILE_H
 #define CPROVER_LANGUAGE_FILE_H
 
-#include <ostream>
+#include <iosfwd>
 #include <set>
+#include <map>
 #include <string>
 
-#include <message.h>
+#include "message.h"
 
-class contextt;
+class symbol_tablet;
 class language_filet;
 class languaget;
 
@@ -68,11 +69,11 @@ public:
   
   void show_parse(std::ostream &out);
   
-  bool typecheck(contextt &context);
+  bool typecheck(symbol_tablet &symbol_table);
 
-  bool final(contextt &context);
+  bool final(symbol_tablet &symbol_table);
 
-  bool interfaces(contextt &context);
+  bool interfaces(symbol_tablet &symbol_table);
   
   void clear()
   {
@@ -82,11 +83,11 @@ public:
 
 protected:                      
   bool typecheck_module(
-    contextt &context,
+    symbol_tablet &symbol_table,
     language_modulet &module);
 
   bool typecheck_module(
-    contextt &context,
+    symbol_tablet &symbol_table,
     const std::string &module);
 };
  

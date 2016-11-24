@@ -1,0 +1,260 @@
+#include <assert.h>
+
+int x;
+
+void test() {}
+
+void other() {
+
+  if (x > 0)
+  {
+    assert(0);
+  }
+
+  if (x > 0)
+
+
+  { assert(0); }
+
+  if (x > 0) {
+    assert(0);
+  }
+
+  if (x > 0) {
+    assert(0);
+  }
+
+  if (x != 3)
+    x = 5;
+
+  for (int i = 0; i < 10; i++)
+    test();
+
+  while(1)
+    if (x == 0)
+      x = x < 0 ? 0 : 1;
+
+  if (x == 0)
+    for (int i = 0; i < 10; i++)
+      test();
+
+  if (x == 0)
+    while (1) {
+      x = 1;
+      x = 2;
+    }
+
+  for (int i = 0; i < 10; i++);
+
+  while(1);
+
+  if (x > 0) {
+
+  } else if (x == 0)
+    assert(0);
+}
+
+int second()
+{
+  if (x != 3) {
+    return 5;
+  }
+
+  assert(1); if (x == 7) assert(1);
+
+  assert(1); if (x == 7)
+               x = 7;
+
+  while (x == 3)
+    test();
+
+  if (x == 3)
+  {
+    return 8;
+  }
+
+  while(x != 7)
+  {
+    test();
+  }
+
+  return 7;
+}
+
+void third()
+{
+  int x = 3 + 7 +
+    9 + 12;
+  assert(x != 3);
+
+  if (x > 0)
+
+    assert(0);
+
+}
+
+void fourth() {
+  if (x == 0 ||
+      x == 3)
+    assert(0);
+
+  if (x == 1 ||
+      x == 4) {
+    assert(0);
+  }
+
+  if (x < x ||
+    x > x  ||
+    x < x ||
+    x > x  ||
+    x == x)
+      x = -2;
+}
+
+void fifth() {
+
+  switch (x) {
+  case 0:
+    break;
+  case 1:
+    break;
+  default:
+    break;
+  }
+}
+
+void sixth() {
+  do {
+    assert(0);
+  } while (x > 0);
+
+  if (x > 0) {
+
+  } else if (x != 7) {
+    assert(0);
+  }
+
+  switch(x) {
+  case 0:
+    /* test case */
+    break;
+  case 1:
+    break;
+  }
+
+  #define ABC while(0)
+  assert(0);
+
+}
+
+void seventh() {
+
+  while(x < 0)
+    for (int i = 0; i < 10; i++)
+      switch (x) {
+    
+      }
+}
+
+void eighth() {
+  
+  switch (x) {
+  case 0:
+    switch (x) {
+    case 0:
+      break;
+    }
+  case 1:
+    break;
+  }
+}
+
+void dp_test1() {
+  int x = 3;
+  int y = 7;
+  assert(x < y);
+}
+
+void dp_test2() {
+  int x = 0;
+  int y = 0;
+  int r1;
+  int r2;
+
+  {r1 = x;}
+  r2 = y;
+  assert(r1 != r2);
+}
+
+void ninth() {
+  int x = 0;
+  int y = 0;
+  do {
+    do {
+      assert(x < 10);
+    } while (y == 0);
+  } while (x == 0);
+}
+
+void tenth() {
+/*      do*/
+/*      {*/
+/*        c = *p++;*/
+
+/*        if (  c >= '1' && c <= '9' )*/
+/*        {*/
+/*          blockSize100k = c - '1' + 1;__asm volatile ("mfence":::"memory");*/
+/*        }*/
+/*        else*/
+/*        if ( c == 'p' )*/
+/*        {*/
+/*          if ( sscanf( p, "%u", &threadsCount ) != 1 )*/
+/*          {*/
+/*            note( 0, "Error parsing the number of threads passed: %s.\n",*/
+/*                  argv[ x ] + 2 );*/
+
+/*            return 1;*/
+/*          }*/
+/*          c = 0; */
+/*        }*/
+/*        else*/
+/*        if ( c == 'v' )*/
+/*        {*/
+/*          ++verbosityLevel;__asm volatile ("mfence":::"memory");__asm volatile ("mfence":::"memory");*/
+/*        }*/
+/*        else*/
+/*          break;*/
+/*      } while( c ){;}*/
+
+  int x = 7;
+
+  do
+  {
+    assert(x <= 10);
+  } while (x == 0);
+
+}
+
+void eleventh() {
+  int x = 3;
+  while (x < 5) {
+    x++;
+  }
+}
+
+void twelfth()
+{
+
+
+
+}
+
+void thirteenth()
+{
+
+
+
+}
+
+int main() {}
+

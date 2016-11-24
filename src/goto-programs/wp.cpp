@@ -8,10 +8,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //#include <langapi/language_util.h>
 
-#include <std_expr.h>
-#include <std_code.h>
-#include <base_type.h>
-#include <i2string.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
+#include <util/base_type.h>
+#include <util/i2string.h>
 
 #include "wp.h"
 
@@ -33,7 +33,7 @@ bool has_nondet(const exprt &dest)
     if(has_nondet(*it))
       return true;
 
-  if(dest.id()==ID_sideeffect)
+  if(dest.id()==ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(dest);
     const irep_idt &statement=side_effect_expr.get_statement();
@@ -59,7 +59,7 @@ Function: approximate_nondet_rec
 
 void approximate_nondet_rec(exprt &dest, unsigned &count)
 {
-  if(dest.id()==ID_sideeffect &&
+  if(dest.id()==ID_side_effect &&
      to_side_effect_expr(dest).get_statement()==ID_nondet)
   {
     count++;
@@ -290,14 +290,14 @@ exprt wp_assign(
   exprt lhs=code.lhs(),
         rhs=code.rhs();
         
+  // take care of non-determinism in the RHS
+  approximate_nondet(rhs);
+
   rewrite_assignment(lhs, rhs);
 
   // replace lhs by rhs in pre
   substitute_rec(pre, lhs, rhs, ns);
   
-  // take care of non-determinism in the RHS
-  approximate_nondet(pre);
-
   return pre;
 }
 
@@ -319,6 +319,31 @@ exprt wp_assume(
   const namespacet &ns)
 {
   return implies_exprt(code.assumption(), post);
+}
+
+/*******************************************************************\
+
+Function: wp_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt wp_decl(
+  const code_declt &code,
+  const exprt &post,
+  const namespacet &ns)
+{
+  // Model decl(var) as var = nondet()
+  const exprt &var = code.symbol();
+  side_effect_expr_nondett nondet(var.type());
+  code_assignt assignment(var, nondet);
+
+  return wp_assign(assignment, post, ns);
 }
 
 /*******************************************************************\
@@ -347,7 +372,7 @@ exprt wp(
   else if(statement==ID_skip)
     return post;
   else if(statement==ID_decl)
-    return post; // ignored
+    return wp_decl(to_code_decl(code), post, ns);
   else if(statement==ID_assert)
     return post;   
   else if(statement==ID_expression)
@@ -357,6 +382,8 @@ exprt wp(
   else if(statement==ID_free)
     return post; // ignored
   else if(statement==ID_asm)
+    return post; // ignored
+  else if(statement==ID_fence)
     return post; // ignored
   else
     throw "sorry, wp("+id2string(statement)+"...) not implemented";

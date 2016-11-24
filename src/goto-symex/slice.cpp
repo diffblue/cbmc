@@ -6,9 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <hash_cont.h>
-
-#include <std_expr.h>
+#include <util/hash_cont.h>
+#include <util/std_expr.h>
 
 #include "slice.h"
 #include "symex_slice_class.h"
@@ -111,7 +110,7 @@ Function: symex_slicet::slice
 
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard_expr);
+  get_symbols(SSA_step.guard);
 
   switch(SSA_step.type)
   {
@@ -123,6 +122,10 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     get_symbols(SSA_step.cond_expr);
     break;
 
+  case goto_trace_stept::GOTO:
+    get_symbols(SSA_step.cond_expr);
+    break;
+
   case goto_trace_stept::LOCATION:
     // ignore
     break;
@@ -131,13 +134,33 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     slice_assignment(SSA_step);
     break;
 
-  case goto_trace_stept::OUTPUT:
+  case goto_trace_stept::DECL:
+    slice_decl(SSA_step);
     break;
     
-  case goto_trace_stept::DECL:
+  case goto_trace_stept::OUTPUT:
+  case goto_trace_stept::INPUT:
+    break;
+    
+  case goto_trace_stept::DEAD:
     // ignore for now
     break;
-
+    
+  case goto_trace_stept::CONSTRAINT:
+  case goto_trace_stept::SHARED_READ:
+  case goto_trace_stept::SHARED_WRITE:
+  case goto_trace_stept::ATOMIC_BEGIN:
+  case goto_trace_stept::ATOMIC_END:
+  case goto_trace_stept::SPAWN:
+  case goto_trace_stept::MEMORY_BARRIER:
+    // ignore for now
+    break;
+    
+  case goto_trace_stept::FUNCTION_CALL:
+  case goto_trace_stept::FUNCTION_RETURN:
+    // ignore for now
+    break;
+    
   default:
     assert(false);  
   }
@@ -172,6 +195,31 @@ void symex_slicet::slice_assignment(
 
 /*******************************************************************\
 
+Function: symex_slicet::slice_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_slicet::slice_decl(
+  symex_target_equationt::SSA_stept &SSA_step)
+{
+  assert(SSA_step.ssa_lhs.id()==ID_symbol);
+  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+
+  if(depends.find(id)==depends.end())
+  {
+    // we don't really need it
+    SSA_step.ignore=true;
+  }
+}
+
+/*******************************************************************\
+
 Function: symex_slice_classt::collect_open_variables
 
   Inputs: equation - symex trace
@@ -179,8 +227,8 @@ Function: symex_slice_classt::collect_open_variables
 
  Outputs: None. But open_variables is modified as a side-effect.
 
- Purpose: Collect the open variables, i.e. variables that are used in RHS
-          but never written in LHS
+ Purpose: Collect the open variables, i.e., variables that are used
+          in RHS but never written in LHS
 
 \*******************************************************************/
 
@@ -197,7 +245,7 @@ void symex_slicet::collect_open_variables(
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
 
-    get_symbols(SSA_step.guard_expr);
+    get_symbols(SSA_step.guard);
 
     switch(SSA_step.type)
     {
@@ -219,9 +267,21 @@ void symex_slicet::collect_open_variables(
       break;
 
     case goto_trace_stept::OUTPUT:
+    case goto_trace_stept::INPUT:
+    case goto_trace_stept::DEAD:
+    case goto_trace_stept::NONE:
       break;
 
     case goto_trace_stept::DECL:
+    case goto_trace_stept::FUNCTION_CALL:
+    case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::CONSTRAINT:
+    case goto_trace_stept::SHARED_READ:
+    case goto_trace_stept::SHARED_WRITE:
+    case goto_trace_stept::ATOMIC_BEGIN:
+    case goto_trace_stept::ATOMIC_END:
+    case goto_trace_stept::SPAWN:
+    case goto_trace_stept::MEMORY_BARRIER:
       // ignore for now
       break;
 
@@ -263,8 +323,8 @@ Function: collect_open_variables
 
  Outputs: None. But open_variables is modified as a side-effect.
 
- Purpose: Collect the open variables, i.e. variables that are used in RHS
-          but never written in LHS
+ Purpose: Collect the open variables, i.e. variables that are used
+          in RHS but never written in LHS
 
 \*******************************************************************/
 
@@ -290,7 +350,7 @@ Function: slice
 \*******************************************************************/
 
 void slice(symex_target_equationt &equation, 
-	   const expr_listt &expressions)
+           const expr_listt &expressions)
 {
   symex_slicet symex_slice;
   symex_slice.slice(equation, expressions);

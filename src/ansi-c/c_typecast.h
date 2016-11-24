@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TYPECAST_H
-#define CPROVER_C_TYPECAST_H
+#ifndef CPROVER_ANSI_C_C_TYPECAST_H
+#define CPROVER_ANSI_C_C_TYPECAST_H
 
-#include <namespace.h>
-#include <expr.h>
+#include <util/namespace.h>
+#include <util/expr.h>
 
 // try a type cast from expr.type() to type
 //
@@ -71,12 +71,14 @@ protected:
                  INT, UINT,
                  LONG, ULONG,
                  LONGLONG, ULONGLONG,
+                 LARGE_SIGNED_INT, LARGE_UNSIGNED_INT,
                  INTEGER, // these are unbounded integers
-                 SINGLE, DOUBLE, LONGDOUBLE, // float
+                 SINGLE, DOUBLE, LONGDOUBLE, FLOAT128, // float
                  RATIONAL, REAL, // these are infinite precision
+                 COMPLEX,
                  VOIDPTR, PTR, OTHER };
 
-  c_typet get_c_type(const typet &type);
+  c_typet get_c_type(const typet &type) const;
 
   void implicit_typecast_arithmetic(
     exprt &expr,
@@ -88,9 +90,12 @@ protected:
   virtual void implicit_typecast_followed(
     exprt &expr,
     const typet &src_type,
+    const typet &orig_dest_type,
     const typet &dest_type);
 
   void do_typecast(exprt &dest, const typet &type);
+
+  c_typet minimum_promotion(const typet &type) const;
 };
 
 #endif

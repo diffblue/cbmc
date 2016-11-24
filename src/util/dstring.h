@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef DSTRING_H
 #define DSTRING_H
 
-#include <ostream>
+#include <iosfwd>
 
 #include "string_container.h"
 
@@ -17,15 +17,27 @@ class dstring
 {
 public:
   // this is safe for static objects
-  inline dstring():no(0)
+  #ifdef __GNUC__
+  constexpr 
+  #endif
+  dstring():no(0)
   {
   }
 
   // this is safe for static objects
   // the 2nd argument is to avoid accidental conversions
-  inline dstring(unsigned _no, unsigned):no(_no)
+  #ifdef __GNUC__
+  constexpr 
+  #endif
+  dstring(unsigned _no, unsigned):no(_no)
   {
   }
+
+  #if 0
+  // This conversion allows the use of dstrings
+  // in switch ... case statements.  
+  constexpr operator int() const { return no; }
+  #endif
 
   // this one is not safe for static objects
   inline dstring(const char *s):no(string_container[s])
@@ -44,12 +56,12 @@ public:
     return no==0; // string 0 is exactly the empty string
   }
   
-  inline char operator[](unsigned i) const
+  inline char operator[](size_t i) const
   {
     return as_string()[i];
   }
   
-  // warning! the address returned is not stable
+  // the pointer is guaranteed to be stable
   inline const char *c_str() const
   {
     return as_string().c_str();
@@ -95,10 +107,6 @@ public:
     return a.no<b.no;
   }
 
-  // warning! the reference returned is not stable
-  inline const std::string &as_string() const
-  { return string_container.get_string(no); }
-   
   // modifying
   
   inline void clear()
@@ -110,6 +118,8 @@ public:
   inline dstring &operator=(const dstring &b)
   { no=b.no; return *this; }
   
+  // friends
+  
   inline friend std::ostream &operator<<(std::ostream &out, const dstring &a)
   {
     return out << a.as_string();
@@ -119,12 +129,9 @@ public:
   {
     return s.hash();
   }
-
-  inline size_t hash() const
-  {
-    return no;
-  }
   
+  // non-standard
+
   inline unsigned get_no() const
   {
     return no;
@@ -132,11 +139,24 @@ public:
   
 protected:
   unsigned no;
+
+  // the reference returned is guaranteed to be stable
+  inline const std::string &as_string() const
+  { return string_container.get_string(no); }
+
+  inline size_t hash() const
+  {
+    return no;
+  }
 };
+
+// the reference returned is guaranteed to be stable
+inline const std::string &as_string(const dstring &s)
+{ return string_container.get_string(s.get_no()); }
 
 struct dstring_hash
 {
-  size_t operator()(const dstring &s) const { return s.hash(); }
+  inline size_t operator()(const dstring &s) const { return hash_string(s); }
 };
 
 size_t hash_string(const dstring &s);

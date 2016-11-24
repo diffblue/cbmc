@@ -22,7 +22,6 @@ public:
   virtual literalt land(const bvt &bv);
   virtual literalt lor(const bvt &bv);
   virtual literalt lxor(const bvt &bv);
-  virtual literalt lnot(literalt a);
   virtual literalt lxor(literalt a, literalt b);
   virtual literalt lnand(literalt a, literalt b);
   virtual literalt lnor(literalt a, literalt b);
@@ -30,9 +29,9 @@ public:
   virtual literalt limplies(literalt a, literalt b);
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
   virtual literalt new_variable();
-  virtual unsigned no_variables() const { return _no_variables; }
-  virtual void set_no_variables(unsigned no) { _no_variables=no; }
-  virtual unsigned no_clauses() const=0;
+  virtual size_t no_variables() const { return _no_variables; }
+  virtual void set_no_variables(size_t no) { _no_variables=no; }
+  virtual size_t no_clauses() const=0;
 
   void gate_and(literalt a, literalt b, literalt o);
   void gate_or(literalt a, literalt b, literalt o);
@@ -45,14 +44,14 @@ public:
   static void eliminate_duplicates(const bvt &bv, bvt &dest);
 
 protected:
-  unsigned _no_variables;
+  size_t _no_variables;
   
   bool process_clause(const bvt &bv, bvt &dest);
 
   static bool is_all(const bvt &bv, literalt l)
   {
-    for(unsigned i=0; i<bv.size(); i++)
-      if(bv[i]!=l) return false;
+    forall_literals(it, bv)
+      if(*it!=l) return false;
     return true;
   }
 };
@@ -64,7 +63,7 @@ public:
   {
   }
   
-  virtual unsigned no_clauses() const
+  virtual size_t no_clauses() const
   {
     return clause_counter;
   }
@@ -72,7 +71,7 @@ public:
 protected:
   typedef enum { INIT, SAT, UNSAT, ERROR } statust;
   statust status;
-  unsigned clause_counter;
+  size_t clause_counter;
 }; 
 
 #endif

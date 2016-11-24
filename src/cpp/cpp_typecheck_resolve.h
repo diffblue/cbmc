@@ -29,17 +29,16 @@ public:
 
   // Returns the scope as a side-effect as 'current_scope'.
   // Should really return explicitly.
-  void resolve_scope(
+  cpp_scopet &resolve_scope(
     const cpp_namet &cpp_name,
-    std::string &base_name,
+    irep_idt &base_name,
     cpp_template_args_non_tct &template_args);
 
   cpp_scopet &resolve_namespace(const cpp_namet &cpp_name);
 
 protected:
   cpp_typecheckt &cpp_typecheck;
-  exprt this_expr;
-  locationt location;
+  source_locationt source_location;
   cpp_scopet *original_scope;
   
   typedef std::vector<exprt> resolve_identifierst;
@@ -50,7 +49,7 @@ protected:
     const cpp_typecheck_fargst &fargs,
     resolve_identifierst &identifiers);
     
-  exprt convert_template_argument(
+  exprt convert_template_parameter(
     const cpp_idt &id);
     
   exprt convert_identifier(
@@ -62,11 +61,15 @@ protected:
     resolve_identifierst &identifiers,
     const cpp_typecheck_fargst &fargs);
 
+  void exact_match_functions(
+    resolve_identifierst &identifiers,
+    const cpp_typecheck_fargst &fargs);
+
   void filter(
     resolve_identifierst &identifiers,
     const wantt want);
 
-  const symbolt &disambiguate_template_classes(
+  symbol_typet disambiguate_template_classes(
     const irep_idt &base_name,
     const cpp_scopest::id_sett &id_set,
     const cpp_template_args_non_tct &template_args);
@@ -116,35 +119,17 @@ protected:
     const cpp_template_args_non_tct &template_args);
 
   void show_identifiers(
-    const std::string &base_name,
+    const irep_idt &base_name,
     const resolve_identifierst &identifiers,
     std::ostream &out);
 
   void resolve_with_arguments(
     cpp_scopest::id_sett &id_set,
-    const std::string &base_name,
+    const irep_idt &base_name,
     const cpp_typecheck_fargst &fargs);
 
   void filter_for_named_scopes(cpp_scopest::id_sett &id_set);
   void filter_for_namespaces(cpp_scopest::id_sett &id_set);
-
-  #ifdef CPP_SYSTEMC_EXTENSION
-  exprt do_builtin_sc_uint_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_int_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_logic_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-
-  exprt do_builtin_sc_lv_extension(
-    const cpp_namet &cpp_name,
-    const cpp_template_args_non_tct &template_args);
-  #endif
 
   struct matcht
   {
@@ -155,7 +140,7 @@ protected:
     matcht(cpp_template_args_tct _s_args,
            cpp_template_args_tct _f_args,
            irep_idt _id):
-      cost(_s_args.arguments().size()),
+      cost((unsigned)_s_args.arguments().size()),
            specialization_args(_s_args),
            full_args(_f_args),
            id(_id)

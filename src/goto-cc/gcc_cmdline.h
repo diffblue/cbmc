@@ -16,11 +16,11 @@ Date: June 2006
 class gcc_cmdlinet:public goto_cc_cmdlinet
 {
 public:
+  // overload
   virtual bool parse(int, const char**);
 
   gcc_cmdlinet()
   {
-    mode=GCC;
   }
 };
 

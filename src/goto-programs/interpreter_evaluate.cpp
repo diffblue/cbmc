@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iostream>
 
-#include <ieee_float.h>
-#include <fixedbv.h>
-#include <std_expr.h>
+#include <util/ieee_float.h>
+#include <util/fixedbv.h>
+#include <util/std_expr.h>
 
 #include "interpreter_class.h"
 
@@ -69,14 +69,14 @@ void interpretert::evaluate(
     else if(expr.type().id()==ID_floatbv)
     {
       ieee_floatt f;
-      f.from_expr(expr);
+      f.from_expr(to_constant_expr(expr));
       dest.push_back(f.pack());
       return;
     }
     else if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
-      f.from_expr(expr);
+      f.from_expr(to_constant_expr(expr));
       dest.push_back(f.get_value());
       return;
     }

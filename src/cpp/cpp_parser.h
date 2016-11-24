@@ -9,12 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_PARSER_H
 #define CPROVER_CPP_PARSER_H
 
-#include <assert.h>
+#include <cassert>
 
-#include <hash_cont.h>
-#include <string_hash.h>
-#include <parser.h>
-#include <expr.h>
+#include <util/hash_cont.h>
+#include <util/string_hash.h>
+#include <util/parser.h>
+#include <util/expr.h>
+
+#include <ansi-c/ansi_c_parser.h>
 
 #include "cpp_parse_tree.h"
 #include "cpp_token_buffer.h"
@@ -31,13 +33,30 @@ public:
     parsert::clear();
     parse_tree.clear();
     token_buffer.clear();
+    asm_block_following=false;
+  }
+  
+  cpp_parsert():
+    mode(ansi_c_parsert::ANSI),
+    recognize_wchar_t(true),
+    asm_block_following(false)    
+  {
   }
 
 public:
   // internal state
+
+  ansi_c_parsert::modet mode;  
+  // ANSI is strict ANSI-C
+  // GCC is, well, gcc
+  // MSC is Microsoft Visual Studio
+  // ICC is Intel's C compiler
+  // CW is CodeWarrior (with GCC extensions enabled)
+  // ARM is ARM's RealView
   
-  enum { LANGUAGE, EXPRESSION } grammar;
-  enum { ANSI, GCC, MSC } mode;
+  // We can furthermore twiddle the recognition of various
+  // keywords. This is honored in particular modes.
+  bool recognize_wchar_t;
 
   cpp_token_buffert token_buffer;
   
@@ -46,22 +65,17 @@ public:
     return token_buffer.current_token();
   }
    
-  void set_location()
+  void add_location()
   {
-    token_buffer.current_token().line_no=line_no-1;
-    token_buffer.current_token().filename=filename;
-  }
-  
-  cpp_parsert():mode(ANSI)
-  {
+    token_buffer.current_token().line_no=get_line_no()-1;
+    token_buffer.current_token().filename=source_location.get_file();
   }
   
   // scanner
   unsigned parenthesis_counter;
+  bool asm_block_following;
 };
 
 extern cpp_parsert cpp_parser;
-int yycpperror(const std::string &error);
-void cpp_scanner_init();
 
 #endif

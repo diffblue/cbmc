@@ -6,28 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
-
+#include "string2int.h"
 #include "arith_tools.h"
 #include "std_types.h"
 #include "std_expr.h"
-
-/*******************************************************************\
-
-Function: bitvector_typet::get_width
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-unsigned bitvector_typet::get_width() const
-{
-  return get_int(ID_width);
-}
 
 /*******************************************************************\
 
@@ -41,11 +23,11 @@ Function: fixedbv_typet::get_integer_bits
 
 \*******************************************************************/
 
-unsigned fixedbv_typet::get_integer_bits() const
+std::size_t fixedbv_typet::get_integer_bits() const
 {
-  const std::string &integer_bits=get_string("integer_bits");
-  assert(integer_bits!="");
-  return atoi(integer_bits.c_str());
+  const irep_idt integer_bits=get(ID_integer_bits);
+  assert(integer_bits!=irep_idt());
+  return unsafe_string2unsigned(id2string(integer_bits));
 }
 
 /*******************************************************************\
@@ -60,11 +42,11 @@ Function: floatbv_typet::get_f
 
 \*******************************************************************/
 
-unsigned floatbv_typet::get_f() const
+std::size_t floatbv_typet::get_f() const
 {
-  const std::string &f=get_string(ID_f);
-  assert(f!="");
-  return atoi(f.c_str());
+  const irep_idt &f=get(ID_f);
+  assert(f!=irep_idt());
+  return unsafe_string2unsigned(id2string(f));
 }
 
 /*******************************************************************\
@@ -79,12 +61,12 @@ Function: struct_union_typet::component_number
 
 \*******************************************************************/
 
-unsigned struct_union_typet::component_number(
+std::size_t struct_union_typet::component_number(
   const irep_idt &component_name) const
 {
   const componentst &c=components();
 
-  unsigned number=0;
+  std::size_t number=0;
 
   for(componentst::const_iterator
       it=c.begin();
@@ -331,6 +313,23 @@ mp_integer signedbv_typet::largest() const
 
 /*******************************************************************\
 
+Function: signedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt signedbv_typet::zero_expr() const
+{
+  return to_constant_expr(from_integer(0, *this));
+}
+
+/*******************************************************************\
+
 Function: signedbv_typet::smallest_expr
 
   Inputs:
@@ -363,3 +362,87 @@ constant_exprt signedbv_typet::largest_expr() const
   return to_constant_expr(from_integer(largest(), *this));
 }
 
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer unsignedbv_typet::smallest() const
+{
+  return 0;
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+mp_integer unsignedbv_typet::largest() const
+{
+  return power(2, get_width())-1;
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::zero_expr() const
+{
+  return to_constant_expr(from_integer(0, *this));
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::smallest_expr() const
+{
+  return to_constant_expr(from_integer(smallest(), *this));
+}
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+constant_exprt unsignedbv_typet::largest_expr() const
+{
+  return to_constant_expr(from_integer(largest(), *this));
+}

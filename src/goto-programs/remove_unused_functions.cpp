@@ -6,7 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <message_stream.h>
+#include <util/message.h>
 
 #include "remove_unused_functions.h"
 
@@ -28,7 +28,7 @@ void remove_unused_functions(
 {
   std::set<irep_idt> used_functions;
   std::list<goto_functionst::function_mapt::iterator> unused_functions;
-  find_used_functions(ID_main, functions, used_functions);
+  find_used_functions(goto_functionst::entry_point(), functions, used_functions);
     
   for(goto_functionst::function_mapt::iterator it=
         functions.function_map.begin();
@@ -39,18 +39,16 @@ void remove_unused_functions(
       unused_functions.push_back(it);
   }
   
-  message_streamt message_stream(message_handler);
+  messaget message(message_handler);
   
   if(unused_functions.size()>0)
   {
-    message_stream.str
+    message.statistics()
       << "Dropping " << unused_functions.size() << " of " <<
       functions.function_map.size() << " functions (" << 
-      used_functions.size() << " used)";
+      used_functions.size() << " used)" << messaget::eom;
   }
 
-  message_stream.statistics();
-  
   for(std::list<goto_functionst::function_mapt::iterator>::const_iterator 
         it=unused_functions.begin();
       it!=unused_functions.end();

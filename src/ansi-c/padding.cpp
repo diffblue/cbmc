@@ -6,11 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <config.h>
-#include <i2string.h>
-#include <pointer_offset_size.h>
-#include <simplify_expr.h>
-#include <arith_tools.h>
+#include <algorithm>
+
+#include <util/config.h>
+#include <util/i2string.h>
+#include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
+#include <util/arith_tools.h>
 
 #include "padding.h"
 
@@ -26,8 +28,20 @@ Function: alignment
 
 \*******************************************************************/
 
-unsigned alignment(const typet &type, const namespacet &ns)
+mp_integer alignment(const typet &type, const namespacet &ns)
 {
+  // is the alignment given?
+  const exprt &given_alignment=
+    static_cast<const exprt &>(type.find(ID_C_alignment));
+
+  if(given_alignment.is_not_nil())
+  {
+    mp_integer a_int;
+    if(!to_integer(given_alignment, a_int))
+      return a_int;
+      // we trust it blindly, no matter how nonsensical
+  }
+
   // compute default
 
   if(type.id()==ID_array)
@@ -39,7 +53,7 @@ unsigned alignment(const typet &type, const namespacet &ns)
     const struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    unsigned result=1;
+    mp_integer result=1;
 
     // get the max
     // (should really be the smallest common denominator)
@@ -54,18 +68,32 @@ unsigned alignment(const typet &type, const namespacet &ns)
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_fixedbv ||
-          type.id()==ID_floatbv)
+          type.id()==ID_floatbv ||
+          type.id()==ID_c_bool)
   {
-    unsigned width=type.get_int(ID_width);
+    std::size_t width=to_bitvector_type(type).get_width();
     return width%8?width/8+1:width/8;
+  }
+  else if(type.id()==ID_c_enum)
+  {
+    return alignment(type.subtype(), ns);
+  }
+  else if(type.id()==ID_c_enum_tag)
+  {
+    return alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
   }
   else if(type.id()==ID_pointer)
   {
-    unsigned width=config.ansi_c.pointer_width;
+    std::size_t width=config.ansi_c.pointer_width;
     return width%8?width/8+1:width/8;
   }
   else if(type.id()==ID_symbol)
     return alignment(ns.follow(type), ns);
+  else if(type.id()==ID_c_bit_field)
+  {
+    // we align these according to the 'underlying type'
+    return alignment(type.subtype(), ns);
+  }
 
   return 1;
 }
@@ -86,36 +114,37 @@ void add_padding(struct_typet &type, const namespacet &ns)
 {
   struct_typet::componentst &components=type.components();
 
-  // first do padding for bit-fields
+  // First do padding for bit-fields to make them
+  // appear on byte boundaries.
 
   {  
-    unsigned padding_counter=0;
-    unsigned bit_field_bits=0;
+    std::size_t padding_counter=0;
+    std::size_t bit_field_bits=0;
 
     for(struct_typet::componentst::iterator
         it=components.begin();
         it!=components.end();
         it++)
     {
-      if(it->get_is_bit_field())
+      if(it->type().id()==ID_c_bit_field &&
+         to_c_bit_field_type(it->type()).get_width()!=0)
       {
         // count the bits
-        bit_field_bits+=it->type().get_int(ID_width);
+        std::size_t width=to_c_bit_field_type(it->type()).get_width();
+        bit_field_bits+=width;
       }
       else if(bit_field_bits!=0)
       {
         // not on a byte-boundary?
         if((bit_field_bits%8)!=0)
         {
-          unsigned pad=8-bit_field_bits%8;
-          unsignedbv_typet padding_type;
-          padding_type.set_width(pad);
+          std::size_t pad=8-bit_field_bits%8;
+          c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
           
           struct_typet::componentt component;
           component.type()=padding_type;
           component.set_name("$bit_field_pad"+i2string(padding_counter++));
           component.set_is_padding(true);
-          component.set_is_bit_field(true);
           
           it=components.insert(it, component);
           it++; // skip over
@@ -130,15 +159,13 @@ void add_padding(struct_typet &type, const namespacet &ns)
     // Add padding at the end?
     if((bit_field_bits%8)!=0)
     {
-      unsigned pad=8-bit_field_bits%8;
-      unsignedbv_typet padding_type;
-      padding_type.set_width(pad);
+      std::size_t pad=8-bit_field_bits%8;
+      c_bit_field_typet padding_type(unsignedbv_typet(pad), pad);
       
       struct_typet::componentt component;
       component.type()=padding_type;
       component.set_name("$bit_field_pad"+i2string(padding_counter++));
       component.set_is_padding(true);
-      component.set_is_bit_field(true);
       
       components.push_back(component);
     }  
@@ -149,40 +176,49 @@ void add_padding(struct_typet &type, const namespacet &ns)
     return; // done
 
   mp_integer offset=0;
-  unsigned padding_counter=0;
-  unsigned max_alignment=0;
-  unsigned bit_field_bits=0;
+  std::size_t padding_counter=0;
+  mp_integer max_alignment=0;
+  std::size_t bit_field_bits=0;
 
   for(struct_typet::componentst::iterator
       it=components.begin();
       it!=components.end();
       it++)
   {
-    // ANSI-C says that bit-fields do not get padded!
-    if(it->get_is_bit_field())
-    {
-      // count the bits
-      bit_field_bits+=it->type().get_int(ID_width);
+    const typet &it_type=it->type();
+    mp_integer a=1;
     
-      // we consider the type for max_alignment, however
-      unsigned a=alignment(it->get_bit_field_type(), ns);
-      if(max_alignment<a) 
-        max_alignment=a;
-      continue;
-    }
-    else if(bit_field_bits!=0)
+    if(it_type.id()==ID_c_bit_field)
     {
-      // these are now assumed to be multiples of 8
-      offset+=bit_field_bits/8;
-      bit_field_bits=0;
+      a=alignment(to_c_bit_field_type(it_type).subtype(), ns);
+      
+      // A zero-width bit-field causes alignment to the base-type.
+      if(to_c_bit_field_type(it_type).get_width()==0)
+      {
+      }
+      else
+      {
+        // Otherwise, ANSI-C says that bit-fields do not get padded!
+        // We consider the type for max_alignment, however.
+        if(max_alignment<a) 
+          max_alignment=a;
+        
+        std::size_t w=to_c_bit_field_type(it_type).get_width();
+        std::size_t bytes;
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        bit_field_bits-=w;
+        offset+=bytes;
+        continue;
+      }
     }
     else if(it->type().get_bool(ID_C_packed) ||
             ns.follow(it->type()).get_bool(ID_C_packed))
-      continue; // the field or type is "packed"
-    
-    const typet &it_type=it->type();
-    unsigned a=alignment(it_type, ns);
-    
+    {
+      // the field or type is "packed"
+    }
+    else
+      a=alignment(it_type, ns);
+      
     // check minimum alignment
     if(a<config.ansi_c.alignment)
       a=config.ansi_c.alignment;
@@ -193,14 +229,14 @@ void add_padding(struct_typet &type, const namespacet &ns)
     if(a!=1)
     {
       // we may need to align it
-      unsigned displacement=integer2long(offset%a);
+      mp_integer displacement=offset%a;
 
       if(displacement!=0)
       {
-        unsigned pad=a-displacement;
+        mp_integer pad=a-displacement;
       
         unsignedbv_typet padding_type;
-        padding_type.set_width(pad*8);
+        padding_type.set_width(integer2unsigned(pad*8));
         
         struct_typet::componentt component;
         component.type()=padding_type;
@@ -213,9 +249,9 @@ void add_padding(struct_typet &type, const namespacet &ns)
         offset+=pad;
       }
     }
-    
-    mp_integer size=pointer_offset_size(ns, it_type);
-    
+
+    mp_integer size=pointer_offset_size(it_type, ns);
+
     if(size!=-1)
       offset+=size;
   }
@@ -237,7 +273,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       simplify(tmp, ns);
       mp_integer tmp_i;
       if(!to_integer(tmp, tmp_i) && tmp_i>max_alignment)
-        max_alignment=integer2long(tmp_i);
+        max_alignment=tmp_i;
     }
   }
 
@@ -247,14 +283,14 @@ void add_padding(struct_typet &type, const namespacet &ns)
   if(max_alignment>1)
   {
     // we may need to align it
-    unsigned displacement=integer2long(offset%max_alignment);
+    mp_integer displacement=offset%max_alignment;
 
     if(displacement!=0)
     {
-      unsigned pad=max_alignment-displacement;
+      mp_integer pad=max_alignment-displacement;
     
       unsignedbv_typet padding_type;
-      padding_type.set_width(pad*8);
+      padding_type.set_width(integer2unsigned(pad*8));
 
       // we insert after any final 'flexible member'
       struct_typet::componentt component;
@@ -264,5 +300,51 @@ void add_padding(struct_typet &type, const namespacet &ns)
       
       components.push_back(component);
     }
+  }
+
+}
+
+/*******************************************************************\
+
+Function: add_padding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void add_padding(union_typet &type, const namespacet &ns)
+{
+  mp_integer max_alignment=alignment(type, ns)*8;
+  mp_integer size_bits=pointer_offset_bits(type, ns);
+
+  union_typet::componentst &components=type.components();
+
+  // Is the union packed?
+  if(type.get_bool(ID_C_packed))
+  {
+    // The size needs to be a multiple of 8 only.
+    max_alignment=8;
+  }
+  
+  // The size must be a multiple of the alignment, or
+  // we add a padding member to the union.
+  
+  if(size_bits%max_alignment!=0)
+  {
+    mp_integer padding=max_alignment-(size_bits%max_alignment);
+
+    unsignedbv_typet padding_type;
+    padding_type.set_width(integer2unsigned(size_bits+padding));
+
+    struct_typet::componentt component;
+    component.type()=padding_type;
+    component.set_name("$pad");
+    component.set_is_padding(true);
+    
+    components.push_back(component);
   }
 }

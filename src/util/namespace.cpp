@@ -6,12 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstring>
-#include <cassert>
-#include <cstdlib>
+#include <algorithm>
 
+#include <cassert>
+
+#include "string2int.h"
+#include "symbol_table.h"
+#include "prefix.h"
+#include "std_types.h"
 #include "namespace.h"
-#include "context.h"
 
 /*******************************************************************\
 
@@ -27,17 +30,33 @@ Function: get_max
 
 unsigned get_max(
   const std::string &prefix,
-  const contextt::symbolst &symbols)
+  const symbol_tablet::symbolst &symbols)
 {
   unsigned max_nr=0;
 
   forall_symbols(it, symbols)
-    if(strncmp(it->first.c_str(), prefix.c_str(), prefix.size())==0)
+    if(has_prefix(id2string(it->first), prefix))
       max_nr=
-        std::max(unsigned(atoi(it->first.c_str()+prefix.size())),
+        std::max(unsafe_c_str2unsigned(it->first.c_str()+prefix.size()),
                  max_nr);
 
   return max_nr;
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::~namespace_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+namespace_baset::~namespace_baset()
+{
 }
 
 /*******************************************************************\
@@ -104,6 +123,66 @@ const typet &namespace_baset::follow(const typet &src) const
 
 /*******************************************************************\
 
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  assert(symbol.type.id()==ID_union || symbol.type.id()==ID_incomplete_union);
+  return symbol.type;
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  assert(symbol.type.id()==ID_struct || symbol.type.id()==ID_incomplete_struct);
+  return symbol.type;
+}
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
+{
+  const symbolt &symbol=lookup(src.get_identifier());
+  assert(symbol.is_type);
+  assert(symbol.type.id()==ID_c_enum || symbol.type.id()==ID_incomplete_c_enum);
+  return symbol.type;
+}
+
+/*******************************************************************\
+
 Function: namespace_baset::follow_macros
 
   Inputs:
@@ -149,11 +228,11 @@ unsigned namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  if(context1!=NULL)
-    m=std::max(m, ::get_max(prefix, context1->symbols));
+  if(symbol_table1!=NULL)
+    m=std::max(m, ::get_max(prefix, symbol_table1->symbols));
 
-  if(context2!=NULL)
-    m=std::max(m, ::get_max(prefix, context2->symbols));
+  if(symbol_table2!=NULL)
+    m=std::max(m, ::get_max(prefix, symbol_table2->symbols));
 
   return m;
 }
@@ -174,24 +253,24 @@ bool namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const  
 {
-  contextt::symbolst::const_iterator it;
+  symbol_tablet::symbolst::const_iterator it;
 
-  if(context1!=NULL)
+  if(symbol_table1!=NULL)
   {
-    it=context1->symbols.find(name);
+    it=symbol_table1->symbols.find(name);
 
-    if(it!=context1->symbols.end())
+    if(it!=symbol_table1->symbols.end())
     {
       symbol=&(it->second);
       return false;
     }
   }
 
-  if(context2!=NULL)
+  if(symbol_table2!=NULL)
   {
-    it=context2->symbols.find(name);
+    it=symbol_table2->symbols.find(name);
 
-    if(it!=context2->symbols.end())
+    if(it!=symbol_table2->symbols.end())
     {
       symbol=&(it->second);
       return false;
@@ -217,9 +296,9 @@ unsigned multi_namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  for(context_listt::const_iterator
-      it=context_list.begin();
-      it!=context_list.end();
+  for(symbol_table_listt::const_iterator
+      it=symbol_table_list.begin();
+      it!=symbol_table_list.end();
       it++)
     m=std::max(m, ::get_max(prefix, (*it)->symbols));
 
@@ -242,11 +321,11 @@ bool multi_namespacet::lookup(
   const irep_idt &name,
   const symbolt *&symbol) const  
 {
-  contextt::symbolst::const_iterator s_it;
+  symbol_tablet::symbolst::const_iterator s_it;
 
-  for(context_listt::const_iterator
-      c_it=context_list.begin();
-      c_it!=context_list.end();
+  for(symbol_table_listt::const_iterator
+      c_it=symbol_table_list.begin();
+      c_it!=symbol_table_list.end();
       c_it++)
   {
     s_it=(*c_it)->symbols.find(name);

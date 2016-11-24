@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <identifier.h>
-
+#include "identifier.h"
 #include "pretty_names.h"
 #include "namespace.h"
 #include "symbol.h"
@@ -25,6 +24,7 @@ Function: pretty_namest::get_pretty_names
 
 \*******************************************************************/
 
+#if 0
 void pretty_namest::get_pretty_names(
   const symbolst &symbols,
   const namespacet &ns)
@@ -91,6 +91,7 @@ void pretty_namest::get_pretty_names(
     }
   }
 }
+#endif
 
 /*******************************************************************\
 
@@ -104,6 +105,7 @@ Function: pretty_namest::pretty_names
 
 \*******************************************************************/
 
+#if 0
 const irep_idt &pretty_namest::pretty_name(
   const irep_idt &identifier) const
 {
@@ -111,3 +113,4 @@ const irep_idt &pretty_namest::pretty_name(
   if(it==pretty_map.end()) return identifier;
   return it->second;
 }
+#endif

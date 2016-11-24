@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module:
+Module: Abstract interface to support a programming language
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -8,6 +8,58 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language.h"
 #include "expr.h"
+
+/*******************************************************************\
+
+Function: languaget::final
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::final(symbol_tablet &symbol_table)
+{
+  return false;
+}
+
+/*******************************************************************\
+
+Function: languaget::interfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::interfaces(symbol_tablet &symbol_table)
+{
+  return false;
+}
+
+/*******************************************************************\
+
+Function: languaget::dependencies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void languaget::dependencies(
+  const std::string &module,
+  std::set<std::string> &modules)
+{
+}
 
 /*******************************************************************\
 
@@ -48,5 +100,28 @@ bool languaget::from_type(
   const namespacet &ns)
 {
   code=type.pretty();
+  return false;
+}
+
+/*******************************************************************\
+
+Function: languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  // probably ansi-c/type2name could be used as better fallback if moved to
+  // util/
+  name=type.pretty();
   return false;
 }

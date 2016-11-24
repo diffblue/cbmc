@@ -9,15 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 #define CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 
-#include <options.h>
-#include <message.h>
+#include <util/message.h>
 
-#include "goto_functions.h"
+#include "goto_model.h"
 
 void link_to_library(
-  contextt &context,
-  goto_functionst &goto_functions,
-  const optionst &options,
-  message_handlert &message_handler);
+  symbol_tablet &,
+  goto_functionst &,
+  message_handlert &);
+
+void link_to_library(
+  goto_modelt &,
+  message_handlert &);
 
 #endif

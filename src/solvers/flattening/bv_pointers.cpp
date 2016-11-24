@@ -6,15 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <i2string.h>
-#include <config.h>
-#include <c_misc.h>
-#include <arith_tools.h>
-#include <prefix.h>
-#include <std_expr.h>
-#include <expr_util.h>
-#include <pointer_offset_size.h>
-#include <threeval.h>
+#include <util/i2string.h>
+#include <util/config.h>
+#include <util/c_misc.h>
+#include <util/arith_tools.h>
+#include <util/prefix.h>
+#include <util/std_expr.h>
+#include <util/expr_util.h>
+#include <util/pointer_offset_size.h>
+#include <util/threeval.h>
 
 #include "bv_pointers.h"
 
@@ -37,15 +37,14 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(expr.id()=="invalid-pointer")
+  if(expr.id()==ID_invalid_pointer)
   {
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
     {
-      bvt bv;
-      convert_bv(operands[0], bv);
+      const bvt &bv=convert_bv(operands[0]);
       
-      if(bv.size()!=0)
+      if(!bv.empty())
       {
         bvt invalid_bv, null_bv;
         encode(pointer_logic.get_invalid_object(), invalid_bv);
@@ -55,7 +54,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
         equal_invalid_bv.resize(object_bits);
         equal_null_bv.resize(object_bits);
 
-        for(unsigned i=0; i<object_bits; i++)
+        for(std::size_t i=0; i<object_bits; i++)
         {
           equal_invalid_bv[i]=prop.lequal(bv[offset_bits+i],
                                           invalid_bv[offset_bits+i]);
@@ -75,43 +74,15 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
     {
-      bvt bv;
-      convert_bv(operands[0], bv);
+      // we postpone
+      literalt l=prop.new_variable();
       
-      {
-        bv.erase(bv.begin(), bv.begin()+offset_bits);
-
-        // for now, allocate literal and then do later
-        is_dynamic_objectt is_dynamic_object;
-        is_dynamic_object.bv=bv;
-        is_dynamic_object.l=prop.new_variable();
-        
-        is_dynamic_object_list.push_back(is_dynamic_object);
-        return is_dynamic_object.l;
-      }
-    }
-  }
-  else if(expr.id()==ID_same_object)
-  {
-    if(operands.size()==2 &&
-       is_ptr(operands[0].type()) &&
-       is_ptr(operands[1].type()))
-    {
-      bvt bv0, bv1;
+      postponed_list.push_back(postponedt());
+      postponed_list.back().op=convert_bv(operands[0]);
+      postponed_list.back().bv.push_back(l);
+      postponed_list.back().expr=expr;
       
-      convert_bv(operands[0], bv0);
-      convert_bv(operands[1], bv1);
-
-      {
-        bvt equal_bv;
-        equal_bv.resize(object_bits);
-
-        for(unsigned i=0; i<object_bits; i++)
-          equal_bv[i]=prop.lequal(bv0[offset_bits+i],
-                                  bv1[offset_bits+i]);
-
-        return prop.land(equal_bv);
-      }
+      return l;
     }
   }
   else if(expr.id()==ID_lt || expr.id()==ID_le ||
@@ -121,20 +92,10 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
        is_ptr(operands[0].type()) &&
        is_ptr(operands[1].type()))
     {
-      bvt bv0, bv1;
+      const bvt &bv0=convert_bv(operands[0]);
+      const bvt &bv1=convert_bv(operands[1]);
 
-      convert_bv(operands[0], bv0);
-      convert_bv(operands[1], bv1);
-
-      const irep_idt rel=expr.id();
-
-      if(rel==ID_le || rel==ID_lt)
-        return bv_utils.lt_or_le(rel==ID_le, bv0, bv1, bv_utilst::UNSIGNED);
-
-      if(rel==ID_ge || rel==ID_gt)
-        return bv_utils.lt_or_le(rel==ID_ge, bv1, bv0, bv_utilst::UNSIGNED);
-                                            // swapped
-      assert(false);
+      return bv_utils.rel(bv0, expr.id(), bv1, bv_utilst::UNSIGNED);
     }
   }
 
@@ -224,7 +185,7 @@ bool bv_pointerst::convert_address_of_rec(
       
     // get size
     mp_integer size=
-      pointer_offset_size(ns, array_type.subtype());
+      pointer_offset_size(array_type.subtype(), ns);
     
     offset_arithmetic(bv, size, index);
     assert(bv.size()==bits);
@@ -242,9 +203,9 @@ bool bv_pointerst::convert_address_of_rec(
 
     if(struct_op_type.id()==ID_struct)
     {
-      mp_integer offset=member_offset(ns,
+      mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
-        member_expr.get_component_name());
+        member_expr.get_component_name(), ns);
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -260,7 +221,7 @@ bool bv_pointerst::convert_address_of_rec(
   }
   else if(expr.id()==ID_constant ||
           expr.id()==ID_string_constant ||
-          expr.id()=="zero_string")
+          expr.id()==ID_array)
   { // constant
     add_addr(expr, bv);
     return false;
@@ -311,15 +272,14 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
     const typet &type=expr.type();
 
-    for(unsigned i=0; i<bits; i++)
-      bv[i]=map.get_literal(identifier, i, type);
+    map.get_literals(identifier, type, bits, bv);
 
     return;
   }
   else if(expr.id()==ID_nondet_symbol)
   {
-    for(unsigned i=0; i<bits; i++)
-      bv[i]=prop.new_variable();
+    Forall_literals(it, bv)
+      *it=prop.new_variable();
 
     return;
   }
@@ -336,14 +296,13 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     else if(op_type.id()==ID_signedbv ||
             op_type.id()==ID_unsignedbv ||
             op_type.id()==ID_bool ||
-            op_type.id()==ID_c_enum)
+            op_type.id()==ID_c_enum ||
+            op_type.id()==ID_c_enum_tag)
     {
       // Cast from integer to pointer.
-      // We need to be able to convert the integer 0 to NULL.
       // We just do a zero extension.
       
-      bvt op_bv;
-      convert_bv(op, op_bv);
+      const bvt &op_bv=convert_bv(op);
       
       bv=bv_utils.zero_extension(op_bv, bits);
 
@@ -352,7 +311,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_if)
   {
-    return SUB::convert_if(expr, bv);
+    return SUB::convert_if(to_if_expr(expr), bv);
   }
   else if(expr.id()==ID_index)
   {
@@ -395,16 +354,16 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
       throw "operator + takes at least two operands";
 
     mp_integer size=0;
-    unsigned count=0;
+    std::size_t count=0;
 
     forall_operands(it, expr)
     {
       if(it->type().id()==ID_pointer)
       {
         count++;
-        convert_bv(*it, bv);
+        bv=convert_bv(*it);
         assert(bv.size()==bits);
-        size=pointer_offset_size(ns, it->type().subtype());
+        size=pointer_offset_size(it->type().subtype(), ns);
       }
     }
 
@@ -417,8 +376,6 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
 
     forall_operands(it, expr)
     {
-      bvt op;
-
       if(it->type().id()==ID_pointer) continue;
 
       if(it->type().id()!=ID_unsignedbv &&
@@ -429,9 +386,9 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
         it->type().id()==ID_signedbv?bv_utilst::SIGNED:
                                      bv_utilst::UNSIGNED;
 
-      convert_bv(*it, op);
+      bvt op=convert_bv(*it);
 
-      if(op.size()==0)
+      if(op.empty())
         throw "unexpected pointer arithmetic operand width";
       
       // we cut any extra bits off
@@ -450,6 +407,8 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_minus)
   {
+    // this is pointer-integer
+
     if(expr.operands().size()!=2)
       throw "operator "+expr.id_string()+" takes two operands";
 
@@ -463,10 +422,10 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     exprt neg_op1=unary_exprt(
       ID_unary_minus, expr.op1(), expr.op1().type());
 
-    convert_bv(expr.op0(), bv);
+    bv=convert_bv(expr.op0());
     
     mp_integer element_size=
-      pointer_offset_size(ns, expr.op0().type().subtype());
+      pointer_offset_size(expr.op0().type().subtype(), ns);
     
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -474,7 +433,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
   }
   else if(expr.id()==ID_lshr || 
           expr.id()==ID_shl)
-    return SUB::convert_shift(expr, bv);
+    return SUB::convert_shift(to_shift_expr(expr), bv);
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitnot)
@@ -483,7 +442,7 @@ void bv_pointerst::convert_pointer_type(const exprt &expr, bvt &bv)
     return SUB::convert_concatenation(expr, bv);
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    return SUB::convert_byte_extract(expr, bv);
+    return SUB::convert_byte_extract(to_byte_extract_expr(expr), bv);
 
   return conversion_failed(expr, bv);
 }
@@ -505,17 +464,16 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   if(is_ptr(expr.type()))
     return convert_pointer_type(expr, bv);
 
-  if(expr.id()==ID_minus && expr.operands().size()==2 &&
+  if(expr.id()==ID_minus &&
+     expr.operands().size()==2 &&
      expr.op0().type().id()==ID_pointer &&
      expr.op1().type().id()==ID_pointer)
   {
     // pointer minus pointer
-    bvt op0, op1;
+    bvt op0=convert_bv(expr.op0());
+    bvt op1=convert_bv(expr.op1());
 
-    convert_bv(expr.op0(), op0);
-    convert_bv(expr.op1(), op1);
-
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       return conversion_failed(expr, bv);
@@ -527,7 +485,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
     bv=bv_utils.sub(op0, op1);
     
     mp_integer element_size=
-      pointer_offset_size(ns, expr.op0().type().subtype());
+      pointer_offset_size(expr.op0().type().subtype(), ns);
       
     if(element_size!=1)
     {
@@ -542,11 +500,9 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
           expr.operands().size()==1 &&
           is_ptr(expr.op0().type()))
   {
-    bvt op0;
+    bvt op0=convert_bv(expr.op0());
 
-    convert_bv(expr.op0(), op0);
-
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr, bv);
@@ -559,15 +515,33 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
 
     return;
   }
+  else if(expr.id()==ID_object_size &&
+          expr.operands().size()==1 &&
+          is_ptr(expr.op0().type()))
+  {
+    // we postpone until we know the objects
+    std::size_t width=boolbv_width(expr.type());
+    
+    bv.resize(width);
+    
+    for(std::size_t i=0; i<width; i++)
+      bv[i]=prop.new_variable();
+    
+    postponed_list.push_back(postponedt());
+    
+    postponed_list.back().op=convert_bv(expr.op0());
+    postponed_list.back().bv=bv;
+    postponed_list.back().expr=expr;
+    
+    return;
+  }
   else if(expr.id()==ID_pointer_object &&
           expr.operands().size()==1 &&
           is_ptr(expr.op0().type()))
   {
-    bvt op0;
+    bvt op0=convert_bv(expr.op0());
 
-    convert_bv(expr.op0(), op0);
-
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
     
     if(width==0)
       return conversion_failed(expr, bv);
@@ -590,7 +564,7 @@ void bv_pointerst::convert_bitvector(const exprt &expr, bvt &bv)
   
     // squeeze it in!
 
-    unsigned width=boolbv_width(expr.type());
+    std::size_t width=boolbv_width(expr.type());
 
     if(width==0)
       return conversion_failed(expr, bv);
@@ -618,7 +592,7 @@ Function: bv_pointerst::bv_get_rec
 exprt bv_pointerst::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
-  unsigned offset,
+  std::size_t offset,
   const typet &type) const
 {
   if(!is_ptr(type))
@@ -626,19 +600,19 @@ exprt bv_pointerst::bv_get_rec(
 
   std::string value_addr, value_offset, value;
 
-  for(unsigned i=0; i<bits; i++)
+  for(std::size_t i=0; i<bits; i++)
   {
     char ch;
-    unsigned bit_nr=i+offset;
+    std::size_t bit_nr=i+offset;
 
     if(unknown[bit_nr])
       ch='0';
     else
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
-       case tvt::TV_FALSE: ch='0'; break;
-       case tvt::TV_TRUE:  ch='1'; break;
-       case tvt::TV_UNKNOWN: ch='0'; break;
+       case tvt::tv_enumt::TV_FALSE: ch='0'; break;
+       case tvt::tv_enumt::TV_TRUE:  ch='1'; break;
+       case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
       
@@ -657,7 +631,7 @@ exprt bv_pointerst::bv_get_rec(
   result.set_value(value);
 
   pointer_logict::pointert pointer;
-  pointer.object=integer2long(binary2integer(value_addr, false));
+  pointer.object=integer2unsigned(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
   
   // we add the elaborated expression as operand
@@ -684,12 +658,12 @@ void bv_pointerst::encode(unsigned addr, bvt &bv)
   bv.resize(bits);
 
   // set offset to zero
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=const_literal(false);
 
   // set variable part
-  for(unsigned i=0; i<object_bits; i++)
-    bv[offset_bits+i]=const_literal(addr&(1<<i));
+  for(std::size_t i=0; i<object_bits; i++)
+    bv[offset_bits+i]=const_literal((addr&(1<<i))!=0);
 }
 
 /*******************************************************************\
@@ -714,7 +688,7 @@ void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
   bvt tmp=bv_utils.add(bv1, bv2);
 
   // copy offset bits
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=tmp[i];
 }
 
@@ -735,8 +709,7 @@ void bv_pointerst::offset_arithmetic(
   const mp_integer &factor,
   const exprt &index)
 {
-  bvt bv_index;
-  convert_bv(index, bv_index);
+  bvt bv_index=convert_bv(index);
 
   bv_utilst::representationt rep=
     index.type().id()==ID_signedbv?bv_utilst::SIGNED:
@@ -779,7 +752,7 @@ void bv_pointerst::offset_arithmetic(
   bvt bv_tmp=bv_utils.add(bv, bv_index);
   
   // copy lower parts of result
-  for(unsigned i=0; i<offset_bits; i++)
+  for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=bv_tmp[i];
 }
 
@@ -807,7 +780,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 
 /*******************************************************************\
 
-Function: bv_pointerst::do_is_dynamic_object
+Function: bv_pointerst::do_postponed
 
   Inputs:
 
@@ -817,36 +790,99 @@ Function: bv_pointerst::do_is_dynamic_object
 
 \*******************************************************************/
 
-void bv_pointerst::do_is_dynamic_object(
-  const is_dynamic_objectt &is_dynamic_object)
+void bv_pointerst::do_postponed(
+  const postponedt &postponed)
 {
-  const pointer_logict::objectst &objects=
-    pointer_logic.objects;
-    
-  unsigned number=0;
-    
-  for(pointer_logict::objectst::const_iterator
-      it=objects.begin();
-      it!=objects.end();
-      it++, number++)
+  if(postponed.expr.id()==ID_dynamic_object)
   {
-    const exprt &expr=*it;
-    
-    bool is_dynamic=pointer_logic.is_dynamic_object(expr);
-    
-    // only compare object part
-    bvt bv;
-    encode(number, bv);
-    
-    bv.erase(bv.begin(), bv.begin()+offset_bits);
-    
-    literalt l1=bv_utils.equal(bv, is_dynamic_object.bv);
-    literalt l2=is_dynamic_object.l;
-    
-    if(!is_dynamic) l2=prop.lnot(l2);
-    
-    prop.l_set_to(prop.limplies(l1, l2), true);
+    const pointer_logict::objectst &objects=
+      pointer_logic.objects;
+      
+    std::size_t number=0;
+      
+    for(pointer_logict::objectst::const_iterator
+        it=objects.begin();
+        it!=objects.end();
+        it++, number++)
+    {
+      const exprt &expr=*it;
+      
+      bool is_dynamic=pointer_logic.is_dynamic_object(expr);
+      
+      // only compare object part
+      bvt bv;
+      encode(number, bv);
+      
+      bv.erase(bv.begin(), bv.begin()+offset_bits);
+
+      bvt saved_bv=postponed.op;
+      saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+      
+      assert(bv.size()==saved_bv.size());
+      assert(postponed.bv.size()==1);
+      
+      literalt l1=bv_utils.equal(bv, saved_bv);
+      literalt l2=postponed.bv.front();
+      
+      if(!is_dynamic) l2=!l2;
+      
+      prop.l_set_to(prop.limplies(l1, l2), true);
+    }
   }
+  else if(postponed.expr.id()==ID_object_size)
+  {
+    const pointer_logict::objectst &objects=
+      pointer_logic.objects;
+      
+    std::size_t number=0;
+      
+    for(pointer_logict::objectst::const_iterator
+        it=objects.begin();
+        it!=objects.end();
+        it++, number++)
+    {
+      const exprt &expr=*it;
+      
+      mp_integer object_size;
+
+      if(expr.id()==ID_symbol)
+      {
+        // just get the type
+        const typet &type=ns.follow(expr.type());
+
+        exprt size_expr=size_of_expr(type, ns);
+ 
+        if(size_expr.is_nil())
+          continue;
+
+        if(to_integer(size_expr, object_size))
+          continue;
+      }
+      else
+        continue;
+      
+      // only compare object part
+      bvt bv;
+      encode(number, bv);
+      
+      bv.erase(bv.begin(), bv.begin()+offset_bits);
+
+      bvt saved_bv=postponed.op;
+      saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+      
+      assert(bv.size()==saved_bv.size());
+      assert(postponed.bv.size()>=1);
+      
+      literalt l1=bv_utils.equal(bv, saved_bv);
+
+      bvt size_bv=bv_utils.build_constant(object_size, postponed.bv.size());
+      literalt l2=bv_utils.equal(postponed.bv, size_bv);
+      
+      prop.l_set_to(prop.limplies(l1, l2), true);
+    }
+  }
+  else
+    assert(false);
 }
 
 /*******************************************************************\
@@ -863,13 +899,14 @@ Function: bv_pointerst::post_process
 
 void bv_pointerst::post_process()
 {
-  for(is_dynamic_object_listt::const_iterator
-      it=is_dynamic_object_list.begin();
-      it!=is_dynamic_object_list.end();
+  for(postponed_listt::const_iterator
+      it=postponed_list.begin();
+      it!=postponed_list.end();
       it++)
-    do_is_dynamic_object(*it);
-  
-  is_dynamic_object_list.clear();
+    do_postponed(*it);
+
+  // Clear the list to avoid re-doing in case of incremental usage.
+  postponed_list.clear();
   
   SUB::post_process();
 }

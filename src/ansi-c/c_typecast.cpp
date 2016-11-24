@@ -6,14 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cassert>
-#include <cstdlib>
+#include <algorithm>
 
-#include <config.h>
-#include <expr_util.h>
-#include <std_expr.h>
-#include <base_type.h>
-#include <symbol.h>
+#include <cassert>
+
+#include <util/config.h>
+#include <util/expr_util.h>
+#include <util/std_expr.h>
+#include <util/base_type.h>
+#include <util/symbol.h>
+#include <util/simplify_expr.h>
 
 #include "c_typecast.h"
 #include "c_types.h"
@@ -138,19 +140,28 @@ bool check_c_implicit_typecast(
   
   const irep_idt &src_type_id=src_type.id();
 
+  if(src_type_id==ID_c_bit_field)
+    return check_c_implicit_typecast(src_type.subtype(), dest_type);
+
+  if(dest_type.id()==ID_c_bit_field)
+    return check_c_implicit_typecast(src_type, dest_type.subtype());
+
   if(src_type_id==ID_natural)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_signedbv) return false;
     if(dest_type.id()==ID_floatbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_integer)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
@@ -158,23 +169,29 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_pointer) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_real)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_rational)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_complex) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_bool)
   {
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
@@ -183,14 +200,19 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_c_enum) return false;
+    if(dest_type.id()==ID_c_enum_tag) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
           src_type_id==ID_c_enum ||
-          src_type_id==ID_incomplete_c_enum)
+          src_type_id==ID_c_enum_tag ||
+          src_type_id==ID_incomplete_c_enum ||
+          src_type_id==ID_c_bool)
   {
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_rational) return false;
@@ -199,12 +221,15 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_fixedbv) return false;
     if(dest_type.id()==ID_pointer) return false;
     if(dest_type.id()==ID_c_enum) return false;
+    if(dest_type.id()==ID_c_enum_tag) return false;
     if(dest_type.id()==ID_incomplete_c_enum) return false;
+    if(dest_type.id()==ID_complex) return false;
   }
   else if(src_type_id==ID_floatbv ||
           src_type_id==ID_fixedbv)
   {
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_integer) return false;
     if(dest_type.id()==ID_real) return false;
     if(dest_type.id()==ID_rational) return false;
@@ -212,6 +237,23 @@ bool check_c_implicit_typecast(
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_floatbv) return false;
     if(dest_type.id()==ID_fixedbv) return false;
+    if(dest_type.id()==ID_complex) return false;
+  }
+  else if(src_type_id==ID_complex)
+  {
+    if(dest_type.id()==ID_complex)
+      return check_c_implicit_typecast(src_type.subtype(), dest_type.subtype());
+    else
+    {
+      // 6.3.1.7, par 2:
+
+      // When a value of complex type is converted to a real type, the
+      // imaginary part of the complex value is discarded and the value of the
+      // real part is converted according to the conversion rules for the
+      // corresponding real type.
+      
+      return check_c_implicit_typecast(src_type.subtype(), dest_type);
+    }
   }
   else if(src_type_id==ID_array ||
           src_type_id==ID_pointer)
@@ -232,8 +274,24 @@ bool check_c_implicit_typecast(
        src_type.subtype()==dest_type.subtype()) return false;
 
     if(dest_type.id()==ID_bool) return false;
+    if(dest_type.id()==ID_c_bool) return false;
     if(dest_type.id()==ID_unsignedbv) return false;
     if(dest_type.id()==ID_signedbv) return false;
+  }
+  else if(src_type_id==ID_vector)
+  {
+    if(dest_type.id()==ID_vector)
+      return false;
+  }
+  else if(src_type_id==ID_complex)
+  {
+    if(dest_type.id()==ID_complex)
+    {
+      // We convert between complex types if we convert between
+      // their component types.
+      if(!check_c_implicit_typecast(src_type.subtype(), dest_type.subtype()))
+        return false;
+    }
   }
 
   return true;
@@ -254,34 +312,24 @@ Function: c_typecastt::follow_with_qualifiers
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
   if(src_type.id()!=ID_symbol) return src_type;
-
-  typet dest_type=src_type;
+  
+  typet result_type=src_type;
   
   // collect qualifiers
-  c_qualifierst qualifiers;
+  c_qualifierst qualifiers(src_type);
   
-  // hack for something that isn't a proper type qualifier
-  bool transparent_union=false;
-  
-  while(dest_type.id()==ID_symbol)
+  while(result_type.id()==ID_symbol)
   {
-    qualifiers+=c_qualifierst(dest_type);
-
-    if(dest_type.get_bool(ID_transparent_union))
-      transparent_union=true;
-  
     const symbolt &followed_type_symbol=
-      ns.lookup(dest_type.get(ID_identifier));
+      ns.lookup(result_type.get(ID_identifier));
 
-    dest_type=followed_type_symbol.type;
+    result_type=followed_type_symbol.type;
+    qualifiers+=c_qualifierst(followed_type_symbol.type);
   }
 
-  qualifiers.write(dest_type);
+  qualifiers.write(result_type);
 
-  if(transparent_union)
-    dest_type.set(ID_transparent_union, true);
-  
-  return dest_type;
+  return result_type;
 }
 
 /*******************************************************************\
@@ -297,10 +345,10 @@ Function: c_typecastt::get_c_type
 \*******************************************************************/
 
 c_typecastt::c_typet c_typecastt::get_c_type(
-  const typet &type)
+  const typet &type) const
 {
-  unsigned width=atoi(type.get(ID_width).c_str());
-  
+  unsigned width=type.get_int(ID_width);
+
   if(type.id()==ID_signedbv)
   {
     if(width<=config.ansi_c.char_width)
@@ -313,6 +361,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return LONG;
     else if(width<=config.ansi_c.long_long_int_width)
       return LONGLONG;
+    else
+      return LARGE_SIGNED_INT;
   }
   else if(type.id()==ID_unsignedbv)
   {
@@ -326,8 +376,12 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return ULONG;
     else if(width<=config.ansi_c.long_long_int_width)
       return ULONGLONG;
+    else
+      return LARGE_UNSIGNED_INT;
   }
   else if(type.id()==ID_bool)
+    return BOOL;
+  else if(type.id()==ID_c_bool)
     return BOOL;
   else if(type.id()==ID_floatbv ||
           type.id()==ID_fixedbv)
@@ -338,6 +392,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return DOUBLE;
     else if(width<=config.ansi_c.long_double_width)
       return LONGDOUBLE;
+    else if(width<=128)
+      return FLOAT128;
   }
   else if(type.id()==ID_pointer)
   {
@@ -351,6 +407,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return PTR;
   }
   else if(type.id()==ID_c_enum ||
+          type.id()==ID_c_enum_tag ||
           type.id()==ID_incomplete_c_enum)
   {
     return INT;
@@ -361,6 +418,10 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return RATIONAL;
   else if(type.id()==ID_real)
     return REAL;
+  else if(type.id()==ID_complex)
+    return COMPLEX;
+  else if(type.id()==ID_c_bit_field)
+    return get_c_type(to_c_bit_field_type(type).subtype());
     
   return OTHER;  
 }
@@ -396,41 +457,75 @@ void c_typecastt::implicit_typecast_arithmetic(
     }
     return;
 
-  case BOOL:       new_type=bool_typet(); break;
+  case BOOL:       assert(false); // should always be promoted to int
   case CHAR:       assert(false); // should always be promoted to int
   case UCHAR:      assert(false); // should always be promoted to int
   case SHORT:      assert(false); // should always be promoted to int
   case USHORT:     assert(false); // should always be promoted to int
-  case INT:        new_type=int_type(); break;
-  case UINT:       new_type=uint_type(); break;
-  case LONG:       new_type=long_int_type(); break;
-  case ULONG:      new_type=long_uint_type(); break;
-  case LONGLONG:   new_type=long_long_int_type(); break;
-  case ULONGLONG:  new_type=long_long_uint_type(); break;
+  case INT:        new_type=signed_int_type(); break;
+  case UINT:       new_type=unsigned_int_type(); break;
+  case LONG:       new_type=signed_long_int_type(); break;
+  case ULONG:      new_type=unsigned_long_int_type(); break;
+  case LONGLONG:   new_type=signed_long_long_int_type(); break;
+  case ULONGLONG:  new_type=unsigned_long_long_int_type(); break;
   case SINGLE:     new_type=float_type(); break;
   case DOUBLE:     new_type=double_type(); break;
   case LONGDOUBLE: new_type=long_double_type(); break;
+  case FLOAT128:   new_type=ieee_float_spect::quadruple_precision().to_type(); break;
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
+  case COMPLEX: return; // do nothing
   default: return;
   }
 
   if(new_type!=expr_type)
-  {
-    if(new_type.id()==ID_pointer &&
-       expr_type.id()==ID_array)
-    {
-      exprt index_expr(ID_index, expr_type.subtype());
-      index_expr.reserve_operands(2);
-      index_expr.move_to_operands(expr);
-      index_expr.copy_to_operands(gen_zero(index_type()));
-      expr=exprt(ID_address_of, new_type);
-      expr.move_to_operands(index_expr);
-    }
-    else
-      do_typecast(expr, new_type);
-  }
+    do_typecast(expr, new_type);
+}
+
+/*******************************************************************\
+
+Function: c_typecastt::implicit_typecast_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+c_typecastt::c_typet c_typecastt::minimum_promotion(
+  const typet &type) const
+{
+  c_typet c_type=get_c_type(type);
+
+  // 6.3.1.1, par 2
+
+  // "If an int can represent all values of the original type, the
+  // value is converted to an int; otherwise, it is converted to
+  // an unsigned int."
+
+  c_typet max_type=std::max(c_type, INT); // minimum promotion
+
+  // The second case can arise if we promote any unsigned type
+  // that is as large as unsigned int.
+
+  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
+     max_type==USHORT)
+    max_type=UINT;
+  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
+          max_type==UCHAR)
+    max_type=UINT;
+  else
+    max_type=std::max(max_type, INT);
+
+  if(max_type==UINT &&
+     type.id()==ID_c_bit_field &&
+     to_c_bit_field_type(type).get_width()<config.ansi_c.int_width)
+    max_type=INT;
+
+  return max_type;
 }
 
 /*******************************************************************\
@@ -447,8 +542,7 @@ Function: c_typecastt::implicit_typecast_arithmetic
 
 void c_typecastt::implicit_typecast_arithmetic(exprt &expr)
 {
-  c_typet c_type=get_c_type(expr.type());
-  c_type=std::max(c_type, INT); // minimum promotion
+  c_typet c_type=minimum_promotion(expr.type());
   implicit_typecast_arithmetic(expr, c_type);
 }
 
@@ -471,7 +565,11 @@ void c_typecastt::implicit_typecast(
   typet src_type=follow_with_qualifiers(expr.type()),
         dest_type=follow_with_qualifiers(type);
   
-  implicit_typecast_followed(expr, src_type, dest_type);
+  typet type_qual=type;
+  c_qualifierst qualifiers(dest_type);
+  qualifiers.write(type_qual);
+
+  implicit_typecast_followed(expr, src_type, type_qual, dest_type);
 }
 
 /*******************************************************************\
@@ -489,26 +587,42 @@ Function: c_typecastt::implicit_typecast_followed
 void c_typecastt::implicit_typecast_followed(
   exprt &expr,
   const typet &src_type,
+  const typet &orig_dest_type,
   const typet &dest_type)
 {
   // do transparent union
   if(dest_type.id()==ID_union &&
-     dest_type.get_bool(ID_transparent_union) &&
+     dest_type.get_bool(ID_C_transparent_union) &&
      src_type.id()!=ID_union)
   {
-    // check union members
-    const union_typet &union_type=to_union_type(dest_type);
+    // The argument corresponding to a transparent union type can be of any
+    // type in the union; no explicit cast is required.
+
+    // GCC docs say:
+    //  If the union member type is a pointer, qualifiers like const on the
+    //  referenced type must be respected, just as with normal pointer
+    //  conversions.
+    // But it is accepted, and Clang doesn't even emit a warning (GCC 4.7 does)
+    typet src_type_no_const=src_type;
+    if(src_type.id()==ID_pointer &&
+       src_type.subtype().get_bool(ID_C_constant))
+      src_type_no_const.subtype().remove(ID_C_constant);
+    
+    // Check union members.
+    const union_typet &dest_union_type=to_union_type(dest_type);
 
     for(union_typet::componentst::const_iterator
-        it=union_type.components().begin();
-        it!=union_type.components().end();
+        it=dest_union_type.components().begin();
+        it!=dest_union_type.components().end();
         it++)
     {
-      if(!check_c_implicit_typecast(src_type, it->type()))
+      if(!check_c_implicit_typecast(src_type_no_const, it->type()))
       {
         // build union constructor
-        exprt union_expr(ID_union, union_type);
+        exprt union_expr(ID_union, orig_dest_type);
         union_expr.move_to_operands(expr);
+        if(!full_eq(src_type, src_type_no_const))
+          do_typecast(union_expr.op0(), src_type_no_const);
         union_expr.set(ID_component_name, it->get_name());
         expr=union_expr;
         return; // ok
@@ -520,13 +634,13 @@ void c_typecastt::implicit_typecast_followed(
   {
     // special case: 0 == NULL
 
-    if(expr.is_zero() && (
+    if(simplify_expr(expr, ns).is_zero() && (
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_signedbv ||
        src_type.id()==ID_natural ||
        src_type.id()==ID_integer))
     {
-      expr=exprt(ID_constant, dest_type);
+      expr=exprt(ID_constant, orig_dest_type);
       expr.set(ID_value, ID_NULL);
       return; // ok
     }
@@ -550,13 +664,15 @@ void c_typecastt::implicit_typecast_followed(
         // very generous:
         // between any two function pointers it's ok
       }
-      else if(base_type_eq(src_type.subtype(), dest_type.subtype(), ns))
+      else if(base_type_eq(src_sub, dest_sub, ns))
       {
         // ok
       }
-      else if(is_number(src_sub) && is_number(dest_sub))
+      else if((is_number(src_sub) || src_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag) &&
+              (is_number(dest_sub) || dest_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag))
       {
-        // also generous: between any to scalar types it's ok
+        // Also generous: between any to scalar types it's ok.
+        // We should probably check the size.
       }
       else
         warnings.push_back("incompatible pointer types");
@@ -578,7 +694,7 @@ void c_typecastt::implicit_typecast_followed(
         expr.type()=src_type; // because of qualifiers
       }
       else
-        do_typecast(expr, dest_type);
+        do_typecast(expr, orig_dest_type);
 
       return; // ok
     }
@@ -587,7 +703,7 @@ void c_typecastt::implicit_typecast_followed(
   if(check_c_implicit_typecast(src_type, dest_type))
     errors.push_back("implicit conversion not permitted");
   else if(src_type!=dest_type)
-    do_typecast(expr, dest_type);
+    do_typecast(expr, orig_dest_type);
 }
 
 /*******************************************************************\
@@ -609,30 +725,75 @@ void c_typecastt::implicit_typecast_arithmetic(
   const typet &type1=ns.follow(expr1.type());
   const typet &type2=ns.follow(expr2.type());
 
-  c_typet c_type1=get_c_type(type1),
-          c_type2=get_c_type(type2);
+  c_typet c_type1=minimum_promotion(type1),
+          c_type2=minimum_promotion(type2);
 
   c_typet max_type=std::max(c_type1, c_type2);
 
-  // "If an int can represent all values of the original type, the
-  // value is converted to an int; otherwise, it is converted to
-  // an unsigned int."
-  
-  // The second case can arise if we promote any unsigned type
-  // that is as large as unsigned int.
+  if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
+  {
+    // get the biggest width of both
+    unsigned width1=type1.get_int(ID_width);
+    unsigned width2=type2.get_int(ID_width);
+    
+    // produce type
+    typet result_type;
 
-  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
-     max_type==USHORT)
-    max_type=UINT;
-  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
-          max_type==UCHAR)
-    max_type=UINT;
-  else
-    max_type=std::max(max_type, INT);
-  
+    if(width1==width2)
+    {
+      if(max_type==LARGE_SIGNED_INT)
+        result_type=signedbv_typet(width1);
+      else
+        result_type=unsignedbv_typet(width1);
+    }
+    else if(width1>width2)
+      result_type=type1;
+    else // width1<width2
+      result_type=type2;
+
+    do_typecast(expr1, result_type);
+    do_typecast(expr2, result_type);
+    
+    return;
+  }
+  else if(max_type==COMPLEX)
+  {
+    if(c_type1==COMPLEX && c_type2==COMPLEX)
+    {
+      // promote to the one with bigger subtype
+      if(get_c_type(type1.subtype())>get_c_type(type2.subtype()))
+        do_typecast(expr2, type1);
+      else
+        do_typecast(expr1, type2);
+    }
+    else if(c_type1==COMPLEX)
+    {
+      assert(c_type1==COMPLEX && c_type2!=COMPLEX);
+      do_typecast(expr2, type1.subtype());
+      do_typecast(expr2, type1);
+    }
+    else
+    {
+      assert(c_type1!=COMPLEX && c_type2==COMPLEX);
+      do_typecast(expr1, type2.subtype());
+      do_typecast(expr1, type2);
+    }
+
+    return;
+  }
+  else if(max_type==SINGLE || max_type==DOUBLE ||
+          max_type==LONGDOUBLE || max_type==FLOAT128)
+  {
+    // Special-case optimisation:
+    // If we have two non-standard sized floats, don't do implicit type
+    // promotion if we can possibly avoid it.
+    if(type1==type2)
+      return;
+  }
+
   implicit_typecast_arithmetic(expr1, max_type);
   implicit_typecast_arithmetic(expr2, max_type);
-  
+
   if(max_type==PTR)
   {
     if(c_type1==VOIDPTR)
@@ -655,25 +816,44 @@ Function: c_typecastt::do_typecast
 
 \*******************************************************************/
 
-void c_typecastt::do_typecast(exprt &dest, const typet &type)
+void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 {
   // special case: array -> pointer is actually
   // something like address_of
   
-  const typet &dest_type=ns.follow(dest.type());
+  const typet &src_type=ns.follow(expr.type());
 
-  if(dest_type.id()==ID_array)
+  if(src_type.id()==ID_array)
   {
     index_exprt index;
-    index.array()=dest;
+    index.array()=expr;
     index.index()=gen_zero(index_type());
-    index.type()=dest_type.subtype();
-    dest=gen_address_of(index);
-    if(ns.follow(dest.type())!=ns.follow(type))
-      dest.make_typecast(type);
+    index.type()=src_type.subtype();
+    expr=address_of_exprt(index);
+    if(ns.follow(expr.type())!=ns.follow(dest_type))
+      expr.make_typecast(dest_type);
     return;
   }
 
-  if(dest_type!=type)
-    dest.make_typecast(type);
+  if(src_type!=dest_type)
+  {
+    // C booleans are special; we produce the
+    // explicit comparision with zero.
+    // Note that this requires ieee_float_notequal
+    // in case of floating-point numbers.
+    
+    if(dest_type.get(ID_C_c_type)==ID_bool)
+    {
+      expr=is_not_zero(expr, ns);
+      expr.make_typecast(dest_type);
+    }
+    else if(dest_type.id()==ID_bool)
+    {
+      expr=is_not_zero(expr, ns);
+    }
+    else
+    {    
+      expr.make_typecast(dest_type);
+    }
+  }
 }

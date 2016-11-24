@@ -12,7 +12,7 @@ Date: July 2006
 #ifndef XML_GOTO_FUNCTION_H_
 #define XML_GOTO_FUNCTION_H_
 
-#include <xml.h>
+#include <util/xml.h>
 #include <goto-programs/goto_functions.h>
 
 #include "xml_irep_hashing.h"

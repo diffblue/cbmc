@@ -7,6 +7,9 @@
 
 void openlog(const char *ident, int option, int facility)
 {
+  (void)*ident;
+  (void)option;
+  (void)facility;
 }
 
 /* FUNCTION: closelog */
@@ -29,5 +32,6 @@ void closelog(void)
 
 void syslog(int priority, const char *format, ...)
 {
-  // should check arguments
+  (void)priority;
+  (void)*format;
 }

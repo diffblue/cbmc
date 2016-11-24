@@ -6,16 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"
+#include "c_bit_field_replacement_type.h"
 
-#ifdef HAVE_FLOATBV
 #include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -29,355 +28,505 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
+void boolbvt::convert_typecast(const typecast_exprt &expr, bvt &bv)
 {
-  if(expr.operands().size()!=1)
-    throw "typecast takes one operand";
-
-  const exprt &op=expr.op0();
-
-  bvt op_bv;
-  convert_bv(op, op_bv);
-  
   const typet &expr_type=ns.follow(expr.type());
+  const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
+  const bvt &op_bv=convert_bv(op);  
 
-  bvtypet dest_bvtype=get_bvtype(expr_type);
-  bvtypet op_bvtype=get_bvtype(op_type);
-  unsigned op_width=op_bv.size();
-
-  unsigned dest_width=boolbv_width(expr_type);
-  
-  if(dest_width==0)
+  if(type_conversion(op_type, op_bv, expr_type, bv))
     return conversion_failed(expr, bv);
+}
+
+/*******************************************************************\
+
+Function: boolbvt::type_conversion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool boolbvt::type_conversion(
+  const typet &src_type, const bvt &src,
+  const typet &dest_type, bvt &dest)
+{
+  bvtypet dest_bvtype=get_bvtype(dest_type);
+  bvtypet src_bvtype=get_bvtype(src_type);
   
-  bv.clear();
-  bv.reserve(dest_width);
+  if(src_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns), src, dest_type, dest);
 
-  if(op_width==0)
-    return conversion_failed(expr, bv);
+  if(dest_bvtype==IS_C_BIT_FIELD)
+    return type_conversion(
+      src_type, src, c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns), dest);
 
+  std::size_t src_width=src.size();
+  std::size_t dest_width=boolbv_width(dest_type);
+  
+  if(dest_width==0 || src_width==0)
+    return true;
+  
+  dest.clear();
+  dest.reserve(dest_width);
+
+  if(dest_type.id()==ID_complex)
+  {
+    if(src_type==dest_type.subtype())
+    {
+      forall_literals(it, src)
+      dest.push_back(*it);
+
+      // pad with zeros
+      for(std::size_t i=src.size(); i<dest_width; i++)
+        dest.push_back(const_literal(false));
+
+      return false;
+    }
+    else if(src_type.id()==ID_complex)
+    {
+      // recursively do both halfs
+      bvt lower, upper, lower_res, upper_res;
+      lower.assign(src.begin(), src.begin()+src.size()/2);
+      upper.assign(src.begin()+src.size()/2, src.end());
+      type_conversion(ns.follow(src_type.subtype()), lower, ns.follow(dest_type.subtype()), lower_res);
+      type_conversion(ns.follow(src_type.subtype()), upper, ns.follow(dest_type.subtype()), upper_res);
+      assert(lower_res.size()+upper_res.size()==dest_width);
+      dest=lower_res;
+      dest.insert(dest.end(), upper_res.begin(), upper_res.end());
+      return false;
+    }
+  }
+  
+  if(src_type.id()==ID_complex)
+  {
+    assert(dest_type.id()!=ID_complex);
+    if(dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_c_enum ||
+       dest_type.id()==ID_c_enum_tag ||
+       dest_type.id()==ID_bool)
+    {
+      // A cast from complex x to real T
+      // is (T) __real__ x.
+      bvt tmp_src(src);
+      tmp_src.resize(src.size()/2); // cut off imag part
+      return type_conversion(src_type.subtype(), tmp_src, dest_type, dest);
+    }
+  }
+  
   switch(dest_bvtype)
   {
   case IS_RANGE:
-    if(op_bvtype==IS_UNSIGNED || op_bvtype==IS_SIGNED)
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_SIGNED ||
+       src_bvtype==IS_C_BOOL)
     {
-      mp_integer dest_from=to_range_type(expr_type).get_from();
+      mp_integer dest_from=to_range_type(dest_type).get_from();
 
       if(dest_from==0)
       {
         // do zero extension
-        bv.resize(dest_width);
-        for(unsigned i=0; i<bv.size(); i++)
-          bv[i]=(i<op_bv.size()?op_bv[i]:const_literal(false));
-        return;
+        dest.resize(dest_width);
+        for(std::size_t i=0; i<dest.size(); i++)
+          dest[i]=(i<src.size()?src[i]:const_literal(false));
+
+        return false;
       }
     }
-    else if(op_bvtype==IS_RANGE)
+    else if(src_bvtype==IS_RANGE) // range to range
     {
-      mp_integer src_from=to_range_type(op_type).get_from();
-      mp_integer dest_from=to_range_type(expr_type).get_from();
+      mp_integer src_from=to_range_type(src_type).get_from();
+      mp_integer dest_from=to_range_type(dest_type).get_from();
 
       if(dest_from==src_from)
       {
-        // do zero extension
-        bv.resize(dest_width);
-        for(unsigned i=0; i<bv.size(); i++)
-          bv[i]=(i<op_bv.size()?op_bv[i]:const_literal(false));
-        return;
+        // do zero extension, if needed
+        dest=bv_utils.zero_extension(src, dest_width);
+        return false;
       }
       else
       {
-        // need to do arithmetic
+        // need to do arithmetic: add src_from-dest_from
+        mp_integer offset=src_from-dest_from;
+        dest=
+          bv_utils.add(
+            bv_utils.zero_extension(src, dest_width),
+            bv_utils.build_constant(offset, dest_width));
       }
+
+      return false;
     }
     break;
     
   case IS_FLOAT: // to float
     {
-      #ifdef HAVE_FLOATBV
       float_utilst float_utils(prop);
       
-      switch(op_bvtype)
+      switch(src_bvtype)
       {
       case IS_FLOAT: // float to float
-        float_utils.spec=to_floatbv_type(op_type);
-        bv=float_utils.conversion(op_bv, to_floatbv_type(expr_type));
-        return;
+        // we don't have a rounding mode here,
+        // which is why we refuse.
+        break;
 
       case IS_SIGNED: // signed to float
       case IS_C_ENUM:
-        float_utils.spec=to_floatbv_type(expr_type);
-        bv=float_utils.from_signed_integer(op_bv);
-        return;
+        float_utils.spec=to_floatbv_type(dest_type);
+        dest=float_utils.from_signed_integer(src);
+        return false;
 
       case IS_UNSIGNED: // unsigned to float
-        float_utils.spec=to_floatbv_type(expr_type);
-        bv=float_utils.from_unsigned_integer(op_bv);
-        return;
+      case IS_C_BOOL: // _Bool to float
+        float_utils.spec=to_floatbv_type(dest_type);
+        dest=float_utils.from_unsigned_integer(src);
+        return false;
 
       case IS_BV:
-        assert(op_width==dest_width);
-        bv=op_bv;
-        return;
+        assert(src_width==dest_width);
+        dest=src;
+        return false;
 
       default:
-        if(op_type.id()==ID_bool)
+        if(src_type.id()==ID_bool)
         {
           // bool to float
           
           // build a one
           ieee_floatt f;
-          f.spec=to_floatbv_type(expr_type);
+          f.spec=to_floatbv_type(dest_type);
           f.from_integer(1);
           
-          convert_bv(f.to_expr(), bv);
+          dest=convert_bv(f.to_expr());
 
-          assert(op_width==1);
+          assert(src_width==1);
           
-          for(unsigned i=0; i<bv.size(); i++)
-            bv[i]=prop.land(bv[i], op_bv[0]);
+          Forall_literals(it, dest)
+            *it=prop.land(*it, src[0]);
             
-          return;
+          return false;
         }
       }
-      #endif
     }
     break;
 
   case IS_FIXED:
-    if(op_bvtype==IS_FIXED)
+    if(src_bvtype==IS_FIXED)
     {
       // fixed to fixed
       
-      unsigned dest_fraction_bits=to_fixedbv_type(expr_type).get_fraction_bits(),
-               dest_int_bits=dest_width-dest_fraction_bits;
-      unsigned op_fraction_bits=to_fixedbv_type(op_type).get_fraction_bits(),
-               op_int_bits=op_width-op_fraction_bits;
+      std::size_t dest_fraction_bits=to_fixedbv_type(dest_type).get_fraction_bits(),
+                  dest_int_bits=dest_width-dest_fraction_bits;
+      std::size_t op_fraction_bits=to_fixedbv_type(src_type).get_fraction_bits(),
+                  op_int_bits=src_width-op_fraction_bits;
       
-      bv.resize(dest_width);
+      dest.resize(dest_width);
       
       // i == position after dot
       // i == 0: first position after dot
 
-      for(unsigned i=0; i<dest_fraction_bits; i++)
+      for(std::size_t i=0; i<dest_fraction_bits; i++)
       {
         // position in bv
-        unsigned p=dest_fraction_bits-i-1;
+        std::size_t p=dest_fraction_bits-i-1;
       
         if(i<op_fraction_bits)
-          bv[p]=op_bv[op_fraction_bits-i-1];
+          dest[p]=src[op_fraction_bits-i-1];
         else 
-          bv[p]=const_literal(false); // zero padding
+          dest[p]=const_literal(false); // zero padding
       }
 
-      for(unsigned i=0; i<dest_int_bits; i++)
+      for(std::size_t i=0; i<dest_int_bits; i++)
       {
         // position in bv
-        unsigned p=dest_fraction_bits+i;
+        std::size_t p=dest_fraction_bits+i;
         assert(p<dest_width);
       
         if(i<op_int_bits)
-          bv[p]=op_bv[i+op_fraction_bits];
+          dest[p]=src[i+op_fraction_bits];
         else 
-          bv[p]=op_bv[op_width-1]; // sign extension
+          dest[p]=src[src_width-1]; // sign extension
       }
 
-      return;
+      return false;
     }
-    else if(op_bvtype==IS_BV)
+    else if(src_bvtype==IS_BV)
     {
-      assert(op_width==dest_width);
-      bv=op_bv;
-      return;
+      assert(src_width==dest_width);
+      dest=src;
+      return false;
     }
-    else if(op_bvtype==IS_UNSIGNED ||
-            op_bvtype==IS_SIGNED ||
-            op_bvtype==IS_C_ENUM)
+    else if(src_bvtype==IS_UNSIGNED ||
+            src_bvtype==IS_SIGNED ||
+            src_bvtype==IS_C_BOOL ||
+            src_bvtype==IS_C_ENUM)
     {
       // integer to fixed
 
-      unsigned dest_fraction_bits=
-        to_fixedbv_type(expr_type).get_fraction_bits();
+      std::size_t dest_fraction_bits=
+        to_fixedbv_type(dest_type).get_fraction_bits();
 
-      for(unsigned i=0; i<dest_fraction_bits; i++)
-        bv.push_back(const_literal(false)); // zero padding
+      for(std::size_t i=0; i<dest_fraction_bits; i++)
+        dest.push_back(const_literal(false)); // zero padding
 
-      for(unsigned i=0; i<dest_width-dest_fraction_bits; i++)
+      for(std::size_t i=0; i<dest_width-dest_fraction_bits; i++)
       {
         literalt l;
       
-        if(i<op_width)
-          l=op_bv[i];
+        if(i<src_width)
+          l=src[i];
         else
         {
-          if(op_bvtype==IS_SIGNED || op_bvtype==IS_C_ENUM)
-            l=op_bv[op_width-1]; // sign extension
+          if(src_bvtype==IS_SIGNED || src_bvtype==IS_C_ENUM)
+            l=src[src_width-1]; // sign extension
           else
             l=const_literal(false); // zero extension
         }
         
-        bv.push_back(l);
+        dest.push_back(l);
       }
 
-      return;
+      return false;
     }
-    else if(op_type.id()==ID_bool)
+    else if(src_type.id()==ID_bool)
     {
       // bool to fixed
-      unsigned fraction_bits=
-        to_fixedbv_type(expr_type).get_fraction_bits();
+      std::size_t fraction_bits=
+        to_fixedbv_type(dest_type).get_fraction_bits();
 
-      assert(op_width==1);
+      assert(src_width==1);
 
-      for(unsigned i=0; i<dest_width; i++)
+      for(std::size_t i=0; i<dest_width; i++)
       {
         if(i==fraction_bits)
-          bv.push_back(op_bv[0]);
+          dest.push_back(src[0]);
         else
-          bv.push_back(const_literal(false));
+          dest.push_back(const_literal(false));
       }
 
-      return;
+      return false;
     }
     break;
   
   case IS_UNSIGNED:
   case IS_SIGNED:
   case IS_C_ENUM:
-    switch(op_bvtype)
+    switch(src_bvtype)
     {
     case IS_FLOAT: // float to integer
-      {
-        #ifdef HAVE_FLOATBV
-        float_utilst float_utils(prop);
-        float_utils.spec=to_floatbv_type(op_type);
-        bv=float_utils.to_integer(op_bv, dest_width, dest_bvtype!=IS_UNSIGNED);
-        return;
-        #else
-        return conversion_failed(expr, bv);
-        #endif
-      }
+      // we don't have a rounding mode here,
+      // which is why we refuse.
+      break;
      
     case IS_FIXED: // fixed to integer
       {
-        unsigned op_fraction_bits=
-          to_fixedbv_type(op_type).get_fraction_bits();
+        std::size_t op_fraction_bits=
+          to_fixedbv_type(src_type).get_fraction_bits();
 
-        for(unsigned i=0; i<dest_width; i++)
+        for(std::size_t i=0; i<dest_width; i++)
         {
-          if(i<op_width-op_fraction_bits)
-            bv.push_back(op_bv[i+op_fraction_bits]);
+          if(i<src_width-op_fraction_bits)
+            dest.push_back(src[i+op_fraction_bits]);
           else
           {
             if(dest_bvtype==IS_SIGNED)
-              bv.push_back(op_bv[op_width-1]); // sign extension
+              dest.push_back(src[src_width-1]); // sign extension
             else
-              bv.push_back(const_literal(false)); // zero extension
+              dest.push_back(const_literal(false)); // zero extension
           }
         }
         
         // we might need to round up in case of negative numbers
         // e.g., (int)(-1.00001)==1
         
-        bvt fraction_bits_bv=op_bv;
+        bvt fraction_bits_bv=src;
         fraction_bits_bv.resize(op_fraction_bits);
         literalt round_up=
-          prop.land(prop.lor(fraction_bits_bv), op_bv.back());
+          prop.land(prop.lor(fraction_bits_bv), src.back());
 
-        bv=bv_utils.incrementer(bv, round_up);
+        dest=bv_utils.incrementer(dest, round_up);
 
-        return;
+        return false;
       }
 
     case IS_UNSIGNED: // integer to integer
     case IS_SIGNED:
     case IS_C_ENUM:
+    case IS_C_BOOL:
       {
         // We do sign extension for any source type
         // that is signed, independently of the
         // destination type.
         // E.g., ((short)(ulong)(short)-1)==-1
         bool sign_extension=
-          op_bvtype==IS_SIGNED || op_bvtype==IS_C_ENUM;
+          src_bvtype==IS_SIGNED || src_bvtype==IS_C_ENUM;
 
-        for(unsigned i=0; i<dest_width; i++)
+        for(std::size_t i=0; i<dest_width; i++)
         {
-          if(i<op_width)
-            bv.push_back(op_bv[i]);
+          if(i<src_width)
+            dest.push_back(src[i]);
           else if(sign_extension)
-            bv.push_back(op_bv[op_width-1]); // sign extension
+            dest.push_back(src[src_width-1]); // sign extension
           else
-            bv.push_back(const_literal(false));
+            dest.push_back(const_literal(false));
         }
 
-        return;
+        return false;
       }
+      
+    case IS_VERILOG_UNSIGNED: // verilog_unsignedbv to signed/unsigned/enum
+      {
+        for(std::size_t i=0; i<dest_width; i++)
+        {
+          std::size_t src_index=i*2; // we take every second bit
 
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always zero-extend
+            dest.push_back(const_literal(false));
+        }
+
+        return false;
+      }
+      break;
+      
+    case IS_VERILOG_SIGNED: // verilog_signedbv to signed/unsigned/enum
+      {
+        for(std::size_t i=0; i<dest_width; i++)
+        {
+          std::size_t src_index=i*2; // we take every second bit
+
+          if(src_index<src_width)
+            dest.push_back(src[src_index]);
+          else // always sign-extend
+            dest.push_back(src.back());
+        }
+
+        return false;
+      }
+      break;
+      
     default:
-      if(op_type.id()==ID_bool)
+      if(src_type.id()==ID_bool)
       {
         // bool to integer
 
-        assert(op_width==1);
+        assert(src_width==1);
 
-        for(unsigned i=0; i<dest_width; i++)
+        for(std::size_t i=0; i<dest_width; i++)
         {
           if(i==0)
-            bv.push_back(op_bv[0]);
+            dest.push_back(src[0]);
           else
-            bv.push_back(const_literal(false));
+            dest.push_back(const_literal(false));
         }
 
-        return;
+        return false;
       }
     }
     break;
     
-  case IS_VERILOGBV:
-    if(op_bvtype==IS_UNSIGNED)
+  case IS_VERILOG_UNSIGNED:
+    if(src_bvtype==IS_UNSIGNED ||
+       src_bvtype==IS_C_BOOL ||
+       src_type.id()==ID_bool)
     {
-      for(unsigned i=0, j=0; i<dest_width; i+=2, j++)
+      for(std::size_t i=0, j=0; i<dest_width; i+=2, j++)
       {
-        if(j<op_width)
-          bv.push_back(op_bv[j]);
+        if(j<src_width)
+          dest.push_back(src[j]);
         else
-          bv.push_back(const_literal(false));
+          dest.push_back(const_literal(false));
 
-        bv.push_back(const_literal(false));
+        dest.push_back(const_literal(false));
       }
 
-      return;
+      return false;
+    }
+    else if(src_bvtype==IS_SIGNED)
+    {
+      for(std::size_t i=0, j=0; i<dest_width; i+=2, j++)
+      {
+        if(j<src_width)
+          dest.push_back(src[j]);
+        else
+          dest.push_back(src.back());
+
+        dest.push_back(const_literal(false));
+      }
+
+      return false;
+    }
+    else if(src_bvtype==IS_VERILOG_UNSIGNED)
+    {
+      // verilog_unsignedbv to verilog_unsignedbv
+      dest=src;
+
+      if(dest_width<src_width)
+        dest.resize(dest_width);
+      else
+      {
+        dest=src;
+        while(dest.size()<dest_width)
+        {
+          dest.push_back(const_literal(false));
+          dest.push_back(const_literal(false));
+        }
+      }
+      return false;
     }
     break;
 
   case IS_BV:
-    assert(op_width==dest_width);
-    bv=op_bv;
-    return;
+    assert(src_width==dest_width);
+    dest=src;
+    return false;
+    
+  case IS_C_BOOL:
+    dest.resize(dest_width, const_literal(false));
+
+    if(src_bvtype==IS_FLOAT)
+    {
+      float_utilst float_utils(prop);
+      float_utils.spec=to_floatbv_type(src_type);
+      dest[0]=!float_utils.is_zero(src);
+    }
+    else if(src_bvtype==IS_C_BOOL)
+      dest[0]=src[0];
+    else
+      dest[0]=!bv_utils.is_zero(src);
+
+    return false;
     
   default:
-    if(expr_type.id()==ID_array)
+    if(dest_type.id()==ID_array)
     {
-      if(op_width==dest_width)
+      if(src_width==dest_width)
       {
-        bv=op_bv;
-        return;
+        dest=src;
+        return false;
       }
     }
-    else if(expr_type.id()==ID_struct)
+    else if(dest_type.id()==ID_struct)
     {
       const struct_typet &dest_struct =
-        to_struct_type(expr_type);
+        to_struct_type(dest_type);
 
-      if(op_type.id()==ID_struct)
+      if(src_type.id()==ID_struct)
       {
         // we do subsets
 
-        bv.resize(dest_width, const_literal(false));
+        dest.resize(dest_width, const_literal(false));
 
         const struct_typet &op_struct =
-          to_struct_type(expr.op0().type());
+          to_struct_type(src_type);
 
         const struct_typet::componentst &dest_comp=
           dest_struct.components();
@@ -395,16 +544,16 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
         typedef std::map<irep_idt, unsigned> op_mapt;
         op_mapt op_map;
 
-        for(unsigned i=0; i<op_comp.size(); i++)
+        for(std::size_t i=0; i<op_comp.size(); i++)
           op_map[op_comp[i].get_name()]=i;
 
         // now gather required fields
-        for(unsigned i=0;
+        for(std::size_t i=0;
             i<dest_comp.size();
             i++)
         {
-          unsigned offset=dest_offsets[i];
-          unsigned int comp_width=boolbv_width(dest_comp[i].type());
+          std::size_t offset=dest_offsets[i];
+          std::size_t comp_width=boolbv_width(dest_comp[i].type());
           if(comp_width==0) continue;
 
           op_mapt::const_iterator it=
@@ -415,8 +564,8 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
             // not found
 
             // filling with free variables
-            for(unsigned j=0; j<comp_width; j++)
-              bv[offset+j]=prop.new_variable();
+            for(std::size_t j=0; j<comp_width; j++)
+              dest[offset+j]=prop.new_variable();
           }
           else
           {
@@ -424,25 +573,25 @@ void boolbvt::convert_typecast(const exprt &expr, bvt &bv)
             if(dest_comp[i].type()!=dest_comp[it->second].type())
             {
               // filling with free variables
-              for(unsigned j=0; j<comp_width; j++)
-                bv[offset+j]=prop.new_variable();
+              for(std::size_t j=0; j<comp_width; j++)
+                dest[offset+j]=prop.new_variable();
             }
             else
             {
-              unsigned op_offset=op_offsets[it->second];
-              for(unsigned j=0; j<comp_width; j++)
-                bv[offset+j]=op_bv[op_offset+j];
+              std::size_t op_offset=op_offsets[it->second];
+              for(std::size_t j=0; j<comp_width; j++)
+                dest[offset+j]=src[op_offset+j];
             }
           }
         }
 
-        return;
+        return false;
       }
     }
 
   }
 
-  conversion_failed(expr, bv);
+  return true;
 }
 
 /*******************************************************************\
@@ -457,27 +606,25 @@ Function: boolbvt::convert_typecast
 
 \*******************************************************************/
 
-literalt boolbvt::convert_typecast(const exprt &expr)
+literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
-  if(expr.operands().size()==1)
-  {
-    if(expr.op0().type().id()==ID_range)
-    {
-      mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
-      mp_integer to=string2integer(expr.op0().type().get_string(ID_to));
-
-      if(from==1 && to==1)
-        return const_literal(true);
-      else if(from==0 && to==0)
-        return const_literal(false);
-    }
-
-    bvt bv;
-    convert_bv(expr.op0(), bv);
-    
-    if(bv.size()!=0)
-      return prop.lor(bv);
-  }
+  assert(expr.operands().size()==1);
   
+  if(expr.op0().type().id()==ID_range)
+  {
+    mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
+    mp_integer to=string2integer(expr.op0().type().get_string(ID_to));
+
+    if(from==1 && to==1)
+      return const_literal(true);
+    else if(from==0 && to==0)
+      return const_literal(false);
+  }
+
+  const bvt &bv=convert_bv(expr.op0());
+  
+  if(!bv.empty())
+    return prop.lor(bv);
+
   return SUB::convert_rest(expr);
 }

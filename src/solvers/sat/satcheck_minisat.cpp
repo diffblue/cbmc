@@ -9,8 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <stack>
 
-#include <i2string.h>
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include "satcheck_minisat.h"
 
@@ -142,7 +141,7 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
   else if(solver->model[a.var_no()]==l_False)
     result=tvt(false);
   else
-    result=tvt(tvt::TV_UNKNOWN);
+    result=tvt(tvt::tv_enumt::TV_UNKNOWN);
   
   if(a.sign()) result=!result;
 
@@ -241,10 +240,9 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
   assert(status!=ERROR);
 
   {
-    std::string msg=
-      i2string(_no_variables)+" variables, "+
-      i2string(solver->nClauses())+" clauses";
-    messaget::status(msg);
+    messaget::status() <<
+      (_no_variables-1) << " variables, " <<
+      solver->nClauses() << " clauses" << messaget::eom;
   }
   
   add_variables();
@@ -255,11 +253,11 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 
   if(empty_clause_added)
   {
-    msg="empty clause: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="empty clause: instance is UNSATISFIABLE";
   }
   else if(!solver->okay())
   {
-    msg="SAT checker inconsistent: negated claim is UNSATISFIABLE, i.e., holds";
+    msg="SAT checker inconsistent: instance is UNSATISFIABLE";
   }
   else
   {
@@ -268,16 +266,16 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 
     if(solver->solve(MiniSat_assumptions))
     {
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
-      messaget::status(msg);
+      msg="SAT checker: instance is SATISFIABLE";
+      messaget::status() << msg << messaget::eom;
       status=SAT;
       return P_SATISFIABLE;
     }
     else
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
   }
 
-  messaget::status(msg);
+  messaget::status() << msg << messaget::eom;
   status=UNSAT;
   return P_UNSATISFIABLE;
 }

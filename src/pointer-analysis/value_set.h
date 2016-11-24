@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <mp_arith.h>
-#include <reference_counting.h>
+#include <util/mp_arith.h>
+#include <util/reference_counting.h>
 
 #include "object_numbering.h"
 #include "value_sets.h"
@@ -28,7 +28,8 @@ public:
 
   static bool field_sensitive(
     const irep_idt &id,
-    const typet &type);
+    const typet &type,
+    const namespacet &);
 
   unsigned location_number;
   static object_numberingt object_numbering;
@@ -58,7 +59,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt empty;
+    const static object_map_dt blank;
   };
   
   exprt to_expr(object_map_dt::const_iterator it) const;
@@ -102,7 +103,7 @@ public:
     {
     }
     
-    entryt(const idt &_identifier, const std::string _suffix):
+    entryt(const idt &_identifier, const std::string &_suffix):
       identifier(_identifier),
       suffix(_suffix)
     {
@@ -136,7 +137,9 @@ public:
     values.clear();
   }
   
-  entryt &get_entry(const entryt &e, const typet &type);
+  entryt &get_entry(
+    const entryt &e, const typet &type,
+    const namespacet &);
   
   void output(
     const namespacet &ns,
@@ -168,7 +171,8 @@ public:
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
-    bool add_to_sets=false);
+    bool is_simplified,
+    bool add_to_sets);
 
   void do_function_call(
     const irep_idt &function,
@@ -185,6 +189,10 @@ public:
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
+  bool eval_pointer_offset(
+    exprt &expr,
+    const namespacet &ns) const;
+
 protected:
   void get_value_set_rec(
     const exprt &expr,
@@ -196,7 +204,8 @@ protected:
   void get_value_set(
     const exprt &expr,
     object_mapt &dest,
-    const namespacet &ns) const;
+    const namespacet &ns,
+    bool is_simplified) const;
 
   void get_reference_set(
     const exprt &expr,

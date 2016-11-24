@@ -9,24 +9,87 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_NAME_H
 #define CPROVER_CPP_CPP_NAME_H
 
-#include "location.h"
+#include <util/expr.h>
 
 class cpp_namet:public irept
 {
 public:
-  cpp_namet():irept(ID_cpp_name)
+  // the subs are one of the following:
+  // ID_name (see namet)
+  // ID_operator
+  // ID_template_args
+  // ::
+  // ~
+
+  class namet:public irept
+  {
+  public:
+    inline namet():irept(ID_name)
+    {
+    }
+
+    explicit inline namet(const irep_idt &base_name):irept(ID_name)
+    {
+      set(ID_identifier, base_name);
+    }
+
+    inline namet(
+      const irep_idt &_base_name,
+      const source_locationt &_source_location):irept(ID_name)
+    {
+      set(ID_identifier, _base_name);
+      add_source_location()=_source_location;
+    }
+    
+    inline source_locationt &add_source_location()
+    {
+      return static_cast<source_locationt &>(add(ID_C_source_location));
+    }
+
+    inline const source_locationt &source_location() const
+    {
+      return static_cast<const source_locationt &>(find(ID_C_source_location));
+    }
+  };
+
+  inline cpp_namet():irept(ID_cpp_name)
   {
   }
+  
+  inline explicit cpp_namet(const irep_idt &base_name):irept(ID_cpp_name)
+  {
+    get_sub().push_back(namet(base_name));
+  }
 
-  const locationt &location() const
+  inline cpp_namet(
+    const irep_idt &_base_name,
+    const source_locationt &_source_location):irept(ID_cpp_name)
+  {
+    get_sub().push_back(namet(_base_name, _source_location));
+  }
+
+  inline const source_locationt &source_location() const
   {
     if(get_sub().empty())
-      return static_cast<const locationt &>(get_nil_irep());
+      return static_cast<const source_locationt &>(get_nil_irep());
     else
-      return static_cast<const locationt &>(get_sub().front().find(ID_C_location));
+      return static_cast<const source_locationt &>(get_sub().front().find(ID_C_source_location));
   }
 
-  void convert(std::string &identifier, std::string &base_name) const;
+  //void convert(std::string &identifier, std::string &base_name) const;
+  irep_idt get_base_name() const;
+  
+  // one of three:
+  // 'identifier'
+  // 'operator X'
+  // '~identifier'
+  inline bool is_simple_name() const
+  {
+    const subt &sub=get_sub();
+    return (sub.size()==1 && sub.front().id()==ID_name) ||
+           (sub.size()==2 && sub.front().id()==ID_operator) ||
+           (sub.size()==2 && sub[0].id()=="~" && sub[1].id()==ID_name);
+  }
 
   bool is_operator() const
   {
@@ -46,6 +109,11 @@ public:
         return true;
     return false;
   }
+  
+  bool is_destructor() const
+  {
+    return get_sub().size()>=1 && get_sub().front().id()=="~";
+  }
 
   bool has_template_args() const
   {
@@ -57,6 +125,16 @@ public:
   }
 
   std::string to_string() const;
+  
+  const exprt &as_expr() const
+  {
+    return static_cast<const exprt &>(static_cast<const irept &>(*this));
+  }
+
+  const typet &as_type() const
+  {
+    return static_cast<const typet &>(static_cast<const irept &>(*this));
+  }
 };
 
 inline cpp_namet &to_cpp_name(irept &cpp_name)

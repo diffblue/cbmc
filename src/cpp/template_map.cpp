@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "template_map.h"
 
 /*******************************************************************\
@@ -57,11 +59,11 @@ void template_mapt::apply(typet &type) const
   {
     apply(static_cast<typet &>(type.add(ID_return_type)));
 
-    irept::subt &arguments=type.add(ID_arguments).get_sub();
+    irept::subt &parameters=type.add(ID_parameters).get_sub();
 
-    Forall_irep(it, arguments)
+    Forall_irep(it, parameters)
     {
-      if(it->id()==ID_argument)
+      if(it->id()==ID_parameter)
         apply(static_cast<typet &>(it->add(ID_type)));
     }
   }
@@ -224,28 +226,26 @@ void template_mapt::build(
   const template_typet &template_type,
   const cpp_template_args_tct &template_args)
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
   cpp_template_args_tct::argumentst instance=
     template_args.arguments();
 
-  template_typet::parameterst::const_iterator t_it=
+  template_typet::template_parameterst::const_iterator t_it=
     template_parameters.begin();
 
   if(instance.size()<template_parameters.size())
   {
     // check for default parameters
-    for(unsigned i = instance.size();
-        i < template_parameters.size();
+    for(std::size_t i=instance.size();
+        i<template_parameters.size();
         i++)
     {
-      const exprt &param=template_parameters[i];
+      const template_parametert &param=template_parameters[i];
 
-      exprt value = static_cast<const exprt &>(param.find("#default"));
-
-      if(value.is_not_nil())
-        instance.push_back(value);
+      if(param.has_default_argument())
+        instance.push_back(param.default_argument());
       else
         break;
     }
@@ -317,28 +317,28 @@ Function: template_mapt::build_unassigned
 void template_mapt::build_unassigned(
   const template_typet &template_type)
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
-  for(template_typet::parameterst::const_iterator
+  for(template_typet::template_parameterst::const_iterator
       t_it=template_parameters.begin();
       t_it!=template_parameters.end();
       t_it++)
   {
-    const exprt &t=*t_it;
+    const template_parametert &t=*t_it;
     
     if(t.id()==ID_type)
     {
       typet tmp(ID_unassigned);
       tmp.set(ID_identifier, t.type().get(ID_identifier));
-      tmp.location()=t.location();
+      tmp.add_source_location()=t.source_location();
       type_map[t.type().get(ID_identifier)]=tmp;
     }
     else
     {
       exprt tmp(ID_unassigned, t.type());
       tmp.set(ID_identifier, t.get(ID_identifier));
-      tmp.location()=t.location();
+      tmp.add_source_location()=t.source_location();
       expr_map[t.get(ID_identifier)]=tmp;
     }    
   }
@@ -359,15 +359,15 @@ Function: template_mapt::build_template_args
 cpp_template_args_tct template_mapt::build_template_args(
   const template_typet &template_type) const
 {
-  const template_typet::parameterst &template_parameters=
-    template_type.parameters();
+  const template_typet::template_parameterst &template_parameters=
+    template_type.template_parameters();
 
   cpp_template_args_tct template_args;
   template_args.arguments().resize(template_parameters.size());
   
-  for(unsigned i=0; i<template_parameters.size(); i++)
+  for(std::size_t i=0; i<template_parameters.size(); i++)
   {
-    const exprt &t=template_parameters[i];
+    const template_parametert &t=template_parameters[i];
     
     if(t.id()==ID_type)
     {

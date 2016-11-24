@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <guard.h>
-#include <std_expr.h>
-#include <i2string.h>
+#include <util/guard.h>
+#include <util/std_expr.h>
+#include <util/i2string.h>
+#include <util/ssa_expr.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>
@@ -31,82 +32,53 @@ public:
 
   guardt guard;
   symex_targett::sourcet source;
-  
+  symex_targett *symex_target;
+
   void initialize(const goto_functionst &goto_functions);
 
   // we have a two-level renaming
 
   typedef std::map<irep_idt, irep_idt> original_identifierst;
-  typedef std::set<irep_idt> declaration_historyt;
 
-  // we remember all declarations
-  declaration_historyt declaration_history; 
+  // we remember all L1 renamings
+  typedef std::set<irep_idt> l1_historyt;
+  l1_historyt l1_history; 
   
   struct renaming_levelt
   {
-  public:
-    virtual irep_idt current_name(const irep_idt &identifier) const=0;
-    virtual irep_idt name(const irep_idt &identifier, unsigned count) const=0;
     virtual ~renaming_levelt() { }
 
-    typedef std::map<irep_idt, unsigned> current_namest;
+    typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
     current_namest current_names;
     
-    void remove(const irep_idt &identifier) { current_names.erase(identifier); }
-    const irep_idt &get_original_name(const irep_idt &identifier) const;
-    void get_original_name(exprt &expr) const;
-    void get_original_name(typet &type) const;
-    void print(std::ostream &out) const;
-    unsigned current_count(const irep_idt &identifier) const;
-
-    irep_idt operator()(const irep_idt &identifier)
+    unsigned current_count(const irep_idt &identifier) const
     {
-      // see if it's already renamed
-      if(is_renamed(identifier)) return identifier;
-
-      // record
-      irep_idt i=current_name(identifier);
-      original_identifiers[i]=identifier;
-      return i;
+      current_namest::const_iterator it=
+        current_names.find(identifier);
+      return it==current_names.end()?0:it->second.second;
     }
 
-    inline void operator()(symbol_exprt &expr)
+    void increase_counter(const irep_idt &identifier)
     {
-      expr.set_identifier(operator()(expr.get_identifier()));
+      assert(current_names.find(identifier)!=current_names.end());
+      ++current_names[identifier].second;
     }
 
-    void rename(const irep_idt &identifier, unsigned count)
+    void get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
     {
-      current_names[identifier]=count;
-      original_identifiers[name(identifier, count)]=identifier;
+      for(current_namest::const_iterator it=current_names.begin();
+          it!=current_names.end();
+          it++)
+        vars.insert(it->second.first);
     }
-    
-    inline bool is_renamed(const irep_idt &identifier) const
-    {
-      return original_identifiers.find(identifier)!=original_identifiers.end();
-    }
-
-  protected:
-    original_identifierst original_identifiers;
   };
   
   // level 0 -- threads!
   // renaming built for one particular interleaving
   struct level0t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned thread_nr) const
-    {
-      return id2string(identifier)+"!"+i2string(thread_nr);
-    }
-
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    {
-      assert(false);
-    }
-
-    irep_idt operator()(
-      const irep_idt &identifier,
+    void operator()(
+      ssa_exprt &ssa_expr,
       const namespacet &ns,
       unsigned thread_nr);
 
@@ -119,60 +91,37 @@ public:
   
   struct level1t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned frame) const
-    {
-      return id2string(identifier)+"@"+i2string(frame);
-    }
-    
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    {
-      // see if it's already renamed
-      if(is_renamed(identifier))
-        return identifier;
+    void operator()(ssa_exprt &ssa_expr);
 
-      // rename only if needed
-      const current_namest::const_iterator it=
-        current_names.find(identifier);
-    
-      if(it==current_names.end())
-        return identifier;
-      else
-        return name(identifier, it->second);
+    void restore_from(const current_namest &other)
+    {
+      current_namest::iterator it=current_names.begin();
+      for(current_namest::const_iterator
+          ito=other.begin();
+          ito!=other.end();
+          ++ito)
+      {
+        while(it!=current_names.end() && it->first<ito->first)
+          ++it;
+        if(it==current_names.end() || ito->first<it->first)
+          current_names.insert(it, *ito);
+        else if(it!=current_names.end())
+        {
+          assert(it->first==ito->first);
+          it->second=ito->second;
+          ++it;
+        }
+      }
     }
 
     level1t() { }
     virtual ~level1t() { }
-  };
+  } level1;
   
   // level 2 -- SSA
 
   struct level2t:public renaming_levelt
   {
-  public:
-    virtual irep_idt name(const irep_idt &identifier, unsigned count) const
-    {
-      return id2string(identifier)+"#"+i2string(count);
-    }
-
-    void get_variables(std::set<irep_idt> &vars) const
-    {
-      for(current_namest::const_iterator it=current_names.begin();
-          it!=current_names.end();
-          it++)
-        vars.insert(it->first);
-    }
-
-    virtual irep_idt current_name(const irep_idt &identifier) const
-    {
-      // see if it's already renamed
-      if(is_renamed(identifier))
-        return identifier;
-
-      // _always_ rename
-      return name(identifier, current_count(identifier));
-    }
-
     level2t() { }
     virtual ~level2t() { }
   } level2;
@@ -195,16 +144,18 @@ public:
   typedef enum { L0=0, L1=1, L2=2 } levelt;
 
   // performs renaming _up to_ the given level
-  irep_idt rename(const irep_idt &identifier, const namespacet &ns, levelt level=L2);
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
-  void rename(typet &type, const namespacet &ns, levelt level=L2);
-  
-  void rename_address(exprt &expr, const namespacet &ns, levelt level);
+  void rename(
+    typet &type,
+    const irep_idt &l1_identifier,
+    const namespacet &ns,
+    levelt level=L2);
   
   void assignment(
-    symbol_exprt &lhs, // L0/L1
+    ssa_exprt &lhs, // L0/L1
     const exprt &rhs,  // L2
     const namespacet &ns,
+    bool rhs_is_simplified,
     bool record_value);
 
   // what to propagate
@@ -212,28 +163,20 @@ public:
   bool constant_propagation_reference(const exprt &expr) const;
 
   // undoes all levels of renaming
-  const irep_idt &get_original_name(const irep_idt &identifier) const;
   void get_original_name(exprt &expr) const;
   void get_original_name(typet &type) const;
-  
-  // does all levels of renaming
-  irep_idt current_name(
-      const namespacet &ns,
-      const irep_idt &identifier)
-  {
-    return current_name(level2, ns, identifier);
-  }
+protected:
+  void rename_address(exprt &expr, const namespacet &ns, levelt level);
 
-  irep_idt current_name(
-    const level2t &level2,
-    const namespacet &ns,
-    const irep_idt &identifier)
-  {
-    return level2.current_name(
-           top().level1.current_name(
-           level0(identifier, ns, source.thread_nr)));
-  }
+  void set_ssa_indices(ssa_exprt &expr, const namespacet &ns, levelt level=L2);
+  // only required for value_set.assign
+  void get_l1_name(exprt &expr) const;
+
+  // this maps L1 names to (L2) types
+  typedef hash_map_cont<irep_idt, typet, irep_id_hash> l1_typest;
+  l1_typest l1_types;
   
+public:
   // uses level 1 names, and is used to
   // do dereferencing
   value_sett value_set;
@@ -242,27 +185,40 @@ public:
   {
   public:
     unsigned depth;
-    level2t level2;
+    level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
+    propagationt propagation;
+    unsigned atomic_section_id;
     
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
-      level2(s.level2),
+      level2_current_names(s.level2.current_names),
       value_set(s.value_set),
-      guard(s.guard)
+      guard(s.guard),
+      propagation(s.propagation),
+      atomic_section_id(s.atomic_section_id)
     {
+    }
+
+    // the below replicate levelt2 member functions
+    void level2_get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
+    {
+      for(level2t::current_namest::const_iterator
+          it=level2_current_names.begin();
+          it!=level2_current_names.end();
+          it++)
+        vars.insert(it->second.first);
+    }
+
+    unsigned level2_current_count(const irep_idt &identifier) const
+    {
+      level2t::current_namest::const_iterator it=
+        level2_current_names.find(identifier);
+      return it==level2_current_names.end()?0:it->second.second;
     }
   };
 
-  irep_idt current_name(
-    const goto_statet &goto_state,
-    const namespacet &ns,
-    const irep_idt &identifier)
-  {
-    return current_name(goto_state.level2, ns, identifier);
-  }
-  
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
   typedef std::map<goto_programt::const_targett, goto_state_listt> goto_state_mapt;
@@ -272,47 +228,109 @@ public:
   class framet
   {
   public:
-    // function calls
-  
+    // function calls  
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
-    level1t level1;
     symex_targett::sourcet calling_location;
 
     goto_programt::const_targett end_of_function;
     exprt return_value;
+    bool hidden_function;
+
+    renaming_levelt::current_namest old_level1;
     
-    typedef std::set<irep_idt> local_variablest;
-    local_variablest local_variables;
+    typedef std::set<irep_idt> local_objectst;
+    local_objectst local_objects;
     
     framet():
-      return_value(static_cast<const exprt &>(get_nil_irep()))
+      return_value(nil_exprt()),
+      hidden_function(false)
     {
     }
 
     // exceptions
     typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
     catch_mapt catch_map;
+
+    // loop and recursion unwinding
+    struct loop_infot
+    {
+      loop_infot():
+        count(0),
+        is_recursion(false)
+      {
+      }
+
+      unsigned count;
+      bool is_recursion;
+    };
+    typedef hash_map_cont<irep_idt, loop_infot, irep_id_hash>
+      loop_iterationst;
+    loop_iterationst loop_iterations;
   };
-  
+
   typedef std::vector<framet> call_stackt;
-  call_stackt call_stack;
+
+  inline call_stackt &call_stack()
+  {
+    assert(source.thread_nr<threads.size());
+    return threads[source.thread_nr].call_stack;
+  }
+  
+  inline const call_stackt &call_stack() const
+  {
+    assert(source.thread_nr<threads.size());
+    return threads[source.thread_nr].call_stack;
+  }
   
   inline framet &top()
   {
-    assert(!call_stack.empty());
-    return call_stack.back();
+    assert(!call_stack().empty());
+    return call_stack().back();
   }
 
   inline const framet &top() const
   {
-    assert(!call_stack.empty());
-    return call_stack.back();
+    assert(!call_stack().empty());
+    return call_stack().back();
   }
   
-  inline framet &new_frame() { call_stack.push_back(framet()); return call_stack.back(); }
-  inline void pop_frame() { call_stack.pop_back(); }
-  inline const framet &previous_frame() { return *(--(--call_stack.end())); }
+  inline framet &new_frame() { call_stack().push_back(framet()); return top(); }
+  inline void pop_frame() { call_stack().pop_back(); }
+  inline const framet &previous_frame() { return *(--(--call_stack().end())); }
+
+  // threads
+  unsigned atomic_section_id;
+  typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
+  typedef hash_map_cont<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
+  typedef std::list<guardt> a_s_w_entryt;
+  typedef hash_map_cont<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
+  read_in_atomic_sectiont read_in_atomic_section;
+  written_in_atomic_sectiont written_in_atomic_section;
+  
+  class threadt
+  {
+  public:
+    goto_programt::const_targett pc;
+    guardt guard;
+    call_stackt call_stack;
+    std::map<irep_idt, unsigned> function_frame;
+    unsigned atomic_section_id;
+
+    threadt():
+      atomic_section_id(0)
+    {
+    }
+  };
+
+  typedef std::vector<threadt> threadst;
+  threadst threads;
+  
+  bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
+  bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
+
+  void switch_to_thread(unsigned t);
+  bool record_events;
 };
 
 #endif

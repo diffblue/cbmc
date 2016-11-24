@@ -6,25 +6,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
-
+#include <cstring>
 #include <sstream>
 #include <fstream>
 
-#include <expr_util.h>
-#include <replace_symbol.h>
-#include <config.h>
+#include <util/expr_util.h>
+#include <util/replace_symbol.h>
+#include <util/config.h>
+
+#include <linking/linking.h>
+#include <linking/remove_internal_symbols.h>
+#include <linking/entry_point.h>
 
 #include "ansi_c_language.h"
-#include "ansi_c_convert.h"
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"
 #include "trans_unit.h"
-#include "c_link.h"
 #include "c_preprocess.h"
-#include "c_main.h"
-#include "internal_additions.h"
+#include "ansi_c_internal_additions.h"
+#include "type2name.h"
 
 /*******************************************************************\
 
@@ -78,14 +79,13 @@ Function: ansi_c_languaget::preprocess
 bool ansi_c_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
-  std::ostream &outstream,
-  message_handlert &message_handler)
+  std::ostream &outstream)
 {
   // stdin?
   if(path=="")
-    return c_preprocess(instream, outstream, message_handler);
+    return c_preprocess(instream, outstream, get_message_handler());
 
-  return c_preprocess(path, outstream, message_handler);  
+  return c_preprocess(path, outstream, get_message_handler());
 }
              
 /*******************************************************************\
@@ -102,8 +102,7 @@ Function: ansi_c_languaget::parse
 
 bool ansi_c_languaget::parse(
   std::istream &instream,
-  const std::string &path,
-  message_handlert &message_handler)
+  const std::string &path)
 {
   // store the path
 
@@ -113,7 +112,7 @@ bool ansi_c_languaget::parse(
 
   std::ostringstream o_preprocessed;
 
-  if(preprocess(instream, path, o_preprocessed, message_handler))
+  if(preprocess(instream, path, o_preprocessed))
     return true;
 
   std::istringstream i_preprocessed(o_preprocessed.str());
@@ -125,30 +124,33 @@ bool ansi_c_languaget::parse(
   std::istringstream codestr(code);
 
   ansi_c_parser.clear();
-  ansi_c_parser.filename=ID_built_in;
+  ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
-  ansi_c_parser.set_message_handler(message_handler);
-  ansi_c_parser.grammar=ansi_c_parsert::LANGUAGE;
+  ansi_c_parser.set_message_handler(get_message_handler());
+  ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
+  ansi_c_parser.cpp98=false; // it's not C++
+  ansi_c_parser.cpp11=false; // it's not C++
 
   switch(config.ansi_c.mode)
   {
-  case configt::ansi_ct::MODE_CODEWARRIOR:
+  case configt::ansi_ct::flavourt::MODE_CODEWARRIOR_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::CW;
     break;
    
-  case configt::ansi_ct::MODE_VISUAL_STUDIO:
+  case configt::ansi_ct::flavourt::MODE_VISUAL_STUDIO_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::MSC;
     break;
     
-  case configt::ansi_ct::MODE_ANSI:
+  case configt::ansi_ct::flavourt::MODE_ANSI_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ANSI;
     break;
     
-  case configt::ansi_ct::MODE_GCC:
+  case configt::ansi_ct::flavourt::MODE_GCC_C:
+  case configt::ansi_ct::flavourt::MODE_GCC_CPP:
     ansi_c_parser.mode=ansi_c_parsert::GCC;
     break;
     
-  case configt::ansi_ct::MODE_ARM:
+  case configt::ansi_ct::flavourt::MODE_ARM_C_CPP:
     ansi_c_parser.mode=ansi_c_parsert::ARM;
     break;
     
@@ -162,8 +164,8 @@ bool ansi_c_languaget::parse(
 
   if(!result)
   {
-    ansi_c_parser.line_no=0;
-    ansi_c_parser.filename=path;
+    ansi_c_parser.set_line_no(0);
+    ansi_c_parser.set_file(path);
     ansi_c_parser.in=&i_preprocessed;
     ansi_c_scanner_init();
     result=ansi_c_parser.parse();
@@ -191,19 +193,17 @@ Function: ansi_c_languaget::typecheck
 \*******************************************************************/
 
 bool ansi_c_languaget::typecheck(
-  contextt &context,
-  const std::string &module,
-  message_handlert &message_handler)
+  symbol_tablet &symbol_table,
+  const std::string &module)
 {
-  if(ansi_c_convert(parse_tree, module, message_handler))
+  symbol_tablet new_symbol_table;
+
+  if(ansi_c_typecheck(parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
-  contextt new_context;
-
-  if(ansi_c_typecheck(parse_tree, new_context, module, message_handler))
-    return true;
-
-  if(c_link(context, new_context, message_handler))
+  remove_internal_symbols(new_symbol_table);
+  
+  if(linking(symbol_table, new_symbol_table, get_message_handler()))
     return true;
     
   return false;
@@ -221,11 +221,10 @@ Function: ansi_c_languaget::final
 
 \*******************************************************************/
 
-bool ansi_c_languaget::final(
-  contextt &context,
-  message_handlert &message_handler)
+bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
-  if(c_main(context, "c::", "c::main", message_handler)) return true;
+  if(entry_point(symbol_table, "main", get_message_handler()))
+    return true;
   
   return false;
 }
@@ -308,6 +307,27 @@ bool ansi_c_languaget::from_type(
 
 /*******************************************************************\
 
+Function: ansi_c_languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool ansi_c_languaget::type_to_name(
+  const typet &type,
+  std::string &name,
+  const namespacet &ns)
+{
+  name=type2name(type, ns);
+  return false;
+}
+
+/*******************************************************************\
+
 Function: ansi_c_languaget::to_expr
 
   Inputs:
@@ -322,22 +342,21 @@ bool ansi_c_languaget::to_expr(
   const std::string &code,
   const std::string &module,
   exprt &expr,
-  message_handlert &message_handler,
   const namespacet &ns)
 {
   expr.make_nil();
 
   // no preprocessing yet...
 
-  std::istringstream i_preprocessed(code);
+  std::istringstream i_preprocessed(
+    "void __my_expression = (void) (\n"+code+"\n);");
   
   // parsing
 
   ansi_c_parser.clear();
-  ansi_c_parser.filename="";
+  ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
-  ansi_c_parser.set_message_handler(message_handler);
-  ansi_c_parser.grammar=ansi_c_parsert::EXPRESSION;
+  ansi_c_parser.set_message_handler(get_message_handler());
   ansi_c_parser.mode=ansi_c_parsert::GCC;
   ansi_c_scanner_init();
 
@@ -347,17 +366,20 @@ bool ansi_c_languaget::to_expr(
     result=true;
   else
   {
-    expr=ansi_c_parser.parse_tree.items.front().value();
+    expr=ansi_c_parser.parse_tree.items.front().declarator().value();
     
-    result=ansi_c_convert(expr, "", message_handler);
-
     // typecheck it
-    if(!result)
-      result=ansi_c_typecheck(expr, message_handler, ns);
+    result=ansi_c_typecheck(expr, get_message_handler(), ns);
   }
 
   // save some memory
   ansi_c_parser.clear();
+  
+  // now remove that (void) cast
+  if(expr.id()==ID_typecast &&
+     expr.type().id()==ID_empty &&
+     expr.operands().size()==1)
+    expr=expr.op0();
 
   return result;
 }

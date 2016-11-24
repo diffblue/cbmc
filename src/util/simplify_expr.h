@@ -23,4 +23,7 @@ bool simplify(
   exprt &expr,
   const namespacet &ns);
 
+// this is the preferred interface
+exprt simplify_expr(const exprt &src, const namespacet &ns);
+
 #endif

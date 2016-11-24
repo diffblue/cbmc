@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+syntax error
+^PARSING ERROR$
+--
+^VERIFICATION SUCCESSFUL$
+--
+Tests a parsing issue regarding array declarators, see Array_Declarator1

@@ -9,9 +9,9 @@ Date: June 2006
 \*******************************************************************/
 
 #include <xmllang/xml_parser.h>
-#include <namespace.h>
-#include <base_type.h>
-#include <message_stream.h>
+#include <util/namespace.h>
+#include <util/base_type.h>
+#include <util/message_stream.h>
 
 #define XML_VERSION "1.4"
 
@@ -26,7 +26,7 @@ Date: June 2006
  
 Function: read_goto_object
  
-  Inputs: input stream, context, functions
+  Inputs: input stream, symbol_table, functions
  
  Outputs: true on error, false otherwise
  
@@ -38,7 +38,7 @@ Function: read_goto_object
 bool read_goto_object(
   std::istream &in,
   const std::string &filename,
-  contextt &context,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 { 
@@ -107,7 +107,7 @@ bool read_goto_object(
             functions.function_map[symbol.name].type=
               to_code_type(symbol.type);
           }
-          context.add(symbol);          
+          symbol_table.add(symbol);          
         }
       }
       else if (sec.name=="functions")

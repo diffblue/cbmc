@@ -9,35 +9,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_DPLIB_CONV_H
 #define CPROVER_PROP_DPLIB_CONV_H
 
-#include <hash_cont.h>
+#include <util/hash_cont.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>
 
 #include "dplib_prop.h"
 
-class dplib_prop_wrappert
-{
-public:
-  dplib_prop_wrappert(std::ostream &_out):dplib_prop(_out) { }
-
-protected:
-  dplib_propt dplib_prop;
-};
-
-class dplib_convt:protected dplib_prop_wrappert, public prop_convt
+class dplib_convt:public prop_convt
 {
 public:
   dplib_convt(
     const namespacet &_ns,
     std::ostream &_out):
-    dplib_prop_wrappert(_out),
-    prop_convt(_ns, dplib_prop),
+    prop_convt(_ns),
+    out(_out),
     pointer_logic(_ns) { }
 
   virtual ~dplib_convt() { }
 
 protected:
+  std::ostream &out;
+
   virtual literalt convert_rest(const exprt &expr);
   virtual void convert_dplib_expr(const exprt &expr);
   virtual void convert_dplib_type(const typet &type);

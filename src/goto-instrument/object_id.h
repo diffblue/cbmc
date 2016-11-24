@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_OBJECT_ID_H
 
 #include <set>
-#include <iostream>
+#include <ostream>
 
-#include <std_expr.h>
-#include <std_code.h>
+#include <util/std_expr.h>
+#include <util/std_code.h>
 
 class object_idt
 {

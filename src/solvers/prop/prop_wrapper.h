@@ -33,9 +33,6 @@ class prop_wrappert:public virtual propt
   virtual literalt lor(const bvt &bv)
   { return p.lor(bv); }
 
-  virtual literalt lnot(literalt a)
-  { return p.lnot(a); }
-
   virtual literalt lxor(literalt a, literalt b)
   { return p.lxor(a, b); }
 
@@ -68,7 +65,7 @@ class prop_wrappert:public virtual propt
   virtual literalt new_variable()
   { return p.new_variable(); }
 
-  virtual unsigned no_variables() const
+  virtual std::size_t no_variables() const
   { return p.no_variables(); }
   
   // solving

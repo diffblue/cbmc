@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <std_types.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_types.h>
 
@@ -27,13 +27,15 @@ Function: cpp_typecheckt::cpp_constructor
 \*******************************************************************/
 
 codet cpp_typecheckt::cpp_constructor(
-  const locationt &location,
+  const source_locationt &source_location,
   const exprt &object,
   const exprt::operandst &operands)
 {
   exprt object_tc=object;
 
   typecheck_expr(object_tc);
+
+  elaborate_class_template(object_tc.type());
 
   typet tmp_type(object_tc.type());
   follow_symbol(tmp_type);
@@ -51,7 +53,7 @@ codet cpp_typecheckt::cpp_constructor(
 
     if(!operands.empty() && !operands.front().get_bool("#array_ini"))
     {
-      err_location(location);
+      err_location(source_location);
       str << "bad array initializer";
       throw 0;
     }
@@ -75,11 +77,14 @@ codet cpp_typecheckt::cpp_constructor(
       nil.make_nil();
       return nil;
     }
+    
+    exprt tmp_size=size_expr;
+    make_constant_index(tmp_size);
 
     mp_integer s;
-    if(to_integer(size_expr, s))
+    if(to_integer(tmp_size, s))
     {
-      err_location(tmp_type);
+      err_location(source_location);
       str << "array size `" << to_string(size_expr)
           << "' is not a constant";
       throw 0;
@@ -94,7 +99,7 @@ codet cpp_typecheckt::cpp_constructor(
       object_tc.type().set("#constant", false);
       object_tc.set("#lvalue", true);
       side_effect_exprt assign("assign");
-      assign.location()=location;
+      assign.add_source_location()=source_location;
       assign.copy_to_operands(object_tc, op_tc);
       typecheck_side_effect_assignment(assign);
       new_code.expression()=assign;
@@ -109,25 +114,25 @@ codet cpp_typecheckt::cpp_constructor(
       {
         exprt::operandst tmp_operands;
 
-        exprt constant=from_integer(i, int_type());
-        constant.location()=location;
+        exprt constant=from_integer(i, index_type());
+        constant.add_source_location()=source_location;
 
         exprt index(ID_index);
         index.copy_to_operands(object);
         index.copy_to_operands(constant);
-        index.location()=location;
+        index.add_source_location()=source_location;
 
         if(!operands.empty())
         {
           exprt operand(ID_index);
           operand.copy_to_operands(operands.front());
           operand.copy_to_operands(constant);
-          operand.location()=location;
+          operand.add_source_location()=source_location;
           tmp_operands.push_back(operand);
         }
 
         exprt i_code =
-          cpp_constructor(location, index, tmp_operands);
+          cpp_constructor(source_location, index, tmp_operands);
 
         if(i_code.is_nil())
         {
@@ -154,7 +159,7 @@ codet cpp_typecheckt::cpp_constructor(
       add_implicit_dereference(*it);
     }
 
-    if(operands_tc.size()==0)
+    if(operands_tc.empty())
     {
       // a POD is NOT initialized
       new_code.make_nil();
@@ -165,14 +170,14 @@ codet cpp_typecheckt::cpp_constructor(
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
       side_effect_exprt assign(ID_assign);
-      assign.location()=location;
+      assign.add_source_location()=source_location;
       assign.copy_to_operands(object_tc, operands_tc.front());
       typecheck_side_effect_assignment(assign);
       new_code.expression()=assign;
     }
     else
     {
-      err_location(location);
+      err_location(source_location);
       str << "initialization of POD requires one argument, "
              "but got " << operands.size() << std::endl;
       throw 0;
@@ -202,7 +207,7 @@ codet cpp_typecheckt::cpp_constructor(
 
     // set most-derived bits
     codet block(ID_block);
-    for(unsigned i=0; i < struct_type.components().size(); i++)
+    for(std::size_t i=0; i < struct_type.components().size(); i++)
     {
       const irept &component = struct_type.components()[i];
       if(component.get(ID_base_name) != "@most_derived")
@@ -211,17 +216,16 @@ codet cpp_typecheckt::cpp_constructor(
       exprt member(ID_member, bool_typet());
       member.set(ID_component_name, component.get(ID_name));
       member.copy_to_operands(object_tc);
-      member.location() = location;
+      member.add_source_location() = source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
-      exprt val;
-      val.make_false();
+      exprt val=false_exprt();
 
       if(!component.get_bool("from_base"))
-        val.make_true();
+        val=true_exprt();
 
       side_effect_exprt assign(ID_assign);
-      assign.location()=location;
+      assign.add_source_location()=source_location;
       assign.move_to_operands(member,val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp;
@@ -261,10 +265,10 @@ codet cpp_typecheckt::cpp_constructor(
     irept cpp_name(ID_cpp_name);
     cpp_name.get_sub().push_back(irept(ID_name));
     cpp_name.get_sub().back().set(ID_identifier, constructor_name);
-    cpp_name.get_sub().back().set(ID_C_location, location);
+    cpp_name.get_sub().back().set(ID_C_source_location, source_location);
 
     side_effect_expr_function_callt function_call;
-    function_call.location()=location;
+    function_call.add_source_location()=source_location;
     function_call.function().swap(static_cast<exprt&>(cpp_name));
     function_call.arguments().reserve(operands_tc.size());
 
@@ -324,25 +328,25 @@ Function: cpp_typecheckt::new_temporary
 \*******************************************************************/
 
 void cpp_typecheckt::new_temporary(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &type,
   const exprt::operandst &ops,
   exprt &temporary)
 {
   // create temporary object
-  exprt tmp_object_expr=exprt(ID_sideeffect, type);
+  exprt tmp_object_expr=exprt(ID_side_effect, type);
   tmp_object_expr.set(ID_statement, ID_temporary_object);
-  tmp_object_expr.location()= location;
+  tmp_object_expr.add_source_location()= source_location;
 
   exprt new_object(ID_new_object);
-  new_object.location() = tmp_object_expr.location();
+  new_object.add_source_location() = tmp_object_expr.source_location();
   new_object.set(ID_C_lvalue, true);
   new_object.type() = tmp_object_expr.type();
 
   already_typechecked(new_object);
 
   codet new_code =
-    cpp_constructor(location, new_object, ops);
+    cpp_constructor(source_location, new_object, ops);
 
   if(new_code.is_not_nil())
   {
@@ -368,12 +372,12 @@ Function: cpp_typecheckt::new_temporary
 \*******************************************************************/
 
 void cpp_typecheckt::new_temporary(
-  const locationt &location,
+  const source_locationt &source_location,
   const typet &type,
   const exprt &op,
   exprt &temporary)
 {
   exprt::operandst ops;
   ops.push_back(op);
-  new_temporary(location,type,ops,temporary);
+  new_temporary(source_location, type, ops, temporary);
 }

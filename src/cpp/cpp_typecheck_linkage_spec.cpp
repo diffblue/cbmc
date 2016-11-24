@@ -22,13 +22,13 @@ Function: cpp_typecheckt::convert
 
 void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
 {
-  irep_idt old_mode=current_mode;
+  irep_idt old_linkage_spec=current_linkage_spec;
 
-  current_mode=linkage_spec.linkage().get(ID_value);
+  current_linkage_spec=linkage_spec.linkage().get(ID_value);
   
   // there is a linkage spec "C++", which we know as "cpp"
-  if(current_mode=="C++")
-    current_mode=ID_cpp;
+  if(current_linkage_spec=="C++")
+    current_linkage_spec=ID_cpp;
 
   // do the declarations
   for(cpp_linkage_spect::itemst::iterator
@@ -38,5 +38,5 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
     convert(*it);
 
   // back to previous linkage spec
-  current_mode=old_mode;
+  current_linkage_spec=old_linkage_spec;
 }

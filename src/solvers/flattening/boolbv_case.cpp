@@ -26,7 +26,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
 {
   const std::vector<exprt> &operands=expr.operands();
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr, bv);
@@ -34,8 +34,8 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
   bv.resize(width);
 
   // make it free variables
-  for(unsigned i=0; i<bv.size(); i++)
-    bv[i]=prop.new_variable();
+  Forall_literals(it, bv)
+    *it=prop.new_variable();
 
   if(operands.size()<3)
     throw "case takes at least three operands";
@@ -50,9 +50,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
 
   forall_operands(it, expr)
   {
-    bvt op;
-
-    convert_bv(*it, op);
+    bvt op=convert_bv(*it);
 
     switch(what)
     {
@@ -74,8 +72,7 @@ void boolbvt::convert_case(const exprt &expr, bvt &bv)
       }
 
       compare_literal=bv_utils.equal(compare_bv, op);
-      compare_literal=prop.land(prop.lnot(previous_compare),
-                           compare_literal);
+      compare_literal=prop.land(!previous_compare, compare_literal);
 
       previous_compare=prop.lor(previous_compare, compare_literal);
 

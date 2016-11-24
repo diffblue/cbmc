@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <set>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "cvc_prop.h"
 
@@ -205,10 +204,10 @@ literalt cvc_propt::land(const bvt &bv)
 
   literalt literal=def_cvc_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " AND ";
-    out << cvc_literal(bv[i]);
+    if(it!=bv.begin()) out << " AND ";
+    out << cvc_literal(*it);
   }
   
   out << ";" << std::endl << std::endl;
@@ -234,10 +233,10 @@ literalt cvc_propt::lor(const bvt &bv)
 
   literalt literal=def_cvc_literal();
 
-  for(unsigned int i=0; i<bv.size(); ++i)
+  forall_literals(it, bv)
   {
-    if(i!=0) out << " OR ";
-    out << cvc_literal(bv[i]);
+    if(it!=bv.begin()) out << " OR ";
+    out << cvc_literal(*it);
   }
   
   out << ";" << std::endl << std::endl;
@@ -259,14 +258,14 @@ Function: cvc_propt::lxor
 
 literalt cvc_propt::lxor(const bvt &bv)
 {
-  if(bv.size()==0) return const_literal(false);
+  if(bv.empty()) return const_literal(false);
   if(bv.size()==1) return bv[0];
   if(bv.size()==2) return lxor(bv[0], bv[1]);
 
   literalt literal=const_literal(false);
 
-  for(unsigned i=0; i<bv.size(); i++)
-    literal=lxor(bv[i], literal);
+  forall_literals(it, bv)
+    literal=lxor(*it, literal);
 
   return literal;
 }
@@ -333,24 +332,6 @@ literalt cvc_propt::lor(literalt a, literalt b)
 
 /*******************************************************************\
 
-Function: cvc_propt::lnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-literalt cvc_propt::lnot(literalt a)
-{
-  a.invert();
-  return a;
-}
-
-/*******************************************************************\
-
 Function: cvc_propt::lxor
 
   Inputs:
@@ -365,8 +346,8 @@ literalt cvc_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false)) return b;
   if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return lnot(b);
-  if(b==const_literal(true)) return lnot(a);
+  if(a==const_literal(true)) return !b;
+  if(b==const_literal(true)) return !a;
 
   out << "%% lxor" << std::endl;
 
@@ -392,7 +373,7 @@ Function: cvc_propt::lnand
 
 literalt cvc_propt::lnand(literalt a, literalt b)
 {
-  return lnot(land(a, b));
+  return !land(a, b);
 }
 
 /*******************************************************************\
@@ -409,7 +390,7 @@ Function: cvc_propt::lnor
 
 literalt cvc_propt::lnor(literalt a, literalt b)
 {
-  return lnot(lor(a, b));
+  return !lor(a, b);
 }
 
 /*******************************************************************\
@@ -426,7 +407,7 @@ Function: cvc_propt::lequal
 
 literalt cvc_propt::lequal(literalt a, literalt b)
 {
-  return lnot(lxor(a, b));
+  return !lxor(a, b);
 }
 
 /*******************************************************************\
@@ -443,7 +424,7 @@ Function: cvc_propt::limplies
 
 literalt cvc_propt::limplies(literalt a, literalt b)
 {
-  return lor(lnot(a), b);
+  return lor(!a, b);
 }
 
 /*******************************************************************\
@@ -544,7 +525,7 @@ void cvc_propt::lcnf(const bvt &bv)
     if(s.insert(*it).second)
       new_bv.push_back(*it);
 
-    if(s.find(lnot(*it))!=s.end())
+    if(s.find(!*it)!=s.end())
       return; // clause satisfied
 
     assert(it->var_no()<_no_variables);

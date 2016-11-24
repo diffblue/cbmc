@@ -9,12 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_HASH_CONT_H
 #define CPROVER_HASH_CONT_H
 
-// you need to pick one of the following three options
-
+// You need to pick one of the following options:
+//
 // #define STL_HASH_NONE
 // #define STL_HASH_STDEXT
 // #define STL_HASH_GNU
 // #define STL_HASH_TR1
+// #define STL_HASH_STD
+//
+// The default is 'STL_HASH_TR1', which will hopefully
+// change one day to 'STL_HASH_STD'.
+
+#if !defined(STL_HASH_NONE) && !defined(STL_HASH_STDEXT) && \
+    !defined(STL_HASH_GNU) && !defined(STL_HASH_TR1) && \
+    !defined(STL_HASH_STD)
+#define STL_HASH_TR1
+#endif
 
 #if defined(STL_HASH_NONE)
 
@@ -65,6 +75,15 @@ typedef std::multiset<T1> hash_multiset_cont;
 #define hash_map_cont std::tr1::unordered_map
 #define hash_set_cont std::tr1::unordered_set
 #define hash_multiset_cont std::tr1::unordered_multiset
+
+#elif defined(STL_HASH_STD)
+
+#include <unordered_set>
+#include <unordered_map>
+
+#define hash_map_cont std::unordered_map
+#define hash_set_cont std::unordered_set
+#define hash_multiset_cont std::unordered_multiset
 
 #else
 

@@ -1,0 +1,8 @@
+KNOWNBUG
+test_link1.cpp
+test_link2.c
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

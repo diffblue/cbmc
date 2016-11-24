@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^Counterexample:$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

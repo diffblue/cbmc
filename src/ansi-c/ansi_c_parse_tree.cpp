@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <ostream>
+
 #include "ansi_c_parse_tree.h"
 
 /*******************************************************************\
@@ -61,8 +63,7 @@ void ansi_c_parse_treet::output(std::ostream &out) const
       it!=items.end();
       it++)
   {
-    symbolt tmp;
-    it->to_symbol(tmp);
-    out << tmp;
+    it->output(out);
+    out << "\n";
   }
 }

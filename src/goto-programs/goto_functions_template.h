@@ -12,9 +12,10 @@ Date: June 2003
 #define CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
 
 #include <ostream>
+#include <cassert>
 
-#include <std_types.h>
-#include <symbol.h>
+#include <util/std_types.h>
+#include <util/symbol.h>
 
 template <class bodyT>
 class goto_function_templatet
@@ -22,14 +23,31 @@ class goto_function_templatet
 public:
   bodyT body;
   code_typet type;
-  bool body_available;
+  
+  typedef std::vector<irep_idt> parameter_identifierst;
+  parameter_identifierst parameter_identifiers;
 
-  bool is_inlined() const
+  inline bool body_available() const
+  {
+    return !body.instructions.empty();
+  }
+
+  inline bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
   }
   
-  goto_function_templatet():body_available(false)
+  inline bool is_hidden() const
+  {
+    return type.get_bool(ID_C_hide);
+  }
+  
+  inline void make_hidden()
+  {
+    type.set(ID_C_hide, true);
+  }
+
+  goto_function_templatet()
   {
   }
   
@@ -37,26 +55,26 @@ public:
   {
     body.clear();
     type.clear();
-    body_available=false;
+    parameter_identifiers.clear();
   }
 
   void swap(goto_function_templatet &other)
   {
     body.swap(other.body);
     type.swap(other.type);
-    std::swap(body_available, other.body_available);
+    parameter_identifiers.swap(other.parameter_identifiers);
   }
-  
+
   void copy_from(const goto_function_templatet<bodyT> &other)
   {
     body.copy_from(other.body);
     type=other.type;
-    body_available=other.body_available;
+    parameter_identifiers=other.parameter_identifiers;
   }
 
   goto_function_templatet(const goto_function_templatet<bodyT> &src):
     type(src.type),
-    body_available(src.body_available)
+    parameter_identifiers(src.parameter_identifiers)
   {
     body.copy_from(src.body);
   }
@@ -70,11 +88,17 @@ public:
   typedef std::map<irep_idt, goto_functiont> function_mapt;
   function_mapt function_map;
   
-  goto_functions_templatet()
+  inline goto_functions_templatet()
   {
   }
+
+  // copy constructor, don't use me!
+  goto_functions_templatet(const goto_functions_templatet<bodyT> &src)
+  {
+    assert(src.function_map.empty());
+  }
   
-  void clear()
+  inline void clear()
   {
     function_map.clear();
   }
@@ -95,12 +119,13 @@ public:
     compute_location_numbers();
   }
 
-  irep_idt main_id() const
+  static inline irep_idt entry_point()
   {
-    return ID_main;
+    // do not confuse with C's "int main()"
+    return ID__start;
   }
   
-  void swap(goto_functions_templatet &other)
+  inline void swap(goto_functions_templatet &other)
   {
     function_map.swap(other.function_map);
   }
@@ -114,9 +139,6 @@ public:
       function_map[f_it->first].copy_from(f_it->second);
   }
 
-private:
-  // copy constructor, deliberatly unavailable
-  goto_functions_templatet(const goto_functions_templatet<bodyT> &src);
 };
 
 /*******************************************************************\
@@ -141,14 +163,15 @@ void goto_functions_templatet<bodyT>::output(
       it!=function_map.end();
       it++)
   {
-    if(it->second.body_available)
+    if(it->second.body_available())
     {
-      out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl;
-      out << std::endl;
+      out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
       
       const symbolt &symbol=ns.lookup(it->first);
-      out << symbol.display_name() << " (" << symbol.name << "):" << std::endl;
+      out << symbol.display_name() << " /* " << symbol.name << " */\n";
       it->second.body.output(ns, symbol.name, out);
+      
+      out << std::flush;
     }
   }
 }

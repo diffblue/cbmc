@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
-#include <context.h>
-#include <message_stream.h>
-#include <config.h>
-#include <std_expr.h>
+#include <util/symbol_table.h>
+#include <util/message.h>
+#include <util/config.h>
+#include <util/std_expr.h>
 
 #include "goto_functions.h"
 
@@ -24,11 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class string_abstractiont:public message_streamt
+class string_abstractiont:public messaget
 {
 public:
   string_abstractiont(
-    contextt &_context,
+    symbol_tablet &_symbol_table,
     message_handlert &_message_handler);
 
   void operator()(goto_programt &dest);
@@ -37,7 +37,7 @@ public:
 protected:
   const std::string arg_suffix;
   std::string sym_suffix;
-  contextt &context;
+  symbol_tablet &symbol_table;
   namespacet ns;
   unsigned temporary_counter;
 
@@ -51,7 +51,7 @@ protected:
   void replace_string_macros(
     exprt &expr,
     bool lhs,
-    const locationt &location);
+    const source_locationt &);
 
   void move_lhs_arithmetic(exprt &lhs, exprt &rhs);
 
@@ -90,8 +90,6 @@ protected:
 
   void abstract_function_call(goto_programt &dest, goto_programt::targett it);
 
-  goto_programt::targett abstract_return(goto_programt &dest, goto_programt::targett it);
-
   goto_programt::targett value_assignments(goto_programt &dest,
       goto_programt::targett it,
       const exprt& lhs, const exprt& rhs);
@@ -113,7 +111,7 @@ protected:
     const exprt &pointer,
     whatt what,
     bool write,
-    const locationt &location);
+    const source_locationt &);
 
   bool build(const exprt &object, exprt &dest, bool write);
   bool build_wrap(const exprt &object, exprt &dest, bool write);
@@ -133,7 +131,6 @@ protected:
       const irep_idt &identifier, const typet &type);
 
   exprt member(const exprt &a, whatt what);
-  irep_idt abstract_ret_val_name(const symbolt &fct);
 
   typet string_struct;
   goto_programt initialization;
@@ -148,7 +145,7 @@ protected:
       goto_functionst::goto_functiont &fct);
 
   void add_argument(
-    code_typet::argumentst &str_args,
+    code_typet::parameterst &str_args,
     const symbolt &fct_symbol,
     const typet &type,
     const irep_idt &base_name,
@@ -175,12 +172,12 @@ protected:
 // keep track of length of strings
 
 void string_abstraction(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_programt &dest);
 
 void string_abstraction(
-  contextt &context,
+  symbol_tablet &symbol_table,
   message_handlert &message_handler,
   goto_functionst &dest);
 

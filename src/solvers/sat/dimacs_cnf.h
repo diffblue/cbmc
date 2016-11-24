@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_DIMACS_CNF_H
 #define CPROVER_DIMACS_CNF_H
 
-#include "cnf_clause_list.h"
+#include <iosfwd>
 
-#include <iostream>
+#include "cnf_clause_list.h"
 
 class dimacs_cnft:public cnf_clause_listt
 {
@@ -38,7 +38,7 @@ protected:
 class dimacs_cnf_dumpt:public cnft
 {
 public:
-  dimacs_cnf_dumpt(std::ostream &_out);
+  explicit dimacs_cnf_dumpt(std::ostream &_out);
   virtual ~dimacs_cnf_dumpt() { }
  
   virtual const std::string solver_text()
@@ -55,10 +55,10 @@ public:
 
   virtual tvt l_get(literalt) const
   {
-    return tvt(tvt::TV_UNKNOWN);
+    return tvt::unknown();
   }
   
-  virtual unsigned int no_clauses() const
+  virtual size_t no_clauses() const
   {
     return 0;
   }

@@ -8,7 +8,7 @@
 
 inline int putchar(int c)
 {
-  _Bool error;
+  __CPROVER_bool error;
   __CPROVER_HIDE: printf("%c", c);
   return (error?-1:c);
 }
@@ -22,9 +22,10 @@ inline int putchar(int c)
 
 inline int puts(const char *s)
 {
-  _Bool error;
+  __CPROVER_HIDE:;
+  __CPROVER_bool error;
   int ret;
-  __CPROVER_HIDE: printf("%s\n", s);
+  printf("%s\n", s);
   if(error) ret=-1; else __CPROVER_assume(ret>=0);
   return ret;
 }
@@ -41,17 +42,37 @@ inline int puts(const char *s)
 #define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+inline void fclose_cleanup(void *stream)
+{
+  __CPROVER_HIDE:;
+  __CPROVER_assert(!__CPROVER_get_must(stream, "open") ||
+                   __CPROVER_get_must(stream, "closed"),
+                   "resource leak: fopen file not closed");
+}
+#endif
+
 inline FILE *fopen(const char *filename, const char *mode)
 {
   __CPROVER_HIDE:;
+  (void)*filename;
+  (void)*mode;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(filename), "fopen zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(mode), "fopen zero-termination of 2nd argument");
   #endif
 
-  FILE *f=malloc(sizeof(FILE));
+  FILE *fopen_result;
 
-  return f;
+  _Bool fopen_error;
+  fopen_result=fopen_error?NULL:malloc(sizeof(FILE));
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_set_must(fopen_result, "open");
+  __CPROVER_cleanup(fopen_result, fclose_cleanup);
+  #endif
+
+  return fopen_result;
 }
 
 /* FUNCTION: fclose */
@@ -64,6 +85,12 @@ inline FILE *fopen(const char *filename, const char *mode)
 inline int fclose(FILE *stream)
 {
   __CPROVER_HIDE:;
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fclose file must be open");
+  __CPROVER_clear_must(stream, "open");
+  __CPROVER_set_must(stream, "closed");
+  #endif
   int return_value;
   free(stream);
   return return_value;
@@ -84,6 +111,8 @@ inline int fclose(FILE *stream)
 inline FILE *fdopen(int handle, const char *mode)
 {
   __CPROVER_HIDE:;
+  (void)handle;
+  (void)*mode;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(mode),
     "fdopen zero-termination of 2nd argument");
@@ -104,7 +133,15 @@ inline FILE *fdopen(int handle, const char *mode)
 inline char *fgets(char *str, int size, FILE *stream)
 {
   __CPROVER_HIDE:;
-  _Bool error;
+  __CPROVER_bool error;
+
+  (void)size;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fgets file must be open");
+  #endif
 
   #ifdef __CPROVER_STRING_ABSTRACTION
   int resulting_size;
@@ -139,6 +176,13 @@ inline size_t fread(
   size_t i;
   __CPROVER_assume(nread<=nitems);
 
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fread file must be open");
+  #endif
+
   for(i=0; i<bytes; i++)
   {
     char nondet_char;
@@ -158,8 +202,15 @@ inline size_t fread(
 inline int feof(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "feof file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -173,8 +224,15 @@ inline int feof(FILE *stream)
 inline int ferror(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS    
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "feof file must be open");
+  #endif
+  
   return return_value;
 }
 
@@ -188,8 +246,15 @@ inline int ferror(FILE *stream)
 inline int fileno(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fileno file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -200,14 +265,22 @@ inline int fileno(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fputs(const char *s, FILE *stream)
+inline int fputs(const char *s, FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "fputs zero-termination of 1st argument");
   #endif
-  *stream;
+  (void)*s;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fputs file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -218,11 +291,18 @@ int fputs(const char *s, FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fflush(FILE *stream)
+inline int fflush(FILE *stream)
 {
   // just return nondet
+  __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fflush file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -233,35 +313,19 @@ int fflush(FILE *stream)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-int fpurge(FILE *stream)
+inline int fpurge(FILE *stream)
 {
   // just return nondet
-  int return_value;
-  *stream;
-  return return_value;
-}
-
-/* FUNCTION: read */
-
-#ifndef __CPROVER_UNISTD_H_INCLUDED
-#include <unistd.h>
-#define __CPROVER_UNISTD_H_INCLUDED
-#endif
-
-inline ssize_t read(int fildes, void *buf, size_t nbyte)
-{
   __CPROVER_HIDE:;
-  ssize_t nread;
-  size_t i;
-  __CPROVER_assume(nread<=nbyte);
+  int return_value;
+  (void)*stream;
 
-  for(i=0; i<nbyte; i++)
-  {
-    char nondet_char;
-    ((char *)buf)[i]=nondet_char;
-  }
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fpurge file must be open");
+  #endif
 
-  return nread;
+  return return_value;
 }
 
 /* FUNCTION: fgetc */
@@ -275,9 +339,15 @@ inline int fgetc(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
   // it's a byte or EOF (-1)
   __CPROVER_assume(return_value>=-1 && return_value<=255);
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fgetc file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -292,8 +362,14 @@ inline int getc(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
-  // it's a byte or EOF
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "getc file must be open");
+  #endif
+
+  // It's a byte or EOF, which we fix to -1.
   __CPROVER_assume(return_value>=-1 && return_value<=255);
   return return_value;
 }
@@ -325,7 +401,13 @@ inline int getw(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "getw file must be open");
+  #endif
+
   // it's any int, no restriction
   return return_value;
 }
@@ -341,7 +423,15 @@ inline int fseek(FILE *stream, long offset, int whence)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+  (void)offset;
+  (void)whence;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fseek file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -352,11 +442,17 @@ inline int fseek(FILE *stream, long offset, int whence)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-long ftell(FILE *stream)
+inline long ftell(FILE *stream)
 {
   __CPROVER_HIDE:;
   int return_value;
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "ftell file must be open");
+  #endif
+
   return return_value;
 }
 
@@ -370,7 +466,12 @@ long ftell(FILE *stream)
 void rewind(FILE *stream)
 {
   __CPROVER_HIDE:
-  *stream;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "rewind file must be open");
+  #endif
 }
 
 /* FUNCTION: fwrite */
@@ -387,7 +488,15 @@ size_t fwrite(
   FILE *stream)
 {
   __CPROVER_HIDE:;
-  *stream;
+  (void)*(char*)ptr;
+  (void)size;
+  (void)*stream;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "fwrite file must be open");
+  #endif
+
   size_t nwrite;
   __CPROVER_assume(nwrite<=nitems);
   return nwrite;
@@ -402,7 +511,7 @@ size_t fwrite(
 
 void perror(const char *s)
 {
-  __CPROVER_hide:;
+  __CPROVER_HIDE:;
   if(s!=0)
   {
     #ifdef __CPROVER_STRING_ABSTRACTION
@@ -414,5 +523,189 @@ void perror(const char *s)
   }
   
   // TODO: print errno error
+}
+
+/* FUNCTION: fscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
+{
+  __CPOVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result=vfscanf(stream, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: scanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int scanf(const char *restrict format, ...)
+{
+  __CPOVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result=vfscanf(stdin, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: sscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int sscanf(const char *restrict s, const char *restrict format, ...)
+{
+  __CPOVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result=vsscanf(s, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: vfscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int vfscanf(FILE *restrict stream, const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  int result;
+  (void)*stream;
+  (void)*format;
+  (void)arg;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "vfscanf file must be open");
+  #endif
+
+  return result;
+}
+
+/* FUNCTION: vscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int vscanf(const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  return vfscanf(stdin, format, arg);
+}
+
+/* FUNCTION: vsscanf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int vsscanf(const char *restrict s, const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  int result;
+  (void)*s;
+  (void)*format;
+  (void)arg;
+  return result;
+}
+
+/* FUNCTION: fprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int fprintf(FILE *stream, const char *restrict format, ...)
+{
+  __CPROVER_HIDE:;
+  va_list list;
+  va_start(list, format);
+  int result=vfprintf(stream, format, list);
+  va_end(list);
+  return result;
+}
+
+/* FUNCTION: vfprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
+{
+  __CPROVER_HIDE:;
+  int result;
+  (void)*stream;
+  (void)*format;
+  (void)arg;
+
+  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                   "vfprintf file must be open");
+  #endif
+
+  return result;
 }
 

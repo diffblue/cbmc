@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_NAMESPACE_SPEC_H
 #define CPROVER_CPP_NAMESPACE_SPEC_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_name.h"
 
@@ -54,6 +54,16 @@ public:
   }
   
   void output(std::ostream &out) const;
+  
+  inline void set_is_inline(bool value)
+  {
+    set(ID_is_inline, value);
+  }
+
+  inline bool get_is_inline() const
+  {
+    return get_bool(ID_is_inline);
+  }
 };
 
 #endif

@@ -23,8 +23,8 @@ int main()
       std::size_t pos=function.find(' ');
       if(pos!=std::string::npos) function=std::string(function, 0, pos);
 
-      std::cout << "{ \"c::" << function << "\",\n";
-      std::cout << "  \"#line 1 \\\"<builtin-library>-" << function << "\\\"\\n\"\n";
+      std::cout << "{ \"" << function << "\",\n";
+      std::cout << "  \"#line 1 \\\"<builtin-library-" << function << ">\\\"\\n\"\n";
     }
     else if(!first)
     {
@@ -52,5 +52,5 @@ int main()
 
   std::cout << 
     "{ 0, 0 }\n"
-    "};\n";
+    "}";
 }

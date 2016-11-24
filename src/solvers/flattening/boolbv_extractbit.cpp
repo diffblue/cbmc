@@ -6,11 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
+#include <algorithm>
 
-#include <arith_tools.h>
-#include <std_expr.h>
-#include <std_types.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
 
@@ -33,8 +34,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   if(operands.size()!=2)
     throw "extractbit takes two operands";
     
-  bvt bv0;
-  convert_bv(operands[0], bv0);
+  const bvt &bv0=convert_bv(operands[0]);
 
   // constant?
   if(operands[1].is_constant())
@@ -50,15 +50,16 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       return bv0[integer2long(o)];
   }
 
-  if(operands[0].type().id()==ID_verilogbv)
+  if(operands[0].type().id()==ID_verilog_signedbv ||
+     operands[0].type().id()==ID_verilog_unsignedbv)
   {
     // TODO
     assert(false);
   }
   else
   {
-    unsigned width_op0=boolbv_width(operands[0].type());
-    unsigned width_op1=boolbv_width(operands[1].type());
+    std::size_t width_op0=boolbv_width(operands[0].type());
+    std::size_t width_op1=boolbv_width(operands[1].type());
 
     if(width_op0==0 || width_op1==0)
       return SUB::convert_rest(expr);
@@ -67,7 +68,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       std::max(address_bits(width_op0), mp_integer(width_op1));
 
     unsignedbv_typet index_type;
-    index_type.set_width(integer2long(index_width));
+    index_type.set_width(integer2unsigned(index_width));
 
     equal_exprt equality;
     equality.lhs()=operands[1]; // index operand
@@ -81,7 +82,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       literalt l=prop.new_variable();
 
       // add implications
-      for(unsigned i=0; i<bv0.size(); i++)
+      for(std::size_t i=0; i<bv0.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
         literalt equal=prop.lequal(l, bv0[i]);
@@ -94,7 +95,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     {
       literalt l=prop.new_variable();
 
-      for(unsigned i=0; i<bv0.size(); i++)
+      for(std::size_t i=0; i<bv0.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
         l=prop.lselect(convert(equality), bv0[i], l);

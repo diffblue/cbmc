@@ -1,0 +1,117 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Hardware and Software Equivalence and Co-Verification</h2>
+
+<h3>Introduction</h3>
+
+<p class="justified">
+A common hardware design approach employed by many companies is to first
+write a quick prototype that behaves like the planned circuit in a language
+like ANSI-C. This program is then used for extensive testing and debugging,
+in particular of any embedded software that will later on be shipped with
+the circuit. An example is the hardware of a cell phone and its software.
+After testing and debugging of the program, the actual hardware design is
+written using hardware description languages like
+<a href="http://en.wikipedia.org/wiki/VHDL">VHDL</a> or
+<a href="http://en.wikipedia.org/wiki/Verilog">Verilog</a>.
+</p>
+
+<p class="justified">
+Thus, there are two implementations of the same design: one written in
+ANSI-C, which is written for simulation, and one written in register
+transfer level HDL, which is the actual product. The ANSI-C implementation
+is usually thoroughly tested and debugged.
+</p>
+
+<p class="justified">
+Due to market constraints, companies aim to sell the chip as soon as
+possible, i.e., shortly after the HDL implementation is designed. There is
+usually little time for additional debugging and testing of the HDL
+implementation. Thus, an automated, or nearly automated way of establishing
+the consistency of the HDL implementation is highly desirable.
+</p>
+
+<p class="justified">
+This motivates the verification problem: we want to verify the consistency
+of the HDL implementation, i.e., the product,
+<a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=936243&userType=inst">
+using the ANSI-C implementation as a reference</a>. Es&shy;ta&shy;bli&shy;shing the consistency
+does not re&shy;quire a formal specification. However, formal methods to verify
+either the hardware or software design are still desirable.
+</p>
+
+<h4>Related Work</h4>
+
+<p class="justified">
+There have been several attempts in the past to tackle the problem. 
+<a href="http://portal.acm.org/citation.cfm?id=513951">
+Semeria et al.</a> describe a tool for verifying the combinational equivalence of
+RTL-C and an HDL.  They translate the C code into HDL and use
+standard equivalence checkers to establish the equivalence.  The C code has
+to be very close to a hardware description (RTL level), which implies that
+the source and target have to be implemented in a very similar way.  There
+are also variants of C specifically for this purpose.  The <a
+href="http://en.wikipedia.org/wiki/SystemC">SystemC standard</a> defines a
+subset of C++ that can be used for synthesis.  Further
+variants of ANSI-C for specifying hardware are SpecC and Handel C, among
+others.</p>
+
+<p class="justified">
+The concept of verifying the equivalence of a software implementation and a
+synchronous transition system was introduced by
+<a href="http://www.springerlink.com/content/ah5lpxaagrjp8ax2/">Pnueli, Siegel, and
+Shtrichman</a>. The C program is re&shy;quired to be in a very
+specific form, since a mechanical translation is assumed.
+</p>
+
+<p class="justified">
+In 2000, <a href="http://doi.acm.org/10.1145/337292.337339">
+Currie, Hu, and Rajan</a> transform DSP assembly language
+into an equation for the Stanford Validity Checker.
+The symbolic execution of programs for comparison with RTL is now
+common practice.
+</p>
+
+<p class="justified">
+The previous work focuses on a small subset of ANSI-C that is particularly
+close to register transfer language. Thus, the designer is often re&shy;quired to
+rewrite the C program manually in order to comply with these constraints. We
+extend the methodology to handle the full set of ANSI-C language features.
+This is a challenge in the presence of complex, dynamic data structures and
+pointers that may dynamically point to multiple objects. Furthermore, our
+methodology allows arbitrary loop constructs.
+</p>
+
+<h4>Further Material</h4>
+
+<p class="justified">We provide a small <a href="hwsw-tutorial.shtml">
+tutorial</a> and a description on <a href="hwsw-inputs.shtml">
+how to synchronize inputs between the C model and the Verilog model</a>.
+There is also a collection of <a href="http://www.cprover.org/hardware/sequential-equivalence/">
+benchmark problems</a> available.</a>
+</p>
+
+<div class="box1">
+<div class="caption">Further Reading</div>
+
+<p>
+<ul>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-ck03.html">
+    Hardware Verification using ANSI-C Programs as a Reference</a></li>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-cky03.html">
+    Behavioral Consistency of C and Verilog Programs Using Bounded Model
+    Checking</a></li>
+<li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-ckl2004.html">A
+    Tool for Checking ANSI-C Programs</a></li>
+
+<li><a target=_top
+href="http://www.kroening.com/publications/view-publications-kc2004.html">Checking
+Consistency of C and Verilog using Predicate Abstraction and Induction</a></li>
+
+</ul>
+</p>
+
+<!--#include virtual="footer.inc" -->
+

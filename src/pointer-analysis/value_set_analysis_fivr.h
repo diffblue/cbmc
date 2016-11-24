@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FIVR_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FIVR_H
 
-#include <goto-programs/flow_insensitive_analysis.h>
+#include <analyses/flow_insensitive_analysis.h>
 
 #include "value_set_domain_fivr.h"
 #include "value_sets.h"
@@ -35,6 +35,7 @@ public:
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
+  using baset::output;
   void output(locationt l, std::ostream &out) 
   {
     state.value_set.set_from(l->function, l->location_number);
@@ -46,11 +47,11 @@ public:
   {
     forall_goto_program_instructions(it, goto_program)
     {
-      std::cout << "**** " << it->location << std::endl;      
+      out << "**** " << it->source_location << std::endl;      
       output(it, out);
-      std::cout << std::endl;
-      goto_program.output_instruction(ns, "", std::cout, it);
-      std::cout << std::endl;
+      out << std::endl;
+      goto_program.output_instruction(ns, "", out, it);
+      out << std::endl;
     }
   }
   

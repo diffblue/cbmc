@@ -6,21 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SPECC_PARSER_H
-#define CPROVER_SPECC_PARSER_H
+#ifndef CPROVER_ANSI_C_PARSER_H
+#define CPROVER_ANSI_C_PARSER_H
 
-#include <assert.h>
+#include <cassert>
 
-#include <parser.h>
-#include <expr.h>
-#include <hash_cont.h>
-#include <string_hash.h>
-#include <i2string.h>
+#include <util/parser.h>
+#include <util/expr.h>
+#include <util/hash_cont.h>
+#include <util/string_hash.h>
+#include <util/i2string.h>
+#include <util/mp_arith.h>
 
 #include "ansi_c_parse_tree.h"
-
-typedef enum { ANSI_C_UNKNOWN, ANSI_C_SYMBOL, ANSI_C_TYPEDEF,
-               ANSI_C_TAG, ANSI_C_LOCAL_LABEL } ansi_c_id_classt;
+#include "ansi_c_scope.h"
 
 int yyansi_cparse();
 
@@ -29,13 +28,15 @@ class ansi_c_parsert:public parsert
 public:
   ansi_c_parse_treet parse_tree;
   
-  ansi_c_parsert():cpp(false)
+  ansi_c_parsert():
+    cpp98(false), cpp11(false),
+    for_has_scope(false)
   {
   }
   
   virtual bool parse()
   {
-    return yyansi_cparse();
+    return yyansi_cparse()!=0;
   }
 
   virtual void clear()
@@ -43,28 +44,27 @@ public:
     parsert::clear();
     parse_tree.clear();
     
-    // scanner
-    string_literal.clear();
+    // scanner state
     tag_following=false;
     asm_block_following=false;
     parenthesis_counter=0;
+    string_literal.clear();
+    pragma_pack.clear();
     
     // setup global scope
     scopes.clear();
-
-    // this is the global scope
     scopes.push_back(scopet());
   }
 
   // internal state of the scanner
-  std::string string_literal;
   bool tag_following;
   bool asm_block_following;
   unsigned parenthesis_counter;
+  std::string string_literal;
+  std::list<exprt> pragma_pack;
   
-  enum { LANGUAGE, EXPRESSION } grammar;
-
-  enum { ANSI, GCC, MSC, ICC, CW, ARM } mode;
+  typedef enum { ANSI, GCC, MSC, ICC, CW, ARM } modet;
+  modet mode;
   // ANSI is strict ANSI-C
   // GCC is, well, gcc
   // MSC is Microsoft Visual Studio
@@ -72,42 +72,15 @@ public:
   // CW is CodeWarrior (with GCC extensions enabled)
   // ARM is ARM's RealView
 
-  // recognize C++ keywords  
-  bool cpp;
+  // recognize C++98 and C++11 keywords  
+  bool cpp98, cpp11;
+  
+  // in C99 and upwards, for(;;) has a scope
+  bool for_has_scope;
 
-  class identifiert
-  {
-  public:
-    ansi_c_id_classt id_class;
-    irep_idt base_name;
-    
-    identifiert():id_class(ANSI_C_UNKNOWN)
-    {
-    }
-  };
- 
-  class scopet
-  {
-  public:
-    typedef hash_map_cont<irep_idt, identifiert, irep_id_hash> name_mapt;
-    name_mapt name_map;
-    
-    std::string prefix;
-    
-    unsigned compound_counter, anon_counter;
-    
-    scopet():compound_counter(0), anon_counter(0) { }
-    
-    void swap(scopet &scope)
-    {
-      name_map.swap(scope.name_map);
-      prefix.swap(scope.prefix);
-      std::swap(compound_counter, scope.compound_counter);
-    }
-    
-    void print(std::ostream &out) const;
-  };
-   
+  typedef ansi_c_identifiert identifiert;  
+  typedef ansi_c_scopet scopet;
+
   typedef std::list<scopet> scopest;
   scopest scopes;
   
@@ -132,18 +105,14 @@ public:
     return scopes.back();
   }
 
-  static void convert_declarator(
-    irept &declarator,
-    const typet &type,
-    irept &identifier);
+  typedef enum { TAG, MEMBER, PARAMETER, OTHER } decl_typet;
 
-  void new_declaration(
-    const irept &type,
-    irept &declarator,
-    exprt &declaration,
-    bool is_tag=false,
-    bool put_into_scope=true);
-   
+  // convert a declarator and then add it to existing an declaration
+  void add_declarator(exprt &declaration, irept &declarator);
+
+  // adds a tag to the current scope
+  void add_tag_with_body(irept &tag);
+
   void copy_item(const ansi_c_declarationt &declaration)
   {
     assert(declaration.id()==ID_declaration);
@@ -160,16 +129,9 @@ public:
   ansi_c_id_classt lookup(
     std::string &name,
     bool tag,
-    bool label) const;
+    bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
-  
-  std::string get_anon_name()
-  {
-    std::string n="#anon";
-    n+=i2string(current_scope().anon_counter++);
-    return n;
-  }
   
   irep_idt lookup_label(const irep_idt id)
   {

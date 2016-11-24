@@ -27,17 +27,7 @@ void ansi_c_typecheckt::typecheck()
       it!=parse_tree.items.end();
       it++)
   {
-    if(it->id()==ID_declaration)
-    {
-      symbolt symbol;
-      to_ansi_c_declaration(*it).to_symbol(symbol);
-      typecheck_symbol(symbol);
-    }
-    else if(it->id()==ID_initializer)
-    {
-    }
-    else
-      assert(false);
+    typecheck_declaration(*it);
   }
 }
 
@@ -55,12 +45,12 @@ Function: ansi_c_typecheck
 
 bool ansi_c_typecheck(
   ansi_c_parse_treet &ansi_c_parse_tree,
-  contextt &context,
+  symbol_tablet &symbol_table,
   const std::string &module,
   message_handlert &message_handler)
 {
   ansi_c_typecheckt ansi_c_typecheck(
-    ansi_c_parse_tree, context, module, message_handler);
+    ansi_c_parse_tree, symbol_table, module, message_handler);
   return ansi_c_typecheck.typecheck_main();
 }
 
@@ -81,31 +71,33 @@ bool ansi_c_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
-  contextt context;
+  symbol_tablet symbol_table;
   ansi_c_parse_treet ansi_c_parse_tree;
 
   ansi_c_typecheckt ansi_c_typecheck(
-    ansi_c_parse_tree, context,
-    ns.get_context(), "", message_handler);
+    ansi_c_parse_tree, symbol_table,
+    ns.get_symbol_table(), "", message_handler);
 
   try
   {
     ansi_c_typecheck.typecheck_expr(expr);
   }
 
-  catch(int e)
+  catch(int)
   {
-    ansi_c_typecheck.error();
+    ansi_c_typecheck.error_msg();
   }
 
   catch(const char *e)
   {
-    ansi_c_typecheck.error(e);
+    ansi_c_typecheck.str << e;
+    ansi_c_typecheck.error_msg();
   }
 
   catch(const std::string &e)
   {
-    ansi_c_typecheck.error(e);
+    ansi_c_typecheck.str << e;
+    ansi_c_typecheck.error_msg();
   }
   
   return ansi_c_typecheck.get_error_found();

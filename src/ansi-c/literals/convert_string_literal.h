@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_CONVERT_STRING_LITERAL_H
 
 #include <string>
-#include <expr.h>
+
+#include <util/expr.h>
 
 exprt convert_string_literal(const std::string &src);
 

@@ -25,7 +25,7 @@ void message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const locationt &location)
+  const source_locationt &location)
 {
   std::string dest;
   
@@ -34,10 +34,10 @@ void message_handlert::print(
   const irep_idt &column=location.get_column();
   const irep_idt &function=location.get_function();
 
-  if(file!="")     { if(dest!="") dest+=" "; dest+="file "+id2string(file); }
-  if(line!="")     { if(dest!="") dest+=" "; dest+="line "+id2string(line); }
-  if(column!="")   { if(dest!="") dest+=" "; dest+="column "+id2string(column); }
-  if(function!="") { if(dest!="") dest+=" "; dest+="function "+id2string(function); }
+  if(!file.empty())     { if(dest!="") dest+=' '; dest+="file "+id2string(file); }
+  if(!line.empty())     { if(dest!="") dest+=' '; dest+="line "+id2string(line); }
+  if(!column.empty())   { if(dest!="") dest+=' '; dest+="column "+id2string(column); }
+  if(!function.empty()) { if(dest!="") dest+=' '; dest+="function "+id2string(function); }
 
   if(dest!="") dest+=": ";
   dest+=message;
@@ -59,7 +59,7 @@ Function: messaget::print
 
 void messaget::print(unsigned level, const std::string &message)
 {
-  if(message_handler!=NULL && verbosity>=level)
+  if(message_handler!=NULL)
     message_handler->print(level, message);
 }
   
@@ -79,13 +79,29 @@ void messaget::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const locationt &location)
+  const source_locationt &location)
 {
-  if(message_handler!=NULL && verbosity>=level)
+  if(message_handler!=NULL)
     message_handler->print(level, message, sequence_number,
                            location);
 }
   
+/*******************************************************************\
+
+Function: message_clientt::~message_clientt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+message_clientt::~message_clientt()
+{
+}
+
 /*******************************************************************\
 
 Function: message_clientt::set_message_handler
@@ -103,3 +119,4 @@ void message_clientt::set_message_handler(
 {
   message_handler=&_message_handler;
 }
+

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGE_UTIL_H
 #define CPROVER_LANGUAGE_UTIL_H
 
-#include <irep.h>
+#include <util/irep.h>
 
 class exprt;
 class namespacet;
@@ -28,5 +28,17 @@ std::string from_type(
   const typet &type);
 
 std::string from_type(const typet &type);
+
+exprt to_expr(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const std::string &src);
+
+std::string type_to_name(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const typet &type);
+
+std::string type_to_name(const typet &type);
 
 #endif

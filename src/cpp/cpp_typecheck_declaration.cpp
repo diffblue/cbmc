@@ -6,36 +6,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \********************************************************************/
 
-#include <i2string.h>
-#include <expr_util.h>
+#include <util/i2string.h>
+#include <util/expr_util.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_declarator_converter.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert_typedef
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool cpp_typecheckt::convert_typedef(typet &type)
-{
-  if(type.id()==ID_merged_type &&
-     type.subtypes().size()>=2 &&
-     type.subtypes()[0].id()==ID_typedef)
-  {
-    type.subtypes().erase(type.subtypes().begin());
-    return true;
-  }
-
-  return false;
-}
 
 /*******************************************************************\
 
@@ -61,7 +36,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
   irept name(ID_name);
   name.set(ID_identifier, identifier);
-  name.set(ID_C_location, declaration.location());
+  name.set(ID_C_source_location, declaration.source_location());
 
   cpp_namet cpp_name;
   cpp_name.move_to_sub(name);
@@ -75,7 +50,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
   if(!cpp_is_pod(declaration.type()))
   {
-   err_location(follow(declaration.type()).location());
+   err_location(follow(declaration.type()).source_location());
    str << "anonymous union is not POD";
    throw 0;
   }
@@ -87,14 +62,14 @@ void cpp_typecheckt::convert_anonymous_union(
   new_code.move_to_operands(decl_statement);
 
   // do scoping
-  symbolt union_symbol=context.symbols[follow(symbol.type).get(ID_name)];
+  symbolt union_symbol=symbol_table.symbols[follow(symbol.type).get(ID_name)];
   const irept::subt &components=union_symbol.type.add(ID_components).get_sub();
 
   forall_irep(it, components)
   {
     if(it->find(ID_type).id()==ID_code)
     {
-     err_location(union_symbol.type.location());
+     err_location(union_symbol.type.source_location());
      str << "anonymous union `" << union_symbol.base_name
          << "' shall not have function members\n";
      throw 0;
@@ -104,7 +79,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
     if(cpp_scopes.current_scope().contains(base_name))
     {
-      err_location(union_symbol.type.location());
+      err_location(union_symbol.type.source_location());
       str << "identifier `" << base_name << "' already in scope";
       throw 0;
     }
@@ -116,7 +91,7 @@ void cpp_typecheckt::convert_anonymous_union(
     id.is_member=true;
   }
 
-  context.symbols[union_symbol.name].type.set(
+  symbol_table.symbols[union_symbol.name].type.set(
     "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);
@@ -173,20 +148,27 @@ void cpp_typecheckt::convert_non_template_declaration(
 {
   assert(!declaration.is_template());
 
-  // do the first part, the type
-  typet &type=declaration.type();
-  bool is_typedef=convert_typedef(type);
+  // we first check if this is a typedef
+  typet &declaration_type=declaration.type();
+  bool is_typedef=declaration.is_typedef();
 
-  typecheck_type(type);
-
+  declaration.name_anon_struct_union();
+  typecheck_type(declaration_type);
+  
+  // Elaborate any class template instance _unless_ we do a typedef.
+  // These are only elaborated on usage!
+  if(!is_typedef)
+    elaborate_class_template(declaration_type);
+  
+  // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&
-     follow(declaration.type()).get_bool("#is_anonymous"))
+     follow(declaration.type()).get_bool(ID_C_is_anonymous))
   {
     typet final_type=follow(declaration.type());
 
     if(final_type.id()!=ID_union)
     {
-      err_location(final_type.location());
+      err_location(final_type.source_location());
       throw "top-level declaration does not declare anything";
     }
 
@@ -205,7 +187,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     cpp_declarator_converter.is_typedef=is_typedef;
 
     symbolt &symbol=cpp_declarator_converter.convert(
-      type, declaration.storage_spec(),
+      declaration_type, declaration.storage_spec(),
       declaration.member_spec(), declarator);
 
     // any template instance to remember?
@@ -220,7 +202,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     it->swap(tmp);
 
     // is there a constructor to be called for the declarator?
-    if(symbol.lvalue &&
+    if(symbol.is_lvalue &&
        declarator.init_args().has_operands())
     {
       symbol.value=

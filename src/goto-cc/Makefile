@@ -1,34 +1,31 @@
-SRC = goto-cc.cpp \
-      cmdline_options.cpp get_base_name.cpp \
-      gcc_cmdline.cpp ms_cl_cmdline.cpp \
-      compile.cpp armcc_cmdline.cpp \
-      languages.cpp goto_cc_cmdline.cpp \
-      xml_binaries/xml_irep_hashing.cpp \
-      xml_binaries/xml_symbol_hashing.cpp \
-      xml_binaries/xml_symbol.cpp \
-      xml_binaries/xml_goto_function.cpp \
-      xml_binaries/xml_goto_function_hashing.cpp \
-      xml_binaries/xml_goto_program.cpp \
-      xml_binaries/xml_goto_program_hashing.cpp \
-      xml_binaries/read_goto_object.cpp
+SRC = goto_cc_main.cpp goto_cc_mode.cpp gcc_mode.cpp \
+      get_base_name.cpp \
+      gcc_cmdline.cpp ms_cl_cmdline.cpp ld_cmdline.cpp \
+      compile.cpp armcc_cmdline.cpp run.cpp \
+      goto_cc_languages.cpp goto_cc_cmdline.cpp \
+      ms_cl_mode.cpp armcc_mode.cpp cw_mode.cpp ld_mode.cpp
 
-OBJ += ../big-int/bigint$(OBJEXT) \
+OBJ += ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
-      ../pointer-analysis/pointer-analysis$(LIBEXT) \
       ../util/util$(LIBEXT) \
+      ../linking/linking$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
+      ../assembler/assembler$(LIBEXT) \
       ../langapi/langapi$(LIBEXT)
 
-INCLUDES= -I .. -I ../util
+INCLUDES= -I ..
 
 LIBS =
 
-CLEANFILES = goto-cc$(EXEEXT)
+CLEANFILES = goto-cc$(EXEEXT) goto-cl$(EXEEXT)
 
 include ../config.inc
 include ../common
 
+ifeq ($(BUILD_ENV_),MSVC)
+all: goto-cl$(EXEEXT)
+endif
 all: goto-cc$(EXEEXT)
 
 ifneq ($(wildcard ../cpp/Makefile),)
@@ -36,8 +33,23 @@ ifneq ($(wildcard ../cpp/Makefile),)
   CP_CXXFLAGS += -D HAVE_CPP
 endif
 
+ifneq ($(wildcard ../java_bytecode/Makefile),)
+  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
+  ifneq ($(LIBZIPLIB),)
+    LIBS += -L $(LIBZIPLIB) -lzip -lz
+  endif
+endif
+
 ###############################################################################
 
 goto-cc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
+
+goto-cl$(EXEEXT): $(OBJ)
+	$(LINKBIN)
+
+.PHONY: goto-cc-mac-signed
+
+goto-cc-mac-signed: goto-cc$(EXEEXT)
+	codesign -v -s $(OSX_IDENTITY) goto-cc$(EXEEXT)
 

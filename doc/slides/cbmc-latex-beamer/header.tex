@@ -1,0 +1,124 @@
+\documentclass{beamer}
+%\documentclass[handout]{beamer}
+
+\pdfcompresslevel9
+
+\usepackage{graphicx}
+\usepackage{epic}
+\usepackage{epsfig}
+\usepackage{eepicemu}
+\usepackage{color}
+\usepackage{alltt}
+\usepackage{cancel}
+\usepackage{hhline}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{boxedminipage}
+\usepackage{listings}
+\usepackage{helvet}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{xspace}
+\usepackage{dsfont}
+\usepackage[noend]{algorithmic}
+\usepackage{mathrsfs}
+\usepackage{pifont}
+
+\hypersetup{%
+	pdftitle={\inserttitle},%
+	pdfauthor={\insertauthor},%
+	pdfsubject={},%
+	pdfkeywords={}%
+}
+
+\DeclareGraphicsExtensions{.pdftex,.png,.pdf,.jpg}
+\DeclareGraphicsRule{.pdftex}{pdf}{*}{}
+
+\begin{lrbox}{2233}
+\begin{picture}(0,0)
+\put(300,-20){\includegraphics[width=2cm]{cbmc-logo-medium}}
+\end{picture}
+\end{lrbox}
+
+\institute[]{\includegraphics{cbmc-logo-medium}}
+
+\usetheme{boxes}
+\usefonttheme[stillsansseriftext,stillsansserifsmall]{serif}
+\setbeamerfont{frametitle}{size=\large,series=\bfseries,shape=\sf}
+\addfootbox{structure}{\,\sf{\bf \insertshorttitle} --
+\href{http://www.cprover.org/}{http://www.cprover.org/}\hfill\insertframenumber\,}
+\addheadbox{structure}{\usebox{2233}}
+
+\renewcommand{\implies}{\Rightarrow}
+
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+
+% COLORS
+
+% butter (yellowish)
+\definecolor{tabutter}{rgb}{0.98824, 0.91373, 0.30980}		% #fce94f
+\definecolor{ta2butter}{rgb}{0.92941, 0.83137, 0}		% #edd400
+\definecolor{ta3butter}{rgb}{0.76863, 0.62745, 0}		% #c4a000
+
+% orange
+\definecolor{taorange}{rgb}{0.98824, 0.68627, 0.24314}		% #fcaf3e
+\definecolor{ta2orange}{rgb}{0.96078, 0.47451, 0}		% #f57900
+\definecolor{ta3orange}{rgb}{0.80784, 0.36078, 0}		% #ce5c00
+
+% chocolate (brownish)
+\definecolor{tachocolate}{rgb}{0.91373, 0.72549, 0.43137}	% #e9b96e
+\definecolor{ta2chocolate}{rgb}{0.75686, 0.49020, 0.066667}	% #c17d11
+\definecolor{ta3chocolate}{rgb}{0.56078, 0.34902, 0.0078431}	% #8f5902
+
+% chameleon (greenish)
+\definecolor{tachameleon}{rgb}{0.54118, 0.88627, 0.20392}	% #8ae234
+\definecolor{ta2chameleon}{rgb}{0.45098, 0.82353, 0.086275}	% #73d216
+\definecolor{ta3chameleon}{rgb}{0.30588, 0.60392, 0.023529}	% #4e9a06
+
+% sky blue
+\definecolor{taskyblue}{rgb}{0.44706, 0.56078, 0.81176}		% #728fcf
+\definecolor{ta2skyblue}{rgb}{0.20392, 0.39608, 0.64314}	% #3465a4
+\definecolor{ta3skyblue}{rgb}{0.12549, 0.29020, 0.52941}	% #204a87
+
+% plum (violettish)
+\definecolor{taplum}{rgb}{0.67843, 0.49804, 0.65882}		% #ad7fa8
+\definecolor{ta2plum}{rgb}{0.45882, 0.31373, 0.48235}		% #75507b
+\definecolor{ta3plum}{rgb}{0.36078, 0.20784, 0.4}		% #5c3566
+
+% scarlet red
+\definecolor{tascarletred}{rgb}{0.93725, 0.16078, 0.16078}	% #ef2929
+\definecolor{ta2scarletred}{rgb}{0.8, 0, 0}			% #cc0000
+\definecolor{ta3scarletred}{rgb}{0.64314, 0, 0}			% #a40000
+
+% aluminium
+\definecolor{taaluminium}{rgb}{0.93333, 0.93333, 0.92549}	% #eeeeec
+\definecolor{ta2aluminium}{rgb}{0.82745, 0.84314, 0.81176}	% #d3d7cf
+\definecolor{ta3aluminium}{rgb}{0.72941, 0.74118, 0.71373}	% #babdb6
+
+% gray
+\definecolor{tagray}{rgb}{0.53333, 0.54118, 0.52157}		% #888a85
+\definecolor{ta2gray}{rgb}{0.33333, 0.34118, 0.32549}		% #555753
+\definecolor{ta3gray}{rgb}{0.18039, 0.20392, 0.21176}		% #2e3436
+
+% gray
+\definecolor{tagray}{rgb}{0.53333, 0.54118, 0.52157}		% #888a85
+
+\usecolortheme[named=ta3skyblue]{structure}
+
+\setbeamercolor{block body}{fg=black,bg=ta3skyblue!10}
+\setbeamercolor{block title}{fg=black,bg=ta3skyblue!30}
+\mode<handout>{\setbeamercolor{block body}{fg=black,bg=white!90!black}}
+\mode<handout>{\setbeamercolor{block title}{fg=black,bg=white!70!black}}
+
+\newcommand{\RETURN}{\STATE \textbf{return}~}
+%\renewcommand{\ENDIF}{}
+
+\newcommand{\power}[1]{\mathscr P({#1})}
+
+\newcommand{\mycheck}{{\color{ta3chameleon}\ding{52}}}
+\newcommand{\myfail}{{\color{ta3scarletred}\ding{56}}}

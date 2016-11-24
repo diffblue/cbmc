@@ -9,29 +9,32 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_ENUM_TYPE_H
 #define CPROVER_CPP_ENUM_TYPE_H
 
-#include <assert.h>
+#include <cassert>
 
-#include <config.h>
-#include <type.h>
+#include <util/type.h>
+
+#include "cpp_name.h"
 
 class cpp_enum_typet:public typet
 {
 public:
-  cpp_enum_typet():typet(ID_c_enum)
+  cpp_enum_typet();
+  
+  inline const cpp_namet &tag() const
   {
-    set(ID_width, config.ansi_c.int_width);
+    return static_cast<const cpp_namet &>(find(ID_tag));
   }
   
-  const irep_idt &get_name() const
+  inline bool has_tag() const
   {
-    return get(ID_name);
+    return find(ID_tag).is_not_nil();
   }
   
-  void set_name(const irep_idt &name)
+  inline cpp_namet &tag()
   {
-    set(ID_name, name);
+    return static_cast<cpp_namet &>(add(ID_tag));
   }
-
+  
   const irept &body() const
   {
     return find(ID_body);
@@ -51,6 +54,8 @@ public:
   {
     return get_bool(ID_C_tag_only_declaration);
   }
+  
+  irep_idt generate_anon_tag() const;
 };
 
 extern inline const cpp_enum_typet &to_cpp_enum_type(const irept &irep)

@@ -6,9 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <namespace.h>
-
-#include "expr.h"
+#include <util/namespace.h>
+#include <util/expr.h>
 
 class c_sizeoft
 {

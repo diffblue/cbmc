@@ -10,17 +10,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef USE_SPRINTF
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #include "i2string.h"
 
-#else
+#ifdef _WIN32
+#ifndef __MINGW32__
+#define snprintf sprintf_s
+#endif
+#endif
 
 #include <sstream>
 
 #include "i2string.h"
-#include "strstream2string.h"
 
 #endif
 
@@ -40,16 +43,12 @@ std::string i2string(int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%d", i);
+  snprintf(buffer, sizeof(buffer), "%d", i);
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str;
+  return strInt.str();
   #endif
 }
 
@@ -69,24 +68,12 @@ std::string i2string(signed long int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  #ifdef _WIN32
-  #ifdef __MINGW32_VERSION
   snprintf(buffer, sizeof(buffer), "%ld", i);
-  #else
-  sprintf_s(buffer, sizeof(buffer), "%ld", i);
-  #endif
-  #else
-  snprintf(buffer, sizeof(buffer), "%ld", i);
-  #endif
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str; 
+  return strInt.str();
   #endif
 }
 
@@ -106,16 +93,12 @@ std::string i2string(unsigned i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%u", i);
+  snprintf(buffer, sizeof(buffer), "%u", i);
   return buffer;
   #else
   std::ostringstream strInt;
-
   strInt << i;
-  std::string str;
-  strstream2string(strInt, str);
-
-  return str; 
+  return strInt.str();
   #endif
 }
 
@@ -135,7 +118,32 @@ std::string i2string(unsigned long int i)
 {
   #ifdef USE_SPRINTF
   char buffer[100];
-  sprintf(buffer, "%lu", i);
+  snprintf(buffer, sizeof(buffer), "%lu", i);
+  return buffer;
+  #else
+  std::ostringstream strInt;
+  strInt << i;
+  return strInt.str();
+  #endif
+}
+
+/*******************************************************************\
+
+Function: i2string
+
+  Inputs: signed long long
+
+ Outputs: string class
+
+ Purpose: convert signed integer to string class
+
+\*******************************************************************/
+
+std::string i2string(signed long long i)
+{
+  #ifdef USE_SPRINTF
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "%lld", i);
   return buffer;
   #else
   std::ostringstream strInt;
@@ -148,3 +156,31 @@ std::string i2string(unsigned long int i)
   #endif
 }
 
+/*******************************************************************\
+
+Function: i2string
+
+  Inputs: unsigned long long
+
+ Outputs: string class
+
+ Purpose: convert unsigned integer to string class
+
+\*******************************************************************/
+
+std::string i2string(unsigned long long i)
+{
+  #ifdef USE_SPRINTF
+  char buffer[100];
+  snprintf(buffer, sizeof(buffer), "%llu", i);
+  return buffer;
+  #else
+  std::ostringstream strInt;
+
+  strInt << i;
+  std::string str;
+  strstream2string(strInt, str);
+
+  return str; 
+  #endif
+}

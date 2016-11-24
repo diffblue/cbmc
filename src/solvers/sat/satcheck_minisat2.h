@@ -26,7 +26,7 @@ template<typename T>
 class satcheck_minisat2_baset:public cnf_solvert
 {
 public:
-  satcheck_minisat2_baset();
+  explicit satcheck_minisat2_baset(T *);
   virtual ~satcheck_minisat2_baset();
   
   virtual resultt prop_solve();
@@ -37,6 +37,9 @@ public:
 
   // extra MiniSat feature: solve with assumptions
   virtual void set_assumptions(const bvt &_assumptions);
+  
+  // extra MiniSat feature: default branching decision
+  void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const;
   virtual bool has_set_assumptions() const { return true; }
@@ -47,7 +50,6 @@ protected:
   
   void add_variables();
   bvt assumptions;
-  bool empty_clause_added;
 };
 
 class satcheck_minisat_no_simplifiert:
@@ -64,6 +66,8 @@ class satcheck_minisat_simplifiert:
 public:
   satcheck_minisat_simplifiert();
   virtual const std::string solver_text();
+  virtual void set_frozen(literalt a);
+  bool is_eliminated(literalt a) const;
 };
 
 #endif

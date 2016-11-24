@@ -16,20 +16,30 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <vector>
-
-#include <expr.h>
-
-class namespacet;
+#include "expr.h"
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_extractt:public exprt
+class byte_extract_exprt:public exprt
 {
 public:
-  explicit inline byte_extractt(irep_idt _id):exprt(_id)
+  explicit inline byte_extract_exprt(irep_idt _id):exprt(_id)
   {
     operands().resize(2);
+  }
+
+  explicit inline byte_extract_exprt(irep_idt _id, const typet &_type):
+    exprt(_id, _type)
+  {
+    operands().resize(2);
+  }
+
+  inline byte_extract_exprt(
+    irep_idt _id,
+    const exprt &_op, const exprt &_offset, const typet &_type):
+    exprt(_id, _type)
+  {
+    copy_to_operands(_op, _offset);
   }
 
   inline exprt &op() { return op0(); }
@@ -39,60 +49,92 @@ public:
   inline const exprt &offset() const { return op1(); }
 };
 
+extern inline const byte_extract_exprt &to_byte_extract_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<const byte_extract_exprt &>(expr);
+}
+
+extern inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  return static_cast<byte_extract_exprt &>(expr);
+}
+
+irep_idt byte_extract_id();
+irep_idt byte_update_id();
+
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_extract_little_endiant:public byte_extractt
+class byte_extract_little_endian_exprt:public byte_extract_exprt
 {
 public:
-  inline byte_extract_little_endiant():byte_extractt(ID_byte_extract_little_endian)
+  inline byte_extract_little_endian_exprt():
+    byte_extract_exprt(ID_byte_extract_little_endian)
+  {
+  }
+
+};
+
+extern inline const byte_extract_little_endian_exprt &to_byte_extract_little_endian_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
+  return static_cast<const byte_extract_little_endian_exprt &>(expr);
+}
+
+extern inline byte_extract_little_endian_exprt &to_byte_extract_little_endian_expr(exprt &expr)
+{
+  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
+  return static_cast<byte_extract_little_endian_exprt &>(expr);
+}
+
+/*! \brief TO_BE_DOCUMENTED
+*/
+class byte_extract_big_endian_exprt:public byte_extract_exprt
+{
+public:
+  inline byte_extract_big_endian_exprt():
+    byte_extract_exprt(ID_byte_extract_big_endian)
+  {
+  }
+
+  byte_extract_big_endian_exprt(
+    const exprt &_op, const exprt &_offset, const typet &_type):
+    byte_extract_exprt(ID_byte_extract_big_endian, _op, _offset, _type)
   {
   }
 };
 
-extern inline const byte_extract_little_endiant &to_byte_extract_little_endian(const exprt &expr)
+extern inline const byte_extract_big_endian_exprt &to_byte_extract_big_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
-  return static_cast<const byte_extract_little_endiant &>(expr);
+  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
+  return static_cast<const byte_extract_big_endian_exprt &>(expr);
 }
 
-extern inline byte_extract_little_endiant &to_byte_extract_little_endian(exprt &expr)
+extern inline byte_extract_big_endian_exprt &to_byte_extract_big_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_extract_little_endian && expr.operands().size()==2);
-  return static_cast<byte_extract_little_endiant &>(expr);
+  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
+  return static_cast<byte_extract_big_endian_exprt &>(expr);
 }
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_extract_big_endiant:public byte_extractt
+class byte_update_exprt:public exprt
 {
 public:
-  inline byte_extract_big_endiant():byte_extractt(ID_byte_extract_big_endian)
-  {
-  }
-};
-
-extern inline const byte_extract_big_endiant &to_byte_extract_big_endian(const exprt &expr)
-{
-  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
-  return static_cast<const byte_extract_big_endiant &>(expr);
-}
-
-extern inline byte_extract_big_endiant &to_byte_extract_big_endian(exprt &expr)
-{
-  assert(expr.id()==ID_byte_extract_big_endian && expr.operands().size()==2);
-  return static_cast<byte_extract_big_endiant &>(expr);
-}
-
-/*! \brief TO_BE_DOCUMENTED
-*/
-class byte_updatet:public exprt
-{
-public:
-  explicit inline byte_updatet(irep_idt _id):exprt(_id)
+  explicit inline byte_update_exprt(irep_idt _id):exprt(_id)
   {
     operands().resize(3);
   }
 
+  inline byte_update_exprt(
+    irep_idt _id,
+    const exprt &_op, const exprt &_offset, const exprt &_value):
+    exprt(_id, _op.type())
+  {
+    copy_to_operands(_op, _offset, _value);
+  }
+  
   inline exprt &op() { return op0(); }
   inline exprt &offset() { return op1(); }
   inline exprt &value() { return op2(); }
@@ -102,95 +144,76 @@ public:
   inline const exprt &value() const { return op2(); }
 };
 
-/*! \brief TO_BE_DOCUMENTED
-*/
-class byte_update_little_endiant:public byte_updatet
+extern inline const byte_update_exprt &to_byte_update_expr(const exprt &expr)
 {
-public:
-  inline byte_update_little_endiant():byte_updatet(ID_byte_update_little_endian)
-  {
-  }
-};
-
-extern inline const byte_update_little_endiant &to_byte_update_little_endian(const exprt &expr)
-{
-  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
-  return static_cast<const byte_update_little_endiant &>(expr);
+  assert(expr.operands().size()==3);
+  return static_cast<const byte_update_exprt &>(expr);
 }
 
-extern inline byte_update_little_endiant &to_byte_update_little_endian(exprt &expr)
+extern inline byte_update_exprt &to_byte_update_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
-  return static_cast<byte_update_little_endiant &>(expr);
+  assert(expr.operands().size()==3);
+  return static_cast<byte_update_exprt &>(expr);
 }
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_update_big_endiant:public byte_updatet
+class byte_update_little_endian_exprt:public byte_update_exprt
 {
 public:
-  inline byte_update_big_endiant():byte_updatet(ID_byte_update_big_endian)
+  inline byte_update_little_endian_exprt():
+    byte_update_exprt(ID_byte_update_little_endian)
   {
   }
+
+  inline byte_update_little_endian_exprt(
+    const exprt &_op, const exprt &_offset, const exprt &_value):
+    byte_update_exprt(ID_byte_update_little_endian, _op, _offset, _value)
+  {
+  }
+
 };
 
-extern inline const byte_update_big_endiant &to_byte_update_big_endian(const exprt &expr)
+extern inline const byte_update_little_endian_exprt &to_byte_update_little_endian_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
-  return static_cast<const byte_update_big_endiant &>(expr);
+  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
+  return static_cast<const byte_update_little_endian_exprt &>(expr);
 }
 
-extern inline byte_update_big_endiant &to_byte_update_big_endian(exprt &expr)
+extern inline byte_update_little_endian_exprt &to_byte_update_little_endian_expr(exprt &expr)
 {
-  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
-  return static_cast<byte_update_big_endiant &>(expr);
+  assert(expr.id()==ID_byte_update_little_endian && expr.operands().size()==3);
+  return static_cast<byte_update_little_endian_exprt &>(expr);
 }
 
-/*! \brief Maps a big-endian offset to a little-endian offset
+/*! \brief TO_BE_DOCUMENTED
 */
-class endianness_mapt
+class byte_update_big_endian_exprt:public byte_update_exprt
 {
 public:
-  endianness_mapt(const typet &type, bool little_endian, const namespacet &_ns):ns(_ns)
+  inline byte_update_big_endian_exprt():
+    byte_update_exprt(ID_byte_update_big_endian)
   {
-    build(type, little_endian);
   }
 
-  inline unsigned map_bit(unsigned bit) const
+  inline byte_update_big_endian_exprt(
+    const exprt &_op, const exprt &_offset, const exprt &_value):
+    byte_update_exprt(ID_byte_update_big_endian, _op, _offset, _value)
   {
-    unsigned byte=bit/8;
-    return map_byte(byte)*8+bit%8;
   }
-  
-  inline unsigned map_byte(unsigned byte) const
-  {
-    assert(byte<map.size());
-    return map[byte];
-  }
-  
-  unsigned size() const
-  {
-    return map.size();
-  }
-  
-  inline void build(const typet &type, bool little_endian)
-  {
-    build_rec(type, little_endian);
-  }
-  
-  void output(std::ostream &) const;
 
-protected:
-  const namespacet &ns;
-  std::vector<unsigned> map;
-
-  void build_rec(const typet &type, bool little_endian);
 };
 
-extern inline std::ostream &operator << (std::ostream &out, const endianness_mapt &m)
+extern inline const byte_update_big_endian_exprt &to_byte_update_big_endian_expr(const exprt &expr)
 {
-  m.output(out);
-  return out;
+  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
+  return static_cast<const byte_update_big_endian_exprt &>(expr);
+}
+
+extern inline byte_update_big_endian_exprt &to_byte_update_big_endian_expr(exprt &expr)
+{
+  assert(expr.id()==ID_byte_update_big_endian && expr.operands().size()==3);
+  return static_cast<byte_update_big_endian_exprt &>(expr);
 }
 
 #endif

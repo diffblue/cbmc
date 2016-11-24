@@ -1,0 +1,31 @@
+#include <assert.h>
+#include <errno.h>
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+#include <math.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#ifndef _WIN32
+#include <complex.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
+#endif
+
+#ifdef __linux__
+#include <alloca.h>
+#endif
+
+int main()
+{
+  return 0;
+}
+

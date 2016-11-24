@@ -1,0 +1,152 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>SATABS &ndash; Predicate Abstraction with SAT</h2>
+
+<h3>Background</h3>
+
+<h4>Sound Abstractions</h4>
+
+<p class="justified">
+This section provides background information on how SATABS operates.  Even
+for very trivial C programs it is impossible to exhaustively examine their
+state space (which is potentially unbounded).  However, not all details in a
+C program necessarily contribute to a bug, so it may be sufficient to only
+examine those parts of the program that are somehow related to a bug.</p>
+
+<p class="justified">
+In practice, many static verification tools (such as <code><a
+href="http://en.wikipedia.org/wiki/Lint_(software)">lint</a></code>) try to
+achieve this goal by applying heuristics.  This approach comes at a cost:
+bugs might be overlooked because the heuristics do not cover all relevant
+aspects of the program.  Therefore, the conclusion that a program is correct
+whenever such a static verification tool is unable to find an error is
+invalid.
+</p>
+
+<center>
+<img src="cegar-1.png" alt="CEGAR Loop">
+</center>
+
+<p class="justified">
+A more sophisticated approach that has been very successful recently
+is to generate a <i>sound</i> abstraction of the original program.
+In this context, <i>soundness</i> refers to the fact that the abstract program
+contains (at least) all relevant behaviors (i.e., bugs) that are present
+in the original program. In the Figure above, the first component 
+strips details from the original program. The number of possible behaviors
+increases as the number of details in the abstract program decreases.
+Intuitively, the reason is that whenever the model checking tool lacks the
+information that is necessary to make an accurate decision on whether a 
+branch of an control flow statement can be taken or not, both branches
+have to be considered.</p>
+
+<p class="justified">
+In the resulting <i>abstract program</i>, a set of concrete 
+states is subsumed by means of a single abstract state. Consider
+the following figure:
+</p>
+
+<center>
+<img src="states.png">
+</center>
+
+<p class="justified">
+The concrete states <font face="Times"><i>x</i><sub>1</sub></font>
+and <font face="Times"><i>x</i><sub>2</sub></font> are mapped to an
+abstract state <font face="Times"><i>X</i></font>, and similarly
+<font face="Times"><i>Y</i></font> subsumes
+<font face="Times"><i>y</i><sub>1</sub></font>
+and <font face="Times"><i>y</i><sub>2</sub></font>.
+However, all transitions that are possible in the concrete program are also
+possible in the abstract model.  The abstract transition
+<font face="Times"><i>X</i></font> &rarr; <font face="Times"><i>Y</i></font>
+summarizes the concrete transitions
+<font face="Times"><i>x</i><sub>1</sub></font> &rarr; <font face="Times"><i>y</i><sub>1</sub></font>
+and <font face="Times"><i>x</i><sub>1</sub></font> &rarr;
+<font face="Times"><i>x</i><sub>1</sub></font>, and <font face="Times"><i>Y</i></font> &rarr;
+<font face="Times"><i>X</i></font>
+corresponds to <font face="Times"><i>x</i><sub>1</sub></font> &rarr;
+<font face="Times"><i>x</i><sub>2</sub></font>.  The
+behavior 
+<font face="Times"><i>X</i></font> &rarr; <font face="Times"><i>Y</i></font> &rarr; 
+<font face="Times"><i>X</i></font> is feasible in the original program,
+because it maps to
+<font face="Times"><i>x</i><sub>1</sub></font> &rarr;
+<font face="Times"><i>x</i><sub>1</sub></font> &rarr;
+<font face="Times"><i>x</i><sub>2</sub></font>.  However,
+<font face="Times"><i>Y</i></font> &rarr;
+<font face="Times"><i>X</i></font> &rarr;
+<font face="Times"><i>Y</i></font>
+is feasible only in the abstract model.</p>
+
+<h4>Spurious Counterexamples</h4>
+
+<p class="justified">
+The consequence is that the model checker (component number two in the
+figure above) possibly reports a <i>spurious</i> counterexample.  We call a
+counterexample spurious whenever it is feasible in the current abstract
+model but not in the original program.  However, whenever the model checker
+is unable to find an execution trace that violates the given property, we
+can conclude that there is no such trace in the original program, either.
+</p>
+
+<p class="justified">
+The feasibility of counterexamples is checked by <i>symbolic simulation</i>
+(performed by component three in the figure above).  If the counterexample
+is indeed feasible, SATABS found a bug in the original program and reports
+it to the user.
+</p>
+
+<h4>Automatic Refinement</h4>
+
+<p class="justified">
+On the other hand, infeasible counterexamples
+(that originate from abstract behaviors that
+result from the omission of details and are not present in the original
+program) are never reported to the user.  Instead, the information is used
+in order to refine the abstraction such that the spurious counterexample is
+not part of the refined model anymore.  For instance, the reason for the
+infeasibility of <font face="Times"><i>Y</i></font>
+&rarr; <font face="Times"><i>X</i></font> &rarr;
+<font face="Times"><i>Y</i></font> is
+that neither
+<font face="Times"><i>y</i><sub>1</sub></font> nor
+<font face="Times"><i>x</i><sub>1</sub></font> can
+be reached from
+<font face="Times"><i>x</i><sub>2</sub></font>.
+Therefore, the abstraction can be refined by partitioning 
+<font face="Times"><i>X</i></font>.
+</p>
+
+<p class="justified">
+The refinement steps can be illustrated as follows:
+</p>
+
+<center>
+<img src="refinement.png" alt="Iterative refinement">
+</center>
+
+<p class="justified">
+The first step (1) is to generate a very coarse abstraction with
+a very small state space. This abstraction is then successively
+refined (2, 3, ...) until either a feasible counterexample is found or the 
+abstract program is detailed enough to show that there is no
+path that leads to a violation of the given property. The problem
+is that this point is not necessarily reached for every input program,
+i.e., it is possible that the the abstraction refinement loop never
+terminates. Therefore, SATABS allows to specify an upper
+bound for the number of iterations.
+</p>
+
+<div class="box2">
+<p class="justified">
+When this upper bound is reached and no counterexample was found,
+this does not necessarily mean that there is none. In this case, 
+you cannot make any conclusions at all with respect to the correctness 
+of the input program.
+</p>
+</div>
+
+<!--#include virtual="footer.inc" -->

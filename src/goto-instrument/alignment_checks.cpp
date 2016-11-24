@@ -6,9 +6,9 @@ Author:
 
 \*******************************************************************/
 
-#include <pointer_offset_size.h>
-#include <config.h>
-#include <context.h>
+#include <util/pointer_offset_size.h>
+#include <util/config.h>
+#include <util/symbol_table.h>
 
 #include "alignment_checks.h"
 
@@ -25,10 +25,10 @@ Function: print_struct_alignment_problems
 \*******************************************************************/
 
 void print_struct_alignment_problems(
-  const contextt &context,
+  const symbol_tablet &symbol_table,
   std::ostream &out)
 {
-  forall_symbols(it, context.symbols)
+  forall_symbols(it, symbol_table.symbols)
     if(it->second.is_type && it->second.type.id()==ID_struct)
     {
       const struct_typet &str=to_struct_type(it->second.type);
@@ -57,8 +57,8 @@ void print_struct_alignment_problems(
             it_next++)
         {
           const typet &it_type=it_next->type();
-          const namespacet ns(context);
-          mp_integer size=pointer_offset_size(ns, it_type);
+          const namespacet ns(symbol_table);
+          mp_integer size=pointer_offset_size(it_type, ns);
 
           cumulated_length+=size;
           // [it_mem;it_next] cannot be covered by an instruction
@@ -96,10 +96,10 @@ void print_struct_alignment_problems(
     {
       // is this structure likely to introduce dataraces?
       #if 0
-      const namespacet ns(context);
+      const namespacet ns(symbol_table);
       const array_typet array=to_array_type(it->second.type);
       const mp_integer size=
-        pointer_offset_size(ns, array.subtype());       
+        pointer_offset_size(array.subtype(), ns);
 
       if(2*integer2long(size)<=config.ansi_c.memory_operand_size)
       {

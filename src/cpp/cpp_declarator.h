@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_DECLARATOR_H
 #define CPROVER_CPP_DECLARATOR_H
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_name.h"
 
@@ -20,14 +20,14 @@ public:
   {
     value().make_nil();
     name().make_nil();
-    location().make_nil();
+    add_source_location().make_nil();
   }
   
-  cpp_declaratort(const typet &type):exprt(ID_cpp_declarator, type)
+  explicit cpp_declaratort(const typet &type):exprt(ID_cpp_declarator, type)
   {
     value().make_nil();
     name().make_nil();
-    location().make_nil();
+    add_source_location().make_nil();
   }
   
   cpp_namet &name() { return static_cast<cpp_namet &>(add(ID_name)); }

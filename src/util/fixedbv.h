@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_FIXEDBV_UTIL_H
 #define CPROVER_FIXEDBV_UTIL_H
 
-#include <mp_arith.h>
-#include <format_spec.h>
+#include "mp_arith.h"
+#include "format_spec.h"
 
-class exprt;
+class constant_exprt;
 class fixedbv_typet;
 
 class fixedbv_spect
@@ -46,12 +46,12 @@ public:
   {
   }
 
-  explicit fixedbvt(const exprt &expr);
+  explicit fixedbvt(const constant_exprt &expr);
 
   void from_integer(const mp_integer &i);
   mp_integer to_integer() const; // this rounds to zero
-  void from_expr(const exprt &expr);
-  exprt to_expr() const;
+  void from_expr(const constant_exprt &expr);
+  constant_exprt to_expr() const;
   void round(const fixedbv_spect &dest_spec);
 
   std::string to_ansi_c_string() const

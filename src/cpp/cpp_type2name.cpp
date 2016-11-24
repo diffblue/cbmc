@@ -7,9 +7,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <string>
-#include <type.h>
-#include <std_types.h>
-#include <i2string.h>
+
+#include <util/type.h>
+#include <util/std_types.h>
+#include <util/i2string.h>
 
 /*******************************************************************\
 
@@ -59,16 +60,16 @@ static void irep2name(const irept &irep, std::string &result)
      irep.get_comments().empty())
     return;
 
-  result+="(";
+  result+='(';
   bool first=true;
 
   forall_named_irep(it, irep.get_named_sub())
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
 
     result+=do_prefix(name2string(it->first));
 
-    result+="=";
+    result+='=';
     std::string tmp;
     irep2name(it->second, tmp);
     result+=tmp;
@@ -79,9 +80,9 @@ static void irep2name(const irept &irep, std::string &result)
        it->first==ID_C_volatile ||
        it->first==ID_C_restricted)
     {
-      if(first) first=false; else result+=",";
+      if(first) first=false; else result+=',';
       result+=do_prefix(name2string(it->first));
-      result+="=";
+      result+='=';
       std::string tmp;
       irep2name(it->second, tmp);
       result+=tmp;
@@ -89,13 +90,13 @@ static void irep2name(const irept &irep, std::string &result)
 
   forall_irep(it, irep.get_sub())
   {
-    if(first) first=false; else result+=",";
+    if(first) first=false; else result+=',';
     std::string tmp;
     irep2name(*it, tmp);
     result+=tmp;
   }
 
-  result+=")";
+  result+=')';
 }
 
 /*******************************************************************\
@@ -139,11 +140,11 @@ std::string cpp_type2name(const typet &type)
   }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {
-    // we try to use #cpp_type
-    const irep_idt cpp_type=type.get(ID_C_cpp_type);
+    // we try to use #c_type
+    const irep_idt c_type=type.get(ID_C_c_type);
     
-    if(cpp_type!=irep_idt())
-      result+=id2string(cpp_type);
+    if(c_type!=irep_idt())
+      result+=id2string(c_type);
     else if(type.id()==ID_unsignedbv)
       result+="unsigned_int";
     else
@@ -151,35 +152,35 @@ std::string cpp_type2name(const typet &type)
   }
   else if(type.id()==ID_fixedbv || type.id()==ID_floatbv)
   {
-    // we try to use #cpp_type
-    const irep_idt cpp_type=type.get(ID_C_cpp_type);
+    // we try to use #c_type
+    const irep_idt c_type=type.get(ID_C_c_type);
 
-    if(cpp_type!=irep_idt())
-      result+=id2string(cpp_type);
+    if(c_type!=irep_idt())
+      result+=id2string(c_type);
     else
       result+="double";
   }
   else if(type.id()==ID_code)
   {
     // we do (args)->(return_type)
-    const code_typet::argumentst &arguments=to_code_type(type).arguments();
+    const code_typet::parameterst &parameters=to_code_type(type).parameters();
     const typet &return_type=to_code_type(type).return_type();
     
-    result+="(";
+    result+='(';
 
-    for(code_typet::argumentst::const_iterator
-        arg_it=arguments.begin();
-        arg_it!=arguments.end();
+    for(code_typet::parameterst::const_iterator
+        arg_it=parameters.begin();
+        arg_it!=parameters.end();
         arg_it++)
     {
-      if(arg_it!=arguments.begin()) result+=",";
+      if(arg_it!=parameters.begin()) result+=',';
       result+=cpp_type2name(arg_it->type());
     }
         
-    result+=")";
+    result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
-    result+=")";
+    result+=')';
   }
   else
   {

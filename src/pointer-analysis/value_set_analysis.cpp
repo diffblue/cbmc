@@ -6,13 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#include <assert.h>
-
-#include <prefix.h>
-#include <cprover_prefix.h>
-#include <xml_irep.h>
-#include <context.h>
-#include <xml.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
+#include <util/xml_expr.h>
+#include <util/xml.h>
 
 #include <langapi/language_util.h>
 
@@ -71,11 +68,11 @@ void value_set_analysist::convert(
   const irep_idt &identifier,
   xmlt &dest) const
 {
-  ::locationt previous_location;
+  source_locationt previous_location;
 
   forall_goto_program_instructions(i_it, goto_program)
   {
-    const ::locationt &location=i_it->location;
+    const source_locationt &location=i_it->source_location;
     
     if(location==previous_location) continue;
 
@@ -86,9 +83,7 @@ void value_set_analysist::convert(
     const value_sett &value_set=(*this)[i_it].value_set;
 
     xmlt &i=dest.new_element("instruction");
-    xmlt &xml_location=i.new_element("location");
-    ::convert(location, xml_location);
-    xml_location.name="location";
+    i.new_element()=::xml(location);
     
     for(value_sett::valuest::const_iterator
         v_it=value_set.values.begin();

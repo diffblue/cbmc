@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "satcheck_zchaff.h"
 
@@ -80,7 +80,7 @@ tvt satcheck_zchaff_baset::l_get(literalt a) const
   {
    case 0: result=tvt(false); break;
    case 1: result=tvt(true); break;
-   default: result=tvt(tvt::TV_UNKNOWN); break;
+   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
   if(a.sign()) result=!result;
@@ -153,7 +153,7 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
     std::string msg=
       i2string(solver->num_variables())+" variables, "+
       i2string(solver->clauses().size())+" clauses";
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   SAT_StatusT result=(SAT_StatusT)solver->solve();
@@ -164,11 +164,11 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
     switch(result)
     {
      case UNSATISFIABLE:
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
       break;
 
      case SATISFIABLE:
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       break;
 
      case UNDETERMINED:
@@ -192,7 +192,7 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
       break;    
     }
 
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   if(result==SATISFIABLE)

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 #define CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 
-#include <iostream>
+#include <iosfwd>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/cfg.h>
@@ -57,21 +57,14 @@ public:
   }
           
 protected:
-  struct cfg_nodet
-  {
-    cfg_nodet()
-    {
-    }
-  };
-
-  typedef cfg_baset<cfg_nodet> cfgt;
+  typedef cfg_baset<empty_cfg_nodet> cfgt;
   cfgt cfg;
 
   typedef std::map<object_idt, object_id_sett> value_mapt;
   value_mapt value_map;
   
   void fixedpoint();
-  bool transform(cfgt::iterator);
+  bool transform(const cfgt::nodet&);
   
   const object_id_sett empty_set;
 };

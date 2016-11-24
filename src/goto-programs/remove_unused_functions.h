@@ -6,10 +6,10 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef _CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTIONS_H_
-#define _CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTIONS_H_
+#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
+#define CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 
-#include <message.h>
+#include <util/message.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -22,4 +22,4 @@ void find_used_functions(
   goto_functionst &functions,
   std::set<irep_idt> &seen);
 
-#endif /*_CPROVER_LOOPFROG_REMOVE_FUNCTIONS_H_*/
+#endif /* CPROVER_LOOPFROG_REMOVE_FUNCTIONS_H */

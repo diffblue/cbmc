@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PROP_SMT2_PROP_H
 #define CPROVER_PROP_SMT2_PROP_H
 
-#include <iostream>
+#include <iosfwd>
 #include <set>
 
-#include <threeval.h>
+#include <util/threeval.h>
 
 #include <solvers/prop/prop.h>
 
@@ -23,6 +23,7 @@ public:
     const std::string &_benchmark,
     const std::string &_source,
     const std::string &_logic,
+    bool _core_enabled,
     std::ostream &_out);
   virtual ~smt2_propt();
 
@@ -31,7 +32,6 @@ public:
   virtual literalt land(const bvt &bv);
   virtual literalt lor(const bvt &bv);
   virtual literalt lxor(const bvt &bv);
-  virtual literalt lnot(literalt a);
   virtual literalt lxor(literalt a, literalt b);
   virtual literalt lnand(literalt a, literalt b);
   virtual literalt lnor(literalt a, literalt b);
@@ -40,8 +40,8 @@ public:
   virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
 
   virtual literalt new_variable();
-  virtual unsigned no_variables() const { return _no_variables; }
-  virtual void set_no_variables(unsigned no) { assert(false); }
+  virtual size_t no_variables() const { return _no_variables; }
+  virtual void set_no_variables(size_t no) { assert(false); }
 
   virtual void lcnf(const bvt &bv);
 
@@ -61,7 +61,7 @@ public:
   virtual void reset_assignment()
   {
     assignment.clear();
-    assignment.resize(no_variables(), tvt(tvt::TV_UNKNOWN));
+    assignment.resize(no_variables(), tvt(tvt::tv_enumt::TV_UNKNOWN));
   }
 
   friend class smt2_convt;
@@ -70,7 +70,7 @@ public:
   void finalize();
 
 protected:
-  unsigned _no_variables;
+  size_t _no_variables;
   std::ostream &out;
   
   std::string smt2_literal(literalt l);
@@ -82,6 +82,8 @@ protected:
   
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;
+
+  bool core_enabled;
 };
 
 #endif

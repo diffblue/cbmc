@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_CPP_TEMPLATE_MAP_H
 
 #include <map>
-#include <iostream>
+#include <iosfwd>
 
-#include <expr.h>
+#include <util/expr.h>
 
 #include "cpp_template_type.h"
 #include "cpp_template_args.h"

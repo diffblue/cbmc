@@ -7,17 +7,17 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <ctype.h>
-#include <cstdlib>
+#include <cctype>
 
-#include <arith_tools.h>
-#include <std_types.h>
-#include <std_expr.h>
-#include <config.h>
-#include <i2string.h>
-#include <expr_util.h>
-#include <find_symbols.h>
-#include <pointer_offset_size.h>
+#include <util/arith_tools.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/config.h>
+#include <util/i2string.h>
+#include <util/expr_util.h>
+#include <util/find_symbols.h>
+#include <util/pointer_offset_size.h>
+#include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -404,11 +404,11 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     else if(expr.type().id()==ID_signedbv ||
             expr.type().id()==ID_unsignedbv)
     {
-      unsigned to_width=atoi(expr.type().get(ID_width).c_str());
+      unsigned to_width=unsafe_string2unsigned(id2string(expr.type().get(ID_width)));
       
       if(op.type().id()==ID_signedbv)
       {
-        unsigned from_width=atoi(op.type().get(ID_width).c_str());
+        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
         
         if(from_width==to_width)
           convert_dplib_expr(op);
@@ -427,7 +427,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       }
       else if(op.type().id()==ID_unsignedbv)
       {
-        unsigned from_width=atoi(op.type().get(ID_width).c_str());
+        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
         
         if(from_width==to_width)
           convert_dplib_expr(op);
@@ -551,7 +551,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     {
       dplib_prop.out << "ARRAY (i: " << array_index_type() << "):";
       
-      assert(expr.operands().size()!=0);
+      assert(!expr.operands().empty());
       
       unsigned i=0;
       forall_operands(it, expr)
@@ -577,10 +577,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       dplib_prop.out << expr.get(ID_value);
     }
     else
-    {
-      std::cerr << expr.pretty() << std::endl;
       throw "unknown constant: "+expr.type().id_string();
-    }
   }
   else if(expr.id()==ID_concatenation || 
           expr.id()==ID_bitand ||
@@ -932,7 +929,6 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       assert(false);
   }
   else if(expr.id()==ID_address_of ||
-          expr.id()=="implicit_address_of" ||
           expr.id()=="reference_to")
   {
     assert(expr.operands().size()==1);
@@ -1046,15 +1042,6 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     // TODO, this has the wrong type
   }
   #endif
-  else if(expr.id()==ID_same_object)
-  {
-    assert(expr.operands().size()==2);
-    dplib_prop.out << "(";
-    convert_dplib_expr(expr.op0());
-    dplib_prop.out << ").object=(";
-    convert_dplib_expr(expr.op1());
-    dplib_prop.out << ").object";
-  }
   else if(expr.id()==ID_string_constant)
   {
     convert_dplib_expr(to_string_constant(expr).to_array_expr());

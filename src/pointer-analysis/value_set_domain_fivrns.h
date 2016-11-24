@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef __CPROVER_VALUE_SET_DOMAIN_FIVRNS_H_
 #define __CPROVER_VALUE_SET_DOMAIN_FIVRNS_H_
 
-#include <goto-programs/flow_insensitive_analysis.h>
+#include <analyses/flow_insensitive_analysis.h>
 
 #include "value_set_fivrns.h"
 

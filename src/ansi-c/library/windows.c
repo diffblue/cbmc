@@ -1,5 +1,6 @@
 /* FUNCTION: QueryPerformanceFrequency */
 
+#ifdef _WIN32
 #include <windows.h>
 
 BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
@@ -7,27 +8,31 @@ BOOL QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency)
   __CPROVER_HIDE:;
   __int64 result;
   lpFrequency->QuadPart=result;
-  _Bool error;
+  __CPROVER_bool error;
   if(error) return 0;
   __CPROVER_assume(result!=0);
   return 1;
 }
+#endif
 
 /* FUNCTION: ExitThread */
 
+#ifdef _WIN32
 #include <windows.h>
 
-VOID ExitThread(DWORD dwExitCode)
+inline VOID ExitThread(DWORD dwExitCode)
 {
   // never returns
   __CPROVER_assume(0);
 }
+#endif
 
 /* FUNCTION: CreateThread */
 
+#ifdef _WIN32
 #include <windows.h>
 
-HANDLE CreateThread(
+inline HANDLE CreateThread(
   LPSECURITY_ATTRIBUTES lpThreadAttributes,
   SIZE_T dwStackSize,
   LPTHREAD_START_ROUTINE lpStartAddress,
@@ -45,3 +50,4 @@ HANDLE CreateThread(
   HANDLE handle;
   return handle;
 }
+#endif

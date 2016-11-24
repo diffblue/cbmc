@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-
+#include <cassert>
 #include <stack>
 
-#include <i2string.h>
+#include <util/i2string.h>
 
 #include "satcheck_smvsat.h"
 
@@ -98,7 +97,7 @@ tvt satcheck_smvsatt::l_get(literalt a) const
   {
    case 0: result=tvt(false); break;
    case 1: result=tvt(true); break;
-   default: result=tvt(tvt::TV_UNKNOWN); break;
+   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
   if(a.sign()) result=!result;
@@ -177,11 +176,11 @@ propt::resultt satcheck_smvsatt::prop_solve()
     switch(result)
     {
     case 0:
-      msg="SAT checker: negated claim is UNSATISFIABLE, i.e., holds";
+      msg="SAT checker: instance is UNSATISFIABLE";
       break;
 
     case 1:
-      msg="SAT checker: negated claim is SATISFIABLE, i.e., does not hold";
+      msg="SAT checker: instance is SATISFIABLE";
       break;
 
     default:
@@ -189,7 +188,7 @@ propt::resultt satcheck_smvsatt::prop_solve()
       break;    
     }
 
-    messaget::status(msg);
+    messaget::status() << msg << messaget::eom;
   }
 
   if(result==0)

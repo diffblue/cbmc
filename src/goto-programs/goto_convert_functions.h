@@ -11,21 +11,25 @@ Date: June 2003
 #ifndef CPROVER_GOTO_CONVERT_FUNCTIONS_H
 #define CPROVER_GOTO_CONVERT_FUNCTIONS_H
 
-#include "goto_functions.h"
+#include "goto_model.h"
 #include "goto_convert_class.h"
 
 // convert it all!
 void goto_convert(
-  contextt &context,
-  const optionst &options,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
+  message_handlert &message_handler);
+  
+// convert it all!
+void goto_convert(
+  symbol_tablet &symbol_table,
+  goto_modelt &dest,
   message_handlert &message_handler);
   
 // just convert a specific function
 void goto_convert(
   const irep_idt &identifier,
-  contextt &context,
-  const optionst &options,
+  symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler);
   
@@ -36,8 +40,7 @@ public:
   void convert_function(const irep_idt &identifier);
 
   goto_convert_functionst(
-    contextt &_context,
-    const optionst &_options,
+    symbol_tablet &_symbol_table,
     goto_functionst &_functions,
     message_handlert &_message_handler);
   
@@ -52,8 +55,8 @@ protected:
   // function calls  
   //
   void add_return(
-    goto_functionst::goto_functiont &f,
-    const locationt &location);
+    goto_functionst::goto_functiont &,
+    const source_locationt &);
 };
 
 #endif

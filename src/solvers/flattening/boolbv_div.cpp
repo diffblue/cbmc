@@ -6,13 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include "boolbv.h"
-
-#ifdef HAVE_FLOATBV
-#include "../floatbv/float_utils.h"
-#endif
 
 /*******************************************************************\
 
@@ -26,30 +22,24 @@ Function: boolbvt::convert_div
 
 \*******************************************************************/
 
-void boolbvt::convert_div(const exprt &expr, bvt &bv)
+void boolbvt::convert_div(const div_exprt &expr, bvt &bv)
 {
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv &&
-     expr.type().id()!=ID_fixedbv &&
-     expr.type().id()!=ID_floatbv)
+     expr.type().id()!=ID_fixedbv)
     return conversion_failed(expr, bv);
 
-  unsigned width=boolbv_width(expr.type());
+  std::size_t width=boolbv_width(expr.type());
   
   if(width==0)
     return conversion_failed(expr, bv);
-
-  if(expr.operands().size()!=2)
-    throw "division takes two operands";
 
   if(expr.op0().type().id()!=expr.type().id() ||
      expr.op1().type().id()!=expr.type().id())
     return conversion_failed(expr, bv);
 
-  bvt op0, op1;
-
-  convert_bv(expr.op0(), op0);
-  convert_bv(expr.op1(), op1);
+  bvt op0=convert_bv(expr.op0());
+  bvt op1=convert_bv(expr.op1());
 
   if(op0.size()!=width ||
      op1.size()!=width)
@@ -59,7 +49,7 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
 
   if(expr.type().id()==ID_fixedbv)
   {
-    unsigned fraction_bits=
+    std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
 
     bvt zeros;
@@ -73,16 +63,6 @@ void boolbvt::convert_div(const exprt &expr, bvt &bv)
     
     // cut it down again
     res.resize(width);
-  }
-  else if(expr.type().id()==ID_floatbv)
-  {
-    #ifdef HAVE_FLOATBV
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
-    res=float_utils.div(op0, op1);
-    #else
-    return conversion_failed(expr, bv);
-    #endif
   }
   else
   {

@@ -6,13 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <ostream>
 
-#include <arith_tools.h>
-#include <std_types.h>
-#include <std_expr.h>
-
+#include "string2int.h"
+#include "arith_tools.h"
+#include "std_types.h"
+#include "std_expr.h"
 #include "bv_arithmetic.h"
 
 /*******************************************************************\
@@ -90,7 +90,7 @@ void bv_spect::from_type(const typet &type)
   else
     assert(0);
   
-  width=atoi(type.get(ID_width).c_str());
+  width=unsafe_string2unsigned(type.get_string(ID_width));
 }
 
 /*******************************************************************\

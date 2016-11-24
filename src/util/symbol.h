@@ -19,15 +19,15 @@ Author: Daniel Kroening, kroening@kroening.com
 /*! \defgroup gr_symbol_table Symbol Table
 */
 
-#include <ostream>
+#include <iosfwd>
 
-#include <expr.h>
+#include "expr.h"
 
 /*! \brief Symbol table entry.
     \ingroup gr_symbol_table
 
     This is a symbol in the symbol table, stored in an
-    object of type contextt.
+    object of type symbol_tablet.
 */
 class symbolt
 {
@@ -39,7 +39,7 @@ public:
   exprt value;
   
   /// Source code location of definition of symbol
-  locationt location;
+  source_locationt location;
   
   /// The unique identifier
   irep_idt name;
@@ -58,24 +58,17 @@ public:
   
   const irep_idt &display_name() const
   {
-    return pretty_name==""?name:pretty_name;
+    return pretty_name.empty()?name:pretty_name;
   }
   
-  typedef std::list<irep_idt> hierarchyt;
-  hierarchyt hierarchy;
-  
-  unsigned ordering;
-  
   // global use
-  bool theorem, is_type, is_macro, is_exported,
-       is_input, is_output, is_statevar;
+  bool is_type, is_macro, is_exported,
+       is_input, is_output, is_state_var, is_property;
        
-  // PVS
-  bool is_actual, free_var, binding;
-  
   // ANSI-C
-  bool static_lifetime, thread_local;
-  bool lvalue, file_local, is_extern, is_volatile;
+  bool is_static_lifetime, is_thread_local;
+  bool is_lvalue, is_file_local, is_extern, is_volatile,
+       is_parameter, is_auxiliary;
 
   symbolt()
   {
@@ -84,14 +77,17 @@ public:
   
   void clear()
   {
+    type.make_nil();
     value.make_nil();
     location.make_nil();
-    lvalue=thread_local=static_lifetime=file_local=is_extern=
-    free_var=theorem=
-    is_type=is_actual=is_macro=is_exported=binding=
-    is_volatile=is_input=is_output=is_statevar=false;
-    ordering=0;
-    name=module=base_name=mode=pretty_name="";
+
+    name=module=base_name=mode=pretty_name=irep_idt();
+
+    is_type=is_macro=is_exported=
+    is_input=is_output=is_state_var=is_property=
+    is_static_lifetime=is_thread_local=
+    is_lvalue=is_file_local=is_extern=is_volatile=
+    is_parameter=is_auxiliary=false;
   }
      
   void swap(symbolt &b);
@@ -102,6 +98,16 @@ public:
   void from_irep(const irept &src);
   
   class symbol_exprt symbol_expr() const;
+  
+  inline bool is_shared() const
+  {
+    return !is_thread_local;
+  }
+  
+  inline bool is_procedure_local() const
+  {
+    return !is_static_lifetime;
+  }
 };
 
 std::ostream &operator<<(std::ostream &out,
@@ -113,23 +119,68 @@ typedef std::list<symbolt> symbol_listt;
 
 #define forall_symbol_list(it, expr) \
   for(symbol_listt::const_iterator it=(expr).begin(); \
-      it!=(expr).end(); it++)
+      it!=(expr).end(); ++it)
 
 typedef std::list<const symbolt *> symbolptr_listt;
 
 #define forall_symbolptr_list(it, list) \
   for(symbolptr_listt::const_iterator it=(list).begin(); \
-      it!=(list).end(); it++)
+      it!=(list).end(); ++it)
 
 #define Forall_symbolptr_list(it, list) \
   for(symbolptr_listt::iterator it=(list).begin(); \
-      it!=(list).end(); it++)
+      it!=(list).end(); ++it)
 
-// the following should move elsewhere
-bool is_global(const symbolt& symbol);
+/*! \brief Symbol table entry describing a data type
+    \ingroup gr_symbol_table
 
-bool is_thread_local(const symbolt& symbol);
+    This is a symbol generated as part of type checking.
+*/
+class type_symbolt:public symbolt
+{
+public:
+  type_symbolt(const typet &_type)
+  {
+    type=_type;
+    is_type=true;
+  }
+};
 
-bool is_procedure_local(const symbolt& symbol);
+/*! \brief Internally generated symbol table entry
+    \ingroup gr_symbol_table
+
+    This is a symbol generated as part of translation to or
+    modification of the intermediate representation.
+*/
+class auxiliary_symbolt:public symbolt
+{
+public:
+  auxiliary_symbolt()
+  {
+    is_lvalue=true;
+    is_state_var=true;
+    is_thread_local=true;
+    is_file_local=true;
+    is_auxiliary=true;
+  }
+};
+
+/*! \brief Symbol table entry of function parameter
+    \ingroup gr_symbol_table
+
+    This is a symbol generated as part of type checking.
+*/
+class parameter_symbolt:public symbolt
+{
+public:
+  parameter_symbolt()
+  {
+    is_lvalue=true;
+    is_state_var=true;
+    is_thread_local=true;
+    is_file_local=true;
+    is_parameter=true;
+  }
+};
 
 #endif

@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_H
 
-#include <goto-programs/static_analysis.h>
+#include <analyses/static_analysis.h>
 
 #include "value_set_domain.h"
 #include "value_sets.h"

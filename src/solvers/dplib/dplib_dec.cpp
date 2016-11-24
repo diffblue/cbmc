@@ -6,11 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
 
-#ifndef _WIN32
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
 #include <unistd.h>
 #endif
 
@@ -19,9 +23,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define getpid _getpid
 #endif
 
-#include <i2string.h>
-#include <str_getline.h>
-#include <prefix.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "dplib_dec.h"
 
@@ -96,7 +100,8 @@ decision_proceduret::resultt dplib_dect::dec_solve()
   std::string command=
     "dplibl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";
     
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
   
   status("Reading result from CVCL");
 
@@ -131,7 +136,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     std::string identifier=std::string(line, 1, pos-1);
     
     // get value
-    if(!str_getline(in, line)) return;
+    if(!std::getline(in, line)) return;
 
     // skip spaces    
     pos=0;
@@ -142,10 +147,11 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     if(pos2==std::string::npos) return;    
     
     std::string value=std::string(line, pos, pos2-pos);
-    
+
+    #if 0    
     std::cout << ">" << identifier << "< = >" << value << "<";
-    
     std::cout << std::endl;
+    #endif
   }
   else
   {
@@ -162,7 +168,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     
     if(line[0]=='l')
     {
-      unsigned number=atoi(line.c_str()+1);
+      unsigned number=unsafe_str2unsigned(line.c_str()+1);
       assert(number<dplib_prop.no_variables());
       dplib_prop.assignment[number]=value;
     }
@@ -187,13 +193,13 @@ decision_proceduret::resultt dplib_dect::read_dplib_result()
   
   std::string line;
   
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(has_prefix(line, "Invalid."))
     {
       dplib_prop.reset_assignment();
     
-      while(str_getline(in, line))
+      while(std::getline(in, line))
       {
         if(has_prefix(line, "ASSERT "))
           read_assert(in, line);

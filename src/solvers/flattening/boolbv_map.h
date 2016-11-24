@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 
-#include <hash_cont.h>
-#include <type.h>
-#include <namespace.h>
+#include <util/hash_cont.h>
+#include <util/type.h>
+#include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
 
@@ -47,10 +47,12 @@ public:
     {
     }
 
-    unsigned width;
+    std::size_t width;
     bvtypet bvtype;
     typet type;
     literal_mapt literal_map;
+    
+    std::string get_value(const propt &) const;
   };
   
   typedef hash_map_cont<irep_idt, map_entryt, irep_id_hash> mappingt;  
@@ -62,16 +64,16 @@ public:
     const irep_idt &identifier,
     const typet &type);
 
-  literalt get_literal(
+  void get_literals(
     const irep_idt &identifier,
-    const unsigned bit,
-    const typet &type);
-
-  void set_literal(
-    const irep_idt &identifier,
-    const unsigned bit,
     const typet &type,
-    literalt literal);
+    const std::size_t width,
+    bvt &literals);
+
+  void set_literals(
+    const irep_idt &identifier,
+    const typet &type,
+    const bvt &literals);
     
 protected:
   propt &prop;

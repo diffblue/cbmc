@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGUAGES_H
 #define CPROVER_LANGUAGES_H
 
-#include <language.h>
+#include <util/language.h>
 
 class languagest
 {
@@ -29,10 +29,9 @@ public:
   bool to_expr(
     const std::string &code,
     const std::string &module,
-    exprt &expr,
-    message_handlert &message_handler)
+    exprt &expr)
   {
-    return language->to_expr(code, module, expr, message_handler, ns);
+    return language->to_expr(code, module, expr, ns);
   }
   
   // constructor / destructor

@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cctype>
+
 #include "parse_float.h"
 
 /*******************************************************************\
@@ -25,7 +27,8 @@ void parse_float(
   mp_integer &significand,
   mp_integer &exponent,
   unsigned &exponent_base,
-  bool &is_float, bool &is_long)
+  bool &is_float, bool &is_long, bool &is_imaginary,
+  bool &is_decimal, bool &is_float80, bool &is_float128)
 {
   // {digits}{dot}{digits}{exponent}?{floatsuffix}?
   // {digits}{dot}{exponent}?{floatsuffix}?
@@ -46,7 +49,7 @@ void parse_float(
   
   // is this hex?
   
-  if(src.size()>=2 && src[0]=='0' && src[1]=='x')
+  if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
   {
     // skip the 0x
     p+=2;
@@ -80,7 +83,8 @@ void parse_float(
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D')
     {
       str_exponent+=*p;
       p++;
@@ -88,16 +92,20 @@ void parse_float(
 
     std::string str_number=str_whole_number+
                            str_fraction_part;
+                           
+    // The significand part is interpreted as a (decimal or hexadecimal)
+    // rational number; the digit sequence in the exponent part is
+    // interpreted as a decimal integer.
 
     if(str_number.empty())
       significand=0;
     else
-      significand=string2integer(str_number, 16);
+      significand=string2integer(str_number, 16); // hex
 
     if(str_exponent.empty())
       exponent=0;
     else
-      exponent=string2integer(str_exponent, 16);
+      exponent=string2integer(str_exponent, 10); // decimal
 
     // adjust exponent
     exponent-=str_fraction_part.size()*4; // each digit has 4 bits
@@ -106,7 +114,9 @@ void parse_float(
   {
     // get whole number part
     while(*p!='.' && *p!=0 && *p!='e' && *p!='E' &&
-          *p!='f' && *p!='F' && *p!='l' && *p!='L')
+          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_whole_number+=*p;
       p++;
@@ -118,7 +128,9 @@ void parse_float(
 
     // get fraction part
     while(*p!=0 && *p!='e' && *p!='E' &&
-           *p!='f' && *p!='F' && *p!='l' && *p!='L')
+          *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_fraction_part+=*p;
       p++;
@@ -133,7 +145,9 @@ void parse_float(
       p++;
 
     // get exponent
-    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L')
+    while(*p!=0 && *p!='f' && *p!='F' && *p!='l' && *p!='L' &&
+          *p!='w' && *p!='W' && *p!='q' && *p!='Q' && *p!='d' && *p!='D' &&
+          *p!='i' && *p!='I' && *p!='j' && *p!='J')
     {
       str_exponent+=*p;
       p++;
@@ -157,7 +171,7 @@ void parse_float(
   }
 
   // get flags
-  is_float=is_long=false;
+  is_float=is_long=is_imaginary=is_decimal=is_float80=is_float128=false;
 
   while(*p!=0)
   {
@@ -165,6 +179,18 @@ void parse_float(
       is_float=true;
     else if(*p=='l' || *p=='L')
       is_long=true;
+    else if(*p=='i' || *p=='I' || *p=='j' || *p=='J')
+      is_imaginary=true;
+    // http://gcc.gnu.org/onlinedocs/gcc/Decimal-Float.html
+    else if(*p=='d' || *p=='D')
+      // a suffix with just d or D but nothing else is a GCC extension with no
+      // particular effect -- and forbidden by Clang
+      is_decimal=is_decimal || *(p+1)!=0;
+    // http://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
+    else if(*p=='w' || *p=='W')
+      is_float80=true;
+    else if(*p=='q' || *p=='Q')
+      is_float128=true;
 
     p++;
   }

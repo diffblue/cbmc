@@ -1,0 +1,80 @@
+<!--#include virtual="header.inc" -->
+
+<p><a href="./">CPROVER Manual TOC</a></p>
+
+<h2>Installing CBMC</h2>
+
+<h3>Requirements</h3>
+
+<p class="justified">
+CBMC is available for Windows, i86 Linux, and MacOS X. 
+CBMC requires a code pre-processing environment comprising of a
+suitable preprocessor and an a set of header files.</p>
+
+<ol>
+
+<li><p class="justified">
+<b>Linux:</b> the preprocessor and the header files typically come with a
+package called <i>gcc</i>, which must be installed prior to the installation
+of CBMC.
+</p></li>
+
+<li><p class="justified">
+<b>Windows:</b> The Windows version of CBMC requires the preprocessor 
+<code>cl.exe</code>, which is part of Microsoft Visual Studio. We recommend
+the free <a href="http://www.visualstudio.com/en-us/products/visual-studio-community-vs">Visual
+Studio Community 2013</a>.
+</p></li>
+
+<li><p class="justified">
+<b>MacOS:</b> Install the
+<a href="http://developer.apple.com/technologies/xcode.html">XCode Command Line Utilities</a>
+prior to installing CBMC. Just installing XCode alone is not enough.
+</p></li>
+
+</ol>
+
+<p class="justified">
+<u>Important note for Windows users</u>: Visual Studio's
+<code>cl.exe</code> relies on a
+complex set of environment variables to identify the target architecture and
+the directories that contain the header files.
+<font color=red>You must run CBMC
+from within the <i>Visual Studio Command Prompt</i>.</font>
+</p>
+
+<p class="justified">
+Note that the distribution files for the
+<a href="installation-plugin.shtml">Eclipse plugin</a> include the
+CBMC executable.  Therefore, if you intend to run CBMC
+exclusively within Eclipse, you can skip the installation of the
+CBMC executable.  However, you still have to install the compiler
+environment as described above.</p>
+
+<h3>Installing the CBMC Binaries</h3>
+
+<ol>
+<li>Download CBMC for your operating system.
+The binaries are available from <a href="http://www.cprover.org/cbmc/">
+http://www.cprover.org/cbmc/</a>.
+</li>
+
+<li>Unzip/untar the archive into a directory of your choice. 
+We recommend to add this directory to your <code>PATH</code> environment
+variable.</li>
+
+</ol>
+
+<p class="justified">
+You are now ready to <a href="cbmc.shtml">use CBMC</a>!</p>
+
+<h3>Building CBMC from Source</h3>
+
+<p class="justified">
+Alternatively, the CBMC source code is available <a href="http://www.cprover.org/svn/cbmc/">via SVN</a>.
+To compile the source code, follow
+<a href="http://www.cprover.org/svn/cbmc/trunk/COMPILING">these instructions</a>.
+</p>
+
+<!--#include virtual="footer.inc" -->
+

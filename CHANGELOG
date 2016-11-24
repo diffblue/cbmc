@@ -1,0 +1,103 @@
+4.7
+===
+
+Added support for Solaris 11.
+
+Bugfixes in partial-order encoding.
+
+Added --float-overflow-check
+
+
+4.6
+===
+
+Improved floating-point encoding.
+
+Improved AIG->CNF encoder.
+
+
+4.5
+===
+
+Optimizations to reduce memory consumption.
+
+Bugfixes in partial-order encoding.
+
+
+4.4
+===
+
+Now checks concurrent programs, with partial-order encoding.
+
+Support for SMT-LIB standard floating-point theory.
+
+goto-instrument knows k-induction and underapproximating loop accelleration.
+
+
+4.3
+===
+
+Floating-point arithmetic now takes the rounding mode into account,
+which can be changed dynamically.
+
+goto-gcc generates hybrid executables on Linux, containing both machine
+code and the CFG.
+
+Limited support for Spec#-style quantifiers added.
+
+Pointer-checks no longer use a heavy-weight alias analysis.
+
+Limited support for some x86 and ARM inline assembly constructs.
+
+
+4.2
+===
+
+goto-cc now passes all command line options to the gcc preprocessor.
+  
+The MacOS binaries are now signed.
+
+The C/C++ front-end has been tested and fixed for the Visual Studio 2012
+header files.
+
+The man-page has been elaborated.
+
+Support for the C99 complex type and gcc's vector type has been added.
+Various built-ins for x86 MMX and SSE instructions have been added.
+
+Support for various C11 features has been added.
+
+Support for various built-in primitives has been added, in particular for
+the __sync_* commands.
+
+New feature: --all-claims now reports the status of all claims; the
+verification continues even if a counterexample is found. This feature uses
+incremental SAT.
+
+The counterexample beautification (--beautify) now uses incremental SAT.
+
+Numerous improvements to SMT1 and SMT2 interfaces.
+
+Support for further SAT solvers (PRECOSAT, PICOSAT, LINGELING)
+
+
+4.1
+===
+
+The support for low-level accesses to dynamically allocated data structures
+and "integer addressed memory" (usually memory-mapped I/O) has been further
+improved.
+
+Numerous improvements to the SMT back-ends.  Specifically, support through
+the SMT1 path for Boolector and Z3 has been improved; support for MathSAT
+has been added.  In combination with the very latest version of MathSAT,
+CBMC now also supports an SMT2 flow (use --mathsat --smt2 to activate this).
+
+
+4.0
+===
+
+Better support for low-level accesses to dynamically allocated data
+structures.
+
+Numerous front-end improvements.

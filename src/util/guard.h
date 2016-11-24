@@ -9,34 +9,42 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GUARD_H
 #define CPROVER_GUARD_H
 
-#include <iostream>
+#include <iosfwd>
 
-#include <expr.h>
+#include "expr.h"
 
-class guardt
+class guardt:public exprt
 {
 public:
-  typedef expr_listt guard_listt;
+  guardt()
+  {
+    make_true();
+  }
+
+  guardt& operator=(const exprt &e)
+  {
+    *this=static_cast<const guardt&>(e);
+
+    return *this;
+  }
 
   void add(const exprt &expr);
 
   void append(const guardt &guard)
   {
-    for(guard_listt::const_iterator it=guard.guard_list.begin();
-        it!=guard.guard_list.end();
-        it++)
-      add(*it);
+    add(guard);
   }
 
-  exprt as_expr(guard_listt::const_iterator it) const;
+  //exprt as_expr(guard_listt::const_iterator it) const;
 
   exprt as_expr() const
   {
-    return as_expr(guard_list.begin());
+    return *this;
   }
   
   void guard_expr(exprt &dest) const;
 
+#if 0
   bool empty() const { return guard_list.empty(); }
   bool is_true() const { return empty(); } 
   bool is_false() const;
@@ -46,16 +54,13 @@ public:
     guard_list.clear();
   }
   
-  void make_false()
-  {
-    guard_list.clear();
-    guard_list.push_back(exprt());
-    guard_list.back().make_false();
-  }
+  void make_false();
+#endif
   
   friend guardt &operator -= (guardt &g1, const guardt &g2);
   friend guardt &operator |= (guardt &g1, const guardt &g2);
   
+#if 0
   void swap(guardt &g)
   {
     guard_list.swap(g.guard_list);
@@ -63,12 +68,12 @@ public:
 
   friend std::ostream &operator << (std::ostream &out, const guardt &g);
   
-  unsigned size() const
+  size_type size() const
   {
     return guard_list.size();
   }
   
-  void resize(unsigned s)
+  void resize(size_type s)
   {
     guard_list.resize(s);
   }
@@ -80,14 +85,17 @@ public:
 
 protected:
   guard_listt guard_list;  
+#endif
 };
 
+#if 0
 #define Forall_guard(it, guard_list) \
   for(guardt::guard_listt::iterator it=(guard_list).begin(); \
-      it!=(guard_list).end(); it++)
+      it!=(guard_list).end(); ++it)
 
 #define forall_guard(it, guard_list) \
   for(guardt::guard_listt::const_iterator it=(guard_list).begin(); \
-      it!=(guard_list).end(); it++)
+      it!=(guard_list).end(); ++it)
+#endif
 
 #endif

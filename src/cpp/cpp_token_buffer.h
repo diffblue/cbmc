@@ -21,16 +21,14 @@ public:
   typedef unsigned int post;
  
   int LookAhead(unsigned offset);
-  int GetToken(cpp_tokent &token);
-  int GetToken();
+  int get_token(cpp_tokent &token);
+  int get_token();
   int LookAhead(unsigned offset, cpp_tokent &token);
 
   post Save();
   void Restore(post pos);
-  //void GetOnlyClosingBracket(Token&);
-
-  //void GetComments(irept &p);
-  //void GetComments2(irept &p);
+  void Replace(const cpp_tokent &token);
+  void Insert(const cpp_tokent &token);
   
   void clear()
   {

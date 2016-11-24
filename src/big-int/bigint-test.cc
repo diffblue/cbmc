@@ -282,11 +282,89 @@ run_sqrt_test ()
   putchar ('\n');
 }
 
+
+// =====================================================================
+// Tests for floorPow2
+// =====================================================================
+// Tests floorPow2, pow and setPower2
+
+static void
+run_floorPow2_tests ()
+{
+  BigInt N;
+  BigInt M;
+
+  printf ("floorPow2 tests ");
+
+  for (unsigned i = 0; i < 512; ++i) {
+    unsigned x = 512 - i;
+    N = pow(2,x);
+    M.setPower2(x);
+
+    if (!(N == M)) {
+      putchar('?');
+    }
+
+    if (N.floorPow2() == x) {
+      putchar ('.');
+    } else {
+      putchar ('X');
+    }
+
+    N -= 1;
+    if (N.floorPow2() == x - 1) {
+      putchar ('.');
+    } else {
+      putchar ('X');
+    }
+
+    N += 2;
+    if (N.floorPow2() == x) {
+      putchar ('.');
+    } else {
+      putchar ('X');
+    }
+    
+  }
+
+  N = pow(2,0);  // 1
+  M.setPower2(0);
+
+  if (!(N == M)) {
+    putchar('?');
+  }
+
+  if (N.floorPow2() == 0) {
+    putchar ('.');
+  } else {
+    putchar ('X');
+  }
+  
+  N -= 1;        // 0
+  if (N.floorPow2() == 0) {
+    putchar ('.');
+  } else {
+    putchar ('X');
+  }
+  
+  N += 2;        // 2
+  if (N.floorPow2() == 1) {
+    putchar ('.');
+  } else {
+    putchar ('X');
+  }
+
+
+  putchar ('\n');
+}
+
+
 int
 main (int, char *[])
 {
   run_simple_tests ();
   run_clisp_tests ("number.tst");
   run_sqrt_test ();
+  run_floorPow2_tests ();
   return 0;
 }

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <stdlib.h>
-#include <assert.h>
+#include <cassert>
 
-#include <prefix.h>
+#include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "boolbv.h"
 
@@ -33,12 +33,10 @@ literalt boolbvt::convert_overflow(const exprt &expr)
      expr.id()==ID_overflow_minus)
   {
     if(operands.size()!=2)
-      throw "operand "+expr.id_string()+" takes two operands";
+      throw "operator "+expr.id_string()+" takes two operands";
 
-    bvt bv0, bv1;
-
-    convert_bv(operands[0], bv0);
-    convert_bv(operands[1], bv1);
+    const bvt &bv0=convert_bv(operands[0]);
+    const bvt &bv1=convert_bv(operands[1]);
 
     if(bv0.size()!=bv1.size())
       return SUB::convert_rest(expr);
@@ -54,16 +52,14 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   else if(expr.id()==ID_overflow_mult)
   {
     if(operands.size()!=2)
-      throw "operand "+expr.id_string()+" takes two operands";
+      throw "operator "+expr.id_string()+" takes two operands";
 
     if(operands[0].type().id()!=ID_unsignedbv &&
        operands[0].type().id()!=ID_signedbv)
       return SUB::convert_rest(expr);
 
-    bvt bv0, bv1;
-
-    convert_bv(operands[0], bv0);
-    convert_bv(operands[1], bv1);
+    bvt bv0=convert_bv(operands[0]);
+    bvt bv1=convert_bv(operands[1]);
 
     if(bv0.size()!=bv1.size())
       throw "operand size mismatch on overflow-*";
@@ -76,8 +72,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       throw "operand type mismatch on overflow-*";
 
     assert(bv0.size()==bv1.size());
-    unsigned old_size=bv0.size();
-    unsigned new_size=old_size*2;
+    std::size_t old_size=bv0.size();
+    std::size_t new_size=old_size*2;
 
     // sign/zero extension
     bv0=bv_utils.extension(bv0, new_size, rep);
@@ -91,7 +87,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       bv_overflow.reserve(old_size);
 
       // get top result bits
-      for(unsigned i=old_size; i<result.size(); i++)
+      for(std::size_t i=old_size; i<result.size(); i++)
         bv_overflow.push_back(result[i]);
 
       return prop.lor(bv_overflow);
@@ -103,40 +99,36 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
       // get top result bits, plus one more
       assert(old_size!=0);
-      for(unsigned i=old_size-1; i<result.size(); i++)
+      for(std::size_t i=old_size-1; i<result.size(); i++)
         bv_overflow.push_back(result[i]);
 
       // these need to be either all 1's or all 0's
       literalt all_one=prop.land(bv_overflow);
-      literalt all_zero=prop.lnot(prop.lor(bv_overflow));
-      return prop.lnot(prop.lor(all_one, all_zero));
+      literalt all_zero=!prop.lor(bv_overflow);
+      return !prop.lor(all_one, all_zero);
     }
   }
   else if(expr.id()==ID_overflow_unary_minus)
   {
     if(operands.size()!=1)
-      throw "operand "+expr.id_string()+" takes one operand";
+      throw "operator "+expr.id_string()+" takes one operand";
 
-    bvt bv;
-
-    convert_bv(operands[0], bv);
+    const bvt &bv=convert_bv(operands[0]);
       
     return bv_utils.overflow_negate(bv);
   }
   else if(has_prefix(expr.id_string(), "overflow-typecast-"))
   {
-    unsigned bits=atoi(expr.id().c_str()+18);
+    std::size_t bits=unsafe_c_str2unsigned(expr.id().c_str()+18);
 
     const exprt::operandst &operands=expr.operands();
 
     if(operands.size()!=1)
-      throw "operand "+expr.id_string()+" takes one operand";
+      throw "operator "+expr.id_string()+" takes one operand";
       
     const exprt &op=operands[0];
 
-    bvt bv;
-
-    convert_bv(op, bv);
+    const bvt &bv=convert_bv(op);
 
     if(bits>=bv.size() || bits==0)
       throw "overflow-typecast got wrong number of bits";
@@ -145,7 +137,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(op.type().id()==ID_signedbv)
     {
       bvt tmp_bv;
-      for(unsigned i=bits; i<bv.size(); i++)
+      for(std::size_t i=bits; i<bv.size(); i++)
         tmp_bv.push_back(prop.lxor(bv[bits-1], bv[i]));
 
       return prop.lor(tmp_bv);
@@ -153,7 +145,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     else
     {
       bvt tmp_bv;
-      for(unsigned i=bits; i<bv.size(); i++)
+      for(std::size_t i=bits; i<bv.size(); i++)
         tmp_bv.push_back(bv[i]);
 
       return prop.lor(tmp_bv);

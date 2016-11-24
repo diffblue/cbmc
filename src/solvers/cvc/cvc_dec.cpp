@@ -6,11 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
+#include <cstring>
+#include <cassert>
+#include <cstdlib> // for system()
 
-#ifndef _WIN32
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
 #include <unistd.h>
 #endif
 
@@ -19,9 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define getpid _getpid
 #endif
 
-#include <i2string.h>
-#include <str_getline.h>
-#include <prefix.h>
+#include <util/i2string.h>
+#include <util/prefix.h>
+#include <util/string2int.h>
 
 #include "cvc_dec.h"
 
@@ -83,11 +88,9 @@ Function: cvc_dect::dec_solve
 
 decision_proceduret::resultt cvc_dect::dec_solve()
 {
-  cvc_prop.out << "QUERY FALSE;" << std::endl;
-  cvc_prop.out << "COUNTERMODEL;" << std::endl;
+  out << "QUERY FALSE;" << std::endl;
+  out << "COUNTERMODEL;" << std::endl;
   
-  post_process();
-
   temp_out.close();
 
   temp_result_filename=
@@ -96,9 +99,10 @@ decision_proceduret::resultt cvc_dect::dec_solve()
   std::string command=
     "cvcl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";
     
-  system(command.c_str());
+  int res=system(command.c_str());
+  assert(0 == res);
   
-  status("Reading result from CVCL");
+  status() << "Reading result from CVCL" << eom;
 
   return read_cvcl_result();
 }
@@ -131,7 +135,7 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     std::string identifier=std::string(line, 1, pos-1);
     
     // get value
-    if(!str_getline(in, line)) return;
+    if(!std::getline(in, line)) return;
 
     // skip spaces    
     pos=0;
@@ -142,29 +146,31 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     if(pos2==std::string::npos) return;    
     
     std::string value=std::string(line, pos, pos2-pos);
-    
+
+    #if 0    
     std::cout << ">" << identifier << "< = >" << value << "<";
-    
     std::cout << std::endl;
+    #endif
   }
   else
   {
     // boolean
-    tvt value=tvt(true);
+    bool value=true;
     
     if(has_prefix(line, "NOT "))
     {
       line=std::string(line, strlen("NOT "), std::string::npos);
-      value=tvt(false);
+      value=false;
     }
     
     if(line=="") return;
     
     if(line[0]=='l')
     {
-      unsigned number=atoi(line.c_str()+1);
-      assert(number<cvc_prop.no_variables());
-      cvc_prop.assignment[number]=value;
+      unsigned number=unsafe_c_str2unsigned(line.c_str()+1);
+      assert(number<no_boolean_variables);
+      assert(no_boolean_variables==boolean_assignment.size());
+      boolean_assignment[number]=value;
     }
   }
 }
@@ -187,13 +193,14 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
   
   std::string line;
   
-  while(str_getline(in, line))
+  while(std::getline(in, line))
   {
     if(has_prefix(line, "Invalid."))
     {
-      cvc_prop.reset_assignment();
+      boolean_assignment.clear();
+      boolean_assignment.resize(no_boolean_variables);
     
-      while(str_getline(in, line))
+      while(std::getline(in, line))
       {
         if(has_prefix(line, "ASSERT "))
           read_assert(in, line);
@@ -205,7 +212,7 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
       return D_UNSATISFIABLE;
   }
   
-  error("Unexpected result from CVC-Lite");
+  error() << "Unexpected result from CVC-Lite" << eom;
   
   return D_ERROR;
 }

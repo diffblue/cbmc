@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CPP_CONVERT_CHARACTER_LITERAL_H
 
 #include <string>
-#include <expr.h>
+
+#include <util/expr.h>
 
 // Ugh. Characters have type 'int' in C, but type
 // 'char' in C++.

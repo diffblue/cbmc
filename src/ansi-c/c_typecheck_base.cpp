@@ -6,14 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <std_types.h>
-#include <prefix.h>
-#include <config.h>
+#include <util/std_types.h>
+#include <util/prefix.h>
+#include <util/config.h>
+#include <util/std_types.h>
+#include <util/i2string.h>
 
 #include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "type2name.h"
-#include "std_types.h"
+#include "c_storage_spec.h"
 
 /*******************************************************************\
 
@@ -51,27 +53,6 @@ std::string c_typecheck_baset::to_string(const typet &type)
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::replace_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::replace_symbol(irept &symbol)
-{
-  id_replace_mapt::const_iterator it=
-    id_replace_map.find(symbol.get(ID_identifier));
-  
-  if(it!=id_replace_map.end())
-    symbol.set(ID_identifier, it->second);
-}
-
-/*******************************************************************\
-
 Function: c_typecheck_baset::move_symbol
 
   Inputs:
@@ -87,11 +68,11 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
   symbol.mode=mode;
   symbol.module=module;
 
-  if(context.move(symbol, new_symbol))
+  if(symbol_table.move(symbol, new_symbol))
   {
     err_location(symbol.location);
     throw "failed to move symbol `"+id2string(symbol.name)+
-          "' into context";
+          "' into symbol table";
   }
 }
 
@@ -109,84 +90,36 @@ Function: c_typecheck_baset::typecheck_symbol
 
 void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
-  // first of all, we typecheck the type
-  typecheck_type(symbol.type);
+  current_symbol_id=symbol.name;
 
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
   
   // set a few flags
-  symbol.lvalue=!symbol.is_type && !symbol.is_macro;
+  symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
   
-  std::string prefix="c::";
-  std::string root_name=prefix+id2string(symbol.base_name);
-  std::string new_name=id2string(symbol.name);
+  irep_idt root_name=symbol.base_name;
+  irep_idt new_name=symbol.name;
 
-  // do anon-tags first
-  if(symbol.is_type &&
-     has_prefix(id2string(symbol.name), prefix+"tag-#anon"))
-  {    
-    // we rename them to make collisions unproblematic
-    std::string typestr = type2name(symbol.type);
-    new_name = prefix+"tag-#anon#" + typestr;
-    
-    id_replace_map[symbol.name]=new_name;    
-
-    contextt::symbolst::const_iterator it=context.symbols.find(new_name);
-    if(it!=context.symbols.end())
-      return; // bail out, we have an appropriate symbol already.
-
-    irep_idt newtag=std::string("#anon#")+typestr;
-    symbol.type.set(ID_tag, newtag);
-  }
-  else if(symbol.file_local)
+  if(symbol.is_file_local)
   {
     // file-local stuff -- stays as is
     // collisions are resolved during linking
   }
   else if(symbol.is_extern && !is_function)
   {
-    // variables mared as "extern" go into the global namespace
+    // variables marked as "extern" go into the global namespace
     // and have static lifetime
     new_name=root_name;
-    symbol.static_lifetime=true;
-  }
-  else if(is_function && !symbol.is_actual)
-  {
-    // functions always go into the global namespace
-    // (code doesn't have lifetime),
-    // unless it's a function argument
-    new_name=root_name;
-    symbol.static_lifetime=false;
+    symbol.is_static_lifetime=true;
   }
   else if(!is_function && symbol.value.id()==ID_code)
   {
     err_location(symbol.value);
     throw "only functions can have a function body";
   }
-
-  if(symbol.name!=new_name)
-  {
-    id_replace_map[symbol.name]=new_name;
-    symbol.name=new_name;
-  }
-
-  #if 0
-  {
-    // and now that we have the proper name
-    // we clean the type of any side-effects
-    // (needs to be done before next symbol)
-    std::list<codet> clean_type_code;
-    clean_type(symbol, symbol.type, clean_type_code);
-    
-    // We store the code that was generated for the type
-    // for later use when we see the declaration.
-    if(!clean_type_code.empty())
-      clean_code[symbol.name]=code_blockt(clean_type_code);
-  }
-  #endif
-    
+  
   // set the pretty name
   if(symbol.is_type &&
      (final_type.id()==ID_struct ||
@@ -208,17 +141,15 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
   else
   {
-    // just strip the c::
-    symbol.pretty_name=
-      std::string(new_name, prefix.size(), std::string::npos);
+    symbol.pretty_name=new_name;
   }
   
   // see if we have it already
-  contextt::symbolst::iterator old_it=context.symbols.find(symbol.name);
+  symbol_tablet::symbolst::iterator old_it=symbol_table.symbols.find(symbol.name);
   
-  if(old_it==context.symbols.end())
+  if(old_it==symbol_table.symbols.end())
   {
-    // just put into context
+    // just put into symbol_table
     symbolt *new_symbol;
     move_symbol(symbol, new_symbol);
     
@@ -255,8 +186,8 @@ Function: c_typecheck_baset::typecheck_new_symbol
 
 void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 {
-  if(symbol.is_actual)
-    adjust_function_argument(symbol.type);
+  if(symbol.is_parameter)
+    adjust_function_parameter(symbol.type);
 
   // check initializer, if needed
 
@@ -268,35 +199,34 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
     {
       // we don't need the identifiers
       code_typet &code_type=to_code_type(symbol.type);
-      for(code_typet::argumentst::iterator
-          it=code_type.arguments().begin();
-          it!=code_type.arguments().end();
+      for(code_typet::parameterst::iterator
+          it=code_type.parameters().begin();
+          it!=code_type.parameters().end();
           it++)
         it->set_identifier(irep_idt());
     }
   }
   else
   {
-    if(symbol.type.id()==ID_array)
+    if(symbol.type.id()==ID_array &&
+       to_array_type(symbol.type).size().is_nil() &&
+       !symbol.is_type)
     {
       // Insert a new type symbol for the array.
       // We do this because we want a convenient way
       // of adjusting the size of the type later on.
 
-      symbolt new_symbol;
+      type_symbolt new_symbol(symbol.type);
       new_symbol.name=id2string(symbol.name)+"$type";
       new_symbol.base_name=id2string(symbol.base_name)+"$type"; 
       new_symbol.location=symbol.location;
       new_symbol.mode=symbol.mode;
       new_symbol.module=symbol.module;
-      new_symbol.type=symbol.type;
-      new_symbol.is_type=true;
-      new_symbol.is_macro=false;
     
       symbol.type=symbol_typet(new_symbol.name);
     
       symbolt *new_sp;
-      context.move(new_symbol, new_sp);
+      symbol_table.move(new_symbol, new_sp);
     }
 
     // check the initializer
@@ -369,13 +299,13 @@ void c_typecheck_baset::typecheck_redefinition_type(
         throw 0;
       }
     }
-    else if(config.ansi_c.os==configt::ansi_ct::OS_WIN &&
+    else if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN &&
             final_new.id()==ID_c_enum && final_old.id()==ID_c_enum)              
     {        
       // under Windows, ignore this silently;
       // MSC doesn't think this is a problem, but GCC complains.
     }
-    else if(config.ansi_c.os==configt::ansi_ct::OS_WIN &&
+    else if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN &&
             final_new.id()==ID_pointer && final_old.id()==ID_pointer &&
             follow(final_new.subtype()).id()==ID_c_enum &&
             follow(final_old.subtype()).id()==ID_c_enum)
@@ -390,8 +320,8 @@ void c_typecheck_baset::typecheck_redefinition_type(
       {
         err_location(new_symbol.location);
         str << "error: type symbol `" << new_symbol.display_name()
-            << "' defined twice:" << std::endl;
-        str << "Original: " << to_string(old_symbol.type) << std::endl;
+            << "' defined twice:" << "\n";
+        str << "Original: " << to_string(old_symbol.type) << "\n";
         str << "     New: " << to_string(new_symbol.type);
         throw 0;
       }
@@ -415,11 +345,23 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   symbolt &old_symbol,
   symbolt &new_symbol)
 {
+  const typet &final_old=follow(old_symbol.type);
+  const typet &initial_new=follow(new_symbol.type);
+
+  if(final_old.id()==ID_array &&
+     to_array_type(final_old).size().is_not_nil() &&
+     initial_new.id()==ID_array &&
+     to_array_type(initial_new).size().is_nil() &&
+     final_old.subtype()==initial_new.subtype())
+  {
+    // this is ok, just use old type
+    new_symbol.type=old_symbol.type;
+  }
+
   // do initializer, this may change the type
   if(follow(new_symbol.type).id()!=ID_code)
     do_initializer(new_symbol);
   
-  const typet &final_old=follow(old_symbol.type);
   const typet &final_new=follow(new_symbol.type);
   
   // K&R stuff?
@@ -429,7 +371,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     if(final_new.id()==ID_code)
     {
       err_location(new_symbol.location);
-      throw "function type not allowed for K&R function argument";
+      throw "function type not allowed for K&R function parameter";
     }
     
     // fix up old symbol -- we now got the type
@@ -447,8 +389,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       err_location(new_symbol.location);
       str << "error: function symbol `" << new_symbol.display_name()
-          << "' defined twice with different types:" << std::endl;
-      str << "Original: " << to_string(old_symbol.type) << std::endl;
+          << "' redefined with a different type:" << "\n";
+      str << "Original: " << to_string(old_symbol.type) << "\n";
       str << "     New: " << to_string(new_symbol.type);
       throw 0;
     }
@@ -470,14 +412,49 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // do body
     
     if(new_symbol.value.is_not_nil())
-    {      
+    {  
       if(old_symbol.value.is_not_nil())
       {
-        err_location(new_symbol.location);
-        str << "function `" << new_symbol.display_name()
-            << "' defined twice";
-        error();
-        throw 0;
+        // gcc allows re-definition if the first
+        // definition is marked as "extern inline"
+        
+        if(old_symbol.type.get_bool(ID_C_inlined) &&
+           (config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_GCC_C ||
+            config.ansi_c.mode==configt::ansi_ct::flavourt::MODE_ARM_C_CPP))
+        {
+          // overwrite "extern inline" properties
+          old_symbol.is_extern=new_symbol.is_extern;
+          old_symbol.is_file_local=new_symbol.is_file_local;
+
+          // remove parameter declarations to avoid conflicts
+          const code_typet::parameterst &old_p=old_ct.parameters();
+          for(code_typet::parameterst::const_iterator
+              p_it=old_p.begin();
+              p_it!=old_p.end();
+              p_it++)
+          {
+            const irep_idt &identifier=p_it->get_identifier();
+
+            symbol_tablet::symbolst::iterator p_s_it=
+              symbol_table.symbols.find(identifier);
+            if(p_s_it!=symbol_table.symbols.end())
+              symbol_table.symbols.erase(p_s_it);
+          }
+        }
+        else
+        {
+          err_location(new_symbol.location);
+          str << "function body `" << new_symbol.display_name()
+              << "' defined twice";
+          error_msg();
+          throw 0;
+        }
+      }
+      else if(inlined)
+      {
+        // preserve "extern inline" properties
+        old_symbol.is_extern=new_symbol.is_extern;
+        old_symbol.is_file_local=new_symbol.is_file_local;
       }
 
       typecheck_function_body(new_symbol);
@@ -488,7 +465,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       // move body
       old_symbol.value.swap(new_symbol.value);
 
-      // overwrite type (because of argument names)
+      // overwrite type (because of parameter names)
       old_symbol.type=new_symbol.type;
     }
 
@@ -498,15 +475,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   if(final_old!=final_new)
   {
     if(final_old.id()==ID_array &&
-       to_array_type(final_old).size().is_not_nil() &&
-       final_new.id()==ID_array &&
-       to_array_type(final_new).size().is_nil() &&
-       final_old.subtype()==final_new.subtype())
-    {
-      // this is ok, just use old type
-      new_symbol.type=old_symbol.type;
-    }
-    else if(final_old.id()==ID_array &&
             to_array_type(final_old).size().is_nil() &&
             final_new.id()==ID_array &&
             to_array_type(final_new).size().is_not_nil() &&
@@ -519,9 +487,9 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         const irep_idt identifier=
           to_symbol_type(old_symbol.type).get_identifier();
 
-        contextt::symbolst::iterator s_it=context.symbols.find(identifier);
+        symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
   
-        if(s_it==context.symbols.end())
+        if(s_it==symbol_table.symbols.end())
         {
           err_location(old_symbol.location);
           str << "typecheck_redefinition_non_type: "
@@ -543,12 +511,33 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     {
       // this is ok for now
     }
+    else if(final_old.id()==ID_pointer &&
+            follow(final_old).subtype().id()==ID_code &&
+            to_code_type(follow(final_old).subtype()).has_ellipsis() &&
+            final_new.id()==ID_pointer &&
+            follow(final_new).subtype().id()==ID_code)
+    {
+      // to allow 
+      // int (*f) ();
+      // int (*f) (int)=0;
+      old_symbol.type=new_symbol.type;
+    }
+    else if(final_old.id()==ID_pointer &&
+            follow(final_old).subtype().id()==ID_code &&
+            final_new.id()==ID_pointer &&
+            follow(final_new).subtype().id()==ID_code &&
+            to_code_type(follow(final_new).subtype()).has_ellipsis())
+    {
+      // to allow 
+      // int (*f) (int)=0;
+      // int (*f) ();
+    }
     else
     {
       err_location(new_symbol.location);
       str << "error: symbol `" << new_symbol.display_name()
-          << "' defined twice with different types:" << std::endl;
-      str << "Original: " << to_string(old_symbol.type) << std::endl;
+          << "' redefined with a different type:" << "\n";
+      str << "Original: " << to_string(old_symbol.type) << "\n";
       str << "     New: " << to_string(new_symbol.type);
       throw 0;
     }
@@ -588,7 +577,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           err_location(new_symbol.value);
           str << "symbol `" << new_symbol.display_name()
               << "' already has an initial value";
-          warning();
+          warning_msg();
         }
       }
     }
@@ -598,6 +587,16 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       old_symbol.type=new_symbol.type;
     }
   }
+  
+  // take care of some flags
+  if(old_symbol.is_extern && !new_symbol.is_extern)
+    old_symbol.location=new_symbol.location;
+
+  old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
+  
+  // We should likely check is_volatile and
+  // is_thread_local for consistency. GCC complains if these
+  // mismatch.
 }
 
 /*******************************************************************\
@@ -616,24 +615,11 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
   code_typet &code_type=to_code_type(symbol.type);
   
-  // adjust the function identifiers
-  for(code_typet::argumentst::iterator
-      a_it=code_type.arguments().begin();
-      a_it!=code_type.arguments().end();
-      a_it++)
-  {
-    irep_idt identifier=a_it->get_identifier();
-    if(identifier!=irep_idt())
-    {
-      id_replace_mapt::const_iterator
-        m_it=id_replace_map.find(identifier);
-
-      if(m_it!=id_replace_map.end())
-        a_it->set_identifier(m_it->second);      
-    }
-  }
-    
   assert(symbol.value.is_not_nil());
+  
+  // reset labels
+  labels_used.clear();
+  labels_defined.clear();
 
   // fix type
   symbol.value.type()=code_type;
@@ -641,8 +627,113 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   // set return type
   return_type=code_type.return_type();
   
-  typecheck_code(to_code(symbol.value));
+  unsigned anon_counter=0;
   
-  if(symbol.name=="c::main")
+  // Add the parameter declarations into the symbol table.
+  code_typet::parameterst &parameters=code_type.parameters();
+  for(code_typet::parameterst::iterator
+      p_it=parameters.begin();
+      p_it!=parameters.end();
+      p_it++)
+  {
+    // may be anonymous
+    if(p_it->get_base_name()==irep_idt())
+    {
+      irep_idt base_name="#anon"+i2string(anon_counter++);
+      p_it->set_base_name(base_name);
+    }
+    
+    // produce identifier
+    irep_idt base_name=p_it->get_base_name();
+    irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
+
+    p_it->set_identifier(identifier);
+
+    parameter_symbolt p_symbol;
+    
+    p_symbol.type=p_it->type();
+    p_symbol.name=identifier;
+    p_symbol.base_name=base_name;
+    p_symbol.location=p_it->source_location();
+
+    symbolt *new_p_symbol;
+    move_symbol(p_symbol, new_p_symbol);
+  }
+
+  // typecheck the body code  
+  typecheck_code(to_code(symbol.value));
+
+  // special case for main()  
+  if(symbol.name==ID_main)
     add_argc_argv(symbol);
+
+  // check the labels
+  for(std::map<irep_idt, source_locationt>::const_iterator
+      it=labels_used.begin(); it!=labels_used.end(); it++)
+  {
+    if(labels_defined.find(it->first)==labels_defined.end())
+    {
+      err_location(it->second);
+      str << "branching label `" << it->first
+          << "' is not defined in function";
+      throw 0;
+    }
+  }
 }
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::typecheck_declaration
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void c_typecheck_baset::typecheck_declaration(
+  ansi_c_declarationt &declaration)
+{
+  if(declaration.get_is_static_assert())
+  {
+    assert(declaration.operands().size()==2);
+    typecheck_expr(declaration.op0());
+    typecheck_expr(declaration.op1());
+  }
+  else
+  {
+    // get storage spec
+    c_storage_spect c_storage_spec(declaration.type());
+  
+    declaration.set_is_inline(c_storage_spec.is_inline);
+    declaration.set_is_static(c_storage_spec.is_static);
+    declaration.set_is_extern(c_storage_spec.is_extern);
+    declaration.set_is_thread_local(c_storage_spec.is_thread_local);
+    declaration.set_is_register(c_storage_spec.is_register);
+    declaration.set_is_typedef(c_storage_spec.is_typedef);
+
+    // first typecheck the type of the declaration
+    typecheck_type(declaration.type());
+    
+    // mark as 'already typechecked'
+    make_already_typechecked(declaration.type());
+
+    // Now do declarators, if any.
+    for(ansi_c_declarationt::declaratorst::iterator
+        d_it=declaration.declarators().begin();
+        d_it!=declaration.declarators().end();
+        d_it++)
+    {
+      symbolt symbol;
+      declaration.to_symbol(*d_it, symbol);
+
+      // now check other half of type
+      typecheck_type(symbol.type);
+
+      typecheck_symbol(symbol);
+    }
+  }
+}
+

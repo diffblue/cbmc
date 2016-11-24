@@ -6,8 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <location.h>
-#include <i2string.h>
+#include <limits>
+
+#include <util/source_location.h>
+#include <util/i2string.h>
 
 #include "symex_bmc.h"
 
@@ -25,9 +27,10 @@ Function: symex_bmct::symex_bmct
 
 symex_bmct::symex_bmct(
   const namespacet &_ns,
-  contextt &_new_context,
+  symbol_tablet &_new_symbol_table,
   symex_targett &_target):
-  goto_symext(_ns, _new_context, _target)
+  goto_symext(_ns, _new_symbol_table, _target),
+  max_unwind_is_set(false)
 {
 }
 
@@ -47,15 +50,16 @@ void symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
 {
-  const locationt &location=state.source.pc->location;
+  const source_locationt &source_location=state.source.pc->source_location;
 
-  if(!location.is_nil() && last_location!=location)
+  if(!source_location.is_nil() && last_source_location!=source_location)
   {
-    print(9, "File "+location.get_string("file")+
-             " line "+location.get_string("line")+
-             " function "+location.get_string("function"));
+    debug() << "BMC at file " << source_location.get_file()
+            << " line " << source_location.get_line()
+            << " function " << source_location.get_function()
+            << eom;
 
-    last_location=location;
+    last_source_location=source_location;
   }
 
   goto_symext::symex_step(goto_functions, state);
@@ -77,24 +81,41 @@ bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
   unsigned unwind)
 {
-  irep_idt id=id2string(source.pc->function)+"."+
-              i2string(source.pc->loop_number);
-  unsigned long this_loop_max_unwind=max_unwind;
+  const irep_idt id=goto_programt::loop_id(source.pc);
 
-  if(unwind_set.count(id)!=0)
-    this_loop_max_unwind=unwind_set[id];
+  // We use the most specific limit we have,
+  // and 'infinity' when we have none.
 
-  #if 1
+  unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
+  
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[source.thread_nr];
+    
+  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+  if(l_it!=this_thread_limits.end())
+    this_loop_limit=l_it->second;
+  else
   {
-    std::string msg=
-      "Unwinding loop "+id2string(id)+" iteration "+i2string(unwind)+
-      " "+source.pc->location.as_string();
-    print(8, msg);
+    l_it=loop_limits.find(id);
+    if(l_it!=loop_limits.end())
+      this_loop_limit=l_it->second;
+    else if(max_unwind_is_set)
+      this_loop_limit=max_unwind;
   }
-  #endif
 
-  return this_loop_max_unwind!=0 &&
-         unwind>=this_loop_max_unwind;
+  bool abort=unwind>=this_loop_limit;
+
+  statistics() << (abort?"Not unwinding":"Unwinding")
+               << " loop " << id << " iteration "
+               << unwind;
+
+  if(this_loop_limit!=std::numeric_limits<unsigned>::max())
+    statistics() << " (" << this_loop_limit << " max)";
+
+  statistics() << " " << source.pc->source_location
+               << " thread " << source.thread_nr << eom;
+
+  return abort;
 }
 
 /*******************************************************************\
@@ -110,30 +131,48 @@ Function: symex_bmct::get_unwind_recursion
 \*******************************************************************/
 
 bool symex_bmct::get_unwind_recursion(
-  const irep_idt &identifier,
+  const irep_idt &id,
+  const unsigned thread_nr,
   unsigned unwind)
 {
-  unsigned long this_loop_max_unwind=max_unwind;
+  // We use the most specific limit we have,
+  // and 'infinity' when we have none.
 
-  #if 1
-  if(unwind!=0)
+  unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
+
+  loop_limitst &this_thread_limits=
+    thread_loop_limits[thread_nr];
+    
+  loop_limitst::const_iterator l_it=this_thread_limits.find(id);
+  if(l_it!=this_thread_limits.end())
+    this_loop_limit=l_it->second;
+  else
   {
-    const symbolt &symbol=ns.lookup(identifier);
-  
-    std::string msg=
-      "Unwinding recursion "+
-      id2string(symbol.display_name())+
-      " iteration "+i2string(unwind);
-      
-    if(this_loop_max_unwind!=0)
-      msg+=" ("+i2string(this_loop_max_unwind)+" max)";
-
-    print(8, msg);
+    l_it=loop_limits.find(id);
+    if(l_it!=loop_limits.end())
+      this_loop_limit=l_it->second;
+    else if(max_unwind_is_set)
+      this_loop_limit=max_unwind;
   }
-  #endif
 
-  return this_loop_max_unwind!=0 &&
-         unwind>=this_loop_max_unwind;
+  bool abort=unwind>this_loop_limit;
+
+  if(unwind>0 || abort)
+  {
+    const symbolt &symbol=ns.lookup(id);
+
+    statistics() << (abort?"Not unwinding":"Unwinding")
+                 << " recursion "
+                 << symbol.display_name()
+                 << " iteration " << unwind;
+    
+    if(this_loop_limit!=std::numeric_limits<unsigned>::max())
+      statistics() << " (" << this_loop_limit << " max)";
+
+    statistics() << eom;
+  }
+
+  return abort;
 }
 
 /*******************************************************************\
@@ -152,9 +191,7 @@ void symex_bmct::no_body(const irep_idt &identifier)
 {
   if(body_warnings.insert(identifier).second)
   {
-    std::string msg=
-      "**** WARNING: no body for function "+id2string(identifier);
-
-    print(2, msg);
+    warning() <<
+      "**** WARNING: no body for function " << identifier << eom;
   }
 }

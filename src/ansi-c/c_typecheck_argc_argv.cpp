@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <arith_tools.h>
-#include <expr_util.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
 
 #include "c_typecheck_base.h"
 
@@ -25,32 +25,32 @@ Function: c_typecheck_baset::add_argc_argv
 
 void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 {
-  const irept &arguments=
-    main_symbol.type.find(ID_arguments);
+  const code_typet::parameterst &parameters=
+    to_code_type(main_symbol.type).parameters();
 
-  if(arguments.get_sub().size()==0)
+  if(parameters.empty())
     return;
 
-  if(arguments.get_sub().size()!=2 &&
-     arguments.get_sub().size()!=3)
+  if(parameters.size()!=2 &&
+     parameters.size()!=3)
   {
     err_location(main_symbol.location);
-    throw "main expected to have no or two or three arguments";
+    throw "main expected to have no or two or three parameters";
   }
 
   symbolt *argc_new_symbol;
   
-  const exprt &op0=static_cast<const exprt &>(arguments.get_sub()[0]);
-  const exprt &op1=static_cast<const exprt &>(arguments.get_sub()[1]);
+  const exprt &op0=static_cast<const exprt &>(parameters[0]);
+  const exprt &op1=static_cast<const exprt &>(parameters[1]);
 
   {
     symbolt argc_symbol;
 
     argc_symbol.base_name="argc";
-    argc_symbol.name="c::argc'";
+    argc_symbol.name="argc'";
     argc_symbol.type=op0.type();
-    argc_symbol.static_lifetime=true;
-    argc_symbol.lvalue=true;
+    argc_symbol.is_static_lifetime=true;
+    argc_symbol.is_lvalue=true;
 
     if(argc_symbol.type.id()!=ID_signedbv &&
        argc_symbol.type.id()!=ID_unsignedbv)
@@ -84,34 +84,34 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     exprt one_expr=from_integer(1, argc_new_symbol->type);
     
     exprt size_expr(ID_plus, argc_new_symbol->type);
-    size_expr.copy_to_operands(symbol_expr(*argc_new_symbol), one_expr);
+    size_expr.copy_to_operands(argc_new_symbol->symbol_expr(), one_expr);
     argv_type.add(ID_size).swap(size_expr);
 
     symbolt argv_symbol;
 
-    argv_symbol.base_name="argv";
-    argv_symbol.name="c::argv'";
+    argv_symbol.base_name="argv'";
+    argv_symbol.name="argv'";
     argv_symbol.type=argv_type;
-    argv_symbol.static_lifetime=true;
-    argv_symbol.lvalue=true;
+    argv_symbol.is_static_lifetime=true;
+    argv_symbol.is_lvalue=true;
 
     symbolt *argv_new_symbol;
     move_symbol(argv_symbol, argv_new_symbol);
   }
   
-  if(arguments.get_sub().size()==3)
+  if(parameters.size()==3)
   {    
     symbolt envp_symbol;    
-    envp_symbol.base_name="envp";
-    envp_symbol.name="c::envp'";
-    envp_symbol.type=(static_cast<const exprt&>(arguments.get_sub()[2])).type();
-    envp_symbol.static_lifetime=true;
+    envp_symbol.base_name="envp'";
+    envp_symbol.name="envp'";
+    envp_symbol.type=(static_cast<const exprt&>(parameters[2])).type();
+    envp_symbol.is_static_lifetime=true;
     
     symbolt envp_size_symbol, *envp_new_size_symbol;
     envp_size_symbol.base_name="envp_size";
-    envp_size_symbol.name="c::envp_size'";
+    envp_size_symbol.name="envp_size'";
     envp_size_symbol.type=op0.type(); // same type as argc!
-    envp_size_symbol.static_lifetime=true;    
+    envp_size_symbol.is_static_lifetime=true;    
     move_symbol(envp_size_symbol, envp_new_size_symbol);        
 
     if(envp_symbol.type.id()!=ID_pointer)
@@ -122,7 +122,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
       throw 0;
     }
     
-    exprt size_expr = symbol_expr(*envp_new_size_symbol);
+    exprt size_expr = envp_new_size_symbol->symbol_expr();
 
     envp_symbol.type.id(ID_array);
     envp_symbol.type.add(ID_size).swap(size_expr);

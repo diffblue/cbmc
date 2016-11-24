@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef XML_PARSER_H
 #define XML_PARSER_H
 
-#include <parser.h>
+#include <util/parser.h>
 
 #include "xml_parse_tree.h"
 
@@ -29,7 +29,7 @@ public:
    
   virtual bool parse()
   {
-    return yyxmlparse();
+    return yyxmlparse()!=0;
   }
   
   void new_level()

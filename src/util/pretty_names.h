@@ -14,10 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 
-#include <irep.h>
+#include "irep.h"
 
 class namespacet;
 
+#if 0
 class pretty_namest
 {
  public:
@@ -31,5 +32,6 @@ class pretty_namest
   
   const irep_idt &pretty_name(const irep_idt &identifier) const;
 };
+#endif
 
 #endif

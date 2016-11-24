@@ -11,14 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <std_expr.h>
+#include <util/std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
 
 class functionst
 {
 public:
-  explicit functionst(prop_conv_baset &_prop_conv):
+  explicit functionst(prop_convt &_prop_conv):
     prop_conv(_prop_conv) { }
     
   virtual ~functionst()
@@ -34,7 +34,7 @@ public:
   }
   
 protected:
-  prop_conv_baset &prop_conv;
+  prop_convt &prop_conv;
 
   typedef std::set<function_application_exprt> applicationst;
   
@@ -49,8 +49,8 @@ protected:
   virtual void add_function_constraints();
   virtual void add_function_constraints(const function_infot &info);
 
-  literalt arguments_equal(const exprt::operandst &o1,
-                           const exprt::operandst &o2);
+  exprt arguments_equal(const exprt::operandst &o1,
+                        const exprt::operandst &o2);
 };
 
 #endif

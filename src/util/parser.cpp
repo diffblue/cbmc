@@ -30,7 +30,7 @@ Function: _newstack
 
 exprt &_newstack(parsert &parser, unsigned &x)
 {
-  x=parser.stack.size();
+  x=(unsigned)parser.stack.size();
 
   if(x>=parser.stack.capacity())
     parser.stack.reserve(x*2);
@@ -55,11 +55,15 @@ void parsert::parse_error(
   const std::string &message,
   const std::string &before)
 {
-  locationt location;
-  location.set_file(filename);
-  location.set_line(i2string(line_no));
   std::string tmp=message;
   if(before!="") tmp+=" before `"+before+"'";
-  print(1, tmp, -1, location);
+  
+  #if 0
+  source_locationt tmp_source_location=source_location;
+  tmp_source_location.set_column(column-before.size());
+  print(1, tmp, -1, tmp_source_location);
+  #else
+  print(1, tmp, -1, source_location);
+  #endif
 }
 

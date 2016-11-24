@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cstdlib>
+#include <ostream>
 
 #include "symbol.h"
-#include "location.h"
+#include "source_location.h"
 #include "std_expr.h"
 
 /*******************************************************************\
@@ -26,41 +26,34 @@ Function: symbolt::show
    
 void symbolt::show(std::ostream &out) const
 {
-  out << "  " << name << std::endl;
-  out << "    type:  " << type.pretty(4) << std::endl
-      << "    value: " << value.pretty(4) << std::endl;
+  out << "  " << name << '\n';
+  out << "    type:  " << type.pretty(4) << '\n'
+      << "    value: " << value.pretty(4) << '\n';
 
   out << "  flags:";
-  if(lvalue)          out << " lvalue";
-  if(static_lifetime) out << " static_lifetime";
-  if(thread_local)    out << " thread_local";
-  if(file_local)      out << " file_local";
-  if(theorem)         out << " theorem";
-  if(is_type)         out << " type";
-  if(is_extern)       out << " extern";
-  if(is_input)        out << " input";
-  if(is_output)       out << " output";
-  if(is_macro)        out << " macro";
-  if(is_actual)       out << " actual";
-  if(binding)         out << " binding";
-  if(free_var)        out << " free_var";
-  if(is_statevar)     out << " statevar";
-  if(mode!="")        out << " mode=" << mode;
-  if(base_name!="")   out << " base_name=" << base_name;
-  if(module!="")      out << " module=" << module;
-  if(pretty_name!="") out << " pretty_name=" << pretty_name;
-  out << std::endl;
-  out << "  location: " << location << std::endl;
+  if(is_lvalue)            out << " lvalue";
+  if(is_static_lifetime)   out << " static_lifetime";
+  if(is_thread_local)      out << " thread_local";
+  if(is_file_local)        out << " file_local";
+  if(is_type)              out << " type";
+  if(is_extern)            out << " extern";
+  if(is_input)             out << " input";
+  if(is_output)            out << " output";
+  if(is_macro)             out << " macro";
+  if(is_parameter)         out << " parameter";
+  if(is_auxiliary)         out << " auxiliary";
+  if(is_property)          out << " property";
+  if(is_state_var)         out << " state_var";
+  if(is_exported)          out << " exported";
+  if(is_volatile)          out << " volatile";
+  if(!mode.empty())        out << " mode=" << mode;
+  if(!base_name.empty())   out << " base_name=" << base_name;
+  if(!module.empty())      out << " module=" << module;
+  if(!pretty_name.empty()) out << " pretty_name=" << pretty_name;
+  out << '\n';
+  out << "  location: " << location << '\n';
 
-  out << "  hierarchy:";
-
-  for(std::list<irep_idt>::const_iterator it=hierarchy.begin();
-      it!=hierarchy.end();
-      it++)
-    out << " " << *it;
-
-  out << std::endl;  
-  out << std::endl;  
+  out << '\n';  
 }
 
 /*******************************************************************\
@@ -105,22 +98,20 @@ void symbolt::to_irep(irept &dest) const
   dest.set(ID_base_name, base_name);
   dest.set(ID_mode, mode);
   dest.set(ID_pretty_name, pretty_name);
-  dest.set("ordering", ordering);
 
   if(is_type) dest.set("is_type", true);
-  if(theorem) dest.set("theorem", true);
   if(is_macro) dest.set("is_macro", true);
   if(is_exported) dest.set("is_exported", true);
   if(is_input) dest.set("is_input", true);
   if(is_output) dest.set("is_output", true);
-  if(is_statevar) dest.set("is_statevar", true);
-  if(is_actual) dest.set("is_actual", true);
-  if(free_var) dest.set("free_var", true);
-  if(binding) dest.set("binding", true);
-  if(lvalue) dest.set("lvalue", true);
-  if(static_lifetime) dest.set("static_lifetime", true);
-  if(thread_local) dest.set("thread_local", true);
-  if(file_local) dest.set("file_local", true);
+  if(is_state_var) dest.set("is_statevar", true);
+  if(is_parameter) dest.set("is_parameter", true);
+  if(is_auxiliary) dest.set("is_auxiliary", true);
+  if(is_property) dest.set("is_property", true);
+  if(is_lvalue) dest.set("is_lvalue", true);
+  if(is_static_lifetime) dest.set("is_static_lifetime", true);
+  if(is_thread_local) dest.set("is_thread_local", true);
+  if(is_file_local) dest.set("is_file_local", true);
   if(is_extern) dest.set("is_extern", true);
   if(is_volatile) dest.set("is_volatile", true);       
 }
@@ -141,29 +132,27 @@ void symbolt::from_irep(const irept &src)
 {
   type=static_cast<const typet &>(src.find(ID_type));
   value=static_cast<const exprt &>(src.find(ID_value));
-  location=static_cast<const locationt &>(src.find(ID_location));
+  location=static_cast<const source_locationt &>(src.find(ID_location));
 
   name=src.get(ID_name);
   module=src.get(ID_module);
   base_name=src.get(ID_base_name);
   mode=src.get(ID_mode);
   pretty_name=src.get(ID_pretty_name);
-  ordering=atoi(src.get("ordering").c_str());
 
   is_type=src.get_bool("is_type");
-  theorem=src.get_bool("theorem");
   is_macro=src.get_bool("is_macro");
   is_exported=src.get_bool("is_exported");
   is_input=src.get_bool("is_input");
   is_output=src.get_bool("is_output");
-  is_statevar=src.get_bool("is_statevar");
-  is_actual=src.get_bool("is_actual");
-  free_var=src.get_bool("free_var");
-  binding=src.get_bool("binding");
-  lvalue=src.get_bool("lvalue");
-  static_lifetime=src.get_bool("static_lifetime");
-  thread_local=src.get_bool("thread_local");
-  file_local=src.get_bool("file_local");
+  is_state_var=src.get_bool("is_state_var");
+  is_parameter=src.get_bool("is_parameter");
+  is_auxiliary=src.get_bool("is_auxiliary");
+  is_property=src.get_bool("property");
+  is_lvalue=src.get_bool("lvalue");
+  is_static_lifetime=src.get_bool("static_lifetime");
+  is_thread_local=src.get_bool("thread_local");
+  is_file_local=src.get_bool("file_local");
   is_extern=src.get_bool("is_extern");
   is_volatile=src.get_bool("is_volatile");
 }
@@ -195,73 +184,21 @@ void symbolt::swap(symbolt &b)
 
   #define SYM_SWAP2(x) std::swap(x, b.x)
   
-  SYM_SWAP2(ordering);
-  SYM_SWAP2(theorem);
   SYM_SWAP2(is_type);
   SYM_SWAP2(is_macro);
   SYM_SWAP2(is_exported);
   SYM_SWAP2(is_input);
   SYM_SWAP2(is_output);
-  SYM_SWAP2(is_statevar);
-  SYM_SWAP2(is_actual);
-  SYM_SWAP2(free_var);
-  SYM_SWAP2(lvalue);
-  SYM_SWAP2(static_lifetime);
-  SYM_SWAP2(thread_local);
-  SYM_SWAP2(file_local);
+  SYM_SWAP2(is_state_var);
+  SYM_SWAP2(is_property);
+  SYM_SWAP2(is_parameter);
+  SYM_SWAP2(is_auxiliary);
+  SYM_SWAP2(is_lvalue);
+  SYM_SWAP2(is_static_lifetime);
+  SYM_SWAP2(is_thread_local);
+  SYM_SWAP2(is_file_local);
   SYM_SWAP2(is_extern);
   SYM_SWAP2(is_volatile);
-}
-
-/*******************************************************************\
-
-Function: is_global
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a global variable
-
-\*******************************************************************/
-
-bool is_global(const symbolt &symbol)
-{
-  return symbol.static_lifetime && !symbol.thread_local;
-}
-
-/*******************************************************************\
-
-Function: is_thread_local
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a thread local variable
-
-\*******************************************************************/
-
-bool is_thread_local(const symbolt &symbol)
-{
-  return symbol.static_lifetime && symbol.thread_local;
-}
-
-/*******************************************************************\
-
-Function: is_procedure_local
-
-  Inputs: symbol
-
- Outputs: boolean
-
- Purpose: decides whether the symbol is a procedure local variable
-
-\*******************************************************************/
-
-bool is_procedure_local(const symbolt &symbol)
-{
-  return !symbol.static_lifetime;
 }
 
 /*******************************************************************\
@@ -270,16 +207,14 @@ Function: symbolt::symbol_expr
 
   Inputs: symbol
 
- Outputs: boolean
+ Outputs: symbol_exprt
 
- Purpose: decides whether the symbol is a procedure local variable
+ Purpose: produces a symbol_exprt for a symbol
 
 \*******************************************************************/
 
 symbol_exprt symbolt::symbol_expr() const
 {
-  symbol_exprt tmp(type);
-  tmp.set_identifier(name);
-  return tmp;
+  return symbol_exprt(name, type);
 }
 

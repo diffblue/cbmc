@@ -6,14 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <sstream>
 #include <fstream>
-#include <cstdlib>
+#include <iostream>
+#include <memory>
 
-#include <i2string.h>
-#include <location.h>
-#include <time_stopping.h>
-#include <message_stream.h>
+#include <util/string2int.h>
+#include <util/i2string.h>
+#include <util/source_location.h>
+#include <util/time_stopping.h>
+#include <util/message_stream.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -21,14 +22,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <goto-symex/goto_trace.h>
+#include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/json_goto_trace.h>
+#include <goto-programs/graphml_goto_trace.h>
+
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
 #include <goto-symex/slice_by_trace.h>
-#include <goto-symex/xml_goto_trace.h>
+#include <goto-symex/memory_model_sc.h>
+#include <goto-symex/memory_model_tso.h>
+#include <goto-symex/memory_model_pso.h>
 
+#include "counterexample_beautification.h"
 #include "bmc.h"
-#include "counterexample_beautification_greedy.h"
 
 /*******************************************************************\
 
@@ -42,9 +48,9 @@ Function: bmct::do_unwind_module
 
 \*******************************************************************/
 
-void bmct::do_unwind_module(
-  decision_proceduret &decision_procedure)
+void bmct::do_unwind_module()
 {
+  // this is a hook for hw-cbmc
 }
 
 /*******************************************************************\
@@ -59,48 +65,62 @@ Function: bmct::error_trace
 
 \*******************************************************************/
 
-void bmct::error_trace(const prop_convt &prop_conv)
+void bmct::error_trace()
 {
-  status("Building error trace");
+  status() << "Building error trace" << eom;
 
-  goto_tracet goto_trace;
+  goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
-  
-  #if 0
-  if(options.get_option("vcd")!="")
-  {
-    if(options.get_option("vcd")=="-")
-      output_vcd(ns, goto_trace, std::cout);
-    else
-    {
-      std::ofstream out(options.get_option("vcd").c_str());
-      output_vcd(ns, goto_trace, out);
-    }
-  }
-  #endif
   
   switch(ui)
   {
   case ui_message_handlert::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+    std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
-    break;
-  
-  case ui_message_handlert::OLD_GUI:
-    show_goto_trace_gui(std::cout, ns, goto_trace);
     break;
   
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << "\n";
     }
     break;
   
   default:
     assert(false);
   }
+
+  const std::string graphml=options.get_option("graphml-cex");
+  if(!graphml.empty())
+  {
+    graphmlt cex_graph;
+    convert(ns, goto_trace, cex_graph);
+
+    if(graphml=="-")
+      write_graphml(cex_graph, std::cout);
+    else
+    {
+      std::ofstream out(graphml.c_str());
+      write_graphml(cex_graph, out);
+    }
+  }
+
+  if(options.get_option("json-cex")!="")
+  {
+    jsont json_trace;
+    convert(ns, goto_trace, json_trace);
+  
+    if(options.get_option("json-cex")=="-")
+    {
+      std::cout << json_trace;
+    }
+    else
+    {
+      std::ofstream out(options.get_option("json-cex").c_str());
+      out << json_trace << '\n';
+    }
+  }  
 }
 
 /*******************************************************************\
@@ -115,17 +135,24 @@ Function: bmct::do_conversion
 
 \*******************************************************************/
 
-void bmct::do_conversion(prop_convt &prop_conv)
+void bmct::do_conversion()
 {
-  // convert HDL
-  do_unwind_module(prop_conv);
+  // convert HDL (hook for hw-cbmc)
+  do_unwind_module();
+  
+  status() << "converting SSA" << eom;
 
   // convert SSA
   equation.convert(prop_conv);
 
   // the 'extra constraints'
-  forall_expr_list(it, bmc_constraints)
-    prop_conv.set_to_true(*it);
+  if(!bmc_constraints.empty())
+  {
+    status() << "converting constraints" << eom;
+    
+    forall_expr_list(it, bmc_constraints)
+      prop_conv.set_to_true(*it);
+  }
 }
 
 /*******************************************************************\
@@ -143,29 +170,25 @@ Function: bmct::run_decision_procedure
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
 {
-  status("Passing problem to "+prop_conv.decision_procedure_text());
+  status() << "Passing problem to " 
+           << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
 
   // stop the time
-  fine_timet sat_start=current_time();
+  absolute_timet sat_start=current_time();
   
-  do_conversion(prop_conv);  
+  do_conversion();
 
-  status("Running "+prop_conv.decision_procedure_text());
+  status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
   decision_proceduret::resultt dec_result=prop_conv.dec_solve();
   // output runtime
 
   {
-    std::ostringstream str;
-    fine_timet sat_stop=current_time();
-
-    str << "Runtime decision procedure: ";
-    output_time(sat_stop-sat_start, str);
-    str << "s";
-    status(str.str());
+    absolute_timet sat_stop=current_time();
+    status() << "Runtime decision procedure: "
+             << (sat_stop-sat_start) << "s" << eom;
   }
 
   return dec_result;
@@ -185,19 +208,10 @@ Function: bmct::report_success
 
 void bmct::report_success()
 {
-  status("VERIFICATION SUCCESSFUL");
+  result() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(ui)
   {
-  case ui_message_handlert::OLD_GUI:
-    std::cout << "SUCCESS" << std::endl
-              << "Verification successful" << std::endl
-              << ""     << std::endl
-              << ""     << std::endl
-              << ""     << std::endl
-              << ""     << std::endl;
-    break;
-    
   case ui_message_handlert::PLAIN:
     break;
     
@@ -206,7 +220,7 @@ void bmct::report_success()
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << "\n";
     }
     break;
     
@@ -229,13 +243,10 @@ Function: bmct::report_failure
 
 void bmct::report_failure()
 {
-  status("VERIFICATION FAILED");
+  result() << "VERIFICATION FAILED" << eom;
 
   switch(ui)
   {
-  case ui_message_handlert::OLD_GUI:
-    break;
-    
   case ui_message_handlert::PLAIN:
     break;
     
@@ -244,7 +255,7 @@ void bmct::report_failure()
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << "\n";
     }
     break;
     
@@ -271,23 +282,26 @@ void bmct::show_program()
 
   languagest languages(ns, new_ansi_c_language());
   
-  std::cout << std::endl << "Program constraints:" << std::endl;
+  std::cout << "\n" << "Program constraints:" << "\n";
 
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end(); it++)
   {
+    std::cout << "// " << it->source.pc->location_number << " ";
+    std::cout << it->source.pc->source_location.as_string() << "\n";
+
     if(it->is_assignment())
     {
       std::string string_value;
       languages.from_expr(it->cond_expr, string_value);
-      std::cout << "(" << count << ") " << string_value << std::endl;
+      std::cout << "(" << count << ") " << string_value << "\n";
 
-      if(!it->guard_expr.is_true())
+      if(!it->guard.is_true())
       {
-        languages.from_expr(it->guard_expr, string_value);
+        languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << std::endl;
+        std::cout << "guard: " << string_value << "\n";
       }
       
       count++;
@@ -297,13 +311,54 @@ void bmct::show_program()
       std::string string_value;
       languages.from_expr(it->cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
-                << string_value <<") " << std::endl;
+                << string_value <<") " << "\n";
 
-      if(!it->guard_expr.is_true())
+      if(!it->guard.is_true())
       {
-        languages.from_expr(it->guard_expr, string_value);
+        languages.from_expr(it->guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
-        std::cout << "guard: " << string_value << std::endl;
+        std::cout << "guard: " << string_value << "\n";
+      }
+
+      count++;
+    }  
+    else if(it->is_assume())
+    {
+      std::string string_value;
+      languages.from_expr(it->cond_expr, string_value);
+      std::cout << "(" << count << ") ASSUME("
+                << string_value <<") " << "\n";
+
+      if(!it->guard.is_true())
+      {
+        languages.from_expr(it->guard, string_value);
+        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << "guard: " << string_value << "\n";
+      }
+
+      count++;
+    }  
+    else if(it->is_constraint())
+    {
+      std::string string_value;
+      languages.from_expr(it->cond_expr, string_value);
+      std::cout << "(" << count << ") CONSTRAINT("
+                << string_value <<") " << "\n";
+
+      count++;
+    }  
+    else if(it->is_shared_read() || it->is_shared_write())
+    {
+      std::string string_value;
+      languages.from_expr(it->ssa_lhs, string_value);
+      std::cout << "(" << count << ") SHARED_" << (it->is_shared_write()?"WRITE":"READ") << "("
+                << string_value <<") " << "\n";
+
+      if(!it->guard.is_true())
+      {
+        languages.from_expr(it->guard, string_value);
+        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
@@ -323,51 +378,75 @@ Function: bmct::run
 
 \*******************************************************************/
 
-bool bmct::run(const goto_functionst &goto_functions)
+safety_checkert::resultt bmct::run(
+  const goto_functionst &goto_functions)
 {
-  //symex.total_claims=0;
+  const std::string mm=options.get_option("mm");
+  std::unique_ptr<memory_model_baset> memory_model;
+  
+  if(mm.empty() || mm=="sc")
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
+  else if(mm=="tso")
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_tsot(ns));
+  else if(mm=="pso")
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
+  else
+  {
+    error() << "Invalid memory model " << mm
+            << " -- use one of sc, tso, pso" << eom;
+    return safety_checkert::ERROR;
+  }
+
   symex.set_message_handler(get_message_handler());
-  symex.set_verbosity(get_verbosity());
   symex.options=options;
 
-  status("Starting Bounded Model Checking");
+  status() << "Starting Bounded Model Checking" << eom;
 
-  symex.last_location.make_nil();
+  symex.last_source_location.make_nil();
 
   try
   {
     // get unwinding info
     setup_unwind();
 
+    // perform symbolic execution
     symex(goto_functions);
+
+    // add a partial ordering, if required    
+    if(equation.has_threads())
+    {
+      memory_model->set_message_handler(get_message_handler());
+      (*memory_model)(equation);
+    }
   }
 
-  catch(std::string &error_str)
+  catch(const std::string &error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
-    message_stream.error(error_str);
-    return true;
+    message_stream.err_location(symex.last_source_location);
+    message_stream.str << error_str;
+    message_stream.error_msg();
+    return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
   {
     message_streamt message_stream(get_message_handler());
-    message_stream.err_location(symex.last_location);
-    message_stream.error(error_str);
-    return true;
+    message_stream.err_location(symex.last_source_location);
+    message_stream.str << error_str;
+    message_stream.error_msg();
+    return safety_checkert::ERROR;
   }
 
   catch(std::bad_alloc)
   {
-    message_streamt message_stream(get_message_handler());
-    message_stream.error("Out of memory");
-    return true;
+    error() << "Out of memory" << eom;
+    return safety_checkert::ERROR;
   }
 
-  print(8, "size of program expression: "+
-           i2string(equation.SSA_steps.size())+
-           " assignments");
+  statistics() << "size of program expression: "
+               << equation.SSA_steps.size()
+               << " steps" << eom;
 
   try
   {
@@ -376,90 +455,87 @@ bool bmct::run(const goto_functionst &goto_functions)
       symex_slice_by_tracet symex_slice_by_trace(ns);
 
       symex_slice_by_trace.slice_by_trace
-	(options.get_option("slice-by-trace"), equation);
+        (options.get_option("slice-by-trace"), equation);
     }
 
-    if(options.get_bool_option("slice-formula"))
+    if(equation.has_threads())
     {
-      slice(equation);
-      print(8, "slicing removed "+
-        i2string(equation.count_ignored_SSA_steps())+" assignments");
+      // we should build a thread-aware SSA slicer
+      statistics() << "no slicing due to threads" << eom;
     }
     else
     {
-      simple_slice(equation);
-      print(8, "simple slicing removed "+
-        i2string(equation.count_ignored_SSA_steps())+" assignments");
+      if(options.get_bool_option("slice-formula"))
+      {
+        slice(equation);
+        statistics() << "slicing removed "
+                     << equation.count_ignored_SSA_steps()
+                     << " assignments" << eom;
+      }
+      else
+      {
+        if(options.get_option("cover")=="")
+        {
+          simple_slice(equation);
+          statistics() << "simple slicing removed "
+                       << equation.count_ignored_SSA_steps()
+                       << " assignments" << eom;
+        }
+      }
     }
 
-    if(options.get_bool_option("program-only"))
     {
-      show_program();
-      return false;
-    }
-
-    {
-      std::string msg;
-      msg="Generated "+i2string(symex.total_claims)+
-          " VCC(s), "+i2string(symex.remaining_claims)+
-          " remaining after simplification";
-      print(8, msg);
+      statistics() << "Generated " << symex.total_vccs
+                   << " VCC(s), " << symex.remaining_vccs
+                   << " remaining after simplification" << eom;
     }
 
     if(options.get_bool_option("show-vcc"))
     {
       show_vcc();
-      return false;
+      return safety_checkert::SAFE; // to indicate non-error
+    }
+    
+    if(options.get_option("cover")!="")
+    {
+      std::string criterion=options.get_option("cover");
+      return cover(goto_functions, criterion)?
+        safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
-    if(symex.remaining_claims==0)
+    // any properties to check at all?
+    if(!options.get_bool_option("program-only") &&
+       symex.remaining_vccs==0)
     {
       report_success();
-      return false;
+      return safety_checkert::SAFE;
     }
 
-    if(options.get_bool_option("boolector"))
-      return decide_boolector();
-    else if(options.get_bool_option("mathsat"))
-      return decide_mathsat();
-    else if(options.get_bool_option("cvc"))
-      return decide_cvc();
-    else if(options.get_bool_option("dimacs"))
-      return write_dimacs();
-    else if(options.get_bool_option("opensmt"))
-      return decide_opensmt();
-    else if(options.get_bool_option("refine"))
-      return decide_bv_refinement();
-    else if(options.get_bool_option("smt1"))
-      // this is the 'default' smt1 solver
-      return decide_smt1(smt1_dect::BOOLECTOR);
-    else if(options.get_bool_option("smt2"))
-      // this is the 'default' smt2 solver
-      return decide_smt2(smt2_dect::MATHSAT);
-    else if(options.get_bool_option("yices"))
-      return decide_yices();
-    else if(options.get_bool_option("z3"))
-      return decide_z3();
-    else
-      return decide_default();
+    if(options.get_bool_option("program-only"))
+    {
+      show_program();
+      return safety_checkert::SAFE;
+    }
+
+    return decide(goto_functions, prop_conv);
   }
 
   catch(std::string &error_str)
   {
-    error(error_str);
-    return true;
+    error() << error_str << eom;
+    return safety_checkert::ERROR;
   }
 
   catch(const char *error_str)
   {
-    error(error_str);
-    return true;
+    error() << error_str << eom;
+    return safety_checkert::ERROR;
   }
 
   catch(std::bad_alloc)
   {
-    error("Out of memory");
-    return true;
+    error() << "Out of memory" << eom;
+    return safety_checkert::ERROR;
   }
 }
 
@@ -475,34 +551,39 @@ Function: bmct::decide
 
 \*******************************************************************/
 
-bool bmct::decide(prop_convt &prop_conv)
+safety_checkert::resultt bmct::decide(
+  const goto_functionst &goto_functions,
+  prop_convt &prop_conv)
 {
-  if(options.get_bool_option("beautify-pbs") ||
-     options.get_bool_option("beautify-greedy"))
-    throw "sorry, this solver does not support beautification";
-
   prop_conv.set_message_handler(get_message_handler());
-  prop_conv.set_verbosity(get_verbosity());
-  
-  bool result=true;
+
+  if(options.get_bool_option("all-properties"))
+    return all_properties(goto_functions, prop_conv);
 
   switch(run_decision_procedure(prop_conv))
   {
   case decision_proceduret::D_UNSATISFIABLE:
-    result=false;
     report_success();
-    break;
+    return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
-    error_trace(prop_conv);
+    if(options.get_bool_option("beautify"))
+      counterexample_beautificationt()(
+        dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
+  
+    error_trace();
     report_failure();
-    break;
+    return UNSAFE;
 
   default:
-    error("decision procedure failed");
-  }
+    if(options.get_bool_option("dimacs") ||
+       options.get_option("outfile")!="")
+      return ERROR;
+      
+    error() << "decision procedure failed" << eom;
 
-  return result;
+    return ERROR;
+  }
 }
 
 /*******************************************************************\
@@ -520,23 +601,41 @@ Function: bmct::setup_unwind
 void bmct::setup_unwind()
 {
   const std::string &set=options.get_option("unwindset");
-  unsigned int length=set.length();
+  std::string::size_type length=set.length();
 
-  for(unsigned int idx=0; idx<length; idx++)
+  for(std::string::size_type idx=0; idx<length; idx++)
   {
     std::string::size_type next=set.find(",", idx);
     std::string val=set.substr(idx, next-idx);
 
+    unsigned thread_nr;
+    bool thread_nr_set=false;
+
+    if(!val.empty() &&
+       isdigit(val[0]) &&
+       val.find(":")!=std::string::npos)
+    {
+      std::string nr=val.substr(0, val.find(":"));
+      thread_nr=unsafe_string2unsigned(nr);
+      thread_nr_set=true;
+      val.erase(0, nr.size()+1);
+    }
+
     if(val.rfind(":")!=std::string::npos)
     {
       std::string id=val.substr(0, val.rfind(":"));
-      unsigned long uw=atol(val.substr(val.rfind(":")+1).c_str());
-      symex.unwind_set[id]=uw;
+      long uw=unsafe_string2int(val.substr(val.rfind(":")+1));
+
+      if(thread_nr_set)
+        symex.set_unwind_thread_loop_limit(thread_nr, id, uw);
+      else
+        symex.set_unwind_loop_limit(id, uw);
     }
     
     if(next==std::string::npos) break;
     idx=next;
   }
 
-  symex.max_unwind=options.get_int_option("unwind");
+  if(options.get_option("unwind")!="")
+    symex.set_unwind_limit(options.get_unsigned_int_option("unwind"));
 }

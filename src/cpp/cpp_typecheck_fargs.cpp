@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <assert.h>
+#include <cassert>
 
-#include <std_types.h>
+#include <util/std_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -60,7 +60,7 @@ void cpp_typecheck_fargst::build(
   operands.clear();
   operands.reserve(function_call.op1().operands().size());
 
-  for(unsigned i=0; i<function_call.op1().operands().size(); i++)
+  for(std::size_t i=0; i<function_call.op1().operands().size(); i++)
     operands.push_back(function_call.op1().operands()[i]);
 }
 
@@ -84,17 +84,17 @@ bool cpp_typecheck_fargst::match(
   distance=0;
 
   exprt::operandst ops = operands;
-  const code_typet::argumentst &arguments=code_type.arguments();
+  const code_typet::parameterst &parameters=code_type.parameters();
 
-  if(arguments.size()>ops.size())
+  if(parameters.size()>ops.size())
   {
     // Check for default values.
-    ops.reserve(arguments.size());
+    ops.reserve(parameters.size());
 
-    for(unsigned i=ops.size(); i<arguments.size(); i++)
+    for(std::size_t i=ops.size(); i<parameters.size(); i++)
     {
       const exprt &default_value=
-        arguments[i].default_value();
+        parameters[i].default_value();
 
       if(default_value.is_nil())
         return false;
@@ -102,14 +102,14 @@ bool cpp_typecheck_fargst::match(
       ops.push_back(default_value);
     }
   }
-  else if(arguments.size()<ops.size())
+  else if(parameters.size()<ops.size())
   {
     // check for ellipsis
     if(!code_type.has_ellipsis())
       return false;
   }
 
-  for(unsigned i=0; i<ops.size(); i++)
+  for(std::size_t i=0; i<ops.size(); i++)
   {
     // read
     // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
@@ -119,14 +119,14 @@ bool cpp_typecheck_fargst::match(
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
     
-    if(i>=arguments.size())
+    if(i>=parameters.size())
     {
       // Ellipsis is the 'worst' of the conversion sequences
       distance+=1000;
       continue;
     }
     
-    exprt argument=arguments[i];
+    exprt parameter=parameters[i];
 
     exprt &operand=ops[i];
 
@@ -140,10 +140,10 @@ bool cpp_typecheck_fargst::match(
 
     // "this" is a special case -- we turn the pointer type
     // into a reference type to do the type matching
-    if(i==0 && argument.get("#base_name")==ID_this)
+    if(i==0 && parameter.get(ID_C_base_name)==ID_this)
     {
-      argument.type().set("#reference", true);
-      argument.type().set("#this", true);
+      parameter.type().set(ID_C_reference, true);
+      parameter.type().set("#this", true);
     }
 
     unsigned rank = 0;
@@ -151,12 +151,12 @@ bool cpp_typecheck_fargst::match(
 
     #if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
-              << " -> " << cpp_typecheck.to_string(argument.type()) << std::endl;
+              << " -> " << cpp_typecheck.to_string(parameter.type()) << std::endl;
     #endif
 
     // can we do the standard conversion sequence?
     if(cpp_typecheck.implicit_conversion_sequence(
-        operand, argument.type(), new_expr, rank))
+        operand, parameter.type(), new_expr, rank))
     {
       // ok
       distance+=rank;
