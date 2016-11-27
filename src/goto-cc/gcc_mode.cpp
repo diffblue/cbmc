@@ -23,12 +23,11 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/get_base_name.h>
+#include <util/run.h>
 
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "run.h"
-
 #include "gcc_mode.h"
 
 /*******************************************************************\
