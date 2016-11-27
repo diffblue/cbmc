@@ -19,6 +19,8 @@ Date:
 
 #include "signal_catcher.h"
 
+pid_t child_pgid;
+
 /*******************************************************************\
 
 Function: install_signal_catcher
@@ -40,10 +42,15 @@ void install_signal_catcher()
 
   act.sa_handler=signal_catcher;
   act.sa_flags=0;
-  sigfillset(&(act.sa_mask));
+  sigemptyset(&(act.sa_mask));
 
   // install signal handler
+  sigaction(SIGHUP, &act, NULL);
+  sigaction(SIGINT, &act, NULL);
   sigaction(SIGTERM, &act, NULL);
+  sigaction(SIGALRM, &act, NULL);
+  sigaction(SIGUSR1, &act, NULL);
+  sigaction(SIGUSR2, &act, NULL);
   #endif
 }
 
@@ -64,7 +71,7 @@ void signal_catcher(int sig)
   #if defined(_WIN32)
   #else
   // kill any children by killing group
-  killpg(0, sig);
+  killpg(child_pgid, sig);
 
   exit(sig);
   #endif
