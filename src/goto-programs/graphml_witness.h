@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include <xmllang/graphml.h>
 
+#include <goto-symex/symex_target_equation.h>
+
 #include "goto_trace.h"
 
 class graphml_witnesst
@@ -22,6 +24,7 @@ public:
   }
 
   void operator()(const goto_tracet &goto_trace);
+  void operator()(const symex_target_equationt &equation);
 
   inline const graphmlt &graph()
   {

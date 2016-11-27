@@ -316,3 +316,19 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     it=next;
   }
 }
+
+/*******************************************************************\
+
+Function: graphml_witnesst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: proof witness
+
+\*******************************************************************/
+
+void graphml_witnesst::operator()(const symex_target_equationt &equation)
+{
+}

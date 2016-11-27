@@ -131,6 +131,8 @@ void bmct::output_graphml(
   graphml_witnesst graphml_witness(ns);
   if(result==UNSAFE)
     graphml_witness(safety_checkert::error_trace);
+  else if(result==SAFE)
+    graphml_witness(equation);
   else
     return;
 
@@ -544,6 +546,7 @@ safety_checkert::resultt bmct::run(
        symex.remaining_vccs==0)
     {
       report_success();
+      output_graphml(SAFE, goto_functions);
       return safety_checkert::SAFE;
     }
 
@@ -619,6 +622,7 @@ safety_checkert::resultt bmct::stop_on_fail(
   {
   case decision_proceduret::D_UNSATISFIABLE:
     report_success();
+    output_graphml(SAFE, goto_functions);
     return SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
