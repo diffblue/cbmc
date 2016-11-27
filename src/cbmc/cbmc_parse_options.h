@@ -53,7 +53,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(graphml-cex):" \
+  "(graphml-witness):" \
   "(localize-faults)(localize-faults-method):" \
   "(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear
 

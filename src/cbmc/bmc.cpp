@@ -106,20 +106,40 @@ void bmct::error_trace()
     }
     break;
   }
+}
 
-  const std::string graphml=options.get_option("graphml-cex");
-  if(!graphml.empty())
+/*******************************************************************\
+
+Function: bmct::output_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: outputs witnesses in graphml format
+
+\*******************************************************************/
+
+void bmct::output_graphml(
+  resultt result,
+  const goto_functionst &goto_functions)
+{
+  const std::string graphml=options.get_option("graphml-witness");
+  if(graphml.empty())
+    return;
+
+  graphmlt graph;
+  if(result==UNSAFE)
+    convert(ns, safety_checkert::error_trace, graph);
+  else
+    return;
+
+  if(graphml=="-")
+    write_graphml(graph, std::cout);
+  else
   {
-    graphmlt cex_graph;
-    convert(ns, goto_trace, cex_graph);
-
-    if(graphml=="-")
-      write_graphml(cex_graph, std::cout);
-    else
-    {
-      std::ofstream out(graphml);
-      write_graphml(cex_graph, out);
-    }
+    std::ofstream out(graphml);
+    write_graphml(graph, out);
   }
 }
 
@@ -611,6 +631,7 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
+      output_graphml(UNSAFE, goto_functions);
     }
 
     report_failure();
