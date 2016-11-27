@@ -314,79 +314,77 @@ void bmct::show_program()
 
   std::cout << "\n" << "Program constraints:" << "\n";
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+  for(const auto &step : equation.SSA_steps)
   {
-    std::cout << "// " << it->source.pc->location_number << " ";
-    std::cout << it->source.pc->source_location.as_string() << "\n";
+    std::cout << "// " << step.source.pc->location_number << " ";
+    std::cout << step.source.pc->source_location.as_string() << "\n";
 
-    if(it->is_assignment())
+    if(step.is_assignment())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") " << string_value << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_assert())
+    else if(step.is_assert())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_assume())
+    else if(step.is_assume())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_constraint())
+    else if(step.is_constraint())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
       count++;
     }
-    else if(it->is_shared_read() || it->is_shared_write())
+    else if(step.is_shared_read() || step.is_shared_write())
     {
       std::string string_value;
-      languages.from_expr(it->ssa_lhs, string_value);
-      std::cout << "(" << count << ") SHARED_" << (it->is_shared_write()?"WRITE":"READ") << "("
+      languages.from_expr(step.ssa_lhs, string_value);
+      std::cout << "(" << count << ") SHARED_" << (step.is_shared_write()?"WRITE":"READ") << "("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
