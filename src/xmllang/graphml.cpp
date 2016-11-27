@@ -295,7 +295,10 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("for", "edge");
     key.set_attribute("id", "originfile");
 
-    key.new_element("default").data="<command-line>";
+    if(src.key_values.find("programfile")!=src.key_values.end())
+      key.new_element("default").data=src.key_values.at("programfile");
+    else
+      key.new_element("default").data="<command-line>";
   }
 
   // <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
@@ -559,11 +562,11 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
   xmlt &graph=graphml.new_element("graph");
   graph.set_attribute("edgedefault", "directed");
 
-  // <data key="sourcecodelang">C</data>
+  for(const auto &kv : src.key_values)
   {
     xmlt &data=graph.new_element("data");
-    data.set_attribute("key", "sourcecodelang");
-    data.data="C";
+    data.set_attribute("key", kv.first);
+    data.data=kv.second;
   }
 
   bool entry_done=false;

@@ -56,6 +56,9 @@ public:
 
     return graph<xml_graph_nodet>::add_node();
   }
+
+  typedef std::map<std::string, std::string> key_valuest;
+  key_valuest key_values;
 };
 
 bool read_graphml(

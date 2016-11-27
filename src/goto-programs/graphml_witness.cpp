@@ -145,13 +145,7 @@ Function: graphml_witnesst::operator()
 
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
-  graphml.key_values["witness-type"]="violation_witness";
   graphml.key_values["sourcecodelang"]="C";
-  graphml.key_values["producer"]="";
-  graphml.key_values["programfile"]="";
-  graphml.key_values["programhash"]="";
-  graphml.key_values["specification"]="";
-  graphml.key_values["architecture"]="";
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
@@ -341,13 +335,7 @@ Function: graphml_witnesst::operator()
 
 void graphml_witnesst::operator()(const symex_target_equationt &equation)
 {
-  graphml.key_values["witness-type"]="correctness_witness";
   graphml.key_values["sourcecodelang"]="C";
-  graphml.key_values["producer"]="";
-  graphml.key_values["programfile"]="";
-  graphml.key_values["programhash"]="";
-  graphml.key_values["specification"]="";
-  graphml.key_values["architecture"]="";
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
