@@ -2,7 +2,7 @@
 
 Module:
 
-Author:
+Author: Daniel Kroening, kroening@kroening.com
 
 Date:
 
@@ -11,13 +11,19 @@ Date:
 #if defined(_WIN32)
 
 #else
-#include <signal.h>
 #include <cstdlib>
-
 #include <csignal>
 #endif
 
+#include <vector>
+
 #include "signal_catcher.h"
+
+// Here we have an instance of an ugly global object.
+// It keeps track of any child processes that we'll kill
+// when we are told to terminate.
+
+std::vector<pid_t> pids_of_children;
 
 /*******************************************************************\
 
@@ -63,9 +69,16 @@ void signal_catcher(int sig)
 {
   #if defined(_WIN32)
   #else
+  
+  #if 1
   // kill any children by killing group
   killpg(0, sig);
+  #else
+  // pass on to any children
+  for(const auto & pid : pids_of_children)
+    kill(pid, sig);
+  #endif
 
-  exit(sig);
+  exit(sig); // should contemplate something from sysexits.h
   #endif
 }
