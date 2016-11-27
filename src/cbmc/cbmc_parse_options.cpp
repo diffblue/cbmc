@@ -142,7 +142,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1);
+    exit(1); // should contemplate EX_USAGE from sysexits.h
   }
 
   if(cmdline.isset("program-only"))
@@ -297,7 +297,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      options.get_bool_option("unwinding-assertions"))
   {
     error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
-    exit(1);
+    exit(1); // should contemplate EX_USAGE from sysexits.h
   }
 
   // remove unused equations
@@ -475,7 +475,7 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << std::endl;
-    return 0;
+    return 0; // should contemplate EX_OK from sysexits.h
   }
   
   //
@@ -504,7 +504,7 @@ int cbmc_parse_optionst::doit()
   {
     error() << "This version of CBMC has no support for "
                " hardware modules. Please use hw-cbmc." << eom;
-    return 1;
+    return 1; // should contemplate EX_USAGE from sysexits.h
   }
   
   register_languages();
@@ -515,7 +515,7 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("preprocess"))
   {
     preprocessing();
-    return 0;
+    return 0; // should contemplate EX_OK from sysexits.h
   }
 
   goto_functionst goto_functions;
@@ -534,7 +534,7 @@ int cbmc_parse_optionst::doit()
   catch(const char *error_msg)
   {
     error() << error_msg << eom;
-    return 1;
+    return 1; // should contemplate EX_SOFTWARE from sysexits.h
   }
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
@@ -554,7 +554,7 @@ int cbmc_parse_optionst::doit()
   {
     const namespacet ns(symbol_table);
     show_properties(ns, get_ui(), goto_functions);
-    return 0;
+    return 0; // should contemplate EX_OK from sysexits.h
   }
 
   if(cmdline.isset("show-reachable-properties")) // may replace --show-properties
@@ -566,11 +566,11 @@ int cbmc_parse_optionst::doit()
     remove_unused_functions(goto_functions, ui_message_handler);
     
     show_properties(ns, get_ui(), goto_functions);
-    return 0;
+    return 0; // should contemplate EX_OK from sysexits.h
   }
 
   if(set_properties(goto_functions))
-    return 7;
+    return 7; // should contemplate EX_USAGE from sysexits.h
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
