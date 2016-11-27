@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
-#include <goto-programs/graphml_goto_trace.h>
+#include <goto-programs/graphml_witness.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -128,18 +128,18 @@ void bmct::output_graphml(
   if(graphml.empty())
     return;
 
-  graphmlt graph;
+  graphml_witnesst graphml_witness(ns);
   if(result==UNSAFE)
-    convert(ns, safety_checkert::error_trace, graph);
+    graphml_witness(safety_checkert::error_trace);
   else
     return;
 
   if(graphml=="-")
-    write_graphml(graph, std::cout);
+    write_graphml(graphml_witness.graph(), std::cout);
   else
   {
     std::ofstream out(graphml);
-    write_graphml(graph, out);
+    write_graphml(graphml_witness.graph(), out);
   }
 }
 
