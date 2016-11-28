@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
@@ -46,7 +47,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_analyzer_parse_options.h"
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
-#include "static_analyzer.h"
+#include "ai_analysis.h"
+#include "static_simplifier.h"
+#include "static_verifier.h"
+#include "static_analyser.h"
 
 /*******************************************************************\
 
@@ -338,22 +342,38 @@ int goto_analyzer_parse_optionst::doit()
   
   if(cmdline.isset("show-intervals"))
   {
-    show_intervals(goto_model, std::cout);
+  	const bool cp=cmdline.isset("constant-propagation");
+  	const bool ia=cmdline.isset("intervals");
+    static_analysert analyser(goto_model, options, get_message_handler(), cp, ia);
+    analyser.show_intervals(goto_model, std::cout);
     return 0;
   }
 
   if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
+     cmdline.isset("intervals") ||
+     cmdline.isset("constant-propagation"))
   {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
+      optionst options;
+      options.set_option("json", cmdline.get_value("json"));
+      options.set_option("xml", cmdline.get_value("xml"));
+  	  const bool cp=cmdline.isset("constant-propagation");
+  	  const bool ia=cmdline.isset("intervals");
+
+      if(cmdline.isset("verify"))
+      {
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
+        verifier();
+        return 0;
+      }
+      else if(cmdline.isset("simplify"))
+      {
+        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+        simplifier.simplify_guards();
+        return 0;
+      }
   }
 
-  error() << "no analysis option given -- consider reading --help"
+  error() << "no analysis/verification option given -- consider reading --help"
           << eom;
   return 6;
 }
@@ -451,13 +471,46 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
-    
+
+    const bool cp=cmdline.isset("constant-propagation");
+    const bool ia=cmdline.isset("intervals");
+
+    //dump it?
+    if (cmdline.isset("dump-goto") || cmdline.isset("dump-c"))
+    {
+      static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+   	  simplifier.simplify_guards();
+      if (cmdline.isset("dump-goto"))
+      {
+    	std::string goto_file=cmdline.get_value("dump-goto");
+        simplifier.write_goto_program(goto_file);
+      }
+      else
+      {
+    	const bool h=false;//cmdline.isset("use-system-headers");
+    	std::string c_file=cmdline.get_value("dump-c");
+    	simplifier.write_c_program(c_file,h);
+      }
+      return true;
+    }
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      namespacet ns(goto_model.symbol_table);
+      // check whether we should simplify the goto-program before showing it
+      if (cmdline.isset("simplify"))
+      {
+        static_simplifiert simplifier(goto_model, options, get_message_handler(), cp, ia);
+      	simplifier.simplify_guards();
+      }
+      else if (cmdline.isset("verify"))
+      {
+        static_verifiert verifier(goto_model, options, get_message_handler(), cp, ia);
+        verifier();
+      }
 
+      namespacet ns(goto_model.symbol_table);
       goto_model.goto_functions.output(ns, std::cout);
+
       return true;
     }
 
@@ -526,17 +579,23 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
+    "Abstract domains:\n"
     "\n"
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
+    " --constant-propagation       propagate constants\n"
     "\n"
-    "Analysis options:\n"
+    "Results options:\n"
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
     "\n"
+    "Verification options:\n"
+	" --verify                     verify goto program\n"
+	" --simplify                   simplify goto program\n"
+    " --invariant                  generate invariant\n"
+	"\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
     " -D macro                     define preprocessor macro (C/C++)\n"
@@ -568,6 +627,8 @@ void goto_analyzer_parse_optionst::help()
     " --main-class class-name      set the name of the main class\n"
     "\n"
     "Program representations:\n"
+    " --dump-goto                  generate simplified goto binary\n"
+    " --dump-c                     generate simplified C program\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     " --show-goto-functions        show goto program\n"

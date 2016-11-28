@@ -157,7 +157,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
   {
     exprt product(operands.front());
     expr.swap(product);
-
+    expr.remove(ID_C_cformat);
     result = false;
   }
   else
@@ -531,6 +531,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   {
     exprt tmp(operands.front());
     expr.swap(tmp);
+    expr.remove(ID_C_cformat);
     return false;
   }
 

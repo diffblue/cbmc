@@ -6,63 +6,33 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <fstream>
+#include "static_verifier.h"
 
-#include <util/threeval.h>
-#include <util/json.h>
-#include <util/xml.h>
 
-#include <analyses/interval_domain.h>
-
-#include "static_analyzer.h"
-
-class static_analyzert:public messaget
-{
-public:
-  static_analyzert(
-    const goto_modelt &_goto_model,
-    const optionst &_options,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    goto_functions(_goto_model.goto_functions),
-    ns(_goto_model.symbol_table),
-    options(_options)
-  {
-  }
-  
-  bool operator()();
-
-protected:
-  const goto_functionst &goto_functions;
-  const namespacet ns;
-  const optionst &options;
-
-  // analyses
-  ait<interval_domaint> interval_analysis;
-
-  void plain_text_report();
-  void json_report(const std::string &);  
-  void xml_report(const std::string &);  
-  
-  tvt eval(goto_programt::const_targett);
-};
 
 /*******************************************************************\
 
-Function: static_analyzert::operator()
+Function: static_verifiertt::operator()
 
   Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
-bool static_analyzert::operator()()
+bool static_verifiert::operator()()
 {
-  status() << "performing interval analysis" << eom;
-  interval_analysis(goto_functions, ns);
+
+  if (constant_propagation)
+    propagate_constants();
+
+  if (intervals)
+  {
+    status() << "performing interval analysis" << eom;
+    interval_analysis(goto_functions, ns);
+  }
 
   if(!options.get_option("json").empty())
     json_report(options.get_option("json"));
@@ -73,48 +43,34 @@ bool static_analyzert::operator()()
 
   return false;
 }
-  
+
 /*******************************************************************\
 
-Function: static_analyzert::eval
+Function: static_verifiert::plain_text_report
 
   Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
-tvt static_analyzert::eval(goto_programt::const_targett t)
-{
-  exprt guard=t->guard;
-  interval_domaint d=interval_analysis[t];
-  d.assume(not_exprt(guard), ns);
-  if(d.is_bottom()) return tvt(true);
-  return tvt::unknown();          
-}
-
-/*******************************************************************\
-
-Function: static_analyzert::plain_text_report
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void static_analyzert::plain_text_report()
+void static_verifiert::plain_text_report()
 {
   unsigned pass=0, fail=0, unknown=0;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
+
+	if(f_it->first=="pthread_create")
+	{
+	  error() << "we do not support C/Pthreads yet" << eom;
+	  throw 0;
+	}
+
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
@@ -123,9 +79,9 @@ void static_analyzert::plain_text_report()
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
-      
+
       result() << '[' << i_it->source_location.get_property_id()
                << ']' << ' ';
 
@@ -151,38 +107,38 @@ void static_analyzert::plain_text_report()
 
     status() << '\n';
   }
-  
+
   status() << "SUMMARY: " << pass << " pass, " << fail << " fail, "
            << unknown << " unknown\n";
 }
 
 /*******************************************************************\
 
-Function: static_analyzert::json_report
+Function: static_verifiert::json_report
 
   Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
-void static_analyzert::json_report(const std::string &file_name)
+void static_verifiert::json_report(const std::string &file_name)
 {
   json_arrayt json_result;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
 
       json_objectt &j=json_result.push_back().make_object();
@@ -191,11 +147,11 @@ void static_analyzert::json_report(const std::string &file_name)
         j["status"]=json_stringt("SUCCESS");
       else if(r.is_false())
         j["status"]=json_stringt("FAILURE");
-      else 
+      else
         j["status"]=json_stringt("UNKNOWN");
 
       j["file"]=json_stringt(id2string(i_it->source_location.get_file()));
-      j["line"]=json_numbert(id2string(i_it->source_location.get_line()));      
+      j["line"]=json_numbert(id2string(i_it->source_location.get_line()));
       j["description"]=json_stringt(id2string(
         i_it->source_location.get_comment()));
     }
@@ -208,38 +164,38 @@ void static_analyzert::json_report(const std::string &file_name)
             << file_name << "'" << eom;
     return;
   }
-  
+
   status() << "Writing report to `" << file_name << "'" << eom;
   out << json_result;
 }
 
 /*******************************************************************\
 
-Function: static_analyzert::xml_report
+Function: static_verifiert::xml_report
 
   Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
-void static_analyzert::xml_report(const std::string &file_name)
+void static_verifiert::xml_report(const std::string &file_name)
 {
   xmlt xml_result;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
 
       xmlt &x=xml_result.new_element("result");
@@ -248,11 +204,11 @@ void static_analyzert::xml_report(const std::string &file_name)
         x.set_attribute("status", "SUCCESS");
       else if(r.is_false())
         x.set_attribute("status", "FAILURE");
-      else 
+      else
         x.set_attribute("status", "UNKNOWN");
 
       x.set_attribute("file", id2string(i_it->source_location.get_file()));
-      x.set_attribute("line", id2string(i_it->source_location.get_line()));      
+      x.set_attribute("line", id2string(i_it->source_location.get_line()));
       x.set_attribute("description", id2string(i_it->source_location.get_comment()));
     }
   }
@@ -264,49 +220,7 @@ void static_analyzert::xml_report(const std::string &file_name)
             << file_name << "'" << eom;
     return;
   }
-  
+
   status() << "Writing report to `" << file_name << "'" << eom;
   out << xml_result;
-}
-
-/*******************************************************************\
-
-Function: static_analyzer
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-bool static_analyzer(
-  const goto_modelt &goto_model,
-  const optionst &options,
-  message_handlert &message_handler)
-{
-  return static_analyzert(
-    goto_model, options, message_handler)();
-}
-
-/*******************************************************************\
-
-Function: show_intervals
-
-  Inputs:
-
- Outputs:
-
- Purpose: 
-
-\*******************************************************************/
-
-void show_intervals(
-  const goto_modelt &goto_model,
-  std::ostream &out)
-{
-  ait<interval_domaint> interval_analysis;
-  interval_analysis(goto_model);
-  interval_analysis.output(goto_model, out);
 }

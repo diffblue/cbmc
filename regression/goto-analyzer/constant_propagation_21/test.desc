@@ -1,0 +1,9 @@
+CORE
+test.c
+account.c --constant-propagation --simplify
+^EXIT=0$
+^SIGNAL=0$
+^\SIMPLIFIED:  assert: 1, assume: 0, goto: 5$
+^\UNKNOWN:     assert: 0, assume: 2, goto: 9$
+--
+^warning: ignoring

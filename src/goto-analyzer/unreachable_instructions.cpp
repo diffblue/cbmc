@@ -8,6 +8,12 @@ Date: April 2016
 
 \*******************************************************************/
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <sstream>
 
 #include <util/json.h>

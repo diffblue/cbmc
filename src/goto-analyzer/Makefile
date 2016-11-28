@@ -1,6 +1,7 @@
 SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
-      taint_parser.cpp taint_analysis.cpp static_analyzer.cpp \
-      unreachable_instructions.cpp
+      taint_parser.cpp taint_analysis.cpp static_verifier.cpp \
+      static_simplifier.cpp unreachable_instructions.cpp \
+      ai_analysis.cpp static_analyser.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
@@ -12,6 +13,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
+      ../goto-instrument/dump_c$(OBJEXT) \
+      ../goto-instrument/goto_program2code$(OBJEXT) \
       ../util/util$(LIBEXT)
 
 INCLUDES= -I ..
