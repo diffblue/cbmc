@@ -22,4 +22,4 @@ install:
   - cd src && make minisat2-download
 
 script:
-  - make CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && cd ../regression && make test
+  - make CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && cd ../regression && make test && cd .. && echo -e "\n\n***** CPP-LINT *****" && python scripts/cpplint.py `git diff --name-only master HEAD`
