@@ -151,4 +151,3 @@ void parameter_assignments(goto_modelt &goto_model)
   parameter_assignmentst rr(goto_model.symbol_table);
   rr(goto_model.goto_functions);
 }
-

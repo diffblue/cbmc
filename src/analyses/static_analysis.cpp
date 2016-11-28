@@ -718,4 +718,3 @@ void static_analysis_baset::concurrent_fixedpoint(
     }
   }
 }
-

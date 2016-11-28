@@ -58,4 +58,3 @@ inline int setjmp(jmp_buf env)
   (void)env;
   return retval;
 }
-

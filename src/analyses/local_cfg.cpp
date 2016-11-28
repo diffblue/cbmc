@@ -93,4 +93,3 @@ void local_cfgt::build(const goto_programt &goto_program)
     }
   }
 }
-

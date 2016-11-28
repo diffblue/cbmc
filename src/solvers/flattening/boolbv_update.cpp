@@ -210,4 +210,3 @@ void boolbvt::convert_update_rec(
   else
     throw "update: unexpected designator";
 }
-

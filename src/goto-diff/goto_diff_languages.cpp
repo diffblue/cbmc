@@ -46,4 +46,3 @@ void goto_diff_languagest::register_languages()
   register_language(new_java_bytecode_language);
   #endif
 }
-

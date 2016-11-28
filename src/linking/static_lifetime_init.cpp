@@ -174,4 +174,3 @@ bool static_lifetime_init(
 
   return false;
 }
-

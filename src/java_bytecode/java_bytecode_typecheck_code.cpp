@@ -77,4 +77,3 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
       typecheck_expr(*a_it);
   }
 }
-

@@ -181,4 +181,3 @@ void taint_parse_treet::output(std::ostream &out) const
   for(const auto & rule : rules)
     rule.output(out);
 }
-

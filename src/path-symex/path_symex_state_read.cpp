@@ -706,4 +706,3 @@ exprt path_symex_statet::instantiate_rec_address(
     throw "address of unexpected `"+src.id_string()+"'";
   }
 }
-

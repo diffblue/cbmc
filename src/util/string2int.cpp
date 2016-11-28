@@ -263,4 +263,3 @@ unsigned long long int unsafe_string2unsignedlonglong(const std::string &str, in
 {
   return str2number<unsigned long long int>(str.c_str(), base, false);
 }
-

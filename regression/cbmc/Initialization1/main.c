@@ -8,4 +8,3 @@ int main()
 
   int i=(long int)&i;
 }
-

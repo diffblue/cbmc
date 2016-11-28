@@ -17,4 +17,3 @@ main()
 
   assert(matrix[0]<max);
 }
-

@@ -196,4 +196,3 @@ void prop_minimizet::operator()()
     prop_conv.dec_solve();
   }
 }
-

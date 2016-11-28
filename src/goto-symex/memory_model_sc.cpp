@@ -425,4 +425,3 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
     }
   }
 }
-

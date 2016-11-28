@@ -176,4 +176,3 @@ void jsont::swap(jsont &other)
   other.object.swap(object);
   other.value.swap(value);
 }
-

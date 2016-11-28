@@ -10,4 +10,3 @@ int main(int argc, char* argv[])
   assert(((A&)c2).f() == ((B&)c2).f());
   return 0;
 }
-

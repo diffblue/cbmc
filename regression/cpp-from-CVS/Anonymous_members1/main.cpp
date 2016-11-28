@@ -24,4 +24,3 @@ int main()
   l.u.LowPart=3;
   assert(l.LowPart==3);
 }
-

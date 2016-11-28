@@ -51,4 +51,3 @@ void java_root_class(symbolt &class_symbol)
     components.insert(components.begin(), component);
   }
 }
-

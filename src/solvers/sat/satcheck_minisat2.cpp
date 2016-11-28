@@ -463,4 +463,3 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 
   return solver->isEliminated(a.var_no());
 }
-

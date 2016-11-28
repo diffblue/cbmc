@@ -439,4 +439,3 @@ void cycles_visitort::com_constraint(
   }
 #endif
 }
-

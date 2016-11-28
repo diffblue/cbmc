@@ -119,4 +119,3 @@ void message_clientt::set_message_handler(
 {
   message_handler=&_message_handler;
 }
-

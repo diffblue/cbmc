@@ -92,4 +92,3 @@ void is_threadedt::compute(const goto_functionst &goto_functions)
         is_threaded_set.insert(i_it);
   }
 }
-

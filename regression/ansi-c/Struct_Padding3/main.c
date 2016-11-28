@@ -115,4 +115,3 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3)==28);
 int main()
 {
 }
-

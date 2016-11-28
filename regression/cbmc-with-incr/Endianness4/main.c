@@ -9,4 +9,3 @@ void main()
   // should work with any endianness
   assert(x==0);
 }
-

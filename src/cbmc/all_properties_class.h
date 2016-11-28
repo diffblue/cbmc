@@ -99,4 +99,3 @@ protected:
   virtual void report(const cover_goalst &cover_goals);
   virtual void do_before_solving() {}
 };
-

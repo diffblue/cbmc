@@ -16,4 +16,3 @@ int main()
   dll_create_generic(dll_insert_master);
   return 0;
 }
-

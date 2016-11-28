@@ -22,4 +22,3 @@ __CPROVER_ASYNC_1:
 
   return 0;
 }
-

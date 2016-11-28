@@ -1129,4 +1129,3 @@ symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
 
   return ret;
 }
-

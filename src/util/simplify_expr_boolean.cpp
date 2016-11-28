@@ -272,4 +272,3 @@ bool simplify_exprt::simplify_not(exprt &expr)
 
   return true;
 }
-

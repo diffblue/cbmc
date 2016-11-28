@@ -2400,4 +2400,3 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
   }
 }
-

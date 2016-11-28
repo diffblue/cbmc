@@ -163,4 +163,3 @@ void get_objects_r_lhs(const exprt &lhs, object_id_sett &dest)
 {
   get_objects_rec(LHS_R, lhs, dest, "");
 }
-

@@ -793,4 +793,3 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
 
   return res;
 }
-

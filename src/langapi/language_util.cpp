@@ -205,4 +205,3 @@ std::string type_to_name(const typet &type)
   symbol_tablet symbol_table;
   return type_to_name(namespacet(symbol_table), "", type);
 }
-

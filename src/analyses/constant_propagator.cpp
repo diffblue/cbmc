@@ -608,4 +608,3 @@ void constant_propagator_ait::replace_types_rec(
   Forall_operands(it, expr)
     replace_types_rec(replace_const, *it);
 }
-

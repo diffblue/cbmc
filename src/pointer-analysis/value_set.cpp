@@ -1915,4 +1915,3 @@ exprt value_sett::make_member(
 
   return member_expr;
 }
-

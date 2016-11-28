@@ -540,4 +540,3 @@ void local_may_aliast::output(
     l++;
   }
 }
-

@@ -126,4 +126,3 @@ void adjust_float_expressions(
     }
   }
 }
-

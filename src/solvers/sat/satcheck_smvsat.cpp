@@ -358,4 +358,3 @@ void satcheck_smvsat_interpolatort::build_aig(
       e.make_not();
   }
 }
-

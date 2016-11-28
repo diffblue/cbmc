@@ -207,4 +207,3 @@ propt::resultt satcheck_limmatt::prop_solve()
 
   return P_ERROR;
 }
-

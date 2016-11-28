@@ -96,4 +96,3 @@ std::string time_periodt::as_string() const
   out << *this;
   return out.str();
 }
-

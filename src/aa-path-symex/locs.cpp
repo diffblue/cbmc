@@ -138,4 +138,3 @@ void locst::output(std::ostream &out) const
   out << "\n";
   out << "The entry location is L" << entry_loc << ".\n";
 }
-

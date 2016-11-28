@@ -160,4 +160,3 @@ codet cpp_typecheckt::cpp_destructor(
 
   return new_code;
 }
-

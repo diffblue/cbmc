@@ -1440,4 +1440,3 @@ void shared_bufferst::cfg_visitort::weak_memory(
     }
   }
 }
-

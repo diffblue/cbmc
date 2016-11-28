@@ -236,4 +236,3 @@ void satcheck_picosatt::set_assumptions(const bvt &bv)
   forall_literals(it, assumptions)
     assert(!it->is_constant());
 }
-

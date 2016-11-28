@@ -598,4 +598,3 @@ bool event_grapht::graph_explorert::backtrack(
 
   return f;
 }
-

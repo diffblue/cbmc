@@ -1806,4 +1806,3 @@ bvt float_utilst::debug2(
 {
   return op0;
 }
-

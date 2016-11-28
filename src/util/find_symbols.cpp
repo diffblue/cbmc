@@ -377,4 +377,3 @@ void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(F_BOTH, src, dest);
 }
-

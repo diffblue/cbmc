@@ -235,5 +235,3 @@ void cpp_typecheckt::add_base_components(
 
   }
 }
-
-

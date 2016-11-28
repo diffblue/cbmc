@@ -192,5 +192,3 @@ void ms_cl_modet::help_mode()
 {
   std::cout << "goto-cl understands the options of CL plus the following.\n\n";
 }
-
-

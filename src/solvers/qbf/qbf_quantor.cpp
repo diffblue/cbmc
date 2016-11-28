@@ -169,4 +169,3 @@ propt::resultt qbf_quantort::prop_solve()
 
   return P_ERROR;
 }
-

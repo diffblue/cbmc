@@ -84,4 +84,3 @@ void fence_pensieve(
   // update counters etc.
   goto_functions.update();
 }
-

@@ -412,5 +412,3 @@ void goto_convert(
     throw 0;
   }
 }
-
-

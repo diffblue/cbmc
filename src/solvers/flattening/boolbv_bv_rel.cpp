@@ -122,4 +122,3 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
 
   return SUB::convert_rest(expr);
 }
-

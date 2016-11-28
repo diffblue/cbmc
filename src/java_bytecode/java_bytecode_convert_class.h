@@ -20,4 +20,3 @@ bool java_bytecode_convert_class(
   message_handlert &message_handler);
 
 #endif
-

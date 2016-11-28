@@ -125,4 +125,3 @@ void goto_symext::symex_start_thread(statet &state)
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
   }
 }
-

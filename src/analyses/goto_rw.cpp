@@ -1128,4 +1128,3 @@ void goto_rw(const goto_functionst &goto_functions,
     goto_rw(body, rw_set);
   }
 }
-

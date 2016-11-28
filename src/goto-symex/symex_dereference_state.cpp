@@ -135,4 +135,3 @@ void symex_dereference_statet::get_value_set(
   std::cout << "**************************\n";
   #endif
 }
-

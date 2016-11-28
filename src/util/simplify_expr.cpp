@@ -2711,4 +2711,3 @@ exprt simplify_expr(const exprt &src, const namespacet &ns)
   simplify_exprt(ns).simplify(tmp);
   return tmp;
 }
-

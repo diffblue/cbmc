@@ -202,4 +202,3 @@ bool write_goto_binary(
 
   return write_goto_binary(out, symbol_table, goto_functions);
 }
-

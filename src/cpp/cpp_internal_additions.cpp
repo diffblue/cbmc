@@ -170,4 +170,3 @@ void cpp_internal_additions(std::ostream &out)
 
   out << std::flush;
 }
-

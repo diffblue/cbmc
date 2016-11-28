@@ -981,4 +981,3 @@ bool value_set_dereferencet::memory_model_bytes(
 
   return true;
 }
-

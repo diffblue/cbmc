@@ -66,4 +66,3 @@ void parsert::parse_error(
   print(1, tmp, -1, source_location);
   #endif
 }
-

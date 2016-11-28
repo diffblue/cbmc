@@ -230,4 +230,3 @@ void show_properties(
   else
     show_properties(ns, ui, goto_model.goto_functions);
 }
-

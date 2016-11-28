@@ -452,4 +452,3 @@ bool taint_analysis(
   return taint_analysis(
     taint_file_name, goto_model.symbol_table, goto_model.goto_functions, show_full, json_file_name);
 }
-

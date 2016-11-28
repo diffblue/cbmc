@@ -2038,4 +2038,3 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 #endif
   return true;
 }
-

@@ -394,4 +394,3 @@ void remove_asm(goto_modelt &goto_model)
 {
   remove_asmt(goto_model.symbol_table, goto_model.goto_functions)();
 }
-

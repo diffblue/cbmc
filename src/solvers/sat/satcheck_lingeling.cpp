@@ -257,4 +257,3 @@ bool satcheck_lingelingt::is_in_conflict(literalt a) const
   assert(!a.is_constant());
   return lglfailed(solver, a.dimacs())!=0;
 }
-

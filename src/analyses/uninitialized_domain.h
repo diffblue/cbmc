@@ -40,4 +40,3 @@ protected:
 
 typedef ait<uninitialized_domaint>
   uninitialized_analysist;
-

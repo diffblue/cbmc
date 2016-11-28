@@ -37,4 +37,3 @@ void show_natural_loops(const goto_functionst &goto_functions)
     std::cout << std::endl;
   }
 }
-

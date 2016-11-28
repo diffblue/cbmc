@@ -133,4 +133,3 @@ languaget *get_default_language()
   assert(!languages.empty());
   return languages.front().factory();
 }
-

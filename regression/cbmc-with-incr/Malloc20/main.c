@@ -49,5 +49,3 @@ int main(void)
   __CPROVER_assert(buffer.contents[1] == 'o', "buffer.contents[1] == 'o'");
   __CPROVER_assert(buffer.contents[2] == 'o', "buffer.contents[2] == 'o'");
 }
-
-

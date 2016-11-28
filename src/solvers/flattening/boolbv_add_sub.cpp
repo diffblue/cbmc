@@ -158,4 +158,3 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   return bv;
 }
-

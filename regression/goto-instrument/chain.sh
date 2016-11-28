@@ -10,4 +10,3 @@ NAME=${2%.c}
 
 $GC $NAME.c -o $NAME.gb
 $GI $OPTS $NAME.gb
-

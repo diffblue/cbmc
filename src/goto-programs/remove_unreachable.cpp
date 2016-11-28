@@ -60,4 +60,3 @@ void remove_unreachable(goto_programt &goto_program)
       it->make_skip();
   }
 }
-

@@ -100,5 +100,3 @@ bvt propt::new_variables(std::size_t width)
     result[i]=new_variable();
   return result;
 }
-
-

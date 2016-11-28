@@ -12,4 +12,3 @@ int main()
 
   assert((au.i == bu.i) == __CPROVER_equal(a, b));
 }
-

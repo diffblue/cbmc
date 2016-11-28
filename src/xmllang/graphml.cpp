@@ -491,4 +491,3 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
 
   return !os.good();
 }
-

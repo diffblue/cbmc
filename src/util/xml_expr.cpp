@@ -317,4 +317,3 @@ xmlt xml(
 
   return result;
 }
-

@@ -32,4 +32,3 @@ __CPROVER_size_t _beginthreadex(
   __CPROVER_size_t handle;
   return handle;
 }
-

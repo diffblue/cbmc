@@ -60,4 +60,3 @@ int main()
   assert(arrayTmp[7]==1);
   #endif
 }
- 

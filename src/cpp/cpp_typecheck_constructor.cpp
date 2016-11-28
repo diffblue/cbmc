@@ -1117,4 +1117,3 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
 
   return false;
 }
-

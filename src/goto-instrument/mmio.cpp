@@ -184,4 +184,3 @@ void mmio(
 
   goto_functions.update();
 }
-

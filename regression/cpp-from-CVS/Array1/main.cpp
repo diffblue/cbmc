@@ -8,4 +8,3 @@ int main()
         for(int l=0; l<2; l++)
           y[i][j][k][l]=2;
 }
-

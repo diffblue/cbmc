@@ -10,4 +10,3 @@ int main()
   __CPROVER_assume(x==1);
   assert(x==1); // passes
 }
-

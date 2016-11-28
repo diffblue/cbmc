@@ -453,4 +453,3 @@ bool read_object_and_link(
     goto_model.goto_functions,
     message_handler);
 }
-

@@ -906,4 +906,3 @@ void c_typecheck_baset::typecheck_declaration(
     }
   }
 }
-

@@ -469,4 +469,3 @@ done
 rm -f goto-magic
 
 print-progress
-

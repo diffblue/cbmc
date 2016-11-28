@@ -215,4 +215,3 @@ decision_proceduret::resultt dplib_dect::read_dplib_result()
 
   return D_ERROR;
 }
-

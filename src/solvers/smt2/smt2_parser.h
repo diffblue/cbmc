@@ -43,4 +43,3 @@ private:
   void get_string_literal();
   bool is_simple_symbol_character(char ch);
 };
-

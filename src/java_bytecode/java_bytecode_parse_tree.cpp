@@ -292,4 +292,3 @@ void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
 
   out << '\n';
 }
-

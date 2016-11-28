@@ -261,4 +261,3 @@ void make_assertions_false(
     }
   }
 }
-

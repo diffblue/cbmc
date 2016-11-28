@@ -789,4 +789,3 @@ bool path_symex_statet::check_assertion(
 
   return true; // not really reachable
 }
-

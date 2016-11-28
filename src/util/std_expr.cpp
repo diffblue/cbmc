@@ -268,4 +268,3 @@ extractbits_exprt::extractbits_exprt(
   upper()=constant_exprt::integer_constant(_upper);
   lower()=constant_exprt::integer_constant(_lower);
 }
-

@@ -73,4 +73,3 @@ int main()
   test_try_catch1();
   test_try_catch2();
 }
-

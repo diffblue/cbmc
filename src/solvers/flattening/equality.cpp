@@ -186,4 +186,3 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
     prop.set_equal(bv_utils.equal(bv1, bv2), it->second);
   }
 }
-

@@ -210,4 +210,3 @@ std::string cpp_expr2name(const exprt &expr)
   irep2name(expr, tmp);
   return tmp;
 }
-

@@ -749,4 +749,3 @@ void gcc_modet::help_mode()
   else
     std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
 }
-

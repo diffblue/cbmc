@@ -329,4 +329,3 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
 
   return false;
 }
-

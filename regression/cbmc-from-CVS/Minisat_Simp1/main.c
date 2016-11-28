@@ -10,4 +10,3 @@ int main()
   dabs=(my_d<0)?-my_d:my_d;
   assert(fabs(my_d)==dabs);
 }
-

@@ -235,4 +235,3 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
   return true;
 }
-

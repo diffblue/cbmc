@@ -205,4 +205,3 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
   return block;
 }
-

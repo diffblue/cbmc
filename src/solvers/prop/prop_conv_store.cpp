@@ -154,4 +154,3 @@ void prop_conv_storet::constraintt::print(std::ostream &out) const
     assert(false);
   }
 }
-

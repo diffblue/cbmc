@@ -504,4 +504,3 @@ mp_integer boolbvt::get_value(
 
   return value;
 }
-  

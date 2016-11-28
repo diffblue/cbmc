@@ -58,4 +58,3 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
 
   return SUB::convert_rest(expr);
 }
-

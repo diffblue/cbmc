@@ -84,4 +84,3 @@ void xml_interfacet::get_xml_options(
     }
   }
 }
-

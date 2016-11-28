@@ -331,4 +331,3 @@ void build_goto_trace(
       break;
     }
 }
-

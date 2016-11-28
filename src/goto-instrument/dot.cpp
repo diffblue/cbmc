@@ -439,4 +439,3 @@ void dot(
   dott dot(src, ns);
   dot.output(out);
 }
-

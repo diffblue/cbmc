@@ -358,4 +358,3 @@ void boolbvt::convert_with_union(
       next_bv[map_u.map_bit(i)]=op2_bv[map_op2.map_bit(i)];
   }
 }
-

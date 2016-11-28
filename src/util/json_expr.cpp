@@ -321,4 +321,3 @@ json_objectt json(
 
   return result;
 }
-

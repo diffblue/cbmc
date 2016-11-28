@@ -202,4 +202,3 @@ void function_exit(
     }
   }
 }
-

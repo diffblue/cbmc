@@ -106,6 +106,3 @@ void show_goto_functions(
   const namespacet ns(goto_model.symbol_table);
   show_goto_functions(ns, ui, goto_model.goto_functions);
 }
-
-
-

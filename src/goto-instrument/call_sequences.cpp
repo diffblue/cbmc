@@ -356,4 +356,3 @@ void check_call_sequence(const goto_functionst &goto_functions)
 
   check_call_sequencet(goto_functions, sequence)();
 }
-

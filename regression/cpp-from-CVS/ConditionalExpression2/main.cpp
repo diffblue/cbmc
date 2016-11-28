@@ -7,5 +7,3 @@ int main()
 	assert(*c == a[0]);
 	return 0;
 }
-
-

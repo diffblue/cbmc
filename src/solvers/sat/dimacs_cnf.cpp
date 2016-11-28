@@ -151,4 +151,3 @@ void dimacs_cnf_dumpt::lcnf(const bvt &bv)
 {
   write_dimacs_clause(bv, out, true);
 }
-

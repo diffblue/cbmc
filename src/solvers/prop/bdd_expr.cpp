@@ -187,4 +187,3 @@ exprt bdd_exprt::as_expr() const
 
   return as_expr(root);
 }
-

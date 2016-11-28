@@ -51,4 +51,3 @@ protected:
     const exprt &expr,
     const symbolt *&symbol);
 };
-

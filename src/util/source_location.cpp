@@ -71,4 +71,3 @@ std::ostream &operator << (
 
   return out;
 }
-

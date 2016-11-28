@@ -567,4 +567,3 @@ void propagate_const_function_pointers(
   propagation.propagate();
   goto_functions.update();
 }
-

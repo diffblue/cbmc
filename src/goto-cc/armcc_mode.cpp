@@ -211,5 +211,3 @@ void armcc_modet::help_mode()
 {
   std::cout << "goto-armcc understands the options of armcc plus the following.\n\n";
 }
-
-

@@ -101,4 +101,3 @@ void nondet_static(
   // update counters etc.
   goto_functions.update();
 }
-

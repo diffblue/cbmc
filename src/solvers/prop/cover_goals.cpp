@@ -160,4 +160,3 @@ decision_proceduret::resultt cover_goalst::operator()()
 
   return decision_proceduret::D_SATISFIABLE;
 }
-

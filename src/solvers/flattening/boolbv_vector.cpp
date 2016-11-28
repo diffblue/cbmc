@@ -55,4 +55,3 @@ bvt boolbvt::convert_vector(const exprt &expr)
 
   return conversion_failed(expr);
 }
-

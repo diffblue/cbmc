@@ -421,4 +421,3 @@ xml_goto_program_convertt::find_instruction( const xmlt &xml,
   }
   return instructions.end();
 }
-

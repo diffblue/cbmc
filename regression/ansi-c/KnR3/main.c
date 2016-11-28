@@ -29,4 +29,3 @@ int main()
 {
   return whois_func_head(0)==0;
 }
-

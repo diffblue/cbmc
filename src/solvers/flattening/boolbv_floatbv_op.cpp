@@ -186,4 +186,3 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
   else
     return conversion_failed(expr);
 }
-

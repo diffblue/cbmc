@@ -54,4 +54,3 @@ void cbmc_parse_optionst::register_languages()
   register_language(new_jsil_language);
   #endif
 }
-

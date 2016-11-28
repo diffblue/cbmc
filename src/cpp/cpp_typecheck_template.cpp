@@ -1236,4 +1236,3 @@ void cpp_typecheckt::convert_template_declaration(
     return;
   }
 }
-

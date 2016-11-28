@@ -17,4 +17,3 @@ int main()
   assert(global!=3); // safe  // #4
   global=3;                   // #5
 }
-

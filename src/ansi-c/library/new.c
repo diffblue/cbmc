@@ -118,4 +118,3 @@ inline void __delete_array(void *ptr)
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }
-

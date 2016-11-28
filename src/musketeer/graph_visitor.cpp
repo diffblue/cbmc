@@ -522,4 +522,3 @@ void const_graph_visitort::CT_not_powr(const edget& edge,
       graph_explore_BC(egraph, next_it->first, new_path, edges, true);
     }
 }
-

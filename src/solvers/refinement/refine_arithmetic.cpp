@@ -676,4 +676,3 @@ std::string bv_refinementt::approximationt::as_string() const
   return i2string(id_nr)+"/"+id2string(expr.id());
   #endif
 }
-

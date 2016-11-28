@@ -329,4 +329,3 @@ void ld_modet::help_mode()
 {
   std::cout << "goto-ld understands the options of ld plus the following.\n\n";
 }
-

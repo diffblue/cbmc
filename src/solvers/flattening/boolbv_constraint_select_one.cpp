@@ -80,4 +80,3 @@ bvt boolbvt::convert_constraint_select_one(const exprt &expr)
 
   return bv;
 }
-

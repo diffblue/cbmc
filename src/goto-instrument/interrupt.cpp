@@ -271,4 +271,3 @@ void interrupt(
 
   goto_functions.update();
 }
-

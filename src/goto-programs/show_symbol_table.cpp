@@ -143,4 +143,3 @@ void show_symbol_table(
     break;
   }
 }
-

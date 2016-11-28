@@ -242,4 +242,3 @@ exprt object_factory(
   else
     return side_effect_expr_nondett(type);
 }
-

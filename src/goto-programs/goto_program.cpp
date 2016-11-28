@@ -575,4 +575,3 @@ std::string as_string(
 
   return "";
 }
-

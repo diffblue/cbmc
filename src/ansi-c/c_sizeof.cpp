@@ -369,4 +369,3 @@ exprt c_offsetof(
   simplify(tmp, ns);
   return tmp;
 }
-

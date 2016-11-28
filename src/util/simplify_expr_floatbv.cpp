@@ -462,4 +462,3 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 
   return true;
 }
-

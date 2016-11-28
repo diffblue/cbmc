@@ -977,4 +977,3 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
 
   return result;
 }
-

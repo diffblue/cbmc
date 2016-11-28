@@ -93,4 +93,3 @@ absolute_timet current_time();
 std::ostream &operator << (std::ostream &, const time_periodt &);
 
 #endif
-

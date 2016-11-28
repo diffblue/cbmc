@@ -296,4 +296,3 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   return res;
 }
-

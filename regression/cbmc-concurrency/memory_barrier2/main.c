@@ -35,4 +35,3 @@ int main()
   __CPROVER_ASYNC_1: thr1(0);
   thr2(0);
 }
-

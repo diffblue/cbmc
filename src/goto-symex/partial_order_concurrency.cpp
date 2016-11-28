@@ -368,4 +368,3 @@ void partial_order_concurrencyt::add_constraint(
 
   equation.constraint(tmp, msg, source);
 }
-

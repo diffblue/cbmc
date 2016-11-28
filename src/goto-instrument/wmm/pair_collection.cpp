@@ -102,4 +102,3 @@ bool event_grapht::graph_pensieve_explorert::find_second_event(
 
   return false;
 }
-

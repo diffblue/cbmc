@@ -182,4 +182,3 @@ void remove_internal_symbols(
     }
   }
 }
-

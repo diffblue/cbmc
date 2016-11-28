@@ -1081,4 +1081,3 @@ std::ostream &operator<<(
   step.output(ns, out);
   return out;
 }
-

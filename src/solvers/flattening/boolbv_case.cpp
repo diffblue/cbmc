@@ -109,4 +109,3 @@ bvt boolbvt::convert_case(const exprt &expr)
 
   return bv;
 }
-

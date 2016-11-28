@@ -86,4 +86,3 @@ void irep_hash_container_baset::pack(
     }
   }
 }
-

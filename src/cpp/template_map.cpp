@@ -383,4 +383,3 @@ cpp_template_args_tct template_mapt::build_template_args(
 
   return template_args;
 }
-

@@ -507,4 +507,3 @@ Function: slicing_criteriont::~slicing_criteriont
 slicing_criteriont::~slicing_criteriont()
 {
 }
-

@@ -558,4 +558,3 @@ void goto_symext::return_assignment(statet &state)
       throw "return with unexpected value";
   }
 }
-

@@ -3251,4 +3251,3 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
   c_typecheck_baset::typecheck_expr_rel(expr);
 }
-

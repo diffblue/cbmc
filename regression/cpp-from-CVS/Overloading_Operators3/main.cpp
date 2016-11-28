@@ -4,4 +4,3 @@ int operator[](int *p, int i);
 int main()
 {
 }
-

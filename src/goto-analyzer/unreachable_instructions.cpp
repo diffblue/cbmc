@@ -213,4 +213,3 @@ void unreachable_instructions(
   if(json && !json_result.array.empty())
     os << json_result << std::endl;
 }
-

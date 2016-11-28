@@ -29,5 +29,3 @@ int main()
   std::cout << "return value: " << result << "\n\n";
   std::cout << json << "\n";
 }
-
-

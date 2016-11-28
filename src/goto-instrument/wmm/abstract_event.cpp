@@ -136,4 +136,3 @@ bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
   /* unknown memory model */
   return true;
 }
-

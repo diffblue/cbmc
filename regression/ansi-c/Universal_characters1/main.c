@@ -15,4 +15,3 @@ int main()
   identifier_ȁ_=10;
   ȁ_abc=10;
 }
-

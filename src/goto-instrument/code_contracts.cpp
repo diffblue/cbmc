@@ -489,4 +489,3 @@ void code_contracts(
 {
   code_contractst(symbol_table, goto_functions)();
 }
-

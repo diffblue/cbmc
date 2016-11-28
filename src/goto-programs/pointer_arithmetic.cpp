@@ -135,4 +135,3 @@ void pointer_arithmetict::make_pointer(const exprt &src)
   else
     add_to_offset(src);
 }
-

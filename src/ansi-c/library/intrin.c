@@ -342,4 +342,3 @@ inline char _InterlockedCompareExchange8(char volatile *p, char v1, char v2)
   __CPROVER_atomic_end();
   return old;
 }
-

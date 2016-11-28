@@ -216,4 +216,3 @@ void satcheck_precosatt::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 */
-

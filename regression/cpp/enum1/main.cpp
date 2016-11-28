@@ -27,4 +27,3 @@ int main()
 namespace whereever { enum some_tag { something }; }
 
 enum whereever::some_tag whatnot = whereever::something;
-

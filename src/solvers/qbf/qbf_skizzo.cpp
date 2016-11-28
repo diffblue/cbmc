@@ -175,4 +175,3 @@ propt::resultt qbf_skizzot::prop_solve()
 
   return P_ERROR;
 }
-

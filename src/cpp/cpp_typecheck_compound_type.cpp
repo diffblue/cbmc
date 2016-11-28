@@ -1926,4 +1926,3 @@ void cpp_typecheckt::make_ptr_typecast(
 
   expr.make_typecast(dest_type);
 }
-

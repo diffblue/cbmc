@@ -136,4 +136,3 @@ const symbolt &get_module(
 
   return symbol;
 }
-

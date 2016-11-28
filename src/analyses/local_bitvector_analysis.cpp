@@ -428,4 +428,3 @@ void local_bitvector_analysist::output(
     l++;
   }
 }
-

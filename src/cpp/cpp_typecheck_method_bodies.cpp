@@ -50,4 +50,3 @@ void cpp_typecheckt::typecheck_method_bodies(
 
   old_instantiation_stack.swap(instantiation_stack);
 }
-

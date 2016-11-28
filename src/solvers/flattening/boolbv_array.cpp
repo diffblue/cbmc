@@ -53,4 +53,3 @@ bvt boolbvt::convert_array(const exprt &expr)
 
   return conversion_failed(expr);
 }
-

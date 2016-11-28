@@ -219,4 +219,3 @@ void symex_parse_optionst::report_cover(
       std::cout << t << '\n';
   }
 }
-

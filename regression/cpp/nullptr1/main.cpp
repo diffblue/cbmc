@@ -24,5 +24,3 @@ int main()
 
   something(nullptr);
 }
-
-

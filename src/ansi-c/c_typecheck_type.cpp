@@ -1640,4 +1640,3 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
     type=signed_int_type(); // the default is integer!
   }
 }
-

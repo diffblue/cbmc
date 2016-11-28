@@ -189,4 +189,3 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
     }
   }
 }
-

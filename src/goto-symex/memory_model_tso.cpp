@@ -208,4 +208,3 @@ void memory_model_tsot::program_order(
     }
   }
 }
-

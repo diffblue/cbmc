@@ -450,4 +450,3 @@ bool satcheck_glucose_simplifiert::is_eliminated(literalt a) const
 
   return solver->isEliminated(a.var_no());
 }
-

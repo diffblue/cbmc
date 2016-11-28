@@ -1798,4 +1798,3 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 
   return result;
 }
-

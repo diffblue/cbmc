@@ -21,4 +21,3 @@ void java_bytecode_convert_method(
   message_handlert &message_handler);
 
 #endif
-

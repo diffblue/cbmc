@@ -207,4 +207,3 @@ void boolbv_mapt::set_literals(
     mb.l=literal;
   }
 }
-

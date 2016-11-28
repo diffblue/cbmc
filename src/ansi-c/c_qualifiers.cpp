@@ -185,4 +185,3 @@ std::ostream &operator << (
 {
   return out << c_qualifiers.as_string();
 }
-

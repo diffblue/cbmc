@@ -313,4 +313,3 @@ void guardt::make_false()
   guard_list.back()=false_exprt();
 }
 #endif
-

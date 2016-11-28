@@ -734,4 +734,3 @@ inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 
   return result;
 }
-

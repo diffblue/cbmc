@@ -227,4 +227,3 @@ void data_dpt::print(messaget& message)
   }
 #endif
 }
-

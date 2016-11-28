@@ -225,4 +225,3 @@ symbol_exprt symbolt::symbol_expr() const
 {
   return symbol_exprt(name, type);
 }
-

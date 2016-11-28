@@ -460,4 +460,3 @@ void restore_returns(
   remove_returnst rr(symbol_table);
   rr.restore(goto_functions);
 }
-

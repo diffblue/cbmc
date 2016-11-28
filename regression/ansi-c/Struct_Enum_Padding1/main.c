@@ -27,4 +27,3 @@ STATIC_ASSERT(sizeof(struct ofpact) == 4);
 int main()
 {
 }
-

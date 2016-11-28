@@ -1818,4 +1818,3 @@ void ieee_floatt::next_representable(bool greater)
   //new_exp -= spec.f;
   //build(new_frac, new_exp);
 }
-

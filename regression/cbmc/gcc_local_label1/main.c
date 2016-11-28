@@ -28,4 +28,3 @@ int main()
 {
   other_f();
 }
-

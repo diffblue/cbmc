@@ -834,4 +834,3 @@ void goto_convertt::remove_side_effect(
     throw 0;
   }
 }
-

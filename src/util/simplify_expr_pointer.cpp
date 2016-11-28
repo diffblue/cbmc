@@ -813,4 +813,3 @@ bool simplify_exprt::simplify_good_pointer(exprt &expr)
 
   return false;
 }
-

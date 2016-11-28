@@ -320,4 +320,3 @@ void ui_message_handlert::json_ui_msg(
   //  a trailing comma.
   std::cout << ",\n" << result;
 }
-

@@ -237,4 +237,3 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
   return result;
 }
-

@@ -67,4 +67,3 @@ bool memory_model_psot::program_order_is_relaxed(
   // only read/read and read/write are maintained
   return is_shared_write(e1);
 }
-

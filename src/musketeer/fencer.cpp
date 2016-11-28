@@ -191,4 +191,3 @@ void fence_weak_memory(
   instrumenter.print_map_function_graph();
 #endif
 }
-

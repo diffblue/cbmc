@@ -1301,4 +1301,3 @@ typet fence_insertert::type_component(std::list<std::string>::const_iterator it,
 
   assert(0);
 }
-

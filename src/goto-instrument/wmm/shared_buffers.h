@@ -261,4 +261,3 @@ protected:
 
   void add_initialization(goto_programt &goto_program);
 };
-

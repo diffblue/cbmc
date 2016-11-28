@@ -464,4 +464,3 @@ void document_properties_latex(
 {
   document_propertiest(goto_functions, out).latex();
 }
-

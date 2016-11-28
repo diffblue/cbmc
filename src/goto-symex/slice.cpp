@@ -392,4 +392,3 @@ void simple_slice(symex_target_equationt &equation)
         s_it++)
       s_it->ignore=true;
 }
-

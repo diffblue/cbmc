@@ -392,4 +392,3 @@ long random(void)
   __CPROVER_assume(result>=0 && result<=2147483647);
   return result;
 }
-

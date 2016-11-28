@@ -161,4 +161,3 @@ bool string_constantt::from_array_expr(const array_exprt &src)
 
   return false;
 }
-

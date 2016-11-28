@@ -200,4 +200,3 @@ void cw_modet::help_mode()
 {
   std::cout << "goto-cw understands the options of gcc (mwcc mode) plus the following.\n\n";
 }
-

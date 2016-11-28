@@ -296,4 +296,3 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
 
   return false;
 }
-

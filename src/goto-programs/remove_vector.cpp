@@ -256,4 +256,3 @@ void remove_vector(goto_modelt &goto_model)
 {
   remove_vector(goto_model.symbol_table, goto_model.goto_functions);
 }
-

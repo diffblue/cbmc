@@ -16,5 +16,3 @@ int main()
 
    assert( n < 11 );
 }
-
-

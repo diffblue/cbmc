@@ -115,4 +115,3 @@ bvt boolbvt::convert_complex_imag(const exprt &expr)
 
   return bv;
 }
-

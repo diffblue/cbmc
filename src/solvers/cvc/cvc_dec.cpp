@@ -216,4 +216,3 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
 
   return D_ERROR;
 }
-

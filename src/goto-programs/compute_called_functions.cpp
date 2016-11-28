@@ -182,4 +182,3 @@ void compute_called_functions(
 {
   compute_called_functions(goto_model.goto_functions, functions);
 }
-

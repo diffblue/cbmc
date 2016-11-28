@@ -596,4 +596,3 @@ void ai_baset::concurrent_fixedpoint(
     }
   }
 }
-

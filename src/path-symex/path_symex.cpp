@@ -1152,4 +1152,3 @@ void path_symex_assert_fail(path_symex_statet &state)
   path_symext path_symex;
   path_symex.do_assert_fail(state);
 }
-
