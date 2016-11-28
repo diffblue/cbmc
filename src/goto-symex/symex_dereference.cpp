@@ -295,7 +295,8 @@ void goto_symext::dereference_rec(
       ns,
       new_symbol_table,
       options,
-      symex_dereference_state);      
+      symex_dereference_state,
+      mode);      
     
     // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
     exprt tmp2=dereference.dereference(
