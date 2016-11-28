@@ -1,0 +1,8 @@
+CORE
+minim.class
+--function minim.f --cover location
+^EXIT=0$
+^SIGNAL=0$
+Reduced from 3 to 1 test cases $
+--
+^warning: ignoring
