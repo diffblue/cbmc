@@ -1,0 +1,9 @@
+CORE
+main.c
+--property main.assertion.3
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED
+^.*main.assertion.3.*FAILURE
+--
+^warning: ignoring

@@ -220,6 +220,38 @@ const std::list<std::string>& cmdlinet::get_values(const std::string &option) co
 
 /*******************************************************************\
 
+Function: cmdlinet::get_comma_separated_values
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const std::list<std::string> cmdlinet::get_comma_separated_values(
+  const std::string &option) const
+{
+  int i=getoptnr(option);
+  assert(i>=0);
+  std::list<std::string> values;
+  for(const auto &value : options[i].values)
+  {
+    std::string::size_type length=value.length();
+    for(std::string::size_type idx=0; idx<length; idx++)
+    {
+      std::string::size_type next=value.find(",", idx);
+      values.push_back(value.substr(idx, next-idx));
+      if(next==std::string::npos) break;
+      idx=next;
+    }
+  }
+  return values;
+}
+
+/*******************************************************************\
+
 Function: cmdlinet::getoptnr
 
   Inputs:

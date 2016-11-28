@@ -593,10 +593,12 @@ bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)
   try
   {
     if(cmdline.isset("claim")) // will go away
-      ::set_properties(goto_functions, cmdline.get_values("claim"));
+      ::set_properties(goto_functions, 
+                       cmdline.get_comma_separated_values("claim"));
 
     if(cmdline.isset("property")) // use this one
-      ::set_properties(goto_functions, cmdline.get_values("property"));
+      ::set_properties(goto_functions, 
+                       cmdline.get_comma_separated_values("property"));
   }
 
   catch(const char *e)

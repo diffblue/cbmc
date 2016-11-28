@@ -23,6 +23,8 @@ public:
 
   const std::list<std::string> &get_values(const std::string &option) const;
   const std::list<std::string> &get_values(char option) const;
+  const std::list<std::string> get_comma_separated_values(
+    const std::string &option) const;
 
   virtual bool isset(char option) const;
   virtual bool isset(const char *option) const;
