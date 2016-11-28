@@ -3,7 +3,7 @@
 
 #if !defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
 
-#if defined(__avr32__) || defined(__hppa__)    || defined(__mk68k__) || \
+#if defined(__avr32__) || defined(__hppa__)    || defined(__m68k__) || \
     defined(__mips__)  || defined(__powerpc__) || defined(__s390__) || \
     defined(__s390x__) || defined(__sparc__)
 
