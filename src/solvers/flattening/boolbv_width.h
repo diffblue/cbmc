@@ -18,12 +18,12 @@ class boolbv_widtht
 public:
   explicit boolbv_widtht(const namespacet &_ns);
   ~boolbv_widtht();
- 
+
   std::size_t operator()(const typet &type) const
   {
     return get_entry(type).total_width;
   }
-  
+
   struct membert
   {
     std::size_t offset, width;
@@ -41,7 +41,7 @@ protected:
     std::size_t total_width;
     std::vector<membert> members;
   };
-  
+
   typedef hash_map_cont<typet, entryt, irep_hash> cachet;
 
   // the 'mutable' is allow const methods above

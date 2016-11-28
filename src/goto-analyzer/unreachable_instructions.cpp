@@ -186,7 +186,7 @@ void unreachable_instructions(
 
   std::set<irep_idt> called;
   compute_called_functions(goto_model, called);
-  
+
   const namespacet ns(goto_model.symbol_table);
 
   forall_goto_functions(f_it, goto_model.goto_functions)

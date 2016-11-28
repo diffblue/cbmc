@@ -44,9 +44,9 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum1), unsigned lo
 
 // Also works when signed
 enum large_enum2 { NEG=-1, LARGE_CONSTANT2=0x100000000 };
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long) || 
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long) ||
               __builtin_types_compatible_p(typeof(LARGE_CONSTANT2), signed long long));
-STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum2), signed long) || 
+STATIC_ASSERT(__builtin_types_compatible_p(typeof(enum large_enum2), signed long) ||
               __builtin_types_compatible_p(typeof(enum large_enum2), signed long long));
 
 // 'Packed' is interesting.

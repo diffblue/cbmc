@@ -25,7 +25,7 @@ public:
     cmdline(_ms_cl_cmdline)
   {
   }
-  
+
 protected:
   ms_cl_cmdlinet &cmdline;
 };

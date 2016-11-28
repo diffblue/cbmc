@@ -18,7 +18,7 @@ bool c_preprocess(
   const std::string &path,
   std::ostream &outstream,
   message_handlert &message_handler);
- 
+
 bool c_preprocess(
   std::istream &instream,
   std::ostream &outstream,
@@ -26,5 +26,5 @@ bool c_preprocess(
 
 // returns 'true' in case of error
 bool test_c_preprocessor(message_handlert &message_handler);
- 
+
 #endif

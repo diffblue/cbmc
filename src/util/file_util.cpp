@@ -2,7 +2,7 @@
 
 Module: File Utilities
 
-Author: 
+Author:
 
 Date: January 2012
 
@@ -41,7 +41,7 @@ Function: get_current_working_directory
 
  Outputs: current working directory
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -51,9 +51,9 @@ std::string get_current_working_directory()
 
   char *buf=(char*)malloc(sizeof(char)*bsize);
   if(!buf) abort();
-  
+
   errno=0;
-  
+
   while(buf && getcwd(buf, bsize-1)==NULL && errno==ERANGE)
   {
     bsize*=2;
@@ -62,7 +62,7 @@ std::string get_current_working_directory()
 
   std::string working_directory=buf;
   free(buf);
-  
+
   return working_directory;
 }
 
@@ -81,21 +81,21 @@ Function: delete_directory
 void delete_directory(const std::string &path)
 {
   #ifdef _WIN32
-  
+
   std::string pattern=path+"\\*";
-  
+
   struct _finddata_t info;
-  
+
   intptr_t handle=_findfirst(pattern.c_str(), &info);
-  
+
   if(handle!=-1)
   {
     unlink(info.name);
-    
+
     while(_findnext(handle, &info)!=-1)
       unlink(info.name);
   }
-  
+
   #else
 
   DIR *dir=opendir(path.c_str());

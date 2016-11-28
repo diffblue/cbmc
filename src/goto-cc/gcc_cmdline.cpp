@@ -15,13 +15,13 @@ Author: CM Wintersteiger, 2006
 #include "gcc_cmdline.h"
 
 /*******************************************************************\
- 
+
 Function: gcc_cmdlinet::parse
- 
+
   Inputs: argument count, argument strings
- 
+
  Outputs: none
- 
+
  Purpose: parses the commandline options into a cmdlinet
 
 \*******************************************************************/
@@ -104,88 +104,88 @@ const char *gcc_options_without_argument[]=
   "--64", // NON-GCC
   "--little-endian", // NON-GCC
   "--big-endian", // NON-GCC
-  "--no-arch", // NON-GCC            
+  "--no-arch", // NON-GCC
   "--partial-inlining", // NON-GCC
-  "-h", 
+  "-h",
   "--help", // NON-GCC
   "-?", // NON-GCC
   "-r", // for ld mimicking
   "-dylib", // for ld mimicking on MacOS
-  "-c", 
+  "-c",
   "-S",
-  "-E", 
+  "-E",
   "-combine",
-  "-pipe", 
+  "-pipe",
   "-pass-exit-codes",
-  "-v", 
+  "-v",
   "-###",
-  "-help", 
+  "-help",
   "-target-help",
-  "--version", 
+  "--version",
   "-ansi",
   "-trigraphs",
   "-no-integrated-cpp",
   "-traditional",
   "-traditional-cpp",
-  "-nostdinc++", 
+  "-nostdinc++",
   "-gen-decls",
   "-pedantic",
   "-pedantic-errors",
-  "-w", 
+  "-w",
   "-dumpspecs",
   "-dumpmachine",
-  "-dumpversion", 
+  "-dumpversion",
   "-g",
-  "-gcoff", 
+  "-gcoff",
   "-gdwarf-2",
-  "-ggdb", 
+  "-ggdb",
   "-gstabs",
-  "-gstabs+", 
+  "-gstabs+",
   "-gvms",
-  "-gxcoff", 
+  "-gxcoff",
   "-gxcoff+",
-  "-p", 
+  "-p",
   "-pg",
   "-print-libgcc-file-name",
   "-print-multi-directory",
   "-print-multi-lib",
-  "-print-search-dirs", 
+  "-print-search-dirs",
   "-Q",
   "-Qn",
   "-Qy",
   "-pthread",
-  "-save-temps", 
+  "-save-temps",
   "-time",
-  "-O", 
-  "-O0",        
-  "-O1", 
+  "-O",
+  "-O0",
+  "-O1",
   "-O2",
-  "-O3", 
+  "-O3",
   "-Os",
   "-Oz", // Apple only
-  "-C", 
+  "-C",
   "-E",
-  "-H", 
+  "-H",
   "-M",
-  "-MM", 
-  "-MG", 
+  "-MM",
+  "-MG",
   "-MP",
-  "-MD", 
+  "-MD",
   "-MMD",
-  "-nostdinc", 
+  "-nostdinc",
   "-P",
-  "-remap", 
+  "-remap",
   "-undef",
-  "-nostdinc", 
+  "-nostdinc",
   "-nostartfiles",
   "-nodefaultlibs",
-  "-nostdlib", 
+  "-nostdlib",
   "-pie",
-  "-rdynamic", 
+  "-rdynamic",
   "-s",
-  "-static", 
-  "-static-libgcc", 
-  "--static", 
+  "-static",
+  "-static-libgcc",
+  "--static",
   "-shared",
   "--shared",
   "-shared-libgcc",
@@ -211,15 +211,15 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       // TODO
       continue;
     }
-  
+
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
       add_infile_arg(argv_i);
       continue;
-    }    
-    
-    // add to new_argv    
+    }
+
+    // add to new_argv
     add_arg(argv_i);
 
     // also store in cmdlinet
@@ -243,9 +243,9 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
     else if(has_prefix(argv_i, "-m")) // m-options
     {
       // these sometimes come with a value separated by '=', e.g., -march=cpu_type
-    
+
       std::size_t equal_pos=argv_i.find('=');
-      
+
       if(equal_pos==std::string::npos)
         set(argv_i); // no value
       else
@@ -315,7 +315,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
       }
 
       if(!found)
-      {    
+      {
         // unrecognized option
         std::cerr << "Warning: uninterpreted gcc option '" << argv[i] << "'" << std::endl;
       }

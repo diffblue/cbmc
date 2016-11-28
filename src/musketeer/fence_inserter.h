@@ -27,7 +27,7 @@ class ilpt;
 // TODO: can be indirectly replaced by a list without redundancy
 // (not a set though)
 struct mip_vart
-{ 
+{
   typedef event_grapht::critical_cyclet::delayt edget;
 
   unsigned unique;
@@ -125,7 +125,7 @@ protected:
 
   /* computes the fence options */
   void compute_fence_options();
- 
+
   /* debug */
   void print_vars() const;
 
@@ -134,9 +134,9 @@ protected:
 
 public:
   explicit fence_insertert(instrumentert &instr):
-    instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e), 
-    constraints_number(0), model(TSO),  const_graph_visitor(*this), 
-    unique(var.unique), fence_options(0), cycles_visitor(*this), 
+    instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e),
+    constraints_number(0), model(TSO),  const_graph_visitor(*this),
+    unique(var.unique), fence_options(0), cycles_visitor(*this),
     epsilon(0.001), with_freq(false)
   {
   }
@@ -144,13 +144,13 @@ public:
   fence_insertert(instrumentert &instr, memory_modelt _model):
     instrumenter(instr), map_to_e(var.map_to_e), map_from_e(var.map_from_e),
     constraints_number(0), model(_model),  const_graph_visitor(*this),
-    unique(var.unique), fence_options(0), cycles_visitor(*this), 
+    unique(var.unique), fence_options(0), cycles_visitor(*this),
     epsilon(0.001), with_freq(false)
   {
   }
 
   /* do it */
-  void compute(); 
+  void compute();
 
   /* selection methods */
   // Note: process_selection updates the selection of cycles in instrumenter,
@@ -163,7 +163,7 @@ public:
   void print_to_file_2();
   void print_to_file_3();
   void print_to_file_4();
-  
+
   /* TODO: to be replaced eventually by ns.lookup and basename */
   static std::string remove_extra(const irep_idt& id)
   {
@@ -180,7 +180,7 @@ public:
 
   typet get_type(const irep_idt &id);
   typet type_component(
-    std::list<std::string>::const_iterator it, 
+    std::list<std::string>::const_iterator it,
     std::list<std::string>::const_iterator end,
     const typet &type);
 };

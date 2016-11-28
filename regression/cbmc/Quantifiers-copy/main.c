@@ -2,7 +2,7 @@ int main()
 {
   int a[5];
   int b[5];
-  
+
   a[0]=0;
   a[1]=1;
   a[2]=2;
@@ -16,5 +16,5 @@ int main()
   assert(b[2]==2);
   assert(b[3]==3);
   assert(b[4]==4);
-  return 0;                
+  return 0;
 }

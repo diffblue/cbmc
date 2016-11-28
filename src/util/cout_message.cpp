@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fcntl.h>
 #include <io.h>
 #include <cstdio>
-#endif 
+#endif
 
 #include "unicode.h"
 #include "cout_message.h"
@@ -42,7 +42,7 @@ void cout_message_handlert::print(
     if(level<=6) std::cout << std::flush;
   }
 }
- 
+
 /*******************************************************************\
 
 Function: cerr_message_handlert::print
@@ -78,7 +78,7 @@ Function: consolte_message_handlert::print
 void console_message_handlert::print(
   unsigned level,
   const std::string &message)
-{ 
+{
   if(verbosity<level)
     return;
 
@@ -89,7 +89,7 @@ void console_message_handlert::print(
   // We use UTF16 when we write to the console,
   // but we write UTF8 otherwise.
 
-  DWORD consoleMode;    
+  DWORD consoleMode;
   if(GetConsoleMode(out_handle, &consoleMode))
   {
     // writing to the console

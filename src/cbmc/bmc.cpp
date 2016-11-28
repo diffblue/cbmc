@@ -73,14 +73,14 @@ void bmct::error_trace()
 
   goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
-  
+
   switch(ui)
   {
   case ui_message_handlert::PLAIN:
     std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
-  
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
@@ -88,7 +88,7 @@ void bmct::error_trace()
       std::cout << xml << "\n";
     }
     break;
-  
+
   case ui_message_handlert::JSON_UI:
     {
       json_objectt json_result;
@@ -139,7 +139,7 @@ void bmct::do_conversion()
 {
   // convert HDL (hook for hw-cbmc)
   do_unwind_module();
-  
+
   status() << "converting SSA" << eom;
 
   // convert SSA
@@ -149,7 +149,7 @@ void bmct::do_conversion()
   if(!bmc_constraints.empty())
   {
     status() << "converting constraints" << eom;
-    
+
     forall_expr_list(it, bmc_constraints)
       prop_conv.set_to_true(*it);
   }
@@ -170,14 +170,14 @@ Function: bmct::run_decision_procedure
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
 {
-  status() << "Passing problem to " 
+  status() << "Passing problem to "
            << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
 
   // stop the time
   absolute_timet sat_start=current_time();
-  
+
   do_conversion();
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
@@ -214,7 +214,7 @@ void bmct::report_success()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -254,7 +254,7 @@ void bmct::report_failure()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -291,7 +291,7 @@ void bmct::show_program()
   unsigned count=1;
 
   languagest languages(ns, new_ansi_c_language());
-  
+
   std::cout << "\n" << "Program constraints:" << "\n";
 
   for(symex_target_equationt::SSA_stepst::const_iterator
@@ -313,7 +313,7 @@ void bmct::show_program()
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
-      
+
       count++;
     }
     else if(it->is_assert())
@@ -331,7 +331,7 @@ void bmct::show_program()
       }
 
       count++;
-    }  
+    }
     else if(it->is_assume())
     {
       std::string string_value;
@@ -347,7 +347,7 @@ void bmct::show_program()
       }
 
       count++;
-    }  
+    }
     else if(it->is_constraint())
     {
       std::string string_value;
@@ -356,7 +356,7 @@ void bmct::show_program()
                 << string_value <<") " << "\n";
 
       count++;
-    }  
+    }
     else if(it->is_shared_read() || it->is_shared_write())
     {
       std::string string_value;
@@ -372,7 +372,7 @@ void bmct::show_program()
       }
 
       count++;
-    }  
+    }
   }
 }
 
@@ -393,7 +393,7 @@ safety_checkert::resultt bmct::run(
 {
   const std::string mm=options.get_option("mm");
   std::unique_ptr<memory_model_baset> memory_model;
-  
+
   if(mm.empty() || mm=="sc")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
   else if(mm=="tso")
@@ -422,7 +422,7 @@ safety_checkert::resultt bmct::run(
     // perform symbolic execution
     symex(goto_functions);
 
-    // add a partial ordering, if required    
+    // add a partial ordering, if required
     if(equation.has_threads())
     {
       memory_model->set_message_handler(get_message_handler());
@@ -505,7 +505,7 @@ safety_checkert::resultt bmct::run(
       show_vcc();
       return safety_checkert::SAFE; // to indicate non-error
     }
-    
+
     if(!options.get_list_option("cover").empty())
     {
       const optionst::value_listt criteria=
@@ -612,7 +612,7 @@ safety_checkert::resultt bmct::stop_on_fail(
 
       error_trace();
     }
-    
+
     report_failure();
     return UNSAFE;
 
@@ -620,7 +620,7 @@ safety_checkert::resultt bmct::stop_on_fail(
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
       return SAFE;
-      
+
     error() << "decision procedure failed" << eom;
 
     return ERROR;
@@ -672,7 +672,7 @@ void bmct::setup_unwind()
       else
         symex.set_unwind_loop_limit(id, uw);
     }
-    
+
     if(next==std::string::npos) break;
     idx=next;
   }

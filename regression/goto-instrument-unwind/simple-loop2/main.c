@@ -8,7 +8,7 @@ int main()
    * every loop will be unwound K times
    **/
   const unsigned K=100;
-  
+
   const unsigned n=10;
   unsigned c=0, i;
 
@@ -20,7 +20,7 @@ int main()
 
   unsigned eva=n;
   if(K<eva) eva=K;
-  
+
   __CPROVER_assert(c==eva, "Simple loop unwind (1)");
 
 }

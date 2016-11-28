@@ -30,7 +30,7 @@ bvt boolbvt::convert_div(const div_exprt &expr)
     return conversion_failed(expr);
 
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
@@ -58,9 +58,9 @@ bvt boolbvt::convert_div(const div_exprt &expr)
     // add fraction_bits least-significant bits
     op0.insert(op0.begin(), zeros.begin(), zeros.end());
     op1=bv_utils.sign_extension(op1, op1.size()+fraction_bits);
-  
+
     bv_utils.divider(op0, op1, res, rem, bv_utilst::SIGNED);
-    
+
     // cut it down again
     res.resize(width);
   }

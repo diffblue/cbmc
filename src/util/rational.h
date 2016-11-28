@@ -42,44 +42,44 @@ public:
     r1.same_denominator(r2);
     return r1.numerator==r2.numerator;
   }
-   
+
   bool operator!=(const rationalt &n) const
   {
     rationalt r1(*this), r2(n);
     r1.same_denominator(r2);
     return r1.numerator!=r2.numerator;
   }
-   
+
   bool operator<(const rationalt &n) const
   {
     rationalt r1(*this), r2(n);
     r1.same_denominator(r2);
     return r1.numerator<r2.numerator;
   }
-   
+
   bool operator<=(const rationalt &n) const
   {
     rationalt r1(*this), r2(n);
     r1.same_denominator(r2);
     return r1.numerator<=r2.numerator;
   }
-   
+
   bool operator>=(const rationalt &n) const
   {
     return !(*this<n);
   }
-   
+
   bool operator>(const rationalt &n) const
   {
     return !(*this<=n);
   }
-   
+
   bool is_zero() const
   { return numerator.is_zero(); }
 
   bool is_one() const
   { return !is_zero() && numerator==denominator; }
-   
+
   bool is_negative() const
   { return !is_zero() && numerator.is_negative(); }
 
@@ -123,7 +123,7 @@ public:
   friend std::ostream& operator<< (std::ostream& out, const rationalt &a);
   friend constant_exprt from_rational(const rationalt &n);
 };
- 
+
 rationalt inverse(const rationalt &n);
 
 #endif

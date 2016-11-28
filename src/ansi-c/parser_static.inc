@@ -177,18 +177,18 @@ Function: make_subtype
 \*******************************************************************/
 
 static void make_subtype(typet &dest, typet &src)
-{  
+{
   // inserts "src" into "dest"
   // e.g., src is a pointer or array,
   // dest is a symbol or type
-  
+
   // find spot in 'dest' where to insert 'src'
-  
+
   #if 0
   std::cout << "D: " << dest.pretty() << std::endl;
   std::cout << "S: " << src.pretty() << std::endl;
   #endif
-  
+
   assert(src.id()==ID_array ||
          src.id()==ID_pointer ||
          src.id()==ID_code ||
@@ -202,7 +202,7 @@ static void make_subtype(typet &dest, typet &src)
   {
     // see if we need to walk down
     typet *sub=p;
-    
+
     if(p->id()==ID_merged_type)
     {
       // do last one
@@ -215,7 +215,7 @@ static void make_subtype(typet &dest, typet &src)
        sub->id()==ID_code)
     {
       // walk down
-      p=&sub->subtype();    
+      p=&sub->subtype();
     }
     else
     {
@@ -231,11 +231,11 @@ static void make_subtype(typet &dest, typet &src)
       else
       {
         // *p is now type or symbol
-    
+
         // save symbol
         typet symbol=*p;
         p->swap(src);
-      
+
         // find spot where to put symbol
         while(true)
         {
@@ -278,7 +278,7 @@ static void make_subtype(YYSTYPE dest, YYSTYPE src)
 {
   make_subtype(stack_type(dest), stack_type(src));
 }
-    
+
 /*******************************************************************\
 
 Function: make_pointer
@@ -347,9 +347,9 @@ static void create_function_scope(const YYSTYPE d)
   if(declarator.type().id()==ID_code)
   {
     code_typet &code_type=to_code_type(declarator.type());
-    
+
     code_typet::parameterst &parameters=code_type.parameters();
-    
+
     // Add the parameter declarations to the scope.
     for(auto & it : parameters)
     {
@@ -359,7 +359,7 @@ static void create_function_scope(const YYSTYPE d)
 
         // we record the function name in the location
         param_decl.add_source_location().set_function(function_name);
-       
+
         if(!param_decl.declarators().empty())
         {
           // add to scope

@@ -42,15 +42,15 @@ public:
 
   // we remember all L1 renamings
   typedef std::set<irep_idt> l1_historyt;
-  l1_historyt l1_history; 
-  
+  l1_historyt l1_history;
+
   struct renaming_levelt
   {
     virtual ~renaming_levelt() { }
 
     typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
     current_namest current_names;
-    
+
     unsigned current_count(const irep_idt &identifier) const
     {
       current_namest::const_iterator it=
@@ -72,7 +72,7 @@ public:
         vars.insert(it->second.first);
     }
   };
-  
+
   // level 0 -- threads!
   // renaming built for one particular interleaving
   struct level0t:public renaming_levelt
@@ -88,7 +88,7 @@ public:
 
   // level 1 -- function frames
   // this is to preserve locality in case of recursion
-  
+
   struct level1t:public renaming_levelt
   {
     void operator()(ssa_exprt &ssa_expr);
@@ -117,7 +117,7 @@ public:
     level1t() { }
     virtual ~level1t() { }
   } level1;
-  
+
   // level 2 -- SSA
 
   struct level2t:public renaming_levelt
@@ -125,7 +125,7 @@ public:
     level2t() { }
     virtual ~level2t() { }
   } level2;
-  
+
   // this maps L1 names to (L2) constants
   class propagationt
   {
@@ -138,9 +138,9 @@ public:
     {
       values.erase(identifier);
     }
-    
+
   } propagation;
-  
+
   typedef enum { L0=0, L1=1, L2=2 } levelt;
 
   // performs renaming _up to_ the given level
@@ -150,7 +150,7 @@ public:
     const irep_idt &l1_identifier,
     const namespacet &ns,
     levelt level=L2);
-  
+
   void assignment(
     ssa_exprt &lhs, // L0/L1
     const exprt &rhs,  // L2
@@ -175,7 +175,7 @@ protected:
   // this maps L1 names to (L2) types
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> l1_typest;
   l1_typest l1_types;
-  
+
 public:
   // uses level 1 names, and is used to
   // do dereferencing
@@ -190,7 +190,7 @@ public:
     guardt guard;
     propagationt propagation;
     unsigned atomic_section_id;
-    
+
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
       level2_current_names(s.level2.current_names),
@@ -228,7 +228,7 @@ public:
   class framet
   {
   public:
-    // function calls  
+    // function calls
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
     symex_targett::sourcet calling_location;
@@ -238,10 +238,10 @@ public:
     bool hidden_function;
 
     renaming_levelt::current_namest old_level1;
-    
+
     typedef std::set<irep_idt> local_objectst;
     local_objectst local_objects;
-    
+
     framet():
       return_value(nil_exprt()),
       hidden_function(false)
@@ -276,13 +276,13 @@ public:
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
-  
+
   inline const call_stackt &call_stack() const
   {
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
-  
+
   inline framet &top()
   {
     assert(!call_stack().empty());
@@ -294,7 +294,7 @@ public:
     assert(!call_stack().empty());
     return call_stack().back();
   }
-  
+
   inline framet &new_frame() { call_stack().push_back(framet()); return top(); }
   inline void pop_frame() { call_stack().pop_back(); }
   inline const framet &previous_frame() { return *(--(--call_stack().end())); }
@@ -307,7 +307,7 @@ public:
   typedef hash_map_cont<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
-  
+
   class threadt
   {
   public:
@@ -325,7 +325,7 @@ public:
 
   typedef std::vector<threadt> threadst;
   threadst threads;
-  
+
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
 

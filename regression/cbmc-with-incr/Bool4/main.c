@@ -6,7 +6,7 @@ int main() {
   b1=1;
   b1 ^= (_Bool)1;
   assert(!b1);
-  
+
   b1=1;
   b2=1;
   b1 ^= b2;

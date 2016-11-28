@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -194,7 +194,7 @@ void cnf_propagate_not(exprt &expr)
   }
 
   Forall_operands(it, expr)
-    cnf_propagate_not(*it);  
+    cnf_propagate_not(*it);
 }
 
 /*******************************************************************\

@@ -27,9 +27,9 @@ void c_typecheck_baset::implicit_typecast(
   const typet &dest_type)
 {
   c_typecastt c_typecast(*this);
-  
+
   typet src_type=expr.type();
-  
+
   c_typecast.implicit_typecast(expr, dest_type);
 
   for(std::list<std::string>::const_iterator
@@ -44,10 +44,10 @@ void c_typecheck_baset::implicit_typecast(
             << to_string(dest_type) << "': "
             << *it << eom;
   }
-  
+
   if(!c_typecast.errors.empty())
     throw 0; // give up
-  
+
   for(std::list<std::string>::const_iterator
       it=c_typecast.warnings.begin();
       it!=c_typecast.warnings.end();

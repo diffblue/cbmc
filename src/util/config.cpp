@@ -798,7 +798,7 @@ void configt::ansi_ct::set_arch_spec_v850()
   // many automotive applications.  This spec is written from the
   // architecture manual rather than having access to a running
   // system.  Thus some assumptions have been made.
-  
+
   set_ILP32();
 
   // Technically, the V850's don't have floating-point at all.
@@ -922,7 +922,7 @@ configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
   return c_standardt::C99;
   #endif
 }
-  
+
 /*******************************************************************\
 
 Function: configt::ansi_ct::default_cpp_standard
@@ -1015,7 +1015,7 @@ void configt::set_arch(const irep_idt &arch)
     ansi_c.arch="i386";
   }
 }
-  
+
 /*******************************************************************\
 
 Function: configt::set
@@ -1031,9 +1031,9 @@ Function: configt::set
 bool configt::set(const cmdlinet &cmdline)
 {
   // defaults -- we match the architecture we have ourselves
-  
+
   cpp.cpp_standard=cppt::default_cpp_standard();
-  
+
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
   ansi_c.c_standard=ansi_ct::default_c_standard();
@@ -1043,7 +1043,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.arch="none";
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
-  
+
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
   // prescribed by IEC 60559:
@@ -1053,7 +1053,7 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset("function"))
     main=cmdline.get_value("function");
-    
+
   if(cmdline.isset('D'))
     ansi_c.defines=cmdline.get_values('D');
 
@@ -1081,7 +1081,7 @@ bool configt::set(const cmdlinet &cmdline)
     else
       set_classpath("."); // default
   }
-  
+
   if(cmdline.isset("main-class"))
     java.main_class=cmdline.get_value("main-class");
 
@@ -1099,7 +1099,7 @@ bool configt::set(const cmdlinet &cmdline)
   irep_idt arch=this_arch;
 
   // let's pick an OS now
-  // the default is the one we run on  
+  // the default is the one we run on
   irep_idt this_os=this_operating_system();
   irep_idt os=this_os;
 
@@ -1139,7 +1139,7 @@ bool configt::set(const cmdlinet &cmdline)
   {
     os=cmdline.get_value("os");
   }
-    
+
   if(os=="windows")
   {
     // Cygwin uses GCC throughout, use i386-linux
@@ -1215,7 +1215,7 @@ bool configt::set(const cmdlinet &cmdline)
     // note that sizeof(void *)==8, but sizeof(long)==4!
     if(arch=="x86_64")
       ansi_c.set_LLP64();
-    
+
     // On Windows, wchar_t is unsigned 16 bit, regardless
     // of the compiler used.
     ansi_c.wchar_t_width=2*8;
@@ -1248,16 +1248,16 @@ bool configt::set(const cmdlinet &cmdline)
     // On Windows, long double width varies by compiler
     assert(ansi_c.long_double_width==sizeof(long double)*8);
     #endif
-  }  
-  
+  }
+
   // the following allows overriding the defaults
-  
+
   if(cmdline.isset("16"))
     ansi_c.set_16();
 
   if(cmdline.isset("32"))
     ansi_c.set_32();
-    
+
   if(cmdline.isset("64"))
     ansi_c.set_64();
 
@@ -1275,15 +1275,15 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset("LP32"))
     ansi_c.set_LP32();  // int=16, long=32, pointer=32
-    
+
   if(cmdline.isset("string-abstraction"))
     ansi_c.string_abstraction=true;
   else
-    ansi_c.string_abstraction=false;  
-  
+    ansi_c.string_abstraction=false;
+
   if(cmdline.isset("no-library"))
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
-  
+
   if(cmdline.isset("little-endian"))
     ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
@@ -1381,9 +1381,9 @@ static irep_idt string_from_ns(
 
   if(ns.lookup(id, symbol))
     throw "failed to find "+id2string(id);
-    
+
   const exprt &tmp=symbol->value;
-  
+
   if(tmp.id()!=ID_address_of ||
      tmp.operands().size()!=1 ||
      tmp.op0().id()!=ID_index ||
@@ -1417,18 +1417,18 @@ static unsigned unsigned_from_ns(
 
   if(ns.lookup(id, symbol))
     throw "failed to find "+id2string(id);
-    
+
   exprt tmp=symbol->value;
   simplify(tmp, ns);
-  
+
   if(tmp.id()!=ID_constant)
     throw "symbol table configuration entry `"+id2string(id)+"' is not a constant";
-  
+
   mp_integer int_value;
-  
+
   if(to_integer(to_constant_expr(tmp), int_value))
     throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
-    
+
   return integer2unsigned(int_value);
 }
 
@@ -1453,7 +1453,7 @@ void configt::set_from_symbol_table(
     return;
 
   namespacet ns(symbol_table);
-  
+
   // clear defines
   ansi_c.defines.clear();
 
@@ -1463,7 +1463,7 @@ void configt::set_from_symbol_table(
     set_arch(id2string(this_architecture()));
   else
     set_arch(string_from_ns(ns, "arch"));
-  
+
   ansi_c.int_width=unsigned_from_ns(ns, "int_width");
   ansi_c.long_int_width=unsigned_from_ns(ns, "long_int_width");
   ansi_c.bool_width=1*8;
@@ -1516,7 +1516,7 @@ Function: configt::ansi_ct::this_architecture
 irep_idt configt::this_architecture()
 {
   irep_idt this_arch;
-  
+
   // following http://wiki.debian.org/ArchitectureSpecificsMemo
 
   #ifdef __alpha__
@@ -1590,7 +1590,7 @@ irep_idt configt::this_architecture()
   this_arch="unknown";
   #endif
 
-  return this_arch;  
+  return this_arch;
 }
 
 /*******************************************************************\
@@ -1617,7 +1617,7 @@ void configt::set_classpath(const std::string &cp)
     #else
     const char cp_separator=':';
     #endif
-    
+
     if(cp[pos]==cp_separator)
     {
       if(!current.empty())
@@ -1629,7 +1629,7 @@ void configt::set_classpath(const std::string &cp)
     else
       current+=cp[pos];
   }
-  
+
   if(!current.empty()) java.classpath.push_back(current);
 }
 
@@ -1648,7 +1648,7 @@ Function: configt::ansi_ct::this_operating_system
 irep_idt configt::this_operating_system()
 {
   irep_idt this_os;
-  
+
   #ifdef _WIN32
   this_os="windows";
   #elif __APPLE__

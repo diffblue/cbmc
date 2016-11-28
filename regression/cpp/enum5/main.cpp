@@ -19,13 +19,13 @@ int main()
 
   // conversion from int
   assert(IMPH_STATE(2)==IMPH_BGF_STOPPED);
-  
+
   // comparison with int
   assert(IMPH_BGF_STOPPED==2);
-  
+
   // implicit conversion to int
   int z= IMPH_ENABLED | IMPH_BGF_STOPPED;
-  
+
   // operator overloading
   IMPH_STATE x = IMPH_ENABLED & IMPH_BGF_STOPPED;
   assert(x==IMPH_BGF_STOPPED);

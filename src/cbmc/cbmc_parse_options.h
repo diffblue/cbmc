@@ -87,17 +87,17 @@ protected:
   virtual bool process_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
-    
+
   bool set_properties(goto_functionst &goto_functions);
-  
+
   void eval_verbosity();
-  
+
   // get any additional stuff before finalizing
   virtual int get_modules(bmct &bmc)
   {
     return -1; // continue
   }
-  
+
   void preprocessing();
 };
 

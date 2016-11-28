@@ -25,5 +25,5 @@ void goto_convertt::convert_asm(
   goto_programt &dest)
 {
   // copy as OTHER
-  copy(code, OTHER, dest);  
+  copy(code, OTHER, dest);
 }

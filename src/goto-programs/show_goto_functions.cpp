@@ -50,7 +50,7 @@ void show_goto_functions(
         it++)
     {
       xmlt &xml_function=xml_functions.new_element("function");
-      xml_function.set_attribute("name", id2string(it->first)); 
+      xml_function.set_attribute("name", id2string(it->first));
     }
 
     std::cout << xml_functions << std::endl;
@@ -80,7 +80,7 @@ void show_goto_functions(
     std::cout << ",\n" << json_result;
   }
   break;
-      
+
   case ui_message_handlert::PLAIN:
     goto_functions.output(ns, std::cout);
     break;

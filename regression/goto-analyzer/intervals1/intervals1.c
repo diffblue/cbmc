@@ -3,10 +3,10 @@
 int main()
 {
   int i, j;
-  
+
   if(i>=20)
     assert(i>=10);
-  
+
   if(i>=10 && i<=20)
     assert(i!=30);
 

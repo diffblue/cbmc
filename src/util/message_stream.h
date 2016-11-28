@@ -52,12 +52,12 @@ public:
   {
     send_msg(8, message);
   }
-  
+
   void debug_msg(const std::string &message)
   {
     send_msg(9, message);
   }
-  
+
   void error_msg()
   {
     send_msg(1, str.str());
@@ -71,21 +71,21 @@ public:
     clear_err();
     sequence_number++;
   }
-  
+
   void status_msg()
   {
     send_msg(6, str.str());
     clear_err();
     sequence_number++;
   }
-  
+
   void statistics_msg()
   {
     send_msg(8, str.str());
     clear_err();
     sequence_number++;
   }
-  
+
   void debug_msg()
   {
     send_msg(9, str.str());
@@ -94,7 +94,7 @@ public:
   }
 
   std::ostringstream str;
-  
+
   inline std::ostream &error()
   {
     return str;
@@ -106,18 +106,18 @@ public:
     return m;
   }
 
-  
+
   bool get_error_found() const
   {
     return error_found;
   }
-  
+
   void error_parse(unsigned level)
   {
     error_parse(level, str.str());
     clear_err();
   }
-  
+
   void clear_err()
   {
     str.clear();
@@ -125,10 +125,10 @@ public:
   }
 
 protected:
-  bool error_found;  
+  bool error_found;
   source_locationt saved_error_location;
   unsigned sequence_number;
-  
+
   void send_msg(unsigned level, const std::string &message)
   {
     if(message=="") return;
@@ -140,7 +140,7 @@ protected:
         message,
         sequence_number,
         saved_error_location);
-      
+
     saved_error_location.make_nil();
   }
 
@@ -150,7 +150,7 @@ protected:
 
   void error_parse(
     unsigned level,
-    const std::string &error);  
+    const std::string &error);
 };
 
 #endif

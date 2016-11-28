@@ -77,7 +77,7 @@ bool java_bytecode_languaget::preprocess(
   // there is no preprocessing!
   return true;
 }
-             
+
 /*******************************************************************\
 
 Function: java_bytecode_languaget::parse
@@ -117,7 +117,7 @@ bool java_bytecode_languaget::parse(
     }
     else
       main_class=config.java.main_class;
-      
+
     // Do we have one now?
     if(main_class.empty())
     {
@@ -126,7 +126,7 @@ bool java_bytecode_languaget::parse(
     }
     else
       java_class_loader.add_jar_file(path);
-    
+
     #else
     error() << "No support for reading JAR files" << eom;
     return true;
@@ -143,7 +143,7 @@ bool java_bytecode_languaget::parse(
 
   return false;
 }
-             
+
 /*******************************************************************\
 
 Function: java_bytecode_languaget::typecheck
@@ -205,7 +205,7 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 
   if(java_entry_point(symbol_table, main_class, get_message_handler()))
     return true;
-  
+
   return false;
 }
 
@@ -220,7 +220,7 @@ Function: java_bytecode_languaget::show_parse
  Purpose:
 
 \*******************************************************************/
-  
+
 void java_bytecode_languaget::show_parse(std::ostream &out)
 {
   java_class_loader(main_class).output(out);
@@ -296,7 +296,7 @@ Function: java_bytecode_languaget::to_expr
  Purpose:
 
 \*******************************************************************/
-                         
+
 bool java_bytecode_languaget::to_expr(
   const std::string &code,
   const std::string &module,
@@ -309,7 +309,7 @@ bool java_bytecode_languaget::to_expr(
   // no preprocessing yet...
 
   std::istringstream i_preprocessed(code);
-  
+
   // parsing
 
   java_bytecode_parser.clear();
@@ -327,7 +327,7 @@ bool java_bytecode_languaget::to_expr(
   else
   {
     expr=java_bytecode_parser.parse_tree.items.front().value();
-    
+
     result=java_bytecode_convert(expr, "", message_handler);
 
     // typecheck it
@@ -340,7 +340,7 @@ bool java_bytecode_languaget::to_expr(
 
   return result;
   #endif
-  
+
   return true; // fail for now
 }
 

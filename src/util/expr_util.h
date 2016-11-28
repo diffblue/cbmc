@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 /*! \file util/expr_util.h
- * \brief Deprecated expression utility functions 
+ * \brief Deprecated expression utility functions
  *
  * \author Daniel Kroening <kroening@kroening.com>
  * \date   Sun Jul 31 21:54:44 BST 2011

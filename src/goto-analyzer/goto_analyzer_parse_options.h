@@ -58,9 +58,9 @@ protected:
 
   virtual bool process_goto_program(const optionst &options);
   bool set_properties();
-  
+
   void eval_verbosity();
-  
+
   bool has_entry_point;
 };
 

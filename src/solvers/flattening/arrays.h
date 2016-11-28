@@ -32,9 +32,9 @@ public:
     post_process_arrays();
     SUB::post_process();
   }
-  
+
   typedef equalityt SUB;
-  
+
   literalt record_array_equality(const equal_exprt &expr);
   void record_array_index(const index_exprt &expr);
 
@@ -55,17 +55,17 @@ protected:
   // elements are added while references are held
   typedef std::list<array_equalityt> array_equalitiest;
   array_equalitiest array_equalities;
-  
+
   // this is used to find the clusters of arrays being compared
   union_find<exprt> arrays;
-  
+
   // this tracks the array indicies for each array
   typedef std::set<exprt> index_sett;
   // references to values in this container need to be stable as
   // elements are added while references are held
   typedef std::map<std::size_t, index_sett> index_mapt;
   index_mapt index_map;
-  
+
   // adds array constraints lazily
   typedef enum lazy_type {ARRAY_ACKERMANN, ARRAY_WITH, ARRAY_IF, ARRAY_OF, ARRAY_TYPECAST} lazy_typet;
   struct lazy_constraintt
@@ -103,7 +103,7 @@ protected:
   void collect_arrays(const exprt &a);
   void collect_indices();
   void collect_indices(const exprt &a);
-  
+
   virtual bool is_unbounded_array(const typet &type) const=0;
     // (maybe this function should be partially moved here from boolbv)
 };

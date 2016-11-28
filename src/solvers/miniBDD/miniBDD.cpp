@@ -13,7 +13,7 @@ namespace miniBDD
 void node::remove_reference()
 {
   assert(reference_counter!=0);
-  
+
   reference_counter--;
 
   if(reference_counter==0 && node_number>=2)
@@ -23,7 +23,7 @@ void node::remove_reference()
     low.clear();
     high.clear();
     mgr->free.push(this);
-  } 
+  }
 }
 
 BDD mgr::Var(const std::string &label)
@@ -39,15 +39,15 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
   out << "digraph BDD {\n";
 
   out << "center = true;\n";
-  
+
   out << "{ rank = same; { node [style=invis]; \"T\" };\n";
-  
+
   if(!suppress_zero)
     out << "  { node [shape=box,fontsize=24]; \"0\"; }\n";
-    
+
   out << "  { node [shape=box,fontsize=24]; \"1\"; }\n"
       << "}\n\n";
-      
+
   for(unsigned v=0; v<var_table.size(); v++)
   {
     out << "{ rank=same; "
@@ -58,7 +58,7 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
     forall_nodes(u)
       if(u->var==(v+1) && u->reference_counter!=0)
         out << '"' << u->node_number << "\"; ";
-    
+
     out << "}\n";
   }
 
@@ -69,9 +69,9 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
   for(unsigned v=0; v<var_table.size(); v++)
     out << " \" " << var_table[v].label
         << " \" ->";
-  
+
   out << " \"T\"; }\n";
-  
+
   out << '\n';
 
   forall_nodes(u)
@@ -83,7 +83,7 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
       out << '"' << u->node_number << '"' << " -> "
           << '"' << u->high.node_number() << '"'
           << " [style=solid,arrowsize=\".75\"];\n";
-        
+
     if(!suppress_zero || u->low.node_number()!=0)
       out << '"' << u->node_number << '"' << " -> "
           << '"' << u->low.node_number() << '"'
@@ -91,7 +91,7 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
 
     out << '\n';
   }
-  
+
   out << "}\n";
 }
 
@@ -101,7 +101,7 @@ void mgr::DumpTikZ(
   bool node_numbers) const
 {
   out << "\\begin{tikzpicture}[node distance=1cm]\n";
-  
+
   out << "  \\tikzstyle{BDDnode}=[circle,draw=black,"
          "inner sep=0pt,minimum size=5mm]\n";
 
@@ -134,7 +134,7 @@ void mgr::DumpTikZ(
         previous=u->node_number;
       }
     }
-    
+
     out << '\n';
   }
 
@@ -144,7 +144,7 @@ void mgr::DumpTikZ(
   out << "  \\node[draw=black, style=rectangle, below of=v"
       << var_table.back().label
       << ", xshift=1cm] (n1) {$1$};\n";
-    
+
   if(!suppress_zero)
     out << "  \\node[draw=black, style=rectangle, left of=n1] (n0) {$0$};\n";
 
@@ -160,7 +160,7 @@ void mgr::DumpTikZ(
       if(!suppress_zero || u->low.node_number()!=0)
         out << "  \\draw[->,dashed] (n" << u->node_number << ") -> (n"
             << u->low.node_number() << ");\n";
-          
+
       if(!suppress_zero || u->high.node_number()!=0)
         out << "  \\draw[->] (n" << u->node_number << ") -> (n"
             << u->high.node_number() << ");\n";
@@ -168,7 +168,7 @@ void mgr::DumpTikZ(
   }
 
   out << '\n';
-  
+
   out << "\\end{tikzpicture}\n";
 }
 
@@ -178,7 +178,7 @@ public:
   inline explicit apply(bool (*_fkt)(bool, bool)):fkt(_fkt)
   {
   }
-  
+
   BDD operator()(const BDD &x, const BDD &y) { return APP(x, y); }
 
 protected:
@@ -195,12 +195,12 @@ BDD apply::APP(const BDD &x, const BDD &y)
   assert(x.node->mgr==y.node->mgr);
 
   // dynamic programming
-  std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());  
+  std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());
   Gt::const_iterator G_it=G.find(key);
   if(G_it!=G.end()) return G_it->second;
 
   mgr *mgr=x.node->mgr;
-  
+
   BDD u;
 
   if(x.is_constant() && y.is_constant())
@@ -219,7 +219,7 @@ BDD apply::APP(const BDD &x, const BDD &y)
               APP(x, y.high()));
 
   G[key]=u;
-    
+
   return u;
 }
 
@@ -312,7 +312,7 @@ BDD mgr::mk(unsigned var, const BDD &low, const BDD &high)
         n->low=low;
         n->high=high;
       }
-      
+
       reverse_map[reverse_key]=n;
       return BDD(n);
     }
@@ -346,7 +346,7 @@ void mgr::DumpTable(std::ostream &out) const
       out << it->var << "\\," << var_table[it->var-1].label << " & "
           << it->low.node_number() << " & " << it->high.node_number()
           << " \\\\";
-          
+
     if(it->node_number==1) out << "\\hline";
 
     out << " % " << it->reference_counter << '\n';
@@ -360,13 +360,13 @@ public:
     var(_var), value(_value)
   {
   }
-  
+
   BDD operator()(const BDD &u) { return RES(u); }
 
 protected:
   const unsigned var;
   const bool value;
-  
+
   BDD RES(const BDD &u);
 };
 
@@ -376,7 +376,7 @@ BDD restrictt::RES(const BDD &u)
 
   assert(u.is_initialized());
   mgr *mgr=u.node->mgr;
-  
+
   BDD t;
 
   if(u.var()>var)
@@ -385,7 +385,7 @@ BDD restrictt::RES(const BDD &u)
     t=mgr->mk(u.var(), RES(u.low()), RES(u.high()));
   else // u.var()==var
     t=RES(value?u.high():u.low());
-    
+
   return t;
 }
 
@@ -458,7 +458,7 @@ bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment)
     assignment[v.var()]=true;
     if(OneSat(v.high(), assignment)) return true;
     assignment[v.var()]=false;
-    return OneSat(v.low(), assignment);    
+    return OneSat(v.low(), assignment);
   }
 }
 

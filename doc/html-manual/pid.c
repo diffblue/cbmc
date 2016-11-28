@@ -30,7 +30,7 @@ float desired_pitch;
 float climb_sum_err=0;
 
 /** Computes desired_gaz and desired_pitch */
-void climb_pid_run() 
+void climb_pid_run()
 {
 
   float err=estimator_z_dot-desired_climb;
@@ -39,7 +39,7 @@ void climb_pid_run()
 
   float pprz=fgaz*MAX_PPRZ;
   desired_gaz=((pprz>=0 && pprz<=MAX_PPRZ) ? pprz : (pprz>MAX_PPRZ ? MAX_PPRZ : 0));
-  
+
   /** pitch offset for climb */
   float pitch_of_vz=(desired_climb>0) ? desired_climb*pitch_of_vz_pgain : 0;
   desired_pitch=nav_pitch+pitch_of_vz;
@@ -55,18 +55,18 @@ int main()
 
   while(1)
   {
-    /** Non-deterministic input values */ 
+    /** Non-deterministic input values */
     desired_climb=nondet_float();
     estimator_z_dot=nondet_float();
 
-    /** Range of input values */ 
+    /** Range of input values */
     __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
     __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
 
     __CPROVER_input("desired_climb", desired_climb);
     __CPROVER_input("estimator_z_dot", estimator_z_dot);
 
-    climb_pid_run(); 
+    climb_pid_run();
 
     __CPROVER_output("desired_gaz", desired_gaz);
     __CPROVER_output("desired_pitch", desired_pitch);

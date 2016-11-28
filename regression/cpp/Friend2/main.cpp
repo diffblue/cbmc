@@ -8,7 +8,7 @@ private:
     X aa;
     aa.x=1;
   }
-  
+
 public:
   X() { }
 };

@@ -20,7 +20,7 @@ int main()
   // both must be complete
   sizeof(abc1);
   sizeof(abc2);
-  
+
   assert(string_array[0][0][0]=='1');
   assert(string_array[0][0][1]=='2');
   assert(string_array[0][0][2]=='3');

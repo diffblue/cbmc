@@ -47,7 +47,7 @@ public:
 
   virtual const std::string solver_text()
   { return "SMT"; }
-   
+
   virtual tvt l_get(literalt literal) const;
   virtual void set_assignment(literalt a, bool value);
 
@@ -66,20 +66,20 @@ public:
 
   friend class smt2_convt;
   friend class smt2_dect;
-  
+
   void finalize();
 
 protected:
   size_t _no_variables;
   std::ostream &out;
-  
+
   std::string smt2_literal(literalt l);
   literalt def_smt2_literal();
-  
+
   std::vector<tvt> assignment;
-  
+
   literalt define_new_variable();
-  
+
   typedef std::set<std::string> smt2_identifierst;
   smt2_identifierst smt2_identifiers;
 

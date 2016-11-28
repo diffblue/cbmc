@@ -19,5 +19,5 @@ int main()
 
   __CPROVER_assert(!__CPROVER_forall { int i; (i>=0 && i<2) ==> (!__CPROVER_forall{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) }, "NotForall-NotForall: successful");
 
-  return 0;                
+  return 0;
 }

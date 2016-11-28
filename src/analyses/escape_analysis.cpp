@@ -20,7 +20,7 @@ Function: escape_domaint::is_tracked
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -32,7 +32,7 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
      identifier=="__CPROVER_dead_object" ||
      identifier=="__CPROVER_deallocated")
     return false;
-    
+
   return true;
 }
 
@@ -44,7 +44,7 @@ Function: escape_domaint::get_function
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -59,7 +59,7 @@ irep_idt escape_domaint::get_function(const exprt &lhs)
     irep_idt identifier=to_symbol_expr(lhs).get_identifier();
     return identifier;
   }
-  
+
   return irep_idt();
 }
 
@@ -71,7 +71,7 @@ Function: escape_domaint::assign_lhs_cleanup
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -85,7 +85,7 @@ void escape_domaint::assign_lhs_cleanup(
     if(is_tracked(symbol_expr))
     {
       irep_idt identifier=symbol_expr.get_identifier();
-      
+
       if(cleanup_functions.empty())
         cleanup_map.erase(identifier);
       else
@@ -102,7 +102,7 @@ Function: escape_domaint::assign_lhs_aliases
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -137,7 +137,7 @@ Function: escape_domaint::get_rhs_cleanup
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -154,7 +154,7 @@ void escape_domaint::get_rhs_cleanup(
 
       const escape_domaint::cleanup_mapt::const_iterator m_it=
         cleanup_map.find(identifier);
-    
+
       if(m_it!=cleanup_map.end())
         cleanup_functions.insert(m_it->second.cleanup_functions.begin(),
                                  m_it->second.cleanup_functions.end());
@@ -179,7 +179,7 @@ Function: escape_domaint::get_rhs_aliases
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -194,7 +194,7 @@ void escape_domaint::get_rhs_aliases(
     {
       irep_idt identifier=symbol_expr.get_identifier();
       alias_set.insert(identifier);
-    
+
       for(aliasest::const_iterator it=aliases.begin();
           it!=aliases.end();
           it++)
@@ -225,7 +225,7 @@ Function: escape_domaint::get_rhs_aliases_address_of
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -256,7 +256,7 @@ Function: escape_domaint::transform
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -277,7 +277,7 @@ void escape_domaint::transform(
   case ASSIGN:
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
-      
+
       std::set<irep_idt> cleanup_functions;
       get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
       assign_lhs_cleanup(code_assign.lhs(), cleanup_functions);
@@ -308,7 +308,7 @@ void escape_domaint::transform(
     {
       const code_function_callt &code_function_call=to_code_function_call(instruction.code);
       const exprt &function=code_function_call.function();
-      
+
       if(function.id()==ID_symbol)
       {
         const irep_idt &identifier=to_symbol_expr(function).get_identifier();
@@ -326,7 +326,7 @@ void escape_domaint::transform(
               // may alias other stuff
               std::set<irep_idt> lhs_set;
               get_rhs_aliases(lhs, lhs_set);
-              
+
               for(std::set<irep_idt>::const_iterator
                   l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
               {
@@ -338,7 +338,7 @@ void escape_domaint::transform(
       }
     }
     break;
-  
+
   case END_FUNCTION:
     // This is the edge to the call site.
     break;
@@ -355,7 +355,7 @@ Function: escape_domaint::output
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -382,13 +382,13 @@ void escape_domaint::output(
       out << ' ' << *c_it;
     out << '\n';
   }
-  
+
   for(aliasest::const_iterator a_it1=aliases.begin();
       a_it1!=aliases.end();
       a_it1++)
   {
     bool first=true;
-  
+
     for(aliasest::const_iterator a_it2=aliases.begin();
         a_it2!=aliases.end();
         a_it2++)
@@ -413,7 +413,7 @@ Function: escape_domaint::merge
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -443,9 +443,9 @@ bool escape_domaint::merge(
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size) changed=true;
   }
-  
+
   // kill empty ones
-  
+
   for(cleanup_mapt::iterator a_it=cleanup_map.begin();
       a_it!=cleanup_map.end();
       ) // no a_it++
@@ -455,13 +455,13 @@ bool escape_domaint::merge(
     else
       a_it++;
   }
-  
+
   // do union
   for(aliasest::const_iterator it=b.aliases.begin();
       it!=b.aliases.end(); it++)
   {
     irep_idt b_root=b.aliases.find(it);
-    
+
     if(!aliases.same_set(*it, b_root))
     {
       aliases.make_union(*it, b_root);
@@ -478,7 +478,7 @@ bool escape_domaint::merge(
       aliases.isolate(it);
   }
   #endif
-  
+
   return changed;
 }
 
@@ -490,18 +490,18 @@ Function: escape_domaint::check_lhs
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
 void escape_domaint::check_lhs(
   const exprt &lhs,
-  std::set<irep_idt> &cleanup_functions)  
+  std::set<irep_idt> &cleanup_functions)
 {
   if(lhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
-    
+
     // pointer with aleanup function?
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
@@ -511,7 +511,7 @@ void escape_domaint::check_lhs(
       // count the aliases
 
       unsigned count=0;
-      
+
       for(aliasest::const_iterator
           a_it=aliases.begin();
           a_it!=aliases.end();
@@ -540,7 +540,7 @@ Function: escape_analysist::insert_cleanup
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -553,14 +553,14 @@ void escape_analysist::insert_cleanup(
   const namespacet &ns)
 {
   source_locationt source_location=location->source_location;
-  
+
   for(std::set<irep_idt>::const_iterator c_it=cleanup_functions.begin();
       c_it!=cleanup_functions.end();
       c_it++)
   {
     symbol_exprt function=ns.lookup(*c_it).symbol_expr();
     const code_typet &function_type=to_code_type(function.type());
-  
+
     goto_function.body.insert_before_swap(location);
     code_function_callt code;
     code.lhs().make_nil();
@@ -575,7 +575,7 @@ void escape_analysist::insert_cleanup(
       if(arg.type()!=param_type) arg.make_typecast(param_type);
       code.arguments().push_back(arg);
     }
-    
+
     location->make_function_call(code);
     location->source_location=source_location;
   }
@@ -589,7 +589,7 @@ Function: escape_analysist::instrument
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -604,7 +604,7 @@ void escape_analysist::instrument(
       get_state(i_it);
 
       const goto_programt::instructiont &instruction=*i_it;
-      
+
       switch(instruction.type)
       {
       case ASSIGN:
@@ -620,14 +620,14 @@ void escape_analysist::instrument(
       case DEAD:
         {
           const code_deadt &code_dead=to_code_dead(instruction.code);
-          
+
           std::set<irep_idt> cleanup_functions1;
-          
+
           escape_domaint &d=operator[](i_it);
 
           const escape_domaint::cleanup_mapt::const_iterator m_it=
             d.cleanup_map.find("&"+id2string(code_dead.get_identifier()));
-            
+
           // does it have a cleanup function for the object?
           if(m_it!=d.cleanup_map.end())
           {
@@ -637,12 +637,12 @@ void escape_analysist::instrument(
           }
 
           std::set<irep_idt> cleanup_functions2;
-          
+
           d.check_lhs(code_dead.symbol(), cleanup_functions2);
 
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions2, false, ns);
-          
+
           for(unsigned i=0; i<cleanup_functions1.size(); i++)
             i_it++;
 

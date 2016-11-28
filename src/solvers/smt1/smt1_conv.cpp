@@ -45,7 +45,7 @@ Function: smt1_convt::print_assignment
 void smt1_convt::print_assignment(std::ostream &out) const
 {
   // Boolean stuff
-  
+
   for(std::size_t v=0; v<boolean_assignment.size(); v++)
     out << "b" << v << "=" << boolean_assignment[v] << "\n";
 
@@ -226,14 +226,14 @@ exprt smt1_convt::ce_value(
     result.set_value(value);
 
     // add the elaborated expression as operand
-    
+
     pointer_logict::pointert p;
     p.object=integer2unsigned(
       binary2integer(
         value.substr(0, BV_ADDR_BITS), false));
-        
+
     p.offset=binary2integer(value.substr(BV_ADDR_BITS, std::string::npos), true);
-    
+
     result.copy_to_operands(pointer_logic.pointer_expr(p, type));
 
     return result;
@@ -249,22 +249,22 @@ exprt smt1_convt::ce_value(
   else if(type.id()==ID_array)
   {
     const typet &subtype=ns.follow(type.subtype());
-  
+
     // arrays in structs are flat, no index
     if(in_struct)
     {
       // we can only do fixed-size arrays
       mp_integer size;
-        
+
       if(!to_integer(to_array_type(type).size(), size))
       {
         std::size_t size_int=integer2unsigned(size);
         std::size_t sub_width=value.size()/size_int;
         exprt array_list(ID_array, type);
         array_list.operands().resize(size_int);
-        
+
         std::size_t offset=value.size();
-        
+
         for(std::size_t i=0; i!=size_int; i++)
         {
           offset-=sub_width;
@@ -272,11 +272,11 @@ exprt smt1_convt::ce_value(
           array_list.operands()[i]=
             ce_value(subtype, "", sub_value, true);
         }
-        
+
         return array_list;
       }
     }
-    else if(subtype.id()==ID_array) 
+    else if(subtype.id()==ID_array)
     {
       // a 2 dimensional array - second dimension is flattened
       return ce_value(subtype, "", value, true);
@@ -284,18 +284,18 @@ exprt smt1_convt::ce_value(
     else
     {
       exprt value_expr=ce_value(subtype, "", value, in_struct);
-      
+
       if(index=="") return nil_exprt();
-  
+
       // use index, recusive call
       exprt index_expr=
         ce_value(signedbv_typet(index.size()), "", index, false);
-      
+
       if(index_expr.is_nil()) return nil_exprt();
-    
+
       exprt array_list("array-list", type);
       array_list.copy_to_operands(index_expr, value_expr);
-    
+
       return array_list;
     }
   }
@@ -337,7 +337,7 @@ Function: smt1_convt::array_index
 void smt1_convt::array_index(const exprt &expr)
 {
   if(expr.type().id()==ID_integer) return convert_expr(expr, true);
-  
+
   typet t=array_index_type();
   if(t==expr.type()) return convert_expr(expr, true);
   exprt tmp(ID_typecast, t);
@@ -599,14 +599,14 @@ literalt smt1_convt::convert(const exprt &expr)
   out << "\n";
 
   find_symbols(expr);
-  
+
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
 
   out << ":extrapreds((";
   convert_literal(l);
   out << "))" << "\n";
-  
+
   out << ":assumption ; convert " << "\n"
       << " (iff ";
   convert_literal(l);
@@ -636,7 +636,7 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
 
   // a sequence of letters, digits, dots (.), single quotes (’), and
   // underscores (_), starting with a letter
-  
+
   // MathSAT does not really seem to like the single quotes '
   // so we avoid these.
 
@@ -1010,7 +1010,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
 
       convert_expr(expr.op0(), true);
       out << " ";
-      
+
       // SMT1 requires the shift distance to have the same width as
       // the value that is shifted -- odd!
 
@@ -1031,7 +1031,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
         convert_expr(expr.op1(), true);
         out << ")"; // extract
       }
-                                                                                                                                                                
+
       out << ")";
     }
     else
@@ -1194,7 +1194,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_width)
   {
     std::size_t result_width=boolbv_width(expr.type());
-    
+
     if(result_width==0)
       throw "conversion failed";
 
@@ -1202,7 +1202,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       throw "width expects 1 operand";
 
     std::size_t op_width=boolbv_width(expr.op0().type());
-    
+
     if(op_width==0)
       throw "conversion failed";
 
@@ -1216,7 +1216,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     const exprt &op0=expr.op0();
 
     std::size_t result_width=boolbv_width(type);
-    
+
     if(result_width==0)
       throw "conversion failed";
 
@@ -1365,10 +1365,10 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_overflow_mult)
   {
     assert(expr.operands().size()==2);
-    
+
     // No better idea than to multiply with double the bits and then compare
     // with max value.
-    
+
     const typet &op_type=expr.op0().type();
     std::size_t width=boolbv_width(op_type);
 
@@ -1389,7 +1389,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       convert_expr(expr.op0(), true);
       out << ") (zero_extend[" << width << "] ";
       convert_expr(expr.op1(), true);
-      out << ")) bv" << power(2, width) << "[" << width*2 << "])";     
+      out << ")) bv" << power(2, width) << "[" << width*2 << "])";
     }
     else
       throw "overflow-* check on unknown type: "+op_type.id_string();
@@ -1418,7 +1418,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   else if(expr.id()==ID_extractbits)
   {
     assert(expr.operands().size()==3);
-    
+
     const typet &op_type=ns.follow(expr.op0().type());
 
     if(op_type.id()==ID_unsignedbv ||
@@ -1433,7 +1433,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
          expr.op2().is_constant())
       {
         mp_integer op1_i, op2_i;
-        
+
         if(to_integer(expr.op1(), op1_i))
           throw "extractbits: to_integer failed";
 
@@ -1491,7 +1491,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   }
   else if(expr.id()==ID_vector)
   {
-    // Vector constructor. 
+    // Vector constructor.
     // We flatten the vector by concatenating its elements.
     convert_nary(expr, "concat", bool_as_bv);
   }
@@ -1719,7 +1719,7 @@ void smt1_convt::convert_typecast(
     {
       // integer to fixedbv
       std::size_t from_width=to_bitvector_type(src_type).get_width();
-      
+
       // we just concatenate a zero-valued fractional part
       out << "(concat";
 
@@ -1828,7 +1828,7 @@ void smt1_convt::convert_typecast(
   else if(dest_type.id()==ID_pointer)
   {
     std::size_t to_width=boolbv_width(dest_type);
-  
+
     if(src_type.id()==ID_pointer)
     {
       // this just passes through
@@ -1877,7 +1877,7 @@ void smt1_convt::convert_typecast(
       typet t=c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns);
       typecast_exprt tmp(typecast_exprt(src, t), dest_type);
       convert_typecast(tmp, bool_as_bv);
-    }  
+    }
   }
   else
     throw "TODO typecast4 ? -> "+dest_type.id_string();
@@ -1966,7 +1966,7 @@ void smt1_convt::convert_union(const exprt &expr)
   assert(expr.operands().size()==1);
   const exprt &op=expr.op0();
 
-  std::size_t total_width=boolbv_width(union_type);  
+  std::size_t total_width=boolbv_width(union_type);
   std::size_t member_width=boolbv_width(op.type());
 
   if(total_width==0)
@@ -2090,8 +2090,8 @@ void smt1_convt::convert_constant(
           expr.type().id()==ID_natural)
   {
     std::string value=expr.get_string(ID_value);
-    
-    if(value[0]=='-') 
+
+    if(value[0]=='-')
       out << "(~ " << value.substr(1) << ")";
     else
       out << value;
@@ -2251,7 +2251,7 @@ void smt1_convt::convert_relation(const exprt &expr, bool bool_as_bv)
     out << " ";
     convert_expr(expr.op1(), true);
   }
-  else if(op_type.id()==ID_rational || 
+  else if(op_type.id()==ID_rational ||
           op_type.id()==ID_integer)
   {
     out << expr.id();
@@ -2297,7 +2297,7 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
   {
     if(expr.operands().size()<2)
       throw "pointer arithmetic with less than two operands";
-  
+
     if(expr.operands().size()==2)
     {
       exprt p=expr.op0(), i=expr.op1();
@@ -2310,8 +2310,8 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
 
       mp_integer element_size=
         pointer_offset_size(expr.type().subtype(), ns);
-        
-      // adjust width if needed    
+
+      // adjust width if needed
       if(boolbv_width(i.type())!=boolbv_width(expr.type()))
         i.make_typecast(signedbv_typet(boolbv_width(expr.type())));
 
@@ -2337,7 +2337,7 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
       exprt p;
       typet integer_type=signedbv_typet(boolbv_width(expr.type()));
       exprt integer_sum(ID_plus, integer_type);
-      
+
       forall_operands(it, expr)
       {
         if(it->type().id()==ID_pointer)
@@ -2345,7 +2345,7 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
         else
           integer_sum.copy_to_operands(*it);
       }
-          
+
       Forall_operands(it, integer_sum)
         if(it->type()!=integer_type)
           it->make_typecast(integer_type);
@@ -2358,7 +2358,7 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
           expr.type().id()==ID_integer)
   {
     convert_nary(expr, "+", true);
-  }  
+  }
   else
     throw "unsupported type for +: "+expr.type().id_string();
 }
@@ -2448,9 +2448,9 @@ Function: smt1_convt::convert_floatbv_minus
 
 void smt1_convt::convert_floatbv_minus(const exprt &expr)
 {
-  assert(expr.operands().size()==3); 
+  assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
-    
+
   throw "todo: floatbv_minus";
 }
 
@@ -2519,12 +2519,12 @@ Function: smt1_convt::convert_floatbv_div
 
 void smt1_convt::convert_floatbv_div(const exprt &expr)
 {
-  assert(expr.operands().size()==3); 
+  assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
-    
+
   throw "todo: floatbv_div";
 }
-      
+
 /*******************************************************************\
 
 Function: smt1_convt::convert_mult
@@ -2540,21 +2540,21 @@ Function: smt1_convt::convert_mult
 void smt1_convt::convert_mult(const mult_exprt &expr)
 {
   assert(expr.operands().size()>=2);
-  
+
   // re-write to binary if needed
   if(expr.operands().size()>2)
   {
     // strip last operand
     exprt tmp=expr;
     tmp.operands().pop_back();
-  
+
     // recursive call
     return convert_mult(mult_exprt(tmp, expr.operands().back()));
   }
-  
+
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()==ID_unsignedbv || 
+  if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv)
   {
     // Note that bvmul is really unsigned,
@@ -2614,12 +2614,12 @@ Function: smt1_convt::convert_floatbv_mult
 
 void smt1_convt::convert_floatbv_mult(const exprt &expr)
 {
-  assert(expr.operands().size()==3); 
+  assert(expr.operands().size()==3);
   assert(expr.type().id()==ID_floatbv);
-    
+
   throw "todo: floatbv_mult";
 }
-        
+
 /*******************************************************************\
 
 Function: smt1_convt::convert_with
@@ -2635,28 +2635,28 @@ Function: smt1_convt::convert_with
 void smt1_convt::convert_with(const exprt &expr)
 {
   // get rid of "with" that has more than three operands
-  
+
   assert(expr.operands().size()>=3);
-  
+
   if(expr.operands().size()>3)
   {
     std::size_t s=expr.operands().size();
-  
+
     // strip of the trailing two operands
     exprt tmp=expr;
     tmp.operands().resize(s-2);
-  
+
     with_exprt new_with_expr;
     assert(new_with_expr.operands().size()==3);
     new_with_expr.type()=expr.type();
     new_with_expr.old()=tmp;
     new_with_expr.where()=expr.operands()[s-2];
     new_with_expr.new_value()=expr.operands()[s-1];
-    
-    // recursive call  
+
+    // recursive call
     return convert_with(new_with_expr);
   }
-  
+
   const typet &expr_type=ns.follow(expr.type());
 
   if(expr_type.id()==ID_array)
@@ -2673,16 +2673,16 @@ void smt1_convt::convert_with(const exprt &expr)
       const member_exprt &member_expr=to_member_expr(array);
       const exprt &struct_op=member_expr.struct_op();
       const irep_idt &name=member_expr.get_component_name();
-      
+
       const typet &struct_op_type=ns.follow(struct_op.type());
 
       std::size_t total_width=boolbv_width(struct_op_type);
-      
+
       if(total_width==0)
         throw "failed to get struct width";
 
       std::size_t offset;
-      
+
       if(struct_op_type.id()==ID_struct)
         offset=boolbv_width.get_member(
           to_struct_type(struct_op_type), name).offset;
@@ -2890,7 +2890,7 @@ void smt1_convt::convert_with(const exprt &expr)
     const exprt &value=expr.op2();
 
     std::size_t total_width=boolbv_width(union_type);
-    
+
     if(total_width==0)
       throw "failed to get union width for with";
 
@@ -2921,7 +2921,7 @@ void smt1_convt::convert_with(const exprt &expr)
     // Update bits in a bit-vector. We will use masking and shifts.
 
     std::size_t total_width=boolbv_width(expr_type);
-    
+
     if(total_width==0)
       throw "failed to get total width";
 
@@ -3083,7 +3083,7 @@ void smt1_convt::convert_member(const member_exprt &expr, bool bool_as_bv)
                        to_struct_type(struct_op_type), name).offset;
 
     std::size_t width=boolbv_width(expr.type());
-    
+
     if(width==0)
       throw "failed to get struct member width";
 
@@ -3340,13 +3340,13 @@ Function: smt1_convt::convert_type
 void smt1_convt::convert_type(const typet &type)
 {
   if(type.id()==ID_array)
-  {    
+  {
     const array_typet &array_type=to_array_type(type);
-    
+
     out << "Array[" << array_index_bits << ":";
 
     std::size_t width=boolbv_width(array_type.subtype());
-    
+
     if(width==0)
       throw "failed to get width of array subtype";
 
@@ -3360,7 +3360,7 @@ void smt1_convt::convert_type(const typet &type)
           type.id()==ID_union)
   {
     std::size_t width=boolbv_width(type);
-    
+
     if(width==0)
       throw "failed to get width of struct/union";
 
@@ -3421,11 +3421,11 @@ void smt1_convt::convert_literal(const literalt l)
   {
     if(l.sign())
       out << "(not ";
-  
+
     out << "B" << l.var_no();
 
     if(l.sign())
-      out << ")";  
+      out << ")";
   }
 }
 
@@ -3536,7 +3536,7 @@ Function: smt1_convt::find_symbols_rec
 \*******************************************************************/
 
 void smt1_convt::find_symbols_rec(
-  const typet &type, 
+  const typet &type,
   std::set<irep_idt> &recstack)
 {
   if(type.id()==ID_array)
@@ -3576,7 +3576,7 @@ void smt1_convt::find_symbols_rec(
   {
     const symbol_typet &st=to_symbol_type(type);
     const irep_idt &id=st.get_identifier();
-    
+
     if(recstack.find(id)==recstack.end())
     {
       recstack.insert(id);
@@ -3618,16 +3618,16 @@ exprt smt1_convt::binary2struct(
     const typet &sub_type=ns.follow(comp.type());
 
     std::size_t sub_size=boolbv_width(sub_type);
-    
+
     if(sub_size==0)
       throw "failed to get component width";
 
     index-=sub_size;
     std::string cval=binary.substr(index, sub_size);
-    
+
     e.operands()[i]=ce_value(sub_type, "", cval, true);
   }
-  
+
   return e;
 }
 
@@ -3657,8 +3657,8 @@ exprt smt1_convt::binary2union(
   // Taking the first component should work.
   // Maybe a better idea is to take a largest component
   std::size_t component_nr=0;
- 
-  // construct a union expr  
+
+  // construct a union expr
   union_exprt e(type);
   e.set_component_number(component_nr);
   e.set_component_name(components[component_nr].get_name());
@@ -3699,7 +3699,7 @@ void smt1_convt::flatten_array(const exprt &op)
     throw "array with non-constant size";
 
   std::size_t elem_width=boolbv_width(elem_type);
-  
+
   if(elem_width==0)
     throw "failed to get width of array subtype";
 

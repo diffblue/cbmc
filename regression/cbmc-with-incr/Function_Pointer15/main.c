@@ -6,7 +6,7 @@ void dll_create_generic(void (*insert_fnc)())
   insert_fnc(&x);
 }
 
-void dll_insert_master(int *a) 
+void dll_insert_master(int *a)
 {
   assert(0);
 }

@@ -114,7 +114,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       throw "operator "+expr.id_string()+" takes one operand";
 
     const bvt &bv=convert_bv(operands[0]);
-      
+
     return bv_utils.overflow_negate(bv);
   }
   else if(has_prefix(expr.id_string(), "overflow-typecast-"))
@@ -125,14 +125,14 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
     if(operands.size()!=1)
       throw "operator "+expr.id_string()+" takes one operand";
-      
+
     const exprt &op=operands[0];
 
     const bvt &bv=convert_bv(op);
 
     if(bits>=bv.size() || bits==0)
       throw "overflow-typecast got wrong number of bits";
-      
+
     // signed or unsigned?
     if(op.type().id()==ID_signedbv)
     {

@@ -2,7 +2,7 @@ class x
 {
 private:
   int i;
-  
+
 public:
   x();
 

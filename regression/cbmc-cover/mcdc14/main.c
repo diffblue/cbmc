@@ -6,7 +6,7 @@ int main()
 
   if (altitude > 2500)
   {
-    /* instructions */  
+    /* instructions */
   }
 
   return 1;

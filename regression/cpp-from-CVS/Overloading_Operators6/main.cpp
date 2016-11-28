@@ -2,7 +2,7 @@ struct A
 {
 	int i;
 	A():i(1){}
-	
+
 	int& operator* () {return i;}
 	int operator+ (int j){return i+j;}
 	int operator~ (){return ~i;}
@@ -18,7 +18,7 @@ struct A
 		assert(a[2] == *a);
 		assert(a == 1);
 	}
-	
+
 	void func2()
 	{
 		A a;
@@ -28,7 +28,7 @@ struct A
 		assert((*this)[2] == *(*this));
 		assert((*this) == 1);
 	}
-		
+
 };
 
 

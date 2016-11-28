@@ -31,12 +31,12 @@ public:
   {
     return _total_time;
   }
-  
+
   virtual fine_timet latest_time()
   {
     return _latest_time;
   }
-  
+
   virtual long number_starts()
   {
     return nr_starts;
@@ -46,12 +46,12 @@ public:
   {
     return _total_time.as_string();
   }
-  
+
   std::string output_latest_time()
   {
     return _latest_time.as_string();
   }
-  
+
   friend std::ostream& operator<< (std::ostream &out, const timert &timer)
   {
     return out << timer._total_time;

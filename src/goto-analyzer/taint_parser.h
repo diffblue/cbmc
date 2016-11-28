@@ -24,7 +24,7 @@ public:
   public:
     enum { SOURCE, SINK, SANITIZER } kind;
     enum { THIS, PARAMETER, RETURN_VALUE } where;
-    
+
     inline bool is_source() const
     {
       return kind==SOURCE;
@@ -45,9 +45,9 @@ public:
     irep_idt taint;
     unsigned parameter_number; // the frist one is '1'
     std::string message;
-    
+
     void output(std::ostream &) const;
-    
+
     inline rulet():parameter_number(0)
     {
     }
@@ -55,7 +55,7 @@ public:
 
   typedef std::list<rulet> rulest;
   rulest rules;
-  
+
   void output(std::ostream &) const;
 };
 

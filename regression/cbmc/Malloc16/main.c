@@ -12,7 +12,7 @@ int main()
 
   tmp = malloc(sizeof(int));
   dev = (int*)tmp;
-  
+
   void *r = (void*)0;
   unsigned int q = r;
   unsigned int p = dev;

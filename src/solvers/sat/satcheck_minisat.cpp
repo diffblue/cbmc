@@ -35,7 +35,7 @@ Function: convert
 void convert(const bvt &bv, vec<Lit> &dest)
 {
   dest.growTo(bv.size());
-  
+
   for(unsigned i=0; i<bv.size(); i++)
     dest[i]=Lit(bv[i].var_no(), bv[i].sign());
 }
@@ -66,13 +66,13 @@ public:
 //      resolution_proof.no_vars = var(c[i]);
     }
   }
-  
+
   virtual void chain(const vec<ClauseId> &cs, const vec<Var> &xs);
 
   virtual void deleted(ClauseId c) { }
   virtual void done() { }
   virtual ~minisat_prooft() { }
-  
+
   simple_prooft resolution_proof;
 };
 
@@ -142,7 +142,7 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
     result=tvt(false);
   else
     result=tvt(tvt::tv_enumt::TV_UNKNOWN);
-  
+
   if(a.sign()) result=!result;
 
   return result;
@@ -199,7 +199,7 @@ Function: satcheck_minisat1_baset::lcnf
 void satcheck_minisat1_baset::lcnf(const bvt &bv)
 {
   bvt new_bv;
-  
+
   if(process_clause(bv, new_bv))
     return;
 
@@ -244,11 +244,11 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
       (_no_variables-1) << " variables, " <<
       solver->nClauses() << " clauses" << messaget::eom;
   }
-  
+
   add_variables();
 
   solver->simplifyDB();
-  
+
   std::string msg;
 
   if(empty_clause_added)

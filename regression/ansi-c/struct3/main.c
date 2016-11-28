@@ -1,5 +1,5 @@
 //#define STATIC_ASSERT(condition) \
-//  int some_array##__LINE__[(condition) ? 1 : -1];    
+//  int some_array##__LINE__[(condition) ? 1 : -1];
 #define STATIC_ASSERT(condition) \
   _Static_assert((condition), "assertion");
 
@@ -19,7 +19,7 @@ int main()
   };
 
   STATIC_ASSERT(sizeof(struct A)==sizeof(int));
-  
+
   {
     struct A
     {

@@ -98,7 +98,7 @@ bool cpp_typecheck_fargst::match(
 
       if(default_value.is_nil())
         return false;
-        
+
       ops.push_back(default_value);
     }
   }
@@ -118,14 +118,14 @@ bool cpp_typecheck_fargst::match(
     // * Standard conversion sequences
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
-    
+
     if(i>=parameters.size())
     {
       // Ellipsis is the 'worst' of the conversion sequences
       distance+=1000;
       continue;
     }
-    
+
     exprt parameter=parameters[i];
 
     exprt &operand=ops[i];

@@ -47,7 +47,7 @@ public:
     goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
-  
+
   bool operator()();
 
   // gets called by prop_covert
@@ -61,10 +61,10 @@ public:
       symex_target_equationt::SSA_stepst::iterator step;
       literalt condition;
     };
-    
+
     typedef std::vector<instancet> instancest;
     instancest instances;
-    
+
     void add_instance(
       symex_target_equationt::SSA_stepst::iterator step,
       literalt condition)
@@ -73,13 +73,13 @@ public:
       instances.back().step=step;
       instances.back().condition=condition;
     }
-    
+
     std::string description;
     source_locationt source_location;
-    
+
     // if satisified, we compute a goto_trace
     bool satisfied;
-    
+
     goalt(
       const std::string &_description,
       const source_locationt &_source_location):
@@ -88,12 +88,12 @@ public:
       satisfied(false)
     {
     }
-    
+
     goalt():source_location(source_locationt::nil()),
             satisfied(false)
     {
     }
-    
+
     exprt as_expr() const
     {
       std::vector<exprt> tmp;
@@ -110,7 +110,7 @@ public:
     goto_tracet goto_trace;
     std::vector<irep_idt> covered_goals;
   };
-  
+
   inline irep_idt id(goto_programt::const_targett loc)
   {
     return loc->source_location.get_property_id();
@@ -120,7 +120,7 @@ public:
   goal_mapt goal_map;
   typedef std::vector<testt> testst;
   testst tests;
-  
+
   std::string get_test(const goto_tracet &goto_trace) const
   {
     bool first=true;
@@ -169,15 +169,15 @@ void bmc_covert::satisfying_assignment()
   for(auto &g_it : goal_map)
   {
     goalt &g=g_it.second;
-    
+
     // covered already?
     if(g.satisfied) continue;
-  
+
     // check whether satisfied
     for(const auto &c_it : g.instances)
     {
       literalt cond=c_it.condition;
-      
+
       if(solver.l_get(cond).is_true())
       {
         status() << "Covered " << g.description << messaget::eom;
@@ -188,7 +188,7 @@ void bmc_covert::satisfying_assignment()
     }
   }
 
-  build_goto_trace(bmc.equation, bmc.equation.SSA_steps.end(), 
+  build_goto_trace(bmc.equation, bmc.equation.SSA_steps.end(),
                    solver, bmc.ns, test.goto_trace);
 
   goto_tracet &goto_trace=test.goto_trace;
@@ -206,7 +206,7 @@ void bmc_covert::satisfying_assignment()
           s_it2=s_it1;
           s_it2!=goto_trace.steps.end();
           s_it2=goto_trace.steps.erase(s_it2));
-        
+
       break;
     }
 
@@ -252,13 +252,13 @@ bool bmc_covert::operator()()
 
   for(auto & it : bmc.equation.SSA_steps)
     it.cond_literal=literalt(0, 0);
-  
+
   // Do conversion to next solver layer
-  
+
   bmc.do_conversion();
-  
+
   //bmc.equation.output(std::cout);
-  
+
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
   for(auto it = bmc.equation.SSA_steps.begin();
@@ -276,24 +276,24 @@ bool bmc_covert::operator()()
       goal_map[id(it->source.pc)].add_instance(it, l_c);
     }
   }
-  
+
   status() << "Aiming to cover " << goal_map.size() << " goal(s)" << eom;
-  
+
   cover_goalst cover_goals(solver);
-  
+
   cover_goals.register_observer(*this);
-  
+
   for(const auto &it : goal_map)
   {
     literalt l=solver.convert(it.second.as_expr());
     cover_goals.add(l);
   }
-  
+
   assert(cover_goals.size()==goal_map.size());
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
-  cover_goals();  
+  cover_goals();
 
   // output runtime
 
@@ -302,13 +302,13 @@ bool bmc_covert::operator()()
     status() << "Runtime decision procedure: "
              << (sat_stop-sat_start) << "s" << eom;
   }
-  
+
   // report
   unsigned goals_covered=0;
-  
+
   for(const auto & it : goal_map)
     if(it.second.satisfied) goals_covered++;
-  
+
   switch(bmc.ui)
   {
     case ui_message_handlert::PLAIN:
@@ -381,7 +381,7 @@ bool bmc_covert::operator()()
           xmlt &xml_goal=xml_result.new_element("goal");
           xml_goal.set_attribute("id", id2string(goal_id));
         }
-    
+
         std::cout << xml_result << "\n";
       }
       break;
@@ -447,7 +447,7 @@ bool bmc_covert::operator()()
            << std::fixed << std::setw(1) << std::setprecision(1)
            << (goal_map.empty()?100.0:100.0*goals_covered/goal_map.size())
            << "%)" << eom;
-           
+
   statistics() << "** Used "
                << cover_goals.iterations() << " iteration"
                << (cover_goals.iterations()==1?"":"s")
@@ -460,7 +460,7 @@ bool bmc_covert::operator()()
     for(const auto & test : tests)
       std::cout << get_test(test.goto_trace) << '\n';
   }
-  
+
   return false;
 }
 

@@ -15,12 +15,12 @@ class languagest
 {
 public:
   // conversion of expressions
-  
+
   bool from_expr(const exprt &expr, std::string &code)
   {
     return language->from_expr(expr, code, ns);
   }
-   
+
   bool from_type(const typet &type, std::string &code)
   {
     return language->from_type(type, code, ns);
@@ -33,12 +33,12 @@ public:
   {
     return language->to_expr(code, module, expr, ns);
   }
-  
+
   // constructor / destructor
-  
+
   languagest(const namespacet &_ns, languaget *_language);
   virtual ~languagest();
-  
+
 protected:
   const namespacet &ns;
   languaget *language;

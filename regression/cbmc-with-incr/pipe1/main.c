@@ -13,7 +13,7 @@ int main()
 
   #ifdef _WIN32
   int ret=_pipe(filedesc, 1000, O_BINARY);
-  #else  
+  #else
   int ret=pipe(filedesc);
   #endif
 

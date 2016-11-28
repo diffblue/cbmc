@@ -6,7 +6,7 @@ inline long _InterlockedDecrement(long volatile *p)
 {
   __CPROVER_HIDE:;
   // This function generates a full memory barrier (or fence) to ensure that
-  // memory operations are completed in order.  
+  // memory operations are completed in order.
   __CPROVER_atomic_begin();
   long result=--(*p);
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence");

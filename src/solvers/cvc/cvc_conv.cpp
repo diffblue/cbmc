@@ -38,7 +38,7 @@ Function: cvc_convt::print_assignment
 void cvc_convt::print_assignment(std::ostream &out) const
 {
   // Boolean stuff
-  
+
   for(unsigned v=0; v<boolean_assignment.size(); v++)
     out << "b" << v << "=" << boolean_assignment[v] << "\n";
 
@@ -86,7 +86,7 @@ void cvc_convt::convert_literal(const literalt l)
 
   if(l.sign())
     out << "(NOT ";
-  
+
   out << "l" << l.var_no();
 
   if(l.sign())
@@ -254,11 +254,11 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
         assert(false);
     }
     else
-    {    
+    {
       out << "(LET P: ";
       out << cvc_pointer_type();
       out << " = ";
-      
+
       if(array.type().id()==ID_pointer)
         convert_expr(array);
       else if(array.type().id()==ID_array)
@@ -283,16 +283,16 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
     out << "(LET P: ";
     out << cvc_pointer_type();
     out << " = ";
-    
+
     convert_address_of_rec(struct_op);
 
     const irep_idt &component_name=
       to_member_expr(expr).get_component_name();
-      
+
     mp_integer offset=member_offset(
       to_struct_type(struct_op.type()),
       component_name, ns);
-    
+
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);
 
@@ -334,7 +334,7 @@ literalt cvc_convt::convert(const exprt &expr)
 
   // Three special cases in which we don't need to generate
   // a handle.
-  
+
   if(expr.is_true())
     return const_literal(true);
   else if(expr.is_false())
@@ -346,7 +346,7 @@ literalt cvc_convt::convert(const exprt &expr)
 
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
-  
+
   find_symbols(expr);
 
   // define new handle
@@ -511,7 +511,7 @@ void cvc_convt::convert_expr(const exprt &expr)
             out << " AND ";
           else if(expr.id()==ID_nand)
             out << " NAND ";
-          else if(expr.id()==ID_xor) 
+          else if(expr.id()==ID_xor)
             out << " XOR ";
           else
             assert(false);
@@ -544,7 +544,7 @@ void cvc_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
     const exprt &op=expr.op0();
-    
+
     if(expr.type().id()==ID_bool)
     {
       if(op.type().id()==ID_signedbv ||
@@ -564,11 +564,11 @@ void cvc_convt::convert_expr(const exprt &expr)
             expr.type().id()==ID_unsignedbv)
     {
       unsigned to_width=unsafe_string2unsigned(id2string(expr.type().get(ID_width)));
-      
+
       if(op.type().id()==ID_signedbv)
       {
         unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
-        
+
         if(from_width==to_width)
           convert_expr(op);
         else if(from_width<to_width)
@@ -587,7 +587,7 @@ void cvc_convt::convert_expr(const exprt &expr)
       else if(op.type().id()==ID_unsignedbv)
       {
         unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
-        
+
         if(from_width==to_width)
           convert_expr(op);
         else if(from_width<to_width)
@@ -598,7 +598,7 @@ void cvc_convt::convert_expr(const exprt &expr)
             out << "0";
 
           out << " @ ";
-            
+
           out << "(";
           convert_expr(op);
           out << "))";
@@ -620,7 +620,7 @@ void cvc_convt::convert_expr(const exprt &expr)
             out << "0";
 
           out << " @ ";
-          
+
           out << "IF ";
           convert_expr(op);
           out << " THEN 0bin1 ELSE 0bin0 ENDIF)";
@@ -653,12 +653,12 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_struct)
   {
     out << "(# ";
-    
+
     const struct_typet &struct_type=to_struct_type(expr.type());
-  
+
     const struct_typet::componentst &components=
       struct_type.components();
-      
+
     assert(components.size()==expr.operands().size());
 
     unsigned i=0;
@@ -672,7 +672,7 @@ void cvc_convt::convert_expr(const exprt &expr)
       out << ":=";
       convert_expr(expr.operands()[i]);
     }
-    
+
     out << " #)";
   }
   else if(expr.id()==ID_constant)
@@ -682,19 +682,19 @@ void cvc_convt::convert_expr(const exprt &expr)
        expr.type().id()==ID_bv)
     {
       const irep_idt &value=expr.get(ID_value);
-      
+
       if(value.size()==8 ||
          value.size()==16 ||
          value.size()==32 ||
          value.size()==64)
       {
         std::size_t w=value.size()/4;
-      
+
         mp_integer i=binary2integer(id2string(value), false);
         std::string hex=integer2string(i, 16);
-        
+
         while(hex.size()<w) hex="0"+hex;
-        
+
         out << "0hex" << hex;
       }
       else
@@ -705,7 +705,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     else if(expr.type().id()==ID_pointer)
     {
       const irep_idt &value=expr.get(ID_value);
-      
+
       if(value=="NULL")
       {
         out << "(# object:="
@@ -728,9 +728,9 @@ void cvc_convt::convert_expr(const exprt &expr)
     else if(expr.type().id()==ID_array)
     {
       out << "ARRAY (i: " << array_index_type() << "):";
-      
+
       assert(!expr.operands().empty());
-      
+
       unsigned i=0;
       forall_operands(it, expr)
       {
@@ -743,7 +743,7 @@ void cvc_convt::convert_expr(const exprt &expr)
         convert_array_value(*it);
         i++;
       }
-      
+
       out << "\n  ELSE ";
       convert_expr(expr.op0());
       out << "\n  ENDIF";
@@ -757,7 +757,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     else
       throw "unknown constant: "+expr.type().id_string();
   }
-  else if(expr.id()==ID_concatenation || 
+  else if(expr.id()==ID_concatenation ||
           expr.id()==ID_bitand ||
           expr.id()==ID_bitor)
   {
@@ -783,7 +783,7 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_bitxor)
   {
     assert(!expr.operands().empty());
-  
+
     if(expr.operands().size()==1)
     {
       convert_expr(expr.op0());
@@ -799,7 +799,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     else
     {
       assert(expr.operands().size()>=3);
-      
+
       exprt tmp(expr);
       tmp.operands().resize(tmp.operands().size()-1);
 
@@ -856,7 +856,7 @@ void cvc_convt::convert_expr(const exprt &expr)
           expr.id()==ID_xor)
   {
     assert(expr.type().id()==ID_bool);
-    
+
     if(expr.operands().size()>=2)
     {
       forall_operands(it, expr)
@@ -870,7 +870,7 @@ void cvc_convt::convert_expr(const exprt &expr)
           else if(expr.id()==ID_xor)
             out << " XOR ";
         }
-        
+
         out << "(";
         convert_expr(*it);
         out << ")";
@@ -923,7 +923,7 @@ void cvc_convt::convert_expr(const exprt &expr)
           expr.id()==ID_gt)
   {
     assert(expr.operands().size()==2);
-    
+
     const typet &op_type=expr.op0().type();
 
     if(op_type.id()==ID_unsignedbv)
@@ -936,7 +936,7 @@ void cvc_convt::convert_expr(const exprt &expr)
         out << "BVGE";
       else if(expr.id()==ID_gt)
         out << "BVGT";
-      
+
       out << "(";
       convert_expr(expr.op0());
       out << ", ";
@@ -953,7 +953,7 @@ void cvc_convt::convert_expr(const exprt &expr)
         out << "SBVGE";
       else if(expr.id()==ID_gt)
         out << "SBVGT";
-      
+
       out << "(";
       convert_expr(expr.op0());
       out << ", ";
@@ -977,16 +977,16 @@ void cvc_convt::convert_expr(const exprt &expr)
           out << ", ";
           convert_expr(*it);
         }
-          
+
         out << ")";
       }
       else if(expr.type().id()==ID_pointer)
       {
         if(expr.operands().size()!=2)
           throw "pointer arithmetic with more than two operands";
-        
+
         const exprt *p, *i;
-        
+
         if(expr.op0().type().id()==ID_pointer)
         {
           p=&expr.op0();
@@ -999,7 +999,7 @@ void cvc_convt::convert_expr(const exprt &expr)
         }
         else
           throw "unexpected mixture in pointer arithmetic";
-        
+
         out << "(LET P: " << cvc_pointer_type() << " = ";
         convert_expr(*p);
         out << " IN P WITH .offset:=BVPLUS("
@@ -1163,7 +1163,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     out << "(";
     convert_expr(expr.op0());
     out << ")";
-  
+
     for(unsigned i=1; i<expr.operands().size(); i+=2)
     {
       assert((i+1)<expr.operands().size());
@@ -1233,11 +1233,11 @@ void cvc_convt::convert_expr(const exprt &expr)
     {
       out << "(";
       convert_expr(expr.op0());
-      
+
       mp_integer i;
       if(to_integer(expr.op1(), i))
         throw "extractbit takes constant as second parameter";
-        
+
       out << "[" << i << ":" << i << "]=0bin1)";
     }
     else
@@ -1246,11 +1246,11 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_replication)
   {
     assert(expr.operands().size()==2);
-  
+
     mp_integer times;
     if(to_integer(expr.op0(), times))
       throw "replication takes constant as first parameter";
-    
+
     out << "(LET v: BITVECTOR(1) = ";
 
     convert_expr(expr.op1());
@@ -1262,7 +1262,7 @@ void cvc_convt::convert_expr(const exprt &expr)
       if(i!=0) out << "@";
       out << "v";
     }
-    
+
     out << ")";
   }
   else
@@ -1289,17 +1289,17 @@ void cvc_convt::set_to(const exprt &expr, bool value)
       set_to(*it, true);
     return;
   }
-  
+
   out << "%% set_to " << (value?"true":"false") << std::endl;
 
   if(expr.id()==ID_equal && value)
   {
     assert(expr.operands().size()==2);
-    
+
     if(expr.op0().id()==ID_symbol)
     {
       const irep_idt &identifier=expr.op0().get(ID_identifier);
-      
+
       identifiert &id=identifier_map[identifier];
 
       if(id.type.is_nil())
@@ -1319,26 +1319,26 @@ void cvc_convt::set_to(const exprt &expr, bool value)
           convert_type(expr.op0().type());
           out << " = ";
           convert_expr(expr.op1());
-        
+
           out << ";" << std::endl << std::endl;
           return;
         }
       }
     }
   }
-  
+
   find_symbols(expr);
 
   out << "ASSERT ";
 
   if(!value)
     out << "NOT (";
-    
+
   convert_expr(expr);
 
   if(!value)
     out << ")";
-    
+
   out << ";" << std::endl << std::endl;
 }
 
@@ -1360,7 +1360,7 @@ void cvc_convt::find_symbols(const exprt &expr)
 
   forall_operands(it, expr)
     find_symbols(*it);
-    
+
   if(expr.id()==ID_symbol)
   {
     if(expr.type().id()==ID_code)
@@ -1379,7 +1379,7 @@ void cvc_convt::find_symbols(const exprt &expr)
       convert_type(expr.type());
       out << ";" << std::endl;
     }
-  }  
+  }
   else if(expr.id()==ID_nondet_symbol)
   {
     if(expr.type().id()==ID_code)
@@ -1398,7 +1398,7 @@ void cvc_convt::find_symbols(const exprt &expr)
       convert_type(expr.type());
       out << ";" << std::endl;
     }
-  }  
+  }
 }
 
 /*******************************************************************\
@@ -1418,10 +1418,10 @@ void cvc_convt::convert_type(const typet &type)
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    
+
     out << "ARRAY " << array_index_type()
                  << " OF ";
-                 
+
     if(array_type.subtype().id()==ID_bool)
       out << "BITVECTOR(1)";
     else
@@ -1435,9 +1435,9 @@ void cvc_convt::convert_type(const typet &type)
           type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
-  
+
     out << "[#";
-    
+
     const struct_typet::componentst &components=
       struct_type.components();
 
@@ -1452,7 +1452,7 @@ void cvc_convt::convert_type(const typet &type)
       out << ": ";
       convert_type(it->type());
     }
-    
+
     out << " #]";
   }
   else if(type.id()==ID_pointer ||
@@ -1467,24 +1467,24 @@ void cvc_convt::convert_type(const typet &type)
   else if(type.id()==ID_signedbv)
   {
     std::size_t width=to_signedbv_type(type).get_width();
-      
+
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
-  
+
     out << "BITVECTOR(" << width << ")";
   }
   else if(type.id()==ID_unsignedbv)
   {
     std::size_t width=to_unsignedbv_type(type).get_width();
-      
+
     if(width==0)
       throw "zero-width vector type: "+type.id_string();
-  
+
     out << "BITVECTOR(" << width << ")";
   }
   else
     throw "unsupported type: "+type.id_string();
-}    
+}
 
 /*******************************************************************\
 

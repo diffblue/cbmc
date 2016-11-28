@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: ILP construction for cycles affecting user-assertions 
+Module: ILP construction for cycles affecting user-assertions
         and resolution
 
 Author: Vincent Nimal
@@ -22,7 +22,7 @@ Function:
 \*******************************************************************/
 
 bool fence_assert_insertert::find_assert(
-  const event_grapht::critical_cyclet& cycle) const 
+  const event_grapht::critical_cyclet& cycle) const
 {
   /* TODO */
   return true;

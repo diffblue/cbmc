@@ -74,7 +74,7 @@ void property_checkert::initialize_property_map(
        it->first==goto_functions.entry_point())
     {
       const goto_programt &goto_program=it->second.body;
-    
+
       for(goto_programt::instructionst::const_iterator
           it=goto_program.instructions.begin();
           it!=goto_program.instructions.end();
@@ -82,11 +82,11 @@ void property_checkert::initialize_property_map(
       {
         if(!it->is_assert())
           continue;
-      
+
         const source_locationt &source_location=it->source_location;
-      
+
         irep_idt property_id=source_location.get_property_id();
-        
+
         property_statust &property_status=property_map[property_id];
         property_status.result=UNKNOWN;
         property_status.location=it;

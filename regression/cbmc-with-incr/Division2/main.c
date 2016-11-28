@@ -3,7 +3,7 @@ _Bool nondet_bool();
 void main()
 {
   int i=2, j;
-  
+
   if(nondet_bool())
     i++;
 

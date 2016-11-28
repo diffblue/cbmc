@@ -16,7 +16,7 @@ void run(const char *what, char *const argv[])
 
   /* now create new process */
   childpid = fork();
-    
+
   if(childpid>=0) /* fork succeeded */
   {
     if(childpid==0) /* fork() returns 0 to the child process */
@@ -40,24 +40,24 @@ void run(const char *what, char *const argv[])
     exit(1);
   }
 }
- 
+
 int main(int argc, char * argv[])
 {
   // First do original call.
-  
+
   // on some systems, gcc gets confused if it is not argument 0
   // (which normally contains the path to the executable being called).
   argv[0]=strdup(gcc);
 
   run(gcc, argv);
-  
+
   // now do preprocessing call
   char **new_argv=malloc(sizeof(char *)*(argc+1));
-  
+
   _Bool compile=0;
   _Bool assemble=0;
   _Bool next_is_o=0;
-  
+
   unsigned i;
 
   for(i=0; i<argc; i++)
@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
 
       if(strcmp(tmp+l-2, ".o")==0)
         tmp[l-2]=0; // cut off .o
-      
+
       strcat(tmp, ".i"); // append .i
       arg=tmp;
       next_is_o=0;
@@ -100,13 +100,13 @@ int main(int argc, char * argv[])
 
     new_argv[i]=arg;
   }
-  
+
   new_argv[argc]=NULL;
-  
+
   if(compile && !assemble)
   {
     run(gcc, new_argv);
   }
-    
+
   return 0;
 }

@@ -33,7 +33,7 @@ public:
     state(_state)
   {
   }
-  
+
 protected:
   goto_symext &goto_symex;
   goto_symext::statet &state;
@@ -42,7 +42,7 @@ protected:
     const std::string &property,
     const std::string &msg,
     const guardt &guard);
-          
+
   virtual void get_value_set(
     const exprt &expr,
     value_setst::valuest &value_set);

@@ -70,7 +70,7 @@ void value_set_analysis_fivrt::add_vars(
   const goto_programt &goto_program)
 {
   typedef std::list<value_set_fivrt::entryt> entry_listt;
-  
+
   // get the globals
   entry_listt globals;
   get_globals(globals);
@@ -79,19 +79,19 @@ void value_set_analysis_fivrt::add_vars(
   goto_programt::decl_identifierst locals;
   goto_program.get_decl_identifiers(locals);
 
-  // cache the list for the locals to speed things up  
+  // cache the list for the locals to speed things up
   typedef hash_map_cont<irep_idt, entry_listt, irep_id_hash> entry_cachet;
   entry_cachet entry_cache;
-  
+
   value_set_fivrt &v=state.value_set;
 
   for(goto_programt::instructionst::const_iterator
       i_it=goto_program.instructions.begin();
       i_it!=goto_program.instructions.end();
       i_it++)
-  {    
+  {
     v.add_vars(globals);
-    
+
     for(goto_programt::decl_identifierst::const_iterator
         l_it=locals.begin();
         l_it!=locals.end();
@@ -103,7 +103,7 @@ void value_set_analysis_fivrt::add_vars(
       if(e_it==entry_cache.end())
       {
         const symbolt &symbol=ns.lookup(*l_it);
-        
+
         std::list<value_set_fivrt::entryt> &entries=entry_cache[*l_it];
         get_entries(symbol, entries);
         v.add_vars(entries);
@@ -157,9 +157,9 @@ void value_set_analysis_fivrt::get_entries_rec(
      t.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(t);
-    
+
     const struct_typet::componentst &c=struct_type.components();
-    
+
     for(struct_typet::componentst::const_iterator
         it=c.begin();
         it!=c.end();
@@ -200,7 +200,7 @@ void value_set_analysis_fivrt::add_vars(
   // get the globals
   std::list<value_set_fivrt::entryt> globals;
   get_globals(globals);
-  
+
   value_set_fivrt &v=state.value_set;
 
   for(goto_functionst::function_mapt::const_iterator
@@ -208,28 +208,28 @@ void value_set_analysis_fivrt::add_vars(
       f_it!=goto_functions.function_map.end();
       f_it++)
   {
-    // get the locals  
-    std::set<irep_idt> locals;  
-    get_local_identifiers(f_it->second, locals);  
+    // get the locals
+    std::set<irep_idt> locals;
+    get_local_identifiers(f_it->second, locals);
 
     forall_goto_program_instructions(i_it, f_it->second.body)
-    {    
+    {
       v.add_vars(globals);
-      
+
       for(std::set<irep_idt>::const_iterator
           l_it=locals.begin();
           l_it!=locals.end();
           l_it++)
       {
         const symbolt &symbol=ns.lookup(*l_it);
-        
+
         std::list<value_set_fivrt::entryt> entries;
         get_entries(symbol, entries);
         v.add_vars(entries);
       }
     }
   }
-}    
+}
 
 /*******************************************************************\
 
@@ -251,7 +251,7 @@ void value_set_analysis_fivrt::get_globals(
     if(it->second.is_lvalue &&
        it->second.is_static_lifetime)
       get_entries(it->second, dest);
-}    
+}
 
 /*******************************************************************\
 
@@ -278,13 +278,13 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         {
           const typet *t = &type;
           while (t->id()==ID_pointer) t = &(t->subtype());
-                  
+
           return (t->id()==ID_code);
         }
-        
+
         break;
       }
-      default: // don't track. 
+      default: // don't track.
         break;
     }
   }
@@ -292,7 +292,7 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
           type.id()==ID_union)
   {
     const struct_typet &struct_type=to_struct_type(type);
-    
+
     const struct_typet::componentst &components=
       struct_type.components();
 
@@ -302,12 +302,12 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         it++)
     {
       if(check_type(it->type())) return true;
-    }    
+    }
   }
   else if(type.id()==ID_array)
     return check_type(type.subtype());
   else if(type.id()==ID_symbol)
     return check_type(ns.follow(type));
-  
-  return false;      
-}    
+
+  return false;
+}

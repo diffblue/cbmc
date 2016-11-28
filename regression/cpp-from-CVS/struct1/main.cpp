@@ -33,7 +33,7 @@ void f()
 int main()
 {
   int z;
-  
+
   z=sizeof(struct AA);
 
 }

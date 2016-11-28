@@ -17,7 +17,7 @@ int main()
   // this sould work
   if(i<sizeof(a))
     strcpy(a, p);
-    
+
   // and even this should work
   char ch;
   ch=*p;

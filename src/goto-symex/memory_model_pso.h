@@ -20,7 +20,7 @@ public:
   }
 
   virtual void operator()(symex_target_equationt &equation);
-  
+
 protected:
   virtual bool program_order_is_relaxed(
     partial_order_concurrencyt::event_it e1,

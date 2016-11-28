@@ -2,7 +2,7 @@
 
 #ifdef PRINT
 #include <stdio.h>
-void assert(int cond) 
+void assert(int cond)
 { if(!cond) printf("assert failed!\n"); }
 #endif
 

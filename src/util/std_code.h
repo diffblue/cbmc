@@ -21,13 +21,13 @@ public:
   inline codet():exprt(ID_code, typet(ID_code))
   {
   }
-  
+
   inline explicit codet(const irep_idt &statement):
     exprt(ID_code, typet(ID_code))
   {
     set_statement(statement);
   }
-  
+
   inline void set_statement(const irep_idt &statement)
   {
     set(ID_statement, statement);
@@ -37,7 +37,7 @@ public:
   {
     return get(ID_statement);
   }
-  
+
   codet &first_statement();
   const codet &first_statement() const;
   codet &last_statement();
@@ -65,7 +65,7 @@ public:
   inline code_blockt():codet(ID_block)
   {
   }
-  
+
   explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
   {
     operandst &o=operands();
@@ -74,14 +74,14 @@ public:
         it=_list.begin();
         it!=_list.end();
         it++)
-      o.push_back(*it);        
+      o.push_back(*it);
   }
-  
+
   inline void add(const codet &code)
   {
     copy_to_operands(code);
   }
-  
+
   // This is the closing '}' or 'END' at the end of a block
   source_locationt end_location() const
   {
@@ -145,12 +145,12 @@ public:
   {
     operands().resize(2);
   }
-  
+
   inline code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
   {
     copy_to_operands(lhs, rhs);
   }
-  
+
   inline exprt &lhs()
   {
     return op0();
@@ -193,12 +193,12 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline explicit code_declt(const exprt &symbol):codet(ID_decl)
   {
     copy_to_operands(symbol);
   }
-  
+
   inline exprt &symbol()
   {
     return op0();
@@ -239,12 +239,12 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline explicit code_deadt(const exprt &symbol):codet(ID_dead)
   {
     copy_to_operands(symbol);
   }
-  
+
   inline exprt &symbol()
   {
     return op0();
@@ -323,7 +323,7 @@ public:
     // will change to resize(1) in the future
     operands().reserve(1);
   }
-  
+
   inline explicit code_assertt(const exprt &expr):codet(ID_assert)
   {
     copy_to_operands(expr);
@@ -363,22 +363,22 @@ public:
     op1().make_nil();
     op2().make_nil();
   }
-  
+
   inline const exprt &cond() const
   {
     return op0();
   }
-  
+
   inline exprt &cond()
   {
     return op0();
   }
-  
+
   inline const codet &then_case() const
   {
     return static_cast<const codet &>(op1());
   }
-  
+
   inline bool has_else_case() const
   {
     return op2().is_not_nil();
@@ -423,17 +423,17 @@ public:
   {
     operands().resize(2);
   }
-  
+
   inline const exprt &value() const
   {
     return op0();
   }
-  
+
   inline exprt &value()
   {
     return op0();
   }
-  
+
   inline const codet &body() const
   {
     return to_code(op1());
@@ -468,17 +468,17 @@ public:
   {
     operands().resize(2);
   }
-  
+
   inline const exprt &cond() const
   {
     return op0();
   }
-  
+
   inline exprt &cond()
   {
     return op0();
   }
-  
+
   inline const codet &body() const
   {
     return to_code(op1());
@@ -513,17 +513,17 @@ public:
   {
     operands().resize(2);
   }
-  
+
   inline const exprt &cond() const
   {
     return op0();
   }
-  
+
   inline exprt &cond()
   {
     return op0();
   }
-  
+
   inline const codet &body() const
   {
     return to_code(op1());
@@ -559,7 +559,7 @@ public:
     operands().resize(4);
   }
 
-  // nil or a statement  
+  // nil or a statement
   inline const exprt &init() const
   {
     return op0();
@@ -574,22 +574,22 @@ public:
   {
     return op1();
   }
-  
+
   inline exprt &cond()
   {
     return op1();
   }
-  
+
   inline const exprt &iter() const
   {
     return op2();
   }
-  
+
   inline exprt &iter()
   {
     return op2();
   }
-  
+
   inline const codet &body() const
   {
     return to_code(op3());
@@ -628,7 +628,7 @@ public:
   {
     set_destination(label);
   }
-  
+
   void set_destination(const irep_idt &label)
   {
     set(ID_destination, label);
@@ -655,7 +655,7 @@ static inline code_gotot &to_code_goto(codet &code)
 }
 
 /*! \brief A function call
-    
+
     The function call instruction has three operands.
     The first is the expression that is used to store
     the return value. The second is the function called.
@@ -670,7 +670,7 @@ public:
     lhs().make_nil();
     op2().id(ID_arguments);
   }
-  
+
   inline exprt &lhs()
   {
     return op0();
@@ -725,23 +725,23 @@ public:
   {
     operands().reserve(1);
   }
-  
+
   explicit inline code_returnt(const exprt &_op):codet(ID_return)
   {
     copy_to_operands(_op);
   }
-  
+
   inline const exprt &return_value() const
   {
     return op0();
   }
-  
+
   inline exprt &return_value()
   {
     operands().resize(1);
     return op0();
   }
-  
+
   inline bool has_return_value() const
   {
     return operands().size()==1;
@@ -783,7 +783,7 @@ public:
     set_label(_label);
     code()=_code;
   }
-  
+
   inline const irep_idt &get_label() const
   {
     return get(ID_label);
@@ -793,7 +793,7 @@ public:
   {
     set(ID_label, label);
   }
-  
+
   codet &code()
   {
     return static_cast<codet &>(op0());
@@ -847,12 +847,12 @@ public:
   {
     return op0();
   }
-  
+
   inline exprt &case_op()
   {
     return op0();
   }
-  
+
   codet &code()
   {
     return static_cast<codet &>(op1());
@@ -928,12 +928,12 @@ public:
   inline code_asmt():codet(ID_asm)
   {
   }
-  
+
   inline explicit code_asmt(const exprt &expr):codet(ID_asm)
   {
     operands().push_back(expr);
   }
-  
+
   inline const irep_idt &get_flavor() const
   {
     return get(ID_flavor);
@@ -966,12 +966,12 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
     operands().push_back(expr);
   }
-  
+
   inline friend code_expressiont &to_code_expression(codet &code)
   {
     assert(code.get_statement()==ID_expression &&
@@ -985,7 +985,7 @@ public:
            code.operands().size()==1);
     return static_cast<const code_expressiont &>(code);
   }
-  
+
   inline const exprt &expression() const
   {
     return op0();
@@ -1028,7 +1028,7 @@ public:
     assert(expr.id()==ID_side_effect);
     return static_cast<const side_effect_exprt &>(expr);
   }
-  
+
   inline const irep_idt &get_statement() const
   {
     return get(ID_statement);

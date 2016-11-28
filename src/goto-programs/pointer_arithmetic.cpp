@@ -111,7 +111,7 @@ void pointer_arithmetict::add_to_offset(const exprt &src)
 
     if(new_offset.op1().type()!=offset.type())
       new_offset.op1().make_typecast(offset.type());
-      
+
     offset=new_offset;
   }
 }

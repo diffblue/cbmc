@@ -26,7 +26,7 @@ Function: java_bytecode_typecheckt::to_string
 \*******************************************************************/
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)
-{ 
+{
   return expr2java(expr, ns);
 }
 
@@ -43,7 +43,7 @@ Function: java_bytecode_typecheckt::to_string
 \*******************************************************************/
 
 std::string java_bytecode_typecheckt::to_string(const typet &type)
-{ 
+{
   return type2java(type, ns);
 }
 
@@ -82,21 +82,21 @@ void java_bytecode_typecheckt::typecheck()
 {
   // The hash table iterators are not stable,
   // and we might add new symbols.
-  
+
   std::vector<irep_idt> identifiers;
   identifiers.reserve(symbol_table.symbols.size());
   forall_symbols(s_it, symbol_table.symbols)
     identifiers.push_back(s_it->first);
-    
+
   // We first check all type symbols,
   // recursively doing base classes first.
   for(const irep_idt &id : identifiers)
   {
     symbolt &symbol=symbol_table.symbols[id];
-    
+
     if(!symbol.is_type)
       continue;
-  
+
     typecheck_type_symbol(symbol);
   }
 
@@ -104,7 +104,7 @@ void java_bytecode_typecheckt::typecheck()
   for(const irep_idt &id : identifiers)
   {
     symbolt &symbol=symbol_table.symbols[id];
-    
+
     if(symbol.is_type)
       continue;
 
@@ -177,10 +177,10 @@ bool java_bytecode_typecheck(
   {
     java_bytecode_typecheck.error(e);
   }
-  
+
   return java_bytecode_typecheck.get_error_found();
   #endif
-  
+
   // fail for now
   return true;
 }

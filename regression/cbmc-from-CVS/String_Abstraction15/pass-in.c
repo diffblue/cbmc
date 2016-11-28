@@ -1,7 +1,7 @@
 void * malloc(unsigned);
 
 void use_str(char * s) {
-  assert(__CPROVER_is_zero_string(s)); 
+  assert(__CPROVER_is_zero_string(s));
 }
 
 int main(int argc, char* argv[]) {

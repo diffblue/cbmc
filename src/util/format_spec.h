@@ -17,7 +17,7 @@ public:
   unsigned min_width;
   unsigned precision;
   bool zero_padding;
-  
+
   // 'printf' equivalents:
   // fF: DECIMAL
   // eE: SCIENTIFIC
@@ -25,7 +25,7 @@ public:
 
   typedef enum { DECIMAL, SCIENTIFIC, AUTOMATIC } stylet;
   stylet style;
-  
+
   format_spect():
     min_width(0),
     precision(6),

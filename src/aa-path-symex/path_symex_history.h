@@ -35,34 +35,34 @@ public:
     index(std::numeric_limits<std::size_t>::max()), history(0)
   {
   }
-  
+
   inline bool is_nil() const
   {
     return index==std::numeric_limits<std::size_t>::max();
   }
-  
+
   inline path_symex_historyt &get_history() const
   {
     assert(history!=0);
     return *history;
   }
-  
+
   // pre-decrement
   inline path_symex_step_reft &operator--();
-  
+
   inline path_symex_stept &operator*() const { return get(); }
   inline path_symex_stept *operator->() const { return &get(); }
-  
+
   void generate_successor();
 
-  // build a forward-traversible version of the history  
+  // build a forward-traversible version of the history
   void build_history(std::vector<path_symex_step_reft> &dest) const;
 
 protected:
   // we use a vector to store all steps
   std::size_t index;
   class path_symex_historyt *history;
-  
+
   inline path_symex_stept &get() const;
 };
 
@@ -73,10 +73,10 @@ class path_symex_stept
 {
 public:
   path_symex_step_reft predecessor;
-  
+
   // the thread that did the step
   unsigned thread_nr;
-  
+
   // the instruction that was executed
   loc_reft pc;
 
@@ -84,8 +84,8 @@ public:
   exprt full_lhs;
   symbol_exprt ssa_lhs;
 
-  bool hidden; 
-  
+  bool hidden;
+
   path_symex_stept():
     guard(nil_exprt()),
     ssa_rhs(nil_exprt()),
@@ -93,10 +93,10 @@ public:
     hidden(false)
   {
   }
-  
+
   // interface to solvers; this converts a single step
   void convert(decision_proceduret &dest) const;
-  
+
   void output(std::ostream &) const;
 };
 
@@ -110,7 +110,7 @@ static inline decision_proceduret &operator << (
     src->convert(dest);
     --src;
   }
-  
+
   return dest;
 }
 

@@ -52,7 +52,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
       std::cout << "pos " << pos << std::endl;
       #endif
       size_t pos_char = line.find_first_of(CHAR_DELIMITERS, 0);
-      
+
       if(pos!=std::string::npos)
       {
         std::string decision = line.substr(0, pos);
@@ -86,7 +86,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
           #ifdef VERBOSE
           std::cout << "parsed_lit " << parsed_lit << " " << std::endl;
           #endif
-          if(parsed_lit == 0) 
+          if(parsed_lit == 0)
           {
             bvt no_dup=cnft::eliminate_duplicates(new_bv);
             #ifdef VERBOSE

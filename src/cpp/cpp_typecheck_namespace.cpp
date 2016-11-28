@@ -56,7 +56,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
               << it->second.location << eom;
       throw 0;
     }
-  
+
     if(it->second.type.id()!=ID_namespace)
     {
       error().source_location=namespace_spec.source_location();

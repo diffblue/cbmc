@@ -7,7 +7,7 @@ int main()
   #error _CHAR_UNSIGNED should be set
   #endif
   #endif
-  
+
   #ifdef __GNUC__
   #ifndef __CHAR_UNSIGNED__
   #error __CHAR_UNSIGNED__ should be set

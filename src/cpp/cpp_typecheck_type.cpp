@@ -68,7 +68,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
       error() << "error: expected type" << eom;
       throw 0;
     }
-    
+
     type=symbol_expr.type();
     assert(type.is_not_nil());
 
@@ -254,6 +254,6 @@ void cpp_typecheckt::typecheck_type(typet &type)
     error() << "unexpected cpp type: " << type.pretty() << eom;
     throw 0;
   }
-  
+
   assert(type.is_not_nil());
 }

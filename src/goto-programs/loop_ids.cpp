@@ -82,7 +82,7 @@ void show_loop_ids(
         {
           unsigned loop_id=it->loop_number;
           std::string id=id2string(it->function)+"."+i2string(loop_id);
-      
+
           xmlt xml_loop("loop");
           xml_loop.set_attribute("name", id);
           xml_loop.new_element("loop-id").data=id;

@@ -9,6 +9,6 @@ int main()
 
     b=1;
   }
- 
+
   assert(a==b);
 }

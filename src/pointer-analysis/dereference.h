@@ -20,7 +20,7 @@ class typecast_exprt;
 class dereferencet
 {
 public:
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param _ns Namespace
    * \param _new_symbol_table A symbol_table to store new symbols in
    * \param _options Options, in particular whether pointer checks are
@@ -34,8 +34,8 @@ public:
   }
 
   ~dereferencet() { }
-  
-  /*! 
+
+  /*!
    * The operator '()' dereferences the
    * given pointer-expression.
    *
@@ -44,7 +44,7 @@ public:
   */
 
   exprt operator()(const exprt &pointer);
-    
+
 private:
   const namespacet &ns;
 

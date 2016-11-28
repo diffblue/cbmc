@@ -6,7 +6,7 @@ BUILD_ENV = AUTO
 #CXXFLAGS = -std=c++11
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
-#LIB_GLPK = -lglpk 
+#LIB_GLPK = -lglpk
 
 # SAT-solvers we have
 #PRECOSAT = ../../precosat-576-7e5e66f-120112

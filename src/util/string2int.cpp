@@ -56,7 +56,7 @@ inline T str2number(const char *str, int base, bool safe)
       assert(val >= (long long)std::numeric_limits<T>::min());
     }
   }
-  
+
   return (T)val;
 }
 

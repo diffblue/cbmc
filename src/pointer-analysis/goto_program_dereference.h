@@ -43,11 +43,11 @@ public:
   void dereference_expression(
     goto_programt::const_targett target,
     exprt &expr);
-    
+
   virtual ~goto_program_dereferencet()
   {
   }
-    
+
 protected:
   const optionst &options;
   const namespacet &ns;
@@ -74,11 +74,11 @@ protected:
 protected:
   void dereference_rec(exprt &expr, guardt &guard, const value_set_dereferencet::modet mode);
   void dereference_expr(exprt &expr, const bool checks_only, const value_set_dereferencet::modet mode);
-  
+
   const std::set<irep_idt> *valid_local_variables;
   source_locationt dereference_location;
   goto_programt::const_targett current_target;
-  
+
   std::set<exprt> assertions;
   goto_programt new_code;
 };

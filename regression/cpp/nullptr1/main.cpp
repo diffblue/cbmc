@@ -17,11 +17,11 @@ int main()
   nullptr_t my_null;
   my_null=nullptr;
   my_null=0;
-  
+
   char buffer[10];
   void *p=my_null, *q=buffer;
   assert(q!=nullptr);
-  
+
   something(nullptr);
 }
 

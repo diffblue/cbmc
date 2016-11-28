@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: 
+Function:
 
   Inputs:
 

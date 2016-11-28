@@ -20,5 +20,5 @@ int main()
 	assert(B::i == 2);
 	obj.A::i++;
 	assert(A::i == 1);
-	
+
 }

@@ -41,25 +41,25 @@ public:
   {
     return *this;
   }
-  
+
   void guard_expr(exprt &dest) const;
 
 #if 0
   bool empty() const { return guard_list.empty(); }
-  bool is_true() const { return empty(); } 
+  bool is_true() const { return empty(); }
   bool is_false() const;
-  
+
   void make_true()
   {
     guard_list.clear();
   }
-  
+
   void make_false();
 #endif
-  
+
   friend guardt &operator -= (guardt &g1, const guardt &g2);
   friend guardt &operator |= (guardt &g1, const guardt &g2);
-  
+
 #if 0
   void swap(guardt &g)
   {
@@ -67,24 +67,24 @@ public:
   }
 
   friend std::ostream &operator << (std::ostream &out, const guardt &g);
-  
+
   size_type size() const
   {
     return guard_list.size();
   }
-  
+
   void resize(size_type s)
   {
     guard_list.resize(s);
   }
-  
+
   const guard_listt &get_guard_list() const
   {
     return guard_list;
   }
 
 protected:
-  guard_listt guard_list;  
+  guard_listt guard_list;
 #endif
 };
 

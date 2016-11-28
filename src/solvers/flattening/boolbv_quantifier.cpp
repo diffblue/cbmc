@@ -188,7 +188,7 @@ bool instantiate_quantifier(exprt &expr,
 
   /**
    * We need to rewrite the forall/exists quantifier into
-   * an OR/AND expr. 
+   * an OR/AND expr.
    **/
   exprt re(expr);
   exprt tmp(re.op1());
@@ -256,7 +256,7 @@ literalt boolbvt::convert_quantifier(const exprt &src)
   exprt expr(src);
   if(!instantiate_quantifier(expr, ns))
     return SUB::convert_rest(src);
-    
+
   quantifiert quantifier;
   quantifier.expr=expr;
   quantifier_list.push_back(quantifier);
@@ -282,11 +282,11 @@ Function: boolbvt::post_process_quantifiers
 void boolbvt::post_process_quantifiers()
 {
   std::set<exprt> instances;
-  
+
   if(quantifier_list.empty()) return;
 
   for(auto it=quantifier_list.begin();
-      it!=quantifier_list.end();  
+      it!=quantifier_list.end();
       ++it)
   {
     prop.set_equal(convert_bool(it->expr), it->l);

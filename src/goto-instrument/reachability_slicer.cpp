@@ -51,7 +51,7 @@ void reachability_slicert::fixedpoint_assertions(
     if(node.reaches_assertion) continue;
 
     node.reaches_assertion=true;
-    
+
     for(cfgt::edgest::const_iterator
         p_it=node.in.begin();
         p_it!=node.in.end();
@@ -93,7 +93,7 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
       // replace unreachable code by skip
       remove_unreachable(f_it->second.body);
     }
-  
+
   // remove the skips
   remove_skip(goto_functions);
   goto_functions.update();

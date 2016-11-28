@@ -29,14 +29,14 @@ public:
     assert(expr.id()==ID_string_constant);
     return static_cast<string_constantt &>(expr);
   }
-  
+
   void set_value(const irep_idt &value);
 
   inline const irep_idt &get_value() const
   {
     return get(ID_value);
   }
-  
+
   array_exprt to_array_expr() const;
   bool from_array_expr(const array_exprt &);
 };

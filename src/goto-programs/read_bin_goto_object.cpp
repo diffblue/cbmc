@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: Read goto object files.
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #include <util/namespace.h>
@@ -17,15 +17,15 @@ Date: June 2006
 #include "read_bin_goto_object.h"
 
 /*******************************************************************\
- 
+
 Function: read_goto_object_v3
- 
+
   Inputs: input stream, symbol_table, functions
- 
+
  Outputs: true on error, false otherwise
- 
+
  Purpose: read goto binary format v3
- 
+
 \*******************************************************************/
 
 bool read_bin_goto_object_v3(
@@ -35,31 +35,31 @@ bool read_bin_goto_object_v3(
   goto_functionst &functions,
   message_handlert &message_handler,
   irep_serializationt &irepconverter)
-{ 
+{
   std::size_t count = irepconverter.read_gb_word(in); // # of symbols
 
   for(std::size_t i=0; i<count; i++)
   {
     symbolt sym;
-      
+
     irepconverter.reference_convert(in, sym.type);
     irepconverter.reference_convert(in, sym.value);
     irepconverter.reference_convert(in, sym.location);
-    
+
     sym.name = irepconverter.read_string_ref(in);
     sym.module = irepconverter.read_string_ref(in);
     sym.base_name = irepconverter.read_string_ref(in);
     sym.mode = irepconverter.read_string_ref(in);
     sym.pretty_name = irepconverter.read_string_ref(in);
-    
+
     // obsolete: symordering
     irepconverter.read_gb_word(in);
 
     std::size_t flags=irepconverter.read_gb_word(in);
-    
+
     sym.is_weak = (flags & (1 << 16))!=0;
     sym.is_type = (flags & (1 << 15))!=0;
-    sym.is_property = (flags & (1 << 14))!=0; 
+    sym.is_property = (flags & (1 << 14))!=0;
     sym.is_macro = (flags & (1 << 13))!=0;
     sym.is_exported = (flags & (1 << 12))!=0;
     sym.is_input = (flags & (1 << 11))!=0;
@@ -74,42 +74,42 @@ bool read_bin_goto_object_v3(
     sym.is_file_local = (flags & (1 << 2))!=0;
     sym.is_extern = (flags & (1 << 1))!=0;
     sym.is_volatile = (flags & 1)!=0;
-    
+
     if(!sym.is_type && sym.type.id()==ID_code)
     {
       // makes sure there is an empty function
       // for every function symbol and fixes
-      // the function types. 
-      functions.function_map[sym.name].type=to_code_type(sym.type);      
+      // the function types.
+      functions.function_map[sym.name].type=to_code_type(sym.type);
     }
-    
+
     symbol_table.add(sym);
   }
-  
+
   count=irepconverter.read_gb_word(in); // # of functions
-  
+
   for(std::size_t i=0; i<count; i++)
-  {    
+  {
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
-    
+
     typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
     target_mapt target_map;
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
     rev_target_mapt rev_target_map;
-    
+
     bool hidden=false;
-    
+
     std::size_t ins_count = irepconverter.read_gb_word(in); // # of instructions
     for(std::size_t i=0; i<ins_count; i++)
     {
       goto_programt::targett itarget = f.body.add_instruction();
       goto_programt::instructiont &instruction=*itarget;
-      
+
       irepconverter.reference_convert(in, instruction.code);
-      instruction.function = irepconverter.read_string_ref(in);      
+      instruction.function = irepconverter.read_string_ref(in);
       irepconverter.reference_convert(in, instruction.source_location);
-      instruction.type = (goto_program_instruction_typet) 
+      instruction.type = (goto_program_instruction_typet)
                               irepconverter.read_gb_word(in);
       instruction.guard.make_nil();
       irepconverter.reference_convert(in, instruction.guard);
@@ -119,12 +119,12 @@ bool read_bin_goto_object_v3(
           rev_target_map.insert(rev_target_map.end(),
             std::make_pair(instruction.target_number, itarget))->second!=itarget)
         assert(false);
-      
+
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
       for(std::size_t i=0; i<t_count; i++)
         // just save the target numbers
         target_map[itarget].push_back(irepconverter.read_gb_word(in));
-        
+
       std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
 
       for(std::size_t i=0; i<l_count; i++)
@@ -136,14 +136,14 @@ bool read_bin_goto_object_v3(
         // which should likely be stored in the binary.
       }
     }
-    
+
     // Resolve targets
     for(target_mapt::iterator tit = target_map.begin();
         tit!=target_map.end();
         tit++)
     {
       goto_programt::targett ins = tit->first;
-      
+
       for(std::list<unsigned>::iterator nit = tit->second.begin();
           nit!=tit->second.end();
           nit++)
@@ -154,27 +154,27 @@ bool read_bin_goto_object_v3(
         ins->targets.push_back(entry->second);
       }
     }
-    
+
     f.body.update();
-    
+
     if(hidden) f.make_hidden();
   }
-  
+
   functions.compute_location_numbers();
 
   return false;
 }
 
 /*******************************************************************\
- 
+
 Function: read_goto_object
- 
+
   Inputs: input stream, symbol table, functions
- 
+
  Outputs: true on error, false otherwise
- 
+
  Purpose: reads a goto binary file back into a symbol and a function table
- 
+
 \*******************************************************************/
 
 bool read_bin_goto_object(
@@ -183,14 +183,14 @@ bool read_bin_goto_object(
   symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
-{ 
+{
   messaget message(message_handler);
 
   {
     char hdr[4];
     hdr[0]=in.get();
     hdr[1]=in.get();
-    hdr[2]=in.get();    
+    hdr[2]=in.get();
 
     if(hdr[0]=='G' && hdr[1]=='B' && hdr[2]=='F')
       ;
@@ -204,7 +204,7 @@ bool read_bin_goto_object(
       else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
       {
         if(filename!="")
-          message.error() << 
+          message.error() <<
             "Sorry, but I can't read ELF binary `" << filename << "'" << messaget::eom;
         else
           message.error() << "Sorry, but I can't read ELF binaries" << messaget::eom;
@@ -215,17 +215,17 @@ bool read_bin_goto_object(
       {
         message.error() << "`" << filename << "' is not a goto-binary" << messaget::eom;
         return true;
-      } 
+      }
     }
   }
-  
+
   irep_serializationt::ireps_containert ic;
   irep_serializationt irepconverter(ic);
   //symbol_serializationt symbolconverter(ic);
-  
+
   {
     std::size_t version=irepconverter.read_gb_word(in);
-        
+
     switch(version)
     {
     case 1:
@@ -236,8 +236,8 @@ bool read_bin_goto_object(
       return true;
 
     case 3:
-      return read_bin_goto_object_v3(in, filename, 
-                                     symbol_table, functions, 
+      return read_bin_goto_object_v3(in, filename,
+                                     symbol_table, functions,
                                      message_handler,
                                      irepconverter);
       break;
@@ -248,7 +248,7 @@ bool read_bin_goto_object(
           "goto-cc; please recompile" << messaget::eom;
       return true;
     }
-  } 
-   
+  }
+
   return false;
 }

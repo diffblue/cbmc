@@ -17,4 +17,4 @@ int main(int argc, char **argv)
 
   // should be fine, and pass without warning
   f(x);
-} 
+}

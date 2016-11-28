@@ -11,7 +11,7 @@ STATIC_ASSERT('\144' == 100);
 STATIC_ASSERT('\xff' == (char)0xff);
 
 // wide ones
-  
+
 STATIC_ASSERT(L'\xff'==255);
 STATIC_ASSERT(L'a'=='a');
 

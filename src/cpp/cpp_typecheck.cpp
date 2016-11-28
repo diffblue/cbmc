@@ -70,7 +70,7 @@ void cpp_typecheckt::typecheck()
 {
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
-  
+
   for(auto & item : cpp_parse_tree.items)
     convert(item);
 
@@ -245,8 +245,8 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
     if(symbol.is_extern)
       continue;
-    
-    // PODs are always statically initialized  
+
+    // PODs are always statically initialized
     if(cpp_is_pod(symbol.type))
       continue;
 
@@ -280,7 +280,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
         init_block.move_to_operands(call);
     }
   }
-  
+
   dynamic_initializations.clear();
 
   //block_sini.move_to_operands(block_dini);
@@ -379,7 +379,7 @@ Function: cpp_typecheckt::clean_up
 void cpp_typecheckt::clean_up()
 {
   symbol_tablet::symbolst::iterator it=symbol_table.symbols.begin();
-  
+
   while(it!=symbol_table.symbols.end())
   {
     symbol_tablet::symbolst::iterator cur_it = it;
@@ -409,7 +409,7 @@ void cpp_typecheckt::clean_up()
       struct_union_typet::componentst &function_members=
         (struct_union_typet::componentst &)
         (struct_union_type.add(ID_methods).get_sub());
-        
+
       function_members.reserve(components.size());
 
       for(const auto & compo_it : components)

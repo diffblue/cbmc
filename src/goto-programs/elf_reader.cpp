@@ -37,11 +37,11 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
    throw "ELF header malformed (magic)";
 
   elf_class=(elf_classt)elf32_header.e_ident[4];
-  
+
   if(elf_class==ELF32)
   {
     char ei_data=elf32_header.e_ident[5];
-    
+
     if(ei_data==1)
       little_endian=true;
     else if(ei_data==2)
@@ -51,7 +51,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
 
     if(elf32_header.e_version!=1)
       throw "unknown ELF32 version";
-      
+
     // get offset for section header
     if(elf32_header.e_shoff==0 ||
        elf32_header.e_shnum==0)
@@ -69,7 +69,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       // read section header
       in.read((char *)&elf32_section_header_table[i], sizeof(Elf32_Shdr));
     }
-    
+
     // string table
     unsigned string_table_nr=elf32_header.e_shstrndx;
     if(string_table_nr>=elf32_section_header_table.size())
@@ -84,7 +84,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     in.read((char *)&elf64_header, sizeof(elf64_header));
 
     char ei_data=elf64_header.e_ident[5];
-    
+
     if(ei_data==1)
       little_endian=true;
     else if(ei_data==2)
@@ -94,7 +94,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
 
     if(elf64_header.e_version!=1)
       throw "unknown ELF64 version";
-      
+
     // get offset for section header
     if(elf64_header.e_shoff==0 ||
        elf64_header.e_shnum==0)
@@ -112,7 +112,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       // read section header
       in.read((char *)&elf64_section_header_table[i], sizeof(Elf64_Shdr));
     }
-    
+
     // string table
     unsigned string_table_nr=elf64_header.e_shstrndx;
     if(string_table_nr>=elf64_section_header_table.size())
@@ -147,7 +147,7 @@ std::string elf_readert::get_string(std::streampos index) const
     if(ch==0) break;
     result+=ch;
   }
-  
+
   return result;
 }
 
@@ -167,6 +167,6 @@ bool elf_readert::has_section(const std::string &name) const
 {
   for(unsigned i=0; i<number_of_sections; i++)
     if(section_name(i)==name) return true;
-  
+
   return false;
 }

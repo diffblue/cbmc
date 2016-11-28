@@ -18,7 +18,7 @@ public:
   inline reference_counting():d(NULL)
   {
   }
-  
+
   explicit reference_counting(const T &other):d(NULL)
   {
     write()=other;
@@ -59,7 +59,7 @@ public:
     remove_ref(d);
     d=NULL;
   }
-  
+
   inline const T &read() const
   {
     if(d==NULL) return T::blank;
@@ -71,7 +71,7 @@ public:
     detatch();
     return *d;
   }
-  
+
 protected:
   class dt:public T
   {
@@ -82,13 +82,13 @@ protected:
     {
     }
   };
-  
+
   dt *d;
 
   void remove_ref(dt *old_d);
-  
+
   void detatch();
-  
+
   void copy_from(const reference_counting &other)
   {
     assert(&other!=this); // check if we assign to ourselves
@@ -101,7 +101,7 @@ protected:
     d=other.d;
     if(d!=NULL) d->ref_count++;
   }
-  
+
 public:
   inline dt *get_d() const
   {
@@ -119,7 +119,7 @@ void reference_counting<T>::remove_ref(dt *old_d)
   #ifdef REFERENCE_COUNTING_DEBUG
   std::cout << "R: " << old_d << " " << old_d->ref_count << std::endl;
   #endif
-  
+
   old_d->ref_count--;
   if(old_d->ref_count==0)
   {
@@ -128,7 +128,7 @@ void reference_counting<T>::remove_ref(dt *old_d)
     old_d->clear();
     std::cout << "DEALLOCATING " << old_d << "\n";
     #endif
-    
+
     delete old_d;
 
     #ifdef REFERENCE_COUNTING_DEBUG
@@ -160,11 +160,11 @@ void reference_counting<T>::detatch()
     #ifdef REFERENCE_COUNTING_DEBUG
     std::cout << "ALLOCATED " << d << std::endl;
     #endif
-    
+
     d->ref_count=1;
     remove_ref(old_d);
   }
-  
+
   assert(d->ref_count==1);
 
   #ifdef REFERENCE_COUNTING_DEBUG
@@ -180,7 +180,7 @@ bool operator==(
   if(o1.get_d()==o2.get_d()) return true;
   return o1.read()==o2.read();
 }
- 
+
 template<class T>
 inline bool operator!=(
   const reference_counting<T> &i1,

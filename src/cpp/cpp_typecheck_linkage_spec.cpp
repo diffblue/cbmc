@@ -25,7 +25,7 @@ void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
   irep_idt old_linkage_spec=current_linkage_spec;
 
   current_linkage_spec=linkage_spec.linkage().get(ID_value);
-  
+
   // there is a linkage spec "C++", which we know as "cpp"
   if(current_linkage_spec=="C++")
     current_linkage_spec=ID_cpp;

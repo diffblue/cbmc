@@ -4,9 +4,9 @@ int main()
   int data=0;
   char *p=(char *)&data;
   i=ii;
-  
+
   __CPROVER_assume(i>=0 && i<4);
-  
+
   p[i]++;
 
   if(i==0)

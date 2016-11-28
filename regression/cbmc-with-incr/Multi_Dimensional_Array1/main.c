@@ -9,11 +9,11 @@ int main()
 
   p=a[9];
   assert(p==a[0]+9*4);
-  
+
   *p=10;
   assert(a[9][0]==10);
 
-  p++;  
+  p++;
   *p=20;
   assert(a[9][1]==20);
 

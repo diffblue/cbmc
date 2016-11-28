@@ -71,14 +71,14 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
                                   const exprt::operandst &o2)
 {
   assert(o1.size()==o2.size());
-  
+
   if(o1.empty())
     return true_exprt();
 
   and_exprt and_expr;
   and_exprt::operandst &conjuncts=and_expr.operands();
   conjuncts.resize(o1.size());
-  
+
   for(std::size_t i=0; i<o1.size(); i++)
   {
     exprt lhs=o1[i];
@@ -86,7 +86,7 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
 
     if(lhs.type()!=rhs.type())
       rhs.make_typecast(lhs.type());
-      
+
     conjuncts[i]=equal_exprt(lhs, rhs);
   }
 
@@ -125,7 +125,7 @@ void functionst::add_function_constraints(const function_infot &info)
 
       implies_exprt implication(arguments_equal_expr,
                                 equal_exprt(*it1, *it2));
-      
+
       prop_conv.set_to_true(implication);
     }
   }

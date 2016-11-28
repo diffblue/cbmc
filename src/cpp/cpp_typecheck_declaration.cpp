@@ -155,15 +155,15 @@ void cpp_typecheckt::convert_non_template_declaration(
 
   // the name anonymous tag types
   declaration.name_anon_struct_union();
-  
+
   // do the type of the declaration
   typecheck_type(declaration_type);
-  
+
   // Elaborate any class template instance _unless_ we do a typedef.
   // These are only elaborated on usage!
   if(!is_typedef)
     elaborate_class_template(declaration_type);
-  
+
   // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&
      follow(declaration.type()).get_bool(ID_C_is_anonymous))
@@ -187,7 +187,7 @@ void cpp_typecheckt::convert_non_template_declaration(
   {
     // copy the declarator (we destroy the original)
     cpp_declaratort declarator=it;
-    
+
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
     cpp_declarator_converter.is_typedef=is_typedef;

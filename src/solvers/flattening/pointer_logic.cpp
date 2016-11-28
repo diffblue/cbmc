@@ -31,7 +31,7 @@ Function: pointer_logict::is_dynamic_object
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {
   if(expr.type().get_bool("#dynamic")) return true;
-  
+
   if(expr.id()==ID_symbol)
     if(has_prefix(id2string(to_symbol_expr(expr).get_identifier()),
                   "symex_dynamic::"))
@@ -56,7 +56,7 @@ void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
 {
   o.clear();
   std::size_t nr=0;
-  
+
   for(pointer_logict::objectst::const_iterator
       it=objects.begin();
       it!=objects.end();
@@ -80,7 +80,7 @@ Function: pointer_logict::add_object
 std::size_t pointer_logict::add_object(const exprt &expr)
 {
   // remove any index/member
-  
+
   if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
@@ -91,7 +91,7 @@ std::size_t pointer_logict::add_object(const exprt &expr)
     assert(expr.operands().size()==1);
     return add_object(expr.op0());
   }
-  
+
   return objects.number(expr);
 }
 
@@ -153,7 +153,7 @@ exprt pointer_logict::pointer_expr(
     result.set_value("INVALID");
     return result;
   }
-  
+
   if(pointer.object>=objects.size())
   {
     constant_exprt result(type);
@@ -164,9 +164,9 @@ exprt pointer_logict::pointer_expr(
   const exprt &object_expr=objects[pointer.object];
 
   exprt deep_object=object_rec(pointer.offset, type, object_expr);
-  
+
   exprt result;
-  
+
   if(type.id()==ID_pointer)
     result=exprt(ID_address_of, type);
   else if(type.id()==ID_reference)
@@ -201,7 +201,7 @@ exprt pointer_logict::object_rec(
       pointer_offset_size(src.type().subtype(), ns);
 
     if(size==0) return src;
-    
+
     mp_integer index=offset/size;
     mp_integer rest=offset%size;
     if(rest<0) rest=-rest;
@@ -209,7 +209,7 @@ exprt pointer_logict::object_rec(
     index_exprt tmp(src.type().subtype());
     tmp.index()=from_integer(index, typet(ID_integer));
     tmp.array()=src;
-    
+
     return object_rec(rest, pointer_type, tmp);
   }
   else if(src.type().id()==ID_struct)
@@ -239,21 +239,21 @@ exprt pointer_logict::object_rec(
         member_exprt tmp(subtype);
         tmp.set_component_name(it->get_name());
         tmp.op0()=src;
-        
+
         return object_rec(
           offset-current_offset, pointer_type, tmp);
       }
-      
+
       assert(new_offset<=offset);
       current_offset=new_offset;
       assert(current_offset<=offset);
     }
-    
+
     return src;
   }
   else if(src.type().id()==ID_union)
     return src;
-  
+
   return src;
 }
 

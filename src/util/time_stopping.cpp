@@ -63,7 +63,7 @@ absolute_timet current_time()
 
 /*******************************************************************\
 
-Function: operator << 
+Function: operator <<
 
   Inputs:
 

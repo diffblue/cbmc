@@ -6,7 +6,7 @@ extern int f(void);
 int main()
 {
   int z;
-  
+
   x=z;
   assert(f()==z);
 }

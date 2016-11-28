@@ -41,14 +41,14 @@ Function: cpp_languaget::extensions
 std::set<std::string> cpp_languaget::extensions() const
 {
   std::set<std::string> s;
-  
+
   s.insert("cpp");
   s.insert("CPP");
   s.insert("cc");
   s.insert("c++");
   s.insert("ii");
   s.insert("cxx");
-  
+
   #ifndef _WIN32
   s.insert("C");
   #endif

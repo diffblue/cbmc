@@ -9,7 +9,7 @@ namespace std {
   extern "C" {
     int abs(int) __attribute__((nothrow)) ;
   }
-  extern "C++" { 
+  extern "C++" {
     inline long abs(long n) __attribute__((nothrow));
     inline long long abs(long long n) __attribute__((nothrow));
   }

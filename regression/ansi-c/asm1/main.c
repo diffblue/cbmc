@@ -23,9 +23,9 @@ int main()
   #ifdef __GNUC__
   __asm volatile("mov ax, dx");
 
-  // another gcc-extension  
+  // another gcc-extension
   register unsigned my_var asm("eax")=1;
-  
+
   // Apple added "ASM Blocks", similar to MS', to gcc
   __asm {
      mov al, 2
@@ -47,6 +47,6 @@ int main()
   __asm mov dx, 0xD007
   __asm out dx, al
   #endif
-  
+
   return 0;
 }

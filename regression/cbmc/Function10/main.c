@@ -26,7 +26,7 @@ int main()
 {
   int *p;
   my_f1(p);
-  
+
   other_func1(1, whatnot);
   assert(global==2);
 }

@@ -32,7 +32,7 @@ bool replace_symbol_extt::replace(exprt &dest) const
   if(have_to_replace(dest.type()))
     if(!replace_symbolt::replace(dest.type()))
       result=false;
-      
+
   // now do expression itself
 
   if(!have_to_replace(dest))

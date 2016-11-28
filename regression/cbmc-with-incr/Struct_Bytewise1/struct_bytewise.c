@@ -30,7 +30,7 @@ void CopyBuffer(unsigned char *src) {
     arrayTmp[i] = src[i];
   }
 }
- 
+
 int main()
 {
   logAppl.a=1;

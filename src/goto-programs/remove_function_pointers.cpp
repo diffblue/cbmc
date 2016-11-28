@@ -53,7 +53,7 @@ protected:
     goto_programt::targett target);
 
   std::set<irep_idt> address_taken;
-  
+
   typedef std::map<irep_idt, code_typet> type_mapt;
   type_mapt type_map;
 
@@ -135,14 +135,14 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
 
   auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
-  
+
   do
   {
     new_symbol.base_name="tmp_return_val$"+i2string(++temporary_counter);
     new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
-  } while(symbol_table.move(new_symbol, symbol_ptr));    
-  
-  return *symbol_ptr;  
+  } while(symbol_table.move(new_symbol, symbol_ptr));
+
+  return *symbol_ptr;
 }
 
 /*******************************************************************\
@@ -162,7 +162,7 @@ bool remove_function_pointerst::arg_is_type_compatible(
   const typet &function_type)
 {
   if(type_eq(call_type, function_type, ns)) return true;
-  
+
   // any integer-vs-enum-vs-pointer is ok
   if(call_type.id()==ID_signedbv ||
      call_type.id()==ID_unsigned ||
@@ -178,14 +178,14 @@ bool remove_function_pointerst::arg_is_type_compatible(
        function_type.id()==ID_c_enum ||
        function_type.id()==ID_c_enum_tag)
       return true;
-     
+
     return false;
   }
-  
+
   // structs/unions need to match,
   // which could be made more generous
- 
-  return false; 
+
+  return false;
 }
 
 /*******************************************************************\
@@ -240,13 +240,13 @@ bool remove_function_pointerst::is_type_compatible(
     // we are quite strict here, could be much more generous
     if(call_parameters.size()!=function_parameters.size())
       return false;
-    
+
     for(unsigned i=0; i<call_parameters.size(); i++)
       if(!arg_is_type_compatible(call_parameters[i].type(),
                                  function_parameters[i].type()))
         return false;
   }
-  
+
   return true;
 }
 
@@ -270,10 +270,10 @@ void remove_function_pointerst::fix_argument_types(
 
   const code_typet::parameterst &function_parameters=
     code_type.parameters();
-  
+
   code_function_callt::argumentst &call_arguments=
     function_call.arguments();
-    
+
   for(unsigned i=0; i<function_parameters.size(); i++)
   {
     if(i<call_arguments.size())
@@ -302,13 +302,13 @@ Function: remove_function_pointerst::fix_return_type
 void remove_function_pointerst::fix_return_type(
   code_function_callt &function_call,
   goto_programt &dest)
-{  
+{
   // are we returning anything at all?
   if(function_call.lhs().is_nil()) return;
-  
+
   const code_typet &code_type=
     to_code_type(ns.follow(function_call.function().type()));
-  
+
   // type already ok?
   if(type_eq(
        function_call.lhs().type(),
@@ -322,7 +322,7 @@ void remove_function_pointerst::fix_return_type(
   symbol_exprt tmp_symbol_expr;
   tmp_symbol_expr.type()=tmp_symbol.type;
   tmp_symbol_expr.set_identifier(tmp_symbol.name);
-  
+
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
 
@@ -330,7 +330,7 @@ void remove_function_pointerst::fix_return_type(
   t_assign->make_assignment();
   t_assign->code=code_assignt(
     old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()));
-}  
+}
 
 /*******************************************************************\
 
@@ -352,7 +352,7 @@ void remove_function_pointerst::remove_function_pointer(
     to_code_function_call(target->code);
 
   const exprt &function=code.function();
-  
+
   // this better have the right type
   code_typet call_type=to_code_type(function.type());
 
@@ -365,12 +365,12 @@ void remove_function_pointerst::remove_function_pointer(
       call_type.parameters().push_back(
         code_typet::parametert(it->type()));
   }
-  
+
   assert(function.id()==ID_dereference);
   assert(function.operands().size()==1);
 
   const exprt &pointer=function.op0();
-  
+
   // Is this simple?
   if(pointer.id()==ID_address_of &&
      to_address_of_expr(pointer).object().id()==ID_symbol)
@@ -379,12 +379,12 @@ void remove_function_pointerst::remove_function_pointer(
       to_address_of_expr(pointer).object();
     return;
   }
-  
+
   typedef std::list<exprt> functionst;
   functionst functions;
-  
+
   bool return_value_used=code.lhs().is_not_nil();
-  
+
   // get all type-compatible functions
   // whose address is ever taken
   for(type_mapt::const_iterator f_it=
@@ -402,19 +402,19 @@ void remove_function_pointerst::remove_function_pointer(
 
     if(f_it->first=="pthread_mutex_cleanup")
       continue;
-    
+
     symbol_exprt expr;
     expr.type()=f_it->second;
     expr.set_identifier(f_it->first);
     functions.push_back(expr);
   }
-  
+
   // the final target is a skip
   goto_programt final_skip;
 
   goto_programt::targett t_final=final_skip.add_instruction();
   t_final->make_skip();
-  
+
   // build the calls and gotos
 
   goto_programt new_code_calls;
@@ -429,24 +429,24 @@ void remove_function_pointerst::remove_function_pointer(
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
     to_code_function_call(t1->code).function()=*it;
-    
+
     // the signature of the function might not match precisely
     fix_argument_types(to_code_function_call(t1->code));
-    
+
     fix_return_type(to_code_function_call(t1->code), new_code_calls);
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
-  
+
     // goto to call
     address_of_exprt address_of;
     address_of.object()=*it;
     address_of.type()=pointer_typet();
     address_of.type().subtype()=it->type();
-    
+
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());
-    
+
     goto_programt::targett t4=new_code_gotos.add_instruction();
     t4->make_goto(t1, equal_exprt(pointer, address_of));
   }
@@ -459,14 +459,14 @@ void remove_function_pointerst::remove_function_pointer(
     t->source_location.set_property_class("pointer dereference");
     t->source_location.set_comment("invalid function pointer");
   }
-  
+
   goto_programt new_code;
-  
+
   // patch them all together
   new_code.destructive_append(new_code_gotos);
   new_code.destructive_append(new_code_calls);
   new_code.destructive_append(final_skip);
-  
+
   // set locations
   Forall_goto_program_instructions(it, new_code)
   {
@@ -477,10 +477,10 @@ void remove_function_pointerst::remove_function_pointer(
     if(!property_class.empty()) it->source_location.set_property_class(property_class);
     if(!comment.empty()) it->source_location.set_comment(comment);
   }
-  
+
   goto_programt::targett next_target=target;
   next_target++;
-  
+
   goto_program.destructive_insert(next_target, new_code);
 
   // We preserve the original dereferencing to possibly catch
@@ -514,10 +514,10 @@ bool remove_function_pointerst::remove_function_pointers(
     {
       const code_function_callt &code=
         to_code_function_call(target->code);
-        
+
       if(code.function().id()==ID_dereference)
       {
-        remove_function_pointer(goto_program, target); 
+        remove_function_pointer(goto_program, target);
         did_something=true;
       }
     }
@@ -546,7 +546,7 @@ Function: remove_function_pointerst::operator()
 void remove_function_pointerst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
-  
+
   for(goto_functionst::function_mapt::iterator f_it=
       functions.function_map.begin();
       f_it!=functions.function_map.end();

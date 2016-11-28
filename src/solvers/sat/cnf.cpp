@@ -201,7 +201,7 @@ void cnft::gate_equal(literalt a, literalt b, literalt o)
 {
   gate_xor(a, b, !o);
 }
-  
+
 /*******************************************************************\
 
 Function: cnft::gate_implies
@@ -265,9 +265,9 @@ literalt cnft::land(const bvt &bv)
   lits.push_back(pos(literal));
   lcnf(lits);
 
-  return literal;  
+  return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cnft::lor
@@ -316,7 +316,7 @@ literalt cnft::lor(const bvt &bv)
 
   return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cnft::lxor
@@ -342,7 +342,7 @@ literalt cnft::lxor(const bvt &bv)
 
   return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cnft::land
@@ -351,7 +351,7 @@ Function: cnft::land
 
  Outputs: Output signal of the AND gate as literal
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -520,7 +520,7 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   literalt o=new_variable();
 
   bvt lits;
-  
+
   lcnf( a, !c,  o);
   lcnf( a,  c, !o);
   lcnf(!a, !b,  o);
@@ -608,12 +608,12 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
   if(bv.empty()) return false;
 
   // first check simple things
-  
+
   for(const auto l : bv)
-  {    
+  {
     // we never use index 0
     assert(l.var_no()!=0);
-    
+
     // we never use 'unused_var_no'
     assert(l.var_no()!=literalt::unused_var_no());
 
@@ -628,11 +628,11 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
 
     assert(l.var_no()<_no_variables);
   }
-  
+
   // now copy
   dest.clear();
   dest.reserve(bv.size());
-  
+
   for(const auto l : bv)
   {
     if(l.is_false())
@@ -640,24 +640,24 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
 
     dest.push_back(l);
   }
-  
+
   // now sort
   std::sort(dest.begin(), dest.end());
 
   // eliminate duplicates and find occurrences of a variable
   // and its negation
-  
+
   if(dest.size()>=2)
   {
     bvt::iterator it=dest.begin();
     literalt previous=*it;
-  
+
     for(it++;
         it!=dest.end();
         ) // no it++
     {
       literalt l=*it;
-      
+
       // prevent duplicate literals
       if(l==previous)
         it=dest.erase(it);
@@ -670,6 +670,6 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
       }
     }
   }
-  
+
   return false;
 }

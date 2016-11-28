@@ -1,6 +1,6 @@
 #define STATIC_ASSERT(condition) \
   int some_array[(condition) ? 1 : -1];
-  
+
 int i;
 double d;
 
@@ -18,7 +18,7 @@ cranberry _cranberry;
 #define __intN_t(N, MODE) \
   typedef int int##N##_t __attribute__ ((__mode__ (MODE))); \
   typedef unsigned int uint##N##_t __attribute__ ((__mode__ (MODE)))
-  
+
 __intN_t (8, __QI__);
 __intN_t (16, __HI__);
 __intN_t (32, __SI__);

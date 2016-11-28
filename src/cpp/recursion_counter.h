@@ -13,7 +13,7 @@ public:
   {
     cnt++;
   }
-  
+
   ~recursion_countert()
   {
     cnt--;

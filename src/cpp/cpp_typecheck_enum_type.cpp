@@ -30,18 +30,18 @@ Function: cpp_typecheckt::typecheck_enum_body
 void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 {
   c_enum_typet &c_enum_type=to_c_enum_type(enum_symbol.type);
-  
+
   exprt &body=static_cast<exprt &>(c_enum_type.add(ID_body));
   irept::subt &components=body.get_sub();
-  
+
   c_enum_tag_typet enum_tag_type(enum_symbol.name);
-  
+
   mp_integer i=0;
-  
+
   Forall_irep(it, components)
   {
     const irep_idt &name=it->get(ID_name);
-    
+
     if(it->find(ID_value).is_not_nil())
     {
       exprt &value=static_cast<exprt &>(it->add(ID_value));
@@ -55,10 +55,10 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
         throw 0;
       }
     }
-    
+
     exprt value_expr=from_integer(i, c_enum_type.subtype());
     value_expr.type()=enum_tag_type; // override type
-    
+
     symbolt symbol;
 
     symbol.name=id2string(enum_symbol.name)+"::"+id2string(name);
@@ -70,7 +70,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.type=enum_tag_type;
     symbol.is_type=false;
     symbol.is_macro=true;
-    
+
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
     {
@@ -82,9 +82,9 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 
     cpp_idt &scope_identifier=
       cpp_scopes.put_into_scope(*new_symbol);
-    
+
     scope_identifier.id_class=cpp_idt::SYMBOL;
-    
+
     ++i;
   }
 }
@@ -106,11 +106,11 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   // first save qualifiers
   c_qualifierst qualifiers;
   qualifiers.read(type);
-  
+
   cpp_enum_typet &enum_type=to_cpp_enum_type(type);
   bool anonymous=!enum_type.has_tag();
   irep_idt base_name;
-  
+
   if(anonymous)
   {
     // we fabricate a tag based on the enum constants contained
@@ -119,7 +119,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   else
   {
     const cpp_namet &tag=enum_type.tag();
-    
+
     if(tag.is_simple_name())
       base_name=tag.get_base_name();
     else
@@ -140,10 +140,10 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     dest_scope.prefix+"tag-"+id2string(base_name);
 
   // check if we have it
-  
+
   symbol_tablet::symbolst::iterator previous_symbol=
     symbol_table.symbols.find(symbol_name);
-    
+
   if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
@@ -164,7 +164,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
-      
+
     // C++11 enumerations have an underlying type,
     // which defaults to int.
     // enums without underlying type may be 'packed'.
@@ -197,7 +197,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     symbol.is_type=true;
     symbol.is_macro=false;
     symbol.pretty_name=pretty_name;
-    
+
     // move early, must be visible before doing body
     symbolt *new_symbol;
     if(symbol_table.move(symbol, new_symbol))
@@ -211,7 +211,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     // put into scope
     cpp_idt &scope_identifier=
       cpp_scopes.put_into_scope(*new_symbol, dest_scope);
-    
+
     scope_identifier.id_class=cpp_idt::CLASS;
 
     typecheck_enum_body(*new_symbol);

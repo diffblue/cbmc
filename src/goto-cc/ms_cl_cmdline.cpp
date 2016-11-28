@@ -17,15 +17,15 @@ Author: Daniel Kroening
 #include "ms_cl_cmdline.h"
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::parse
- 
+
   Inputs: argument count, argument strings
- 
+
  Outputs: none
- 
+
  Purpose: parses the commandline options into a cmdlinet
- 
+
 \*******************************************************************/
 
 const char *non_ms_cl_options[]=
@@ -44,7 +44,7 @@ const char *non_ms_cl_options[]=
   "--little-endian",
   "--big-endian",
   "--unsigned-char",
-  "--no-arch",            
+  "--no-arch",
   "--help",
   "--xml",
   "--partial-inlining",
@@ -99,21 +99,21 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::parse_env
- 
+
   Inputs:
- 
+
  Outputs: none
- 
+
  Purpose:
- 
+
 \*******************************************************************/
 
 void ms_cl_cmdlinet::parse_env()
 {
   // first do environment
-  
+
   #ifdef _WIN32
 
   const wchar_t *CL_env=_wgetenv(L"CL");
@@ -128,19 +128,19 @@ void ms_cl_cmdlinet::parse_env()
   if(CL_env!=NULL)
     process_response_file_line(CL_env);
 
-  #endif  
+  #endif
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::parse
- 
+
   Inputs: argument count, argument strings
- 
+
  Outputs: none
- 
+
  Purpose: parses the commandline options into a cmdlinet
- 
+
 \*******************************************************************/
 
 bool ms_cl_cmdlinet::parse(int argc, const char **argv)
@@ -152,20 +152,20 @@ bool ms_cl_cmdlinet::parse(int argc, const char **argv)
   // skip argv[0]
   for(int i=1; i<argc; i++)
     options.push_back(argv[i]);
-  
+
   return parse(options);
 }
 
 /*******************************************************************\
- 
+
 Function: my_wgetline
- 
-  Inputs: 
- 
+
+  Inputs:
+
  Outputs:
- 
- Purpose: 
- 
+
+ Purpose:
+
 \*******************************************************************/
 
 static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
@@ -179,7 +179,7 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
     char ch1, ch2;
     in.get(ch1);
     in.get(ch2);
-    
+
     if(!in)
     {
       if(!dest.empty()) in.clear();
@@ -198,26 +198,26 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
     else
       dest+=wchar_t(ch1+(ch2<<8));
   }
-        
+
   return in;
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::process_response_file
- 
-  Inputs: 
- 
+
+  Inputs:
+
  Outputs: none
- 
- Purpose: 
- 
+
+ Purpose:
+
 \*******************************************************************/
 
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
   std::ifstream infile(file);
-  
+
   if(!infile)
   {
     std::cerr << "failed to open response file `"
@@ -233,25 +233,25 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
      line[1]==char(0xfe))
   {
     // Unicode, UTF-16 little endian
-    
+
     #if 1
     // Re-open -- should be using wifstream,
     // but this isn't available everywhere.
     std::ifstream infile2(file, std::ios::binary);
     infile2.seekg(2);
     std::wstring wline;
-    
+
     while(my_wgetline(infile2, wline))
       process_response_file_line(narrow(wline)); // we UTF-8 it
 
     #else
-    
+
     std::wifstream infile2(file, std::ios::binary);
     std::wstring wline;
-    
+
     while(std::getline(infile2, wline))
       process_response_file_line(narrow(wline)); // we UTF-8 it
-    
+
     #endif
   }
   else if(line.size()>=3 &&
@@ -262,7 +262,7 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     // This is the UTF-8 BOM. We can proceed as usual, since
     // we use UTF-8 internally.
     infile.seekg(3);
-    
+
     while(getline(infile, line))
       process_response_file_line(line);
   }
@@ -276,15 +276,15 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::process_response_file_line
- 
-  Inputs: 
- 
+
+  Inputs:
+
  Outputs: none
- 
- Purpose: 
- 
+
+ Purpose:
+
 \*******************************************************************/
 
 void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
@@ -303,7 +303,7 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   for(std::size_t i=0; i<line.size(); i++)
   {
     char ch=line[i];
-    
+
     if(ch==' ' && !in_quotes)
     {
       if(!option.empty()) options.push_back(option);
@@ -323,22 +323,22 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::process_non_cl_option
- 
-  Inputs: 
- 
+
+  Inputs:
+
  Outputs: none
- 
- Purpose: 
- 
+
+ Purpose:
+
 \*******************************************************************/
 
 void ms_cl_cmdlinet::process_non_cl_option(
   const std::string &s)
 {
   set(s);
-      
+
   for(unsigned j=0; non_ms_cl_options[j]!=NULL; j++)
     if(s==non_ms_cl_options[j])
       return;
@@ -349,15 +349,15 @@ void ms_cl_cmdlinet::process_non_cl_option(
 }
 
 /*******************************************************************\
- 
+
 Function: ms_cl_cmdlinet::process_cl_option
- 
-  Inputs: 
- 
+
+  Inputs:
+
  Outputs: none
- 
- Purpose: 
- 
+
+ Purpose:
+
 \*******************************************************************/
 
 const char *ms_cl_flags[]=
@@ -526,7 +526,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
       return;
     }
   }
-  
+
   for(std::size_t j=0; ms_cl_prefixes[j]!=NULL; j++)
   {
     std::string ms_cl_prefix=ms_cl_prefixes[j];
@@ -534,7 +534,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     if(std::string(s, 1, ms_cl_prefix.size())==ms_cl_prefix)
     {
       cmdlinet::optiont option;
-      
+
       int optnr;
 
       if(ms_cl_prefix.size()==1)

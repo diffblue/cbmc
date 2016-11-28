@@ -32,7 +32,7 @@ struct chord_args_t
 // Internal start routine for a thread in a chord
 static void* chord_start_routine(void *ptr)
 {
-  struct chord_args_t *args = (struct chord_args_t *) ptr; 
+  struct chord_args_t *args = (struct chord_args_t *) ptr;
 
   // ignore errors
   pthread_join(args->thread, NULL);

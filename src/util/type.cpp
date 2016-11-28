@@ -62,10 +62,10 @@ bool is_number(const typet &type)
   return id==ID_rational ||
          id==ID_real ||
          id==ID_integer ||
-         id==ID_natural || 
+         id==ID_natural ||
          id==ID_complex ||
          id==ID_unsignedbv ||
-         id==ID_signedbv || 
+         id==ID_signedbv ||
          id==ID_floatbv ||
          id==ID_fixedbv;
 }

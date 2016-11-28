@@ -39,7 +39,7 @@ language_uit::language_uit(
 {
   set_message_handler(ui_message_handler);
 }
-   
+
 /*******************************************************************\
 
 Function: language_uit::~language_uit
@@ -75,7 +75,7 @@ bool language_uit::parse()
     if(parse(_cmdline.args[i]))
       return true;
   }
-   
+
   return false;
 }
 
@@ -119,7 +119,7 @@ bool language_uit::parse(const std::string &filename)
     error("failed to figure out type of file", filename);
     return true;
   }
-  
+
   languaget &language=*lf.language;
   language.set_message_handler(get_message_handler());
 
@@ -134,7 +134,7 @@ bool language_uit::parse(const std::string &filename)
   }
 
   lf.get_modules();
-   
+
   return false;
 }
 
@@ -153,20 +153,20 @@ Function: language_uit::typecheck
 bool language_uit::typecheck()
 {
   status() << "Converting" << eom;
-  
+
   language_files.set_message_handler(*message_handler);
 
   if(language_files.typecheck(symbol_table))
   {
     if(get_ui()==ui_message_handlert::PLAIN)
       std::cerr << "CONVERSION ERROR" << std::endl;
-      
+
     return true;
   }
 
   return false;
 }
- 
+
 /*******************************************************************\
 
 Function: language_uit::final
@@ -258,21 +258,21 @@ void language_uit::show_symbol_table_plain(
 {
   if(!brief)
     out << '\n' << "Symbols:" << '\n' << std::endl;
-    
+
   // we want to sort alphabetically
   std::set<std::string> symbols;
 
   forall_symbols(it, symbol_table.symbols)
     symbols.insert(id2string(it->first));
-  
+
   const namespacet ns(symbol_table);
 
   for(const std::string &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
-    
+
     languaget *ptr;
-    
+
     if(symbol.mode=="")
       ptr=get_default_language();
     else
@@ -283,13 +283,13 @@ void language_uit::show_symbol_table_plain(
 
     std::unique_ptr<languaget> p(ptr);
     std::string type_str, value_str;
-    
+
     if(symbol.type.is_not_nil())
       p->from_type(symbol.type, type_str, ns);
-    
+
     if(symbol.value.is_not_nil())
       p->from_expr(symbol.value, value_str, ns);
-    
+
     if(brief)
     {
       out << symbol.name << " " << type_str << std::endl;
@@ -324,7 +324,7 @@ void language_uit::show_symbol_table_plain(
 
     out << '\n';
     out << "Location....: " << symbol.location << '\n';
-    
+
     out << '\n' << std::flush;
   }
 }

@@ -57,16 +57,16 @@ void goto_symext::vcc(
   // we are willing to re-write some quantified expressions
   rewrite_quantifiers(expr, state);
 
-  // now rename, enables propagation    
+  // now rename, enables propagation
   state.rename(expr, ns);
-  
+
   // now try simplifier on it
   do_simplify(expr);
 
   if(expr.is_true()) return;
-  
+
   state.guard.guard_expr(expr);
-  
+
   remaining_vccs++;
   target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
@@ -164,13 +164,13 @@ void goto_symext::operator()(
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
-  
+
   assert(state.top().end_of_function->is_end_function());
 
   while(!state.call_stack().empty())
   {
     symex_step(goto_functions, state);
-    
+
     // is there another thread to execute?
     if(state.call_stack().empty() &&
        state.source.thread_nr+1<state.threads.size())
@@ -280,17 +280,17 @@ void goto_symext::symex_step(
     symex_end_of_function(state);
     state.source.pc++;
     break;
-  
+
   case LOCATION:
     if(!state.guard.is_false())
       target.location(state.guard.as_expr(), state.source);
     state.source.pc++;
     break;
-  
+
   case GOTO:
     symex_goto(state);
     break;
-    
+
   case ASSUME:
     if(!state.guard.is_false())
     {
@@ -315,7 +315,7 @@ void goto_symext::symex_step(
 
     state.source.pc++;
     break;
-    
+
   case RETURN:
     if(!state.guard.is_false())
       return_assignment(state);
@@ -343,7 +343,7 @@ void goto_symext::symex_step(
 
       Forall_expr(it, deref_code.arguments())
         clean_expr(*it, state, false);
-    
+
       symex_function_call(goto_functions, state, deref_code);
     }
     else
@@ -373,37 +373,37 @@ void goto_symext::symex_step(
     symex_start_thread(state);
     state.source.pc++;
     break;
-  
+
   case END_THREAD:
     // behaves like assume(0);
     if(!state.guard.is_false())
       state.guard.add(false_exprt());
     state.source.pc++;
     break;
-  
+
   case ATOMIC_BEGIN:
     symex_atomic_begin(state);
     state.source.pc++;
     break;
-    
+
   case ATOMIC_END:
     symex_atomic_end(state);
     state.source.pc++;
     break;
-    
+
   case CATCH:
     symex_catch(state);
     state.source.pc++;
     break;
-  
+
   case THROW:
     symex_throw(state);
     state.source.pc++;
     break;
-    
+
   case NO_INSTRUCTION_TYPE:
     throw "symex got NO_INSTRUCTION";
-  
+
   default:
     throw "symex got unexpected instruction";
   }

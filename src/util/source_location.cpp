@@ -68,7 +68,7 @@ std::ostream &operator << (
   if(source_location.is_nil()) return out;
 
   out << source_location.as_string();
-  
+
   return out;
 }
 

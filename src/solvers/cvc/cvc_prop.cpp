@@ -165,7 +165,7 @@ void cvc_propt::lequal(literalt a, literalt b, literalt o)
       << cvc_literal(b) << ") <=> " << cvc_literal(o)
       << ";" << std::endl << std::endl;
 }
-  
+
 /*******************************************************************\
 
 Function: cvc_propt::limplies
@@ -209,12 +209,12 @@ literalt cvc_propt::land(const bvt &bv)
     if(it!=bv.begin()) out << " AND ";
     out << cvc_literal(*it);
   }
-  
+
   out << ";" << std::endl << std::endl;
 
-  return literal;  
+  return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cvc_propt::lor
@@ -238,12 +238,12 @@ literalt cvc_propt::lor(const bvt &bv)
     if(it!=bv.begin()) out << " OR ";
     out << cvc_literal(*it);
   }
-  
+
   out << ";" << std::endl << std::endl;
 
-  return literal;  
+  return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cvc_propt::lxor
@@ -269,7 +269,7 @@ literalt cvc_propt::lxor(const bvt &bv)
 
   return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: cvc_propt::land
@@ -293,7 +293,7 @@ literalt cvc_propt::land(literalt a, literalt b)
   out << "%% land" << std::endl;
 
   literalt o=def_cvc_literal();
-  
+
   out << cvc_literal(a) << " AND " << cvc_literal(b) << ";"
       << std::endl << std::endl;
 
@@ -319,11 +319,11 @@ literalt cvc_propt::lor(literalt a, literalt b)
   if(a==const_literal(true)) return const_literal(true);
   if(b==const_literal(true)) return const_literal(true);
   if(a==b) return a;
-  
+
   out << "%% lor" << std::endl;
 
   literalt o=def_cvc_literal();
-  
+
   out << cvc_literal(a) << " OR " << cvc_literal(b) << ";"
       << std::endl << std::endl;
 
@@ -352,7 +352,7 @@ literalt cvc_propt::lxor(literalt a, literalt b)
   out << "%% lxor" << std::endl;
 
   literalt o=def_cvc_literal();
-  
+
   out << cvc_literal(a) << " XOR " << cvc_literal(b) << ";"
       << std::endl << std::endl;
 
@@ -440,7 +440,7 @@ Function: cvc_propt::lselect
 \*******************************************************************/
 
 literalt cvc_propt::lselect(literalt a, literalt b, literalt c)
-{ 
+{
   if(a==const_literal(true)) return b;
   if(a==const_literal(false)) return c;
   if(b==c) return b;
@@ -565,7 +565,7 @@ std::string cvc_propt::cvc_literal(literalt l)
     return "TRUE";
 
   if(l.sign())
-    return "(NOT l"+i2string(l.var_no())+")";  
+    return "(NOT l"+i2string(l.var_no())+")";
 
   return "l"+i2string(l.var_no());
 }

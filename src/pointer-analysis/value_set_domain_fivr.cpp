@@ -27,22 +27,22 @@ bool value_set_domain_fivrt::transform(
   const namespacet &ns,
   locationt from_l,
   locationt to_l)
-{   
+{
   value_set.set_from(from_l->function, from_l->location_number);
   value_set.set_to(to_l->function, to_l->location_number);
-  
+
   #if 0
-  std::cout << "Transforming: " << 
-    from_l->function << " " << from_l->location_number << " to " << 
+  std::cout << "Transforming: " <<
+    from_l->function << " " << from_l->location_number << " to " <<
     to_l->function << " " << to_l->location_number << std::endl;
   #endif
-  
+
   switch(from_l->type)
   {
-  case END_FUNCTION:    
+  case END_FUNCTION:
     value_set.do_end_function(get_return_lhs(to_l), ns);
     break;
-  
+
   case RETURN:
   case OTHER:
   case ASSIGN:
@@ -55,11 +55,11 @@ bool value_set_domain_fivrt::transform(
         to_code_function_call(from_l->code);
 
       value_set.do_function_call(to_l->function, code.arguments(), ns);
-      break;        
+      break;
     }
-    
-  default:;    
+
+  default:;
   }
-  
+
   return value_set.handover();
 }

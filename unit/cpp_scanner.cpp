@@ -36,7 +36,7 @@ int main(int argc, const char *argv[])
   cpp_parser.in=&in;
 
   cpp_tokent tk;
-  
+
   while(cpp_parser.token_buffer.get_token(tk))
     std::cout << tk.text << '\n';
 

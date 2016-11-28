@@ -8,7 +8,7 @@ struct X
 int main()
 {
   int *p;
-  
+
   p=&x.a;
   *p=10;
   p++;

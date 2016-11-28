@@ -12,29 +12,29 @@ int main()
   assert(sizeof(i3)==4);
   assert(sizeof(i4)==8);
   #endif
-  
+
   // general types
-  
+
   char c;
   short s;
   int i;
   long l;
   long long ll;
-  
+
   assert(sizeof(c)==1);
   assert(sizeof(s)==2);
   assert(sizeof(i)==4);
   assert(sizeof(l)==4);
   assert(sizeof(ll)==8);
-  
-  // these constants are Visual Studio-specific  
+
+  // these constants are Visual Studio-specific
   #ifdef _MSC_VER
   assert(sizeof(1i8)==1);
   assert(sizeof(1i16)==2);
   assert(sizeof(1i32)==4);
   assert(sizeof(1i64)==8);
   assert(sizeof(1i128)==16);
-  
+
   // oh, and these pointer qualifiers are Visual Studio-specific
   int * __ptr32 p32;
   //int * __ptr64 p64;
@@ -43,6 +43,6 @@ int main()
   assert(sizeof(p32)==4);
   //assert(sizeof(p64)==8);
   #endif
-  
+
   assert(sizeof(void *)==4);
 }

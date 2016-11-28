@@ -28,7 +28,7 @@ class satcheck_glucose_baset:public cnf_solvert
 public:
   explicit satcheck_glucose_baset(T *);
   virtual ~satcheck_glucose_baset();
-  
+
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
 
@@ -37,17 +37,17 @@ public:
 
   // extra MiniSat feature: solve with assumptions
   virtual void set_assumptions(const bvt &_assumptions);
-  
+
   // extra MiniSat feature: default branching decision
   void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const;
   virtual bool has_set_assumptions() const { return true; }
   virtual bool has_is_in_conflict() const { return true; }
-  
+
 protected:
   T *solver;
-  
+
   void add_variables();
   bvt assumptions;
 };

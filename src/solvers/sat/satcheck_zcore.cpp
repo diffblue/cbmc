@@ -115,7 +115,7 @@ propt::resultt satcheck_zcoret::prop_solve()
     std::ofstream out(cnf_file.c_str(), std::ios::out);
     write_dimacs_cnf(out);
   }
-  
+
   // generate resolve_trace
   system(std::string("zchaff_verify "+cnf_file+" > "+output_file).c_str());
 
@@ -127,25 +127,25 @@ propt::resultt satcheck_zcoret::prop_solve()
   // read result
   {
     std::ifstream in(core_file.c_str());
-    
+
     while(true)
     {
       std::string line;
       if(!std::getline(in, line)) break;
-      
+
       if(!(line.substr(0,1)=="c" || line.substr(0,1)=="p"))
       {
         const char *p=line.c_str();
-        
+
         while(true)
         {
           int l=unsafe_str2int(p);
           if(l==0) break;
-          
+
           if(l<0) l=-l;
 
           in_core.insert(l);
-          
+
           // next one
           const char *q=strchr(p, ' ');
           while(*q==' ') q++;
@@ -155,10 +155,10 @@ propt::resultt satcheck_zcoret::prop_solve()
       }
     }
   }
-  
+
   if(in_core.empty())
     return P_ERROR;
-  
+
   remove(cnf_file.c_str());
   //remove(core_file.c_str());
   remove(trace_file.c_str());

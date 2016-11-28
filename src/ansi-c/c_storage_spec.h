@@ -18,13 +18,13 @@ public:
   {
     clear();
   }
-  
+
   explicit c_storage_spect(const typet &type)
   {
     clear();
     read(type);
   }
-  
+
   void clear()
   {
     is_typedef=false;
@@ -38,7 +38,7 @@ public:
     asm_label.clear();
     section.clear();
   }
-  
+
   bool is_typedef, is_extern, is_static, is_register,
        is_inline, is_thread_local, is_weak;
 
@@ -48,7 +48,7 @@ public:
   // GCC asm labels __asm__("foo") - these change the symbol name
   irep_idt asm_label;
   irep_idt section;
-  
+
   friend bool operator == (
     const c_storage_spect &a,
     const c_storage_spect &b)
@@ -83,10 +83,10 @@ public:
     a.is_inline       |=b.is_inline;
     a.is_thread_local |=b.is_thread_local;
     // attributes belong to the declarator, don't replace them
-    
+
     return a;
   }
-  
+
   void read(const typet &type);
 };
 

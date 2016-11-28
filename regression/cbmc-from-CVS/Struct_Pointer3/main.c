@@ -5,7 +5,7 @@ struct listt
 };
 
 typedef struct listt listt;
- 
+
 int main ()
 {
   listt el0, el1, *ppp1, *ppp2;

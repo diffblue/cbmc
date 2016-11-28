@@ -130,7 +130,7 @@ bool compilet::doit()
   {
     if(link()) return true;
   }
-  
+
   return false;
 }
 
@@ -168,7 +168,7 @@ bool compilet::add_input_file(const std::string &file_name)
               << "' has no extension, not considered" << eom;
     return false;
   }
-  
+
   std::string ext = file_name.substr(r+1, file_name.length());
 
   if(ext=="c" ||
@@ -212,15 +212,15 @@ bool compilet::add_input_file(const std::string &file_name)
 
     // unpack now
     cmd << "ar x " << concat_dir_file(working_directory, file_name);
-    
+
     FILE *stream;
 
     stream=popen(cmd.str().c_str(), "r");
     pclose(stream);
-    
+
     cmd.clear();
     cmd.str("");
-    
+
     // add the files from "ar t"
     #ifdef _WIN32
     if(file_name[0]!='/' && file_name[1]!=':')
@@ -331,7 +331,7 @@ bool compilet::find_library(const std::string &name)
       }
     }
   }
-  
+
   return false;
 }
 
@@ -396,7 +396,7 @@ bool compilet::link()
   }
 
   // produce entry point?
-  
+
   if(mode==COMPILE_LINK_EXECUTABLE)
   {
     // new symbols may have been added to a previously linked file
@@ -439,7 +439,7 @@ bool compilet::compile()
   {
     std::string file_name=source_files.front();
     source_files.pop_front();
-    
+
     // Visual Studio always prints the name of the file it's doing
     if(echo_file_name)
       status() << file_name << eom;
@@ -456,7 +456,7 @@ bool compilet::compile()
       convert_symbols(compiled_functions);
 
       std::string cfn;
-      
+
       if(output_file_object=="")
         cfn=get_base_name(file_name, true)+"."+object_file_extension;
       else
@@ -469,7 +469,7 @@ bool compilet::compile()
       compiled_functions.clear();
     }
   }
-  
+
   return false;
 }
 
@@ -502,10 +502,10 @@ bool compilet::parse(const std::string &file_name)
   }
 
   languaget *languagep;
-  
+
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
-  
+
   if(override_language!="")
   {
     if(override_language=="c++" || override_language=="c++-header")
@@ -524,7 +524,7 @@ bool compilet::parse(const std::string &file_name)
 
   languaget &language=*languagep;
   language.set_message_handler(get_message_handler());
-  
+
   language_filet language_file;
 
   std::pair<language_filest::filemapt::iterator, bool>
@@ -549,7 +549,7 @@ bool compilet::parse(const std::string &file_name)
 
       if(!ofs.is_open())
       {
-        error() << "failed to open output file `" 
+        error() << "failed to open output file `"
                 << cmdline.get_value('o') << "'" << eom;
         return true;
       }
@@ -588,7 +588,7 @@ Function: compilet::parse_stdin
 bool compilet::parse_stdin()
 {
   ansi_c_languaget language;
-  
+
   language.set_message_handler(get_message_handler());
 
   print(8, "Parsing: (stdin)");
@@ -665,7 +665,7 @@ bool compilet::write_bin_object_file(
   const symbol_tablet &lsymbol_table,
   goto_functionst &functions)
 {
-  statistics() << "Writing binary format object `" 
+  statistics() << "Writing binary format object `"
                << file_name << "'" << eom;
 
   // symbols
@@ -709,10 +709,10 @@ bool compilet::parse_source(const std::string &file_name)
 {
   if(parse(file_name))
     return true;
-    
+
   if(typecheck()) // we just want to typecheck this one file here
     return true;
-    
+
   if((has_suffix(file_name, ".class") ||
       has_suffix(file_name, ".jar")) &&
      final())
@@ -830,14 +830,14 @@ void compilet::convert_symbols(goto_functionst &dest)
   // the compilation may add symbols!
 
   symbol_tablet::symbolst::size_type before=0;
-  
+
   while(before!=symbol_table.symbols.size())
   {
     before=symbol_table.symbols.size();
 
     typedef std::set<irep_idt> symbols_sett;
     symbols_sett symbols;
-  
+
     Forall_symbols(it, symbol_table.symbols)
       symbols.insert(it->first);
 

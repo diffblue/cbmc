@@ -30,7 +30,7 @@ public:
   {
     return convert(src);
   }
-  
+
   exprt convert(const exprt &);
 
   exprt negation(const exprt &, const ieee_float_spect &);
@@ -44,7 +44,7 @@ public:
 
   // add/sub
   exprt add_sub(bool subtract, const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
-  
+
   // mul/div
   exprt mul(const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
   exprt div(const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
@@ -80,7 +80,7 @@ protected:
     exprt round_to_zero;
     exprt round_to_plus_inf;
     exprt round_to_minus_inf;
-    
+
     void get(const exprt &rm);
     explicit rounding_mode_bitst(const exprt &rm) { get(rm); }
   };
@@ -98,7 +98,7 @@ protected:
   {
     exprt sign, infinity, zero, NaN;
     exprt fraction, exponent;
-    
+
     unpacked_floatt():
       sign(false_exprt()),
       infinity(false_exprt()),
@@ -129,7 +129,7 @@ protected:
 
   void round_fraction(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
   void round_exponent(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
-  
+
   // rounding decision for fraction
   exprt fraction_rounding_decision(
     const std::size_t dest_bits,

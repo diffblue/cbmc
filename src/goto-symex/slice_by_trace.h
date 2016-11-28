@@ -34,11 +34,11 @@ public:
   event_tracet sigma;
 
   typedef std::vector<std::vector<irep_idt> > value_tracet;
-  
+
   value_tracet sigma_vals;
-  
+
   typedef std::vector<exprt> trace_conditionst;
-  
+
   trace_conditionst t;
 
   std::set<exprt> sliced_guards;
@@ -56,7 +56,7 @@ public:
   bool parse_alphabet(std::string read_line);
 
   void parse_events(std::string read_line);
-  
+
   void compute_ts_fd(symex_target_equationt &equation);
 
   void compute_ts_back(symex_target_equationt &equation);

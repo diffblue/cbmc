@@ -1,7 +1,7 @@
 struct A {};
 
 struct B {
-	 explicit B(A&){}	
+	 explicit B(A&){}
 };
 
 void test(const B& b){};

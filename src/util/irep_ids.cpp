@@ -31,7 +31,7 @@ Function: initialize_string_container
 void initialize_string_container()
 {
   // this is called by the constructor of string_containert
-  
+
   for(unsigned i=0; irep_ids_table[i]!=NULL; i++)
   {
     unsigned x;

@@ -36,7 +36,7 @@ public:
   {
     copy_to_operands(a);
   }
-  
+
   inline oexprt operator[](const exprt &_index) const
   {
     return oexprt(*this, ID_index, _index, type().subtype());

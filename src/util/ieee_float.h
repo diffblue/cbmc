@@ -23,18 +23,18 @@ public:
   // Number of bits for fraction (excluding hidden bit)
   // and exponent, respectively
   std::size_t f, e;
-  
+
   // x86 has an extended precision format with an explicit
   // integer bit.
   bool x86_extended;
-  
+
   mp_integer bias() const;
-  
+
   ieee_float_spect(const floatbv_typet &type)
   {
     from_type(type);
   }
-  
+
   void from_type(const floatbv_typet &type);
 
   ieee_float_spect():f(0), e(0), x86_extended(false)
@@ -50,14 +50,14 @@ public:
     // Add one for the sign bit.
     // Add one if x86 explicit integer bit is used.
     return f+e+1+(x86_extended?1:0);
-  }  
+  }
 
   mp_integer max_exponent() const;
   mp_integer max_fraction() const;
-  
+
   class floatbv_typet to_type() const;
 
-  // the well-know standard formats  
+  // the well-know standard formats
   inline static ieee_float_spect single_precision()
   {
     // 32 bits in total
@@ -68,30 +68,30 @@ public:
   {
     // 64 bits in total
     return ieee_float_spect(52, 11);
-  }  
-  
+  }
+
   inline static ieee_float_spect quadruple_precision()
   {
     // IEEE 754 binary128
     return ieee_float_spect(112, 15);
-  }  
-  
+  }
+
   inline static ieee_float_spect x86_80()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
     result.x86_extended=true;
     return result;
-  }  
-  
+  }
+
   inline static ieee_float_spect x86_96()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
     result.x86_extended=true;
     return result;
-  }  
-  
+  }
+
   inline friend bool operator == (
     const ieee_float_spect &a, const ieee_float_spect &b)
   {
@@ -123,27 +123,27 @@ public:
   rounding_modet rounding_mode;
 
   ieee_float_spect spec;
-  
+
   explicit ieee_floatt(const ieee_float_spect &_spec):
     rounding_mode(ROUND_TO_EVEN),
     spec(_spec), sign_flag(false), exponent(0), fraction(0),
     NaN_flag(false), infinity_flag(false)
   {
   }
-  
+
   ieee_floatt():
     rounding_mode(ROUND_TO_EVEN),
     sign_flag(false), exponent(0), fraction(0),
     NaN_flag(false), infinity_flag(false)
   {
   }
-  
+
   explicit ieee_floatt(const constant_exprt &expr):
     rounding_mode(ROUND_TO_EVEN)
   {
     from_expr(expr);
   }
-  
+
   void negate()
   {
     sign_flag=!sign_flag;
@@ -160,13 +160,13 @@ public:
     NaN_flag=false;
     infinity_flag=false;
   }
-  
+
   void make_NaN();
   void make_plus_infinity();
   void make_minus_infinity();
   void make_fltmax(); // maximum representable finite floating-point number
   void make_fltmin(); // minimum normalized positive floating-point number
-  
+
   static ieee_floatt NaN(const ieee_float_spect &_spec)
   { ieee_floatt c(_spec); c.make_NaN(); return c; }
 
@@ -186,7 +186,7 @@ public:
 
   // set to next representable number towards plus infinity
   void increment(bool distinguish_zero=false)
-  { 
+  {
     if(is_zero() && get_sign() && distinguish_zero)
       negate();
     else
@@ -195,7 +195,7 @@ public:
 
   // set to previous representable number towards minus infinity
   void decrement(bool distinguish_zero=false)
-  { 
+  {
     if(is_zero() && !get_sign() && distinguish_zero)
       negate();
     else
@@ -210,7 +210,7 @@ public:
 
   const mp_integer &get_exponent() const { return exponent; }
   const mp_integer &get_fraction() const { return fraction; }
-  
+
   // performs conversion to IEEE floating point format
   void from_integer(const mp_integer &i);
   void from_base10(const mp_integer &exp, const mp_integer &frac);
@@ -240,11 +240,11 @@ public:
   {
     return format(format_spect());
   }
-  
+
   std::string to_string_decimal(std::size_t precision) const;
-  std::string to_string_scientific(std::size_t precision) const;  
+  std::string to_string_scientific(std::size_t precision) const;
   std::string format(const format_spect &format_spec) const;
-  
+
   friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
   {
     return out << f.to_ansi_c_string();
@@ -254,12 +254,12 @@ public:
   constant_exprt to_expr() const;
   void from_expr(const constant_exprt &expr);
 
-  // the usual opertors  
+  // the usual opertors
   ieee_floatt &operator /= (const ieee_floatt &other);
   ieee_floatt &operator *= (const ieee_floatt &other);
   ieee_floatt &operator += (const ieee_floatt &other);
   ieee_floatt &operator -= (const ieee_floatt &other);
-  
+
   friend bool operator < (const ieee_floatt &a, const ieee_floatt &b);
   friend bool operator <=(const ieee_floatt &a, const ieee_floatt &b);
   friend bool operator > (const ieee_floatt &a, const ieee_floatt &b);
@@ -274,7 +274,7 @@ public:
   // these do IEEE equality, i.e., NAN!=NAN
   friend bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
   friend bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
-  
+
 protected:
   void divide_and_round(mp_integer &fraction, const mp_integer &factor);
   void align();
@@ -285,7 +285,7 @@ protected:
   mp_integer exponent; // this is unbiased
   mp_integer fraction; // this _does_ include the hidden bit
   bool NaN_flag, infinity_flag;
-  
+
   // number of digits of an integer >=1 in base 10
   static mp_integer base10_digits(const mp_integer &src);
 };

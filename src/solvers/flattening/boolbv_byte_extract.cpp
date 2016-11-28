@@ -34,14 +34,14 @@ bvt map_bv(const endianness_mapt &map, const bvt &src)
 
   bvt result;
   result.resize(src.size(), const_literal(false));
-  
+
   for(std::size_t i=0; i<src.size(); i++)
   {
     size_t mapped_index=map.map_bit(i);
     assert(mapped_index<src.size());
     result[i]=src[mapped_index];
   }
-  
+
   return result;
 }
 
@@ -68,9 +68,9 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     exprt tmp=flatten_byte_extract(expr, ns);
     return convert_bv(tmp);
   }
-  
+
   std::size_t width=boolbv_width(expr.type());
-  
+
   // special treatment for bit-fields and big-endian:
   // we need byte granularity
   #if 0
@@ -89,12 +89,12 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   if(width==0)
     return conversion_failed(expr);
-    
+
   const exprt &op=expr.op();
   const exprt &offset=expr.offset();
-  
+
   bool little_endian;
-  
+
   if(expr.id()==ID_byte_extract_little_endian)
     little_endian=true;
   else if(expr.id()==ID_byte_extract_big_endian)
@@ -106,7 +106,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   }
 
   // first do op0
-  
+
   endianness_mapt op_map(op.type(), little_endian, ns);
   const bvt op_bv=map_bv(op_map, convert_bv(op));
 
@@ -125,7 +125,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
       throw "byte_extract flatting with negative offset: "+expr.pretty();
 
     mp_integer offset=index*byte_width;
-    
+
     std::size_t offset_i=integer2unsigned(offset);
 
     for(std::size_t i=0; i<width; i++)
@@ -138,7 +138,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   else
   {
     std::size_t bytes=op_bv.size()/byte_width;
-    
+
     if(prop.has_set_to())
     {
       // free variables
@@ -177,11 +177,11 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
       equality.lhs()=offset; // index operand
 
       typet constant_type(offset.type()); // type of index operand
-      
+
       for(std::size_t i=0; i<bytes; i++)
       {
         equality.rhs()=from_integer(i, constant_type);
-          
+
         literalt e=convert(equality);
 
         std::size_t offset=i*byte_width;
@@ -189,7 +189,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
         for(std::size_t j=0; j<width; j++)
         {
           literalt l;
-          
+
           if(offset+j<op_bv.size())
             l=op_bv[offset+j];
           else
@@ -200,12 +200,12 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
           else
             bv[j]=prop.lselect(e, l, bv[j]);
         }
-      }    
+      }
     }
   }
 
   // shuffle the result
   bv=map_bv(result_map, bv);
-  
+
   return bv;
 }

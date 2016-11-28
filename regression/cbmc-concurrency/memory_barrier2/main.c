@@ -29,7 +29,7 @@ void* thr2(void * arg) {
   // end: critical section
   flag2 = 0;
 }
-  
+
 int main()
 {
   __CPROVER_ASYNC_1: thr1(0);
