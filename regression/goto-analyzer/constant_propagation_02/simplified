@@ -1,0 +1,81 @@
+Reading GOTO program from `out.goto'
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+main /* main */
+        // 0 file constant_propagation_02.c line 5 function main
+        signed int i;
+        // 1 file constant_propagation_02.c line 5 function main
+        i = 0;
+        // 2 file constant_propagation_02.c line 5 function main
+        signed int j;
+        // 3 file constant_propagation_02.c line 5 function main
+        j = 2;
+        // 4 file constant_propagation_02.c line 7 function main
+        IF FALSE THEN GOTO 1
+        // 5 file constant_propagation_02.c line 9 function main
+        0 = 1;
+        // 6 file constant_propagation_02.c line 10 function main
+        2 = 3;
+        // 7 no location
+     1: SKIP
+        // 8 file constant_propagation_02.c line 12 function main
+        ASSERT FALSE // assertion j!=3
+        // 9 file constant_propagation_02.c line 12 function main
+        GOTO 2
+        // 10 file constant_propagation_02.c line 12 function main
+        (void)0;
+        // 11 no location
+     2: SKIP
+        // 12 file constant_propagation_02.c line 13 function main
+        dead j;
+        // 13 file constant_propagation_02.c line 13 function main
+        dead i;
+        // 14 file constant_propagation_02.c line 13 function main
+        main#return_value = NONDET(signed int);
+        // 15 file constant_propagation_02.c line 13 function main
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+_start /* _start */
+        // 16 no location
+        __CPROVER_initialize();
+        // 17 file constant_propagation_02.c line 3
+        main();
+        // 18 file constant_propagation_02.c line 3
+        return' = main#return_value;
+        // 19 file constant_propagation_02.c line 3
+        dead main#return_value;
+        // 20 file constant_propagation_02.c line 3
+        OUTPUT("return", return');
+        // 21 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+__CPROVER_initialize /* __CPROVER_initialize */
+        // 22 no location
+        // Labels: __CPROVER_HIDE
+        SKIP
+        // 23 file <built-in-additions> line 39
+        __CPROVER_dead_object = NULL;
+        // 24 file <built-in-additions> line 38
+        __CPROVER_deallocated = NULL;
+        // 25 file <built-in-additions> line 42
+        __CPROVER_malloc_is_new_array = FALSE;
+        // 26 file <built-in-additions> line 40
+        __CPROVER_malloc_object = NULL;
+        // 27 file <built-in-additions> line 41
+        __CPROVER_malloc_size = 0ul;
+        // 28 file <built-in-additions> line 43
+        __CPROVER_memory_leak = NULL;
+        // 29 file <built-in-additions> line 31
+        __CPROVER_next_thread_id = 0ul;
+        // 30 file <built-in-additions> line 85
+        __CPROVER_pipe_count = 0u;
+        // 31 file <built-in-additions> line 65
+        __CPROVER_rounding_mode = 0;
+        // 32 file <built-in-additions> line 29
+        __CPROVER_thread_id = 0ul;
+        // 33 file <built-in-additions> line 30
+        __CPROVER_threads_exited = ARRAY_OF(FALSE);
+        // 34 no location
+        END_FUNCTION

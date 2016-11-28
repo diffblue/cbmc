@@ -1,6 +1,6 @@
 CORE
 intervals1.c
---intervals
+--intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file intervals1.c line 8 function main, assertion i>=10: SUCCESS$

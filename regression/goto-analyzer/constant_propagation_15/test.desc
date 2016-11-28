@@ -1,0 +1,9 @@
+FUTURE
+constant_propagation_15.c
+--constants --simplify out.goto
+^EXIT=0$
+^SIGNAL=0$
+^SIMPLIFIED:  assert: 1, assume: 0, goto: 1, assigns: 4, function calls: 0$
+^UNMODIFIED:  assert: 0, assume: 0, goto: 2, assigns: 11, function calls: 2$
+--
+^warning: ignoring
