@@ -14,7 +14,7 @@ public:
         //printf ("elem is '%c' \n", elem);
         return elem;
    }
-   
+
    void add(void)
    {
         int c = elem + elem;

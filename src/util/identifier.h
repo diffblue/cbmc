@@ -29,7 +29,7 @@ public:
   componentst components;
 
 protected:
-  void parse(const std::string &s);  
+  void parse(const std::string &s);
 };
 
 #endif

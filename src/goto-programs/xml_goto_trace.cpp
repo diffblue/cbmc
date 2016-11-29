@@ -37,7 +37,7 @@ void convert(
   xmlt &dest)
 {
   dest=xmlt("goto_trace");
-  
+
   source_locationt previous_source_location;
 
   for(const auto & it : goto_trace.steps)
@@ -47,14 +47,14 @@ void convert(
     xmlt xml_location;
     if(source_location.is_not_nil() && source_location.get_file()!="")
       xml_location=xml(source_location);
-    
+
     switch(it.type)
     {
     case goto_trace_stept::ASSERT:
       if(!it.cond_value)
       {
         irep_idt property_id;
-        
+
         if(it.pc->is_assert())
           property_id=source_location.get_property_id();
         else if(it.pc->is_goto()) // unwinding, we suspect
@@ -63,7 +63,7 @@ void convert(
             id2string(it.pc->source_location.get_function())+".unwind."+
             i2string(it.pc->loop_number);
         }
-      
+
         xmlt &xml_failure=dest.new_element("failure");
 
         xml_failure.set_attribute_bool("hidden", it.hidden);
@@ -76,7 +76,7 @@ void convert(
           xml_failure.new_element().swap(xml_location);
       }
       break;
-      
+
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::DECL:
       {
@@ -88,7 +88,7 @@ void convert(
 
         std::string value_string, binary_string, type_string,
                     full_lhs_string, full_lhs_value_string;
-        
+
         if(it.lhs_object_value.is_not_nil())
           value_string=from_expr(ns, identifier, it.lhs_object_value);
 
@@ -118,7 +118,7 @@ void convert(
         xml_assignment.new_element("full_lhs").data=full_lhs_string;
         xml_assignment.new_element("full_lhs_value").data=full_lhs_value_string;
         xml_assignment.new_element("value").data=value_string;
-        
+
         xml_assignment.set_attribute_bool("hidden", it.hidden);
         xml_assignment.set_attribute("thread", i2string(it.thread_nr));
         xml_assignment.set_attribute("identifier", id2string(identifier));
@@ -126,7 +126,7 @@ void convert(
         xml_assignment.set_attribute("display_name", id2string(display_name));
         xml_assignment.set_attribute("step_nr", i2string(it.step_nr));
 
-        xml_assignment.set_attribute("assignment_type", 
+        xml_assignment.set_attribute("assignment_type",
           it.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
           "state");
 
@@ -134,14 +134,14 @@ void convert(
           xml_assignment.new_element("value_expression").new_element(xml(it.lhs_object_value, ns));
       }
       break;
-      
+
     case goto_trace_stept::OUTPUT:
       {
         printf_formattert printf_formatter(ns);
         printf_formatter(id2string(it.format_string), it.io_args);
         std::string text=printf_formatter.as_string();
         xmlt &xml_output=dest.new_element("output");
-        
+
         xml_output.new_element("text").data=text;
 
         xml_output.set_attribute_bool("hidden", it.hidden);
@@ -159,35 +159,35 @@ void convert(
         }
       }
       break;
-      
+
     case goto_trace_stept::INPUT:
       {
         xmlt &xml_input=dest.new_element("input");
         xml_input.new_element("input_id").data=id2string(it.io_id);
-        
+
         xml_input.set_attribute_bool("hidden", it.hidden);
         xml_input.set_attribute("thread", i2string(it.thread_nr));
         xml_input.set_attribute("step_nr", i2string(it.step_nr));
-        
+
         for(const auto & l_it : it.io_args)
         {
           xml_input.new_element("value").data=from_expr(ns, "", l_it);
           xml_input.new_element("value_expression").
             new_element(xml(l_it, ns));
         }
-            
+
         if(xml_location.name!="")
           xml_input.new_element().swap(xml_location);
       }
       break;
-      
+
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
       {
         std::string tag=
           (it.type==goto_trace_stept::FUNCTION_CALL)?"function_call":"function_return";
         xmlt &xml_call_return=dest.new_element(tag);
-        
+
         xml_call_return.set_attribute_bool("hidden", it.hidden);
         xml_call_return.set_attribute("thread", i2string(it.thread_nr));
         xml_call_return.set_attribute("step_nr", i2string(it.step_nr));
@@ -202,7 +202,7 @@ void convert(
           xml_call_return.new_element().swap(xml_location);
       }
       break;
-      
+
     default:
       if(source_location!=previous_source_location)
       {
@@ -210,7 +210,7 @@ void convert(
         if(xml_location.name!="")
         {
           xmlt &xml_location_only=dest.new_element("location-only");
-          
+
           xml_location_only.set_attribute_bool("hidden", it.hidden);
           xml_location_only.set_attribute("thread", i2string(it.thread_nr));
           xml_location_only.set_attribute("step_nr", i2string(it.step_nr));

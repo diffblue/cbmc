@@ -55,7 +55,7 @@ void prop_minimizet::fix_objectives()
 {
   std::vector<objectivet> &entry=current->second;
   bool found=false;
-  
+
   for(std::vector<objectivet>::iterator
       o_it=entry.begin();
       o_it!=entry.end();
@@ -71,10 +71,10 @@ void prop_minimizet::fix_objectives()
       found=true;
     }
   }
-  
+
   assert(found);
 }
-  
+
 /*******************************************************************\
 
 Function: prop_minimizet::constaint
@@ -93,7 +93,7 @@ literalt prop_minimizet::constraint()
   std::vector<objectivet> &entry=current->second;
 
   bvt or_clause;
-  
+
   for(std::vector<objectivet>::iterator
       o_it=entry.begin();
       o_it!=entry.end();
@@ -114,7 +114,7 @@ literalt prop_minimizet::constraint()
     or_exprt or_expr;
     forall_literals(it, or_clause)
       or_expr.copy_to_operands(literal_exprt(*it));
-    
+
     return prop_conv.convert(or_expr);
   }
 }
@@ -140,7 +140,7 @@ void prop_minimizet::operator()()
   _number_satisfied=0;
   _value=0;
   bool last_was_SAT=false;
-  
+
   // go from high weights to low ones
   for(current=objectives.rbegin();
       current!=objectives.rend();
@@ -150,10 +150,10 @@ void prop_minimizet::operator()()
 
     decision_proceduret::resultt dec_result;
     do
-    {  
+    {
       // We want to improve on one of the objectives, please!
       literalt c=constraint();
-    
+
       if(c.is_false())
         dec_result=decision_proceduret::D_UNSATISFIABLE;
       else
@@ -164,7 +164,7 @@ void prop_minimizet::operator()()
         assumptions.push_back(c);
         prop_conv.set_assumptions(assumptions);
         dec_result=prop_conv.dec_solve();
-    
+
         switch(dec_result)
         {
         case decision_proceduret::D_UNSATISFIABLE:
@@ -185,7 +185,7 @@ void prop_minimizet::operator()()
     }
     while(dec_result!=decision_proceduret::D_UNSATISFIABLE);
   }
-  
+
   if(!last_was_SAT)
   {
     // We don't have a satisfying assignment to work with.
@@ -196,4 +196,3 @@ void prop_minimizet::operator()()
     prop_conv.dec_solve();
   }
 }
-

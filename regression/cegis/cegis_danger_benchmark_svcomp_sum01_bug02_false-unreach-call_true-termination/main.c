@@ -14,4 +14,3 @@ int main() {
   __CPROVER_assert(sn==n*a || sn == 0, "A");
   return 0;
 }
-

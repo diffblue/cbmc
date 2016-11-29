@@ -2,7 +2,7 @@ int main()
 {
   int i;
 
-  // this should fail  
+  // this should fail
   goto ERROR;
 
   return 0;

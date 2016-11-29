@@ -46,7 +46,7 @@ void counterexample_beautificationt::get_minimization_list(
       if(!prop_conv.l_get(it->guard_literal).is_false())
       {
         const typet &type=it->ssa_lhs.type();
-      
+
         if(type!=bool_typet())
         {
           // we minimize the absolute value, if applicable
@@ -95,7 +95,7 @@ counterexample_beautificationt::get_failed_property(
        prop_conv.l_get(it->guard_literal).is_true() &&
        prop_conv.l_get(it->cond_literal).is_false())
       return it;
-  
+
   assert(false);
   return equation.SSA_steps.end();
 }
@@ -120,7 +120,7 @@ void counterexample_beautificationt::operator()(
   // find failed property
 
   failed=get_failed_property(bv_cbmc, equation);
-  
+
   // lock the failed assertion
   bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);
 
@@ -151,7 +151,7 @@ void counterexample_beautificationt::operator()(
     // give to propositional minimizer
     prop_minimizet prop_minimize(bv_cbmc);
     prop_minimize.set_message_handler(bv_cbmc.get_message_handler());
-    
+
     for(guard_countt::const_iterator
         it=guard_count.begin();
         it!=guard_count.end();
@@ -168,9 +168,9 @@ void counterexample_beautificationt::operator()(
 
     // get symbols we care about
     minimization_listt minimization_list;
-  
+
     get_minimization_list(bv_cbmc, equation, minimization_list);
-  
+
     // minimize
     bv_minimizet bv_minimize(bv_cbmc);
     bv_minimize.set_message_handler(bv_cbmc.get_message_handler());

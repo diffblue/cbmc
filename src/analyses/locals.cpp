@@ -33,10 +33,10 @@ void localst::build(const goto_functiont &goto_function)
       locals_map[code_decl.get_identifier()]=
         to_symbol_expr(code_decl.symbol());
     }
-      
+
   const code_typet::parameterst &parameters=
     goto_function.type.parameters();
-      
+
   for(code_typet::parameterst::const_iterator
       it=parameters.begin();
       it!=parameters.end();

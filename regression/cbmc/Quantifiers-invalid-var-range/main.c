@@ -6,5 +6,5 @@ int main()
 
   assert(a[0][0]==10||a[0][1]==10||a[0][2]==10);
 
-  return 0;                
+  return 0;
 }

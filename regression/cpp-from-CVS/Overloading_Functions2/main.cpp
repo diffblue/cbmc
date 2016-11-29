@@ -15,4 +15,3 @@ int main()
 	C c;
 	assert(f1(c)==false);
 }
-

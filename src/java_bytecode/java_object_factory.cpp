@@ -39,7 +39,7 @@ void gen_nondet_init(
   irep_idt class_identifier)
 {
   const typet &type=ns.follow(expr.type());
-  
+
   if(type.id()==ID_pointer)
   {
     #if 0
@@ -98,10 +98,10 @@ void gen_nondet_init(
     const irep_idt struct_tag=struct_type.get_tag();
 
     const componentst &components=struct_type.components();
-    
+
     recursion_set.insert(struct_tag);
     assert(!recursion_set.empty());
-    
+
     for(const auto & component : components)
     {
       const typet &component_type=component.type();
@@ -226,7 +226,7 @@ exprt object_factory(
     aux_symbol.is_static_lifetime=true;
 
     exprt object=aux_symbol.symbol_expr();
-    
+
     const namespacet ns(symbol_table);
     gen_nondet_init(object, init_code, ns);
 
@@ -242,4 +242,3 @@ exprt object_factory(
   else
     return side_effect_expr_nondett(type);
 }
-

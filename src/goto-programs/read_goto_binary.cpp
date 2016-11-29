@@ -85,11 +85,11 @@ bool read_goto_binary(
                     << messaget::eom;
     return true;
   }
-  
+
   char hdr[4];
   hdr[0]=in.get();
   hdr[1]=in.get();
-  hdr[2]=in.get();    
+  hdr[2]=in.get();
   hdr[3]=in.get();
   in.seekg(0);
 
@@ -105,7 +105,7 @@ bool read_goto_binary(
     try
     {
       elf_readert elf_reader(in);
-      
+
       for(unsigned i=0; i<elf_reader.number_of_sections; i++)
         if(elf_reader.section_name(i)=="goto-cc")
         {
@@ -113,12 +113,12 @@ bool read_goto_binary(
           return read_bin_goto_object(
             in, filename, symbol_table, goto_functions, message_handler);
         }
-        
+
       // section not found
       messaget(message_handler).error() <<
         "failed to find goto-cc section in ELF binary" << messaget::eom;
     }
-    
+
     catch(const char *s)
     {
       messaget(message_handler).error() << s << messaget::eom;
@@ -166,7 +166,7 @@ bool read_goto_binary(
     messaget(message_handler).error() <<
       "not a goto binary" << messaget::eom;
   }
-  
+
   return true;
 }
 
@@ -189,9 +189,9 @@ bool is_goto_binary(const std::string &filename)
   #else
   std::ifstream in(filename, std::ios::binary);
   #endif
-  
+
   if(!in) return false;
-  
+
   // We accept two forms:
   // 1. goto binaries, marked with 0x7f GBF
   // 2. ELF binaries, marked with 0x7f ELF
@@ -199,7 +199,7 @@ bool is_goto_binary(const std::string &filename)
   char hdr[4];
   hdr[0]=in.get();
   hdr[1]=in.get();
-  hdr[2]=in.get();    
+  hdr[2]=in.get();
   hdr[3]=in.get();
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
@@ -215,7 +215,7 @@ bool is_goto_binary(const std::string &filename)
       elf_readert elf_reader(in);
       if(elf_reader.has_section("goto-cc")) return true;
     }
-    
+
     catch(...)
     {
       // ignore any errors
@@ -230,13 +230,13 @@ bool is_goto_binary(const std::string &filename)
       osx_fat_readert osx_fat_reader(in);
       if(osx_fat_reader.has_gb()) return true;
     }
-    
+
     catch(...)
     {
       // ignore any errors
     }
   }
-  
+
   return false;
 }
 
@@ -397,7 +397,7 @@ bool read_object_and_link(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  messaget(message_handler).statistics() << "Reading: " 
+  messaget(message_handler).statistics() << "Reading: "
                                          << file_name << messaget::eom;
 
   // we read into a temporary model
@@ -453,4 +453,3 @@ bool read_object_and_link(
     goto_model.goto_functions,
     message_handler);
 }
-

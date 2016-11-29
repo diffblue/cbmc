@@ -30,4 +30,3 @@ generated_files: json_lex.yy.cpp json_y.tab.cpp json_y.tab.h
 # extra dependencies
 json_y.tab$(OBJEXT): json_y.tab.cpp json_y.tab.h
 json_lex.yy$(OBJEXT): json_y.tab.cpp json_lex.yy.cpp json_y.tab.h
-

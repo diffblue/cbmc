@@ -180,4 +180,3 @@ void legacy_message_streamt::error_parse(
     tptr++;
   }
 }
-

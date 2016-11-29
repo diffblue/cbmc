@@ -42,14 +42,14 @@ bool static_lifetime_init(
   message_handlert &message_handler)
 {
   namespacet ns(symbol_table);
-      
+
   symbol_tablet::symbolst::iterator s_it=
     symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
   if(s_it==symbol_table.symbols.end()) return false;
 
   symbolt &init_symbol=s_it->second;
-  
+
   init_symbol.value=code_blockt();
   init_symbol.value.add_source_location()=source_location;
 
@@ -57,7 +57,7 @@ bool static_lifetime_init(
 
   // add the magic label to hide
   dest.add(code_labelt("__CPROVER_HIDE", code_skipt()));
-  
+
   // do assignments based on "value"
 
   // sort alphabetically for reproducible results
@@ -71,7 +71,7 @@ bool static_lifetime_init(
     const symbolt &symbol=ns.lookup(id);
 
     const irep_idt &identifier=symbol.name;
-  
+
     if(!symbol.is_static_lifetime) continue;
 
     if(symbol.is_type || symbol.is_macro) continue;
@@ -87,19 +87,19 @@ bool static_lifetime_init(
        identifier=="envp'" ||
        identifier=="envp_size'")
       continue;
-      
+
     // just for linking
     if(has_prefix(id, CPROVER_PREFIX "architecture_"))
       continue;
-  
+
     const typet &type=ns.follow(symbol.type);
-      
+
     // check type
     if(type.id()==ID_code ||
        type.id()==ID_empty)
       continue;
-    
-    // We won't try to initialize any symbols that have 
+
+    // We won't try to initialize any symbols that have
     // remained incomplete.
 
     if(symbol.value.is_nil() &&
@@ -120,26 +120,26 @@ bool static_lifetime_init(
       it->second.type=type;
       it->second.type.set(ID_size, gen_one(size_type()));
     }
-      
+
     if(type.id()==ID_incomplete_struct ||
        type.id()==ID_incomplete_union)
       continue; // do not initialize
-      
+
     if(symbol.value.id()==ID_nondet)
       continue; // do not initialize
 
     exprt rhs;
-      
+
     if(symbol.value.is_nil())
     {
-    
+
       try
       {
         namespacet ns(symbol_table);
         rhs=zero_initializer(symbol.type, symbol.location, ns, message_handler);
         assert(rhs.is_not_nil());
       }
-      
+
       catch(...)
       {
         return true;
@@ -147,7 +147,7 @@ bool static_lifetime_init(
     }
     else
       rhs=symbol.value;
-    
+
     code_assignt code(symbol.symbol_expr(), rhs);
     code.add_source_location()=symbol.location;
 
@@ -164,7 +164,7 @@ bool static_lifetime_init(
     if(symbol.type.id()==ID_code &&
        to_code_type(symbol.type).return_type().id()==ID_constructor)
     {
-      code_function_callt function_call;      
+      code_function_callt function_call;
       function_call.function()=symbol.symbol_expr();
       function_call.add_source_location()=source_location;
       dest.move_to_operands(function_call);
@@ -174,4 +174,3 @@ bool static_lifetime_init(
 
   return false;
 }
-

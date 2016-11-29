@@ -23,4 +23,3 @@ int main(void) {
     assert(f(x) == g(x));
   }
 }
-

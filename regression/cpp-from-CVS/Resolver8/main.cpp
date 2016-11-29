@@ -11,5 +11,3 @@ int main()
 {
 	assert(func(1));
 }
-
-

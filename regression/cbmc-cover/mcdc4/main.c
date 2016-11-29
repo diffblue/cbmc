@@ -8,7 +8,7 @@ int main()
   __CPROVER_input("C", C);
   __CPROVER_input("D", D);
 
-  if((A && B) || (C && D)) 
+  if((A && B) || (C && D))
   {
   }
   else

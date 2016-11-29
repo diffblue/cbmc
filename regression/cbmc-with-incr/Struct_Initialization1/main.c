@@ -40,7 +40,7 @@ int main() {
   assert(S1.f==0);
   assert(S1.g==2);
   assert(S1.p==0);
-  
+
   assert(S2.s1.a==1);
   assert(S2.s1.b==2);
   assert(S2.s2.a==3);

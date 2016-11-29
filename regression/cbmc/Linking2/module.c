@@ -9,7 +9,7 @@ typedef int t;
 struct my_struct
 {
   t t_field;
-};  
+};
 
 // this one is local, tool!
 static t i=1;
@@ -23,7 +23,7 @@ void f()
   assert(j==3);
   i=3;
   j=4;
-  
+
   struct my_struct xx;
   assert(sizeof(xx.t_field)==sizeof(int));
 }

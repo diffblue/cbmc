@@ -18,13 +18,13 @@ int my_open(int a)
 struct file_ops fops = { .open =  my_open };
 
 int main(void)
-{    
+{
   struct dev tmp[4];
 
   devs = &tmp;
-  
+
   (devs+0)->ops = &fops;  // does not work
-    
+
   assert(10 == (* devs[0].ops->open)(10));
 
   return 0;

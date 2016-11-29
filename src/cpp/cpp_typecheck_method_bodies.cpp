@@ -33,7 +33,7 @@ void cpp_typecheckt::typecheck_method_bodies(
     symbolt &method_symbol=*b.method_symbol;
     template_map.swap(b.template_map);
     instantiation_stack.swap(b.instantiation_stack);
-    
+
     if(method_symbol.name==ID_main)
       add_argc_argv(method_symbol);
 
@@ -50,4 +50,3 @@ void cpp_typecheckt::typecheck_method_bodies(
 
   old_instantiation_stack.swap(instantiation_stack);
 }
-

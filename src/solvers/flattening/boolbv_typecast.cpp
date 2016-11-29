@@ -33,7 +33,7 @@ bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
   const typet &expr_type=ns.follow(expr.type());
   const exprt &op=expr.op();
   const typet &op_type=ns.follow(op.type());
-  const bvt &op_bv=convert_bv(op);  
+  const bvt &op_bv=convert_bv(op);
 
   bvt bv;
 
@@ -61,7 +61,7 @@ bool boolbvt::type_conversion(
 {
   bvtypet dest_bvtype=get_bvtype(dest_type);
   bvtypet src_bvtype=get_bvtype(src_type);
-  
+
   if(src_bvtype==IS_C_BIT_FIELD)
     return type_conversion(
       c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns), src, dest_type, dest);
@@ -72,10 +72,10 @@ bool boolbvt::type_conversion(
 
   std::size_t src_width=src.size();
   std::size_t dest_width=boolbv_width(dest_type);
-  
+
   if(dest_width==0 || src_width==0)
     return true;
-  
+
   dest.clear();
   dest.reserve(dest_width);
 
@@ -106,7 +106,7 @@ bool boolbvt::type_conversion(
       return false;
     }
   }
-  
+
   if(src_type.id()==ID_complex)
   {
     assert(dest_type.id()!=ID_complex);
@@ -125,7 +125,7 @@ bool boolbvt::type_conversion(
       return type_conversion(src_type.subtype(), tmp_src, dest_type, dest);
     }
   }
-  
+
   switch(dest_bvtype)
   {
   case IS_RANGE:
@@ -169,11 +169,11 @@ bool boolbvt::type_conversion(
       return false;
     }
     break;
-    
+
   case IS_FLOAT: // to float
     {
       float_utilst float_utils(prop);
-      
+
       switch(src_bvtype)
       {
       case IS_FLOAT: // float to float
@@ -202,19 +202,19 @@ bool boolbvt::type_conversion(
         if(src_type.id()==ID_bool)
         {
           // bool to float
-          
+
           // build a one
           ieee_floatt f;
           f.spec=to_floatbv_type(dest_type);
           f.from_integer(1);
-          
+
           dest=convert_bv(f.to_expr());
 
           assert(src_width==1);
-          
+
           Forall_literals(it, dest)
             *it=prop.land(*it, src[0]);
-            
+
           return false;
         }
       }
@@ -225,14 +225,14 @@ bool boolbvt::type_conversion(
     if(src_bvtype==IS_FIXED)
     {
       // fixed to fixed
-      
+
       std::size_t dest_fraction_bits=to_fixedbv_type(dest_type).get_fraction_bits(),
                   dest_int_bits=dest_width-dest_fraction_bits;
       std::size_t op_fraction_bits=to_fixedbv_type(src_type).get_fraction_bits(),
                   op_int_bits=src_width-op_fraction_bits;
-      
+
       dest.resize(dest_width);
-      
+
       // i == position after dot
       // i == 0: first position after dot
 
@@ -240,10 +240,10 @@ bool boolbvt::type_conversion(
       {
         // position in bv
         std::size_t p=dest_fraction_bits-i-1;
-      
+
         if(i<op_fraction_bits)
           dest[p]=src[op_fraction_bits-i-1];
-        else 
+        else
           dest[p]=const_literal(false); // zero padding
       }
 
@@ -252,10 +252,10 @@ bool boolbvt::type_conversion(
         // position in bv
         std::size_t p=dest_fraction_bits+i;
         assert(p<dest_width);
-      
+
         if(i<op_int_bits)
           dest[p]=src[i+op_fraction_bits];
-        else 
+        else
           dest[p]=src[src_width-1]; // sign extension
       }
 
@@ -283,7 +283,7 @@ bool boolbvt::type_conversion(
       for(std::size_t i=0; i<dest_width-dest_fraction_bits; i++)
       {
         literalt l;
-      
+
         if(i<src_width)
           l=src[i];
         else
@@ -293,7 +293,7 @@ bool boolbvt::type_conversion(
           else
             l=const_literal(false); // zero extension
         }
-        
+
         dest.push_back(l);
       }
 
@@ -318,7 +318,7 @@ bool boolbvt::type_conversion(
       return false;
     }
     break;
-  
+
   case IS_UNSIGNED:
   case IS_SIGNED:
   case IS_C_ENUM:
@@ -328,7 +328,7 @@ bool boolbvt::type_conversion(
       // we don't have a rounding mode here,
       // which is why we refuse.
       break;
-     
+
     case IS_FIXED: // fixed to integer
       {
         std::size_t op_fraction_bits=
@@ -346,10 +346,10 @@ bool boolbvt::type_conversion(
               dest.push_back(const_literal(false)); // zero extension
           }
         }
-        
+
         // we might need to round up in case of negative numbers
         // e.g., (int)(-1.00001)==1
-        
+
         bvt fraction_bits_bv=src;
         fraction_bits_bv.resize(op_fraction_bits);
         literalt round_up=
@@ -384,7 +384,7 @@ bool boolbvt::type_conversion(
 
         return false;
       }
-      
+
     case IS_VERILOG_UNSIGNED: // verilog_unsignedbv to signed/unsigned/enum
       {
         for(std::size_t i=0; i<dest_width; i++)
@@ -400,7 +400,7 @@ bool boolbvt::type_conversion(
         return false;
       }
       break;
-      
+
     case IS_VERILOG_SIGNED: // verilog_signedbv to signed/unsigned/enum
       {
         for(std::size_t i=0; i<dest_width; i++)
@@ -416,7 +416,7 @@ bool boolbvt::type_conversion(
         return false;
       }
       break;
-      
+
     default:
       if(src_type.id()==ID_bool)
       {
@@ -436,7 +436,7 @@ bool boolbvt::type_conversion(
       }
     }
     break;
-    
+
   case IS_VERILOG_UNSIGNED:
     if(src_bvtype==IS_UNSIGNED ||
        src_bvtype==IS_C_BOOL ||
@@ -492,7 +492,7 @@ bool boolbvt::type_conversion(
     assert(src_width==dest_width);
     dest=src;
     return false;
-    
+
   case IS_C_BOOL:
     dest.resize(dest_width, const_literal(false));
 
@@ -508,7 +508,7 @@ bool boolbvt::type_conversion(
       dest[0]=!bv_utils.is_zero(src);
 
     return false;
-    
+
   default:
     if(dest_type.id()==ID_array)
     {
@@ -613,7 +613,7 @@ Function: boolbvt::convert_typecast
 literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
   assert(expr.operands().size()==1);
-  
+
   if(expr.op0().type().id()==ID_range)
   {
     mp_integer from=string2integer(expr.op0().type().get_string(ID_from));
@@ -626,7 +626,7 @@ literalt boolbvt::convert_typecast(const typecast_exprt &expr)
   }
 
   const bvt &bv=convert_bv(expr.op0());
-  
+
   if(!bv.empty())
     return prop.lor(bv);
 

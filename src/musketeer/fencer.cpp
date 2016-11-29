@@ -124,7 +124,7 @@ void fence_weak_memory(
     /* if no cycle, no need to instrument */
     if(instrumenter.set_of_cycles.size() == 0)
     {
-      message.result() 
+      message.result()
         << "program safe -- no need to place additional fences"
         << messaget::eom;
       instrumenter.print_map_function_graph();
@@ -141,7 +141,7 @@ void fence_weak_memory(
   if(!no_cfg_kill)
     instrumenter.cfg_cycles_filter();
 
-  /* selects method, infers fences then outputs them */ 
+  /* selects method, infers fences then outputs them */
   switch(mode) {
     case INFER:
     {
@@ -172,7 +172,7 @@ void fence_weak_memory(
   instrumenter.print_outputs(model, hide_internals);
 #endif
 
-  /* TODO: insert the fences into the actual code or call script directly 
+  /* TODO: insert the fences into the actual code or call script directly
      from here*/
 
   /* removes potential skips */
@@ -191,4 +191,3 @@ void fence_weak_memory(
   instrumenter.print_map_function_graph();
 #endif
 }
-

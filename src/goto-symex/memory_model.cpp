@@ -15,7 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 Function: memory_model_baset::memory_model_baset
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -33,7 +33,7 @@ memory_model_baset::memory_model_baset(const namespacet &_ns):
 
 Function: memory_model_baset::~memory_model_baset
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -49,7 +49,7 @@ memory_model_baset::~memory_model_baset()
 
 Function: memory_model_baset::nondet_bool_symbol
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -69,7 +69,7 @@ symbol_exprt memory_model_baset::nondet_bool_symbol(
 
 Function: memory_model_baset::po
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -93,7 +93,7 @@ bool memory_model_baset::po(event_it e1, event_it e2)
 
 Function: memory_model_baset::read_from
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -113,14 +113,14 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       a_it++)
   {
     const a_rect &a_rec=a_it->second;
-  
+
     for(event_listt::const_iterator
         r_it=a_rec.reads.begin();
         r_it!=a_rec.reads.end();
         r_it++)
     {
       const event_it r=*r_it;
-      
+
       exprt::operandst rf_some_operands;
       rf_some_operands.reserve(a_rec.writes.size());
 
@@ -131,7 +131,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           ++w_it)
       {
         const event_it w=*w_it;
-        
+
         // rf cannot contradict program order
         if(po(r, w))
           continue; // contradicts po
@@ -140,7 +140,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           w->source.thread_nr==r->source.thread_nr;
 
         symbol_exprt s=nondet_bool_symbol("rf");
-        
+
         // record the symbol
         choice_symbols[
           std::make_pair(r, w)]=s;
@@ -166,7 +166,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
         rf_some_operands.push_back(s);
       }
-      
+
       // value equals the one of some write
       exprt rf_some;
 
@@ -189,4 +189,3 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
     }
   }
 }
-

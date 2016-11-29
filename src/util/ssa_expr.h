@@ -132,7 +132,7 @@ public:
 
     set_identifier(build_identifier(get_original_expr(), l0, l1, l2));
   }
-  
+
   static irep_idt build_identifier(
     const exprt &src,
     const irep_idt &l0,

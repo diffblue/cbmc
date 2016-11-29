@@ -32,7 +32,7 @@ public:
       round_to_minus_inf(const_literal(false))
     {
     }
-    
+
     void set(const ieee_floatt::rounding_modet mode)
     {
       round_to_even=round_to_zero=round_to_plus_inf=round_to_minus_inf=
@@ -43,24 +43,24 @@ public:
       case ieee_floatt::ROUND_TO_EVEN:
         round_to_even=const_literal(true);
         break;
-        
+
       case ieee_floatt::ROUND_TO_MINUS_INF:
         round_to_minus_inf=const_literal(true);
         break;
-        
+
       case ieee_floatt::ROUND_TO_PLUS_INF:
         round_to_plus_inf=const_literal(true);
         break;
-        
+
       case ieee_floatt::ROUND_TO_ZERO:
         round_to_zero=const_literal(true);
         break;
-          
+
       default:;
       }
     }
   };
-  
+
   rounding_mode_bitst rounding_mode_bits;
 
   explicit float_utilst(propt &_prop):
@@ -68,7 +68,7 @@ public:
     bv_utils(_prop)
   {
   }
-  
+
   void set_rounding_mode(const bvt &);
 
   virtual ~float_utilst()
@@ -127,7 +127,7 @@ public:
   literalt exponent_all_ones(const bvt &);
   literalt exponent_all_zeros(const bvt &);
   literalt fraction_all_zeros(const bvt &);
-    
+
   // debugging hooks
   bvt debug1(const bvt &op0, const bvt &op1);
   bvt debug2(const bvt &op0, const bvt &op1);
@@ -180,7 +180,7 @@ protected:
 
   void round_fraction(unbiased_floatt &result);
   void round_exponent(unbiased_floatt &result);
-  
+
   // rounding decision for fraction
   literalt fraction_rounding_decision(
     const std::size_t dest_bits,

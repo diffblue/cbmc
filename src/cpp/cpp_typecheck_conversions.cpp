@@ -429,7 +429,7 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   if(expr.type().id()==ID_floatbv ||
      expr.type().id()==ID_fixedbv)
   {
-    if(type.id()!=ID_signedbv && 
+    if(type.id()!=ID_signedbv &&
        type.id()!=ID_unsignedbv)
       return false;
   }
@@ -557,7 +557,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
 
   if(expr.get_bool(ID_C_lvalue))
     return false;
-    
+
   // integer 0 to NULL pointer conversion?
   if(simplify_expr(expr, *this).is_zero() &&
      expr.type().id()!=ID_pointer)
@@ -570,7 +570,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
 
   if(type.find("to-member").is_not_nil())
     return false;
-  
+
   if(expr.type().id() != ID_pointer ||
      expr.type().find("to-member").is_not_nil())
     return false;
@@ -752,7 +752,7 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   if(expr.type().id()!=ID_signedbv &&
      expr.type().id()!=ID_unsignedbv &&
-     expr.type().id()!=ID_pointer && 
+     expr.type().id()!=ID_pointer &&
      expr.type().id()!=ID_c_enum_tag)
     return false;
 
@@ -812,10 +812,10 @@ bool cpp_typecheckt::standard_conversion_sequence(
   if(type.id()==ID_c_bit_field)
     return standard_conversion_sequence(expr, type.subtype(), new_expr, rank);
 
-  // we turn bit fields into their underlying type  
+  // we turn bit fields into their underlying type
   if(curr_expr.type().id()==ID_c_bit_field)
     curr_expr.make_typecast(curr_expr.type().subtype());
-  
+
   if(curr_expr.type().id()==ID_array)
   {
     if(type.id()==ID_pointer)
@@ -880,7 +880,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
     else if(type.id()==ID_floatbv || type.id()==ID_fixedbv)
     {
-      if(!standard_conversion_floating_point_promotion(curr_expr, new_expr) || 
+      if(!standard_conversion_floating_point_promotion(curr_expr, new_expr) ||
          new_expr.type() != type)
       {
         if(!standard_conversion_floating_point_conversion(curr_expr, type, new_expr) &&
@@ -919,7 +919,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
   }
   else
     new_expr = curr_expr;
-    
+
   curr_expr.swap(new_expr);
 
   if(curr_expr.type().id()==ID_pointer)
@@ -945,7 +945,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
         rank+=1;
         break;
       }
-      
+
     }
     while(sub_from.id()==ID_pointer);
 
@@ -988,11 +988,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   const typet &to = follow(type);
 
   new_expr.make_nil();
-  
+
   // special case:
   // A conversion from a type to the same type is given an exact
   // match rank even though a user-defined conversion is used
-  
+
   if(from==to)
     rank+=0;
   else
@@ -1298,7 +1298,7 @@ bool cpp_typecheckt::reference_related(
 {
   assert(is_reference(type));
   assert(!is_reference(expr.type()));
-  
+
   typet from = follow(expr.type());
   typet to = follow(type.subtype());
 
@@ -1309,7 +1309,7 @@ bool cpp_typecheckt::reference_related(
   if(from==to)
     return true;
 
-  if(from.id()==ID_struct && 
+  if(from.id()==ID_struct &&
      to.id()==ID_struct)
     return subtype_typecast(to_struct_type(from),
                             to_struct_type(to));
@@ -1627,7 +1627,7 @@ Function: implicit_conversion_sequence
            The rank of the sequence is stored in 'rank'
 
   Purpose:  implicit conversion sequence
-  
+
 \*******************************************************************/
 
 bool cpp_typecheckt::implicit_conversion_sequence(
@@ -2167,7 +2167,7 @@ bool cpp_typecheckt::static_typecast(
   bool check_constantness)
 {
   exprt e=expr;
-  
+
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
@@ -2232,7 +2232,7 @@ bool cpp_typecheckt::static_typecast(
     new_expr.make_typecast(type);
     return true;
   }
-  
+
   // int/enum to enum
   if(type.id()==ID_c_enum_tag && (
                 e.type().id()==ID_signedbv

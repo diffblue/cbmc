@@ -73,7 +73,7 @@ void value_set_analysist::convert(
   forall_goto_program_instructions(i_it, goto_program)
   {
     const source_locationt &location=i_it->source_location;
-    
+
     if(location==previous_location) continue;
 
     if(location.is_nil() || location.get_file()==irep_idt())
@@ -84,7 +84,7 @@ void value_set_analysist::convert(
 
     xmlt &i=dest.new_element("instruction");
     i.new_element()=::xml(location);
-    
+
     for(value_sett::valuest::const_iterator
         v_it=value_set.values.begin();
         v_it!=value_set.values.end();
@@ -94,10 +94,10 @@ void value_set_analysist::convert(
       var.new_element("identifier").data=
         id2string(v_it->first);
 
-      #if 0      
+      #if 0
       const value_sett::expr_sett &expr_set=
         v_it->second.expr_set();
-      
+
       for(value_sett::expr_sett::const_iterator
           e_it=expr_set.begin();
           e_it!=expr_set.end();
@@ -105,7 +105,7 @@ void value_set_analysist::convert(
       {
         std::string value_str=
           from_expr(ns, identifier, *e_it);
-        
+
         var.new_element("value").data=
           xmlt::escape(value_str);
       }
@@ -138,7 +138,7 @@ void convert(
       f_it++)
   {
     xmlt &f=dest.new_element("function");
-    f.new_element("identifier").data=id2string(f_it->first);    
+    f.new_element("identifier").data=id2string(f_it->first);
     value_set_analysis.convert(f_it->second.body, f_it->first, f);
   }
 }
@@ -161,10 +161,9 @@ void convert(
   xmlt &dest)
 {
   dest=xmlt("value_set_analysis");
-  
+
   value_set_analysis.convert(
     goto_program,
     "",
     dest.new_element("program"));
 }
-

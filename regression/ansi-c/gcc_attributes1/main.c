@@ -2,7 +2,7 @@
 
 typedef int i32;
 
-i32 __attribute__((aligned)) counter; 
+i32 __attribute__((aligned)) counter;
 
 __attribute__((aligned)) __attribute__((aligned)) int x0;
 const __attribute__((aligned)) int x1;
@@ -94,7 +94,7 @@ int gvar3 __attribute__((__aligned__));
 struct Scomb {
   int x;
 } __attribute__ ((packed, aligned (64)));
-                
+
 #endif
 
 int main()

@@ -33,9 +33,8 @@ void cbmc_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
   register_language(new_cpp_language);
-  
+
   #ifdef HAVE_JAVA_BYTECODE
   register_language(new_java_bytecode_language);
   #endif
 }
-

@@ -4,12 +4,12 @@ struct A
 	A(){};
 	protected:
 	A(int i):i(i){};
-	
+
 };
 
 struct B: A
 {
-	B():A(0){}	
+	B():A(0){}
 };
 
 B b;

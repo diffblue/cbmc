@@ -16,11 +16,11 @@ int main()
   // signed int if int is bigger!
   unsigned char a2=1;
   signed char b2=-1;
-  
+
   if(sizeof(char)<sizeof(int))
     assert(a2>b2);
   else
-    assert(a2<b2);  
+    assert(a2<b2);
 
   // the result of the arithmetic conversions is unsigned!
   unsigned int a3=1;

@@ -23,7 +23,7 @@ Function: symbolt::show
  Purpose:
 
 \*******************************************************************/
-   
+
 void symbolt::show(std::ostream &out) const
 {
   out << "  " << name << '\n';
@@ -54,7 +54,7 @@ void symbolt::show(std::ostream &out) const
   out << '\n';
   out << "  location: " << location << '\n';
 
-  out << '\n';  
+  out << '\n';
 }
 
 /*******************************************************************\
@@ -74,7 +74,7 @@ std::ostream &operator<<(std::ostream &out,
 {
   symbol.show(out);
   return out;
-}                        
+}
 
 /*******************************************************************\
 
@@ -117,7 +117,7 @@ irept symbolt::to_irep() const
   if(is_thread_local) dest.set("is_thread_local", true);
   if(is_file_local) dest.set("is_file_local", true);
   if(is_extern) dest.set("is_extern", true);
-  if(is_volatile) dest.set("is_volatile", true);       
+  if(is_volatile) dest.set("is_volatile", true);
 
   return dest;
 }
@@ -179,7 +179,7 @@ Function: symbolt::swap
 void symbolt::swap(symbolt &b)
 {
   #define SYM_SWAP1(x) x.swap(b.x)
-  
+
   SYM_SWAP1(type);
   SYM_SWAP1(value);
   SYM_SWAP1(name);
@@ -190,7 +190,7 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP1(location);
 
   #define SYM_SWAP2(x) std::swap(x, b.x)
-  
+
   SYM_SWAP2(is_type);
   SYM_SWAP2(is_macro);
   SYM_SWAP2(is_exported);
@@ -225,4 +225,3 @@ symbol_exprt symbolt::symbol_expr() const
 {
   return symbol_exprt(name, type);
 }
-

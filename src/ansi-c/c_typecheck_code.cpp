@@ -167,22 +167,22 @@ Function: c_typecheck_baset::typecheck_asm
 void c_typecheck_baset::typecheck_asm(codet &code)
 {
   const irep_idt flavor=to_code_asm(code).get_flavor();
-  
+
   if(flavor==ID_gcc)
   {
     // These have 5 operands.
     // The first parameter is a string.
     // Parameters 1, 2, 3, 4 are lists of expressions.
-    
+
     // Parameter 1: OutputOperands
     // Parameter 2: InputOperands
     // Parameter 3: Clobbers
     // Parameter 4: GotoLabels
 
     assert(code.operands().size()==5);
-  
+
     typecheck_expr(code.op0());
-  
+
     for(unsigned i=1; i<code.operands().size(); i++)
     {
       exprt &list=code.operands()[i];
@@ -252,18 +252,18 @@ void c_typecheck_baset::typecheck_block(codet &code)
     if(it1->is_nil()) continue;
 
     codet &code_op=to_code(*it1);
-  
+
     if(code_op.get_statement()==ID_label)
     {
       // these may be nested
       codet *code_ptr=&code_op;
-      
+
       while(code_ptr->get_statement()==ID_label)
       {
         assert(code_ptr->operands().size()==1);
         code_ptr=&to_code(code_ptr->op0());
       }
-      
+
       //codet &label_op=*code_ptr;
 
       new_ops.move_to_operands(code_op);
@@ -352,7 +352,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
   ansi_c_declarationt declaration;
   declaration.swap(code.op0());
-  
+
   if(declaration.get_is_static_assert())
   {
     assert(declaration.operands().size()==2);
@@ -363,13 +363,13 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     typecheck_code(code);
     return; // done
   }
-  
+
   typecheck_declaration(declaration);
-  
+
   std::list<codet> new_code;
-  
+
   // iterate over declarators
-  
+
   for(ansi_c_declarationt::declaratorst::const_iterator
       d_it=declaration.declarators().begin();
       d_it!=declaration.declarators().end();
@@ -390,8 +390,8 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     }
 
     symbolt &symbol=s_it->second;
-    
-    // This must not be an incomplete type, unless it's 'extern' 
+
+    // This must not be an incomplete type, unless it's 'extern'
     // or a typedef.
     if(!symbol.is_type &&
        !symbol.is_extern &&
@@ -401,7 +401,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       error() << "incomplete type not permitted here" << eom;
       throw 0;
     }
-  
+
     // see if it's a typedef
     // or a function
     // or static
@@ -417,21 +417,21 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       code.add_source_location()=symbol.location;
       code.symbol()=symbol.symbol_expr();
       code.symbol().add_source_location()=symbol.location;
-      
+
       // add initializer, if any
       if(symbol.value.is_not_nil())
       {
         code.operands().resize(2);
-        code.op1()=symbol.value; 
+        code.op1()=symbol.value;
       }
-      
+
       new_code.push_back(code);
     }
   }
-  
+
   // stash away any side-effects in the declaration
   new_code.splice(new_code.begin(), clean_code);
-  
+
   if(new_code.empty())
   {
     source_locationt source_location=code.source_location();
@@ -488,7 +488,7 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
     return is_complete_type(type.subtype());
   else if(type.id()==ID_symbol)
     return is_complete_type(follow(type));
-  
+
   return true;
 }
 
@@ -538,7 +538,7 @@ void c_typecheck_baset::typecheck_for(codet &code)
     error() << "for expected to have four operands" << eom;
     throw 0;
   }
-    
+
   // the "for" statement has an implicit block around it,
   // since code.op0() may contain declarations
   //
@@ -677,7 +677,7 @@ void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
       error() << "did not expect `case' here" << eom;
       throw 0;
     }
-  
+
     exprt &case_expr=code.case_op();
     typecheck_expr(case_expr);
     implicit_typecast(case_expr, switch_op_type);
@@ -779,7 +779,7 @@ void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
   }
 
   exprt &dest=code.op0();
-  
+
   if(dest.id()!=ID_dereference)
   {
     err_location(dest);
@@ -787,7 +787,7 @@ void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
             << eom;
     throw 0;
   }
-  
+
   assert(dest.operands().size()==1);
 
   typecheck_expr(dest.op0());
@@ -837,7 +837,7 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
     code_block.move_to_operands(code.then_case());
     code.then_case().swap(code_block);
   }
-  
+
   typecheck_code(to_code(code.then_case()));
 
   if(!code.else_case().is_nil())

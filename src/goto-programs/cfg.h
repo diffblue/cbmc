@@ -401,7 +401,7 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     {
       // empty function
       this->add_edge(entry, entry_map[next_PC]);
-    }        
+    }
   }
   else if(next_PC!=goto_program.instructions.end())
     this->add_edge(entry, entry_map[next_PC]);

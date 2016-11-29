@@ -136,7 +136,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
   typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
-  for(typename cfgt::edgest::const_iterator 
+  for(typename cfgt::edgest::const_iterator
       s_it=(post_dom?n.in:n.out).begin();
       s_it!=(post_dom?n.in:n.out).end();
       ++s_it)
@@ -151,7 +151,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     bool changed=false;
     typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
     if(node.dominators.empty())
-      for(typename cfgt::edgest::const_iterator 
+      for(typename cfgt::edgest::const_iterator
           p_it=(post_dom?node.out:node.in).begin();
           !changed && p_it!=(post_dom?node.out:node.in).end();
           ++p_it)
@@ -163,11 +163,11 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
         }
 
     // compute intersection of predecessors
-    for(typename cfgt::edgest::const_iterator 
+    for(typename cfgt::edgest::const_iterator
           p_it=(post_dom?node.out:node.in).begin();
         p_it!=(post_dom?node.out:node.in).end();
         ++p_it)
-    {   
+    {
       const target_sett &other=cfg[p_it->first].dominators;
       if(other.empty())
         continue;
@@ -198,7 +198,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 
     if(changed) // fixed point for node reached?
     {
-      for(typename cfgt::edgest::const_iterator 
+      for(typename cfgt::edgest::const_iterator
             s_it=(post_dom?node.in:node.out).begin();
           s_it!=(post_dom?node.in:node.out).end();
           ++s_it)
@@ -229,7 +229,7 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
       it!=cfg.entry_map.end(); ++it)
   {
     unsigned n=it->first->location_number;
-    
+
     if(post_dom)
       out << n << " post-dominated by ";
     else
@@ -238,7 +238,7 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
         d_it!=it->second.dominators.end();)
     {
       out << (*d_it)->location_number;
-      if (++d_it!=it->second.dominators.end()) 
+      if (++d_it!=it->second.dominators.end())
         out << ", ";
     }
     out << "\n";

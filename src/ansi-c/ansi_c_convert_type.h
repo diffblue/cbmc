@@ -22,7 +22,7 @@ public:
            int_cnt, short_cnt, long_cnt,
            double_cnt, float_cnt, c_bool_cnt,
            proper_bool_cnt, complex_cnt;
-  
+
   // extensions
   unsigned int8_cnt, int16_cnt, int32_cnt, int64_cnt,
            ptr32_cnt, ptr64_cnt,
@@ -30,7 +30,7 @@ public:
            floatbv_cnt, fixedbv_cnt;
 
   typet gcc_attribute_mode;
-           
+
   bool packed, aligned;
   exprt vector_size, alignment, bv_width, fraction_width;
   exprt msc_based; // this is Visual Studio
@@ -38,22 +38,22 @@ public:
 
   // storage spec
   c_storage_spect c_storage_spec;
-       
+
   // qualifiers
   c_qualifierst c_qualifiers;
 
   void read(const typet &type);
   void write(typet &type);
-  
+
   source_locationt source_location;
-  
+
   std::list<typet> other;
-  
+
   ansi_c_convert_typet(message_handlert &_message_handler):
     messaget(_message_handler)
   {
   }
-  
+
   void clear()
   {
     unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
@@ -67,14 +67,14 @@ public:
     fraction_width.make_nil();
     msc_based.make_nil();
     gcc_attribute_mode.make_nil();
-    
+
     packed=aligned=constructor=destructor=false;
 
     other.clear();
     c_storage_spec.clear();
     c_qualifiers.clear();
   }
-  
+
 protected:
   void read_rec(const typet &type);
 };

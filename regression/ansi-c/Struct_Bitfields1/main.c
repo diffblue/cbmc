@@ -44,7 +44,7 @@ int main()
   s1.my_bit++;
   ++s1.my_bit;
   (unsigned)s1.my_bit;
-  
+
   int *p;
   p=p+s1.my_bit;
   p=p-s1.my_bit;

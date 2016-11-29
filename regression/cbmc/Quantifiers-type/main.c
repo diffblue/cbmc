@@ -9,5 +9,5 @@ int main()
   assert(a[0]==10 && a[1]==10);
   assert(b[0]==10 && b[1]==10);
 
-  return 0;                
+  return 0;
 }

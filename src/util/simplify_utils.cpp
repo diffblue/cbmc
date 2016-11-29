@@ -197,4 +197,3 @@ bool sort_and_join(exprt &expr)
 
   return result;
 }
-

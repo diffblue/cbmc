@@ -114,7 +114,7 @@ void prop_conv_storet::constraintt::replay(prop_convt &dest) const
   case SET_TO:
     dest.set_to(expr, value);
     break;
-  
+
   case CONVERT:
     //dest.prop.set_equal(dest.convert_rest(expr), literal);
     break;
@@ -144,14 +144,13 @@ void prop_conv_storet::constraintt::print(std::ostream &out) const
     out << "SET_TO " << (value?"TRUE":"FALSE") << ": ";
     out << expr.pretty() << "\n";
     break;
-  
+
   case CONVERT:
     out << "CONVERT(" << literal.dimacs() << "): ";
     out << expr.pretty() << "\n";
     break;
-  
+
   default:
     assert(false);
   }
 }
-

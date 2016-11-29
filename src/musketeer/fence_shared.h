@@ -4,7 +4,7 @@ Module: (naive) Fence insertion
 
 Purpose: fences all the shared or volatile-declared variables
 
-Author: Vincent Nimal 
+Author: Vincent Nimal
 
 \*******************************************************************/
 

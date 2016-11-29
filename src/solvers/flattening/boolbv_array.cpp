@@ -26,7 +26,7 @@ bvt boolbvt::convert_array(const exprt &expr)
 
   if(width==0)
     return conversion_failed(expr);
-    
+
   if(expr.type().id()==ID_array)
   {
     assert(expr.has_operands());
@@ -36,7 +36,7 @@ bvt boolbvt::convert_array(const exprt &expr)
 
     bvt bv;
     bv.reserve(width);
-    
+
     forall_expr(it, operands)
     {
       const bvt &tmp=convert_bv(*it);
@@ -46,11 +46,10 @@ bvt boolbvt::convert_array(const exprt &expr)
 
       forall_literals(it2, tmp)
         bv.push_back(*it2);
-    }   
+    }
 
     return bv;
   }
-  
+
   return conversion_failed(expr);
 }
-

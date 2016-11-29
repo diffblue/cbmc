@@ -22,7 +22,7 @@ nettle_buffer_init(struct nettle_buffer *buffer)
 int nettle_buffer_grow(struct nettle_buffer *buffer, size_t length)
 {
   if (buffer->condition) return 0; // Uncommenting this line fixes the bug.
-  
+
   size_t alloc = buffer->alloc * 2 + length + 100; // Replcing alloc size by a constant fixes the bug.
   //size_t alloc = 103;
   uint8_t *p = (uint8_t *) malloc(alloc);
@@ -49,5 +49,3 @@ int main(void)
   __CPROVER_assert(buffer.contents[1] == 'o', "buffer.contents[1] == 'o'");
   __CPROVER_assert(buffer.contents[2] == 'o', "buffer.contents[2] == 'o'");
 }
-
-

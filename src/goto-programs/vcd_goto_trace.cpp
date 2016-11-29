@@ -35,7 +35,7 @@ std::string as_vcd_binary(
   const namespacet &ns)
 {
   const typet &type=ns.follow(expr.type());
-  
+
   if(expr.id()==ID_constant)
   {
     if(type.id()==ID_unsignedbv ||
@@ -52,7 +52,7 @@ std::string as_vcd_binary(
 
     forall_operands(it, expr)
       result+=as_vcd_binary(*it, ns);
-    
+
     return result;
   }
   else if(expr.id()==ID_struct)
@@ -61,15 +61,15 @@ std::string as_vcd_binary(
 
     forall_operands(it, expr)
       result+=as_vcd_binary(*it, ns);
-    
+
     return result;
   }
   else if(expr.id()==ID_union)
-  { 
+  {
     assert(expr.operands().size()==1);
     return as_vcd_binary(expr.op0(), ns);
   }
-  
+
   // build "xxx"
 
   mp_integer width;
@@ -93,7 +93,7 @@ std::string as_vcd_binary(
 
     return result;
   }
-  
+
   return "";
 }
 
@@ -117,12 +117,12 @@ void output_vcd(
   time_t t;
   time(&t);
   out << "$date\n  " << ctime(&t) << "$end" << "\n";
-  
+
   // this is pretty arbitrary
   out << "$timescale 1 ns $end" << "\n";
 
   // we first collect all variables that are assigned
-  
+
   numbering<irep_idt> n;
 
   for(const auto & it : goto_trace.steps)
@@ -131,7 +131,7 @@ void output_vcd(
     {
       irep_idt identifier=it.lhs_object.get_identifier();
       const typet &type=it.lhs_object.type();
-        
+
       const auto number=n.number(identifier);
 
       mp_integer width;
@@ -140,12 +140,12 @@ void output_vcd(
         width=1;
       else
         width=pointer_offset_bits(type, ns);
-        
+
       if(width>=1)
         out << "$var reg " << width << " V" << number << " "
             << identifier << " $end" << "\n";
     }
-  }  
+  }
 
   // end of header
   out << "$enddefinitions $end" << "\n";
@@ -165,7 +165,7 @@ void output_vcd(
         timestamp++;
 
         const auto number=n.number(identifier);
-        
+
         // booleans are special in VCD
         if(type.id()==ID_bool)
         {
@@ -185,7 +185,7 @@ void output_vcd(
         }
       }
       break;
-      
+
     default:;
     }
   }

@@ -14,5 +14,5 @@ int main()
   assert(z1);
   assert(z2);
 
-  return 0;                
+  return 0;
 }

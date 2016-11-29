@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Main Module 
+Module: Main Module
 
 Author: Vincent Nimal
 

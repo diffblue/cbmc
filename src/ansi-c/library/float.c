@@ -5,7 +5,7 @@
 
 __CPROVER_thread_local unsigned __CPROVER_fpu_control_word;
 
-unsigned int _controlfp( 
+unsigned int _controlfp(
   unsigned int new_value,
   unsigned int mask)
 {
@@ -14,7 +14,7 @@ unsigned int _controlfp(
 
   if((mask&_MCW_RC)!=0)
     __CPROVER_rounding_mode=(new_value&_MCW_RC)>>8;
-  
+
   return __CPROVER_fpu_control_word;
 }
 

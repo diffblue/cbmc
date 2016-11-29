@@ -3,7 +3,7 @@
 int main()
 {
   int i;
-  
+
   switch(i)
   {
   case 0: assert(i==0);
@@ -14,9 +14,9 @@ int main()
   default:
     assert(i!=0 && i!=1);
   }
-  
+
   int z=0;
-  
+
   // a declaration is ok here
   switch(int z=123)
   {
@@ -24,6 +24,6 @@ int main()
   default: assert(0);
   }
 
-  // and there is scope!  
+  // and there is scope!
   assert(z==0);
 }

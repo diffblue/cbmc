@@ -81,7 +81,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       instrument/cegis_library.cpp instrument/instrument_var_ops.cpp instrument/meta_variables.cpp \
       instrument/find_cprover_initialize.cpp \
       runner/cegis_parse_options.cpp runner/cegis_main.cpp runner/cegis_languages.cpp
- 
+
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
@@ -141,4 +141,3 @@ endif
 
 cegis$(EXEEXT): $(OBJ)
 	$(LINKBIN)
-

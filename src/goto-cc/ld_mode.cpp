@@ -47,14 +47,14 @@ int ld_modet::doit()
   unsigned int verbosity=1;
 
   compilet compiler(cmdline);
-  
+
   if(cmdline.isset('v') || cmdline.isset('V'))
   {
     // This a) prints the version and b) increases verbosity.
     // Linking continues, don't exit!
-    
+
     std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
-    
+
     // 'V' should also print some supported "emulations".
   }
 
@@ -75,10 +75,10 @@ int ld_modet::doit()
     debug() << "LD mode (hybrid)" << eom;
   else
     debug() << "LD mode" << eom;
-  
+
   // get configuration
   config.set(cmdline);
-  
+
   // determine actions to be undertaken
   compiler.mode=compilet::LINK_LIBRARY;
 
@@ -118,7 +118,7 @@ int ld_modet::doit()
     compiler.output_file_object="";
     compiler.output_file_executable="a.out";
   }
-    
+
   // do all the rest
   if(compiler.doit())
     return 1; // ld uses exit code 1 for all sorts of errors
@@ -130,7 +130,7 @@ int ld_modet::doit()
       result=true;
   }
   #endif
-  
+
   return EX_OK;
 }
 
@@ -153,7 +153,7 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     return 0;
 
   std::list<std::string> output_files;
-  
+
   if(cmdline.isset('c'))
   {
     if(cmdline.isset('o'))
@@ -179,13 +179,13 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     if(cmdline.isset('o'))
       output_files.push_back(cmdline.get_value('o'));
     else
-      output_files.push_back("a.out");      
+      output_files.push_back("a.out");
   }
 
   if(output_files.empty()) return 0;
 
   debug("Running gcc to generate hybrid binary");
-  
+
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
@@ -197,9 +197,9 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
 
   // build new argv
   std::vector<std::string> new_argv;
-  
+
   new_argv.reserve(cmdline.parsed_argv.size());
-  
+
   bool skip_next=false;
 
   for(ld_cmdlinet::parsed_argvt::const_iterator
@@ -224,16 +224,16 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
   // overwrite argv[0]
   assert(new_argv.size()>=1);
   new_argv[0]="gcc";
-  
+
   #if 0
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
-  
+
   int result=run("gcc", new_argv);
-  
+
   // merge output from gcc with goto-binaries
   // using objcopy
   for(std::list<std::string>::const_iterator
@@ -248,27 +248,27 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
     {
       // remove any existing goto-cc section
       std::vector<std::string> objcopy_argv;
-    
+
       objcopy_argv.push_back("objcopy");
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
-      
+
       run(objcopy_argv[0], objcopy_argv);
     }
 
-    // now add goto-binary as goto-cc section  
+    // now add goto-binary as goto-cc section
     std::string saved=*it+".goto-cc-saved";
 
     std::vector<std::string> objcopy_argv;
-  
+
     objcopy_argv.push_back("objcopy");
     objcopy_argv.push_back("--add-section");
     objcopy_argv.push_back("goto-cc="+saved);
     objcopy_argv.push_back(*it);
-    
+
     run(objcopy_argv[0], objcopy_argv);
 
-    remove(saved.c_str());    
+    remove(saved.c_str());
 
     #elif defined(__APPLE__)
     // Mac
@@ -281,8 +281,8 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
       debug("merging "+*it);
 
       std::vector<std::string> lipo_argv;
-    
-      // now add goto-binary as hppa7100LC section  
+
+      // now add goto-binary as hppa7100LC section
       std::string saved=*it+".goto-cc-saved";
 
       lipo_argv.push_back("lipo");
@@ -293,22 +293,22 @@ int ld_modet::gcc_hybrid_binary(const cmdlinet::argst &input_files)
       lipo_argv.push_back(saved);
       lipo_argv.push_back("-output");
       lipo_argv.push_back(*it);
-      
+
       run(lipo_argv[0], lipo_argv);
 
-      remove(saved.c_str());    
+      remove(saved.c_str());
     }
-    
+
     return 0;
-    
+
     #else
-    
+
     error() << "binary merging not implemented for this architecture" << eom;
     return 1;
 
     #endif
   }
-  
+
   return result!=0;
 }
 #endif
@@ -329,4 +329,3 @@ void ld_modet::help_mode()
 {
   std::cout << "goto-ld understands the options of ld plus the following.\n\n";
 }
-

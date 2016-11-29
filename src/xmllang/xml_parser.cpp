@@ -46,7 +46,7 @@ bool parse_xml(
   // save some memory
   xml_parser.clear();
 
-  return result;  
+  return result;
 }
 
 /*******************************************************************\
@@ -68,8 +68,8 @@ bool parse_xml(
   xmlt &dest)
 {
   std::ifstream in(filename);
-  
+
   if(!in) return true;
- 
+
   return parse_xml(in, filename, message_handler, dest);
 }

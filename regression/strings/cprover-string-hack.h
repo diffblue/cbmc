@@ -70,4 +70,3 @@ extern __CPROVER_string __CPROVER_uninterpreted_string_char_set_func(__CPROVER_s
 extern __CPROVER_string __CPROVER_uninterpreted_string_copy_func(__CPROVER_string str);
 extern unsigned __CPROVER_uninterpreted_string_parse_int_func(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_string_of_int_func(unsigned i);
-

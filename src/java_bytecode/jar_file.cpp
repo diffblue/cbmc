@@ -40,9 +40,9 @@ void jar_filet::open(const std::string &filename)
   {
     std::size_t number_of_files=
       zip_get_num_entries(static_cast<struct zip *>(zip), 0);
-      
+
     index.reserve(number_of_files);
-    
+
     for(std::size_t i=0; i<number_of_files; i++)
     {
       std::string file_name=
@@ -54,7 +54,7 @@ void jar_filet::open(const std::string &filename)
   zip=nullptr;
   #endif
 }
-    
+
 /*******************************************************************\
 
 Function: jar_filet::~jar_filet
@@ -74,7 +74,7 @@ jar_filet::~jar_filet()
     zip_close(static_cast<struct zip *>(zip));
   #endif
 }
-    
+
 /*******************************************************************\
 
 Function: jar_filet::get_entry
@@ -93,15 +93,15 @@ std::string jar_filet::get_entry(std::size_t i)
 {
   if(zip==nullptr)
     return std::string("");
-    
+
   assert(i<index.size());
 
   std::string dest;
-  
+
   #ifdef HAVE_LIBZIP
   struct zip_file *zip_file=
     zip_fopen_index(static_cast<struct zip *>(zip), i, 0);
-  
+
   if(zip_file==NULL)
   {
     zip_close(static_cast<struct zip *>(zip));
@@ -111,7 +111,7 @@ std::string jar_filet::get_entry(std::size_t i)
 
   std::vector<char> buffer;
   buffer.resize(ZIP_READ_SIZE);
-  
+
   while(true)
   {
     int bytes_read=
@@ -121,9 +121,9 @@ std::string jar_filet::get_entry(std::size_t i)
     dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
   }
 
-  zip_fclose(zip_file);    
+  zip_fclose(zip_file);
   #endif
-  
+
   return dest;
 }
 
@@ -143,7 +143,7 @@ jar_filet::manifestt jar_filet::get_manifest()
 {
   std::size_t i=0;
   bool found=false;
-    
+
   for(const auto & e : index)
   {
     if(e=="META-INF/MANIFEST.MF")
@@ -151,16 +151,16 @@ jar_filet::manifestt jar_filet::get_manifest()
       found=true;
       break;
     }
-    
+
     i++;
   }
 
   if(!found)
     return manifestt();
-  
+
   std::string dest=get_entry(i);
   std::istringstream in(dest);
-  
+
   manifestt manifest;
 
   std::string line;
@@ -169,20 +169,20 @@ jar_filet::manifestt jar_filet::get_manifest()
     std::size_t pos=line.find(':');
     if(pos==std::string::npos) continue;
     std::string key=line.substr(0, pos);
-    
+
     // skip spaces
     pos++;
     while(pos<line.size() && line[pos]==' ') pos++;
 
     std::string value=line.substr(pos, std::string::npos);
-    
+
     // trim off \r
     if(!value.empty() && *value.rbegin()=='\r')
       value.resize(value.size()-1);
-    
+
     // store
     manifest[key]=value;
   }
-  
+
   return manifest;
 }

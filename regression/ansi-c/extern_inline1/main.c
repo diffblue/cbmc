@@ -27,4 +27,3 @@ int main()
   assert(foo(0)==0);
 #endif
 }
-

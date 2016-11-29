@@ -3,7 +3,7 @@ int counter=1;
 struct T
 {
   int z;
-  
+
   T();
 };
 

@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 int main()
@@ -16,5 +16,3 @@ int main()
 
    assert( n < 11 );
 }
-
-

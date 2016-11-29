@@ -29,7 +29,7 @@ public:
   virtual bool parse(
     std::istream &instream,
     const std::string &path);
-             
+
   virtual bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module);
@@ -38,10 +38,10 @@ public:
     symbol_tablet &symbol_table);
 
   virtual void show_parse(std::ostream &out);
-  
+
   virtual ~ansi_c_languaget();
   ansi_c_languaget() { }
-  
+
   virtual bool from_expr(
     const exprt &expr,
     std::string &code,
@@ -62,21 +62,21 @@ public:
     const std::string &module,
     exprt &expr,
     const namespacet &ns);
-                       
+
   virtual languaget *new_language()
   { return new ansi_c_languaget; }
-   
+
   virtual std::string id() const { return "C"; }
   virtual std::string description() const { return "ANSI-C 99"; }
   virtual std::set<std::string> extensions() const;
 
-  virtual void modules_provided(std::set<std::string> &modules);  
-  
+  virtual void modules_provided(std::set<std::string> &modules);
+
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
 };
- 
+
 languaget *new_ansi_c_language();
- 
+
 #endif

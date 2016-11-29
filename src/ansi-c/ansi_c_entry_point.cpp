@@ -46,7 +46,7 @@ exprt::operandst build_function_environment(
 {
   exprt::operandst result;
   result.resize(parameters.size());
-  
+
   std::size_t i=0;
 
   for(const auto & p : parameters)
@@ -55,25 +55,25 @@ exprt::operandst build_function_environment(
     if(base_name.empty()) base_name="argument#"+i2string(i);
     irep_idt identifier=id2string(goto_functionst::entry_point())+
       "::"+id2string(base_name);
-  
-    {  
+
+    {
       auxiliary_symbolt new_symbol;
       new_symbol.mode=ID_C;
       new_symbol.is_static_lifetime=false;
       new_symbol.name=identifier;
       new_symbol.base_name=base_name;
       new_symbol.type=p.type();
-    
+
       symbol_table.move(new_symbol);
     }
-    
+
     symbol_exprt symbol_expr(identifier, p.type());
 
     code_declt decl;
     decl.symbol()=symbol_expr;
-    
+
     init_code.add(decl);
-    
+
     codet input(ID_input);
     input.operands().resize(2);
 
@@ -82,13 +82,13 @@ exprt::operandst build_function_environment(
       index_exprt(string_constantt(base_name), gen_zero(index_type())));
     input.op1()=symbol_expr;
     input.add_source_location()=p.source_location();
-    
+
     init_code.move_to_operands(input);
-    
+
     result[i]=symbol_expr;
     i++;
   }
-  
+
   return result;
 }
 
@@ -124,7 +124,7 @@ void record_function_outputs(
     const symbolt &return_symbol=symbol_table.lookup("return'");
 
     output.op0()=address_of_exprt(
-      index_exprt(string_constantt(return_symbol.base_name), 
+      index_exprt(string_constantt(return_symbol.base_name),
                   gen_zero(index_type())));
 
     output.op1()=return_symbol.symbol_expr();
@@ -149,7 +149,7 @@ void record_function_outputs(
       output.operands().resize(2);
 
       output.op0()=address_of_exprt(
-        index_exprt(string_constantt(symbol.base_name), 
+        index_exprt(string_constantt(symbol.base_name),
                     gen_zero(index_type())));
       output.op1()=symbol.symbol_expr();
       output.add_source_location()=p.source_location();
@@ -185,35 +185,35 @@ bool ansi_c_entry_point(
     return false; // silently ignore
 
   irep_idt main_symbol;
-  
+
   // find main symbol
   if(config.main!="")
   {
     std::list<irep_idt> matches;
-  
+
     forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
     {
       // look it up
       symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(it->second);
-      
+
       if(s_it==symbol_table.symbols.end()) continue;
-    
+
       if(s_it->second.type.id()==ID_code)
         matches.push_back(it->second);
     }
-    
+
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main 
+      message.error() << "main symbol `" << config.main
                       << "' not found" << messaget::eom;
       return true; // give up
     }
-    
+
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main 
+      message.error() << "main symbol `" << config.main
                       << "' is ambiguous" << messaget::eom;
       return true;
     }
@@ -222,16 +222,16 @@ bool ansi_c_entry_point(
   }
   else
     main_symbol=standard_main;
-    
+
   // look it up
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(main_symbol);
-  
+
   if(s_it==symbol_table.symbols.end())
     return false; // give up silently
-    
+
   const symbolt &symbol=s_it->second;
-  
+
   // check if it has a body
   if(symbol.value.is_nil())
   {
@@ -243,9 +243,9 @@ bool ansi_c_entry_point(
 
   if(static_lifetime_init(symbol_table, symbol.location, message_handler))
     return true;
-  
+
   code_blockt init_code;
-  
+
   // build call to initialization function
 
   {
@@ -259,7 +259,7 @@ bool ansi_c_entry_point(
                       << messaget::eom;
       return true;
     }
-  
+
     code_function_callt call_init;
     call_init.lhs().make_nil();
     call_init.add_source_location()=symbol.location;
@@ -269,7 +269,7 @@ bool ansi_c_entry_point(
   }
 
   // build call to main function
-  
+
   code_function_callt call_main;
   call_main.add_source_location()=symbol.location;
   call_main.function()=symbol.symbol_expr();
@@ -303,36 +303,36 @@ bool ansi_c_entry_point(
 
       const symbolt &argc_symbol=ns.lookup("argc'");
       const symbolt &argv_symbol=ns.lookup("argv'");
-      
+
       {
         // assume argc is at least one
         exprt one=from_integer(1, argc_symbol.type);
-        
+
         exprt ge(ID_ge, typet(ID_bool));
         ge.copy_to_operands(argc_symbol.symbol_expr(), one);
-        
+
         codet assumption;
         assumption.set_statement(ID_assume);
         assumption.move_to_operands(ge);
         init_code.move_to_operands(assumption);
       }
-      
+
       {
         // assume argc is at most MAX/8-1
         mp_integer upper_bound=
           power(2, config.ansi_c.int_width-4);
-        
+
         exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
-        
+
         exprt le(ID_le, typet(ID_bool));
         le.copy_to_operands(argc_symbol.symbol_expr(), bound_expr);
-        
+
         codet assumption;
         assumption.set_statement(ID_assume);
         assumption.move_to_operands(le);
         init_code.move_to_operands(assumption);
       }
-      
+
       {
         // record argc as an input
         codet input(ID_input);
@@ -342,14 +342,14 @@ bool ansi_c_entry_point(
         input.op1()=argc_symbol.symbol_expr();
         init_code.move_to_operands(input);
       }
-      
+
       if(parameters.size()==3)
-      {        
+      {
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp_size is INTMAX-1
         mp_integer max;
-        
+
         if(envp_size_symbol.type.id()==ID_signedbv)
         {
           max=to_signedbv_type(envp_size_symbol.type).largest();
@@ -360,21 +360,21 @@ bool ansi_c_entry_point(
         }
         else
           assert(false);
-        
+
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
-        
+
         exprt le(ID_le, bool_typet());
         le.copy_to_operands(envp_size_symbol.symbol_expr(), max_minus_one);
-        
+
         codet assumption;
         assumption.set_statement(ID_assume);
         assumption.move_to_operands(le);
         init_code.move_to_operands(assumption);
       }
-      
+
       {
         /* zero_string doesn't work yet */
-        
+
         /*
         exprt zero_string(ID_zero_string, array_typet());
         zero_string.type().subtype()=char_type();
@@ -387,11 +387,11 @@ bool ansi_c_entry_point(
 
         if(argv_symbol.type.subtype()!=address_of.type())
           address_of.make_typecast(argv_symbol.type.subtype());
-        
+
         // assign argv[*] to the address of a string-object
         exprt array_of("array_of", argv_symbol.type);
         array_of.copy_to_operands(address_of);
-        
+
         init_code.copy_to_operands(
           code_assignt(argv_symbol.symbol_expr(), array_of));
         */
@@ -401,12 +401,12 @@ bool ansi_c_entry_point(
         // assign argv[argc] to NULL
         exprt null(ID_constant, argv_symbol.type.subtype());
         null.set(ID_value, ID_NULL);
-        
+
         exprt index_expr(ID_index, argv_symbol.type.subtype());
         index_expr.copy_to_operands(
           argv_symbol.symbol_expr(),
           argc_symbol.symbol_expr());
-          
+
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
 
@@ -414,44 +414,44 @@ bool ansi_c_entry_point(
       }
 
       if(parameters.size()==3)
-      {        
+      {
         const symbolt &envp_symbol=ns.lookup("envp'");
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
-        
+
         // assume envp[envp_size] is NULL
         exprt null(ID_constant, envp_symbol.type.subtype());
         null.set(ID_value, ID_NULL);
-        
+
         exprt index_expr(ID_index, envp_symbol.type.subtype());
         index_expr.copy_to_operands(
           envp_symbol.symbol_expr(),
           envp_size_symbol.symbol_expr());
-          
+
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
-        
+
         exprt is_null(ID_equal, typet(ID_bool));
         is_null.copy_to_operands(index_expr, null);
-        
+
         codet assumption2;
         assumption2.set_statement(ID_assume);
         assumption2.move_to_operands(is_null);
         init_code.move_to_operands(assumption2);
       }
-      
+
       {
         exprt::operandst &operands=call_main.arguments();
 
         if(parameters.size()==3)
           operands.resize(3);
-        else 
+        else
           operands.resize(2);
-          
+
         exprt &op0=operands[0];
         exprt &op1=operands[1];
-        
+
         op0=argc_symbol.symbol_expr();
-        
+
         {
           const exprt &arg1=parameters[1];
 
@@ -460,7 +460,7 @@ bool ansi_c_entry_point(
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
-        
+
           op1=exprt(ID_address_of, arg1.type());
           op1.move_to_operands(index_expr);
         }
@@ -472,11 +472,11 @@ bool ansi_c_entry_point(
           exprt &op2=operands[2];
 
           const exprt &arg2=parameters[2];
-          
+
           exprt index_expr(ID_index, arg2.type().subtype());
           index_expr.copy_to_operands(
             envp_symbol.symbol_expr(), gen_zero(index_type()));
-            
+
           op2=exprt(ID_address_of, arg2.type());
           op2.move_to_operands(index_expr);
         }
@@ -503,12 +503,12 @@ bool ansi_c_entry_point(
 
   code_typet main_type;
   main_type.return_type()=empty_typet();
-  
+
   new_symbol.name=goto_functionst::entry_point();
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
   new_symbol.mode=symbol.mode;
-  
+
   if(symbol_table.move(new_symbol))
   {
     messaget message;
@@ -516,6 +516,6 @@ bool ansi_c_entry_point(
     message.error() << "failed to move main symbol" << messaget::eom;
     return true;
   }
-  
+
   return false;
 }

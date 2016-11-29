@@ -12,4 +12,3 @@ register int x;
 int main()
 {
 }
-

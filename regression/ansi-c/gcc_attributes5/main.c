@@ -29,7 +29,7 @@ int (* __attribute__((cdecl,regparm(0))) foo4)(int x);
 typedef int (__attribute__((cdecl,regparm(0))) foo5)(int x);
 typedef int (__attribute__((cdecl,regparm(0))) *foo6)(int x);
 typedef int* (__attribute__((cdecl,regparm(0))) *foo7)(int x);
-                
+
 #endif
 
 int main()

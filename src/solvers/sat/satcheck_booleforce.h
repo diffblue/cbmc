@@ -18,7 +18,7 @@ class satcheck_booleforce_baset:public cnf_solvert
 {
 public:
   virtual ~satcheck_booleforce_baset();
-  
+
   virtual const std::string solver_text();
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
@@ -36,7 +36,7 @@ class satcheck_booleforce_coret:public satcheck_booleforce_baset
 {
 public:
   satcheck_booleforce_coret();
-  
+
   bool is_in_core(literalt l) const;
 };
 

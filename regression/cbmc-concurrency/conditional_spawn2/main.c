@@ -23,4 +23,3 @@ __CPROVER_ASYNC_1: thread();
 
   return 0;
 }
-

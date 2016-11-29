@@ -98,13 +98,13 @@ void goto_symex_statet::level0t::operator()(
     std::cerr << "level0: failed to find " << obj_identifier << std::endl;
     abort();
   }
-  
+
   // don't rename shared variables or functions
   if(s->type.id()==ID_code ||
      s->is_shared())
     return;
 
-  // rename!    
+  // rename!
   ssa_expr.set_level_0(thread_nr);
 }
 
@@ -152,7 +152,7 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
 {
   if(expr.is_constant())
     return true;
-  
+
   if(expr.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr=to_address_of_expr(expr);
@@ -187,7 +187,7 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
     forall_operands(it, expr)
       if(!constant_propagation(*it))
         return false;
-        
+
     return true;
   }
   else if(expr.id()==ID_array_of)
@@ -398,7 +398,7 @@ void goto_symex_statet::assignment(
   lhs.update_type();
   assert_l1_renaming(lhs);
 
-  #if 0  
+  #if 0
   assert(l1_identifier != get_original_name(l1_identifier)
       || l1_identifier=="goto_symex::\\guard"
       || ns.lookup(l1_identifier).is_shared()
@@ -419,12 +419,12 @@ void goto_symex_statet::assignment(
   assert_l2_renaming(rhs);
 
   // for value propagation -- the RHS is L2
-  
+
   if(!is_shared && record_value && constant_propagation(rhs))
     propagation.values[l1_identifier]=rhs;
   else
     propagation.remove(l1_identifier);
-      
+
   {
     // update value sets
     value_sett::expr_sett rhs_value_set;
@@ -437,9 +437,9 @@ void goto_symex_statet::assignment(
     assert_l1_renaming(l1_lhs);
     assert_l1_renaming(l1_rhs);
 
-    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);  
+    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
-  
+
   #if 0
   std::cout << "Assigning " << l1_identifier << std::endl;
   value_set.output(ns, std::cout);
@@ -502,21 +502,21 @@ void goto_symex_statet::set_ssa_indices(
   case L0:
     level0(ssa_expr, ns, source.thread_nr);
     break;
-    
+
   case L1:
     if(!ssa_expr.get_level_2().empty()) return;
     if(!ssa_expr.get_level_1().empty()) return;
     level0(ssa_expr, ns, source.thread_nr);
     level1(ssa_expr);
     break;
-  
+
   case L2:
     if(!ssa_expr.get_level_2().empty()) return;
     level0(ssa_expr, ns, source.thread_nr);
     level1(ssa_expr);
     ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
     break;
-    
+
   default:
     assert(false);
   }
@@ -796,7 +796,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   if(obj_identifier=="goto_symex::\\guard" ||
      !ns.lookup(obj_identifier).is_shared())
     return false; // not shared
-    
+
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
@@ -1005,7 +1005,7 @@ void goto_symex_statet::get_original_name(exprt &expr) const
 }
 
 /*******************************************************************\
- 
+
 Function: goto_symex_statet::get_original_name
 
   Inputs:
@@ -1084,7 +1084,7 @@ void goto_symex_statet::switch_to_thread(unsigned t)
 {
   assert(source.thread_nr<threads.size());
   assert(t<threads.size());
-  
+
   // save PC
   threads[source.thread_nr].pc=source.pc;
   threads[source.thread_nr].atomic_section_id=atomic_section_id;
@@ -1092,6 +1092,6 @@ void goto_symex_statet::switch_to_thread(unsigned t)
   // get new PC
   source.thread_nr=t;
   source.pc=threads[t].pc;
-  
+
   guard=threads[t].guard;
 }

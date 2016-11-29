@@ -27,7 +27,7 @@ int main()
   foo();
 
   g=1;
-  bar();       
+  bar();
 
   return 0;
 }

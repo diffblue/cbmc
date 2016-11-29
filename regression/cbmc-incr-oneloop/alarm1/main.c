@@ -116,7 +116,7 @@ void Alarm_system_compute(t_Alarm_system_io *_io_, t_Alarm_system_state *_state_
             } else {
                 if (_io_->VehLocked == 0) {
                     _state_->InitSystem_OPEN = FALSE;
-                    _state_->VehicleOpen_OPEN = TRUE; //possible BUG 
+                    _state_->VehicleOpen_OPEN = TRUE; //possible BUG
                 } else {
                     /*  Perform during and on-event actions of state InitSystem  */
                     _io_->AlarmArmed = TO_BOOL(1);
@@ -379,11 +379,11 @@ t_Alarm_system_io havocIO() {
 
 int main() {
   int k=0;
-  t_Alarm_system_state _state_; 
-  t_Alarm_system_state _state_old; 
+  t_Alarm_system_state _state_;
+  t_Alarm_system_state _state_old;
   t_Alarm_system_io _io_;
   Alarm_system_init(&_io_,&_state_);
-  while(1) { 
+  while(1) {
     _state_old = _state_;
     _io_ = havocIO();
     Alarm_system_compute(&_io_,&_state_);
@@ -394,4 +394,3 @@ int main() {
   }
   return 0;
 }
-

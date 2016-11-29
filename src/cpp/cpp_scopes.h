@@ -110,7 +110,7 @@ public:
   {
     current_scope_ptr=&get_global_scope();
   }
-  
+
   cpp_scopet &get_global_scope()
   {
     return current_scope().get_global_scope();

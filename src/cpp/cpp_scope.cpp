@@ -30,7 +30,7 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
   case cpp_scopet::RECURSIVE: return out << "RECURSIVE";
   default: assert(false);
   }
-  
+
   return out;
 }
 
@@ -66,8 +66,8 @@ void cpp_scopet::lookup(
 
   if(this->base_name==base_name)
     id_set.insert(this);
-    
-  if(kind==SCOPE_ONLY) return; // done  
+
+  if(kind==SCOPE_ONLY) return; // done
 
   // using scopes
   for(scope_listt::iterator
@@ -96,8 +96,8 @@ void cpp_scopet::lookup(
     // Note the different kind!
     other_scope.lookup(base_name, QUALIFIED, id_set);
   }
-  
-  if(kind==QUALIFIED) return; // done  
+
+  if(kind==QUALIFIED) return; // done
   if(!id_set.empty()) return; // done
 
   // ask parent, recursive call
@@ -130,10 +130,10 @@ void cpp_scopet::lookup(
   std::cout << "B: " << base_name <<  std::endl;
   std::cout << "K: " << kind << std::endl;
   std::cout << "I: " << id_class << std::endl;
-  std::cout << "THIS: " << this->base_name << " " << this->id_class 
+  std::cout << "THIS: " << this->base_name << " " << this->id_class
             << " " << this->identifier << std::endl;
   #endif
-  
+
   cpp_id_mapt::iterator
     lower_it=sub.lower_bound(base_name);
 
@@ -154,7 +154,7 @@ void cpp_scopet::lookup(
      this->id_class == id_class)
     id_set.insert(this);
 
-  if(kind==SCOPE_ONLY) return; // done  
+  if(kind==SCOPE_ONLY) return; // done
 
   // using scopes
   for(scope_listt::iterator
@@ -184,8 +184,8 @@ void cpp_scopet::lookup(
     // Note the different kind!
     other_scope.lookup(base_name, QUALIFIED, id_class, id_set);
   }
-  
-  if(kind==QUALIFIED) return; // done  
+
+  if(kind==QUALIFIED) return; // done
 
   if(!id_set.empty() &&
      id_class!=TEMPLATE) return; // done, upwards scopes are hidden

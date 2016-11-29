@@ -43,7 +43,7 @@ smt1_dect::solvert cbmc_solverst::get_smt1_solver_type() const
   assert(options.get_bool_option("smt1"));
 
   smt1_dect::solvert s = smt1_dect::GENERIC;
-  
+
   if(options.get_bool_option("boolector"))
     s = smt1_dect::BOOLECTOR;
   else if(options.get_bool_option("mathsat"))
@@ -81,7 +81,7 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
   assert(options.get_bool_option("smt2"));
 
   smt2_dect::solvert s = smt2_dect::GENERIC;
-  
+
   if(options.get_bool_option("boolector"))
     s = smt2_dect::BOOLECTOR;
   else if(options.get_bool_option("mathsat"))
@@ -122,7 +122,7 @@ public:
   {
     assert(_prop!=NULL);
   }
-  
+
   ~cbmc_solver_with_propt()
   {
     delete prop;
@@ -213,21 +213,21 @@ Function: cbmc_solverst::get_default
 cbmc_solverst::solvert* cbmc_solverst::get_default()
 {
   solvert *solver;
-  
-  if(options.get_bool_option("beautify") || 
+
+  if(options.get_bool_option("beautify") ||
      !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
     propt* prop = new satcheck_no_simplifiert();
     prop->set_message_handler(get_message_handler());
-    
+
     bv_cbmct* bv_cbmc = new bv_cbmct(ns, *prop);
-    
+
     if(options.get_option("arrays-uf")=="never")
       bv_cbmc->unbounded_array=bv_cbmct::U_NONE;
     else if(options.get_option("arrays-uf")=="always")
       bv_cbmc->unbounded_array=bv_cbmct::U_ALL;
-   
+
     solver = new cbmc_solver_with_propt(bv_cbmc, prop);
   }
   else // with simplifier
@@ -265,7 +265,7 @@ Function: cbmc_solverst::get_dimacs
  Purpose:
 
 \*******************************************************************/
- 
+
 cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
 {
   no_beautification();
@@ -273,9 +273,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
 
   dimacs_cnft *prop=new dimacs_cnft();
   prop->set_message_handler(get_message_handler());
-  
+
   std::string filename=options.get_option("outfile");
-  
+
   return new cbmc_solver_with_propt(new cbmc_dimacst(ns, *prop, filename), prop);
 }
 
@@ -290,7 +290,7 @@ Function: cbmc_solverst::get_bv_refinement
  Purpose:
 
 \*******************************************************************/
- 
+
 cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
 {
   propt *prop;
@@ -303,20 +303,20 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   }
   else
     prop=new satcheck_no_simplifiert();
-  
+
   prop->set_message_handler(get_message_handler());
 
   bv_refinementt *bv_refinement = new bv_refinementt(ns, *prop);
   bv_refinement->set_ui(ui);
 
-  // we allow setting some parameters  
+  // we allow setting some parameters
   if(options.get_option("max-node-refinement")!="")
-    bv_refinement->max_node_refinement = 
+    bv_refinement->max_node_refinement =
       options.get_unsigned_int_option("max-node-refinement");
 
-  bv_refinement->do_array_refinement = 
+  bv_refinement->do_array_refinement =
     options.get_bool_option("refine-arrays");
-  bv_refinement->do_arithmetic_refinement = 
+  bv_refinement->do_arithmetic_refinement =
     options.get_bool_option("refine-arithmetic");
 
   return new cbmc_solver_with_propt(bv_refinement, prop);
@@ -333,14 +333,14 @@ Function: cbmc_solverst::get_smt1
  Purpose:
 
 \*******************************************************************/
- 
+
 cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
 {
   no_beautification();
   no_incremental_check();
 
   const std::string &filename=options.get_option("outfile");
-  
+
   if(filename=="")
   {
     if(solver==smt1_dect::GENERIC)
@@ -379,7 +379,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
     #else
     std::ofstream *out=new std::ofstream(filename);
     #endif
-    
+
     if(!out)
     {
       error() << "failed to open " << filename << eom;
@@ -399,7 +399,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
     return new cbmc_solver_with_filet(smt1_conv, out);
   }
 }
-  
+
 /*******************************************************************\
 
 Function: cbmc_solverst::get_smt2
@@ -411,13 +411,13 @@ Function: cbmc_solverst::get_smt2
  Purpose:
 
 \*******************************************************************/
-   
+
 cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 {
   no_beautification();
 
   const std::string &filename=options.get_option("outfile");
-  
+
   if(filename=="")
   {
     if(solver==smt2_dect::GENERIC)
@@ -425,7 +425,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
       error() << "please use --outfile" << eom;
       throw 0;
     }
-  
+
     smt2_dect* smt2_dec = new smt2_dect(
       ns,
       "cbmc",
@@ -462,7 +462,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     #else
     std::ofstream *out=new std::ofstream(filename);
     #endif
-    
+
     if(!*out)
     {
       error() << "failed to open " << filename << eom;

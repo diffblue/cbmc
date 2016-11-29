@@ -36,7 +36,7 @@ xmlt xml(const source_locationt &location)
   xmlt result;
 
   result.name="location";
-  
+
   if(!location.get_file().empty())
     result.set_attribute("file", id2string(location.get_file()));
 
@@ -48,7 +48,7 @@ xmlt xml(const source_locationt &location)
 
   if(!location.get_function().empty())
     result.set_attribute("function", id2string(location.get_function()));
-  
+
   return result;
 }
 
@@ -175,7 +175,7 @@ xmlt xml(
   const namespacet &ns)
 {
   xmlt result;
-  
+
   const typet &type=ns.follow(expr.type());
 
   if(expr.id()==ID_constant)
@@ -185,17 +185,17 @@ xmlt xml(
        type.id()==ID_c_bit_field)
     {
       std::size_t width=to_bitvector_type(type).get_width();
-    
+
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
       result.set_attribute("width", width);
-      
+
       const typet &underlying_type=
         type.id()==ID_c_bit_field?type.subtype():
         type;
 
       bool is_signed=underlying_type.id()==ID_signedbv;
-        
+
       std::string sig=is_signed?"":"unsigned ";
 
       if(width==config.ansi_c.char_width)
@@ -271,9 +271,9 @@ xmlt xml(
   else if(expr.id()==ID_array)
   {
     result.name="array";
-    
+
     unsigned index=0;
-    
+
     forall_operands(it, expr)
     {
       xmlt &e=result.new_element("element");
@@ -285,7 +285,7 @@ xmlt xml(
   else if(expr.id()==ID_struct)
   {
     result.name="struct";
-    
+
     // these are expected to have a struct type
     if(type.id()==ID_struct)
     {
@@ -302,11 +302,11 @@ xmlt xml(
     }
   }
   else if(expr.id()==ID_union)
-  { 
+  {
     result.name="union";
-    
+
     assert(expr.operands().size()==1);
-    
+
     xmlt &e=result.new_element("member");
     e.new_element(xml(expr.op0(), ns));
     e.set_attribute("member_name",
@@ -317,4 +317,3 @@ xmlt xml(
 
   return result;
 }
-

@@ -18,17 +18,17 @@ public:
   {
     operands().resize(2);
   }
-  
+
   exprt &cond()
   {
     return op0();
   }
 
-  const exprt &cond() const 
+  const exprt &cond() const
   {
     return op0();
   }
-  
+
   const exprt &description() const
   {
     return op1();

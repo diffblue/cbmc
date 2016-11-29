@@ -8,4 +8,3 @@
 
 // depreciated, and will disappear
 //unsigned bv_width(const typet &type);
-

@@ -16,18 +16,18 @@ int main(int argc, char **argv)
   try
   {
     elf_readert elf_reader(in);
-  
+
     // iterate over sections
     for(unsigned i=0; i<elf_reader.number_of_sections; i++)
     {
       std::cout << "Section " << i << ": " << elf_reader.section_name(i) << std::endl;
-    }  
+    }
   }
-  
+
   catch(const char *s)
   {
     std::cerr << "Exception: " << s << std::endl;
   }
-  
+
   return 0;
 }

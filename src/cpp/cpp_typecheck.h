@@ -163,7 +163,7 @@ protected:
     const irep_idt &base_name,
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
-    
+
   std::string function_template_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
@@ -174,7 +174,7 @@ protected:
     const symbolt &template_symbol,
     const cpp_template_args_non_tct &template_args);
 
-  // template instantiations    
+  // template instantiations
   class instantiationt
   {
   public:
@@ -185,9 +185,9 @@ protected:
 
   typedef std::list<instantiationt> instantiation_stackt;
   instantiation_stackt instantiation_stack;
-  
+
   void show_instantiation_stack(std::ostream &);
-  
+
   class instantiation_levelt
   {
   public:
@@ -197,21 +197,21 @@ protected:
     {
       instantiation_stack.push_back(instantiationt());
     }
-    
+
     ~instantiation_levelt()
     {
       instantiation_stack.pop_back();
     }
-    
+
   private:
     instantiation_stackt &instantiation_stack;
   };
-  
+
   const symbolt &class_template_symbol(
     const source_locationt &source_location,
     const symbolt &template_symbol,
     const cpp_template_args_tct &specialization_template_args,
-    const cpp_template_args_tct &full_template_args);  
+    const cpp_template_args_tct &full_template_args);
 
   void elaborate_class_template(
     const typet &type);
@@ -335,15 +335,15 @@ protected:
       instantiation_stack(_instantiation_stack)
     {
     }
-    
+
     symbolt *method_symbol;
     template_mapt template_map;
     instantiation_stackt instantiation_stack;
   };
-  
+
   typedef std::list<method_bodyt> method_bodiest;
   method_bodiest method_bodies;
-  
+
   void add_method_body(symbolt *_method_symbol)
   {
     method_bodies.push_back(method_bodyt(

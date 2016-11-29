@@ -35,11 +35,11 @@ int main()
 {
   struct S1 s1;
   struct S2 s2;
-  
+
   f1(&s1);
   f1(&s2);
   f1(0);
-  
+
   f2(0);
   f2(1>2); // these are int
 }

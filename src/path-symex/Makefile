@@ -15,4 +15,3 @@ all: path-symex$(LIBEXT)
 
 path-symex$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

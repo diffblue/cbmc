@@ -52,7 +52,7 @@ std::ostream& goto_programt::output_instruction(
     {
       out << " " << *l_it;
     }
-    
+
     out << '\n';
   }
 
@@ -66,7 +66,7 @@ std::ostream& goto_programt::output_instruction(
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET" << '\n';
     break;
-  
+
   case GOTO:
     if(!it->guard.is_true())
     {
@@ -76,7 +76,7 @@ std::ostream& goto_programt::output_instruction(
     }
 
     out << "GOTO ";
-    
+
     for(instructiont::targetst::const_iterator
         gt_it=it->targets.begin();
         gt_it!=it->targets.end();
@@ -85,10 +85,10 @@ std::ostream& goto_programt::output_instruction(
       if(gt_it!=it->targets.begin()) out << ", ";
       out << (*gt_it)->target_number;
     }
-      
+
     out << '\n';
     break;
-    
+
   case RETURN:
   case OTHER:
   case DECL:
@@ -97,61 +97,61 @@ std::ostream& goto_programt::output_instruction(
   case ASSIGN:
     out << from_expr(ns, identifier, it->code) << '\n';
     break;
-    
+
   case ASSUME:
   case ASSERT:
     if(it->is_assume())
       out << "ASSUME ";
     else
       out << "ASSERT ";
-      
+
     {
       out << from_expr(ns, identifier, it->guard);
-    
+
       const irep_idt &comment=it->source_location.get_comment();
       if(comment!="") out << " // " << comment;
     }
-      
+
     out << '\n';
     break;
 
   case SKIP:
     out << "SKIP" << '\n';
     break;
-    
+
   case END_FUNCTION:
     out << "END_FUNCTION" << '\n';
     break;
-    
+
   case LOCATION:
     out << "LOCATION" << '\n';
     break;
-    
+
   case THROW:
     out << "THROW";
 
     {
       const irept::subt &exception_list=
         it->code.find(ID_exception_list).get_sub();
-    
+
       for(irept::subt::const_iterator
           it=exception_list.begin();
           it!=exception_list.end();
           it++)
         out << " " << it->id();
     }
-    
+
     if(it->code.operands().size()==1)
       out << ": " << from_expr(ns, identifier, it->code.op0());
-    
+
     out << '\n';
     break;
-    
+
   case CATCH:
     if(!it->targets.empty())
     {
       out << "CATCH-PUSH ";
-    
+
       unsigned i=0;
       const irept::subt &exception_list=
         it->code.find(ID_exception_list).get_sub();
@@ -169,36 +169,36 @@ std::ostream& goto_programt::output_instruction(
     }
     else
       out << "CATCH-POP";
-      
+
     out << '\n';
     break;
-    
+
   case ATOMIC_BEGIN:
     out << "ATOMIC_BEGIN" << '\n';
     break;
-    
+
   case ATOMIC_END:
     out << "ATOMIC_END" << '\n';
     break;
-    
+
   case START_THREAD:
     out << "START THREAD ";
 
     if(it->targets.size()==1)
       out << it->targets.front()->target_number;
-    
+
     out << '\n';
     break;
-    
+
   case END_THREAD:
     out << "END THREAD" << '\n';
     break;
-    
+
   default:
     throw "unknown statement";
   }
 
-  return out;  
+  return out;
 }
 
 /*******************************************************************\
@@ -226,7 +226,7 @@ void goto_programt::get_decl_identifiers(
       decl_identifiers.insert(symbol_expr.get_identifier());
     }
   }
-} 
+}
 
 /*******************************************************************\
 
@@ -291,12 +291,12 @@ std::list<exprt> expressions_read(
   case GOTO:
     dest.push_back(instruction.guard);
     break;
-  
+
   case RETURN:
     if(to_code_return(instruction.code).return_value().is_not_nil())
       dest.push_back(to_code_return(instruction.code).return_value());
     break;
-  
+
   case FUNCTION_CALL:
     {
       const code_function_callt &function_call=
@@ -307,7 +307,7 @@ std::list<exprt> expressions_read(
         parse_lhs_read(function_call.lhs(), dest);
     }
     break;
-  
+
   case ASSIGN:
     {
       const code_assignt &assignment=to_code_assign(instruction.code);
@@ -315,10 +315,10 @@ std::list<exprt> expressions_read(
       parse_lhs_read(assignment.lhs(), dest);
     }
     break;
-  
+
   default:;
   }
-  
+
   return dest;
 }
 
@@ -349,14 +349,14 @@ std::list<exprt> expressions_written(
         dest.push_back(function_call.lhs());
     }
     break;
-  
+
   case ASSIGN:
     dest.push_back(to_code_assign(instruction.code).lhs());
     break;
-  
+
   default:;
   }
-  
+
   return dest;
 }
 
@@ -374,7 +374,7 @@ Function: get_objects_read
 
 void objects_read(
   const exprt &src,
-  std::list<exprt> &dest) 
+  std::list<exprt> &dest)
 {
   if(src.id()==ID_symbol)
     dest.push_back(src);
@@ -414,10 +414,10 @@ std::list<exprt> objects_read(
   std::list<exprt> expressions=expressions_read(instruction);
 
   std::list<exprt> dest;
-  
+
   forall_expr_list(it, expressions)
     objects_read(*it, dest);
-  
+
   return dest;
 }
 
@@ -465,10 +465,10 @@ std::list<exprt> objects_written(
   std::list<exprt> expressions=expressions_written(instruction);
 
   std::list<exprt> dest;
-  
+
   forall_expr_list(it, expressions)
     objects_written(*it, dest);
-  
+
   return dest;
 }
 
@@ -494,7 +494,7 @@ std::string as_string(
   {
   case NO_INSTRUCTION_TYPE:
     return "(NO INSTRUCTION TYPE)";
-    
+
   case GOTO:
     if(!i.guard.is_true())
     {
@@ -504,7 +504,7 @@ std::string as_string(
     }
 
     result+="GOTO ";
-    
+
     for(goto_programt::instructiont::targetst::const_iterator
         gt_it=i.targets.begin();
         gt_it!=i.targets.end();
@@ -514,7 +514,7 @@ std::string as_string(
       result+=i2string((*gt_it)->target_number);
     }
     return result;
-    
+
   case RETURN:
   case OTHER:
   case DECL:
@@ -522,14 +522,14 @@ std::string as_string(
   case FUNCTION_CALL:
   case ASSIGN:
     return from_expr(ns, i.function, i.code);
-    
+
   case ASSUME:
   case ASSERT:
     if(i.is_assume())
       result+="ASSUME ";
     else
       result+="ASSERT ";
-      
+
     result+=from_expr(ns, i.function, i.guard);
 
     {
@@ -540,39 +540,38 @@ std::string as_string(
 
   case SKIP:
     return "SKIP";
-    
+
   case END_FUNCTION:
     return "END_FUNCTION";
-    
+
   case LOCATION:
     return "LOCATION";
-    
+
   case THROW:
     return "THROW";
-    
+
   case CATCH:
     return "CATCH";
-    
+
   case ATOMIC_BEGIN:
     return "ATOMIC_BEGIN";
-    
+
   case ATOMIC_END:
     return "ATOMIC_END";
-    
+
   case START_THREAD:
     result+="START THREAD ";
 
     if(i.targets.size()==1)
       result+=i2string(i.targets.front()->target_number);
     return result;
-    
+
   case END_THREAD:
     return "END THREAD";
-    
+
   default:
     throw "unknown statement";
   }
 
   return "";
 }
-

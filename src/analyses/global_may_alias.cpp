@@ -16,7 +16,7 @@ Function: global_may_alias_domaint::assign_lhs_aliases
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -47,7 +47,7 @@ Function: global_may_alias_domaint::get_rhs_aliases
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -59,7 +59,7 @@ void global_may_alias_domaint::get_rhs_aliases(
   {
     irep_idt identifier=to_symbol_expr(rhs).get_identifier();
     alias_set.insert(identifier);
-    
+
     for(aliasest::const_iterator it=aliases.begin();
         it!=aliases.end();
         it++)
@@ -89,7 +89,7 @@ Function: global_may_alias_domaint::get_rhs_aliases_address_of
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -120,7 +120,7 @@ Function: global_may_alias_domaint::transform
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -137,7 +137,7 @@ void global_may_alias_domaint::transform(
   case ASSIGN:
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
-      
+
       std::set<irep_idt> aliases;
       get_rhs_aliases(code_assign.rhs(), aliases);
       assign_lhs_aliases(code_assign.lhs(), aliases);
@@ -170,7 +170,7 @@ Function: global_may_alias_domaint::output
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -184,7 +184,7 @@ void global_may_alias_domaint::output(
       a_it1++)
   {
     bool first=true;
-  
+
     for(aliasest::const_iterator a_it2=aliases.begin();
         a_it2!=aliases.end();
         a_it2++)
@@ -209,7 +209,7 @@ Function: global_may_alias_domaint::merge
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -225,7 +225,7 @@ bool global_may_alias_domaint::merge(
       it!=b.aliases.end(); it++)
   {
     irep_idt b_root=b.aliases.find(it);
-    
+
     if(!aliases.same_set(*it, b_root))
     {
       aliases.make_union(*it, b_root);
@@ -242,6 +242,6 @@ bool global_may_alias_domaint::merge(
       aliases.isolate(it);
   }
   #endif
-  
+
   return changed;
 }

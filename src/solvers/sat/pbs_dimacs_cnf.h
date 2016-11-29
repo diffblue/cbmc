@@ -30,7 +30,7 @@ class pbs_dimacs_cnft:public dimacs_cnft
   virtual ~pbs_dimacs_cnft()
   {
   }
- 
+
   virtual void write_dimacs_pb(std::ostream &out);
 
   bool optimize;
@@ -51,7 +51,7 @@ class pbs_dimacs_cnft:public dimacs_cnft
   virtual tvt l_get(literalt a) const;
 
   // dummy functions
-  
+
   virtual const std::string solver_text()
     { return "PBS - Pseudo Boolean/CNF Solver and Optimizer"; }
 

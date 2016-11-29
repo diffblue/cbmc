@@ -40,10 +40,10 @@ public:
   BDD operator ==(const BDD &) const;
   BDD operator &(const BDD &) const;
   BDD operator |(const BDD &) const;
-  
+
   // copy operator
   inline BDD &operator=(const BDD &);
-  
+
   inline bool is_constant() const;
   inline bool is_true() const;
   inline bool is_false() const;
@@ -53,10 +53,10 @@ public:
   inline const BDD &high() const;
   inline unsigned node_number() const;
   inline void clear();
-  
+
   bool is_initialized() const { return node!=0; }
 
-  // internal  
+  // internal
   explicit inline BDD(class node *_node);
   class node *node;
 };
@@ -67,7 +67,7 @@ public:
   class mgr *mgr;
   unsigned var, node_number, reference_counter;
   BDD low, high;
-  
+
   inline node(
     class mgr *_mgr,
     unsigned _var, unsigned _node_number,
@@ -91,29 +91,29 @@ public:
 
   inline const BDD &True() const;
   inline const BDD &False() const;
-  
+
   friend class BDD;
   friend class node;
-  
+
   // create a node (consulting the reverse-map)
   BDD mk(unsigned var, const BDD &low, const BDD &high);
-  
+
   inline std::size_t number_of_nodes();
-  
+
   struct var_table_entryt
   {
     std::string label;
     inline var_table_entryt(const std::string &_label);
-  };  
+  };
 
   typedef std::vector<var_table_entryt> var_tablet;
-  var_tablet var_table;  
-  
+  var_tablet var_table;
+
 protected:
   typedef std::list<node> nodest;
   nodest nodes;
   BDD true_bdd, false_bdd;
-  
+
   // this is our reverse-map for nodes
   struct reverse_keyt
   {
@@ -121,12 +121,12 @@ protected:
     inline reverse_keyt(
       unsigned _var, const BDD &_low, const BDD &_high);
   };
-  
+
   friend bool operator < (const reverse_keyt &x, const reverse_keyt &y);
-  
+
   typedef std::map<reverse_keyt, node *> reverse_mapt;
   reverse_mapt reverse_map;
-  
+
   typedef std::stack<node *> freet;
   freet free;
 };

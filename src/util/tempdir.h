@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: CM Wintersteiger
 
@@ -21,9 +21,9 @@ public:
   std::string path;
 
   std::string operator()(const std::string &file);
-  
+
   void clear();
-  
+
   explicit temp_dirt(const std::string &name_template);
   ~temp_dirt();
 };
@@ -36,8 +36,8 @@ class temp_working_dirt:public temp_dirt
 {
 public:
   std::string old_working_directory;
-  
-  explicit temp_working_dirt(const std::string &name_template);  
+
+  explicit temp_working_dirt(const std::string &name_template);
   ~temp_working_dirt();
 };
 

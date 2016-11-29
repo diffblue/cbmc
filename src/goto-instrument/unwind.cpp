@@ -53,21 +53,21 @@ void unwind(
   std::vector<goto_programt::targett> &iteration_points)
 {
   assert(k!=0);
-  
+
   iteration_points.resize(k);
 
   // loop_exit: where to go after the loop ends
   // loop_iter: where to go for the next iteration
-  
+
   // Add a 'goto' and a 'skip' _before_ loop_exit.
   // The goto is to take care of 'fall-out' loop exit, and is
   // not needed if there is an unconditional goto before loop_exit.
 
   if(loop_exit!=goto_program.instructions.begin())
-  {  
+  {
     goto_programt::targett t_before=loop_exit;
     t_before--;
-    
+
     if(t_before->is_goto() && t_before->guard.is_true())
     {
       // no 'fall-out'
@@ -76,28 +76,28 @@ void unwind(
     {
       // guard against 'fall-out'
       goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
-  
+
       t_goto->make_goto(loop_exit);
       t_goto->source_location=loop_exit->source_location;
       t_goto->function=loop_exit->function;
       t_goto->guard=true_exprt();
     }
   }
-  
+
   goto_programt::targett t_skip=goto_program.insert_before(loop_exit);
   goto_programt::targett loop_iter=t_skip;
-  
+
   t_skip->make_skip();
   t_skip->source_location=loop_head->source_location;
   t_skip->function=loop_head->function;
-  
+
   // record the exit point of first iteration
   iteration_points[0]=loop_iter;
-  
+
   // build a map for branch targets inside the loop
   std::map<goto_programt::targett, unsigned> target_map;
 
-  { 
+  {
     unsigned count=0;
     for(goto_programt::targett t=loop_head;
         t!=loop_exit; t++, count++)
@@ -108,7 +108,7 @@ void unwind(
   }
 
   // re-direct any branches that go to loop_head to loop_iter
-  
+
   for(goto_programt::targett t=loop_head;
       t!=loop_iter; t++)
   {
@@ -119,7 +119,7 @@ void unwind(
         t_it++)
       if(*t_it==loop_head) *t_it=loop_iter;
   }
-  
+
   // we make k-1 copies, to be inserted before loop_exit
   goto_programt copies;
 
@@ -140,7 +140,7 @@ void unwind(
 
     // record exit point of this copy
     iteration_points[i]=target_vector.back();
-    
+
     // adjust the intra-loop branches
 
     for(std::size_t i=0; i<target_vector.size(); i++)
@@ -161,10 +161,10 @@ void unwind(
         }
       }
     }
-  }  
-  
+  }
+
   assert(copies.instructions.size()==(k-1)*target_map.size());
-  
+
   // now insert copies before loop_exit
   goto_program.destructive_insert(loop_exit, copies);
 
@@ -189,7 +189,7 @@ void goto_unwind(
   const unsigned k)
 {
   // Here we unwind all loops in the program.
-  // Each loop body is simply repeated k times (if condition holds) 
+  // Each loop body is simply repeated k times (if condition holds)
   Forall_goto_functions(it, goto_functions)
   {
     goto_functionst::goto_functiont &goto_function=it->second;
@@ -228,4 +228,3 @@ void goto_unwind(
     }
   }
 }
-

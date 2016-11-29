@@ -15,7 +15,7 @@ Author: CM Wintersteiger
 #include <util/expr.h>
 #include <util/mp_arith.h>
 
-class format_tokent 
+class format_tokent
 {
 public:
   typedef enum { UNKNOWN,
@@ -26,19 +26,19 @@ public:
                  STRING, // s
                  POINTER // p
                } token_typet;
-                 
-  typedef enum { ALTERNATE, ZERO_PAD, LEFT_ADJUST, 
+
+  typedef enum { ALTERNATE, ZERO_PAD, LEFT_ADJUST,
                  SIGNED_SPACE, SIGN, ASTERISK } flag_typet;
-                   
+
   typedef enum { LEN_h, LEN_hh, LEN_l, LEN_ll, LEN_L, LEN_j, LEN_t } length_modifierst;
-  
+
   typedef enum { SIGNED_DEC, UNSIGNED_DEC, UNSIGNED_OCT, UNSIGNED_HEX } representationt;
-  
+
   explicit format_tokent(token_typet _type) : type(_type) { }
   format_tokent(): type(UNKNOWN) { }
-  
-  token_typet type;  
-  std::list<flag_typet> flags;  
+
+  token_typet type;
+  std::list<flag_typet> flags;
   mp_integer field_width;
   mp_integer precision;
   length_modifierst length_modifier;

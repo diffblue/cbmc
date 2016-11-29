@@ -14,4 +14,3 @@ int main()
 
  assert(l==6);
 }
-

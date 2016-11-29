@@ -37,9 +37,9 @@ public:
     if(fit!=assignment.end())
       return a.sign()?tvt(!fit->second) : tvt(fit->second);
     else
-    {      
+    {
       // throw "Missing toplevel assignment from QuBE";
-      // We assume this is a don't-care and return unknown      
+      // We assume this is a don't-care and return unknown
     }
 
 

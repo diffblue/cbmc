@@ -30,7 +30,7 @@ cmdlinet::cmdlinet()
 
 /*******************************************************************\
 
-Function: cmdlinet::~cmdlinet 
+Function: cmdlinet::~cmdlinet
 
   Inputs:
 
@@ -235,7 +235,7 @@ int cmdlinet::getoptnr(char option) const
   for(unsigned i=0; i<options.size(); i++)
     if(options[i].optchar==option)
       return i;
-  
+
   return -1;
 }
 
@@ -256,7 +256,7 @@ int cmdlinet::getoptnr(const std::string &option) const
   for(unsigned i=0; i<options.size(); i++)
     if(options[i].optstring==option)
       return i;
-  
+
   return -1;
 }
 
@@ -340,7 +340,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
         if(optnr<0) // try multi-letter
           optnr=getoptnr(argv[i]+1);
       }
-   
+
       if(optnr<0) return true;
       options[optnr].isset=true;
       if(options[optnr].hasval)

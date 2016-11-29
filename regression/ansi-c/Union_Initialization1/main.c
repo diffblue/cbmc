@@ -7,7 +7,7 @@ typedef struct some_struct
     long two;
   } three;
 } num_t;
- 
+
 int main()
 {
   num_t num1 = { 0 };

@@ -10,7 +10,7 @@ void test_try_finally1()
   {
     global=2;
   }
-  
+
   assert(global==2);
 }
 
@@ -26,7 +26,7 @@ void helper()
   {
     global=3;
   }
-  
+
   assert(global==2);
 }
 
@@ -46,7 +46,7 @@ void test_try_catch1()
   {
     global=2;
   }
-  
+
   assert(global==1);
 }
 
@@ -62,7 +62,7 @@ void test_try_catch2()
   {
     global=3;
   }
-  
+
   assert(global==3);
 }
 
@@ -73,4 +73,3 @@ int main()
   test_try_catch1();
   test_try_catch2();
 }
-

@@ -61,15 +61,15 @@ void cpp_declarationt::name_anon_struct_union(typet &dest)
     if(dest.find(ID_tag).is_nil())
     {
       // it's anonymous
-      
+
       const declaratorst &d=declarators();
-      
+
       if(!d.empty() &&
          d.front().name().is_simple_name())
       {
         // Anon struct/unions without declarator are pretty
         // useless, but still possible.
-        
+
         irep_idt base_name="anon-"+id2string(d.front().name().get_base_name());
         dest.set(ID_tag, cpp_namet(base_name));
         dest.set(ID_C_is_anonymous, true);

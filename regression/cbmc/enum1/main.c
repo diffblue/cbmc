@@ -11,13 +11,13 @@ int array[E5];
 int main()
 {
   int integer;
-  
+
   a=E2;
   assert(a==1);
-  
+
   assert(E4==4);
   assert(sizeof(array)==sizeof(int)*5);
-  
+
   integer=a;
   assert(integer==1);
 }

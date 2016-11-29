@@ -16,7 +16,7 @@ int main()
     throw (int)0;
     assert(0);
   }
-  
+
   catch(int i)
   {
     // yes
@@ -29,7 +29,7 @@ int main()
   {
     assert(0);
   }
-                  
+
   // example 2
 
   try
@@ -37,7 +37,7 @@ int main()
     throw (char)0;
     assert(0);
   }
-  
+
   catch(int i)
   {
     assert(0);
@@ -57,7 +57,7 @@ int main()
     throw whatnot(1);
     assert(0);
   }
-  
+
   catch(int i)
   {
     assert(0);

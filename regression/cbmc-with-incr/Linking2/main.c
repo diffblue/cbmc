@@ -21,13 +21,13 @@ int main()
 {
   assert(i==2);
   assert(j==3);
-  
+
   f(); // does not change i,
        // but does change j
-  
+
   assert(i==2);
   assert(j==4);
-  
+
   struct my_struct xx;
   assert(sizeof(xx.t_field)==1);
 }

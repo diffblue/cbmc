@@ -83,7 +83,7 @@ bool replace_symbolt::replace(exprt &dest) const
   if(have_to_replace(dest.type()))
     if(!replace(dest.type()))
       result=false;
-      
+
   // now do expression itself
 
   if(!have_to_replace(dest))
@@ -138,7 +138,7 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
 
   if(have_to_replace(dest.type()))
     return true;
-      
+
   // now do expression itself
 
   if(dest.id()==ID_symbol)
@@ -189,11 +189,11 @@ bool replace_symbolt::replace(typet &dest) const
   Forall_subtypes(it, dest)
     if(!replace(*it))
       result=false;
-    
+
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
-    struct_union_typet &struct_union_type=to_struct_union_type(dest);    
+    struct_union_typet &struct_union_type=to_struct_union_type(dest);
     struct_union_typet::componentst &components=
       struct_union_type.components();
 
@@ -203,7 +203,7 @@ bool replace_symbolt::replace(typet &dest) const
         it++)
       if(!replace(*it))
         result=false;
-  } 
+  }
   else if(dest.id()==ID_code)
   {
     code_typet &code_type=to_code_type(dest);
@@ -257,12 +257,12 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
   forall_subtypes(it, dest)
     if(have_to_replace(*it))
       return true;
-    
+
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=
-      to_struct_union_type(dest);    
+      to_struct_union_type(dest);
 
     const struct_union_typet::componentst &components=
       struct_union_type.components();
@@ -273,13 +273,13 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
         it++)
       if(have_to_replace(*it))
         return true;
-  } 
+  }
   else if(dest.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(dest);
     if(have_to_replace(code_type.return_type()))
       return true;
-      
+
     const code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::const_iterator
@@ -296,4 +296,3 @@ bool replace_symbolt::have_to_replace(const typet &dest) const
 
   return false;
 }
-

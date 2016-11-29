@@ -43,7 +43,7 @@ protected:
   const namespacet ns;
   const goto_functionst& goto_functions;
 
-  struct { 
+  struct {
     std::list<symbol_exprt> writes;
     std::list<symbol_exprt> reads;
   } fenced_edges;
@@ -125,7 +125,7 @@ public:
     const goto_functionst& _goto_functions)
     :simple_insertiont(_message, _value_sets,_symbol_table,_goto_functions)
   {}
-}; 
+};
 
 /* fence insertion for all shared accesses */
 class fence_all_shared_aegt:public fence_all_sharedt
@@ -147,7 +147,7 @@ public:
     const goto_functionst& _goto_functions)
     :fence_all_sharedt(_message, _value_sets, _symbol_table, _goto_functions)
   {}
-}; 
+};
 
 /* fence insertion for volatile accesses (a la MSVC) */
 class fence_volatilet:public simple_insertiont
@@ -174,7 +174,7 @@ Function: is_volatile
 
  Outputs:
 
- Purpose: we can determine whether an access is volatile just by looking at 
+ Purpose: we can determine whether an access is volatile just by looking at
    the type of the variables involved in the expression. We assume that the
    program is correctly typed (i.e., volatile-marked)
 
@@ -199,7 +199,7 @@ bool fence_volatilet::is_volatile (const typet &src) const
     if(is_volatile(src.subtype()))
       return true;
   }
-  else if(src.has_subtypes()) 
+  else if(src.has_subtypes())
   {
     /* if a pointer points to a volatile variable, then any access through this
        pointer has also to be considered as volatile (conservative) */
@@ -253,19 +253,19 @@ void fence_volatilet::compute()
             continue;
 
           try {
-            message.debug() << "debug: " 
+            message.debug() << "debug: "
               << id2string(w_it->second.object) << messaget::eom;
             const symbolt& var=ns.lookup(w_it->second.object);
             if(is_volatile(var.type))
             {
               message.debug() << "volatile: "
-                << id2string(w_it->second.object) << messaget::eom; 
-              fenced_edges.writes.push_front(w_it->second.symbol_expr); 
+                << id2string(w_it->second.object) << messaget::eom;
+              fenced_edges.writes.push_front(w_it->second.symbol_expr);
             }
-          } catch (std::string s) { 
-            message.warning() << "failed to find" << s 
-              << messaget::eom; 
-            continue; 
+          } catch (std::string s) {
+            message.warning() << "failed to find" << s
+              << messaget::eom;
+            continue;
           }
         }
         forall_rw_set_r_entries(r_it, rw_set)
@@ -275,7 +275,7 @@ void fence_volatilet::compute()
 
           try
           {
-            message.debug() << "debug: " 
+            message.debug() << "debug: "
               << id2string(r_it->second.object) << messaget::eom;
             const symbolt& var=ns.lookup(r_it->second.object);
             #if 0
@@ -283,16 +283,16 @@ void fence_volatilet::compute()
             #endif
             if(is_volatile(var.type))
             {
-              message.debug() << "volatile: " 
-                << id2string(r_it->second.object) << messaget::eom; 
-              fenced_edges.reads.push_front(r_it->second.symbol_expr); 
+              message.debug() << "volatile: "
+                << id2string(r_it->second.object) << messaget::eom;
+              fenced_edges.reads.push_front(r_it->second.symbol_expr);
             }
           }
           catch (std::string s)
-          { 
-            message.warning() << "failed to find" << s 
-              << messaget::eom; 
-            continue; 
+          {
+            message.warning() << "failed to find" << s
+              << messaget::eom;
+            continue;
           }
         }
     }
@@ -337,11 +337,11 @@ void fence_all_sharedt::compute()
 
           try {
             const symbolt& var=ns.lookup(w_it->second.object);
-            message.debug() << "debug: " 
+            message.debug() << "debug: "
               << id2string(w_it->second.object) << " shared: " << var.is_shared()
-              << " loc: " << w_it->second.symbol_expr.source_location() 
+              << " loc: " << w_it->second.symbol_expr.source_location()
               << messaget::eom;
-            if(var.is_shared()) 
+            if(var.is_shared())
             {
               /* this variable has perhaps been discovered after dereferencing
                  a pointer. We want to report this pointer */
@@ -350,7 +350,7 @@ void fence_all_sharedt::compute()
               if(ref.find(w_it->second.object)!=ref.end())
               {
                 const irep_idt from=ref[w_it->second.object];
-                const rw_set_baset::entryt& entry= ( 
+                const rw_set_baset::entryt& entry= (
                   rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
                   rw_set.r_entries[from] :
                   rw_set.w_entries[from]
@@ -362,15 +362,15 @@ void fence_all_sharedt::compute()
               }
               else {
                 message.debug() << "shared: "
-                  << id2string(w_it->second.object) << " -> " 
+                  << id2string(w_it->second.object) << " -> "
                   << w_it->second.object << messaget::eom;
                 fenced_edges.writes.push_front(w_it->second.symbol_expr);
               }
             }
-          } catch (std::string s) { 
-            message.warning() << "failed to find" << s 
-              << messaget::eom; 
-            continue; 
+          } catch (std::string s) {
+            message.warning() << "failed to find" << s
+              << messaget::eom;
+            continue;
           }
         }
         forall_rw_set_r_entries(r_it, rw_set)
@@ -380,11 +380,11 @@ void fence_all_sharedt::compute()
 
           try {
             const symbolt& var=ns.lookup(r_it->second.object);
-            message.debug() << "debug: " 
+            message.debug() << "debug: "
               << id2string(r_it->second.object) << " shared: "
-              << var.is_shared() << " loc: " 
+              << var.is_shared() << " loc: "
               << r_it->second.symbol_expr.source_location() << messaget::eom;
-            if(var.is_shared()) 
+            if(var.is_shared())
             {
               /* this variable has perhaps been discovered after dereferencing
                  a pointer. We want to report this pointer */
@@ -405,16 +405,16 @@ void fence_all_sharedt::compute()
                 fenced_edges.reads.push_front(entry.symbol_expr);
               }
               else {
-                message.debug() << "shared: " 
-                  << id2string(r_it->second.object) << " -> " 
+                message.debug() << "shared: "
+                  << id2string(r_it->second.object) << " -> "
                   << r_it->second.object << messaget::eom;
                 fenced_edges.reads.push_front(r_it->second.symbol_expr);
               }
             }
-          } catch (std::string s) { 
-            message.warning() << "failed to find" << s 
-              << messaget::eom; 
-            continue; 
+          } catch (std::string s) {
+            message.warning() << "failed to find" << s
+              << messaget::eom;
+            continue;
           }
        }
     }
@@ -454,7 +454,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
 #ifdef LOCAL_MAY
   , local_may_aliast& local_may
 #endif
-) 
+)
 {
   forall_goto_program_instructions(i_it, code) {
     if(i_it->is_function_call())
@@ -489,11 +489,11 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
 
       try {
         const symbolt& var=ns.lookup(w_it->second.object);
-        message.debug() << "debug: " 
+        message.debug() << "debug: "
           << id2string(w_it->second.object) << " shared: "
-          << var.is_shared() << " loc: " 
+          << var.is_shared() << " loc: "
           << w_it->second.symbol_expr.source_location() << messaget::eom;
-        if(var.is_shared()) 
+        if(var.is_shared())
         {
           /* this variable has perhaps been discovered after dereferencing
              a pointer. We want to report this pointer */
@@ -515,15 +515,15 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           }
           else {
             message.debug() << "shared: "
-              << id2string(w_it->second.object) << " -> " 
+              << id2string(w_it->second.object) << " -> "
               << w_it->second.object << messaget::eom;
             fenced_edges.writes.push_front(w_it->second.symbol_expr);
           }
         }
-      } catch (std::string s) { 
-        message.warning() << "failed to find" << s 
-          << messaget::eom; 
-        continue; 
+      } catch (std::string s) {
+        message.warning() << "failed to find" << s
+          << messaget::eom;
+        continue;
       }
     }
     forall_rw_set_r_entries(r_it, rw_set)
@@ -533,11 +533,11 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
 
       try {
         const symbolt& var=ns.lookup(r_it->second.object);
-        message.debug() << "debug: " 
+        message.debug() << "debug: "
           << id2string(r_it->second.object) << " shared: "
-          <<var.is_shared() << " loc: " 
+          <<var.is_shared() << " loc: "
           << r_it->second.symbol_expr.source_location() << messaget::eom;
-        if(var.is_shared() && var.type.id()!=ID_code) 
+        if(var.is_shared() && var.type.id()!=ID_code)
         {
           /* this variable has perhaps been discovered after dereferencing
              a pointer. We want to report this pointer */
@@ -559,15 +559,15 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           }
           else {
             message.debug() << "shared: "
-              << id2string(r_it->second.object) << " -> " 
+              << id2string(r_it->second.object) << " -> "
               << r_it->second.object << messaget::eom;
             fenced_edges.reads.push_front(r_it->second.symbol_expr);
           }
         }
-      } catch (std::string s) { 
-        message.warning() << "failed to find" << s 
-          << messaget::eom; 
-        continue; 
+      } catch (std::string s) {
+        message.warning() << "failed to find" << s
+          << messaget::eom;
+        continue;
       }
     }
   }
@@ -592,7 +592,7 @@ void fence_all_shared(
   goto_functionst &goto_functions)
 {
   messaget message(message_handler);
-  fence_all_sharedt instrumenter(message, value_sets, symbol_table, 
+  fence_all_sharedt instrumenter(message, value_sets, symbol_table,
     goto_functions);
   instrumenter.do_it();
 }
@@ -616,7 +616,7 @@ void fence_all_shared_aeg(
   goto_functionst &goto_functions)
 {
   messaget message(message_handler);
-  fence_all_shared_aegt instrumenter(message, value_sets, symbol_table, 
+  fence_all_shared_aegt instrumenter(message, value_sets, symbol_table,
     goto_functions);
   instrumenter.do_it();
 }
@@ -640,7 +640,7 @@ void fence_volatile(
   goto_functionst &goto_functions)
 {
   messaget message(message_handler);
-  fence_volatilet instrumenter(message, value_sets, symbol_table, 
+  fence_volatilet instrumenter(message, value_sets, symbol_table,
     goto_functions);
   instrumenter.do_it();
 }

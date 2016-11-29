@@ -54,7 +54,7 @@ struct thread_chain_args_t
 // Internal start routine for a thread in a thread_chain
 static void* thread_chain_start_routine(void *ptr)
 {
-  struct thread_chain_args_t *args = (struct thread_chain_args_t *) ptr; 
+  struct thread_chain_args_t *args = (struct thread_chain_args_t *) ptr;
 
   // ignore errors
   pthread_join(args->thread, NULL);

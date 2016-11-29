@@ -30,7 +30,7 @@ void CopyBuffer(unsigned char *src) {
     arrayTmp[i] = src[i];
   }
 }
- 
+
 int main()
 {
   logAppl.a=1;
@@ -60,4 +60,3 @@ int main()
   assert(arrayTmp[7]==1);
   #endif
 }
- 

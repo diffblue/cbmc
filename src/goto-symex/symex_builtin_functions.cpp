@@ -54,7 +54,7 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
       if(t.is_not_nil()) return t;
     }
   }
-  
+
   return nil_typet();
 }
 
@@ -65,15 +65,15 @@ void goto_symext::symex_malloc(
 {
   if(code.operands().size()!=1)
     throw "malloc expected to have one operand";
-    
+
   if(lhs.is_nil())
     return; // ignore
 
   dynamic_counter++;
-  
+
   exprt size=code.op0();
   typet object_type=nil_typet();
-  
+
   // is the type given?
   if(code.type().id()==ID_pointer && code.type().subtype().id()!=ID_empty)
   {
@@ -84,11 +84,11 @@ void goto_symext::symex_malloc(
     exprt tmp_size=size;
     state.rename(tmp_size, ns); // to allow constant propagation
     simplify(tmp_size, ns);
-    
+
     // special treatment for sizeof(T)*x
     {
       typet tmp_type=c_sizeof_type_rec(tmp_size);
-      
+
       if(tmp_type.is_not_nil())
       {
         // Did the size get multiplied?
@@ -122,25 +122,25 @@ void goto_symext::symex_malloc(
           else
           {
             mp_integer elements=alloc_size/elem_size;
-            
+
             if(elements*elem_size==alloc_size)
               object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
           }
         }
       }
     }
-    
+
     if(object_type.is_nil())
       object_type=array_typet(unsigned_char_type(), tmp_size);
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
-    
+
     if(object_type.id()==ID_array &&
        !to_array_type(object_type).size().is_constant())
     {
       exprt &size=to_array_type(object_type).size();
-    
+
       symbolt size_symbol;
 
       size_symbol.base_name="dynamic_object_size"+i2string(dynamic_counter);
@@ -157,7 +157,7 @@ void goto_symext::symex_malloc(
       symex_assign_rec(state, assignment);
     }
   }
-  
+
   // value
   symbolt value_symbol;
 
@@ -169,9 +169,9 @@ void goto_symext::symex_malloc(
   value_symbol.mode=ID_C;
 
   new_symbol_table.add(value_symbol);
-  
+
   address_of_exprt rhs;
-  
+
   if(object_type.id()==ID_array)
   {
     rhs.type()=pointer_typet(value_symbol.type.subtype());
@@ -185,7 +185,7 @@ void goto_symext::symex_malloc(
     rhs.op0()=value_symbol.symbol_expr();
     rhs.type()=pointer_typet(value_symbol.type);
   }
-  
+
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
@@ -228,7 +228,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
 {
   if(code.operands().size()!=1)
     throw "va_arg_next expected to have one operand";
-    
+
   if(lhs.is_nil())
     return; // ignore
 
@@ -238,7 +238,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   irep_idt id=get_symbol(tmp);
 
   exprt rhs=gen_zero(lhs.type());
-  
+
   if(id!=irep_idt())
   {
     // strip last name off id to get function name
@@ -293,7 +293,7 @@ irep_idt get_string_argument_rec(const exprt &src)
     if(src.op0().id()==ID_index)
     {
       assert(src.op0().operands().size()==2);
-      
+
       if(src.op0().op0().id()==ID_string_constant &&
          src.op0().op1().is_zero())
       {
@@ -302,7 +302,7 @@ irep_idt get_string_argument_rec(const exprt &src)
       }
     }
   }
-  
+
   return "";
 }
 
@@ -354,7 +354,7 @@ void goto_symext::symex_printf(
 
   for(unsigned i=1; i<operands.size(); i++)
     args.push_back(operands[i]);
-    
+
   const irep_idt format_string=
     get_string_argument(operands[0], ns);
 
@@ -388,7 +388,7 @@ void goto_symext::symex_input(
   state.rename(id_arg, ns);
 
   std::list<exprt> args;
-  
+
   for(unsigned i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
@@ -425,7 +425,7 @@ void goto_symext::symex_output(
   state.rename(id_arg, ns);
 
   std::list<exprt> args;
-  
+
   for(unsigned i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
@@ -461,7 +461,7 @@ void goto_symext::symex_cpp_new(
     throw "new expected to return pointer";
 
   do_array=(code.get(ID_statement)==ID_cpp_new_array);
-      
+
   dynamic_counter++;
 
   const std::string count_string(i2string(dynamic_counter));
@@ -474,7 +474,7 @@ void goto_symext::symex_cpp_new(
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
   symbol.mode=ID_cpp;
-  
+
   if(do_array)
   {
     symbol.type=array_typet();
@@ -486,14 +486,14 @@ void goto_symext::symex_cpp_new(
 
   //symbol.type.set("#active", symbol_expr(active_symbol));
   symbol.type.set("#dynamic", true);
-  
+
   new_symbol_table.add(symbol);
 
   // make symbol expression
 
   exprt rhs(ID_address_of, pointer_typet());
   rhs.type().subtype()=code.type().subtype();
-  
+
   if(do_array)
   {
     exprt index_expr(ID_index, code.type().subtype());
@@ -502,7 +502,7 @@ void goto_symext::symex_cpp_new(
   }
   else
     rhs.copy_to_operands(symbol.symbol_expr());
-  
+
   symex_assign_rec(state, code_assignt(lhs, rhs));
 }
 
@@ -545,21 +545,21 @@ void goto_symext::symex_trace(
     throw "CBMC_trace expects at least two arguments";
 
   int debug_thresh=unsafe_string2int(options.get_option("debug-level"));
-  
+
   mp_integer debug_lvl;
 
   if(to_integer(code.arguments()[0], debug_lvl))
     throw "CBMC_trace expects constant as first argument";
-    
+
   if(code.arguments()[1].id()!="implicit_address_of" ||
      code.arguments()[1].operands().size()!=1 ||
      code.arguments()[1].op0().id()!=ID_string_constant)
     throw "CBMC_trace expects string constant as second argument";
-  
+
   if(mp_integer(debug_thresh)>=debug_lvl)
   {
     std::list<exprt> vars;
-    
+
     irep_idt event=code.arguments()[1].op0().get(ID_value);
 
     for(unsigned j=2; j<code.arguments().size(); j++)

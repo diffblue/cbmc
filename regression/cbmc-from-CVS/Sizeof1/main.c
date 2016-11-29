@@ -28,6 +28,6 @@ OS_EVENT OSEventTbl[10] ;
 int main(void)
 {
   int x;
-  
+
   x=sizeof(OSEventTbl);
 }

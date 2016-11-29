@@ -38,7 +38,7 @@ protected:
   virtual void convert_address_of_rec(const exprt &expr);
 
   pointer_logict pointer_logic;
-  
+
 private:
   void convert_identifier(const std::string &identifier);
   void find_symbols(const exprt &expr);
@@ -51,19 +51,19 @@ private:
   static std::string array_index_type();
   static std::string array_index(unsigned i);
   static std::string dplib_pointer_type();
-  
+
   struct identifiert
   {
     typet type;
     exprt value;
-    
+
     identifiert()
     {
       type.make_nil();
       value.make_nil();
     }
   };
-  
+
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 

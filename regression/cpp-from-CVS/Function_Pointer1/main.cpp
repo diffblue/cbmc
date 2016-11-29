@@ -6,8 +6,8 @@ int f(int x)
 int main()
 {
   int (*p)(int);
-  
+
   p=f;
-  
+
   p(1);
 }

@@ -16,15 +16,15 @@ int main()
   assert(((float[2]) {2.7, 3.1})[1]==3.1f);
   assert(((struct POINT) {0, 1}).y==1);
   assert(((union U) {1.4}).f==1.4f);
-  
+
   // Address can be taken, lifetime is that of the
   // containing block.
   int *p=&(int){ 42 };
   assert(*p==42);
-  
+
   // and modified
   *p=43;
   assert(*p==43);
-  
+
   return 0;
 }

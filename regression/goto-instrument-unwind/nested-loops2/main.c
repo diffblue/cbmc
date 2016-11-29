@@ -9,7 +9,7 @@ int main()
    * every loop will be unwound K times
    **/
   const unsigned K=10;
-  
+
   const unsigned n=6;
   unsigned c=0, i;
 
@@ -27,14 +27,14 @@ int main()
     }
     unsigned eva2=i;
     if(K<eva2) eva2=K;
-    
+
     __CPROVER_assert(c2==eva2, "Nested loops unwind (2): the inner one");
 
   }
 
   unsigned eva=n;
   if(K<eva) eva=K;
-  
+
   __CPROVER_assert(c==eva, "Nested loops unwind (2)");
 
 }

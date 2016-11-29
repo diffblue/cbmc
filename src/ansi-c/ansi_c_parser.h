@@ -28,30 +28,30 @@ class ansi_c_parsert:public parsert
 {
 public:
   ansi_c_parse_treet parse_tree;
-  
+
   ansi_c_parsert():
     cpp98(false), cpp11(false),
     for_has_scope(false)
   {
   }
-  
+
   virtual bool parse() override
   {
     return yyansi_cparse()!=0;
   }
 
-  virtual void clear() override 
+  virtual void clear() override
   {
     parsert::clear();
     parse_tree.clear();
-    
+
     // scanner state
     tag_following=false;
     asm_block_following=false;
     parenthesis_counter=0;
     string_literal.clear();
     pragma_pack.clear();
-    
+
     // setup global scope
     scopes.clear();
     scopes.push_back(scopet());
@@ -67,33 +67,33 @@ public:
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
 
-  // recognize C++98 and C++11 keywords  
+  // recognize C++98 and C++11 keywords
   bool cpp98, cpp11;
-  
+
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
 
-  typedef ansi_c_identifiert identifiert;  
+  typedef ansi_c_identifiert identifiert;
   typedef ansi_c_scopet scopet;
 
   typedef std::list<scopet> scopest;
   scopest scopes;
-  
+
   scopet &root_scope()
   {
     return scopes.front();
   }
-  
+
   const scopet &root_scope() const
   {
     return scopes.front();
   }
-  
+
   void pop_scope()
   {
     scopes.pop_back();
   }
-   
+
   scopet &current_scope()
   {
     assert(!scopes.empty());
@@ -113,7 +113,7 @@ public:
     assert(declaration.id()==ID_declaration);
     parse_tree.items.push_back(declaration);
   }
-   
+
   void new_scope(const std::string &prefix)
   {
     const scopet &current=current_scope();
@@ -128,7 +128,7 @@ public:
     bool label);
 
   static ansi_c_id_classt get_class(const typet &type);
-  
+
   irep_idt lookup_label(const irep_idt base_name)
   {
     irep_idt identifier;

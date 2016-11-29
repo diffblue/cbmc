@@ -6,15 +6,15 @@ int my_f(int x, ...)
 {
   __builtin_va_list list;
   __builtin_va_start(list, x);
-  
+
   int value;
   unsigned i;
-  
+
   for(i=0; i<x; i++)
     value=__builtin_va_arg(list, int);
 
   __builtin_va_end(list);
-  
+
   return value;
 }
 

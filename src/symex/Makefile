@@ -61,4 +61,3 @@ symex$(EXEEXT): $(OBJ)
 
 symex-mac-signed: cbmc$(EXEEXT)
 	strip symex$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) symex$(EXEEXT)
-

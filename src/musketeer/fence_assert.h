@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: ILP construction for cycles affecting user-assertions 
+Module: ILP construction for cycles affecting user-assertions
         and resolution
 
 Author: Vincent Nimal

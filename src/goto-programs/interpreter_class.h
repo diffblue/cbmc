@@ -23,9 +23,9 @@ public:
     goto_functions(_goto_functions)
   {
   }
-  
+
   void operator()();
-  
+
   friend class simplify_evaluatet;
 
 protected:
@@ -35,7 +35,7 @@ protected:
 
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> memory_mapt;
   memory_mapt memory_map;
-  
+
   class memory_cellt
   {
   public:
@@ -43,17 +43,17 @@ protected:
     unsigned offset;
     mp_integer value;
   };
-  
+
   typedef std::vector<memory_cellt> memoryt;
   memoryt memory;
-  
+
   std::size_t stack_pointer;
-  
+
   void build_memory_map();
   void build_memory_map(const symbolt &symbol);
   unsigned get_size(const typet &type) const;
   void step();
-  
+
   void execute_assert();
   void execute_assume();
   void execute_assign();
@@ -81,14 +81,14 @@ protected:
     memory_mapt local_map;
     unsigned old_stack_pointer;
   };
-  
+
   typedef std::stack<stack_framet> call_stackt;
   call_stackt call_stack;
-  
+
   goto_functionst::function_mapt::const_iterator function;
   goto_programt::const_targett PC, next_PC;
   bool done;
-  
+
   bool evaluate_boolean(const exprt &expr) const
   {
     std::vector<mp_integer> v;
@@ -100,8 +100,8 @@ protected:
   void evaluate(
     const exprt &expr,
     std::vector<mp_integer> &dest) const;
-  
+
   mp_integer evaluate_address(const exprt &expr) const;
-  
+
   void show_state();
 };

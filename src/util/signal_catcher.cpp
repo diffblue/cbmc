@@ -69,7 +69,7 @@ void signal_catcher(int sig)
 {
   #if defined(_WIN32)
   #else
-  
+
   #if 1
   // kill any children by killing group
   killpg(0, sig);

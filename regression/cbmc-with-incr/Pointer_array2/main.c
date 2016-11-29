@@ -10,4 +10,3 @@ void main() {
   __cil_tmp24 = &(disk->disk_name);
   assert(__cil_tmp24!=0);
 }
-

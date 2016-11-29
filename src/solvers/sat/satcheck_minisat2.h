@@ -28,7 +28,7 @@ class satcheck_minisat2_baset:public cnf_solvert
 public:
   explicit satcheck_minisat2_baset(T *);
   virtual ~satcheck_minisat2_baset();
-  
+
   virtual resultt prop_solve() override;
   virtual tvt l_get(literalt a) const override final;
 
@@ -37,17 +37,17 @@ public:
 
   // extra MiniSat feature: solve with assumptions
   virtual void set_assumptions(const bvt &_assumptions) override;
-  
+
   // extra MiniSat feature: default branching decision
   void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const override;
   virtual bool has_set_assumptions() const override final { return true; }
   virtual bool has_is_in_conflict() const override final { return true; }
-  
+
 protected:
   T *solver;
-  
+
   void add_variables();
   bvt assumptions;
 };

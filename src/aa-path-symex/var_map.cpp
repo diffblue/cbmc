@@ -41,13 +41,13 @@ void var_mapt::var_infot::output(std::ostream &out) const
   case THREAD_LOCAL: out << "THREAD_LOCAL"; break;
   case SHARED: out << "SHARED"; break;
   }
-  
+
   out << "\n";
-  
+
   out << "number: " << number << "\n";
-  
+
   out << "type: " << type << "\n";
-  
+
   out << "\n";
 }
 
@@ -85,7 +85,7 @@ void var_mapt::init(var_infot &var_info)
       else
         var_info.kind=var_infot::PROCEDURE_LOCAL;
     }
-    
+
     catch(std::string s)
     {
       throw "var_mapt::init identifier \"" +

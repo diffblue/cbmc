@@ -41,13 +41,13 @@ public:
   void gate_nand(literalt a, literalt b, literalt o);
   void gate_nor(literalt a, literalt b, literalt o);
   void gate_equal(literalt a, literalt b, literalt o);
-  void gate_implies(literalt a, literalt b, literalt o);  
+  void gate_implies(literalt a, literalt b, literalt o);
 
   static bvt eliminate_duplicates(const bvt &);
 
 protected:
   size_t _no_variables;
-  
+
   bool process_clause(const bvt &bv, bvt &dest);
 
   static bool is_all(const bvt &bv, literalt l)
@@ -64,7 +64,7 @@ public:
   cnf_solvert():status(INIT), clause_counter(0)
   {
   }
-  
+
   virtual size_t no_clauses() const override
   {
     return clause_counter;
@@ -74,6 +74,6 @@ protected:
   typedef enum { INIT, SAT, UNSAT, ERROR } statust;
   statust status;
   size_t clause_counter;
-}; 
+};
 
 #endif

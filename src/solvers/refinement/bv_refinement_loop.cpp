@@ -73,14 +73,14 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
   post_process();
 
   debug() << "Solving with " << prop.solver_text() << eom;
-  
+
   unsigned iteration=0;
-  
+
   // now enter the loop
   while(true)
   {
     iteration++;
-  
+
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
@@ -116,7 +116,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
       else
         status() << "BV-Refinement: got UNSAT, and the proof fails, refining" << eom;
       break;
-    
+
     default:
       return D_ERROR;
     }
@@ -156,7 +156,7 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   prop.set_assumptions(assumptions);
   propt::resultt result=prop.prop_solve();
   prop.set_assumptions(parent_assumptions);
- 
+
   switch(result)
   {
    case propt::P_SATISFIABLE: return D_SATISFIABLE;
@@ -180,7 +180,7 @@ Function: bv_refinementt::check_SAT
 void bv_refinementt::check_SAT()
 {
   progress=false;
-  
+
   arrays_overapproximated();
 
   for(approximationst::iterator

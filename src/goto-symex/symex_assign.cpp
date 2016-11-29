@@ -62,22 +62,22 @@ void goto_symext::symex_assign(
 
   replace_nondet(lhs);
   replace_nondet(rhs);
-  
+
   if(rhs.id()==ID_side_effect)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
-    
+
     if(statement==ID_function_call)
     {
       assert(!side_effect_expr.operands().empty());
-    
+
       if(side_effect_expr.op0().id()!=ID_symbol)
         throw "symex_assign: expected symbol as function";
 
       const irep_idt &identifier=
         to_symbol_expr(side_effect_expr.op0()).get_identifier();
-      
+
       throw "symex_assign: unexpected function call: "+id2string(identifier);
     }
     else if(statement==ID_cpp_new ||
@@ -150,7 +150,7 @@ exprt goto_symext::add_to_lhs(
     assert(p->operands().size()>=1);
     p=&p->op0();
   }
-  
+
   assert(p->is_nil());
 
   *p=tmp_what;
@@ -218,10 +218,10 @@ void goto_symext::symex_assign_rec(
   {
     // this is stuff like __real__ x = 1;
     assert(lhs.operands().size()==1);
-    
+
     exprt new_rhs=exprt(ID_complex, lhs.op0().type());
     new_rhs.operands().resize(2);
-    
+
     if(lhs.id()==ID_complex_real)
     {
       new_rhs.op0()=rhs;
@@ -232,7 +232,7 @@ void goto_symext::symex_assign_rec(
       new_rhs.op0()=unary_exprt(ID_complex_real, lhs.op0(), lhs.type());
       new_rhs.op1()=rhs;
     }
-    
+
     symex_assign_rec(state, lhs.op0(), full_lhs, new_rhs, guard, assignment_type);
   }
   else
@@ -260,7 +260,7 @@ void goto_symext::symex_assign_symbol(
   assignment_typet assignment_type)
 {
   exprt ssa_rhs=rhs;
-  
+
   // put assignment guard into the rhs
   if(!guard.is_true())
   {
@@ -271,13 +271,13 @@ void goto_symext::symex_assign_symbol(
     tmp_ssa_rhs.false_case()=lhs;
     tmp_ssa_rhs.swap(ssa_rhs);
   }
-  
+
   state.rename(ssa_rhs, ns);
   do_simplify(ssa_rhs);
-  
+
   ssa_exprt ssa_lhs=lhs;
   state.assignment(ssa_lhs, ssa_rhs, ns, options.get_bool_option("simplify"), constant_propagation);
-  
+
   exprt ssa_full_lhs=full_lhs;
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
   const bool record_events=state.record_events;
@@ -287,16 +287,16 @@ void goto_symext::symex_assign_symbol(
 
   guardt tmp_guard(state.guard);
   tmp_guard.append(guard);
-  
+
   // do the assignment
   const symbolt &symbol=ns.lookup(ssa_lhs.get_original_expr());
   if(symbol.is_auxiliary) assignment_type=symex_targett::HIDDEN;
-  
+
   target.assignment(
     tmp_guard.as_expr(),
     ssa_lhs,
     ssa_full_lhs, add_to_lhs(full_lhs, ssa_lhs.get_original_expr()),
-    ssa_rhs, 
+    ssa_rhs,
     state.source,
     assignment_type);
 }
@@ -322,14 +322,14 @@ void goto_symext::symex_assign_typecast(
   assignment_typet assignment_type)
 {
   // these may come from dereferencing on the lhs
-  
+
   assert(lhs.operands().size()==1);
-  
+
   exprt rhs_typecasted=rhs;
   rhs_typecasted.make_typecast(lhs.op0().type());
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
-  
+
   symex_assign_rec(
     state, lhs.op0(), new_full_lhs, rhs_typecasted, guard, assignment_type);
 }
@@ -370,7 +370,7 @@ void goto_symext::symex_assign_array(
           lhs_type.id_string()+"'";
 
   #ifdef USE_UPDATE
-  
+
   // turn
   //   a[i]=e
   // into
@@ -380,12 +380,12 @@ void goto_symext::symex_assign_array(
   new_rhs.old()=lhs_array;
   new_rhs.designator().push_back(index_designatort(lhs_index));
   new_rhs.new_value()=rhs;
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
     state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
-  
+
   #else
   // turn
   //   a[i]=e
@@ -394,7 +394,7 @@ void goto_symext::symex_assign_array(
 
   exprt new_rhs(ID_with, lhs_type);
   new_rhs.copy_to_operands(lhs_array, lhs_index, rhs);
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
@@ -433,7 +433,7 @@ void goto_symext::symex_assign_struct_member(
   if(lhs_struct.id()==ID_typecast)
   {
     assert(lhs_struct.operands().size()==1);
-    
+
     if(lhs_struct.op0().id()=="NULL-object")
     {
       // ignore, and give up
@@ -455,7 +455,7 @@ void goto_symext::symex_assign_struct_member(
   const irep_idt &component_name=lhs.get_component_name();
 
   #ifdef USE_UPDATE
-  
+
   // turn
   //   a.c=e
   // into
@@ -465,12 +465,12 @@ void goto_symext::symex_assign_struct_member(
   new_rhs.old()=lhs_struct;
   new_rhs.designator().push_back(member_designatort(component_name));
   new_rhs.new_value()=rhs;
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
     state, lhs_struct, new_full_lhs, new_rhs, guard, assignment_type);
-  
+
   #else
   // turn
   //   a.c=e
@@ -480,7 +480,7 @@ void goto_symext::symex_assign_struct_member(
   exprt new_rhs(ID_with, lhs_struct.type());
   new_rhs.copy_to_operands(lhs_struct, exprt(ID_member_name), rhs);
   new_rhs.op1().set(ID_component_name, component_name);
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
@@ -511,20 +511,20 @@ void goto_symext::symex_assign_if(
   // we have (c?a:b)=e;
 
   guardt old_guard=guard;
-  
+
   exprt renamed_guard=lhs.cond();
   state.rename(renamed_guard, ns);
   do_simplify(renamed_guard);
 
-  if(!renamed_guard.is_false())  
+  if(!renamed_guard.is_false())
   {
     guard.add(renamed_guard);
     symex_assign_rec(state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
     guard.swap(old_guard);
   }
-   
+
   if(!renamed_guard.is_true())
-  { 
+  {
     guard.add(not_exprt(renamed_guard));
     symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
     guard.swap(old_guard);
@@ -565,10 +565,9 @@ void goto_symext::symex_assign_byte_extract(
 
   new_rhs.copy_to_operands(lhs.op(), lhs.offset(), rhs);
   new_rhs.type()=lhs.op().type();
-  
+
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
     state, lhs.op(), new_full_lhs, new_rhs, guard, assignment_type);
 }
-

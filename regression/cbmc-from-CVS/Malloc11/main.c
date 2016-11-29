@@ -24,7 +24,7 @@ int main()
 
   if( a != NULL)
     a[0]=0;
-    
+
   if(n>=1) assert(a[0]==0);
 
   return 1;

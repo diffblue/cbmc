@@ -37,10 +37,10 @@ void goto_symext::symex_start_thread(statet &state)
   target.spawn(state.guard.as_expr(), state.source);
 
   const goto_programt::instructiont &instruction=*state.source.pc;
-  
+
   if(instruction.targets.size()!=1)
     throw "start_thread expects one target";
-    
+
   goto_programt::const_targett thread_target=
     instruction.targets.front();
 
@@ -125,4 +125,3 @@ void goto_symext::symex_start_thread(statet &state)
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
   }
 }
-

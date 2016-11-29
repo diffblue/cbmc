@@ -8,7 +8,7 @@ union U my_u;
 
 union U
 {
-  int some;  
+  int some;
 };
 
 struct S my_s;

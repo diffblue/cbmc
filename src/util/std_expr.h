@@ -80,7 +80,7 @@ public:
   {
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param identifier Name of symbol
   */
   inline explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
@@ -88,14 +88,14 @@ public:
     set_identifier(identifier);
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param  type Type of symbol
   */
   inline explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param identifier Name of symbol
    * \param  type Type of symbol
   */
@@ -125,7 +125,7 @@ public:
   {
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param identifier Name of symbol
   */
   inline explicit decorated_symbol_exprt(const irep_idt &identifier):
@@ -133,7 +133,7 @@ public:
   {
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param  type Type of symbol
   */
   inline explicit decorated_symbol_exprt(const typet &type):
@@ -141,7 +141,7 @@ public:
   {
   }
 
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param identifier Name of symbol
    * \param  type Type of symbol
   */
@@ -150,17 +150,17 @@ public:
     const typet &type):symbol_exprt(identifier, type)
   {
   }
-  
+
   inline bool is_static_lifetime() const
   {
     return get_bool(ID_C_static_lifetime);
   }
-  
+
   inline void set_static_lifetime()
   {
     return set(ID_C_static_lifetime, true);
   }
-  
+
   inline void clear_static_lifetime()
   {
     remove(ID_C_static_lifetime);
@@ -170,12 +170,12 @@ public:
   {
     return get_bool(ID_C_thread_local);
   }
-  
+
   inline void set_thread_local()
   {
     return set(ID_C_thread_local, true);
   }
-  
+
   inline void clear_thread_local()
   {
     remove(ID_C_thread_local);
@@ -481,7 +481,7 @@ public:
   {
     copy_to_operands(_lhs, _rhs);
   }
-  
+
 protected:
   using exprt::op2; // hide
 };
@@ -1034,18 +1034,18 @@ public:
   {
     operands().resize(2);
   }
- 
+
   explicit inline index_exprt(const typet &_type):exprt(ID_index, _type)
   {
     operands().resize(2);
   }
-  
+
   inline index_exprt(const exprt &_array, const exprt &_index):
     exprt(ID_index, _array.type().subtype())
   {
     copy_to_operands(_array, _index);
   }
-  
+
   inline index_exprt(
     const exprt &_array,
     const exprt &_index,
@@ -1054,7 +1054,7 @@ public:
   {
     copy_to_operands(_array, _index);
   }
-  
+
   inline exprt &array()
   {
     return op0();
@@ -1112,13 +1112,13 @@ public:
   inline array_of_exprt():unary_exprt(ID_array_of)
   {
   }
- 
+
   explicit inline array_of_exprt(
     const exprt &_what, const array_typet &_type):
     unary_exprt(ID_array_of, _what, _type)
   {
   }
- 
+
   inline exprt &what()
   {
     return op0();
@@ -1166,12 +1166,12 @@ public:
   inline array_exprt():exprt(ID_array)
   {
   }
- 
+
   explicit inline array_exprt(const array_typet &_type):
     exprt(ID_array, _type)
   {
   }
- 
+
   friend inline const array_exprt &to_array_expr(const exprt &expr)
   {
     assert(expr.id()==ID_array);
@@ -1209,12 +1209,12 @@ public:
   inline vector_exprt():exprt(ID_vector)
   {
   }
- 
+
   explicit inline vector_exprt(const vector_typet &_type):
     exprt(ID_vector, _type)
   {
   }
- 
+
   friend inline const vector_exprt &to_vector_expr(const exprt &expr)
   {
     assert(expr.id()==ID_vector);
@@ -1252,12 +1252,12 @@ public:
   inline union_exprt():unary_exprt(ID_union)
   {
   }
- 
+
   explicit inline union_exprt(const typet &_type):
     unary_exprt(ID_union, _type)
   {
   }
- 
+
   explicit inline union_exprt(
     const irep_idt &_component_name,
     const exprt &_value,
@@ -1266,7 +1266,7 @@ public:
   {
     set_component_name(_component_name);
   }
- 
+
   friend inline const union_exprt &to_union_expr(const exprt &expr)
   {
     assert(expr.id()==ID_union && expr.operands().size()==1);
@@ -1288,7 +1288,7 @@ public:
   {
     set(ID_component_name, component_name);
   }
-  
+
   inline std::size_t get_component_number() const
   {
     return get_size_t(ID_component_number);
@@ -1324,12 +1324,12 @@ public:
   inline struct_exprt():exprt(ID_struct)
   {
   }
- 
+
   explicit inline struct_exprt(const typet &_type):
     exprt(ID_struct, _type)
   {
   }
- 
+
   friend inline const struct_exprt &to_struct_expr(const exprt &expr)
   {
     assert(expr.id()==ID_struct);
@@ -1367,18 +1367,18 @@ public:
   inline complex_exprt():binary_exprt(ID_complex)
   {
   }
- 
+
   explicit inline complex_exprt(const complex_typet &_type):
     binary_exprt(ID_complex, _type)
   {
   }
-  
+
   explicit inline complex_exprt(
     const exprt &_real, const exprt &_imag, const complex_typet &_type):
     binary_exprt(_real, ID_complex, _imag, _type)
   {
   }
-  
+
   inline exprt real()
   {
     return op0();
@@ -1450,7 +1450,7 @@ public:
   {
     return op0();
   }
-  
+
   const exprt &root_object() const
   {
     const exprt *p=&object();
@@ -1460,7 +1460,7 @@ public:
       assert(!p->operands().empty());
       p=&p->op0();
     }
-    
+
     return *p;
   }
 
@@ -1717,7 +1717,7 @@ public:
 
 /*! 1) generates a conjunction for two or more operands
  *  2) for one operand, returns the operand
- *  3) returns true otherwise 
+ *  3) returns true otherwise
 */
 
 exprt conjunction(const exprt::operandst &);
@@ -1819,7 +1819,7 @@ public:
 
 /*! 1) generates a disjunction for two or more operands
  *  2) for one operand, returns the operand
- *  3) returns false otherwise 
+ *  3) returns false otherwise
 */
 
 exprt disjunction(const exprt::operandst &);
@@ -2257,7 +2257,7 @@ public:
   {
     copy_to_operands(_src, _lower, _upper);
   }
-  
+
   extractbits_exprt(
     const exprt &_src,
     const std::size_t _upper,
@@ -2337,7 +2337,7 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline exprt &object()
   {
     return op0();
@@ -2388,7 +2388,7 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline exprt &op()
   {
     return op0();
@@ -2507,7 +2507,7 @@ public:
   {
     operands().resize(3);
   }
-  
+
   inline exprt &cond()
   {
     return op0();
@@ -2584,7 +2584,7 @@ public:
   {
     operands().resize(3);
   }
-  
+
   inline exprt &old()
   {
     return op0();
@@ -2649,7 +2649,7 @@ public:
   {
     copy_to_operands(_index);
   }
-  
+
   inline const exprt &index() const
   {
     return op0();
@@ -2751,7 +2751,7 @@ public:
     operands().resize(3);
     op1().id(ID_designator);
   }
-  
+
   inline exprt &old()
   {
     return op0();
@@ -2761,7 +2761,7 @@ public:
   {
     return op0();
   }
-  
+
   // the designator operands are either
   // 1) member_designator or
   // 2) index_designator
@@ -2831,7 +2831,7 @@ public:
   {
     operands().resize(3);
   }
-  
+
   inline exprt &array()
   {
     return op0();
@@ -2920,7 +2920,7 @@ public:
   {
     operands().resize(1);
   }
-  
+
   inline irep_idt get_component_name() const
   {
     return get(ID_component_name);
@@ -2930,7 +2930,7 @@ public:
   {
     set(ID_component_name, component_name);
   }
-  
+
   inline std::size_t get_component_number() const
   {
     return get_size_t(ID_component_number);
@@ -2941,13 +2941,13 @@ public:
     set(ID_component_number, component_number);
   }
 
-  // will go away, use compound()  
+  // will go away, use compound()
   inline const exprt &struct_op() const
   {
     return op0();
   }
 
-  // will go away, use compound()  
+  // will go away, use compound()
   inline exprt &struct_op()
   {
     return op0();
@@ -3244,7 +3244,7 @@ public:
   {
     copy_to_operands(_lhs, _rhs, _rm);
   }
-  
+
   inline exprt &lhs()
   {
     return op0();
@@ -3268,12 +3268,12 @@ public:
   inline exprt &rounding_mode()
   {
     return op2();
-  }  
+  }
 
   inline const exprt &rounding_mode() const
   {
     return op2();
-  }  
+  }
 };
 
 /*! \brief Cast a generic exprt to an \ref ieee_float_op_exprt
@@ -3327,7 +3327,7 @@ public:
   inline explicit constant_exprt(const typet &type):exprt(ID_constant, type)
   {
   }
-  
+
   inline constant_exprt(const irep_idt &_value, const typet &_type):
     exprt(ID_constant, _type)
   {
@@ -3345,7 +3345,7 @@ public:
   }
 
   bool value_is_zero_string() const;
-  
+
   static constant_exprt integer_constant(unsigned);
 };
 
@@ -3493,13 +3493,13 @@ public:
     exprt(ID_concatenation, _type)
   {
   }
-  
+
   explicit inline concatenation_exprt(
     const exprt &_op0, const exprt &_op1, const typet &_type):
     exprt(ID_concatenation, _type)
   {
     copy_to_operands(_op0, _op1);
-  }  
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref concatenation_exprt
@@ -3548,7 +3548,7 @@ public:
     operands().resize(3);
     op0()=symbol_exprt();
   }
-  
+
   symbol_exprt &symbol()
   {
     return static_cast<symbol_exprt &>(op0());
@@ -3615,7 +3615,7 @@ public:
     operands().resize(2);
     op0()=symbol_exprt();
   }
-  
+
   symbol_exprt &symbol()
   {
     return static_cast<symbol_exprt &>(op0());
@@ -3647,7 +3647,7 @@ public:
     operands().resize(2);
     op0()=symbol_exprt();
   }
-  
+
   symbol_exprt &symbol()
   {
     return static_cast<symbol_exprt &>(op0());

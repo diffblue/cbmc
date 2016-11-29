@@ -45,7 +45,7 @@ bool parse_json(
   // save some memory
   json_parser.clear();
 
-  return result;  
+  return result;
 }
 
 /*******************************************************************\
@@ -67,8 +67,8 @@ bool parse_json(
   jsont &dest)
 {
   std::ifstream in(filename);
-  
+
   if(!in) return true;
- 
+
   return parse_json(in, filename, message_handler, dest);
 }

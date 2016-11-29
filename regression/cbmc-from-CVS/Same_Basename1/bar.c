@@ -6,4 +6,3 @@ int main()
   assert(func(x));
   return 0;
 }
-

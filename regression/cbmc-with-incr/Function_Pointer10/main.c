@@ -20,12 +20,12 @@ void test2()
 {
   char a=5;
   int (*fun) (int, int);
-    
+
   if(a)
     fun = func;
   else
     fun = func2;
-            
+
   int b=(*fun) (a, a);
 }
 

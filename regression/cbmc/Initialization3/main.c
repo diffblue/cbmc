@@ -28,4 +28,3 @@ int main()
   Split(&t);
   return 0;
 }
-

@@ -140,7 +140,7 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_input(const char *id, ...);\n"
     "void __CPROVER_output(const char *id, ...);\n"
     "void __CPROVER_cover(__CPROVER_bool condition);\n"
-    
+
     // concurrency-related
     "void __CPROVER_atomic_begin();\n"
     "void __CPROVER_atomic_end();\n"
@@ -151,13 +151,13 @@ void ansi_c_internal_additions(std::string &code)
 
     // traces
     "void CBMC_trace(int lvl, const char *event, ...);\n"
-    
+
     // pointers
     "unsigned __CPROVER_POINTER_OBJECT(const void *p);\n"
     "signed __CPROVER_POINTER_OFFSET(const void *p);\n"
     "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
-    
+
     // malloc
     "void *__CPROVER_malloc(__CPROVER_size_t size);\n"
     "const void *__CPROVER_deallocated=0;\n"
@@ -169,7 +169,7 @@ void ansi_c_internal_additions(std::string &code)
 
     // this is ANSI-C
     "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"
-    
+
     // this is GCC
     "extern __CPROVER_thread_local const char __FUNCTION__[__CPROVER_constant_infinity_uint];\n"
     "extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
@@ -202,7 +202,7 @@ void ansi_c_internal_additions(std::string &code)
     "double __CPROVER_fabs(double x);\n"
     "long double __CPROVER_fabsl(long double x);\n"
     "float __CPROVER_fabsf(float x);\n"
-    
+
     // arrays
     "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
     "void __CPROVER_array_copy(const void *dest, const void *src);\n"
@@ -211,10 +211,10 @@ void ansi_c_internal_additions(std::string &code)
     // k-induction
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
       "unsigned step, unsigned loop_free);\n"
-      
+
     // format string-related
     "int __CPROVER_scanf(const char *, ...);\n"
-    
+
     // pipes, write, read, close
     "struct __CPROVER_pipet {\n"
     "  _Bool widowed;\n"
@@ -228,7 +228,7 @@ void ansi_c_internal_additions(std::string &code)
     "unsigned __CPROVER_pipe_count=0;\n"
 
     "\n";
-    
+
   // GCC junk stuff, also for CLANG and ARM
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::GCC ||
      config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE ||
@@ -246,7 +246,7 @@ void ansi_c_internal_additions(std::string &code)
     {
       if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
         code+="typedef double __float128;\n"; // clang doesn't do __float128
-    
+
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
     }
@@ -290,15 +290,15 @@ void ansi_c_internal_additions(std::string &code)
   if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
     code+="int __noop();\n"
           "int __assume(int);\n";
-    
+
   // ARM stuff
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
     code+=arm_builtin_headers;
-    
+
   // CW stuff
   if(config.ansi_c.mode==configt::ansi_ct::flavourt::CODEWARRIOR)
     code+=cw_builtin_headers;
-    
+
   // Architecture strings
   ansi_c_architecture_strings(code);
 }

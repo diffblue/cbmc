@@ -244,7 +244,7 @@ void sat_path_enumeratort::build_fixed() {
       fixedt->make_skip();
       continue;
     }
-    
+
     if (d != distinguishing_points.end()) {
       // We've hit a distinguishing point.  Set the relevant shadow
       // distinguisher to true.

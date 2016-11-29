@@ -27,16 +27,16 @@ protected:
   typedef boolbvt SUB;
 
   unsigned object_bits, offset_bits, bits;
-  
+
   void encode(std::size_t object, bvt &bv);
-  
+
   virtual bvt convert_pointer_type(const exprt &expr);
-  
+
   virtual void add_addr(const exprt &expr, bvt &bv);
-  
+
   // overloading
   virtual literalt convert_rest(const exprt &expr);
-  
+
   virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   virtual exprt bv_get_rec(
@@ -48,7 +48,7 @@ protected:
   bool convert_address_of_rec(
     const exprt &expr,
     bvt &bv);
-    
+
   void offset_arithmetic(bvt &bv, const mp_integer &x);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const exprt &index);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const bvt &index_bv);
@@ -58,12 +58,12 @@ protected:
     bvt bv, op;
     exprt expr;
   };
-  
+
   typedef std::list<postponedt> postponed_listt;
-  postponed_listt postponed_list;  
-  
+  postponed_listt postponed_list;
+
   void do_postponed(const postponedt &postponed);
-  
+
   static bool is_ptr(const typet &type)
   {
     return type.id()==ID_pointer || type.id()==ID_reference;

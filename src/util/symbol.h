@@ -34,37 +34,37 @@ class symbolt
 public:
   /// Type of symbol
   typet type;
-  
+
   /// Initial value of symbol
   exprt value;
-  
+
   /// Source code location of definition of symbol
   source_locationt location;
-  
+
   /// The unique identifier
   irep_idt name;
-  
+
   /// Name of module the symbol belongs to
   irep_idt module;
-  
+
   /// Base (non-scoped) name
   irep_idt base_name;
-  
+
   /// Language mode
   irep_idt mode;
-  
+
   /// Language-specific display name
   irep_idt pretty_name;
-  
+
   const irep_idt &display_name() const
   {
     return pretty_name.empty()?name:pretty_name;
   }
-  
+
   // global use
   bool is_type, is_macro, is_exported,
        is_input, is_output, is_state_var, is_property;
-       
+
   // ANSI-C
   bool is_static_lifetime, is_thread_local;
   bool is_lvalue, is_file_local, is_extern, is_volatile,
@@ -74,7 +74,7 @@ public:
   {
     clear();
   }
-  
+
   void clear()
   {
     type.make_nil();
@@ -89,21 +89,21 @@ public:
     is_lvalue=is_file_local=is_extern=is_volatile=
     is_parameter=is_auxiliary=is_weak=false;
   }
-     
+
   void swap(symbolt &b);
   void show(std::ostream &out) const;
 
   // serialization
   irept to_irep() const;
   void from_irep(const irept &src);
-  
+
   class symbol_exprt symbol_expr() const;
-  
+
   inline bool is_shared() const
   {
     return !is_thread_local;
   }
-  
+
   inline bool is_procedure_local() const
   {
     return !is_static_lifetime;
@@ -114,7 +114,7 @@ std::ostream &operator<<(std::ostream &out,
                          const symbolt &symbol);
 
 #include <list>
- 
+
 typedef std::list<symbolt> symbol_listt;
 
 #define forall_symbol_list(it, expr) \

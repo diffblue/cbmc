@@ -38,7 +38,7 @@ bool is_volatile(
     assert(s_it!=symbol_table.symbols.end());
     return is_volatile(symbol_table, s_it->second.type);
   }
-  
+
   return false;
 }
 
@@ -58,7 +58,7 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
 {
   Forall_operands(it, expr)
     nondet_volatile_rhs(symbol_table, *it);
-    
+
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dereference)
   {
@@ -66,7 +66,7 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
     {
       typet t=expr.type();
       t.remove(ID_C_volatile);
-    
+
       // replace by nondet
       side_effect_expr_nondett nondet_expr(t);
       expr.swap(nondet_expr);
@@ -130,7 +130,7 @@ void nondet_volatile(
   Forall_goto_program_instructions(i_it, goto_program)
   {
     goto_programt::instructiont &instruction=*i_it;
-    
+
     if(instruction.is_assign())
     {
       nondet_volatile_rhs(symbol_table, to_code_assign(instruction.code).rhs());
@@ -139,7 +139,7 @@ void nondet_volatile(
     else if(instruction.is_function_call())
     {
       // these have arguments and a return LHS
-      
+
       code_function_callt &code_function_call=
         to_code_function_call(instruction.code);
 
@@ -149,7 +149,7 @@ void nondet_volatile(
           it!=code_function_call.arguments().end();
           it++)
         nondet_volatile_rhs(symbol_table, *it);
-      
+
       // do return value
       nondet_volatile_lhs(symbol_table, code_function_call.lhs());
     }

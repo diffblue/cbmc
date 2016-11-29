@@ -21,4 +21,3 @@
 <li><a href="/hardware/">Hardware Verification</a></li>
 </ul>
 </div>
-

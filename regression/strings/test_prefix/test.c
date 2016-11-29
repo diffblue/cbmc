@@ -12,6 +12,6 @@ int main()
   __CPROVER_bool c = __CPROVER_string_isprefix(__CPROVER_string_literal("Wello"),s);
   assert(b);
   assert(c);
-    
+
   return 0;
 }

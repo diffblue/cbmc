@@ -1114,7 +1114,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   const cfg_dominatorst &dominators=loops.get_dominator_info();
 
   // always use convert_goto_if for dead code as the construction below relies
-  // on effective dominator information 
+  // on effective dominator information
   cfg_dominatorst::cfgt::entry_mapt::const_iterator t_entry=
     dominators.cfg.entry_map.find(target);
   assert(t_entry!=dominators.cfg.entry_map.end());
@@ -2225,7 +2225,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       cleanup_expr(*it, no_typecast);
   }
 
-  // work around transparent union argument 
+  // work around transparent union argument
   if(expr.id()==ID_union &&
      ns.follow(expr.type()).id()!=ID_union)
   {
@@ -2269,9 +2269,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     {
       // Replace by a function call to nondet_...
       // We first search for a suitable one in the symbol table.
-      
+
       irep_idt id="";
-      
+
       for(symbol_tablet::symbolst::const_iterator
           it=symbol_table.symbols.begin();
           it!=symbol_table.symbols.end();
@@ -2285,13 +2285,13 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         id=it->second.name;
         break;
       }
-      
+
       // none found? make one
-      
+
       if(id=="")
       {
         irep_idt base_name="";
-      
+
         if(expr.type().get(ID_C_c_type)!="")
         {
           irep_idt suffix;
@@ -2301,7 +2301,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
              symbol_table.symbols.end())
             base_name="nondet_"+id2string(suffix);
         }
-        
+
         if(base_name=="")
         {
           unsigned count;
@@ -2311,29 +2311,29 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
               count++);
           base_name="nondet_"+i2string(count);
         }
-        
+
         code_typet code_type;
         code_type.return_type()=expr.type();
-        
+
         symbolt symbol;
         symbol.base_name=base_name;
         symbol.name=base_name;
         symbol.type=code_type;
         id=symbol.name;
-        
+
         symbol_table.move(symbol);
       }
-      
+
       const symbolt &symbol=ns.lookup(id);
-      
+
       symbol_exprt symbol_expr(symbol.name, symbol.type);
       symbol_expr.add_source_location()=expr.source_location();
-      
+
       side_effect_expr_function_callt call;
       call.add_source_location()=expr.source_location();
       call.function()=symbol_expr;
       call.type()=expr.type();
-      
+
       expr.swap(call);
     }
   }
@@ -2400,4 +2400,3 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     }
   }
 }
-

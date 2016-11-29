@@ -18,7 +18,7 @@ public:
   {
     get_xml_options(_cmdline);
   }
-  
+
 protected:
   void get_xml_options(cmdlinet &cmdline);
   void get_xml_options(const class xmlt &xml, cmdlinet &cmdline);

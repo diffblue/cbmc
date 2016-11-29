@@ -35,7 +35,7 @@ void replace_async(
         if(fct.function().id() == ID_symbol)
         {
           const symbol_exprt &fsym=to_symbol_expr(fct.function());
-           
+
           if(ns.lookup(fsym.get_identifier()).base_name == "pthread_create")
           {
             assert(fct.arguments().size()>=4);
@@ -56,7 +56,7 @@ void replace_async(
             /* takes the 4th argument (argument of the function to call) */
             new_call.arguments()[0]=fct.arguments()[3];
 
-            /* __CPROVER_ASYNC labels only evaluated at C parsing time; we 
+            /* __CPROVER_ASYNC labels only evaluated at C parsing time; we
                reproduce here the effects of the evaluation of this label */
             i_it->labels.push_front("__CPROVER_ASYNC_0");
             i_it->clear(START_THREAD);

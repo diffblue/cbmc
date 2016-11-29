@@ -8,7 +8,7 @@ class module_name
       operator unsigned int();
       operator bool();
 };
- 
+
 void f (module_name name) {
     (const char*) name;
     name .operator const char *();

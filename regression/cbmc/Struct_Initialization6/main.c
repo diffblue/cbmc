@@ -6,7 +6,7 @@ struct X
   {
     int z;
   } f [3];
-  
+
   int g, h;
 
 } foo = { .g=200, .f[1].z=100 };
@@ -30,7 +30,7 @@ int main()
   assert(z.a3==30);
   assert(z.a4==40);
   assert(z.a5==0);
-  
+
   assert(enable[0]==1);
   assert(enable[30]==2);
   assert(enable[31]==3);

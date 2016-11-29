@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: collection of pairs (for Pensieve's static delay-set 
+Module: collection of pairs (for Pensieve's static delay-set
         analysis) in graph of abstract events
 
 Author:
@@ -50,18 +50,18 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet& ns)
       continue;
 
     /* find Y s.t. X --po-- Y and Y --cmp-- B, by rules (2) + (4) */
-    if(find_second_event(first)) 
+    if(find_second_event(first))
     {
       const abstract_eventt& first_event=egraph[first];
- 
+
       try {
         /* directly outputs */
-        OUTPUT(res, "fence", first_event.source_location.get_file(), 
-          first_event.source_location.get_line(), first_event.variable, 
+        OUTPUT(res, "fence", first_event.source_location.get_file(),
+          first_event.source_location.get_line(), first_event.variable,
             first_event.operation);
-      } catch (std::string s) { 
+      } catch (std::string s) {
         egraph.message.warning() << "failed to find" << s << messaget::eom;
-        continue; 
+        continue;
       }
     }
   }
@@ -82,7 +82,7 @@ Function: event_grapht::graph_explorert::find_second_event
 \*******************************************************************/
 
 bool event_grapht::graph_pensieve_explorert::find_second_event(
-  unsigned current) 
+  unsigned current)
 {
   if(visited_nodes.find(current)!=visited_nodes.end())
     return false;
@@ -102,4 +102,3 @@ bool event_grapht::graph_pensieve_explorert::find_second_event(
 
   return false;
 }
-

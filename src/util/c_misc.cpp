@@ -33,14 +33,14 @@ void MetaChar(std::string &out, char c, bool inString)
   switch(c)
   {
   case '\'':
-    if(inString) 
+    if(inString)
       out+="'";
     else
       out+="\\'";
     break;
 
   case '"':
-    if(inString) 
+    if(inString)
       out+="\\\"";
     else
       out+="\"";
@@ -135,9 +135,9 @@ Function: MetaString
 std::string MetaString(const std::string &in)
 {
   std::string result;
-  
+
   for(const auto & ch : in)
     MetaChar(result, ch, true);
-  
+
   return result;
 }

@@ -13,7 +13,7 @@ inline void longjmp(jmp_buf env, int val)
   (void)val;
   __CPROVER_assume(0);
 }
-       
+
 /* FUNCTION: _longjmp */
 
 #ifndef __CPROVER_SETJMP_H_INCLUDED
@@ -28,7 +28,7 @@ inline void _longjmp(jmp_buf env, int val)
   (void)val;
   __CPROVER_assume(0);
 }
-       
+
 /* FUNCTION: siglongjmp */
 
 #ifndef __CPROVER_SETJMP_H_INCLUDED
@@ -58,4 +58,3 @@ inline int setjmp(jmp_buf env)
   (void)env;
   return retval;
 }
-

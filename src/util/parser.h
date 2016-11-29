@@ -13,11 +13,11 @@ class parsert:public messaget
 {
 public:
   std::istream *in;
-  
+
   std::string this_line, last_line;
-  
+
   std::vector<exprt> stack;
-  
+
   virtual void clear()
   {
     line_no=0;
@@ -27,12 +27,12 @@ public:
     source_location.clear();
     last_line.clear();
   }
-  
+
   inline parsert():in(NULL) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
-  
+
   inline bool read(char &ch)
   {
     if(!in->read(&ch, 1)) return false;
@@ -44,44 +44,44 @@ public:
     }
     else
       this_line+=ch;
-    
+
     return true;
   }
-   
+
   virtual bool parse()=0;
 
   inline bool eof()
   {
     return in->eof();
   }
-  
+
   void parse_error(
     const std::string &message,
     const std::string &before);
-    
+
   inline void inc_line_no()
   {
     ++line_no;
     column=1;
   }
-  
+
   inline void set_line_no(unsigned _line_no)
   {
     line_no=_line_no;
   }
-  
+
   inline void set_file(const irep_idt &file)
   {
     source_location.set_file(file);
     source_location.set_working_directory(
       get_current_working_directory());
   }
-  
+
   inline irep_idt get_file() const
   {
     return source_location.get_file();
   }
-  
+
   inline unsigned get_line_no() const
   {
     return line_no;
@@ -105,26 +105,26 @@ public:
       previous_line_no=line_no;
       source_location.set_line(line_no);
     }
-    
+
     e.add_source_location()=source_location;
   }
-  
+
   inline void set_function(const irep_idt &function)
   {
     source_location.set_function(function);
   }
-  
+
   inline void advance_column(unsigned token_width)
   {
     column+=token_width;
   }
-  
+
 protected:
   source_locationt source_location;
   unsigned line_no, previous_line_no;
   unsigned column;
 };
- 
+
 exprt &_newstack(parsert &parser, unsigned &x);
 
 #define newstack(x) _newstack(PARSER, (x))

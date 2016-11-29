@@ -166,11 +166,11 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(return_type.id()==ID_constructor ||
      return_type.id()==ID_destructor)
     return_type=empty_typet();
-  
+
   typecheck_code(to_code(symbol.value));
 
   symbol.value.type()=symbol.type;
-  
+
   return_type = old_return_type;
 }
 

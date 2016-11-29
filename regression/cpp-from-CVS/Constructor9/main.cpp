@@ -29,7 +29,7 @@ int main()
   assert(a.b_array[1].i==1);
 
   B b_array[2];
-	
+
   assert(b_array[0].i==1);
   assert(b_array[1].i==1);
 }

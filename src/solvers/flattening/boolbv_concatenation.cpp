@@ -23,10 +23,10 @@ Function: boolbvt::convert_concatenation
 bvt boolbvt::convert_concatenation(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
-    
+
   const exprt::operandst &operands=expr.operands();
 
   if(operands.empty())
@@ -47,10 +47,10 @@ bvt boolbvt::convert_concatenation(const exprt &expr)
 
     for(std::size_t i=0; i<op.size(); i++)
       bv[offset+i]=op[i];
-  }    
+  }
 
   if(offset!=0)
     throw "concatenation operand width too small";
-    
+
   return bv;
 }

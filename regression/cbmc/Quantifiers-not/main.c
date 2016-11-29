@@ -19,5 +19,5 @@ int main()
   if(!__CPROVER_exists { int i; (i>=0 && i<2) ==> a[i]>=5 && a[i]<=10 })
     __CPROVER_assert(0, "failure 2");
 
-  return 0;                
+  return 0;
 }

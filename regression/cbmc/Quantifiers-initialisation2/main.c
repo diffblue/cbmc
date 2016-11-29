@@ -14,5 +14,5 @@ int main()
   assert(a[2]>a[3]);
   __CPROVER_assert(__CPROVER_forall {unsigned i; (i>=1 && i<10) ==> c[i-1]<=c[i]}, "forall c[]");
   assert(c[3]>=c[1]);
-  return 0;                
+  return 0;
 }

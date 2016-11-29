@@ -123,7 +123,7 @@ void rationalt::normalize()
   {
     denominator/=_gcd;
     numerator/=_gcd;
-  }  
+  }
 }
 
 /*******************************************************************\

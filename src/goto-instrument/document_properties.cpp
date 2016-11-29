@@ -27,7 +27,7 @@ public:
     out(_out)
   {
   }
-  
+
   void html()
   {
     format=HTML;
@@ -43,7 +43,7 @@ public:
 private:
   const goto_functionst &goto_functions;
   std::ostream &out;
-    
+
   struct linet
   {
     std::string text;
@@ -55,14 +55,14 @@ private:
   void get_code(
     const source_locationt &source_location,
     std::string &dest);
-    
+
   struct doc_claimt
   {
     std::set<irep_idt> comment_set;
   };
 
   enum { HTML, LATEX } format;
-  
+
   void doit();
 };
 
@@ -128,7 +128,7 @@ std::string escape_latex(const std::string &s, bool alltt)
     if(s[i]=='\\' || s[i]=='{' || s[i]=='}')
       dest+="\\";
 
-    if(!alltt && 
+    if(!alltt &&
        (s[i]=='_' || s[i]=='$' || s[i]=='~' ||
         s[i]=='^' || s[i]=='%' || s[i]=='#' ||
         s[i]=='&'))
@@ -265,7 +265,7 @@ void document_propertiest::get_code(
       it=lines.erase(it);
     else
       break;
-  }    
+  }
 
   for(std::list<linet>::iterator it=lines.end();
       it!=lines.begin();)
@@ -295,27 +295,27 @@ void document_propertiest::get_code(
     case LATEX:
       while(line_no.size()<4)
         line_no=" "+line_no;
-    
+
       line_no+"  ";
-    
+
       tmp+=escape_latex(it->text, true);
 
       if(it->line_number==line_int)
         tmp="{\\ttb{}"+tmp+"}";
-        
+
       break;
-      
+
     case HTML:
       while(line_no.size()<4)
         line_no="&nbsp;"+line_no;
-    
+
       line_no+"&nbsp;&nbsp;";
-    
+
       tmp+=escape_html(it->text);
 
       if(it->line_number==line_int)
         tmp="<em>"+tmp+"</em>";
-        
+
       break;
     }
 
@@ -395,7 +395,7 @@ void document_propertiest::doit()
       out << std::endl;
       out << std::endl;
       break;
-    
+
     case HTML:
       out << "<div class=\"claim\">" << std::endl
           << "<div class=\"location\">File "
@@ -464,4 +464,3 @@ void document_properties_latex(
 {
   document_propertiest(goto_functions, out).latex();
 }
-

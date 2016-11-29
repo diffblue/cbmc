@@ -33,7 +33,7 @@ mmcc_parse_optionst::mmcc_parse_optionst(int argc, const char **argv):
   parse_options_baset(MMCC_OPTIONS, argc, argv)
 {
 }
-  
+
 /*******************************************************************\
 
 Function: mmcc_parse_optionst::doit
@@ -53,13 +53,13 @@ int mmcc_parse_optionst::doit()
     std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
-  
+
   try
   {
     if(cmdline.args.size()==1)
     {
       std::ifstream in(cmdline.args[0].c_str());
-      
+
       if(!in)
       {
         std::cerr << "failed to open `" << cmdline.args[0] << "'\n";
@@ -88,7 +88,7 @@ int mmcc_parse_optionst::doit()
     std::cerr << error << '\n';
     return 10;
   }
-  
+
   return 0;
 }
 
@@ -109,19 +109,19 @@ int mmcc_parse_optionst::convert(
   const std::string &file)
 {
   console_message_handlert message_handler;
-  
+
   mm_parser.set_message_handler(message_handler);
   mm_parser.in=&in;
   mm_parser.set_file(file);
-  
+
   if(mm_parser.parse())
   {
     std::cerr << "parse error, giving up\n";
     return 3;
   }
-  
+
   mm2cpp(mm_parser.model_name, mm_parser.instruction, std::cout);
-  
+
   return 0;
 }
 
@@ -142,7 +142,7 @@ void mmcc_parse_optionst::help()
   std::cout <<
     "\n"
     "* *   MMCC " CBMC_VERSION " - Copyright (C) 2015-2015    * *\n";
-    
+
   std::cout <<
     "\n"
     "Usage:                       Purpose:\n"

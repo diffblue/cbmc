@@ -7,6 +7,6 @@ int main()
 
   p+=30;
   diff=(char *)p-(char *)array;
-  
+
   assert(diff==30*sizeof(int));
 }

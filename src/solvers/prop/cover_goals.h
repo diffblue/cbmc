@@ -30,7 +30,7 @@ public:
     prop_conv(_prop_conv)
   {
   }
-  
+
   virtual ~cover_goalst();
 
   // returns result of last run on success
@@ -42,7 +42,7 @@ public:
   {
     literalt condition;
     enum class statust { UNKNOWN, COVERED, UNCOVERED, ERROR } status;
-    
+
     goalt():status(statust::UNKNOWN)
     {
     }
@@ -50,24 +50,24 @@ public:
 
   typedef std::list<goalt> goalst;
   goalst goals;
-  
+
   // statistics
 
   inline std::size_t number_covered() const
   {
     return _number_covered;
   }
-  
+
   inline unsigned iterations() const
   {
     return _iterations;
   }
-  
+
   inline goalst::size_type size() const
   {
     return goals.size();
   }
-  
+
   // managing the goals
 
   inline void add(const literalt condition)
@@ -75,22 +75,22 @@ public:
     goals.push_back(goalt());
     goals.back().condition=condition;
   }
-  
+
   // register an observer if you want to be told
   // about satisfying assignments
-  
+
   class observert
   {
   public:
     virtual void goal_covered(const goalt &) { }
     virtual void satisfying_assignment() { }
   };
-  
+
   inline void register_observer(observert &o)
   {
     observers.push_back(&o);
   }
-  
+
 protected:
   std::size_t _number_covered;
   unsigned _iterations;

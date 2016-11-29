@@ -1,10 +1,10 @@
 /*
  * Recursive implementation multiplication by repeated addition
  * Check that this multiplication is commutative
- * 
+ *
  * Author: Jan Leike
  * Date: 2013-07-17
- * 
+ *
  */
 
 extern int __VERIFIER_nondet_int(void);

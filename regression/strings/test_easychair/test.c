@@ -40,4 +40,3 @@ int main(){
   // s survived all checks
   return true;
 }
-

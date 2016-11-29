@@ -62,7 +62,7 @@ Function: signed_int_type
 
 typet signed_int_type()
 {
-  typet result=signedbv_typet(config.ansi_c.int_width);  
+  typet result=signedbv_typet(config.ansi_c.int_width);
   result.set(ID_C_c_type, ID_signed_int);
   return result;
 }
@@ -100,7 +100,7 @@ Function: unsigned_int_type
 
 typet unsigned_int_type()
 {
-  typet result=unsignedbv_typet(config.ansi_c.int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.int_width);
   result.set(ID_C_c_type, ID_unsigned_int);
   return result;
 }
@@ -119,7 +119,7 @@ Function: unsigned_short_int_type
 
 typet unsigned_short_int_type()
 {
-  typet result=unsignedbv_typet(config.ansi_c.short_int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.short_int_width);
   result.set(ID_C_c_type, ID_unsigned_short_int);
   return result;
 }
@@ -222,7 +222,7 @@ Function: unsigned_long_int_type
 
 typet unsigned_long_int_type()
 {
-  typet result=unsignedbv_typet(config.ansi_c.long_int_width);  
+  typet result=unsignedbv_typet(config.ansi_c.long_int_width);
   result.set(ID_C_c_type, ID_unsigned_long_int);
   return result;
 }
@@ -289,9 +289,9 @@ typet char_type()
 
   // There are 3 char types, i.e., this one is
   // different from either signed char or unsigned char!
-    
+
   result.set(ID_C_c_type, ID_char);
-    
+
   return result;
 }
 
@@ -312,7 +312,7 @@ typet unsigned_char_type()
   typet result=unsignedbv_typet(config.ansi_c.char_width);
 
   result.set(ID_C_c_type, ID_unsigned_char);
-  
+
   return result;
 }
 
@@ -333,7 +333,7 @@ typet signed_char_type()
   typet result=signedbv_typet(config.ansi_c.char_width);
 
   result.set(ID_C_c_type, ID_signed_char);
-  
+
   return result;
 }
 
@@ -352,7 +352,7 @@ Function: wchar_t_type
 typet wchar_t_type()
 {
   typet result;
-  
+
   if(config.ansi_c.wchar_t_is_unsigned)
     result=unsignedbv_typet(config.ansi_c.wchar_t_width);
   else
@@ -404,7 +404,7 @@ Function: char32_t_type
 typet char32_t_type()
 {
   typet result;
-  
+
   // Types char16_t and char32_t denote distinct types with the same size,
   // signedness, and alignment as uint_least16_t and uint_least32_t,
   // respectively, in <stdint.h>, called the underlying types.
@@ -430,7 +430,7 @@ Function: float_type
 typet float_type()
 {
   typet result;
-  
+
   if(config.ansi_c.use_fixed_for_float)
   {
     fixedbv_typet tmp;
@@ -461,7 +461,7 @@ Function: double_type
 typet double_type()
 {
   typet result;
-  
+
   if(config.ansi_c.use_fixed_for_float)
   {
     fixedbv_typet tmp;
@@ -471,7 +471,7 @@ typet double_type()
   }
   else
     result=ieee_float_spect::double_precision().to_type();
-  
+
   result.set(ID_C_c_type, ID_double);
 
   return result;
@@ -492,7 +492,7 @@ Function: long_double_type
 typet long_double_type()
 {
   typet result;
-  
+
   if(config.ansi_c.use_fixed_for_float)
   {
     fixedbv_typet tmp;
@@ -521,7 +521,7 @@ typet long_double_type()
     else
       assert(false);
   }
-  
+
   result.set(ID_C_c_type, ID_long_double);
 
   return result;
@@ -542,7 +542,7 @@ Function: gcc_float128_type
 typet gcc_float128_type()
 {
   typet result;
-  
+
   if(config.ansi_c.use_fixed_for_float)
   {
     fixedbv_typet tmp;
@@ -555,7 +555,7 @@ typet gcc_float128_type()
     result=ieee_float_spect::quadruple_precision().to_type();
   }
 
-  // not same as long double!  
+  // not same as long double!
   result.set(ID_C_c_type, ID_gcc_float128);
 
   return result;

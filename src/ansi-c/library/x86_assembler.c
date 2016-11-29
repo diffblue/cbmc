@@ -49,4 +49,3 @@ inline void __asm_lfence(void)
 {
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence");
 }
-

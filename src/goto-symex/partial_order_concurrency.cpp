@@ -18,7 +18,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 Function: partial_order_concurrencyt::~partial_order_concurrencyt
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -35,7 +35,7 @@ partial_order_concurrencyt::partial_order_concurrencyt(
 
 Function: partial_order_concurrencyt::~partial_order_concurrencyt
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -51,7 +51,7 @@ partial_order_concurrencyt::~partial_order_concurrencyt()
 
 Function: partial_order_concurrencyt::add_init_writes
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -111,7 +111,7 @@ void partial_order_concurrencyt::add_init_writes(
 
 Function: partial_order_concurrencyt::build_event_lists
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -172,7 +172,7 @@ void partial_order_concurrencyt::build_event_lists(
 
 Function: partial_order_concurrencyt::rw_clock_id
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -198,7 +198,7 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
 
 Function: partial_order_concurrencyt::clock
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -240,7 +240,7 @@ symbol_exprt partial_order_concurrencyt::clock(
 
 Function: partial_order_concurrencyt::is_shared_write
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -262,7 +262,7 @@ bool partial_order_concurrencyt::is_shared_write(event_it event) const
 
 Function: partial_order_concurrencyt::is_shared_read
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -284,7 +284,7 @@ bool partial_order_concurrencyt::is_shared_read(event_it event) const
 
 Function: partial_order_concurrencyt::build_clock_type
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -306,7 +306,7 @@ void partial_order_concurrencyt::build_clock_type(
 
 Function: partial_order_concurrencyt::before
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -349,7 +349,7 @@ exprt partial_order_concurrencyt::before(
 
 Function: partial_order_concurrencyt::add_constraint
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -368,4 +368,3 @@ void partial_order_concurrencyt::add_constraint(
 
   equation.constraint(tmp, msg, source);
 }
-

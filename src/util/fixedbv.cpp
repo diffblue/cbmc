@@ -162,7 +162,7 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
   v=result;
   spec=dest_spec;
 }
-  
+
 /*******************************************************************\
 
 Function: fixedbvt::negate
@@ -291,7 +291,7 @@ std::string fixedbvt::format(
 
   if(!fraction_part.empty())
     dest+="."+fraction_part;
-  
+
   while(dest.size()<format_spec.min_width)
     dest=" "+dest;
 

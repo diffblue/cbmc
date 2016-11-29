@@ -73,9 +73,9 @@ symbolt &cpp_declarator_convertert::convert(
   assert(declarator.id()==ID_cpp_declarator);
   final_type=declarator.merge_type(declaration_type);
   assert(final_type.is_not_nil());
-  
+
   cpp_template_args_non_tct template_args;
-  
+
   // run resolver on scope
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
@@ -200,7 +200,7 @@ symbolt &cpp_declarator_convertert::convert(
   else
   {
     // no, it's no way a method
-    
+
     // we won't allow the constructor/destructor type
     if(final_type.id()==ID_code &&
        to_code_type(final_type).return_type().id()==ID_constructor)
@@ -219,7 +219,7 @@ symbolt &cpp_declarator_convertert::convert(
       return convert_new_symbol(storage_spec, member_spec, declarator);
 
     symbolt &symbol=c_it->second;
-    
+
     if(!storage_spec.is_extern())
       symbol.is_extern = false;
 
@@ -274,7 +274,7 @@ void cpp_declarator_convertert::combine_types(
     // to argument names, default values, and inlined-ness
     const code_typet &decl_code_type=to_code_type(decl_type);
     code_typet &symbol_code_type=to_code_type(symbol.type);
-    
+
     if(decl_code_type.get_inlined())
       symbol_code_type.set_inlined(true);
 
@@ -393,7 +393,7 @@ void cpp_declarator_convertert::handle_initializer(
     // the symbol is really located here
     symbol.is_extern=false;
   }
-  
+
   if(symbol.value.is_nil())
   {
     // no initial value yet
@@ -461,7 +461,7 @@ void cpp_declarator_convertert::get_final_identifier()
       // and the same signature?
       symbol_tablet::symbolst::const_iterator
         c_it=cpp_typecheck.symbol_table.symbols.find(identifier);
-        
+
       if(c_it!=cpp_typecheck.symbol_table.symbols.end() &&
          c_it->second.type.id()==ID_code &&
          cpp_typecheck.function_identifier(final_type)==
@@ -513,12 +513,12 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_type=is_typedef;
   symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
-  
+
   // Constant? These are propagated.
   if(symbol.type.get_bool(ID_C_constant) &&
      symbol.value.is_not_nil())
     symbol.is_macro=true;
-  
+
   if(member_spec.is_inline())
     symbol.type.set(ID_C_inlined, true);
 
@@ -582,10 +582,10 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   if(!is_code)
   {
     cpp_scopest::id_sett id_set;
-  
+
     cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, cpp_scopet::SCOPE_ONLY, id_set);
-     
+
     for(cpp_scopest::id_sett::const_iterator
         id_it=id_set.begin();
         id_it!=id_set.end();

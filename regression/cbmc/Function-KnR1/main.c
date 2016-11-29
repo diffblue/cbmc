@@ -31,7 +31,6 @@ const char *msg;
 main()
 {
   struct X x;
-  
+
   assert(f(0, 0, x, 0)==10);
 }
-

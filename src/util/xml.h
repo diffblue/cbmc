@@ -1,9 +1,9 @@
 /*******************************************************************\
- 
+
 Module:
- 
+
 Author: Daniel Kroening, kroening@kroening.com
- 
+
 \*******************************************************************/
 
 #ifndef XML_H
@@ -60,7 +60,7 @@ public:
   {
     attributest::const_iterator i=attributes.find(attribute);
     if(i!=attributes.end())
-      return i->second;                    
+      return i->second;
     return "";
   }
 

@@ -6,4 +6,3 @@ static inline void f()
 {
   x=1;
 }
-

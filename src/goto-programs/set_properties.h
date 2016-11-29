@@ -19,8 +19,8 @@ void set_properties(
   goto_modelt &goto_model,
   const std::list<std::string> &properties);
 
-void make_assertions_false(goto_functionst &);  
-void make_assertions_false(goto_modelt &);  
+void make_assertions_false(goto_functionst &);
+void make_assertions_false(goto_modelt &);
 
 void label_properties(goto_functionst &);
 void label_properties(goto_programt &);

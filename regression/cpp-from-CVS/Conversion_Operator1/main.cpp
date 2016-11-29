@@ -17,7 +17,7 @@ int  main()
    int i1 = int(I1);
    assert(i1==1);
 
-   
+
    Int I2(2);
    int i2 = (int&)I2;
    assert(i2==2);

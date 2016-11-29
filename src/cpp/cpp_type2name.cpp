@@ -48,7 +48,7 @@ Function: irep2name
 static void irep2name(const irept &irep, std::string &result)
 {
   result="";
-  
+
   if(is_reference(static_cast<const typet&>(irep)))
     result+="reference";
 
@@ -117,13 +117,13 @@ std::string cpp_type2name(const typet &type)
 
   if(type.get_bool(ID_C_constant))
     result+="const_";
-  
+
   if(type.get_bool(ID_C_restricted))
     result+="restricted_";
-  
+
   if(type.get_bool(ID_C_volatile))
     result+="volatile_";
-    
+
   if(type.id()==ID_empty || type.id()==ID_void)
     result+="void";
   else if(type.id()==ID_bool)
@@ -141,7 +141,7 @@ std::string cpp_type2name(const typet &type)
   {
     // we try to use #c_type
     const irep_idt c_type=type.get(ID_C_c_type);
-    
+
     if(c_type!=irep_idt())
       result+=id2string(c_type);
     else if(type.id()==ID_unsignedbv)
@@ -164,7 +164,7 @@ std::string cpp_type2name(const typet &type)
     // we do (args)->(return_type)
     const code_typet::parameterst &parameters=to_code_type(type).parameters();
     const typet &return_type=to_code_type(type).return_type();
-    
+
     result+='(';
 
     for(code_typet::parameterst::const_iterator
@@ -175,7 +175,7 @@ std::string cpp_type2name(const typet &type)
       if(arg_it!=parameters.begin()) result+=',';
       result+=cpp_type2name(arg_it->type());
     }
-        
+
     result+=')';
     result+="->(";
     result+=cpp_type2name(return_type);
@@ -188,7 +188,7 @@ std::string cpp_type2name(const typet &type)
     irep2name(type, tmp);
     return tmp;
   }
-  
+
   return result;
 }
 
@@ -210,4 +210,3 @@ std::string cpp_expr2name(const exprt &expr)
   irep2name(expr, tmp);
   return tmp;
 }
-
