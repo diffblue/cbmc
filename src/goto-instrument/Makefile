@@ -72,4 +72,3 @@ goto-instrument$(EXEEXT): $(OBJ)
 
 goto-instrument-mac-signed: goto-instrument$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) goto-instrument$(EXEEXT)
-

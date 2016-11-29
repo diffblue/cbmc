@@ -141,4 +141,3 @@ endif
 
 cegis$(EXEEXT): $(OBJ)
 	$(LINKBIN)
-

@@ -38,4 +38,3 @@ generated_files: mm_y.tab.cpp mm_lex.yy.cpp mm_y.tab.h
 
 mmcc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
-

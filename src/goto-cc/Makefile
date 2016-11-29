@@ -52,4 +52,3 @@ goto-cl$(EXEEXT): $(OBJ)
 
 goto-cc-mac-signed: goto-cc$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) goto-cc$(EXEEXT)
-

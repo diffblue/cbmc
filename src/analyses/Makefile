@@ -21,4 +21,3 @@ all: analyses$(LIBEXT)
 
 analyses$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

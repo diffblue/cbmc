@@ -14,4 +14,3 @@ all: linking$(LIBEXT)
 
 linking$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

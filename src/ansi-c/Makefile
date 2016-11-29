@@ -110,4 +110,3 @@ generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
 
 ansi-c$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
