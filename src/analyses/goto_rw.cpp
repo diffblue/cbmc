@@ -127,8 +127,6 @@ void rw_range_sett::get_objects_dereference(
 {
   const exprt &pointer=deref.pointer();
   get_objects_rec(get_modet::READ, pointer);
-  if(mode!=get_modet::READ)
-    get_objects_rec(mode, pointer);
 }
 
 void rw_range_sett::get_objects_byte_extract(
@@ -413,14 +411,13 @@ void rw_range_sett::get_objects_typecast(
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
-  if(object.id()==ID_string_constant ||
+  if(object.id()==ID_symbol ||
+     object.id()==ID_string_constant ||
      object.id()==ID_label ||
      object.id()==ID_array ||
      object.id()=="NULL-object")
     // constant, nothing to do
     return;
-  else if(object.id()==ID_symbol)
-    get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_dereference)
     get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_index)
@@ -562,11 +559,6 @@ void rw_range_sett::get_objects_rec(
           expr.id()==ID_string_constant)
   {
     // dereferencing may yield some weird ones, ignore these
-  }
-  else if(mode==get_modet::LHS_W)
-  {
-    forall_operands(it, expr)
-      get_objects_rec(mode, *it);
   }
   else
     throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
