@@ -326,6 +326,8 @@ void custom_bitvector_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
+  if(has_values.is_false()) return;
+
   // upcast of ai
   custom_bitvector_analysist &cba=
     static_cast<custom_bitvector_analysist &>(ai);
@@ -565,8 +567,11 @@ void custom_bitvector_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  if(is_bottom)
-    out << "BOTTOM\n";
+  if(has_values.is_known())
+  {
+    out << has_values.to_string() << '\n';
+    return;
+  }
 
   const custom_bitvector_analysist &cba=
     static_cast<const custom_bitvector_analysist &>(ai);
@@ -625,10 +630,10 @@ bool custom_bitvector_domaint::merge(
   locationt from,
   locationt to)
 {
-  if(b.is_bottom)
+  if(b.has_values.is_false())
     return false; // no change
 
-  if(is_bottom)
+  if(has_values.is_false())
   {
     *this=b;
     return true; // change
@@ -858,7 +863,7 @@ void custom_bitvector_analysist::check(
         if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
           continue;
 
-        if(operator[](i_it).is_bottom) continue;
+        if(operator[](i_it).has_values.is_false()) continue;
 
         exprt tmp=eval(i_it->guard, i_it);
         result=simplify_expr(tmp, ns);

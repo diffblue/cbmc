@@ -120,8 +120,7 @@ Function: ai_baset::entry_state
 
 void ai_baset::entry_state(const goto_programt &goto_program)
 {
-  // The first instruction of 'goto_program' is the entry point,
-  // and we make that 'top'.
+  // The first instruction of 'goto_program' is the entry point
   get_state(goto_program.instructions.begin()).make_entry();
 }
 

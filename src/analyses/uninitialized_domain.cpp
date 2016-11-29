@@ -31,7 +31,7 @@ void uninitialized_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(is_bottom) return;
+  if(has_values.is_false()) return;
 
   switch(from->type)
   {
@@ -98,8 +98,8 @@ void uninitialized_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  if(is_bottom)
-    out << "BOTTOM";
+  if(has_values.is_known())
+    out << has_values.to_string() << '\n';
   else
   {
     for(const auto & id : uninitialized)
@@ -124,16 +124,16 @@ bool uninitialized_domaint::merge(
   locationt from,
   locationt to)
 {
-  bool old_is_bottom=is_bottom;
-  
-  is_bottom=is_bottom && other.is_bottom;
-  
   unsigned old_uninitialized=uninitialized.size();
 
   uninitialized.insert(
     other.uninitialized.begin(),
     other.uninitialized.end());
 
-  return old_is_bottom!=is_bottom ||
-         old_uninitialized!=uninitialized.size();
+  bool changed=
+    (has_values.is_false() && !other.has_values.is_false()) ||
+    old_uninitialized!=uninitialized.size();
+  has_values=tvt::unknown();
+
+  return changed;
 }

@@ -266,6 +266,8 @@ void escape_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
+  if(has_values.is_false()) return;
+
   // upcast of ai
   //escape_analysist &ea=
   //  static_cast<escape_analysist &>(ai);
@@ -364,9 +366,9 @@ void escape_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  if(is_bottom)
+  if(has_values.is_known())
   {
-    out << "BOTTOM\n";
+    out << has_values.to_string() << '\n';
     return;
   }
 
@@ -422,10 +424,10 @@ bool escape_domaint::merge(
   locationt from,
   locationt to)
 {
-  if(b.is_bottom)
+  if(b.has_values.is_false())
     return false; // no change
 
-  if(is_bottom)
+  if(has_values.is_false())
   {
     *this=b;
     return true; // change

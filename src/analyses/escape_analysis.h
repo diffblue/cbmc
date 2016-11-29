@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_ESCAPE_ANALYSIS_H
 
 #include <util/numbering.h>
+#include <util/threeval.h>
 #include <util/union_find.h>
 
 #include "ai.h"
@@ -28,7 +29,7 @@ class escape_analysist;
 class escape_domaint:public ai_domain_baset
 {
 public:
-  escape_domaint():is_bottom(true)
+  escape_domaint():has_values(false)
   {
   }
 
@@ -51,19 +52,20 @@ public:
   void make_bottom() override final
   {
     cleanup_map.clear();
-    is_bottom=true;
+    aliases.clear();
+    has_values=tvt(false);
   }
 
   void make_top() override final
   {
-    // We don't have a proper top.
-    assert(false);
+    cleanup_map.clear();
+    aliases.clear();
+    has_values=tvt(true);
   }
-  
+
   void make_entry() override final
   {
-    cleanup_map.clear();
-    is_bottom=false;
+    make_top();
   }
 
   typedef union_find<irep_idt> aliasest;
@@ -80,9 +82,9 @@ public:
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
 
-  bool is_bottom;
-
 protected:
+  tvt has_values;
+
   void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);
   void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
