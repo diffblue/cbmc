@@ -36,10 +36,16 @@ path_searcht::resultt path_searcht::operator()(
   
   locs.build(goto_functions);
 
-  // this is the container for the history-forest  
+  // Perform a non-comprehensive check on JSON file.
+  if(taint_engine->enabled &&
+      taint_data.check_rules(locs, warning(), *taint_engine)) {
+    warning() << "Rules inconsistent." << eom;
+  }
+
+  // This is the container for the history-forest
   path_symex_historyt history;
   
-  queue.push_back(initial_state(var_map, locs, history));
+  queue.push_back(initial_state(var_map, locs, history, *taint_engine));
   
   // set up the statistics
   number_of_dropped_states=0;
@@ -236,6 +242,24 @@ void path_searcht::pick_state()
   case search_heuristict::LOCS:
     return;
   }  
+}
+
+/*******************************************************************\
+
+Function: path_searcht::set_taint
+
+ Inputs: The taint engine, name of JSON file, and a flag denoting
+ 	 whether the taint engine is enabled.
+
+ Outputs: Nothing
+
+ Purpose: Sets initial information to perform taint analysis
+
+\*******************************************************************/
+void path_searcht::set_taint(const bool enabled, std::string file, taint_enginet &_taint_engine) {
+  taint_file = file;
+  taint_engine = &_taint_engine;
+  taint_engine->enabled = enabled;
 }
 
 /*******************************************************************\

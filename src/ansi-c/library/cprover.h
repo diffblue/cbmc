@@ -130,3 +130,8 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 #define __CPROVER_danger_max_solution_size 1
 #define __CPROVER_danger_number_of_vars 1
 #define __CPROVER_danger_number_of_consts 1
+
+__CPROVER_bool __CPROVER_is_taint(const char *, const char *);
+void           __CPROVER_set_taint(const char *, const char *);
+const char *   __CPROVER_get_taint(const char *);
+

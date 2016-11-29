@@ -133,6 +133,10 @@ void ansi_c_internal_additions(std::string &code)
     "__CPROVER_bool __CPROVER_get_must(const void *, const char *);\n"
     "__CPROVER_bool __CPROVER_get_may(const void *, const char *);\n"
 
+    "__CPROVER_bool __CPROVER_is_taint(const char *, const char *);\n"
+    "void           __CPROVER_set_taint(const char *, const char *);\n"
+    "const void *   __CPROVER_get_taint(const char *);\n"
+
     "const unsigned __CPROVER_constant_infinity_uint;\n"
     "typedef void __CPROVER_integer;\n"
     "typedef void __CPROVER_rational;\n"
