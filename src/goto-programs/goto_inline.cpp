@@ -213,7 +213,12 @@ void goto_partial_inline(
       // called function
       const goto_functiont &goto_function=f_it->second;
 
-      if(!goto_function.body_available())
+      // We can't take functions without bodies to find functions
+      // inside them to be inlined.
+      // We also don't allow for the _start function to have any of its
+      // function calls to be inlined
+      if(!goto_function.body_available() ||
+         f_it->first==ID__start)
         continue;
 
       const goto_programt &goto_program=goto_function.body;
