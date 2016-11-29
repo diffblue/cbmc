@@ -12,6 +12,6 @@ all: linking$(LIBEXT)
 
 ###############################################################################
 
-linking$(LIBEXT): $(OBJ) 
+linking$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 

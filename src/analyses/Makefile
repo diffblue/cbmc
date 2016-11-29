@@ -19,6 +19,6 @@ all: analyses$(LIBEXT)
 
 ###############################################################################
 
-analyses$(LIBEXT): $(OBJ) 
+analyses$(LIBEXT): $(OBJ)
 	$(LINKLIB)
 

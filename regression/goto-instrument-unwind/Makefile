@@ -13,10 +13,10 @@ testnew:
 	@../test.pl -c ../unwind-chain.sh -F
 
 test:
-	@../test.pl -c ../unwind-chain.sh 
+	@../test.pl -c ../unwind-chain.sh
 
 tests.log: ../test.pl
-	@../test.pl -c ../unwind-chain.sh 
+	@../test.pl -c ../unwind-chain.sh
 
 clean:
 	@for dir in *; do \
