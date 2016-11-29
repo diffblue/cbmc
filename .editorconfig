@@ -11,3 +11,7 @@ trim_trailing_whitespace = true
 max_line_length = 80
 end_of_line = lf
 insert_final_newline = true
+
+[*patch]
+# Trailing spaces are significant in patch files
+trim_trailing_whitespace = false
