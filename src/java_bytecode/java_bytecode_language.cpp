@@ -173,14 +173,29 @@ bool java_bytecode_languaget::parse(
   return false;
 }
 
+static irep_idt get_virtual_method_target(
+  const std::set<irep_idt>& needed_classes,
+  const irep_idt& call_basename,
+  const irep_idt& classname,
+  const symbol_tablet& symbol_table)
+{
+  // Program-wide, is this class ever instantiated?
+  if(!needed_classes.count(classname))
+    return irep_idt();
+  auto methodid=id2string(classname)+"."+id2string(call_basename);
+  if(symbol_table.has_symbol(methodid))
+    return methodid;
+  else
+    return irep_idt();
+}
+
 static void get_virtual_method_targets(
   const code_function_callt& c,
   const std::set<irep_idt>& needed_classes,
   std::vector<irep_idt>& needed_methods,
-  const symbol_tablet& symbol_table,
+  symbol_tablet& symbol_table,
   const class_hierarchyt& class_hierarchy)
 {
-
   const auto& called_function=c.function();
   assert(called_function.id()==ID_virtual_function);
 
@@ -189,17 +204,56 @@ static void get_virtual_method_targets(
   const auto& call_basename=called_function.get(ID_component_name);
   assert(call_basename!=irep_idt());
 
+  auto old_size=needed_methods.size();
+
   auto child_classes=class_hierarchy.get_children_trans(call_class);
-  child_classes.push_back(call_class);
   for(const auto& child_class : child_classes)
   {
-    // Program-wide, is this class ever instantiated?
-    if(!needed_classes.count(child_class))
-      continue;
-    auto methodid=id2string(child_class)+"."+id2string(call_basename);
-    if(symbol_table.has_symbol(methodid))
-      needed_methods.push_back(methodid);
+    auto child_method=get_virtual_method_target(needed_classes,call_basename,
+                                                child_class,symbol_table);
+    if(child_method!=irep_idt())
+      needed_methods.push_back(child_method);
   }
+
+  irep_idt parent_class_id=call_class;
+  while(1)
+  {
+    auto parent_method=get_virtual_method_target(needed_classes,call_basename,
+                                                 parent_class_id,symbol_table);
+    if(parent_method!=irep_idt())
+    {
+      needed_methods.push_back(parent_method);
+      break;
+    }
+    else
+    {
+      auto findit=class_hierarchy.class_map.find(parent_class_id);
+      if(findit==class_hierarchy.class_map.end())
+        break;
+      else
+      {
+        const auto& entry=findit->second;
+        if(entry.parents.size()==0)
+          break;
+        else
+          parent_class_id=entry.parents[0];
+      }
+    }
+  }
+
+  if(needed_methods.size()==old_size)
+  {
+    // Didn't find any candidate callee. Generate a stub.
+    std::string stubname=id2string(call_class)+"."+id2string(call_basename);
+    symbolt symbol;
+    symbol.name=stubname;
+    symbol.base_name=call_basename;
+    symbol.type=c.function().type();
+    symbol.value.make_nil();
+    symbol.mode=ID_java;
+    symbol_table.add(symbol);
+  }
+
 }
 
 static void gather_virtual_callsites(const exprt& e, std::vector<const code_function_callt*>& result)
@@ -253,6 +307,7 @@ static void gather_field_types(
 static void initialise_needed_classes(
   const std::vector<irep_idt>& entry_points,
   const namespacet& ns,
+  const class_hierarchyt& ch,
   std::set<irep_idt>& needed_classes)
 {
   for(const auto& mname : entry_points)
@@ -263,8 +318,12 @@ static void initialise_needed_classes(
     {
       if(param.type().id()==ID_pointer)
       {
-	needed_classes.insert(to_symbol_type(param.type().subtype()).get_identifier());
-	gather_field_types(param.type().subtype(),ns,needed_classes);
+        const auto& param_classid=to_symbol_type(param.type().subtype()).get_identifier();
+        std::vector<irep_idt> class_and_parents=ch.get_parents_trans(param_classid);
+        class_and_parents.push_back(param_classid);
+        for(const auto& classid : class_and_parents)
+          needed_classes.insert(classid);
+        gather_field_types(param.type().subtype(),ns,needed_classes);
       }
     }
   }
@@ -344,7 +403,7 @@ bool java_bytecode_languaget::typecheck(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(method_worklist2,namespacet(symbol_table),needed_classes);
+  initialise_needed_classes(method_worklist2,namespacet(symbol_table),ch,needed_classes);
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt*> virtual_callsites;
@@ -386,6 +445,7 @@ bool java_bytecode_languaget::typecheck(
 
     for(const auto& callsite : virtual_callsites)
     {
+      // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(*callsite,needed_classes,method_worklist2,
 				 symbol_table,ch);
     }
