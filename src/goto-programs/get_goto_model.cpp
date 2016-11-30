@@ -32,8 +32,9 @@ Function: get_goto_modelt::operator()
 
 \*******************************************************************/
 
-bool get_goto_modelt::operator()(const std::vector<std::string> &files)
+bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
 {
+  const std::vector<std::string> &files=_cmdline.args;
   if(files.empty())
   {
     error() << "Please provide a program" << eom;
@@ -92,6 +93,7 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
 
         languaget &language=*lf.language;
         language.set_message_handler(get_message_handler());
+        language.get_language_options(_cmdline);
 
         status() << "Parsing " << filename << eom;
 
