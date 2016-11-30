@@ -980,10 +980,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
         c=code_assertt(check);
         c.add_source_location().set_comment("Dynamic cast check");
         c.add_source_location().set_property_class("bad-dynamic-cast");
-        results[0]=op[0];
       }
       else
         c=code_skipt();
+
+      results[0]=op[0];
     }
     else if(statement=="invokedynamic")
     {
