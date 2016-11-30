@@ -462,7 +462,7 @@ bool java_bytecode_languaget::typecheck(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(method_worklist2,namespacet(symbol_table),needed_classes);
+  initialise_needed_classes(method_worklist2,namespacet(symbol_table),ch,needed_classes);
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt*> virtual_callsites;
@@ -504,6 +504,7 @@ bool java_bytecode_languaget::typecheck(
 
     for(const auto& callsite : virtual_callsites)
     {
+      // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(*callsite,needed_classes,method_worklist2,
 				 symbol_table,ch);
     }
