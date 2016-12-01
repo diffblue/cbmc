@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/pointer_predicates.h>
 #include <util/cprover_prefix.h>
+#include <util/options.h>
 
 #include "local_bitvector_analysis.h"
 #include "goto_check.h"

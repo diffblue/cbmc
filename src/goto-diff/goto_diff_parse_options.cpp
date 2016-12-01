@@ -16,6 +16,7 @@ Author: Peter Schrammel
 #include <util/expr_util.h>
 #include <util/language.h>
 #include <util/i2string.h>
+#include <util/options.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>

@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
 
-#include <util/namespace.h>
-#include <util/options.h>
-
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
+
+class namespacet;
+class optionst;
 
 void goto_check(
   const namespacet &ns,
