@@ -368,9 +368,9 @@ void dependence_grapht::add_dep(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  const unsigned n_from=state_map[from].get_node_id();
+  const node_indext n_from=state_map[from].get_node_id();
   assert(n_from<size());
-  const unsigned n_to=state_map[to].get_node_id();
+  const node_indext n_to=state_map[to].get_node_id();
   assert(n_to<size());
 
   // add_edge is redundant as the subsequent operations also insert
