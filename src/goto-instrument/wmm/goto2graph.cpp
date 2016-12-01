@@ -11,6 +11,7 @@ Date: 2012
 #include <vector>
 #include <string>
 #include <fstream>
+#include <limits>
 
 #ifndef _WIN32
 #include <cstdlib>
@@ -997,8 +998,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 #endif
   );
 
-  unsigned previous=(unsigned)-1;
-  unsigned previous_gnode=(unsigned)-1;
+  unsigned previous=std::numeric_limits<unsigned>::max();
+  unsigned previous_gnode=std::numeric_limits<unsigned>::max();
 
 #if 0
   /* for the moment, use labels ASSERT in front of the assertions
@@ -1146,7 +1147,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       std::pair<unsigned,unsigned>(new_write_node, new_write_gnode));
 
     /* creates Read -po-> Write */
-    if(previous!=(unsigned)-1)
+    if(previous!=std::numeric_limits<unsigned>::max())
     {
       instrumenter.message.debug() << previous<<"-po->"<<new_write_node
         << messaget::eom;
@@ -1254,7 +1255,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     previous_gnode = new_write_gnode;
   }
 
-  if(previous != (unsigned)-1)
+  if(previous!=std::numeric_limits<unsigned>::max())
   {
     in_pos[i_it].clear();
     in_pos[i_it].insert(nodet(previous,previous_gnode));
