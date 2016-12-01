@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
-#include <goto-programs/graphml_goto_trace.h>
+#include <goto-programs/graphml_witness.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -106,20 +106,40 @@ void bmct::error_trace()
     }
     break;
   }
+}
 
-  const std::string graphml=options.get_option("graphml-cex");
-  if(!graphml.empty())
+/*******************************************************************\
+
+Function: bmct::output_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: outputs witnesses in graphml format
+
+\*******************************************************************/
+
+void bmct::output_graphml(
+  resultt result,
+  const goto_functionst &goto_functions)
+{
+  const std::string graphml=options.get_option("graphml-witness");
+  if(graphml.empty())
+    return;
+
+  graphml_witnesst graphml_witness(ns);
+  if(result==UNSAFE)
+    graphml_witness(safety_checkert::error_trace);
+  else
+    return;
+
+  if(graphml=="-")
+    write_graphml(graphml_witness.graph(), std::cout);
+  else
   {
-    graphmlt cex_graph;
-    convert(ns, goto_trace, cex_graph);
-
-    if(graphml=="-")
-      write_graphml(cex_graph, std::cout);
-    else
-    {
-      std::ofstream out(graphml);
-      write_graphml(cex_graph, out);
-    }
+    std::ofstream out(graphml);
+    write_graphml(graphml_witness.graph(), out);
   }
 }
 
@@ -294,79 +314,77 @@ void bmct::show_program()
 
   std::cout << "\n" << "Program constraints:" << "\n";
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+  for(const auto &step : equation.SSA_steps)
   {
-    std::cout << "// " << it->source.pc->location_number << " ";
-    std::cout << it->source.pc->source_location.as_string() << "\n";
+    std::cout << "// " << step.source.pc->location_number << " ";
+    std::cout << step.source.pc->source_location.as_string() << "\n";
 
-    if(it->is_assignment())
+    if(step.is_assignment())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") " << string_value << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_assert())
+    else if(step.is_assert())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_assume())
+    else if(step.is_assume())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
     }
-    else if(it->is_constraint())
+    else if(step.is_constraint())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
       count++;
     }
-    else if(it->is_shared_read() || it->is_shared_write())
+    else if(step.is_shared_read() || step.is_shared_write())
     {
       std::string string_value;
-      languages.from_expr(it->ssa_lhs, string_value);
-      std::cout << "(" << count << ") SHARED_" << (it->is_shared_write()?"WRITE":"READ") << "("
+      languages.from_expr(step.ssa_lhs, string_value);
+      std::cout << "(" << count << ") SHARED_" << (step.is_shared_write()?"WRITE":"READ") << "("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -611,6 +629,7 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
+      output_graphml(UNSAFE, goto_functions);
     }
 
     report_failure();

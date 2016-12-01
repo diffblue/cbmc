@@ -279,53 +279,9 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
   graphml.set_attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
   graphml.set_attribute("xmlns", "http://graphml.graphdrawing.org/xmlns");
 
-  // <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "assumption");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "assumption");
-  }
-
-  // <key attr.name="sourcecode" attr.type="string" for="edge" id="sourcecode"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "sourcecode");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "sourcecode");
-  }
-
-  // <key attr.name="sourcecodeLanguage" attr.type="string" for="graph" id="sourcecodelang"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "sourcecodeLanguage");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "graph");
-    key.set_attribute("id", "sourcecodelang");
-  }
-
-  // <key attr.name="control" attr.type="string" for="edge" id="control"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "control");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "control");
-  }
-
-  // <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "startline");
-    key.set_attribute("attr.type", "int");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "startline");
-  }
-
-  // <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
-  //     <default>"&lt;command-line&gt;"</default>
+  // <key attr.name="originFileName" attr.type="string" for="edge"
+  //      id="originfile">
+  //   <default>"&lt;command-line&gt;"</default>
   // </key>
   {
     xmlt &key=graphml.new_element("key");
@@ -335,6 +291,25 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "originfile");
 
     key.new_element("default").data="<command-line>";
+  }
+
+  // <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "invariant");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "node");
+    key.set_attribute("id", "invariant");
+  }
+
+  //<key attr.name="invariant.scope" attr.type="string" for="node"
+  //     id="invariant.scope"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "invariant.scope");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "node");
+    key.set_attribute("id", "invariant.scope");
   }
 
   // <key attr.name="nodeType" attr.type="string" for="node" id="nodetype">
@@ -350,7 +325,8 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="path";
   }
 
-  // <key attr.name="isFrontierNode" attr.type="boolean" for="node" id="frontier">
+  // <key attr.name="isFrontierNode" attr.type="boolean" for="node"
+  //      id="frontier">
   //     <default>false</default>
   // </key>
   {
@@ -363,7 +339,8 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="false";
   }
 
-  // <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
+  // <key attr.name="isViolationNode" attr.type="boolean" for="node"
+  //      id="violation">
   //     <default>false</default>
   // </key>
   {
@@ -402,24 +379,22 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="false";
   }
 
-  // <key attr.name="enterFunction" attr.type="string" for="edge" id="enterFunction"/>
+  // <key attr.name="enterLoopHead" attr.type="boolean" for="edge"
+  //      id="enterLoopHead">
+  //   <default>false</default>
+  // </key>
   {
     xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "enterFunction");
-    key.set_attribute("attr.type", "string");
+    key.set_attribute("attr.name", "enterLoopHead");
+    key.set_attribute("attr.type", "boolean");
     key.set_attribute("for", "edge");
-    key.set_attribute("id", "enterFunction");
+    key.set_attribute("id", "enterLoopHead");
+
+    key.new_element("default").data="false";
   }
 
-  // <key attr.name="returnFromFunction" attr.type="string" for="edge" id="returnFrom"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "returnFromFunction");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "returnFrom");
-  }
-
+  // <key attr.name="threadId" attr.type="string" for="edge" id="threadId"/>
+  // TODO: format for multi-threaded programs not defined yet
   {
     xmlt &key=graphml.new_element("key");
     key.set_attribute("attr.name", "threadNumber");
@@ -430,6 +405,151 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="0";
   }
 
+  // <key attr.name="sourcecodeLanguage" attr.type="string" for="graph"
+  //      id="sourcecodelang"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "sourcecodeLanguage");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "sourcecodelang");
+  }
+
+  // <key attr.name="programFile" attr.type="string" for="graph"
+  //      id="programfile"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "programFile");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "programfile");
+  }
+
+  // <key attr.name="programHash" attr.type="string" for="graph"
+  //      id="programhash"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "programHash");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "programhash");
+  }
+
+  // <key attr.name="specification" attr.type="string" for="graph"
+  //      id="specification"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "specification");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "specification");
+  }
+
+  // <key attr.name="architecture" attr.type="string" for="graph"
+  //      id="architecture"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "architecture");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "architecture");
+  }
+
+  // <key attr.name="producer" attr.type="string" for="graph"
+  //      id="producer"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "producer");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "producer");
+  }
+
+  // <key attr.name="sourcecode" attr.type="string" for="edge" id="sourcecode"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "sourcecode");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "sourcecode");
+  }
+
+  // <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "startline");
+    key.set_attribute("attr.type", "int");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "startline");
+  }
+
+  // <key attr.name="control" attr.type="string" for="edge" id="control"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "control");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "control");
+  }
+
+  // <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "assumption");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "assumption");
+  }
+
+  // <key attr.name="assumption.resultfunction" attr.type="string" for="edge"
+  //      id="assumption.resultfunction"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "assumption.resultfunction");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "assumption.resultfunction");
+  }
+
+  // <key attr.name="assumption.scope" attr.type="string" for="edge"
+  //      id="assumption.scope"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "assumption.scope");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "assumption.scope");
+  }
+
+  // <key attr.name="enterFunction" attr.type="string" for="edge"
+  //      id="enterFunction"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "enterFunction");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "enterFunction");
+  }
+
+  // <key attr.name="returnFromFunction" attr.type="string" for="edge"
+  //      id="returnFrom"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "returnFromFunction");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "returnFrom");
+  }
+
+  // <key attr.name="witness-type" attr.type="string" for="graph"
+  //      id="witness-type"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "witness-type");
+    key.set_attribute("attr.type", "string");
+    key.set_attribute("for", "graph");
+    key.set_attribute("id", "witness-type");
+  }
 
   xmlt &graph=graphml.new_element("graph");
   graph.set_attribute("edgedefault", "directed");
