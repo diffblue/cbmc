@@ -1,8 +1,8 @@
-CORE
+KNOWNBUG
 Main.class
---function "Other.fail:()V" --show-goto-functions
+--function "Other.fail"
+^EXIT=0$
 ^SIGNAL=0$
-MALLOC.*Other
-struct_init.*Other.fail
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
