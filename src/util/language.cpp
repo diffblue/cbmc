@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 
 #include "expr.h"
+#include <util/symbol.h>
+#include <util/symbol_table.h>
 
 bool languaget::final(symbol_tablet &symbol_table)
 {
