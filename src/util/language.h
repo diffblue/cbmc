@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 
 class symbol_tablet;
+class symbolt;
 class exprt;
 class namespacet;
 class typet;
@@ -114,5 +115,14 @@ public:
 
   languaget() { }
   virtual ~languaget() { }
+
+protected:
+  void generate_opaque_method_stubs(symbol_tablet &symbol_table);
+  virtual irep_idt generate_opaque_stub_body(
+    symbolt &symbol,
+    symbol_tablet &symbol_table);
+
+private:
+  bool is_symbol_opaque_function(const symbolt &symbol);
 };
 #endif // CPROVER_UTIL_LANGUAGE_H
