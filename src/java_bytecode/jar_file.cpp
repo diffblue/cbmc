@@ -144,7 +144,7 @@ jar_filet::manifestt jar_filet::get_manifest()
   std::size_t i=0;
   bool found=false;
 
-  for(const auto & e : index)
+  for(const auto &e : index)
   {
     if(e=="META-INF/MANIFEST.MF")
     {

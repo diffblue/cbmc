@@ -65,12 +65,9 @@ void instrument_intervals(
 
     exprt::operandst assertion;
 
-    for(std::set<symbol_exprt>::const_iterator
-        s_it=symbols.begin();
-        s_it!=symbols.end();
-        s_it++)
+    for(const auto &symbol_expr : symbols)
     {
-      exprt tmp=d.make_expression(*s_it);
+      exprt tmp=d.make_expression(symbol_expr);
       if(!tmp.is_true())
         assertion.push_back(tmp);
     }

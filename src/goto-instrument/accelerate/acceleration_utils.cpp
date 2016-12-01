@@ -64,24 +64,20 @@ void acceleration_utilst::find_modified(goto_programt::instructionst &instructio
   }
 }
 
-
-void acceleration_utilst::find_modified(patht &path,
-    expr_sett &modified) {
-  for (patht::iterator it = path.begin();
-       it != path.end();
-       ++it) {
-    find_modified(it->loc, modified);
-  }
+void acceleration_utilst::find_modified(
+  const patht &path,
+  expr_sett &modified)
+{
+  for(const auto &step : path)
+    find_modified(step.loc, modified);
 }
 
 void acceleration_utilst::find_modified(
-    natural_loops_mutablet::natural_loopt &loop,
-    expr_sett &modified) {
-  for (natural_loops_mutablet::natural_loopt::iterator it = loop.begin();
-       it != loop.end();
-       ++it) {
-    find_modified(*it, modified);
-  }
+  const natural_loops_mutablet::natural_loopt &loop,
+  expr_sett &modified)
+{
+  for(const auto &step : loop)
+    find_modified(step, modified);
 }
 
 void acceleration_utilst::find_modified(goto_programt::targett t,

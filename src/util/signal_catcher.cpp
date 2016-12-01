@@ -105,7 +105,7 @@ void signal_catcher(int sig)
   killpg(0, sig);
   #else
   // pass on to any children
-  for(const auto & pid : pids_of_children)
+  for(const auto &pid : pids_of_children)
     kill(pid, sig);
   #endif
 

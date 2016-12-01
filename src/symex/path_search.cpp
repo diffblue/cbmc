@@ -81,7 +81,7 @@ path_searcht::resultt path_searcht::operator()(
       debug() << "Loc: #" << state.get_pc().loc_number
               << ", queue: " << queue.size()
               << ", depth: " << state.get_depth();
-      for(const auto & s : queue)
+      for(const auto &s : queue)
         debug() << ' ' << s.get_depth();
 
       debug() << eom;
@@ -173,7 +173,7 @@ Function: path_searcht::report_statistics
 void path_searcht::report_statistics()
 {
   std::size_t number_of_visited_locations=0;
-  for(const auto & l : loc_data)
+  for(const auto &l : loc_data)
     if(l.visited)
       number_of_visited_locations++;
 

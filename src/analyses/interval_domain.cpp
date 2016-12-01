@@ -41,27 +41,25 @@ void interval_domaint::output(
     return;
   }
 
-  for(int_mapt::const_iterator
-      i_it=int_map.begin(); i_it!=int_map.end(); i_it++)
+  for(const auto &interval : int_map)
   {
-    if(i_it->second.is_top()) continue;
-    if(i_it->second.lower_set)
-      out << i_it->second.lower << " <= ";
-    out << i_it->first;
-    if(i_it->second.upper_set)
-      out << " <= " << i_it->second.upper;
+    if(interval.second.is_top()) continue;
+    if(interval.second.lower_set)
+      out << interval.second.lower << " <= ";
+    out << interval.first;
+    if(interval.second.upper_set)
+      out << " <= " << interval.second.upper;
     out << "\n";
   }
 
-  for(float_mapt::const_iterator
-      i_it=float_map.begin(); i_it!=float_map.end(); i_it++)
+  for(const auto &interval : float_map)
   {
-    if(i_it->second.is_top()) continue;
-    if(i_it->second.lower_set)
-      out << i_it->second.lower << " <= ";
-    out << i_it->first;
-    if(i_it->second.upper_set)
-      out << " <= " << i_it->second.upper;
+    if(interval.second.is_top()) continue;
+    if(interval.second.lower_set)
+      out << interval.second.lower << " <= ";
+    out << interval.first;
+    if(interval.second.upper_set)
+      out << " <= " << interval.second.upper;
     out << "\n";
   }
 }

@@ -125,7 +125,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   cover_goals.set_message_handler(get_message_handler());
   cover_goals.register_observer(*this);
 
-  for(const auto & g : goal_map)
+  for(const auto &g : goal_map)
   {
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
@@ -142,13 +142,13 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   if(result==decision_proceduret::D_ERROR)
   {
     error=true;
-    for(auto & g : goal_map)
+    for(auto &g : goal_map)
       if(g.second.status==goalt::statust::UNKNOWN)
         g.second.status=goalt::statust::ERROR;
   }
   else
   {
-    for(auto & g : goal_map)
+    for(auto &g : goal_map)
       if(g.second.status==goalt::statust::UNKNOWN)
         g.second.status=goalt::statust::SUCCESS;
   }
@@ -197,17 +197,18 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     {
       status() << "\n** Results:" << eom;
 
-      for(const auto & it : goal_map)
-        status() << "[" << it.first << "] "
-                 << it.second.description << ": " << it.second.status_string()
+      for(const auto &goal_pair : goal_map)
+        status() << "[" << goal_pair.first << "] "
+                 << goal_pair.second.description << ": "
+                 << goal_pair.second.status_string()
                  << eom;
 
       if(bmc.options.get_bool_option("trace"))
-        for(const auto & it : goal_map)
-          if(it.second.status==goalt::statust::FAILURE)
+        for(const auto &g : goal_map)
+          if(g.second.status==goalt::statust::FAILURE)
           {
-            std::cout << "\n" << "Trace for " << it.first << ":" << "\n";
-            show_goto_trace(std::cout, bmc.ns, it.second.goto_trace);
+            std::cout << "\n" << "Trace for " << g.first << ":" << "\n";
+            show_goto_trace(std::cout, bmc.ns, g.second.goto_trace);
           }
 
       status() << "\n** " << cover_goals.number_covered()
@@ -220,14 +221,14 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 
   case ui_message_handlert::XML_UI:
     {
-      for(const auto & it : goal_map)
+      for(const auto &g : goal_map)
       {
         xmlt xml_result("result");
-        xml_result.set_attribute("property", id2string(it.first));
-        xml_result.set_attribute("status", it.second.status_string());
+        xml_result.set_attribute("property", id2string(g.first));
+        xml_result.set_attribute("status", g.second.status_string());
 
-        if(it.second.status==goalt::statust::FAILURE)
-          convert(bmc.ns, it.second.goto_trace, xml_result.new_element());
+        if(g.second.status==goalt::statust::FAILURE)
+          convert(bmc.ns, g.second.goto_trace, xml_result.new_element());
 
         std::cout << xml_result << "\n";
       }
@@ -239,17 +240,17 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       json_objectt json_result;
       json_arrayt &result_array=json_result["result"].make_array();
 
-      for(const auto & it : goal_map)
+      for(const auto &g : goal_map)
       {
         json_objectt &result=result_array.push_back().make_object();
-        result["property"]=json_stringt(id2string(it.first));
-        result["description"]=json_stringt(id2string(it.second.description));
-        result["status"]=json_stringt(it.second.status_string());
+        result["property"]=json_stringt(id2string(g.first));
+        result["description"]=json_stringt(id2string(g.second.description));
+        result["status"]=json_stringt(g.second.status_string());
 
-        if(it.second.status==goalt::statust::FAILURE)
+        if(g.second.status==goalt::statust::FAILURE)
         {
           jsont &json_trace=result["trace"];
-          convert(bmc.ns, it.second.goto_trace, json_trace);
+          convert(bmc.ns, g.second.goto_trace, json_trace);
         }
       }
 

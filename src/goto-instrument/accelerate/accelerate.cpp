@@ -447,16 +447,15 @@ void acceleratet::insert_automaton(trace_automatont &automaton) {
   // Now for each program location that appears as a symbol in the
   // trace automaton, add the appropriate code to drive the state
   // machine.
-  for (trace_automatont::alphabett::iterator it = automaton.alphabet.begin();
-       it != automaton.alphabet.end();
-       ++it) {
+  for(const auto &sym : automaton.alphabet)
+  {
     scratch_programt state_machine(symbol_table);
-    trace_automatont::sym_range_pairt p = transitions.equal_range(*it);
+    trace_automatont::sym_range_pairt p=transitions.equal_range(sym);
 
     build_state_machine(p.first, p.second, accept_states, state, next_state,
         state_machine);
 
-    program.insert_before_swap(*it, state_machine);
+    program.insert_before_swap(sym, state_machine);
   }
 }
 

@@ -136,7 +136,7 @@ void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
     return;
   }
 
-  for(const auto & op : src.operands())
+  for(const auto &op : src.operands())
     collect_conditions_rec(op, dest);
 
   if(is_condition(src) && !src.is_constant())
@@ -988,7 +988,7 @@ void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
   }
   else
   {
-    for(const auto & op : src.operands())
+    for(const auto &op : src.operands())
       collect_decisions_rec(op, dest);
   }
 }
@@ -1202,7 +1202,7 @@ void instrument_cover_goals(
 
         const source_locationt source_location=i_it->source_location;
 
-        for(const auto & c : conditions)
+        for(const auto &c : conditions)
         {
           const std::string c_string=from_expr(ns, "", c);
 
@@ -1238,7 +1238,7 @@ void instrument_cover_goals(
 
         const source_locationt source_location=i_it->source_location;
 
-        for(const auto & d : decisions)
+        for(const auto &d : decisions)
         {
           const std::string d_string=from_expr(ns, "", d);
 
@@ -1284,7 +1284,7 @@ void instrument_cover_goals(
 
         const source_locationt source_location=i_it->source_location;
 
-        for(const auto & p : both)
+        for(const auto &p : both)
         {
           bool is_decision=decisions.find(p)!=decisions.end();
           bool is_condition=conditions.find(p)!=conditions.end();
@@ -1322,7 +1322,7 @@ void instrument_cover_goals(
         // however, this is not true, e.g., ''? :'' operator.
         minimize_mcdc_controlling(controlling, *decisions.begin());
 
-        for(const auto & p : controlling)
+        for(const auto &p : controlling)
         {
           std::string p_string=from_expr(ns, "", p);
 

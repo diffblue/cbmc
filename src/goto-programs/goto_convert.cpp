@@ -59,9 +59,9 @@ Function: goto_convertt::finish_gotos
 
 void goto_convertt::finish_gotos()
 {
-  for(const auto & it : targets.gotos)
+  for(const auto &g_it : targets.gotos)
   {
-    goto_programt::instructiont &i=*it;
+    goto_programt::instructiont &i=*g_it;
 
     if(i.code.get_statement()=="non-deterministic-goto")
     {
@@ -141,7 +141,7 @@ Function: goto_convertt::finish_computed_gotos
 
 void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 {
-  for(auto & g_it : targets.computed_gotos)
+  for(auto &g_it : targets.computed_gotos)
   {
     goto_programt::instructiont &i=*g_it;
     exprt destination=i.code.op0();
@@ -156,13 +156,10 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
     i.code=code_expressiont(pointer);
 
     // insert huge case-split
-    for(labelst::const_iterator
-        l_it=targets.labels.begin();
-        l_it!=targets.labels.end();
-        l_it++)
+    for(const auto &label : targets.labels)
     {
       exprt label_expr(ID_label, empty_typet());
-      label_expr.set(ID_identifier, l_it->first);
+      label_expr.set(ID_identifier, label.first);
 
       equal_exprt guard;
 
@@ -172,7 +169,7 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       goto_programt::targett t=
         goto_program.insert_after(g_it);
 
-      t->make_goto(l_it->second);
+      t->make_goto(label.second);
       t->source_location=i.source_location;
       t->guard=guard;
     }
@@ -1434,16 +1431,16 @@ void goto_convertt::convert_switch(
 
   goto_programt tmp_cases;
 
-  for(auto & it : targets.cases)
+  for(auto &case_pair : targets.cases)
   {
-    const caset &case_ops=it.second;
+    const caset &case_ops=case_pair.second;
 
     assert(!case_ops.empty());
 
     exprt guard_expr=case_guard(argument, case_ops);
 
     goto_programt::targett x=tmp_cases.add_instruction();
-    x->make_goto(it.first);
+    x->make_goto(case_pair.first);
     x->guard.swap(guard_expr);
     x->source_location=case_ops.front().find_source_location();
   }

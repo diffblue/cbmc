@@ -86,12 +86,9 @@ void goto_convert_functionst::goto_convert()
       symbol_list.push_back(it->first);
   }
 
-  for(symbol_listt::const_iterator
-      it=symbol_list.begin();
-      it!=symbol_list.end();
-      it++)
+  for(const auto &id : symbol_list)
   {
-    convert_function(*it);
+    convert_function(id);
   }
 
   functions.compute_location_numbers();
@@ -127,14 +124,9 @@ bool goto_convert_functionst::hide(const goto_programt &goto_program)
       i_it!=goto_program.instructions.end();
       i_it++)
   {
-    for(goto_programt::instructiont::labelst::const_iterator
-        l_it=i_it->labels.begin();
-        l_it!=i_it->labels.end();
-        l_it++)
-    {
-      if(*l_it=="__CPROVER_HIDE")
+    for(const auto &label : i_it->labels)
+      if(label=="__CPROVER_HIDE")
         return true;
-    }
   }
 
   return false;

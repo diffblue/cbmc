@@ -292,7 +292,7 @@ bool java_entry_point(
       std::string prefix=main_identifier+':';
       std::set<irep_idt> matches;
 
-      for(const auto & s : symbol_table.symbols)
+      for(const auto &s : symbol_table.symbols)
         if(has_prefix(id2string(s.first), prefix) &&
            s.second.type.id()==ID_code)
           matches.insert(s.first);
@@ -313,7 +313,7 @@ bool java_entry_point(
         message.error() << "main symbol `" << config.main
                         << "' is ambiguous:\n";
 
-        for(const auto & s : matches)
+        for(const auto &s : matches)
           message.error() << "  " << s << '\n';
 
         message.error() << messaget::eom;

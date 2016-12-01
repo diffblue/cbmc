@@ -170,11 +170,7 @@ void set_properties(
 {
   std::unordered_set<irep_idt, irep_id_hash> property_set;
 
-  for(std::list<std::string>::const_iterator
-      it=properties.begin();
-      it!=properties.end();
-      it++)
-    property_set.insert(*it);
+  property_set.insert(properties.begin(), properties.end());
 
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();

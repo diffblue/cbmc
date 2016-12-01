@@ -154,22 +154,15 @@ void remove_asmt::process_instruction(
     bool unknown=false;
     bool x86_32_locked_atomic=false;
 
-    for(std::list<assembler_parsert::instructiont>::const_iterator
-        it=assembler_parser.instructions.begin();
-        it!=assembler_parser.instructions.end();
-        it++)
+    for(const auto &instruction : assembler_parser.instructions)
     {
-      const assembler_parsert::instructiont &instruction=*it;
       if(instruction.empty()) continue;
 
       #if 0
       std::cout << "A ********************\n";
-      for(assembler_parsert::instructiont::const_iterator
-          t_it=instruction.begin();
-          t_it!=instruction.end();
-          t_it++)
+      for(const auto &ins : instruction)
       {
-        std::cout << "XX: " << t_it->pretty() << std::endl;
+        std::cout << "XX: " << ins.pretty() << std::endl;
       }
 
       std::cout << "B ********************\n";

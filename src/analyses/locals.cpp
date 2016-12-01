@@ -34,15 +34,9 @@ void localst::build(const goto_functiont &goto_function)
         to_symbol_expr(code_decl.symbol());
     }
 
-  const code_typet::parameterst &parameters=
-    goto_function.type.parameters();
-
-  for(code_typet::parameterst::const_iterator
-      it=parameters.begin();
-      it!=parameters.end();
-      it++)
-    locals_map[it->get_identifier()]=
-      symbol_exprt(it->get_identifier(), it->type());
+  for(const auto &param : goto_function.type.parameters())
+    locals_map[param.get_identifier()]=
+      symbol_exprt(param.get_identifier(), param.type());
 }
 
 /*******************************************************************\
@@ -59,9 +53,6 @@ Function: localst::output
 
 void localst::output(std::ostream &out) const
 {
-  for(locals_mapt::const_iterator
-      it=locals_map.begin();
-      it!=locals_map.end();
-      it++)
-    out << it->first << "\n";
+  for(const auto &local : locals_map)
+    out << local.first << "\n";
 }

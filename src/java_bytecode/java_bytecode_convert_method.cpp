@@ -100,7 +100,7 @@ protected:
     variablest &var_list,
     instruction_sizet inst_size)
   {
-    for(variablet &var : var_list)
+    for(const variablet &var : var_list)
     {
       size_t start_pc=var.start_pc;
       size_t length=var.length;
@@ -312,7 +312,7 @@ void java_bytecode_convert_methodt::convert(
   // to calculate which variable to use, one uses the address of the instruction
   // that uses the variable, the size of the instruction and the start_pc /
   // length values in the local variable table
-  for(const auto & v : m.local_variable_table)
+  for(const auto &v : m.local_variable_table)
   {
     typet t=java_type_from_string(v.signature);
     std::ostringstream id_oss;
@@ -328,25 +328,25 @@ void java_bytecode_convert_methodt::convert(
   }
 
   // set up variables array
-  for(std::size_t i=0, param_index=0;
-      i<parameters.size(); ++i)
+  std::size_t param_index=0;
+  for(const auto &param : parameters)
   {
     variables[param_index].resize(1);
-    param_index+=get_variable_slots(parameters[i]);
+    param_index+=get_variable_slots(param);
   }
 
   // assign names to parameters
-  for(std::size_t i=0, param_index=0;
-      i<parameters.size(); ++i)
+  param_index=0;
+  for(auto &param : parameters)
   {
     irep_idt base_name, identifier;
 
-    if(i==0 && parameters[i].get_this())
+    if(param_index==0 && param.get_this())
     {
       base_name="this";
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
-      parameters[i].set_base_name(base_name);
-      parameters[i].set_identifier(identifier);
+      param.set_base_name(base_name);
+      param.set_identifier(identifier);
     }
     else
     {
@@ -356,14 +356,14 @@ void java_bytecode_convert_methodt::convert(
 
       if(base_name.empty())
       {
-        const typet &type=parameters[i].type();
+        const typet &type=param.type();
         char suffix=java_char_from_type(type);
         base_name="arg"+std::to_string(param_index)+suffix;
         identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
 
-      parameters[i].set_base_name(base_name);
-      parameters[i].set_identifier(identifier);
+      param.set_base_name(base_name);
+      param.set_identifier(identifier);
     }
 
     // add to symbol table
@@ -371,16 +371,17 @@ void java_bytecode_convert_methodt::convert(
     parameter_symbol.base_name=base_name;
     parameter_symbol.mode=ID_java;
     parameter_symbol.name=identifier;
-    parameter_symbol.type=parameters[i].type();
+    parameter_symbol.type=param.type();
     symbol_table.add(parameter_symbol);
 
     // add as a JVM variable
-    std::size_t slots=get_variable_slots(parameters[i]);
+    std::size_t slots=get_variable_slots(param);
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
     variables[param_index][0].start_pc=0;
     variables[param_index][0].length=std::numeric_limits<size_t>::max();
     variables[param_index][0].is_parameter=true;
     param_index+=slots;
+    assert(param_index>0);
   }
 
   const bool is_virtual=!m.is_static && !m.is_final;
@@ -590,33 +591,28 @@ codet java_bytecode_convert_methodt::convert_instructions(
             i_it->statement=="lookupswitch")
     {
       bool is_label=true;
-      for(instructiont::argst::const_iterator
-          a_it=i_it->args.begin();
-          a_it!=i_it->args.end();
-          a_it++, is_label=!is_label)
+      for(const auto &arg : i_it->args)
       {
         if(is_label)
         {
           const unsigned target=safe_string2unsigned(
-            id2string(to_constant_expr(*a_it).get_value()));
+            id2string(to_constant_expr(arg).get_value()));
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
         }
+        is_label=!is_label;
       }
     }
   }
 
-  for(address_mapt::iterator
-      it=address_map.begin();
-      it!=address_map.end();
-      ++it)
+  for(const auto &address : address_map)
   {
-    for(unsigned s : it->second.successors)
+    for(unsigned s : address.second.successors)
     {
       address_mapt::iterator a_it=address_map.find(s);
       assert(a_it!=address_map.end());
 
-      a_it->second.predecessors.insert(it->first);
+      a_it->second.predecessors.insert(address.first);
     }
   }
 
@@ -1475,12 +1471,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     push(results);
 
     a_it->second.done=true;
-    for(std::list<unsigned>::iterator
-        it=a_it->second.successors.begin();
-        it!=a_it->second.successors.end();
-        ++it)
+    for(const unsigned address : a_it->second.successors)
     {
-      address_mapt::iterator a_it2=address_map.find(*it);
+      address_mapt::iterator a_it2=address_map.find(address);
       assert(a_it2!=address_map.end());
 
       if(!stack.empty() && a_it2->second.predecessors.size()>1)
@@ -1507,17 +1500,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
         {
           assert(a_it2->second.stack.size()==stack.size());
           stackt::const_iterator os_it=a_it2->second.stack.begin();
-          for(stackt::iterator s_it=stack.begin();
-              s_it!=stack.end();
-              ++s_it)
+          for(auto &expr : stack)
           {
             assert(has_prefix(os_it->get_string(ID_C_base_name),
                               "$stack"));
             symbol_exprt lhs=to_symbol_expr(*os_it);
-            code_assignt a(lhs, *s_it);
+            code_assignt a(lhs, expr);
             more_code.copy_to_operands(a);
 
-            s_it->swap(lhs);
+            expr.swap(lhs);
             ++os_it;
           }
         }
@@ -1544,7 +1535,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   code_blockt code;
 
   // locals
-  for(const auto & var : used_local_names)
+  for(const auto &var : used_local_names)
   {
     code.add(code_declt(var));
     symbolt new_symbol;
@@ -1561,16 +1552,16 @@ codet java_bytecode_convert_methodt::convert_instructions(
     symbol_table.add(new_symbol);
   }
   // temporaries
-  for(const auto & var : tmp_vars)
+  for(const auto &var : tmp_vars)
   {
     code.add(code_declt(var));
   }
 
-  for(const auto & it : address_map)
+  for(const auto &address_pair : address_map)
   {
-    const unsigned address=it.first;
-    assert(it.first==it.second.source->address);
-    const codet &c=it.second.code;
+    const unsigned address=address_pair.first;
+    assert(address_pair.first==address_pair.second.source->address);
+    const codet &c=address_pair.second.code;
 
     if(targets.find(address)!=targets.end())
       code.add(code_labelt(label(std::to_string(address)), c));

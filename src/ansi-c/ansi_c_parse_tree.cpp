@@ -58,12 +58,9 @@ Function: ansi_c_parse_treet::output
 
 void ansi_c_parse_treet::output(std::ostream &out) const
 {
-  for(itemst::const_iterator
-      it=items.begin();
-      it!=items.end();
-      it++)
+  for(const auto &item : items)
   {
-    it->output(out);
+    item.output(out);
     out << "\n";
   }
 }

@@ -28,10 +28,8 @@ Function: invariant_propagationt::make_all_true
 
 void invariant_propagationt::make_all_true()
 {
-  for(state_mapt::iterator it=state_map.begin();
-      it!=state_map.end();
-      it++)
-    it->second.invariant_set.make_true();
+  for(auto &state : state_map)
+    state.second.invariant_set.make_true();
 }
 
 /*******************************************************************\
@@ -48,10 +46,8 @@ Function: invariant_propagationt::make_all_false
 
 void invariant_propagationt::make_all_false()
 {
-  for(state_mapt::iterator it=state_map.begin();
-      it!=state_map.end();
-      it++)
-    it->second.invariant_set.make_false();
+  for(auto &state : state_map)
+    state.second.invariant_set.make_false();
 }
 
 /*******************************************************************\
@@ -81,10 +77,7 @@ void invariant_propagationt::add_objects(
   typedef std::unordered_map<irep_idt, object_listt, irep_id_hash> object_cachet;
   object_cachet object_cache;
 
-  for(goto_programt::instructionst::const_iterator
-      i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end();
-      i_it++)
+  forall_goto_program_instructions(i_it, goto_program)
   {
     #if 0
     invariant_sett &is=(*this)[i_it].invariant_set;
@@ -92,19 +85,16 @@ void invariant_propagationt::add_objects(
     is.add_objects(globals);
     #endif
 
-    for(goto_programt::decl_identifierst::const_iterator
-        l_it=locals.begin();
-        l_it!=locals.end();
-        l_it++)
+    for(const auto &local : locals)
     {
       // cache hit?
-      object_cachet::const_iterator e_it=object_cache.find(*l_it);
+      object_cachet::const_iterator e_it=object_cache.find(local);
 
       if(e_it==object_cache.end())
       {
-        const symbolt &symbol=ns.lookup(*l_it);
+        const symbolt &symbol=ns.lookup(local);
 
-        object_listt &objects=object_cache[*l_it];
+        object_listt &objects=object_cache[local];
         get_objects(symbol, objects);
         #if 0
         is.add_objects(objects);
@@ -138,11 +128,8 @@ void invariant_propagationt::get_objects(
 
   get_objects_rec(symbol.symbol_expr(), object_list);
 
-  for(std::list<exprt>::const_iterator
-      it=object_list.begin();
-      it!=object_list.end();
-      it++)
-    dest.push_back(object_store.add(*it));
+  for(const auto &expr : object_list)
+    dest.push_back(object_store.add(expr));
 }
 
 /*******************************************************************\
@@ -173,13 +160,10 @@ void invariant_propagationt::get_objects_rec(
     exprt member_expr(ID_member);
     member_expr.copy_to_operands(src);
 
-    for(struct_typet::componentst::const_iterator
-        it=c.begin();
-        it!=c.end();
-        it++)
+    for(const auto &component : c)
     {
-      member_expr.set(ID_component_name, it->get_string(ID_name));
-      member_expr.type()=it->type();
+      member_expr.set(ID_component_name, component.get_name());
+      member_expr.type()=component.type();
       // recursive call
       get_objects_rec(member_expr, dest);
     }
@@ -214,10 +198,7 @@ void invariant_propagationt::add_objects(
   object_listt globals;
   get_globals(globals);
 
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     // get the locals
     std::set<irep_idt> locals;
@@ -229,10 +210,7 @@ void invariant_propagationt::add_objects(
     typedef std::unordered_map<irep_idt, object_listt, irep_id_hash> object_cachet;
     object_cachet object_cache;
 
-    for(goto_programt::instructionst::const_iterator
-        i_it=goto_program.instructions.begin();
-        i_it!=goto_program.instructions.end();
-        i_it++)
+    forall_goto_program_instructions(i_it, goto_program)
     {
       #if 0
       invariant_sett &is=(*this)[i_it].invariant_set;
@@ -240,19 +218,16 @@ void invariant_propagationt::add_objects(
       is.add_objects(globals);
       #endif
 
-      for(std::set<irep_idt>::const_iterator
-          l_it=locals.begin();
-          l_it!=locals.end();
-          l_it++)
+      for(const auto &local : locals)
       {
         // cache hit?
-        object_cachet::const_iterator e_it=object_cache.find(*l_it);
+        object_cachet::const_iterator e_it=object_cache.find(local);
 
         if(e_it==object_cache.end())
         {
-          const symbolt &symbol=ns.lookup(*l_it);
+          const symbolt &symbol=ns.lookup(local);
 
-          object_listt &objects=object_cache[*l_it];
+          object_listt &objects=object_cache[local];
           get_objects(symbol, objects);
           #if 0
           is.add_objects(objects);
@@ -370,10 +345,7 @@ void invariant_propagationt::initialize(const goto_functionst &goto_functions)
 {
   baset::initialize(goto_functions);
 
-  for(goto_functionst::function_mapt::const_iterator f_it=
-        goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     initialize(f_it->second.body);
 }
 

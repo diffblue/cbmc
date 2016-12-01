@@ -116,9 +116,9 @@ cpp_scopet &cpp_typecheckt::tag_scope(
   cpp_scopet::id_sett id_set;
   cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE, id_set);
 
-  for(const auto & it : id_set)
-    if(it->is_class())
-      return static_cast<cpp_scopet &>(it->get_parent());
+  for(const auto &id : id_set)
+    if(id->is_class())
+      return static_cast<cpp_scopet &>(id->get_parent());
 
   // Tags without body that we don't have already
   // and that are not a tag-only declaration go into
@@ -511,14 +511,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // The method may be virtual implicitly.
     std::set<irep_idt> virtual_bases;
 
-    for(const auto & it : components)
+    for(const auto &comp : components)
     {
-      if(it.get_bool(ID_is_virtual))
+      if(comp.get_bool(ID_is_virtual))
       {
-        if(it.get("virtual_name")==virtual_name)
+        if(comp.get("virtual_name")==virtual_name)
         {
           is_virtual=true;
-          const code_typet& code_type = to_code_type(it.type());
+          const code_typet& code_type=to_code_type(comp.type());
           assert(code_type.parameters().size()>0);
           const typet& pointer_type = code_type.parameters()[0].type();
           assert(pointer_type.id() == ID_pointer);
@@ -646,14 +646,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
         arg.type().subtype().set(ID_identifier, virtual_base);
 
         // create symbols for the parameters
-        code_typet::parameterst& args =  code_type.parameters();
-        for(unsigned i=0; i<args.size(); i++)
+        code_typet::parameterst &args=code_type.parameters();
+        unsigned i=0;
+        for(auto &arg : args)
         {
-          code_typet::parametert& arg = args[i];
           irep_idt base_name = arg.get_base_name();
 
           if(base_name==irep_idt())
-            base_name="arg"+std::to_string(i);
+            base_name="arg"+std::to_string(i++);
 
           symbolt arg_symb;
           arg_symb.name = id2string(func_symb.name) + "::"+ id2string(base_name);
@@ -879,7 +879,7 @@ void cpp_typecheckt::put_compound_into_scope(
 
     cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY, id_set);
 
-    for(const auto & id_it : id_set)
+    for(const auto &id_it : id_set)
     {
       const cpp_idt &id=*id_it;
 
@@ -965,7 +965,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
   // It should be a friend function.
   // Do the declarators.
 
-  for(auto & sub_it : declaration.declarators())
+  for(auto &sub_it : declaration.declarators())
   {
     bool has_value = sub_it.value().is_not_nil();
 
@@ -1124,7 +1124,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
 
       // declarators
-      for(auto & declarator : declaration.declarators())
+      for(auto &declarator : declaration.declarators())
       {
         // Skip the constructors until all the data members
         // are discovered
@@ -1202,7 +1202,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(!declaration.is_constructor())
         continue;
 
-      for(auto & declarator : declaration.declarators())
+      for(auto &declarator : declaration.declarators())
       {
         #if 0
         irep_idt ctor_base_name=
@@ -1508,9 +1508,9 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   // should be visible in the containing struct/union,
   // and that recursively!
 
-  for(const auto & it : struct_union_components)
+  for(const auto &comp : struct_union_components)
   {
-    if(it.type().id()==ID_code)
+    if(comp.type().id()==ID_code)
     {
       error().source_location=struct_union_symbol.type.source_location();
       error() << "anonymous struct/union member `"
@@ -1519,26 +1519,26 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
       throw 0;
     }
 
-    if(it.get_anonymous())
+    if(comp.get_anonymous())
     {
-      const symbolt &symbol=lookup(it.type().get(ID_identifier));
+      const symbolt &symbol=lookup(comp.type().get(ID_identifier));
       // recrusive call
       add_anonymous_members_to_scope(symbol);
     }
     else
     {
-      const irep_idt &base_name=it.get_base_name();
+      const irep_idt &base_name=comp.get_base_name();
 
       if(cpp_scopes.current_scope().contains(base_name))
       {
-        error().source_location=it.source_location();
+        error().source_location=comp.source_location();
         error() << "`" << base_name << "' already in scope" << eom;
         throw 0;
       }
 
       cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
       id.id_class=cpp_idt::SYMBOL;
-      id.identifier=it.get(ID_name);
+      id.identifier=comp.get_name();
       id.class_identifier=struct_union_symbol.name;
       id.is_member=true;
     }
@@ -1637,10 +1637,8 @@ bool cpp_typecheckt::get_component(
   const struct_union_typet::componentst &components=
     final_type.components();
 
-  for(const auto & it : components)
+  for(const auto &component : components)
   {
-    const struct_union_typet::componentt &component = it;
-
     exprt tmp(ID_member, component.type());
     tmp.set(ID_component_name, component.get_name());
     tmp.add_source_location()=source_location;

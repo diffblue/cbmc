@@ -48,7 +48,7 @@ exprt::operandst build_function_environment(
 
   std::size_t i=0;
 
-  for(const auto & p : parameters)
+  for(const auto &p : parameters)
   {
     irep_idt base_name=p.get_base_name().empty()?
       ("argument#"+std::to_string(i)):p.get_base_name();
@@ -132,7 +132,7 @@ void record_function_outputs(
   #if 0
   std::size_t i=0;
 
-  for(const auto & p : parameters)
+  for(const auto &p : parameters)
   {
     if(p.get_identifier().empty())
       continue;

@@ -609,21 +609,16 @@ void c_typecastt::implicit_typecast_followed(
       src_type_no_const.subtype().remove(ID_C_constant);
 
     // Check union members.
-    const union_typet &dest_union_type=to_union_type(dest_type);
-
-    for(union_typet::componentst::const_iterator
-        it=dest_union_type.components().begin();
-        it!=dest_union_type.components().end();
-        it++)
+    for(const auto &comp : to_union_type(dest_type).components())
     {
-      if(!check_c_implicit_typecast(src_type_no_const, it->type()))
+      if(!check_c_implicit_typecast(src_type_no_const, comp.type()))
       {
         // build union constructor
         exprt union_expr(ID_union, orig_dest_type);
         union_expr.move_to_operands(expr);
         if(!full_eq(src_type, src_type_no_const))
           do_typecast(union_expr.op0(), src_type_no_const);
-        union_expr.set(ID_component_name, it->get_name());
+        union_expr.set(ID_component_name, comp.get_name());
         expr=union_expr;
         return; // ok
       }

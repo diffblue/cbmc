@@ -73,7 +73,7 @@ Function: c_typecheck_baset::add_rounding_mode
 
 void c_typecheck_baset::add_rounding_mode(exprt &expr)
 {
-  for(auto & op : expr.operands())
+  for(auto &op : expr.operands())
     add_rounding_mode(op);
 
   if(expr.id()==ID_div ||

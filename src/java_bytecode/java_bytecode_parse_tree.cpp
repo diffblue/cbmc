@@ -81,7 +81,7 @@ Function: java_bytecode_parse_treet::classt::output
 
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
-  for(const auto & annotation : annotations)
+  for(const auto &annotation : annotations)
   {
     annotation.output(out);
     out << '\n';
@@ -137,7 +137,7 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
     out << '(';
 
     bool first=true;
-    for(const auto & element_value_pair : element_value_pairs)
+    for(const auto &element_value_pair : element_value_pairs)
     {
       if(first) first=false; else out << ", ";
       element_value_pair.output(out);
@@ -185,7 +185,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
-  for(const auto & annotation : annotations)
+  for(const auto &annotation : annotations)
   {
     out << "  ";
     annotation.output(out);
@@ -222,7 +222,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
   out << "  {" << '\n';
 
-  for(const auto & i : instructions)
+  for(const auto &i : instructions)
   {
     if(i.source_location.get_line()!=irep_idt())
       out << "    // " << i.source_location << '\n';
@@ -249,7 +249,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   out << '\n';
 
   out << "  Locals:\n";
-  for(const auto & v : local_variable_table)
+  for(const auto &v : local_variable_table)
   {
     out << "    " << v.index << ": " << v.name << ' '
         << v.signature << '\n';
@@ -272,7 +272,7 @@ Function: java_bytecode_parse_treet::fieldt::output
 
 void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
 {
-  for(const auto & annotation : annotations)
+  for(const auto &annotation : annotations)
   {
     out << "  ";
     annotation.output(out);

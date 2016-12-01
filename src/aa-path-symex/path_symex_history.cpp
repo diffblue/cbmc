@@ -29,10 +29,8 @@ void path_symex_stept::output(std::ostream &out) const
   out << "PCs:";
 
 /*
-    for(pc_vectort::const_iterator p_it=s_it->pc_vector.begin();
-        p_it!=pc_vector.end();
-        p_it++)
-      out << " " << *p_it;
+    for(const auto &pc : s_it->pc_vector)
+      out << " " << pc;
  */
   out << "\n";
 

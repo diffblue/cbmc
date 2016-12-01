@@ -182,10 +182,10 @@ void cpp_typecheckt::convert_non_template_declaration(
   }
 
   // do the declarators (optional)
-  for(auto & it : declaration.declarators())
+  for(auto &d : declaration.declarators())
   {
     // copy the declarator (we destroy the original)
-    cpp_declaratort declarator=it;
+    cpp_declaratort declarator=d;
 
     cpp_declarator_convertert cpp_declarator_converter(*this);
 
@@ -204,7 +204,7 @@ void cpp_typecheckt::convert_non_template_declaration(
 
     // replace declarator by symbol expression
     exprt tmp=cpp_symbol_expr(symbol);
-    it.swap(tmp);
+    d.swap(tmp);
 
     // is there a constructor to be called for the declarator?
     if(symbol.is_lvalue &&

@@ -428,17 +428,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       const unsignedbv_typet size_t_type(config.ansi_c.pointer_width);
       expr.op0().type()=size_t_type;
 
-      for(auto & it : expr.op0().operands())
+      for(auto &op : expr.op0().operands())
       {
-        if(it.type().id()==ID_pointer)
+        if(op.type().id()==ID_pointer)
         {
-          it.make_typecast(size_t_type);
+          op.make_typecast(size_t_type);
         }
         else
         {
-          it.make_typecast(size_t_type);
+          op.make_typecast(size_t_type);
           if(step>1)
-            it=mult_exprt(from_integer(step, size_t_type), it);
+            op=mult_exprt(from_integer(step, size_t_type), op);
         }
       }
 
@@ -1500,19 +1500,16 @@ bool simplify_exprt::simplify_update(exprt &expr)
   exprt updated_value=to_update_expr(expr).old();
   exprt *value_ptr=&updated_value;
 
-  for(exprt::operandst::const_iterator
-      it=designator.begin();
-      it!=designator.end();
-      it++)
+  for(const auto &e : designator)
   {
     const typet &value_ptr_type=ns.follow(value_ptr->type());
 
-    if(it->id()==ID_index_designator &&
+    if(e.id()==ID_index_designator &&
        value_ptr->id()==ID_array)
     {
       mp_integer i;
 
-      if(to_integer(it->op0(), i))
+      if(to_integer(e.op0(), i))
         return true;
 
       if(i<0 || i>=value_ptr->operands().size())
@@ -1520,11 +1517,11 @@ bool simplify_exprt::simplify_update(exprt &expr)
 
       value_ptr=&value_ptr->operands()[integer2size_t(i)];
     }
-    else if(it->id()==ID_member_designator &&
+    else if(e.id()==ID_member_designator &&
             value_ptr->id()==ID_struct)
     {
       const irep_idt &component_name=
-        it->get(ID_component_name);
+        e.get(ID_component_name);
 
       if(!to_struct_type(value_ptr_type).
          has_component(component_name))
@@ -1707,16 +1704,13 @@ exprt simplify_exprt::bits2expr(
     const union_typet::componentst &components=
       union_type.components();
 
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
+    for(const auto &component : components)
     {
-      exprt val=bits2expr(bits, it->type(), little_endian);
+      exprt val=bits2expr(bits, component.type(), little_endian);
       if(val.is_nil())
         continue;
 
-      return union_exprt(it->get_name(), val, type);
+      return union_exprt(component.get_name(), val, type);
     }
   }
   else if(type.id()==ID_struct)
@@ -1729,12 +1723,9 @@ exprt simplify_exprt::bits2expr(
     result.reserve_operands(components.size());
 
     mp_integer m_offset_bits=0;
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
+    for(const auto &component : components)
     {
-      mp_integer m_size=pointer_offset_bits(it->type(), ns);
+      mp_integer m_size=pointer_offset_bits(component.type(), ns);
       assert(m_size>=0);
 
       std::string comp_bits=
@@ -1742,7 +1733,7 @@ exprt simplify_exprt::bits2expr(
           bits,
           integer2size_t(m_offset_bits),
           integer2size_t(m_size));
-      exprt comp=bits2expr(comp_bits, it->type(), little_endian);
+      exprt comp=bits2expr(comp_bits, component.type(), little_endian);
       if(comp.is_nil())
         return nil_exprt();
       result.move_to_operands(comp);
@@ -2075,21 +2066,18 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       struct_type.components();
 
     mp_integer m_offset_bits=0;
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
+    for(const auto &component : components)
     {
       mp_integer m_size=
-        pointer_offset_bits(it->type(), ns);
+        pointer_offset_bits(component.type(), ns);
       if(m_size<=0)
         break;
 
       if(offset*8==m_offset_bits &&
          el_size==m_size &&
-         base_type_eq(expr.type(), it->type(), ns))
+         base_type_eq(expr.type(), component.type(), ns))
       {
-        member_exprt member(expr.op(), it->get_name(), it->type());
+        member_exprt member(expr.op(), component.get_name(), component.type());
         simplify_member(member);
         expr.swap(member);
 
@@ -2099,7 +2087,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
               offset*8+el_size<=m_offset_bits+m_size &&
               m_offset_bits%8==0)
       {
-        expr.op()=member_exprt(expr.op(), it->get_name(), it->type());
+        expr.op()=member_exprt(expr.op(), component.get_name(), component.type());
         simplify_member(expr.op());
         expr.offset()=
           from_integer(offset-m_offset_bits/8, expr.offset().type());
@@ -2271,14 +2259,11 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
     const struct_typet::componentst &components=
       struct_type.components();
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
+    for(const auto &component : components)
     {
       mp_integer m_offset=
-        member_offset(struct_type, it->get_name(), ns);
-      mp_integer m_size_bits=pointer_offset_bits(it->type(), ns);
+        member_offset(struct_type, component.get_name(), ns);
+      mp_integer m_size_bits=pointer_offset_bits(component.type(), ns);
       mp_integer m_size_bytes=m_size_bits/8;
 
       // can we determine the current offset, and is it a byte-sized
@@ -2302,7 +2287,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
         result_expr=expr.op();
 
       exprt member_name(ID_member_name);
-      member_name.set(ID_component_name, it->get_name());
+      member_name.set(ID_component_name, component.get_name());
       result_expr=with_exprt(result_expr, member_name, nil_exprt());
 
       // are we updating on member boundaries?
@@ -2313,7 +2298,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       {
         byte_update_exprt v(
           ID_byte_update_little_endian,
-          member_exprt(root, it->get_name(), it->type()),
+          member_exprt(root, component.get_name(), component.type()),
           from_integer(offset_int-m_offset, offset.type()),
           value);
 
@@ -2332,7 +2317,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
           ID_byte_extract_little_endian,
           value,
           from_integer(m_offset-offset_int, offset.type()),
-          it->type());
+          component.type());
 
         to_with_expr(result_expr).new_value().swap(v);
       }

@@ -349,15 +349,11 @@ void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
 
   // replicate <= and != constraints
 
-  for(ineq_sett::const_iterator it=le_set.begin();
-      it!=le_set.end();
-      it++)
-    add_eq(le_set, p, *it);
+  for(const auto &le : le_set)
+    add_eq(le_set, p, le);
 
-  for(ineq_sett::const_iterator it=ne_set.begin();
-      it!=ne_set.end();
-      it++)
-    add_eq(ne_set, p, *it);
+  for(const auto &ne : ne_set)
+    add_eq(ne_set, p, ne);
 }
 
 /*******************************************************************\
@@ -509,30 +505,24 @@ void invariant_sett::output(
       out << std::endl;
     }
 
-  for(bounds_mapt::const_iterator it=bounds_map.begin();
-      it!=bounds_map.end();
-      it++)
+  for(const auto &bounds : bounds_map)
   {
-    out << to_string(it->first, identifier)
-        << " in " << it->second
+    out << to_string(bounds.first, identifier)
+        << " in " << bounds.second
         << std::endl;
   }
 
-  for(ineq_sett::const_iterator it=le_set.begin();
-      it!=le_set.end();
-      it++)
+  for(const auto &le : le_set)
   {
-    out << to_string(it->first, identifier)
-        << " <= " << to_string(it->second, identifier)
+    out << to_string(le.first, identifier)
+        << " <= " << to_string(le.second, identifier)
         << std::endl;
   }
 
-  for(ineq_sett::const_iterator it=ne_set.begin();
-      it!=ne_set.end();
-      it++)
+  for(const auto &ne : ne_set)
   {
-    out << to_string(it->first, identifier)
-        << " != " << to_string(it->second, identifier)
+    out << to_string(ne.first, identifier)
+        << " != " << to_string(ne.second, identifier)
         << std::endl;
   }
 }
@@ -697,24 +687,19 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     {
       const struct_typet &struct_type=to_struct_type(op_type);
 
-      const struct_typet::componentst &c=struct_type.components();
-
       exprt lhs_member_expr(ID_member);
       exprt rhs_member_expr(ID_member);
       lhs_member_expr.copy_to_operands(expr.op0());
       rhs_member_expr.copy_to_operands(expr.op1());
 
-      for(struct_typet::componentst::const_iterator
-          it=c.begin();
-          it!=c.end();
-          it++)
+      for(const auto &comp : struct_type.components())
       {
-        const irep_idt &component_name=it->get(ID_name);
+        const irep_idt &component_name=comp.get(ID_name);
 
         lhs_member_expr.set(ID_component_name, component_name);
         rhs_member_expr.set(ID_component_name, component_name);
-        lhs_member_expr.type()=it->type();
-        rhs_member_expr.type()=it->type();
+        lhs_member_expr.type()=comp.type();
+        rhs_member_expr.type()=comp.type();
 
         equal_exprt equality;
         equality.lhs()=lhs_member_expr;

@@ -64,17 +64,13 @@ void goto_symext::initialize_auto_object(
   if(type.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=struct_type.components();
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : struct_type.components())
     {
       member_exprt member_expr;
       member_expr.struct_op()=expr;
-      member_expr.set_component_name(it->get_name());
-      member_expr.type()=it->type();
+      member_expr.set_component_name(comp.get_name());
+      member_expr.type()=comp.type();
 
       initialize_auto_object(member_expr, state);
     }

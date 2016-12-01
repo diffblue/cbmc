@@ -131,7 +131,7 @@ const symbolt &get_module(
 
     message.error() << "multiple modules found, please select one:\n";
 
-    for(const auto & s_it : modules)
+    for(const auto &s_it : modules)
       message.error() << "  " << s_it << '\n';
 
     message.error() << messaget::eom;

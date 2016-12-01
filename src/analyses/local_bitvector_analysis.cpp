@@ -323,12 +323,9 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
   // Gather the objects we track, and
   // feed in sufficiently bad defaults for their value
   // in the entry location.
-  for(localst::locals_mapt::const_iterator
-      it=locals.locals_map.begin();
-      it!=locals.locals_map.end();
-      it++)
-    if(is_tracked(it->first))
-      loc_infos[0].points_to[pointers.number(it->first)]=flagst::mk_unknown();
+  for(const auto &local : locals.locals_map)
+    if(is_tracked(local.first))
+      loc_infos[0].points_to[pointers.number(local.first)]=flagst::mk_unknown();
 
   while(!work_queue.empty())
   {
@@ -374,13 +371,10 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
     default:;
     }
 
-    for(local_cfgt::successorst::const_iterator
-        it=node.successors.begin();
-        it!=node.successors.end();
-        it++)
+    for(const auto &succ : node.successors)
     {
-      if(loc_infos[*it].merge(loc_info_dest))
-        work_queue.push(*it);
+      if(loc_infos[succ].merge(loc_info_dest))
+        work_queue.push(succ);
     }
   }
 }

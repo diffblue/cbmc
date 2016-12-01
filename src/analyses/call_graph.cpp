@@ -110,12 +110,10 @@ void call_grapht::output_dot(std::ostream &out) const
 {
   out << "digraph call_graph {\n";
 
-  for(grapht::const_iterator it=graph.begin();
-      it!=graph.end();
-      it++)
+  for(const auto &edge : graph)
   {
-    out << "  \"" << it->first << "\" -> "
-        << "\"" << it->second << "\" "
+    out << "  \"" << edge.first << "\" -> "
+        << "\"" << edge.second << "\" "
         << " [arrowhead=\"vee\"];"
         << "\n";
   }
@@ -137,12 +135,9 @@ Function: call_grapht::output
 
 void call_grapht::output(std::ostream &out) const
 {
-  for(grapht::const_iterator
-      it=graph.begin();
-      it!=graph.end();
-      it++)
+  for(const auto &edge : graph)
   {
-    out << it->first << " -> " << it->second << "\n";
+    out << edge.first << " -> " << edge.second << "\n";
   }
 }
 
@@ -160,15 +155,12 @@ Function: call_grapht::output_xml
 
 void call_grapht::output_xml(std::ostream &out) const
 {
-  for(grapht::const_iterator
-      it=graph.begin();
-      it!=graph.end();
-      it++)
+  for(const auto &edge : graph)
   {
     out << "<call_graph_edge caller=\"";
-    xmlt::escape_attribute(id2string(it->first), out);
+    xmlt::escape_attribute(id2string(edge.first), out);
     out << "\" callee=\"";
-    xmlt::escape_attribute(id2string(it->second), out);
+    xmlt::escape_attribute(id2string(edge.second), out);
     out << "\">\n";
   }
 }

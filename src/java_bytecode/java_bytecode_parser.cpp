@@ -335,7 +335,7 @@ void java_bytecode_parsert::get_class_refs()
   // Get the class references for the benefit of a dependency
   // analysis.
 
-  for(const auto & c : constant_pool)
+  for(const auto &c : constant_pool)
   {
     switch(c.tag)
     {
@@ -354,17 +354,17 @@ void java_bytecode_parsert::get_class_refs()
     }
   }
 
-  for(const auto & m : parse_tree.parsed_class.fields)
+  for(const auto &m : parse_tree.parsed_class.fields)
   {
     typet t=java_type_from_string(m.signature);
     get_class_refs_rec(t);
   }
 
-  for(const auto & m : parse_tree.parsed_class.methods)
+  for(const auto &m : parse_tree.parsed_class.methods)
   {
     typet t=java_type_from_string(m.signature);
     get_class_refs_rec(t);
-    for(const auto & var : m.local_variable_table)
+    for(const auto &var : m.local_variable_table)
     {
       typet var_type=java_type_from_string(var.signature);
       get_class_refs_rec(var_type);
@@ -391,7 +391,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
     const code_typet &ct=to_code_type(src);
     const typet &rt=ct.return_type();
     get_class_refs_rec(rt);
-    for(const auto & p : ct.parameters())
+    for(const auto &p : ct.parameters())
       get_class_refs_rec(p.type());
   }
   else if(src.id()==ID_symbol)
@@ -409,7 +409,7 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   else if(src.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(src);
-    for(const auto & c : struct_type.components())
+    for(const auto &c : struct_type.components())
       get_class_refs_rec(c.type());
   }
   else if(src.id()==ID_pointer)
@@ -1301,7 +1301,7 @@ void java_bytecode_parsert::relement_value_pairs(
   u2 num_element_value_pairs=read_u2();
   element_value_pairs.resize(num_element_value_pairs);
 
-  for(auto & element_value_pair : element_value_pairs)
+  for(auto &element_value_pair : element_value_pairs)
   {
     u2 element_name_index=read_u2();
     element_value_pair.element_name=pool_entry(element_name_index).s;

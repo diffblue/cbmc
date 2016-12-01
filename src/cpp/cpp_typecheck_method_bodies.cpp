@@ -27,7 +27,7 @@ void cpp_typecheckt::typecheck_method_bodies(
   instantiation_stackt old_instantiation_stack;
   old_instantiation_stack.swap(instantiation_stack);
 
-  for(auto & b : bodies)
+  for(auto &b : bodies)
   {
     symbolt &method_symbol=*b.method_symbol;
     template_map.swap(b.template_map);

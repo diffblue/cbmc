@@ -773,7 +773,7 @@ void aig_prop_solvert::convert_aig()
 
 
   // 3. Do constraints
-  for(const auto & c_it : aig.constraints)
+  for(const auto &c_it : aig.constraints)
     solver.l_set_to(c_it, true);
 
   // HACK!

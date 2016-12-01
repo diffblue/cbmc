@@ -85,11 +85,8 @@ void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
   out << "  PC: " << thread.pc << std::endl;
   out << "  Call stack:";
-  for(call_stackt::const_iterator
-      it=thread.call_stack.begin();
-      it!=thread.call_stack.end();
-      it++)
-    out << " " << it->return_location << std::endl;
+  for(const auto &call : thread.call_stack)
+    out << " " << call.return_location << std::endl;
   out << std::endl;
 }
 

@@ -154,23 +154,16 @@ void smt2_convt::write_footer(std::ostream &out)
   }
 
   // fix up the object sizes
-  for(defined_expressionst::iterator it = object_sizes.begin();
-      it != object_sizes.end();
-      ++it)
-  {
-    define_object_size(it->second, it->first);
-  }
+  for(const auto &object : object_sizes)
+    define_object_size(object.second, object.first);
 
   out << "(check-sat)" << "\n";
   out << "\n";
 
   if (solver!=BOOLECTOR)
   {
-    for(smt2_identifierst::const_iterator
-        it=smt2_identifiers.begin();
-        it!=smt2_identifiers.end();
-        it++)
-      out << "(get-value (|" << *it << "|))" << "\n";
+    for(const auto &id : smt2_identifiers)
+      out << "(get-value (|" << id << "|))" << "\n";
   }
 
   out << "\n";
@@ -204,23 +197,19 @@ void smt2_convt::define_object_size(
   std::size_t h = pointer_width - 1;
   std::size_t l = pointer_width - BV_ADDR_BITS;
 
-  for(pointer_logict::objectst::const_iterator it = pointer_logic.objects.begin();
-      it != pointer_logic.objects.end();
-      ++it, number++)
+  for(const auto &o : pointer_logic.objects)
   {
-    const exprt &o = *it;
     const typet &type = ns.follow(o.type());
     exprt size_expr = size_of_expr(type, ns);
     mp_integer object_size;
 
-    if (o.id() != ID_symbol)
+    if(o.id()!=ID_symbol ||
+       size_expr.is_nil() ||
+       to_integer(size_expr, object_size))
+    {
+      ++number;
       continue;
-
-    if (size_expr.is_nil())
-      continue;
-
-    if (to_integer(size_expr, object_size))
-      continue;
+    }
 
     out << "(assert (implies (= " <<
       "((_ extract " << h << " " << l << ") ";
@@ -228,6 +217,8 @@ void smt2_convt::define_object_size(
     out << ") (_ bv" << number << " " << BV_ADDR_BITS << "))" <<
       "(= " << id << " (_ bv" << object_size.to_ulong() << " " <<
       size_width << "))))\n";
+
+    ++number;
   }
 }
 
@@ -3062,8 +3053,8 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
     {
       out << "(or";
 
-      for(const auto & it : dynamic_objects)
-        out << " (= (_ bv" << it
+      for(const auto &object : dynamic_objects)
+        out << " (= (_ bv" << object
             << " " << BV_ADDR_BITS << ") ?obj)";
 
       out << ")"; // or
@@ -5075,8 +5066,8 @@ void smt2_convt::find_symbols_rec(
      const struct_typet::componentst &components=
        to_struct_type(type).components();
 
-     for(std::size_t i=0; i<components.size(); i++)
-       find_symbols_rec(components[i].type(), recstack);
+     for(const auto &component : components)
+       find_symbols_rec(component.type(), recstack);
 
      // Declare the corresponding SMT type if we haven't already.
      if(need_decl)
@@ -5095,9 +5086,8 @@ void smt2_convt::find_symbols_rec(
        out << "(declare-datatypes () ((" << smt_typename << " "
            << "(mk-" << smt_typename << " ";
 
-       for(std::size_t i = 0; i < components.size(); i++)
+       for(const auto &component : components)
        {
-         const struct_union_typet::componentt &component = components[i];
          out << "(" << smt_typename << "." << component.get_name()
                        << " ";
          convert_type(component.type());
@@ -5154,15 +5144,15 @@ void smt2_convt::find_symbols_rec(
      const union_typet::componentst &components=
        to_union_type(type).components();
 
-     for(std::size_t i=0; i<components.size(); i++)
-       find_symbols_rec(components[i].type(), recstack);
+     for(const auto &component : components)
+       find_symbols_rec(component.type(), recstack);
    }
    else if(type.id()==ID_code)
    {
      const code_typet::parameterst &parameters=
          to_code_type(type).parameters();
-     for(std::size_t i=0; i<parameters.size(); i++)
-       find_symbols_rec(parameters[i].type(), recstack);
+     for(const auto &param : parameters)
+       find_symbols_rec(param.type(), recstack);
 
      find_symbols_rec(to_code_type(type).return_type(), recstack);
    }

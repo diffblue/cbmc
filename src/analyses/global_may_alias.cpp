@@ -30,11 +30,9 @@ void global_may_alias_domaint::assign_lhs_aliases(
 
     aliases.isolate(identifier);
 
-    for(std::set<irep_idt>::const_iterator it=alias_set.begin();
-        it!=alias_set.end();
-        it++)
+    for(const auto &alias : alias_set)
     {
-      aliases.make_union(identifier, *it);
+      aliases.make_union(identifier, alias);
     }
   }
 }
@@ -60,11 +58,9 @@ void global_may_alias_domaint::get_rhs_aliases(
     irep_idt identifier=to_symbol_expr(rhs).get_identifier();
     alias_set.insert(identifier);
 
-    for(aliasest::const_iterator it=aliases.begin();
-        it!=aliases.end();
-        it++)
-      if(aliases.same_set(*it, identifier))
-        alias_set.insert(*it);
+    for(const auto &alias : alias_set)
+      if(aliases.same_set(alias, identifier))
+        alias_set.insert(alias);
   }
   else if(rhs.id()==ID_if)
   {

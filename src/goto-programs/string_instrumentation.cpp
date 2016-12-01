@@ -527,11 +527,9 @@ void string_instrumentationt::do_format_string_read(
 
     unsigned args=0;
 
-    for(format_token_listt::const_iterator it=token_list.begin();
-        it!=token_list.end();
-        it++)
+    for(const auto &token : token_list)
     {
-      if(it->type==format_tokent::STRING)
+      if(token.type==format_tokent::STRING)
       {
         const exprt &arg = arguments[argument_start_inx+args];
         const typet &arg_type = ns.follow(arg.type());
@@ -560,11 +558,11 @@ void string_instrumentationt::do_format_string_read(
         }
       }
 
-      if(it->type!=format_tokent::TEXT &&
-         it->type!=format_tokent::UNKNOWN) args++;
+      if(token.type!=format_tokent::TEXT &&
+         token.type!=format_tokent::UNKNOWN) args++;
 
-      if(find(it->flags.begin(), it->flags.end(), format_tokent::ASTERISK)!=
-         it->flags.end())
+      if(find(token.flags.begin(), token.flags.end(), format_tokent::ASTERISK)!=
+         token.flags.end())
         args++; // just eat the additional argument
     }
   }
@@ -641,15 +639,13 @@ void string_instrumentationt::do_format_string_write(
 
     unsigned args=0;
 
-    for(format_token_listt::const_iterator it=token_list.begin();
-        it!=token_list.end();
-        it++)
+    for(const auto &token : token_list)
     {
-      if(find(it->flags.begin(), it->flags.end(), format_tokent::ASTERISK)!=
-         it->flags.end())
+      if(find(token.flags.begin(), token.flags.end(), format_tokent::ASTERISK)!=
+         token.flags.end())
         continue; // asterisk means `ignore this'
 
-      switch(it->type)
+      switch(token.type)
       {
         case format_tokent::STRING:
         {
@@ -664,9 +660,9 @@ void string_instrumentationt::do_format_string_write(
           comment += function_name;
           assertion->source_location.set_comment(comment);
 
-          if(it->field_width!=0)
+          if(token.field_width!=0)
           {
-            exprt fwidth = from_integer(it->field_width, unsigned_int_type());
+            exprt fwidth = from_integer(token.field_width, unsigned_int_type());
             exprt fw_1(ID_plus, unsigned_int_type());
             exprt one = gen_one(unsigned_int_type());
             fw_1.move_to_operands(fwidth);
@@ -694,7 +690,7 @@ void string_instrumentationt::do_format_string_write(
           }
 
           // now kill the contents
-          invalidate_buffer(dest, target, argument, arg_type, it->field_width);
+          invalidate_buffer(dest, target, argument, arg_type, token.field_width);
 
           args++;
           break;

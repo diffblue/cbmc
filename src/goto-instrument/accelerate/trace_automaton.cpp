@@ -28,9 +28,8 @@ void trace_automatont::build() {
  * successors of any location with multiple successors.
  */
 void trace_automatont::build_alphabet(goto_programt &program) {
-  for (goto_programt::targett it = program.instructions.begin();
-       it != program.instructions.end();
-       ++it) {
+  Forall_goto_program_instructions(it, program)
+  {
     goto_programt::targetst succs;
 
     program.get_successors(it, succs);
@@ -44,12 +43,8 @@ void trace_automatont::build_alphabet(goto_programt &program) {
 void trace_automatont::init_nta() {
   nta.init_state = nta.add_state();
 
-  for (alphabett::iterator it = alphabet.begin();
-       it != alphabet.end();
-       ++it) {
-    goto_programt::targett &t = const_cast<goto_programt::targett&>(*it);
-    nta.add_trans(nta.init_state, t, nta.init_state);
-  }
+  for(const auto &sym : alphabet)
+    nta.add_trans(nta.init_state, sym, nta.init_state);
 }
 
 /*
@@ -65,10 +60,9 @@ void trace_automatont::add_path(patht &path) {
   std::cout << "Adding path: ";
 #endif
 
-  for (patht::iterator it = path.begin();
-       it != path.end();
-       ++it) {
-    goto_programt::targett l = it->loc;
+  for(const auto &step : path)
+  {
+    goto_programt::targett l=step.loc;
 #ifdef DEBUG
       std::cout << ", " << l->location_number << ":" << l->location;
 #endif
@@ -291,12 +285,13 @@ void automatont::move(statet s, goto_programt::targett a, state_sett &t) {
   }
 }
 
-void automatont::move(state_sett &s, goto_programt::targett a, state_sett &t) {
-  for (state_sett::iterator it = s.begin();
-       it != s.end();
-       ++it) {
-    move(*it, a, t);
-  }
+void automatont::move(
+  state_sett &s,
+  goto_programt::targett a,
+  state_sett &t)
+{
+  for(const auto &state : s)
+    move(state, a, t);
 }
 
 void trace_automatont::get_transitions(sym_mapt &transitions)
@@ -307,11 +302,10 @@ void trace_automatont::get_transitions(sym_mapt &transitions)
   {
     automatont::transitionst &dta_transitions = dtrans[i];
 
-    for (automatont::transitionst::iterator it = dta_transitions.begin();
-         it != dta_transitions.end();
-         ++it) {
-      goto_programt::targett l = it->first;
-      unsigned int j = it->second;
+    for(const auto &trans : dta_transitions)
+    {
+      goto_programt::targett l=trans.first;
+      unsigned int j=trans.second;
 
       // We have a transition: i -l-> j.
       state_pairt state_pair(i, j);
@@ -341,11 +335,8 @@ void automatont::reverse(goto_programt::targett epsilon)
     // epsilon transitions to each accept state.
     new_init = add_state();
 
-    for (state_sett::iterator it = accept_states.begin();
-         it != accept_states.end();
-         ++it) {
-      add_trans(new_init, epsilon, *it);
-    }
+    for(const auto &s : accept_states)
+      add_trans(new_init, epsilon, s);
   }
 
   std::cout << "Reversing automaton, old init=" << init_state << ", new init="
@@ -361,11 +352,10 @@ void automatont::reverse(goto_programt::targett epsilon)
   {
     transitionst &trans = old_table[i];
 
-    for (transitionst::iterator it = trans.begin();
-         it != trans.end();
-         ++it) {
-      goto_programt::targett l = it->first;
-      unsigned int j = it->second;
+    for(const auto &t : trans)
+    {
+      goto_programt::targett l=t.first;
+      unsigned int j=t.second;
 
       // There was a transition i -l-> j, so add a transition
       // j -l-> i.
@@ -384,15 +374,13 @@ void automatont::trim() {
   do {
     state_sett tmp;
 
-    for (state_sett::iterator it = new_states.begin();
-         it != new_states.end();
-         ++it) {
-      transitionst &trans = transitions[*it];
+    for(const auto &s : new_states)
+    {
+      transitionst &trans=transitions[s];
 
-      for (transitionst::iterator jt = trans.begin();
-           jt != trans.end();
-           ++jt) {
-        unsigned int j = jt->second;
+      for(const auto &t : trans)
+      {
+        unsigned int j=t.second;
 
         if (reachable.find(j) == reachable.end()) {
           reachable.insert(j);
@@ -429,20 +417,16 @@ void automatont::output(std::ostream &str) {
 
   str << "Accept states: ";
 
-  for (state_sett::iterator it = accept_states.begin();
-       it != accept_states.end();
-       ++it) {
-    str << *it << " ";
-  }
+  for(const auto &state : accept_states)
+    str << state << " ";
 
   str << std::endl;
 
   for (unsigned int i = 0; i < transitions.size(); ++i) {
-    for (transitionst::iterator it = transitions[i].begin();
-         it != transitions[i].end();
-         ++it) {
-      goto_programt::targett l = it->first;
-      statet j = it->second;
+    for(const auto &trans : transitions[i])
+    {
+      goto_programt::targett l=trans.first;
+      statet j=trans.second;
 
       str << i << " -- " << l->location_number << " --> " << j << std::endl;
     }
@@ -453,11 +437,8 @@ std::size_t automatont::count_transitions()
 {
   std::size_t ret = 0;
 
-  for (transition_tablet::iterator it = transitions.begin();
-       it != transitions.end();
-       ++it) {
-    ret += it->size();
-  }
+  for(const auto &trans : transitions)
+    ret+=trans.size();
 
   return ret;
 }

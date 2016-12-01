@@ -705,16 +705,15 @@ void disjunctive_polynomial_accelerationt::build_path(
     // to see which branch was taken.
     bool found_branch = false;
 
-    for (goto_programt::targetst::iterator it = succs.begin();
-         it != succs.end();
-         ++it) {
-      exprt &distinguisher = distinguishing_points[*it];
+    for(const auto &succ : succs)
+    {
+      exprt &distinguisher=distinguishing_points[succ];
       bool taken = scratch_program.eval(distinguisher).is_true();
 
       if (taken) {
         if (!found_branch ||
-            ((*it)->location_number < next->location_number)) {
-          next = *it;
+            (succ->location_number < next->location_number)) {
+          next=succ;
         }
 
         found_branch = true;
@@ -836,12 +835,12 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
       // header we're happy & redirect it to our end-of-body sentinel.
       // If it jumps somewhere else, it's part of a nested loop and we
       // kill it.
-      for (goto_programt::targetst::iterator target = t->targets.begin();
-           target != t->targets.end();
-           ++target) {
-        if ((*target)->location_number > t->location_number) {
+      for(const auto &target : t->targets)
+      {
+        if (target->location_number > t->location_number) {
           // A forward jump...
-          if (loop.find(*target) != loop.end()) {
+          if(loop.find(target)!=loop.end())
+          {
             // Case 1: a forward jump within the loop.  Do nothing.
             continue;
           } else {
@@ -851,7 +850,7 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
           }
         } else {
           // A backwards jump...
-          if (*target == loop_header) {
+          if (target==loop_header) {
             // Case 3: a backwards jump to the loop header.  Redirect to sentinel.
             fixedt->targets.clear();
             fixedt->targets.push_back(end);
@@ -869,12 +868,11 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
   // body is the same as the master path.  We do this by assuming that
   // each of the shadow-distinguisher variables is equal to its corresponding
   // master-distinguisher.
-  for (std::list<exprt>::iterator it = distinguishers.begin();
-       it != distinguishers.end();
-       ++it) {
-    exprt &shadow = shadow_distinguishers[*it];
+  for(const auto &expr : distinguishers)
+  {
+    const exprt &shadow=shadow_distinguishers[expr];
 
-    fixed.insert_after(end)->make_assumption(equal_exprt(*it, shadow));
+    fixed.insert_after(end)->make_assumption(equal_exprt(expr, shadow));
   }
 
   // Finally, let's remove all the skips we introduced and fix the

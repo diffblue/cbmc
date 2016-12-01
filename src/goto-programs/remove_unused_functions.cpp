@@ -49,11 +49,8 @@ void remove_unused_functions(
       used_functions.size() << " used)" << messaget::eom;
   }
 
-  for(std::list<goto_functionst::function_mapt::iterator>::const_iterator
-        it=unused_functions.begin();
-      it!=unused_functions.end();
-      it++)
-    functions.function_map.erase(*it);
+  for(const auto &f : unused_functions)
+    functions.function_map.erase(f);
 }
 
 /*******************************************************************\

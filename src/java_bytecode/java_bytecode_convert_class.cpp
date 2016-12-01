@@ -89,11 +89,9 @@ void java_bytecode_convert_classt::convert(const classt &c)
   }
 
   // interfaces are recorded as bases
-  const std::list<irep_idt> &ifc=c.implements;
-
-  for(const auto & it : ifc)
+  for(const auto &interface : c.implements)
   {
-    symbol_typet base("java::"+id2string(it));
+    symbol_typet base("java::"+id2string(interface));
     class_type.add_base(base);
   }
 
@@ -117,13 +115,13 @@ void java_bytecode_convert_classt::convert(const classt &c)
   }
 
   // now do fields
-  for(const auto & it : c.fields)
-    convert(*class_symbol, it);
+  for(const auto &field : c.fields)
+    convert(*class_symbol, field);
 
   // now do methods
-  for(const auto & it : c.methods)
+  for(const auto &method : c.methods)
     java_bytecode_convert_method(
-      *class_symbol, it, symbol_table, get_message_handler());
+      *class_symbol, method, symbol_table, get_message_handler());
 
   // is this a root class?
   if(c.extends.empty())

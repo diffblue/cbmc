@@ -216,15 +216,9 @@ void cfg_baset<T, P, I>::compute_edges_goto(
      !instruction.guard.is_true())
     this->add_edge(entry, entry_map[next_PC]);
 
-  for(goto_programt::instructiont::targetst::const_iterator
-      t_it=instruction.targets.begin();
-      t_it!=instruction.targets.end();
-      t_it++)
-  {
-    goto_programt::const_targett t=*t_it;
+  for(const auto &t : instruction.targets)
     if(t!=goto_program.instructions.end())
       this->add_edge(entry, entry_map[t]);
-  }
 }
 
 /*******************************************************************\
@@ -252,15 +246,9 @@ void cfg_baset<T, P, I>::compute_edges_catch(
   // Not ideal, but preserves targets
   // Ideally, the throw statements should have those as successors
 
-  for(goto_programt::instructiont::targetst::const_iterator
-      t_it=instruction.targets.begin();
-      t_it!=instruction.targets.end();
-      t_it++)
-  {
-    goto_programt::const_targett t=*t_it;
+  for(const auto &t : instruction.targets)
     if(t!=goto_program.instructions.end())
       this->add_edge(entry, entry_map[t]);
-  }
 }
 
 /*******************************************************************\
@@ -333,15 +321,9 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
     next_PC,
     entry);
 
-  for(goto_programt::instructiont::targetst::const_iterator
-      t_it=instruction.targets.begin();
-      t_it!=instruction.targets.end();
-      t_it++)
-  {
-    goto_programt::const_targett t=*t_it;
+  for(const auto &t : instruction.targets)
     if(t!=goto_program.instructions.end())
       this->add_edge(entry, this->entry_map[t]);
-  }
 }
 
 /*******************************************************************\

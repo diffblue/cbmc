@@ -44,13 +44,8 @@ std::ostream& goto_programt::output_instruction(
   if(!it->labels.empty())
   {
     out << "        // Labels:";
-    for(instructiont::labelst::const_iterator
-        l_it=it->labels.begin();
-        l_it!=it->labels.end();
-        l_it++)
-    {
-      out << " " << *l_it;
-    }
+    for(const auto &label : it->labels)
+      out << " " << label;
 
     out << '\n';
   }
@@ -133,11 +128,8 @@ std::ostream& goto_programt::output_instruction(
       const irept::subt &exception_list=
         it->code.find(ID_exception_list).get_sub();
 
-      for(irept::subt::const_iterator
-          it=exception_list.begin();
-          it!=exception_list.end();
-          it++)
-        out << " " << it->id();
+      for(const auto &ex : exception_list)
+        out << " " << ex.id();
     }
 
     if(it->code.operands().size()==1)
