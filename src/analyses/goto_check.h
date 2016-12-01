@@ -32,7 +32,7 @@ void goto_check(
 #define GOTO_CHECK_OPTIONS \
   "(bounds-check)(pointer-check)(memory-leak-check)" \
   "(div-by-zero-check)(signed-overflow-check)(unsigned-overflow-check)" \
-  "(pointer-overflow-check)(undefined-shift-check)" \
+  "(pointer-overflow-check)(conversion-check)(undefined-shift-check)" \
   "(float-overflow-check)(nan-check)"
 
 #define GOTO_CHECK_HELP \
@@ -43,6 +43,7 @@ void goto_check(
   " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" \
   " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n" \
   " --pointer-overflow-check     enable pointer arithmetic over- and underflow checks\n" \
+  " --conversion-check           check whether values can be represented after type cast\n" \
   " --undefined-shift-check      check shift greater than bit-width\n" \
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
@@ -55,6 +56,7 @@ void goto_check(
   options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); \
   options.set_option("unsigned-overflow-check", cmdline.isset("unsigned-overflow-check")); \
   options.set_option("pointer-overflow-check", cmdline.isset("pointer-overflow-check")); \
+  options.set_option("conversion-check", cmdline.isset("conversion-check")); \
   options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); \
   options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); \
   options.set_option("nan-check", cmdline.isset("nan-check"))
