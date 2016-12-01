@@ -85,14 +85,7 @@ std::string as_vcd_binary(
     width=pointer_offset_size(type, ns)*8;
 
   if(width>=0)
-  {
-    std::string result;
-
-    for(; width!=0; --width)
-      result+='x';
-
-    return result;
-  }
+    return std::string(integer2size_t(width), 'x');
 
   return "";
 }

@@ -214,8 +214,7 @@ Function: xmlt::do_indent
 
 void xmlt::do_indent(std::ostream &out, unsigned indent)
 {
-  for(unsigned i=0; i<indent; i++)
-    out << ' ';
+  out << std::string(indent, ' ');
 }
 
 /*******************************************************************\
