@@ -50,18 +50,23 @@ void acceleration_utilst::gather_rvalues(const exprt &expr,
   }
 }
 
-void acceleration_utilst::find_modified(goto_programt &body,
-    expr_sett &modified) {
-  find_modified(body.instructions, modified);
+void acceleration_utilst::find_modified(
+  const goto_programt &body,
+  expr_sett &modified)
+{
+  forall_goto_program_instructions(it, body)
+    find_modified(it, modified);
 }
 
-void acceleration_utilst::find_modified(goto_programt::instructionst &instructions,
-    expr_sett &modified) {
-  for (goto_programt::instructionst::iterator it = instructions.begin();
-       it != instructions.end();
-       ++it) {
+void acceleration_utilst::find_modified(
+  const goto_programt::instructionst &instructions,
+  expr_sett &modified)
+{
+  for(goto_programt::instructionst::const_iterator
+      it=instructions.begin();
+      it!=instructions.end();
+      ++it)
     find_modified(it, modified);
-  }
 }
 
 void acceleration_utilst::find_modified(
@@ -80,8 +85,10 @@ void acceleration_utilst::find_modified(
     find_modified(step, modified);
 }
 
-void acceleration_utilst::find_modified(goto_programt::targett t,
-  expr_sett &modified) {
+void acceleration_utilst::find_modified(
+  goto_programt::const_targett t,
+  expr_sett &modified)
+{
   if (t->is_assign()) {
     code_assignt assignment = to_code_assign(t->code);
     modified.insert(assignment.lhs());

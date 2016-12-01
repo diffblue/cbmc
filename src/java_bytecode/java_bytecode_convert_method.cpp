@@ -95,7 +95,7 @@ protected:
   } instruction_sizet;
 
   // return corresponding reference of variable
-  variablet &find_variable_for_slot(
+  const variablet &find_variable_for_slot(
     size_t address,
     variablest &var_list,
     instruction_sizet inst_size)
@@ -140,7 +140,7 @@ protected:
     variablest &var_list=variables[number_int];
 
     // search variable in list for correct frame / address if necessary
-    variablet &var=
+    const variablet &var=
       find_variable_for_slot(address, var_list, inst_size);
 
     if(var.symbol_expr.get_identifier().empty())

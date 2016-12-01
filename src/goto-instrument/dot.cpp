@@ -326,7 +326,7 @@ Function: dott::escape
 
 std::string &dott::escape(std::string &str)
 {
-  for(unsigned i=0; i<str.size(); i++)
+  for(std::string::size_type i=0; i<str.size(); i++)
   {
     if(str[i]=='\n')
     {

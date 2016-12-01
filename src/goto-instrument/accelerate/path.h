@@ -12,20 +12,20 @@
 class path_nodet
 {
 public:
-  path_nodet(goto_programt::targett &_loc) :
-      loc(_loc),
-      guard(nil_exprt())
+  explicit path_nodet(const goto_programt::targett &_loc):
+    loc(_loc),
+    guard(nil_exprt())
   {
   }
 
-  path_nodet(goto_programt::targett &_loc,
+  path_nodet(const goto_programt::targett &_loc,
              const exprt &_guard) :
       loc(_loc),
       guard(_guard)
   {
   }
 
-  void output(goto_programt &program, std::ostream &str);
+  void output(const goto_programt &program, std::ostream &str);
 
   goto_programt::targett loc;
   const exprt guard;
@@ -34,6 +34,10 @@ public:
 typedef std::list<path_nodet> patht;
 typedef std::list<patht> pathst;
 
-void output_path(patht &path, goto_programt &program, namespacet &ns, std::ostream &str);
+void output_path(
+  const patht &path,
+  const goto_programt &program,
+  const namespacet &ns,
+  std::ostream &str);
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_H

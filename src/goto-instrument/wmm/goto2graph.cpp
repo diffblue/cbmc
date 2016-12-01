@@ -552,7 +552,7 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_body
 \*******************************************************************/
 
 void inline instrumentert::cfg_visitort::visit_cfg_body(
-  goto_programt::instructionst::iterator i_it,
+  goto_programt::const_targett i_it,
   loop_strategyt replicate_body,
   value_setst& value_sets
 #ifdef LOCAL_MAY
@@ -608,13 +608,13 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_duplicate
 \*******************************************************************/
 
 void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
-  goto_programt::targett targ, goto_programt::targett i_it)
+  goto_programt::const_targett targ, goto_programt::const_targett i_it)
 {
   instrumenter.message.status() << "Duplication..." << messaget::eom;
   const goto_functionst::goto_functiont& fun=instrumenter.goto_functions.function_map[i_it->function];
 
   bool found_pos=false;
-  goto_programt::instructiont::targett new_targ=targ;
+  goto_programt::const_targett new_targ=targ;
 
   if(in_pos[targ].empty())
   {
@@ -679,7 +679,7 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_backedge
 \*******************************************************************/
 
 void inline instrumentert::cfg_visitort::visit_cfg_backedge(
-  goto_programt::targett targ, goto_programt::targett i_it)
+  goto_programt::const_targett targ, goto_programt::const_targett i_it)
 {
   /* if in_pos was updated at this program point */
   if(updated.find(targ)!=updated.end())
@@ -704,7 +704,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
     instrumenter.message.debug() << "else case" << messaget::eom;
 
     /* connects NEXT nodes following the targets -- bwd analysis */
-    for(goto_programt::instructionst::iterator cur=i_it;
+    for(goto_programt::const_targett cur=i_it;
       cur!=targ; --cur)
     {
       for(const auto &in : cur->incoming_edges)
@@ -1494,7 +1494,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
       {
         bool target_in_cycle = false;
 
-        Forall_goto_program_instructions(targ, interleaving)
+        forall_goto_program_instructions(targ, interleaving)
           if(targ==t)
           {
             target_in_cycle = true;

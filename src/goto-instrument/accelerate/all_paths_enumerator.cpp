@@ -8,7 +8,7 @@ bool all_paths_enumeratort::next(patht &path) {
   if (last_path.empty()) {
     // This is the first time we've been called -- build an initial
     // path.
-    last_path.push_back(loop_header);
+    last_path.push_back(path_nodet(loop_header));
 
     // This shouldn't be able to fail.
     complete_path(last_path, 0);
