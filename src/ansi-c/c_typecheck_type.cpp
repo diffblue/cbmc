@@ -926,7 +926,9 @@ void c_typecheck_baset::typecheck_compound_body(
     {
       if(!members.insert(it->get_name()).second)
       {
-        // we do nothing (as gcc won't complain)
+        error().source_location=it->source_location();
+        error() << "duplicate member " << it->get_name() << eom;
+        throw 0;
       }
     }
   }
