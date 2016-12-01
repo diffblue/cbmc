@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
+#include <analyses/goto_check.h>
+
 #include "path_search.h"
 
 class goto_functionst;
@@ -25,9 +27,7 @@ class optionst;
   "(function):" \
   "D:I:" \
   "(depth):(context-bound):(branch-bound):(unwind):" \
-  "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
-  "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
-  "(float-overflow-check)" \
+  GOTO_CHECK_OPTIONS \
   "(no-assertions)(no-assumptions)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \

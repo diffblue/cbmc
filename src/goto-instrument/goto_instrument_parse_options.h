@@ -15,20 +15,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
 
+#include <analyses/goto_check.h>
+
 #define GOTO_INSTRUMENT_OPTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
   "(dump-c)(dump-cpp)(use-system-headers)(dot)(xml)" \
-  "(bounds-check)(no-bounds-check)" \
-  "(pointer-check)(memory-leak-check)(no-pointer-check)" \
+  GOTO_CHECK_OPTIONS \
+  /* no-X-check are deprecated and ignored */ \
+  "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
+  "(no-nan-check)" \
   "(remove-pointers)" \
   "(no-simplify)" \
   "(assert-to-assume)" \
-  "(div-by-zero-check)(no-div-by-zero-check)" \
-  "(undefined-shift-check)" \
   "(no-assertions)(no-assumptions)(uninitialized-check)" \
-  "(nan-check)(no-nan-check)" \
   "(race-check)(scc)(one-event-per-cycle)" \
   "(minimum-interference)" \
   "(mm):(my-events)(unwind):" \
@@ -39,7 +40,6 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
-  "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)" \
   "(show-goto-functions)(show-value-sets)" \
   "(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \

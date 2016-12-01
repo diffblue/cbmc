@@ -28,8 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 
-#include <analyses/goto_check.h>
-
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
@@ -112,47 +110,8 @@ void symex_parseoptionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.getval("unwindset"));
 
-  // check array bounds
-  if(cmdline.isset("bounds-check"))
-    options.set_option("bounds-check", true);
-  else
-    options.set_option("bounds-check", false);
-
-  // check division by zero
-  if(cmdline.isset("div-by-zero-check"))
-    options.set_option("div-by-zero-check", true);
-  else
-    options.set_option("div-by-zero-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("signed-overflow-check"))
-    options.set_option("signed-overflow-check", true);
-  else
-    options.set_option("signed-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("unsigned-overflow-check"))
-    options.set_option("unsigned-overflow-check", true);
-  else
-    options.set_option("unsigned-overflow-check", false);
-
-  // check for NaN (not a number)
-  if(cmdline.isset("nan-check"))
-    options.set_option("nan-check", true);
-  else
-    options.set_option("nan-check", false);
-
-  // check pointers
-  if(cmdline.isset("pointer-check"))
-    options.set_option("pointer-check", true);
-  else
-    options.set_option("pointer-check", false);
-
-  // check for memory leaks
-  if(cmdline.isset("memory-leak-check"))
-    options.set_option("memory-leak-check", true);
-  else
-    options.set_option("memory-leak-check", false);
+  // all checks supported by goto_check
+  GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -811,13 +770,7 @@ void symex_parseoptionst::help()
     " --round-to-zero              IEEE floating point rounding mode\n"
     "\n"
     "Program instrumentation options:\n"
-    " --bounds-check               enable array bounds checks\n"
-    " --div-by-zero-check          enable division by zero checks\n"
-    " --pointer-check              enable pointer checks\n"
-    " --memory-leak-check          enable memory leak checks\n"
-    " --signed-overflow-check      enable arithmetic over- and underflow checks\n"
-    " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n"
-    " --nan-check                  check floating-point for NaN\n"
+    GOTO_CHECK_HELP
     " --show-properties            show the properties\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
