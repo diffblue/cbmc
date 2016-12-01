@@ -185,7 +185,7 @@ static void populate_predecessor_map(
     {
       for(auto pred : amapit->second.predecessors)
       {
-        auto pred_var=live_variable_at_address[pred];
+        auto pred_var=(pred < live_variable_at_address.size() ? live_variable_at_address[pred] : 0);
         if(pred_var==&*it)
         {
           // Flow from within same live range?
@@ -200,8 +200,10 @@ static void populate_predecessor_map(
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
           {
+            // These sorts of infeasible edges can occur because jsr handling is presently vague
+            // (any subroutine is assumed to be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from out of range for " <<
-              it->var.name << " " << pred << " -> " << amapit->first << "\n";
+              it->var.name << " " << pred << " -> " << amapit->first << messaget::eom;
             continue;
           }
           if(!is_store_to_slot(*(inst_before_this->second.source),it->var.index))
@@ -210,7 +212,13 @@ static void populate_predecessor_map(
         }
         else {
           if(pred_var->var.name!=it->var.name || pred_var->var.signature!=it->var.signature)
-            throw "Local variable table: flow from variable with clashing name or signature";
+          {
+            // These sorts of infeasible edges can occur because jsr handling is presently vague
+            // (any subroutine is assumed to be able to return to any callsite)
+            msg.warning() << "Local variable table: ignoring flow from clashing variable for " <<
+              it->var.name << " " << pred << " -> " << amapit->first << messaget::eom;
+            continue;
+          }
           // OK, this is a flow from a similar but distinct entry in the local var table.
           predecessor_map[&*it].insert(pred_var);
         }
