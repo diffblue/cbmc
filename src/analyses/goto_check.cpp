@@ -40,6 +40,7 @@ public:
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
     enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
     enable_unsigned_overflow_check=_options.get_bool_option("unsigned-overflow-check");
+    enable_pointer_overflow_check=_options.get_bool_option("pointer-overflow-check");
     enable_undefined_shift_check=_options.get_bool_option("undefined-shift-check");
     enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
@@ -103,6 +104,7 @@ protected:
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
+  bool enable_pointer_overflow_check;
   bool enable_undefined_shift_check;
   bool enable_float_overflow_check;
   bool enable_simplify;
@@ -899,7 +901,7 @@ void goto_checkt::pointer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!enable_pointer_check)
+  if(!enable_pointer_overflow_check)
     return;
 
   if(expr.id()==ID_plus ||
