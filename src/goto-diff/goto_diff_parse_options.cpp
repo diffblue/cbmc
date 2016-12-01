@@ -37,8 +37,6 @@ Author: Peter Schrammel
 
 #include <pointer-analysis/add_failed_symbols.h>
 
-#include <analyses/goto_check.h>
-
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
@@ -495,10 +493,6 @@ bool goto_diff_parse_optionst::process_goto_program(
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
-
-    // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
 
     // add failed symbols
     // needs to be done before pointer analysis
