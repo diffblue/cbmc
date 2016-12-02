@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include <util/symbol.h>
 #include <util/symbol_table.h>
+#include <util/prefix.h>
+#include <util/cprover_prefix.h>
 
 /*******************************************************************\
 
@@ -200,13 +202,20 @@ Function: languaget::is_symbol_opaque_function
  Outputs: True if the symbol is an opaque (e.g. non-bodied) function
 
  Purpose: To identify if a given symbol is an opaque function and
-          hence needs to be stubbed
+          hence needs to be stubbed. We explicitly exclude CPROVER
+          functions, if they have no body it is because we haven't
+          generated it yet.
 
 \*******************************************************************/
 
 bool languaget::is_symbol_opaque_function(const symbolt &symbol)
 {
+  // Explictly exclude CPROVER functions since these aren't opaque
+  std::string variable_id_str(symbol.name.c_str());
+  bool is_cprover_function = has_prefix(variable_id_str, CPROVER_PREFIX);
+
   return !symbol.is_type &&
     symbol.value.id()==ID_nil &&
-    symbol.type.id()==ID_code;
+    symbol.type.id()==ID_code &&
+    !is_cprover_function;
 }
