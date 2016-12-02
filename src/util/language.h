@@ -12,11 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <util/symbol.h>
 
 #include "message.h"
 
 class symbol_tablet;
-class symbolt;
 class exprt;
 class namespacet;
 class typet;
@@ -122,7 +122,14 @@ protected:
     symbolt &symbol,
     symbol_tablet &symbol_table);
 
+  virtual parameter_symbolt build_stub_parameter_symbol(
+    const symbolt &function_symbol,
+    size_t parameter_index,
+    const typet &parameter_type);
 private:
   bool is_symbol_opaque_function(const symbolt &symbol);
+  void generate_opaque_parameter_symbols(
+    symbolt &function_symbol,
+    symbol_tablet &symbol_table);
 };
 #endif // CPROVER_UTIL_LANGUAGE_H

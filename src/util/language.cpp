@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
+#include <util/std_types.h>
 
 /*******************************************************************\
 
@@ -154,6 +155,8 @@ void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
     {
       symbolt &symbol=symbol_entry.second;
 
+      generate_opaque_parameter_symbols(symbol, symbol_table);
+
       irep_idt return_symbol_id = generate_opaque_stub_body(
         symbol,
         symbol_table);
@@ -191,6 +194,36 @@ irep_idt languaget::generate_opaque_stub_body(
   return ID_nil;
 }
 
+/*******************************************************************\
+
+Function: languaget::build_stub_parameter_symbol
+
+  Inputs:
+          function_symbol - the symbol of an opaque function
+          parameter_index - the index of the parameter within the
+                            the parameter list
+          parameter_type - the type of the parameter
+
+ Outputs: A named symbol to be added to the symbol table representing
+          one of the parameters in this opaque function.
+
+ Purpose: To build the parameter symbol and choose its name. This should
+          be implemented in each language.
+
+\*******************************************************************/
+
+parameter_symbolt languaget::build_stub_parameter_symbol(
+  const symbolt &function_symbol,
+  size_t parameter_index,
+  const typet &parameter_type)
+{
+  error() << "language " << id()
+          << " doesn't implement build_stub_parameter_symbol. "
+          << "This means cannot use opaque functions." << eom;
+
+  return parameter_symbolt();
+}
+
 
 /*******************************************************************\
 
@@ -218,4 +251,40 @@ bool languaget::is_symbol_opaque_function(const symbolt &symbol)
     symbol.value.id()==ID_nil &&
     symbol.type.id()==ID_code &&
     !is_cprover_function;
+}
+
+/*******************************************************************\
+
+Function: languaget::generate_opaque_parameter_symbols
+
+  Inputs:
+          function_symbol - the symbol of an opaque function
+          symbol_table - the symbol table to add the new parameter
+                         symbols into
+
+ Outputs:
+
+ Purpose: To create stub parameter symbols for each parameter the
+          function has and assign their IDs into the parameters
+          identifier.
+
+\*******************************************************************/
+
+void languaget::generate_opaque_parameter_symbols(
+  symbolt &function_symbol,
+  symbol_tablet &symbol_table)
+{
+  code_typet &function_type = to_code_type(function_symbol.type);
+  code_typet::parameterst &parameters=function_type.parameters();
+  for(std::size_t i=0; i<parameters.size(); ++i)
+  {
+    code_typet::parametert &param=parameters[i];
+    const parameter_symbolt &param_symbol=
+      build_stub_parameter_symbol(function_symbol, i, param.type());
+
+    param.set_base_name(param_symbol.base_name);
+    param.set_identifier(param_symbol.name);
+
+    symbol_table.add(param_symbol);
+  }
 }
