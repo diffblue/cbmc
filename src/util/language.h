@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 #include <util/symbol.h>
+#include <util/std_types.h>
 
 #include "message.h"
 
@@ -125,7 +126,7 @@ protected:
   virtual parameter_symbolt build_stub_parameter_symbol(
     const symbolt &function_symbol,
     size_t parameter_index,
-    const typet &parameter_type);
+    const code_typet::parametert &parameter);
 private:
   bool is_symbol_opaque_function(const symbolt &symbol);
   void generate_opaque_parameter_symbols(
