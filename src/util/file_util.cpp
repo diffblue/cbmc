@@ -32,6 +32,10 @@ Date: January 2012
 #define pclose _pclose
 #endif
 
+#ifdef USE_BOOST
+#include <boost/filesystem.hpp>
+#endif
+
 #include "file_util.h"
 
 
@@ -238,10 +242,14 @@ void  fileutl_create_directory(std::string const&  pathname)
 # if defined(WIN32)
     std::system((std::string("mkdir \"") + pathname + "\"").c_str());
 # elif defined(__linux__) || defined(__APPLE__)
+#ifdef USE_BOOST
+  boost::filesystem::create_directories(pathname);
+#else
   auto ignore = std::system(
         (std::string("mkdir -p \"") + pathname + "\"").c_str()
         );
   (void)ignore;
+#endif
 # else
 #   error "Unsuported platform."
 # endif
