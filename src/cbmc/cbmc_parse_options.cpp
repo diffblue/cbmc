@@ -920,9 +920,8 @@ bool cbmc_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
-    
 
-    if(cmdline.isset("pass")) 
+    if(cmdline.isset("pass"))
     {
       status() << "PASS Preprocessing " << eom;
       pass_preprocess(symbol_table, goto_functions);
