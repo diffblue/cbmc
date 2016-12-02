@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_OBJECT_ID_H
-#define CPROVER_OBJECT_ID_H
+#ifndef CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
+#define CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 
 #include <set>
 #include <ostream>
@@ -55,4 +55,4 @@ void get_objects_w(const code_assignt &assign, object_id_sett &);
 void get_objects_w_lhs(const exprt &lhs, object_id_sett &);
 void get_objects_r_lhs(const exprt &lhs, object_id_sett &);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H

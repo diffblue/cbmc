@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H_
-#define CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H_
+#ifndef CPROVER_CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H
+#define CPROVER_CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H
 
 #include <functional>
 
@@ -58,4 +58,4 @@ void instrument_program_ops(
     goto_programt::targett pos,
     const std::set<irep_idt> &state_vars);
 
-#endif /* CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_ENVIRONMENT_INSTRUMENT_STATE_VARS_H

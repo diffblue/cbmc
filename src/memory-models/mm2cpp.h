@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MM2CPP_H
-#define CPROVER_MM2CPP_H
+#ifndef CPROVER_MEMORY_MODELS_MM2CPP_H
+#define CPROVER_MEMORY_MODELS_MM2CPP_H
 
 #include <util/irep.h>
 
@@ -16,4 +16,4 @@ void mm2cpp(
   const irept &,
   std::ostream &);
 
-#endif
+#endif // CPROVER_MEMORY_MODELS_MM2CPP_H

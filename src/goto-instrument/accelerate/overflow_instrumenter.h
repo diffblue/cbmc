@@ -1,5 +1,5 @@
-#ifndef OVERFLOW_INSTRUMENTER_H
-#define OVERFLOW_INSTRUMENTER_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
 
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -47,4 +47,4 @@ class overflow_instrumentert {
   std::set<int> checked;
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H

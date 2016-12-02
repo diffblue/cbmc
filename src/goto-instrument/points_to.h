@@ -71,4 +71,4 @@ protected:
 
 std::ostream &operator << (std::ostream &, const points_tot &);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_POINTS_TO_H

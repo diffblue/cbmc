@@ -24,4 +24,4 @@ void show_properties(
   const goto_modelt &,
   ui_message_handlert::uit ui);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H

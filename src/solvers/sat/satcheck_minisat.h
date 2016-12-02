@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_MINISAT_H
-#define CPROVER_SATCHECK_MINISAT_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_MINISAT_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_MINISAT_H
 
 #include <vector>
 
@@ -88,4 +88,4 @@ public:
 protected:
   std::vector<bool> in_core;
 };
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT_H

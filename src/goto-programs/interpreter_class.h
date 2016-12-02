@@ -1,9 +1,3 @@
-#include <stack>
-
-#include <util/arith_tools.h>
-
-#include "goto_functions.h"
-
 /*******************************************************************\
 
    Class: interpretert
@@ -11,6 +5,15 @@
  Purpose: interpreter for GOTO programs
 
 \*******************************************************************/
+
+#ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
+#define CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
+
+#include <stack>
+
+#include <util/arith_tools.h>
+
+#include "goto_functions.h"
 
 class interpretert
 {
@@ -105,3 +108,5 @@ protected:
 
   void show_state();
 };
+
+#endif // CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H

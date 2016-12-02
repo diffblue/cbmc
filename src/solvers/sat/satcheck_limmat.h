@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_LIMMAT_H
-#define CPROVER_SATCHECK_LIMMAT_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_LIMMAT_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_LIMMAT_H
 
 #include <vector>
 #include "dimacs_cnf.h"
@@ -29,4 +29,4 @@ class satcheck_limmatt:public dimacs_cnft
   std::vector<unsigned char> assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_LIMMAT_H

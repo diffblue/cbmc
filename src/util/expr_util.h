@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_UTIL_EXPR_UTIL_H
+#define CPROVER_UTIL_EXPR_UTIL_H
+
 /*! \file util/expr_util.h
  * \brief Deprecated expression utility functions
  *
@@ -59,3 +62,5 @@ bool has_subexpr(const exprt &, const irep_idt &);
 
 /*! lift up an if_exprt one level */
 if_exprt lift_if(const exprt &, std::size_t operand_number);
+
+#endif // CPROVER_UTIL_EXPR_UTIL_H

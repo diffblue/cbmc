@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_ZCHAFF_H
-#define CPROVER_SATCHECK_ZCHAFF_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_ZCHAFF_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_ZCHAFF_H
 
 #include "cnf_clause_list.h"
 
@@ -46,4 +46,4 @@ class satcheck_zchafft:public satcheck_zchaff_baset
   virtual ~satcheck_zchafft();
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_ZCHAFF_H

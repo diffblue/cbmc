@@ -150,4 +150,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_AIG_H

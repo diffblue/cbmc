@@ -9,8 +9,8 @@ Date: July 2006
 
 \*******************************************************************/
 
-#ifndef XML_GOTO_FUNCTION_H_
-#define XML_GOTO_FUNCTION_H_
+#ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_FUNCTION_HASHING_H
+#define CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_FUNCTION_HASHING_H
 
 #include <util/xml.h>
 #include <goto-programs/goto_functions.h>
@@ -28,4 +28,4 @@ class xml_goto_function_convertt {
   void convert( const goto_functionst::goto_functiont&, xmlt& );
 };
 
-#endif /*XML_GOTO_FUNCTION_H_*/
+#endif // CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_FUNCTION_HASHING_H

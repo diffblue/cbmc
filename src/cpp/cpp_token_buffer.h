@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TOKEN_BUFFER_H
-#define CPROVER_CPP_TOKEN_BUFFER_H
+#ifndef CPROVER_CPP_CPP_TOKEN_BUFFER_H
+#define CPROVER_CPP_CPP_TOKEN_BUFFER_H
 
 #include "cpp_token.h"
 
@@ -56,4 +56,4 @@ protected:
   void read_token();
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_TOKEN_BUFFER_H

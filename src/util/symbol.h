@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SYMBOL_H
-#define CPROVER_SYMBOL_H
+#ifndef CPROVER_UTIL_SYMBOL_H
+#define CPROVER_UTIL_SYMBOL_H
 
 /*! \file util/symbol.h
  * \brief Symbol table entry
@@ -183,4 +183,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_SYMBOL_H

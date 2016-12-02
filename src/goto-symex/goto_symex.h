@@ -274,4 +274,4 @@ protected:
   void rewrite_quantifiers(exprt &expr, statet &state);
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

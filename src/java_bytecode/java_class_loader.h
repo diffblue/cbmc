@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_CLASS_LOADER_H
-#define CPROVER_JAVA_CLASS_LOADER_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
+#define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
 
 #include <map>
 
@@ -63,4 +63,4 @@ protected:
   std::list<std::string> jar_files;
 };
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

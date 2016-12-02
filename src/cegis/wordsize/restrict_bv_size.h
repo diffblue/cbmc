@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H_
-#define CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H_
+#ifndef CPROVER_CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H
+#define CPROVER_CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H
 
 #include <cstddef>
 
@@ -44,4 +44,4 @@ void restrict_bv_size(class exprt &expr, size_t width_in_bits);
  */
 bool restrict_bv_size(class typet &type, size_t width_in_bits);
 
-#endif /* CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H_ */
+#endif // CPROVER_CEGIS_WORDSIZE_RESTRICT_BV_SIZE_H

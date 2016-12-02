@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CMDLINE_H
-#define CPROVER_CMDLINE_H
+#ifndef CPROVER_UTIL_CMDLINE_H
+#define CPROVER_UTIL_CMDLINE_H
 
 #include <vector>
 #include <list>
@@ -51,4 +51,4 @@ protected:
   int getoptnr(const std::string &option) const;
 };
 
-#endif
+#endif // CPROVER_UTIL_CMDLINE_H

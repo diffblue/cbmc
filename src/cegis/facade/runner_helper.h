@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_FACADE_RUNNER_HELPER_H_
-#define CEGIS_FACADE_RUNNER_HELPER_H_
+#ifndef CPROVER_CEGIS_FACADE_RUNNER_HELPER_H
+#define CPROVER_CEGIS_FACADE_RUNNER_HELPER_H
 
 #include <util/message.h>
 
@@ -63,4 +63,4 @@ int run_cegis_with_statistics_wrapper(
 
 #include "runner_helper.inc"
 
-#endif /* CEGIS_FACADE_RUNNER_HELPER_H_ */
+#endif // CPROVER_CEGIS_FACADE_RUNNER_HELPER_H

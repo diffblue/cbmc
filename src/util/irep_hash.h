@@ -6,8 +6,8 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_IREP_HASH_H
-#define CPROVER_IREP_HASH_H
+#ifndef CPROVER_UTIL_IREP_HASH_H
+#define CPROVER_UTIL_IREP_HASH_H
 
 // you need to pick one of the following options
 
@@ -470,4 +470,4 @@ inline std::size_t murmurhash3_hash_finalize<64>(
 
 #endif
 
-#endif
+#endif // CPROVER_UTIL_IREP_HASH_H

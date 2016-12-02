@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_PROGRAM_H_
-#define CEGIS_SAFETY_PROGRAM_H_
+#ifndef CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_H
+#define CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_H
 
 #include <cegis/invariant/options/invariant_program.h>
 
@@ -83,4 +83,4 @@ public:
   virtual invariant_loopt &add_loop();
 };
 
-#endif /* CEGIS_SAFETY_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_H

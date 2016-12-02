@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BV_ARITHMETIC_H
-#define CPROVER_BV_ARITHMETIC_H
+#ifndef CPROVER_UTIL_BV_ARITHMETIC_H
+#define CPROVER_UTIL_BV_ARITHMETIC_H
 
 #include <iosfwd>
 
@@ -127,4 +127,4 @@ bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b);
 bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b);
 std::ostream& operator << (std::ostream &, const bv_arithmetict &);
 
-#endif
+#endif // CPROVER_UTIL_BV_ARITHMETIC_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_STATISTICS_WRAPPER_H_
-#define CEGIS_STATISTICS_WRAPPER_H_
+#ifndef CPROVER_CEGIS_STATISTICS_CEGIS_STATISTICS_WRAPPER_H
+#define CPROVER_CEGIS_STATISTICS_CEGIS_STATISTICS_WRAPPER_H
 
 #include <chrono>
 
@@ -84,4 +84,4 @@ public:
 
 #include "cegis_statistics_wrapper.inc"
 
-#endif /* CEGIS_STATISTICS_WRAPPER_H_ */
+#endif // CPROVER_CEGIS_STATISTICS_CEGIS_STATISTICS_WRAPPER_H

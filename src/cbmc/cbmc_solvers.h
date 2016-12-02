@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_SOLVERS_H
-#define CPROVER_CBMC_SOLVERS_H
+#ifndef CPROVER_CBMC_CBMC_SOLVERS_H
+#define CPROVER_CBMC_CBMC_SOLVERS_H
 
 #include <list>
 #include <map>
@@ -123,4 +123,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_CBMC_CBMC_SOLVERS_H

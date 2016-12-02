@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FLOAT_UTILS_H
-#define CPROVER_FLOAT_UTILS_H
+#ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
+#define CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
 
 #include <util/ieee_float.h>
 
@@ -201,4 +201,4 @@ protected:
     literalt &sticky);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H

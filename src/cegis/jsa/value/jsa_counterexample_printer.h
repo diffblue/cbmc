@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_COUNTEREXAMPLE_PRINTER_H_
-#define CEGIS_JSA_COUNTEREXAMPLE_PRINTER_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_PRINTER_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_PRINTER_H
 
 #include <util/message.h>
 
@@ -43,4 +43,4 @@ void print_jsa_counterexample(
 
 #include <cegis/jsa/value/jsa_counterexample_printer.inc>
 
-#endif /* CEGIS_JSA_COUNTEREXAMPLE_PRINTER_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_PRINTER_H

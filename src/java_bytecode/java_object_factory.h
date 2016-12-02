@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_OBJECT_FACTORY_H
-#define CPROVER_JAVA_OBJECT_FACTORY_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
+#define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
 #include <util/std_code.h>
 #include <util/symbol_table.h>
@@ -18,4 +18,4 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table);
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

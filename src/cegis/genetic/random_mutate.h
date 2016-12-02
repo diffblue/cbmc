@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_RANDOM_MUTATE_H_
-#define CEGIS_GENETIC_RANDOM_MUTATE_H_
+#ifndef CPROVER_CEGIS_GENETIC_RANDOM_MUTATE_H
+#define CPROVER_CEGIS_GENETIC_RANDOM_MUTATE_H
 
 #include <cegis/value/program_individual.h>
 
@@ -71,4 +71,4 @@ public:
   void post_process(program_individualt &ind) const;
 };
 
-#endif /* CEGIS_GENETIC_RANDOM_MUTATE_H_ */
+#endif // CPROVER_CEGIS_GENETIC_RANDOM_MUTATE_H

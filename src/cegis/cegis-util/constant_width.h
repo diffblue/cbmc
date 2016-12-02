@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef UTIL_CONSTANT_WIDTH_H_
-#define UTIL_CONSTANT_WIDTH_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_CONSTANT_WIDTH_H
+#define CPROVER_CEGIS_CEGIS_UTIL_CONSTANT_WIDTH_H
 
 #include <cstddef>
 
@@ -24,4 +24,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 size_t get_min_word_width(const class exprt &expr);
 
-#endif /* UTIL_CONSTANT_WIDTH_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_CONSTANT_WIDTH_H

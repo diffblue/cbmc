@@ -6,8 +6,8 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#ifndef CPROVER_FENCE_INSERTER_H
-#define CPROVER_FENCE_INSERTER_H
+#ifndef CPROVER_MUSKETEER_FENCE_INSERTER_H
+#define CPROVER_MUSKETEER_FENCE_INSERTER_H
 
 #include <goto-instrument/wmm/event_graph.h>
 #include <goto-instrument/wmm/wmm.h>
@@ -185,4 +185,4 @@ public:
     const typet &type);
 };
 
-#endif
+#endif // CPROVER_MUSKETEER_FENCE_INSERTER_H

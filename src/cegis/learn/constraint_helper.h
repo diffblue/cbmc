@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_LEARN_CONSTRAINT_HELPER_H_
-#define CEGIS_LEARN_CONSTRAINT_HELPER_H_
+#ifndef CPROVER_CEGIS_LEARN_CONSTRAINT_HELPER_H
+#define CPROVER_CEGIS_LEARN_CONSTRAINT_HELPER_H
 
 /**
  * @brief
@@ -19,4 +19,4 @@
  */
 void transform_asserts_to_assumes(class goto_functionst &gf);
 
-#endif /* CEGIS_LEARN_CONSTRAINT_HELPER_H_ */
+#endif // CPROVER_CEGIS_LEARN_CONSTRAINT_HELPER_H

@@ -6,8 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_REPLACE_SYMBOL_EXT_H
-#define CPROVER_REPLACE_SYMBOL_EXT_H
+#ifndef CPROVER_ANALYSES_REPLACE_SYMBOL_EXT_H
+#define CPROVER_ANALYSES_REPLACE_SYMBOL_EXT_H
 
 #include <util/replace_symbol.h>
 
@@ -17,4 +17,4 @@ public:
   virtual bool replace(exprt &dest) const;
 };
 
-#endif
+#endif // CPROVER_ANALYSES_REPLACE_SYMBOL_EXT_H

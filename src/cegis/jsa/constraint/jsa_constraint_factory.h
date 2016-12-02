@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef JSA_CONSTRAINT_FACTORY_H_
-#define JSA_CONSTRAINT_FACTORY_H_
+#ifndef CPROVER_CEGIS_JSA_CONSTRAINT_JSA_CONSTRAINT_FACTORY_H
+#define CPROVER_CEGIS_JSA_CONSTRAINT_JSA_CONSTRAINT_FACTORY_H
 
 /**
  * @brief
@@ -20,4 +20,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void insert_jsa_constraint(class jsa_programt &prog, bool use_assume);
 
-#endif /* JSA_CONSTRAINT_FACTORY_H_ */
+#endif // CPROVER_CEGIS_JSA_CONSTRAINT_JSA_CONSTRAINT_FACTORY_H

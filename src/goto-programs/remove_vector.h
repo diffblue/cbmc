@@ -17,4 +17,4 @@ void remove_vector(symbol_tablet &, goto_functionst &);
 
 void remove_vector(goto_modelt &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_VECTOR_H

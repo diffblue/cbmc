@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_COUNTEREXAMPLE_VARS_H_
-#define CEGIS_COUNTEREXAMPLE_VARS_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_COUNTEREXAMPLE_VARS_H
+#define CPROVER_CEGIS_CEGIS_UTIL_COUNTEREXAMPLE_VARS_H
 
 #include <iosfwd>
 #include <functional>
@@ -147,4 +147,4 @@ bool has_counterexample_marker(goto_programt::const_targett pos);
  */
 const irep_idt &get_counterexample_marker(goto_programt::const_targett pos);
 
-#endif /* CEGIS_COUNTEREXAMPLE_VARS_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_COUNTEREXAMPLE_VARS_H

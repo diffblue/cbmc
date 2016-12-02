@@ -6,8 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_CONSTANT_PROPAGATOR_H
-#define CPROVER_CONSTANT_PROPAGATOR_H
+#ifndef CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
+#define CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 
 #include "ai.h"
 
@@ -119,4 +119,4 @@ protected:
     exprt &expr);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H

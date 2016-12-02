@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_PROGRAM_INDIVIDUAL_SERIALISATION_H_
-#define CEGIS_PROGRAM_INDIVIDUAL_SERIALISATION_H_
+#ifndef CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_SERIALISATION_H
+#define CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_SERIALISATION_H
 
 #include <util/std_expr.h>
 
@@ -122,4 +122,4 @@ public:
   void operator()(class danger_goto_solutiont &result, const irept &sdu) const;
 };
 
-#endif /* CEGIS_PROGRAM_INDIVIDUAL_SERIALISATION_H_ */
+#endif // CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_SERIALISATION_H

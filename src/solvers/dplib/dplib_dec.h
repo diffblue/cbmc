@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_DPLIB_DEC_H
-#define CPROVER_PROP_DPLIB_DEC_H
+#ifndef CPROVER_SOLVERS_DPLIB_DPLIB_DEC_H
+#define CPROVER_SOLVERS_DPLIB_DPLIB_DEC_H
 
 #include <fstream>
 
@@ -39,4 +39,4 @@ protected:
   void read_assert(std::istream &in, std::string &line);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_DPLIB_DPLIB_DEC_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_IREP_H
-#define CPROVER_IREP_H
+#ifndef CPROVER_UTIL_IREP_H
+#define CPROVER_UTIL_IREP_H
 
 #include <vector>
 #include <string>
@@ -384,4 +384,4 @@ struct irep_full_eq
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_IREP_H

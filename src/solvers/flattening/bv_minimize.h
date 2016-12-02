@@ -11,8 +11,8 @@ Purpose: Find a satisfying assignment that minimizes a given set
 
 \*******************************************************************/
 
-#ifndef CPROVER_BV_MINIMIZER_H
-#define CPROVER_BV_MINIMIZER_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H
+#define CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H
 
 #include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
@@ -60,4 +60,4 @@ public:
   satcheckt satcheck;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H

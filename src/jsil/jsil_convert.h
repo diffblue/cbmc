@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_CONVERT_H
-#define CPROVER_JSIL_CONVERT_H
+#ifndef CPROVER_JSIL_JSIL_CONVERT_H
+#define CPROVER_JSIL_JSIL_CONVERT_H
 
 class jsil_parse_treet;
 class message_handlert;
@@ -18,4 +18,4 @@ bool jsil_convert(
   symbol_tablet &symbol_table,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_JSIL_JSIL_CONVERT_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ESCAPE_ANALYSIS_H
-#define CPROVER_ESCAPE_ANALYSIS_H
+#ifndef CPROVER_ANALYSES_ESCAPE_ANALYSIS_H
+#define CPROVER_ANALYSES_ESCAPE_ANALYSIS_H
 
 #include <util/numbering.h>
 #include <util/union_find.h>
@@ -112,4 +112,4 @@ protected:
     const namespacet &);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_ESCAPE_ANALYSIS_H

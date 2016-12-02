@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_SMT2_CONV_H
-#define CPROVER_SOLVER_SMT2_CONV_H
+#ifndef CPROVER_SOLVERS_SMT2_SMT2_CONV_H
+#define CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 
 #include <sstream>
 #include <set>
@@ -294,4 +294,4 @@ protected:
   std::vector<bool> boolean_assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SMT2_SMT2_CONV_H

@@ -21,4 +21,4 @@ bool static_lifetime_init(
 
 #define INITIALIZE_FUNCTION CPROVER_PREFIX "initialize"
 
-#endif
+#endif // CPROVER_LINKING_STATIC_LIFETIME_INIT_H

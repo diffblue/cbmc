@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_QDIMACS_CNF_H
-#define CPROVER_QBF_QDIMACS_CNF_H
+#ifndef CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
+#define CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
 
 #include <set>
 #include <iosfwd>
@@ -92,4 +92,4 @@ protected:
   void write_prefix(std::ostream &out) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_QBF_QDIMACS_CNF_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_OEXPR_H
-#define CPROVER_OEXPR_H
+#ifndef CPROVER_UTIL_OLD_OEXPR_H
+#define CPROVER_UTIL_OLD_OEXPR_H
 
 #include "expr.h"
 #include "std_types.h"
@@ -160,4 +160,4 @@ static inline oexprt typecast(const oexprt &a, const typet &t)
   return oexprt(ID_typecast, a, t);
 }
 
-#endif
+#endif // CPROVER_UTIL_OLD_OEXPR_H

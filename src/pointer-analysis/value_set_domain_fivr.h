@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef VALUE_SET_DOMAIN_INCR_H_
-#define VALUE_SET_DOMAIN_INCR_H_
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_FIVR_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_FIVR_H
 
 #include <analyses/flow_insensitive_analysis.h>
 
@@ -54,4 +54,4 @@ public:
 
 };
 
-#endif /*VALUE_SET_DOMAIN_INCR_H_*/
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_FIVR_H

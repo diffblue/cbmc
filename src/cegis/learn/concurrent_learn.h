@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONCURRENT_LEARN_H_
-#define CEGIS_CONCURRENT_LEARN_H_
+#ifndef CPROVER_CEGIS_LEARN_CONCURRENT_LEARN_H
+#define CPROVER_CEGIS_LEARN_CONCURRENT_LEARN_H
 
 #include <functional>
 
@@ -90,4 +90,4 @@ public:
 
 #include "concurrent_learn.inc"
 
-#endif /* CEGIS_CONCURRENT_LEARN_H_ */
+#endif // CPROVER_CEGIS_LEARN_CONCURRENT_LEARN_H

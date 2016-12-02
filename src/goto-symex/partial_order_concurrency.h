@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_PARTIAL_ORDER_CONCURRENCY_H
-#define CPROVER_PARTIAL_ORDER_CONCURRENCY_H
+#ifndef CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
+#define CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 
 #include <util/message.h>
 
@@ -374,4 +374,4 @@ private:
 };
 #endif
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H

@@ -69,4 +69,4 @@ extern inline std::ostream &operator << (
   return out;
 }
 
-#endif
+#endif // CPROVER_UTIL_ENDIANNESS_MAP_H

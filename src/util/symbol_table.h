@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SYMBOL_TABLE_H
-#define CPROVER_SYMBOL_TABLE_H
+#ifndef CPROVER_UTIL_SYMBOL_TABLE_H
+#define CPROVER_UTIL_SYMBOL_TABLE_H
 
 /*! \file util/symbol_table.h
  * \brief Symbol table
@@ -96,4 +96,4 @@ std::ostream &operator << (
   std::ostream &out,
   const symbol_tablet &symbol_table);
 
-#endif
+#endif // CPROVER_UTIL_SYMBOL_TABLE_H

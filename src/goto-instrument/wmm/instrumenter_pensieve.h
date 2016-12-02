@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef INSTRUMENTER_PENSIEVE_H
-#define INSTRUMENTER_PENSIEVE_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_INSTRUMENTER_PENSIEVE_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_INSTRUMENTER_PENSIEVE_H
 
 #include "event_graph.h"
 #include "goto2graph.h"
@@ -37,4 +37,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_INSTRUMENTER_PENSIEVE_H

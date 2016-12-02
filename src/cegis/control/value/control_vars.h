@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_VARS_H_
-#define CEGIS_CONTROL_VARS_H_
+#ifndef CPROVER_CEGIS_CONTROL_VALUE_CONTROL_VARS_H
+#define CPROVER_CEGIS_CONTROL_VALUE_CONTROL_VARS_H
 
 #define CEGIS_CONTROL_SOLUTION_VAR_NAME "controller"
 #define __CEGIS_ALTERNATIVE_MEMBER_NAMES
@@ -24,4 +24,4 @@
 #define CEGIS_CONTROL_B_SIZE_MEMBER_NAME "num_size"
 #endif
 
-#endif /* CEGIS_CONTROL_VARS_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VALUE_CONTROL_VARS_H

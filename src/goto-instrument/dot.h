@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_DOT_H
-#define CPROVER_DOT_H
+#ifndef CPROVER_GOTO_INSTRUMENT_DOT_H
+#define CPROVER_GOTO_INSTRUMENT_DOT_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -16,4 +16,4 @@ void dot(
   const namespacet &ns,
   std::ostream &out);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_DOT_H

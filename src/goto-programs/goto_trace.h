@@ -177,4 +177,4 @@ void trace_value(
   const exprt &full_lhs,
   const exprt &value);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H

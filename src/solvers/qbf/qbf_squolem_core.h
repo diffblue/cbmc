@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_SQUOLEM_CORE_H
-#define CPROVER_QBF_SQUOLEM_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_SQUOLEM_CORE_H
+#define CPROVER_SOLVERS_QBF_QBF_SQUOLEM_CORE_H
 
 #include <util/hash_cont.h>
 #include <quannon/squolem2/squolem2.h>
@@ -56,4 +56,4 @@ private:
   void setup(void);
 };
 
-#endif /*_CPROVER_QBF_SQUOLEM_CORE_H_*/
+#endif // CPROVER_SOLVERS_QBF_QBF_SQUOLEM_CORE_H

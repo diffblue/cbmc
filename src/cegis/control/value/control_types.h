@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_TYPES_H_
-#define CEGIS_CONTROL_TYPES_H_
+#ifndef CPROVER_CEGIS_CONTROL_VALUE_CONTROL_TYPES_H
+#define CPROVER_CEGIS_CONTROL_VALUE_CONTROL_TYPES_H
 
 /**
  * @brief
@@ -54,4 +54,4 @@ const typet &control_array_size_type(const symbol_tablet &st);
  */
 const typet &control_runtime_array_size_type(const symbol_tablet &st);
 
-#endif /* CEGIS_CONTROL_TYPES_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VALUE_CONTROL_TYPES_H

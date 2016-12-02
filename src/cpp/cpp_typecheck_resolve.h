@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TYPECHECK_RESOLVE_H
-#define CPROVER_CPP_TYPECHECK_RESOLVE_H
+#ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
+#define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
 #include "cpp_typecheck_fargs.h"
 #include "cpp_name.h"
@@ -155,4 +155,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H

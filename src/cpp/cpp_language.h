@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_LANGUAGE_H
-#define CPROVER_CPP_LANGUAGE_H
+#ifndef CPROVER_CPP_CPP_LANGUAGE_H
+#define CPROVER_CPP_CPP_LANGUAGE_H
 
 /*! \defgroup gr_cpp C++ front-end */
 
@@ -96,4 +96,4 @@ protected:
 
 languaget *new_cpp_language();
 
-#endif
+#endif // CPROVER_CPP_CPP_LANGUAGE_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_SCOPES_H
-#define CPROVER_CPP_SCOPES_H
+#ifndef CPROVER_CPP_CPP_SCOPES_H
+#define CPROVER_CPP_CPP_SCOPES_H
 
 #include <set>
 
@@ -147,4 +147,4 @@ protected:
   cpp_scopet *saved_scope;
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_SCOPES_H

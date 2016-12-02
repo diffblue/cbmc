@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_COMPILE_H
-#define GOTO_CC_COMPILE_H
+#ifndef CPROVER_GOTO_CC_COMPILE_H
+#define CPROVER_GOTO_CC_COMPILE_H
 
 #include <util/symbol.h>
 #include <util/rename_symbol.h>
@@ -76,4 +76,4 @@ protected:
   void convert_symbols(goto_functionst &dest);
 };
 
-#endif /*COMPILE_H_*/
+#endif // CPROVER_GOTO_CC_COMPILE_H

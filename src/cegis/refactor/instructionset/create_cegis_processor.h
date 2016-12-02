@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H_
-#define CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H_
+#ifndef CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H
+#define CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H
 
 #include <set>
 
@@ -89,4 +89,4 @@ std::string create_cegis_processor(
     class goto_functionst &gf,
     const std::map<typet, size_t> &variable_slots_per_context_type);
 
-#endif /* CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_CREATE_CEGIS_PROCESSOR_H

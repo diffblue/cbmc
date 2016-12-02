@@ -8,8 +8,8 @@ Date: May 2007
 
 \*******************************************************************/
 
-#ifndef CPROVER_IREP_SERIALIZATION_H
-#define CPROVER_IREP_SERIALIZATION_H
+#ifndef CPROVER_UTIL_IREP_SERIALIZATION_H
+#define CPROVER_UTIL_IREP_SERIALIZATION_H
 
 #include <map>
 #include <iosfwd>
@@ -80,4 +80,4 @@ private:
   void read_irep(std::istream &, irept &irep);
 };
 
-#endif /*IREP_SERIALIZATION_H_*/
+#endif // CPROVER_UTIL_IREP_SERIALIZATION_H

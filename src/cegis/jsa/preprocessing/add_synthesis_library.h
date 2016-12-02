@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_ADD_SYNTHESIS_LIBRARY_H_
-#define CEGIS_JSA_ADD_SYNTHESIS_LIBRARY_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_ADD_SYNTHESIS_LIBRARY_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_ADD_SYNTHESIS_LIBRARY_H
 
 #include <goto-programs/goto_program.h>
 
@@ -26,4 +26,4 @@ void add_jsa_library(
     size_t max_sz,
     const goto_programt::targetst &pred_op_locations);
 
-#endif /* CEGIS_JSA_ADD_SYNTHESIS_LIBRARY_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_ADD_SYNTHESIS_LIBRARY_H

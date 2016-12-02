@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_LANGUAGE_H
-#define CPROVER_JSIL_LANGUAGE_H
+#ifndef CPROVER_JSIL_JSIL_LANGUAGE_H
+#define CPROVER_JSIL_JSIL_LANGUAGE_H
 
 #include <util/language.h>
 
@@ -71,4 +71,4 @@ protected:
 
 languaget *new_jsil_language();
 
-#endif
+#endif // CPROVER_JSIL_JSIL_LANGUAGE_H

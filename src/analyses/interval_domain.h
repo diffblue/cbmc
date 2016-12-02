@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_INTERVAL_DOMAIN_H
-#define CPROVER_INTERVAL_DOMAIN_H
+#ifndef CPROVER_ANALYSES_INTERVAL_DOMAIN_H
+#define CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 
 #include <util/ieee_float.h>
 #include <util/mp_arith.h>
@@ -93,4 +93,4 @@ protected:
   ieee_float_intervalt get_float_rec(const exprt &);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_INTERVAL_DOMAIN_H

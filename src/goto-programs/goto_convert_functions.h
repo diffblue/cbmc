@@ -8,8 +8,8 @@ Date: June 2003
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_CONVERT_FUNCTIONS_H
-#define CPROVER_GOTO_CONVERT_FUNCTIONS_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 
 #include "goto_model.h"
 #include "goto_convert_class.h"
@@ -59,4 +59,4 @@ protected:
     const source_locationt &);
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H

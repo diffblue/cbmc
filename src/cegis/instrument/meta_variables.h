@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_META_VARIABLES_H_
-#define CEGIS_META_VARIABLES_H_
+#ifndef CPROVER_CEGIS_INSTRUMENT_META_VARIABLES_H
+#define CPROVER_CEGIS_INSTRUMENT_META_VARIABLES_H
 
 #include <goto-programs/goto_program.h>
 
@@ -155,4 +155,4 @@ std::string get_cegis_code_prefix(
     size_t num_consts,
     size_t max_solution_size);
 
-#endif /* CEGIS_META_VARIABLES_H_ */
+#endif // CPROVER_CEGIS_INSTRUMENT_META_VARIABLES_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_TYPECHECK_H
-#define CPROVER_TYPECHECK_H
+#ifndef CPROVER_UTIL_TYPECHECK_H
+#define CPROVER_UTIL_TYPECHECK_H
 
 #include "message_stream.h"
 
@@ -66,4 +66,4 @@ public:
   virtual bool typecheck_main();
 };
 
-#endif
+#endif // CPROVER_UTIL_TYPECHECK_H

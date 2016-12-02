@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FORMAT_CONSTANT_H
-#define CPROVER_FORMAT_CONSTANT_H
+#ifndef CPROVER_UTIL_FORMAT_CONSTANT_H
+#define CPROVER_UTIL_FORMAT_CONSTANT_H
 
 #include <string>
 
@@ -21,4 +21,4 @@ public:
   std::string operator()(const exprt &expr);
 };
 
-#endif
+#endif // CPROVER_UTIL_FORMAT_CONSTANT_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_CVC_CONV_H
-#define CPROVER_PROP_CVC_CONV_H
+#ifndef CPROVER_SOLVERS_CVC_CVC_CONV_H
+#define CPROVER_SOLVERS_CVC_CVC_CONV_H
 
 #include <util/hash_cont.h>
 
@@ -78,4 +78,4 @@ private:
   static std::string cvc_pointer_type();
 };
 
-#endif
+#endif // CPROVER_SOLVERS_CVC_CVC_CONV_H

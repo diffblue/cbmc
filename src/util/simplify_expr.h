@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SIMPLIFY_EXPR_H
-#define CPROVER_SIMPLIFY_EXPR_H
+#ifndef CPROVER_UTIL_SIMPLIFY_EXPR_H
+#define CPROVER_UTIL_SIMPLIFY_EXPR_H
 
 class exprt;
 class namespacet;
@@ -26,4 +26,4 @@ bool simplify(
 // this is the preferred interface
 exprt simplify_expr(const exprt &src, const namespacet &ns);
 
-#endif
+#endif // CPROVER_UTIL_SIMPLIFY_EXPR_H

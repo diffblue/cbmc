@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_INSERT_PROGRAM_H_
-#define CEGIS_INVARIANT_INSERT_PROGRAM_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_PROGRAM_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_PROGRAM_H
 
 #include <goto-programs/goto_program.h>
 
@@ -54,4 +54,4 @@ void insert_program(goto_programt &body, const goto_programt::targett &pos,
 void insert_program(goto_programt &body, goto_programt::targett pos,
     const goto_programt::instructionst &prog, const replacementst &replacements);
 
-#endif /* CEGIS_INVARIANT_INSERT_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_PROGRAM_H

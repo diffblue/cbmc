@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
+#define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
+
 #include <iosfwd>
 #include <string>
 
@@ -43,3 +46,5 @@ private:
   void get_string_literal();
   bool is_simple_symbol_character(char ch);
 };
+
+#endif // CPROVER_SOLVERS_SMT2_SMT2_PARSER_H

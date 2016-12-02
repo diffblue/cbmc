@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_CONSTANT_STRATEGY_H_
-#define CEGIS_DANGER_CONSTANT_STRATEGY_H_
+#ifndef CPROVER_CEGIS_INVARIANT_CONSTANT_CONSTANT_STRATEGY_H
+#define CPROVER_CEGIS_INVARIANT_CONSTANT_CONSTANT_STRATEGY_H
 
 #include <cstddef>
 
@@ -25,4 +25,4 @@ Author: Daniel Kroening, kroening@kroening.com
 typedef size_t (*constant_strategyt)(class invariant_programt &program,
     const size_t max_length);
 
-#endif /* CEGIS_DANGER_CONSTANT_STRATEGY_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_CONSTANT_CONSTANT_STRATEGY_H

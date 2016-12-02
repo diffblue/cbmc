@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNIFIED_DIFF_H
-#define CPROVER_UNIFIED_DIFF_H
+#ifndef CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
+#define CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
 
 #include <iosfwd>
 #include <list>
@@ -103,4 +103,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_GOTO_DIFF_UNIFIED_DIFF_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_SOLUTION_H_
-#define CEGIS_CONTROL_SOLUTION_H_
+#ifndef CPROVER_CEGIS_CONTROL_VALUE_CONTROL_SOLUTION_H
+#define CPROVER_CEGIS_CONTROL_VALUE_CONTROL_SOLUTION_H
 
 #include <util/std_expr.h>
 
@@ -35,4 +35,4 @@ public:
   array_exprt b;
 };
 
-#endif /* CEGIS_CONTROL_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VALUE_CONTROL_SOLUTION_H

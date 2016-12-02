@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_UTIL_LABELLED_ASSIGNMENTS_H_
-#define CEGIS_UTIL_LABELLED_ASSIGNMENTS_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_LABELLED_ASSIGNMENTS_H
+#define CPROVER_CEGIS_CEGIS_UTIL_LABELLED_ASSIGNMENTS_H
 
 #include <deque>
 
@@ -28,4 +28,4 @@ typedef std::map<const irep_idt, exprt::operandst> labelled_assignmentst;
  */
 typedef std::deque<labelled_assignmentst> labelled_counterexamplest;
 
-#endif /* CEGIS_UTIL_LABELLED_ASSIGNMENTS_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_LABELLED_ASSIGNMENTS_H

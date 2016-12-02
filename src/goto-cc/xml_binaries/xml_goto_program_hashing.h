@@ -9,8 +9,8 @@ Date: July 2006
 
 \*******************************************************************/
 
-#ifndef XML_GOTO_PROGRAM_H_
-#define XML_GOTO_PROGRAM_H_
+#ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_HASHING_H
+#define CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_HASHING_H
 
 #include <goto-programs/goto_program.h>
 #include <util/xml.h>
@@ -36,4 +36,4 @@ class xml_goto_program_convertt {
 
 
 
-#endif /*XML_GOTO_PROGRAM_H_*/
+#endif // CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_HASHING_H

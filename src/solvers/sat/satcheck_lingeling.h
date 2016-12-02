@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_satcheck_lingeling_H
-#define CPROVER_satcheck_lingeling_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_LINGELING_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_LINGELING_H
 
 #include "cnf.h"
 
@@ -37,4 +37,4 @@ protected:
   bvt assumptions;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_LINGELING_H

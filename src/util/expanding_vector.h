@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_EXPANDING_VECTOR_H
-#define CPROVER_EXPANDING_VECTOR_H
+#ifndef CPROVER_UTIL_EXPANDING_VECTOR_H
+#define CPROVER_UTIL_EXPANDING_VECTOR_H
 
 #include <vector>
 
@@ -38,4 +38,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_EXPANDING_VECTOR_H

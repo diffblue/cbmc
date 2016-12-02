@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_POINTER_PREDICATES_H
-#define CPROVER_GOTO_PROGRAMS_POINTER_PREDICATES_H
+#ifndef CPROVER_UTIL_POINTER_PREDICATES_H
+#define CPROVER_UTIL_POINTER_PREDICATES_H
 
 #include "namespace.h"
 
@@ -31,4 +31,4 @@ exprt dynamic_object_upper_bound(const exprt &pointer, const typet &dereference_
 exprt object_lower_bound(const exprt &pointer);
 exprt object_upper_bound(const exprt &pointer, const typet &dereference_type, const namespacet &ns);
 
-#endif
+#endif // CPROVER_UTIL_POINTER_PREDICATES_H

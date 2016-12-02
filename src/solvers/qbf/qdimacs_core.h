@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QDIMACS_CORE_H
-#define CPROVER_QDIMACS_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QDIMACS_CORE_H
+#define CPROVER_SOLVERS_QBF_QDIMACS_CORE_H
 
 #include <map>
 
@@ -32,4 +32,4 @@ public:
   void simplify_extractbits(exprt &expr) const;
 };
 
-#endif /*CPROVER_QDIMACS_CORE_H*/
+#endif // CPROVER_SOLVERS_QBF_QDIMACS_CORE_H

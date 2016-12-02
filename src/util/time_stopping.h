@@ -8,8 +8,8 @@ Date: February 2004
 
 \*******************************************************************/
 
-#ifndef CPROVER_TIME_STOPPING_H
-#define CPROVER_TIME_STOPPING_H
+#ifndef CPROVER_UTIL_TIME_STOPPING_H
+#define CPROVER_UTIL_TIME_STOPPING_H
 
 #include <iosfwd>
 #include <string>
@@ -92,4 +92,4 @@ absolute_timet current_time();
 
 std::ostream &operator << (std::ostream &, const time_periodt &);
 
-#endif
+#endif // CPROVER_UTIL_TIME_STOPPING_H

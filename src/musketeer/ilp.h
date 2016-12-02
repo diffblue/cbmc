@@ -12,8 +12,8 @@ Author: Vincent Nimal
 
 #include <vector>
 
-#ifndef ILP_H
-#define ILP_H
+#ifndef CPROVER_MUSKETEER_ILP_H
+#define CPROVER_MUSKETEER_ILP_H
 
 #ifdef HAVE_GLPK
 class ilpt
@@ -69,4 +69,4 @@ public:
 class ilpt {};
 #endif
 
-#endif
+#endif // CPROVER_MUSKETEER_ILP_H

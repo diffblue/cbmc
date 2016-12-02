@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SYMEX_PARSEOPTIONS_H
-#define CPROVER_SYMEX_PARSEOPTIONS_H
+#ifndef CPROVER_AA_SYMEX_SYMEX_PARSEOPTIONS_H
+#define CPROVER_AA_SYMEX_SYMEX_PARSEOPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parseoptions.h>
@@ -75,4 +75,4 @@ protected:
   void eval_verbosity();
 };
 
-#endif
+#endif // CPROVER_AA_SYMEX_SYMEX_PARSEOPTIONS_H

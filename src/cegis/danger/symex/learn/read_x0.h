@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_READ_X0_H_
-#define CEGIS_DANGER_READ_X0_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_LEARN_READ_X0_H
+#define CPROVER_CEGIS_DANGER_SYMEX_LEARN_READ_X0_H
 
 /**
  * @brief
@@ -34,4 +34,4 @@ void danger_read_x0(class danger_goto_solutiont &result,
 void danger_read_x0(class program_individualt &ind, const danger_programt &prog,
     const goto_tracet &trace);
 
-#endif /* CEGIS_DANGER_READ_X0_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_LEARN_READ_X0_H

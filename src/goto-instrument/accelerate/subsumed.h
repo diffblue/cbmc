@@ -1,5 +1,5 @@
-#ifndef SUBSUMED_H
-#define SUBSUMED_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H
 
 #include "path.h"
 
@@ -20,4 +20,4 @@ public:
 
 typedef std::list<subsumed_patht> subsumed_pathst;
 
-#endif // SUBSUMED_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H

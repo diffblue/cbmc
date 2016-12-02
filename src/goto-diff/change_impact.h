@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_CHANGE_IMPACT_H
-#define CPROVER_CHANGE_IMPACT_H
+#ifndef CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
+#define CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
 
 class goto_modelt;
 typedef enum {FORWARD, BACKWARD, BOTH} impact_modet;
@@ -20,4 +20,4 @@ void change_impact(
   impact_modet impact_mode,
   bool compact_output);
 
-#endif
+#endif // CPROVER_GOTO_DIFF_CHANGE_IMPACT_H

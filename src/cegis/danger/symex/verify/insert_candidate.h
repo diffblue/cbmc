@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_INSERT_CANDIDATE_H_
-#define CEGIS_DANGER_INSERT_CANDIDATE_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_VERIFY_INSERT_CANDIDATE_H
+#define CPROVER_CEGIS_DANGER_SYMEX_VERIFY_INSERT_CANDIDATE_H
 
 /**
  * @brief Candidate solution type for this CEGIS component.
@@ -29,4 +29,4 @@ typedef class danger_goto_solutiont candidatet;
 void danger_insert_candidate(class danger_programt &program,
     const candidatet &candidate);
 
-#endif /* CEGIS_DANGER_INSERT_CANDIDATE_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_VERIFY_INSERT_CANDIDATE_H

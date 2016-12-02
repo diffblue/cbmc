@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PREPROCESSOR_H
-#define CPROVER_PREPROCESSOR_H
+#ifndef CPROVER_UTIL_PREPROCESSOR_H
+#define CPROVER_UTIL_PREPROCESSOR_H
 
 #include <iosfwd>
 #include <string>
@@ -37,4 +37,4 @@ public:
   virtual void preprocessor()=0;
 };
 
-#endif
+#endif // CPROVER_UTIL_PREPROCESSOR_H

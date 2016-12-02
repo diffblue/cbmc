@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_JSA_SOURCE_PROVIDER_H_
-#define CEGIS_GENETIC_JSA_SOURCE_PROVIDER_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_JSA_SOURCE_PROVIDER_H
+#define CPROVER_CEGIS_JSA_GENETIC_JSA_SOURCE_PROVIDER_H
 
 #include <string>
 
@@ -41,4 +41,4 @@ public:
   const std::string &operator()();
 };
 
-#endif /* CEGIS_GENETIC_JSA_SOURCE_PROVIDER_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_JSA_SOURCE_PROVIDER_H

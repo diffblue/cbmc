@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CPROVER_JAVA_BYTECODE_BYTECODE_INFO_H
+#define CPROVER_JAVA_BYTECODE_BYTECODE_INFO_H
 
 #include <cstdint>
 
@@ -50,3 +51,5 @@ typedef int8_t  s1;
 typedef int16_t s2;
 typedef int32_t s4;
 typedef int64_t s8;
+
+#endif // CPROVER_JAVA_BYTECODE_BYTECODE_INFO_H

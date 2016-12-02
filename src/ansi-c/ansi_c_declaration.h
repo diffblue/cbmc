@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_DECLARATION_H
-#define CPROVER_ANSI_C_DECLARATION_H
+#ifndef CPROVER_ANSI_C_ANSI_C_DECLARATION_H
+#define CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 
 #include <cassert>
 
@@ -244,4 +244,4 @@ extern inline const ansi_c_declarationt &to_ansi_c_declaration(const exprt &expr
   return static_cast<const ansi_c_declarationt &>(expr);
 }
 
-#endif
+#endif // CPROVER_ANSI_C_ANSI_C_DECLARATION_H

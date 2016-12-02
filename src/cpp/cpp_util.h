@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_UTIL_H
-#define CPROVER_CPP_UTIL_H
+#ifndef CPROVER_CPP_CPP_UTIL_H
+#define CPROVER_CPP_CPP_UTIL_H
 
 #include <util/expr.h>
 #include <util/symbol.h>
@@ -45,4 +45,4 @@ extern inline void already_typechecked(irept &irep)
   irep.swap(tmp);
 }
 
-#endif
+#endif // CPROVER_CPP_CPP_UTIL_H

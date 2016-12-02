@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_CONVERT_STRING_LITERAL_H
-#define CPROVER_ANSI_C_CONVERT_STRING_LITERAL_H
+#ifndef CPROVER_ANSI_C_LITERALS_CONVERT_STRING_LITERAL_H
+#define CPROVER_ANSI_C_LITERALS_CONVERT_STRING_LITERAL_H
 
 #include <string>
 
@@ -15,4 +15,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt convert_string_literal(const std::string &src);
 
-#endif
+#endif // CPROVER_ANSI_C_LITERALS_CONVERT_STRING_LITERAL_H

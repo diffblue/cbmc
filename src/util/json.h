@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSON_H
-#define CPROVER_JSON_H
+#ifndef CPROVER_UTIL_JSON_H
+#define CPROVER_UTIL_JSON_H
 
 #include <vector>
 #include <map>
@@ -227,4 +227,4 @@ json_objectt &jsont::make_object()
   return static_cast<json_objectt &>(*this);
 }
 
-#endif
+#endif // CPROVER_UTIL_JSON_H

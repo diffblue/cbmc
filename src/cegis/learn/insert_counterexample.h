@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H_
-#define CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H
 
 #include <goto-programs/goto_program.h>
 
@@ -112,4 +112,4 @@ std::string get_ce_array_name(const irep_idt &loc_id);
  */
 std::string get_ce_value_index_name(const irep_idt &loc_id);
 
-#endif /* CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_LEARN_INSERT_COUNTEREXAMPLE_H

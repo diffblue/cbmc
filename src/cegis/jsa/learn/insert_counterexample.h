@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_INSERT_COUNTEREXAMPLE_H_
-#define CEGIS_JSA_INSERT_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_INSERT_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_JSA_LEARN_INSERT_COUNTEREXAMPLE_H
 
 #include <cegis/jsa/value/jsa_counterexample.h>
 
@@ -24,4 +24,4 @@ void insert_counterexamples(
     class jsa_programt &program,
     const jsa_counterexamplest &ces);
 
-#endif /* CEGIS_JSA_INSERT_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_INSERT_COUNTEREXAMPLE_H

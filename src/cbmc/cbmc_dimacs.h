@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_DIMACS_H
-#define CPROVER_CBMC_DIMACS_H
+#ifndef CPROVER_CBMC_CBMC_DIMACS_H
+#define CPROVER_CBMC_CBMC_DIMACS_H
 
 #include "bv_cbmc.h"
 
@@ -34,4 +34,4 @@ protected:
   bool write_dimacs(std::ostream &);
 };
 
-#endif
+#endif // CPROVER_CBMC_CBMC_DIMACS_H

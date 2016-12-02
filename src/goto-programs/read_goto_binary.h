@@ -40,4 +40,4 @@ bool read_object_and_link(
   goto_modelt &,
   message_handlert &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H

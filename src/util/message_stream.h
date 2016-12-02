@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MESSAGE_STREAM_H
-#define CPROVER_MESSAGE_STREAM_H
+#ifndef CPROVER_UTIL_MESSAGE_STREAM_H
+#define CPROVER_UTIL_MESSAGE_STREAM_H
 
 #include <sstream>
 
@@ -153,4 +153,4 @@ protected:
     const std::string &error);
 };
 
-#endif
+#endif // CPROVER_UTIL_MESSAGE_STREAM_H

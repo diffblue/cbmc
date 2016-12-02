@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_LEARN_CONFIG_H_
-#define CEGIS_SAFETY_LEARN_CONFIG_H_
+#ifndef CPROVER_CEGIS_SAFETY_SYMEX_LEARN_SAFETY_LEARN_CONFIG_H
+#define CPROVER_CEGIS_SAFETY_SYMEX_LEARN_SAFETY_LEARN_CONFIG_H
 
 #include <deque>
 
@@ -176,4 +176,4 @@ public:
   size_t get_num_consts() const;
 };
 
-#endif /* CEGIS_SAFETY_LEARN_CONFIG_H_ */
+#endif // CPROVER_CEGIS_SAFETY_SYMEX_LEARN_SAFETY_LEARN_CONFIG_H

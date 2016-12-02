@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H_
-#define CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H_
+#ifndef CPROVER_CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H
+#define CPROVER_CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H
 
 #include <deque>
 #include <functional>
@@ -39,4 +39,4 @@ void serialise(std::deque<unsigned int> &stream,
 void serialise(std::deque<unsigned int> &stream,
     const std::map<const irep_idt, exprt> assignments);
 
-#endif /* CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H_ */
+#endif // CPROVER_CEGIS_GENETIC_SERIALISE_INDIVIDUAL_H

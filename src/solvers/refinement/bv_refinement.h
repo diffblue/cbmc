@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_BV_REFINEMENT_H
-#define CPROVER_SOLVER_BV_REFINEMENT_H
+#ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
+#define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
 #include <langapi/language_ui.h>
 
@@ -111,4 +111,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H

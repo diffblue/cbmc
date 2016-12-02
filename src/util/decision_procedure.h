@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_DECISION_PROCEDURE_H
-#define CPROVER_DECISION_PROCEDURE_H
+#ifndef CPROVER_UTIL_DECISION_PROCEDURE_H
+#define CPROVER_UTIL_DECISION_PROCEDURE_H
 
 #include "message.h"
 
@@ -67,4 +67,4 @@ static inline decision_proceduret & operator << (
   return dest;
 }
 
-#endif
+#endif // CPROVER_UTIL_DECISION_PROCEDURE_H

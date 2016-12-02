@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_HASH_CONT_H
-#define CPROVER_HASH_CONT_H
+#ifndef CPROVER_UTIL_HASH_CONT_H
+#define CPROVER_UTIL_HASH_CONT_H
 
 // You need to pick one of the following options:
 //
@@ -90,4 +90,4 @@ typedef std::multiset<T1> hash_multiset_cont;
 
 #endif
 
-#endif
+#endif // CPROVER_UTIL_HASH_CONT_H

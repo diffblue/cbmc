@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROPDEC_LITERAL_H
-#define CPROVER_PROPDEC_LITERAL_H
+#ifndef CPROVER_SOLVERS_PROP_LITERAL_H
+#define CPROVER_SOLVERS_PROP_LITERAL_H
 
 #include <vector>
 #include <iosfwd>
@@ -206,4 +206,4 @@ typedef std::vector<literalt> bvt;
   for(bvt::iterator it=(bv).begin(); \
       it!=(bv).end(); ++it)
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_LITERAL_H

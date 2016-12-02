@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FIND_MACROS_H
-#define CPROVER_FIND_MACROS_H
+#ifndef CPROVER_UTIL_FIND_MACROS_H
+#define CPROVER_UTIL_FIND_MACROS_H
 
 #include "hash_cont.h"
 #include "irep.h"
@@ -22,4 +22,4 @@ void find_macros(
   const namespacet &ns,
   find_macros_sett &dest);
 
-#endif
+#endif // CPROVER_UTIL_FIND_MACROS_H

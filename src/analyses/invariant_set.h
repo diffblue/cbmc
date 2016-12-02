@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CEGAR_INVARIANT_SET_H
-#define CPROVER_CEGAR_INVARIANT_SET_H
+#ifndef CPROVER_ANALYSES_INVARIANT_SET_H
+#define CPROVER_ANALYSES_INVARIANT_SET_H
 
 #include <util/std_code.h>
 #include <util/numbering.h>
@@ -285,4 +285,4 @@ protected:
     const std::pair<unsigned, unsigned> &ineq);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_INVARIANT_SET_H

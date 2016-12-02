@@ -34,4 +34,4 @@ void compute_called_functions(
   const goto_modelt &,
   std::set<irep_idt> &functions);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H

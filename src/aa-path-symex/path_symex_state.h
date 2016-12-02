@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_STATE_H
-#define CPROVER_PATH_SYMEX_STATE_H
+#ifndef CPROVER_AA_PATH_SYMEX_PATH_SYMEX_STATE_H
+#define CPROVER_AA_PATH_SYMEX_PATH_SYMEX_STATE_H
 
 #include <algorithm>
 
@@ -347,4 +347,4 @@ path_symex_statet initial_state(
   const locst &locs,
   path_symex_historyt &);
 
-#endif
+#endif // CPROVER_AA_PATH_SYMEX_PATH_SYMEX_STATE_H

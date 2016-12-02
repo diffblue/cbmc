@@ -13,4 +13,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void remove_unreachable(goto_programt &goto_program);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_UNREACHABLE_H

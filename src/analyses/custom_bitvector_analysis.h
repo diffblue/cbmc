@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CUSTOM_BITVECTOR_ANALYSIS_H
-#define CPROVER_CUSTOM_BITVECTOR_ANALYSIS_H
+#ifndef CPROVER_ANALYSES_CUSTOM_BITVECTOR_ANALYSIS_H
+#define CPROVER_ANALYSES_CUSTOM_BITVECTOR_ANALYSIS_H
 
 #include <util/numbering.h>
 
@@ -158,4 +158,4 @@ protected:
   std::set<exprt> aliases(const exprt &, locationt loc);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_CUSTOM_BITVECTOR_ANALYSIS_H

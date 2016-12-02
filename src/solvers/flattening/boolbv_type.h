@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BOOLBV_TYPE_H
-#define CPROVER_BOOLBV_TYPE_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_TYPE_H
+#define CPROVER_SOLVERS_FLATTENING_BOOLBV_TYPE_H
 
 #include <util/type.h>
 
@@ -21,4 +21,4 @@ typedef enum
 
 bvtypet get_bvtype(const typet &type);
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_TYPE_H

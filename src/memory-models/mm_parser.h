@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MM_PARSER_H
-#define CPROVER_MM_PARSER_H
+#ifndef CPROVER_MEMORY_MODELS_MM_PARSER_H
+#define CPROVER_MEMORY_MODELS_MM_PARSER_H
 
 #include <util/parser.h>
 #include <util/std_code.h>
@@ -34,4 +34,4 @@ public:
 
 extern mm_parsert mm_parser;
 
-#endif
+#endif // CPROVER_MEMORY_MODELS_MM_PARSER_H

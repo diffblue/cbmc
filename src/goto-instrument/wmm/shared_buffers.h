@@ -1,3 +1,6 @@
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
+
 #include <map>
 #include <set>
 
@@ -261,3 +264,5 @@ protected:
 
   void add_initialization(goto_programt &goto_program);
 };
+
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H

@@ -88,4 +88,4 @@ static inline exprt dereference(const exprt &pointer, const namespacet &ns)
   return dereference_object(pointer);
 }
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_DEREFERENCE_H

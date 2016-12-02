@@ -178,4 +178,4 @@ protected:
   id_sett renamed_ids;
 };
 
-#endif
+#endif // CPROVER_LINKING_LINKING_CLASS_H

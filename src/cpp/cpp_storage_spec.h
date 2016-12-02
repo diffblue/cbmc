@@ -52,4 +52,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_STORAGE_SPEC_H

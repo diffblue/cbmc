@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_RANDOM_CROSS_H_
-#define CEGIS_GENETIC_RANDOM_CROSS_H_
+#ifndef CPROVER_CEGIS_GENETIC_RANDOM_CROSS_H
+#define CPROVER_CEGIS_GENETIC_RANDOM_CROSS_H
 
 #include <cegis/value/program_individual.h>
 
@@ -52,4 +52,4 @@ public:
   void operator()(const individualst &parents, const individualst &children);
 };
 
-#endif /* CEGIS_GENETIC_RANDOM_CROSS_H_ */
+#endif // CPROVER_CEGIS_GENETIC_RANDOM_CROSS_H

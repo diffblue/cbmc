@@ -1,6 +1,7 @@
 /* FUNCTION: __CPROVER_jsa_synthesise */
 
-#ifndef JSA_TRANSFORMERS_H_
+#ifndef CPROVER_ANSI_C_LIBRARY_JSA_H
+#define CPROVER_ANSI_C_LIBRARY_JSA_H
 
 #ifdef JSA_GENETIC_SYNTHESIS_H_
 #ifndef __CPROVER_jsa_extern
@@ -1164,4 +1165,4 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_invariant_iterator(
 
 #endif
 
-#endif /* CEGIS_JSA_TRANSFORMERS_H_ */
+#endif // CPROVER_ANSI_C_LIBRARY_JSA_H

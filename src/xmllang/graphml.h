@@ -47,4 +47,4 @@ bool read_graphml(
 
 bool write_graphml(const graphmlt &src, std::ostream &os);
 
-#endif
+#endif // CPROVER_XMLLANG_GRAPHML_H

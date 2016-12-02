@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H_
-#define CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H
+#define CPROVER_CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H
 
 #include <iterator>
 
@@ -113,4 +113,4 @@ public:
   static const instr_iteratort end;
 };
 
-#endif /* CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_INSTRUCTION_ITERATOR_H

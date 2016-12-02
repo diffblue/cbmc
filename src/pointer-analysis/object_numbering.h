@@ -15,4 +15,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 typedef hash_numbering<exprt, irep_hash> object_numberingt;
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_OBJECT_NUMBERING_H

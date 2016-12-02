@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_GOTO_SYMEX_SYMEX_DEREFERENCE_STATE_H
+#define CPROVER_GOTO_SYMEX_SYMEX_DEREFERENCE_STATE_H
+
 #include <pointer-analysis/dereference_callback.h>
 
 #include "goto_symex.h"
@@ -51,3 +54,5 @@ protected:
     const exprt &expr,
     const symbolt *&symbol);
 };
+
+#endif // CPROVER_GOTO_SYMEX_SYMEX_DEREFERENCE_STATE_H

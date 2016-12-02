@@ -22,4 +22,4 @@ void output_vcd(
   const goto_tracet &goto_trace,
   std::ostream &out);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_VCD_GOTO_TRACE_H

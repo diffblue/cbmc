@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNICODE_H
-#define CPROVER_UNICODE_H
+#ifndef CPROVER_UTIL_UNICODE_H
+#define CPROVER_UTIL_UNICODE_H
 
 #include <string>
 
@@ -24,4 +24,4 @@ std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s);
 
 const char **narrow_argv(int argc, const wchar_t **argv_wide);
 
-#endif
+#endif // CPROVER_UTIL_UNICODE_H

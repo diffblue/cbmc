@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H_
-#define CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H
+#define CPROVER_CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H
 
 #include <cegis/jsa/value/jsa_solution.h>
 
@@ -23,4 +23,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 jsa_solutiont default_jsa_solution(const class jsa_programt &prog);
 
-#endif /* CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_DEFAULT_SOLUTION_H

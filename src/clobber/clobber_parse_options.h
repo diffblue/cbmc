@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CLOBBER_PARSEOPTIONS_H
-#define CPROVER_CLOBBER_PARSEOPTIONS_H
+#ifndef CPROVER_CLOBBER_CLOBBER_PARSE_OPTIONS_H
+#define CPROVER_CLOBBER_CLOBBER_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -63,4 +63,4 @@ protected:
   void eval_verbosity();
 };
 
-#endif
+#endif // CPROVER_CLOBBER_CLOBBER_PARSE_OPTIONS_H

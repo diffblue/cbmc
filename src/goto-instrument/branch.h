@@ -16,4 +16,4 @@ void branch(
   goto_functionst &goto_functions,
   const irep_idt &id);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_BRANCH_H

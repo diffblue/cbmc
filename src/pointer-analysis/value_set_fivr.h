@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef VALUE_SET_FIVR_H_
-#define VALUE_SET_FIVR_H_
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVR_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVR_H
 
 #include <util/mp_arith.h>
 #include <util/namespace.h>
@@ -374,4 +374,4 @@ protected:
     recfind_recursion_sett &recursion_set) const;
 };
 
-#endif /*VALUE_SET_INCR_H_*/
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVR_H

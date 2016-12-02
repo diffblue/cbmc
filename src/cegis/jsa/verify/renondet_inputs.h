@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_RENONDET_INPUTS_H_
-#define CEGIS_JSA_RENONDET_INPUTS_H_
+#ifndef CPROVER_CEGIS_JSA_VERIFY_RENONDET_INPUTS_H
+#define CPROVER_CEGIS_JSA_VERIFY_RENONDET_INPUTS_H
 
 /**
  * @brief
@@ -19,4 +19,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void assume_renondet_inputs_valid(class jsa_programt &prog);
 
-#endif /* CEGIS_JSA_RENONDET_INPUTS_H_ */
+#endif // CPROVER_CEGIS_JSA_VERIFY_RENONDET_INPUTS_H

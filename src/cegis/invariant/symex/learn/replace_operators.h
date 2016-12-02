@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_REPLACE_OPERATORS_H_
-#define CEGIS_INVARIANT_REPLACE_OPERATORS_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_REPLACE_OPERATORS_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_REPLACE_OPERATORS_H
 
 #include <goto-programs/goto_program.h>
 
@@ -48,4 +48,4 @@ void replace_ops_in_instr(const symbol_tablet &st, const std::string &func_name,
     const size_t op0, const size_t op1, const size_t op2,
     const size_t instr_idx);
 
-#endif /* CEGIS_INVARIANT_REPLACE_OPERATORS_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_REPLACE_OPERATORS_H

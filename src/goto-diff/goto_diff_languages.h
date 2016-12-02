@@ -6,8 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_DIFF_LANGUAGES_H
-#define CPROVER_GOTO_DIFF_LANGUAGES_H
+#ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_LANGUAGES_H
+#define CPROVER_GOTO_DIFF_GOTO_DIFF_LANGUAGES_H
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_model.h>
@@ -29,4 +29,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_GOTO_DIFF_GOTO_DIFF_LANGUAGES_H

@@ -1,5 +1,5 @@
-#ifndef LINEARIZE_H
-#define LINEARIZE_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_LINEARIZE_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_LINEARIZE_H
 
 #include <vector>
 
@@ -26,4 +26,4 @@ typedef struct linear_recurrence {
 
 bool linearize(symex_target_equationt &equation, linear_recurrencet &recurrence);
 
-#endif // LINEARIZE_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_LINEARIZE_H

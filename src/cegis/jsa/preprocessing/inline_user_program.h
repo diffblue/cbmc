@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_INLINE_USER_PROGRAM_H_
-#define CEGIS_INLINE_USER_PROGRAM_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_INLINE_USER_PROGRAM_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_INLINE_USER_PROGRAM_H
 
 /**
  * @brief
@@ -22,4 +22,4 @@ void inline_jsa_user_program(
     const class symbol_tablet &st,
     class goto_functionst &gf);
 
-#endif /* CEGIS_INLINE_USER_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_INLINE_USER_PROGRAM_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LITERAL_EXPR_H
-#define CPROVER_LITERAL_EXPR_H
+#ifndef CPROVER_SOLVERS_PROP_LITERAL_EXPR_H
+#define CPROVER_SOLVERS_PROP_LITERAL_EXPR_H
 
 #include <util/std_expr.h>
 
@@ -60,4 +60,4 @@ extern inline literal_exprt &to_literal_expr(exprt &expr)
   return static_cast<literal_exprt &>(expr);
 }
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_LITERAL_EXPR_H

@@ -12,4 +12,4 @@ Author: Daniel Kroening
 void remove_internal_symbols(
   class symbol_tablet &symbol_table);
 
-#endif
+#endif // CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef XML_H
-#define XML_H
+#ifndef CPROVER_UTIL_XML_H
+#define CPROVER_UTIL_XML_H
 
 #include <list>
 #include <map>
@@ -130,4 +130,4 @@ extern inline std::ostream& operator <<(
   return out;
 }
 
-#endif
+#endif // CPROVER_UTIL_XML_H

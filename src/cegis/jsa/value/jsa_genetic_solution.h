@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_GENETIC_SOLUTION_H_
-#define CEGIS_JSA_GENETIC_SOLUTION_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_SOLUTION_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_SOLUTION_H
 
 #include <vector>
 
@@ -114,4 +114,4 @@ public:
  */
 typedef std::vector<jsa_genetic_solutiont> jsa_populationt;
 
-#endif /* CEGIS_JSA_GENETIC_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_SOLUTION_H

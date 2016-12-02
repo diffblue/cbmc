@@ -1,5 +1,5 @@
-#ifndef SCRATCH_PROGRAM_H
-#define SCRATCH_PROGRAM_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 
 #include <string>
 
@@ -74,4 +74,4 @@ class scratch_programt : public goto_programt {
   prop_convt *checker;
 };
 
-#endif // SCRATCH_PROGRAM_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H

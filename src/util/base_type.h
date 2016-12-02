@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BASE_TYPE_H
-#define CPROVER_BASE_TYPE_H
+#ifndef CPROVER_UTIL_BASE_TYPE_H
+#define CPROVER_UTIL_BASE_TYPE_H
 
 #include "union_find.h"
 #include "irep.h"
@@ -66,4 +66,4 @@ protected:
   identifierst identifiers;
 };
 
-#endif
+#endif // CPROVER_UTIL_BASE_TYPE_H

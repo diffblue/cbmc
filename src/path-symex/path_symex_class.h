@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_CLASS_H
-#define CPROVER_PATH_SYMEX_CLASS_H
+#ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_CLASS_H
+#define CPROVER_PATH_SYMEX_PATH_SYMEX_CLASS_H
 
 #include "path_symex.h"
 
@@ -92,4 +92,4 @@ protected:
 };
 
 
-#endif
+#endif // CPROVER_PATH_SYMEX_PATH_SYMEX_CLASS_H

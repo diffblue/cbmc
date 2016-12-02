@@ -17,4 +17,4 @@ mp_integer alignment(const typet &type, const namespacet &);
 void add_padding(struct_typet &type, const namespacet &);
 void add_padding(union_typet &type, const namespacet &);
 
-#endif
+#endif // CPROVER_ANSI_C_PADDING_H

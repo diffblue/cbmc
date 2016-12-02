@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_FITNESS_CONFIG_H_
-#define CEGIS_SAFETY_FITNESS_CONFIG_H_
+#ifndef CPROVER_CEGIS_SAFETY_SYMEX_FITNESS_SAFETY_FITNESS_CONFIG_H
+#define CPROVER_CEGIS_SAFETY_SYMEX_FITNESS_SAFETY_FITNESS_CONFIG_H
 
 #include <util/message.h>
 
@@ -120,4 +120,4 @@ public:
   void show(messaget::mstreamt &os, const candidatet &candidate) const;
 };
 
-#endif /* CEGIS_SAFETY_FITNESS_CONFIG_H_ */
+#endif // CPROVER_CEGIS_SAFETY_SYMEX_FITNESS_SAFETY_FITNESS_CONFIG_H

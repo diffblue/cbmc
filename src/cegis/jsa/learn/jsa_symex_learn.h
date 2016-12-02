@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_SYMEX_LEARN_H_
-#define CEGIS_JSA_SYMEX_LEARN_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_JSA_SYMEX_LEARN_H
+#define CPROVER_CEGIS_JSA_LEARN_JSA_SYMEX_LEARN_H
 
 #include <deque>
 #include <functional>
@@ -147,4 +147,4 @@ public:
   std::function<size_t()> get_const_pred_ops_count() const;
 };
 
-#endif /* CEGIS_JSA_SYMEX_LEARN_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_JSA_SYMEX_LEARN_H

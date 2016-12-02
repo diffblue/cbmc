@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_BOOLEFORCE_H
-#define CPROVER_SATCHECK_BOOLEFORCE_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_BOOLEFORCE_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_BOOLEFORCE_H
 
 #include <vector>
 #include <set>
@@ -40,4 +40,4 @@ public:
   bool is_in_core(literalt l) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_BOOLEFORCE_H

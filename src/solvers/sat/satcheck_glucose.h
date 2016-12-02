@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_GLUCOSE_H
-#define CPROVER_SATCHECK_GLUCOSE_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_GLUCOSE_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_GLUCOSE_H
 
 #include "cnf.h"
 
@@ -70,4 +70,4 @@ public:
   bool is_eliminated(literalt a) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_GLUCOSE_H

@@ -6,8 +6,8 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#ifndef CONST_GRAPH_VISITOR_H
-#define CONST_GRAPH_VISITOR_H
+#ifndef CPROVER_MUSKETEER_GRAPH_VISITOR_H
+#define CPROVER_MUSKETEER_GRAPH_VISITOR_H
 
 #include <set>
 #include <list>
@@ -58,4 +58,4 @@ public:
   {}
 };
 
-#endif
+#endif // CPROVER_MUSKETEER_GRAPH_VISITOR_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_INSTRUMENT_VARS_H_
-#define CEGIS_INVARIANT_INSTRUMENT_VARS_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INSTRUMENT_VARS_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INSTRUMENT_VARS_H
 
 #include <util/irep.h>
 
@@ -89,4 +89,4 @@ void link_user_program_variables(class invariant_programt &prog,
 size_t get_invariant_variable_ids(const class symbol_tablet &st,
     operand_variable_idst &ids);
 
-#endif /* CEGIS_INVARIANT_INSTRUMENT_VARS_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INSTRUMENT_VARS_H

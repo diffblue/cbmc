@@ -8,8 +8,8 @@ Date: July 2006
 
 \*******************************************************************/
 
-#ifndef XML_SYMBOL_HASHING_H_
-#define XML_SYMBOL_HASHING_H_
+#ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_SYMBOL_HASHING_H
+#define CPROVER_GOTO_CC_XML_BINARIES_XML_SYMBOL_HASHING_H
 
 #include <util/symbol.h>
 #include <util/xml.h>
@@ -29,4 +29,4 @@ class xml_symbol_convertt {
   void convert(const xmlt &, symbolt &);
 };
 
-#endif /*XML_SYMBOL_HASHING_H_*/
+#endif // CPROVER_GOTO_CC_XML_BINARIES_XML_SYMBOL_HASHING_H

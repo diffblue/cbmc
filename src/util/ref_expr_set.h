@@ -81,4 +81,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_REF_EXPR_SET_H

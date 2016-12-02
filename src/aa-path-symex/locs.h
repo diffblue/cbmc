@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_LOCS_H
-#define CPROVER_PATH_SYMEX_LOCS_H
+#ifndef CPROVER_AA_PATH_SYMEX_LOCS_H
+#define CPROVER_AA_PATH_SYMEX_LOCS_H
 
 #include <util/std_expr.h>
 
@@ -112,4 +112,4 @@ protected:
   for(exprt::operandst::iterator it=(expr).loc_vector.begin(); \
       it!=(locs).loc_vector.end(); it++)
 
-#endif
+#endif // CPROVER_AA_PATH_SYMEX_LOCS_H

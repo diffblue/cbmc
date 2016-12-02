@@ -20,4 +20,4 @@ void mmio(
   class symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_MMIO_H

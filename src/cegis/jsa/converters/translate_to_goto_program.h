@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_TRANSLATE_TO_GOTO_PROGRAM_H_
-#define CEGIS_JSA_TRANSLATE_TO_GOTO_PROGRAM_H_
+#ifndef CPROVER_CEGIS_JSA_CONVERTERS_TRANSLATE_TO_GOTO_PROGRAM_H
+#define CPROVER_CEGIS_JSA_CONVERTERS_TRANSLATE_TO_GOTO_PROGRAM_H
 
 #include <goto-programs/goto_program.h>
 #include <cegis/jsa/value/jsa_genetic_synthesis.h>
@@ -56,4 +56,4 @@ void convert(
     const jsa_programt &prog,
     const std::vector<__CPROVER_jsa_invariant_instructiont> &solution);
 
-#endif /* CEGIS_JSA_TRANSLATE_TO_GOTO_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_JSA_CONVERTERS_TRANSLATE_TO_GOTO_PROGRAM_H

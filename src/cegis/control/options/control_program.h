@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_PROGRAM_H_
-#define CEGIS_CONTROL_PROGRAM_H_
+#ifndef CPROVER_CEGIS_CONTROL_OPTIONS_CONTROL_PROGRAM_H
+#define CPROVER_CEGIS_CONTROL_OPTIONS_CONTROL_PROGRAM_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -66,4 +66,4 @@ public:
   control_programt &operator=(const control_programt &other);
 };
 
-#endif /* CEGIS_CONTROL_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_CONTROL_OPTIONS_CONTROL_PROGRAM_H

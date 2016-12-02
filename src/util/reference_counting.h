@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef __REFERENCE_COUNTING_H
-#define __REFERENCE_COUNTING_H
+#ifndef CPROVER_UTIL_REFERENCE_COUNTING_H
+#define CPROVER_UTIL_REFERENCE_COUNTING_H
 
 #include <cassert>
 
@@ -187,4 +187,4 @@ inline bool operator!=(
   const reference_counting<T> &i2)
 { return !(i1==i2); }
 
-#endif
+#endif // CPROVER_UTIL_REFERENCE_COUNTING_H

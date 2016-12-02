@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_MEMORY_MODEL_PSO_H
-#define CPROVER_MEMORY_MODEL_PSO_H
+#ifndef CPROVER_GOTO_SYMEX_MEMORY_MODEL_PSO_H
+#define CPROVER_GOTO_SYMEX_MEMORY_MODEL_PSO_H
 
 #include "memory_model_tso.h"
 
@@ -27,4 +27,4 @@ protected:
     partial_order_concurrencyt::event_it e2) const;
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_PSO_H

@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_BODY_PROVIDER_H_
-#define CEGIS_INVARIANT_BODY_PROVIDER_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INVARIANT_BODY_PROVIDER_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INVARIANT_BODY_PROVIDER_H
 
 #include <cegis/invariant/options/invariant_program.h>
 
@@ -55,4 +55,4 @@ public:
 
 #include "invariant_body_provider.inc"
 
-#endif /* CEGIS_INVARIANT_BODY_PROVIDER_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_INVARIANT_BODY_PROVIDER_H

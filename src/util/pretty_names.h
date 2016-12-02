@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PRETTY_NAMES_H
-#define CPROVER_CBMC_PRETTY_NAMES_H
+#ifndef CPROVER_UTIL_PRETTY_NAMES_H
+#define CPROVER_UTIL_PRETTY_NAMES_H
 
 // THIS FILE WILL GO AWAY
 
@@ -34,4 +34,4 @@ class pretty_namest
 };
 #endif
 
-#endif
+#endif // CPROVER_UTIL_PRETTY_NAMES_H

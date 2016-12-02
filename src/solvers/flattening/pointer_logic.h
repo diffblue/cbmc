@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_LOGIC_H
-#define CPROVER_POINTER_LOGIC_H
+#ifndef CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
+#define CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
 
 #include <util/mp_arith.h>
 #include <util/hash_cont.h>
@@ -82,4 +82,4 @@ protected:
     const exprt &src) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H

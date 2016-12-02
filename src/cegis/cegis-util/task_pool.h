@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef UTIL_TASK_POOL_H_
-#define UTIL_TASK_POOL_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_TASK_POOL_H
+#define CPROVER_CEGIS_CEGIS_UTIL_TASK_POOL_H
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -108,4 +108,4 @@ public:
   void join_some();
 };
 
-#endif /* UTIL_TASK_POOL_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_TASK_POOL_H

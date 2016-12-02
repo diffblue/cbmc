@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_PARSE_TREE_H
-#define CPROVER_JSIL_PARSE_TREE_H
+#ifndef CPROVER_JSIL_JSIL_PARSE_TREE_H
+#define CPROVER_JSIL_JSIL_PARSE_TREE_H
 
 #include <ostream>
 #include <list>
@@ -114,4 +114,4 @@ public:
   void output(std::ostream &out) const;
 };
 
-#endif
+#endif // CPROVER_JSIL_JSIL_PARSE_TREE_H

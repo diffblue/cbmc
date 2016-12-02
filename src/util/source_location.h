@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOURCE_LOCATION_H
-#define CPROVER_SOURCE_LOCATION_H
+#ifndef CPROVER_UTIL_SOURCE_LOCATION_H
+#define CPROVER_UTIL_SOURCE_LOCATION_H
 
 #include "irep.h"
 
@@ -142,4 +142,4 @@ protected:
 
 std::ostream &operator <<(std::ostream &, const source_locationt &);
 
-#endif
+#endif // CPROVER_UTIL_SOURCE_LOCATION_H

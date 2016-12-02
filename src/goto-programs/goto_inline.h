@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_INLINE_H
-#define CPROVER_GOTO_INLINE_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
 
 #include "goto_model.h"
 
@@ -39,4 +39,4 @@ void goto_partial_inline(
   message_handlert &message_handler,
   unsigned _smallfunc_limit = 0);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H

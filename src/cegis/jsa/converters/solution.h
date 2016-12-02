@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cegis/jsa/value/jsa_solution.h>
 
-#ifndef CEGIS_JSA_CONVERT_SOLUTION_H_
-#define CEGIS_JSA_CONVERT_SOLUTION_H_
+#ifndef CPROVER_CEGIS_JSA_CONVERTERS_SOLUTION_H
+#define CPROVER_CEGIS_JSA_CONVERTERS_SOLUTION_H
 
 // TODO: Convert genetic solution to irep / irep to genetic solution
 
@@ -27,4 +27,4 @@ jsa_solutiont convert(
     const class jsa_genetic_solutiont &solution,
     const class jsa_programt &prog);
 
-#endif /* CEGIS_JSA_CONVERT_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_JSA_CONVERTERS_SOLUTION_H

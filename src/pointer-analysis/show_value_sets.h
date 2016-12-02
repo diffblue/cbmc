@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_SHOW_VALUE_SETS_H
-#define CPROVER_GOTO_PROGRAMS_SHOW_VALUE_SETS_H
+#ifndef CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H
+#define CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H
 
 #include <util/ui_message.h>
 
@@ -25,4 +25,4 @@ void show_value_sets(
   const goto_programt &goto_program,
   const value_set_analysist &value_set_analysis);
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H

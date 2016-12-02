@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MINIBDD_H
-#define CPROVER_MINIBDD_H
+#ifndef CPROVER_SOLVERS_MINIBDD_MINIBDD_H
+#define CPROVER_SOLVERS_MINIBDD_MINIBDD_H
 
 /*! \file solvers/miniBDD/miniBDD.h
  * \brief Small BDD implementation
@@ -142,4 +142,4 @@ bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment);
 // inline functions
 #include "miniBDD.inc"
 
-#endif
+#endif // CPROVER_SOLVERS_MINIBDD_MINIBDD_H

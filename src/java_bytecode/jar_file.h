@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_JAR_FILE_H
-#define CPROVER_JAVA_JAR_FILE_H
+#ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
+#define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
 #include <string>
 #include <vector>
@@ -63,4 +63,4 @@ protected:
   file_mapt file_map;
 };
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAR_FILE_H

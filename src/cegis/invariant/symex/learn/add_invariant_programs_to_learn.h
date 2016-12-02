@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_ADD_INVARIANT_PROGRAMS_TO_LEARN_H_
-#define CEGIS_INVARIANT_ADD_INVARIANT_PROGRAMS_TO_LEARN_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_INVARIANT_PROGRAMS_TO_LEARN_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_INVARIANT_PROGRAMS_TO_LEARN_H
 
 #include <goto-programs/goto_program.h>
 
@@ -75,4 +75,4 @@ goto_programt::targett add_inv_prog(invariant_programt &prog,
 goto_programt::targett add_invariant_progs_to_learn(
     class invariant_programt &prog, size_t max_solution_size);
 
-#endif /* CEGIS_INVARIANT_ADD_INVARIANT_PROGRAMS_TO_LEARN_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_INVARIANT_PROGRAMS_TO_LEARN_H

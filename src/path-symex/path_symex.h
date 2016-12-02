@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_H
-#define CPROVER_PATH_SYMEX_H
+#ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_H
+#define CPROVER_PATH_SYMEX_PATH_SYMEX_H
 
 #include "locs.h"
 #include "path_symex_state.h"
@@ -36,4 +36,4 @@ void path_symex_goto(
 void path_symex_assert_fail(
   path_symex_statet &state);
 
-#endif
+#endif // CPROVER_PATH_SYMEX_PATH_SYMEX_H

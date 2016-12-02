@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROPDEC_BFORMULA_H
-#define CPROVER_PROPDEC_BFORMULA_H
+#ifndef CPROVER_SOLVERS_PROP_BFORMULA_H
+#define CPROVER_SOLVERS_PROP_BFORMULA_H
 
 #include "prop.h"
 
@@ -125,4 +125,4 @@ bformulat const_bformula(bool value);
 
 //typedef std::vector<bformulat> bvt;
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_BFORMULA_H

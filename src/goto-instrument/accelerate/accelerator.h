@@ -1,5 +1,5 @@
-#ifndef PATH_ACCELERATOR_H
-#define PATH_ACCELERATOR_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATOR_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATOR_H
 
 #include "path.h"
 
@@ -53,4 +53,4 @@ class path_acceleratort {
   std::set<exprt> dirty_vars;
 };
 
-#endif // PATH_ACCELERATOR_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATOR_H

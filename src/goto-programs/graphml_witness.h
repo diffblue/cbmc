@@ -39,4 +39,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GRAPHML_WITNESS_H

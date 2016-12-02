@@ -20,4 +20,4 @@ void convert(
   const goto_tracet &goto_trace,
   xmlt &xml);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_XML_GOTO_TRACE_H

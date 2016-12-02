@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_PARALLEL_DANGER_VERIFIER_H_
-#define CEGIS_PARALLEL_DANGER_VERIFIER_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFIER_H
+#define CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFIER_H
 
 #include <cegis/danger/symex/verify/danger_verify_config.h>
 
@@ -107,4 +107,4 @@ public:
       const counterexamplet &counterexample) const;
 };
 
-#endif /* CEGIS_PARALLEL_DANGER_VERIFIER_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFIER_H

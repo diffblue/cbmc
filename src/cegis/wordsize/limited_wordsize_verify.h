@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_LIMITED_WORDSIZE_VERIFY_H_
-#define CEGIS_LIMITED_WORDSIZE_VERIFY_H_
+#ifndef CPROVER_CEGIS_WORDSIZE_LIMITED_WORDSIZE_VERIFY_H
+#define CPROVER_CEGIS_WORDSIZE_LIMITED_WORDSIZE_VERIFY_H
 
 #include <deque>
 #include <functional>
@@ -117,4 +117,4 @@ public:
 
 #include "limited_wordsize_verify.inc"
 
-#endif /* CEGIS_LIMITED_WORDSIZE_VERIFY_H_ */
+#endif // CPROVER_CEGIS_WORDSIZE_LIMITED_WORDSIZE_VERIFY_H

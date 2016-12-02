@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TYPECHECK_H
-#define CPROVER_CPP_TYPECHECK_H
+#ifndef CPROVER_CPP_CPP_TYPECHECK_H
+#define CPROVER_CPP_CPP_TYPECHECK_H
 
 #include <cassert>
 #include <set>
@@ -600,4 +600,4 @@ private:
   bool disable_access_control;           // Disable protect and private
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_TYPECHECK_H

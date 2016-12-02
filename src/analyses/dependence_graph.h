@@ -9,8 +9,8 @@ Date: August 2013
 
 \*******************************************************************/
 
-#ifndef CPROVER_DEPENDENCE_GRAPH_H
-#define CPROVER_DEPENDENCE_GRAPH_H
+#ifndef CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
+#define CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 
 #include <util/graph.h>
 
@@ -176,4 +176,4 @@ protected:
   reaching_definitions_analysist rd;
 };
 
-#endif
+#endif // CPROVER_ANALYSES_DEPENDENCE_GRAPH_H

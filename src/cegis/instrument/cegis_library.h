@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_LIBRARY_H_
-#define CEGIS_LIBRARY_H_
+#ifndef CPROVER_CEGIS_INSTRUMENT_CEGIS_LIBRARY_H
+#define CPROVER_CEGIS_INSTRUMENT_CEGIS_LIBRARY_H
 
 #include <goto-programs/goto_program.h>
 
@@ -61,4 +61,4 @@ void add_cegis_execute_placeholder(symbol_tablet &st);
  */
 code_typet cegis_execute_type();
 
-#endif /* CEGIS_LIBRARY_H_ */
+#endif // CPROVER_CEGIS_INSTRUMENT_CEGIS_LIBRARY_H

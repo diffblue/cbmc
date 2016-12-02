@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_REPLACE_SYMBOL_H
-#define CPROVER_REPLACE_SYMBOL_H
+#ifndef CPROVER_UTIL_REPLACE_SYMBOL_H
+#define CPROVER_UTIL_REPLACE_SYMBOL_H
 
 //
 // true: did nothing
@@ -68,4 +68,4 @@ protected:
   bool have_to_replace(const typet &type) const;
 };
 
-#endif
+#endif // CPROVER_UTIL_REPLACE_SYMBOL_H

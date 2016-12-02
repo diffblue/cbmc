@@ -7,8 +7,8 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_SMT_CONV_H
-#define CPROVER_SOLVER_SMT_CONV_H
+#ifndef CPROVER_SOLVERS_SMT1_SMT1_CONV_H
+#define CPROVER_SOLVERS_SMT1_SMT1_CONV_H
 
 #include <sstream>
 #include <set>
@@ -199,4 +199,4 @@ protected:
   std::vector<bool> boolean_assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SMT1_SMT1_CONV_H

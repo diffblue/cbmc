@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ERROR_H
-#define CPROVER_ERROR_H
+#ifndef CPROVER_UTIL_ERROR_H
+#define CPROVER_UTIL_ERROR_H
 
 #include <exception>
 #include <sstream>
@@ -81,4 +81,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_ERROR_H

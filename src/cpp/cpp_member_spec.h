@@ -38,4 +38,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_MEMBER_SPEC_H

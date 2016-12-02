@@ -90,4 +90,4 @@ public:
   void read(const typet &type);
 };
 
-#endif
+#endif // CPROVER_ANSI_C_C_STORAGE_SPEC_H

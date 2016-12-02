@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_RENAME_SYMBOL_H
-#define CPROVER_RENAME_SYMBOL_H
+#ifndef CPROVER_UTIL_RENAME_SYMBOL_H
+#define CPROVER_UTIL_RENAME_SYMBOL_H
 
 //
 // true: did nothing
@@ -62,4 +62,4 @@ protected:
   bool have_to_rename(const typet &type) const;
 };
 
-#endif
+#endif // CPROVER_UTIL_RENAME_SYMBOL_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_INSERT_CONSTRAINT_H_
-#define CEGIS_INVARIANT_INSERT_CONSTRAINT_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_CONSTRAINT_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_CONSTRAINT_H
 
 #include <deque>
 #include <functional>
@@ -38,4 +38,4 @@ void invariant_insert_constraint(
     constraint_factoryt constraint_factory,
     size_t quantifier_label_offset = 0);
 
-#endif /* CEGIS_INVARIANT_INSERT_CONSTRAINT_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_VERIFY_INSERT_CONSTRAINT_H

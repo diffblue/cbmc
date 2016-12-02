@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H_
-#define CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H_
+#ifndef CPROVER_CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H
+#define CPROVER_CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H
 
 /**
  * @brief
@@ -45,4 +45,4 @@ public:
 
 #include "learn_preprocess_seed.inc"
 
-#endif /* CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H_ */
+#endif // CPROVER_CEGIS_GENETIC_LEARN_PREPROCESS_SEED_H

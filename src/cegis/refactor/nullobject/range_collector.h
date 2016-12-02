@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H_
-#define CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H_
+#ifndef CPROVER_CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H
+#define CPROVER_CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H
 
 /**
  * @brief
@@ -24,4 +24,4 @@
  */
 void collect_nullobject_ranges(class refactor_programt &prog);
 
-#endif /* CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_NULLOBJECT_RANGE_COLLECTOR_H

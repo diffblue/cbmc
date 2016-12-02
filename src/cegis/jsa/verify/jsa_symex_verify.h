@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_SYMEX_VERIFY_H_
-#define CEGIS_JSA_SYMEX_VERIFY_H_
+#ifndef CPROVER_CEGIS_JSA_VERIFY_JSA_SYMEX_VERIFY_H
+#define CPROVER_CEGIS_JSA_VERIFY_JSA_SYMEX_VERIFY_H
 
 #include <deque>
 
@@ -93,4 +93,4 @@ public:
       const counterexamplet &counterexample) const;
 };
 
-#endif /* CEGIS_JSA_SYMEX_VERIFY_H_ */
+#endif // CPROVER_CEGIS_JSA_VERIFY_JSA_SYMEX_VERIFY_H

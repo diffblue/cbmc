@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_LANGUAGE_H
-#define CPROVER_ANSI_C_LANGUAGE_H
+#ifndef CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
+#define CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 
 /*! \defgroup gr_ansi_c ANSI-C front-end */
 
@@ -79,4 +79,4 @@ protected:
 
 languaget *new_ansi_c_language();
 
-#endif
+#endif // CPROVER_ANSI_C_ANSI_C_LANGUAGE_H

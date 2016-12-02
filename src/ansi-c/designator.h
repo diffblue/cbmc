@@ -61,4 +61,4 @@ inline std::ostream &operator << (std::ostream &os, const designatort &d)
   return os;
 }
 
-#endif
+#endif // CPROVER_ANSI_C_DESIGNATOR_H

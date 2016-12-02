@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef DSTRING_H
-#define DSTRING_H
+#ifndef CPROVER_UTIL_DSTRING_H
+#define CPROVER_UTIL_DSTRING_H
 
 #include <iosfwd>
 
@@ -163,4 +163,4 @@ size_t hash_string(const dstring &s);
 
 std::ostream &operator << (std::ostream &out, const dstring &a);
 
-#endif
+#endif // CPROVER_UTIL_DSTRING_H

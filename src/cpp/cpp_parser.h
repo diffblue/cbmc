@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_PARSER_H
-#define CPROVER_CPP_PARSER_H
+#ifndef CPROVER_CPP_CPP_PARSER_H
+#define CPROVER_CPP_CPP_PARSER_H
 
 #include <cassert>
 
@@ -71,4 +71,4 @@ public:
 
 extern cpp_parsert cpp_parser;
 
-#endif
+#endif // CPROVER_CPP_CPP_PARSER_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_EXPR2C_CLASS_H
-#define CPROVER_EXPR2C_CLASS_H
+#ifndef CPROVER_ANSI_C_EXPR2C_CLASS_H
+#define CPROVER_ANSI_C_EXPR2C_CLASS_H
 
 #include <string>
 
@@ -210,4 +210,4 @@ protected:
   std::string convert_sizeof(const exprt &src, unsigned &precedence);
 };
 
-#endif
+#endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

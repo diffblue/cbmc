@@ -8,8 +8,8 @@ Date: May 2007
 
 \*******************************************************************/
 
-#ifndef CPROVER_READ_BIN_GOTO_OBJECT_H
-#define CPROVER_READ_BIN_GOTO_OBJECT_H
+#ifndef CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H
+#define CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H
 
 #include <iosfwd>
 #include <string>
@@ -25,4 +25,4 @@ bool read_bin_goto_object(
   goto_functionst &goto_functions,
   message_handlert &message_handler);
 
-#endif /*READ_BIN_GOTO_OBJECT_H_*/
+#endif // CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H

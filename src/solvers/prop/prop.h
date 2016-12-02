@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_H
-#define CPROVER_PROP_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_H
+#define CPROVER_SOLVERS_PROP_PROP_H
 
 // decision procedure wrapper for boolean propositional logics
 
@@ -99,4 +99,4 @@ protected:
   bvt lcnf_bv;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_PROP_H

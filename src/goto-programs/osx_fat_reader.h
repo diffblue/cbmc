@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_OSX_FAT_READER_H
-#define CPROVER_OSX_FAT_READER_H
+#ifndef CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
+#define CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
 
 #include <fstream>
 #include <string>
@@ -32,4 +32,4 @@ private:
 
 bool is_osx_fat_magic(char hdr[4]);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H

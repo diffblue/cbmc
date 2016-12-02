@@ -1,3 +1,6 @@
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
+
 #include <util/namespace.h>
 #include <util/hash_cont.h>
 #include <util/expr.h>
@@ -105,3 +108,5 @@ void accelerate_functions(
   goto_functionst &functions,
   symbol_tablet &ns,
   bool use_z3);
+
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_TYPE_H
-#define CPROVER_TYPE_H
+#ifndef CPROVER_UTIL_TYPE_H
+#define CPROVER_UTIL_TYPE_H
 
 #include <list>
 
@@ -205,4 +205,4 @@ pre-defined types:
 bool is_number(const typet &type);
 // rational, real, integer, complex, unsignedbv, signedbv, floatbv
 
-#endif
+#endif // CPROVER_UTIL_TYPE_H

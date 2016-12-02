@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_STATIC_ANALYSIS_H
-#define CPROVER_GOTO_PROGRAMS_STATIC_ANALYSIS_H
+#ifndef CPROVER_ANALYSES_STATIC_ANALYSIS_H
+#define CPROVER_ANALYSES_STATIC_ANALYSIS_H
 
 #ifndef USE_DEPRECATED_STATIC_ANALYSIS_H
 #error Deprecated, use ai.h instead
@@ -384,4 +384,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_ANALYSES_STATIC_ANALYSIS_H

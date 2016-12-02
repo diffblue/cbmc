@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_DECLARATOR_H
-#define CPROVER_CPP_DECLARATOR_H
+#ifndef CPROVER_CPP_CPP_DECLARATOR_H
+#define CPROVER_CPP_CPP_DECLARATOR_H
 
 #include <util/expr.h>
 
@@ -54,4 +54,4 @@ public:
   typet merge_type(const typet &declaration_type) const;
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_DECLARATOR_H

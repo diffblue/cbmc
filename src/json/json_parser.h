@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef JSON_PARSER_H
-#define JSON_PARSER_H
+#ifndef CPROVER_JSON_JSON_PARSER_H
+#define CPROVER_JSON_JSON_PARSER_H
 
 #include <cassert>
 #include <stack>
@@ -64,4 +64,4 @@ bool parse_json(
   message_handlert &message_handler,
   jsont &dest);
 
-#endif
+#endif // CPROVER_JSON_JSON_PARSER_H

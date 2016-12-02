@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LINKING_H
-#define CPROVER_LINKING_H
+#ifndef CPROVER_LINKING_LINKING_H
+#define CPROVER_LINKING_LINKING_H
 
 #include <util/message.h>
 #include <util/symbol_table.h>
@@ -21,4 +21,4 @@ bool linking(
   symbol_tablet &new_symbol_table,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_LINKING_LINKING_H

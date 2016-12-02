@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BASIC_SYMEX_EQUATION_H
-#define CPROVER_BASIC_SYMEX_EQUATION_H
+#ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
+#define CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 
 #include <list>
 #include <iosfwd>
@@ -311,4 +311,4 @@ extern inline bool operator<(
 std::ostream &operator<<(std::ostream &out, const symex_target_equationt::SSA_stept &step);
 std::ostream &operator<<(std::ostream &out, const symex_target_equationt &equation);
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H

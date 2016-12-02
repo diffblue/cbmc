@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_GCC_CMDLINE_H
-#define GOTO_CC_GCC_CMDLINE_H
+#ifndef CPROVER_GOTO_CC_GCC_CMDLINE_H
+#define CPROVER_GOTO_CC_GCC_CMDLINE_H
 
 #include "goto_cc_cmdline.h"
 
@@ -24,4 +24,4 @@ public:
   }
 };
 
-#endif /* GOTO_CC_GCC_CMDLINE_H */
+#endif // CPROVER_GOTO_CC_GCC_CMDLINE_H

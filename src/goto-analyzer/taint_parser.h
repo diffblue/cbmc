@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_TAINT_PARSER_H
-#define CPROVER_TAINT_PARSER_H
+#ifndef CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
+#define CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
 
 #include <string>
 #include <list>
@@ -64,4 +64,4 @@ bool taint_parser(
   taint_parse_treet &,
   message_handlert &);
 
-#endif
+#endif // CPROVER_GOTO_ANALYZER_TAINT_PARSER_H

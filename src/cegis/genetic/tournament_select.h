@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_TOURNAMENT_SELECT_H_
-#define CEGIS_GENETIC_TOURNAMENT_SELECT_H_
+#ifndef CPROVER_CEGIS_GENETIC_TOURNAMENT_SELECT_H
+#define CPROVER_CEGIS_GENETIC_TOURNAMENT_SELECT_H
 
 #include <cegis/value/program_individual.h>
 
@@ -59,4 +59,4 @@ public:
 
 #include "tournament_select.inc"
 
-#endif /* CEGIS_GENETIC_TOURNAMENT_SELECT_H_ */
+#endif // CPROVER_CEGIS_GENETIC_TOURNAMENT_SELECT_H

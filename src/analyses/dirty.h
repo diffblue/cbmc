@@ -8,8 +8,8 @@ Date: March 2013
 
 \*******************************************************************/
 
-#ifndef CPROVER_DIRTY_H
-#define CPROVER_DIRTY_H
+#ifndef CPROVER_ANALYSES_DIRTY_H
+#define CPROVER_ANALYSES_DIRTY_H
 
 #include <util/std_expr.h>
 #include <goto-programs/goto_functions.h>
@@ -65,4 +65,4 @@ static inline std::ostream &operator << (
   return out;
 }
 
-#endif
+#endif // CPROVER_ANALYSES_DIRTY_H

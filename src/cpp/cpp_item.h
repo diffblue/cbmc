@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_ITEM_H
-#define CPROVER_CPP_ITEM_H
+#ifndef CPROVER_CPP_CPP_ITEM_H
+#define CPROVER_CPP_CPP_ITEM_H
 
 #include <cassert>
 
@@ -147,4 +147,4 @@ public:
 
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_ITEM_H

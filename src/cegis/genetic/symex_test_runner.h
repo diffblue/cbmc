@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_SYMEX_TEST_RUNNER_H_
-#define CEGIS_GENETIC_SYMEX_TEST_RUNNER_H_
+#ifndef CPROVER_CEGIS_GENETIC_SYMEX_TEST_RUNNER_H
+#define CPROVER_CEGIS_GENETIC_SYMEX_TEST_RUNNER_H
 
 #include <util/expr.h>
 
@@ -82,4 +82,4 @@ public:
 
 #include "symex_test_runner.inc"
 
-#endif /* CEGIS_GENETIC_SYMEX_TEST_RUNNER_H_ */
+#endif // CPROVER_CEGIS_GENETIC_SYMEX_TEST_RUNNER_H

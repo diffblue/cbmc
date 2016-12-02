@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_CNF_H
-#define CPROVER_PROP_CNF_H
+#ifndef CPROVER_SOLVERS_SAT_CNF_H
+#define CPROVER_SOLVERS_SAT_CNF_H
 
 #include <solvers/prop/prop.h>
 
@@ -76,4 +76,4 @@ protected:
   size_t clause_counter;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_CNF_H

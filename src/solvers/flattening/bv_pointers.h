@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BV_POINTERS_H
-#define CPROVER_BV_POINTERS_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
+#define CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 
 #include <util/hash_cont.h>
 
@@ -70,4 +70,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H

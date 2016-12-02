@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H_
-#define CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H_
+#ifndef CPROVER_CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H
+#define CPROVER_CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H
 
 #include <cegis/safety/value/safety_goto_solution.h>
 
@@ -23,4 +23,4 @@ Author: Daniel Kroening, kroening@kroening.com
 void safety_insert_candidate(class safety_programt &program,
     const safety_goto_solutiont &candidate);
 
-#endif /* CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H_ */
+#endif // CPROVER_CEGIS_SAFETY_SYMEX_VERIFY_INSERT_CANDIDATE_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBFCHECK_CORE_H
-#define CPROVER_QBFCHECK_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_CORE_H
+#define CPROVER_SOLVERS_QBF_QBF_CORE_H
 
 #ifdef HAVE_QBF_CORE
 #define QBF_CORE_SKIZZO
@@ -40,4 +40,4 @@ typedef qbf_bdd_coret qbf_coret;
 #endif
 #endif
 
-#endif
+#endif // CPROVER_SOLVERS_QBF_QBF_CORE_H

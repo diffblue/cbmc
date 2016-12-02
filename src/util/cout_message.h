@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_COUT_MESSAGE_H
-#define CPROVER_COUT_MESSAGE_H
+#ifndef CPROVER_UTIL_COUT_MESSAGE_H
+#define CPROVER_UTIL_COUT_MESSAGE_H
 
 #include "message.h"
 
@@ -32,4 +32,4 @@ public:
   virtual void print(unsigned level, const std::string &message);
 };
 
-#endif
+#endif // CPROVER_UTIL_COUT_MESSAGE_H

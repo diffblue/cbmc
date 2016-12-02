@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_CONVERT_TYPE_H
-#define CPROVER_ANSI_C_CONVERT_TYPE_H
+#ifndef CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
+#define CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 
 #include <util/message.h>
 
@@ -79,4 +79,4 @@ protected:
   void read_rec(const typet &type);
 };
 
-#endif
+#endif // CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H

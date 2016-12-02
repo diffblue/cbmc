@@ -6,9 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MESSAGE_H
-
-#define CPROVER_MESSAGE_H
+#ifndef CPROVER_UTIL_MESSAGE_H
+#define CPROVER_UTIL_MESSAGE_H
 
 #include <string>
 #include <iosfwd>
@@ -265,4 +264,4 @@ protected:
   mstreamt mstream;
 };
 
-#endif
+#endif // CPROVER_UTIL_MESSAGE_H

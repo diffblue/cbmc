@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_MEMORY_MODELS_MMCC_PARSE_OPTIONS_H
+#define CPROVER_MEMORY_MODELS_MMCC_PARSE_OPTIONS_H
 
 #include <util/parse_options.h>
 
@@ -28,4 +28,4 @@ protected:
   int convert(std::istream &, const std::string &);
 };
 
-#endif
+#endif // CPROVER_MEMORY_MODELS_MMCC_PARSE_OPTIONS_H

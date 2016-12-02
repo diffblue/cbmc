@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_REMOVE_VIRTUAL_FUNCTIONS_H
-#define CPROVER_REMOVE_VIRTUAL_FUNCTIONS_H
+#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
+#define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 
 #include "goto_model.h"
 
@@ -22,4 +22,4 @@ void remove_virtual_functions(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H

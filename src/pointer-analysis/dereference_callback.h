@@ -38,4 +38,4 @@ public:
     const symbolt *&symbol)=0;
 };
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_DEREFERENCE_CALLBACK_H

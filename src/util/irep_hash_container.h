@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_IREP_HASH_H
-#define CPROVER_IREP_HASH_H
+#ifndef CPROVER_UTIL_IREP_HASH_CONTAINER_H
+#define CPROVER_UTIL_IREP_HASH_CONTAINER_H
 
 #include <cstdlib>  // for size_t
 #include <vector>
@@ -91,4 +91,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_IREP_HASH_CONTAINER_H

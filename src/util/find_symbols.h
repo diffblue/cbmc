@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FIND_SYMBOLS_H
-#define CPROVER_FIND_SYMBOLS_H
+#ifndef CPROVER_UTIL_FIND_SYMBOLS_H
+#define CPROVER_UTIL_FIND_SYMBOLS_H
 
 #include <set>
 
@@ -66,4 +66,4 @@ void find_type_and_expr_symbols(
   const exprt &src,
   find_symbols_sett &dest);
 
-#endif
+#endif // CPROVER_UTIL_FIND_SYMBOLS_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_SCOPE_H
-#define CPROVER_ANSI_C_SCOPE_H
+#ifndef CPROVER_ANSI_C_ANSI_C_SCOPE_H
+#define CPROVER_ANSI_C_ANSI_C_SCOPE_H
 
 #include <util/hash_cont.h>
 #include <util/irep.h>
@@ -57,4 +57,4 @@ public:
   void print(std::ostream &out) const;
 };
 
-#endif
+#endif // CPROVER_ANSI_C_ANSI_C_SCOPE_H

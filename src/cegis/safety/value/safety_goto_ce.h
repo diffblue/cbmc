@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_GOTO_CE_H_
-#define CEGIS_SAFETY_GOTO_CE_H_
+#ifndef CPROVER_CEGIS_SAFETY_VALUE_SAFETY_GOTO_CE_H
+#define CPROVER_CEGIS_SAFETY_VALUE_SAFETY_GOTO_CE_H
 
 #include <util/expr.h>
 
@@ -50,4 +50,4 @@ public:
   bool operator==(const safety_goto_cet &other) const;
 };
 
-#endif /* CEGIS_SAFETY_GOTO_CE_H_ */
+#endif // CPROVER_CEGIS_SAFETY_VALUE_SAFETY_GOTO_CE_H

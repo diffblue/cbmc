@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_INSTRUMENT_PRED_OPS_H_
-#define CEGIS_JSA_INSTRUMENT_PRED_OPS_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_INSTRUMENT_PRED_OPS_H
+#define CPROVER_CEGIS_JSA_LEARN_INSTRUMENT_PRED_OPS_H
 
 #include <goto-programs/goto_program.h>
 #include <cegis/jsa/value/pred_ops.h>
@@ -51,4 +51,4 @@ void instrument_pred_ops(
     class jsa_programt &prog,
     const goto_programt::targetst &ops);
 
-#endif /* CEGIS_JSA_INSTRUMENT_PRED_OPS_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_INSTRUMENT_PRED_OPS_H

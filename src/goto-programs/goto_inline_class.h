@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
-#define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 
 #include <util/message.h>
 
@@ -86,4 +86,4 @@ protected:
   finished_inlining_sett finished_inlining_set;
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H

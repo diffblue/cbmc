@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_ASSIGNMENTS_PRINTER_H_
-#define CEGIS_ASSIGNMENTS_PRINTER_H_
+#ifndef CPROVER_CEGIS_VALUE_ASSIGNMENTS_PRINTER_H
+#define CPROVER_CEGIS_VALUE_ASSIGNMENTS_PRINTER_H
 
 #include <util/message.h>
 #include <util/expr.h>
@@ -27,4 +27,4 @@ void print_assignments(
     const class symbol_tablet &st,
     const std::map<const irep_idt, exprt> &assignments);
 
-#endif /* CEGIS_ASSIGNMENTS_PRINTER_H_ */
+#endif // CPROVER_CEGIS_VALUE_ASSIGNMENTS_PRINTER_H

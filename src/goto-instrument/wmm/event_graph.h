@@ -8,8 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
-#ifndef EVENT_GRAPH_H
-#define EVENT_GRAPH_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H
 
 #include <list>
 #include <set>
@@ -543,4 +543,4 @@ public:
     exploration.collect_pairs(ns);
   }
 };
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H

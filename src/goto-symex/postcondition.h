@@ -20,4 +20,4 @@ void postcondition(
   const class goto_symex_statet &s,
   exprt &dest);
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_POSTCONDITION_H

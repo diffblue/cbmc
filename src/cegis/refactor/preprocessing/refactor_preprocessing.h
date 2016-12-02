@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H_
-#define CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H_
+#ifndef CPROVER_CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H
+#define CPROVER_CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H
 
 #include <cegis/refactor/options/refactor_program.h>
 
@@ -72,4 +72,4 @@ public:
   const refactor_programt &get_program() const;
 };
 
-#endif /* CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_PREPROCESSING_REFACTOR_PREPROCESSING_H

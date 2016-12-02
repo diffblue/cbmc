@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_NUMBERING_H
-#define CPROVER_NUMBERING_H
+#ifndef CPROVER_UTIL_NUMBERING_H
+#define CPROVER_UTIL_NUMBERING_H
 
 #include <cassert>
 #include <map>
@@ -112,4 +112,4 @@ protected:
   numberst numbers;
 };
 
-#endif
+#endif // CPROVER_UTIL_NUMBERING_H

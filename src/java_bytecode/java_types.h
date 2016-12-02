@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_TYPES_H
-#define CPROVER_JAVA_TYPES_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
+#define CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 
 #include <util/type.h>
 #include <util/std_types.h>
@@ -44,4 +44,4 @@ char java_char_from_type(const typet &type);
 typet java_bytecode_promotion(const typet &);
 exprt java_bytecode_promotion(const exprt &);
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

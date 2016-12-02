@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_ARMCC_MODE_H
-#define GOTO_CC_ARMCC_MODE_H
+#ifndef CPROVER_GOTO_CC_ARMCC_MODE_H
+#define CPROVER_GOTO_CC_ARMCC_MODE_H
 
 #include "goto_cc_mode.h"
 #include "armcc_cmdline.h"
@@ -30,4 +30,4 @@ protected:
   armcc_cmdlinet &cmdline;
 };
 
-#endif /* GOTO_CC_ARMCC_MODE_H */
+#endif // CPROVER_GOTO_CC_ARMCC_MODE_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_SMT2_PROP_H
-#define CPROVER_PROP_SMT2_PROP_H
+#ifndef CPROVER_SOLVERS_SMT2_SMT2_PROP_H
+#define CPROVER_SOLVERS_SMT2_SMT2_PROP_H
 
 #include <iosfwd>
 #include <set>
@@ -86,4 +86,4 @@ protected:
   bool core_enabled;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SMT2_SMT2_PROP_H

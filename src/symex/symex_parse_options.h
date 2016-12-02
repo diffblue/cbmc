@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SYMEX_PARSE_OPTIONS_H
-#define CPROVER_SYMEX_PARSE_OPTIONS_H
+#ifndef CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H
+#define CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -73,4 +73,4 @@ protected:
   std::string get_test(const goto_tracet &goto_trace);
 };
 
-#endif
+#endif // CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H

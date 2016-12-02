@@ -14,4 +14,4 @@ Author: Daniel Kroening, kroening@kroening.com
 void remove_skip(goto_programt &goto_program);
 void remove_skip(goto_functionst &goto_functions);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_CLONE_HEAP_H_
-#define CEGIS_JSA_CLONE_HEAP_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_CLONE_HEAP_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_CLONE_HEAP_H
 
 #include <goto-programs/goto_program.h>
 
@@ -67,4 +67,4 @@ goto_programt::targett assume_valid_heap(
     goto_programt::targett pos,
     const exprt &heap_ptr);
 
-#endif /* CEGIS_JSA_CLONE_HEAP_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_CLONE_HEAP_H

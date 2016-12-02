@@ -111,4 +111,4 @@ void pointer_checks(
   const optionst &options,
   value_setst &value_sets);
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H

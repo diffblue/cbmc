@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_SMT2IREP_H
-#define CPROVER_SOLVER_SMT2IREP_H
+#ifndef CPROVER_SOLVERS_SMT2_SMT2IREP_H
+#define CPROVER_SOLVERS_SMT2_SMT2IREP_H
 
 #include <iosfwd>
 
@@ -15,4 +15,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 irept smt2irep(std::istream &);
 
-#endif
+#endif // CPROVER_SOLVERS_SMT2_SMT2IREP_H

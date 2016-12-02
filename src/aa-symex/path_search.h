@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SEARCH_H
-#define CPROVER_PATH_SEARCH_H
+#ifndef CPROVER_AA_SYMEX_PATH_SEARCH_H
+#define CPROVER_AA_SYMEX_PATH_SEARCH_H
 
 #include <util/time_stopping.h>
 
@@ -91,4 +91,4 @@ protected:
     const goto_functionst &goto_functions);
 };
 
-#endif
+#endif // CPROVER_AA_SYMEX_PATH_SEARCH_H

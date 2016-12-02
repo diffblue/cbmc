@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_DPLIB_PROP_H
-#define CPROVER_PROP_DPLIB_PROP_H
+#ifndef CPROVER_SOLVERS_DPLIB_DPLIB_PROP_H
+#define CPROVER_SOLVERS_DPLIB_DPLIB_PROP_H
 
 #include <iosfwd>
 
@@ -86,4 +86,4 @@ protected:
   void finish();
 };
 
-#endif
+#endif // CPROVER_SOLVERS_DPLIB_DPLIB_PROP_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_PROGRAM_H_
-#define CEGIS_JSA_PROGRAM_H_
+#ifndef CPROVER_CEGIS_JSA_OPTIONS_JSA_PROGRAM_H
+#define CPROVER_CEGIS_JSA_OPTIONS_JSA_PROGRAM_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -129,4 +129,4 @@ public:
   jsa_programt &operator=(const jsa_programt &other);
 };
 
-#endif /* CEGIS_JSA_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_JSA_OPTIONS_JSA_PROGRAM_H

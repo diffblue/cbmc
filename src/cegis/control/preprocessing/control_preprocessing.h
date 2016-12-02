@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_PREPROCESSING_H_
-#define CEGIS_CONTROL_PREPROCESSING_H_
+#ifndef CPROVER_CEGIS_CONTROL_PREPROCESSING_CONTROL_PREPROCESSING_H
+#define CPROVER_CEGIS_CONTROL_PREPROCESSING_CONTROL_PREPROCESSING_H
 
 #include <cegis/control/options/control_program.h>
 
@@ -68,4 +68,4 @@ public:
   const control_programt &get_program() const;
 };
 
-#endif /* CEGIS_CONTROL_PREPROCESSING_H_ */
+#endif // CPROVER_CEGIS_CONTROL_PREPROCESSING_CONTROL_PREPROCESSING_H

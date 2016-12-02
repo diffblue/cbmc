@@ -8,8 +8,8 @@ Date: October 2012
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_IS_THREADED_H
-#define CPROVER_GOTO_PROGRAMS_IS_THREADED_H
+#ifndef CPROVER_ANALYSES_IS_THREADED_H
+#define CPROVER_ANALYSES_IS_THREADED_H
 
 #include <set>
 
@@ -37,4 +37,4 @@ protected:
     const goto_functionst &goto_functions);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_IS_THREADED_H

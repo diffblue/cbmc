@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_COUNTEREXAMPLE_H_
-#define CEGIS_CONTROL_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_CONTROL_VALUE_CONTROL_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_CONTROL_VALUE_CONTROL_COUNTEREXAMPLE_H
 
 #include <deque>
 #include <map>
@@ -24,4 +24,4 @@ typedef std::map<const irep_idt, exprt::operandst> control_counterexamplet;
 
 typedef std::deque<control_counterexamplet> control_counterexamplest;
 
-#endif /* CEGIS_CONTROL_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VALUE_CONTROL_COUNTEREXAMPLE_H

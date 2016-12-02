@@ -567,4 +567,4 @@ void cfg_baset<T, P, I>::compute_edges(
       compute_edges(goto_functions, it->second.body);
 }
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_CFG_H

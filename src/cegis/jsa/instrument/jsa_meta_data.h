@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/source_location.h>
 
-#ifndef CEGIS_JSA_META_DATA_H_
-#define CEGIS_JSA_META_DATA_H_
+#ifndef CPROVER_CEGIS_JSA_INSTRUMENT_JSA_META_DATA_H
+#define CPROVER_CEGIS_JSA_INSTRUMENT_JSA_META_DATA_H
 
 #define JSA_MODULE "<builtin-library-jsa>"
 #define JSA_PREFIX CPROVER_PREFIX "jsa_"
@@ -95,4 +95,4 @@ source_locationt jsa_builtin_source_location();
  */
 bool is_jsa_const(const class symbol_exprt &symbol);
 
-#endif /* CEGIS_JSA_META_DATA_H_ */
+#endif // CPROVER_CEGIS_JSA_INSTRUMENT_JSA_META_DATA_H

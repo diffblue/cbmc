@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H_
-#define CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H_
+#ifndef CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H
+#define CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H
 
 typedef enum
 {
@@ -26,4 +26,4 @@ typedef enum
  */
 refactoring_typet get_refactoring_type(const class optionst &options);
 
-#endif /* CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTORING_TYPE_H

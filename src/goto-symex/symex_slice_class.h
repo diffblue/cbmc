@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H
+#define CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H
+
 #include "symex_target_equation.h"
 #include "slice.h"
 
@@ -39,3 +42,5 @@ protected:
   void slice_assignment(symex_target_equationt::SSA_stept &SSA_step);
   void slice_decl(symex_target_equationt::SSA_stept &SSA_step);
 };
+
+#endif // CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H

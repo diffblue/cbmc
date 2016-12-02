@@ -20,4 +20,4 @@ void convert(
   const goto_tracet &,
   jsont &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_JSON_GOTO_TRACE_H

@@ -149,4 +149,4 @@ inline const cpp_namet &to_cpp_name(const irept &cpp_name)
   return static_cast<const cpp_namet &>(cpp_name);
 }
 
-#endif
+#endif // CPROVER_CPP_CPP_NAME_H

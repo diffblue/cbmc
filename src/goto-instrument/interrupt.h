@@ -22,4 +22,4 @@ void interrupt(
   goto_functionst &goto_functions,
   const irep_idt &interrupt_handler);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_H

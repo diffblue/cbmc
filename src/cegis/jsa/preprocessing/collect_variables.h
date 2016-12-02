@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H_
-#define CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H
 
 /**
  * @brief
@@ -28,4 +28,4 @@ void add_inductive_step_renondets(class jsa_programt &prog);
  */
 void collect_counterexample_vars(jsa_programt &prog);
 
-#endif /* CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_COLLECT_VARIABLES_H

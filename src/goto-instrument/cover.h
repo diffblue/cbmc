@@ -8,8 +8,8 @@ Date: May 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_COVER_H
-#define CPROVER_COVER_H
+#ifndef CPROVER_GOTO_INSTRUMENT_COVER_H
+#define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
 
@@ -27,4 +27,4 @@ void instrument_cover_goals(
   goto_functionst &goto_functions,
   coverage_criteriont);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_COVER_H

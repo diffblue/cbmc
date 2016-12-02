@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FI_H
-#define CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_FI_H
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FI_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FI_H
 
 #include <analyses/flow_insensitive_analysis.h>
 
@@ -70,4 +70,4 @@ public:
   }
 };
 
-#endif /*VALUE_PROPAGATION_FUI_H_*/
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FI_H

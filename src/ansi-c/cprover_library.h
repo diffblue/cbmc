@@ -28,4 +28,4 @@ void add_cprover_library(
   symbol_tablet &,
   message_handlert &);
 
-#endif
+#endif // CPROVER_ANSI_C_CPROVER_LIBRARY_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BOOLBV_MAP_H
-#define CPROVER_BOOLBV_MAP_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
+#define CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 
 #include <vector>
 
@@ -81,4 +81,4 @@ protected:
   const boolbv_widtht &boolbv_width;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H

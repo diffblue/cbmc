@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FLATTEN_BYTE_OPERATORS_H
-#define CPROVER_FLATTEN_BYTE_OPERATORS_H
+#ifndef CPROVER_SOLVERS_FLATTENING_FLATTEN_BYTE_OPERATORS_H
+#define CPROVER_SOLVERS_FLATTENING_FLATTEN_BYTE_OPERATORS_H
 
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -26,4 +26,4 @@ exprt flatten_byte_operators(const exprt &src, const namespacet &ns);
 
 bool has_byte_operator(const exprt &src);
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_FLATTEN_BYTE_OPERATORS_H

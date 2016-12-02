@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_
-#define CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_
+#ifndef CPROVER_CEGIS_REFACTOR_VALUE_REFACTOR_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_REFACTOR_VALUE_REFACTOR_COUNTEREXAMPLE_H
 
 #include <cegis/cegis-util/labelled_assignments.h>
 
@@ -26,4 +26,4 @@ typedef labelled_assignmentst refactor_counterexamplet;
  */
 typedef labelled_counterexamplest refactor_counterexamplest;
 
-#endif /* CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_VALUE_REFACTOR_COUNTEREXAMPLE_H

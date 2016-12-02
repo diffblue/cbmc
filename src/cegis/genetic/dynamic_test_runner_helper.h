@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DYNAMIC_TEST_RUNNER_HELPER_H_
-#define CEGIS_DYNAMIC_TEST_RUNNER_HELPER_H_
+#ifndef CPROVER_CEGIS_GENETIC_DYNAMIC_TEST_RUNNER_HELPER_H
+#define CPROVER_CEGIS_GENETIC_DYNAMIC_TEST_RUNNER_HELPER_H
 
 #include <functional>
 
@@ -80,4 +80,4 @@ void close_fitness_tester_library(
 
 #include "dynamic_test_runner_helper.inc"
 
-#endif /* CEGIS_DYNAMIC_TEST_RUNNER_HELPER_H_ */
+#endif // CPROVER_CEGIS_GENETIC_DYNAMIC_TEST_RUNNER_HELPER_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_LITERALS_H_
-#define CEGIS_LITERALS_H_
+#ifndef CPROVER_CEGIS_INSTRUMENT_LITERALS_H
+#define CPROVER_CEGIS_INSTRUMENT_LITERALS_H
 
 #include <util/cprover_prefix.h>
 
@@ -27,4 +27,4 @@
 #define CONSTRAINT_CALLER CONSTRAINT_CALLER_NAME ":()V"
 #define CONSTRAINT_CALLER_ID "java::" CONSTRAINT_CALLER
 
-#endif /* CEGIS_LITERALS_H_ */
+#endif // CPROVER_CEGIS_INSTRUMENT_LITERALS_H

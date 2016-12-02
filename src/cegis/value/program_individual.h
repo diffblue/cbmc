@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_INDIVIDUAL_H_
-#define CEGIS_GENETIC_INDIVIDUAL_H_
+#ifndef CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_H
+#define CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_H
 
 #include <cstddef>
 #include <deque>
@@ -64,4 +64,4 @@ typedef std::vector<program_individualt> program_populationt;
  */
 typedef family_selectiont<program_populationt> program_individual_selectiont;
 
-#endif /* CEGIS_GENETIC_INDIVIDUAL_H_ */
+#endif // CPROVER_CEGIS_VALUE_PROGRAM_INDIVIDUAL_H

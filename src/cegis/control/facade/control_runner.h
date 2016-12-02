@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_RUNNER_H_
-#define CEGIS_CONTROL_RUNNER_H_
+#ifndef CPROVER_CEGIS_CONTROL_FACADE_CONTROL_RUNNER_H
+#define CPROVER_CEGIS_CONTROL_FACADE_CONTROL_RUNNER_H
 
 #include <util/message.h>
 
@@ -27,4 +27,4 @@
 int run_control(class optionst &options, messaget::mstreamt &result,
     const class symbol_tablet &st, const class goto_functionst &gf);
 
-#endif /* CEGIS_CONTROL_RUNNER_H_ */
+#endif // CPROVER_CEGIS_CONTROL_FACADE_CONTROL_RUNNER_H

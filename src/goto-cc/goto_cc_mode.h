@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_MODE_H
-#define GOTO_CC_MODE_H
+#ifndef CPROVER_GOTO_CC_GOTO_CC_MODE_H
+#define CPROVER_GOTO_CC_GOTO_CC_MODE_H
 
 #include <langapi/language_ui.h>
 
@@ -35,4 +35,4 @@ protected:
   goto_cc_cmdlinet &cmdline;
 };
 
-#endif /* GOTO_CC_MODE_H */
+#endif // CPROVER_GOTO_CC_GOTO_CC_MODE_H

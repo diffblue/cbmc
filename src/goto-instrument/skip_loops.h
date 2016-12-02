@@ -8,8 +8,8 @@ Date: January 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_SKIP_LOOPS_H
-#define CPROVER_SKIP_LOOPS_H
+#ifndef CPROVER_GOTO_INSTRUMENT_SKIP_LOOPS_H
+#define CPROVER_GOTO_INSTRUMENT_SKIP_LOOPS_H
 
 #include <string>
 
@@ -21,4 +21,4 @@ bool skip_loops(
   const std::string &loop_ids,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_SKIP_LOOPS_H

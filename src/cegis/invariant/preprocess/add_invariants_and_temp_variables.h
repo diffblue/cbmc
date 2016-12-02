@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_ADD_INVARIANT_AND_TEMP_VARIABLES_H_
-#define CEGIS_INVARIANT_ADD_INVARIANT_AND_TEMP_VARIABLES_H_
+#ifndef CPROVER_CEGIS_INVARIANT_PREPROCESS_ADD_INVARIANTS_AND_TEMP_VARIABLES_H
+#define CPROVER_CEGIS_INVARIANT_PREPROCESS_ADD_INVARIANTS_AND_TEMP_VARIABLES_H
 
 #include <functional>
 
@@ -70,4 +70,4 @@ void create_tmp_variables(
     const size_t max_program_length,
     const class typet &type);
 
-#endif /* CEGIS_INVARIANT_ADD_INVARIANT_AND_TEMP_VARIABLES_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_PREPROCESS_ADD_INVARIANTS_AND_TEMP_VARIABLES_H

@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_MEMORY_MODEL_H
-#define CPROVER_MEMORY_MODEL_H
+#ifndef CPROVER_GOTO_SYMEX_MEMORY_MODEL_H
+#define CPROVER_GOTO_SYMEX_MEMORY_MODEL_H
 
 #include "partial_order_concurrency.h"
 
@@ -39,4 +39,4 @@ protected:
   typedef std::map<unsigned, event_listt> per_thread_mapt;
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_H

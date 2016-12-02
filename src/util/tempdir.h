@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_TEMPDIR_H
-#define CPROVER_TEMPDIR_H
+#ifndef CPROVER_UTIL_TEMPDIR_H
+#define CPROVER_UTIL_TEMPDIR_H
 
 #include <string>
 
@@ -41,4 +41,4 @@ public:
   ~temp_working_dirt();
 };
 
-#endif
+#endif // CPROVER_UTIL_TEMPDIR_H

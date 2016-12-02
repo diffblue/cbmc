@@ -29,4 +29,4 @@ void collect_open_variables(
   const symex_target_equationt &equation,
   symbol_sett &open_variables);
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_SLICE_H

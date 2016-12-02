@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_OPTIONS_H
-#define CPROVER_OPTIONS_H
+#ifndef CPROVER_UTIL_OPTIONS_H
+#define CPROVER_UTIL_OPTIONS_H
 
 #include <string>
 #include <map>
@@ -54,4 +54,4 @@ protected:
   const value_listt empty_list;
 };
 
-#endif
+#endif // CPROVER_UTIL_OPTIONS_H

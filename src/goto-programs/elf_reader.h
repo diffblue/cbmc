@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_ELF_READER_H
-#define CPROVER_ELF_READER_H
+#ifndef CPROVER_GOTO_PROGRAMS_ELF_READER_H
+#define CPROVER_GOTO_PROGRAMS_ELF_READER_H
 
 #include <iosfwd>
 #include <string>
@@ -151,4 +151,4 @@ protected:
   std::istream &in;
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_ELF_READER_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_CNF_CLAUSE_LIST_H
-#define CPROVER_PROP_CNF_CLAUSE_LIST_H
+#ifndef CPROVER_SOLVERS_SAT_CNF_CLAUSE_LIST_H
+#define CPROVER_SOLVERS_SAT_CNF_CLAUSE_LIST_H
 
 #include <list>
 
@@ -107,4 +107,4 @@ protected:
   assignmentt assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_CNF_CLAUSE_LIST_H

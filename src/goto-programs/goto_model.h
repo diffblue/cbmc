@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_MODEL_H
-#define CPROVER_GOTO_MODEL_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
 
 #include <util/symbol_table.h>
 
@@ -48,4 +48,4 @@ public:
   goto_modelt(const goto_modelt &) = delete;
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H

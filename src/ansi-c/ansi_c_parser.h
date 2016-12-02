@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANSI_C_PARSER_H
-#define CPROVER_ANSI_C_PARSER_H
+#ifndef CPROVER_ANSI_C_ANSI_C_PARSER_H
+#define CPROVER_ANSI_C_ANSI_C_PARSER_H
 
 #include <cassert>
 
@@ -142,4 +142,4 @@ extern ansi_c_parsert ansi_c_parser;
 int yyansi_cerror(const std::string &error);
 void ansi_c_scanner_init();
 
-#endif
+#endif // CPROVER_ANSI_C_ANSI_C_PARSER_H

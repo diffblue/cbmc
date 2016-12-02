@@ -34,4 +34,4 @@ protected:
            const goto_programt &body);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_CALL_GRAPH_H

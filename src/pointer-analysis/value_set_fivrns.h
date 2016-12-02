@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef __CPROVER_VALUE_SET_FIVRNS_H_
-#define __CPROVER_VALUE_SET_FIVRNS_H_
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
 
 #include <util/mp_arith.h>
 #include <util/namespace.h>
@@ -347,4 +347,4 @@ protected:
     const namespacet &ns);
 };
 
-#endif /*__CPROVER_VALUE_SET_FIVR_H_*/
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H

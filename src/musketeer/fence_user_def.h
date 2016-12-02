@@ -7,8 +7,8 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#ifndef CPROVER_FENCE_USER_DEF_H
-#define CPROVER_FENCE_USER_DEF_H
+#ifndef CPROVER_MUSKETEER_FENCE_USER_DEF_H
+#define CPROVER_MUSKETEER_FENCE_USER_DEF_H
 
 #include <set>
 
@@ -44,4 +44,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_MUSKETEER_FENCE_USER_DEF_H

@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_MS_CL_CMDLINE_H
-#define GOTO_CC_MS_CL_CMDLINE_H
+#ifndef CPROVER_GOTO_CC_MS_CL_CMDLINE_H
+#define CPROVER_GOTO_CC_MS_CL_CMDLINE_H
 
 #include "goto_cc_cmdline.h"
 
@@ -32,4 +32,4 @@ protected:
   bool parse(const std::vector<std::string> &);
 };
 
-#endif /*MS_CL_CMDLINE_H_*/
+#endif // CPROVER_GOTO_CC_MS_CL_CMDLINE_H
