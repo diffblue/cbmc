@@ -413,7 +413,7 @@ void java_bytecode_convert_methodt::convert(
 
   tmp_vars.clear();
   method_symbol.value=convert_instructions(m.instructions, code_type);
-  
+
   // do we have the method symbol already?
   const auto s_it=symbol_table.symbols.find(method.get_name());
   if(s_it!=symbol_table.symbols.end())
@@ -761,7 +761,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       // does the function symbol exist?
       irep_idt id=arg0.get(ID_identifier);
-
       if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
       {
         // no, create stub
@@ -784,16 +783,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       else
       {
         // static binding
-	/*if(id == "java::java.lang.String.charAt:(I)C")
-	  call.function()=symbol_exprt("java::__CPROVER_uninterpreted_char_at", arg0.type());
-	  else*/
-	  call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-
+        call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
       }
 
       call.function().add_source_location()=i_it->source_location;
       c = call;
-      
     }
     else if(statement=="return")
     {
