@@ -215,7 +215,7 @@ Function: languaget::build_stub_parameter_symbol
 parameter_symbolt languaget::build_stub_parameter_symbol(
   const symbolt &function_symbol,
   size_t parameter_index,
-  const typet &parameter_type)
+  const code_typet::parametert &parameter)
 {
   error() << "language " << id()
           << " doesn't implement build_stub_parameter_symbol. "
@@ -280,7 +280,7 @@ void languaget::generate_opaque_parameter_symbols(
   {
     code_typet::parametert &param=parameters[i];
     const parameter_symbolt &param_symbol=
-      build_stub_parameter_symbol(function_symbol, i, param.type());
+      build_stub_parameter_symbol(function_symbol, i, param);
 
     param.set_base_name(param_symbol.base_name);
     param.set_identifier(param_symbol.name);
