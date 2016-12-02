@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: GOTO-CC Main Module
- 
+
 Authors: Daniel Kroening, kroening@kroening.com
- 
+
 Date: May 2006
- 
+
 \*******************************************************************/
 
 #include <algorithm>
@@ -26,15 +26,15 @@ Date: May 2006
 #include "ld_mode.h"
 
 /*******************************************************************\
- 
+
 Function: to_lower_string
- 
+
   Inputs:
- 
+
  Outputs:
- 
+
  Purpose:
- 
+
 \*******************************************************************/
 
 std::string to_lower_string(const std::string &s)
@@ -45,15 +45,15 @@ std::string to_lower_string(const std::string &s)
 }
 
 /*******************************************************************\
- 
+
 Function: main
- 
+
   Inputs:
- 
+
  Outputs:
- 
+
  Purpose:
- 
+
 \*******************************************************************/
 
 #ifdef _MSC_VER
@@ -61,7 +61,7 @@ int wmain(int argc, const wchar_t **argv_wide)
 #else
 int main(int argc, const char **argv)
 #endif
-{  
+{
   #ifdef _MSC_VER
   const char **argv=narrow_argv(argc, argv_wide);
   #endif
@@ -71,7 +71,7 @@ int main(int argc, const char **argv)
     std::cerr << "failed to determine base name" << std::endl;
     return 1;
   }
-  
+
   #ifdef _MSC_VER
   // we do 'to_lower_string' because of Windows
   std::string base_name=
@@ -79,7 +79,7 @@ int main(int argc, const char **argv)
   #else
   std::string base_name=get_base_name(argv[0], false);
   #endif
-  
+
   if(base_name=="goto-link" || base_name=="link" ||
      base_name=="goto-cl" || base_name=="cl")
   {

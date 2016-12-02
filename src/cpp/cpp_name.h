@@ -40,7 +40,7 @@ public:
       set(ID_identifier, _base_name);
       add_source_location()=_source_location;
     }
-    
+
     inline source_locationt &add_source_location()
     {
       return static_cast<source_locationt &>(add(ID_C_source_location));
@@ -55,7 +55,7 @@ public:
   inline cpp_namet():irept(ID_cpp_name)
   {
   }
-  
+
   inline explicit cpp_namet(const irep_idt &base_name):irept(ID_cpp_name)
   {
     get_sub().push_back(namet(base_name));
@@ -78,7 +78,7 @@ public:
 
   //void convert(std::string &identifier, std::string &base_name) const;
   irep_idt get_base_name() const;
-  
+
   // one of three:
   // 'identifier'
   // 'operator X'
@@ -109,7 +109,7 @@ public:
         return true;
     return false;
   }
-  
+
   bool is_destructor() const
   {
     return get_sub().size()>=1 && get_sub().front().id()=="~";
@@ -125,7 +125,7 @@ public:
   }
 
   std::string to_string() const;
-  
+
   const exprt &as_expr() const
   {
     return static_cast<const exprt &>(static_cast<const irept &>(*this));

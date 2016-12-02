@@ -193,7 +193,7 @@ print-progress() {
 
   echo "Packages at URL: $PKG_URL_COUNT" >> $PROG
   echo "^ + size within bounds: $PKG_SIZE_COUNT" >> $PROG
-  echo -e "^ + package downloaded: $PKG_DOWN_COUNT\n" >> $PROG  
+  echo -e "^ + package downloaded: $PKG_DOWN_COUNT\n" >> $PROG
 
   echo "Files within packages: $FILE_COUNT" >> $PROG
   echo "^ + is a goto binary: $GB_COUNT" >> $PROG
@@ -289,7 +289,7 @@ do
     file -m goto-magic "$F" 2>&1 | grep 'goto-binary' > /dev/null 2>&1
     # If file is a goto binary
     if [ $? -eq 0 ]; then
-      
+
       GB_COUNT=$(($GB_COUNT + 1))
 
       # Size of the binary
@@ -355,7 +355,7 @@ do
         if [ $? -ne 0 ]; then
           echo "$L: $F: Linking error, giving up" >> $INFO
           continue
-        fi 
+        fi
       fi
       F="$F.linked"
 
@@ -364,7 +364,7 @@ do
 
       echo "@@@ Running tools on $L: $F." >> $INFO
       echo "@@@ LoC: $LOC" >> $INFO
-      echo "@@@ Binary size (in bytes): $SIZE" >> $INFO 
+      echo "@@@ Binary size (in bytes): $SIZE" >> $INFO
 
       # ------------------------------------------------------------------------
       # Invoke tools
@@ -382,7 +382,7 @@ do
         # Create invocation and start process
         mkdir "inst-$i"; cd "inst-$i"
         OUT=$(replace "$F")
-        INV="${FE[$i]}" 
+        INV="${FE[$i]}"
         INV="/usr/bin/time -p timeout -k 5 $TIMEOUT $INV ../$F > $OUT.$i 2>&1"
         echo "@@@: Invocation '$INV'" >> ../$INFO
         bash -c "ulimit -v $MAXMEM_FE; $INV" &
@@ -395,7 +395,7 @@ do
         R=$(($R + 1))
         if [ $R -lt $FACTOR ] && [ $i -lt $TN1 ]; then
           continue
-        fi  
+        fi
 
         while true; do
           for P in $PIDS
@@ -469,4 +469,3 @@ done
 rm -f goto-magic
 
 print-progress
-

@@ -34,7 +34,7 @@ bvt boolbvt::convert_constraint_select_one(const exprt &expr)
     throw "constraint_select_one expects matching types";
 
   bvt bv;
- 
+
   if(prop.has_set_to())
   {
     std::size_t width=boolbv_width(expr.type());
@@ -77,7 +77,6 @@ bvt boolbvt::convert_constraint_select_one(const exprt &expr)
       op_nr++;
     }
   }
-  
+
   return bv;
 }
-

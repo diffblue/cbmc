@@ -3,7 +3,7 @@ int main() {
   int i;
   int a[100];
 
-  // this is guaranteed not to be a buffer overflow  
+  // this is guaranteed not to be a buffer overflow
   if(x<100 && a[x])
   {
     i++;

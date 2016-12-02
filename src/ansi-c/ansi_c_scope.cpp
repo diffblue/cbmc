@@ -36,4 +36,3 @@ void ansi_c_scopet::print(std::ostream &out) const
         << "\n";
   }
 }
-

@@ -6,6 +6,6 @@ typedef enum enumname enumname;
 int main()
 {
   enumname x;
-  
+
   x=ASD;
 }

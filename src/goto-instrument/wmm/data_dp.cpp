@@ -26,9 +26,9 @@ Function: data_dpt::dp_analysis
 \*******************************************************************/
 
 void data_dpt::dp_analysis(
-  const datat& read, 
-  bool local_read, 
-  const datat& write, 
+  const datat& read,
+  bool local_read,
+  const datat& write,
   bool local_write)
 {
   const_iterator it;
@@ -68,7 +68,7 @@ Function: data_dpt::dp_analysis
 
 \*******************************************************************/
 
-void data_dpt::dp_analysis(const abstract_eventt& read, 
+void data_dpt::dp_analysis(const abstract_eventt& read,
   const abstract_eventt& write)
 {
   datat d_read(read.variable,read.source_location);
@@ -227,4 +227,3 @@ void data_dpt::print(messaget& message)
   }
 #endif
 }
-

@@ -1,5 +1,5 @@
 #define STATIC_ASSERT(condition) \
-  int some_array##__LINE__[(condition) ? 1 : -1];    
+  int some_array##__LINE__[(condition) ? 1 : -1];
 
 STATIC_ASSERT('\''==39);
 STATIC_ASSERT(L'\''==39);

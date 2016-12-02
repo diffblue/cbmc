@@ -324,7 +324,7 @@ run_floorPow2_tests ()
     } else {
       putchar ('X');
     }
-    
+
   }
 
   N = pow(2,0);  // 1
@@ -339,14 +339,14 @@ run_floorPow2_tests ()
   } else {
     putchar ('X');
   }
-  
+
   N -= 1;        // 0
   if (N.floorPow2() == 0) {
     putchar ('.');
   } else {
     putchar ('X');
   }
-  
+
   N += 2;        // 2
   if (N.floorPow2() == 1) {
     putchar ('.');

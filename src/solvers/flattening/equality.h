@@ -24,8 +24,8 @@ public:
     propt &_prop):prop_conv_solvert(_ns, _prop) { }
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
-  
-  virtual void post_process()
+
+  virtual void post_process() override
   {
     add_equality_constraints();
     prop_conv_solvert::post_process();
@@ -43,10 +43,10 @@ protected:
     elements_revt elements_rev;
     equalitiest equalities;
   };
- 
+
   typedef hash_map_cont<const typet, typestructt, irep_hash> typemapt;
-  
-  typemapt typemap;    
+
+  typemapt typemap;
 
   virtual literalt equality2(const exprt &e1, const exprt &e2);
   virtual void add_equality_constraints();

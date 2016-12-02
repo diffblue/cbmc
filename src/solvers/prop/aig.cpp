@@ -82,13 +82,13 @@ const aigt::terminal_sett &aigt::get_terminals_rec(
   terminalst &terminals) const
 {
   terminalst::iterator it=terminals.find(n);
-  
+
   if(it!=terminals.end())
     return it->second; // already done
-  
+
   assert(n<nodes.size());
   const aig_nodet &node=nodes[n];
-  
+
   terminal_sett &t=terminals[n];
 
   if(node.is_and())
@@ -111,7 +111,7 @@ const aigt::terminal_sett &aigt::get_terminals_rec(
   {
     t.insert(n);
   }
-    
+
   return t;
 }
 

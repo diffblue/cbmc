@@ -23,7 +23,7 @@ class propt:public messaget, public prop_assignmentt
 public:
   propt() { }
   virtual ~propt() { }
- 
+
   // boolean operators
   virtual literalt land(literalt a, literalt b)=0;
   virtual literalt lor(literalt a, literalt b)=0;
@@ -42,7 +42,7 @@ public:
   {
     set_equal(a, const_literal(value));
   }
-  
+
   void l_set_to_true(literalt a)
   { l_set_to(a, true); }
   void l_set_to_false(literalt a)
@@ -64,7 +64,7 @@ public:
   // Some solvers (notably aig) prefer encodings that avoid raw CNF
   // They overload this to return false and thus avoid some optimisations
   virtual bool cnf_handled_well() const { return true; }
-  
+
   // assumptions
   virtual void set_assumptions(const bvt &_assumptions) { }
   virtual bool has_set_assumptions() const { return false; }
@@ -74,12 +74,12 @@ public:
   virtual void set_variable_name(literalt a, const std::string &name) { }
   virtual size_t no_variables() const=0;
   bvt new_variables(std::size_t width);
-  
+
   // solving
   virtual const std::string solver_text()=0;
   typedef enum { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR } resultt;
-  virtual resultt prop_solve()=0;  
-  
+  virtual resultt prop_solve()=0;
+
   // satisfying assignment, from prop_assignmentt
   virtual tvt l_get(literalt a) const=0;
   virtual void set_assignment(literalt a, bool value);
@@ -88,9 +88,9 @@ public:
   // Returns true if an assumption is in the final conflict.
   // Note that only literals that are assumptions (see set_assumptions)
   // may be queried.
-  virtual bool is_in_conflict(literalt l) const;  
+  virtual bool is_in_conflict(literalt l) const;
   virtual bool has_is_in_conflict() const { return false; }
-  
+
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
 

@@ -177,14 +177,14 @@ exprt to_expr(
   const std::string &src)
 {
   std::unique_ptr<languaget> p(get_language(ns, identifier));
-  
+
   const symbolt &symbol=ns.lookup(identifier);
 
   exprt expr;
 
   if(p->to_expr(src, id2string(symbol.module), expr, ns))
     return nil_exprt();
-  
+
   return expr;
 }
 
@@ -205,4 +205,3 @@ std::string type_to_name(const typet &type)
   symbol_tablet symbol_table;
   return type_to_name(namespacet(symbol_table), "", type);
 }
-

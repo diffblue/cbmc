@@ -26,7 +26,7 @@ public:
   std::string name;
   bool type_checked, in_progress;
   language_filet *file;
-  
+
   language_modulet()
   { type_checked=in_progress=false; }
 };
@@ -39,7 +39,7 @@ public:
 
   languaget *language;
   std::string filename;
-  
+
   void get_modules();
 
   language_filet(const language_filet &rhs);
@@ -50,7 +50,7 @@ public:
 
   ~language_filet();
 };
- 
+
 class language_filest:public messaget
 {
 public:
@@ -66,22 +66,22 @@ public:
   }
 
   bool parse();
-  
+
   void show_parse(std::ostream &out);
-  
+
   bool typecheck(symbol_tablet &symbol_table);
 
   bool final(symbol_tablet &symbol_table);
 
   bool interfaces(symbol_tablet &symbol_table);
-  
+
   void clear()
   {
     filemap.clear();
     modulemap.clear();
   }
 
-protected:                      
+protected:
   bool typecheck_module(
     symbol_tablet &symbol_table,
     language_modulet &module);
@@ -90,5 +90,5 @@ protected:
     symbol_tablet &symbol_table,
     const std::string &module);
 };
- 
+
 #endif

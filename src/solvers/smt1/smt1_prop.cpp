@@ -94,7 +94,7 @@ literalt smt1_propt::land(const bvt &bv)
 
   out << ":assumption ; land" << "\n";
   out << " (iff " << smt1_literal(l) << " (and";
-  
+
   forall_literals(it, bv)
     out << " " << smt1_literal(*it);
 
@@ -102,7 +102,7 @@ literalt smt1_propt::land(const bvt &bv)
 
   return l;
 }
-  
+
 /*******************************************************************\
 
 Function: smt1_propt::lor
@@ -131,7 +131,7 @@ literalt smt1_propt::lor(const bvt &bv)
 
   return l;
 }
-  
+
 /*******************************************************************\
 
 Function: smt1_propt::lxor
@@ -163,7 +163,7 @@ literalt smt1_propt::lxor(const bvt &bv)
 
   return l;
 }
-  
+
 /*******************************************************************\
 
 Function: smt1_propt::land
@@ -216,7 +216,7 @@ literalt smt1_propt::lor(literalt a, literalt b)
   if(a==const_literal(true)) return const_literal(true);
   if(b==const_literal(true)) return const_literal(true);
   if(a==b) return a;
-  
+
   out << "\n";
 
   literalt l=new_variable();
@@ -343,7 +343,7 @@ Function: smt1_propt::lselect
 \*******************************************************************/
 
 literalt smt1_propt::lselect(literalt a, literalt b, literalt c)
-{ 
+{
   if(a==const_literal(true)) return b;
   if(a==const_literal(false)) return c;
   if(b==c) return b;
@@ -382,7 +382,7 @@ literalt smt1_propt::new_variable()
   literalt l;
   l.set(_no_variables, false);
   _no_variables++;
-  
+
   out << ":extrapreds((" << smt1_literal(l) << "))" << "\n";
 
   return l;
@@ -413,7 +413,7 @@ void smt1_propt::lcnf(const bvt &bv)
   else
   {
     out << "(or";
-    
+
     for(bvt::const_iterator it=bv.begin(); it!=bv.end(); it++)
       out << " " << smt1_literal(*it);
 
@@ -441,11 +441,11 @@ std::string smt1_propt::smt1_literal(literalt l)
     return "false";
   else if(l==const_literal(true))
     return "true";
-    
+
   std::string v="B"+i2string(l.var_no());
 
   if(l.sign())
-    return "(not "+v+")";  
+    return "(not "+v+")";
 
   return v;
 }

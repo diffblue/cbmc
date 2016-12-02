@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening
 
@@ -53,15 +53,15 @@ Function: my_mkstemps
 int my_mkstemps(char *template_str, int suffix_len)
 {
   // The template should be of the form tmpXXXXXXsuffix
-  
+
   std::size_t template_length=strlen(template_str);
-  
+
   if(suffix_len+6>template_length)
     return -1; // suffix too long
-  
+
   char *XXXXXX_pos=
     template_str+template_length-6-suffix_len;
-  
+
   if(strncmp(XXXXXX_pos, "XXXXXX", 6)!=0)
     return -1; // XXXXXX missing
 
@@ -80,7 +80,7 @@ int my_mkstemps(char *template_str, int suffix_len)
       XXXXXX_pos[i]=letters_and_numbers[number%62];
       number/=62;
     }
-    
+
     int fd=open(template_str, O_RDWR|O_CREAT|O_EXCL, 0600);
     if(fd >= 0)
       return fd; // ok
@@ -114,7 +114,7 @@ std::string get_temporary_file(
   DWORD dwRetVal;
 
   dwRetVal = GetTempPathA(MAX_PATH,          // length of the buffer
-                          lpTempPathBuffer); // buffer for path 
+                          lpTempPathBuffer); // buffer for path
 
   if (dwRetVal > MAX_PATH || (dwRetVal == 0))
     throw "GetTempPath failed";
@@ -135,15 +135,15 @@ std::string get_temporary_file(
   #endif
 
   char *t_ptr=strdup(t_template.c_str());
-  
+
   int fd=mkstemps(t_ptr, suffix.size());
 
   if(fd<0)
-    throw "mkstemps failed";  
-    
+    throw "mkstemps failed";
+
   close(fd);
 
-  std::string result=std::string(t_ptr);  
+  std::string result=std::string(t_ptr);
   free(t_ptr);
   return result;
 }

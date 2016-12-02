@@ -25,9 +25,9 @@ Author: CM Wintersteiger, 2006
 
 Function: goto_cc_modet::goto_cc_modet
 
-  Inputs: 
+  Inputs:
 
- Outputs: 
+ Outputs:
 
  Purpose: constructor
 
@@ -45,9 +45,9 @@ goto_cc_modet::goto_cc_modet(goto_cc_cmdlinet &_cmdline):
 
 Function: goto_cc_modet::~goto_cc_modet
 
-  Inputs: 
+  Inputs:
 
- Outputs: 
+ Outputs:
 
  Purpose: constructor
 
@@ -128,7 +128,7 @@ int goto_cc_modet::main(int argc, const char **argv)
   {
     return EX_SOFTWARE;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;

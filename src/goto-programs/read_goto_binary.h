@@ -21,12 +21,12 @@ bool read_goto_binary(
   symbol_tablet &,
   goto_functionst &,
   message_handlert &);
-  
+
 bool read_goto_binary(
   const std::string &filename,
   goto_modelt &dest,
   message_handlert &);
-  
+
 bool is_goto_binary(const std::string &filename);
 
 bool read_object_and_link(

@@ -15,13 +15,13 @@ int main()
   // to a constant pointer to pointers to constant-chars
   const char * const *p2;
   p2=my_array;
-  
+
   const char *p3;
   char ch;
-  
+
   p3=*p2;
-  
+
   ch=*p3;
-  
+
   assert(ch=='x');
 }

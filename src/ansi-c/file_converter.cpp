@@ -8,7 +8,7 @@ int main()
   while(getline(std::cin, line))
   {
     std::cout << "\"";
-    
+
     for(std::size_t i=0; i<line.size(); i++)
     {
       const char ch=line[i];
@@ -21,14 +21,14 @@ int main()
       }
       else if((ch&0x80)!=0)
       {
-        std::cout << "\\x" 
+        std::cout << "\\x"
                   << std::hex << (unsigned(ch)&0xff)
                   << std::dec;
       }
       else
         std::cout << ch;
     }
-    
+
     std::cout << "\\n\"" << std::endl;
   }
 }

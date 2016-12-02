@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: A special command line object to mimick ARM's armcc
- 
+
 Author: Daniel Kroening
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #ifndef GOTO_CC_ARMCC_CMDLINE_H

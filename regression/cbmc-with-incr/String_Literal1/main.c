@@ -11,16 +11,16 @@ int main()
   assert("\""[0]=='"');
   assert("\%"[0]=='%');
   assert("\n"[0]==10);
-  
+
   // spliced to avoid hex ambiguity
   assert("\x5" "five"[0]==0x5);
 
   // spliced accoss multiple lines
   const char some_string[]=
-    "\x5" 
+    "\x5"
 #pragma whatnot
     "five";
-  
+
   assert(some_string[0]==0x5);
 
   // wide strings
@@ -40,16 +40,16 @@ int main()
   assert(euro_sign[3]==0);
   assert(sizeof(euro_sign)==4);
 
-  // the following is C++ and C99  
+  // the following is C++ and C99
   const wchar_t wide_amount[]=L"\u20AC123,00"; //€123,00
   assert(wide_amount[0]==0x20ac);
   assert(wide_amount[1]=='1');
-  
+
   // C11 unicode string literals
   assert(sizeof(u8""[0])==sizeof(char));
   assert(sizeof(u""[0])==2);
   assert(sizeof(U""[0])==4);
-  
+
   // generic wide string, OS-dependent
   assert(sizeof(L""[0])==sizeof(wchar_t));
 }

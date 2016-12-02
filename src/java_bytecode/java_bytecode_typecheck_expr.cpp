@@ -24,7 +24,7 @@ Function: java_bytecode_typecheckt::typecheck_expr
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
-{ 
+{
   if(expr.id()==ID_code)
     return typecheck_code(to_code(expr));
 
@@ -61,7 +61,7 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
-{ 
+{
   assert(expr.operands().empty());
   typet &type=expr.type();
   typecheck_type(type);
@@ -80,7 +80,7 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &expr)
-{ 
+{
   assert(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
   typecheck_type(type);
@@ -99,7 +99,7 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_string_literal
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
-{ 
+{
   const irep_idt value=expr.get(ID_value);
 
   // we create a symbol for these
@@ -110,7 +110,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     symbol_table.symbols.find(identifier);
 
   const symbol_typet string_type("java::java.lang.String");
-  
+
   if(s_it==symbol_table.symbols.end())
   {
     // no, create the symbol
@@ -122,14 +122,14 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
     new_symbol.is_lvalue=true;
-    
+
     if(symbol_table.add(new_symbol))
     {
       error() << "failed to add string literal symbol to symbol table" << eom;
       throw 0;
     }
   }
-  
+
   expr=address_of_exprt(
     symbol_exprt(identifier, string_type));
 }
@@ -147,17 +147,17 @@ Function: java_bytecode_typecheckt::typecheck_expr_symbol
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
-{ 
+{
   irep_idt identifier=expr.get_identifier();
 
   // does it exist already in the destination symbol table?
   symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find(identifier);
-  
+
   if(s_it==symbol_table.symbols.end())
   {
     assert(has_prefix(id2string(identifier), "java::"));
-  
+
     // no, create the symbol
     symbolt new_symbol;
     new_symbol.name=identifier;
@@ -166,7 +166,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
-    
+
     if(new_symbol.type.id()==ID_code)
     {
       new_symbol.is_lvalue=false;
@@ -175,7 +175,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     {
       new_symbol.is_lvalue=true;
     }
-    
+
     if(symbol_table.add(new_symbol))
     {
       error() << "failed to add expression symbol to symbol table" << eom;
@@ -210,12 +210,12 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
 {
   // The member might be in a parent class, which we resolve here.
   const irep_idt component_name=expr.get_component_name();
-  
+
   while(1)
   {
     if(ns.follow(expr.struct_op().type()).id()!=ID_struct)
       break; // give up
-  
+
     const struct_typet &struct_type=
       to_struct_type(ns.follow(expr.struct_op().type()));
 
@@ -225,15 +225,15 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     // look at parent
     const struct_typet::componentst &components=
       struct_type.components();
-    
+
     if(components.empty())
       break; // give up
 
     const struct_typet::componentt &c=components.front();
-    
+
     member_exprt m(expr.struct_op(), c.get_name(), c.type());
     m.add_source_location()=expr.source_location();
-    
+
     expr.struct_op()=m;
   }
 

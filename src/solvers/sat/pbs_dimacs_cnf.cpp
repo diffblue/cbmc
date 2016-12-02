@@ -92,7 +92,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   //std::cout << "PBS COMMAND IS: " << command << "\n";
   /*
-    if (!(getenv("PBS_PATH") == NULL)) 
+    if (!(getenv("PBS_PATH") == NULL))
     {
     command = getenv("PBS_PATH");
     }
@@ -123,7 +123,7 @@ bool pbs_dimacs_cnft::pbs_solve()
   #else
   command += " -z";
   #endif
-    
+
   command += " -a > temp.out";
 
   int res=system(command.c_str());
@@ -139,7 +139,7 @@ bool pbs_dimacs_cnft::pbs_solve()
     error() << "Unable to read SAT results!" << eom;
     return false;
   }
-   
+
   opt_sum = -1;
 
   while(file && !file.eof ())
@@ -190,7 +190,7 @@ bool pbs_dimacs_cnft::pbs_solve()
           sscanf(line.c_str(),"%*s %*s %*s %d", &opt_sum);
         }
     }
-  
+
   return satisfied;
 }
 
@@ -209,23 +209,23 @@ Function: pbs_dimacs_cnft::prop_solve
 propt::resultt pbs_dimacs_cnft::prop_solve()
 {
   std::ofstream file("temp.cnf");
-   
+
   write_dimacs_cnf(file);
-  
+
   std::ofstream pbfile("temp.cnf.pb");
-  
+
   write_dimacs_pb(pbfile);
 
   file.close();
   pbfile.close();
 
   // We start counting at 1, thus there is one variable fewer.
-  messaget::status() << 
+  messaget::status() <<
     (no_variables()-1) << " variables, " <<
     clauses.size() << " clauses" << eom;
 
   bool result=pbs_solve();
-  
+
   if(!result)
   {
     messaget::status() <<
@@ -234,12 +234,12 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   else
   {
     messaget::status() <<
-      "PBS checker: system is SATISFIABLE"; 
+      "PBS checker: system is SATISFIABLE";
     if(optimize)
       messaget::status() << " (distance " << opt_sum << ")";
     messaget::status() << eom;
   }
-  
+
   if(result)
     return P_SATISFIABLE;
   else
@@ -261,7 +261,7 @@ Function: pbs_dimacs_cnft::l_get
 tvt pbs_dimacs_cnft::l_get(literalt a) const
 {
   int dimacs_lit = a.dimacs();
-  
+
   //std::cout << a << " / " << dimacs_lit << " = ";
 
   bool neg = (dimacs_lit < 0);

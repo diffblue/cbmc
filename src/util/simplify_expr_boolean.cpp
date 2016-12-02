@@ -39,7 +39,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
        operands.front().type().id()!=ID_bool ||
        operands.back().type().id()!=ID_bool)
       return true;
-      
+
     // turn a => b into !a || b
 
     expr.id(ID_or);
@@ -78,7 +78,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       exprt tmp(operands.front());
       expr.swap(tmp);
       return false;
-    }    
+    }
   }
   else if(expr.id()==ID_or ||
           expr.id()==ID_and ||
@@ -140,7 +140,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         it++;
       }
     }
-    
+
     // search for a and !a
     if(expr.id()==ID_and || expr.id()==ID_or)
     {
@@ -212,7 +212,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
 
   if(expr.type().id()!=ID_bool ||
      op.type().id()!=ID_bool) return true;
-     
+
   if(op.id()==ID_not) // (not not a) == a
   {
     if(op.operands().size()==1)
@@ -245,7 +245,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
       it->make_not();
       simplify_node(*it);
     }
-    
+
     expr.id(expr.id()==ID_and?ID_or:ID_and);
 
     return false;
@@ -258,7 +258,17 @@ bool simplify_exprt::simplify_not(exprt &expr)
     expr.id(ID_equal);
     return false;
   }
-  
+  else if(op.id()==ID_exists) // !(exists: a) <-> forall: not a
+  {
+    assert(op.operands().size()==2);
+    exprt tmp;
+    tmp.swap(op);
+    expr.swap(tmp);
+    expr.id(ID_forall);
+    expr.op1().make_not();
+    simplify_node(expr.op1());
+    return false;
+  }
+
   return true;
 }
-

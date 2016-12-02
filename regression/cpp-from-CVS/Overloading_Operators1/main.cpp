@@ -18,10 +18,10 @@ int main()
   T x;
 
   int temp;
-  
+
   temp=x+2;
   assert(temp==2);
-  
+
   temp=x-3;
   assert(temp==-3);
 }

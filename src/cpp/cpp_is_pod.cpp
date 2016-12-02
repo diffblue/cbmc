@@ -52,7 +52,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
     // * private/protected, unless static
     // * overloading assignment operator
     // * Base classes
-    
+
     const struct_typet &struct_type=to_struct_type(type);
 
     if(!type.find(ID_bases).get_sub().empty())
@@ -74,7 +74,7 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
 
       if(it->get_bool(ID_is_virtual))
         return false;
-      
+
       const typet &sub_type=it->type();
 
       if(sub_type.id()==ID_code)

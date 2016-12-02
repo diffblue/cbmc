@@ -1,9 +1,9 @@
 // _Atomic is a C11 keyword. It can be used as a type qualifier
 // and as a type specifier, which introduces ambiguity into the grammar.
-               
+
 // 6.7.2.4 - 4: If the _Atomic keyword is immediately followed by a left
 // parenthesis, it is interpreted as a type specifier (with a type name),
-// not as a type qualifier. 
+// not as a type qualifier.
 
 // Visual Studio doesn't have it, will likely never have it.
 

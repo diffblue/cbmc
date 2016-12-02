@@ -5,14 +5,14 @@ int main()
   __CPROVER_assume(!__CPROVER_isnand(f2));
   __CPROVER_assume(!__CPROVER_isinfd(f2));
   f=f2;
-  
+
   // addition
   assert(100.0+10==110);
   assert(0+f==f);
   assert(f+0==f);
   assert(100+0.5==100.5);
   assert(0.0+0.0+f==f);
-  
+
   // subtraction
   assert(100.0-10==90);
   assert(0-f==-f);
@@ -41,7 +41,7 @@ int main()
   assert(100.0/0.5==200);
   assert(0/1.0==0);
   assert(f/1.0==f);
-  
+
   // conversion
   assert(((double)(float)100)==100.0);
   assert(((unsigned int)100.0)==100.0);
@@ -51,7 +51,7 @@ int main()
   assert((int)0.49==0);
   assert((int)-1.5==-1);
   assert((int)-10.49==-10);
-  
+
   // relations
   assert(1.0<2.5);
   assert(1.0<=2.5);

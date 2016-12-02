@@ -31,7 +31,7 @@ public:
   }
 
   const char *to_string() const;
-  
+
   inline tv_enumt get_value() const
   {
     return value;
@@ -40,7 +40,7 @@ public:
   inline tvt()
   {
   }
-  
+
   inline explicit tvt(bool b):value(b?tv_enumt::TV_TRUE:tv_enumt::TV_FALSE)
   {
   }

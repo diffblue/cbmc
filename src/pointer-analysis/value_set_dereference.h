@@ -28,7 +28,7 @@ class symbolt;
 class value_set_dereferencet
 {
 public:
-  /*! \brief Constructor 
+  /*! \brief Constructor
    * \param _ns Namespace
    * \param _new_symbol_table A symbol_table to store new symbols in
    * \param _options Options, in particular whether pointer checks are
@@ -47,10 +47,10 @@ public:
   { }
 
   virtual ~value_set_dereferencet() { }
-  
+
   typedef enum { READ, WRITE } modet;
-  
-  /*! 
+
+  /*!
    * The method 'dereference' dereferences the
    * given pointer-expression. Any errors are
    * reported to the callback method given in the
@@ -68,7 +68,7 @@ public:
     const exprt &pointer,
     const guardt &guard,
     const modet mode);
-    
+
   /*! \brief Returns 'true' iff the given expression contains unary '*'
   */
   static bool has_dereference(const exprt &expr);
@@ -89,20 +89,20 @@ private:
   void offset_sum(
     exprt &dest,
     const exprt &offset) const;
-    
+
   class valuet
   {
   public:
     exprt value;
     exprt pointer_guard;
-    
+
     valuet():value(nil_exprt()), pointer_guard(false_exprt())
     {
     }
   };
-  
+
   valuet build_reference_to(
-    const exprt &what, 
+    const exprt &what,
     const modet mode,
     const exprt &pointer,
     const guardt &guard);
@@ -111,12 +111,12 @@ private:
     const exprt &symbol,
     const exprt &premise,
     exprt &value);
-             
+
   static const exprt &get_symbol(const exprt &object);
-  
+
   void bounds_check(const index_exprt &expr, const guardt &guard);
   void valid_check(const exprt &expr, const guardt &guard, const modet mode);
-  
+
   void invalid_pointer(const exprt &expr, const guardt &guard);
 
   bool memory_model(
@@ -130,7 +130,7 @@ private:
     const typet &type,
     const guardt &guard,
     const exprt &offset);
-    
+
   bool memory_model_bytes(
     exprt &value,
     const typet &type,

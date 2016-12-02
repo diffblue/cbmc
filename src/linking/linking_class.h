@@ -28,11 +28,11 @@ public:
     ns(_main_symbol_table)
   {
   }
-   
+
   virtual void typecheck();
-  
+
   rename_symbolt rename_symbol;
- 
+
 protected:
 
   typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
@@ -40,7 +40,7 @@ protected:
   bool needs_renaming_type(
     const symbolt &old_symbol,
     const symbolt &new_symbol);
-    
+
   bool needs_renaming_non_type(
     const symbolt &old_symbol,
     const symbolt &new_symbol);
@@ -56,7 +56,7 @@ protected:
   }
 
   void do_type_dependencies(id_sett &);
-    
+
   void rename_symbols(const id_sett &needs_to_be_renamed);
   void copy_symbols();
 
@@ -99,11 +99,11 @@ protected:
     const typet &type1,
     const typet &type2,
     adjust_type_infot &info);
-  
+
   void duplicate_type_symbol(
     symbolt &old_symbol,
     symbolt &new_symbol);
-  
+
   std::string expr_to_string(
     const namespacet &ns,
     const irep_idt &identifier,
@@ -174,7 +174,7 @@ protected:
 
   irep_idt rename(irep_idt);
 
-  // the new IDs created by renaming  
+  // the new IDs created by renaming
   id_sett renamed_ids;
 };
 

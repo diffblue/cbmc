@@ -49,7 +49,7 @@ std::string narrow(const wchar_t *s)
     r+=char(*s);
     s++;
   }
-  
+
   return r;
   #endif
 }
@@ -85,7 +85,7 @@ std::wstring widen(const char *s)
     r+=wchar_t(*s);
     s++;
   }
-  
+
   return r;
   #endif
 }
@@ -111,7 +111,7 @@ std::string narrow(const std::wstring &s)
   std::string r(rlength, 0);
   WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)slength, &r[0], rlength, NULL, NULL);
   return r;
-  
+
   #else
   // dummy conversion
   return std::string(s.begin(), s.end());
@@ -160,7 +160,7 @@ Function: utf32_to_utf8
 
 void utf32_to_utf8(unsigned int c, std::string &result)
 {
-  if(c<=0x7f)           
+  if(c<=0x7f)
     result+=char(c);
   else if(c<=0x7ff)
   {
@@ -174,7 +174,7 @@ void utf32_to_utf8(unsigned int c, std::string &result)
     result+=char((c & 0x3f)        | 0x80);
   }
   else
-  {         
+  {
     result+=char((c >> 18)         | 0xf0);
     result+=char(((c >> 12) & 0x3f)| 0x80);
     result+=char(((c >> 6) & 0x3f) | 0x80);
@@ -197,7 +197,7 @@ Function: utf32_to_utf8
 std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
 {
   std::string result;
-  
+
   result.reserve(s.size()); // at least that long
 
   for(const auto it : s)
@@ -221,14 +221,14 @@ Function: utf16_to_utf8
 std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s)
 {
   std::string result;
-  
+
   result.reserve(s.size()); // at least that long
 
   for(const auto it : s)
     utf32_to_utf8(it, result);
 
   return result;
-}                                                                                                                                                                                                                                                                                        
+}
 
 /*******************************************************************\
 
@@ -249,10 +249,10 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
   // the following never gets deleted
   const char **argv_narrow=new const char *[argc+1];
   argv_narrow[argc]=0;
-    
+
   for(int i=0; i<argc; i++)
     argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
-  
+
   return argv_narrow;
 }
 

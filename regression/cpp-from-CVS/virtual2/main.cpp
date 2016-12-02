@@ -4,7 +4,7 @@ class X
 {
 public:
   virtual int f();
-  
+
   int m;
 };
 
@@ -21,8 +21,8 @@ class Y:public X
 int main()
 {
   Y y;
-  
+
   y.f();
-  
+
   assert(g==10);
 }

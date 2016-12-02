@@ -59,7 +59,7 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   while(i<s && ch!=(char)0);
   #endif
   return dst;
-}                        
+}
 
 /* FUNCTION: __builtin___strncat_chk */
 
@@ -73,10 +73,10 @@ __inline char *__builtin___strncat_chk(
   __CPROVER_assert(__CPROVER_is_zero_string(src) || __CPROVER_buffer_size(src)>=n, "strncat zero-termination of 2nd argument");
   __CPROVER_assert(__CPROVER_buffer_size(dst)==s, "builtin object size");
   additional=(n<__CPROVER_zero_string_length(src))?n:__CPROVER_zero_string_length(src);
-  new_size=__CPROVER_is_zero_string(dst)+additional; 
+  new_size=__CPROVER_is_zero_string(dst)+additional;
   __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
                    "strncat buffer overflow");
-  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst); 
+  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst);
   __CPROVER_size_t i;
   for (i = 0 ; i < n && i<__CPROVER_zero_string_length(src) ; i++)
     dst[dest_len + i] = src[i];
@@ -140,7 +140,7 @@ inline char *strncpy(char *dst, const char *src, size_t n)
   __CPROVER_assert(__CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
   __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "strncpy buffer overflow");
   __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);  
+  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
   __CPROVER_size_t i=0;
   char ch;
@@ -173,7 +173,7 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
   __CPROVER_assert(__CPROVER_buffer_size(dst)>=n, "strncpy buffer overflow");
   __CPROVER_assert(__CPROVER_buffer_size(dst)==object_size, "builtin object size");
   __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);  
+  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
   __CPROVER_size_t i=0;
   char ch;
@@ -252,10 +252,10 @@ inline char *strncat(char *dst, const char *src, size_t n)
   __CPROVER_assert(__CPROVER_is_zero_string(dst), "strncat zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(src) || __CPROVER_buffer_size(src)>=n, "strncat zero-termination of 2nd argument");
   additional=(n<__CPROVER_zero_string_length(src))?n:__CPROVER_zero_string_length(src);
-  new_size=__CPROVER_is_zero_string(dst)+additional; 
+  new_size=__CPROVER_is_zero_string(dst)+additional;
   __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
                    "strncat buffer overflow");
-  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst); 
+  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst);
   __CPROVER_size_t i;
   for (i = 0 ; i < n && i<__CPROVER_zero_string_length(src) ; i++)
     dst[dest_len + i] = src[i];
@@ -338,7 +338,7 @@ inline int strcasecmp(const char *s1, const char *s2)
   {
     ch1=s1[i];
     ch2=s2[i];
-    
+
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
 
@@ -421,7 +421,7 @@ inline int strncasecmp(const char *s1, const char *s2, size_t n)
   {
     ch1=s1[i];
     ch2=s2[i];
-    
+
     if(ch1>='A' && ch1<='Z') ch1+=('a'-'A');
     if(ch2>='A' && ch2<='Z') ch2+=('a'-'A');
 
@@ -639,7 +639,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
   {
     for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
   }
-  else 
+  else
   {
     for(__CPROVER_size_t i=n; i>0; i--) ((char *)dest)[i-1]=((const char *)src)[i-1];
   }

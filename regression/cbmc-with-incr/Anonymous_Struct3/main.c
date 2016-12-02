@@ -5,11 +5,11 @@ typedef union my_U {
     unsigned      : 1;
     unsigned f1   : 1;
   };
-  char raw;       
+  char raw;
 } fields_t;
 
 fields_t x;
- 
+
 int main()
 {
   x.f1 = 1;

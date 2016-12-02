@@ -5339,4 +5339,3 @@ signed long int wrap(signed long int kX, signed long int kLowerBound, signed lon
 
   return kLowerBound + (kX - kLowerBound) % (signed long int)range_size;
 }
-

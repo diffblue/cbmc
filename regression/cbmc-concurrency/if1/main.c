@@ -6,4 +6,3 @@ int main()
       __CPROVER_assert(0, "x");
   return a;
 }
-

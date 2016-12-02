@@ -130,21 +130,21 @@ public:
   bool simplify_rec(exprt &expr);
 
   virtual bool simplify(exprt &expr);
-  
+
   typedef std::set<mp_integer> value_listt;
   bool get_values(const exprt &expr, value_listt &value_list);
-  
+
   inline static bool is_bitvector_type(const typet &type)
   {
     return type.id()==ID_unsignedbv ||
            type.id()==ID_signedbv ||
            type.id()==ID_bv;
   }
-  
+
   // bit-level conversions
   exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
   std::string expr2bits(const exprt &expr, bool little_endian);
-  
+
 protected:
   const namespacet &ns;
 #ifdef DEBUG_ON_DEMAND

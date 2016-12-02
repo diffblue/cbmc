@@ -101,7 +101,7 @@ void trace_automatont::add_path(patht &path) {
 void trace_automatont::determinise() {
 #ifdef DEBUG
   std::cout << "Determinising automaton with " << nta.num_states <<
-    " states and " << nta.accept_states.size() << " accept states and " 
+    " states and " << nta.accept_states.size() << " accept states and "
     << nta.count_transitions() << " transitions" << endl;
 #endif
 

@@ -17,9 +17,9 @@ public:
   cpp_token_buffert():current_pos(0)
   {
   }
- 
+
   typedef unsigned int post;
- 
+
   int LookAhead(unsigned offset);
   int get_token(cpp_tokent &token);
   int get_token();
@@ -29,7 +29,7 @@ public:
   void Restore(post pos);
   void Replace(const cpp_tokent &token);
   void Insert(const cpp_tokent &token);
-  
+
   void clear()
   {
     tokens.clear();
@@ -43,15 +43,15 @@ public:
     assert(!tokens.empty());
     return tokens.back();
   }
-  
+
 protected:
   typedef std::list<cpp_tokent> tokenst;
   tokenst tokens;
-  
+
   std::vector<tokenst::iterator> token_vector;
-  
+
   post current_pos;
-  
+
   // get another token from lexer
   void read_token();
 };

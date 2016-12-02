@@ -7,4 +7,3 @@ int main(void)
   int bar0[restrict] = {0};
   return 0;
 }
-

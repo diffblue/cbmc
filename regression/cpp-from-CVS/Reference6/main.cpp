@@ -1,8 +1,8 @@
 class X
 {
-public:  
+public:
   int x;
-  
+
   X():x(0)
   {
   }
@@ -20,6 +20,6 @@ int main()
   y.x=10;
 
   r()=y;
-  
+
   assert(g.x==10);
 }

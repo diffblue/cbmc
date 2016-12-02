@@ -19,7 +19,7 @@ class namespacet;
 class instrumenter_pensievet:public instrumentert
 {
 public:
-  instrumenter_pensievet(symbol_tablet& _symbol_table, 
+  instrumenter_pensievet(symbol_tablet& _symbol_table,
     goto_functionst& _goto_f, messaget& message)
     : instrumentert(_symbol_table, _goto_f, message)
   {

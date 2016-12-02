@@ -1,5 +1,5 @@
 #define STATIC_ASSERT(condition) \
-  int some_array##__LINE__[(condition) ? 1 : -1];    
+  int some_array##__LINE__[(condition) ? 1 : -1];
 
 #ifdef __GNUC__
 

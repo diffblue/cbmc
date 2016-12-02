@@ -42,7 +42,6 @@ public:
     use_datatypes(false),
     use_array_of_bool(false),
     emit_set_logic(true),
-    strings_mode(STRINGS_OFF),
     out(_out),
     benchmark(_benchmark),
     notes(_notes),
@@ -60,16 +59,14 @@ public:
     {
     case GENERIC:
       break;
-    
+
     case BOOLECTOR:
       break;
-      
+
     case CVC3:
       break;
 
     case CVC4:
-      strings_mode = STRINGS_SMTLIB;
-      logic = "ALL_SUPPORTED";
       break;
 
     case MATHSAT:
@@ -77,29 +74,16 @@ public:
 
     case OPENSMT:
       break;
-      
+
     case YICES:
       break;
-    
+
     case Z3:
       use_array_of_bool=true;
       emit_set_logic=false;
       use_datatypes=true;
-      strings_mode = STRINGS_QARRAY;
       break;
     }
-
-    string_literal_func = "__CPROVER_uninterpreted_string_literal";
-    char_literal_func = "__CPROVER_uninterpreted_char_literal";
-    string_length_func = "__CPROVER_uninterpreted_strlen";
-    string_equal_func = "__CPROVER_uninterpreted_string_equal";
-    string_char_at_func = "__CPROVER_uninterpreted_char_at";
-    string_concat_func = "__CPROVER_uninterpreted_strcat";
-    string_substring_func = "__CPROVER_uninterpreted_substring";
-    string_is_prefix_func = "__CPROVER_uninterpreted_strprefixof";
-    string_is_suffix_func = "__CPROVER_uninterpreted_strsuffixof";
-    string_char_set_func = "__CPROVER_uninterpreted_char_set";
-    string_length_width = 32; // TODO! 
 
     write_header();
   }
@@ -111,8 +95,6 @@ public:
   bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
-  enum strings_modet { STRINGS_OFF, STRINGS_SMTLIB, STRINGS_QARRAY };
-  strings_modet strings_mode;
 
   // overloading interfaces
   virtual literalt convert(const exprt &expr);
@@ -133,18 +115,18 @@ protected:
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
-  
+
   bvt assumptions;
   boolbv_widtht boolbv_width;
-  
+
   void write_header();
   void write_footer(std::ostream &);
 
-  // tweaks for arrays  
+  // tweaks for arrays
   bool use_array_theory(const exprt &);
   void flatten_array(const exprt &);
   void unflatten_array(const exprt &);
-  
+
   // specific expressions go here
   void convert_byte_update(const byte_update_exprt &expr);
   void convert_byte_extract(const byte_extract_exprt &expr);
@@ -170,13 +152,12 @@ protected:
   void convert_overflow(const exprt &expr);
   void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
-  void convert_uninterpreted_function(const exprt &expr);
-  
+
   std::string convert_identifier(const irep_idt &identifier);
-  
+
   // introduces a let-expression for operands
   exprt convert_operands(const exprt &);
-  
+
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
@@ -194,7 +175,7 @@ protected:
 
   public:
     let_visitort(const seen_expressionst &map):let_map(map) { }
-    
+
     void operator()(exprt &expr)
     {
       seen_expressionst::const_iterator it = let_map.find(expr);
@@ -207,7 +188,7 @@ protected:
       }
     }
   };
-  
+
   exprt letify(exprt &expr);
   exprt letify_rec(
     exprt &expr,
@@ -224,26 +205,26 @@ protected:
     exprt &expr,
     const seen_expressionst &map);
 
-  // Parsing solver responses  
+  // Parsing solver responses
   constant_exprt parse_literal(const irept &, const typet &type);
   exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);
-  
+
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
-  
+
   class smt2_symbolt:public exprt
   {
   public:
     smt2_symbolt(const irep_idt &_identifier, const typet &_type):
       exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
-      
+
     inline const irep_idt &get_identifier() const
     {
       return get(ID_identifier);
@@ -255,7 +236,7 @@ protected:
     assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);
   }
-  
+
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays but also
   // floats when using the FPA theory.
@@ -263,7 +244,7 @@ protected:
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
   void unflatten(wheret, const typet &, unsigned nesting=0);
-  
+
   // pointers
   pointer_logict pointer_logic;
   void convert_address_of_rec(
@@ -276,14 +257,14 @@ protected:
   {
     typet type;
     exprt value;
-    
+
     identifiert()
     {
       type.make_nil();
       value.make_nil();
     }
   };
-  
+
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
@@ -293,7 +274,7 @@ protected:
   // use_datatype is set
   typedef std::map<typet, std::string> datatype_mapt;
   datatype_mapt datatype_map;
-  
+
   // for replacing various defined expressions:
   //
   // ID_array_of
@@ -311,40 +292,6 @@ protected:
   // Boolean part
   unsigned no_boolean_variables;
   std::vector<bool> boolean_assignment;
-
-  // string support
-  irep_idt string_literal_func;
-  irep_idt char_literal_func;
-  irep_idt string_length_func;
-  irep_idt string_equal_func;
-  irep_idt string_char_at_func;
-  irep_idt string_concat_func;
-  irep_idt string_substring_func;
-  irep_idt string_is_prefix_func;
-  irep_idt string_is_suffix_func;
-  irep_idt string_char_set_func;
-  size_t string_length_width;
-  
-  bool is_string_type(const typet &type);
-  bool is_char_type(const typet &type);
-  void convert_string_equal(const function_application_exprt &f);
-  void convert_string_length(const function_application_exprt &f);
-  void convert_string_concat(const function_application_exprt &f);
-  void convert_string_char_at(const function_application_exprt &f);
-  void convert_string_substring(const function_application_exprt &f);
-  void convert_string_is_prefix(const function_application_exprt &f);
-  void convert_string_is_suffix(const function_application_exprt &f);
-
-  void define_string_literal(const function_application_exprt &f);
-  void define_char_literal(const function_application_exprt &f);
-  void define_string_equal(const function_application_exprt &f);
-  void define_string_concat(const function_application_exprt &f);
-  void define_string_substring(const function_application_exprt &f);
-  void define_string_is_prefix(const function_application_exprt &f);
-  void define_string_is_suffix(const function_application_exprt &f);
-  void define_string_char_set(const function_application_exprt &f);
-
-  defined_expressionst string_lengths;
 };
 
 #endif

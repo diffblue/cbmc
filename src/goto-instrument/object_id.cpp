@@ -43,7 +43,7 @@ void get_objects_rec(
     if(mode==LHS_R)
       get_objects_rec(READ, index_expr.array(), dest, "[]"+suffix);
     else
-      get_objects_rec(mode, index_expr.array(), dest, "[]"+suffix);    
+      get_objects_rec(mode, index_expr.array(), dest, "[]"+suffix);
   }
   else if(expr.id()==ID_if)
   {
@@ -66,7 +66,7 @@ void get_objects_rec(
   {
     const dereference_exprt &dereference_expr=
       to_dereference_expr(expr);
-      
+
     if(mode==LHS_R || mode==READ)
       get_objects_rec(READ, dereference_expr.pointer(), dest, "");
   }
@@ -163,4 +163,3 @@ void get_objects_r_lhs(const exprt &lhs, object_id_sett &dest)
 {
   get_objects_rec(LHS_R, lhs, dest, "");
 }
-

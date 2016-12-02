@@ -53,4 +53,3 @@ goto-diff$(EXEEXT): $(OBJ)
 
 cbmc-mac-signed: goto-diff$(EXEEXT)
 	strip goto-diff$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) goto-diff$(EXEEXT)
-

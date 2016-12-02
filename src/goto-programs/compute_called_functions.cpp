@@ -28,7 +28,7 @@ void compute_address_taken_functions(
 {
   forall_operands(it, src)
     compute_address_taken_functions(*it, address_taken);
-    
+
   if(src.id()==ID_address_of &&
      src.type().id()==ID_pointer &&
      src.type().subtype().id()==ID_code)
@@ -58,7 +58,7 @@ void compute_functions(
 {
   forall_operands(it, src)
     compute_functions(*it, address_taken);
-    
+
   if(src.type().id()==ID_code &&
      src.id()==ID_symbol)
     address_taken.insert(to_symbol_expr(src).get_identifier());
@@ -125,30 +125,30 @@ void compute_called_functions(
 {
   std::set<irep_idt> working_queue;
   std::set<irep_idt> done;
-  
+
   // start from entry point
   working_queue.insert(goto_functions.entry_point());
-  
+
   while(!working_queue.empty())
   {
     irep_idt id=*working_queue.begin();
     working_queue.erase(working_queue.begin());
-    
+
     if(done.find(id)!=done.end())
       continue;
-      
+
     functions.insert(id);
     done.insert(id);
-    
+
     const goto_functionst::function_mapt::const_iterator f_it=
       goto_functions.function_map.find(id);
-      
+
     if(f_it==goto_functions.function_map.end())
       continue;
-    
+
     const goto_programt &program=
       f_it->second.body;
-      
+
     compute_address_taken_functions(program, working_queue);
 
     forall_goto_program_instructions(i_it, program)
@@ -161,7 +161,7 @@ void compute_called_functions(
       }
     }
   }
-  
+
 }
 
 /*******************************************************************\
@@ -182,4 +182,3 @@ void compute_called_functions(
 {
   compute_called_functions(goto_model.goto_functions, functions);
 }
-

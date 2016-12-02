@@ -145,4 +145,3 @@ void stack_depth(
   // update counters etc.
   goto_functions.update();
 }
-

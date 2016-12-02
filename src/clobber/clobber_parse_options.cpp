@@ -56,7 +56,7 @@ clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   language_uit("CLOBBER " CBMC_VERSION, cmdline)
 {
 }
-  
+
 /*******************************************************************\
 
 Function: clobber_parse_optionst::eval_verbosity
@@ -73,7 +73,7 @@ void clobber_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   int v=messaget::M_STATISTICS;
-  
+
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2int(cmdline.getval("verbosity"));
@@ -82,7 +82,7 @@ void clobber_parse_optionst::eval_verbosity()
     else if(v>10)
       v=10;
   }
-  
+
   ui_message_handler.set_verbosity(v);
 }
 
@@ -213,7 +213,7 @@ int clobber_parse_optionst::doit()
 
   if(get_goto_program(options, goto_functions))
     return 6;
-    
+
   label_properties(goto_functions);
 
   if(cmdline.isset("show-properties"))
@@ -225,25 +225,25 @@ int clobber_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7;
-    
+
   // do instrumentation
 
   try
   {
     const namespacet ns(symbol_table);
-    
+
     std::ofstream out("simulator.c");
-    
+
     if(!out)
       throw std::string("failed to create file simulator.c");
-    
+
     dump_c(goto_functions, true, ns, out);
-    
+
     status() << "instrumentation complete; compile and execute simulator.c" << eom;
-    
+
     return 0;
   }
-  
+
   catch(const std::string error_msg)
   {
     error() << error_msg << messaget::eom;
@@ -256,7 +256,7 @@ int clobber_parse_optionst::doit()
     return 8;
   }
 
-  #if 0                                         
+  #if 0
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
   memory_info(debug());
@@ -295,12 +295,12 @@ bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
     error(e);
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   return false;
 }
 
@@ -315,7 +315,7 @@ Function: clobber_parse_optionst::get_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 bool clobber_parse_optionst::get_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
@@ -336,7 +336,7 @@ bool clobber_parse_optionst::get_goto_program(
       if(read_goto_binary(cmdline.args[0],
            symbol_table, goto_functions, get_message_handler()))
         return true;
-        
+
       config.ansi_c.set_from_symbol_table(symbol_table);
 
       if(cmdline.isset("show-symbol-table"))
@@ -344,9 +344,9 @@ bool clobber_parse_optionst::get_goto_program(
         show_symbol_table();
         return true;
       }
-      
+
       irep_idt entry_point=goto_functions.entry_point();
-      
+
       if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
         error() << "The goto binary has no entry point; please complete linking" << eom;
@@ -360,45 +360,45 @@ bool clobber_parse_optionst::get_goto_program(
         error() << "Please give one source file only" << eom;
         return true;
       }
-      
+
       std::string filename=cmdline.args[0];
-      
+
       #ifdef _MSC_VER
-      std::ifstream infile(widen(filename).c_str());
+      std::ifstream infile(widen(filename));
       #else
-      std::ifstream infile(filename.c_str());
+      std::ifstream infile(filename);
       #endif
-                
+
       if(!infile)
       {
         error() << "failed to open input file `" << filename << "'" << eom;
         return true;
       }
-                              
+
       languaget *language=get_language_from_filename(filename);
-                                                
+
       if(language==NULL)
       {
         error() << "failed to figure out type of file `" <<  filename << "'" << eom;
         return true;
       }
-      
+
       language->set_message_handler(get_message_handler());
-                                                                
+
       status("Parsing", filename);
-  
+
       if(language->parse(infile, filename))
       {
         error() << "PARSING ERROR" << eom;
         return true;
       }
-      
+
       language->show_parse(std::cout);
       return true;
     }
     else
     {
-    
+
       if(parse()) return true;
       if(typecheck()) return true;
       if(final()) return true;
@@ -413,7 +413,7 @@ bool clobber_parse_optionst::get_goto_program(
       }
 
       irep_idt entry_point=goto_functions.entry_point();
-      
+
       if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
         error() << "No entry point; please provide a main function" << eom;
@@ -446,18 +446,18 @@ bool clobber_parse_optionst::get_goto_program(
     error(e);
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
     return true;
   }
-  
+
   return false;
 }
 
@@ -472,7 +472,7 @@ Function: clobber_parse_optionst::process_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 bool clobber_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
@@ -484,20 +484,20 @@ bool clobber_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
-    
+
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
-    
+
     // recalculate numbers, etc.
     goto_functions.update();
 
     // add loop ids
     goto_functions.compute_loop_numbers();
-    
+
     // if we aim to cover, replace
     // all assertions by false to prevent simplification
-    
+
     if(cmdline.isset("cover-assertions"))
       make_assertions_false(goto_functions);
 
@@ -527,18 +527,18 @@ bool clobber_parse_optionst::process_goto_program(
     error(e);
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
     return true;
   }
-  
+
   return false;
 }
 
@@ -611,10 +611,10 @@ void clobber_parse_optionst::report_properties(
         it++)
       if(it->second.status==path_searcht::FAIL)
         failed++;
-    
+
     status() << "** " << failed
              << " of " << property_map.size() << " failed"
-             << eom;  
+             << eom;
   }
 }
 #endif
@@ -639,7 +639,7 @@ void clobber_parse_optionst::report_success()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -648,7 +648,7 @@ void clobber_parse_optionst::report_success()
       std::cout << std::endl;
     }
     break;
-    
+
   default:
     assert(false);
   }
@@ -677,7 +677,7 @@ void clobber_parse_optionst::show_counterexample(
     std::cout << std::endl << "Counterexample:" << std::endl;
     show_goto_trace(std::cout, ns, error_trace);
     break;
-  
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
@@ -685,7 +685,7 @@ void clobber_parse_optionst::show_counterexample(
       std::cout << xml << std::endl;
     }
     break;
-  
+
   default:
     assert(false);
   }
@@ -711,7 +711,7 @@ void clobber_parse_optionst::report_failure()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -720,7 +720,7 @@ void clobber_parse_optionst::report_failure()
       std::cout << std::endl;
     }
     break;
-    
+
   default:
     assert(false);
   }
@@ -743,11 +743,11 @@ void clobber_parse_optionst::help()
   std::cout <<
     "\n"
     "* *     CLOBBER " CBMC_VERSION " - Copyright (C) 2014 ";
-    
+
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-    
+
   std::cout << "     * *\n";
-    
+
   std::cout <<
     "* *                    Daniel Kroening                      * *\n"
     "* *                 University of Oxford                    * *\n"

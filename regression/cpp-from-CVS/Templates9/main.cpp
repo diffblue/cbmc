@@ -33,7 +33,7 @@ int main()
 {
   A<bool> obj0; // general one
   assert(obj0.a == 0);
-  
+
   A<int> obj1; // specialized
   assert(obj1.a == 1);
 

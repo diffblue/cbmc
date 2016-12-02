@@ -113,12 +113,12 @@ const BDD &mgr::False() const
 {
   return false_bdd;
 }
-  
+
 void node::add_reference()
 {
   reference_counter++;
 }
-  
+
 mgr::reverse_keyt::reverse_keyt(
   unsigned _var, const BDD &_low, const BDD &_high):
   var(_var), low(_low.node->node_number), high(_high.node->node_number)

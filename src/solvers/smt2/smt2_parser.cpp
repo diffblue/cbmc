@@ -29,7 +29,7 @@ bool smt2_parsert::is_simple_symbol_character(char ch)
   // ~ ! @ $ % ^ & * _ - + = < > . ? /
   // that does not start with a digit and is not a reserved word.
 
-  return isalnum(ch) || 
+  return isalnum(ch) ||
      ch=='~' || ch=='!' || ch=='@' || ch=='$' || ch=='%' ||
      ch=='^' || ch=='&' || ch=='*' || ch=='_' || ch=='-' ||
      ch=='+' || ch=='=' || ch=='<' || ch=='>' || ch=='.' ||
@@ -69,7 +69,7 @@ void smt2_parsert::get_simple_symbol()
       return;
     }
   }
-  
+
   // eof -- this is ok here
 }
 
@@ -104,7 +104,7 @@ void smt2_parsert::get_decimal_numeral()
       return;
     }
   }
-  
+
   // eof -- this is ok here
 }
 
@@ -141,7 +141,7 @@ void smt2_parsert::get_bin_numeral()
       return;
     }
   }
-  
+
   // eof -- this is ok here
 }
 
@@ -178,7 +178,7 @@ void smt2_parsert::get_hex_numeral()
       return;
     }
   }
-  
+
   // eof -- this is ok here
 }
 
@@ -202,7 +202,7 @@ void smt2_parsert::get_quoted_symbol()
   // contain |
 
   buffer.clear();
-  
+
   char ch;
   while(in.get(ch))
   {
@@ -228,7 +228,7 @@ Function: smt2_parsert::get_string_literal
 void smt2_parsert::get_string_literal()
 {
   buffer.clear();
-  
+
   char ch;
   while(in.get(ch))
   {
@@ -243,7 +243,7 @@ void smt2_parsert::get_string_literal()
         else
         {
           in.unget();
-          return; // done 
+          return; // done
         }
       }
       else
@@ -284,19 +284,19 @@ void smt2_parsert::operator()()
     case (char)160: // non-breaking space
       // skip any whitespace
       break;
-    
+
     case ';': // comment
       // skip until newline
       while(in.get(ch) && ch!='\n')
         ; // ignore
       break;
-    
+
     case '(':
       // produce sub-expression
       open_parentheses++;
       open_expression();
       break;
-      
+
     case ')':
       // done with sub-expression
       if(open_parentheses==0) // unexpected ')'. This is an error.
@@ -304,34 +304,34 @@ void smt2_parsert::operator()()
         error("unexpected closing parenthesis");
         return;
       }
-      
+
       open_parentheses--;
 
       close_expression();
-      
+
       if(open_parentheses==0)
-        return; // done        
+        return; // done
 
       break;
-      
+
     case '|': // quoted symbol
       get_quoted_symbol();
       symbol();
       if(open_parentheses==0) return; // done
       break;
-      
+
     case '"': // string literal
       get_string_literal();
       string_literal();
       if(open_parentheses==0) return; // done
       break;
-      
+
     case ':': // keyword
       get_simple_symbol();
       keyword();
       if(open_parentheses==0) return; // done
       break;
-      
+
     case '#':
       if(in.get(ch))
       {
@@ -350,7 +350,7 @@ void smt2_parsert::operator()()
           error("unexpected numeral token");
           return;
         }
-         
+
         if(open_parentheses==0) return; // done
       }
       else
@@ -385,7 +385,7 @@ void smt2_parsert::operator()()
   }
 
   if(open_parentheses==0)
-  {  
+  {
     // Hmpf, eof before we got anything. Blank file!
   }
   else

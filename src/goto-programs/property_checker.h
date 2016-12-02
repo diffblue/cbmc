@@ -27,7 +27,7 @@ public:
     message_handlert &_message_handler);
 
   typedef enum { PASS, FAIL, ERROR, UNKNOWN } resultt;
-  
+
   static std::string as_string(resultt);
 
   // Check whether all properties in goto_functions hold.
@@ -35,12 +35,12 @@ public:
 
   struct property_statust
   {
-    // this is the counterexample  
+    // this is the counterexample
     goto_tracet error_trace;
     resultt result;
     goto_programt::const_targett location;
   };
-  
+
   // the irep_idt is the property id
   typedef std::map<irep_idt, property_statust> property_mapt;
   property_mapt property_map;

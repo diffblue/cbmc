@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: interpretert::read
+Function: interpretert::evaluate
 
   Inputs:
 
@@ -35,62 +35,14 @@ void interpretert::read(
   for(unsigned i=0; i<dest.size(); i++, ++address)
   {
     mp_integer value;
-    
-    if(address<memory.size()) {
-      const memory_cellt &cell=memory[integer2long(address)];
-      value=cell.value;
-      if (cell.initialised==0) cell.initialised=-1;
-    }
+
+    if(address<memory.size())
+      value=memory[integer2size_t(address)].value;
     else
       value=0;
-      
+
     dest[i]=value;
   }
-}
-
-/*******************************************************************\
-
-Function: interpretert::allocate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void interpretert::allocate(
-  mp_integer address,
-  unsigned size)
-{
-  // randomize memory region
-  for(unsigned i=0; i<size; i++, ++address)
-  {
-    if(address<memory.size()) {
-      memory_cellt &cell= memory[integer2long(address)];
-      cell.value=0;
-      cell.initialised=0;
-    }
-  }
-}
-
-/*******************************************************************\
-
-Function: interpretert::allocate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void interpretert::clear_input_flags()
-{
-  for(unsigned long i=0; i<memory.size(); i++)
-    memory[i].initialised=0;
 }
 
 /*******************************************************************\
@@ -154,7 +106,7 @@ void interpretert::evaluate(
 
       unsigned sub_size=get_size(it->type());
       if(sub_size==0) continue;
-      
+
       std::vector<mp_integer> tmp;
       evaluate(*it, tmp);
 
@@ -166,10 +118,10 @@ void interpretert::evaluate(
       else
         error=true;
     }
-    
+
     if(!error)
       return;
-      
+
     dest.clear();
   }
   else if(expr.id()==ID_equal ||
@@ -190,7 +142,7 @@ void interpretert::evaluate(
     {
       const mp_integer &op0=tmp0.front();
       const mp_integer &op1=tmp1.front();
-    
+
       if(expr.id()==ID_equal)
         dest.push_back(op0==op1);
       else if(expr.id()==ID_notequal)
@@ -211,7 +163,7 @@ void interpretert::evaluate(
   {
     if(expr.operands().size()<1)
       throw id2string(expr.id())+" expects at least one operand";
-      
+
     bool result=false;
 
     forall_operands(it, expr)
@@ -225,7 +177,7 @@ void interpretert::evaluate(
         break;
       }
     }
-    
+
     dest.push_back(result);
 
     return;
@@ -234,7 +186,7 @@ void interpretert::evaluate(
   {
     if(expr.operands().size()!=3)
       throw "if expects three operands";
-      
+
     std::vector<mp_integer> tmp0, tmp1, tmp2;
     evaluate(expr.op0(), tmp0);
     evaluate(expr.op1(), tmp1);
@@ -246,7 +198,7 @@ void interpretert::evaluate(
       const mp_integer &op1=tmp1.front();
       const mp_integer &op2=tmp2.front();
 
-      dest.push_back(op0!=0?op1:op2);    
+      dest.push_back(op0!=0?op1:op2);
     }
 
     return;
@@ -255,7 +207,7 @@ void interpretert::evaluate(
   {
     if(expr.operands().size()<1)
       throw id2string(expr.id())+" expects at least one operand";
-      
+
     bool result=true;
 
     forall_operands(it, expr)
@@ -269,7 +221,7 @@ void interpretert::evaluate(
         break;
       }
     }
-    
+
     dest.push_back(result);
 
     return;
@@ -278,7 +230,7 @@ void interpretert::evaluate(
   {
     if(expr.operands().size()!=1)
       throw id2string(expr.id())+" expects one operand";
-      
+
     std::vector<mp_integer> tmp;
     evaluate(expr.op0(), tmp);
 
@@ -298,7 +250,7 @@ void interpretert::evaluate(
       if(tmp.size()==1)
         result+=tmp.front();
     }
-    
+
     dest.push_back(result);
     return;
   }
@@ -306,7 +258,7 @@ void interpretert::evaluate(
   {
     // type-dependent!
     mp_integer result;
-    
+
     if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
@@ -354,7 +306,7 @@ void interpretert::evaluate(
           result*=tmp.front();
       }
     }
-    
+
     dest.push_back(result);
     return;
   }
@@ -418,7 +370,7 @@ void interpretert::evaluate(
   {
     if(expr.operands().size()!=1)
       throw "typecast expects one operand";
-      
+
     std::vector<mp_integer> tmp;
     evaluate(expr.op0(), tmp);
 
@@ -442,7 +394,7 @@ void interpretert::evaluate(
       {
         const std::string s=
           integer2binary(value, to_unsignedbv_type(expr.type()).get_width());
-        dest.push_back(binary2integer(s, false));        
+        dest.push_back(binary2integer(s, false));
         return;
       }
       else if(expr.type().id()==ID_bool)
@@ -466,13 +418,7 @@ void interpretert::evaluate(
 
     return;
   }
-  else if ((expr.id()==ID_array) || (expr.id()==ID_array_of))
-  {
-    forall_operands(it,expr) {
-      evaluate(*it,dest);
-    }
-    return;
-  }
+
   std::cout << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
             << std::endl;
@@ -495,10 +441,10 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
   if(expr.id()==ID_symbol)
   {
     const irep_idt &identifier=expr.get(ID_identifier);
-    
+
     interpretert::memory_mapt::const_iterator m_it1=
       memory_map.find(identifier);
-   
+
     if(m_it1!=memory_map.end())
       return m_it1->second;
 
@@ -506,7 +452,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
     {
       interpretert::memory_mapt::const_iterator m_it2=
         call_stack.top().local_map.find(identifier);
-   
+
       if(m_it2!=call_stack.top().local_map.end())
         return m_it2->second;
     }
@@ -558,11 +504,11 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
         break;
 
       offset+=get_size(it->type());
-    }    
+    }
 
     return evaluate_address(expr.op0())+offset;
   }
-  
+
   std::cout << "!! failed to evaluate address: "
             << from_expr(ns, function->first, expr)
             << std::endl;

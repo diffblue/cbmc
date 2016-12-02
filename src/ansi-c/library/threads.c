@@ -205,4 +205,3 @@ int cnd_timedwait(cnd_t* restrict cond, mtx_t* restrict mutex,
 void cnd_destroy(cnd_t* cond)
 {
 }
-

@@ -16,4 +16,3 @@ int main()
   assert (a.v == TWO);
   return 0;
 }
-

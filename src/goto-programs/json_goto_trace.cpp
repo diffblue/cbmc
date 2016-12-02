@@ -35,7 +35,7 @@ void convert(
   jsont &dest)
 {
   json_arrayt &dest_array=dest.make_array();
-  
+
   source_locationt previous_source_location;
 
   for(const auto & it : goto_trace.steps)
@@ -48,14 +48,14 @@ void convert(
       json_location=json(source_location);
     else
       json_location=json_nullt();
-    
+
     switch(it.type)
     {
     case goto_trace_stept::ASSERT:
       if(!it.cond_value)
       {
         irep_idt property_id;
-        
+
         if(it.pc->is_assert())
           property_id=source_location.get_property_id();
         else if(it.pc->is_goto()) // unwinding, we suspect
@@ -64,9 +64,9 @@ void convert(
             id2string(it.pc->source_location.get_function())+".unwind."+
             i2string(it.pc->loop_number);
         }
-      
+
         json_objectt &json_failure=dest_array.push_back().make_object();
-        
+
         json_failure["stepType"]=json_stringt("failure");
         json_failure["hidden"]=jsont::json_boolean(it.hidden);
         json_failure["thread"]=json_numbert(i2string(it.thread_nr));
@@ -77,13 +77,13 @@ void convert(
           json_failure["sourceLocation"]=json_location;
       }
       break;
-      
+
     case goto_trace_stept::ASSIGNMENT:
     case goto_trace_stept::DECL:
       {
         irep_idt identifier=it.lhs_object.get_identifier();
         json_objectt &json_assignment=dest_array.push_back().make_object();
-        
+
         json_assignment["stepType"]=json_stringt("assignment");
 
         if(!json_location.is_null())
@@ -126,11 +126,11 @@ void convert(
                        "actual-parameter":"variable");
       }
       break;
-      
+
     case goto_trace_stept::OUTPUT:
       {
         json_objectt &json_output=dest_array.push_back().make_object();
-        
+
         json_output["stepType"]=json_stringt("output");
         json_output["hidden"]=jsont::json_boolean(it.hidden);
         json_output["thread"]=json_numbert(i2string(it.thread_nr));
@@ -150,16 +150,16 @@ void convert(
           json_output["sourceLocation"]=json_location;
       }
       break;
-      
+
     case goto_trace_stept::INPUT:
       {
         json_objectt &json_input=dest_array.push_back().make_object();
-        
+
         json_input["stepType"]=json_stringt("input");
         json_input["hidden"]=jsont::json_boolean(it.hidden);
         json_input["thread"]=json_numbert(i2string(it.thread_nr));
         json_input["inputID"]=json_stringt(id2string(it.io_id));
-        
+
         json_arrayt &json_values=json_input["values"].make_array();
 
         for(const auto l_it : it.io_args)
@@ -174,7 +174,7 @@ void convert(
           json_input["sourceLocation"]=json_location;
       }
       break;
-      
+
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
       {
@@ -182,7 +182,7 @@ void convert(
           (it.type==goto_trace_stept::FUNCTION_CALL)?
             "function-call":"function-return";
         json_objectt &json_call_return=dest_array.push_back().make_object();
-        
+
         json_call_return["stepType"]=json_stringt(tag);
         json_call_return["hidden"]=jsont::json_boolean(it.hidden);
         json_call_return["thread"]=json_numbert(i2string(it.thread_nr));
@@ -198,7 +198,7 @@ void convert(
           json_call_return["sourceLocation"]=json_location;
       }
       break;
-      
+
     default:
       if(source_location!=previous_source_location)
       {

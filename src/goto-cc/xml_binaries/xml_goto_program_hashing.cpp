@@ -1,12 +1,12 @@
 /*******************************************************************\
- 
+
 Module: Convert goto programs to xml structures and back (with irep
         hashing)
- 
+
 Author: CM Wintersteiger
- 
+
 Date: July 2006
- 
+
 \*******************************************************************/
 
 #include <sstream>
@@ -16,16 +16,16 @@ Date: July 2006
 #include "xml_goto_program_hashing.h"
 
 /*******************************************************************\
- 
+
 Function: xml_goto_program_convertt::convert
- 
+
   Inputs: goto program and an xml structure to fill
- 
+
  Outputs: none
- 
+
  Purpose: constructs the xml structure according to the goto program
           and the namespace into the given xml object.
- 
+
 \*******************************************************************/
 
 void xml_goto_program_convertt::convert(const goto_programt &goto_program,
@@ -43,7 +43,7 @@ void xml_goto_program_convertt::convert(const goto_programt &goto_program,
     xmlt &ins = xml.new_element("instruction");
     if (!ins_it->location.is_nil())
     {
-      irepconverter.reference_convert(ins_it->location, ins.new_element("location"));      
+      irepconverter.reference_convert(ins_it->location, ins.new_element("location"));
     }
 
     if(!ins_it->labels.empty())
@@ -189,7 +189,7 @@ void xml_goto_program_convertt::convert(const goto_programt &goto_program,
       ins.name = "unknown";
       break;
     }
-    
+
     if(ins_it->function!="")
     {
       xmlt &fnc=ins.new_element("function");
@@ -199,23 +199,23 @@ void xml_goto_program_convertt::convert(const goto_programt &goto_program,
 }
 
 /*******************************************************************\
- 
+
 Function: xml_goto_program_convertt::convert
- 
+
   Inputs: an xml structure and a goto program to fill
- 
+
  Outputs: none
- 
+
  Purpose: constructs the goto program according to the xml structure
           and the namespace into the given goto program object.
- 
+
 \*******************************************************************/
 void xml_goto_program_convertt::convert( const xmlt& xml,
               goto_programt& goto_program)
 {
   goto_program.clear();
   goto_programt::instructionst &instructions = goto_program.instructions;
-  
+
   xmlt::elementst::const_iterator it = xml.elements.begin();
   for (; it != xml.elements.end(); it++)
   {
@@ -395,16 +395,16 @@ void xml_goto_program_convertt::convert( const xmlt& xml,
 }
 
 /*******************************************************************\
- 
+
 Function: xml_goto_program_convertt::find_instruction
- 
+
   Inputs: a target label string, the instructions list and an xml program
- 
+
  Outputs: iterator to the found instruction or .end()
- 
- Purpose: finds the index of the instruction labelled with the given 
+
+ Purpose: finds the index of the instruction labelled with the given
           target label in the given xml-program
- 
+
 \*******************************************************************/
 goto_programt::targett
 xml_goto_program_convertt::find_instruction( const xmlt &xml,
@@ -421,4 +421,3 @@ xml_goto_program_convertt::find_instruction( const xmlt &xml,
   }
   return instructions.end();
 }
-

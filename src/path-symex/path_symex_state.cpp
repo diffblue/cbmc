@@ -45,12 +45,12 @@ path_symex_statet initial_state(
   path_symex_historyt &path_symex_history)
 {
   path_symex_statet s(var_map, locs, path_symex_history);
-  
+
   // create one new thread
   path_symex_statet::threadt &thread=s.add_thread();
   thread.pc=locs.entry_loc; // set its PC
   s.set_current_thread(0);
-  
+
   return s;
 }
 
@@ -159,13 +159,13 @@ void path_symex_statet::record_step()
   if(!history.is_nil() &&
      history->thread_nr!=current_thread)
     no_thread_interleavings++;
-    
+
   // update our statistics
   depth++;
-  
+
   if(get_instruction()->is_goto())
     no_branches++;
-    
+
   // add the step
   history.generate_successor();
   stept &step=*history;
@@ -193,17 +193,17 @@ bool path_symex_statet::is_feasible(
 {
   // feed path constraint to decision procedure
   decision_procedure << history;
-  
+
   // check whether SAT
   switch(decision_procedure())
   {
   case decision_proceduret::D_SATISFIABLE: return true;
-  
+
   case decision_proceduret::D_UNSATISFIABLE: return false;
-  
+
   case decision_proceduret::D_ERROR: throw "error from decision procedure";
   }
-  
+
   return true; // not really reachable
 }
 
@@ -229,7 +229,7 @@ bool path_symex_statet::check_assertion(
 
   // the assertion in SSA
   exprt assertion=read(instruction.guard);
-  
+
   // trivial?
   if(assertion.is_true()) return true; // no error
 
@@ -239,19 +239,18 @@ bool path_symex_statet::check_assertion(
   // negate the assertion
   decision_procedure.set_to(assertion, false);
 
-  // check whether SAT  
+  // check whether SAT
   switch(decision_procedure.dec_solve())
   {
   case decision_proceduret::D_SATISFIABLE:
     return false; // error
-   
+
   case decision_proceduret::D_UNSATISFIABLE:
     return true; // no error
-  
+
   default:
     throw "error from decision procedure";
   }
 
   return true; // not really reachable
 }
-

@@ -2,7 +2,7 @@ int main() {
   struct a {
     int f;
   } x[1];
-  
+
   struct a y;
 
   x[0].f = 7;

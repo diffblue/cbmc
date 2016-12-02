@@ -30,7 +30,7 @@ public:
   {
     return convert(src);
   }
-  
+
   exprt convert(const exprt &);
 
   exprt negation(const exprt &, const ieee_float_spect &);
@@ -44,7 +44,7 @@ public:
 
   // add/sub
   exprt add_sub(bool subtract, const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
-  
+
   // mul/div
   exprt mul(const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
   exprt div(const exprt &, const exprt &, const exprt &rm, const ieee_float_spect &);
@@ -52,9 +52,9 @@ public:
   // conversion
   exprt from_unsigned_integer(const exprt &, const exprt &rm, const ieee_float_spect &);
   exprt from_signed_integer(const exprt &, const exprt &rm, const ieee_float_spect &);
-  exprt to_signed_integer(const exprt &src, unsigned dest_width, const exprt &rm, const ieee_float_spect &);
-  exprt to_unsigned_integer(const exprt &src, unsigned dest_width, const exprt &rm, const ieee_float_spect &);
-  exprt to_integer(const exprt &src, unsigned dest_width, bool is_signed, const exprt &rm, const ieee_float_spect &);
+  exprt to_signed_integer(const exprt &src, std::size_t dest_width, const exprt &rm, const ieee_float_spect &);
+  exprt to_unsigned_integer(const exprt &src, std::size_t dest_width, const exprt &rm, const ieee_float_spect &);
+  exprt to_integer(const exprt &src, std::size_t dest_width, bool is_signed, const exprt &rm, const ieee_float_spect &);
   exprt conversion(const exprt &src, const exprt &rm, const ieee_float_spect &src_spec, const ieee_float_spect &dest_spec);
 
   // relations
@@ -80,7 +80,7 @@ protected:
     exprt round_to_zero;
     exprt round_to_plus_inf;
     exprt round_to_minus_inf;
-    
+
     void get(const exprt &rm);
     explicit rounding_mode_bitst(const exprt &rm) { get(rm); }
   };
@@ -98,7 +98,7 @@ protected:
   {
     exprt sign, infinity, zero, NaN;
     exprt fraction, exponent;
-    
+
     unpacked_floatt():
       sign(false_exprt()),
       infinity(false_exprt()),
@@ -129,10 +129,10 @@ protected:
 
   void round_fraction(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
   void round_exponent(unbiased_floatt &result, const rounding_mode_bitst &, const ieee_float_spect &);
-  
+
   // rounding decision for fraction
   exprt fraction_rounding_decision(
-    const unsigned dest_bits,
+    const std::size_t dest_bits,
     const exprt sign,
     const exprt &fraction,
     const rounding_mode_bitst &);

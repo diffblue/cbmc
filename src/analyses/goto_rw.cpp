@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening
 
@@ -1015,7 +1015,7 @@ void goto_rw(goto_programt::const_targett target,
   case NO_INSTRUCTION_TYPE:
     assert(false);
     break;
-    
+
   case GOTO:
   case ASSUME:
   case ASSERT:
@@ -1024,7 +1024,7 @@ void goto_rw(goto_programt::const_targett target,
       rw_range_sett::READ,
       target->guard);
     break;
-    
+
   case RETURN:
     {
       const code_returnt &code_return=
@@ -1036,7 +1036,7 @@ void goto_rw(goto_programt::const_targett target,
           code_return.return_value());
     }
     break;
-    
+
   case OTHER:
     //if it's printf, mark the operands as read here
     if (target->code.get(ID_statement)==ID_printf)
@@ -1045,7 +1045,7 @@ void goto_rw(goto_programt::const_targett target,
         rw_set.get_objects_rec(target, rw_range_sett::READ, *it);
     }
     break;
-    
+
   case SKIP:
   case START_THREAD:
   case END_THREAD:
@@ -1056,12 +1056,12 @@ void goto_rw(goto_programt::const_targett target,
   case THROW:
   case CATCH:
     // these don't read or write anything
-    break;      
+    break;
 
   case ASSIGN:
     goto_rw(target, to_code_assign(target->code), rw_set);
     break;
-  
+
   case DEAD:
     rw_set.get_objects_rec(
       target,
@@ -1077,7 +1077,7 @@ void goto_rw(goto_programt::const_targett target,
       rw_range_sett::LHS_W,
       to_code_decl(target->code).symbol());
     break;
-  
+
   case FUNCTION_CALL:
     goto_rw(target, to_code_function_call(target->code), rw_set);
     break;
@@ -1128,4 +1128,3 @@ void goto_rw(const goto_functionst &goto_functions,
     goto_rw(body, rw_set);
   }
 }
-

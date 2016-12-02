@@ -25,7 +25,7 @@ Function: boolbvt::convert_mult
 bvt boolbvt::convert_mult(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
@@ -39,12 +39,12 @@ bvt boolbvt::convert_mult(const exprt &expr)
   const exprt &op0=expr.op0();
 
   bool no_overflow=expr.id()=="no-overflow-mult";
-  
+
   if(expr.type().id()==ID_fixedbv)
   {
     if(op0.type()!=expr.type())
       throw "multiplication with mixed types";
-    
+
     bv=convert_bv(op0);
 
     if(bv.size()!=width)
@@ -52,10 +52,10 @@ bvt boolbvt::convert_mult(const exprt &expr)
 
     std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
-             
+
     // do a sign extension by fraction_bits bits
     bv=bv_utils.sign_extension(bv, bv.size()+fraction_bits);
-      
+
     for(exprt::operandst::const_iterator it=operands.begin()+1;
         it!=operands.end(); it++)
     {
@@ -71,7 +71,7 @@ bvt boolbvt::convert_mult(const exprt &expr)
 
       bv=bv_utils.signed_multiplier(bv, op);
     }
-    
+
     // cut it down again
     bv.erase(bv.begin(), bv.begin()+fraction_bits);
 
@@ -82,16 +82,16 @@ bvt boolbvt::convert_mult(const exprt &expr)
   {
     if(op0.type()!=expr.type())
       throw "multiplication with mixed types";
-      
+
     bv_utilst::representationt rep=
       expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
                                     bv_utilst::UNSIGNED;
-    
+
     bv=convert_bv(op0);
 
     if(bv.size()!=width)
       throw "convert_mult: unexpected operand width";
-      
+
     for(exprt::operandst::const_iterator it=operands.begin()+1;
         it!=operands.end(); it++)
     {
@@ -107,10 +107,10 @@ bvt boolbvt::convert_mult(const exprt &expr)
         bv=bv_utils.multiplier_no_overflow(bv, op, rep);
       else
         bv=bv_utils.multiplier(bv, op, rep);
-    }    
+    }
 
     return bv;
   }
-  
+
   return conversion_failed(expr);
 }

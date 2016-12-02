@@ -28,9 +28,9 @@ public:
     goto_functions(_goto_functions)
   {
   }
-  
+
   void operator()();
-  
+
 protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
@@ -41,7 +41,7 @@ protected:
 
   void process_function(
     goto_functionst::goto_functiont &);
-    
+
   void gcc_asm_function_call(
     const irep_idt &function_base_name,
     const codet &code,
@@ -66,12 +66,12 @@ void remove_asmt::gcc_asm_function_call(
   goto_programt &dest)
 {
   irep_idt function_identifier=function_base_name;
-  
+
   code_function_callt function_call;
   function_call.lhs().make_nil();
 
   const pointer_typet void_pointer=pointer_typet(void_typet());
-  
+
   // outputs
   forall_operands(it, code.op1())
   {
@@ -95,7 +95,7 @@ void remove_asmt::gcc_asm_function_call(
   code_typet fkt_type;
   fkt_type.return_type()=void_typet();
   fkt_type.make_ellipsis();
-  
+
   symbol_exprt fkt(function_identifier, fkt_type);
 
   function_call.function()=fkt;
@@ -108,12 +108,12 @@ void remove_asmt::gcc_asm_function_call(
   if(!symbol_table.has_symbol(function_identifier))
   {
     symbolt symbol;
-    
+
     symbol.name=function_identifier;
     symbol.type=fkt_type;
     symbol.base_name=function_base_name;
     symbol.value=nil_exprt();
-    
+
     symbol_table.add(symbol);
   }
 }
@@ -135,21 +135,21 @@ void remove_asmt::process_instruction(
   goto_programt &dest)
 {
   const code_asmt &code=to_code_asm(instruction.code);
-  
+
   const irep_idt &flavor=code.get_flavor();
 
   if(flavor==ID_gcc)
   {
     const irep_idt &i_str=
       to_string_constant(code.op0()).get_value();
-      
+
     //std::cout << "DOING " << i_str << std::endl;
 
     std::istringstream str(id2string(i_str));
     assembler_parser.clear();
     assembler_parser.in=&str;
     assembler_parser.parse();
-    
+
     goto_programt tmp_dest;
     bool unknown=false;
     bool x86_32_locked_atomic=false;
@@ -161,7 +161,7 @@ void remove_asmt::process_instruction(
     {
       const assembler_parsert::instructiont &instruction=*it;
       if(instruction.empty()) continue;
-      
+
       #if 0
       std::cout << "A ********************\n";
       for(assembler_parsert::instructiont::const_iterator
@@ -171,25 +171,25 @@ void remove_asmt::process_instruction(
       {
         std::cout << "XX: " << t_it->pretty() << std::endl;
       }
-      
+
       std::cout << "B ********************\n";
       #endif
-      
+
       // deal with prefixes
       irep_idt command;
       unsigned pos=0;
-      
+
       if(instruction.front().id()==ID_symbol &&
          instruction.front().get(ID_identifier)=="lock")
       {
         x86_32_locked_atomic=true;
         pos++;
       }
-      
+
       // done?
       if(pos==instruction.size())
         continue;
-      
+
       if(instruction[pos].id()==ID_symbol)
       {
         command=instruction[pos].get(ID_identifier);
@@ -298,7 +298,7 @@ void remove_asmt::process_instruction(
         x86_32_locked_atomic=false;
       }
     }
-    
+
     if(unknown)
     {
       // we give up; we should perhaps print a warning
@@ -330,10 +330,10 @@ void remove_asmt::process_function(
       goto_programt tmp_dest;
       process_instruction(*it, tmp_dest);
       it->make_skip();
-      
+
       goto_programt::targett next=it;
       next++;
-      
+
       goto_function.body.destructive_insert(next, tmp_dest);
     }
   }
@@ -394,4 +394,3 @@ void remove_asm(goto_modelt &goto_model)
 {
   remove_asmt(goto_model.symbol_table, goto_model.goto_functions)();
 }
-

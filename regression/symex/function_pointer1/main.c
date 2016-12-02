@@ -21,7 +21,7 @@ int main()
   f_ptr=f1;
   f_ptr();
   assert(global==1);
-  
+
   f_ptr=f2;
   f_ptr();
   assert(global==2);

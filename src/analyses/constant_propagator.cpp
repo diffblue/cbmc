@@ -85,7 +85,7 @@ void constant_propagator_domaint::transform(
   std::cout << "before:\n";
   output(std::cout,ai,ns);
 #endif
-  
+
   if(from->is_decl())
   {
     const code_declt &code_decl=to_code_decl(from->code);
@@ -105,7 +105,7 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_goto())
   {
-    exprt g; 
+    exprt g;
     if(from->get_target()==to)
       g = simplify_expr(from->guard, ns);
     else
@@ -121,7 +121,7 @@ void constant_propagator_domaint::transform(
   else if(from->is_function_call())
   {
     const exprt &function=to_code_function_call(from->code).function();
-    
+
     if(function.id()==ID_symbol)
     {
       const irep_idt &identifier=to_symbol_expr(function).get_identifier();
@@ -168,14 +168,14 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   std::cout << "two_way_propagate_rec: " << from_expr(ns,"",expr) << '\n';
 #endif
   bool change = false;
-  
+
   if(expr.id()==ID_and)
   {
     // need a fixed point here to get the most out of it
     do
     {
       change = false;
-      
+
       forall_operands(it, expr)
         if(two_way_propagate_rec(*it, ns))
           change = true;
@@ -184,10 +184,10 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   }
   else if(expr.id()==ID_equal)
   {
-    const exprt &lhs = expr.op0(); 
+    const exprt &lhs = expr.op0();
     const exprt &rhs = expr.op1();
 
-    // two-way propagation 
+    // two-way propagation
     valuest copy_values = values;
     assign_rec(copy_values, lhs, rhs, ns);
     if(!values.is_constant(rhs) || values.is_constant(lhs))
@@ -238,12 +238,12 @@ Function: constant_propagator_domaint::valuest::is_constant
 
 bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
-  if(expr.id()==ID_side_effect && 
-     to_side_effect_expr(expr).get_statement()==ID_nondet) 
+  if(expr.id()==ID_side_effect &&
+     to_side_effect_expr(expr).get_statement()==ID_nondet)
     return false;
 
-  if(expr.id()==ID_side_effect && 
-     to_side_effect_expr(expr).get_statement()==ID_malloc) 
+  if(expr.id()==ID_side_effect &&
+     to_side_effect_expr(expr).get_statement()==ID_malloc)
     return false;
 
   if(expr.id()==ID_symbol)
@@ -278,16 +278,16 @@ bool constant_propagator_domaint::valuest::is_constant_address_of(const exprt &e
   if(expr.id()==ID_index)
     return is_constant_address_of(to_index_expr(expr).array()) &&
            is_constant(to_index_expr(expr).index());
-  
+
   if(expr.id()==ID_member)
     return is_constant_address_of(to_member_expr(expr).struct_op());
-  
+
   if(expr.id()==ID_dereference)
     return is_constant(to_dereference_expr(expr).pointer());
 
   if(expr.id()==ID_string_constant)
     return true;
-  
+
   return true;
 }
 
@@ -341,7 +341,7 @@ void constant_propagator_domaint::valuest::output(
   if(is_bottom)
     out << "  bottom\n";
 
-  for(replace_symbolt::expr_mapt::const_iterator 
+  for(replace_symbolt::expr_mapt::const_iterator
         it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       ++it)
@@ -383,7 +383,7 @@ Function: constant_propagator_domaint::valuest::merge
 
 bool constant_propagator_domaint::valuest::merge(const valuest &src)
 {
-  //nothing to do 
+  //nothing to do
   if(src.is_bottom)
     return false;
 
@@ -394,11 +394,11 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     is_bottom = src.is_bottom;
     return true;
   }
-  
+
   bool changed = false;
 
   //set everything to top that is not in src
-  for(replace_symbolt::expr_mapt::const_iterator 
+  for(replace_symbolt::expr_mapt::const_iterator
         it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
       )
@@ -413,12 +413,12 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     else ++it;
   }
 
-  for(replace_symbolt::expr_mapt::const_iterator 
+  for(replace_symbolt::expr_mapt::const_iterator
       it=src.replace_const.expr_map.begin();
       it!=src.replace_const.expr_map.end();
       ++it)
-  {      
-    replace_symbolt::expr_mapt::iterator 
+  {
+    replace_symbolt::expr_mapt::iterator
       c_it = replace_const.expr_map.find(it->first);
 
     if(c_it != replace_const.expr_map.end())
@@ -457,15 +457,15 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
 {
   if(src.is_bottom || is_bottom)
     return false;
-  
+
   bool changed = false;
 
-  for(replace_symbolt::expr_mapt::const_iterator 
+  for(replace_symbolt::expr_mapt::const_iterator
       it=src.replace_const.expr_map.begin();
       it!=src.replace_const.expr_map.end();
       ++it)
   {
-    replace_symbolt::expr_mapt::iterator 
+    replace_symbolt::expr_mapt::iterator
       c_it = replace_const.expr_map.find(it->first);
 
     if(c_it != replace_const.expr_map.end())
@@ -513,7 +513,7 @@ Function: constant_propagator_ait::replace
 
   Inputs:
 
- Outputs: 
+ Outputs:
 
  Purpose:
 
@@ -533,7 +533,7 @@ Function: constant_propagator_ait::replace
 
   Inputs:
 
- Outputs: 
+ Outputs:
 
  Purpose:
 
@@ -568,8 +568,8 @@ void constant_propagator_ait::replace(
     {
       s_it->second.values.replace_const(to_code_function_call(it->code).function());
       simplify_expr(to_code_function_call(it->code).function(), ns);
-    
-      exprt::operandst &args = 
+
+      exprt::operandst &args =
         to_code_function_call(it->code).arguments();
 
       for(exprt::operandst::iterator o_it = args.begin();
@@ -593,14 +593,14 @@ Function: constant_propagator_ait::replace_types_rec
 
   Inputs:
 
- Outputs: 
+ Outputs:
 
  Purpose:
 
 \*******************************************************************/
 
 void constant_propagator_ait::replace_types_rec(
-  const replace_symbolt &replace_const, 
+  const replace_symbolt &replace_const,
   exprt &expr)
 {
   replace_const(expr.type());
@@ -608,4 +608,3 @@ void constant_propagator_ait::replace_types_rec(
   Forall_operands(it, expr)
     replace_types_rec(replace_const, *it);
 }
-

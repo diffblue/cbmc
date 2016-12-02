@@ -32,7 +32,7 @@ public:
     const goto_functionst &goto_functions);
 
   bool show_vcc;
-  
+
   unsigned depth_limit;
   unsigned context_bound;
   unsigned unwind_limit;
@@ -56,7 +56,7 @@ public:
     irep_idt description;
     goto_tracet error_trace;
   };
-  
+
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;
 
@@ -75,18 +75,18 @@ protected:
   // State queue. Iterators are stable.
   typedef std::list<statet> queuet;
   queuet queue;
-  
+
   queuet::iterator pick_state();
-  
+
   bool execute(queuet::iterator state, const namespacet &);
-  
+
   void check_assertion(statet &state, const namespacet &);
   void do_show_vcc(statet &state, const namespacet &);
-  
+
   bool drop_state(const statet &state) const;
-  
+
   void report_statistics();
-  
+
   void initialize_property_map(
     const goto_functionst &goto_functions);
 };

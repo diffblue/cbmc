@@ -16,7 +16,7 @@ Author: Vincent Nimal
 #define ILP_H
 
 #ifdef HAVE_GLPK
-class ilpt 
+class ilpt
 {
 protected:
   template <class T>
@@ -60,7 +60,7 @@ public:
   }
 
   void solve() {
-    glp_load_matrix(lp, matrix_size, imat.to_array(), 
+    glp_load_matrix(lp, matrix_size, imat.to_array(),
       jmat.to_array(), vmat.to_array());
     glp_intopt(lp, &parm);
   }

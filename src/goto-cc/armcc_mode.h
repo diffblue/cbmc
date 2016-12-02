@@ -25,7 +25,7 @@ public:
     cmdline(_armcc_cmdline)
   {
   }
-  
+
 protected:
   armcc_cmdlinet &cmdline;
 };

@@ -1,6 +1,6 @@
 #include <assert.h>
 
-static int 
+static int
 (safe_mod_func_int32_t_s_s)(int si1, int si2 )
 {
  return
@@ -21,7 +21,7 @@ int main()
  a=1;
  b=-2;
 #endif
- int x=safe_mod_func_int32_t_s_s(a, b); 
+ int x=safe_mod_func_int32_t_s_s(a, b);
  assert(x==1);
  return 0;
 }

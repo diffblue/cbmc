@@ -81,28 +81,28 @@ public:
   {
   public:
     codeT code;
-    
+
     //! function this belongs to
     irep_idt function;
-    
+
     //! the location of the instruction in the source file
     source_locationt source_location;
-    
+
     //! what kind of instruction?
     goto_program_instruction_typet type;
 
     //! guard for gotos, assume, assert
     guardT guard;
-    
+
     // The below will eventually become a single target only.
     //! the target for gotos and for start_thread nodes
     typedef typename std::list<class instructiont>::iterator targett;
     typedef typename std::list<class instructiont>::const_iterator const_targett;
     typedef std::list<targett> targetst;
     typedef std::list<const_targett> const_targetst;
-    
+
     targetst targets;
-    
+
     // for the usual case of a single target
     inline targett get_target() const
     {
@@ -117,7 +117,7 @@ public:
       targets.push_back(t);
     }
 
-    //! goto target labels    
+    //! goto target labels
     typedef std::list<irep_idt> labelst;
     labelst labels;
 
@@ -128,7 +128,7 @@ public:
     inline bool is_target() const
     { return target_number!=unsigned(-1); }
 
-    //! clear the node    
+    //! clear the node
     inline void clear(goto_program_instruction_typet _type)
     {
       type=_type;
@@ -136,7 +136,7 @@ public:
       guard=true_exprt();
       code.make_nil();
     }
-     
+
     inline void make_goto() { clear(GOTO); }
     inline void make_return() { clear(RETURN); }
     inline void make_function_call(const codeT &_code) { clear(FUNCTION_CALL); code=_code; }
@@ -157,7 +157,7 @@ public:
       make_goto();
       targets.push_back(_target);
     }
-    
+
     inline void make_goto(targett _target, const guardT &g)
     {
       make_goto(_target);
@@ -201,7 +201,7 @@ public:
     {
     }
 
-    //! swap two instructions    
+    //! swap two instructions
     void swap(instructiont &instruction)
     {
       instruction.code.swap(code);
@@ -211,15 +211,15 @@ public:
       instruction.targets.swap(targets);
       instruction.function.swap(function);
     }
-    
+
     //! A globally unique number to identify a program location.
     //! It's guaranteed to be ordered in program order within
     //! one goto_program.
     unsigned location_number;
-    
+
     //! Number unique per function to identify loops
     unsigned loop_number;
-    
+
     //! A number to identify branch targets.
     //! This is -1 if it's not a target.
     unsigned target_number;
@@ -232,13 +232,13 @@ public:
       for(const auto & t : targets)
         if(t->location_number<=location_number)
           return true;
-          
+
       return false;
-    }    
+    }
   };
 
   typedef std::list<class instructiont> instructionst;
-  
+
   typedef typename instructionst::iterator targett;
   typedef typename instructionst::const_iterator const_targett;
   typedef typename std::list<targett> targetst;
@@ -246,7 +246,7 @@ public:
 
   //! The list of instructions in the goto program
   instructionst instructions;
-  
+
   void get_successors(
     targett target,
     targetst &successors);
@@ -265,7 +265,7 @@ public:
     next++;
     instructions.insert(next, instructiont())->swap(*target);
   }
-  
+
   //! Insertion that preserves jumps to "target".
   //! The instruction is destroyed.
   void insert_before_swap(targett target, instructiont &instruction)
@@ -273,7 +273,7 @@ public:
     insert_before_swap(target);
     target->swap(instruction);
   }
-  
+
   //! Insertion that preserves jumps to "target".
   //! The program p is destroyed.
   void insert_before_swap(targett target, goto_program_templatet<codeT, guardT> &p)
@@ -286,14 +286,14 @@ public:
     p.instructions.erase(p.instructions.begin());
     instructions.splice(next, p.instructions);
   }
-  
+
   //! Insertion before the given target
   //! \return newly inserted location
   inline targett insert_before(targett target)
   {
     return instructions.insert(target, instructiont());
   }
-  
+
   //! Insertion after the given target
   //! \return newly inserted location
   inline targett insert_after(targett target)
@@ -302,7 +302,7 @@ public:
     t++;
     return instructions.insert(t, instructiont());
   }
-  
+
   //! Appends the given program, which is destroyed
   inline void destructive_append(goto_program_templatet<codeT, guardT> &p)
   {
@@ -344,13 +344,13 @@ public:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  //! Output goto-program to given stream  
+  //! Output goto-program to given stream
   inline std::ostream &output(std::ostream &out) const
   {
     return output(namespacet(symbol_tablet()), "", out);
   }
 
-  //! Output a single instruction  
+  //! Output a single instruction
   virtual std::ostream &output_instruction(
     const namespacet &ns,
     const irep_idt &identifier,
@@ -366,18 +366,18 @@ public:
     for(auto & i : instructions)
       i.location_number=nr++;
   }
-  
+
   //! Compute location numbers
   inline void compute_location_numbers()
   {
     unsigned nr=0;
     compute_location_numbers(nr);
   }
-  
+
   //! Compute loop numbers
   void compute_loop_numbers();
 
-  //! Update all indices  
+  //! Update all indices
   void update();
 
   //! Human-readable loop name
@@ -386,7 +386,7 @@ public:
     return id2string(target->function)+"."+
            i2string(target->loop_number);
   }
-  
+
   //! Is the program empty?
   inline bool empty() const
   {
@@ -402,24 +402,24 @@ public:
   {
   }
 
-  //! Swap the goto program   
+  //! Swap the goto program
   inline void swap(goto_program_templatet<codeT, guardT> &program)
   {
     program.instructions.swap(instructions);
   }
 
-  //! Clear the goto program  
+  //! Clear the goto program
   inline void clear()
   {
     instructions.clear();
   }
 
-  //! Copy a full goto program, preserving targets  
+  //! Copy a full goto program, preserving targets
   void copy_from(const goto_program_templatet<codeT, guardT> &src);
 
-  //! Does the goto program have an assertion?  
+  //! Does the goto program have an assertion?
   bool has_assertion() const;
-}; 
+};
 
 template <class codeT, class guardT>
 void goto_program_templatet<codeT, guardT>::compute_loop_numbers()
@@ -440,7 +440,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
 
   targett next=target;
   next++;
-  
+
   const instructiont &i=*target;
 
   if(i.is_goto())
@@ -489,7 +489,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
 
   const_targett next=target;
   next++;
-  
+
   const instructiont &i=*target;
 
   if(i.is_goto())
@@ -549,17 +549,17 @@ std::ostream& goto_program_templatet<codeT, guardT>::output(
       it++)
     output_instruction(ns, identifier, out, it);
 
-  return out;  
+  return out;
 }
 
 template <class codeT, class guardT>
 void goto_program_templatet<codeT, guardT>::compute_target_numbers()
 {
   // reset marking
-  
+
   for(auto & i : instructions)
     i.target_number=-1;
-  
+
   // mark the goto targets
 
   for(const auto & i : instructions)
@@ -570,10 +570,10 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
         t->target_number=0;
     }
   }
-  
+
   // number the targets properly
   unsigned cnt=0;
-  
+
   for(auto & i : instructions)
   {
     if(i.is_target())
@@ -597,7 +597,7 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       }
     }
   }
-  
+
 }
 
 template <class codeT, class guardT>
@@ -623,7 +623,7 @@ void goto_program_templatet<codeT, guardT>::copy_from(
   }
 
   // Loop over program - 2nd time updates targets
-  
+
   for(auto & i : instructions)
   {
     for(auto & t : i.targets)
@@ -667,9 +667,9 @@ void goto_program_templatet<codeT, guardT>::compute_incoming_edges()
       it++)
   {
     targetst successors;
-  
+
     get_successors(it, successors);
-    
+
     for(const auto & s : successors)
     {
       if(s!=instructions.end())

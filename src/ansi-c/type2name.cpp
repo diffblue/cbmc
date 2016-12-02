@@ -110,7 +110,7 @@ static std::string type2name(
   symbol_numbert &symbol_number)
 {
   std::string result;
-  
+
   // qualifiers first
   if(type.get_bool(ID_C_constant))
     result+='c';
@@ -141,17 +141,17 @@ static std::string type2name(
   else if(type.id()==ID_unsignedbv)
     result+="U" + type.get_string(ID_width);
   else if(type.id()==ID_bool ||
-          type.id()==ID_c_bool) 
+          type.id()==ID_c_bool)
     result+='B';
-  else if(type.id()==ID_integer) 
+  else if(type.id()==ID_integer)
     result+='I';
-  else if(type.id()==ID_real) 
+  else if(type.id()==ID_real)
     result+='R';
-  else if(type.id()==ID_complex) 
+  else if(type.id()==ID_complex)
     result+='C';
-  else if(type.id()==ID_floatbv) 
+  else if(type.id()==ID_floatbv)
     result+="F" + type.get_string(ID_width);
-  else if(type.id()==ID_fixedbv) 
+  else if(type.id()==ID_fixedbv)
     result+="X" + type.get_string(ID_width);
   else if(type.id()==ID_natural)
     result+='N';
@@ -169,7 +169,7 @@ static std::string type2name(
         it=parameters.begin();
         it!=parameters.end();
         it++)
-    {      
+    {
       if(it!=parameters.begin()) result+='|';
       result+=type2name(it->type(), ns, symbol_number);
     }
@@ -202,7 +202,7 @@ static std::string type2name(
     parent_is_sym_check=true;
     result+=type2name_symbol(type, ns, symbol_number);
   }
-  else if(type.id()==ID_struct || 
+  else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
     assert(parent_is_sym_check);
@@ -216,7 +216,7 @@ static std::string type2name(
         it=components.begin();
         it!=components.end();
         it++)
-    {            
+    {
       if(it!=components.begin()) result+='|';
       result+=type2name(it->type(), ns, symbol_number);
       result+="'"+it->get_string(ID_name)+"'";
@@ -250,10 +250,10 @@ static std::string type2name(
   else if(type.id()==ID_vector)
     result+="VEC"+type.get_string(ID_size);
   else
-    throw (std::string("Unknown type '") + 
-           type.id_string() + 
-           "' encountered."); 
-    
+    throw (std::string("Unknown type '") +
+           type.id_string() +
+           "' encountered.");
+
   if(type.has_subtype())
   {
     result+='{';
@@ -265,13 +265,13 @@ static std::string type2name(
   {
     result+='$';
     forall_subtypes(it, type)
-    {      
+    {
       result+=type2name(*it, ns, symbol_number);
       result+='|';
     }
     result[result.size()-1]='$';
   }
-  
+
   return result;
 }
 
@@ -311,4 +311,3 @@ std::string type2name(const typet &type)
   symbol_tablet symbol_table;
   return type2name(type, namespacet(symbol_table));
 }
-

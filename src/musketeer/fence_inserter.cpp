@@ -45,7 +45,7 @@ unsigned fence_insertert::fence_cost(fence_typet f) const {
     case Branching:
       return 2;
     case Ctlfence:
-      return 1;     
+      return 1;
   }
   assert(false);
   return 0;
@@ -101,7 +101,7 @@ void fence_insertert::preprocess() {
     ++C_j)
   {
     /* filtering */
-    if(filter_cycles(C_j->id)) 
+    if(filter_cycles(C_j->id))
       continue;
 
     std::set<unsigned> new_wr_set;
@@ -224,7 +224,7 @@ void fence_insertert::preprocess() {
         std::set<unsigned> ct_set;
         assert( invisible_var.map_to_e.find(*e_c_it)
           != invisible_var.map_to_e.end());
-        const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second, 
+        const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
         std::set<unsigned> ct_not_powr_set;
@@ -247,8 +247,8 @@ Function: fence_insertert::mip_set_var
 
 \*******************************************************************/
 
-void inline fence_insertert::mip_set_var(ilpt& ilp, 
-  unsigned& i) 
+void inline fence_insertert::mip_set_var(ilpt& ilp,
+  unsigned& i)
 {
 #ifdef HAVE_GLPK
   glp_add_cols(ilp.lp, unique*fence_options);
@@ -513,7 +513,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
     }
   }
 
-  /* then, poww constraints: for all C_j */ 
+  /* then, poww constraints: for all C_j */
   for(std::list<std::set<unsigned> >::const_iterator
     e_i=poww_constraints.begin();
     e_i!=poww_constraints.end();
@@ -536,7 +536,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
         ilp.imat[i]=row;
         ilp.jmat[i]=col;
         if(model==Power) {
-          if(pt_set.find(col_to_var(col))!=pt_set.end() 
+          if(pt_set.find(col_to_var(col))!=pt_set.end()
               && (col_to_fence(col)==Lwfence || col_to_fence(col)==Fence))
             ilp.vmat[i]=1.0;
           else
@@ -580,7 +580,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
         if(model==Power) {
           if(col==var_fence_to_col(Dp, *e_nc_it)
               ||(pt_set.find(col_to_var(col))!=pt_set.end()
-              && (col_to_fence(col)==Lwfence 
+              && (col_to_fence(col)==Lwfence
                 || col_to_fence(col)==Fence
 #if 0
                 || col_to_fence(col)==Branching
@@ -594,7 +594,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
         else if (model==Unknown) {
           if(col==var_fence_to_col(Dp, *e_nc_it)
               ||(pt_set.find(col_to_var(col))!=pt_set.end()
-              && (col_to_fence(col)==Fence 
+              && (col_to_fence(col)==Fence
 #if 0
                 || col_to_fence(col)==Branching
 #endif
@@ -671,7 +671,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
 #if 0
               ||(it_set.find(col_to_var(col))!=it_set.end()
               && col_to_fence(col)==Ctlfence)
-#endif   
+#endif
             )
             ilp.vmat[i]=1.0;
           else
@@ -691,7 +691,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
     }
   }
 
-  if(model==Power || model==Unknown) 
+  if(model==Power || model==Unknown)
   {
     /* finally, Power/ARM constraints for Rfes: for all C_j */
     for(std::list<std::set<unsigned> >::const_iterator
@@ -710,16 +710,16 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
         std::set<unsigned> ct_set;
         assert( invisible_var.map_to_e.find(*e_c_it)
           != invisible_var.map_to_e.end());
-        const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second, 
+        const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
         std::set<unsigned> ct_not_powr_set;
         const_graph_visitor.CT_not_powr(invisible_var.map_to_e.find(
           *e_c_it)->second, ct_not_powr_set);
 
-        instrumenter.message.statistics() << "size of CT for " 
+        instrumenter.message.statistics() << "size of CT for "
           << invisible_var.map_to_e.find(*e_c_it)->second.first << ","
-          << invisible_var.map_to_e.find(*e_c_it)->second.second << ": " 
+          << invisible_var.map_to_e.find(*e_c_it)->second.second << ": "
           << ct_set.size() << messaget::eom;
 
         /* sum_e' f_e' + sum_e'' lwf_e'' */
@@ -746,7 +746,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
       }
     }
   }
-  instrumenter.message.debug() << "3: " << i << " row: " << row 
+  instrumenter.message.debug() << "3: " << i << " row: " << row
     << messaget::eom;
 #else
   throw "Sorry, musketeer requires glpk; please recompile\
@@ -771,7 +771,7 @@ void fence_insertert::solve() {
   ilpt ilp;
 
   instrumenter.message.statistics() << "po^+ edges considered:"
-    << unique << " cycles:" << instrumenter.set_of_cycles.size() 
+    << unique << " cycles:" << instrumenter.set_of_cycles.size()
     << messaget::eom;
 
   /* sets the variables and coefficients */
@@ -787,13 +787,13 @@ void fence_insertert::solve() {
 
   const unsigned const_constraints_number=constraints_number;
   const unsigned const_unique=unique;
- 
+
   const unsigned mat_size=const_unique*fence_options*const_constraints_number;
   instrumenter.message.statistics() << "size of the system: " << mat_size
     << messaget::eom;
-  instrumenter.message.statistics() << "# of constraints: " 
+  instrumenter.message.statistics() << "# of constraints: "
     << const_constraints_number << messaget::eom;
-  instrumenter.message.statistics() << "# of variables: " 
+  instrumenter.message.statistics() << "# of variables: "
     << const_unique*fence_options << messaget::eom;
 
   ilp.set_size(mat_size);
@@ -806,13 +806,13 @@ void fence_insertert::solve() {
   /* tables read from 1 in glpk -- first row/column ignored */
   mip_fill_matrix(ilp, i, const_constraints_number, const_unique);
 
-  instrumenter.message.statistics() << "i: " << i << " mat_size: " << mat_size 
+  instrumenter.message.statistics() << "i: " << i << " mat_size: " << mat_size
     << messaget::eom;
   //assert(i-1==mat_size);
 
 #ifdef DEBUG
   for(i=1; i<=mat_size; ++i)
-    instrumenter.message.debug() << i << "[" << ilp.imat[i] << "," 
+    instrumenter.message.debug() << i << "[" << ilp.imat[i] << ","
       << ilp.jmat[i] << "]=" << ilp.vmat[i] << messaget::eom;
 #endif
 
@@ -826,7 +826,7 @@ void fence_insertert::solve() {
   /* checks optimality */
   switch(glp_mip_status(ilp.lp)) {
     case GLP_OPT:
-      instrumenter.message.result() << "Optimal solution found" 
+      instrumenter.message.result() << "Optimal solution found"
         << messaget::eom;
       break;
     case GLP_UNDEF:
@@ -837,7 +837,7 @@ void fence_insertert::solve() {
         optimal, due to early termination" << messaget::eom;
       break;
     case GLP_NOFEAS:
-      instrumenter.message.result() 
+      instrumenter.message.result()
         << "No feasible solution, the system is UNSAT" << messaget::eom;
       assert(0);
   }
@@ -845,7 +845,7 @@ void fence_insertert::solve() {
   event_grapht& egraph=instrumenter.egraph;
 
   /* loads results (x_i) */
-  instrumenter.message.statistics() << "minimal cost: " 
+  instrumenter.message.statistics() << "minimal cost: "
     << glp_mip_obj_val(ilp.lp) << messaget::eom;
   for(unsigned j=1; j<=const_unique*fence_options; ++j)
   {
@@ -854,10 +854,10 @@ void fence_insertert::solve() {
       /* insert that fence */
       assert(map_to_e.find(col_to_var(j))!=map_to_e.end());
       const edget& delay = map_to_e.find(col_to_var(j))->second;
-      instrumenter.message.statistics() << delay.first << " -> " 
-        << delay.second << " : " << to_string(col_to_fence(j)) 
+      instrumenter.message.statistics() << delay.first << " -> "
+        << delay.second << " : " << to_string(col_to_fence(j))
         << messaget::eom;
-      instrumenter.message.statistics() << "(between " 
+      instrumenter.message.statistics() << "(between "
         << egraph[delay.first].source_location << " and "
         << egraph[delay.second].source_location << messaget::eom;
       fenced_edges.insert(std::pair<edget,fence_typet>(delay, col_to_fence(j)));
@@ -908,8 +908,8 @@ void fence_insertert::print_to_file()
     std::ostringstream s;
     const abstract_eventt& first=instrumenter.egraph[it->first.first];
 
-    s << to_string(it->second) << "|" << first.source_location.get_file() 
-      << "|" << first.source_location.get_line() << "|" 
+    s << to_string(it->second) << "|" << first.source_location.get_file()
+      << "|" << first.source_location.get_line() << "|"
       << first.source_location.get_column() << std::endl;
     non_redundant_display.insert(s.str());
   }
@@ -936,7 +936,7 @@ Function: fence_insertert::print_to_file_2
 \*******************************************************************/
 
   /* prints final results */
-  void fence_insertert::print_to_file_2() 
+  void fence_insertert::print_to_file_2()
   {
     /* removes redundant (due to several call to the same fenced function) */
     std::set<std::string> non_redundant_display;
@@ -948,13 +948,13 @@ Function: fence_insertert::print_to_file_2
       const abstract_eventt& first=instrumenter.egraph[it->first.first];
       const abstract_eventt& second=instrumenter.egraph[it->first.second];
 
-      s << to_string(it->second) << "|" << first.source_location.get_file() 
-      << "|" << first.source_location.get_line() << "|" 
+      s << to_string(it->second) << "|" << first.source_location.get_file()
+      << "|" << first.source_location.get_line() << "|"
       << second.source_location.get_file()
       << "|" << second.source_location.get_line() << std::endl;
       non_redundant_display.insert(s.str());
     }
-    
+
     std::ofstream results;
     results.open("results.txt");
     for(std::set<std::string>::const_iterator it=non_redundant_display.begin();
@@ -990,17 +990,17 @@ Function: fence_insertert::print_to_file_3
       const abstract_eventt& second=instrumenter.egraph[it->first.second];
 
       try {
-      s << to_string(it->second) << "|" << first.source_location.get_file() 
-        << "|" << first.source_location.get_function() << "|" 
+      s << to_string(it->second) << "|" << first.source_location.get_file()
+        << "|" << first.source_location.get_function() << "|"
         << first.source_location.get_line() << "|" << first.variable << "|"
         << second.source_location.get_file() << "|"
-        << second.source_location.get_function() << "|" 
+        << second.source_location.get_function() << "|"
         << second.source_location.get_line()
         << "|" << second.variable << std::endl;
       non_redundant_display.insert(s.str());
       }
       catch (std::string s) {
-        instrumenter.message.warning() 
+        instrumenter.message.warning()
           << "Couldn't retrieve symbols of variables " << first.variable
           << " and " << second.variable << " due to " << s << messaget::eom;
       }
@@ -1041,20 +1041,20 @@ Function: fence_insertert::print_to_file_4
       const abstract_eventt& second=instrumenter.egraph[it->first.second];
 
       try {
-      s << to_string(it->second) << "|" << first.source_location.get_file() 
-        << "|" << first.source_location.get_function() << "|" 
-        << first.source_location.get_line() 
-        << "|" << first.variable << "|" 
+      s << to_string(it->second) << "|" << first.source_location.get_file()
+        << "|" << first.source_location.get_function() << "|"
+        << first.source_location.get_line()
+        << "|" << first.variable << "|"
         << get_type(first.variable).get("#c_type") << "|"
-        << second.source_location.get_file() << "|" 
-        << second.source_location.get_function() << "|" 
-        << second.source_location.get_line() 
+        << second.source_location.get_file() << "|"
+        << second.source_location.get_function() << "|"
+        << second.source_location.get_line()
         << "|" << second.variable << "|"
         << get_type(second.variable).get("#c_type") << std::endl;
       non_redundant_display.insert(s.str());
       }
       catch (std::string s) {
-        instrumenter.message.warning() 
+        instrumenter.message.warning()
           << "Couldn't retrieve types of variables " << first.variable
           << " and " << second.variable << " due to " << s << messaget::eom;
       }
@@ -1121,7 +1121,7 @@ Function: fence_insertert::col_to_fence
 
 \*******************************************************************/
 
-inline fence_insertert::fence_typet fence_insertert::col_to_fence(unsigned u) 
+inline fence_insertert::fence_typet fence_insertert::col_to_fence(unsigned u)
   const
 {
   switch(u%fence_options) {
@@ -1301,4 +1301,3 @@ typet fence_insertert::type_component(std::list<std::string>::const_iterator it,
 
   assert(0);
 }
-

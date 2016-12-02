@@ -20,13 +20,13 @@ class concurrency_instrumentationt
 {
 public:
   concurrency_instrumentationt(
-    value_setst &_value_sets, 
+    value_setst &_value_sets,
     symbol_tablet &_symbol_table):
     value_sets(_value_sets),
     symbol_table(_symbol_table)
   {
   }
-  
+
   void operator()(goto_functionst &goto_functions)
   {
     instrument(goto_functions);
@@ -91,8 +91,8 @@ void concurrency_instrumentationt::instrument(exprt &expr)
 
   find_symbols(expr, symbols);
 
-  replace_symbolt replace_symbol;  
-  
+  replace_symbolt replace_symbol;
+
   for(std::set<exprt>::const_iterator
       s_it=symbols.begin();
       s_it!=symbols.end();
@@ -105,13 +105,13 @@ void concurrency_instrumentationt::instrument(exprt &expr)
 
       shared_varst::const_iterator
         v_it=shared_vars.find(identifier);
-        
+
       if(v_it!=shared_vars.end())
       {
         index_exprt new_expr;
         //new_expr.array()=symbol_expr();
         //new_expr.index()=symbol_expr();
-    
+
         replace_symbol.insert(identifier, new_expr);
       }
     }
@@ -188,10 +188,10 @@ void concurrency_instrumentationt::collect(const exprt &expr)
 
       namespacet ns(symbol_table);
       const symbolt &symbol=ns.lookup(identifier);
-      
+
       if(!symbol.is_state_var)
         continue;
-      
+
       if(symbol.is_thread_local)
       {
         if(thread_local_vars.find(identifier)!=thread_local_vars.end())
@@ -277,11 +277,11 @@ void concurrency_instrumentationt::instrument(
 {
   namespacet ns(symbol_table);
   is_threadedt is_threaded(goto_functions);
-  
+
   // this first collects all shared and thread-local variables
   forall_goto_functions(f_it, goto_functions)
     collect(f_it->second.body, is_threaded);
-    
+
   // add array symbols
   add_array_symbols();
 

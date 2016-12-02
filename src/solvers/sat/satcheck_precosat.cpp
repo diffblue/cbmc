@@ -86,7 +86,7 @@ Function: satcheck_precosatt::lcnf
 void satcheck_precosatt::lcnf(const bvt &bv)
 {
   bvt new_bv;
-  
+
   if(process_clause(bv, new_bv))
     return;
 
@@ -121,7 +121,7 @@ propt::resultt satcheck_precosatt::prop_solve()
       i2string(solver->getAddedOrigClauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
-  
+
   std::string msg;
 
   const int res=solver->solve();
@@ -216,4 +216,3 @@ void satcheck_precosatt::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 */
-

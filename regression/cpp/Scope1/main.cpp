@@ -7,7 +7,7 @@ public:
   public:
     typedef int tt;
   };
-  
+
   class C
   {
   public:

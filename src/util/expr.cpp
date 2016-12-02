@@ -363,7 +363,7 @@ void exprt::negate()
     if(is_constant())
     {
       const irep_idt &value=get(ID_value);
-      
+
       if(type_id==ID_integer)
       {
         set(ID_value, integer2string(-string2integer(id2string(value))));
@@ -752,7 +752,7 @@ Function: exprt::visit
 void exprt::visit(expr_visitort &visitor)
 {
   std::stack<exprt *> stack;
-  
+
   stack.push(this);
 
   while(!stack.empty())
@@ -782,7 +782,7 @@ Function: exprt::visit
 void exprt::visit(const_expr_visitort &visitor) const
 {
   std::stack<const exprt *> stack;
-  
+
   stack.push(this);
 
   while(!stack.empty())

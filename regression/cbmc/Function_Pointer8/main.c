@@ -26,7 +26,7 @@ void func1(int a)
 
 void run_irq_handler()
 {
-  (* ihandler.handler)(10);  
+  (* ihandler.handler)(10);
 }
 
 void run_timer()
@@ -37,7 +37,7 @@ void run_timer()
 int main()
 {
   ihandler.handler = func1;
-  
+
   run_irq_handler();
   run_timer();
 }

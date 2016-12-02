@@ -32,13 +32,13 @@ Function: >>
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)
 {
   mp_integer power=::power(2, b);
-  
+
   if(a>=0)
     return a/power;
   else
   {
     // arithmetic shift right isn't division for negative numbers!
-    // http://en.wikipedia.org/wiki/Arithmetic_shift 
+    // http://en.wikipedia.org/wiki/Arithmetic_shift
 
     if((a%power)==0)
       return a/power;

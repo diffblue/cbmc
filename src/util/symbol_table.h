@@ -56,15 +56,15 @@ public:
   symbolst symbols;
   symbol_base_mapt symbol_base_map;
   symbol_module_mapt symbol_module_map;
-  
+
   bool add(const symbolt &symbol);
-  
+
   bool move(symbolt &symbol, symbolt *&new_symbol);
 
   // this will go away, use add instead
   bool move(symbolt &symbol)
   { symbolt *new_symbol; return move(symbol, new_symbol); }
-   
+
   void clear()
   {
     symbols.clear();
@@ -73,16 +73,16 @@ public:
   }
 
   bool remove(const irep_idt &name);
-   
+
   void show(std::ostream &out) const;
-  
+
   inline void swap(symbol_tablet &other)
   {
     symbols.swap(other.symbols);
     symbol_base_map.swap(other.symbol_base_map);
     symbol_module_map.swap(other.symbol_module_map);
   }
-  
+
   inline bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name)!=symbols.end();

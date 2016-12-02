@@ -152,7 +152,7 @@ std::string i2string(signed long long i)
   std::string str;
   strstream2string(strInt, str);
 
-  return str; 
+  return str;
   #endif
 }
 
@@ -181,6 +181,6 @@ std::string i2string(unsigned long long i)
   std::string str;
   strstream2string(strInt, str);
 
-  return str; 
+  return str;
   #endif
 }

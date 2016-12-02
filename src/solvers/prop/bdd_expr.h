@@ -36,7 +36,7 @@ public:
 
 protected:
   const namespacet &ns;
-  miniBDD::mgr bdd_mgr;  
+  miniBDD::mgr bdd_mgr;
   BDDt root;
 
   typedef hash_map_cont<exprt, BDDt, irep_hash> expr_mapt;

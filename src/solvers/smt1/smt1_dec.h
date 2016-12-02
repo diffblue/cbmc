@@ -21,7 +21,7 @@ public:
   smt1_temp_filet();
   ~smt1_temp_filet();
 
-protected:  
+protected:
   std::ofstream temp_out;
   std::string temp_out_filename, temp_result_filename;
 };
@@ -44,10 +44,10 @@ public:
     dec_solve_was_called(false)
   {
   }
-  
+
   virtual resultt dec_solve();
   virtual std::string decision_procedure_text() const;
-  
+
 protected:
   std::string logic;
   bool dec_solve_was_called;
@@ -58,10 +58,10 @@ protected:
   resultt read_result_mathsat(std::istream &in);
   resultt read_result_yices(std::istream &in);
   resultt read_result_z3(std::istream &in);
-  
+
   bool string_to_expr_z3(
-    const typet &type, 
-    const std::string &value, exprt &e) const;  
+    const typet &type,
+    const std::string &value, exprt &e) const;
 
   std::string mathsat_value(const std::string &src);
 

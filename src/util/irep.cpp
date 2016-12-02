@@ -116,11 +116,11 @@ void irept::detach()
     #ifdef IREP_DEBUG
     std::cout << "ALLOCATED " << data << std::endl;
     #endif
-    
+
     data->ref_count=1;
     remove_ref(old_data);
   }
-  
+
   assert(data->ref_count==1);
 
   #ifdef IREP_DEBUG
@@ -145,7 +145,7 @@ Function: irept::remove_ref
 void irept::remove_ref(dt *old_data)
 {
   if(old_data==&empty_d) return;
-  
+
   #if 0
   nonrecursive_destructor(old_data);
   #else
@@ -155,13 +155,13 @@ void irept::remove_ref(dt *old_data)
   #ifdef IREP_DEBUG
   std::cout << "R: " << old_data << " " << old_data->ref_count << std::endl;
   #endif
-  
+
   old_data->ref_count--;
   if(old_data->ref_count==0)
   {
     #ifdef IREP_DEBUG
     std::cout << "D: " << pretty() << std::endl;
-    std::cout << "DELETING " << old_data->data 
+    std::cout << "DELETING " << old_data->data
               << " " << old_data << std::endl;
     old_data->clear();
     std::cout << "DEALLOCATING " << old_data << "\n";
@@ -195,13 +195,13 @@ Function: irept::nonrecursive_destructor
 void irept::nonrecursive_destructor(dt *old_data)
 {
   std::vector<dt *> stack(1, old_data);
-  
+
   while(!stack.empty())
   {
     dt *d=stack.back();
     stack.erase(--stack.end());
     if(d==&empty_d) continue;
-    
+
     assert(d->ref_count!=0);
     d->ref_count--;
 
@@ -220,7 +220,7 @@ void irept::nonrecursive_destructor(dt *old_data)
         stack.push_back(it->second.data);
         it->second.data=&empty_d;
       }
-      
+
       for(named_subt::iterator
           it=d->comments.begin();
           it!=d->comments.end();
@@ -229,7 +229,7 @@ void irept::nonrecursive_destructor(dt *old_data)
         stack.push_back(it->second.data);
         it->second.data=&empty_d;
       }
-      
+
       for(subt::iterator
           it=d->sub.begin();
           it!=d->sub.end();
@@ -238,10 +238,10 @@ void irept::nonrecursive_destructor(dt *old_data)
         stack.push_back(it->data);
         it->data=&empty_d;
       }
-      
+
       // now delete, won't do recursion
       delete d;
-    }    
+    }
   }
 }
 #endif
@@ -316,7 +316,7 @@ const irep_idt &irept::get(const irep_namet &name) const
   }
   #else
   named_subt::const_iterator it=s.find(name);
-  
+
   if(it==s.end())
   {
     const static irep_idt empty;
@@ -427,7 +427,7 @@ Function: irept::set
 void irept::set(const irep_namet &name, const long long value)
 {
   add(name).id(i2string(value));
-}  
+}
 
 /*******************************************************************\
 
@@ -453,7 +453,7 @@ void irept::remove(const irep_namet &name)
   #else
   s.erase(name);
   #endif
-}  
+}
 
 /*******************************************************************\
 
@@ -635,17 +635,17 @@ bool full_eq(const irept &i1, const irept &i2)
   {
     irept::named_subt::const_iterator i1_it=i1_named_sub.begin();
     irept::named_subt::const_iterator i2_it=i2_named_sub.begin();
-    
+
     for(; i1_it!=i1_named_sub.end(); i1_it++, i2_it++)
       if(i1_it->first!=i2_it->first ||
          !full_eq(i1_it->second, i2_it->second))
         return false;
   }
-  
+
   {
     irept::named_subt::const_iterator i1_it=i1_comments.begin();
     irept::named_subt::const_iterator i2_it=i2_comments.begin();
-    
+
     for(; i1_it!=i1_comments.end(); i1_it++, i2_it++)
       if(i1_it->first!=i2_it->first ||
          !full_eq(i1_it->second, i2_it->second))
@@ -927,7 +927,7 @@ Function: irept::pretty
 
 std::string irept::pretty(unsigned indent, unsigned max_indent) const
 {
-  if (max_indent > 0 && indent > max_indent) 
+  if (max_indent > 0 && indent > max_indent)
     return "";
 
   std::string result;
@@ -977,4 +977,3 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
 
   return result;
 }
-

@@ -6,9 +6,9 @@ int main()
   __CPROVER_assume(0<=y && y<=1);
   while(1) {
     switch(x) {
-    case 0 : 
+    case 0 :
       if(y<=2) {
-        if(nondet()) x=1; 
+        if(nondet()) x=1;
         else y++;
       }
       else x=2;

@@ -42,17 +42,17 @@ void show_properties(
   {
     if(!it.is_assert())
       continue;
-      
+
     const source_locationt &source_location=it.source_location;
-      
+
     const irep_idt &comment=source_location.get_comment();
     //const irep_idt &function=location.get_function();
     const irep_idt &property_class=source_location.get_property_class();
     const irep_idt description=
       (comment==""?"assertion":comment);
-      
+
     irep_idt property_id=source_location.get_property_id();
-    
+
     switch(ui)
     {
     case ui_message_handlert::XML_UI:
@@ -62,11 +62,11 @@ void show_properties(
         xml_claim.new_element("number").data=id2string(property_id); // will go away
         xml_claim.new_element("name").data=id2string(property_id); // will go away
         xml_claim.set_attribute("name", id2string(property_id)); // use this one
-        
+
         xmlt &l=xml_claim.new_element();
         l=xml(it.source_location);
-        
-        xml_claim.new_element("description").data=id2string(description);        
+
+        xml_claim.new_element("description").data=id2string(description);
         xml_claim.new_element("property").data=id2string(property_class);
         xml_claim.new_element("expression").data=from_expr(ns, identifier, it.guard);
         xml_claim.new_element("source").data="";
@@ -78,11 +78,11 @@ void show_properties(
         xmlt xml_property("property");
         xml_property.set_attribute("name", id2string(property_id)); // use this one
         xml_property.set_attribute("class", id2string(property_class)); // use this one
-        
+
         xmlt &property_l=xml_property.new_element();
         property_l=xml(it.source_location);
-        
-        xml_property.new_element("description").data=id2string(description);        
+
+        xml_property.new_element("description").data=id2string(description);
         xml_property.new_element("expression").data=from_expr(ns, identifier, it.guard);
 
         std::cout << xml_property << std::endl;
@@ -92,7 +92,7 @@ void show_properties(
     case ui_message_handlert::JSON_UI:
       assert(false);
       break;
-      
+
     case ui_message_handlert::PLAIN:
       std::cout << "Property " << property_id << ":" << std::endl;
 
@@ -230,4 +230,3 @@ void show_properties(
   else
     show_properties(ns, ui, goto_model.goto_functions);
 }
-

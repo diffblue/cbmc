@@ -103,7 +103,7 @@ fault_localizationt::get_failed_property()
        bmc.prop_conv.l_get(it->guard_literal).is_true() &&
        bmc.prop_conv.l_get(it->cond_literal).is_false())
       return it;
-  
+
   assert(false);
   return bmc.equation.SSA_steps.end();
 }
@@ -120,7 +120,7 @@ Function: fault_localizationt::check
 
 \*******************************************************************/
 
-bool fault_localizationt::check(const lpointst &lpoints, 
+bool fault_localizationt::check(const lpointst &lpoints,
                                 const lpoints_valuet& value)
 {
   assert(value.size()==lpoints.size());
@@ -258,13 +258,22 @@ void fault_localizationt::report(irep_idt goal_id)
 {
   if(goal_id==ID_nil)
     goal_id=failed->source.pc->source_location.get_property_id();
+
   lpointst &lpoints = lpoints_map[goal_id];
-  assert(!lpoints.empty());
+
+  if(lpoints.empty())
+  {
+    status() << "["+id2string(goal_id)+"]: \n"
+                   << "   unable to localize fault"
+                   << eom;
+    return;
+  }
+
   debug() << "Fault localization scores:" << eom;
   lpointt &max=lpoints.begin()->second;
   for(auto &l : lpoints)
   {
-    debug() << l.second.target->source_location 
+    debug() << l.second.target->source_location
             << "\n  score: " << l.second.score << eom;
     if(max.score<l.second.score)
       max=l.second;
@@ -309,19 +318,19 @@ Function: fault_localizationt::run_decision_procedure
 decision_proceduret::resultt
 fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
 {
-  status() << "Passing problem to " 
+  status() << "Passing problem to "
                << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(bmc.get_message_handler());
 
   // stop the time
   absolute_timet sat_start=current_time();
-  
+
   bmc.do_conversion();
 
   freeze_guards();
 
-  status() << "Running " << prop_conv.decision_procedure_text() 
+  status() << "Running " << prop_conv.decision_procedure_text()
                << eom;
 
   decision_proceduret::resultt dec_result=prop_conv.dec_solve();
@@ -365,7 +374,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
 
       bmc.error_trace();
     }
-    
+
     //localize faults
     run(ID_nil);
     status() << "\n** Most likely fault location:" << eom;
@@ -400,18 +409,18 @@ void fault_localizationt::goal_covered(
   {
     // failed already?
     if(g.second.status==goalt::statust::FAILURE) continue;
-  
+
     // check whether failed
     for(auto &c : g.second.instances)
     {
       literalt cond=c->cond_literal;
-      
+
       if(solver.l_get(cond).is_false())
       {
         g.second.status=goalt::statust::FAILURE;
         symex_target_equationt::SSA_stepst::iterator next=c;
         next++; // include the assertion
-        build_goto_trace(bmc.equation, next, solver, bmc.ns, 
+        build_goto_trace(bmc.equation, next, solver, bmc.ns,
                          g.second.goto_trace);
 
         //localize faults
@@ -443,11 +452,14 @@ void fault_localizationt::report(
   switch(bmc.ui)
   {
   case ui_message_handlert::PLAIN:
-    status() << "\n** Most likely fault location:" << eom;
-    for(auto &g : goal_map)
+    if(cover_goals.number_covered()>0)
     {
-      if(g.second.status!=goalt::statust::FAILURE) continue;
-      report(g.first);
+      status() << "\n** Most likely fault location:" << eom;
+      for(auto &g : goal_map)
+      {
+        if(g.second.status!=goalt::statust::FAILURE) continue;
+        report(g.first);
+      }
     }
     break;
   case ui_message_handlert::XML_UI:
@@ -456,4 +468,3 @@ void fault_localizationt::report(
     break;
   }
 }
-

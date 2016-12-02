@@ -15,24 +15,24 @@ class loc_reft
 {
 public:
   unsigned loc_number;
-  
+
   inline loc_reft next_loc()
   {
     loc_reft tmp=*this;
     tmp.increase();
     return tmp;
   }
-  
+
   inline void increase()
   {
     loc_number++;
   }
-  
+
   inline void decrease()
   {
     loc_number--;
   }
-  
+
   inline bool is_nil() const
   {
     return loc_number==nil().loc_number;
@@ -40,13 +40,13 @@ public:
 
   loc_reft():loc_number(-1) // ugly conversion
   {
-  }  
-  
+  }
+
   static inline loc_reft nil()
   {
     return loc_reft();
   }
-  
+
   inline loc_reft &operator++() // this is pre-increment
   {
     increase();

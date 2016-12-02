@@ -65,15 +65,15 @@ void parameter_assignmentst::do_function_calls(
       const namespacet ns(symbol_table);
       const symbolt &function_symbol=ns.lookup(identifier);
       const code_typet &code_type=to_code_type(function_symbol.type);
-      
+
       goto_programt tmp;
-      
+
       for(std::size_t nr=0; nr<code_type.parameters().size(); nr++)
       {
         irep_idt p_identifier=code_type.parameters()[nr].get_identifier();
-        
+
         if(p_identifier.empty()) continue;
-      
+
         if(nr<function_call.arguments().size())
         {
           goto_programt::targett t=tmp.add_instruction();
@@ -87,10 +87,10 @@ void parameter_assignmentst::do_function_calls(
           t->function=i_it->function;
         }
       }
-      
+
       std::size_t count=tmp.instructions.size();
       goto_program.insert_before_swap(i_it, tmp);
-      
+
       for(; count!=0; count--) i_it++;
     }
   }
@@ -151,4 +151,3 @@ void parameter_assignments(goto_modelt &goto_model)
   parameter_assignmentst rr(goto_model.symbol_table);
   rr(goto_model.goto_functions);
 }
-

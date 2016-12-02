@@ -22,13 +22,13 @@ class replace_symbolt
 public:
   typedef hash_map_cont<irep_idt, exprt, irep_id_hash> expr_mapt;
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> type_mapt;
-  
+
   inline void insert(const irep_idt &identifier,
                      const exprt &expr)
   {
     expr_map.insert(std::pair<irep_idt, exprt>(identifier, expr));
   }
-  
+
   void insert(const class symbol_exprt &old_expr,
               const exprt &new_expr);
 
@@ -37,10 +37,10 @@ public:
   {
     type_map.insert(std::pair<irep_idt, typet>(identifier, type));
   }
-  
+
   virtual bool replace(exprt &dest) const;
   virtual bool replace(typet &dest) const;
-  
+
   inline void operator()(exprt &dest) const
   {
     replace(dest);
@@ -50,7 +50,7 @@ public:
   {
     replace(dest);
   }
-  
+
   inline void clear()
   {
     expr_map.clear();
@@ -59,11 +59,11 @@ public:
 
   replace_symbolt();
   virtual ~replace_symbolt();
-  
+
   expr_mapt expr_map;
   type_mapt type_map;
 
-protected:  
+protected:
   bool have_to_replace(const exprt &dest) const;
   bool have_to_replace(const typet &type) const;
 };

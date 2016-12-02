@@ -46,4 +46,3 @@ int main()
   printf("struct S: %lu\n", sizeof(struct S));
   return 0;
 }
-

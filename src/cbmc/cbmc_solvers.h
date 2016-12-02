@@ -33,7 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 Solver factory
 
 \*******************************************************************/
- 
+
 class cbmc_solverst:public messaget
 {
 public:
@@ -66,7 +66,7 @@ public:
 
     //use this to get the prop_conv
     prop_convt& prop_conv() const
-    { 
+    {
       assert(prop_conv_ptr!=NULL);
       return *prop_conv_ptr;
     }
@@ -81,7 +81,7 @@ public:
     solvert *solver;
     if(options.get_bool_option("dimacs"))
       solver = get_dimacs();
-    else if(options.get_bool_option("refine")) 
+    else if(options.get_bool_option("refine"))
       solver = get_bv_refinement();
     else if(options.get_bool_option("pass"))
       solver = get_string_refinement(); 
@@ -92,11 +92,11 @@ public:
     else
       solver = get_default();
 
-    return std::unique_ptr<solvert>(solver); 
+    return std::unique_ptr<solvert>(solver);
   }
 
   virtual ~cbmc_solverst()
-  { 
+  {
   }
 
   void set_ui(language_uit::uit _ui) { ui=_ui; }

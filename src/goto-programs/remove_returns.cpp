@@ -63,7 +63,7 @@ void remove_returnst::replace_returns(
   typet return_type=f_it->second.type.return_type();
 
   const irep_idt function_id=f_it->first;
-  
+
   // returns something but void?
   bool has_return_value=return_type!=empty_typet();
 
@@ -88,12 +88,12 @@ void remove_returnst::replace_returns(
     new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
     new_symbol.mode=function_symbol.mode;
     new_symbol.type=return_type;
-    
+
     symbol_table.add(new_symbol);
   }
 
   goto_programt &goto_program=f_it->second.body;
-  
+
   if(goto_program.empty())
     return;
 
@@ -166,6 +166,7 @@ void remove_returnst::do_function_calls(
         if(function_call.lhs().is_not_nil())
         {
           exprt rhs;
+
           if(f_it->second.body_available())
           {
             symbol_exprt return_value;
@@ -177,7 +178,7 @@ void remove_returnst::do_function_calls(
           {
             rhs=side_effect_expr_nondett(function_call.lhs().type());
           }
-          
+
           goto_programt::targett t_a=goto_program.insert_after(i_it);
           t_a->make_assignment();
           t_a->source_location=i_it->source_location;
@@ -315,26 +316,29 @@ bool remove_returnst::restore_returns(
       // replace "fkt#return_value=x;" by "return x;"
       code_returnt return_code(assign.rhs());
 
-      // now turn the `return' into `assignment'
-      i_it->type=RETURN;
-      i_it->code=return_code;
+      // the assignment might be a goto target
+      i_it->make_skip();
+      i_it++;
 
-      // remove the subsequent goto (and possibly dead)
-      goto_programt::instructionst::iterator next=i_it;
-      ++next;
-      assert(next!=goto_program.instructions.end());
-
-      if(next->is_dead())
+      while(!i_it->is_goto() && !i_it->is_end_function())
       {
-        assert(to_code_dead(next->code).symbol()==
-               return_code.return_value());
-        next=goto_program.instructions.erase(next);
-        assert(next!=goto_program.instructions.end());
+        assert(i_it->is_dead());
+        i_it++;
       }
 
-      assert(next->is_goto());
-      // i_it remains valid
-      goto_program.instructions.erase(next);
+      if(i_it->is_goto())
+      {
+        goto_programt::const_targett target=i_it->get_target();
+        assert(target->is_end_function());
+      }
+      else
+      {
+        assert(i_it->is_end_function());
+        i_it=goto_program.instructions.insert(i_it, *i_it);
+      }
+
+      i_it->make_return();
+      i_it->code=return_code;
     }
   }
 
@@ -456,4 +460,3 @@ void restore_returns(
   remove_returnst rr(symbol_table);
   rr.restore(goto_functions);
 }
-

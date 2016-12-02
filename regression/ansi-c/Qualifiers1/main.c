@@ -16,11 +16,11 @@ int main()
   volatile int * const p=(int * const)&a;
   *((int * const)&a) = 1;
   *p=2;
-  
+
   f(&a);
   g(&a);
 
-  // now with typedef  
+  // now with typedef
   ptr_constant pp1;
   const_ptr_constant pp2=pp1;
 }

@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Main Module 
+Module: Main Module
 
 Author:
 
@@ -61,7 +61,7 @@ Function: goto_fence_inserter_parse_optionst::set_verbosity
 void goto_fence_inserter_parse_optionst::set_verbosity()
 {
   unsigned int v=8; // default
-  
+
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
@@ -90,13 +90,13 @@ int goto_fence_inserter_parse_optionst::doit()
     std::cout << MUSKETEER_VERSION << std::endl;
     return 0;
   }
-  
+
   if(cmdline.args.size()!=1 && cmdline.args.size()!=2)
   {
     help();
     return 0;
   }
-  
+
   set_verbosity();
 
   try
@@ -108,12 +108,12 @@ int goto_fence_inserter_parse_optionst::doit()
     get_goto_program(goto_functions);
 
     instrument_goto_program(goto_functions);
-    
+
     // write new binary?
     if(cmdline.args.size()==2)
     {
       status() << "Writing GOTO program to " << cmdline.args[1] << eom;
-      
+
       if(write_goto_binary(
         cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
         return 1;
@@ -136,12 +136,12 @@ int goto_fence_inserter_parse_optionst::doit()
     error() << e << eom;
     return 11;
   }
-  
+
   catch(int)
   {
     return 11;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
@@ -160,7 +160,7 @@ Function: goto_fence_inserter_parse_optionst::get_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 void goto_fence_inserter_parse_optionst::get_goto_program(
   goto_functionst &goto_functions)
 {
@@ -184,13 +184,13 @@ Function: goto_fence_inserter_parse_optionst::instrument_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 void goto_fence_inserter_parse_optionst::instrument_goto_program(
   goto_functionst &goto_functions)
 {
   optionst options;
 
-  // unwind loops 
+  // unwind loops
   if(cmdline.isset("unwind"))
   {
     status() << "Unwinding loops" << eom;
@@ -198,25 +198,25 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
   }
 
   // we add the library, as some analyses benefit
-  
-  status() << "Adding CPROVER library" << eom;      
+
+  status() << "Adding CPROVER library" << eom;
   link_to_library(symbol_table, goto_functions, ui_message_handler);
 
   namespacet ns(symbol_table);
 
   // add generic checks, if needed
   goto_check(ns, options, goto_functions);
- 
+
   if( cmdline.isset("mm")
       || cmdline.isset("all-shared")
-      || cmdline.isset("volatile") 
-      || cmdline.isset("pensieve") 
-      || cmdline.isset("naive") 
+      || cmdline.isset("volatile")
+      || cmdline.isset("pensieve")
+      || cmdline.isset("naive")
       || cmdline.isset("all-shared-aeg") )
   {
     if(cmdline.isset("remove-function-pointers")) {
       status() << "remove soundly function pointers" << eom;
-      remove_function_pointers(symbol_table, goto_functions, 
+      remove_function_pointers(symbol_table, goto_functions,
         cmdline.isset("pointer-check"));
     }
 
@@ -233,7 +233,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     if( cmdline.isset("const-function-pointer-propagation") ) {
       /* propagate const pointers to functions */
       status() << "Propagate Constant Function Pointers" << eom;
-      propagate_const_function_pointers(symbol_table, goto_functions, 
+      propagate_const_function_pointers(symbol_table, goto_functions,
         get_message_handler());
     }
 
@@ -241,7 +241,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     //return;
 #if 0
     status() << "Function Pointer Removal" << eom;
-    remove_function_pointers(symbol_table, goto_functions, 
+    remove_function_pointers(symbol_table, goto_functions,
       cmdline.isset("pointer-check"));
 #endif
 
@@ -276,7 +276,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     }
     if(cmdline.isset("all-shared-aeg")) {
       status() << "Shared variables accesses detection (CF)" << eom;
-      fence_all_shared_aeg(get_message_handler(), value_set_analysis, 
+      fence_all_shared_aeg(get_message_handler(), value_set_analysis,
         symbol_table, goto_functions);
       // simple analysis, coupled with script to insert;
       // does not transform the goto-binary
@@ -285,7 +285,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     else if(cmdline.isset("volatile")) {
       status() << "Detection of variables declared volatile" << eom;
 
-      fence_volatile(get_message_handler(), value_set_analysis, symbol_table, 
+      fence_volatile(get_message_handler(), value_set_analysis, symbol_table,
         goto_functions);
       // simple analysis, coupled with script to insert;
       // does not transform the goto-binary
@@ -295,14 +295,14 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
       status() << "Delay-set analysis" << eom;
 
       const unsigned unwind_loops =
-        ( cmdline.isset("unwind") ? 
+        ( cmdline.isset("unwind") ?
           unsafe_string2unsigned(cmdline.get_value("unwind")) : 0 );
 
       const unsigned max_po_trans =
         ( cmdline.isset("max-po-trans") ?
           unsafe_string2unsigned(cmdline.get_value("max-po-trans")) : 0 );
 
-      fence_pensieve(         
+      fence_pensieve(
         value_set_analysis,
         symbol_table,
         goto_functions,
@@ -322,7 +322,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
       std::string mm=cmdline.get_value("mm");
       memory_modelt model;
 
-      status() << "Fence detection for " << mm 
+      status() << "Fence detection for " << mm
         << " via critical cycles and ILP" << eom;
 
       // strategy of instrumentation
@@ -340,9 +340,9 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
       else
         /* default: instruments all unsafe pairs */
         inst_strategy=all;
-      
-      const unsigned unwind_loops = 
-        ( cmdline.isset("unwind") ? 
+
+      const unsigned unwind_loops =
+        ( cmdline.isset("unwind") ?
           unsafe_string2unsigned(cmdline.get_value("unwind")) : 0 );
 
       const unsigned max_var =
@@ -381,7 +381,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 
       /* inference mode */
       infer_modet infer_mode=INFER;
-      
+
       if(cmdline.isset("userdef"))
         infer_mode=USER_DEF;
 
@@ -416,17 +416,17 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
           get_message_handler(),
           cmdline.isset("ignore-arrays"));
     }
-  }  
+  }
 
   // add failed symbols
   add_failed_symbols(symbol_table);
-  
+
   // recalculate numbers, etc.
   goto_functions.update();
 
   // add loop ids
   goto_functions.compute_loop_numbers();
-  
+
   // label the assertions
   label_properties(goto_functions);
 }

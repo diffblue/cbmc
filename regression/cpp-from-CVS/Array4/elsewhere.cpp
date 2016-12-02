@@ -6,4 +6,3 @@ void elsewhere()
   // should fail, this is out of bounds
   ch=my_string[10];
 }
-

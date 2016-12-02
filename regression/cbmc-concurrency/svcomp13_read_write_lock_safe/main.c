@@ -44,4 +44,3 @@ __CPROVER_ASYNC_1: writer();
 __CPROVER_ASYNC_1: reader();
   return 0;
 }
-

@@ -95,7 +95,7 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
 
    default:
     return true;
-  }    
+  }
 
   return false;
 }

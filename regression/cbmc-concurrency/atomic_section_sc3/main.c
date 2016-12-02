@@ -90,4 +90,3 @@ __CPROVER_ASYNC_1: dec();
 
   return 0;
 }
-

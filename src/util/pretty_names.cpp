@@ -86,7 +86,7 @@ void pretty_namest::get_pretty_names(
         std::string new_name=id.as_string();
 
         names.insert(new_name);
-        pretty_map[*it]=new_name;      
+        pretty_map[*it]=new_name;
       }
     }
   }

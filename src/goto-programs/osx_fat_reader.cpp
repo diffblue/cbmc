@@ -112,4 +112,3 @@ bool osx_fat_readert::extract_gb(
     "lipo -thin hppa7100LC -output \""+dest+"\" \""+source+"\"";
   return system(command.c_str())!=0;
 }
-

@@ -78,7 +78,7 @@ tvt satcheck_glucose_baset<T>::l_get(literalt a) const
     result=tvt(false);
   else
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
-  
+
   if(a.sign()) result=!result;
 
   return result;
@@ -181,7 +181,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
     else if(!it->is_false())
       assert(it->var_no()<(unsigned)solver->nVars());
   }
-    
+
   Glucose::vec<Glucose::Lit> c;
 
   convert(bv, c);
@@ -217,9 +217,9 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
       (no_variables()-1) << " variables, " <<
       solver->nClauses() << " clauses" << eom;
   }
-  
+
   add_variables();
-  
+
   if(!solver->okay())
   {
     messaget::status() <<
@@ -229,7 +229,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
   {
     // if assumptions contains false, we need this to be UNSAT
     bool has_false=false;
-    
+
     forall_literals(it, assumptions)
       if(it->is_false())
         has_false=true;
@@ -246,7 +246,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
 
       if(solver->solve(solver_assumptions))
       {
-        messaget::status() << 
+        messaget::status() <<
           "SAT checker: instance is SATISFIABLE" << eom;
         assert(solver->model.size()!=0);
         status=SAT;
@@ -450,4 +450,3 @@ bool satcheck_glucose_simplifiert::is_eliminated(literalt a) const
 
   return solver->isEliminated(a.var_no());
 }
-

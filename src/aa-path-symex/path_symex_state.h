@@ -104,7 +104,7 @@ public:
     // it's a given explicit value or a symbol with given identifier
     exprt value;
     symbol_exprt ssa_symbol;
-    
+
     // for uninterpreted functions or arrays we maintain an index set
     typedef std::set<exprt> index_sett;
     index_sett index_set;
@@ -115,11 +115,11 @@ public:
     {
     }
   };
-  
+
   // the values of the shared variables
   typedef std::vector<var_statet> var_valt;
   var_valt shared_vars;
-  
+
   // procedure frame
   struct framet
   {
@@ -129,31 +129,31 @@ public:
     var_valt saved_local_vars;
   };
 
-  // call stack  
+  // call stack
   typedef std::vector<framet> call_stackt;
-  
+
   // the state of a thread
   struct threadt
   {
   public:
-    loc_reft pc;    
+    loc_reft pc;
     call_stackt call_stack; // the call stack
     var_valt local_vars; // thread-local variables
     bool active;
-    
+
     threadt():active(true)
     {
     }
   };
-  
+
   typedef std::vector<threadt> threadst;
   threadst threads;
 
   // warning: reference is not stable
   var_statet &get_var_state(const var_mapt::var_infot &var_info);
-  
+
   bool inside_atomic_section;
-  
+
   inline unsigned get_current_thread() const
   {
     return current_thread;
@@ -163,7 +163,7 @@ public:
   {
     current_thread=_thread;
   }
-  
+
   goto_programt::const_targett get_instruction() const;
 
   // branch taken case
@@ -198,7 +198,7 @@ public:
 
   // execution history
   path_symex_step_reft history;
-  
+
   // adds an entry to the history
   void record_step();
 
@@ -206,13 +206,13 @@ public:
   void record_branch_step(bool taken);
 
   // various state transformers
-  
+
   inline threadt &add_thread()
   {
     threads.resize(threads.size()+1);
     return threads.back();
   }
-  
+
   inline void disable_current_thread()
   {
     threads[current_thread].active=false;
@@ -232,8 +232,8 @@ public:
   {
     threads[current_thread].pc=new_pc;
   }
-  
-  // output  
+
+  // output
   void output(std::ostream &out) const;
   void output(const threadt &thread, std::ostream &out) const;
 
@@ -242,7 +242,7 @@ public:
   {
     return read(src, true);
   }
-  
+
   // instantiate without constant propagation
   inline exprt read_no_propagate(const exprt &src)
   {
@@ -252,17 +252,17 @@ public:
   exprt dereference_rec(const exprt &src, bool propagate);
 
   std::string array_index_as_string(const exprt &) const;
-  
+
   inline unsigned get_no_thread_interleavings() const
   {
     return no_thread_interleavings;
   }
-  
+
   inline unsigned get_depth() const
   {
     return depth;
   }
-  
+
   bool is_feasible(class decision_proceduret &) const;
 
   bool check_assertion(class decision_proceduret &);
@@ -346,5 +346,5 @@ path_symex_statet initial_state(
   var_mapt &var_map,
   const locst &locs,
   path_symex_historyt &);
-  
+
 #endif

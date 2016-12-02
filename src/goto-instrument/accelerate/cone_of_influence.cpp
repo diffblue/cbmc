@@ -32,7 +32,7 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
 
 #ifdef DEBUG
     std::cout << "Previous cone: " << std::endl;
-    
+
     for (expr_sett::iterator it = curr.begin();
          it != curr.end();
          ++it) {
@@ -40,7 +40,7 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
     }
 
     std::cout << std::endl << "Current cone: " << std::endl;
-    
+
     for (expr_sett::iterator it = next.begin();
          it != next.end();
          ++it) {
@@ -91,7 +91,7 @@ void cone_of_influencet::get_succs(
       return;
     }
   }
-  
+
   unsigned int loc = next->location_number;
   expr_sett &s = cone_map[loc];
   targets.insert(s.begin(), s.end());

@@ -22,4 +22,3 @@ int main(int argc, char* argv[])
   D* pd = new D(ref_d);
   assert(pd->r == 10);
 }
-

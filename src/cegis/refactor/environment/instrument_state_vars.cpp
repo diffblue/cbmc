@@ -4,29 +4,34 @@ namespace
 {
 class var_findert: public const_expr_visitort
 {
+  std::set<irep_idt> &vars;
 public:
-  std::set<irep_idt> vars;
+  var_findert(std::set<irep_idt> &vars) :
+      vars(vars)
+  {
+  }
 
   virtual ~var_findert()=default;
 
   virtual void operator()(const exprt &expr)
   {
     if (ID_symbol != expr.id()) return;
+    if (ID_code == expr.type().id()) return;
+    // TODO: Follow function calls
     vars.insert(to_symbol_expr(expr).get_identifier());
   }
 };
 }
 
-std::set<irep_idt> collect_state_vars(goto_programt::const_targett first,
-    const goto_programt::const_targett last)
+void collect_state_vars(std::set<irep_idt> &result,
+    goto_programt::const_targett first, const goto_programt::const_targett last)
 {
-  var_findert visitor;
+  var_findert visitor(result);
   for (; first != last; ++first)
   {
     first->code.visit(visitor);
     first->guard.visit(visitor);
   }
-  return visitor.vars;
 }
 
 void instrument_program_ops(goto_programt &body, goto_programt::targett pos,

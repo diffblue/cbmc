@@ -4,7 +4,7 @@ public:
   X()
   {
   }
-  
+
   static void some_func()
   {
     // This is an unbounded expansion,

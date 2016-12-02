@@ -86,7 +86,7 @@ Function: satcheck_lingelingt::lcnf
 void satcheck_lingelingt::lcnf(const bvt &bv)
 {
   bvt new_bv;
-  
+
   if(process_clause(bv, new_bv))
     return;
 
@@ -121,7 +121,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
       i2string(clause_counter)+" clauses";
     messaget::status() << msg << messaget::eom;
   }
-  
+
   std::string msg;
 
   forall_literals(it, assumptions)
@@ -257,4 +257,3 @@ bool satcheck_lingelingt::is_in_conflict(literalt a) const
   assert(!a.is_constant());
   return lglfailed(solver, a.dimacs())!=0;
 }
-

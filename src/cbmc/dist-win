@@ -15,7 +15,7 @@ mkdir /tmp/cbmc-dist
 cp ../cbmc/cbmc.exe \
    ../goto-cc/goto-cl.exe ../goto-instrument/goto-instrument.exe \
    /tmp/cbmc-dist/
-cp ~/progr/cbmc.vs64/trunk/src/cbmc/cbmc.exe /tmp/cbmc-dist/cbmc64.exe
+cp ~/progr/cbmc.vs64/src/cbmc/cbmc.exe /tmp/cbmc-dist/cbmc64.exe
 cp ../../LICENSE /tmp/cbmc-dist/LICENSE.txt
 unix2dos /tmp/cbmc-dist/LICENSE.txt
 cd /tmp/cbmc-dist

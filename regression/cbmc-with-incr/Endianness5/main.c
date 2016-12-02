@@ -5,8 +5,8 @@ unsigned short shortTmp;
 int main()
 {
   ptrUShort = (unsigned short*)(&regb[12]);
-  shortTmp= *ptrUShort; 
+  shortTmp= *ptrUShort;
 
   // should pass
-  *ptrUShort = 1234;   
+  *ptrUShort = 1234;
 }

@@ -20,7 +20,7 @@ class havoc_loopst
 {
 public:
   typedef goto_functionst::goto_functiont goto_functiont;
-  
+
   havoc_loopst(
     function_modifiest &_function_modifies,
     goto_functiont &_goto_function):
@@ -31,13 +31,13 @@ public:
   {
     havoc_loops();
   }
-  
+
 protected:
   goto_functiont &goto_function;
   local_may_aliast local_may_alias;
   function_modifiest &function_modifies;
   natural_loops_mutablet natural_loops;
-  
+
   typedef std::set<exprt> modifiest;
   typedef const natural_loops_mutablet::natural_loopt loopt;
 
@@ -51,7 +51,7 @@ protected:
     const goto_programt::targett loop_head,
     const modifiest &modifies,
     goto_programt &dest);
-  
+
   void get_modifies(
     const loopt &,
     modifiest &);
@@ -77,7 +77,7 @@ goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
 
   // find the last instruction in the loop
   std::map<unsigned, goto_programt::targett> loop_map;
-  
+
   for(loopt::const_iterator l_it=loop.begin();
       l_it!=loop.end();
       l_it++)
@@ -85,7 +85,7 @@ goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
 
   // get the one with the highest number
   goto_programt::targett last=(--loop_map.end())->second;
-  
+
   return ++last;
 }
 
@@ -113,7 +113,7 @@ void havoc_loopst::build_havoc_code(
   {
     exprt lhs=*m_it;
     exprt rhs=side_effect_expr_nondett(lhs.type());
-  
+
     goto_programt::targett t=dest.add_instruction(ASSIGN);
     t->function=loop_head->function;
     t->source_location=loop_head->source_location;
@@ -140,18 +140,18 @@ void havoc_loopst::havoc_loop(
 {
   assert(!loop.empty());
 
-  // first find out what can get changed in the loop  
+  // first find out what can get changed in the loop
   modifiest modifies;
   get_modifies(loop, modifies);
-  
+
   // build the havoc-ing code
   goto_programt havoc_code;
   build_havoc_code(loop_head, modifies, havoc_code);
-  
+
   // Now havoc at the loop head. Use insert_swap to
   // preserve jumps to loop head.
   goto_function.body.insert_before_swap(loop_head, havoc_code);
-  
+
   // compute the loop exit
   goto_programt::targett loop_exit=
     get_loop_exit(loop);
@@ -209,11 +209,11 @@ void havoc_loopst::get_modifies(
       const code_function_callt &code_function_call=
         to_code_function_call(instruction.code);
       const exprt &lhs=code_function_call.lhs();
-      
+
       // return value assignment
       if(lhs.is_not_nil())
         function_modifies.get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
-        
+
       function_modifies(code_function_call.function(), modifies);
     }
   }
@@ -234,7 +234,7 @@ Function: havoc_loopst::havoc_loops
 void havoc_loopst::havoc_loops()
 {
   // iterate over the (natural) loops in the function
-  
+
   for(natural_loops_mutablet::loop_mapt::const_iterator
       l_it=natural_loops.loop_map.begin();
       l_it!=natural_loops.loop_map.end();

@@ -57,4 +57,3 @@ clobber$(EXEEXT): $(OBJ)
 
 clobber-mac-signed: cbmc$(EXEEXT)
 	strip clobber$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) clobber$(EXEEXT)
-

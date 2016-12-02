@@ -7,7 +7,7 @@ int main() {
 
   // Visual Studio needs to be 2013 onwards
   #if defined(_MSC_VER) && !defined(__CYGWIN__) && _MSC_VER < 1800
-  
+
   // see http://www.johndcook.com/math_h.html
 
   #else

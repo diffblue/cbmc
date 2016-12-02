@@ -95,18 +95,18 @@ public:
   typedef std::set<bvt> equal_const_registeredt;
   equal_const_registeredt equal_const_registered;
   void equal_const_register(const bvt &var);
-  
+
   typedef std::pair<bvt, bvt> var_constant_pairt;
   typedef std::map<var_constant_pairt, literalt> equal_const_cachet;
   equal_const_cachet equal_const_cache;
-  
+
   literalt equal_const_rec (bvt &var, bvt &constant);
   literalt equal_const(const bvt &var, const bvt &constant);
   #endif
 
-  
+
   literalt equal(const bvt &op0, const bvt &op1);
-  
+
   static inline literalt sign_bit(const bvt &op)
   {
     return op[op.size()-1];
@@ -117,7 +117,7 @@ public:
 
   literalt is_not_zero(const bvt &op)
   { return prop.lor(op); }
-  
+
   literalt is_int_min(const bvt &op)
   {
     bvt tmp=op;
@@ -162,7 +162,7 @@ public:
     result.resize(new_size, const_literal(false));
     return result;
   }
-  
+
   void set_equal(const bvt &a, const bvt &b);
 
   // if cond holds, a has to be equal to b
@@ -172,9 +172,9 @@ public:
 
   bvt select(literalt s, const bvt &a, const bvt &b);
 
-  // computes a[last:first]  
+  // computes a[last:first]
   static bvt extract(const bvt &a, std::size_t first, std::size_t last);
-  
+
   // extracts the n most significant bits
   static bvt extract_msb(const bvt &a, std::size_t n);
 

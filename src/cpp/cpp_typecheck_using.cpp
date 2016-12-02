@@ -27,7 +27,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   // there are two forms of using clauses:
   // a) using namespace SCOPE;  ("using directive")
   // b) using SCOPE::id;        ("using declaration")
-  
+
   cpp_typecheck_resolvet resolver(*this);
   cpp_save_scopet save_scope(this->cpp_scopes);
 
@@ -40,7 +40,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
 
   cpp_scopes.current_scope().lookup(
     base_name, qualified?cpp_scopet::QUALIFIED:cpp_scopet::RECURSIVE, id_set);
-    
+
   bool using_directive=cpp_using.get_namespace();
 
   if(id_set.empty())

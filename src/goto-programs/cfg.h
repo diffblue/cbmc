@@ -42,7 +42,7 @@ template<class T,
 class cfg_baset:public graph< cfg_base_nodet<T,I> >
 {
 public:
-  typedef unsigned entryt;
+  typedef std::size_t entryt;
 
   struct entry_mapt:
     public std::map<goto_programt::const_targett, entryt>
@@ -401,7 +401,7 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     {
       // empty function
       this->add_edge(entry, entry_map[next_PC]);
-    }        
+    }
   }
   else if(next_PC!=goto_program.instructions.end())
     this->add_edge(entry, entry_map[next_PC]);

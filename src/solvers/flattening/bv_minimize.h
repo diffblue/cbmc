@@ -3,7 +3,7 @@
 Module: SAT-optimizer for minimizing expressions
 
 Author: Georg Weissenbacher
-    
+
 Date: July 2006
 
 Purpose: Find a satisfying assignment that minimizes a given set
@@ -26,12 +26,12 @@ public:
     boolbv(_boolbv)
   {
   }
-  
+
   void operator()(const minimization_listt &objectives);
-  
+
 protected:
   boolbvt &boolbv;
-  
+
   void add_objective(
     class prop_minimizet &prop_minimize,
     const exprt &objective);
@@ -41,7 +41,7 @@ class bv_minimizing_dect:public bv_pointerst
 {
 public:
   virtual const std::string description()
-  { 
+  {
     return "Bit vector minimizing SAT";
   }
 

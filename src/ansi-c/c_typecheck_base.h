@@ -62,11 +62,11 @@ protected:
 
   typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;
-  
+
   // overload to use language specific syntax
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
-  
+
   //
   // service functions
   //
@@ -91,13 +91,13 @@ protected:
     designatort &designator,
     const exprt &value,
     bool force_constant);
-    
+
   designatort make_designator(const typet &type, const exprt &src);
   void designator_enter(const typet &type, designatort &designator); // go down
   void increment_designator(designatort &designator);
 
   // typecasts
-  
+
   bool gcc_vector_types_compatible(const vector_typet &, const vector_typet &);
 
   virtual void implicit_typecast(exprt &expr, const typet &type);
@@ -108,7 +108,7 @@ protected:
   {
     implicit_typecast(expr, bool_typet());
   }
-  
+
   // code
   virtual void start_typecheck_code();
   virtual void typecheck_code(codet &code);
@@ -134,16 +134,16 @@ protected:
   virtual void typecheck_dowhile(code_dowhilet &code);
   virtual void typecheck_start_thread(codet &code);
   virtual void typecheck_spec_expr(codet &code, const irep_idt &spec);
-  
+
   bool break_is_allowed;
   bool continue_is_allowed;
   bool case_is_allowed;
   typet switch_op_type;
   typet return_type;
-  
+
   // to check that all labels used are also defined
   std::map<irep_idt, source_locationt> labels_defined, labels_used;
-  
+
   // expressions
   virtual void typecheck_expr_builtin_va_arg(exprt &expr);
   virtual void typecheck_expr_builtin_offsetof(exprt &expr);
@@ -186,9 +186,9 @@ protected:
   virtual void make_constant(exprt &expr);
   virtual void make_constant_index(exprt &expr);
   virtual void make_constant_rec(exprt &expr);
-  
+
   virtual bool gcc_types_compatible_p(const typet &, const typet &);
-  
+
   // types
   virtual void typecheck_type(typet &type);
   virtual void typecheck_compound_type(struct_union_typet &type);
@@ -204,7 +204,14 @@ protected:
   virtual void typecheck_custom_type(typet &type);
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;
-  
+
+  typet enum_constant_type(
+    const mp_integer &min, const mp_integer &max) const;
+
+  typet enum_underlying_type(
+    const mp_integer &min, const mp_integer &max,
+    bool is_packed) const;
+
   void make_already_typechecked(typet &dest)
   {
     typet result(ID_already_typechecked);
@@ -222,7 +229,7 @@ protected:
   void move_symbol(symbolt &symbol, symbolt *&new_symbol);
   void move_symbol(symbolt &symbol)
   { symbolt *new_symbol; move_symbol(symbol, new_symbol); }
-  
+
   // top-level stuff
   void typecheck_declaration(ansi_c_declarationt &);
   void typecheck_symbol(symbolt &symbol);
@@ -232,14 +239,14 @@ protected:
   void typecheck_function_body(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);
-  
+
   inline static bool is_numeric_type(const typet &src)
   {
     return src.id()==ID_complex ||
            src.id()==ID_unsignedbv ||
            src.id()==ID_signedbv ||
-           src.id()==ID_floatbv || 
-           src.id()==ID_fixedbv || 
+           src.id()==ID_floatbv ||
+           src.id()==ID_fixedbv ||
            src.id()==ID_c_bool ||
            src.id()==ID_bool ||
            src.id()==ID_c_enum_tag ||

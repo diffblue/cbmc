@@ -32,11 +32,11 @@ public:
     const goto_programt::const_targett,
     const exprt &lhs,
     modifiest &);
-  
+
   void get_modifies_function(
     const exprt &,
-    modifiest &);    
-    
+    modifiest &);
+
   inline void operator()(const exprt &function, modifiest &modifies)
   {
     get_modifies_function(function, modifies);

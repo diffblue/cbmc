@@ -25,4 +25,3 @@ all: java_bytecode$(LIBEXT)
 
 java_bytecode$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

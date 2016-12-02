@@ -27,7 +27,7 @@ std::size_t to_be_merged_irept::hash() const
 
   const irept::subt &sub=get_sub();
   const irept::named_subt &named_sub=get_named_sub();
-  
+
   forall_irep(it, sub)
     result=hash_combine(result, static_cast<const merged_irept &>(*it).hash());
 
@@ -69,17 +69,17 @@ bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
   {
     irept::subt::const_iterator s_it=sub.begin();
     irept::subt::const_iterator os_it=o_sub.begin();
-  
+
     for(; s_it!=sub.end(); s_it++, os_it++)
       if(static_cast<const merged_irept &>(*s_it)!=
          static_cast<const merged_irept &>(*os_it))
         return false;
   }
-  
+
   {
     irept::named_subt::const_iterator s_it=named_sub.begin();
     irept::named_subt::const_iterator os_it=o_named_sub.begin();
-  
+
     for(; s_it!=named_sub.end(); s_it++, os_it++)
       if(s_it->first!=os_it->first ||
          static_cast<const merged_irept &>(s_it->second)!=
@@ -138,7 +138,7 @@ const merged_irept &merged_irepst::merged(const irept &irep)
 
   if(result.second) // really new, record
     merged_irep_store.insert(merged_irept(new_irep));
-  
+
   return static_cast<const merged_irept &>(static_cast<const irept &>(*result.first));
 }
 

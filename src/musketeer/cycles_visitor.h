@@ -30,7 +30,7 @@ public:
   /* computes po^+ edges in U{C_1, ..., C_j} */
   void po_edges(std::set<unsigned>& edges);
 
-  /* computes pairs that will be protected for the 
+  /* computes pairs that will be protected for the
      TSO/PSO/RMO/Power/ARM by the constraints */
   void powr_constraint(const event_grapht::critical_cyclet& C_j,
     std::set<unsigned>& edges);

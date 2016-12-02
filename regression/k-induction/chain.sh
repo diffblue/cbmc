@@ -22,5 +22,3 @@ if [ $? == 0 ] ; then echo "## Base case passes" ; else echo "## Base case fails
 $goto_instrument --k-induction $k --step-case $name.o $name.step.o
 $cbmc $name.step.o
 if [ $? == 0 ] ; then echo "## Step case passes" ; else echo "## Step case fails" ; fi
-
-

@@ -24,12 +24,12 @@ public:
 
   typedef std::list<exprt> valuest;
 
-  // this is not const to allow a lazy evaluation  
+  // this is not const to allow a lazy evaluation
   virtual void get_values(
     goto_programt::const_targett l,
     const exprt &expr,
     valuest &dest)=0;
-    
+
   virtual ~value_setst()
   {
   }

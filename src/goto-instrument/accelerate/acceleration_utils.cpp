@@ -113,7 +113,7 @@ bool acceleration_utilst::check_inductive(
   substitutiont substitution;
 
   stash_polynomials(program, polynomials, substitution, path);
- 
+
   for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {
@@ -322,7 +322,7 @@ bool acceleration_utilst::do_assumptions(
   // assert(!precondition);
 
   exprt condition = precondition(path);
-  scratch_programt program(symbol_table); 
+  scratch_programt program(symbol_table);
 
   substitutiont substitution;
   stash_polynomials(program, polynomials, substitution, path);
@@ -482,7 +482,7 @@ bool acceleration_utilst::do_arrays(
 
   expr_sett arrays_written;
   expr_pairst array_assignments;
-  
+
   array_assignments = gather_array_assignments(loop_body, arrays_written);
 
 #ifdef DEBUG
@@ -1129,4 +1129,3 @@ symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
 
   return ret;
 }
-

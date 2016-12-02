@@ -18,8 +18,8 @@ Function: operator<<
 
  Outputs:
 
- Purpose: 
- 
+ Purpose:
+
 \*******************************************************************/
 
 std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
@@ -46,6 +46,6 @@ std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
   default:
     out << "?";
   }
-  
+
   return out;
 }

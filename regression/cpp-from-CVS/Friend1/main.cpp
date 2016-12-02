@@ -10,7 +10,7 @@ public:
     T x=1;
     return x;
   }
-  
+
   int base;
 };
 
@@ -18,5 +18,5 @@ int main()
 {
   C c(1);
 
-  assert(f()==1);  
+  assert(f()==1);
 }

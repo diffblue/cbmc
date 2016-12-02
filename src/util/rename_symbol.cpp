@@ -82,7 +82,7 @@ bool rename_symbolt::rename(exprt &dest) const
   if(have_to_rename(dest.type()))
     if(!rename(dest.type()))
       result=false;
-      
+
   // now do expression itself
 
   if(!have_to_rename(dest))
@@ -137,7 +137,7 @@ bool rename_symbolt::have_to_rename(const exprt &dest) const
 
   if(have_to_rename(dest.type()))
     return true;
-      
+
   // now do expression itself
 
   if(dest.id()==ID_symbol)
@@ -188,11 +188,11 @@ bool rename_symbolt::rename(typet &dest) const
   Forall_subtypes(it, dest)
     if(!rename(*it))
       result=false;
-    
+
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
-    struct_union_typet &struct_union_type=to_struct_union_type(dest);    
+    struct_union_typet &struct_union_type=to_struct_union_type(dest);
     struct_union_typet::componentst &components=
       struct_union_type.components();
 
@@ -202,7 +202,7 @@ bool rename_symbolt::rename(typet &dest) const
         it++)
       if(!rename(*it))
         result=false;
-  } 
+  }
   else if(dest.id()==ID_code)
   {
     code_typet &code_type=to_code_type(dest);
@@ -281,12 +281,12 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
   forall_subtypes(it, dest)
     if(have_to_rename(*it))
       return true;
-    
+
   if(dest.id()==ID_struct ||
      dest.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=
-      to_struct_union_type(dest);    
+      to_struct_union_type(dest);
 
     const struct_union_typet::componentst &components=
       struct_union_type.components();
@@ -297,13 +297,13 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
         it++)
       if(have_to_rename(*it))
         return true;
-  } 
+  }
   else if(dest.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(dest);
     if(have_to_rename(code_type.return_type()))
       return true;
-      
+
     const code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::const_iterator
@@ -329,4 +329,3 @@ bool rename_symbolt::have_to_rename(const typet &dest) const
 
   return false;
 }
-

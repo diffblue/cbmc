@@ -28,11 +28,11 @@ Date: July 2005
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
 */
-class goto_trace_stept 
+class goto_trace_stept
 {
 public:
   unsigned step_nr;
-  
+
   bool is_assignment() const      { return type==ASSIGNMENT; }
   bool is_assume() const          { return type==ASSUME; }
   bool is_assert() const          { return type==ASSERT; }
@@ -59,41 +59,41 @@ public:
                  SHARED_READ, SHARED_WRITE,
                  SPAWN, MEMORY_BARRIER, ATOMIC_BEGIN, ATOMIC_END } typet;
   typet type;
-  
+
   // we may choose to hide a step
   bool hidden;
-  
+
   // we categorize
   typedef enum { STATE, ACTUAL_PARAMETER } assignment_typet;
   assignment_typet assignment_type;
-    
+
   goto_programt::const_targett pc;
 
   // this transition done by given thread number
   unsigned thread_nr;
-  
+
   // for assume, assert, goto
   bool cond_value;
   exprt cond_expr;
-  
+
   // for assert
   std::string comment;
 
   // the object being assigned
   ssa_exprt lhs_object;
-  
+
   // the full, original lhs expression
   exprt full_lhs;
 
   // A constant with the new value
   exprt lhs_object_value, full_lhs_value;
-  
+
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
   typedef std::list<exprt> io_argst;
   io_argst io_args;
   bool formatted;
-  
+
   // for function call/return
   irep_idt identifier;
 
@@ -102,7 +102,7 @@ public:
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
-    
+
   goto_trace_stept():
     step_nr(0),
     type(NONE),
@@ -128,15 +128,15 @@ class goto_tracet
 public:
   typedef std::list<goto_trace_stept> stepst;
   stepst steps;
-  
+
   irep_idt mode;
-  
+
   inline void clear()
   {
     mode.clear();
     steps.clear();
   }
-  
+
   /*! \brief outputs the trace in ASCII to a given stream
   */
   void output(
@@ -148,24 +148,19 @@ public:
     other.steps.swap(steps);
     other.mode.swap(mode);
   }
-  
+
   inline void add_step(const goto_trace_stept &step)
   {
     steps.push_back(step);
   }
 
-  inline goto_trace_stept &get_last_step()
-  {
-    return steps.back();
-  }
-
-  // delete all steps after (not including) s  
+  // delete all steps after (not including) s
   void trim_after(stepst::iterator s)
   {
     assert(s!=steps.end());
     s++;
     for(;
-        s!=steps.end(); 
+        s!=steps.end();
         s=steps.erase(s));
   }
 };

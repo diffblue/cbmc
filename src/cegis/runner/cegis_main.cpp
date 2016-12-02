@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: CEGIS Main Module 
+Module: CEGIS Main Module
 
 Author: Daniel Kroening, kroening@kroening.com
 

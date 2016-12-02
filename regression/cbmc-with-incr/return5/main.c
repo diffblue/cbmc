@@ -39,6 +39,6 @@ int main()
   res1 = f1(a);
 
   assert(res0 == res1); /* <-- should fail */
-  
+
   return 0;
 }

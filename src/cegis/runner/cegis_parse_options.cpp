@@ -78,6 +78,7 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("cegis-match-select", !cmdline.isset("cegis-tournament-select"));
     options.set_option("cegis-statistics", cmdline.isset("cegis-statistics"));
     options.set_option(CEGIS_GENETIC, cmdline.isset(CEGIS_GENETIC));
+    options.set_option(CEGIS_GENETIC_ONLY, cmdline.isset(CEGIS_GENETIC_ONLY));
     set_integer_option(options, cmdline, "cegis-genetic-rounds", 10u);
     set_integer_option(options, cmdline, "cegis-seed", 747864937u);
     set_integer_option(options, cmdline, "cegis-genetic-popsize", 2000u);

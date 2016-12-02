@@ -33,20 +33,20 @@ public:
       throw "identifier "+id2string(name)+" not found";
     return *symbol;
   }
-  
+
   const symbolt &lookup(const irept &irep) const
   {
     return lookup(irep.get(ID_identifier));
   }
-  
+
   virtual ~namespace_baset();
-   
+
   void follow_symbol(irept &irep) const;
   void follow_macros(exprt &expr) const;
   const typet &follow(const typet &src) const;
 
   // These produce union_typet, struct_typet, c_enum_typet or
-  // the incomplete version.  
+  // the incomplete version.
   const typet &follow_tag(const union_tag_typet &src) const;
   const typet &follow_tag(const struct_tag_typet &src) const;
   const typet &follow_tag(const c_enum_tag_typet &src) const;
@@ -64,24 +64,24 @@ public:
   // constructors
   explicit namespacet(const symbol_tablet &_symbol_table)
   { symbol_table1=&_symbol_table; symbol_table2=NULL; }
-   
+
   namespacet(const symbol_tablet &_symbol_table1, const symbol_tablet &_symbol_table2)
   { symbol_table1=&_symbol_table1; symbol_table2=&_symbol_table2; }
-  
+
   namespacet(const symbol_tablet *_symbol_table1, const symbol_tablet *_symbol_table2)
   { symbol_table1=_symbol_table1; symbol_table2=_symbol_table2; }
- 
+
   using namespace_baset::lookup;
-   
+
   // these do the actual lookup
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
   virtual unsigned get_max(const std::string &prefix) const;
-  
+
   const symbol_tablet &get_symbol_table() const
   {
     return *symbol_table1;
   }
-  
+
 protected:
   const symbol_tablet *symbol_table1, *symbol_table2;
 };
@@ -101,18 +101,18 @@ public:
 
   // these do the actual lookup
   using namespace_baset::lookup;
-  
+
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
   virtual unsigned get_max(const std::string &prefix) const;
-  
+
   inline void add(const symbol_tablet &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);
   }
-  
+
 protected:
   typedef std::vector<const symbol_tablet *> symbol_table_listt;
   symbol_table_listt symbol_table_list;
 };
- 
+
 #endif

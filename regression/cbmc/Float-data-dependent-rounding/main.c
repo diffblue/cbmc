@@ -10,7 +10,7 @@
 int main (void) {
   #if defined(_MSC_VER) && _MSC_VER < 1800
   #else
-  
+
   #ifdef FE_UPWARD
   #ifdef FW_DOWNWARD
   float f;
@@ -33,7 +33,7 @@ int main (void) {
   }
   #endif
   #endif
-  
+
   #endif
 
   return 1;

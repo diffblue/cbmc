@@ -16,7 +16,7 @@ int main()
   assert(str_array[1].b==4);
 
   int x;
-  
+
   // this also exists (GCC)
   str_array[0] = (struct teststr){ .a=1, .c=x };
   assert(str_array[0].a==1);

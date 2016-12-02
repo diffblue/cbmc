@@ -13,4 +13,3 @@ int main() {
   assert(__CPROVER_is_zero_string(x));
   return 0;
 }
-

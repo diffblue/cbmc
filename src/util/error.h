@@ -21,21 +21,21 @@ public:
   {
     return "";
   }
-  
+
   virtual ~error_baset() throw ()
   {
   }
-  
+
   inline error_baset()
   {
   }
-  
+
   inline explicit error_baset(const locationt &_location):location(_location)
   {
   }
-  
+
   locationt location;
-};          
+};
 
 class error_str:public error_baset, public std::ostringstream
 {
@@ -44,20 +44,20 @@ public:
   {
     return str().c_str();
   }
-  
+
   virtual ~error_str() throw ()
   {
   }
-  
+
   inline error_str()
   {
   }
-  
+
   explicit inline error_str(const locationt &_location):
     error_baset(_location), std::ostringstream()
   {
   }
-  
+
   explicit inline error_str(const char *string)
   {
     str(string);
@@ -67,7 +67,7 @@ public:
   {
     str(string);
   }
-  
+
   inline error_str(const error_str &other):std::ostringstream()
   {
     str(other.str());

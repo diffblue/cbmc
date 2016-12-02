@@ -5,5 +5,5 @@ int main()
   {
     assert(i<10);
   }
-  
+
 }

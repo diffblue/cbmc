@@ -41,7 +41,7 @@ exprt dereferencet::operator()(const exprt &pointer)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
-          pointer.type().pretty();  
+          pointer.type().pretty();
 
   // type of the object
   const typet &type=pointer.type().subtype();
@@ -77,9 +77,9 @@ exprt dereferencet::read_object(
   const typet &dest_type=ns.follow(type);
 
   // is the object an array with matching subtype?
-  
+
   exprt simplified_offset=simplify_expr(offset, ns);
-  
+
   // check if offset is zero
   if(simplified_offset.is_zero())
   {
@@ -94,22 +94,22 @@ exprt dereferencet::read_object(
       return typecast_exprt(object, dest_type);
     }
   }
-  
+
   if(object.id()==ID_index)
   {
     const index_exprt &index_expr=to_index_expr(object);
-    
+
     exprt index=index_expr.index();
-    
+
     // multiply index by object size
     exprt size=size_of_expr(object_type, ns);
 
     if(size.is_nil())
       throw "dereference failed to get object size for index";
-      
+
     index.make_typecast(simplified_offset.type());
     size.make_typecast(index.type());
-      
+
     exprt new_offset=plus_exprt(simplified_offset, mult_exprt(index, size));
 
     return read_object(index_expr.array(), new_offset, type);
@@ -117,25 +117,25 @@ exprt dereferencet::read_object(
   else if(object.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(object);
-    
+
     const typet &compound_type=
       ns.follow(member_expr.struct_op().type());
-    
+
     if(compound_type.id()==ID_struct)
     {
       const struct_typet &struct_type=
         to_struct_type(compound_type);
-    
+
       exprt member_offset=member_offset_expr(
         struct_type, member_expr.get_component_name(), ns);
 
       if(member_offset.is_nil())
         throw "dereference failed to get member offset";
-        
+
       member_offset.make_typecast(simplified_offset.type());
-        
+
       exprt new_offset=plus_exprt(simplified_offset, member_offset);
-      
+
       return read_object(member_expr.struct_op(), new_offset, type);
     }
     else if(compound_type.id()==ID_union)
@@ -145,14 +145,14 @@ exprt dereferencet::read_object(
       return read_object(member_expr.struct_op(), offset, type);
     }
   }
-  
+
   // check if we have an array with the right subtype
   if(object_type.id()==ID_array &&
      base_type_eq(object_type.subtype(), dest_type, ns))
   {
     // check proper alignment
     exprt size=size_of_expr(dest_type, ns);
-    
+
     if(size.is_not_nil())
     {
       mp_integer size_constant, offset_constant;
@@ -167,7 +167,7 @@ exprt dereferencet::read_object(
       }
     }
   }
-  
+
   // give up and use byte_extract
   return binary_exprt(object, byte_extract_id(), simplified_offset, dest_type);
 }
@@ -192,10 +192,10 @@ exprt dereferencet::dereference_rec(
   if(address.id()==ID_address_of)
   {
     const address_of_exprt &address_of_expr=to_address_of_expr(address);
-    
+
     const exprt &object=address_of_expr.object();
 
-    return read_object(object, offset, type);    
+    return read_object(object, offset, type);
   }
   else if(address.id()==ID_typecast)
   {
@@ -220,7 +220,7 @@ exprt dereferencet::dereference_rec(
   else if(address.id()==ID_constant)
   {
     const typet result_type=ns.follow(address.type()).subtype();
-  
+
     // pointer-typed constant
     if(to_constant_expr(address).get_value()==ID_NULL) // NULL
     {

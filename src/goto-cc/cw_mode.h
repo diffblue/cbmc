@@ -25,7 +25,7 @@ public:
     cmdline(_gcc_cmdline)
   {
   }
-  
+
 protected:
   gcc_cmdlinet &cmdline;
 };

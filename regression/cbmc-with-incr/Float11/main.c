@@ -31,7 +31,7 @@ int main()
   assert(0<1);
   assert(1>-0);
   assert(-0<1);
-  
+
   assert(!(0.999f<0.0f));
   assert(!(-0.999f>-0.0f));
   assert(!(0.999f<=0.0f));

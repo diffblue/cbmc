@@ -95,7 +95,7 @@ public:
   // named_subt has to provide stable references; with C++11 we could
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
-  
+
   #ifdef SUB_IS_LIST
   typedef std::list<std::pair<irep_namet, irept> > named_subt;
   #else
@@ -172,12 +172,12 @@ public:
     return *this;
   }
   #endif
-  
+
   inline ~irept()
   {
     remove_ref(data);
   }
-  
+
   #else
   inline irept()
   {
@@ -186,7 +186,7 @@ public:
 
   inline const irep_idt &id() const
   { return read().data; }
-  
+
   inline const std::string &id_string() const
   { return id2string(read().data); }
 
@@ -201,7 +201,7 @@ public:
   {
     return id2string(get(name));
   }
-  
+
   const irep_idt &get(const irep_namet &name) const;
   bool get_bool(const irep_namet &name) const;
   signed int get_int(const irep_namet &name) const;
@@ -214,13 +214,13 @@ public:
   inline void set(const irep_namet &name, const irept &irep)
   { add(name, irep); }
   void set(const irep_namet &name, const long long value);
-  
+
   void remove(const irep_namet &name);
   void move_to_sub(irept &irep);
   void move_to_named_sub(const irep_namet &name, irept &irep);
-  
+
   friend bool operator==(const irept &i1, const irept &i2);
-   
+
   friend inline bool operator!=(const irept &i1, const irept &i2)
   { return !(i1==i2); }
 
@@ -233,25 +233,25 @@ public:
   friend bool ordering(const irept &i1, const irept &i2);
 
   int compare(const irept &i) const;
-  
+
   inline void clear() { *this=irept(); }
 
   inline void make_nil() { *this=get_nil_irep(); }
-  
+
   inline subt &get_sub() { return write().sub; } // DANGEROUS
   inline const subt &get_sub() const { return read().sub; }
   inline named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
   inline const named_subt &get_named_sub() const { return read().named_sub; }
   inline named_subt &get_comments() { return write().comments; } // DANGEROUS
   inline const named_subt &get_comments() const { return read().comments; }
-  
+
   std::size_t hash() const;
   std::size_t full_hash() const;
-  
+
   friend bool full_eq(const irept &a, const irept &b);
-  
+
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
-  
+
 protected:
   inline static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
@@ -294,7 +294,7 @@ public:
       hash_code=0;
       #endif
     }
-    
+
     void swap(dt &d)
     {
       d.data.swap(data);
@@ -305,7 +305,7 @@ public:
       std::swap(d.hash_code, hash_code);
       #endif
     }
-    
+
     #ifdef SHARING
     dt():ref_count(1)
       #ifdef HASH_CODE
@@ -322,17 +322,17 @@ public:
     }
     #endif
   };
-  
+
 protected:
   #ifdef SHARING
   dt *data;
   static dt empty_d;
-  
-  static void remove_ref(dt *old_data);  
+
+  static void remove_ref(dt *old_data);
   static void nonrecursive_destructor(dt *old_data);
   void detach();
 
-public:  
+public:
   inline const dt &read() const
   {
     return *data;
@@ -346,7 +346,7 @@ public:
     #endif
     return *data;
   }
-  
+
   #else
   dt data;
 
@@ -378,7 +378,7 @@ struct irep_full_hash
 
 struct irep_full_eq
 {
-  inline bool operator()(const irept &i1, const irept &i2) const 
+  inline bool operator()(const irept &i1, const irept &i2) const
   {
     return full_eq(i1, i2);
   }

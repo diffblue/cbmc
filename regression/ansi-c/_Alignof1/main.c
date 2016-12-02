@@ -1,5 +1,5 @@
 #define STATIC_ASSERT(condition) \
-  int some_array##__LINE__[(condition) ? 1 : -1];    
+  int some_array##__LINE__[(condition) ? 1 : -1];
 
 // C11: _Alignof
 // 6.5.3.4
@@ -46,7 +46,7 @@ STATIC_ASSERT(_Alignof(struct foo)==128);
 
 // gcc takes the following, but clang doesn't
 STATIC_ASSERT(_Alignof(int __attribute__((aligned(128))))==128);
-#endif    
+#endif
 
 int main()
 {

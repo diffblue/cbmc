@@ -1,10 +1,8 @@
 /*******************************************************************\
 
-Module: Traces of GOTO Programs
+Module: Witnesses for Traces and Proofs
 
 Author: Daniel Kroening
-
-  Date: January 2015
 
 \*******************************************************************/
 
@@ -14,11 +12,11 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 
-#include "graphml_goto_trace.h"
+#include "graphml_witness.h"
 
 /*******************************************************************\
 
-Function: remove_l0_l1
+Function: graphml_witnesst::remove_l0_l1
 
   Inputs:
 
@@ -28,7 +26,7 @@ Function: remove_l0_l1
 
 \*******************************************************************/
 
-static void remove_l0_l1(exprt &expr)
+void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {
@@ -56,7 +54,7 @@ static void remove_l0_l1(exprt &expr)
 
 /*******************************************************************\
 
-Function: convert_assign_rec
+Function: graphml_witnesst::convert_assign_rec
 
   Inputs:
 
@@ -66,8 +64,7 @@ Function: convert_assign_rec
 
 \*******************************************************************/
 
-static std::string convert_assign_rec(
-  const namespacet &ns,
+std::string graphml_witnesst::convert_assign_rec(
   const irep_idt &identifier,
   const code_assignt &assign)
 {
@@ -86,7 +83,7 @@ static std::string convert_assign_rec(
           from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
           type.subtype());
       if(!result.empty()) result+=' ';
-      result+=convert_assign_rec(ns, identifier, code_assignt(index, *it));
+      result+=convert_assign_rec(identifier, code_assignt(index, *it));
     }
   }
   else if(assign.rhs().id()==ID_struct ||
@@ -116,7 +113,7 @@ static std::string convert_assign_rec(
           c_it->get_name(),
           it->type());
       if(!result.empty()) result+=' ';
-      result+=convert_assign_rec(ns, identifier, code_assignt(member, *it));
+      result+=convert_assign_rec(identifier, code_assignt(member, *it));
       ++c_it;
     }
   }
@@ -134,28 +131,25 @@ static std::string convert_assign_rec(
 
 /*******************************************************************\
 
-Function: convert
+Function: graphml_witnesst::operator()
 
   Inputs:
 
  Outputs:
 
- Purpose:
+ Purpose: counterexample witness
 
 \*******************************************************************/
 
-void convert(
-  const namespacet &ns,
-  const goto_tracet &goto_trace,
-  graphmlt &graphml)
+void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
-  const unsigned sink=graphml.add_node();
+  const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
   graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
 
   // step numbers start at 1
-  std::vector<unsigned> step_to_node(goto_trace.steps.size()+1, 0);
+  std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
 
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
@@ -190,7 +184,7 @@ void convert(
       continue;
     }
 
-    const unsigned node=graphml.add_node();
+    const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
       i2string(it->pc->location_number)+"."+i2string(it->step_nr);
     graphml[node].file=source_location.get_file();
@@ -257,7 +251,7 @@ void convert(
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "assumption");
           code_assignt assign(it->lhs_object, it->lhs_object_value);
-          val.data=convert_assign_rec(ns, identifier, assign);
+          val.data=convert_assign_rec(identifier, assign);
 
           xmlt &val_s=edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");

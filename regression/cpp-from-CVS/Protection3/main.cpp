@@ -1,7 +1,7 @@
 class A
 {
 	int i;
-	
+
 	public:
 	class B
 	{

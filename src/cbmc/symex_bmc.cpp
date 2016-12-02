@@ -87,10 +87,10 @@ bool symex_bmct::get_unwind(
   // and 'infinity' when we have none.
 
   unsigned this_loop_limit=std::numeric_limits<unsigned>::max();
-  
+
   loop_limitst &this_thread_limits=
     thread_loop_limits[source.thread_nr];
-    
+
   loop_limitst::const_iterator l_it=this_thread_limits.find(id);
   if(l_it!=this_thread_limits.end())
     this_loop_limit=l_it->second;
@@ -142,7 +142,7 @@ bool symex_bmct::get_unwind_recursion(
 
   loop_limitst &this_thread_limits=
     thread_loop_limits[thread_nr];
-    
+
   loop_limitst::const_iterator l_it=this_thread_limits.find(id);
   if(l_it!=this_thread_limits.end())
     this_loop_limit=l_it->second;
@@ -165,7 +165,7 @@ bool symex_bmct::get_unwind_recursion(
                  << " recursion "
                  << symbol.display_name()
                  << " iteration " << unwind;
-    
+
     if(this_loop_limit!=std::numeric_limits<unsigned>::max())
       statistics() << " (" << this_loop_limit << " max)";
 

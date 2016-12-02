@@ -53,7 +53,7 @@ $(patsubst %, %.dir, $(DIRS)):
 
 $(patsubst %, %_generated_files, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(patsubst %_generated_files, %, $@) generated_files
-	
+
 generated_files: $(patsubst %, %_generated_files, $(DIRS))
 
 # cleaning
@@ -93,11 +93,13 @@ zlib-download:
 
 libzip-download:
 	@echo "Downloading libzip 1.1.2"
-	@lwp-download http://www.nih.at/libzip/libzip-1.1.2.tar.gz
-	@tar xfz libzip-1.1.2.tar.gz
+	# The below wants SSL
+	#@lwp-download http://www.nih.at/libzip/libzip-1.1.2.tar.gz
+	@lwp-download http://http.debian.net/debian/pool/main/libz/libzip/libzip_1.1.2.orig.tar.gz
+	@tar xfz libzip_1.1.2.orig.tar.gz
 	@rm -Rf ../libzip
 	@mv libzip-1.1.2 ../libzip
-	@rm libzip-1.1.2.tar.gz
+	@rm libzip_1.1.2.orig.tar.gz
 
 libzip-build:
 	@echo "Building zlib"

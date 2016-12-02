@@ -23,7 +23,7 @@ Inputs:
 
 Outputs:
 
-Purpose: 
+Purpose:
 
 \*******************************************************************/
 
@@ -101,13 +101,13 @@ void remove_complex(exprt &expr)
                      complex_member(expr.op1(), ID_real));
 
       struct_expr.op0().add_source_location()=expr.source_location();
-      
+
       struct_expr.op1()=
         binary_exprt(complex_member(expr.op0(), ID_imag), expr.id(),
-                     complex_member(expr.op1(), ID_imag));      
+                     complex_member(expr.op1(), ID_imag));
 
       struct_expr.op1().add_source_location()=expr.source_location();
-      
+
       expr=struct_expr;
     }
     else if(expr.id()==ID_unary_minus)
@@ -122,12 +122,12 @@ void remove_complex(exprt &expr)
         unary_minus_exprt(complex_member(expr.op0(), ID_real));
 
       struct_expr.op0().add_source_location()=expr.source_location();
-      
+
       struct_expr.op1()=
         unary_minus_exprt(complex_member(expr.op0(), ID_imag));
 
       struct_expr.op1().add_source_location()=expr.source_location();
-      
+
       expr=struct_expr;
     }
     else if(expr.id()==ID_complex)
@@ -151,13 +151,13 @@ void remove_complex(exprt &expr)
           typecast_exprt(complex_member(expr.op0(), ID_real), subtype);
 
         struct_expr.op0().add_source_location()=expr.source_location();
-        
+
         struct_expr.op1()=
           typecast_exprt(complex_member(expr.op0(), ID_imag), subtype);
 
         struct_expr.op1().add_source_location()=expr.source_location();
-        
-        expr=struct_expr;        
+
+        expr=struct_expr;
       }
       else
       {
@@ -168,7 +168,7 @@ void remove_complex(exprt &expr)
         struct_expr.op0()=typecast_exprt(expr.op0(), subtype);
         struct_expr.op1()=gen_zero(subtype);
         struct_expr.add_source_location()=expr.source_location();
-        
+
         expr=struct_expr;
       }
     }
@@ -223,7 +223,7 @@ void remove_complex(typet &type)
   else if(type.id()==ID_complex)
   {
     remove_complex(type.subtype());
-    
+
     // Replace by a struct with two members.
     // The real part goes first.
     struct_typet struct_type;
@@ -232,8 +232,8 @@ void remove_complex(typet &type)
     struct_type.components()[0].type()=type.subtype();
     struct_type.components()[0].set_name(ID_real);
     struct_type.components()[1].type()=type.subtype();
-    struct_type.components()[1].set_name(ID_imag);    
-    
+    struct_type.components()[1].set_name(ID_imag);
+
     type=struct_type;
   }
 }
@@ -351,4 +351,3 @@ void remove_complex(goto_modelt &goto_model)
 {
   remove_complex(goto_model.symbol_table, goto_model.goto_functions);
 }
-

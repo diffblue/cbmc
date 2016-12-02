@@ -379,4 +379,3 @@ void dependence_grapht::add_dep(
   nodes[n_from].out[n_to].add(kind);
   nodes[n_to].in[n_from].add(kind);
 }
-

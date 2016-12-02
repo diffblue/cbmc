@@ -73,7 +73,7 @@ void symex_target_equationt::shared_read(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.type=goto_trace_stept::SHARED_READ;
@@ -103,7 +103,7 @@ void symex_target_equationt::shared_write(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.type=goto_trace_stept::SHARED_WRITE;
@@ -239,10 +239,10 @@ void symex_target_equationt::assignment(
   assignment_typet assignment_type)
 {
   assert(ssa_lhs.is_not_nil());
-  
+
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_full_lhs;
@@ -278,10 +278,10 @@ void symex_target_equationt::decl(
   assignment_typet assignment_type)
 {
   assert(ssa_lhs.is_not_nil());
-  
+
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
@@ -335,7 +335,7 @@ void symex_target_equationt::location(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::LOCATION;
   SSA_step.source=source;
@@ -362,7 +362,7 @@ void symex_target_equationt::function_call(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::FUNCTION_CALL;
   SSA_step.source=source;
@@ -390,7 +390,7 @@ void symex_target_equationt::function_return(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
   SSA_step.source=source;
@@ -419,7 +419,7 @@ void symex_target_equationt::output(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
@@ -450,7 +450,7 @@ void symex_target_equationt::output_fmt(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::OUTPUT;
   SSA_step.source=source;
@@ -482,7 +482,7 @@ void symex_target_equationt::input(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::INPUT;
   SSA_step.source=source;
@@ -496,7 +496,7 @@ void symex_target_equationt::input(
 
 Function: symex_target_equationt::assumption
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -511,7 +511,7 @@ void symex_target_equationt::assumption(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSUME;
@@ -540,7 +540,7 @@ void symex_target_equationt::assertion(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::ASSERT;
@@ -569,7 +569,7 @@ void symex_target_equationt::goto_instruction(
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::GOTO;
@@ -582,7 +582,7 @@ void symex_target_equationt::goto_instruction(
 
 Function: symex_target_equationt::constraint
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -598,7 +598,7 @@ void symex_target_equationt::constraint(
   // like assumption, but with global effect
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
-  
+
   SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
   SSA_step.type=goto_trace_stept::CONSTRAINT;
@@ -614,7 +614,7 @@ Function: symex_target_equationt::convert
 
   Inputs: converter
 
- Outputs: 
+ Outputs:
 
  Purpose:
 
@@ -840,7 +840,7 @@ void symex_target_equationt::convert_assertions(
       implies_exprt implication(
         assumption,
         it.cond_expr);
-      
+
       // do the conversion
       it.cond_literal=prop_conv.convert(implication);
 
@@ -886,7 +886,7 @@ void symex_target_equationt::convert_io(
       for(const auto & o_it : it.io_args)
       {
         exprt tmp=o_it;
-        
+
         if(tmp.is_constant() ||
            tmp.id()==ID_string_constant)
           it.converted_io_args.push_back(tmp);
@@ -952,7 +952,7 @@ void symex_target_equationt::output(std::ostream &out) const
 {
   for(const auto & it : SSA_steps)
   {
-    it.output(ns, out);    
+    it.output(ns, out);
     out << "--------------\n";
   }
 }
@@ -1005,13 +1005,13 @@ void symex_target_equationt::SSA_stept::output(
     case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
     case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
     case PHI: out << "PHI"; break;
-    case GUARD: out << "GUARD"; break; 
+    case GUARD: out << "GUARD"; break;
     default:;
     }
 
     out << ")" << std::endl;
     break;
-    
+
   case goto_trace_stept::DEAD: out << "DEAD" << std::endl; break;
   case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION_CALL" << std::endl; break;
   case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION_RETURN" << std::endl; break;
@@ -1029,7 +1029,7 @@ void symex_target_equationt::SSA_stept::output(
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
     out << from_expr(ns, "", cond_expr) << std::endl;
-  
+
   if(is_assert() || is_constraint())
     out << comment << std::endl;
 
@@ -1081,4 +1081,3 @@ std::ostream &operator<<(
   step.output(ns, out);
   return out;
 }
-

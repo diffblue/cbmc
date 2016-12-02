@@ -16,5 +16,5 @@ int main()
     c[i]=i;
 
   assert(__CPROVER_forall {unsigned i; i>9 || c[i]==i});
-  return 0;                
+  return 0;
 }

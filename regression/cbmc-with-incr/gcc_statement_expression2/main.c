@@ -8,7 +8,7 @@ int f()
 int main()
 {
   int i;
-  
+
   int x = ({f();});
   assert(x==1);
 
@@ -20,7 +20,7 @@ int main()
   int z = ({ i=1; i++; });
   assert(z==1);
   assert(i==2);
-  
+
   // same at top level
   ({ i=1; i++; });
   assert(i==2);

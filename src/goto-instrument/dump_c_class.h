@@ -131,4 +131,3 @@ protected:
     std::list<irep_idt> &local_static,
     std::list<irep_idt> &local_type_decls);
 };
-

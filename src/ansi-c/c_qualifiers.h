@@ -20,13 +20,13 @@ public:
   {
     clear();
   }
-  
+
   explicit c_qualifierst(const typet &src)
   {
     clear();
     read(src);
   }
-  
+
   void clear()
   {
     is_constant=false;
@@ -40,21 +40,21 @@ public:
 
   // standard ones
   bool is_constant, is_volatile, is_restricted, is_atomic, is_noreturn;
-  
+
   // MS Visual Studio extension
   bool is_ptr32, is_ptr64;
-  
+
   // gcc extension
   bool is_transparent_union;
-  
+
   // will likely add alignment here as well
-  
+
   std::string as_string() const;
   void read(const typet &src);
   void write(typet &src) const;
-  
+
   static void clear(typet &dest);
-  
+
   bool is_subset_of(const c_qualifierst &q) const
   {
     return (!is_constant || q.is_constant) &&
@@ -67,7 +67,7 @@ public:
 
     // is_transparent_union isn't checked
   }
-  
+
   friend bool operator == (
     const c_qualifierst &a,
     const c_qualifierst &b)
@@ -88,7 +88,7 @@ public:
   {
     return !(a==b);
   }
-  
+
   c_qualifierst &operator += (
     const c_qualifierst &b)
   {
@@ -102,7 +102,7 @@ public:
     is_noreturn|=b.is_noreturn;
     return *this;
   }
-  
+
   friend unsigned count(const c_qualifierst &q)
   {
     return q.is_constant+q.is_volatile+q.is_restricted+q.is_atomic+
