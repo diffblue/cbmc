@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 
 class symbol_tablet;
-class symbolt;
 class exprt;
 class namespacet;
 class typet;
