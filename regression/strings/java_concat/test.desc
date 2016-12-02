@@ -1,0 +1,8 @@
+CORE
+test_concat.class
+--pass
+^EXIT=10$
+^SIGNAL=0$
+^\[assertion.1\] assertion at file test_concat.java line 9: SUCCESS$
+^\[assertion.2\] assertion at file test_concat.java line 10: FAILURE$
+--

@@ -342,6 +342,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if(cmdline.isset("pass"))
+  {
+    options.set_option("pass", true);
+  }
+
   if(cmdline.isset("max-node-refinement"))
     options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
 
@@ -994,6 +999,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove skips
     remove_skip(goto_functions);
     goto_functions.update();
+
   }
 
   catch(const char *e)

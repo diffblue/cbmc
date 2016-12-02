@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <iostream>
 
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
@@ -123,6 +124,33 @@ void smt2_convt::write_header()
   // set-logic should come after setting options
   if(emit_set_logic && !logic.empty())
     out << "(set-logic " << logic << ")" << "\n";
+
+  if (strings_mode == STRINGS_SMTLIB) {
+    out << "; string support via QF_S SMT-LIB logic\n";
+    out << "(define-sort cprover.String () String)\n";
+    out << "(define-sort cprover.Char () String)\n";
+    out << "(define-sort cprover.Pos () (_ BitVec "
+        << string_length_width << "))\n";
+    out << "(define-fun cprover.ubv_to_int ((?x cprover.Pos)) "
+        << "Int ";
+    out << "(bv2nat ?x))\n\n";
+    // out << "(let ((bit0 (_ bv0 1))) (+ ";
+    // mp_integer bit;
+    // for (size_t i = 0; i < string_length_width; ++i) {
+    //   bit.setPower2(i);
+    //   out << "(ite (= ((_ extract " << i << " " << i << ") ?x) bit0) 0 "
+    //       << bit << ") ";
+    // }
+    // out << "0))"
+    //     << ")\n\n";
+  } else if (strings_mode == STRINGS_QARRAY) {
+    out << "; string support via PASS-style quantified arrays\n";
+    out << "(define-sort cprover.Char () (_ BitVec 8))\n"
+        << "(define-sort cprover.Pos () (_ BitVec "
+        << string_length_width << "))\n"
+        << "(define-sort cprover.String () (Array cprover.Pos cprover.Char))\n";
+    out << "(declare-fun cprover.str.len (cprover.String) cprover.Pos)\n";
+  }
 }
 
 /*******************************************************************\
@@ -2005,6 +2033,15 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_constraint_select_one)
   {
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is not yet supported");
+  }
+  else if(expr.id()==ID_function_application)
+  {
+    defined_expressionst::const_iterator it=defined_expressions.find(expr);
+    if (it != defined_expressions.end()) {
+      out << it->second;
+    } else {
+      convert_uninterpreted_function(expr);
+    }
   }
   else
     UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
@@ -4441,7 +4478,164 @@ void smt2_convt::convert_overflow(const exprt &expr)
   UNREACHABLE;
 }
 
-/*******************************************************************\
+
+void smt2_convt::convert_uninterpreted_function(const exprt &expr)
+{
+  const function_application_exprt &f = to_function_application_expr(expr);
+  const exprt &name = f.function();
+
+  // check if this is something we recognize
+  if (name.id() == ID_symbol) {
+    const irep_idt &id=to_symbol_expr(name).get_identifier();
+    if (strings_mode != STRINGS_OFF) {
+      if (id == string_equal_func) {
+        return convert_string_equal(f);
+      } else if (id == string_char_at_func) {
+        return convert_string_char_at(f);
+      } else if (id == string_length_func) {
+        return convert_string_length(f);
+      } else if (id == string_concat_func) {
+        return convert_string_concat(f);
+      } else if (id == string_substring_func) {
+        return convert_string_substring(f);
+      } else if (id == string_is_prefix_func) {
+        return convert_string_is_prefix(f);
+      } else if (id == string_is_suffix_func) {
+        return convert_string_is_suffix(f);
+      }
+    }
+  }
+  
+  UNEXPECTEDCASE("unsupported uninterpreted function: " + name.id_string());
+}
+
+
+void smt2_convt::convert_string_equal(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_equal");
+  }
+  out << "(= ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_char_at(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_char_at");
+  }
+  if (strings_mode == STRINGS_SMTLIB) {
+    out << "(str.at ";
+    convert_expr(args[0]);
+    out << " (cprover.ubv_to_int ";
+    typecast_exprt pos =
+      typecast_exprt(args[1], unsignedbv_typet(string_length_width));
+    convert_expr(pos);
+    out << "))";
+  } else {
+    out << "(select ";
+    convert_expr(args[0]);
+    out << " ";
+    typecast_exprt pos =
+      typecast_exprt(args[1], unsignedbv_typet(string_length_width));
+    convert_expr(pos);
+    out << ")";
+  }
+}
+
+
+void smt2_convt::convert_string_concat(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_concat");
+  }
+  out << "(str.++ ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_substring(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 3) {
+    UNEXPECTEDCASE("args mismatch in string_substring");
+  }
+  out << "(let ((?i (cprover.ubv_to_int ";
+  typecast_exprt pi =
+    typecast_exprt(args[1], unsignedbv_typet(string_length_width));
+  convert_typecast(pi);
+  out << ")) (?j ";
+  out << "(cprover.ubv_to_int ";
+  typecast_exprt pj =
+    typecast_exprt(args[2], unsignedbv_typet(string_length_width));
+  convert_typecast(pj);
+  out << "))) ";
+  out << "(str.substr ";
+  convert_expr(args[0]);
+  out << " ";
+  out << "?i (+ ?i ?j))";
+}
+
+
+void smt2_convt::convert_string_is_prefix(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_is_prefix");
+  }
+  out << "(str.prefixof ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_is_suffix(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_is_suffix");
+  }
+  out << "(str.suffixof ";
+  convert_expr(args[0]);
+  out << " ";
+  convert_expr(args[1]);
+  out << ")";
+}
+
+
+void smt2_convt::convert_string_length(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 1) {
+    UNEXPECTEDCASE("args mismatch in string_length");
+  }
+  if (strings_mode == STRINGS_SMTLIB) {
+    if (string_lengths.find(f) != string_lengths.end()) {
+      out << string_lengths[f];
+    } else {
+      UNEXPECTEDCASE("string_length not found");
+    }
+  } else {
+    out << "(cprover.str.len ";
+    convert_expr(args[0]);
+    out << ")";
+  }
+}
+
+
+/*******************************************************************    \
 
 Function: smt2_convt::set_to
 
@@ -4642,26 +4836,28 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      // introduce a temporary array.
-      exprt tmp=to_string_constant(expr).to_array_expr();
-      const array_typet &array_type=to_array_type(tmp.type());
+      if (strings_mode == STRINGS_OFF) {
+        // introduce a temporary array.
+        exprt tmp=to_string_constant(expr).to_array_expr();
+        const array_typet &array_type=to_array_type(tmp.type());
 
-      irep_idt id="string."+i2string(defined_expressions.size());
-      out << "; the following is a substitute for a string" << "\n";
-      out << "(declare-fun " << id << " () ";
-      convert_type(array_type);
-      out << ")" << "\n";
+        irep_idt id="string."+i2string(defined_expressions.size());
+        out << "; the following is a substitute for a string" << "\n";
+        out << "(declare-fun " << id << " () ";
+        convert_type(array_type);
+        out << ")" << "\n";
 
-      for(std::size_t i=0; i<tmp.operands().size(); i++)
-      {
-        out << "(assert (= (select " << id;
-        convert_expr(from_integer(i, array_type.size().type()));
-        out << ") "; // select
-        convert_expr(tmp.operands()[i]);
-        out << "))" << "\n";
+        for(std::size_t i=0; i<tmp.operands().size(); i++)
+        {
+          out << "(assert (= (select " << id;
+          convert_expr(from_integer(i, array_type.size().type()));
+          out << ") "; // select
+          convert_expr(tmp.operands()[i]);
+          out << "))" << "\n";
+        }
+
+        defined_expressions[expr]=id;
       }
-
-      defined_expressions[expr]=id;
     }
   }
   else if(expr.id()==ID_object_size &&
@@ -4743,7 +4939,419 @@ void smt2_convt::find_symbols(const exprt &expr)
     }
   }
 
+  if (strings_mode != STRINGS_OFF && expr.id() == ID_function_application) {
+    const function_application_exprt &f = to_function_application_expr(expr);
+    const exprt &name = f.function();
+    if (name.id() == ID_symbol) {
+      const irep_idt &id = to_symbol_expr(name).get_identifier();
+      const function_application_exprt::argumentst &args = f.arguments();
+
+      if (id == string_literal_func) {
+        return define_string_literal(f);
+      } else if (id == char_literal_func) {
+        return define_char_literal(f);
+      } else if (id == string_char_set_func) {
+        return define_string_char_set(f);
+      }
+      
+      if (strings_mode == STRINGS_SMTLIB) {
+        if (id == string_length_func &&
+            string_lengths.find(expr) == string_lengths.end()) {
+          const typet &type = f.type();
+          if (type.id()==ID_unsignedbv ||
+              type.id()==ID_signedbv) {
+            std::size_t w=to_bitvector_type(type).get_width();
+            irep_idt id="string_length."+i2string(string_lengths.size());
+            typecast_exprt len = typecast_exprt(
+              symbol_exprt(id, expr.type()),
+              unsignedbv_typet(string_length_width));
+            out << "(declare-fun " << id << " () ";
+            convert_type(expr.type());
+            out << ")\n";
+            out << "(assert (= (cprover.ubv_to_int ";
+            convert_typecast(len);
+            out << ") (str.len ";
+            convert_expr(args[0]);
+            out << ")))\n";
+            // out << "(define-fun " << id << " () ";
+            // convert_type(expr.type());
+            // out << " ((_ int2bv " << w << ") (str.len ";
+            // convert_expr(args[0]);
+            // out << ")))\n";
+            string_lengths[expr] = id;
+          } else {
+            UNEXPECTEDCASE("return type of string_length is not a bit-vector");
+          }
+        }
+      } else {
+        if (id == string_equal_func) {
+          define_string_equal(f);
+        } else if (id == string_concat_func) {
+          define_string_concat(f);
+        } else if (id == string_substring_func) {
+          define_string_substring(f);
+        } else if (id == string_is_prefix_func) {
+          define_string_is_prefix(f);
+        } else if (id == string_is_suffix_func) {
+          define_string_is_suffix(f);
+        }
+      }
+    }
+  }
 }
+
+
+void smt2_convt::define_string_equal(const function_application_exprt &f)
+{
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 2) {
+    UNEXPECTEDCASE("args mismatch in string_equal");
+  }
+  const exprt &s1 = args[0];
+  const exprt &s2 = args[1];
+
+  out << "; string equal\n";
+  
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id = "string_equal." + index;
+  out << "(declare-fun " << id << " () Bool)\n";
+  irep_idt s1id = "string_equal.s1." + index;
+  irep_idt s2id = "string_equal.s2." + index;
+  out << "(define-fun " << s1id << " () cprover.String ";
+  convert_expr(s1);
+  out << ")\n";
+  out << "(define-fun " << s2id << " () cprover.String ";
+  convert_expr(s2);
+  out << ")\n";
+  irep_idt witness = "string_equal.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> " << id
+      << " (= (cprover.str.len " << s1id << ") "
+      << "(cprover.str.len " << s2id << "))))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << s2id << " ?n)))))\n";
+
+  out << "(assert (=> (not " << id << ") (or ";
+  out << "(not (= (cprover.str.len " << s1id << ") (cprover.str.len "
+      << s2id << ")))\n";
+  out << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << s2id << " " << witness << ")))";
+  out << "))))\n\n";
+
+  defined_expressions[f] = id;
+}
+
+
+void smt2_convt::define_string_literal(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+    
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 1) {
+    UNEXPECTEDCASE("args mismatch in string_literal");
+  }
+  const exprt &arg = args[0];
+  if (arg.operands().size() == 1 &&
+      arg.operands()[0].operands().size() == 1 &&
+      arg.operands()[0].operands()[0].operands().size() == 2 &&
+      arg.operands()[0].operands()[0].operands()[0].id() == ID_string_constant){
+    const exprt &s = arg.operands()[0].operands()[0].operands()[0];
+    irep_idt sval = to_string_constant(s).get_value();
+    irep_idt id="string."+i2string(defined_expressions.size());
+    defined_expressions[f] = id;
+    if (strings_mode == STRINGS_SMTLIB) {
+      // TODO -- handle better (also quoting)
+      out << "(define-fun " << id << " () cprover.String \""
+          << sval << "\")\n";
+    } else {
+      out << "(declare-fun " << id << " () cprover.String)\n";
+
+      for (std::size_t i = 0; i < sval.size(); ++i) {
+        out << "(assert (= (select " << id << " (_ bv" << i << " "
+            << string_length_width << "))"
+            << " (_ bv" << int(sval[i]) << " 8)))\n";
+      }
+      out << "(assert (= (cprover.str.len " << id << ") "
+          << "(_ bv" << sval.size() << " " << string_length_width << ")))\n";
+        
+      defined_expressions[f] = id;
+    }
+    return;
+  }
+  UNEXPECTEDCASE("string_literal");
+}
+
+
+void smt2_convt::define_char_literal(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
+  const function_application_exprt::argumentst &args = f.arguments();
+  if (args.size() != 1) {
+    UNEXPECTEDCASE("args mismatch in string_literal");
+  }
+  const exprt &arg = args[0];
+  if (arg.operands().size() == 1 &&
+      arg.operands()[0].operands().size() == 1 &&
+      arg.operands()[0].operands()[0].operands().size() == 2 &&
+      arg.operands()[0].operands()[0].operands()[0].id() == ID_string_constant){
+    const exprt &s = arg.operands()[0].operands()[0].operands()[0];
+    irep_idt sval = to_string_constant(s).get_value();
+    if (sval.size() != 1) {
+      UNEXPECTEDCASE("bad literal in char_literal");
+    }
+    
+    irep_idt id="char."+i2string(defined_expressions.size());
+    defined_expressions[f] = id;
+    if (strings_mode == STRINGS_SMTLIB) {
+      // TODO -- handle better (also quoting)
+      out << "(define-fun " << id << " () cprover.Char \""
+          << sval << "\")\n";
+    } else {
+      out << "(define-fun " << id << " () cprover.Char "
+          << "(_ bv" << int(sval[0]) << " 8))\n";
+    }
+    return;
+  }
+  UNEXPECTEDCASE("char_literal");
+}
+
+
+void smt2_convt::define_string_concat(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+  
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_concat." + index;
+  const function_application_exprt::argumentst &args = f.arguments();
+  defined_expressions[f] = id;
+  
+  out << "; string concatenation\n";
+  out << "(declare-fun " << id << " () cprover.String)\n";
+  irep_idt s0id = "string_concat.s0." + index;
+  irep_idt s1id = "string_concat.s1." + index;
+  out << "(define-fun " << s0id << " () cprover.String ";
+  convert_expr(args[0]);
+  out << ")\n";
+  out << "(define-fun " << s1id << " () cprover.String ";
+  convert_expr(args[1]);
+  out << ")\n";
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (bvult ?n (cprover.str.len " << s0id << ")) "
+      << "(= (select " << s0id << " ?n) (select " << id << " ?n)))))\n";
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (bvult ?n (cprover.str.len " << s1id << ")) "
+      << "(= (select " << s1id << " ?n) (select " << id
+      << " (bvadd (cprover.str.len " << s0id << ") ?n))))))\n";
+  out << "(assert (= (cprover.str.len " << id
+      << ") (bvadd (cprover.str.len " << s0id << ") "
+      << "(cprover.str.len " << s1id << "))))\n";
+  out << "(assert (bvuge (cprover.str.len " << id << ") "
+      << "(cprover.str.len " << s0id << ")))\n";
+  out << "(assert (bvuge (cprover.str.len " << id << ") "
+      << "(cprover.str.len " << s1id << ")))\n\n";
+}
+
+
+void smt2_convt::define_string_substring(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_substring." + index;
+  const function_application_exprt::argumentst &args = f.arguments();  
+  defined_expressions[f] = id;
+
+  out << "; substring\n";
+  out << "(declare-fun " << id << " () cprover.String)\n";
+
+  irep_idt sid = "string_substring.s." + index;
+  irep_idt iid = "string_substring.i." + index;
+  irep_idt jid = "string_substring.j." + index;
+
+  out << "(define-fun " << sid << " () cprover.String ";
+  convert_expr(args[0]);
+  out << ")\n";
+  
+  typecast_exprt i = typecast_exprt(
+    args[1], unsignedbv_typet(string_length_width));
+  typecast_exprt j = typecast_exprt(
+    args[2], unsignedbv_typet(string_length_width));
+
+  out << "(define-fun " << iid << " () cprover.Pos ";
+  convert_expr(i);
+  out << ")\n";
+  out << "(define-fun " << jid << " () cprover.Pos ";
+  convert_expr(j);
+  out << ")\n";
+  
+  out << "(assert "
+      << "(forall ((?n cprover.Pos)) "
+      << "(=> (bvult ?n (cprover.str.len " << id << "))\n"
+      << "(= (select " << id << " ?n) (select " << sid
+      << " (bvadd " << iid << " ?n))))))\n";
+
+  out << "(assert (and "
+      << "(bvult " << iid << " " << jid << ") "
+      << "(bvule " << jid << " (cprover.str.len " << sid << "))\n"
+      << "(= (cprover.str.len " << id << ") "
+      << "(bvsub " << jid << " " << iid << "))))\n";
+
+  out << "(assert (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << id << ")))\n\n";
+}
+
+
+void smt2_convt::define_string_is_prefix(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_isprefix." + index;
+  const function_application_exprt::argumentst &args = f.arguments();  
+  defined_expressions[f] = id;
+
+  irep_idt sid = "string_prefix.s." + index;
+  irep_idt s1id = "string_prefix.s1." + index;
+  
+  out << "; string is prefix\n"
+      << "(declare-fun " << id << " () Bool)\n";
+  out << "(define-fun " << s1id << " () cprover.String ";
+  convert_expr(args[0]);
+  out << ")\n";
+  out << "(define-fun " << sid << " () cprover.String ";
+  convert_expr(args[1]);
+
+  irep_idt ugeid = "string_prefix.uge." + index;
+  out << ")\n";
+  out << "(define-fun " << ugeid << " () Bool "
+      << " (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))\n";
+    
+  out << "(assert (=> " << id << " " << ugeid << "))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << sid << " ?n)))))\n";
+
+  irep_idt witness = "string_prefix.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> (not " << id << ") (or\n"
+      << "(not " << ugeid << ")\n"
+      << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << sid << " " << witness << "))))\n";
+  out << ")))\n\n";
+}
+
+
+void smt2_convt::define_string_is_suffix(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
+  std::string index = i2string(defined_expressions.size());
+  irep_idt id="string_issuffix." + index;
+  const function_application_exprt::argumentst &args = f.arguments();  
+  defined_expressions[f] = id;
+
+  irep_idt sid = "string_suffix.s." + index;
+  irep_idt s1id = "string_suffix.s1." + index;
+  
+  out << "; string is suffix\n"
+      << "(declare-fun " << id << " () Bool)\n";
+  out << "(define-fun " << s1id << " () cprover.String ";
+  convert_expr(args[0]);
+  out << ")\n";
+  out << "(define-fun " << sid << " () cprover.String ";
+  convert_expr(args[1]);
+
+  irep_idt ugeid = "string_suffix.uge." + index;
+  out << ")\n";
+  out << "(define-fun " << ugeid << " () Bool "
+      << " (bvuge (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))\n";
+    
+  out << "(assert (=> " << id << " " << ugeid << "))\n";
+
+  out << "(assert (forall ((?n cprover.Pos)) "
+      << "(=> (and " << id << " (bvult ?n (cprover.str.len " << s1id << "))) "
+      << "(= (select " << s1id << " ?n) "
+      << "(select " << sid << " (bvadd ?n "
+      << "(bvsub (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << "))))))))\n";
+
+  irep_idt witness = "string_suffix.idx." + index;
+  out << "(declare-fun " << witness << " () cprover.Pos)\n";
+  
+  out << "(assert (=> (not " << id << ") (or\n"
+      << "(not " << ugeid << ")\n"
+      << "(and (bvult " << witness << " (cprover.str.len " << s1id << ")) "
+      << "(not (= (select " << s1id << " " << witness << ") "
+      << "(select " << sid << " (bvadd " << witness
+      << " (bvsub (cprover.str.len " << sid << ") "
+      << "(cprover.str.len " << s1id << ")))))))\n";
+  out << ")))\n\n";
+}
+
+
+void smt2_convt::define_string_char_set(const function_application_exprt &f)
+{
+  if (defined_expressions.find(f) != defined_expressions.end()) {
+    return;
+  }
+
+  irep_idt id="string_char_set."+i2string(defined_expressions.size());
+  const function_application_exprt::argumentst &args = f.arguments();  
+  defined_expressions[f] = id;
+
+  out << "; string update\n";
+  out << "(declare-fun " << id << " () cprover.String)\n";
+  typecast_exprt idx = typecast_exprt(
+      args[1], unsignedbv_typet(string_length_width));
+  
+  if (strings_mode == STRINGS_SMTLIB) {
+    out << "(assert (= " << id
+        << "(let ((?s ";
+    convert_expr(args[0]);
+    out << ") (?i (cprover.ubv_to_int ";
+    convert_expr(idx);
+    out << "))) "
+        << "(str.++ (str.substr ?s 0 ?i) ";
+    convert_expr(args[2]);
+    out << " (str.substr ?s (+ ?i 1) (- (str.len ?s) (+ ?i 1)))))))\n";
+  } else {
+    out << "(assert "
+        << "(let ((?s ";
+    convert_expr(args[0]);
+    out << ") (?i ";
+    convert_expr(idx);
+    out << ") (?c ";
+    convert_expr(args[2]);
+    out << ")) (=> (bvult ?i (cprover.str.len ?s)) "
+        << "(and (= " << id << " (store ?s ?i ?c)) "
+        << "(= (cprover.str.len ?s) (cprover.str.len " << id << "))))))\n";
+  }
+}
+
 
 /*******************************************************************\
 
@@ -4818,6 +5426,12 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id()==ID_struct)
   {
+    irep_idt tag = to_struct_type(type).get_tag();
+    if (strings_mode != STRINGS_OFF && is_string_type(type)) {
+      out << "cprover.String";
+    } else if (strings_mode != STRINGS_OFF && is_char_type(type)) {
+      out << "cprover.Char";
+    } else
     if(use_datatypes)
     {
       assert(datatype_map.find(type)!=datatype_map.end());
@@ -4942,6 +5556,26 @@ void smt2_convt::convert_type(const typet &type)
   }
 }
 
+
+bool smt2_convt::is_string_type(const typet &type)
+{
+  if (type.id() == ID_struct) {
+    irep_idt tag = to_struct_type(type).get_tag();
+    return tag == irep_idt("__CPROVER_string");
+  }
+  return false;
+}
+
+
+bool smt2_convt::is_char_type(const typet &type)
+{
+  if (type.id() == ID_struct) {
+    irep_idt tag = to_struct_type(type).get_tag();
+    return tag == irep_idt("__CPROVER_char");
+  }
+  return false;
+}
+
 /*******************************************************************\
 
 Function: smt2_convt::find_symbols
@@ -5044,7 +5678,9 @@ void smt2_convt::find_symbols_rec(
      // Cater for mutually recursive struct types
      bool need_decl=false;
      if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
+        datatype_map.find(type)==datatype_map.end() &&
+        !(strings_mode != STRINGS_OFF &&
+          (is_string_type(type) || is_char_type(type))))
      {
        std::string smt_typename = "struct."+i2string(datatype_map.size());
        datatype_map[type] = smt_typename;

@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 #include "boolbv_type.h"
-
+#include <iostream>
 //#define DEBUG
 
 /*******************************************************************\

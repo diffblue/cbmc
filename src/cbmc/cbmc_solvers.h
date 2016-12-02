@@ -79,7 +79,6 @@ public:
   virtual std::unique_ptr<solvert> get_solver()
   {
     solvert *solver;
-
     if(options.get_bool_option("dimacs"))
       solver = get_dimacs();
     else if(options.get_bool_option("refine")) 
