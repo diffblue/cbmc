@@ -14,14 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
+#include <analyses/goto_check.h>
+
 class goto_functionst;
 class optionst;
 
 #define CLOBBER_OPTIONS \
   "(depth):(context-bound):(unwind):" \
-  "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
-  "(signed-overflow-check)(unsigned-overflow-check)(nan-check)" \
-  "(float-overflow-check)" \
+  GOTO_CHECK_OPTIONS \
   "(no-assertions)(no-assumptions)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \

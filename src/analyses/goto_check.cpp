@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/pointer_predicates.h>
 #include <util/cprover_prefix.h>
+#include <util/options.h>
 
 #include "local_bitvector_analysis.h"
 #include "goto_check.h"
@@ -39,6 +40,8 @@ public:
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
     enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
     enable_unsigned_overflow_check=_options.get_bool_option("unsigned-overflow-check");
+    enable_pointer_overflow_check=_options.get_bool_option("pointer-overflow-check");
+    enable_conversion_check=_options.get_bool_option("conversion-check");
     enable_undefined_shift_check=_options.get_bool_option("undefined-shift-check");
     enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
@@ -72,6 +75,7 @@ protected:
   void pointer_overflow_check(const exprt &expr, const guardt &guard);
   void pointer_validity_check(const dereference_exprt &expr, const guardt &guard);
   void integer_overflow_check(const exprt &expr, const guardt &guard);
+  void conversion_check(const exprt &expr, const guardt &guard);
   void float_overflow_check(const exprt &expr, const guardt &guard);
   void nan_check(const exprt &expr, const guardt &guard);
 
@@ -102,6 +106,8 @@ protected:
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
   bool enable_unsigned_overflow_check;
+  bool enable_pointer_overflow_check;
+  bool enable_conversion_check;
   bool enable_undefined_shift_check;
   bool enable_float_overflow_check;
   bool enable_simplify;
@@ -302,7 +308,7 @@ void goto_checkt::mod_by_zero_check(
 
 /*******************************************************************\
 
-Function: goto_checkt::integer_overflow_check
+Function: goto_checkt::conversion_check
 
   Inputs:
 
@@ -312,24 +318,19 @@ Function: goto_checkt::integer_overflow_check
 
 \*******************************************************************/
 
-void goto_checkt::integer_overflow_check(
+void goto_checkt::conversion_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!enable_signed_overflow_check &&
-     !enable_unsigned_overflow_check)
+  if(!enable_conversion_check)
     return;
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
 
-  if(type.id()==ID_signedbv && !enable_signed_overflow_check)
+  if(type.id()!=ID_signedbv &&
+     type.id()!=ID_unsignedbv)
     return;
-
-  if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
-    return;
-
-  // add overflow subgoal
 
   if(expr.id()==ID_typecast)
   {
@@ -490,10 +491,41 @@ void goto_checkt::integer_overflow_check(
           guard);
       }
     }
-
-    return;
   }
-  else if(expr.id()==ID_div)
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::integer_overflow_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::integer_overflow_check(
+  const exprt &expr,
+  const guardt &guard)
+{
+  if(!enable_signed_overflow_check &&
+     !enable_unsigned_overflow_check)
+    return;
+
+  // First, check type.
+  const typet &type=ns.follow(expr.type());
+
+  if(type.id()==ID_signedbv && !enable_signed_overflow_check)
+    return;
+
+  if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
+    return;
+
+  // add overflow subgoal
+
+  if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
 
@@ -898,7 +930,7 @@ void goto_checkt::pointer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
-  if(!enable_pointer_check)
+  if(!enable_pointer_overflow_check)
     return;
 
   if(expr.id()==ID_plus ||
@@ -1429,8 +1461,7 @@ void goto_checkt::check_rec(
   }
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult ||
-          expr.id()==ID_unary_minus ||
-          expr.id()==ID_typecast)
+          expr.id()==ID_unary_minus)
   {
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
@@ -1451,6 +1482,8 @@ void goto_checkt::check_rec(
       pointer_overflow_check(expr, guard);
     }
   }
+  else if(expr.id()==ID_typecast)
+    conversion_check(expr, guard);
   else if(expr.id()==ID_le || expr.id()==ID_lt ||
           expr.id()==ID_ge || expr.id()==ID_gt)
     pointer_rel_check(expr, guard);

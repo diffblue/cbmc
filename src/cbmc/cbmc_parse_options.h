@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
+#include <analyses/goto_check.h>
+
 #include "xml_interface.h"
 
 class bmct;
@@ -28,8 +30,7 @@ class optionst;
   "D:I:(c89)(c99)(c11)(cpp89)(cpp99)(cpp11)" \
   "(classpath):(cp):(main-class):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
-  "(bounds-check)(pointer-check)(div-by-zero-check)(memory-leak-check)" \
-  "(signed-overflow-check)(unsigned-overflow-check)(float-overflow-check)(nan-check)" \
+  GOTO_CHECK_OPTIONS \
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \

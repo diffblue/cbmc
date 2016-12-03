@@ -16,6 +16,7 @@ Author: Peter Schrammel
 #include <util/expr_util.h>
 #include <util/language.h>
 #include <util/i2string.h>
+#include <util/options.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -35,8 +36,6 @@ Author: Peter Schrammel
 #include <goto-programs/remove_returns.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
-
-#include <analyses/goto_check.h>
 
 #include <langapi/mode.h>
 
@@ -494,10 +493,6 @@ bool goto_diff_parse_optionst::process_goto_program(
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
-
-    // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
 
     // add failed symbols
     // needs to be done before pointer analysis

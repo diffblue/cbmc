@@ -43,7 +43,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_bitvector_analysis.h>
 #include <analyses/custom_bitvector_analysis.h>
 #include <analyses/escape_analysis.h>
-#include <analyses/goto_check.h>
 #include <analyses/call_graph.h>
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
@@ -783,59 +782,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   else
     options.set_option("assert-to-assume", false);
 
-  // check array bounds
-  if(cmdline.isset("bounds-check"))
-    options.set_option("bounds-check", true);
-  else
-    options.set_option("bounds-check", false);
-
-  // check division by zero
-  if(cmdline.isset("div-by-zero-check"))
-    options.set_option("div-by-zero-check", true);
-  else
-    options.set_option("div-by-zero-check", false);
-
-  // check undefined shifts
-  if(cmdline.isset("undefined-shift-check"))
-    options.set_option("undefined-shift-check", true);
-  else
-    options.set_option("undefined-shift-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("signed-overflow-check"))
-    options.set_option("signed-overflow-check", true);
-  else
-    options.set_option("signed-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("unsigned-overflow-check"))
-    options.set_option("unsigned-overflow-check", true);
-  else
-    options.set_option("unsigned-overflow-check", false);
-
-  // check overflow/underflow
-  if(cmdline.isset("float-overflow-check"))
-    options.set_option("float-overflow-check", true);
-  else
-    options.set_option("float-overflow-check", false);
-
-  // check for NaN (not a number)
-  if(cmdline.isset("nan-check"))
-    options.set_option("nan-check", true);
-  else
-    options.set_option("nan-check", false);
-
-  // check pointers
-  if(cmdline.isset("pointer-check"))
-    options.set_option("pointer-check", true);
-  else
-    options.set_option("pointer-check", false);
-
-  // check pointers
-  if(cmdline.isset("memory-leak-check"))
-    options.set_option("memory-leak-check", true);
-  else
-    options.set_option("memory-leak-check", false);
+  // all checks supported by goto_check
+  GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -1308,14 +1256,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
-    " --bounds-check               add array bounds checks\n"
-    " --div-by-zero-check          add division by zero checks\n"
-    " --pointer-check              add pointer checks\n"
-    " --memory-leak-check          add memory leak checks\n"
-    " --signed-overflow-check      add arithmetic over- and underflow checks\n"
-    " --unsigned-overflow-check    add arithmetic over- and underflow checks\n"
-    " --undefined-shift-check      add range checks for shift distances\n"
-    " --nan-check                  add floating-point NaN checks\n"
+    GOTO_CHECK_HELP
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
     " --error-label label          check that label is unreachable\n"
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n"

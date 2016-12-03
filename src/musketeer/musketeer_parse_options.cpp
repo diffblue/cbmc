@@ -32,7 +32,6 @@ Author:
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/local_may_alias.h>
-#include <analyses/goto_check.h>
 
 #include <goto-instrument/rw_set.h>
 #include <goto-instrument/wmm/weak_memory.h>
@@ -203,9 +202,6 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
   link_to_library(symbol_table, goto_functions, ui_message_handler);
 
   namespacet ns(symbol_table);
-
-  // add generic checks, if needed
-  goto_check(ns, options, goto_functions);
 
   if( cmdline.isset("mm")
       || cmdline.isset("all-shared")
