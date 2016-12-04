@@ -32,6 +32,9 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
   irep_idt line;
   unsigned thread_nr;
   bool is_violation;
+  bool has_invariant;
+  std::string invariant;
+  std::string invariant_scope;
 };
 
 class graphmlt : public graph<xml_graph_nodet>

@@ -75,6 +75,7 @@ static bool build_graph_rec(
     graphmlt::nodet &node=dest[n];
     node.node_name=node_name;
     node.is_violation=false;
+    node.has_invariant=false;
     node.thread_nr=0;
 
     for(xmlt::elementst::const_iterator
@@ -605,6 +606,17 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       xmlt &entry=node.new_element("data");
       entry.set_attribute("key", "violation");
       entry.data="true";
+    }
+
+    if(n.has_invariant)
+    {
+      xmlt &val=node.new_element("data");
+      val.set_attribute("key", "invariant");
+      val.data=n.invariant;
+
+      xmlt &val_s=node.new_element("data");
+      val_s.set_attribute("key", "invariant.scope");
+      val_s.data=n.invariant_scope;
     }
 
     for(graphmlt::edgest::const_iterator

@@ -151,6 +151,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   graphml[sink].node_name="sink";
   graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
+  graphml[sink].has_invariant=false;
 
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
@@ -196,6 +197,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     graphml[node].thread_nr=it->thread_nr;
     graphml[node].is_violation=
       it->type==goto_trace_stept::ASSERT && !it->cond_value;
+    graphml[node].has_invariant=false;
 
     step_to_node[it->step_nr]=node;
   }
@@ -341,6 +343,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
   graphml[sink].node_name="sink";
   graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
+  graphml[sink].has_invariant=false;
 
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(equation.SSA_steps.size()+1, 0);
@@ -384,6 +387,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
     graphml[node].thread_nr=it->source.thread_nr;
+    graphml[node].is_violation=false;
+    graphml[node].has_invariant=false;
 
     step_to_node[step_nr]=node;
   }
@@ -442,14 +447,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
         {
           irep_idt identifier=it->ssa_lhs.get_object_name();
 
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "invariant");
+          graphml[to].has_invariant=true;
           code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
-          val.data=convert_assign_rec(identifier, assign);
-
-          xmlt &val_s=edge.new_element("data");
-          val_s.set_attribute("key", "invariant.scope");
-          val_s.data=id2string(it->source.pc->source_location.get_function());
+          graphml[to].invariant=convert_assign_rec(identifier, assign);
+          graphml[to].invariant_scope=
+            id2string(it->source.pc->source_location.get_function());
         }
         else if(it->is_goto() &&
                 it->source.pc->is_goto())
