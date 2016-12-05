@@ -1,5 +1,5 @@
-#ifndef POLYNOMIAL_ACCELERATOR_H
-#define POLYNOMIAL_ACCELERATOR_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_ACCELERATOR_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_ACCELERATOR_H
 
 #include <map>
 #include <set>
@@ -129,4 +129,4 @@ class polynomial_acceleratort : public path_accelerationt {
 
 expr_sett find_modified(goto_programt::instructionst &body);
 
-#endif // POLYNOMIAL_ACCELERATOR_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_ACCELERATOR_H

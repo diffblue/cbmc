@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_SCOPE_H
-#define CPROVER_CPP_SCOPE_H
+#ifndef CPROVER_CPP_CPP_SCOPE_H
+#define CPROVER_CPP_CPP_SCOPE_H
 
 #include <iosfwd>
 #include <set>
@@ -125,4 +125,4 @@ public:
 
 std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt);
 
-#endif
+#endif // CPROVER_CPP_CPP_SCOPE_H

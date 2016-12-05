@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FIXEDBV_UTIL_H
-#define CPROVER_FIXEDBV_UTIL_H
+#ifndef CPROVER_UTIL_FIXEDBV_H
+#define CPROVER_UTIL_FIXEDBV_H
 
 #include "mp_arith.h"
 #include "format_spec.h"
@@ -96,4 +96,4 @@ bool operator >=(const fixedbvt &a, const fixedbvt &b);
 bool operator ==(const fixedbvt &a, const fixedbvt &b);
 bool operator !=(const fixedbvt &a, const fixedbvt &b);
 
-#endif
+#endif // CPROVER_UTIL_FIXEDBV_H

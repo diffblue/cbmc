@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_PROGRAM_H_
-#define CEGIS_INVARIANT_PROGRAM_H_
+#ifndef CPROVER_CEGIS_INVARIANT_OPTIONS_INVARIANT_PROGRAM_H
+#define CPROVER_CEGIS_INVARIANT_OPTIONS_INVARIANT_PROGRAM_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -145,4 +145,4 @@ public:
   virtual invariant_loopt &add_loop() = 0;
 };
 
-#endif /* CEGIS_INVARIANT_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_OPTIONS_INVARIANT_PROGRAM_H

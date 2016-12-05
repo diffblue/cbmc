@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
-#define CPROVER_POINTER_ANALYSIS_FAILED_SYMBOLS_H
+#ifndef CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
+#define CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 
 #include <util/irep.h>
 
@@ -24,4 +24,4 @@ exprt get_failed_symbol(
   const symbol_exprt &expr,
   const namespacet &ns);
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H

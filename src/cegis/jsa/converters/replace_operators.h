@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_REPLACE_OPERATORS_H_
-#define CEGIS_JSA_REPLACE_OPERATORS_H_
+#ifndef CPROVER_CEGIS_JSA_CONVERTERS_REPLACE_OPERATORS_H
+#define CPROVER_CEGIS_JSA_CONVERTERS_REPLACE_OPERATORS_H
 
 #include <goto-programs/goto_program.h>
 
@@ -46,4 +46,4 @@ void replace_query_ops(
     const __CPROVER_jsa_query_instructiont &instr,
     const __CPROVER_jsa_query_instructiont &prefix);
 
-#endif /* CEGIS_JSA_REPLACE_OPERATORS_H_ */
+#endif // CPROVER_CEGIS_JSA_CONVERTERS_REPLACE_OPERATORS_H

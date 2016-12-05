@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_HISTORY_H
-#define CPROVER_PATH_SYMEX_HISTORY_H
+#ifndef CPROVER_AA_PATH_SYMEX_PATH_SYMEX_HISTORY_H
+#define CPROVER_AA_PATH_SYMEX_PATH_SYMEX_HISTORY_H
 
 #include <cassert>
 #include <limits>
@@ -161,4 +161,4 @@ inline void path_symex_step_reft::build_history(
   }
 }
 
-#endif
+#endif // CPROVER_AA_PATH_SYMEX_PATH_SYMEX_HISTORY_H

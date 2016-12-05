@@ -360,4 +360,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_ANALYSES_AI_H

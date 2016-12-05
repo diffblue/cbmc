@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UI_MESSAGE_H
-#define CPROVER_UI_MESSAGE_H
+#ifndef CPROVER_UTIL_UI_MESSAGE_H
+#define CPROVER_UTIL_UI_MESSAGE_H
 
 #include "message.h"
 
@@ -67,4 +67,4 @@ protected:
   const char *level_string(unsigned level);
 };
 
-#endif
+#endif // CPROVER_UTIL_UI_MESSAGE_H

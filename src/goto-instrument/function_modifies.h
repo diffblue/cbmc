@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MODIFIES_H
-#define CPROVER_MODIFIES_H
+#ifndef CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
+#define CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
 
 #include <goto-programs/goto_functions.h>
 #include <analyses/local_may_alias.h>
@@ -49,4 +49,4 @@ protected:
   function_mapt function_map;
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H

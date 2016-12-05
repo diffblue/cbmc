@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_BYTECODE_LANGUAGE_H
-#define CPROVER_JAVA_BYTECODE_LANGUAGE_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
+#define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
 #include <util/language.h>
 
@@ -69,4 +69,4 @@ protected:
 
 languaget *new_java_bytecode_language();
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H

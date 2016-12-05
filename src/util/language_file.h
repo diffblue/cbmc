@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LANGUAGE_FILE_H
-#define CPROVER_LANGUAGE_FILE_H
+#ifndef CPROVER_UTIL_LANGUAGE_FILE_H
+#define CPROVER_UTIL_LANGUAGE_FILE_H
 
 #include <iosfwd>
 #include <set>
@@ -91,4 +91,4 @@ protected:
     const std::string &module);
 };
 
-#endif
+#endif // CPROVER_UTIL_LANGUAGE_FILE_H

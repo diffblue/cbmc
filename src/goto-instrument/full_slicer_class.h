@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAM_FULL_SLICER_CLASS_H
-#define CPROVER_GOTO_PROGRAM_FULL_SLICER_CLASS_H
+#ifndef CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H
+#define CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H
 
 #include <stack>
 #include <vector>
@@ -149,4 +149,4 @@ protected:
   const std::list<std::string> &property_ids;
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H

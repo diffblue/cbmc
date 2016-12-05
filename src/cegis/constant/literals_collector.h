@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_LITERALS_COLLECTOR_H_
-#define CEGIS_LITERALS_COLLECTOR_H_
+#ifndef CPROVER_CEGIS_CONSTANT_LITERALS_COLLECTOR_H
+#define CPROVER_CEGIS_CONSTANT_LITERALS_COLLECTOR_H
 
 #include <util/std_expr.h>
 
@@ -26,4 +26,4 @@ std::vector<constant_exprt> collect_integer_literals(
     const class symbol_tablet &st,
     const class goto_functionst &gf);
 
-#endif /* CEGIS_LITERALS_COLLECTOR_H_ */
+#endif // CPROVER_CEGIS_CONSTANT_LITERALS_COLLECTOR_H

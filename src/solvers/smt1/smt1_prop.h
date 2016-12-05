@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_SMT_PROP_H
-#define CPROVER_PROP_SMT_PROP_H
+#ifndef CPROVER_SOLVERS_SMT1_SMT1_PROP_H
+#define CPROVER_SOLVERS_SMT1_SMT1_PROP_H
 
 #include <iosfwd>
 
@@ -77,4 +77,4 @@ protected:
   std::vector<tvt> assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SMT1_SMT1_PROP_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_SYMEX_FITNESS_H_
-#define CEGIS_GENETIC_SYMEX_FITNESS_H_
+#ifndef CPROVER_CEGIS_GENETIC_LAZY_FITNESS_H
+#define CPROVER_CEGIS_GENETIC_LAZY_FITNESS_H
 
 /**
  * @brief
@@ -108,4 +108,4 @@ public:
 
 #include "lazy_fitness.inc"
 
-#endif /* CEGIS_GENETIC_SYMEX_FITNESS_H_ */
+#endif // CPROVER_CEGIS_GENETIC_LAZY_FITNESS_H

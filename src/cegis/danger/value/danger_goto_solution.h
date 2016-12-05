@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_GOTO_SOLUTION_H_
-#define CEGIS_DANGER_GOTO_SOLUTION_H_
+#ifndef CPROVER_CEGIS_DANGER_VALUE_DANGER_GOTO_SOLUTION_H
+#define CPROVER_CEGIS_DANGER_VALUE_DANGER_GOTO_SOLUTION_H
 
 #include <goto-programs/goto_program.h>
 
@@ -38,4 +38,4 @@ public:
   nondet_choicest x0_choices;
 };
 
-#endif /* CEGIS_DANGER_GOTO_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_DANGER_VALUE_DANGER_GOTO_SOLUTION_H

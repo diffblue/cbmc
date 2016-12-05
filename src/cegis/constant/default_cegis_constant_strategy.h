@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DEFAULT_CONSTANT_STRATEGY_H_
-#define CEGIS_DEFAULT_CONSTANT_STRATEGY_H_
+#ifndef CPROVER_CEGIS_CONSTANT_DEFAULT_CEGIS_CONSTANT_STRATEGY_H
+#define CPROVER_CEGIS_CONSTANT_DEFAULT_CEGIS_CONSTANT_STRATEGY_H
 
 #include <cstddef>
 
@@ -24,4 +24,4 @@ size_t default_cegis_constant_strategy(
     class symbol_tablet &st,
     class goto_functionst &gf);
 
-#endif /* CEGIS_DEFAULT_CONSTANT_STRATEGY_H_ */
+#endif // CPROVER_CEGIS_CONSTANT_DEFAULT_CEGIS_CONSTANT_STRATEGY_H

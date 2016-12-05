@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_ID_H
-#define CPROVER_CPP_ID_H
+#ifndef CPROVER_CPP_CPP_ID_H
+#define CPROVER_CPP_CPP_ID_H
 
 #include <cassert>
 #include <list>
@@ -104,4 +104,4 @@ protected:
 std::ostream &operator<<(std::ostream &out, const cpp_idt &cpp_id);
 std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class);
 
-#endif
+#endif // CPROVER_CPP_CPP_ID_H

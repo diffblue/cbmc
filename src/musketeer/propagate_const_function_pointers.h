@@ -6,8 +6,8 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#ifndef PROPAGATE_CONST_FUNCTION_POINTERS_H
-#define PROPAGATE_CONST_FUNCTION_POINTERS_H
+#ifndef CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
+#define CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
 
 class symbol_tablet;
 class goto_functionst;
@@ -25,4 +25,4 @@ void propagate_const_function_pointers(
   goto_functionst& goto_functions,
   message_handlert& message_handler);
 
-#endif
+#endif // CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H

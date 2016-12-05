@@ -8,8 +8,8 @@ Date: February 2012
 
 \*******************************************************************/
 
-#ifndef FENCE_H
-#define FENCE_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_FENCE_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_FENCE_H
 
 #include <goto-programs/goto_program.h>
 
@@ -23,4 +23,4 @@ bool is_lwfence(
   const goto_programt::instructiont &instruction,
   const namespacet &ns);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_FENCE_H

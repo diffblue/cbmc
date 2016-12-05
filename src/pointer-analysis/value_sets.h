@@ -35,4 +35,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SETS_H

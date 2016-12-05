@@ -8,8 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
-#ifndef DATA_DEP_H
-#define DATA_DEP_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H
 
 #include <set>
 
@@ -69,4 +69,4 @@ public:
   void print(messaget& message);
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H

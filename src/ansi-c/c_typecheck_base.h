@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TYPECHECK_BASE_H
-#define CPROVER_C_TYPECHECK_BASE_H
+#ifndef CPROVER_ANSI_C_C_TYPECHECK_BASE_H
+#define CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 
 #include <util/symbol_table.h>
 #include <util/typecheck.h>
@@ -259,4 +259,4 @@ protected:
   void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);
 };
 
-#endif
+#endif // CPROVER_ANSI_C_C_TYPECHECK_BASE_H

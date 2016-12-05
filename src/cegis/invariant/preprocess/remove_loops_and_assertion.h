@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_REMOVE_LOOPS_AND_ASSERTION_H_
-#define CEGIS_INVARIANT_REMOVE_LOOPS_AND_ASSERTION_H_
+#ifndef CPROVER_CEGIS_INVARIANT_PREPROCESS_REMOVE_LOOPS_AND_ASSERTION_H
+#define CPROVER_CEGIS_INVARIANT_PREPROCESS_REMOVE_LOOPS_AND_ASSERTION_H
 
 #include <goto-programs/goto_program.h>
 
@@ -40,4 +40,4 @@ void invariant_remove_loop(
     goto_programt::targett &body_begin,
     goto_programt::targett &body_end);
 
-#endif /* CEGIS_INVARIANT_REMOVE_LOOPS_AND_ASSERTION_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_PREPROCESS_REMOVE_LOOPS_AND_ASSERTION_H

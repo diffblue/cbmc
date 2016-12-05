@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_STRING_HELPER_H_
-#define CEGIS_STRING_HELPER_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_STRING_HELPER_H
+#define CPROVER_CEGIS_CEGIS_UTIL_STRING_HELPER_H
 
 #include <string>
 
@@ -58,4 +58,4 @@ bool ends_with(const std::string &haystack, const std::string &suffix);
  */
 void remove_suffix(std::string &haystack, const std::string &suffix);
 
-#endif /* CEGIS_STRING_HELPER_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_STRING_HELPER_H

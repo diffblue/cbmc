@@ -333,4 +333,4 @@ public:
   bool record_events;
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNION_FIND_H
-#define CPROVER_UNION_FIND_H
+#ifndef CPROVER_UTIL_UNION_FIND_H
+#define CPROVER_UTIL_UNION_FIND_H
 
 #include <cassert>
 #include <vector>
@@ -246,4 +246,4 @@ protected:
   typedef numbering<T> subt;
 };
 
-#endif
+#endif // CPROVER_UTIL_UNION_FIND_H

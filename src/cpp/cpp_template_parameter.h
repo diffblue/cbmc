@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TEMPLATE_PARAMETER_H
-#define CPROVER_CPP_TEMPLATE_PARAMETER_H
+#ifndef CPROVER_CPP_CPP_TEMPLATE_PARAMETER_H
+#define CPROVER_CPP_CPP_TEMPLATE_PARAMETER_H
 
 #include <util/expr.h>
 
@@ -71,4 +71,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_TEMPLATE_PARAMETER_H

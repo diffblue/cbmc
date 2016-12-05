@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_THREEVAL_H
-#define CPROVER_THREEVAL_H
+#ifndef CPROVER_UTIL_THREEVAL_H
+#define CPROVER_UTIL_THREEVAL_H
 
 #include <iosfwd>
 
@@ -86,4 +86,4 @@ protected:
 
 std::ostream &operator << (std::ostream &out, const tvt &a);
 
-#endif
+#endif // CPROVER_UTIL_THREEVAL_H

@@ -27,4 +27,4 @@ protected:
   virtual bvt convert_waitfor_symbol(const exprt &expr);
 };
 
-#endif
+#endif // CPROVER_CBMC_BV_CBMC_H

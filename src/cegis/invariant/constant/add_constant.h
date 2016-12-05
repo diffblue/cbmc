@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_ADD_CONSTANT_H_
-#define CEGIS_DANGER_ADD_CONSTANT_H_
+#ifndef CPROVER_CEGIS_INVARIANT_CONSTANT_ADD_CONSTANT_H
+#define CPROVER_CEGIS_INVARIANT_CONSTANT_ADD_CONSTANT_H
 
 #include <string>
 
@@ -35,4 +35,4 @@ void add_danger_constant(class invariant_programt &program,
 void add_danger_constant(invariant_programt &program, const std::string &name,
     const exprt &value);
 
-#endif /* CEGIS_DANGER_ADD_CONSTANT_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_CONSTANT_ADD_CONSTANT_H

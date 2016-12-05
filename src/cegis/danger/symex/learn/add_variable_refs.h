@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_INSTRUMENT_VARIABLE_REFS_H_
-#define CEGIS_DANGER_INSTRUMENT_VARIABLE_REFS_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_VARIABLE_REFS_H
+#define CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_VARIABLE_REFS_H
 
 #include <cegis/invariant/symex/learn/instrument_vars.h>
 
@@ -24,4 +24,4 @@
 void link_meta_variables(danger_programt &prog, const size_t user_vars,
     const size_t max_solution_size);
 
-#endif /* CEGIS_DANGER_INSTRUMENT_VARIABLE_REFS_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_VARIABLE_REFS_H

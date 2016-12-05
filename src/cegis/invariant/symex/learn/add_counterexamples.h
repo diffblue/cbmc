@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_ADD_COUNTEREXAMPLES_H_
-#define CEGIS_INVARIANT_ADD_COUNTEREXAMPLES_H_
+#ifndef CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H
+#define CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H
 
 #include <deque>
 #include <functional>
@@ -108,4 +108,4 @@ void invariant_add_constraint(invariant_programt &prog,
     const constraint_factoryt constraint,
     const goto_programt::targett &ce_loop_end);
 
-#endif /* CEGIS_INVARIANT_ADD_COUNTEREXAMPLES_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H

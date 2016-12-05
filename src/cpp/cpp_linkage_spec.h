@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_LINKAGE_SPEC_H
-#define CPROVER_CPP_LINKAGE_SPEC_H
+#ifndef CPROVER_CPP_CPP_LINKAGE_SPEC_H
+#define CPROVER_CPP_CPP_LINKAGE_SPEC_H
 
 class cpp_linkage_spect:public exprt
 {
@@ -39,4 +39,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_LINKAGE_SPEC_H

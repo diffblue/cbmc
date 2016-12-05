@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ARRAYS_H
-#define CPROVER_ARRAYS_H
+#ifndef CPROVER_SOLVERS_FLATTENING_ARRAYS_H
+#define CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 
 #include <set>
 
@@ -108,4 +108,4 @@ protected:
     // (maybe this function should be partially moved here from boolbv)
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_ARRAYS_H

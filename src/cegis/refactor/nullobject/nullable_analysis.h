@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H_
-#define CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H_
+#ifndef CPROVER_CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H
+#define CPROVER_CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H
 
 #include <cegis/refactor/instructionset/operand_data.h>
 
@@ -72,4 +72,4 @@ void replace_method_call_by_processor(
     const std::string &processor,
     const std::string &prog);
 
-#endif /* CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_NULLOBJECT_NULLABLE_ANALYSIS_H

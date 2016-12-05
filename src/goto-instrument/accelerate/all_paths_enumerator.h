@@ -1,5 +1,5 @@
-#ifndef ALL_PATHS_ENUMERATOR_H
-#define ALL_PATHS_ENUMERATOR_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ALL_PATHS_ENUMERATOR_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ALL_PATHS_ENUMERATOR_H
 
 #include <goto-programs/goto_program.h>
 
@@ -34,4 +34,4 @@ class all_paths_enumeratort : public path_enumeratort {
   patht last_path;
 };
 
-#endif // ALL_PATHS_ENUMERATOR_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ALL_PATHS_ENUMERATOR_H

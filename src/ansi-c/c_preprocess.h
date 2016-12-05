@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_PREPROCESS_H
-#define CPROVER_C_PREPROCESS_H
+#ifndef CPROVER_ANSI_C_C_PREPROCESS_H
+#define CPROVER_ANSI_C_C_PREPROCESS_H
 
 #include <iosfwd>
 #include <string>
@@ -27,4 +27,4 @@ bool c_preprocess(
 // returns 'true' in case of error
 bool test_c_preprocessor(message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_ANSI_C_C_PREPROCESS_H

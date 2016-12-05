@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_COUNTEREXAMPLE_H_
-#define CEGIS_JSA_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_H
 
 #include <deque>
 #include <map>
@@ -24,4 +24,4 @@ typedef std::map<const irep_idt, exprt> jsa_counterexamplet;
 
 typedef std::deque<jsa_counterexamplet> jsa_counterexamplest;
 
-#endif /* CEGIS_JSA_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_COUNTEREXAMPLE_H

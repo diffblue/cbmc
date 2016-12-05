@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STRING_COLLECTION_H
-#define CPROVER_STRING_COLLECTION_H
+#ifndef CPROVER_UTIL_OLD_COLLECTION_H
+#define CPROVER_UTIL_OLD_COLLECTION_H
 
 #include "string_hash.h"
 #include "hash_cont.h"
@@ -188,4 +188,4 @@ protected:
 
 typedef collection_set<collection<std::string, string_hash> > string_collection_set;
 
-#endif
+#endif // CPROVER_UTIL_OLD_COLLECTION_H

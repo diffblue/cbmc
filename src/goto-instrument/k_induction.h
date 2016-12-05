@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_K_INDUCTION_H
-#define CPROVER_K_INDUCTION_H
+#ifndef CPROVER_GOTO_INSTRUMENT_K_INDUCTION_H
+#define CPROVER_GOTO_INSTRUMENT_K_INDUCTION_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -16,4 +16,4 @@ void k_induction(
   bool base_case, bool step_case,
   unsigned k);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_K_INDUCTION_H

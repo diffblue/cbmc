@@ -8,8 +8,8 @@ Date: November 2011
 
 \*******************************************************************/
 
-#ifndef CPROVER_STACK_DEPTH_H
-#define CPROVER_STACK_DEPTH_H
+#ifndef CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
+#define CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
 
 class symbol_tablet;
 class goto_functionst;
@@ -19,4 +19,4 @@ void stack_depth(
   goto_functionst &goto_functions,
   const int depth);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H

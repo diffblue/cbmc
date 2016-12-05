@@ -18,4 +18,4 @@ void remove_asm(symbol_tablet &, goto_functionst &);
 
 void remove_asm(goto_modelt &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H

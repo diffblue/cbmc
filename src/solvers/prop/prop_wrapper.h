@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_WRAPPER_H
-#define CPROVER_PROP_WRAPPER_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_WRAPPER_H
+#define CPROVER_SOLVERS_PROP_PROP_WRAPPER_H
 
 #include "prop.h"
 
@@ -82,4 +82,4 @@ class prop_wrappert:public virtual propt
   propt &p;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_PROP_WRAPPER_H

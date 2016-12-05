@@ -8,8 +8,8 @@ Date: June 2006
 
 \*******************************************************************/
 
-#ifndef CPROVER_READ_GOTO_OBJECT_H
-#define CPROVER_READ_GOTO_OBJECT_H
+#ifndef CPROVER_GOTO_CC_XML_BINARIES_READ_GOTO_OBJECT_H
+#define CPROVER_GOTO_CC_XML_BINARIES_READ_GOTO_OBJECT_H
 
 #include <util/message.h>
 #include <util/symbol_table.h>
@@ -22,4 +22,4 @@ bool read_goto_object(
   goto_functionst &functions,
   message_handlert &msg_hndlr);
 
-#endif /* CPROVER_READ_GOTO_OBJECT_H */
+#endif // CPROVER_GOTO_CC_XML_BINARIES_READ_GOTO_OBJECT_H

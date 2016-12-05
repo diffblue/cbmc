@@ -8,8 +8,8 @@ Date: September 2011
 
 \*******************************************************************/
 
-#ifndef CPROVER_WEAK_MEMORY_H
-#define CPROVER_WEAK_MEMORY_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H
 
 #include "wmm.h"
 
@@ -49,4 +49,4 @@ void introduce_temporaries(
 #endif
   messaget& message);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H

@@ -6,8 +6,8 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_TYPES_H
-#define CPROVER_JSIL_TYPES_H
+#ifndef CPROVER_JSIL_JSIL_TYPES_H
+#define CPROVER_JSIL_JSIL_TYPES_H
 
 #include <util/type.h>
 #include <util/std_types.h>
@@ -110,4 +110,4 @@ extern inline const jsil_union_typet &to_jsil_union_type(
   return static_cast<const jsil_union_typet &>(type);
 }
 
-#endif
+#endif // CPROVER_JSIL_JSIL_TYPES_H

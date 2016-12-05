@@ -1,5 +1,5 @@
-#ifndef CPROVER_PARSER_H
-#define CPROVER_PARSER_H
+#ifndef CPROVER_UTIL_PARSER_H
+#define CPROVER_UTIL_PARSER_H
 
 #include <iosfwd>
 #include <string>
@@ -157,4 +157,4 @@ exprt &_newstack(parsert &parser, unsigned &x);
 
 #define YY_USER_ACTION PARSER.advance_column(yyleng);
 
-#endif
+#endif // CPROVER_UTIL_PARSER_H

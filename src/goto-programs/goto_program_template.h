@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAM_TEMPLATE_H
-#define CPROVER_GOTO_PROGRAM_TEMPLATE_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
 
 /*! \defgroup gr_goto_programs Goto programs */
 
@@ -696,4 +696,4 @@ struct const_target_hash_templatet
   { return t->location_number; }
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H

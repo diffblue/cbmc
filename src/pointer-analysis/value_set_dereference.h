@@ -138,4 +138,4 @@ private:
     const exprt &offset);
 };
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H

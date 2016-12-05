@@ -8,8 +8,8 @@ Date:   April 2010
 
 \*******************************************************************/
 
-#ifndef GOTO_CC_CMDLINE_H
-#define GOTO_CC_CMDLINE_H
+#ifndef CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
+#define CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
 
 #include <util/cmdline.h>
 
@@ -78,4 +78,4 @@ protected:
   void add_infile_arg(const std::string &arg);
 };
 
-#endif /* GOTO_CC_CMDLINE_H */
+#endif // CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H

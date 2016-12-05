@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_BYTECODE_TYPECHECK_H
-#define CPROVER_JAVA_BYTECODE_TYPECHECK_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
+#define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 
 #include <set>
 
@@ -65,4 +65,4 @@ protected:
   std::set<irep_idt> already_typechecked;
 };
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H

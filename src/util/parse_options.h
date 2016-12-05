@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PARSE_OPTIONS_H
-#define CPROVER_PARSE_OPTIONS_H
+#ifndef CPROVER_UTIL_PARSE_OPTIONS_H
+#define CPROVER_UTIL_PARSE_OPTIONS_H
 
 #include <string>
 
@@ -33,4 +33,4 @@ private:
   bool parse_result;
 };
 
-#endif
+#endif // CPROVER_UTIL_PARSE_OPTIONS_H

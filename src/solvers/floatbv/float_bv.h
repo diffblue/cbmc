@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FLOAT_BV_H
-#define CPROVER_FLOAT_BV_H
+#ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
+#define CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
 
 #include <util/i2string.h>
 #include <util/ieee_float.h>
@@ -156,4 +156,4 @@ static inline exprt float_bv(const exprt &src)
   return float_bvt()(src);
 }
 
-#endif
+#endif // CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H

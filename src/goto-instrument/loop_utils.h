@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOOP_UTILS_H
-#define CPROVER_LOOP_UTILS_H
+#ifndef CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H
+#define CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H
 
 #include <analyses/natural_loops.h>
 
@@ -28,4 +28,4 @@ void build_havoc_code(
 
 goto_programt::targett get_loop_exit(const loopt &);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H

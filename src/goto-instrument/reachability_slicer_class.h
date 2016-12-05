@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAM_SLICER_CLASS_H
-#define CPROVER_GOTO_PROGRAM_SLICER_CLASS_H
+#ifndef CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
+#define CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/cfg.h>
@@ -53,4 +53,4 @@ protected:
   void slice(goto_functionst &goto_functions);
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H

@@ -26,4 +26,4 @@ void function_exit(
   goto_functionst &goto_functions,
   const irep_idt &id);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_FUNCTION_H

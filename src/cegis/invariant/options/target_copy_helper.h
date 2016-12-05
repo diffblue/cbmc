@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_TARGET_COPY_HELPER_H_
-#define CEGIS_TARGET_COPY_HELPER_H_
+#ifndef CPROVER_CEGIS_INVARIANT_OPTIONS_TARGET_COPY_HELPER_H
+#define CPROVER_CEGIS_INVARIANT_OPTIONS_TARGET_COPY_HELPER_H
 
 #include <cegis/invariant/options/invariant_program.h>
 
@@ -93,4 +93,4 @@ public:
       const invariant_programt::invariant_loopt &loop) const;
 };
 
-#endif /* CEGIS_TARGET_COPY_HELPER_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_OPTIONS_TARGET_COPY_HELPER_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SIMPLIFY_EXPR_CLASS_H
-#define CPROVER_SIMPLIFY_EXPR_CLASS_H
+#ifndef CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H
+#define CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H
 
 // #define DEBUG_ON_DEMAND
 #ifdef DEBUG_ON_DEMAND
@@ -153,4 +153,4 @@ protected:
   replace_mapt local_replace_map;
 };
 
-#endif
+#endif // CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H

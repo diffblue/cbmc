@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_ENCODED_DANGER_LEARN_CONFIG_H_
-#define CEGIS_ENCODED_DANGER_LEARN_CONFIG_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_LEARN_ENCODED_DANGER_LEARN_CONFIG_H
+#define CPROVER_CEGIS_DANGER_SYMEX_LEARN_ENCODED_DANGER_LEARN_CONFIG_H
 
 #include <cegis/value/program_individual.h>
 
@@ -122,4 +122,4 @@ public:
   size_t get_num_consts() const;
 };
 
-#endif /* CEGIS_ENCODED_DANGER_LEARN_CONFIG_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_LEARN_ENCODED_DANGER_LEARN_CONFIG_H

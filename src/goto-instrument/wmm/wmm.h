@@ -8,8 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
-#ifndef MEMORY_MODEL
-#define MEMORY_MODEL
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_WMM_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_WMM_H
 
 typedef enum {
   Unknown=-1,
@@ -34,4 +34,4 @@ typedef enum {
   no_loop=2
 } loop_strategyt;
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_WMM_H

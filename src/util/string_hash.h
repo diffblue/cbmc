@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STRING_HASH_H
-#define CPROVER_STRING_HASH_H
+#ifndef CPROVER_UTIL_STRING_HASH_H
+#define CPROVER_UTIL_STRING_HASH_H
 
 #include <string>
 
@@ -19,4 +19,4 @@ struct string_hash
   size_t operator()(const std::string &s) const { return hash_string(s); }
 };
 
-#endif
+#endif // CPROVER_UTIL_STRING_HASH_H

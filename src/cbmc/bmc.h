@@ -116,4 +116,4 @@ protected:
   friend class fault_localizationt;
 };
 
-#endif
+#endif // CPROVER_CBMC_BMC_H

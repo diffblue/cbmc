@@ -1,5 +1,5 @@
-#ifndef CPROVER_TIMER_H
-#define CPROVER_TIMER_H
+#ifndef CPROVER_UTIL_TIMER_H
+#define CPROVER_UTIL_TIMER_H
 
 #include <string>
 #include <iosfwd>
@@ -60,4 +60,4 @@ public:
 
 std::ostream& operator<< (std::ostream &out, const timert &timer);
 
-#endif /*CPROVER_TIMER_H*/
+#endif // CPROVER_UTIL_TIMER_H

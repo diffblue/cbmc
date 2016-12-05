@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_PREPROCESSING_H_
-#define CEGIS_JSA_PREPROCESSING_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_JSA_PREPROCESSING_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_JSA_PREPROCESSING_H
 
 #include <cegis/jsa/options/jsa_program.h>
 
@@ -79,4 +79,4 @@ public:
   const jsa_programt &get_jsa_program() const;
 };
 
-#endif /* CEGIS_JSA_PREPROCESSING_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_JSA_PREPROCESSING_H

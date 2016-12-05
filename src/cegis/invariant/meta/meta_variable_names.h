@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_META_VARIABLE_NAMES_H_
-#define CEGIS_INVARIANT_META_VARIABLE_NAMES_H_
+#ifndef CPROVER_CEGIS_INVARIANT_META_META_VARIABLE_NAMES_H
+#define CPROVER_CEGIS_INVARIANT_META_META_VARIABLE_NAMES_H
 
 #include <string>
 
@@ -45,4 +45,4 @@ std::string get_Gx(const size_t loop_id);
  */
 std::string get_tmp(const size_t id);
 
-#endif /* CEGIS_INVARIANT_META_VARIABLE_NAMES_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_META_META_VARIABLE_NAMES_H

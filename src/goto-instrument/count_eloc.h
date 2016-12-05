@@ -17,4 +17,4 @@ void count_eloc(const goto_functionst &goto_functions);
 
 void list_eloc(const goto_functionst &goto_functions);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H

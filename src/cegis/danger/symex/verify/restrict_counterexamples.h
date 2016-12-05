@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_RESTRICT_COUNTEREXAMPLES_H_
-#define CEGIS_DANGER_RESTRICT_COUNTEREXAMPLES_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_VERIFY_RESTRICT_COUNTEREXAMPLES_H
+#define CPROVER_CEGIS_DANGER_SYMEX_VERIFY_RESTRICT_COUNTEREXAMPLES_H
 
 #include <cstddef>
 
@@ -64,4 +64,4 @@ void force_guard_violation(goto_functionst &gf, const size_t num_loops);
 void force_ranking_error(goto_functionst &gf,
     const size_t num_loops);
 
-#endif /* CEGIS_DANGER_RESTRICT_COUNTEREXAMPLES_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_VERIFY_RESTRICT_COUNTEREXAMPLES_H

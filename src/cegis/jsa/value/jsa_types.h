@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_TYPES_H_
-#define CEGIS_JSA_TYPES_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_TYPES_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_TYPES_H
 
 #include <util/std_types.h>
 
@@ -108,4 +108,4 @@ array_typet jsa_query_type(const exprt & size);
  */
 symbol_typet jsa_heap_type();
 
-#endif /* CEGIS_JSA_TYPES_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_TYPES_H

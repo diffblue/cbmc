@@ -6,8 +6,8 @@ Author: Alex Groce
 
 \*******************************************************************/
 
-#ifndef CPROVER_PBS_DIMACS_CNF_H
-#define CPROVER_PBS_DIMACS_CNF_H
+#ifndef CPROVER_SOLVERS_SAT_PBS_DIMACS_CNF_H
+#define CPROVER_SOLVERS_SAT_PBS_DIMACS_CNF_H
 
 #include <set>
 #include <map>
@@ -60,4 +60,4 @@ class pbs_dimacs_cnft:public dimacs_cnft
   std::set<int> assigned;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_PBS_DIMACS_CNF_H

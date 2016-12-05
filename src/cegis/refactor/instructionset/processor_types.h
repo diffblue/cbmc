@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H_
-#define CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H_
+#ifndef CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H
+#define CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H
 
 #include <util/type.h>
 
@@ -50,4 +50,4 @@ typet cegis_size_type();
  */
 bool is_cegis_primitive(const typet &type);
 
-#endif /* CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_TYPES_H

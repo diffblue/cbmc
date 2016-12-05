@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_DIMACS_CNF_H
-#define CPROVER_DIMACS_CNF_H
+#ifndef CPROVER_SOLVERS_SAT_DIMACS_CNF_H
+#define CPROVER_SOLVERS_SAT_DIMACS_CNF_H
 
 #include <iosfwd>
 
@@ -67,4 +67,4 @@ protected:
   std::ostream &out;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_DIMACS_CNF_H

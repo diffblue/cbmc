@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_CONSTRAINT_FACTORY_H_
-#define CEGIS_DANGER_CONSTRAINT_FACTORY_H_
+#ifndef CPROVER_CEGIS_DANGER_CONSTRAINT_DANGER_CONSTRAINT_FACTORY_H
+#define CPROVER_CEGIS_DANGER_CONSTRAINT_DANGER_CONSTRAINT_FACTORY_H
 
 #include <util/std_expr.h>
 
@@ -50,4 +50,4 @@ public:
  */
 notequal_exprt danger_component_as_bool(const std::string &base_name);
 
-#endif /* CEGIS_DANGER_CONSTRAINT_FACTORY_H_ */
+#endif // CPROVER_CEGIS_DANGER_CONSTRAINT_DANGER_CONSTRAINT_FACTORY_H

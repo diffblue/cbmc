@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_CLASS_HIERARCHY_H
-#define CPROVER_CLASS_HIERARCHY_H
+#ifndef CPROVER_GOTO_PROGRAMS_CLASS_HIERARCHY_H
+#define CPROVER_GOTO_PROGRAMS_CLASS_HIERARCHY_H
 
 #include <iosfwd>
 #include <map>
@@ -55,4 +55,4 @@ protected:
   void get_parents_trans_rec(const irep_idt &, idst &) const;
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_CLASS_HIERARCHY_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_PROPAGATE_CONTROLLER_SIZES_H_
-#define CEGIS_PROPAGATE_CONTROLLER_SIZES_H_
+#ifndef CPROVER_CEGIS_CONTROL_PREPROCESSING_PROPAGATE_CONTROLLER_SIZES_H
+#define CPROVER_CEGIS_CONTROL_PREPROCESSING_PROPAGATE_CONTROLLER_SIZES_H
 
 #include <goto-programs/goto_program.h>
 
@@ -86,4 +86,4 @@ void remove_solution_assignment(goto_programt &body);
  */
 goto_programt::targett get_solution_assignment(goto_programt &body);
 
-#endif /* CEGIS_PROPAGATE_CONTROLLER_SIZES_H_ */
+#endif // CPROVER_CEGIS_CONTROL_PREPROCESSING_PROPAGATE_CONTROLLER_SIZES_H

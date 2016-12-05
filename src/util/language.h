@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LANGUAGE_H
-#define CPROVER_LANGUAGE_H
+#ifndef CPROVER_UTIL_LANGUAGE_H
+#define CPROVER_UTIL_LANGUAGE_H
 
 #include <set>
 #include <iosfwd>
@@ -102,4 +102,4 @@ public:
   languaget() { }
   virtual ~languaget() { }
 };
-#endif
+#endif // CPROVER_UTIL_LANGUAGE_H

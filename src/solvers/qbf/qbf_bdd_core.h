@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_BDD_CORE_H
-#define CPROVER_QBF_BDD_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_BDD_CORE_H
+#define CPROVER_SOLVERS_QBF_QBF_BDD_CORE_H
 
 #include <vector>
 
@@ -69,4 +69,4 @@ protected:
   void compress_certificate(void);
 };
 
-#endif /* QBF_BDD_CORE_H_ */
+#endif // CPROVER_SOLVERS_QBF_QBF_BDD_CORE_H

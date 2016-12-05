@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_DECLARATOR_CONVERTER_H
-#define CPROVER_CPP_DECLARATOR_CONVERTER_H
+#ifndef CPROVER_CPP_CPP_DECLARATOR_CONVERTER_H
+#define CPROVER_CPP_CPP_DECLARATOR_CONVERTER_H
 
 #include <util/symbol.h>
 
@@ -90,4 +90,4 @@ protected:
     symbolt &symbol);
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_DECLARATOR_CONVERTER_H

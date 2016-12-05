@@ -9,8 +9,8 @@ Date: February 2013
 
 \*******************************************************************/
 
-#ifndef CPROVER_REACHING_DEFINITIONS_H
-#define CPROVER_REACHING_DEFINITIONS_H
+#ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
+#define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
 #include "ai.h"
 #include "goto_rw.h"
@@ -248,4 +248,4 @@ protected:
   dirtyt * is_dirty;
 };
 
-#endif
+#endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_H

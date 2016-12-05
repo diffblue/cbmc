@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAM_H
-#define CPROVER_GOTO_PROGRAM_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
 #include <set>
 
@@ -63,4 +63,4 @@ std::string as_string(
   const namespacet &ns,
   const goto_programt::instructiont &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H

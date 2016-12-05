@@ -19,4 +19,4 @@ void nondet_volatile(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H

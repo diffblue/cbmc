@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_RANDOM_INDIVIDUAL_H_
-#define CEGIS_GENETIC_RANDOM_INDIVIDUAL_H_
+#ifndef CPROVER_CEGIS_GENETIC_RANDOM_INDIVIDUAL_H
+#define CPROVER_CEGIS_GENETIC_RANDOM_INDIVIDUAL_H
 
 #include <util/type.h>
 
@@ -183,4 +183,4 @@ public:
   operator std::function<unsigned int()>() const;
 };
 
-#endif /* CEGIS_GENETIC_RANDOM_INDIVIDUAL_H_ */
+#endif // CPROVER_CEGIS_GENETIC_RANDOM_INDIVIDUAL_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H_
-#define CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H_
+#ifndef CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H
+#define CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H
 
 #include <deque>
 
@@ -114,4 +114,4 @@ public:
   refactor_programt &operator=(const refactor_programt &other);
 };
 
-#endif /* CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_OPTIONS_REFACTOR_PROGRAM_H

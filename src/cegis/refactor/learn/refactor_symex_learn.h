@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H_
-#define CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H_
+#ifndef CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H
+#define CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H
 
 #include <util/message.h>
 
@@ -100,4 +100,4 @@ public:
       const candidatet &candidate) const;
 };
 
-#endif /* CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_SYMEX_LEARN_H

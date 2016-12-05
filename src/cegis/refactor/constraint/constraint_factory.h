@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H_
-#define CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H_
+#ifndef CPROVER_CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H
+#define CPROVER_CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H
 
 /**
  * @brief
@@ -28,4 +28,4 @@ void create_constraint_function_caller(class refactor_programt &prog);
  */
 void create_refactoring_constraint(refactor_programt &prog);
 
-#endif /* CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_CONSTRAINT_CONSTRAINT_FACTORY_H

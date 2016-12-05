@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOCAL_MAY_ALIAS_H
-#define CPROVER_LOCAL_MAY_ALIAS_H
+#ifndef CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
+#define CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 
 #include <stack>
 #include <memory>
@@ -145,4 +145,4 @@ protected:
   target_mapt target_map;
 };
 
-#endif
+#endif // CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H

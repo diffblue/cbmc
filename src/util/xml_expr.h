@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_XML_EXPR_H
-#define CPROVER_XML_EXPR_H
+#ifndef CPROVER_UTIL_XML_EXPR_H
+#define CPROVER_UTIL_XML_EXPR_H
 
 #include "xml.h"
 
@@ -26,4 +26,4 @@ xmlt xml(
 
 xmlt xml(const source_locationt &);
 
-#endif
+#endif // CPROVER_UTIL_XML_EXPR_H

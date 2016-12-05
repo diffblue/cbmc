@@ -98,4 +98,4 @@ protected:
   c_typet minimum_promotion(const typet &type) const;
 };
 
-#endif
+#endif // CPROVER_ANSI_C_C_TYPECAST_H

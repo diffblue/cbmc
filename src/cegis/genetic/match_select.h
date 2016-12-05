@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_MATCH_SELECT_H_
-#define CEGIS_GENETIC_MATCH_SELECT_H_
+#ifndef CPROVER_CEGIS_GENETIC_MATCH_SELECT_H
+#define CPROVER_CEGIS_GENETIC_MATCH_SELECT_H
 
 #include <functional>
 
@@ -81,4 +81,4 @@ public:
 
 #include "match_select.inc"
 
-#endif /* CEGIS_GENETIC_MATCH_SELECT_H_ */
+#endif // CPROVER_CEGIS_GENETIC_MATCH_SELECT_H

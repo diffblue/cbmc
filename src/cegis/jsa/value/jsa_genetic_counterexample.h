@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_GENETIC_COUNTEREXAMPLE_H_
-#define CEGIS_JSA_GENETIC_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_COUNTEREXAMPLE_H
 
 #include <deque>
 #include <map>
@@ -31,4 +31,4 @@ public:
   assignments_per_program_locationt assignments_per_program_location;
 };
 
-#endif /* CEGIS_JSA_GENETIC_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_GENETIC_COUNTEREXAMPLE_H

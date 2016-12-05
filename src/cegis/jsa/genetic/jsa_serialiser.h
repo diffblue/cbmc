@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_SERIALISER_H_
-#define CEGIS_JSA_SERIALISER_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_JSA_SERIALISER_H
+#define CPROVER_CEGIS_JSA_GENETIC_JSA_SERIALISER_H
 
 #include <functional>
 
@@ -88,4 +88,4 @@ public:
   operator std::function<void(jsa_solutiont &, const irept &)>() const;
 };
 
-#endif /* CEGIS_JSA_SERIALISER_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_JSA_SERIALISER_H

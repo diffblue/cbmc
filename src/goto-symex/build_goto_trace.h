@@ -29,4 +29,4 @@ void build_goto_trace(
   const namespacet &ns,
   goto_tracet &goto_trace);
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_BUILD_GOTO_TRACE_H

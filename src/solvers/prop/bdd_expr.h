@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_BDD_EXPR_H
-#define CPROVER_BDD_EXPR_H
+#ifndef CPROVER_SOLVERS_PROP_BDD_EXPR_H
+#define CPROVER_SOLVERS_PROP_BDD_EXPR_H
 
 /*! \file solvers/prop/bdd_expr.h
  * \brief Binary decision diagram
@@ -48,4 +48,4 @@ protected:
   exprt as_expr(const BDDt &r) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H

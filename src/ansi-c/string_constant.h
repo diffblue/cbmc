@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STRING_CONSTANT_H
-#define CPROVER_STRING_CONSTANT_H
+#ifndef CPROVER_ANSI_C_STRING_CONSTANT_H
+#define CPROVER_ANSI_C_STRING_CONSTANT_H
 
 #include <util/std_expr.h>
 #include <util/expr.h>
@@ -44,4 +44,4 @@ public:
 const string_constantt &to_string_constant(const exprt &expr);
 string_constantt &to_string_constant(exprt &expr);
 
-#endif
+#endif // CPROVER_ANSI_C_STRING_CONSTANT_H

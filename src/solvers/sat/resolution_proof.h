@@ -45,4 +45,4 @@ public:
 
 typedef resolution_prooft<clauset> simple_prooft;
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_RESOLUTION_PROOF_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_H
-#define CPROVER_SATCHECK_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_H
 
 // this picks the "default" SAT solver
 
@@ -78,4 +78,4 @@ typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 #endif
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_H

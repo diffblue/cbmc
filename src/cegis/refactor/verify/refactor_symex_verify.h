@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_
-#define CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_
+#ifndef CPROVER_CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H
+#define CPROVER_CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H
 
 #include <util/message.h>
 
@@ -91,4 +91,4 @@ public:
       const counterexamplet &counterexample) const;
 };
 
-#endif /* CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_VERIFY_REFACTOR_SYMEX_VERIFY_H

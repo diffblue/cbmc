@@ -1,5 +1,5 @@
-#ifndef DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H
-#define DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SAT_PATH_ENUMERATOR_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SAT_PATH_ENUMERATOR_H
 
 #include <map>
 #include <set>
@@ -68,4 +68,4 @@ class sat_path_enumeratort : public path_enumeratort {
   std::list<distinguish_valuest> accelerated_paths;
 };
 
-#endif // DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_SAT_PATH_ENUMERATOR_H

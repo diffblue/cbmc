@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_QUBE_CORE_H
-#define CPROVER_QBF_QUBE_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_QUBE_CORE_H
+#define CPROVER_SOLVERS_QBF_QBF_QUBE_CORE_H
 
 #include "qdimacs_core.h"
 
@@ -54,4 +54,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_SOLVERS_QBF_QBF_QUBE_CORE_H

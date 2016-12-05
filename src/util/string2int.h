@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_STRING2INT_H
-#define CPROVER_STRING2INT_H
+#ifndef CPROVER_UTIL_STRING2INT_H
+#define CPROVER_UTIL_STRING2INT_H
 
 #include <string>
 
@@ -36,4 +36,4 @@ std::size_t unsafe_string2size_t(const std::string &str, int base=10);
 long long int unsafe_string2signedlonglong(const std::string &str, int base=10);
 long long unsigned int unsafe_string2unsignedlonglong(const std::string &str, int base=10);
 
-#endif
+#endif // CPROVER_UTIL_STRING2INT_H

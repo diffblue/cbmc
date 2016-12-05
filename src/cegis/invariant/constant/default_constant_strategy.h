@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_DEFAULT_CONSTANT_STRATEGY_H_
-#define CEGIS_DANGER_DEFAULT_CONSTANT_STRATEGY_H_
+#ifndef CPROVER_CEGIS_INVARIANT_CONSTANT_DEFAULT_CONSTANT_STRATEGY_H
+#define CPROVER_CEGIS_INVARIANT_CONSTANT_DEFAULT_CONSTANT_STRATEGY_H
 
 /**
  * @brief
@@ -23,4 +23,4 @@ Author: Daniel Kroening, kroening@kroening.com
 size_t default_constant_strategy(class invariant_programt &program,
     const size_t max_length);
 
-#endif /* CEGIS_DANGER_DEFAULT_CONSTANT_STRATEGY_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_CONSTANT_DEFAULT_CONSTANT_STRATEGY_H

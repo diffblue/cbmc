@@ -6,8 +6,8 @@
 
 \*******************************************************************/
 
-#ifndef CPROVER_INFER_MODE_H
-#define CPROVER_INFER_MODE_H
+#ifndef CPROVER_MUSKETEER_INFER_MODE_H
+#define CPROVER_MUSKETEER_INFER_MODE_H
 
 typedef enum {
   INFER=0,
@@ -15,4 +15,4 @@ typedef enum {
   USER_ASSERT=2
 } infer_modet;
 
-#endif
+#endif // CPROVER_MUSKETEER_INFER_MODE_H

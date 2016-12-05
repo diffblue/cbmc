@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_HORN_ENCODING_H
-#define CPROVER_HORN_ENCODING_H
+#ifndef CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H
+#define CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H
 
 #include <iosfwd>
 
@@ -18,4 +18,4 @@ void horn_encoding(
   const namespacet &,
   std::ostream &out);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H

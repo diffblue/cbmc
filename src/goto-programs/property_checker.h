@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROPERTY_CHECKER_H
-#define CPROVER_PROPERTY_CHECKER_H
+#ifndef CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H
+#define CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H
 
 // this is just an interface -- it won't actually do any checking!
 
@@ -49,4 +49,4 @@ protected:
   void initialize_property_map(const goto_functionst &);
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H

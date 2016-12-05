@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H_
-#define CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H_
+#ifndef CPROVER_CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H
+#define CPROVER_CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H
 
 #include <functional>
 
@@ -76,4 +76,4 @@ public:
 
 #include "instruction_set_info_factory.inc"
 
-#endif /* CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H_ */
+#endif // CPROVER_CEGIS_GENETIC_INSTRUCTION_SET_INFO_FACTORY_H

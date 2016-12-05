@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_CONV_STORE_H
-#define CPROVER_PROP_CONV_STORE_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_CONV_STORE_H
+#define CPROVER_SOLVERS_PROP_PROP_CONV_STORE_H
 
 #include "prop_conv.h"
 
@@ -64,4 +64,4 @@ protected:
   constraintst constraints;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_PROP_CONV_STORE_H

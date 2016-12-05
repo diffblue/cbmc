@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_PRECOSAT_H
-#define CPROVER_SATCHECK_PRECOSAT_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_PRECOSAT_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_PRECOSAT_H
 
 #include "cnf.h"
 
@@ -40,4 +40,4 @@ protected:
   // bvt assumptions;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_PRECOSAT_H

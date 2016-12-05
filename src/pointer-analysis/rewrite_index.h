@@ -16,4 +16,4 @@ class index_exprt;
 
 dereference_exprt rewrite_index(const index_exprt &index_expr);
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_REWRITE_INDEX_H

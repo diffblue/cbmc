@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_TEMPS_HELPER_H_
-#define CEGIS_JSA_TEMPS_HELPER_H_
+#ifndef CPROVER_CEGIS_JSA_INSTRUMENT_TEMPS_HELPER_H
+#define CPROVER_CEGIS_JSA_INSTRUMENT_TEMPS_HELPER_H
 
 #include <goto-programs/goto_program.h>
 
@@ -43,4 +43,4 @@ void add_zero_jsa_temps_to_pred_exec(jsa_programt &prog);
  */
 size_t count_tmps(const symbol_tablet &st);
 
-#endif /* CEGIS_JSA_TEMPS_HELPER_H_ */
+#endif // CPROVER_CEGIS_JSA_INSTRUMENT_TEMPS_HELPER_H

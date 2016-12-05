@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_EXPR2JSIL_H
-#define CPROVER_EXPR2JSIL_H
+#ifndef CPROVER_JSIL_EXPR2JSIL_H
+#define CPROVER_JSIL_EXPR2JSIL_H
 
 #include <string>
 
@@ -18,4 +18,4 @@ class typet;
 std::string expr2jsil(const exprt &expr, const namespacet &ns);
 std::string type2jsil(const typet &type, const namespacet &ns);
 
-#endif
+#endif // CPROVER_JSIL_EXPR2JSIL_H

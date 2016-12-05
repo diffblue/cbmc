@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_EXECUTE_JSA_PROGRAMS_H_
-#define CEGIS_JSA_EXECUTE_JSA_PROGRAMS_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_EXECUTE_JSA_PROGRAMS_H
+#define CPROVER_CEGIS_JSA_LEARN_EXECUTE_JSA_PROGRAMS_H
 
 /**
  * @brief
@@ -19,4 +19,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void execute_jsa_learn_programs(class jsa_programt &prog);
 
-#endif /* CEGIS_JSA_EXECUTE_JSA_PROGRAMS_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_EXECUTE_JSA_PROGRAMS_H

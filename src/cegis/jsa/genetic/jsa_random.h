@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_JSA_RANDOM_H_
-#define CEGIS_GENETIC_JSA_RANDOM_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_JSA_RANDOM_H
+#define CPROVER_CEGIS_JSA_GENETIC_JSA_RANDOM_H
 
 #include <functional>
 
@@ -150,4 +150,4 @@ public:
   unsigned int rand() const;
 };
 
-#endif /* CEGIS_GENETIC_JSA_RANDOM_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_JSA_RANDOM_H

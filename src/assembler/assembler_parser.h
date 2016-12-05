@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ASSEMBLER_PARSER_H
-#define CPROVER_ASSEMBLER_PARSER_H
+#ifndef CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
+#define CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
 
 #include <util/parser.h>
 #include <util/expr.h>
@@ -55,4 +55,4 @@ public:
 
 extern assembler_parsert assembler_parser;
 
-#endif
+#endif // CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H

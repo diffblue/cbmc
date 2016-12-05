@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTIONDESCRIPTION_H_
-#define CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTIONDESCRIPTION_H_
+#ifndef CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTION_DESCRIPTION_H
+#define CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTION_DESCRIPTION_H
 
 #include <functional>
 
@@ -98,4 +98,4 @@ public:
  */
 typedef std::vector<instruction_descriptiont> instruction_descriptionst;
 
-#endif /* CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTIONDESCRIPTION_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_INSTRUCTION_DESCRIPTION_H

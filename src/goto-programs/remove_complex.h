@@ -8,8 +8,8 @@ Date:   September 2014
 
 \*******************************************************************/
 
-#ifndef CPROVER_REMOVE_COMPLEX_H
-#define CPROVER_REMOVE_COMPLEX_H
+#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_COMPLEX_H
+#define CPROVER_GOTO_PROGRAMS_REMOVE_COMPLEX_H
 
 #include <goto-programs/goto_model.h>
 
@@ -17,4 +17,4 @@ void remove_complex(symbol_tablet &, goto_functionst &);
 
 void remove_complex(goto_modelt &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_REMOVE_COMPLEX_H

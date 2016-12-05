@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_SMVSAT_H
-#define CPROVER_SATCHECK_SMVSAT_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_SMVSAT_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_SMVSAT_H
 
 #include <vector>
 #include <set>
@@ -85,4 +85,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_SMVSAT_H

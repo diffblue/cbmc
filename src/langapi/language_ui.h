@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_LANGUAGE_UI_H
-#define CPROVER_LANGUAGE_UI_H
+#ifndef CPROVER_LANGAPI_LANGUAGE_UI_H
+#define CPROVER_LANGAPI_LANGUAGE_UI_H
 
 #include <util/message.h>
 #include <util/language_file.h>
@@ -54,4 +54,4 @@ protected:
   const cmdlinet &_cmdline;
 };
 
-#endif
+#endif // CPROVER_LANGAPI_LANGUAGE_UI_H

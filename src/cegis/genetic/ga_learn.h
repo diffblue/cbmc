@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_GA_LEARN_H_
-#define CEGIS_GENETIC_GA_LEARN_H_
+#ifndef CPROVER_CEGIS_GENETIC_GA_LEARN_H
+#define CPROVER_CEGIS_GENETIC_GA_LEARN_H
 
 #include <chrono>
 #include <functional>
@@ -153,4 +153,4 @@ public:
 
 #include "ga_learn.inc"
 
-#endif /* CEGIS_GENETIC_GA_LEARN_H_ */
+#endif // CPROVER_CEGIS_GENETIC_GA_LEARN_H

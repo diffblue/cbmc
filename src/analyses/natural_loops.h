@@ -6,8 +6,8 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 \*******************************************************************/
 
-#ifndef CPROVER_NATURAL_LOOPS_H
-#define CPROVER_NATURAL_LOOPS_H
+#ifndef CPROVER_ANALYSES_NATURAL_LOOPS_H
+#define CPROVER_ANALYSES_NATURAL_LOOPS_H
 
 #include <stack>
 #include <iosfwd>
@@ -206,4 +206,4 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
   }
 }
 
-#endif
+#endif // CPROVER_ANALYSES_NATURAL_LOOPS_H

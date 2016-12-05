@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_COVER_GOALS_H
-#define CPROVER_COVER_GOALS_H
+#ifndef CPROVER_SOLVERS_PROP_COVER_GOALS_H
+#define CPROVER_SOLVERS_PROP_COVER_GOALS_H
 
 #include <util/message.h>
 
@@ -105,4 +105,4 @@ private:
   void freeze_goal_variables();
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_COVER_GOALS_H

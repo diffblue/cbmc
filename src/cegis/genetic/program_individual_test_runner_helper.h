@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H_
-#define CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H_
+#ifndef CPROVER_CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H
+#define CPROVER_CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H
 
 #include <string>
 
@@ -32,4 +32,4 @@ void implement_program_individual_deserialise(std::string &source, bool danger);
  */
 void transform_program_individual_main_to_lib(std::string &source, bool danger);
 
-#endif /* CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H_ */
+#endif // CPROVER_CEGIS_GENETIC_PROGRAM_INDIVIDUAL_TEST_RUNNER_HELPER_H

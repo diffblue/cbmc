@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CEGAR_INVARIANT_PROPAGATION_H
-#define CPROVER_CEGAR_INVARIANT_PROPAGATION_H
+#ifndef CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
+#define CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
 
 #include <pointer-analysis/value_sets.h>
 
@@ -68,4 +68,4 @@ protected:
   bool check_type(const typet &type) const;
 };
 
-#endif
+#endif // CPROVER_ANALYSES_INVARIANT_PROPAGATION_H

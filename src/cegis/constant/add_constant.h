@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_ADD_CONSTANT_H_
-#define CEGIS_ADD_CONSTANT_H_
+#ifndef CPROVER_CEGIS_CONSTANT_ADD_CONSTANT_H
+#define CPROVER_CEGIS_CONSTANT_ADD_CONSTANT_H
 
 #include <goto-programs/goto_program.h>
 
@@ -45,4 +45,4 @@ void add_cegis_constant(
     const exprt &value,
     goto_programt::targett pos);
 
-#endif /* CEGIS_ADD_CONSTANT_H_ */
+#endif // CPROVER_CEGIS_CONSTANT_ADD_CONSTANT_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BV_UTILS_H
-#define CPROVER_BV_UTILS_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
+#define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
 #include <map>
 #include <set>
@@ -212,4 +212,4 @@ protected:
   bvt wallace_tree(const std::vector<bvt> &pps);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BV_UTILS_H

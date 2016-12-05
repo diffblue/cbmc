@@ -6,8 +6,8 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#ifndef CYCLES_VISITOR_H
-#define CYCLES_VISITOR_H
+#ifndef CPROVER_MUSKETEER_CYCLES_VISITOR_H
+#define CPROVER_MUSKETEER_CYCLES_VISITOR_H
 
 #include <set>
 
@@ -44,4 +44,4 @@ public:
     std::set<unsigned>& edges);
 };
 
-#endif
+#endif // CPROVER_MUSKETEER_CYCLES_VISITOR_H

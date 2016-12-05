@@ -181,4 +181,4 @@ void string_abstraction(
   message_handlert &message_handler,
   goto_functionst &dest);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H

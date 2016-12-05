@@ -6,8 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_DIFF_BASE_H
-#define CPROVER_GOTO_DIFF_BASE_H
+#ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_H
+#define CPROVER_GOTO_DIFF_GOTO_DIFF_H
 
 #include <goto-programs/goto_model.h>
 #include <langapi/language_ui.h>
@@ -56,4 +56,4 @@ protected:
 
 };
 
-#endif
+#endif // CPROVER_GOTO_DIFF_GOTO_DIFF_H

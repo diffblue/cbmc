@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOC_REF_H
-#define CPROVER_LOC_REF_H
+#ifndef CPROVER_PATH_SYMEX_LOC_REF_H
+#define CPROVER_PATH_SYMEX_LOC_REF_H
 
 #include <iosfwd>
 
@@ -83,4 +83,4 @@ static inline std::ostream &operator << (std::ostream &out, loc_reft l)
     return out << l.loc_number;
 }
 
-#endif
+#endif // CPROVER_PATH_SYMEX_LOC_REF_H

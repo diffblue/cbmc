@@ -8,8 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
-#ifndef ABSTRACT_EVENT_H
-#define ABSTRACT_EVENT_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H
 
 #include <util/source_location.h>
 #include <util/graph.h>
@@ -152,4 +152,4 @@ public:
     return value;
   }
 };
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H

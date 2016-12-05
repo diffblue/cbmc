@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_DECLARATION_H
-#define CPROVER_CPP_DECLARATION_H
+#ifndef CPROVER_CPP_CPP_DECLARATION_H
+#define CPROVER_CPP_CPP_DECLARATION_H
 
 #include <cassert>
 
@@ -152,4 +152,4 @@ extern inline const cpp_declarationt &to_cpp_declaration(const irept &irep)
   return static_cast<const cpp_declarationt &>(irep);
 }
 
-#endif
+#endif // CPROVER_CPP_CPP_DECLARATION_H

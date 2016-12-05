@@ -8,8 +8,8 @@ Date: January 2010
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNINITALIZED_H
-#define CPROVER_UNINITALIZED_H
+#ifndef CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H
+#define CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H
 
 #include <iosfwd>
 
@@ -24,4 +24,4 @@ void show_uninitialized(
   const goto_functionst &goto_functions,
   std::ostream &out);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H

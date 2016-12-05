@@ -112,4 +112,4 @@ public:
 
 std::ostream &operator << (std::ostream &, const c_qualifierst &);
 
-#endif
+#endif // CPROVER_ANSI_C_C_QUALIFIERS_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_BUILD_GOTO_TRACE_H
-#define CPROVER_PATH_SYMEX_BUILD_GOTO_TRACE_H
+#ifndef CPROVER_AA_PATH_SYMEX_BUILD_GOTO_TRACE_H
+#define CPROVER_AA_PATH_SYMEX_BUILD_GOTO_TRACE_H
 
 #include <util/decision_procedure.h>
 #include <goto-programs/goto_trace.h>
@@ -19,4 +19,4 @@ void build_goto_trace(
   const decision_proceduret &decision_procedure,
   goto_tracet &goto_trace);
 
-#endif
+#endif // CPROVER_AA_PATH_SYMEX_BUILD_GOTO_TRACE_H

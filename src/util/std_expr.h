@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STD_EXPR_H
-#define CPROVER_STD_EXPR_H
+#ifndef CPROVER_UTIL_STD_EXPR_H
+#define CPROVER_UTIL_STD_EXPR_H
 
 /*! \file util/std_expr.h
  * \brief API to expression classes
@@ -3669,4 +3669,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_STD_EXPR_H

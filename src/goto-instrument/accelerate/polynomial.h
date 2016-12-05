@@ -1,5 +1,5 @@
-#ifndef POLYNOMIAL_H
-#define POLYNOMIAL_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_H
 
 #include <vector>
 #include <map>
@@ -50,4 +50,4 @@ public:
 
 typedef std::vector<polynomialt> polynomialst;
 
-#endif // POLYNOMIAL_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_H

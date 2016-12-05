@@ -1,5 +1,5 @@
-#ifndef CPROVER_SET_STACK_H
-#define CPROVER_SET_STACK_H
+#ifndef CPROVER_UTIL_OLD_SET_STACK_H
+#define CPROVER_UTIL_OLD_SET_STACK_H
 
 #include <set>
 #include <list>
@@ -146,4 +146,4 @@ void hash_set_stack<T, H>::resize(list_size_type s)
   }
 }
 
-#endif
+#endif // CPROVER_UTIL_OLD_SET_STACK_H

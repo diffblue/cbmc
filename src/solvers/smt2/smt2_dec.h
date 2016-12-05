@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_SMT2_DEC_H
-#define CPROVER_PROP_SMT2_DEC_H
+#ifndef CPROVER_SOLVERS_SMT2_SMT2_DEC_H
+#define CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 
 /*! \defgroup gr_smt2 SMT-LIB 2.x Interface */
 
@@ -57,4 +57,4 @@ protected:
   resultt read_result(std::istream &in);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SMT2_SMT2_DEC_H

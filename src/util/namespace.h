@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_NAMESPACE_H
-#define CPROVER_NAMESPACE_H
+#ifndef CPROVER_UTIL_NAMESPACE_H
+#define CPROVER_UTIL_NAMESPACE_H
 
 #include "irep.h"
 
@@ -115,4 +115,4 @@ protected:
   symbol_table_listt symbol_table_list;
 };
 
-#endif
+#endif // CPROVER_UTIL_NAMESPACE_H

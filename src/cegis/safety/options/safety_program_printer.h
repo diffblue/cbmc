@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_PROGRAM_PRINTER_H_
-#define CEGIS_SAFETY_PROGRAM_PRINTER_H_
+#ifndef CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_PRINTER_H
+#define CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_PRINTER_H
 
 #include <util/message.h>
 
@@ -27,4 +27,4 @@ void print_safety_program(messaget::mstreamt &os,
     const class safety_programt &program,
     const safety_goto_solutiont &solution);
 
-#endif /* CEGIS_DANGER_PROGRAM_PRINTER_H_ */
+#endif // CPROVER_CEGIS_SAFETY_OPTIONS_SAFETY_PROGRAM_PRINTER_H

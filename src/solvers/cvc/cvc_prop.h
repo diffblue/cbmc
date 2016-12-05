@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_CVC_PROP_H
-#define CPROVER_PROP_CVC_PROP_H
+#ifndef CPROVER_SOLVERS_CVC_CVC_PROP_H
+#define CPROVER_SOLVERS_CVC_CVC_PROP_H
 
 #include <iosfwd>
 
@@ -83,4 +83,4 @@ protected:
   std::vector<tvt> assignment;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_CVC_CVC_PROP_H

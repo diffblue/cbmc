@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSE_OPTIONS_H
-#define CPROVER_CBMC_PARSE_OPTIONS_H
+#ifndef CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
+#define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -102,4 +102,4 @@ protected:
   void preprocessing();
 };
 
-#endif
+#endif // CPROVER_CBMC_CBMC_PARSE_OPTIONS_H

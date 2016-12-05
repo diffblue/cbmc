@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNWIND_H
-#define CPROVER_UNWIND_H
+#ifndef CPROVER_GOTO_INSTRUMENT_UNWIND_H
+#define CPROVER_GOTO_INSTRUMENT_UNWIND_H
 
 #include <goto-programs/goto_program.h>
 
@@ -28,4 +28,4 @@ void goto_unwind(
   goto_functionst &goto_functions,
   const unsigned k);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_UNWIND_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_EXTRACT_CANDIDATE_H_
-#define CEGIS_JSA_EXTRACT_CANDIDATE_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_EXTRACT_CANDIDATE_H
+#define CPROVER_CEGIS_JSA_LEARN_EXTRACT_CANDIDATE_H
 
 #include <cegis/jsa/value/pred_ops.h>
 
@@ -45,4 +45,4 @@ void extract_jsa_candidate(
     const pred_op_idst &result_pred_ops,
     const size_t max_size);
 
-#endif /* CEGIS_JSA_EXTRACT_CANDIDATE_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_EXTRACT_CANDIDATE_H

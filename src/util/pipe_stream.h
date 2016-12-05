@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_UTIL_PIPE_STREAM
-#define CPROVER_UTIL_PIPE_STREAM
+#ifndef CPROVER_UTIL_PIPE_STREAM_H
+#define CPROVER_UTIL_PIPE_STREAM_H
 
 #include <iosfwd>
 #include <string>
@@ -71,4 +71,4 @@ protected:
   filedescriptor_streambuf buffer;
 };
 
-#endif
+#endif // CPROVER_UTIL_PIPE_STREAM_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TEMPLATE_ARGS_H
-#define CPROVER_CPP_TEMPLATE_ARGS_H
+#ifndef CPROVER_CPP_CPP_TEMPLATE_ARGS_H
+#define CPROVER_CPP_CPP_TEMPLATE_ARGS_H
 
 #include <util/irep.h>
 
@@ -85,4 +85,4 @@ extern inline const cpp_template_args_tct &to_cpp_template_args_tc(const irept &
   return static_cast<const cpp_template_args_tct &>(irep);
 }
 
-#endif
+#endif // CPROVER_CPP_CPP_TEMPLATE_ARGS_H

@@ -1,5 +1,5 @@
-#ifndef CONE_OF_INFLUENCE_H
-#define CONE_OF_INFLUENCE_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_CONE_OF_INFLUENCE_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_CONE_OF_INFLUENCE_H
 
 #include <goto-programs/goto_program.h>
 
@@ -41,4 +41,4 @@ class cone_of_influencet {
   const namespacet ns;
 };
 
-#endif // CONE_OF_INFLUENCE_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_CONE_OF_INFLUENCE_H

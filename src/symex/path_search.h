@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SEARCH_H
-#define CPROVER_PATH_SEARCH_H
+#ifndef CPROVER_SYMEX_PATH_SEARCH_H
+#define CPROVER_SYMEX_PATH_SEARCH_H
 
 #include <util/time_stopping.h>
 #include <util/expanding_vector.h>
@@ -136,4 +136,4 @@ protected:
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
 };
 
-#endif
+#endif // CPROVER_SYMEX_PATH_SEARCH_H

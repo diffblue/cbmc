@@ -88,4 +88,4 @@ protected:
   hash_set_cont<irep_idt, irep_id_hash> body_warnings;
 };
 
-#endif
+#endif // CPROVER_CBMC_SYMEX_BMC_H

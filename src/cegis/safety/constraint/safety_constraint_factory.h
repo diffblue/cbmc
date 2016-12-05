@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_CONSTRAINT_FACTORY_H_
-#define CEGIS_SAFETY_CONSTRAINT_FACTORY_H_
+#ifndef CPROVER_CEGIS_SAFETY_CONSTRAINT_SAFETY_CONSTRAINT_FACTORY_H
+#define CPROVER_CEGIS_SAFETY_CONSTRAINT_SAFETY_CONSTRAINT_FACTORY_H
 
 #include <util/expr.h>
 
@@ -23,4 +23,4 @@
  */
 exprt create_safety_constraint(const size_t number_of_loops);
 
-#endif /* CEGIS_SAFETY_CONSTRAINT_FACTORY_H_ */
+#endif // CPROVER_CEGIS_SAFETY_CONSTRAINT_SAFETY_CONSTRAINT_FACTORY_H

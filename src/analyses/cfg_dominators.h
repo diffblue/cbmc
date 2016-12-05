@@ -6,8 +6,8 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 \*******************************************************************/
 
-#ifndef CPROVER_CFG_DOMINATORS_H
-#define CPROVER_CFG_DOMINATORS_H
+#ifndef CPROVER_ANALYSES_CFG_DOMINATORS_H
+#define CPROVER_ANALYSES_CFG_DOMINATORS_H
 
 #include <set>
 #include <list>
@@ -251,4 +251,4 @@ typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targe
 typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targett, true>
         cfg_post_dominatorst;
 
-#endif
+#endif // CPROVER_ANALYSES_CFG_DOMINATORS_H

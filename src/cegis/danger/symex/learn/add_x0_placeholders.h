@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_ADD_X0_PLACEHOLDERS_H_
-#define CEGIS_DANGER_ADD_X0_PLACEHOLDERS_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_X0_PLACEHOLDERS_H
+#define CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_X0_PLACEHOLDERS_H
 
 /**
  * @brief
@@ -19,4 +19,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void danger_add_x0_placeholders(class danger_programt &prog);
 
-#endif /* CEGIS_DANGER_ADD_X0_PLACEHOLDERS_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_LEARN_ADD_X0_PLACEHOLDERS_H

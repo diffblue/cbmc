@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_CEGIS_UTIL_MODULE_HELPER_H_
-#define CEGIS_CEGIS_UTIL_MODULE_HELPER_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_MODULE_HELPER_H
+#define CPROVER_CEGIS_CEGIS_UTIL_MODULE_HELPER_H
 
 #include <string>
 
@@ -21,4 +21,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 std::string get_current_executable_file_path();
 
-#endif /* CEGIS_CEGIS_UTIL_MODULE_HELPER_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_MODULE_HELPER_H

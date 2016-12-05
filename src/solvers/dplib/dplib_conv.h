@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_DPLIB_CONV_H
-#define CPROVER_PROP_DPLIB_CONV_H
+#ifndef CPROVER_SOLVERS_DPLIB_DPLIB_CONV_H
+#define CPROVER_SOLVERS_DPLIB_DPLIB_CONV_H
 
 #include <util/hash_cont.h>
 
@@ -70,4 +70,4 @@ private:
   identifier_mapt identifier_map;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_DPLIB_DPLIB_CONV_H

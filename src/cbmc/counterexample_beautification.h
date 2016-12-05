@@ -47,4 +47,4 @@ protected:
   symex_target_equationt::SSA_stepst::const_iterator failed;
 };
 
-#endif
+#endif // CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H

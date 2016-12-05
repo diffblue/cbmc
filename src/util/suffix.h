@@ -17,4 +17,4 @@ inline bool has_suffix(const std::string &s, const std::string &suffix)
   return s.compare(s.size()-suffix.size(), std::string::npos, suffix)==0;
 }
 
-#endif
+#endif // CPROVER_UTIL_SUFFIX_H

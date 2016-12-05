@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_PARALLEL_DANGER_VERIFY_TASK_H_
-#define CEGIS_PARALLEL_DANGER_VERIFY_TASK_H_
+#ifndef CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFY_TASK_H
+#define CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFY_TASK_H
 
 #include <cegis/cegis-util/irep_pipe.h>
 #include <cegis/danger/symex/verify/danger_verify_config.h>
@@ -164,4 +164,4 @@ public:
   bool join();
 };
 
-#endif /* CEGIS_PARALLEL_DANGER_VERIFY_TASK_H_ */
+#endif // CPROVER_CEGIS_DANGER_SYMEX_VERIFY_PARALLEL_DANGER_VERIFY_TASK_H

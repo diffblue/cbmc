@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H_
-#define CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H_
+#ifndef CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H
+#define CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H
 
 #include <util/message.h>
 
@@ -29,4 +29,4 @@ void print_refactor_candidate(
     const class goto_functionst &gf,
     const refactor_solutiont &candidate);
 
-#endif /* CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_LEARN_REFACTOR_CANDIDATE_PRINTER_H

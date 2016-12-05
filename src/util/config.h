@@ -160,4 +160,4 @@ public:
 
 extern configt config;
 
-#endif
+#endif // CPROVER_UTIL_CONFIG_H

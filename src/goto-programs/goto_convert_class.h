@@ -469,4 +469,4 @@ protected:
   exprt get_array_argument(const exprt &src);
 };
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_CLASS_H

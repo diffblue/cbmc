@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_LITERALS_SEED_H_
-#define CEGIS_LITERALS_SEED_H_
+#ifndef CPROVER_CEGIS_SEED_LITERALS_SEED_H
+#define CPROVER_CEGIS_SEED_LITERALS_SEED_H
 
 #include <cegis/danger/symex/verify/danger_verify_config.h>
 
@@ -48,4 +48,4 @@ public:
   void operator()(danger_verify_configt::counterexamplest &ces);
 };
 
-#endif /* CEGIS_LITERALS_SEED_H_ */
+#endif // CPROVER_CEGIS_SEED_LITERALS_SEED_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BOOLBV_WIDTH_H
-#define CPROVER_BOOLBV_WIDTH_H
+#ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H
+#define CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H
 
 #include <util/std_types.h>
 #include <util/namespace.h>
@@ -50,4 +50,4 @@ protected:
   const entryt &get_entry(const typet &type) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H

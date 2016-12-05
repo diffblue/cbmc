@@ -1,5 +1,5 @@
-#ifndef ENUMERATING_LOOP_ACCELERATION_H
-#define  ENUMERATING_LOOP_ACCELERATION_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ENUMERATING_LOOP_ACCELERATION_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ENUMERATING_LOOP_ACCELERATION_H
 
 #include <goto-programs/goto_program.h>
 
@@ -52,4 +52,4 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
   path_enumeratort *path_enumerator;
 };
 
-#endif // ENUMERATING_LOOP_ACCELERATION_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ENUMERATING_LOOP_ACCELERATION_H

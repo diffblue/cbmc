@@ -6,8 +6,8 @@ Author:
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_FENCE_INSERTER_PARSEOPTIONS_H
-#define CPROVER_GOTO_FENCE_INSERTER_PARSEOPTIONS_H
+#ifndef CPROVER_MUSKETEER_MUSKETEER_PARSE_OPTIONS_H
+#define CPROVER_MUSKETEER_MUSKETEER_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -53,4 +53,4 @@ protected:
   void set_verbosity();
 };
 
-#endif
+#endif // CPROVER_MUSKETEER_MUSKETEER_PARSE_OPTIONS_H

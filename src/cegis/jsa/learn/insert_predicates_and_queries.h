@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_INSERT_PREDICATES_AND_QUERIES_H_
-#define CEGIS_JSA_INSERT_PREDICATES_AND_QUERIES_H_
+#ifndef CPROVER_CEGIS_JSA_LEARN_INSERT_PREDICATES_AND_QUERIES_H
+#define CPROVER_CEGIS_JSA_LEARN_INSERT_PREDICATES_AND_QUERIES_H
 
 #include <cstddef>
 
@@ -42,4 +42,4 @@ void declare_jsa_query(jsa_programt &prog, size_t max_size);
  */
 void declare_jsa_invariant(jsa_programt &prog, size_t max_size);
 
-#endif /* CEGIS_JSA_INSERT_PREDICATES_AND_QUERIES_H_ */
+#endif // CPROVER_CEGIS_JSA_LEARN_INSERT_PREDICATES_AND_QUERIES_H

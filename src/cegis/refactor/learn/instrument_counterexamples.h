@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H_
-#define CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H_
+#ifndef CPROVER_CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H
+#define CPROVER_CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H
 
 #include <cegis/refactor/value/refactor_counterexample.h>
 
@@ -24,4 +24,4 @@ void instrument_counterexamples(
     class refactor_programt &prog,
     refactor_counterexamplest ces);
 
-#endif /* CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_LEARN_INSTRUMENT_COUNTEREXAMPLES_H

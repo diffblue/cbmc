@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_SOLUTION_H_
-#define CEGIS_JSA_SOLUTION_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_H
 
 #include <goto-programs/goto_program.h>
 
@@ -83,4 +83,4 @@ public:
   void clear();
 };
 
-#endif /* CEGIS_JSA_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_H

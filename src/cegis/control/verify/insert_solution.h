@@ -8,8 +8,8 @@
 \*******************************************************************/
 
 
-#ifndef CEGIS_CONTROL_INSERT_SOLUTION_H_
-#define CEGIS_CONTROL_INSERT_SOLUTION_H_
+#ifndef CPROVER_CEGIS_CONTROL_VERIFY_INSERT_SOLUTION_H
+#define CPROVER_CEGIS_CONTROL_VERIFY_INSERT_SOLUTION_H
 
 /**
  * @brief
@@ -23,4 +23,4 @@ void insert_solution(
     class control_programt &program,
     const class control_solutiont &solution);
 
-#endif /* CEGIS_CONTROL_INSERT_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VERIFY_INSERT_SOLUTION_H

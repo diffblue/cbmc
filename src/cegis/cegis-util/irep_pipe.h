@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_IREP_PIPE_H_
-#define CEGIS_IREP_PIPE_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_IREP_PIPE_H
+#define CPROVER_CEGIS_CEGIS_UTIL_IREP_PIPE_H
 
 /**
  * @brief Helper for sending irep SDUs through pipes.
@@ -127,4 +127,4 @@ public:
   void auto_close();
 };
 
-#endif /* CEGIS_IREP_PIPE_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_IREP_PIPE_H

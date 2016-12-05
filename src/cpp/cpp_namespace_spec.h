@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_NAMESPACE_SPEC_H
-#define CPROVER_CPP_NAMESPACE_SPEC_H
+#ifndef CPROVER_CPP_CPP_NAMESPACE_SPEC_H
+#define CPROVER_CPP_CPP_NAMESPACE_SPEC_H
 
 #include <util/expr.h>
 
@@ -66,4 +66,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_NAMESPACE_SPEC_H

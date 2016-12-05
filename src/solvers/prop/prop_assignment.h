@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_ASSIGNMENT_H
-#define CPROVER_PROP_ASSIGNMENT_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_ASSIGNMENT_H
+#define CPROVER_SOLVERS_PROP_PROP_ASSIGNMENT_H
 
 #include "literal.h"
 
@@ -27,4 +27,4 @@ public:
   virtual void copy_assignment_from(const propt &prop)=0;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_PROP_ASSIGNMENT_H

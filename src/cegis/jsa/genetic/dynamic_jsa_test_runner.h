@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_DYNAMIC_JSA_TEST_RUNNER_H_
-#define CEGIS_DYNAMIC_JSA_TEST_RUNNER_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_DYNAMIC_JSA_TEST_RUNNER_H
+#define CPROVER_CEGIS_JSA_GENETIC_DYNAMIC_JSA_TEST_RUNNER_H
 
 #include <functional>
 
@@ -82,4 +82,4 @@ public:
   void join();
 };
 
-#endif /* CEGIS_DYNAMIC_JSA_TEST_RUNNER_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_DYNAMIC_JSA_TEST_RUNNER_H

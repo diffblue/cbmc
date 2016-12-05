@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_UTIL_TYPE_HELPER_H_
-#define CEGIS_UTIL_TYPE_HELPER_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_TYPE_HELPER_H
+#define CPROVER_CEGIS_CEGIS_UTIL_TYPE_HELPER_H
 
 #include <set>
 
@@ -74,4 +74,4 @@ public:
   bool operator()(const typet &type) const;
 };
 
-#endif /* CEGIS_UTIL_TYPE_HELPER_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_TYPE_HELPER_H

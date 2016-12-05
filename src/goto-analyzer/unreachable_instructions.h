@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_UNREACHABLE_INSTRUCTIONS_H
-#define CPROVER_UNREACHABLE_INSTRUCTIONS_H
+#ifndef CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H
+#define CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H
 
 #include <ostream>
 
@@ -20,4 +20,4 @@ void unreachable_instructions(
   const bool json,
   std::ostream &os);
 
-#endif
+#endif // CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H

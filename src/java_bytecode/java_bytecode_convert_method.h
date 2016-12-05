@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_BYTECODE_CONVERT_METHOD_H
-#define CPROVER_JAVA_BYTECODE_CONVERT_METHOD_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
+#define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
 
 #include <util/symbol_table.h>
 #include <util/message.h>
@@ -20,4 +20,4 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H

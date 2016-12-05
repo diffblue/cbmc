@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef FLOW_INSENSITIVE_ANALYSIS_H_
-#define FLOW_INSENSITIVE_ANALYSIS_H_
+#ifndef CPROVER_ANALYSES_FLOW_INSENSITIVE_ANALYSIS_H
+#define CPROVER_ANALYSES_FLOW_INSENSITIVE_ANALYSIS_H
 
 #include <queue>
 #include <map>
@@ -259,4 +259,4 @@ private:
   void dummy(const T &s) { const statet &x=dummy1(s); (void)x; }
 };
 
-#endif /*FLOW_INSENSITIVE_ANALYSIS_H_*/
+#endif // CPROVER_ANALYSES_FLOW_INSENSITIVE_ANALYSIS_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_RUNNER_H_
-#define CEGIS_SAFETY_RUNNER_H_
+#ifndef CPROVER_CEGIS_SAFETY_FACADE_SAFETY_RUNNER_H
+#define CPROVER_CEGIS_SAFETY_FACADE_SAFETY_RUNNER_H
 
 #include <util/message.h>
 
@@ -28,4 +28,4 @@ Author: Daniel Kroening, kroening@kroening.com
 int run_safety(class optionst &options, messaget::mstreamt &result,
     const class symbol_tablet &st, const class goto_functionst &gf);
 
-#endif /* CEGIS_SAFETY_RUNNER_H_ */
+#endif // CPROVER_CEGIS_SAFETY_FACADE_SAFETY_RUNNER_H

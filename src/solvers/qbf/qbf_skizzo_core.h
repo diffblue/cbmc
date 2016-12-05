@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_SKIZZO_CORE_H
-#define CPROVER_QBF_SKIZZO_CORE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_SKIZZO_CORE_H
+#define CPROVER_SOLVERS_QBF_QBF_SKIZZO_CORE_H
 
 #include "qbf_bdd_core.h"
 
@@ -30,4 +30,4 @@ protected:
   bool get_certificate(void);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_QBF_QBF_SKIZZO_CORE_H

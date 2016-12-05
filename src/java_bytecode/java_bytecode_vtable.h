@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JAVA_BYTECODE_VTABLE_H
-#define CPROVER_JAVA_BYTECODE_VTABLE_H
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_VTABLE_H
+#define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_VTABLE_H
 
 #include <util/std_types.h>
 
@@ -33,4 +33,4 @@ bool java_bytecode_vtable(
   symbol_tablet &symbol_table,
   const std::string &module);
 
-#endif /* CPROVER_JAVA_BYTECODE_VTABLE_H */
+#endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_VTABLE_H

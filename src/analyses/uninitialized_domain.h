@@ -8,6 +8,9 @@ Date: January 2010
 
 \*******************************************************************/
 
+#ifndef CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H
+#define CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H
+
 #include "ai.h"
 
 class uninitialized_domaint:public ai_domain_baset
@@ -40,3 +43,5 @@ protected:
 
 typedef ait<uninitialized_domaint>
   uninitialized_analysist;
+
+#endif // CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H

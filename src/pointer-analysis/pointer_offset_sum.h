@@ -13,4 +13,4 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt pointer_offset_sum(const exprt &a, const exprt &b);
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_POINTER_OFFSET_SUM_H

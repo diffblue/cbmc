@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_IEEE_FLOAT_H
-#define CPROVER_IEEE_FLOAT_H
+#ifndef CPROVER_UTIL_IEEE_FLOAT_H
+#define CPROVER_UTIL_IEEE_FLOAT_H
 
 #include <iosfwd>
 
@@ -300,4 +300,4 @@ std::ostream& operator << (std::ostream &, const ieee_floatt &);
 bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
 bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
 
-#endif
+#endif // CPROVER_UTIL_IEEE_FLOAT_H

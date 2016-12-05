@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GUARD_H
-#define CPROVER_GUARD_H
+#ifndef CPROVER_UTIL_GUARD_H
+#define CPROVER_UTIL_GUARD_H
 
 #include <iosfwd>
 
@@ -98,4 +98,4 @@ protected:
       it!=(guard_list).end(); ++it)
 #endif
 
-#endif
+#endif // CPROVER_UTIL_GUARD_H

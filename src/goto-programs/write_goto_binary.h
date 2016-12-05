@@ -32,4 +32,4 @@ bool write_goto_binary(
   const goto_functionst &goto_functions,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_WRITE_GOTO_BINARY_H

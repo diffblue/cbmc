@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef __GRAPH_H
-#define __GRAPH_H
+#ifndef CPROVER_UTIL_GRAPH_H
+#define CPROVER_UTIL_GRAPH_H
 
 #include <list>
 #include <stack>
@@ -723,4 +723,4 @@ void graph<N>::output_dot_node(std::ostream &out, node_indext n) const
     out << n << " -> " << it->first << '\n';
 }
 
-#endif
+#endif // CPROVER_UTIL_GRAPH_H

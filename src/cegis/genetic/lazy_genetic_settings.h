@@ -5,8 +5,8 @@
  *      Author: Pascal
  */
 
-#ifndef CEGIS_LAZY_GENETIC_SETTINGS_H_
-#define CEGIS_LAZY_GENETIC_SETTINGS_H_
+#ifndef CPROVER_CEGIS_GENETIC_LAZY_GENETIC_SETTINGS_H
+#define CPROVER_CEGIS_GENETIC_LAZY_GENETIC_SETTINGS_H
 
 #include <functional>
 
@@ -106,4 +106,4 @@ public:
 
 #include "lazy_genetic_settings.inc"
 
-#endif /* CEGIS_LAZY_GENETIC_SETTINGS_H_ */
+#endif // CPROVER_CEGIS_GENETIC_LAZY_GENETIC_SETTINGS_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_CREATE_TEMP_VARIABLES_H_
-#define CEGIS_JSA_CREATE_TEMP_VARIABLES_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_CREATE_TEMP_VARIABLES_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_CREATE_TEMP_VARIABLES_H
 
 #include <cstddef>
 
@@ -22,4 +22,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void create_jsa_temp_variables(class jsa_programt &prog, size_t max_size);
 
-#endif /* CEGIS_JSA_CREATE_TEMP_VARIABLES_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_CREATE_TEMP_VARIABLES_H

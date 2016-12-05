@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STD_CODE_H
-#define CPROVER_STD_CODE_H
+#ifndef CPROVER_UTIL_STD_CODE_H
+#define CPROVER_UTIL_STD_CODE_H
 
 #include <cassert>
 
@@ -1201,4 +1201,4 @@ static inline code_try_catcht &to_code_try_catch(codet &code)
   return static_cast<code_try_catcht &>(code);
 }
 
-#endif
+#endif // CPROVER_UTIL_STD_CODE_H

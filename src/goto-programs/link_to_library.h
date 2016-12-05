@@ -22,4 +22,4 @@ void link_to_library(
   goto_modelt &,
   message_handlert &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H

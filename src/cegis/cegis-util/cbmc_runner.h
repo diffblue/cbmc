@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_UTIL_CBMC_RUNNER_H_
-#define CEGIS_UTIL_CBMC_RUNNER_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_CBMC_RUNNER_H
+#define CPROVER_CEGIS_CEGIS_UTIL_CBMC_RUNNER_H
 
 #include <goto-programs/safety_checker.h>
 
@@ -63,4 +63,4 @@ safety_checkert::resultt run_cbmc(
     cbmc_resultt &result,
     const class optionst &options);
 
-#endif /* CEGIS_UTIL_CBMC_RUNNER_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_CBMC_RUNNER_H

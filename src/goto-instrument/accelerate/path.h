@@ -1,5 +1,5 @@
-#ifndef PATH_H
-#define PATH_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_H
 
 #include <iosfwd>
 #include <list>
@@ -36,4 +36,4 @@ typedef std::list<patht> pathst;
 
 void output_path(patht &path, goto_programt &program, namespacet &ns, std::ostream &str);
 
-#endif // PATH_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_H

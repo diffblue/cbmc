@@ -27,4 +27,4 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_H

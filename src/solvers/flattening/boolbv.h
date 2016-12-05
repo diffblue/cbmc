@@ -251,4 +251,4 @@ protected:
   numbering<irep_idt> string_numbering;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_BOOLBV_H

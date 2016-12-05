@@ -24,4 +24,4 @@ void show_goto_functions(
   const goto_modelt &,
   ui_message_handlert::uit ui);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_H
-#define CPROVER_POINTER_ANALYSIS_VALUE_PROPAGATION_H
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
 
 #define USE_DEPRECATED_STATIC_ANALYSIS_H
 #include <analyses/static_analysis.h>
@@ -59,4 +59,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H

@@ -92,4 +92,4 @@ public:
   unsigned dynamic_count; // memory allocation
 };
 
-#endif
+#endif // CPROVER_PATH_SYMEX_VAR_MAP_H

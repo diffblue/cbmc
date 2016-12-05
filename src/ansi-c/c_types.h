@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_C_TYPES_H
-#define CPROVER_C_TYPES_H
+#ifndef CPROVER_ANSI_C_C_TYPES_H
+#define CPROVER_ANSI_C_C_TYPES_H
 
 #include <util/type.h>
 
@@ -44,4 +44,4 @@ typet void_type();
 // ID_signed_int gets "signed int".
 std::string c_type_as_string(const irep_idt &);
 
-#endif
+#endif // CPROVER_ANSI_C_C_TYPES_H

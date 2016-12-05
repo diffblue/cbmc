@@ -8,8 +8,8 @@ Date: July 2006
 
 \*******************************************************************/
 
-#ifndef XML_IREP_HASHING_H_
-#define XML_IREP_HASHING_H_
+#ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_IREP_HASHING_H
+#define CPROVER_GOTO_CC_XML_BINARIES_XML_IREP_HASHING_H
 
 #include <util/xml.h>
 #include <util/irep.h>
@@ -92,4 +92,4 @@ class xml_irep_convertt {
     unsigned long add_with_childs(const irept&);
 };
 
-#endif /*XML_IREP_HASHING_H_*/
+#endif // CPROVER_GOTO_CC_XML_BINARIES_XML_IREP_HASHING_H

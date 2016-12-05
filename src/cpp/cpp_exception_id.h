@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_EXCEPTION_ID_H
-#define CPROVER_CPP_EXCEPTION_ID_H
+#ifndef CPROVER_CPP_CPP_EXCEPTION_ID_H
+#define CPROVER_CPP_CPP_EXCEPTION_ID_H
 
 // turns a type into an exception ID
 
@@ -17,4 +17,4 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 irep_idt cpp_exception_id(const typet &, const namespacet &);
 irept cpp_exception_list(const typet &, const namespacet &);
 
-#endif
+#endif // CPROVER_CPP_CPP_EXCEPTION_ID_H

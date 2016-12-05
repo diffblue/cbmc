@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_FLATTENING_EQUALITY_H
-#define CPROVER_SOLVER_FLATTENING_EQUALITY_H
+#ifndef CPROVER_SOLVERS_FLATTENING_EQUALITY_H
+#define CPROVER_SOLVERS_FLATTENING_EQUALITY_H
 
 #include <map>
 
@@ -53,4 +53,4 @@ protected:
   virtual void add_equality_constraints(const typestructt &typestruct);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_EQUALITY_H

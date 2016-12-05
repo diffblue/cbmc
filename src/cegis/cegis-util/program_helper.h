@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_PROGRAM_HELPER_H_
-#define CEGIS_PROGRAM_HELPER_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_PROGRAM_HELPER_H
+#define CPROVER_CEGIS_CEGIS_UTIL_PROGRAM_HELPER_H
 
 #include <goto-programs/goto_program.h>
 
@@ -402,4 +402,4 @@ void assign_in_cprover_init(
     symbolt &symbol,
     const exprt &value);
 
-#endif /* CEGIS_PROGRAM_HELPER_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_PROGRAM_HELPER_H

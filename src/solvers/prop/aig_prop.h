@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROPSOLVE_AIG_PROP_H
-#define CPROVER_PROPSOLVE_AIG_PROP_H
+#ifndef CPROVER_SOLVERS_PROP_AIG_PROP_H
+#define CPROVER_SOLVERS_PROP_AIG_PROP_H
 
 #include <cassert>
 
@@ -119,4 +119,4 @@ protected:
   void convert_node(unsigned n, const aigt::nodet &node, bool n_pos, bool n_neg, std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_AIG_PROP_H

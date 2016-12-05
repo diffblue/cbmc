@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_FLOAT_HELPER_H_
-#define CEGIS_CONTROL_FLOAT_HELPER_H_
+#ifndef CPROVER_CEGIS_CONTROL_VALUE_FLOAT_HELPER_H
+#define CPROVER_CEGIS_CONTROL_VALUE_FLOAT_HELPER_H
 
 #include <util/expr.h>
 
@@ -35,4 +35,4 @@ double to_control_float(const constant_exprt &expr);
  */
 exprt to_control_float_expr(const class symbol_tablet &st, double value);
 
-#endif /* CEGIS_CONTROL_FLOAT_HELPER_H_ */
+#endif // CPROVER_CEGIS_CONTROL_VALUE_FLOAT_HELPER_H

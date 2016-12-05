@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_REMOVE_LOOP_H_
-#define CEGIS_JSA_REMOVE_LOOP_H_
+#ifndef CPROVER_CEGIS_JSA_PREPROCESSING_REMOVE_LOOP_H
+#define CPROVER_CEGIS_JSA_PREPROCESSING_REMOVE_LOOP_H
 
 /**
  * @brief
@@ -19,4 +19,4 @@ Author: Daniel Kroening, kroening@kroening.com
  */
 void remove_loop(class jsa_programt &prog);
 
-#endif /* CEGIS_JSA_REMOVE_LOOP_H_ */
+#endif // CPROVER_CEGIS_JSA_PREPROCESSING_REMOVE_LOOP_H

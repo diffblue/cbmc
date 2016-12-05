@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOCAL_BITVECTOR_ANALYSIS_H
-#define CPROVER_LOCAL_BITVECTOR_ANALYSIS_H
+#ifndef CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
+#define CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
 
 #include <stack>
 
@@ -222,4 +222,4 @@ protected:
   bool is_tracked(const irep_idt &identifier);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H

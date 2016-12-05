@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PROP_MINIMIZE_H
-#define CPROVER_PROP_MINIMIZE_H
+#ifndef CPROVER_SOLVERS_PROP_MINIMIZE_H
+#define CPROVER_SOLVERS_PROP_MINIMIZE_H
 
 #include <map>
 
@@ -88,4 +88,4 @@ protected:
   objectivest::reverse_iterator current;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_PROP_MINIMIZE_H

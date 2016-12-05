@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_LANGUAGES_H
-#define CPROVER_LANGUAGES_H
+#ifndef CPROVER_LANGAPI_LANGUAGES_H
+#define CPROVER_LANGAPI_LANGUAGES_H
 
 #include <util/language.h>
 
@@ -44,4 +44,4 @@ protected:
   languaget *language;
 };
 
-#endif
+#endif // CPROVER_LANGAPI_LANGUAGES_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_FUNCTIONS_H
-#define CPROVER_FUNCTIONS_H
+#ifndef CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
+#define CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
 
 #include <set>
 
@@ -53,4 +53,4 @@ protected:
                         const exprt::operandst &o2);
 };
 
-#endif
+#endif // CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H

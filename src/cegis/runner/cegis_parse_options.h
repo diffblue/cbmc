@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CEGIS_PARSEOPTIONS_H
-#define CPROVER_CEGIS_PARSEOPTIONS_H
+#ifndef CPROVER_CEGIS_RUNNER_CEGIS_PARSE_OPTIONS_H
+#define CPROVER_CEGIS_RUNNER_CEGIS_PARSE_OPTIONS_H
 
 #include <cbmc/cbmc_parse_options.h>
 
@@ -35,4 +35,4 @@ protected:
   virtual int do_bmc(bmct &bmc, const goto_functionst &goto_functions);
 };
 
-#endif
+#endif // CPROVER_CEGIS_RUNNER_CEGIS_PARSE_OPTIONS_H

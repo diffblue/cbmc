@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
-#define CPROVER_GOTO_PROGRAMS_GOTO_CHECK_H
+#ifndef CPROVER_ANALYSES_GOTO_CHECK_H
+#define CPROVER_ANALYSES_GOTO_CHECK_H
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_model.h>
@@ -61,4 +61,4 @@ void goto_check(
   options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); \
   options.set_option("nan-check", cmdline.isset("nan-check"))
 
-#endif
+#endif // CPROVER_ANALYSES_GOTO_CHECK_H

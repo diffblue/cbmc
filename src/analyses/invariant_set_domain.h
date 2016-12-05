@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_ANALYSIS_INVARIANT_SET_DOMAIN_H
-#define CPROVER_POINTER_ANALYSIS_INVARIANT_SET_DOMAIN_H
+#ifndef CPROVER_ANALYSES_INVARIANT_SET_DOMAIN_H
+#define CPROVER_ANALYSES_INVARIANT_SET_DOMAIN_H
 
 #include "ai.h"
 #include "invariant_set.h"
@@ -49,4 +49,4 @@ public:
     const namespacet &ns);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_INVARIANT_SET_DOMAIN_H

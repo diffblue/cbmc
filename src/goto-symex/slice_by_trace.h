@@ -74,4 +74,4 @@ public:
   bool implies_false (exprt e);
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_SLICE_BY_TRACE_H

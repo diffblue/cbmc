@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_TYPECHECK_H
-#define CPROVER_JSIL_TYPECHECK_H
+#ifndef CPROVER_JSIL_JSIL_TYPECHECK_H
+#define CPROVER_JSIL_JSIL_TYPECHECK_H
 
 #include <util/typecheck.h>
 #include <util/namespace.h>
@@ -92,4 +92,4 @@ protected:
   hash_set_cont<irep_idt, irep_id_hash> already_typechecked;
 };
 
-#endif
+#endif // CPROVER_JSIL_JSIL_TYPECHECK_H

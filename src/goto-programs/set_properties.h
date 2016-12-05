@@ -26,4 +26,4 @@ void label_properties(goto_functionst &);
 void label_properties(goto_programt &);
 void label_properties(goto_modelt &);
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SATCHECK_ZCORE_H
-#define CPROVER_SATCHECK_ZCORE_H
+#ifndef CPROVER_SOLVERS_SAT_SATCHECK_ZCORE_H
+#define CPROVER_SOLVERS_SAT_SATCHECK_ZCORE_H
 
 #include <set>
 
@@ -32,4 +32,4 @@ protected:
   std::set<unsigned> in_core;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_SATCHECK_ZCORE_H

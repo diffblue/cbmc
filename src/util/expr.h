@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_EXPR_H
-#define CPROVER_EXPR_H
+#ifndef CPROVER_UTIL_EXPR_H
+#define CPROVER_UTIL_EXPR_H
 
 #define OPERANDS_IN_GETSUB
 
@@ -172,4 +172,4 @@ public:
   virtual void operator()(const exprt &expr) { }
 };
 
-#endif
+#endif // CPROVER_UTIL_EXPR_H

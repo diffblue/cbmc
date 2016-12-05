@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_GENETIC_CONVERT_H_
-#define CEGIS_JSA_GENETIC_CONVERT_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_JSA_GENETIC_CONVERT_H
+#define CPROVER_CEGIS_JSA_GENETIC_JSA_GENETIC_CONVERT_H
 
 #include <util/message.h>
 
@@ -54,4 +54,4 @@ public:
   void show(messaget::mstreamt &os, const candidatet &candidate) const;
 };
 
-#endif /* CEGIS_JSA_GENETIC_CONVERT_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_JSA_GENETIC_CONVERT_H

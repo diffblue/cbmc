@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_FIND_CPROVER_INITIALIZE_H_
-#define CEGIS_FIND_CPROVER_INITIALIZE_H_
+#ifndef CPROVER_CEGIS_INSTRUMENT_FIND_CPROVER_INITIALIZE_H
+#define CPROVER_CEGIS_INSTRUMENT_FIND_CPROVER_INITIALIZE_H
 
 #include <goto-programs/goto_program.h>
 
@@ -34,4 +34,4 @@ goto_programt::targett find_cprover_initialize(goto_programt &body);
  */
 goto_programt::targett find_last_instr(goto_programt &body);
 
-#endif /* CEGIS_FIND_CPROVER_INITIALIZE_H_ */
+#endif // CPROVER_CEGIS_INSTRUMENT_FIND_CPROVER_INITIALIZE_H

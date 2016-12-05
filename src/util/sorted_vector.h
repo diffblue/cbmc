@@ -20,8 +20,8 @@
 
  */
 
-#ifndef SORTED_VECTOR_
-#define SORTED_VECTOR_
+#ifndef CPROVER_UTIL_SORTED_VECTOR_H
+#define CPROVER_UTIL_SORTED_VECTOR_H
 #define VERSION_SORTED_VECTOR_ 0x00010010
 
 #include <algorithm>
@@ -301,4 +301,4 @@ template<class K, bool bNoDuplicates,class Pr,class A> inline
 //#pragma pack(pop)
 #elif VERSION_SORTED_VECTOR_ != 0x00010010
 #error You have included two sorted_vector.h with different version numbers
-#endif
+#endif // CPROVER_UTIL_SORTED_VECTOR_H

@@ -181,4 +181,4 @@ bool operator < (
   const symex_targett::sourcet &a,
   const symex_targett::sourcet &b);
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_SYMEX_TARGET_H

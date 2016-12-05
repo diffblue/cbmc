@@ -8,8 +8,8 @@ Date: April 2010
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_GOTO_RW_H
-#define CPROVER_GOTO_PROGRAMS_GOTO_RW_H
+#ifndef CPROVER_ANALYSES_GOTO_RW_H
+#define CPROVER_ANALYSES_GOTO_RW_H
 
 #include <map>
 #include <ostream>
@@ -307,4 +307,4 @@ protected:
     const range_spect &range_end);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_GOTO_RW_H

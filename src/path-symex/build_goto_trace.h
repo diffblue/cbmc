@@ -19,4 +19,4 @@ void build_goto_trace(
   const decision_proceduret &decision_procedure,
   goto_tracet &goto_trace);
 
-#endif
+#endif // CPROVER_PATH_SYMEX_BUILD_GOTO_TRACE_H

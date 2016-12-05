@@ -8,8 +8,8 @@ Date: December 2013
 
 \*******************************************************************/
 
-#ifndef REPLACE_ASYNC_H
-#define REPLACE_ASYNC_H
+#ifndef CPROVER_MUSKETEER_REPLACE_ASYNC_H
+#define CPROVER_MUSKETEER_REPLACE_ASYNC_H
 
 #include <goto-programs/goto_program.h>
 #include <util/std_code.h>
@@ -78,4 +78,4 @@ void replace_async(
   }
 }
 
-#endif
+#endif // CPROVER_MUSKETEER_REPLACE_ASYNC_H

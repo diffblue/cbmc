@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_INSTRUCTION_SET_FACTORY_H_
-#define CEGIS_DANGER_INSTRUCTION_SET_FACTORY_H_
+#ifndef CPROVER_CEGIS_INSTRUCTIONS_INSTRUCTION_SET_FACTORY_H
+#define CPROVER_CEGIS_INSTRUCTIONS_INSTRUCTION_SET_FACTORY_H
 
 #include <goto-programs/goto_program.h>
 
@@ -41,4 +41,4 @@ instruction_sett extract_instruction_set(
     const std::string &last_prefix,
     const std::string &single_prefix);
 
-#endif /* CEGIS_DANGER_INSTRUCTION_SET_FACTORY_H_ */
+#endif // CPROVER_CEGIS_INSTRUCTIONS_INSTRUCTION_SET_FACTORY_H

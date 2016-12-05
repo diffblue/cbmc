@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_USING_H
-#define CPROVER_CPP_USING_H
+#ifndef CPROVER_CPP_CPP_USING_H
+#define CPROVER_CPP_CPP_USING_H
 
 #include "cpp_name.h"
 
@@ -39,4 +39,4 @@ public:
   }
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_USING_H

@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_SAFETY_LEARN_ADD_COUNTEREXAMPLES_H_
-#define CEGIS_SAFETY_LEARN_ADD_COUNTEREXAMPLES_H_
+#ifndef CPROVER_CEGIS_SAFETY_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H
+#define CPROVER_CEGIS_SAFETY_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H
 
 #include <cegis/invariant/symex/learn/add_counterexamples.h>
 #include <cegis/safety/value/safety_goto_ce.h>
@@ -34,4 +34,4 @@ typedef std::deque<safety_goto_cet> safety_goto_cest;
 void safety_add_learned_counterexamples(class safety_programt &prog,
     const safety_goto_cest &ces, constraint_factoryt constraint);
 
-#endif /* CEGIS_SAFETY_LEARN_ADD_COUNTEREXAMPLES_H_ */
+#endif // CPROVER_CEGIS_SAFETY_SYMEX_LEARN_ADD_COUNTEREXAMPLES_H

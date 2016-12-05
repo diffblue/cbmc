@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STD_TYPES_H
-#define CPROVER_STD_TYPES_H
+#ifndef CPROVER_UTIL_STD_TYPES_H
+#define CPROVER_UTIL_STD_TYPES_H
 
 /*! \file util/std_types.h
  * \brief API to type classes
@@ -1615,4 +1615,4 @@ extern inline complex_typet &to_complex_type(typet &type)
   return static_cast<complex_typet &>(type);
 }
 
-#endif
+#endif // CPROVER_UTIL_STD_TYPES_H

@@ -7,8 +7,8 @@
 
  \*******************************************************************/
 
-#ifndef CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
-#define CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_
+#ifndef CPROVER_CEGIS_SYMEX_CEGIS_SYMEX_LEARN_H
+#define CPROVER_CEGIS_SYMEX_CEGIS_SYMEX_LEARN_H
 
 #include <functional>
 
@@ -138,4 +138,4 @@ public:
 
 #include "cegis_symex_learn.inc"
 
-#endif /* CEGIS_DANGER_CEGIS_SYMEX_LEARN_H_ */
+#endif // CPROVER_CEGIS_SYMEX_CEGIS_SYMEX_LEARN_H

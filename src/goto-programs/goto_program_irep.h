@@ -8,8 +8,8 @@ Date: May 2007
 
 \*******************************************************************/
 
-#ifndef GOTO_PROGRAM_IREP_H
-#define GOTO_PROGRAM_IREP_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_IREP_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_IREP_H
 
 #include <goto-programs/goto_program.h>
 
@@ -19,4 +19,4 @@ void convert(const irept &irep, goto_programt::instructiont &instruction);
 void convert(const goto_programt &program, irept &irep);
 void convert(const irept &irep, goto_programt &program);
 
-#endif /* GOTO_PROGRAM_IREP_H */
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_IREP_H

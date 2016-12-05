@@ -6,8 +6,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_JSIL_PARSER_H
-#define CPROVER_JSIL_PARSER_H
+#ifndef CPROVER_JSIL_JSIL_PARSER_H
+#define CPROVER_JSIL_JSIL_PARSER_H
 
 #include <util/parser.h>
 
@@ -43,4 +43,4 @@ extern jsil_parsert jsil_parser;
 int yyjsilerror(const std::string &error);
 void jsil_scanner_init();
 
-#endif
+#endif // CPROVER_JSIL_JSIL_PARSER_H

@@ -2,8 +2,8 @@
 
 // Whatever is necessary to use alloca().
 
-#ifndef ALLOCAINC_H
-#define ALLOCAINC_H
+#ifndef CPROVER_BIG_INT_ALLOCAINC_H
+#define CPROVER_BIG_INT_ALLOCAINC_H
 
 
 #if defined linux || defined __linux__		\
@@ -48,4 +48,4 @@ extern "C" void *alloca (unsigned);
 #endif
 
 
-#endif//ndef ALLOCAINC_H
+#endif // CPROVER_BIG_INT_ALLOCAINC_H

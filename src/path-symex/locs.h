@@ -117,4 +117,4 @@ protected:
   for(exprt::operandst::iterator it=(expr).loc_vector.begin(); \
       it!=(locs).loc_vector.end(); it++)
 
-#endif
+#endif // CPROVER_PATH_SYMEX_LOCS_H

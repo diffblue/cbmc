@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TYPECAST_H
-#define CPROVER_CPP_TYPECAST_H
+#ifndef CPROVER_CPP_CPP_TYPECAST_H
+#define CPROVER_CPP_CPP_TYPECAST_H
 
 #include <ansi-c/c_typecast.h>
 
@@ -65,4 +65,4 @@ public:
   cpp_typecheckt &cpp_typecheck;
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_TYPECAST_H

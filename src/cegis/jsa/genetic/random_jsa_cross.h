@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_RANDOM_JSA_CROSS_H_
-#define CEGIS_RANDOM_JSA_CROSS_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_CROSS_H
+#define CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_CROSS_H
 
 #include <deque>
 
@@ -49,4 +49,4 @@ public:
       const individualst &children) const;
 };
 
-#endif /* CEGIS_RANDOM_JSA_CROSS_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_CROSS_H

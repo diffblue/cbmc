@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_RATIONAL_H
-#define CPROVER_RATIONAL_H
+#ifndef CPROVER_UTIL_RATIONAL_H
+#define CPROVER_UTIL_RATIONAL_H
 
 #include <cassert>
 #include <vector>
@@ -126,4 +126,4 @@ public:
 
 rationalt inverse(const rationalt &n);
 
-#endif
+#endif // CPROVER_UTIL_RATIONAL_H

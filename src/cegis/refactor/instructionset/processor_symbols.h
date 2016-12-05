@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H_
-#define CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H_
+#ifndef CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H
+#define CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H
 
 #include <util/std_expr.h>
 
@@ -139,4 +139,4 @@ dereference_exprt cegis_operand(
  */
 bool is_refactor_meta_var(const irep_idt &var);
 
-#endif /* CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H_ */
+#endif // CPROVER_CEGIS_REFACTOR_INSTRUCTIONSET_PROCESSOR_SYMBOLS_H

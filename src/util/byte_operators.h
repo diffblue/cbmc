@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_BYTE_OPERATORS_H
-#define CPROVER_BYTE_OPERATORS_H
+#ifndef CPROVER_UTIL_BYTE_OPERATORS_H
+#define CPROVER_UTIL_BYTE_OPERATORS_H
 
 /*! \file util/byte_operators.h
  * \brief Expression classes for byte-level operators
@@ -222,4 +222,4 @@ extern inline byte_update_big_endian_exprt &to_byte_update_big_endian_expr(exprt
   return static_cast<byte_update_big_endian_exprt &>(expr);
 }
 
-#endif
+#endif // CPROVER_UTIL_BYTE_OPERATORS_H

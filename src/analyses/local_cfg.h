@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_LOCAL_CFG_H
-#define CPROVER_LOCAL_CFG_H
+#ifndef CPROVER_ANALYSES_LOCAL_CFG_H
+#define CPROVER_ANALYSES_LOCAL_CFG_H
 
 #include <util/numbering.h>
 
@@ -49,4 +49,4 @@ protected:
   void build(const goto_programt &goto_program);
 };
 
-#endif
+#endif // CPROVER_ANALYSES_LOCAL_CFG_H

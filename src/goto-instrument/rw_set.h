@@ -8,8 +8,8 @@ Date: February 2006
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_RW_SET
-#define CPROVER_GOTO_PROGRAMS_RW_SET
+#ifndef CPROVER_GOTO_INSTRUMENT_RW_SET_H
+#define CPROVER_GOTO_INSTRUMENT_RW_SET_H
 
 #include <iosfwd>
 #include <vector>
@@ -272,4 +272,4 @@ protected:
   }
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_RW_SET_H

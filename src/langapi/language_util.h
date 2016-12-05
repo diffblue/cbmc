@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_LANGUAGE_UTIL_H
-#define CPROVER_LANGUAGE_UTIL_H
+#ifndef CPROVER_LANGAPI_LANGUAGE_UTIL_H
+#define CPROVER_LANGAPI_LANGUAGE_UTIL_H
 
 #include <util/irep.h>
 
@@ -41,4 +41,4 @@ std::string type_to_name(
 
 std::string type_to_name(const typet &type);
 
-#endif
+#endif // CPROVER_LANGAPI_LANGUAGE_UTIL_H

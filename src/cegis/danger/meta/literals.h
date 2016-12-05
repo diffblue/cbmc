@@ -7,11 +7,11 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_DANGER_LITERALS_H_
-#define CEGIS_DANGER_LITERALS_H_
+#ifndef CPROVER_CEGIS_DANGER_META_LITERALS_H
+#define CPROVER_CEGIS_DANGER_META_LITERALS_H
 
 #define DANGER_PREFIX "__CPROVER_danger_"
 #define DANGER_EXECUTE DANGER_PREFIX "execute"
 #define DANGER_X0_PLACEHOLDER_PREFIX DANGER_PREFIX "x0_"
 
-#endif /* CEGIS_DANGER_LITERALS_H_ */
+#endif // CPROVER_CEGIS_DANGER_META_LITERALS_H

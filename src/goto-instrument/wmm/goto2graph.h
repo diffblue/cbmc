@@ -8,8 +8,8 @@ Date: 2012
 
 \*******************************************************************/
 
-#ifndef INSTRUMENTER_H
-#define INSTRUMENTER_H
+#ifndef CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
+#define CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
 
 #include <map>
 
@@ -389,4 +389,4 @@ public:
   void print_outputs(memory_modelt model, bool hide_internals);
 };
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H

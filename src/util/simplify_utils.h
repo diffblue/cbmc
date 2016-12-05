@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SIMPLIFY_UTILS_H
-#define CPROVER_SIMPLIFY_UTILS_H
+#ifndef CPROVER_UTIL_SIMPLIFY_UTILS_H
+#define CPROVER_UTIL_SIMPLIFY_UTILS_H
 
 #include "expr.h"
 
@@ -15,4 +15,4 @@ bool sort_operands(exprt::operandst &operands);
 
 bool sort_and_join(exprt &expr);
 
-#endif
+#endif // CPROVER_UTIL_SIMPLIFY_UTILS_H

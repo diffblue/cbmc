@@ -83,4 +83,4 @@ private:
   template_mapt &map;
 };
 
-#endif
+#endif // CPROVER_CPP_TEMPLATE_MAP_H

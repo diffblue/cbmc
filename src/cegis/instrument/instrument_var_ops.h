@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INSTRUMENT_VAR_OPS_H_
-#define CEGIS_INSTRUMENT_VAR_OPS_H_
+#ifndef CPROVER_CEGIS_INSTRUMENT_INSTRUMENT_VAR_OPS_H
+#define CPROVER_CEGIS_INSTRUMENT_INSTRUMENT_VAR_OPS_H
 
 #include <goto-programs/goto_program.h>
 
@@ -166,4 +166,4 @@ goto_programt::targett set_ops_reference(const symbol_tablet &st,
  */
 source_locationt default_cegis_source_location();
 
-#endif /* CEGIS_INSTRUMENT_VAR_OPS_H_ */
+#endif // CPROVER_CEGIS_INSTRUMENT_INSTRUMENT_VAR_OPS_H

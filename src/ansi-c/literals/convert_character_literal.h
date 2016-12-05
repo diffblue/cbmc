@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_CONVERT_CHARACTER_LITERAL_H
-#define CPROVER_CPP_CONVERT_CHARACTER_LITERAL_H
+#ifndef CPROVER_ANSI_C_LITERALS_CONVERT_CHARACTER_LITERAL_H
+#define CPROVER_ANSI_C_LITERALS_CONVERT_CHARACTER_LITERAL_H
 
 #include <string>
 
@@ -20,4 +20,4 @@ exprt convert_character_literal(
   const std::string &src,
   bool force_integer_type);
 
-#endif
+#endif // CPROVER_ANSI_C_LITERALS_CONVERT_CHARACTER_LITERAL_H

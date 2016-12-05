@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef VALUE_SET_FI_H_
-#define VALUE_SET_FI_H_
+#ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H
+#define CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H
 
 #include <set>
 
@@ -316,4 +316,4 @@ protected:
                     flatten_seent&) const;
 };
 
-#endif /*VALUE_SET_FI_H_*/
+#endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H

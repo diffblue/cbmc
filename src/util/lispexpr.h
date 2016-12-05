@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // THIS HEADER IS DEPRECATED AND WILL GO AWAY
 
-#ifndef CPROVER_LISPEXPR_H
-#define CPROVER_LISPEXPR_H
+#ifndef CPROVER_UTIL_LISPEXPR_H
+#define CPROVER_UTIL_LISPEXPR_H
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <cstring>
@@ -97,4 +97,4 @@ std::string escape(const std::string &s);
 
 int test_lispexpr();
 
-#endif
+#endif // CPROVER_UTIL_LISPEXPR_H

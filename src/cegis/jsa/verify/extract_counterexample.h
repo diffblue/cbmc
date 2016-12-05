@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_EXTRACT_COUNTEREXAMPLE_H_
-#define CEGIS_JSA_EXTRACT_COUNTEREXAMPLE_H_
+#ifndef CPROVER_CEGIS_JSA_VERIFY_EXTRACT_COUNTEREXAMPLE_H
+#define CPROVER_CEGIS_JSA_VERIFY_EXTRACT_COUNTEREXAMPLE_H
 
 #include <cegis/jsa/value/jsa_counterexample.h>
 
@@ -26,4 +26,4 @@ void extract(
     jsa_counterexamplet &ce,
     const class goto_tracet &trace);
 
-#endif /* CEGIS_JSA_EXTRACT_COUNTEREXAMPLE_H_ */
+#endif // CPROVER_CEGIS_JSA_VERIFY_EXTRACT_COUNTEREXAMPLE_H

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_RANDOM_JSA_MUTATE_H_
-#define CEGIS_RANDOM_JSA_MUTATE_H_
+#ifndef CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_MUTATE_H
+#define CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_MUTATE_H
 
 /**
  * @brief
@@ -59,4 +59,4 @@ public:
   void post_process(individualt &ind) const;
 };
 
-#endif /* CEGIS_RANDOM_JSA_MUTATE_H_ */
+#endif // CPROVER_CEGIS_JSA_GENETIC_RANDOM_JSA_MUTATE_H

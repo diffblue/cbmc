@@ -1,5 +1,5 @@
-#ifndef LOOP_ACCELERATION_H
-#define LOOP_ACCELERATION_H
+#ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_LOOP_ACCELERATION_H
+#define CPROVER_GOTO_INSTRUMENT_ACCELERATE_LOOP_ACCELERATION_H
 
 #include "path.h"
 #include "accelerator.h"
@@ -9,4 +9,4 @@ class loop_accelerationt {
   virtual bool accelerate(path_acceleratort &accelerator) = 0;
 };
 
-#endif // LOOP_ACCELERATION_H
+#endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_LOOP_ACCELERATION_H

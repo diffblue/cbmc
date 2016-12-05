@@ -6,8 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_DIFF_SYNTACTIC_H
-#define CPROVER_GOTO_DIFF_SYNTACTIC_H
+#ifndef CPROVER_GOTO_DIFF_SYNTACTIC_DIFF_H
+#define CPROVER_GOTO_DIFF_SYNTACTIC_DIFF_H
 
 #include "goto_diff.h"
 
@@ -27,4 +27,4 @@ class syntactic_difft : public goto_difft
 
 };
 
-#endif
+#endif // CPROVER_GOTO_DIFF_SYNTACTIC_DIFF_H

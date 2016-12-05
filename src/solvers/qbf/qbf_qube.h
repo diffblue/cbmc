@@ -6,8 +6,8 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#ifndef CPROVER_QBF_QUBE_H
-#define CPROVER_QBF_QUBE_H
+#ifndef CPROVER_SOLVERS_QBF_QBF_QUBE_H
+#define CPROVER_SOLVERS_QBF_QBF_QUBE_H
 
 #include "qdimacs_cnf.h"
 
@@ -22,4 +22,4 @@ public:
   virtual tvt l_get(literalt a) const;
 };
 
-#endif
+#endif // CPROVER_SOLVERS_QBF_QBF_QUBE_H

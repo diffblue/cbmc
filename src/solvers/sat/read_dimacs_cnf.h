@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef __CPROVER_READ_DIMACS_CNF_H
-#define __CPROVER_READ_DIMACS_CNF_H
+#ifndef CPROVER_SOLVERS_SAT_READ_DIMACS_CNF_H
+#define CPROVER_SOLVERS_SAT_READ_DIMACS_CNF_H
 
 #include "cnf.h"
 
 void read_dimacs_cnf(std::istream &in, cnft &dest);
 
-#endif
+#endif // CPROVER_SOLVERS_SAT_READ_DIMACS_CNF_H

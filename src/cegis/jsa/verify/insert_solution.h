@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_INSERT_SOLUTION_H_
-#define CEGIS_JSA_INSERT_SOLUTION_H_
+#ifndef CPROVER_CEGIS_JSA_VERIFY_INSERT_SOLUTION_H
+#define CPROVER_CEGIS_JSA_VERIFY_INSERT_SOLUTION_H
 
 /**
  * @brief
@@ -22,4 +22,4 @@ void insert_jsa_solution(
     class jsa_programt &prog,
     const class jsa_solutiont &solution);
 
-#endif /* CEGIS_JSA_INSERT_SOLUTION_H_ */
+#endif // CPROVER_CEGIS_JSA_VERIFY_INSERT_SOLUTION_H

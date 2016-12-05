@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H_
-#define CEGIS_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H_
+#ifndef CPROVER_CEGIS_SAFETY_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H
+#define CPROVER_CEGIS_SAFETY_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H
 
 #include <functional>
 
@@ -76,4 +76,4 @@ public:
   void join();
 };
 
-#endif /* CEGIS_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H_ */
+#endif // CPROVER_CEGIS_SAFETY_GENETIC_DYNAMIC_SAFETY_TEST_RUNNER_H

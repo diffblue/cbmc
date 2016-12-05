@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef STRING_CONTAINER_H
-#define STRING_CONTAINER_H
+#ifndef CPROVER_UTIL_STRING_CONTAINER_H
+#define CPROVER_UTIL_STRING_CONTAINER_H
 
 #include <list>
 #include <vector>
@@ -89,4 +89,4 @@ protected:
 // an ugly global object
 extern string_containert string_container;
 
-#endif
+#endif // CPROVER_UTIL_STRING_CONTAINER_H

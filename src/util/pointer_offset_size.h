@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_POINTER_OFFSET_SIZE_H
-#define CPROVER_POINTER_OFFSET_SIZE_H
+#ifndef CPROVER_UTIL_POINTER_OFFSET_SIZE_H
+#define CPROVER_UTIL_POINTER_OFFSET_SIZE_H
 
 #include "mp_arith.h"
 #include "irep.h"
@@ -83,4 +83,4 @@ bool get_subexpression_at_offset(
   const typet& target_type,
   const namespacet& ns);
 
-#endif
+#endif // CPROVER_UTIL_POINTER_OFFSET_SIZE_H

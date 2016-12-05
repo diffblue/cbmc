@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_TEMPLATE_TYPE_H
-#define CPROVER_CPP_TEMPLATE_TYPE_H
+#ifndef CPROVER_CPP_CPP_TEMPLATE_TYPE_H
+#define CPROVER_CPP_CPP_TEMPLATE_TYPE_H
 
 #include <util/type.h>
 #include <util/expr.h>
@@ -62,4 +62,4 @@ inline typet &template_subtype(typet &type)
   return type;
 }
 
-#endif
+#endif // CPROVER_CPP_CPP_TEMPLATE_TYPE_H

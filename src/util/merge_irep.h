@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_MERGE_IREP_H
-#define CPROVER_MERGE_IREP_H
+#ifndef CPROVER_UTIL_MERGE_IREP_H
+#define CPROVER_UTIL_MERGE_IREP_H
 
 #include "irep.h"
 #include "hash_cont.h"
@@ -119,4 +119,4 @@ protected:
   const irept& merged(const irept &irep);
 };
 
-#endif
+#endif // CPROVER_UTIL_MERGE_IREP_H

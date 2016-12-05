@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PATH_SYMEX_VAR_MAP_H
-#define CPROVER_PATH_SYMEX_VAR_MAP_H
+#ifndef CPROVER_AA_PATH_SYMEX_VAR_MAP_H
+#define CPROVER_AA_PATH_SYMEX_VAR_MAP_H
 
 #include <map>
 
@@ -118,4 +118,4 @@ public:
   unsigned dynamic_count; // memory allocation
 };
 
-#endif
+#endif // CPROVER_AA_PATH_SYMEX_VAR_MAP_H

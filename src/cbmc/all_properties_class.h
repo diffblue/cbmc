@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef CPROVER_CBMC_ALL_PROPERTIES_CLASS_H
+#define CPROVER_CBMC_ALL_PROPERTIES_CLASS_H
+
 #include <solvers/prop/cover_goals.h>
 
 #include "bmc.h"
@@ -99,3 +102,5 @@ protected:
   virtual void report(const cover_goalst &cover_goals);
   virtual void do_before_solving() {}
 };
+
+#endif // CPROVER_CBMC_ALL_PROPERTIES_CLASS_H

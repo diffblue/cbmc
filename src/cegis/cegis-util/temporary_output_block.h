@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H_
-#define CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H_
+#ifndef CPROVER_CEGIS_CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H
+#define CPROVER_CEGIS_CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H
 
 /**
  * @brief
@@ -40,4 +40,4 @@ public:
   void release() const;
 };
 
-#endif /* CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H_ */
+#endif // CPROVER_CEGIS_CEGIS_UTIL_TEMPORARY_OUTPUT_BLOCK_H

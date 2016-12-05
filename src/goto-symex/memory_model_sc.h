@@ -6,8 +6,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_MEMORY_MODEL_SC_H
-#define CPROVER_MEMORY_MODEL_SC_H
+#ifndef CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H
+#define CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H
 
 #include "memory_model.h"
 
@@ -38,4 +38,4 @@ protected:
   void write_serialization_external(symex_target_equationt &equation);
 };
 
-#endif
+#endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H

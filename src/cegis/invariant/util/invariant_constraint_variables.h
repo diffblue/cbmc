@@ -7,8 +7,8 @@
 
 \*******************************************************************/
 
-#ifndef CEGIS_INVARIANT_CONSTRAINT_VARIABLES_H_
-#define CEGIS_INVARIANT_CONSTRAINT_VARIABLES_H_
+#ifndef CPROVER_CEGIS_INVARIANT_UTIL_INVARIANT_CONSTRAINT_VARIABLES_H
+#define CPROVER_CEGIS_INVARIANT_UTIL_INVARIANT_CONSTRAINT_VARIABLES_H
 
 #include <deque>
 #include <set>
@@ -67,4 +67,4 @@ typedef std::deque<symbol_exprt> constraint_varst;
 void get_invariant_constraint_vars(constraint_varst &vars,
     const invariant_programt &program);
 
-#endif /* CEGIS_INVARIANT_CONSTRAINT_VARIABLES_H_ */
+#endif // CPROVER_CEGIS_INVARIANT_UTIL_INVARIANT_CONSTRAINT_VARIABLES_H

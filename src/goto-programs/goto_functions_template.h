@@ -8,8 +8,8 @@ Date: June 2003
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
-#define CPROVER_GOTO_FUNCTIONS_TEMPLATE_H
+#ifndef CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H
+#define CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H
 
 #include <ostream>
 #include <cassert>
@@ -266,4 +266,4 @@ void goto_functions_templatet<bodyT>::compute_loop_numbers()
     it->second.body.compute_loop_numbers();
 }
 
-#endif
+#endif // CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_TAINT_ANALYSIS_H
-#define CPROVER_TAINT_ANALYSIS_H
+#ifndef CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
+#define CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
 
 #include <util/message.h>
 #include <util/namespace.h>
@@ -21,4 +21,4 @@ bool taint_analysis(
   bool show_full,
   const std::string &json_file_name);
 
-#endif
+#endif // CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H

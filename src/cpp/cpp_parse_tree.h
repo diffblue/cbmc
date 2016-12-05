@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#ifndef CPROVER_CPP_PARSE_TREE_H
-#define CPROVER_CPP_PARSE_TREE_H
+#ifndef CPROVER_CPP_CPP_PARSE_TREE_H
+#define CPROVER_CPP_CPP_PARSE_TREE_H
 
 #include "cpp_item.h"
 
@@ -23,4 +23,4 @@ public:
   void clear();
 };
 
-#endif
+#endif // CPROVER_CPP_CPP_PARSE_TREE_H

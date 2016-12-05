@@ -8,8 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // THIS FILE IS DEPRECATED
 
-#ifndef CPROVER_NAMESPACE_UTILS_H
-#define CPROVER_NAMESPACE_UTILS_H
+#ifndef CPROVER_UTIL_NAMESPACE_UTILS_H
+#define CPROVER_UTIL_NAMESPACE_UTILS_H
 
 #include "namespace.h"
 #include "base_type.h"
@@ -101,4 +101,4 @@ class namespace_utilst:public virtual namespace_utils_baset
   }
 };
 
-#endif
+#endif // CPROVER_UTIL_NAMESPACE_UTILS_H

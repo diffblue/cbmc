@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_GENETIC_FAMILY_SELECTION_H_
-#define CEGIS_GENETIC_FAMILY_SELECTION_H_
+#ifndef CPROVER_CEGIS_GENETIC_FAMILY_SELECTION_H
+#define CPROVER_CEGIS_GENETIC_FAMILY_SELECTION_H
 
   /**
    * @brief
@@ -81,4 +81,4 @@ public:
 
 #include "family_selection.inc"
 
-#endif /* CEGIS_GENETIC_FAMILY_SELECTION_H_ */
+#endif // CPROVER_CEGIS_GENETIC_FAMILY_SELECTION_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_STATIC_ANALYZER_H
-#define CPROVER_STATIC_ANALYZER_H
+#ifndef CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
+#define CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
 
 #include <iosfwd>
 
@@ -26,4 +26,4 @@ void show_intervals(
   const goto_modelt &,
   std::ostream &);
 
-#endif
+#endif // CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H

@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_PRINTF_FORMATTER
-#define CPROVER_PRINTF_FORMATTER
+#ifndef CPROVER_ANSI_C_PRINTF_FORMATTER_H
+#define CPROVER_ANSI_C_PRINTF_FORMATTER_H
 
 #include <util/expr.h>
 #include <util/namespace.h>
@@ -48,4 +48,4 @@ protected:
   const exprt make_type(const exprt &src, const typet &dest);
 };
 
-#endif
+#endif // CPROVER_ANSI_C_PRINTF_FORMATTER_H

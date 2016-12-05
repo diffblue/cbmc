@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CEGIS_JSA_SOLUTION_PRINTER_H_
-#define CEGIS_JSA_SOLUTION_PRINTER_H_
+#ifndef CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_PRINTER_H
+#define CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_PRINTER_H
 
 #include <util/message.h>
 
@@ -32,4 +32,4 @@ void print_jsa_solution(
     const pred_op_idst &op_ids,
     const pred_op_idst &const_op_ids);
 
-#endif /* CEGIS_JSA_SOLUTION_PRINTER_H_ */
+#endif // CPROVER_CEGIS_JSA_VALUE_JSA_SOLUTION_PRINTER_H
