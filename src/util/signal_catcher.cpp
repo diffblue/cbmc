@@ -9,7 +9,7 @@ Date:
 \*******************************************************************/
 
 #if defined(_WIN32)
-
+#include <process.h>
 #else
 #include <cstdlib>
 #include <csignal>
