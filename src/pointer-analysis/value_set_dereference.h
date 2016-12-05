@@ -38,7 +38,7 @@ public:
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
     dereference_callbackt &_dereference_callback,
-    const irep_idt _language_mode=irep_idt()):
+    const irep_idt _language_mode):
     ns(_ns),
     new_symbol_table(_new_symbol_table),
     options(_options),
