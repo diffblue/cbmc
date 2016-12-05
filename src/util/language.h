@@ -127,6 +127,9 @@ protected:
     const symbolt &function_symbol,
     size_t parameter_index,
     const code_typet::parametert &parameter);
+
+  static irep_idt get_stub_return_symbol_name(const irep_idt &function_id);
+
 private:
   bool is_symbol_opaque_function(const symbolt &symbol);
   void generate_opaque_parameter_symbols(

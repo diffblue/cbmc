@@ -224,6 +224,28 @@ parameter_symbolt languaget::build_stub_parameter_symbol(
   return parameter_symbolt();
 }
 
+/*******************************************************************\
+
+Function: languaget::get_stub_return_symbol_name
+
+  Inputs:
+          function_id - the function that has a return value
+
+ Outputs: the identifier to use for the symbol that will store the
+          return value of this function.
+
+ Purpose: To get the name of the symbol to be used for the return value
+          of the function. Generates a name like to_return_function_name
+
+\*******************************************************************/
+
+irep_idt languaget::get_stub_return_symbol_name(const irep_idt &function_id)
+{
+  std::ostringstream return_symbol_name_builder;
+  return_symbol_name_builder << "to_return_" << function_id;
+  return return_symbol_name_builder.str();
+}
+
 
 /*******************************************************************\
 
