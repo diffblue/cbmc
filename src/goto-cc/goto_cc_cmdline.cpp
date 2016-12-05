@@ -11,6 +11,7 @@ Date:   April 2010
 #include <cstring>
 #include <cassert>
 #include <iostream>
+#include <cstdio>
 
 #include <util/prefix.h>
 #include <util/tempfile.h>
