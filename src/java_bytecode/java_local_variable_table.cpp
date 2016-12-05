@@ -522,7 +522,7 @@ java_bytecode_convert_methodt::find_variable_for_slot(
     {
       bool found_hole=false;
       for(auto &hole : var.holes)
-        if(address>=hole.start_pc && address<(hole.start_pc-hole.length))
+        if(address>=hole.start_pc && address<(hole.start_pc+hole.length))
         {
           found_hole=true;
           break;
