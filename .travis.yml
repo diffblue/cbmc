@@ -23,3 +23,8 @@ install:
 
 script:
   - make CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && cd ../regression && make test
+
+matrix:
+  include:
+    - env: NAME="CPP-LINT"
+      script: cd .. && python scripts/cpplint.py `git diff --name-only master HEAD`
