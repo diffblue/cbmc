@@ -458,7 +458,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       return result;
     }
     
-    const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");    
+    const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
     exprt pointer_offset=unary_exprt(

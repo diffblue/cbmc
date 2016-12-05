@@ -435,7 +435,7 @@ safety_checkert::resultt bmct::run(
   {
     const symbolt *init_symbol;
     if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
-      symex.mode=init_symbol->mode;
+      symex.language_mode=init_symbol->mode;
   }  
 
   status() << "Starting Bounded Model Checking" << eom;

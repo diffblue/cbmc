@@ -38,7 +38,7 @@ public:
     symbol_tablet &_new_symbol_table,
     const optionst &_options,
     dereference_callbackt &_dereference_callback,
-    const irep_idt _language_mode = irep_idt()):
+    const irep_idt _language_mode=irep_idt()):
     ns(_ns),
     new_symbol_table(_new_symbol_table),
     options(_options),
@@ -80,6 +80,8 @@ private:
   symbol_tablet &new_symbol_table;
   const optionst &options;
   dereference_callbackt &dereference_callback;
+  /// language_mode: ID_java, ID_C or another language identifier
+  /// if we know the source language in use, irep_idt() otherwise.
   const irep_idt language_mode;
   static unsigned invalid_counter;
 
