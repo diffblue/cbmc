@@ -242,7 +242,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 	  return res;
 	}
 
-
     } 
   debug () << "string_refinementt::dec_solve reached the maximum number of steps allowed";
   return D_ERROR;
