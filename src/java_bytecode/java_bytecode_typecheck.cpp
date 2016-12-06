@@ -184,3 +184,9 @@ bool java_bytecode_typecheck(
   // fail for now
   return true;
 }
+
+// Static members of java_bytecode_typecheckt:
+std::map<irep_idt, irep_idt>
+  java_bytecode_typecheckt::string_literal_to_symbol_name;
+std::map<irep_idt, size_t>
+  java_bytecode_typecheckt::escaped_string_literal_count;
