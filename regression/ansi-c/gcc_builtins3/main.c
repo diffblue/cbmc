@@ -14,4 +14,3 @@ void __attribute__((ms_abi)) bar(__builtin_ms_va_list authors, ...)
 int main()
 {
 }
-

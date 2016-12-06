@@ -17,7 +17,7 @@ int main()
   assert(sizeof(v4si)==16);
 
   vector_u x, y, z;
-  
+
   z.v=x.v+y.v;
 
   assert(z.members[0]==x.members[0]+y.members[0]);
@@ -45,7 +45,7 @@ int main()
   assert(z.members[1]==~x.members[1]);
   assert(z.members[2]==~x.members[2]);
   assert(z.members[3]==~x.members[3]);
-  
+
   // build vector with typecast
   z.v=(v4si){ 0, 1, 2, 3 };
   assert(z.members[0]==0 && z.members[1]==1 && z.members[2]==2 && z.members[3]==3);
@@ -54,14 +54,14 @@ int main()
   v4si some_vector={ 10, 11, 12, 13 };
   z.v=some_vector;
   assert(z.members[0]==10 && z.members[1]==11 && z.members[2]==12 && z.members[3]==13);
-  
+
   // same from one
   v4si other_vector={ 0 };
   z.v=other_vector;
 
   // an array of vectors
   v4si image[] = { other_vector };
-  
+
   assert(z.members[1]==0);
 }
 

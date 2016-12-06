@@ -29,7 +29,7 @@ void cnf_clause_listt::lcnf(const bvt &bv)
 
   if(process_clause(bv, new_bv))
     return;
-    
+
   clauses.push_back(new_bv);
 }
 

@@ -25,7 +25,7 @@ public:
     smt2_parsert(_in), out(_out), first(true)
   {
   }
-  
+
 protected:
   std::ostream &out;
   bool first;
@@ -42,7 +42,7 @@ protected:
     // possibly need to quote
     out << buffer;
   }
-  
+
   virtual void keyword()
   {
     if(first)
@@ -52,7 +52,7 @@ protected:
 
     out << ':' << buffer;
   }
-  
+
   virtual void string_literal()
   {
     if(first)
@@ -71,7 +71,7 @@ protected:
 
     out << '"';
   }
-  
+
   virtual void numeral()
   {
     if(first)
@@ -81,22 +81,22 @@ protected:
 
     out << buffer;
   }
-  
+
   virtual void open_expression() // '('
   {
     if(!first)
       out << ' ';
-      
+
     out << '(';
     first=true;
   }
-  
+
   virtual void close_expression() // ')'
   {
     out << ')';
     first=false;
   }
-  
+
   virtual void error(const std::string &message)
   {
     std::cerr << "error: " << message << '\n';

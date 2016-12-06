@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_CBMC_PARSEOPTIONS_H
-#define CPROVER_CBMC_PARSEOPTIONS_H
+#ifndef CPROVER_CBMC_PARSE_OPTIONS_H
+#define CPROVER_CBMC_PARSE_OPTIONS_H
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
@@ -44,6 +44,7 @@ class optionst;
   "(show-claims)(claim):(show-properties)(show-reachable-properties)(property):" \
   "(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
+  "(nondet-static)" \
   "(version)" \
   "(cover):" \
   "(mm):" \
@@ -52,7 +53,7 @@ class optionst;
   "(arrays-uf-always)(arrays-uf-never)" \
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(graphml-cex):" \
+  "(graphml-witness):" \
   "(localize-faults)(localize-faults-method):" \
   "(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear
 
@@ -62,8 +63,8 @@ class cbmc_parse_optionst:
   public language_uit
 {
 public:
-  virtual int doit();
-  virtual void help();
+  virtual int doit() override;
+  virtual void help() override;
 
   cbmc_parse_optionst(int argc, const char **argv);
   cbmc_parse_optionst(
@@ -86,17 +87,17 @@ protected:
   virtual bool process_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
-    
+
   bool set_properties(goto_functionst &goto_functions);
-  
+
   void eval_verbosity();
-  
+
   // get any additional stuff before finalizing
   virtual int get_modules(bmct &bmc)
   {
     return -1; // continue
   }
-  
+
   void preprocessing();
 };
 

@@ -15,7 +15,7 @@ class symbol_tablet;
 class goto_functionst;
 
 #include "rw_set.h"
- 
+
 void interrupt(
   value_setst &value_sets,
   const class symbol_tablet &symbol_table,

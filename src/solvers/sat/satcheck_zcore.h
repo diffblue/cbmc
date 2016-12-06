@@ -18,11 +18,11 @@ class satcheck_zcoret:public dimacs_cnft
 public:
   satcheck_zcoret();
   virtual ~satcheck_zcoret();
-  
+
   virtual const std::string solver_text();
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
-  
+
   bool is_in_core(literalt l) const
   {
     return in_core.find(l.var_no())!=in_core.end();

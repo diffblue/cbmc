@@ -18,7 +18,7 @@ class cpp_typecheck_fargst // for function overloading
 public:
   bool in_use, has_object;
   exprt::operandst operands;
-  
+
   // has_object indicates that the first element of
   // 'operands' is the 'this' pointer (with the object type,
   // not pointer to object type)

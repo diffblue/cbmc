@@ -18,7 +18,7 @@ Date: January 2010
 
    Class: uninitializedt
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -41,7 +41,7 @@ protected:
   // The variables that need tracking,
   // i.e., are uninitialized and may be read?
   std::set<irep_idt> tracking;
-  
+
   void get_tracking(goto_programt::const_targett i_it);
 };
 
@@ -93,13 +93,13 @@ Function: uninitializedt::add_assertions
 void uninitializedt::add_assertions(goto_programt &goto_program)
 {
   uninitialized_analysis(goto_program, ns);
-  
+
   // find out which variables need tracking
 
   tracking.clear();
   forall_goto_program_instructions(i_it, goto_program)
     get_tracking(i_it);
-    
+
   // add tracking symbols to symbol table
   for(std::set<irep_idt>::const_iterator
       it=tracking.begin();
@@ -119,7 +119,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     new_symbol.is_static_lifetime=false;
     new_symbol.is_file_local=true;
     new_symbol.is_lvalue=true;
-    
+
     symbol_table.move(new_symbol);
   }
 
@@ -140,7 +140,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
         goto_programt::targett i1=goto_program.insert_after(i_it);
         goto_programt::targett i2=goto_program.insert_after(i1);
         i_it++, i_it++;
-        
+
         const irep_idt new_identifier=
           id2string(identifier)+"#initialized";
 
@@ -153,7 +153,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
 
         i2->type=ASSIGN;
         i2->source_location=instruction.source_location;
-        i2->code=code_assignt(symbol_expr, false_exprt());        
+        i2->code=code_assignt(symbol_expr, false_exprt());
       }
     }
     else
@@ -179,7 +179,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
           {
             assert(tracking.find(identifier)!=tracking.end());
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
-          
+
             // insert assertion
             goto_programt::instructiont assertion;
             assertion.type=ASSERT;
@@ -187,7 +187,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             assertion.source_location=instruction.source_location;
             assertion.source_location.set_comment("use of uninitialized local variable");
             assertion.source_location.set_property_class("uninitialized local");
-            
+
             goto_program.insert_before_swap(i_it, assertion);
             i_it++;
           }
@@ -204,20 +204,20 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
           if(tracking.find(identifier)!=tracking.end())
           {
             const irep_idt new_identifier=id2string(identifier)+"#initialized";
-          
+
             goto_programt::instructiont assignment;
             assignment.type=ASSIGN;
             assignment.code=code_assignt(
               symbol_exprt(new_identifier, bool_typet()), true_exprt());
             assignment.source_location=instruction.source_location;
-            
+
             goto_program.insert_before_swap(i_it, assignment);
             i_it++;
           }
         }
       }
     }
-  }  
+  }
 }
 
 /*******************************************************************\

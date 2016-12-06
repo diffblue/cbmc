@@ -5,12 +5,12 @@ int main()
   int i;
   long l;
   long long ll;
-  
+
   assert(sizeof(s)==2);
   assert(sizeof(i)==4);
   assert(sizeof(l)==4);
   assert(sizeof(ll)==8);
-  
+
   // oh, and these pointer qualifiers are MS-specific
   #ifdef _MSC_VER
   int * __ptr32 p32;
@@ -20,6 +20,6 @@ int main()
   assert(sizeof(p32)==4);
   assert(sizeof(p64)==8);
   #endif
-  
+
   assert(sizeof(void *)==8);
 }

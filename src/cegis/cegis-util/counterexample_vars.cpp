@@ -8,13 +8,15 @@
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/cegis-util/counterexample_vars.h>
 
-void collect_counterexample_locations(goto_programt::targetst &locs,
+namespace
+{
+size_t collect_counterexample_locations(goto_programt::targetst &locs,
     const char * const marker_prefix, goto_programt &prog,
-    const std::function<bool(goto_programt::const_targett target)> is_meta)
+    const std::function<bool(goto_programt::const_targett target)> is_meta,
+    size_t marker_index)
 {
   goto_programt::instructionst &body=prog.instructions;
   const goto_programt::targett end(body.end());
-  size_t marker_index=0;
   for (goto_programt::targett instr=body.begin(); instr != end; ++instr)
     if (is_nondet(instr, end) && !is_meta(instr))
     {
@@ -22,6 +24,15 @@ void collect_counterexample_locations(goto_programt::targetst &locs,
       instr->labels.push_back(marker_prefix + std::to_string(marker_index++));
       locs.push_back(instr);
     }
+  return marker_index;
+}
+}
+
+void collect_counterexample_locations(goto_programt::targetst &locs,
+    const char * const marker_prefix, goto_programt &prog,
+    const std::function<bool(goto_programt::const_targett target)> is_meta)
+{
+  collect_counterexample_locations(locs, marker_prefix, prog, is_meta, 0);
 }
 
 #define TMP_IF_EXPR_PREFIX "tmp_if_expr$"
@@ -56,6 +67,15 @@ void collect_counterexample_locations(goto_programt::targetst &locs,
 {
   collect_counterexample_locations(locs, DEFAULT_MARKER_LABEL_PREFIX, prog,
       is_meta);
+}
+
+size_t collect_counterexample_locations(goto_programt::targetst &locs,
+    goto_programt &prog,
+    const std::function<bool(goto_programt::const_targett target)> is_meta,
+    const size_t marker_index_offset)
+{
+  return collect_counterexample_locations(locs, DEFAULT_MARKER_LABEL_PREFIX,
+      prog, is_meta, marker_index_offset);
 }
 
 namespace

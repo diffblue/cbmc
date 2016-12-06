@@ -26,9 +26,9 @@ int main()
 	B b;
 	b.i = 0;
 	b.B::i++;
-	
+
 	b.A::i = 10;
-	
+
 	b.f();
 	assert(b.i    == 2);
 	assert(b.A::i == 11);

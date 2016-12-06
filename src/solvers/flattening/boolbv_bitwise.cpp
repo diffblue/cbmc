@@ -23,7 +23,7 @@ Function: boolbvt::convert_bitwise
 bvt boolbvt::convert_bitwise(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
@@ -33,7 +33,7 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
       throw "bitnot takes one operand";
 
     const exprt &op0=expr.op0();
-    
+
     const bvt &op_bv=convert_bv(op0);
 
     if(op_bv.size()!=width)
@@ -42,20 +42,20 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
     return bv_utils.inverted(op_bv);
   }
   else if(expr.id()==ID_bitand || expr.id()==ID_bitor ||
-          expr.id()==ID_bitxor || 
+          expr.id()==ID_bitxor ||
           expr.id()==ID_bitnand || expr.id()==ID_bitnor ||
           expr.id()==ID_bitxnor)
   {
     bvt bv;
     bv.resize(width);
-    
+
     forall_operands(it, expr)
     {
       const bvt &op=convert_bv(*it);
 
       if(op.size()!=width)
         throw "convert_bitwise: unexpected operand width";
-        
+
       if(it==expr.operands().begin())
         bv=op;
       else
@@ -78,10 +78,10 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
             throw "unexpected operand";
         }
       }
-    }    
+    }
 
     return bv;
   }
- 
+
   throw "unexpected bitwise operand";
 }

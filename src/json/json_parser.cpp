@@ -36,7 +36,7 @@ bool parse_json(
   json_parser.in=&in;
   json_parser.set_message_handler(message_handler);
 
-  bool result=yyjsonparse()!=0;
+  bool result=json_parser.parse();
 
   // save result
   if(json_parser.stack.size()==1)
@@ -45,7 +45,7 @@ bool parse_json(
   // save some memory
   json_parser.clear();
 
-  return result;  
+  return result;
 }
 
 /*******************************************************************\
@@ -66,9 +66,9 @@ bool parse_json(
   message_handlert &message_handler,
   jsont &dest)
 {
-  std::ifstream in(filename.c_str());
-  
+  std::ifstream in(filename);
+
   if(!in) return true;
- 
+
   return parse_json(in, filename, message_handler, dest);
 }

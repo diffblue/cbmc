@@ -32,7 +32,7 @@ public:
   virtual void get_value_set(
     const exprt &expr,
     value_setst::valuest &value_set)=0;
-  
+
   virtual bool has_failed_symbol(
     const exprt &expr,
     const symbolt *&symbol)=0;

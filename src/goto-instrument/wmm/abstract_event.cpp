@@ -22,7 +22,7 @@ Function: abstract_eventt::unsafe_pair_lwfence_param
 
 \*******************************************************************/
 
-bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next, 
+bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next,
   memory_modelt model,
   bool lwsync_met) const
 {
@@ -109,7 +109,7 @@ bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
   switch(model)
   {
   case TSO:
-    return (thread==next.thread && operation==Write && next.operation==Read 
+    return (thread==next.thread && operation==Write && next.operation==Read
       && (met&1)==0);
   case PSO:
     return (thread==next.thread && operation==Write
@@ -136,4 +136,3 @@ bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
   /* unknown memory model */
   return true;
 }
-

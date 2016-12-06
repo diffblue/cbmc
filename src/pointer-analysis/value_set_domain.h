@@ -19,7 +19,7 @@ class value_set_domaint:public domain_baset
 public:
   value_sett value_set;
 
-  // overloading  
+  // overloading
 
   inline bool merge(const value_set_domaint &other, locationt to)
   {
@@ -32,7 +32,7 @@ public:
   {
     value_set.output(ns, out);
   }
-    
+
   virtual void initialize(
     const namespacet &ns,
     locationt l)
@@ -53,7 +53,7 @@ public:
   {
     value_set.get_reference_set(expr, dest, ns);
   }
-  
+
 };
 
 #endif

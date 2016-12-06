@@ -32,10 +32,10 @@ public:
 
   typedef std::vector<std::string> argst;
   argst args;
-  
+
   cmdlinet();
   virtual ~cmdlinet();
-  
+
 protected:
   struct optiont
   {
@@ -44,7 +44,7 @@ protected:
     std::string optstring;
     std::list<std::string> values;
   };
-   
+
   std::vector<optiont> options;
 
   int getoptnr(char option) const;

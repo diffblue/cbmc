@@ -20,7 +20,7 @@ class satcheck_zchaff_baset:public cnf_clause_listt
 public:
   satcheck_zchaff_baset(class CSolver *_solver);
   virtual ~satcheck_zchaff_baset();
-  
+
   virtual const std::string solver_text();
   virtual resultt prop_solve();
   virtual tvt l_get(literalt a) const;
@@ -34,7 +34,7 @@ public:
 
 protected:
   class CSolver *solver;
-  
+
   typedef enum { INIT, SAT, UNSAT, ERROR } statust;
   statust status;
 };
@@ -45,5 +45,5 @@ class satcheck_zchafft:public satcheck_zchaff_baset
   satcheck_zchafft();
   virtual ~satcheck_zchafft();
 };
- 
+
 #endif

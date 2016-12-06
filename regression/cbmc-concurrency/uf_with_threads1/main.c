@@ -25,7 +25,7 @@ int main()
   pthread_t t;
   pthread_create(&t,NULL,foo1,NULL);
   pthread_create(&t,NULL,foo2,NULL);
-  
+
   if(done1 && done2)
     assert(res1 == res2);
 }

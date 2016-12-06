@@ -140,7 +140,7 @@ public:
   {
     copy_to_operands(_op, _offset, _value);
   }
-  
+
   inline exprt &op() { return op0(); }
   inline exprt &offset() { return op1(); }
   inline exprt &value() { return op2(); }

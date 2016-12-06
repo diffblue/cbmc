@@ -23,7 +23,7 @@ class goto_function_templatet
 public:
   bodyT body;
   code_typet type;
-  
+
   typedef std::vector<irep_idt> parameter_identifierst;
   parameter_identifierst parameter_identifiers;
 
@@ -36,12 +36,12 @@ public:
   {
     return type.get_bool(ID_C_inlined);
   }
-  
+
   inline bool is_hidden() const
   {
     return type.get_bool(ID_C_hide);
   }
-  
+
   inline void make_hidden()
   {
     type.set(ID_C_hide, true);
@@ -50,7 +50,7 @@ public:
   goto_function_templatet()
   {
   }
-  
+
   void clear()
   {
     body.clear();
@@ -87,7 +87,7 @@ public:
   typedef goto_function_templatet<bodyT> goto_functiont;
   typedef std::map<irep_idt, goto_functiont> function_mapt;
   function_mapt function_map;
-  
+
   inline goto_functions_templatet()
   {
   }
@@ -97,16 +97,16 @@ public:
   {
     assert(src.function_map.empty());
   }
-  
+
   inline void clear()
   {
     function_map.clear();
   }
-  
+
   void output(
     const namespacet &ns,
     std::ostream &out) const;
-    
+
   void compute_location_numbers();
   void compute_loop_numbers();
   void compute_target_numbers();
@@ -124,12 +124,12 @@ public:
     // do not confuse with C's "int main()"
     return ID__start;
   }
-  
+
   inline void swap(goto_functions_templatet &other)
   {
     function_map.swap(other.function_map);
   }
-  
+
   void copy_from(const goto_functions_templatet &other)
   {
     for(typename function_mapt::const_iterator
@@ -166,11 +166,11 @@ void goto_functions_templatet<bodyT>::output(
     if(it->second.body_available())
     {
       out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
-      
+
       const symbolt &symbol=ns.lookup(it->first);
       out << symbol.display_name() << " /* " << symbol.name << " */\n";
       it->second.body.output(ns, symbol.name, out);
-      
+
       out << std::flush;
     }
   }
@@ -265,5 +265,5 @@ void goto_functions_templatet<bodyT>::compute_loop_numbers()
       it++)
     it->second.body.compute_loop_numbers();
 }
-  
+
 #endif

@@ -49,7 +49,7 @@ static bool is_directory(const std::string &s)
 
 int ms_cl_modet::doit()
 {
-  if(cmdline.isset('?') || 
+  if(cmdline.isset('?') ||
      cmdline.isset("help"))
   {
     help();
@@ -60,7 +60,7 @@ int ms_cl_modet::doit()
 
   compilet compiler(cmdline);
 
-  #if 0  
+  #if 0
   bool act_as_ld=
     has_prefix(base_name, "link") ||
     has_prefix(base_name, "goto-link");
@@ -73,13 +73,13 @@ int ms_cl_modet::doit()
   ui_message_handler.set_verbosity(verbosity);
 
   debug() << "Visual Studio mode" << eom;
-  
+
   // get configuration
   config.set(cmdline);
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
   compiler.object_file_extension="obj";
-  
+
   // determine actions to be undertaken
 
   if(cmdline.isset('E') || cmdline.isset('P'))
@@ -88,7 +88,7 @@ int ms_cl_modet::doit()
     compiler.mode=compilet::COMPILE_ONLY;
   else
     compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
-                     
+
   compiler.echo_file_name=true;
 
   if(cmdline.isset("Fo"))
@@ -120,7 +120,7 @@ int ms_cl_modet::doit()
       compiler.output_file_executable=
         get_base_name(cmdline.args[0], true)+".exe";
   }
-  
+
   if(cmdline.isset('J'))
     config.ansi_c.char_is_unsigned=true;
 
@@ -192,5 +192,3 @@ void ms_cl_modet::help_mode()
 {
   std::cout << "goto-cl understands the options of CL plus the following.\n\n";
 }
-
-

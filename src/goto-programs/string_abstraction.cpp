@@ -39,7 +39,7 @@ bool string_abstractiont::build_wrap(const exprt &object, exprt &dest, bool writ
   if(build(object, dest, write)) return true;
 
   // extra consistency check
-  // use 
+  // use
   // #define build_wrap(a,b,c) build(a,b,c)
   // to avoid it
   const typet &a_t=build_abstraction_type(object.type());
@@ -912,7 +912,7 @@ const typet& string_abstractiont::build_abstraction_type(const typet &type)
   const typet &eff_type=ns.follow(type);
   abstraction_types_mapt::const_iterator map_entry=
     abstraction_types_map.find(eff_type);
-  if(map_entry!=abstraction_types_map.end()) 
+  if(map_entry!=abstraction_types_map.end())
     return map_entry->second;
 
   abstraction_types_mapt tmp;
@@ -949,7 +949,7 @@ const typet& string_abstractiont::build_abstraction_type_rec(const typet &type,
   ::std::pair< abstraction_types_mapt::iterator, bool > map_entry(
       abstraction_types_map.insert(::std::make_pair(
           eff_type, nil_typet())));
-  if(!map_entry.second) 
+  if(!map_entry.second)
     return map_entry.first->second;
 
   if(eff_type.id()==ID_array || eff_type.id()==ID_pointer)
@@ -1798,4 +1798,3 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 
   return result;
 }
-

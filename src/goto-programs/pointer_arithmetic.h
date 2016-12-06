@@ -16,7 +16,7 @@ struct pointer_arithmetict
   exprt pointer, offset;
 
   pointer_arithmetict(const exprt &src);
-  
+
 protected:
   void read(const exprt &src);
   void add_to_offset(const exprt &src);

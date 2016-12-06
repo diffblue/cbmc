@@ -17,19 +17,19 @@ public:
   inline path_replayt()
   {
   }
-  
+
   inline explicit path_replayt(const path_symex_statet &src)
   {
     get_branches(src.history);
   }
-  
+
   void replay(path_symex_statet &);
-  
+
 protected:
   // TODO: consider something even denser, say something like a bitset
   typedef std::vector<bool> branchest;
   branchest branches;
-  
+
   void get_branches(const path_symex_step_reft history);
 };
 

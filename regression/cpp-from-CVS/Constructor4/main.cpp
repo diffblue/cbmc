@@ -1,7 +1,7 @@
 struct x
 {
   int *q;
-  
+
   x();
 };
 

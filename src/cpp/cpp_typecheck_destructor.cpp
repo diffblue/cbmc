@@ -121,7 +121,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
-      const symbolt &virtual_table_symbol_type = 
+      const symbolt &virtual_table_symbol_type =
         namespacet(symbol_table).lookup(
           cit->type().subtype().get(ID_identifier));
 
@@ -179,7 +179,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     if(dtor_code.is_not_nil())
       block.move_to_operands(dtor_code);
   }
-  
+
   const irept::subt &bases=symbol.type.find(ID_bases).get_sub();
 
   // call the base destructors in the reverse order
@@ -205,4 +205,3 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
   return block;
 }
-

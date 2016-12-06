@@ -22,7 +22,7 @@ struct ref_expr_set_dt
   ref_expr_set_dt() {}
   typedef hash_set_cont<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
-  
+
   const static ref_expr_set_dt blank;
 };
 
@@ -41,18 +41,18 @@ public:
   {
     return read().expr_set;
   }
-  
+
   inline expr_sett &expr_set_write()
   {
     return write().expr_set;
   }
-  
+
   bool make_union(const ref_expr_sett &s2)
   {
     if(s2.d==NULL) return false;
-    
+
     if(s2.d==d) return false;
-  
+
     if(d==NULL)
     {
       copy_from(s2);
@@ -67,7 +67,7 @@ public:
     expr_sett tmp(read().expr_set);
     size_t old_size=tmp.size();
     tmp.insert(s2.begin(), s2.end());
-    
+
     // anything new?
     if(tmp.size()==old_size) return false;
     move(tmp);

@@ -5,4 +5,3 @@ int main() {
   assert(s_pdt > 1);
   return 0;
 }
-

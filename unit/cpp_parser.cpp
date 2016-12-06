@@ -24,9 +24,8 @@ int main(int argc, const char *argv[])
 
   std::ifstream in(argv[1]);
   cpp_parser.in=&in;
-  
+
   cpp_parser.parse();
 
   return 0;
 }
-

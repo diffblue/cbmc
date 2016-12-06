@@ -11,7 +11,7 @@ int main()
 {
   x a;
   void *p;
-  
+
   // this should fail
   p=a.f;
 }

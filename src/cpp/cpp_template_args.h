@@ -68,7 +68,7 @@ public:
       if(it->id()==ID_unassigned ||
          it->type().id()==ID_unassigned)
         return true;
-        
+
     return false;
   }
 };

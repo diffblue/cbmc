@@ -36,7 +36,7 @@ void xml_interfacet::get_xml_options(cmdlinet &cmdline)
     parse_xml(std::cin, "", message_handler, xml);
 
     get_xml_options(xml, cmdline);
-    
+
     cmdline.set("xml-ui");
   }
 }
@@ -65,7 +65,7 @@ void xml_interfacet::get_xml_options(
     // recursive call
     get_xml_options(*e_it, cmdline);
   }
-  
+
   if(xml.name=="valueOption")
   {
     std::string name=xml.get_attribute("name");
@@ -84,4 +84,3 @@ void xml_interfacet::get_xml_options(
     }
   }
 }
-

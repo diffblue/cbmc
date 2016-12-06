@@ -33,14 +33,14 @@ void find_symbols(
 void find_symbols(
   const exprt &src,
   std::set<exprt> &dest);
-  
+
 void find_symbols(
   const exprt &src,
   std::set<symbol_exprt> &dest);
-  
+
 bool has_symbol(
   const exprt &src,
-  const find_symbols_sett &symbols);  
+  const find_symbols_sett &symbols);
 
 void find_type_symbols(
   const typet &src,

@@ -261,17 +261,17 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
       {
         std::string id=std::string(line, 0, pos);
         std::string value=std::string(line, pos+1, std::string::npos);
-      
+
         // Boolector offers array values as follows:
         //
         // ID[INDEX] VALUE
         //
         // There may be more than one line per ID
-        
+
         if(id!="" && id[id.size()-1]==']') // array?
         {
           std::size_t pos2=id.find('[');
-          
+
           if(pos2!=std::string::npos)
           {
             std::string new_id=std::string(id, 0, pos2);
@@ -298,7 +298,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
       for(valuet::index_value_mapt::const_iterator
           i_it=v.index_value_map.begin(); i_it!=v.index_value_map.end(); i_it++)
         set_value(it->second, i_it->first, i_it->second);
-        
+
       if(v.value!="") set_value(it->second, "", v.value);
     }
 
@@ -386,15 +386,15 @@ std::string smt1_dect::mathsat_value(const std::string &src)
 {
   std::size_t pos=src.find('[');
 
-  if(std::string(src, 0, 2)=="bv" && 
+  if(std::string(src, 0, 2)=="bv" &&
      pos!=std::string::npos &&
-     src[src.size()-1]==']') 
+     src[src.size()-1]==']')
   {
     unsigned width=safe_string2unsigned(std::string(src, pos+1, src.size()-pos-2));
     mp_integer i=string2integer(std::string(src, 2, pos-2));
     return integer2binary(i, width);
   }
-  
+
   return "";
 }
 
@@ -793,4 +793,3 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
 
   return res;
 }
-

@@ -293,13 +293,13 @@ void template_mapt::set(
   else
   {
     // must be non-type
-  
+
     if(value.id()==ID_type)
       assert(false); // typechecked before!
 
     irep_idt identifier=parameter.get(ID_identifier);
     expr_map[identifier]=value;
-  }    
+  }
 }
 
 /*******************************************************************\
@@ -326,7 +326,7 @@ void template_mapt::build_unassigned(
       t_it++)
   {
     const template_parametert &t=*t_it;
-    
+
     if(t.id()==ID_type)
     {
       typet tmp(ID_unassigned);
@@ -340,7 +340,7 @@ void template_mapt::build_unassigned(
       tmp.set(ID_identifier, t.get(ID_identifier));
       tmp.add_source_location()=t.source_location();
       expr_map[t.get(ID_identifier)]=tmp;
-    }    
+    }
   }
 }
 
@@ -364,11 +364,11 @@ cpp_template_args_tct template_mapt::build_template_args(
 
   cpp_template_args_tct template_args;
   template_args.arguments().resize(template_parameters.size());
-  
+
   for(std::size_t i=0; i<template_parameters.size(); i++)
   {
     const template_parametert &t=template_parameters[i];
-    
+
     if(t.id()==ID_type)
     {
       template_args.arguments()[i]=
@@ -378,9 +378,8 @@ cpp_template_args_tct template_mapt::build_template_args(
     {
       template_args.arguments()[i]=
         lookup_expr(t.get(ID_identifier));
-    }    
+    }
   }
-  
+
   return template_args;
 }
-

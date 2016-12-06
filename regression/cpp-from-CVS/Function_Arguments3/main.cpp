@@ -25,7 +25,7 @@ int main()
 {
   f(0);
   assert(global==10);
-  
+
   g((int *)0);
   assert(global==20);
 

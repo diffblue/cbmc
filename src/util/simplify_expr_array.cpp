@@ -76,11 +76,11 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()==ID_with)
   {
     // we have (a WITH [i:=e])[j]
-  
+
     const exprt &with_expr=array;
 
     if(with_expr.operands().size()!=3) return true;
-    
+
     if(with_expr.op1()==expr.op1())
     {
       // simplify (e with [i:=v])[i] to v
@@ -93,12 +93,12 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // Turn (a with i:=x)[j] into (i==j)?x:a[j].
       // watch out that the type of i and j might be different.
       equal_exprt equality_expr(expr.op1(), with_expr.op1());
-      
+
       if(equality_expr.lhs().type()!=equality_expr.rhs().type())
         equality_expr.rhs().make_typecast(equality_expr.lhs().type());
 
       simplify_inequality(equality_expr);
-      
+
       index_exprt new_index_expr;
       new_index_expr.type()=expr.type();
       new_index_expr.array()=with_expr.op0();
@@ -129,7 +129,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
           array.id()==ID_array)
   {
     mp_integer i;
-    
+
     if(to_integer(expr.op1(), i))
     {
     }
@@ -148,9 +148,9 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()==ID_string_constant)
   {
     mp_integer i;
-    
+
     const irep_idt &value=array.get(ID_value);
-  
+
     if(to_integer(expr.op1(), i))
     {
     }
@@ -237,4 +237,3 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
   return result;
 }
-

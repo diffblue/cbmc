@@ -53,7 +53,7 @@ void dirtyt::find_dirty(const exprt &expr)
     find_dirty_address_of(address_of_expr.object());
     return;
   }
-  
+
   forall_operands(it, expr)
     find_dirty(*it);
 }

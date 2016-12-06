@@ -163,7 +163,7 @@ protected:
     const irep_idt &base_name,
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
-    
+
   std::string function_template_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
@@ -174,7 +174,7 @@ protected:
     const symbolt &template_symbol,
     const cpp_template_args_non_tct &template_args);
 
-  // template instantiations    
+  // template instantiations
   class instantiationt
   {
   public:
@@ -185,9 +185,9 @@ protected:
 
   typedef std::list<instantiationt> instantiation_stackt;
   instantiation_stackt instantiation_stack;
-  
+
   void show_instantiation_stack(std::ostream &);
-  
+
   class instantiation_levelt
   {
   public:
@@ -197,21 +197,21 @@ protected:
     {
       instantiation_stack.push_back(instantiationt());
     }
-    
+
     ~instantiation_levelt()
     {
       instantiation_stack.pop_back();
     }
-    
+
   private:
     instantiation_stackt &instantiation_stack;
   };
-  
+
   const symbolt &class_template_symbol(
     const source_locationt &source_location,
     const symbolt &template_symbol,
     const cpp_template_args_tct &specialization_template_args,
-    const cpp_template_args_tct &full_template_args);  
+    const cpp_template_args_tct &full_template_args);
 
   void elaborate_class_template(
     const typet &type);
@@ -321,33 +321,33 @@ protected:
   void do_virtual_table(const symbolt& symbol);
 
   // we need to be able to delay the typechecking
-  // of function bodies to handle methods with
+  // of method bodies to handle methods with
   // bodies in the class definition
-  struct function_bodyt
+  struct method_bodyt
   {
   public:
-    function_bodyt(
-      symbolt *_function_symbol,
+    method_bodyt(
+      symbolt *_method_symbol,
       const template_mapt &_template_map,
       const instantiation_stackt &_instantiation_stack):
-      function_symbol(_function_symbol),
+      method_symbol(_method_symbol),
       template_map(_template_map),
       instantiation_stack(_instantiation_stack)
     {
     }
-    
-    symbolt *function_symbol;
+
+    symbolt *method_symbol;
     template_mapt template_map;
     instantiation_stackt instantiation_stack;
   };
-  
-  typedef std::list<function_bodyt> function_bodiest;
-  function_bodiest function_bodies;
-  
-  void add_function_body(symbolt *_function_symbol)
+
+  typedef std::list<method_bodyt> method_bodiest;
+  method_bodiest method_bodies;
+
+  void add_method_body(symbolt *_method_symbol)
   {
-    function_bodies.push_back(function_bodyt(
-      _function_symbol, template_map, instantiation_stack));
+    method_bodies.push_back(method_bodyt(
+      _method_symbol, template_map, instantiation_stack));
   }
 
   // types
@@ -386,7 +386,7 @@ protected:
   void typecheck_compound_body(symbolt &symbol);
   void typecheck_compound_body(struct_union_typet &type) { assert(false); };
   void typecheck_enum_body(symbolt &symbol);
-  void typecheck_function_bodies();
+  void typecheck_method_bodies(method_bodiest &);
   void typecheck_compound_bases(struct_typet &type);
   void add_anonymous_members_to_scope(const symbolt &struct_union_symbol);
 

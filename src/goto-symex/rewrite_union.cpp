@@ -39,7 +39,7 @@ void rewrite_union(
   {
     const exprt &op=to_member_expr(expr).struct_op();
     const typet &op_type=ns.follow(op.type());
-    
+
     if(op_type.id()==ID_union)
     {
       exprt offset=gen_zero(index_type());

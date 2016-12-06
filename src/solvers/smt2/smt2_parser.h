@@ -15,13 +15,13 @@ public:
   smt2_parsert(std::istream &_in):in(_in)
   {
   }
-  
+
   void operator()();
-  
+
 protected:
   std::istream &in;
   std::string buffer;
-  
+
   // string literal, numeral, simple symbol, quoted symbol
   // and keyword are in 'buffer'
   virtual void string_literal() = 0;
@@ -43,4 +43,3 @@ private:
   void get_string_literal();
   bool is_simple_symbol_character(char ch);
 };
-

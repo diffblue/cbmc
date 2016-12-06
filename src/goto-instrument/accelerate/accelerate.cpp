@@ -393,7 +393,7 @@ symbolt acceleratet::make_symbol(std::string name, typet type) {
   ret.base_name = name;
   ret.pretty_name = name;
   ret.type = type;
- 
+
   symbol_table.add(ret);
 
   return ret;

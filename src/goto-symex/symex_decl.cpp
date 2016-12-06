@@ -39,7 +39,7 @@ void goto_symext::symex_decl(statet &state)
 
   if(code.operands().size()!=1)
     throw "decl expects one operand";
-  
+
   if(code.op0().id()!=ID_symbol)
     throw "decl expects symbol as first operand";
 
@@ -62,7 +62,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 {
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
-  
+
   ssa_exprt ssa(expr);
   state.rename(ssa, ns, goto_symex_statet::L1);
   const irep_idt &l1_identifier=ssa.get_identifier();
@@ -76,9 +76,9 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   {
     exprt failed=
       get_failed_symbol(expr, ns);
-    
+
     exprt rhs;
-    
+
     if(failed.is_not_nil())
     {
       address_of_exprt address_of_expr;
@@ -88,11 +88,11 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     }
     else
       rhs=exprt(ID_invalid);
-    
+
     state.rename(rhs, ns, goto_symex_statet::L1);
     state.value_set.assign(ssa, rhs, ns, true, false);
   }
-  
+
   // prevent propagation
   state.propagation.remove(l1_identifier);
 
@@ -104,14 +104,14 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     state.level2.current_names[l1_identifier]=std::make_pair(ssa, 0);
   state.level2.increase_counter(l1_identifier);
   state.rename(ssa, ns);
-  
+
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden
   bool hidden=
     ns.lookup(expr.get_identifier()).is_auxiliary ||
     state.top().hidden_function ||
     state.source.pc->source_location.get_hide();
-  
+
   target.decl(
     state.guard.as_expr(),
     ssa,

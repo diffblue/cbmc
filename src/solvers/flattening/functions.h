@@ -20,7 +20,7 @@ class functionst
 public:
   explicit functionst(prop_convt &_prop_conv):
     prop_conv(_prop_conv) { }
-    
+
   virtual ~functionst()
   {
   }
@@ -32,20 +32,20 @@ public:
   {
     add_function_constraints();
   }
-  
+
 protected:
   prop_convt &prop_conv;
 
   typedef std::set<function_application_exprt> applicationst;
-  
+
   struct function_infot
   {
     applicationst applications;
   };
-  
+
   typedef std::map<exprt, function_infot> function_mapt;
   function_mapt function_map;
-  
+
   virtual void add_function_constraints();
   virtual void add_function_constraints(const function_infot &info);
 

@@ -21,17 +21,17 @@ public:
   xml_parse_treet parse_tree;
 
   std::list<xmlt *> stack;
-  
+
   xmlt &current()
   {
     return *stack.back();
   }
-   
+
   virtual bool parse()
   {
     return yyxmlparse()!=0;
   }
-  
+
   void new_level()
   {
     current().elements.push_back(xmlt());

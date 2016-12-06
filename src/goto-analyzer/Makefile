@@ -57,4 +57,3 @@ goto-analyzer$(EXEEXT): $(OBJ)
 
 goto-analyzer-mac-signed: goto-analyzer$(EXEEXT)
 	strip goto-analyzer$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) goto-analyzer$(EXEEXT)
-

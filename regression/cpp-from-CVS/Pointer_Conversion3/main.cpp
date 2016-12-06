@@ -1,6 +1,6 @@
 struct A {
 	int i;
-	
+
 };
 
 struct B

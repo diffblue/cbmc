@@ -18,7 +18,7 @@ class dstring
 public:
   // this is safe for static objects
   #ifdef __GNUC__
-  constexpr 
+  constexpr
   #endif
   dstring():no(0)
   {
@@ -27,7 +27,7 @@ public:
   // this is safe for static objects
   // the 2nd argument is to avoid accidental conversions
   #ifdef __GNUC__
-  constexpr 
+  constexpr
   #endif
   dstring(unsigned _no, unsigned):no(_no)
   {
@@ -35,7 +35,7 @@ public:
 
   #if 0
   // This conversion allows the use of dstrings
-  // in switch ... case statements.  
+  // in switch ... case statements.
   constexpr operator int() const { return no; }
   #endif
 
@@ -50,23 +50,23 @@ public:
   }
 
   // access
-  
+
   inline bool empty() const
   {
     return no==0; // string 0 is exactly the empty string
   }
-  
+
   inline char operator[](size_t i) const
   {
     return as_string()[i];
   }
-  
+
   // the pointer is guaranteed to be stable
   inline const char *c_str() const
   {
     return as_string().c_str();
   }
-  
+
   inline size_t size() const
   {
     return as_string().size();
@@ -95,48 +95,48 @@ public:
   bool operator> (const std::string &b) const { return as_string()> b; }
   bool operator<=(const std::string &b) const { return as_string()<=b; }
   bool operator>=(const std::string &b) const { return as_string()>=b; }
-  
+
   int compare(const dstring &b) const
   {
     if(no==b.no) return 0; // equal
     return as_string().compare(b.as_string());
   }
-  
+
   inline friend bool ordering(const dstring &a, const dstring &b)
   {
     return a.no<b.no;
   }
 
   // modifying
-  
+
   inline void clear()
   { no=0; }
-   
+
   inline void swap(dstring &b)
   { unsigned t=no; no=b.no; b.no=t; }
 
   inline dstring &operator=(const dstring &b)
   { no=b.no; return *this; }
-  
+
   // friends
-  
+
   inline friend std::ostream &operator<<(std::ostream &out, const dstring &a)
   {
     return out << a.as_string();
   }
-  
+
   inline friend size_t hash_string(const dstring &s)
   {
     return s.hash();
   }
-  
+
   // non-standard
 
   inline unsigned get_no() const
   {
     return no;
   }
-  
+
 protected:
   unsigned no;
 

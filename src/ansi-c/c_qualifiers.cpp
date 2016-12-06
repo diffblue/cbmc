@@ -25,7 +25,7 @@ Function: c_qualifierst::as_string
 std::string c_qualifierst::as_string() const
 {
   std::string qualifiers;
-  
+
   if(is_constant)
     qualifiers+="const ";
 
@@ -34,19 +34,19 @@ std::string c_qualifierst::as_string() const
 
   if(is_restricted)
     qualifiers+="restrict ";
-    
+
   if(is_atomic)
     qualifiers+="_Atomic ";
-    
+
   if(is_ptr32)
     qualifiers+="__ptr32 ";
-    
+
   if(is_ptr64)
     qualifiers+="__ptr64 ";
 
   if(is_noreturn)
     qualifiers+="_Noreturn ";
-    
+
   return qualifiers;
 }
 
@@ -185,4 +185,3 @@ std::ostream &operator << (
 {
   return out << c_qualifiers.as_string();
 }
-

@@ -8,7 +8,7 @@
 #endif
 #ifndef __CPROVER_cegis_number_of_ops
 #define __CPROVER_cegis_number_of_ops 3
-#endif 
+#endif
 #ifndef __CPROVER_cegis_max_solution_size
 #define __CPROVER_cegis_max_solution_size 1
 #endif

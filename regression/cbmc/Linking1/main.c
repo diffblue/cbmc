@@ -15,9 +15,9 @@ int main()
 {
   assert(i==1);
   assert(a_struct.asd==0);
-  
+
   f();
-  
+
   assert(i==2);
   assert(a_struct.asd==123);
 }

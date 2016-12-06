@@ -29,4 +29,3 @@ std::ostream & operator << (std::ostream &out, literalt l)
   else
     return out << (l.sign()?"-":"") << l.var_no();
 }
-

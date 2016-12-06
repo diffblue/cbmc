@@ -46,7 +46,7 @@ inline HANDLE CreateThread(
 
   if(lpThreadId) *lpThreadId=thread_id;
   __CPROVER_ASYNC_1: lpStartAddress(lpParameter);
-  
+
   HANDLE handle;
   return handle;
 }

@@ -44,7 +44,7 @@ Function: add_failed_symbol
 void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
   if(!symbol.is_lvalue) return;
-  
+
   if(symbol.type.get(ID_C_failed_symbol)!="")
     return;
 
@@ -59,12 +59,12 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
     new_symbol.type=symbol.type.subtype();
     new_symbol.value.make_nil();
     new_symbol.type.set(ID_C_is_failed_symbol, true);
-    
+
     symbol.type.set(ID_C_failed_symbol, new_symbol.name);
-    
+
     if(new_symbol.type.id()==ID_pointer)
       add_failed_symbol(new_symbol, symbol_table); // recursive call
-        
+
     symbol_table.move(new_symbol);
   }
 }
@@ -91,7 +91,7 @@ void add_failed_symbols(symbol_tablet &symbol_table)
 
   Forall_symbols(it, symbol_table.symbols)
     symbol_list.push_back(&(it->second));
-  
+
   for(symbol_listt::const_iterator
       it=symbol_list.begin();
       it!=symbol_list.end();
@@ -122,8 +122,8 @@ exprt get_failed_symbol(
 
   if(failed_symbol_id==irep_idt())
     return nil_exprt();
-    
+
   const symbolt &failed_symbol=ns.lookup(failed_symbol_id);
-  
+
   return symbol_exprt(failed_symbol_id, failed_symbol.type);
 }

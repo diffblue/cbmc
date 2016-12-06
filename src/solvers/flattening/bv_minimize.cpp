@@ -16,11 +16,11 @@ Author: Georg Weissenbacher, georg.weissenbacher@inf.ethz.ch
 
 Function: bv_minimizet::add_objective
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -38,19 +38,19 @@ void bv_minimizet::add_objective(
      type.id()==ID_c_enum_tag ||
      type.id()==ID_signedbv ||
      type.id()==ID_fixedbv)
-  {    
+  {
     // convert it
     bvt bv=boolbv.convert_bv(objective);
-  
+
     for(std::size_t i=0; i<bv.size(); i++)
     {
       literalt lit=bv[i];
-  
+
       if(lit.is_constant()) // fixed already, ignore
         continue;
 
       prop_minimizet::weightt weight=(1LL<<i);
-      
+
       if(type.id()==ID_signedbv ||
          type.id()==ID_fixedbv ||
          type.id()==ID_floatbv)
@@ -60,7 +60,7 @@ void bv_minimizet::add_objective(
         if(i==bv.size()-1)
           weight=-weight;
       }
-      
+
       prop_minimize.objective(lit, weight);
     }
   }
@@ -70,11 +70,11 @@ void bv_minimizet::add_objective(
 
 Function: bv_minimizet::operator()
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -84,7 +84,7 @@ void bv_minimizet::operator()(const minimization_listt &symbols)
 
   prop_minimizet prop_minimize(boolbv);
   prop_minimize.set_message_handler(get_message_handler());
-  
+
   for(minimization_listt::const_iterator
       l_it=symbols.begin();
       l_it!=symbols.end();
@@ -92,7 +92,7 @@ void bv_minimizet::operator()(const minimization_listt &symbols)
   {
     add_objective(prop_minimize, *l_it);
   }
-  
+
   // now solve
   prop_minimize();
 }

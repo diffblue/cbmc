@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Symex Main Module 
+Module: Symex Main Module
 
 Author: Daniel Kroening, kroening@kroening.com
 

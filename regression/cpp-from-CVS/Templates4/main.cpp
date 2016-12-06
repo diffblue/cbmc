@@ -20,8 +20,8 @@ public:
   {
     assert(3==f<int>(3));
   }
- 
-  
+
+
   bool t;
   T1():t(false) { }
 };
@@ -29,7 +29,7 @@ public:
 int main()
 {
   T1 x;
-  
+
   x.g();
   assert(1==x.f<int>(1));
   assert(true==x.f<bool>(true));

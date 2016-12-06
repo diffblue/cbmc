@@ -31,7 +31,7 @@ int main ()
   unsigned int   count;
   unsigned char  random;
 
-  int lock_held = 0; 
+  int lock_held = 0;
 
   dummy_major = register_chrdev (0, "dummy");
   inode.i_rdev = dummy_major << MINORBITS;
@@ -49,14 +49,14 @@ int main ()
 
       switch (random)
 	{
-	case 1: 
+	case 1:
 	  rval = dummy_open (&inode, &my_file);
 	  if (rval == 0)
 	    lock_held = TRUE;
 	  break;
 	case 2:
 	  __CPROVER_assume (lock_held);
-	  count = dummy_read (&my_file, buffer, BUF_SIZE); 
+	  count = dummy_read (&my_file, buffer, BUF_SIZE);
 	  break;
 	case 3:
 	  dummy_release (&inode, &my_file);

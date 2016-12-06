@@ -66,7 +66,7 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(int argc, const char 
   ui_message_handler(cmdline, "GOTO-ANALYZER " CBMC_VERSION)
 {
 }
-  
+
 /*******************************************************************\
 
 Function: goto_analyzer_parse_optionst::register_languages
@@ -103,13 +103,13 @@ void goto_analyzer_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
-  
+
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
     if(v>10) v=10;
   }
-  
+
   ui_message_handler.set_verbosity(v);
 }
 
@@ -239,7 +239,7 @@ int goto_analyzer_parse_optionst::doit()
     std::cout << CBMC_VERSION << std::endl;
     return 0;
   }
-  
+
   //
   // command line options
   //
@@ -257,12 +257,12 @@ int goto_analyzer_parse_optionst::doit()
            << config.this_operating_system() << eom;
 
   register_languages();
-  
+
   goto_model.set_message_handler(get_message_handler());
 
   if(goto_model(cmdline.args))
     return 6;
-    
+
   if(process_goto_program(options))
     return 6;
 
@@ -311,7 +311,7 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("show-local-may-alias"))
   {
     namespacet ns(goto_model.symbol_table);
-  
+
     forall_goto_functions(it, goto_model.goto_functions)
     {
       std::cout << ">>>>\n";
@@ -335,7 +335,7 @@ int goto_analyzer_parse_optionst::doit()
 
   if(set_properties())
     return 7;
-  
+
   if(cmdline.isset("show-intervals"))
   {
     show_intervals(goto_model, std::cout);
@@ -389,12 +389,12 @@ bool goto_analyzer_parse_optionst::set_properties()
     error() << e << eom;
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   return false;
 }
 
@@ -409,7 +409,7 @@ Function: goto_analyzer_parse_optionst::process_goto_program
  Purpose:
 
 \*******************************************************************/
-  
+
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
 {
@@ -421,7 +421,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    status() << "Adding CPROVER library (" 
+    status() << "Adding CPROVER library ("
              << config.ansi_c.arch << ")" << eom;
     link_to_library(goto_model, ui_message_handler);
     #endif
@@ -434,7 +434,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_model, ui_message_handler);
-    
+
     // remove returns, gcc vectors, complex
     remove_returns(goto_model);
     remove_vector(goto_model);
@@ -445,13 +445,13 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(options, goto_model);
     #endif
-    
+
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
 
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
-    
+
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
@@ -480,18 +480,18 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     error() << e << eom;
     return true;
   }
-  
+
   catch(int)
   {
     return true;
   }
-  
+
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
     return true;
   }
-  
+
   return false;
 }
 
@@ -512,11 +512,11 @@ void goto_analyzer_parse_optionst::help()
   std::cout <<
     "\n"
     "* * GOTO-ANALYSER " CBMC_VERSION " - Copyright (C) 2016 ";
-    
+
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-    
+
   std::cout << " * *\n";
-    
+
   std::cout <<
     "* *                Daniel Kroening, DiffBlue                * *\n"
     "* *                 kroening@kroening.com                   * *\n"

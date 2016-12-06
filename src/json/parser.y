@@ -7,7 +7,7 @@
 
 int yyjsonlex();
 extern char *yyjsontext;
-extern std::size_t yyjsonleng;
+extern int yyjsonleng; // really an int, not a size_t
 
 static std::string convert_TOK_STRING()
 {

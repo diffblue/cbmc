@@ -156,21 +156,21 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   #ifdef DEBUG
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
-  
+
   // This has four phases!
   // 1. Floating-point expression adjustment (rounding mode)
   // 2. Dereferencing, including propagation of pointers.
   // 3. Rewriting to SSA symbols
   // 4. Simplifier
-  
+
   exprt tmp1=src;
   adjust_float_expressions(tmp1, var_map.ns);
 
   // we force propagation for dereferencing
   exprt tmp2=dereference_rec(tmp1, true);
-  
+
   exprt tmp3=instantiate_rec(tmp2, propagate);
-  
+
   exprt tmp4=simplify_expr(tmp3, var_map.ns);
 
   #ifdef DEBUG
@@ -202,12 +202,12 @@ exprt path_symex_statet::instantiate_rec(
   #endif
 
   const typet &src_type=var_map.ns.follow(src.type());
-  
+
   if(src_type.id()==ID_struct) // src is a struct
   {
     const struct_typet &struct_type=to_struct_type(src_type);
     const struct_typet::componentst &components=struct_type.components();
-    
+
     struct_exprt result(src.type());
     result.operands().resize(components.size());
 
@@ -225,43 +225,43 @@ exprt path_symex_statet::instantiate_rec(
       }
       else
         new_src=member_exprt(src, component_name, subtype);
-      
+
       // recursive call
       result.operands()[i]=instantiate_rec(new_src, propagate);
     }
 
     return result; // done
-  } 
+  }
   else if(src_type.id()==ID_array) // src is an array
   {
     const array_typet &array_type=to_array_type(src_type);
     const typet &subtype=array_type.subtype();
-    
+
     if(array_type.size().is_constant())
     {
       mp_integer size;
       if(to_integer(array_type.size(), size))
         throw "failed to convert array size";
-        
+
       unsigned long long size_int=integer2unsigned(size);
-        
+
       array_exprt result(array_type);
       result.operands().resize(size_int);
-    
+
       // split it up into elements
       for(unsigned long long i=0; i<size_int; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_src=index_exprt(src, index, subtype);
-        
+
         // array constructor?
         if(src.id()==ID_array)
           new_src=simplify_expr(new_src, var_map.ns);
-        
+
         // recursive call
         result.operands()[i]=instantiate_rec(new_src, propagate);
       }
-      
+
       return result; // done
     }
     else
@@ -273,30 +273,30 @@ exprt path_symex_statet::instantiate_rec(
   {
     const vector_typet &vector_type=to_vector_type(src_type);
     const typet &subtype=vector_type.subtype();
-    
+
     if(!vector_type.size().is_constant())
       throw "vector with non-constant size";
 
     mp_integer size;
     if(to_integer(vector_type.size(), size))
       throw "failed to convert vector size";
-      
+
     unsigned long long int size_int=integer2unsigned(size);
-    
+
     vector_exprt result(vector_type);
     exprt::operandst &operands=result.operands();
     operands.resize(size_int);
-  
+
     // split it up into elements
     for(unsigned long long i=0; i<size_int; ++i)
     {
       exprt index=from_integer(i, vector_type.size().type());
       exprt new_src=index_exprt(src, index, subtype);
-      
+
       // vector constructor?
       if(src.id()==ID_vector)
         new_src=simplify_expr(new_src, var_map.ns);
-      
+
       // recursive call
       operands[i]=instantiate_rec(new_src, propagate);
     }
@@ -305,15 +305,15 @@ exprt path_symex_statet::instantiate_rec(
   }
 
   // check whether this is a symbol(.member|[index])*
-  
+
   {
     exprt tmp_symbol_member_index=
       read_symbol_member_index(src, propagate);
-  
+
     if(tmp_symbol_member_index.is_not_nil())
       return tmp_symbol_member_index; // yes!
   }
-  
+
   if(src.id()==ID_address_of)
   {
     assert(src.operands().size()==1);
@@ -325,9 +325,9 @@ exprt path_symex_statet::instantiate_rec(
   {
     // could be done separately
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
-    
+
     if(statement==ID_nondet)
-    {        
+    {
       irep_idt id="symex::nondet"+i2string(var_map.nondet_count);
       var_map.nondet_count++;
       return symbol_exprt(id, src.type());
@@ -350,9 +350,9 @@ exprt path_symex_statet::instantiate_rec(
   {
     const typet &compound_type=
       var_map.ns.follow(to_member_expr(src).struct_op().type());
-      
+
     if(compound_type.id()==ID_struct)
-    {  
+    {
       // avoids indefinite recursion above
       return src;
     }
@@ -372,14 +372,14 @@ exprt path_symex_statet::instantiate_rec(
     return src;
 
   exprt src2=src;
-  
+
   // recursive calls on structure of 'src'
   Forall_operands(it, src2)
   {
     exprt tmp_op=instantiate_rec(*it, propagate);
     *it=tmp_op;
   }
-  
+
   return src2;
 }
 
@@ -403,7 +403,7 @@ exprt path_symex_statet::read_symbol_member_index(
   exprt current=src;
   const typet final_type=src.type();
   exprt::operandst indices;
-  
+
   // don't touch function symbols
   if(var_map.ns.follow(final_type).id()==ID_code)
     return nil_exprt();
@@ -412,12 +412,12 @@ exprt path_symex_statet::read_symbol_member_index(
   while(true)
   {
     exprt next=nil_exprt();
-  
+
     if(current.id()==ID_symbol)
     {
       if(current.get_bool(ID_C_SSA_symbol))
         return nil_exprt(); // SSA already
-    
+
       irep_idt identifier=
         to_symbol_expr(current).get_identifier();
 
@@ -429,7 +429,7 @@ exprt path_symex_statet::read_symbol_member_index(
                 << " var_info " << var_info.full_identifier << std::endl;
       #endif
 
-      // warning: reference is not stable      
+      // warning: reference is not stable
       var_statet &var_state=get_var_state(var_info);
 
       if(propagate && var_state.value.is_not_nil())
@@ -444,19 +444,19 @@ exprt path_symex_statet::read_symbol_member_index(
           // produce one
           var_state.ssa_symbol=var_info.ssa_symbol();
         }
-            
+
         return var_state.ssa_symbol;
       }
     }
     else if(current.id()==ID_member)
     {
       const member_exprt &member_expr=to_member_expr(current);
-      
+
       const typet &compound_type=
         var_map.ns.follow(member_expr.struct_op().type());
-      
+
       if(compound_type.id()==ID_struct)
-      { 
+      {
         // go into next iteration
         next=member_expr.struct_op();
         suffix="."+id2string(member_expr.get_component_name())+suffix;
@@ -467,12 +467,12 @@ exprt path_symex_statet::read_symbol_member_index(
     else if(current.id()==ID_index)
     {
       const index_exprt &index_expr=to_index_expr(current);
-      
+
       exprt index_tmp=read(index_expr.index(), propagate);
       indices.push_back(index_tmp);
-      
+
       std::string index_string=array_index_as_string(index_tmp);
-      
+
       // go into next iteration
       next=index_expr.array();
       suffix=index_string+suffix;
@@ -482,7 +482,7 @@ exprt path_symex_statet::read_symbol_member_index(
       return nil_exprt();
     }
 
-    // next round  
+    // next round
     assert(next.is_not_nil());
     current=next;
   }
@@ -536,7 +536,7 @@ exprt path_symex_statet::dereference_rec(
 
     // now hand over to dereference
     exprt address_dereferenced=::dereference(address, var_map.ns);
-    
+
     // the dereferenced address is a mixture of non-SSA and SSA symbols
     // (e.g., if-guards and array indices)
     return address_dereferenced;
@@ -546,7 +546,7 @@ exprt path_symex_statet::dereference_rec(
     return src;
 
   exprt src2=src;
-  
+
   {
     // recursive calls on structure of 'src'
     Forall_operands(it, src2)
@@ -555,7 +555,7 @@ exprt path_symex_statet::dereference_rec(
       *it=tmp_op;
     }
   }
-  
+
   return src2;
 }
 
@@ -582,7 +582,7 @@ exprt path_symex_statet::instantiate_rec_address(
   if(src.id()==ID_symbol)
   {
     return src;
-  } 
+  }
   else if(src.id()==ID_index)
   {
     assert(src.operands().size()==2);
@@ -658,7 +658,7 @@ void path_symex_statet::record_step()
   if(!history.is_nil() &&
      history->thread_nr!=current_thread)
     no_thread_interleavings++;
-    
+
   // update our statistics
   depth++;
 
@@ -726,18 +726,18 @@ bool path_symex_statet::is_feasible(
 {
   // feed path constraint to decision procedure
   decision_procedure << history;
-  
+
   // check whether SAT
   switch(decision_procedure())
   {
   case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE: return true;
-  
+
   case decision_proceduret::D_UNSATISFIABLE: return false;
-  
+
   case decision_proceduret::D_ERROR: throw "error from decsion procedure";
   }
-  
+
   return true; // not really reachable
 }
 
@@ -763,7 +763,7 @@ bool path_symex_statet::check_assertion(
 
   // the assertion in SSA
   exprt assertion=read(instruction.guard);
-  
+
   // trivial?
   if(assertion.is_true()) return true; // no error
 
@@ -773,20 +773,19 @@ bool path_symex_statet::check_assertion(
   // negate the assertion
   decision_procedure.set_to(assertion, false);
 
-  // check whether SAT  
+  // check whether SAT
   switch(decision_procedure.dec_solve())
   {
   case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE:
     return false; // error
-   
+
   case decision_proceduret::D_UNSATISFIABLE:
     return true; // no error
-  
+
   default:
     throw "error from decision procedure";
   }
 
   return true; // not really reachable
 }
-

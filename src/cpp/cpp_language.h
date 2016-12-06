@@ -38,7 +38,7 @@ public:
     symbol_tablet &dest,
     symbol_tablet &src,
     const std::string &module,
-    class replace_symbolt &replace_symbol) const; 
+    class replace_symbolt &replace_symbol) const;
 
   virtual bool final(
     symbol_tablet &symbol_table);

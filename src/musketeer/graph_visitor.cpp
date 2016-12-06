@@ -24,7 +24,7 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::graph_explore(event_grapht& egraph, unsigned next, 
+void const_graph_visitort::graph_explore(event_grapht& egraph, unsigned next,
   unsigned end, std::list<unsigned>& old_path, std::set<unsigned>& edges)
 {
   if(next == end) {
@@ -52,7 +52,7 @@ void const_graph_visitort::graph_explore(event_grapht& egraph, unsigned next,
         continue;
       visited_nodes.insert(next_it->first);
 
-      old_path.push_back/*front*/(next_it->first); 
+      old_path.push_back/*front*/(next_it->first);
       graph_explore(egraph, next_it->first, end, old_path, edges);
       old_path.pop_back/*front*/();
     }
@@ -124,7 +124,7 @@ void const_graph_visitort::graph_explore_BC(event_grapht& egraph, unsigned next,
   /* TODO: restricts to C_1 U ... U C_n for perf improvement */
   assert(old_path.size() > 0);
 
-  fence_inserter.instrumenter.message.debug() << "(BC) explore " << old_path.front() 
+  fence_inserter.instrumenter.message.debug() << "(BC) explore " << old_path.front()
     << " --...--> " << next << messaget::eom;
 
   if(visited_nodes.find(next)!=visited_nodes.end())
@@ -183,7 +183,7 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::const_graph_explore_BC(event_grapht& egraph, 
+void const_graph_visitort::const_graph_explore_BC(event_grapht& egraph,
   unsigned next, std::list<unsigned>& old_path)
 {
   /* TODO: restricts to C_1 U ... U C_n */
@@ -252,7 +252,7 @@ void const_graph_visitort::graph_explore_AC(event_grapht& egraph, unsigned next,
   /* TODO: restricts to C_1 U ... U C_n */
   assert(old_path.size() > 0);
 
-  fence_inserter.instrumenter.message.debug() << "(AC) explore " 
+  fence_inserter.instrumenter.message.debug() << "(AC) explore "
     << old_path.front() << " --...--> " << next << messaget::eom;
 
   if(visited_nodes.find(next)!=visited_nodes.end())
@@ -280,7 +280,7 @@ void const_graph_visitort::graph_explore_AC(event_grapht& egraph, unsigned next,
     {
       const abstract_eventt& e1=egraph[*next_it];
       const abstract_eventt& e2=egraph[*it];
-      if(!porw || (e1.operation==abstract_eventt::Read 
+      if(!porw || (e1.operation==abstract_eventt::Read
         && e2.operation==abstract_eventt::Write))
         edges.insert(fence_inserter.add_edge(edget(*next_it,*it)));
     }
@@ -311,7 +311,7 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::const_graph_explore_AC(event_grapht& egraph, 
+void const_graph_visitort::const_graph_explore_AC(event_grapht& egraph,
   unsigned next, std::list<unsigned>& old_path)
 {
   /* TODO: restricts to C_1 U ... U C_n */
@@ -378,7 +378,7 @@ Function:
 void const_graph_visitort::PT(const edget& e, std::set<unsigned>& edges) {
   visited_nodes.clear();
 
-//  if(!e.is_po) /* e is in po^+\po */ is_po is a flag set manually, do not 
+//  if(!e.is_po) /* e is in po^+\po */ is_po is a flag set manually, do not
 //  use it for checks!!
   const graph<abstract_eventt>::edgest& list_po_out=
     fence_inserter.instrumenter.egraph.po_out(e.first);
@@ -388,7 +388,7 @@ void const_graph_visitort::PT(const edget& e, std::set<unsigned>& edges) {
     event_grapht& egraph=fence_inserter.instrumenter.egraph;
 
     /* all the pos inbetween */
-    for(graph<abstract_eventt>::edgest::const_iterator 
+    for(graph<abstract_eventt>::edgest::const_iterator
       next_it=egraph.po_out(e.first).begin();
       next_it!=egraph.po_out(e.first).end();
       ++next_it)
@@ -443,7 +443,7 @@ void const_graph_visitort::CT(const edget& edge, std::set<unsigned>& edges) {
   visited_nodes.clear();
 
   /* if one event only on this thread of the cycle, discard */
-  if(egraph.po_in(first).size() > 0) 
+  if(egraph.po_in(first).size() > 0)
     for(graph<abstract_eventt>::edgest::const_iterator
       next_it=egraph.po_in(first).begin();
       next_it!=egraph.po_in(first).end();
@@ -480,8 +480,8 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::CT_not_powr(const edget& edge, 
-  std::set<unsigned>& edges) 
+void const_graph_visitort::CT_not_powr(const edget& edge,
+  std::set<unsigned>& edges)
 {
   event_grapht& egraph=fence_inserter.instrumenter.egraph;
 
@@ -494,7 +494,7 @@ void const_graph_visitort::CT_not_powr(const edget& edge,
     (test_first.operation==abstract_eventt::Write?edge.first:edge.second);
   const unsigned second=
     (test_second.operation==abstract_eventt::Read?edge.second:edge.first);
-  
+
   /* TODO: AC + restricts to C_1 U ... U C_n */
   visited_nodes.clear();
 
@@ -522,4 +522,3 @@ void const_graph_visitort::CT_not_powr(const edget& edge,
       graph_explore_BC(egraph, next_it->first, new_path, edges, true);
     }
 }
-

@@ -26,11 +26,11 @@ Function: cbmc_dimacst::write_dimacs
 \*******************************************************************/
 
 bool cbmc_dimacst::write_dimacs(const std::string &filename)
-{ 
+{
   if(filename.empty() || filename=="-")
     return write_dimacs(std::cout);
 
-  std::ofstream out(filename.c_str());
+  std::ofstream out(filename);
 
   if(!out)
   {
@@ -95,6 +95,6 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
 
     out << "\n";
   }
-  
+
   return false;
 }

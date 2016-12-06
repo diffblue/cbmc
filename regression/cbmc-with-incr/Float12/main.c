@@ -5,7 +5,7 @@ int main()
   unsigned char x;
 
   d=f;
-  
+
   if(f==x)
     assert(d==x);
 }

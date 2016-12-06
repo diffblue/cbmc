@@ -636,7 +636,7 @@ float sqrtf(float f)
     float upperSquare = upper * upper;  // Might be +Inf
 
     // Restrict these to bound f and thus compute the possible
-    // values for the square root.  Note that the lower bound 
+    // values for the square root.  Note that the lower bound
     // can be equal, this is important to catch edge cases such as
     // 0x1.fffffep+127f and relies on the smallest normal number
     // being a perfect square (which it will be for any sensible

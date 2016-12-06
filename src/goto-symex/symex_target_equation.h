@@ -54,7 +54,7 @@ public:
     const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type);
-    
+
   // declare fresh variable - lhs must be symbol
   virtual void decl(
     const exprt &guard,
@@ -84,14 +84,14 @@ public:
   virtual void location(
     const exprt &guard,
     const sourcet &source);
-  
+
   // output
   virtual void output(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &fmt,
     const std::list<exprt> &args);
-  
+
   // output, formatted
   virtual void output_fmt(
     const exprt &guard,
@@ -99,14 +99,14 @@ public:
     const irep_idt &output_id,
     const irep_idt &fmt,
     const std::list<exprt> &args);
-  
+
   // input
   virtual void input(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
     const std::list<exprt> &args);
-  
+
   // record an assumption
   virtual void assumption(
     const exprt &guard,
@@ -169,7 +169,7 @@ public:
   public:
     sourcet source;
     goto_trace_stept::typet type;
-    
+
     bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
     bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
@@ -189,7 +189,7 @@ public:
 
     // we may choose to hide
     bool hidden;
-    
+
     exprt guard;
     literalt guard_literal;
 
@@ -198,27 +198,27 @@ public:
     exprt ssa_full_lhs, original_full_lhs;
     exprt ssa_rhs;
     assignment_typet assignment_type;
-    
+
     // for ASSUME/ASSERT/GOTO/CONSTRAINT
-    exprt cond_expr; 
+    exprt cond_expr;
     literalt cond_literal;
     std::string comment;
-    
+
     // for INPUT/OUTPUT
     irep_idt format_string, io_id;
     bool formatted;
     std::list<exprt> io_args;
     std::list<exprt> converted_io_args;
-    
+
     // for function call/return
     irep_idt identifier;
 
     // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
     unsigned atomic_section_id;
-    
+
     // for slicing
     bool ignore;
-    
+
     SSA_stept():
       type(goto_trace_stept::NONE),
       hidden(false),
@@ -235,12 +235,12 @@ public:
       ignore(false)
     {
     }
-    
+
     void output(
       const namespacet &ns,
       std::ostream &out) const;
   };
-  
+
   unsigned count_assertions() const
   {
     unsigned i=0;
@@ -250,7 +250,7 @@ public:
       if(it->is_assert()) i++;
     return i;
   }
-  
+
   unsigned count_ignored_SSA_steps() const
   {
     unsigned i=0;
@@ -263,7 +263,7 @@ public:
 
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
-  
+
   SSA_stepst::iterator get_SSA_step(unsigned s)
   {
     SSA_stepst::iterator it=SSA_steps.begin();
@@ -276,12 +276,12 @@ public:
   }
 
   void output(std::ostream &out) const;
-  
+
   void clear()
   {
     SSA_steps.clear();
   }
-  
+
   bool has_threads() const
   {
     for(SSA_stepst::const_iterator it=SSA_steps.begin();
@@ -292,7 +292,7 @@ public:
 
     return false;
   }
-  
+
 protected:
   const namespacet &ns;
 

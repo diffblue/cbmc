@@ -82,7 +82,7 @@ void goto_symext::parameter_assignments(
     const typet &parameter_type=parameter.type();
 
     const irep_idt &identifier=parameter.get_identifier();
-    
+
     if(identifier==irep_idt())
       throw "no identifier for function parameter";
 
@@ -115,7 +115,7 @@ void goto_symext::parameter_assignments(
       {
         const typet &f_parameter_type=ns.follow(parameter_type);
         const typet &f_rhs_type=ns.follow(rhs.type());
-      
+
         // But we are willing to do some limited conversion.
         // This is highly dubious, obviously.
         if((f_parameter_type.id()==ID_signedbv ||
@@ -148,7 +148,7 @@ void goto_symext::parameter_assignments(
           throw error.str();
         }
       }
-      
+
       symex_assign_rec(state, code_assignt(lhs, rhs));
     }
 
@@ -168,15 +168,15 @@ void goto_symext::parameter_assignments(
     for( ; it1!=arguments.end(); it1++, va_count++)
     {
       irep_idt id=id2string(function_identifier)+"::va_arg"+i2string(va_count);
-      
+
       // add to symbol table
       symbolt symbol;
       symbol.name=id;
       symbol.base_name="va_arg"+i2string(va_count);
       symbol.type=it1->type();
-      
+
       new_symbol_table.move(symbol);
-      
+
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 
       symex_assign_rec(state, code_assignt(lhs, *it1));
@@ -240,7 +240,7 @@ void goto_symext::symex_function_call_symbol(
 
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
-    
+
   if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);
@@ -276,9 +276,9 @@ void goto_symext::symex_function_call_code(
 {
   const irep_idt &identifier=
     to_symbol_expr(call.function()).get_identifier();
-  
+
   // find code in function map
-  
+
   goto_functionst::function_mapt::const_iterator it=
     goto_functions.function_map.find(identifier);
 
@@ -286,7 +286,7 @@ void goto_symext::symex_function_call_code(
     throw "failed to find `"+id2string(identifier)+"' in function_map";
 
   const goto_functionst::goto_functiont &goto_function=it->second;
-  
+
   const bool stop_recursing=get_unwind_recursion(
     identifier,
     state.source.thread_nr,
@@ -303,7 +303,7 @@ void goto_symext::symex_function_call_code(
     {
       if(options.get_bool_option("unwinding-assertions"))
         vcc(false_exprt(), "recursion unwinding assertion", state);
-      
+
       // add to state guard to prevent further assignments
       state.guard.add(false_exprt());
     }
@@ -311,17 +311,17 @@ void goto_symext::symex_function_call_code(
     state.source.pc++;
     return;
   }
-  
+
   // record the call
   target.function_call(state.guard.as_expr(), identifier, state.source);
 
   if(!goto_function.body_available())
   {
     no_body(identifier);
-    
+
     // record the return
     target.function_return(state.guard.as_expr(), identifier, state.source);
-  
+
     if(call.lhs().is_not_nil())
     {
       side_effect_expr_nondett rhs(call.lhs().type());
@@ -333,16 +333,16 @@ void goto_symext::symex_function_call_code(
     state.source.pc++;
     return;
   }
-  
+
   // read the arguments -- before the locality renaming
   exprt::operandst arguments=call.arguments();
   for(unsigned i=0; i<arguments.size(); i++)
     state.rename(arguments[i], ns);
-  
+
   // produce a new frame
   assert(!state.call_stack().empty());
   goto_symex_statet::framet &frame=state.new_frame();
-  
+
   // preserve locality of local variables
   locality(identifier, state, goto_function);
 
@@ -392,10 +392,10 @@ void goto_symext::pop_frame(statet &state)
 
     // restore program counter
     state.source.pc=frame.calling_location.pc;
-  
+
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);
-  
+
     // clear function-locals from L2 renaming
     for(goto_symex_statet::renaming_levelt::current_namest::iterator
         c_it=state.level2.current_names.begin();
@@ -415,7 +415,7 @@ void goto_symext::pop_frame(statet &state)
       state.level2.current_names.erase(cur);
     }
   }
-  
+
   state.pop_frame();
 }
 
@@ -465,7 +465,7 @@ void goto_symext::locality(
   frame_nr++;
 
   std::set<irep_idt> local_identifiers;
-  
+
   get_local_identifiers(goto_function, local_identifiers);
 
   statet::framet &frame=state.top();
@@ -486,18 +486,18 @@ void goto_symext::locality(
 
     if(c_it!=state.level1.current_names.end())
       frame.old_level1[l0_name]=c_it->second;
-    
+
     // do L1 renaming -- these need not be unique, as
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
-    
+
     state.level1.current_names[l0_name]=
       std::make_pair(ssa, frame_nr);
     state.rename(ssa, ns, goto_symex_statet::L1);
 
     irep_idt l1_name=ssa.get_identifier();
     unsigned offset=0;
-    
+
     while(state.l1_history.find(l1_name)!=state.l1_history.end())
     {
       state.level1.increase_counter(l0_name);
@@ -505,7 +505,7 @@ void goto_symext::locality(
       ssa.set_level_1(frame_nr+offset);
       l1_name=ssa.get_identifier();
     }
-    
+
     // now unique -- store
     frame.local_objects.insert(l1_name);
     state.l1_history.insert(l1_name);
@@ -537,7 +537,7 @@ void goto_symext::return_assignment(statet &state)
   if(code.operands().size()==1)
   {
     exprt value=code.op0();
-  
+
     if(frame.return_value.is_not_nil())
     {
       code_assignt assignment(frame.return_value, value);
@@ -558,4 +558,3 @@ void goto_symext::return_assignment(statet &state)
       throw "return with unexpected value";
   }
 }
-

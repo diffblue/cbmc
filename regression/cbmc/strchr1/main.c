@@ -4,7 +4,7 @@
 int main() {
 
   // "The terminating null character is considered to be part of the string."
-  
+
   char arr[] = { 'a', 'a', 'a', 0};
   assert(strchr(arr, 0) == arr + sizeof(arr) - 1);
   assert(strrchr(arr, 0) == arr + sizeof(arr) - 1);

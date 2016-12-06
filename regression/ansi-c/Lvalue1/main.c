@@ -14,4 +14,3 @@ int main()
   const char *f=&(__FUNCTION__[2]);
   char *p=&(char){':'};
 }
-

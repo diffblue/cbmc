@@ -23,13 +23,13 @@ void test1()
 void test2()
 {
   mgr mgr;
-  
+
   BDD a=mgr.Var("a");
   BDD b=mgr.Var("b");
   BDD c=mgr.Var("c");
   BDD d=mgr.Var("d");
-  
-  BDD final=(a == b) & (c == d);  
+
+  BDD final=(a == b) & (c == d);
 
   a.clear();
   b.clear();
@@ -42,7 +42,7 @@ void test2()
 void test3()
 {
   mgr mgr;
-  
+
   BDD final=mgr.Var("x") & mgr.Var("y");
 
   mgr.DumpDot(std::cout);

@@ -248,15 +248,15 @@ exprt good_pointer_def(
               good_dynamic_tmp1);
 
   exprt good_dynamic=
-    or_exprt(not_exprt(dynamic_object(pointer)), 
+    or_exprt(not_exprt(dynamic_object(pointer)),
              good_dynamic_tmp2);
 
   exprt not_null=
     not_exprt(null_pointer(pointer));
-  
+
   exprt not_invalid=
     not_exprt(invalid_pointer(pointer));
-    
+
   exprt bad_other=
     or_exprt(object_lower_bound(pointer),
              object_upper_bound(pointer, dereference_type, ns));
@@ -380,7 +380,7 @@ exprt dynamic_object_upper_bound(
 {
   // this is
   // POINTER_OFFSET(p)+size>__CPROVER_malloc_size
-  
+
   exprt malloc_size=dynamic_size(ns);
 
   exprt object_offset=pointer_offset(pointer);
@@ -416,7 +416,7 @@ exprt object_upper_bound(
 {
   // this is
   // POINTER_OFFSET(p)+size>OBJECT_SIZE(pointer)
-  
+
   exprt object_size_expr=object_size(pointer);
 
   exprt object_offset=pointer_offset(pointer);

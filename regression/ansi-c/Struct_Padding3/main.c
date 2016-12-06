@@ -19,7 +19,7 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct1a, ch2)==5);
 struct my_struct1b {
   char ch1;
   // this would normally be padded, but it won't!
-  int i __attribute__((packed)); 
+  int i __attribute__((packed));
   char ch2;
 };
 
@@ -31,7 +31,7 @@ struct my_struct1c {
   // this would normally be padded, but it won't!
   struct
   {
-    int i; 
+    int i;
   } sub __attribute__((packed));
   char ch2;
 };
@@ -115,4 +115,3 @@ STATIC_ASSERT(__builtin_offsetof(struct my_struct3, i3)==28);
 int main()
 {
 }
-

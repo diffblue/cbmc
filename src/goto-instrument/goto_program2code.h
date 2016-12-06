@@ -209,4 +209,3 @@ protected:
       goto_programt::const_targett upper_bound,
       codet &dest);
 };
-

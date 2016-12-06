@@ -5,7 +5,7 @@ struct S
   int i;
   char ch;
   int j; // this gets aligned
-  
+
   struct Ssub
   {
     int x, y;
@@ -42,10 +42,10 @@ int main(void)
   assert((long int)&((struct S *)0)->array==16+4);
   assert((long int)&((struct S *)0)->array[1]==16+12);
   assert((long int)&((struct S *)0)->array[1].y==16+12+4);
-  
+
   // these are _constants_!
 
-  #ifdef __GNUC__  
+  #ifdef __GNUC__
   enum { E1 = __builtin_offsetof(struct S, ch) };
   #endif
 

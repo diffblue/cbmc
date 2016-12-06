@@ -22,25 +22,25 @@ class cnf_clause_listt:public cnft
 public:
   cnf_clause_listt() { }
   virtual ~cnf_clause_listt() { }
- 
+
   virtual void lcnf(const bvt &bv);
 
   virtual const std::string solver_text()
   { return "CNF clause list"; }
-   
+
   virtual tvt l_get(literalt literal) const
   {
     return tvt::unknown();
   }
 
   virtual resultt prop_solve() { return P_ERROR; }
-  
+
   virtual size_t no_clauses() const { return clauses.size(); }
-  
+
   typedef std::list<bvt> clausest;
-  
+
   clausest &get_clauses() { return clauses; }
-  
+
   void copy_to(cnft &cnf) const
   {
     cnf.set_no_variables(_no_variables);
@@ -59,7 +59,7 @@ public:
 
     return result;
   }
-  
+
   size_t hash() const
   {
     size_t result=0;
@@ -68,7 +68,7 @@ public:
 
     return result;
   }
-  
+
 protected:
   clausest clauses;
 };
@@ -80,17 +80,17 @@ class cnf_clause_list_assignmentt:public cnf_clause_listt
 {
 public:
   typedef std::vector<tvt> assignmentt;
-  
+
   inline assignmentt &get_assignment()
   {
     return assignment;
   }
-  
+
   virtual tvt l_get(literalt literal) const
   {
     if(literal.is_true()) return tvt(true);
     if(literal.is_false()) return tvt(false);
-    
+
     unsigned v=literal.var_no();
 
     if(v==0 || v>=assignment.size())
@@ -99,7 +99,7 @@ public:
     tvt r=assignment[v];
     return literal.sign()?!r:r;
   }
-  
+
   virtual void copy_assignment_from(const propt &prop);
   void print_assignment(std::ostream &out) const;
 

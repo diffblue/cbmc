@@ -19,20 +19,20 @@ void goto_convert(
   symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler);
-  
+
 // convert it all!
 void goto_convert(
   symbol_tablet &symbol_table,
   goto_modelt &dest,
   message_handlert &message_handler);
-  
+
 // just convert a specific function
 void goto_convert(
   const irep_idt &identifier,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler);
-  
+
 class goto_convert_functionst:public goto_convertt
 {
 public:
@@ -43,16 +43,16 @@ public:
     symbol_tablet &_symbol_table,
     goto_functionst &_functions,
     message_handlert &_message_handler);
-  
+
   virtual ~goto_convert_functionst();
 
 protected:
   goto_functionst &functions;
-  
+
   static bool hide(const goto_programt &goto_program);
 
   //
-  // function calls  
+  // function calls
   //
   void add_return(
     goto_functionst::goto_functiont &,

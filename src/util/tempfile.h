@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening
 
@@ -28,7 +28,7 @@ public:
       name(get_temporary_file(prefix, suffix))
   {
   }
-  
+
   // get the name
   inline std::string operator()() const
   {

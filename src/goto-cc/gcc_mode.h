@@ -28,22 +28,22 @@ public:
   }
 
   bool produce_hybrid_binary;
-  
+
 protected:
   bool act_as_ld;
   std::string native_compiler_name;
-  
+
   int preprocess(
     const std::string &language,
     const std::string &src,
     const std::string &dest);
 
   int run_gcc(); // call gcc with original command line
-  
+
   int gcc_hybrid_binary();
-  
+
   static bool needs_preprocessing(const std::string &);
-  
+
   inline const char *compiler_name()
   {
     if(native_compiler_name.empty())

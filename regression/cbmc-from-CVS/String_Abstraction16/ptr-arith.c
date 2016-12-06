@@ -10,7 +10,6 @@ int main(int argc, char* argv[]) {
   name=strcpy(name, "abcdefghi");
   name=strcpy(name+5-1, "xxxxx");
   assert(__CPROVER_is_zero_string(name));
-  
+
   return 0;
 }
-

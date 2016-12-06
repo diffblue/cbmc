@@ -2,7 +2,7 @@ typedef struct
 {
  int a;
 } S;
- 
+
 int main(void)
 {
   S s;

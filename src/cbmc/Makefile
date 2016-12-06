@@ -77,4 +77,3 @@ cbmc$(EXEEXT): $(OBJ)
 
 cbmc-mac-signed: cbmc$(EXEEXT)
 	strip cbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
-

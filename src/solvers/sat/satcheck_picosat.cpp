@@ -86,7 +86,7 @@ Function: satcheck_picosatt::lcnf
 void satcheck_picosatt::lcnf(const bvt &bv)
 {
   bvt new_bv;
-  
+
   if(process_clause(bv, new_bv))
     return;
 
@@ -122,7 +122,7 @@ propt::resultt satcheck_picosatt::prop_solve()
       i2string(picosat_added_original_clauses(picosat))+" clauses";
     messaget::status() << msg << messaget::eom;
   }
-  
+
   std::string msg;
 
   forall_literals(it, assumptions)
@@ -236,4 +236,3 @@ void satcheck_picosatt::set_assumptions(const bvt &bv)
   forall_literals(it, assumptions)
     assert(!it->is_constant());
 }
-

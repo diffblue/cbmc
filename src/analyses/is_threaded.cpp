@@ -16,7 +16,7 @@ class is_threaded_domaint:public ai_domain_baset
   bool has_spawn;
 public:
   bool is_threaded;
-  
+
   inline is_threaded_domaint():has_spawn(false), is_threaded(false)
   {
   }
@@ -40,7 +40,7 @@ public:
 
     return old_i_t!=is_threaded || old_h_s!=has_spawn;
   }
-  
+
   void transform(
     locationt from,
     locationt to,
@@ -75,9 +75,9 @@ void is_threadedt::compute(const goto_functionst &goto_functions)
   const namespacet ns(symbol_table);
 
   ait<is_threaded_domaint> is_threaded_analysis;
-  
+
   is_threaded_analysis(goto_functions, ns);
-  
+
   for(goto_functionst::function_mapt::const_iterator
       f_it=goto_functions.function_map.begin();
       f_it!=goto_functions.function_map.end();
@@ -92,4 +92,3 @@ void is_threadedt::compute(const goto_functionst &goto_functions)
         is_threaded_set.insert(i_it);
   }
 }
-

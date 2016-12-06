@@ -26,12 +26,12 @@ Function: boolbvt::convert_extractbits
 bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
-  
+
   const irep_idt &type_id=expr.type().id();
-  
+
   if(type_id!=ID_signedbv &&
      type_id!=ID_unsignedbv &&
      type_id!=ID_c_enum &&
@@ -54,7 +54,7 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
   if(to_integer(expr.op1(), o1) ||
      to_integer(expr.op2(), o2))
     return conversion_failed(expr);
-    
+
   if(o1<0 || o1>=bv0.size())
   {
     error().source_location=expr.find_source_location();
@@ -89,6 +89,6 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 
   for(std::size_t i=0; i<width; i++)
     bv[i]=bv0[offset+i];
-    
+
   return bv;
 }

@@ -20,6 +20,6 @@ int main()
     }
 
   }
-  
+
   assert(g==2);
 }

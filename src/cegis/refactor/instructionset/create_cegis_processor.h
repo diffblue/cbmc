@@ -32,19 +32,51 @@ std::set<typet> collect_context_types(const goto_ranget &range);
  * @brief
  *
  * @details
+ * @code
+ * execute_next_instr:
+ * #define program[i].opcode opcode
+ * #define program[i].op0 op0
+ * #define program[i].op1 op1
+ * #define program[i].op2 op2
  *
- * @param st
- * @param state_vars
+ * if (instr_code < 2)
+ * {
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_int_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_int_size);
+ *   __CPROVER_assume(op2 < __CPROVER_cegis_variable_array_int_size);
+ * } else if (instr_code < 4)
+ * {
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_double_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_double_size);
+ *   __CPROVER_assume(op2 < __CPROVER_cegis_variable_array_double_size);
+ * } else if (instr_code < 5)
+ * {
+ *   __CPROVER_assume(op0 < __CPROVER_cegis_variable_array_iobject_size);
+ *   __CPROVER_assume(op1 < __CPROVER_cegis_variable_array_double_size);
+ * }
  *
- * @return
- */
-std::map<typet, size_t> slots_per_type(const symbol_tablet &st,
-    const std::set<irep_idt> &state_vars);
-
-/**
- * @brief
- *
- * @details
+ * switch(instr_code)
+ * {
+ *   case 0:
+ *     *__CPROVER_cegis_variable_array_int[op0]=*__CPROVER_cegis_variable_array_int[op1] + *__CPROVER_cegis_variable_array_int[op2];
+ *     break;
+ *   case 1:
+ *     *__CPROVER_cegis_variable_array_int[op0]=*__CPROVER_cegis_variable_array_int[op1] - *__CPROVER_cegis_variable_array_int[op2];
+ *     break;
+ *   case 2:
+ *     *__CPROVER_cegis_variable_array_double[op0]=*__CPROVER_cegis_variable_array_double[op1] + *__CPROVER_cegis_variable_array_double[op2];
+ *     break;
+ *   case 3:
+ *     *__CPROVER_cegis_variable_array_double[op0]=*__CPROVER_cegis_variable_array_double[op1] - *__CPROVER_cegis_variable_array_double[op2];
+ *     break;
+ *   case 4:
+ *     *__CPROVER_cegis_variable_array_double[op0]=(*__CPROVER_cegis_variable_array_iobject[op1]).someMethod(*__CPROVER_cegis_variable_array_int[op2]);
+ *     break;
+ *   case 5:
+ *     (*__CPROVER_cegis_variable_array_iobject[op0]).someOtherMethod(*__CPROVER_cegis_variable_array_double[op1]);
+ *     break;
+ * }
+ * @endcode
  *
  * @param st
  * @param gf

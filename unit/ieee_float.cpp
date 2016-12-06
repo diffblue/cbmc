@@ -27,7 +27,7 @@
 
 std::string float2binary(float f)
 {
-  union 
+  union
   {
     float f;
     int i;
@@ -65,7 +65,7 @@ float random_float()
     case 4:
       return NZERO;
       break;
-    default: 
+    default:
       u.i=random();
       u.i=(u.i<<16)^random();
       return u.f;
@@ -156,8 +156,8 @@ void check_comparison(int i)
   i2.from_float(f2);
 
   int op=(binrel)i%6;
- 
-  switch(op) 
+
+  switch(op)
   {
     case EQ:
       ires = ieee_equal(i1,i2);
@@ -203,8 +203,8 @@ void check_comparison(int i)
 
 void check_conversion(int i)
 {
-  union 
-  { 
+  union
+  {
     float f;
     unsigned i;
   } a, b;
@@ -219,7 +219,7 @@ void check_conversion(int i)
 
   if(a.i != b.i && !((a.f != a.f) && (b.f != b.f)))
   {
-    std::cout << "conversion failure: " << a.f << " -> " << t << " -> " 
+    std::cout << "conversion failure: " << a.f << " -> " << t << " -> "
               << b.f << std::endl;
   }
 }
@@ -229,9 +229,9 @@ void check_nextafter(int i)
   float f1 = random_float();
   float f2 = nextafterf(f1, PINF);
   float f3 = nextafterf(f1, NINF);
-  
+
   ieee_floatt i1, i2, i3;
-  
+
   i1.from_float(f1);
   i2 = i1;
   i2.increment(false);
@@ -242,17 +242,17 @@ void check_nextafter(int i)
      (f2 != i2.to_float() && !(f2 != f2 && i2.is_NaN())) ||
      (f3 != i3.to_float() && !(f3 != f3 && i3.is_NaN())))
   {
-    std::cout << "Incorrect nextafter: " << std::endl 
+    std::cout << "Incorrect nextafter: " << std::endl
               << "mach float: " << f1 << " " << f2 << " " << f3 << std::endl
-              << "ieee_float: " << i1.to_float() << " " 
+              << "ieee_float: " << i1.to_float() << " "
                   << i2.to_float() << " " << i3.to_float() << std::endl;
-    std::cout << "Binary representation: " << std::endl 
-              << "mach float: " << float2binary(f1) << " " 
+    std::cout << "Binary representation: " << std::endl
+              << "mach float: " << float2binary(f1) << " "
               << float2binary(f2) << " " << float2binary(f3) << std::endl
-              << "ieee_float: " << float2binary(i1.to_float()) << " " 
-                  << float2binary(i2.to_float()) 
+              << "ieee_float: " << float2binary(i1.to_float()) << " "
+                  << float2binary(i2.to_float())
                   << " " << float2binary(i3.to_float()) << std::endl;
- 
+
   }
 }
 
@@ -269,8 +269,8 @@ void check_minmax()
   t.make_fltmin();
   if(t.to_float() != FLT_MIN)
     std::cout << "make_fltmin is broken:"
-             << std::endl << " machine float: " << FLT_MIN 
-            << ", ieee_floatt: " << t.to_float() << "(" 
+             << std::endl << " machine float: " << FLT_MIN
+            << ", ieee_floatt: " << t.to_float() << "("
             << (t.to_float() == FLT_MIN) <<  ")" << std::endl;
 }
 

@@ -64,14 +64,14 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
   std::pair<cachet::iterator, bool> cache_result=
     cache.insert(std::pair<typet, entryt>(type, entryt()));
-    
+
   entryt &entry=cache_result.first->second;
 
   if(!cache_result.second) // found!
     return entry;
-    
+
   entry.total_width=0;
-  
+
   const irep_idt type_id=type.id();
 
   if(type_id==ID_struct)
@@ -81,7 +81,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
     std::size_t offset=0;
     entry.members.resize(components.size());
-  
+
     for(std::size_t i=0; i<entry.members.size(); i++)
     {
       std::size_t sub_width=operator()(components[i].type());
@@ -89,7 +89,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       entry.members[i].width=sub_width;
       offset+=sub_width;
     }
-    
+
     entry.total_width=offset;
   }
   else if(type_id==ID_union)
@@ -98,9 +98,9 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
       to_union_type(type).components();
 
     entry.members.resize(components.size());
-    
+
     std::size_t max_width=0;
-  
+
     for(std::size_t i=0; i<entry.members.size(); i++)
     {
       std::size_t sub_width=operator()(components[i].type());
@@ -248,7 +248,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   }
   else if(type_id==ID_string)
     entry.total_width=32;
-  
+
   return entry;
 }
 

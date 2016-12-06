@@ -50,7 +50,7 @@ bvt boolbvt::convert_update(const exprt &expr)
   // start the recursion
   convert_update_rec(
     expr.op1().operands(), 0, expr.type(), 0, expr.op2(), bv);
-    
+
   return bv;
 }
 
@@ -83,7 +83,7 @@ void boolbvt::convert_update_rec(
     // done
     bvt new_value_bv=convert_bv(new_value);
     std::size_t new_value_width=boolbv_width(type);
-    
+
     if(new_value_width!=new_value_bv.size())
       throw "convert_update_rec: unexpected new_value size";
 
@@ -93,7 +93,7 @@ void boolbvt::convert_update_rec(
       assert(offset+i<bv.size());
       bv[offset+i]=new_value_bv[i];
     }
-    
+
     return;
   }
 
@@ -103,14 +103,14 @@ void boolbvt::convert_update_rec(
   {
     if(type.id()!=ID_array)
       throw "update: index designator needs array";
-      
+
     if(designator.operands().size()!=1)
       throw "update: index designator takes one operand";
-      
+
     bvt index_bv=convert_bv(designator.op0());
 
     const array_typet &array_type=to_array_type(type);
-    
+
     const typet &subtype=ns.follow(array_type.subtype());
 
     std::size_t element_size=boolbv_width(subtype);
@@ -119,13 +119,13 @@ void boolbvt::convert_update_rec(
     mp_integer size;
     if(to_integer(array_type.size(), size))
       throw "update: failed to get array size";
-      
+
     bvt tmp_bv=bv;
-    
+
     for(std::size_t i=0; i!=integer2size_t(size); ++i)
     {
       std::size_t new_offset=offset+i*element_size;
-      
+
       convert_update_rec(
         designators, d+1, subtype, new_offset, new_value, tmp_bv);
 
@@ -143,14 +143,14 @@ void boolbvt::convert_update_rec(
   else if(designator.id()==ID_member_designator)
   {
     const irep_idt &component_name=designator.get(ID_component_name);
-  
+
     if(type.id()==ID_struct)
     {
       const struct_typet &struct_type=
         to_struct_type(type);
 
       std::size_t struct_offset=0;
-      
+
       struct_typet::componentt component;
       component.make_nil();
 
@@ -173,7 +173,7 @@ void boolbvt::convert_update_rec(
 
         struct_offset+=sub_width;
       }
-        
+
       if(component.is_nil())
         throw "update: failed to find struct component";
 
@@ -192,7 +192,7 @@ void boolbvt::convert_update_rec(
 
       const union_typet::componentt &component=
         union_type.get_component(component_name);
-        
+
       if(component.is_nil())
         throw "update: failed to find union component";
 
@@ -210,4 +210,3 @@ void boolbvt::convert_update_rec(
   else
     throw "update: unexpected designator";
 }
-

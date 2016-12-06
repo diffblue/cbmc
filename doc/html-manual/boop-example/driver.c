@@ -18,7 +18,7 @@ int dummy_open (struct inode *inode, struct file *filp)
   if (locked)
     return -1;
   locked = TRUE;
- 
+
   return 0; /* success */
 }
 
@@ -30,7 +30,7 @@ unsigned int dummy_read (struct file *filp, char *buf, int max)
       n = nondet_int ();
       __CPROVER_assume ((n >= 0) && (n <= max));
       /* writing to the buffer is not modeled here */
-      
+
       return n;
     }
   return -1;
@@ -46,4 +46,3 @@ int dummy_release (struct inode *inode, struct file *filp)
     }
   return -1;
 }
-

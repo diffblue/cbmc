@@ -13,4 +13,3 @@ all: langapi$(LIBEXT)
 
 langapi$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-	

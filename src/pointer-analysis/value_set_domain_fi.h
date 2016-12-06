@@ -19,7 +19,7 @@ class value_set_domain_fit:public flow_insensitive_abstract_domain_baset
 public:
   value_set_fit value_set;
 
-  // overloading  
+  // overloading
 
 //  virtual bool merge(const value_set_domain_fit &other)
 //  {
@@ -32,11 +32,11 @@ public:
   {
     value_set.output(ns, out);
   }
-    
+
   virtual void initialize(
     const namespacet &ns)
   {
-    value_set.clear();    
+    value_set.clear();
   }
 
   virtual bool transform(
@@ -51,12 +51,12 @@ public:
   {
     value_set.get_reference_set(expr, expr_set, ns);
   }
-  
+
   virtual void clear( void )
   {
     value_set.clear();
   }
-  
+
 };
 
 #endif /*VALUE_SET_DOMAIN_FI_H_*/

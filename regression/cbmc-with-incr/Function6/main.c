@@ -3,7 +3,7 @@ int global;
 void f()
 {
   void g();
-  
+
   g();
 }
 

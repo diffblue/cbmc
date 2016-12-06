@@ -15,7 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 Function: memory_model_sct::operator()
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -29,7 +29,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
 
   build_event_lists(equation);
   build_clock_type(equation);
-  
+
   read_from(equation);
   write_serialization_external(equation);
   program_order(equation);
@@ -40,7 +40,7 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
 
 Function: memory_model_sct::before
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -93,7 +93,7 @@ void memory_model_sct::build_per_thread_map(
   per_thread_mapt &dest) const
 {
   // this orders the events within a thread
-  
+
   for(eventst::const_iterator
       e_it=equation.SSA_steps.begin();
       e_it!=equation.SSA_steps.end();
@@ -139,8 +139,8 @@ void memory_model_sct::thread_spawn(
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
       if(next_thread==per_thread_map.end()) continue;
-      
-      // add a constraint for all events, 
+
+      // add a constraint for all events,
       // considering regression/cbmc-concurrency/pthread_create_tso1
       for(event_listt::const_iterator
           n_it=next_thread->second.begin();
@@ -156,7 +156,7 @@ void memory_model_sct::thread_spawn(
       }
     }
   }
-} 
+}
 
 #if 0
 void memory_model_sct::thread_spawn(
@@ -165,7 +165,7 @@ void memory_model_sct::thread_spawn(
 {
   // thread spawn: the spawn precedes the first
   // instruction of the new thread in program order
-  
+
   unsigned next_thread_id=0;
   for(eventst::const_iterator
       e_it=equation.SSA_steps.begin();
@@ -220,7 +220,7 @@ void memory_model_sct::program_order(
   build_per_thread_map(equation, per_thread_map);
 
   thread_spawn(equation, per_thread_map);
-  
+
   // iterate over threads
 
   for(per_thread_mapt::const_iterator
@@ -229,11 +229,11 @@ void memory_model_sct::program_order(
       t_it++)
   {
     const event_listt &events=t_it->second;
-    
+
     // iterate over relevant events in the thread
-    
+
     event_it previous=equation.SSA_steps.end();
-    
+
     for(event_listt::const_iterator
         e_it=events.begin();
         e_it!=events.end();
@@ -284,7 +284,7 @@ void memory_model_sct::write_serialization_external(
 
     // This is quadratic in the number of writes
     // per address. Perhaps some better encoding
-    // based on 'places'?    
+    // based on 'places'?
     for(event_listt::const_iterator
         w_it1=a_rec.writes.begin();
         w_it1!=a_rec.writes.end();
@@ -339,7 +339,7 @@ Function: memory_model_sct::from_read
 void memory_model_sct::from_read(symex_target_equationt &equation)
 {
   // from-read: (w', w) in ws and (w', r) in rf -> (r, w) in fr
-  
+
   for(address_mapt::const_iterator
       a_it=address_map.begin();
       a_it!=address_map.end();
@@ -361,7 +361,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           ++w)
       {
         exprt ws1, ws2;
-        
+
         if(po(*w_prime, *w) &&
            !program_order_is_relaxed(*w_prime, *w))
         {
@@ -390,7 +390,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           exprt rf=c_it->second;
           exprt cond;
           cond.make_nil();
-        
+
           if(c_it->first.second==*w_prime && !ws1.is_false())
           {
             exprt fr=before(r, *w);
@@ -420,9 +420,8 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             add_constraint(equation,
               cond, "fr", r->source);
         }
-        
+
       }
     }
   }
 }
-

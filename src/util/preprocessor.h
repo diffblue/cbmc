@@ -27,7 +27,7 @@ public:
     filename(_filename)
   {
   }
-    
+
   virtual ~preprocessort() { }
 
   std::istream &in;

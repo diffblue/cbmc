@@ -17,17 +17,17 @@ public:
   cpp_usingt():irept(ID_cpp_using)
   {
   }
-  
+
   cpp_namet &name()
   {
     return (cpp_namet &)add(ID_name);
   }
 
-  const cpp_namet &name() const 
+  const cpp_namet &name() const
   {
     return (cpp_namet &)find(ID_name);
   }
-  
+
   bool get_namespace() const
   {
     return get_bool(ID_namespace);

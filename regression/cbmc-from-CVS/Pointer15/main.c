@@ -5,6 +5,6 @@ int main()
   int c;
 
   p=(c?p:0);
-  
+
   p=(int * const)0;
 }

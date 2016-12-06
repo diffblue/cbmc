@@ -309,4 +309,3 @@ signed int main(void)
   ethoc_open(&netdev);
   return 0;
 }
-

@@ -15,7 +15,7 @@ public:
   c_sizeoft(const namespacet &_ns):ns(_ns)
   {
   }
-  
+
   virtual ~c_sizeoft()
   {
   }

@@ -33,4 +33,3 @@ value=fptr(value);    //value should be 16 after this
 assert(value == 16);
 
 }
-

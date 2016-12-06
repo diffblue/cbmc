@@ -78,7 +78,7 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
     result=tvt(false);
   else
     return tvt::unknown();
-  
+
   if(a.sign()) result=!result;
 
   return result;
@@ -181,7 +181,7 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
     else if(!it->is_false())
       assert(it->var_no()<(unsigned)solver->nVars());
   }
-    
+
   Minisat::vec<Minisat::Lit> c;
 
   convert(bv, c);
@@ -210,17 +210,17 @@ template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
   assert(status!=ERROR);
-  
+
   {
     messaget::status() <<
       (no_variables()-1) << " variables, " <<
       solver->nClauses() << " clauses" << eom;
   }
-  
+
   try
   {
     add_variables();
-    
+
     if(!solver->okay())
     {
       messaget::status() <<
@@ -230,7 +230,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
     {
       // if assumptions contains false, we need this to be UNSAT
       bool has_false=false;
-      
+
       forall_literals(it, assumptions)
         if(it->is_false())
           has_false=true;
@@ -244,10 +244,10 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
       {
         Minisat::vec<Minisat::Lit> solver_assumptions;
         convert(assumptions, solver_assumptions);
-        
+
         if(solver->solve(solver_assumptions))
         {
-          messaget::status() << 
+          messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
           assert(solver->model.size()!=0);
           status=SAT;
@@ -381,7 +381,7 @@ template<typename T>
 void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
-  
+
   forall_literals(it, assumptions)
     if(it->is_true())
     {
@@ -463,4 +463,3 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 
   return solver->isEliminated(a.var_no());
 }
-

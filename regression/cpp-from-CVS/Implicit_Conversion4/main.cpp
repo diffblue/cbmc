@@ -78,5 +78,5 @@ int main()
 	const C&  r6 = c2;
 	assert(func1(r6)==50);
 	assert(func3(r6)==50);
-	
+
 }

@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
-#include <goto-programs/graphml_goto_trace.h>
+#include <goto-programs/graphml_witness.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/slice.h>
@@ -73,14 +73,14 @@ void bmct::error_trace()
 
   goto_tracet &goto_trace=safety_checkert::error_trace;
   build_goto_trace(equation, prop_conv, ns, goto_trace);
-  
+
   switch(ui)
   {
   case ui_message_handlert::PLAIN:
     std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
-  
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml;
@@ -88,7 +88,7 @@ void bmct::error_trace()
       std::cout << xml << "\n";
     }
     break;
-  
+
   case ui_message_handlert::JSON_UI:
     {
       json_objectt json_result;
@@ -106,20 +106,40 @@ void bmct::error_trace()
     }
     break;
   }
+}
 
-  const std::string graphml=options.get_option("graphml-cex");
-  if(!graphml.empty())
+/*******************************************************************\
+
+Function: bmct::output_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: outputs witnesses in graphml format
+
+\*******************************************************************/
+
+void bmct::output_graphml(
+  resultt result,
+  const goto_functionst &goto_functions)
+{
+  const std::string graphml=options.get_option("graphml-witness");
+  if(graphml.empty())
+    return;
+
+  graphml_witnesst graphml_witness(ns);
+  if(result==UNSAFE)
+    graphml_witness(safety_checkert::error_trace);
+  else
+    return;
+
+  if(graphml=="-")
+    write_graphml(graphml_witness.graph(), std::cout);
+  else
   {
-    graphmlt cex_graph;
-    convert(ns, goto_trace, cex_graph);
-
-    if(graphml=="-")
-      write_graphml(cex_graph, std::cout);
-    else
-    {
-      std::ofstream out(graphml.c_str());
-      write_graphml(cex_graph, out);
-    }
+    std::ofstream out(graphml);
+    write_graphml(graphml_witness.graph(), out);
   }
 }
 
@@ -139,7 +159,7 @@ void bmct::do_conversion()
 {
   // convert HDL (hook for hw-cbmc)
   do_unwind_module();
-  
+
   status() << "converting SSA" << eom;
 
   // convert SSA
@@ -149,7 +169,7 @@ void bmct::do_conversion()
   if(!bmc_constraints.empty())
   {
     status() << "converting constraints" << eom;
-    
+
     forall_expr_list(it, bmc_constraints)
       prop_conv.set_to_true(*it);
   }
@@ -170,14 +190,14 @@ Function: bmct::run_decision_procedure
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
 {
-  status() << "Passing problem to " 
+  status() << "Passing problem to "
            << prop_conv.decision_procedure_text() << eom;
 
   prop_conv.set_message_handler(get_message_handler());
 
   // stop the time
   absolute_timet sat_start=current_time();
-  
+
   do_conversion();
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
@@ -214,7 +234,7 @@ void bmct::report_success()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -254,7 +274,7 @@ void bmct::report_failure()
   {
   case ui_message_handlert::PLAIN:
     break;
-    
+
   case ui_message_handlert::XML_UI:
     {
       xmlt xml("cprover-status");
@@ -291,88 +311,86 @@ void bmct::show_program()
   unsigned count=1;
 
   languagest languages(ns, new_ansi_c_language());
-  
+
   std::cout << "\n" << "Program constraints:" << "\n";
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+  for(const auto &step : equation.SSA_steps)
   {
-    std::cout << "// " << it->source.pc->location_number << " ";
-    std::cout << it->source.pc->source_location.as_string() << "\n";
+    std::cout << "// " << step.source.pc->location_number << " ";
+    std::cout << step.source.pc->source_location.as_string() << "\n";
 
-    if(it->is_assignment())
+    if(step.is_assignment())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") " << string_value << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
-      
+
       count++;
     }
-    else if(it->is_assert())
+    else if(step.is_assert())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
-    }  
-    else if(it->is_assume())
+    }
+    else if(step.is_assume())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
-    }  
-    else if(it->is_constraint())
+    }
+    else if(step.is_constraint())
     {
       std::string string_value;
-      languages.from_expr(it->cond_expr, string_value);
+      languages.from_expr(step.cond_expr, string_value);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
       count++;
-    }  
-    else if(it->is_shared_read() || it->is_shared_write())
+    }
+    else if(step.is_shared_read() || step.is_shared_write())
     {
       std::string string_value;
-      languages.from_expr(it->ssa_lhs, string_value);
-      std::cout << "(" << count << ") SHARED_" << (it->is_shared_write()?"WRITE":"READ") << "("
+      languages.from_expr(step.ssa_lhs, string_value);
+      std::cout << "(" << count << ") SHARED_" << (step.is_shared_write()?"WRITE":"READ") << "("
                 << string_value <<") " << "\n";
 
-      if(!it->guard.is_true())
+      if(!step.guard.is_true())
       {
-        languages.from_expr(it->guard, string_value);
+        languages.from_expr(step.guard, string_value);
         std::cout << std::string(i2string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
       count++;
-    }  
+    }
   }
 }
 
@@ -393,7 +411,7 @@ safety_checkert::resultt bmct::run(
 {
   const std::string mm=options.get_option("mm");
   std::unique_ptr<memory_model_baset> memory_model;
-  
+
   if(mm.empty() || mm=="sc")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
   else if(mm=="tso")
@@ -422,7 +440,7 @@ safety_checkert::resultt bmct::run(
     // perform symbolic execution
     symex(goto_functions);
 
-    // add a partial ordering, if required    
+    // add a partial ordering, if required
     if(equation.has_threads())
     {
       memory_model->set_message_handler(get_message_handler());
@@ -484,7 +502,7 @@ safety_checkert::resultt bmct::run(
       }
       else
       {
-        if(options.get_option("cover")=="")
+        if(options.get_list_option("cover").empty())
         {
           simple_slice(equation);
           statistics() << "simple slicing removed "
@@ -505,11 +523,12 @@ safety_checkert::resultt bmct::run(
       show_vcc();
       return safety_checkert::SAFE; // to indicate non-error
     }
-    
-    if(options.get_option("cover")!="")
+
+    if(!options.get_list_option("cover").empty())
     {
-      std::string criterion=options.get_option("cover");
-      return cover(goto_functions, criterion)?
+      const optionst::value_listt criteria=
+        options.get_list_option("cover");
+      return cover(goto_functions, criteria)?
         safety_checkert::ERROR:safety_checkert::SAFE;
     }
 
@@ -610,8 +629,9 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
+      output_graphml(UNSAFE, goto_functions);
     }
-    
+
     report_failure();
     return UNSAFE;
 
@@ -619,7 +639,7 @@ safety_checkert::resultt bmct::stop_on_fail(
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
       return SAFE;
-      
+
     error() << "decision procedure failed" << eom;
 
     return ERROR;
@@ -671,7 +691,7 @@ void bmct::setup_unwind()
       else
         symex.set_unwind_loop_limit(id, uw);
     }
-    
+
     if(next==std::string::npos) break;
     idx=next;
   }

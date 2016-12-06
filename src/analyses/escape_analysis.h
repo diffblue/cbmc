@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*******************************************************************\
 
    Class: escape_domaint
-   
+
  Purpose:
 
 \*******************************************************************/
@@ -31,7 +31,7 @@ public:
   escape_domaint():is_bottom(true)
   {
   }
-  
+
   virtual void transform(
     locationt from,
     locationt to,
@@ -47,33 +47,33 @@ public:
     const escape_domaint &b,
     locationt from,
     locationt to);
-    
+
   void make_bottom()
   {
     cleanup_map.clear();
     is_bottom=true;
   }
-  
+
   void make_top()
   {
     cleanup_map.clear();
     is_bottom=false;
   }
-  
+
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
-  
+
   struct cleanupt
   {
     std::set<irep_idt> cleanup_functions;
   };
-  
+
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
-  
+
   bool is_bottom;
 
-protected:  
+protected:
   void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);
   void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
@@ -81,13 +81,13 @@ protected:
   void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
   irep_idt get_function(const exprt &);
   void check_lhs(const exprt &, std::set<irep_idt> &);
-  
+
   friend class escape_analysist;
-  
+
   bool is_tracked(const symbol_exprt &);
 };
 
-class escape_analysist:public ait<escape_domaint> 
+class escape_analysist:public ait<escape_domaint>
 {
 public:
   void instrument(
@@ -102,7 +102,7 @@ protected:
   friend class escape_domaint;
 
   numbering<irep_idt> bits;
-  
+
   void insert_cleanup(
     goto_functionst::goto_functiont &,
     goto_programt::targett,

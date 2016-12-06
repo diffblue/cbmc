@@ -9,5 +9,5 @@ struct A
 int main()
 {
   int v = A<int>::some_function(10);
-  assert(v==10);  
+  assert(v==10);
 }

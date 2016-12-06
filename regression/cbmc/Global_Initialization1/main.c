@@ -22,6 +22,6 @@ int main()
   assert(x == 123);
   assert(y == 0);
   assert(b[0]=='a');
-  assert(some_func()==0);  
+  assert(some_func()==0);
   assert(p==&y);
 }

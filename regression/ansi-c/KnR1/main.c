@@ -37,4 +37,3 @@ int main()
 {
   return d(-1)!=0;
 }
-

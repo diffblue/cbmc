@@ -21,30 +21,30 @@ class cpp_itemt:public irept
 {
 public:
   // declaration
-  
+
   cpp_declarationt &make_declaration()
   {
     id(ID_cpp_declaration);
     return (cpp_declarationt &)*this;
   }
-  
+
   cpp_declarationt &get_declaration()
   {
     assert(is_declaration());
     return (cpp_declarationt &)*this;
   }
-  
+
   const cpp_declarationt &get_declaration() const
   {
     assert(is_declaration());
     return (const cpp_declarationt &)*this;
   }
-  
+
   bool is_declaration() const
   {
     return id()==ID_cpp_declaration;
   }
-  
+
   // linkage spec
 
   cpp_linkage_spect &make_linkage_spec()
@@ -69,9 +69,9 @@ public:
   {
     return id()==ID_cpp_linkage_spec;
   }
-  
+
   // namespace
-  
+
   cpp_namespace_spect &make_namespace_spec()
   {
     id(ID_cpp_namespace_spec);
@@ -96,7 +96,7 @@ public:
   }
 
   // using
-  
+
   cpp_usingt &make_using()
   {
     id(ID_cpp_using);
@@ -119,7 +119,7 @@ public:
   {
     return id()==ID_cpp_using;
   }
-  
+
   // static assertion
 
   cpp_static_assertt &make_static_assert()
@@ -138,7 +138,13 @@ public:
   {
     return id()==ID_cpp_static_assert;
   }
-  
+
+  const source_locationt &source_location() const
+  {
+    return static_cast<const source_locationt &>(
+      find(ID_C_source_location));
+  }
+
 };
 
 #endif

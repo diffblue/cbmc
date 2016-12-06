@@ -40,16 +40,16 @@ ui_message_handlert::ui_message_handlert(
   case XML_UI:
     std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
     std::cout << "<cprover>" << "\n";
-    
+
     {
       xmlt program_xml;
       program_xml.name="program";
       program_xml.data=program;
-      
+
       std::cout << program_xml;
     }
     break;
-    
+
   case JSON_UI:
     {
       std::cout << "[\n";
@@ -103,7 +103,7 @@ ui_message_handlert::~ui_message_handlert()
   case XML_UI:
     std::cout << "</cprover>" << "\n";
     break;
-  
+
   case JSON_UI:
     std::cout << "\n]\n";
     break;
@@ -208,9 +208,9 @@ void ui_message_handlert::print(
 
       if(!tmp_message.empty() && *tmp_message.rbegin()=='\n')
         tmp_message.resize(tmp_message.size()-1);
-      
+
       const char *type=level_string(level);
-        
+
       std::string sequence_number_str=
         sequence_number>=0?i2string(sequence_number):"";
 
@@ -247,7 +247,7 @@ void ui_message_handlert::ui_msg(
   case XML_UI:
     xml_ui_msg(type, msg1, msg2, location);
     break;
-    
+
   case JSON_UI:
     json_ui_msg(type, msg1, msg2, location);
     break;
@@ -281,7 +281,7 @@ void ui_message_handlert::xml_ui_msg(
 
   result.new_element("text").data=msg1;
   result.set_attribute("type", type);
-  
+
   std::cout << result;
   std::cout << std::endl;
 }
@@ -320,4 +320,3 @@ void ui_message_handlert::json_ui_msg(
   //  a trailing comma.
   std::cout << ",\n" << result;
 }
-

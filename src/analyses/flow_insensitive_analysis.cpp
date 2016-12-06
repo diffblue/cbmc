@@ -43,7 +43,7 @@ exprt flow_insensitive_abstract_domain_baset::get_guard(
     tmp.make_not();
     return tmp;
   }
-  
+
   return from->guard;
 }
 
@@ -67,13 +67,13 @@ exprt flow_insensitive_abstract_domain_baset::get_return_lhs(locationt to) const
 
   if(to->is_end_function())
     return static_cast<const exprt &>(get_nil_irep());
-  
+
   // must be the function call
   assert(to->is_function_call());
 
   const code_function_callt &code=
     to_code_function_call(to_code(to->code));
-  
+
   return code.lhs();
 }
 
@@ -163,7 +163,7 @@ void flow_insensitive_analysis_baset::output(
   const irep_idt &identifier,
   std::ostream &out) const
 {
-  get_state().output(ns, out);  
+  get_state().output(ns, out);
 }
 
 /*******************************************************************\
@@ -182,15 +182,15 @@ flow_insensitive_analysis_baset::locationt flow_insensitive_analysis_baset::get_
   working_sett &working_set)
 {
   assert(!working_set.empty());
-  
+
 //  working_sett::iterator i=working_set.begin();
 //  locationt l=i->second;
 //  working_set.erase(i);
-    
+
 //  pop_heap(working_set.begin(), working_set.end());
   locationt l=working_set.top();
   working_set.pop();
-    
+
   return l;
 }
 
@@ -212,21 +212,21 @@ bool flow_insensitive_analysis_baset::fixedpoint(
 {
   if(goto_program.instructions.empty())
     return false;
-  
+
   working_sett working_set;
-  
+
 //  make_heap(working_set.begin(), working_set.end());
 
   put_in_working_set(
     working_set,
     goto_program.instructions.begin());
-    
+
   bool new_data=false;
 
   while(!working_set.empty())
   {
     locationt l=get_next(working_set);
-    
+
     if(visit(l, working_set, goto_program, goto_functions))
       new_data=true;
   }
@@ -253,15 +253,15 @@ bool flow_insensitive_analysis_baset::visit(
   const goto_functionst &goto_functions)
 {
   bool new_data=false;
-  
+
   #if 0
-  std::cout << "Visiting: " << l->function << " " << 
+  std::cout << "Visiting: " << l->function << " " <<
     l->location_number << std::endl;
   #endif
 
   goto_programt::const_targetst successors;
   goto_program.get_successors(l, successors);
-  
+
   seen_locations.insert(l);
   if (statistics.find(l)==statistics.end())
     statistics[l]=1;
@@ -277,15 +277,15 @@ bool flow_insensitive_analysis_baset::visit(
 
     if(to_l==goto_program.instructions.end())
       continue;
-      
+
     bool changed=false;
-    
+
     if(l->is_function_call())
     {
       // this is a big special case
       const code_function_callt &code=
         to_code_function_call(to_code(l->code));
-      
+
       changed=
         do_function_call_rec(
           l,
@@ -296,17 +296,17 @@ bool flow_insensitive_analysis_baset::visit(
     }
     else
       changed = get_state().transform(ns, l, to_l);
-    
+
     if(changed || !seen(to_l))
     {
-      new_data=true;      
-      put_in_working_set(working_set, to_l);            
+      new_data=true;
+      put_in_working_set(working_set, to_l);
     }
   }
-  
+
 //  if (id2string(l->function).find("debug")!=std::string::npos)
 //    std::cout << l->function << std::endl; //=="messages::debug")
-  
+
 //  {
 //    static unsigned state_cntr=0;
 //    std::string s("pastate"); s += i2string(state_cntr);
@@ -344,33 +344,33 @@ bool flow_insensitive_analysis_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
-    const code_function_callt &code = 
+    const code_function_callt &code =
       to_code_function_call(to_code(l_call->code));
-    
+
     goto_programt temp;
-    
+
     goto_programt::targett r=temp.add_instruction();
     r->make_return();
     r->code=code_returnt();
     r->function=f_it->first;
     r->location_number=0;
-    
+
     exprt rhs=side_effect_expr_nondett(code.lhs().type());
-    r->code.move_to_operands(rhs);    
-    
-    goto_programt::targett t=temp.add_instruction(END_FUNCTION);    
+    r->code.move_to_operands(rhs);
+
+    goto_programt::targett t=temp.add_instruction(END_FUNCTION);
     t->code.set(ID_identifier, code.function());
     t->function=f_it->first;
     t->location_number=1;
-    
+
     locationt l_next=l_call; l_next++;
     bool new_data=state.transform(ns, l_call, r);
     new_data = state.transform(ns, r, t) || new_data;
     new_data = state.transform(ns, t, l_next) || new_data;
-    
+
     return new_data;
   }
-        
+
   assert(!goto_function.body.instructions.empty());
 
   bool new_data=false;
@@ -378,9 +378,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
-    
+
     // do the edge from the call site to the beginning of the function
-    new_data=state.transform(ns, l_call, l_begin);  
+    new_data=state.transform(ns, l_call, l_begin);
 
     // do each function at least once
     if(functions_done.find(f_it->first)==
@@ -410,9 +410,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
     l_next++;
     new_data = state.transform(ns, l_end, l_next) || new_data;
   }
-  
+
   return new_data;
-}    
+}
 
 /*******************************************************************\
 
@@ -432,13 +432,13 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
   const exprt::operandst &arguments,
   statet &state,
   const goto_functionst &goto_functions)
-{ 
+{
   bool new_data = false;
-  
+
   if(function.id()==ID_symbol)
   {
     const irep_idt &identifier=function.get(ID_identifier);
-    
+
     if(recursion_set.find(identifier)!=recursion_set.end())
     {
       // recursion detected!
@@ -446,29 +446,29 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
     }
     else
       recursion_set.insert(identifier);
-      
+
     goto_functionst::function_mapt::const_iterator it=
       goto_functions.function_map.find(identifier);
-      
+
     if(it==goto_functions.function_map.end())
       throw "failed to find function "+id2string(identifier);
-    
-    new_data = 
+
+    new_data =
       do_function_call(
         l_call,
         goto_functions,
         it,
         arguments,
         state);
-    
+
     recursion_set.erase(identifier);
   }
   else if(function.id()==ID_if)
   {
     if(function.operands().size()!=3)
       throw "if takes three arguments";
-    
-    new_data = 
+
+    new_data =
       do_function_call_rec(
         l_call,
         function.op1(),
@@ -488,7 +488,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
   {
     // get value set
     expr_sett values;
-    
+
     get_reference_set(function, values);
 
     // now call all of these
@@ -499,19 +499,19 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
       if(it->id()==ID_object_descriptor)
       {
         const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
-        
+
         // ... but only if they are actually functions.
         goto_functionst::function_mapt::const_iterator it=
           goto_functions.function_map.find(o.object().get(ID_identifier));
-        
+
         if (it!=goto_functions.function_map.end())
         {
           new_data =
             do_function_call_rec(
-              l_call, 
-              o.object(), 
-              arguments, 
-              state, 
+              l_call,
+              o.object(),
+              arguments,
+              state,
               goto_functions) || new_data;
         }
       }

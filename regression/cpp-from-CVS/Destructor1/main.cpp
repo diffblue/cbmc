@@ -15,6 +15,6 @@ int main()
     t1 instance1;
     assert(g==1);
   }
-  
+
   assert(g==2);
 }

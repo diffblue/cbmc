@@ -29,4 +29,3 @@ int main(int argc, char* argv[])
   if(fabs(x) >= 50)
   return 0;
 }
-

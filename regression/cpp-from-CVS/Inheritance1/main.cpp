@@ -2,7 +2,7 @@ class b
 {
 public:
   int x;
-  
+
   void f();
 };
 

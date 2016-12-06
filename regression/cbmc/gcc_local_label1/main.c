@@ -8,14 +8,14 @@ void other_f()
   #ifdef __GNUC__
   here:;
   x++;
-  
+
   {
     __label__ here, there;
-    
+
     goto here; // not jumping up, but down!
 
     here:; // this would usually fail
-    
+
     assert(0);
   }
   #else
@@ -28,4 +28,3 @@ int main()
 {
   other_f();
 }
-

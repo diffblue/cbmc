@@ -27,17 +27,16 @@ public:
     std::ostream &out,
     const ai_baset &ai,
     const namespacet &ns) const;
-  
+
   // returns true iff there is s.th. new
   bool merge(
     const uninitialized_domaint &other,
     locationt from,
     locationt to);
-  
+
 protected:
   void assign(const exprt &lhs);
 };
 
 typedef ait<uninitialized_domaint>
   uninitialized_analysist;
-

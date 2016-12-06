@@ -64,7 +64,7 @@ void cpp_convert_typet::read(const typet &type)
   ptr32_cnt=ptr64_cnt=float128_cnt=int128_cnt=0;
 
   other.clear();
-  
+
   #if 0
   std::cout << "cpp_convert_typet::read: " << type.pretty() << std::endl;
   #endif
@@ -353,9 +353,9 @@ Function: cpp_convert_typet::write
 void cpp_convert_typet::write(typet &type)
 {
   type.clear();
-  
+
   // first, do "other"
-  
+
   if(!other.empty())
   {
     if(double_cnt || float_cnt || signed_cnt ||

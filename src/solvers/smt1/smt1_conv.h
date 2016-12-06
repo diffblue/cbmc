@@ -35,7 +35,7 @@ public:
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_source,
-    const std::string &_logic,    
+    const std::string &_logic,
     solvert _solver,
     std::ostream &_out):
     prop_convt(_ns),
@@ -68,14 +68,14 @@ protected:
   solvert solver;
   std::ostream &out;
   boolbv_widtht boolbv_width;
-  
+
   void write_header();
   void write_footer();
 
   // new stuff
   void convert_expr(const exprt &expr, bool bool_as_bv);
   void convert_type(const typet &type);
-  
+
   // specific expressions go here
   void convert_byte_update(const exprt &expr, bool bool_as_bv);
   void convert_byte_extract(
@@ -101,23 +101,23 @@ protected:
   void convert_overflow(const exprt &expr);
   void convert_with(const exprt &expr);
   void convert_update(const exprt &expr);
-  
+
   std::string convert_identifier(const irep_idt &identifier);
   void convert_literal(const literalt l);
-  
+
   // auxiliary methods
   std::set<irep_idt> quantified_symbols;
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
   void flatten_array(const exprt &op);
-  
+
   // booleans vs. bit-vector[1]
   void from_bv_begin(const typet &type, bool bool_as_bv);
   void from_bv_end(const typet &type, bool bool_as_bv);
   void from_bool_begin(const typet &type, bool bool_as_bv);
   void from_bool_end(const typet &type, bool bool_as_bv);
-  
+
   // arrays
   typet array_index_type() const;
   void array_index(const exprt &expr);
@@ -132,14 +132,14 @@ protected:
   {
     typet type;
     exprt value;
-    
+
     identifiert()
     {
       type.make_nil();
       value.make_nil();
     }
   };
-  
+
   void set_value(
     identifiert &identifier,
     const std::string &index,
@@ -154,43 +154,43 @@ protected:
     else
       identifier.value=tmp;
   }
-  
+
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
   identifier_mapt identifier_map;
-  
+
   unsigned array_index_bits;
-  
+
   // for replacing 'array_of' expressions
   typedef std::map<exprt, irep_idt> array_of_mapt;
   array_of_mapt array_of_map;
-  
+
   // for replacing 'array' expressions
   typedef std::map<exprt, irep_idt> array_expr_mapt;
   array_expr_mapt array_expr_map;
-  
+
   // for replacing string constants
   typedef std::map<exprt, exprt> string2array_mapt;
   string2array_mapt string2array_map;
-  
+
   exprt ce_value(
     const typet &type,
     const std::string &index,
     const std::string &v,
     bool in_struct) const;
-  
+
   exprt binary2struct(
-    const struct_typet &type, 
-    const std::string &binary) const;  
+    const struct_typet &type,
+    const std::string &binary) const;
 
   exprt binary2union(
-    const union_typet &type, 
-    const std::string &binary) const;  
+    const union_typet &type,
+    const std::string &binary) const;
 
   // flattens multi-operand expressions into binary
   // expressions
-  void convert_nary(const exprt &expr, 
+  void convert_nary(const exprt &expr,
                     const irep_idt op_string,
                     bool bool_as_bv);
 

@@ -12,7 +12,7 @@ extern inline void bar()
 
 // similar with an incomplete array
 extern char some_array[];
- 
+
 // similar with a union
 extern union moo y;
 

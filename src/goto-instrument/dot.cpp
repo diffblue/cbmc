@@ -30,9 +30,9 @@ public:
     subgraphscount(0)
   {
   }
-  
+
   void output(std::ostream &out);
-  
+
 protected:
   const namespacet &ns;
   const goto_functionst &goto_functions;
@@ -43,10 +43,10 @@ protected:
   std::list<exprt> clusters;
 
   void write_dot_subgraph(
-    std::ostream &, 
-    const std::string &, 
+    std::ostream &,
+    const std::string &,
     const goto_programt &);
-    
+
   void do_dot_function_calls(std::ostream &);
 
   std::string &escape(std::string &str);
@@ -88,8 +88,8 @@ void dott::write_dot_subgraph(
   out << "label=\"" << name << "\";" << std::endl;
 
   const goto_programt::instructionst& instructions =
-    goto_program.instructions;  
-  
+    goto_program.instructions;
+
   if(instructions.empty())
   {
     out << "Node_" << subgraphscount << "_0 " <<
@@ -100,15 +100,15 @@ void dott::write_dot_subgraph(
     std::set<goto_programt::const_targett> seen;
     goto_programt::const_targetst worklist;
     worklist.push_back(instructions.begin());
-    
+
     while(!worklist.empty())
     {
       goto_programt::const_targett it=worklist.front();
       worklist.pop_front();
-      
+
       if(it==instructions.end() ||
          seen.find(it)!=seen.end()) continue;
-          
+
       std::stringstream tmp("");
       if(it->is_goto())
       {
@@ -138,8 +138,8 @@ void dott::write_dot_subgraph(
       }
       else if(it->is_skip())
         tmp.str("Skip");
-      else if(it->is_end_function())            
-        tmp.str("End of Function");      
+      else if(it->is_end_function())
+        tmp.str("End of Function");
       else if(it->is_location())
         tmp.str("Location");
       else if(it->is_dead())
@@ -154,18 +154,18 @@ void dott::write_dot_subgraph(
         while (t[ t.size()-1 ]=='\n')
           t = t.substr(0,t.size()-1);
         tmp.str(escape(t));
-        
+
         exprt fc;
         std::stringstream ss;
         ss << "Node_" << subgraphscount << "_" << it->location_number;
         fc.operands().push_back(exprt(ss.str()));
-        fc.operands().push_back(it->code.op1());  
+        fc.operands().push_back(it->code.op1());
         function_calls.push_back(fc);
       }
       else if(it->is_assign() ||
               it->is_decl() ||
               it->is_return() ||
-              it->is_other())      
+              it->is_other())
       {
         std::string t = from_expr(ns, "", it->code);
         while (t[ t.size()-1 ]=='\n')
@@ -184,7 +184,7 @@ void dott::write_dot_subgraph(
         tmp.str("UNKNOWN");
 
       out << "Node_" << subgraphscount << "_" << it->location_number;
-      out << " [shape="; 
+      out << " [shape=";
       if(it->is_goto() && !it->guard.is_true() && !it->guard.is_false())
         out << "diamond";
       else
@@ -194,7 +194,7 @@ void dott::write_dot_subgraph(
       out << "\"];" << std::endl;
 
       std::set<goto_programt::const_targett> tres;
-      std::set<goto_programt::const_targett> fres;          
+      std::set<goto_programt::const_targett> fres;
       find_next(instructions, it, tres, fres);
 
       std::string tlabel="true";
@@ -204,9 +204,9 @@ void dott::write_dot_subgraph(
         tlabel="";
         flabel="";
       }
-            
-      typedef std::set<goto_programt::const_targett> t;          
-      
+
+      typedef std::set<goto_programt::const_targett> t;
+
       for (t::iterator trit=tres.begin();
            trit!=tres.end();
            trit++)
@@ -215,14 +215,14 @@ void dott::write_dot_subgraph(
           frit!=fres.end();
           frit++)
         write_edge(out, *it, **frit, flabel);
-    
+
       seen.insert(it);
       goto_programt::const_targetst temp;
       goto_program.get_successors(it, temp);
       worklist.insert(worklist.end(), temp.begin(), temp.end());
     }
   }
-  
+
   out << "}" << std::endl;
   subgraphscount++;
 }
@@ -380,7 +380,7 @@ void dott::find_next(
 
   if(it->is_goto() && it->guard.is_true())
     return;
-  
+
   goto_programt::const_targett next = it; next++;
   if(next!=instructions.end())
     fres.insert(next);
@@ -437,6 +437,5 @@ void dot(
   std::ostream &out)
 {
   dott dot(src, ns);
-  dot.output(out);  
+  dot.output(out);
 }
-

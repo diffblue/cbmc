@@ -13,7 +13,7 @@ Author: CM Wintersteiger
 
 #include <goto-programs/goto_functions.h>
 
-void remove_unused_functions( 
+void remove_unused_functions(
   goto_functionst &functions,
   message_handlert &message_handler);
 

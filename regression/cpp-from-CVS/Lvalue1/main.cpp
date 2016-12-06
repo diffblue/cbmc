@@ -20,7 +20,7 @@ int main()
 	//
 	// It's not clear what the best is. Should this code be rejected?
 	// Is the compatibility with gcc more important?
-	
+
 	assert(factory().get_i() == 0);
-	
+
 }

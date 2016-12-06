@@ -21,5 +21,3 @@ void i2c_hid_open() {
 void main() {
 __CPROVER_ASYNC_1: i2c_hid_open();
 }
-
-

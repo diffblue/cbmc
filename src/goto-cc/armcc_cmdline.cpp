@@ -12,15 +12,15 @@ Author: Daniel Kroening
 #include "armcc_cmdline.h"
 
 /*******************************************************************\
- 
+
 Function: armcc_cmdlinet::parse
- 
+
   Inputs: argument count, argument strings
- 
+
  Outputs: none
- 
+
  Purpose: parses the commandline options into a cmdlinet
- 
+
 \*******************************************************************/
 
 // see
@@ -44,7 +44,7 @@ static const char *options_no_arg[]=
   "--no-arch",
   "--no-library",
   "--string-abstraction",
-                  
+
   // armcc
   "--help",
   "--show_cmdline",
@@ -280,8 +280,8 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     {
       args.push_back(argv[i]);
       continue;
-    }    
-    
+    }
+
     // it starts with - and it isn't "-"
 
     std::string prefix;
@@ -307,7 +307,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
         else
           set(prefix, "");
       }
-    } 
+    }
     else if(prefix_in_list(argv[i], options_with_prefix, prefix))
     {
       // options that have a concatenated argument
@@ -315,7 +315,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     }
     else
     { // unrecognized option
-      std::cout << "Warning: uninterpreted armcc option '" 
+      std::cout << "Warning: uninterpreted armcc option '"
                 << argv[i] << "'" << std::endl;
     }
   }

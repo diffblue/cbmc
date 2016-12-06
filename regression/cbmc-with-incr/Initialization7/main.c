@@ -15,4 +15,3 @@ int main()
   __CPROVER_assert(x==42, "");
   return 0;
 }
-

@@ -19,6 +19,5 @@ generated_files: assembler_lex.yy.cpp
 
 ###############################################################################
 
-assembler$(LIBEXT): $(OBJ) 
+assembler$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

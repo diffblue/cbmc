@@ -124,14 +124,14 @@ void goto_trace_stept::output(
       out << "Violated property:" << "\n";
       if(pc->source_location.is_nil())
         out << "  " << pc->source_location << "\n";
-      
+
       if(comment!="")
         out << "  " << comment << "\n";
       out << "  " << from_expr(ns, "", pc->guard) << "\n";
       out << "\n";
     }
   }
-  
+
   out << "\n";
 }
 
@@ -152,7 +152,7 @@ std::string trace_value_binary(
   const namespacet &ns)
 {
   const typet &type=ns.follow(expr.type());
-  
+
   if(expr.id()==ID_constant)
   {
     if(type.id()==ID_unsignedbv ||
@@ -176,29 +176,29 @@ std::string trace_value_binary(
   else if(expr.id()==ID_array)
   {
     std::string result;
-  
+
     forall_operands(it, expr)
     {
       if(result=="") result="{ "; else result+=", ";
       result+=trace_value_binary(*it, ns);
     }
-      
+
     return result+" }";
   }
   else if(expr.id()==ID_struct)
   {
     std::string result="{ ";
-  
+
     forall_operands(it, expr)
     {
       if(it!=expr.operands().begin()) result+=", ";
       result+=trace_value_binary(*it, ns);
     }
-      
+
     return result+" }";
   }
   else if(expr.id()==ID_union)
-  { 
+  {
     assert(expr.operands().size()==1);
     return trace_value_binary(expr.op0(), ns);
   }
@@ -231,7 +231,7 @@ void trace_value(
     identifier=lhs_object.get_object_name();
 
   std::string value_string;
-  
+
   if(value.is_nil())
     value_string="(assignment removed)";
   else
@@ -267,12 +267,12 @@ void show_state_header(
   unsigned step_nr)
 {
   out << "\n";
-  
+
   if(step_nr==0)
     out << "Initial State";
   else
     out << "State " << step_nr;
-  
+
   out << " " << source_location
       << " thread " << state.thread_nr << "\n";
   out << "----------------------------------------------------" << "\n";
@@ -330,7 +330,7 @@ void show_goto_trace(
     // hide the hidden ones
     if(it->hidden)
       continue;
-  
+
     switch(it->type)
     {
     case goto_trace_stept::ASSERT:
@@ -344,11 +344,11 @@ void show_goto_trace(
 
         if(it->pc->is_assert())
           out << "  " << from_expr(ns, "", it->pc->guard) << "\n";
-        
+
         out << "\n";
       }
       break;
-      
+
     case goto_trace_stept::ASSUME:
       if(!it->cond_value)
       {
@@ -359,14 +359,14 @@ void show_goto_trace(
 
         if(it->pc->is_assume())
           out << "  " << from_expr(ns, "", it->pc->guard) << "\n";
-        
+
         out << "\n";
       }
       break;
-      
+
     case goto_trace_stept::LOCATION:
       break;
-      
+
     case goto_trace_stept::GOTO:
       break;
 
@@ -382,7 +382,7 @@ void show_goto_trace(
           prev_step_nr=it->step_nr;
           show_state_header(out, *it, it->pc->source_location, it->step_nr);
         }
-        
+
         // see if the full lhs is something clean
         if(is_index_member_symbol(it->full_lhs))
           trace_value(out, ns, it->lhs_object, it->full_lhs, it->full_lhs_value);
@@ -426,7 +426,7 @@ void show_goto_trace(
           // the binary representation
           out << " (" << trace_value_binary(*l_it, ns) << ")";
         }
-      
+
         out << "\n";
       }
       break;
@@ -446,10 +446,10 @@ void show_goto_trace(
         // the binary representation
         out << " (" << trace_value_binary(*l_it, ns) << ")";
       }
-      
+
       out << "\n";
       break;
-      
+
     case goto_trace_stept::FUNCTION_CALL:
     case goto_trace_stept::FUNCTION_RETURN:
     case goto_trace_stept::SPAWN:
@@ -458,16 +458,16 @@ void show_goto_trace(
     case goto_trace_stept::ATOMIC_END:
     case goto_trace_stept::DEAD:
       break;
-    
+
     case goto_trace_stept::CONSTRAINT:
       assert(false);
       break;
-      
+
     case goto_trace_stept::SHARED_READ:
     case goto_trace_stept::SHARED_WRITE:
       assert(false);
       break;
-      
+
     default:
       assert(false);
     }

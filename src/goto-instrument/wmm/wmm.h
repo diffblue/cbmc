@@ -13,9 +13,9 @@ Date: 2012
 
 typedef enum {
   Unknown=-1,
-  TSO=0, 
-  PSO=1, 
-  RMO=2, 
+  TSO=0,
+  PSO=1,
+  RMO=2,
   Power=3
 } memory_modelt;
 

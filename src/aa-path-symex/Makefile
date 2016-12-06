@@ -14,4 +14,3 @@ all: aa-path-symex$(LIBEXT)
 
 aa-path-symex$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

@@ -38,7 +38,7 @@ bvt boolbvt::convert_union(const union_exprt &expr)
 
   bvt bv;
   bv.resize(width);
-  
+
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
   {
     for(std::size_t i=0; i<op_bv.size(); i++)
@@ -62,6 +62,6 @@ bvt boolbvt::convert_union(const union_exprt &expr)
     for(std::size_t i=op_bv.size(); i<bv.size(); i++)
       bv[map_u.map_bit(i)]=prop.new_variable();
   }
-  
+
   return bv;
 }

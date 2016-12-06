@@ -23,9 +23,9 @@ int main(void)
   ps->func = x?ten:twenty;
 
   ppp=ps->func;
-  
+
   y=ps->func();
-  
+
   assert(y==10 || y==20);
 
   return 0;

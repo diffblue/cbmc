@@ -151,7 +151,7 @@ void dplib_propt::lequal(literalt a, literalt b, literalt o)
       << dplib_literal(b) << ") <=> " << dplib_literal(o)
       << ";" << std::endl << std::endl;
 }
-  
+
 /*******************************************************************\
 
 Function: dplib_propt::limplies
@@ -195,12 +195,12 @@ literalt dplib_propt::land(const bvt &bv)
     if(it!=bv.begin()) out << " & ";
     out << dplib_literal(*it);
   }
-  
+
   out << std::endl << std::endl;
 
-  return literal;  
+  return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: dplib_propt::lor
@@ -224,12 +224,12 @@ literalt dplib_propt::lor(const bvt &bv)
     if(it!=bv.begin()) out << " | ";
     out << dplib_literal(*it);
   }
-  
+
   out << std::endl << std::endl;
 
-  return literal;  
+  return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: dplib_propt::lxor
@@ -255,7 +255,7 @@ literalt dplib_propt::lxor(const bvt &bv)
 
   return literal;
 }
-  
+
 /*******************************************************************\
 
 Function: dplib_propt::land
@@ -302,7 +302,7 @@ literalt dplib_propt::lor(literalt a, literalt b)
   if(a==const_literal(true)) return const_literal(true);
   if(b==const_literal(true)) return const_literal(true);
   if(a==b) return a;
-  
+
   literalt o=def_dplib_literal();
   out << dplib_literal(a) << " | " << dplib_literal(b)
       << ";" << std::endl << std::endl;
@@ -417,7 +417,7 @@ Function: dplib_propt::lselect
 \*******************************************************************/
 
 literalt dplib_propt::lselect(literalt a, literalt b, literalt c)
-{ 
+{
   if(a==const_literal(true)) return b;
   if(a==const_literal(false)) return c;
   if(b==c) return b;
@@ -542,7 +542,7 @@ std::string dplib_propt::dplib_literal(literalt l)
     return "TRUE";
 
   if(l.sign())
-    return "(NOT l"+i2string(l.var_no())+")";  
+    return "(NOT l"+i2string(l.var_no())+")";
 
   return "l"+i2string(l.var_no());
 }

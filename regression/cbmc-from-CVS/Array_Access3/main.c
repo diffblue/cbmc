@@ -10,9 +10,9 @@ int main()
 
   // not normal
   2[a]=2;
-  
+
   assert(a[2]==2);
-  
+
   p=a;
 
   // also a bit strange

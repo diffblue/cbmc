@@ -19,7 +19,7 @@ public:
   dplib_temp_filet();
   ~dplib_temp_filet();
 
-protected:  
+protected:
   std::ofstream temp_out;
   std::string temp_out_filename, temp_result_filename;
 };
@@ -31,9 +31,9 @@ public:
     dplib_convt(_ns, temp_out)
   {
   }
-  
+
   virtual resultt dec_solve();
-  
+
 protected:
   resultt read_dplib_result();
   void read_assert(std::istream &in, std::string &line);

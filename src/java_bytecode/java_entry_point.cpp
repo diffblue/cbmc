@@ -57,18 +57,18 @@ void create_initialize(symbol_tablet &symbol_table)
   code_typet type;
   type.return_type()=empty_typet();
   initialize.type=type;
-  
+
   code_blockt init_code;
-  
+
   namespacet ns(symbol_table);
-  
+
   symbol_exprt rounding_mode=
     ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
 
   init_code.add(code_assignt(rounding_mode, gen_zero(rounding_mode.type())));
-  
+
   initialize.value=init_code;
-  
+
   if(symbol_table.add(initialize))
     throw "failed to add "+std::string(INITIALIZE);
 }
@@ -93,9 +93,9 @@ bool java_static_lifetime_init(
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
-  
+
   // we need to zero out all static variables
-  
+
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();
@@ -112,7 +112,7 @@ bool java_static_lifetime_init(
       code_block.add(assignment);
     }
   }
-  
+
   // we now need to run all the <clinit> methods
 
   for(symbol_tablet::symbolst::const_iterator
@@ -130,7 +130,7 @@ bool java_static_lifetime_init(
       code_block.add(function_call);
     }
   }
-  
+
   return false;
 }
 
@@ -167,7 +167,7 @@ exprt::operandst java_build_arguments(
     bool allow_null=config.main!="" && !is_this;
 
     main_arguments[param_number]=
-      object_factory(parameters[param_number].type(), 
+      object_factory(parameters[param_number].type(),
                      init_code, allow_null, symbol_table);
 
     const symbolt &p_symbol=
@@ -177,7 +177,7 @@ exprt::operandst java_build_arguments(
     codet input(ID_input);
     input.operands().resize(2);
     input.op0()=address_of_exprt(
-      index_exprt(string_constantt(p_symbol.base_name), 
+      index_exprt(string_constantt(p_symbol.base_name),
                   gen_zero(index_type())));
     input.op1()=main_arguments[param_number];
     input.add_source_location()=parameters[param_number].source_location();
@@ -203,7 +203,7 @@ Function: java_record_outputs
 void java_record_outputs(
   const symbolt &function,
   const exprt::operandst &main_arguments,
-  code_blockt &init_code, 
+  code_blockt &init_code,
   symbol_tablet &symbol_table)
 {
   const code_typet::parameterst &parameters=
@@ -224,7 +224,7 @@ void java_record_outputs(
     const symbolt &return_symbol=symbol_table.lookup("return'");
 
     output.op0()=address_of_exprt(
-      index_exprt(string_constantt(return_symbol.base_name), 
+      index_exprt(string_constantt(return_symbol.base_name),
                   gen_zero(index_type())));
     output.op1()=return_symbol.symbol_expr();
     output.add_source_location()=
@@ -246,7 +246,7 @@ void java_record_outputs(
       codet output(ID_output);
       output.operands().resize(2);
       output.op0()=address_of_exprt(
-        index_exprt(string_constantt(p_symbol.base_name), 
+        index_exprt(string_constantt(p_symbol.base_name),
                     gen_zero(index_type())));
       output.op1()=main_arguments[param_number];
       output.add_source_location()=parameters[param_number].source_location();
@@ -287,15 +287,15 @@ bool java_entry_point(
   {
     // Add java:: prefix
     std::string main_identifier="java::"+config.main;
-    
+
     symbol_tablet::symbolst::const_iterator s_it;
-    
+
     // Does it have a type signature? (':' suffix)
     if(config.main.rfind(':')==std::string::npos)
     {
       std::string prefix=main_identifier+':';
       std::set<irep_idt> matches;
-      
+
       for(const auto & s : symbol_table.symbols)
         if(has_prefix(id2string(s.first), prefix) &&
            s.second.type.id()==ID_code)
@@ -319,7 +319,7 @@ bool java_entry_point(
 
         for(const auto & s : matches)
           message.error() << "  " << s << '\n';
-        
+
         message.error() << messaget::eom;
 
         return true;
@@ -347,7 +347,7 @@ bool java_entry_point(
                       << "' not a function" << messaget::eom;
       return true;
     }
-    
+
     // check if it has a body
     if(symbol.value.is_nil())
     {
@@ -398,7 +398,7 @@ bool java_entry_point(
 
     // function symbol
     symbol=symbol_table.symbols.find(*matches.begin())->second;
-  
+
     // check if it has a body
     if(symbol.value.is_nil())
     {

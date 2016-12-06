@@ -32,7 +32,7 @@ public:
 protected:
   void get_minimization_list(
     prop_convt &prop_conv,
-    const symex_target_equationt &equation,        
+    const symex_target_equationt &equation,
     minimization_listt &minimization_list);
 
   void minimize(

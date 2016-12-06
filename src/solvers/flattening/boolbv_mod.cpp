@@ -31,14 +31,14 @@ bvt boolbvt::convert_mod(const mod_exprt &expr)
     return conversion_failed(expr);
 
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
   if(expr.op0().type().id()!=expr.type().id() ||
      expr.op1().type().id()!=expr.type().id())
     throw "mod got mixed-type operands";
-    
+
   bv_utilst::representationt rep=
     expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
                                   bv_utilst::UNSIGNED;

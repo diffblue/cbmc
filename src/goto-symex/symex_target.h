@@ -22,13 +22,13 @@ public:
   }
 
   virtual ~symex_targett() { }
-  
+
   struct sourcet
   {
     unsigned thread_nr;
     goto_programt::const_targett pc;
     bool is_set;
-  
+
     sourcet():
       thread_nr(0),
       is_set(false)
@@ -50,11 +50,11 @@ public:
     {
     }
   };
-  
+
   typedef enum {
     STATE, HIDDEN, VISIBLE_ACTUAL_PARAMETER, HIDDEN_ACTUAL_PARAMETER, PHI, GUARD
   } assignment_typet;
-  
+
   // read event
   virtual void shared_read(
     const exprt &guard,
@@ -115,7 +115,7 @@ public:
     const sourcet &source,
     const irep_idt &output_id,
     const std::list<exprt> &args)=0;
-  
+
   // record formatted output
   virtual void output_fmt(
     const exprt &guard,
@@ -123,14 +123,14 @@ public:
     const irep_idt &output_id,
     const irep_idt &fmt,
     const std::list<exprt> &args)=0;
-  
+
   // record input
   virtual void input(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
     const std::list<exprt> &args)=0;
-  
+
   // record an assumption
   virtual void assumption(
     const exprt &guard,

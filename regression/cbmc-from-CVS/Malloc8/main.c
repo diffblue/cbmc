@@ -9,10 +9,10 @@ int main() {
 	struct person** ptr_ptr_p1;
 	ptr_ptr_p1 = malloc(sizeof(struct person*));
         *ptr_ptr_p1 = malloc(sizeof(struct person));
-	
+
 	// Piecewise assignments are ok with cbmc
 	struct person* ptr_p;
-	ptr_p = *ptr_ptr_p1; 
+	ptr_p = *ptr_ptr_p1;
 	ptr_p->name = "Dummy";
 	printf("%s\n", ptr_p->name);
 

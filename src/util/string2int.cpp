@@ -56,7 +56,7 @@ inline T str2number(const char *str, int base, bool safe)
       assert(val >= (long long)std::numeric_limits<T>::min());
     }
   }
-  
+
   return (T)val;
 }
 
@@ -263,4 +263,3 @@ unsigned long long int unsafe_string2unsignedlonglong(const std::string &str, in
 {
   return str2number<unsigned long long int>(str.c_str(), base, false);
 }
-

@@ -101,14 +101,14 @@ public:
 
   typedef enum { ELF32=1, ELF64=2 } elf_classt;
   elf_classt elf_class;
-  
+
   // the ELF header
   Elf32_Ehdr elf32_header;
   Elf64_Ehdr elf64_header;
-  
+
   bool little_endian;
 
-  // section header table  
+  // section header table
   typedef std::vector<Elf32_Shdr> elf32_section_header_tablet;
   elf32_section_header_tablet elf32_section_header_table;
 
@@ -128,23 +128,23 @@ public:
   {
     return get_string(elf64_section_header_table[index].sh_name);
   }
-  
+
   unsigned number_of_sections;
 
   std::string section_name(unsigned index) const
   {
-    return 
+    return
       elf_class==ELF32?elf32_section_name(index):
                        elf64_section_name(index);
   }
-  
+
   std::streampos section_offset(unsigned index) const
   {
     return
       elf_class==ELF32?elf32_section_header_table[index].sh_offset:
                        elf64_section_header_table[index].sh_offset;
   }
-  
+
   bool has_section(const std::string &name) const;
 
 protected:

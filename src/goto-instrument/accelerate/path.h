@@ -32,7 +32,7 @@ public:
 };
 
 typedef std::list<path_nodet> patht;
-typedef std::list<patht> pathst; 
+typedef std::list<patht> pathst;
 
 void output_path(patht &path, goto_programt &program, namespacet &ns, std::ostream &str);
 

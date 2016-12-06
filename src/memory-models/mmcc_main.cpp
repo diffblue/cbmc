@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: mmcc Main Module 
+Module: mmcc Main Module
 
 Author: Daniel Kroening, kroening@kroening.com
 

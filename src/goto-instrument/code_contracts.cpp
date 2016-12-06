@@ -101,13 +101,13 @@ static void check_apply_invariants(
   // H: assert(invariant);
   // havoc;
   // assume(invariant);
-  // if(guard) goto E: 
+  // if(guard) goto E:
   // loop;
   // assert(invariant);
   // assume(false);
   // E: ...
 
-  // find out what can get changed in the loop  
+  // find out what can get changed in the loop
   modifiest modifies;
   get_modifies(local_may_alias, loop, modifies);
 
@@ -489,4 +489,3 @@ void code_contracts(
 {
   code_contractst(symbol_table, goto_functions)();
 }
-

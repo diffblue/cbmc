@@ -43,7 +43,7 @@ void goto_inlinet::parameter_assignments(
 
   const code_typet::parameterst &parameter_types=
     code_type.parameters();
-  
+
   // iterates over the types of the parameters
   for(code_typet::parameterst::const_iterator
       it2=parameter_types.begin();
@@ -72,7 +72,7 @@ void goto_inlinet::parameter_assignments(
       decl->code=code_declt(symbol.symbol_expr());
       decl->code.add_source_location()=source_location;
       decl->source_location=source_location;
-      decl->function=function_name; 
+      decl->function=function_name;
     }
 
     // this is the actual parameter
@@ -93,7 +93,7 @@ void goto_inlinet::parameter_assignments(
 
     // nil means "don't assign"
     if(actual.is_nil())
-    {    
+    {
     }
     else
     {
@@ -103,7 +103,7 @@ void goto_inlinet::parameter_assignments(
       {
         const typet &f_partype = ns.follow(par_type);
         const typet &f_acttype = ns.follow(actual.type());
-        
+
         // we are willing to do some conversion
         if((f_partype.id()==ID_pointer &&
             f_acttype.id()==ID_pointer) ||
@@ -118,7 +118,7 @@ void goto_inlinet::parameter_assignments(
                  f_partype.id()==ID_bool) &&
                 (f_acttype.id()==ID_signedbv ||
                  f_acttype.id()==ID_unsignedbv ||
-                 f_acttype.id()==ID_bool))  
+                 f_acttype.id()==ID_bool))
         {
           actual.make_typecast(par_type);
         }
@@ -144,7 +144,7 @@ void goto_inlinet::parameter_assignments(
       dest.add_instruction(ASSIGN);
       dest.instructions.back().source_location=source_location;
       dest.instructions.back().code.swap(assignment);
-      dest.instructions.back().function=function_name;      
+      dest.instructions.back().function=function_name;
     }
 
     if(it1!=arguments.end())
@@ -177,7 +177,7 @@ void goto_inlinet::parameter_destruction(
 {
   const code_typet::parameterst &parameter_types=
     code_type.parameters();
-  
+
   // iterates over the types of the parameters
   for(code_typet::parameterst::const_iterator
       it=parameter_types.begin();
@@ -203,7 +203,7 @@ void goto_inlinet::parameter_destruction(
       dead->code=code_deadt(symbol.symbol_expr());
       dead->code.add_source_location()=source_location;
       dead->source_location=source_location;
-      dead->function=function_name; 
+      dead->function=function_name;
     }
   }
 }
@@ -242,10 +242,10 @@ void goto_inlinet::replace_return(
           warning_msg();
           continue;
         }
-      
+
         goto_programt tmp;
         goto_programt::targett assignment=tmp.add_instruction(ASSIGN);
-        
+
         code_assignt code_assign(lhs, it->code.op0());
 
         // this may happen if the declared return type at the call site
@@ -257,7 +257,7 @@ void goto_inlinet::replace_return(
         assignment->code=code_assign;
         assignment->source_location=it->source_location;
         assignment->function=it->function;
-        
+
         if(constrain.is_not_nil() && !constrain.is_true())
         {
           codet constrain(ID_bp_constrain);
@@ -265,7 +265,7 @@ void goto_inlinet::replace_return(
           constrain.move_to_operands(assignment->code);
           constrain.copy_to_operands(constrain);
         }
-        
+
         dest.insert_before_swap(it, *assignment);
         it++;
       }
@@ -273,12 +273,12 @@ void goto_inlinet::replace_return(
       {
         goto_programt tmp;
         goto_programt::targett expression=tmp.add_instruction(OTHER);
-        
+
         expression->code=codet(ID_expression);
         expression->code.move_to_operands(it->code.op0());
         expression->source_location=it->source_location;
         expression->function=it->function;
-        
+
         dest.insert_before_swap(it, *expression);
         it++;
       }
@@ -294,7 +294,7 @@ void goto_inlinet::replace_return(
                     << it->code.pretty() << eom;
           continue;
         }
-      
+
         code_assignt code_assign(lhs, it->code.op0());
 
         // this may happen if the declared return type at the call site
@@ -357,7 +357,7 @@ void replace_location(
   irep_idt property_id=dest.get_property_id();
 
   dest=new_location;
-  
+
   if(comment!=irep_idt()) dest.set_comment(comment);
   if(property_class!=irep_idt()) dest.set_property_class(property_class);
   if(property_id!=irep_idt()) dest.set_property_id(property_id);
@@ -409,7 +409,7 @@ void goto_inlinet::expand_function_call(
 {
   // look it up
   const irep_idt identifier=function.get_identifier();
-  
+
   // we ignore certain calls
   if(identifier=="__CPROVER_cleanup" ||
      identifier=="__CPROVER_set_must" ||
@@ -421,7 +421,7 @@ void goto_inlinet::expand_function_call(
     target++;
     return; // ignore
   }
-  
+
   // see if we are already expanding it
   if(recursion_set.find(identifier)!=recursion_set.end())
   {
@@ -436,7 +436,7 @@ void goto_inlinet::expand_function_call(
     warning().source_location=function.find_source_location();
     warning() << "recursion is ignored" << eom;
     target->make_skip();
-    
+
     target++;
     return;
   }
@@ -456,10 +456,10 @@ void goto_inlinet::expand_function_call(
     error() << "failed to find function `" << identifier << "'" << eom;
     throw 0;
   }
-  
+
   const goto_functionst::goto_functiont &f=m_it->second;
 
-  // see if we need to inline this  
+  // see if we need to inline this
   if(!full)
   {
     if(!f.body_available() ||
@@ -479,10 +479,10 @@ void goto_inlinet::expand_function_call(
 
     goto_programt tmp2;
     tmp2.copy_from(f.body);
-    
+
     assert(tmp2.instructions.back().is_end_function());
     tmp2.instructions.back().type=LOCATION;
-    
+
     replace_return(tmp2, lhs, constrain);
 
     goto_programt tmp;
@@ -494,11 +494,11 @@ void goto_inlinet::expand_function_call(
     {
       source_locationt new_source_location=
         function.find_source_location();
-    
+
       if(new_source_location.is_not_nil())
       {
         new_source_location.set_hide();
-      
+
         Forall_goto_program_instructions(it, tmp)
         {
           if(it->function==identifier)
@@ -520,10 +520,10 @@ void goto_inlinet::expand_function_call(
       }
     }
 
-    // set up location instruction for function call  
+    // set up location instruction for function call
     target->type=LOCATION;
     target->code.clear();
-    
+
     goto_programt::targett next_target(target);
     next_target++;
 
@@ -551,7 +551,7 @@ void goto_inlinet::expand_function_call(
       t->source_location=target->source_location;
       t->function=target->function;
     }
-    
+
     // return value
     if(lhs.is_not_nil())
     {
@@ -560,7 +560,7 @@ void goto_inlinet::expand_function_call(
 
       code_assignt code(lhs, rhs);
       code.add_source_location()=target->source_location;
-    
+
       goto_programt::targett t=tmp.add_instruction(ASSIGN);
       t->source_location=target->source_location;
       t->function=target->function;
@@ -592,7 +592,7 @@ Function: goto_inlinet::goto_inline
 void goto_inlinet::goto_inline(goto_programt &dest)
 {
   goto_inline_rec(dest, true);
-  replace_return(dest, 
+  replace_return(dest,
     static_cast<const exprt &>(get_nil_irep()),
     static_cast<const exprt &>(get_nil_irep()));
 }
@@ -614,18 +614,18 @@ void goto_inlinet::goto_inline_rec(
   bool full)
 {
   // already done?
-  
+
   if(finished_inlining_set.find(f_it->first)!=
      finished_inlining_set.end())
     return; // yes
-    
+
   // do it
-  
+
   goto_inline_rec(f_it->second.body, full);
-  
+
   // remember we did it
- 
-  finished_inlining_set.insert(f_it->first); 
+
+  finished_inlining_set.insert(f_it->first);
 }
 
 /*******************************************************************\
@@ -655,7 +655,7 @@ void goto_inlinet::goto_inline_rec(goto_programt &dest, bool full)
 
   if(changed)
   {
-    remove_skip(dest);  
+    remove_skip(dest);
     dest.update();
   }
 }
@@ -711,10 +711,10 @@ bool goto_inlinet::inline_instruction(
     }
   }
 
-  // advance iterator  
+  // advance iterator
   it++;
 
-  return false; 
+  return false;
 }
 
 /*******************************************************************\
@@ -735,16 +735,16 @@ void goto_inline(
   message_handlert &message_handler)
 {
   goto_inlinet goto_inline(goto_functions, ns, message_handler);
-  
+
   try
   {
     // find entry point
     goto_functionst::function_mapt::iterator it=
       goto_functions.function_map.find(goto_functionst::entry_point());
-      
+
     if(it==goto_functions.function_map.end())
       return;
-    
+
     goto_inline.goto_inline(it->second.body);
   }
 
@@ -765,7 +765,7 @@ void goto_inline(
     goto_inline.error() << e << messaget::eom;
     throw 0;
   }
-  
+
   // clean up
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();
@@ -817,9 +817,9 @@ void goto_partial_inline(
     goto_functions,
     ns,
     message_handler);
-  
+
   goto_inline.smallfunc_limit=_smallfunc_limit;
-  
+
   try
   {
     for(goto_functionst::function_mapt::iterator

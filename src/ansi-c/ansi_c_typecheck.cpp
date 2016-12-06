@@ -97,6 +97,6 @@ bool ansi_c_typecheck(
   {
     ansi_c_typecheck.error() << e << messaget::eom;
   }
-  
+
   return ansi_c_typecheck.get_error_found();
 }

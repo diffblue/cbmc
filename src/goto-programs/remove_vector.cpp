@@ -41,10 +41,10 @@ void remove_vector(exprt &expr)
     {
       remove_vector(expr.type());
       array_typet array_type=to_array_type(expr.type());
-      
+
       mp_integer dimension;
       to_integer(array_type.size(), dimension);
-    
+
       assert(expr.operands().size()==2);
       const typet subtype=array_type.subtype();
       // do component-wise:
@@ -55,22 +55,22 @@ void remove_vector(exprt &expr)
       for(unsigned i=0; i<array_expr.operands().size(); i++)
       {
         exprt index=from_integer(i, array_type.size().type());
-      
+
         array_expr.operands()[i]=
           binary_exprt(index_exprt(expr.op0(), index, subtype), expr.id(),
                        index_exprt(expr.op1(), index, subtype));
       }
-      
+
       expr=array_expr;
     }
     else if(expr.id()==ID_unary_minus || expr.id()==ID_bitnot)
     {
       remove_vector(expr.type());
       array_typet array_type=to_array_type(expr.type());
-      
+
       mp_integer dimension;
       to_integer(array_type.size(), dimension);
-    
+
       assert(expr.operands().size()==1);
       const typet subtype=array_type.subtype();
       // do component-wise:
@@ -81,11 +81,11 @@ void remove_vector(exprt &expr)
       for(unsigned i=0; i<array_expr.operands().size(); i++)
       {
         exprt index=from_integer(i, array_type.size().type());
-      
+
         array_expr.operands()[i]=
           unary_exprt(expr.id(), index_exprt(expr.op0(), index, subtype));
       }
-      
+
       expr=array_expr;
     }
     else if(expr.id()==ID_vector)
@@ -133,9 +133,9 @@ void remove_vector(typet &type)
   else if(type.id()==ID_vector)
   {
     vector_typet &vector_type=to_vector_type(type);
-  
+
     remove_vector(type.subtype());
-    
+
     // Replace by an array with appropriate number of members.
     array_typet array_type(vector_type.subtype(), vector_type.size());
     array_type.add_source_location()=type.source_location();
@@ -256,4 +256,3 @@ void remove_vector(goto_modelt &goto_model)
 {
   remove_vector(goto_model.symbol_table, goto_model.goto_functions);
 }
-

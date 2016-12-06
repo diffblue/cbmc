@@ -28,11 +28,11 @@ void substitute(
   const std::string &by)
 {
   assert(!what.empty());
-  
+
   while(true)
   {
     std::string::size_type pos=dest.find(what);
-    
+
     if(pos==std::string::npos)
       return; // done
 

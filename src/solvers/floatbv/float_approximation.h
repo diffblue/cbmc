@@ -22,7 +22,7 @@ public:
   }
 
   virtual ~float_approximationt();
-  
+
   bool over_approximate;
   bool partial_interpretation;
 

@@ -37,7 +37,7 @@ std::string unescape_string(const std::string &src)
       // go to next character
       i++;
       assert(i<src.size()); // backslash can't be last character
-      
+
       ch=src[i];
       switch(ch)
       {
@@ -58,7 +58,7 @@ std::string unescape_string(const std::string &src)
 
         {
           std::string hex;
-          
+
           const unsigned digits=(ch=='u')?4:8;
           hex.reserve(digits);
 
@@ -69,7 +69,7 @@ std::string unescape_string(const std::string &src)
 
           // go back
           i--;
-        
+
           unsigned int result=hex_to_unsigned(hex.c_str(), hex.size());
 
           // Universal characters in non-wide strings don't
@@ -79,7 +79,7 @@ std::string unescape_string(const std::string &src)
 
         dest+=ch;
         break;
-      
+
       case 'x': // hex
         i++;
 
@@ -94,27 +94,27 @@ std::string unescape_string(const std::string &src)
 
           // go back
           i--;
-        
+
           ch=hex_to_unsigned(hex.c_str(), hex.size());
         }
-        
-        dest+=ch;      
+
+        dest+=ch;
         break;
-      
+
       default:
         if(isdigit(ch)) // octal
         {
           std::string octal;
-          
+
           while(i<src.size() && isdigit(src[i]))
           {
             octal+=src[i];
             i++;
           }
-          
+
           // go back
           i--;
-          
+
           ch=octal_to_unsigned(octal.c_str(), octal.size());
           dest+=ch;
         }
@@ -151,11 +151,11 @@ std::basic_string<unsigned int> unescape_wide_string(
   std::basic_string<unsigned int> dest;
 
   dest.reserve(src.size()); // about that long, but may be shorter
-  
+
   for(unsigned i=0; i<src.size(); i++)
   {
     unsigned int ch=(unsigned char)src[i];
-    
+
     if(ch=='\\') // escape?
     {
       i++;
@@ -174,14 +174,14 @@ std::basic_string<unsigned int> unescape_wide_string(
       case 'a': dest.push_back('\a'); break; /* BEL (0x07) */
       case '"': dest.push_back('"'); break;
       case '\'': dest.push_back('\''); break;
-      
+
       case 'u': // universal character
       case 'U': // universal character
         i++;
 
         {
           std::string hex;
-          
+
           unsigned count=(ch=='u')?4:8;
           hex.reserve(count);
 
@@ -190,12 +190,12 @@ std::basic_string<unsigned int> unescape_wide_string(
 
           // go back
           i--;
-        
+
           unsigned int result;
           sscanf(hex.c_str(), "%x", &result);
           ch=result;
         }
-        
+
         dest.push_back(ch);
         break;
 
@@ -209,7 +209,7 @@ std::basic_string<unsigned int> unescape_wide_string(
             hex+=src[i];
             i++;
           }
-        
+
           // go back
           i--;
 
@@ -217,24 +217,24 @@ std::basic_string<unsigned int> unescape_wide_string(
           sscanf(hex.c_str(), "%x", &result);
           ch=result;
         }
-        
-        dest.push_back(ch);      
+
+        dest.push_back(ch);
         break;
-      
+
       default:
         if(isdigit(ch)) // octal
         {
           std::string octal;
-          
+
           while(i<src.size() && isdigit(src[i]))
           {
             octal+=src[i];
             i++;
           }
-          
+
           // go back
           i--;
-          
+
           unsigned int result;
           sscanf(octal.c_str(), "%o", &result);
           ch=result;
@@ -267,10 +267,10 @@ Function: hex_to_unsigned
 
 \*******************************************************************/
 
-unsigned hex_to_unsigned(const char *hex, unsigned digits)
+unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 {
   unsigned value=0;
-  
+
   for(; digits!=0; digits--, hex++)
   {
     char ch=*hex;
@@ -285,7 +285,7 @@ unsigned hex_to_unsigned(const char *hex, unsigned digits)
     else if(isxdigit(ch))
       value|=10+tolower(ch)-'a';
   }
-  
+
   return value;
 }
 
@@ -301,10 +301,10 @@ Function: octal_to_unsigned
 
 \*******************************************************************/
 
-unsigned octal_to_unsigned(const char *octal, unsigned digits)
+unsigned octal_to_unsigned(const char *octal, std::size_t digits)
 {
   unsigned value=0;
-  
+
   for(; digits!=0; digits--, octal++)
   {
     char ch=*octal;
@@ -317,6 +317,6 @@ unsigned octal_to_unsigned(const char *octal, unsigned digits)
     if(isdigit(ch))
       value|=ch-'0';
   }
-  
+
   return value;
 }

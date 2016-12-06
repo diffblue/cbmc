@@ -24,12 +24,12 @@ public:
   {
     id=symbol_expr.get_identifier();
   }
-  
+
   explicit object_idt(const irep_idt &identifier)
   {
     id=identifier;
   }
-  
+
   friend std::ostream &operator << (std::ostream &out, const object_idt &x)
   {
     return out << x.id;
@@ -39,7 +39,7 @@ public:
   {
     return a.id < b.id;
   }
-  
+
 protected:
   irep_idt id;
 };

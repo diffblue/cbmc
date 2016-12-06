@@ -15,7 +15,7 @@ void testAdd (int mode, double f, double g, int sign) {
 
   assert(f_plus_g == 0.0);
   assert(g_plus_f == 0.0);
-  
+
   assert(signbit(f_plus_g) == sign);
   assert(signbit(g_plus_f) == sign);
   #endif

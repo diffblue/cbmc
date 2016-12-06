@@ -86,7 +86,7 @@ bool ansi_c_languaget::preprocess(
 
   return c_preprocess(path, outstream, get_message_handler());
 }
-             
+
 /*******************************************************************\
 
 Function: ansi_c_languaget::parse
@@ -150,7 +150,7 @@ bool ansi_c_languaget::parse(
 
   return result;
 }
-             
+
 /*******************************************************************\
 
 Function: ansi_c_languaget::typecheck
@@ -173,10 +173,10 @@ bool ansi_c_languaget::typecheck(
     return true;
 
   remove_internal_symbols(new_symbol_table);
-  
+
   if(linking(symbol_table, new_symbol_table, get_message_handler()))
     return true;
-    
+
   return false;
 }
 
@@ -196,7 +196,7 @@ bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
   if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
     return true;
-  
+
   return false;
 }
 
@@ -211,7 +211,7 @@ Function: ansi_c_languaget::show_parse
  Purpose:
 
 \*******************************************************************/
-  
+
 void ansi_c_languaget::show_parse(std::ostream &out)
 {
   parse_tree.output(out);
@@ -308,7 +308,7 @@ Function: ansi_c_languaget::to_expr
  Purpose:
 
 \*******************************************************************/
-                         
+
 bool ansi_c_languaget::to_expr(
   const std::string &code,
   const std::string &module,
@@ -321,7 +321,7 @@ bool ansi_c_languaget::to_expr(
 
   std::istringstream i_preprocessed(
     "void __my_expression = (void) (\n"+code+"\n);");
-  
+
   // parsing
 
   ansi_c_parser.clear();
@@ -338,14 +338,14 @@ bool ansi_c_languaget::to_expr(
   else
   {
     expr=ansi_c_parser.parse_tree.items.front().declarator().value();
-    
+
     // typecheck it
     result=ansi_c_typecheck(expr, get_message_handler(), ns);
   }
 
   // save some memory
   ansi_c_parser.clear();
-  
+
   // now remove that (void) cast
   if(expr.id()==ID_typecast &&
      expr.type().id()==ID_empty &&

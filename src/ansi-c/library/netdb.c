@@ -12,10 +12,10 @@ struct hostent *gethostbyname(const char *name)
 
   __CPROVER_bool error;
   if(error) return 0;
-  
+
   // quite restrictive, as will alias between calls
   static struct hostent result;
-  
+
   // we whould be filling in the fields of this
   return &result;
 }
@@ -31,10 +31,10 @@ struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 
   __CPROVER_bool error;
   if(error) return 0;
-  
+
   // quite restrictive, as will alias between calls
   static struct hostent result;
-  
+
   // we whould be filling in the fields of this
   return &result;
 }
@@ -47,10 +47,10 @@ struct hostent *gethostent(void)
 
   __CPROVER_bool error;
   if(error) return 0;
-  
+
   // quite restrictive, as will alias between calls
   static struct hostent result;
-  
+
   // we whould be filling in the fields of this
   return &result;
 }
