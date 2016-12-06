@@ -934,10 +934,20 @@ void goto_symex_statet::rename(
   {
     l1_type_entry=l1_types.insert(std::make_pair(l1_identifier, type));
 
-    if(!l1_type_entry.second)
+    if(!l1_type_entry.second) // was already in map
     {
-      type=l1_type_entry.first->second;
-      return;
+      // do not change a complete array type to an incomplete one
+
+      const typet &type_prev=l1_type_entry.first->second;
+
+      if(type.id()!=ID_array ||
+         type_prev.id()!=ID_array ||
+         to_array_type(type).is_incomplete() ||
+         to_array_type(type_prev).is_complete())
+      {
+        type=l1_type_entry.first->second;
+        return;
+      }
     }
   }
 
