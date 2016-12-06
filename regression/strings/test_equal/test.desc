@@ -3,6 +3,6 @@ test.c
 --pass
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func(s, __CPROVER_uninterpreted_string_literal_func(\"pippo\")): SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_uninterpreted_string_equal_func(s, __CPROVER_uninterpreted_string_literal_func(\"mippo\")): FAILURE$
+^\[main.assertion.1\] assertion __CPROVER_string_equal(s, __CPROVER_string_literal("pippo")): SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_string_equal(s, __CPROVER_string_literal("mippo")): FAILURE$
 --
