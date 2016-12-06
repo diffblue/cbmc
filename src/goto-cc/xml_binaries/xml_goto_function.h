@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: Convert goto functions into xml structures and back
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #ifndef XML_GOTO_FUNCTION_H_

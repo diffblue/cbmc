@@ -6,5 +6,3 @@ public :
 
 template<>
 int c<char>::f00(const char*);
-
-  

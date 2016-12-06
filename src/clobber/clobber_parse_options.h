@@ -53,13 +53,13 @@ protected:
   bool process_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
-    
+
   bool set_properties(goto_functionst &goto_functions);
 
   void report_success();
   void report_failure();
   void show_counterexample(const class goto_tracet &);
-            
+
   void eval_verbosity();
 };
 

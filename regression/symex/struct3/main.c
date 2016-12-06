@@ -9,9 +9,9 @@ int main()
 {
   int i;
   char *p;
-  
+
   p=&x.a;
-  
+
   p[0]=1;
   p[1]=2;
   p[2]=3;
@@ -24,7 +24,7 @@ int main()
 
   // same again, directly to head of struct
   p=(char *)&y;
-  
+
   p[0]=1;
   p[1]=2;
   p[2]=3;

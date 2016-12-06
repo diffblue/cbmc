@@ -25,7 +25,7 @@ public:
 
   virtual bool has_set_to() const { return false; }
   virtual bool cnf_handled_well() const { return false; }
- 
+
   virtual literalt land(literalt a, literalt b);
   virtual literalt lor(literalt a, literalt b);
   virtual literalt land(const bvt &bv);
@@ -46,7 +46,7 @@ public:
   {
     return dest.new_node();
   }
-  
+
   virtual size_t no_variables() const
   { return dest.number_of_nodes(); }
 
@@ -55,7 +55,7 @@ public:
 
   virtual tvt l_get(literalt a) const
   { assert(0); return tvt::unknown(); }
-  
+
   virtual resultt prop_solve()
   { assert(0); return P_ERROR; }
 
@@ -74,12 +74,12 @@ public:
 
   aig_plus_constraintst &dest;
   virtual bool has_set_to() const { return true; }
- 
+
   virtual void lcnf(const bvt &clause)
   {
     l_set_to_true(lor(clause));
   }
-  
+
   virtual void l_set_to(literalt a, bool value)
   {
     dest.constraints.push_back(a^!value);
@@ -94,7 +94,7 @@ public:
     solver(_solver)
   {
   }
-  
+
   aig_plus_constraintst aig;
 
   virtual const std::string solver_text()
@@ -103,16 +103,16 @@ public:
 
   virtual tvt l_get(literalt a) const;
   virtual resultt prop_solve();
-  
+
   virtual void set_message_handler(message_handlert &m)
   {
     aig_prop_constraintt::set_message_handler(m);
     solver.set_message_handler(m);
   }
-  
+
 protected:
   propt &solver;
-  
+
   void convert_aig();
   void usage_count(std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
   void compute_phase(std::vector<bool> &n_pos, std::vector<bool> &n_neg);

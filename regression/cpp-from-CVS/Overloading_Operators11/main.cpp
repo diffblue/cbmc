@@ -5,7 +5,7 @@ struct C {
 
 struct A {
 	C c1;
-	
+
 	A():c1(false){}
 	const C* operator->() const {return &c1;}
 };

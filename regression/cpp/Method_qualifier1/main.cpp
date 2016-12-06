@@ -15,7 +15,7 @@ int main()
   const my_class &zz_const=zz;
   volatile my_class &zz_volatile=zz;
   const volatile my_class &zz_const_volatile=zz;
-  
+
   assert(zz.my_method()==1);
   assert(zz_const.my_method()==2);
   assert(zz_volatile.my_method()==3);

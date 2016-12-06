@@ -15,7 +15,7 @@ struct B
 
 struct A
 {
-	B b;	
+	B b;
 	B& operator->()
 	{
 		return b;

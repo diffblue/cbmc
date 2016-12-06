@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: ILP construction for cycles containing user-placed fences 
+Module: ILP construction for cycles containing user-placed fences
         and resolution
 
 Author: Vincent Nimal
@@ -41,7 +41,7 @@ public:
 
   fence_user_def_insertert(instrumentert &instr, memory_modelt _model)
     :fence_insertert(instr, _model) {
-  }  
+  }
 };
 
 #endif

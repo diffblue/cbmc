@@ -15,7 +15,7 @@ class xmlt;
 void convert(
   const irept &irep,
   xmlt &xml);
-  
+
 void convert(
   const xmlt &xml,
   irept &irep);

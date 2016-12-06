@@ -35,11 +35,11 @@ protected:
   /* stack of callsites: provides functions and location in the goto-program */
   goto_programt::const_targetst callsite_stack;
 
-  bool resolve(const irep_idt& symb, 
-    symbol_exprt& goto_function, 
-    unsigned& stack_scope) 
+  bool resolve(const irep_idt& symb,
+    symbol_exprt& goto_function,
+    unsigned& stack_scope)
   {
-    message.debug() << "I resolve " << symb << " with " 
+    message.debug() << "I resolve " << symb << " with "
       << pointer_to_fun[symb].get_identifier() << messaget::eom;
     if(pointer_to_fun.find(symb)==pointer_to_fun.end())
       return false;
@@ -50,19 +50,19 @@ protected:
     }
   }
 
-  /* TODO: use the whole name rather than the base one, to avoid 
+  /* TODO: use the whole name rather than the base one, to avoid
      overwriting?
      Yes! Pure propagation of pointers only intra-proc. At call, arguments
      and pointed functions stored in the table -- no need to keep the match
      between two pointers inter-proc. */
-  bool add(const irep_idt& symb, const symbol_exprt& goto_function) 
+  bool add(const irep_idt& symb, const symbol_exprt& goto_function)
   {
     return add(symb, goto_function, callsite_stack.size());
   }
 
-  bool add(const irep_idt& symb, 
+  bool add(const irep_idt& symb,
     const symbol_exprt& goto_function,
-    unsigned scope) 
+    unsigned scope)
   {
     pointer_to_fun[symb]=goto_function;
     pointer_to_stack[symb]=scope;
@@ -93,7 +93,7 @@ protected:
 
   void propagate(const irep_idt& function);
 
-  void dup_caller_and_inline_callee(const symbol_exprt& function, 
+  void dup_caller_and_inline_callee(const symbol_exprt& function,
     unsigned stack_scope);
 
   /* to keep track of the constant function pointers passed as arguments */
@@ -106,20 +106,20 @@ protected:
     arg_stackt (const_function_pointer_propagationt& _cfpp)
       :cfpp(_cfpp)
     {}
-    void add_args(const symbol_exprt& const_function, 
+    void add_args(const symbol_exprt& const_function,
       goto_programt::instructionst::iterator it);
     void remove_args();
   };
 
 public:
-  const_function_pointer_propagationt(symbol_tablet& _symbol_table, 
+  const_function_pointer_propagationt(symbol_tablet& _symbol_table,
     goto_functionst& _goto_functions, messaget& _message)
-    :symbol_table(_symbol_table), goto_functions(_goto_functions), 
+    :symbol_table(_symbol_table), goto_functions(_goto_functions),
       ns(_symbol_table), message(_message)
   {}
 
   /* Note that it only propagates from MAIN, following the CFG, without
-     resolving non-constant function pointers. */ 
+     resolving non-constant function pointers. */
   void propagate() {
     propagate(goto_functionst::entry_point());
   }
@@ -129,7 +129,7 @@ public:
 
 Function:
 
-  Inputs: 'it' pointing to the callsite to update, 'function' the function 
+  Inputs: 'it' pointing to the callsite to update, 'function' the function
           actually called, 'stack_scope' the place where the constant was
           defined in the call stack
 
@@ -149,17 +149,17 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
      duplication */
   goto_programt::const_targetst new_callsite_stack;
 
-  goto_programt::const_targetst::const_iterator 
+  goto_programt::const_targetst::const_iterator
     callsite=callsite_stack.begin();
 
   std::string last_suffix="";
 
-  for(unsigned current_call=callsite_stack.size(); 
-    current_call>=stack_scope; 
+  for(unsigned current_call=callsite_stack.size();
+    current_call>=stack_scope;
     --current_call)
   {
-    message.debug() << "current_call=" << current_call << " stack_scope=" 
-      << stack_scope << " callsite_stack.size()=" << callsite_stack.size() 
+    message.debug() << "current_call=" << current_call << " stack_scope="
+      << stack_scope << " callsite_stack.size()=" << callsite_stack.size()
       << messaget::eom;
     assert(callsite!=callsite_stack.end());
 
@@ -169,7 +169,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
 
     goto_functionst::goto_functiont* pfunction_dup=&goto_functions
       .function_map[function_id];
-    
+
     std::string suffix="$";
 
     if(current_call>stack_scope)
@@ -186,7 +186,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       }
 
       /* creates a new, unique copy of the function */
-      message.debug() << "duplicate function: " << function_id 
+      message.debug() << "duplicate function: " << function_id
         << messaget::eom;
       const irep_idt function_new_id=id2string(function_id)+suffix;
 
@@ -221,27 +221,27 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       symbol_table.add(dup_fun_symb);
 
       goto_functions.update();
-      message.debug() << "new function " << function_new_id << " created." 
+      message.debug() << "new function " << function_new_id << " created."
         << messaget::eom;
-      message.debug() << "new function " 
+      message.debug() << "new function "
         << goto_functions.function_map[function_new_id].body.instructions
           .front().function << " created." << messaget::eom;
     }
 
-    if(current_call<callsite_stack.size()) 
+    if(current_call<callsite_stack.size())
     {
-      message.debug() << "we then modify the previous callers" 
+      message.debug() << "we then modify the previous callers"
         << messaget::eom;
 
       /* sets the call to the previous newly duplicated function */
       goto_programt::instructionst& new_instructions=
         pfunction_dup->body.instructions;
       goto_programt::targett it=new_instructions.begin();
-      // beurk -- should use location_number or something unique per 
+      // beurk -- should use location_number or something unique per
       // instruction but shared between two copies of a same goto-program
-      for(; it->source_location!=(*callsite)->source_location 
+      for(; it->source_location!=(*callsite)->source_location
         && it!=new_instructions.end(); ++it);
-      
+
       assert(it->source_location==(*callsite)->source_location);
       exprt& function_called=to_code_function_call(it->code).function();
       assert(function_called.id()==ID_symbol);
@@ -249,7 +249,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       symbol_fun_called.set_identifier(
         id2string(symbol_fun_called.get_identifier())+last_suffix);
 
-      /* removes the constant pointer from the arguments passed at call */ 
+      /* removes the constant pointer from the arguments passed at call */
       code_function_callt::argumentst& args=to_code_function_call(it->code)
         .arguments();
       for(code_function_callt::argumentst::iterator arg_it=args.begin();
@@ -259,20 +259,20 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
           const symbol_exprt& symb_arg=to_symbol_expr(*arg_it);
           if(symb_arg.get_identifier()==const_function.get_identifier()
             || (pointer_to_fun.find(symb_arg.get_identifier())
-              !=pointer_to_fun.end() 
+              !=pointer_to_fun.end()
               && pointer_to_fun[symb_arg.get_identifier()]==const_function) )
             args.erase(arg_it);
         }
         else if(arg_it->id()==ID_address_of) {
           const address_of_exprt& add_arg=to_address_of_expr(*arg_it);
-          if(add_arg.object().id()==ID_symbol 
+          if(add_arg.object().id()==ID_symbol
             && to_symbol_expr(add_arg.object()).get_identifier()
               ==const_function.get_identifier())
             args.erase(arg_it);
         }
       }
 
-      new_callsite_stack.push_back(it); 
+      new_callsite_stack.push_back(it);
     }
     else {
       message.debug() << "we first modify the first caller" << messaget::eom;
@@ -282,10 +282,10 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       goto_programt::instructionst& new_instructions=
         pfunction_dup->body.instructions;
       goto_programt::targett it=new_instructions.begin();
-      // beurk -- should use location_number or something unique per 
+      // beurk -- should use location_number or something unique per
       // instruction but shared between two copies of a same goto-program
-      for(; it->source_location!=(*callsite)->source_location 
-        && it!=new_instructions.end(); ++it); 
+      for(; it->source_location!=(*callsite)->source_location
+        && it!=new_instructions.end(); ++it);
 
       message.debug() << "callsite targetted: " << (*callsite)->source_location
         << " function: " << const_function.get_identifier() << messaget::eom;
@@ -302,9 +302,9 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   }
 
   /* and updates the call_stack and callsite_stack */
-  //new_callsite_stack.splice(new_callsite_stack.end(), callsite_stack, 
+  //new_callsite_stack.splice(new_callsite_stack.end(), callsite_stack,
   //  callsite, callsite_stack.end());
-  for(goto_programt::const_targetst::const_iterator it=callsite; 
+  for(goto_programt::const_targetst::const_iterator it=callsite;
     it!=callsite_stack.end(); ++it)
     new_callsite_stack.push_back(*it);
 
@@ -320,13 +320,13 @@ Function:
 
  Outputs:
 
- Purpose: adds const pointers (instantiated here or propagated) passed 
+ Purpose: adds const pointers (instantiated here or propagated) passed
           as arguments in the map
 
 \*******************************************************************/
 
 void const_function_pointer_propagationt::arg_stackt::add_args(
-  const symbol_exprt& const_function, 
+  const symbol_exprt& const_function,
   goto_programt::instructionst::iterator it)
 {
   /* if constant pointers passed as arguments, add the names of the parameters
@@ -375,13 +375,13 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
 
       cfpp.add(cor_arg_it->get_base_name(), arg_symbol_expr);
       insert(cor_arg_it->get_base_name());
-      cfpp.message.debug() << "SET: insert " << cor_arg_it->get_base_name() 
+      cfpp.message.debug() << "SET: insert " << cor_arg_it->get_base_name()
         << messaget::eom;
     }
     else {
-      cfpp.message.debug() << "fun: " << const_function.get_identifier() 
+      cfpp.message.debug() << "fun: " << const_function.get_identifier()
         << " - arg: (symb) " << cfpp.symbol_table
-          .lookup(to_symbol_expr(*arg_it).get_identifier()).base_name 
+          .lookup(to_symbol_expr(*arg_it).get_identifier()).base_name
         << messaget::eom;
 
       const symbol_exprt& arg_symbol_expr=to_symbol_expr(*arg_it);
@@ -392,7 +392,7 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
         cfpp.add(cor_arg_it->get_base_name(), cfpp.get(arg_symbol.base_name),
           cfpp.fun_id_to_invok[arg_symbol.base_name]);
         insert(cor_arg_it->get_base_name());
-        cfpp.message.debug() << "SET: insert " << cor_arg_it->get_base_name() 
+        cfpp.message.debug() << "SET: insert " << cor_arg_it->get_base_name()
           << messaget::eom;
       }
     }
@@ -432,7 +432,7 @@ Function:
 \*******************************************************************/
 
 void const_function_pointer_propagationt::propagate(
-  const irep_idt& function_id) 
+  const irep_idt& function_id)
 {
   if(goto_functions.function_map.find(function_id)
     ==goto_functions.function_map.end())
@@ -459,12 +459,12 @@ void const_function_pointer_propagationt::propagate(
         continue;
       const address_of_exprt& addr_rhs=to_address_of_expr(rhs);
 
-      if(addr_rhs.object().id()!=ID_symbol 
+      if(addr_rhs.object().id()!=ID_symbol
         || addr_rhs.object().type().id()!=ID_code)
         continue;
       const symbol_exprt& symbol_rhs=to_symbol_expr(addr_rhs.object());
 
-      /* lhs must be a pointer */        
+      /* lhs must be a pointer */
       if(lhs.id()!=ID_symbol || lhs.type().id()!=ID_pointer)
         continue;
       const symbol_exprt& symbol_expr_lhs=to_symbol_expr(lhs);
@@ -477,7 +477,7 @@ void const_function_pointer_propagationt::propagate(
       callsite_stack.push_front(it);
 
       const exprt& fun=to_code_function_call(it->code).function();
- 
+
       /* if it is a function pointer */
       if(fun.id()==ID_dereference) {
         const exprt& fun_pointer=to_dereference_expr(fun).pointer();
@@ -493,14 +493,14 @@ void const_function_pointer_propagationt::propagate(
         unsigned stack_scope=0;
 
         /* is it a constant pointer? */
-        if(resolve(fun_symbol.base_name, const_function, stack_scope)) 
+        if(resolve(fun_symbol.base_name, const_function, stack_scope))
         {
           /* saves the current context (stack of --unduplicated-- callsites) */
           goto_programt::const_targetst context(callsite_stack);
 
           /* it is. Inline it and explore it. */
           dup_caller_and_inline_callee(const_function, stack_scope);
-          message.debug() << "I substitute " << const_function.get_identifier() 
+          message.debug() << "I substitute " << const_function.get_identifier()
             << messaget::eom;
 
           arg_stackt arg_stack(*this);
@@ -523,7 +523,7 @@ void const_function_pointer_propagationt::propagate(
 
         /* just propagate */
         const symbol_exprt& fun_symbol_expr=to_symbol_expr(fun);
-        const irep_idt& fun_id=fun_symbol_expr.get_identifier(); 
+        const irep_idt& fun_id=fun_symbol_expr.get_identifier();
 
         arg_stackt arg_stack(*this);
         arg_stack.add_args(fun_symbol_expr, it);
@@ -558,13 +558,12 @@ Function:
 
 void propagate_const_function_pointers(
   symbol_tablet& symbol_table,
-  goto_functionst& goto_functions, 
+  goto_functionst& goto_functions,
   message_handlert& message_handler)
 {
   messaget message(message_handler);
-  const_function_pointer_propagationt propagation(symbol_table, 
+  const_function_pointer_propagationt propagation(symbol_table,
     goto_functions, message);
   propagation.propagate();
   goto_functions.update();
 }
-

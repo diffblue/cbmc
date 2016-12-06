@@ -23,6 +23,7 @@ src/util/irep_ids.inc
 # regression/test files
 *.out
 regression/ansi-c/tests.log
+regression/symex/tests.log
 regression/cbmc-java/tests.log
 regression/cbmc/tests.log
 src/big-int/test-bigint

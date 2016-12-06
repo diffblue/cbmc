@@ -1,8 +1,8 @@
-struct S { 
+struct S {
   char *Operator;
 };
 
-const struct S b1006_props = { 
+const struct S b1006_props = {
   .Operator = "OR"
 };
 

@@ -33,4 +33,3 @@ void *checkThread(void *param) {
 
   return 0;
 }
-

@@ -33,7 +33,7 @@ void bv_refinementt::post_process_arrays()
 {
   collect_indices();
   // at this point all indices should in the index set
-  
+
   // just build the data structure
   update_index_map(true);
 
@@ -58,7 +58,7 @@ Function: bv_refinementt::arrays_overapproximated
 void bv_refinementt::arrays_overapproximated()
 {
   if(!do_array_refinement) return;
-  
+
   unsigned nb_active = 0;
 
   std::list<lazy_constraintt>::iterator it = lazy_array_constraints.begin();
@@ -104,7 +104,7 @@ void bv_refinementt::arrays_overapproximated()
     {
     case decision_proceduret::D_SATISFIABLE:
       ++it;
-      break; 
+      break;
     case decision_proceduret::D_UNSATISFIABLE:
       prop.l_set_to_true(convert(current));
       nb_active++;
@@ -116,9 +116,9 @@ void bv_refinementt::arrays_overapproximated()
 
   }
 
-  debug() << "BV-Refinement: " << nb_active 
+  debug() << "BV-Refinement: " << nb_active
           << " array expressions become active" << eom;
-  debug() << "BV-Refinement: " << lazy_array_constraints.size() 
+  debug() << "BV-Refinement: " << lazy_array_constraints.size()
           << " inactive array expressions" << eom;
   if (nb_active > 0)
     progress = true;
@@ -141,7 +141,7 @@ void bv_refinementt::freeze_lazy_constraints()
 {
   if(!lazy_arrays) return;
 
-  for(std::list<lazy_constraintt>::iterator 
+  for(std::list<lazy_constraintt>::iterator
         l_it = lazy_array_constraints.begin();
       l_it != lazy_array_constraints.end(); ++l_it)
   {
@@ -151,7 +151,7 @@ void bv_refinementt::freeze_lazy_constraints()
         it != symbols.end(); ++it)
     {
       bvt bv = convert_bv(l_it->lazy);
-      forall_literals(b_it, bv) 
+      forall_literals(b_it, bv)
         if(!b_it->is_constant()) prop.set_frozen(*b_it);
     }
   }

@@ -12,7 +12,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 Function: memory_model_psot::operator()
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -26,7 +26,7 @@ void memory_model_psot::operator()(symex_target_equationt &equation)
 
   build_event_lists(equation);
   build_clock_type(equation);
-  
+
   read_from(equation);
   write_serialization_external(equation);
   program_order(equation);
@@ -67,4 +67,3 @@ bool memory_model_psot::program_order_is_relaxed(
   // only read/read and read/write are maintained
   return is_shared_write(e1);
 }
-

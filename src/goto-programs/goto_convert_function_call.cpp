@@ -62,17 +62,17 @@ void goto_convertt::do_function_call(
   goto_programt &dest)
 {
   // make it all side effect free
-  
+
   exprt new_lhs=lhs,
         new_function=function;
-  
+
   exprt::operandst new_arguments=arguments;
 
   if(!new_lhs.is_nil())
     clean_expr(new_lhs, dest);
 
   clean_expr(new_function, dest);
-  
+
   // the arguments of __noop do not get evaluated
   if(new_function.id()==ID_symbol &&
      to_symbol_expr(new_function).get_identifier()=="__noop")
@@ -212,7 +212,7 @@ void goto_convertt::do_function_call_other(
   function_call.lhs()=lhs;
   function_call.function()=function;
   function_call.arguments()=arguments;
-  
+
   t->source_location=function.source_location();
   t->code.swap(function_call);
 }

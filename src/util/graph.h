@@ -31,12 +31,12 @@ public:
   typedef std::map<node_indext, edget> edgest;
 
   edgest in, out;
-  
+
   inline void add_in(node_indext n)
   {
     in.insert(std::pair<node_indext, edget>(n, edget()));
   }
-  
+
   inline void add_out(node_indext n)
   {
     out.insert(std::pair<node_indext, edget>(n, edget()));
@@ -46,7 +46,7 @@ public:
   {
     in.erase(n);
   }
-  
+
   inline void erase_out(node_indext n)
   {
     out.erase(n);
@@ -77,7 +77,7 @@ void intersection(
   typename graph_nodet<E>::edgest &dest)
 {
   typename graph_nodet<E>::edgest::const_iterator
-    it_a=a.begin(), 
+    it_a=a.begin(),
     it_b=b.begin();
 
   while(it_a!=a.end() && it_b!=b.end())
@@ -95,7 +95,7 @@ void intersection(
   }
 }
 
-// a generic graph class with a parametric node type  
+// a generic graph class with a parametric node type
 template<class N=graph_nodet<empty_edget> >
 class graph
 {
@@ -108,7 +108,7 @@ public:
 
 protected:
   nodest nodes;
-  
+
 public:
   inline node_indext add_node()
   {
@@ -116,7 +116,7 @@ public:
     nodes.push_back(nodet());
     return no;
   }
-  
+
   inline void swap(graph &other)
   {
     nodes.swap(other.nodes);
@@ -136,17 +136,17 @@ public:
   {
     return nodes[n];
   }
-  
+
   inline void resize(node_indext s)
   {
     nodes.resize(s);
   }
-  
+
   inline std::size_t size() const
   {
     return nodes.size();
   }
-  
+
   inline const edgest &in(node_indext n) const
   {
     return nodes[n].in;
@@ -156,19 +156,19 @@ public:
   {
     return nodes[n].out;
   }
-  
+
   inline void add_edge(node_indext a, node_indext b)
   {
     nodes[a].add_out(b);
     nodes[b].add_in(a);
   }
-  
+
   inline void remove_edge(node_indext a, node_indext b)
   {
     nodes[a].erase_out(b);
     nodes[b].erase_in(a);
   }
-  
+
   inline edget &edge(node_indext a, node_indext b)
   {
     return nodes[a].out[b];
@@ -178,20 +178,20 @@ public:
   void remove_undirected_edge(node_indext a, node_indext b);
   void remove_in_edges(node_indext n);
   void remove_out_edges(node_indext n);
-  
+
   inline void remove_edges(node_indext n)
   {
     remove_in_edges(n);
     remove_out_edges(n);
   }
-  
+
   inline void clear()
   {
     nodes.clear();
   }
-  
+
   typedef std::list<node_indext> patht;
-  
+
   inline void shortest_path(
     node_indext src,
     node_indext dest,
@@ -206,18 +206,18 @@ public:
   {
     shortest_path(node, node, path, true);
   }
-    
+
   void visit_reachable(node_indext src);
-  
+
   void make_chordal();
-  
+
   // return value: number of connected subgraphs
   std::size_t connected_subgraphs(
     std::vector<node_indext> &subgraph_nr);
 
   // return value: number of SCCs
   std::size_t SCCs(std::vector<node_indext> &subgraph_nr);
-  
+
   void output_dot(std::ostream &out) const;
   void output_dot_node(std::ostream &out, node_indext n) const;
 
@@ -243,7 +243,7 @@ protected:
       in_scc.resize(n, false);
       max_dfs=scc_count=0;
       subgraph_nr.resize(n, 0);
-    }  
+    }
   };
 
   void tarjan(class tarjant &t, node_indext v);
@@ -291,8 +291,8 @@ Function: graph::remove_undirected_edge
  Purpose:
 
 \*******************************************************************/
- 
-template<class N> 
+
+template<class N>
 void graph<N>::remove_undirected_edge(node_indext a, node_indext b)
 {
   nodet &na=nodes[a];
@@ -319,14 +319,14 @@ template<class N>
 void graph<N>::remove_in_edges(node_indext n)
 {
   nodet &node=nodes[n];
-  
+
   // delete all incoming edges
   for(typename edgest::const_iterator
       it=node.in.begin();
       it!=node.in.end();
       it++)
     nodes[it->first].erase_out(n);
-    
+
   node.in.clear();
 }
 
@@ -346,14 +346,14 @@ template<class N>
 void graph<N>::remove_out_edges(node_indext n)
 {
   nodet &node=nodes[n];
-  
+
   // delete all outgoing edges
   for(typename edgest::const_iterator
       it=node.out.begin();
       it!=node.out.end();
       it++)
     nodes[it->first].erase_in(n);
-  
+
   node.out.clear();
 }
 
@@ -379,7 +379,7 @@ void graph<N>::shortest_path(
   std::vector<bool> visited;
   std::vector<unsigned> distance;
   std::vector<unsigned> previous;
-  
+
   // initialization
   visited.resize(nodes.size(), false);
   distance.resize(nodes.size(), (unsigned)(-1));
@@ -394,21 +394,21 @@ void graph<N>::shortest_path(
   // does BFS, not Dijkstra
   // we hope the graph is sparse
   std::vector<node_indext> frontier_set, new_frontier_set;
-  
+
   frontier_set.reserve(nodes.size());
 
   frontier_set.push_back(src);
-  
+
   unsigned d=0;
   bool found=false;
-  
+
   while(!frontier_set.empty() && !found)
   {
     d++;
-  
+
     new_frontier_set.clear();
     new_frontier_set.reserve(nodes.size());
-  
+
     for(typename std::vector<node_indext>::const_iterator
         f_it=frontier_set.begin();
         f_it!=frontier_set.end() && !found;
@@ -416,7 +416,7 @@ void graph<N>::shortest_path(
     {
       node_indext i=*f_it;
       const nodet &n=nodes[i];
-      
+
       // do all neighbors
       for(typename edgest::const_iterator
           o_it=n.out.begin();
@@ -424,7 +424,7 @@ void graph<N>::shortest_path(
           o_it++)
       {
         node_indext o=o_it->first;
-      
+
         if(!visited[o])
         {
           distance[o]=d;
@@ -438,14 +438,14 @@ void graph<N>::shortest_path(
         }
       }
     }
-    
+
     frontier_set.swap(new_frontier_set);
   }
-  
+
   // compute path
   // walk towards 0-distance node
   path.clear();
-  
+
   // reachable at all?
   if(distance[dest]==(unsigned)(-1))
     return; // nah
@@ -514,12 +514,12 @@ std::size_t graph<N>::connected_subgraphs(
   std::vector<node_indext> &subgraph_nr)
 {
   std::vector<bool> visited;
-  
+
   visited.resize(nodes.size(), false);
   subgraph_nr.resize(nodes.size(), 0);
 
   std::size_t nr=0;
-  
+
   for(node_indext src=0; src<size(); src++)
   {
     if(visited[src]) continue;
@@ -533,7 +533,7 @@ std::size_t graph<N>::connected_subgraphs(
     {
       node_indext n=s.top();
       s.pop();
-      
+
       visited[n]=true;
       subgraph_nr[n]=nr;
 
@@ -586,7 +586,7 @@ void graph<N>::tarjan(tarjant &t, node_indext v)
     {
       tarjan(t, vp);
       t.lowlink[v]=std::min(t.lowlink[v], t.lowlink[vp]);
-    }       
+    }
     else if(t.in_scc[vp])
       t.lowlink[v]=std::min(t.lowlink[v], t.depth[vp]);
   }

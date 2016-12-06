@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -66,7 +66,7 @@ code_blockt &codet::make_block()
   *this=codet();
   set_statement(ID_block);
   move_to_operands(tmp);
-  
+
   return static_cast<code_blockt &>(*this);
 }
 

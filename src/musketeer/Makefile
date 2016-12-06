@@ -51,4 +51,3 @@ musketeer$(EXEEXT): $(OBJ)
 
 musketeer-mac-signed: musketeer$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) musketeer$(EXEEXT)
-

@@ -15,7 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 Function: memory_model_tsot::operator()
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -29,7 +29,7 @@ void memory_model_tsot::operator()(symex_target_equationt &equation)
 
   build_event_lists(equation);
   build_clock_type(equation);
-  
+
   read_from(equation);
   write_serialization_external(equation);
   program_order(equation);
@@ -42,7 +42,7 @@ void memory_model_tsot::operator()(symex_target_equationt &equation)
 
 Function: memory_model_tsot::before
 
-  Inputs: 
+  Inputs:
 
  Outputs:
 
@@ -103,7 +103,7 @@ void memory_model_tsot::program_order(
   build_per_thread_map(equation, per_thread_map);
 
   thread_spawn(equation, per_thread_map);
-  
+
   // iterate over threads
 
   for(per_thread_mapt::const_iterator
@@ -112,9 +112,9 @@ void memory_model_tsot::program_order(
       t_it++)
   {
     const event_listt &events=t_it->second;
-    
+
     // iterate over relevant events in the thread
-    
+
     for(event_listt::const_iterator
         e_it=events.begin();
         e_it!=events.end();
@@ -208,4 +208,3 @@ void memory_model_tsot::program_order(
     }
   }
 }
-

@@ -79,7 +79,7 @@ library_check: library/*.c
 		[ $$ec -eq 0 ] || exit $$ec ; \
 	done
 	touch $@
-	
+
 cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	cat library/*.c | library/converter$(EXEEXT) > $@
 
@@ -108,6 +108,5 @@ generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
 
 ###############################################################################
 
-ansi-c$(LIBEXT): $(OBJ) 
+ansi-c$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

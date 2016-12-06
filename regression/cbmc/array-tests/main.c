@@ -60,25 +60,25 @@ int main (void) {
 
     /*** Direct use ***/
     // No changes
-    
+
     // Constant accesss : should simplify away
     assert(uninitialisedGlobalArray1[31] == 0);
     assert(uninitialisedGlobalArray1[23] == 0);
     assert(uninitialisedGlobalArray2[37] == 0);
-    
+
     assert(initialisedUniform1[11] == 0);
     assert(initialisedUniform2[13] == 0);
     assert(initialisedUniform2[15] == 0);
     assert(initialisedUniform3[17] == 1);
-    
+
     assert(initialisedNonUniform1[3] == 3);
     assert(initialisedNonUniform1[5] == 5);
     assert(initialisedNonUniform2[7] == 7);
     assert(initialisedNonUniform3[9] == 6);
-    
+
     // Variable access
     int directUseReadLocation[8]; // Non-det
-    
+
     if (0 <= directUseReadLocation[0] &&
 	directUseReadLocation[0] < 256)
       assert(uninitialisedGlobalArray1[directUseReadLocation[0]] == 0);
@@ -108,7 +108,7 @@ int main (void) {
 
 
   } else if (test == 1) {
-    
+
     /*** Constant redundant update ***/
     // Updates should simplify away.
     // Shouldn't require array_of to array conversion.
@@ -117,7 +117,7 @@ int main (void) {
     uninitialisedGlobalArray1[23] = 0;
     uninitialisedGlobalArray1[33] = 0;
     uninitialisedGlobalArray2[63] = 0;
-    
+
     initialisedUniform1[13] = 0;
     initialisedUniform2[11] = 0;
     initialisedUniform2[15] = 0;
@@ -129,7 +129,7 @@ int main (void) {
     // These two check write re-ordering and coalescing
     initialisedNonUniform1[2] = 11;
     initialisedNonUniform1[3] = 25;
-    
+
     initialisedNonUniform1[2] = 2;
     initialisedNonUniform1[3] = 3;
     initialisedNonUniform1[4] = 4;
@@ -146,15 +146,15 @@ int main (void) {
     assert(initialisedUniform2[13] == 0);
     assert(initialisedUniform2[15] == 0);
     assert(initialisedUniform3[17] == 1);
-    
+
     assert(initialisedNonUniform1[3] == 3);
     assert(initialisedNonUniform1[5] == 5);
     assert(initialisedNonUniform2[7] == 7);
     assert(initialisedNonUniform3[9] == 6);
-    
+
     // Variable access
     int constantRedundantUpdateReadLocation[8]; // Non-det
-    
+
     if (0 <= constantRedundantUpdateReadLocation[0] &&
 	constantRedundantUpdateReadLocation[0] < 256)
       assert(uninitialisedGlobalArray1[constantRedundantUpdateReadLocation[0]] == 0);
@@ -191,7 +191,7 @@ int main (void) {
     uninitialisedGlobalArray1[23] = 2;
     uninitialisedGlobalArray1[53] = 3;
     uninitialisedGlobalArray2[62] = 4;
-        
+
     initialisedUniform1[12] = 1;
     initialisedUniform2[10] = 1;
     initialisedUniform2[15] = 1;
@@ -199,16 +199,16 @@ int main (void) {
     initialisedUniform3[13] = 0;
     initialisedUniform3[15] = 0;
     initialisedUniform3[17] = 0;
-        
+
     initialisedNonUniform1[2] = -2;
     initialisedNonUniform1[3] = -3;
     initialisedNonUniform1[7] = -4;
     initialisedNonUniform2[3] = 11;
     initialisedNonUniform3[9] = 11;
     initialisedNonUniform3[7] = 10;
-    
 
-    
+
+
     // Constant accesss : should still simplify away
     assert(uninitialisedGlobalArray1[31] == 0);
     assert(uninitialisedGlobalArray1[23] == 2);
@@ -226,7 +226,7 @@ int main (void) {
 
     // Variable access
     int constantNonRedundantUpdateReadLocation[8]; // Non-det
-    
+
     if (0 <= constantNonRedundantUpdateReadLocation[0] &&
 	constantNonRedundantUpdateReadLocation[0] < 5)
       assert(uninitialisedGlobalArray1[constantNonRedundantUpdateReadLocation[0]] == 0);
@@ -268,9 +268,9 @@ int main (void) {
     //   context-free rewriter.
     // * For the non-uniform arrays some complex reasoning is needed.
     // * Simplification across Phi nodes is needed as well
-    
+
     int redundantWriteLocation[16];
-    
+
     if (0 <= redundantWriteLocation[0] &&
 	redundantWriteLocation[0] < 256)
       uninitialisedGlobalArray1[redundantWriteLocation[0]] = 0;
@@ -283,7 +283,7 @@ int main (void) {
 	redundantWriteLocation[2] < 256)
       uninitialisedGlobalArray2[redundantWriteLocation[2]] = 0;
 
-    
+
 
     if (0 <= redundantWriteLocation[3] &&
 	redundantWriteLocation[3] < 64)
@@ -323,7 +323,7 @@ int main (void) {
       // Check write coallescing and reordering
       // Can re-order writes if the indexes being equal implies the
       // values are equal.
-      
+
       initialisedNonUniform1[redundantWriteLocation[10]] = 29;
       initialisedNonUniform1[redundantWriteLocation[11]] = 29;
 
@@ -351,8 +351,8 @@ int main (void) {
     // If the array is simplified then this should simplify as well
     // If not then they likely won't and thus an example of a constant
     // index into a non-constant (but completely known) array.
-    
- 
+
+
     assert(uninitialisedGlobalArray1[31] == 0);
     assert(uninitialisedGlobalArray1[23] == 0);
     assert(uninitialisedGlobalArray2[37] == 0);
@@ -361,16 +361,16 @@ int main (void) {
     assert(initialisedUniform2[13] == 0);
     assert(initialisedUniform2[15] == 0);
     assert(initialisedUniform3[17] == 1);
-    
+
     assert(initialisedNonUniform1[3] == 3);
     assert(initialisedNonUniform1[5] == 5);
     assert(initialisedNonUniform2[7] == 7);
     assert(initialisedNonUniform3[9] == 6);
 
-    
+
     // Variable access
     int variableRedundantUpdateReadLocation[8]; // Non-det
-    
+
     if (0 <= variableRedundantUpdateReadLocation[0] &&
 	variableRedundantUpdateReadLocation[0] < 256)
       assert(uninitialisedGlobalArray1[variableRedundantUpdateReadLocation[0]] == 0);
@@ -398,14 +398,14 @@ int main (void) {
 	variableRedundantUpdateReadLocation[7] < 16)
       assert(initialisedNonUniform3[variableRedundantUpdateReadLocation[7]] == 15 - variableRedundantUpdateReadLocation[7]);
 
-     
+
   } else if (test == 4) {
 
     /*** Variable non-redundant update ***/
     // No obvious simplifications to writes
 
     int nonRedundantWriteLocation[16];
-    
+
     if (0 <= nonRedundantWriteLocation[0] &&
 	nonRedundantWriteLocation[0] < 256 &&
 	nonRedundantWriteLocation[0] != 31)
@@ -421,7 +421,7 @@ int main (void) {
 	nonRedundantWriteLocation[2] < 256)
       uninitialisedGlobalArray2[nonRedundantWriteLocation[2]] = (nonRedundantWriteLocation[2] & 0xFF);
 
-    
+
 
     if (0 <= nonRedundantWriteLocation[3] &&
 	nonRedundantWriteLocation[3] < 10)
@@ -464,7 +464,7 @@ int main (void) {
       // Check write coallescing and reordering
       // Can re-order writes if the indexes being equal implies the
       // values are equal.
-      
+
       initialisedNonUniform1[nonRedundantWriteLocation[10]] = 29;
       initialisedNonUniform1[nonRedundantWriteLocation[11]] = 29;
 
@@ -487,7 +487,7 @@ int main (void) {
       initialisedNonUniform3[nonRedundantWriteLocation[15]] += 1;
     }
 
-    
+
     // Constant access
     // Again, constant index into a fully known but non-constant array
     assert(uninitialisedGlobalArray1[31] == 0);
@@ -498,7 +498,7 @@ int main (void) {
     assert((initialisedUniform2[13] & 0xE) == 0);
     assert(initialisedUniform2[15] == 0);
     assert(initialisedUniform3[17] == 1);
-    
+
     assert(initialisedNonUniform1[3] - 2 >= 0);
     assert(initialisedNonUniform1[5] - 4 >= 0);
     assert(initialisedNonUniform2[7] == 7);
@@ -506,7 +506,7 @@ int main (void) {
 
     // Variable access
     int variableNonRedundantUpdateReadLocation[8]; // Non-det
-    
+
     if (0 <= variableNonRedundantUpdateReadLocation[0] &&
 	variableNonRedundantUpdateReadLocation[0] < 256)
       assert(uninitialisedGlobalArray1[variableNonRedundantUpdateReadLocation[0]] >= 0);
@@ -541,4 +541,3 @@ int main (void) {
 
   return 0;
 }
-

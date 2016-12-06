@@ -10,7 +10,7 @@ int main()
 {
   std::string line;
   bool first=true;
-  
+
   std::cout << "{\n";
 
   while(getline(std::cin, line))
@@ -18,7 +18,7 @@ int main()
     if(has_prefix(line, "/* FUNCTION: "))
     {
       if(first) first=false; else std::cout << "},\n";
-    
+
       std::string function=std::string(line, 13, std::string::npos);
       std::size_t pos=function.find(' ');
       if(pos!=std::string::npos) function=std::string(function, 0, pos);
@@ -29,7 +29,7 @@ int main()
     else if(!first)
     {
       std::cout << "  \"";
-      
+
       for(unsigned i=0; i<line.size(); i++)
       {
         const char ch=line[i];
@@ -43,14 +43,14 @@ int main()
         else
           std::cout << ch;
       }
-      
+
       std::cout << "\\n\"" << std::endl;
     }
   }
-  
+
   if(!first) std::cout << "},\n";
 
-  std::cout << 
+  std::cout <<
     "{ 0, 0 }\n"
     "}";
 }

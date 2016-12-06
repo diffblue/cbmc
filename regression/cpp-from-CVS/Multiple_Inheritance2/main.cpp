@@ -12,4 +12,3 @@ int main()
 	d.i = 10;
 	assert(d.i == 10);
 }
-

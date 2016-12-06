@@ -75,7 +75,7 @@ Function: dimacs_cnft::write_problem_line
 void dimacs_cnft::write_problem_line(std::ostream &out)
 {
   // We start counting at 1, thus there is one variable fewer.
-  out << "p cnf " << (no_variables()-1) << " " 
+  out << "p cnf " << (no_variables()-1) << " "
       << clauses.size() << "\n";
 }
 
@@ -102,9 +102,9 @@ static void write_dimacs_clause(
   // this format allows clauses to be on multiple lines."
   // Some historic solvers (zchaff e.g.) have silently swallowed
   // literals in clauses that exceed some fixed buffer size.
-  
+
   // However, the SAT competition format does not allow line
-  // breaks in clauses, so we offer both options. 
+  // breaks in clauses, so we offer both options.
 
   for(size_t j=0; j<clause.size(); j++)
   {
@@ -151,4 +151,3 @@ void dimacs_cnf_dumpt::lcnf(const bvt &bv)
 {
   write_dimacs_clause(bv, out, true);
 }
-

@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: message_streamt::error_parse_line
+Function: legacy_message_streamt::error_parse_line
 
   Inputs:
 
@@ -23,7 +23,7 @@ Function: message_streamt::error_parse_line
 
 \*******************************************************************/
 
-void message_streamt::error_parse_line(
+void legacy_message_streamt::error_parse_line(
   unsigned level,
   const std::string &line)
 {
@@ -144,7 +144,7 @@ void message_streamt::error_parse_line(
 
 /*******************************************************************\
 
-Function: message_streamt::error_parse
+Function: legacy_message_streamt::error_parse
 
   Inputs:
 
@@ -154,7 +154,7 @@ Function: message_streamt::error_parse
 
 \*******************************************************************/
 
-void message_streamt::error_parse(
+void legacy_message_streamt::error_parse(
   unsigned level,
   const std::string &error)
 {
@@ -180,4 +180,3 @@ void message_streamt::error_parse(
     tptr++;
   }
 }
-

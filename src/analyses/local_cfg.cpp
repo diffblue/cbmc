@@ -29,7 +29,7 @@ Function: local_cfgt::build
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -37,9 +37,9 @@ void local_cfgt::build(const goto_programt &goto_program)
 {
   nodes.resize(goto_program.instructions.size());
 
-  {  
+  {
     node_nrt loc_nr=0;
-  
+
     for(goto_programt::const_targett it=goto_program.instructions.begin();
         it!=goto_program.instructions.end();
         it++, loc_nr++)
@@ -53,36 +53,36 @@ void local_cfgt::build(const goto_programt &goto_program)
   {
     nodet &node=nodes[loc_nr];
     const goto_programt::instructiont &instruction=*node.t;
-    
+
     switch(instruction.type)
     {
     case GOTO:
       if(!instruction.guard.is_true())
         node.successors.push_back(loc_nr+1);
-        
+
       for(goto_programt::targetst::const_iterator
           t_it=instruction.targets.begin();
           t_it!=instruction.targets.end();
           t_it++)
       {
         node_nrt l=loc_map.find(*t_it)->second;
-        node.successors.push_back(l); 
+        node.successors.push_back(l);
       }
       break;
-      
+
     case START_THREAD:
       node.successors.push_back(loc_nr+1);
-        
+
       for(goto_programt::targetst::const_iterator
           t_it=instruction.targets.begin();
           t_it!=instruction.targets.end();
           t_it++)
       {
         node_nrt l=loc_map.find(*t_it)->second;
-        node.successors.push_back(l); 
+        node.successors.push_back(l);
       }
       break;
-      
+
     case THROW:
     case END_FUNCTION:
     case END_THREAD:
@@ -91,6 +91,5 @@ void local_cfgt::build(const goto_programt &goto_program)
     default:
       node.successors.push_back(loc_nr+1);
     }
-  }  
+  }
 }
-

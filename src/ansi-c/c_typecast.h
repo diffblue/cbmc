@@ -56,13 +56,13 @@ public:
   virtual void implicit_typecast_arithmetic(
     exprt &expr1,
     exprt &expr2);
-  
+
   std::list<std::string> errors;
   std::list<std::string> warnings;
 
 protected:
   const namespacet &ns;
-  
+
   // these are in promotion order
 
   enum c_typet { BOOL,
@@ -83,7 +83,7 @@ protected:
   void implicit_typecast_arithmetic(
     exprt &expr,
     c_typet c_type);
-  
+
   typet follow_with_qualifiers(const typet &src);
 
   // after follow_with_qualifiers

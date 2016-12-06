@@ -157,4 +157,3 @@ STATIC_ASSERT(
 int main()
 {
 }
-

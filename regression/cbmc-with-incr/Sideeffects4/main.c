@@ -11,10 +11,10 @@ _Bool my_f()
 int main()
 {
   // side-effect in ?:
-  glob=0;  
-  result=glob?1:my_f();  
+  glob=0;
+  result=glob?1:my_f();
   assert(result==0);
-  
+
   // side-effect in ||
   glob=0;
   result=glob||my_f();
@@ -24,9 +24,9 @@ int main()
   glob=0;
   result=glob||(0+my_f());
   assert(result==0);
-  
+
   // another variant of this
-  int r, c=1;  
+  int r, c=1;
   r=c?(c=0, 10):20;
   assert(c==0 && r==10);
 }

@@ -34,7 +34,7 @@ void instrument_intervals(
     find_symbols(i_it->code, symbols);
     find_symbols(i_it->guard, symbols);
   }
-  
+
   Forall_goto_program_instructions(i_it, goto_function.body)
   {
     if(i_it==goto_function.body.instructions.begin())
@@ -60,7 +60,7 @@ void instrument_intervals(
       else
         continue; // don't instrument
     }
-  
+
     const interval_domaint &d=interval_analysis[i_it];
 
     exprt::operandst assertion;
@@ -74,7 +74,7 @@ void instrument_intervals(
       if(!tmp.is_true())
         assertion.push_back(tmp);
     }
-    
+
     if(!assertion.empty())
     {
       goto_programt::targett t=i_it;
@@ -104,7 +104,7 @@ void interval_analysis(
   goto_functionst &goto_functions)
 {
   ait<interval_domaint> interval_analysis;
-  
+
   interval_analysis(goto_functions, ns);
 
   Forall_goto_functions(f_it, goto_functions)

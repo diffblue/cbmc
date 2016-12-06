@@ -80,7 +80,7 @@ bvt boolbvt::convert_case(const exprt &expr)
       what=VALUE;
       break;
 
-    case VALUE: 
+    case VALUE:
       if(bv.size()!=op.size())
       {
         std::cerr << "result size: " << bv.size()
@@ -106,7 +106,6 @@ bvt boolbvt::convert_case(const exprt &expr)
       assert(false);
     }
   }
-  
+
   return bv;
 }
-

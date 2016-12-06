@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: ILP construction for cycles affecting user-assertions 
+Module: ILP construction for cycles affecting user-assertions
         and resolution
 
 Author: Vincent Nimal
@@ -22,7 +22,7 @@ Function:
 \*******************************************************************/
 
 bool fence_user_def_insertert::contains_user_def(
-  const event_grapht::critical_cyclet& cycle) const 
+  const event_grapht::critical_cyclet& cycle) const
 {
   /* DEPRECATED: user-inserted fences now detected at cycle collection */
   #if 0
@@ -35,7 +35,7 @@ bool fence_user_def_insertert::contains_user_def(
   /* we collect the fences back in the graph; indeed, in the cycles we extract,
      it is possible that some lwfence have been ignored, as they had no effect
      (in the case of WR) */
-  #endif  
+  #endif
 
   return cycle.has_user_defined_fence;
 }

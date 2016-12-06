@@ -90,15 +90,15 @@ void interval_domaint::transform(
   case DECL:
     havoc_rec(to_code_decl(instruction.code).symbol());
     break;
-    
+
   case DEAD:
     havoc_rec(to_code_dead(instruction.code).symbol());
     break;
-  
+
   case ASSIGN:
     assign(to_code_assign(instruction.code));
     break;
-  
+
   case GOTO:
     {
       locationt next=from;
@@ -109,11 +109,11 @@ void interval_domaint::transform(
         assume(instruction.guard, ns);
     }
     break;
-  
+
   case ASSUME:
     assume(instruction.guard, ns);
     break;
-  
+
   case FUNCTION_CALL:
     {
       const code_function_callt &code_function_call=
@@ -122,7 +122,7 @@ void interval_domaint::transform(
         havoc_rec(code_function_call.lhs());
     }
     break;
-  
+
   default:;
   }
 }
@@ -163,7 +163,7 @@ bool interval_domaint::merge(
       integer_intervalt previous=it->second;
       it->second.join(b_it->second);
       if(it->second!=previous) result=true;
-        
+
       it++;
     }
   }
@@ -182,7 +182,7 @@ bool interval_domaint::merge(
       ieee_float_intervalt previous=it->second;
       it->second.join(b_it->second);
       if(it->second!=previous) result=true;
-        
+
       it++;
     }
   }
@@ -269,27 +269,27 @@ void interval_domaint::assume_rec(
     assume_rec(lhs, ID_le, rhs);
     return;
   }
-  
+
   if(id==ID_notequal)
     return; // won't do split
-  
+
   if(id==ID_ge)
-    return assume_rec(rhs, ID_le, lhs);    
-    
+    return assume_rec(rhs, ID_le, lhs);
+
   if(id==ID_gt)
-    return assume_rec(rhs, ID_lt, lhs);    
+    return assume_rec(rhs, ID_lt, lhs);
 
   // we now have lhs <  rhs or
   //             lhs <= rhs
 
   assert(id==ID_lt || id==ID_le);
 
-  #ifdef DEBUG  
-  std::cout << "assume_rec: " 
+  #ifdef DEBUG
+  std::cout << "assume_rec: "
             << from_expr(lhs) << " " << id << " "
             << from_expr(rhs) << "\n";
   #endif
-  
+
   if(lhs.id()==ID_symbol && rhs.id()==ID_constant)
   {
     irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
@@ -315,7 +315,7 @@ void interval_domaint::assume_rec(
   else if(lhs.id()==ID_constant && rhs.id()==ID_symbol)
   {
     irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
-    
+
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
       mp_integer tmp;
@@ -338,7 +338,7 @@ void interval_domaint::assume_rec(
   {
     irep_idt lhs_identifier=to_symbol_expr(lhs).get_identifier();
     irep_idt rhs_identifier=to_symbol_expr(rhs).get_identifier();
-    
+
     if(is_int(lhs.type()) && is_int(rhs.type()))
     {
       integer_intervalt &lhs_i=int_map[lhs_identifier];
@@ -459,18 +459,18 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
 
     exprt::operandst conjuncts;
 
-    if(interval.upper_set) 
+    if(interval.upper_set)
     {
       exprt tmp=from_integer(interval.upper, src.type());
       conjuncts.push_back(binary_relation_exprt(src, ID_le, tmp));
     }
 
-    if(interval.lower_set) 
+    if(interval.lower_set)
     {
       exprt tmp=from_integer(interval.lower, src.type());
       conjuncts.push_back(binary_relation_exprt(tmp, ID_le, src));
     }
-  
+
     return conjunction(conjuncts);
   }
   else if(is_float(src.type()))
@@ -483,18 +483,18 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
 
     exprt::operandst conjuncts;
 
-    if(interval.upper_set) 
+    if(interval.upper_set)
     {
       exprt tmp=interval.upper.to_expr();
       conjuncts.push_back(binary_relation_exprt(src, ID_le, tmp));
     }
 
-    if(interval.lower_set) 
+    if(interval.lower_set)
     {
       exprt tmp=interval.lower.to_expr();
       conjuncts.push_back(binary_relation_exprt(tmp, ID_le, src));
     }
-  
+
     return conjunction(conjuncts);
   }
   else

@@ -29,7 +29,7 @@ public:
     instructionst::const_iterator it) const;
 
   goto_programt() { }
-  
+
   // get the variables in decl statements
   typedef std::set<irep_idt> decl_identifierst;
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
@@ -44,7 +44,7 @@ public:
   for(goto_programt::instructionst::iterator \
       it=(program).instructions.begin(); \
       it!=(program).instructions.end(); it++)
- 
+
 extern inline bool operator<(const goto_programt::const_targett i1,
                              const goto_programt::const_targett i2)
 {

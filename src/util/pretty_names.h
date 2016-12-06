@@ -24,12 +24,12 @@ class pretty_namest
  public:
   typedef std::set<irep_idt> symbolst;
   typedef std::map<irep_idt, irep_idt> pretty_mapt;
-  
+
   pretty_mapt pretty_map;
 
   void get_pretty_names(const symbolst &symbols,
                         const namespacet &ns);
-  
+
   const irep_idt &pretty_name(const irep_idt &identifier) const;
 };
 #endif

@@ -21,4 +21,3 @@ int main()
   assert(i==1); // should fail, as there are two threads
   assert(i==2); // should pass
 }
-

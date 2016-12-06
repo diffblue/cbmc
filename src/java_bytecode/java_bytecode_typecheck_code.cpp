@@ -21,15 +21,15 @@ Function: java_bytecode_typecheckt::typecheck_code
 \*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_code(codet &code)
-{ 
+{
   const irep_idt &statement=code.get_statement();
-  
+
   if(statement==ID_assign)
   {
     code_assignt &code_assign=to_code_assign(code);
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
-    
+
     if(code_assign.lhs().type()!=code_assign.rhs().type())
       code_assign.rhs().make_typecast(code_assign.lhs().type());
   }
@@ -69,7 +69,7 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
     code_function_callt &code_function_call=to_code_function_call(code);
     typecheck_expr(code_function_call.lhs());
     typecheck_expr(code_function_call.function());
-    
+
     for(code_function_callt::argumentst::iterator
         a_it=code_function_call.arguments().begin();
         a_it!=code_function_call.arguments().end();
@@ -77,4 +77,3 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
       typecheck_expr(*a_it);
   }
 }
-

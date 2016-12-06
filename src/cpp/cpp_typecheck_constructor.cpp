@@ -260,7 +260,7 @@ void cpp_typecheckt::default_cpctor(
   exprt param_name(ID_name);
   param_name.add_source_location()=source_location;
   param_name.set(ID_identifier, param_identifier);
-  
+
   cpp_namet cpp_parameter;
   cpp_parameter.move_to_sub(param_name);
 
@@ -335,11 +335,11 @@ void cpp_typecheckt::default_cpctor(
       exprt name(ID_name);
       name.set(ID_identifier,mem_it->get(ID_base_name));
       name.add_source_location()=source_location;
-      
+
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
-      const symbolt &virtual_table_symbol_type = 
+      const symbolt &virtual_table_symbol_type =
         namespacet(symbol_table).lookup(mem_it->type().subtype().get(ID_identifier));
 
       const symbolt &virtual_table_symbol_var  =
@@ -545,7 +545,7 @@ void cpp_typecheckt::default_assignop_value(
         // throw 0;
         continue;
       }
-  
+
       mp_integer size;
       bool to_int = to_integer(size_expr, size);
       assert(!to_int);
@@ -827,7 +827,7 @@ void cpp_typecheckt::full_member_initialization(
           for(struct_typet::componentst::const_iterator c_it =
               components.begin(); c_it != components.end(); c_it++)
           {
-            if(c_it->get(ID_base_name)==base_name && 
+            if(c_it->get(ID_base_name)==base_name &&
                c_it->get(ID_type)!=ID_code &&
                !c_it->get_bool(ID_is_type))
             {
@@ -909,11 +909,11 @@ void cpp_typecheckt::full_member_initialization(
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
-      const symbolt& virtual_table_symbol_type = 
+      const symbolt& virtual_table_symbol_type =
         lookup(mem_it->type().subtype().get(ID_identifier));
 
       const symbolt& virtual_table_symbol_var  =
-        lookup(id2string(virtual_table_symbol_type.name) + "@" + 
+        lookup(id2string(virtual_table_symbol_type.name) + "@" +
             id2string(struct_union_type.get(ID_name)));
 
       exprt var = virtual_table_symbol_var.symbol_expr();
@@ -1117,4 +1117,3 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
 
   return false;
 }
-

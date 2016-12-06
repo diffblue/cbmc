@@ -18,10 +18,9 @@ typedef union _LARGE_INTEGER {
 int main()
 {
   LARGE_INTEGER l;
-  
+
   l.QuadPart=1;
   l.LowPart=2;
   l.u.LowPart=3;
   assert(l.LowPart==3);
 }
-

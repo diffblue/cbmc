@@ -9,4 +9,3 @@ int main(){
   __CPROVER_ASYNC_1: thr1(0);
 	for(int i=0; i<5; ++i) ;
 }
-

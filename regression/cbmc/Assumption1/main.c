@@ -1,7 +1,7 @@
 int main()
 {
   int x;
-  
+
   __CPROVER_assume(x>=0);
   assert(x!=-1);
 
@@ -10,4 +10,3 @@ int main()
   __CPROVER_assume(x==1);
   assert(x==1); // passes
 }
-

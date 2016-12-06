@@ -8,8 +8,8 @@ int main()
     goto l;
 
   i=2;
- 
- l:; 
- 
+
+ l:;
+
   assert(i==1 || !j);
 }

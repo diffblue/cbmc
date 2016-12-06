@@ -41,21 +41,21 @@ exprt build_full_lhs_rec(
 {
   if(src_ssa.id()!=src_original.id())
     return src_original;
-    
+
   const irep_idt id=src_original.id();
 
   if(id==ID_index)
   {
     // get index value from src_ssa
     exprt index_value=prop_conv.get(to_index_expr(src_ssa).index());
-    
+
     if(index_value.is_not_nil())
     {
       simplify(index_value, ns);
       index_exprt tmp=to_index_expr(src_original);
       tmp.index()=index_value;
       tmp.array()=
-        build_full_lhs_rec(prop_conv, ns, 
+        build_full_lhs_rec(prop_conv, ns,
           to_index_expr(src_original).array(),
           to_index_expr(src_ssa).array());
       return tmp;
@@ -74,8 +74,8 @@ exprt build_full_lhs_rec(
   else if(id==ID_if)
   {
     if_exprt tmp2=to_if_expr(src_original);
-    
-    tmp2.false_case()=build_full_lhs_rec(prop_conv, ns, 
+
+    tmp2.false_case()=build_full_lhs_rec(prop_conv, ns,
       tmp2.false_case(), to_if_expr(src_ssa).false_case());
 
     tmp2.true_case()=build_full_lhs_rec(prop_conv, ns,
@@ -105,9 +105,9 @@ exprt build_full_lhs_rec(
     tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0(), src_ssa.op0());
 
     // re-write into big case-split
-    
+
   }
-  
+
   return src_original;
 }
 
@@ -153,19 +153,19 @@ void build_goto_trace(
   // We need to re-sort the steps according to their clock.
   // Furthermore, read-events need to occur before write
   // events with the same clock.
-  
+
   typedef std::map<mp_integer, goto_tracet::stepst> time_mapt;
   time_mapt time_map;
-  
+
   mp_integer current_time=0;
-  
+
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=target.SSA_steps.begin();
       it!=end_step;
       it++)
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
-    
+
     if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
@@ -220,9 +220,9 @@ void build_goto_trace(
       continue;
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(goto_trace_stept());    
+    steps.push_back(goto_trace_stept());
     goto_trace_stept &goto_trace_step=steps.back();
-    
+
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
@@ -243,21 +243,21 @@ void build_goto_trace(
         SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER))?
       goto_trace_stept::ACTUAL_PARAMETER:
       goto_trace_stept::STATE;
-    
+
     if(SSA_step.original_full_lhs.is_not_nil())
       goto_trace_step.full_lhs=
         build_full_lhs_rec(
           prop_conv, ns, SSA_step.original_full_lhs, SSA_step.ssa_full_lhs);
-    
+
     if(SSA_step.ssa_lhs.is_not_nil())
       goto_trace_step.lhs_object_value=prop_conv.get(SSA_step.ssa_lhs);
-    
+
     if(SSA_step.ssa_full_lhs.is_not_nil())
     {
       goto_trace_step.full_lhs_value=prop_conv.get(SSA_step.ssa_full_lhs);
       simplify(goto_trace_step.full_lhs_value, ns);
     }
-    
+
     for(const auto & j : SSA_step.converted_io_args)
     {
       if(j.is_constant() ||
@@ -280,7 +280,7 @@ void build_goto_trace(
         prop_conv.l_get(SSA_step.cond_literal).is_true();
     }
   }
-  
+
   // Now assemble into a single goto_trace.
   // This expoits sorted-ness of the map.
   for(auto & t_it : time_map)
@@ -288,7 +288,7 @@ void build_goto_trace(
 
   // produce the step numbers
   unsigned step_nr=0;
-  
+
   for(auto & s_it : goto_trace.steps)
     s_it.step_nr=++step_nr;
 }
@@ -327,8 +327,7 @@ void build_goto_trace(
           s_it2=s_it1;
           s_it2!=goto_trace.steps.end();
           s_it2=goto_trace.steps.erase(s_it2));
-        
+
       break;
     }
 }
-

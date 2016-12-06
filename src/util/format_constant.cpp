@@ -53,4 +53,3 @@ std::string format_constantt::operator()(const exprt &expr)
 
   return "(format-constant failed: "+expr.id_string()+")";
 }
-

@@ -28,7 +28,7 @@ public:
 
   explicit goto_cc_modet(goto_cc_cmdlinet &_cmdline);
   ~goto_cc_modet();
-  
+
 protected:
   ui_message_handlert ui_message_handler;
   void register_languages();

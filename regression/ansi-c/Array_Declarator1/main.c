@@ -22,7 +22,7 @@ keyword static also appears within the [ and ] of the array type
 derivation, then for each call to the function, the value of the
 corresponding actual argument shall provide access to the first element
 of an array with at least as many elements as specified by the size
-expression. 
+expression.
 
 6.7.5.3(21):
 The following are all compatible function prototype declarators.
@@ -39,10 +39,10 @@ as are:
 corresponding to a in any call to f must be a non-null pointer to the
 first of at least three arrays of 5 doubles, which the others do not.)
 
-The comments in the rule for array_abstract_declarator in 
+The comments in the rule for array_abstract_declarator in
 src/ansi-c/parser.y indicate awareness of the standard regarding this
 issue, however, it seems that the case where both TOK_STATIC and
-attribute_type_qualifier_list (in either order) occur is not covered, 
+attribute_type_qualifier_list (in either order) occur is not covered,
 even though the standard allows this combination.
 
 Further investigation into this issue also revealed that the rules

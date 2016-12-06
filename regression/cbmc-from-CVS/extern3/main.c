@@ -15,12 +15,12 @@ int f() {
     return x;
   }
 }
-              
+
 int main()
 {
   int ret;
 
   ret=f();
-  
+
   assert(ret==5);
 }

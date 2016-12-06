@@ -103,7 +103,7 @@ unsigned string_containert::get(const char *s)
   string_ptrt string_ptr(s);
 
   hash_tablet::iterator it=hash_table.find(string_ptr);
-  
+
   if(it!=hash_table.end())
     return it->second;
 
@@ -114,7 +114,7 @@ unsigned string_containert::get(const char *s)
   string_ptrt result(string_list.back());
 
   hash_table[result]=r;
-  
+
   // these are not
   string_vector.push_back(&string_list.back());
 
@@ -138,7 +138,7 @@ unsigned string_containert::get(const std::string &s)
   string_ptrt string_ptr(s);
 
   hash_tablet::iterator it=hash_table.find(string_ptr);
-  
+
   if(it!=hash_table.end())
     return it->second;
 
@@ -149,7 +149,7 @@ unsigned string_containert::get(const std::string &s)
   string_ptrt result(string_list.back());
 
   hash_table[result]=r;
-  
+
   // these are not
   string_vector.push_back(&string_list.back());
 

@@ -14,4 +14,3 @@ int main()
   x a(5);
   assert(a.i==5);
 }
-

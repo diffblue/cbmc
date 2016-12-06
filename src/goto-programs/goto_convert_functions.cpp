@@ -38,7 +38,7 @@ goto_convert_functionst::goto_convert_functionst(
   functions(_functions)
 {
 }
-  
+
 /*******************************************************************\
 
 Function: goto_convert_functionst::~goto_convert_functionst
@@ -85,7 +85,7 @@ void goto_convert_functionst::goto_convert()
         it->second.mode=="jsil"))
       symbol_list.push_back(it->first);
   }
-  
+
   for(symbol_listt::const_iterator
       it=symbol_list.begin();
       it!=symbol_list.end();
@@ -93,7 +93,7 @@ void goto_convert_functionst::goto_convert()
   {
     convert_function(*it);
   }
-  
+
   functions.compute_location_numbers();
 
   // this removes the parse tree of the bodies from memory
@@ -136,7 +136,7 @@ bool goto_convert_functionst::hide(const goto_programt &goto_program)
         return true;
     }
   }
-  
+
   return false;
 }
 
@@ -160,7 +160,7 @@ void goto_convert_functionst::add_return(
   if(!f.body.instructions.empty() &&
      f.body.instructions.back().is_return())
     return; // not needed, we have one already
-    
+
   // see if we have an unconditional goto at the end
   if(!f.body.instructions.empty() &&
      f.body.instructions.back().is_goto() &&
@@ -181,7 +181,7 @@ void goto_convert_functionst::add_return(
          last_instruction->guard.is_true())
         return;
 
-      // return?        
+      // return?
       if(last_instruction->is_return())
         return;
 
@@ -194,7 +194,7 @@ void goto_convert_functionst::add_return(
         break; // give up
     }
   }
-  
+
   #endif
 
   goto_programt::targett t=f.body.add_instruction();
@@ -222,18 +222,18 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
 {
   const symbolt &symbol=ns.lookup(identifier);
   goto_functionst::goto_functiont &f=functions.function_map[identifier];
-  
+
   // make tmp variables local to function
   tmp_symbol_prefix=id2string(symbol.name)+"::$tmp::";
   temporary_counter=0;
-  
+
   f.type=to_code_type(symbol.type);
   if(f.body_available()) return; // already converted
 
   if(symbol.value.is_nil() ||
      symbol.value.id()=="compiled") /* goto_inline may have removed the body */
     return;
-  
+
   if(symbol.value.id()!=ID_code)
   {
     error().source_location=symbol.value.find_source_location();
@@ -241,9 +241,9 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
             << eom;
     throw 0;
   }
-  
+
   const codet &code=to_code(symbol.value);
-  
+
   source_locationt end_location;
 
   if(code.get_statement()==ID_block)
@@ -265,11 +265,11 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     f.type.return_type().id()!=ID_destructor;
 
   goto_convert_rec(code, f.body);
-  
+
   // add non-det return value, if needed
   if(targets.has_return_value)
     add_return(f, end_location);
-      
+
   // handle SV-COMP's __VERIFIER_atomic_
   if(!f.body.instructions.empty() &&
       has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
@@ -296,7 +296,7 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   // do function tags
   Forall_goto_program_instructions(i_it, f.body)
     i_it->function=identifier;
-  
+
   f.body.update();
 
   if(hide(f.body))
@@ -343,9 +343,9 @@ void goto_convert(
 {
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
-  
+
   try
-  {  
+  {
     goto_convert_functions.goto_convert();
   }
 
@@ -388,9 +388,9 @@ void goto_convert(
 {
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
-  
+
   try
-  {  
+  {
     goto_convert_functions.convert_function(identifier);
   }
 
@@ -412,5 +412,3 @@ void goto_convert(
     throw 0;
   }
 }
-
-

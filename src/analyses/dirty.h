@@ -47,13 +47,13 @@ public:
   {
     return dirty;
   }
-  
+
 protected:
   void build(const goto_functiont &goto_function);
 
   // variables whose address is taken
   id_sett dirty;
-  
+
   void find_dirty(const exprt &expr);
   void find_dirty_address_of(const exprt &expr);
 };

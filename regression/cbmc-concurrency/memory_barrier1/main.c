@@ -20,4 +20,3 @@ int main()
   pthread_join(t1, 0);
   return 0;
 }
-

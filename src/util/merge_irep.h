@@ -24,10 +24,10 @@ public:
 
   inline bool operator < (const merged_irept &other) const
   {
-    // again, assumes that both are in the same container  
+    // again, assumes that both are in the same container
     return ((std::size_t)data) < ((std::size_t)other.data);
   }
-  
+
   inline std::size_t hash() const { return (std::size_t)data; }
 
   // copy constructor: will only copy from other merged_irepts
@@ -40,7 +40,7 @@ protected:
   inline explicit merged_irept(const irept &src):irept(src)
   {
   }
-  
+
   friend class merged_irepst;
   friend class to_be_merged_irept;
 };
@@ -63,7 +63,7 @@ protected:
   inline explicit to_be_merged_irept(const irept &src):irept(src)
   {
   }
-  
+
   friend class merged_irepst;
 };
 
@@ -84,10 +84,10 @@ public:
 protected:
   typedef hash_set_cont<merged_irept, merged_irep_hash> merged_irep_storet;
   merged_irep_storet merged_irep_store;
-  
+
   typedef hash_set_cont<to_be_merged_irept, to_be_merged_irep_hash> to_be_merged_irep_storet;
   to_be_merged_irep_storet to_be_merged_irep_store;
-  
+
   const merged_irept &merged(const irept &);
 };
 
@@ -102,7 +102,7 @@ public:
 
 protected:
   typedef hash_set_cont<irept, irep_hash> irep_storet;
-  irep_storet irep_store;     
+  irep_storet irep_store;
 
   const irept & merged(const irept &irep);
 };
@@ -114,7 +114,7 @@ public:
 
 protected:
   typedef hash_set_cont<irept, irep_full_hash, irep_full_eq> irep_storet;
-  irep_storet irep_store;     
+  irep_storet irep_store;
 
   const irept& merged(const irept &irep);
 };

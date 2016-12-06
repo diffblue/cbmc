@@ -21,7 +21,7 @@ public:
   {
     // this is 'top'
   }
-  
+
   inline explicit interval_template(const T &x):
     lower_set(true),
     upper_set(true),
@@ -29,7 +29,7 @@ public:
     upper(x)
   {
   }
-  
+
   inline explicit interval_template(const T &l, const T &u):
     lower_set(true),
     upper_set(true),
@@ -37,40 +37,40 @@ public:
     upper(u)
   {
   }
-  
+
   bool lower_set, upper_set;
   T lower, upper;
-  
+
   inline const T &get_lower() const
   {
     return lower;
   }
-  
+
   inline const T &get_upper() const
   {
     return upper;
   }
-  
+
   inline bool empty() const
   {
     return upper_set && lower_set && lower>upper;
   }
-  
+
   inline bool is_bottom() const // equivalent to 'false'
   {
     return empty();
   }
-  
+
   inline bool is_top() const // equivalent to 'true'
   {
     return !lower_set && !upper_set;
   }
-  
+
   inline bool singleton() const
   {
     return upper_set && lower_set && lower==upper;
   }
-  
+
   // constraints
   void make_le_than(const T &v) // add upper bound
   {
@@ -84,7 +84,7 @@ public:
       upper=v;
     }
   }
-  
+
   void make_ge_than(const T &v) // add lower bound
   {
     if(lower_set)
@@ -97,19 +97,19 @@ public:
       lower=v;
     }
   }
-          
+
   // Union or disjunction
   inline void join(const interval_template<T> &i)
   {
     approx_union_with(i);
   }
-              
+
   // Intersection or conjunction
   inline void meet(const interval_template<T> &i)
   {
     intersect_with(i);
   }
-  
+
   void intersect_with(const interval_template &i)
   {
     if(i.lower_set)
@@ -124,7 +124,7 @@ public:
         lower=i.lower;
       }
     }
-    
+
     if(i.upper_set)
     {
       if(upper_set)
@@ -145,7 +145,7 @@ public:
       lower=std::min(lower, i.lower);
     else if(!i.lower_set && lower_set)
       lower_set=false;
-    
+
     if(i.upper_set && upper_set)
       upper=std::max(upper, i.upper);
     else if(!i.upper_set && upper_set)
@@ -220,14 +220,14 @@ std::ostream &operator << (std::ostream &out, const interval_template<T> &i)
     out << '[' << i.lower;
   else
     out << ")-INF";
-  
+
   out << ',';
-  
+
   if(i.upper_set)
     out << i.upper << ']';
   else
     out << "+INF(";
-  
+
   return out;
 }
 

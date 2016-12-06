@@ -28,7 +28,7 @@ public:
     ns(_ns)
   {
   }
-  
+
   exprt operator()(
     const typet &type,
     const source_locationt &source_location)
@@ -41,12 +41,12 @@ protected:
 
   std::string to_string(const exprt &src)
   {
-    return expr2c(src, ns); 
+    return expr2c(src, ns);
   }
 
   std::string to_string(const typet &src)
   {
-    return type2c(src, ns); 
+    return type2c(src, ns);
   }
 
   exprt zero_initializer_rec(
@@ -71,7 +71,7 @@ exprt zero_initializert::zero_initializer_rec(
   const source_locationt &source_location)
 {
   const irep_idt &type_id=type.id();
-  
+
   if(type_id==ID_bool)
   {
     exprt result=false_exprt();
@@ -103,7 +103,7 @@ exprt zero_initializert::zero_initializer_rec(
   else if(type_id==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    
+
     if(array_type.size().is_nil())
     {
       // we initialize this with an empty array
@@ -134,7 +134,7 @@ exprt zero_initializert::zero_initializer_rec(
                 << to_string(array_type.size()) << "'" << eom;
         throw 0;
       }
-        
+
       if(array_size<0)
       {
         error().source_location=source_location;
@@ -152,7 +152,7 @@ exprt zero_initializert::zero_initializer_rec(
   else if(type_id==ID_vector)
   {
     const vector_typet &vector_type=to_vector_type(type);
-    
+
     exprt tmpval=zero_initializer_rec(vector_type.subtype(), source_location);
 
     mp_integer vector_size;
@@ -164,7 +164,7 @@ exprt zero_initializert::zero_initializer_rec(
               << to_string(vector_type.size()) << "'" << eom;
       throw 0;
     }
-      
+
     if(vector_size<0)
     {
       error().source_location=source_location;
@@ -185,7 +185,7 @@ exprt zero_initializert::zero_initializer_rec(
       to_struct_type(type).components();
 
     exprt value(ID_struct, type);
-    
+
     value.operands().reserve(components.size());
 
     for(struct_typet::componentst::const_iterator
@@ -218,7 +218,7 @@ exprt zero_initializert::zero_initializer_rec(
     union_typet::componentt component;
     bool found=false;
     mp_integer component_size=0;
-    
+
     // we need to find the largest member
 
     for(struct_typet::componentst::const_iterator
@@ -230,7 +230,7 @@ exprt zero_initializert::zero_initializer_rec(
       if(it->type().id()==ID_code) continue;
 
       mp_integer bits=pointer_offset_bits(it->type(), ns);
-      
+
       if(bits>component_size)
       {
         component=*it;

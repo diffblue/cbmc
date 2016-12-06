@@ -14,4 +14,3 @@ int main()
   foo();
   return cr_register_hook();
 }
-

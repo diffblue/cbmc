@@ -2,7 +2,7 @@ int main()
 {
   {
     unsigned i, j, k, l;
-  
+
     j=k;
     i=j/2;
     l=j>>1;
@@ -13,7 +13,7 @@ int main()
     l=j&1;
     assert(i==l);
   }
-  
+
   {
     signed int i, j, k, l;
 
@@ -28,6 +28,6 @@ int main()
     i=j%2;
     l=j&1;
     assert(i==l);
-    
+
   }
 }

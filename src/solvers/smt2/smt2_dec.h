@@ -49,10 +49,10 @@ public:
 
   virtual resultt dec_solve();
   virtual std::string decision_procedure_text() const;
-  
+
   // yes, we are incremental!
   virtual bool has_set_assumptions() const { return true; }
-  
+
 protected:
   resultt read_result(std::istream &in);
 };

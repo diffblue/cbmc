@@ -15,12 +15,12 @@ int main()
   function()=2;
   assert(g==2);
 
-  {  
+  {
     int *p=&g;
     int &r=*p;
     assert(r==2);
   }
-  
+
   {
     X x;
     X *p=&x;

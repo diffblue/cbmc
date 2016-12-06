@@ -9,8 +9,8 @@ int main()
   q=(char *)p;
   q+=30*sizeof(int);
   p=(int *)q;
-  
+
   *p=1;
-  
+
   assert(my_array[30]==1);
 }

@@ -8,7 +8,7 @@ inline int sem_init(sem_t *sem, int pshared, unsigned int value)
   (void)pshared;
   (void)value;
   (void)sem;
-  
+
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(sem, "sem-init");
   __CPROVER_clear_may(sem, "sem-destroyed");

@@ -5,7 +5,7 @@
 /* modelled after                                                              */
 /*     Robert Bosch GmbH: Bosch Automotive Handbook. Bentley (2007)            */
 /* if you reuse this code, please cite also                                    */
-/*      Peter Schrammel, Tom Melham, Daniel Kroening. Chaining Test Cases for 
+/*      Peter Schrammel, Tom Melham, Daniel Kroening. Chaining Test Cases for
         Reactive System Testing. In Testing Software and Systems
         LNCS Volume 8254, 2013, pp 133-148                                     */
 /*******************************************************************************/
@@ -27,7 +27,7 @@ typedef struct state {
 #define I_BRAKE 5
 
 typedef struct input {
-  int signal; 
+  int signal;
 } t_input;
 
 void init(t_state *s) {
@@ -48,7 +48,7 @@ void compute(t_input* i, t_state *s) {
   }
   else if((s->mode==0) && (s->speed==0) && (s->button==1)) {
     if((i->signal==I_GAS)||(i->signal==I_ACC)) {s->speed=1; s->mode=1; }
-    else if(i->signal==I_BUTTON) s->button=0; 
+    else if(i->signal==I_BUTTON) s->button=0;
   }
   else if((s->mode==1) && (s->speed==1) && (s->button==1)) {
     if(i->signal==I_GAS) { s->speed=2; s->mode=2; }
@@ -64,12 +64,12 @@ void compute(t_input* i, t_state *s) {
     else if(i->signal==I_BUTTON) { s->mode=0; s->button=0; }
   }
   else if((s->mode==0) && (s->speed==2) && (s->button==0)) {
-    if((i->signal==I_BRAKE)||(i->signal==I_DEC)) s->speed=1; 
-    else if(i->signal==I_BUTTON) s->button=1; 
+    if((i->signal==I_BRAKE)||(i->signal==I_DEC)) s->speed=1;
+    else if(i->signal==I_BUTTON) s->button=1;
   }
   else if((s->mode==0) && (s->speed==2) && (s->button==1)) {
     if((i->signal==I_BRAKE)||(i->signal==I_DEC)) { s->speed=1; s->mode=1; }
-    else if(i->signal==I_BUTTON) s->button=0; 
+    else if(i->signal==I_BUTTON) s->button=0;
   }
 }
 

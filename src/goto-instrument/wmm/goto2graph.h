@@ -34,7 +34,7 @@ public:
   namespacet ns;
 
 protected:
-  goto_functionst &goto_functions; 
+  goto_functionst &goto_functions;
 
   /* alternative representation of graph (SCC) */
   std::map<unsigned,unsigned> map_vertex_gnode;
@@ -84,16 +84,16 @@ protected:
 
   typedef std::set<goto_programt::instructiont::targett> target_sett;
 
-  class cfg_visitort 
+  class cfg_visitort
   {
-  protected: 
+  protected:
     namespacet& ns;
     instrumentert& instrumenter;
 
     /* pointer to the egraph(s) that we construct */
     event_grapht& egraph;
-    std::vector<std::set<unsigned> >& egraph_SCCs;    
-    graph<abstract_eventt>& egraph_alt;  
+    std::vector<std::set<unsigned> >& egraph_SCCs;
+    graph<abstract_eventt>& egraph_alt;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -112,16 +112,16 @@ protected:
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
-      goto_programt::instructionst::iterator i_it, 
+      goto_programt::instructionst::iterator i_it,
       loop_strategyt replicate_body,
       value_setst& value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
       #endif
     ); // deprecated
-    void inline visit_cfg_backedge(goto_programt::targett targ, 
+    void inline visit_cfg_backedge(goto_programt::targett targ,
       goto_programt::targett i_it);
-    void inline visit_cfg_duplicate(goto_programt::targett targ, 
+    void inline visit_cfg_duplicate(goto_programt::targett targ,
       goto_programt::targett i_it);
     void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
       goto_programt::instructionst::iterator& i_it, bool no_dependencies
@@ -133,8 +133,8 @@ protected:
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
     void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_function_call(value_setst& value_sets, 
-      goto_programt::instructionst::iterator i_it, 
+    void visit_cfg_function_call(value_setst& value_sets,
+      goto_programt::instructionst::iterator i_it,
       memory_modelt model,
       bool no_dependenciess,
       loop_strategyt duplicate_body);
@@ -169,14 +169,14 @@ protected:
 
     /* previous nodes (fwd analysis) */
     typedef std::pair<unsigned,unsigned> nodet;
-    typedef std::map<goto_programt::instructiont::targett,std::set<nodet> > 
+    typedef std::map<goto_programt::instructiont::targett,std::set<nodet> >
       incoming_post;
 
     incoming_post in_pos;
     std::set<goto_programt::instructiont::targett> updated;
 
     /* "next nodes" (bwd steps in fwd/bck analysis) */
-    incoming_post out_pos;    
+    incoming_post out_pos;
 
     #define add_all_pos(it, target, source) \
     for(std::set<nodet>::const_iterator \
@@ -206,7 +206,7 @@ protected:
 
     cfg_visitort(namespacet& _ns, instrumentert& _instrumenter)
     :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
-      egraph_SCCs(_instrumenter.egraph_SCCs), 
+      egraph_SCCs(_instrumenter.egraph_SCCs),
       egraph_alt(_instrumenter.egraph_alt)
     {
       write_counter = 0;
@@ -287,7 +287,7 @@ public:
   std::vector<std::set<event_grapht::critical_cyclet> > set_of_cycles_per_SCC;
   unsigned num_sccs;
 
-  /* map from function to begin and end of the corresponding part of the 
+  /* map from function to begin and end of the corresponding part of the
      graph */
   typedef std::map<irep_idt,std::pair<std::set<unsigned>,
     std::set<unsigned> > > map_function_nodest;
@@ -314,17 +314,17 @@ public:
     }
   }
 
-  /* variables to instrument, locations of variables to instrument on 
+  /* variables to instrument, locations of variables to instrument on
      the cycles, and locations of all the variables on the critical cycles */
-  /* TODO: those maps are here to interface easily with weak_mem.cpp, 
+  /* TODO: those maps are here to interface easily with weak_mem.cpp,
      but a rewriting of weak_mem can eliminate them */
   std::set<irep_idt> var_to_instr;
   std::multimap<irep_idt,source_locationt> id2loc;
   std::multimap<irep_idt,source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f, 
+  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f,
     messaget& _message)
-    :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true), 
+    :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true),
       render_by_file(false), render_by_function(false), message(_message),
       egraph(_message)
   {
@@ -382,9 +382,9 @@ public:
   }
 
   /* prints outputs:
-     - cycles.dot: graph of the instrumented cycles  
+     - cycles.dot: graph of the instrumented cycles
      - ref.txt: names of the instrumented cycles
-     - output.txt: names of the instructions in the code 
+     - output.txt: names of the instructions in the code
      - all.txt: all */
   void print_outputs(memory_modelt model, bool hide_internals);
 };

@@ -212,7 +212,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
   exprt guard;
   bool path_is_monotone;
-  
+
   try {
     path_is_monotone = utils.do_assumptions(polynomials, path, guard);
   } catch (std::string s) {
@@ -512,7 +512,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   assert_for_values(program, values, coefficients, 0, fixed, var);
   assert_for_values(program, values, coefficients, 1, fixed, var);
   assert_for_values(program, values, coefficients, 2, fixed, var);
- 
+
   // Let's make sure that we get a path we have not seen before.
   for (std::list<distinguish_valuest>::iterator it = accelerated_paths.begin();
        it != accelerated_paths.end();
@@ -811,7 +811,7 @@ void disjunctive_polynomial_accelerationt::build_fixed() {
       fixedt->make_skip();
       continue;
     }
-    
+
     if (d != distinguishing_points.end()) {
       // We've hit a distinguishing point.  Set the relevant shadow
       // distinguisher to true.

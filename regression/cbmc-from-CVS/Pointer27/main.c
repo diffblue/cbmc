@@ -1,11 +1,11 @@
  #include <assert.h>
- 
+
 typedef struct
 {
   char a;
   int b;
 } S1t;
- 
+
 int main ()
 {
   S1t* mem[4];

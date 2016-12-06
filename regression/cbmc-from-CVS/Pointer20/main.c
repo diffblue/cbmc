@@ -6,7 +6,7 @@ int global;
 void f() {
   int local;
   int input;
-  
+
   input=nondet_int();
 
   p=input?&local:&global;

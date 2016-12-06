@@ -8,7 +8,7 @@ int main()
 
   // pointer into an integer
   q=(char *)&i;
-  
+
   i=0x03020100;
 
   // endianness-dependent
@@ -21,15 +21,15 @@ int main()
   assert(ch1==1);
   assert(ch2==2);
   assert(ch3==3);
-  
+
   unsigned int *up=(unsigned int *)q;
   assert(*up==i);
-  
+
   // pointer with conditional
   int input, x, y;
   p=input?&x:&y;
   *p=1;
-  
+
   if(input)
     assert(x==1);
   else

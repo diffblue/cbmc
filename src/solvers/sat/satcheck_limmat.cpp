@@ -125,7 +125,7 @@ void satcheck_limmatt::copy_cnf()
       //it=clauses.erase(it))
   {
     int *clause=new int[it->size()+1];
-    
+
     for(unsigned j=0; j<it->size(); j++)
       clause[j]=(*it)[j].dimacs();
 
@@ -178,7 +178,7 @@ propt::resultt satcheck_limmatt::prop_solve()
 
      default:
       msg="SAT checker failed: unknown result";
-      break;    
+      break;
     }
 
     messaget::status() << msg << messaget::eom;
@@ -204,7 +204,6 @@ propt::resultt satcheck_limmatt::prop_solve()
 
     return P_SATISFIABLE;
   }
- 
+
   return P_ERROR;
 }
-

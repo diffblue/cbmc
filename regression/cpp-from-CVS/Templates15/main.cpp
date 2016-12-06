@@ -5,4 +5,3 @@ struct A {
 
 template <class T, class C>
 struct A;
-

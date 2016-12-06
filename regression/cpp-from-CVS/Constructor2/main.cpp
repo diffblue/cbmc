@@ -2,7 +2,7 @@ class t1
 {
 public:
   int i;
-  
+
   t1();
   t1(int z);
 };
@@ -20,7 +20,7 @@ class t2
 {
 public:
   int i;
-  
+
   t2();
   t2(int z);
 };
@@ -36,5 +36,5 @@ t2::t2(int z)
 int main()
 {
   t1 instance1(5);
-  assert(instance1.i==5);  
+  assert(instance1.i==5);
 }

@@ -9,7 +9,7 @@ int main(void)
 {
   int x;
   assert(my_func(x)==x);
-  
+
   // this is yet another gcc extension
   union my_U
   {
@@ -17,10 +17,10 @@ int main(void)
     char ch;
     float f;
   } union_object;
-  
+
   float some_float=1.5;
-  
+
   union_object=(union my_U)some_float;
-  
+
   assert(union_object.f==1.5);
-} 
+}

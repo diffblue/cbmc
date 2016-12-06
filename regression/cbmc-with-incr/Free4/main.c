@@ -8,11 +8,11 @@ void my_free(int *q)
 int main()
 {
   int *p=malloc(sizeof(int));
-  
+
   *p=2;
-  
+
   my_free(p);
 
-  // should fail  
+  // should fail
   *p=3;
 }

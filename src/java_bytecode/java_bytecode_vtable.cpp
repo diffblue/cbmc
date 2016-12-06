@@ -297,7 +297,7 @@ void create_vtable_symbol(
 {
   const irep_idt vttype=
     vtnamest::get_type(id2string(class_symbol.name));
-  
+
   if(!symbol_table.has_symbol(vttype))
     create_vtable_type(vttype, symbol_table, class_symbol);
 }
@@ -338,7 +338,7 @@ void create_vtable_pointer(symbolt &class_symbol)
 {
   const irep_idt vttype=
     vtnamest::get_type(id2string(class_symbol.name));
-  
+
   add_vtable_pointer_member(vttype, class_symbol);
 }
 

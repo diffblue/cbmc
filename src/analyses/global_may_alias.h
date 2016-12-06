@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*******************************************************************\
 
    Class: global_may_alias_domaint
-   
+
  Purpose:
 
 \*******************************************************************/
@@ -43,27 +43,27 @@ public:
     const global_may_alias_domaint &b,
     locationt from,
     locationt to);
-    
+
   void make_bottom()
   {
     aliases.clear();
   }
-  
+
   void make_top()
   {
     aliases.clear();
   }
-  
+
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
-  
-protected:  
+
+protected:
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
   void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
   void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);
 };
 
-class global_may_alias_analysist:public ait<global_may_alias_domaint> 
+class global_may_alias_analysist:public ait<global_may_alias_domaint>
 {
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)

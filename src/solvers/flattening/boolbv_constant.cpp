@@ -23,15 +23,15 @@ Function: boolbvt::convert_constant
 bvt boolbvt::convert_constant(const constant_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
   bvt bv;
   bv.resize(width);
-  
+
   const typet &expr_type=expr.type();
-  
+
   if(expr_type.id()==ID_array)
   {
     std::size_t op_width=width/expr.operands().size();
@@ -52,8 +52,8 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
         bv[offset+j]=tmp[j];
 
       offset+=op_width;
-    }   
-    
+    }
+
     return bv;
   }
   else if(expr_type.id()==ID_string)
@@ -67,7 +67,7 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
     mp_integer from=to_range_type(expr_type).get_from();
     mp_integer value=string2integer(id2string(expr.get_value()));
     mp_integer v=value-from;
-    
+
     std::string binary=integer2binary(v, width);
 
     for(std::size_t i=0; i<width; i++)
@@ -139,23 +139,23 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
         bv[i*2]=const_literal(false);
         bv[i*2+1]=const_literal(false);
         break;
-      
+
       case '1':
         bv[i*2]=const_literal(true);
         bv[i*2+1]=const_literal(false);
         break;
-      
+
       case 'x':
         bv[i*2]=const_literal(false);
         bv[i*2+1]=const_literal(true);
         break;
-      
+
       case 'z':
       case '?':
         bv[i*2]=const_literal(true);
         bv[i*2+1]=const_literal(true);
         break;
-        
+
       default:
         error().source_location=expr.find_source_location();
         error() << "unknown character in Verilog constant:"
@@ -166,6 +166,6 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
 
     return bv;
   }
-  
+
   return conversion_failed(expr);
 }

@@ -3,7 +3,7 @@ void * malloc(unsigned);
 char * make_str() {
   unsigned short len;
   char * str;
-  
+
   __CPROVER_assume(len > 0);
   str = malloc(len);
   __CPROVER_assume(__CPROVER_buffer_size(str) == len);
@@ -25,4 +25,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-

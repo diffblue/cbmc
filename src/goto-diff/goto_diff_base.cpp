@@ -67,7 +67,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     case ui_message_handlert::JSON_UI:
     {
       json_objectt json_result;
-      json_result["totalNumberOfFunctions"]= 
+      json_result["totalNumberOfFunctions"]=
         json_stringt(i2string(total_functions_count));
       convert_function_group
         (json_result["newFunctions"].make_array(), new_functions);

@@ -7,7 +7,7 @@ int main()
 
   strcpy(a, "asdasd\000");
   assert(strlen(a+1)==5);
-  
+
   p=a+1;
   assert(strlen(p)==5);
 

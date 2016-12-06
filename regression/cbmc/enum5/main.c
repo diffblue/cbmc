@@ -18,4 +18,3 @@ int main()
   __CPROVER_assert(0, "");
   return 0;
 }
-

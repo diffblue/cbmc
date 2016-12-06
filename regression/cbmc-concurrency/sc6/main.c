@@ -20,4 +20,3 @@ int main(){
   __CPROVER_assert(!(r1 == 1 && r2 == 1), "SC");
   return 0;
 }
-

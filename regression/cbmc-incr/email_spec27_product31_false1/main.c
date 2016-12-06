@@ -143,8 +143,8 @@ void chuckKeyAddRjh(void) ;
 #line 61
 void rjhEnableForwarding(void) ;
 #line 18 "Test.c"
-void setup_bob__wrappee__Base(int bob___0 ) 
-{ 
+void setup_bob__wrappee__Base(int bob___0 )
+{
 
   {
   {
@@ -156,8 +156,8 @@ void setup_bob__wrappee__Base(int bob___0 )
 }
 }
 #line 23 "Test.c"
-void setup_bob(int bob___0 ) 
-{ 
+void setup_bob(int bob___0 )
+{
 
   {
   {
@@ -171,8 +171,8 @@ void setup_bob(int bob___0 )
 }
 }
 #line 33 "Test.c"
-void setup_rjh__wrappee__Base(int rjh___0 ) 
-{ 
+void setup_rjh__wrappee__Base(int rjh___0 )
+{
 
   {
   {
@@ -184,8 +184,8 @@ void setup_rjh__wrappee__Base(int rjh___0 )
 }
 }
 #line 40 "Test.c"
-void setup_rjh(int rjh___0 ) 
-{ 
+void setup_rjh(int rjh___0 )
+{
 
   {
   {
@@ -199,8 +199,8 @@ void setup_rjh(int rjh___0 )
 }
 }
 #line 50 "Test.c"
-void setup_chuck__wrappee__Base(int chuck___0 ) 
-{ 
+void setup_chuck__wrappee__Base(int chuck___0 )
+{
 
   {
   {
@@ -212,8 +212,8 @@ void setup_chuck__wrappee__Base(int chuck___0 )
 }
 }
 #line 57 "Test.c"
-void setup_chuck(int chuck___0 ) 
-{ 
+void setup_chuck(int chuck___0 )
+{
 
   {
   {
@@ -227,7 +227,7 @@ void setup_chuck(int chuck___0 )
 }
 }
 #line 69 "Test.c"
-void bobToRjh(void) 
+void bobToRjh(void)
 { int tmp ;
   int tmp___0 ;
   int tmp___1 ;
@@ -259,8 +259,8 @@ void bobToRjh(void)
 }
 }
 #line 81 "Test.c"
-void rjhToBob(void) 
-{ 
+void rjhToBob(void)
+{
 
   {
   {
@@ -275,7 +275,7 @@ void rjhToBob(void)
 }
 #line 88 "Test.c"
 #line 95 "Test.c"
-void setup(void) 
+void setup(void)
 { char const   * __restrict  __cil_tmp1 ;
   char const   * __restrict  __cil_tmp2 ;
   char const   * __restrict  __cil_tmp3 ;
@@ -312,7 +312,7 @@ void setup(void)
 }
 }
 #line 112 "Test.c"
-int main(void) 
+int main(void)
 { int retValue_acc ;
   int tmp ;
 
@@ -341,7 +341,7 @@ int main(void)
 }
 }
 #line 125 "Test.c"
-void bobKeyAdd(void) 
+void bobKeyAdd(void)
 { int tmp ;
   int tmp___0 ;
   char const   * __restrict  __cil_tmp3 ;
@@ -375,8 +375,8 @@ void bobKeyAdd(void)
 }
 }
 #line 137 "Test.c"
-void rjhKeyAdd(void) 
-{ 
+void rjhKeyAdd(void)
+{
 
   {
   {
@@ -392,8 +392,8 @@ void rjhKeyAdd(void)
 }
 }
 #line 146 "Test.c"
-void rjhKeyAddChuck(void) 
-{ 
+void rjhKeyAddChuck(void)
+{
 
   {
   {
@@ -409,8 +409,8 @@ void rjhKeyAddChuck(void)
 }
 }
 #line 156 "Test.c"
-void bobKeyAddChuck(void) 
-{ 
+void bobKeyAddChuck(void)
+{
 
   {
   {
@@ -426,8 +426,8 @@ void bobKeyAddChuck(void)
 }
 }
 #line 165 "Test.c"
-void chuckKeyAdd(void) 
-{ 
+void chuckKeyAdd(void)
+{
 
   {
   {
@@ -443,8 +443,8 @@ void chuckKeyAdd(void)
 }
 }
 #line 174 "Test.c"
-void chuckKeyAddRjh(void) 
-{ 
+void chuckKeyAddRjh(void)
+{
 
   {
   {
@@ -460,8 +460,8 @@ void chuckKeyAddRjh(void)
 }
 }
 #line 183 "Test.c"
-void rjhDeletePrivateKey(void) 
-{ 
+void rjhDeletePrivateKey(void)
+{
 
   {
   {
@@ -473,8 +473,8 @@ void rjhDeletePrivateKey(void)
 }
 }
 #line 190 "Test.c"
-void bobKeyChange(void) 
-{ 
+void bobKeyChange(void)
+{
 
   {
   {
@@ -486,8 +486,8 @@ void bobKeyChange(void)
 }
 }
 #line 197 "Test.c"
-void rjhKeyChange(void) 
-{ 
+void rjhKeyChange(void)
+{
 
   {
   {
@@ -499,8 +499,8 @@ void rjhKeyChange(void)
 }
 }
 #line 204 "Test.c"
-void rjhEnableForwarding(void) 
-{ 
+void rjhEnableForwarding(void)
+{
 
   {
   {
@@ -516,7 +516,7 @@ void rjhEnableForwarding(void)
 #line 41 "featureselect.h"
 int select_one(void) ;
 #line 8 "featureselect.c"
-int select_one(void) 
+int select_one(void)
 { int retValue_acc ;
   int choice = __VERIFIER_nondet_int();
 
@@ -530,8 +530,8 @@ int select_one(void)
 }
 }
 #line 14 "featureselect.c"
-void select_features(void) 
-{ 
+void select_features(void)
+{
 
   {
 #line 115 "featureselect.c"
@@ -539,8 +539,8 @@ void select_features(void)
 }
 }
 #line 20 "featureselect.c"
-void select_helpers(void) 
-{ 
+void select_helpers(void)
+{
 
   {
 #line 133 "featureselect.c"
@@ -548,7 +548,7 @@ void select_helpers(void)
 }
 }
 #line 25 "featureselect.c"
-int valid_product(void) 
+int valid_product(void)
 { int retValue_acc ;
 
   {
@@ -607,7 +607,7 @@ void setEmailIsSignatureVerified(int handle , int value ) ;
 #line 5 "EmailLib.c"
 int __ste_Email_counter  =    0;
 #line 7 "EmailLib.c"
-int initEmail(void) 
+int initEmail(void)
 { int retValue_acc ;
 
   {
@@ -634,7 +634,7 @@ int __ste_email_id0  =    0;
 #line 17 "EmailLib.c"
 int __ste_email_id1  =    0;
 #line 19 "EmailLib.c"
-int getEmailId(int handle ) 
+int getEmailId(int handle )
 { int retValue_acc ;
 
   {
@@ -663,8 +663,8 @@ int getEmailId(int handle )
 }
 }
 #line 29 "EmailLib.c"
-void setEmailId(int handle , int value ) 
-{ 
+void setEmailId(int handle , int value )
+{
 
   {
 #line 35
@@ -689,7 +689,7 @@ int __ste_email_from0  =    0;
 #line 39 "EmailLib.c"
 int __ste_email_from1  =    0;
 #line 41 "EmailLib.c"
-int getEmailFrom(int handle ) 
+int getEmailFrom(int handle )
 { int retValue_acc ;
 
   {
@@ -718,8 +718,8 @@ int getEmailFrom(int handle )
 }
 }
 #line 51 "EmailLib.c"
-void setEmailFrom(int handle , int value ) 
-{ 
+void setEmailFrom(int handle , int value )
+{
 
   {
 #line 57
@@ -744,7 +744,7 @@ int __ste_email_to0  =    0;
 #line 61 "EmailLib.c"
 int __ste_email_to1  =    0;
 #line 63 "EmailLib.c"
-int getEmailTo(int handle ) 
+int getEmailTo(int handle )
 { int retValue_acc ;
 
   {
@@ -773,8 +773,8 @@ int getEmailTo(int handle )
 }
 }
 #line 73 "EmailLib.c"
-void setEmailTo(int handle , int value ) 
-{ 
+void setEmailTo(int handle , int value )
+{
 
   {
 #line 79
@@ -799,7 +799,7 @@ char *__ste_email_subject0  ;
 #line 83 "EmailLib.c"
 char *__ste_email_subject1  ;
 #line 85 "EmailLib.c"
-char *getEmailSubject(int handle ) 
+char *getEmailSubject(int handle )
 { char *retValue_acc ;
   void *__cil_tmp3 ;
 
@@ -831,8 +831,8 @@ char *getEmailSubject(int handle )
 }
 }
 #line 95 "EmailLib.c"
-void setEmailSubject(int handle , char *value ) 
-{ 
+void setEmailSubject(int handle , char *value )
+{
 
   {
 #line 101
@@ -857,7 +857,7 @@ char *__ste_email_body0  =    (char *)0;
 #line 105 "EmailLib.c"
 char *__ste_email_body1  =    (char *)0;
 #line 107 "EmailLib.c"
-char *getEmailBody(int handle ) 
+char *getEmailBody(int handle )
 { char *retValue_acc ;
   void *__cil_tmp3 ;
 
@@ -889,8 +889,8 @@ char *getEmailBody(int handle )
 }
 }
 #line 117 "EmailLib.c"
-void setEmailBody(int handle , char *value ) 
-{ 
+void setEmailBody(int handle , char *value )
+{
 
   {
 #line 123
@@ -915,7 +915,7 @@ int __ste_email_isEncrypted0  =    0;
 #line 127 "EmailLib.c"
 int __ste_email_isEncrypted1  =    0;
 #line 129 "EmailLib.c"
-int isEncrypted(int handle ) 
+int isEncrypted(int handle )
 { int retValue_acc ;
 
   {
@@ -944,8 +944,8 @@ int isEncrypted(int handle )
 }
 }
 #line 139 "EmailLib.c"
-void setEmailIsEncrypted(int handle , int value ) 
-{ 
+void setEmailIsEncrypted(int handle , int value )
+{
 
   {
 #line 145
@@ -970,7 +970,7 @@ int __ste_email_encryptionKey0  =    0;
 #line 149 "EmailLib.c"
 int __ste_email_encryptionKey1  =    0;
 #line 151 "EmailLib.c"
-int getEmailEncryptionKey(int handle ) 
+int getEmailEncryptionKey(int handle )
 { int retValue_acc ;
 
   {
@@ -999,8 +999,8 @@ int getEmailEncryptionKey(int handle )
 }
 }
 #line 161 "EmailLib.c"
-void setEmailEncryptionKey(int handle , int value ) 
-{ 
+void setEmailEncryptionKey(int handle , int value )
+{
 
   {
 #line 167
@@ -1025,7 +1025,7 @@ int __ste_email_isSigned0  =    0;
 #line 171 "EmailLib.c"
 int __ste_email_isSigned1  =    0;
 #line 173 "EmailLib.c"
-int isSigned(int handle ) 
+int isSigned(int handle )
 { int retValue_acc ;
 
   {
@@ -1054,8 +1054,8 @@ int isSigned(int handle )
 }
 }
 #line 183 "EmailLib.c"
-void setEmailIsSigned(int handle , int value ) 
-{ 
+void setEmailIsSigned(int handle , int value )
+{
 
   {
 #line 189
@@ -1080,7 +1080,7 @@ int __ste_email_signKey0  =    0;
 #line 193 "EmailLib.c"
 int __ste_email_signKey1  =    0;
 #line 195 "EmailLib.c"
-int getEmailSignKey(int handle ) 
+int getEmailSignKey(int handle )
 { int retValue_acc ;
 
   {
@@ -1109,8 +1109,8 @@ int getEmailSignKey(int handle )
 }
 }
 #line 205 "EmailLib.c"
-void setEmailSignKey(int handle , int value ) 
-{ 
+void setEmailSignKey(int handle , int value )
+{
 
   {
 #line 211
@@ -1135,7 +1135,7 @@ int __ste_email_isSignatureVerified0  ;
 #line 215 "EmailLib.c"
 int __ste_email_isSignatureVerified1  ;
 #line 217 "EmailLib.c"
-int isVerified(int handle ) 
+int isVerified(int handle )
 { int retValue_acc ;
 
   {
@@ -1164,8 +1164,8 @@ int isVerified(int handle )
 }
 }
 #line 227 "EmailLib.c"
-void setEmailIsSignatureVerified(int handle , int value ) 
-{ 
+void setEmailIsSignatureVerified(int handle , int value )
+{
 
   {
 #line 233
@@ -1230,7 +1230,7 @@ int findClientAddressBookAlias(int handle , int userid ) ;
 #line 5 "ClientLib.c"
 int __ste_Client_counter  =    0;
 #line 7 "ClientLib.c"
-int initClient(void) 
+int initClient(void)
 { int retValue_acc ;
 
   {
@@ -1259,7 +1259,7 @@ char *__ste_client_name1  =    (char *)0;
 #line 19 "ClientLib.c"
 char *__ste_client_name2  =    (char *)0;
 #line 22 "ClientLib.c"
-char *getClientName(int handle ) 
+char *getClientName(int handle )
 { char *retValue_acc ;
   void *__cil_tmp3 ;
 
@@ -1299,8 +1299,8 @@ char *getClientName(int handle )
 }
 }
 #line 34 "ClientLib.c"
-void setClientName(int handle , char *value ) 
-{ 
+void setClientName(int handle , char *value )
+{
 
   {
 #line 42
@@ -1335,7 +1335,7 @@ int __ste_client_outbuffer2  =    0;
 #line 50 "ClientLib.c"
 int __ste_client_outbuffer3  =    0;
 #line 53 "ClientLib.c"
-int getClientOutbuffer(int handle ) 
+int getClientOutbuffer(int handle )
 { int retValue_acc ;
 
   {
@@ -1372,8 +1372,8 @@ int getClientOutbuffer(int handle )
 }
 }
 #line 65 "ClientLib.c"
-void setClientOutbuffer(int handle , int value ) 
-{ 
+void setClientOutbuffer(int handle , int value )
+{
 
   {
 #line 73
@@ -1406,7 +1406,7 @@ int __ste_ClientAddressBook_size1  =    0;
 #line 81 "ClientLib.c"
 int __ste_ClientAddressBook_size2  =    0;
 #line 84 "ClientLib.c"
-int getClientAddressBookSize(int handle ) 
+int getClientAddressBookSize(int handle )
 { int retValue_acc ;
 
   {
@@ -1443,8 +1443,8 @@ int getClientAddressBookSize(int handle )
 }
 }
 #line 96 "ClientLib.c"
-void setClientAddressBookSize(int handle , int value ) 
-{ 
+void setClientAddressBookSize(int handle , int value )
+{
 
   {
 #line 104
@@ -1471,7 +1471,7 @@ void setClientAddressBookSize(int handle , int value )
 }
 }
 #line 106 "ClientLib.c"
-int createClientAddressBookEntry(int handle ) 
+int createClientAddressBookEntry(int handle )
 { int retValue_acc ;
   int size ;
   int tmp ;
@@ -1525,7 +1525,7 @@ int __ste_Client_AddressBook2_Alias1  =    0;
 #line 131 "ClientLib.c"
 int __ste_Client_AddressBook2_Alias2  =    0;
 #line 134 "ClientLib.c"
-int getClientAddressBookAlias(int handle , int index ) 
+int getClientAddressBookAlias(int handle , int index )
 { int retValue_acc ;
 
   {
@@ -1634,7 +1634,7 @@ int getClientAddressBookAlias(int handle , int index )
 }
 }
 #line 171 "ClientLib.c"
-int findClientAddressBookAlias(int handle , int userid ) 
+int findClientAddressBookAlias(int handle , int userid )
 { int retValue_acc ;
 
   {
@@ -1743,8 +1743,8 @@ int findClientAddressBookAlias(int handle , int userid )
 }
 }
 #line 208 "ClientLib.c"
-void setClientAddressBookAlias(int handle , int index , int value ) 
-{ 
+void setClientAddressBookAlias(int handle , int index , int value )
+{
 
   {
 #line 234
@@ -1840,7 +1840,7 @@ int __ste_Client_AddressBook2_Address1  =    0;
 #line 252 "ClientLib.c"
 int __ste_Client_AddressBook2_Address2  =    0;
 #line 255 "ClientLib.c"
-int getClientAddressBookAddress(int handle , int index ) 
+int getClientAddressBookAddress(int handle , int index )
 { int retValue_acc ;
 
   {
@@ -1949,8 +1949,8 @@ int getClientAddressBookAddress(int handle , int index )
 }
 }
 #line 291 "ClientLib.c"
-void setClientAddressBookAddress(int handle , int index , int value ) 
-{ 
+void setClientAddressBookAddress(int handle , int index , int value )
+{
 
   {
 #line 317
@@ -2034,7 +2034,7 @@ int __ste_client_autoResponse1  =    0;
 #line 323 "ClientLib.c"
 int __ste_client_autoResponse2  =    0;
 #line 326 "ClientLib.c"
-int getClientAutoResponse(int handle ) 
+int getClientAutoResponse(int handle )
 { int retValue_acc ;
 
   {
@@ -2071,8 +2071,8 @@ int getClientAutoResponse(int handle )
 }
 }
 #line 338 "ClientLib.c"
-void setClientAutoResponse(int handle , int value ) 
-{ 
+void setClientAutoResponse(int handle , int value )
+{
 
   {
 #line 346
@@ -2105,7 +2105,7 @@ int __ste_client_privateKey1  =    0;
 #line 352 "ClientLib.c"
 int __ste_client_privateKey2  =    0;
 #line 355 "ClientLib.c"
-int getClientPrivateKey(int handle ) 
+int getClientPrivateKey(int handle )
 { int retValue_acc ;
 
   {
@@ -2142,8 +2142,8 @@ int getClientPrivateKey(int handle )
 }
 }
 #line 367 "ClientLib.c"
-void setClientPrivateKey(int handle , int value ) 
-{ 
+void setClientPrivateKey(int handle , int value )
+{
 
   {
 #line 375
@@ -2176,7 +2176,7 @@ int __ste_ClientKeyring_size1  =    0;
 #line 381 "ClientLib.c"
 int __ste_ClientKeyring_size2  =    0;
 #line 384 "ClientLib.c"
-int getClientKeyringSize(int handle ) 
+int getClientKeyringSize(int handle )
 { int retValue_acc ;
 
   {
@@ -2213,8 +2213,8 @@ int getClientKeyringSize(int handle )
 }
 }
 #line 396 "ClientLib.c"
-void setClientKeyringSize(int handle , int value ) 
-{ 
+void setClientKeyringSize(int handle , int value )
+{
 
   {
 #line 404
@@ -2241,7 +2241,7 @@ void setClientKeyringSize(int handle , int value )
 }
 }
 #line 406 "ClientLib.c"
-int createClientKeyringEntry(int handle ) 
+int createClientKeyringEntry(int handle )
 { int retValue_acc ;
   int size ;
   int tmp ;
@@ -2295,7 +2295,7 @@ int __ste_Client_Keyring2_User1  =    0;
 #line 430 "ClientLib.c"
 int __ste_Client_Keyring2_User2  =    0;
 #line 433 "ClientLib.c"
-int getClientKeyringUser(int handle , int index ) 
+int getClientKeyringUser(int handle , int index )
 { int retValue_acc ;
 
   {
@@ -2380,8 +2380,8 @@ int getClientKeyringUser(int handle , int index )
 }
 }
 #line 473 "ClientLib.c"
-void setClientKeyringUser(int handle , int index , int value ) 
-{ 
+void setClientKeyringUser(int handle , int index , int value )
+{
 
   {
 #line 499
@@ -2459,7 +2459,7 @@ int __ste_Client_Keyring2_PublicKey1  =    0;
 #line 517 "ClientLib.c"
 int __ste_Client_Keyring2_PublicKey2  =    0;
 #line 520 "ClientLib.c"
-int getClientKeyringPublicKey(int handle , int index ) 
+int getClientKeyringPublicKey(int handle , int index )
 { int retValue_acc ;
 
   {
@@ -2544,7 +2544,7 @@ int getClientKeyringPublicKey(int handle , int index )
 }
 }
 #line 557 "ClientLib.c"
-int findPublicKey(int handle , int userid ) 
+int findPublicKey(int handle , int userid )
 { int retValue_acc ;
 
   {
@@ -2629,8 +2629,8 @@ int findPublicKey(int handle , int userid )
 }
 }
 #line 595 "ClientLib.c"
-void setClientKeyringPublicKey(int handle , int index , int value ) 
-{ 
+void setClientKeyringPublicKey(int handle , int index , int value )
+{
 
   {
 #line 621
@@ -2698,7 +2698,7 @@ int __ste_client_forwardReceiver2  =    0;
 #line 629 "ClientLib.c"
 int __ste_client_forwardReceiver3  =    0;
 #line 631 "ClientLib.c"
-int getClientForwardReceiver(int handle ) 
+int getClientForwardReceiver(int handle )
 { int retValue_acc ;
 
   {
@@ -2735,8 +2735,8 @@ int getClientForwardReceiver(int handle )
 }
 }
 #line 643 "ClientLib.c"
-void setClientForwardReceiver(int handle , int value ) 
-{ 
+void setClientForwardReceiver(int handle , int value )
+{
 
   {
 #line 651
@@ -2769,7 +2769,7 @@ int __ste_client_idCounter1  =    0;
 #line 657 "ClientLib.c"
 int __ste_client_idCounter2  =    0;
 #line 660 "ClientLib.c"
-int getClientId(int handle ) 
+int getClientId(int handle )
 { int retValue_acc ;
 
   {
@@ -2806,8 +2806,8 @@ int getClientId(int handle )
 }
 }
 #line 672 "ClientLib.c"
-void setClientId(int handle , int value ) 
-{ 
+void setClientId(int handle , int value )
+{
 
   {
 #line 680
@@ -2836,7 +2836,7 @@ void setClientId(int handle , int value )
 #line 1 "scenario.o"
 #pragma merger(0,"scenario.i","")
 #line 1 "scenario.c"
-void test(void) 
+void test(void)
 { int op1 ;
   int op2 ;
   int op3 ;
@@ -2916,7 +2916,7 @@ void test(void)
         goto _L___8;
       }
     } else {
-      _L___8: /* CIL Label */ 
+      _L___8: /* CIL Label */
 #line 19
       if (! op2) {
         {
@@ -2931,7 +2931,7 @@ void test(void)
           goto _L___7;
         }
       } else {
-        _L___7: /* CIL Label */ 
+        _L___7: /* CIL Label */
 #line 22
         if (! op3) {
           {
@@ -2950,7 +2950,7 @@ void test(void)
             goto _L___6;
           }
         } else {
-          _L___6: /* CIL Label */ 
+          _L___6: /* CIL Label */
 #line 26
           if (! op4) {
             {
@@ -2969,7 +2969,7 @@ void test(void)
               goto _L___5;
             }
           } else {
-            _L___5: /* CIL Label */ 
+            _L___5: /* CIL Label */
 #line 30
             if (! op5) {
               {
@@ -2988,7 +2988,7 @@ void test(void)
                 goto _L___4;
               }
             } else {
-              _L___4: /* CIL Label */ 
+              _L___4: /* CIL Label */
 #line 34
               if (! op6) {
                 {
@@ -3007,7 +3007,7 @@ void test(void)
                   goto _L___3;
                 }
               } else {
-                _L___3: /* CIL Label */ 
+                _L___3: /* CIL Label */
 #line 38
                 if (! op7) {
                   {
@@ -3026,7 +3026,7 @@ void test(void)
                     goto _L___2;
                   }
                 } else {
-                  _L___2: /* CIL Label */ 
+                  _L___2: /* CIL Label */
 #line 42
                   if (! op8) {
                     {
@@ -3041,7 +3041,7 @@ void test(void)
                       goto _L___1;
                     }
                   } else {
-                    _L___1: /* CIL Label */ 
+                    _L___1: /* CIL Label */
 #line 45
                     if (! op9) {
                       {
@@ -3060,7 +3060,7 @@ void test(void)
                         goto _L___0;
                       }
                     } else {
-                      _L___0: /* CIL Label */ 
+                      _L___0: /* CIL Label */
 #line 49
                       if (! op10) {
                         {
@@ -3079,7 +3079,7 @@ void test(void)
                           goto _L;
                         }
                       } else {
-                        _L: /* CIL Label */ 
+                        _L: /* CIL Label */
 #line 53
                         if (! op11) {
                           {
@@ -3126,7 +3126,7 @@ void test(void)
 #line 4 "wsllib.h"
 void __automaton_fail(void) ;
 #line 12 "VerifyForward_spec.c"
-__inline void __utac_acc__VerifyForward_spec__1(int client , int msg ) 
+__inline void __utac_acc__VerifyForward_spec__1(int client , int msg )
 { int pubkey ;
   int tmp ;
   int tmp___0 ;
@@ -3179,7 +3179,7 @@ extern  __attribute__((__nothrow__)) void free(void *__ptr ) ;
 #line 32 "libacc.c"
 void __utac__exception__cf_handler_set(void *exception , int (*cflow_func)(int  ,
                                                                            int  ) ,
-                                       int val ) 
+                                       int val )
 { struct __UTAC__EXCEPTION *excep ;
   struct __UTAC__CFLOW_FUNC *cf ;
   void *tmp ;
@@ -3245,7 +3245,7 @@ void __utac__exception__cf_handler_set(void *exception , int (*cflow_func)(int  
 }
 }
 #line 44 "libacc.c"
-void __utac__exception__cf_handler_free(void *exception ) 
+void __utac__exception__cf_handler_free(void *exception )
 { struct __UTAC__EXCEPTION *excep ;
   struct __UTAC__CFLOW_FUNC *cf ;
   struct __UTAC__CFLOW_FUNC *tmp ;
@@ -3324,7 +3324,7 @@ void __utac__exception__cf_handler_free(void *exception )
 }
 }
 #line 59 "libacc.c"
-void __utac__exception__cf_handler_reset(void *exception ) 
+void __utac__exception__cf_handler_reset(void *exception )
 { struct __UTAC__EXCEPTION *excep ;
   struct __UTAC__CFLOW_FUNC *cf ;
   unsigned long __cil_tmp5 ;
@@ -3412,7 +3412,7 @@ void *__utac__error_stack_mgt(void *env , int mode , int count ) ;
 #line 80 "libacc.c"
 static struct __ACC__ERR *head  =    (struct __ACC__ERR *)0;
 #line 79 "libacc.c"
-void *__utac__error_stack_mgt(void *env , int mode , int count ) 
+void *__utac__error_stack_mgt(void *env , int mode , int count )
 { void *retValue_acc ;
   struct __ACC__ERR *new ;
   void *tmp ;
@@ -3564,7 +3564,7 @@ void *__utac__error_stack_mgt(void *env , int mode , int count )
 }
 }
 #line 122 "libacc.c"
-void *__utac__get_this_arg(int i , struct JoinPoint *this ) 
+void *__utac__get_this_arg(int i , struct JoinPoint *this )
 { void *retValue_acc ;
   unsigned long __cil_tmp4 ;
   unsigned long __cil_tmp5 ;
@@ -3628,7 +3628,7 @@ void *__utac__get_this_arg(int i , struct JoinPoint *this )
 }
 }
 #line 129 "libacc.c"
-char const   *__utac__get_this_argtype(int i , struct JoinPoint *this ) 
+char const   *__utac__get_this_argtype(int i , struct JoinPoint *this )
 { char const   *retValue_acc ;
   unsigned long __cil_tmp4 ;
   unsigned long __cil_tmp5 ;
@@ -3696,7 +3696,7 @@ char const   *__utac__get_this_argtype(int i , struct JoinPoint *this )
 #line 1 "Util.h"
 int prompt(char *msg ) ;
 #line 9 "Util.c"
-int prompt(char *msg ) 
+int prompt(char *msg )
 { int retValue_acc ;
   int retval ;
   char const   * __restrict  __cil_tmp4 ;
@@ -3749,7 +3749,7 @@ int queued_message  ;
 #line 12 "Client.c"
 int queued_client  ;
 #line 18 "Client.c"
-void mail(int client , int msg ) 
+void mail(int client , int msg )
 { int tmp ;
 
   {
@@ -3766,7 +3766,7 @@ void mail(int client , int msg )
 }
 }
 #line 27 "Client.c"
-void outgoing__wrappee__Keys(int client , int msg ) 
+void outgoing__wrappee__Keys(int client , int msg )
 { int tmp ;
 
   {
@@ -3783,7 +3783,7 @@ void outgoing__wrappee__Keys(int client , int msg )
 }
 }
 #line 33 "Client.c"
-void outgoing__wrappee__Encrypt(int client , int msg ) 
+void outgoing__wrappee__Encrypt(int client , int msg )
 { int receiver ;
   int tmp ;
   int pubkey ;
@@ -3820,8 +3820,8 @@ void outgoing__wrappee__Encrypt(int client , int msg )
 }
 }
 #line 51 "Client.c"
-void outgoing(int client , int msg ) 
-{ 
+void outgoing(int client , int msg )
+{
 
   {
   {
@@ -3835,7 +3835,7 @@ void outgoing(int client , int msg )
 }
 }
 #line 60 "Client.c"
-void deliver(int client , int msg ) 
+void deliver(int client , int msg )
 { int __utac__ad__arg1 ;
   int __utac__ad__arg2 ;
 
@@ -3855,8 +3855,8 @@ void deliver(int client , int msg )
 }
 }
 #line 68 "Client.c"
-void incoming__wrappee__Sign(int client , int msg ) 
-{ 
+void incoming__wrappee__Sign(int client , int msg )
+{
 
   {
   {
@@ -3868,7 +3868,7 @@ void incoming__wrappee__Sign(int client , int msg )
 }
 }
 #line 75 "Client.c"
-void incoming__wrappee__Forward(int client , int msg ) 
+void incoming__wrappee__Forward(int client , int msg )
 { int fwreceiver ;
   int tmp ;
 
@@ -3897,8 +3897,8 @@ void incoming__wrappee__Forward(int client , int msg )
 }
 }
 #line 89 "Client.c"
-void incoming__wrappee__Verify(int client , int msg ) 
-{ 
+void incoming__wrappee__Verify(int client , int msg )
+{
 
   {
   {
@@ -3912,7 +3912,7 @@ void incoming__wrappee__Verify(int client , int msg )
 }
 }
 #line 96 "Client.c"
-void incoming(int client , int msg ) 
+void incoming(int client , int msg )
 { int privkey ;
   int tmp ;
   int tmp___0 ;
@@ -3966,7 +3966,7 @@ void incoming(int client , int msg )
 }
 }
 #line 115 "Client.c"
-int createClient(char *name ) 
+int createClient(char *name )
 { int retValue_acc ;
   int client ;
   int tmp ;
@@ -3987,7 +3987,7 @@ int createClient(char *name )
 }
 }
 #line 123 "Client.c"
-void sendEmail(int sender , int receiver ) 
+void sendEmail(int sender , int receiver )
 { int email ;
   int tmp ;
 
@@ -4005,8 +4005,8 @@ void sendEmail(int sender , int receiver )
 }
 }
 #line 133 "Client.c"
-void queue(int client , int msg ) 
-{ 
+void queue(int client , int msg )
+{
 
   {
 #line 134
@@ -4020,7 +4020,7 @@ void queue(int client , int msg )
 }
 }
 #line 142 "Client.c"
-int is_queue_empty(void) 
+int is_queue_empty(void)
 { int retValue_acc ;
 
   {
@@ -4033,7 +4033,7 @@ int is_queue_empty(void)
 }
 }
 #line 149 "Client.c"
-int get_queued_client(void) 
+int get_queued_client(void)
 { int retValue_acc ;
 
   {
@@ -4046,7 +4046,7 @@ int get_queued_client(void)
 }
 }
 #line 156 "Client.c"
-int get_queued_email(void) 
+int get_queued_email(void)
 { int retValue_acc ;
 
   {
@@ -4059,7 +4059,7 @@ int get_queued_email(void)
 }
 }
 #line 162 "Client.c"
-int isKeyPairValid(int publicKey , int privateKey ) 
+int isKeyPairValid(int publicKey , int privateKey )
 { int retValue_acc ;
   char const   * __restrict  __cil_tmp4 ;
 
@@ -4096,8 +4096,8 @@ int isKeyPairValid(int publicKey , int privateKey )
 }
 }
 #line 172 "Client.c"
-void generateKeyPair(int client , int seed ) 
-{ 
+void generateKeyPair(int client , int seed )
+{
 
   {
   {
@@ -4109,7 +4109,7 @@ void generateKeyPair(int client , int seed )
 }
 }
 #line 178 "Client.c"
-void sign(int client , int msg ) 
+void sign(int client , int msg )
 { int privkey ;
   int tmp ;
 
@@ -4138,8 +4138,8 @@ void sign(int client , int msg )
 }
 }
 #line 188 "Client.c"
-void forward(int client , int msg ) 
-{ 
+void forward(int client , int msg )
+{
 
   {
   {
@@ -4155,7 +4155,7 @@ void forward(int client , int msg )
 }
 }
 #line 197 "Client.c"
-void verify(int client , int msg ) 
+void verify(int client , int msg )
 { int tmp ;
   int tmp___0 ;
   int pubkey ;
@@ -4221,8 +4221,8 @@ void verify(int client , int msg )
 #line 1 "wsllib_check.o"
 #pragma merger(0,"wsllib_check.i","")
 #line 3 "wsllib_check.c"
-void __automaton_fail(void) 
-{ 
+void __automaton_fail(void)
+{
 
   {
   goto ERROR;
@@ -4236,7 +4236,7 @@ void __automaton_fail(void)
 #line 15 "Email.h"
 int cloneEmail(int msg ) ;
 #line 9 "Email.c"
-void printMail__wrappee__Keys(int msg ) 
+void printMail__wrappee__Keys(int msg )
 { int tmp ;
   int tmp___0 ;
   int tmp___1 ;
@@ -4278,7 +4278,7 @@ void printMail__wrappee__Keys(int msg )
 }
 }
 #line 17 "Email.c"
-void printMail__wrappee__Encrypt(int msg ) 
+void printMail__wrappee__Encrypt(int msg )
 { int tmp ;
   int tmp___0 ;
   char const   * __restrict  __cil_tmp4 ;
@@ -4306,7 +4306,7 @@ void printMail__wrappee__Encrypt(int msg )
 }
 }
 #line 26 "Email.c"
-void printMail__wrappee__Forward(int msg ) 
+void printMail__wrappee__Forward(int msg )
 { int tmp ;
   int tmp___0 ;
   char const   * __restrict  __cil_tmp4 ;
@@ -4334,7 +4334,7 @@ void printMail__wrappee__Forward(int msg )
 }
 }
 #line 33 "Email.c"
-void printMail(int msg ) 
+void printMail(int msg )
 { int tmp ;
   char const   * __restrict  __cil_tmp3 ;
 
@@ -4354,7 +4354,7 @@ void printMail(int msg )
 }
 }
 #line 41 "Email.c"
-int isReadable__wrappee__Keys(int msg ) 
+int isReadable__wrappee__Keys(int msg )
 { int retValue_acc ;
 
   {
@@ -4367,7 +4367,7 @@ int isReadable__wrappee__Keys(int msg )
 }
 }
 #line 49 "Email.c"
-int isReadable(int msg ) 
+int isReadable(int msg )
 { int retValue_acc ;
   int tmp ;
 
@@ -4395,7 +4395,7 @@ int isReadable(int msg )
 }
 }
 #line 57 "Email.c"
-int cloneEmail(int msg ) 
+int cloneEmail(int msg )
 { int retValue_acc ;
 
   {
@@ -4408,7 +4408,7 @@ int cloneEmail(int msg )
 }
 }
 #line 62 "Email.c"
-int createEmail(int from , int to ) 
+int createEmail(int from , int to )
 { int retValue_acc ;
   int msg ;
 

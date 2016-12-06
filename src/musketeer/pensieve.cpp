@@ -59,7 +59,7 @@ void fence_pensieve(
   message.status() << "Temporary variables added" << messaget::eom;
 
   unsigned max_thds = 0;
-  
+
   instrumenter_pensievet instrumenter(symbol_table, goto_functions, message);
   max_thds=instrumenter.goto2graph_cfg(value_sets, Power, true, no_loop);
   message.status() << "Abstract event graph computed" << messaget::eom;
@@ -70,7 +70,7 @@ void fence_pensieve(
     instrumenter.set_parameters_collection(max_thds);
 
   /* necessary for correct printings */
-  namespacet ns(symbol_table); 
+  namespacet ns(symbol_table);
 
   if(naive_mode)
     instrumenter.collect_pairs_naive(ns);
@@ -84,4 +84,3 @@ void fence_pensieve(
   // update counters etc.
   goto_functions.update();
 }
-

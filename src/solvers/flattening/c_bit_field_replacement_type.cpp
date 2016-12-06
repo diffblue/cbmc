@@ -25,7 +25,7 @@ typet c_bit_field_replacement_type(
   const namespacet &ns)
 {
   const typet &subtype=src.subtype();
-  
+
   if(subtype.id()==ID_unsignedbv ||
      subtype.id()==ID_signedbv ||
      subtype.id()==ID_c_bool)

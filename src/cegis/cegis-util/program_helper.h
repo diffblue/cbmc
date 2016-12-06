@@ -145,6 +145,19 @@ const irep_idt &get_affected_variable(const goto_programt::instructiont &instr);
  */
 bool is_global_const(const irep_idt &name, const typet &type);
 
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param from
+ * @param to
+ */
+void move_labels(
+    goto_programt::instructionst &body,
+    const goto_programt::targett &from,
+    const goto_programt::targett &to);
 
 /**
  * @brief
@@ -155,8 +168,24 @@ bool is_global_const(const irep_idt &name, const typet &type);
  * @param from
  * @param to
  */
-void move_labels(goto_programt &body, const goto_programt::targett &from,
+void move_labels(
+    goto_programt &body,
+    const goto_programt::targett &from,
     const goto_programt::targett &to);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param target
+ *
+ * @return
+ */
+goto_programt::targett insert_before_preserve_labels(
+    goto_programt &body,
+    const goto_programt::targett &target);
 
 /**
  * @brief
@@ -176,13 +205,27 @@ bool is_builtin(const source_locationt &loc);
  *
  * @param st
  * @param full_name
+ * @param base_name
+ * @param type
+ *
+ * @return
+ */
+symbolt &create_local_cegis_symbol(symbol_tablet &st, const std::string &full_name,
+    const std::string &base_name, const typet &type);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param full_name
  * @param type
  *
  * @return
  */
 symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
     const typet &type);
-
 
 /**
  * @brief
@@ -200,6 +243,20 @@ symbolt &create_cegis_symbol(symbol_tablet &st, const std::string &full_name,
 goto_programt::targett cegis_assign(const symbol_tablet &st,
     goto_functionst &gf, const goto_programt::targett &insert_after_pos,
     const exprt &lhs, const exprt &rhs);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ * @param instr
+ * @param lhs
+ * @param rhs
+ * @param loc
+ */
+void cegis_assign(const symbol_tablet &st, goto_programt::instructiont &instr,
+    const exprt &lhs, const exprt &rhs, const source_locationt &loc);
 
 /**
  * @brief
@@ -259,6 +316,25 @@ goto_programt::targett cegis_assign_user_variable(const symbol_tablet &st,
  *
  * @details
  *
+ * @param st
+ * @param body
+ * @param insert_after_pos
+ * @param func_name
+ * @param var_name
+ * @param value
+ *
+ * @return
+ */
+goto_programt::targett cegis_assign_local_variable(const symbol_tablet &st,
+    goto_programt &body, const goto_programt::targett &insert_after_pos,
+    const std::string &func_name, const std::string &var_name,
+    const exprt &value);
+
+/**
+ * @brief
+ *
+ * @details
+ *
  * @param body
  * @param pos
  */
@@ -282,6 +358,48 @@ goto_programt::targett add_return_assignment(
     goto_programt &body,
     goto_programt::targett pos,
     const irep_idt &func_id,
+    const exprt &value);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ *
+ * @return
+ */
+goto_programt::targett insert_after_preserving_source_location(
+    goto_programt &body,
+    goto_programt::targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param body
+ * @param pos
+ *
+ * @return
+ */
+goto_programt::targett insert_before_preserving_source_location(
+    goto_programt &body,
+    goto_programt::targett pos);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param gf
+ * @param symbol
+ * @param value
+ */
+void assign_in_cprover_init(
+    goto_functionst &gf,
+    symbolt &symbol,
     const exprt &value);
 
 #endif /* CEGIS_PROGRAM_HELPER_H_ */

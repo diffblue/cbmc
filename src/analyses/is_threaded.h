@@ -28,7 +28,7 @@ public:
   {
     return is_threaded_set.find(t)!=is_threaded_set.end();
   }
-  
+
 protected:
   typedef std::set<goto_programt::const_targett> is_threaded_sett;
   is_threaded_sett is_threaded_set;

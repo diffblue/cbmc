@@ -2,7 +2,7 @@ struct x
 {
   void f();
   int f(int);
-  
+
 };
 
 void x::f()

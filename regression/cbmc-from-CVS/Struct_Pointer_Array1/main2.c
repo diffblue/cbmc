@@ -8,7 +8,7 @@ StructTag *TagTbl[2];
 int main() {
   unsigned int i;
   assume(i<2);
-  
+
 	if(TagTbl[i] != NULL)
 		TagTbl[i]->field = 1;
 }

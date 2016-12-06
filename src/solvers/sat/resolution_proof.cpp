@@ -30,11 +30,11 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
   std::vector<bool> seen;
 
   assert(!clauses.empty());
-  
+
   seen.resize(clauses.size(), false);
-  
+
   s.push(clauses.size()-1);
-  
+
   while(!s.empty())
   {
     typename clausest::size_type c_id=s.top();
@@ -42,9 +42,9 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
 
     if(seen[c_id]) continue;
     seen[c_id]=true;
-    
+
     const T &c=clauses[c_id];
-    
+
     if(c.is_root)
     {
       for(std::size_t i=0; i<c.root_clause.size(); i++)

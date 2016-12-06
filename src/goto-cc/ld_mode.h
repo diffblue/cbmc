@@ -28,10 +28,10 @@ public:
   }
 
   bool produce_hybrid_binary;
-  
+
 protected:
   ld_cmdlinet &cmdline;
-  
+
   //int gcc_hybrid_binary(const cmdlinet::argst &input_files);
   //static bool is_supported_source_file(const std::string &);
 };

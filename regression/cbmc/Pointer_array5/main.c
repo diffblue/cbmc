@@ -18,7 +18,7 @@ int main() {
     array_init[2] = &a2;
 
     void **local_array=(void**)array_init;
-    
+
     int *address=(int *)local_array[0];
     assert(address==&a0);
   }

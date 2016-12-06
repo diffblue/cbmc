@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-int x = 0, y; 
+int x = 0, y;
 
 void* thr1(void * arg)
 {

@@ -33,9 +33,9 @@ void path_symex_stept::output(std::ostream &out) const
         p_it!=pc_vector.end();
         p_it++)
       out << " " << *p_it;
- */     
+ */
   out << "\n";
-  
+
   out << "Guard: " << from_expr(guard) << "\n";
   out << "Full LHS: " << from_expr(full_lhs) << "\n";
   out << "SSA LHS: " << from_expr(ssa_lhs) << "\n";

@@ -13,7 +13,7 @@ class B {
 };
 
 template<class T>
-int A<T>::get_i(B& b){return b.i;} 
+int A<T>::get_i(B& b){return b.i;}
 
 int main()
 {

@@ -68,7 +68,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
 {
   // 'name' needs to be set, or we produce mal-formed
   // XML.
-  
+
   if(name=="") return;
 
   do_indent(out, indent);
@@ -137,10 +137,10 @@ void xmlt::escape(const std::string &s, std::ostream &out)
     case '>':
       out << "&gt;";
       break;
-    
+
     case '\r':
       break; // drop!
-    
+
     case '\n':
       out << '\n';
       break;
@@ -280,6 +280,44 @@ Function: xmlt::set_attribute
 void xmlt::set_attribute(
   const std::string &attribute,
   unsigned value)
+{
+  set_attribute(attribute, i2string(value));
+}
+
+/*******************************************************************\
+
+Function: xmlt::set_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void xmlt::set_attribute(
+  const std::string &attribute,
+  unsigned long value)
+{
+  set_attribute(attribute, i2string(value));
+}
+
+/*******************************************************************\
+
+Function: xmlt::set_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void xmlt::set_attribute(
+  const std::string &attribute,
+  unsigned long long value)
 {
   set_attribute(attribute, i2string(value));
 }

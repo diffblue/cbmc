@@ -8,7 +8,7 @@ public:
   X(int i):z(i)
   {
   }
-  
+
   int z;
 };
 

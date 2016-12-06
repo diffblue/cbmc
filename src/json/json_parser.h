@@ -22,9 +22,14 @@ class json_parsert:public parsert
 public:
   typedef std::stack<jsont, std::vector<jsont> > stackt;
   stackt stack;
-  
+
   inline jsont &top() { return stack.top(); }
-  
+
+  virtual bool parse() override
+  {
+    return yyjsonparse()!=0;
+  }
+
   inline void push(const jsont &x)
   {
     stack.push(x);
@@ -37,7 +42,7 @@ public:
     stack.pop();
   }
 
-  virtual void clear()
+  virtual void clear() override
   {
     stack=stackt();
   }

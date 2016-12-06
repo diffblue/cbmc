@@ -35,7 +35,7 @@ public:
   {
     // build the CFG data structure
     cfg(goto_functions);
-    
+
     // iterate
     fixedpoint();
   }
@@ -48,24 +48,24 @@ public:
   }
 
   void output(std::ostream &out) const;
-  
+
   inline friend std::ostream &operator << (
     std::ostream &out, const points_tot &points_to)
   {
     points_to.output(out);
     return out;
   }
-          
+
 protected:
   typedef cfg_baset<empty_cfg_nodet> cfgt;
   cfgt cfg;
 
   typedef std::map<object_idt, object_id_sett> value_mapt;
   value_mapt value_map;
-  
+
   void fixedpoint();
   bool transform(const cfgt::nodet&);
-  
+
   const object_id_sett empty_set;
 };
 

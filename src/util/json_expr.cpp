@@ -33,7 +33,7 @@ Function: json
 json_objectt json(const source_locationt &location)
 {
   json_objectt result;
-  
+
   if(!location.get_file().empty())
     result["file"]=json_stringt(id2string(location.get_file()));
 
@@ -45,7 +45,7 @@ json_objectt json(const source_locationt &location)
 
   if(!location.get_function().empty())
     result["function"]=json_stringt(id2string(location.get_function()));
-  
+
   return result;
 }
 
@@ -176,7 +176,7 @@ json_objectt json(
   const namespacet &ns)
 {
   json_objectt result;
-  
+
   const typet &type=ns.follow(expr.type());
 
   if(expr.id()==ID_constant)
@@ -186,17 +186,17 @@ json_objectt json(
        type.id()==ID_c_bit_field)
     {
       std::size_t width=to_bitvector_type(type).get_width();
-    
+
       result["name"]=json_stringt("integer");
       result["binary"]=json_stringt(expr.get_string(ID_value));
       result["width"]=json_numbert(i2string(width));
-      
+
       const typet &underlying_type=
         type.id()==ID_c_bit_field?type.subtype():
         type;
 
       bool is_signed=underlying_type.id()==ID_signedbv;
-        
+
       std::string sig=is_signed?"":"unsigned ";
 
       if(width==config.ansi_c.char_width)
@@ -275,9 +275,9 @@ json_objectt json(
   {
     result["name"]=json_stringt("array");
     json_arrayt &elements=result["elements"].make_array();
-    
+
     unsigned index=0;
-    
+
     forall_operands(it, expr)
     {
       json_objectt &e=elements.push_back().make_object();
@@ -289,7 +289,7 @@ json_objectt json(
   else if(expr.id()==ID_struct)
   {
     result["name"]=json_stringt("struct");
-    
+
     // these are expected to have a struct type
     if(type.id()==ID_struct)
     {
@@ -307,11 +307,11 @@ json_objectt json(
     }
   }
   else if(expr.id()==ID_union)
-  { 
+  {
     result["name"]=json_stringt("union");
-    
+
     assert(expr.operands().size()==1);
-    
+
     json_objectt &e=result["member"].make_object();
     e["value"]=json(expr.op0(), ns);
     e["name"]=json_stringt(id2string(to_union_expr(expr).get_component_name()));
@@ -321,4 +321,3 @@ json_objectt json(
 
   return result;
 }
-

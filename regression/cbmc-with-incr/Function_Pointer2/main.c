@@ -14,10 +14,10 @@ int main()
 {
   void (*p)(int);
   __CPROVER_bool c;
-  
+
   p=c?f:g;
-  
+
   p(1);
-  
+
   assert(global==c);
 }

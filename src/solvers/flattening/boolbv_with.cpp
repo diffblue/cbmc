@@ -73,7 +73,7 @@ bvt boolbvt::convert_with(const exprt &expr)
                  prev_bv,
                  bv);
   }
-  
+
   return bv;
 }
 
@@ -139,7 +139,7 @@ void boolbvt::convert_with_array(
 {
   if(is_unbounded_array(type))
   {
-    // can't do this    
+    // can't do this
     error().source_location=type.source_location();
     error() << "convert_with_array called for unbounded array" << eom;
     throw 0;
@@ -155,7 +155,7 @@ void boolbvt::convert_with_array(
     error() << "convert_with_array expects constant array size" << eom;
     throw 0;
   }
-    
+
   const bvt &op2_bv=convert_bv(op2);
 
   if(size*op2_bv.size()!=prev_bv.size())
@@ -304,7 +304,7 @@ void boolbvt::convert_with_struct(
 
       for(std::size_t i=0; i<sub_width; i++)
         next_bv[offset+i]=op2_bv[i];
-        
+
       break; // done
     }
 
@@ -358,4 +358,3 @@ void boolbvt::convert_with_union(
       next_bv[map_u.map_bit(i)]=op2_bv[map_op2.map_bit(i)];
   }
 }
-

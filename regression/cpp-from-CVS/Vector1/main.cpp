@@ -5,7 +5,7 @@ using namespace std;
 void sort(vector<int>& c)
 {
 	if (c.begin() == c.end()) return;
-	
+
 	for(int i=0; i < c.size(); i++)
 	{
 		for(vector<int>::iterator it = c.begin();
@@ -17,7 +17,7 @@ void sort(vector<int>& c)
 
 			if(it_inc == c.end())
 				break;
-		
+
 			if(it_inc < it)
 			{
 				vector<int>::value_type tmp = * it;
@@ -43,7 +43,7 @@ int main()
 	{
 		vector<int>::iterator it_inc = it;
 		it_inc++;
-		
+
 		if(it_inc == vec.end()) break;
 		__CPROVER_assert(*it <= *it_inc, "sorting error");
 	}

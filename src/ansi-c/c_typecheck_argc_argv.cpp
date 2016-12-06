@@ -40,7 +40,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
   }
 
   symbolt *argc_new_symbol;
-  
+
   const exprt &op0=static_cast<const exprt &>(parameters[0]);
   const exprt &op1=static_cast<const exprt &>(parameters[1]);
 
@@ -83,7 +83,7 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     // need to add one to the size -- the array is terminated
     // with NULL
     exprt one_expr=from_integer(1, argc_new_symbol->type);
-    
+
     exprt size_expr(ID_plus, argc_new_symbol->type);
     size_expr.copy_to_operands(argc_new_symbol->symbol_expr(), one_expr);
     argv_type.add(ID_size).swap(size_expr);
@@ -99,21 +99,21 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
     symbolt *argv_new_symbol;
     move_symbol(argv_symbol, argv_new_symbol);
   }
-  
+
   if(parameters.size()==3)
-  {    
-    symbolt envp_symbol;    
+  {
+    symbolt envp_symbol;
     envp_symbol.base_name="envp'";
     envp_symbol.name="envp'";
     envp_symbol.type=(static_cast<const exprt&>(parameters[2])).type();
     envp_symbol.is_static_lifetime=true;
-    
+
     symbolt envp_size_symbol, *envp_new_size_symbol;
     envp_size_symbol.base_name="envp_size";
     envp_size_symbol.name="envp_size'";
     envp_size_symbol.type=op0.type(); // same type as argc!
-    envp_size_symbol.is_static_lifetime=true;    
-    move_symbol(envp_size_symbol, envp_new_size_symbol);        
+    envp_size_symbol.is_static_lifetime=true;
+    move_symbol(envp_size_symbol, envp_new_size_symbol);
 
     if(envp_symbol.type.id()!=ID_pointer)
     {
@@ -122,12 +122,12 @@ void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
               << to_string(envp_symbol.type) << '\'' << eom;
       throw 0;
     }
-    
+
     exprt size_expr = envp_new_size_symbol->symbol_expr();
 
     envp_symbol.type.id(ID_array);
     envp_symbol.type.add(ID_size).swap(size_expr);
-    
+
     symbolt *envp_new_symbol;
     move_symbol(envp_symbol, envp_new_symbol);
   }

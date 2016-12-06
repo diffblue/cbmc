@@ -25,8 +25,8 @@ void add_danger_execute(std::string &source, const size_t num_vars,
     const size_t num_consts, const size_t max_prog_size,
     const std::string &exec_func_name)
 {
-  std::string text=get_cegis_library_text(num_vars, num_consts,
-      max_prog_size, exec_func_name);
+  std::string text=get_cegis_library_text(num_vars, num_consts, max_prog_size,
+      exec_func_name);
   substitute(text, "#define opcode program[i].opcode",
       "const opcodet opcode=program[i].opcode;");
   substitute(text, "#line 1 \"<builtin-library>\"",
@@ -69,7 +69,7 @@ bool handle_start(std::string &source, const std::string &line)
 
 bool handle_return_value(const std::string &line)
 {
-  return contains(line, "main#return_value");
+  return contains(line, "main#return_value") || contains(line, "_return'");
 }
 
 #define PROG_PREFIX "  struct " CEGIS_PREFIX "instructiont "
@@ -100,7 +100,9 @@ void replace_danger_execute_size(std::string &line)
 
 void replace_return_values(std::string &line)
 {
+  substitute(line, "OUTPUT(\"return\", return')", "");
   substitute(line, "#return_value", "__return_value");
+  substitute(line, "return'", "__return_value");
 }
 
 void fix_cprover_names(std::string &line)

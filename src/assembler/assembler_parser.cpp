@@ -31,4 +31,3 @@ int yyassemblererror(const std::string &error)
   assembler_parser.parse_error(error, yyassemblertext);
   return 0;
 }
-

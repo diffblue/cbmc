@@ -16,6 +16,13 @@
  * @brief
  *
  * @details
+ */
+#define TAG_PREFIX "tag-"
+
+/**
+ * @brief
+ *
+ * @details
  *
  * @param st
  * @param type

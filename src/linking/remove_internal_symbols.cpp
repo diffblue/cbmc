@@ -18,11 +18,11 @@ Author: Daniel Kroening
 
 Function: get_symbols_rec
 
-  Inputs: 
+  Inputs:
 
- Outputs: 
+ Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -32,12 +32,12 @@ void get_symbols_rec(
   find_symbols_sett &dest)
 {
   dest.insert(symbol.name);
-  
+
   find_symbols_sett new_symbols;
 
   find_type_and_expr_symbols(symbol.type, new_symbols);
   find_type_and_expr_symbols(symbol.value, new_symbols);
-  
+
   if(symbol.type.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(symbol.type);
@@ -80,7 +80,7 @@ Function: remove_internal_symbols
           * non-static function with body that is not extern inline
           * symbol used in an EXPORTED symbol
           * type used in an EXPORTED symbol
-          
+
           Read
           http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
           on "extern inline"
@@ -95,11 +95,11 @@ void remove_internal_symbols(
 
   // we retain certain special ones
   find_symbols_sett special;
-  special.insert("argc'");  
-  special.insert("argv'");  
-  special.insert("envp'");  
-  special.insert("envp_size'");  
-  special.insert(CPROVER_PREFIX "memory");  
+  special.insert("argc'");
+  special.insert("argv'");
+  special.insert("envp'");
+  special.insert("envp_size'");
+  special.insert(CPROVER_PREFIX "memory");
   special.insert(CPROVER_PREFIX "initialize");
   special.insert(CPROVER_PREFIX "malloc_size");
   special.insert(CPROVER_PREFIX "deallocated");
@@ -115,7 +115,7 @@ void remove_internal_symbols(
     if(exported.find(it->first)!=exported.end())
       continue;
 
-    // not marked yet  
+    // not marked yet
     const symbolt &symbol=it->second;
 
     if(special.find(symbol.name)!=special.end())
@@ -123,7 +123,7 @@ void remove_internal_symbols(
       get_symbols_rec(ns, symbol, exported);
       continue;
     }
-    
+
     bool is_function=symbol.type.id()==ID_code;
     bool is_file_local=symbol.is_file_local;
     bool is_type=symbol.is_type;
@@ -155,7 +155,7 @@ void remove_internal_symbols(
     {
       // 'extern' symbols are only exported if there
       // is an initializer.
-      if((has_initializer || !symbol.is_extern) && 
+      if((has_initializer || !symbol.is_extern) &&
          !is_file_local)
       {
         get_symbols_rec(ns, symbol, exported);
@@ -182,4 +182,3 @@ void remove_internal_symbols(
     }
   }
 }
-

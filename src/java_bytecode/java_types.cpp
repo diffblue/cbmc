@@ -224,7 +224,7 @@ pointer_typet java_array_type(const char subtype)
   symbol_typet symbol_type("java::"+id2string(class_name));
   symbol_type.set(ID_C_base_name, class_name);
   symbol_type.set(ID_C_element_type, java_type_from_char(subtype));
-  
+
   return pointer_typet(symbol_type);
 }
 
@@ -347,16 +347,16 @@ typet java_type_from_string(const std::string &src)
       if(e_pos==std::string::npos) return nil_typet();
 
       code_typet result;
-      
+
       result.return_type()=
         java_type_from_string(std::string(src, e_pos+1, std::string::npos));
 
       for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
       {
         code_typet::parametert param;
-        
+
         size_t start=i;
-        
+
         while(i<src.size())
         {
           if(src[i]=='L')
@@ -369,16 +369,16 @@ typet java_type_from_string(const std::string &src)
           else
             break;
         }
-        
+
         std::string sub_str=src.substr(start, i-start+1);
         param.type()=java_type_from_string(sub_str);
-        
+
         if(param.type().id()==ID_symbol)
           param.type()=java_reference_type(param.type());
-        
+
         result.parameters().push_back(param);
       }
-        
+
       return result;
     }
 
@@ -390,16 +390,16 @@ typet java_type_from_string(const std::string &src)
       tmp.subtype().set(ID_C_element_type, subtype);
       return tmp;
     }
-    
+
   case 'B': return java_byte_type();
-  case 'F': return java_float_type();    
+  case 'F': return java_float_type();
   case 'D': return java_double_type();
   case 'I': return java_int_type();
   case 'C': return java_char_type();
   case 'S': return java_short_type();
   case 'Z': return java_boolean_type();
-  case 'V': return java_void_type();  
-  case 'J': return java_long_type();  
+  case 'V': return java_void_type();
+  case 'J': return java_long_type();
 
   case 'L':
     {
@@ -417,7 +417,7 @@ typet java_type_from_string(const std::string &src)
       result.subtype().set(ID_C_base_name, class_name);
       return result;
     }
-  
+
   default:
     return nil_typet();
   }
@@ -504,7 +504,7 @@ symbol_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
     return to_symbol_type(java_type_from_string(id).subtype());
-  
+
   std::string class_name=id;
 
   class_name=slash_to_dot(class_name);

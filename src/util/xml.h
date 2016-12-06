@@ -1,9 +1,9 @@
 /*******************************************************************\
- 
+
 Module:
- 
+
 Author: Daniel Kroening, kroening@kroening.com
- 
+
 \*******************************************************************/
 
 #ifndef XML_H
@@ -45,6 +45,14 @@ public:
 
   void set_attribute(
     const std::string &attribute,
+    unsigned long value);
+
+  void set_attribute(
+    const std::string &attribute,
+    unsigned long long value);
+
+  void set_attribute(
+    const std::string &attribute,
     const std::string &value);
 
   std::string get_attribute(
@@ -52,7 +60,7 @@ public:
   {
     attributest::const_iterator i=attributes.find(attribute);
     if(i!=attributes.end())
-      return i->second;                    
+      return i->second;
     return "";
   }
 

@@ -1,8 +1,8 @@
 main()
 {
   unsigned int N;
-  __CPROVER_assume(N>0); 
- 
+  __CPROVER_assume(N>0);
+
   unsigned int j,k;
   int matrix[N], max;
 
@@ -17,4 +17,3 @@ main()
 
   assert(matrix[0]<max);
 }
-

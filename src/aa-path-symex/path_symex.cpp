@@ -33,7 +33,7 @@ public:
   inline path_symext()
   {
   }
-  
+
   void operator()(
     path_symex_statet &state,
     std::list<path_symex_statet> &furter_states);
@@ -43,17 +43,17 @@ public:
   void do_goto(
     path_symex_statet &state,
     bool taken);
-    
+
   void do_assert_fail(path_symex_statet &state)
   {
     const goto_programt::instructiont &instruction=
       *state.get_instruction();
-    
+
     state.record_step();
     state.next_pc();
     exprt guard=state.read(not_exprt(instruction.guard));
     state.history->guard=guard;
-  }  
+  }
 
 protected:
   void do_goto(
@@ -68,13 +68,13 @@ protected:
     exprt f=state.read(call.function());
     function_call_rec(state, call, f, further_states);
   }
-    
+
   void function_call_rec(
     path_symex_statet &state,
     const code_function_callt &function_call,
     const exprt &function,
     std::list<path_symex_statet> &further_states);
-    
+
   void return_from_function(
     path_symex_statet &state,
     const exprt &return_value);
@@ -208,7 +208,7 @@ void path_symext::assign(
 
   // read the address of the lhs, with propagation
   exprt lhs_address=state.read(address_of_exprt(lhs));
-  
+
   // now SSA it, no propagation
   exprt ssa_lhs=
     state.read_no_propagate(dereference_exprt(lhs_address));
@@ -249,7 +249,7 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
       if(t.is_not_nil()) return t;
     }
   }
-  
+
   return nil_typet();
 }
 
@@ -260,16 +260,16 @@ void path_symext::symex_malloc(
 {
   if(code.operands().size()!=1)
     throw "malloc expected to have one operand";
-    
+
   // increment dynamic object counter
   unsigned dynamic_count=++state.var_map.dynamic_count;
-  
+
   exprt size=code.op0();
   typet object_type=nil_typet();
-  
+
   {
     exprt tmp_size=state.read(size); // to allow constant propagation
-    
+
     // special treatment for sizeof(T)*x
     if(tmp_size.id()==ID_mult &&
        tmp_size.operands().size()==2 &&
@@ -277,12 +277,12 @@ void path_symext::symex_malloc(
     {
       object_type=array_typet(
         c_sizeof_type_rec(tmp_size.op0()),
-        tmp_size.op1());      
+        tmp_size.op1());
     }
     else
     {
       typet tmp_type=c_sizeof_type_rec(tmp_size);
-      
+
       if(tmp_type.is_not_nil())
       {
         // Did the size get multiplied?
@@ -298,25 +298,25 @@ void path_symext::symex_malloc(
           else
           {
             mp_integer elements=alloc_size/elem_size;
-            
+
             if(elements*elem_size==alloc_size)
               object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
           }
         }
       }
     }
-    
+
     if(object_type.is_nil())
       object_type=array_typet(unsigned_char_type(), tmp_size);
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
-    
+
     if(object_type.id()==ID_array &&
        !to_array_type(object_type).size().is_constant())
     {
       exprt &size=to_array_type(object_type).size();
-    
+
       symbolt size_symbol;
 
       size_symbol.base_name="dynamic_object_size"+i2string(dynamic_count);
@@ -328,13 +328,13 @@ void path_symext::symex_malloc(
       //state.var_map(size_symbol.name, suffix, size_symbol.type);
 
       assign(state,
-             size_symbol.symbol_expr(), 
+             size_symbol.symbol_expr(),
              size);
 
       size=size_symbol.symbol_expr();
     }
   }
-  
+
   // value
   symbolt value_symbol;
 
@@ -348,7 +348,7 @@ void path_symext::symex_malloc(
   //state.var_map(value_symbol.name, suffix, value_symbol.type);
 
   address_of_exprt rhs;
-  
+
   if(object_type.id()==ID_array)
   {
     rhs.type()=pointer_typet(value_symbol.type.subtype());
@@ -362,7 +362,7 @@ void path_symext::symex_malloc(
     rhs.op0()=value_symbol.symbol_expr();
     rhs.type()=pointer_typet(value_symbol.type);
   }
-  
+
   if(rhs.type()!=lhs.type())
     rhs.make_typecast(lhs.type());
 
@@ -383,31 +383,31 @@ Function: path_symext::assign_rec
 
 void path_symext::assign_rec(
   path_symex_statet &state,
-  exprt::operandst &guard, 
-  const exprt &ssa_lhs, 
+  exprt::operandst &guard,
+  const exprt &ssa_lhs,
   const exprt &ssa_rhs)
 {
   //const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
-  
+
   #ifdef DEBUG
   std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
   //std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
   #endif
-  
+
   if(ssa_lhs.id()==ID_symbol)
   {
     // These are expected to the SSA symbols
     assert(ssa_lhs.get_bool(ID_C_SSA_symbol));
-    
+
     const symbol_exprt &symbol_expr=to_symbol_expr(ssa_lhs);
     const irep_idt &full_identifier=symbol_expr.get(ID_C_full_identifier);
-    
+
     #ifdef DEBUG
     const irep_idt &ssa_identifier=symbol_expr.get_identifier();
     std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
     std::cout << "full identifier: " << full_identifier << std::endl;
     #endif
-    
+
     var_mapt::var_infot &var_info=state.var_map[full_identifier];
     assert(var_info.full_identifier==full_identifier);
 
@@ -447,7 +447,7 @@ void path_symext::assign_rec(
       // record the step
       state.record_step();
       path_symex_stept &step=*state.history;
-      
+
       if(!guard.empty()) step.guard=conjunction(guard);
       step.full_lhs=ssa_lhs;
       step.ssa_lhs=new_lhs;
@@ -469,7 +469,7 @@ void path_symext::assign_rec(
 
     const typet &compound_type=
       state.var_map.ns.follow(struct_op.type());
-  
+
     if(compound_type.id()==ID_struct)
     {
       throw "unexpected struct member on lhs";
@@ -481,7 +481,7 @@ void path_symext::assign_rec(
       new_rhs.type()=struct_op.type();
       new_rhs.set_component_name(ssa_lhs_member_expr.get_component_name());
       new_rhs.op()=ssa_rhs;
-      
+
       assign_rec(state, guard, struct_op, new_rhs);
     }
     else
@@ -493,7 +493,7 @@ void path_symext::assign_rec(
     std::cout << "assign_rec ID_index" << std::endl;
     #endif
 
-    throw "unexpected array index on lhs";    
+    throw "unexpected array index on lhs";
   }
   else if(ssa_lhs.id()==ID_dereference)
   {
@@ -516,7 +516,7 @@ void path_symext::assign_rec(
     guard.push_back(cond);
     assign_rec(state, guard, lhs_if_expr.true_case(), ssa_rhs);
     guard.pop_back();
-    
+
     // false
     guard.push_back(not_exprt(cond));
     assign_rec(state, guard, lhs_if_expr.false_case(), ssa_rhs);
@@ -531,12 +531,12 @@ void path_symext::assign_rec(
 
     const byte_extract_exprt &byte_extract_expr=
       to_byte_extract_expr(ssa_lhs);
-  
+
     // assignment to byte_extract operators:
     // turn into byte_update operator
-    
+
     irep_idt new_id;
-    
+
     if(ssa_lhs.id()==ID_byte_extract_little_endian)
       new_id=ID_byte_update_little_endian;
     else if(ssa_lhs.id()==ID_byte_extract_big_endian)
@@ -550,7 +550,7 @@ void path_symext::assign_rec(
     new_rhs.op()=byte_extract_expr.op();
     new_rhs.offset()=byte_extract_expr.offset();
     new_rhs.value()=ssa_rhs;
-    
+
     const exprt new_lhs=byte_extract_expr.op();
 
     assign_rec(state, guard, new_lhs, new_rhs);
@@ -561,12 +561,12 @@ void path_symext::assign_rec(
       to_struct_type(state.var_map.ns.follow(ssa_lhs.type()));
     const struct_typet::componentst &components=
       struct_type.components();
-    
+
     // split up into components
     const exprt::operandst &operands=ssa_lhs.operands();
-    
+
     assert(operands.size()==components.size());
-    
+
     for(unsigned i=0; i<components.size(); i++)
     {
       exprt new_rhs=
@@ -579,15 +579,15 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_array)
   {
     const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
-  
+
     if(ssa_lhs_type.id()!=ID_array)
       throw "array constructor must have array type";
-      
+
     const array_typet &array_type=
       to_array_type(ssa_lhs_type);
-      
+
     const exprt::operandst &operands=ssa_lhs.operands();
-    
+
     // split up into elements
     for(unsigned i=0; i<operands.size(); i++)
     {
@@ -602,9 +602,9 @@ void path_symext::assign_rec(
   {
     const vector_typet &vector_type=
       to_vector_type(state.var_map.ns.follow(ssa_lhs.type()));
-    
+
     const exprt::operandst &operands=ssa_lhs.operands();
-    
+
     // split up into elements
     for(unsigned i=0; i<operands.size(); i++)
     {
@@ -663,11 +663,11 @@ void path_symext::function_call_rec(
 
     if(f_it==state.locs.function_map.end())
       throw "failed to find `"+id2string(function_identifier)+"' in function_map";
-  
+
     const locst::function_entryt &function_entry=f_it->second;
 
     loc_reft function_entry_point=function_entry.first_loc;
-  
+
     // do we have a body?
     if(function_entry_point==loc_reft())
     {
@@ -678,7 +678,7 @@ void path_symext::function_call_rec(
       state.next_pc();
       return;
     }
-  
+
     // push a frame on the call stack
     path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
     thread.call_stack.push_back(path_symex_statet::framet());
@@ -686,7 +686,7 @@ void path_symext::function_call_rec(
     thread.call_stack.back().return_location=thread.pc.next_loc();
     thread.call_stack.back().return_lhs=call.lhs();
     thread.call_stack.back().saved_local_vars=thread.local_vars;
-    
+
     // update statistics
     state.recursion_map[function_identifier]++;
 
@@ -695,7 +695,7 @@ void path_symext::function_call_rec(
     const code_typet::argumentst &function_arguments=code_type.arguments();
 
     const exprt::operandst &call_arguments=call.arguments();
-  
+
     // now assign the argument values
     for(unsigned i=0; i<call_arguments.size(); i++)
     {
@@ -708,7 +708,7 @@ void path_symext::function_call_rec(
           throw "function_call " + id2string(function_identifier) + " no identifier for function argument";
 
         symbol_exprt lhs(identifier, function_argument.type());
-            
+
         // TODO: need to save+restore
 
         assign(state, lhs, call_arguments[i]);
@@ -784,7 +784,7 @@ void path_symext::return_from_function(
   {
     // update statistics
     state.recursion_map[thread.call_stack.back().current_function]--;
-  
+
     // set PC to return location
     thread.pc=thread.call_stack.back().return_location;
 
@@ -826,7 +826,7 @@ void path_symext::do_goto(
   assert(!loc.branch_target.is_nil());
 
   exprt guard=state.read(instruction.guard);
-  
+
   if(guard.is_true())
   {
     state.record_branch_step(true);
@@ -933,7 +933,7 @@ void path_symext::do_goto(
   }
 
   exprt guard=state.read(instruction.guard);
-  
+
   if(taken)
   {
     // branch taken case
@@ -969,7 +969,7 @@ void path_symext::operator()(
 {
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
-    
+
   #ifdef DEBUG
   std::cout << "path_symext::operator(): " << instruction.type
             << std::endl;
@@ -982,7 +982,7 @@ void path_symext::operator()(
     state.record_step();
     return_from_function(state, nil_exprt());
     break;
-    
+
   case RETURN:
     // pop the call stack
     {
@@ -992,15 +992,15 @@ void path_symext::operator()(
       return_from_function(state, return_val);
     }
     break;
-    
+
   case START_THREAD:
     {
       const loct &loc=state.locs[state.pc()];
       assert(!loc.branch_target.is_nil());
-      
+
       state.record_step();
       state.next_pc();
-      
+
       // ordering of the following matters due to vector instability
       path_symex_statet::threadt &new_thread=state.add_thread();
       path_symex_statet::threadt &old_thread=state.threads[state.get_current_thread()];
@@ -1008,29 +1008,29 @@ void path_symext::operator()(
       new_thread.local_vars=old_thread.local_vars;
     }
     break;
-    
+
   case END_THREAD:
     state.record_step();
     state.disable_current_thread();
     break;
-    
+
   case GOTO:
     if (state.is_lazy())
       do_goto(state, state.restore_branch());
     else
       do_goto(state, further_states);
     break;
-    
+
   case CATCH:
     // ignore for now
     state.record_step();
     state.next_pc();
     break;
-    
+
   case THROW:
     state.record_step();
     throw "THROW not yet implemented";
-    
+
   case ASSUME:
     state.record_step();
     state.next_pc();
@@ -1042,7 +1042,7 @@ void path_symext::operator()(
       state.history->guard=guard;
     }
     break;
-    
+
   case ASSERT:
   case SKIP:
   case LOCATION:
@@ -1074,17 +1074,17 @@ void path_symext::operator()(
     state.next_pc();
     state.inside_atomic_section=false;
     break;
-    
+
   case ASSIGN:
     assign(state, to_code_assign(instruction.code));
     state.next_pc();
     break;
-    
+
   case FUNCTION_CALL:
     state.record_step();
     function_call(state, to_code_function_call(instruction.code), further_states);
     break;
-    
+
   case OTHER:
     state.record_step();
 
@@ -1218,4 +1218,3 @@ void path_symex_assert_fail(path_symex_statet &state)
   path_symext path_symex;
   path_symex.do_assert_fail(state);
 }
-

@@ -10,18 +10,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_
 #define CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_
 
-#include <deque>
-#include <map>
-
-#include <util/expr.h>
+#include <cegis/cegis-util/labelled_assignments.h>
 
 /**
  * @brief
  *
- * @details List of values per CE location.
+ * @details
  */
-typedef std::map<const irep_idt, exprt::operandst> refactor_counterexamplet;
+typedef labelled_assignmentst refactor_counterexamplet;
 
-typedef std::deque<refactor_counterexamplet> refactor_counterexamplest;
+/**
+ * @brief
+ *
+ * @details
+ */
+typedef labelled_counterexamplest refactor_counterexamplest;
 
 #endif /* CEGIS_REFACTOR_VALUE_REFACTOR_COUNTERXAMPLE_H_ */

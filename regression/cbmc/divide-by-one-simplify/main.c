@@ -4,7 +4,7 @@ int main (void) {
   float f;
   float g;
   int i;
-  
+
   __CPROVER_assume(f == f); // I.E. not NaN
 
   g = f;

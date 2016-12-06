@@ -70,7 +70,7 @@ Function: propt::is_in_conflict
 
  Outputs: true iff the given literal is part of the final conflict
 
- Purpose:  
+ Purpose:
 
 \*******************************************************************/
 
@@ -86,9 +86,9 @@ Function: propt::new_variables
 
   Inputs: width
 
- Outputs: bitvector 
+ Outputs: bitvector
 
- Purpose: generates a bitvector of given width with new variables 
+ Purpose: generates a bitvector of given width with new variables
 
 \*******************************************************************/
 
@@ -100,5 +100,3 @@ bvt propt::new_variables(std::size_t width)
     result[i]=new_variable();
   return result;
 }
-
-

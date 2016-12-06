@@ -24,13 +24,13 @@ Function:
   Inputs:
 
  Outputs:
- 
+
  Purpose:
 
 \*******************************************************************/
 
 /* po^+ /\ U{C_1, ..., C_n} \/ delays */
-void cycles_visitort::po_edges(std::set<unsigned>& edges) 
+void cycles_visitort::po_edges(std::set<unsigned>& edges)
 {
   instrumentert& instrumenter=fence_inserter.instrumenter;
 
@@ -48,16 +48,16 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
 #ifdef BTWN1
     /* btwn1: variables are all the pos involved in cycles, plus the delays
        for dp when analysing Power or ARM */
-    if(fence_inserter.model==Power || fence_inserter.model==Unknown) 
+    if(fence_inserter.model==Power || fence_inserter.model==Unknown)
     {
-      /* for Power/ARM, add also delays as variables for dp (other fences 
+      /* for Power/ARM, add also delays as variables for dp (other fences
          are superfluous if the edge is not in pos; yet it's not harmful) */
       for(std::set<edget>::iterator e_i=C_j->unsafe_pairs.begin();
         e_i!=C_j->unsafe_pairs.end(); ++e_i)
       {
         if(e_i->is_po)
           edges.insert(fence_inserter.add_edge(*e_i));
-        else 
+        else
         {
           /* also add pos of non-delaying pos+ of cycles, as they could AC or
              BC */
@@ -69,7 +69,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
             std::list<unsigned> new_path;
             new_path.push_back(e_i->first);
             new_path.push_back(next_it->first);
-            fence_inserter.const_graph_visitor.const_graph_explore_AC(egraph, 
+            fence_inserter.const_graph_visitor.const_graph_explore_AC(egraph,
               next_it->first, new_path);
           }
 
@@ -81,7 +81,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
             std::list<unsigned> new_path;
             new_path.push_back(e_i->second);
             new_path.push_back(next_it->first);
-            fence_inserter.const_graph_visitor.const_graph_explore_BC(egraph, 
+            fence_inserter.const_graph_visitor.const_graph_explore_BC(egraph,
               next_it->first, new_path);
           }
         }
@@ -113,7 +113,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
           std::list<unsigned> new_path;
           new_path.push_back(e_i.first);
           new_path.push_back(next_it->first);
-          fence_inserter.const_graph_visitor.const_graph_explore(egraph, 
+          fence_inserter.const_graph_visitor.const_graph_explore(egraph,
             next_it->first, e_i.second, new_path);
         }
       }
@@ -137,7 +137,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
             std::list<unsigned> new_path;
             new_path.push_back(e_i.first);
             new_path.push_back(next_it->first);
-            fence_inserter.const_graph_visitor.const_graph_explore(egraph, 
+            fence_inserter.const_graph_visitor.const_graph_explore(egraph,
               next_it->first, e_i.second, new_path);
           }
         }
@@ -169,7 +169,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
           break;
       }
 
-      if(C_j_it==C_j->end()) 
+      if(C_j_it==C_j->end())
         continue;
 #endif
 
@@ -312,7 +312,7 @@ void cycles_visitort::poww_constraint(
 }
 
 /*******************************************************************\
- 
+
 Function:
 
   Inputs:
@@ -343,7 +343,7 @@ void cycles_visitort::porw_constraint(
 }
 
 /*******************************************************************\
- 
+
 Function:
 
   Inputs:
@@ -374,7 +374,7 @@ void cycles_visitort::porr_constraint(
 }
 
 /*******************************************************************\
- 
+
 Function:
 
   Inputs:
@@ -387,11 +387,11 @@ Function:
 
 /* C_j /\ comWR */
 void cycles_visitort::com_constraint(
-  const event_grapht::critical_cyclet& C_j,                          
-  std::set<unsigned>& edges) 
+  const event_grapht::critical_cyclet& C_j,
+  std::set<unsigned>& edges)
 {
   event_grapht& egraph=fence_inserter.instrumenter.egraph;
- 
+
   for(std::set<edget>::const_iterator it=C_j.unsafe_pairs.begin();
     it!=C_j.unsafe_pairs.end();
     ++it)
@@ -415,7 +415,7 @@ void cycles_visitort::com_constraint(
     const abstract_eventt& e1=egraph[*e_it];
     const abstract_eventt& e2=egraph[*next_it];
 
-    if(e1.operation==abstract_eventt::Write 
+    if(e1.operation==abstract_eventt::Write
       && e2.operation==abstract_eventt::Read
       && e1.thread!=e2.thread)
     {
@@ -430,7 +430,7 @@ void cycles_visitort::com_constraint(
   const abstract_eventt& e1=egraph[*e_it];
   const abstract_eventt& e2=egraph[*next_it];
 
-  if(e1.operation==abstract_eventt::Write 
+  if(e1.operation==abstract_eventt::Write
     && e2.operation==abstract_eventt::Read
     && e1.thread!=e2.thread)
   {
@@ -439,4 +439,3 @@ void cycles_visitort::com_constraint(
   }
 #endif
 }
-

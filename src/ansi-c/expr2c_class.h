@@ -133,7 +133,7 @@ protected:
     unsigned precedence);
 
   std::string convert_complex(
-    const exprt &src, 
+    const exprt &src,
     unsigned precedence);
 
   std::string convert_comma(

@@ -1,26 +1,26 @@
 /*******************************************************************\
- 
+
 Module: Compile and link source and object files.
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #include "xml_irep.h"
 #include "xml_symbol.h"
 
 /*******************************************************************\
- 
+
 Function: convert
- 
+
   Inputs: a symbol and an xml node
- 
+
  Outputs: none
- 
+
  Purpose: converts a symbol to an xml symbol node
- 
+
 \*******************************************************************/
 
 void convert(const symbolt& sym, xmlt &root)
@@ -69,21 +69,21 @@ void convert(const symbolt& sym, xmlt &root)
 }
 
 /*******************************************************************\
- 
+
 Function: convert
- 
+
   Inputs: an xml node and a symbol
- 
+
  Outputs: none
- 
+
  Purpose: converts an xml symbol node to a symbol
- 
+
 \*******************************************************************/
 
 void convert(const xmlt &xmlsym, symbolt& symbol)
 {
   symbol.name=xmlsym.get_attribute("name");
-  
+
   for(xmlt::elementst::const_iterator
       it=xmlsym.elements.begin();
       it!=xmlsym.elements.end();
@@ -120,7 +120,7 @@ void convert(const xmlt &xmlsym, symbolt& symbol)
       //symbol.binding = it->get_attribute_bool("binding");
       //symbol.free_var = it->get_attribute_bool("free_var");
       symbol.is_state_var = it->get_attribute_bool("statevar");
-      
+
       for(xmlt::elementst::const_iterator
           fit=it->elements.begin();
           fit!=it->elements.end();

@@ -24,7 +24,7 @@ class namespace_utils_baset
   virtual ~namespace_utils_baset()
   {
   }
- 
+
   const symbolt &lookup(const irep_idt &name) const
   {
     const symbolt *symbol;
@@ -32,7 +32,7 @@ class namespace_utils_baset
       throw "identifier "+id2string(name)+" not found";
     return *symbol;
   }
-   
+
   const symbolt &lookup(const symbol_exprt &symbol_expr) const
   {
     const symbolt *symbol;
@@ -40,7 +40,7 @@ class namespace_utils_baset
       throw "identifier "+id2string(symbol_expr.get_identifier())+" not found";
     return *symbol;
   }
-   
+
   bool lookup(const irep_idt &name, const symbolt *&symbol) const
   {
     return ns().lookup(name, symbol);
@@ -66,13 +66,13 @@ class namespace_utils_baset
   {
     ::base_type(type, ns());
   }
-   
+
   void base_type(exprt &expr)
   {
     ::base_type(expr, ns());
   }
   */
-   
+
   bool type_eq(const typet &type1, const typet &type2)
   {
     return ::type_eq(type1, type2, ns());
@@ -86,12 +86,12 @@ class namespace_utils_baset
  protected:
   virtual const namespacet &ns() const=0;
 };
- 
+
 class namespace_utilst:public virtual namespace_utils_baset
 {
  public:
   namespace_utilst(const namespacet &_ns):__ns(_ns){}
-  
+
  protected:
   const namespacet &__ns;
 
@@ -100,5 +100,5 @@ class namespace_utilst:public virtual namespace_utils_baset
     return __ns;
   }
 };
- 
+
 #endif

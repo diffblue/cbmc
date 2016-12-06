@@ -39,4 +39,3 @@ int main()
   assert(f(some_struct_var.e1)==1);
   assert(f(some_struct_var.e2)==2);
 }
-

@@ -19,7 +19,7 @@ Function: call_grapht::call_grapht
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -35,7 +35,7 @@ Function: call_grapht::call_grapht
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -56,7 +56,7 @@ Function: call_grapht::add
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -83,7 +83,7 @@ Function: call_grapht::add
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -102,7 +102,7 @@ Function: call_grapht::output_dot
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -119,7 +119,7 @@ void call_grapht::output_dot(std::ostream &out) const
         << " [arrowhead=\"vee\"];"
         << "\n";
   }
-  
+
   out << "}\n";
 }
 
@@ -131,7 +131,7 @@ Function: call_grapht::output
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -154,7 +154,7 @@ Function: call_grapht::output_xml
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 

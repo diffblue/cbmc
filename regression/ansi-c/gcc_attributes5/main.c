@@ -16,7 +16,7 @@ STATIC_ASSERT(__alignof(var2)==8);
 STATIC_ASSERT(__alignof(var3)==8);
 STATIC_ASSERT(__alignof(var4)==8);
 STATIC_ASSERT(__alignof(var5)==8);
-STATIC_ASSERT(__alignof(var6)==8);
+STATIC_ASSERT(__alignof(var6)==__alignof(void *));
 STATIC_ASSERT(__alignof(var7)==8);
 
 void (__attribute__((aligned)) *****f1)(void);
@@ -29,7 +29,7 @@ int (* __attribute__((cdecl,regparm(0))) foo4)(int x);
 typedef int (__attribute__((cdecl,regparm(0))) foo5)(int x);
 typedef int (__attribute__((cdecl,regparm(0))) *foo6)(int x);
 typedef int* (__attribute__((cdecl,regparm(0))) *foo7)(int x);
-                
+
 #endif
 
 int main()

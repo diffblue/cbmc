@@ -18,7 +18,7 @@ struct sc_ufixed
 const sc_ufixed<1, 1> one(1U);
 
 int main (void) {
-  //const sc_ufixed<1, 1> one(1U);  
+  //const sc_ufixed<1, 1> one(1U);
   one.multiply(one);
   return 0;
 }

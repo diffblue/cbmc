@@ -28,7 +28,7 @@ public:
     f.l.invert();
     return f;
   }
-  
+
   friend bformulat operator? (
     bformulat c, bformulat a, bformulat b);
 
@@ -38,65 +38,65 @@ public:
   friend bformulat operator ==(bformulat a, bformulat b);
   friend bformulat operator !=(bformulat a, bformulat b);
 
-  // for sets  
+  // for sets
   friend inline bool operator <(const bformulat a, const bformulat b)
   {
     return a.l<b.l;
   }
-  
+
   inline literalt::var_not var_no() const
   {
     return l.var_no();
   }
-  
+
   inline bool sign() const
   {
     return l.sign();
   }
-  
+
   inline void set(literalt _l)
   {
     l=_l;
   }
-  
+
   inline void set(literalt::var_not v, bool sign)
   {
     l.set(v, sign);
   }
-  
+
   inline literalt get_literal() const
   {
     return l;
   }
-  
+
   void clear()
   {
     l.clear();
     prop=NULL;
   }
-  
+
   inline void swap(bformulat &x)
   {
     std::swap(x.l, l);
     std::swap(x.prop, prop);
   }
-  
+
   // constants
   inline void make_true()
   {
     l.make_true();
   }
-  
+
   inline void make_false()
   {
     l.make_false();
   }
-  
+
   inline bool is_true() const
   {
     return l.is_true();
   }
-  
+
   inline bool is_false() const
   {
     return l.is_false();
@@ -113,7 +113,7 @@ public:
     f.l=const_literal(value);
     return f;
   }
-  
+
   inline bool is_constant() const
   {
     return l.is_constant();

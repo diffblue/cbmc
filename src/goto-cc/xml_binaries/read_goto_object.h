@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: Read goto object files.
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #ifndef CPROVER_READ_GOTO_OBJECT_H

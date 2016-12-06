@@ -46,14 +46,14 @@ public:
     retain_trivial=_options.get_bool_option("retain-trivial");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
-    enable_assumptions=_options.get_bool_option("assumptions");    
+    enable_assumptions=_options.get_bool_option("assumptions");
     error_labels=_options.get_list_option("error-label");
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
 
   void goto_check(goto_functiont &goto_function);
-    
+
   irep_idt mode;
 
 protected:
@@ -84,20 +84,20 @@ protected:
     const source_locationt &,
     const exprt &src_expr,
     const guardt &guard);
-  
+
   goto_programt new_code;
   typedef std::set<exprt> assertionst;
   assertionst assertions;
-  
+
   void invalidate(const exprt &lhs);
-  
+
   inline static bool has_dereference(const exprt &src)
   {
     return has_subexpr(src, ID_dereference);
   }
 
   bool enable_bounds_check;
-  bool enable_pointer_check;  
+  bool enable_pointer_check;
   bool enable_memory_leak_check;
   bool enable_div_by_zero_check;
   bool enable_signed_overflow_check;
@@ -138,7 +138,7 @@ void goto_checkt::invalidate(const exprt &lhs)
     // clear all assertions about 'symbol'
     find_symbols_sett find_symbols_set;
     find_symbols_set.insert(to_symbol_expr(lhs).get_identifier());
-    
+
     for(assertionst::iterator
         it=assertions.begin();
         it!=assertions.end();
@@ -146,11 +146,11 @@ void goto_checkt::invalidate(const exprt &lhs)
     {
       assertionst::iterator next=it;
       next++;
-      
+
       if(has_symbol(*it, find_symbols_set) ||
          has_dereference(*it))
         assertions.erase(it);
-        
+
       it=next;
     }
   }
@@ -220,10 +220,10 @@ void goto_checkt::undefined_shift_check(
 
   // Undefined for all types and shifts if distance exceeds width,
   // and also undefined for negative distances.
-  
+
   const typet &distance_type=
     ns.follow(expr.distance().type());
-  
+
   if(distance_type.id()==ID_signedbv)
   {
     binary_relation_exprt inequality(
@@ -240,15 +240,15 @@ void goto_checkt::undefined_shift_check(
 
   const typet &op_type=
     ns.follow(expr.op().type());
-  
+
   if(op_type.id()==ID_unsignedbv || op_type.id()==ID_signedbv)
-  {  
+  {
     exprt width_expr=
       from_integer(to_bitvector_type(op_type).get_width(), distance_type);
 
     if(width_expr.is_nil())
       throw "no number for width for operator "+expr.id_string();
-      
+
     binary_relation_exprt inequality(
       expr.distance(), ID_lt, width_expr);
 
@@ -322,31 +322,31 @@ void goto_checkt::integer_overflow_check(
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
-  
+
   if(type.id()==ID_signedbv && !enable_signed_overflow_check)
     return;
 
   if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
     return;
-    
+
   // add overflow subgoal
 
   if(expr.id()==ID_typecast)
   {
     // conversion to signed int may overflow
-  
+
     if(expr.operands().size()!=1)
       throw "typecast takes one operand";
 
     const typet &old_type=ns.follow(expr.op0().type());
-    
+
     if(type.id()==ID_signedbv)
     {
-      unsigned new_width=to_signedbv_type(type).get_width();
+      std::size_t new_width=to_signedbv_type(type).get_width();
 
       if(old_type.id()==ID_signedbv) // signed -> signed
       {
-        unsigned old_width=to_signedbv_type(old_type).get_width();
+        std::size_t old_width=to_signedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -367,7 +367,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
-        unsigned old_width=to_unsignedbv_type(old_type).get_width();
+        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width+1) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -408,11 +408,11 @@ void goto_checkt::integer_overflow_check(
     }
     else if(type.id()==ID_unsignedbv)
     {
-      unsigned new_width=to_unsignedbv_type(type).get_width();
+      std::size_t new_width=to_unsignedbv_type(type).get_width();
 
       if(old_type.id()==ID_signedbv) // signed -> unsigned
       {
-        unsigned old_width=to_signedbv_type(old_type).get_width();
+        std::size_t old_width=to_signedbv_type(old_type).get_width();
 
         if(new_width>=old_width-1)
         {
@@ -451,7 +451,7 @@ void goto_checkt::integer_overflow_check(
       }
       else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
       {
-        unsigned old_width=to_unsignedbv_type(old_type).get_width();
+        std::size_t old_width=to_unsignedbv_type(old_type).get_width();
         if(new_width>=old_width) return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
@@ -514,7 +514,7 @@ void goto_checkt::integer_overflow_check(
         expr,
         guard);
     }
-    
+
     return;
   }
   else if(expr.id()==ID_mod)
@@ -528,7 +528,7 @@ void goto_checkt::integer_overflow_check(
     {
       // overflow on unary- can only happen with the smallest
       // representable number 100....0
-      
+
       equal_exprt int_min_eq(
         expr.op0(), to_signedbv_type(type).smallest_expr());
 
@@ -540,7 +540,7 @@ void goto_checkt::integer_overflow_check(
         expr,
         guard);
     }
-  
+
     return;
   }
 
@@ -551,11 +551,11 @@ void goto_checkt::integer_overflow_check(
   {
     // The overflow checks are binary!
     // We break these up.
-  
+
     for(unsigned i=1; i<expr.operands().size(); i++)
     {
       exprt tmp;
-      
+
       if(i==1)
         tmp=expr.op0();
       else
@@ -563,14 +563,14 @@ void goto_checkt::integer_overflow_check(
         tmp=expr;
         tmp.operands().resize(i);
       }
-      
+
       overflow.operands().resize(2);
       overflow.op0()=tmp;
       overflow.op1()=expr.operands()[i];
-      
+
       std::string kind=
         type.id()==ID_unsignedbv?"unsigned":"signed";
-    
+
       add_guarded_claim(
         not_exprt(overflow),
         "arithmetic overflow on "+kind+" "+expr.id_string(),
@@ -627,15 +627,15 @@ void goto_checkt::float_overflow_check(
     // Can overflow if casting from larger
     // to smaller type.
     assert(expr.operands().size()==1);
-    
+
     if(ns.follow(expr.op0().type()).id()==ID_floatbv)
     {
       // float-to-float
       unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
       unary_exprt new_inf(ID_isinf, expr, bool_typet());
-    
+
       or_exprt overflow_check(op0_inf, not_exprt(new_inf));
-    
+
       add_guarded_claim(
         overflow_check,
         "arithmetic overflow on floating-point typecast",
@@ -648,7 +648,7 @@ void goto_checkt::float_overflow_check(
     {
       // non-float-to-float
       unary_exprt new_inf(ID_isinf, expr, bool_typet());
-    
+
       add_guarded_claim(
         not_exprt(new_inf),
         "arithmetic overflow on floating-point typecast",
@@ -667,7 +667,7 @@ void goto_checkt::float_overflow_check(
     // Can overflow if dividing by something small
     unary_exprt new_inf(ID_isinf, expr, bool_typet());
     unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
-    
+
     or_exprt overflow_check(op0_inf, not_exprt(new_inf));
 
     add_guarded_claim(
@@ -696,17 +696,17 @@ void goto_checkt::float_overflow_check(
     if(expr.operands().size()==2)
     {
       // Can overflow
-      unary_exprt new_inf(ID_isinf, expr, bool_typet());      
+      unary_exprt new_inf(ID_isinf, expr, bool_typet());
       unary_exprt op0_inf(ID_isinf, expr.op0(), bool_typet());
       unary_exprt op1_inf(ID_isinf, expr.op1(), bool_typet());
-      
+
       or_exprt overflow_check(op0_inf, op1_inf, not_exprt(new_inf));
-      
+
       std::string kind=
         expr.id()==ID_plus?"addition":
         expr.id()==ID_minus?"subtraction":
         expr.id()==ID_mult?"multiplication":"";
-      
+
       add_guarded_claim(
         overflow_check,
         "arithmetic overflow on floating-point "+kind,
@@ -720,7 +720,7 @@ void goto_checkt::float_overflow_check(
     else if(expr.operands().size()>=3)
     {
       assert(expr.id()!=ID_minus);
-      
+
       // break up
       exprt tmp=make_binary(expr);
       float_overflow_check(tmp, guard);
@@ -751,7 +751,7 @@ void goto_checkt::nan_check(
   // first, check type
   if(expr.type().id()!=ID_floatbv)
     return;
-    
+
   if(expr.id()!=ID_plus &&
      expr.id()!=ID_mult &&
      expr.id()!=ID_div &&
@@ -759,9 +759,9 @@ void goto_checkt::nan_check(
     return;
 
   // add NaN subgoal
-  
+
   exprt isnan;
-  
+
   if(expr.id()==ID_div)
   {
     assert(expr.operands().size()==2);
@@ -774,7 +774,7 @@ void goto_checkt::nan_check(
       ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
 
     exprt div_inf=unary_exprt(ID_isinf, expr.op1(), bool_typet());
-    
+
     isnan=or_exprt(zero_div_zero, div_inf);
   }
   else if(expr.id()==ID_mult)
@@ -946,7 +946,7 @@ void goto_checkt::pointer_validity_check(
 
   local_bitvector_analysist::flagst flags=
     local_bitvector_analysis->get(t, pointer);
-    
+
   const typet &dereference_type=pointer_type.subtype();
 
   // For Java, we only need to check for null
@@ -1108,7 +1108,7 @@ void goto_checkt::bounds_check(
       +array_type.id_string();
 
   std::string name=array_name(expr.array());
-  
+
   const exprt &index=expr.index();
   object_descriptor_exprt ode;
   ode.build(expr, ns);
@@ -1125,7 +1125,7 @@ void goto_checkt::bounds_check(
     else
     {
       mp_integer i;
-      
+
       if(!to_integer(index, i) && i>=0)
       {
         // ok
@@ -1275,14 +1275,14 @@ void goto_checkt::add_guarded_claim(
     new_expr=exprt(ID_implies, bool_typet());
     new_expr.move_to_operands(guard_expr, expr);
   }
-  
+
   if(assertions.insert(new_expr).second)
   {
     goto_program_instruction_typet type=
       enable_assert_to_assume?ASSUME:ASSERT;
-    
+
     goto_programt::targett t=new_code.add_instruction(type);
-    
+
     std::string source_expr_string=from_expr(ns, "", src_expr);
 
     t->guard.swap(new_expr);
@@ -1410,7 +1410,7 @@ void goto_checkt::check_rec(
   else if(expr.id()==ID_div)
   {
     div_by_zero_check(to_div_expr(expr), guard);
-    
+
     if(expr.type().id()==ID_signedbv)
       integer_overflow_check(expr, guard);
     else if(expr.type().id()==ID_floatbv)
@@ -1497,7 +1497,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
   }
 
   assertions.clear();
-  
+
   local_bitvector_analysist local_bitvector_analysis_obj(goto_function);
   local_bitvector_analysis=&local_bitvector_analysis_obj;
 
@@ -1507,7 +1507,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
   {
     t=it;
     goto_programt::instructiont &i=*it;
-    
+
     new_code.clear();
 
     // we clear all recorded assertions if
@@ -1516,7 +1516,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     if(retain_trivial ||
        i.is_target())
       assertions.clear();
-    
+
     check(i.guard);
 
     // magic ERROR label?
@@ -1539,11 +1539,11 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         t->source_location.set("user-provided", true);
       }
     }
-    
+
     if(i.is_other())
     {
       const irep_idt &statement=i.code.get(ID_statement);
-      
+
       if(statement==ID_expression)
       {
         check(i.code);
@@ -1557,10 +1557,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     else if(i.is_assign())
     {
       const code_assignt &code_assign=to_code_assign(i.code);
-    
+
       check(code_assign.lhs());
       check(code_assign.rhs());
-      
+
       // the LHS might invalidate any assertion
       invalidate(code_assign.lhs());
     }
@@ -1568,7 +1568,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     {
       const code_function_callt &code_function_call=
         to_code_function_call(i.code);
-        
+
       // for Java, need to check whether 'this' is null
       // on non-static method invocations
       if(mode==ID_java &&
@@ -1578,10 +1578,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
          to_code_type(code_function_call.function().type()).has_this())
       {
         exprt pointer=code_function_call.arguments()[0];
-      
+
         local_bitvector_analysist::flagst flags=
           local_bitvector_analysis->get(t, pointer);
-          
+
         if(flags.is_unknown() || flags.is_null())
         {
           notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
@@ -1595,7 +1595,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
             guardt());
         }
       }
-    
+
       forall_operands(it, code_function_call)
         check(*it);
 
@@ -1618,11 +1618,11 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
          i.code.op0().operands().size()==1)
       {
         // must not throw NULL
-        
+
         exprt pointer=i.code.op0().op0();
 
         if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
-        {        
+        {
           notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
 
           add_guarded_claim(
@@ -1656,7 +1656,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       {
         assert(i.code.operands().size()==1);
         const symbol_exprt &variable=to_symbol_expr(i.code.op0());
-        
+
         // is it dirty?
         if(local_bitvector_analysis->dirty(variable))
         {
@@ -1686,7 +1686,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         goto_programt::targett t=new_code.add_instruction();
         t->make_assignment();
         t->code=code_assignt(leak_expr, leak_expr);
-        
+
         source_locationt source_location;
         source_location.set_function(i.function);
 
@@ -1722,10 +1722,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         if(it->source_location.get_column()!=irep_idt())
           i_it->source_location.set_column(it->source_location.get_column());
       }
-      
+
       if(i_it->function==irep_idt()) i_it->function=it->function;
     }
-      
+
     // insert new instructions -- make sure targets are not moved
 
     while(!new_code.instructions.empty())
@@ -1756,7 +1756,7 @@ void goto_check(
 {
   goto_checkt goto_check(ns, options);
   goto_check.goto_check(goto_function);
-}                    
+}
 
 /*******************************************************************\
 
@@ -1776,7 +1776,7 @@ void goto_check(
   goto_functionst &goto_functions)
 {
   goto_checkt goto_check(ns, options);
-  
+
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
@@ -1784,7 +1784,7 @@ void goto_check(
   {
     goto_check.goto_check(it->second);
   }
-}                    
+}
 
 /*******************************************************************\
 
@@ -1804,7 +1804,7 @@ void goto_check(
 {
   const namespacet ns(goto_model.symbol_table);
   goto_checkt goto_check(ns, options);
-  
+
   for(goto_functionst::function_mapt::iterator
       it=goto_model.goto_functions.function_map.begin();
       it!=goto_model.goto_functions.function_map.end();
@@ -1812,4 +1812,4 @@ void goto_check(
   {
     goto_check.goto_check(it->second);
   }
-}                    
+}

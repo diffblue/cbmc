@@ -23,9 +23,9 @@ public:
   }
 
   typedef std::set<cpp_idt *> id_sett;
-  
+
   enum lookup_kindt { SCOPE_ONLY, QUALIFIED, RECURSIVE };
-  
+
   void lookup(
     const irep_idt &base_name,
     lookup_kindt kind,
@@ -87,14 +87,14 @@ public:
   {
     return static_cast<cpp_scopet &>(cpp_idt::get_parent());
   }
-  
+
   cpp_scopet &get_global_scope()
   {
     cpp_scopet *p=this;
-    
+
     while(!p->is_global_scope())
       p=&(p->get_parent());
-    
+
     return *p;
   }
 

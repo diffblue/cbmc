@@ -4,7 +4,7 @@ public:
   static int A1;
   static int A2;
   static const int A3=20;
-  
+
   // the const ones are good as array size
   int table[A3];
 };

@@ -6,7 +6,7 @@ main()
   {
   case 0:
     goto end;
-    
+
   default:
     x = 0;
   }

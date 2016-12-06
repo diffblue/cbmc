@@ -49,13 +49,13 @@ public:
     return a.l!=b.l;
   }
 
-  // for sets  
+  // for sets
   friend inline bool operator <(const literalt a, const literalt b)
   {
     return a.l<b.l;
   }
 
-  // negates if 'b' is true  
+  // negates if 'b' is true
   friend inline literalt operator^(const literalt a, const bool b)
   {
     literalt result=a;
@@ -82,27 +82,27 @@ public:
   {
     return l>>1;
   }
-  
+
   inline bool sign() const
   {
     return l&1;
   }
-  
+
   inline void set(var_not _l)
   {
     l=_l;
   }
-  
+
   inline void set(var_not v, bool sign)
   {
     l=(v<<1)|((var_not)sign);
   }
-  
+
   inline var_not get() const
   {
     return l;
   }
-  
+
   inline void invert()
   {
     l^=(var_not)1;
@@ -121,40 +121,40 @@ public:
 
     return result;
   }
-  
+
   void from_dimacs(int d)
   {
     bool sign=d<0;
     if(sign) d=-d;
     set(d, sign);
   }
-  
+
   inline void clear()
   {
     l=0;
   }
-  
+
   inline void swap(literalt &x)
   {
     std::swap(x.l, l);
   }
-  
+
   // constants
   inline void make_true()
   {
     set(const_var_no(), true);
   }
-  
+
   inline void make_false()
   {
     set(const_var_no(), false);
   }
-  
+
   inline bool is_true() const
   {
     return is_constant() && sign();
   }
-  
+
   inline bool is_false() const
   {
     return is_constant() && !sign();
@@ -164,7 +164,7 @@ public:
   {
     return literalt(literalt::const_var_no(), value);
   }
-  
+
   inline bool is_constant() const
   {
     return var_no()==const_var_no();
@@ -182,7 +182,7 @@ public:
   {
     return (var_not(-2)<<1)>>1;
   }
-  
+
 protected:
   var_not l;
 };

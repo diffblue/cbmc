@@ -41,14 +41,14 @@ Function: cpp_languaget::extensions
 std::set<std::string> cpp_languaget::extensions() const
 {
   std::set<std::string> s;
-  
+
   s.insert("cpp");
   s.insert("CPP");
   s.insert("cc");
   s.insert("c++");
   s.insert("ii");
   s.insert("cxx");
-  
+
   #ifndef _WIN32
   s.insert("C");
   #endif
@@ -98,7 +98,7 @@ bool cpp_languaget::preprocess(
   const char *ext=strrchr(path.c_str(), '.');
   if(ext!=NULL && std::string(ext)==".ipp")
   {
-    std::ifstream infile(path.c_str());
+    std::ifstream infile(path);
 
     char ch;
 

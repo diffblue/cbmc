@@ -33,7 +33,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
   const std::string &src)
 {
   assert(src.size()>=2);
-  
+
   if(src[0]=='u' && src[1]=='8')
   {
     assert(src[src.size()-1]=='"');
@@ -41,7 +41,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
 
     std::basic_string<unsigned int> value=
       unescape_wide_string(std::string(src, 3, src.size()-4));
-    
+
     // turn into utf-8
     std::string utf8_value=utf32_to_utf8(value);
 
@@ -56,7 +56,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
   {
     assert(src[src.size()-1]=='"');
     assert(src[1]=='"');
-    
+
     return unescape_wide_string(std::string(src, 2, src.size()-3));
   }
   else
@@ -98,9 +98,9 @@ exprt convert_string_literal(const std::string &src)
   // GCC allows "asd" L"xyz"!
 
   std::basic_string<unsigned int> value;
-  
+
   char wide=0;
-  
+
   for(unsigned i=0; i<src.size(); i++)
   {
     char ch=src[i];
@@ -135,15 +135,15 @@ exprt convert_string_literal(const std::string &src)
       i=j;
     }
   }
-  
+
   if(wide!=0)
-  {   
+  {
     // add implicit trailing zero
     value.push_back(0);
-    
+
     // L is wchar_t, u is char16_t, U is char32_t.
     typet subtype;
-    
+
     switch(wide)
     {
     case 'L': subtype=wchar_t_type(); break;
@@ -161,25 +161,25 @@ exprt convert_string_literal(const std::string &src)
     result.operands().resize(value.size());
     for(unsigned i=0; i<value.size(); i++)
       result.operands()[i]=from_integer(value[i], subtype);
-    
+
     return result;
   }
   else
   {
     std::string char_value;
-    
+
     char_value.resize(value.size());
-    
+
     for(unsigned i=0; i<value.size(); i++)
     {
       // Loss of data here if value[i]>255.
       // gcc issues a warning in this case.
       char_value[i]=value[i];
     }
-    
+
     string_constantt result;
     result.set_value(char_value);
-    
+
     return result;
   }
 }

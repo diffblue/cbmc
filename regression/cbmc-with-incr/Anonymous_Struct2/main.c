@@ -29,7 +29,7 @@ struct S_struct
   union U_union {
     int x, y;
   };
-  
+
   int z;
 } s;
 
@@ -40,7 +40,7 @@ int main()
   s.x=1;
   s.y=2;
   s.z=3;
-  
+
   assert(s2.y==1);
   assert(s2.z==1);
 }

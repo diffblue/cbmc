@@ -43,7 +43,7 @@ const symbolt &get_module_by_name(
 
     if(s.is_type || s.type.id()!=ID_module)
       continue;
-    
+
     symbolptr_list.push_back(&s);
   }
 
@@ -94,14 +94,14 @@ const symbolt &get_module(
   forall_symbols(it, symbol_table.symbols)
   {
     const symbolt &s=it->second;
-    
+
     if(s.type.id()!=ID_module)
       continue;
 
-    // this is our default    
+    // this is our default
     if(s.base_name==ID_main)
       return get_module_by_name(symbol_table, "main", message_handler);
-    
+
     symbolptr_list.push_back(&s);
   }
 
@@ -117,9 +117,9 @@ const symbolt &get_module(
 
     forall_symbolptr_list(it, symbolptr_list)
       modules.insert(id2string((*it)->pretty_name));
-  
+
     message.error() << "multiple modules found, please select one:\n";
-    
+
     for(const auto & s_it : modules)
       message.error() << "  " << s_it << '\n';
 
@@ -128,7 +128,7 @@ const symbolt &get_module(
   }
 
   // symbolptr_list has exactly one element
-  
+
   const symbolt &symbol=*symbolptr_list.front();
 
   message.status() << "Using module `" << symbol.pretty_name << "'"
@@ -136,4 +136,3 @@ const symbolt &get_module(
 
   return symbol;
 }
-

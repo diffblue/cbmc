@@ -44,18 +44,18 @@ void parse_float(
   std::string str_whole_number,
               str_fraction_part,
               str_exponent;
-              
+
   exponent_base=10;
-  
+
   // is this hex?
-  
+
   if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
   {
     // skip the 0x
     p+=2;
-  
+
     exponent_base=2;
-  
+
     // get whole number part
     while(*p!='.' && *p!=0 && *p!='p' && *p!='P')
     {
@@ -92,7 +92,7 @@ void parse_float(
 
     std::string str_number=str_whole_number+
                            str_fraction_part;
-                           
+
     // The significand part is interpreted as a (decimal or hexadecimal)
     // rational number; the digit sequence in the exponent part is
     // interpreted as a decimal integer.

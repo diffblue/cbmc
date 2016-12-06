@@ -10,6 +10,6 @@ int main()
 
   free(p);
 
-  // well, a double-free  
+  // well, a double-free
   free(p);
 }

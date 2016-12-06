@@ -6,7 +6,7 @@ int main()
   union
   {
     int a;
-    char b;	
+    char b;
   };
 
   a = 'z';

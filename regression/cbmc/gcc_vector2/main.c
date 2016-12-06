@@ -30,7 +30,7 @@ int main()
     assert(((int*) &a)[i]==((int*) &b)[i]);
     assert(((int*) &b)[i]==b[i]);
   }
-  
+
   #endif
 
   return 0;

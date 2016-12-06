@@ -6,7 +6,7 @@ class A
 
 class B: A
 {
-	
+
 };
 
 void set_one(A& a)

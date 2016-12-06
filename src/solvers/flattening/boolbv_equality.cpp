@@ -49,13 +49,13 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
       //std::cout << "X: " << from_expr(ns, "", tmp) << std::endl;
       return record_array_equality(to_equal_expr(tmp));
     }
-    
+
     return record_array_equality(expr);
   }
 
   const bvt &bv0=convert_bv(expr.lhs());
   const bvt &bv1=convert_bv(expr.rhs());
-    
+
   if(bv0.size()!=bv1.size())
   {
     std::cerr << "lhs: " << expr.lhs().pretty() << std::endl;
@@ -101,7 +101,7 @@ literalt boolbvt::convert_verilog_case_equality(const binary_relation_exprt &exp
 
   const bvt &bv0=convert_bv(expr.lhs());
   const bvt &bv1=convert_bv(expr.rhs());
-    
+
   if(bv0.size()!=bv1.size())
   {
     std::cerr << "lhs: " << expr.lhs().pretty() << std::endl;

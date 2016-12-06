@@ -146,7 +146,7 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
 {
   // this is *not* incremental
   assert(status==INIT);
-  
+
   copy_cnf();
 
   {
@@ -185,11 +185,11 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
 
      case ABORTED:
       msg="SAT checker failed: ABORTED";
-      break;    
+      break;
 
      default:
       msg="SAT checker failed: unknown result";
-      break;    
+      break;
     }
 
     messaget::status() << msg << messaget::eom;
@@ -222,9 +222,9 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
     status=SAT;
     return P_SATISFIABLE;
   }
- 
+
   status=ERROR;
- 
+
   return P_ERROR;
 }
 

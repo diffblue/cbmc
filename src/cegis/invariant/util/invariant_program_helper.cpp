@@ -19,14 +19,6 @@ void erase_target(goto_programt::instructionst &body,
   body.erase(target);
 }
 
-goto_programt::targett insert_before_preserve_labels(goto_programt &body,
-    const goto_programt::targett &target)
-{
-  const goto_programt::targett result=body.insert_before(target);
-  move_labels(body, target, result);
-  return result;
-}
-
 void restrict_bv_size(invariant_programt &prog, const size_t width_in_bits)
 {
   restrict_bv_size(prog.st, prog.gf, width_in_bits);

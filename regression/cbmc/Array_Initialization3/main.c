@@ -22,16 +22,16 @@ int main(void)
 {
   assert(array1[0][1]==2);
   assert(array1[1][0]==3);    // returned false in this case
-  
+
   assert(array2[0]==0);
   assert(array2[1]==10);
   assert(array2[10]==100);
   assert(sizeof(array2)==sizeof(int)*11);
-  
+
   assert(sizeof(array3)==sizeof(int)*8);
-  
+
   assert(sizeof(array7)==sizeof(int)*2);
   assert(sizeof(array8)==sizeof(int)*3);
-  
+
   return 0;
 }

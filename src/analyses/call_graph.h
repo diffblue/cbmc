@@ -28,7 +28,7 @@ public:
   grapht graph;
 
   void add(const irep_idt &caller, const irep_idt &callee);
-  
+
 protected:
   void add(const irep_idt &function,
            const goto_programt &body);

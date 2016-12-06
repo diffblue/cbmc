@@ -152,4 +152,3 @@ cat gcc-builtins.h | sed 's/__builtin/XX__builtin/' | \
 rm gcc-builtins.o
 
 echo "Successfully built gcc-builtins.h"
-

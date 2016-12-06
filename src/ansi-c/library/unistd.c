@@ -5,9 +5,9 @@ unsigned int sleep(unsigned int seconds)
   __CPROVER_HIDE:;
   // do nothing, but return nondet value
   unsigned remaining_time;
-  
+
   if(remaining_time>seconds) remaining_time=seconds;
-  
+
   return remaining_time;
 }
 

@@ -20,12 +20,12 @@ class jsil_parsert:public parsert
 public:
   jsil_parse_treet parse_tree;
 
-  virtual bool parse()
+  virtual bool parse() override
   {
     return yyjsilparse()!=0;
   }
 
-  virtual void clear()
+  virtual void clear() override
   {
     parsert::clear();
     parse_tree.clear();

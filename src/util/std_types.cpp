@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -151,7 +151,7 @@ bool struct_typet::is_prefix_of(const struct_typet &other) const
 
   if(ot_components.size()<
      tt_components.size())
-    return false; 
+    return false;
 
   componentst::const_iterator
     ot_it=ot_components.begin();

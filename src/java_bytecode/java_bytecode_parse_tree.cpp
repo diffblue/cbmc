@@ -64,7 +64,7 @@ void java_bytecode_parse_treet::output(std::ostream &out) const
   {
     out << "  " << *it << '\n';
   }
-    
+
 }
 
 /*******************************************************************\
@@ -98,9 +98,9 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   {
     it->output(out);
   }
-  
+
   out << '\n';
-  
+
   for(methodst::const_iterator
       it=methods.begin();
       it!=methods.end();
@@ -108,7 +108,7 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   {
     it->output(out);
   }
-  
+
   out << '}' << '\n';
   out << '\n';
 }
@@ -131,18 +131,18 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
   namespacet ns(symbol_table);
 
   out << '@' << type2java(type, ns);
-  
+
   if(!element_value_pairs.empty())
   {
     out << '(';
-    
+
     bool first=true;
     for(const auto & element_value_pair : element_value_pairs)
     {
       if(first) first=false; else out << ", ";
       element_value_pair.output(out);
     }
-    
+
     out << ')';
   }
 }
@@ -196,25 +196,25 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
   if(is_public)
     out << "public ";
-  
+
   if(is_protected)
     out << "protected ";
-  
+
   if(is_private)
     out << "private ";
-  
+
   if(is_static)
     out << "static ";
-  
+
   if(is_final)
     out << "final ";
-  
+
   if(is_native)
     out << "native ";
-  
+
   if(is_synchronized)
     out << "synchronized ";
-  
+
   out << name;
   out << " : " << signature;
 
@@ -229,7 +229,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
     out << "    " << i.address << ": ";
     out << i.statement;
-    
+
     for(std::vector<exprt>::const_iterator
         a_it=i.args.begin(); a_it!=i.args.end(); a_it++)
     {
@@ -247,7 +247,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
   out << "  }" << '\n';
 
   out << '\n';
-  
+
   out << "  Locals:\n";
   for(const auto & v : local_variable_table)
   {
@@ -255,7 +255,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
         << v.signature << '\n';
   }
 
-  out << '\n';  
+  out << '\n';
 }
 
 /*******************************************************************\
@@ -283,13 +283,12 @@ void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
 
   if(is_public)
     out << "public ";
-  
+
   if(is_static)
     out << "static ";
-  
+
   out << name;
   out << " : " << signature << ';';
 
   out << '\n';
 }
-

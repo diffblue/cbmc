@@ -40,7 +40,7 @@ protected:
   cpp_typecheckt &cpp_typecheck;
   source_locationt source_location;
   cpp_scopet *original_scope;
-  
+
   typedef std::vector<exprt> resolve_identifierst;
 
   void convert_identifiers(
@@ -48,10 +48,10 @@ protected:
     const wantt want,
     const cpp_typecheck_fargst &fargs,
     resolve_identifierst &identifiers);
-    
+
   exprt convert_template_parameter(
     const cpp_idt &id);
-    
+
   exprt convert_identifier(
     const cpp_idt &id,
     const wantt want,
@@ -100,15 +100,15 @@ protected:
   exprt guess_function_template_args(
     const exprt &expr,
     const cpp_typecheck_fargst &fargs);
-    
+
   void guess_template_args(
     const typet &template_parameter,
     const typet &desired_type);
-    
+
   void guess_template_args(
     const exprt &template_parameter,
     const exprt &desired_expr);
-    
+
   bool disambiguate_functions(
     const exprt &expr,
     unsigned &args_distance,
@@ -147,12 +147,12 @@ protected:
     {
     }
   };
-  
+
   inline friend bool operator < (const matcht &m1, const matcht &m2)
   {
     return m1.cost<m2.cost;
   }
-  
+
 };
 
 #endif

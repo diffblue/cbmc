@@ -35,12 +35,12 @@ void set_properties(
       it++)
   {
     if(!it->is_assert()) continue;
-    
+
     irep_idt property_id=it->source_location.get_property_id();
 
     hash_set_cont<irep_idt, irep_id_hash>::iterator
       c_it=property_set.find(property_id);
-      
+
     if(c_it==property_set.end())
       it->type=SKIP;
     else
@@ -87,9 +87,9 @@ void label_properties(
       it++)
   {
     if(!it->is_assert()) continue;
-    
+
     irep_idt function=it->source_location.get_function();
-    
+
     std::string prefix=id2string(function);
     if(it->source_location.get_property_class()!="")
     {
@@ -98,20 +98,20 @@ void label_properties(
       std::string class_infix=
         id2string(it->source_location.get_property_class());
 
-      // replace the spaces by underscores        
+      // replace the spaces by underscores
       std::replace(class_infix.begin(), class_infix.end(), ' ', '_');
-      
+
       prefix+=class_infix;
     }
 
     if(prefix!="") prefix+=".";
-    
+
     unsigned &count=property_counters[prefix];
-    
+
     count++;
-    
+
     std::string property_id=prefix+i2string(count);
-    
+
     it->source_location.set_property_id(property_id);
   }
 }
@@ -250,7 +250,7 @@ void make_assertions_false(
       f_it++)
   {
     goto_programt &goto_program=f_it->second.body;
-    
+
     for(goto_programt::instructionst::iterator
         i_it=goto_program.instructions.begin();
         i_it!=goto_program.instructions.end();
@@ -261,4 +261,3 @@ void make_assertions_false(
     }
   }
 }
-

@@ -10,7 +10,7 @@
 Function: shared_buffert::unique
 
   Inputs:
- 
+
  Outputs:
 
  Purpose: returns a unique id (for fresh variables)
@@ -39,9 +39,9 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
 {
   var_mapt::const_iterator it=var_map.find(object);
   if(it!=var_map.end()) return it->second;
- 
+
   varst &vars=var_map[object];
-  
+
   namespacet ns(symbol_table);
   const symbolt &symbol=ns.lookup(object);
 
@@ -50,18 +50,18 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   vars.w_buff0=add(object, symbol.base_name, "$w_buff0", symbol.type);
   vars.w_buff1=add(object, symbol.base_name, "$w_buff1", symbol.type);
 
-  vars.w_buff0_used=add(object, symbol.base_name, "$w_buff0_used", 
+  vars.w_buff0_used=add(object, symbol.base_name, "$w_buff0_used",
     bool_typet());
-  vars.w_buff1_used=add(object, symbol.base_name, "$w_buff1_used", 
+  vars.w_buff1_used=add(object, symbol.base_name, "$w_buff1_used",
     bool_typet());
 
   vars.mem_tmp=add(object, symbol.base_name, "$mem_tmp", symbol.type);
-  vars.flush_delayed=add(object, symbol.base_name, "$flush_delayed", 
+  vars.flush_delayed=add(object, symbol.base_name, "$flush_delayed",
     bool_typet());
 
-  vars.read_delayed=add(object, symbol.base_name, "$read_delayed", 
+  vars.read_delayed=add(object, symbol.base_name, "$read_delayed",
     bool_typet());
-  vars.read_delayed_var=add(object, symbol.base_name, "$read_delayed_var", 
+  vars.read_delayed_var=add(object, symbol.base_name, "$read_delayed_var",
     pointer_typet(symbol.type));
 
   unsigned cnt;
@@ -140,17 +140,17 @@ void shared_bufferst::add_initialization(goto_programt &goto_program)
     source_locationt source_location;
     source_location.make_nil();
 
-    assignment(goto_program, t, source_location, it->second.w_buff0_used, 
+    assignment(goto_program, t, source_location, it->second.w_buff0_used,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.w_buff1_used, 
+    assignment(goto_program, t, source_location, it->second.w_buff1_used,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.flush_delayed, 
+    assignment(goto_program, t, source_location, it->second.flush_delayed,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.read_delayed, 
+    assignment(goto_program, t, source_location, it->second.read_delayed,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.read_delayed_var, 
+    assignment(goto_program, t, source_location, it->second.read_delayed_var,
       null_pointer_exprt(pointer_typet(it->second.type)));
- 
+
     for(
       std::vector<irep_idt>::const_iterator l_it=
         it->second.r_buff0_thds.begin();
@@ -235,9 +235,9 @@ void shared_bufferst::assignment(
     t->code=code_assignt(symbol, value);
     t->code.add_source_location()=source_location;
     t->source_location=source_location;
- 
+
     //instrumentations.insert((const irep_idt) (t->code.id()));
- 
+
     t++;
   }
   catch(std::string s)
@@ -271,7 +271,7 @@ void shared_bufferst::delay_read(
 
 #if 0
   assignment(goto_program, target, source_location, vars.read_delayed, true_exprt());
-  assignment(goto_program, target, source_location, vars.read_delayed_var, 
+  assignment(goto_program, target, source_location, vars.read_delayed_var,
     read_object);
 
   const irep_idt& new_var=add_fresh_var(write_object,unique(),vars.type);
@@ -293,7 +293,7 @@ void shared_bufferst::delay_read(
   const symbol_exprt read_object_expr = symbol_exprt(read_object, vars.type);
 
   assignment(goto_program, target, source_location, vars.read_delayed, true_exprt());
-  assignment(goto_program, target, source_location, vars.read_delayed_var, 
+  assignment(goto_program, target, source_location, vars.read_delayed_var,
     address_of_exprt( read_object_expr ));
 }
 
@@ -306,7 +306,7 @@ Function: shared_bufferst::flush_read
  Outputs:
 
 Purpose: flushes read (POWER)
- 
+
 \*******************************************************************/
 
 void shared_bufferst::flush_read(
@@ -324,7 +324,7 @@ void shared_bufferst::flush_read(
   const symbol_exprt var_expr=symbol_exprt(vars.read_delayed_var, vars.type);
   const exprt eq_expr=equal_exprt(var_expr, fresh_var_expr);
 
-  const symbol_exprt cond_delayed_expr=symbol_exprt(vars.read_delayed, 
+  const symbol_exprt cond_delayed_expr=symbol_exprt(vars.read_delayed,
     bool_typet());
   const exprt if_expr=if_exprt(cond_delayed_expr, eq_expr, true_exprt());
 
@@ -372,14 +372,14 @@ void shared_bufferst::write(
   // We rotate the write buffers for anything that is written.
   assignment(goto_program, target, source_location, vars.w_buff1, vars.w_buff0);
   assignment(
-    goto_program, target, source_location, vars.w_buff0, 
+    goto_program, target, source_location, vars.w_buff0,
     original_instruction.code.op1());
 
   // We update the used flags
   assignment(goto_program, target, source_location, vars.w_buff1_used, vars.w_buff0_used);
   assignment(goto_program, target, source_location, vars.w_buff0_used, true_exprt());
 
-  // We should not exceed the buffer size -- inserts assertion for dynamically 
+  // We should not exceed the buffer size -- inserts assertion for dynamically
   // checking this
   const exprt buff0_used_expr=symbol_exprt(vars.w_buff0_used, bool_typet());
   const exprt buff1_used_expr=symbol_exprt(vars.w_buff1_used, bool_typet());
@@ -395,7 +395,7 @@ void shared_bufferst::write(
 
   // We update writers ownership of the values in the buffer
   for(unsigned cnt=0; cnt<nb_threads; cnt++)
-    assignment(goto_program, target, source_location, vars.r_buff1_thds[cnt], 
+    assignment(goto_program, target, source_location, vars.r_buff1_thds[cnt],
       vars.r_buff0_thds[cnt]);
 
   // We update the lucky new author of this value in the buffer
@@ -424,7 +424,7 @@ void shared_bufferst::det_flush(
 {
   const std::string identifier = id2string(object);
 
-  // mostly for instrumenting the fences. A thread only flushes the values it 
+  // mostly for instrumenting the fences. A thread only flushes the values it
   // wrote in the buffer.
   message.debug() << "det flush: " << messaget::eom;
   const varst &vars=(*this)(object);
@@ -432,8 +432,8 @@ void shared_bufferst::det_flush(
   // current value in the memory
   const exprt lhs=symbol_exprt(object, vars.type);
 
-  // if buff0 from this thread, uses it to update the memory (the most recent 
-  // value, or last write by -ws-> ); if not, if buff1 from this thread, uses 
+  // if buff0 from this thread, uses it to update the memory (the most recent
+  // value, or last write by -ws-> ); if not, if buff1 from this thread, uses
   // it; if not, keeps the current memory value
   const exprt buff0_expr = symbol_exprt(vars.w_buff0, vars.type);
   const exprt buff1_expr = symbol_exprt(vars.w_buff1, vars.type);
@@ -441,14 +441,14 @@ void shared_bufferst::det_flush(
   const exprt buff0_used_expr = symbol_exprt(vars.w_buff0_used, bool_typet());
   const exprt buff1_used_expr = symbol_exprt(vars.w_buff1_used, bool_typet());
 
-  const exprt buff0_mine_expr = symbol_exprt(vars.r_buff0_thds[current_thread], 
+  const exprt buff0_mine_expr = symbol_exprt(vars.r_buff0_thds[current_thread],
     bool_typet());
-  const exprt buff1_mine_expr = symbol_exprt(vars.r_buff1_thds[current_thread], 
+  const exprt buff1_mine_expr = symbol_exprt(vars.r_buff1_thds[current_thread],
     bool_typet());
 
-  const exprt buff0_used_and_mine_expr = and_exprt(buff0_used_expr, 
+  const exprt buff0_used_and_mine_expr = and_exprt(buff0_used_expr,
     buff0_mine_expr);
-  const exprt buff1_used_and_mine_expr = and_exprt(buff1_used_expr, 
+  const exprt buff1_used_and_mine_expr = and_exprt(buff1_used_expr,
     buff1_mine_expr);
 
   const exprt new_value_expr = if_exprt(
@@ -460,12 +460,12 @@ void shared_bufferst::det_flush(
       lhs
     )
   );
-    
+
   // We update (or not) the value in the memory
   assignment(goto_program, target, source_location, object, new_value_expr);
 
   // We udpate the flags of the buffer
-  // if buff0 used and mine, then it is no more used, as we flushed the last 
+  // if buff0 used and mine, then it is no more used, as we flushed the last
   // write and -ws-> imposes not to have other writes in the buffer
   assignment(goto_program, target, source_location, vars.w_buff0_used,
     if_exprt(
@@ -480,7 +480,7 @@ void shared_bufferst::det_flush(
   // otherwise, remains as it is
   const exprt buff0_or_buff1_used_and_mine_expr = or_exprt(
     buff0_used_and_mine_expr,
-    buff1_used_and_mine_expr    
+    buff1_used_and_mine_expr
   );
 
   assignment(goto_program, target, source_location, vars.w_buff1_used,
@@ -489,14 +489,14 @@ void shared_bufferst::det_flush(
       false_exprt(),
       buff1_used_expr
     )
-  );  
+  );
 
   // We update the ownerships
   // if buff0 mine and used, flushed, so belongs to nobody
-  const exprt buff0_thd_expr = symbol_exprt(vars.r_buff0_thds[current_thread], 
+  const exprt buff0_thd_expr = symbol_exprt(vars.r_buff0_thds[current_thread],
     bool_typet());
 
-  assignment(goto_program, target, source_location, vars.r_buff0_thds[current_thread], 
+  assignment(goto_program, target, source_location, vars.r_buff0_thds[current_thread],
     if_exprt(
       buff0_used_and_mine_expr,
       false_exprt(),
@@ -504,9 +504,9 @@ void shared_bufferst::det_flush(
     )
   );
 
-  // if buff1 used and mine, or if buff0 used and mine, then buff1 flushed and 
+  // if buff1 used and mine, or if buff0 used and mine, then buff1 flushed and
   // doesn't belong to anybody
-  const exprt buff1_thd_expr = symbol_exprt(vars.r_buff1_thds[current_thread], 
+  const exprt buff1_thd_expr = symbol_exprt(vars.r_buff1_thds[current_thread],
     bool_typet());
 
   assignment(goto_program, target, source_location, vars.r_buff1_thds[current_thread],
@@ -516,7 +516,7 @@ void shared_bufferst::det_flush(
       buff1_thd_expr
     )
   );
-}         
+}
 
 /*******************************************************************\
 
@@ -550,7 +550,7 @@ void shared_bufferst::nondet_flush(
   irep_idt choice0=choice(target->function, "0");
   irep_idt choice2=choice(target->function, "2"); //delays the write flush
 
-  const symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());  
+  const symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
   const symbol_exprt delay_expr=symbol_exprt(choice2, bool_typet());
   const exprt nondet_bool_expr=side_effect_expr_nondett(bool_typet());
 
@@ -564,9 +564,9 @@ void shared_bufferst::nondet_flush(
   const exprt lhs=symbol_exprt(object, vars.type);
 
   // Buffer uses
-  const symbol_exprt buff0_used_expr=symbol_exprt(vars.w_buff0_used, 
+  const symbol_exprt buff0_used_expr=symbol_exprt(vars.w_buff0_used,
     bool_typet());
-  const symbol_exprt buff1_used_expr=symbol_exprt(vars.w_buff1_used, 
+  const symbol_exprt buff1_used_expr=symbol_exprt(vars.w_buff1_used,
     bool_typet());
 
   // Buffer ownerships
@@ -580,7 +580,7 @@ void shared_bufferst::nondet_flush(
   assignment(goto_program, target, source_location, vars.flush_delayed, delay_expr);
   assignment(goto_program, target, source_location, vars.mem_tmp, lhs);
 
-  // for POWER, only instrumented reads can read from the buffers of other 
+  // for POWER, only instrumented reads can read from the buffers of other
   // threads
   bool instrumented=false;
 
@@ -603,7 +603,7 @@ void shared_bufferst::nondet_flush(
     // 7 cases
 
     // (1) (3) (4)
-    // if buff0 unused 
+    // if buff0 unused
     // or buff0 not mine and buff1 unused
     // or buff0 not mine and buff1 not mine
     // -> read from memory (and does not modify the buffer in any aspect)
@@ -665,7 +665,7 @@ void shared_bufferst::nondet_flush(
     const exprt buff1_5_expr = buff1_expr;
     const exprt buff0_thd_5_expr = buff0_thd_expr;
     const exprt buff1_thd_5_expr = false_exprt();
-       
+
     // Updates
     // memory
     assignment(goto_program, target, source_location, object, if_exprt(
@@ -734,7 +734,7 @@ void shared_bufferst::nondet_flush(
       )
     ));
     // buff0_thd
-    assignment(goto_program, target, source_location, 
+    assignment(goto_program, target, source_location,
       vars.r_buff0_thds[current_thread], if_exprt(
         delay_expr,
         buff0_thd_expr,
@@ -750,7 +750,7 @@ void shared_bufferst::nondet_flush(
       )
     );
     // buff1_thd
-    assignment(goto_program, target, source_location, 
+    assignment(goto_program, target, source_location,
       vars.r_buff1_thds[current_thread], if_exprt(
         delay_expr,
         buff1_thd_expr,
@@ -774,14 +774,14 @@ void shared_bufferst::nondet_flush(
     // One extra non-deterministic choice needed
     irep_idt choice1=choice(target->function, "1");
     const symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
-    
+
     // throw Boolean dice
     assignment(goto_program, target, source_location, choice1, nondet_bool_expr);
 
     // 7 cases
 
     // (1)
-    // if buff0 unused 
+    // if buff0 unused
     // -> read from memory (and does not modify the buffer in any aspect)
     const exprt cond_1_expr = not_exprt( buff0_used_expr );
     const exprt val_1_expr = lhs;
@@ -888,7 +888,7 @@ void shared_bufferst::nondet_flush(
     const exprt buff1_5_expr = buff1_expr;
     const exprt buff0_thd_5_expr = false_exprt();
     const exprt buff1_thd_5_expr = false_exprt();
-      
+
     // Updates
     // memory
     assignment(goto_program, target, source_location, object, if_exprt(
@@ -997,7 +997,7 @@ void shared_bufferst::nondet_flush(
       )
     ));
     // buff0_thd
-    assignment(goto_program, target, source_location, 
+    assignment(goto_program, target, source_location,
       vars.r_buff0_thds[current_thread], if_exprt(
         delay_expr,
         buff0_thd_expr,
@@ -1021,7 +1021,7 @@ void shared_bufferst::nondet_flush(
       )
     );
     // buff1_thd
-    assignment(goto_program, target, source_location, 
+    assignment(goto_program, target, source_location,
       vars.r_buff1_thds[current_thread], if_exprt(
         delay_expr,
         buff1_thd_expr,
@@ -1067,8 +1067,8 @@ Function: is_buffered
 bool shared_bufferst::is_buffered(
   const namespacet &ns,
   const symbol_exprt &symbol_expr,
-  bool is_write 
-  // are we asking for the variable (false), or for the variable and 
+  bool is_write
+  // are we asking for the variable (false), or for the variable and
   // the source_location in the code (true)
 )
 {
@@ -1088,7 +1088,7 @@ bool shared_bufferst::is_buffered(
 
   if(!symbol.is_static_lifetime)
     return false; // these are local
-   
+
   if(symbol.is_thread_local)
     return false; // these are local
 
@@ -1101,12 +1101,12 @@ bool shared_bufferst::is_buffered(
 bool shared_bufferst::is_buffered_in_general(
   const namespacet &ns,
   const symbol_exprt &symbol_expr,
-  bool is_write 
-  // are we asking for the variable (false), or for the variable and the 
+  bool is_write
+  // are we asking for the variable (false), or for the variable and the
   // source_location in the code? (true)
 )
 {
-  if(cav11) 
+  if(cav11)
     return true;
 
   const irep_idt &identifier=symbol_expr.get_identifier();
@@ -1117,7 +1117,7 @@ bool shared_bufferst::is_buffered_in_general(
 
   if(!is_write)
   {
-    // to be uncommented only when we are sure all the cycles 
+    // to be uncommented only when we are sure all the cycles
     // are detected (before detection of the pairs -- no hack)
     // WARNING: on the FULL cycle, not reduced by PO
     /*typedef std::multimap<irep_idt,source_locationt>::iterator m_itt;
@@ -1146,7 +1146,7 @@ Function: affected_by_delay
 
  Outputs:
 
- Purpose: analysis over the goto-program which computes in 
+ Purpose: analysis over the goto-program which computes in
           affected_by_delay_set the variables (non necessarily
           shared themselves) whose value could be changed as
           effect of a read delay
@@ -1179,7 +1179,7 @@ void shared_bufferst::affected_by_delay(
             message.debug() <<"debug: "<<id2string(w_it->second.object)
               <<" reads from "<<id2string(r_it->second.object)
               <<messaget::eom;
-            if(is_buffered_in_general(ns, r_it->second.symbol_expr,true)) 
+            if(is_buffered_in_general(ns, r_it->second.symbol_expr,true))
               //shouldn't it be true? false => overapprox
               affected_by_delay_set.insert(w_it->second.object);
           }
@@ -1244,23 +1244,23 @@ void shared_bufferst::cfg_visitort::weak_memory(
           );
 
           if(rw_set.empty()) continue;
-  
+
           // add all the written values (which are not instrumentations)
           // in a set
           forall_rw_set_w_entries(w_it, rw_set)
             if(shared_buffers.is_buffered(ns, w_it->second.symbol_expr,false))
               past_writes.insert(w_it->second.object);
-      
+
           goto_programt::instructiont original_instruction;
           original_instruction.swap(instruction);
           const source_locationt &source_location=
             original_instruction.source_location;
 
-          // ATOMIC_BEGIN: we make the whole thing atomic      
+          // ATOMIC_BEGIN: we make the whole thing atomic
           instruction.make_atomic_begin();
           instruction.source_location=source_location;
           i_it++;
- 
+
           // we first perform (non-deterministically) up to 2 writes for
           // stuff that is potentially read
           forall_rw_set_r_entries(e_it, rw_set)
@@ -1272,7 +1272,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
             if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,false))
               shared_buffers.nondet_flush(
                 goto_program, i_it, source_location, e_it->second.object,
-                current_thread, 
+                current_thread,
                 (model==TSO || model==PSO || model==RMO));
           }
 
@@ -1285,14 +1285,14 @@ void shared_bufferst::cfg_visitort::weak_memory(
               if(shared_buffers.is_buffered(ns, r_it->second.symbol_expr,true))
               {
                 shared_buffers.delay_read(
-                  goto_program, i_it, source_location, r_it->second.object, 
+                  goto_program, i_it, source_location, r_it->second.object,
                   e_it->second.object);
               }
 
             if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,true))
             {
               shared_buffers.write(
-                goto_program, i_it, source_location, 
+                goto_program, i_it, source_location,
                 e_it->second.object,original_instruction,
                 current_thread);
             }
@@ -1304,46 +1304,46 @@ void shared_bufferst::cfg_visitort::weak_memory(
                   if(shared_buffers.affected_by_delay_set.find(r_it->second.object)
                     !=shared_buffers.affected_by_delay_set.end())
                   {
-                    shared_buffers.message.debug() << "second: " 
+                    shared_buffers.message.debug() << "second: "
                       << r_it->second.object << messaget::eom;
-                    const varst &vars=(shared_buffers)(r_it->second.object);  
+                    const varst &vars=(shared_buffers)(r_it->second.object);
 
                     shared_buffers.message.debug() << "writer "
                       <<e_it->second.object
                       <<" reads "<<r_it->second.object<< messaget::eom;
 
                     // TO FIX: how to deal with rhs including calls?
-                    // if a read is delayed, use its alias instead of itself 
+                    // if a read is delayed, use its alias instead of itself
                     // -- or not
-                    symbol_exprt to_replace_expr = symbol_exprt( 
+                    symbol_exprt to_replace_expr = symbol_exprt(
                       r_it->second.object, vars.type);
-                    symbol_exprt new_read_expr = symbol_exprt( 
+                    symbol_exprt new_read_expr = symbol_exprt(
                       vars.read_delayed_var,
                     pointer_typet(vars.type));
-                    symbol_exprt read_delayed_expr = symbol_exprt( 
+                    symbol_exprt read_delayed_expr = symbol_exprt(
                       vars.read_delayed, bool_typet());
 
                     // One extra non-deterministic choice needed
                     irep_idt choice1=shared_buffers.choice(
                       instruction.function, "1");
-                    const symbol_exprt choice1_expr=symbol_exprt(choice1, 
+                    const symbol_exprt choice1_expr=symbol_exprt(choice1,
                       bool_typet());
                     const exprt nondet_bool_expr=side_effect_expr_nondett(
                       bool_typet());
 
                     // throw Boolean dice
-                    shared_buffers.assignment(goto_program, i_it, source_location, 
-                      choice1, 
+                    shared_buffers.assignment(goto_program, i_it, source_location,
+                      choice1,
                       nondet_bool_expr);
 
-                    exprt rhs = if_exprt( 
-                    read_delayed_expr, 
+                    exprt rhs = if_exprt(
+                    read_delayed_expr,
                     if_exprt(
                       choice1_expr,
                       dereference_exprt(new_read_expr,vars.type),
                       to_replace_expr),
                     to_replace_expr);//original_instruction.code.op1());
-        
+
                     shared_buffers.assignment(
                       goto_program, i_it, source_location,
                       r_it->second.object, rhs);
@@ -1351,23 +1351,23 @@ void shared_bufferst::cfg_visitort::weak_memory(
 
               // normal assignment
               shared_buffers.assignment(
-                goto_program, i_it, source_location, 
+                goto_program, i_it, source_location,
                 e_it->second.object, original_instruction.code.op1());
             }
           }
 
-          // if last writes was flushed to make the lhs reads the buffer but 
-          // without affecting the memory, restore the previous memory value 
+          // if last writes was flushed to make the lhs reads the buffer but
+          // without affecting the memory, restore the previous memory value
           // (buffer flush delay)
           forall_rw_set_r_entries(e_it, rw_set)
             if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,false))
             {
-              shared_buffers.message.debug() << "flush restore: " 
+              shared_buffers.message.debug() << "flush restore: "
                 << e_it->second.object << messaget::eom;
               const varst vars= (shared_buffers)(e_it->second.object);
-              const exprt delayed_expr=symbol_exprt(vars.flush_delayed, 
+              const exprt delayed_expr=symbol_exprt(vars.flush_delayed,
                 bool_typet());
-              const symbol_exprt mem_value_expr=symbol_exprt(vars.mem_tmp, 
+              const symbol_exprt mem_value_expr=symbol_exprt(vars.mem_tmp,
                 vars.type);
               const exprt cond_expr=if_exprt(delayed_expr, mem_value_expr,
                 e_it->second.symbol_expr);
@@ -1385,16 +1385,16 @@ void shared_bufferst::cfg_visitort::weak_memory(
           i_it->make_atomic_end();
           i_it->source_location=source_location;
           i_it++;
-     
+
           i_it--; // the for loop already counts us up
         }
         catch (...)
         {
-          shared_buffers.message.warning() << "Identifier not found" 
+          shared_buffers.message.warning() << "Identifier not found"
             << messaget::eom;
         }
     }
-    else if(is_fence(instruction, ns) || (instruction.is_other() 
+    else if(is_fence(instruction, ns) || (instruction.is_other()
        && instruction.code.get_statement()==ID_fence
        && (instruction.code.get_bool("WRfence")
          || instruction.code.get_bool("WWfence")
@@ -1412,7 +1412,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
       i_it++;
 
       // does it for all the previous statements
-      for(std::set<irep_idt>::iterator s_it=past_writes.begin(); 
+      for(std::set<irep_idt>::iterator s_it=past_writes.begin();
         s_it!=past_writes.end(); s_it++)
       {
         shared_buffers.det_flush(
@@ -1425,9 +1425,9 @@ void shared_bufferst::cfg_visitort::weak_memory(
       i_it->make_atomic_end();
       i_it->source_location=source_location;
       i_it++;
-      
+
       i_it--; // the for loop already counts us up
-    }    
+    }
     else if(is_lwfence(instruction, ns))
     {
       // po -- remove the lwfence
@@ -1440,4 +1440,3 @@ void shared_bufferst::cfg_visitort::weak_memory(
     }
   }
 }
-

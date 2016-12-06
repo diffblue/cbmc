@@ -34,7 +34,7 @@ int main()
   assert(g==20);
 
   {
-    D d;  
+    D d;
     assert(g==10);
   }
 

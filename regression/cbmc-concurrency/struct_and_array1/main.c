@@ -22,7 +22,7 @@ void *foo1(void *arg1)
 void *foo2(void *arg2)
 {
   st.y = 1;
-  my_array[2]=2;
+  my_array[2]=1;
   done2 = 1;
 }
 
@@ -31,7 +31,7 @@ int main()
   pthread_t t;
   pthread_create(&t,NULL,foo1,NULL);
   pthread_create(&t,NULL,foo2,NULL);
-  
+
   if(done1 && done2)
   {
     assert(st.x==st.y);

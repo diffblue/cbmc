@@ -8,4 +8,3 @@ int main(int argc, char* argv[]) {
   assert(__CPROVER_buffer_size(str) == len);
   return 0;
 }
-

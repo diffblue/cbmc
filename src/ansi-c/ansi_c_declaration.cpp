@@ -29,7 +29,7 @@ Function: ansi_c_declaratort::build
 void ansi_c_declaratort::build(irept &src)
 {
   typet *p=static_cast<typet *>(&src);
-  
+
   // walk down subtype until we hit symbol or "abstract"
   while(true)
   {
@@ -62,7 +62,7 @@ void ansi_c_declaratort::build(irept &src)
     else
       p=&t.subtype();
   }
-  
+
   type()=static_cast<const typet &>(src);
   value().make_nil();
 }
@@ -95,7 +95,7 @@ void ansi_c_declarationt::output(std::ostream &out) const
   out << "\n";
 
   out << "Type: " << type().pretty() << "\n";
-  
+
   for(declaratorst::const_iterator d_it=declarators().begin();
       d_it!=declarators().end();
       d_it++)
@@ -123,7 +123,7 @@ typet ansi_c_declarationt::full_type(
   // this gets types that are still raw parse trees
   while(p->is_not_nil())
   {
-    if(p->id()==ID_pointer || p->id()==ID_array || 
+    if(p->id()==ID_pointer || p->id()==ID_array ||
        p->id()==ID_vector || p->id()==ID_c_bit_field ||
        p->id()==ID_block_pointer || p->id()==ID_code)
       p=&p->subtype();
@@ -138,7 +138,7 @@ typet ansi_c_declarationt::full_type(
   }
 
   *p=type();
-  
+
   return result;
 }
 
@@ -158,7 +158,7 @@ void ansi_c_declarationt::to_symbol(
   const ansi_c_declaratort &declarator,
   symbolt &symbol) const
 {
-  symbol.clear();    
+  symbol.clear();
   symbol.value=declarator.value();
   symbol.type=full_type(declarator);
   symbol.name=declarator.get_name();
@@ -169,16 +169,16 @@ void ansi_c_declarationt::to_symbol(
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();
   symbol.is_weak=get_is_weak();
-  
+
   // is it a function?
-  
+
   if(symbol.type.id()==ID_code && !symbol.is_type)
   {
     symbol.is_static_lifetime=false;
     symbol.is_thread_local=false;
 
     symbol.is_file_local=get_is_static();
-    
+
     if(get_is_inline())
       symbol.type.set(ID_C_inlined, true);
 
@@ -205,13 +205,13 @@ void ansi_c_declarationt::to_symbol(
       !symbol.is_macro &&
       !symbol.is_type &&
       (get_is_global() || get_is_static());
-      
+
     symbol.is_thread_local=
       (!symbol.is_static_lifetime && !get_is_extern()) ||
       get_is_thread_local();
-       
+
     symbol.is_file_local=
-      symbol.is_macro || 
+      symbol.is_macro ||
       (!get_is_global() && !get_is_extern()) ||
       (get_is_global() && get_is_static()) ||
       symbol.is_parameter;

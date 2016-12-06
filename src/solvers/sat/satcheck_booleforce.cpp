@@ -139,7 +139,7 @@ Function: satcheck_booleforce_baset::lcnf
 void satcheck_booleforce_baset::lcnf(const bvt &bv)
 {
   bvt tmp;
-  
+
   if(process_clause(bv, tmp))
     return;
 
@@ -148,7 +148,7 @@ void satcheck_booleforce_baset::lcnf(const bvt &bv)
 
   // zero-terminated
   booleforce_add(0);
-  
+
   clause_counter++;
 }
 
@@ -185,7 +185,7 @@ propt::resultt satcheck_booleforce_baset::prop_solve()
 
     default:
       msg="SAT checker failed: unknown result";
-      break;    
+      break;
     }
 
     messaget::status() << msg << messaget::eom;
@@ -202,9 +202,9 @@ propt::resultt satcheck_booleforce_baset::prop_solve()
     status=SAT;
     return P_SATISFIABLE;
   }
-  
+
   status=ERROR;
- 
+
   return P_ERROR;
 }
 

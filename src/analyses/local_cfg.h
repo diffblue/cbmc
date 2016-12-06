@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*******************************************************************\
 
    Class: local_cfgt
-   
+
  Purpose:
 
 \*******************************************************************/
@@ -36,16 +36,16 @@ public:
 
   typedef std::map<goto_programt::const_targett, node_nrt> loc_mapt;
   loc_mapt loc_map;
-  
+
   typedef std::vector<nodet> nodest;
   nodest nodes;
-  
+
   inline explicit local_cfgt(const goto_programt &_goto_program)
   {
     build(_goto_program);
   }
 
-protected:  
+protected:
   void build(const goto_programt &goto_program);
 };
 

@@ -28,13 +28,13 @@ public:
   source_locationt last_source_location;
 
   // Control unwinding.
-  
+
   void set_unwind_limit(unsigned limit)
   {
     max_unwind=limit;
     max_unwind_is_set=true;
   }
-  
+
   void set_unwind_thread_loop_limit(
     unsigned thread_nr,
     const irep_idt &id,
@@ -50,7 +50,7 @@ public:
     loop_limits[id]=limit;
   }
 
-protected:  
+protected:
   // We have
   // 1) a global limit (max_unwind)
   // 2) a limit per loop, all threads
@@ -62,7 +62,7 @@ protected:
 
   typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> loop_limitst;
   loop_limitst loop_limits;
-  
+
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
   thread_loop_limitst thread_loop_limits;
 
@@ -82,9 +82,9 @@ protected:
     const irep_idt &identifier,
     const unsigned thread_nr,
     unsigned unwind);
-    
+
   virtual void no_body(const irep_idt &identifier);
-  
+
   hash_set_cont<irep_idt, irep_id_hash> body_warnings;
 };
 

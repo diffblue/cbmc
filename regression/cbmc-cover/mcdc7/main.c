@@ -1,7 +1,7 @@
 int main()
 {
   signed x, y;
-  
+
   __CPROVER_input("x", x);
   __CPROVER_input("y", y);
 

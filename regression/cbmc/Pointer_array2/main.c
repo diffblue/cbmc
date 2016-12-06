@@ -13,4 +13,3 @@ int main() {
   assert(__cil_tmp24!=0);
   return 0;
 }
-

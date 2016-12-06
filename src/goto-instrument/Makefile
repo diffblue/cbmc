@@ -41,7 +41,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS = 
+LIBS =
 
 CLEANFILES = goto-instrument$(EXEEXT)
 
@@ -72,4 +72,3 @@ goto-instrument$(EXEEXT): $(OBJ)
 
 goto-instrument-mac-signed: goto-instrument$(EXEEXT)
 	codesign -v -s $(OSX_IDENTITY) goto-instrument$(EXEEXT)
-

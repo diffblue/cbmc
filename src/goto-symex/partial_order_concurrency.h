@@ -34,34 +34,34 @@ public:
   static irep_idt rw_clock_id(
     event_it e,
     axiomt axiom=AX_PROPAGATION);
-  
+
 protected:
   const namespacet &ns;
 
   typedef std::vector<event_it> event_listt;
-  
+
   // lists of reads and writes per address
   struct a_rect
   {
     event_listt reads, writes;
   };
-  
+
   typedef std::map<irep_idt, a_rect> address_mapt;
   address_mapt address_map;
-  
+
   void build_event_lists(symex_target_equationt &);
   void add_init_writes(symex_target_equationt &);
-  
+
   // a per-thread numbering of the events
   typedef std::map<event_it, unsigned> numberingt;
-  numberingt numbering;  
-  
+  numberingt numbering;
+
   // produces the symbol ID for an event
   static inline irep_idt id(event_it event)
   {
     return event->ssa_lhs.get_identifier();
   }
-  
+
   // produces an address ID for an event
   inline irep_idt address(event_it event) const
   {
@@ -81,7 +81,7 @@ protected:
     const exprt &cond,
     const std::string &msg,
     const symex_targett::sourcet &source) const;
-  
+
   // the partial order constraint for two events
   exprt before(event_it e1, event_it e2, unsigned axioms);
   virtual exprt before(event_it e1, event_it e2)=0;
@@ -91,7 +91,7 @@ protected:
 
   // is it a read from a shared variable?
   bool is_shared_read(event_it e) const;
-  
+
   // is this a spawn?
   static inline bool is_spawn(event_it e)
   {

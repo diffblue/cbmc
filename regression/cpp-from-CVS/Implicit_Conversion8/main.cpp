@@ -37,4 +37,3 @@ int main()
 	b_not(b1,b2);
 	assert(b1.b != b2.b);
 }
-
