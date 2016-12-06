@@ -1,0 +1,10 @@
+CORE
+main.c
+--unwind 0 --continue-as-loops
+^Unwinding loop.*iteration 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^Unwinding loop.*iteration 11

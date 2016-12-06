@@ -84,8 +84,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "code_contracts.h"
 #include "unwind.h"
 
-
-
 /*******************************************************************\
 
 Function: goto_instrument_parse_optionst::eval_verbosity
@@ -146,15 +144,100 @@ int goto_instrument_parse_optionst::doit()
     get_goto_program();
     instrument_goto_program();
 
-    if(cmdline.isset("unwind"))
     {
+      bool unwind=cmdline.isset("unwind");
+      bool unwindset=cmdline.isset("unwindset");
+      bool unwindset_file=cmdline.isset("unwindset-file");
 
-      int k = stoi(cmdline.get_value("unwind"));
+      if(unwindset && unwindset_file)
+        throw "only one of --unwindset and --unwindset-file supported at a "
+              "time";
 
-      goto_unwind(goto_functions, k);
+      if(unwind || unwindset || unwindset_file)
+      {
+        int k=-1;
 
-      goto_functions.update();
-      goto_functions.compute_loop_numbers();
+        if(unwind)
+          k=safe_string2int (cmdline.get_value("unwind"));
+
+        unwind_sett unwind_set;
+
+        if(unwindset_file)
+        {
+          std::string us;
+          std::string fn=cmdline.get_value("unwindset-file");
+
+#ifdef _MSC_VER
+          std::ifstream file(widen(fn));
+#else
+          std::ifstream file(fn);
+#endif
+          if(!file)
+            throw "cannot open file "+fn;
+
+          std::stringstream buffer;
+          buffer << file.rdbuf();
+          us=buffer.str();
+          parse_unwindset(us, unwind_set);
+        }
+        else if(unwindset)
+          parse_unwindset(cmdline.get_value("unwindset"), unwind_set);
+
+        bool unwinding_assertions=cmdline.isset("unwinding-assertions");
+        bool partial_loops=cmdline.isset("partial-loops");
+        bool continue_as_loops=cmdline.isset("continue-as-loops");
+
+        if(unwinding_assertions+partial_loops+continue_as_loops>1)
+          throw "more than one of --unwinding-assertions,--partial-loops,"
+                "--continue-as-loops selected";
+
+        goto_unwindt::unwind_strategyt unwind_strategy=goto_unwindt::ASSUME;
+
+        if(unwinding_assertions)
+        {
+          unwind_strategy=goto_unwindt::ASSERT;
+        }
+        else if(partial_loops)
+        {
+          unwind_strategy=goto_unwindt::PARTIAL;
+        }
+        else if(continue_as_loops)
+        {
+          unwind_strategy=goto_unwindt::CONTINUE;
+        }
+
+        goto_unwindt goto_unwind;
+        goto_unwind(goto_functions, unwind_set, k, unwind_strategy);
+
+        goto_functions.update();
+        goto_functions.compute_loop_numbers();
+
+        if(cmdline.isset("log"))
+        {
+          std::string filename=cmdline.get_value("log");
+          bool have_file=!filename.empty() && filename!="-";
+
+          jsont result=goto_unwind.output_log_json();
+
+          if(have_file)
+          {
+#ifdef _MSC_VER
+            std::ofstream of(widen(filename));
+#else
+            std::ofstream of(filename);
+#endif
+            if(!of)
+              throw "failed to open file "+filename;
+
+            of << result;
+            of.close();
+          }
+          else
+          {
+            std::cout << result << std::endl;
+          }
+        }
+      }
     }
 
     if(cmdline.isset("show-value-sets"))
@@ -1253,6 +1336,11 @@ void goto_instrument_parse_optionst::help()
     "Semantic transformations:\n"
     " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
     " --unwind <n>                 unwinds the loops <n> times\n"
+    " --unwindset L:B,...          unwind loop L with a bound of B\n"
+    " --unwindset-file <file>      read unwindset from file\n"
+    " --partial-loops              permit paths with partial loops\n"
+    " --unwinding-assertions       generate unwinding assertions\n"
+    " --continue-as-loops          add loop for remaining iterations after unwound part\n"
     " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"

@@ -1,6 +1,6 @@
 SRC = cpp_parser.cpp cpp_scanner.cpp elf_reader.cpp float_utils.cpp \
       ieee_float.cpp json.cpp miniBDD.cpp osx_fat_reader.cpp \
-      smt2_parser.cpp wp.cpp
+      smt2_parser.cpp wp.cpp string_utils.cpp
 
 INCLUDES= -I ../src/
 
@@ -55,3 +55,7 @@ smt2_parser$(EXEEXT): smt2_parser$(OBJEXT)
 
 wp$(EXEEXT): wp$(OBJEXT)
 	$(LINKBIN)
+
+string_utils$(EXEEXT): string_utils$(OBJEXT)
+	$(LINKBIN)
+

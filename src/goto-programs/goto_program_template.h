@@ -293,6 +293,13 @@ public:
   {
     return instructions.insert(target, instructiont());
   }
+  
+  //! Insertion before the given target
+  //! \return newly inserted location
+  inline targett insert_before(const_targett target)
+  {
+    return instructions.insert(target, instructiont());
+  }
 
   //! Insertion after the given target
   //! \return newly inserted location
@@ -315,6 +322,17 @@ public:
   //! The program is destroyed.
   inline void destructive_insert(
     targett target,
+    goto_program_templatet<codeT, guardT> &p)
+  {
+    instructions.splice(target,
+                        p.instructions);
+    // BUG: The iterators to p-instructions are invalidated!
+  }
+
+  //! Inserts the given program at the given location.
+  //! The program is destroyed.
+  inline void destructive_insert(
+    const_targett target,
     goto_program_templatet<codeT, guardT> &p)
   {
     instructions.splice(target,
