@@ -252,10 +252,10 @@ void java_bytecode_convert_classt::add_array_types()
 {
   const char letters[]="ijsbcfdza";
 
-  for(unsigned i=0; letters[i]!=0; i++)
+  for(const char l : letters)
   {
     symbol_typet symbol_type=
-      to_symbol_type(java_array_type(letters[i]).subtype());
+      to_symbol_type(java_array_type(l).subtype());
 
     struct_typet struct_type;
     // we have the base class, java.lang.Object, length and data
