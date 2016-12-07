@@ -36,6 +36,22 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
   modules.insert(get_base_name(parse_path, true));
 }
 
+/// Generate a _start function for a specific function
+/// \param entry_function_symbol: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the _start method was generated correctly
+bool ansi_c_languaget::generate_start_function(
+  const symbolt &entry_function_symbol,
+  symbol_tablet &symbol_table)
+{
+  return generate_ansi_c_start_function(
+    entry_function_symbol,
+    symbol_table,
+    *message_handler);
+}
+
 /// ANSI-C preprocessing
 bool ansi_c_languaget::preprocess(
   std::istream &instream,

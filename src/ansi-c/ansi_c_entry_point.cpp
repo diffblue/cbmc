@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+#include <util/symbol.h>
 
 #include <util/c_types.h>
 #include <ansi-c/string_constant.h>
@@ -190,6 +191,22 @@ bool ansi_c_entry_point(
   if(static_lifetime_init(symbol_table, symbol.location, message_handler))
     return true;
 
+  return generate_ansi_c_start_function(symbol, symbol_table, message_handler);
+}
+
+
+/// Generate a _start function for a specific function
+/// \param entry_function_symbol: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the _start method was generated correctly
+bool generate_ansi_c_start_function(
+  const symbolt &symbol,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  PRECONDITION(!symbol.value.is_nil());
   code_blockt init_code;
 
   // build call to initialization function
@@ -237,7 +254,7 @@ bool ansi_c_entry_point(
   const code_typet::parameterst &parameters=
     to_code_type(symbol.type).parameters();
 
-  if(symbol.name==standard_main)
+  if(symbol.name==ID_main)
   {
     if(parameters.empty())
     {

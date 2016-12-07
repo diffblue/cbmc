@@ -194,6 +194,22 @@ void languaget::generate_opaque_parameter_symbols(
   }
 }
 
+/// Generate a entry function for a specific function. Should be overriden in
+/// derived languagets
+/// \param entry_function_symbol: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the entry method was generated correctly
+bool languaget::generate_start_function(
+  const symbolt &entry_function_symbol,
+  symbol_tablet &symbol_table)
+{
+  // Implement in derived languagets
+  assert(0);
+  return true;
+}
+
 /// To replace an existing _start function with a new one that calls a specified
 /// function
 /// \param required_entry_function: a code symbol inside the symbol table which
@@ -205,18 +221,14 @@ void languaget::generate_opaque_parameter_symbols(
 /// \return Returns false if the new start function is created successfully,
 ///   true otherwise.
 bool languaget::regenerate_start_function(
-  const symbolt &required_entry_function,
+  const symbolt &entry_function_symbol,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
   // Remove the existing _start function so we can create a new one
   symbol_table.remove(goto_functionst::entry_point());
-  config.main=required_entry_function.name.c_str();
 
-  // TODO(tkiley): calling final is not really correct (in fact for example,
-  // opaque function stubs get generated here). Instead the final method should
-  // call this to generate the function in the first place.
-  bool return_code=final(symbol_table);
+  bool return_code=generate_start_function(entry_function_symbol, symbol_table);
 
   // Remove the function from the goto_functions so is copied back in
   // from the symbol table
