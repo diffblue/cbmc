@@ -626,6 +626,18 @@ int cbmc_parse_optionst::get_goto_program(
     if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
       return 6;
 
+    if(cmdline.isset("function"))
+    {
+      const symbolt &desired_entry_function=
+        symbol_table.lookup(cmdline.get_value("function"));
+      languaget *language=get_language_from_mode(desired_entry_function.mode);
+
+      language->regenerate_start_function(
+        desired_entry_function,
+        symbol_table,
+        goto_functions);
+    }
+
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table(goto_model, ui_message_handler.get_ui());

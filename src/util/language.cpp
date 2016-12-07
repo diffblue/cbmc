@@ -12,11 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 
 #include "expr.h"
+#include <util/config.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
+#include <goto-programs/goto_functions.h>
 
 bool languaget::final(symbol_tablet &symbol_table)
 {
@@ -190,4 +192,43 @@ void languaget::generate_opaque_parameter_symbols(
 
     symbol_table.add(param_symbol);
   }
+}
+
+/// To replace an existing _start function with a new one that calls a specified
+/// function
+/// \param required_entry_function: a code symbol inside the symbol table which
+///   is the function that should be used as the entry point.
+/// \param symbol_table: the symbol table for the program. The _start symbol
+///   will be replaced with a new start function
+/// \param goto_functions: the functions for the goto program. The _start
+///   function will be erased from this
+/// \return Returns false if the new start function is created successfully,
+///   true otherwise.
+bool languaget::regenerate_start_function(
+  const symbolt &required_entry_function,
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions)
+{
+  // Remove the existing _start function so we can create a new one
+  symbol_table.remove(goto_functionst::entry_point());
+  config.main=required_entry_function.name.c_str();
+
+  // TODO(tkiley): calling final is not really correct (in fact for example,
+  // opaque function stubs get generated here). Instead the final method should
+  // call this to generate the function in the first place.
+  bool return_code=final(symbol_table);
+
+  // Remove the function from the goto_functions so is copied back in
+  // from the symbol table
+  if(!return_code)
+  {
+    const auto &start_function=
+      goto_functions.function_map.find(goto_functionst::entry_point());
+    if(start_function!=goto_functions.function_map.end())
+    {
+      goto_functions.function_map.erase(start_function);
+    }
+  }
+
+  return return_code;
 }
