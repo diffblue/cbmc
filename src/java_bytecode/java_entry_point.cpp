@@ -543,6 +543,31 @@ bool java_entry_point(
        max_nondet_array_length))
     return true;
 
+  return generate_java_start_function(symbol, symbol_table, message_handler);
+}
+
+/*******************************************************************\
+
+Function: generate_start_function
+
+  Inputs:
+          entry_function_symbol - The symbol for the function that should
+                                  be used as the entry point
+          symbol_table - The symbol table for the program. The new _start
+                         function symbol will be added to this table
+
+ Outputs: Returns false if the _start method was generated correctly
+
+ Purpose: Generate a _start function for a specific function
+
+\*******************************************************************/
+
+bool generate_java_start_function(
+  const symbolt &symbol,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  messaget message(message_handler);
   code_blockt init_code;
 
   // build call to initialization function

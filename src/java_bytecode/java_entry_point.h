@@ -30,4 +30,9 @@ main_function_resultt get_main_symbol(
   const irep_idt &main_class,
   message_handlert &);
 
+bool generate_java_start_function(
+  const symbolt &symbol,
+  class symbol_tablet &symbol_table,
+  class message_handlert &message_handler);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

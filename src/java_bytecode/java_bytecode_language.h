@@ -70,6 +70,10 @@ public:
 
   void modules_provided(std::set<std::string> &modules) override;
 
+  virtual bool generate_start_function(
+    const class symbolt &entry_function_symbol,
+    class symbol_tablet &symbol_table) override;
+
 protected:
   irep_idt main_class;
   java_class_loadert java_class_loader;
