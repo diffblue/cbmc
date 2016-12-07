@@ -132,6 +132,31 @@ bool languaget::type_to_name(
 
 /*******************************************************************\
 
+Function: generate_start_function
+
+  Inputs:
+          entry_function_symbol - The symbol for the function that should
+                                  be used as the entry point
+          symbol_table - The symbol table for the program. The new _start
+                         function symbol will be added to this table
+
+ Outputs: Returns false if the _start method was generated correctly
+
+ Purpose: Generate a _start function for a specific function. Should
+          be overriden in derived languagets
+
+\*******************************************************************/
+bool languaget::generate_start_function(
+  const symbolt &entry_function_symbol,
+  symbol_tablet &symbol_table)
+{
+  // Implement in derived languagets
+  assert(0);
+  return true;
+}
+
+/*******************************************************************\
+
 Function: languaget::regenerate_start_function
 
   Inputs:
@@ -153,18 +178,14 @@ Function: languaget::regenerate_start_function
 
 \*******************************************************************/
 bool languaget::regenerate_start_function(
-  const symbolt &required_entry_function,
+  const symbolt &entry_function_symbol,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
   // Remove the existing _start function so we can create a new one
   symbol_table.remove(ID__start);
-  config.main=required_entry_function.name.c_str();
 
-  // TODO(tkiley): calling final is not really correct (in fact for example,
-  // opaque function stubs get generated here). Instead the final method should
-  // call this to generate the function in the first place.
-  bool return_code=final(symbol_table);
+  bool return_code=generate_start_function(entry_function_symbol, symbol_table);
 
   // Remove the function from the goto_functions so is copied back in
   // from the symbol table

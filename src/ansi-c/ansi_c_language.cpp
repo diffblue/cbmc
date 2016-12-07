@@ -61,6 +61,32 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 
 /*******************************************************************\
 
+Function: ansi_c_languaget::generate_start_function
+
+  Inputs:
+          entry_function_symbol - The symbol for the function that should
+                                  be used as the entry point
+          symbol_table - The symbol table for the program. The new _start
+                         function symbol will be added to this table
+
+ Outputs: Returns false if the _start method was generated correctly
+
+ Purpose: Generate a _start function for a specific function
+
+\*******************************************************************/
+
+bool ansi_c_languaget::generate_start_function(
+  const symbolt &entry_function_symbol,
+  symbol_tablet &symbol_table)
+{
+  return generate_ansi_c_start_function(
+    entry_function_symbol,
+    symbol_table,
+    *message_handler);
+}
+
+/*******************************************************************\
+
 Function: ansi_c_languaget::preprocess
 
   Inputs:
