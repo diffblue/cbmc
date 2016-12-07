@@ -674,6 +674,8 @@ int cbmc_parse_optionst::get_goto_program(
     cmdlinet::argst binaries;
     binaries.reserve(cmdline.args.size());
 
+    // Remove all binaries from the command line as they
+    // are already compiled
     for(cmdlinet::argst::iterator
         it=cmdline.args.begin();
         it!=cmdline.args.end();
