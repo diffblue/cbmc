@@ -374,18 +374,22 @@ bool c_preprocess(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
-  std::string file=get_temporary_file("tmp.stdin", ".c");
-  FILE *tmp=fopen(file.c_str(), "wt");
+  temporary_filet tmp_file("tmp.stdin", ".c");
 
-  char ch;
-  while(instream.read(&ch, 1))
-    fputc(ch, tmp);
+  std::ofstream tmp(tmp_file());
+  
+  if(!tmp)
+  {
+    messaget message(message_handler);
+    message.error() << "failed to open temporary file" << messaget::eom;
+    return true; // error
+  }
 
-  fclose(tmp);
+  tmp << instream.rdbuf(); // copy
 
-  bool result=c_preprocess(file, outstream, message_handler);
+  tmp.close(); // flush
 
-  unlink(file.c_str());
+  bool result=c_preprocess(tmp_file(), outstream, message_handler);
 
   return result;
 }
@@ -553,25 +557,21 @@ bool c_preprocess_visual_studio(
   // that's why we use system()
   int result=system(command.c_str());
 
-  FILE *stream=fopen(tmpi.c_str(), "r");
+  std::ifstream instream(tmpi);
 
-  if(stream==NULL)
+  if(!instream)
   {
     unlink(tmpi.c_str());
     unlink(stderr_file.c_str());
     unlink(command_file_name.c_str());
-    message.error() << "CL Preprocessing failed (fopen failed)"
+    message.error() << "CL Preprocessing failed (open failed)"
                     << messaget::eom;
     return true;
   }
 
-  {
-    int ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << (unsigned char)ch;
-  }
+  outstream << instream.rdbuf(); // copy
 
-  fclose(stream);
+  instream.close();
   unlink(tmpi.c_str());
   unlink(command_file_name.c_str());
 
@@ -998,7 +998,7 @@ bool c_preprocess_gcc_clang(
   // that's why we use system() and a temporary file
   result=system(command.c_str());
 
-  FILE *stream=fopen(tmpi.c_str(), "r");
+  std::ifstream instream(tmpi);
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file);
@@ -1006,19 +1006,16 @@ bool c_preprocess_gcc_clang(
 
   unlink(stderr_file.c_str());
 
-  if(stream!=NULL)
+  if(instream)
   {
-    int ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << (unsigned char)ch;
-
-    fclose(stream);
+    outstream << instream.rdbuf();
+    instream.close();
     unlink(tmpi.c_str());
   }
   else
   {
     unlink(tmpi.c_str());
-    message.error() << "GCC preprocessing failed (fopen failed)"
+    message.error() << "GCC preprocessing failed (open failed)"
                     << messaget::eom;
     result=1;
   }
@@ -1145,15 +1142,12 @@ bool c_preprocess_arm(
   // that's why we use system() and a temporary file
   result=system(command.c_str());
 
-  FILE *stream=fopen(tmpi.c_str(), "r");
+  std::ifstream instream(tmpi);
 
-  if(stream!=NULL)
+  if(!instream)
   {
-    int ch;
-    while((ch=fgetc(stream))!=EOF)
-      outstream << (unsigned char)ch;
-
-    fclose(stream);
+    outstream << instream.rdbuf(); // copy
+    instream.close();
     unlink(tmpi.c_str());
   }
   else
