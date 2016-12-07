@@ -510,6 +510,32 @@ bool java_entry_point(
     max_nondet_tree_depth,
     pointer_type_selector);
 
+  return generate_java_start_function(
+    symbol,
+    symbol_table,
+    message_handler,
+    assume_init_pointers_not_null,
+    max_nondet_array_length,
+    max_nondet_tree_depth,
+    pointer_type_selector);
+}
+
+/// Generate a _start function for a specific function
+/// \param entry_function_symbol: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the _start method was generated correctly
+bool generate_java_start_function(
+  const symbolt &symbol,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
+  const select_pointer_typet &pointer_type_selector)
+{
+  messaget message(message_handler);
   code_blockt init_code;
 
   // build call to initialization function
