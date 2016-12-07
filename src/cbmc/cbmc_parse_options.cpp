@@ -719,6 +719,18 @@ int cbmc_parse_optionst::get_goto_program(
       }
     }
 
+    if(cmdline.isset("function"))
+    {
+      const symbolt &desired_entry_function=
+        symbol_table.lookup(cmdline.get_value("function"));
+      languaget *language=get_language_from_mode(desired_entry_function.mode);
+
+      language->regenerate_start_function(
+        desired_entry_function,
+        symbol_table,
+        goto_functions);
+    }
+
     if(!binaries.empty())
       config.set_from_symbol_table(symbol_table);
 

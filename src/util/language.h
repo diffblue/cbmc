@@ -101,6 +101,11 @@ public:
 
   virtual languaget *new_language()=0;
 
+  bool regenerate_start_function(
+    const class symbolt &required_entry_function,
+    symbol_tablet &symbol_table,
+    class goto_functionst &goto_functions);
+
   // constructor / destructor
 
   languaget() { }
