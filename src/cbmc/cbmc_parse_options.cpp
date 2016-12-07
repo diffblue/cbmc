@@ -630,14 +630,24 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(cmdline.isset("function"))
     {
-      const symbolt &desired_entry_function=
-        symbol_table.lookup(cmdline.get_value("function"));
-      languaget *language=get_language_from_mode(desired_entry_function.mode);
+      const std::string &function_id=cmdline.get_value("function");
+      const auto &desired_entry_function=
+        symbol_table.symbols.find(function_id);
 
-      language->regenerate_start_function(
-        desired_entry_function,
-        symbol_table,
-        goto_functions);
+      if(desired_entry_function!=symbol_table.symbols.end())
+      {
+        languaget *language=get_language_from_mode(
+          desired_entry_function->second.mode);
+        language->regenerate_start_function(
+          desired_entry_function->second,
+          symbol_table,
+          goto_functions);
+      }
+      else
+      {
+        error() << "main symbol `" << function_id;
+        error() << "' not found" << messaget::eom;
+      }
     }
 
     if(cmdline.isset("show-symbol-table"))
