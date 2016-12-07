@@ -624,6 +624,8 @@ int cbmc_parse_optionst::get_goto_program(
   try
   {
     if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
+    // Remove all binaries from the command line as they
+    // are already compiled
       return 6;
 
     if(cmdline.isset("function"))
