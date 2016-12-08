@@ -4,6 +4,7 @@ DIRS = ansi-c \
        cpp \
        cbmc-java \
        goto-analyzer \
+       goto-cc-cbmc \
        goto-instrument \
        goto-instrument-typedef \
        test-script \
