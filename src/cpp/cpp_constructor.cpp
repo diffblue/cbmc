@@ -77,7 +77,7 @@ codet cpp_typecheckt::cpp_constructor(
       nil.make_nil();
       return nil;
     }
-    
+
     exprt tmp_size=size_expr;
     make_constant_index(tmp_size);
 
@@ -182,7 +182,7 @@ codet cpp_typecheckt::cpp_constructor(
                  "but got " << operands.size() << eom;
       throw 0;
     }
-    
+
     return new_code;
   }
   else if(tmp_type.id()==ID_union)

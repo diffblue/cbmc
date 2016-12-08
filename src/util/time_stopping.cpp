@@ -63,7 +63,7 @@ absolute_timet current_time()
 
 /*******************************************************************\
 
-Function: operator << 
+Function: operator <<
 
   Inputs:
 
@@ -96,4 +96,3 @@ std::string time_periodt::as_string() const
   out << *this;
   return out.str();
 }
-

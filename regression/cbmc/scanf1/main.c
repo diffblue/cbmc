@@ -12,7 +12,7 @@ int main(void)
   long int li=0;
   void *p=0;
   char buffer[10];
-  
+
   __CPROVER_scanf("%c", &c);
   __CPROVER_scanf("%hhd", &si);
   __CPROVER_scanf("%d", &i);
@@ -34,4 +34,3 @@ int main(void)
 
   return 0;
 }
-

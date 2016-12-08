@@ -4,4 +4,3 @@ extern int some_int;
 int some_int;
 
 extern int some_int;
-

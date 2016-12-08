@@ -177,10 +177,10 @@ std::string expr2cppt::convert_rec(
 {
   c_qualifierst new_qualifiers(qualifiers);
   new_qualifiers.read(src);
-  
+
   const std::string d=
     declarator==""?declarator:(" "+declarator);
-    
+
   const std::string q=
     new_qualifiers.as_string();
 
@@ -242,7 +242,7 @@ std::string expr2cppt::convert_rec(
        symbol.type.id()==ID_incomplete_struct)
     {
       std::string dest=q;
-      
+
       if(symbol.type.get_bool(ID_C_class))
         dest+="class";
       else if(symbol.type.get_bool(ID_C_interface))
@@ -380,9 +380,9 @@ std::string expr2cppt::convert_rec(
 
     // C doesn't really have syntax for function types,
     // so we use C++11 trailing return types!
-  
+
     std::string dest="auto";
-    
+
     // qualifiers, declarator?
     if(d.empty())
       dest+=' ';
@@ -402,7 +402,7 @@ std::string expr2cppt::convert_rec(
 
       dest+=convert(it->type());
     }
-    
+
     if(code_type.has_ellipsis())
     {
       if(!parameters.empty()) dest+=", ";
@@ -410,7 +410,7 @@ std::string expr2cppt::convert_rec(
     }
 
     dest+=')';
-    
+
     const typet &return_type=code_type.return_type();
     dest+=" -> "+convert(return_type);
 

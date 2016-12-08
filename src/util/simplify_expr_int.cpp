@@ -48,7 +48,7 @@ bool simplify_exprt::simplify_bswap(exprt &expr)
     // take apart
     for(std::size_t bit=0; bit<width; bit+=8)
       bytes.push_back((value>>bit)%256);
-      
+
     // put back together, but backwards
     mp_integer new_value=0;
     for(std::size_t bit=0; bit<width; bit+=8)
@@ -57,11 +57,11 @@ bool simplify_exprt::simplify_bswap(exprt &expr)
       new_value+=bytes.back()<<bit;
       bytes.pop_back();
     }
-    
+
     expr=from_integer(new_value, expr.type());
     return false;
   }
-  
+
   return true;
 }
 
@@ -94,7 +94,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
 
   // true if we have found a constant
   bool found = false;
-  
+
   typet c_sizeof_type=nil_typet();
 
   // scan all the operands
@@ -146,7 +146,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     else
       it++; // move to the next operand
   }
-  
+
   if(c_sizeof_type.is_not_nil())
   {
     assert(found);
@@ -199,7 +199,7 @@ bool simplify_exprt::simplify_div(exprt &expr)
 
   if(expr.operands().size()!=2)
     return true;
-    
+
   const typet &expr_type=expr.type();
 
   if(expr_type!=expr.op0().type() ||
@@ -394,12 +394,12 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   bool result=true;
 
   exprt::operandst &operands=expr.operands();
-  
+
   assert(expr.id()==ID_plus);
 
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
-  
+
   if(ns.follow(expr.type()).id()==ID_floatbv)
   {
     // we only merge neighboring constants!
@@ -407,7 +407,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     {
       exprt::operandst::iterator next=it;
       next++;
-      
+
       if(next!=operands.end())
       {
         if(it->type()==next->type() &&
@@ -448,7 +448,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     forall_operands(it, expr)
       if(is_number(it->type()) && it->is_constant())
         count++;
-    
+
     // merge constants?
     if(count>=2)
     {
@@ -475,7 +475,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
         }
       }
     }
-    
+
     // search for a and -a
     // first gather all the a's with -a
     typedef hash_map_cont<exprt, exprt::operandst::iterator, irep_hash>
@@ -561,7 +561,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
   if(operands.size()!=2)
     return true;
-  
+
   if(is_number(expr.type()) &&
      is_number(operands[0].type()) &&
      is_number(operands[1].type()))
@@ -595,7 +595,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
           operands[1].type().id()==ID_pointer)
   {
     // pointer arithmetic: rewrite "p-p" to "0"
-    
+
     if(operands[0]==operands[1])
     {
       exprt zero=gen_zero(expr.type());
@@ -626,12 +626,12 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
 {
   if(!is_bitvector_type(expr.type()))
     return true;
-    
+
   // check if these are really boolean
   if(expr.type().id()!=ID_bool)
   {
     bool all_bool=true;
-    
+
     forall_operands(it, expr)
     {
       if(it->id()==ID_typecast &&
@@ -645,12 +645,12 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       else
         all_bool=false;
     }
-        
+
     if(all_bool)
     {
       // re-write to boolean+typecast
       exprt new_expr=expr;
-      
+
       if(expr.id()==ID_bitand)
         new_expr.id(ID_and);
       else if(expr.id()==ID_bitor)
@@ -659,7 +659,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         new_expr.id(ID_xor);
       else
         assert(false);
-        
+
       Forall_operands(it, new_expr)
       {
         if(it->id()==ID_typecast)
@@ -673,47 +673,47 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         else if(it->is_one())
           *it=true_exprt();
       }
-        
+
       new_expr.type()=bool_typet();
       simplify_node(new_expr);
 
       new_expr.make_typecast(expr.type());
       simplify_node(new_expr);
-      
+
       expr.swap(new_expr);
       return false;
     }
   }
 
   bool result=true;
-    
+
   // try to merge constants
-  
+
   std::size_t width=to_bitvector_type(expr.type()).get_width();
-    
+
   while(expr.operands().size()>=2)
   {
     const irep_idt &a_str=expr.op0().get(ID_value);
     const irep_idt &b_str=expr.op1().get(ID_value);
-    
+
     if(!expr.op0().is_constant())
       break;
-      
+
     if(!expr.op1().is_constant())
       break;
-      
+
     if(expr.op0().type()!=expr.type())
       break;
-                
+
     if(expr.op1().type()!=expr.type())
       break;
-      
+
     assert(a_str.size()==b_str.size());
-      
+
     constant_exprt new_op(expr.type());
     std::string new_value;
     new_value.resize(width);
-                
+
     if(expr.id()==ID_bitand)
     {
       for(std::size_t i=0; i<width; i++)
@@ -731,13 +731,13 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     }
     else
       break;
-      
+
     new_op.set_value(new_value);
 
     // erase first operand
     expr.operands().erase(expr.operands().begin());
     expr.op0().swap(new_op);
-    
+
     result=false;
   }
 
@@ -759,7 +759,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         it++;
     }
   }
-  
+
   // two operands that are syntactically the same
 
   if(expr.operands().size()==2 &&
@@ -780,7 +780,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       return false;
     }
   }
-  
+
   if(expr.operands().size()==1)
   {
     exprt tmp;
@@ -788,7 +788,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     expr.swap(tmp);
     return false;
   }
-  
+
   return result;
 }
 
@@ -810,7 +810,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
 
   if(!is_bitvector_type(op0_type))
     return true;
-  
+
   std::size_t width=to_bitvector_type(op0_type).get_width();
 
   assert(expr.operands().size()==2);
@@ -866,15 +866,15 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         op=constant_exprt(value?ID_1:ID_0, unsignedbv_typet(1));
       }
     }
-    
+
     // search for neighboring constants to merge
     size_t i=0;
-    
+
     while(i<expr.operands().size()-1)
     {
       exprt &opi=expr.operands()[i];
       exprt &opn=expr.operands()[i+1];
-    
+
       if(opi.is_constant() &&
          opn.is_constant() &&
          is_bitvector_type(opi.type()) &&
@@ -897,12 +897,12 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   {
     // search for neighboring constants to merge
     size_t i=0;
-    
+
     while(i<expr.operands().size()-1)
     {
       exprt &opi=expr.operands()[i];
       exprt &opn=expr.operands()[i+1];
-    
+
       if(opi.is_constant() &&
          opn.is_constant() &&
          (opi.type().id()==ID_verilog_unsignedbv || is_bitvector_type(opi.type())) &&
@@ -931,7 +931,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
     expr.swap(tmp);
     result=false;
   }
-  
+
   return result;
 }
 
@@ -956,10 +956,10 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     return true;
 
   mp_integer distance;
-  
+
   if(to_integer(expr.op1(), distance))
     return true;
-    
+
   if(distance==0)
   {
     exprt tmp;
@@ -969,16 +969,16 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
   }
 
   mp_integer value;
-  
+
   if(to_integer(expr.op0(), value))
     return true;
 
-  if(expr.op0().type().id()==ID_unsignedbv || 
+  if(expr.op0().type().id()==ID_unsignedbv ||
      expr.op0().type().id()==ID_signedbv)
-  { 
+  {
     mp_integer width=
       string2integer(id2string(expr.op0().type().get(ID_width)));
-      
+
     if(expr.id()==ID_lshr)
     {
       // this is to guard against large values of distance
@@ -1079,15 +1079,15 @@ bool simplify_exprt::simplify_power(exprt &expr)
     return true;
 
   mp_integer base, exponent;
-  
+
   if(to_integer(expr.op0(), base))
     return true;
-    
+
   if(to_integer(expr.op1(), exponent))
     return true;
-    
+
   mp_integer result=power(base, exponent);
-  
+
   expr=from_integer(result, expr.type());
   return false;
 }
@@ -1100,7 +1100,7 @@ Function: simplify_exprt::simplify_extractbits
 
  Outputs:
 
- Purpose: Simplifies extracting of bits from a constant. 
+ Purpose: Simplifies extracting of bits from a constant.
 
 \*******************************************************************/
 
@@ -1118,7 +1118,7 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
   {
     std::size_t width=to_bitvector_type(op0_type).get_width();
     mp_integer start, end;
-    
+
     if(to_integer(expr.op1(), start))
       return true;
 
@@ -1141,7 +1141,7 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
     std::string extracted_value=
       svalue.substr(width-integer2size_t(start)-1,
                     integer2size_t(start-end+1));
-    
+
     exprt tmp(ID_constant, expr.type());
     tmp.set(ID_value, extracted_value);
     expr.swap(tmp);
@@ -1333,11 +1333,11 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
 
   exprt tmp0=expr.op0();
   exprt tmp1=expr.op1();
-  
+
   // types must match
   if(!base_type_eq(tmp0.type(), tmp1.type(), ns))
     return true;
-    
+
   // if rhs is ID_if (and lhs is not), swap operands for == and !=
   if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
      tmp0.id()!=ID_if &&
@@ -1372,20 +1372,20 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     return simplify_inequality_pointer_object(expr);
 
   // first see if we compare to a constant
-  
+
   bool op0_is_const=tmp0.is_constant();
   bool op1_is_const=tmp1.is_constant();
-  
+
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
-  
+
   if(tmp0.type().id()==ID_c_enum_tag)
     tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
 
   if(tmp1.type().id()==ID_c_enum_tag)
     tmp1.type()=ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
 
-  // are _both_ constant?  
+  // are _both_ constant?
   if(op0_is_const && op1_is_const)
   {
     if(tmp0.type().id()==ID_bool)
@@ -1423,7 +1423,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
         expr.make_bool(f0<f1);
       else
         assert(false);
-    
+
       return false;
     }
     else if(tmp0.type().id()==ID_floatbv)
@@ -1445,7 +1445,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
         expr.make_bool(f0<f1);
       else
         assert(false);
-    
+
       return false;
     }
     else if(tmp0.type().id()==ID_rational)
@@ -1478,13 +1478,13 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     else
     {
       mp_integer v0, v1;
-      
+
       if(to_integer(tmp0, v0))
         return true;
 
       if(to_integer(tmp1, v1))
         return true;
-      
+
       if(expr.id()==ID_notequal)
         expr.make_bool(v0!=v1);
       else if(expr.id()==ID_equal)
@@ -1515,9 +1515,9 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       expr.id(ID_lt);
     else if(expr.id()==ID_lt)
       expr.id(ID_gt);
-    
+
     expr.op0().swap(expr.op1());
-    
+
     // one is constant
     simplify_inequality_constant(expr);
     return false;
@@ -1525,14 +1525,14 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   else if(op1_is_const)
   {
     // one is constant
-    return simplify_inequality_constant(expr); 
+    return simplify_inequality_constant(expr);
   }
   else
   {
     // both are not constant
     return simplify_inequality_not_constant(expr);
   }
-    
+
   assert(false);
   return false;
 }
@@ -1561,7 +1561,7 @@ bool simplify_exprt::eliminate_common_addends(
      (op1.is_constant() &&
       to_constant_expr(op1).get_value()==ID_NULL))
     return true;
-  
+
   if(op0.id()==ID_plus)
   {
     bool result=true;
@@ -1579,7 +1579,7 @@ bool simplify_exprt::eliminate_common_addends(
     Forall_operands(it, op1)
       if(!eliminate_common_addends(op0, *it))
         result=false;
-      
+
     return result;
   }
   else if(op0==op1)
@@ -1593,7 +1593,7 @@ bool simplify_exprt::eliminate_common_addends(
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -1612,13 +1612,13 @@ Function: simplify_exprt::simplify_inequality_not_constant
 bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
-  
+
   // pretty much all of the simplifications below are unsound
   // for IEEE float because of NaN!
-  
+
   if(ns.follow(expr.op0().type()).id()==ID_floatbv)
     return true;
-  
+
   // eliminate strict inequalities
   if(expr.id()==ID_notequal)
   {
@@ -1717,7 +1717,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
       return false;
     }
   }
-  
+
   // See if we can eliminate common addends on both sides.
   // On bit-vectors, this is only sound on '='.
   if(expr.id()==ID_equal)
@@ -1731,9 +1731,9 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
       return false;
     }
   }
-  
+
   return true;
-}  
+}
 
 /*******************************************************************\
 
@@ -1774,15 +1774,15 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       simplify_node(expr);
       return false;
     }
-  
+
     // very special case for pointers
     if(expr.id()==ID_equal &&
        expr.op1().is_constant() &&
        expr.op1().get(ID_value)==ID_NULL)
     {
       // the address of an object is never NULL
-    
-      if(expr.op0().id()==ID_address_of && 
+
+      if(expr.op0().id()==ID_address_of &&
          expr.op0().operands().size()==1)
       {
         if(expr.op0().op0().id()==ID_symbol ||
@@ -1833,18 +1833,18 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     // all we are doing with pointers
     return true;
   }
-  
+
   // is it a separation predicate?
-  
+
   if(expr.op0().id()==ID_plus)
   {
     // see if there is a constant in the sum
-    
+
     if(expr.id()==ID_equal || expr.id()==ID_notequal)
     {
       mp_integer constant=0;
       bool changed=false;
-      
+
       Forall_operands(it, expr.op0())
       {
         if(it->is_constant())
@@ -1858,7 +1858,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
           }
         }
       }
-      
+
       if(changed)
       {
         // adjust constant
@@ -1873,11 +1873,11 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       }
     }
   }
-  
+
   #if 1
   // (double)value REL const ---> value rel const
   // if 'const' can be represented exactly.
-  
+
   if(expr.op0().id()==ID_typecast &&
      expr.op0().operands().size()==1 &&
      ns.follow(expr.op0().type()).id()==ID_floatbv &&
@@ -1979,7 +1979,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   {
     bv_spect spec(expr.op0().type());
     mp_integer max(spec.max_value());
-    
+
     if(expr.id()==ID_notequal)
     {
       expr.id(ID_equal);
@@ -1993,7 +1993,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       mp_integer i;
       if(to_integer(expr.op1(), i))
         throw "Bit-vector constant unexpectedly non-integer";
-      
+
       if (i == max)
       {
         expr=false_exprt();
@@ -2038,4 +2038,3 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 #endif
   return true;
 }
-

@@ -26,4 +26,3 @@ int main()
   assert(i==0);
   #endif
 }
-

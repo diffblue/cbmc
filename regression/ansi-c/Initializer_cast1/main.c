@@ -21,18 +21,18 @@ int main()
   struct S s;
   union U u;
 
-  // scalar  
+  // scalar
   l=(long){0x1};
-  
+
   // struct
   s=(struct S){ 1, 2, 3, 4, 5, 6 };
-  
+
   // union
   u=(union U)s;
-  
+
   // union
   u=(union U){ 1 };
-  
+
   // array
   const int *a=(array_type){ 1, 2, 3, 4 };
 }

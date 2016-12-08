@@ -11,6 +11,6 @@ int main()
   q=&array;
   q++;
   q--;
-  
+
   assert(**q==*p);
 }

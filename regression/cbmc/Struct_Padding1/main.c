@@ -7,13 +7,13 @@ struct my_struct1
 {
   int i;
   char ch;
-  
+
   struct
   {
     // this gets padded
     int j;
   };
-  
+
   // Bit-fields do not get padded in between,
   // but fill up an integer!
   unsigned bf1:1;
@@ -27,7 +27,7 @@ struct my_struct2
 {
   int i;
   char ch[4];
-  
+
   // no padding needed
   int j;
 
@@ -48,7 +48,7 @@ int main()
   assert(xx1.i==1);
   assert(xx1.ch==2);
   assert(xx1.j==3);
-  
+
   // let's probe the padding
   char *p=&xx1.ch;
   assert(p[0]==2);

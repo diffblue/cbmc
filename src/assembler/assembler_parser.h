@@ -21,7 +21,7 @@ class assembler_parsert:public parsert
 public:
   typedef std::vector<irept> instructiont;
   std::list<instructiont> instructions;
-  
+
   void add_token(const irept &irep)
   {
     if(instructions.empty())
@@ -29,16 +29,16 @@ public:
 
     instructions.back().push_back(irep);
   }
-  
+
   void new_instruction()
   {
     instructions.push_back(instructiont());
   }
-  
+
   assembler_parsert()
   {
   }
-  
+
   virtual bool parse()
   {
     yyassemblerlex();

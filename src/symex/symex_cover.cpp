@@ -34,7 +34,7 @@ std::string symex_parse_optionst::get_test(const goto_tracet &goto_trace)
   bool first=true;
   std::string test;
   const namespacet ns(goto_model.symbol_table);
-  
+
   for(const auto & step : goto_trace.steps)
   {
     if(step.is_input())
@@ -70,11 +70,11 @@ void symex_parse_optionst::report_cover(
 {
   // report
   unsigned goals_covered=0;
-  
+
   for(const auto & it : property_map)
     if(it.second.is_failure())
       goals_covered++;
-  
+
   switch(get_ui())
   {
     case ui_message_handlert::PLAIN:
@@ -138,7 +138,7 @@ void symex_parse_optionst::report_cover(
                     xml(step.io_args.front(), ns);
               }
             }
-            
+
           }
         }
 
@@ -187,7 +187,7 @@ void symex_parse_optionst::report_cover(
                 json_test.push_back(json_input);
               }
             }
-            
+
           }
         }
       }
@@ -212,11 +212,10 @@ void symex_parse_optionst::report_cover(
     for(const auto & it : property_map)
       if(it.second.is_failure())
         tests.insert(get_test(it.second.error_trace));
-    
+
     std::cout << "Test suite:" << '\n';
 
     for(const auto & t : tests)
       std::cout << t << '\n';
   }
 }
-

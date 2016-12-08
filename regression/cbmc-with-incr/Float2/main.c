@@ -11,7 +11,7 @@ main()
 
   b=1.250;
   assert(b==1.25);
-  
+
   // with exponent
   a=0.5e2;
   assert(a==50);

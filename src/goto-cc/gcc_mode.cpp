@@ -23,12 +23,11 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/get_base_name.h>
+#include <util/run.h>
 
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "run.h"
-
 #include "gcc_mode.h"
 
 /*******************************************************************\
@@ -88,7 +87,7 @@ int gcc_modet::doit()
   {
     // This a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
-    
+
     if(act_as_ld)
       std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
     else
@@ -102,7 +101,7 @@ int gcc_modet::doit()
     else
       std::cout << "gcc (GCC) 3.4.4 (goto-cc " CBMC_VERSION ")\n\n";
 
-    std::cout << 
+    std::cout <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
       "Architecture: " << config.this_architecture() << '\n' <<
@@ -145,21 +144,21 @@ int gcc_modet::doit()
   // * assembly (-S)
   // * preprocessing (-E).
   // * no input files given
-  
+
   if(act_as_ld)
   {
   }
-  else if(cmdline.isset('M') || 
+  else if(cmdline.isset('M') ||
           cmdline.isset("MM") ||
           cmdline.isset('S') ||
           cmdline.isset('E') ||
           !cmdline.have_infile_arg())
     return run_gcc(); // exit!
-  
+
   // get configuration
   config.set(cmdline);
 
-  // Intel-specific  
+  // Intel-specific
   // in GCC, m16 is 32-bit (!), as documented here:
   // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59672
   if(cmdline.isset("m16") ||
@@ -173,33 +172,33 @@ int gcc_modet::doit()
     config.ansi_c.arch="x86_64";
     config.ansi_c.set_arch_spec_x86_64();
   }
-    
+
   // ARM-specific
   if(cmdline.isset("mbig-endian") || cmdline.isset("mbig"))
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
   else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
-    
+
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
   {
     config.ansi_c.wchar_t_width=config.ansi_c.short_int_width;
     config.ansi_c.wchar_t_is_unsigned=true;
   }
-  
+
   // -fsingle-precision-constant makes floating-point constants "float"
   // instead of double
   if(cmdline.isset("-fsingle-precision-constant"))
     config.ansi_c.single_precision_constant=true;
-  
+
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;
 
   // determine actions to be undertaken
-  compilet compiler(cmdline);  
+  compilet compiler(cmdline);
   compiler.ui_message_handler.set_verbosity(verbosity);
-  
+
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
   else if(cmdline.isset('c'))
@@ -247,11 +246,11 @@ int gcc_modet::doit()
     compiler.object_file_extension="s";
   else
     compiler.object_file_extension="o";
-  
+
   if(cmdline.isset("std"))
   {
     std::string std_string=cmdline.get_value("std");
-    
+
     if(std_string=="gnu89" || std_string=="c89")
       config.ansi_c.set_c89();
 
@@ -264,7 +263,7 @@ int gcc_modet::doit()
       config.ansi_c.set_c11();
 
     if(std_string=="c++11" || std_string=="c++1x" ||
-       std_string=="gnu++11" || std_string=="gnu++1x" || 
+       std_string=="gnu++11" || std_string=="gnu++1x" ||
        std_string=="c++1y" ||
        std_string=="gnu++1y")
       config.cpp.set_cpp11();
@@ -280,7 +279,7 @@ int gcc_modet::doit()
   // gcc's default is 64 bits for double
   if(cmdline.isset("short-double"))
     config.ansi_c.double_width=32;
-    
+
   // gcc's default is signed chars on most architectures
   if(cmdline.isset("funsigned-char"))
     config.ansi_c.char_is_unsigned=true;
@@ -322,14 +321,14 @@ int gcc_modet::doit()
     compiler.output_file_object="";
     compiler.output_file_executable="a.out";
   }
-  
+
   // We now iterate over any input files
-  
+
   temp_dirt temp_dir("goto-cc-XXXXXX");
-  
+
   {
     std::string language;
-    
+
     for(goto_cc_cmdlinet::parsed_argvt::iterator
         arg_it=cmdline.parsed_argv.begin();
         arg_it!=cmdline.parsed_argv.end();
@@ -366,7 +365,7 @@ int gcc_modet::doit()
             error() << "preprocessing has failed" << eom;
             return exit_code;
           }
-          
+
           compiler.add_input_file(dest);
         }
         else
@@ -388,7 +387,7 @@ int gcc_modet::doit()
       }
     }
   }
-  
+
   // Revert to gcc in case there is no source to compile
   // and no binary to link.
 
@@ -404,7 +403,7 @@ int gcc_modet::doit()
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary)
     return gcc_hybrid_binary();
-  
+
   return EX_OK;
 }
 
@@ -427,11 +426,11 @@ int gcc_modet::preprocess(
 {
   // build new argv
   std::vector<std::string> new_argv;
-  
+
   new_argv.reserve(cmdline.parsed_argv.size());
 
   bool skip_next=false;
-  
+
   for(gcc_cmdlinet::parsed_argvt::const_iterator
       it=cmdline.parsed_argv.begin();
       it!=cmdline.parsed_argv.end();
@@ -473,30 +472,30 @@ int gcc_modet::preprocess(
   // destination file
   new_argv.push_back("-o");
   new_argv.push_back(dest);
-  
+
   // language, if given
   if(language!="")
   {
     new_argv.push_back("-x");
     new_argv.push_back(language);
   }
-  
-  // source file  
+
+  // source file
   new_argv.push_back(src);
-  
+
   const char *compiler=compiler_name();
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
   new_argv[0]=compiler;
-  
+
   #if 0
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
-  
+
   return run(compiler, new_argv, cmdline.stdin_file);
 }
 
@@ -516,7 +515,7 @@ int gcc_modet::run_gcc()
 {
   // build new argv
   std::vector<std::string> new_argv;
-  
+
   new_argv.reserve(cmdline.parsed_argv.size());
 
   for(gcc_cmdlinet::parsed_argvt::const_iterator
@@ -526,7 +525,7 @@ int gcc_modet::run_gcc()
   {
     new_argv.push_back(it->arg);
   }
-  
+
   // overwrite argv[0]
   assert(new_argv.size()>=1);
 
@@ -534,14 +533,14 @@ int gcc_modet::run_gcc()
     new_argv[0]=linker_name();
   else
     new_argv[0]=compiler_name();
-  
+
   #if 0
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
-  
+
   return run(new_argv[0], new_argv, cmdline.stdin_file);
 }
 
@@ -574,7 +573,7 @@ int gcc_modet::gcc_hybrid_binary()
   }
 
   std::list<std::string> output_files;
-  
+
   if(cmdline.isset('c'))
   {
     if(cmdline.isset('o'))
@@ -599,7 +598,7 @@ int gcc_modet::gcc_hybrid_binary()
     if(cmdline.isset('o'))
       output_files.push_back(cmdline.get_value('o'));
     else
-      output_files.push_back("a.out");      
+      output_files.push_back("a.out");
   }
 
   if(output_files.empty() ||
@@ -611,7 +610,7 @@ int gcc_modet::gcc_hybrid_binary()
     debug() << "Running ld to generate hybrid binary" << eom;
   else
     debug() << "Running gcc to generate hybrid binary" << eom;
-  
+
   // save the goto-cc output files
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
@@ -623,9 +622,9 @@ int gcc_modet::gcc_hybrid_binary()
 
   // build new argv
   std::vector<std::string> new_argv;
-  
+
   new_argv.reserve(cmdline.parsed_argv.size());
-  
+
   bool skip_next=false;
 
   for(gcc_cmdlinet::parsed_argvt::const_iterator
@@ -649,21 +648,21 @@ int gcc_modet::gcc_hybrid_binary()
 
   // overwrite argv[0]
   assert(new_argv.size()>=1);
-  
+
   if(act_as_ld)
     new_argv[0]=linker_name();
   else
     new_argv[0]=compiler_name();
-  
+
   #if 0
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
   std::cout << std::endl;
   #endif
-  
+
   int result=run(new_argv[0], new_argv, "");
-  
+
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
   for(std::list<std::string>::const_iterator
@@ -679,17 +678,17 @@ int gcc_modet::gcc_hybrid_binary()
     {
       // remove any existing goto-cc section
       std::vector<std::string> objcopy_argv;
-    
+
       objcopy_argv.push_back("objcopy");
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
-      
+
       result=run(objcopy_argv[0], objcopy_argv, "");
     }
 
     if(result==0)
     {
-      // now add goto-binary as goto-cc section  
+      // now add goto-binary as goto-cc section
       std::vector<std::string> objcopy_argv;
 
       objcopy_argv.push_back("objcopy");
@@ -707,7 +706,7 @@ int gcc_modet::gcc_hybrid_binary()
     {
       std::vector<std::string> lipo_argv;
 
-      // now add goto-binary as hppa7100LC section  
+      // now add goto-binary as hppa7100LC section
       lipo_argv.push_back("lipo");
       lipo_argv.push_back(*it);
       lipo_argv.push_back("-create");
@@ -727,7 +726,7 @@ int gcc_modet::gcc_hybrid_binary()
     return 1;
     #endif
   }
-  
+
   return result;
 }
 
@@ -750,4 +749,3 @@ void gcc_modet::help_mode()
   else
     std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
 }
-

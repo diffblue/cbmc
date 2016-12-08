@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Goto-Analyser Main Module 
+Module: Goto-Analyser Main Module
 
 Author: Daniel Kroening, kroening@kroening.com
 

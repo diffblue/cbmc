@@ -56,9 +56,9 @@ protected:
   virtual bool process_goto_program(
     const optionst &options,
     goto_modelt &goto_model);
-    
+
   void eval_verbosity();
-  
+
   void preprocessing();
 };
 

@@ -80,24 +80,24 @@ public:
     remove_returns_done(false)
   {
   }
-  
+
 protected:
   ui_message_handlert ui_message_handler;
   virtual void register_languages();
 
   void get_goto_program();
   void instrument_goto_program();
-    
+
   void eval_verbosity();
-  
+
   void do_function_pointer_removal();
   void do_partial_inlining();
   void do_remove_returns();
-  
+
   bool function_pointer_removal_done;
   bool partial_inlining_done;
   bool remove_returns_done;
-  
+
   goto_functionst goto_functions;
 };
 

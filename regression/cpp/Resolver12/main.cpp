@@ -5,4 +5,3 @@ int main()
 	A a;
 	a.x; // bad
 }
-

@@ -106,7 +106,7 @@ bool is_void_pointer(const typet &type)
   {
     if(type.subtype().id()==ID_empty)
       return true;
-  
+
     return is_void_pointer(type.subtype());
   }
   else
@@ -129,7 +129,7 @@ bool check_c_implicit_typecast(
   const typet &src_type,
   const typet &dest_type)
 {
-  // check qualifiers  
+  // check qualifiers
 
   if(src_type.id()==ID_pointer && dest_type.id()==ID_pointer &&
      src_type.subtype().get_bool(ID_C_constant) &&
@@ -137,7 +137,7 @@ bool check_c_implicit_typecast(
     return true;
 
   if(src_type==dest_type) return false;
-  
+
   const irep_idt &src_type_id=src_type.id();
 
   if(src_type_id==ID_c_bit_field)
@@ -251,7 +251,7 @@ bool check_c_implicit_typecast(
       // imaginary part of the complex value is discarded and the value of the
       // real part is converted according to the conversion rules for the
       // corresponding real type.
-      
+
       return check_c_implicit_typecast(src_type.subtype(), dest_type);
     }
   }
@@ -269,7 +269,7 @@ bool check_c_implicit_typecast(
               is_void_pointer(dest_type))  // to void from anything
         return false;
     }
-    
+
     if(dest_type.id()==ID_array &&
        src_type.subtype()==dest_type.subtype()) return false;
 
@@ -312,12 +312,12 @@ Function: c_typecastt::follow_with_qualifiers
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
   if(src_type.id()!=ID_symbol) return src_type;
-  
+
   typet result_type=src_type;
-  
+
   // collect qualifiers
   c_qualifierst qualifiers(src_type);
-  
+
   while(result_type.id()==ID_symbol)
   {
     const symbolt &followed_type_symbol=
@@ -422,8 +422,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return COMPLEX;
   else if(type.id()==ID_c_bit_field)
     return get_c_type(to_c_bit_field_type(type).subtype());
-    
-  return OTHER;  
+
+  return OTHER;
 }
 
 /*******************************************************************\
@@ -443,9 +443,9 @@ void c_typecastt::implicit_typecast_arithmetic(
   c_typet c_type)
 {
   typet new_type;
-  
+
   const typet &expr_type=ns.follow(expr.type());
-  
+
   switch(c_type)
   {
   case PTR:
@@ -561,10 +561,10 @@ Function: c_typecastt::implicit_typecast
 void c_typecastt::implicit_typecast(
   exprt &expr,
   const typet &type)
-{    
+{
   typet src_type=follow_with_qualifiers(expr.type()),
         dest_type=follow_with_qualifiers(type);
-  
+
   typet type_qual=type;
   c_qualifierst qualifiers(dest_type);
   qualifiers.write(type_qual);
@@ -607,7 +607,7 @@ void c_typecastt::implicit_typecast_followed(
     if(src_type.id()==ID_pointer &&
        src_type.subtype().get_bool(ID_C_constant))
       src_type_no_const.subtype().remove(ID_C_constant);
-    
+
     // Check union members.
     const union_typet &dest_union_type=to_union_type(dest_type);
 
@@ -644,12 +644,12 @@ void c_typecastt::implicit_typecast_followed(
       expr.set(ID_value, ID_NULL);
       return; // ok
     }
-  
+
     if(src_type.id()==ID_pointer ||
        src_type.id()==ID_array)
     {
       // we are quite generous about pointers
-      
+
       const typet &src_sub=ns.follow(src_type.subtype());
       const typet &dest_sub=ns.follow(dest_type.subtype());
 
@@ -699,7 +699,7 @@ void c_typecastt::implicit_typecast_followed(
       return; // ok
     }
   }
-  
+
   if(check_c_implicit_typecast(src_type, dest_type))
     errors.push_back("implicit conversion not permitted");
   else if(src_type!=dest_type)
@@ -735,7 +735,7 @@ void c_typecastt::implicit_typecast_arithmetic(
     // get the biggest width of both
     unsigned width1=type1.get_int(ID_width);
     unsigned width2=type2.get_int(ID_width);
-    
+
     // produce type
     typet result_type;
 
@@ -753,7 +753,7 @@ void c_typecastt::implicit_typecast_arithmetic(
 
     do_typecast(expr1, result_type);
     do_typecast(expr2, result_type);
-    
+
     return;
   }
   else if(max_type==COMPLEX)
@@ -801,7 +801,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   {
     if(c_type1==VOIDPTR)
       do_typecast(expr1, expr2.type());
-    
+
     if(c_type2==VOIDPTR)
       do_typecast(expr2, expr1.type());
   }
@@ -824,7 +824,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 {
   // special case: array -> pointer is actually
   // something like address_of
-  
+
   const typet &src_type=ns.follow(expr.type());
 
   if(src_type.id()==ID_array)
@@ -845,7 +845,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     // explicit comparision with zero.
     // Note that this requires ieee_float_notequal
     // in case of floating-point numbers.
-    
+
     if(dest_type.get(ID_C_c_type)==ID_bool)
     {
       expr=is_not_zero(expr, ns);
@@ -856,7 +856,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
       expr=is_not_zero(expr, ns);
     }
     else
-    {    
+    {
       expr.make_typecast(dest_type);
     }
   }

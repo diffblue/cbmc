@@ -32,7 +32,7 @@ class path_acceleratort {
   path_acceleratort(const path_acceleratort &that) :
     path(that.path),
     changed_vars(that.changed_vars),
-    dirty_vars(that.dirty_vars) 
+    dirty_vars(that.dirty_vars)
   {
     pure_accelerator.copy_from(that.pure_accelerator);
     overflow_path.copy_from(that.overflow_path);

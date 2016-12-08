@@ -961,4 +961,3 @@ void reaching_definitions_analysist::initialize(
 
   concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions);
 }
-

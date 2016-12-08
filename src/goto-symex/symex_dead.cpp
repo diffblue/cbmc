@@ -36,13 +36,13 @@ void goto_symext::symex_dead(statet &state)
 
   if(code.operands().size()!=1)
     throw "dead expects one operand";
-  
+
   if(code.op0().id()!=ID_symbol)
     throw "dead expects symbol as first operand";
 
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
-  
+
   ssa_exprt ssa(to_symbol_expr(code.op0()));
   state.rename(ssa, ns, goto_symex_statet::L1);
 
@@ -51,9 +51,9 @@ void goto_symext::symex_dead(statet &state)
   {
     exprt failed=
       get_failed_symbol(to_symbol_expr(code.op0()), ns);
-    
+
     exprt rhs;
-    
+
     if(failed.is_not_nil())
     {
       address_of_exprt address_of_expr;
@@ -63,7 +63,7 @@ void goto_symext::symex_dead(statet &state)
     }
     else
       rhs=exprt(ID_invalid);
-    
+
     state.rename(rhs, ns, goto_symex_statet::L1);
     state.value_set.assign(ssa, rhs, ns, true, false);
   }

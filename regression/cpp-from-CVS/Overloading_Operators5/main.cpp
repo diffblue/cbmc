@@ -8,7 +8,7 @@ struct X
 
   int i;
   int j;
-  
+
   X &operator= (const struct X &r);
 };
 
@@ -23,9 +23,9 @@ void doit()
   X a, b;
 
   g=1;
-  
+
   a=b;
-  
+
   assert(g==2);
 }
 

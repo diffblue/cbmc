@@ -35,37 +35,37 @@ public:
   static object_numberingt object_numbering;
 
   typedef irep_idt idt;
-  
+
   class objectt
   {
   public:
     objectt():offset_is_set(false)
     {
     }
-  
+
     explicit objectt(const mp_integer &_offset):
       offset(_offset),
       offset_is_set(true)
     {
     }
-  
+
     mp_integer offset;
     bool offset_is_set;
     bool offset_is_zero() const
     { return offset_is_set && offset.is_zero(); }
   };
-  
+
   class object_map_dt:public std::map<unsigned, objectt>
   {
   public:
     object_map_dt() {}
     const static object_map_dt blank;
   };
-  
+
   exprt to_expr(object_map_dt::const_iterator it) const;
-  
+
   typedef reference_counting<object_map_dt> object_mapt;
-  
+
   void set(object_mapt &dest, object_map_dt::const_iterator it) const
   {
     dest.write()[it->first]=it->second;
@@ -80,39 +80,39 @@ public:
   {
     return insert(dest, object_numbering.number(src), objectt());
   }
-  
+
   bool insert(object_mapt &dest, const exprt &src, const mp_integer &offset) const
   {
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
-  
+
   bool insert(object_mapt &dest, unsigned n, const objectt &object) const;
-  
+
   bool insert(object_mapt &dest, const exprt &expr, const objectt &object) const
   {
     return insert(dest, object_numbering.number(expr), object);
   }
-  
+
   struct entryt
   {
     object_mapt object_map;
     idt identifier;
     std::string suffix;
-    
+
     entryt()
     {
     }
-    
+
     entryt(const idt &_identifier, const std::string &_suffix):
       identifier(_identifier),
       suffix(_suffix)
     {
     }
   };
-  
+
   typedef std::set<exprt> expr_sett;
 
-  #ifdef USE_DSTRING   
+  #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
   #else
   typedef hash_map_cont<idt, entryt, string_hash> valuest;
@@ -131,22 +131,22 @@ public:
   {
     values.clear();
   }
-  
+
   void clear()
   {
     values.clear();
   }
-  
+
   entryt &get_entry(
     const entryt &e, const typet &type,
     const namespacet &);
-  
+
   void output(
     const namespacet &ns,
     std::ostream &out) const;
-    
+
   valuest values;
-  
+
   // true = added s.th. new
   bool make_union(object_mapt &dest, const object_mapt &src) const;
 
@@ -158,11 +158,11 @@ public:
   {
     return make_union(new_values.values);
   }
-  
+
   void guard(
     const exprt &expr,
     const namespacet &ns);
-  
+
   void apply_code(
     const codet &code,
     const namespacet &ns);
@@ -234,9 +234,9 @@ protected:
   void do_free(
     const exprt &op,
     const namespacet &ns);
-    
+
   exprt make_member(
-    const exprt &src, 
+    const exprt &src,
     const irep_idt &component_name,
     const namespacet &ns);
 };

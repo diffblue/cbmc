@@ -24,7 +24,7 @@ void close_fitness_tester_library(fitness_lib_handlet &handle)
 
 namespace
 {
-void write_file(const char * const path, const std::string &content)
+void write_file(const std::string &path, const std::string &content)
 {
   std::ofstream ofs(path);
   ofs << content;
@@ -51,7 +51,7 @@ void *prepare_fitness_tester_library(fitness_lib_handlet &handle,
 {
   const temporary_filet source_file(SOURCE_FILE_PREFIX, SOURCE_FILE_SUFFIX);
   const std::string source_file_name(source_file());
-  write_file(source_file_name.c_str(), source_code_provider());
+  write_file(source_file_name, source_code_provider());
   std::string compile_command;
   if (configt::ansi_ct::preprocessort::CLANG == config.ansi_c.preprocessor)
     compile_command+=CLANG_COMPILE_COMMAND;

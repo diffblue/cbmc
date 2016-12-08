@@ -3,7 +3,7 @@ int glob;
 int main()
 {
   int loc=0;
-  
+
   while(glob!=1000)
   {
     if(glob<10) glob++;

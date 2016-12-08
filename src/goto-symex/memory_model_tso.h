@@ -20,7 +20,7 @@ public:
   }
 
   virtual void operator()(symex_target_equationt &equation);
-  
+
 protected:
   virtual exprt before(event_it e1, event_it e2);
   virtual bool program_order_is_relaxed(
@@ -30,4 +30,3 @@ protected:
 };
 
 #endif
-

@@ -21,6 +21,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_size.h"
 
+member_offset_iterator::member_offset_iterator(const struct_typet& _type,
+                                               const namespacet& _ns) :
+  current({0,0}),
+  type(_type),
+  ns(_ns),
+  bit_field_bits(0)
+{
+}
+
+member_offset_iterator& member_offset_iterator::operator++()
+{
+  if(current.second!=-1) // Already failed?
+  {
+    const auto& comp=type.components()[current.first];
+    if(comp.type().id()==ID_c_bit_field)
+    {
+      // take the extra bytes needed
+      std::size_t w=to_c_bit_field_type(comp.type()).get_width();
+      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8);
+      bit_field_bits-=w;
+    }
+    else
+    {
+      const typet &subtype=comp.type();
+      mp_integer sub_size=pointer_offset_size(subtype, ns);
+      if(sub_size==-1) current.second=-1; // give up
+      else current.second+=sub_size;
+    }
+  }
+  ++current.first;
+  return *this;
+}
+
 /*******************************************************************\
 
 Function: member_offset
@@ -39,35 +72,18 @@ mp_integer member_offset(
   const namespacet &ns)
 {
   const struct_typet::componentst &components=type.components();
-  
-  mp_integer result=0;
-  std::size_t bit_field_bits=0;
-  
+  member_offset_iterator offsets(type,ns);
+
   for(struct_typet::componentst::const_iterator
       it=components.begin();
-      it!=components.end();
-      it++)
+      it!=components.end() && offsets->second!=-1;
+      ++it, ++offsets)
   {
     if(it->get_name()==member)
       break;
-
-    if(it->type().id()==ID_c_bit_field)
-    {
-      // take the extra bytes needed
-      std::size_t w=to_c_bit_field_type(it->type()).get_width();
-      for(; w>bit_field_bits; ++result, bit_field_bits+=8);
-      bit_field_bits-=w;
-    }
-    else
-    {
-      const typet &subtype=it->type();
-      mp_integer sub_size=pointer_offset_size(subtype, ns);
-      if(sub_size==-1) return -1; // give up
-      result+=sub_size;
-    }
   }
 
-  return result;
+  return offsets->second;
 }
 
 /*******************************************************************\
@@ -110,31 +126,31 @@ mp_integer pointer_offset_bits(
   if(type.id()==ID_array)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
-  
+
     // get size
     const exprt &size=to_array_type(type).size();
 
     // constant?
     mp_integer i;
-    
+
     if(to_integer(size, i))
       return -1; // we cannot distinguish the elements
-    
+
     return sub*i;
   }
   else if(type.id()==ID_vector)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
-  
+
     // get size
     const exprt &size=to_vector_type(type).size();
 
     // constant?
     mp_integer i;
-    
+
     if(to_integer(size, i))
       return -1; // we cannot distinguish the elements
-    
+
     return sub*i;
   }
   else if(type.id()==ID_complex)
@@ -147,9 +163,9 @@ mp_integer pointer_offset_bits(
     const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=
       struct_type.components();
-      
+
     mp_integer result=0;
-    
+
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -168,11 +184,11 @@ mp_integer pointer_offset_bits(
     const union_typet &union_type=to_union_type(type);
     const union_typet::componentst &components=
       union_type.components();
-      
+
     mp_integer result=0;
 
     // compute max
-    
+
     for(union_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -182,7 +198,7 @@ mp_integer pointer_offset_bits(
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
       if(sub_size>result) result=sub_size;
     }
-    
+
     return result;
   }
   else if(type.id()==ID_signedbv ||
@@ -275,10 +291,10 @@ exprt member_offset_expr(
   const namespacet &ns)
 {
   const struct_typet::componentst &components=type.components();
-  
+
   exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
   std::size_t bit_field_bits=0;
-  
+
   for(struct_typet::componentst::const_iterator
       it=components.begin();
       it!=components.end();
@@ -304,7 +320,7 @@ exprt member_offset_expr(
   }
 
   simplify(result, ns);
-  
+
   return result;
 }
 
@@ -328,15 +344,15 @@ exprt size_of_expr(
   {
     exprt sub=size_of_expr(type.subtype(), ns);
     if(sub.is_nil()) return nil_exprt();
-  
+
     // get size
     exprt size=to_array_type(type).size();
-    
+
     if(size.is_nil()) return nil_exprt();
-    
+
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
-    
+
     exprt result=mult_exprt(size, sub);
 
     simplify(result, ns);
@@ -347,15 +363,15 @@ exprt size_of_expr(
   {
     exprt sub=size_of_expr(type.subtype(), ns);
     if(sub.is_nil()) return nil_exprt();
-  
+
     // get size
     exprt size=to_vector_type(type).size();
-    
+
     if(size.is_nil()) return nil_exprt();
-    
+
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
-    
+
     exprt result=mult_exprt(size, sub);
     simplify(result, ns);
 
@@ -365,9 +381,9 @@ exprt size_of_expr(
   {
     exprt sub=size_of_expr(type.subtype(), ns);
     if(sub.is_nil()) return nil_exprt();
-  
+
     const exprt size=from_integer(2, sub.type());
-    
+
     exprt result=mult_exprt(size, sub);
     simplify(result, ns);
 
@@ -378,10 +394,10 @@ exprt size_of_expr(
     const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=
       struct_type.components();
-      
+
     exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
     std::size_t bit_field_bits=0;
-    
+
     for(struct_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -406,7 +422,7 @@ exprt size_of_expr(
     }
 
     simplify(result, ns);
-    
+
     return result;
   }
   else if(type.id()==ID_union)
@@ -414,11 +430,11 @@ exprt size_of_expr(
     const union_typet &union_type=to_union_type(type);
     const union_typet::componentst &components=
       union_type.components();
-      
+
     mp_integer result=0;
 
     // compute max
-    
+
     for(union_typet::componentst::const_iterator
         it=components.begin();
         it!=components.end();
@@ -438,7 +454,7 @@ exprt size_of_expr(
 
       if(sub_size>result) result=sub_size;
     }
-    
+
     return from_integer(result, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_signedbv ||
@@ -519,12 +535,12 @@ mp_integer compute_pointer_offset(
   else if(expr.id()==ID_index)
   {
     assert(expr.operands().size()==2);
-    
+
     const typet &array_type=ns.follow(expr.op0().type());
     assert(array_type.id()==ID_array);
 
     mp_integer o=compute_pointer_offset(expr.op0(), ns);
-    
+
     if(o!=-1)
     {
       mp_integer sub_size=
@@ -535,24 +551,24 @@ mp_integer compute_pointer_offset(
       if(sub_size!=0 && !to_integer(expr.op1(), i))
         return o+i*sub_size;
     }
-      
+
     // don't know
   }
   else if(expr.id()==ID_member)
   {
     assert(expr.operands().size()==1);
     const typet &type=ns.follow(expr.op0().type());
-    
+
     assert(type.id()==ID_struct ||
            type.id()==ID_union);
 
     mp_integer o=compute_pointer_offset(expr.op0(), ns);
 
     if(o!=-1)
-    {    
+    {
       if(type.id()==ID_union)
         return o;
-    
+
       return o+member_offset(
         to_struct_type(type), expr.get(ID_component_name), ns);
     }
@@ -615,4 +631,68 @@ exprt build_sizeof_expr(
     result.make_typecast(expr.type());
 
   return result;
+}
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  mp_integer offset,
+  const typet& target_type_raw,
+  const namespacet& ns)
+{
+  const typet& source_type=ns.follow(result.type());
+  const typet& target_type=ns.follow(target_type_raw);
+
+  if(offset==0 && source_type==target_type)
+    return true;
+
+  if(source_type.id()==ID_struct)
+  {
+    const auto& st=to_struct_type(source_type);
+    const struct_typet::componentst &components=st.components();
+    member_offset_iterator offsets(st,ns);
+    while(offsets->first<components.size() && offsets->second!=-1 && offsets->second<=offset)
+    {
+      auto nextit=offsets;
+      ++nextit;
+      if((offsets->first+1)==components.size() || offset<nextit->second)
+      {
+	// This field might be, or might contain, the answer.
+	result=member_exprt(result,
+			    components[offsets->first].get_name(),
+			    components[offsets->first].type());
+	return get_subexpression_at_offset(result, offset - offsets->second, target_type, ns);
+      }
+      ++offsets;
+    }
+    return false;
+  }
+  else if(source_type.id()==ID_array)
+  {
+    // A cell of the array might be, or contain, the subexpression we're looking for.
+    const auto& at=to_array_type(source_type);
+    mp_integer elem_size=pointer_offset_size(at.subtype(),ns);
+    if(elem_size==-1)
+      return false;
+    mp_integer cellidx=offset / elem_size;
+    if(cellidx < 0 || !cellidx.is_long())
+      return false;
+    offset=offset % elem_size;
+    result=index_exprt(result,from_integer(cellidx,unsignedbv_typet(64)));
+    return get_subexpression_at_offset(result,offset,target_type,ns);
+  }
+  else
+    return false;
+
+}
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  const exprt& offset,
+  const typet& target_type,
+  const namespacet& ns)
+{
+  mp_integer offset_const;
+  if(to_integer(offset,offset_const))
+    return false;
+  return get_subexpression_at_offset(result,offset_const,target_type,ns);
 }

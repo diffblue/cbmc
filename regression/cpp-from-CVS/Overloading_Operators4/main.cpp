@@ -6,7 +6,7 @@ struct X
 
   int i;
   int j;
-  
+
   bool operator == (const struct X &o)
   {
     return i==o.i &&

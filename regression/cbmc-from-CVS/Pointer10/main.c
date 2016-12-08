@@ -14,11 +14,11 @@ main()
 
   p=&(s.array[4]);
   *p=5;
-  
+
   assert(s.array[4]==5);
-  
+
   p=&s.z;
   *p=6;
-  
+
   assert(s.z==6);
 }

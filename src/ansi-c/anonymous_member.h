@@ -18,4 +18,3 @@ bool has_component_rec(
   const typet &struct_union_type,
   const irep_idt &component_name,
   const namespacet &ns);
-

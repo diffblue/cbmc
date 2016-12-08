@@ -10,4 +10,3 @@ class B: public A
 	void set(int i){this->i = i;}
 	int get() const {return i;}
 };
-

@@ -12,6 +12,7 @@
 
 #include <util/message.h>
 
+#include <cegis/refactor/options/refactor_program.h>
 #include <cegis/refactor/value/refactor_counterexample.h>
 #include <cegis/refactor/value/refactor_solution.h>
 
@@ -22,6 +23,8 @@
  */
 class refactor_symex_verifyt
 {
+  const refactor_programt &original_program;
+  refactor_programt current_program;
 public:
   typedef refactor_counterexamplet counterexamplet;
   typedef refactor_counterexamplest counterexamplest;
@@ -31,8 +34,10 @@ public:
    * @brief
    *
    * @details
+   *
+   * @param prog
    */
-  explicit refactor_symex_verifyt();
+  explicit refactor_symex_verifyt(const refactor_programt &prog);
 
   /**
    * @brief

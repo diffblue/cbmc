@@ -59,10 +59,10 @@ public:
     {
     case GENERIC:
       break;
-    
+
     case BOOLECTOR:
       break;
-      
+
     case CVC3:
       break;
 
@@ -74,10 +74,10 @@ public:
 
     case OPENSMT:
       break;
-      
+
     case YICES:
       break;
-    
+
     case Z3:
       use_array_of_bool=true;
       emit_set_logic=false;
@@ -115,18 +115,18 @@ protected:
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
-  
+
   bvt assumptions;
   boolbv_widtht boolbv_width;
-  
+
   void write_header();
   void write_footer(std::ostream &);
 
-  // tweaks for arrays  
+  // tweaks for arrays
   bool use_array_theory(const exprt &);
   void flatten_array(const exprt &);
   void unflatten_array(const exprt &);
-  
+
   // specific expressions go here
   void convert_byte_update(const byte_update_exprt &expr);
   void convert_byte_extract(const byte_extract_exprt &expr);
@@ -152,12 +152,12 @@ protected:
   void convert_overflow(const exprt &expr);
   void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
-  
+
   std::string convert_identifier(const irep_idt &identifier);
-  
+
   // introduces a let-expression for operands
   exprt convert_operands(const exprt &);
-  
+
   // auxiliary methods
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
@@ -175,7 +175,7 @@ protected:
 
   public:
     let_visitort(const seen_expressionst &map):let_map(map) { }
-    
+
     void operator()(exprt &expr)
     {
       seen_expressionst::const_iterator it = let_map.find(expr);
@@ -188,7 +188,7 @@ protected:
       }
     }
   };
-  
+
   exprt letify(exprt &expr);
   exprt letify_rec(
     exprt &expr,
@@ -205,26 +205,26 @@ protected:
     exprt &expr,
     const seen_expressionst &map);
 
-  // Parsing solver responses  
+  // Parsing solver responses
   constant_exprt parse_literal(const irept &, const typet &type);
   exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);
-  
+
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
-  
+
   class smt2_symbolt:public exprt
   {
   public:
     smt2_symbolt(const irep_idt &_identifier, const typet &_type):
       exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
-      
+
     inline const irep_idt &get_identifier() const
     {
       return get(ID_identifier);
@@ -236,7 +236,7 @@ protected:
     assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);
   }
-  
+
   // flattens any non-bitvector type into a bitvector,
   // e.g., booleans, vectors, structs, arrays but also
   // floats when using the FPA theory.
@@ -244,7 +244,7 @@ protected:
   typedef enum { BEGIN, END } wheret;
   void flatten2bv(const exprt &);
   void unflatten(wheret, const typet &, unsigned nesting=0);
-  
+
   // pointers
   pointer_logict pointer_logic;
   void convert_address_of_rec(
@@ -257,14 +257,14 @@ protected:
   {
     typet type;
     exprt value;
-    
+
     identifiert()
     {
       type.make_nil();
       value.make_nil();
     }
   };
-  
+
   typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
@@ -274,7 +274,7 @@ protected:
   // use_datatype is set
   typedef std::map<typet, std::string> datatype_mapt;
   datatype_mapt datatype_map;
-  
+
   // for replacing various defined expressions:
   //
   // ID_array_of

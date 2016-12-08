@@ -79,8 +79,8 @@ bool symex_dereference_statet::has_failed_symbol(
       ns.lookup(to_symbol_expr(expr).get_identifier());
 
     const irep_idt &failed_symbol=
-      ptr_symbol.type.get("#failed_symbol");    
-      
+      ptr_symbol.type.get("#failed_symbol");
+
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
     {
@@ -94,7 +94,7 @@ bool symex_dereference_statet::has_failed_symbol(
       return true;
     }
   }
-  
+
   return false;
 }
 
@@ -115,17 +115,17 @@ void symex_dereference_statet::get_value_set(
   value_setst::valuest &value_set)
 {
   state.value_set.get_value_set(expr, value_set, goto_symex.ns);
-  
+
   #if 0
   std::cout << "**************************\n";
   state.value_set.output(goto_symex.ns, std::cout);
   std::cout << "**************************\n";
   #endif
-  
+
   #if 0
   std::cout << "E: " << from_expr(goto_symex.ns, "", expr) << std::endl;
   #endif
-  
+
   #if 0
   std::cout << "**************************\n";
   for(value_setst::valuest::const_iterator it=value_set.begin();
@@ -135,4 +135,3 @@ void symex_dereference_statet::get_value_set(
   std::cout << "**************************\n";
   #endif
 }
-

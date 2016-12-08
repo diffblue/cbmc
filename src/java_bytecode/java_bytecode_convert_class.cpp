@@ -35,7 +35,7 @@ public:
   void operator()(const java_bytecode_parse_treet &parse_tree)
   {
     add_array_types();
-  
+
     if(parse_tree.loading_successful)
       convert(parse_tree.parsed_class);
     else
@@ -51,7 +51,7 @@ protected:
   // conversion
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const fieldt &f);
-  
+
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
 };
@@ -106,9 +106,9 @@ void java_bytecode_convert_classt::convert(const classt &c)
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
-  
+
   symbolt *class_symbol;
-  
+
   // add before we do members
   if(symbol_table.move(new_symbol, class_symbol))
   {
@@ -160,9 +160,9 @@ void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_nam
   new_symbol.type=class_type;
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
-  
+
   symbolt *class_symbol;
-  
+
   if(symbol_table.move(new_symbol, class_symbol))
   {
     warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
@@ -206,7 +206,7 @@ void java_bytecode_convert_classt::convert(
     new_symbol.type=field_type;
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
     new_symbol.mode=ID_java;
-    new_symbol.is_type=false;  
+    new_symbol.is_type=false;
     new_symbol.value=gen_zero(field_type);
 
     if(symbol_table.add(new_symbol))
@@ -226,7 +226,7 @@ void java_bytecode_convert_classt::convert(
     component.set_base_name(f.name);
     component.set_pretty_name(f.name);
     component.type()=field_type;
-    
+
     if(f.is_private)
       component.set_access(ID_private);
     else if(f.is_protected)
@@ -256,7 +256,7 @@ void java_bytecode_convert_classt::add_array_types()
   {
     symbol_typet symbol_type=
       to_symbol_type(java_array_type(letters[i]).subtype());
-    
+
     struct_typet struct_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type

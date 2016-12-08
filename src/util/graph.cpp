@@ -7,4 +7,3 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "graph.h"
-

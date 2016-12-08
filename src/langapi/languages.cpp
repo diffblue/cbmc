@@ -41,4 +41,3 @@ languagest::~languagest()
 {
   delete language;
 }
-

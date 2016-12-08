@@ -155,4 +155,3 @@ bool skip_loops(
 
   return false;
 }
-

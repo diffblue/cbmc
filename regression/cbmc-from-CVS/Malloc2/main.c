@@ -26,10 +26,10 @@ int main(void)
 
   if (!pp)
     return -10;
-    
+
   pp2=&(pp->irqc);
-  
+
   //*(&(pp->irqc))=0;
-  
+
   return 0;
 }

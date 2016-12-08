@@ -21,6 +21,20 @@ class constant_exprt;
 
 // these return -1 on failure
 
+class member_offset_iterator {
+  typedef std::pair<size_t,mp_integer> refst;
+  refst current;
+  const struct_typet &type;
+  const namespacet &ns;
+  size_t bit_field_bits;
+ public:
+  member_offset_iterator(const struct_typet& _type,
+                         const namespacet& _ns);
+  member_offset_iterator& operator++();
+  const refst& operator*() const { return current; }
+  const refst* operator->() const { return &current; }
+};
+
 mp_integer member_offset(
   const struct_typet &type,
   const irep_idt &member,
@@ -56,5 +70,17 @@ exprt size_of_expr(
 exprt build_sizeof_expr(
   const constant_exprt &expr,
   const namespacet &ns);
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  mp_integer offset,
+  const typet& target_type,
+  const namespacet& ns);
+
+bool get_subexpression_at_offset(
+  exprt& result,
+  const exprt& offset,
+  const typet& target_type,
+  const namespacet& ns);
 
 #endif

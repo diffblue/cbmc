@@ -29,4 +29,3 @@ int yyjsilerror(const std::string &error)
   jsil_parser.parse_error(error, yyjsiltext);
   return 0;
 }
-

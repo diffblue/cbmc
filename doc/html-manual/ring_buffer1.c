@@ -15,14 +15,14 @@ unsigned int ring_buffer[SIZE];
 int main()
 {
   unsigned index=0;
-  
+
   while(1)
   {
     unsigned output;
     output=ring_buffer[index];
     printf("%u\n", output);
     assert(output<=MAX);
-    
+
     ring_buffer[index]=sample();
 
     index=(index+1)%SIZE;

@@ -4,7 +4,7 @@
  *
  * Permission is granted to use, distribute and modify this code provided that:
  *   · this copyright notice appears,
- *   · 
+ *   ·
  * The author welcomes any suggestions on the code or reportings of actual
  * use of the code. Please send your comments to holzherr@infobrain.com.
  *
@@ -14,10 +14,10 @@
  * you, its user, assume the entire risk as to its quality and accuracy.
  *
  * Created:                        November 19th, 2002
- * Last modified:        November 27th, 2002 
+ * Last modified:        November 27th, 2002
                                                 (changed namespace from std to codeproject;
                                                 uses template member functions for MSCVER>=1300)
-                                                                
+
  */
 
 #ifndef SORTED_VECTOR_
@@ -66,12 +66,12 @@ public:
 
 #if (_MSC_VER >= 1300)
         template<class It>
-        sorted_vector(It first, It beyond, 
+        sorted_vector(It first, It beyond,
                                         const Pr& pred = Pr(),const A& al = A())
                 :key_compare_(pred),vec_(first,beyond,al)
         {stable_sort();}
 #else
-    sorted_vector(const_iterator first, const_iterator beyond, 
+    sorted_vector(const_iterator first, const_iterator beyond,
                                         const Pr& pred = Pr(),const A& al = A())
         :key_compare_(pred),vec_(first,beyond,al)
         {stable_sort();}
@@ -85,18 +85,18 @@ public:
                                      return *this;}
     Myt_& operator=(const Cont& x){vec_.operator=(x);
                                     sort();return *this;}
-                
+
         void                                reserve(size_type n)        {vec_.reserve(n);}
         iterator                        begin()                                        {return vec_.begin(); }
         const_iterator                begin() const                        {return vec_.begin(); }
     iterator                        end()                                        {return vec_.end();}
     const_iterator                end() const                                {return vec_.end();}
     reverse_iterator        rbegin()                                {return vec_.rbegin();}
-    const_reverse_iterator rbegin() const   
+    const_reverse_iterator rbegin() const
                                                                                                 {return vec_.rbegin();}
 
     reverse_iterator rend()                                                {return vec_.rend();}
-    const_reverse_iterator rend() const     
+    const_reverse_iterator rend() const
                                                                                                 {return vec_.rend();}
 
 
@@ -108,7 +108,7 @@ public:
     reference at(size_type p)                                        {return vec_.at(p);}
         const_reference operator[](size_type p) const
                                                                                                 {return vec_.operator[](p);}
-                
+
         reference operator[](size_type p)                        {return vec_.operator[](p);}
     reference front()                                                        {return vec_.front();}
         const_reference front() const                                {return vec_.front();}
@@ -116,7 +116,7 @@ public:
     const_reference back() const                                {return vec_.back();}
     void pop_back()                                                                {vec_.pop_back();}
 
-    void assign(const_iterator first, const_iterator beyond)                                        
+    void assign(const_iterator first, const_iterator beyond)
                                                                                                 {vec_.assign(first,beyond);}
         void assign(size_type n, const K& x = K())
                                                                                                 {vec_.assign(n,x);}
@@ -178,7 +178,7 @@ public:
     iterator erase(iterator p)          {return vec_.erase(p);}
         iterator erase(iterator first, iterator beyond)
                                         {return vec_.erase(first,beyond);}
-    size_type erase(const K& key)     
+    size_type erase(const K& key)
         {
             Pairii_ begEnd= equal_range(key);
             size_type n= std::distance(begEnd.first,begEnd.second);
@@ -186,8 +186,8 @@ public:
             return n;
         }
     void clear()                        {return vec_.clear();}
-                
-    bool Eq_(const Myt_& x) const      
+
+    bool Eq_(const Myt_& x) const
                 {return (size() == x.size()
                 && std::equal(begin(), end(), x.begin())); }
         bool Lt_(const Myt_& x) const
@@ -195,7 +195,7 @@ public:
                                                                                 x.begin(), x.end()));}
         void swap(Myt_& x)
         {vec_.swap(x.vec_);std::swap(key_compare_,x.key_compare_);}
-        
+
         friend void swap(Myt_& x, Myt_& Y_)
                 {x.swap(Y_); }
 
@@ -228,18 +228,18 @@ public:
 /*functions for use with direct std::vector-access*/
     Cont& get_container()
         {return vec_;}
-    void sort()//restore sorted order after low level access 
+    void sort()//restore sorted order after low level access
         {   std::sort(vec_.begin(),vec_.end(),key_compare_);
             if( bNoDuplicates ){
                 vec_.erase(Unique_(),vec_.end());
             }
         }
-    void stable_sort()//restore sorted order after low level access 
+    void stable_sort()//restore sorted order after low level access
         {   std::stable_sort(vec_.begin(),vec_.end(),key_compare_);
             if( bNoDuplicates ){
                 erase(Unique_(),end());
             }
-        }   
+        }
 
 protected:
   iterator Unique_()

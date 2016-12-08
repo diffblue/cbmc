@@ -149,7 +149,7 @@ bool polynomial_acceleratort::accelerate(patht &loop,
   exprt guard_last;
 
   bool path_is_monotone;
-  
+
   try {
     path_is_monotone = utils.do_assumptions(polynomials, loop, guard);
   } catch (std::string s) {
@@ -584,7 +584,7 @@ bool polynomial_acceleratort::check_inductive(
   substitutiont substitution;
 
   stash_polynomials(program, polynomials, substitution, body);
- 
+
   for (std::map<exprt, polynomialt>::iterator it = polynomials.begin();
        it != polynomials.end();
        ++it) {

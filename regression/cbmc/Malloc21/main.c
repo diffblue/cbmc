@@ -21,14 +21,12 @@ int main(void)
     if (!(v1 <= 0)) {
         len = __VERIFIER_nondet_int();
 	__CPROVER_assume(len > 0);
-	data = malloc(len * sizeof(int));	
+	data = malloc(len * sizeof(int));
     }
 
     data[0] = 0;
-    int tmp = data[0]; 
+    int tmp = data[0];
     assert(tmp == 0);
 
     return 0;
 }
-
-

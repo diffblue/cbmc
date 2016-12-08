@@ -18,13 +18,13 @@ int main () {
   char b[MAX];
   a[0] = 2;
   b[0] = 2;
-  
+
   for (int i = 1; i < MAX; i++) {
     a[i] = nondet_char();
     b[i] = nondet_char();
   }
 
   cmp_str(a, b, MAX);
-  
+
   return 0;
 }

@@ -23,7 +23,7 @@ int main()
   __CPROVER_assert(p1==2, "p[1] matches");
   __CPROVER_assert(p2==3, "p[2] matches");
   __CPROVER_assert(p3==4, "p[3] matches");
-  
+
   unsigned short *q=(unsigned short *)array;
   unsigned short q0=q[0];
   __CPROVER_assert(q0==0x0102, "p[0,1] matches");

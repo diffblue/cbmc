@@ -22,7 +22,7 @@ namespace SOME
   extern "C" void somef(char)
   {
   }
-  
+
   extern "C++" void somef(int)
   {
   }

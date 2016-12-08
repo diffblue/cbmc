@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -55,7 +55,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   end--;
 
   assert(end->is_end_function());
-  
+
   source_locationt source_location=end->source_location;
   irep_idt function=end->function;
 
@@ -63,13 +63,13 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   exprt mutex_locked_string=
     string_constantt("mutex-locked");
-  
+
   binary_exprt get_may("get_may");
-  
+
   // NULL is any
   get_may.op0()=constant_exprt(ID_NULL, pointer_typet(empty_typet()));
   get_may.op1()=address_of_exprt(mutex_locked_string);
-  
+
   end->make_assertion(not_exprt(get_may));
 
   end->source_location=source_location;
@@ -93,7 +93,7 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
 {
   // we'll look for START THREAD
   std::set<irep_idt> thread_fkts;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(has_start_thread(f_it->second.body))
@@ -146,18 +146,18 @@ void mutex_init_instrumentation(
     {
       const code_assignt &code_assign=
        to_code_assign(it->code);
-       
+
       if(code_assign.lhs().type()==lock_type)
       {
         goto_programt::targett t=goto_program.insert_after(it);
 
         code_function_callt call;
-        
+
         call.function()=f_it->second.symbol_expr();
         call.arguments().resize(2);
         call.arguments()[0]=address_of_exprt(code_assign.lhs());
         call.arguments()[1]=address_of_exprt(string_constantt("mutex-init"));
-        
+
         t->make_function_call(call);
         t->source_location=it->source_location;
       }
@@ -182,7 +182,7 @@ void mutex_init_instrumentation(
   goto_functionst &goto_functions)
 {
   // get pthread_mutex_lock
-  
+
   symbol_tablet::symbolst::const_iterator f_it=
     symbol_table.symbols.find("pthread_mutex_lock");
 
@@ -193,9 +193,9 @@ void mutex_init_instrumentation(
   code_typet code_type=to_code_type(to_code_type(f_it->second.type));
   if(code_type.parameters().size()!=1)
     return;
-  
+
   typet lock_type=code_type.parameters()[0].type();
-  
+
   if(lock_type.id()!=ID_pointer)
     return;
 

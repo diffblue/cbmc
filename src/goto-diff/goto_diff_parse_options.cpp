@@ -419,7 +419,7 @@ int goto_diff_parse_optionst::get_goto_program(
   }
   else
   {
-    // This is a a workaround to make parse() think that there is only 
+    // This is a a workaround to make parse() think that there is only
     // one source file.
     std::string arg2("");
     if(cmdline.args.size()==2)

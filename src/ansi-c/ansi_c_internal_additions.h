@@ -14,4 +14,3 @@ void ansi_c_architecture_strings(std::string &code);
 extern const char gcc_builtin_headers_generic[];
 extern const char gcc_builtin_headers_ia32[];
 extern const char arm_builtin_headers[];
-

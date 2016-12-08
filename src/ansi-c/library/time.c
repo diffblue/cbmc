@@ -169,4 +169,3 @@ char *ctime(const time_t *clock)
   return ctime_result;
   #endif
 }
-

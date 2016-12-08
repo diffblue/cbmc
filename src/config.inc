@@ -2,12 +2,11 @@
 BUILD_ENV = AUTO
 
 # Variables you may want to override
-CXXFLAGS = -Wall -O0 -g -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
 #CXXFLAGS = -std=c++11
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
-#LIB_GLPK = -lglpk 
+#LIB_GLPK = -lglpk
 
 # SAT-solvers we have
 #PRECOSAT = ../../precosat-576-7e5e66f-120112
@@ -24,4 +23,4 @@ LIBZIPINC = ../../libzip/lib
 
 # Signing identity for MacOS Gatekeeper
 
-OSX_IDENTITY="3rd Party Mac Developer Application: Daniel Kroening"
+OSX_IDENTITY="Developer ID Application: Daniel Kroening"

@@ -81,4 +81,3 @@ bool syntactic_difft::operator()()
            modified_functions.empty() &&
            deleted_functions.empty());
 }
-

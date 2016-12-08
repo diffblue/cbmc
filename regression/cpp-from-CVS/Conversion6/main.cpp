@@ -20,6 +20,6 @@ int main()
 	assert((* ((A*)&b)).i == 1); // This works fine.
 
 	int  bi = func( * ((A*)&b)); // Satabs Ok.
-	                             // cbmc error	
+	                             // cbmc error
 	assert(bi == 1);
 }

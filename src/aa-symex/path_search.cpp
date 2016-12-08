@@ -49,14 +49,14 @@ path_searcht::resultt path_searcht::operator()(
 
   locst locs(ns);
   var_mapt var_map(ns);
-  
+
   locs.build(goto_functions);
 
-  // this is the container for the history-forest  
+  // this is the container for the history-forest
   path_symex_historyt history;
-  
+
   queue.push_back(initial_state(var_map, locs, history));
-  
+
   // set up the statistics
   number_of_paths=0;
   number_of_instructions=0;
@@ -68,9 +68,9 @@ path_searcht::resultt path_searcht::operator()(
 
   // stop the time
   start_time=current_time();
-  
+
   initialize_property_map(goto_functions);
-  
+
   while(!queue.empty())
   {
     // Pick a state from the queue,
@@ -106,7 +106,7 @@ path_searcht::resultt path_searcht::operator()(
       while(state->is_lazy() && state->is_executable());
       assert(queue.size() == queue_size);
     }
-    
+
     // TODO: check lazy states before fast forwarding, or perhaps it
     // is better to even check before inserting into queue
     if(drop_state(*state))
@@ -115,13 +115,13 @@ path_searcht::resultt path_searcht::operator()(
       queue.erase(state);
       continue;
     }
-    
+
     if(!state->is_executable())
     {
       queue.erase(state);
       continue;
     }
-    
+
     // count only executable instructions
     number_of_instructions++;
 
@@ -140,7 +140,7 @@ path_searcht::resultt path_searcht::operator()(
       else
       {
         check_assertion(*state, ns);
-        
+
         // all assertions failed?
         if(number_of_failed_properties==property_map.size())
           break;
@@ -241,7 +241,7 @@ Function: path_searcht::try_await()
   Inputs:
 
  Outputs: returns true if and only if at least one child process
-          has terminated 
+          has terminated
 
  Purpose: POSIX-compliant nonblocking wait on child processes,
           child's status is preserved for await() function
@@ -287,7 +287,7 @@ void path_searcht::report_statistics()
            << number_of_VCCs_after_simplification
            << " remaining after simplification"
            << messaget::eom;
-  
+
   time_periodt total_time=current_time()-start_time;
   status() << "Runtime: " << total_time << "s total, "
            << sat_time << "s SAT" << messaget::eom;
@@ -329,20 +329,20 @@ void path_searcht::do_show_vcc(
 {
   // keep statistics
   number_of_VCCs++;
-  
+
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
-    
+
   mstreamt &out=result();
 
   if(instruction.location.is_not_nil())
     out << instruction.location << "\n";
-  
+
   if(instruction.location.get_comment()!="")
     out << instruction.location.get_comment() << "\n";
-    
+
   unsigned count=1;
-  
+
   std::vector<path_symex_step_reft> steps;
   state.history.build_history(steps);
 
@@ -350,7 +350,7 @@ void path_searcht::do_show_vcc(
       s_it=steps.begin();
       s_it!=steps.end();
       s_it++)
-  {      
+  {
     if((*s_it)->guard.is_not_nil())
     {
       std::string string_value=from_expr(ns, "", (*s_it)->guard);
@@ -368,7 +368,7 @@ void path_searcht::do_show_vcc(
   }
 
   out << "|--------------------------" << "\n";
-  
+
   exprt assertion=state.read(instruction.guard);
 
   out << "{" << 1 << "} "
@@ -376,7 +376,7 @@ void path_searcht::do_show_vcc(
 
   if(!assertion.is_true())
     number_of_VCCs_after_simplification++;
-  
+
   out << eom;
 }
 
@@ -396,10 +396,10 @@ bool path_searcht::drop_state(const statet &state) const
 {
   // depth
   if(depth_limit!=-1 && state.get_depth()>depth_limit) return true;
-  
+
   // context bound
   if(context_bound!=-1 && state.get_no_thread_interleavings()) return true;
-  
+
   // unwinding limit -- loops
   if(unwind_limit!=-1 && state.get_instruction()->is_backwards_goto())
   {
@@ -410,7 +410,7 @@ bool path_searcht::drop_state(const statet &state) const
       if(it->second>unwind_limit)
         return true;
   }
-  
+
   // unwinding limit -- recursion
   if(unwind_limit!=-1 && state.get_instruction()->is_function_call())
   {
@@ -421,7 +421,7 @@ bool path_searcht::drop_state(const statet &state) const
       if(it->second>unwind_limit)
         return true;
   }
-  
+
   return false;
 }
 
@@ -443,13 +443,13 @@ void path_searcht::check_assertion(
 {
   // keep statistics
   number_of_VCCs++;
-  
+
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
   irep_idt property_name=instruction.location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
-  
+
   if(property_entry.status==FAIL)
     return; // already failed
   else if(property_entry.status==NOT_REACHED)
@@ -463,7 +463,7 @@ void path_searcht::check_assertion(
 
   // keep statistics
   number_of_VCCs_after_simplification++;
-  
+
   status() << "Checking property " << property_name << eom;
 
   // take the time
@@ -471,7 +471,7 @@ void path_searcht::check_assertion(
 
   satcheckt satcheck;
   bv_pointerst bv_pointers(ns, satcheck);
-  
+
   satcheck.set_message_handler(get_message_handler());
   bv_pointers.set_message_handler(get_message_handler());
 
@@ -481,7 +481,7 @@ void path_searcht::check_assertion(
     property_entry.status=FAIL;
     number_of_failed_properties++;
   }
-  
+
   sat_time+=current_time()-sat_start_time;
 }
 
@@ -507,7 +507,7 @@ void path_searcht::initialize_property_map(
     if(!it->second.is_inlined())
     {
       const goto_programt &goto_program=it->second.body;
-    
+
       for(goto_programt::instructionst::const_iterator
           it=goto_program.instructions.begin();
           it!=goto_program.instructions.end();
@@ -515,14 +515,14 @@ void path_searcht::initialize_property_map(
       {
         if(!it->is_assert())
           continue;
-      
+
         const locationt &location=it->location;
-      
+
         irep_idt property_name=location.get_property_id();
-        
+
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
         property_entry.description=location.get_comment();
       }
-    }    
+    }
 }

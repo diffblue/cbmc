@@ -35,7 +35,7 @@ void drm_vm_open_locked(struct drm_device *dev)
  }
 }
 
-int main(void) 
+int main(void)
 {
  struct drm_device dev;
  drm_vm_open_locked(&dev);

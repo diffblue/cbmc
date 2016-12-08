@@ -23,7 +23,7 @@ public:
   {
   public:
     typet type;
-  
+
     class element_value_pairt
     {
     public:
@@ -31,13 +31,13 @@ public:
       exprt value;
       void output(std::ostream &) const;
     };
-    
+
     typedef std::vector<element_value_pairt> element_value_pairst;
     element_value_pairst element_value_pairs;
-    
+
     void output(std::ostream &) const;
   };
-  
+
   typedef std::vector<annotationt> annotationst;
 
   class instructiont
@@ -49,7 +49,7 @@ public:
     typedef std::vector<exprt> argst;
     argst args;
   };
-  
+
   class membert
   {
   public:
@@ -59,14 +59,14 @@ public:
     annotationst annotations;
 
     virtual void output(std::ostream &out) const = 0;
-    
+
     inline membert():
       is_public(false), is_protected(false), is_private(false),
       is_static(false), is_final(false)
     {
     }
   };
-  
+
   class methodt:public membert
   {
   public:
@@ -75,20 +75,20 @@ public:
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
-    
+
     instructiont &add_instruction()
     {
       instructions.push_back(instructiont());
       return instructions.back();
     }
-    
+
     class exceptiont
     {
     };
-    
+
     typedef std::vector<exceptiont> exception_tablet;
     exception_tablet exception_table;
-    
+
     class local_variablet
     {
     public:
@@ -135,18 +135,18 @@ public:
     stack_map_tablet stack_map_table;
 
     virtual void output(std::ostream &out) const;
-    
+
     inline methodt():is_native(false), is_abstract(false), is_synchronized(false)
     {
     }
   };
-  
+
   class fieldt:public membert
   {
   public:
     virtual void output(std::ostream &out) const;
   };
-  
+
   class classt
   {
   public:
@@ -154,13 +154,13 @@ public:
     bool is_abstract;
     typedef std::list<irep_idt> implementst;
     implementst implements;
-    
+
     typedef std::list<fieldt> fieldst;
     typedef std::list<methodt> methodst;
     fieldst fields;
     methodst methods;
     annotationst annotations;
-    
+
     inline fieldt &add_field()
     {
       fields.push_back(fieldt());
@@ -174,12 +174,12 @@ public:
     }
 
     void output(std::ostream &out) const;
-    
+
     void swap(classt &other);
   };
-  
+
   classt parsed_class;
-  
+
   void swap(java_bytecode_parse_treet &other)
   {
     other.parsed_class.swap(parsed_class);
@@ -191,9 +191,9 @@ public:
 
   typedef std::set<irep_idt> class_refst;
   class_refst class_refs;
-  
+
   bool loading_successful;
-  
+
   inline java_bytecode_parse_treet():loading_successful(false)
   {
   }

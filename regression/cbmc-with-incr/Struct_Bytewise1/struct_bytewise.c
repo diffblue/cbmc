@@ -3,7 +3,7 @@
 
 #if !defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
 
-#if defined(__avr32__) || defined(__hppa__)    || defined(__mk68k__) || \
+#if defined(__avr32__) || defined(__hppa__)    || defined(__m68k__) || \
     defined(__mips__)  || defined(__powerpc__) || defined(__s390__) || \
     defined(__s390x__) || defined(__sparc__)
 
@@ -30,7 +30,7 @@ void CopyBuffer(unsigned char *src) {
     arrayTmp[i] = src[i];
   }
 }
- 
+
 int main()
 {
   logAppl.a=1;
@@ -60,4 +60,3 @@ int main()
   assert(arrayTmp[7]==1);
   #endif
 }
- 

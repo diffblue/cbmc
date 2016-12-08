@@ -86,10 +86,10 @@ std::string expr2javat::convert_code_function_call(
     dest+=lhs_str;
     dest+='=';
   }
-  
+
   const code_typet &code_type=
     to_code_type(src.function().type());
-  
+
   bool has_this=code_type.has_this() &&
                 !src.arguments().empty();
 
@@ -110,7 +110,7 @@ std::string expr2javat::convert_code_function_call(
   dest+='(';
 
   const exprt::operandst &arguments=src.arguments();
-  
+
   bool first=true;
 
   forall_expr(it, arguments)
@@ -296,10 +296,10 @@ std::string expr2javat::convert_rec(
 {
   c_qualifierst new_qualifiers(qualifiers);
   new_qualifiers.read(src);
-  
+
   const std::string d=
     declarator==""?declarator:(" "+declarator);
-    
+
   const std::string q=
     new_qualifiers.as_string();
 
@@ -328,7 +328,7 @@ std::string expr2javat::convert_rec(
     // Java doesn't really have syntax for function types,
     // so we make one up, loosley inspired by the syntax
     // of lamda expressions.
-  
+
     std::string dest="";
 
     dest+='(';
@@ -344,7 +344,7 @@ std::string expr2javat::convert_rec(
 
       dest+=convert(it->type());
     }
-    
+
     if(code_type.has_ellipsis())
     {
       if(!parameters.empty()) dest+=", ";
@@ -352,7 +352,7 @@ std::string expr2javat::convert_rec(
     }
 
     dest+=')';
-    
+
     const typet &return_type=code_type.return_type();
     dest+=" -> "+convert(return_type);
 
@@ -402,7 +402,7 @@ std::string expr2javat::convert_java_instanceof(
     unsigned precedence;
     return convert_norep(src, precedence);
   }
-  
+
   return convert(src.op0())+" instanceof "+convert(src.op1().type());
 }
 

@@ -17,7 +17,7 @@ class invariant_set_domaint:public ai_domain_baset
 public:
   invariant_sett invariant_set;
 
-  // overloading  
+  // overloading
 
   inline bool merge(
     const invariant_set_domaint &other,
@@ -34,7 +34,7 @@ public:
   {
     invariant_set.output("", out);
   }
-    
+
   virtual void initialize(
     const namespacet &ns,
     locationt l)

@@ -1514,4 +1514,3 @@ void dump_cpp(
   dump_ct goto2cpp(src, use_system_headers, ns, new_cpp_language);
   out << goto2cpp;
 }
-

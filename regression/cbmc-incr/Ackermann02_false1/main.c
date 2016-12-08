@@ -1,10 +1,10 @@
 /*
  * Implementation the Ackermann function.
  * http://en.wikipedia.org/wiki/Ackermann_function
- * 
+ *
  * Author: Matthias Heizmann
  * Date: 2013-07-13
- * 
+ *
  */
 
 extern int __VERIFIER_nondet_int(void);
@@ -27,7 +27,7 @@ int main() {
     if (m < 2 || result >= 4) {
         return 0;
     } else {
-        ERROR: 
+        ERROR:
         goto ERROR;
     }
 }

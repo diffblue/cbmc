@@ -29,7 +29,7 @@ public:
 
   typedef static_analysist<value_set_domaint> baset;
 
-  // overloading  
+  // overloading
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
@@ -47,7 +47,7 @@ public:
     const goto_programt &goto_program,
     const irep_idt &identifier,
     xmlt &dest) const;
-    
+
 public:
   // interface value_sets
   virtual void get_values(
@@ -56,7 +56,7 @@ public:
     value_setst::valuest &dest)
   {
     (*this)[l].value_set.get_value_set(expr, dest, ns);
-  }  
+  }
 };
 
 #endif

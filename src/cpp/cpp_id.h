@@ -59,9 +59,9 @@ public:
   {
     return id_class==TYPEDEF;
   }
-  
+
   irep_idt identifier, base_name;
-  
+
   // if it is a member or method, what class is it in?
   irep_idt class_identifier;
   exprt this_expr;
@@ -69,7 +69,7 @@ public:
   // scope data
   std::string prefix, suffix;
   unsigned compound_counter;
-  
+
   inline cpp_idt &get_parent() const
   {
     assert(parent!=NULL);

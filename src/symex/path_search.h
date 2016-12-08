@@ -33,7 +33,7 @@ public:
 
   virtual resultt operator()(
     const goto_functionst &goto_functions);
-    
+
   void set_depth_limit(unsigned limit)
   {
     depth_limit_set=true;
@@ -60,7 +60,7 @@ public:
 
   bool show_vcc;
   bool eager_infeasibility;
-  
+
   // statistics
   unsigned number_of_dropped_states;
   unsigned number_of_paths;
@@ -82,16 +82,16 @@ public:
     irep_idt description;
     goto_tracet error_trace;
     source_locationt source_location;
-    
+
     inline bool is_success() const { return status==SUCCESS; }
     inline bool is_failure() const { return status==FAILURE; }
     inline bool is_not_reached() const { return status==NOT_REACHED; }
   };
-  
+
   inline void set_dfs() { search_heuristic=search_heuristict::DFS; }
   inline void set_bfs() { search_heuristic=search_heuristict::BFS; }
   inline void set_locs() { search_heuristic=search_heuristict::LOCS; }
-  
+
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;
 
@@ -102,7 +102,7 @@ protected:
   // The states most recently executed are at the head.
   typedef std::list<statet> queuet;
   queuet queue;
-  
+
   // search heuristic
   void pick_state();
 
@@ -113,17 +113,17 @@ protected:
   };
 
   expanding_vector<loc_datat> loc_data;
-  
+
   bool execute(queuet::iterator state);
-  
+
   void check_assertion(statet &state);
   bool is_feasible(statet &state);
   void do_show_vcc(statet &state);
-  
+
   bool drop_state(const statet &state) const;
-  
+
   void report_statistics();
-  
+
   void initialize_property_map(
     const goto_functionst &goto_functions);
 

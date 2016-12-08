@@ -7,7 +7,7 @@ void f(unsigned int counter) {
 int main() {
   unsigned int x;
   __CPROVER_assume(x<=10);
-  
+
   f(x);
 
 }

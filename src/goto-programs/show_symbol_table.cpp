@@ -48,21 +48,21 @@ void show_symbol_table_plain(
   std::ostream &out)
 {
   out << '\n' << "Symbols:" << '\n' << '\n';
-    
+
   // we want to sort alphabetically
   std::set<std::string> symbols;
 
   forall_symbols(it, goto_model.symbol_table.symbols)
     symbols.insert(id2string(it->first));
-  
+
   const namespacet ns(goto_model.symbol_table);
 
   for(const std::string &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
-    
+
     languaget *ptr;
-    
+
     if(symbol.mode=="")
       ptr=get_default_language();
     else
@@ -73,13 +73,13 @@ void show_symbol_table_plain(
 
     std::unique_ptr<languaget> p(ptr);
     std::string type_str, value_str;
-    
+
     if(symbol.type.is_not_nil())
       p->from_type(symbol.type, type_str, ns);
-    
+
     if(symbol.value.is_not_nil())
       p->from_expr(symbol.value, value_str, ns);
-    
+
     out << "Symbol......: " << symbol.name << '\n' << std::flush;
     out << "Pretty name.: " << symbol.pretty_name << '\n';
     out << "Module......: " << symbol.module << '\n';
@@ -108,7 +108,7 @@ void show_symbol_table_plain(
 
     out << '\n';
     out << "Location....: " << symbol.location << '\n';
-    
+
     out << '\n' << std::flush;
   }
 }
@@ -143,4 +143,3 @@ void show_symbol_table(
     break;
   }
 }
-

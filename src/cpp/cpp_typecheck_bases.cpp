@@ -29,7 +29,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
   irep_idt default_class_access=
     type.get_bool(ID_C_class)?ID_private:ID_public;
-    
+
   irept::subt &bases_irep=type.add(ID_bases).get_sub();
 
   Forall_irep(base_it, bases_irep)
@@ -49,7 +49,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       error() << "expected type as struct/class base" << eom;
       throw 0;
     }
-    
+
     // elaborate any class template instances given as bases
     elaborate_class_template(base_symbol_expr.type());
 
@@ -202,7 +202,7 @@ void cpp_typecheckt::add_base_components(
 
     // copy the component
     dest_c.push_back(*it);
-    
+
     // now twiddle the copy
     struct_typet::componentt &component=dest_c.back();
     component.set(ID_from_base, true);
@@ -230,10 +230,8 @@ void cpp_typecheckt::add_base_components(
     }
     else
       assert(false);
-      
+
     // put into scope
-    
+
   }
 }
-
-

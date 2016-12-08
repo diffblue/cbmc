@@ -44,7 +44,7 @@ int main(void)
   assert(castWithRounding(FE_DOWNWARD,x) == low);
   assert(castWithRounding(FE_DOWNWARD,-x) == -high);
   #endif
-  
+
   assert(castWithRounding(FE_TOWARDZERO,x) == low);
   assert(castWithRounding(FE_TOWARDZERO,-x) == -low);
   #endif

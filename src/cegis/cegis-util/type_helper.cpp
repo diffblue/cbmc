@@ -7,8 +7,6 @@
 
 #include <cegis/cegis-util/type_helper.h>
 
-#define TAG_PREFIX "tag-"
-
 const typet &replace_struct_by_symbol_type(const symbol_tablet &st,
     const typet &type)
 {

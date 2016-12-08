@@ -33,17 +33,17 @@ void value_set_domaint::transform(
     // ignore for now
     break;
 
-  case END_FUNCTION:    
+  case END_FUNCTION:
     value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
     break;
-  
+
   case RETURN:
   case OTHER:
   case ASSIGN:
   case DECL:
     value_set.apply_code(from_l->code, ns);
     break;
-    
+
   case ASSUME:
     value_set.guard(from_l->guard, ns);
     break;
@@ -56,7 +56,7 @@ void value_set_domaint::transform(
       value_set.do_function_call(to_l->function, code.arguments(), ns);
     }
     break;
-  
+
   default:;
     // do nothing
   }

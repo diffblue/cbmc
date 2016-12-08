@@ -35,7 +35,7 @@ public:
 
   typedef std::map<irep_idt, symbol_exprt> locals_mapt;
   locals_mapt locals_map;
-  
+
 protected:
   void build(const goto_functiont &goto_function);
 };

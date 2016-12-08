@@ -16,6 +16,6 @@ int main()
   r0=test_bit_parity(699050);
   assert(r0==0);
 
-  r1=test_bit_parity(699050+1);  
+  r1=test_bit_parity(699050+1);
   assert(r1==1);
 }

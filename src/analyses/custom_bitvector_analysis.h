@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /*******************************************************************\
 
    Class: custom_bitvector_domaint
-   
+
  Purpose:
 
 \*******************************************************************/
@@ -65,9 +65,9 @@ public:
     locationt to);
 
   typedef unsigned long long bit_vectort;
-  
+
   typedef std::map<irep_idt, bit_vectort> bitst;
-  
+
   struct vectorst
   {
     bit_vectort may_bits, must_bits;
@@ -75,7 +75,7 @@ public:
     {
     }
   };
-  
+
   static vectorst merge(const vectorst &a, const vectorst &b)
   {
     vectorst result;
@@ -83,16 +83,16 @@ public:
     result.must_bits=a.must_bits&b.must_bits;
     return result;
   }
-  
+
   bitst may_bits, must_bits;
-  
+
   void assign_lhs(const exprt &, const vectorst &);
   void assign_lhs(const irep_idt &, const vectorst &);
   vectorst get_rhs(const exprt &) const;
   vectorst get_rhs(const irep_idt &) const;
 
   bool is_bottom;
-  
+
   custom_bitvector_domaint():is_bottom(true)
   {
   }
@@ -102,7 +102,7 @@ public:
     const exprt &src,
     custom_bitvector_analysist &) const;
 
-protected:  
+protected:
   typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
@@ -112,24 +112,24 @@ protected:
   {
     dest|=(1ll<<bit_nr);
   }
-  
+
   static inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
   {
     dest|=(1ll<<bit_nr);
     dest^=(1ll<<bit_nr);
-  }  
-  
+  }
+
   static inline bool get_bit(const bit_vectort src, unsigned bit_nr)
   {
     return (src&(1ll<<bit_nr))!=0;
   }
-  
-  void erase_blank_vectors(bitst &);  
-  
+
+  void erase_blank_vectors(bitst &);
+
   static irep_idt object2id(const exprt &);
 };
 
-class custom_bitvector_analysist:public ait<custom_bitvector_domaint> 
+class custom_bitvector_analysist:public ait<custom_bitvector_domaint>
 {
 public:
   void instrument(goto_functionst &);
@@ -144,7 +144,7 @@ public:
 
   typedef numbering<irep_idt> bitst;
   bitst bits;
-  
+
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)
   {
@@ -154,7 +154,7 @@ protected:
   friend class custom_bitvector_domaint;
 
   local_may_alias_factoryt local_may_alias_factory;
-  
+
   std::set<exprt> aliases(const exprt &, locationt loc);
 };
 

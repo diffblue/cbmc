@@ -116,7 +116,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
       if(resolved_expr.id()==ID_symbol)
       {
-        symbol.value=  
+        symbol.value=
           address_of_exprt(resolved_expr);
       }
       else if(resolved_expr.id()==ID_member)
@@ -129,7 +129,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       }
       else
         assert(false);
-      
+
       if(symbol.type != symbol.value.type())
       {
         error().source_location=symbol.location;
@@ -143,12 +143,12 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
 
     typecheck_expr(symbol.value);
-    
+
     if(symbol.value.id()==ID_initializer_list ||
        symbol.value.id()==ID_string_constant)
     {
       do_initializer(symbol.value, symbol.type, true);
-      
+
       if(symbol.type.find(ID_size).is_nil())
         symbol.type=symbol.value.type();
     }
@@ -281,7 +281,7 @@ void cpp_typecheckt::zero_initializer(
       irept name(ID_name);
       name.set(ID_identifier, comp.get(ID_base_name));
       name.set(ID_C_source_location, source_location);
-      
+
       cpp_namet cpp_name;
       cpp_name.move_to_sub(name);
 

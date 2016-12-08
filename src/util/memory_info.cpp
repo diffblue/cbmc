@@ -51,7 +51,7 @@ void memory_info(std::ostream &out)
   out << "  total allocated space: " << m.uordblks << "\n";
   out << "  total free space: " << m.fordblks << "\n";
   #endif
-  
+
   #ifdef _WIN32
   #if 0
   PROCESS_MEMORY_COUNTERS pmc;
@@ -62,7 +62,7 @@ void memory_info(std::ostream &out)
   }
   #endif
   #endif
-  
+
   #ifdef __APPLE__
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;

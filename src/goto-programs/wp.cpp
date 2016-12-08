@@ -23,7 +23,7 @@ Function: has_nondet
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -37,11 +37,11 @@ bool has_nondet(const exprt &dest)
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(dest);
     const irep_idt &statement=side_effect_expr.get_statement();
-    
+
     if(statement==ID_nondet)
       return true;
   }
-  
+
   return false;
 }
 
@@ -53,7 +53,7 @@ Function: approximate_nondet_rec
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -67,7 +67,7 @@ void approximate_nondet_rec(exprt &dest, unsigned &count)
     dest.id(ID_nondet_symbol);
     return;
   }
-  
+
   Forall_operands(it, dest)
     approximate_nondet_rec(*it, count);
 }
@@ -80,7 +80,7 @@ Function: approximate_nondet
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -114,7 +114,7 @@ aliasingt aliasing(
      e1.op0().id()==ID_address_of &&
      e1.op0().operands().size()==1)
     return aliasing(e1.op0().op0(), e2, ns);
-    
+
   if(e2.id()==ID_dereference &&
      e2.operands().size()==1 &&
      e2.op0().id()==ID_address_of &&
@@ -124,7 +124,7 @@ aliasingt aliasing(
   // fairly radical. Ignores struct prefixes and the like.
   if(!base_type_eq(e1.type(), e2.type(), ns))
     return A_MUSTNOT;
-    
+
   // syntactically the same?
   if(e1==e2)
     return A_MUST;
@@ -138,10 +138,10 @@ aliasingt aliasing(
     else
       return A_MUSTNOT;
   }
-    
+
   // an array or struct will never alias with a variable,
   // nor will a struct alias with an array
-  
+
   if(e1.id()==ID_index || e1.id()==ID_struct)
     if(e2.id()!=ID_dereference && e1.id()!=e2.id())
       return A_MUSTNOT;
@@ -153,7 +153,7 @@ aliasingt aliasing(
   // we give up, and say it may
   // (could do much more here)
 
-  return A_MAY;    
+  return A_MAY;
 }
 
 /*******************************************************************\
@@ -199,7 +199,7 @@ void substitute_rec(
         exprt dest_address=address_of_exprt(dest);
 
         equal_exprt alias_cond=equal_exprt(what_address, dest_address);
-        
+
         if_exprt if_expr;
 
         if_expr.cond()=alias_cond;
@@ -210,10 +210,10 @@ void substitute_rec(
         dest=if_expr;
         return;
       }
-    
+
     case A_MUSTNOT:
       // nothing to do
-      break;      
+      break;
     }
   }
 }
@@ -244,10 +244,10 @@ void rewrite_assignment(exprt &lhs, exprt &rhs)
     new_rhs.where().id(ID_member_name);
     new_rhs.where().set(ID_component_name, component_name);
     new_rhs.new_value()=rhs;
-    
+
     lhs=new_lhs;
     rhs=new_rhs;
-    
+
     rewrite_assignment(lhs, rhs); // rec. call
   }
   else if(lhs.id()==ID_index) // turn s[i]:=e into s:=(s with [i]=e)
@@ -260,10 +260,10 @@ void rewrite_assignment(exprt &lhs, exprt &rhs)
     new_rhs.old()=new_lhs;
     new_rhs.where()=index_expr.index();
     new_rhs.new_value()=rhs;
-    
+
     lhs=new_lhs;
     rhs=new_rhs;
-    
+
     rewrite_assignment(lhs, rhs); // rec. call
   }
 }
@@ -286,10 +286,10 @@ exprt wp_assign(
   const namespacet &ns)
 {
   exprt pre=post;
-  
+
   exprt lhs=code.lhs(),
         rhs=code.rhs();
-        
+
   // take care of non-determinism in the RHS
   approximate_nondet(rhs);
 
@@ -297,7 +297,7 @@ exprt wp_assign(
 
   // replace lhs by rhs in pre
   substitute_rec(pre, lhs, rhs, ns);
-  
+
   return pre;
 }
 
@@ -364,7 +364,7 @@ exprt wp(
   const namespacet &ns)
 {
   const irep_idt &statement=code.get_statement();
-  
+
   if(statement==ID_assign)
     return wp_assign(to_code_assign(code), post, ns);
   else if(statement==ID_assume)
@@ -374,7 +374,7 @@ exprt wp(
   else if(statement==ID_decl)
     return wp_decl(to_code_decl(code), post, ns);
   else if(statement==ID_assert)
-    return post;   
+    return post;
   else if(statement==ID_expression)
     return post;
   else if(statement==ID_printf)

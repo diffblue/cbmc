@@ -36,7 +36,7 @@ bvt boolbvt::convert_abs(const exprt &expr)
 
   if(operands.size()!=1)
     throw "abs takes one operand";
-    
+
   const exprt &op0=expr.op0();
 
   const bvt &op_bv=convert_bv(op0);
@@ -45,7 +45,7 @@ bvt boolbvt::convert_abs(const exprt &expr)
     return conversion_failed(expr);
 
   bvtypet bvtype=get_bvtype(expr.type());
-  
+
   if(bvtype==IS_FIXED ||
      bvtype==IS_SIGNED ||
      bvtype==IS_UNSIGNED)
@@ -58,6 +58,6 @@ bvt boolbvt::convert_abs(const exprt &expr)
     float_utils.spec=to_floatbv_type(expr.type());
     return float_utils.abs(op_bv);
   }
-  
+
   return conversion_failed(expr);
 }

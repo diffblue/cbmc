@@ -7,9 +7,9 @@ public:
   {
     g=1;
   }
-  
+
   int mA;
-  
+
   A();
 };
 
@@ -30,7 +30,7 @@ public:
     g=2;
     mB=3;
   }
-  
+
   int mB;
 };
 
@@ -38,11 +38,11 @@ int main()
 {
   B b;
   A *p;
-  
+
   p=&b;
-  
+
   p->f();
-  
+
   assert(g==2);
   assert(b.mB==3);
 }

@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: A special command line object for the gcc-like options
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #ifndef GOTO_CC_GCC_CMDLINE_H

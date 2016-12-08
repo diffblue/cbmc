@@ -22,7 +22,7 @@ struct __declspec(dllimport) some_struct_tag { int x; };
 
 //__delegate int GetDayOfWeek();
 
-// __event 
+// __event
 
 void f4()
 {
@@ -58,7 +58,7 @@ __int64 i64;
 
 __int8 i8;
 
-// __interface 
+// __interface
 
 void f9()
 {
@@ -83,7 +83,7 @@ void f9()
 
 // __property
 
-// __raise 
+// __raise
 
 // __sealed
 

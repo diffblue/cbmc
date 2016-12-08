@@ -7,6 +7,6 @@ void f()
   x=1;
   px++;
 
-  // now out of bounds  
+  // now out of bounds
   y=*px;
 }

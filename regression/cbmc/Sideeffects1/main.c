@@ -1,12 +1,12 @@
 int main(void)
 {
   int x, y;
-  
+
   x=100;
-  
+
   y=x/=2;
   assert(x==50);
-  
+
   y=x*=3;
   assert(x==150);
 

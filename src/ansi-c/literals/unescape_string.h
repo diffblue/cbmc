@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 std::string unescape_string(const std::string &);
 std::basic_string<unsigned int> unescape_wide_string(const std::string &);
 
-unsigned hex_to_unsigned(const char *, unsigned digits);
-unsigned octal_to_unsigned(const char *, unsigned digits);
+unsigned hex_to_unsigned(const char *, std::size_t digits);
+unsigned octal_to_unsigned(const char *, std::size_t digits);
 
 #endif

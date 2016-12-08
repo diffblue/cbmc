@@ -14,13 +14,13 @@ Author: Daniel Kroening, 2013
 #include "ld_cmdline.h"
 
 /*******************************************************************\
- 
+
 Function: ld_cmdlinet::parse
- 
+
   Inputs: argument count, argument strings
- 
+
  Outputs: none
- 
+
  Purpose: parses the commandline options into a cmdlinet
 
 \*******************************************************************/
@@ -250,15 +250,15 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
       // TODO
       continue;
     }
-  
+
     // file?
     if(argv_i=="-" || !has_prefix(argv_i, "-"))
     {
       add_infile_arg(argv_i);
       continue;
-    }    
-    
-    // add to new_argv    
+    }
+
+    // add to new_argv
     add_arg(argv_i);
 
     // also store in cmdlinet
@@ -276,7 +276,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
         set(os); // record as long
       }
     }
-    
+
     // arguments to options can be given as follows:
     // 1) concatenated for short options
     // 2) concatenated with '=' for long options
@@ -285,7 +285,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     for(const char **o=ld_options_with_argument; *o!=NULL && !found; o++)
     {
       std::string os(*o);
-    
+
       // separated?
       if(argv_i==os ||
          (os.size()>=3 && os[0]=='-' && os[1]=='-' && "-"+argv_i==os))
@@ -321,7 +321,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     }
 
     if(!found)
-    {    
+    {
       // unrecognized option
       std::cerr << "Warning: uninterpreted ld option '" << argv_i << "'" << std::endl;
     }

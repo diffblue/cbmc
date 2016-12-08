@@ -10,7 +10,7 @@ struct B
 	A* pa;
 	int (A::* pmethod)();
         B(A* pa, int (A::* pmethod)()):pa(pa),pmethod(pmethod){}
-	int eval(){return (pa->*pmethod)();}	
+	int eval(){return (pa->*pmethod)();}
 };
 
 int main()

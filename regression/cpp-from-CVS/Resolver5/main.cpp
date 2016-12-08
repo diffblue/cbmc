@@ -13,6 +13,6 @@ int main()
 	obj1.i = 200;
 
 	assert(func(obj1) == 200); // Argument-dependant name lookup
-	
+
 	return 0;
 }

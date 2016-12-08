@@ -26,7 +26,7 @@ Function: cpp_namet::get_base_name
 irep_idt cpp_namet::get_base_name() const
 {
   const subt &sub=get_sub();
-  
+
   // find last "::"
   unsigned base=0;
 
@@ -44,7 +44,7 @@ irep_idt cpp_namet::get_base_name() const
   else if(base+1<sub.size() && sub[base].id()==ID_operator)
     return "operator"+sub[base+1].id_string();
   else if(base+1<sub.size() && sub[base].id()=="~" && sub[base+1].id()==ID_name)
-    return "~"+sub[base+1].get_string(ID_identifier); 
+    return "~"+sub[base+1].get_string(ID_identifier);
 
   return irep_idt();
 }
@@ -119,6 +119,6 @@ std::string cpp_namet::to_string() const
     else
       str+=it->get_string(ID_identifier);
   }
-  
+
   return str;
 }

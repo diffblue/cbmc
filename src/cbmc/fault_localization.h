@@ -29,8 +29,8 @@ public:
     const optionst &_options)
     :
     bmc_all_propertiest(_goto_functions, _bmc.prop_conv, _bmc),
-    goto_functions(_goto_functions), 
-    bmc(_bmc), 
+    goto_functions(_goto_functions),
+    bmc(_bmc),
     options(_options)
   {
     set_message_handler(bmc.get_message_handler());
@@ -90,7 +90,7 @@ protected:
   virtual void report(const cover_goalst &cover_goals);
 
   //override bmc_all_propertiest
-  virtual void do_before_solving() 
+  virtual void do_before_solving()
   {
     freeze_guards();
   }

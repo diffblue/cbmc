@@ -63,7 +63,7 @@ int cw_modet::doit()
   ui_message_handler.set_verbosity(verbosity);
 
   debug() << "CodeWarrior mode" << eom;
-  
+
   // get configuration
   config.set(cmdline);
 
@@ -107,7 +107,7 @@ int cw_modet::doit()
     compiler.output_file_object="";
     compiler.output_file_executable="a.out";
   }
-    
+
   if(cmdline.isset("Wp,"))
   {
     const std::list<std::string> &values=
@@ -200,4 +200,3 @@ void cw_modet::help_mode()
 {
   std::cout << "goto-cw understands the options of gcc (mwcc mode) plus the following.\n\n";
 }
-

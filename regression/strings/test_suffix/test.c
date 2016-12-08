@@ -10,6 +10,6 @@ int main()
 
   assert(__CPROVER_string_issuffix(__CPROVER_string_literal("po"),s));
   assert(__CPROVER_string_issuffix(__CPROVER_string_literal("pp"),s));
-    
+
   return 0;
 }

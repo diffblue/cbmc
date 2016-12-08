@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: Convert goto programs to xml structures and back.
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #include <sstream>
@@ -16,16 +16,16 @@ Date: June 2006
 #include "xml_goto_program.h"
 
 /*******************************************************************\
- 
+
 Function: convert
- 
+
   Inputs: goto program, namespace and an xml structure to fill
- 
+
  Outputs: none
- 
+
  Purpose: constructs the xml structure according to the goto program
           and the namespace into the given xml object.
- 
+
 \*******************************************************************/
 
 void convert(const goto_programt &goto_program,
@@ -44,7 +44,7 @@ void convert(const goto_programt &goto_program,
 
     if (!ins_it->location.is_nil())
     {
-      convert(ins_it->location, ins.new_element("location"));      
+      convert(ins_it->location, ins.new_element("location"));
     }
 
     if(!ins_it->labels.empty())
@@ -149,7 +149,7 @@ void convert(const goto_programt &goto_program,
           convert(ins_it->code, c);
           break;
         }
-        
+
         case OTHER:
         {
           ins.name = "instruction";
@@ -157,15 +157,15 @@ void convert(const goto_programt &goto_program,
           convert(ins_it->code, c);
           break;
         }
-        
-        case ASSIGN: 
+
+        case ASSIGN:
         {
           ins.name = "assign";
           xmlt &c = ins.new_element("code");
           convert(ins_it->code, c);
           break;
         }
-        
+
         case FUNCTION_CALL:
         {
           ins.name = "functioncall";
@@ -195,7 +195,7 @@ void convert(const goto_programt &goto_program,
         ins.name = "unknown";
         break;
     }
-    
+
     if (ins_it->function!="")
     {
       xmlt &fnc = ins.new_element("function");
@@ -205,17 +205,17 @@ void convert(const goto_programt &goto_program,
 }
 
 /*******************************************************************\
- 
+
 Function: convert
- 
+
   Inputs: an xml structure, namespace, function symbol
           and a goto program to fill
- 
+
  Outputs: none
- 
+
  Purpose: constructs the goto program according to the xml structure
           and the namespace into the given goto program object.
- 
+
 \*******************************************************************/
 void convert( const xmlt& xml,
               goto_programt& goto_program)
@@ -399,16 +399,16 @@ void convert( const xmlt& xml,
 }
 
 /*******************************************************************\
- 
+
 Function: find_instruction
- 
+
   Inputs: a target label string, the instructions list and an xml program
- 
+
  Outputs: iterator to the found instruction or .end()
- 
- Purpose: finds the index of the instruction labelled with the given 
+
+ Purpose: finds the index of the instruction labelled with the given
           target label in the given xml-program
- 
+
 \*******************************************************************/
 
 goto_programt::targett
@@ -430,4 +430,3 @@ find_instruction(
 
   return instructions.end();
 }
-

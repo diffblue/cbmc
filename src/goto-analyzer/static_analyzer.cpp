@@ -29,7 +29,7 @@ public:
     options(_options)
   {
   }
-  
+
   bool operator()();
 
 protected:
@@ -41,9 +41,9 @@ protected:
   ait<interval_domaint> interval_analysis;
 
   void plain_text_report();
-  void json_report(const std::string &);  
-  void xml_report(const std::string &);  
-  
+  void json_report(const std::string &);
+  void xml_report(const std::string &);
+
   tvt eval(goto_programt::const_targett);
 };
 
@@ -55,7 +55,7 @@ Function: static_analyzert::operator()
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -73,7 +73,7 @@ bool static_analyzert::operator()()
 
   return false;
 }
-  
+
 /*******************************************************************\
 
 Function: static_analyzert::eval
@@ -82,7 +82,7 @@ Function: static_analyzert::eval
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -92,7 +92,7 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
   interval_domaint d=interval_analysis[t];
   d.assume(not_exprt(guard), ns);
   if(d.is_bottom()) return tvt(true);
-  return tvt::unknown();          
+  return tvt::unknown();
 }
 
 /*******************************************************************\
@@ -103,18 +103,18 @@ Function: static_analyzert::plain_text_report
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
 void static_analyzert::plain_text_report()
 {
   unsigned pass=0, fail=0, unknown=0;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
@@ -123,9 +123,9 @@ void static_analyzert::plain_text_report()
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
-      
+
       result() << '[' << i_it->source_location.get_property_id()
                << ']' << ' ';
 
@@ -151,7 +151,7 @@ void static_analyzert::plain_text_report()
 
     status() << '\n';
   }
-  
+
   status() << "SUMMARY: " << pass << " pass, " << fail << " fail, "
            << unknown << " unknown\n";
 }
@@ -164,25 +164,25 @@ Function: static_analyzert::json_report
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
 void static_analyzert::json_report(const std::string &file_name)
 {
   json_arrayt json_result;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
 
       json_objectt &j=json_result.push_back().make_object();
@@ -191,11 +191,11 @@ void static_analyzert::json_report(const std::string &file_name)
         j["status"]=json_stringt("SUCCESS");
       else if(r.is_false())
         j["status"]=json_stringt("FAILURE");
-      else 
+      else
         j["status"]=json_stringt("UNKNOWN");
 
       j["file"]=json_stringt(id2string(i_it->source_location.get_file()));
-      j["line"]=json_numbert(id2string(i_it->source_location.get_line()));      
+      j["line"]=json_numbert(id2string(i_it->source_location.get_line()));
       j["description"]=json_stringt(id2string(
         i_it->source_location.get_comment()));
     }
@@ -208,7 +208,7 @@ void static_analyzert::json_report(const std::string &file_name)
             << file_name << "'" << eom;
     return;
   }
-  
+
   status() << "Writing report to `" << file_name << "'" << eom;
   out << json_result;
 }
@@ -221,25 +221,25 @@ Function: static_analyzert::xml_report
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
 void static_analyzert::xml_report(const std::string &file_name)
 {
   xmlt xml_result;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     if(!f_it->second.body.has_assertion()) continue;
-    
+
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(!i_it->is_assert()) continue;
-      
+
       tvt r=eval(i_it);
 
       xmlt &x=xml_result.new_element("result");
@@ -248,11 +248,11 @@ void static_analyzert::xml_report(const std::string &file_name)
         x.set_attribute("status", "SUCCESS");
       else if(r.is_false())
         x.set_attribute("status", "FAILURE");
-      else 
+      else
         x.set_attribute("status", "UNKNOWN");
 
       x.set_attribute("file", id2string(i_it->source_location.get_file()));
-      x.set_attribute("line", id2string(i_it->source_location.get_line()));      
+      x.set_attribute("line", id2string(i_it->source_location.get_line()));
       x.set_attribute("description", id2string(i_it->source_location.get_comment()));
     }
   }
@@ -264,7 +264,7 @@ void static_analyzert::xml_report(const std::string &file_name)
             << file_name << "'" << eom;
     return;
   }
-  
+
   status() << "Writing report to `" << file_name << "'" << eom;
   out << xml_result;
 }
@@ -277,7 +277,7 @@ Function: static_analyzer
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 
@@ -298,7 +298,7 @@ Function: show_intervals
 
  Outputs:
 
- Purpose: 
+ Purpose:
 
 \*******************************************************************/
 

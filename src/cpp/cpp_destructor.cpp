@@ -57,7 +57,7 @@ codet cpp_typecheckt::cpp_destructor(
       new_code.make_nil();
       return new_code;
     }
-    
+
     exprt tmp_size=size_expr;
     make_constant_index(tmp_size);
 
@@ -160,4 +160,3 @@ codet cpp_typecheckt::cpp_destructor(
 
   return new_code;
 }
-

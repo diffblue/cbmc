@@ -12,4 +12,3 @@ void func2(TP tp)
 int main()
 {
 }
-

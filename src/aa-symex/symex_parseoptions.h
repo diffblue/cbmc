@@ -63,14 +63,14 @@ protected:
   bool process_goto_program(
     const optionst &options,
     goto_functionst &goto_functions);
-    
+
   bool set_properties(goto_functionst &goto_functions);
 
   void report_success();
   void report_failure();
   void report_properties(const path_searcht::property_mapt &);
   void show_counterexample(const class goto_tracet &);
-            
+
   void eval_verbosity();
 };
 

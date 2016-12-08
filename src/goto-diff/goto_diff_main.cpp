@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: GOTO-DIFF Main Module 
+Module: GOTO-DIFF Main Module
 
 Author: Peter Schrammel
 

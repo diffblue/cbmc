@@ -103,7 +103,7 @@ void print_struct_alignment_problems(
 
       if(2*integer2long(size)<=config.ansi_c.memory_operand_size)
       {
-        out << std::endl << "WARNING: " 
+        out << std::endl << "WARNING: "
             << "declaration of an array at "
             << it->second.location << std::endl
             << "might be concurrently accessed" << std::endl;

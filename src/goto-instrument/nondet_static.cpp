@@ -53,7 +53,7 @@ void nondet_static(
       // is it a __CPROVER_* variable?
       if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX))
         continue;
-        
+
       // static lifetime?
       if(!ns.lookup(sym.get_identifier()).is_static_lifetime)
         continue;
@@ -101,4 +101,3 @@ void nondet_static(
   // update counters etc.
   goto_functions.update();
 }
-

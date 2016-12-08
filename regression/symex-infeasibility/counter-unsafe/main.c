@@ -37,4 +37,3 @@ int main() {
   assert(0 <= y && y != n);
   return 0;
 }
-

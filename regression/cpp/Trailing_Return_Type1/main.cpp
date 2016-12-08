@@ -16,7 +16,7 @@ class some_class
     return x + 1;
   }
   #endif
-  
+
   // template function
   template<typename someT>
   static auto f003(int x) -> someT

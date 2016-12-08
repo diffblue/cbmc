@@ -100,7 +100,7 @@ propt::resultt qbf_qubet::prop_solve()
     return P_SATISFIABLE;
 
   {
-    messaget::status() << 
+    messaget::status() <<
       "QuBE: " <<
       no_variables() << " variables, " <<
       no_clauses() << " clauses" << eom;
@@ -175,4 +175,3 @@ propt::resultt qbf_qubet::prop_solve()
 
   return P_ERROR;
 }
-

@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: A special command line object for the ld-like options
- 
+
 Author: Daniel Kroening
- 
+
 Date: Feb 2013
- 
+
 \*******************************************************************/
 
 #ifndef GOTO_CC_LD_CMDLINE_H

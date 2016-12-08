@@ -110,7 +110,7 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
   }
 
   #ifdef DEBUG
-  std::cout << "EQUALITY " << l << "<=>" 
+  std::cout << "EQUALITY " << l << "<=>"
             << e1 << "=" << e2 << std::endl;
   #endif
 
@@ -172,7 +172,7 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
   }
 
   // generate equality constraints
-  
+
   bv_utilst bv_utils(prop);
 
   for(equalitiest::const_iterator
@@ -182,8 +182,7 @@ void equalityt::add_equality_constraints(const typestructt &typestruct)
   {
     const bvt &bv1=eq_bvs[it->first.first];
     const bvt &bv2=eq_bvs[it->first.second];
-    
+
     prop.set_equal(bv_utils.equal(bv1, bv2), it->second);
   }
 }
-

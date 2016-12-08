@@ -22,13 +22,13 @@ public:
     size_t index;
     size_t size;
     typet type, subtype;
-    
+
     entryt():index(0), size(0)
     {
     }
   };
 
-  bool empty() const { return index_list.empty(); }  
+  bool empty() const { return index_list.empty(); }
   size_t size() const { return index_list.size(); }
   const entryt &operator[](size_t i) const { return index_list[i]; }
   entryt &operator[](size_t i) { return index_list[i]; }
@@ -41,7 +41,7 @@ public:
   {
     index_list.push_back(entry);
   }
-  
+
   void pop_entry()
   {
     index_list.pop_back();

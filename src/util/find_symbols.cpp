@@ -87,7 +87,7 @@ bool has_symbol(
       if(has_symbol(*it, symbols, current, next))
         return true;
   }
-  
+
   return false;
 }
 
@@ -178,9 +178,9 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
 {
   forall_operands(it, src)
     find_symbols(kind, *it, dest);
-  
+
   find_symbols(kind, src.type(), dest);
-  
+
   if(kind==F_BOTH || kind==F_EXPR)
     if(src.id()==ID_symbol ||
        src.id()==ID_next_symbol)
@@ -220,7 +220,7 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     forall_subtypes(it, src)
       find_symbols(kind, *it, dest);
   }
-    
+
   if(src.id()==ID_struct ||
      src.id()==ID_union)
   {
@@ -232,7 +232,7 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
         it!=components.end();
         it++)
       find_symbols(kind, *it, dest);
-  } 
+  }
   else if(src.id()==ID_code)
   {
     const code_typet &code_type=to_code_type(src);
@@ -245,7 +245,7 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
         it++)
     {
       find_symbols(kind, *it, dest);
-      
+
       //irep_idt identifier=it->get_identifier();
       //if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
       //  dest.insert(identifier);
@@ -377,4 +377,3 @@ void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(F_BOTH, src, dest);
 }
-

@@ -20,4 +20,3 @@ all: pointer-analysis$(LIBEXT)
 
 pointer-analysis$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-

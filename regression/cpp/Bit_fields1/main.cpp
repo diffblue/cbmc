@@ -9,16 +9,16 @@ struct some_struct {
 
   // an anonymous bitfield
   signed int :2;
-  
+
   // with typedef
   INT x:1;
-  
+
   // made of sizeof
   unsigned int abc: sizeof(int);
 
   // enums are integers!
   some_enum_type enum_field1 : 5;
-  
+
   // and good as field sizes
   some_enum_type enum_field2 : E1;
 } X;

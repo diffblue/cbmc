@@ -53,7 +53,7 @@ public:
   virtual ~qbf_bdd_coret();
 
   virtual literalt new_variable();
-  
+
   virtual void lcnf(const bvt &bv);
   virtual literalt lor(literalt a, literalt b);
   virtual literalt lor(const bvt &bv);

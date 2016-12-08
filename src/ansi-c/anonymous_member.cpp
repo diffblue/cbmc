@@ -34,7 +34,7 @@ static exprt make_member_expr(
   if(struct_union.get_bool(ID_C_lvalue))
     result.set(ID_C_lvalue, true);
 
-  // todo: should to typedef chains properly    
+  // todo: should to typedef chains properly
   const typet &type=
     ns.follow(struct_union.type());
 
@@ -42,7 +42,7 @@ static exprt make_member_expr(
      type.get_bool(ID_C_constant) ||
      struct_union.type().get_bool(ID_C_constant))
     result.set(ID_C_constant, true);
-    
+
   return result;
 }
 
@@ -75,7 +75,7 @@ exprt get_component_rec(
       it++)
   {
     const typet &type=ns.follow(it->type());
-  
+
     if(it->get_name()==component_name)
     {
       return make_member_expr(struct_union, *it, ns);
@@ -88,7 +88,7 @@ exprt get_component_rec(
       if(result.is_not_nil()) return result;
     }
   }
-  
+
   return nil_exprt();
 }
 
@@ -130,6 +130,6 @@ bool has_component_rec(
         return true;
     }
   }
-  
+
   return false;
 }

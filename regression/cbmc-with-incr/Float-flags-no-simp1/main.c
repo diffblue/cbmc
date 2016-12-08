@@ -9,7 +9,7 @@ int main()
   #ifndef _MSC_VER
 
   // first check constants
-  
+
   assert(isnormal(FLT_MAX));
   assert(isinf(HUGE_VAL));
   assert(isinf(HUGE_VALF));

@@ -19,12 +19,12 @@
  *
  * @details
  *
+ * @param result
  * @param first
  * @param last
- *
- * @return
  */
-std::set<irep_idt> collect_state_vars(
+void collect_state_vars(
+    std::set<irep_idt> &result,
     goto_programt::const_targett first,
     goto_programt::const_targett last);
 

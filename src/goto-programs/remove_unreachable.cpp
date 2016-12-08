@@ -41,7 +41,7 @@ void remove_unreachable(goto_programt &goto_program)
       reachable.insert(t);
       goto_programt::targetst successors;
       goto_program.get_successors(t, successors);
-      
+
       for(goto_programt::targetst::const_iterator
           s_it=successors.begin();
           s_it!=successors.end();
@@ -49,10 +49,10 @@ void remove_unreachable(goto_programt &goto_program)
         working.push(*s_it);
     }
   }
-  
+
   // make all unreachable code a skip
   // unless it's an 'end_function'
-  
+
   Forall_goto_program_instructions(it, goto_program)
   {
     if(reachable.find(it)==reachable.end() &&
@@ -60,4 +60,3 @@ void remove_unreachable(goto_programt &goto_program)
       it->make_skip();
   }
 }
-

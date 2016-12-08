@@ -34,7 +34,7 @@ public:
   virtual resultt operator()(
     const goto_functionst &goto_functions)=0;
 
-  // this is the counterexample  
+  // this is the counterexample
   goto_tracet error_trace;
 
 protected:

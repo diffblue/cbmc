@@ -52,10 +52,10 @@ void cpp_exception_list_rec(
   {
     // just get tag
     dest.push_back("struct_"+src.get_string(ID_tag));
-    
+
     // now do any bases, recursively
     const irept::subt &bases=src.find(ID_bases).get_sub();
-    
+
     forall_irep(it, bases)
     {
       const typet &type=static_cast<const typet &>(it->find(ID_type));
@@ -66,13 +66,13 @@ void cpp_exception_list_rec(
   {
     // grab C/C++ type
     irep_idt c_type=src.get(ID_C_c_type);
-  
+
     if(c_type!=irep_idt())
     {
       dest.push_back(id2string(c_type)+suffix);
       return;
     }
-  
+
   }
 }
 
@@ -94,13 +94,13 @@ irept cpp_exception_list(
 {
   std::vector<irep_idt> ids;
   irept result(ID_exception_list);
-  
+
   cpp_exception_list_rec(src, ns, "", ids);
   result.get_sub().resize(ids.size());
 
   for(unsigned i=0; i<ids.size(); i++)
     result.get_sub()[i].id(ids[i]);
-  
+
   return result;
 }
 

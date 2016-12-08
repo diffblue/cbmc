@@ -17,7 +17,7 @@ class clauset
 {
 public:
   bool is_root;
-    
+
   // if root, what clause
   bvt root_clause;
 
@@ -28,7 +28,7 @@ public:
     unsigned pivot_var_no;
     unsigned clause_id;
   };
-    
+
   typedef std::vector<stept> stepst;
   stepst steps;
 };
@@ -39,7 +39,7 @@ class resolution_prooft
 public:
   typedef std::vector<T> clausest;
   clausest clauses;
-  
+
   void build_core(std::vector<bool> &in_core);
 };
 

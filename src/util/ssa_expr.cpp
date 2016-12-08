@@ -93,4 +93,3 @@ irep_idt ssa_exprt::build_identifier(
 
   return oss.str();
 }
-

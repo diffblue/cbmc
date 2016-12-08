@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening
 
@@ -29,7 +29,7 @@ Date: August 2012
 #include <util/unicode.h>
 
 #include "run.h"
-  
+
 /*******************************************************************\
 
 Function: run
@@ -41,7 +41,7 @@ Function: run
  Purpose:
 
 \*******************************************************************/
-  
+
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
@@ -53,9 +53,9 @@ int run(
 
   // unicode version of the arguments
   std::vector<std::wstring> wargv;
-  
+
   wargv.resize(argv.size());
-  
+
   for(std::size_t i=0; i<argv.size(); i++)
     wargv[i]=widen(argv[i]);
 
@@ -63,7 +63,7 @@ int run(
 
   for(std::size_t i=0; i<wargv.size(); i++)
     _argv[i]=wargv[i].c_str();
-  
+
   _argv[argv.size()]=NULL;
 
   // warning: the arguments may still need escaping
@@ -72,10 +72,10 @@ int run(
 
   int status=(int)_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
 
-  delete[] _argv;  
+  delete[] _argv;
 
   return status;
-  
+
   #else
   int stdin_fd=STDIN_FILENO;
 
@@ -93,7 +93,7 @@ int run(
 
   /* now create new process */
   childpid = fork();
-    
+
   if(childpid>=0) /* fork succeeded */
   {
     if(childpid==0) /* fork() returns 0 to the child process */
@@ -103,7 +103,7 @@ int run(
         _argv[i]=strdup(argv[i].c_str());
 
       _argv[argv.size()]=NULL;
-      
+
       if(stdin_fd!=STDIN_FILENO)
         dup2(stdin_fd, STDIN_FILENO);
       execvp(what.c_str(), _argv);

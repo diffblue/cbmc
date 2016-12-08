@@ -5,7 +5,7 @@ int main()
   int i;
   q=&i;
   p=&q;
- 
- 
+
+
   **p=1;
 }

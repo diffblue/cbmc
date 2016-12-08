@@ -26,7 +26,7 @@ public:
 
   // map loop headers to loops
   typedef std::map<T, natural_loopt> loop_mapt;
-  
+
   loop_mapt loop_map;
 
   inline void operator()(P &program)
@@ -35,12 +35,12 @@ public:
   }
 
   void output(std::ostream &) const;
-  
+
   inline const cfg_dominators_templatet<P, T, false>& get_dominator_info() const
   {
     return cfg_dominators;
   }
-  
+
   inline natural_loops_templatet()
   {
   }
@@ -55,7 +55,7 @@ protected:
   typedef typename cfg_dominators_templatet<P, T, false>::cfgt::nodet nodet;
 
   void compute(P &program);
-  void compute_natural_loop(T, T);  
+  void compute_natural_loop(T, T);
 };
 
 class natural_loopst:
@@ -109,10 +109,10 @@ void natural_loops_templatet<P, T>::compute(P &program)
         {
           const nodet &node=
             cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
-          
+
 #ifdef DEBUG
-          std::cout << "Computing loop for " 
-                    << m_it->location_number << " -> " 
+          std::cout << "Computing loop for "
+                    << m_it->location_number << " -> "
                     << (*n_it)->location_number << "\n";
 #endif
           if(node.dominators.find(*n_it)!=node.dominators.end())
@@ -142,7 +142,7 @@ template<class P, class T>
 void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
 {
   assert(n->location_number<=m->location_number);
-  
+
   std::stack<T> stack;
 
   natural_loopt &loop=loop_map[n];
@@ -194,7 +194,7 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
       h_it!=loop_map.end(); ++h_it)
   {
     unsigned n=h_it->first->location_number;
-    
+
     out << n << " is head of { ";
     for(typename natural_loopt::const_iterator l_it=h_it->second.begin();
         l_it!=h_it->second.end(); ++l_it)

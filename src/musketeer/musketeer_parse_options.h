@@ -22,7 +22,7 @@ Author:
   "(cfg-kill)(no-dependencies)(force-loop-duplication)(no-loop-duplication)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(cav11)(version)(const-function-pointer-propagation)(print-graph)" \
-  "(volatile)(all-shared)(pensieve)(naive)(all-shared-aeg)(async)(userdef)" 
+  "(volatile)(all-shared)(pensieve)(naive)(all-shared-aeg)(async)(userdef)"
 
 class goto_fence_inserter_parse_optionst:
   public parse_options_baset,
@@ -38,7 +38,7 @@ public:
     ui_message_handler(cmdline, "musketeer")
   {
   }
-  
+
 protected:
   ui_message_handlert ui_message_handler;
 
@@ -49,7 +49,7 @@ protected:
 
   void instrument_goto_program(
     goto_functionst &goto_functions);
-    
+
   void set_verbosity();
 };
 

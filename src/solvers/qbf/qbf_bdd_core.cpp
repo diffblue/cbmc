@@ -355,15 +355,15 @@ Function: qbf_bdd_coret::lor
 literalt qbf_bdd_coret::lor(literalt a, literalt b)
 {
   literalt nl = new_variable();
-  
+
   BDD abdd(*bdd_variable_map[a.var_no()]);
   BDD bbdd(*bdd_variable_map[b.var_no()]);
-  
+
   if(a.sign()) abdd = ~abdd;
   if(b.sign()) bbdd = ~bbdd;
-  
+
   *bdd_variable_map[nl.var_no()] |= abdd | bbdd;
-  
+
   return nl;
 }
 
@@ -380,22 +380,22 @@ Function: qbf_bdd_coret::lor
 \*******************************************************************/
 
 literalt qbf_bdd_coret::lor(const bvt &bv)
-{   
+{
   forall_literals(it, bv)
     if(*it==const_literal(true))
       return const_literal(true);
-  
+
   literalt nl = new_variable();
-  
+
   BDD &orbdd = *bdd_variable_map[nl.var_no()];
 
   forall_literals(it, bv)
   {
     literalt l=*it;
-    
+
     if(l==const_literal(false))
       continue;
-    
+
     BDD v(*bdd_variable_map[l.var_no()]);
     if(l.sign()) v = ~v;
 

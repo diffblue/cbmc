@@ -3,7 +3,7 @@
  Module:
 
  Author: Vincent Nimal
- 
+
 \*******************************************************************/
 
 #ifndef CPROVER_INFER_MODE_H

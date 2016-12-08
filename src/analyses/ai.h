@@ -31,9 +31,9 @@ public:
   virtual ~ai_domain_baset()
   {
   }
-  
+
   typedef goto_programt::const_targett locationt;
-  
+
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
   // b) there is an edge from the last instruction (END_FUNCTION) of the function
@@ -52,7 +52,7 @@ public:
     const namespacet &ns) const
   {
   }
-  
+
   // no states
   virtual void make_bottom()
   {
@@ -62,12 +62,12 @@ public:
   virtual void make_top()
   {
   }
-  
+
   // a reasonable entry-point state
   virtual void make_entry()
   {
   }
-  
+
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
@@ -87,7 +87,7 @@ public:
   ai_baset()
   {
   }
-  
+
   virtual ~ai_baset()
   {
   }
@@ -101,7 +101,7 @@ public:
     entry_state(goto_program);
     fixedpoint(goto_program, goto_functions, ns);
   }
-    
+
   inline void operator()(
     const goto_functionst &goto_functions,
     const namespacet &ns)
@@ -132,7 +132,7 @@ public:
   virtual void clear()
   {
   }
-  
+
   virtual void output(
     const namespacet &ns,
     const goto_functionst &goto_functions,
@@ -179,9 +179,9 @@ protected:
 
   // the work-queue is sorted by location number
   typedef std::map<unsigned, locationt> working_sett;
-  
+
   locationt get_next(working_sett &working_set);
-  
+
   void put_in_working_set(
     working_sett &working_set,
     locationt l)
@@ -189,13 +189,13 @@ protected:
     working_set.insert(
       std::pair<unsigned, locationt>(l->location_number, l));
   }
-  
+
   // true = found s.th. new
   bool fixedpoint(
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
-    
+
   virtual void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns)=0;
@@ -214,10 +214,10 @@ protected:
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
-  
+
   typedef std::set<irep_idt> recursion_sett;
   recursion_sett recursion_set;
-    
+
   // function calls
   bool do_function_call_rec(
     locationt l_call, locationt l_return,
@@ -234,7 +234,7 @@ protected:
     const namespacet &ns);
 
   // abstract methods
-    
+
   virtual bool merge(const statet &src, locationt from, locationt to)=0;
   // for concurrent fixedpoint
   virtual bool merge_shared(
@@ -265,14 +265,14 @@ public:
     if(it==state_map.end()) throw "failed to find state";
     return it->second;
   }
-    
+
   inline const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end()) throw "failed to find state";
     return it->second;
   }
-  
+
   virtual void clear()
   {
     state_map.clear();
@@ -302,7 +302,7 @@ protected:
     statet &dest=get_state(to);
     return static_cast<domainT &>(dest).merge(static_cast<const domainT &>(src), from, to);
   }
-  
+
   virtual statet *make_temporary_state(const statet &s)
   {
     return new domainT(static_cast<const domainT &>(s));
@@ -315,7 +315,7 @@ protected:
     sequential_fixedpoint(goto_functions, ns);
   }
 
-private:  
+private:
   // to enforce that domainT is derived from ai_domain_baset
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
 

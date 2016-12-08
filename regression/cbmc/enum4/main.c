@@ -14,4 +14,3 @@ int main()
   void *(___args[1]) = {&_event_arg};
   execute(___args);
 }
-

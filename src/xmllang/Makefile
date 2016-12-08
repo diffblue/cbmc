@@ -30,4 +30,3 @@ generated_files: xml_lex.yy.cpp xml_y.tab.cpp xml_y.tab.h
 # extra dependencies
 xml_y.tab$(OBJEXT): xml_y.tab.cpp xml_y.tab.h
 xml_lex.yy$(OBJEXT): xml_y.tab.cpp xml_lex.yy.cpp xml_y.tab.h
-

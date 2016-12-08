@@ -19,6 +19,6 @@ int main()
   st.x = f1();
   x = nondet_int();
   st.x = x;
-  
+
   return 0;
 }

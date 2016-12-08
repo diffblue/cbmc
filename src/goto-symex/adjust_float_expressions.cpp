@@ -43,9 +43,9 @@ void adjust_float_expressions(
   {
     symbol_exprt rounding_mode=
       ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
-      
+
     rounding_mode.add_source_location()=expr.source_location();
-  
+
     if(expr.id()==ID_plus || expr.id()==ID_minus ||
        expr.id()==ID_mult || expr.id()==ID_div ||
        expr.id()==ID_rem)
@@ -68,19 +68,19 @@ void adjust_float_expressions(
       expr.op2()=rounding_mode;
     }
   }
-  
+
   if(expr.id()==ID_typecast)
   {
     const typecast_exprt &typecast_expr=to_typecast_expr(expr);
-    
+
     const typet &src_type=typecast_expr.op().type();
     const typet &dest_type=typecast_expr.type();
 
     symbol_exprt rounding_mode=
       ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
-      
+
     rounding_mode.add_source_location()=expr.source_location();
-  
+
     if(dest_type.id()==ID_floatbv &&
        src_type.id()==ID_floatbv)
     {
@@ -126,4 +126,3 @@ void adjust_float_expressions(
     }
   }
 }
-

@@ -116,7 +116,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 {
   // we write the problem into a file
   smt2_temp_filet smt2_temp_file;
-  
+
   // copy from string buffer into file
   smt2_temp_file.temp_out << stringstream.str();
 
@@ -209,12 +209,12 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   int res=system(command.c_str());
   if(res<0)
   {
-    error() << "error running SMT2 soler" << eom;
+    error() << "error running SMT2 solver" << eom;
     return decision_proceduret::D_ERROR;
   }
 
   std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
-  
+
   return read_result(in);
 }
 
@@ -244,7 +244,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   while(in)
   {
     irept parsed=smt2irep(in);
-    
+
     if(parsed.id()=="sat")
       res=D_SATISFIABLE;
     else if(parsed.id()=="unsat")
@@ -259,7 +259,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // Examples:
       // ( (B0 true) )
       // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
-      
+
       values[s0.id()]=s1;
     }
     else if(parsed.id()=="" &&
@@ -296,4 +296,3 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   return res;
 }
-

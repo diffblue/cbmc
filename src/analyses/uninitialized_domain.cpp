@@ -50,7 +50,7 @@ void uninitialized_domaint::transform(
       std::list<exprt> written=expressions_written(*from);
 
       forall_expr_list(it, written) assign(*it);
-      
+
       // we only care about the *first* uninitalized use
       forall_expr_list(it, read) assign(*it);
     }
@@ -121,7 +121,7 @@ bool uninitialized_domaint::merge(
   locationt to)
 {
   unsigned old_uninitialized=uninitialized.size();
-  
+
   uninitialized.insert(
     other.uninitialized.begin(),
     other.uninitialized.end());

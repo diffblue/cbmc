@@ -46,7 +46,7 @@ void locst::build(const goto_functionst &goto_functions)
                    loc_reft> target_mapt;
 
   target_mapt target_map;
-  
+
   forall_goto_functions(f_it, goto_functions)
   {
     const goto_functionst::goto_functiont &goto_function = f_it->second;
@@ -68,12 +68,12 @@ void locst::build(const goto_functionst &goto_functions)
     else
       function_entry.first_loc=loc_reft::nil();
   }
-  
+
   if(function_map.find(ID_main)==function_map.end())
     throw "no entry point";
-  
+
   entry_loc=function_map[ID_main].first_loc;
-    
+
   // build branch targets
   for(unsigned l=0; l<loc_vector.size(); l++)
   {
@@ -125,17 +125,16 @@ void locst::output(std::ostream &out) const
       function=loc.function;
       out << "*** " << function << "\n";
     }
-   
+
     out << "  L" << l << ": "
 //        << loc.target->type << " "
 //        << loc.target->location
         << " " << as_string(ns, *loc.target) << "\n";
-              
+
     if(!loc.branch_target.is_nil())
       out << "    T: " << loc.branch_target << "\n";
   }
-  
+
   out << "\n";
   out << "The entry location is L" << entry_loc << ".\n";
 }
-

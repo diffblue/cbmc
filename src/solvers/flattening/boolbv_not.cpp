@@ -26,7 +26,7 @@ bvt boolbvt::convert_not(const not_exprt &expr)
 
   if(op_bv.size()<1)
     throw "not operator takes one non-empty operand";
-    
+
   const typet &op_type=expr.op().type();
 
   if(op_type.id()!=ID_verilog_signedbv ||
@@ -43,7 +43,7 @@ bvt boolbvt::convert_not(const not_exprt &expr)
       bvt bv;
       bv.resize(2);
 
-      // this returns 'x' for 'z'      
+      // this returns 'x' for 'z'
       bv[0]=prop.lselect(has_x_or_z, const_literal(false), normal_bits_zero);
       bv[1]=has_x_or_z;
 

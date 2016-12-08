@@ -7,6 +7,5 @@ void main()
     *(cp+i) = 0;
 
   // should work with any endianness
-  assert(x==0); 
+  assert(x==0);
 }
-

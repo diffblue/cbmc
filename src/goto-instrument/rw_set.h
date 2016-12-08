@@ -39,51 +39,51 @@ public:
   }
 
   ~rw_set_baset() {}
- 
+
   struct entryt
   {
     symbol_exprt symbol_expr;
     irep_idt object;
     exprt guard;
-    
+
     entryt():guard(true_exprt())
     {
     }
   };
-  
+
   typedef hash_map_cont<irep_idt, entryt, irep_id_hash> entriest;
   entriest r_entries, w_entries;
- 
+
   void swap(rw_set_baset &other)
   {
     std::swap(other.r_entries, r_entries);
     std::swap(other.w_entries, w_entries);
   }
-  
+
   inline rw_set_baset &operator += (const rw_set_baset &other)
   {
     r_entries.insert(other.r_entries.begin(), other.r_entries.end());
     w_entries.insert(other.w_entries.begin(), other.w_entries.end());
     return *this;
   }
-  
+
   inline bool empty() const
   {
     return r_entries.empty() && w_entries.empty();
   }
-  
+
   inline bool has_w_entry(irep_idt object) const
   {
     return w_entries.find(object)!=w_entries.end();
   }
-  
+
   inline bool has_r_entry(irep_idt object) const
   {
     return r_entries.find(object)!=r_entries.end();
   }
-  
+
   void output(std::ostream &out) const;
-  
+
 protected:
   virtual void track_deref(const entryt& entry, bool read) {}
   virtual void set_track_deref() {}
@@ -102,11 +102,11 @@ extern inline std::ostream & operator << (
 #define forall_rw_set_r_entries(it, rw_set) \
   for(rw_set_baset::entriest::const_iterator it=(rw_set).r_entries.begin(); \
       it!=(rw_set).r_entries.end(); it++)
-      
+
 #define forall_rw_set_w_entries(it, rw_set) \
   for(rw_set_baset::entriest::const_iterator it=(rw_set).w_entries.begin(); \
       it!=(rw_set).w_entries.end(); it++)
-      
+
 // a producer of read/write sets
 
 class _rw_set_loct:public rw_set_baset
@@ -129,7 +129,7 @@ public:
   }
 
   ~_rw_set_loct() {}
-  
+
 protected:
   value_setst &value_sets;
   const goto_programt::const_targett target;
@@ -142,19 +142,19 @@ protected:
   {
     read_write_rec(expr, true, false, "", guardt());
   }
-  
+
   inline void read(const exprt &expr, const guardt &guard)
   {
     read_write_rec(expr, true, false, "", guard);
   }
-  
+
   inline void write(const exprt &expr)
   {
     read_write_rec(expr, false, true, "", guardt());
   }
-  
+
   void compute();
-  
+
   void assign(const exprt &lhs, const exprt &rhs);
 
   void read_write_rec(
@@ -204,7 +204,7 @@ public:
   }
 
   ~rw_set_functiont() {}
-  
+
 protected:
   value_setst &value_sets;
   const goto_functionst &goto_functions;
@@ -218,9 +218,9 @@ class rw_set_with_trackt:public _rw_set_loct
 {
 public:
   // NOTE: combine this with entriest to avoid double copy
-  /* keeps track of who is dereferenced from who. 
+  /* keeps track of who is dereferenced from who.
      E.g., y=&z; x=*y;
-     reads(x=*y;)={y,z} 
+     reads(x=*y;)={y,z}
      dereferenced_from={z|->y} */
   std::map<const irep_idt, const irep_idt> dereferenced_from;
 
@@ -265,7 +265,7 @@ protected:
   void set_track_deref() {
     dereferencing=true;
   }
-  
+
   void reset_track_deref() {
     dereferencing=false;
     dereferenced.clear();

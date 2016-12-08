@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: 
+Module:
 
 Author: Daniel Kroening
 
@@ -13,7 +13,7 @@ Date: August 2012
 
 #include <string>
 #include <vector>
-  
+
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,

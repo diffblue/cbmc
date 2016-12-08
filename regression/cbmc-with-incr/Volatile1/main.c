@@ -3,4 +3,3 @@ int main() {
   if (!x)
     assert(!x);
 }
-

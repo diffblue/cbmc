@@ -18,7 +18,7 @@ struct S2
 int main(void)
 {
   _Bool b;
-  
+
   if(b)
   {
     struct S1 *p=my_malloc(sizeof(struct S1));
@@ -29,6 +29,6 @@ int main(void)
     struct S2 *p=my_malloc(sizeof(struct S2));
     p->y=1;
   }
-  
+
   return 0;
 }

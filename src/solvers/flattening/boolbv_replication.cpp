@@ -25,7 +25,7 @@ Function: boolbvt::convert_replication
 bvt boolbvt::convert_replication(const replication_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
-  
+
   if(width==0)
     return conversion_failed(expr);
 
@@ -49,10 +49,10 @@ bvt boolbvt::convert_replication(const replication_exprt &expr)
       bv[i+offset]=op[i];
 
     offset+=op.size();
-  }    
+  }
 
   if(offset!=bv.size())
     throw "replication operand width too small";
-    
+
   return bv;
 }

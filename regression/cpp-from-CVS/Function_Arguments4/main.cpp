@@ -12,7 +12,7 @@ struct B
 B f(B b)
 {
   assert(i==11);
-  return b;  
+  return b;
 }
 
 

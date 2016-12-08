@@ -162,7 +162,7 @@ void goto_symext::replace_array_equal(exprt &expr)
   if(expr.id()==ID_array_equal)
   {
     assert(expr.operands().size()==2);
-   
+
     // we expect two index expressions
     process_array_expr(expr.op0());
     process_array_expr(expr.op1());

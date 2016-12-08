@@ -1,11 +1,11 @@
 /*******************************************************************\
- 
+
 Module: Converts symbols to xml structures and back.
- 
+
 Author: CM Wintersteiger
- 
+
 Date: June 2006
- 
+
 \*******************************************************************/
 
 #ifndef XML_SYMBOL_H_

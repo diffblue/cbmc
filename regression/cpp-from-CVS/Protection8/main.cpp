@@ -5,7 +5,7 @@ struct A
   int get_i(){return i;}
 
 	A(int i):i(i){};
-	
+
 };
 
 struct B: A

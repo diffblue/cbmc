@@ -67,4 +67,3 @@ bool replace_expr(const replace_mapt &what, exprt &dest)
 
   return result;
 }
-

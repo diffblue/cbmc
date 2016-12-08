@@ -18,4 +18,3 @@ int main()
   pthread_create(&t, 0, thr1, 0);
   pthread_create(&t, 0, thr1, 0);
 }
-

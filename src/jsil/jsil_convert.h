@@ -19,4 +19,3 @@ bool jsil_convert(
   message_handlert &message_handler);
 
 #endif
-
