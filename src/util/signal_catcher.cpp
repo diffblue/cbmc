@@ -23,7 +23,10 @@ Date:
 // It keeps track of any child processes that we'll kill
 // when we are told to terminate.
 
+#ifdef _WIN32
+#else
 std::vector<pid_t> pids_of_children;
+#endif
 
 /*******************************************************************\
 
@@ -49,6 +52,33 @@ void install_signal_catcher()
   sigfillset(&(act.sa_mask));
 
   // install signal handler
+  sigaction(SIGTERM, &act, NULL);
+  #endif
+}
+
+/*******************************************************************\
+
+Function: remove_signal_catcher
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void remove_signal_catcher()
+{
+  #if defined(_WIN32)
+  #else
+  // declare act to deal with action on signal set
+  static struct sigaction act;
+
+  act.sa_handler=SIG_DFL;
+  act.sa_flags=0;
+  sigfillset(&(act.sa_mask));
+
   sigaction(SIGTERM, &act, NULL);
   #endif
 }
