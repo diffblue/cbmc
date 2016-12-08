@@ -1,0 +1,20 @@
+CORE
+main.c
+"--function fun --cover branch --show-reachable-properties"
+
+^EXIT=0$
+^SIGNAL=0$
+^Property fun\.coverage\.1:$
+^  file main\.c line 3 function fun$
+^  function fun entry point$
+^  FALSE$
+^Property fun\.coverage\.2:$
+^  file main\.c line 3 function fun$
+^  function fun block 1 branch false$
+^  !(x > 0)$
+^Property fun\.coverage\.3:$
+^  file main\.c line 3 function fun$
+^  function fun block 1 branch true$
+^  !(!(x > 0))$
+--
+^warning: ignoring
