@@ -109,15 +109,12 @@ void record_function_outputs(
   code_blockt &init_code,
   symbol_tablet &symbol_table)
 {
-  //const code_typet::parameterst &parameters=
-  //  to_code_type(function.type).parameters();
-
   bool has_return_value=
     to_code_type(function.type).return_type()!=empty_typet();
 
   if(has_return_value)
   {
-    //record return value
+    // record return value
     codet output(ID_output);
     output.operands().resize(2);
 
@@ -194,7 +191,8 @@ bool ansi_c_entry_point(
     forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
     {
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(it->second);
+      symbol_tablet::symbolst::const_iterator s_it=
+        symbol_table.symbols.find(it->second);
 
       if(s_it==symbol_table.symbols.end()) continue;
 
@@ -456,7 +454,9 @@ bool ansi_c_entry_point(
           const exprt &arg1=parameters[1];
 
           exprt index_expr(ID_index, arg1.type().subtype());
-          index_expr.copy_to_operands(argv_symbol.symbol_expr(), gen_zero(index_type()));
+          index_expr.copy_to_operands(
+            argv_symbol.symbol_expr(),
+            gen_zero(index_type()));
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);

@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/i2string.h>
-#include <util/prefix.h>
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
@@ -29,8 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_entry_point.h"
 #include "java_object_factory.h"
-
-//#include "zero_initializer.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
 
@@ -46,8 +43,7 @@ Function: create_initialize
 
 \*******************************************************************/
 
-namespace {
-void create_initialize(symbol_tablet &symbol_table)
+static void create_initialize(symbol_tablet &symbol_table)
 {
   symbolt initialize;
   initialize.name=INITIALIZE;
@@ -72,7 +68,7 @@ void create_initialize(symbol_tablet &symbol_table)
   if(symbol_table.add(initialize))
     throw "failed to add "+std::string(INITIALIZE);
 }
-}
+
 
 /*******************************************************************\
 
@@ -217,7 +213,7 @@ void java_record_outputs(
 
   if(has_return_value)
   {
-    //record return value
+    // record return value
     codet output(ID_output);
     output.operands().resize(2);
 
