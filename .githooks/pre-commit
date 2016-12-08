@@ -1,0 +1,50 @@
+#!/bin/bash
+# Runs scripts/cpplint.py on the modified files
+# Based on https://github.com/s0enke/git-hooks/
+#
+# @author Peter Schrammel <peter.schrammel@diffblue.com>
+
+gitRoot="$(dirname $0)/../.."
+
+# this is the magic:
+# retrieve all files in staging area that are added, modified or renamed
+# but no deletions etc
+files=$(git diff-index --name-only --cached --diff-filter=ACMR HEAD -- )
+
+if [ "$files" == "" ]; then
+    exit 0
+fi
+
+# create temporary copy of staging area and delete upon exit
+cleanup()
+{
+  rm -rf $tmpStaging
+}
+
+trap cleanup EXIT
+
+tmpStaging=$(mktemp -d)
+
+# Copy contents of staged version of files to temporary staging area
+# because we only want the staged version that will be commited and not
+# the version in the working directory
+stagedFiles=""
+for file in $files
+do
+  id=$(git diff-index --cached HEAD $file | cut -d " " -f4)
+
+  # create staged version of file in temporary staging area with the same
+  # path as the original file
+  mkdir -p "$tmpStaging/$(dirname $file)"
+  git cat-file blob $id > "$tmpStaging/$file"
+  stagedFiles="$stagedFiles $tmpStaging/$file"
+done
+
+output=$(cd $gitRoot; python scripts/cpplint.py $stagedFiles 2>&1)
+retval=$?
+
+if [ $retval -ne 0 ]
+then
+    echo "$output"
+    exit 1
+fi
