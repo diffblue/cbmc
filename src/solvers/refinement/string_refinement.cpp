@@ -41,9 +41,9 @@ void string_refinementt::display_index_set() {
 	 end = index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
     debug() << "IS(" << pretty_short(s) << ") == {";
-    
+
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
-         j != end; ++j) 
+         j != end; ++j)
       debug() << pretty_short (*j) << "; ";
     debug() << "}"  << eom;
   }
@@ -61,7 +61,7 @@ void string_refinementt::add_instantiations()
     debug() << "IS(" << pretty_short(s) << ") == {";
 
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
-         j != end; ++j) 
+         j != end; ++j)
       debug() << pretty_short (*j) << "; ";
     debug() << "}"  << eom;
 
@@ -86,10 +86,10 @@ literalt string_refinementt::convert_rest(const exprt &expr)
     {
       // can occur in __CPROVER_assume
       bvt bv = convert_function_application(to_function_application_expr(expr));
-      assert(bv.size() == 1); 
+      assert(bv.size() == 1);
       return bv[0];
     }
-  else 
+  else
     {
       return SUB::convert_rest(expr);
     }
@@ -107,7 +107,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
       string_exprt str = generator.string_of_symbol(to_symbol_expr(expr));
       bvt bv = convert_bv(str);
       return bv;
-    } 
+    }
   else return SUB::convert_symbol(expr);
 }
 
@@ -126,13 +126,13 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
   if(expr.lhs().id()==ID_symbol &&
      // We can have affectation of string from StringBuilder or CharSequence
-     //type==ns.follow(expr.rhs().type()) && 
+     //type==ns.follow(expr.rhs().type()) &&
      type.id()!=ID_bool)
   {
-    debug() << "string_refinementt " << pretty_short(expr.lhs()) << " <- " 
+    debug() << "string_refinementt " << pretty_short(expr.lhs()) << " <- "
 	    << pretty_short(expr.rhs()) << eom;
-    
-    if(refined_string_typet::is_unrefined_string_type(type)) 
+
+    if(refined_string_typet::is_unrefined_string_type(type))
       {
 	generator.check_char_type(expr.lhs());
 	symbol_exprt sym = to_symbol_expr(expr.lhs());
@@ -160,7 +160,7 @@ void string_refinementt::print_time(std::string s)
 {
   debug() << s << " TIME == "
 	  << (std::chrono::duration_cast<std::chrono::microseconds>
-	      (std::chrono::high_resolution_clock::now()-start_time).count()  / 1000) 
+	      (std::chrono::high_resolution_clock::now()-start_time).count()  / 1000)
 	  << eom;
 }
 
@@ -187,10 +187,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
 
   //string_axioms.clear(); should not be necessary
-  
+
   initial_index_set(universal_axioms);
   debug() << "string_refinementt::dec_solve: warning update_index_set has to be checked" << eom;
-  update_index_set(cur); 
+  update_index_set(cur);
   cur.clear();
   add_instantiations();
 
@@ -199,33 +199,33 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
       print_time("string_refinementt::dec_solve");
       decision_proceduret::resultt res = SUB::dec_solve();
-      
-      switch(res) 
+
+      switch(res)
 	{
 	case D_SATISFIABLE:
 	  if(!check_axioms()) {
 	    debug() << "check_SAT: got SAT but the model is not correct" << eom;
-	  } 
+	  }
 	  else {
 	    debug() << "check_SAT: the model is correct" << eom;
 	    return D_SATISFIABLE;
 	  }
-	  
+
 	  debug() <<  "refining.." << eom;
-	  current_index_set.clear(); 
-	  update_index_set(cur); 
+	  current_index_set.clear();
+	  update_index_set(cur);
 	  cur.clear();
 	  add_instantiations();
 
-	  if(variable_with_multiple_occurence_in_index) 
+	  if(variable_with_multiple_occurence_in_index)
 	    {
 	      debug() << "WARNING: some variable appears multiple times" << eom;
 	    }
-	  
+
 	  if(current_index_set.empty()){
 	    debug() << "current index set is empty" << eom;
 	    return D_SATISFIABLE;
-	  } 
+	  }
 
 	  display_index_set();
 	  debug()<< "instantiating NOT_CONTAINS constraints" << eom;
@@ -238,11 +238,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 	    }
 	  }
 	  break;
-	default: 
+	default:
 	  return res;
 	}
 
-    } 
+    }
   debug () << "string_refinementt::dec_solve reached the maximum number of steps allowed";
   return D_ERROR;
 }
@@ -262,15 +262,15 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
 {
   if (!seen_instances.insert(lemma).second)
-    { 
-      debug() << "string_refinementt::add_lemma : already seen" << eom; 
-      return; 
+    {
+      debug() << "string_refinementt::add_lemma : already seen" << eom;
+      return;
     }
 
-  if(lemma == true_exprt()) 
-    { 
-      debug() << "string_refinementt::add_lemma : tautology" << eom; 
-      return; 
+  if(lemma == true_exprt())
+    {
+      debug() << "string_refinementt::add_lemma : tautology" << eom;
+      return;
     }
 
   debug() << "adding lemma " << pretty_short(lemma) << eom;
@@ -280,7 +280,7 @@ void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
     cur.push_back(lemma);
 }
 
-unsigned integer_of_expr(const constant_exprt & expr) 
+unsigned integer_of_expr(const constant_exprt & expr)
 {
   return integer2unsigned(string2integer(as_string(expr.get_value()),2));
 }
@@ -294,7 +294,7 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
   unsigned str[n];
   exprt val = get(arr);
   if(val.id() == "array-list") {
-    for (size_t i = 0; i < val.operands().size()/2; i++) {  
+    for (size_t i = 0; i < val.operands().size()/2; i++) {
       exprt index = val.operands()[i*2];
       unsigned idx = integer_of_expr(to_constant_expr(index));
       if(idx < n){
@@ -315,7 +315,7 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
     else
       buf << "?";
   }
-  
+
   buf << "\"";
   return buf.str();
 }
@@ -326,7 +326,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   unsignedbv_typet chart;
   if(arr.type().subtype() == generator.get_char_type())
     chart = generator.get_char_type();
-  else { 
+  else {
     assert(false);
     //assert(arr.type().subtype() == java_char_type);
     //chart = java_char_type;
@@ -335,8 +335,8 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   if(val.id() == "array-list") {
     exprt ret =
       array_of_exprt(chart.zero_expr(), array_typet(chart, infinity_exprt(generator.get_index_type())));
-    
-    for (size_t i = 0; i < val.operands().size()/2; i++) {  
+
+    for (size_t i = 0; i < val.operands().size()/2; i++) {
       exprt index = val.operands()[i*2];
       assert(index.type() == generator.get_index_type());
       exprt value = val.operands()[i*2+1];
@@ -345,52 +345,52 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
       ret = with_exprt(ret, index, value);
     }
     return ret;
-  
+
   } else {
-    debug() << "unable to get array-list value of " 
+    debug() << "unable to get array-list value of "
 	    << pretty_short(val) << eom;
     return arr;
   }
 }
- 
+
 
 bool string_refinementt::check_axioms()
 {
   // build the interpretation from the model of the prop_solver
-  
+
   debug() << "string_refinementt::check_axioms: ==============="
 	  << "===========================================" << eom;
-  debug() << "string_refinementt::check_axioms: build the" 
+  debug() << "string_refinementt::check_axioms: build the"
 	  << " interpretation from the model of the prop_solver" << eom;
   replace_mapt fmodel;
 
   std::map<irep_idt, string_exprt>::iterator it;
-  for (it = generator.symbol_to_string.begin(); it != generator.symbol_to_string.end(); ++it) 
+  for (it = generator.symbol_to_string.begin(); it != generator.symbol_to_string.end(); ++it)
     {
       string_exprt refined = it->second;
       const exprt &econtent = refined.content();
       const exprt &elength  = refined.length();
-      
+
       exprt len = get(elength);
       exprt arr = get_array(econtent, len);
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      debug() << it->first << " = " << pretty_short(it->second) 
+      debug() << it->first << " = " << pretty_short(it->second)
 	      << " of length " << pretty_short(len) <<" := " << eom
-	      << pretty_short(get(econtent)) << eom 
+	      << pretty_short(get(econtent)) << eom
 	      << string_of_array(econtent,len) << eom;
     }
 
   for(std::vector<symbol_exprt>::iterator it = generator.boolean_symbols.begin();
       it != generator.boolean_symbols.end(); it++) {
-    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
+    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;
     fmodel[*it] = get(*it);
   }
 
   for(std::vector<symbol_exprt>::iterator it = generator.index_symbols.begin();
       it != generator.index_symbols.end(); it++) {
-    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;  
+    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;
     fmodel[*it] = get(*it);
   }
 
@@ -438,17 +438,17 @@ bool string_refinementt::check_axioms()
     debug() << violated.size() << " string axioms can be violated" << eom;
 
     if(use_counter_example) {
-      
+
       std::vector<string_constraintt> new_axioms(violated.size());
-      
+
       // Checking if the current solution satisfies the constraints
       for (size_t i = 0; i < violated.size(); ++i) {
-	
+
 	new_axioms[i] = universal_axioms[violated[i].first];
 
 	const exprt &val = violated[i].second;
 	const string_constraintt &axiom = universal_axioms[violated[i].first];
-	
+
 	exprt premise(axiom.premise());
 	exprt body(axiom.body());
 	implies_exprt instance(premise, body);
@@ -462,7 +462,7 @@ bool string_refinementt::check_axioms()
 
     return false;
   }
-  
+
 }
 
 
@@ -503,22 +503,22 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
     // We should group constants together...
     const exprt &t = it->first;
     int second = negated?(-it->second):it->second;
-    if(t.id() == ID_constant) 
+    if(t.id() == ID_constant)
       {
 	std::string value(to_constant_expr(t).get_value().c_str());
 	constants += binary2integer(value,true) * second;
-      } 
+      }
     else
       {
 	if(second != 0)
 	  {
-	    if(second == -1) 
+	    if(second == -1)
 	      {
 		if(sum == refined_string_typet::index_of_int(0)) sum = unary_minus_exprt(t);
 		else sum = minus_exprt(sum,t);
 	      }
 	    else if(second == 1)
-	      { 
+	      {
 		if(sum == refined_string_typet::index_of_int(0)) sum = t;
 		else sum = plus_exprt(sum, t);
 	      }
@@ -526,7 +526,7 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
 	else
 	  {
 	    debug() << "in string_refinementt::sum_of_map:"
-		    << " warning: several occurences of the same variable: " 
+		    << " warning: several occurences of the same variable: "
 		    << t.pretty() << eom;
 	    variable_with_multiple_occurence_in_index = true;
 	    if(second > 1)
@@ -538,7 +538,7 @@ exprt string_refinementt::sum_of_map(std::map<exprt,int> & m, bool negated) {
 	  }
       }
   }
-  
+
   return plus_exprt(sum,constant_exprt(integer2binary(constants, STRING_SOLVER_INDEX_WIDTH), refined_string_typet::index_type()));
 }
 
@@ -547,12 +547,12 @@ exprt string_refinementt::simplify_sum(const exprt &f) {
   return sum_of_map(map);
 }
 
-exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f) 
+exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, const exprt &f)
 {
   exprt positive, negative;
   // number of time the element should be added (can be negative)
-  // qvar has to be equal to val - f(0) if it appears positively in f 
-  // (ie if f(qvar) = f(0) + qvar) and f(0) - val if it appears negatively 
+  // qvar has to be equal to val - f(0) if it appears positively in f
+  // (ie if f(qvar) = f(0) + qvar) and f(0) - val if it appears negatively
   // in f. So we start by computing val - f(0).
   std::map< exprt, int> elems = map_of_sum(minus_exprt(val,f));
 
@@ -574,8 +574,8 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
       elems.erase(it);
     }
   }
-  
-  if (!found) { 
+
+  if (!found) {
     debug() << "string_refinementt::compute_subst: qvar not found" << eom;
     debug() << "qvar = " << qvar.pretty() << eom
 	    << "val = " << val.pretty() << eom
@@ -585,7 +585,7 @@ exprt string_refinementt::compute_subst(const exprt &qvar, const exprt &val, con
 
   return sum_of_map(elems,neg);
 }
-  
+
 
 
 class find_qvar_visitor: public const_expr_visitort {
@@ -601,7 +601,7 @@ public:
 };
 
 // Look for the given symbol in the index expression
-bool find_qvar(const exprt index, const symbol_exprt & qvar) 
+bool find_qvar(const exprt index, const symbol_exprt & qvar)
 {
   find_qvar_visitor v2(qvar);
   try {
@@ -612,9 +612,9 @@ bool find_qvar(const exprt index, const symbol_exprt & qvar)
 
 
 void string_refinementt::initial_index_set
-(const std::vector<string_constraintt>  & string_axioms) 
+(const std::vector<string_constraintt>  & string_axioms)
 {
-  for (size_t i = 0; i < string_axioms.size(); ++i) 
+  for (size_t i = 0; i < string_axioms.size(); ++i)
     initial_index_set(string_axioms[i]);
 }
 
@@ -635,11 +635,11 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
     {
       exprt cur = to_process.back();
       to_process.pop_back();
-      if (cur.id() == ID_index) 
+      if (cur.id() == ID_index)
 	{
 	  const exprt &s = cur.op0();
 	  const exprt &i = cur.op1();
-      
+
 	  bool has_quant_var = find_qvar(i,qvar);
 
 	  // if cur is of the form s[i] and no quantified variable appears in i
@@ -656,10 +656,10 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
 	      current_index_set[s].insert(e);
 	      index_set[s].insert(e);
 	    }
-	
-	} 
+
+	}
       else
-	forall_operands(it, cur) 
+	forall_operands(it, cur)
 	  to_process.push_back(*it);
     }
 }
@@ -693,15 +693,15 @@ void string_refinementt::update_index_set(const exprt &formula)
 }
 
 
-// Will be used to visit an expression and return the index used 
+// Will be used to visit an expression and return the index used
 // with the given char array
 class find_index_visitor: public const_expr_visitort {
 private:
     const exprt &str_;
-  
+
 public:
   find_index_visitor(const exprt &str): str_(str){}
-  
+
   void operator()(const exprt &expr) {
     if (expr.id() == ID_index) {
       const index_exprt &i = to_index_expr(expr);
@@ -717,7 +717,7 @@ exprt find_index(const exprt & expr, const exprt & str) {
   try {
     expr.visit(v1);
     return nil_exprt();
-  } 
+  }
   catch (exprt i) { return i; }
 }
 
@@ -730,14 +730,14 @@ string_constraintt string_refinementt::instantiate(const string_constraintt &axi
   exprt idx = find_index(axiom.body(),str);
   if(idx.is_nil()) return string_constraintt();
   if(!find_qvar(idx,axiom.get_univ_var())) return string_constraintt();
-  
+
   exprt r = compute_subst(axiom.get_univ_var(), val, idx);
   exprt instance(axiom);
   replace_expr(axiom.get_univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
   exprt bounds = and_exprt(axiom.univ_within_bounds(),binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val));
   replace_expr(axiom.get_univ_var(), r, bounds);
-  return string_constraintt(bounds,instance);     
+  return string_constraintt(bounds,instance);
 }
 
 
@@ -761,8 +761,8 @@ void string_refinementt::instantiate_not_contains(const string_constraintt & axi
 	exprt witness_bounds = implies_exprt
 	  (and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val), binary_relation_exprt(minus_exprt(to_string_expr(s0).length(),to_string_expr(s1).length()),ID_ge,val)),
 	   and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,plus_exprt(val,axiom.witness_of(val))),
-		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,axiom.witness_of(val))), 
-			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,axiom.witness_of(val)), 
+		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,axiom.witness_of(val))),
+			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,axiom.witness_of(val)),
 					 binary_relation_exprt(refined_string_typet::index_zero(),ID_le,axiom.witness_of(val))))));
 	new_lemmas.push_back(witness_bounds);
       }

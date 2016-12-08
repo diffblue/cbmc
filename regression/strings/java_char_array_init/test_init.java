@@ -1,6 +1,6 @@
 public class test_init {
-    
-    public static void main(String[] argv) 
+
+    public static void main(String[] argv)
     {
 	char [] str = new char[10];
 	str[0] = 'H';

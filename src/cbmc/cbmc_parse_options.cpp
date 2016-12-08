@@ -116,13 +116,13 @@ void cbmc_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
-  
+
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
     if(v>10) v=10;
   }
-  
+
   ui_message_handler.set_verbosity(v);
 }
 
@@ -143,7 +143,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1);
+    exit(1); // should contemplate EX_USAGE from sysexits.h
   }
 
   if(cmdline.isset("program-only"))
@@ -153,7 +153,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
-    options.set_option("cover", cmdline.get_value("cover"));
+    options.set_option("cover", cmdline.get_values("cover"));
 
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
@@ -918,9 +918,9 @@ bool cbmc_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
-    
 
-    if(cmdline.isset("pass")) 
+
+    if(cmdline.isset("pass"))
     {
       status() << "PASS Preprocessing " << eom;
       pass_preprocesst(symbol_table, goto_functions, ui_message_handler);

@@ -82,7 +82,7 @@ protected:
   void initialize(approximationt &approximation);
   void get_values(approximationt &approximation);
   bool is_in_conflict(approximationt &approximation);
-  
+
   virtual void check_SAT();
   virtual void check_UNSAT();
   bool progress;

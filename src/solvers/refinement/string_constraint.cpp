@@ -14,7 +14,7 @@ exprt string_constraintt::premise() const {
   if(form == SIMPLE || form == UNIV_QUANT) {
     if(id() == ID_implies)
       return op0();
-    else 
+    else
       return true_exprt();
   }
   else {
@@ -46,10 +46,10 @@ string_constraintt string_constraintt::forall(const symbol_exprt & univ, const e
   return forall(univ,refined_string_typet::index_zero(),bound_sup);
 }
 
-string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt univ_bound_sup, 
-				 exprt premise, exprt exists_bound_inf, 
+string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt univ_bound_sup,
+				 exprt premise, exprt exists_bound_inf,
 				 exprt exists_bound_sup, exprt s0, exprt s1)
-{ 
+{
   string_constraintt sc(premise);
   sc.form = NOT_CONTAINS;
   sc.bounds.push_back(univ_bound_inf);
@@ -66,7 +66,7 @@ string_constraintt string_constraintt::exists(const symbol_exprt & exist, const 
 {
   assert(is_simple() || is_string_constant());
   return string_constraintt
-    (and_exprt(*this, 
+    (and_exprt(*this,
 	       and_exprt(binary_relation_exprt(exist, ID_ge, bound_inf),
 			 binary_relation_exprt(exist, ID_lt, bound_sup))));
 }

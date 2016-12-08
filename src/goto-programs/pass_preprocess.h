@@ -15,7 +15,7 @@ Date:   September 2016
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
 
-class pass_preprocesst:public messaget 
+class pass_preprocesst:public messaget
 {
  private:
   namespacet ns;
@@ -31,7 +31,7 @@ class pass_preprocesst:public messaget
 
  public:
   pass_preprocesst(symbol_tablet &, goto_functionst &, message_handlert &);
-  
+
  private:
 
   // add a temporary symbol to the symbol table
@@ -49,7 +49,7 @@ class pass_preprocesst:public messaget
   void make_string_function_call
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
-  // replace "r = s.some_function(x,...)" by "s=function_name(s,x,...)" 
+  // replace "r = s.some_function(x,...)" by "s=function_name(s,x,...)"
   // and add a correspondance from r to s in the string_builders map
   void make_string_function_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
@@ -63,17 +63,17 @@ class pass_preprocesst:public messaget
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
 
-  // replace "r.some_function(arr,...)" by 
+  // replace "r.some_function(arr,...)" by
   // "r = function_name(arr.length,arr.data,...);
   void make_of_char_array_function_call
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
-  // replace "r = some_function(arr,...)" by 
+  // replace "r = some_function(arr,...)" by
   // "r = function_name(arr.length,arr.data,...);
   void make_of_char_array_function
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
-  // replace "r = s.some_function(i,arr,...)" by "s=function_name(s,i,arr.length,arr.data)" 
+  // replace "r = s.some_function(i,arr,...)" by "s=function_name(s,i,arr.length,arr.data)"
   // and add a correspondance from r to s in the string_builders map
   void make_of_char_array_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
@@ -81,7 +81,7 @@ class pass_preprocesst:public messaget
   bool has_java_string_type(const exprt &expr);
 
   void replace_string_calls(goto_functionst::function_mapt::iterator f_it);
-  
+
 };
 
 #endif

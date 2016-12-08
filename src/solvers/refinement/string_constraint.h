@@ -14,11 +14,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/refined_string_type.h>
 
-class string_constraintt : public exprt 
+class string_constraintt : public exprt
 {
 private:
   // String axioms can have 4 different forms:
-  // either a simple expression p, 
+  // either a simple expression p,
   // or a string constant: forall x in [0,|s|[. s(x) = c(x)
   // or universally quantified expression: forall x in [lb,ub[. p(x)
   // or a expression for non containment:
@@ -33,7 +33,7 @@ private:
 
   // Only for NOT_CONTAINS constraints (represent s1 and s2)
   std::vector<exprt> compared_strings;
-  
+
   // we should change the structure of the class to adopt the notations of chapter 7
   //  exprt index_guard;
 
@@ -62,16 +62,16 @@ public:
   string_constraintt exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup);
   // Default bound inferior is 0
   string_constraintt exists(const symbol_exprt & exist, const exprt & bound_sup);
-  
+
   static string_constraintt not_contains
-  (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise, 
+  (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise,
    exprt exists_bound_inf, exprt exists_bound_sup, exprt s0, exprt s1);
 
   bool is_simple() const { return (form == SIMPLE); };
   bool is_string_constant() const { return (form == STRING_CONSTANT); };
   bool is_univ_quant() const { return (form == UNIV_QUANT); };
   bool is_not_contains() const { return (form == NOT_CONTAINS); };
-  
+
   exprt premise() const;
 
   exprt body() const;
@@ -83,7 +83,7 @@ public:
   inline symbol_exprt get_univ_var() const { assert(form==UNIV_QUANT); return quantified_variable;}
   inline exprt univ_bound_inf() const { return bounds[0]; }
   inline exprt univ_bound_sup() const { return bounds[1]; }
-  inline exprt univ_within_bounds() const 
+  inline exprt univ_within_bounds() const
   { return and_exprt(binary_relation_exprt(bounds[0],ID_le,get_univ_var()),
 		     binary_relation_exprt(bounds[1],ID_gt,get_univ_var())); }
   inline exprt exists_bound_inf() const { return bounds[2]; }
@@ -107,7 +107,7 @@ public:
    assert(form == SIMPLE);
    return string_constraintt(not_exprt(*this));
  }
- 
+
 
 };
 

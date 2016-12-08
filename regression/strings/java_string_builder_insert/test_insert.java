@@ -1,6 +1,6 @@
 public class test_insert {
-    
-    public static void main(String[] argv) 
+
+    public static void main(String[] argv)
     {
 	char [] str = new char[5];
 	str[0] = 'H';

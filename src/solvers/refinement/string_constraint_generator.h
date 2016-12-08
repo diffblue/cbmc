@@ -17,11 +17,11 @@ public:
 
   string_constraint_generatort() : language(UNKNOWN){ }
 
-  constant_exprt constant_char(int i); 
-  constant_exprt constant_unsigned(int i,size_t width); 
-  constant_exprt constant_signed(int i,size_t width); 
+  constant_exprt constant_char(int i);
+  constant_exprt constant_unsigned(int i,size_t width);
+  constant_exprt constant_signed(int i,size_t width);
   unsignedbv_typet get_char_type();
-  size_t get_char_width(); 
+  size_t get_char_width();
   inline signedbv_typet get_index_type() {return refined_string_typet::index_type();};
 
   std::vector<string_constraintt> axioms;
@@ -30,12 +30,12 @@ public:
   // to ensure its equal to the given string expression.
   string_exprt make_string(const exprt &str);
 
-  // Same thing but associates the string to the given symbol instead 
+  // Same thing but associates the string to the given symbol instead
   // of returning it.
   void make_string(const symbol_exprt & sym, const exprt &str);
 
 
-  // Boolean symbols that are used to know whether the results 
+  // Boolean symbols that are used to know whether the results
   // of some functions should be true.
   std::vector<symbol_exprt> boolean_symbols;
 
@@ -48,13 +48,13 @@ public:
 
   std::map<irep_idt, string_exprt> symbol_to_string;
   inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr)
-  { symbol_to_string[sym.get_identifier()]= expr; }  
+  { symbol_to_string[sym.get_identifier()]= expr; }
 
 
   // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
   string_exprt get_string_of_symbol(const symbol_exprt & sym);
 
-  // Add to the list of axioms, lemmas which should hold for the string to be 
+  // Add to the list of axioms, lemmas which should hold for the string to be
   // equal to the given expression.
   string_exprt of_expr(const exprt & unrefined_string);
 
@@ -62,8 +62,8 @@ public:
   void string_of_expr(const symbol_exprt & sym, const exprt & str);
   string_exprt string_of_symbol(const symbol_exprt & sym);
 
-  // The following functions convert different string functions 
-  // and add the corresponding lemmas to a list of properties to be checked  
+  // The following functions convert different string functions
+  // and add the corresponding lemmas to a list of properties to be checked
   exprt function_application(const function_application_exprt &expr);
 
   string_exprt empty_string(const function_application_exprt &f);
@@ -154,7 +154,7 @@ public:
 
   exprt char_literal(const function_application_exprt &f);
 
-  
+
   // Warning: this function is underspecified
   exprt string_code_point_count(const function_application_exprt &f);
   // Warning: this function is underspecified
@@ -174,7 +174,7 @@ private:
 
   enum {C, JAVA, UNKNOWN} language;
 
-  
+
   inline bool use_c_string() {return (language == C);}
 
   // assert that the number of argument is equal to nb and extract them

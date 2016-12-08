@@ -37,19 +37,19 @@ public:
 
   static exprt is_positive(const exprt & x);
 
-private:  
+private:
   typedef bv_refinementt SUB;
   std::chrono::high_resolution_clock::time_point start_time;
 
 
 protected:
-  
+
   typedef std::set<exprt> expr_sett;
-  
+
   virtual bvt convert_symbol(const exprt &expr);
   virtual bvt convert_function_application
   (const function_application_exprt &expr);
-  
+
   decision_proceduret::resultt dec_solve();
 
   // fills as many 0 as necessary in the bit vectors to have the right width
@@ -57,12 +57,12 @@ protected:
 
 
 private:
-  
+
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
-  // 
+  //
   std::vector<string_constraintt> universal_axioms;
   //
   std::vector<string_constraintt> not_contains_axioms;
@@ -105,12 +105,12 @@ private:
   void initial_index_set(const string_constraintt &axiom);
   void initial_index_set(const std::vector<string_constraintt> &string_axioms);
 
-  // Takes an universaly quantified formula [axiom], 
-  // an array of char variable [s], and an index expression [val]. 
+  // Takes an universaly quantified formula [axiom],
+  // an array of char variable [s], and an index expression [val].
   // Computes one index [v1] in which [axiom.idx] appears, takes the
   // corresponding substitition [r] (obtained with [compute_subst]).
   // Then substitutes [axiom.idx] with [r] in [axiom].
-  // axiom is not constant because we may record some information about 
+  // axiom is not constant because we may record some information about
   // instantiation of existential variables.
   string_constraintt instantiate(const string_constraintt &axiom, const exprt &str,
                     const exprt &val);
@@ -127,7 +127,7 @@ private:
   // elems different from qvar. 			  //
   // Takes e minus the sum of the element in elems.	  //
   exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
-  
+
   // Rewrite a sum in a simple form: sum m_i * expr_i
   std::map< exprt, int> map_of_sum(const exprt &f);
   exprt sum_of_map(std::map<exprt,int> &m,bool negated=false);
