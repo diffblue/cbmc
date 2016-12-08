@@ -7,7 +7,7 @@ Author: Daniel Poetzl
 \*******************************************************************/
 
 #include <cassert>
-#include <iostream>
+#include <cctype>
 
 #include "string_utils.h"
 
