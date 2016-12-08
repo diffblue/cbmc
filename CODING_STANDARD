@@ -5,8 +5,12 @@ Whitespaces:
 - No lines wider than 80 chars.
 - If a method is bigger than 50 lines, break it into parts.
 - Put matching { } into the same column.
-- No spaces around operators, except &&, ||, and <<
-- Spaces after , and ; inside 'for'
+- No spaces around operators (=, +, ==, ...)
+  Exceptions: Spaces around &&, || and <<
+- Space after comma (parameter lists, argument lists, ...)
+- Space after colon inside 'for'
+- No whitespaces at end of line
+- No whitespaces in blank lines
 - Put argument lists on next line (and ident 2 spaces) if too long
 - Put parameters on separate lines (and ident 2 spaces) if too long
 - No whitespaces around colon for inheritance, 
@@ -16,8 +20,6 @@ Whitespaces:
 - if(...), else, for(...), do, and while(...) are always in a separate line
 - Break expressions in if, for, while if necessary and align them 
   with the first character following the opening parenthesis
-- No whitespaces at end of line
-- Avoid whitespaces in blank lines
 - Use {} instead of ; for the empty statement
 - Single line blocks without { } are allowed, 
   but put braces around multi-line blocks
