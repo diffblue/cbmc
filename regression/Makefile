@@ -5,6 +5,7 @@ DIRS = ansi-c \
        cbmc-java-inheritance \
        cpp \
        goto-analyzer \
+       goto-cc-cbmc \
        goto-diff \
        goto-gcc \
        goto-instrument \
