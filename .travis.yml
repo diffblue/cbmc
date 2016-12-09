@@ -48,4 +48,4 @@ script:
 matrix:
   include:
     - env: NAME="CPP-LINT"
-      script: cd .. && python scripts/cpplint.py `git diff --name-only master HEAD`
+      script: cd .. && DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
