@@ -131,6 +131,9 @@ public:
     compute_edges(goto_functions, goto_program);
   }
 
+  I get_first_node(P &program) const { return program.instructions.begin(); }
+  I get_last_node(P &program) const { return --program.instructions.end(); }
+  bool nodes_empty(P &program) const { return program.instructions.empty(); }
 };
 
 /*******************************************************************\
