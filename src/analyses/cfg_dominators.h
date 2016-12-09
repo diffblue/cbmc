@@ -126,13 +126,13 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
   std::list<T> worklist;
 
-  if(program.instructions.empty())
+  if(cfg.nodes_empty(program))
     return;
 
   if(post_dom)
-    entry_node = --program.instructions.end();
+    entry_node=cfg.get_last_node(program);
   else
-    entry_node = program.instructions.begin();
+    entry_node=cfg.get_first_node(program);
   typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
@@ -228,17 +228,18 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
       it=cfg.entry_map.begin();
       it!=cfg.entry_map.end(); ++it)
   {
-    unsigned n=it->first->location_number;
+    T n=it->first;
 
     if(post_dom)
       out << n << " post-dominated by ";
     else
       out << n << " dominated by ";
-    for(typename target_sett::const_iterator d_it=it->second.dominators.begin();
-        d_it!=it->second.dominators.end();)
+    const auto& doms=cfg[it->second].dominators;
+    for(typename target_sett::const_iterator d_it=doms.begin();
+        d_it!=doms.end();)
     {
-      out << (*d_it)->location_number;
-      if (++d_it!=it->second.dominators.end())
+      out << *d_it;
+      if(++d_it!=doms.end())
         out << ", ";
     }
     out << "\n";
