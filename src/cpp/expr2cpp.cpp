@@ -13,8 +13,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol.h>
 #include <util/lispirep.h>
 #include <util/lispexpr.h>
+#include <util/namespace.h>
 
 #include <ansi-c/c_misc.h>
+#include <ansi-c/c_qualifiers.h>
 #include <ansi-c/expr2c_class.h>
 
 #include "expr2cpp.h"

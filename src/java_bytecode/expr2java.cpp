@@ -8,11 +8,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
+#include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/arith_tools.h>
 
+#include <ansi-c/c_qualifiers.h>
 #include <ansi-c/expr2c_class.h>
 
 #include "java_types.h"

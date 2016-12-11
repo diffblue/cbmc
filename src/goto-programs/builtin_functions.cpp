@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
+#include <util/rational.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
 #include <util/rational_tools.h>

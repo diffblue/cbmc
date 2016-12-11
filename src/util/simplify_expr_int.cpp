@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "base_type.h"
+#include "rational.h"
 #include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"

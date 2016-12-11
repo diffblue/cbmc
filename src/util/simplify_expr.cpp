@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
+#include "rational.h"
 #include "simplify_expr_class.h"
 #include "simplify_expr.h"
 #include "mp_arith.h"

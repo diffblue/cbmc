@@ -13,12 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 #include <unordered_set>
 
-#include <util/expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/namespace.h>
 
-#include "c_qualifiers.h"
+class c_qualifierst;
+class namespacet;
 
 class expr2ct
 {

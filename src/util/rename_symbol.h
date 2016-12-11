@@ -14,7 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 // false: renamed something
 //
 
-#include "expr.h"
+#include <unordered_map>
+
+#include "irep.h"
+
+class exprt;
+class typet;
 
 class rename_symbolt
 {
