@@ -1,12 +1,14 @@
 #!/bin/bash
 
-SRC=../../../src
+src=../../../src
+goto_cc=$src/goto-cc/goto-cc
+goto_instrument=$src/goto-instrument/goto-instrument
 
-GC=$SRC/goto-cc/goto-cc
-GI=$SRC/goto-instrument/goto-instrument
+name=${@:$#}
+name=${name%.c}
 
-OPTS=$1
-NAME=${2%.c}
+args=${@:1:$#-1}
 
-$GC $NAME.c -o $NAME.gb
-$GI $OPTS $NAME.gb
+$goto_cc -o $name.gb $name.c
+$goto_instrument $args $name.gb
+
