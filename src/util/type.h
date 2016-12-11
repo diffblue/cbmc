@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_TYPE_H
 #define CPROVER_UTIL_TYPE_H
 
-#include <list>
-
 #include <util/source_location.h>
 
 #define SUBTYPE_IN_GETSUB
@@ -147,16 +145,6 @@ public:
   void copy_to_subtypes(const typet &type);
   #endif
 };
-
-typedef std::list<typet> type_listt;
-
-#define forall_type_list(it, type) \
-  for(type_listt::const_iterator it=(type).begin(); \
-      it!=(type).end(); ++it)
-
-#define Forall_type_list(it, type) \
-  for(type_listt::iterator it=(type).begin(); \
-      it!=(type).end(); ++it)
 
 #define forall_subtypes(it, type) \
   if((type).has_subtypes()) \
