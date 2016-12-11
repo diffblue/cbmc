@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_INTERVAL_TEMPLATE_H
 
 #include <algorithm>
-#include <ostream>
+#include <iosfwd>
 
-#include "threeval.h"
+#include <util/threeval.h>
 
 template<class T> class interval_template
 {

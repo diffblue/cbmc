@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ieee_float.h>
 #include <util/mp_arith.h>
-#include <util/interval_template.h>
 
 #include "ai.h"
+#include "interval_template.h"
 
 typedef interval_template<mp_integer> integer_intervalt;
 typedef interval_template<ieee_floatt> ieee_float_intervalt;
