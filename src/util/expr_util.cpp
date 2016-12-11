@@ -197,67 +197,6 @@ exprt gen_one(const typet &type)
 
 /*******************************************************************\
 
-Function: gen_not
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op);
-
-exprt gen_not(const exprt &op)
-{
-  return gen_unary(ID_not, bool_typet(), op);
-}
-
-/*******************************************************************\
-
-Function: gen_unary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt gen_unary(const irep_idt &id, const typet &type, const exprt &op)
-{
-  exprt result(id, type);
-  result.copy_to_operands(op);
-  return result;
-}
-
-/*******************************************************************\
-
-Function: gen_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt gen_binary(
-  const irep_idt &id,
-  const typet &type,
-  const exprt &op1,
-  const exprt &op2)
-{
-  exprt result(id, type);
-  result.copy_to_operands(op1, op2);
-  return result;
-}
-
-/*******************************************************************\
-
 Function: make_next_state
 
   Inputs:
