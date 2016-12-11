@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/expr_util.h>
-#include <util/c_misc.h>
 #include <util/base_type.h>
 #include <util/arith_tools.h>
 #include <util/rename.h>

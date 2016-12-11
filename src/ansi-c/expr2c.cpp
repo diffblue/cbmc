@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/arith_tools.h>
-#include <util/c_misc.h>
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
@@ -35,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
 
+#include "c_misc.h"
 #include "expr2c.h"
 #include "c_types.h"
 #include "expr2c_class.h"

@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/c_misc.h>
 #include <util/lispirep.h>
 #include <util/lispexpr.h>
 
+#include <ansi-c/c_misc.h>
 #include <ansi-c/expr2c_class.h>
 
 #include "expr2cpp.h"
