@@ -12,7 +12,6 @@ Date: May 2016
 #include <iterator>
 
 #include <util/prefix.h>
-#include <util/i2string.h>
 #include <util/expr_util.h>
 
 #include "cover.h"
@@ -1120,7 +1119,7 @@ void instrument_cover_goals(
         unsigned block_nr=basic_blocks[i_it];
         if(blocks_done.insert(block_nr).second)
         {
-          std::string b=i2string(block_nr);
+          std::string b=std::to_string(block_nr);
           std::string id=id2string(i_it->function)+"#"+b;
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
@@ -1165,7 +1164,7 @@ void instrument_cover_goals(
 
       if(i_it->is_goto() && !i_it->guard.is_true())
       {
-        std::string b=i2string(basic_blocks[i_it]);
+        std::string b=std::to_string(basic_blocks[i_it]);
         std::string true_comment=
           "function "+id2string(i_it->function)+" block "+b+" branch true";
         std::string false_comment=

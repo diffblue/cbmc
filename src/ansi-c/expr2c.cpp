@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
-#include <util/i2string.h>
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/prefix.h>
@@ -290,11 +289,11 @@ std::string expr2ct::convert_rec(
         return q+"long double"+d;
     }
     const std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
-    return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]"+d;
+    return q+"__CPROVER_fixedbv["+std::to_string(width)+"]["+std::to_string(fraction_bits)+"]"+d;
   }
   else if(src.id()==ID_c_bit_field)
   {
-    std::string width=i2string(to_c_bit_field_type(src).get_width());
+    std::string width=std::to_string(to_c_bit_field_type(src).get_width());
     return q+convert(src.subtype())+d+" : "+width;
   }
   else if(src.id()==ID_signedbv ||

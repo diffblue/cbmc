@@ -13,7 +13,6 @@ Date: November 2011
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
-#include <util/i2string.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -80,7 +79,7 @@ void stack_depth(
   assert_ins->source_location=first->source_location;
   assert_ins->function=first->function;
 
-  assert_ins->source_location.set_comment("Stack depth exceeds "+i2string(i_depth));
+  assert_ins->source_location.set_comment("Stack depth exceeds "+std::to_string(i_depth));
   assert_ins->source_location.set_property_class("stack-depth");
 
   goto_programt::targett plus_ins=goto_program.insert_before(first);

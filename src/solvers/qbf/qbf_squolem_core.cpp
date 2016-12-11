@@ -8,7 +8,6 @@ Author: CM Wintersteiger
 
 #include <algorithm>
 
-#include <util/i2string.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
@@ -166,8 +165,8 @@ propt::resultt qbf_squolem_coret::prop_solve()
   {
     std::string msg=
       "Squolem: "+
-      i2string(no_variables())+" variables, "+
-      i2string(no_clauses())+" clauses";
+      std::to_string(no_variables())+" variables, "+
+      std::to_string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

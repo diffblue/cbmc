@@ -10,7 +10,6 @@ Author: Peter Schrammel
 
 #include <util/xml.h>
 #include <util/json.h>
-#include <util/i2string.h>
 #include <util/xml_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>

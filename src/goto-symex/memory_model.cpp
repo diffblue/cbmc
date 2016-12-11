@@ -7,7 +7,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 \*******************************************************************/
 
 #include <util/std_expr.h>
-#include <util/i2string.h>
 
 #include "memory_model.h"
 
@@ -61,7 +60,7 @@ symbol_exprt memory_model_baset::nondet_bool_symbol(
   const std::string &prefix)
 {
   return symbol_exprt(
-    "memory_model::choice_"+prefix+i2string(var_cnt++),
+    "memory_model::choice_"+prefix+std::to_string(var_cnt++),
     bool_typet());
 }
 

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string2int.h"
 #include "irep.h"
-#include "i2string.h"
 #include "string_hash.h"
 #include "irep_hash.h"
 
@@ -426,7 +425,7 @@ Function: irept::set
 
 void irept::set(const irep_namet &name, const long long value)
 {
-  add(name).id(i2string(value));
+  add(name).id(std::to_string(value));
 }
 
 /*******************************************************************\
@@ -969,7 +968,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     result+="\n";
     indent_str(result, indent);
 
-    result+=i2string(count++);
+    result+=std::to_string(count++);
     result+=": ";
 
     result+=it->pretty(indent+2, max_indent);

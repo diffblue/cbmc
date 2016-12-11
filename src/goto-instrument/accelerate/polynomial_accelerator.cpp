@@ -18,7 +18,6 @@
 #include <util/options.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/i2string.h>
 #include <util/find_symbols.h>
 #include <util/rename.h>
 #include <util/simplify_expr.h>

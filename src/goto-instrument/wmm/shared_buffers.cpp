@@ -1,4 +1,3 @@
-#include <util/i2string.h>
 
 #include "shared_buffers.h"
 #include "fence.h"
@@ -19,8 +18,8 @@ Function: shared_buffert::unique
 
 std::string shared_bufferst::unique (void)
 {
-  message.debug()<<"$fresh#"+i2string(uniq)<<messaget::eom;
-  return "$fresh#"+i2string(uniq++);
+  message.debug()<<"$fresh#"+std::to_string(uniq)<<messaget::eom;
+  return "$fresh#"+std::to_string(uniq++);
 }
 
 /*******************************************************************\
@@ -70,10 +69,10 @@ const shared_bufferst::varst &shared_bufferst::operator()(const irep_idt &object
   {
     vars.r_buff0_thds.push_back(
       shared_bufferst::add(
-        object, symbol.base_name, "$r_buff0_thd"+i2string(cnt), bool_typet()));
+        object, symbol.base_name, "$r_buff0_thd"+std::to_string(cnt), bool_typet()));
     vars.r_buff1_thds.push_back(
       shared_bufferst::add(
-        object, symbol.base_name, "$r_buff1_thd"+i2string(cnt), bool_typet()));
+        object, symbol.base_name, "$r_buff1_thd"+std::to_string(cnt), bool_typet()));
   }
 
   return vars;

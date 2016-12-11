@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/config.h>
-#include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
@@ -59,7 +58,7 @@ std::string dplib_convt::dplib_pointer_type()
 {
   assert(config.ansi_c.pointer_width!=0);
   return "[# object: INT, offset: BITVECTOR("+
-         i2string(config.ansi_c.pointer_width)+") #]";
+         std::to_string(config.ansi_c.pointer_width)+") #]";
 }
 
 /*******************************************************************\
@@ -76,7 +75,7 @@ Function: dplib_convt::array_index_type
 
 std::string dplib_convt::array_index_type()
 {
-  return std::string("SIGNED [")+i2string(32)+"]";
+  return std::string("SIGNED [")+std::to_string(32)+"]";
 }
 
 /*******************************************************************\

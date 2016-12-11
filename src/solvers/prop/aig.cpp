@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <ostream>
 
-#include <util/i2string.h>
 
 #include "aig.h"
 
@@ -27,7 +26,7 @@ Function: aigt::label
 
 std::string aigt::label(nodest::size_type v) const
 {
-  return "var("+i2string(v)+")";
+  return "var("+std::to_string(v)+")";
 }
 
 /*******************************************************************\
@@ -44,7 +43,7 @@ Function: aigt::dot_label
 
 std::string aigt::dot_label(nodest::size_type v) const
 {
-  return "var("+i2string(v)+")";
+  return "var("+std::to_string(v)+")";
 }
 
 /*******************************************************************\

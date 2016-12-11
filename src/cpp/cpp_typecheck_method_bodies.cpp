@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 
 #include "cpp_typecheck.h"
 

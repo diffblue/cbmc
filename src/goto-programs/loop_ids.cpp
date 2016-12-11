@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_expr.h>
 #include <util/json.h>
 #include <util/json_expr.h>
-#include <util/i2string.h>
 
 #include "loop_ids.h"
 
@@ -81,7 +80,7 @@ void show_loop_ids(
         if(it->is_backwards_goto())
         {
           unsigned loop_id=it->loop_number;
-          std::string id=id2string(it->function)+"."+i2string(loop_id);
+          std::string id=id2string(it->function)+"."+std::to_string(loop_id);
 
           xmlt xml_loop("loop");
           xml_loop.set_attribute("name", id);
@@ -111,7 +110,7 @@ void show_loop_ids_json(
     if(it->is_backwards_goto())
     {
       unsigned loop_id=it->loop_number;
-      std::string id=id2string(it->function)+"."+i2string(loop_id);
+      std::string id=id2string(it->function)+"."+std::to_string(loop_id);
 
       json_objectt &loop=loops.push_back().make_object();
       loop["name"]=json_stringt(id);

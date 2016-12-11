@@ -5,7 +5,6 @@
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
-#include <util/i2string.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
 
@@ -114,7 +113,7 @@ public:
   irep_idt get_anon_id()
   {
     ++anon_count;
-    return "#anon"+i2string(anon_count);
+    return "#anon"+std::to_string(anon_count);
   }
 
   std::string full_name() const
@@ -536,7 +535,7 @@ bool Parser::SyntaxError()
   {
     source_locationt source_location;
     source_location.set_file(t[0].filename);
-    source_location.set_line(i2string(t[0].line_no));
+    source_location.set_line(std::to_string(t[0].line_no));
 
     std::string message="parse error before `";
 

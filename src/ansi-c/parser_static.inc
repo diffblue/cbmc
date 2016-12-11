@@ -2,7 +2,6 @@
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
-#include <util/i2string.h>
 #include <util/string2int.h>
 
 #include "c_types.h"

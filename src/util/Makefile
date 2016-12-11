@@ -1,5 +1,5 @@
 SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
-      expr.cpp expr_util.cpp i2string.cpp irep.cpp language.cpp \
+      expr.cpp expr_util.cpp irep.cpp language.cpp \
       lispexpr.cpp lispirep.cpp source_location.cpp message.cpp language_file.cpp \
       mp_arith.cpp namespace.cpp parse_options.cpp rename.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \

@@ -10,7 +10,6 @@ Date: 2012
 
 #include "event_graph.h"
 
-#include <util/i2string.h>
 #include <util/message.h>
 
 #include <fstream>
@@ -1121,7 +1120,7 @@ std::string event_grapht::critical_cyclet::print() const
 {
   std::string cycle = "Cycle: ";
   for(const_iterator it=begin(); it!=end(); ++it)
-    cycle += i2string(egraph[*it].id) + "; ";
+    cycle += std::to_string(egraph[*it].id) + "; ";
   return cycle + " End of cycle.";
 }
 
@@ -1230,7 +1229,7 @@ std::string event_grapht::critical_cyclet::print_output() const
     const abstract_eventt& it_evt=egraph[*it];
     cycle += id2string(it_evt.variable) + " (";
     cycle += it_evt.source_location.as_string();
-    cycle += " thread " + i2string(it_evt.thread) + ") ";
+    cycle += " thread " + std::to_string(it_evt.thread) + ") ";
   }
   return cycle;
 }
@@ -1261,15 +1260,15 @@ std::string event_grapht::critical_cyclet::print_detail(
       + " (" + it_evt.source_location.as_string()  + ")";
     if(map_var2id.find(var_name)!=map_var2id.end())
     {
-      cycle += "t" + i2string(it_evt.thread) + " (";
+      cycle += "t" + std::to_string(it_evt.thread) + " (";
       cycle += map_var2id[var_name] + ") ";
     }
     else
     {
-      const std::string new_id = "var@" + i2string(map_var2id.size());
+      const std::string new_id = "var@" + std::to_string(map_var2id.size());
       map_var2id[var_name] = new_id;
       map_id2var[new_id] = var_name;
-      cycle += "t" + i2string(it_evt.thread) + " (";
+      cycle += "t" + std::to_string(it_evt.thread) + " (";
       cycle += new_id + ") ";
     }
   }

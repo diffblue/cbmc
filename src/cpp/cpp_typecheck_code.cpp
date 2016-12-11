@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/source_location.h>
 

@@ -8,7 +8,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/threeval.h>
 
 #include "satcheck_picosat.h"
@@ -118,8 +117,8 @@ propt::resultt satcheck_picosatt::prop_solve()
 
   {
     std::string msg=
-      i2string(_no_variables-1)+" variables, "+
-      i2string(picosat_added_original_clauses(picosat))+" clauses";
+      std::to_string(_no_variables-1)+" variables, "+
+      std::to_string(picosat_added_original_clauses(picosat))+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

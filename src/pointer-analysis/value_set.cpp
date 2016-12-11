@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/arith_tools.h>
@@ -1619,7 +1618,7 @@ void value_sett::do_function_call(
 
   for(unsigned i=0; i<arguments.size(); i++)
   {
-    const std::string identifier="value_set::dummy_arg_"+i2string(i);
+    const std::string identifier="value_set::dummy_arg_"+std::to_string(i);
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
     assign(dummy_lhs, arguments[i], ns, false, false);
   }
@@ -1637,7 +1636,7 @@ void value_sett::do_function_call(
     if(identifier=="") continue;
 
     const exprt v_expr=
-      symbol_exprt("value_set::dummy_arg_"+i2string(i), it->type());
+      symbol_exprt("value_set::dummy_arg_"+std::to_string(i), it->type());
 
     exprt actual_lhs=symbol_exprt(identifier, it->type());
     assign(actual_lhs, v_expr, ns, true, true);

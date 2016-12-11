@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>

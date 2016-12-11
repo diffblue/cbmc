@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/string2int.h>
-#include <util/i2string.h>
 
 #include <ansi-c/expr2c.h>
 
@@ -286,7 +285,7 @@ void document_propertiest::get_code(
   for(std::list<linet>::iterator it=lines.begin();
       it!=lines.end(); it++)
   {
-    std::string line_no=i2string(it->line_number);
+    std::string line_no=std::to_string(it->line_number);
 
     std::string tmp;
 

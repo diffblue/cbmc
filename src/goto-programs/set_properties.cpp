@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <unordered_set>
 
-#include <util/i2string.h>
 
 #include "set_properties.h"
 
@@ -110,7 +109,7 @@ void label_properties(
 
     count++;
 
-    std::string property_id=prefix+i2string(count);
+    std::string property_id=prefix+std::to_string(count);
 
     it->source_location.set_property_id(property_id);
   }

@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include "i2string.h"
 #include "language.h"
 #include "language_file.h"
 
@@ -172,7 +171,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 
       while(modulemap.find(module_name)!=modulemap.end())
       {
-        module_name=*mo_it+"#"+i2string(collision_counter);
+        module_name=*mo_it+"#"+std::to_string(collision_counter);
         collision_counter++;
       }
 

@@ -7,7 +7,6 @@ Author: Daniel Kroening
 \*******************************************************************/
 
 #include <util/config.h>
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
@@ -186,7 +185,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
-      i2string(it->pc->location_number)+"."+i2string(it->step_nr);
+      std::to_string(it->pc->location_number)+"."+std::to_string(it->step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
     graphml[node].thread_nr=it->thread_nr;

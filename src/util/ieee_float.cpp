@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_types.h"
 #include "std_expr.h"
 #include "ieee_float.h"
-#include "i2string.h"
 
 /*******************************************************************\
 

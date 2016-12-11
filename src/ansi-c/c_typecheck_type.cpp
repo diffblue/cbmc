@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
-#include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 
@@ -568,7 +567,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       do
       {
-        suffix="$array_size"+i2string(count);
+        suffix="$array_size"+std::to_string(count);
         temp_identifier=id2string(base_symbol.name)+suffix;
         count++;
       }
@@ -911,7 +910,7 @@ void c_typecheck_baset::typecheck_compound_body(
   {
     if(it->get_name()!=irep_idt()) continue;
 
-    it->set_name("$anon"+i2string(anon_member_counter++));
+    it->set_name("$anon"+std::to_string(anon_member_counter++));
     it->set_anonymous(true);
   }
 

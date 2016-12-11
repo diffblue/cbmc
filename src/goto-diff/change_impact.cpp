@@ -120,7 +120,7 @@ void full_slicert::operator()(
 #ifdef DEBUG_FULL_SLICERT
         else
         {
-          std::string c="ins:"+i2string(i_it->location_number);
+          std::string c="ins:"+std::to_string(i_it->location_number);
           c+=" req by:";
           for(std::set<unsigned>::const_iterator
               req_it=cfg[e].required_by.begin();
@@ -128,7 +128,7 @@ void full_slicert::operator()(
               ++req_it)
           {
             if(req_it!=cfg[e].required_by.begin()) c+=",";
-            c+=i2string(*req_it);
+            c+=std::to_string(*req_it);
           }
           i_it->source_location.set_column(c);  // for show-goto-functions
           i_it->source_location.set_comment(c); // for dump-c

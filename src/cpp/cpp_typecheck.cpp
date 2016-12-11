@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/expr_util.h>
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 #include <util/source_location.h>
 #include <util/symbol.h>
 

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include "rename.h"
-#include "i2string.h"
 #include "symbol.h"
 #include "expr.h"
 #include "namespace.h"
@@ -51,7 +50,7 @@ void get_new_name(irep_idt &new_name, const namespacet &ns)
 
   std::string prefix=id2string(new_name)+"_";
 
-  new_name=prefix+i2string(ns.get_max(prefix)+1);
+  new_name=prefix+std::to_string(ns.get_max(prefix)+1);
 }
 
 /*******************************************************************\

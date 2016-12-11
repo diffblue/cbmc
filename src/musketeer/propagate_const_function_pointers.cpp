@@ -2,7 +2,6 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/irep.h>
-#include <util/i2string.h>
 #include <util/namespace.h>
 #include <util/message.h>
 
@@ -175,12 +174,12 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
     {
       /* unique suffix */
       if(map_unique.find(function_id)!=map_unique.end()) {
-        suffix+=i2string(map_unique[function_id]);
+        suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
       }
       else {
         map_unique[function_id]=0;
-        suffix+=i2string(map_unique[function_id]);
+        suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
       }
 

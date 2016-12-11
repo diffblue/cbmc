@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/decision_procedure.h>
-#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
 
@@ -328,7 +327,7 @@ exprt path_symex_statet::instantiate_rec(
 
     if(statement==ID_nondet)
     {
-      irep_idt id="symex::nondet"+i2string(var_map.nondet_count);
+      irep_idt id="symex::nondet"+std::to_string(var_map.nondet_count);
       var_map.nondet_count++;
       return symbol_exprt(id, src.type());
     }

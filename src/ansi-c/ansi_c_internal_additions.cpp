@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/config.h>
 
 #include "ansi_c_internal_additions.h"
@@ -94,7 +93,7 @@ static std::string architecture_string(int value, const char *s)
 {
   return std::string("const int __CPROVER_architecture_")+
          std::string(s)+
-         "="+i2string(value)+";\n";
+         "="+std::to_string(value)+";\n";
 }
 
 /*******************************************************************\
@@ -193,7 +192,7 @@ void ansi_c_internal_additions(std::string &code)
     "double __CPROVER_inf(void);\n"
     "float __CPROVER_inff(void);\n"
     "long double __CPROVER_infl(void);\n"
-    "int __CPROVER_thread_local __CPROVER_rounding_mode="+i2string(config.ansi_c.rounding_mode)+";\n"
+    "int __CPROVER_thread_local __CPROVER_rounding_mode="+std::to_string(config.ansi_c.rounding_mode)+";\n"
 
     // absolute value
     "int __CPROVER_abs(int x);\n"

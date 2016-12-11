@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 #include <util/type_eq.h>
 
 #include <ansi-c/c_types.h>
@@ -1250,7 +1249,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   // create an uninitialized dummy symbol
   // because of a lack of contextual information we can't build a nice name
   // here, but moving that into locals should suffice for proper operation
-  irep_idt identifier="$tmp::nondet_str#str$"+i2string(++temporary_counter);
+  irep_idt identifier="$tmp::nondet_str#str$"+std::to_string(++temporary_counter);
   // ensure decl and initialization
   locals[identifier]=identifier;
 

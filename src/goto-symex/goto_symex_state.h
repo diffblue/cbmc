@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/guard.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/ssa_expr.h>
 
 #include <pointer-analysis/value_set.h>

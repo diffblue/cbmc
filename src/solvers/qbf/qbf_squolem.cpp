@@ -6,7 +6,6 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 
 #include "qbf_squolem.h"
 
@@ -94,8 +93,8 @@ propt::resultt qbf_squolemt::prop_solve()
   {
     std::string msg=
       "Squolem: "+
-      i2string(no_variables())+" variables, "+
-      i2string(no_clauses())+" clauses";
+      std::to_string(no_variables())+" variables, "+
+      std::to_string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

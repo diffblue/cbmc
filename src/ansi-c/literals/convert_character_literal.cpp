@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 #include <util/std_expr.h>
 
 #include "../c_types.h"
@@ -71,7 +70,7 @@ exprt convert_character_literal(
       result=from_integer(x, type);
     }
     else
-      throw "wide literals with "+i2string(value.size())+
+      throw "wide literals with "+std::to_string(value.size())+
             " characters are not supported";
   }
   else
@@ -104,7 +103,7 @@ exprt convert_character_literal(
       result=from_integer(x, signed_int_type());
     }
     else
-      throw "literals with "+i2string(value.size())+
+      throw "literals with "+std::to_string(value.size())+
             " characters are not supported";
   }
 

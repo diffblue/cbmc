@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/decision_procedure.h>
-#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
 
