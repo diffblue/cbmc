@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
-#include "namespace_utils.h"
 #include "config.h"
 #include "bv_arithmetic.h"
 #include "std_expr.h"
