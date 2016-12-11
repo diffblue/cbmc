@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <vector>
 
-#include <util/hash_cont.h>
 #include <util/type.h>
 #include <util/namespace.h>
 
@@ -55,7 +54,7 @@ public:
     std::string get_value(const propt &) const;
   };
 
-  typedef hash_map_cont<irep_idt, map_entryt, irep_id_hash> mappingt;
+  typedef std::unordered_map<irep_idt, map_entryt, irep_id_hash> mappingt;
   mappingt mapping;
 
   void show() const;

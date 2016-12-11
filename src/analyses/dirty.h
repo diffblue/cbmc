@@ -11,13 +11,15 @@ Date: March 2013
 #ifndef CPROVER_ANALYSES_DIRTY_H
 #define CPROVER_ANALYSES_DIRTY_H
 
+#include <unordered_set>
+
 #include <util/std_expr.h>
 #include <goto-programs/goto_functions.h>
 
 class dirtyt
 {
 public:
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef goto_functionst::goto_functiont goto_functiont;
 
   explicit dirtyt(const goto_functiont &goto_function)

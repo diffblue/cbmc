@@ -102,7 +102,7 @@ void dump_ct::operator()(std::ostream &os)
   forall_symbols(it, symbols_transparent.symbols)
     copied_symbol_table.add(it->second);
 
-  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
+  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
   // add tags to anonymous union/struct/enum,

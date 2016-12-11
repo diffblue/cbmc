@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/parser.h>
 #include <util/expr.h>
-#include <util/hash_cont.h>
 #include <util/string_hash.h>
 #include <util/i2string.h>
 #include <util/mp_arith.h>

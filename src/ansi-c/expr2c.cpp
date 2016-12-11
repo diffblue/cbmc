@@ -1894,7 +1894,7 @@ std::string expr2ct::convert_symbol(
     dest=src.op0().get_string(ID_identifier);
   else
   {
-    hash_map_cont<irep_idt, irep_idt, irep_id_hash>::const_iterator
+    std::unordered_map<irep_idt, irep_idt, irep_id_hash>::const_iterator
       entry=shorthands.find(id);
     // we might be called from conversion of a type
     if(entry==shorthands.end())

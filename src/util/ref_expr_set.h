@@ -9,18 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_REF_EXPR_SET_H
 #define CPROVER_UTIL_REF_EXPR_SET_H
 
-#include <set>
+#include <unordered_set>
 
-#include "hash_cont.h"
 #include "expr.h"
 #include "reference_counting.h"
 
-extern const hash_set_cont<exprt, irep_hash> empty_expr_set;
+extern const std::unordered_set<exprt, irep_hash> empty_expr_set;
 
 struct ref_expr_set_dt
 {
   ref_expr_set_dt() {}
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
+  typedef std::unordered_set<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
 
   const static ref_expr_set_dt blank;

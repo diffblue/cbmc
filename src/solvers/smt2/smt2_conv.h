@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <set>
 
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
 
@@ -165,7 +164,7 @@ protected:
 
   // letification
   typedef std::pair<unsigned, symbol_exprt> let_count_id;
-  typedef hash_map_cont<exprt, let_count_id, irep_hash> seen_expressionst;
+  typedef std::unordered_map<exprt, let_count_id, irep_hash> seen_expressionst;
   unsigned let_id_count;
   const static unsigned LET_COUNT = 2;
 
@@ -265,7 +264,7 @@ protected:
     }
   };
 
-  typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
+  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
   identifier_mapt identifier_map;

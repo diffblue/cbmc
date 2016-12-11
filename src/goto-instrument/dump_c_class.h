@@ -46,16 +46,16 @@ protected:
   const namespacet ns;
   languaget *language;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> convertedt;
+  typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
 
-  typedef hash_map_cont<irep_idt, std::string, irep_id_hash>
+  typedef std::unordered_map<irep_idt, std::string, irep_id_hash>
     system_library_mapt;
   system_library_mapt system_library_map;
 
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash>
+  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
     declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
@@ -102,7 +102,7 @@ protected:
     const typet &type,
     std::ostream &os);
 
-  typedef hash_map_cont<irep_idt, code_declt, irep_id_hash>
+  typedef std::unordered_map<irep_idt, code_declt, irep_id_hash>
           local_static_declst;
 
   void convert_global_variable(

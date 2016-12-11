@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "type2name.h"
 
-typedef hash_map_cont<irep_idt, std::pair<size_t, bool>, irep_id_hash>
+typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
   symbol_numbert;
 
 static std::string type2name(

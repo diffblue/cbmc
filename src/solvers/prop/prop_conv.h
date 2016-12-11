@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <map>
 
-#include <util/hash_cont.h>
 #include <util/decision_procedure.h>
 #include <util/expr.h>
 #include <util/std_expr.h>
@@ -106,7 +105,7 @@ public:
   virtual void clear_cache() { cache.clear();}
 
   typedef std::map<irep_idt, literalt> symbolst;
-  typedef hash_map_cont<exprt, literalt, irep_hash> cachet;
+  typedef std::unordered_map<exprt, literalt, irep_hash> cachet;
 
   const cachet &get_cache() const { return cache; }
   const symbolst &get_symbols() const { return symbols; }

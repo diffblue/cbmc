@@ -240,7 +240,7 @@ void linkingt::detailed_conflict_report_rec(
         }
         else if(!base_type_eq(subtype1, subtype2, ns))
         {
-          typedef hash_set_cont<typet, irep_hash> type_sett;
+          typedef std::unordered_set<typet, irep_hash> type_sett;
           type_sett parent_types;
 
           exprt e=conflict_path_before;

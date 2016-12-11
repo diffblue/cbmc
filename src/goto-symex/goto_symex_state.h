@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
 #include <cassert>
+#include <unordered_set>
 
 #include <util/guard.h>
 #include <util/std_expr.h>
@@ -64,7 +65,7 @@ public:
       ++current_names[identifier].second;
     }
 
-    void get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
+    void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
       for(current_namest::const_iterator it=current_names.begin();
           it!=current_names.end();
@@ -173,7 +174,7 @@ protected:
   void get_l1_name(exprt &expr) const;
 
   // this maps L1 names to (L2) types
-  typedef hash_map_cont<irep_idt, typet, irep_id_hash> l1_typest;
+  typedef std::unordered_map<irep_idt, typet, irep_id_hash> l1_typest;
   l1_typest l1_types;
 
 public:
@@ -202,7 +203,7 @@ public:
     }
 
     // the below replicate levelt2 member functions
-    void level2_get_variables(hash_set_cont<ssa_exprt, irep_hash> &vars) const
+    void level2_get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
       for(level2t::current_namest::const_iterator
           it=level2_current_names.begin();
@@ -264,7 +265,7 @@ public:
       unsigned count;
       bool is_recursion;
     };
-    typedef hash_map_cont<irep_idt, loop_infot, irep_id_hash>
+    typedef std::unordered_map<irep_idt, loop_infot, irep_id_hash>
       loop_iterationst;
     loop_iterationst loop_iterations;
   };
@@ -302,9 +303,9 @@ public:
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef hash_map_cont<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef hash_map_cont<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
 

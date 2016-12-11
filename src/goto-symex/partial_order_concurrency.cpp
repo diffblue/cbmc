@@ -62,7 +62,7 @@ Function: partial_order_concurrencyt::add_init_writes
 void partial_order_concurrencyt::add_init_writes(
   symex_target_equationt &equation)
 {
-  hash_set_cont<irep_idt, irep_id_hash> init_done;
+  std::unordered_set<irep_idt, irep_id_hash> init_done;
   bool spawn_seen=false;
 
   symex_target_equationt::SSA_stepst init_steps;

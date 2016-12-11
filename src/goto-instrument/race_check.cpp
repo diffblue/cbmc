@@ -8,7 +8,6 @@ Date: February 2006
 
 \*******************************************************************/
 
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 #include <util/guard.h>
 #include <util/symbol_table.h>

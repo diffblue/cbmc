@@ -41,7 +41,7 @@ protected:
 
   unsigned temporary_counter;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   id_sett summarized;
 
   void code_contracts(goto_functionst::goto_functiont &goto_function);

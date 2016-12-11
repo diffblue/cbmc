@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_CBMC_SYMEX_BMC_H
 #define CPROVER_CBMC_SYMEX_BMC_H
 
-#include <util/hash_cont.h>
 #include <util/message.h>
 
 #include <goto-symex/goto_symex.h>
@@ -60,7 +59,7 @@ protected:
   unsigned max_unwind;
   bool max_unwind_is_set;
 
-  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> loop_limitst;
+  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> loop_limitst;
   loop_limitst loop_limits;
 
   typedef std::map<unsigned, loop_limitst> thread_loop_limitst;
@@ -85,7 +84,7 @@ protected:
 
   virtual void no_body(const irep_idt &identifier);
 
-  hash_set_cont<irep_idt, irep_id_hash> body_warnings;
+  std::unordered_set<irep_idt, irep_id_hash> body_warnings;
 };
 
 #endif // CPROVER_CBMC_SYMEX_BMC_H

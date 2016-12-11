@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/namespace.h>
-#include <util/hash_cont.h>
 
 class boolbv_widtht
 {
@@ -42,7 +41,7 @@ protected:
     std::vector<membert> members;
   };
 
-  typedef hash_map_cont<typet, entryt, irep_hash> cachet;
+  typedef std::unordered_map<typet, entryt, irep_hash> cachet;
 
   // the 'mutable' is allow const methods above
   mutable cachet cache;

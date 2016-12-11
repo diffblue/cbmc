@@ -47,10 +47,10 @@ public:
   friend class simplify_exprt;
 
   #if 1
-  typedef hash_map_cont<
+  typedef std::unordered_map<
     exprt, exprt, irep_full_hash, irep_full_eq> containert;
   #else
-  typedef hash_map_cont<
+  typedef std::unordered_map<
     exprt, exprt, irep_hash> containert;
   #endif
 

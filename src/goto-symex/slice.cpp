@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 
 #include "slice.h"

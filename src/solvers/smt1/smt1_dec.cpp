@@ -251,7 +251,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
     boolean_assignment.clear();
     boolean_assignment.resize(no_boolean_variables, false);
 
-    typedef hash_map_cont<std::string, valuet, string_hash> valuest;
+    typedef std::unordered_map<std::string, valuet, string_hash> valuest;
     valuest values;
 
     while(std::getline(in, line))
@@ -418,7 +418,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, valuet, string_hash> valuest;
+  typedef std::unordered_map<std::string, valuet, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))
@@ -499,7 +499,7 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  typedef std::unordered_map<std::string, std::string, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))
@@ -688,7 +688,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  typedef std::unordered_map<std::string, std::string, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))

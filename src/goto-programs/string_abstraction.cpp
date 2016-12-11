@@ -379,7 +379,7 @@ Function: string_abstractiont::declare_define_locals
 
 void string_abstractiont::declare_define_locals(goto_programt &dest)
 {
-  typedef hash_map_cont<irep_idt, goto_programt::targett, irep_id_hash>
+  typedef std::unordered_map<irep_idt, goto_programt::targett, irep_id_hash>
     available_declst;
   available_declst available_decls;
 

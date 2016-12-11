@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 #include "numbering.h"
-#include "hash_cont.h"
 
 class irept;
 
@@ -45,7 +44,7 @@ protected:
     }
   };
 
-  typedef hash_map_cont<const void *, unsigned, pointer_hash> ptr_hasht;
+  typedef std::unordered_map<const void *, unsigned, pointer_hash> ptr_hasht;
   ptr_hasht ptr_hash;
 
   // this is the second level: content

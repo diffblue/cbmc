@@ -15,7 +15,6 @@ Date: February 2006
 #include <vector>
 #include <set>
 
-#include <util/hash_cont.h>
 #include <util/guard.h>
 #include <util/std_code.h>
 #include <util/namespace.h>
@@ -51,7 +50,7 @@ public:
     }
   };
 
-  typedef hash_map_cont<irep_idt, entryt, irep_id_hash> entriest;
+  typedef std::unordered_map<irep_idt, entryt, irep_id_hash> entriest;
   entriest r_entries, w_entries;
 
   void swap(rw_set_baset &other)

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/hash_cont.h>
 #include <util/c_misc.h>
 #include <util/lispirep.h>
 #include <util/lispexpr.h>
@@ -51,7 +50,7 @@ protected:
     const c_qualifierst &qualifiers,
     const std::string &declarator);
 
-  typedef hash_set_cont<std::string, string_hash> id_sett;
+  typedef std::unordered_set<std::string, string_hash> id_sett;
 };
 
 /*******************************************************************\

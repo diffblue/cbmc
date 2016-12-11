@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_CVC_CVC_CONV_H
 #define CPROVER_SOLVERS_CVC_CVC_CONV_H
 
-#include <util/hash_cont.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/pointer_logic.h>
@@ -56,7 +55,7 @@ protected:
     }
   };
 
-  typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
+  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
   identifier_mapt identifier_map;

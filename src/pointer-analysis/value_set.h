@@ -115,7 +115,7 @@ public:
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
   #else
-  typedef hash_map_cont<idt, entryt, string_hash> valuest;
+  typedef std::unordered_map<idt, entryt, string_hash> valuest;
   #endif
 
   void get_value_set(

@@ -1128,7 +1128,7 @@ void dplib_convt::set_to(const exprt &expr, bool value)
 
       if(id.type.is_nil())
       {
-        hash_set_cont<irep_idt, irep_id_hash> s_set;
+        std::unordered_set<irep_idt, irep_id_hash> s_set;
 
         ::find_symbols(expr.op1(), s_set);
 

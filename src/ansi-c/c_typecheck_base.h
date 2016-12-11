@@ -60,7 +60,7 @@ protected:
   const irep_idt mode;
   irep_idt current_symbol_id;
 
-  typedef hash_map_cont<irep_idt, typet, irep_id_hash> id_type_mapt;
+  typedef std::unordered_map<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;
 
   // overload to use language specific syntax
@@ -253,7 +253,7 @@ protected:
            src.id()==ID_c_bit_field;
   }
 
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> asm_label_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> asm_label_mapt;
   asm_label_mapt asm_label_map;
 
   void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);

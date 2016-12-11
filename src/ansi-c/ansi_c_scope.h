@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_SCOPE_H
 #define CPROVER_ANSI_C_ANSI_C_SCOPE_H
 
-#include <util/hash_cont.h>
 #include <util/irep.h>
 
 typedef enum { ANSI_C_UNKNOWN, ANSI_C_SYMBOL, ANSI_C_TYPEDEF,
@@ -31,7 +30,7 @@ class ansi_c_scopet
 public:
   // This maps "scope names" (tag-X, label-X, X) to
   // ansi_c_identifiert.
-  typedef hash_map_cont<irep_idt, ansi_c_identifiert, irep_id_hash> name_mapt;
+  typedef std::unordered_map<irep_idt, ansi_c_identifiert, irep_id_hash> name_mapt;
   name_mapt name_map;
 
   std::string prefix;

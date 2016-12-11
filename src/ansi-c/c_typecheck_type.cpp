@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <unordered_set>
+
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
@@ -916,7 +918,7 @@ void c_typecheck_baset::typecheck_compound_body(
   // scan for duplicate members
 
   {
-    hash_set_cont<irep_idt, irep_id_hash> members;
+    std::unordered_set<irep_idt, irep_id_hash> members;
 
     for(struct_union_typet::componentst::iterator
         it=components.begin();
