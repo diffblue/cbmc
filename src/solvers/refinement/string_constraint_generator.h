@@ -24,7 +24,9 @@ public:
   size_t get_char_width();
   inline signedbv_typet get_index_type() {return refined_string_typet::index_type();};
 
-  std::vector<string_constraintt> axioms;
+  // Axioms are of three kinds: universally quantified string constraint,
+  // not contains string constraints and simple formulas.
+  std::vector<exprt> axioms;
 
   // Create a new string expression and add the necessary lemma
   // to ensure its equal to the given string expression.
@@ -41,6 +43,14 @@ public:
 
   // Symbols used in existential quantifications
   std::vector<symbol_exprt> index_symbols;
+
+  // Used to store information about witnesses for not_contains constraints
+  std::map<string_not_contains_constraintt,symbol_exprt> witness;
+
+  //
+  inline exprt witness_of
+  (const string_not_contains_constraintt & c, const exprt & univ_val) const
+  { return index_exprt(witness.at(c), univ_val); }
 
   symbol_exprt fresh_exist_index(const irep_idt &prefix);
   symbol_exprt fresh_univ_index(const irep_idt &prefix);

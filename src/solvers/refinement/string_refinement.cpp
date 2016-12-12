@@ -72,8 +72,7 @@ void string_refinementt::add_instantiations()
 
       for (size_t k = 0; k < universal_axioms.size(); ++k) {
 	assert(universal_axioms[k].is_univ_quant());
-	string_constraintt lemma = instantiate(universal_axioms[k], s, val);
-	assert(lemma.is_simple());
+	exprt lemma = instantiate(universal_axioms[k], s, val);
 	add_lemma(lemma);
       }
     }
@@ -169,24 +168,25 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   print_time("string_refinementt::dec_solve");
   for(unsigned i = 0; i < generator.axioms.size(); i++)
-    if(generator.axioms[i].is_simple())
-      add_lemma(generator.axioms[i]);
-    else if(generator.axioms[i].is_string_constant())
-      add_lemma(generator.axioms[i]); //,false);
-    else if(generator.axioms[i].is_univ_quant()) {
-      debug() << "universaly quantified : " << pretty_short(generator.axioms[i]) << eom;
-      universal_axioms.push_back(generator.axioms[i]);
+    if(generator.axioms[i].id() == ID_string_constraint)
+    {
+      debug() << "universaly quantified " << eom;
+      // << generator.axioms[i].pretty() << eom;
+      string_constraintt c= to_string_constraint(generator.axioms[i]);
+      universal_axioms.push_back(c);
     }
-    else {
-      assert(generator.axioms[i].is_not_contains());
-      generator.axioms[i].witness = string_exprt::fresh_symbol
+    else if(generator.axioms[i].id() == ID_string_not_contains_constraint)
+    {
+      string_not_contains_constraintt axiom=
+	to_string_not_contains_constraint(generator.axioms[i]);
+      generator.witness[axiom] = string_exprt::fresh_symbol
 	("not_contains_witness",
 	 array_typet(refined_string_typet::index_type(),
 		     infinity_exprt(refined_string_typet::index_type())));
-      not_contains_axioms.push_back(generator.axioms[i]);
+      not_contains_axioms.push_back(axiom);
     }
-
-  //string_axioms.clear(); should not be necessary
+    else
+      add_lemma(generator.axioms[i]);
 
   initial_index_set(universal_axioms);
   debug() << "string_refinementt::dec_solve: warning update_index_set has to be checked" << eom;
@@ -425,7 +425,7 @@ bool string_refinementt::check_axioms()
 
   debug() << "there are " << not_contains_axioms.size() << " not_contains axioms" << eom;
   for (size_t i = 0; i < not_contains_axioms.size(); ++i) {
-    exprt val = get(not_contains_axioms[i].witness_of(refined_string_typet::index_zero()));
+    exprt val = get(generator.witness_of(not_contains_axioms[i],refined_string_typet::index_zero()));
     violated.push_back(std::make_pair(i, val));
   }
 
@@ -652,7 +652,9 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
 	    {
 	      // otherwise we add k-1
 	      exprt e(i);
-	      replace_expr(qvar,minus_exprt(axiom.univ_bound_sup(),refined_string_typet::index_of_int(1)),e);
+	      replace_expr(qvar,
+			   minus_exprt(axiom.upper_bound(),
+				       refined_string_typet::index_of_int(1)),e);
 	      current_index_set[s].insert(e);
 	      index_set[s].insert(e);
 	    }
@@ -723,26 +725,26 @@ exprt find_index(const exprt & expr, const exprt & str) {
 
 
 
-string_constraintt string_refinementt::instantiate(const string_constraintt &axiom,
+exprt string_refinementt::instantiate(const string_constraintt &axiom,
 				     const exprt &str, const exprt &val)
 {
   assert(axiom.is_univ_quant());
   exprt idx = find_index(axiom.body(),str);
-  if(idx.is_nil()) return string_constraintt();
-  if(!find_qvar(idx,axiom.get_univ_var())) return string_constraintt();
+  if(idx.is_nil()) return true_exprt();
+  if(!find_qvar(idx,axiom.get_univ_var())) return true_exprt();
 
   exprt r = compute_subst(axiom.get_univ_var(), val, idx);
-  exprt instance(axiom);
+  implies_exprt instance(axiom.premise(), axiom.body());
   replace_expr(axiom.get_univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
   exprt bounds = and_exprt(axiom.univ_within_bounds(),binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val));
   replace_expr(axiom.get_univ_var(), r, bounds);
-  return string_constraintt(bounds,instance);
+  return implies_exprt(bounds,instance);
 }
 
 
-void string_refinementt::instantiate_not_contains(const string_constraintt & axiom, std::vector<exprt> & new_lemmas){
-  assert(axiom.is_not_contains());
+void string_refinementt::instantiate_not_contains(const string_not_contains_constraintt & axiom, std::vector<exprt> & new_lemmas)
+{
   exprt s0 = axiom.s0();
   exprt s1 = axiom.s1();
 
@@ -754,16 +756,23 @@ void string_refinementt::instantiate_not_contains(const string_constraintt & axi
     for(expr_sett::iterator it1 = index_set1.begin(); it1 != index_set1.end(); it1++)
       {
 	debug() << pretty_short(*it0) << " : " << pretty_short(*it1) << eom;
-	exprt val = minus_exprt(*it0,*it1);
-	exprt lemma = implies_exprt(and_exprt(axiom.premise(),equal_exprt(axiom.witness_of(val), *it1)), not_exprt(equal_exprt(to_string_expr(s0)[*it0],to_string_expr(s1)[*it1])));
+	exprt val = minus_exprt(*it0, *it1);
+	exprt witness = generator.witness_of(axiom,val);
+	and_exprt prem_and_is_witness(axiom.premise(),
+				      equal_exprt(witness, *it1));
+
+	not_exprt differ(equal_exprt(to_string_expr(s0)[*it0],
+				     to_string_expr(s1)[*it1]));
+	exprt lemma = implies_exprt(prem_and_is_witness,differ);
+				    
 	new_lemmas.push_back(lemma);
 	// we put bounds on the witnesses: 0 <= v <= |s0| - |s1| ==> 0 <= v+w[v] < |s0| && 0 <= w[v] < |s1|
 	exprt witness_bounds = implies_exprt
 	  (and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,val), binary_relation_exprt(minus_exprt(to_string_expr(s0).length(),to_string_expr(s1).length()),ID_ge,val)),
-	   and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,plus_exprt(val,axiom.witness_of(val))),
-		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,axiom.witness_of(val))),
-			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,axiom.witness_of(val)),
-					 binary_relation_exprt(refined_string_typet::index_zero(),ID_le,axiom.witness_of(val))))));
+	   and_exprt(binary_relation_exprt(refined_string_typet::index_zero(),ID_le,plus_exprt(val,witness)),
+		     and_exprt(binary_relation_exprt(to_string_expr(s0).length(),ID_gt,plus_exprt(val,witness)),
+			       and_exprt(binary_relation_exprt(to_string_expr(s1).length(),ID_gt,witness),
+					 binary_relation_exprt(refined_string_typet::index_zero(),ID_le,witness)))));
 	new_lemmas.push_back(witness_bounds);
       }
 }

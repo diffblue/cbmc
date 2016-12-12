@@ -65,7 +65,7 @@ private:
   //
   std::vector<string_constraintt> universal_axioms;
   //
-  std::vector<string_constraintt> not_contains_axioms;
+  std::vector<string_not_contains_constraintt> not_contains_axioms;
 
   int nb_sat_iteration;
 
@@ -112,10 +112,12 @@ private:
   // Then substitutes [axiom.idx] with [r] in [axiom].
   // axiom is not constant because we may record some information about
   // instantiation of existential variables.
-  string_constraintt instantiate(const string_constraintt &axiom, const exprt &str,
+  exprt instantiate(const string_constraintt &axiom, const exprt &str,
                     const exprt &val);
 
-  void instantiate_not_contains(const string_constraintt &axiom, std::vector<exprt> & new_lemmas);
+  void instantiate_not_contains
+  (const string_not_contains_constraintt &axiom,
+   std::vector<exprt> & new_lemmas);
 
   // For expressions f of a certain form, 		  //
   // returns an expression corresponding to $f^{−1}(val)$.//
