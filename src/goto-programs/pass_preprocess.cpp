@@ -186,7 +186,7 @@ void pass_preprocesst::make_to_char_array_function
 }
 
 
-void pass_preprocesst::make_of_char_array_function
+void pass_preprocesst::make_char_array_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -206,7 +206,7 @@ void pass_preprocesst::make_of_char_array_function
   make_string_function(i_it,function_name);
 }
 
-void pass_preprocesst::make_of_char_array_function_call
+void pass_preprocesst::make_char_array_function_call
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -225,7 +225,7 @@ void pass_preprocesst::make_of_char_array_function_call
   make_string_function_call(i_it,function_name);
 }
 
-void pass_preprocesst::make_of_char_array_side_effect
+void pass_preprocesst::make_char_array_side_effect
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -272,11 +272,11 @@ void pass_preprocesst::replace_string_calls
 	      else if(string_function_calls.find(function_id) != string_function_calls.end())
 		make_string_function_call(i_it, string_function_calls[function_id]);
 	      else if(string_of_char_array_functions.find(function_id) != string_of_char_array_functions.end())
-		make_of_char_array_function(i_it,string_of_char_array_functions[function_id]);
+		make_char_array_function(i_it,string_of_char_array_functions[function_id]);
 	      else if(string_of_char_array_function_calls.find(function_id) != string_of_char_array_function_calls.end())
-		make_of_char_array_function_call(i_it,string_of_char_array_function_calls[function_id]);
+		make_char_array_function_call(i_it,string_of_char_array_function_calls[function_id]);
 	      else if(side_effect_char_array_functions.find(function_id) != side_effect_char_array_functions.end())
-		make_of_char_array_side_effect(i_it,side_effect_char_array_functions[function_id]);
+		make_char_array_side_effect(i_it,side_effect_char_array_functions[function_id]);
 	      else if(function_id == irep_idt("java::java.lang.String.toCharArray:()[C"))
 		make_to_char_array_function(goto_program,i_it);
 	    }

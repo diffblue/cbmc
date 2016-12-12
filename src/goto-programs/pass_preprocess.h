@@ -63,19 +63,19 @@ class pass_preprocesst:public messaget
   void make_to_char_array_function
     (goto_programt & goto_program, goto_programt::instructionst::iterator &);
 
-  // replace "r.some_function(arr,...)" by
-  // "r = function_name(arr.length,arr.data,...);
-  void make_of_char_array_function_call
-    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
-
   // replace "r = some_function(arr,...)" by
   // "r = function_name(arr.length,arr.data,...);
-  void make_of_char_array_function
+  void make_char_array_function
+    (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
+
+  // replace "r.some_function(arr,...)" by
+  // "r = function_name(arr.length,arr.data,...);
+  void make_char_array_function_call
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   // replace "r = s.some_function(i,arr,...)" by "s=function_name(s,i,arr.length,arr.data)"
   // and add a correspondance from r to s in the string_builders map
-  void make_of_char_array_side_effect
+  void make_char_array_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
   bool has_java_string_type(const exprt &expr);
