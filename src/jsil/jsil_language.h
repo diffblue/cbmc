@@ -69,6 +69,10 @@ public:
   virtual void modules_provided(std::set<std::string> &modules);
   virtual bool interfaces(symbol_tablet &symbol_table);
 
+  virtual bool generate_start_function(
+    const class symbolt &entry_function_symbol,
+    class symbol_tablet &symbol_table) override;
+
 protected:
   jsil_parse_treet parse_tree;
   std::string parse_path;

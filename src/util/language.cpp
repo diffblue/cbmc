@@ -191,20 +191,3 @@ void languaget::generate_opaque_parameter_symbols(
     symbol_table.add(param_symbol);
   }
 }
-
-/// Generate a entry function for a specific function. Should be overriden in
-/// derived languagets
-/// \param entry_function_symbol: The symbol for the function that should be
-///   used as the entry point
-/// \param symbol_table: The symbol table for the program. The new _start
-///   function symbol will be added to this table
-/// \return Returns false if the entry method was generated correctly
-bool languaget::generate_start_function(
-  const symbolt &entry_function_symbol,
-  symbol_tablet &symbol_table)
-{
-  // Implement in derived languagets
-  assert(0);
-  return true;
-}
-
