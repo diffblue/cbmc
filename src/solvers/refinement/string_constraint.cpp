@@ -46,7 +46,7 @@ string_constraintt string_constraintt::with_forall(const symbol_exprt & univ, co
   return with_forall(univ,refined_string_typet::index_zero(),bound_sup);
 }
 
-string_constraintt string_constraintt::not_contains(exprt univ_bound_inf, exprt univ_bound_sup,
+string_constraintt string_constraintt::create_not_contains(exprt univ_bound_inf, exprt univ_bound_sup,
 				 exprt premise, exprt exists_bound_inf,
 				 exprt exists_bound_sup, exprt s0, exprt s1)
 {

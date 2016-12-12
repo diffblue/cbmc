@@ -63,7 +63,7 @@ public:
   // Default bound inferior is 0
   string_constraintt with_exists(const symbol_exprt & exist, const exprt & bound_sup);
 
-  static string_constraintt not_contains
+  static string_constraintt create_not_contains
   (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise,
    exprt exists_bound_inf, exprt exists_bound_sup, exprt s0, exprt s1);
 

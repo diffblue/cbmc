@@ -1360,7 +1360,7 @@ exprt string_constraint_generatort::string_contains
   // forall startpos <= |s0| - |s1|.  (!contains && |s0| >= |s1| )
   //      ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
   axioms.push_back
-    (string_constraintt::not_contains
+    (string_constraintt::create_not_contains
      (refined_string_typet::index_zero(),plus_exprt(refined_string_typet::index_of_int(1),minus_exprt(s0.length(),s1.length())),
       and_exprt(not_exprt(contains),s0.longer(s1)),refined_string_typet::index_zero(),s1.length(),s0,s1));
 
