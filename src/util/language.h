@@ -103,7 +103,7 @@ public:
 
   virtual bool generate_start_function(
     const class symbolt &entry_function_symbol,
-    class symbol_tablet &symbol_table);
+    class symbol_tablet &symbol_table)=0;
 
   // constructor / destructor
 

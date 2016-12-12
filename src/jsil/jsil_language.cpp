@@ -75,6 +75,32 @@ bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
 
 /*******************************************************************\
 
+Function: jsil_languaget::generate_start_function
+
+  Inputs:
+          entry_function_symbol - The symbol for the function that should
+                                  be used as the entry point
+          symbol_table - The symbol table for the program. The new _start
+                         function symbol will be added to this table
+
+ Outputs: Returns false if the _start method was generated correctly
+
+ Purpose: Generate a _start function for a specific function
+
+\*******************************************************************/
+
+bool jsil_languaget::generate_start_function(
+  const symbolt &entry_function_symbol,
+  symbol_tablet &symbol_table)
+{
+  // TODO(tkiley): This should be implemented if this language
+  // is used.
+  assert(0);
+  return true;
+}
+
+/*******************************************************************\
+
 Function: jsil_languaget::preprocess
 
   Inputs:
