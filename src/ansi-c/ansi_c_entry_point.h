@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
-  const std::string &standard_main,
   message_handlert &message_handler);
 
 bool generate_ansi_c_start_function(
