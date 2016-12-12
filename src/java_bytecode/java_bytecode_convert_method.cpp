@@ -576,15 +576,13 @@ void replace_goto_target(codet& repl, const irep_idt& old_label, const irep_idt&
   }
 }
 
-} // End anonymous namespace delimiting file-local functions
-
 /*******************************************************************\
 
 Function: java_bytecode_convert_methodt::get_block_for_pcrange
 
   Inputs: 'tree', a code block descriptor, and 'this_block', the corresponding
           actual code_blockt. 'address_start' and 'address_limit', the Java
-          bytecode offsets searched for. 'next_block_start_address', the 
+          bytecode offsets searched for. 'next_block_start_address', the
           bytecode offset of tree/this_block's successor sibling, or UINT_MAX
           if none exists.
 
@@ -1829,17 +1827,87 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.add(code_declt(var));
   }
 
-  for(const auto &address_pair : address_map)
+  // Try to recover block structure as indicated in the local variable table:
+
+  // The block tree node mirrors the block structure of root_block,
+  // indexing the Java PCs were each subblock starts and ends.
+  block_tree_node root;
+  code_blockt root_block;
+
+  bool start_new_block=true;
+  for(auto ait=address_map.begin(), aend=address_map.end(); ait != aend; ++ait)
   {
+    const auto& address_pair=*ait;
     const unsigned address=address_pair.first;
     assert(address_pair.first==address_pair.second.source->address);
     const codet &c=address_pair.second.code;
 
-    if(targets.find(address)!=targets.end())
-      code.add(code_labelt(label(std::to_string(address)), c));
-    else if(c.get_statement()!=ID_skip)
-      code.add(c);
+    if(!start_new_block)
+      start_new_block=targets.find(address)!=targets.end();
+    if(!start_new_block)
+      start_new_block=address_pair.second.predecessors.size()>1;
+
+    if(start_new_block)
+    {
+      code_labelt newlabel(label(std::to_string(address)), code_blockt());
+      root_block.move_to_operands(newlabel);
+      root.branch.push_back(block_tree_node::get_leaf());
+      assert((root.branch_addresses.size()==0 ||
+              root.branch_addresses.back()<address) &&
+             "Block addresses should be unique and increasing");
+      root.branch_addresses.push_back(address);
+    }
+
+    if(c.get_statement()!=ID_skip)
+    {
+      auto& lastlabel=to_code_label(to_code(root_block.operands().back()));
+      auto& add_to_block=to_code_block(lastlabel.code());
+      add_to_block.add(c);
+    }
+    start_new_block=address_pair.second.successors.size()>1;
   }
+
+  for(const auto& vlist : variables)
+  {
+    for(const auto& v : vlist)
+    {
+      if(v.is_parameter)
+        continue;
+      // Merge lexical scopes as far as possible to allow us to
+      // declare these variable scopes faithfully.
+      // Don't insert yet, as for the time being the blocks' only
+      // operands must be other blocks.
+      get_or_create_block_for_pcrange(
+        root,
+        root_block,
+        v.start_pc,
+        v.start_pc+v.length,
+        std::numeric_limits<unsigned>::max(),
+        address_map);
+    }
+  }
+  for(const auto& vlist : variables)
+  {
+    for(const auto& v : vlist)
+    {
+      if(v.is_parameter)
+        continue;
+      // Skip anonymous variables:
+      if(v.symbol_expr.get_identifier()==irep_idt())
+        continue;
+      code_declt d(v.symbol_expr);
+      auto& block=get_block_for_pcrange(
+        root,
+        root_block,
+        v.start_pc,
+        v.start_pc+v.length,
+        std::numeric_limits<unsigned>::max());
+      block.operands().insert(block.operands().begin(),d);
+    }
+  }
+
+  for(auto& block : root_block.operands())
+    code.move_to_operands(block);
 
   return code;
 }
