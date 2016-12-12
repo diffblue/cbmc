@@ -85,6 +85,10 @@ public:
 
   void modules_provided(std::set<std::string> &modules) override;
 
+  virtual bool generate_start_function(
+    const class symbolt &entry_function_symbol,
+    class symbol_tablet &symbol_table) override;
+
 protected:
   cpp_parse_treet cpp_parse_tree;
   std::string parse_path;
