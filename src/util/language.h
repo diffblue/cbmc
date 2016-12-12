@@ -105,11 +105,6 @@ public:
     const class symbolt &entry_function_symbol,
     class symbol_tablet &symbol_table);
 
-  bool regenerate_start_function(
-    const class symbolt &entry_function_symbol,
-    symbol_tablet &symbol_table,
-    class goto_functionst &goto_functions);
-
   // constructor / destructor
 
   languaget() { }

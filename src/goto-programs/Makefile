@@ -18,7 +18,9 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       graphml_witness.cpp remove_virtual_functions.cpp \
       class_hierarchy.cpp show_goto_functions.cpp get_goto_model.cpp \
       slice_global_inits.cpp goto_inline_class.cpp class_identifier.cpp \
-      remove_static_init_loops.cpp remove_instanceof.cpp
+      remove_static_init_loops.cpp remove_instanceof.cpp \
+      rebuild_goto_start_function.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 

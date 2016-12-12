@@ -8,10 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "language.h"
 #include "expr.h"
-#include <util/config.h>
-#include <util/symbol.h>
-#include <util/symbol_table.h>
-#include <goto-programs/goto_functions.h>
 
 /*******************************************************************\
 
@@ -153,50 +149,4 @@ bool languaget::generate_start_function(
   // Implement in derived languagets
   assert(0);
   return true;
-}
-
-/*******************************************************************\
-
-Function: languaget::regenerate_start_function
-
-  Inputs:
-          required_entry_function - a code symbol inside the symbol
-                                    table which is the function that
-                                    should be used as the entry point.
-
-          symbol_table - the symbol table for the program. The _start
-                         symbol will be replaced with a new start function
-
-          goto_functions - the functions for the goto program. The _start
-                           function will be erased from this
-
- Outputs: Returns false if the new start function is created successfully,
-          true otherwise.
-
- Purpose: To replace an existing _start function with a new one that
-          calls a specified function
-
-\*******************************************************************/
-bool languaget::regenerate_start_function(
-  const symbolt &entry_function_symbol,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
-{
-  // Remove the existing _start function so we can create a new one
-  symbol_table.remove(ID__start);
-
-  bool return_code=generate_start_function(entry_function_symbol, symbol_table);
-
-  // Remove the function from the goto_functions so is copied back in
-  // from the symbol table
-  if(!return_code)
-  {
-    const auto &start_function=goto_functions.function_map.find(ID__start);
-    if(start_function!=goto_functions.function_map.end())
-    {
-      goto_functions.function_map.erase(start_function);
-    }
-  }
-
-  return return_code;
 }
