@@ -119,7 +119,18 @@ protected:
   }
 
   // JVM local variables
-  const exprt variable(const exprt &arg, char type_char, size_t address, instruction_sizet inst_size)
+  enum variable_cast_argumentt
+  {
+    CAST_AS_NEEDED,
+    NO_CAST
+  };
+
+  const exprt variable(
+    const exprt &arg,
+    char type_char,
+    size_t address,
+    instruction_sizet inst_size,
+    variable_cast_argumentt do_cast)
   {
     irep_idt number=to_constant_expr(arg).get_value();
 
@@ -145,7 +156,7 @@ protected:
     else
     {
       exprt result=var.symbol_expr;
-      if(t!=result.type()) result=typecast_exprt(result, t);
+      if(do_cast==CAST_AS_NEEDED && t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
   }
@@ -829,7 +840,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX);
+      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX, NO_CAST);
 
       const bool is_array('a' == statement[0]);
 
@@ -861,7 +872,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX);
+      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX, CAST_AS_NEEDED);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1023,10 +1034,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST);
+      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST, NO_CAST);
       code_assign.rhs()=plus_exprt(
-                                   variable(arg0, 'i', i_it->address, INST_INDEX_CONST),
-                          typecast_exprt(arg1, java_int_type()));
+        variable(arg0, 'i', i_it->address, INST_INDEX_CONST, CAST_AS_NEEDED),
+        typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
     else if(statement==patternt("?xor"))
