@@ -158,8 +158,6 @@ protected:
     else
     {
       exprt result=var.symbol_expr;
-      if(!var.is_parameter)
-        used_local_names.insert(to_symbol_expr(result));
       if(do_cast==CAST_AS_NEEDED && t!=result.type()) result=typecast_exprt(result, t);
       return result;
     }
@@ -342,6 +340,17 @@ void java_bytecode_convert_methodt::convert(
     variables[v.index][number_index_entries].symbol_expr=result;
     variables[v.index][number_index_entries].start_pc=v.start_pc;
     variables[v.index][number_index_entries].length=v.length;
+    symbolt new_symbol;
+    new_symbol.name=identifier;
+    new_symbol.type=t;
+    new_symbol.base_name=v.name;
+    new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.is_file_local=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_lvalue=true;
+    symbol_table.add(new_symbol);
   }
 
   // set up variables array
