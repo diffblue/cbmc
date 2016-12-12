@@ -54,14 +54,14 @@ public:
   { form = SIMPLE; }
 
   // Add an universal quantifier
-  string_constraintt forall(const symbol_exprt & univ, const exprt & bound_inf, const exprt & bound_sup);
+  string_constraintt with_forall(const symbol_exprt & univ, const exprt & bound_inf, const exprt & bound_sup);
   // Default bound inferior is 0
-  string_constraintt forall(const symbol_exprt & univ, const exprt & bound_sup);
+  string_constraintt with_forall(const symbol_exprt & univ, const exprt & bound_sup);
 
   // Bound a variable that is existentially quantified
-  string_constraintt exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup);
+  string_constraintt with_exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup);
   // Default bound inferior is 0
-  string_constraintt exists(const symbol_exprt & exist, const exprt & bound_sup);
+  string_constraintt with_exists(const symbol_exprt & exist, const exprt & bound_sup);
 
   static string_constraintt not_contains
   (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise,
