@@ -38,6 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__CHAR_BIT__=8"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
+  " -D__INT32_TYPE__=long"\
   " -D__LONG_LONG_MAX__=2147483647L"\
   " -D__LONG_MAX__=2147483647" \
   " -D__SIZE_TYPE__=\"unsigned int\""\
@@ -53,6 +54,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__CHAR_BIT__=8"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
+  " -D__INT32_TYPE__=int"\
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=2147483647L" \
   " -D__SIZE_TYPE__=\"long unsigned int\""\
@@ -68,6 +70,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__CHAR_BIT__=8"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
+  " -D__INT32_TYPE__=int"\
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=9223372036854775807L"\
   " -D__SIZE_TYPE__=\"long unsigned int\""\
@@ -83,6 +86,7 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__CHAR_BIT__=8"\
   " -D__SCHAR_MAX__=127"\
   " -D__SHRT_MAX__=32767"\
+  " -D__INT32_TYPE__=int"\
   " -D__LONG_LONG_MAX__=9223372036854775807LL"\
   " -D__LONG_MAX__=2147483647"\
   " -D__SIZE_TYPE__=\"long long unsigned int\""\
