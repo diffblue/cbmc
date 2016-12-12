@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/arith_tools.h>
 
 #define STRING_SOLVER_INDEX_WIDTH 32
 #define STRING_SOLVER_C_CHAR_WIDTH 8
@@ -64,8 +65,7 @@ public:
   {  return (is_unrefined_string_type(expr.type())); }
 
   static inline constant_exprt index_of_int(int i)
-  {  return constant_exprt(integer2binary(i, STRING_SOLVER_INDEX_WIDTH),
-			   index_type()); }
+  { return from_integer(i,index_type()); }
 
 };
 
