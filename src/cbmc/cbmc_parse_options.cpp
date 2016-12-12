@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -631,22 +632,14 @@ int cbmc_parse_optionst::get_goto_program(
     if(cmdline.isset("function"))
     {
       const std::string &function_id=cmdline.get_value("function");
-      const auto &desired_entry_function=
-        symbol_table.symbols.find(function_id);
+      rebuild_goto_start_functiont start_function_rebuilder(
+        get_message_handler(),
+        goto_model.symbol_table,
+        goto_model.goto_functions);
 
-      if(desired_entry_function!=symbol_table.symbols.end())
+      if(start_function_rebuilder(function_id))
       {
-        languaget *language=get_language_from_mode(
-          desired_entry_function->second.mode);
-        language->regenerate_start_function(
-          desired_entry_function->second,
-          symbol_table,
-          goto_functions);
-      }
-      else
-      {
-        error() << "main symbol `" << function_id;
-        error() << "' not found" << messaget::eom;
+        return 6;
       }
     }
 
