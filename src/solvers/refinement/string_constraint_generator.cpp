@@ -19,9 +19,10 @@ constant_exprt string_constraint_generatort::constant_char(int i)
   switch(language)
     {
     case C :
-      return constant_exprt(integer2binary(i,STRING_SOLVER_CHAR_WIDTH),refined_string_typet::char_type());
+      return constant_exprt(integer2binary(i,STRING_SOLVER_C_CHAR_WIDTH),
+			    refined_string_typet::char_type());
       break;
-    case JAVA : return constant_exprt(integer2binary(i,JAVA_STRING_SOLVER_CHAR_WIDTH),refined_string_typet::java_char_type());
+    case JAVA : return constant_exprt(integer2binary(i,STRING_SOLVER_JAVA_CHAR_WIDTH),refined_string_typet::java_char_type());
       break;
     default: assert(false);
     }
@@ -60,8 +61,8 @@ unsignedbv_typet string_constraint_generatort::get_char_type()
 size_t string_constraint_generatort::get_char_width()
 {
   if(language==C)
-    return STRING_SOLVER_CHAR_WIDTH;
-  else if(language==JAVA) return JAVA_STRING_SOLVER_CHAR_WIDTH;
+    return STRING_SOLVER_C_CHAR_WIDTH;
+  else if(language==JAVA) return STRING_SOLVER_JAVA_CHAR_WIDTH;
   else assert(false);
 }
 
@@ -350,7 +351,7 @@ string_exprt string_constraint_generatort::string_literal(const function_applica
 
       const exprt &s = arg.op0().op0().op0();
       sval = to_string_constant(s).get_value();
-      char_width = STRING_SOLVER_CHAR_WIDTH;
+      char_width = STRING_SOLVER_C_CHAR_WIDTH;
       char_type = refined_string_typet::char_type();
 
     }
@@ -363,7 +364,7 @@ string_exprt string_constraint_generatort::string_literal(const function_applica
 
       //it seems the value of the string is lost, we need to recover it from the identifier
       sval = extract_java_string(to_symbol_expr(s));
-      char_width = JAVA_STRING_SOLVER_CHAR_WIDTH;
+      char_width = STRING_SOLVER_JAVA_CHAR_WIDTH;
       char_type = refined_string_typet::java_char_type();
     }
 
@@ -1548,7 +1549,7 @@ exprt string_constraint_generatort::char_literal
     irep_idt sval = s.get_value();
     assert(sval.size() == 1);
 
-    std::string binary=integer2binary(unsigned(sval[0]), STRING_SOLVER_CHAR_WIDTH);
+    std::string binary=integer2binary(unsigned(sval[0]), STRING_SOLVER_C_CHAR_WIDTH);
 
     return constant_exprt(binary, get_char_type());
   }

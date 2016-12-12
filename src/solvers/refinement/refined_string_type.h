@@ -14,8 +14,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/std_expr.h>
 
 #define STRING_SOLVER_INDEX_WIDTH 32
-#define STRING_SOLVER_CHAR_WIDTH 8
-#define JAVA_STRING_SOLVER_CHAR_WIDTH 16
+#define STRING_SOLVER_C_CHAR_WIDTH 8
+#define STRING_SOLVER_JAVA_CHAR_WIDTH 16
 
 // Internal type used for string refinement
 class refined_string_typet : public struct_typet {
@@ -27,9 +27,9 @@ public:
   { return to_array_type((to_struct_type(*this)).components()[1].type());}
 
   // Types used in this refinement
-  static inline unsignedbv_typet char_type() { return unsignedbv_typet(STRING_SOLVER_CHAR_WIDTH);}
+  static inline unsignedbv_typet char_type() { return unsignedbv_typet(STRING_SOLVER_C_CHAR_WIDTH);}
 
-  static inline unsignedbv_typet java_char_type() { return unsignedbv_typet(JAVA_STRING_SOLVER_CHAR_WIDTH);}
+  static inline unsignedbv_typet java_char_type() { return unsignedbv_typet(STRING_SOLVER_JAVA_CHAR_WIDTH);}
 
   static inline signedbv_typet index_type() { return signedbv_typet(STRING_SOLVER_INDEX_WIDTH);}
 
