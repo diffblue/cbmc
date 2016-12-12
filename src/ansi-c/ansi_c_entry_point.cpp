@@ -190,7 +190,6 @@ Function: ansi_c_entry_point
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
-  const std::string &standard_main,
   message_handlert &message_handler)
 {
   // check if entry point is already there
@@ -237,7 +236,7 @@ bool ansi_c_entry_point(
     main_symbol=matches.front();
   }
   else
-    main_symbol=standard_main;
+    main_symbol=ID_main;
 
   // look it up
   symbol_tablet::symbolst::const_iterator s_it=

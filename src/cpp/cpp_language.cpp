@@ -227,7 +227,7 @@ Function: cpp_languaget::final
 
 bool cpp_languaget::final(symbol_tablet &symbol_table)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+  if(ansi_c_entry_point(symbol_table, get_message_handler()))
     return true;
 
   return false;

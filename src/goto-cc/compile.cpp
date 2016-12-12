@@ -407,7 +407,7 @@ bool compilet::link()
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, ui_message_handler))
       return true;
 
     // entry_point may (should) add some more functions.
