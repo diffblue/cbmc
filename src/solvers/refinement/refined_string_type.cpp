@@ -41,7 +41,13 @@ bool refined_string_typet::is_java_string_type(const typet &type)
 
 bool refined_string_typet::is_java_deref_string_type(const typet &type)
 {
-  if(type.id() == ID_struct) {
+  if(type.id() == ID_symbol)
+  {
+    irep_idt tag = to_symbol_type(type).get_identifier();
+    return (tag == irep_idt("java::java.lang.String"));
+  }
+  else if(type.id() == ID_struct)
+  {
     irep_idt tag = to_struct_type(type).get_tag();
     return (tag == irep_idt("java.lang.String"));
   }
