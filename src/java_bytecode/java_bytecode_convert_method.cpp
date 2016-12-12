@@ -223,6 +223,23 @@ protected:
       stack[stack.size()-o.size()+i]=o[i];
   }
 
+  struct converted_instructiont
+  {
+    converted_instructiont(
+      const instructionst::const_iterator &it,
+      const codet &_code):source(it), code(_code), done(false)
+      {}
+
+    instructionst::const_iterator source;
+    std::list<unsigned> successors;
+    std::set<unsigned> predecessors;
+    codet code;
+    stackt stack;
+    bool done;
+  };
+
+  typedef std::map<unsigned, converted_instructiont> address_mapt;
+
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
   void convert(const instructiont &);
@@ -524,23 +541,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   // first pass: get targets and map addresses to instructions
 
-  struct converted_instructiont
-  {
-    converted_instructiont(
-      const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-    {
-    }
-
-    instructionst::const_iterator source;
-    std::list<unsigned> successors;
-    std::set<unsigned> predecessors;
-    codet code;
-    stackt stack;
-    bool done;
-  };
-
-  typedef std::map<unsigned, converted_instructiont> address_mapt;
   address_mapt address_map;
   std::set<unsigned> targets;
 
