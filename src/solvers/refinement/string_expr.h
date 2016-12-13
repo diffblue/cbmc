@@ -14,7 +14,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_constraint.h>
-#include <solvers/refinement/string_functions.h>
 #include <solvers/refinement/refined_string_type.h>
 
 

@@ -56,7 +56,7 @@ typedef unsigned char __CPROVER_char;
  ******************************************************************************/
 extern __CPROVER_char __CPROVER_uninterpreted_string_char_at_func(__CPROVER_string str, int pos);
 extern __CPROVER_bool __CPROVER_uninterpreted_string_equal_func(__CPROVER_string str1, __CPROVER_string str2);
-extern __CPROVER_string __CPROVER_uninterpreted_string_literal_func();
+extern __CPROVER_string __CPROVER_uninterpreted_string_literal_func(char * str);
 extern __CPROVER_char __CPROVER_uninterpreted_char_literal_func();
 extern __CPROVER_string __CPROVER_uninterpreted_string_concat_func(__CPROVER_string str1, __CPROVER_string str2);
 extern int __CPROVER_uninterpreted_string_length_func(__CPROVER_string str);
