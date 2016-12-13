@@ -330,6 +330,7 @@ static bool implicit(const namespacet &ns, goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
 
+  if (target->is_assume()) return true;
   if(!target->is_assign()) return false;
 
   const code_assignt &a=to_code_assign(target->code);
