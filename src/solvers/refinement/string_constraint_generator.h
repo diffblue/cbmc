@@ -18,8 +18,6 @@ public:
   string_constraint_generatort() : language(UNKNOWN){ }
 
   constant_exprt constant_char(int i);
-  constant_exprt constant_unsigned(int i,size_t width);
-  constant_exprt constant_signed(int i,size_t width);
   unsignedbv_typet get_char_type();
   size_t get_char_width();
   inline signedbv_typet get_index_type() {return refined_string_typet::index_type();};
