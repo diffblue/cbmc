@@ -16,7 +16,13 @@ Date: January 2010
 class uninitialized_domaint:public ai_domain_baset
 {
 public:
-  // locals that are not initialized
+  uninitialized_domaint():is_bottom(true)
+  {
+  }
+  
+  bool is_bottom;
+
+  // Locals that are declared but may not be initialized
   typedef std::set<irep_idt> uninitializedt;
   uninitializedt uninitialized;
 
@@ -33,17 +39,19 @@ public:
     
   void make_top() override final
   {
-    uninitialized.clear();
+    // We don't have a proper 'top', and refuse to do this.
+    assert(false);
   }
 
   void make_bottom() override final
   {
     uninitialized.clear();
+    is_bottom=true;
   }
 
   void make_entry() override final
   {
-    uninitialized.clear();
+    make_top();
   }
 
   // returns true iff there is s.th. new

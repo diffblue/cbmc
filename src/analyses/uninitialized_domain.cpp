@@ -31,6 +31,8 @@ void uninitialized_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
+  if(is_bottom) return;
+
   switch(from->type)
   {
   case DECL:
@@ -96,11 +98,13 @@ void uninitialized_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  for(uninitializedt::const_iterator
-      it=uninitialized.begin();
-      it!=uninitialized.end();
-      it++)
-    out << *it << '\n';
+  if(is_bottom)
+    out << "BOTTOM";
+  else
+  {
+    for(const auto & id : uninitialized)
+      out << id << '\n';
+  }
 }
 
 /*******************************************************************\
@@ -120,11 +124,16 @@ bool uninitialized_domaint::merge(
   locationt from,
   locationt to)
 {
+  bool old_is_bottom=is_bottom;
+  
+  is_bottom=is_bottom && other.is_bottom;
+  
   unsigned old_uninitialized=uninitialized.size();
 
   uninitialized.insert(
     other.uninitialized.begin(),
     other.uninitialized.end());
 
-  return old_uninitialized!=uninitialized.size();
+  return old_is_bottom!=is_bottom ||
+         old_uninitialized!=uninitialized.size();
 }
