@@ -3,8 +3,6 @@ main.c
 --unwind 2 --full-slice
 ^EXIT=0$
 ^SIGNAL=0$
-^size of program expression: 215 steps$
-^simple slicing removed 13 assignments$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
