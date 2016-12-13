@@ -855,6 +855,19 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("pointer-check"));
     remove_virtual_functions(symbol_table, goto_functions);
 
+    // do partial inlining
+    status() << "Partial Inlining" << eom;
+    goto_partial_inline(goto_functions, ns, ui_message_handler);
+
+    // remove returns, gcc vectors, complex
+    remove_returns(symbol_table, goto_functions);
+    remove_vector(symbol_table, goto_functions);
+    remove_complex(symbol_table, goto_functions);
+
+    // add generic checks
+    status() << "Generic Property Instrumentation" << eom;
+    goto_check(ns, options, goto_functions);
+
     // full slice?
     if(cmdline.isset("full-slice"))
     {
@@ -875,6 +888,7 @@ bool cbmc_parse_optionst::process_goto_program(
       }
     }
 
+<<<<<<< fada6185d03028840f415fda8f5ab057218a602c
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
