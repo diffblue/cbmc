@@ -860,7 +860,7 @@ bool cbmc_parse_optionst::process_goto_program(
     {
       status() << "Performing a full slice" << eom;
       remove_virtual_functions(symbol_table,goto_functions);
-      remove_function_pointers(symbol_table,goto_functions,false);
+      remove_function_pointers(symbol_table,goto_functions,cmdline.isset("pointer-check"));
       remove_returns(symbol_table,goto_functions);
       goto_functions.update();
       try
