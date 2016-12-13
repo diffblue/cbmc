@@ -277,16 +277,13 @@ string_exprt string_constraint_generatort::add_axioms_for_constant(irep_idt sval
   std::wstring utf16 = utf8_to_utf16le(str);
 
   for (std::size_t i = 0; i < utf16.size(); ++i) {
-    std::string idx_binary = integer2binary(i,STRING_SOLVER_INDEX_WIDTH);
-    constant_exprt idx(idx_binary, refined_string_typet::index_type());
-    std::string sval_binary=integer2binary((unsigned)utf16[i], char_width);
-    constant_exprt c(sval_binary,char_type);
+    exprt idx = from_integer(i,refined_string_typet::index_type());
+    exprt c = from_integer((unsigned)utf16[i], char_type);
     equal_exprt lemma(res[idx], c);
     axioms.push_back(lemma);
   }
 
-  std::string s_length_binary = integer2binary(unsigned(utf16.size()),STRING_SOLVER_INDEX_WIDTH);
-  exprt s_length = constant_exprt(s_length_binary, refined_string_typet::index_type());
+  exprt s_length = from_integer(unsigned(utf16.size()), refined_string_typet::index_type());
 
   axioms.push_back(res.has_length(s_length));
   return res;
@@ -1530,10 +1527,7 @@ exprt string_constraint_generatort::add_axioms_for_char_literal
     const string_constantt s = to_string_constant(arg.op0().op0().op0());
     irep_idt sval = s.get_value();
     assert(sval.size() == 1);
-
-    std::string binary=integer2binary(unsigned(sval[0]), STRING_SOLVER_C_CHAR_WIDTH);
-
-    return constant_exprt(binary, get_char_type());
+    return from_integer(unsigned(sval[0]), get_char_type());
   }
   else
     {
