@@ -112,7 +112,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 
   if (refined_string_typet::is_unrefined_string_type(type))
     {
-      string_exprt str = generator.string_of_symbol(to_symbol_expr(expr));
+      string_exprt str = generator.find_or_add_string_of_symbol(to_symbol_expr(expr));
       bvt bv = convert_bv(str);
       return bv;
     }
@@ -123,7 +123,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 bvt string_refinementt::convert_function_application(const function_application_exprt &expr)
 {
   debug() << "string_refinementt::convert_function_application "  << pretty_short(expr) << eom;
-  exprt f = generator.function_application(expr);
+  exprt f = generator.add_axioms_for_function_application(expr);
   return convert_bv(f);
 }
 
@@ -149,7 +149,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
     if(refined_string_typet::is_unrefined_string_type(type))
       {
 	symbol_exprt sym = to_symbol_expr(expr.lhs());
-	generator.string_of_expr(sym,expr.rhs());
+	generator.set_string_symbol_equal_to_expr(sym,expr.rhs());
 	return false;
       }
     else if(type==ns.follow(expr.rhs().type()))
@@ -438,7 +438,7 @@ bool string_refinementt::check_axioms()
 
   debug() << "there are " << not_contains_axioms.size() << " not_contains axioms" << eom;
   for (size_t i = 0; i < not_contains_axioms.size(); ++i) {
-    exprt val = get(generator.witness_of(not_contains_axioms[i],refined_string_typet::index_zero()));
+    exprt val = get(generator.get_witness_of(not_contains_axioms[i],refined_string_typet::index_zero()));
     violated.push_back(std::make_pair(i, val));
   }
 
@@ -770,7 +770,7 @@ void string_refinementt::instantiate_not_contains(const string_not_contains_cons
       {
 	debug() << pretty_short(*it0) << " : " << pretty_short(*it1) << eom;
 	exprt val = minus_exprt(*it0, *it1);
-	exprt witness = generator.witness_of(axiom,val);
+	exprt witness = generator.get_witness_of(axiom,val);
 	and_exprt prem_and_is_witness(axiom.premise(),
 				      equal_exprt(witness, *it1));
 

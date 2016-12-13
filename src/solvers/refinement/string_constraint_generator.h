@@ -25,26 +25,14 @@ public:
 
   inline irep_idt &get_mode() { return mode; }
 
-  constant_exprt constant_char(int i);
-  unsignedbv_typet get_char_type();
-  size_t get_char_width();
-  inline signedbv_typet get_index_type() {return refined_string_typet::index_type();};
+  unsignedbv_typet get_char_type() const;
+  inline signedbv_typet get_index_type() const {return refined_string_typet::index_type();};
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
   std::vector<exprt> axioms;
 
-  // Create a new string expression and add the necessary lemma
-  // to ensure its equal to the given string expression.
-  string_exprt make_string(const exprt &str);
-
-  // Same thing but associates the string to the given symbol instead
-  // of returning it.
-  void make_string(const symbol_exprt & sym, const exprt &str);
-
-
-  // Boolean symbols that are used to know whether the results
-  // of some functions should be true.
+  // Boolean symbols for the results of some string functions
   std::vector<symbol_exprt> boolean_symbols;
 
   // Symbols used in existential quantifications
@@ -53,8 +41,8 @@ public:
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt,symbol_exprt> witness;
 
-  //
-  inline exprt witness_of
+  // 
+  inline exprt get_witness_of
   (const string_not_contains_constraintt & c, const exprt & univ_val) const
   { return index_exprt(witness.at(c), univ_val); }
 
@@ -62,143 +50,155 @@ public:
   symbol_exprt fresh_univ_index(const irep_idt &prefix);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
 
+  // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
   std::map<irep_idt, string_exprt> symbol_to_string;
+
+  string_exprt find_or_add_string_of_symbol(const symbol_exprt & sym);
+
   inline void assign_to_symbol(const symbol_exprt & sym, const string_exprt & expr)
   { symbol_to_string[sym.get_identifier()]= expr; }
 
 
-  // We maintain a map from symbols to strings. If a symbol is not yet present we will create a new one with the correct type depending on whether this is a java or c string
-  string_exprt get_string_of_symbol(const symbol_exprt & sym);
-
   // Add to the list of axioms, lemmas which should hold for the string to be
   // equal to the given expression.
-  string_exprt of_expr(const exprt & unrefined_string);
+  //  string_exprt create_string_equal_to_expr(const exprt & unrefined_string);
 
-  string_exprt string_of_expr(const exprt & expr);
-  void string_of_expr(const symbol_exprt & sym, const exprt & str);
-  string_exprt string_of_symbol(const symbol_exprt & sym);
+  string_exprt add_axioms_for_string_expr(const exprt & expr);
+  void set_string_symbol_equal_to_expr(const symbol_exprt & sym, const exprt & str);
 
   // The following functions convert different string functions
   // and add the corresponding lemmas to a list of properties to be checked
-  exprt function_application(const function_application_exprt &expr);
+  exprt add_axioms_for_function_application(const function_application_exprt &expr);
 
-  string_exprt empty_string(const function_application_exprt &f);
-  string_exprt string_char_set(const function_application_exprt &expr);
-  exprt string_char_at(const function_application_exprt &f);
-  exprt string_code_point_at(const function_application_exprt &f);
-  exprt string_code_point_before(const function_application_exprt &f);
-  string_exprt string_copy(const function_application_exprt &f);
-  string_exprt string_concat(const string_exprt & s1, const string_exprt & s2);
-  string_exprt string_concat(const function_application_exprt &f);
-  string_exprt string_concat_int(const function_application_exprt &f);
-  string_exprt string_concat_long(const function_application_exprt &f);
-  string_exprt string_concat_bool(const function_application_exprt &f);
-  string_exprt string_concat_char(const function_application_exprt &f);
-  string_exprt string_concat_double(const function_application_exprt &f);
-  string_exprt string_concat_float(const function_application_exprt &f);
-  string_exprt string_concat_code_point(const function_application_exprt &f);
-  string_exprt string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type);
-  exprt string_contains(const function_application_exprt &f);
-  exprt string_equal(const function_application_exprt &f);
-  exprt string_equals_ignore_case(const function_application_exprt &f);
-  exprt string_data(const function_application_exprt &f);
-  string_exprt string_delete (const string_exprt &str, const exprt & start, const exprt & end);
-  string_exprt string_delete(const function_application_exprt &expr);
-  string_exprt string_delete_char_at(const function_application_exprt &expr);
-  exprt string_hash_code(const function_application_exprt &f);
-
-  // Warning: the specifications are only partial for some of the "index_of" functions
-  exprt string_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
-  exprt string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
-  exprt string_index_of(const function_application_exprt &f);
-  exprt string_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
-  exprt string_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
-  exprt string_last_index_of(const function_application_exprt &f);
-
-  string_exprt string_insert(const string_exprt & s1, const string_exprt & s2, const exprt &offset);
-  string_exprt string_insert(const function_application_exprt &f);
-  string_exprt string_insert_int(const function_application_exprt &f);
-  string_exprt string_insert_long(const function_application_exprt &f);
-  string_exprt string_insert_bool(const function_application_exprt &f);
-  string_exprt string_insert_char(const function_application_exprt &f);
-  string_exprt string_insert_double(const function_application_exprt &f);
-  string_exprt string_insert_float(const function_application_exprt &f);
-  string_exprt string_insert_char_array(const function_application_exprt &f);
-  exprt string_is_empty(const function_application_exprt &f);
-  exprt string_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset);
-  exprt string_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
-  exprt string_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
-  exprt string_length(const function_application_exprt &f);
-  string_exprt string_literal(const function_application_exprt &f);
-  string_exprt of_int(const function_application_exprt &f);
-  string_exprt of_int(const exprt &i, size_t max_size);
-  string_exprt of_int_hex(const exprt &i);
-  string_exprt of_int_hex(const function_application_exprt &f);
-  string_exprt of_long(const function_application_exprt &f);
-  string_exprt of_long(const exprt &i, size_t max_size);
-  string_exprt of_bool(const function_application_exprt &f);
-  string_exprt of_bool(const exprt &i);
-  string_exprt of_char(const function_application_exprt &f);
-  string_exprt of_char(const exprt &i);
-  string_exprt of_char_array(const function_application_exprt &f);
-  string_exprt of_char_array
-  (const exprt & length, const exprt & data, const exprt & offset, const exprt & count);
-
-  // Warning: the specifications of these functions is only partial:
-  string_exprt of_float(const function_application_exprt &f);
-  string_exprt of_float(const exprt &f, bool double_precision=false);
-  string_exprt of_double(const function_application_exprt &f);
-
-  string_exprt string_replace(const function_application_exprt &f);
-  string_exprt string_set_length(const function_application_exprt &f);
-
-  // Warning: the specification may not be correct for the case where the string is not long enough
-  string_exprt string_substring(const string_exprt & str, const exprt & start, const exprt & end);
-  string_exprt string_substring(const function_application_exprt &expr);
-
-  string_exprt string_to_lower_case(const function_application_exprt &expr);
-  string_exprt string_to_upper_case(const function_application_exprt &expr);
-  string_exprt string_trim(const function_application_exprt &expr);
-
-  // Warning: not working correctly at the moment
-  string_exprt string_value_of(const function_application_exprt &f);
-
-  string_exprt code_point(const exprt &code_point);
-  string_exprt java_char_array(const exprt & char_array);
-
-  string_exprt string_if(const if_exprt &expr);
-
-  exprt char_literal(const function_application_exprt &f);
-
-
-  // Warning: this function is underspecified
-  exprt string_code_point_count(const function_application_exprt &f);
-  // Warning: this function is underspecified
-  exprt string_offset_by_code_point(const function_application_exprt &f);
-  exprt string_parse_int(const function_application_exprt &f);
-  exprt string_to_char_array(const function_application_exprt &f);
-
-  exprt string_compare_to(const function_application_exprt &f);
-
-  // Warning: this does not work at the moment because of the way we treat string pointers
-  symbol_exprt string_intern(const function_application_exprt &f);
 
 private:
 
+  // The following functions add axioms for the returned value
+  // to be equal to the result of the function given as argument
+  exprt add_axioms_for_char_at(const function_application_exprt &f);
+  exprt add_axioms_for_code_point_at(const function_application_exprt &f);
+  exprt add_axioms_for_code_point_before(const function_application_exprt &f);
+  exprt add_axioms_for_contains(const function_application_exprt &f);
+  exprt add_axioms_for_equal(const function_application_exprt &f);
+  exprt add_axioms_for_equals_ignore_case(const function_application_exprt &f);
+  exprt add_axioms_for_data(const function_application_exprt &f);
+  exprt add_axioms_for_hash_code(const function_application_exprt &f);
+  exprt add_axioms_for_is_empty(const function_application_exprt &f);
+  exprt add_axioms_for_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset);
+  exprt add_axioms_for_is_prefix(const function_application_exprt &f, bool swap_arguments=false);
+  exprt add_axioms_for_is_suffix(const function_application_exprt &f, bool swap_arguments=false);
+  exprt add_axioms_for_length(const function_application_exprt &f);
+
+  string_exprt add_axioms_for_empty_string(const function_application_exprt &f);
+  string_exprt add_axioms_for_char_set(const function_application_exprt &expr);
+  string_exprt add_axioms_for_copy(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat(const string_exprt & s1, const string_exprt & s2);
+  string_exprt add_axioms_for_concat(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_int(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_long(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_bool(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_char(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_double(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_float(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_code_point(const function_application_exprt &f);
+  string_exprt add_axioms_for_constant(irep_idt sval, int char_width, unsignedbv_typet char_type);
+  string_exprt add_axioms_for_delete (const string_exprt &str, const exprt & start, const exprt & end);
+  string_exprt add_axioms_for_delete(const function_application_exprt &expr);
+  string_exprt add_axioms_for_delete_char_at(const function_application_exprt &expr);
+
+  string_exprt add_axioms_for_insert(const string_exprt & s1, const string_exprt & s2, const exprt &offset);
+  string_exprt add_axioms_for_insert(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_int(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_long(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_bool(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_char(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_double(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_float(const function_application_exprt &f);
+  string_exprt add_axioms_for_insert_char_array(const function_application_exprt &f);
+
+  // Add axioms for conversion to string 
+  string_exprt add_axioms_from_literal(const function_application_exprt &f);
+  string_exprt add_axioms_from_int(const function_application_exprt &f);
+  string_exprt add_axioms_from_int(const exprt &i, size_t max_size);
+  string_exprt add_axioms_from_int_hex(const exprt &i);
+  string_exprt add_axioms_from_int_hex(const function_application_exprt &f);
+  string_exprt add_axioms_from_long(const function_application_exprt &f);
+  string_exprt add_axioms_from_long(const exprt &i, size_t max_size);
+  string_exprt add_axioms_from_bool(const function_application_exprt &f);
+  string_exprt add_axioms_from_bool(const exprt &i);
+  string_exprt add_axioms_from_char(const function_application_exprt &f);
+  string_exprt add_axioms_from_char(const exprt &i);
+  string_exprt add_axioms_from_char_array(const function_application_exprt &f);
+  string_exprt add_axioms_from_char_array
+  (const exprt & length, const exprt & data, const exprt & offset, const exprt & count);
+
+  // Warning: the specifications are only partial for some of the "index_of" functions
+  exprt add_axioms_for_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
+  exprt add_axioms_for_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
+  exprt add_axioms_for_index_of(const function_application_exprt &f);
+  exprt add_axioms_for_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index);
+  exprt add_axioms_for_last_index_of(const string_exprt &str, const exprt & c, const exprt & from_index);
+  exprt add_axioms_for_last_index_of(const function_application_exprt &f);
+
+  // Warning: the specifications of these functions is only partial:
+  string_exprt add_axioms_from_float(const function_application_exprt &f);
+  string_exprt add_axioms_from_float(const exprt &f, bool double_precision=false);
+  string_exprt add_axioms_from_double(const function_application_exprt &f);
+
+  string_exprt add_axioms_for_replace(const function_application_exprt &f);
+  string_exprt add_axioms_for_set_length(const function_application_exprt &f);
+
+  // Warning: the specification may not be correct for the case where the string is not long enough
+  string_exprt add_axioms_for_substring(const string_exprt & str, const exprt & start, const exprt & end);
+  string_exprt add_axioms_for_substring(const function_application_exprt &expr);
+
+  string_exprt add_axioms_for_to_lower_case(const function_application_exprt &expr);
+  string_exprt add_axioms_for_to_upper_case(const function_application_exprt &expr);
+  string_exprt add_axioms_for_trim(const function_application_exprt &expr);
+
+  // Warning: not working correctly at the moment
+  string_exprt add_axioms_for_value_of(const function_application_exprt &f);
+
+  string_exprt add_axioms_for_code_point(const exprt &code_point);
+  string_exprt add_axioms_for_java_char_array(const exprt & char_array);
+
+  string_exprt add_axioms_for_if(const if_exprt &expr);
+
+  exprt add_axioms_for_char_literal(const function_application_exprt &f);
+
+  // Warning: this function is underspecified
+  exprt add_axioms_for_code_point_count(const function_application_exprt &f);
+  // Warning: this function is underspecified
+  exprt add_axioms_for_offset_by_code_point(const function_application_exprt &f);
+  exprt add_axioms_for_parse_int(const function_application_exprt &f);
+  exprt add_axioms_for_to_char_array(const function_application_exprt &f);
+
+  exprt add_axioms_for_compare_to(const function_application_exprt &f);
+
+  // Warning: this does not work at the moment because of the way we treat string pointers
+  symbol_exprt add_axioms_for_intern(const function_application_exprt &f);
+
+  
+  // Which language shoud be used
   irep_idt mode;
 
   // assert that the number of argument is equal to nb and extract them
-  inline function_application_exprt::argumentst args(const function_application_exprt &expr, size_t nb)
+  inline static function_application_exprt::argumentst args(const function_application_exprt &expr, size_t nb)
   {
     function_application_exprt::argumentst args = expr.arguments();
     assert(args.size() == nb);
     return args;
   }
 
-  exprt int_of_hex_char(exprt chr, unsigned char_width, typet char_type);
-  exprt is_high_surrogate(const exprt & chr);
-  exprt is_low_surrogate(const exprt & chr);
+  constant_exprt constant_char(int i) const;
+  size_t get_char_width() const;
+  exprt int_of_hex_char(exprt chr, unsigned char_width, typet char_type) const;
+  exprt is_high_surrogate(const exprt & chr) const;
+  exprt is_low_surrogate(const exprt & chr) const;
+
+  // Pool used for the intern method
   std::map<string_exprt, symbol_exprt> pool;
+  // Used to determine whether hashcode should be equal
   std::map<string_exprt, symbol_exprt> hash;
 
 };

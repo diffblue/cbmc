@@ -15,7 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/pointer_predicates.h>
 #include <util/arith_tools.h>
 
-constant_exprt string_constraint_generatort::constant_char(int i)
+constant_exprt string_constraint_generatort::constant_char(int i) const
 {
   if(mode==ID_C)
     return from_integer(i,refined_string_typet::char_type());
@@ -24,7 +24,7 @@ constant_exprt string_constraint_generatort::constant_char(int i)
   else assert(false); // only C and java modes supported
 }
 
-unsignedbv_typet string_constraint_generatort::get_char_type()
+unsignedbv_typet string_constraint_generatort::get_char_type() const
 {
   if(mode==ID_C)
     return refined_string_typet::char_type();
@@ -33,7 +33,7 @@ unsignedbv_typet string_constraint_generatort::get_char_type()
   else assert(false); // only C and java modes supported
 }
 
-size_t string_constraint_generatort::get_char_width()
+size_t string_constraint_generatort::get_char_width() const
 {
   if(mode==ID_C)
     return STRING_SOLVER_C_CHAR_WIDTH;
@@ -62,31 +62,31 @@ symbol_exprt string_constraint_generatort::fresh_boolean(const irep_idt &prefix)
 }
 
 
-string_exprt string_constraint_generatort::string_of_expr(const exprt & unrefined_string)
+string_exprt string_constraint_generatort::add_axioms_for_string_expr(const exprt & unrefined_string)
 {
   string_exprt s;
 
   if(unrefined_string.id() == ID_function_application)
     {
-      exprt res = function_application(to_function_application_expr(unrefined_string));
+      exprt res = add_axioms_for_function_application(to_function_application_expr(unrefined_string));
       assert(res.type() == refined_string_typet(get_char_type()));
       s = to_string_expr(res);
     }
   else if(unrefined_string.id()==ID_symbol)
-    s = get_string_of_symbol(to_symbol_expr(unrefined_string));
+    s = find_or_add_string_of_symbol(to_symbol_expr(unrefined_string));
   else if(unrefined_string.id()==ID_address_of)
     {
       assert(unrefined_string.op0().id()==ID_symbol);
-      s = get_string_of_symbol(to_symbol_expr(unrefined_string.op0()));
+      s = find_or_add_string_of_symbol(to_symbol_expr(unrefined_string.op0()));
     }
   else if(unrefined_string.id()==ID_if)
-    s = string_if(to_if_expr(unrefined_string));
+    s = add_axioms_for_if(to_if_expr(unrefined_string));
   else if(unrefined_string.id()==ID_nondet_symbol || unrefined_string.id()==ID_struct) {
     // We ignore non deterministic symbols and struct
   }
   else
     {
-      throw ("string_exprt of:\n" + unrefined_string.pretty()
+      throw ("add_axioms_for_string_expr:\n" + unrefined_string.pretty()
 	     + "\nwhich is not a function application, a symbol or an if expression");
     }
 
@@ -96,13 +96,13 @@ string_exprt string_constraint_generatort::string_of_expr(const exprt & unrefine
 
 
 
-string_exprt string_constraint_generatort::string_if(const if_exprt &expr)
+string_exprt string_constraint_generatort::add_axioms_for_if(const if_exprt &expr)
 {
   string_exprt res(get_char_type());
   assert(refined_string_typet::is_unrefined_string_type(expr.true_case().type()));
-  string_exprt t = string_of_expr(expr.true_case());
+  string_exprt t = add_axioms_for_string_expr(expr.true_case());
   assert(refined_string_typet::is_unrefined_string_type(expr.false_case().type()));
-  string_exprt f = string_of_expr(expr.false_case());
+  string_exprt f = add_axioms_for_string_expr(expr.false_case());
 
   axioms.push_back(implies_exprt(expr.cond(),res.same_length(t)));
   symbol_exprt qvar = fresh_univ_index("QA_string_if_true");
@@ -116,7 +116,7 @@ string_exprt string_constraint_generatort::string_if(const if_exprt &expr)
 }
 
 
-string_exprt string_constraint_generatort::get_string_of_symbol(const symbol_exprt & sym)
+string_exprt string_constraint_generatort::find_or_add_string_of_symbol(const symbol_exprt & sym)
 {
   irep_idt id = sym.get_identifier();
   std::map<irep_idt, string_exprt>::iterator f = symbol_to_string.find(id);
@@ -127,11 +127,8 @@ string_exprt string_constraint_generatort::get_string_of_symbol(const symbol_exp
   return symbol_to_string[id];
 }
 
-string_exprt string_constraint_generatort::string_of_symbol(const symbol_exprt & sym)
-{ return get_string_of_symbol(sym); }
 
-
-exprt string_constraint_generatort::function_application
+exprt string_constraint_generatort::add_axioms_for_function_application
 (const function_application_exprt & expr)
 {
   const exprt &name = expr.function();
@@ -139,123 +136,123 @@ exprt string_constraint_generatort::function_application
 
   const irep_idt &id = to_symbol_expr(name).get_identifier();
   if (starts_with(id,cprover_char_literal_func))
-    return char_literal(expr);
+    return add_axioms_for_char_literal(expr);
   else if (starts_with(id,cprover_string_length_func))
-    return string_length(expr);
+    return add_axioms_for_length(expr);
   else if (starts_with(id,cprover_string_equal_func))
-    return string_equal(expr);
+    return add_axioms_for_equal(expr);
   else if (starts_with(id,cprover_string_equals_ignore_case_func))
-    return string_equals_ignore_case(expr);
+    return add_axioms_for_equals_ignore_case(expr);
   else if (starts_with(id,cprover_string_is_empty_func))
-    return string_is_empty(expr);
+    return add_axioms_for_is_empty(expr);
   else if (starts_with(id,cprover_string_char_at_func))
-    return string_char_at(expr);
+    return add_axioms_for_char_at(expr);
   else if (starts_with(id,cprover_string_is_prefix_func))
-    return string_is_prefix(expr);
+    return add_axioms_for_is_prefix(expr);
   else if (starts_with(id,cprover_string_is_suffix_func))
-    return string_is_suffix(expr);
+    return add_axioms_for_is_suffix(expr);
   else if (starts_with(id,cprover_string_startswith_func))
-    return string_is_prefix(expr,true);
+    return add_axioms_for_is_prefix(expr,true);
   else if (starts_with(id,cprover_string_endswith_func))
-    return string_is_suffix(expr,true);
+    return add_axioms_for_is_suffix(expr,true);
   else if (starts_with(id,cprover_string_contains_func))
-    return string_contains(expr);
+    return add_axioms_for_contains(expr);
   else if (starts_with(id,cprover_string_hash_code_func))
-    return string_hash_code(expr);
+    return add_axioms_for_hash_code(expr);
   else if (starts_with(id,cprover_string_index_of_func))
-    return string_index_of(expr);
+    return add_axioms_for_index_of(expr);
   else if (starts_with(id,cprover_string_last_index_of_func))
-    return string_last_index_of(expr);
+    return add_axioms_for_last_index_of(expr);
   else if (starts_with(id,cprover_string_parse_int_func))
-    return string_parse_int(expr);
+    return add_axioms_for_parse_int(expr);
   else if (starts_with(id,cprover_string_to_char_array_func))
-    return string_to_char_array(expr);
+    return add_axioms_for_to_char_array(expr);
   else if (starts_with(id,cprover_string_code_point_at_func))
-    return string_code_point_at(expr);
+    return add_axioms_for_code_point_at(expr);
   else if (starts_with(id,cprover_string_code_point_before_func))
-    return string_code_point_before(expr);
+    return add_axioms_for_code_point_before(expr);
   else if (starts_with(id,cprover_string_code_point_count_func))
-    return string_code_point_count(expr);
+    return add_axioms_for_code_point_count(expr);
   else if (starts_with(id,cprover_string_offset_by_code_point_func))
-    return string_offset_by_code_point(expr);
+    return add_axioms_for_offset_by_code_point(expr);
   else if (starts_with(id,cprover_string_compare_to_func))
-    return string_compare_to(expr);
+    return add_axioms_for_compare_to(expr);
   else if(starts_with(id,cprover_string_literal_func))
-    return string_literal(expr);
+    return add_axioms_from_literal(expr);
   else if(starts_with(id,cprover_string_concat_func))
-    return string_concat(expr);
+    return add_axioms_for_concat(expr);
   else if(starts_with(id,cprover_string_concat_int_func))
-    return string_concat_int(expr);
+    return add_axioms_for_concat_int(expr);
   else if(starts_with(id,cprover_string_concat_long_func))
-    return string_concat_long(expr);
+    return add_axioms_for_concat_long(expr);
   else if(starts_with(id,cprover_string_concat_bool_func))
-      return string_concat_bool(expr);
+      return add_axioms_for_concat_bool(expr);
   else if(starts_with(id,cprover_string_concat_char_func))
-    return string_concat_char(expr);
+    return add_axioms_for_concat_char(expr);
   else if(starts_with(id,cprover_string_concat_double_func))
-    return string_concat_double(expr);
+    return add_axioms_for_concat_double(expr);
   else if(starts_with(id,cprover_string_concat_float_func))
-    return string_concat_float(expr);
+    return add_axioms_for_concat_float(expr);
   else if(starts_with(id,cprover_string_concat_code_point_func))
-    return string_concat_code_point(expr);
+    return add_axioms_for_concat_code_point(expr);
   else if(starts_with(id,cprover_string_insert_func))
-    return string_insert(expr);
+    return add_axioms_for_insert(expr);
   else if(starts_with(id,cprover_string_insert_int_func))
-    return string_insert_int(expr);
+    return add_axioms_for_insert_int(expr);
   else if(starts_with(id,cprover_string_insert_long_func))
-    return string_insert_long(expr);
+    return add_axioms_for_insert_long(expr);
   else if(starts_with(id,cprover_string_insert_bool_func))
-    return string_insert_bool(expr);
+    return add_axioms_for_insert_bool(expr);
   else if(starts_with(id,cprover_string_insert_char_func))
-    return string_insert_char(expr);
+    return add_axioms_for_insert_char(expr);
   else if(starts_with(id,cprover_string_insert_double_func))
-    return string_insert_double(expr);
+    return add_axioms_for_insert_double(expr);
   else if(starts_with(id,cprover_string_insert_float_func))
-    return string_insert_float(expr);
+    return add_axioms_for_insert_float(expr);
   else if(starts_with(id,cprover_string_insert_char_array_func))
-    return string_insert_char_array(expr);
+    return add_axioms_for_insert_char_array(expr);
   else if(starts_with(id,cprover_string_substring_func))
-    return string_substring(expr);
+    return add_axioms_for_substring(expr);
   else if(starts_with(id,cprover_string_trim_func))
-    return string_trim(expr);
+    return add_axioms_for_trim(expr);
   else if(starts_with(id,cprover_string_to_lower_case_func))
-    return string_to_lower_case(expr);
+    return add_axioms_for_to_lower_case(expr);
   else if(starts_with(id,cprover_string_to_upper_case_func))
-    return string_to_upper_case(expr);
+    return add_axioms_for_to_upper_case(expr);
   else if(starts_with(id,cprover_string_char_set_func))
-    return string_char_set(expr);
+    return add_axioms_for_char_set(expr);
   else if(starts_with(id,cprover_string_value_of_func))
-    return string_value_of(expr);
+    return add_axioms_for_value_of(expr);
   else if(starts_with(id,cprover_string_empty_string_func))
-    return empty_string(expr);
+    return add_axioms_for_empty_string(expr);
   else if(starts_with(id,cprover_string_copy_func))
-    return string_copy(expr);
+    return add_axioms_for_copy(expr);
   else if(starts_with(id,cprover_string_of_int_func))
-    return of_int(expr);
+    return add_axioms_from_int(expr);
   else if(starts_with(id,cprover_string_of_int_hex_func))
-    return of_int_hex(expr);
+    return add_axioms_from_int_hex(expr);
   else if(starts_with(id,cprover_string_of_float_func))
-    return of_float(expr);
+    return add_axioms_from_float(expr);
   else if(starts_with(id,cprover_string_of_double_func))
-    return of_double(expr);
+    return add_axioms_from_double(expr);
   else if(starts_with(id,cprover_string_of_long_func))
-    return of_long(expr);
+    return add_axioms_from_long(expr);
   else if(starts_with(id,cprover_string_of_bool_func))
-    return of_bool(expr);
+    return add_axioms_from_bool(expr);
   else if(starts_with(id,cprover_string_of_char_func))
-    return of_char(expr);
+    return add_axioms_from_char(expr);
   else if(starts_with(id,cprover_string_of_char_array_func))
-    return of_char_array(expr);
+    return add_axioms_from_char_array(expr);
   else if(starts_with(id,cprover_string_set_length_func))
-    return string_set_length(expr);
+    return add_axioms_for_set_length(expr);
   else if(starts_with(id,cprover_string_delete_func))
-    return string_delete(expr);
+    return add_axioms_for_delete(expr);
   else if(starts_with(id,cprover_string_delete_char_at_func))
-    return string_delete_char_at(expr);
+    return add_axioms_for_delete_char_at(expr);
   else if(starts_with(id,cprover_string_replace_func))
-    return string_replace(expr);
+    return add_axioms_for_replace(expr);
   else if(starts_with(id,cprover_string_data_func))
-    return string_data(expr);
+    return add_axioms_for_data(expr);
   else
     {
       std::string msg("string_exprt::function_application: unknown symbol :");
@@ -272,7 +269,7 @@ irep_idt extract_java_string(const symbol_exprt & s)
   return irep_idt(value);
 }
 
-string_exprt string_constraint_generatort::string_constant(irep_idt sval, int char_width, unsignedbv_typet char_type){
+string_exprt string_constraint_generatort::add_axioms_for_constant(irep_idt sval, int char_width, unsignedbv_typet char_type){
 
   string_exprt res(char_type);
   std::string str = sval.c_str();
@@ -295,7 +292,7 @@ string_exprt string_constraint_generatort::string_constant(irep_idt sval, int ch
   return res;
 }
 
-string_exprt string_constraint_generatort::empty_string(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_for_empty_string(const function_application_exprt &f)
 {
   assert(f.arguments().size() == 0);
   string_exprt res(get_char_type());
@@ -303,7 +300,7 @@ string_exprt string_constraint_generatort::empty_string(const function_applicati
   return res;
 }
 
-string_exprt string_constraint_generatort::string_literal(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_from_literal(const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 1); //bad args to string literal?
@@ -340,11 +337,11 @@ string_exprt string_constraint_generatort::string_literal(const function_applica
       char_type = refined_string_typet::java_char_type();
     }
 
-  return string_constant(sval,char_width,char_type);
+  return add_axioms_for_constant(sval,char_width,char_type);
 }
 
 
-string_exprt string_constraint_generatort::string_concat(const string_exprt & s1, const string_exprt & s2)
+string_exprt string_constraint_generatort::add_axioms_for_concat(const string_exprt & s1, const string_exprt & s2)
 {
   // |res| = |s1| + |s2|
   string_exprt res(get_char_type());
@@ -366,21 +363,21 @@ string_exprt string_constraint_generatort::string_concat(const string_exprt & s1
 }
 
 
-string_exprt string_constraint_generatort::string_concat(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_for_concat(const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2);
 
-  string_exprt s1 = string_of_expr(args[0]);
-  string_exprt s2 = string_of_expr(args[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args[0]);
+  string_exprt s2 = add_axioms_for_string_expr(args[1]);
 
-  return string_concat(s1, s2);
+  return add_axioms_for_concat(s1, s2);
 }
 
 
-string_exprt string_constraint_generatort::string_copy(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_for_copy(const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,1)[0]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,1)[0]);
   string_exprt res(get_char_type());
   axioms.push_back(res.same_length(s1));
   symbol_exprt idx = fresh_univ_index("QA_index_copy");
@@ -389,9 +386,9 @@ string_exprt string_constraint_generatort::string_copy(const function_applicatio
   return res;
 }
 
-string_exprt string_constraint_generatort::string_set_length(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_for_set_length(const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
   exprt k = args(f,2)[1];
   string_exprt res(get_char_type());
 
@@ -409,7 +406,7 @@ string_exprt string_constraint_generatort::string_set_length(const function_appl
 }
 
 
-string_exprt string_constraint_generatort::java_char_array(const exprt & char_array)
+string_exprt string_constraint_generatort::add_axioms_for_java_char_array(const exprt & char_array)
 {
   string_exprt res(get_char_type());
   exprt arr = to_address_of_expr(char_array).object();
@@ -421,7 +418,7 @@ string_exprt string_constraint_generatort::java_char_array(const exprt & char_ar
 }
 
 
-string_exprt string_constraint_generatort::string_value_of(const function_application_exprt &f)
+string_exprt string_constraint_generatort::add_axioms_for_value_of(const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   if(args.size() == 3)
@@ -430,7 +427,7 @@ string_exprt string_constraint_generatort::string_value_of(const function_applic
       exprt char_array = args[0];
       exprt offset = args[1];
       exprt count = args[2];
-      string_exprt str = java_char_array(char_array);
+      string_exprt str = add_axioms_for_java_char_array(char_array);
       axioms.push_back(res.has_length(count));
       symbol_exprt idx = fresh_univ_index("QA_index_value_of");
       string_constraintt a1(idx, count, equal_exprt(str[plus_exprt(idx,offset)],res[idx]));
@@ -440,23 +437,23 @@ string_exprt string_constraint_generatort::string_value_of(const function_applic
   else
     {
       assert(args.size() == 1);
-      return java_char_array(args[0]);
+      return add_axioms_for_java_char_array(args[0]);
     }
 }
 
-string_exprt string_constraint_generatort::string_substring
+string_exprt string_constraint_generatort::add_axioms_for_substring
 (const function_application_exprt &f)
 {
   assert(f.arguments().size() >= 2);
-  string_exprt str = string_of_expr(f.arguments()[0]);
+  string_exprt str = add_axioms_for_string_expr(f.arguments()[0]);
   exprt i(f.arguments()[1]);
   exprt j;
   if(f.arguments().size() == 3) j = f.arguments()[2];
   else { assert(f.arguments().size() == 2); j = str.length(); }
-  return string_substring(str,i,j);
+  return add_axioms_for_substring(str,i,j);
 }
 
-string_exprt string_constraint_generatort::string_substring
+string_exprt string_constraint_generatort::add_axioms_for_substring
   (const string_exprt & str, const exprt & start, const exprt & end)
 {
   symbol_exprt idx = fresh_exist_index("index_substring");
@@ -478,10 +475,10 @@ string_exprt string_constraint_generatort::string_substring
   return res;
 }
 
-string_exprt string_constraint_generatort::string_trim
+string_exprt string_constraint_generatort::add_axioms_for_trim
 (const function_application_exprt &expr)
 {
-  string_exprt str = string_of_expr(args(expr,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(expr,1)[0]);
   string_exprt res(get_char_type());
   symbol_exprt idx = fresh_exist_index("index_trim");
   exprt space_char = constant_char(32);
@@ -517,10 +514,10 @@ string_exprt string_constraint_generatort::string_trim
   return res;
 }
 
-string_exprt string_constraint_generatort::string_to_lower_case
+string_exprt string_constraint_generatort::add_axioms_for_to_lower_case
 (const function_application_exprt &expr)
 {
-  string_exprt str = string_of_expr(args(expr,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(expr,1)[0]);
   string_exprt res(get_char_type());
   exprt char_a = constant_char(97);
   exprt char_A = constant_char(65);
@@ -541,10 +538,10 @@ string_exprt string_constraint_generatort::string_to_lower_case
 }
 
 
-string_exprt string_constraint_generatort::string_to_upper_case
+string_exprt string_constraint_generatort::add_axioms_for_to_upper_case
 (const function_application_exprt &expr)
 {
-  string_exprt str = string_of_expr(args(expr,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(expr,1)[0]);
   string_exprt res(get_char_type());
   exprt char_a = constant_char(97);
   exprt char_A = constant_char(65);
@@ -565,23 +562,23 @@ string_exprt string_constraint_generatort::string_to_upper_case
 }
 
 
-string_exprt string_constraint_generatort::of_int
+string_exprt string_constraint_generatort::add_axioms_from_int
 (const function_application_exprt &expr)
-{ return of_int(args(expr,1)[0],10); }
+{ return add_axioms_from_int(args(expr,1)[0],10); }
 
-string_exprt string_constraint_generatort::of_long
+string_exprt string_constraint_generatort::add_axioms_from_long
 (const function_application_exprt &expr)
-{ return of_int(args(expr,1)[0],30); }
+{ return add_axioms_from_int(args(expr,1)[0],30); }
 
-string_exprt string_constraint_generatort::of_float
+string_exprt string_constraint_generatort::add_axioms_from_float
 (const function_application_exprt &f)
-{ return of_float(args(f,1)[0],false); }
+{ return add_axioms_from_float(args(f,1)[0],false); }
 
-string_exprt string_constraint_generatort::of_double
+string_exprt string_constraint_generatort::add_axioms_from_double
 (const function_application_exprt &f)
-{ return of_float(args(f,1)[0],true); }
+{ return add_axioms_from_float(args(f,1)[0],true); }
 
-string_exprt string_constraint_generatort::of_float
+string_exprt string_constraint_generatort::add_axioms_from_float
 (const exprt &f, bool double_precision)
 {
   // Warning: we currently only have partial specification
@@ -596,7 +593,7 @@ string_exprt string_constraint_generatort::of_float
   string_exprt sign_string(char_type);
 
   //     If the argument is NaN, the result is the string "NaN".
-  string_exprt nan_string = string_constant("NaN",char_width,char_type);
+  string_exprt nan_string = add_axioms_for_constant("NaN",char_width,char_type);
 
   ieee_float_spect fspec = double_precision?ieee_float_spect::double_precision():ieee_float_spect::single_precision();
 
@@ -620,7 +617,7 @@ string_exprt string_constraint_generatort::of_float
 
   // If m is infinity, it is represented by the characters "Infinity"; thus, positive infinity produces the result "Infinity" and negative infinity produces the result "-Infinity".
 
-  string_exprt infinity_string = string_constant("Infinity",char_width,char_type);
+  string_exprt infinity_string = add_axioms_for_constant("Infinity",char_width,char_type);
   exprt isinf = float_bvt().isinf(f,fspec);
   axioms.push_back(implies_exprt(isinf, magnitude.same_length(infinity_string)));
   symbol_exprt qvar_inf = fresh_univ_index("QA_equal_infinity");
@@ -630,23 +627,23 @@ string_exprt string_constraint_generatort::of_float
 
   //If m is zero, it is represented by the characters "0.0"; thus, negative zero produces the result "-0.0" and positive zero produces the result "0.0".
 
-  string_exprt zero_string = string_constant("0.0", char_width, char_type);
+  string_exprt zero_string = add_axioms_for_constant("0.0", char_width, char_type);
   exprt iszero = float_bvt().is_zero(f,fspec);
   axioms.push_back(implies_exprt(iszero, magnitude.same_length(zero_string)));
   symbol_exprt qvar_zero = fresh_univ_index("QA_equal_zero");
   axioms.push_back
     (string_constraintt(qvar_zero, zero_string.length(), iszero, equal_exprt(magnitude[qvar_zero],zero_string[qvar_zero])));
 
-  return string_concat(sign_string,magnitude);
+  return add_axioms_for_concat(sign_string,magnitude);
 }
 
 
-string_exprt string_constraint_generatort::of_bool
+string_exprt string_constraint_generatort::add_axioms_from_bool
 (const function_application_exprt &f)
-{ return of_bool(args(f,1)[0]); }
+{ return add_axioms_from_bool(args(f,1)[0]); }
 
 
-string_exprt string_constraint_generatort::of_bool(const exprt &i)
+string_exprt string_constraint_generatort::add_axioms_from_bool(const exprt &i)
 {
   unsignedbv_typet char_type = get_char_type();
   int char_width = get_char_width();
@@ -656,8 +653,8 @@ string_exprt string_constraint_generatort::of_bool(const exprt &i)
 
   typecast_exprt eq(i,bool_typet());
 
-  string_exprt true_string = string_constant("true",char_width,char_type);
-  string_exprt false_string = string_constant("false",char_width,char_type);
+  string_exprt true_string = add_axioms_for_constant("true",char_width,char_type);
+  string_exprt false_string = add_axioms_for_constant("false",char_width,char_type);
 
   axioms.push_back(implies_exprt(eq, res.same_length(true_string)));
   symbol_exprt qvar = fresh_univ_index("QA_equal_true");
@@ -673,7 +670,7 @@ string_exprt string_constraint_generatort::of_bool(const exprt &i)
 }
 
 
-string_exprt string_constraint_generatort::of_int
+string_exprt string_constraint_generatort::add_axioms_from_int
 (const exprt &i, size_t max_size)
 {
   string_exprt res(get_char_type());
@@ -745,7 +742,8 @@ string_exprt string_constraint_generatort::of_int
 }
 
 
-exprt string_constraint_generatort::int_of_hex_char(exprt chr, unsigned char_width, typet char_type)
+exprt string_constraint_generatort::int_of_hex_char
+(exprt chr, unsigned char_width, typet char_type) const
 {
   exprt zero_char = constant_char('0');
   exprt nine_char = constant_char('9');
@@ -756,7 +754,7 @@ exprt string_constraint_generatort::int_of_hex_char(exprt chr, unsigned char_wid
 }
 
 
-string_exprt string_constraint_generatort::of_int_hex(const exprt &i)
+string_exprt string_constraint_generatort::add_axioms_from_int_hex(const exprt &i)
 {
   string_exprt res(get_char_type());
   typet type = i.type();
@@ -802,15 +800,15 @@ string_exprt string_constraint_generatort::of_int_hex(const exprt &i)
   return res;
 }
 
-string_exprt string_constraint_generatort::of_int_hex
+string_exprt string_constraint_generatort::add_axioms_from_int_hex
 (const function_application_exprt &f)
-{ return of_int_hex(args(f,1)[0]); }
+{ return add_axioms_from_int_hex(args(f,1)[0]); }
 
-string_exprt string_constraint_generatort::of_char
+string_exprt string_constraint_generatort::add_axioms_from_char
 (const function_application_exprt &f)
-{ return of_char(args(f,1)[0]); }
+{ return add_axioms_from_char(args(f,1)[0]); }
 
-string_exprt string_constraint_generatort::of_char(const exprt &c)
+string_exprt string_constraint_generatort::add_axioms_from_char(const exprt &c)
 {
   string_exprt res(get_char_type());
   and_exprt lemma(equal_exprt(res[0], c), res.has_length(1));
@@ -819,7 +817,7 @@ string_exprt string_constraint_generatort::of_char(const exprt &c)
 }
 
 
-string_exprt string_constraint_generatort::code_point(const exprt &code_point)
+string_exprt string_constraint_generatort::add_axioms_for_code_point(const exprt &code_point)
 {
   string_exprt res(get_char_type());
   typet type = code_point.type();
@@ -849,11 +847,11 @@ string_exprt string_constraint_generatort::code_point(const exprt &code_point)
 }
 
 
-string_exprt string_constraint_generatort::string_char_set
+string_exprt string_constraint_generatort::add_axioms_for_char_set
 (const function_application_exprt &f)
 {
   string_exprt res(get_char_type());
-  string_exprt str = string_of_expr(args(f,3)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
   with_exprt sarrnew(str.content(), args(f,3)[1], args(f,3)[2]);
   implies_exprt lemma(binary_relation_exprt(args(f,3)[1], ID_lt, str.length()),
                       and_exprt(equal_exprt(res.content(), sarrnew),
@@ -862,10 +860,10 @@ string_exprt string_constraint_generatort::string_char_set
   return res;
 }
 
-string_exprt string_constraint_generatort::string_replace
+string_exprt string_constraint_generatort::add_axioms_for_replace
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,3)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
   exprt oldChar = args(f,3)[1];
   exprt newChar = args(f,3)[2];
   string_exprt res(get_char_type());
@@ -882,164 +880,164 @@ string_exprt string_constraint_generatort::string_replace
   return res;
 }
 
-string_exprt string_constraint_generatort::string_delete_char_at
+string_exprt string_constraint_generatort::add_axioms_for_delete_char_at
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,2)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,2)[0]);
   exprt index_one = refined_string_typet::index_of_int(1);
-  return string_delete(str,args(f,2)[1],plus_exprt(args(f,2)[1],index_one));
+  return add_axioms_for_delete(str,args(f,2)[1],plus_exprt(args(f,2)[1],index_one));
 }
 
-string_exprt string_constraint_generatort::string_delete
+string_exprt string_constraint_generatort::add_axioms_for_delete
 (const string_exprt &str, const exprt & start, const exprt & end)
 {
   assert(start.type() == refined_string_typet::index_type());
   assert(end.type() == refined_string_typet::index_type());
-  string_exprt str1 = string_substring(str,refined_string_typet::index_zero(),start);
-  string_exprt str2 = string_substring(str,end,str.length());
-  return string_concat(str1,str2);
+  string_exprt str1 = add_axioms_for_substring(str,refined_string_typet::index_zero(),start);
+  string_exprt str2 = add_axioms_for_substring(str,end,str.length());
+  return add_axioms_for_concat(str1,str2);
 }
 
-string_exprt string_constraint_generatort::string_delete
+string_exprt string_constraint_generatort::add_axioms_for_delete
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,3)[0]);
-  return string_delete(str,args(f,3)[1],args(f,3)[2]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
+  return add_axioms_for_delete(str,args(f,3)[1],args(f,3)[2]);
 }
 
 
-string_exprt string_constraint_generatort::string_concat_int
+string_exprt string_constraint_generatort::add_axioms_for_concat_int
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_int(args(f,2)[1],10);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_int(args(f,2)[1],10);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_long
+string_exprt string_constraint_generatort::add_axioms_for_concat_long
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_int(args(f,2)[1],30);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_int(args(f,2)[1],30);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_bool
+string_exprt string_constraint_generatort::add_axioms_for_concat_bool
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_bool(args(f,2)[1]);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_bool(args(f,2)[1]);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_char
+string_exprt string_constraint_generatort::add_axioms_for_concat_char
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_char(args(f,2)[1]);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_char(args(f,2)[1]);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_double
+string_exprt string_constraint_generatort::add_axioms_for_concat_double
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_float(args(f,2)[1],30);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_float(args(f,2)[1],30);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_float
+string_exprt string_constraint_generatort::add_axioms_for_concat_float
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = of_float(args(f,2)[1],10);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_from_float(args(f,2)[1],10);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_concat_code_point
+string_exprt string_constraint_generatort::add_axioms_for_concat_code_point
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = code_point(args(f,2)[1]);
-  return string_concat(s1,s2);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_for_code_point(args(f,2)[1]);
+  return add_axioms_for_concat(s1,s2);
 }
 
-string_exprt string_constraint_generatort::string_insert
+string_exprt string_constraint_generatort::add_axioms_for_insert
 (const string_exprt & s1, const string_exprt & s2, const exprt & offset)
 {
   assert(offset.type() == refined_string_typet::index_type());
-  string_exprt pref = string_substring(s1,refined_string_typet::index_zero(),offset);
-  string_exprt suf = string_substring(s1,offset,s1.length());
-  string_exprt concat1 = string_concat(pref,s2);
-  return string_concat(concat1,suf);
+  string_exprt pref = add_axioms_for_substring(s1,refined_string_typet::index_zero(),offset);
+  string_exprt suf = add_axioms_for_substring(s1,offset,s1.length());
+  string_exprt concat1 = add_axioms_for_concat(pref,s2);
+  return add_axioms_for_concat(concat1,suf);
 }
 
-string_exprt string_constraint_generatort::string_insert
+string_exprt string_constraint_generatort::add_axioms_for_insert
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = string_of_expr(args(f,3)[2]);
-  return string_insert(s1, s2, args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_for_string_expr(args(f,3)[2]);
+  return add_axioms_for_insert(s1, s2, args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_int
+string_exprt string_constraint_generatort::add_axioms_for_insert_int
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_int(args(f,3)[2],10);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_int(args(f,3)[2],10);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_long
+string_exprt string_constraint_generatort::add_axioms_for_insert_long
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_int(args(f,3)[2],30);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_int(args(f,3)[2],30);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_bool
+string_exprt string_constraint_generatort::add_axioms_for_insert_bool
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_bool(args(f,3)[2]);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_bool(args(f,3)[2]);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_char
+string_exprt string_constraint_generatort::add_axioms_for_insert_char
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_char(args(f,3)[2]);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_char(args(f,3)[2]);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_double
+string_exprt string_constraint_generatort::add_axioms_for_insert_double
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_float(args(f,3)[2]);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_float(args(f,3)[2]);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
-string_exprt string_constraint_generatort::string_insert_float
+string_exprt string_constraint_generatort::add_axioms_for_insert_float
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,3)[0]);
-  string_exprt s2 = of_float(args(f,3)[2]);
-  return string_insert(s1,s2,args(f,3)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,3)[0]);
+  string_exprt s2 = add_axioms_from_float(args(f,3)[2]);
+  return add_axioms_for_insert(s1,s2,args(f,3)[1]);
 }
 
 
-exprt string_constraint_generatort::string_equal
+exprt string_constraint_generatort::add_axioms_for_equal
 (const function_application_exprt &f)
  {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   symbol_exprt eq = fresh_boolean("equal");
   typecast_exprt tc_eq(eq,f.type());
 
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = string_of_expr(args(f,2)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_for_string_expr(args(f,2)[1]);
 
   // We want to write:
   // eq <=> (s1.length = s2.length  && forall i < s1.length. s1[i] = s2[i])
@@ -1079,7 +1077,7 @@ exprt character_equals_ignore_case
 		  and_exprt(is_upper_case_2, equal_exprt(minus_exprt(plus_exprt(char_a,char2),char_A),char1)));
 }
 
-exprt string_constraint_generatort::string_equals_ignore_case
+exprt string_constraint_generatort::add_axioms_for_equals_ignore_case
 (const function_application_exprt &f)
 {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
@@ -1089,8 +1087,8 @@ exprt string_constraint_generatort::string_equals_ignore_case
   exprt char_a = constant_char('a');
   exprt char_A = constant_char('A');
   exprt char_Z = constant_char('Z');
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = string_of_expr(args(f,2)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_for_string_expr(args(f,2)[1]);
   symbol_exprt witness = fresh_exist_index("witness_unequal_ignore_case");
   symbol_exprt qvar = fresh_univ_index("QA_equal_ignore_case");
 
@@ -1112,17 +1110,17 @@ exprt string_constraint_generatort::string_equals_ignore_case
 }
 
 
-exprt string_constraint_generatort::string_length
+exprt string_constraint_generatort::add_axioms_for_length
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,1)[0]);
   return str.length();
 }
 
-exprt string_constraint_generatort::string_data
+exprt string_constraint_generatort::add_axioms_for_data
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,3)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
   exprt tab_data = args(f,3)[1];
   exprt data = args(f,3)[2];
   symbol_exprt qvar = fresh_univ_index("QA_string_data");
@@ -1146,7 +1144,7 @@ exprt string_constraint_generatort::string_data
   return void_expr;
 }
 
-string_exprt string_constraint_generatort::of_char_array
+string_exprt string_constraint_generatort::add_axioms_from_char_array
 (const exprt & length, const exprt & data, const exprt & offset, const exprt & count)
 {
   string_exprt str(get_char_type());
@@ -1162,7 +1160,7 @@ string_exprt string_constraint_generatort::of_char_array
   return str;
 }
 
-string_exprt string_constraint_generatort::of_char_array
+string_exprt string_constraint_generatort::add_axioms_from_char_array
 (const function_application_exprt &f)
 {
   exprt offset;
@@ -1180,10 +1178,10 @@ string_exprt string_constraint_generatort::of_char_array
     }
   exprt tab_length = f.arguments()[0];
   exprt data = f.arguments()[1];
-  return of_char_array(tab_length,data,offset,count);
+  return add_axioms_from_char_array(tab_length,data,offset,count);
 }
 
-string_exprt string_constraint_generatort::string_insert_char_array
+string_exprt string_constraint_generatort::add_axioms_for_insert_char_array
 (const function_application_exprt &f)
 {
   exprt offset;
@@ -1200,11 +1198,11 @@ string_exprt string_constraint_generatort::string_insert_char_array
       offset = from_integer(0,signedbv_typet(32));
     }
 
-  string_exprt str = string_of_expr(f.arguments()[0]);
+  string_exprt str = add_axioms_for_string_expr(f.arguments()[0]);
   exprt length = f.arguments()[2];
   exprt data = f.arguments()[3];
-  string_exprt arr = of_char_array(length,data,offset,count);
-  return string_insert(str,arr,f.arguments()[1]);
+  string_exprt arr = add_axioms_from_char_array(length,data,offset,count);
+  return add_axioms_for_insert(str,arr,f.arguments()[1]);
 }
 
 
@@ -1213,7 +1211,7 @@ exprt is_positive(const exprt & x)
 { return binary_relation_exprt(x, ID_ge, refined_string_typet::index_of_int(0)); }
 
 
-exprt string_constraint_generatort::string_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset)
+exprt string_constraint_generatort::add_axioms_for_is_prefix(const string_exprt &prefix, const string_exprt &str, const exprt & offset)
 {
   symbol_exprt isprefix = fresh_boolean("isprefix");
   axioms.push_back(implies_exprt(isprefix, str.longer(plus_exprt(prefix.length(),offset))));
@@ -1236,32 +1234,32 @@ exprt string_constraint_generatort::string_is_prefix(const string_exprt &prefix,
   return isprefix;
 }
 
-exprt string_constraint_generatort::string_is_prefix
+exprt string_constraint_generatort::add_axioms_for_is_prefix
 (const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
-  string_exprt s0 = string_of_expr(args[swap_arguments?1:0]);
-  string_exprt s1 = string_of_expr(args[swap_arguments?0:1]);
+  string_exprt s0 = add_axioms_for_string_expr(args[swap_arguments?1:0]);
+  string_exprt s1 = add_axioms_for_string_expr(args[swap_arguments?0:1]);
   exprt offset;
   if(args.size() == 2) offset = refined_string_typet::index_zero();
   else if (args.size() == 3) offset = args[2];
-  return typecast_exprt(string_is_prefix(s0,s1,offset),f.type());
+  return typecast_exprt(add_axioms_for_is_prefix(s0,s1,offset),f.type());
 }
 
-exprt string_constraint_generatort::string_is_empty
+exprt string_constraint_generatort::add_axioms_for_is_empty
 (const function_application_exprt &f)
 {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   symbol_exprt is_empty = fresh_boolean("is_empty");
-  string_exprt s0 = string_of_expr(args(f,1)[0]);
+  string_exprt s0 = add_axioms_for_string_expr(args(f,1)[0]);
   axioms.push_back(implies_exprt(is_empty, s0.has_length(0)));
   axioms.push_back(implies_exprt(s0.has_length(0),is_empty));
   return typecast_exprt(is_empty,f.type());
 
 }
 
-exprt string_constraint_generatort::string_is_suffix
+exprt string_constraint_generatort::add_axioms_for_is_suffix
 (const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args = f.arguments();
@@ -1270,8 +1268,8 @@ exprt string_constraint_generatort::string_is_suffix
 
   symbol_exprt issuffix = fresh_boolean("issuffix");
   typecast_exprt tc_issuffix(issuffix,f.type());
-  string_exprt s0 = string_of_expr(args[swap_arguments?1:0]);
-  string_exprt s1 = string_of_expr(args[swap_arguments?0:1]);
+  string_exprt s0 = add_axioms_for_string_expr(args[swap_arguments?1:0]);
+  string_exprt s1 = add_axioms_for_string_expr(args[swap_arguments?0:1]);
 
   // issufix(s1,s0) => s0.length >= s1.length
   // && forall witness < s1.length.
@@ -1304,14 +1302,14 @@ exprt string_constraint_generatort::string_is_suffix
 }
 
 
-exprt string_constraint_generatort::string_contains
+exprt string_constraint_generatort::add_axioms_for_contains
 ( const function_application_exprt &f)
 {
   assert(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   symbol_exprt contains = fresh_boolean("contains");
   typecast_exprt tc_contains(contains,f.type());
-  string_exprt s0 = string_of_expr(args(f,2)[0]);
-  string_exprt s1 = string_of_expr(args(f,2)[1]);
+  string_exprt s0 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[1]);
 
   // contains => s0.length >= s1.length
   // && startpos <= s0.length - s1.length
@@ -1343,9 +1341,9 @@ exprt string_constraint_generatort::string_contains
 }
 
 
-exprt string_constraint_generatort::string_hash_code(const function_application_exprt &f)
+exprt string_constraint_generatort::add_axioms_for_hash_code(const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,1)[0]);
   typet return_type = f.type();
 
   // initialisation of the missing pool variable
@@ -1375,7 +1373,7 @@ exprt string_constraint_generatort::string_hash_code(const function_application_
   return hash[str];
 }
 
-exprt string_constraint_generatort::string_index_of
+exprt string_constraint_generatort::add_axioms_for_index_of
 (const string_exprt &str, const exprt & c, const exprt & from_index)
 {
   symbol_exprt index = fresh_exist_index("index_of");
@@ -1406,7 +1404,7 @@ exprt string_constraint_generatort::string_index_of
   return index;
 }
 
-exprt string_constraint_generatort::string_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
+exprt string_constraint_generatort::add_axioms_for_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
 {
   symbol_exprt offset = fresh_exist_index("index_of");
   symbol_exprt contains = fresh_boolean("contains_substring");
@@ -1423,7 +1421,7 @@ exprt string_constraint_generatort::string_index_of_string(const string_exprt &s
   return offset;
 }
 
-exprt string_constraint_generatort::string_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
+exprt string_constraint_generatort::add_axioms_for_last_index_of_string(const string_exprt &str, const string_exprt & substring, const exprt & from_index)
 {
   symbol_exprt offset = fresh_exist_index("index_of");
   symbol_exprt contains = fresh_boolean("contains_substring");
@@ -1441,12 +1439,12 @@ exprt string_constraint_generatort::string_last_index_of_string(const string_exp
 }
 
 
-exprt string_constraint_generatort::string_index_of
+exprt string_constraint_generatort::add_axioms_for_index_of
 ( const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(f.type() == refined_string_typet::index_type());
-  string_exprt str = string_of_expr(args[0]);
+  string_exprt str = add_axioms_for_string_expr(args[0]);
   exprt c = args[1];
   exprt from_index;
 
@@ -1456,14 +1454,14 @@ exprt string_constraint_generatort::string_index_of
 
   if(refined_string_typet::is_java_string_type(c.type()))
     {
-      string_exprt sub = string_of_expr(c);
-      return string_index_of_string(str,sub,from_index);
+      string_exprt sub = add_axioms_for_string_expr(c);
+      return add_axioms_for_index_of_string(str,sub,from_index);
     }
   else
-    return string_index_of(str,typecast_exprt(c,get_char_type()),from_index);
+    return add_axioms_for_index_of(str,typecast_exprt(c,get_char_type()),from_index);
 }
 
-exprt string_constraint_generatort::string_last_index_of
+exprt string_constraint_generatort::add_axioms_for_last_index_of
 (const string_exprt &str, const exprt & c, const exprt & from_index)
 {
   symbol_exprt index = fresh_exist_index("last_index_of");
@@ -1492,12 +1490,12 @@ exprt string_constraint_generatort::string_last_index_of
   return index;
 }
 
-exprt string_constraint_generatort::string_last_index_of
+exprt string_constraint_generatort::add_axioms_for_last_index_of
 ( const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(f.type() == refined_string_typet::index_type());
-  string_exprt str = string_of_expr(args[0]);
+  string_exprt str = add_axioms_for_string_expr(args[0]);
   exprt c = args[1];
   exprt from_index;
 
@@ -1509,14 +1507,14 @@ exprt string_constraint_generatort::string_last_index_of
 
   if(refined_string_typet::is_java_string_type(c.type()))
     {
-      string_exprt sub = string_of_expr(c);
-      return string_last_index_of_string(str,sub,from_index);
+      string_exprt sub = add_axioms_for_string_expr(c);
+      return add_axioms_for_last_index_of_string(str,sub,from_index);
     }
   else
-    return string_last_index_of(str,typecast_exprt(c,get_char_type()),from_index);
+    return add_axioms_for_last_index_of(str,typecast_exprt(c,get_char_type()),from_index);
 }
 
-exprt string_constraint_generatort::char_literal
+exprt string_constraint_generatort::add_axioms_for_char_literal
 ( const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
@@ -1545,19 +1543,19 @@ exprt string_constraint_generatort::char_literal
 }
 
 
-exprt string_constraint_generatort::string_char_at
+exprt string_constraint_generatort::add_axioms_for_char_at
 ( const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,2)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,2)[0]);
   symbol_exprt char_sym = string_exprt::fresh_symbol("char",get_char_type());
   axioms.push_back(equal_exprt(char_sym,str[args(f,2)[1]]));
   return char_sym;
 }
 
-exprt string_constraint_generatort::string_parse_int
+exprt string_constraint_generatort::add_axioms_for_parse_int
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,1)[0]);
   typet type = f.type();
   symbol_exprt i = string_exprt::fresh_symbol("parsed_int",type);
 
@@ -1595,25 +1593,25 @@ exprt string_constraint_generatort::string_parse_int
 }
 
 
-exprt string_constraint_generatort::is_high_surrogate(const exprt & chr)
+exprt string_constraint_generatort::is_high_surrogate(const exprt & chr) const
 {
   return and_exprt
     (binary_relation_exprt(chr,ID_ge,constant_char(0xD800)),
      binary_relation_exprt(chr,ID_le,constant_char(0xDBFF)));
 }
 
-exprt string_constraint_generatort::is_low_surrogate(const exprt & chr)
+exprt string_constraint_generatort::is_low_surrogate(const exprt & chr) const
 {
   return and_exprt
     (binary_relation_exprt(chr,ID_ge,constant_char(0xDC00)),
      binary_relation_exprt(chr,ID_le,constant_char(0xDFFF)));
 }
 
-exprt string_constraint_generatort::string_code_point_at
+exprt string_constraint_generatort::add_axioms_for_code_point_at
 ( const function_application_exprt &f)
 {
   typet return_type = f.type();
-  string_exprt str = string_of_expr(args(f,2)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,2)[0]);
   exprt pos = args(f,2)[1];
   symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
   assert(return_type.id() == ID_signedbv);
@@ -1639,14 +1637,14 @@ exprt string_constraint_generatort::string_code_point_at
   return result;
 }
 
-exprt string_constraint_generatort::string_code_point_before
+exprt string_constraint_generatort::add_axioms_for_code_point_before
 ( const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   assert(args.size() == 2);
   typet return_type = f.type();
   symbol_exprt result = string_exprt::fresh_symbol("char",return_type);
-  string_exprt str = string_of_expr(args[0]);
+  string_exprt str = add_axioms_for_string_expr(args[0]);
 
   exprt char1 = str[minus_exprt(args[1],refined_string_typet::index_of_int(2))];
   exprt char1_as_int = typecast_exprt(char1,return_type);
@@ -1673,10 +1671,10 @@ exprt string_constraint_generatort::string_code_point_before
   return result;
 }
 
-exprt string_constraint_generatort::string_code_point_count
+exprt string_constraint_generatort::add_axioms_for_code_point_count
 ( const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,3)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
   exprt begin = args(f,3)[1];
   exprt end = args(f,3)[2];
   typet return_type = f.type();
@@ -1688,10 +1686,10 @@ exprt string_constraint_generatort::string_code_point_count
   return result;
 }
 
-exprt string_constraint_generatort::string_offset_by_code_point
+exprt string_constraint_generatort::add_axioms_for_offset_by_code_point
 ( const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,3)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,3)[0]);
   exprt index = args(f,3)[1];
   exprt offset = args(f,3)[2];
   typet return_type = f.type();
@@ -1705,19 +1703,19 @@ exprt string_constraint_generatort::string_offset_by_code_point
 }
 
 
-exprt string_constraint_generatort::string_to_char_array
+exprt string_constraint_generatort::add_axioms_for_to_char_array
 (const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,1)[0]);
   return str.content();
 }
 
 
-exprt string_constraint_generatort::string_compare_to
+exprt string_constraint_generatort::add_axioms_for_compare_to
 (const function_application_exprt &f)
 {
-  string_exprt s1 = string_of_expr(args(f,2)[0]);
-  string_exprt s2 = string_of_expr(args(f,2)[1]);
+  string_exprt s1 = add_axioms_for_string_expr(args(f,2)[0]);
+  string_exprt s2 = add_axioms_for_string_expr(args(f,2)[1]);
   typet return_type = f.type();
   symbol_exprt res = string_exprt::fresh_symbol("compare_to",return_type);
 
@@ -1769,9 +1767,9 @@ exprt string_constraint_generatort::string_compare_to
   return res;
 }
 
-symbol_exprt string_constraint_generatort::string_intern(const function_application_exprt &f)
+symbol_exprt string_constraint_generatort::add_axioms_for_intern(const function_application_exprt &f)
 {
-  string_exprt str = string_of_expr(args(f,1)[0]);
+  string_exprt str = add_axioms_for_string_expr(args(f,1)[0]);
   typet return_type = f.type();
 
   // initialisation of the missing pool variable
@@ -1813,11 +1811,11 @@ symbol_exprt string_constraint_generatort::string_intern(const function_applicat
 }
 
 
-void string_constraint_generatort::string_of_expr(const symbol_exprt & sym, const exprt & str)
+void string_constraint_generatort::set_string_symbol_equal_to_expr(const symbol_exprt & sym, const exprt & str)
 {
   if(str.id()==ID_symbol)
-    assign_to_symbol(sym,string_of_symbol(to_symbol_expr(str)));
+    assign_to_symbol(sym,find_or_add_string_of_symbol(to_symbol_expr(str)));
   else
-    assign_to_symbol(sym,string_of_expr(str));
+    assign_to_symbol(sym,add_axioms_for_string_expr(str));
 }
 
