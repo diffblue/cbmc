@@ -56,13 +56,14 @@ public:
 
   void make_top() override final
   {
-    cleanup_map.clear();
-    is_bottom=false;
+    // We don't have a proper top.
+    assert(false);
   }
   
   void make_entry() override final
   {
-    make_top();
+    cleanup_map.clear();
+    is_bottom=false;
   }
 
   typedef union_find<irep_idt> aliasest;
@@ -73,6 +74,9 @@ public:
     std::set<irep_idt> cleanup_functions;
   };
 
+  // We track a set of 'cleanup functions' for specific
+  // identifiers. The cleanup functions are executed
+  // once the last pointer to an object is lost.
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
 
