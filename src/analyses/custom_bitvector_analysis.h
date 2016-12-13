@@ -27,32 +27,31 @@ class custom_bitvector_analysist;
 class custom_bitvector_domaint:public ai_domain_baset
 {
 public:
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) final override;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const final override;
 
-  virtual void make_bottom()
+  void make_bottom() final override
   {
     may_bits.clear();
     must_bits.clear();
     is_bottom=true;
   }
 
-  virtual void make_top()
+  void make_top() final override
   {
-    may_bits.clear();
-    must_bits.clear();
-    is_bottom=false;
+    // We don't have a proper top, and refuse to do this.
+    assert(false);
   }
 
-  virtual void make_entry()
+  void make_entry() final override
   {
     may_bits.clear();
     must_bits.clear();
