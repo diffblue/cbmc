@@ -13,7 +13,6 @@ Date:   September 2016
 
 #include <util/irep.h>
 
-bool starts_with(irep_idt id, irep_idt prefix);
 const irep_idt cprover_char_literal_func("__CPROVER_uninterpreted_char_literal_func");
 const irep_idt cprover_string_literal_func("__CPROVER_uninterpreted_string_literal_func");
 const irep_idt cprover_string_char_at_func("__CPROVER_uninterpreted_string_char_at_func");

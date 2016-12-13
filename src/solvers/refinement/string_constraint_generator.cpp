@@ -14,6 +14,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <java_bytecode/java_types.h>
 #include <util/pointer_predicates.h>
 #include <util/arith_tools.h>
+#include <util/prefix.h>
+
+bool has_prefix(const irep_idt &s, const irep_idt &prefix)
+{
+  return has_prefix(id2string(s), id2string(prefix));
+}
 
 constant_exprt string_constraint_generatort::constant_char(int i) const
 {
@@ -135,123 +141,123 @@ exprt string_constraint_generatort::add_axioms_for_function_application
   assert(name.id() == ID_symbol);
 
   const irep_idt &id = to_symbol_expr(name).get_identifier();
-  if (starts_with(id,cprover_char_literal_func))
+  if (has_prefix(id,cprover_char_literal_func))
     return add_axioms_for_char_literal(expr);
-  else if (starts_with(id,cprover_string_length_func))
+  else if (has_prefix(id,cprover_string_length_func))
     return add_axioms_for_length(expr);
-  else if (starts_with(id,cprover_string_equal_func))
+  else if (has_prefix(id,cprover_string_equal_func))
     return add_axioms_for_equal(expr);
-  else if (starts_with(id,cprover_string_equals_ignore_case_func))
+  else if (has_prefix(id,cprover_string_equals_ignore_case_func))
     return add_axioms_for_equals_ignore_case(expr);
-  else if (starts_with(id,cprover_string_is_empty_func))
+  else if (has_prefix(id,cprover_string_is_empty_func))
     return add_axioms_for_is_empty(expr);
-  else if (starts_with(id,cprover_string_char_at_func))
+  else if (has_prefix(id,cprover_string_char_at_func))
     return add_axioms_for_char_at(expr);
-  else if (starts_with(id,cprover_string_is_prefix_func))
+  else if (has_prefix(id,cprover_string_is_prefix_func))
     return add_axioms_for_is_prefix(expr);
-  else if (starts_with(id,cprover_string_is_suffix_func))
+  else if (has_prefix(id,cprover_string_is_suffix_func))
     return add_axioms_for_is_suffix(expr);
-  else if (starts_with(id,cprover_string_startswith_func))
+  else if (has_prefix(id,cprover_string_startswith_func))
     return add_axioms_for_is_prefix(expr,true);
-  else if (starts_with(id,cprover_string_endswith_func))
+  else if (has_prefix(id,cprover_string_endswith_func))
     return add_axioms_for_is_suffix(expr,true);
-  else if (starts_with(id,cprover_string_contains_func))
+  else if (has_prefix(id,cprover_string_contains_func))
     return add_axioms_for_contains(expr);
-  else if (starts_with(id,cprover_string_hash_code_func))
+  else if (has_prefix(id,cprover_string_hash_code_func))
     return add_axioms_for_hash_code(expr);
-  else if (starts_with(id,cprover_string_index_of_func))
+  else if (has_prefix(id,cprover_string_index_of_func))
     return add_axioms_for_index_of(expr);
-  else if (starts_with(id,cprover_string_last_index_of_func))
+  else if (has_prefix(id,cprover_string_last_index_of_func))
     return add_axioms_for_last_index_of(expr);
-  else if (starts_with(id,cprover_string_parse_int_func))
+  else if (has_prefix(id,cprover_string_parse_int_func))
     return add_axioms_for_parse_int(expr);
-  else if (starts_with(id,cprover_string_to_char_array_func))
+  else if (has_prefix(id,cprover_string_to_char_array_func))
     return add_axioms_for_to_char_array(expr);
-  else if (starts_with(id,cprover_string_code_point_at_func))
+  else if (has_prefix(id,cprover_string_code_point_at_func))
     return add_axioms_for_code_point_at(expr);
-  else if (starts_with(id,cprover_string_code_point_before_func))
+  else if (has_prefix(id,cprover_string_code_point_before_func))
     return add_axioms_for_code_point_before(expr);
-  else if (starts_with(id,cprover_string_code_point_count_func))
+  else if (has_prefix(id,cprover_string_code_point_count_func))
     return add_axioms_for_code_point_count(expr);
-  else if (starts_with(id,cprover_string_offset_by_code_point_func))
+  else if (has_prefix(id,cprover_string_offset_by_code_point_func))
     return add_axioms_for_offset_by_code_point(expr);
-  else if (starts_with(id,cprover_string_compare_to_func))
+  else if (has_prefix(id,cprover_string_compare_to_func))
     return add_axioms_for_compare_to(expr);
-  else if(starts_with(id,cprover_string_literal_func))
+  else if(has_prefix(id,cprover_string_literal_func))
     return add_axioms_from_literal(expr);
-  else if(starts_with(id,cprover_string_concat_func))
+  else if(has_prefix(id,cprover_string_concat_func))
     return add_axioms_for_concat(expr);
-  else if(starts_with(id,cprover_string_concat_int_func))
+  else if(has_prefix(id,cprover_string_concat_int_func))
     return add_axioms_for_concat_int(expr);
-  else if(starts_with(id,cprover_string_concat_long_func))
+  else if(has_prefix(id,cprover_string_concat_long_func))
     return add_axioms_for_concat_long(expr);
-  else if(starts_with(id,cprover_string_concat_bool_func))
+  else if(has_prefix(id,cprover_string_concat_bool_func))
       return add_axioms_for_concat_bool(expr);
-  else if(starts_with(id,cprover_string_concat_char_func))
+  else if(has_prefix(id,cprover_string_concat_char_func))
     return add_axioms_for_concat_char(expr);
-  else if(starts_with(id,cprover_string_concat_double_func))
+  else if(has_prefix(id,cprover_string_concat_double_func))
     return add_axioms_for_concat_double(expr);
-  else if(starts_with(id,cprover_string_concat_float_func))
+  else if(has_prefix(id,cprover_string_concat_float_func))
     return add_axioms_for_concat_float(expr);
-  else if(starts_with(id,cprover_string_concat_code_point_func))
+  else if(has_prefix(id,cprover_string_concat_code_point_func))
     return add_axioms_for_concat_code_point(expr);
-  else if(starts_with(id,cprover_string_insert_func))
+  else if(has_prefix(id,cprover_string_insert_func))
     return add_axioms_for_insert(expr);
-  else if(starts_with(id,cprover_string_insert_int_func))
+  else if(has_prefix(id,cprover_string_insert_int_func))
     return add_axioms_for_insert_int(expr);
-  else if(starts_with(id,cprover_string_insert_long_func))
+  else if(has_prefix(id,cprover_string_insert_long_func))
     return add_axioms_for_insert_long(expr);
-  else if(starts_with(id,cprover_string_insert_bool_func))
+  else if(has_prefix(id,cprover_string_insert_bool_func))
     return add_axioms_for_insert_bool(expr);
-  else if(starts_with(id,cprover_string_insert_char_func))
+  else if(has_prefix(id,cprover_string_insert_char_func))
     return add_axioms_for_insert_char(expr);
-  else if(starts_with(id,cprover_string_insert_double_func))
+  else if(has_prefix(id,cprover_string_insert_double_func))
     return add_axioms_for_insert_double(expr);
-  else if(starts_with(id,cprover_string_insert_float_func))
+  else if(has_prefix(id,cprover_string_insert_float_func))
     return add_axioms_for_insert_float(expr);
-  else if(starts_with(id,cprover_string_insert_char_array_func))
+  else if(has_prefix(id,cprover_string_insert_char_array_func))
     return add_axioms_for_insert_char_array(expr);
-  else if(starts_with(id,cprover_string_substring_func))
+  else if(has_prefix(id,cprover_string_substring_func))
     return add_axioms_for_substring(expr);
-  else if(starts_with(id,cprover_string_trim_func))
+  else if(has_prefix(id,cprover_string_trim_func))
     return add_axioms_for_trim(expr);
-  else if(starts_with(id,cprover_string_to_lower_case_func))
+  else if(has_prefix(id,cprover_string_to_lower_case_func))
     return add_axioms_for_to_lower_case(expr);
-  else if(starts_with(id,cprover_string_to_upper_case_func))
+  else if(has_prefix(id,cprover_string_to_upper_case_func))
     return add_axioms_for_to_upper_case(expr);
-  else if(starts_with(id,cprover_string_char_set_func))
+  else if(has_prefix(id,cprover_string_char_set_func))
     return add_axioms_for_char_set(expr);
-  else if(starts_with(id,cprover_string_value_of_func))
+  else if(has_prefix(id,cprover_string_value_of_func))
     return add_axioms_for_value_of(expr);
-  else if(starts_with(id,cprover_string_empty_string_func))
+  else if(has_prefix(id,cprover_string_empty_string_func))
     return add_axioms_for_empty_string(expr);
-  else if(starts_with(id,cprover_string_copy_func))
+  else if(has_prefix(id,cprover_string_copy_func))
     return add_axioms_for_copy(expr);
-  else if(starts_with(id,cprover_string_of_int_func))
+  else if(has_prefix(id,cprover_string_of_int_func))
     return add_axioms_from_int(expr);
-  else if(starts_with(id,cprover_string_of_int_hex_func))
+  else if(has_prefix(id,cprover_string_of_int_hex_func))
     return add_axioms_from_int_hex(expr);
-  else if(starts_with(id,cprover_string_of_float_func))
+  else if(has_prefix(id,cprover_string_of_float_func))
     return add_axioms_from_float(expr);
-  else if(starts_with(id,cprover_string_of_double_func))
+  else if(has_prefix(id,cprover_string_of_double_func))
     return add_axioms_from_double(expr);
-  else if(starts_with(id,cprover_string_of_long_func))
+  else if(has_prefix(id,cprover_string_of_long_func))
     return add_axioms_from_long(expr);
-  else if(starts_with(id,cprover_string_of_bool_func))
+  else if(has_prefix(id,cprover_string_of_bool_func))
     return add_axioms_from_bool(expr);
-  else if(starts_with(id,cprover_string_of_char_func))
+  else if(has_prefix(id,cprover_string_of_char_func))
     return add_axioms_from_char(expr);
-  else if(starts_with(id,cprover_string_of_char_array_func))
+  else if(has_prefix(id,cprover_string_of_char_array_func))
     return add_axioms_from_char_array(expr);
-  else if(starts_with(id,cprover_string_set_length_func))
+  else if(has_prefix(id,cprover_string_set_length_func))
     return add_axioms_for_set_length(expr);
-  else if(starts_with(id,cprover_string_delete_func))
+  else if(has_prefix(id,cprover_string_delete_func))
     return add_axioms_for_delete(expr);
-  else if(starts_with(id,cprover_string_delete_char_at_func))
+  else if(has_prefix(id,cprover_string_delete_char_at_func))
     return add_axioms_for_delete_char_at(expr);
-  else if(starts_with(id,cprover_string_replace_func))
+  else if(has_prefix(id,cprover_string_replace_func))
     return add_axioms_for_replace(expr);
-  else if(starts_with(id,cprover_string_data_func))
+  else if(has_prefix(id,cprover_string_data_func))
     return add_axioms_for_data(expr);
   else
     {
