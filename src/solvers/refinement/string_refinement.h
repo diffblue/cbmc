@@ -26,6 +26,9 @@ public:
   string_refinementt(const namespacet &_ns, propt &_prop);
   ~string_refinementt() {};
 
+  //Determine which language should be used
+   void set_mode();
+
   // Should we use counter examples at each iteration?
   bool use_counter_example;
 

@@ -36,6 +36,16 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   start_time = std::chrono::high_resolution_clock::now();
 }
 
+void string_refinementt::set_mode()
+{
+  debug() << "initializing mode" << eom;
+  // symbol_table.show(std::cout);
+  symbolt init = ns.lookup(irep_idt("__CPROVER_initialize"));
+  irep_idt mode = init.mode;
+  debug() << "mode detected as " << mode << eom;
+  generator.set_mode(mode);
+}
+
 void string_refinementt::display_index_set() {
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
 	 end = index_set.end(); i != end; ++i) {
@@ -102,7 +112,6 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 
   if (refined_string_typet::is_unrefined_string_type(type))
     {
-      generator.check_char_type(expr);
       string_exprt str = generator.string_of_symbol(to_symbol_expr(expr));
       bvt bv = convert_bv(str);
       return bv;
@@ -121,6 +130,12 @@ bvt string_refinementt::convert_function_application(const function_application_
 bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
   if(!equality_propagation) return true;
+
+  // We should not do that everytime, but I cannot find
+  // another good entry point
+  if(generator.get_mode() == ID_unknown)
+    set_mode();
+
   const typet &type=ns.follow(expr.lhs().type());
 
   if(expr.lhs().id()==ID_symbol &&
@@ -133,7 +148,6 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     if(refined_string_typet::is_unrefined_string_type(type))
       {
-	generator.check_char_type(expr.lhs());
 	symbol_exprt sym = to_symbol_expr(expr.lhs());
 	generator.string_of_expr(sym,expr.rhs());
 	return false;
@@ -165,7 +179,6 @@ void string_refinementt::print_time(std::string s)
 
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
-
   print_time("string_refinementt::dec_solve");
   for(unsigned i = 0; i < generator.axioms.size(); i++)
     if(generator.axioms[i].id() == ID_string_constraint)

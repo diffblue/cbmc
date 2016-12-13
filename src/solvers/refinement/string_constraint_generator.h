@@ -15,7 +15,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 class string_constraint_generatort {
 public:
 
-  string_constraint_generatort() : language(UNKNOWN){ }
+  string_constraint_generatort() : mode(ID_unknown) { }
+
+  void set_mode(irep_idt _mode)
+  {
+    assert((_mode==ID_java)||(_mode==ID_C)); // only C and java modes supported
+    mode=_mode;
+  }
+
+  inline irep_idt &get_mode() { return mode; }
 
   constant_exprt constant_char(int i);
   unsignedbv_typet get_char_type();
@@ -175,15 +183,9 @@ public:
   // Warning: this does not work at the moment because of the way we treat string pointers
   symbol_exprt string_intern(const function_application_exprt &f);
 
-  // Check that the given string is from the right language
-  void check_char_type(const exprt & str);
-
 private:
 
-  enum {C, JAVA, UNKNOWN} language;
-
-
-  inline bool use_c_string() {return (language == C);}
+  irep_idt mode;
 
   // assert that the number of argument is equal to nb and extract them
   inline function_application_exprt::argumentst args(const function_application_exprt &expr, size_t nb)

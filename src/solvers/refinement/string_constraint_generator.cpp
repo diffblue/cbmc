@@ -17,47 +17,29 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 constant_exprt string_constraint_generatort::constant_char(int i)
 {
-  switch(language)
-    {
-    case C :
-      return from_integer(i,refined_string_typet::char_type());
-      break;
-    case JAVA :
-      return from_integer(i,refined_string_typet::java_char_type());
-      break;
-    default: assert(false);
-    }
-}
-
-void string_constraint_generatort::check_char_type(const exprt & str)
-{
-  if(language == C)
-    assert(refined_string_typet::is_c_string_type(str.type()));
-  else
-    if(language == UNKNOWN)
-      {
-	if(refined_string_typet::is_c_string_type(str.type()))
-	  language = C;
-	else
-	  language = JAVA;
-      }
-
+  if(mode==ID_C)
+    return from_integer(i,refined_string_typet::char_type());
+  else if(mode==ID_java)
+    return from_integer(i,refined_string_typet::java_char_type());
+  else assert(false); // only C and java modes supported
 }
 
 unsignedbv_typet string_constraint_generatort::get_char_type()
 {
-  if(language==C)
+  if(mode==ID_C)
     return refined_string_typet::char_type();
-  else if(language==JAVA) return refined_string_typet::java_char_type();
-  else assert(false);
+  else if(mode==ID_java)
+    return refined_string_typet::java_char_type();
+  else assert(false); // only C and java modes supported
 }
 
 size_t string_constraint_generatort::get_char_width()
 {
-  if(language==C)
+  if(mode==ID_C)
     return STRING_SOLVER_C_CHAR_WIDTH;
-  else if(language==JAVA) return STRING_SOLVER_JAVA_CHAR_WIDTH;
-  else assert(false);
+  else if(mode==ID_java)
+    return STRING_SOLVER_JAVA_CHAR_WIDTH;
+  else assert(false); // only C and java modes supported
 }
 
 symbol_exprt string_constraint_generatort::fresh_univ_index(const irep_idt &prefix)
@@ -83,8 +65,6 @@ symbol_exprt string_constraint_generatort::fresh_boolean(const irep_idt &prefix)
 string_exprt string_constraint_generatort::string_of_expr(const exprt & unrefined_string)
 {
   string_exprt s;
-
-  check_char_type(unrefined_string);
 
   if(unrefined_string.id() == ID_function_application)
     {
@@ -1106,9 +1086,6 @@ exprt string_constraint_generatort::string_equals_ignore_case
 
   symbol_exprt eq = fresh_boolean("equal_ignore_case");
   typecast_exprt tc_eq(eq,f.type());
-
-  check_char_type(f); // is this necessary?
-
   exprt char_a = constant_char('a');
   exprt char_A = constant_char('A');
   exprt char_Z = constant_char('Z');
