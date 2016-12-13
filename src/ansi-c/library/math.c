@@ -22,6 +22,31 @@ inline long double __builtin_fabsl(long double d) { return __CPROVER_fabsl(d); }
 
 inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
 
+/* FUNCTION: __builtin_isgreater */
+
+int __builtin_isgreater(float f, float g) { return f > g; }
+
+/* FUNCTION: __builtin_isgreaterequal */
+
+int __builtin_isgreaterequal(float f, float g) { return f >= g; }
+
+/* FUNCTION: __builtin_isless */
+
+int __builtin_isless(float f, float g) { return f < g;}
+
+/* FUNCTION: __builtin_islessequal */
+
+int __builtin_islessequal(float f, float g) { return f <= g; }
+
+/* FUNCTION: __builtin_islessgreater */
+
+int __builtin_islessgreater(float f, float g) { return (f < g) || (g > f); }
+
+/* FUNCTION: __builtin_isunordered */
+
+int __builtin_isunordered(float f, float g) { return isnan(f) || isnan(g); }
+
+
 /* FUNCTION: isfinite */
 
 int isfinite(double d) { return __CPROVER_isfinited(d); }
@@ -424,8 +449,68 @@ float __builtin_nanf(const char *str)
   // the 'str' argument is not yet used
 __CPROVER_hide:;
   (void)*str;
+  return 0.0f/0.0f;
+}
+
+
+/* ISO 9899:2011
+ * The call nan("n-char-sequence") is equivalent to
+ * strtod("NAN(n-char-sequence)", (char**) NULL); the call nan("") is
+ * equivalent to strtod("NAN()", (char**) NULL). If tagp does not
+ * point to an n-char sequence or an empty string, the call is
+ * equivalent to strtod("NAN", (char**) NULL). Calls to nanf and nanl
+ * are equivalent to the corresponding calls to strtof and strtold.
+ *
+ * The nan functions return a quiet NaN, if available, with content
+ * indicated through tagp. If the implementation does not support
+ * quiet NaNs, the functions return zero.
+ */
+
+/* FUNCTION: nan */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double nan(const char *str) {
+  // the 'str' argument is not yet used
+ __CPROVER_hide:;
+  (void)*str;
   return 0.0/0.0;
 }
+
+/* FUNCTION: nanf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float nanf(const char *str) {
+  // the 'str' argument is not yet used
+ __CPROVER_hide:;
+  (void)*str;
+  return 0.0f/0.0f;
+}
+
+/* FUNCTION: nanl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double nanl(const char *str) {
+  // the 'str' argument is not yet used
+ __CPROVER_hide:;
+  (void)*str;
+  return 0.0/0.0;
+}
+
+
+
+
 
 /* FUNCTION: nextUpf */
 
@@ -575,6 +660,7 @@ __CPROVER_hide:;
     --m.bv;
     return m.f;
   }
+  
 }
 
 
@@ -607,8 +693,6 @@ __CPROVER_hide:;
 #endif
 
 float nextUpf(float f);
-
-extern int __CPROVER_rounding_mode;
 
 float sqrtf(float f)
 {
@@ -645,7 +729,7 @@ float sqrtf(float f)
     __CPROVER_assume(f < upperSquare);
 
     // Select between them to work out which to return
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST :
       return (f - lowerSquare < upperSquare - f) ? lower : upper; break;
@@ -720,7 +804,7 @@ double sqrt(double d)
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
 
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST:
       return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
@@ -789,7 +873,7 @@ long double sqrtl(long double d)
     __CPROVER_assume(lowerSquare <= d);
     __CPROVER_assume(d < upperSquare);
 
-    switch(__CPROVER_rounding_mode)
+    switch(fegetround())
     {
     case FE_TONEAREST:
       return (d - lowerSquare < upperSquare - d) ? lower : upper; break;
@@ -816,3 +900,1245 @@ long double sqrtl(long double d)
     return root;
   }
 }
+
+
+/* ISO 9899:2011
+ * The fmax functions determine the maximum numeric value of their
+ * arguments. 242)
+ *
+ * 242) NaN arguments are treated as missing data: if one argument is
+ * a NaN and the other numeric, then the fmax functions choose the
+ * numeric value. See F.10.9.2.
+ *
+ * - If just one argument is a NaN, the fmax functions return the other
+ *   argument (if both arguments are NaNs, the functions return a NaN).
+ * - The returned value is exact and is independent of the current
+ *   rounding direction mode.
+ * - The body of the fmax function might be 374)
+ *       { return (isgreaterequal(x, y) || isnan(y)) ? x : y; }
+ *
+ * 374) Ideally, fmax would be sensitive to the sign of zero, for
+ * example fmax(-0.0, +0.0) would return +0; however, implementation
+ * in software might be impractical.
+ */
+
+/* FUNCTION: fmax */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
+double fmax(double f, double g) { return ((f >= g) || isnan(g)) ? f : g; }
+
+/* FUNCTION : fmaxf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
+float fmaxf(float f, float g) { return ((f >= g) || isnan(g)) ? f : g; }
+
+
+/* FUNCTION : fmaxl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
+long double fmaxl(long double f, long double g) { return ((f >= g) || isnan(g)) ? f : g; }
+
+
+/* ISO 9899:2011
+ * The fmin functions determine the minimum numeric value of their
+ * arguments.243)
+ *
+ * 243) The fmin functions are analogous to the fmax functions in
+ * their treatment of NaNs.
+ *
+ * - The fmin functions are analogous to the fmax functions (see F.10.9.2).
+ * - The returned value is exact and is independent of the current
+ *   rounding direction mode.
+ */
+
+/* FUNCTION: fmin */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+ 
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB
+double fmin(double f, double g) { return ((f <= g) || isnan(g)) ? f : g; }
+
+/* FUNCTION: fminf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
+float fminf(float f, float g) { return ((f <= g) || isnan(g)) ? f : g; }
+
+/* FUNCTION: fminl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+// TODO : Should call a __CPROVER_function so that it can be converted to SMT-LIB 
+long double fminl(long double f, long double g) { return ((f <= g) || isnan(g)) ? f : g; }
+
+
+/* ISO 9899:2011
+ * The fdim functions determine the positive difference between their
+ * arguments:
+ *     x - y if x > y
+ *     +0    if x <= y
+ * A range error may occur.
+ */
+
+/* FUNCTION: fdim */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fdim(double f, double g) { return ((f > g) ? f - g : +0.0); }
+
+
+/* FUNCTION: fdimf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
+
+
+/* FUNCTION: fdiml */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fdim(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
+
+
+
+/* FUNCTION: __sort_of_CPROVER_round_to_integral */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d)
+{
+  double magicConst = 0x1.0p+52;
+  double return_value;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
+  
+  if (fabs(d) >= magicConst || d == 0.0)
+  {
+    return_value = d;
+  }
+  else
+  {
+    if (!signbit(d)) {
+      double tmp = d + magicConst;
+      return_value = tmp - magicConst;
+    } else {
+      double tmp = d - magicConst;
+      return_value = tmp + magicConst;    
+    }
+  }
+
+  fesetround(saved_rounding_mode);
+  return return_value;
+}
+
+/* FUNCTION: __sort_of_CPROVER_round_to_integralf */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
+{
+  float magicConst = 0x1.0p+23f;  // 23 is significant
+  float return_value;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
+  
+  if (fabsf(d) >= magicConst || d == 0.0)
+  {
+    return_value = d;
+  }
+  else
+  {
+    if (!signbit(d)) {
+      float tmp = d + magicConst;
+      return_value = tmp - magicConst;    
+    } else {
+      float tmp = d - magicConst;
+      return_value = tmp + magicConst;    
+    }
+  }
+
+  fesetround(saved_rounding_mode);
+  return return_value;
+}
+
+
+/* FUNCTION: __sort_of_CPROVER_round_to_integrall */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
+{
+  long double magicConst = 0x1.0p+64d;
+  long double return_value;
+  int saved_rounding_mode = fegetround();
+  fesetround(rounding_mode);
+  
+  if (fabsl(d) >= magicConst || d == 0.0)
+  {
+    return_value = d;
+  }
+  else
+  {
+    if (!signbit(d)) {
+      long double tmp = d + magicConst;
+      return_value = tmp - magicConst;    
+    } else {
+      long double tmp = d - magicConst;
+      return_value = tmp + magicConst;    
+    }
+  }
+
+  fesetround(saved_rounding_mode);
+  return return_value;
+}
+
+/* ISO 9899:2011
+ *
+ * The ceil functions compute the smallest integer value not less than
+ * x.
+ */
+
+/* FUNCTION: ceil */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double ceil(double x)
+{
+  return __sort_of_CPROVER_round_to_integral(FE_UPWARD, x);
+}
+
+/* FUNCTION: ceilf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float ceilf(float x)
+{
+  return __sort_of_CPROVER_round_to_integralf(FE_UPWARD, x);
+}
+
+
+/* FUNCTION: ceill */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double ceill(long double x)
+{
+  return __sort_of_CPROVER_round_to_integrall(FE_UPWARD, x);
+}
+
+
+/* ISO 9899:2011
+ *
+ * The floor functions compute the largest integer value not greater than x.
+ */
+
+/* FUNCTION: floor */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double floor(double x)
+{
+  return __sort_of_CPROVER_round_to_integral(FE_DOWNWARD, x);
+}
+
+/* FUNCTION: floorf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float floorf(float x)
+{
+  return __sort_of_CPROVER_round_to_integralf(FE_DOWNWARD, x);
+}
+
+
+/* FUNCTION: floorl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double floorl(long double x)
+{
+  return __sort_of_CPROVER_round_to_integrall(FE_DOWNWARD, x);
+}
+
+
+/* ISO 9899:2011
+ *
+ * The trunc functions round their argument to the integer value, in
+ * floating format, nearest to but no larger in magnitude than the argument.
+ */
+
+/* FUNCTION: trunc */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double trunc(double x)
+{
+  return __sort_of_CPROVER_round_to_integral(FE_TOWARDZERO, x);
+}
+
+/* FUNCTION: truncf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float truncf(float x)
+{
+  return __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, x);
+}
+
+
+/* FUNCTION: truncl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double truncl(long double x)
+{
+  return __sort_of_CPROVER_round_to_integrall(FE_TOWARDZERO, x);
+}
+
+
+/* ISO 9899:2011
+ *
+ * The round functions round their argument to the integer value, in
+ * floating format, nearest to but no larger in magnitude than the argument.
+ */
+
+/* FUNCTION: round */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double round(double x)
+{
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  return __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+}
+
+/* FUNCTION: roundf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float roundf(float x)
+{
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  return __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+}
+
+
+/* FUNCTION: roundl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double roundl(long double x)
+{
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  return __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+}
+
+
+
+/* ISO 9899:2011
+ *
+ * The nearbyint functions round their argument to an integer value in
+ * floating-point format, using the current rounding direction and
+ * without raising the inexact floating-point exception.
+ */
+
+/* FUNCTION: nearbyint */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double nearbyint(double x)
+{
+  return __sort_of_CPROVER_round_to_integral(fegetround(), x);
+}
+
+/* FUNCTION: nearbyintf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float nearbyintf(float x)
+{
+  return __sort_of_CPROVER_round_to_integralf(fegetround(), x);
+}
+
+
+/* FUNCTION: nearbyintl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double nearbyintl(long double x)
+{
+  return __sort_of_CPROVER_round_to_integrall(fegetround(), x);
+}
+
+
+
+/* ISO 9899:2011
+ *
+ * The rint functions differ from the nearbyint functions (7.12.9.3)
+ * only in that the rint functions may raise the inexact
+ * floating-point exception if the result differs in value from the argument.
+ */
+
+/* FUNCTION: rint */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double rint(double x)
+{
+  return __sort_of_CPROVER_round_to_integral(fegetround(), x);
+}
+
+/* FUNCTION: rintf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float rintf(float x)
+{
+  return __sort_of_CPROVER_round_to_integralf(fegetround(), x);
+}
+
+/* FUNCTION: rintl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double rintl(long double x)
+{
+  return __sort_of_CPROVER_round_to_integrall(fegetround(), x);
+}
+
+
+
+/* ISO 9899:2011
+ *
+ * The lrint and llrint functions round their argument to the nearest
+ * integer value, rounding according to the current rounding
+ * direction. If the rounded value is outside the range of the return
+ * type, the numeric result is unspecified and a domain error or range
+ * error may occur.
+ */
+
+/* FUNCTION: lrint */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+long int lrint(double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  double rti = __sort_of_CPROVER_round_to_integral(fegetround(), x);
+  return (long int)rti;
+}
+
+/* FUNCTION: lrintf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float lrintf(float x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  float rti = __sort_of_CPROVER_round_to_integralf(fegetround(), x);
+  return (long int)rti;
+}
+
+
+/* FUNCTION: lrintl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double lrintl(long double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  long double rti = __sort_of_CPROVER_round_to_integrall(fegetround(), x);
+  return (long int)rti;
+}
+
+
+/* FUNCTION: llrint */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+long long int llrint(double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  double rti = __sort_of_CPROVER_round_to_integral(fegetround(), x);
+  return (long long int)rti;
+}
+
+/* FUNCTION: llrintf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float llrintf(float x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  float rti = __sort_of_CPROVER_round_to_integralf(fegetround(), x);
+  return (long long int)rti;
+}
+
+
+/* FUNCTION: llrintl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double llrintl(long double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  long double rti = __sort_of_CPROVER_round_to_integrall(fegetround(), x);
+  return (long long int)rti;
+}
+
+
+/* ISO 9899:2011
+ *
+ * The lround and llround functions round their argument to the
+ * nearest integer value, rounding halfway cases away from zero,
+ * regardless of the current rounding direction. If the rounded value
+ * is outside the range of the return type, the numeric result is
+ * unspecified and a domain error or range error may occur.
+ */
+
+/* FUNCTION: lround */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+long int lround(double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  double rti = __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+  return (long int)rti;
+}
+
+/* FUNCTION: lroundf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float lroundf(float x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  float rti = __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+  return (long int)rti;
+}
+
+
+/* FUNCTION: lroundl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double lroundl(long double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+  return (long int)rti;
+}
+
+
+/* FUNCTION: llround */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+long long int llround(double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  double rti = __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+  return (long long int)rti;
+}
+
+/* FUNCTION: llroundf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float llroundf(float x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  float rti = __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+  return (long long int)rti;
+}
+
+
+/* FUNCTION: llroundl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double llroundl(long double x)
+{
+  // TODO : should be an all-in-one __CPROVER function to allow
+  // conversion to SMT
+  // TODO : Should be RNA not RNE, needs a new rounding mode
+  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+  return (long long int)rti;
+}
+
+
+/* ISO 9899:2011
+ *
+ * The modf functions break the argument value into integral and
+ * fractional parts, each of which has the same type and sign as the
+ * argument. They store the integral part (in floating-point format)
+ * in the object pointed to by iptr.
+ */
+
+/* FUNCTION: modf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+
+double modf(double x, double *iptr)
+{
+  *iptr = __sort_of_CPROVER_round_to_integral(FE_TOWARDZERO, x);
+  return (x - *iptr);
+}
+
+/* FUNCTION: modff */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+  float modff(float x, float *iptr)
+{
+  *iptr = __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, x);
+  return (x - *iptr);
+}
+
+
+/* FUNCTION: modfl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+  long double modfl(long double x, long double *iptr)
+{
+  *iptr = __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, x);
+  return (x - *iptr);
+}
+
+
+
+/* FUNCTION: __sort_of_CPROVER_remainder */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
+  
+double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y)
+{
+  // Extended precision helps... a bit...
+  long double div = x/y;
+  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
+  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
+  return res;
+}
+
+/* FUNCTION: __sort_of_CPROVER_remainderf */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+
+float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
+
+float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y)
+{
+  // Extended precision helps... a bit...
+  long double div = x/y;
+  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
+  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
+  return res;
+}
+
+/* FUNCTION: __sort_of_CPROVER_remainderl */
+// TODO : Should be a real __CPROVER function to convert to SMT-LIB
+
+long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
+
+long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y)
+{
+  // Extended precision helps... a bit...
+  long double div = x/y;
+  long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
+  long double res = (-y * n) + x;   // TODO : FMA would be an improvement
+  return res;
+}
+
+
+
+/* ISO 9899:2011
+ *
+ * The fmod functions return the value x - ny, for some
+ * integer n such that, if y is nonzero, the result has the same sign
+ * as x and magnitude less than the magnitude of y. If y is zero,
+ * whether a domain error occurs or the fmod functions return zero is
+ * implementation-defined.
+ */
+
+/* FUNCTION: fmod */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
+
+double fmod(double x, double y) { return __sort_of_CPROVER_remainder(FE_TOWARDZERO, x, y); }
+
+
+/* FUNCTION: fmodf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
+
+float fmodf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TOWARDZERO, x, y); }
+
+
+/* FUNCTION: fmodl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
+
+long double fmodl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TOWARDZERO, x, y); }
+
+
+
+/* ISO 9899:2011
+ *
+ * The remainder functions compute the remainder x REM y required by
+ * IEC 60559.239)
+ *
+ * 239) "When y != 0, the remainder r = x REM y is defined regardless
+ *      of the rounding mode by the  mathematical relation r = x - n
+ *      y, where n is the integer nearest the exact value of x/y;
+ *      whenever | n -  x/y | = 1/2, then n is even. If r = 0, its
+ *      sign shall be that of x." This definition is applicable for
+ *      all implementations.
+ */
+
+/* FUNCTION: remainder */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y);
+
+double remainder(double x, double y) { return __sort_of_CPROVER_remainder(FE_TONEAREST, x, y); }
+
+
+/* FUNCTION: remainderf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y);
+
+float remainderf(float x, float y) { return __sort_of_CPROVER_remainderf(FE_TONEAREST, x, y); }
+
+
+/* FUNCTION: remainderl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_FENV_H_INCLUDED
+#include <fenv.h>
+#define __CPROVER_FENV_H_INCLUDED
+#endif
+
+long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y);
+
+long double remainderl(long double x, long double y) { return __sort_of_CPROVER_remainderl(FE_TONEAREST, x, y); }
+
+
+
+
+/* ISO 9899:2011
+ * The copysign functions produce a value with the magnitude of x and
+ * the sign of y. They produce a NaN (with the sign of y) if x is a
+ * NaN. On implementations that represent a signed zero but do not
+ * treat negative zero consistently in arithmetic operations, the
+ * copysign functions regard the sign of zero as positive.
+ */
+
+/* FUNCTION: copysign */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+double fabs (double d);
+
+double copysign(double x, double y)
+{
+  double abs = fabs(x);
+  return (signbit(y)) ? -abs : abs;
+}
+
+/* FUNCTION: copysignf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+float fabsf (float d);
+
+float copysignf(float x, float y)
+{
+  float abs = fabs(x);
+  return (signbit(y)) ? -abs : abs;
+}
+
+/* FUNCTION: copysignl */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+long double fabsl (long double d);
+
+long double copysignl(long double x, long double y)
+{
+  long double abs = fabs(x);
+  return (signbit(y)) ? -abs : abs;
+}
+
+
+
