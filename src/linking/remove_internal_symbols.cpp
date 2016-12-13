@@ -144,6 +144,16 @@ void remove_internal_symbols(
     if(is_type)
     {
       // never EXPORTED by itself
+        // Without this code the symbol is lost when compiling with
+        // goto-cc
+        // So the problem with this approach is that this is per typedef
+        // we move the name of the typedef into the type it corresponds to
+        // e.g. will not elegantly work when more than one typedef for the same
+        // type. Instead we want to somehow whenever we find an expression
+        // that directly uses a typedef we want to record that that is the case
+        // so we can use the correct typedef
+#if 0
+#endif
     }
     else if(is_function)
     {
