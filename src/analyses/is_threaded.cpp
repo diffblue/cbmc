@@ -13,12 +13,17 @@ Date: October 2012
 
 class is_threaded_domaint:public ai_domain_baset
 {
-  bool has_spawn;
 public:
+  bool reachable;
+  bool has_spawn;
   bool is_threaded;
 
-  inline is_threaded_domaint():has_spawn(false), is_threaded(false)
+  inline is_threaded_domaint():
+    reachable(false),
+    has_spawn(false),
+    is_threaded(false)
   {
+    // this is bottom
   }
 
   inline bool merge(
@@ -26,6 +31,10 @@ public:
     locationt from,
     locationt to)
   {
+    bool old_reachable=reachable;
+    if(src.reachable)
+      reachable=true;
+  
     bool old_h_s=has_spawn;
     if(src.has_spawn &&
        (from->is_end_function() ||
@@ -38,21 +47,40 @@ public:
        !from->is_end_function()))
       is_threaded=true;
 
-    return old_i_t!=is_threaded || old_h_s!=has_spawn;
+    return old_reachable!=reachable ||
+           old_i_t!=is_threaded ||
+           old_h_s!=has_spawn;
   }
 
   void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns)
+    const namespacet &ns) override final
   {
+    if(!reachable) return;
     if(from->is_start_thread() ||
        to->is_end_thread())
     {
       has_spawn=true;
       is_threaded=true;
     }
+  }
+  
+  void make_bottom() override final
+  {
+    reachable=has_spawn=is_threaded=false;
+  }
+
+  void make_top() override final
+  {
+    reachable=has_spawn=is_threaded=true;
+  }
+  
+  void make_entry() override final
+  {
+    reachable=true;
+    has_spawn=is_threaded=false;
   }
 };
 

@@ -16,8 +16,11 @@ Author: Peter Schrammel
 class constant_propagator_domaint:public ai_domain_baset
 {
 public:
-  virtual void transform(locationt, locationt, ai_baset &, const namespacet &);
-  virtual void output(std::ostream &, const ai_baset &, const namespacet &) const;
+  void transform(locationt, locationt, ai_baset &, const namespacet &) override final;
+  void output(std::ostream &, const ai_baset &, const namespacet &) const override final;
+  void make_top() override final { values.set_to_top(); }
+  void make_bottom() override final { values.set_to_bottom(); }
+  void make_entry() override final { values.set_to_top(); }
   bool merge(const constant_propagator_domaint &, locationt, locationt);
 
   struct valuest

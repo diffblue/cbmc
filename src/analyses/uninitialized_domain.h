@@ -20,16 +20,31 @@ public:
   typedef std::set<irep_idt> uninitializedt;
   uninitializedt uninitialized;
 
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const override final;
+    
+  void make_top() override final
+  {
+    uninitialized.clear();
+  }
+
+  void make_bottom() override final
+  {
+    uninitialized.clear();
+  }
+
+  void make_entry() override final
+  {
+    uninitialized.clear();
+  }
 
   // returns true iff there is s.th. new
   bool merge(

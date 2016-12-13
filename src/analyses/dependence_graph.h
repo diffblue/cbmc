@@ -83,12 +83,27 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) final override;
 
-  virtual void output(
-      std::ostream &out,
-      const ai_baset &ai,
-      const namespacet &ns) const;
+  void output(
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const final override;
+    
+  void make_top() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
+
+  void make_bottom() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
+
+  void make_entry() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
 
   void set_node_id(node_indext id)
   {
@@ -111,6 +126,7 @@ protected:
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     dependence_grapht &dep_graph);
+
   void data_dependencies(
     goto_programt::const_targett from,
     goto_programt::const_targett to,

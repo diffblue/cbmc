@@ -27,26 +27,34 @@ public:
     return invariant_set.make_union(other.invariant_set);
   }
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const
+    const namespacet &ns) const override final
   {
     invariant_set.output("", out);
-  }
-
-  virtual void initialize(
-    const namespacet &ns,
-    locationt l)
-  {
-    invariant_set.make_true();
   }
 
   virtual void transform(
     locationt from_l,
     locationt to_l,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
+    
+  void make_top() override final
+  {
+    invariant_set.make_true();
+  }
+
+  void make_bottom() override final
+  {
+    invariant_set.make_false();
+  }
+
+  void make_entry() override final
+  {
+    invariant_set.make_true();
+  }
 };
 
 #endif // CPROVER_ANALYSES_INVARIANT_SET_DOMAIN_H

@@ -54,6 +54,11 @@ public:
     aliases.clear();
   }
 
+  void make_entry()
+  {
+    aliases.clear();
+  }
+
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
 

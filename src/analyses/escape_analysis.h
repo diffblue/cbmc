@@ -32,32 +32,37 @@ public:
   {
   }
 
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const override final;
 
   bool merge(
     const escape_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom()
+  void make_bottom() override final
   {
     cleanup_map.clear();
     is_bottom=true;
   }
 
-  void make_top()
+  void make_top() override final
   {
     cleanup_map.clear();
     is_bottom=false;
+  }
+  
+  void make_entry() override final
+  {
+    make_top();
   }
 
   typedef union_find<irep_idt> aliasest;

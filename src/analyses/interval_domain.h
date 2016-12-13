@@ -24,17 +24,21 @@ public:
   // Trivial, conjunctive interval domain for both float
   // and integers. The categorization 'float' and 'integers'
   // is done by is_int and is_float.
+  
+  interval_domaint():bottom(true)
+  {
+  }
 
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const override final;
 
   bool merge(
     const interval_domaint &b,
@@ -42,7 +46,7 @@ public:
     locationt to);
 
   // no states
-  virtual void make_bottom()
+  void make_bottom() override final
   {
     int_map.clear();
     float_map.clear();
@@ -50,11 +54,16 @@ public:
   }
 
   // all states
-  virtual void make_top()
+  void make_top() override final
   {
     int_map.clear();
     float_map.clear();
     bottom=false;
+  }
+
+  void make_entry() override final
+  {
+    make_top();
   }
 
   exprt make_expression(const symbol_exprt &) const;

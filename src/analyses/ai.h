@@ -54,19 +54,13 @@ public:
   }
 
   // no states
-  virtual void make_bottom()
-  {
-  }
+  virtual void make_bottom()=0;
 
   // all states
-  virtual void make_top()
-  {
-  }
+  virtual void make_top()=0;
 
   // a reasonable entry-point state
-  virtual void make_entry()
-  {
-  }
+  virtual void make_entry()=0;
 
   // also add
   //
