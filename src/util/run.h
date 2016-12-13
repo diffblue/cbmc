@@ -19,4 +19,6 @@ int run(
   const std::vector<std::string> &argv,
   const std::string &std_input);
 
+int run_shell(const std::string &command);
+
 #endif // CPROVER_UTIL_RUN_H
