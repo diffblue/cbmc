@@ -59,7 +59,19 @@ sub load($) {
 
 sub test($$$$$) {
   my ($name, $test, $t_level, $cmd, $ign) = @_;
-  my ($level, $input, $options, @results) = load("$test");
+  my ($level, $input, $options, $grep_options, @results) = load("$test");
+
+  # If the 4th line starts with a '-' we use that line as options to pass to
+  # grep when matching all lines in this test
+  if($grep_options =~ /^-/) {
+    print "\nActivating perl flags: $grep_options\n";
+  }
+  else {
+    # No grep options so stick this back into the results array
+    unshift @results, $grep_options;
+    $grep_options = "";
+  }
+
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
@@ -107,7 +119,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep \$'$result' \"$name/$output\" >/dev/null");
+          system("bash", "-c", "grep $grep_options \$'$result' \"$name/$output\" >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
