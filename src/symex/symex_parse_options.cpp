@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_instanceof.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -361,7 +362,10 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // remove stuff
     remove_complex(goto_model);
     remove_vector(goto_model);
+    // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
+    // Java instanceof -> clsid comparison:
+    remove_instanceof(goto_model);
     rewrite_union(goto_model);
     adjust_float_expressions(goto_model);
 
