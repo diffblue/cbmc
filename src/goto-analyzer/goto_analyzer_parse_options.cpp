@@ -387,7 +387,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_function_pointers(goto_model, cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
-    // Java instanceof -> clsid comparison:
+    // remove rtti
     remove_instanceof(goto_model);
 
     // do partial inlining

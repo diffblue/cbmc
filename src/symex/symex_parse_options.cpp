@@ -369,7 +369,6 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     remove_vector(goto_model);
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
-    // Java instanceof -> clsid comparison:
     remove_instanceof(goto_model);
     rewrite_union(goto_model);
     adjust_float_expressions(goto_model);
