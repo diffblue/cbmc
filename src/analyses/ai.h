@@ -54,19 +54,14 @@ public:
   }
 
   // no states
-  virtual void make_bottom()
-  {
-  }
+  virtual void make_bottom()=0;
 
-  // all states
-  virtual void make_top()
-  {
-  }
+  // all states -- the analysis doesn't use this,
+  // and domains may refuse to implement it.
+  virtual void make_top()=0;
 
   // a reasonable entry-point state
-  virtual void make_entry()
-  {
-  }
+  virtual void make_entry()=0;
 
   // also add
   //
@@ -273,7 +268,7 @@ public:
     return it->second;
   }
 
-  virtual void clear()
+  virtual void clear() override
   {
     state_map.clear();
     ai_baset::clear();
@@ -284,33 +279,33 @@ protected:
   state_mapt state_map;
 
   // this one creates states, if need be
-  virtual statet &get_state(locationt l)
+  virtual statet &get_state(locationt l) override
   {
     return state_map[l]; // calls default constructor
   }
 
   // this one just finds states
-  virtual const statet &find_state(locationt l) const
+  virtual const statet &find_state(locationt l) const override
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end()) throw "failed to find state";
     return it->second;
   }
 
-  virtual bool merge(const statet &src, locationt from, locationt to)
+  virtual bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
     return static_cast<domainT &>(dest).merge(static_cast<const domainT &>(src), from, to);
   }
 
-  virtual statet *make_temporary_state(const statet &s)
+  virtual statet *make_temporary_state(const statet &s) override
   {
     return new domainT(static_cast<const domainT &>(s));
   }
 
   virtual void fixedpoint(
     const goto_functionst &goto_functions,
-    const namespacet &ns)
+    const namespacet &ns) override
   {
     sequential_fixedpoint(goto_functions, ns);
   }
@@ -324,7 +319,7 @@ private:
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
-    const namespacet &ns)
+    const namespacet &ns) override
   {
     throw "not implemented";
   }
@@ -345,7 +340,7 @@ public:
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
-    const namespacet &ns)
+    const namespacet &ns) override
   {
     statet &dest=this->get_state(to);
     return static_cast<domainT &>(dest).merge_shared(static_cast<const domainT &>(src), from, to, ns);
@@ -354,7 +349,7 @@ public:
 protected:
   virtual void fixedpoint(
     const goto_functionst &goto_functions,
-    const namespacet &ns)
+    const namespacet &ns) override
   {
     this->concurrent_fixedpoint(goto_functions, ns);
   }

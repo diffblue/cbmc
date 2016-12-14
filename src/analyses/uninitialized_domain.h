@@ -16,20 +16,43 @@ Date: January 2010
 class uninitialized_domaint:public ai_domain_baset
 {
 public:
-  // locals that are not initialized
+  uninitialized_domaint():is_bottom(true)
+  {
+  }
+  
+  bool is_bottom;
+
+  // Locals that are declared but may not be initialized
   typedef std::set<irep_idt> uninitializedt;
   uninitializedt uninitialized;
 
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const override final;
+    
+  void make_top() override final
+  {
+    // We don't have a proper 'top', and refuse to do this.
+    assert(false);
+  }
+
+  void make_bottom() override final
+  {
+    uninitialized.clear();
+    is_bottom=true;
+  }
+
+  void make_entry() override final
+  {
+    make_top();
+  }
 
   // returns true iff there is s.th. new
   bool merge(

@@ -28,28 +28,34 @@ class global_may_alias_analysist;
 class global_may_alias_domaint:public ai_domain_baset
 {
 public:
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) final override;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const final override;
 
   bool merge(
     const global_may_alias_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom()
+  void make_bottom() final override
   {
     aliases.clear();
   }
 
-  void make_top()
+  void make_top() final override
+  {
+    // We don't have a proper top.
+    assert(false);
+  }
+
+  void make_entry() final override
   {
     aliases.clear();
   }

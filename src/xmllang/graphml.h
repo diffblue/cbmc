@@ -39,11 +39,11 @@ typedef graph<xml_graph_nodet> graphmlt;
 bool read_graphml(
   std::istream &is,
   graphmlt &dest,
-  unsigned &entry);
+  graphmlt::node_indext &entry);
 bool read_graphml(
   const std::string &filename,
   graphmlt &dest,
-  unsigned &entry);
+  graphmlt::node_indext &entry);
 
 bool write_graphml(const graphmlt &src, std::ostream &os);
 

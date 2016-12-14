@@ -20,56 +20,6 @@ Date: August 2013
 
 class dependence_grapht;
 
-class dep_graph_domaint:public ai_domain_baset
-{
-public:
-  dep_graph_domaint():node_id((unsigned)-1)
-  {
-  }
-
-  bool merge(
-    const dep_graph_domaint &src,
-    goto_programt::const_targett from,
-    goto_programt::const_targett to);
-
-  void transform(
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
-    ai_baset &ai,
-    const namespacet &ns);
-
-  virtual void output(
-      std::ostream &out,
-      const ai_baset &ai,
-      const namespacet &ns) const;
-
-  void set_node_id(unsigned id)
-  {
-    node_id=id;
-  }
-
-  unsigned get_node_id() const
-  {
-    return node_id;
-  }
-
-protected:
-  unsigned node_id;
-
-  typedef std::set<goto_programt::const_targett> depst;
-  depst control_deps, data_deps;
-
-  void control_dependencies(
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
-    dependence_grapht &dep_graph);
-  void data_dependencies(
-    goto_programt::const_targett from,
-    goto_programt::const_targett to,
-    dependence_grapht &dep_graph,
-    const namespacet &ns);
-};
-
 class dep_edget
 {
 public:
@@ -112,6 +62,76 @@ struct dep_nodet:public graph_nodet<dep_edget>
   typedef graph_nodet<dep_edget>::edgest edgest;
 
   goto_programt::const_targett PC;
+};
+
+class dep_graph_domaint:public ai_domain_baset
+{
+public:
+  typedef graph<dep_nodet>::node_indext node_indext;
+
+  dep_graph_domaint():
+    node_id(std::numeric_limits<node_indext>::max())
+  {
+  }
+
+  bool merge(
+    const dep_graph_domaint &src,
+    goto_programt::const_targett from,
+    goto_programt::const_targett to);
+
+  void transform(
+    goto_programt::const_targett from,
+    goto_programt::const_targett to,
+    ai_baset &ai,
+    const namespacet &ns) final override;
+
+  void output(
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const final override;
+    
+  void make_top() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
+
+  void make_bottom() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
+
+  void make_entry() final override
+  {
+    node_id=std::numeric_limits<node_indext>::max();
+  }
+
+  void set_node_id(node_indext id)
+  {
+    node_id=id;
+  }
+
+  node_indext get_node_id() const
+  {
+    assert(node_id!=std::numeric_limits<node_indext>::max());
+    return node_id;
+  }
+
+protected:
+  node_indext node_id;
+
+  typedef std::set<goto_programt::const_targett> depst;
+  depst control_deps, data_deps;
+
+  void control_dependencies(
+    goto_programt::const_targett from,
+    goto_programt::const_targett to,
+    dependence_grapht &dep_graph);
+
+  void data_dependencies(
+    goto_programt::const_targett from,
+    goto_programt::const_targett to,
+    dependence_grapht &dep_graph,
+    const namespacet &ns);
 };
 
 class dependence_grapht:
@@ -161,7 +181,7 @@ public:
 
     if(entry.second)
     {
-      const unsigned node_id=add_node();
+      const node_indext node_id=add_node();
       entry.first->second.set_node_id(node_id);
       nodes[node_id].PC=l;
     }

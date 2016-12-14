@@ -32,29 +32,35 @@ public:
   {
   }
 
-  virtual void transform(
+  void transform(
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns);
+    const namespacet &ns) override final;
 
-  virtual void output(
+  void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const;
+    const namespacet &ns) const override final;
 
   bool merge(
     const escape_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom()
+  void make_bottom() override final
   {
     cleanup_map.clear();
     is_bottom=true;
   }
 
-  void make_top()
+  void make_top() override final
+  {
+    // We don't have a proper top.
+    assert(false);
+  }
+  
+  void make_entry() override final
   {
     cleanup_map.clear();
     is_bottom=false;
@@ -68,6 +74,9 @@ public:
     std::set<irep_idt> cleanup_functions;
   };
 
+  // We track a set of 'cleanup functions' for specific
+  // identifiers. The cleanup functions are executed
+  // once the last pointer to an object is lost.
   typedef std::map<irep_idt, cleanupt > cleanup_mapt;
   cleanup_mapt cleanup_map;
 

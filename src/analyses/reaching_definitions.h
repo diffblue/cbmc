@@ -93,18 +93,33 @@ public:
     bv_container=&_bv_container;
   }
 
-  virtual void transform(
-      locationt from,
-      locationt to,
-      ai_baset &ai,
-      const namespacet &ns);
+  void transform(
+    locationt from,
+    locationt to,
+    ai_baset &ai,
+    const namespacet &ns) override final;
 
-  virtual void output(
-      std::ostream &out,
-      const ai_baset &ai,
-      const namespacet &ns) const
+  void output(
+    std::ostream &out,
+    const ai_baset &ai,
+    const namespacet &ns) const override final
   {
     output(out);
+  }
+  
+  void make_top() override final
+  {
+    values.clear();
+  }
+
+  void make_bottom() override final
+  {
+    values.clear();
+  }
+
+  void make_entry() override final
+  {
+    values.clear();
   }
 
   // returns true iff there is s.th. new
@@ -112,6 +127,7 @@ public:
     const rd_range_domaint &other,
     locationt from,
     locationt to);
+
   bool merge_shared(
     const rd_range_domaint &other,
     locationt from,

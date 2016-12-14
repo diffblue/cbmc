@@ -19,6 +19,8 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 // collide with std::stack included by graph.h
 #include "xml_parser.h"
 
+typedef std::map<std::string, graphmlt::node_indext> name_mapt;
+
 /*******************************************************************\
 
 Function: add_node
@@ -31,12 +33,12 @@ Function: add_node
 
 \*******************************************************************/
 
-static std::size_t add_node(
+static graphmlt::node_indext add_node(
   const std::string &name,
-  std::map<std::string, std::size_t> &name_to_node,
+  name_mapt &name_to_node,
   graphmlt &graph)
 {
-  std::pair<std::map<std::string, std::size_t>::iterator, bool> entry=
+  std::pair<name_mapt::iterator, bool> entry=
     name_to_node.insert(std::make_pair(name, 0));
   if(entry.second)
     entry.first->second=graph.add_node();
@@ -58,7 +60,7 @@ Function: build_graph_rec
 
 static bool build_graph_rec(
   const xmlt &xml,
-  std::map<std::string, std::size_t> &name_to_node,
+  name_mapt &name_to_node,
   std::map<std::string, std::map<std::string, std::string> > &defaults,
   graphmlt &dest,
   std::string &entrynode)
@@ -67,7 +69,8 @@ static bool build_graph_rec(
   {
     const std::string node_name=xml.get_attribute("id");
 
-    const std::size_t n=add_node(node_name, name_to_node, dest);
+    const graphmlt::node_indext n=
+      add_node(node_name, name_to_node, dest);
 
     graphmlt::nodet &node=dest[n];
     node.node_name=node_name;
@@ -96,8 +99,8 @@ static bool build_graph_rec(
     const std::string source=xml.get_attribute("source");
     const std::string target=xml.get_attribute("target");
 
-    const unsigned s=add_node(source, name_to_node, dest);
-    const unsigned t=add_node(target, name_to_node, dest);
+    const graphmlt::node_indext s=add_node(source, name_to_node, dest);
+    const graphmlt::node_indext t=add_node(target, name_to_node, dest);
 
     // add edge and annotate
     xmlt xml_w_defaults=xml;
@@ -180,11 +183,11 @@ Function: build_graph
 static bool build_graph(
   const xmlt &xml,
   graphmlt &dest,
-  unsigned &entry)
+  graphmlt::node_indext &entry)
 {
   assert(dest.size()==0);
 
-  std::map<std::string, std::size_t> name_to_node;
+  name_mapt name_to_node;
   std::map<std::string, std::map<std::string, std::string> > defaults;
   std::string entrynode;
 
@@ -204,8 +207,7 @@ static bool build_graph(
   }
 
   assert(!entrynode.empty());
-  std::map<std::string, std::size_t>::const_iterator it=
-    name_to_node.find(entrynode);
+  name_mapt::const_iterator it=name_to_node.find(entrynode);
   assert(it!=name_to_node.end());
   entry=it->second;
 
@@ -224,7 +226,10 @@ Function: read_graphml
 
 \*******************************************************************/
 
-bool read_graphml(std::istream &is, graphmlt &dest, unsigned &entry)
+bool read_graphml(
+  std::istream &is,
+  graphmlt &dest,
+  graphmlt::node_indext &entry)
 {
   null_message_handlert message_handler;
   xmlt xml;
@@ -250,7 +255,7 @@ Function: read_graphml
 bool read_graphml(
   const std::string &filename,
   graphmlt &dest,
-  unsigned &entry)
+  graphmlt::node_indext &entry)
 {
   null_message_handlert message_handler;
   xmlt xml;
@@ -562,7 +567,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
   }
 
   bool entry_done=false;
-  for(unsigned i=0; i<src.size(); ++i)
+  for(graphmlt::node_indext i=0; i<src.size(); ++i)
   {
     const graphmlt::nodet &n=src[i];
 
