@@ -495,18 +495,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_array)
   {
-    // The [...] gets attached to the declarator.
-    std::string array_suffix;
-
-    if(to_array_type(src).size().is_nil())
-      array_suffix="[]";
-    else
-      array_suffix="["+convert(to_array_type(src).size())+"]";
-
-    // This won't really parse without declarator.
-    // Note that qualifiers are passed down.
-    return convert_rec(
-      src.subtype(), qualifiers, declarator+array_suffix);
+    return convert_array_type(src, qualifiers, declarator);
   }
   else if(src.id()==ID_incomplete_array)
   {
@@ -773,6 +762,68 @@ std::string expr2ct::convert_struct_type(
   dest+=declarator;
 
   return dest;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_array_type
+
+  Inputs:
+          src - The array type to convert
+          qualifier
+          declarator_str
+
+ Outputs: A C-like type declaration of an array
+
+ Purpose: To generate a C-like type declaration of an array. Includes
+          the size of the array in the []
+
+\*******************************************************************/
+
+std::string expr2ct::convert_array_type(
+  const typet &src,
+  const c_qualifierst &qualifiers,
+  const std::string &declarator_str)
+{
+  return convert_array_type(src, qualifiers, declarator_str, true);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_array_type
+
+  Inputs:
+          src - The array type to convert
+          qualifier
+          declarator_str
+          inc_size_if_possible - Should the generated string include
+                                 the size of the array (if it is known).
+
+ Outputs: A C-like type declaration of an array
+
+ Purpose: To generate a C-like type declaration of an array. Optionally
+          can include or exclude the size of the array in the []
+
+\*******************************************************************/
+
+std::string expr2ct::convert_array_type(
+  const typet &src,
+  const c_qualifierst &qualifiers,
+  const std::string &declarator_str,
+  bool inc_size_if_possible)
+{
+  // The [...] gets attached to the declarator.
+  std::string array_suffix;
+
+  if(to_array_type(src).size().is_nil() || !inc_size_if_possible)
+    array_suffix="[]";
+  else
+    array_suffix="["+convert(to_array_type(src).size())+"]";
+
+  // This won't really parse without declarator.
+  // Note that qualifiers are passed down.
+  return convert_rec(
+    src.subtype(), qualifiers, declarator_str+array_suffix);
 }
 
 /*******************************************************************\

@@ -50,6 +50,17 @@ protected:
     bool inc_struct_body,
     bool inc_padding_parameters);
 
+  virtual std::string convert_array_type(
+    const typet &src,
+    const c_qualifierst &qualifiers,
+    const std::string &declarator_str);
+
+  std::string convert_array_type(
+    const typet &src,
+    const c_qualifierst &qualifiers,
+    const std::string &declarator_str,
+    bool inc_size_if_possible);
+
   static std::string indent_str(unsigned indent);
 
   std::unordered_map<irep_idt,
