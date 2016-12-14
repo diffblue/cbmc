@@ -706,7 +706,7 @@ Function: expr2ct::convert_struct_type
           declarator - the declarator on the type
           inc_struct_body - when generating the code, should we include
                             a complete definition of the struct
-          inc_padding_parameters - should the padding parameters be included
+          inc_padding_components - should the padding parameters be included
                                    Note this only makes sense if inc_struct_body
 
  Outputs: Returns a type declaration for a struct, optionally containing the
@@ -721,12 +721,12 @@ std::string expr2ct::convert_struct_type(
   const std::string &qualifiers,
   const std::string &declarator,
   bool inc_struct_body,
-  bool inc_padding_parameters)
+  bool inc_padding_components)
 {
   // Either we are including the body (in which case it makes sense to include
   // or exclude the parameters) or there is no body so therefore we definitely
   // shouldn't be including the parameters
-  assert(inc_struct_body || !inc_padding_parameters);
+  assert(inc_struct_body || !inc_padding_components);
 
   const struct_typet &struct_type=to_struct_type(src);
 
@@ -740,20 +740,21 @@ std::string expr2ct::convert_struct_type(
   {
     dest+=" {";
 
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
+    for(const struct_union_typet::componentt &component :
+      struct_type.components())
     {
       // Skip padding parameters unless we including them
-      if(it->get_is_padding() && !inc_padding_parameters)
+      if(component.get_is_padding() && !inc_padding_components)
       {
         continue;
       }
 
-      dest+= ' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
-      dest+= ';';
+      dest+=' ';
+      dest+=convert_rec(
+        component.type(),
+        c_qualifierst(),
+        id2string(component.get_name()));
+      dest+=';';
     }
 
     dest+=" }";
@@ -2267,7 +2268,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    dest = convert_constant_bool(src.is_true());
+    dest=convert_constant_bool(src.is_true());
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -2283,7 +2284,7 @@ std::string expr2ct::convert_constant(
 
     if(type.id()==ID_c_bool)
     {
-      dest = convert_constant_bool(int_value != 0);
+      dest=convert_constant_bool(int_value!=0);
     }
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
@@ -2482,7 +2483,7 @@ Function: expr2ct::convert_struct
   Inputs:
     src - The struct declaration expression
     precedence
-    include_padding_members - Should the generated C code
+    include_padding_components - Should the generated C code
                               include the padding members added
                               to structs for GOTOs benifit
 
@@ -2495,7 +2496,7 @@ Function: expr2ct::convert_struct
 std::string expr2ct::convert_struct(
   const exprt &src,
   unsigned &precedence,
-  bool include_padding_members)
+  bool include_padding_components)
 {
   const typet full_type=ns.follow(src.type());
 
@@ -2519,15 +2520,13 @@ std::string expr2ct::convert_struct(
   bool newline=false;
   size_t last_size=0;
 
-  for(struct_typet::componentst::const_iterator
-      c_it=components.begin();
-      c_it!=components.end();
-      c_it++)
+  for(const struct_union_typet::componentt &component :
+    struct_type.components())
   {
     if(o_it->type().id()==ID_code)
       continue;
 
-    if(c_it->get_is_padding() && !include_padding_members)
+    if(component.get_is_padding() && !include_padding_components)
     {
       ++o_it;
       continue;
@@ -2556,7 +2555,7 @@ std::string expr2ct::convert_struct(
       newline=false;
 
     dest+='.';
-    dest+=c_it->get_string(ID_name);
+    dest+=component.get_string(ID_name);
     dest+='=';
     dest+=tmp;
 

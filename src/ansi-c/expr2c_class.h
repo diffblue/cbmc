@@ -48,7 +48,7 @@ protected:
     const std::string &qualifer_str,
     const std::string &declarator_str,
     bool inc_struct_body,
-    bool inc_padding_parameters);
+    bool inc_padding_components);
 
   virtual std::string convert_array_type(
     const typet &src,
@@ -237,7 +237,7 @@ protected:
   std::string convert_struct(
     const exprt &src,
     unsigned &precedence,
-    bool include_padding_members);
+    bool include_padding_components);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H
