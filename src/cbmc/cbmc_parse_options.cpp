@@ -894,7 +894,7 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(symbol_table, goto_functions);
-    // Java instanceof -> clsid comparison:
+    // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
 
     // full slice?
