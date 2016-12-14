@@ -209,6 +209,11 @@ protected:
   std::string convert_designated_initializer(const exprt &src, unsigned &precedence);
   std::string convert_concatenation(const exprt &src, unsigned &precedence);
   std::string convert_sizeof(const exprt &src, unsigned &precedence);
+
+  std::string convert_struct(
+    const exprt &src,
+    unsigned &precedence,
+    bool include_padding_members);
 };
 
 #endif // CPROVER_ANSI_C_EXPR2C_CLASS_H

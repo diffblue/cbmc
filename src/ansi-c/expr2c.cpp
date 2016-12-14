@@ -2338,6 +2338,31 @@ std::string expr2ct::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
+  return convert_struct(src, precedence, true);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_struct
+
+  Inputs:
+    src - The struct declaration expression
+    precedence
+    include_padding_members - Should the generated C code
+                              include the padding members added
+                              to structs for GOTOs benifit
+
+ Outputs: A string representation of the struct expression
+
+ Purpose: To generate a C-like string representing a struct. Can optionally
+          include the padding parameters.
+
+\*******************************************************************/
+std::string expr2ct::convert_struct(
+  const exprt &src,
+  unsigned &precedence,
+  bool include_padding_members)
+{
   const typet full_type=ns.follow(src.type());
 
   if(full_type.id()!=ID_struct)
@@ -2367,6 +2392,12 @@ std::string expr2ct::convert_struct(
   {
     if(o_it->type().id()==ID_code)
       continue;
+
+    if(c_it->get_is_padding() && !include_padding_members)
+    {
+      ++o_it;
+      continue;
+    }
 
     if(first)
       first=false;
