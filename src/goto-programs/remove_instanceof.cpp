@@ -276,3 +276,9 @@ void remove_instanceof(
   remove_instanceoft rem(symbol_table, goto_functions);
   rem.lower_instanceof();
 }
+
+void remove_instanceof(goto_modelt &goto_model)
+{
+  remove_instanceof(
+    goto_model.symbol_table, goto_model.goto_functions);
+}

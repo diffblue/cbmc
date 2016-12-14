@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
@@ -884,7 +885,10 @@ bool cbmc_parse_optionst::process_goto_program(
       symbol_table,
       goto_functions,
       cmdline.isset("pointer-check"));
+    // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(symbol_table, goto_functions);
+    // Java instanceof -> clsid comparison:
+    remove_instanceof(symbol_table, goto_functions);
 
     // full slice?
     if(cmdline.isset("full-slice"))
