@@ -209,6 +209,7 @@ protected:
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
   std::string convert_literal(const exprt &src, unsigned &precedence);
   virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
+  virtual std::string convert_constant_bool(bool boolean_value);
 
   std::string convert_norep(const exprt &src, unsigned &precedence);
 
