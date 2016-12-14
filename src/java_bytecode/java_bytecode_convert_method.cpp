@@ -108,9 +108,21 @@ exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
   return operands;
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::pop_residue
+
+Inputs:
+
+Outputs:
+
+Purpose: removes minimum(n, stack.size()) elements from the stack
+
+\*******************************************************************/
+
 void java_bytecode_convert_methodt::pop_residue(std::size_t n)
 {
-  std::size_t residue_size=n<=stack.size()?n:stack.size();
+  std::size_t residue_size=std::min(n, stack.size());
 
   stack.resize(stack.size()-residue_size);
 }
@@ -804,8 +816,10 @@ static void gather_symbol_live_ranges(
     }
   }
   else
+  {
     forall_operands(it, e)
       gather_symbol_live_ranges(pc, *it, result);
+  }
 }
 
 /*******************************************************************\
@@ -874,18 +888,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     if(i_it->statement=="athrow" ||
        i_it->statement=="invokestatic" ||
-       i_it->statement=="invokevirtual")
+       i_it->statement=="invokevirtual" ||
+       i_it->statement=="invokespecial" ||
+       i_it->statement=="invokeinterface")
     {
       // find the corresponding try-catch blocks and add the handlers
       // to the targets
-      for(std::size_t e=0; e<method.exception_table.size(); e++)
+      for(const auto &exception_row : method.exception_table)
       {
-        if(i_it->address>=method.exception_table[e].start_pc &&
-           i_it->address<method.exception_table[e].end_pc)
+        if(i_it->address>=exception_row.start_pc &&
+           i_it->address<exception_row.end_pc)
         {
           a_entry.first->second.successors.push_back(
-            method.exception_table[e].handler_pc);
-          targets.insert(method.exception_table[e].handler_pc);
+            exception_row.handler_pc);
+          targets.insert(exception_row.handler_pc);
         }
       }
     }
@@ -1023,7 +1039,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         exprt exc_var=variable(
           arg0, statement[0],
           i_it->address,
-          false);
+          NO_CAST);
 
         // throw away the operands
         pop_residue(bytecode_info.pop);
@@ -1032,17 +1048,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
         side_effect_expr_catcht catch_handler_expr;
         // pack the exception variable so that it can be used
         // later for instrumentation
-        catch_handler_expr.set(ID_handler, exc_var);
-        codet catch_handler=code_expressiont(catch_handler_expr);
+        catch_handler_expr.get_sub().resize(1);
+        catch_handler_expr.get_sub()[0]=exc_var;
 
-        code_labelt newlabel(label(i2string(cur_pc)), code_blockt());
+        codet catch_handler=code_expressiont(catch_handler_expr);
+        code_labelt newlabel(label(std::to_string(cur_pc)),
+                             code_blockt());
+
         code_blockt label_block=to_code_block(newlabel.code());
         code_blockt handler_block;
         handler_block.move_to_operands(c);
         handler_block.move_to_operands(catch_handler);
         handler_block.move_to_operands(label_block);
         c=handler_block;
-
         break;
       }
     }
@@ -1065,11 +1083,30 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="athrow")
     {
       assert(op.size()==1 && results.size()==1);
+      code_blockt block;
+      if(!disable_runtime_checks)
+      {
+        // TODO throw NullPointerException instead
+        const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+        const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+        const exprt not_equal_null(
+          binary_relation_exprt(lhs, ID_notequal, rhs));
+        code_assertt check(not_equal_null);
+        check.add_source_location()
+          .set_comment("Throw null");
+        check.add_source_location()
+          .set_property_class("null-pointer-exception");
+        block.move_to_operands(check);
+      }
+
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
       throw_expr.copy_to_operands(op[0]);
       c=code_expressiont(throw_expr);
       results[0]=op[0];
+
+      block.move_to_operands(c);
+      c=block;
     }
     else if(statement=="checkcast")
     {
@@ -1115,7 +1152,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="invokevirtual" ||
             statement=="invokestatic")
     {
-      const bool use_this(statement != "invokestatic");
+      const bool use_this(statement!="invokestatic");
       const bool is_virtual(
         statement=="invokevirtual" || statement=="invokeinterface");
 
@@ -2046,17 +2083,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // add the CATCH-PUSH instruction(s)
     // be aware of different try-catch blocks with the same starting pc
     std::size_t pos=0;
-    int end_pc=-1;
+    size_t end_pc=0;
     while(pos<method.exception_table.size())
     {
       // check if this is the beginning of a try block
       for(; pos<method.exception_table.size(); ++pos)
       {
         // unexplored try-catch?
-        if(cur_pc==method.exception_table[pos].start_pc && end_pc==-1)
+        if(cur_pc==method.exception_table[pos].start_pc && end_pc==0)
+        {
           end_pc=method.exception_table[pos].end_pc;
+        }
 
-	// currently explored try-catch?
+        // currently explored try-catch?
         if(cur_pc==method.exception_table[pos].start_pc &&
            method.exception_table[pos].end_pc==end_pc)
         {
@@ -2067,7 +2106,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // instruction by generating a label corresponding to
           // the handler's pc
           handler_labels.push_back(
-            label(i2string(method.exception_table[pos].handler_pc)));
+            label(std::to_string(method.exception_table[pos].handler_pc)));
         }
         else
           break;
@@ -2104,28 +2143,33 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
 
       // reset
-      end_pc=-1;
+      end_pc=0;
       exception_ids.clear();
       handler_labels.clear();
     }
 
     // next add the CATCH-POP instructions
-    int start_pc=-1;
+    size_t start_pc=0;
+    // as the first try block may have start_pc 0, we
+    // must track it separately
+    bool first_handler=false;
     // check if this is the end of a try block
-    for(std::size_t e=0; e<method.exception_table.size(); e++)
+    for(const auto &exception_row : method.exception_table)
     {
       // add the CATCH-POP before the end of the try block
-      if(cur_pc<method.exception_table[e].end_pc &&
+      if(cur_pc<exception_row.end_pc &&
         !working_set.empty() &&
-        *working_set.begin()==method.exception_table[e].end_pc)
+        *working_set.begin()==exception_row.end_pc)
       {
         // have we already added a CATCH-POP for the current try-catch?
         // (each row corresponds to a handler)
-        if(method.exception_table[e].start_pc!=start_pc)
+        if(exception_row.start_pc!=start_pc || !first_handler)
         {
+          if(!first_handler)
+            first_handler=true;
           // remember the beginning of the try-catch so that we don't add
           // another CATCH-POP for the same try-catch
-          start_pc=method.exception_table[e].start_pc;
+          start_pc=exception_row.start_pc;
           // add CATCH_POP instruction
           side_effect_expr_catcht catch_pop_expr;
           code_blockt end_try_block;
@@ -2139,34 +2183,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
     }
 
-    for(std::size_t e=0; e<method.exception_table.size(); e++)
-    {
-      if(cur_pc==method.exception_table[e].handler_pc)
-      {
-        // add a CATCH-PUSH signaling a handler (by using ID_handler)
-        // this will serve to signal the beginning of a handler
-        side_effect_expr_catcht catch_handler_expr;
-        irept exc_handler(ID_handler);
-        exc_handler.get_sub().resize(1);
-        exc_handler.get_sub()[0].id(
-          method.exception_table[e].catch_type.get_identifier());
-        catch_handler_expr.set(ID_handler, exc_handler);
-        codet catch_handler=code_expressiont(catch_handler_expr);
-
-        // create labels for the handlers that match those used
-        // in CATCH-PUSH above
-        code_labelt newlabel(label(i2string(cur_pc)), code_blockt());
-        code_blockt label_block=to_code_block(newlabel.code());
-        code_blockt handler_block;
-        handler_block.move_to_operands(c);
-        handler_block.move_to_operands(catch_handler);
-        handler_block.move_to_operands(label_block);
-
-        c=handler_block;
-        break;
-      }
-    }
-
     if(!i_it->source_location.get_line().empty())
       c.add_source_location()=i_it->source_location;
 
@@ -2177,6 +2193,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       address_mapt::iterator a_it2=address_map.find(address);
       assert(a_it2!=address_map.end());
+
+      // we don't worry about exception handlers as we don't load the
+      // operands from the stack anyway -- we keep explicit global
+      // exception variables
+      for(const auto &exception_row : method.exception_table)
+      {
+        if(address==exception_row.handler_pc)
+        {
+          stack.clear();
+          break;
+        }
+      }
 
       if(!stack.empty() && a_it2->second.predecessors.size()>1)
       {
@@ -2242,8 +2270,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
   }
 
-  // TODO: add exception handlers from exception table
-  // review successor computation of athrow!
   code_blockt code;
 
   // Add anonymous locals to the symtab:

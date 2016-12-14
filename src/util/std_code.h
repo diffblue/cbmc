@@ -1130,7 +1130,6 @@ public:
   inline side_effect_expr_catcht():side_effect_exprt(ID_push_catch)
   {
   }
-  // TODO: change to ID_catch
   inline explicit side_effect_expr_catcht(const irept &exception_list):
     side_effect_exprt(ID_push_catch)
   {
