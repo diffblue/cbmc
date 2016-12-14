@@ -740,7 +740,6 @@ java_super_method_call
 skip_initialize
 java_enum_static_unwind
 push_catch
-handler
 string_constraint
 string_not_contains_constraint
 cprover_char_literal_func

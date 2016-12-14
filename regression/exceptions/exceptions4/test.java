@@ -9,9 +9,11 @@ public class test {
       throw b;
     }
     catch(C exc) {
+      System.out.println("C");
       assert false;
     }
     catch(B exc) {
+      System.out.println("B");
     }
   }
 }

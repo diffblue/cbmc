@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
@@ -810,6 +811,8 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
     cmdline.isset("pointer-check"));
   status() << "Virtual function removal" << eom;
   remove_virtual_functions(symbol_table, goto_functions);
+  status() << "Catch and throw removal" << eom;
+  remove_exceptions(symbol_table, goto_functions);
   status() << "Java instanceof removal" << eom;
   remove_instanceof(symbol_table, goto_functions);
 }
