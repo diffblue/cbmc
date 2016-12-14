@@ -38,6 +38,18 @@ protected:
     const c_qualifierst &qualifiers,
     const std::string &declarator);
 
+  virtual std::string convert_struct_type(
+    const typet &src,
+    const std::string &qualifiers_str,
+    const std::string &declarator_str);
+
+  std::string convert_struct_type(
+    const typet &src,
+    const std::string &qualifer_str,
+    const std::string &declarator_str,
+    bool inc_struct_body,
+    bool inc_padding_parameters);
+
   static std::string indent_str(unsigned indent);
 
   std::unordered_map<irep_idt,
