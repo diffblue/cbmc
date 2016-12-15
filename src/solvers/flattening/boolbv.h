@@ -47,17 +47,17 @@ public:
   virtual bvt convert_bitvector(const exprt &expr); // no cache
 
   // overloading
-  virtual exprt get(const exprt &expr) const override;
-  virtual void set_to(const exprt &expr, bool value) override;
-  virtual void print_assignment(std::ostream &out) const override;
+  exprt get(const exprt &expr) const override;
+  void set_to(const exprt &expr, bool value) override;
+  void print_assignment(std::ostream &out) const override;
 
-  virtual void clear_cache() override
+  void clear_cache() override
   {
     SUB::clear_cache();
     bv_cache.clear();
   }
 
-  virtual void post_process() override
+  void post_process() override
   {
     post_process_quantifiers();
     functions.post_process();

@@ -27,7 +27,7 @@ class arrayst:public equalityt
 public:
   arrayst(const namespacet &_ns, propt &_prop);
 
-  virtual void post_process() override
+  void post_process() override
   {
     post_process_arrays();
     SUB::post_process();

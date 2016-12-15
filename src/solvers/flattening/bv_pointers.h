@@ -19,7 +19,7 @@ class bv_pointerst:public boolbvt
 public:
   bv_pointerst(const namespacet &_ns, propt &_prop);
 
-  virtual void post_process();
+  void post_process() override;
 
 protected:
   pointer_logict pointer_logic;
@@ -35,15 +35,14 @@ protected:
   virtual void add_addr(const exprt &expr, bvt &bv);
 
   // overloading
-  virtual literalt convert_rest(const exprt &expr);
+  literalt convert_rest(const exprt &expr) override;
+  bvt convert_bitvector(const exprt &expr) override; // no cache
 
-  virtual bvt convert_bitvector(const exprt &expr); // no cache
-
-  virtual exprt bv_get_rec(
+  exprt bv_get_rec(
     const bvt &bv,
     const std::vector<bool> &unknown,
     std::size_t offset,
-    const typet &type) const;
+    const typet &type) const override;
 
   bool convert_address_of_rec(
     const exprt &expr,

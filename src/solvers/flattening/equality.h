@@ -25,7 +25,7 @@ public:
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
 
-  virtual void post_process() override
+  void post_process() override
   {
     add_equality_constraints();
     prop_conv_solvert::post_process();
