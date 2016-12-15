@@ -127,7 +127,7 @@ public:
 
     //! is this node a branch target?
     inline bool is_target() const
-    { return target_number!=std::numeric_limits<unsigned>::max(); }
+    { return target_number!=nil_target; }
 
     //! clear the node
     inline void clear(goto_program_instruction_typet _type)
@@ -189,7 +189,7 @@ public:
       type(NO_INSTRUCTION_TYPE),
       guard(true_exprt()),
       location_number(0),
-      target_number(std::numeric_limits<unsigned>::max())
+      target_number(nil_target)
     {
     }
 
@@ -198,7 +198,7 @@ public:
       type(_type),
       guard(true_exprt()),
       location_number(0),
-      target_number(std::numeric_limits<unsigned>::max())
+      target_number(nil_target)
     {
     }
 
@@ -213,6 +213,10 @@ public:
       instruction.function.swap(function);
     }
 
+    //! Uniquely identify an invalid target or location
+    static const unsigned nil_target=
+      std::numeric_limits<unsigned>::max();
+
     //! A globally unique number to identify a program location.
     //! It's guaranteed to be ordered in program order within
     //! one goto_program.
@@ -222,7 +226,7 @@ public:
     unsigned loop_number;
 
     //! A number to identify branch targets.
-    //! This is -1 if it's not a target.
+    //! This is \ref nil_target if it's not a target.
     unsigned target_number;
 
     //! Returns true if the instruction is a backwards branch.
@@ -577,7 +581,7 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
   // reset marking
 
   for(auto & i : instructions)
-    i.target_number=-1;
+    i.target_number=instructiont::nil_target;
 
   // mark the goto targets
 
@@ -612,7 +616,7 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       if(t!=instructions.end())
       {
         assert(t->target_number!=0);
-        assert(t->target_number!=std::numeric_limits<unsigned>::max());
+        assert(t->target_number!=instructiont::nil_target);
       }
     }
   }
