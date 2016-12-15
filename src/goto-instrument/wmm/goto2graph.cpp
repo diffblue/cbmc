@@ -126,12 +126,12 @@ unsigned instrumentert::goto2graph_cfg(
   std::vector<std::size_t> subgraph_index;
   num_sccs = egraph_alt.SCCs(subgraph_index);
   assert(egraph_SCCs.empty());
-  egraph_SCCs.resize(num_sccs, std::set<unsigned>());
-  for(std::map<unsigned,unsigned>::const_iterator it=map_vertex_gnode.begin();
+  egraph_SCCs.resize(num_sccs, std::set<event_idt>());
+  for(std::map<event_idt,event_idt>::const_iterator it=map_vertex_gnode.begin();
     it!=map_vertex_gnode.end();
     it++)
   {
-    const unsigned sg = subgraph_index[it->second];
+    const std::size_t sg = subgraph_index[it->second];
     egraph_SCCs[sg].insert(it->first);
   }
 
@@ -150,7 +150,7 @@ unsigned instrumentert::goto2graph_cfg(
   message.statistics() <<"Number of writes: "<<visitor.write_counter<<messaget::eom;
   message.statistics() <<"Number of wse: "<<visitor.ws_counter<<messaget::eom;
   message.statistics() <<"Number of rfe/fre: "<<visitor.fr_rf_counter<<messaget::eom;
-  unsigned instr_counter=0;
+  std::size_t instr_counter=0;
   for(goto_functionst::function_mapt::const_iterator it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       ++it)
@@ -404,8 +404,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
   /* beginning of the function */
   goto_programt::instructionst::iterator targ=body.begin();
 
-  std::set<unsigned> in_nodes;
-  std::set<unsigned> out_nodes;
+  std::set<event_idt> in_nodes;
+  std::set<event_idt> out_nodes;
 
   /* if the target has already been covered by fwd analysis */
   if(in_pos.find(targ)!=in_pos.end())
@@ -477,8 +477,8 @@ Function: alt_copy_segment
 
 \*******************************************************************/
 
-unsigned alt_copy_segment(wmm_grapht& alt_egraph,
-  unsigned begin, unsigned end)
+event_idt alt_copy_segment(wmm_grapht& alt_egraph,
+  event_idt begin, event_idt end)
 {
   /* no need to duplicate the loop nodes for the SCC-detection graph -- a
      single back-edge will ensure the same connectivity */
@@ -669,8 +669,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
       egraph.copy_segment(begin_it->first, end_it->first);
       alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
 #if 0
-      const unsigned end=egraph.copy_segment(begin_it->first, end_it->first);
-      const unsigned alt_end=alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
+      const event_idt end=egraph.copy_segment(begin_it->first, end_it->first);
+      const event_idt alt_end=alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
       //in_pos[i_it].insert(nodet(end, alt_end)); // copied; no need for back-edge!
 #endif
     }
@@ -889,9 +889,9 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
   const goto_programt::instructiont& instruction=*i_it;
   const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
     thread, "f", instrumenter.unique_id++, instruction.source_location, false);
-  const unsigned new_fence_node=egraph.add_node();
+  const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
-  const unsigned new_fence_gnode=egraph_alt.add_node();
+  const event_idt new_fence_gnode=egraph_alt.add_node();
   egraph_alt[new_fence_gnode]=new_fence_event;
   instrumenter.map_vertex_gnode.insert(
     std::make_pair(new_fence_node, new_fence_gnode));
@@ -941,9 +941,9 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   const abstract_eventt new_fence_event(abstract_eventt::ASMfence,
     thread, "asm", instrumenter.unique_id++, instruction.source_location,
     false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul, RRcumul);
-  const unsigned new_fence_node=egraph.add_node();
+  const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
-  const unsigned new_fence_gnode=egraph_alt.add_node();
+  const event_idt new_fence_gnode=egraph_alt.add_node();
   egraph_alt[new_fence_gnode]=new_fence_event;
   instrumenter.map_vertex_gnode.insert(
     std::make_pair(new_fence_node, new_fence_gnode));
@@ -998,8 +998,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 #endif
   );
 
-  unsigned previous=std::numeric_limits<unsigned>::max();
-  unsigned previous_gnode=std::numeric_limits<unsigned>::max();
+  event_idt previous=std::numeric_limits<event_idt>::max();
+  event_idt previous_gnode=std::numeric_limits<event_idt>::max();
 
 #if 0
   /* for the moment, use labels ASSERT in front of the assertions
@@ -1031,7 +1031,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       thread, id2string(read), instrumenter.unique_id++,
       instruction.source_location, local(read));
 
-    const unsigned new_read_node=egraph.add_node();
+    const event_idt new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
     instrumenter.message.debug() << "new Read"<<read<<" @thread"
       <<(thread)<<"("<<instruction.source_location<<","
@@ -1041,7 +1041,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     if(read==ID_unknown)
       unknown_read_nodes.insert(new_read_node);
 
-    const unsigned new_read_gnode=egraph_alt.add_node();
+    const event_idt new_read_gnode=egraph_alt.add_node();
     egraph_alt[new_read_gnode]=new_read_event;
     instrumenter.map_vertex_gnode.insert(
     std::make_pair(new_read_node,new_read_gnode));
@@ -1078,7 +1078,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() << id_it->second<<"<-com->"
           <<new_read_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(id_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_read_node,id_it->second);
@@ -1089,7 +1089,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       }
 
     /* for unknown writes */
-    for(std::set<unsigned>::const_iterator id_it=
+    for(std::set<event_idt>::const_iterator id_it=
       unknown_write_nodes.begin();
       id_it!=unknown_write_nodes.end();
       ++id_it)
@@ -1097,7 +1097,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_read_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(*id_it);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_read_node,*id_it);
@@ -1131,7 +1131,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       thread, id2string(write), instrumenter.unique_id++,
       instruction.source_location, local(write));
 
-    const unsigned new_write_node=egraph.add_node();
+    const event_idt new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
     instrumenter.message.debug() << "new Write "<<write<<" @thread"<<(thread)
       <<"("<<instruction.source_location<<","
@@ -1141,13 +1141,13 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     if(write==ID_unknown)
       unknown_read_nodes.insert(new_write_node);
 
-    const unsigned new_write_gnode=egraph_alt.add_node();
+    const event_idt new_write_gnode=egraph_alt.add_node();
     egraph_alt[new_write_gnode]=new_write_event;
     instrumenter.map_vertex_gnode.insert(
-      std::pair<unsigned,unsigned>(new_write_node, new_write_gnode));
+      std::pair<event_idt,event_idt>(new_write_node, new_write_gnode));
 
     /* creates Read -po-> Write */
-    if(previous!=std::numeric_limits<unsigned>::max())
+    if(previous!=std::numeric_limits<event_idt>::max())
     {
       instrumenter.message.debug() << previous<<"-po->"<<new_write_node
         << messaget::eom;
@@ -1182,7 +1182,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() <<idr_it->second<<"<-com->"
           <<new_write_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(idr_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_write_node,idr_it->second);
@@ -1201,7 +1201,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() << idw_it->second<<"<-com->"
           <<new_write_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(idw_it->second);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_write_node,idw_it->second);
@@ -1212,7 +1212,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       }
 
     /* for unknown writes */
-    for(std::set<unsigned>::const_iterator id_it=
+    for(std::set<event_idt>::const_iterator id_it=
       unknown_write_nodes.begin();
       id_it!=unknown_write_nodes.end();
       ++id_it)
@@ -1220,7 +1220,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_write_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(*id_it);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_write_node,*id_it);
@@ -1231,7 +1231,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       }
 
     /* for unknown reads */
-    for(std::set<unsigned>::const_iterator id_it=
+    for(std::set<event_idt>::const_iterator id_it=
       unknown_read_nodes.begin();
       id_it!=unknown_read_nodes.end();
       ++id_it)
@@ -1239,7 +1239,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_write_node << messaget::eom;
-        std::map<unsigned,unsigned>::const_iterator entry=
+        std::map<event_idt,event_idt>::const_iterator entry=
           instrumenter.map_vertex_gnode.find(*id_it);
         assert(entry!=instrumenter.map_vertex_gnode.end());
         egraph.add_com_edge(new_write_node,*id_it);
@@ -1255,7 +1255,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     previous_gnode = new_write_gnode;
   }
 
-  if(previous!=std::numeric_limits<unsigned>::max())
+  if(previous!=std::numeric_limits<event_idt>::max())
   {
     in_pos[i_it].clear();
     in_pos[i_it].insert(nodet(previous,previous_gnode));
@@ -1316,9 +1316,9 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
   const goto_programt::instructiont& instruction=*i_it;
   const abstract_eventt new_fence_event(abstract_eventt::Fence,
     thread, "F", instrumenter.unique_id++, instruction.source_location, false);
-  const unsigned new_fence_node=egraph.add_node();
+  const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
-  const unsigned new_fence_gnode=egraph_alt.add_node();
+  const event_idt new_fence_gnode=egraph_alt.add_node();
   egraph_alt[new_fence_gnode]=new_fence_event;
   instrumenter.map_vertex_gnode.insert(
     std::make_pair(new_fence_node, new_fence_gnode));
@@ -1655,12 +1655,12 @@ void inline instrumentert::print_outputs_local(
   bool hide_internals)
 {
   /* to represent the po aligned in the dot */
-  std::map<unsigned,std::set<unsigned> > same_po;
+  std::map<unsigned,std::set<event_idt> > same_po;
   unsigned max_thread = 0;
   unsigned colour = 0;
 
   /* to represent the files as clusters */
-  std::map<irep_idt,std::set<unsigned> > same_file;
+  std::map<irep_idt,std::set<event_idt> > same_file;
 
   /* to summarise in a table all the variables */
   std::map<std::string,std::string> map_id2var;
@@ -1679,7 +1679,7 @@ void inline instrumentert::print_outputs_local(
       << std::endl;
 
     /* emphasises instrumented events */
-    for(std::list<unsigned>::const_iterator it_e=it->begin();
+    for(std::list<event_idt>::const_iterator it_e=it->begin();
       it_e!=it->end(); it_e++)
     {
       const abstract_eventt& ev = egraph[*it_e];
@@ -1710,7 +1710,7 @@ void inline instrumentert::print_outputs_local(
       {
         dot << "{rank=same; thread_" << i
           << "[shape=plaintext, label=\"thread " << i << "\"];";
-        for(std::set<unsigned>::iterator it=same_po[i].begin();
+        for(std::set<event_idt>::iterator it=same_po[i].begin();
           it!=same_po[i].end(); it++)
           dot << egraph[*it].id << ";";
         dot << "};" << std::endl;
@@ -1718,13 +1718,13 @@ void inline instrumentert::print_outputs_local(
 
   /* clusters events by file/function */
   if(render_by_file || render_by_function)
-    for(std::map<irep_idt,std::set<unsigned> >::const_iterator it=
+    for(std::map<irep_idt,std::set<event_idt> >::const_iterator it=
       same_file.begin();
       it!=same_file.end(); it++)
     {
       dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{" << std::endl;
       dot << "  label=\"" << it->first << "\";" << std::endl;
-      for(std::set<unsigned>::const_iterator ev_it=it->second.begin();
+      for(std::set<event_idt>::const_iterator ev_it=it->second.begin();
         ev_it!=it->second.end(); ev_it++)
       {
         dot << "  " << egraph[*ev_it].id << ";" << std::endl;
@@ -1816,7 +1816,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
   unsigned scc = 0;
   set_of_cycles_per_SCC.resize(num_sccs,
     std::set<event_grapht::critical_cyclet>());
-  for(std::vector<std::set<unsigned> >::const_iterator it=egraph_SCCs.begin();
+  for(std::vector<std::set<event_idt> >::const_iterator it=egraph_SCCs.begin();
     it!=egraph_SCCs.end(); it++)
     if(it->size()>=4)
       egraph.collect_cycles(set_of_cycles_per_SCC[scc++],model,*it);
@@ -1827,12 +1827,12 @@ class pthread_argumentt
 public:
   instrumentert& instr;
   memory_modelt mem;
-  const std::set<unsigned>& filter;
+  const std::set<event_idt>& filter;
   std::set<event_grapht::critical_cyclet>& cycles;
 
   pthread_argumentt(instrumentert& _instr,
     memory_modelt _mem,
-    const std::set<unsigned>& _filter,
+    const std::set<event_idt>& _filter,
     std::set<event_grapht::critical_cyclet>& _cycles)
     :instr(_instr),mem(_mem),filter(_filter),cycles(_cycles)
   {
@@ -1845,7 +1845,7 @@ void* collect_cycles_in_thread(void* arg)
   /* arguments */
   instrumentert& this_instrumenter = ((pthread_argumentt*) arg)->instr;
   memory_modelt model = ((pthread_argumentt*) arg)->mem;
-  const std::set<unsigned>& filter = ((pthread_argumentt*) arg)->filter;
+  const std::set<event_idt>& filter = ((pthread_argumentt*) arg)->filter;
   std::set<event_grapht::critical_cyclet>& cycles =
     ((pthread_argumentt*) arg)->cycles;
 
@@ -1872,7 +1872,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
       interesting_SCCs.insert(scc);
       pthread_argumentt arg(*this,model,*it,set_of_cycles_per_SCC[scc]);
 
-      unsigned rc = pthread_create(&threads[scc++], NULL,
+      int rc = pthread_create(&threads[scc++], NULL,
         collect_cycles_in_thread, (void*) &arg);
 
       message.status()<<(rc!=0?"Failure ":"Success ")
@@ -1882,7 +1882,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
   for(unsigned i=0; i<number_of_sccs; i++)
     if(interesting_SCCs.find(i)!=interesting_SCCs.end())
     {
-      unsigned rc = pthread_join(threads[i],NULL);
+      int rc = pthread_join(threads[i],NULL);
       message.status()<<(rc!=0?"Failure ":"Success ")
         <<"in joining thread for SCC #"<<i<<messaget::eom;
     }
