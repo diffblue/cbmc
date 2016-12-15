@@ -1,6 +1,6 @@
 CORE
 test.c
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion __CPROVER_string_length(s) == i + 5: SUCCESS$

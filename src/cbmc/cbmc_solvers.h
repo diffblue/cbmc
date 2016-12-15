@@ -84,7 +84,7 @@ public:
       solver = get_dimacs();
     else if(options.get_bool_option("refine"))
       solver = get_bv_refinement();
-    else if(options.get_bool_option("pass"))
+    else if(options.get_bool_option("string-refine"))
       solver = get_string_refinement();
     else if(options.get_bool_option("smt1"))
       solver = get_smt1(get_smt1_solver_type());
