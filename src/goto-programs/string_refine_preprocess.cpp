@@ -9,14 +9,14 @@ Date:   September 2016
 
 \*******************************************************************/
 
-#include "pass_preprocess.h"
+#include "string_refine_preprocess.h"
 
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/pointer_offset_size.h>
 #include <solvers/refinement/string_expr.h>
 
-symbol_exprt pass_preprocesst::new_tmp_symbol
+symbol_exprt string_refine_preprocesst::new_tmp_symbol
 (const std::string &name, const typet &type)
 {
   auxiliary_symbolt tmp_symbol;
@@ -29,7 +29,7 @@ symbol_exprt pass_preprocesst::new_tmp_symbol
   return symbol_exprt(name,type);
 }
 
-void pass_preprocesst::declare_function(irep_idt function_name, const typet &type)
+void string_refine_preprocesst::declare_function(irep_idt function_name, const typet &type)
 {
   auxiliary_symbolt func_symbol;
   func_symbol.base_name=function_name;
@@ -41,7 +41,7 @@ void pass_preprocesst::declare_function(irep_idt function_name, const typet &typ
   goto_functions.function_map[function_name];
 }
 
-void pass_preprocesst::make_string_function
+void string_refine_preprocesst::make_string_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -59,7 +59,7 @@ void pass_preprocesst::make_string_function
   i_it->code=assignment;
 }
 
-void pass_preprocesst::make_string_function_call
+void string_refine_preprocesst::make_string_function_call
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -77,7 +77,7 @@ void pass_preprocesst::make_string_function_call
   i_it->code=assignment;
 }
 
-void pass_preprocesst::make_string_function_side_effect
+void string_refine_preprocesst::make_string_function_side_effect
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -99,20 +99,20 @@ void pass_preprocesst::make_string_function_side_effect
   i_it->code=assignment;
 }
 
-void pass_preprocesst::make_to_char_array_function
+void string_refine_preprocesst::make_to_char_array_function
 (goto_programt & goto_program, goto_programt::instructionst::iterator & i_it)
 {
 
   code_function_callt &function_call=to_code_function_call(i_it->code);
   if(function_call.lhs().type().id()!=ID_pointer)
-    debug() << "pass_preprocesst::make_to_char_array_function: "
+    debug() << "string_refine_preprocesst::make_to_char_array_function: "
 	    << "the function call should return a pointer" << eom;
 
   typet object_type = function_call.lhs().type().subtype();
   exprt object_size = size_of_expr(object_type, ns);
 
   if(object_size.is_nil())
-    debug() << "pass_preprocesst::make_to_char_array_function got nil object_size" << eom;
+    debug() << "string_refine_preprocesst::make_to_char_array_function got nil object_size" << eom;
 
   auto location = function_call.source_location();
   std::vector<codet> new_code;
@@ -185,7 +185,7 @@ void pass_preprocesst::make_to_char_array_function
 }
 
 
-void pass_preprocesst::make_char_array_function
+void string_refine_preprocesst::make_char_array_function
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -205,7 +205,7 @@ void pass_preprocesst::make_char_array_function
   make_string_function(i_it,function_name);
 }
 
-void pass_preprocesst::make_char_array_function_call
+void string_refine_preprocesst::make_char_array_function_call
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -224,7 +224,7 @@ void pass_preprocesst::make_char_array_function_call
   make_string_function_call(i_it,function_name);
 }
 
-void pass_preprocesst::make_char_array_side_effect
+void string_refine_preprocesst::make_char_array_side_effect
 (goto_programt::instructionst::iterator & i_it, irep_idt function_name)
 {
   code_function_callt &function_call=to_code_function_call(i_it->code);
@@ -244,7 +244,7 @@ void pass_preprocesst::make_char_array_side_effect
 }
 
 
-void pass_preprocesst::replace_string_calls
+void string_refine_preprocesst::replace_string_calls
 (goto_functionst::function_mapt::iterator f_it)
 {
   goto_programt &goto_program=f_it->second.body;
@@ -313,7 +313,7 @@ void pass_preprocesst::replace_string_calls
   return;
 }
 
-bool pass_preprocesst::has_java_string_type(const exprt &expr)
+bool string_refine_preprocesst::has_java_string_type(const exprt &expr)
 {
   const typet type = expr.type();
   if(type.id() == ID_pointer) {
@@ -326,7 +326,7 @@ bool pass_preprocesst::has_java_string_type(const exprt &expr)
   } else return false;
 }
 
-exprt pass_preprocesst::replace_string_literals(const exprt & expr)
+exprt string_refine_preprocesst::replace_string_literals(const exprt & expr)
 {
   if(has_java_string_type(expr) )
     {
@@ -353,7 +353,7 @@ exprt pass_preprocesst::replace_string_literals(const exprt & expr)
   return expr;
 }
 
-pass_preprocesst::pass_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions,
+string_refine_preprocesst::string_refine_preprocesst (symbol_tablet & _symbol_table, goto_functionst & _goto_functions,
 				    message_handlert &_message_handler):
   messaget(_message_handler), symbol_table(_symbol_table), ns(_symbol_table),
   goto_functions(_goto_functions)

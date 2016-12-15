@@ -17,7 +17,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       goto_trace.cpp xml_goto_trace.cpp vcd_goto_trace.cpp \
       graphml_witness.cpp remove_virtual_functions.cpp \
       class_hierarchy.cpp show_goto_functions.cpp get_goto_model.cpp \
-      pass_preprocess.cpp
+      string_refine_preprocess.cpp
 
 INCLUDES= -I ..
 

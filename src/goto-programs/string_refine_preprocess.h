@@ -9,13 +9,13 @@ Date:   September 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_PASS_PREPROCESS_H
-#define CPROVER_PASS_PREPROCESS_H
+#ifndef CPROVER_STRING_REFINE_PREPROCESS_H
+#define CPROVER_STRING_REFINE_PREPROCESS_H
 
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
 
-class pass_preprocesst:public messaget
+class string_refine_preprocesst:public messaget
 {
  private:
   namespacet ns;
@@ -31,7 +31,7 @@ class pass_preprocesst:public messaget
   std::map<irep_idt, irep_idt> side_effect_char_array_functions;
 
  public:
-  pass_preprocesst(symbol_tablet &, goto_functionst &, message_handlert &);
+  string_refine_preprocesst(symbol_tablet &, goto_functionst &, message_handlert &);
 
  private:
 
@@ -85,4 +85,4 @@ class pass_preprocesst:public messaget
 
 };
 
-#endif
+#endif 
