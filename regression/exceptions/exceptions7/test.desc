@@ -1,0 +1,9 @@
+CORE
+test.class
+
+^EXIT=10$
+^SIGNAL=0$
+^.*assertion at file test.java line 21 function.*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
