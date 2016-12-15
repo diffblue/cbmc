@@ -13,18 +13,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <sstream>
 #include <solvers/refinement/string_refinement.h>
-
-// This is mostly for debugging:
-#include <langapi/languages.h>
-#include <ansi-c/ansi_c_language.h>
-
-// Succinct version of pretty()
-std::string string_refinementt::pretty_short(const exprt & expr) {
-  languagest languages(ns, new_ansi_c_language());
-  std::string string_value;
-  languages.from_expr(expr, string_value);
-  return string_value;
-}
+#include <langapi/language_util.h>
 
 string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
   SUB(_ns, _prop)
@@ -50,11 +39,11 @@ void string_refinementt::display_index_set() {
   for (std::map<exprt, expr_sett>::iterator i = index_set.begin(),
 	 end = index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
-    debug() << "IS(" << pretty_short(s) << ") == {";
+    debug() << "IS(" << from_expr(s) << ") == {";
 
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
          j != end; ++j)
-      debug() << pretty_short (*j) << "; ";
+      debug() << from_expr(*j) << "; ";
     debug() << "}"  << eom;
   }
 }
@@ -68,11 +57,11 @@ void string_refinementt::add_instantiations()
   for (std::map<exprt, expr_sett>::iterator i = current_index_set.begin(),
 	 end = current_index_set.end(); i != end; ++i) {
     const exprt &s = i->first;
-    debug() << "IS(" << pretty_short(s) << ") == {";
+    debug() << "IS(" << from_expr(s) << ") == {";
 
     for (expr_sett::const_iterator j = i->second.begin(), end = i->second.end();
          j != end; ++j)
-      debug() << pretty_short (*j) << "; ";
+      debug() << from_expr(*j) << "; ";
     debug() << "}"  << eom;
 
 
@@ -122,7 +111,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
 
 bvt string_refinementt::convert_function_application(const function_application_exprt &expr)
 {
-  debug() << "string_refinementt::convert_function_application "  << pretty_short(expr) << eom;
+  debug() << "string_refinementt::convert_function_application "  << from_expr(expr) << eom;
   exprt f = generator.add_axioms_for_function_application(expr);
   return convert_bv(f);
 }
@@ -143,8 +132,8 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
      //type==ns.follow(expr.rhs().type()) &&
      type.id()!=ID_bool)
   {
-    debug() << "string_refinementt " << pretty_short(expr.lhs()) << " <- "
-	    << pretty_short(expr.rhs()) << eom;
+    debug() << "string_refinementt " << from_expr(expr.lhs()) << " <- "
+	    << from_expr(expr.rhs()) << eom;
 
     if(refined_string_typet::is_unrefined_string_type(type))
       {
@@ -286,7 +275,7 @@ void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
       return;
     }
 
-  debug() << "adding lemma " << pretty_short(lemma) << eom;
+  debug() << "adding lemma " << from_expr(lemma) << eom;
 
   prop.l_set_to_true(convert(lemma));
   if(add_to_index_set)
@@ -361,7 +350,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 
   } else {
     debug() << "unable to get array-list value of "
-	    << pretty_short(val) << eom;
+	    << from_expr(val) << eom;
     return arr;
   }
 }
@@ -389,21 +378,21 @@ bool string_refinementt::check_axioms()
 
       fmodel[elength] = len;
       fmodel[econtent] = arr;
-      debug() << it->first << " = " << pretty_short(it->second)
-	      << " of length " << pretty_short(len) <<" := " << eom
-	      << pretty_short(get(econtent)) << eom
+      debug() << it->first << " = " << from_expr(it->second)
+	      << " of length " << from_expr(len) <<" := " << eom
+	      << from_expr(get(econtent)) << eom
 	      << string_of_array(econtent,len) << eom;
     }
 
   for(std::vector<symbol_exprt>::iterator it = generator.boolean_symbols.begin();
       it != generator.boolean_symbols.end(); it++) {
-    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;
+    debug() << "" << it->get_identifier() << " := " << from_expr(get(*it)) << eom;
     fmodel[*it] = get(*it);
   }
 
   for(std::vector<symbol_exprt>::iterator it = generator.index_symbols.begin();
       it != generator.index_symbols.end(); it++) {
-    debug() << "" << it->get_identifier() << " := " << pretty_short(get(*it)) << eom;
+    debug() << "" << it->get_identifier() << " := " << from_expr(get(*it)) << eom;
     fmodel[*it] = get(*it);
   }
 
@@ -417,7 +406,7 @@ bool string_refinementt::check_axioms()
     exprt negaxiom = and_exprt(axiom.premise(), not_exprt(axiom.body()));
     replace_expr(fmodel, negaxiom);
 
-    debug() << "negaxiom: " << pretty_short(negaxiom) << eom;
+    debug() << "negaxiom: " << from_expr(negaxiom) << eom;
 
     satcheck_no_simplifiert sat_check;
     SUB solver(ns, sat_check);
@@ -695,8 +684,8 @@ void string_refinementt::update_index_set(const exprt &formula)
       assert(s.type().id() == ID_array);
       const exprt &simplified = simplify_sum(i);
       if(index_set[s].insert(simplified).second) {
-	debug() << "adding to index set of " << pretty_short(s)
-		<< ": " << pretty_short(simplified) << eom;
+	debug() << "adding to index set of " << from_expr(s)
+		<< ": " << from_expr(simplified) << eom;
 	current_index_set[s].insert(simplified);
       }
     } else {
@@ -761,14 +750,14 @@ void string_refinementt::instantiate_not_contains(const string_not_contains_cons
   exprt s0 = axiom.s0();
   exprt s1 = axiom.s1();
 
-  debug() << "instantiate not contains " << pretty_short(s0) << " : " << pretty_short(s1) << eom;
+  debug() << "instantiate not contains " << from_expr(s0) << " : " << from_expr(s1) << eom;
   expr_sett index_set0 = index_set[to_string_expr(s0).content()];
   expr_sett index_set1 = index_set[to_string_expr(s1).content()];
 
   for(expr_sett::iterator it0 = index_set0.begin(); it0 != index_set0.end(); it0++)
     for(expr_sett::iterator it1 = index_set1.begin(); it1 != index_set1.end(); it1++)
       {
-	debug() << pretty_short(*it0) << " : " << pretty_short(*it1) << eom;
+	debug() << from_expr(*it0) << " : " << from_expr(*it1) << eom;
 	exprt val = minus_exprt(*it0, *it1);
 	exprt witness = generator.get_witness_of(axiom,val);
 	and_exprt prem_and_is_witness(axiom.premise(),

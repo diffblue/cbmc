@@ -146,9 +146,6 @@ private:
   // Convert the content of a string to a more readable representation
   std::string string_of_array(const exprt &arr, const exprt &size);
 
-  // succinct and pretty way to display an expression
-  std::string pretty_short(const exprt & expr);
-
   void print_time(std::string s);
 };
 
