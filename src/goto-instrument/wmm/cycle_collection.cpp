@@ -393,7 +393,7 @@ bool event_grapht::graph_explorert::backtrack(
     if(!get_com_only)
     {
       /* we first visit via po transition, if existing */
-      for(graph<abstract_eventt>::edgest::const_iterator
+      for(wmm_grapht::edgest::const_iterator
         w_it=egraph.po_out(vertex).begin();
         w_it!=egraph.po_out(vertex).end(); w_it++)
       {
@@ -436,7 +436,7 @@ bool event_grapht::graph_explorert::backtrack(
 
     if(!no_comm)
     /* we then visit via com transitions, if existing */
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       w_it=egraph.com_out(vertex).begin();
       w_it!=egraph.com_out(vertex).end(); w_it++)
     {
@@ -568,7 +568,7 @@ bool event_grapht::graph_explorert::backtrack(
          (!this_vertex.WRfence
            && egraph[point_stack.top()].operation==abstract_eventt::Write));
 
-    for(graph<abstract_eventt>::edgest::const_iterator w_it=
+    for(wmm_grapht::edgest::const_iterator w_it=
       egraph.po_out(vertex).begin();
       w_it!=egraph.po_out(vertex).end(); w_it++)
     {

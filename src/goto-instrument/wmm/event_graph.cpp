@@ -42,7 +42,7 @@ void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id,
     "\"];" << std::endl;
   visited.insert(node_id);
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=po_out(node_id).begin();
     it!=po_out(node_id).end(); ++it)
   {
@@ -52,7 +52,7 @@ void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id,
       print_rec_graph(file, it->first, visited);
   }
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=com_out(node_id).begin();
     it!=com_out(node_id).end(); ++it)
   {
@@ -111,7 +111,7 @@ void event_grapht::explore_copy_segment(std::set<unsigned>& explored,
   if(begin==end)
     return;
 
-  for(graph<abstract_eventt>::edgest::const_iterator it=po_out(begin).begin();
+  for(wmm_grapht::edgest::const_iterator it=po_out(begin).begin();
     it!=po_out(begin).end();
     ++it)
     explore_copy_segment(explored, it->first, end);

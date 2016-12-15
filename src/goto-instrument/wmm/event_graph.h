@@ -29,6 +29,8 @@ class namespacet;
                      graph of abstract events
 \*******************************************************************/
 
+typedef graph<abstract_eventt> wmm_grapht;
+
 class event_grapht
 {
 public:
@@ -194,14 +196,14 @@ public:
 
     inline bool operator<(const critical_cyclet& other) const
     {
-      return ( ((std::list<unsigned>) *this) < (std::list<unsigned>)other);
+      return ( ((std::list<event_idt>) *this) < (std::list<event_idt>)other);
     }
   };
 
 protected:
   /* graph contains po and com transitions */
-  graph<abstract_eventt> po_graph;
-  graph<abstract_eventt> com_graph;
+  wmm_grapht po_graph;
+  wmm_grapht com_graph;
 
   /* parameters limiting the exploration */
   unsigned max_var;
@@ -365,7 +367,7 @@ public:
     return po_no;
   }
 
-  inline graph<abstract_eventt>::nodet &operator[](unsigned n)
+  inline wmm_grapht::nodet &operator[](unsigned n)
   {
     return po_graph[n];
   }
@@ -385,22 +387,22 @@ public:
     return po_graph.size();
   }
 
-  inline const graph<abstract_eventt>::edgest &po_in(unsigned n) const
+  inline const wmm_grapht::edgest &po_in(unsigned n) const
   {
     return po_graph.in(n);
   }
 
-  inline const graph<abstract_eventt>::edgest &po_out(unsigned n) const
+  inline const wmm_grapht::edgest &po_out(unsigned n) const
   {
     return po_graph.out(n);
   }
 
-  inline const graph<abstract_eventt>::edgest &com_in(unsigned n) const
+  inline const wmm_grapht::edgest &com_in(unsigned n) const
   {
     return com_graph.in(n);
   }
 
-  inline const graph<abstract_eventt>::edgest &com_out(unsigned n) const
+  inline const wmm_grapht::edgest &com_out(unsigned n) const
   {
     return com_graph.out(n);
   }

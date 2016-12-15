@@ -477,7 +477,7 @@ Function: alt_copy_segment
 
 \*******************************************************************/
 
-unsigned alt_copy_segment(graph<abstract_eventt>& alt_egraph,
+unsigned alt_copy_segment(wmm_grapht& alt_egraph,
   unsigned begin, unsigned end)
 {
   /* no need to duplicate the loop nodes for the SCC-detection graph -- a
@@ -1457,13 +1457,13 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     }
     assert(current_po);
 
-    const graph<abstract_eventt>::edgest& pos_cur = egraph.po_out(*e_it);
-    const graph<abstract_eventt>::edgest& pos_next = egraph.po_out(*(++e_it));
+    const wmm_grapht::edgest& pos_cur = egraph.po_out(*e_it);
+    const wmm_grapht::edgest& pos_next = egraph.po_out(*(++e_it));
     --e_it;
 
     bool exists_n = false;
 
-    for(graph<abstract_eventt>::edgest::const_iterator edge_it=pos_cur.begin();
+    for(wmm_grapht::edgest::const_iterator edge_it=pos_cur.begin();
       edge_it!=pos_cur.end(); edge_it++)
     {
       if(pos_next.find(edge_it->first)!=pos_next.end())

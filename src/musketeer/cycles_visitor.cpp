@@ -61,7 +61,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
         {
           /* also add pos of non-delaying pos+ of cycles, as they could AC or
              BC */
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_in(e_i->first).begin();
             next_it!=egraph.po_in(e_i->first).end();
             ++next_it)
@@ -73,7 +73,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
               next_it->first, new_path);
           }
 
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_out(e_i->second).begin();
             next_it!=egraph.po_out(e_i->second).end();
             ++next_it)
@@ -105,7 +105,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
       else
       {
         /* adds basic pos from this pos^+ */
-        for(graph<abstract_eventt>::edgest::const_iterator
+        for(wmm_grapht::edgest::const_iterator
           next_it=egraph.po_out(e_i.first).begin();
           next_it!=egraph.po_out(e_i.first).end();
           ++next_it)
@@ -129,7 +129,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
         else
         {
           /* adds basic pos from this pos^+ */
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_out(e_i.first).begin();
             next_it!=egraph.po_out(e_i.first).end();
             ++next_it)

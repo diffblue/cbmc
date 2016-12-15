@@ -43,7 +43,7 @@ void const_graph_visitort::graph_explore(event_grapht& egraph, unsigned next,
     /* this path is not connecting a to b => return */
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
       ++next_it)
@@ -90,7 +90,7 @@ void const_graph_visitort::const_graph_explore(event_grapht& egraph, unsigned ne
     /* this path is not connecting a to b => return */
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
       ++next_it)
@@ -133,7 +133,7 @@ void const_graph_visitort::graph_explore_BC(event_grapht& egraph, unsigned next,
 
   /* if all the incoming pos were already visited, add */
   bool no_other_pos = true;
-  for(graph<abstract_eventt>::edgest::const_iterator it=
+  for(wmm_grapht::edgest::const_iterator it=
     egraph.po_out(next).begin();
     it!=egraph.po_out(next).end();
     ++it)
@@ -159,7 +159,7 @@ void const_graph_visitort::graph_explore_BC(event_grapht& egraph, unsigned next,
     assert(it!=old_path.end());
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
       ++next_it)
@@ -195,7 +195,7 @@ void const_graph_visitort::const_graph_explore_BC(event_grapht& egraph,
 
   /* if all the incoming pos were already visited, add */
   bool no_other_pos = true;
-  for(graph<abstract_eventt>::edgest::const_iterator it=
+  for(wmm_grapht::edgest::const_iterator it=
     egraph.po_out(next).begin();
     it!=egraph.po_out(next).end();
     ++it)
@@ -222,7 +222,7 @@ void const_graph_visitort::const_graph_explore_BC(event_grapht& egraph,
     assert(it!=old_path.end());
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
       ++next_it)
@@ -261,7 +261,7 @@ void const_graph_visitort::graph_explore_AC(event_grapht& egraph, unsigned next,
 
   /* if all the incoming pos were already visited, add */
   bool no_other_pos = true;
-  for(graph<abstract_eventt>::edgest::const_iterator it=
+  for(wmm_grapht::edgest::const_iterator it=
     egraph.po_in(next).begin();
     it!=egraph.po_in(next).end();
     ++it)
@@ -287,7 +287,7 @@ void const_graph_visitort::graph_explore_AC(event_grapht& egraph, unsigned next,
     assert(it!=old_path.end());
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(next).begin();
       next_it!=egraph.po_in(next).end();
       ++next_it)
@@ -323,7 +323,7 @@ void const_graph_visitort::const_graph_explore_AC(event_grapht& egraph,
 
   /* if all the incoming pos were already visited, add */
   bool no_other_pos = true;
-  for(graph<abstract_eventt>::edgest::const_iterator it=
+  for(wmm_grapht::edgest::const_iterator it=
     egraph.po_in(next).begin();
     it!=egraph.po_in(next).end();
     ++it)
@@ -351,7 +351,7 @@ void const_graph_visitort::const_graph_explore_AC(event_grapht& egraph,
     assert(it!=old_path.end());
   }
   else {
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(next).begin();
       next_it!=egraph.po_in(next).end();
       ++next_it)
@@ -380,7 +380,7 @@ void const_graph_visitort::PT(const edget& e, std::set<unsigned>& edges) {
 
 //  if(!e.is_po) /* e is in po^+\po */ is_po is a flag set manually, do not
 //  use it for checks!!
-  const graph<abstract_eventt>::edgest& list_po_out=
+  const wmm_grapht::edgest& list_po_out=
     fence_inserter.instrumenter.egraph.po_out(e.first);
   if(list_po_out.find(e.second)==list_po_out.end())
   {
@@ -388,7 +388,7 @@ void const_graph_visitort::PT(const edget& e, std::set<unsigned>& edges) {
     event_grapht& egraph=fence_inserter.instrumenter.egraph;
 
     /* all the pos inbetween */
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(e.first).begin();
       next_it!=egraph.po_out(e.first).end();
       ++next_it)
@@ -444,7 +444,7 @@ void const_graph_visitort::CT(const edget& edge, std::set<unsigned>& edges) {
 
   /* if one event only on this thread of the cycle, discard */
   if(egraph.po_in(first).size() > 0)
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(first).begin();
       next_it!=egraph.po_in(first).end();
       ++next_it)
@@ -456,7 +456,7 @@ void const_graph_visitort::CT(const edget& edge, std::set<unsigned>& edges) {
     }
 
   if(egraph.po_out(second).size() > 0)
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(second).begin();
       next_it!=egraph.po_out(second).end();
       ++next_it)
@@ -499,7 +499,7 @@ void const_graph_visitort::CT_not_powr(const edget& edge,
   visited_nodes.clear();
 
   if(egraph.po_in(first).size() > 0)
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(first).begin();
       next_it!=egraph.po_in(first).end();
       ++next_it)
@@ -511,7 +511,7 @@ void const_graph_visitort::CT_not_powr(const edget& edge,
     }
 
   if(egraph.po_out(second).size() > 0)
-    for(graph<abstract_eventt>::edgest::const_iterator
+    for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(second).begin();
       next_it!=egraph.po_out(second).end();
       ++next_it)

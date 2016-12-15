@@ -38,7 +38,7 @@ protected:
 
   /* alternative representation of graph (SCC) */
   std::map<unsigned,unsigned> map_vertex_gnode;
-  graph<abstract_eventt> egraph_alt;
+  wmm_grapht egraph_alt;
 
   unsigned unique_id;
 
@@ -93,7 +93,7 @@ protected:
     /* pointer to the egraph(s) that we construct */
     event_grapht& egraph;
     std::vector<std::set<unsigned> >& egraph_SCCs;
-    graph<abstract_eventt>& egraph_alt;
+    wmm_grapht& egraph_alt;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;

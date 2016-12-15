@@ -89,7 +89,7 @@ bool event_grapht::graph_pensieve_explorert::find_second_event(
 
   visited_nodes.insert(current);
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=egraph.po_out(current).begin();
     it!=egraph.po_out(current).end(); ++it)
   {
