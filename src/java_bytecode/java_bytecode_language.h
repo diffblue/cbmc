@@ -16,51 +16,51 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_languaget:public languaget
 {
 public:
-  virtual bool preprocess(
+  bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream);
+    std::ostream &outstream) override;
 
-  virtual bool parse(
+  bool parse(
     std::istream &instream,
-    const std::string &path);
+    const std::string &path) override;
 
-  virtual bool typecheck(
+  bool typecheck(
     symbol_tablet &context,
-    const std::string &module);
+    const std::string &module) override;
 
-  virtual bool final(
-    symbol_tablet &context);
+  bool final(
+    symbol_tablet &context) override;
 
-  virtual void show_parse(std::ostream &out);
+  void show_parse(std::ostream &out) override;
 
-  virtual ~java_bytecode_languaget();
+  ~java_bytecode_languaget() override;
   java_bytecode_languaget() { }
 
-  virtual bool from_expr(
+  bool from_expr(
     const exprt &expr,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual bool from_type(
+  bool from_type(
     const typet &type,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual bool to_expr(
+  bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual languaget *new_language()
+  languaget *new_language() override
   { return new java_bytecode_languaget; }
 
-  virtual std::string id() const { return "java"; }
-  virtual std::string description() const { return "Java Bytecode"; }
-  virtual std::set<std::string> extensions() const;
+  std::string id() const override { return "java"; }
+  std::string description() const override { return "Java Bytecode"; }
+  std::set<std::string> extensions() const override;
 
-  virtual void modules_provided(std::set<std::string> &modules);
+  void modules_provided(std::set<std::string> &modules) override;
 
 protected:
   irep_idt main_class;

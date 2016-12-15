@@ -21,56 +21,56 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_languaget:public languaget
 {
 public:
-  virtual bool preprocess(
+  bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream);
+    std::ostream &outstream) override;
 
-  virtual bool parse(
+  bool parse(
     std::istream &instream,
-    const std::string &path);
+    const std::string &path) override;
 
-  virtual bool typecheck(
+  bool typecheck(
     symbol_tablet &symbol_table,
-    const std::string &module);
+    const std::string &module) override;
 
-  virtual bool final(
-    symbol_tablet &symbol_table);
+  bool final(
+    symbol_tablet &symbol_table) override;
 
-  virtual void show_parse(std::ostream &out);
+  void show_parse(std::ostream &out) override;
 
-  virtual ~ansi_c_languaget();
+  ~ansi_c_languaget() override;
   ansi_c_languaget() { }
 
-  virtual bool from_expr(
+  bool from_expr(
     const exprt &expr,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual bool from_type(
+  bool from_type(
     const typet &type,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual bool type_to_name(
+  bool type_to_name(
     const typet &type,
     std::string &name,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual bool to_expr(
+  bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual languaget *new_language()
+  languaget *new_language() override
   { return new ansi_c_languaget; }
 
-  virtual std::string id() const { return "C"; }
-  virtual std::string description() const { return "ANSI-C 99"; }
-  virtual std::set<std::string> extensions() const;
+  std::string id() const override { return "C"; }
+  std::string description() const override { return "ANSI-C 99"; }
+  std::set<std::string> extensions() const override;
 
-  virtual void modules_provided(std::set<std::string> &modules);
+  void modules_provided(std::set<std::string> &modules) override;
 
 protected:
   ansi_c_parse_treet parse_tree;
