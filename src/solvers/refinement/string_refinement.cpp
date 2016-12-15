@@ -282,17 +282,21 @@ void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
     cur.push_back(lemma);
 }
 
-unsigned unsigned_of_expr(const constant_exprt & expr)
+int integer_of_expr(const constant_exprt & expr)
 {
   mp_integer i;
   assert(!to_integer(expr,i));
-  return integer2unsigned(i);
+  if(i<0)
+    return -integer2unsigned(-i);
+  else
+    return integer2unsigned(i);
 }
 
 std::string string_refinementt::string_of_array(const exprt &arr, const exprt &size)
 {
   if(size.id() != ID_constant) return "string of unknown size";
-  unsigned n = unsigned_of_expr(to_constant_expr(size));
+  int n = integer_of_expr(to_constant_expr(size));
+  if(n<0) return "string of wrong size";
   if(n>500) return "very long string";
   if(n==0) return "\"\"";
   unsigned str[n];
@@ -300,10 +304,11 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
   if(val.id() == "array-list") {
     for (size_t i = 0; i < val.operands().size()/2; i++) {
       exprt index = val.operands()[i*2];
-      unsigned idx = unsigned_of_expr(to_constant_expr(index));
-      if(idx < n){
+      int idx = integer_of_expr(to_constant_expr(index));
+      if(idx<n)
+      {
 	exprt value = val.operands()[i*2+1];
-	str[idx] = unsigned_of_expr(to_constant_expr(value));
+	str[idx] = integer_of_expr(to_constant_expr(value));
       }
     }
   } else {
@@ -605,7 +610,7 @@ public:
 };
 
 // Look for the given symbol in the index expression
-bool find_qvar(const exprt index, const symbol_exprt & qvar)
+static bool find_qvar(const exprt index, const symbol_exprt & qvar)
 {
   find_qvar_visitor v2(qvar);
   try {
