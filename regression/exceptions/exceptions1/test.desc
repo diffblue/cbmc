@@ -1,0 +1,10 @@
+CORE
+test.class
+
+^EXIT=10$
+^SIGNAL=0$
+^.*assertion at file test.java line 26 function.*: FAILURE$
+\*\* 1 of 35 failed (2 iterations)$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
