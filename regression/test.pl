@@ -194,7 +194,7 @@ follows the format specified below. Any line starting with // will be ignored.
 
 where
   <level>                is one of CORE, THOROUGH, FUTURE or KNOWNBUG
-  <main source>          is a file with extension .c/.i/.cpp/.ii/.xml/.class/.jar
+  <main source>          is a file with extension .c/.i/.gb/.cpp/.ii/.xml/.class/.jar
   <options>              additional options to be passed to CMD
   <grep_options>         additional flags to be passed to grep when checking required
                          patterns (this is optional, if the line stats with a `-'
