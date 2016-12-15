@@ -23,40 +23,40 @@ public:
   {
   }
 
-  virtual bool has_set_to() const { return false; }
-  virtual bool cnf_handled_well() const { return false; }
+  bool has_set_to() const override { return false; }
+  bool cnf_handled_well() const override { return false; }
 
-  virtual literalt land(literalt a, literalt b);
-  virtual literalt lor(literalt a, literalt b);
-  virtual literalt land(const bvt &bv);
-  virtual literalt lor(const bvt &bv);
-  virtual void lcnf(const bvt &clause) { assert(false); }
-  virtual literalt lxor(literalt a, literalt b);
-  virtual literalt lxor(const bvt &bv);
-  virtual literalt lnand(literalt a, literalt b);
-  virtual literalt lnor(literalt a, literalt b);
-  virtual literalt lequal(literalt a, literalt b);
-  virtual literalt limplies(literalt a, literalt b);
-  virtual literalt lselect(literalt a, literalt b, literalt c); // a?b:c
-  virtual void set_equal(literalt a, literalt b);
+  literalt land(literalt a, literalt b) override;
+  literalt lor(literalt a, literalt b) override;
+  literalt land(const bvt &bv) override;
+  literalt lor(const bvt &bv) override;
+  void lcnf(const bvt &clause) override { assert(false); }
+  literalt lxor(literalt a, literalt b) override;
+  literalt lxor(const bvt &bv) override;
+  literalt lnand(literalt a, literalt b) override;
+  literalt lnor(literalt a, literalt b) override;
+  literalt lequal(literalt a, literalt b) override;
+  literalt limplies(literalt a, literalt b) override;
+  literalt lselect(literalt a, literalt b, literalt c) override; // a?b:c
+  void set_equal(literalt a, literalt b) override;
 
-  virtual void l_set_to(literalt a, bool value) { assert(false); }
+  void l_set_to(literalt a, bool value) override { assert(false); }
 
-  virtual literalt new_variable()
+  literalt new_variable() override
   {
     return dest.new_node();
   }
 
-  virtual size_t no_variables() const
+  size_t no_variables() const override
   { return dest.number_of_nodes(); }
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   { return "conversion into and-inverter graph"; }
 
-  virtual tvt l_get(literalt a) const
+  tvt l_get(literalt a) const override
   { assert(0); return tvt::unknown(); }
 
-  virtual resultt prop_solve()
+  resultt prop_solve() override
   { assert(0); return P_ERROR; }
 
 protected:
@@ -73,14 +73,14 @@ public:
   }
 
   aig_plus_constraintst &dest;
-  virtual bool has_set_to() const { return true; }
+  bool has_set_to() const override { return true; }
 
-  virtual void lcnf(const bvt &clause)
+  void lcnf(const bvt &clause) override
   {
     l_set_to_true(lor(clause));
   }
 
-  virtual void l_set_to(literalt a, bool value)
+  void l_set_to(literalt a, bool value) override
   {
     dest.constraints.push_back(a^!value);
   }
@@ -97,14 +97,14 @@ public:
 
   aig_plus_constraintst aig;
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   { return "conversion into and-inverter graph followed by "+
            solver.solver_text(); }
 
-  virtual tvt l_get(literalt a) const;
-  virtual resultt prop_solve();
+  tvt l_get(literalt a) const override;
+  resultt prop_solve() override;
 
-  virtual void set_message_handler(message_handlert &m)
+  void set_message_handler(message_handlert &m) override
   {
     aig_prop_constraintt::set_message_handler(m);
     solver.set_message_handler(m);
