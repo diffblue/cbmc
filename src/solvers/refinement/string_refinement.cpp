@@ -282,15 +282,17 @@ void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
     cur.push_back(lemma);
 }
 
-unsigned integer_of_expr(const constant_exprt & expr)
+unsigned unsigned_of_expr(const constant_exprt & expr)
 {
-  return integer2unsigned(string2integer(as_string(expr.get_value()),2));
+  mp_integer i;
+  assert(!to_integer(expr,i));
+  return integer2unsigned(i);
 }
 
 std::string string_refinementt::string_of_array(const exprt &arr, const exprt &size)
 {
   if(size.id() != ID_constant) return "string of unknown size";
-  unsigned n = integer_of_expr(to_constant_expr(size));
+  unsigned n = unsigned_of_expr(to_constant_expr(size));
   if(n>500) return "very long string";
   if(n==0) return "\"\"";
   unsigned str[n];
@@ -298,10 +300,10 @@ std::string string_refinementt::string_of_array(const exprt &arr, const exprt &s
   if(val.id() == "array-list") {
     for (size_t i = 0; i < val.operands().size()/2; i++) {
       exprt index = val.operands()[i*2];
-      unsigned idx = integer_of_expr(to_constant_expr(index));
+      unsigned idx = unsigned_of_expr(to_constant_expr(index));
       if(idx < n){
 	exprt value = val.operands()[i*2+1];
-	str[idx] = integer_of_expr(to_constant_expr(value));
+	str[idx] = unsigned_of_expr(to_constant_expr(value));
       }
     }
   } else {
