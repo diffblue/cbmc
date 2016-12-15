@@ -185,6 +185,7 @@ follows the format specified below. Any line starting with // will be ignored.
 <level>
 <main source>
 <options>
+<grep_options>
 <required patterns>
 --
 <disallowed patterns>
@@ -195,6 +196,10 @@ where
   <level>                is one of CORE, THOROUGH, FUTURE or KNOWNBUG
   <main source>          is a file with extension .c/.i/.cpp/.ii/.xml/.class/.jar
   <options>              additional options to be passed to CMD
+  <grep_options>         additional flags to be passed to grep when checking required
+                         patterns (this is optional, if the line stats with a `-'
+                         it will be used as grep options. Otherwise, it will be
+                         considered part of the required patterns)
   <required patterns>    one or more lines of regualar expressions that must occur in the output
   <disallowed patterns>  one or more lines of expressions that must not occur in output
   <comment text>         free form text
