@@ -126,7 +126,8 @@ xmlt xml(
   {
     result.name="vector";
     result.new_element("subtype").new_element()=xml(type.subtype(), ns);
-    result.new_element("size").new_element()=xml(to_vector_type(type).size(), ns);
+    result.new_element("size").new_element()=
+      xml(to_vector_type(type).size(), ns);
   }
   else if(type.id()==ID_struct)
   {
@@ -318,7 +319,8 @@ xmlt xml(
 
     xmlt &e=result.new_element("member");
     e.new_element(xml(expr.op0(), ns));
-    e.set_attribute("member_name",
+    e.set_attribute(
+      "member_name",
       id2string(to_union_expr(expr).get_component_name()));
   }
   else
