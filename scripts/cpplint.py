@@ -4344,16 +4344,17 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
           'Line ends in whitespace.  Consider deleting these extra spaces.')
 
 # ensure indentation within parenthesized expressions
-  prev_initial_spaces = 0
-  if linenum>0:
-    while prev_initial_spaces < len(prev) and prev[prev_initial_spaces] == ' ':
-      prev_initial_spaces += 1
-  if Search(r'\([^\)]*,$', line) or Search(r'\(\[^\)]*, $', line):
-    error(filename, linenum, 'whitespace/indent', 4,
-          'If parameters or arguments require a line break, each parameter should be put on its own line.')
-  if (Search(r'\([^\)]*$', prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', prev):
-    error(filename, linenum, 'whitespace/indent', 4,
-          'Indent of wrapped parenthesized expression or parameter or argument list should be 2')
+  if (not Search(r'^\s+//', line)):
+    prev_initial_spaces = 0
+    if linenum>0:
+      while prev_initial_spaces < len(prev) and prev[prev_initial_spaces] == ' ':
+        prev_initial_spaces += 1
+    if Search(r'\([^\)]*,$', line) or Search(r'\(\[^\)]*, $', line):
+      error(filename, linenum, 'whitespace/indent', 4,
+            'If parameters or arguments require a line break, each parameter should be put on its own line.')
+    if (Search(r'\([^\)]*$', prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', prev):
+      error(filename, linenum, 'whitespace/indent', 4,
+            'Indent of wrapped parenthesized expression or parameter or argument list should be 2')
 
   # Check if the line is a header guard.
   is_header_guard = False
