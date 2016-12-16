@@ -7,8 +7,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_STRING_REFINEMENT_H
-#define CPROVER_SOLVER_STRING_REFINEMENT_H
+#ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
+#define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
 #include <langapi/language_ui.h>
 
@@ -17,17 +17,14 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_expr.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-// This is to analyse the performances of the different steps
-#include <chrono>
-
 class string_refinementt: public bv_refinementt
 {
 public:
   string_refinementt(const namespacet &_ns, propt &_prop);
-  ~string_refinementt() {};
+  ~string_refinementt() {}
 
-  //Determine which language should be used
-   void set_mode();
+  // Determine which language should be used
+  void set_mode();
 
   // Should we use counter examples at each iteration?
   bool use_counter_example;
@@ -41,12 +38,10 @@ public:
   static exprt is_positive(const exprt & x);
 
 private:
-  typedef bv_refinementt SUB;
-  std::chrono::high_resolution_clock::time_point start_time;
-
+  // Base class
+  typedef bv_refinementt supert;
 
 protected:
-
   typedef std::set<exprt> expr_sett;
 
   virtual bvt convert_symbol(const exprt &expr);
@@ -60,14 +55,13 @@ protected:
 
 
 private:
-
   string_constraint_generatort generator;
 
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
-  //
+
   std::vector<string_constraintt> universal_axioms;
-  //
+
   std::vector<string_not_contains_constraintt> not_contains_axioms;
 
   int nb_sat_iteration;
@@ -83,17 +77,17 @@ private:
   // for debugging
   void display_index_set();
 
-  // Tells if there is a index in the index set where the same variable occurs several time.
+  // Tells if there is a index in the index set where the same variable occurs
+  // several times.
   bool variable_with_multiple_occurence_in_index;
 
   // Natural number expression corresponding to a constant integer
-  constant_exprt constant_of_nat(int i,typet t);
+  constant_exprt constant_of_nat(int i, typet t);
 
   void add_lemma(const exprt &lemma, bool add_to_index_set=true);
 
-  //void set_to(const exprt &expr, bool value);
   bool boolbv_set_equality_to_true(const equal_exprt &expr);
-  //bool set_equality_to_true(const equal_exprt &expr);
+
   literalt convert_rest(const exprt &expr);
 
   // Instantiate forall constraints with index from the index set
@@ -115,27 +109,24 @@ private:
   // Then substitutes [axiom.idx] with [r] in [axiom].
   // axiom is not constant because we may record some information about
   // instantiation of existential variables.
-  exprt instantiate(const string_constraintt &axiom, const exprt &str,
-                    const exprt &val);
+  exprt instantiate
+  (const string_constraintt &axiom, const exprt &str, const exprt &val);
 
-  void instantiate_not_contains
-  (const string_not_contains_constraintt &axiom,
-   std::vector<exprt> & new_lemmas);
+  void instantiate_not_contains(
+    const string_not_contains_constraintt &axiom,
+    std::vector<exprt> & new_lemmas);
 
-  // For expressions f of a certain form, 		  //
-  // returns an expression corresponding to $f^{−1}(val)$.//
-  // i.e. the value that is necessary for qvar for f to   //
-  // be equal to val.                                     //
-  // Takes an expression containing + and − operations 	  //
-  // in which qvar appears exactly once. 		  //
-  // Rewrites it as a sum of qvar and elements in list	  //
-  // elems different from qvar. 			  //
-  // Takes e minus the sum of the element in elems.	  //
+  // For expressions f of a certain form, returns an expression corresponding
+  // to $f^{−1}(val)$.
+  // i.e. the value that is necessary for qvar for f to be equal to val.
+  // Takes an expression containing + and − operations in which qvar appears
+  // exactly once. Rewrites it as a sum of qvar and elements in list elems
+  // different from qvar. Takes e minus the sum of the element in elems.
   exprt compute_subst(const exprt &qvar, const exprt &val, const exprt &f);
 
   // Rewrite a sum in a simple form: sum m_i * expr_i
-  std::map< exprt, int> map_of_sum(const exprt &f);
-  exprt sum_of_map(std::map<exprt,int> &m,bool negated=false);
+  std::map<exprt, int> map_of_sum(const exprt &f);
+  exprt sum_of_map(std::map<exprt, int> &m, bool negated=false);
 
   // Simplify a sum (an expression with only plus and minus expr)
   exprt simplify_sum(const exprt &f);

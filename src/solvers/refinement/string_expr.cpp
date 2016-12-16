@@ -25,9 +25,10 @@ string_exprt::string_exprt(unsignedbv_typet char_type)
   : struct_exprt(refined_string_typet(char_type))
 {
   refined_string_typet t(char_type);
-  symbol_exprt length = fresh_symbol("string_length",refined_string_typet::index_type());
-  symbol_exprt content = fresh_symbol("string_content",t.get_content_type());
-  move_to_operands(length,content);
+  symbol_exprt length=
+    fresh_symbol("string_length", refined_string_typet::index_type());
+  symbol_exprt content=fresh_symbol("string_content", t.get_content_type());
+  move_to_operands(length, content);
 }
 
 

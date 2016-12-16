@@ -1,23 +1,22 @@
 /** -*- C++ -*- *****************************************************\
 
 Module: String constraints
-        (see the PASS paper at HVC'13 
+        (see the PASS paper at HVC'13
 
 Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVER_STRING_CONSTRAINT_H
-#define CPROVER_SOLVER_STRING_CONSTRAINT_H
+#ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
+#define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 
 #include <langapi/language_ui.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/refined_string_type.h>
 
-class string_constraintt : public exprt
+class string_constraintt: public exprt
 {
 public:
-
   // String constraints are of the form
   // forall univ_var in [0,bound[. premise => body
   // or premise => body
@@ -46,65 +45,57 @@ public:
   {
     return operands()[4];
   }
-  
+
   // Trivial constraint
   string_constraintt() : exprt(ID_string_constraint)
   {
-    assert(false); //string constraints should not be initialized directly
-    copy_to_operands(true_exprt(),true_exprt());
+    assert(false); // string constraints should not be initialized directly
+    copy_to_operands(true_exprt(), true_exprt());
   }
 
-  // // Constraint with no quantification, and no premise
-  // string_constraintt(const exprt & body) : exprt(ID_string_constraint)
-  // {
-  //   copy_to_operands(true_exprt(),body);
-  // }
-
-  // Constraint with no quantification: prem => bod
-  // string_constraintt(const exprt & prem, const exprt & body)
-  //   : exprt(ID_string_constraint)
-  // {
-  //   copy_to_operands(prem,body);
-  // }
-
   // Returns a new constraints with an universal quantifier added
-  string_constraintt(const symbol_exprt &univ, const exprt &bound_inf, const exprt &bound_sup, const exprt &prem, const exprt &body)
+  string_constraintt(
+    const symbol_exprt &univ,
+    const exprt &bound_inf,
+    const exprt &bound_sup,
+    const exprt &prem,
+    const exprt &body)
     : exprt(ID_string_constraint)
   {
-    copy_to_operands(prem,body);
+    copy_to_operands(prem, body);
     copy_to_operands(univ, bound_sup, bound_inf);
   };
-  
+
   // Default bound inferior is 0
-  string_constraintt(const symbol_exprt &univ, const exprt &bound_sup, const exprt &prem, const exprt &body)
-    : string_constraintt(univ, refined_string_typet::index_zero(), bound_sup, prem, body)
+  string_constraintt(
+    const symbol_exprt &univ,
+    const exprt &bound_sup,
+    const exprt &prem,
+    const exprt &body)
+    : string_constraintt(univ, refined_string_typet::index_zero(),
+                         bound_sup, prem, body)
   {};
 
   // Default premise is true
-  string_constraintt(const symbol_exprt &univ, const exprt &bound_sup, const exprt &body)
-    : string_constraintt(univ, refined_string_typet::index_zero(), bound_sup, true_exprt(), body)
+  string_constraintt
+  (const symbol_exprt &univ, const exprt &bound_sup, const exprt &body)
+    : string_constraintt
+      (univ, refined_string_typet::index_zero(), bound_sup, true_exprt(), body)
   {};
 
-  // Bound a variable that is existentially quantified
-  //string_constraintt with_exists(const symbol_exprt & exist, const exprt & bound_inf, const exprt & bound_sup);
+  bool is_simple() const { return (operands().size()==2); }
+  bool is_univ_quant() const { return (operands().size()==5); }
+  bool is_not_contains() const { return false; }
 
-  // Default bound inferior is 0
-  //string_constraintt with_exists(const symbol_exprt & exist, const exprt & bound_sup);
-
-  bool is_simple() const { return (operands().size() == 2); };
-  bool is_univ_quant() const { return (operands().size() == 5); };
-  bool is_not_contains() const { return false; };
-  
   inline symbol_exprt get_univ_var() const
   { return to_symbol_expr(univ_var()); }
-  
+
   inline exprt univ_within_bounds() const
   {
     return and_exprt
       (binary_relation_exprt(lower_bound(), ID_le, get_univ_var()),
        binary_relation_exprt(upper_bound(), ID_gt, get_univ_var()));
   }
-  
 };
 
 extern inline const string_constraintt &to_string_constraint(const exprt &expr)
@@ -119,16 +110,20 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
   return static_cast<string_constraintt &>(expr);
 }
 
-class string_not_contains_constraintt : public exprt
+class string_not_contains_constraintt: public exprt
 {
 public:
-  // string_contains_constraintt are formula of the form:
+  // string_not contains_constraintt are formula of the form:
   // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
 
-
-  string_not_contains_constraintt
-  (exprt univ_lower_bound, exprt univ_bound_sup, exprt premise,
-   exprt exists_bound_inf, exprt exists_bound_sup, exprt s0, exprt s1)
+  string_not_contains_constraintt(
+    exprt univ_lower_bound,
+    exprt univ_bound_sup,
+    exprt premise,
+    exprt exists_bound_inf,
+    exprt exists_bound_sup,
+    exprt s0,
+    exprt s1)
     :exprt(ID_string_not_contains_constraint)
   {
     copy_to_operands(univ_lower_bound, univ_bound_sup, premise);
@@ -136,13 +131,13 @@ public:
     copy_to_operands(s1);
   };
 
-  bool is_not_contains() const { return true; };
+  bool is_not_contains() const { return true; }
 
   inline const exprt &univ_lower_bound() const
   {
     return operands()[0];
   }
-  
+
   inline const exprt &univ_upper_bound() const
   {
     return operands()[1];
@@ -167,19 +162,18 @@ public:
   {
     return operands()[5];
   }
-  
+
   inline const exprt &s1() const
   {
     return operands()[6];
   }
-
 };
 
 extern inline const string_not_contains_constraintt
 &to_string_not_contains_constraint(const exprt &expr)
 {
   assert(expr.id()==ID_string_not_contains_constraint
-	 && expr.operands().size()==7);
+         && expr.operands().size()==7);
   return static_cast<const string_not_contains_constraintt &>(expr);
 }
 
@@ -187,7 +181,7 @@ extern inline string_not_contains_constraintt
 &to_string_not_contains_constraint(exprt &expr)
 {
   assert(expr.id()==ID_string_not_contains_constraint
-	 && expr.operands().size()==7);
+         && expr.operands().size()==7);
   return static_cast<string_not_contains_constraintt &>(expr);
 }
 

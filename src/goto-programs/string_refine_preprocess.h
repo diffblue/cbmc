@@ -9,8 +9,8 @@ Date:   September 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_STRING_REFINE_PREPROCESS_H
-#define CPROVER_STRING_REFINE_PREPROCESS_H
+#ifndef CPROVER_GOTO_PROGRAMS_STRING_REFINE_PREPROCESS_H
+#define CPROVER_GOTO_PROGRAMS_STRING_REFINE_PREPROCESS_H
 
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
@@ -31,16 +31,16 @@ class string_refine_preprocesst:public messaget
   std::map<irep_idt, irep_idt> side_effect_char_array_functions;
 
  public:
-  string_refine_preprocesst(symbol_tablet &, goto_functionst &, message_handlert &);
+  string_refine_preprocesst
+    (symbol_tablet &, goto_functionst &, message_handlert &);
 
  private:
-
   // add a temporary symbol to the symbol table
   symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
   void declare_function(irep_idt function_name, const typet &type);
 
-  exprt replace_string_literals(const exprt & );
+  exprt replace_string_literals(const exprt &);
 
   // replace "lhs=s.some_function(x,...)" by "lhs=function_name(s,x,...)"
   void make_string_function
@@ -74,7 +74,8 @@ class string_refine_preprocesst:public messaget
   void make_char_array_function_call
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
 
-  // replace "r = s.some_function(i,arr,...)" by "s=function_name(s,i,arr.length,arr.data)"
+  // replace `r = s.some_function(i,arr,...)` by
+  // `s=function_name(s,i,arr.length,arr.data)`
   // and add a correspondance from r to s in the string_builders map
   void make_char_array_side_effect
     (goto_programt::instructionst::iterator & i_it, irep_idt function_name);
@@ -82,7 +83,6 @@ class string_refine_preprocesst:public messaget
   bool has_java_string_type(const exprt &expr);
 
   void replace_string_calls(goto_functionst::function_mapt::iterator f_it);
-
 };
 
-#endif 
+#endif
