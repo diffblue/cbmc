@@ -33,6 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
 
+#include <analyses/is_threaded.h>
+#include <analyses/goto_check.h>
 #include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
@@ -49,6 +51,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
+#include "static_show_domain.h"
+#include "static_simplifier.h"
 
 /*******************************************************************\
 
@@ -175,6 +179,100 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
   #endif
+
+
+  // Output format choice
+  options.set_option("text", false);
+  options.set_option("json", false);
+  options.set_option("xml", false);
+  options.set_option("outfile", "-");
+
+  if(cmdline.isset("text"))
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", cmdline.get_value("text"));
+  }
+  else if(cmdline.isset("json"))
+  {
+    options.set_option("json", true);
+    options.set_option("outfile", cmdline.get_value("json"));
+  }
+  else if(cmdline.isset("xml"))
+  {
+    options.set_option("xml", true);
+    options.set_option("outfile", cmdline.get_value("xml"));
+  }
+  else
+  {
+    options.set_option("text", true);
+  }
+
+
+  // Task options
+  options.set_option(    "show", false);
+  options.set_option(  "verify", false);
+  options.set_option("simplify", false);
+
+  if(cmdline.isset("show") ||
+      cmdline.isset("show-intervals") ||
+      cmdline.isset("show-non-null"))
+    options.set_option("show", true);
+  else if(cmdline.isset("verify"))
+    options.set_option("verify", true);
+  else if(cmdline.isset("simplify"))
+  {
+    options.set_option("simplify", true);
+    options.set_option("outfile", cmdline.get_value("simplify"));
+  }
+
+  if(!(options.get_bool_option("show")  ||
+    options.get_bool_option("verify")  ||
+    options.get_bool_option("simplify")))
+  {
+    status() << "Task defaults to --show" << eom;
+    options.set_option("show", true);
+  }
+
+
+  // Abstract interpreter choice
+  options.set_option("flow-sensitive", false);
+  options.set_option("concurrent", false);
+
+  if(cmdline.isset("flow-sensitive"))
+    options.set_option("flow-sensitive", true);
+  else if(cmdline.isset("concurrent"))
+    options.set_option("concurrent", true);
+  else
+  {
+    is_threadedt is_threaded(goto_model.goto_functions);
+    bool contains_concurrent_code=is_threaded();
+
+    options.set_option("flow-sensitive", !contains_concurrent_code);
+    options.set_option("concurrent",  contains_concurrent_code);
+  }
+
+
+  // Domain choice
+  options.set_option("constants", false);
+  options.set_option("intervals", false);
+  options.set_option("non-null", false);
+
+  if(cmdline.isset("intervals") ||
+     cmdline.isset("show-intervals"))
+    options.set_option("intervals", true);
+  else if(cmdline.isset("non-null") ||
+          cmdline.isset("show-non-null"))
+    options.set_option("non-null", true);
+  else if(cmdline.isset("constants"))
+    options.set_option("constants", true);
+
+  if(!(options.get_bool_option("constants")  ||
+     options.get_bool_option("intervals")  ||
+     options.get_bool_option("non-null")))
+  {
+    status() << "Domain defaults to --constants" << eom;
+    options.set_option("constants", true);
+  }
 }
 
 /*******************************************************************\
@@ -233,9 +331,12 @@ int goto_analyzer_parse_optionst::doit()
     else
     {
       std::string json_file=cmdline.get_value("json");
-      bool result=
-        taint_analysis(
-          goto_model, taint_file, get_message_handler(), false, json_file);
+      bool result=taint_analysis(
+        goto_model,
+        taint_file,
+        get_message_handler(),
+        false,
+        json_file);
       return result?10:0;
     }
   }
@@ -346,17 +447,47 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
+
+  // Output file factory
+  std::ostream *out;
+  const std::string outfile=options.get_option("outfile");
+  if(outfile=="-")
+    out=&std::cout;
+  else
   {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
+    out=new std::ofstream(outfile);
+    if(!*out)
+    {
+      error() << "Failed to open output file `"
+              << outfile << "'" << eom;
+      return 6;
+    }
   }
 
+
+  // Run the analysis
+  bool result=true;
+  if(options.get_bool_option("show"))
+    result=static_show_domain(goto_model, options, get_message_handler(), *out);
+
+  else if(options.get_bool_option("verify"))
+    result=   static_analyzer(goto_model, options, get_message_handler(), *out);
+
+  else if(options.get_bool_option("simplify"))
+    result= static_simplifier(goto_model, options, get_message_handler(), *out);
+  else
+  {
+    error() << "No task given" << eom;
+    return 6;
+  }
+
+  if(out!=&std::cout)
+    delete out;
+
+  return result?10:0;
+
+
+  // Final defensive error case
   error() << "no analysis option given -- consider reading --help"
           << eom;
   return 6;
@@ -532,8 +663,29 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
+    "Task options:\n"
+    " --show                       display the abstract domains\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --verify                     use the abstract domains to check assertions\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --simplify file_name         use the abstract domains to simplify the program\n"
     "\n"
+    "Abstract interpreter options:\n"
+    " --flow-sensitive             use flow-sensitive abstract interpreter\n"
+    " --concurrent                 use concurrent abstract interpreter\n"
+    "\n"
+    "Domain options:\n"
+    " --constants                  constant abstraction\n"
+    " --intervals                  interval abstraction\n"
+    " --non-null                   non-null abstraction\n"
+    "\n"
+    "Output options:\n"
+    " --text file_name             output results in plain text to given file\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --json file_name             output results in JSON format to given file\n"
+    " --xml file_name              output results in XML format to given file\n"
+    "\n"
+    "Other analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
@@ -541,13 +693,6 @@ void goto_analyzer_parse_optionst::help()
     " --unreachable-functions      list functions unreachable from the entry point\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-functions        list functions reachable from the entry point\n"
-    " --intervals                  interval analysis\n"
-    " --non-null                   non-null analysis\n"
-    "\n"
-    "Analysis options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --json file_name             output results in JSON format to given file\n"
-    " --xml file_name              output results in XML format to given file\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
