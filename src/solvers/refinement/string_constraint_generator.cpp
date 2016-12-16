@@ -269,7 +269,9 @@ exprt string_constraint_generatort::add_axioms_for_function_application
 irep_idt extract_java_string(const symbol_exprt & s)
 {
   std::string tmp(s.get(ID_identifier).c_str());
-  std::string value = tmp.substr(31);
+  std::string prefix("java::java.lang.String.Literal.");
+  assert(has_prefix(tmp,prefix));
+  std::string value = tmp.substr(prefix.length());
   return irep_idt(value);
 }
 
