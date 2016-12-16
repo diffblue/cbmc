@@ -73,14 +73,6 @@ void remove_returnst::replace_returns(
     symbol_tablet::symbolst::iterator s_it=
       symbol_table.symbols.find(function_id);
 
-    if(s_it==symbol_table.symbols.end())
-      {
-	std::string str = "function symbol for ";
-	str += function_id.c_str();
-	str += " not found";
-	throw str;
-      }
-
     assert(s_it!=symbol_table.symbols.end());
     symbolt &function_symbol=s_it->second;
 
