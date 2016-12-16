@@ -41,11 +41,14 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
-  "(json):(xml):" \
+  "(json):(xml):(text):" \
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
-  "(non-null)(show-non-null)"
+  "(non-null)(show-non-null)" \
+  "(constants)" \
+  "(show)(verify)(simplify):" \
+  "(flow-sensitive)(concurrent)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

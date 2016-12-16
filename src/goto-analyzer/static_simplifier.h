@@ -2,13 +2,12 @@
 
 Module:
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 \*******************************************************************/
 
-
-#ifndef CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
-#define CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
+#ifndef CPROVER_GOTO_ANALYZER_STATIC_SIMPLIFIER_H
+#define CPROVER_GOTO_ANALYZER_STATIC_SIMPLIFIER_H
 
 #include <iosfwd>
 
@@ -18,14 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
-bool static_analyzer(
-  const goto_modelt &,
+bool static_simplifier(
+  goto_modelt &,
   const optionst &,
   message_handlert &,
   std::ostream &);
 
-void show_intervals(
-  const goto_modelt &,
-  std::ostream &);
-
-#endif // CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
+#endif
