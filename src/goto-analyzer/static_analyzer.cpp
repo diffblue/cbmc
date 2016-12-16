@@ -8,25 +8,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
-#include <util/threeval.h>
 #include <util/json.h>
 #include <util/xml.h>
 
 #include <analyses/interval_domain.h>
+#include <analyses/constant_propagator.h>
 
 #include "static_analyzer.h"
 
+template<class analyzerT>
 class static_analyzert:public messaget
 {
 public:
   static_analyzert(
     const goto_modelt &_goto_model,
     const optionst &_options,
-    message_handlert &_message_handler):
+    message_handlert &_message_handler,
+    std::ostream &_out):
     messaget(_message_handler),
     goto_functions(_goto_model.goto_functions),
     ns(_goto_model.symbol_table),
-    options(_options)
+    options(_options),
+    out(_out)
   {
   }
 
@@ -36,38 +39,38 @@ protected:
   const goto_functionst &goto_functions;
   const namespacet ns;
   const optionst &options;
+  std::ostream &out;
 
   // analyses
-  ait<interval_domaint> interval_analysis;
+  analyzerT domain;
 
   void plain_text_report();
-  void json_report(const std::string &);
-  void xml_report(const std::string &);
-
-  tvt eval(goto_programt::const_targett);
+  void json_report();
+  void xml_report();
 };
 
 /*******************************************************************\
 
-Function: static_analyzert::operator()
+Function: static_analyzert<analyzerT>::operator()
 
-  Inputs:
+  Inputs: None.
 
- Outputs:
+ Outputs: false on success, true on failure.
 
- Purpose:
+ Purpose: Run the analysis, check the assertions and report in the correct format.
 
 \*******************************************************************/
 
-bool static_analyzert::operator()()
+template<class analyzerT>
+bool static_analyzert<analyzerT>::operator()()
 {
-  status() << "performing interval analysis" << eom;
-  interval_analysis(goto_functions, ns);
+  status() << "Performing analysis" << eom;
+  domain(goto_functions, ns);
 
-  if(!options.get_option("json").empty())
-    json_report(options.get_option("json"));
-  else if(!options.get_option("xml").empty())
-    xml_report(options.get_option("xml"));
+  if(options.get_bool_option("json"))
+    json_report();
+  else if(options.get_bool_option("xml"))
+    xml_report();
   else
     plain_text_report();
 
@@ -76,38 +79,18 @@ bool static_analyzert::operator()()
 
 /*******************************************************************\
 
-Function: static_analyzert::eval
+Function: static_analyzert<analyzerT>::plain_text_report
 
-  Inputs:
+  Inputs: None.
 
- Outputs:
+ Outputs: Text report via out.
 
- Purpose:
-
-\*******************************************************************/
-
-tvt static_analyzert::eval(goto_programt::const_targett t)
-{
-  exprt guard=t->guard;
-  interval_domaint d=interval_analysis[t];
-  d.assume(not_exprt(guard), ns);
-  if(d.is_bottom()) return tvt(true);
-  return tvt::unknown();
-}
-
-/*******************************************************************\
-
-Function: static_analyzert::plain_text_report
-
-  Inputs:
-
- Outputs:
-
- Purpose:
+ Purpose: Check the assertions and give results as text.
 
 \*******************************************************************/
 
-void static_analyzert::plain_text_report()
+template<class analyzerT>
+void static_analyzert<analyzerT>::plain_text_report()
 {
   unsigned pass=0, fail=0, unknown=0;
 
@@ -124,7 +107,7 @@ void static_analyzert::plain_text_report()
     {
       if(!i_it->is_assert()) continue;
 
-      tvt r=eval(i_it);
+      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
 
       result() << '[' << i_it->source_location.get_property_id()
                << ']' << ' ';
@@ -133,48 +116,43 @@ void static_analyzert::plain_text_report()
       if(!i_it->source_location.get_comment().empty())
         result() << ", " << i_it->source_location.get_comment();
       result() << ": ";
-      if(r.is_true())
-        result() << "SUCCESS";
-      else if(r.is_false())
-        result() << "FAILURE";
+      if(simplified.is_true())
+        { result() << "SUCCESS"; pass++; }
+      else if(simplified.is_false())
+        { result() << "FAILURE (if reachable)"; fail++; }
       else
-        result() << "UNKNOWN";
+        { result() << "UNKNOWN"; unknown++; }
       result() << eom;
 
-      if(r.is_true())
-        pass++;
-      else if(r.is_false())
-        fail++;
-      else
-        unknown++;
     }
 
     status() << '\n';
   }
-
-  status() << "SUMMARY: " << pass << " pass, " << fail << " fail, "
+  status() << "SUMMARY: " << pass << " pass, " << fail << " fail if reachable, "
            << unknown << " unknown\n";
 }
 
 /*******************************************************************\
 
-Function: static_analyzert::json_report
+Function: static_analyzert<analyzerT>::json_report
 
-  Inputs:
+  Inputs: None.
 
- Outputs:
+ Outputs: JSON report via out.
 
- Purpose:
+ Purpose: Check the assertions and give results as JSON.
 
 \*******************************************************************/
 
-void static_analyzert::json_report(const std::string &file_name)
+template<class analyzerT>
+void static_analyzert<analyzerT>::json_report()
 {
   json_arrayt json_result;
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
+    if(!f_it->second.body.has_assertion())
+      continue;
 
     if(f_it->first=="__actual_thread_spawn")
       continue;
@@ -183,14 +161,14 @@ void static_analyzert::json_report(const std::string &file_name)
     {
       if(!i_it->is_assert()) continue;
 
-      tvt r=eval(i_it);
+      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
 
       json_objectt &j=json_result.push_back().make_object();
 
-      if(r.is_true())
+      if(simplified.is_true())
         j["status"]=json_stringt("SUCCESS");
-      else if(r.is_false())
-        j["status"]=json_stringt("FAILURE");
+      else if(simplified.is_false())
+        j["status"]=json_stringt("FAILURE (if reachable)");
       else
         j["status"]=json_stringt("UNKNOWN");
 
@@ -200,32 +178,24 @@ void static_analyzert::json_report(const std::string &file_name)
         i_it->source_location.get_comment()));
     }
   }
-
-  std::ofstream out(file_name);
-  if(!out)
-  {
-    error() << "failed to open JSON output file `"
-            << file_name << "'" << eom;
-    return;
-  }
-
-  status() << "Writing report to `" << file_name << "'" << eom;
+  status() << "Writing JSON report" << eom;
   out << json_result;
 }
 
 /*******************************************************************\
 
-Function: static_analyzert::xml_report
+Function: static_analyzert<analyzerT>::xml_report
 
-  Inputs:
+  Inputs: None.
 
- Outputs:
+ Outputs: XML report via out.
 
- Purpose:
+ Purpose: Check the assertions and give results as XML.
 
 \*******************************************************************/
 
-void static_analyzert::xml_report(const std::string &file_name)
+template<class analyzerT>
+void static_analyzert<analyzerT>::xml_report()
 {
   xmlt xml_result;
 
@@ -240,14 +210,14 @@ void static_analyzert::xml_report(const std::string &file_name)
     {
       if(!i_it->is_assert()) continue;
 
-      tvt r=eval(i_it);
+      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
 
       xmlt &x=xml_result.new_element("result");
 
-      if(r.is_true())
+      if(simplified.is_true())
         x.set_attribute("status", "SUCCESS");
-      else if(r.is_false())
-        x.set_attribute("status", "FAILURE");
+      else if(simplified.is_false())
+        x.set_attribute("status", "FAILURE (if reachable)");
       else
         x.set_attribute("status", "UNKNOWN");
 
@@ -257,15 +227,7 @@ void static_analyzert::xml_report(const std::string &file_name)
     }
   }
 
-  std::ofstream out(file_name);
-  if(!out)
-  {
-    error() << "failed to open XML output file `"
-            << file_name << "'" << eom;
-    return;
-  }
-
-  status() << "Writing report to `" << file_name << "'" << eom;
+  status() << "Writing XML report" << eom;
   out << xml_result;
 }
 
@@ -273,21 +235,56 @@ void static_analyzert::xml_report(const std::string &file_name)
 
 Function: static_analyzer
 
-  Inputs:
+  Inputs: The goto_model to check, options giving the domain and output,
+          the message handler and output stream.
 
- Outputs:
+ Outputs: Report via out.
 
- Purpose:
+ Purpose: Runs the analyzer, check assertions and generate a report.
 
 \*******************************************************************/
 
 bool static_analyzer(
   const goto_modelt &goto_model,
   const optionst &options,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  std::ostream &out)
 {
-  return static_analyzert(
-    goto_model, options, message_handler)();
+  if(options.get_bool_option("flow-sensitive"))
+  {
+    if(options.get_bool_option("constants"))
+      return static_analyzert<ait<constant_propagator_domaint> >
+        (goto_model, options, message_handler, out)();
+
+    else if(options.get_bool_option("intervals"))
+      return static_analyzert<ait<interval_domaint> >
+        (goto_model, options, message_handler, out)();
+
+    // else if(options.get_bool_option("non-null"))
+    //   return static_analyzert<ait<non_null_domaint> >
+    //     (goto_model, options, message_handler, out)();
+  }
+  else if(options.get_bool_option("concurrent"))
+  {
+    // Constant and interval don't have merge_shared yet
+#if 0
+    if(options.get_bool_option("constants"))
+      return static_analyzert<concurrency_aware_ait<constant_propagator_domaint> >
+        (goto_model, options, message_handler, out)();
+
+    else if(options.get_bool_option("intervals"))
+      return static_analyzert<concurrency_aware_ait<interval_domaint> >
+        (goto_model, options, message_handler, out)();
+
+    // else if(options.get_bool_option("non-null"))
+    //   return static_analyzert<concurrency_aware_ait<non_null_domaint> >
+    //     (goto_model, options, message_handler, out)();
+#endif
+  }
+
+  messaget m(message_handler);
+  m.status() << "Task / Interpreter / Domain combination not supported" << messaget::eom;
+  return true;
 }
 
 /*******************************************************************\
