@@ -129,20 +129,29 @@ void interval_domaint::transform(
 
 /*******************************************************************\
 
-Function: interval_domaint::merge
+Function: interval_domaint::join
 
-  Inputs:
+  Inputs: The interval domain, b, to join to this domain.
 
- Outputs:
+ Outputs: True if the join increases the set represented by *this,
+          False if there is no change.
 
- Purpose:
+ Purpose: Sets *this to the mathematical join between the two domains.
+          This can be thought of as an abstract version of union;
+          *this is increased so that it contains all of the values that
+          are represented by b as well as its original intervals.
+          The result is an overapproximation, for example:
+             "[0,1]".join("[3,4]") --> "[0,4]"
+          includes 2 which isn't in [0,1] or [3,4].
+
+          Join is used in several places, the most significant being
+          merge, which uses it to bring together two different paths
+          of analysis.
 
 \*******************************************************************/
 
-bool interval_domaint::merge(
-  const interval_domaint &b,
-  locationt from,
-  locationt to)
+bool interval_domaint::join(
+  const interval_domaint &b)
 {
   if(b.bottom)
     return false;
@@ -526,4 +535,68 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
   }
   else
     return true_exprt();
+}
+
+/*******************************************************************\
+
+Function: interval_domaint::simplify
+
+  Inputs: The expression to simplify.
+
+ Outputs: A simplified version of the expression.
+
+ Purpose: Uses the abstract state to simplify a given expression
+          using context-specific information.
+
+\*******************************************************************/
+
+/*
+ * This implementation is aimed at reducing assertions to true, particularly
+ * range checks for arrays and other bounds checks.
+ *
+ * Rather than work with the various kinds of exprt directly, we use assume,
+ * join and is_bottom.  It is sufficient for the use case and avoids duplicating
+ * functionality that is in assume anyway.
+ *
+ * As some expressions (1<=a && a<=2) can be represented exactly as intervals
+ * and some can't (a<1 || a>2), the way these operations are used varies
+ * depending on the structure of the expression to try to give the best results.
+ * For example negating a disjunction makes it easier for assume to handle.
+ */
+
+bool interval_domaint::ai_simplify(
+  exprt &condition,
+  const namespacet &ns) const
+{
+  bool unchanged=true;
+  interval_domaint d(*this);
+
+  // merge intervals to properly handle conjunction
+  if(condition.id()==ID_and)              // May be directly representable
+  {
+    interval_domaint a;
+    a.make_top();                         // a is everything
+    a.assume(condition, ns);              // Restrict a to an over-approximation
+                                          //  of when condition is true
+    if(!a.join(d))                        // If d (this) is included in a...
+    {                                     // Then the condition is always true
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+  else if(condition.id()==ID_symbol)
+  {
+    // TODO: we have to handle symbol expression
+  }
+  else                                    // Less likely to be representable
+  {
+    d.assume(not_exprt(condition), ns);   // Restrict to when condition is false
+    if(d.is_bottom())                     // If there there are none...
+    {                                     // Then the condition is always true
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+
+  return unchanged;
 }
