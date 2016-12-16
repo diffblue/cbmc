@@ -19,6 +19,9 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
 
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unreachable.h>
+
 #include "static_simplifier.h"
 
 template<class analyzerT>
@@ -73,6 +76,21 @@ bool static_simplifiert<analyzerT>::operator()(void)
 
   status() << "Simplifying program" << eom;
   simplify_program();
+
+  // Remove obviously unreachable things and (now) unconditional branches
+  if (options.get_bool_option("simplify-slicing"))
+  {
+    status() << "Removing unreachable instructions" << eom;
+
+    remove_skip(goto_functions);  // Removes goto false
+    goto_functions.update();
+
+    remove_unreachable(goto_functions);  // Convert unreachable to skips
+    goto_functions.update();
+
+    remove_skip(goto_functions);  // Remove all of the new skips
+    goto_functions.update();
+  }
 
   status() << "Writing goto binary" << eom;
   return write_goto_binary(out, ns.get_symbol_table(), goto_functions);
