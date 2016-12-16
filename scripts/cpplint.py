@@ -3281,8 +3281,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'readability/identifiers', 4,
           'Remove spaces around %s' % match.group(0))
 
+# check any inherited classes don't have a space between the type and the :
+  if Search(r'(struct|class)\s[\w_]*\s+:', line):
+    error(filename, linenum, 'readability/identifiers', 4, 'There shouldn\'t be a space between class identifier and :')
+
 #check type definitions end with t
-  if Search(r'(struct|class)\s[\w_]*[^t^;^:](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
+  if Search(r'(struct|class)\s[\w_]*[^t^;^:^\s](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
     error(filename, linenum, 'readability/identifiers', 4,
           'Class or struct identifier should end with t')
 
