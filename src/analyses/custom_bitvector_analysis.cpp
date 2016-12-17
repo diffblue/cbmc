@@ -678,7 +678,7 @@ void custom_bitvector_domaint::erase_blank_vectors(bitst &bits)
 {
   for(bitst::iterator a_it=bits.begin();
       a_it!=bits.end();
-      )
+     ) // no a_it++
   {
     if(a_it->second==0)
       a_it=bits.erase(a_it);

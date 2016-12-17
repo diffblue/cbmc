@@ -398,7 +398,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
   for(replace_symbolt::expr_mapt::const_iterator
         it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
-      )
+      ) // no it++
   {
     if(src.replace_const.expr_map.find(it->first) ==
        src.replace_const.expr_map.end())
@@ -459,19 +459,19 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
     replace_symbolt::expr_mapt::iterator c_it=
       replace_const.expr_map.find(src_replace_pair.first);
 
-    if(c_it != replace_const.expr_map.end())
+    if(c_it!=replace_const.expr_map.end())
     {
       if(c_it->second!=src_replace_pair.second)
       {
         set_to_bottom();
-        changed = true;
+        changed=true;
         break;
       }
     }
     else
     {
       set_to(src_replace_pair.first, src_replace_pair.second);
-      changed = true;
+      changed=true;
     }
   }
 

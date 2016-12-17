@@ -221,8 +221,10 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
       out << n << " post-dominated by ";
     else
       out << n << " dominated by ";
-    for(typename target_sett::const_iterator d_it=node.second.dominators.begin();
-        d_it!=node.second.dominators.end();)
+    for(typename target_sett::const_iterator
+        d_it=node.second.dominators.begin();
+        d_it!=node.second.dominators.end();
+       ) // no d_it++
     {
       out << (*d_it)->location_number;
       if (++d_it!=node.second.dominators.end())
