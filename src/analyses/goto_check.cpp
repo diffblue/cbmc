@@ -1729,10 +1729,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       }
     }
 
-    for(goto_programt::instructionst::iterator
-        i_it=new_code.instructions.begin();
-        i_it!=new_code.instructions.end();
-        i_it++)
+    Forall_goto_program_instructions(i_it, new_code)
     {
       if(i_it->source_location.is_nil())
       {
@@ -1805,10 +1802,7 @@ void goto_check(
 {
   goto_checkt goto_check(ns, options);
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_functions)
   {
     goto_check.goto_check(it->second);
   }
@@ -1833,10 +1827,7 @@ void goto_check(
   const namespacet ns(goto_model.symbol_table);
   goto_checkt goto_check(ns, options);
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_model.goto_functions.function_map.begin();
-      it!=goto_model.goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_model.goto_functions)
   {
     goto_check.goto_check(it->second);
   }

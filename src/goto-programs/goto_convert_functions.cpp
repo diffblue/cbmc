@@ -119,10 +119,7 @@ Function: goto_convert_functionst::hide
 
 bool goto_convert_functionst::hide(const goto_programt &goto_program)
 {
-  for(goto_programt::instructionst::const_iterator
-      i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end();
-      i_it++)
+  forall_goto_program_instructions(i_it, goto_program)
   {
     for(const auto &label : i_it->labels)
       if(label=="__CPROVER_HIDE")

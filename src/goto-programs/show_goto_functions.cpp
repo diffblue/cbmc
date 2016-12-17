@@ -43,10 +43,7 @@ void show_goto_functions(
   {
     //This only prints the list of functions
     xmlt xml_functions("functions");
-    for(goto_functionst::function_mapt::const_iterator
-          it=goto_functions.function_map.begin();
-        it!=goto_functions.function_map.end();
-        it++)
+    forall_goto_functions(it, goto_functions)
     {
       xmlt &xml_function=xml_functions.new_element("function");
       xml_function.set_attribute("name", id2string(it->first));
@@ -60,10 +57,7 @@ void show_goto_functions(
   {
     //This only prints the list of functions
     json_arrayt json_functions;
-    for(goto_functionst::function_mapt::const_iterator
-          it=goto_functions.function_map.begin();
-        it!=goto_functions.function_map.end();
-        it++)
+    forall_goto_functions(it, goto_functions)
     {
       json_objectt &json_function=
         json_functions.push_back(jsont()).make_object();

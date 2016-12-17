@@ -132,10 +132,7 @@ void flow_insensitive_analysis_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     out << "////" << std::endl;
     out << "//// Function: " << f_it->first << std::endl;
@@ -547,10 +544,7 @@ void flow_insensitive_analysis_baset::fixedpoint(
 {
   // do each function at least once
 
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
     if(functions_done.find(it->first)==
        functions_done.end())
     {

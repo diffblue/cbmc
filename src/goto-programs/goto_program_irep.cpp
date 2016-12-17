@@ -109,10 +109,7 @@ void convert( const goto_programt &program, irept &irep )
 {
   irep.id("goto-program");
   irep.get_sub().reserve(program.instructions.size());
-  for (goto_programt::instructionst::const_iterator it=
-          program.instructions.begin();
-       it!=program.instructions.end();
-       it++)
+  forall_goto_program_instructions(it, program)
   {
     irep.get_sub().push_back(irept());
     convert(*it, irep.get_sub().back());

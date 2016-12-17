@@ -135,10 +135,7 @@ void static_analysis_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out) const
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->second.body_available())
     {
@@ -198,10 +195,7 @@ Function: static_analysis_baset::generate_states
 void static_analysis_baset::generate_states(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     generate_states(f_it->second.body);
 }
 
@@ -239,10 +233,7 @@ Function: static_analysis_baset::update
 void static_analysis_baset::update(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     update(f_it->second.body);
 }
 

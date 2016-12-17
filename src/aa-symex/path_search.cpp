@@ -491,23 +491,17 @@ Function: path_searcht::initialize_property_map
 void path_searcht::initialize_property_map(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
     if(!it->second.is_inlined())
     {
       const goto_programt &goto_program=it->second.body;
 
-      for(goto_programt::instructionst::const_iterator
-          it=goto_program.instructions.begin();
-          it!=goto_program.instructions.end();
-          it++)
+      forall_goto_program_instructions(i_it, goto_program)
       {
-        if(!it->is_assert())
+        if(!i_it->is_assert())
           continue;
 
-        const locationt &location=it->location;
+        const locationt &location=i_it->location;
 
         irep_idt property_name=location.get_property_id();
 

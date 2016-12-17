@@ -54,9 +54,7 @@ void show_loop_ids(
   {
     case ui_message_handlert::PLAIN:
     {
-      for(goto_programt::instructionst::const_iterator
-            it=goto_program.instructions.begin();
-          it!=goto_program.instructions.end(); it++)
+      forall_goto_program_instructions(it, goto_program)
       {
         if(it->is_backwards_goto())
         {
@@ -73,9 +71,7 @@ void show_loop_ids(
     }
     case ui_message_handlert::XML_UI:
     {
-      for(goto_programt::instructionst::const_iterator
-            it=goto_program.instructions.begin();
-          it!=goto_program.instructions.end(); it++)
+      forall_goto_program_instructions(it, goto_program)
       {
         if(it->is_backwards_goto())
         {
@@ -103,9 +99,7 @@ void show_loop_ids_json(
 {
   assert(ui==ui_message_handlert::JSON_UI); //use function above
 
-  for(goto_programt::instructionst::const_iterator
-        it=goto_program.instructions.begin();
-      it!=goto_program.instructions.end(); it++)
+  forall_goto_program_instructions(it, goto_program)
   {
     if(it->is_backwards_goto())
     {

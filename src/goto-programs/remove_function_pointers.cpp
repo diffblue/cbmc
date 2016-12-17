@@ -106,10 +106,7 @@ remove_function_pointerst::remove_function_pointerst(
   compute_address_taken_functions(goto_functions, address_taken);
 
   // build type map
-  for(goto_functionst::function_mapt::const_iterator f_it=
-      goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     type_map[f_it->first]=f_it->second.type;
 }
 

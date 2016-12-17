@@ -172,10 +172,7 @@ void set_properties(
 
   property_set.insert(properties.begin(), properties.end());
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_functions)
     if(!it->second.is_inlined())
       set_properties(it->second.body, property_set);
 
