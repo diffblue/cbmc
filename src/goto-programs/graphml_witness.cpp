@@ -8,6 +8,8 @@ Author: Daniel Kroening
 
 #include <iostream>
 
+#include <util/base_type.h>
+#include <util/byte_operators.h>
 #include <util/config.h>
 #include <util/i2string.h>
 #include <util/arith_tools.h>
@@ -91,32 +93,53 @@ std::string graphml_witnesst::convert_assign_rec(
   else if(assign.rhs().id()==ID_struct ||
           assign.rhs().id()==ID_union)
   {
+    // dereferencing may have resulted in an lhs that is the first
+    // struct member; undo this
+    if(assign.lhs().id()==ID_member &&
+       !base_type_eq(assign.lhs().type(), assign.rhs().type(), ns))
+    {
+      code_assignt tmp=assign;
+      tmp.lhs()=to_member_expr(assign.lhs()).struct_op();
+
+      return convert_assign_rec(identifier, tmp);
+    }
+    else if(assign.lhs().id()==ID_byte_extract_little_endian ||
+            assign.lhs().id()==ID_byte_extract_big_endian)
+    {
+      code_assignt tmp=assign;
+      tmp.lhs()=to_byte_extract_expr(assign.lhs()).op();
+
+      return convert_assign_rec(identifier, tmp);
+    }
+
     const struct_union_typet &type=
       to_struct_union_type(ns.follow(assign.lhs().type()));
     const struct_union_typet::componentst &components=
       type.components();
 
-    struct_union_typet::componentst::const_iterator c_it=
-      components.begin();
-    forall_operands(it, assign.rhs())
+    exprt::operandst::const_iterator it=
+      assign.rhs().operands().begin();
+    for(const auto & comp : components)
     {
-      if(c_it->type().id()==ID_code ||
-         c_it->get_is_padding() ||
+      if(comp.type().id()==ID_code ||
+         comp.get_is_padding() ||
          // for some reason #is_padding gets lost in *some* cases
-         has_prefix(id2string(c_it->get_name()), "$pad"))
-      {
-        ++c_it;
+         has_prefix(id2string(comp.get_name()), "$pad"))
         continue;
-      }
 
-      assert(c_it!=components.end());
+      assert(it!=assign.rhs().operands().end());
+
       member_exprt member(
           assign.lhs(),
-          c_it->get_name(),
+          comp.get_name(),
           it->type());
       if(!result.empty()) result+=' ';
       result+=convert_assign_rec(identifier, code_assignt(member, *it));
-      ++c_it;
+      ++it;
+
+      // for unions just assign to the first member
+      if(assign.rhs().id()==ID_union)
+        break;
     }
   }
   else
@@ -404,7 +427,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
     if(from==sink)
     {
-      ++it; ++step_nr;
+      ++it;
+      ++step_nr;
       continue;
     }
 
