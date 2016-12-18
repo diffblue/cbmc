@@ -1370,8 +1370,24 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 
 double round(double x)
 {
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  return __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+  // Tempting but RNE not RNA
+  // return __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  return __sort_of_CPROVER_round_to_integral(FE_TOWARDZERO, xp);
 }
 
 /* FUNCTION: roundf */
@@ -1390,8 +1406,24 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float roundf(float x)
 {
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  return __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+  // Tempting but RNE not RNA
+  // return __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  float xp;
+  if (x > 0.0f) {
+    xp = x + 0.5f;
+  } else if (x < 0.0f) {
+    xp = x - 0.5f;
+  } else {
+    xp = x;
+  }
+
+  fegetround(FE_TOWARDZERO);
+  
+  return __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, xp);
 }
 
 
@@ -1411,8 +1443,24 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 
 long double roundl(long double x)
 {
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  return __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+  // Tempting but RNE not RNA
+  // return __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  long double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  return __sort_of_CPROVER_round_to_integrall(FE_TOWARDZERO, xp);
 }
 
 
@@ -1721,9 +1769,23 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 long int lround(double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  double rti = __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+  // conversion to SMT, plus should use RNA
+
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  double rti = __sort_of_CPROVER_round_to_integral(FE_TOWARDZERO, xp);
   return (long int)rti;
 }
 
@@ -1744,9 +1806,22 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 float lroundf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  float rti = __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+  // conversion to SMT, plus should use RNA
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  float xp;
+  if (x > 0.0f) {
+    xp = x + 0.5f;
+  } else if (x < 0.0f) {
+    xp = x - 0.5f;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  float rti = __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, xp);
   return (long int)rti;
 }
 
@@ -1767,10 +1842,23 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 
 long double lroundl(long double x)
 {
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
+  // conversion to SMT, plus should use RNA
+  long double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TOWARDZERO, xp);
   return (long int)rti;
 }
 
@@ -1792,9 +1880,22 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
 long long int llround(double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  double rti = __sort_of_CPROVER_round_to_integral(FE_TONEAREST, x);
+  // conversion to SMT, plus should use RNA
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  double rti = __sort_of_CPROVER_round_to_integral(FE_TOWARDZERO, xp);
   return (long long int)rti;
 }
 
@@ -1815,9 +1916,22 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 float llroundf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  float rti = __sort_of_CPROVER_round_to_integralf(FE_TONEAREST, x);
+  // conversion to SMT, plus should use RNA
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  float xp;
+  if (x > 0.0f) {
+    xp = x + 0.5f;
+  } else if (x < 0.0f) {
+    xp = x - 0.5f;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  float rti = __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, xp);
   return (long long int)rti;
 }
 
@@ -1839,10 +1953,23 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 long double llroundl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
-  // conversion to SMT
-  // TODO : Should be RNA not RNE, needs a new rounding mode
-  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TONEAREST, x);
-  return (long long int)rti;
+  // conversion to SMT, plus should use RNA
+  int saved_rounding_mode = fegetround();
+  fesetround(FE_TOWARDZERO);
+
+  long double xp;
+  if (x > 0.0) {
+    xp = x + 0.5;
+  } else if (x < 0.0) {
+    xp = x - 0.5;
+  } else {
+    xp = x;
+  }
+
+  fesetround(saved_rounding_mode);
+  
+  long double rti = __sort_of_CPROVER_round_to_integrall(FE_TOWARDZERO, xp);
+  return (long int)rti;
 }
 
 
