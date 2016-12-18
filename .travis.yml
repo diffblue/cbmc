@@ -38,14 +38,11 @@ addons:
     packages:
       - libwww-perl
 
-install:
-  - chmod a+x regression/failed-tests-printer.pl
-  - cd src && make minisat2-download
-
 script:
-  - make CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && cd ../regression && make test
+  - make -C src minisat2-download
+  - make -C src CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
 
 matrix:
   include:
     - env: NAME="CPP-LINT"
-      script: cd .. && DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
+      script: DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
