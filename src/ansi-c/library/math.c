@@ -24,7 +24,7 @@ inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
 
 /* FUNCTION: __builtin_isgreater */
 
-int __builtin_isgreater(float f, float g) { return f > g; }
+int __builtin_isgreater(double f, double g) { return f > g; }
 
 /* FUNCTION: __builtin_isgreaterequal */
 
@@ -40,7 +40,7 @@ int __builtin_islessequal(float f, float g) { return f <= g; }
 
 /* FUNCTION: __builtin_islessgreater */
 
-int __builtin_islessgreater(float f, float g) { return (f < g) || (g > f); }
+int __builtin_islessgreater(float f, float g) { return (f < g) || (f > g); }
 
 /* FUNCTION: __builtin_isunordered */
 
@@ -2050,6 +2050,9 @@ double __sort_of_CPROVER_round_to_integral (int rounding_mode, double d);
   
 double __sort_of_CPROVER_remainder (int rounding_mode, double x, double y)
 {
+  if (x == 0.0 || __CPROVER_isinfd(y))
+    return x;
+
   // Extended precision helps... a bit...
   long double div = x/y;
   long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
@@ -2064,6 +2067,9 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
 float __sort_of_CPROVER_remainderf (int rounding_mode, float x, float y)
 {
+  if (x == 0.0f || __CPROVER_isinff(y))
+    return x;
+
   // Extended precision helps... a bit...
   long double div = x/y;
   long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
@@ -2078,6 +2084,9 @@ long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double
 
 long double __sort_of_CPROVER_remainderl (int rounding_mode, long double x, long double y)
 {
+  if (x == 0.0 || __CPROVER_isinfld(y))
+    return x;
+
   // Extended precision helps... a bit...
   long double div = x/y;
   long double n = __sort_of_CPROVER_round_to_integral(rounding_mode,div);
