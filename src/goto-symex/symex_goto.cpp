@@ -102,6 +102,17 @@ void goto_symext::symex_goto(statet &state)
     new_state_pc=goto_target;
     state_pc=state.source.pc;
     state_pc++;
+
+    // skip dead instructions
+    if(new_guard.is_true())
+      while(state_pc!=goto_target && !state_pc->is_target())
+        ++state_pc;
+
+    if(state_pc==goto_target)
+    {
+      state.source.pc=goto_target;
+      return; // nothing else to do
+    }
   }
   else
   {
