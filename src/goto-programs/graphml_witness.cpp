@@ -151,16 +151,21 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
 
+  goto_tracet::stepst::const_iterator prev_it=goto_trace.steps.end();
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
       it!=goto_trace.steps.end();
-      it++)
+      it++) //we cannot replace this by a ranged for
   {
     const source_locationt &source_location=it->pc->source_location;
 
     if(it->hidden ||
        (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
+       (prev_it!=goto_trace.steps.end() &&
+        prev_it->pc->source_location==it->pc->source_location) ||
+#if 0
        (it->is_goto() && it->pc->guard.is_true()) ||
+#endif
        source_location.is_nil() ||
        source_location.get_file().empty() ||
        source_location.get_file()=="<built-in-additions>" ||
@@ -183,6 +188,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
       continue;
     }
+
+    prev_it=it;
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
