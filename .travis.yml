@@ -5,44 +5,39 @@ sudo: required
 matrix:
   include:
     - os: linux
-      dist: trusty
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            # newer g++ version (also pulls libstdc++)
-            - g++-4.9
-            - libwww-perl
-    - os: linux
-      dist: trusty
       compiler: gcc
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            # newer g++ version (also pulls libstdc++)
-            - g++-4.9
             - libwww-perl
+            - g++-5
       before_install:
-        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 90
-    - os: osx
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 90
+      env: COMPILER=g++-5
+    - os: linux
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - libwww-perl
+            - clang-3.7
+      before_install:
+        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.7 90
+      env: COMPILER=clang++-3.7
     - os: osx
       compiler: gcc
-
-addons:
-  apt:
-    packages:
-      - libwww-perl
+      env: COMPILER=g++
+    - os: osx
+      compiler: clang
+      env: COMPILER=clang++
+    - env: NAME="CPP-LINT"
+      script: DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
 
 script:
   - make -C src minisat2-download
-  - make -C src CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
-
-matrix:
-  include:
-    - env: NAME="CPP-LINT"
-      script: DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
+  - make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
