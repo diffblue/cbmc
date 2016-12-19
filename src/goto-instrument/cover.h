@@ -13,9 +13,11 @@ Date: May 2016
 
 #include <goto-programs/goto_model.h>
 
-enum class coverage_criteriont {
+enum class coverage_criteriont
+{
   LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, BOUNDARY, ASSERTION, COVER};
+  PATH, MCDC, BOUNDARY, ASSERTION, COVER
+};
 
 class basic_blockst
 {
@@ -84,7 +86,6 @@ public:
     goto_functionst &goto_functions);
 
 private:
-
   void instrument_assertion(
     goto_programt::instructionst::iterator &i_it);
 
