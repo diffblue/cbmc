@@ -127,7 +127,8 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   escape_non_alnum(escaped);
   identifier_str << "java::java.lang.String.Literal." << escaped;
   // Avoid naming clashes by virtue of escaping:
-  size_t unique_num=++(escaped_string_literal_count[identifier_str.str()]);
+  size_t unique_num=escaped_string_literal_count[identifier_str.str()];
+  unique_num++;
   if(unique_num!=1)
     identifier_str << unique_num;
 

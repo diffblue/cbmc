@@ -448,24 +448,24 @@ char java_char_from_type(const typet &type)
 
   if(id==ID_signedbv)
   {
-    const size_t width(type.get_unsigned_int(ID_width));
-    if(java_int_type().get_unsigned_int(ID_width) == width)
+    const size_t width=to_signedbv_type(type).get_width();
+    if(to_signedbv_type(java_int_type()).get_width()==width)
       return 'i';
-    else if(java_long_type().get_unsigned_int(ID_width) == width)
+    else if(to_signedbv_type(java_long_type()).get_width()==width)
       return 'l';
-    else if(java_short_type().get_unsigned_int(ID_width) == width)
+    else if(to_signedbv_type(java_short_type()).get_width()==width)
       return 's';
-    else if(java_byte_type().get_unsigned_int(ID_width) == width)
+    else if(to_signedbv_type(java_byte_type()).get_width()==width)
       return 'b';
   }
   else if(id==ID_unsignedbv)
     return 'c';
   else if(id==ID_floatbv)
   {
-    const size_t width(type.get_unsigned_int(ID_width));
-    if(java_float_type().get_unsigned_int(ID_width) == width)
+    const size_t width(to_floatbv_type(type).get_width());
+    if(to_floatbv_type(java_float_type()).get_width()==width)
       return 'f';
-    else if(java_double_type().get_unsigned_int(ID_width) == width)
+    else if(to_floatbv_type(java_double_type()).get_width()==width)
       return 'd';
   }
   else if(id==ID_c_bool)
