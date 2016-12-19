@@ -159,10 +159,21 @@ bvt float_utilst::to_integer(
   // The following is the usual case in ANSI-C, and we optimize for that.
   if(rounding_mode_bits.round_to_zero.is_true())
   {
+    bvt fraction=unpacked.fraction;
+
+    if(dest_width>fraction.size())
+    {
+      bvt lsb_extension=bv_utils.build_constant(0U, dest_width-fraction.size());
+      fraction.insert(fraction.begin(),
+                      lsb_extension.begin(),
+                      lsb_extension.end());
+    }
+
     // if the exponent is positive, shift right
-    bvt offset=bv_utils.build_constant(spec.f, unpacked.exponent.size());
+    bvt offset=bv_utils.build_constant(fraction.size()-1,
+                                       unpacked.exponent.size());
     bvt distance=bv_utils.sub(offset, unpacked.exponent);
-    bvt shift_result=bv_utils.shift(unpacked.fraction, bv_utilst::LRIGHT, distance);
+    bvt shift_result=bv_utils.shift(fraction, bv_utilst::LRIGHT, distance);
 
     // if the exponent is negative, we have zero anyways
     bvt result=shift_result;
@@ -175,11 +186,6 @@ bvt float_utilst::to_integer(
     if(result.size()>dest_width)
     {
       result.resize(dest_width);
-    }
-    else if(result.size()<dest_width)
-    {
-      // zero extend
-      result=bv_utils.zero_extension(result, dest_width);
     }
 
     assert(result.size()==dest_width);
