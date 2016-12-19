@@ -1611,6 +1611,34 @@ def CloseExpression(clean_lines, linenum, pos):
   # Did not find end of expression before end of file, give up
   return (line, clean_lines.NumLines(), -1)
 
+def FindDoStart(clean_lines, linenum):
+  """If found a while (...); find the potential do to match it.
+
+  Work our way up through the lines starting at linenum to find a do
+  that hasn't been matched. This might not succeed as might just be an
+  emtpy while statement.
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The line number with the while(...); on
+
+  Returns:
+    A tuple (found, linenum), found is true if an opening
+    do statement found, false otherwise. The linenum will
+    be the line the do is found on (or -1 if never found)
+  """
+
+  reverse_lines = clean_lines.lines[linenum-1:0:-1]
+  found_linenum = linenum - 1;
+  for line in reverse_lines:
+    if Search(r'^\s*do\s*{?\s*$', line):
+      return True, found_linenum
+    elif Search(r'^\s*}?\s*while\(.*\)\s*;\s*$', line):
+      return False, -1
+    else:
+      found_linenum = found_linenum - 1
+
+  return False, -1
 
 def FindStartOfExpressionInLine(line, endpos, stack):
   """Find position at the matching start of current expression.
@@ -3997,7 +4025,17 @@ def CheckEmptyBlockBody(filename, clean_lines, linenum, error):
   # is likely an error.
   line = clean_lines.elided[linenum]
   matched = Match(r'\s*(for|while|if)\s*\(', line)
-  if matched:
+  while_matched = Match(r'\s*(while)\s*\(', line)
+
+  # if it is a do while loop, we have the while clause on a separate line
+  # so need to exclude that
+  do_found = False
+  if while_matched:
+    do_found, num = FindDoStart(clean_lines, linenum)
+
+  is_do_while = while_matched and do_found
+  # either not a while or if we are, we didn't find a do
+  if matched and not is_do_while:
     # Find the end of the conditional expression.
     (end_line, end_linenum, end_pos) = CloseExpression(
         clean_lines, linenum, line.find('('))
