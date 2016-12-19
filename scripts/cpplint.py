@@ -3859,6 +3859,21 @@ def CheckBraces(filename, clean_lines, linenum, error):
             error(filename, linenum, 'readability/braces', 4,
                   'If/else bodies with multiple statements require braces')
 
+def CheckDoWhile(filename, clean_lines, linenum, error):
+  """Looks for while of a do while on the same line as the closing brace
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+  if Search(r'}\s*while\s*\(', line):
+    do_found, num = FindDoStart(clean_lines, linenum)
+    if do_found:
+        error(filename, linenum, 'readability/braces', 4,
+            'while statement of do...while loop should be on a separate line to the closing brace')
 
 def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
   """Looks for redundant trailing semicolon.
@@ -4433,6 +4448,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
 
   # Some more style checks
   CheckBraces(filename, clean_lines, linenum, error)
+  CheckDoWhile(filename, clean_lines, linenum, error)
   CheckTrailingSemicolon(filename, clean_lines, linenum, error)
   CheckEmptyBlockBody(filename, clean_lines, linenum, error)
   CheckAccess(filename, clean_lines, linenum, nesting_state, error)
