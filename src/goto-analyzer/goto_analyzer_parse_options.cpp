@@ -300,204 +300,240 @@ Function: goto_analyzer_parse_optionst::doit
 
 int goto_analyzer_parse_optionst::doit()
 {
-  if(cmdline.isset("version"))
+  try
   {
-    std::cout << CBMC_VERSION << std::endl;
-    return 0;
-  }
-
-  //
-  // command line options
-  //
-
-  optionst options;
-  get_command_line_options(options);
-  eval_verbosity();
-
-  //
-  // Print a banner
-  //
-  status() << "GOTO-ANALYSER version " CBMC_VERSION " "
-           << sizeof(void *)*8 << "-bit "
-           << config.this_architecture() << " "
-           << config.this_operating_system() << eom;
-
-  register_languages();
-
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline))
-    return 6;
-
-  if(process_goto_program(options))
-    return 6;
-
-  if(cmdline.isset("taint"))
-  {
-    std::string taint_file=cmdline.get_value("taint");
-
-    if(cmdline.isset("show-taint"))
+    if(cmdline.isset("version"))
     {
-      taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
+      std::cout << CBMC_VERSION << std::endl;
       return 0;
     }
-    else
+
+    //
+    // command line options
+    //
+    optionst options;
+    get_command_line_options(options);
+    eval_verbosity();
+
+    //
+    // Print a banner
+    //
+    status() << "GOTO-ANALYZER version " CBMC_VERSION " "
+       << sizeof(void *)*8 << "-bit "
+       << config.this_architecture() << " "
+       << config.this_operating_system() << eom;
+
+    register_languages();
+
+    goto_model.set_message_handler(get_message_handler());
+
+    if(goto_model(cmdline.args))
+      return 6;
+
+    goto_functionst::function_mapt::const_iterator f_it=
+      goto_model.goto_functions.function_map.find(
+        goto_functionst::entry_point());
+
+    if(f_it==goto_model.goto_functions.function_map.end())
     {
-      std::string json_file=cmdline.get_value("json");
-      bool result=taint_analysis(
-        goto_model,
-        taint_file,
-        get_message_handler(),
-        false,
-        json_file);
-      return result?10:0;
-    }
-  }
-
-  if(cmdline.isset("unreachable-instructions"))
-  {
-    const std::string json_file=cmdline.get_value("json");
-
-    if(json_file.empty())
-      unreachable_instructions(goto_model, false, std::cout);
-    else if(json_file=="-")
-      unreachable_instructions(goto_model, true, std::cout);
-    else
-    {
-      std::ofstream ofs(json_file);
-      if(!ofs)
-      {
-        error() << "Failed to open json output `"
-                << json_file << "'" << eom;
-        return 6;
-      }
-
-      unreachable_instructions(goto_model, true, ofs);
-    }
-
-    return 0;
-  }
-
-  if(cmdline.isset("unreachable-functions"))
-  {
-    const std::string json_file=cmdline.get_value("json");
-
-    if(json_file.empty())
-      unreachable_functions(goto_model, false, std::cout);
-    else if(json_file=="-")
-      unreachable_functions(goto_model, true, std::cout);
-    else
-    {
-      std::ofstream ofs(json_file);
-      if(!ofs)
-      {
-        error() << "Failed to open json output `"
-                << json_file << "'" << eom;
-        return 6;
-      }
-
-      unreachable_functions(goto_model, true, ofs);
-    }
-
-    return 0;
-  }
-
-  if(cmdline.isset("reachable-functions"))
-  {
-    const std::string json_file=cmdline.get_value("json");
-
-    if(json_file.empty())
-      reachable_functions(goto_model, false, std::cout);
-    else if(json_file=="-")
-      reachable_functions(goto_model, true, std::cout);
-    else
-    {
-      std::ofstream ofs(json_file);
-      if(!ofs)
-      {
-        error() << "Failed to open json output `"
-                << json_file << "'" << eom;
-        return 6;
-      }
-
-      reachable_functions(goto_model, true, ofs);
-    }
-
-    return 0;
-  }
-
-  if(cmdline.isset("show-local-may-alias"))
-  {
-    namespacet ns(goto_model.symbol_table);
-
-    forall_goto_functions(it, goto_model.goto_functions)
-    {
-      std::cout << ">>>>\n";
-      std::cout << ">>>> " << it->first << '\n';
-      std::cout << ">>>>\n";
-      local_may_aliast local_may_alias(it->second);
-      local_may_alias.output(std::cout, it->second, ns);
-      std::cout << '\n';
-    }
-
-    return 0;
-  }
-
-  label_properties(goto_model);
-
-  if(cmdline.isset("show-properties"))
-  {
-    show_properties(goto_model, get_ui());
-    return 0;
-  }
-
-  if(set_properties())
-    return 7;
-
-
-  // Output file factory
-  std::ostream *out;
-  const std::string outfile=options.get_option("outfile");
-  if(outfile=="-")
-    out=&std::cout;
-  else
-  {
-    out=new std::ofstream(outfile);
-    if(!*out)
-    {
-      error() << "Failed to open output file `"
-              << outfile << "'" << eom;
+      error() << "Entry point not found" << eom;
       return 6;
     }
+
+    if(process_goto_program(options))
+      return 6;
+
+    status() << "Starting analysis" << eom;
+
+    if(cmdline.isset("taint"))
+    {
+      std::string taint_file=cmdline.get_value("taint");
+
+      if(cmdline.isset("show-taint"))
+      {
+        taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
+        return 0;
+      }
+      else
+      {
+        std::string json_file=cmdline.get_value("json");
+        bool result=taint_analysis(
+          goto_model,
+          taint_file,
+          get_message_handler(),
+          false,
+          json_file);
+        return result?10:0;
+      }
+    }
+
+    if(cmdline.isset("unreachable-instructions"))
+    {
+      const std::string json_file=cmdline.get_value("json");
+
+      if(json_file.empty())
+        unreachable_instructions(goto_model, false, std::cout);
+      else if(json_file=="-")
+        unreachable_instructions(goto_model, true, std::cout);
+      else
+      {
+        std::ofstream ofs(json_file);
+        if(!ofs)
+        {
+          error() << "Failed to open json output `"
+                  << json_file << "'" << eom;
+          return 6;
+        }
+
+        unreachable_instructions(goto_model, true, ofs);
+      }
+
+      return 0;
+    }
+
+    if(cmdline.isset("unreachable-functions"))
+    {
+      const std::string json_file=cmdline.get_value("json");
+
+      if(json_file.empty())
+        unreachable_functions(goto_model, false, std::cout);
+      else if(json_file=="-")
+        unreachable_functions(goto_model, true, std::cout);
+      else
+      {
+        std::ofstream ofs(json_file);
+        if(!ofs)
+        {
+          error() << "Failed to open json output `"
+                  << json_file << "'" << eom;
+          return 6;
+        }
+
+        unreachable_functions(goto_model, true, ofs);
+      }
+
+      return 0;
+    }
+
+    if(cmdline.isset("reachable-functions"))
+    {
+      const std::string json_file=cmdline.get_value("json");
+
+      if(json_file.empty())
+        reachable_functions(goto_model, false, std::cout);
+      else if(json_file=="-")
+        reachable_functions(goto_model, true, std::cout);
+      else
+      {
+        std::ofstream ofs(json_file);
+        if(!ofs)
+        {
+          error() << "Failed to open json output `"
+                  << json_file << "'" << eom;
+          return 6;
+        }
+
+        reachable_functions(goto_model, true, ofs);
+      }
+
+      return 0;
+    }
+
+    if(cmdline.isset("show-local-may-alias"))
+    {
+      namespacet ns(goto_model.symbol_table);
+
+      forall_goto_functions(it, goto_model.goto_functions)
+      {
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
+        local_may_aliast local_may_alias(it->second);
+        local_may_alias.output(std::cout, it->second, ns);
+        std::cout << '\n';
+      }
+
+      return 0;
+    }
+
+    label_properties(goto_model);
+
+    if(cmdline.isset("show-properties"))
+    {
+      show_properties(goto_model, get_ui());
+      return 0;
+    }
+
+    if(set_properties())
+      return 7;
+
+    // Output file factory
+    std::ostream *out;
+    const std::string outfile=options.get_option("outfile");
+    if(outfile=="-")
+      out=&std::cout;
+    else
+    {
+      if(options.get_bool_option("simplify"))
+        out=new std::ofstream(outfile, std::ios::binary);
+      else
+        out=new std::ofstream(outfile);
+
+      if(!*out)
+      {
+        error() << "Failed to open output file `" << outfile << "'" << eom;
+        return 6;
+      }
+    }
+
+    // Run the analysis
+    bool result=true;
+    if(options.get_bool_option("show"))
+      result=
+        static_show_domain(
+          goto_model,
+          options,
+          get_message_handler(),
+          *out);
+    else if(options.get_bool_option("verify"))
+      result=static_analyzer(goto_model, options, get_message_handler(), *out);
+    else if(options.get_bool_option("simplify"))
+      result=
+        static_simplifier(
+          goto_model,
+          options,
+          get_message_handler(),
+          *out);
+    else
+    {
+      error() << "No task given" << eom;
+      return 6;
+    }
+
+    if(out!=&std::cout)
+      delete out;
+
+    return result?10:0;
   }
-
-
-  // Run the analysis
-  bool result=true;
-  if(options.get_bool_option("show"))
-    result=static_show_domain(goto_model, options, get_message_handler(), *out);
-
-  else if(options.get_bool_option("verify"))
-    result=   static_analyzer(goto_model, options, get_message_handler(), *out);
-
-  else if(options.get_bool_option("simplify"))
-    result= static_simplifier(goto_model, options, get_message_handler(), *out);
-  else
+  catch(const char *e)
   {
-    error() << "No task given" << eom;
+    error() << e << eom;
     return 6;
   }
-
-  if(out!=&std::cout)
-    delete out;
-
-  return result?10:0;
-
-
-  // Final defensive error case
-  error() << "no analysis option given -- consider reading --help"
-          << eom;
-  return 6;
+  catch(const std::string e)
+  {
+    error() << e << eom;
+    return 6;
+  }
+  catch(int x)
+  {
+    return x;
+  }
+  catch(std::bad_alloc)
+  {
+    error() << "Out of memory" << eom;
+    return 6;
+  }
 }
 
 /*******************************************************************\
