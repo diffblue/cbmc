@@ -930,6 +930,8 @@ bool cbmc_parse_optionst::process_goto_program(
           c=coverage_criteriont::MCDC;
         else if(criterion_string=="cover")
           c=coverage_criteriont::COVER;
+        else if(criterion_string=="boundary-values")
+          c=coverage_criteriont::BOUNDARY;
         else
         {
           error() << "unknown coverage criterion" << eom;

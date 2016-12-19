@@ -15,7 +15,7 @@ Date: May 2016
 
 enum class coverage_criteriont {
   LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, ASSERTION, COVER };
+  PATH, MCDC, ASSERTION, COVER, BOUNDARY };
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,

@@ -22,6 +22,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../goto-instrument/full_slicer$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) \
       ../goto-instrument/cover$(OBJEXT) \
+      ../goto-instrument/cover_boundary_values$(OBJEXT) \
       ../analyses/analyses$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \

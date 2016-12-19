@@ -388,6 +388,8 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
         c=coverage_criteriont::MCDC;
       else if(criterion=="cover")
         c=coverage_criteriont::COVER;
+      else if(criterion=="boundary-values")
+        c=coverage_criteriont::BOUNDARY;
       else
       {
         error() << "unknown coverage criterion" << eom;
