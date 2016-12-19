@@ -141,7 +141,7 @@ static std::set<exprt> collect_conditions(
   case FUNCTION_CALL:
     return collect_conditions(t->code);
 
-  default:;
+  default: {}
   }
 
   return std::set<exprt>();
@@ -358,7 +358,7 @@ static std::set<exprt> replacement_and_conjunction(
   }
   return result;
 }
-        
+
 /*******************************************************************\
 
 Function: non_ordered_expr_expansion
@@ -373,7 +373,7 @@ Function: non_ordered_expr_expansion
 
 static std::set<exprt> non_ordered_expr_expansion(const exprt &src)
 {
-  if(src.id()==ID_not&&is_arithmetic_predicate(src.op0()))
+  if(src.id()==ID_not && is_arithmetic_predicate(src.op0()))
   {
     return ordered_negation(src.op0());
   }
@@ -406,7 +406,7 @@ static std::set<exprt> non_ordered_expr_expansion(const exprt &src)
     }
     if(expanded_op.empty()) continue;
     auto re=replacement_and_conjunction(expanded_op, operands, i);
-    for(auto &x: re)
+    for(auto &x : re)
     {
       auto rec_result=non_ordered_expr_expansion(x);
       result.insert(rec_result.begin(), rec_result.end());
@@ -632,7 +632,7 @@ static std::set<exprt> collect_mcdc_controlling_nested(
     // dual-loop structure to eliminate complex
     // non-atomic-conditional terms
     bool changed=true;
-    while(changed) 
+    while(changed)
     {
       changed=false;
       // the 2nd loop
@@ -746,7 +746,7 @@ static std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
   for(auto &x : ops)
   {
     exprt y(x);
-    if(y == e) signs.insert(+1);
+    if(y==e) signs.insert(+1);
     else if(y.id()==ID_not)
     {
       y.make_not();
@@ -786,7 +786,7 @@ static void remove_repetition(std::set<exprt> &exprs)
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
-  for(auto &x: exprs)
+  for(auto &x : exprs)
   {
     std::set<exprt> new_conditions = collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
@@ -811,7 +811,7 @@ static void remove_repetition(std::set<exprt> &exprs)
   exprs=new_exprs;
   new_exprs.clear();
 
-  for(auto &x: exprs)
+  for(auto &x : exprs)
   {
     bool red=false;
     /**
@@ -820,7 +820,7 @@ static void remove_repetition(std::set<exprt> &exprs)
      * and ''y'' are identical iff they have the
      * same sign for every atomic condition ''c''.
      **/
-    for(auto &y: new_exprs)
+    for(auto &y : new_exprs)
     {
       bool iden = true;
       for(auto &c : conditions)
@@ -879,7 +879,7 @@ Function: eval_expr
 \*******************************************************************/
 
 static bool eval_expr(
-  const std::map<exprt, signed> &atomic_exprs, 
+  const std::map<exprt, signed> &atomic_exprs,
   const exprt &src)
 {
   std::vector<exprt> operands;
@@ -913,13 +913,13 @@ static bool eval_expr(
     no_op.make_not();
     return !eval_expr(atomic_exprs, no_op);
   }
-  else //if(is_condition(src))
+  else // if(is_condition(src))
   {
     // ''src'' should be guaranteed to be consistent
     // with ''atomic_exprs''
     if(atomic_exprs.find(src)->second==+1)
       return true;
-    else //if(atomic_exprs.find(src)->second==-1)
+    else // if(atomic_exprs.find(src)->second==-1)
       return false;
   }
 }
@@ -996,7 +996,7 @@ static bool is_mcdc_pair(
   signed cs1=atomic_exprs_e1.find(c)->second;
   signed cs2=atomic_exprs_e2.find(c)->second;
   // a mcdc pair should both contain ''c'', i.e., sign=+1 or -1
-  if(cs1==0||cs2==0)
+  if(cs1==0 || cs2==0)
     return false;
 
   // A mcdc pair regarding an atomic expr ''c''
@@ -1028,7 +1028,8 @@ static bool is_mcdc_pair(
   }
 
   if(diff_count==1) return true;
-  else return false;
+  else
+    return false;
 }
 
 /*******************************************************************\
@@ -1087,7 +1088,7 @@ static void minimize_mcdc_controlling(
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
-  for(auto &x: controlling)
+  for(auto &x : controlling)
   {
     std::set<exprt> new_conditions = collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
@@ -1153,7 +1154,8 @@ static void minimize_mcdc_controlling(
     {
       controlling.swap(new_controlling);
     }
-    else break;
+    else
+      break;
   }
 }
 
@@ -1242,7 +1244,7 @@ static std::set<exprt> collect_decisions(
   case FUNCTION_CALL:
     return collect_decisions(t->code);
 
-  default:;
+  default: {}
   }
 
   return std::set<exprt>();
@@ -1591,7 +1593,7 @@ void instrument_cover_goalst::instrument_mcdc(
   bool boundary_values_analysis=
        criteria.find(coverage_criteriont::BOUNDARY)!=criteria.end();
   std::set<exprt> controlling;
-  for(auto &dec: decisions)
+  for(auto &dec : decisions)
   {
     std::set<exprt> ctrl=collect_mcdc_controlling_nested({dec});
     if(boundary_values_analysis)
@@ -1607,7 +1609,7 @@ void instrument_cover_goalst::instrument_mcdc(
   if(boundary_values_analysis)
   {
     std::set<exprt> boundary_controlling;
-    for(auto &x: controlling)
+    for(auto &x : controlling)
     {
       auto res=non_ordered_expr_expansion(x);
       boundary_controlling.insert(res.begin(), res.end());
@@ -1655,11 +1657,13 @@ void instrument_cover_goalst::instrument_cover_goals(
 
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
-     has_prefix(id2string(goto_program.instructions.front().source_location.get_file()),
-                "<builtin-library-"))
+     has_prefix(
+       id2string(
+         goto_program.instructions.front().source_location.get_file()),
+         "<builtin-library-"))
     return;
-  
-  for(const auto &criterion:criteria)
+
+  for(const auto &criterion : criteria)
   {
     coverage_criterion=as_string(criterion);
     property_class="coverage";
@@ -1670,40 +1674,40 @@ void instrument_cover_goalst::instrument_cover_goals(
       {
       case coverage_criteriont::ASSERTION:
         // turn into 'assert(false)' to avoid simplification
-    	instrument_assertion(i_it);
+        instrument_assertion(i_it);
         break;
-        
+
       case coverage_criteriont::COVER:
         // turn __CPROVER_cover(x) into 'assert(!x)'
-   	    instrument_cover(i_it);
+        instrument_cover(i_it);
         break;
-        
+
       case coverage_criteriont::LOCATION:
-        instrument_location(i_it,goto_program,basic_blocks,blocks_done);
+        instrument_location(i_it, goto_program, basic_blocks, blocks_done);
         break;
-      
+
       case coverage_criteriont::BRANCH:
-        instrument_branch(i_it,goto_program,basic_blocks);
+        instrument_branch(i_it, goto_program, basic_blocks);
         break;
-        
+
       case coverage_criteriont::CONDITION:
-        instrument_condition(i_it,goto_program);
+        instrument_condition(i_it, goto_program);
         break;
-      
+
       case coverage_criteriont::DECISION:
-        instrument_decision(i_it,goto_program);
+        instrument_decision(i_it, goto_program);
         break;
 
       case coverage_criteriont::MCDC:
-        instrument_mcdc(i_it,goto_program,basic_blocks,blocks_done);
+        instrument_mcdc(i_it, goto_program, basic_blocks, blocks_done);
         break;
 
       case coverage_criteriont::PATH:
         if(i_it->is_assert())
           i_it->make_skip();
         break;
-      
-      default:;
+
+      default: {}
       }
     }
   }
@@ -1729,7 +1733,7 @@ void instrument_cover_goalst::instrument_cover_goals(
     if(f_it->first==ID__start ||
        f_it->first=="__CPROVER_initialize")
       continue;
-      
+
     instrument_cover_goals(f_it->second.body);
   }
 }
