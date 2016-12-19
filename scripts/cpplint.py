@@ -1489,6 +1489,104 @@ class CleansedLines(object):
 
     return collapsed
 
+def IsTemplateArgumentList_DB(clean_lines, linenum, pos):
+    """if lines[linenum][pos] is >, finds out if it is closing bracket
+    of a template argument.
+
+    Finds a matching < (if possible) to the > at position line[linenum][pos]
+    and then  analyzes the string between the two to work out if it could
+    in fact be a template argument list or just some general code.
+
+    Args:
+      clean_lines: A CleansedLines instance containing the file.
+      linenum: The number of the line to check.
+      pos: A position on the line.
+
+    Returns:
+      True if the angled bracket pointed to is the end of a template arguement
+      list
+    """
+    (start_line, start_linenum, start_pos) = OpenExpression(clean_lines, linenum, pos)
+
+    # We didn't find a matching < so clearly not a template argument list
+    if start_pos == -1:
+        return False
+
+    # This collects all the charatcers between the > and matching <
+    # It also reverses it since we don't care about the actual contents
+    # we are just looking to make sure no weird characters (like &&)
+    inbetween_string = ""
+    if linenum == start_linenum:
+      inbetween_string = clean_lines.elided[start_linenum][start_pos:pos + 1]
+    else:
+      while(start_linenum != linenum):
+        inbetween_string += clean_lines.elided[start_linenum][start_pos:]
+        start_linenum += 1
+        start_pos = 0
+      inbetween_string += clean_lines.elided[linenum][0:pos]
+
+    is_simple_template_params = Match('^[<>(::),\w\s]*$', inbetween_string)
+    if is_simple_template_params:
+        return True
+
+    # The operators & or * are accepted within the template arguments
+    # as we can have reference or pointer types in the list
+    # however, they must be followed by a > (excepting white space)
+    # anything else indicates they are being used as a type
+
+    is_looking_for_closing_angle_bracket = False
+    for char in inbetween_string:
+      if char in ['&', '*']:
+        is_looking_for_closing_angle_bracket = True
+      elif is_looking_for_closing_angle_bracket:
+        if char == '>':
+          is_looking_for_closing_angle_bracket = False
+        elif char not in [' ', '\t']:
+          return False
+
+    return True
+
+def OpenExpression(clean_lines, linenum, pos):
+  """If input points to ) or } or ] or >, finds the position that opens it.
+
+  If lines[linenum][pos] points to a ')' or '}' or ']' or '>', finds the
+  linenum/pos that correspond to the closing of the expression.
+
+  Essentially a mirror of what CloseExpression does
+
+  TODO(tkiley): could probably be merged with CloseExpression
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    pos: A position on the line.
+
+  Returns:
+    A tuple (line, linenum, pos) pointer *to* the closing brace, or
+    (line, len(lines), -1) if we never find a close.  Note we ignore
+    strings and comments when matching; and the line we return is the
+    'cleansed' line at linenum.
+  """
+
+  line = clean_lines.elided[linenum]
+  if (line[pos] not in ')}]>'):
+    return (line, clean_lines.NumLines(), -1)
+
+  # Check first line
+  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [])
+  if end_pos > -1:
+    return (line, linenum, end_pos)
+
+  # Continue scanning forward
+  while stack and linenum > 0:
+    linenum -= 1
+    line = clean_lines.elided[linenum]
+    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
+    if end_pos > -1:
+      return (line, linenum, end_pos)
+
+  # Did not find end of expression before end of file, give up
+  return (line, clean_lines.NumLines(), -1)
 
 def FindEndOfExpressionInLine(line, startpos, stack):
   """Find the position just after the end of current parenthesized expression.
@@ -2407,6 +2505,13 @@ class NestingState(object):
   def InTemplateArgumentList(self, clean_lines, linenum, pos):
     """Check if current position is inside template argument list.
 
+    TODO (tkiley): This method seems a little generous for what it
+    considers to be in a template argument list, providing the line
+    between pos and the end contains a > (or even an =) before the
+    end of the line or }, {, ; then it will say yes... For now have
+    added method IsTemplateArgumentList_DB but should work out
+    what the idea with this method is a unify.
+
     Args:
       clean_lines: A CleansedLines instance containing the file.
       linenum: The number of the line to check.
@@ -3291,7 +3396,18 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # many lines (not that this is behavior that I approve of...)
   match1 = Search(r'[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
   match2 = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
-  if match1 and not Search(r'<<', line) and not Search(r'char \*', line) and not Search(r'\#include', line) and not Search(r'<.*[^\s]>', line):
+  operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
+  operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
+
+  if match2 and match2.group(1) == '>':
+    res = IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)
+
+  if (match1 and
+    not Search(r'<<', line) and # We ignore the left shift operator since might be a stream and then formatting rules go out of the window
+    not Search(r'char \*', line) and # I don't know why this exception exists?
+    not Search(r'\#include', line) and # I suppose file names could contains operators??
+    #not Search(r'<.*[^\s]>', line)): #  This checks for template declarations (providing they don't run onto next line)
+    not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos)):
 #      and not Search(r'\b(if|while|for) ', line)
 #      # Operators taken from [lex.operators] in C++11 standard.
 #      and not Search(r'(>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=)', line)
@@ -3299,7 +3415,9 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'whitespace/operators', 4,
 #          'Missing spaces around =')
           'Remove spaces around %s' % match1.group(1))
-  elif match2 and not Search(r'<<', line) and not Search(r'<[^\s].*>', line):
+  elif (match2 and
+    not Search(r'<<', line) and
+    not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)):
     error(filename, linenum, 'whitespace/operators', 4,
           'Remove spaces around %s' % match2.group(0))
 
