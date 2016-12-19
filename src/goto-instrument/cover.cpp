@@ -106,7 +106,7 @@ Function: is_condition
 
 \*******************************************************************/
 
-bool is_condition(const exprt &src)
+static bool is_condition(const exprt &src)
 {
   if(src.type().id()!=ID_bool) return false;
 
@@ -130,7 +130,9 @@ Function: collect_conditions_rec
 
 \*******************************************************************/
 
-void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
+static void collect_conditions_rec(
+  const exprt &src,
+  std::set<exprt> &dest)
 {
   if(src.id()==ID_address_of)
   {
@@ -156,7 +158,7 @@ Function: collect_conditions
 
 \*******************************************************************/
 
-std::set<exprt> collect_conditions(const exprt &src)
+static std::set<exprt> collect_conditions(const exprt &src)
 {
   std::set<exprt> result;
   collect_conditions_rec(src, result);
@@ -175,7 +177,8 @@ Function: collect_conditions
 
 \*******************************************************************/
 
-std::set<exprt> collect_conditions(const goto_programt::const_targett t)
+static std::set<exprt> collect_conditions(
+  const goto_programt::const_targett t)
 {
   switch(t->type)
   {
@@ -205,7 +208,9 @@ Function: collect_operands
 
 \*******************************************************************/
 
-void collect_operands(const exprt &src, std::vector<exprt> &dest)
+static void collect_operands(
+  const exprt &src,
+  std::vector<exprt> &dest)
 {
   for(const exprt &op : src.operands())
   {
@@ -228,7 +233,8 @@ Function: non_ordered_predicate_expansion
 
 \*******************************************************************/
 
-std::set<exprt> non_ordered_predicate_expansion(const exprt &src)
+static std::set<exprt> non_ordered_predicate_expansion(
+  const exprt &src)
 {
   std::set<exprt> result;
   // the expansion of "<=" is "<" and "=="
@@ -289,7 +295,7 @@ Function: ordered_negation
 
 \*******************************************************************/
 
-std::set<exprt> ordered_negation(const exprt &src)
+static std::set<exprt> ordered_negation(const exprt &src)
 {
   std::set<exprt> result;
   // the negation of "==" is "<" and ">"
@@ -362,7 +368,7 @@ Function: is_arithmetic_predicate
 
 \*******************************************************************/
 
-bool is_arithmetic_predicate(const exprt &src)
+static bool is_arithmetic_predicate(const exprt &src)
 {
   return (src.id()==ID_lt
           || src.id()==ID_le
@@ -385,7 +391,7 @@ Function: replacement_and_conjunction
 
 \*******************************************************************/
 
-std::set<exprt> replacement_and_conjunction(
+static std::set<exprt> replacement_and_conjunction(
   const std::set<exprt> &replacement_exprs,
   const std::vector<exprt> &operands,
   const std::size_t i)
@@ -393,12 +399,9 @@ std::set<exprt> replacement_and_conjunction(
   std::set<exprt> result;
   for(auto &y : replacement_exprs)
   {
-    std::vector<exprt> others;
-    for(std::size_t j=0; j<operands.size(); j++)
-      if(i!=j)
-        others.push_back(operands[j]);
-
-    others.push_back(y);
+    assert(operands.size()>i);
+    std::vector<exprt> others(operands);
+    others[i]=y;
     exprt c=conjunction(others);
     result.insert(c);
   }
@@ -417,63 +420,51 @@ Function: non_ordered_expr_expansion
 
 \*******************************************************************/
 
-std::set<exprt> non_ordered_expr_expansion(const exprt &src)
+static std::set<exprt> non_ordered_expr_expansion(const exprt &src)
 {
+  if(src.id()==ID_not&&is_arithmetic_predicate(src.op0()))
+  {
+    return ordered_negation(src.op0());
+  }
+
   std::set<exprt> result;
-
-  std::set<exprt> s1, s2;
-
-  if(src.id()!=ID_not||!is_arithmetic_predicate(src.op0()))
-    s1.insert(src);
-  else
-  {
-    auto res=ordered_negation(src.op0());
-    s1.insert(res.begin(), res.end());
-  }
-
+  std::vector<exprt> operands;;
+  collect_operands(src, operands);
   // expand negations and non-ordered predicates
-  bool changed=true;
-  while(changed)
+  for(std::size_t i=0; i<operands.size(); ++i)
   {
-    changed=false;
-    for(auto &x: s1)
+    // an 'op' can be expanded if 1) it is a 'not' or 2) it
+    // is a predicate with '<=', '>=' or '!='
+    std::set<exprt> expanded_op;
+    if(operands[i].id()==ID_not)
     {
-      std::vector<exprt> operands;
-      collect_operands(x, operands);
-      for(std::size_t i=0; i<operands.size(); i++)
+      const exprt &no=operands[i].op0();
+      if(is_arithmetic_predicate(no))
       {
-        std::set<exprt> res;
-        if(operands[i].id()==ID_not)
-        {
-          exprt no=operands[i].op0();
-          if(is_arithmetic_predicate(no))
-          {
-            res=ordered_negation(no);
-            if(!res.empty()) changed=true;
-          }
-        }
-        else
-        {
-          if(operands[i].id()==ID_le
-             || operands[i].id()==ID_ge
-             || operands[i].id()==ID_notequal)
-          {
-            res=non_ordered_predicate_expansion(operands[i]);
-            if(!res.empty()) changed=true;
-          }
-        }
-        std::set<exprt> co=replacement_and_conjunction(res, operands, i);
-        s2.insert(co.begin(), co.end());
-        if(!res.empty()) break;
+        expanded_op=ordered_negation(no);
       }
-      if(!changed) s2.insert(x);
     }
-    if(!changed) break;
-    s1.swap(s2);
-    s2.clear();
+    else
+    {
+      if(operands[i].id()==ID_le
+         || operands[i].id()==ID_ge
+         || operands[i].id()==ID_notequal)
+      {
+        expanded_op=non_ordered_predicate_expansion(operands[i]);
+      }
+    }
+    if(expanded_op.empty()) continue;
+    auto re=replacement_and_conjunction(expanded_op, operands, i);
+    for(auto &x: re)
+    {
+      auto rec_result=non_ordered_expr_expansion(x);
+      result.insert(rec_result.begin(), rec_result.end());
+    }
+    // The loop can terminate as long as one 'op' has been expanded,
+    // since the recursive call will handle other expansions.
+    return result;
   }
-
-  return s1;
+  return {src};
 }
 
 /*******************************************************************\
@@ -488,7 +479,7 @@ Function: decision_expansion
 
 \*******************************************************************/
 
-std::set<exprt> decision_expansion(const exprt &dec)
+static std::set<exprt> decision_expansion(const exprt &dec)
 {
   std::set<exprt> ctrl;
   // dec itself may be a non-ordered predicate
@@ -496,15 +487,11 @@ std::set<exprt> decision_expansion(const exprt &dec)
   if(d.id()==ID_not) d=d.op0();
   if(is_arithmetic_predicate(d))
   {
-    auto res=non_ordered_predicate_expansion(d);
-    if(not res.empty())
-      ctrl.insert(res.begin(), res.end());
-    else ctrl.insert(d);
+    auto res=non_ordered_expr_expansion(d);
+    ctrl.insert(res.begin(), res.end());
     d.make_not();
-    res=non_ordered_predicate_expansion(d);
-    if(not res.empty())
-      ctrl.insert(res.begin(), res.end());
-    else ctrl.insert(d);
+    res=non_ordered_expr_expansion(d);
+    ctrl.insert(res.begin(), res.end());
   }
   return ctrl;
 }
@@ -522,13 +509,14 @@ Function: collect_mcdc_controlling_rec
 
 \*******************************************************************/
 
-void collect_mcdc_controlling_rec(
+static void collect_mcdc_controlling_rec(
   const exprt &src,
   const std::vector<exprt> &conditions,
   std::set<exprt> &result)
 {
   // src is conjunction (ID_and) or disjunction (ID_or)
-  if(src.id()==ID_and || src.id()==ID_or)
+  if(src.id()==ID_and ||
+     src.id()==ID_or)
   {
     std::vector<exprt> operands;
     collect_operands(src, operands);
@@ -643,7 +631,7 @@ Function: collect_mcdc_controlling
 
 \*******************************************************************/
 
-std::set<exprt> collect_mcdc_controlling(
+static std::set<exprt> collect_mcdc_controlling(
   const std::set<exprt> &decisions)
 {
   std::set<exprt> result;
@@ -652,6 +640,7 @@ std::set<exprt> collect_mcdc_controlling(
   {
     collect_mcdc_controlling_rec(d, { }, result);
   }
+
   return result;
 }
 
@@ -805,7 +794,7 @@ Function: sign_of_expr
 
 \*******************************************************************/
 
-std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
+static std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
 {
   std::set<signed> signs;
 
@@ -872,7 +861,7 @@ Function: remove_repetition
 
 \*******************************************************************/
 
-void remove_repetition(std::set<exprt> &exprs)
+static void remove_repetition(std::set<exprt> &exprs)
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
@@ -967,8 +956,9 @@ Function: eval_expr
           the atomic expr values
 
 \*******************************************************************/
-bool eval_expr(
-  const std::map<exprt, signed> &atomic_exprs,
+
+static bool eval_expr(
+  const std::map<exprt, signed> &atomic_exprs, 
   const exprt &src)
 {
   std::vector<exprt> operands;
@@ -1025,7 +1015,7 @@ Function: values_of_atomic_exprs
 
 \*******************************************************************/
 
-std::map<exprt, signed> values_of_atomic_exprs(
+static std::map<exprt, signed> values_of_atomic_exprs(
   const exprt &e,
   const std::set<exprt> &conditions)
 {
@@ -1064,7 +1054,7 @@ Function: is_mcdc_pair
 
 \*******************************************************************/
 
-bool is_mcdc_pair(
+static bool is_mcdc_pair(
   const exprt &e1,
   const exprt &e2,
   const exprt &c,
@@ -1133,7 +1123,7 @@ Function: has_mcdc_pair
 
 \*******************************************************************/
 
-bool has_mcdc_pair(
+static bool has_mcdc_pair(
   const exprt &c,
   const std::set<exprt> &expr_set,
   const std::set<exprt> &conditions,
@@ -1170,7 +1160,7 @@ Function: minimize_mcdc_controlling
 
 \*******************************************************************/
 
-void minimize_mcdc_controlling(
+static void minimize_mcdc_controlling(
   std::set<exprt> &controlling,
   const exprt &decision)
 {
@@ -1258,7 +1248,7 @@ Function: collect_decisions_rec
 
 \*******************************************************************/
 
-void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
+static void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
 {
   if(src.id()==ID_address_of)
   {
@@ -1299,7 +1289,7 @@ Function: collect_decisions
 
 \*******************************************************************/
 
-std::set<exprt> collect_decisions(const exprt &src)
+static std::set<exprt> collect_decisions(const exprt &src)
 {
   std::set<exprt> result;
   collect_decisions_rec(src, result);
@@ -1318,7 +1308,8 @@ Function: collect_decisions
 
 \*******************************************************************/
 
-std::set<exprt> collect_decisions(const goto_programt::const_targett t)
+static std::set<exprt> collect_decisions(
+  const goto_programt::const_targett t)
 {
   switch(t->type)
   {
