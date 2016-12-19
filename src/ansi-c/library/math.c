@@ -22,32 +22,68 @@ inline long double __builtin_fabsl(long double d) { return __CPROVER_fabsl(d); }
 
 inline float __builtin_fabsf(float f) { return __CPROVER_fabsf(f); }
 
-/* FUNCTION: __builtin_isgreater */
+/* FUNCTION: __CPROVER_isgreaterf */
 
-int __builtin_isgreater(double f, double g) { return f > g; }
+int __CPROVER_isgreaterf(float f, float g) { return f > g; }
 
-/* FUNCTION: __builtin_isgreaterequal */
+/* FUNCTION: __CPROVER_isgreaterd */
 
-int __builtin_isgreaterequal(float f, float g) { return f >= g; }
+int __CPROVER_isgreaterd(double f, double g) { return f > g; }
 
-/* FUNCTION: __builtin_isless */
+/* FUNCTION: __CPROVER_isgreaterequalf */
 
-int __builtin_isless(float f, float g) { return f < g;}
+int __CPROVER_isgreaterequalf(float f, float g) { return f >= g; }
 
-/* FUNCTION: __builtin_islessequal */
+/* FUNCTION: __CPROVER_isgreaterequald */
 
-int __builtin_islessequal(float f, float g) { return f <= g; }
+int __CPROVER_isgreaterequald(double f, double g) { return f >= g; }
 
-/* FUNCTION: __builtin_islessgreater */
+/* FUNCTION: __CPROVER_islessf */
 
-int __builtin_islessgreater(float f, float g) { return (f < g) || (f > g); }
+int __CPROVER_islessf(float f, float g) { return f < g;}
 
-/* FUNCTION: __builtin_isunordered */
+/* FUNCTION: __CPROVER_islessd */
 
-int __builtin_isunordered(float f, float g) { return isnan(f) || isnan(g); }
+int __CPROVER_islessd(double f, double g) { return f < g;}
+
+/* FUNCTION: __CPROVER_islessequalf */
+
+int __CPROVER_islessequalf(float f, float g) { return f <= g; }
+
+/* FUNCTION: __CPROVER_islessequald */
+
+int __CPROVER_islessequald(double f, double g) { return f <= g; }
+
+/* FUNCTION: __CPROVER_islessgreaterf */
+
+int __CPROVER_islessgreaterf(float f, float g) { return (f < g) || (f > g); }
+
+/* FUNCTION: __CPROVER_islessgreaterd */
+
+int __CPROVER_islessgreaterd(double f, double g) { return (f < g) || (f > g); }
+
+/* FUNCTION: __CPROVER_isunorderedf */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+int __CPROVER_isunorderedf(float f, float g) { return isnanf(f) || isnanf(g); }
+
+/* FUNCTION: __CPROVER_isunorderedd */
+
+#ifndef __CPROVER_MATH_H_INCLUDED
+#include <math.h>
+#define __CPROVER_MATH_H_INCLUDED
+#endif
+
+int __CPROVER_isunorderedd(double f, double g) { return isnan(f) || isnan(g); }
 
 
 /* FUNCTION: isfinite */
+
+#undef isfinite
 
 int isfinite(double d) { return __CPROVER_isfinited(d); }
 
@@ -64,6 +100,8 @@ int __finitef(float f) { return __CPROVER_isfinitef(f); }
 int __finitel(long double ld) { return __CPROVER_isfiniteld(ld); }
 
 /* FUNCTION: isinf */
+
+#undef isinf
 
 inline int isinf(double d) { return __CPROVER_isinfd(d); }
 
@@ -89,6 +127,8 @@ inline int __isinfl(long double ld) { return __CPROVER_isinfld(ld); }
 
 /* FUNCTION: isnan */
 
+#undef isnan
+
 inline int isnan(double d) { return __CPROVER_isnand(d); }
 
 /* FUNCTION: __isnan */
@@ -112,6 +152,8 @@ inline int isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 inline int __isnanl(long double ld) { return __CPROVER_isnanld(ld); }
 
 /* FUNCTION: isnormal */
+
+#undef isnormal
 
 inline int isnormal(double d) { return __CPROVER_isnormald(d); }
 
@@ -176,6 +218,8 @@ inline int _ldsign(long double ld) { return __CPROVER_signld(ld); }
 inline int _fdsign(float f) { return __CPROVER_signf(f); }
 
 /* FUNCTION: signbit */
+
+#undef signbit
 
 inline int signbit(double d) { return __CPROVER_signd(d); }
 
@@ -1032,7 +1076,7 @@ float fdimf(float f, float g) { return ((f > g) ? f - g : +0.0f); }
 #define __CPROVER_MATH_H_INCLUDED
 #endif
 
-long double fdim(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
+long double fdiml(long double f, long double g) { return ((f > g) ? f - g : +0.0); }
 
 
 
@@ -1130,7 +1174,7 @@ float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d)
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d)
 {
-  long double magicConst = 0x1.0p+64d;
+  long double magicConst = 0x1.0p+64;
   long double return_value;
   int saved_rounding_mode = fegetround();
   fesetround(rounding_mode);
@@ -1421,7 +1465,7 @@ float roundf(float x)
     xp = x;
   }
 
-  fegetround(FE_TOWARDZERO);
+  fesetround(saved_rounding_mode);
   
   return __sort_of_CPROVER_round_to_integralf(FE_TOWARDZERO, xp);
 }
@@ -1643,7 +1687,7 @@ long int lrint(double x)
 
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
-float lrintf(float x)
+long int lrintf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
@@ -1666,7 +1710,7 @@ float lrintf(float x)
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
-long double lrintl(long double x)
+long int lrintl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
@@ -1711,7 +1755,7 @@ long long int llrint(double x)
 
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
-float llrintf(float x)
+long long int llrintf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
@@ -1734,7 +1778,7 @@ float llrintf(float x)
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
-long double llrintl(long double x)
+long long int llrintl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT
@@ -1803,7 +1847,7 @@ long int lround(double x)
 
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
-float lroundf(float x)
+long int lroundf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT, plus should use RNA
@@ -1840,7 +1884,7 @@ float lroundf(float x)
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
-long double lroundl(long double x)
+long int lroundl(long double x)
 {
   int saved_rounding_mode = fegetround();
   fesetround(FE_TOWARDZERO);
@@ -1913,7 +1957,7 @@ long long int llround(double x)
 
 float __sort_of_CPROVER_round_to_integralf (int rounding_mode, float d);
 
-float llroundf(float x)
+long long int llroundf(float x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT, plus should use RNA
@@ -1950,7 +1994,7 @@ float llroundf(float x)
 
 long double __sort_of_CPROVER_round_to_integrall (int rounding_mode, long double d);
 
-long double llroundl(long double x)
+long long int llroundl(long double x)
 {
   // TODO : should be an all-in-one __CPROVER function to allow
   // conversion to SMT, plus should use RNA
@@ -1969,7 +2013,7 @@ long double llroundl(long double x)
   fesetround(saved_rounding_mode);
   
   long double rti = __sort_of_CPROVER_round_to_integrall(FE_TOWARDZERO, xp);
-  return (long int)rti;
+  return (long long int)rti;
 }
 
 
