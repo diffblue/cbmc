@@ -397,7 +397,8 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
       }
 
       status() << "Instrumenting coverge goals" << eom;
-      instrument_cover_goals(symbol_table, goto_model.goto_functions, {c});
+      instrument_cover_goalst goals(symbol_table,{c});
+      goals.instrument_cover_goals(goto_model.goto_functions);
       goto_model.goto_functions.update();
     }
 
