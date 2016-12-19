@@ -68,7 +68,7 @@ public:
 
 class instrument_cover_goalst
 {
-  public:
+public:
   instrument_cover_goalst(
     const symbol_tablet &_symbol_table,
     const std::set<coverage_criteriont> &_criteria):
@@ -83,9 +83,43 @@ class instrument_cover_goalst
   void instrument_cover_goals(
     goto_functionst &goto_functions);
 
-  private:
-    const namespacet ns;
-    const std::set<coverage_criteriont> &criteria;
+private:
+
+  void instrument_assertion(
+    goto_programt::instructionst::iterator &i_it);
+
+  void instrument_cover(
+    goto_programt::instructionst::iterator &i_it);
+
+  void instrument_location(
+    goto_programt::instructionst::iterator &i_it,
+    goto_programt &goto_program,
+    basic_blockst &basic_blocks,
+    std::set<unsigned> &blocks_done);
+
+  void instrument_branch(
+    goto_programt::instructionst::iterator &i_it,
+    goto_programt &goto_program,
+    basic_blockst &basic_blocks);
+
+  void instrument_condition(
+    goto_programt::instructionst::iterator &i_it,
+    goto_programt &goto_program);
+
+  void instrument_decision(
+    goto_programt::instructionst::iterator &i_it,
+    goto_programt &goto_program);
+
+  void instrument_mcdc(
+    goto_programt::instructionst::iterator &i_it,
+    goto_programt &goto_program,
+    basic_blockst &basic_blocks,
+    std::set<unsigned> &blocks_done);
+
+  const namespacet ns;
+  const std::set<coverage_criteriont> &criteria;
+  irep_idt coverage_criterion;
+  irep_idt property_class;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H

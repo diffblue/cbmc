@@ -1250,6 +1250,393 @@ static std::set<exprt> collect_decisions(
 
 /*******************************************************************\
 
+Function: instrument_assertion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_assertion(
+  goto_programt::instructionst::iterator &i_it)
+{
+  if(i_it->is_assert())
+  {
+    i_it->guard=false_exprt();
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_cover
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_cover(
+  goto_programt::instructionst::iterator &i_it)
+{
+  if(i_it->is_function_call())
+  {
+    const code_function_callt &code_function_call=
+      to_code_function_call(i_it->code);
+    if(code_function_call.function().id()==ID_symbol &&
+       to_symbol_expr(code_function_call.function()).get_identifier()==
+       "__CPROVER_cover" &&
+       code_function_call.arguments().size()==1)
+    {
+      const exprt c=code_function_call.arguments()[0];
+      std::string comment="condition `"+from_expr(ns, "", c)+"'";
+      i_it->guard=not_exprt(c);
+      i_it->type=ASSERT;
+      i_it->code.clear();
+      i_it->source_location.set_comment(comment);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+    }
+  }
+  else if(i_it->is_assert())
+    i_it->make_skip();
+}
+
+/*******************************************************************\
+
+Function: instrument_location
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_location(
+  goto_programt::instructionst::iterator &i_it,
+  goto_programt &goto_program,
+  basic_blockst &basic_blocks,
+  std::set<unsigned> &blocks_done)
+{
+  if(i_it->is_assert())
+    i_it->make_skip();
+
+  unsigned block_nr=basic_blocks[i_it];
+  if(blocks_done.insert(block_nr).second)
+  {
+    std::string b=i2string(block_nr);
+    std::string id=id2string(i_it->function)+"#"+b;
+    source_locationt source_location=
+      basic_blocks.source_location_map[block_nr];
+
+    if(!source_location.get_file().empty() &&
+       source_location.get_file()[0]!='<')
+    {
+      std::string comment="block "+b;
+      goto_program.insert_before_swap(i_it);
+      i_it->make_assertion(false_exprt());
+      i_it->source_location=source_location;
+      i_it->source_location.set_comment(comment);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+
+      i_it++;
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_branch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_branch(
+  goto_programt::instructionst::iterator &i_it,
+  goto_programt &goto_program,
+  basic_blockst &basic_blocks)
+{
+  if(i_it->is_assert())
+    i_it->make_skip();
+
+  if(i_it==goto_program.instructions.begin())
+  {
+    // we want branch coverage to imply 'entry point of function'
+    // coverage
+    std::string comment=
+      "function "+id2string(i_it->function)+" entry point";
+
+    source_locationt source_location=i_it->source_location;
+
+    goto_programt::targett t=goto_program.insert_before(i_it);
+    t->make_assertion(false_exprt());
+    t->source_location=source_location;
+    t->source_location.set_comment(comment);
+    t->source_location.set(ID_coverage_criterion, coverage_criterion);
+    t->source_location.set_property_class(property_class);
+  }
+
+  if(i_it->is_goto() && !i_it->guard.is_true())
+  {
+    std::string b=i2string(basic_blocks[i_it]);
+    std::string true_comment=
+      "function "+id2string(i_it->function)+" block "+b+" branch true";
+    std::string false_comment=
+      "function "+id2string(i_it->function)+" block "+b+" branch false";
+
+    exprt guard=i_it->guard;
+    source_locationt source_location=i_it->source_location;
+
+    goto_program.insert_before_swap(i_it);
+    i_it->make_assertion(not_exprt(guard));
+    i_it->source_location=source_location;
+    i_it->source_location.set_comment(true_comment);
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+
+    goto_program.insert_before_swap(i_it);
+    i_it->make_assertion(guard);
+    i_it->source_location=source_location;
+    i_it->source_location.set_comment(false_comment);
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+
+    i_it++;
+    i_it++;
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_condition
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_condition(
+  goto_programt::instructionst::iterator &i_it,
+  goto_programt &goto_program)
+{
+  if(i_it->is_assert())
+    i_it->make_skip();
+
+  // Conditions are all atomic predicates in the programs.
+  {
+    const std::set<exprt> conditions=collect_conditions(i_it);
+
+    const source_locationt source_location=i_it->source_location;
+
+    for(const auto & c : conditions)
+    {
+      const std::string c_string=from_expr(ns, "", c);
+
+      const std::string comment_t="condition `"+c_string+"' true";
+      goto_program.insert_before_swap(i_it);
+      i_it->make_assertion(c);
+      i_it->source_location=source_location;
+      i_it->source_location.set_comment(comment_t);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+
+      const std::string comment_f="condition `"+c_string+"' false";
+      goto_program.insert_before_swap(i_it);
+      i_it->make_assertion(not_exprt(c));
+      i_it->source_location=source_location;
+      i_it->source_location.set_comment(comment_f);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+    }
+
+    for(std::size_t i=0; i<conditions.size()*2; i++)
+      i_it++;
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_decision
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_decision(
+  goto_programt::instructionst::iterator &i_it,
+  goto_programt &goto_program)
+{
+  if(i_it->is_assert())
+    i_it->make_skip();
+
+  // Decisions are maximal Boolean combinations of conditions.
+  {
+    const std::set<exprt> decisions=collect_decisions(i_it);
+
+    const source_locationt source_location=i_it->source_location;
+
+    for(const auto & d : decisions)
+    {
+      const std::string d_string=from_expr(ns, "", d);
+
+      const std::string comment_t="decision `"+d_string+"' true";
+      goto_program.insert_before_swap(i_it);
+      i_it->make_assertion(d);
+      i_it->source_location=source_location;
+      i_it->source_location.set_comment(comment_t);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+
+      const std::string comment_f="decision `"+d_string+"' false";
+      goto_program.insert_before_swap(i_it);
+      i_it->make_assertion(not_exprt(d));
+      i_it->source_location=source_location;
+      i_it->source_location.set_comment(comment_f);
+      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+      i_it->source_location.set_property_class(property_class);
+    }
+
+    for(std::size_t i=0; i<decisions.size()*2; i++)
+      i_it++;
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_mcdc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goalst::instrument_mcdc(
+  goto_programt::instructionst::iterator &i_it,
+  goto_programt &goto_program,
+  basic_blockst &basic_blocks,
+  std::set<unsigned> &blocks_done)
+{
+  if(i_it->is_assert())
+    i_it->make_skip();
+
+  // 1. Each entry and exit point is invoked
+  // 2. Each decision takes every possible outcome
+  // 3. Each condition in a decision takes every possible outcome
+  // 4. Each condition in a decision is shown to independently
+  //    affect the outcome of the decision.
+
+  const std::set<exprt> conditions=collect_conditions(i_it);
+  const std::set<exprt> decisions=collect_decisions(i_it);
+
+  std::set<exprt> both;
+  std::set_union(conditions.begin(), conditions.end(),
+                 decisions.begin(), decisions.end(),
+                 inserter(both, both.end()));
+
+  const source_locationt source_location=i_it->source_location;
+
+  for(const auto & p : both)
+  {
+    bool is_decision=decisions.find(p)!=decisions.end();
+    bool is_condition=conditions.find(p)!=conditions.end();
+
+    std::string description=
+      (is_decision && is_condition)?"decision/condition":
+      is_decision?"decision":"condition";
+
+    std::string p_string=from_expr(ns, "", p);
+
+    std::string comment_t=description+" `"+p_string+"' true";
+    goto_program.insert_before_swap(i_it);
+    i_it->make_assertion(not_exprt(p));
+    i_it->source_location=source_location;
+    i_it->source_location.set_comment(comment_t);
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+
+    std::string comment_f=description+" `"+p_string+"' false";
+    goto_program.insert_before_swap(i_it);
+    i_it->make_assertion(p);
+    i_it->source_location=source_location;
+    i_it->source_location.set_comment(comment_f);
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+  }
+
+  bool boundary_values_analysis=
+       criteria.find(coverage_criteriont::BOUNDARY)!=criteria.end();
+  std::set<exprt> controlling;
+  for(auto &dec: decisions)
+  {
+    std::set<exprt> ctrl=collect_mcdc_controlling_nested({dec});
+    if(boundary_values_analysis)
+    {
+      auto res=decision_expansion(dec);
+      ctrl.insert(res.begin(), res.end());
+    }
+    remove_repetition(ctrl);
+    minimize_mcdc_controlling(ctrl, dec);
+    controlling.insert(ctrl.begin(), ctrl.end());
+  }
+
+  if(boundary_values_analysis)
+  {
+    std::set<exprt> boundary_controlling;
+    for(auto &x: controlling)
+    {
+      auto res=non_ordered_expr_expansion(x);
+      boundary_controlling.insert(res.begin(), res.end());
+    }
+    controlling=boundary_controlling;
+    remove_repetition(controlling);
+  }
+
+  for(const auto & p : controlling)
+  {
+    std::string p_string=from_expr(ns, "", p);
+
+    std::string description=
+      "MC/DC independence condition `"+p_string+"'";
+
+    goto_program.insert_before_swap(i_it);
+    i_it->make_assertion(not_exprt(p));
+    i_it->source_location=source_location;
+    i_it->source_location.set_comment(description);
+    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+    i_it->source_location.set_property_class(property_class);
+  }
+
+  for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
+    i_it++;
+}
+
+/*******************************************************************\
+
 Function: instrument_cover_goals
 
   Inputs:
@@ -1274,8 +1661,8 @@ void instrument_cover_goalst::instrument_cover_goals(
   
   for(const auto &criterion:criteria)
   {
-    const irep_idt coverage_criterion=as_string(criterion);
-    const irep_idt property_class="coverage";
+    coverage_criterion=as_string(criterion);
+    property_class="coverage";
 
     Forall_goto_program_instructions(i_it, goto_program)
     {
@@ -1283,290 +1670,32 @@ void instrument_cover_goalst::instrument_cover_goals(
       {
       case coverage_criteriont::ASSERTION:
         // turn into 'assert(false)' to avoid simplification
-        if(i_it->is_assert())
-        {
-          i_it->guard=false_exprt();
-          i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-          i_it->source_location.set_property_class(property_class);
-        }
+    	instrument_assertion(i_it);
         break;
         
       case coverage_criteriont::COVER:
         // turn __CPROVER_cover(x) into 'assert(!x)'
-        if(i_it->is_function_call())
-        {
-          const code_function_callt &code_function_call=
-            to_code_function_call(i_it->code);
-          if(code_function_call.function().id()==ID_symbol &&
-             to_symbol_expr(code_function_call.function()).get_identifier()==
-             "__CPROVER_cover" &&
-             code_function_call.arguments().size()==1)
-          {
-            const exprt c=code_function_call.arguments()[0];
-            std::string comment="condition `"+from_expr(ns, "", c)+"'";
-            i_it->guard=not_exprt(c);
-            i_it->type=ASSERT;
-            i_it->code.clear();
-            i_it->source_location.set_comment(comment);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-          }
-        }
-        else if(i_it->is_assert())
-          i_it->make_skip();
+   	    instrument_cover(i_it);
         break;
         
       case coverage_criteriont::LOCATION:
-        if(i_it->is_assert())
-          i_it->make_skip();
-
-        {
-          unsigned block_nr=basic_blocks[i_it];
-          if(blocks_done.insert(block_nr).second)
-          {
-            std::string b=i2string(block_nr);
-            std::string id=id2string(i_it->function)+"#"+b;
-            source_locationt source_location=
-              basic_blocks.source_location_map[block_nr];
-            
-            if(!source_location.get_file().empty() &&
-               source_location.get_file()[0]!='<')
-            {
-              std::string comment="block "+b;
-              goto_program.insert_before_swap(i_it);
-              i_it->make_assertion(false_exprt());
-              i_it->source_location=source_location;
-              i_it->source_location.set_comment(comment);
-              i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-              i_it->source_location.set_property_class(property_class);
-              
-              i_it++;
-            }
-          }
-        }
+        instrument_location(i_it,goto_program,basic_blocks,blocks_done);
         break;
       
       case coverage_criteriont::BRANCH:
-        if(i_it->is_assert())
-          i_it->make_skip();
-
-        if(i_it==goto_program.instructions.begin())
-        {
-          // we want branch coverage to imply 'entry point of function'
-          // coverage
-          std::string comment=
-            "function "+id2string(i_it->function)+" entry point";
-
-          source_locationt source_location=i_it->source_location;
-
-          goto_programt::targett t=goto_program.insert_before(i_it);
-          t->make_assertion(false_exprt());
-          t->source_location=source_location;
-          t->source_location.set_comment(comment);
-          t->source_location.set(ID_coverage_criterion, coverage_criterion);
-          t->source_location.set_property_class(property_class);
-        }
-      
-        if(i_it->is_goto() && !i_it->guard.is_true())
-        {
-          std::string b=i2string(basic_blocks[i_it]);
-          std::string true_comment=
-            "function "+id2string(i_it->function)+" block "+b+" branch true";
-          std::string false_comment=
-            "function "+id2string(i_it->function)+" block "+b+" branch false";
-
-          exprt guard=i_it->guard;
-          source_locationt source_location=i_it->source_location;
-
-          goto_program.insert_before_swap(i_it);
-          i_it->make_assertion(not_exprt(guard));
-          i_it->source_location=source_location;
-          i_it->source_location.set_comment(true_comment);
-          i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-          i_it->source_location.set_property_class(property_class);
-
-          goto_program.insert_before_swap(i_it);
-          i_it->make_assertion(guard);
-          i_it->source_location=source_location;
-          i_it->source_location.set_comment(false_comment);
-          i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-          i_it->source_location.set_property_class(property_class);
-          
-          i_it++;
-          i_it++;
-        }
+        instrument_branch(i_it,goto_program,basic_blocks);
         break;
         
       case coverage_criteriont::CONDITION:
-        if(i_it->is_assert())
-          i_it->make_skip();
-
-        // Conditions are all atomic predicates in the programs.
-        {
-          const std::set<exprt> conditions=collect_conditions(i_it);
-
-          const source_locationt source_location=i_it->source_location;
-
-          for(const auto & c : conditions)
-          {
-            const std::string c_string=from_expr(ns, "", c);
-          
-            const std::string comment_t="condition `"+c_string+"' true";
-            goto_program.insert_before_swap(i_it);
-            i_it->make_assertion(c);
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_t);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-
-            const std::string comment_f="condition `"+c_string+"' false";
-            goto_program.insert_before_swap(i_it);
-            i_it->make_assertion(not_exprt(c));
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_f);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-          }
-          
-          for(std::size_t i=0; i<conditions.size()*2; i++)
-            i_it++;
-        }
+        instrument_condition(i_it,goto_program);
         break;
       
       case coverage_criteriont::DECISION:
-        if(i_it->is_assert())
-          i_it->make_skip();
-
-        // Decisions are maximal Boolean combinations of conditions.
-        {
-          const std::set<exprt> decisions=collect_decisions(i_it);
-
-          const source_locationt source_location=i_it->source_location;
-
-          for(const auto & d : decisions)
-          {
-            const std::string d_string=from_expr(ns, "", d);
-          
-            const std::string comment_t="decision `"+d_string+"' true";
-            goto_program.insert_before_swap(i_it);
-            i_it->make_assertion(d);
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_t);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-
-            const std::string comment_f="decision `"+d_string+"' false";
-            goto_program.insert_before_swap(i_it);
-            i_it->make_assertion(not_exprt(d));
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_f);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-          }
-          
-          for(std::size_t i=0; i<decisions.size()*2; i++)
-            i_it++;
-        }
+        instrument_decision(i_it,goto_program);
         break;
 
       case coverage_criteriont::MCDC:
-        if(i_it->is_assert())
-          i_it->make_skip();
-
-        // 1. Each entry and exit point is invoked
-        // 2. Each decision takes every possible outcome
-        // 3. Each condition in a decision takes every possible outcome
-        // 4. Each condition in a decision is shown to independently
-        //    affect the outcome of the decision.
-        {
-          const std::set<exprt> conditions=collect_conditions(i_it);
-          const std::set<exprt> decisions=collect_decisions(i_it);
-          
-          std::set<exprt> both;
-          std::set_union(conditions.begin(), conditions.end(),
-                         decisions.begin(), decisions.end(),
-                         inserter(both, both.end()));
-
-          const source_locationt source_location=i_it->source_location;
-
-          for(const auto & p : both)
-          {
-            bool is_decision=decisions.find(p)!=decisions.end();
-            bool is_condition=conditions.find(p)!=conditions.end();
-            
-            std::string description=
-              (is_decision && is_condition)?"decision/condition":
-              is_decision?"decision":"condition";
-              
-            std::string p_string=from_expr(ns, "", p);
-          
-            std::string comment_t=description+" `"+p_string+"' true";
-            goto_program.insert_before_swap(i_it);
-            //i_it->make_assertion(p);
-            i_it->make_assertion(not_exprt(p));
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_t);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-
-            std::string comment_f=description+" `"+p_string+"' false";
-            goto_program.insert_before_swap(i_it);
-            //i_it->make_assertion(not_exprt(p));
-            i_it->make_assertion(p);
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(comment_f);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-          }
-          
-          bool boundary_values_analysis=
-               criteria.find(coverage_criteriont::BOUNDARY)!=criteria.end();
-          std::set<exprt> controlling;
-          for(auto &dec: decisions)
-          {
-            std::set<exprt> ctrl=collect_mcdc_controlling_nested({dec});
-            if(boundary_values_analysis)
-            {
-              auto res=decision_expansion(dec);
-              ctrl.insert(res.begin(), res.end());
-            }
-            remove_repetition(ctrl);
-            minimize_mcdc_controlling(ctrl, dec);
-            controlling.insert(ctrl.begin(), ctrl.end());
-          }
-
-          if(boundary_values_analysis)
-          {
-            std::set<exprt> boundary_controlling;
-            for(auto &x: controlling)
-            {
-              auto res=non_ordered_expr_expansion(x);
-              boundary_controlling.insert(res.begin(), res.end());
-            }
-            controlling=boundary_controlling;
-            remove_repetition(controlling);
-          }
-
-
-          for(const auto & p : controlling)
-          {
-            std::string p_string=from_expr(ns, "", p);
-
-            std::string description=
-              "MC/DC independence condition `"+p_string+"'";
-              
-            goto_program.insert_before_swap(i_it);
-            i_it->make_assertion(not_exprt(p));
-            //i_it->make_assertion(p);
-            i_it->source_location=source_location;
-            i_it->source_location.set_comment(description);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-            i_it->source_location.set_property_class(property_class);
-          }
-          
-          for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
-            i_it++;
-        }
+        instrument_mcdc(i_it,goto_program,basic_blocks,blocks_done);
         break;
 
       case coverage_criteriont::PATH:
