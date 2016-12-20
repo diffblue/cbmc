@@ -1,7 +1,10 @@
 /** -*- C++ -*- *****************************************************\
 
-Module: Type of string expressions for PASS algorithm
-        (see the PASS paper at HVC'13)
+Module: Type for string expressions used by the string solver.
+        These string expressions contains a field `length`, of type
+	`index_type`, a field `content` of type `content_type`.
+	This module also defines function to recognise the C and java
+	string types.
 
 Author: Romain Brenguier, romain.brenguier@diffblue.com
 
@@ -49,9 +52,9 @@ public:
 
   static bool is_c_string_type(const typet & type);
 
-  static bool is_java_string_type(const typet & type);
+  static bool is_java_string_pointer_type(const typet & type);
 
-  static bool is_java_deref_string_type(const typet & type);
+  static bool is_java_string_type(const typet & type);
 
   static bool is_java_string_builder_type(const typet & type);
 
@@ -68,7 +71,7 @@ public:
   static inline bool is_unrefined_string_type(const typet & type)
   {
     return (is_c_string_type(type)
-            || is_java_string_type(type)
+            || is_java_string_pointer_type(type)
             || is_java_string_builder_type(type)
             || is_java_char_sequence_type(type));
   }

@@ -1,7 +1,8 @@
 /** -*- C++ -*- *****************************************************\
 
-Module: String support via axiom instantiation
-        (see the PASS paper at HVC'13)
+Module: String support via creating string constraints and progressively
+        instantiating the universal constraints as needed.
+	The procedure is described in the PASS paper at HVC'13.
 
 Author: Alberto Griggio, alberto.griggio@gmail.com
 
@@ -136,8 +137,6 @@ private:
 
   // Convert the content of a string to a more readable representation
   std::string string_of_array(const exprt &arr, const exprt &size);
-
-  void print_time(std::string s);
 };
 
 #endif

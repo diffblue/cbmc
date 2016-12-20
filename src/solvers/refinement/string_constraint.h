@@ -1,7 +1,12 @@
 /** -*- C++ -*- *****************************************************\
 
-Module: String constraints
-        (see the PASS paper at HVC'13
+Module: String constraints.
+        These are formulas talking about strings. We implemented two
+        forms of constraints: `string_constraintt` implements formulas
+        of the form $\forall univ_var \in [lb,ub[. premise => body$,
+	and not_contains_constraintt implements those of the form:
+        $\forall x in [lb,ub[. p(x) => \exists y in [lb,ub[.
+	s1[x+y] != s2[y]$.
 
 Author: Romain Brenguier, romain.brenguier@diffblue.com
 
@@ -18,7 +23,7 @@ class string_constraintt: public exprt
 {
 public:
   // String constraints are of the form
-  // forall univ_var in [0,bound[. premise => body
+  // forall univ_var in [lower_bound,upper_bound[. premise => body
   // or premise => body
 
   inline const exprt &premise() const
@@ -53,7 +58,6 @@ public:
     copy_to_operands(true_exprt(), true_exprt());
   }
 
-  // Returns a new constraints with an universal quantifier added
   string_constraintt(
     const symbol_exprt &univ,
     const exprt &bound_inf,

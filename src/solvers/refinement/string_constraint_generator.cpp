@@ -1,7 +1,8 @@
 /** -*- C++ -*- *****************************************************\
 
-Module: Constraint generation from string function calls
-        for the PASS algorithm (see the PASS paper at HVC'13)
+Module: Generates string constraints to link results from string functions
+        with their arguments. This is inspired by the PASS paper at HVC'13
+	which gives examples of constraints for several functions.
 
 Author: Romain Brenguier, romain.brenguier@diffblue.com
 
@@ -71,6 +72,19 @@ symbol_exprt string_constraint_generatort::fresh_boolean
 }
 
 
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_string_expr
+
+  Inputs: an expression of type string 
+
+ Outputs: a string expression that is link to the argument through 
+          axioms that are added to the list
+
+ Purpose: obtain a refined string expression corresponding to string
+          variable of string function call
+
+\*******************************************************************/
 string_exprt string_constraint_generatort::add_axioms_for_string_expr
 (const exprt & unrefined_string)
 {
@@ -144,7 +158,19 @@ string_exprt string_constraint_generatort::find_or_add_string_of_symbol
   return symbol_to_string[id];
 }
 
+/*******************************************************************\
 
+Function: string_constraint_generatort::add_axioms_for_function_application
+
+  Inputs: an expression containing a function application
+
+ Outputs: expression corresponding to the result of the function application
+
+ Purpose: strings contained in this call are converted to objects of type 
+          `string_exprt`, through adding axioms. Axioms are then added to
+          enforce that the result corresponds to the function application.
+
+\*******************************************************************/
 exprt string_constraint_generatort::add_axioms_for_function_application
 (const function_application_exprt & expr)
 {
@@ -159,7 +185,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application
   else if(id==ID_cprover_string_length_func)
     return add_axioms_for_length(expr);
   else if(id==ID_cprover_string_equal_func)
-    return add_axioms_for_equal(expr);
+    return add_axioms_for_equals(expr);
   else if(id==ID_cprover_string_equals_ignore_case_func)
     return add_axioms_for_equals_ignore_case(expr);
   else if(id==ID_cprover_string_is_empty_func)
@@ -1202,7 +1228,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_float
 }
 
 
-exprt string_constraint_generatort::add_axioms_for_equal
+exprt string_constraint_generatort::add_axioms_for_equals
 (const function_application_exprt &f)
 {
   assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
@@ -1720,7 +1746,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of
   else
     assert(false);
 
-  if(refined_string_typet::is_java_string_type(c.type()))
+  if(refined_string_typet::is_java_string_pointer_type(c.type()))
   {
     string_exprt sub=add_axioms_for_string_expr(c);
     return add_axioms_for_index_of_string(str, sub, from_index);
@@ -1788,7 +1814,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of
   else
     assert(false);
 
-  if(refined_string_typet::is_java_string_type(c.type()))
+  if(refined_string_typet::is_java_string_pointer_type(c.type()))
   {
     string_exprt sub=add_axioms_for_string_expr(c);
     return add_axioms_for_last_index_of_string(str, sub, from_index);

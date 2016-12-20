@@ -1,11 +1,12 @@
 /** -*- C++ -*- *****************************************************\
 
-    Module: String support via axiom instantiation
-    (see the PASS paper at HVC'13)
+Module: String support via creating string constraints and progressively
+        instantiating the universal constraints as needed.
+	The procedure is described in the PASS paper at HVC'13.
 
-    Author: Alberto Griggio, alberto.griggio@gmail.com
+Author: Alberto Griggio, alberto.griggio@gmail.com
 
-    \*******************************************************************/
+\*******************************************************************/
 
 #include <ansi-c/string_constant.h>
 #include <util/i2string.h>
@@ -26,7 +27,6 @@ string_refinementt::string_refinementt(const namespacet &_ns, propt &_prop):
 void string_refinementt::set_mode()
 {
   debug() << "initializing mode" << eom;
-  // symbol_table.show(std::cout);
   symbolt init=ns.lookup(irep_idt("__CPROVER_initialize"));
   irep_idt mode=init.mode;
   debug() << "mode detected as " << mode << eom;
@@ -164,8 +164,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(std::size_t i=0; i<generator.axioms.size(); i++)
     if(generator.axioms[i].id()==ID_string_constraint)
     {
-      debug() << "universaly quantified " << eom;
-      // << generator.axioms[i].pretty() << eom;
       string_constraintt c= to_string_constraint(generator.axioms[i]);
       universal_axioms.push_back(c);
     }
