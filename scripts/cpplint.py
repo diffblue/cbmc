@@ -3871,7 +3871,35 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
   line = clean_lines.elided[linenum]        # get rid of comments and strings
 
+  # Check for if/else if/else that have brace on the same line
+  if Search(r'if\(.*\)\s*{', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Brace after an if should be on a new line')
+  elif Search(r'else if\(.*\)\s*{', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Brace after else if should be on a new line')
+  elif Search(r'else\s*{', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Brace after else should be on a new line')
 
+  # Check for else if/else that are on the same line as the previous brace
+  elif Search(r'}\s*else if', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Else if should be on a new line after closing brace')
+  elif Search(r'}\s*else', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Else should be on a new line after closing brace')
+
+  # Check for if/else if/else don't have statements on the same line
+  if Search(r'if\(.*\)\s*[^{\s]+', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Statement after an if should be on a new line')
+  elif Search(r'else if\(.*\)\s*[^{]+', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Statement after else if should be on a new line')
+  elif Search(r'else\s[^{]+', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Statement after else should be on a new line')
 
   # If braces come on one side of an else, they should be on both.
   # However, we have to worry about "else if" that spans multiple lines!
