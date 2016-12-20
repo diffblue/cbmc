@@ -3394,7 +3394,7 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Otherwise not.  Note we only check for non-spaces on *both* sides;
   # sometimes people put non-spaces on one side when aligning ='s among
   # many lines (not that this is behavior that I approve of...)
-  match1 = Search(r'[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
+  match1 = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
   match2 = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
   operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
   operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
