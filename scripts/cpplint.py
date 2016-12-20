@@ -4448,6 +4448,9 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   line = raw_lines[linenum]
   prev = raw_lines[linenum - 1] if linenum > 0 else ''
 
+  elided_line = clean_lines.elided[linenum]
+  elided_prev = clean_lines.elided[linenum - 1] if linenum > 0 else ''
+
   if line.find('\t') != -1:
     error(filename, linenum, 'whitespace/tab', 1,
           'Tab found, replace by spaces')
@@ -4488,18 +4491,17 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
     error(filename, linenum, 'whitespace/end_of_line', 4,
           'Line ends in whitespace.  Consider deleting these extra spaces.')
 
-# ensure indentation within parenthesized expressions
-  if (not Search(r'^\s+//', line)):
-    prev_initial_spaces = 0
-    if linenum>0:
-      while prev_initial_spaces < len(prev) and prev[prev_initial_spaces] == ' ':
-        prev_initial_spaces += 1
-    if Search(r'\([^\)]*,$', line) or Search(r'\(\[^\)]*, $', line):
-      error(filename, linenum, 'whitespace/indent', 4,
-            'If parameters or arguments require a line break, each parameter should be put on its own line.')
-    if (Search(r'\([^\)]*$', prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', prev):
-      error(filename, linenum, 'whitespace/indent', 4,
-            'Indent of wrapped parenthesized expression or parameter or argument list should be 2')
+# ensure indentation within parenthesized expressions (only on elided lines since we don't care about comments or strings)
+  prev_initial_spaces = 0
+  if linenum>0:
+    while prev_initial_spaces < len(prev) and prev[prev_initial_spaces] == ' ':
+      prev_initial_spaces += 1
+  if Search(r'\([^\)]*,$', elided_line) or Search(r'\(\[^\)]*, $', elided_line):
+    error(filename, linenum, 'whitespace/indent', 4,
+          'If parameters or arguments require a line break, each parameter should be put on its own line.')
+  if (Search(r'\([^\)]*$', elided_prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', elided_prev):
+    error(filename, linenum, 'whitespace/indent', 4,
+          'Indent of wrapped parenthesized expression or parameter or argument list should be 2')
 
   # Check if the line is a header guard.
   is_header_guard = False
