@@ -290,8 +290,11 @@ std::string string_refinementt::string_of_array
   unsigned n=integer_of_expr(to_constant_expr(size));
   if(n>500) return "very long string";
   if(n==0) return "\"\"";
-  unsigned str[n];
+
+  std::ostringstream buf;
+  buf << "\"";
   exprt val=get(arr);
+
   if(val.id()=="array-list")
   {
     for(size_t i=0; i<val.operands().size()/2; i++)
@@ -301,24 +304,17 @@ std::string string_refinementt::string_of_array
       if(idx<n)
       {
         exprt value=val.operands()[i*2+1];
-        str[idx]=integer_of_expr(to_constant_expr(value));
+        char c=static_cast<char>(integer_of_expr(to_constant_expr(value)));
+        if(31<c)
+          buf << c;
+        else
+          buf << "?";
       }
     }
   }
   else
   {
     return "unable to get array-list";
-  }
-
-  std::ostringstream buf;
-  buf << "\"";
-  for(unsigned i=0; i<n; i++)
-  {
-    char c=static_cast<char>(str[i]);
-    if(31<c)
-      buf << c;
-    else
-      buf << "?";
   }
 
   buf << "\"";
