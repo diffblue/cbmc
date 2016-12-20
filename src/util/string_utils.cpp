@@ -8,6 +8,7 @@ Author: Daniel Poetzl
 
 #include <cassert>
 #include <cctype>
+#include <algorithm>
 
 #include "string_utils.h"
 
@@ -25,22 +26,18 @@ Function:
 
 std::string strip_string(const std::string &s)
 {
-  std::string::size_type n=s.length();
+  auto pred=[](char c){ return std::isspace(c); };
 
-  // find first non-space char
-  unsigned i;
-  for(i=0; i<n; i++)
-  {
-    if(!std::isspace(s[i]))
-      break;
-  }
-  if(i==n)
+  std::string::const_iterator left
+    =std::find_if_not(s.begin(), s.end(), pred);
+  if(left==s.end())
     return "";
 
-  std::string::const_reverse_iterator r_it;
-  for(r_it=s.rbegin(); std::isspace(*r_it); r_it++);
+  std::string::size_type i=std::distance(s.begin(), left);
 
-  unsigned j=std::distance(r_it, s.rend())-1;
+  std::string::const_reverse_iterator right
+    =std::find_if_not(s.rbegin(), s.rend(), pred);
+  std::string::size_type j=std::distance(right, s.rend())-1;
 
   return s.substr(i, (j-i+1));
 }
@@ -76,12 +73,12 @@ void split_string(
   std::string::size_type n=s.length();
   assert(n>0);
 
-  unsigned start=0;
-  unsigned i;
+  std::string::size_type start=0;
+  std::string::size_type i;
 
-  for (i=0; i<n; i++)
+  for(i=0; i<n; i++)
   {
-    if (s[i]==delim)
+    if(s[i]==delim)
     {
       std::string new_s=s.substr(start, i-start);
 
@@ -90,6 +87,7 @@ void split_string(
 
       if(!remove_empty || !new_s.empty())
         result.push_back(new_s);
+
       start=i+1;
     }
   }
@@ -102,7 +100,8 @@ void split_string(
   if(!remove_empty || !new_s.empty())
     result.push_back(new_s);
 
-  assert(!result.empty());
+  if(result.empty())
+    result.push_back("");
 }
 
 /*******************************************************************\
