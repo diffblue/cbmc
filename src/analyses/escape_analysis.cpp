@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "escape_analysis.h"
 
-#include <iostream>
-
 /*******************************************************************\
 
 Function: escape_domaint::is_tracked
