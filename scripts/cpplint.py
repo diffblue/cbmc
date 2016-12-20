@@ -3464,7 +3464,7 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Note that && is not included here.  This is because there are too
   # many false positives due to RValue references.
 #  match = Search(r'[^<>=!\s](==|!=|<=|>=|\|\|)[^<>=!\s,;\)]', line)
-  match = Search(r'[^\s](<<|&&|\|\|)[^\s]', line)
+  match = Search(r'[^\s](&&|\|\|)[^\s]', line)
   if match:
     error(filename, linenum, 'whitespace/operators', 3,
           'Missing spaces around %s' % match.group(1))
