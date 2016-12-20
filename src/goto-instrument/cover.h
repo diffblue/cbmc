@@ -87,32 +87,32 @@ public:
 
 private:
   void instrument_assertion(
-    goto_programt::instructionst::iterator &i_it);
+    goto_programt::instructionst::iterator &insn);
 
   void instrument_cover(
-    goto_programt::instructionst::iterator &i_it);
+    goto_programt::instructionst::iterator &insn);
 
   void instrument_location(
-    goto_programt::instructionst::iterator &i_it,
+    goto_programt::instructionst::iterator &insn,
     goto_programt &goto_program,
     basic_blockst &basic_blocks,
     std::set<unsigned> &blocks_done);
 
   void instrument_branch(
-    goto_programt::instructionst::iterator &i_it,
+    goto_programt::instructionst::iterator &insn,
     goto_programt &goto_program,
     basic_blockst &basic_blocks);
 
   void instrument_condition(
-    goto_programt::instructionst::iterator &i_it,
+    goto_programt::instructionst::iterator &insn,
     goto_programt &goto_program);
 
   void instrument_decision(
-    goto_programt::instructionst::iterator &i_it,
+    goto_programt::instructionst::iterator &insn,
     goto_programt &goto_program);
 
   void instrument_mcdc(
-    goto_programt::instructionst::iterator &i_it,
+    goto_programt::instructionst::iterator &insn,
     goto_programt &goto_program,
     basic_blockst &basic_blocks,
     std::set<unsigned> &blocks_done);
