@@ -1,0 +1,9 @@
+CORE
+main.cpp
+
+^main\.cpp:11:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
+^main\.cpp:14:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
+^main\.cpp:17:  Put braces on a separate next line  \[whitespace/braces\] \[5\]$
+^Total errors found: 3$
+^SIGNAL=0$
+--

@@ -1,0 +1,8 @@
+CORE
+main.cpp
+
+^main\.cpp:12:  Statement after an if should be on a new line  \[readability/braces\] \[5\]$
+^main\.cpp:13:  Statement after else if should be on a new line  \[readability/braces\] \[5\]$
+^Total errors found: 3$
+^SIGNAL=0$
+--
