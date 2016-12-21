@@ -1536,10 +1536,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
 
         if(!target_in_cycle)
         {
-          goto_programt::instructiont new_inst;
-          new_inst.make_assertion(false_exprt());
-          int_it->swap(new_inst);
-          // delete new_inst
+          int_it->make_assertion(false_exprt());
           break;
         }
       }
