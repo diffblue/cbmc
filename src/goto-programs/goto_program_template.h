@@ -248,6 +248,19 @@ public:
   //! The list of instructions in the goto program
   instructionst instructions;
 
+  // Convert a const_targett to a targett - use with care and avoid
+  // whenever possible
+  targett const_cast_target(const_targett t)
+  {
+    return instructions.erase(t, t);
+  }
+
+  // Dummy for templates with possible const contexts
+  const_targett const_cast_target(const_targett t) const
+  {
+    return t;
+  }
+
   void get_successors(
     targett target,
     targetst &successors);
