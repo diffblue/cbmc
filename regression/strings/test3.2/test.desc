@@ -1,6 +1,6 @@
-CORE
+FUTURE
 test.c
---pass
+--string-refine
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

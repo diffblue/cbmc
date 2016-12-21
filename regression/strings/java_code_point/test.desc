@@ -1,6 +1,6 @@
-CORE
+FUTURE
 test_code_point.class
---pass
+--string-refine
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[assertion.1\] assertion at file test_code_point.java line 5: SUCCESS$

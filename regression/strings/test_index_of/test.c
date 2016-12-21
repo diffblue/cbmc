@@ -7,7 +7,7 @@ int main(){
   __CPROVER_string str;
   int firstSlash = __CPROVER_string_index_of(str,'/');
   //__CPROVER_char_literal("/"));
-  int lastSlash = __CPROVER_string_last_index_of(str,__CPROVER_char_literal("/"));
+  int lastSlash = __CPROVER_string_last_index_of(str,'/');
 
   __CPROVER_assume(__CPROVER_string_equal(str, __CPROVER_string_literal("abc/abc/abc")));
 
