@@ -1070,10 +1070,10 @@ void cbmc_parse_optionst::help()
     " cbmc file.c ...              source file names\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n"
+    " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
     " --property id                only check one specific property\n"
-    " --stop-on-fail               stop analysis once a failed property is detected\n"
-    " --trace                      give a counterexample trace for failed properties\n"
+    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
+    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1096,14 +1096,14 @@ void cbmc_parse_optionst::help()
                                        configt::ansi_ct::default_c_standard()==
                                        configt::ansi_ct::c_standardt::C99?"c99":
                                        configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"
+                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n" // NOLINT(*)
     " --cpp98/03/11                set C++ language standard (default: "
                                    << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98":
+                                       configt::cppt::cpp_standardt::CPP98?"cpp98": // NOLINT(*)
                                        configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03":
+                                       configt::cppt::cpp_standardt::CPP03?"cpp03": // NOLINT(*)
                                        configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"
+                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n" // NOLINT(*)
     #ifdef _WIN32
     " --gcc                        use GCC as preprocessor\n"
     #endif
@@ -1125,15 +1125,15 @@ void cbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover CC                   create test-suite with coverage criterion CC\n"
-    " --mm MM                      memory consistency model for concurrent programs\n"
+    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     "\n"
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     "\n"
     "Semantic transformations:\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     "\n"
     "BMC options:\n"
     " --program-only               only show program expression\n"
@@ -1147,11 +1147,11 @@ void cbmc_parse_optionst::help()
     " --unwinding-assertions       generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
-    " --graphml-witness filename   write the witness in GraphML format to filename\n"
+    " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n"
+    " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
     " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
@@ -1162,8 +1162,8 @@ void cbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --outfile filename           output formula to given file\n"
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
+    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
+    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
