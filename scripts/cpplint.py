@@ -3183,27 +3183,15 @@ def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, e
 
       if(Search(r'Inputs:', raw_lines[i])):
         found_inputs = True
-        if(not Match(r'^ Inputs:', raw_lines[i])):
-          error(filename, i, 'readability/function_comment', 4,
-            'Inputs: should be indented one space in')
       elif(Search(r'Outputs:', raw_lines[i])):
         found_outputs = True
-        if(not Match(r'^ Outputs:', raw_lines[i])):
-          error(filename, i, 'readability/function_comment', 4,
-            'Outputs: should be indented one space in')
       elif(Search(r'Purpose:', raw_lines[i])):
         found_purpose = True
-        if(not Match(r'^ Purpose:', raw_lines[i])):
-          error(filename, i, 'readability/function_comment', 4,
-            'Purpose: should be indented one space in')
       elif(Search(r'Function:', raw_lines[i])):
         found_function_name = True
         if(not Search(function_name_regex, raw_lines[i])):
           error(filename, i, 'readability/function_comment', 4,
             'Function: name in the comment doesn\'t match the function name')
-        if(not Match(r'^Function:', raw_lines[i])):
-          error(filename, i, 'readability/function_comment', 4,
-            'Function: should not be indented in the function header')
 
     if found_header_top:
       if not found_inputs:
