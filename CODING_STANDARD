@@ -75,6 +75,8 @@ Naming:
 
 Header files:
 - Avoid unnecessary #includes, especially in header files
+- Prefer forward declaration to includes, but forward declare at the top
+  of the header file rather than in line
 - Guard headers with #ifndef CPROVER_DIRECTORIES_FILE_H, etc
 
 C++ features:
@@ -109,6 +111,9 @@ C++ features:
 - We allow to use 3rd-party libraries directly. 
   No wrapper matching the coding rules is required. 
   Allowed libraries are: STL. 
+- Use the auto keyword if and only if one of the following
+  - The type is explictly repeated on the RHS (e.g. a constructor call)
+  - Adding the type will increase confusion (e.g. iterators, function pointers)
 
 Architecture-specific code:
 - Avoid if possible.
