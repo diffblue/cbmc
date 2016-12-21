@@ -8,25 +8,17 @@ Author: Thomas Kiley, thomas@diffblue.com
 
 /*******************************************************************\
 
-Function: fun
+ Function: fun
 
- Inputs:
+   Inputs:
 
- Outputs:
+Outputs:
 
- Purpose:
+  Purpose:
 
 \*******************************************************************/
 
 static void fun()
 {
-  if(condition) {
-    fun();
-  }
-  else if(condition) {
-    fun();
-  }
-  else  {
-    fun();
-  }
+  do_something();
 }

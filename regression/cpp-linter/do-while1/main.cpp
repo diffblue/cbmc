@@ -6,6 +6,18 @@ Author: Thomas Kiley, thomas@diffblue.com
 
 \*******************************************************************/
 
+/*******************************************************************\
+
+Function: fun
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static void fun()
 {
   // This should not produce a warning

@@ -224,6 +224,7 @@ _ERROR_CATEGORIES = [
     'readability/strings',
     'readability/todo',
     'readability/utf8',
+    'readability/function_comment'
     'runtime/arrays',
     'runtime/casting',
     'runtime/explicit',
@@ -3080,6 +3081,147 @@ def CheckForNamespaceIndentation(filename, nesting_state, clean_lines, line,
     CheckItemIndentationInNamespace(filename, clean_lines.elided,
                                     line, error)
 
+def CheckForFunctionCommentHeaders(filename, raw_lines, error):
+  """ Check all the lines for functions without function comment headers
+
+  Using the raw original lines (before multi-line comments are removed)
+  find lines that contain functions and checks they have a function comment header
+
+  Args:
+    filename - The name of the file being checked
+    raw_lines - The original, with comments lines
+    error - the function to report errors with
+  """
+  linenum = 0
+  function_state = _FunctionState()
+  for line in raw_lines:
+    joined_line = ''
+    starting_func = False
+    regexp = r'(\w(\w|::|\*|\&|\s)*)\('  # decls * & space::name( ...
+    match_result = Match(regexp, line)
+    if match_result:
+      # If the name is all caps and underscores, figure it's a macro and
+      # ignore it, unless it's TEST or TEST_F.
+      function_name = match_result.group(1).split()[-1]
+      if function_name == 'TEST' or function_name == 'TEST_F' or (
+        not Match(r'[A-Z_]+$', function_name)):
+        starting_func = True
+
+      if starting_func:
+        body_found = False
+        for start_linenum in xrange(linenum, len(raw_lines)):
+          start_line = raw_lines[start_linenum]
+          joined_line += ' ' + start_line.lstrip()
+          if Search(r'(;|})', start_line):  # Declarations and trivial functions
+            body_found = True
+            break                              # ... ignore
+          elif Search(r'{', start_line):
+            body_found = True
+            function = Search(r'((\w|:)*)\(', line).group(1)
+            if Match(r'TEST', function):    # Handle TEST... macros
+              parameter_regexp = Search(r'(\(.*\))', joined_line)
+              if parameter_regexp:             # Ignore bad syntax
+                function += parameter_regexp.group(1)
+            else:
+              function += '()'
+            function_state.Begin(function)
+            break
+      if not body_found:
+        # No body for the function (or evidence of a non-function) was found.
+        error(filename, linenum, 'readability/fn_size', 5,
+              'Lint failed to find start of function body.')
+      else:
+        CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error)
+    linenum += 1
+
+def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error):
+    """ Check each function has a comment header
+
+    Rules for function comment header:
+    1. Header demarked by /*{67}\ at the top
+    2. Header demarked by \*{67}/ at the bottom
+    3. Contains Function: classname::function_name
+    4. Contains Inputs:
+    5. Contains Outputs:
+    6. Contains Purpose:
+    7. new line between function and bottom of comment
+
+    Args:
+      filename - the name of the file
+      raw_lines - all the unmodified lines (including multi-line comments)
+      linenum - the line number of the line to check
+      function_name - the name of the function that was found
+      error - function to report errors with
+
+    """
+
+    header_top_regex = r'^/\*{67}\\$'
+    header_bottom_regex = r'^\\\*{67}/$'
+    function_name_regex = r'Function: (\w+::)?' + function_name+'$'
+
+    found_empty_space = raw_lines[linenum-1] == ""
+
+    header_start = linenum - 2 if found_empty_space else linenum - 1
+    found_header_bottom = Match(header_bottom_regex, raw_lines[header_start])
+
+    if not found_header_bottom:
+      error(filename, linenum, 'readability/function_comment', 4,
+        'Could not find function header comment for ' + function_name)
+      return
+
+    found_header_top = False
+
+    found_function_name = False
+    found_inputs = False
+    found_outputs = False
+    found_purpose = False
+
+    for i in xrange(header_start - 1, 0, -1):
+      if(Match(header_top_regex, raw_lines[i])):
+        found_header_top = True
+        break
+
+      if(Search(r'Inputs:', raw_lines[i])):
+        found_inputs = True
+        if(not Match(r'^ Inputs:', raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Inputs: should be indented one space in')
+      elif(Search(r'Outputs:', raw_lines[i])):
+        found_outputs = True
+        if(not Match(r'^ Outputs:', raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Outputs: should be indented one space in')
+      elif(Search(r'Purpose:', raw_lines[i])):
+        found_purpose = True
+        if(not Match(r'^ Purpose:', raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Purpose: should be indented one space in')
+      elif(Search(r'Function:', raw_lines[i])):
+        found_function_name = True
+        if(not Search(function_name_regex, raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Function: name in the comment doesn\'t match the function name')
+        if(not Match(r'^Function:', raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Function: should not be indented in the function header')
+
+    if found_header_top:
+      if not found_inputs:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Inputs:')
+      if not found_outputs:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Outputs:')
+      if not found_purpose:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Purpose:')
+    else:
+      error(filename, linenum, 'readability/function_comment', 4,
+        'Could not find top of function header comment for ' + function_name)
+
+    if not found_empty_space:
+        error(filename, linenum, 'readability/function_comment', 4,
+        'Insert an empty line between function header comment and the function ' + function_name)
 
 def CheckForFunctionLengths(filename, clean_lines, linenum,
                             function_state, error):
@@ -3142,6 +3284,7 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
       # No body for the function (or evidence of a non-function) was found.
       error(filename, linenum, 'readability/fn_size', 5,
             'Lint failed to find start of function body.')
+
   elif Match(r'^\}\s*$', line):  # function end
     function_state.Check(error, filename, linenum)
     function_state.End()
@@ -6027,6 +6170,7 @@ def ProcessFileData(filename, file_extension, lines, error,
   ResetNolintSuppressions()
 
   CheckForCopyright(filename, lines, error)
+  CheckForFunctionCommentHeaders(filename, lines, error)
   ProcessGlobalSuppresions(lines)
   RemoveMultiLineComments(filename, lines, error)
   clean_lines = CleansedLines(lines)

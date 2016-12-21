@@ -17,16 +17,7 @@ Function: fun
  Purpose:
 
 \*******************************************************************/
-
 static void fun()
 {
-  if(condition) {
-    fun();
-  }
-  else if(condition) {
-    fun();
-  }
-  else  {
-    fun();
-  }
+  do_something();
 }

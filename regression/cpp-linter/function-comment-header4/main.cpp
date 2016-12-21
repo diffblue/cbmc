@@ -8,7 +8,7 @@ Author: Thomas Kiley, thomas@diffblue.com
 
 /*******************************************************************\
 
-Function: fun
+Function: wrong_name
 
  Inputs:
 
@@ -20,13 +20,5 @@ Function: fun
 
 static void fun()
 {
-  if(condition) {
-    fun();
-  }
-  else if(condition) {
-    fun();
-  }
-  else  {
-    fun();
-  }
+  do_something();
 }

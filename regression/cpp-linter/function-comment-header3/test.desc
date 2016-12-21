@@ -1,0 +1,7 @@
+CORE
+main.cpp
+
+^main\.cpp:20:  Insert an empty line between function header comment and the function fun  \[readability/function_comment\] \[4\]$
+^Total errors found: 1$
+^SIGNAL=0$
+--

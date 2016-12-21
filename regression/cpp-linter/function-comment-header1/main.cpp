@@ -20,13 +20,11 @@ Function: fun
 
 static void fun()
 {
-  if(condition) {
-    fun();
-  }
-  else if(condition) {
-    fun();
-  }
-  else  {
-    fun();
-  }
+  do_something();
+}
+
+static void foo()
+{
+  // No function header
+  do_something();
 }
