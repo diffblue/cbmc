@@ -24,76 +24,76 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <stack>
 
-class BDD
+class mini_bddt
 {
 public:
-  inline BDD();
-  inline BDD(const BDD &x);
-  inline ~BDD();
+  inline mini_bddt();
+  inline mini_bddt(const mini_bddt &x);
+  inline ~mini_bddt();
 
   // Boolean operators on BDDs
-  BDD operator !() const;
-  BDD operator ^(const BDD &) const;
-  BDD operator ==(const BDD &) const;
-  BDD operator &(const BDD &) const;
-  BDD operator |(const BDD &) const;
+  mini_bddt operator !() const;
+  mini_bddt operator ^(const mini_bddt &) const;
+  mini_bddt operator ==(const mini_bddt &) const;
+  mini_bddt operator &(const mini_bddt &) const;
+  mini_bddt operator |(const mini_bddt &) const;
 
   // copy operator
-  inline BDD &operator=(const BDD &);
+  inline mini_bddt &operator=(const mini_bddt &);
 
   inline bool is_constant() const;
   inline bool is_true() const;
   inline bool is_false() const;
 
   inline unsigned var() const;
-  inline const BDD &low() const;
-  inline const BDD &high() const;
+  inline const mini_bddt &low() const;
+  inline const mini_bddt &high() const;
   inline unsigned node_number() const;
   inline void clear();
 
   bool is_initialized() const { return node!=0; }
 
   // internal
-  explicit inline BDD(class node *_node);
-  class node *node;
+  explicit inline mini_bddt(class mini_bdd_nodet *_node);
+  class mini_bdd_nodet *node;
 };
 
-class node
+class mini_bdd_nodet
 {
 public:
-  class mgr *mgr;
+  class mini_bdd_mgrt *mgr;
   unsigned var, node_number, reference_counter;
-  BDD low, high;
+  mini_bddt low, high;
 
-  inline node(
-    class mgr *_mgr,
+  inline mini_bdd_nodet(
+    class mini_bdd_mgrt *_mgr,
     unsigned _var, unsigned _node_number,
-    const BDD &_low, const BDD &_high);
+    const mini_bddt &_low, const mini_bddt &_high);
 
   inline void add_reference();
   void remove_reference();
 };
 
-class mgr
+class mini_bdd_mgrt
 {
 public:
-  mgr();
-  ~mgr();
+  mini_bdd_mgrt();
+  ~mini_bdd_mgrt();
 
-  BDD Var(const std::string &label);
+  mini_bddt Var(const std::string &label);
 
   void DumpDot(std::ostream &out, bool supress_zero=false) const;
   void DumpTikZ(std::ostream &out, bool supress_zero=false, bool node_numbers=true) const;
   void DumpTable(std::ostream &out) const;
 
-  inline const BDD &True() const;
-  inline const BDD &False() const;
+  inline const mini_bddt &True() const;
+  inline const mini_bddt &False() const;
 
-  friend class BDD;
-  friend class node;
+  friend class mini_bddt;
+  friend class mini_bdd_nodet;
 
   // create a node (consulting the reverse-map)
-  BDD mk(unsigned var, const BDD &low, const BDD &high);
+  mini_bddt mk(unsigned var, const mini_bddt &low, const mini_bddt &high);
 
   inline std::size_t number_of_nodes();
 
@@ -107,32 +107,32 @@ public:
   var_tablet var_table;
 
 protected:
-  typedef std::list<node> nodest;
+  typedef std::list<mini_bdd_nodet> nodest;
   nodest nodes;
-  BDD true_bdd, false_bdd;
+  mini_bddt true_bdd, false_bdd;
 
   // this is our reverse-map for nodes
   struct reverse_keyt
   {
     unsigned var, low, high;
     inline reverse_keyt(
-      unsigned _var, const BDD &_low, const BDD &_high);
+      unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
   };
 
   friend bool operator < (const reverse_keyt &x, const reverse_keyt &y);
 
-  typedef std::map<reverse_keyt, node *> reverse_mapt;
+  typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;
   reverse_mapt reverse_map;
 
-  typedef std::stack<node *> freet;
+  typedef std::stack<mini_bdd_nodet *> freet;
   freet free;
 };
 
-BDD restrict(const BDD &u, unsigned var, const bool value);
-BDD exists(const BDD &u, unsigned var);
-BDD substitute(const BDD &where, unsigned var, const BDD &by_what);
-std::string cubes(const BDD &u);
-bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment);
+mini_bddt restrict(const mini_bddt &u, unsigned var, const bool value);
+mini_bddt exists(const mini_bddt &u, unsigned var);
+mini_bddt substitute(const mini_bddt &where, unsigned var, const mini_bddt &by_what);
+std::string cubes(const mini_bddt &u);
+bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment);
 
 // inline functions
 #include "miniBDD.inc"

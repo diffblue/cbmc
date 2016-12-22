@@ -32,20 +32,18 @@ public:
   void from_expr(const exprt &expr);
   exprt as_expr() const;
 
-  typedef miniBDD::BDD BDDt;
-
 protected:
   const namespacet &ns;
-  miniBDD::mgr bdd_mgr;
-  BDDt root;
+  mini_bdd_mgrt bdd_mgr;
+  mini_bddt root;
 
-  typedef std::unordered_map<exprt, BDDt, irep_hash> expr_mapt;
+  typedef std::unordered_map<exprt, mini_bddt, irep_hash> expr_mapt;
   expr_mapt expr_map;
   typedef std::map<unsigned, exprt> node_mapt;
   node_mapt node_map;
 
-  BDDt from_expr_rec(const exprt &expr);
-  exprt as_expr(const BDDt &r) const;
+  mini_bddt from_expr_rec(const exprt &expr);
+  exprt as_expr(const mini_bddt &r) const;
 };
 
 #endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H

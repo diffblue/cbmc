@@ -13,12 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void test1()
 {
-  mgr mgr;
+  mini_bdd_mgrt mgr;
 
-  BDD x=mgr.Var("x");
-  BDD y=mgr.Var("y");
-  BDD z=mgr.Var("z");
-  BDD f=(x&y&z)|(!x&!y&z);
+  mini_bddt x=mgr.Var("x");
+  mini_bddt y=mgr.Var("y");
+  mini_bddt z=mgr.Var("z");
+  mini_bddt f=(x&y&z)|(!x&!y&z);
   y.clear();
   x.clear();
   z.clear();
@@ -29,14 +29,14 @@ void test1()
 
 void test2()
 {
-  mgr mgr;
+  mini_bdd_mgrt mgr;
 
-  BDD a=mgr.Var("a");
-  BDD b=mgr.Var("b");
-  BDD c=mgr.Var("c");
-  BDD d=mgr.Var("d");
+  mini_bddt a=mgr.Var("a");
+  mini_bddt b=mgr.Var("b");
+  mini_bddt c=mgr.Var("c");
+  mini_bddt d=mgr.Var("d");
 
-  BDD final=(a == b) & (c == d);
+  mini_bddt final=(a == b) & (c == d);
 
   a.clear();
   b.clear();
@@ -48,9 +48,9 @@ void test2()
 
 void test3()
 {
-  mgr mgr;
+  mini_bdd_mgrt mgr;
 
-  BDD final=mgr.Var("x") & mgr.Var("y");
+  mini_bddt final=mgr.Var("x") & mgr.Var("y");
 
   mgr.DumpDot(std::cout);
   //mgr.DumpTikZ(std::cout);
