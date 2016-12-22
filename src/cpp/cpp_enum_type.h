@@ -58,13 +58,13 @@ public:
   irep_idt generate_anon_tag() const;
 };
 
-extern inline const cpp_enum_typet &to_cpp_enum_type(const irept &irep)
+inline const cpp_enum_typet &to_cpp_enum_type(const irept &irep)
 {
   assert(irep.id()==ID_c_enum);
   return static_cast<const cpp_enum_typet &>(irep);
 }
 
-extern inline cpp_enum_typet &to_cpp_enum_type(irept &irep)
+inline cpp_enum_typet &to_cpp_enum_type(irept &irep)
 {
   assert(irep.id()==ID_c_enum);
   return static_cast<cpp_enum_typet &>(irep);

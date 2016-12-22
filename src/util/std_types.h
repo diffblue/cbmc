@@ -138,7 +138,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const symbol_typet &to_symbol_type(const typet &type)
+inline const symbol_typet &to_symbol_type(const typet &type)
 {
   assert(type.id()==ID_symbol);
   return static_cast<const symbol_typet &>(type);
@@ -147,7 +147,7 @@ extern inline const symbol_typet &to_symbol_type(const typet &type)
 /*! \copydoc to_symbol_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline symbol_typet &to_symbol_type(typet &type)
+inline symbol_typet &to_symbol_type(typet &type)
 {
   assert(type.id()==ID_symbol);
   return static_cast<symbol_typet &>(type);
@@ -273,7 +273,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const struct_union_typet &to_struct_union_type(const typet &type)
+inline const struct_union_typet &to_struct_union_type(const typet &type)
 {
   assert(type.id()==ID_struct ||
          type.id()==ID_union);
@@ -283,7 +283,7 @@ extern inline const struct_union_typet &to_struct_union_type(const typet &type)
 /*! \copydoc to_struct_union_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline struct_union_typet &to_struct_union_type(typet &type)
+inline struct_union_typet &to_struct_union_type(typet &type)
 {
   assert(type.id()==ID_struct ||
          type.id()==ID_union);
@@ -313,7 +313,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const struct_typet &to_struct_type(const typet &type)
+inline const struct_typet &to_struct_type(const typet &type)
 {
   assert(type.id()==ID_struct);
   return static_cast<const struct_typet &>(type);
@@ -322,7 +322,7 @@ extern inline const struct_typet &to_struct_type(const typet &type)
 /*! \copydoc to_struct_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline struct_typet &to_struct_type(typet &type)
+inline struct_typet &to_struct_type(typet &type)
 {
   assert(type.id()==ID_struct);
   return static_cast<struct_typet &>(type);
@@ -403,7 +403,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const class_typet &to_class_type(const typet &type)
+inline const class_typet &to_class_type(const typet &type)
 {
   assert(type.id()==ID_struct);
   return static_cast<const class_typet &>(type);
@@ -412,7 +412,7 @@ extern inline const class_typet &to_class_type(const typet &type)
 /*! \copydoc to_class_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline class_typet &to_class_type(typet &type)
+inline class_typet &to_class_type(typet &type)
 {
   assert(type.id()==ID_struct);
   return static_cast<class_typet &>(type);
@@ -438,7 +438,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const union_typet &to_union_type(const typet &type)
+inline const union_typet &to_union_type(const typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<const union_typet &>(type);
@@ -447,7 +447,7 @@ extern inline const union_typet &to_union_type(const typet &type)
 /*! \copydoc to_union_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline union_typet &to_union_type(typet &type)
+inline union_typet &to_union_type(typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<union_typet &>(type);
@@ -491,7 +491,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const tag_typet &to_tag_type(const typet &type)
+inline const tag_typet &to_tag_type(const typet &type)
 {
   assert(type.id()==ID_c_enum_tag ||
          type.id()==ID_struct_tag ||
@@ -502,7 +502,7 @@ extern inline const tag_typet &to_tag_type(const typet &type)
 /*! \copydoc to_tag_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline tag_typet &to_tag_type(typet &type)
+inline tag_typet &to_tag_type(typet &type)
 {
   assert(type.id()==ID_c_enum_tag ||
          type.id()==ID_struct_tag ||
@@ -532,7 +532,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const struct_tag_typet &to_struct_tag_type(const typet &type)
+inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 {
   assert(type.id()==ID_struct_tag);
   return static_cast<const struct_tag_typet &>(type);
@@ -541,7 +541,7 @@ extern inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 /*! \copydoc to_struct_tag_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline struct_tag_typet &to_struct_tag_type(typet &type)
+inline struct_tag_typet &to_struct_tag_type(typet &type)
 {
   assert(type.id()==ID_struct_tag);
   return static_cast<struct_tag_typet &>(type);
@@ -569,7 +569,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const union_tag_typet &to_union_tag_type(const typet &type)
+inline const union_tag_typet &to_union_tag_type(const typet &type)
 {
   assert(type.id()==ID_union_tag);
   return static_cast<const union_tag_typet &>(type);
@@ -578,7 +578,7 @@ extern inline const union_tag_typet &to_union_tag_type(const typet &type)
 /*! \copydoc to_union_tag_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline union_tag_typet &to_union_tag_type(typet &type)
+inline union_tag_typet &to_union_tag_type(typet &type)
 {
   assert(type.id()==ID_union_tag);
   return static_cast<union_tag_typet &>(type);
@@ -615,7 +615,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const enumeration_typet &to_enumeration_type(const typet &type)
+inline const enumeration_typet &to_enumeration_type(const typet &type)
 {
   assert(type.id()==ID_enumeration);
   return static_cast<const enumeration_typet &>(type);
@@ -624,7 +624,7 @@ extern inline const enumeration_typet &to_enumeration_type(const typet &type)
 /*! \copydoc to_enumeration_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline enumeration_typet &to_enumeration_type(typet &type)
+inline enumeration_typet &to_enumeration_type(typet &type)
 {
   assert(type.id()==ID_enumeration);
   return static_cast<enumeration_typet &>(type);
@@ -669,7 +669,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const c_enum_typet &to_c_enum_type(const typet &type)
+inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
   assert(type.id()==ID_c_enum);
   return static_cast<const c_enum_typet &>(type);
@@ -678,7 +678,7 @@ extern inline const c_enum_typet &to_c_enum_type(const typet &type)
 /*! \copydoc to_c_enum_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline c_enum_typet &to_c_enum_type(typet &type)
+inline c_enum_typet &to_c_enum_type(typet &type)
 {
   assert(type.id()==ID_c_enum);
   return static_cast<c_enum_typet &>(type);
@@ -706,7 +706,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
+inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 {
   assert(type.id()==ID_c_enum_tag);
   return static_cast<const c_enum_tag_typet &>(type);
@@ -715,7 +715,7 @@ extern inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 /*! \copydoc to_enum_tag_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
+inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
 {
   assert(type.id()==ID_c_enum_tag);
   return static_cast<c_enum_tag_typet &>(type);
@@ -873,7 +873,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const code_typet &to_code_type(const typet &type)
+inline const code_typet &to_code_type(const typet &type)
 {
   assert(type.id()==ID_code);
   return static_cast<const code_typet &>(type);
@@ -882,7 +882,7 @@ extern inline const code_typet &to_code_type(const typet &type)
 /*! \copydoc to_code_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline code_typet &to_code_type(typet &type)
+inline code_typet &to_code_type(typet &type)
 {
   assert(type.id()==ID_code);
   return static_cast<code_typet &>(type);
@@ -935,7 +935,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const array_typet &to_array_type(const typet &type)
+inline const array_typet &to_array_type(const typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<const array_typet &>(type);
@@ -944,7 +944,7 @@ extern inline const array_typet &to_array_type(const typet &type)
 /*! \copydoc to_array_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline array_typet &to_array_type(typet &type)
+inline array_typet &to_array_type(typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<array_typet &>(type);
@@ -975,7 +975,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
+inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<const incomplete_array_typet &>(type);
@@ -984,7 +984,7 @@ extern inline const incomplete_array_typet &to_incomplete_array_type(const typet
 /*! \copydoc to_incomplete_array_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline incomplete_array_typet &to_incomplete_array_type(typet &type)
+inline incomplete_array_typet &to_incomplete_array_type(typet &type)
 {
   assert(type.id()==ID_array);
   return static_cast<incomplete_array_typet &>(type);
@@ -1361,7 +1361,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const pointer_typet &to_pointer_type(const typet &type)
+inline const pointer_typet &to_pointer_type(const typet &type)
 {
   assert(type.id()==ID_pointer);
   return static_cast<const pointer_typet &>(type);
@@ -1370,7 +1370,7 @@ extern inline const pointer_typet &to_pointer_type(const typet &type)
 /*! \copydoc to_pointer_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline pointer_typet &to_pointer_type(typet &type)
+inline pointer_typet &to_pointer_type(typet &type)
 {
   assert(type.id()==ID_pointer);
   return static_cast<pointer_typet &>(type);
@@ -1432,7 +1432,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const c_bool_typet &to_c_bool_type(const typet &type)
+inline const c_bool_typet &to_c_bool_type(const typet &type)
 {
   assert(type.id()==ID_c_bool);
   return static_cast<const c_bool_typet &>(type);
@@ -1441,7 +1441,7 @@ extern inline const c_bool_typet &to_c_bool_type(const typet &type)
 /*! \copydoc to_c_bool_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline c_bool_typet &to_c_bool_type(typet &type)
+inline c_bool_typet &to_c_bool_type(typet &type)
 {
   assert(type.id()==ID_c_bool);
   return static_cast<c_bool_typet &>(type);
@@ -1548,7 +1548,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const vector_typet &to_vector_type(const typet &type)
+inline const vector_typet &to_vector_type(const typet &type)
 {
   assert(type.id()==ID_vector);
   return static_cast<const vector_typet &>(type);
@@ -1557,7 +1557,7 @@ extern inline const vector_typet &to_vector_type(const typet &type)
 /*! \copydoc to_vector_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline vector_typet &to_vector_type(typet &type)
+inline vector_typet &to_vector_type(typet &type)
 {
   assert(type.id()==ID_vector);
   return static_cast<vector_typet &>(type);
@@ -1588,7 +1588,7 @@ public:
  *
  * \ingroup gr_std_types
 */
-extern inline const complex_typet &to_complex_type(const typet &type)
+inline const complex_typet &to_complex_type(const typet &type)
 {
   assert(type.id()==ID_complex);
   return static_cast<const complex_typet &>(type);
@@ -1597,7 +1597,7 @@ extern inline const complex_typet &to_complex_type(const typet &type)
 /*! \copydoc to_complex_type(const typet &)
  * \ingroup gr_std_types
 */
-extern inline complex_typet &to_complex_type(typet &type)
+inline complex_typet &to_complex_type(typet &type)
 {
   assert(type.id()==ID_complex);
   return static_cast<complex_typet &>(type);

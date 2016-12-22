@@ -150,7 +150,7 @@ protected:
     exprt &sticky);
 };
 
-static inline exprt float_bv(const exprt &src)
+inline exprt float_bv(const exprt &src)
 {
   return float_bvt()(src);
 }

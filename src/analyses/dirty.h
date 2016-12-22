@@ -60,8 +60,9 @@ protected:
   void find_dirty_address_of(const exprt &expr);
 };
 
-static inline std::ostream &operator << (
-  std::ostream &out, const dirtyt &dirty)
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const dirtyt &dirty)
 {
   dirty.output(out);
   return out;

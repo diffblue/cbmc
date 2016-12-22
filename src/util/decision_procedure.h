@@ -59,7 +59,7 @@ protected:
   const namespacet &ns;
 };
 
-static inline decision_proceduret & operator << (
+inline decision_proceduret & operator<<(
   decision_proceduret &dest,
   const exprt &src)
 {

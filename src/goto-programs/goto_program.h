@@ -51,8 +51,9 @@ public:
       it=(program).instructions.begin(); \
       it!=(program).instructions.end(); it++)
 
-extern inline bool operator<(const goto_programt::const_targett i1,
-                             const goto_programt::const_targett i2)
+inline bool operator<(
+  const goto_programt::const_targett i1,
+  const goto_programt::const_targett i2)
 {
   return order_const_target<codet, exprt>(i1, i2);
 }

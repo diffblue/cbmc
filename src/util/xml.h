@@ -122,7 +122,7 @@ protected:
     unsigned indent);
 };
 
-extern inline std::ostream& operator <<(
+inline std::ostream& operator<<(
   std::ostream &out,
   const xmlt &xml)
 {

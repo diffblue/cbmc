@@ -121,7 +121,7 @@ public:
   std::string value;
 };
 
-static inline std::ostream & operator << (std::ostream &out, const jsont &src)
+inline std::ostream & operator<<(std::ostream &out, const jsont &src)
 {
   src.output(out);
   return out;

@@ -42,14 +42,14 @@ public:
   }
 };
 
-extern inline jsil_builtin_code_typet &to_jsil_builtin_code_type(
+inline jsil_builtin_code_typet &to_jsil_builtin_code_type(
   code_typet &code)
 {
   assert(code.get_bool("jsil_builtin_proceduret"));
   return static_cast<jsil_builtin_code_typet &>(code);
 }
 
-extern inline bool is_jsil_builtin_code_type(const typet &type)
+inline bool is_jsil_builtin_code_type(const typet &type)
 {
   return type.id()==ID_code &&
          type.get_bool("jsil_builtin_proceduret");
@@ -65,14 +65,14 @@ public:
   }
 };
 
-extern inline jsil_spec_code_typet &to_jsil_spec_code_type(
+inline jsil_spec_code_typet &to_jsil_spec_code_type(
   code_typet &code)
 {
   assert(code.get_bool("jsil_spec_proceduret"));
   return static_cast<jsil_spec_code_typet &>(code);
 }
 
-extern inline bool is_jsil_spec_code_type(const typet &type)
+inline bool is_jsil_spec_code_type(const typet &type)
 {
   return type.id()==ID_code &&
          type.get_bool("jsil_spec_proceduret");
@@ -97,14 +97,13 @@ public:
   const typet& to_type() const;
 };
 
-extern inline jsil_union_typet &to_jsil_union_type(typet &type)
+inline jsil_union_typet &to_jsil_union_type(typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<jsil_union_typet &>(type);
 }
 
-extern inline const jsil_union_typet &to_jsil_union_type(
-  const typet &type)
+inline const jsil_union_typet &to_jsil_union_type(const typet &type)
 {
   assert(type.id()==ID_union);
   return static_cast<const jsil_union_typet &>(type);

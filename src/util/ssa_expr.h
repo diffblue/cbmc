@@ -146,7 +146,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
+inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
   assert(expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol) &&
@@ -157,7 +157,7 @@ extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 /*! \copydoc to_ssa_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline ssa_exprt &to_ssa_expr(exprt &expr)
+inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
   assert(expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol) &&
@@ -165,7 +165,7 @@ extern inline ssa_exprt &to_ssa_expr(exprt &expr)
   return static_cast<ssa_exprt &>(expr);
 }
 
-extern inline bool is_ssa_expr(const exprt &expr)
+inline bool is_ssa_expr(const exprt &expr)
 {
   return expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol);

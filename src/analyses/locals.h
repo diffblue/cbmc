@@ -40,7 +40,7 @@ protected:
   void build(const goto_functiont &goto_function);
 };
 
-static inline std::ostream &operator << (
+inline std::ostream &operator<<(
   std::ostream &out, const localst &locals)
 {
   locals.output(out);

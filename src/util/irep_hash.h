@@ -139,7 +139,7 @@ Function: basic_hash_finalize
 
 \*******************************************************************/
 
-static inline std::size_t basic_hash_finalize(
+inline std::size_t basic_hash_finalize(
   std::size_t h1,
   std::size_t len)
 {

@@ -53,13 +53,13 @@ public:
   void build(irept &src);
 };
 
-extern inline ansi_c_declaratort &to_ansi_c_declarator(exprt &expr)
+inline ansi_c_declaratort &to_ansi_c_declarator(exprt &expr)
 {
   assert(expr.id()==ID_declarator);
   return static_cast<ansi_c_declaratort &>(expr);
 }
 
-extern inline const ansi_c_declaratort &to_ansi_c_declarator(const exprt &expr)
+inline const ansi_c_declaratort &to_ansi_c_declarator(const exprt &expr)
 {
   assert(expr.id()==ID_declarator);
   return static_cast<const ansi_c_declaratort &>(expr);
@@ -232,13 +232,13 @@ public:
   }
 };
 
-extern inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
+inline ansi_c_declarationt &to_ansi_c_declaration(exprt &expr)
 {
   assert(expr.id()==ID_declaration);
   return static_cast<ansi_c_declarationt &>(expr);
 }
 
-extern inline const ansi_c_declarationt &to_ansi_c_declaration(const exprt &expr)
+inline const ansi_c_declarationt &to_ansi_c_declaration(const exprt &expr)
 {
   assert(expr.id()==ID_declaration);
   return static_cast<const ansi_c_declarationt &>(expr);

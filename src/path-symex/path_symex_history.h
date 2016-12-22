@@ -121,7 +121,7 @@ public:
 };
 
 // converts the full history
-static inline decision_proceduret &operator << (
+inline decision_proceduret &operator<<(
   decision_proceduret &dest,
   path_symex_step_reft src)
 {

@@ -45,13 +45,13 @@ public:
   class code_blockt &make_block();
 };
 
-static inline const codet &to_code(const exprt &expr)
+inline const codet &to_code(const exprt &expr)
 {
   assert(expr.id()==ID_code);
   return static_cast<const codet &>(expr);
 }
 
-static inline codet &to_code(exprt &expr)
+inline codet &to_code(exprt &expr)
 {
   assert(expr.id()==ID_code);
   return static_cast<codet &>(expr);
@@ -114,13 +114,13 @@ public:
   }
 };
 
-static inline const code_blockt &to_code_block(const codet &code)
+inline const code_blockt &to_code_block(const codet &code)
 {
   assert(code.get_statement()==ID_block);
   return static_cast<const code_blockt &>(code);
 }
 
-static inline code_blockt &to_code_block(codet &code)
+inline code_blockt &to_code_block(codet &code)
 {
   assert(code.get_statement()==ID_block);
   return static_cast<code_blockt &>(code);
@@ -172,13 +172,13 @@ public:
   }
 };
 
-static inline const code_assignt &to_code_assign(const codet &code)
+inline const code_assignt &to_code_assign(const codet &code)
 {
   assert(code.get_statement()==ID_assign && code.operands().size()==2);
   return static_cast<const code_assignt &>(code);
 }
 
-static inline code_assignt &to_code_assign(codet &code)
+inline code_assignt &to_code_assign(codet &code)
 {
   assert(code.get_statement()==ID_assign && code.operands().size()==2);
   return static_cast<code_assignt &>(code);
@@ -292,13 +292,13 @@ public:
   }
 };
 
-static inline const code_assumet &to_code_assume(const codet &code)
+inline const code_assumet &to_code_assume(const codet &code)
 {
   assert(code.get_statement()==ID_assume);
   return static_cast<const code_assumet &>(code);
 }
 
-static inline code_assumet &to_code_assume(codet &code)
+inline code_assumet &to_code_assume(codet &code)
 {
   assert(code.get_statement()==ID_assume);
   return static_cast<code_assumet &>(code);
@@ -330,13 +330,13 @@ public:
   }
 };
 
-static inline const code_assertt &to_code_assert(const codet &code)
+inline const code_assertt &to_code_assert(const codet &code)
 {
   assert(code.get_statement()==ID_assert);
   return static_cast<const code_assertt &>(code);
 }
 
-static inline code_assertt &to_code_assert(codet &code)
+inline code_assertt &to_code_assert(codet &code)
 {
   assert(code.get_statement()==ID_assert);
   return static_cast<code_assertt &>(code);
@@ -390,14 +390,14 @@ public:
   }
 };
 
-static inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
+inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
 {
   assert(code.get_statement()==ID_ifthenelse &&
          code.operands().size()==3);
   return static_cast<const code_ifthenelset &>(code);
 }
 
-static inline code_ifthenelset &to_code_ifthenelse(codet &code)
+inline code_ifthenelset &to_code_ifthenelse(codet &code)
 {
   assert(code.get_statement()==ID_ifthenelse &&
          code.operands().size()==3);
@@ -435,14 +435,14 @@ public:
   }
 };
 
-static inline const code_switcht &to_code_switch(const codet &code)
+inline const code_switcht &to_code_switch(const codet &code)
 {
   assert(code.get_statement()==ID_switch &&
          code.operands().size()==2);
   return static_cast<const code_switcht &>(code);
 }
 
-static inline code_switcht &to_code_switch(codet &code)
+inline code_switcht &to_code_switch(codet &code)
 {
   assert(code.get_statement()==ID_switch &&
          code.operands().size()==2);
@@ -480,14 +480,14 @@ public:
   }
 };
 
-static inline const code_whilet &to_code_while(const codet &code)
+inline const code_whilet &to_code_while(const codet &code)
 {
   assert(code.get_statement()==ID_while &&
          code.operands().size()==2);
   return static_cast<const code_whilet &>(code);
 }
 
-static inline code_whilet &to_code_while(codet &code)
+inline code_whilet &to_code_while(codet &code)
 {
   assert(code.get_statement()==ID_while &&
          code.operands().size()==2);
@@ -525,14 +525,14 @@ public:
   }
 };
 
-static inline const code_dowhilet &to_code_dowhile(const codet &code)
+inline const code_dowhilet &to_code_dowhile(const codet &code)
 {
   assert(code.get_statement()==ID_dowhile &&
          code.operands().size()==2);
   return static_cast<const code_dowhilet &>(code);
 }
 
-static inline code_dowhilet &to_code_dowhile(codet &code)
+inline code_dowhilet &to_code_dowhile(codet &code)
 {
   assert(code.get_statement()==ID_dowhile &&
          code.operands().size()==2);
@@ -591,14 +591,14 @@ public:
   }
 };
 
-static inline const code_fort &to_code_for(const codet &code)
+inline const code_fort &to_code_for(const codet &code)
 {
   assert(code.get_statement()==ID_for &&
          code.operands().size()==4);
   return static_cast<const code_fort &>(code);
 }
 
-static inline code_fort &to_code_for(codet &code)
+inline code_fort &to_code_for(codet &code)
 {
   assert(code.get_statement()==ID_for &&
          code.operands().size()==4);
@@ -630,14 +630,14 @@ public:
   }
 };
 
-static inline const code_gotot &to_code_goto(const codet &code)
+inline const code_gotot &to_code_goto(const codet &code)
 {
   assert(code.get_statement()==ID_goto &&
          code.operands().empty());
   return static_cast<const code_gotot &>(code);
 }
 
-static inline code_gotot &to_code_goto(codet &code)
+inline code_gotot &to_code_goto(codet &code)
 {
   assert(code.get_statement()==ID_goto &&
          code.operands().empty());
@@ -694,13 +694,13 @@ public:
   }
 };
 
-static inline const code_function_callt &to_code_function_call(const codet &code)
+inline const code_function_callt &to_code_function_call(const codet &code)
 {
   assert(code.get_statement()==ID_function_call);
   return static_cast<const code_function_callt &>(code);
 }
 
-static inline code_function_callt &to_code_function_call(codet &code)
+inline code_function_callt &to_code_function_call(codet &code)
 {
   assert(code.get_statement()==ID_function_call);
   return static_cast<code_function_callt &>(code);
@@ -740,13 +740,13 @@ public:
   }
 };
 
-static inline const code_returnt &to_code_return(const codet &code)
+inline const code_returnt &to_code_return(const codet &code)
 {
   assert(code.get_statement()==ID_return);
   return static_cast<const code_returnt &>(code);
 }
 
-static inline code_returnt &to_code_return(codet &code)
+inline code_returnt &to_code_return(codet &code)
 {
   assert(code.get_statement()==ID_return);
   return static_cast<code_returnt &>(code);
@@ -797,13 +797,13 @@ public:
   }
 };
 
-static inline const code_labelt &to_code_label(const codet &code)
+inline const code_labelt &to_code_label(const codet &code)
 {
   assert(code.get_statement()==ID_label && code.operands().size()==1);
   return static_cast<const code_labelt &>(code);
 }
 
-static inline code_labelt &to_code_label(codet &code)
+inline code_labelt &to_code_label(codet &code)
 {
   assert(code.get_statement()==ID_label && code.operands().size()==1);
   return static_cast<code_labelt &>(code);
@@ -856,13 +856,13 @@ public:
   }
 };
 
-static inline const code_switch_caset &to_code_switch_case(const codet &code)
+inline const code_switch_caset &to_code_switch_case(const codet &code)
 {
   assert(code.get_statement()==ID_switch_case && code.operands().size()==2);
   return static_cast<const code_switch_caset &>(code);
 }
 
-static inline code_switch_caset &to_code_switch_case(codet &code)
+inline code_switch_caset &to_code_switch_case(codet &code)
 {
   assert(code.get_statement()==ID_switch_case && code.operands().size()==2);
   return static_cast<code_switch_caset &>(code);
@@ -878,13 +878,13 @@ public:
   }
 };
 
-static inline const code_breakt &to_code_break(const codet &code)
+inline const code_breakt &to_code_break(const codet &code)
 {
   assert(code.get_statement()==ID_break);
   return static_cast<const code_breakt &>(code);
 }
 
-static inline code_breakt &to_code_break(codet &code)
+inline code_breakt &to_code_break(codet &code)
 {
   assert(code.get_statement()==ID_break);
   return static_cast<code_breakt &>(code);
@@ -900,13 +900,13 @@ public:
   }
 };
 
-static inline const code_continuet &to_code_continue(const codet &code)
+inline const code_continuet &to_code_continue(const codet &code)
 {
   assert(code.get_statement()==ID_continue);
   return static_cast<const code_continuet &>(code);
 }
 
-static inline code_continuet &to_code_continue(codet &code)
+inline code_continuet &to_code_continue(codet &code)
 {
   assert(code.get_statement()==ID_continue);
   return static_cast<code_continuet &>(code);
@@ -937,13 +937,13 @@ public:
   }
 };
 
-static inline code_asmt &to_code_asm(codet &code)
+inline code_asmt &to_code_asm(codet &code)
 {
   assert(code.get_statement()==ID_asm);
   return static_cast<code_asmt &>(code);
 }
 
-static inline const code_asmt &to_code_asm(const codet &code)
+inline const code_asmt &to_code_asm(const codet &code)
 {
   assert(code.get_statement()==ID_asm);
   return static_cast<const code_asmt &>(code);
@@ -1108,14 +1108,14 @@ public:
   }
 };
 
-static inline side_effect_expr_throwt &to_side_effect_expr_throw(exprt &expr)
+inline side_effect_expr_throwt &to_side_effect_expr_throw(exprt &expr)
 {
   assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<side_effect_expr_throwt &>(expr);
 }
 
-static inline const side_effect_expr_throwt &to_side_effect_expr_throw(const exprt &expr)
+inline const side_effect_expr_throwt &to_side_effect_expr_throw(const exprt &expr)
 {
   assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_throw);
@@ -1174,13 +1174,13 @@ public:
   }
 };
 
-static inline const code_try_catcht &to_code_try_catch(const codet &code)
+inline const code_try_catcht &to_code_try_catch(const codet &code)
 {
   assert(code.get_statement()==ID_try_catch && code.operands().size()>=3);
   return static_cast<const code_try_catcht &>(code);
 }
 
-static inline code_try_catcht &to_code_try_catch(codet &code)
+inline code_try_catcht &to_code_try_catch(codet &code)
 {
   assert(code.get_statement()==ID_try_catch && code.operands().size()>=3);
   return static_cast<code_try_catcht &>(code);

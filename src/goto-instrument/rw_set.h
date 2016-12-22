@@ -91,7 +91,7 @@ protected:
   const namespacet &ns;
 };
 
-extern inline std::ostream & operator << (
+inline std::ostream &operator<<(
   std::ostream &out, const rw_set_baset &rw_set)
 {
   rw_set.output(out);

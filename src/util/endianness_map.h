@@ -61,7 +61,7 @@ protected:
   void build_big_endian(const typet &type);
 };
 
-extern inline std::ostream &operator << (
+inline std::ostream &operator<<(
   std::ostream &out,
   const endianness_mapt &m)
 {

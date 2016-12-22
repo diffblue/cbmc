@@ -43,7 +43,7 @@ typedef std::string irep_namet;
 typedef string_hash irep_id_hash;
 #endif
 
-extern inline const std::string &id2string(const irep_idt &d)
+inline const std::string &id2string(const irep_idt &d)
 {
   #ifdef USE_DSTRING
   return as_string(d);
@@ -52,7 +52,7 @@ extern inline const std::string &id2string(const irep_idt &d)
   #endif
 }
 
-extern inline const std::string &name2string(const irep_namet &n)
+inline const std::string &name2string(const irep_namet &n)
 {
   #ifdef USE_DSTRING
   return as_string(n);

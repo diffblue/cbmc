@@ -301,7 +301,7 @@ protected:
   void merge_ireps(SSA_stept &SSA_step);
 };
 
-extern inline bool operator<(
+inline bool operator<(
   const symex_target_equationt::SSA_stepst::const_iterator a,
   const symex_target_equationt::SSA_stepst::const_iterator b)
 {

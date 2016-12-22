@@ -82,7 +82,7 @@ private:
     const typet &type);
 };
 
-static inline exprt dereference(const exprt &pointer, const namespacet &ns)
+inline exprt dereference(const exprt &pointer, const namespacet &ns)
 {
   dereferencet dereference_object(ns);
   return dereference_object(pointer);

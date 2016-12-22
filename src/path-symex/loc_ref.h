@@ -58,24 +58,24 @@ public:
     decrease();
     return *this;
   }
+
+  bool operator<(const loc_reft other) const
+  {
+    return loc_number<other.loc_number;
+  }
+
+  bool operator!=(const loc_reft other) const
+  {
+    return loc_number!=other.loc_number;
+  }
+
+  bool operator==(const loc_reft other) const
+  {
+    return loc_number==other.loc_number;
+  }
 };
 
-static inline bool operator < (const loc_reft l1, const loc_reft l2)
-{
-  return l1.loc_number < l2.loc_number;
-}
-
-static inline bool operator != (const loc_reft l1, const loc_reft l2)
-{
-  return l1.loc_number != l2.loc_number;
-}
-
-static inline bool operator == (const loc_reft l1, const loc_reft l2)
-{
-  return l1.loc_number == l2.loc_number;
-}
-
-static inline std::ostream &operator << (std::ostream &out, loc_reft l)
+inline std::ostream &operator<<(std::ostream &out, const loc_reft l)
 {
   if(l.is_nil())
     return out << "nil";
