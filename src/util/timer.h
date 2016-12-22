@@ -27,27 +27,27 @@ public:
   virtual void stop();
   virtual void clear();
 
-  virtual time_periodt total_time()
+  virtual time_periodt total_time() const
   {
     return _total_time;
   }
 
-  virtual fine_timet latest_time()
+  virtual fine_timet latest_time() const
   {
     return _latest_time;
   }
 
-  virtual long number_starts()
+  virtual long number_starts() const
   {
     return nr_starts;
   }
 
-  std::string output_total_time()
+  std::string output_total_time() const
   {
     return _total_time.as_string();
   }
 
-  std::string output_latest_time()
+  std::string output_latest_time() const
   {
     return _latest_time.as_string();
   }
