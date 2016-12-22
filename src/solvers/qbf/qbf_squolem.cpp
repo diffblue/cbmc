@@ -21,7 +21,8 @@ Function: qbf_squolemt::qbf_squolemt
 
 \*******************************************************************/
 
-qbf_squolemt::qbf_squolemt() : early_decision(false)
+qbf_squolemt::qbf_squolemt():
+  early_decision(false)
 {
 }
 
@@ -98,7 +99,8 @@ propt::resultt qbf_squolemt::prop_solve()
     messaget::status() << msg << messaget::eom;
   }
 
-  if(early_decision) return P_UNSATISFIABLE;
+  if(early_decision)
+    return P_UNSATISFIABLE;
 
 //  squolem.options.set_showStatus(true);
   squolem.options.set_freeOnExit(true);
@@ -108,7 +110,7 @@ propt::resultt qbf_squolemt::prop_solve()
   squolem.options.set_saveDebugFile(true);
 
   squolem.endOfOriginals();
-  bool result = squolem.decide();
+  bool result=squolem.decide();
 
   if(result)
   {
@@ -138,7 +140,8 @@ Function: qbf_squolemt::lcnf
 
 void qbf_squolemt::lcnf(const bvt &bv)
 {
-  if(early_decision) return; // we don't need no more...
+  if(early_decision)
+    return; // we don't need no more...
 
   bvt new_bv;
 
@@ -158,7 +161,7 @@ void qbf_squolemt::lcnf(const bvt &bv)
     buffer[i]=new_bv[i].dimacs();
     i++;
   }
-  while (i<new_bv.size());
+  while(i<new_bv.size());
 
   if(!squolem.addClause(buffer))
     early_decision=true;
@@ -178,8 +181,9 @@ Function: qbf_squolemt::add_quantifier
 
 void qbf_squolemt::add_quantifier(const quantifiert &quantifier)
 {
-  squolem.quantifyVariableInner(quantifier.var_no,
-                                quantifier.type==quantifiert::UNIVERSAL);
+  squolem.quantifyVariableInner(
+    quantifier.var_no,
+    quantifier.type==quantifiert::UNIVERSAL);
 
   qdimacs_cnft::add_quantifier(quantifier); // necessary?
 }

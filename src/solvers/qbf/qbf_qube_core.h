@@ -11,7 +11,7 @@ Author: CM Wintersteiger
 
 #include "qdimacs_core.h"
 
-class qbf_qube_coret : public qdimacs_coret
+class qbf_qube_coret:public qdimacs_coret
 {
 protected:
   std::string qbf_tmp_file;
@@ -32,7 +32,7 @@ public:
   {
     unsigned v=a.var_no();
 
-    assignmentt::const_iterator fit = assignment.find(v);
+    assignmentt::const_iterator fit=assignment.find(v);
 
     if(fit!=assignment.end())
       return a.sign()?tvt(!fit->second) : tvt(fit->second);
@@ -50,7 +50,7 @@ public:
 
   virtual const exprt f_get(literalt l)
   {
-    throw "Qube does not support full certificates.";
+    throw "qube does not support full certificates.";
   }
 };
 

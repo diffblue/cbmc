@@ -9,8 +9,6 @@ Author: CM Wintersteiger
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
-//#include <solvers/flattening/boolbv_width.h>
-
 #include "qdimacs_core.h"
 
 /*******************************************************************\
@@ -56,7 +54,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
       std::string value_string;
       value_string.resize(width, '0');
 
-      if(it->second.size() == width) // all bits extracted from this one!
+      if(it->second.size()==width) // all bits extracted from this one!
       {
         const irep_idt &ident=it->first.get(ID_identifier);
         const exprt::operandst &old_operands=expr.operands();
@@ -74,10 +72,10 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
               const exprt &val_expr=oit->op1();
               mp_integer value;
               to_integer(val_expr, value);
-              value_string[value.to_ulong()] = '1';
+              value_string[value.to_ulong()]='1';
 
               #if 0
-              std::cout << "[" << value << "] = 1" << std::endl;
+              std::cout << "[" << value << "]=1" << std::endl;
               #endif
 
               continue;
@@ -105,7 +103,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
         std::cout << "FINAL: " << value_string << std::endl;
         #endif
 
-        expr.operands() = new_operands;
+        expr.operands()=new_operands;
       }
       #endif
     }

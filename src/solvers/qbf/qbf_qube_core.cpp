@@ -83,10 +83,9 @@ propt::resultt qbf_qube_coret::prop_solve()
     return P_SATISFIABLE;
 
   {
-    messaget::status() <<
-      "QuBE: " <<
-      no_variables() << " variables, " <<
-      no_clauses() << " clauses" << eom;
+    messaget::status() << "QuBE: "
+      << no_variables() << " variables, "
+      << no_clauses() << " clauses" << eom;
   }
 
   std::string result_tmp_file="qube.out";
@@ -102,9 +101,9 @@ propt::resultt qbf_qube_coret::prop_solve()
   std::string options="";
 
   // solve it
-  int res=system(("QuBE " + options + " " + qbf_tmp_file +
-          " > "+result_tmp_file).c_str());
-  assert(0 == res);
+  int res=system((
+    "QuBE "+options+" "+qbf_tmp_file+" > "+result_tmp_file).c_str());
+  assert(0==res);
 
   bool result=false;
 
@@ -126,9 +125,9 @@ propt::resultt qbf_qube_coret::prop_solve()
       {
         mp_integer b(line.substr(2).c_str());
         if(b<0)
-          assignment[integer2unsigned(b.negate())] = false;
+          assignment[integer2unsigned(b.negate())]=false;
         else
-          assignment[integer2unsigned(b)] = true;
+          assignment[integer2unsigned(b)]=true;
       }
       else if(line=="s cnf 1")
       {
@@ -180,7 +179,7 @@ Function: qbf_qube_coret::is_in_core
 
 bool qbf_qube_coret::is_in_core(literalt l) const
 {
-  throw ("Not supported");
+  throw "not supported";
 }
 
 /*******************************************************************\
@@ -197,5 +196,5 @@ Function: qbf_qube_coret::m_get
 
 qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt a) const
 {
-  throw ("not supported");
+  throw "not supported";
 }

@@ -16,7 +16,7 @@ Author: CM Wintersteiger
 class qbf_squolem_coret:public qdimacs_coret
 {
 protected:
-  Squolem2* squolem;
+  Squolem2 *squolem;
   bool early_decision;
 
 public:

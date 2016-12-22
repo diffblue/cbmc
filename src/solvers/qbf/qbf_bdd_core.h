@@ -14,13 +14,13 @@ Author: CM Wintersteiger
 
 #include "qdimacs_core.h"
 
-class Cudd;
-class BDD;
+class Cudd; // NOLINT(*)
+class BDD; // NOLINT(*)
 
-class qbf_bdd_certificatet : public qdimacs_coret
+class qbf_bdd_certificatet:public qdimacs_coret
 {
 protected:
-  Cudd* bdd_manager;
+  Cudd *bdd_manager;
 
   typedef std::vector<BDD*> model_bddst;
   model_bddst model_bdds;

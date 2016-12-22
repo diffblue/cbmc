@@ -110,14 +110,10 @@ propt::resultt qbf_quantort::prop_solve()
     write_qdimacs_cnf(out);
   }
 
-  //std::string options=" --equivalences=0";
-  std::string options="";
-
   // solve it
-  int res=system(("quantor "+qbf_tmp_file+
-         options+
-         " -o "+result_tmp_file).c_str());
-  assert(0 == res);
+  int res=system((
+    "quantor "+qbf_tmp_file+" -o "+result_tmp_file).c_str());
+  assert(0==res);
 
   bool result=false;
 
