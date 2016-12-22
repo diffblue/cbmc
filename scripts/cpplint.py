@@ -3099,12 +3099,19 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
     starting_func = False
     # Look for declaration function_name( but allowing for *, & being attached to the function name
     # but not being considered part of it
-    regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>\w(\w|::)*)\('
+    regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(\w(\w|::)*))\('#
+    operator_regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(|operator\(.*\)|operator.*))\('
+    operator_match = Match(operator_regexp, line)
     match_result = Match(regexp, line)
-    if match_result:
+    function_name = ""
+    if operator_match:
+        function_name = operator_match.group('fnc_name')
+    elif match_result:
+      function_name = match_result.group('fnc_name')
+
+    if operator_match or match_result:
       # If the name is all caps and underscores, figure it's a macro and
       # ignore it, unless it's TEST or TEST_F.
-      function_name = match_result.group('fnc_name')
       if function_name == 'TEST' or function_name == 'TEST_F' or (
         not Match(r'[A-Z_]+$', function_name)):
         starting_func = True
@@ -3156,6 +3163,8 @@ def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, e
       error - function to report errors with
 
     """
+
+    function_name = re.escape(function_name)
 
     header_top_regex = r'^/\*{67}\\$'
     header_bottom_regex = r'^\\\*{67}/$'
