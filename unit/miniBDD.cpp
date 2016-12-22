@@ -23,7 +23,7 @@ void test1()
   x.clear();
   z.clear();
 
-  //mgr.DumpDot(std::cout);
+  // mgr.DumpDot(std::cout);
   mgr.DumpTikZ(std::cout);
 }
 
@@ -36,7 +36,7 @@ void test2()
   mini_bddt c=mgr.Var("c");
   mini_bddt d=mgr.Var("d");
 
-  mini_bddt final=(a == b) & (c == d);
+  mini_bddt final=(a==b)&(c==d);
 
   a.clear();
   b.clear();
@@ -50,11 +50,13 @@ void test3()
 {
   mini_bdd_mgrt mgr;
 
-  mini_bddt final=mgr.Var("x") & mgr.Var("y");
+  mini_bddt final=mgr.Var("x")&mgr.Var("y");
 
   mgr.DumpDot(std::cout);
-  //mgr.DumpTikZ(std::cout);
-  //mgr.DumpTable(std::cout);
+  #if 0
+  mgr.DumpTikZ(std::cout);
+  mgr.DumpTable(std::cout);
+  #endif
 }
 
 #include <langapi/language_util.h>

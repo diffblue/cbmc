@@ -32,11 +32,11 @@ public:
   inline ~mini_bddt();
 
   // Boolean operators on BDDs
-  mini_bddt operator !() const;
-  mini_bddt operator ^(const mini_bddt &) const;
-  mini_bddt operator ==(const mini_bddt &) const;
-  mini_bddt operator &(const mini_bddt &) const;
-  mini_bddt operator |(const mini_bddt &) const;
+  mini_bddt operator!() const;
+  mini_bddt operator^(const mini_bddt &) const;
+  mini_bddt operator==(const mini_bddt &) const;
+  mini_bddt operator&(const mini_bddt &) const;
+  mini_bddt operator|(const mini_bddt &) const;
 
   // copy operator
   inline mini_bddt &operator=(const mini_bddt &);
@@ -83,7 +83,10 @@ public:
   mini_bddt Var(const std::string &label);
 
   void DumpDot(std::ostream &out, bool supress_zero=false) const;
-  void DumpTikZ(std::ostream &out, bool supress_zero=false, bool node_numbers=true) const;
+  void DumpTikZ(
+    std::ostream &out,
+    bool supress_zero=false,
+    bool node_numbers=true) const;
   void DumpTable(std::ostream &out) const;
 
   inline const mini_bddt &True() const;
@@ -119,7 +122,7 @@ protected:
       unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
   };
 
-  friend bool operator < (const reverse_keyt &x, const reverse_keyt &y);
+  friend bool operator<(const reverse_keyt &x, const reverse_keyt &y);
 
   typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;
   reverse_mapt reverse_map;
@@ -130,7 +133,10 @@ protected:
 
 mini_bddt restrict(const mini_bddt &u, unsigned var, const bool value);
 mini_bddt exists(const mini_bddt &u, unsigned var);
-mini_bddt substitute(const mini_bddt &where, unsigned var, const mini_bddt &by_what);
+mini_bddt substitute(
+  const mini_bddt &where,
+  unsigned var,
+  const mini_bddt &by_what);
 std::string cubes(const mini_bddt &u);
 bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment);
 

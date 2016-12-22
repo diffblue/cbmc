@@ -185,7 +185,10 @@ public:
   {
   }
 
-  mini_bddt operator()(const mini_bddt &x, const mini_bddt &y) { return APP(x, y); }
+  mini_bddt operator()(const mini_bddt &x, const mini_bddt &y)
+  {
+    return APP(x, y);
+  }
 
 protected:
   bool (*fkt)(bool, bool);
@@ -234,24 +237,24 @@ bool equal_fkt(bool x, bool y)
   return x==y;
 }
 
-mini_bddt mini_bddt::operator ==(const mini_bddt &other) const
+mini_bddt mini_bddt::operator==(const mini_bddt &other) const
 {
   return mini_bdd_applyt(equal_fkt)(*this, other);
 }
 
 bool xor_fkt(bool x, bool y)
 {
-  return x ^ y;
+  return x^y;
 }
 
-mini_bddt mini_bddt::operator ^(const mini_bddt &other) const
+mini_bddt mini_bddt::operator^(const mini_bddt &other) const
 {
   return mini_bdd_applyt(xor_fkt)(*this, other);
 }
 
-mini_bddt mini_bddt::operator !() const
+mini_bddt mini_bddt::operator!() const
 {
-  return node->mgr->True() ^ *this;
+  return node->mgr->True()^*this;
 }
 
 bool and_fkt(bool x, bool y)
@@ -259,7 +262,7 @@ bool and_fkt(bool x, bool y)
   return x && y;
 }
 
-mini_bddt mini_bddt::operator &(const mini_bddt &other) const
+mini_bddt mini_bddt::operator&(const mini_bddt &other) const
 {
   return mini_bdd_applyt(and_fkt)(*this, other);
 }
@@ -269,7 +272,7 @@ bool or_fkt(bool x, bool y)
   return x || y;
 }
 
-mini_bddt mini_bddt::operator |(const mini_bddt &other) const
+mini_bddt mini_bddt::operator|(const mini_bddt &other) const
 {
   return mini_bdd_applyt(or_fkt)(*this, other);
 }
@@ -287,7 +290,10 @@ mini_bdd_mgrt::~mini_bdd_mgrt()
 {
 }
 
-mini_bddt mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt &high)
+mini_bddt mini_bdd_mgrt::mk(
+  unsigned var,
+  const mini_bddt &low,
+  const mini_bddt &high)
 {
   assert(var<=var_table.size());
 
@@ -325,8 +331,9 @@ mini_bddt mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt 
   }
 }
 
-bool operator < (const mini_bdd_mgrt::reverse_keyt &x,
-                 const mini_bdd_mgrt::reverse_keyt &y)
+bool operator<(
+  const mini_bdd_mgrt::reverse_keyt &x,
+  const mini_bdd_mgrt::reverse_keyt &y)
 {
   if(x.var<y.var) return true;
   if(x.var>y.var) return false;
