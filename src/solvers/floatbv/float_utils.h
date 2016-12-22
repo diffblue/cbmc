@@ -69,6 +69,13 @@ public:
   {
   }
 
+  float_utilst(propt &_prop, const floatbv_typet &type):
+    spec(ieee_float_spect(type)),
+    prop(_prop),
+    bv_utils(_prop)
+  {
+  }
+
   void set_rounding_mode(const bvt &);
 
   virtual ~float_utilst()

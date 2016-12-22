@@ -348,8 +348,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     assert(expr.operands().size()==2);
     bvt bv0=convert_bitvector(expr.op0());
     bvt bv1=convert_bitvector(expr.op1());
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
+    float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     bvt bv=expr.id()==ID_float_debug1?
       float_utils.debug1(bv0, bv1):
       float_utils.debug2(bv0, bv1);
@@ -643,8 +642,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_NaN(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)
@@ -659,8 +657,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return prop.land(
         !float_utils.is_infinity(bv),
         !float_utils.is_NaN(bv));
@@ -677,8 +674,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_infinity(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)
@@ -693,8 +689,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_normal(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)

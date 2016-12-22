@@ -54,8 +54,7 @@ bvt boolbvt::convert_abs(const exprt &expr)
   }
   else if(bvtype==IS_FLOAT)
   {
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
+    float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.abs(op_bv);
   }
 

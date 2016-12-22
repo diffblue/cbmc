@@ -2466,8 +2466,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     {
       constant_exprt val(dest_type);
 
-      ieee_floatt a;
-      a.spec=to_floatbv_type(dest_type);
+      ieee_floatt a(to_floatbv_type(dest_type));
 
       mp_integer significand;
       mp_integer exponent;

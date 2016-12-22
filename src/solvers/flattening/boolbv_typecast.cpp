@@ -204,8 +204,7 @@ bool boolbvt::type_conversion(
           // bool to float
 
           // build a one
-          ieee_floatt f;
-          f.spec=to_floatbv_type(dest_type);
+          ieee_floatt f(to_floatbv_type(dest_type));
           f.from_integer(1);
 
           dest=convert_bv(f.to_expr());
@@ -498,8 +497,7 @@ bool boolbvt::type_conversion(
 
     if(src_bvtype==IS_FLOAT)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(src_type);
+      float_utilst float_utils(prop, to_floatbv_type(src_type));
       dest[0]=!float_utils.is_zero(src);
     }
     else if(src_bvtype==IS_C_BOOL)

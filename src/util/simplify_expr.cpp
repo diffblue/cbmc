@@ -639,8 +639,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         const floatbv_typet &f_expr_type=
           to_floatbv_type(expr_type);
 
-        ieee_floatt f;
-        f.spec=f_expr_type;
+        ieee_floatt f(f_expr_type);
         f.from_integer(int_value);
         expr=f.to_expr();
 

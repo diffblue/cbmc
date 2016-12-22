@@ -121,9 +121,7 @@ exprt convert_float_literal(const std::string &src)
   }
   else
   {
-    ieee_floatt a;
-
-    a.spec=to_floatbv_type(result.type());
+    ieee_floatt a(to_floatbv_type(result.type()));
 
     if(base==10)
       a.from_base10(significand, exponent);

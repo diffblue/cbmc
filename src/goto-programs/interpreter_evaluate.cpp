@@ -268,8 +268,7 @@ void interpretert::evaluate(
     }
     else if(expr.type().id()==ID_floatbv)
     {
-      ieee_floatt f;
-      f.spec=to_floatbv_type(expr.type());
+      ieee_floatt f(to_floatbv_type(expr.type()));
       f.from_integer(1);
       result=f.pack();
     }
@@ -294,9 +293,8 @@ void interpretert::evaluate(
         }
         else if(expr.type().id()==ID_floatbv)
         {
-          ieee_floatt f1, f2;
-          f1.spec=to_floatbv_type(expr.type());
-          f2.spec=to_floatbv_type(it->type());
+          ieee_floatt f1(to_floatbv_type(expr.type()));
+          ieee_floatt f2(to_floatbv_type(it->type()));
           f1.unpack(result);
           f2.unpack(tmp.front());
           f1*=f2;

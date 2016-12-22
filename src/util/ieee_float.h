@@ -131,6 +131,17 @@ public:
   {
   }
 
+  explicit ieee_floatt(const floatbv_typet &type):
+    rounding_mode(ROUND_TO_EVEN),
+    spec(ieee_float_spect(type)),
+    sign_flag(false),
+    exponent(0),
+    fraction(0),
+    NaN_flag(false),
+    infinity_flag(false)
+  {
+  }
+
   ieee_floatt():
     rounding_mode(ROUND_TO_EVEN),
     sign_flag(false), exponent(0), fraction(0),

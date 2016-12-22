@@ -290,9 +290,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         {
           if(dest_type.id()==ID_floatbv) // int to float
           {
-            ieee_floatt result;
+            ieee_floatt result(to_floatbv_type(dest_type));
             result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
-            result.spec=to_floatbv_type(dest_type);
             result.from_integer(value);
             expr=result.to_expr();
             return false;
