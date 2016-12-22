@@ -104,11 +104,6 @@ public:
     return as_string().compare(b.as_string());
   }
 
-  inline friend bool ordering(const dstring &a, const dstring &b)
-  {
-    return a.no<b.no;
-  }
-
   // modifying
 
   inline void clear()
@@ -120,21 +115,21 @@ public:
   inline dstring &operator=(const dstring &b)
   { no=b.no; return *this; }
 
-  // friends
+  // output
 
-  inline friend std::ostream &operator<<(std::ostream &out, const dstring &a)
+  inline std::ostream &operator<<(std::ostream &out) const
   {
-    return out << a.as_string();
-  }
-
-  inline friend size_t hash_string(const dstring &s)
-  {
-    return s.hash();
+    return out << as_string();
   }
 
   // non-standard
 
   inline unsigned get_no() const
+  {
+    return no;
+  }
+
+  inline size_t hash() const
   {
     return no;
   }
@@ -145,11 +140,6 @@ protected:
   // the reference returned is guaranteed to be stable
   inline const std::string &as_string() const
   { return string_container.get_string(no); }
-
-  inline size_t hash() const
-  {
-    return no;
-  }
 };
 
 // the reference returned is guaranteed to be stable
@@ -158,11 +148,17 @@ inline const std::string &as_string(const dstring &s)
 
 struct dstring_hash
 {
-  inline size_t operator()(const dstring &s) const { return hash_string(s); }
+  inline size_t operator()(const dstring &s) const { return s.hash(); }
 };
 
-size_t hash_string(const dstring &s);
+inline size_t hash_string(const dstring &s)
+{
+  return s.hash();
+}
 
-std::ostream &operator << (std::ostream &out, const dstring &a);
+inline std::ostream &operator<<(std::ostream &out, const dstring &a)
+{
+  return a.operator<<(out);
+}
 
 #endif // CPROVER_UTIL_DSTRING_H

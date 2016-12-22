@@ -433,9 +433,9 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
     ieee_floatt f1(to_constant_expr(expr.op1()));
 
     if(expr.id()==ID_ieee_float_notequal)
-      expr.make_bool(ieee_not_equal(f0, f1));
+      expr.make_bool(f0.ieee_not_equal(f1));
     else if(expr.id()==ID_ieee_float_equal)
-      expr.make_bool(ieee_equal(f0, f1));
+      expr.make_bool(f0.ieee_equal(f1));
     else
       assert(false);
 

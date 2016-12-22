@@ -128,8 +128,6 @@ public:
   bool is_one() const;
   bool is_boolean() const;
 
-  friend bool operator<(const exprt &X, const exprt &Y);
-
   const source_locationt &find_source_location() const;
 
   inline const source_locationt &source_location() const

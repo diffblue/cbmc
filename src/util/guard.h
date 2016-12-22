@@ -66,8 +66,6 @@ public:
     guard_list.swap(g.guard_list);
   }
 
-  friend std::ostream &operator << (std::ostream &out, const guardt &g);
-
   size_type size() const
   {
     return guard_list.size();

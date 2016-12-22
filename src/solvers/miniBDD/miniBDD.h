@@ -120,9 +120,9 @@ protected:
     unsigned var, low, high;
     inline reverse_keyt(
       unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
-  };
 
-  friend bool operator<(const reverse_keyt &x, const reverse_keyt &y);
+    bool operator<(const reverse_keyt &other) const;
+  };
 
   typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;
   reverse_mapt reverse_map;

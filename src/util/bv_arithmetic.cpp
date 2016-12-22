@@ -331,14 +331,14 @@ Function: operator <
 
 \*******************************************************************/
 
-bool operator < (const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator<(const bv_arithmetict &other)
 {
-  return a.value<b.value;
+  return value<other.value;
 }
 
 /*******************************************************************\
 
-Function: operator <=
+Function: bv_arithmetict::operator<=
 
   Inputs:
 
@@ -348,14 +348,14 @@ Function: operator <=
 
 \*******************************************************************/
 
-bool operator <=(const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator<=(const bv_arithmetict &other)
 {
-  return a.value<=b.value;
+  return value<=other.value;
 }
 
 /*******************************************************************\
 
-Function: operator >
+Function: bv_arithmetict::operator>
 
   Inputs:
 
@@ -365,14 +365,14 @@ Function: operator >
 
 \*******************************************************************/
 
-bool operator > (const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator>(const bv_arithmetict &other)
 {
-  return a.value>b.value;
+  return value>other.value;
 }
 
 /*******************************************************************\
 
-Function: operator >=
+Function: bv_arithmetict::operator>=
 
   Inputs:
 
@@ -382,14 +382,14 @@ Function: operator >=
 
 \*******************************************************************/
 
-bool operator >=(const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator>=(const bv_arithmetict &other)
 {
-  return a.value>=b.value;
+  return value>=other.value;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: bv_arithmetict::operator==
 
   Inputs:
 
@@ -399,14 +399,14 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator==(const bv_arithmetict &other)
 {
-  return a.value==b.value;
+  return value==other.value;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: bv_arithmetict::operator==
 
   Inputs:
 
@@ -416,14 +416,14 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const bv_arithmetict &a, int i)
+bool bv_arithmetict::operator==(int i)
 {
-  return a.value==i;
+  return value==i;
 }
 
 /*******************************************************************\
 
-Function: operator !=
+Function: bv_arithmetict::operator!=
 
   Inputs:
 
@@ -433,9 +433,9 @@ Function: operator !=
 
 \*******************************************************************/
 
-bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b)
+bool bv_arithmetict::operator!=(const bv_arithmetict &other)
 {
-  return a.value!=b.value;
+  return value!=other.value;
 }
 
 /*******************************************************************\

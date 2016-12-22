@@ -33,16 +33,6 @@ public:
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
 
-  friend void convert(
-    const goto_functionst &goto_functions,
-    const value_set_analysist &value_set_analysis,
-    xmlt &dest);
-
-  friend void convert(
-    const goto_programt &goto_program,
-    const value_set_analysist &value_set_analysis,
-    xmlt &dest);
-
   void convert(
     const goto_programt &goto_program,
     const irep_idt &identifier,
@@ -58,5 +48,15 @@ public:
     (*this)[l].value_set.get_value_set(expr, dest, ns);
   }
 };
+
+void convert(
+  const goto_functionst &goto_functions,
+  const value_set_analysist &value_set_analysis,
+  xmlt &dest);
+
+void convert(
+  const goto_programt &goto_program,
+  const value_set_analysist &value_set_analysis,
+  xmlt &dest);
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H

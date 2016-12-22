@@ -51,13 +51,11 @@ public:
   {
     return _latest_time.as_string();
   }
-
-  friend std::ostream& operator<< (std::ostream &out, const timert &timer)
-  {
-    return out << timer._total_time;
-  }
 };
 
-std::ostream& operator<< (std::ostream &out, const timert &timer);
+std::ostream& operator<<(std::ostream &out, const timert &timer)
+{
+  return out << timer.total_time();
+}
 
 #endif // CPROVER_UTIL_TIMER_H

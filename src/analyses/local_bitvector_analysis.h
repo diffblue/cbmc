@@ -167,20 +167,14 @@ public:
     }
 
     void print(std::ostream &) const;
+
+    inline flagst operator|(const flagst other) const
+    {
+      flagst result(*this);
+      result.bits|=other.bits;
+      return result;
+    }
   };
-
-  friend std::ostream & operator << (std::ostream &out, const flagst f)
-  {
-    f.print(out);
-    return out;
-  }
-
-  inline friend flagst operator|(const flagst f1, const flagst f2)
-  {
-    flagst result=f1;
-    result.bits|=f2.bits;
-    return result;
-  }
 
   flagst get(
     const goto_programt::const_targett t,
@@ -221,5 +215,13 @@ protected:
 
   bool is_tracked(const irep_idt &identifier);
 };
+
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const local_bitvector_analysist::flagst &flags)
+{
+  flags.print(out);
+  return out;
+}
 
 #endif // CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H

@@ -146,13 +146,12 @@ protected:
            id(_id)
     {
     }
+
+    inline bool operator<(const matcht &other) const
+    {
+      return cost<other.cost;
+    }
   };
-
-  inline friend bool operator < (const matcht &m1, const matcht &m2)
-  {
-    return m1.cost<m2.cost;
-  }
-
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H

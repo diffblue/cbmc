@@ -210,25 +210,21 @@ public:
   }
 
   const irep_idt &get_identifier() const;
-
-  friend inline const code_declt &to_code_decl(const codet &code)
-  {
-    // will be size()==1 in the future
-    assert(code.get_statement()==ID_decl && code.operands().size()>=1);
-    return static_cast<const code_declt &>(code);
-  }
-
-  friend inline code_declt &to_code_decl(codet &code)
-  {
-    // will be size()==1 in the future
-    assert(code.get_statement()==ID_decl && code.operands().size()>=1);
-    return static_cast<code_declt &>(code);
-  }
-
 };
 
-const code_declt &to_code_decl(const codet &code);
-code_declt &to_code_decl(codet &code);
+inline const code_declt &to_code_decl(const codet &code)
+{
+  // will be size()==1 in the future
+  assert(code.get_statement()==ID_decl && code.operands().size()>=1);
+  return static_cast<const code_declt &>(code);
+}
+
+inline code_declt &to_code_decl(codet &code)
+{
+  // will be size()==1 in the future
+  assert(code.get_statement()==ID_decl && code.operands().size()>=1);
+  return static_cast<code_declt &>(code);
+}
 
 /*! \brief A removal of a local variable
 */
@@ -256,23 +252,19 @@ public:
   }
 
   const irep_idt &get_identifier() const;
-
-  friend inline const code_deadt &to_code_dead(const codet &code)
-  {
-    assert(code.get_statement()==ID_dead && code.operands().size()==1);
-    return static_cast<const code_deadt &>(code);
-  }
-
-  friend inline code_deadt &to_code_dead(codet &code)
-  {
-    assert(code.get_statement()==ID_dead && code.operands().size()==1);
-    return static_cast<code_deadt &>(code);
-  }
-
 };
 
-const code_deadt &to_code_dead(const codet &code);
-code_deadt &to_code_dead(codet &code);
+inline const code_deadt &to_code_dead(const codet &code)
+{
+  assert(code.get_statement()==ID_dead && code.operands().size()==1);
+  return static_cast<const code_deadt &>(code);
+}
+
+inline code_deadt &to_code_dead(codet &code)
+{
+  assert(code.get_statement()==ID_dead && code.operands().size()==1);
+  return static_cast<code_deadt &>(code);
+}
 
 /*! \brief An assumption
 */
@@ -972,20 +964,6 @@ public:
     copy_to_operands(expr);
   }
 
-  inline friend code_expressiont &to_code_expression(codet &code)
-  {
-    assert(code.get_statement()==ID_expression &&
-           code.operands().size()==1);
-    return static_cast<code_expressiont &>(code);
-  }
-
-  inline friend const code_expressiont &to_code_expression(const codet &code)
-  {
-    assert(code.get_statement()==ID_expression &&
-           code.operands().size()==1);
-    return static_cast<const code_expressiont &>(code);
-  }
-
   inline const exprt &expression() const
   {
     return op0();
@@ -997,8 +975,19 @@ public:
   }
 };
 
-code_expressiont &to_code_expression(codet &code);
-const code_expressiont &to_code_expression(const codet &code);
+inline code_expressiont &to_code_expression(codet &code)
+{
+  assert(code.get_statement()==ID_expression &&
+         code.operands().size()==1);
+  return static_cast<code_expressiont &>(code);
+}
+
+inline const code_expressiont &to_code_expression(const codet &code)
+{
+  assert(code.get_statement()==ID_expression &&
+         code.operands().size()==1);
+  return static_cast<const code_expressiont &>(code);
+}
 
 /*! \brief An expression containing a side effect
 */
@@ -1017,18 +1006,6 @@ public:
     set_statement(statement);
   }
 
-  inline friend side_effect_exprt &to_side_effect_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_side_effect);
-    return static_cast<side_effect_exprt &>(expr);
-  }
-
-  inline friend const side_effect_exprt &to_side_effect_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_side_effect);
-    return static_cast<const side_effect_exprt &>(expr);
-  }
-
   inline const irep_idt &get_statement() const
   {
     return get(ID_statement);
@@ -1040,8 +1017,17 @@ public:
   }
 };
 
-side_effect_exprt &to_side_effect_expr(exprt &expr);
-const side_effect_exprt &to_side_effect_expr(const exprt &expr);
+inline side_effect_exprt &to_side_effect_expr(exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  return static_cast<side_effect_exprt &>(expr);
+}
+
+inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  return static_cast<const side_effect_exprt &>(expr);
+}
 
 /*! \brief A side effect that returns a non-deterministically chosen value
 */
@@ -1088,24 +1074,23 @@ public:
   {
     return op1().operands();
   }
-
-  inline friend side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr)
-  {
-    assert(expr.id()==ID_side_effect);
-    assert(expr.get(ID_statement)==ID_function_call);
-    return static_cast<side_effect_expr_function_callt &>(expr);
-  }
-
-  inline friend const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr)
-  {
-    assert(expr.id()==ID_side_effect);
-    assert(expr.get(ID_statement)==ID_function_call);
-    return static_cast<const side_effect_expr_function_callt &>(expr);
-  }
 };
 
-side_effect_expr_function_callt &to_side_effect_expr_function_call(exprt &expr);
-const side_effect_expr_function_callt &to_side_effect_expr_function_call(const exprt &expr);
+inline side_effect_expr_function_callt
+  &to_side_effect_expr_function_call(exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_function_call);
+  return static_cast<side_effect_expr_function_callt &>(expr);
+}
+
+inline const side_effect_expr_function_callt
+  &to_side_effect_expr_function_call(const exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_function_call);
+  return static_cast<const side_effect_expr_function_callt &>(expr);
+}
 
 /*! \brief A side effect that throws an exception
 */

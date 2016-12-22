@@ -1148,7 +1148,7 @@ ieee_floatt &ieee_floatt::operator -= (const ieee_floatt &other)
 
 /*******************************************************************\
 
-Function: operator <
+Function: ieee_floatt::operator<
 
   Inputs:
 
@@ -1158,54 +1158,54 @@ Function: operator <
 
 \*******************************************************************/
 
-bool operator < (const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator<(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
+  if(NaN_flag || other.NaN_flag) return false;
 
   // check both zero?
-  if(a.is_zero() && b.is_zero())
+  if(is_zero() && other.is_zero())
     return false;
 
   // one of them zero?
-  if(a.is_zero())
-    return !b.sign_flag;
-  else if(b.is_zero())
-    return a.sign_flag;
+  if(is_zero())
+    return !other.sign_flag;
+  else if(other.is_zero())
+    return sign_flag;
 
   // check sign
-  if(a.sign_flag!=b.sign_flag)
-    return a.sign_flag;
+  if(sign_flag!=other.sign_flag)
+    return sign_flag;
 
   // handle infinity
-  if(a.infinity_flag)
+  if(infinity_flag)
   {
-    if(b.infinity_flag)
+    if(other.infinity_flag)
       return false;
     else
-      return a.sign_flag;
+      return sign_flag;
   }
-  else if(b.infinity_flag)
-    return !a.sign_flag;
+  else if(other.infinity_flag)
+    return !sign_flag;
 
   // check exponent
-  if(a.exponent!=b.exponent)
+  if(exponent!=other.exponent)
   {
-    if(a.sign_flag) // both negative
-      return a.exponent>b.exponent;
+    if(sign_flag) // both negative
+      return exponent>other.exponent;
     else
-      return a.exponent<b.exponent;
+      return exponent<other.exponent;
   }
 
   // check significand
-  if(a.sign_flag) // both negative
-    return a.fraction>b.fraction;
+  if(sign_flag) // both negative
+    return fraction>other.fraction;
   else
-    return a.fraction<b.fraction;
+    return fraction<other.fraction;
 }
 
 /*******************************************************************\
 
-Function: operator <=
+Function: ieee_floatt::operator<=
 
   Inputs:
 
@@ -1215,30 +1215,31 @@ Function: operator <=
 
 \*******************************************************************/
 
-bool operator <=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator<=(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
+  if(NaN_flag || other.NaN_flag) return false;
 
   // check zero
-  if(a.is_zero() && b.is_zero())
+  if(is_zero() && other.is_zero())
     return true;
 
   // handle infinity
-  if(a.infinity_flag && b.infinity_flag && a.sign_flag==b.sign_flag)
+  if(infinity_flag && other.infinity_flag &&
+     sign_flag==other.sign_flag)
     return true;
 
-  if(!a.infinity_flag && !b.infinity_flag &&
-     a.sign_flag==b.sign_flag &&
-     a.exponent==b.exponent &&
-     a.fraction==b.fraction)
+  if(!infinity_flag && !other.infinity_flag &&
+     sign_flag==other.sign_flag &&
+     exponent==other.exponent &&
+     fraction==other.fraction)
     return true;
 
-  return a<b;
+  return *this<other;
 }
 
 /*******************************************************************\
 
-Function: operator >
+Function: ieee_floatt::operator>
 
   Inputs:
 
@@ -1248,14 +1249,14 @@ Function: operator >
 
 \*******************************************************************/
 
-bool operator > (const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator>(const ieee_floatt &other) const
 {
-  return b < a;
+  return other<*this;
 }
 
 /*******************************************************************\
 
-Function: operator >=
+Function: ieee_floatt::operator>=
 
   Inputs:
 
@@ -1265,14 +1266,14 @@ Function: operator >=
 
 \*******************************************************************/
 
-bool operator >=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator>=(const ieee_floatt &other) const
 {
-  return b <= a;
+  return other<=*this;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: ieee_floatt::operator==
 
   Inputs:
 
@@ -1282,29 +1283,31 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator==(const ieee_floatt &other) const
 {
   // packed equality!
-  if(a.NaN_flag && b.NaN_flag)
+  if(NaN_flag && other.NaN_flag)
     return true;
-  else if(a.NaN_flag || b.NaN_flag)
+  else if(NaN_flag || other.NaN_flag)
     return false;
 
-  if(a.infinity_flag && b.infinity_flag &&
-     a.sign_flag == b.sign_flag) return true;
-  else if(a.infinity_flag || b.infinity_flag)
+  if(infinity_flag && other.infinity_flag &&
+     sign_flag==other.sign_flag)
+    return true;
+  else if(infinity_flag || other.infinity_flag)
     return false;
 
   //if(a.is_zero() && b.is_zero()) return true;
 
-  return a.exponent==b.exponent &&
-         a.fraction==b.fraction &&
-         a.sign_flag==b.sign_flag;
+  return
+    exponent==other.exponent &&
+    fraction==other.fraction &&
+    sign_flag==other.sign_flag;
 }
 
 /*******************************************************************\
 
-Function: ieee_equal
+Function: ieee_floatt::ieee_equal
 
   Inputs:
 
@@ -1314,17 +1317,17 @@ Function: ieee_equal
 
 \*******************************************************************/
 
-bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::ieee_equal(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
-  if(a.is_zero() && b.is_zero()) return true;
-  assert(a.spec==b.spec);
-  return a==b;
+  if(NaN_flag || other.NaN_flag) return false;
+  if(is_zero() && other.is_zero()) return true;
+  assert(spec==other.spec);
+  return *this==other;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: ieee_floatt::operator==
 
   Inputs:
 
@@ -1334,17 +1337,16 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const ieee_floatt &a, int i)
+bool ieee_floatt::operator==(int i) const
 {
-  ieee_floatt other;
-  other.spec=a.spec;
+  ieee_floatt other(spec);
   other.from_integer(i);
-  return a==other;
+  return *this==other;
 }
 
 /*******************************************************************\
 
-Function: operator !=
+Function: ieee_floatt::operator!=
 
   Inputs:
 
@@ -1354,9 +1356,9 @@ Function: operator !=
 
 \*******************************************************************/
 
-bool operator !=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator!=(const ieee_floatt &other) const
 {
-  return !(a==b);
+  return !(*this==other);
 }
 
 /*******************************************************************\
@@ -1371,12 +1373,12 @@ Function: ieee_not_equal
 
 \*******************************************************************/
 
-bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::ieee_not_equal(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return true; // !!!
-  if(a.is_zero() && b.is_zero()) return false;
-  assert(a.spec==b.spec);
-  return a!=b;
+  if(NaN_flag || other.NaN_flag) return true; // !!!
+  if(is_zero() && other.is_zero()) return false;
+  assert(spec==other.spec);
+  return *this!=other;
 }
 
 /*******************************************************************\

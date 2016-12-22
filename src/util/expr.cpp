@@ -325,23 +325,6 @@ void exprt::make_false()
 
 /*******************************************************************\
 
-Function: operator<
-
-  Inputs:
-
- Outputs:
-
- Purpose: defines ordering on expressions for canonicalization
-
-\*******************************************************************/
-
-bool operator<(const exprt &X, const exprt &Y)
-{
-  return (irept &)X < (irept &)Y;
-}
-
-/*******************************************************************\
-
 Function: exprt::negate
 
   Inputs:

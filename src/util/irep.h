@@ -219,18 +219,20 @@ public:
   void move_to_sub(irept &irep);
   void move_to_named_sub(const irep_namet &name, irept &irep);
 
-  friend bool operator==(const irept &i1, const irept &i2);
+  bool operator==(const irept &other) const;
 
-  friend inline bool operator!=(const irept &i1, const irept &i2)
-  { return !(i1==i2); }
+  inline bool operator!=(const irept &other) const
+  {
+    return !(*this==other);
+  }
 
   inline void swap(irept &irep)
   {
     std::swap(irep.data, data);
   }
 
-  friend bool operator<(const irept &i1, const irept &i2);
-  friend bool ordering(const irept &i1, const irept &i2);
+  bool operator<(const irept &other) const;
+  bool ordering(const irept &other) const;
 
   int compare(const irept &i) const;
 
@@ -248,7 +250,7 @@ public:
   std::size_t hash() const;
   std::size_t full_hash() const;
 
-  friend bool full_eq(const irept &a, const irept &b);
+  bool full_eq(const irept &other) const;
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
@@ -380,7 +382,7 @@ struct irep_full_eq
 {
   inline bool operator()(const irept &i1, const irept &i2) const
   {
-    return full_eq(i1, i2);
+    return i1.full_eq(i2);
   }
 };
 

@@ -1219,12 +1219,6 @@ public:
   {
     set(ID_integer_bits, b);
   }
-
-  inline friend const fixedbv_typet &to_fixedbv_type(const typet &type)
-  {
-    assert(type.id()==ID_fixedbv);
-    return static_cast<const fixedbv_typet &>(type);
-  }
 };
 
 /*! \brief Cast a generic typet to a \ref fixedbv_typet
@@ -1237,7 +1231,11 @@ public:
  *
  * \ingroup gr_std_types
 */
-const fixedbv_typet &to_fixedbv_type(const typet &type);
+inline const fixedbv_typet &to_fixedbv_type(const typet &type)
+{
+  assert(type.id()==ID_fixedbv);
+  return static_cast<const fixedbv_typet &>(type);
+}
 
 /*! \brief Fixed-width bit-vector with IEEE floating-point interpretation
 */
@@ -1260,12 +1258,6 @@ public:
   {
     set(ID_f, b);
   }
-
-  inline friend const floatbv_typet &to_floatbv_type(const typet &type)
-  {
-    assert(type.id()==ID_floatbv);
-    return static_cast<const floatbv_typet &>(type);
-  }
 };
 
 /*! \brief Cast a generic typet to a \ref floatbv_typet
@@ -1278,7 +1270,11 @@ public:
  *
  * \ingroup gr_std_types
 */
-const floatbv_typet &to_floatbv_type(const typet &type);
+inline const floatbv_typet &to_floatbv_type(const typet &type)
+{
+  assert(type.id()==ID_floatbv);
+  return static_cast<const floatbv_typet &>(type);
+}
 
 /*! \brief Type for c bit fields
 */
@@ -1294,18 +1290,6 @@ public:
   {
   }
 
-  inline friend const c_bit_field_typet &to_c_bit_field_type(const typet &type)
-  {
-    assert(type.id()==ID_c_bit_field);
-    return static_cast<const c_bit_field_typet &>(type);
-  }
-
-  inline friend c_bit_field_typet &to_c_bit_field_type(typet &type)
-  {
-    assert(type.id()==ID_c_bit_field);
-    return static_cast<c_bit_field_typet &>(type);
-  }
-
   // These have a sub-type
 };
 
@@ -1319,7 +1303,11 @@ public:
  *
  * \ingroup gr_std_types
 */
-const c_bit_field_typet &to_c_bit_field_type(const typet &type);
+inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
+{
+  assert(type.id()==ID_c_bit_field);
+  return static_cast<const c_bit_field_typet &>(type);
+}
 
 /*! \brief Cast a generic typet to a \ref c_bit_field_typet
  *
@@ -1331,7 +1319,11 @@ const c_bit_field_typet &to_c_bit_field_type(const typet &type);
  *
  * \ingroup gr_std_types
 */
-c_bit_field_typet &to_c_bit_field_type(typet &type);
+inline c_bit_field_typet &to_c_bit_field_type(typet &type)
+{
+  assert(type.id()==ID_c_bit_field);
+  return static_cast<c_bit_field_typet &>(type);
+}
 
 /*! \brief The pointer type
 */
@@ -1463,12 +1455,6 @@ public:
   inline string_typet():typet(ID_string)
   {
   }
-
-  inline friend const string_typet &to_string_type(const typet &type)
-  {
-    assert(type.id()==ID_string);
-    return static_cast<const string_typet &>(type);
-  }
 };
 
 /*! \brief Cast a generic typet to a \ref string_typet
@@ -1481,7 +1467,11 @@ public:
  *
  * \ingroup gr_std_types
 */
-const string_typet &to_string_type(const typet &type);
+inline const string_typet &to_string_type(const typet &type)
+{
+  assert(type.id()==ID_string);
+  return static_cast<const string_typet &>(type);
+}
 
 /*! \brief A type for subranges of integers
 */
@@ -1496,12 +1486,6 @@ public:
   {
     set_from(_from);
     set_to(_to);
-  }
-
-  inline friend const range_typet &to_range_type(const typet &type)
-  {
-    assert(type.id()==ID_range);
-    return static_cast<const range_typet &>(type);
   }
 
   mp_integer get_from() const;
@@ -1521,7 +1505,11 @@ public:
  *
  * \ingroup gr_std_types
 */
-const range_typet &to_range_type(const typet &type);
+inline const range_typet &to_range_type(const typet &type)
+{
+  assert(type.id()==ID_range);
+  return static_cast<const range_typet &>(type);
+}
 
 /*! \brief A constant-size array type
 */

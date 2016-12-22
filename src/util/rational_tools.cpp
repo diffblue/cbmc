@@ -116,8 +116,9 @@ Function: from_rational
 
 constant_exprt from_rational(const rationalt &a)
 {
-  std::string d=integer2string(a.numerator);
-  if(a.denominator!=1) d+="/"+integer2string(a.denominator);
+  std::string d=integer2string(a.get_numerator());
+  if(a.get_denominator()!=1)
+    d+="/"+integer2string(a.get_denominator());
   constant_exprt result;
   result.type()=rational_typet();
   result.set_value(d);

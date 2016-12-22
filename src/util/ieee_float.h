@@ -92,21 +92,16 @@ public:
     return result;
   }
 
-  inline friend bool operator == (
-    const ieee_float_spect &a, const ieee_float_spect &b)
+  inline bool operator==(const ieee_float_spect &other) const
   {
-    return a.f==b.f && a.e==b.e && a.x86_extended==b.x86_extended;
+    return f==other.f && e==other.e && x86_extended==other.x86_extended;
   }
 
-  inline friend bool operator != (
-    const ieee_float_spect &a, const ieee_float_spect &b)
+  inline bool operator!=(const ieee_float_spect &other) const
   {
-    return !(a==b);
+    return !(*this==other);
   }
 };
-
-bool operator == (const ieee_float_spect &a, const ieee_float_spect &b);
-bool operator != (const ieee_float_spect &a, const ieee_float_spect &b);
 
 class ieee_floatt
 {
@@ -256,11 +251,6 @@ public:
   std::string to_string_scientific(std::size_t precision) const;
   std::string format(const format_spect &format_spec) const;
 
-  friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
-  {
-    return out << f.to_ansi_c_string();
-  }
-
   // expressions
   constant_exprt to_expr() const;
   void from_expr(const constant_exprt &expr);
@@ -271,20 +261,20 @@ public:
   ieee_floatt &operator += (const ieee_floatt &other);
   ieee_floatt &operator -= (const ieee_floatt &other);
 
-  friend bool operator < (const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator <=(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator > (const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator >=(const ieee_floatt &a, const ieee_floatt &b);
+  bool operator<(const ieee_floatt &other) const;
+  bool operator<=(const ieee_floatt &other) const;
+  bool operator>(const ieee_floatt &other) const;
+  bool operator>=(const ieee_floatt &other) const;
 
   // warning: these do packed equality, not IEEE equality
   // e.g., NAN==NAN
-  friend bool operator ==(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator !=(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator ==(const ieee_floatt &a, int i);
+  bool operator==(const ieee_floatt &other) const;
+  bool operator!=(const ieee_floatt &other) const;
+  bool operator==(int i) const;
 
   // these do IEEE equality, i.e., NAN!=NAN
-  friend bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
+  bool ieee_equal(const ieee_floatt &other) const;
+  bool ieee_not_equal(const ieee_floatt &other) const;
 
 protected:
   void divide_and_round(mp_integer &fraction, const mp_integer &factor);
@@ -301,14 +291,11 @@ protected:
   static mp_integer base10_digits(const mp_integer &src);
 };
 
-bool operator < (const ieee_floatt &a, const ieee_floatt &b);
-bool operator <=(const ieee_floatt &a, const ieee_floatt &b);
-bool operator > (const ieee_floatt &a, const ieee_floatt &b);
-bool operator >=(const ieee_floatt &a, const ieee_floatt &b);
-bool operator ==(const ieee_floatt &a, const ieee_floatt &b);
-bool operator !=(const ieee_floatt &a, const ieee_floatt &b);
-std::ostream& operator << (std::ostream &, const ieee_floatt &);
-bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
-bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
+inline std::ostream& operator<<(
+  std::ostream &out,
+  const ieee_floatt &f)
+{
+  return out << f.to_ansi_c_string();
+}
 
 #endif // CPROVER_UTIL_IEEE_FLOAT_H

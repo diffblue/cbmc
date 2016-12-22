@@ -74,12 +74,12 @@ public:
   fixedbvt &operator += (const fixedbvt &other);
   fixedbvt &operator -= (const fixedbvt &other);
 
-  friend bool operator < (const fixedbvt &a, const fixedbvt &b) { return a.v<b.v; }
-  friend bool operator <=(const fixedbvt &a, const fixedbvt &b) { return a.v<=b.v; }
-  friend bool operator > (const fixedbvt &a, const fixedbvt &b) { return a.v>b.v; }
-  friend bool operator >=(const fixedbvt &a, const fixedbvt &b) { return a.v>=b.v; }
-  friend bool operator ==(const fixedbvt &a, const fixedbvt &b) { return a.v==b.v; }
-  friend bool operator !=(const fixedbvt &a, const fixedbvt &b) { return a.v!=b.v; }
+  bool operator<(const fixedbvt &other) const { return v<other.v; }
+  bool operator<=(const fixedbvt &other) const { return v<=other.v; }
+  bool operator>(const fixedbvt &other) const { return v>other.v; }
+  bool operator>=(const fixedbvt &other) const { return v>=other.v; }
+  bool operator==(const fixedbvt &other) const { return v==other.v; }
+  bool operator!=(const fixedbvt &other) const { return v!=other.v; }
 
   const mp_integer &get_value() const { return v; }
   void set_value(const mp_integer &_v) { v=_v; }
@@ -88,12 +88,5 @@ protected:
   // negative values stored as such
   mp_integer v;
 };
-
-bool operator < (const fixedbvt &a, const fixedbvt &b);
-bool operator <=(const fixedbvt &a, const fixedbvt &b);
-bool operator > (const fixedbvt &a, const fixedbvt &b);
-bool operator >=(const fixedbvt &a, const fixedbvt &b);
-bool operator ==(const fixedbvt &a, const fixedbvt &b);
-bool operator !=(const fixedbvt &a, const fixedbvt &b);
 
 #endif // CPROVER_UTIL_FIXEDBV_H

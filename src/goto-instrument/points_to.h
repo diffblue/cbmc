@@ -49,13 +49,6 @@ public:
 
   void output(std::ostream &out) const;
 
-  inline friend std::ostream &operator << (
-    std::ostream &out, const points_tot &points_to)
-  {
-    points_to.output(out);
-    return out;
-  }
-
 protected:
   typedef cfg_baset<empty_cfg_nodet> cfgt;
   cfgt cfg;
@@ -69,6 +62,12 @@ protected:
   const object_id_sett empty_set;
 };
 
-std::ostream &operator << (std::ostream &, const points_tot &);
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const points_tot &points_to)
+{
+  points_to.output(out);
+  return out;
+}
 
 #endif // CPROVER_GOTO_INSTRUMENT_POINTS_TO_H

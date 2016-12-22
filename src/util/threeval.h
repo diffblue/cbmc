@@ -49,35 +49,35 @@ public:
   {
   }
 
-  inline friend bool operator ==(const tvt a, const tvt b)
+  inline bool operator==(const tvt other) const
   {
-    return a.value==b.value;
+    return value==other.value;
   }
 
-  inline friend bool operator !=(const tvt a, const tvt b)
+  inline bool operator!=(const tvt other) const
   {
-    return a.value!=b.value;
+    return value!=other.value;
   }
 
-  inline friend tvt operator &&(const tvt a, const tvt b)
+  inline tvt operator&&(const tvt other) const
   {
-    if(a.value==tv_enumt::TV_FALSE || b.value==tv_enumt::TV_FALSE) return tvt(tv_enumt::TV_FALSE);
-    if(a.value==tv_enumt::TV_TRUE  && b.value==tv_enumt::TV_TRUE)  return tvt(tv_enumt::TV_TRUE);
-    return tvt(tv_enumt::TV_UNKNOWN);
+    if(is_false() || other.is_false()) return tvt(false);
+    if(is_true() && other.is_true()) return tvt(true);
+    return unknown();
   }
 
-  inline friend tvt operator ||(const tvt a, const tvt b)
+  inline tvt operator||(const tvt other)
   {
-    if(a.value==tv_enumt::TV_TRUE  || b.value==tv_enumt::TV_TRUE)  return tvt(tv_enumt::TV_TRUE);
-    if(a.value==tv_enumt::TV_FALSE && b.value==tv_enumt::TV_FALSE) return tvt(tv_enumt::TV_FALSE);
-    return tvt(tv_enumt::TV_UNKNOWN);
+    if(is_true() || other.is_true()) return tvt(true);
+    if(is_false() && other.is_false()) return tvt(false);
+    return unknown();
   }
 
-  inline friend tvt operator !(const tvt a)
+  inline tvt operator!() const
   {
-    if(a.value==tv_enumt::TV_UNKNOWN) return tvt(tv_enumt::TV_UNKNOWN);
-    if(a.value==tv_enumt::TV_TRUE) return tvt(tv_enumt::TV_FALSE);
-    return tvt(tv_enumt::TV_TRUE);
+    if(is_unknown()) return unknown();
+    if(is_true()) return tvt(false);
+    return tvt(true);
   }
 
 protected:

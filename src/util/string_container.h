@@ -31,10 +31,8 @@ struct string_ptrt
   {
   }
 
-  friend bool operator==(const string_ptrt a, const string_ptrt b);
+  bool operator==(const string_ptrt &other) const;
 };
-
-bool operator==(const string_ptrt a, const string_ptrt b);
 
 class string_ptr_hash
 {

@@ -44,9 +44,9 @@ public:
     {
     }
 
-    friend bool operator==(const quantifiert &a, const quantifiert &b)
+    bool operator==(const quantifiert &other) const
     {
-      return a.type==b.type && a.var_no==b.var_no;
+      return type==other.type && var_no==other.var_no;
     }
 
     size_t hash() const
@@ -85,7 +85,8 @@ public:
   virtual void set_quantifier(const quantifiert::typet type, const literalt l);
   void copy_to(qdimacs_cnft &cnf) const;
 
-  friend bool operator==(const qdimacs_cnft &a, const qdimacs_cnft &b);
+  bool operator==(const qdimacs_cnft &other) const;
+
   size_t hash() const;
 
 protected:

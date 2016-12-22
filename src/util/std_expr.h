@@ -1074,18 +1074,6 @@ public:
   {
     return op1();
   }
-
-  friend inline const index_exprt &to_index_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_index && expr.operands().size()==2);
-    return static_cast<const index_exprt &>(expr);
-  }
-
-  friend inline index_exprt &to_index_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_index && expr.operands().size()==2);
-    return static_cast<index_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to an \ref index_exprt
@@ -1098,11 +1086,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const index_exprt &to_index_expr(const exprt &expr);
+inline const index_exprt &to_index_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_index && expr.operands().size()==2);
+  return static_cast<const index_exprt &>(expr);
+}
+
 /*! \copydoc to_index_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-index_exprt &to_index_expr(exprt &expr);
+inline index_exprt &to_index_expr(exprt &expr)
+{
+  assert(expr.id()==ID_index && expr.operands().size()==2);
+  return static_cast<index_exprt &>(expr);
+}
 
 /*! \brief array constructor from single element
 */
@@ -1128,18 +1125,6 @@ public:
   {
     return op0();
   }
-
-  friend inline const array_of_exprt &to_array_of_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_array_of && expr.operands().size()==1);
-    return static_cast<const array_of_exprt &>(expr);
-  }
-
-  friend inline array_of_exprt &to_array_of_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_array_of && expr.operands().size()==1);
-    return static_cast<array_of_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to an \ref array_of_exprt
@@ -1152,11 +1137,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const array_of_exprt &to_array_of_expr(const exprt &expr);
+inline const array_of_exprt &to_array_of_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_array_of && expr.operands().size()==1);
+  return static_cast<const array_of_exprt &>(expr);
+}
+
 /*! \copydoc to_array_of_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-array_of_exprt &to_array_of_expr(exprt &expr);
+inline array_of_exprt &to_array_of_expr(exprt &expr)
+{
+  assert(expr.id()==ID_array_of && expr.operands().size()==1);
+  return static_cast<array_of_exprt &>(expr);
+}
 
 /*! \brief array constructor from list of elements
 */
@@ -1171,18 +1165,6 @@ public:
     exprt(ID_array, _type)
   {
   }
-
-  friend inline const array_exprt &to_array_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_array);
-    return static_cast<const array_exprt &>(expr);
-  }
-
-  friend inline array_exprt &to_array_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_array);
-    return static_cast<array_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to an \ref array_exprt
@@ -1195,11 +1177,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const array_exprt &to_array_expr(const exprt &expr);
+inline const array_exprt &to_array_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_array);
+  return static_cast<const array_exprt &>(expr);
+}
+
 /*! \copydoc to_array_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-array_exprt &to_array_expr(exprt &expr);
+inline array_exprt &to_array_expr(exprt &expr)
+{
+  assert(expr.id()==ID_array);
+  return static_cast<array_exprt &>(expr);
+}
 
 /*! \brief array constructor from list of elements
 */
@@ -1214,18 +1205,6 @@ public:
     exprt(ID_vector, _type)
   {
   }
-
-  friend inline const vector_exprt &to_vector_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_vector);
-    return static_cast<const vector_exprt &>(expr);
-  }
-
-  friend inline vector_exprt &to_vector_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_vector);
-    return static_cast<vector_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to an \ref vector_exprt
@@ -1238,11 +1217,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const vector_exprt &to_vector_expr(const exprt &expr);
+inline const vector_exprt &to_vector_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_vector);
+  return static_cast<const vector_exprt &>(expr);
+}
+
 /*! \copydoc to_vector_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-vector_exprt &to_vector_expr(exprt &expr);
+inline vector_exprt &to_vector_expr(exprt &expr)
+{
+  assert(expr.id()==ID_vector);
+  return static_cast<vector_exprt &>(expr);
+}
 
 /*! \brief union constructor from single element
 */
@@ -1265,18 +1253,6 @@ public:
     unary_exprt(ID_union, _value, _type)
   {
     set_component_name(_component_name);
-  }
-
-  friend inline const union_exprt &to_union_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_union && expr.operands().size()==1);
-    return static_cast<const union_exprt &>(expr);
-  }
-
-  friend inline union_exprt &to_union_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_union && expr.operands().size()==1);
-    return static_cast<union_exprt &>(expr);
   }
 
   inline irep_idt get_component_name() const
@@ -1310,11 +1286,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const union_exprt &to_union_expr(const exprt &expr);
+inline const union_exprt &to_union_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_union && expr.operands().size()==1);
+  return static_cast<const union_exprt &>(expr);
+}
+
 /*! \copydoc to_union_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-union_exprt &to_union_expr(exprt &expr);
+inline union_exprt &to_union_expr(exprt &expr)
+{
+  assert(expr.id()==ID_union && expr.operands().size()==1);
+  return static_cast<union_exprt &>(expr);
+}
 
 /*! \brief struct constructor from list of elements
 */
@@ -1329,18 +1314,6 @@ public:
     exprt(ID_struct, _type)
   {
   }
-
-  friend inline const struct_exprt &to_struct_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_struct);
-    return static_cast<const struct_exprt &>(expr);
-  }
-
-  friend inline struct_exprt &to_struct_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_struct);
-    return static_cast<struct_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to a \ref struct_exprt
@@ -1353,11 +1326,20 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const struct_exprt &to_struct_expr(const exprt &expr);
+inline const struct_exprt &to_struct_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_struct);
+  return static_cast<const struct_exprt &>(expr);
+}
+
 /*! \copydoc to_struct_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-struct_exprt &to_struct_expr(exprt &expr);
+inline struct_exprt &to_struct_expr(exprt &expr)
+{
+  assert(expr.id()==ID_struct);
+  return static_cast<struct_exprt &>(expr);
+}
 
 /*! \brief complex constructor from a pair of numbers
 */
@@ -1473,18 +1455,6 @@ public:
   {
     return op1();
   }
-
-  friend inline const object_descriptor_exprt &to_object_descriptor_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
-    return static_cast<const object_descriptor_exprt &>(expr);
-  }
-
-  friend inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
-    return static_cast<object_descriptor_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to an \ref object_descriptor_exprt
@@ -1497,11 +1467,21 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const object_descriptor_exprt &to_object_descriptor_expr(const exprt &expr);
+inline const object_descriptor_exprt &to_object_descriptor_expr(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
+  return static_cast<const object_descriptor_exprt &>(expr);
+}
+
 /*! \copydoc to_object_descriptor_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-object_descriptor_exprt &to_object_descriptor_expr(exprt &expr);
+inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
+{
+  assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
+  return static_cast<object_descriptor_exprt &>(expr);
+}
 
 /*! \brief TO_BE_DOCUMENTED
 */
@@ -1541,18 +1521,6 @@ public:
   {
     return op1();
   }
-
-  friend inline const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
-    return static_cast<const dynamic_object_exprt &>(expr);
-  }
-
-  friend inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
-    return static_cast<dynamic_object_exprt &>(expr);
-  }
 };
 
 /*! \brief Cast a generic exprt to a \ref dynamic_object_exprt
@@ -1565,11 +1533,21 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr);
+inline const dynamic_object_exprt &to_dynamic_object_expr(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
+  return static_cast<const dynamic_object_exprt &>(expr);
+}
+
 /*! \copydoc to_dynamic_object_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-dynamic_object_exprt &to_dynamic_object_expr(exprt &expr);
+inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
+{
+  assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
+  return static_cast<dynamic_object_exprt &>(expr);
+}
 
 /*! \brief semantic type conversion
 */

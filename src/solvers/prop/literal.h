@@ -39,34 +39,34 @@ public:
     set(v, sign);
   }
 
-  friend inline bool operator ==(const literalt a, const literalt b)
+  inline bool operator==(const literalt other) const
   {
-    return a.l==b.l;
+    return l==other.l;
   }
 
-  friend inline bool operator !=(const literalt a, const literalt b)
+  inline bool operator!=(const literalt other) const
   {
-    return a.l!=b.l;
+    return l!=other.l;
   }
 
   // for sets
-  friend inline bool operator <(const literalt a, const literalt b)
+  inline bool operator<(const literalt other) const
   {
-    return a.l<b.l;
+    return l<other.l;
   }
 
   // negates if 'b' is true
-  friend inline literalt operator^(const literalt a, const bool b)
+  inline literalt operator^(const bool b) const
   {
-    literalt result=a;
+    literalt result(*this);
     result.l^=(var_not)b;
     return result;
   }
 
   // negates the literal
-  friend inline literalt operator!(const literalt a)
+  inline literalt operator!() const
   {
-    literalt result(a);
+    literalt result(*this);
     result.invert();
     return result;
   }
@@ -160,18 +160,10 @@ public:
     return is_constant() && !sign();
   }
 
-  friend inline literalt const_literal(bool value)
-  {
-    return literalt(literalt::const_var_no(), value);
-  }
-
   inline bool is_constant() const
   {
     return var_no()==const_var_no();
   }
-
-  friend inline literalt neg(literalt a) { return !a; }
-  friend inline literalt pos(literalt a) { return a; }
 
   static inline var_not const_var_no()
   {
@@ -190,10 +182,14 @@ protected:
 std::ostream & operator << (std::ostream &out, literalt l);
 
 // constants
-literalt const_literal(bool value);
+inline literalt const_literal(bool value)
+{
+  return literalt(literalt::const_var_no(), value);
+}
 
-literalt neg(literalt a);
-literalt pos(literalt a);
+inline literalt neg(literalt a) { return !a; }
+inline literalt pos(literalt a) { return a; }
+
 
 // bit-vectors
 typedef std::vector<literalt> bvt;

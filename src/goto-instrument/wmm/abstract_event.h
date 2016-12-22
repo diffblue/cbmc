@@ -91,11 +91,6 @@ public:
   inline bool is_fence() const {
     return operation==Fence || operation==Lwfence || operation==ASMfence;}
 
-  friend std::ostream& operator<<(std::ostream& s, const abstract_eventt& e)
-  {
-    return s << e.get_operation() << e.variable;
-  }
-
   /* checks the safety of the pair locally (i.e., w/o taking fences
      or dependencies into account -- use is_unsafe on the whole
      critical cycle for this) */
@@ -152,4 +147,12 @@ public:
     return value;
   }
 };
+
+inline std::ostream& operator<<(
+  std::ostream& s,
+  const abstract_eventt &e)
+{
+  return s << e.get_operation() << e.variable;
+}
+
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H

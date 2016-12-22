@@ -99,17 +99,17 @@ public:
   bv_arithmetict &operator -= (const bv_arithmetict &other);
   bv_arithmetict &operator %= (const bv_arithmetict &other);
 
-  friend bool operator < (const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator <=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator > (const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator >=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator ==(const bv_arithmetict &a, int i);
+  bool operator<(const bv_arithmetict &other);
+  bool operator<=(const bv_arithmetict &other);
+  bool operator>(const bv_arithmetict &other);
+  bool operator>=(const bv_arithmetict &other);
+  bool operator==(const bv_arithmetict &other);
+  bool operator!=(const bv_arithmetict &other);
+  bool operator==(int i);
 
-  friend std::ostream& operator << (std::ostream &out, const bv_arithmetict &f)
+  std::ostream& operator<<(std::ostream &out)
   {
-    return out << f.to_ansi_c_string();
+    return out << to_ansi_c_string();
   }
 
   // turn into natural number representation
@@ -123,13 +123,5 @@ protected:
   // puts the value back into its range
   void adjust();
 };
-
-bool operator < (const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator <=(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator > (const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator >=(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b);
-std::ostream& operator << (std::ostream &, const bv_arithmetict &);
 
 #endif // CPROVER_UTIL_BV_ARITHMETIC_H

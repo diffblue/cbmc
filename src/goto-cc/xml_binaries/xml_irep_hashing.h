@@ -42,7 +42,7 @@ class xml_irep_convertt {
     {
       bool operator()(const irept &l, const irept &r) const
       {
-        return full_eq(l,r);
+        return l.full_eq(l,r);
       }
     };
 

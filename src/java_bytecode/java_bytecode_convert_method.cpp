@@ -41,20 +41,25 @@ public:
   }
 
   // match with '?'
-  friend bool operator==(const irep_idt &what, const patternt &pattern)
+  bool operator==(const irep_idt &what) const
   {
     for(std::size_t i=0; i<what.size(); i++)
-      if(pattern.p[i]==0)
+      if(p[i]==0)
         return false;
-      else if(pattern.p[i]!='?' && pattern.p[i]!=what[i])
+      else if(p[i]!='?' && p[i]!=what[i])
         return false;
 
-    return pattern.p[what.size()]==0;
+    return p[what.size()]==0;
   }
 
 protected:
   const char *p;
 };
+
+static bool operator==(const irep_idt &what, const patternt &pattern)
+{
+  return pattern==what;
+}
 
 const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);

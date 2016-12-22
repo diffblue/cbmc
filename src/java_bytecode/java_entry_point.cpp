@@ -220,7 +220,7 @@ exprt::operandst java_build_arguments(
         to_code_type(function.type).return_type().id()==ID_empty &&
         (!to_code_type(function.type).has_this()) &&
         parameters.size()==1 &&
-        full_eq(parameters[0].type(), string_array_type);
+        parameters[0].type().full_eq(string_array_type);
       is_main=(named_main && has_correct_type);
     }
 
