@@ -35,7 +35,7 @@ public:
 
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);
-  
+
   void make_all_true();
   void make_all_false();
 
@@ -43,7 +43,7 @@ public:
   void simplify(goto_functionst &goto_functions);
 
   typedef ait<invariant_set_domaint> baset;
-  
+
 protected:
   const namespacet &ns;
   value_setst &value_sets;

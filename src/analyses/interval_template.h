@@ -76,7 +76,8 @@ public:
   {
     if(upper_set)
     {
-      if(upper>v) upper=v;
+      if(upper>v)
+        upper=v;
     }
     else
     {
@@ -89,7 +90,8 @@ public:
   {
     if(lower_set)
     {
-      if(lower<v) lower=v;
+      if(lower<v)
+        lower=v;
     }
     else
     {
@@ -154,43 +156,52 @@ public:
 };
 
 template<class T>
-tvt operator <= (const interval_template<T> &a, const interval_template<T> &b)
+tvt operator<=(const interval_template<T> &a, const interval_template<T> &b)
 {
-  if(a.upper_set && b.lower_set && a.upper<=b.lower) return tvt(true);
-  if(a.lower_set && b.upper_set && a.lower>b.upper) return tvt(false);
+  if(a.upper_set && b.lower_set && a.upper<=b.lower)
+    return tvt(true);
+  if(a.lower_set && b.upper_set && a.lower>b.upper)
+    return tvt(false);
+
   return tvt::unknown();
 }
 
 template<class T>
-tvt operator >= (const interval_template<T> &a, const interval_template<T> &b)
+tvt operator>=(const interval_template<T> &a, const interval_template<T> &b)
 {
   return b<=a;
 }
 
 template<class T>
-tvt operator <  (const interval_template<T> &a, const interval_template<T> &b)
+tvt operator<(const interval_template<T> &a, const interval_template<T> &b)
 {
   return !(a>=b);
 }
 
 template<class T>
-tvt operator >  (const interval_template<T> &a, const interval_template<T> &b)
+tvt operator>(const interval_template<T> &a, const interval_template<T> &b)
 {
   return !(a<=b);
 }
 
 template<class T>
-bool operator == (const interval_template<T> &a, const interval_template<T> &b)
+bool operator==(const interval_template<T> &a, const interval_template<T> &b)
 {
-  if(a.lower_set!=b.lower_set) return false;
-  if(a.upper_set!=b.upper_set) return false;
-  if(a.lower_set && a.lower!=b.lower) return false;
-  if(a.upper_set && a.upper!=b.upper) return false;
+  if(a.lower_set!=b.lower_set)
+    return false;
+  if(a.upper_set!=b.upper_set)
+    return false;
+
+  if(a.lower_set && a.lower!=b.lower)
+    return false;
+  if(a.upper_set && a.upper!=b.upper)
+    return false;
+
   return true;
 }
 
 template<class T>
-bool operator != (const interval_template<T> &a, const interval_template<T> &b)
+bool operator!=(const interval_template<T> &a, const interval_template<T> &b)
 {
   return !(a==b);
 }

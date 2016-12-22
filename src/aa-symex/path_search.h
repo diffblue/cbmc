@@ -80,7 +80,6 @@ public:
   property_mapt property_map;
 
 protected:
-
 #ifdef PATH_SYMEX_FORK
   // blocks until child processes have terminated
   int await();

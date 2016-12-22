@@ -137,13 +137,14 @@ protected:
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
-    matcht(cpp_template_args_tct _s_args,
-           cpp_template_args_tct _f_args,
-           irep_idt _id):
+    matcht(
+      cpp_template_args_tct _s_args,
+      cpp_template_args_tct _f_args,
+      irep_idt _id):
       cost((unsigned)_s_args.arguments().size()),
-           specialization_args(_s_args),
-           full_args(_f_args),
-           id(_id)
+      specialization_args(_s_args),
+      full_args(_f_args),
+      id(_id)
     {
     }
 

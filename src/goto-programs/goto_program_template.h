@@ -23,27 +23,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 
-typedef enum { NO_INSTRUCTION_TYPE=0,
-               GOTO=1,          // branch, possibly guarded
-               ASSUME=2,        // non-failing guarded self loop
-               ASSERT=3,        // assertions
-               OTHER=4,         // anything else
-               SKIP=5,          // just advance the PC
-               START_THREAD=6,  // spawns an asynchronous thread
-               END_THREAD=7,    // end the current thread
-               LOCATION=8,      // semantically like SKIP
-               END_FUNCTION=9,  // exit point of a function
-               ATOMIC_BEGIN=10, // marks a block without interleavings
-               ATOMIC_END=11,   // end of a block without interleavings
-               RETURN=12,       // set function return value (no control-flow change)
-               ASSIGN=13,       // assignment lhs:=rhs
-               DECL=14,         // declare a local variable
-               DEAD=15,         // marks the end-of-live of a local variable
-               FUNCTION_CALL=16,// call a function
-               THROW=17,        // throw an exception
-               CATCH=18         // catch an exception
-             }
-  goto_program_instruction_typet;
+typedef enum
+{
+  NO_INSTRUCTION_TYPE=0,
+  GOTO=1,           // branch, possibly guarded
+  ASSUME=2,         // non-failing guarded self loop
+  ASSERT=3,         // assertions
+  OTHER=4,          // anything else
+  SKIP=5,           // just advance the PC
+  START_THREAD=6,   // spawns an asynchronous thread
+  END_THREAD=7,     // end the current thread
+  LOCATION=8,       // semantically like SKIP
+  END_FUNCTION=9,   // exit point of a function
+  ATOMIC_BEGIN=10,  // marks a block without interleavings
+  ATOMIC_END=11,    // end of a block without interleavings
+  RETURN=12,        // set function return value (no control-flow change)
+  ASSIGN=13,        // assignment lhs:=rhs
+  DECL=14,          // declare a local variable
+  DEAD=15,          // marks the end-of-live of a local variable
+  FUNCTION_CALL=16, // call a function
+  THROW=17,         // throw an exception
+  CATCH=18          // catch an exception
+} goto_program_instruction_typet;
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
@@ -142,7 +143,6 @@ public:
 
     inline void make_goto() { clear(GOTO); }
     inline void make_return() { clear(RETURN); }
-    inline void make_function_call(const codeT &_code) { clear(FUNCTION_CALL); code=_code; }
     inline void make_skip() { clear(SKIP); }
     inline void make_throw() { clear(THROW); }
     inline void make_catch() { clear(CATCH); }
@@ -167,11 +167,17 @@ public:
       guard=g;
     }
 
+    inline void make_function_call(const codeT &_code)
+    {
+      clear(FUNCTION_CALL);
+      code=_code;
+    }
+
     inline bool is_goto         () const { return type==GOTO;          }
     inline bool is_return       () const { return type==RETURN;        }
     inline bool is_assign       () const { return type==ASSIGN;        }
     inline bool is_function_call() const { return type==FUNCTION_CALL; }
-    inline bool is_throw        () const { return type==THROW; }
+    inline bool is_throw        () const { return type==THROW;         }
     inline bool is_catch        () const { return type==CATCH;         }
     inline bool is_skip         () const { return type==SKIP;          }
     inline bool is_location     () const { return type==LOCATION;      }
@@ -310,7 +316,9 @@ public:
 
   //! Insertion that preserves jumps to "target".
   //! The program p is destroyed.
-  void insert_before_swap(targett target, goto_program_templatet<codeT, guardT> &p)
+  void insert_before_swap(
+    targett target,
+    goto_program_templatet<codeT, guardT> &p)
   {
     assert(target!=instructions.end());
     if(p.instructions.empty()) return;
@@ -327,7 +335,7 @@ public:
   {
     return instructions.insert(target, instructiont());
   }
-  
+
   //! Insertion before the given target
   //! \return newly inserted location
   inline targett insert_before(const_targett target)
@@ -358,8 +366,7 @@ public:
     targett target,
     goto_program_templatet<codeT, guardT> &p)
   {
-    instructions.splice(target,
-                        p.instructions);
+    instructions.splice(target, p.instructions);
     // BUG: The iterators to p-instructions are invalidated!
   }
 
@@ -369,8 +376,7 @@ public:
     const_targett target,
     goto_program_templatet<codeT, guardT> &p)
   {
-    instructions.splice(target,
-                        p.instructions);
+    instructions.splice(target, p.instructions);
     // BUG: The iterators to p-instructions are invalidated!
   }
 
@@ -649,7 +655,6 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       }
     }
   }
-
 }
 
 template <class codeT, class guardT>

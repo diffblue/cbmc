@@ -61,7 +61,8 @@ public:
 
   std::string format(const format_spect &format_spec) const;
 
-  bool operator == (int i) const;
+  bool operator==(int i) const;
+
   bool is_zero() const
   {
     return v==0;
@@ -69,10 +70,10 @@ public:
 
   void negate();
 
-  fixedbvt &operator /= (const fixedbvt &other);
-  fixedbvt &operator *= (const fixedbvt &other);
-  fixedbvt &operator += (const fixedbvt &other);
-  fixedbvt &operator -= (const fixedbvt &other);
+  fixedbvt &operator/=(const fixedbvt &other);
+  fixedbvt &operator*=(const fixedbvt &other);
+  fixedbvt &operator+=(const fixedbvt &other);
+  fixedbvt &operator-=(const fixedbvt &other);
 
   bool operator<(const fixedbvt &other) const { return v<other.v; }
   bool operator<=(const fixedbvt &other) const { return v<=other.v; }

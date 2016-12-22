@@ -310,7 +310,7 @@ const irep_idt &irept::get(const irep_namet &name) const
   if(it==s.end() ||
      it->first!=name)
   {
-    const static irep_idt empty;
+    static const irep_idt empty;
     return empty;
   }
   #else
@@ -318,7 +318,7 @@ const irep_idt &irept::get(const irep_namet &name) const
 
   if(it==s.end())
   {
-    const static irep_idt empty;
+    static const irep_idt empty;
     return empty;
   }
   #endif
@@ -578,7 +578,8 @@ bool irept::operator==(const irept &other) const
   ++irep_cmp_cnt;
   #endif
   #ifdef SHARING
-  if(data==other.data) return true;
+  if(data==other.data)
+    return true;
   #endif
 
   if(id()!=other.id() ||
@@ -623,9 +624,10 @@ bool irept::full_eq(const irept &other) const
   const irept::named_subt &i1_comments=get_comments();
   const irept::named_subt &i2_comments=other.get_comments();
 
-  if(i1_sub.size()      !=i2_sub.size()) return false;
-  if(i1_named_sub.size()!=i2_named_sub.size()) return false;
-  if(i1_comments.size() !=i2_comments.size()) return false;
+  if(i1_sub.size()!=i2_sub.size() ||
+     i1_named_sub.size()!=i2_named_sub.size() ||
+     i1_comments.size()!=i2_comments.size())
+    return false;
 
   for(std::size_t i=0; i<i1_sub.size(); i++)
     if(!i1_sub[i].full_eq(i2_sub[i]))
@@ -926,7 +928,7 @@ Function: irept::pretty
 
 std::string irept::pretty(unsigned indent, unsigned max_indent) const
 {
-  if (max_indent > 0 && indent > max_indent)
+  if(max_indent>0 && indent>max_indent)
     return "";
 
   std::string result;

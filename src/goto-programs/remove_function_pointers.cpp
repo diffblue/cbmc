@@ -64,8 +64,9 @@ protected:
     const typet &function_type);
 
   void fix_argument_types(code_function_callt &function_call);
-  void fix_return_type(code_function_callt &function_call,
-                       goto_programt &dest);
+  void fix_return_type(
+    code_function_callt &function_call,
+    goto_programt &dest);
 
   symbolt &new_tmp_symbol();
 
@@ -129,8 +130,10 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
 
   do
   {
-    new_symbol.base_name="tmp_return_val$"+std::to_string(++temporary_counter);
-    new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
+    new_symbol.base_name=
+      "tmp_return_val$"+std::to_string(++temporary_counter);
+    new_symbol.name=
+      "remove_function_pointers::"+id2string(new_symbol.base_name);
   } while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
@@ -459,7 +462,8 @@ void remove_function_pointerst::remove_function_pointer(
     irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
     it->function=target->function;
-    if(!property_class.empty()) it->source_location.set_property_class(property_class);
+    if(!property_class.empty())
+      it->source_location.set_property_class(property_class);
     if(!comment.empty()) it->source_location.set_comment(comment);
   }
 

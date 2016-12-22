@@ -80,22 +80,22 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
 
   switch(mode)
   {
-   case 0:
+  case 0:
     rational_value=rationalt(string2integer(no1));
     break;
 
-   case '.':
+  case '.':
     rational_value=rationalt(string2integer(no1));
     rational_value+=
       rationalt(string2integer(no2))/rationalt(power10(no2.size()));
     break;
 
-   case '/':
+  case '/':
     rational_value=rationalt(string2integer(no1));
     rational_value/=rationalt(string2integer(no2));
     break;
 
-   default:
+  default:
     return true;
   }
 

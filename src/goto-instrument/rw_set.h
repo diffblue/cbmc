@@ -59,7 +59,7 @@ public:
     std::swap(other.w_entries, w_entries);
   }
 
-  inline rw_set_baset &operator += (const rw_set_baset &other)
+  inline rw_set_baset &operator+=(const rw_set_baset &other)
   {
     r_entries.insert(other.r_entries.begin(), other.r_entries.end());
     w_entries.insert(other.w_entries.begin(), other.w_entries.end());
@@ -249,7 +249,8 @@ protected:
   bool dereferencing;
   std::vector<entryt> dereferenced;
 
-  void track_deref(const entryt& entry, bool read) {
+  void track_deref(const entryt& entry, bool read)
+  {
     if(dereferencing && dereferenced.size()==0)
     {
       dereferenced.insert(dereferenced.begin(), entry);
@@ -257,15 +258,17 @@ protected:
         set_reads.insert(entry.object);
     }
     else if(dereferencing && dereferenced.size()>0)
-      dereferenced_from.insert(std::make_pair(entry.object,
-        dereferenced.front().object));
+      dereferenced_from.insert(
+        std::make_pair(entry.object, dereferenced.front().object));
   }
 
-  void set_track_deref() {
+  void set_track_deref()
+  {
     dereferencing=true;
   }
 
-  void reset_track_deref() {
+  void reset_track_deref()
+  {
     dereferencing=false;
     dereferenced.clear();
   }

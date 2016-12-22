@@ -667,8 +667,12 @@ void c_typecastt::implicit_typecast_followed(
       {
         // ok
       }
-      else if((is_number(src_sub) || src_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag) &&
-              (is_number(dest_sub) || dest_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag))
+      else if((is_number(src_sub) ||
+               src_sub.id()==ID_c_enum ||
+               src_sub.id()==ID_c_enum_tag) &&
+              (is_number(dest_sub) ||
+               dest_sub.id()==ID_c_enum ||
+               src_sub.id()==ID_c_enum_tag))
       {
         // Also generous: between any to scalar types it's ok.
         // We should probably check the size.

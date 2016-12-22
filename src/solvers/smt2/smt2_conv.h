@@ -27,7 +27,17 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
-  typedef enum { GENERIC, BOOLECTOR, CVC3, CVC4, MATHSAT, OPENSMT, YICES, Z3 } solvert;
+  typedef enum
+  {
+    GENERIC,
+    BOOLECTOR,
+    CVC3,
+    CVC4,
+    MATHSAT,
+    OPENSMT,
+    YICES,
+    Z3
+  } solvert;
 
   smt2_convt(
     const namespacet &_ns,
@@ -166,9 +176,9 @@ protected:
   typedef std::pair<unsigned, symbol_exprt> let_count_id;
   typedef std::unordered_map<exprt, let_count_id, irep_hash> seen_expressionst;
   unsigned let_id_count;
-  const static unsigned LET_COUNT = 2;
+  const static unsigned LET_COUNT=2;
 
-  class let_visitort : public expr_visitort
+  class let_visitort:public expr_visitort
   {
     const seen_expressionst &let_map;
 
@@ -177,13 +187,12 @@ protected:
 
     void operator()(exprt &expr)
     {
-      seen_expressionst::const_iterator it = let_map.find(expr);
-      if (it != let_map.end() &&
-          it->second.first >= LET_COUNT)
+      seen_expressionst::const_iterator it=let_map.find(expr);
+      if(it!=let_map.end() &&
+         it->second.first>=LET_COUNT)
       {
-        symbol_exprt symb = it->second.second;
-        expr = symb;
-        return;
+        symbol_exprt symb=it->second.second;
+        expr=symb;
       }
     }
   };

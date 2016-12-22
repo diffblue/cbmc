@@ -308,7 +308,8 @@ void dep_graph_domaint::output(
         it!=control_deps.end();
         ++it)
     {
-      if(it!=control_deps.begin()) out << ",";
+      if(it!=control_deps.begin())
+        out << ",";
       out << (*it)->location_number;
     }
     out << std::endl;
@@ -322,7 +323,8 @@ void dep_graph_domaint::output(
         it!=data_deps.end();
         ++it)
     {
-      if(it!=data_deps.begin()) out << ",";
+      if(it!=data_deps.begin())
+        out << ",";
       out << (*it)->location_number;
     }
     out << std::endl;

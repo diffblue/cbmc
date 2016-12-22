@@ -313,7 +313,8 @@ void unified_difft::lcss(
     for(j=0; j<=new_count; ++j)
     {
       std::cerr << " ";
-      if(lcss_matrix[i][j]<10) std::cerr << " ";
+      if(lcss_matrix[i][j]<10)
+        std::cerr << " ";
       std::cerr << lcss_matrix[i][j];
     }
     std::cerr << std::endl;

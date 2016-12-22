@@ -153,7 +153,10 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
 
     if(rem*2>=p)
     {
-      if(v<0) --div; else ++div;
+      if(v<0)
+        --div;
+      else
+        ++div;
     }
 
     result=div;

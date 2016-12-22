@@ -36,7 +36,8 @@ void invariant_set_domaint::transform(
 
       goto_programt::const_targett next=from_l;
       next++;
-      if(next==to_l) tmp.make_not();
+      if(next==to_l)
+        tmp.make_not();
 
       simplify(tmp, ns);
       invariant_set.strengthen(tmp);

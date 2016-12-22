@@ -331,7 +331,7 @@ void goto_unwindt::unwind(
 
   // after unwound part
   copies.destructive_append(rest_program);
-  
+
   // now insert copies before loop_exit
   goto_program.destructive_insert(loop_exit, copies);
 }
@@ -355,7 +355,7 @@ int goto_unwindt::get_k(
   const unwind_sett &unwind_set) const
 {
   assert(global_k>=-1);
-  
+
   unwind_sett::const_iterator f_it=unwind_set.find(func);
   if(f_it==unwind_set.end())
     return global_k;

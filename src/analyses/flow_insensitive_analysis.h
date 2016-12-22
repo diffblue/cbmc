@@ -28,7 +28,7 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  virtual void initialize( const namespacet &ns )=0;
+  virtual void initialize(const namespacet &ns)=0;
 
   virtual bool transform(
     const namespacet &ns,
@@ -80,7 +80,7 @@ public:
 
   std::map<locationt, unsigned> statistics;
 
-  bool seen( const locationt& l )
+  bool seen(const locationt& l)
   {
     return (seen_locations.find(l)!=seen_locations.end());
   }

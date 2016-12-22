@@ -50,17 +50,17 @@ public:
     std::string& err);
 
   bool integral_conversion(
-      const typet &src_type,
-      const typet &dest_type);
+    const typet &src_type,
+    const typet &dest_type);
 
   exprt subtype_offset(
-      const struct_typet &from,
-      const struct_typet &to);
+    const struct_typet &from,
+    const struct_typet &to);
 
   void make_ptr_typecast(
-      exprt &expr,
-      const typet & src_type,
-      const typet & dest_type);
+    exprt &expr,
+    const typet & src_type,
+    const typet & dest_type);
 
   cpp_typecheckt &cpp_typecheck;
 };

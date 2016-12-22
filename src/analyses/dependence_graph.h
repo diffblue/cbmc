@@ -41,7 +41,8 @@ public:
         break;
       case DATA:
       case CTRL:
-        if(kind!=_kind) kind=BOTH;
+        if(kind!=_kind)
+          kind=BOTH;
         break;
       case BOTH:
         break;

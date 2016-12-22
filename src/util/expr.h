@@ -50,11 +50,17 @@ public:
   // constructors
   inline exprt() { }
   inline explicit exprt(const irep_idt &_id):irept(_id) { }
-  inline exprt(const irep_idt &_id, const typet &_type):irept(_id) { add(ID_type, _type); }
+  inline exprt(const irep_idt &_id, const typet &_type):irept(_id)
+  {
+    add(ID_type, _type);
+  }
 
   // returns the type of the expression
   inline typet &type() { return static_cast<typet &>(add(ID_type)); }
-  inline const typet &type() const { return static_cast<const typet &>(find(ID_type)); }
+  inline const typet &type() const
+  {
+    return static_cast<const typet &>(find(ID_type));
+  }
 
   // returns true if there is at least one operand
   inline bool has_operands() const
@@ -101,12 +107,14 @@ public:
   inline void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
-  void move_to_operands(exprt &expr); // destroys expr
-  void move_to_operands(exprt &e1, exprt &e2); // destroys e1, e2
-  void move_to_operands(exprt &e1, exprt &e2, exprt &e3); // destroys e1, e2, e3
-  void copy_to_operands(const exprt &expr); // does not destroy expr
-  void copy_to_operands(const exprt &e1, const exprt &e2); // does not destroy expr
-  void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3); // does not destroy expr
+  // destroys expr, e1, e2, e3
+  void move_to_operands(exprt &expr);
+  void move_to_operands(exprt &e1, exprt &e2);
+  void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
+  // does not destroy expr, e1, e2, e3
+  void copy_to_operands(const exprt &expr);
+  void copy_to_operands(const exprt &e1, const exprt &e2);
+  void copy_to_operands(const exprt &e1, const exprt &e2, const exprt &e3);
 
   // the following are deprecated -- use constructors instead
   void make_typecast(const typet &_type);

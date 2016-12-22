@@ -378,7 +378,7 @@ bool c_preprocess(
   temporary_filet tmp_file("tmp.stdin", ".c");
 
   std::ofstream tmp(tmp_file());
-  
+
   if(!tmp)
   {
     messaget message(message_handler);

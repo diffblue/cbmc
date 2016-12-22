@@ -219,7 +219,7 @@ Function: operator /=
 
 \*******************************************************************/
 
-bv_arithmetict &bv_arithmetict::operator /= (const bv_arithmetict &other)
+bv_arithmetict &bv_arithmetict::operator/=(const bv_arithmetict &other)
 {
   assert(other.spec==spec);
 
@@ -243,7 +243,7 @@ Function: operator *=
 
 \*******************************************************************/
 
-bv_arithmetict &bv_arithmetict::operator *= (const bv_arithmetict &other)
+bv_arithmetict &bv_arithmetict::operator*=(const bv_arithmetict &other)
 {
   assert(other.spec==spec);
 
@@ -265,7 +265,7 @@ Function: operator +=
 
 \*******************************************************************/
 
-bv_arithmetict &bv_arithmetict::operator += (const bv_arithmetict &other)
+bv_arithmetict &bv_arithmetict::operator+=(const bv_arithmetict &other)
 {
   assert(other.spec==spec);
 
@@ -309,7 +309,7 @@ Function: operator %=
 
 \*******************************************************************/
 
-bv_arithmetict &bv_arithmetict::operator %= (const bv_arithmetict &other)
+bv_arithmetict &bv_arithmetict::operator%=(const bv_arithmetict &other)
 {
   assert(other.spec==spec);
 

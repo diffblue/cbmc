@@ -58,7 +58,8 @@ public:
     ai_baset &ai,
     const namespacet &ns) override final
   {
-    if(!reachable) return;
+    if(!reachable)
+      return;
     if(from->is_start_thread() ||
        to->is_end_thread())
     {

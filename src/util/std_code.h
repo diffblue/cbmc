@@ -1115,7 +1115,8 @@ inline side_effect_expr_throwt &to_side_effect_expr_throw(exprt &expr)
   return static_cast<side_effect_expr_throwt &>(expr);
 }
 
-inline const side_effect_expr_throwt &to_side_effect_expr_throw(const exprt &expr)
+inline const side_effect_expr_throwt &to_side_effect_expr_throw(
+  const exprt &expr)
 {
   assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_throw);

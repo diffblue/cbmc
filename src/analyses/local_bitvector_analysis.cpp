@@ -32,14 +32,22 @@ Function: local_bitvector_analysist::flagst::print
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
-  if(is_unknown()) out << "+unknown";
-  if(is_uninitialized()) out << "+uninitialized";
-  if(is_uses_offset()) out << "+uses_offset";
-  if(is_dynamic_local()) out << "+dynamic_local";
-  if(is_dynamic_heap()) out << "+dynamic_heap";
-  if(is_null()) out << "+null";
-  if(is_static_lifetime()) out << "+static_lifetime";
-  if(is_integer_address()) out << "+integer_address";
+  if(is_unknown())
+    out << "+unknown";
+  if(is_uninitialized())
+    out << "+uninitialized";
+  if(is_uses_offset())
+    out << "+uses_offset";
+  if(is_dynamic_local())
+    out << "+dynamic_local";
+  if(is_dynamic_heap())
+    out << "+dynamic_heap";
+  if(is_null())
+    out << "+null";
+  if(is_static_lifetime())
+    out << "+static_lifetime";
+  if(is_integer_address())
+    out << "+integer_address";
 }
 
 /*******************************************************************\
@@ -86,9 +94,11 @@ Function: local_bitvector_analysist::is_tracked
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
-  if(it==locals.locals_map.end()) return false;
-  if(it->second.id()!=ID_pointer) return false;
-  if(dirty(identifier)) return false;
+  if(it==locals.locals_map.end() ||
+     it->second.id()!=ID_pointer ||
+     dirty(identifier))
+    return false;
+
   return true;
 }
 
@@ -313,7 +323,8 @@ Function: local_bitvector_analysist::build
 
 void local_bitvector_analysist::build(const goto_functiont &goto_function)
 {
-  if(cfg.nodes.empty()) return;
+  if(cfg.nodes.empty())
+    return;
 
   work_queuet work_queue;
   work_queue.push(0);

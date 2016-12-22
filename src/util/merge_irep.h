@@ -16,17 +16,17 @@ Author: Daniel Kroening, kroening@kroening.com
 class merged_irept:public irept
 {
 public:
-  inline bool operator == (const merged_irept &other) const
+  inline bool operator==(const merged_irept &other) const
   {
     // We assume that both are in the same container,
     // which isn't checked.
     return data==other.data;
   }
 
-  inline bool operator < (const merged_irept &other) const
+  inline bool operator<(const merged_irept &other) const
   {
     // again, assumes that both are in the same container
-    return ((std::size_t)data) < ((std::size_t)other.data);
+    return ((std::size_t)data)<((std::size_t)other.data);
   }
 
   inline std::size_t hash() const { return (std::size_t)data; }
@@ -55,7 +55,7 @@ struct merged_irep_hash
 class to_be_merged_irept:public irept
 {
 public:
-  bool operator == (const to_be_merged_irept &other) const;
+  bool operator==(const to_be_merged_irept &other) const;
   std::size_t hash() const;
 
 protected:
@@ -85,7 +85,8 @@ protected:
   typedef std::unordered_set<merged_irept, merged_irep_hash> merged_irep_storet;
   merged_irep_storet merged_irep_store;
 
-  typedef std::unordered_set<to_be_merged_irept, to_be_merged_irep_hash> to_be_merged_irep_storet;
+  typedef std::unordered_set<to_be_merged_irept, to_be_merged_irep_hash>
+    to_be_merged_irep_storet;
   to_be_merged_irep_storet to_be_merged_irep_store;
 
   const merged_irept &merged(const irept &);

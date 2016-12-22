@@ -116,7 +116,9 @@ public:
   {
     assert(goto_functions!=NULL);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);
-    if(f_it!=fkt_map.end()) return *f_it->second;
+    if(f_it!=fkt_map.end())
+      return *f_it->second;
+
     goto_functionst::function_mapt::const_iterator f_it2=
       goto_functions->function_map.find(fkt);
     assert(f_it2!=goto_functions->function_map.end());

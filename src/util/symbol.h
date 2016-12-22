@@ -110,8 +110,7 @@ public:
   }
 };
 
-std::ostream &operator<<(std::ostream &out,
-                         const symbolt &symbol);
+std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
 
 /*! \brief Symbol table entry describing a data type
     \ingroup gr_symbol_table

@@ -72,7 +72,8 @@ class decision_proceduret;
 class path_symex_stept
 {
 public:
-  enum kindt {
+  enum kindt
+  {
     NON_BRANCH, BRANCH_TAKEN, BRANCH_NOT_TAKEN
   } branch;
 

@@ -907,8 +907,10 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
 
       if(opi.is_constant() &&
          opn.is_constant() &&
-         (opi.type().id()==ID_verilog_unsignedbv || is_bitvector_type(opi.type())) &&
-         (opn.type().id()==ID_verilog_unsignedbv || is_bitvector_type(opn.type())))
+         (opi.type().id()==ID_verilog_unsignedbv ||
+          is_bitvector_type(opi.type())) &&
+         (opn.type().id()==ID_verilog_unsignedbv ||
+          is_bitvector_type(opn.type())))
       {
         // merge!
         const std::string new_value=
@@ -1001,7 +1003,7 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
       if(distance>=0)
       {
         // this is to simulate an arithmetic right shift
-        mp_integer new_value=value >> distance;
+        mp_integer new_value=value>>distance; // NOLINT(whitespace/operators)
         expr=from_integer(new_value, expr.type());
         return false;
       }
@@ -1128,10 +1130,10 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
       return true;
 
     if(start<0 || start>=width ||
-       end  <0 || end  >=width)
+       end<0 || end>=width)
       return true;
 
-    assert(start>=end); //is this always the case??
+    assert(start>=end); // is this always the case??
 
     const irep_idt &value=expr.op0().get(ID_value);
 
@@ -1692,9 +1694,9 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
         const mp_integer &int_value1=*it1;
 
         if(expr.id()==ID_ge)
-          tmp=(int_value0 >= int_value1);
+          tmp=(int_value0>=int_value1);
         else if(expr.id()==ID_equal)
-          tmp=(int_value0 == int_value1);
+          tmp=(int_value0==int_value1);
         else
         {
           tmp=false;
@@ -1979,8 +1981,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   #define NORMALISE_CONSTANT_TESTS
   #ifdef NORMALISE_CONSTANT_TESTS
   // Normalise to >= and = to improve caching and term sharing
-  if (expr.op0().type().id()==ID_unsignedbv ||
-      expr.op0().type().id()==ID_signedbv)
+  if(expr.op0().type().id()==ID_unsignedbv ||
+     expr.op0().type().id()==ID_signedbv)
   {
     bv_spect spec(expr.op0().type());
     mp_integer max(spec.max_value());
@@ -1999,7 +2001,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       if(to_integer(expr.op1(), i))
         throw "Bit-vector constant unexpectedly non-integer";
 
-      if (i == max)
+      if(i==max)
       {
         expr=false_exprt();
         return false;
@@ -2025,7 +2027,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       if(to_integer(expr.op1(), i))
         throw "Bit-vector constant unexpectedly non-integer";
 
-      if (i == max)
+      if(i==max)
       {
         expr=true_exprt();
         return false;

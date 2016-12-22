@@ -61,10 +61,14 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file( const std::string &, const symbol_tablet &,
-                          goto_functionst &);
-  bool write_bin_object_file( const std::string&, const symbol_tablet &,
-                              goto_functionst& );
+  bool write_object_file(
+    const std::string &,
+    const symbol_tablet &,
+    goto_functionst &);
+  bool write_bin_object_file(
+    const std::string &,
+    const symbol_tablet &,
+    goto_functionst &);
 
 protected:
   cmdlinet &cmdline;

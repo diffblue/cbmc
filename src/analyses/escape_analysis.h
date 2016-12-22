@@ -79,7 +79,7 @@ public:
   // We track a set of 'cleanup functions' for specific
   // identifiers. The cleanup functions are executed
   // once the last pointer to an object is lost.
-  typedef std::map<irep_idt, cleanupt > cleanup_mapt;
+  typedef std::map<irep_idt, cleanupt> cleanup_mapt;
   cleanup_mapt cleanup_map;
 
 protected:

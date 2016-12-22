@@ -162,7 +162,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
       std::list<exprt> written=objects_written(instruction);
 
       // if(instruction.is_function_call())
-      //const code_function_callt &code_function_call=
+      // const code_function_callt &code_function_call=
       //  to_code_function_call(instruction.code);
 
       const std::set<irep_idt> &uninitialized=
@@ -185,7 +185,8 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
             assertion.type=ASSERT;
             assertion.guard=symbol_exprt(new_identifier, bool_typet());
             assertion.source_location=instruction.source_location;
-            assertion.source_location.set_comment("use of uninitialized local variable");
+            assertion.source_location.set_comment(
+              "use of uninitialized local variable");
             assertion.source_location.set_property_class("uninitialized local");
 
             goto_program.insert_before_swap(i_it, assertion);
@@ -276,5 +277,4 @@ void show_uninitialized(
       uninitialized_analysis.output(ns, f_it->second.body, out);
     }
   }
-
 }

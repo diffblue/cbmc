@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 
@@ -142,7 +142,9 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
     bv_cache.insert(std::make_pair(expr, bvt()));
   if(!cache_result.second)
   {
-    //std::cerr << "Cache hit on " << expr << "\n";
+    #ifdef DEBUG
+    std::cout << "Cache hit on " << expr << "\n";
+    #endif
     return cache_result.first->second;
   }
 
@@ -327,7 +329,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_array_of(to_array_of_expr(expr));
   else if(expr.id()==ID_let)
   {
-    //const let_exprt &let_expr=to_let_expr(expr);
+    // const let_exprt &let_expr=to_let_expr(expr);
     throw "let is todo";
   }
   else if(expr.id()==ID_function_application)
@@ -555,8 +557,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=2)
       throw "notequal expects two operands";
 
-    return !convert_equality(
-        equal_exprt(expr.op0(), expr.op1()));
+    return !convert_equality(equal_exprt(expr.op0(), expr.op1()));
   }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)

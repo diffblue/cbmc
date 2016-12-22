@@ -43,7 +43,7 @@ public:
   virtual literalt new_variable();
   virtual size_t no_variables() const { return _no_variables; }
   virtual void set_no_variables(size_t no) { assert(false); }
-  //virtual unsigned no_clauses()=0;
+  // virtual unsigned no_clauses()=0;
 
   virtual void lcnf(const bvt &bv);
 

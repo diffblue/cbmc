@@ -59,7 +59,8 @@ protected:
 };
 
 class natural_loopst:
-    public natural_loops_templatet<const goto_programt, goto_programt::const_targett>
+    public natural_loops_templatet<const goto_programt,
+                                   goto_programt::const_targett>
 {
 };
 
@@ -80,7 +81,7 @@ Function: natural_loops_templatet::compute
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -96,9 +97,9 @@ void natural_loops_templatet<P, T>::compute(P &program)
 #endif
 
   // find back-edges m->n
-  for (T m_it = program.instructions.begin();
-       m_it != program.instructions.end();
-       ++m_it)
+  for(T m_it=program.instructions.begin();
+      m_it!=program.instructions.end();
+      ++m_it)
   {
     if(m_it->is_backwards_goto())
     {
@@ -149,7 +150,7 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
   loop.insert(n);
   loop.insert(m);
 
-  if (n!=m)
+  if(n!=m)
     stack.push(m);
 
   while(!stack.empty())
@@ -194,7 +195,8 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
     for(typename natural_loopt::const_iterator l_it=loop.second.begin();
         l_it!=loop.second.end(); ++l_it)
     {
-      if(l_it!=loop.second.begin()) out << ", ";
+      if(l_it!=loop.second.begin())
+        out << ", ";
       out << (*l_it)->location_number;
     }
     out << " }\n";

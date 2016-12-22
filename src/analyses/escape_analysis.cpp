@@ -260,7 +260,8 @@ void escape_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false()) return;
+  if(has_values.is_false())
+    return;
 
   // upcast of ai
   //escape_analysist &ea=
@@ -386,12 +387,17 @@ void escape_domaint::output(
       if(aliases.is_root(a_it1) && a_it1!=a_it2 &&
          aliases.same_set(a_it1, a_it2))
       {
-        if(first) { out << "Aliases: " << *a_it1; first=false; }
+        if(first)
+        {
+          out << "Aliases: " << *a_it1;
+          first=false;
+        }
         out << ' ' << *a_it2;
       }
     }
 
-    if(!first) out << '\n';
+    if(!first)
+      out << '\n';
   }
 }
 
@@ -429,7 +435,8 @@ bool escape_domaint::merge(
     std::set<irep_idt> &a_cleanup=cleanup_map[cleanup.first].cleanup_functions;
     unsigned old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
-    if(a_cleanup.size()!=old_size) changed=true;
+    if(a_cleanup.size()!=old_size)
+      changed=true;
   }
 
   // kill empty ones
@@ -554,8 +561,10 @@ void escape_analysist::insert_cleanup(
     {
       typet param_type=function_type.parameters().front().type();
       exprt arg=lhs;
-      if(is_object) arg=address_of_exprt(arg);
-      if(arg.type()!=param_type) arg.make_typecast(param_type);
+      if(is_object)
+        arg=address_of_exprt(arg);
+      if(arg.type()!=param_type)
+        arg.make_typecast(param_type);
       code.arguments().push_back(arg);
     }
 

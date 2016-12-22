@@ -73,7 +73,6 @@ public:
     byte_extract_exprt(ID_byte_extract_little_endian)
   {
   }
-
 };
 
 inline const byte_extract_little_endian_exprt
@@ -181,7 +180,6 @@ public:
     byte_update_exprt(ID_byte_update_little_endian, _op, _offset, _value)
   {
   }
-
 };
 
 inline const byte_update_little_endian_exprt
@@ -213,7 +211,6 @@ public:
     byte_update_exprt(ID_byte_update_big_endian, _op, _offset, _value)
   {
   }
-
 };
 
 inline const byte_update_big_endian_exprt

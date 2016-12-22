@@ -70,14 +70,20 @@ inline bool operator<(
   const reaching_definitiont &a,
   const reaching_definitiont &b)
 {
-  if(a.definition_at<b.definition_at) return true;
-  if(b.definition_at<a.definition_at) return false;
+  if(a.definition_at<b.definition_at)
+    return true;
+  if(b.definition_at<a.definition_at)
+    return false;
 
-  if(a.bit_begin<b.bit_begin) return true;
-  if(b.bit_begin<a.bit_begin) return false;
+  if(a.bit_begin<b.bit_begin)
+    return true;
+  if(b.bit_begin<a.bit_begin)
+    return false;
 
-  if(a.bit_end<b.bit_end) return true;
-  if(b.bit_end<a.bit_end) return false;
+  if(a.bit_end<b.bit_end)
+    return true;
+  if(b.bit_end<a.bit_end)
+    return false;
 
   // we do not expect comparison of unrelated definitions
   // as this operator< is only used in sparse_bitvector_analysist
@@ -119,14 +125,16 @@ public:
   void make_top() override final
   {
     values.clear();
-    if(bv_container) bv_container->clear();
+    if(bv_container)
+      bv_container->clear();
     has_values=tvt(true);
   }
 
   void make_bottom() override final
   {
     values.clear();
-    if(bv_container) bv_container->clear();
+    if(bv_container)
+      bv_container->clear();
     has_values=tvt(false);
   }
 

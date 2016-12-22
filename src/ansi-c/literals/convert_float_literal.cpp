@@ -39,9 +39,17 @@ exprt convert_float_literal(const std::string &src)
   bool is_decimal, is_float80, is_float128; // GCC extensions
   unsigned base;
 
-  parse_float(src, significand, exponent, base,
-              is_float, is_long, is_imaginary,
-              is_decimal, is_float80, is_float128);
+  parse_float(
+    src,
+    significand,
+    exponent,
+    base,
+    is_float,
+    is_long,
+    is_imaginary,
+    is_decimal,
+    is_float80,
+    is_float128);
 
   exprt result=exprt(ID_constant);
 
@@ -130,7 +138,8 @@ exprt convert_float_literal(const std::string &src)
     else
       assert(false);
 
-    result.set(ID_value,
+    result.set(
+      ID_value,
       integer2binary(a.pack(), a.spec.width()));
   }
 

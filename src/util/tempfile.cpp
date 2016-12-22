@@ -68,9 +68,9 @@ int my_mkstemps(char *template_str, int suffix_len)
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
   static long long unsigned int random_state;
-  random_state += getpid() + 123;
+  random_state+=getpid()+123;
 
-  for(unsigned attempt = 0; ; ++attempt)
+  for(unsigned attempt=0; ; ++attempt)
   {
     unsigned long long number=random_state;
 
@@ -81,7 +81,7 @@ int my_mkstemps(char *template_str, int suffix_len)
     }
 
     int fd=open(template_str, O_RDWR|O_CREAT|O_EXCL, 0600);
-    if(fd >= 0)
+    if(fd>=0)
       return fd; // ok
 
     random_state+=4321+getpid(); // avoid repeating
@@ -112,10 +112,12 @@ std::string get_temporary_file(
   char lpTempPathBuffer[MAX_PATH];
   DWORD dwRetVal;
 
-  dwRetVal = GetTempPathA(MAX_PATH,          // length of the buffer
-                          lpTempPathBuffer); // buffer for path
+  dwRetVal=
+    GetTempPathA(
+      MAX_PATH,          // length of the buffer
+      lpTempPathBuffer); // buffer for path
 
-  if (dwRetVal > MAX_PATH || (dwRetVal == 0))
+  if(dwRetVal>MAX_PATH || (dwRetVal==0))
     throw "GetTempPath failed";
 
   // the path returned by GetTempPath ends with a backslash

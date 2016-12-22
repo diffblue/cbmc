@@ -61,7 +61,8 @@ void range_domaint::output(
       itr!=end();
       ++itr)
   {
-    if(itr!=begin()) out << ";";
+    if(itr!=begin())
+      out << ";";
     out << itr->first << ":" << itr->second;
   }
   out << "]";
@@ -870,7 +871,8 @@ void guarded_range_domaint::output(
       itr!=end();
       ++itr)
   {
-    if(itr!=begin()) out << ";";
+    if(itr!=begin())
+      out << ";";
     out << itr->first << ":" << itr->second.first;
     out << " if " << from_expr(ns, "", itr->second.second);
   }

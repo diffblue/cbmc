@@ -82,7 +82,8 @@ exprt get_component_rec(
     {
       exprt tmp=make_member_expr(struct_union, comp, ns);
       exprt result=get_component_rec(tmp, component_name, ns);
-      if(result.is_not_nil()) return result;
+      if(result.is_not_nil())
+        return result;
     }
   }
 

@@ -32,7 +32,7 @@ public:
 
   inline bool operator<(const object_idt &other) const
   {
-    return id < other.id;
+    return id<other.id;
   }
 
   const irep_idt &get_id() const

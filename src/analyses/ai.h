@@ -36,8 +36,8 @@ public:
 
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from the last instruction (END_FUNCTION) of the function
-  //    to the instruction _following_ the call site
+  // b) there is an edge from the last instruction (END_FUNCTION)
+  //    of the function to the instruction _following_ the call site
   //    (this also needs to set the LHS, if applicable)
 
   virtual void transform(
@@ -257,14 +257,18 @@ public:
   inline domainT &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
   inline const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
@@ -288,14 +292,17 @@ protected:
   virtual const statet &find_state(locationt l) const override
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
   virtual bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
-    return static_cast<domainT &>(dest).merge(static_cast<const domainT &>(src), from, to);
+    return static_cast<domainT &>(dest).merge(
+      static_cast<const domainT &>(src), from, to);
   }
 
   virtual statet *make_temporary_state(const statet &s) override
@@ -343,7 +350,8 @@ public:
     const namespacet &ns) override
   {
     statet &dest=this->get_state(to);
-    return static_cast<domainT &>(dest).merge_shared(static_cast<const domainT &>(src), from, to, ns);
+    return static_cast<domainT &>(dest).merge_shared(
+      static_cast<const domainT &>(src), from, to, ns);
   }
 
 protected:

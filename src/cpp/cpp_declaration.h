@@ -104,12 +104,14 @@ public:
 
   inline cpp_template_args_non_tct &partial_specialization_args()
   {
-    return static_cast<cpp_template_args_non_tct &>(add("partial_specialization_args"));
+    return static_cast<cpp_template_args_non_tct &>(
+      add("partial_specialization_args"));
   }
 
   inline const cpp_template_args_non_tct &partial_specialization_args() const
   {
-    return static_cast<const cpp_template_args_non_tct &>(find("partial_specialization_args"));
+    return static_cast<const cpp_template_args_non_tct &>(
+      find("partial_specialization_args"));
   }
 
   inline void set_specialization_of(const irep_idt &id)

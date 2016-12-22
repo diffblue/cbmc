@@ -18,10 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 struct loct
 {
 public:
-  loct(goto_programt::const_targett _target,
-       const irep_idt &_function):
-       target(_target),
-       function(_function)
+  loct(
+    goto_programt::const_targett _target,
+    const irep_idt &_function):
+    target(_target),
+    function(_function)
   {
   }
 
@@ -55,13 +56,13 @@ public:
 
   inline loct &operator[] (loc_reft l)
   {
-    assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
+    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
   inline const loct &operator[] (loc_reft l) const
   {
-    assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
+    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 

@@ -308,7 +308,11 @@ inline bool operator<(
   return &(*a)<&(*b);
 }
 
-std::ostream &operator<<(std::ostream &out, const symex_target_equationt::SSA_stept &step);
-std::ostream &operator<<(std::ostream &out, const symex_target_equationt &equation);
+std::ostream &operator<<(
+  std::ostream &out,
+  const symex_target_equationt::SSA_stept &step);
+std::ostream &operator<<(
+  std::ostream &out,
+  const symex_target_equationt &equation);
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H

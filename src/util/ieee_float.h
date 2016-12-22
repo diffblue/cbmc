@@ -41,7 +41,8 @@ public:
   {
   }
 
-  ieee_float_spect(std::size_t _f, std::size_t _e):f(_f), e(_e), x86_extended(false)
+  ieee_float_spect(std::size_t _f, std::size_t _e):
+    f(_f), e(_e), x86_extended(false)
   {
   }
 
@@ -109,11 +110,12 @@ public:
   // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
   // is the IEEE default.
   // The numbering below is what x86 uses in the control word.
-  typedef enum {
+  typedef enum
+  {
     ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,
     ROUND_TO_PLUS_INF=2,  ROUND_TO_ZERO=3,
-    UNKNOWN, NONDETERMINISTIC }
-    rounding_modet;
+    UNKNOWN, NONDETERMINISTIC
+  } rounding_modet;
 
   rounding_modet rounding_mode;
 
@@ -208,7 +210,10 @@ public:
       next_representable(false);
   }
 
-  bool is_zero() const { return !NaN_flag && !infinity_flag && fraction==0 && exponent==0; }
+  bool is_zero() const
+  {
+    return !NaN_flag && !infinity_flag && fraction==0 && exponent==0;
+  }
   bool get_sign() const { return sign_flag; }
   bool is_NaN() const { return NaN_flag; }
   bool is_infinity() const { return !NaN_flag && infinity_flag; }
@@ -256,10 +261,10 @@ public:
   void from_expr(const constant_exprt &expr);
 
   // the usual opertors
-  ieee_floatt &operator /= (const ieee_floatt &other);
-  ieee_floatt &operator *= (const ieee_floatt &other);
-  ieee_floatt &operator += (const ieee_floatt &other);
-  ieee_floatt &operator -= (const ieee_floatt &other);
+  ieee_floatt &operator/=(const ieee_floatt &other);
+  ieee_floatt &operator*=(const ieee_floatt &other);
+  ieee_floatt &operator+=(const ieee_floatt &other);
+  ieee_floatt &operator-=(const ieee_floatt &other);
 
   bool operator<(const ieee_floatt &other) const;
   bool operator<=(const ieee_floatt &other) const;

@@ -49,13 +49,15 @@ protected:
     symbol(); // we don't distinguish
   }
 
-  virtual void open_expression() // '('
+  // '('
+  virtual void open_expression()
   {
     // produce sub-irep
     stack.push(irept());
   }
 
-  virtual void close_expression() // ')'
+  // ')'
+  virtual void close_expression()
   {
     // done with sub-irep
     assert(!stack.empty()); // unexpected )

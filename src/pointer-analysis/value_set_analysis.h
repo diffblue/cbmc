@@ -22,10 +22,10 @@ class value_set_analysist:
   public static_analysist<value_set_domaint>
 {
 public:
-   explicit value_set_analysist(const namespacet &_ns):
-     static_analysist<value_set_domaint>(_ns)
-   {
-   }
+  explicit value_set_analysist(const namespacet &_ns):
+    static_analysist<value_set_domaint>(_ns)
+  {
+  }
 
   typedef static_analysist<value_set_domaint> baset;
 

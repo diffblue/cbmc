@@ -140,8 +140,10 @@ Function: exprt::copy_to_operands
 
 \*******************************************************************/
 
-void exprt::copy_to_operands(const exprt &e1, const exprt &e2,
-                             const exprt &e3)
+void exprt::copy_to_operands(
+  const exprt &e1,
+  const exprt &e2,
+  const exprt &e3)
 {
   operandst &op=operands();
   #ifndef USE_LIST

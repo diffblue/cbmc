@@ -35,7 +35,7 @@ public:
     add(guard);
   }
 
-  //exprt as_expr(guard_listt::const_iterator it) const;
+  // exprt as_expr(guard_listt::const_iterator it) const;
 
   exprt as_expr() const
   {

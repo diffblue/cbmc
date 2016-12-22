@@ -382,7 +382,8 @@ Function: local_may_aliast::build
 
 void local_may_aliast::build(const goto_functiont &goto_function)
 {
-  if(cfg.nodes.empty()) return;
+  if(cfg.nodes.empty())
+    return;
 
   work_queuet work_queue;
 

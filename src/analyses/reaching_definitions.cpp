@@ -896,9 +896,12 @@ Function: reaching_definitions_analysist::~reaching_definitions_analysist
 
 reaching_definitions_analysist::~reaching_definitions_analysist()
 {
-  if(is_dirty) delete is_dirty;
-  if(is_threaded) delete is_threaded;
-  if(value_sets) delete value_sets;
+  if(is_dirty)
+    delete is_dirty;
+  if(is_threaded)
+    delete is_threaded;
+  if(value_sets)
+    delete value_sets;
 }
 
 /*******************************************************************\

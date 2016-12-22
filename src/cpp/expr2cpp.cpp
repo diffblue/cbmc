@@ -343,16 +343,16 @@ std::string expr2cppt::convert_rec(
     typet member;
     member.swap(tmp.add("to-member"));
 
-    std::string dest = "(" + convert_rec(member, c_qualifierst(), "") + ":: *)";
+    std::string dest="("+convert_rec(member, c_qualifierst(), "")+":: *)";
 
     if(src.subtype().id()==ID_code)
     {
       const code_typet& code_type = to_code_type(src.subtype());
       const typet& return_type = code_type.return_type();
-      dest = convert_rec(return_type, c_qualifierst(), "") +" " + dest;
+      dest=convert_rec(return_type, c_qualifierst(), "")+" "+dest;
 
       const code_typet::parameterst &args = code_type.parameters();
-      dest += "(";
+      dest+="(";
 
       for(code_typet::parameterst::const_iterator it=args.begin();
           it!=args.end();
@@ -362,7 +362,7 @@ std::string expr2cppt::convert_rec(
         dest+=convert_rec(it->type(), c_qualifierst(), "");
       }
 
-      dest += ")";
+      dest+=")";
       dest+=d;
     }
     else
@@ -542,10 +542,10 @@ std::string expr2cppt::convert(
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
     return convert_function(src, "throw", precedence=16);
-  else if(src.is_constant() && src.type().id() == ID_verilog_signedbv)
-    return "'" + id2string(src.get(ID_value)) + "'";
-  else if(src.is_constant() && src.type().id() == ID_verilog_unsignedbv)
-    return "'" + id2string(src.get(ID_value)) + "'";
+  else if(src.is_constant() && src.type().id()==ID_verilog_signedbv)
+    return "'"+id2string(src.get(ID_value))+"'";
+  else if(src.is_constant() && src.type().id()==ID_verilog_unsignedbv)
+    return "'"+id2string(src.get(ID_value))+"'";
   else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
     return "nullptr";
   else if(src.id()==ID_unassigned)
@@ -580,7 +580,7 @@ std::string expr2cppt::convert_code(
 
   if(statement==ID_cpp_new ||
      statement==ID_cpp_new_array)
-    return convert_cpp_new(src,indent);
+    return convert_cpp_new(src, indent);
 
   return expr2ct::convert_code(src, indent);
 }
@@ -601,8 +601,8 @@ std::string expr2cppt::convert_extractbit(
   const exprt &src,
   unsigned precedence)
 {
-  assert(src.operands().size() == 2);
-  return convert(src.op0()) + "[" + convert(src.op1()) + "]";
+  assert(src.operands().size()==2);
+  return convert(src.op0())+"["+convert(src.op1())+"]";
 }
 
 /*******************************************************************\
@@ -621,9 +621,10 @@ std::string expr2cppt::convert_extractbits(
   const exprt &src,
   unsigned precedence)
 {
-  assert(src.operands().size() == 3);
-  return convert(src.op0()) + ".range(" + convert(src.op1()) + ","
-         + convert(src.op2()) + ")";
+  assert(src.operands().size()==3);
+  return
+    convert(src.op0())+".range("+convert(src.op1())+ ","+
+    convert(src.op2())+")";
 }
 
 /*******************************************************************\

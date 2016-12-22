@@ -126,7 +126,8 @@ void global_may_alias_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false()) return;
+  if(has_values.is_false())
+    return;
 
   const goto_programt::instructiont &instruction=*from;
 
@@ -196,12 +197,17 @@ void global_may_alias_domaint::output(
       if(aliases.is_root(a_it1) && a_it1!=a_it2 &&
          aliases.same_set(a_it1, a_it2))
       {
-        if(first) { out << "Aliases: " << *a_it1; first=false; }
+        if(first)
+        {
+          out << "Aliases: " << *a_it1;
+          first=false;
+        }
         out << ' ' << *a_it2;
       }
     }
 
-    if(!first) out << '\n';
+    if(!first)
+      out << '\n';
   }
 }
 

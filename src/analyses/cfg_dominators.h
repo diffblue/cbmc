@@ -149,7 +149,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     bool changed=false;
     typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
     if(node.dominators.empty())
-      for(const auto & edge : (post_dom?node.out:node.in))
+      for(const auto &edge : (post_dom ? node.out : node.in))
         if(!cfg[edge.first].dominators.empty())
         {
           node.dominators=cfg[edge.first].dominators;
@@ -158,7 +158,7 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
         }
 
     // compute intersection of predecessors
-    for(const auto & edge : (post_dom?node.out:node.in))
+    for(const auto &edge : (post_dom ? node.out : node.in))
     {
       const target_sett &other=cfg[edge.first].dominators;
       if(other.empty())
@@ -170,10 +170,20 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
       // in-place intersection. not safe to use set_intersect
       while(n_it!=node.dominators.end() && o_it!=other.end())
       {
-        if(*n_it==current) ++n_it;
-        else if(*n_it<*o_it) { changed=true; node.dominators.erase(n_it++); }
-        else if(*o_it<*n_it) ++o_it;
-        else { ++n_it; ++o_it; }
+        if(*n_it==current)
+          ++n_it;
+        else if(*n_it<*o_it)
+        {
+          changed=true;
+          node.dominators.erase(n_it++);
+        }
+        else if(*o_it<*n_it)
+          ++o_it;
+        else
+        {
+          ++n_it;
+          ++o_it;
+        }
       }
 
       while(n_it!=node.dominators.end())

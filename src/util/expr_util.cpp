@@ -102,7 +102,7 @@ with_exprt make_with_expr(const update_exprt &src)
     }
     else if(it->id()==ID_member_designator)
     {
-      //irep_idt component_name=
+      // irep_idt component_name=
       //  to_member_designator(*it).get_component_name();
     }
     else
@@ -217,7 +217,7 @@ Function: lift_if
 
 if_exprt lift_if(const exprt &src, std::size_t operand_number)
 {
-  assert(operand_number < src.operands().size());
+  assert(operand_number<src.operands().size());
   assert(src.operands()[operand_number].id()==ID_if);
 
   const if_exprt if_expr=to_if_expr(src.operands()[operand_number]);

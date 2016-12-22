@@ -42,9 +42,10 @@ Function: string_ptrt::operator==
 
 bool string_ptrt::operator==(const string_ptrt &other) const
 {
-  if(len!=other.len) return false;
-  if(len==0) return true;
-  return memcmp(s, other.s, len)==0;
+  if(len!=other.len)
+    return false;
+
+  return len==0 || memcmp(s, other.s, len)==0;
 }
 
 /*******************************************************************\

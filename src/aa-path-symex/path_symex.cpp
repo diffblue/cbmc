@@ -133,26 +133,31 @@ bool path_symext::propagate(const exprt &src)
   else if(src.id()==ID_plus)
   {
     forall_operands(it, src)
-      if(!propagate(*it)) return false;
+      if(!propagate(*it))
+        return false;
     return true;
   }
   else if(src.id()==ID_array)
   {
     forall_operands(it, src)
-      if(!propagate(*it)) return false;
+      if(!propagate(*it))
+        return false;
     return true;
   }
   else if(src.id()==ID_vector)
   {
     forall_operands(it, src)
-      if(!propagate(*it)) return false;
+      if(!propagate(*it))
+        return false;
     return true;
   }
   else if(src.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(src);
-    if(!propagate(if_expr.true_case())) return false;
-    if(!propagate(if_expr.false_case())) return false;
+    if(!propagate(if_expr.true_case()) ||
+       !propagate(if_expr.false_case()))
+      return false;
+
     return true;
   }
   else if(src.id()==ID_array_of)
@@ -244,7 +249,8 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
     forall_operands(it, expr)
     {
       typet t=c_sizeof_type_rec(*it);
-      if(t.is_not_nil()) return t;
+      if(t.is_not_nil())
+        return t;
     }
   }
 
@@ -446,7 +452,8 @@ void path_symext::assign_rec(
       state.record_step();
       path_symex_stept &step=*state.history;
 
-      if(!guard.empty()) step.guard=conjunction(guard);
+      if(!guard.empty())
+        step.guard=conjunction(guard);
       step.full_lhs=ssa_lhs;
       step.ssa_lhs=new_lhs;
       step.ssa_rhs=ssa_rhs;

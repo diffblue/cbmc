@@ -145,7 +145,8 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
 
   // see if we have it already
-  symbol_tablet::symbolst::iterator old_it=symbol_table.symbols.find(symbol.name);
+  symbol_tablet::symbolst::iterator old_it=
+    symbol_table.symbols.find(symbol.name);
 
   if(old_it==symbol_table.symbols.end())
   {
@@ -500,7 +501,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         const irep_idt identifier=
           to_symbol_type(old_symbol.type).get_identifier();
 
-        symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(identifier);
+        symbol_tablet::symbolst::iterator s_it=
+          symbol_table.symbols.find(identifier);
 
         if(s_it==symbol_table.symbols.end())
         {

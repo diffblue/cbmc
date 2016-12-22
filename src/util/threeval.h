@@ -23,7 +23,10 @@ public:
   inline bool is_true() const { return value==tv_enumt::TV_TRUE; }
   inline bool is_false() const { return value==tv_enumt::TV_FALSE; }
   inline bool is_unknown() const { return value==tv_enumt::TV_UNKNOWN; }
-  inline bool is_known() const { return value==tv_enumt::TV_TRUE || value==tv_enumt::TV_FALSE; }
+  inline bool is_known() const
+  {
+    return value==tv_enumt::TV_TRUE || value==tv_enumt::TV_FALSE;
+  }
 
   static inline tvt unknown()
   {
@@ -61,22 +64,31 @@ public:
 
   inline tvt operator&&(const tvt other) const
   {
-    if(is_false() || other.is_false()) return tvt(false);
-    if(is_true() && other.is_true()) return tvt(true);
+    if(is_false() || other.is_false())
+      return tvt(false);
+    if(is_true() && other.is_true())
+      return tvt(true);
+
     return unknown();
   }
 
   inline tvt operator||(const tvt other)
   {
-    if(is_true() || other.is_true()) return tvt(true);
-    if(is_false() && other.is_false()) return tvt(false);
+    if(is_true() || other.is_true())
+      return tvt(true);
+    if(is_false() && other.is_false())
+      return tvt(false);
+
     return unknown();
   }
 
   inline tvt operator!() const
   {
-    if(is_unknown()) return unknown();
-    if(is_true()) return tvt(false);
+    if(is_unknown())
+      return unknown();
+    if(is_true())
+      return tvt(false);
+
     return tvt(true);
   }
 

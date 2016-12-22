@@ -39,7 +39,8 @@ Author: Daniel Kroening, kroening@kroening.com
 // Error checking the expression type
 #define INVALIDEXPR(S) throw "Invalid expression: " S
 
-// Unexpected types and other combination not implemented and not expected to be needed
+// Unexpected types and other combination not implemented and not
+// expected to be needed
 #define UNEXPECTEDCASE(S) throw "Unexpected case: " S
 
 // General todos
@@ -191,13 +192,13 @@ void smt2_convt::define_object_size(
   const irep_idt &id,
   const exprt &expr)
 {
-  assert(expr.id() == ID_object_size);
+  assert(expr.id()==ID_object_size);
   const exprt &ptr = expr.op0();
   std::size_t size_width = boolbv_width(expr.type());
   std::size_t pointer_width = boolbv_width(ptr.type());
   std::size_t number = 0;
-  std::size_t h = pointer_width - 1;
-  std::size_t l = pointer_width - BV_ADDR_BITS;
+  std::size_t h=pointer_width-1;
+  std::size_t l=pointer_width-BV_ADDR_BITS;
 
   for(const auto &o : pointer_logic.objects)
   {
@@ -300,7 +301,7 @@ constant_exprt smt2_convt::parse_literal(
   //
   // * Numeral -- this is a natural number in decimal and is of the form:
   //                0|([1-9][0-9]*)
-  // * Decimal -- this is a decimal expansion of a real number and is of the form:
+  // * Decimal -- this is a decimal expansion of a real number of the form:
   //                (0|[1-9][0-9]*)[.]([0-9]+)
   // * Binary -- this is a natural number in binary and is of the form:
   //                #b[01]+
@@ -342,8 +343,10 @@ constant_exprt smt2_convt::parse_literal(
     {
       const floatbv_typet &floatbv_type=to_floatbv_type(type);
       constant_exprt s1=parse_literal(src.get_sub()[1], bv_typet(1));
-      constant_exprt s2=parse_literal(src.get_sub()[2], bv_typet(floatbv_type.get_e()));
-      constant_exprt s3=parse_literal(src.get_sub()[3], bv_typet(floatbv_type.get_f()));
+      constant_exprt s2=
+        parse_literal(src.get_sub()[2], bv_typet(floatbv_type.get_e()));
+      constant_exprt s3=
+        parse_literal(src.get_sub()[3], bv_typet(floatbv_type.get_f()));
       // stitch the bits together
       std::string bits=id2string(s1.get_value())+
                        id2string(s2.get_value())+
@@ -388,8 +391,10 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return from_integer(value,
-                        ns.follow_tag(to_c_enum_tag_type(type)));
+    return
+      from_integer(
+        value,
+        ns.follow_tag(to_c_enum_tag_type(type)));
   }
   else if(type.id()==ID_fixedbv ||
           type.id()==ID_floatbv)
@@ -529,9 +534,11 @@ exprt smt2_convt::parse_struct(
 
       assert(offset+component_width<=total_width);
       std::string component_binary=
-        "#b"+id2string(binary).substr(total_width-offset-component_width, component_width);
+        "#b"+id2string(binary).substr(
+          total_width-offset-component_width, component_width);
 
-      result.operands()[i]=parse_rec(irept(component_binary), components[i].type());
+      result.operands()[i]=
+        parse_rec(irept(component_binary), components[i].type());
 
       offset+=component_width;
     }
@@ -693,7 +700,6 @@ void smt2_convt::convert_address_of_rec(
     }
     else
       UNEXPECTEDCASE("unexpected type of member operand");
-
   }
   else if(expr.id()==ID_if)
   {
@@ -1170,7 +1176,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_datatypes)
       {
-        assert(datatype_map.find(expr.type()) != datatype_map.end());
+        assert(datatype_map.find(expr.type())!=datatype_map.end());
 
         const std::string smt_typename=
           datatype_map.find(expr.type())->second;
@@ -1235,7 +1241,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     {
       if(use_datatypes)
       {
-        assert(datatype_map.find(expr.type()) != datatype_map.end());
+        assert(datatype_map.find(expr.type())!=datatype_map.end());
 
         const std::string smt_typename=
           datatype_map.find(expr.type())->second;
@@ -1282,7 +1288,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_sign)
   {
-    assert(expr.operands().size() == 1);
+    assert(expr.operands().size()==1);
 
     const typet &op_type=expr.op0().type();
 
@@ -1306,7 +1312,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << " (_ bv0 " << op_width << "))";
     }
     else
-      UNEXPECTEDCASE("sign applied to type " + expr.type().id_string());
+      UNEXPECTEDCASE("sign applied to type "+expr.type().id_string());
   }
   else if(expr.id()==ID_if)
   {
@@ -1527,12 +1533,15 @@ void smt2_convt::convert_expr(const exprt &expr)
         }
       }
       else
-        UNEXPECTEDCASE("unsupported op1 type for "+expr.id_string()+": "+type.id_string());
+        UNEXPECTEDCASE(
+          "unsupported op1 type for "+expr.id_string()+": "+
+          type.id_string());
 
       out << ")"; // bv*sh
     }
     else
-      UNEXPECTEDCASE("unsupported type for "+expr.id_string()+": "+type.id_string());
+      UNEXPECTEDCASE(
+        "unsupported type for "+expr.id_string()+": "+type.id_string());
   }
   else if(expr.id()==ID_with)
   {
@@ -2021,10 +2030,13 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_constraint_select_one)
   {
-    UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is not yet supported");
+    UNEXPECTEDCASE(
+      "smt2_convt::convert_expr: `"+expr.id_string()+
+      "' is not yet supported");
   }
   else
-    UNEXPECTEDCASE("smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
+    UNEXPECTEDCASE(
+      "smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
 }
 
 /*******************************************************************\
@@ -2203,15 +2215,19 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           convert_expr(src);
         }
       }
-      else if (dest_type.id()==ID_signedbv)
+      else if(dest_type.id()==ID_signedbv)
       {
         // this should be floatbv_typecast, not typecast
-        UNEXPECTEDCASE("typecast unexpected "+src_type.id_string()+" -> "+dest_type.id_string());
+        UNEXPECTEDCASE(
+          "typecast unexpected "+src_type.id_string()+" -> "+
+          dest_type.id_string());
       }
-      else if (dest_type.id()==ID_unsignedbv)
+      else if(dest_type.id()==ID_unsignedbv)
       {
         // this should be floatbv_typecast, not typecast
-        UNEXPECTEDCASE("typecast unexpected "+src_type.id_string()+" -> "+dest_type.id_string());
+        UNEXPECTEDCASE(
+          "typecast unexpected "+src_type.id_string()+" -> "+
+          dest_type.id_string());
       }
     }
     else if(src_type.id()==ID_bool) // from boolean to int
@@ -2299,7 +2315,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
     {
-      UNEXPECTEDCASE("TODO typecast2 "+src_type.id_string()+" -> "+dest_type.id_string() + " src == " + from_expr(ns, "", src));
+      UNEXPECTEDCASE(
+        "TODO typecast2 "+src_type.id_string()+" -> "+
+        dest_type.id_string()+" src == "+from_expr(ns, "", src));
     }
   }
   else if(dest_type.id()==ID_fixedbv) // to fixedbv
@@ -2515,7 +2533,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
   }
   else
-    UNEXPECTEDCASE("TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string());
+    UNEXPECTEDCASE(
+      "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string());
 }
 
 /*******************************************************************\
@@ -2533,7 +2552,7 @@ Function: smt2_convt::convert_floatbv_typecast
 void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
   const exprt &src=expr.op();
-  //const exprt &rounding_mode=expr.rounding_mode();
+  // const exprt &rounding_mode=expr.rounding_mode();
   const typet &src_type=src.type();
   const typet &dest_type=expr.type();
 
@@ -2631,12 +2650,15 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       // We first convert to 'underlying type'
       floatbv_typecast_exprt tmp=expr;
-      tmp.op()=typecast_exprt(src,
-                              ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
+      tmp.op()=
+        typecast_exprt(
+          src,
+          ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
       convert_floatbv_typecast(tmp);
     }
     else
-      UNEXPECTEDCASE("TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
+      UNEXPECTEDCASE(
+        "TODO typecast11 "+src_type.id_string()+" -> "+dest_type.id_string());
   }
   else if(dest_type.id()==ID_signedbv)
   {
@@ -2668,7 +2690,8 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   }
   else
   {
-    UNEXPECTEDCASE("TODO typecast12 "+src_type.id_string()+" -> "+dest_type.id_string());
+    UNEXPECTEDCASE(
+      "TODO typecast12 "+src_type.id_string()+" -> "+dest_type.id_string());
   }
 }
 
@@ -2697,7 +2720,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
 
   if(use_datatypes)
   {
-    assert(datatype_map.find(struct_type) != datatype_map.end());
+    assert(datatype_map.find(struct_type)!=datatype_map.end());
     const std::string smt_typename =
       datatype_map.find(struct_type)->second;
 
@@ -2889,8 +2912,8 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
          is needed to get to IEEE-754 style representations. */
 
       ieee_floatt v=ieee_floatt(expr);
-      size_t e = floatbv_type.get_e();
-      size_t f = floatbv_type.get_f() + 1;
+      size_t e=floatbv_type.get_e();
+      size_t f=floatbv_type.get_f()+1;
 
       /* Should be sufficient, but not currently supported by mathsat */
       #if 0
@@ -2906,7 +2929,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       }
       else if(v.is_infinity())
       {
-        if (v.get_sign())
+        if(v.get_sign())
           out << "(_ -oo " << e << " " << f << ")";
         else
           out << "(_ +oo " << e << " " << f << ")";
@@ -3160,8 +3183,8 @@ void smt2_convt::convert_relation(const exprt &expr)
     out << ")";
   }
   else
-    UNEXPECTEDCASE("unsupported type for "+expr.id_string()+": "+op_type.id_string());
-
+    UNEXPECTEDCASE(
+      "unsupported type for "+expr.id_string()+": "+op_type.id_string());
 }
 
 /*******************************************************************\
@@ -3229,7 +3252,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         out << "(bvmul ";
         convert_expr(i);
         out << " (_ bv" << element_size
-                      << " " << boolbv_width(expr.type()) << "))";
+            << " " << boolbv_width(expr.type()) << "))";
       }
       else
         convert_expr(i);
@@ -3272,7 +3295,10 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
         exprt tmp(ID_plus, vector_type.subtype());
         forall_operands(it, expr)
           tmp.copy_to_operands(
-            index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
+            index_exprt(
+              *it,
+              from_integer(size-i-1, index_type),
+              vector_type.subtype()));
 
         out << " ";
         convert_expr(tmp);
@@ -3330,7 +3356,9 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
     else if(value==3)
       out << "roundTowardZero";
     else
-      INVALIDEXPR("Unknown constant rounding mode with value "+id2string(cexpr.get_value()));
+      INVALIDEXPR(
+        "Unknown constant rounding mode with value "+
+        id2string(cexpr.get_value()));
   }
   else
   {
@@ -3494,7 +3522,10 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       exprt tmp(ID_minus, vector_type.subtype());
       forall_operands(it, expr)
         tmp.copy_to_operands(
-          index_exprt(*it, from_integer(size-i-1, index_type), vector_type.subtype()));
+          index_exprt(
+            *it,
+            from_integer(size-i-1, index_type),
+            vector_type.subtype()));
 
       out << " ";
       convert_expr(tmp);
@@ -3851,7 +3882,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
     if(use_datatypes)
     {
-      assert(datatype_map.find(expr_type) != datatype_map.end());
+      assert(datatype_map.find(expr_type)!=datatype_map.end());
       const std::string smt_typename=
         datatype_map.find(expr_type)->second;
 
@@ -3993,7 +4024,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
     out << ")"; // bvor
   }
   else
-    UNEXPECTEDCASE("with expects struct, union, or array type, but got "+expr.type().id_string());
+    UNEXPECTEDCASE(
+      "with expects struct, union, or array type, but got "+
+      expr.type().id_string());
 }
 
 /*******************************************************************\
@@ -4125,7 +4158,8 @@ void smt2_convt::convert_index(const index_exprt &expr)
     }
   }
   else
-    UNEXPECTEDCASE("index with unsupported array type: "+array_op_type.id_string());
+    UNEXPECTEDCASE(
+      "index with unsupported array type: "+array_op_type.id_string());
 }
 
 /*******************************************************************\
@@ -4159,7 +4193,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
 
     if(use_datatypes)
     {
-      assert(datatype_map.find(struct_type) != datatype_map.end());
+      assert(datatype_map.find(struct_type)!=datatype_map.end());
       const std::string smt_typename=
         datatype_map.find(struct_type)->second;
 
@@ -4201,7 +4235,8 @@ void smt2_convt::convert_member(const member_exprt &expr)
     unflatten(END, expr.type());
   }
   else
-    UNEXPECTEDCASE("convert_member on an unexpected type " + struct_op_type.id_string());
+    UNEXPECTEDCASE(
+      "convert_member on an unexpected type "+struct_op_type.id_string());
 }
 
 /*******************************************************************\
@@ -4230,7 +4265,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      assert(datatype_map.find(type) != datatype_map.end());
+      assert(datatype_map.find(type)!=datatype_map.end());
 
       const std::string smt_typename=
         datatype_map.find(type)->second;
@@ -4266,7 +4301,7 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_datatypes)
     {
-      assert(datatype_map.find(type) != datatype_map.end());
+      assert(datatype_map.find(type)!=datatype_map.end());
 
       const std::string smt_typename=
         datatype_map.find(type)->second;
@@ -4343,7 +4378,7 @@ void smt2_convt::unflatten(
   {
     if(use_datatypes)
     {
-      assert(datatype_map.find(type) != datatype_map.end());
+      assert(datatype_map.find(type)!=datatype_map.end());
 
       const std::string smt_typename=
         datatype_map.find(type)->second;
@@ -4395,7 +4430,7 @@ void smt2_convt::unflatten(
       {
         out << ")) ";
 
-        assert(datatype_map.find(type) != datatype_map.end());
+        assert(datatype_map.find(type)!=datatype_map.end());
 
         const std::string smt_typename=
           datatype_map.find(type)->second;
@@ -4503,7 +4538,8 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
     if(equal_expr.lhs().id()==ID_symbol)
     {
-      const irep_idt &identifier=to_symbol_expr(equal_expr.lhs()).get_identifier();
+      const irep_idt &identifier=
+        to_symbol_expr(equal_expr.lhs()).get_identifier();
 
       if(identifier_map.find(identifier)==identifier_map.end())
       {
@@ -4684,10 +4720,10 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     const exprt &op = expr.op0();
 
-    if (op.type().id() == ID_pointer ||
-        op.type().id() == ID_reference)
+    if(op.type().id()==ID_pointer ||
+       op.type().id()==ID_reference)
     {
-      if (object_sizes.find(expr)==object_sizes.end())
+      if(object_sizes.find(expr)==object_sizes.end())
       {
         irep_idt id="object_size."+std::to_string(object_sizes.size());
         out << "(declare-fun " << id << " () ";
@@ -4757,7 +4793,6 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ")\n"; // define-fun
     }
   }
-
 }
 
 /*******************************************************************\
@@ -4776,7 +4811,7 @@ bool smt2_convt::use_array_theory(const exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
   assert(type.id()==ID_array);
-  //const array_typet &array_type=to_array_type(ns.follow(expr.type()));
+  // const array_typet &array_type=to_array_type(ns.follow(expr.type()));
 
   if(use_datatypes)
   {
@@ -4992,188 +5027,189 @@ void smt2_convt::find_symbols_rec(
   std::set<irep_idt> &recstack)
 {
   if(type.id()==ID_array)
-   {
-     const array_typet &array_type=to_array_type(type);
-     find_symbols(array_type.size());
-     find_symbols_rec(array_type.subtype(), recstack);
-   }
-   else if(type.id()==ID_incomplete_array)
-   {
-     find_symbols_rec(type.subtype(), recstack);
-   }
-   else if(type.id()==ID_complex)
-   {
-     find_symbols_rec(type.subtype(), recstack);
+  {
+    const array_typet &array_type=to_array_type(type);
+    find_symbols(array_type.size());
+    find_symbols_rec(array_type.subtype(), recstack);
+  }
+  else if(type.id()==ID_incomplete_array)
+  {
+    find_symbols_rec(type.subtype(), recstack);
+  }
+  else if(type.id()==ID_complex)
+  {
+    find_symbols_rec(type.subtype(), recstack);
 
-     if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
-     {
-       std::string smt_typename = "complex."+std::to_string(datatype_map.size());
-       datatype_map[type] = smt_typename;
+    if(use_datatypes &&
+       datatype_map.find(type)==datatype_map.end())
+    {
+      std::string smt_typename = "complex."+std::to_string(datatype_map.size());
+      datatype_map[type] = smt_typename;
 
-       out << "(declare-datatypes () ((" << smt_typename << " "
-           << "(mk-" << smt_typename;
+      out << "(declare-datatypes () ((" << smt_typename << " "
+          << "(mk-" << smt_typename;
 
-       out << " (" << smt_typename << ".imag ";
-       convert_type(type.subtype());
-       out << ")";
+      out << " (" << smt_typename << ".imag ";
+      convert_type(type.subtype());
+      out << ")";
 
-       out << " (" << smt_typename << ".real ";
-       convert_type(type.subtype());
-       out << ")";
+      out << " (" << smt_typename << ".real ";
+      convert_type(type.subtype());
+      out << ")";
 
-       out << "))))\n";
-     }
-   }
-   else if(type.id()==ID_vector)
-   {
-     find_symbols_rec(type.subtype(), recstack);
+      out << "))))\n";
+    }
+  }
+  else if(type.id()==ID_vector)
+  {
+    find_symbols_rec(type.subtype(), recstack);
 
-     if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
-     {
-       const vector_typet &vector_type=to_vector_type(type);
+    if(use_datatypes &&
+       datatype_map.find(type)==datatype_map.end())
+    {
+      const vector_typet &vector_type=to_vector_type(type);
 
-       mp_integer size;
-       if(to_integer(vector_type.size(), size))
-         INVALIDEXPR("failed to convert vector size to constant");
+      mp_integer size;
+      if(to_integer(vector_type.size(), size))
+        INVALIDEXPR("failed to convert vector size to constant");
 
-       std::string smt_typename = "vector."+std::to_string(datatype_map.size());
-       datatype_map[type] = smt_typename;
+      std::string smt_typename = "vector."+std::to_string(datatype_map.size());
+      datatype_map[type] = smt_typename;
 
-       out << "(declare-datatypes () ((" << smt_typename << " "
-           << "(mk-" << smt_typename;
+      out << "(declare-datatypes () ((" << smt_typename << " "
+          << "(mk-" << smt_typename;
 
-       for(mp_integer i=0; i!=size; ++i)
-       {
-         out << " (" << smt_typename << "." << i << " ";
-         convert_type(type.subtype());
-         out << ")";
-       }
+      for(mp_integer i=0; i!=size; ++i)
+      {
+        out << " (" << smt_typename << "." << i << " ";
+        convert_type(type.subtype());
+        out << ")";
+      }
 
-       out << "))))\n";
-     }
-   }
-   else if(type.id()==ID_struct)
-   {
-     // Cater for mutually recursive struct types
-     bool need_decl=false;
-     if(use_datatypes &&
-        datatype_map.find(type)==datatype_map.end())
-     {
-       std::string smt_typename = "struct."+std::to_string(datatype_map.size());
-       datatype_map[type] = smt_typename;
-       need_decl=true;
-     }
+      out << "))))\n";
+    }
+  }
+  else if(type.id()==ID_struct)
+  {
+    // Cater for mutually recursive struct types
+    bool need_decl=false;
+    if(use_datatypes &&
+       datatype_map.find(type)==datatype_map.end())
+    {
+      std::string smt_typename = "struct."+std::to_string(datatype_map.size());
+      datatype_map[type] = smt_typename;
+      need_decl=true;
+    }
 
-     const struct_typet::componentst &components=
-       to_struct_type(type).components();
+    const struct_typet::componentst &components=
+      to_struct_type(type).components();
 
      for(const auto &component : components)
        find_symbols_rec(component.type(), recstack);
 
-     // Declare the corresponding SMT type if we haven't already.
-     if(need_decl)
-     {
-       std::string smt_typename = datatype_map[type];
+    // Declare the corresponding SMT type if we haven't already.
+    if(need_decl)
+    {
+      std::string smt_typename = datatype_map[type];
 
-       // We're going to create a datatype named something like `struct.0'.
-       // It's going to have a single constructor named `mk-struct.0' with an
-       // argument for each member of the struct.  The declaration that
-       // creates this type looks like:
-       //
-       // (declare-datatypes () ((struct.0 (mk-struct.0
-       //                                   (struct.0.component1 type1)
-       //                                   ...
-       //                                   (struct.0.componentN typeN)))))
-       out << "(declare-datatypes () ((" << smt_typename << " "
-           << "(mk-" << smt_typename << " ";
+      // We're going to create a datatype named something like `struct.0'.
+      // It's going to have a single constructor named `mk-struct.0' with an
+      // argument for each member of the struct.  The declaration that
+      // creates this type looks like:
+      //
+      // (declare-datatypes () ((struct.0 (mk-struct.0
+      //                                   (struct.0.component1 type1)
+      //                                   ...
+      //                                   (struct.0.componentN typeN)))))
+      out << "(declare-datatypes () ((" << smt_typename << " "
+          << "(mk-" << smt_typename << " ";
 
-       for(const auto &component : components)
-       {
-         out << "(" << smt_typename << "." << component.get_name()
-                       << " ";
-         convert_type(component.type());
-         out << ") ";
-       }
+      for(const auto &component : components)
+      {
+        out << "(" << smt_typename << "." << component.get_name()
+                      << " ";
+        convert_type(component.type());
+        out << ") ";
+      }
 
-       out << "))))" << "\n";
+      out << "))))" << "\n";
 
-       // Let's also declare convenience functions to update individual members of
-       // the struct whil we're at it.  The functions are named like
-       // `update-struct.0.component1'.  Their declarations look like:
-       //
-       // (declare-fun update-struct.0.component1
-       //               ((s struct.0)     ; first arg -- the struct to update
-       //                (v type1))       ; second arg -- the value to update
-       //               struct.0          ; the output type
-       //               (mk-struct.0      ; build the new struct...
-       //                v                ; the updated value
-       //                (struct.0.component2 s)  ; retain the other members
-       //                ...
-       //                (struct.0.componentN s)))
+      // Let's also declare convenience functions to update individual
+      // members of the struct whil we're at it.  The functions are
+      // named like `update-struct.0.component1'.  Their declarations
+      // look like:
+      //
+      // (declare-fun update-struct.0.component1
+      //         ((s struct.0)     ; first arg -- the struct to update
+      //          (v type1))       ; second arg -- the value to update
+      //         struct.0          ; the output type
+      //         (mk-struct.0      ; build the new struct...
+      //          v                ; the updated value
+      //          (struct.0.component2 s)  ; retain the other members
+      //          ...
+      //          (struct.0.componentN s)))
 
-       for(std::size_t i = 0; i < components.size(); i++)
-       {
-         const struct_union_typet::componentt &component = components[i];
-         out << "(define-fun update-" << smt_typename << "."
-             << component.get_name() << " "
-             << "((s " << smt_typename << ") "
-             <<  "(v ";
-         convert_type(component.type());
-         out << ")) " << smt_typename << " "
-             << "(mk-" << smt_typename
-             << " ";
+      for(std::size_t i = 0; i < components.size(); i++)
+      {
+        const struct_union_typet::componentt &component = components[i];
+        out << "(define-fun update-" << smt_typename << "."
+            << component.get_name() << " "
+            << "((s " << smt_typename << ") "
+            <<  "(v ";
+        convert_type(component.type());
+        out << ")) " << smt_typename << " "
+            << "(mk-" << smt_typename
+            << " ";
 
-         for(std::size_t j = 0; j < components.size(); j++)
-         {
-           if(j==i)
-             out << "v ";
-           else
-           {
-             out << "(" << smt_typename << "."
+        for(std::size_t j = 0; j < components.size(); j++)
+        {
+          if(j==i)
+            out << "v ";
+          else
+          {
+            out << "(" << smt_typename << "."
                  << components[j].get_name() << " s) ";
-           }
-         }
+          }
+        }
 
-         out << "))" << "\n";
-       }
+        out << "))" << "\n";
+      }
 
-       out << "\n";
-     }
-   }
-   else if(type.id()==ID_union)
-   {
-     const union_typet::componentst &components=
-       to_union_type(type).components();
+      out << "\n";
+    }
+  }
+  else if(type.id()==ID_union)
+  {
+    const union_typet::componentst &components=
+      to_union_type(type).components();
 
-     for(const auto &component : components)
-       find_symbols_rec(component.type(), recstack);
-   }
-   else if(type.id()==ID_code)
-   {
-     const code_typet::parameterst &parameters=
-         to_code_type(type).parameters();
-     for(const auto &param : parameters)
-       find_symbols_rec(param.type(), recstack);
+    for(const auto &component : components)
+      find_symbols_rec(component.type(), recstack);
+  }
+  else if(type.id()==ID_code)
+  {
+    const code_typet::parameterst &parameters=
+      to_code_type(type).parameters();
+    for(const auto &param : parameters)
+      find_symbols_rec(param.type(), recstack);
 
-     find_symbols_rec(to_code_type(type).return_type(), recstack);
-   }
-   else if(type.id()==ID_pointer)
-   {
-     find_symbols_rec(type.subtype(), recstack);
-   }
-   else if(type.id()==ID_symbol)
-   {
-     const symbol_typet &st=to_symbol_type(type);
-     const irep_idt &id=st.get_identifier();
+    find_symbols_rec(to_code_type(type).return_type(), recstack);
+  }
+  else if(type.id()==ID_pointer)
+  {
+    find_symbols_rec(type.subtype(), recstack);
+  }
+  else if(type.id()==ID_symbol)
+  {
+    const symbol_typet &st=to_symbol_type(type);
+    const irep_idt &id=st.get_identifier();
 
-     if(recstack.find(id)==recstack.end())
-     {
-       recstack.insert(id);
-       find_symbols_rec(ns.follow(type), recstack);
-     }
-   }
+    if(recstack.find(id)==recstack.end())
+    {
+      recstack.insert(id);
+      find_symbols_rec(ns.follow(type), recstack);
+    }
+  }
 }
 
 /*******************************************************************\
@@ -5216,13 +5252,13 @@ exprt smt2_convt::letify_rec(
   const seen_expressionst &map,
   unsigned i)
 {
-  if(i >= let_order.size())
+  if(i>=let_order.size())
     return substitute_let(expr, map);
 
   exprt current=let_order[i];
-  assert(map.find(current) != map.end());
+  assert(map.find(current)!=map.end());
 
-  if (map.find(current)->second.first < LET_COUNT)
+  if(map.find(current)->second.first<LET_COUNT)
     return letify_rec(expr, let_order, map, i+1);
 
   let_exprt let;
@@ -5267,7 +5303,7 @@ void smt2_convt::collect_bindings(
   for (unsigned i = 0; i < expr.operands().size(); ++i)
     collect_bindings(expr.operands()[i], map, let_order);
 
-  assert(map.find(expr) == map.end());
+  assert(map.find(expr)==map.end());
 
   symbol_exprt let=
     symbol_exprt("_let_"+std::to_string(++let_id_count), expr.type());

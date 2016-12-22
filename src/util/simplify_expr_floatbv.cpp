@@ -264,7 +264,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         if(dest_type.id()==ID_floatbv) // float to float
         {
           ieee_floatt result(to_constant_expr(op0));
-          result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+          result.rounding_mode=
+            (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
           result.change_spec(
             ieee_float_spect(to_floatbv_type(dest_type)));
           expr=result.to_expr();
@@ -276,7 +277,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           if(rounding_mode==ieee_floatt::ROUND_TO_ZERO)
           {
             ieee_floatt result(to_constant_expr(op0));
-            result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+            result.rounding_mode=
+              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             mp_integer value=result.to_integer();
             expr=from_integer(value, dest_type);
             return false;
@@ -292,7 +294,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           if(dest_type.id()==ID_floatbv) // int to float
           {
             ieee_floatt result(to_floatbv_type(dest_type));
-            result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+            result.rounding_mode=
+              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
             result.from_integer(value);
             expr=result.to_expr();
             return false;
@@ -307,8 +310,18 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   if(expr.op0().id()==ID_if &&
      expr.op0().operands().size()==3)
   {
-    exprt tmp_op1=binary_exprt(expr.op0().op1(), ID_floatbv_typecast, expr.op1(), dest_type);
-    exprt tmp_op2=binary_exprt(expr.op0().op2(), ID_floatbv_typecast, expr.op1(), dest_type);
+    exprt tmp_op1=
+      binary_exprt(
+        expr.op0().op1(),
+        ID_floatbv_typecast,
+        expr.op1(),
+        dest_type);
+    exprt tmp_op2=
+      binary_exprt(
+        expr.op0().op2(),
+        ID_floatbv_typecast,
+        expr.op1(),
+        dest_type);
     simplify_floatbv_typecast(tmp_op1);
     simplify_floatbv_typecast(tmp_op2);
     expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, dest_type);
@@ -360,7 +373,8 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
     mp_integer rounding_mode;
     if(!to_integer(op2, rounding_mode))
     {
-      v0.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+      v0.rounding_mode=
+        (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
       v1.rounding_mode=v0.rounding_mode;
 
       ieee_floatt result=v0;
@@ -382,8 +396,8 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
   }
 
   // division by one? Exact for all rounding modes.
-  if (expr.id()==ID_floatbv_div &&
-      op1.is_constant() && op1.is_one())
+  if(expr.id()==ID_floatbv_div &&
+     op1.is_constant() && op1.is_one())
   {
     exprt tmp;
     tmp.swap(op0);

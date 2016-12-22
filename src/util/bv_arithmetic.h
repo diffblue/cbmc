@@ -93,11 +93,11 @@ public:
   exprt to_expr() const;
   void from_expr(const exprt &expr);
 
-  bv_arithmetict &operator /= (const bv_arithmetict &other);
-  bv_arithmetict &operator *= (const bv_arithmetict &other);
-  bv_arithmetict &operator += (const bv_arithmetict &other);
-  bv_arithmetict &operator -= (const bv_arithmetict &other);
-  bv_arithmetict &operator %= (const bv_arithmetict &other);
+  bv_arithmetict &operator/=(const bv_arithmetict &other);
+  bv_arithmetict &operator*=(const bv_arithmetict &other);
+  bv_arithmetict &operator+=(const bv_arithmetict &other);
+  bv_arithmetict &operator-=(const bv_arithmetict &other);
+  bv_arithmetict &operator%=(const bv_arithmetict &other);
 
   bool operator<(const bv_arithmetict &other);
   bool operator<=(const bv_arithmetict &other);

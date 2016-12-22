@@ -24,7 +24,7 @@ public:
   // Trivial, conjunctive interval domain for both float
   // and integers. The categorization 'float' and 'integers'
   // is done by is_int and is_float.
-  
+
   interval_domaint():bottom(true)
   {
   }

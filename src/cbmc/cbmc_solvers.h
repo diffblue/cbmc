@@ -47,7 +47,7 @@ public:
   {
   }
 
-  //The solver class (that takes care of allocated objects)
+  // The solver class (that takes care of allocated objects)
   class solvert
   {
   public:
@@ -63,7 +63,7 @@ public:
       delete prop_conv_ptr;
     }
 
-    //use this to get the prop_conv
+    // use this to get the prop_conv
     prop_convt& prop_conv() const
     {
       assert(prop_conv_ptr!=NULL);
@@ -74,7 +74,7 @@ public:
     prop_convt* prop_conv_ptr;
   };
 
-  //returns a solvert object
+  // returns a solvert object
   virtual std::unique_ptr<solvert> get_solver()
   {
     solvert *solver;
@@ -116,10 +116,9 @@ protected:
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
 
-  //consistency checks during solver creation
+  // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
-
 };
 
 #endif // CPROVER_CBMC_CBMC_SOLVERS_H

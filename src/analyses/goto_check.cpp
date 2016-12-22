@@ -353,7 +353,8 @@ void goto_checkt::conversion_check(
       if(old_type.id()==ID_signedbv) // signed -> signed
       {
         std::size_t old_width=to_signedbv_type(old_type).get_width();
-        if(new_width>=old_width) return; // always ok
+        if(new_width>=old_width)
+          return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
         no_overflow_upper.lhs()=expr.op0();
@@ -374,7 +375,8 @@ void goto_checkt::conversion_check(
       else if(old_type.id()==ID_unsignedbv) // unsigned -> signed
       {
         std::size_t old_width=to_unsignedbv_type(old_type).get_width();
-        if(new_width>=old_width+1) return; // always ok
+        if(new_width>=old_width+1)
+          return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
         no_overflow_upper.lhs()=expr.op0();
@@ -458,7 +460,8 @@ void goto_checkt::conversion_check(
       else if(old_type.id()==ID_unsignedbv) // unsigned -> unsigned
       {
         std::size_t old_width=to_unsignedbv_type(old_type).get_width();
-        if(new_width>=old_width) return; // always ok
+        if(new_width>=old_width)
+          return; // always ok
 
         binary_relation_exprt no_overflow_upper(ID_le);
         no_overflow_upper.lhs()=expr.op0();
@@ -1793,7 +1796,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           i_it->source_location.set_column(it->source_location.get_column());
       }
 
-      if(i_it->function==irep_idt()) i_it->function=it->function;
+      if(i_it->function==irep_idt())
+        i_it->function=it->function;
     }
 
     // insert new instructions -- make sure targets are not moved

@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -385,7 +385,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   }
   else if(root_object.id()==ID_dynamic_object)
   {
-    //const dynamic_object_exprt &dynamic_object=
+    // const dynamic_object_exprt &dynamic_object=
     //  to_dynamic_object_expr(root_object);
 
     // the object produced by malloc
@@ -406,7 +406,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     if(options.get_bool_option("pointer-check"))
     {
-      //if(!dynamic_object.valid().is_true())
+      // if(!dynamic_object.valid().is_true())
       {
         // check if it is still alive
         guardt tmp_guard(guard);
@@ -541,7 +541,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         result.value.make_typecast(dereference_type);
     }
     else if(root_object_type.id()==ID_array &&
-            dereference_type_compare(root_object_type.subtype(), dereference_type))
+            dereference_type_compare(
+              root_object_type.subtype(),
+              dereference_type))
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
@@ -587,8 +589,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(ns.follow(result.value.type())!=ns.follow(dereference_type))
         result.value.make_typecast(dereference_type);
     }
-    else if(get_subexpression_at_offset(root_object_subexpression, o.offset(),
-					dereference_type, ns))
+    else if(get_subexpression_at_offset(
+        root_object_subexpression,
+        o.offset(),
+        dereference_type,
+        ns))
     {
       // Successfully found a member, array index, or combination thereof
       // that matches the desired type and offset:

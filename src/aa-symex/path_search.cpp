@@ -218,7 +218,8 @@ int path_searcht::await()
     pid_t pid=wait(&status);
     if(pid==-1)
     {
-      if(errno==ECHILD) break; // no more child processes
+      if(errno==ECHILD)
+        break; // no more child processes
     }
     else
     {
@@ -451,7 +452,8 @@ void path_searcht::check_assertion(statet &state)
   exprt assertion=
     state.read(instruction.guard);
 
-  if(assertion.is_true()) return; // no error, trivially
+  if(assertion.is_true())
+    return; // no error, trivially
 
   // keep statistics
   number_of_VCCs_after_simplification++;

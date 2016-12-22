@@ -54,7 +54,8 @@ Function: inv_object_storet::get
 bool inv_object_storet::get(const exprt &expr, unsigned &n)
 {
   std::string s=build_string(expr);
-  if(s=="") return true;
+  if(s.empty())
+    return true;
 
   // if it's a constant, we add it in any case
   if(is_constant(expr))
@@ -540,7 +541,8 @@ Function: invariant_sett::strengthen
 
 void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
 {
-  if(expr.type()==type) return;
+  if(expr.type()==type)
+    return;
 
   if(type.id()==ID_unsignedbv)
   {
@@ -549,7 +551,8 @@ void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
     if(op_width<=8)
     {
       unsigned a;
-      if(get_object(expr, a)) return;
+      if(get_object(expr, a))
+        return;
 
       add_bounds(a, boundst(0, power(2, op_width)-1));
     }
@@ -863,14 +866,16 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     bool ob0=get_object(expr.op0(), p.first);
     bool ob1=get_object(expr.op1(), p.second);
 
-    if(ob0 || ob1) return tvt::unknown();
+    if(ob0 || ob1)
+      return tvt::unknown();
 
     tvt r;
 
     if(expr.id()==ID_le)
     {
       r=is_le(p);
-      if(!r.is_unknown()) return r;
+      if(!r.is_unknown())
+        return r;
 
       boundst b0, b1;
       get_bounds(p.first, b0);
@@ -881,7 +886,8 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     else if(expr.id()==ID_lt)
     {
       r=is_lt(p);
-      if(!r.is_unknown()) return r;
+      if(!r.is_unknown())
+        return r;
 
       boundst b0, b1;
       get_bounds(p.first, b0);
@@ -932,7 +938,8 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
 
   bounds_mapt::const_iterator it=bounds_map.find(a);
 
-  if(it!=bounds_map.end()) bounds=it->second;
+  if(it!=bounds_map.end())
+    bounds=it->second;
 }
 
 /*******************************************************************\
@@ -954,11 +961,13 @@ void invariant_sett::nnf(exprt &expr, bool negate)
 
   if(expr.is_true())
   {
-    if(negate) expr=false_exprt();
+    if(negate)
+      expr=false_exprt();
   }
   else if(expr.is_false())
   {
-    if(negate) expr=true_exprt();
+    if(negate)
+      expr=true_exprt();
   }
   else if(expr.id()==ID_not)
   {
@@ -977,7 +986,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   }
   else if(expr.id()==ID_or)
   {
-    if(negate) expr.id(ID_and);
+    if(negate)
+      expr.id(ID_and);
 
     Forall_operands(it, expr)
       nnf(*it, negate);
@@ -997,7 +1007,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     }
     else
     {
-      if(negate) expr.make_not();
+      if(negate)
+        expr.make_not();
     }
   }
   else if(expr.id()==ID_le)
@@ -1040,11 +1051,13 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   }
   else if(expr.id()==ID_equal)
   {
-    if(negate) expr.id(ID_notequal);
+    if(negate)
+      expr.id(ID_notequal);
   }
   else if(expr.id()==ID_notequal)
   {
-    if(negate) expr.id(ID_equal);
+    if(negate)
+      expr.id(ID_equal);
   }
   else
   {
@@ -1245,9 +1258,10 @@ bool invariant_sett::make_union(const invariant_sett &other)
   if(make_union_bounds_map(other.bounds_map))
     return true;
 
-  if(old_eq_roots!=eq_set.count_roots()) return true;
-  if(old_ne_set!=ne_set.size()) return true;
-  if(old_le_set!=le_set.size()) return true;
+  if(old_eq_roots!=eq_set.count_roots() ||
+     old_ne_set!=ne_set.size() ||
+     old_le_set!=le_set.size())
+    return true;
 
   return false; // no change
 }
@@ -1287,7 +1301,8 @@ bool invariant_sett::make_union_bounds_map(const bounds_mapt &other)
     {
       boundst old(it->second);
       it->second.approx_union_with(o_it->second);
-      if(it->second!=old) changed=true;
+      if(it->second!=old)
+        changed=true;
       it++;
     }
   }
@@ -1333,7 +1348,8 @@ void invariant_sett::modifies(const exprt &lhs)
      lhs.id()==ID_member)
   {
     unsigned a;
-    if(!get_object(lhs, a)) modifies(a);
+    if(!get_object(lhs, a))
+      modifies(a);
   }
   else if(lhs.id()==ID_index)
   {

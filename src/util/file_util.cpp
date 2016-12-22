@@ -105,7 +105,7 @@ void delete_directory(const std::string &path)
     struct dirent *ent;
 
     while((ent=readdir(dir))!=NULL)
-      remove((path + "/" + ent->d_name).c_str());
+      remove((path+"/"+ent->d_name).c_str());
 
     closedir(dir);
   }
@@ -128,8 +128,9 @@ Function: concat_dir_file
 
 \*******************************************************************/
 
-std::string concat_dir_file(const std::string &directory,
-                            const std::string &file_name)
+std::string concat_dir_file(
+  const std::string &directory,
+  const std::string &file_name)
 {
   #ifdef _WIN32
   return  (file_name.size()>1 &&

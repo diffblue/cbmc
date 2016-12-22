@@ -382,12 +382,13 @@ void invariant_propagationt::simplify(goto_programt &goto_program)
 {
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(!i_it->is_assert()) continue;
+    if(!i_it->is_assert())
+      continue;
 
     // find invariant set
     state_mapt::const_iterator s_it=state_map.find(i_it);
-
-    if(s_it==state_map.end()) continue;
+    if(s_it==state_map.end())
+      continue;
 
     const invariant_sett &invariant_set=s_it->second.invariant_set;
 

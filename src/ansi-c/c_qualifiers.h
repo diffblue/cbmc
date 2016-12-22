@@ -85,8 +85,7 @@ public:
     return !(*this==other);
   }
 
-  c_qualifierst &operator += (
-    const c_qualifierst &b)
+  c_qualifierst &operator+=(const c_qualifierst &b)
   {
     is_constant|=b.is_constant;
     is_volatile|=b.is_volatile;

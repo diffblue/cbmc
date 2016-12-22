@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define USE_DSTRING
 #define SHARING
-//#define HASH_CODE
+// #define HASH_CODE
 #define USE_MOVE
-//#define SUB_IS_LIST
+// #define SUB_IS_LIST
 
 #ifdef SUB_IS_LIST
 #include <list>
@@ -370,12 +370,18 @@ public:
 
 struct irep_hash
 {
-  inline std::size_t operator()(const irept &irep) const { return irep.hash(); }
+  inline std::size_t operator()(const irept &irep) const
+  {
+    return irep.hash();
+  }
 };
 
 struct irep_full_hash
 {
-  inline std::size_t operator()(const irept &irep) const { return irep.full_hash(); }
+  inline std::size_t operator()(const irept &irep) const
+  {
+    return irep.full_hash();
+  }
 };
 
 struct irep_full_eq

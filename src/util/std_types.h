@@ -390,7 +390,6 @@ public:
 
     return false;
   }
-
 };
 
 /*! \brief Cast a generic typet to a \ref class_typet
@@ -636,7 +635,8 @@ inline enumeration_typet &to_enumeration_type(typet &type)
 class c_enum_typet:public type_with_subtypet
 {
 public:
-  explicit c_enum_typet(const typet &_subtype):type_with_subtypet(ID_c_enum, _subtype)
+  explicit c_enum_typet(const typet &_subtype):
+    type_with_subtypet(ID_c_enum, _subtype)
   {
   }
 
@@ -646,9 +646,14 @@ public:
     inline irep_idt get_value() const { return get(ID_value); }
     inline void set_value(const irep_idt &value) { set(ID_value, value); }
     inline irep_idt get_identifier() const { return get(ID_identifier); }
-    inline void set_identifier(const irep_idt &identifier) { set(ID_identifier, identifier); }
+    inline void set_identifier(const irep_idt &identifier)
+    {
+      set(ID_identifier, identifier);
+    }
     inline irep_idt get_base_name() const { return get(ID_base_name); }
-    inline void set_base_name(const irep_idt &base_name) { set(ID_base_name, base_name); }
+    inline void set_base_name(const irep_idt &base_name) {
+      set(ID_base_name, base_name);
+    }
   };
 
   typedef std::vector<c_enum_membert> memberst;
@@ -897,8 +902,9 @@ public:
   {
   }
 
-  inline array_typet(const typet &_subtype,
-                     const exprt &_size):type_with_subtypet(ID_array, _subtype)
+  inline array_typet(
+    const typet &_subtype,
+    const exprt &_size):type_with_subtypet(ID_array, _subtype)
   {
     size()=_size;
   }
@@ -922,7 +928,6 @@ public:
   {
     return size().is_nil();
   }
-
 };
 
 /*! \brief Cast a generic typet to an \ref array_typet
@@ -1004,7 +1009,10 @@ public:
   {
   }
 
-  inline bitvector_typet(const irep_idt &_id, const typet &_subtype, std::size_t width):
+  inline bitvector_typet(
+    const irep_idt &_id,
+    const typet &_subtype,
+    std::size_t width):
     type_with_subtypet(_id, _subtype)
   {
     set_width(width);
@@ -1118,7 +1126,8 @@ public:
   {
   }
 
-  inline explicit unsignedbv_typet(std::size_t width):bitvector_typet(ID_unsignedbv, width)
+  inline explicit unsignedbv_typet(std::size_t width):
+    bitvector_typet(ID_unsignedbv, width)
   {
   }
 
@@ -1163,7 +1172,8 @@ public:
   {
   }
 
-  inline explicit signedbv_typet(std::size_t width):bitvector_typet(ID_signedbv, width)
+  inline explicit signedbv_typet(std::size_t width):
+    bitvector_typet(ID_signedbv, width)
   {
   }
 
@@ -1520,8 +1530,9 @@ public:
   {
   }
 
-  inline vector_typet(const typet &_subtype,
-                      const exprt &_size):type_with_subtypet(ID_vector, _subtype)
+  inline vector_typet(
+    const typet &_subtype,
+    const exprt &_size):type_with_subtypet(ID_vector, _subtype)
   {
     size()=_size;
   }
@@ -1535,7 +1546,6 @@ public:
   {
     return static_cast<exprt &>(add(ID_size));
   }
-
 };
 
 /*! \brief Cast a generic typet to a \ref vector_typet

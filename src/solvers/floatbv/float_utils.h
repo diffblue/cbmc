@@ -104,8 +104,16 @@ public:
 
   // add/sub
   virtual bvt add_sub(const bvt &src1, const bvt &src2, bool subtract);
-  bvt add(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, false); }
-  bvt sub(const bvt &src1, const bvt &src2) { return add_sub(src1, src2, true); }
+
+  bvt add(const bvt &src1, const bvt &src2)
+  {
+    return add_sub(src1, src2, false);
+  }
+
+  bvt sub(const bvt &src1, const bvt &src2)
+  {
+    return add_sub(src1, src2, true);
+  }
 
   // mul/div/rem
   virtual bvt mul(const bvt &src1, const bvt &src2);

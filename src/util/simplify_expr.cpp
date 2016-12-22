@@ -34,14 +34,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-//#define DEBUGX
+// #define DEBUGX
 
 #ifdef DEBUGX
 #include <langapi/language_util.h>
 #include <iostream>
 #endif
 
-//#define USE_CACHE
+// #define USE_CACHE
 
 #ifdef USE_CACHE
 struct simplify_expr_cachet
@@ -51,8 +51,7 @@ public:
   typedef std::unordered_map<
     exprt, exprt, irep_full_hash, irep_full_eq> containert;
   #else
-  typedef std::unordered_map<
-    exprt, exprt, irep_hash> containert;
+  typedef std::unordered_map<exprt, exprt, irep_hash> containert;
   #endif
 
   containert container_normal;
@@ -248,7 +247,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().id()==ID_typecast &&
      expr.op0().operands().size()==1 &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv) &&
-     to_bitvector_type(op_type).get_width() >= config.ansi_c.pointer_width)
+     to_bitvector_type(op_type).get_width()>=config.ansi_c.pointer_width)
   {
     exprt tmp=expr.op0().op0();
     expr.op0().swap(tmp);
@@ -382,7 +381,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv))
   {
     bool enlarge=
-      to_bitvector_type(expr_type).get_width() > to_bitvector_type(op_type).get_width();
+      to_bitvector_type(expr_type).get_width()>
+      to_bitvector_type(op_type).get_width();
 
     if(!enlarge)
     {
@@ -650,7 +650,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr=from_rational(r);
         return false;
       }
-
     }
     else if(op_type_id==ID_fixedbv)
     {
@@ -715,7 +714,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
-      const typet &base_type=ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
+      const typet &base_type=
+        ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -845,7 +845,7 @@ bool simplify_exprt::simplify_if_implies(
   bool truth,
   bool &new_truth)
 {
-  if(expr == cond)
+  if(expr==cond)
   {
     new_truth = truth;
     return false;
@@ -853,51 +853,15 @@ bool simplify_exprt::simplify_if_implies(
 
   if(truth && cond.id()==ID_lt && expr.id()==ID_lt)
   {
-    if(cond.op0() == expr.op0() &&
-        cond.op1().is_constant() &&
-        expr.op1().is_constant() &&
-        cond.op1().type() == expr.op1().type())
+    if(cond.op0()==expr.op0() &&
+       cond.op1().is_constant() &&
+       expr.op1().is_constant() &&
+       cond.op1().type()==expr.op1().type())
     {
-      const irep_idt &type_id = cond.op1().type().id();
+      const irep_idt &type_id=cond.op1().type().id();
       if(type_id==ID_integer || type_id==ID_natural)
       {
-        if(string2integer(cond.op1().get_string(ID_value)) >=
-          string2integer(expr.op1().get_string(ID_value)))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_unsignedbv)
-      {
-        const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), false) >=
-           binary2integer(expr.op1().get_string(ID_value), false))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-      else if(type_id==ID_signedbv)
-      {
-        const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), true) >=
-           binary2integer(expr.op1().get_string(ID_value), true))
-        {
-          new_truth = true;
-          return false;
-        }
-      }
-    }
-    if(cond.op1() == expr.op1() &&
-        cond.op0().is_constant() &&
-        expr.op0().is_constant() &&
-        cond.op0().type() == expr.op0().type())
-    {
-      const irep_idt &type_id = cond.op1().type().id();
-      if(type_id==ID_integer || type_id==ID_natural)
-      {
-        if(string2integer(cond.op1().get_string(ID_value)) <=
+        if(string2integer(cond.op1().get_string(ID_value))>=
            string2integer(expr.op1().get_string(ID_value)))
         {
           new_truth = true;
@@ -907,7 +871,7 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_unsignedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), false) <=
+        if(binary2integer(cond.op1().get_string(ID_value), false)>=
            binary2integer(expr.op1().get_string(ID_value), false))
         {
           new_truth = true;
@@ -917,7 +881,43 @@ bool simplify_exprt::simplify_if_implies(
       else if(type_id==ID_signedbv)
       {
         const mp_integer i1, i2;
-        if(binary2integer(cond.op1().get_string(ID_value), true) <=
+        if(binary2integer(cond.op1().get_string(ID_value), true)>=
+           binary2integer(expr.op1().get_string(ID_value), true))
+        {
+          new_truth = true;
+          return false;
+        }
+      }
+    }
+    if(cond.op1()==expr.op1() &&
+       cond.op0().is_constant() &&
+       expr.op0().is_constant() &&
+       cond.op0().type()==expr.op0().type())
+    {
+      const irep_idt &type_id = cond.op1().type().id();
+      if(type_id==ID_integer || type_id==ID_natural)
+      {
+        if(string2integer(cond.op1().get_string(ID_value))<=
+           string2integer(expr.op1().get_string(ID_value)))
+        {
+          new_truth = true;
+          return false;
+        }
+      }
+      else if(type_id==ID_unsignedbv)
+      {
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), false)<=
+           binary2integer(expr.op1().get_string(ID_value), false))
+        {
+          new_truth = true;
+          return false;
+        }
+      }
+      else if(type_id==ID_signedbv)
+      {
+        const mp_integer i1, i2;
+        if(binary2integer(cond.op1().get_string(ID_value), true)<=
            binary2integer(expr.op1().get_string(ID_value), true))
         {
           new_truth = true;
@@ -992,17 +992,17 @@ bool simplify_exprt::simplify_if_conj(
 {
   forall_operands(it, cond)
   {
-    if(expr == *it)
+    if(expr==*it)
     {
       expr=true_exprt();
       return false;
     }
   }
 
-  bool result = true;
+  bool result=true;
 
   Forall_operands(it, expr)
-    result = simplify_if_conj(*it, cond) && result;
+    result=simplify_if_conj(*it, cond) && result;
 
   return result;
 }
@@ -1025,17 +1025,17 @@ bool simplify_exprt::simplify_if_disj(
 {
   forall_operands(it, cond)
   {
-    if(expr == *it)
+    if(expr==*it)
     {
       expr=false_exprt();
       return false;
     }
   }
 
-  bool result = true;
+  bool result=true;
 
   Forall_operands(it, expr)
-    result = simplify_if_disj(*it, cond) && result;
+    result=simplify_if_disj(*it, cond) && result;
 
   return result;
 }
@@ -1096,26 +1096,26 @@ Function: simplify_exprt::simplify_if_cond
 
 bool simplify_exprt::simplify_if_cond(exprt &expr)
 {
-  bool result = true;
-  bool tmp = false;
+  bool result=true;
+  bool tmp=false;
 
   while(!tmp)
   {
-    tmp = true;
+    tmp=true;
 
     if(expr.id()==ID_and)
     {
       if(expr.has_operands())
       {
         exprt::operandst &operands = expr.operands();
-        for(exprt::operandst::iterator it1 = operands.begin();
-            it1 != operands.end(); it1++)
+        for(exprt::operandst::iterator it1=operands.begin();
+            it1!=operands.end(); it1++)
         {
-          for(exprt::operandst::iterator it2 = operands.begin();
-              it2 != operands.end(); it2++)
+          for(exprt::operandst::iterator it2=operands.begin();
+              it2!=operands.end(); it2++)
           {
-            if(it1 != it2)
-              tmp = simplify_if_recursive(*it1, *it2, true) && tmp;
+            if(it1!=it2)
+              tmp=simplify_if_recursive(*it1, *it2, true) && tmp;
           }
         }
       }
@@ -1123,7 +1123,7 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
 
     if(!tmp) simplify_rec(expr);
 
-    result = tmp && result;
+    result=tmp && result;
   }
 
   return result;
@@ -2004,9 +2004,10 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
         integer2size_t(el_size));
 
     exprt tmp=
-      bits2expr(bits_cut,
-                expr.type(),
-                expr.id()==ID_byte_extract_little_endian);
+      bits2expr(
+        bits_cut,
+        expr.type(),
+        expr.id()==ID_byte_extract_little_endian);
 
     if(tmp.is_not_nil())
     {
@@ -2194,20 +2195,20 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
         const irep_idt &component_name=with.where().get(ID_component_name);
 
         // is this a bit field?
-        if(struct_type.get_component(component_name).type().id()==ID_c_bit_field)
+        if(struct_type.get_component(component_name).type().id()==
+           ID_c_bit_field)
         {
           // don't touch -- might not be byte-aligned
         }
         else
         {
           // new offset = offset + component offset
-          mp_integer i = member_offset(struct_type,
-                                       component_name, ns);
-          if(i != -1)
+          mp_integer i=member_offset(struct_type, component_name, ns);
+          if(i!=-1)
           {
             exprt compo_offset = from_integer(i, offset.type());
-            plus_exprt new_offset (offset, compo_offset);
-            simplify_node (new_offset);
+            plus_exprt new_offset(offset, compo_offset);
+            simplify_node(new_offset);
             exprt new_value(with.op2());
             expr.op1().swap(new_offset);
             expr.op2().swap(new_value);
@@ -2218,12 +2219,12 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       }
       else if(tp.id()==ID_array)
       {
-        mp_integer i = pointer_offset_size(tp.subtype(), ns);
-        if(i != -1)
+        mp_integer i=pointer_offset_size(tp.subtype(), ns);
+        if(i!=-1)
         {
           const exprt& index=with.where();
           mult_exprt index_offset(index, from_integer(i, index.type()));
-          simplify_node (index_offset);
+          simplify_node(index_offset);
 
           // index_offset may need a typecast
           if(!base_type_eq(offset.type(), index.type(), ns))
@@ -2233,7 +2234,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
             index_offset.swap(tmp);
           }
 
-          plus_exprt new_offset (offset, index_offset);
+          plus_exprt new_offset(offset, index_offset);
           simplify_node(new_offset);
           exprt new_value(with.op2());
           expr.op1().swap(new_offset);
@@ -2449,7 +2450,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
 {
   if(!expr.has_operands()) return true;
 
-  //#define DEBUGX
+  // #define DEBUGX
 
   #ifdef DEBUGX
   exprt old(expr);

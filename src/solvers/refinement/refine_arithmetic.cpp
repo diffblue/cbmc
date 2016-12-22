@@ -317,7 +317,7 @@ void bv_refinementt::check_SAT(approximationt &a)
               << "==" << integer2binary(result.pack(), spec.width()) << eom;
     #endif
 
-    //if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
+    // if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
 
     if(a.over_state<max_node_refinement)
     {
@@ -410,19 +410,22 @@ void bv_refinementt::check_SAT(approximationt &a)
       {
         r=bv_utils.multiplier(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else if(a.expr.id()==ID_div)
       {
         r=bv_utils.divider(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else if(a.expr.id()==ID_mod)
       {
         r=bv_utils.remainder(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else
         assert(0);
@@ -434,7 +437,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   }
   else if(type.id()==ID_fixedbv)
   {
-    //TODO: not implemented
+    // TODO: not implemented
     assert(0);
   }
   else

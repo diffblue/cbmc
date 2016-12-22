@@ -75,10 +75,12 @@ protected:
   std::string convert_typecast(
     const typecast_exprt &src, unsigned &precedence);
 
-  std::string convert_pointer_arithmetic(const exprt &src,
+  std::string convert_pointer_arithmetic(
+    const exprt &src,
     unsigned &precedence);
 
-  std::string convert_pointer_difference(const exprt &src,
+  std::string convert_pointer_difference(
+    const exprt &src,
     unsigned &precedence);
 
   std::string convert_binary(
