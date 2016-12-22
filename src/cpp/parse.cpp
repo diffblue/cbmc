@@ -9432,10 +9432,6 @@ Function: Parser::operator()
 
 \*******************************************************************/
 
-#if 0
-#include <iostream>
-#endif
-
 bool Parser::operator()()
 {
   number_of_errors=0;

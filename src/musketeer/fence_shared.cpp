@@ -15,7 +15,6 @@ Author: Vincent Nimal
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/cprover_prefix.h>
 #include <util/message.h>
 
 #include <goto-programs/remove_skip.h>

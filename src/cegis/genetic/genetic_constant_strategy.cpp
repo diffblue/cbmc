@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cegis/invariant/constant/literals_constant_strategy.h>
 #include <cegis/invariant/options/invariant_program.h>
 #include <cegis/genetic/genetic_constant_strategy.h>
-#include <cegis/genetic/genetic_constant_strategy.h>
 
 namespace
 {

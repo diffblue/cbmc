@@ -10,13 +10,14 @@ Author: Daniel Kroening
 #include <process.h>
 #include <sys/stat.h>
 #include <windows.h>
-#include <fcntl.h>
 #include <io.h>
 #include <tchar.h>
 #define getpid _getpid
 #define open _open
 #define close _close
 #endif
+
+#include <fcntl.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -29,7 +30,6 @@ Author: Daniel Kroening
     defined(__MACH__)
 #include <unistd.h>
 #include <sys/time.h>
-#include <fcntl.h>
 #endif
 
 #include "tempfile.h"

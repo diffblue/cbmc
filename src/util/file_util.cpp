@@ -8,6 +8,8 @@ Date: January 2012
 
 \*******************************************************************/
 
+#include <cerrno>
+
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
@@ -15,7 +17,6 @@ Date: January 2012
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
-#include <cerrno>
 #include <dirent.h>
 #include <cstdlib>
 #include <cstdio>
@@ -25,7 +26,6 @@ Date: January 2012
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
-#include <cerrno>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose

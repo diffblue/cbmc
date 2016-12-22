@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
-#include <util/std_types.h>
 
 #include "c_typecheck_base.h"
 #include "expr2c.h"

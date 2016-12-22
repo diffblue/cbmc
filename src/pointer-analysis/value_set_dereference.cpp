@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #ifdef DEBUG
 #include <iostream>
-#include <langapi/language_util.h>
 #endif
 
 #include <cassert>

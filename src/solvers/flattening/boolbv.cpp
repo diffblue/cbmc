@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <map>
 #include <set>
-#include <cstdlib> // abort()
 
 #include <util/symbol.h>
 #include <util/mp_arith.h>

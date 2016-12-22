@@ -31,7 +31,6 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
-#include <goto-programs/remove_returns.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 

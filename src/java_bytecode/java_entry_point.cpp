@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/suffix.h>
+
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
