@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class lispsymbolt:public std::string
 {
  public:
+  // NOLINTNEXTLINE(runtime/explicit)
   lispsymbolt(const char *a):std::string(a)
   {
   }
@@ -33,6 +34,7 @@ class lispsymbolt:public std::string
   {
   }
 
+  // NOLINTNEXTLINE(runtime/explicit)
   lispsymbolt(const std::string &a):std::string(a)
   {
   }

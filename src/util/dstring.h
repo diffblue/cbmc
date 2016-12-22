@@ -40,11 +40,13 @@ public:
   #endif
 
   // this one is not safe for static objects
+  // NOLINTNEXTLINE(runtime/explicit)
   inline dstring(const char *s):no(string_container[s])
   {
   }
 
   // this one is not safe for static objects
+  // NOLINTNEXTLINE(runtime/explicit)
   inline dstring(const std::string &s):no(string_container[s])
   {
   }
