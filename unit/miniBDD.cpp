@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/miniBDD/miniBDD.h>
 
-using namespace miniBDD;
-
 void test1()
 {
   mgr mgr;

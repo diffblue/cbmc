@@ -24,9 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <stack>
 
-namespace miniBDD
-{
-
 class BDD
 {
 public:
@@ -136,8 +133,6 @@ BDD exists(const BDD &u, unsigned var);
 BDD substitute(const BDD &where, unsigned var, const BDD &by_what);
 std::string cubes(const BDD &u);
 bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment);
-
-} // namespace miniBDD
 
 // inline functions
 #include "miniBDD.inc"

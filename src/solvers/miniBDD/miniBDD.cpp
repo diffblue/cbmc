@@ -16,9 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define forall_nodes(it) for(nodest::const_iterator it=nodes.begin(); \
   it!=nodes.end(); it++)
 
-namespace miniBDD
-{
-
 void node::remove_reference()
 {
   assert(reference_counter!=0);
@@ -470,5 +467,3 @@ bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment)
     return OneSat(v.low(), assignment);
   }
 }
-
-} // namespace miniBDD

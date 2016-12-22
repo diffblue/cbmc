@@ -2,9 +2,6 @@
 
 // inline functions
 
-namespace miniBDD
-{
-
 BDD::BDD():node(0)
 {
 }
@@ -129,5 +126,3 @@ std::size_t mgr::number_of_nodes()
 {
   return nodes.size()-free.size();
 }
-
-} // namespace miniBDD
