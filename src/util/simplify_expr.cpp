@@ -626,7 +626,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
           to_fixedbv_type(expr_type);
 
         fixedbvt f;
-        f.spec=f_expr_type;
+        f.spec=fixedbv_spect(f_expr_type);
         f.from_integer(int_value);
         expr=f.to_expr();
 
@@ -648,7 +648,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_rational)
       {
-        rationalt r=int_value;
+        rationalt r(int_value);
         expr=from_rational(r);
         return false;
       }
@@ -668,7 +668,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         // fixedbv to fixedbv
         fixedbvt f(to_constant_expr(expr.op0()));
-        f.round(to_fixedbv_type(expr_type));
+        f.round(fixedbv_spect(to_fixedbv_type(expr_type)));
         expr=f.to_expr();
         return false;
       }
@@ -687,7 +687,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       else if(expr_type_id==ID_floatbv)
       {
         // float to double or double to float
-        f.change_spec(to_floatbv_type(expr_type));
+        ieee_floatt f(to_constant_expr(expr.op0()));
+        f.change_spec(ieee_float_spect(to_floatbv_type(expr_type)));
         expr=f.to_expr();
         return false;
       }

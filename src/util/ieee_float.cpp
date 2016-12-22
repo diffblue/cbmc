@@ -1423,7 +1423,7 @@ Function: ieee_floatt::from_expr
 
 void ieee_floatt::from_expr(const constant_exprt &expr)
 {
-  spec=to_floatbv_type(expr.type());
+  spec=ieee_float_spect(to_floatbv_type(expr.type()));
   unpack(binary2integer(id2string(expr.get_value()), false));
 }
 

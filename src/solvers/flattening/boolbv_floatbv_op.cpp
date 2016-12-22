@@ -48,33 +48,36 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   if(src_type.id()==ID_floatbv &&
      dest_type.id()==ID_floatbv)
   {
-    float_utils.spec=to_floatbv_type(src_type);
-    return float_utils.conversion(bv0, to_floatbv_type(dest_type));
+    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
+    return
+      float_utils.conversion(
+        bv0,
+        ieee_float_spect(to_floatbv_type(dest_type)));
   }
   else if(src_type.id()==ID_signedbv &&
           dest_type.id()==ID_floatbv)
   {
-    float_utils.spec=to_floatbv_type(dest_type);
+    float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
     return float_utils.from_signed_integer(bv0);
   }
   else if(src_type.id()==ID_unsignedbv &&
           dest_type.id()==ID_floatbv)
   {
-    float_utils.spec=to_floatbv_type(dest_type);
+    float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
     return float_utils.from_unsigned_integer(bv0);
   }
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_signedbv)
   {
     std::size_t dest_width=to_signedbv_type(dest_type).get_width();
-    float_utils.spec=to_floatbv_type(src_type);
+    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
     return float_utils.to_signed_integer(bv0, dest_width);
   }
   else if(src_type.id()==ID_floatbv &&
           dest_type.id()==ID_unsignedbv)
   {
     std::size_t dest_width=to_unsignedbv_type(dest_type).get_width();
-    float_utils.spec=to_floatbv_type(src_type);
+    float_utils.spec=ieee_float_spect(to_floatbv_type(src_type));
     return float_utils.to_unsigned_integer(bv0, dest_width);
   }
   else
@@ -122,7 +125,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
 
   if(type.id()==ID_floatbv)
   {
-    float_utils.spec=to_floatbv_type(expr.type());
+    float_utils.spec=ieee_float_spect(to_floatbv_type(expr.type()));
 
     if(expr.id()==ID_floatbv_plus)
       return float_utils.add_sub(bv0, bv1, false);
@@ -143,7 +146,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
 
     if(subtype.id()==ID_floatbv)
     {
-      float_utils.spec=to_floatbv_type(subtype);
+      float_utils.spec=ieee_float_spect(to_floatbv_type(subtype));
 
       std::size_t width=boolbv_width(type);
       std::size_t sub_width=boolbv_width(subtype);

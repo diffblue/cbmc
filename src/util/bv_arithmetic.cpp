@@ -471,6 +471,6 @@ Function: bv_arithmetict::from_expr
 void bv_arithmetict::from_expr(const exprt &expr)
 {
   assert(expr.is_constant());
-  spec=expr.type();
+  spec=bv_spect(expr.type());
   value=binary2integer(expr.get_string(ID_value), spec.is_signed);
 }

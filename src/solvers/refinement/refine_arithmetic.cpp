@@ -478,7 +478,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
   if(a.expr.type().id()==ID_floatbv)
   {
     const floatbv_typet &floatbv_type=to_floatbv_type(a.expr.type());
-    ieee_float_spect spec=floatbv_type;
+    ieee_float_spect spec(floatbv_type);
 
     a.under_assumptions.reserve(a.op0_bv.size()+a.op1_bv.size());
 

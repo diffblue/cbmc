@@ -265,7 +265,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         {
           ieee_floatt result(to_constant_expr(op0));
           result.rounding_mode=(ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
-          result.change_spec(to_floatbv_type(dest_type));
+          result.change_spec(
+            ieee_float_spect(to_floatbv_type(dest_type)));
           expr=result.to_expr();
           return false;
         }

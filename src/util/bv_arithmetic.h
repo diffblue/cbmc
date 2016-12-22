@@ -38,6 +38,11 @@ public:
   mp_integer min_value() const;
 
   typet to_type() const;
+
+  bool operator==(const bv_spect &other) const
+  {
+    return width==other.width && is_signed==other.is_signed;
+  }
 };
 
 class bv_arithmetict

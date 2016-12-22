@@ -183,13 +183,13 @@ bool boolbvt::type_conversion(
 
       case IS_SIGNED: // signed to float
       case IS_C_ENUM:
-        float_utils.spec=to_floatbv_type(dest_type);
+        float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
         dest=float_utils.from_signed_integer(src);
         return false;
 
       case IS_UNSIGNED: // unsigned to float
       case IS_C_BOOL: // _Bool to float
-        float_utils.spec=to_floatbv_type(dest_type);
+        float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
         dest=float_utils.from_unsigned_integer(src);
         return false;
 

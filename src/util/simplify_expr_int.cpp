@@ -1888,9 +1888,11 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   {
     ieee_floatt const_val(to_constant_expr(expr.op1()));
     ieee_floatt const_val_converted=const_val;
-    const_val_converted.change_spec(to_floatbv_type(ns.follow(expr.op0().op0().type())));
+    const_val_converted.change_spec(
+      ieee_float_spect(to_floatbv_type(ns.follow(expr.op0().op0().type()))));
     ieee_floatt const_val_converted_back=const_val_converted;
-    const_val_converted_back.change_spec(to_floatbv_type(ns.follow(expr.op0().type())));
+    const_val_converted_back.change_spec(
+      ieee_float_spect(to_floatbv_type(ns.follow(expr.op0().type()))));
     if(const_val_converted_back==const_val)
     {
       exprt result=expr;

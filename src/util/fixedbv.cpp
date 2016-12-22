@@ -60,7 +60,7 @@ Function: fixedbvt::from_expr
 
 void fixedbvt::from_expr(const constant_exprt &expr)
 {
-  spec=to_fixedbv_type(expr.type());
+  spec=fixedbv_spect(to_fixedbv_type(expr.type()));
   v=binary2integer(id2string(expr.get_value()), true);
 }
 
