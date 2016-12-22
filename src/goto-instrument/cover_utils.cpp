@@ -689,7 +689,8 @@ Function: sign_of_expr
 
 \*******************************************************************/
 
-std::set<signed> instrument_cover_utilst::sign_of_expr(const exprt &e, const exprt &E)
+std::set<signed> instrument_cover_utilst::sign_of_expr(
+  const exprt &e, const exprt &E)
 {
   std::set<signed> signs;
 
