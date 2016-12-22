@@ -3097,12 +3097,14 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
   for line in raw_lines:
     joined_line = ''
     starting_func = False
-    regexp = r'(\w(\w|::|\*|\&|\s)*)\('  # decls * & space::name( ...
+    # Look for declaration function_name( but allowing for *, & being attached to the function name
+    # but not being considered part of it
+    regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>\w(\w|::)*)\('
     match_result = Match(regexp, line)
     if match_result:
       # If the name is all caps and underscores, figure it's a macro and
       # ignore it, unless it's TEST or TEST_F.
-      function_name = match_result.group(1).split()[-1]
+      function_name = match_result.group('fnc_name')
       if function_name == 'TEST' or function_name == 'TEST_F' or (
         not Match(r'[A-Z_]+$', function_name)):
         starting_func = True
