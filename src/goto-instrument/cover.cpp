@@ -352,7 +352,8 @@ void instrument_cover_goalst::instrument_cover_goals(
     coverage_criterion=as_string(criterion);
     property_class="coverage";
 
-    instrument_mcdc_goalst mcdc(ns, criteria, coverage_criterion, property_class);
+    instrument_mcdc_goalst mcdc(
+      ns, criteria, coverage_criterion, property_class);
 
     Forall_goto_program_instructions(i_it, goto_program)
     {
@@ -390,7 +391,7 @@ void instrument_cover_goalst::instrument_cover_goals(
         break;
 
       case coverage_criteriont::MCDC:
-    	mcdc.instrument_mcdc(i_it, goto_program, basic_blocks, blocks_done);
+        mcdc.instrument_mcdc(i_it, goto_program, basic_blocks, blocks_done);
         break;
 
       default: {}
