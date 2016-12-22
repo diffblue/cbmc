@@ -59,7 +59,19 @@ sub load($) {
 
 sub test($$$$$) {
   my ($name, $test, $t_level, $cmd, $ign) = @_;
-  my ($level, $input, $options, @results) = load("$test");
+  my ($level, $input, $options, $grep_options, @results) = load("$test");
+
+  # If the 4th line starts with a '-' we use that line as options to pass to
+  # grep when matching all lines in this test
+  if($grep_options =~ /^-/) {
+    print "\nActivating perl flags: $grep_options\n";
+  }
+  else {
+    # No grep options so stick this back into the results array
+    unshift @results, $grep_options;
+    $grep_options = "";
+  }
+
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
@@ -107,7 +119,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep \$'$result' \"$name/$output\" >/dev/null");
+          system("bash", "-c", "grep $grep_options \$'$result' \"$name/$output\" >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
@@ -173,6 +185,7 @@ follows the format specified below. Any line starting with // will be ignored.
 <level>
 <main source>
 <options>
+<grep_options>
 <required patterns>
 --
 <disallowed patterns>
@@ -181,8 +194,12 @@ follows the format specified below. Any line starting with // will be ignored.
 
 where
   <level>                is one of CORE, THOROUGH, FUTURE or KNOWNBUG
-  <main source>          is a file with extension .c/.i/.cpp/.ii/.xml/.class/.jar
+  <main source>          is a file with extension .c/.i/.gb/.cpp/.ii/.xml/.class/.jar
   <options>              additional options to be passed to CMD
+  <grep_options>         additional flags to be passed to grep when checking required
+                         patterns (this is optional, if the line stats with a `-'
+                         it will be used as grep options. Otherwise, it will be
+                         considered part of the required patterns)
   <required patterns>    one or more lines of regualar expressions that must occur in the output
   <disallowed patterns>  one or more lines of expressions that must not occur in output
   <comment text>         free form text
