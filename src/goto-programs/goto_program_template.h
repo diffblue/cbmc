@@ -195,7 +195,7 @@ public:
     {
     }
 
-    inline instructiont(goto_program_instruction_typet _type):
+    explicit inline instructiont(goto_program_instruction_typet _type):
       source_location(static_cast<const source_locationt &>(get_nil_irep())),
       type(_type),
       guard(true_exprt()),

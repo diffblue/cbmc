@@ -22,7 +22,7 @@ class xml_symbol_convertt {
     std::list<irept> irepcache;
 
   public:
-    xml_symbol_convertt(xml_irep_convertt::ireps_containert &ic) :
+    explicit xml_symbol_convertt(xml_irep_convertt::ireps_containert &ic) :
       irepconverter(ic) {};
 
   void convert(const symbolt &, xmlt &);

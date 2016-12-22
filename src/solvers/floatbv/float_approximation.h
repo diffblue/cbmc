@@ -14,7 +14,7 @@ Author:
 class float_approximationt:public float_utilst
 {
 public:
-  float_approximationt(propt &_prop):
+  explicit float_approximationt(propt &_prop):
     float_utilst(_prop),
     over_approximate(false),
     partial_interpretation(false)

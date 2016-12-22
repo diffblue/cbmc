@@ -50,7 +50,7 @@ class restrict_bv_size_visitort: public expr_visitort
 {
   const size_t width_in_bits;
 public:
-  restrict_bv_size_visitort(const size_t width_in_bits) :
+  explicit restrict_bv_size_visitort(const size_t width_in_bits) :
       width_in_bits(width_in_bits)
   {
   }

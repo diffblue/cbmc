@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class smt2irept:public smt2_parsert
 {
 public:
-  smt2irept(std::istream &_in):smt2_parsert(_in)
+  explicit smt2irept(std::istream &_in):smt2_parsert(_in)
   {
   }
 

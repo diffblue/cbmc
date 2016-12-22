@@ -33,7 +33,7 @@ private:
     individualt *individual;
   public:
     pid_t child_pid;
-    bool_pipet(individualt *individual);
+    explicit bool_pipet(individualt *individual);
     void run_test(const class optionst &options, configt &config,
         const counterexamplet &ce);
     void join();

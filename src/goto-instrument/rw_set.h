@@ -32,7 +32,7 @@ Date: February 2006
 class rw_set_baset
 {
 public:
-  rw_set_baset(const namespacet &_ns)
+  explicit rw_set_baset(const namespacet &_ns)
     :ns(_ns)
   {
   }

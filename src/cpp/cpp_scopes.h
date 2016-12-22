@@ -125,7 +125,7 @@ protected:
 class cpp_save_scopet
 {
 public:
-  cpp_save_scopet(cpp_scopest &_cpp_scopes):
+  explicit cpp_save_scopet(cpp_scopest &_cpp_scopes):
     cpp_scopes(_cpp_scopes),
     saved_scope(_cpp_scopes.current_scope_ptr)
   {

@@ -31,7 +31,7 @@ class instr_iteratort: public std::iterator<std::input_iterator_tag,
    *
    * @details
    */
-  explicit instr_iteratort();
+  instr_iteratort();
 public:
   /**
    * @brief

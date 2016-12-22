@@ -49,7 +49,7 @@ public:
   typedef std::map<irep_idt, function_entryt> function_mapt;
   function_mapt function_map;
 
-  locst(const namespacet &_ns);
+  explicit locst(const namespacet &_ns);
   void build(const goto_functionst &goto_functions);
   void output(std::ostream &out) const;
 

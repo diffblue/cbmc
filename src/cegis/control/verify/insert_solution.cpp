@@ -80,8 +80,7 @@ class is_assignment_tot
 {
   const std::string name;
 public:
-  is_assignment_tot(const std::string &name) :
-      name(name)
+  explicit is_assignment_tot(const std::string &name):name(name)
   {
   }
 

@@ -64,7 +64,7 @@ public:
   void const_graph_explore_AC(event_grapht& egraph, event_idt next,
     std::list<event_idt>& old_path);
 
-  const_graph_visitort(fence_insertert& _fence_inserter)
+  explicit const_graph_visitort(fence_insertert& _fence_inserter)
     : fence_inserter(_fence_inserter)
   {}
 };

@@ -28,7 +28,7 @@ class assign_x0t
   goto_functionst &gf;
   goto_programt::targetst::const_iterator current_choice;
 public:
-  assign_x0t(danger_programt &prog) :
+  explicit assign_x0t(danger_programt &prog) :
       st(prog.st), gf(prog.gf), current_choice(prog.x0_choices.begin())
   {
   }

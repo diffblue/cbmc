@@ -103,7 +103,7 @@ public:
   struct var_table_entryt
   {
     std::string label;
-    inline var_table_entryt(const std::string &_label);
+    explicit inline var_table_entryt(const std::string &_label);
   };
 
   typedef std::vector<var_table_entryt> var_tablet;

@@ -55,7 +55,7 @@ class create_danger_meta_variables_for_loopt
   size_t loop_id;
   const bool use_ranking;
 public:
-  create_danger_meta_variables_for_loopt(danger_programt &prog) :
+  explicit create_danger_meta_variables_for_loopt(danger_programt &prog) :
       st(prog.st), gf(prog.gf), loop_id(0u), use_ranking(prog.use_ranking)
   {
   }

@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class dplib_propt:virtual public propt
 {
 public:
-  dplib_propt(std::ostream &_out);
+  explicit dplib_propt(std::ostream &_out);
   virtual ~dplib_propt() { }
 
   virtual void land(literalt a, literalt b, literalt o);

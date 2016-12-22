@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_conv_storet:public prop_convt
 {
 public:
-  prop_conv_storet(const namespacet &_ns):prop_convt(_ns)
+  explicit prop_conv_storet(const namespacet &_ns):prop_convt(_ns)
   {
   }
 

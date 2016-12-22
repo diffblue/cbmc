@@ -51,7 +51,7 @@ public:
   class solvert
   {
   public:
-    solvert(prop_convt* _prop_conv)
+    explicit solvert(prop_convt* _prop_conv)
     {
       assert(_prop_conv!=NULL);
       prop_conv_ptr = _prop_conv;

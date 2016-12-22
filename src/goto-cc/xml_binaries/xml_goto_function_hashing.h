@@ -21,7 +21,7 @@ class xml_goto_function_convertt {
   private:
     xml_irep_convertt::ireps_containert &ireps_container;
   public:
-    xml_goto_function_convertt(xml_irep_convertt::ireps_containert &ic) :
+    explicit xml_goto_function_convertt(xml_irep_convertt::ireps_containert &ic) :
       ireps_container(ic) {};
 
   void convert( const xmlt&, goto_functionst::goto_functiont& );

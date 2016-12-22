@@ -14,7 +14,7 @@ Author: Alex Groce (agroce@gmail.com)
 class symex_slice_by_tracet
 {
 public:
-  symex_slice_by_tracet(const namespacet &_ns):ns(_ns)
+  explicit symex_slice_by_tracet(const namespacet &_ns):ns(_ns)
   {
   }
 

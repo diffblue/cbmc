@@ -30,7 +30,7 @@ public:
 
   mp_integer bias() const;
 
-  ieee_float_spect(const floatbv_typet &type)
+  explicit ieee_float_spect(const floatbv_typet &type)
   {
     from_type(type);
   }

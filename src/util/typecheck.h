@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class legacy_typecheckt:public legacy_message_streamt
 {
 public:
-  legacy_typecheckt(message_handlert &_message_handler):
+  explicit legacy_typecheckt(message_handlert &_message_handler):
     legacy_message_streamt(_message_handler) { }
   virtual ~legacy_typecheckt() { }
 

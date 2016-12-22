@@ -29,7 +29,7 @@ public:
    *
    * @param lcfg
    */
-  jsa_source_providert(jsa_symex_learnt &lcfg);
+  explicit jsa_source_providert(jsa_symex_learnt &lcfg);
 
   /**
    * @brief

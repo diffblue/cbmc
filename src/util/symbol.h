@@ -121,7 +121,7 @@ std::ostream &operator<<(std::ostream &out,
 class type_symbolt:public symbolt
 {
 public:
-  type_symbolt(const typet &_type)
+  explicit type_symbolt(const typet &_type)
   {
     type=_type;
     is_type=true;

@@ -45,7 +45,7 @@ public:
   {
   }
 
-  inline natural_loops_templatet(P &program)
+  explicit inline natural_loops_templatet(P &program)
   {
     compute(program);
   }

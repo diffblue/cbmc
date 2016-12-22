@@ -23,7 +23,7 @@ protected:
   fence_insertert& fence_inserter;
 
 public:
-  cycles_visitort(fence_insertert& _fi)
+  explicit cycles_visitort(fence_insertert& _fi)
     : fence_inserter(_fi)
   {}
 

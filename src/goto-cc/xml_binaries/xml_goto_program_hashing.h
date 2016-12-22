@@ -21,7 +21,7 @@ class xml_goto_program_convertt {
   private:
     xml_irep_convertt irepconverter;
   public:
-    xml_goto_program_convertt(xml_irep_convertt::ireps_containert &ic) :
+    explicit xml_goto_program_convertt(xml_irep_convertt::ireps_containert &ic) :
       irepconverter(ic) {};
 
   void convert(const goto_programt&, xmlt&);

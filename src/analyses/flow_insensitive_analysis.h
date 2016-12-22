@@ -86,7 +86,7 @@ public:
     return (seen_locations.find(l)!=seen_locations.end());
   }
 
-  flow_insensitive_analysis_baset(const namespacet &_ns):
+  explicit flow_insensitive_analysis_baset(const namespacet &_ns):
     ns(_ns),
     initialized(false)
   {
@@ -225,7 +225,7 @@ class flow_insensitive_analysist:public flow_insensitive_analysis_baset
 {
 public:
   // constructor
-  flow_insensitive_analysist(const namespacet &_ns):
+  explicit flow_insensitive_analysist(const namespacet &_ns):
     flow_insensitive_analysis_baset(_ns)
   {
   }

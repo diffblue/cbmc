@@ -129,7 +129,7 @@ protected:
 class save_scopet
 {
 public:
-  inline save_scopet(new_scopet *&_scope):
+  explicit inline save_scopet(new_scopet *&_scope):
     scope_ptr(_scope), old_scope(_scope)
   {
   }

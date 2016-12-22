@@ -8,7 +8,8 @@
 class subsumed_patht
 {
 public:
-  subsumed_patht(patht &_subsumed) {
+  explicit subsumed_patht(patht &_subsumed)
+  {
     patht::iterator it = subsumed.begin();
     subsumed.insert(it, _subsumed.begin(), _subsumed.end());
   }

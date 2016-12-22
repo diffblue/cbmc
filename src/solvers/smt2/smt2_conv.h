@@ -173,7 +173,7 @@ protected:
     const seen_expressionst &let_map;
 
   public:
-    let_visitort(const seen_expressionst &map):let_map(map) { }
+    explicit let_visitort(const seen_expressionst &map):let_map(map) { }
 
     void operator()(exprt &expr)
     {

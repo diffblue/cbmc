@@ -226,14 +226,13 @@ constant_exprt from_integer(
   else if(type_id==ID_fixedbv)
   {
     fixedbvt fixedbv;
-    fixedbv.spec=to_fixedbv_type(type);
+    fixedbv.spec=fixedbv_spect(to_fixedbv_type(type));
     fixedbv.from_integer(int_value);
     return fixedbv.to_expr();
   }
   else if(type_id==ID_floatbv)
   {
-    ieee_floatt ieee_float;
-    ieee_float.spec=to_floatbv_type(type);
+    ieee_floatt ieee_float(to_floatbv_type(type));
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
   }

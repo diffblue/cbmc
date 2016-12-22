@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class mm2cppt
 {
 public:
-  inline mm2cppt(std::ostream &_out):out(_out)
+  explicit inline mm2cppt(std::ostream &_out):out(_out)
   {
   }
 

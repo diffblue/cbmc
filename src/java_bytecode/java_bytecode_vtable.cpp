@@ -21,7 +21,7 @@ const char ID_virtual_name[] = "virtual_name";
 class is_virtual_name_equalt {
   const irep_idt &virtual_name;
 public:
-  is_virtual_name_equalt(const class_typet::methodt &method) :
+  explicit is_virtual_name_equalt(const class_typet::methodt &method) :
       virtual_name(method.get(ID_virtual_name)) {
   }
   bool operator()(const class_typet::methodt &method) const {
@@ -32,7 +32,7 @@ public:
 class is_name_equalt {
   const irep_idt &name;
 public:
-  is_name_equalt(const irep_idt &name) :
+  explicit is_name_equalt(const irep_idt &name) :
       name(name) {
   }
   bool operator()(const class_typet::componentt &component) const {

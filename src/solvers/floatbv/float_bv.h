@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class float_bvt
 {
 public:
-  explicit float_bvt()
+  float_bvt()
   {
   }
 

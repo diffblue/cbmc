@@ -45,7 +45,7 @@ public:
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
 
-  compilet(cmdlinet &_cmdline);
+  explicit compilet(cmdlinet &_cmdline);
 
   ~compilet();
 

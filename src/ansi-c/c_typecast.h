@@ -38,7 +38,7 @@ bool c_implicit_typecast_arithmetic(
 class c_typecastt
 {
 public:
-  c_typecastt(const namespacet &_ns):ns(_ns)
+  explicit c_typecastt(const namespacet &_ns):ns(_ns)
   {
   }
 

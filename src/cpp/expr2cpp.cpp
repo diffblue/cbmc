@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class expr2cppt:public expr2ct
 {
 public:
-  expr2cppt(const namespacet &_ns):expr2ct(_ns) { }
+  explicit expr2cppt(const namespacet &_ns):expr2ct(_ns) { }
 
   std::string convert(const exprt &src) override
   {

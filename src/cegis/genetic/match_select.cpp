@@ -56,7 +56,7 @@ class is_contestant_less_thant
 {
   const contestantt no_contestant;
 public:
-  is_contestant_less_thant(const contestantt &no_contestant) :
+  explicit is_contestant_less_thant(const contestantt &no_contestant) :
       no_contestant(no_contestant)
   {
   }

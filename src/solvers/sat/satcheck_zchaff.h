@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class satcheck_zchaff_baset:public cnf_clause_listt
 {
 public:
-  satcheck_zchaff_baset(class CSolver *_solver);
+  explicit satcheck_zchaff_baset(class CSolver *_solver);
   virtual ~satcheck_zchaff_baset();
 
   virtual const std::string solver_text();

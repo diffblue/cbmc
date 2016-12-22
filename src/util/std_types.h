@@ -959,7 +959,7 @@ public:
   {
   }
 
-  inline incomplete_array_typet(const typet &_subtype):
+  explicit inline incomplete_array_typet(const typet &_subtype):
     type_with_subtypet(ID_array, _subtype)
   {
   }

@@ -23,7 +23,7 @@ public:
   std::size_t width;
   bool is_signed;
 
-  bv_spect(const typet &type)
+  explicit bv_spect(const typet &type)
   {
     from_type(type);
   }
@@ -50,7 +50,7 @@ class bv_arithmetict
 public:
   bv_spect spec;
 
-  bv_arithmetict(const bv_spect &_spec):
+  explicit bv_arithmetict(const bv_spect &_spec):
     spec(_spec), value(0)
   {
   }
@@ -59,7 +59,7 @@ public:
   {
   }
 
-  bv_arithmetict(const exprt &expr)
+  explicit bv_arithmetict(const exprt &expr)
   {
     from_expr(expr);
   }

@@ -22,7 +22,7 @@ class namespacet;
 class expr2ct
 {
 public:
-  expr2ct(const namespacet &_ns):ns(_ns), sizeof_nesting(0) { }
+  explicit expr2ct(const namespacet &_ns):ns(_ns), sizeof_nesting(0) { }
   virtual ~expr2ct() { }
 
   virtual std::string convert(const typet &src);

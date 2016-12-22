@@ -30,7 +30,7 @@ Date: February 2006
 class w_guardst
 {
 public:
-  w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
+  explicit w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
   {
   }
 

@@ -20,7 +20,7 @@ class symbol_visitort: public const_expr_visitort
 {
   std::set<irep_idt> &vars;
 public:
-  symbol_visitort(std::set<irep_idt> &vars) :
+  explicit symbol_visitort(std::set<irep_idt> &vars) :
       vars(vars)
   {
   }

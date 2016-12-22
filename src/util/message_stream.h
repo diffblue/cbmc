@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class legacy_message_streamt:public message_clientt
 {
 public:
-  legacy_message_streamt(message_handlert &_message_handler):
+  explicit legacy_message_streamt(message_handlert &_message_handler):
     message_clientt(_message_handler),
     error_found(false),
     saved_error_location(static_cast<const source_locationt &>(get_nil_irep())),

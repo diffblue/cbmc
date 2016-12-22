@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class c_sizeoft
 {
 public:
-  c_sizeoft(const namespacet &_ns):ns(_ns)
+  explicit c_sizeoft(const namespacet &_ns):ns(_ns)
   {
   }
 

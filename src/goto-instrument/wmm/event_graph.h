@@ -133,18 +133,18 @@ public:
       event_idt second;
       bool is_po;
 
-      delayt(event_idt _first)
-        :first(_first),is_po(true)
+      explicit delayt(event_idt _first):
+        first(_first), is_po(true)
       {
       }
 
-      delayt(event_idt _first, event_idt _second)
-        :first(_first),second(_second),is_po(false)
+      delayt(event_idt _first, event_idt _second):
+        first(_first), second(_second), is_po(false)
       {
       }
 
-      delayt(event_idt _first, event_idt _second, bool _is_po)
-        :first(_first),second(_second),is_po(_is_po)
+      delayt(event_idt _first, event_idt _second, bool _is_po):
+        first(_first), second(_second), is_po(_is_po)
       {
       }
 
@@ -340,7 +340,7 @@ protected:
   };
 
 public:
-  event_grapht(messaget& _message):
+  explicit event_grapht(messaget& _message):
     filter_thin_air(true),
     filter_uniproc(true),
     message(_message)

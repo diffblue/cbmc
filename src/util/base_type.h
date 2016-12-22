@@ -37,7 +37,7 @@ bool base_type_eq(
 class base_type_eqt
 {
 public:
-  base_type_eqt(const namespacet &_ns):ns(_ns)
+  explicit base_type_eqt(const namespacet &_ns):ns(_ns)
   {
   }
 

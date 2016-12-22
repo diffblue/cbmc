@@ -28,8 +28,8 @@ protected:
 public:
   // constructors
   rationalt():numerator(0), denominator(1) { }
-  rationalt(const mp_integer &i):numerator(i), denominator(1) { }
-  rationalt(int i):numerator(i), denominator(1) { }
+  explicit rationalt(const mp_integer &i):numerator(i), denominator(1) { }
+  explicit rationalt(int i):numerator(i), denominator(1) { }
 
   rationalt &operator+=(const rationalt &n);
   rationalt &operator-=(const rationalt &n);

@@ -101,8 +101,8 @@ protected:
     const_function_pointer_propagationt& cfpp;
 
   public:
-    arg_stackt (const_function_pointer_propagationt& _cfpp)
-      :cfpp(_cfpp)
+    explicit arg_stackt(const_function_pointer_propagationt& _cfpp):
+      cfpp(_cfpp)
     {}
     void add_args(const symbol_exprt& const_function,
       goto_programt::instructionst::iterator it);

@@ -2310,7 +2310,7 @@ public:
     copy_to_operands(op);
   }
 
-  explicit address_of_exprt():
+  address_of_exprt():
     exprt(ID_address_of, pointer_typet())
   {
     operands().resize(1);

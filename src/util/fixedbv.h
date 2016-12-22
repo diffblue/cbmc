@@ -29,7 +29,7 @@ public:
   {
   }
 
-  fixedbv_spect(const fixedbv_typet &type);
+  explicit fixedbv_spect(const fixedbv_typet &type);
 
   inline std::size_t get_fraction_bits() const
   {

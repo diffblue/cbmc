@@ -76,7 +76,7 @@ public:
         :key_compare_(pred),vec_(first,beyond,al)
         {stable_sort();}
 #endif
-        sorted_vector(const Myt_& x)
+        explicit sorted_vector(const Myt_& x)
                 : key_compare_(x.key_compare_),vec_(x.vec_)
         {}
     ~sorted_vector()                {}

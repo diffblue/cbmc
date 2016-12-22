@@ -20,7 +20,7 @@
 
 class scratch_programt : public goto_programt {
  public:
-  scratch_programt(symbol_tablet &_symbol_table) :
+  explicit scratch_programt(symbol_tablet &_symbol_table) :
       constant_propagation(true),
       symbol_table(_symbol_table),
       ns(symbol_table),

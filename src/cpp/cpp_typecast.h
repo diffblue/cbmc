@@ -16,7 +16,7 @@ class cpp_typecheckt;
 class cpp_typecastt:public c_typecastt
 {
 public:
-  cpp_typecastt(cpp_typecheckt &cpp_typecheck);
+  explicit cpp_typecastt(cpp_typecheckt &cpp_typecheck);
 
   virtual void implicit_typecast(
     exprt &expr,

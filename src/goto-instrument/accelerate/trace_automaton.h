@@ -68,7 +68,7 @@ class automatont {
 
 class trace_automatont {
  public:
-  trace_automatont(goto_programt &_goto_program) :
+  explicit trace_automatont(goto_programt &_goto_program) :
     goto_program(_goto_program)
   {
     build_alphabet(goto_program);

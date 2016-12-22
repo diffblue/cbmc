@@ -22,7 +22,7 @@ class value_set_analysist:
   public static_analysist<value_set_domaint>
 {
 public:
-   value_set_analysist(const namespacet &_ns):
+   explicit value_set_analysist(const namespacet &_ns):
      static_analysist<value_set_domaint>(_ns)
    {
    }
