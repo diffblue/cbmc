@@ -3120,26 +3120,15 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
         body_found = False
         for start_linenum in xrange(linenum, len(raw_lines)):
           start_line = raw_lines[start_linenum]
-          joined_line += ' ' + start_line.lstrip()
-          if Search(r'(;|})', start_line):  # Declarations and trivial functions
+          if Search(r'{', start_line):
             body_found = True
-            break                              # ... ignore
-          elif Search(r'{', start_line):
-            body_found = True
-            function = Search(r'((\w|:)*)\(', line).group(1)
-            if Match(r'TEST', function):    # Handle TEST... macros
-              parameter_regexp = Search(r'(\(.*\))', joined_line)
-              if parameter_regexp:             # Ignore bad syntax
-                function += parameter_regexp.group(1)
-            else:
-              function += '()'
-            function_state.Begin(function)
             break
-      if not body_found:
-        # No body for the function (or evidence of a non-function) was found.
-        error(filename, linenum, 'readability/fn_size', 5,
-              'Lint failed to find start of function body.')
-      else:
+          elif Search(r';', start_line):
+            body_found = False
+            break
+
+      # body found, i.e. not a declaration
+      if body_found:
         CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error)
     linenum += 1
 
