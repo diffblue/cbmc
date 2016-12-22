@@ -43,7 +43,6 @@ protected:
   }
 
   friend class merged_irepst;
-  friend class to_be_merged_irept;
 };
 
 struct merged_irep_hash

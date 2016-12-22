@@ -110,8 +110,6 @@ protected:
   {
   }
 
-  friend class escape_domaint;
-
   numbering<irep_idt> bits;
 
   void insert_cleanup(

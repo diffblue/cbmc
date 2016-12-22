@@ -92,7 +92,6 @@ public:
   inline const mini_bddt &True() const;
   inline const mini_bddt &False() const;
 
-  friend class mini_bddt;
   friend class mini_bdd_nodet;
 
   // create a node (consulting the reverse-map)

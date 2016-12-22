@@ -53,10 +53,6 @@ public:
   // additional stuff
   expr_listt bmc_constraints;
 
-  friend class cbmc_satt;
-  friend class hw_cbmc_satt;
-  friend class counterexample_beautification_greedyt;
-
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface

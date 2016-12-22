@@ -59,7 +59,6 @@ public:
   virtual void clear(void)=0;
 
 protected:
-  friend class flow_insensitive_analysis_baset;
   bool changed;
   // utilities
 

@@ -29,8 +29,6 @@ public:
 
   void operator()();
 
-  friend class simplify_evaluatet;
-
 protected:
   const symbol_tablet &symbol_table;
   const namespacet ns;

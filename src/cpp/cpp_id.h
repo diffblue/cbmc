@@ -90,8 +90,6 @@ public:
   void print(std::ostream &out, unsigned indent=0) const;
   void print_fields(std::ostream &out, unsigned indent=0) const;
 
-  friend class cpp_scopet;
-
 protected:
   cpp_id_mapt sub;
 

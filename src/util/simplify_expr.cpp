@@ -47,8 +47,6 @@ Author: Daniel Kroening, kroening@kroening.com
 struct simplify_expr_cachet
 {
 public:
-  friend class simplify_exprt;
-
   #if 1
   typedef std::unordered_map<
     exprt, exprt, irep_full_hash, irep_full_eq> containert;
