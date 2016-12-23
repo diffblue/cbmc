@@ -37,31 +37,31 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final override;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final override;
+    const namespacet &ns) const final;
 
   bool merge(
     const global_may_alias_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom() final override
+  void make_bottom() final
   {
     aliases.clear();
     has_values=tvt(false);
   }
 
-  void make_top() final override
+  void make_top() final
   {
     aliases.clear();
     has_values=tvt(true);
   }
 
-  void make_entry() final override
+  void make_entry() final
   {
     make_top();
   }
@@ -69,7 +69,7 @@ public:
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
 
-protected:
+private:
   tvt has_values;
 
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);

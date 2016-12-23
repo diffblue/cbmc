@@ -56,7 +56,7 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) override final
+    const namespacet &ns) final
   {
     if(!reachable)
       return;
@@ -68,17 +68,17 @@ public:
     }
   }
 
-  void make_bottom() override final
+  void make_bottom() final
   {
     reachable=has_spawn=is_threaded=false;
   }
 
-  void make_top() override final
+  void make_top() final
   {
     reachable=has_spawn=is_threaded=true;
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     reachable=true;
     has_spawn=is_threaded=false;

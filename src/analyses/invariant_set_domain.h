@@ -41,7 +41,7 @@ public:
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const override final
+    const namespacet &ns) const final
   {
     if(has_values.is_known())
       out << has_values.to_string() << '\n';
@@ -53,21 +53,21 @@ public:
     locationt from_l,
     locationt to_l,
     ai_baset &ai,
-    const namespacet &ns) override final;
+    const namespacet &ns) final;
 
-  void make_top() override final
+  void make_top() final
   {
     invariant_set.make_true();
     has_values=tvt(true);
   }
 
-  void make_bottom() override final
+  void make_bottom() final
   {
     invariant_set.make_false();
     has_values=tvt(false);
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     invariant_set.make_true();
     has_values=tvt(true);

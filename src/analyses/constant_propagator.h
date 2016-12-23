@@ -20,14 +20,14 @@ public:
     locationt,
     locationt,
     ai_baset &,
-    const namespacet &) override final;
+    const namespacet &) final;
   void output(
     std::ostream &,
     const ai_baset &,
-    const namespacet &) const override final;
-  void make_top() override final { values.set_to_top(); }
-  void make_bottom() override final { values.set_to_bottom(); }
-  void make_entry() override final { values.set_to_top(); }
+    const namespacet &) const final;
+  void make_top() final { values.set_to_top(); }
+  void make_bottom() final { values.set_to_bottom(); }
+  void make_entry() final { values.set_to_top(); }
   bool merge(const constant_propagator_domaint &, locationt, locationt);
 
   struct valuest
@@ -79,7 +79,7 @@ public:
 
   valuest values;
 
-protected:
+private:
   void assign(
     valuest &dest,
     const symbol_exprt &lhs,

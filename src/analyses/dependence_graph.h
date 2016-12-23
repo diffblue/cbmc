@@ -86,14 +86,14 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     ai_baset &ai,
-    const namespacet &ns) final override;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final override;
+    const namespacet &ns) const final;
 
-  void make_top() final override
+  void make_top() final
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -102,7 +102,7 @@ public:
     data_deps.clear();
   }
 
-  void make_bottom() final override
+  void make_bottom() final
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -111,7 +111,7 @@ public:
     data_deps.clear();
   }
 
-  void make_entry() final override
+  void make_entry() final
   {
     make_top();
   }
@@ -127,7 +127,7 @@ public:
     return node_id;
   }
 
-protected:
+private:
   tvt has_values;
   node_indext node_id;
 

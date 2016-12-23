@@ -27,7 +27,7 @@ public:
   virtual resultt prop_solve() override;
   virtual tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv) override final;
+  virtual void lcnf(const bvt &bv) final;
 
   virtual void set_assignment(literalt a, bool value) override;
 

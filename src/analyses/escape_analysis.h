@@ -37,33 +37,33 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) override final;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const override final;
+    const namespacet &ns) const final;
 
   bool merge(
     const escape_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom() override final
+  void make_bottom() final
   {
     cleanup_map.clear();
     aliases.clear();
     has_values=tvt(false);
   }
 
-  void make_top() override final
+  void make_top() final
   {
     cleanup_map.clear();
     aliases.clear();
     has_values=tvt(true);
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     make_top();
   }
@@ -82,9 +82,8 @@ public:
   typedef std::map<irep_idt, cleanupt> cleanup_mapt;
   cleanup_mapt cleanup_map;
 
-protected:
+private:
   tvt has_values;
-
   void assign_lhs_cleanup(const exprt &, const std::set<irep_idt> &);
   void get_rhs_cleanup(const exprt &, std::set<irep_idt> &);
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);

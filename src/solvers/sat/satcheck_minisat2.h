@@ -30,9 +30,9 @@ public:
   virtual ~satcheck_minisat2_baset();
 
   virtual resultt prop_solve() override;
-  virtual tvt l_get(literalt a) const override final;
+  virtual tvt l_get(literalt a) const final;
 
-  virtual void lcnf(const bvt &bv) override final;
+  virtual void lcnf(const bvt &bv) final;
   virtual void set_assignment(literalt a, bool value) override;
 
   // extra MiniSat feature: solve with assumptions
@@ -42,8 +42,8 @@ public:
   void set_polarity(literalt a, bool value);
 
   virtual bool is_in_conflict(literalt a) const override;
-  virtual bool has_set_assumptions() const override final { return true; }
-  virtual bool has_is_in_conflict() const override final { return true; }
+  virtual bool has_set_assumptions() const final { return true; }
+  virtual bool has_is_in_conflict() const final { return true; }
 
 protected:
   T *solver;
@@ -65,8 +65,8 @@ class satcheck_minisat_simplifiert:
 {
 public:
   satcheck_minisat_simplifiert();
-  virtual const std::string solver_text() override final;
-  virtual void set_frozen(literalt a) override final;
+  virtual const std::string solver_text() final;
+  virtual void set_frozen(literalt a) final;
   bool is_eliminated(literalt a) const;
 };
 

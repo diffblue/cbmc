@@ -112,17 +112,17 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) override final;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const override final
+    const namespacet &ns) const final
   {
     output(out);
   }
 
-  void make_top() override final
+  void make_top() final
   {
     values.clear();
     if(bv_container)
@@ -130,7 +130,7 @@ public:
     has_values=tvt(true);
   }
 
-  void make_bottom() override final
+  void make_bottom() final
   {
     values.clear();
     if(bv_container)
@@ -138,7 +138,7 @@ public:
     has_values=tvt(false);
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     make_top();
   }
@@ -165,7 +165,7 @@ public:
     export_cache[identifier].clear();
   }
 
-protected:
+private:
   tvt has_values;
 
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
