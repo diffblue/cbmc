@@ -19,8 +19,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/expr.h>
 #include <util/std_types.h>
 
-typedef std::multimap<irep_idt, class cpp_idt> cpp_id_mapt;
-
 class cpp_scopet;
 
 class cpp_idt
@@ -91,6 +89,7 @@ public:
   void print_fields(std::ostream &out, unsigned indent=0) const;
 
 protected:
+  typedef std::multimap<irep_idt, cpp_idt> cpp_id_mapt;
   cpp_id_mapt sub;
 
   // These are used for base classes and 'using' clauses.
