@@ -14,8 +14,8 @@ int main(int argc, const char **argv)
   {
     std::string line;
 
-    std::cout << "#ifndef CPROVER_IREP_IDS_H" << std::endl;
-    std::cout << "#define CPROVER_IREP_IDS_H" << std::endl;
+    std::cout << "#ifndef CPROVER_UTIL_IREP_IDS_H" << std::endl;
+    std::cout << "#define CPROVER_UTIL_IREP_IDS_H" << std::endl;
     std::cout << std::endl;
 
     unsigned count=1;

@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UTIL_C_MISC_H
-#define CPROVER_UTIL_C_MISC_H
+#ifndef CPROVER_ANSI_C_C_MISC_H
+#define CPROVER_ANSI_C_C_MISC_H
 
 #include <string>
 
 std::string MetaString(const std::string &in);
 
-#endif // CPROVER_UTIL_C_MISC_H
+#endif // CPROVER_ANSI_C_C_MISC_H

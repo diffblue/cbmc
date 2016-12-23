@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UTIL_INTERVAL_TEMPLATE_H
-#define CPROVER_UTIL_INTERVAL_TEMPLATE_H
+#ifndef CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
+#define CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
 
 #include <algorithm>
 #include <iosfwd>
@@ -242,4 +242,4 @@ std::ostream &operator << (std::ostream &out, const interval_template<T> &i)
   return out;
 }
 
-#endif // CPROVER_UTIL_INTERVAL_TEMPLATE_H
+#endif // CPROVER_ANALYSES_INTERVAL_TEMPLATE_H
