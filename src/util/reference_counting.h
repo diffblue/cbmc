@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 template<typename T>
+// NOLINTNEXTLINE(readability/identifiers)
 class reference_counting
 {
 public:

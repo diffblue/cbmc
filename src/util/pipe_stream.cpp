@@ -28,7 +28,7 @@ Author:
 
 /*******************************************************************\
 
-Function: pipe_stream::pipe_stream
+Function: pipe_streamt::pipe_streamt
 
   Inputs:
 
@@ -38,7 +38,7 @@ Function: pipe_stream::pipe_stream
 
 \*******************************************************************/
 
-pipe_stream::pipe_stream(
+pipe_streamt::pipe_streamt(
   const std::string &_executable,
   const std::list<std::string> &_args):
   std::iostream(&buffer),
@@ -52,7 +52,7 @@ pipe_stream::pipe_stream(
 
 /*******************************************************************\
 
-Function: pipe_stream::run
+Function: pipe_streamt::run
 
   Inputs:
 
@@ -65,7 +65,7 @@ Function: pipe_stream::run
 
 #ifdef _WIN32
 
-int pipe_stream::run()
+int pipe_streamt::run()
 {
   HANDLE hOutputReadTmp, hOutputRead, hOutputWrite;
   HANDLE hInputWriteTmp, hInputRead, hInputWrite;
@@ -147,9 +147,9 @@ int pipe_stream::run()
 
 #else
 
-int pipe_stream::run()
+int pipe_streamt::run()
 {
-  filedescriptor_streambuf::HANDLE in[2], out[2];
+  filedescriptor_streambuft::HANDLE in[2], out[2];
 
   if(pipe(in)==-1 || pipe(out)==-1)
     return -1;
@@ -206,7 +206,7 @@ int pipe_stream::run()
 
 /*******************************************************************\
 
-Function: pipe_stream::wait
+Function: pipe_streamt::wait
 
   Inputs:
 
@@ -216,7 +216,7 @@ Function: pipe_stream::wait
 
 \*******************************************************************/
 
-int pipe_stream::wait()
+int pipe_streamt::wait()
 {
   #ifdef _WIN32
   DWORD status;
@@ -244,7 +244,7 @@ int pipe_stream::wait()
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::filedescriptor_streambuf
+Function: filedescriptor_streambuft::filedescriptor_streambuft
 
   Inputs:
 
@@ -254,7 +254,7 @@ Function: filedescriptor_streambuf::filedescriptor_streambuf
 
 \*******************************************************************/
 
-filedescriptor_streambuf::filedescriptor_streambuf():
+filedescriptor_streambuft::filedescriptor_streambuft():
   #ifdef _WIN32
   proc_in(INVALID_HANDLE_VALUE),
   proc_out(INVALID_HANDLE_VALUE)
@@ -269,7 +269,7 @@ filedescriptor_streambuf::filedescriptor_streambuf():
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::~filedescriptor_streambuf
+Function: filedescriptor_streambuft::~filedescriptor_streambuft
 
   Inputs:
 
@@ -279,7 +279,7 @@ Function: filedescriptor_streambuf::~filedescriptor_streambuf
 
 \*******************************************************************/
 
-filedescriptor_streambuf::~filedescriptor_streambuf()
+filedescriptor_streambuft::~filedescriptor_streambuft()
 {
   #ifdef _WIN32
 
@@ -304,7 +304,7 @@ filedescriptor_streambuf::~filedescriptor_streambuf()
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::overflow
+Function: filedescriptor_streambuft::overflow
 
   Inputs:
 
@@ -314,7 +314,7 @@ Function: filedescriptor_streambuf::overflow
 
 \*******************************************************************/
 
-std::streambuf::int_type filedescriptor_streambuf::overflow(
+std::streambuf::int_type filedescriptor_streambuft::overflow(
   std::streambuf::int_type character)
 {
   if(character!=EOF)
@@ -336,7 +336,7 @@ std::streambuf::int_type filedescriptor_streambuf::overflow(
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::xsputn
+Function: filedescriptor_streambuft::xsputn
 
   Inputs:
 
@@ -346,7 +346,7 @@ Function: filedescriptor_streambuf::xsputn
 
 \*******************************************************************/
 
-std::streamsize filedescriptor_streambuf::xsputn(
+std::streamsize filedescriptor_streambuft::xsputn(
   const char* str, std::streamsize count)
 {
 #ifdef _WIN32
@@ -360,7 +360,7 @@ std::streamsize filedescriptor_streambuf::xsputn(
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::underflow
+Function: filedescriptor_streambuft::underflow
 
   Inputs:
 
@@ -370,7 +370,7 @@ Function: filedescriptor_streambuf::underflow
 
 \*******************************************************************/
 
-std::streambuf::int_type filedescriptor_streambuf::underflow()
+std::streambuf::int_type filedescriptor_streambuft::underflow()
 {
   if(gptr()==0)
     return traits_type::eof();
@@ -398,7 +398,7 @@ std::streambuf::int_type filedescriptor_streambuf::underflow()
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::xsgetn
+Function: filedescriptor_streambuft::xsgetn
 
   Inputs:
 
@@ -408,7 +408,7 @@ Function: filedescriptor_streambuf::xsgetn
 
 \*******************************************************************/
 
-std::streamsize filedescriptor_streambuf::xsgetn(
+std::streamsize filedescriptor_streambuft::xsgetn(
   char *target, std::streamsize count)
 {
   std::streamsize available = showmanyc();
@@ -432,7 +432,7 @@ std::streamsize filedescriptor_streambuf::xsgetn(
 
 /*******************************************************************\
 
-Function: filedescriptor_streambuf::showmanyc
+Function: filedescriptor_streambuft::showmanyc
 
   Inputs:
 
@@ -442,7 +442,7 @@ Function: filedescriptor_streambuf::showmanyc
 
 \*******************************************************************/
 
-std::streamsize filedescriptor_streambuf::showmanyc()
+std::streamsize filedescriptor_streambuft::showmanyc()
 {
   if(gptr()==0)
     return 0;
@@ -455,7 +455,7 @@ std::streamsize filedescriptor_streambuf::showmanyc()
 
 /*******************************************************************\
 
-   Brief demonstration of the pipe_stream class
+   Brief demonstration of the pipe_streamt class
 
 \*******************************************************************/
 
@@ -468,8 +468,8 @@ int main(int argc, char** argv)
   std::string command("cat");
   std::list<std::string> arguments;
 
-  pipe_stream process(command, arguments);
-  if (process.run() < 0)
+  pipe_streamt process(command, arguments);
+  if(process.run() < 0)
     return -1;
 
   process << "xxx\n" << std::endl;

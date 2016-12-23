@@ -20,11 +20,13 @@ Date: February 2004
 #include "time_stopping.h"
 
 #if defined(_WIN32) && !defined(__MINGW32__)
+// NOLINTNEXTLINE(readability/identifiers)
 struct timezone
 {
   int dummy;
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 void gettimeofday(struct timeval* p, struct timezone *tz)
 {
   union
@@ -53,7 +55,9 @@ Function: current_time
 
 absolute_timet current_time()
 {
+  // NOLINTNEXTLINE(readability/identifiers)
   struct timeval tv;
+  // NOLINTNEXTLINE(readability/identifiers)
   struct timezone tz;
 
   gettimeofday(&tv, &tz);

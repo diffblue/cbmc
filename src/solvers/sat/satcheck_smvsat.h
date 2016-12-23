@@ -28,6 +28,7 @@ public:
   virtual void lcnf(const bvt &bv);
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   struct sat_instance *satsolver;
 };
 
@@ -69,16 +70,17 @@ protected:
   std::vector<short> partition_numbers;
 
   void build_aig(
+    // NOLINTNEXTLINE(readability/identifiers)
     struct interpolator &interpolator_satsolver,
     int output,
     exprt &dest);
 
-  struct entry
+  struct entryt
   {
     int g;
     exprt *e;
 
-    entry(int _g, exprt *_e):g(_g), e(_e)
+    entryt(int _g, exprt *_e):g(_g), e(_e)
     {
     }
   };

@@ -17,16 +17,16 @@ Author:
 // http://www.skyfree.org/linux/references/ELF_Format.pdf
 // http://downloads.openwatcom.org/ftp/devel/docs/elf-64-gen.pdf
 
-typedef unsigned short Elf32_Half; // 2
-typedef unsigned int Elf32_Word; // 4
-typedef unsigned int Elf32_Off; // 4
-typedef unsigned int Elf32_Addr; // 4
+typedef unsigned short Elf32_Half; // 2  NOLINT(readability/identifiers)
+typedef unsigned int Elf32_Word; // 4  NOLINT(readability/identifiers)
+typedef unsigned int Elf32_Off; // 4  NOLINT(readability/identifiers)
+typedef unsigned int Elf32_Addr; // 4  NOLINT(readability/identifiers)
 
-typedef unsigned short Elf64_Half; // 2
-typedef unsigned int Elf64_Word; // 4
-typedef unsigned long long int Elf64_Xword; // 8
-typedef unsigned long long int Elf64_Off; // 8
-typedef unsigned long long int Elf64_Addr; // 8
+typedef unsigned short Elf64_Half; // 2  NOLINT(readability/identifiers)
+typedef unsigned int Elf64_Word; // 4  NOLINT(readability/identifiers)
+typedef unsigned long long int Elf64_Xword; // 8 NOLINT(readability/identifiers)
+typedef unsigned long long int Elf64_Off; // 8  NOLINT(readability/identifiers)
+typedef unsigned long long int Elf64_Addr; // 8  NOLINT(readability/identifiers)
 
 #define EI_NIDENT 16
 

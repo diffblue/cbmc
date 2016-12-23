@@ -33,6 +33,7 @@ public:
     SUB::post_process();
   }
 
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef equalityt SUB;
 
   literalt record_array_equality(const equal_exprt &expr);

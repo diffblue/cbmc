@@ -173,8 +173,8 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  typedef std::pair<unsigned, symbol_exprt> let_count_id;
-  typedef std::unordered_map<exprt, let_count_id, irep_hash> seen_expressionst;
+  typedef std::pair<unsigned, symbol_exprt> let_count_idt;
+  typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
   unsigned let_id_count;
   const static unsigned LET_COUNT=2;
 

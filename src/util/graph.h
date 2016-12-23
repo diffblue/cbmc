@@ -97,7 +97,7 @@ void intersection(
 
 // a generic graph class with a parametric node type
 template<class N=graph_nodet<empty_edget> >
-class graph
+class grapht
 {
 public:
   typedef N nodet;
@@ -117,7 +117,7 @@ public:
     return no;
   }
 
-  inline void swap(graph &other)
+  void swap(grapht &other)
   {
     nodes.swap(other.nodes);
   }
@@ -257,7 +257,7 @@ protected:
 
 /*******************************************************************\
 
-Function: graph::add_undirected_edge
+Function: grapht::add_undirected_edge
 
   Inputs:
 
@@ -268,7 +268,7 @@ Function: graph::add_undirected_edge
 \*******************************************************************/
 
 template<class N>
-void graph<N>::add_undirected_edge(node_indext a, node_indext b)
+void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
 {
   assert(a<nodes.size());
   assert(b<nodes.size());
@@ -282,7 +282,7 @@ void graph<N>::add_undirected_edge(node_indext a, node_indext b)
 
 /*******************************************************************\
 
-Function: graph::remove_undirected_edge
+Function: grapht::remove_undirected_edge
 
   Inputs:
 
@@ -293,7 +293,7 @@ Function: graph::remove_undirected_edge
 \*******************************************************************/
 
 template<class N>
-void graph<N>::remove_undirected_edge(node_indext a, node_indext b)
+void grapht<N>::remove_undirected_edge(node_indext a, node_indext b)
 {
   nodet &na=nodes[a];
   nodet &nb=nodes[b];
@@ -305,7 +305,7 @@ void graph<N>::remove_undirected_edge(node_indext a, node_indext b)
 
 /*******************************************************************\
 
-Function: graph::remove_in_edges
+Function: grapht::remove_in_edges
 
   Inputs:
 
@@ -316,7 +316,7 @@ Function: graph::remove_in_edges
 \*******************************************************************/
 
 template<class N>
-void graph<N>::remove_in_edges(node_indext n)
+void grapht<N>::remove_in_edges(node_indext n)
 {
   nodet &node=nodes[n];
 
@@ -332,7 +332,7 @@ void graph<N>::remove_in_edges(node_indext n)
 
 /*******************************************************************\
 
-Function: graph::remove_out_edges
+Function: grapht::remove_out_edges
 
   Inputs:
 
@@ -343,7 +343,7 @@ Function: graph::remove_out_edges
 \*******************************************************************/
 
 template<class N>
-void graph<N>::remove_out_edges(node_indext n)
+void grapht<N>::remove_out_edges(node_indext n)
 {
   nodet &node=nodes[n];
 
@@ -359,7 +359,7 @@ void graph<N>::remove_out_edges(node_indext n)
 
 /*******************************************************************\
 
-Function: graph::shortest_path
+Function: grapht::shortest_path
 
   Inputs:
 
@@ -370,7 +370,7 @@ Function: graph::shortest_path
 \*******************************************************************/
 
 template<class N>
-void graph<N>::shortest_path(
+void grapht<N>::shortest_path(
   node_indext src,
   node_indext dest,
   patht &path,
@@ -462,7 +462,7 @@ void graph<N>::shortest_path(
 
 /*******************************************************************\
 
-Function: graph::visit_reachable
+Function: grapht::visit_reachable
 
   Inputs:
 
@@ -473,7 +473,7 @@ Function: graph::visit_reachable
 \*******************************************************************/
 
 template<class N>
-void graph<N>::visit_reachable(node_indext src)
+void grapht<N>::visit_reachable(node_indext src)
 {
   // DFS
 
@@ -499,7 +499,7 @@ void graph<N>::visit_reachable(node_indext src)
 
 /*******************************************************************\
 
-Function: graph::connected_subgraphs
+Function: grapht::connected_subgraphs
 
   Inputs:
 
@@ -510,7 +510,7 @@ Function: graph::connected_subgraphs
 \*******************************************************************/
 
 template<class N>
-std::size_t graph<N>::connected_subgraphs(
+std::size_t grapht<N>::connected_subgraphs(
   std::vector<node_indext> &subgraph_nr)
 {
   std::vector<bool> visited;
@@ -555,7 +555,7 @@ std::size_t graph<N>::connected_subgraphs(
 
 /*******************************************************************\
 
-Function: graph::tarjan
+Function: grapht::tarjan
 
   Inputs:
 
@@ -566,7 +566,7 @@ Function: graph::tarjan
 \*******************************************************************/
 
 template<class N>
-void graph<N>::tarjan(tarjant &t, node_indext v)
+void grapht<N>::tarjan(tarjant &t, node_indext v)
 {
   t.scc_stack.push(v);
   t.in_scc[v]=true;
@@ -610,7 +610,7 @@ void graph<N>::tarjan(tarjant &t, node_indext v)
 
 /*******************************************************************\
 
-Function: graph::SCCs
+Function: grapht::SCCs
 
   Inputs:
 
@@ -621,7 +621,7 @@ Function: graph::SCCs
 \*******************************************************************/
 
 template<class N>
-std::size_t graph<N>::SCCs(std::vector<node_indext> &subgraph_nr)
+std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 {
   tarjant t(nodes.size(), subgraph_nr);
 
@@ -634,7 +634,7 @@ std::size_t graph<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 
 /*******************************************************************\
 
-Function: graph::make_chordal
+Function: grapht::make_chordal
 
   Inputs:
 
@@ -645,9 +645,9 @@ Function: graph::make_chordal
 \*******************************************************************/
 
 template<class N>
-void graph<N>::make_chordal()
+void grapht<N>::make_chordal()
 {
-  graph tmp(*this);
+  grapht tmp(*this);
 
   // This assumes an undirected graph.
   // 1. remove all nodes in tmp, reconnecting the remaining ones
@@ -682,7 +682,7 @@ void graph<N>::make_chordal()
 
 /*******************************************************************\
 
-Function: graph::output_dot
+Function: grapht::output_dot
 
   Inputs:
 
@@ -693,7 +693,7 @@ Function: graph::output_dot
 \*******************************************************************/
 
 template<class N>
-void graph<N>::output_dot(std::ostream &out) const
+void grapht<N>::output_dot(std::ostream &out) const
 {
   for(node_indext n=0; n<nodes.size(); n++)
     output_dot_node(out, n);
@@ -701,7 +701,7 @@ void graph<N>::output_dot(std::ostream &out) const
 
 /*******************************************************************\
 
-Function: graph::output_dot_node
+Function: grapht::output_dot_node
 
   Inputs:
 
@@ -712,7 +712,7 @@ Function: graph::output_dot_node
 \*******************************************************************/
 
 template<class N>
-void graph<N>::output_dot_node(std::ostream &out, node_indext n) const
+void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const
 {
   const nodet &node=nodes[n];
 

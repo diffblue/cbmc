@@ -13,14 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_container.h"
 
-class dstring
+class dstringt
 {
 public:
   // this is safe for static objects
   #ifdef __GNUC__
   constexpr
   #endif
-  dstring():no(0)
+  dstringt():no(0)
   {
   }
 
@@ -29,7 +29,7 @@ public:
   #ifdef __GNUC__
   constexpr
   #endif
-  dstring(unsigned _no, unsigned):no(_no)
+  dstringt(unsigned _no, unsigned):no(_no)
   {
   }
 
@@ -41,13 +41,13 @@ public:
 
   // this one is not safe for static objects
   // NOLINTNEXTLINE(runtime/explicit)
-  inline dstring(const char *s):no(string_container[s])
+  inline dstringt(const char *s):no(string_container[s])
   {
   }
 
   // this one is not safe for static objects
   // NOLINTNEXTLINE(runtime/explicit)
-  inline dstring(const std::string &s):no(string_container[s])
+  inline dstringt(const std::string &s):no(string_container[s])
   {
   }
 
@@ -76,14 +76,14 @@ public:
 
   // ordering -- not the same as lexicographical ordering
 
-  inline bool operator< (const dstring &b) const { return no<b.no; }
+  inline bool operator< (const dstringt &b) const { return no<b.no; }
 
   // comparison with same type
 
-  inline bool operator==(const dstring &b) const
+  inline bool operator==(const dstringt &b) const
   { return no==b.no; } // really fast equality testing
 
-  inline bool operator!=(const dstring &b) const
+  inline bool operator!=(const dstringt &b) const
   { return no!=b.no; } // really fast equality testing
 
   // comparison with other types
@@ -93,12 +93,12 @@ public:
 
   bool operator==(const std::string &b) const { return as_string()==b; }
   bool operator!=(const std::string &b) const { return as_string()!=b; }
-  bool operator< (const std::string &b) const { return as_string()< b; }
-  bool operator> (const std::string &b) const { return as_string()> b; }
+  bool operator<(const std::string &b) const { return as_string()<b; }
+  bool operator>(const std::string &b) const { return as_string()>b; }
   bool operator<=(const std::string &b) const { return as_string()<=b; }
   bool operator>=(const std::string &b) const { return as_string()>=b; }
 
-  int compare(const dstring &b) const
+  int compare(const dstringt &b) const
   {
     if(no==b.no) return 0; // equal
     return as_string().compare(b.as_string());
@@ -109,10 +109,10 @@ public:
   inline void clear()
   { no=0; }
 
-  inline void swap(dstring &b)
+  inline void swap(dstringt &b)
   { unsigned t=no; no=b.no; b.no=t; }
 
-  inline dstring &operator=(const dstring &b)
+  inline dstringt &operator=(const dstringt &b)
   { no=b.no; return *this; }
 
   // output
@@ -143,21 +143,21 @@ protected:
 };
 
 // the reference returned is guaranteed to be stable
-inline const std::string &as_string(const dstring &s)
+inline const std::string &as_string(const dstringt &s)
 { return string_container.get_string(s.get_no()); }
 
 // NOLINTNEXTLINE(readability/identifiers)
 struct dstring_hash
 {
-  inline size_t operator()(const dstring &s) const { return s.hash(); }
+  inline size_t operator()(const dstringt &s) const { return s.hash(); }
 };
 
-inline size_t hash_string(const dstring &s)
+inline size_t hash_string(const dstringt &s)
 {
   return s.hash();
 }
 
-inline std::ostream &operator<<(std::ostream &out, const dstring &a)
+inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
 {
   return a.operator<<(out);
 }

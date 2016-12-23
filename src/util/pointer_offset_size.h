@@ -21,8 +21,10 @@ class constant_exprt;
 
 // these return -1 on failure
 
-class member_offset_iterator {
-  typedef std::pair<size_t,mp_integer> refst;
+// NOLINTNEXTLINE(readability/identifiers)
+class member_offset_iterator
+{
+  typedef std::pair<size_t, mp_integer> refst;
   refst current;
   const struct_typet &type;
   const namespacet &ns;

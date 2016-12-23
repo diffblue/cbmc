@@ -33,8 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep_ids.h"
 
 #ifdef USE_DSTRING
-typedef dstring irep_idt;
-typedef dstring irep_namet;
+typedef dstringt irep_idt;
+typedef dstringt irep_namet;
 // NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
 #else
@@ -270,11 +270,7 @@ public:
     unsigned ref_count;
     #endif
 
-    #ifdef USE_DSTRING
-    dstring data;
-    #else
-    std::string data;
-    #endif
+    irep_idt data;
 
     named_subt named_sub;
     named_subt comments;

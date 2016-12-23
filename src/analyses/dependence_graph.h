@@ -69,7 +69,7 @@ struct dep_nodet:public graph_nodet<dep_edget>
 class dep_graph_domaint:public ai_domain_baset
 {
 public:
-  typedef graph<dep_nodet>::node_indext node_indext;
+  typedef grapht<dep_nodet>::node_indext node_indext;
 
   dep_graph_domaint():
     has_values(false),
@@ -148,11 +148,11 @@ protected:
 
 class dependence_grapht:
   public ait<dep_graph_domaint>,
-  public graph<dep_nodet>
+  public grapht<dep_nodet>
 {
 public:
   using ait<dep_graph_domaint>::operator[];
-  using graph<dep_nodet>::operator[];
+  using grapht<dep_nodet>::operator[];
 
   explicit dependence_grapht(const namespacet &_ns):
     ns(_ns),

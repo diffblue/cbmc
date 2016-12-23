@@ -28,7 +28,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 static unsigned __indent;
 
-struct indenter
+struct indenter // NOLINT(readability/identifiers)
 {
   indenter() { __indent+=2; }
   ~indenter() { __indent-=2; }
@@ -179,7 +179,7 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
   }
 }
 
-class Parser
+class Parser // NOLINT(readability/identifiers)
 {
 public:
   explicit Parser(cpp_parsert &_cpp_parser):

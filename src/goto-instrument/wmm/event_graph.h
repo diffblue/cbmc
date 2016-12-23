@@ -29,7 +29,7 @@ class namespacet;
                      graph of abstract events
 \*******************************************************************/
 
-typedef graph<abstract_eventt> wmm_grapht;
+typedef grapht<abstract_eventt> wmm_grapht;
 typedef wmm_grapht::node_indext event_idt;
 
 class event_grapht
@@ -368,7 +368,7 @@ public:
     return po_no;
   }
 
-  inline wmm_grapht::nodet &operator[](event_idt n)
+  grapht<abstract_eventt>::nodet &operator[](event_idt n)
   {
     return po_graph[n];
   }

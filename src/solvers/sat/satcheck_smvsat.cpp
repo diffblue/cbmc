@@ -282,6 +282,7 @@ void satcheck_smvsat_interpolatort::interpolate(exprt &dest)
 {
   // crate instance
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct interpolator *interpolator_satsolver=
     new_interpolator(satsolver);
 
@@ -314,17 +315,18 @@ Function: satcheck_smvsat_interpolatort::build_aig
 \*******************************************************************/
 
 void satcheck_smvsat_interpolatort::build_aig(
+  // NOLINTNEXTLINE(readability/identifiers)
   struct interpolator &interpolator_satsolver,
   int output,
   exprt &dest)
 {
-  std::stack<entry> stack;
+  std::stack<entryt> stack;
 
-  stack.push(entry(output, &dest));
+  stack.push(entryt(output, &dest));
 
   while(!stack.empty())
   {
-    entry x=stack.top();
+    entryt x=stack.top();
     stack.pop();
 
     bool invert=x.g<0;
@@ -349,8 +351,8 @@ void satcheck_smvsat_interpolatort::build_aig(
       unsigned g0=interpolator_satsolver.aig_arg(n, 0);
       unsigned g1=interpolator_satsolver.aig_arg(n, 1);
 
-      stack.push(entry(g0, &e.op0()));
-      stack.push(entry(g1, &e.op1()));
+      stack.push(entryt(g0, &e.op0()));
+      stack.push(entryt(g1, &e.op1()));
     }
 
     if(invert)

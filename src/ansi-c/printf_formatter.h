@@ -34,11 +34,12 @@ protected:
   unsigned format_pos;
   inline bool eol() const { return format_pos>=format.size(); }
 
-  class eol_exception { };
+  class eol_exceptiont { };
 
   char next()
   {
-    if(eol()) throw eol_exception();
+    if(eol())
+      throw eol_exceptiont();
     return format[format_pos++];
   }
 

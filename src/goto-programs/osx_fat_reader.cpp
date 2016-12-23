@@ -59,6 +59,7 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
   has_gb_arch(false)
 {
 #ifdef __APPLE__
+  // NOLINTNEXTLINE(readability/identifiers)
   struct fat_header fh;
   // NOLINTNEXTLINE(readability/identifiers)
   in.read(reinterpret_cast<char*>(&fh), sizeof(struct fat_header));
@@ -74,6 +75,7 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
 
   for(unsigned i=0; !has_gb_arch && i<narch; ++i)
   {
+    // NOLINTNEXTLINE(readability/identifiers)
     struct fat_arch fa;
     // NOLINTNEXTLINE(readability/identifiers)
     in.read(reinterpret_cast<char*>(&fa), sizeof(struct fat_arch));

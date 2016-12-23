@@ -40,6 +40,7 @@ Function: memory_info
 void memory_info(std::ostream &out)
 {
   #ifdef __linux__
+  // NOLINTNEXTLINE(readability/identifiers)
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << "\n";
   out << "  number of free chunks: " << m.ordblks << "\n";
@@ -64,6 +65,7 @@ void memory_info(std::ostream &out)
   #endif
 
   #ifdef __APPLE__
+  // NOLINTNEXTLINE(readability/identifiers)
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
   task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);

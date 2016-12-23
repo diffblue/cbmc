@@ -23,6 +23,7 @@ public:
 protected:
   pointer_logict pointer_logic;
 
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
   unsigned object_bits, offset_bits, bits;

@@ -189,7 +189,7 @@ protected:
 
   // pointers -> flagst
   // This is a vector, so it's fast.
-  typedef expanding_vector<flagst> points_tot;
+  typedef expanding_vectort<flagst> points_tot;
 
   // the information tracked per program location
   class loc_infot

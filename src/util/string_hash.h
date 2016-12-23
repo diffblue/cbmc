@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 size_t hash_string(const std::string &s);
 size_t hash_string(const char *s);
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct string_hash
 {
   size_t operator()(const std::string &s) const { return hash_string(s); }

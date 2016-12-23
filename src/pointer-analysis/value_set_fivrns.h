@@ -76,7 +76,9 @@ public:
     typedef std::map<unsigned, objectt> objmapt;
     objmapt objmap;
 
+    // NOLINTNEXTLINE(readability/identifiers)
     typedef objmapt::const_iterator const_iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
     typedef objmapt::iterator iterator;
 
     const_iterator find(unsigned k) { return objmap.find(k); }

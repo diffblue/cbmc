@@ -101,6 +101,7 @@ protected:
   virtual literalt convert_rest(const exprt &expr) override;
   virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
 
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef arrayst SUB;
 
   void conversion_failed(const exprt &expr, bvt &bv)

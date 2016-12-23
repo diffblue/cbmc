@@ -39,10 +39,10 @@ int main(int argc, const char **argv)
 #ifdef USE_DSTRING
       if(pos==std::string::npos)
         std::cout << line
-                  << " dstring(" << count << ", 0)";
+                  << " dstringt(" << count << ", 0)";
       else
         std::cout << std::string(line, 0, pos)
-                  << " dstring(" << count << ", 0)"
+                  << " dstringt(" << count << ", 0)"
                   << " // "
                   << std::string(line, pos+1, std::string::npos);
 #else

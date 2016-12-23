@@ -39,7 +39,7 @@ struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
-class cfg_baset:public graph< cfg_base_nodet<T,I> >
+class cfg_baset:public grapht< cfg_base_nodet<T, I> >
 {
 public:
   typedef std::size_t entryt;
@@ -47,9 +47,9 @@ public:
   struct entry_mapt:
     public std::map<goto_programt::const_targett, entryt>
   {
-    graph< cfg_base_nodet<T,I> > & container;
+    grapht< cfg_base_nodet<T, I> > & container;
 
-    explicit entry_mapt(graph< cfg_base_nodet<T,I> > & _container):
+    explicit entry_mapt(grapht< cfg_base_nodet<T, I> > & _container):
       container(_container)
     {
     }

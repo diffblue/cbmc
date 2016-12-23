@@ -26,6 +26,7 @@ public:
   virtual std::string decision_procedure_text() const
   { return "refinement loop with "+prop.solver_text(); }
 
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef bv_pointerst SUB;
 
   // maximal number of times we refine a formula node

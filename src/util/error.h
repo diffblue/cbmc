@@ -37,7 +37,7 @@ public:
   locationt location;
 };
 
-class error_str:public error_baset, public std::ostringstream
+class error_streamt:public error_baset, public std::ostringstream
 {
 public:
   virtual const char* what() const throw()
@@ -45,36 +45,36 @@ public:
     return str().c_str();
   }
 
-  virtual ~error_str() throw ()
+  virtual ~error_streamt() throw()
   {
   }
 
-  inline error_str()
+  error_streamt()
   {
   }
 
-  explicit inline error_str(const locationt &_location):
+  explicit error_streamt(const locationt &_location):
     error_baset(_location), std::ostringstream()
   {
   }
 
-  explicit inline error_str(const char *string)
+  explicit error_streamt(const char *string)
   {
     str(string);
   }
 
-  explicit inline error_str(const std::string &string)
+  explicit error_streamt(const std::string &string)
   {
     str(string);
   }
 
-  inline error_str(const error_str &other):std::ostringstream()
+  error_streamt(const error_streamt &other):std::ostringstream()
   {
     str(other.str());
     location=other.location;
   }
 
-  inline error_str(const locationt &_location, const std::string &string):
+  error_streamt(const locationt &_location, const std::string &string):
     error_baset(_location)
   {
     str(string);

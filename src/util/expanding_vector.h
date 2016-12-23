@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 template<typename T>
-class expanding_vector:public std::vector<T>
+class expanding_vectort:public std::vector<T>
 {
 public:
   inline T & operator[] (typename std::vector<T>::size_type n)
@@ -24,7 +24,7 @@ public:
   inline const T & operator[] (typename std::vector<T>::size_type n) const
   {
     // hack-ish const cast
-    const_cast<expanding_vector *>(this)->check_index(n);
+    const_cast<expanding_vectort*>(this)->check_index(n);
     return subt::operator[](n);
   }
 

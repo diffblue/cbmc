@@ -104,6 +104,7 @@ class numbered_evtst
 
 public:
   typedef std::vector<evtt const*> ordered_evtst;
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef ordered_evtst::const_iterator const_iterator;
   typedef std::map<evtt const*, ordered_evtst::size_type> ordered_evts_mapt;
 

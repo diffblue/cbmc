@@ -5297,7 +5297,7 @@ void smt2_convt::collect_bindings(
 
   if(it!=map.end())
   {
-    let_count_id &count_id = it->second;
+    let_count_idt &count_id=it->second;
     ++(count_id.first);
     return;
   }

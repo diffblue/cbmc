@@ -41,6 +41,7 @@ public:
   virtual bool is_in_conflict(literalt l) const override;
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   class Solver *solver;
   void add_variables();
   bvt assumptions;
@@ -64,6 +65,7 @@ public:
   //void set_partition_id(unsigned p_id);
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   class Proof *proof;
   class minisat_prooft *minisat_proof;
 };

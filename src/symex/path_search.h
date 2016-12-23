@@ -112,7 +112,7 @@ protected:
     loc_datat():visited(false) { }
   };
 
-  expanding_vector<loc_datat> loc_data;
+  expanding_vectort<loc_datat> loc_data;
 
   bool execute(queuet::iterator state);
 

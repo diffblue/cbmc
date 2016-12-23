@@ -19,10 +19,11 @@ using namespace Eigen;
  * i.e. the next value of the vars vector is calculated by applying the matrix
  * to the current vars vector.
  */
-typedef struct linear_recurrence {
-  MatrixXd matrix;
+struct linear_recurrencet
+{
+  Eigen::MatrixXd matrix;
   std::vector<exprt> vars;
-} linear_recurrencet;
+};
 
 bool linearize(symex_target_equationt &equation, linear_recurrencet &recurrence);
 

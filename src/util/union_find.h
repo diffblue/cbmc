@@ -17,9 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 // Standard union find with weighting and path compression.
 // See http://www.cs.princeton.edu/~rs/AlgsDS07/01UnionFind.pdf
 
+// NOLINTNEXTLINE(readability/identifiers)
 class unsigned_union_find
 {
 public:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef std::size_t size_type;
 
 protected:
@@ -122,9 +124,11 @@ public:
 };
 
 template <typename T>
+// NOLINTNEXTLINE(readability/identifiers)
 class union_find:public numbering<T>
 {
 public:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef typename numbering<T>::size_type size_type;
 
   // true == already in same set

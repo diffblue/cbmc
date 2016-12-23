@@ -22,7 +22,7 @@ struct procedure_local_cfg_baset<
   T,
   java_bytecode_convert_methodt::method_with_amapt,
   unsigned> :
-  public graph<cfg_base_nodet<T, unsigned> >
+  public grapht<cfg_base_nodet<T, unsigned> >
 {
   typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
   typedef std::map<unsigned, unsigned> entry_mapt;

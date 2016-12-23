@@ -45,6 +45,7 @@ void install_signal_catcher()
   #if defined(_WIN32)
   #else
   // declare act to deal with action on signal set
+  // NOLINTNEXTLINE(readability/identifiers)
   static struct sigaction act;
 
   act.sa_handler=signal_catcher;
@@ -73,6 +74,7 @@ void remove_signal_catcher()
   #if defined(_WIN32)
   #else
   // declare act to deal with action on signal set
+  // NOLINTNEXTLINE(readability/identifiers)
   static struct sigaction act;
 
   act.sa_handler=SIG_DFL;

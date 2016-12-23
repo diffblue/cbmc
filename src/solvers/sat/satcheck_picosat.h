@@ -11,6 +11,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "cnf.h"
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct PicoSAT;
 
 class satcheck_picosatt:public cnf_solvert

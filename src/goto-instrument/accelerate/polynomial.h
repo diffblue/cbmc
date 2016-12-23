@@ -9,10 +9,11 @@
 class monomialt
 {
 public:
-  typedef struct term {
+  struct termt
+  {
     exprt var;
     unsigned int exp;   // This means exponent, not expression.
-  } termt;
+  };
 
   // Invariant: this vector is sorted lexicographically w.r.t. the variable.
   std::vector<termt> terms;
