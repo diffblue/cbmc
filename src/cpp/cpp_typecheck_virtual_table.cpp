@@ -15,11 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 Function: cpp_typecheckt::do_virtual_table
 
-Inputs:
-
-Outputs:
-
-Purpose:
+Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 

@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: C++ Language Parsing
+
+Author: Daniel Kroening, kroening@cs.cmu.edu
+
+\*******************************************************************/
+
 #include <cassert>
 #include <map>
 

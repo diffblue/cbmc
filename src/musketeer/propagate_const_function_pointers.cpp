@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Constant Function Pointer Propagation
+
+Author: Vincent Nimal
+
+\*******************************************************************/
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

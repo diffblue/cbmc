@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Parser utilities
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 

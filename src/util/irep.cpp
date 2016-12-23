@@ -612,10 +612,12 @@ Function: irept::full_eq
 bool irept::full_eq(const irept &other) const
 {
   #ifdef SHARING
-  if(data==other.data) return true;
+  if(data==other.data)
+    return true;
   #endif
 
-  if(id()!=other.id()) return false;
+  if(id()!=other.id())
+    return false;
 
   const irept::subt &i1_sub=get_sub();
   const irept::subt &i2_sub=other.get_sub();

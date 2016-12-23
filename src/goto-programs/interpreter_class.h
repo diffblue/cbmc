@@ -1,8 +1,8 @@
 /*******************************************************************\
 
-   Class: interpretert
+Module: Interpreter for GOTO Programs
 
- Purpose: interpreter for GOTO programs
+Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 

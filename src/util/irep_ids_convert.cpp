@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Build pre-initialized entries for C-string container
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <iostream>
 #include <string>
 

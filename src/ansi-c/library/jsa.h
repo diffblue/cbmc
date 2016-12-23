@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 /* FUNCTION: __CPROVER_jsa_synthesise */
 
 #ifndef CPROVER_ANSI_C_LIBRARY_JSA_H
