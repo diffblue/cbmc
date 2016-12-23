@@ -272,7 +272,7 @@ public:
     return it->second;
   }
 
-  virtual void clear() override
+  void clear() override
   {
     state_map.clear();
     ai_baset::clear();
@@ -289,7 +289,7 @@ protected:
   }
 
   // this one just finds states
-  virtual const statet &find_state(locationt l) const override
+  const statet &find_state(locationt l) const override
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end())
@@ -298,19 +298,19 @@ protected:
     return it->second;
   }
 
-  virtual bool merge(const statet &src, locationt from, locationt to) override
+  bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
     return static_cast<domainT &>(dest).merge(
       static_cast<const domainT &>(src), from, to);
   }
 
-  virtual statet *make_temporary_state(const statet &s) override
+  statet *make_temporary_state(const statet &s) override
   {
     return new domainT(static_cast<const domainT &>(s));
   }
 
-  virtual void fixedpoint(
+  void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {
@@ -322,7 +322,7 @@ private:
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
 
   // not implemented in sequential analyses
-  virtual bool merge_shared(
+  bool merge_shared(
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
@@ -343,7 +343,7 @@ public:
   {
   }
 
-  virtual bool merge_shared(
+  bool merge_shared(
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
@@ -355,7 +355,7 @@ public:
   }
 
 protected:
-  virtual void fixedpoint(
+  void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {
