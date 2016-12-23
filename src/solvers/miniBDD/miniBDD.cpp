@@ -408,7 +408,7 @@ BDD substitute(const BDD &t, unsigned var, const BDD &tp)
   //  (!tp & t[var/0])
 
   return ( tp & restrict(t, var, true)) |
-         (!tp & restrict(t, var, false));
+         ((!tp) & restrict(t, var, false));
 }
 
 void cubes(const BDD &u, const std::string &path, std::string &result)
