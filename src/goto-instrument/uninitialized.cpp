@@ -14,6 +14,8 @@ Date: January 2010
 
 #include <analyses/uninitialized_domain.h>
 
+#include "uninitialized.h"
+
 /*******************************************************************\
 
    Class: uninitializedt

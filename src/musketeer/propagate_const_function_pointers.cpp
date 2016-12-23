@@ -12,6 +12,8 @@
 #include <list>
 #include <cassert>
 
+#include "propagate_const_function_pointers.h"
+
 class const_function_pointer_propagationt {
 protected:
   symbol_tablet& symbol_table;

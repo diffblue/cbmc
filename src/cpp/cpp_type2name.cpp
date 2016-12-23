@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/type.h>
 #include <util/std_types.h>
 
+#include "cpp_type2name.h"
+
 /*******************************************************************\
 
 Function: do_prefix

@@ -28,6 +28,8 @@ Date: September 2011
 #include <analyses/local_may_alias.h>
 #endif
 
+#include "mmio.h"
+
 /*******************************************************************\
 
 Function: mmio

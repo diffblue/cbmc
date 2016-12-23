@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
+#include "path_symex.h"
 #include "path_symex_class.h"
 
 //#define DEBUG
