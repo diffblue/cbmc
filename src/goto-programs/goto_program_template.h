@@ -100,8 +100,8 @@ public:
 
     // The below will eventually become a single target only.
     //! the target for gotos and for start_thread nodes
-    typedef typename std::list<class instructiont>::iterator targett;
-    typedef typename std::list<class instructiont>::const_iterator const_targett;
+    typedef typename std::list<instructiont>::iterator targett;
+    typedef typename std::list<instructiont>::const_iterator const_targett;
     typedef std::list<targett> targetst;
     typedef std::list<const_targett> const_targetst;
 
@@ -264,7 +264,7 @@ public:
     }
   };
 
-  typedef std::list<class instructiont> instructionst;
+  typedef std::list<instructiont> instructionst;
 
   typedef typename instructionst::iterator targett;
   typedef typename instructionst::const_iterator const_targett;
