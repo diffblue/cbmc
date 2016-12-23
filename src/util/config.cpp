@@ -1041,7 +1041,8 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.os=ansi_ct::ost::NO_OS;
   ansi_c.arch="none";
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
-  ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
+  // NOLINTNEXTLINE(readability/casting)
+  ansi_c.NULL_is_zero=reinterpret_cast<size_t>((void*)0)==0;
 
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
@@ -1241,7 +1242,7 @@ bool configt::set(const cmdlinet &cmdline)
     assert(ansi_c.pointer_width==sizeof(void *)*8);
     assert(ansi_c.single_width==sizeof(float)*8);
     assert(ansi_c.double_width==sizeof(double)*8);
-    assert(ansi_c.char_is_unsigned==(char(255)==255));
+    assert(ansi_c.char_is_unsigned==(static_cast<char>(255)==255));
 
     #ifndef _WIN32
     // On Windows, long double width varies by compiler

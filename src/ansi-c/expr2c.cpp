@@ -2301,7 +2301,7 @@ std::string expr2ct::convert_constant(
       else if(int_value>=' ' && int_value<126)
       {
         dest+='\'';
-        dest+=char(integer2ulong(int_value));
+        dest+=static_cast<char>(integer2ulong(int_value));
         dest+='\'';
       }
       else
@@ -2737,7 +2737,7 @@ std::string expr2ct::convert_array(
 
       default:
         if(ch>=' ' && ch!=127 && ch<0xff)
-          dest+=(char)ch;
+          dest+=static_cast<char>(ch);
         else
         {
           char hexbuf[10];

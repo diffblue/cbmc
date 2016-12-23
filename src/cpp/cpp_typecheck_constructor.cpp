@@ -274,8 +274,9 @@ void cpp_typecheckt::default_cpctor(
   // Parameter declaration
   cpp_declarationt parameter_decl;
   parameter_decl.set(ID_type, ID_merged_type);
-  typet::subtypest &sub = parameter_decl.type().subtypes();
-  sub.push_back(static_cast<const typet &>(static_cast<const irept &>(cppcomp)));
+  typet::subtypest &sub=parameter_decl.type().subtypes();
+  sub.push_back(
+    static_cast<const typet &>(static_cast<const irept &>(cppcomp)));
   irept constnd(ID_const);
   sub.push_back(static_cast<const typet &>(constnd));
   parameter_decl.move_to_operands(parameter_tor);
@@ -318,7 +319,8 @@ void cpp_typecheckt::default_cpctor(
       codet mem_init(ID_member_initializer);
       mem_init.add_source_location() = source_location;
       mem_init.set(ID_member, cppname);
-      mem_init.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
+      mem_init.copy_to_operands(
+        static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
       initializers.move_to_sub(mem_init);
     }
   }
@@ -381,8 +383,9 @@ void cpp_typecheckt::default_cpctor(
 
     exprt memberexpr(ID_member);
     memberexpr.set(ID_component_cpp_name, cppname);
-    memberexpr.copy_to_operands(static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
-    memberexpr.add_source_location() = source_location;
+    memberexpr.copy_to_operands(
+      static_cast<const exprt &>(static_cast<const irept &>(cpp_parameter)));
+    memberexpr.add_source_location()=source_location;
 
     if(mem_it->type().id()==ID_array)
       memberexpr.set("#array_ini", true);
@@ -442,12 +445,13 @@ void cpp_typecheckt::default_assignop(
   declarator_type.subtype().add("#qualifier").make_nil();
   declarator_type.subtype().subtype().make_nil();
 
-  exprt& args = (exprt&) declarator.type().add(ID_parameters);
-  args.add_source_location() = source_location;
+  exprt &args=static_cast<exprt&>(declarator.type().add(ID_parameters));
+  args.add_source_location()=source_location;
 
   args.get_sub().push_back(irept(ID_cpp_declaration));
 
-  cpp_declarationt& args_decl = (cpp_declarationt&) args.get_sub().back();
+  cpp_declarationt &args_decl=
+    static_cast<cpp_declarationt&>(args.get_sub().back());
 
   typet::subtypest & args_decl_type_sub = args_decl.type().subtypes();
 
@@ -462,7 +466,7 @@ void cpp_typecheckt::default_assignop(
   args_decl.add_source_location() = source_location;
 
   cpp_declaratort &args_decl_declor=
-    (cpp_declaratort&) args_decl.operands().back();
+    static_cast<cpp_declaratort&>(args_decl.operands().back());
 
   args_decl_declor.name().id(ID_cpp_name);
   args_decl_declor.name().get_sub().push_back(irept(ID_name));

@@ -99,7 +99,7 @@ static std::string rate(std::size_t covered, std::size_t total)
 
   std::ostringstream oss;
 
-  oss << (float)covered/(float)total;
+  oss << static_cast<float>(covered)/static_cast<float>(total);
 #else
   std::ostringstream oss;
   oss << covered << " of " << total;

@@ -164,9 +164,12 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   exprt::operandst &ops=expr.operands();
 
   // start with last one
-  for(int i=int(ops.size())-1; i>=0; i--)
+  for(exprt::operandst::reverse_iterator
+      it=ops.rbegin();
+      it!=ops.rend();
+      ++it)
   {
-    exprt &op=ops[i];
+    exprt &op=*it;
 
     if(!op.is_boolean())
     {

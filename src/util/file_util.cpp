@@ -49,7 +49,7 @@ std::string get_current_working_directory()
 {
   unsigned bsize=50;
 
-  char *buf=(char*)malloc(sizeof(char)*bsize);
+  char *buf=reinterpret_cast<char*>(malloc(sizeof(char)*bsize));
   if(!buf) abort();
 
   errno=0;
@@ -57,7 +57,7 @@ std::string get_current_working_directory()
   while(buf && getcwd(buf, bsize-1)==NULL && errno==ERANGE)
   {
     bsize*=2;
-    buf=(char*)realloc(buf, sizeof(char)*bsize);
+    buf=reinterpret_cast<char*>(realloc(buf, sizeof(char)*bsize));
   }
 
   std::string working_directory=buf;

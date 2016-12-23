@@ -32,10 +32,11 @@ std::string narrow(const wchar_t *s)
 {
   #ifdef _WIN32
 
-  size_t slength=wcslen(s);
-  int rlength=WideCharToMultiByte(CP_UTF8, 0, s, slength, NULL, 0, NULL, NULL);
+  int slength=static_cast<int>(wcslen(s));
+  int rlength=
+    WideCharToMultiByte(CP_UTF8, 0, s, slength, NULL, 0, NULL, NULL);
   std::string r(rlength, 0);
-  WideCharToMultiByte(CP_UTF8, 0, s, (int)slength, &r[0], rlength, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, s, slength, &r[0], rlength, NULL, NULL);
   return r;
 
   #else
@@ -44,7 +45,7 @@ std::string narrow(const wchar_t *s)
   r.reserve(wcslen(s));
   while(*s!=0)
   {
-    r+=char(*s);
+    r+=static_cast<char>(*s);
     s++;
   }
 
@@ -68,10 +69,11 @@ std::wstring widen(const char *s)
 {
   #ifdef _WIN32
 
-  size_t slength=strlen(s);
-  int rlength=MultiByteToWideChar(CP_UTF8, 0, s, (int)slength, NULL, 0);
+  int slength=static_cast<int>(strlen(s));
+  int rlength=
+    MultiByteToWideChar(CP_UTF8, 0, s, slength, NULL, 0);
   std::wstring r(rlength, 0);
-  MultiByteToWideChar(CP_UTF8, 0, s, (int)slength, &r[0], rlength);
+  MultiByteToWideChar(CP_UTF8, 0, s, slength, &r[0], rlength);
   return r;
 
   #else
@@ -104,10 +106,11 @@ std::string narrow(const std::wstring &s)
 {
   #ifdef _WIN32
 
-  size_t slength=s.size();
-  int rlength=WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)slength, NULL, 0, NULL, NULL);
+  int slength=static_cast<int>(s.size());
+  int rlength=
+    WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, NULL, 0, NULL, NULL);
   std::string r(rlength, 0);
-  WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)slength, &r[0], rlength, NULL, NULL);
+  WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, &r[0], rlength, NULL, NULL);
   return r;
 
   #else
@@ -132,8 +135,9 @@ std::wstring widen(const std::string &s)
 {
   #ifdef _WIN32
 
-  size_t slength=s.size();
-  int rlength=MultiByteToWideChar(CP_UTF8, 0, &s[0], (int)slength, NULL, 0);
+  int slength=static_cast<int>(s.size());
+  int rlength=
+    MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, NULL, 0);
   std::wstring r(rlength, 0);
   MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, &r[0], rlength);
   return r;
@@ -159,24 +163,24 @@ Function: utf32_to_utf8
 void utf32_to_utf8(unsigned int c, std::string &result)
 {
   if(c<=0x7f)
-    result+=char(c);
+    result+=static_cast<char>(c);
   else if(c<=0x7ff)
   {
-    result+=char((c >> 6)   | 0xc0);
-    result+=char((c & 0x3f) | 0x80);
+    result+=static_cast<char>((c >> 6)   | 0xc0);
+    result+=static_cast<char>((c & 0x3f) | 0x80);
   }
   else if(c<=0xffff)
   {
-    result+=char((c >> 12)         | 0xe0);
-    result+=char(((c >> 6) & 0x3f) | 0x80);
-    result+=char((c & 0x3f)        | 0x80);
+    result+=static_cast<char>((c >> 12)         | 0xe0);
+    result+=static_cast<char>(((c >> 6) & 0x3f) | 0x80);
+    result+=static_cast<char>((c & 0x3f)        | 0x80);
   }
   else
   {
-    result+=char((c >> 18)         | 0xf0);
-    result+=char(((c >> 12) & 0x3f)| 0x80);
-    result+=char(((c >> 6) & 0x3f) | 0x80);
-    result+=char((c & 0x3f)        | 0x80);
+    result+=static_cast<char>((c >> 18)         | 0xf0);
+    result+=static_cast<char>(((c >> 12) & 0x3f)| 0x80);
+    result+=static_cast<char>(((c >> 6) & 0x3f) | 0x80);
+    result+=static_cast<char>((c & 0x3f)        | 0x80);
   }
 }
 

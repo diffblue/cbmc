@@ -2573,7 +2573,7 @@ bool goto_convertt::get_string_constant(
             binary2integer(id2string(to_constant_expr(*it).get_value()), true));
 
           if(i!=0) // to skip terminating 0
-            result+=char(i);
+            result+=static_cast<char>(i);
         }
 
       return value=result, false;

@@ -101,7 +101,7 @@ public:
   void go_to(cpp_idt &id)
   {
     assert(id.is_scope);
-    current_scope_ptr=(cpp_scopet *)&id;
+    current_scope_ptr=&static_cast<cpp_scopet&>(id);
   }
 
   // move up to next global scope

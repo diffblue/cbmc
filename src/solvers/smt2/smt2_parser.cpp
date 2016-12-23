@@ -281,7 +281,7 @@ void smt2_parsert::operator()()
     case '\n':
     case '\r':
     case '\t':
-    case (char)160: // non-breaking space
+    case static_cast<char>(160): // non-breaking space
       // skip any whitespace
       break;
 

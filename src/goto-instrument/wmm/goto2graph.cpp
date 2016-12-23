@@ -1806,11 +1806,11 @@ public:
 void* collect_cycles_in_thread(void* arg)
 {
   /* arguments */
-  instrumentert& this_instrumenter = ((pthread_argumentt*) arg)->instr;
-  memory_modelt model = ((pthread_argumentt*) arg)->mem;
-  const std::set<event_idt>& filter = ((pthread_argumentt*) arg)->filter;
-  std::set<event_grapht::critical_cyclet>& cycles =
-    ((pthread_argumentt*) arg)->cycles;
+  pthread_argumentt *p_arg=reinterpret_cast<pthread_argumentt*>(arg);
+  instrumentert &this_instrumenter=p_arg->instr;
+  memory_modelt model=p_arg->mem;
+  const std::set<event_idt> &filter=p_arg->filter;
+  std::set<event_grapht::critical_cyclet> &cycles=p_arg->cycles;
 
   this_instrumenter.egraph.collect_cycles(cycles, model, filter);
 
@@ -1835,8 +1835,8 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
       interesting_SCCs.insert(scc);
       pthread_argumentt arg(*this,model,*it,set_of_cycles_per_SCC[scc]);
 
-      int rc = pthread_create(&threads[scc++], NULL,
-        collect_cycles_in_thread, (void*) &arg);
+      int rc=pthread_create(&threads[scc++], NULL,
+        collect_cycles_in_thread, &arg);
 
       message.status()<<(rc!=0?"Failure ":"Success ")
         <<"in creating thread for SCC #"<<scc-1<<messaget::eom;

@@ -60,12 +60,13 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
 {
 #ifdef __APPLE__
   struct fat_header fh;
-  in.read((char*)&fh, sizeof(struct fat_header));
+  // NOLINTNEXTLINE(readability/identifiers)
+  in.read(reinterpret_cast<char*>(&fh), sizeof(struct fat_header));
 
   if(!in)
     throw "failed to read OSX fat header";
 
-  if(!is_osx_fat_magic((char*)&(fh.magic)))
+  if(!is_osx_fat_magic(reinterpret_cast<char*>(&(fh.magic))))
     throw "OSX fat header malformed (magic)";
 
   assert(sizeof(fh.nfat_arch)==4);
@@ -74,7 +75,8 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
   for(unsigned i=0; !has_gb_arch && i<narch; ++i)
   {
     struct fat_arch fa;
-    in.read((char*)&fa, sizeof(struct fat_arch));
+    // NOLINTNEXTLINE(readability/identifiers)
+    in.read(reinterpret_cast<char*>(&fa), sizeof(struct fat_arch));
 
     assert(sizeof(fa.cputype)==4 &&
            sizeof(fa.cpusubtype)==4 &&

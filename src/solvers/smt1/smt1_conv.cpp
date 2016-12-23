@@ -1067,7 +1067,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
     std::size_t op_width=boolbv_width(expr.op0().type());
-    signed int ext=(int)boolbv_width(expr.type())-(int)BV_ADDR_BITS;
+    signed int ext=boolbv_width(expr.type())-BV_ADDR_BITS;
 
     if(ext>0)
       out << "(zero_extend[" << ext << "] ";

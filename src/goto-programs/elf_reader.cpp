@@ -25,7 +25,9 @@ Function: elf_readert::elf_readert
 elf_readert::elf_readert(std::istream &_in):in(_in)
 {
   // read 32-bit header
-  in.read((char *)&elf32_header, sizeof(elf32_header));
+  in.read(
+    reinterpret_cast<char*>(&elf32_header),
+    sizeof(elf32_header));
 
   if(!in)
     throw "failed to read ELF header";
@@ -67,7 +69,9 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       in.seekg(elf32_header.e_shoff+i*elf32_header.e_shentsize);
 
       // read section header
-      in.read((char *)&elf32_section_header_table[i], sizeof(Elf32_Shdr));
+      in.read(
+        reinterpret_cast<char*>(&elf32_section_header_table[i]),
+        sizeof(Elf32_Shdr));
     }
 
     // string table
@@ -81,7 +85,9 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
   {
     // read 64-bit header
     in.seekg(0);
-    in.read((char *)&elf64_header, sizeof(elf64_header));
+    in.read(
+      reinterpret_cast<char*>(&elf64_header),
+      sizeof(elf64_header));
 
     char ei_data=elf64_header.e_ident[5];
 
@@ -110,7 +116,9 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
       in.seekg(elf64_header.e_shoff+i*elf64_header.e_shentsize);
 
       // read section header
-      in.read((char *)&elf64_section_header_table[i], sizeof(Elf64_Shdr));
+      in.read(
+        reinterpret_cast<char*>(&elf64_section_header_table[i]),
+        sizeof(Elf64_Shdr));
     }
 
     // string table

@@ -57,7 +57,7 @@ public:
     const unwind_strategyt unwind_strategy=PARTIAL)
   {
     const unwind_sett unwind_set;
-    operator()(goto_functions, unwind_set, (int)k, unwind_strategy);
+    operator()(goto_functions, unwind_set, k, unwind_strategy);
   }
 
   void operator()(

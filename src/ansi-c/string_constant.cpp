@@ -110,7 +110,7 @@ array_exprt string_constantt::to_array_expr() const
     {
       std::string ch_str="'";
       if(ch=='\'' || ch=='\\') ch_str+='\\';
-      ch_str+=(char)ch;
+      ch_str+=static_cast<char>(ch);
       ch_str+="'";
     }
   }
@@ -149,7 +149,7 @@ bool string_constantt::from_array_expr(const array_exprt &src)
     mp_integer int_value=0;
     if(to_integer(*it, int_value)) return true;
     unsigned unsigned_value=integer2unsigned(int_value);
-    value+=(char)unsigned_value;
+    value+=static_cast<char>(unsigned_value);
   }
 
   // Drop the implicit zero at the end.

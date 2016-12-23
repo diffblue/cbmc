@@ -126,7 +126,8 @@ void satcheck_zchaff_baset::copy_cnf()
   for(clausest::const_iterator it=clauses.begin();
       it!=clauses.end();
       it++)
-    solver->add_orig_clause((int *)&((*it)[0]), it->size());
+    solver->add_orig_clause(
+      reinterpret_cast<int*>(&((*it)[0])), it->size());
 }
 
 /*******************************************************************\

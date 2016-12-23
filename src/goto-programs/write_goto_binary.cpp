@@ -56,23 +56,23 @@ bool write_goto_binary_v3(
     write_gb_word(out, 0); // old: sym.ordering
 
     unsigned flags=0;
-    flags = (flags << 1) | (int)sym.is_weak;
-    flags = (flags << 1) | (int)sym.is_type;
-    flags = (flags << 1) | (int)sym.is_property;
-    flags = (flags << 1) | (int)sym.is_macro;
-    flags = (flags << 1) | (int)sym.is_exported;
-    flags = (flags << 1) | (int)sym.is_input;
-    flags = (flags << 1) | (int)sym.is_output;
-    flags = (flags << 1) | (int)sym.is_state_var;
-    flags = (flags << 1) | (int)sym.is_parameter;
-    flags = (flags << 1) | (int)sym.is_auxiliary;
-    flags = (flags << 1) | (int)false; // sym.binding;
-    flags = (flags << 1) | (int)sym.is_lvalue;
-    flags = (flags << 1) | (int)sym.is_static_lifetime;
-    flags = (flags << 1) | (int)sym.is_thread_local;
-    flags = (flags << 1) | (int)sym.is_file_local;
-    flags = (flags << 1) | (int)sym.is_extern;
-    flags = (flags << 1) | (int)sym.is_volatile;
+    flags = (flags << 1) | static_cast<int>(sym.is_weak);
+    flags = (flags << 1) | static_cast<int>(sym.is_type);
+    flags = (flags << 1) | static_cast<int>(sym.is_property);
+    flags = (flags << 1) | static_cast<int>(sym.is_macro);
+    flags = (flags << 1) | static_cast<int>(sym.is_exported);
+    flags = (flags << 1) | static_cast<int>(sym.is_input);
+    flags = (flags << 1) | static_cast<int>(sym.is_output);
+    flags = (flags << 1) | static_cast<int>(sym.is_state_var);
+    flags = (flags << 1) | static_cast<int>(sym.is_parameter);
+    flags = (flags << 1) | static_cast<int>(sym.is_auxiliary);
+    flags = (flags << 1) | static_cast<int>(false); // sym.binding;
+    flags = (flags << 1) | static_cast<int>(sym.is_lvalue);
+    flags = (flags << 1) | static_cast<int>(sym.is_static_lifetime);
+    flags = (flags << 1) | static_cast<int>(sym.is_thread_local);
+    flags = (flags << 1) | static_cast<int>(sym.is_file_local);
+    flags = (flags << 1) | static_cast<int>(sym.is_extern);
+    flags = (flags << 1) | static_cast<int>(sym.is_volatile);
 
     write_gb_word(out, flags);
   }

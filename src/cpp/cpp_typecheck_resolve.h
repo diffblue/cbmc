@@ -133,7 +133,7 @@ protected:
 
   struct matcht
   {
-    unsigned cost;
+    std::size_t cost;
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
@@ -141,7 +141,7 @@ protected:
       cpp_template_args_tct _s_args,
       cpp_template_args_tct _f_args,
       irep_idt _id):
-      cost((unsigned)_s_args.arguments().size()),
+      cost(_s_args.arguments().size()),
       specialization_args(_s_args),
       full_args(_f_args),
       id(_id)

@@ -75,7 +75,7 @@ Function: operator <<
 
 std::ostream &operator << (std::ostream &out, const time_periodt &period)
 {
-  return out << (double)(period.get_t())/1000;
+  return out << static_cast<double>(period.get_t())/1000;
 }
 
 /*******************************************************************\

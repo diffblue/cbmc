@@ -552,7 +552,7 @@ bool Parser::SyntaxError()
     parser.error() << message << messaget::eom;
   }
 
-  return bool(++number_of_errors < max_errors);
+  return ++number_of_errors < max_errors;
 }
 
 /*******************************************************************\
@@ -1799,8 +1799,9 @@ bool Parser::rIntegralDeclaration(
 {
   #ifdef DEBUG
   indenter _i;
-  std::cout << std::string(__indent, ' ') << "Parser::rIntegralDeclaration 1  token: "
-            << (char) lex.LookAhead(0) << "\n";
+  std::cout << std::string(__indent, ' ')
+            << "Parser::rIntegralDeclaration 1  token: "
+            << static_cast<char>(lex.LookAhead(0)) << "\n";
   #endif
 
   if(!optCvQualify(cv_q))
@@ -3901,7 +3902,7 @@ bool Parser::rOperatorName(irept &name)
   case '<':
   case '>':
   case ',':
-    operator_id=irep_idt(std::string(char(t), 1));
+    operator_id=irep_idt(std::string(static_cast<char>(t), 1));
     break;
 
   case TOK_MULTASSIGN: operator_id="*="; break;

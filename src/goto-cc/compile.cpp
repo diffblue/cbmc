@@ -250,7 +250,7 @@ bool compilet::add_input_file(const std::string &file_name)
       {
         if(ch!='\n')
         {
-          line+=(char)ch;
+          line+=static_cast<char>(ch);
         }
         else
         {
