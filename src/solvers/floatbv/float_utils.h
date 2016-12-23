@@ -56,7 +56,7 @@ public:
         round_to_zero=const_literal(true);
         break;
 
-      default:;
+      default: assert(false);
       }
     }
   };
