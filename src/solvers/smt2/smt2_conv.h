@@ -233,13 +233,13 @@ protected:
       exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
 
-    inline const irep_idt &get_identifier() const
+    const irep_idt &get_identifier() const
     {
       return get(ID_identifier);
     }
   };
 
-  inline const smt2_symbolt &to_smt2_symbol(const exprt &expr)
+  const smt2_symbolt &to_smt2_symbol(const exprt &expr)
   {
     assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);

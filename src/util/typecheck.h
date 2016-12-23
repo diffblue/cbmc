@@ -38,21 +38,21 @@ public:
 
   virtual ~typecheckt() { }
 
-  inline mstreamt &error()
+  mstreamt &error()
   {
     error_found=true;
     return messaget::error();
   }
 
   // not pretty, but makes transition easier
-  inline void err_location(const exprt &src)
+  void err_location(const exprt &src)
   {
     error().source_location=src.find_source_location();
   }
 
   bool error_found;
 
-  inline bool get_error_found() const
+  bool get_error_found() const
   {
     return error_found;
   }

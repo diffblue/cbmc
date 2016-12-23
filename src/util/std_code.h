@@ -18,22 +18,22 @@ Author: Daniel Kroening, kroening@kroening.com
 class codet:public exprt
 {
 public:
-  inline codet():exprt(ID_code, typet(ID_code))
+  codet():exprt(ID_code, typet(ID_code))
   {
   }
 
-  inline explicit codet(const irep_idt &statement):
+  explicit codet(const irep_idt &statement):
     exprt(ID_code, typet(ID_code))
   {
     set_statement(statement);
   }
 
-  inline void set_statement(const irep_idt &statement)
+  void set_statement(const irep_idt &statement)
   {
     set(ID_statement, statement);
   }
 
-  inline const irep_idt &get_statement() const
+  const irep_idt &get_statement() const
   {
     return get(ID_statement);
   }
@@ -62,7 +62,7 @@ inline codet &to_code(exprt &expr)
 class code_blockt:public codet
 {
 public:
-  inline code_blockt():codet(ID_block)
+  code_blockt():codet(ID_block)
   {
   }
 
@@ -77,7 +77,7 @@ public:
       o.push_back(*it);
   }
 
-  inline void add(const codet &code)
+  void add(const codet &code)
   {
     copy_to_operands(code);
   }
@@ -141,32 +141,32 @@ public:
 class code_assignt:public codet
 {
 public:
-  inline code_assignt():codet(ID_assign)
+  code_assignt():codet(ID_assign)
   {
     operands().resize(2);
   }
 
-  inline code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
+  code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
   {
     copy_to_operands(lhs, rhs);
   }
 
-  inline exprt &lhs()
+  exprt &lhs()
   {
     return op0();
   }
 
-  inline exprt &rhs()
+  exprt &rhs()
   {
     return op1();
   }
 
-  inline const exprt &lhs() const
+  const exprt &lhs() const
   {
     return op0();
   }
 
-  inline const exprt &rhs() const
+  const exprt &rhs() const
   {
     return op1();
   }
@@ -189,22 +189,22 @@ inline code_assignt &to_code_assign(codet &code)
 class code_declt:public codet
 {
 public:
-  inline code_declt():codet(ID_decl)
+  code_declt():codet(ID_decl)
   {
     operands().resize(1);
   }
 
-  inline explicit code_declt(const exprt &symbol):codet(ID_decl)
+  explicit code_declt(const exprt &symbol):codet(ID_decl)
   {
     copy_to_operands(symbol);
   }
 
-  inline exprt &symbol()
+  exprt &symbol()
   {
     return op0();
   }
 
-  inline const exprt &symbol() const
+  const exprt &symbol() const
   {
     return op0();
   }
@@ -231,22 +231,22 @@ inline code_declt &to_code_decl(codet &code)
 class code_deadt:public codet
 {
 public:
-  inline code_deadt():codet(ID_dead)
+  code_deadt():codet(ID_dead)
   {
     operands().resize(1);
   }
 
-  inline explicit code_deadt(const exprt &symbol):codet(ID_dead)
+  explicit code_deadt(const exprt &symbol):codet(ID_dead)
   {
     copy_to_operands(symbol);
   }
 
-  inline exprt &symbol()
+  exprt &symbol()
   {
     return op0();
   }
 
-  inline const exprt &symbol() const
+  const exprt &symbol() const
   {
     return op0();
   }
@@ -271,22 +271,22 @@ inline code_deadt &to_code_dead(codet &code)
 class code_assumet:public codet
 {
 public:
-  inline code_assumet():codet(ID_assume)
+  code_assumet():codet(ID_assume)
   {
     operands().resize(1);
   }
 
-  inline explicit code_assumet(const exprt &expr):codet(ID_assume)
+  explicit code_assumet(const exprt &expr):codet(ID_assume)
   {
     copy_to_operands(expr);
   }
 
-  inline const exprt &assumption() const
+  const exprt &assumption() const
   {
     return op0();
   }
 
-  inline exprt &assumption()
+  exprt &assumption()
   {
     return op0();
   }
@@ -309,22 +309,22 @@ inline code_assumet &to_code_assume(codet &code)
 class code_assertt:public codet
 {
 public:
-  inline code_assertt():codet(ID_assert)
+  code_assertt():codet(ID_assert)
   {
     operands().resize(1);
   }
 
-  inline explicit code_assertt(const exprt &expr):codet(ID_assert)
+  explicit code_assertt(const exprt &expr):codet(ID_assert)
   {
     copy_to_operands(expr);
   }
 
-  inline const exprt &assertion() const
+  const exprt &assertion() const
   {
     return op0();
   }
 
-  inline exprt &assertion()
+  exprt &assertion()
   {
     return op0();
   }
@@ -347,44 +347,44 @@ inline code_assertt &to_code_assert(codet &code)
 class code_ifthenelset:public codet
 {
 public:
-  inline code_ifthenelset():codet(ID_ifthenelse)
+  code_ifthenelset():codet(ID_ifthenelse)
   {
     operands().resize(3);
     op1().make_nil();
     op2().make_nil();
   }
 
-  inline const exprt &cond() const
+  const exprt &cond() const
   {
     return op0();
   }
 
-  inline exprt &cond()
+  exprt &cond()
   {
     return op0();
   }
 
-  inline const codet &then_case() const
+  const codet &then_case() const
   {
     return static_cast<const codet &>(op1());
   }
 
-  inline bool has_else_case() const
+  bool has_else_case() const
   {
     return op2().is_not_nil();
   }
 
-  inline const codet &else_case() const
+  const codet &else_case() const
   {
     return static_cast<const codet &>(op2());
   }
 
-  inline codet &then_case()
+  codet &then_case()
   {
     return static_cast<codet &>(op1());
   }
 
-  inline codet &else_case()
+  codet &else_case()
   {
     return static_cast<codet &>(op2());
   }
@@ -409,27 +409,27 @@ inline code_ifthenelset &to_code_ifthenelse(codet &code)
 class code_switcht:public codet
 {
 public:
-  inline code_switcht():codet(ID_switch)
+  code_switcht():codet(ID_switch)
   {
     operands().resize(2);
   }
 
-  inline const exprt &value() const
+  const exprt &value() const
   {
     return op0();
   }
 
-  inline exprt &value()
+  exprt &value()
   {
     return op0();
   }
 
-  inline const codet &body() const
+  const codet &body() const
   {
     return to_code(op1());
   }
 
-  inline codet &body()
+  codet &body()
   {
     return static_cast<codet &>(op1());
   }
@@ -454,27 +454,27 @@ inline code_switcht &to_code_switch(codet &code)
 class code_whilet:public codet
 {
 public:
-  inline code_whilet():codet(ID_while)
+  code_whilet():codet(ID_while)
   {
     operands().resize(2);
   }
 
-  inline const exprt &cond() const
+  const exprt &cond() const
   {
     return op0();
   }
 
-  inline exprt &cond()
+  exprt &cond()
   {
     return op0();
   }
 
-  inline const codet &body() const
+  const codet &body() const
   {
     return to_code(op1());
   }
 
-  inline codet &body()
+  codet &body()
   {
     return static_cast<codet &>(op1());
   }
@@ -499,27 +499,27 @@ inline code_whilet &to_code_while(codet &code)
 class code_dowhilet:public codet
 {
 public:
-  inline code_dowhilet():codet(ID_dowhile)
+  code_dowhilet():codet(ID_dowhile)
   {
     operands().resize(2);
   }
 
-  inline const exprt &cond() const
+  const exprt &cond() const
   {
     return op0();
   }
 
-  inline exprt &cond()
+  exprt &cond()
   {
     return op0();
   }
 
-  inline const codet &body() const
+  const codet &body() const
   {
     return to_code(op1());
   }
 
-  inline codet &body()
+  codet &body()
   {
     return static_cast<codet &>(op1());
   }
@@ -544,48 +544,48 @@ inline code_dowhilet &to_code_dowhile(codet &code)
 class code_fort:public codet
 {
 public:
-  inline code_fort():codet(ID_for)
+  code_fort():codet(ID_for)
   {
     operands().resize(4);
   }
 
   // nil or a statement
-  inline const exprt &init() const
+  const exprt &init() const
   {
     return op0();
   }
 
-  inline exprt &init()
+  exprt &init()
   {
     return op0();
   }
 
-  inline const exprt &cond() const
+  const exprt &cond() const
   {
     return op1();
   }
 
-  inline exprt &cond()
+  exprt &cond()
   {
     return op1();
   }
 
-  inline const exprt &iter() const
+  const exprt &iter() const
   {
     return op2();
   }
 
-  inline exprt &iter()
+  exprt &iter()
   {
     return op2();
   }
 
-  inline const codet &body() const
+  const codet &body() const
   {
     return to_code(op3());
   }
 
-  inline codet &body()
+  codet &body()
   {
     return static_cast<codet &>(op3());
   }
@@ -610,11 +610,11 @@ inline code_fort &to_code_for(codet &code)
 class code_gotot:public codet
 {
 public:
-  inline code_gotot():codet(ID_goto)
+  code_gotot():codet(ID_goto)
   {
   }
 
-  explicit inline code_gotot(const irep_idt &label):codet(ID_goto)
+  explicit code_gotot(const irep_idt &label):codet(ID_goto)
   {
     set_destination(label);
   }
@@ -654,41 +654,41 @@ inline code_gotot &to_code_goto(codet &code)
 class code_function_callt:public codet
 {
 public:
-  inline code_function_callt():codet(ID_function_call)
+  code_function_callt():codet(ID_function_call)
   {
     operands().resize(3);
     lhs().make_nil();
     op2().id(ID_arguments);
   }
 
-  inline exprt &lhs()
+  exprt &lhs()
   {
     return op0();
   }
 
-  inline const exprt &lhs() const
+  const exprt &lhs() const
   {
     return op0();
   }
 
-  inline exprt &function()
+  exprt &function()
   {
     return op1();
   }
 
-  inline const exprt &function() const
+  const exprt &function() const
   {
     return op1();
   }
 
   typedef exprt::operandst argumentst;
 
-  inline argumentst &arguments()
+  argumentst &arguments()
   {
     return op2().operands();
   }
 
-  inline const argumentst &arguments() const
+  const argumentst &arguments() const
   {
     return op2().operands();
   }
@@ -711,28 +711,28 @@ inline code_function_callt &to_code_function_call(codet &code)
 class code_returnt:public codet
 {
 public:
-  inline code_returnt():codet(ID_return)
+  code_returnt():codet(ID_return)
   {
     operands().resize(1);
     op0().make_nil();
   }
 
-  explicit inline code_returnt(const exprt &_op):codet(ID_return)
+  explicit code_returnt(const exprt &_op):codet(ID_return)
   {
     copy_to_operands(_op);
   }
 
-  inline const exprt &return_value() const
+  const exprt &return_value() const
   {
     return op0();
   }
 
-  inline exprt &return_value()
+  exprt &return_value()
   {
     return op0();
   }
 
-  inline bool has_return_value() const
+  bool has_return_value() const
   {
     if(operands().empty())
       return false; // backwards compatibility
@@ -757,18 +757,18 @@ inline code_returnt &to_code_return(codet &code)
 class code_labelt:public codet
 {
 public:
-  inline code_labelt():codet(ID_label)
+  code_labelt():codet(ID_label)
   {
     operands().resize(1);
   }
 
-  explicit inline code_labelt(const irep_idt &_label):codet(ID_label)
+  explicit code_labelt(const irep_idt &_label):codet(ID_label)
   {
     operands().resize(1);
     set_label(_label);
   }
 
-  inline code_labelt(
+  code_labelt(
     const irep_idt &_label, const codet &_code):codet(ID_label)
   {
     operands().resize(1);
@@ -776,12 +776,12 @@ public:
     code()=_code;
   }
 
-  inline const irep_idt &get_label() const
+  const irep_idt &get_label() const
   {
     return get(ID_label);
   }
 
-  inline void set_label(const irep_idt &label)
+  void set_label(const irep_idt &label)
   {
     set(ID_label, label);
   }
@@ -814,33 +814,33 @@ inline code_labelt &to_code_label(codet &code)
 class code_switch_caset:public codet
 {
 public:
-  inline code_switch_caset():codet(ID_switch_case)
+  code_switch_caset():codet(ID_switch_case)
   {
     operands().resize(2);
   }
 
-  inline code_switch_caset(
+  code_switch_caset(
     const exprt &_case_op, const codet &_code):codet(ID_switch_case)
   {
     copy_to_operands(_case_op, _code);
   }
 
-  inline bool is_default() const
+  bool is_default() const
   {
     return get_bool(ID_default);
   }
 
-  inline void set_default()
+  void set_default()
   {
     return set(ID_default, true);
   }
 
-  inline const exprt &case_op() const
+  const exprt &case_op() const
   {
     return op0();
   }
 
-  inline exprt &case_op()
+  exprt &case_op()
   {
     return op0();
   }
@@ -873,7 +873,7 @@ inline code_switch_caset &to_code_switch_case(codet &code)
 class code_breakt:public codet
 {
 public:
-  inline code_breakt():codet(ID_break)
+  code_breakt():codet(ID_break)
   {
   }
 };
@@ -895,7 +895,7 @@ inline code_breakt &to_code_break(codet &code)
 class code_continuet:public codet
 {
 public:
-  inline code_continuet():codet(ID_continue)
+  code_continuet():codet(ID_continue)
   {
   }
 };
@@ -917,21 +917,21 @@ inline code_continuet &to_code_continue(codet &code)
 class code_asmt:public codet
 {
 public:
-  inline code_asmt():codet(ID_asm)
+  code_asmt():codet(ID_asm)
   {
   }
 
-  inline explicit code_asmt(const exprt &expr):codet(ID_asm)
+  explicit code_asmt(const exprt &expr):codet(ID_asm)
   {
     copy_to_operands(expr);
   }
 
-  inline const irep_idt &get_flavor() const
+  const irep_idt &get_flavor() const
   {
     return get(ID_flavor);
   }
 
-  inline void set_flavor(const irep_idt &f)
+  void set_flavor(const irep_idt &f)
   {
     set(ID_flavor, f);
   }
@@ -954,22 +954,22 @@ inline const code_asmt &to_code_asm(const codet &code)
 class code_expressiont:public codet
 {
 public:
-  inline code_expressiont():codet(ID_expression)
+  code_expressiont():codet(ID_expression)
   {
     operands().resize(1);
   }
 
-  inline explicit code_expressiont(const exprt &expr):codet(ID_expression)
+  explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
     copy_to_operands(expr);
   }
 
-  inline const exprt &expression() const
+  const exprt &expression() const
   {
     return op0();
   }
 
-  inline exprt &expression()
+  exprt &expression()
   {
     return op0();
   }
@@ -994,24 +994,24 @@ inline const code_expressiont &to_code_expression(const codet &code)
 class side_effect_exprt:public exprt
 {
 public:
-  inline explicit side_effect_exprt(const irep_idt &statement):
+  explicit side_effect_exprt(const irep_idt &statement):
     exprt(ID_side_effect)
   {
     set_statement(statement);
   }
 
-  inline side_effect_exprt(const irep_idt &statement, const typet &_type):
+  side_effect_exprt(const irep_idt &statement, const typet &_type):
     exprt(ID_side_effect, _type)
   {
     set_statement(statement);
   }
 
-  inline const irep_idt &get_statement() const
+  const irep_idt &get_statement() const
   {
     return get(ID_statement);
   }
 
-  inline void set_statement(const irep_idt &statement)
+  void set_statement(const irep_idt &statement)
   {
     return set(ID_statement, statement);
   }
@@ -1034,11 +1034,11 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  inline side_effect_expr_nondett():side_effect_exprt(ID_nondet)
+  side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
   }
 
-  inline explicit side_effect_expr_nondett(const typet &_type):
+  explicit side_effect_expr_nondett(const typet &_type):
     side_effect_exprt(ID_nondet, _type)
   {
   }
@@ -1049,28 +1049,28 @@ public:
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
-  inline side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
+  side_effect_expr_function_callt():side_effect_exprt(ID_function_call)
   {
     operands().resize(2);
     op1().id(ID_arguments);
   }
 
-  inline exprt &function()
+  exprt &function()
   {
     return op0();
   }
 
-  inline const exprt &function() const
+  const exprt &function() const
   {
     return op0();
   }
 
-  inline exprt::operandst &arguments()
+  exprt::operandst &arguments()
   {
     return op1().operands();
   }
 
-  inline const exprt::operandst &arguments() const
+  const exprt::operandst &arguments() const
   {
     return op1().operands();
   }
@@ -1097,11 +1097,11 @@ inline const side_effect_expr_function_callt
 class side_effect_expr_throwt:public side_effect_exprt
 {
 public:
-  inline side_effect_expr_throwt():side_effect_exprt(ID_throw)
+  side_effect_expr_throwt():side_effect_exprt(ID_throw)
   {
   }
 
-  inline explicit side_effect_expr_throwt(const irept &exception_list):
+  explicit side_effect_expr_throwt(const irept &exception_list):
     side_effect_exprt(ID_throw)
   {
     set(ID_exception_list, exception_list);
@@ -1128,7 +1128,7 @@ inline const side_effect_expr_throwt &to_side_effect_expr_throw(
 class code_try_catcht:public codet
 {
 public:
-  inline code_try_catcht():codet(ID_try_catch)
+  code_try_catcht():codet(ID_try_catch)
   {
     operands().resize(1);
   }

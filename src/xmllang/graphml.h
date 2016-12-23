@@ -40,7 +40,7 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
 class graphmlt:public grapht<xml_graph_nodet>
 {
 public:
-  inline bool has_node(const std::string &node_name) const
+  bool has_node(const std::string &node_name) const
   {
     for(const auto &n : nodes)
       if(n.node_name==node_name)

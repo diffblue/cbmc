@@ -16,20 +16,20 @@ Author: Daniel Kroening, kroening@kroening.com
 class literal_exprt:public predicate_exprt
 {
 public:
-  inline explicit literal_exprt(literalt a):
+  explicit literal_exprt(literalt a):
     predicate_exprt(ID_literal)
   {
     set_literal(a);
   }
 
-  inline literalt get_literal() const
+  literalt get_literal() const
   {
     literalt result;
     result.set(literalt::var_not(get_long_long(ID_literal)));
     return result;
   }
 
-  inline void set_literal(literalt a)
+  void set_literal(literalt a)
   {
     set(ID_literal, a.get());
   }

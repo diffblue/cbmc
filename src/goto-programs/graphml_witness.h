@@ -26,7 +26,7 @@ public:
   void operator()(const goto_tracet &goto_trace);
   void operator()(const symex_target_equationt &equation);
 
-  inline const graphmlt &graph()
+  const graphmlt &graph()
   {
     return graphml;
   }

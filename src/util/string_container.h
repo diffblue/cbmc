@@ -20,7 +20,7 @@ struct string_ptrt
   const char *s;
   size_t len;
 
-  inline const char *c_str() const
+  const char *c_str() const
   {
     return s;
   }
@@ -44,12 +44,12 @@ public:
 class string_containert
 {
 public:
-  inline unsigned operator[](const char *s)
+  unsigned operator[](const char *s)
   {
     return get(s);
   }
 
-  inline unsigned operator[](const std::string &s)
+  unsigned operator[](const std::string &s)
   {
     return get(s);
   }
@@ -59,13 +59,13 @@ public:
   ~string_containert();
 
   // the pointer is guaranteed to be stable
-  inline const char *c_str(size_t no) const
+  const char *c_str(size_t no) const
   {
     return string_vector[no]->c_str();
   }
 
   // the reference is guaranteed to be stable
-  inline const std::string &get_string(size_t no) const
+  const std::string &get_string(size_t no) const
   {
     return *string_vector[no];
   }

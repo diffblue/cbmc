@@ -35,7 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class patternt
 {
 public:
-  explicit inline patternt(const char *_p):p(_p)
+  explicit patternt(const char *_p):p(_p)
   {
   }
 

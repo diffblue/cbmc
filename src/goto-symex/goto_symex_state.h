@@ -273,33 +273,33 @@ public:
 
   typedef std::vector<framet> call_stackt;
 
-  inline call_stackt &call_stack()
+  call_stackt &call_stack()
   {
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
 
-  inline const call_stackt &call_stack() const
+  const call_stackt &call_stack() const
   {
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
 
-  inline framet &top()
+  framet &top()
   {
     assert(!call_stack().empty());
     return call_stack().back();
   }
 
-  inline const framet &top() const
+  const framet &top() const
   {
     assert(!call_stack().empty());
     return call_stack().back();
   }
 
-  inline framet &new_frame() { call_stack().push_back(framet()); return top(); }
-  inline void pop_frame() { call_stack().pop_back(); }
-  inline const framet &previous_frame() { return *(--(--call_stack().end())); }
+  framet &new_frame() { call_stack().push_back(framet()); return top(); }
+  void pop_frame() { call_stack().pop_back(); }
+  const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   // threads
   unsigned atomic_section_id;

@@ -39,7 +39,7 @@ public:
     return (result.first)->second;
   }
 
-  inline number_type operator()(const T &a)
+  number_type operator()(const T &a)
   {
     return number(a);
   }

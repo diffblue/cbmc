@@ -105,7 +105,7 @@ public:
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
   virtual unsigned get_max(const std::string &prefix) const;
 
-  inline void add(const symbol_tablet &symbol_table)
+  void add(const symbol_tablet &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);
   }

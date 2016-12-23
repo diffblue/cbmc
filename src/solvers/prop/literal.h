@@ -29,34 +29,34 @@ public:
   typedef unsigned var_not;
 
   // constructors
-  inline literalt()
+  literalt()
   {
     set(unused_var_no(), false);
   }
 
-  inline literalt(var_not v, bool sign)
+  literalt(var_not v, bool sign)
   {
     set(v, sign);
   }
 
-  inline bool operator==(const literalt other) const
+  bool operator==(const literalt other) const
   {
     return l==other.l;
   }
 
-  inline bool operator!=(const literalt other) const
+  bool operator!=(const literalt other) const
   {
     return l!=other.l;
   }
 
   // for sets
-  inline bool operator<(const literalt other) const
+  bool operator<(const literalt other) const
   {
     return l<other.l;
   }
 
   // negates if 'b' is true
-  inline literalt operator^(const bool b) const
+  literalt operator^(const bool b) const
   {
     literalt result(*this);
     result.l^=(var_not)b;
@@ -64,46 +64,46 @@ public:
   }
 
   // negates the literal
-  inline literalt operator!() const
+  literalt operator!() const
   {
     literalt result(*this);
     result.invert();
     return result;
   }
 
-  inline literalt operator^=(const bool a)
+  literalt operator^=(const bool a)
   {
     // we use the least significant bit to store the sign
     l^=(var_not)a;
     return *this;
   }
 
-  inline var_not var_no() const
+  var_not var_no() const
   {
     return l>>1;
   }
 
-  inline bool sign() const
+  bool sign() const
   {
     return l&1;
   }
 
-  inline void set(var_not _l)
+  void set(var_not _l)
   {
     l=_l;
   }
 
-  inline void set(var_not v, bool sign)
+  void set(var_not v, bool sign)
   {
     l=(v<<1)|((var_not)sign);
   }
 
-  inline var_not get() const
+  var_not get() const
   {
     return l;
   }
 
-  inline void invert()
+  void invert()
   {
     l^=(var_not)1;
   }
@@ -129,38 +129,38 @@ public:
     set(d, sign);
   }
 
-  inline void clear()
+  void clear()
   {
     l=0;
   }
 
-  inline void swap(literalt &x)
+  void swap(literalt &x)
   {
     std::swap(x.l, l);
   }
 
   // constants
-  inline void make_true()
+  void make_true()
   {
     set(const_var_no(), true);
   }
 
-  inline void make_false()
+  void make_false()
   {
     set(const_var_no(), false);
   }
 
-  inline bool is_true() const
+  bool is_true() const
   {
     return is_constant() && sign();
   }
 
-  inline bool is_false() const
+  bool is_false() const
   {
     return is_constant() && !sign();
   }
 
-  inline bool is_constant() const
+  bool is_constant() const
   {
     return var_no()==const_var_no();
   }

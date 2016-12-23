@@ -97,7 +97,7 @@ protected:
     jumpst &jumps,
     const cfg_post_dominatorst &cfg_post_dominators);
 
-  inline void add_to_queue(
+  void add_to_queue(
     queuet &queue,
     const cfgt::entryt &entry,
     goto_programt::const_targett reason)

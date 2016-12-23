@@ -154,12 +154,12 @@ public:
 
   bool inside_atomic_section;
 
-  inline unsigned get_current_thread() const
+  unsigned get_current_thread() const
   {
     return current_thread;
   }
 
-  inline void set_current_thread(unsigned _thread)
+  void set_current_thread(unsigned _thread)
   {
     current_thread=_thread;
   }
@@ -167,30 +167,30 @@ public:
   goto_programt::const_targett get_instruction() const;
 
   // branch taken case
-  inline void record_true_branch()
+  void record_true_branch()
   {
     branches.push_back(true);
   }
 
   // branch not taken case
-  inline void record_false_branch()
+  void record_false_branch()
   {
     branches.push_back(false);
   }
 
-  inline bool is_lazy() const
+  bool is_lazy() const
   {
     return branches_restore < branches.size();
   }
 
   // returns branch direction that should be taken
-  inline bool restore_branch()
+  bool restore_branch()
   {
     assert(is_lazy());
     return branches[branches_restore++];
   }
 
-  inline bool is_executable() const
+  bool is_executable() const
   {
     return !threads.empty() &&
            threads[current_thread].active;
@@ -207,28 +207,28 @@ public:
 
   // various state transformers
 
-  inline threadt &add_thread()
+  threadt &add_thread()
   {
     threads.resize(threads.size()+1);
     return threads.back();
   }
 
-  inline void disable_current_thread()
+  void disable_current_thread()
   {
     threads[current_thread].active=false;
   }
 
-  inline loc_reft pc() const
+  loc_reft pc() const
   {
     return threads[current_thread].pc;
   }
 
-  inline void next_pc()
+  void next_pc()
   {
     threads[current_thread].pc.increase();
   }
 
-  inline void set_pc(loc_reft new_pc)
+  void set_pc(loc_reft new_pc)
   {
     threads[current_thread].pc=new_pc;
   }
@@ -238,13 +238,13 @@ public:
   void output(const threadt &thread, std::ostream &out) const;
 
   // instantiate expressions with propagation
-  inline exprt read(const exprt &src)
+  exprt read(const exprt &src)
   {
     return read(src, true);
   }
 
   // instantiate without constant propagation
-  inline exprt read_no_propagate(const exprt &src)
+  exprt read_no_propagate(const exprt &src)
   {
     return read(src, false);
   }
@@ -253,12 +253,12 @@ public:
 
   std::string array_index_as_string(const exprt &) const;
 
-  inline unsigned get_no_thread_interleavings() const
+  unsigned get_no_thread_interleavings() const
   {
     return no_thread_interleavings;
   }
 
-  inline unsigned get_depth() const
+  unsigned get_depth() const
   {
     return depth;
   }

@@ -26,11 +26,11 @@ public:
   {
   }
 
-  inline error_baset()
+  error_baset()
   {
   }
 
-  inline explicit error_baset(const locationt &_location):location(_location)
+  explicit error_baset(const locationt &_location):location(_location)
   {
   }
 

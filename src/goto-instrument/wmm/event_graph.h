@@ -148,13 +148,13 @@ public:
       {
       }
 
-      inline bool operator==(const delayt& other) const
+      bool operator==(const delayt& other) const
       {
         return (is_po ? first==other.first
           : first==other.first&&second==other.second);
       }
 
-      inline bool operator<(const delayt& other) const
+      bool operator<(const delayt& other) const
       {
         return (is_po ? first<other.first
           : first<other.first||(first==other.first&&second<other.second));
@@ -195,7 +195,7 @@ public:
     void print_dot(std::ostream &str,
       unsigned colour, memory_modelt model) const;
 
-    inline bool operator<(const critical_cyclet& other) const
+    bool operator<(const critical_cyclet& other) const
     {
       return ( ((std::list<event_idt>) *this) < (std::list<event_idt>)other);
     }
@@ -302,12 +302,12 @@ protected:
     {
     }
 
-    inline bool filtering(event_idt u)
+    bool filtering(event_idt u)
     {
       return filter.find(u)==filter.end();
     }
 
-    inline std::list<event_idt>* initial_filtering(std::list<event_idt>* order)
+    std::list<event_idt>* initial_filtering(std::list<event_idt>* order)
     {
       static std::list<event_idt> new_order;
 
@@ -383,27 +383,27 @@ public:
     return com_graph.has_edge(i,j);
   }
 
-  inline std::size_t size() const
+  std::size_t size() const
   {
     return po_graph.size();
   }
 
-  inline const wmm_grapht::edgest &po_in(event_idt n) const
+  const wmm_grapht::edgest &po_in(event_idt n) const
   {
     return po_graph.in(n);
   }
 
-  inline const wmm_grapht::edgest &po_out(event_idt n) const
+  const wmm_grapht::edgest &po_out(event_idt n) const
   {
     return po_graph.out(n);
   }
 
-  inline const wmm_grapht::edgest &com_in(event_idt n) const
+  const wmm_grapht::edgest &com_in(event_idt n) const
   {
     return com_graph.in(n);
   }
 
-  inline const wmm_grapht::edgest &com_out(event_idt n) const
+  const wmm_grapht::edgest &com_out(event_idt n) const
   {
     return com_graph.out(n);
   }

@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_minimizet:public messaget
 {
 public:
-  explicit inline prop_minimizet(prop_convt &_prop_conv):
+  explicit prop_minimizet(prop_convt &_prop_conv):
     _number_objectives(0),
     prop_conv(_prop_conv)
   {
@@ -37,17 +37,17 @@ public:
 
   // statistics
 
-  inline std::size_t number_satisfied() const
+  std::size_t number_satisfied() const
   {
     return _number_satisfied;
   }
 
-  inline unsigned iterations() const
+  unsigned iterations() const
   {
     return _iterations;
   }
 
-  inline std::size_t size() const
+  std::size_t size() const
   {
     return _number_objectives;
   }

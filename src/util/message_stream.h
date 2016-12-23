@@ -95,7 +95,7 @@ public:
 
   std::ostringstream str;
 
-  inline std::ostream &error()
+  std::ostream &error()
   {
     return str;
   }

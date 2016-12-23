@@ -44,19 +44,19 @@ public:
     bool merge(const valuest &src);
     bool meet(const valuest &src);
 
-    inline void set_to_bottom()
+    void set_to_bottom()
     {
       replace_const.clear();
       is_bottom = true;
     }
 
-    inline void set_to(const irep_idt &lhs_id, const exprt &rhs_val)
+    void set_to(const irep_idt &lhs_id, const exprt &rhs_val)
     {
       replace_const.expr_map[lhs_id] = rhs_val;
       is_bottom = false;
     }
 
-    inline void set_to(const symbol_exprt &lhs, const exprt &rhs_val)
+    void set_to(const symbol_exprt &lhs, const exprt &rhs_val)
     {
       set_to(lhs.get_identifier(), rhs_val);
     }
@@ -65,12 +65,12 @@ public:
     bool is_constant_address_of(const exprt &expr) const;
     bool set_to_top(const irep_idt &id);
 
-    inline bool set_to_top(const symbol_exprt &expr)
+    bool set_to_top(const symbol_exprt &expr)
     {
       return set_to_top(expr.get_identifier());
     }
 
-    inline void set_to_top()
+    void set_to_top()
     {
       replace_const.clear();
       is_bottom = false;

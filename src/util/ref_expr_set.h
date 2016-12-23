@@ -36,12 +36,12 @@ public:
     return d->expr_set.empty();
   }
 
-  inline const expr_sett &expr_set() const
+  const expr_sett &expr_set() const
   {
     return read().expr_set;
   }
 
-  inline expr_sett &expr_set_write()
+  expr_sett &expr_set_write()
   {
     return write().expr_set;
   }

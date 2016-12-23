@@ -30,7 +30,7 @@ public:
     id=identifier;
   }
 
-  inline bool operator<(const object_idt &other) const
+  bool operator<(const object_idt &other) const
   {
     return id<other.id;
   }

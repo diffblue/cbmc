@@ -87,7 +87,7 @@ public:
   {
   }
 
-  inline void operator()(
+  void operator()(
     const goto_programt &goto_program,
     const namespacet &ns)
   {
@@ -97,7 +97,7 @@ public:
     fixedpoint(goto_program, goto_functions, ns);
   }
 
-  inline void operator()(
+  void operator()(
     const goto_functionst &goto_functions,
     const namespacet &ns)
   {
@@ -106,7 +106,7 @@ public:
     fixedpoint(goto_functions, ns);
   }
 
-  inline void operator()(const goto_modelt &goto_model)
+  void operator()(const goto_modelt &goto_model)
   {
     const namespacet ns(goto_model.symbol_table);
     initialize(goto_model.goto_functions);
@@ -114,7 +114,7 @@ public:
     fixedpoint(goto_model.goto_functions, ns);
   }
 
-  inline void operator()(
+  void operator()(
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
@@ -133,7 +133,7 @@ public:
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
-  inline void output(
+  void output(
     const goto_modelt &goto_model,
     std::ostream &out) const
   {
@@ -141,7 +141,7 @@ public:
     output(ns, goto_model.goto_functions, out);
   }
 
-  inline void output(
+  void output(
     const namespacet &ns,
     const goto_programt &goto_program,
     std::ostream &out) const
@@ -149,7 +149,7 @@ public:
     output(ns, goto_program, "", out);
   }
 
-  inline void output(
+  void output(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function,
     std::ostream &out) const
@@ -254,7 +254,7 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  inline domainT &operator[](locationt l)
+  domainT &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
     if(it==state_map.end())
@@ -263,7 +263,7 @@ public:
     return it->second;
   }
 
-  inline const domainT &operator[](locationt l) const
+  const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end())

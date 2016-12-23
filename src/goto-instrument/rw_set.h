@@ -59,24 +59,24 @@ public:
     std::swap(other.w_entries, w_entries);
   }
 
-  inline rw_set_baset &operator+=(const rw_set_baset &other)
+  rw_set_baset &operator+=(const rw_set_baset &other)
   {
     r_entries.insert(other.r_entries.begin(), other.r_entries.end());
     w_entries.insert(other.w_entries.begin(), other.w_entries.end());
     return *this;
   }
 
-  inline bool empty() const
+  bool empty() const
   {
     return r_entries.empty() && w_entries.empty();
   }
 
-  inline bool has_w_entry(irep_idt object) const
+  bool has_w_entry(irep_idt object) const
   {
     return w_entries.find(object)!=w_entries.end();
   }
 
-  inline bool has_r_entry(irep_idt object) const
+  bool has_r_entry(irep_idt object) const
   {
     return r_entries.find(object)!=r_entries.end();
   }
@@ -112,7 +112,7 @@ class _rw_set_loct:public rw_set_baset
 {
 public:
 #ifdef LOCAL_MAY
-  inline _rw_set_loct(
+  _rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target,
@@ -122,7 +122,7 @@ public:
     target(_target),
     local_may(may)
 #else
-  inline _rw_set_loct(
+  _rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target):
@@ -143,17 +143,17 @@ protected:
   local_may_aliast& local_may;
 #endif
 
-  inline void read(const exprt &expr)
+  void read(const exprt &expr)
   {
     read_write_rec(expr, true, false, "", guardt());
   }
 
-  inline void read(const exprt &expr, const guardt &guard)
+  void read(const exprt &expr, const guardt &guard)
   {
     read_write_rec(expr, true, false, "", guard);
   }
 
-  inline void write(const exprt &expr)
+  void write(const exprt &expr)
   {
     read_write_rec(expr, false, true, "", guardt());
   }
@@ -173,14 +173,14 @@ class rw_set_loct:public _rw_set_loct
 {
 public:
 #ifdef LOCAL_MAY
-  inline rw_set_loct(
+  rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target,
     local_may_aliast &may):
     _rw_set_loct(_ns, _value_sets, _target, may)
 #else
-  inline rw_set_loct(
+  rw_set_loct(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target):
@@ -235,7 +235,7 @@ public:
   std::set<irep_idt> set_reads;
 
 #ifdef LOCAL_MAY
-  inline rw_set_with_trackt(
+  rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target,
@@ -243,7 +243,7 @@ public:
     _rw_set_loct(_ns, _value_sets, _target, may),
     dereferencing(false)
 #else
-  inline rw_set_with_trackt(
+  rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target):

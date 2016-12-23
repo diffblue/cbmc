@@ -16,7 +16,7 @@ template<typename T>
 class reference_counting
 {
 public:
-  inline reference_counting():d(NULL)
+  reference_counting():d(NULL)
   {
   }
 
@@ -26,7 +26,7 @@ public:
   }
 
   // copy constructor
-  inline reference_counting(const reference_counting &other):d(other.d)
+  reference_counting(const reference_counting &other):d(other.d)
   {
     if(d!=NULL)
     {
@@ -38,7 +38,7 @@ public:
     }
   }
 
-  inline reference_counting &operator=(const reference_counting &other)
+  reference_counting &operator=(const reference_counting &other)
   {
     copy_from(other);
     return *this;
@@ -61,13 +61,13 @@ public:
     d=NULL;
   }
 
-  inline const T &read() const
+  const T &read() const
   {
     if(d==NULL) return T::blank;
     return *d;
   }
 
-  inline T &write()
+  T &write()
   {
     detatch();
     return *d;
@@ -104,7 +104,7 @@ protected:
   }
 
 public:
-  inline dt *get_d() const
+  dt *get_d() const
   {
     return d;
   }

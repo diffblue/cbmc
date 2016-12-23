@@ -27,9 +27,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class mini_bddt
 {
 public:
-  inline mini_bddt();
-  inline mini_bddt(const mini_bddt &x);
-  inline ~mini_bddt();
+  mini_bddt();
+  mini_bddt(const mini_bddt &x);
+  ~mini_bddt();
 
   // Boolean operators on BDDs
   mini_bddt operator!() const;
@@ -39,22 +39,22 @@ public:
   mini_bddt operator|(const mini_bddt &) const;
 
   // copy operator
-  inline mini_bddt &operator=(const mini_bddt &);
+  mini_bddt &operator=(const mini_bddt &);
 
-  inline bool is_constant() const;
-  inline bool is_true() const;
-  inline bool is_false() const;
+  bool is_constant() const;
+  bool is_true() const;
+  bool is_false() const;
 
-  inline unsigned var() const;
-  inline const mini_bddt &low() const;
-  inline const mini_bddt &high() const;
-  inline unsigned node_number() const;
-  inline void clear();
+  unsigned var() const;
+  const mini_bddt &low() const;
+  const mini_bddt &high() const;
+  unsigned node_number() const;
+  void clear();
 
   bool is_initialized() const { return node!=0; }
 
   // internal
-  explicit inline mini_bddt(class mini_bdd_nodet *_node);
+  explicit mini_bddt(class mini_bdd_nodet *_node);
   class mini_bdd_nodet *node;
 };
 
@@ -65,12 +65,12 @@ public:
   unsigned var, node_number, reference_counter;
   mini_bddt low, high;
 
-  inline mini_bdd_nodet(
+  mini_bdd_nodet(
     class mini_bdd_mgrt *_mgr,
     unsigned _var, unsigned _node_number,
     const mini_bddt &_low, const mini_bddt &_high);
 
-  inline void add_reference();
+  void add_reference();
   void remove_reference();
 };
 
@@ -89,20 +89,20 @@ public:
     bool node_numbers=true) const;
   void DumpTable(std::ostream &out) const;
 
-  inline const mini_bddt &True() const;
-  inline const mini_bddt &False() const;
+  const mini_bddt &True() const;
+  const mini_bddt &False() const;
 
   friend class mini_bdd_nodet;
 
   // create a node (consulting the reverse-map)
   mini_bddt mk(unsigned var, const mini_bddt &low, const mini_bddt &high);
 
-  inline std::size_t number_of_nodes();
+  std::size_t number_of_nodes();
 
   struct var_table_entryt
   {
     std::string label;
-    explicit inline var_table_entryt(const std::string &_label);
+    explicit var_table_entryt(const std::string &_label);
   };
 
   typedef std::vector<var_table_entryt> var_tablet;
@@ -117,7 +117,7 @@ protected:
   struct reverse_keyt
   {
     unsigned var, low, high;
-    inline reverse_keyt(
+    reverse_keyt(
       unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
 
     bool operator<(const reverse_keyt &other) const;

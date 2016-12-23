@@ -16,24 +16,24 @@ class loc_reft
 public:
   unsigned loc_number;
 
-  inline loc_reft next_loc() const
+  loc_reft next_loc() const
   {
     loc_reft tmp=*this;
     tmp.increase();
     return tmp;
   }
 
-  inline void increase()
+  void increase()
   {
     loc_number++;
   }
 
-  inline void decrease()
+  void decrease()
   {
     loc_number--;
   }
 
-  inline bool is_nil() const
+  bool is_nil() const
   {
     return loc_number==nil().loc_number;
   }
@@ -47,13 +47,13 @@ public:
     return loc_reft();
   }
 
-  inline loc_reft &operator++() // this is pre-increment
+  loc_reft &operator++() // this is pre-increment
   {
     increase();
     return *this;
   }
 
-  inline loc_reft &operator--() // this is pre-decrement
+  loc_reft &operator--() // this is pre-decrement
   {
     decrease();
     return *this;

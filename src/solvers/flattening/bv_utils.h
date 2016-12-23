@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_utilst
 {
 public:
-  explicit inline bv_utilst(propt &_prop):prop(_prop) { }
+  explicit bv_utilst(propt &_prop):prop(_prop) { }
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 

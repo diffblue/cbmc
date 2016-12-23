@@ -70,17 +70,17 @@ public:
 
   void assume(const exprt &, const namespacet &);
 
-  inline static bool is_int(const typet &src)
+  static bool is_int(const typet &src)
   {
     return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
   }
 
-  inline static bool is_float(const typet &src)
+  static bool is_float(const typet &src)
   {
     return src.id()==ID_floatbv;
   }
 
-  inline bool is_bottom() const
+  bool is_bottom() const
   {
     return bottom;
   }

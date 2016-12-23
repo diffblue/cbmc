@@ -131,7 +131,7 @@ public:
 
   irep_idt mode;
 
-  inline void clear()
+  void clear()
   {
     mode.clear();
     steps.clear();
@@ -143,13 +143,13 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
-  inline void swap(goto_tracet &other)
+  void swap(goto_tracet &other)
   {
     other.steps.swap(steps);
     other.mode.swap(mode);
   }
 
-  inline void add_step(const goto_trace_stept &step)
+  void add_step(const goto_trace_stept &step)
   {
     steps.push_back(step);
   }

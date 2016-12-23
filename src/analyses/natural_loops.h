@@ -29,23 +29,23 @@ public:
 
   loop_mapt loop_map;
 
-  inline void operator()(P &program)
+  void operator()(P &program)
   {
     compute(program);
   }
 
   void output(std::ostream &) const;
 
-  inline const cfg_dominators_templatet<P, T, false>& get_dominator_info() const
+  const cfg_dominators_templatet<P, T, false>& get_dominator_info() const
   {
     return cfg_dominators;
   }
 
-  inline natural_loops_templatet()
+  natural_loops_templatet()
   {
   }
 
-  explicit inline natural_loops_templatet(P &program)
+  explicit natural_loops_templatet(P &program)
   {
     compute(program);
   }

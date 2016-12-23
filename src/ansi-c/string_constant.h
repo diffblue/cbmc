@@ -20,7 +20,7 @@ public:
 
   void set_value(const irep_idt &value);
 
-  inline const irep_idt &get_value() const
+  const irep_idt &get_value() const
   {
     return get(ID_value);
   }

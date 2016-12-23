@@ -272,7 +272,7 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  inline T &operator[](locationt l)
+  T &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
     if(it==state_map.end())
@@ -281,7 +281,7 @@ public:
     return it->second;
   }
 
-  inline const T &operator[](locationt l) const
+  const T &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
     if(it==state_map.end())

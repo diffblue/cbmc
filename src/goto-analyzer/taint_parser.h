@@ -25,17 +25,17 @@ public:
     enum { SOURCE, SINK, SANITIZER } kind;
     enum { THIS, PARAMETER, RETURN_VALUE } where;
 
-    inline bool is_source() const
+    bool is_source() const
     {
       return kind==SOURCE;
     }
 
-    inline bool is_sink() const
+    bool is_sink() const
     {
       return kind==SINK;
     }
 
-    inline bool is_sanitizer() const
+    bool is_sanitizer() const
     {
       return kind==SANITIZER;
     }
@@ -48,7 +48,7 @@ public:
 
     void output(std::ostream &) const;
 
-    inline rulet():parameter_number(0)
+    rulet():parameter_number(0)
     {
     }
   };

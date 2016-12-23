@@ -78,7 +78,7 @@ public:
            id_class==NAMESPACE;
   }
 
-  inline bool is_template_scope() const
+  bool is_template_scope() const
   {
     return id_class==TEMPLATE_SCOPE;
   }

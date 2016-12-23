@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_searcht:public safety_checkert
 {
 public:
-  explicit inline path_searcht(const namespacet &_ns):
+  explicit path_searcht(const namespacet &_ns):
     safety_checkert(_ns),
     show_vcc(false),
     eager_infeasibility(false),
@@ -83,14 +83,14 @@ public:
     goto_tracet error_trace;
     source_locationt source_location;
 
-    inline bool is_success() const { return status==SUCCESS; }
-    inline bool is_failure() const { return status==FAILURE; }
-    inline bool is_not_reached() const { return status==NOT_REACHED; }
+    bool is_success() const { return status==SUCCESS; }
+    bool is_failure() const { return status==FAILURE; }
+    bool is_not_reached() const { return status==NOT_REACHED; }
   };
 
-  inline void set_dfs() { search_heuristic=search_heuristict::DFS; }
-  inline void set_bfs() { search_heuristic=search_heuristict::BFS; }
-  inline void set_locs() { search_heuristic=search_heuristict::LOCS; }
+  void set_dfs() { search_heuristic=search_heuristict::DFS; }
+  void set_bfs() { search_heuristic=search_heuristict::BFS; }
+  void set_locs() { search_heuristic=search_heuristict::LOCS; }
 
   typedef std::map<irep_idt, property_entryt> property_mapt;
   property_mapt property_map;

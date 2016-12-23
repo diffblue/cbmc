@@ -237,8 +237,8 @@ public:
     flow_insensitive_analysis_baset::clear();
   }
 
-  inline T& get_data() { return state; }
-  inline const T& get_data() const { return state; }
+  T &get_data() { return state; }
+  const T &get_data() const { return state; }
 
 protected:
   T state; // one global state

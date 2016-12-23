@@ -63,7 +63,7 @@ protected:
   }
 
   // produces an address ID for an event
-  inline irep_idt address(event_it event) const
+  irep_idt address(event_it event) const
   {
     ssa_exprt tmp=event->ssa_lhs;
     tmp.remove_level_2();
@@ -302,7 +302,7 @@ private:
   // map between events and (symbolic) integers
   typet node_type;
   std::map<evtt const*, unsigned> barrier_id;
-  inline symbol_exprt node_symbol(
+  symbol_exprt node_symbol(
       const evtt &evt,
       const std::string &prefix) const;
   std::vector<std::pair<symbol_exprt, symbol_exprt> > atomic_section_bounds[AC_N_AXIOMS];

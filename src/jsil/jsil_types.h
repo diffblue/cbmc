@@ -35,7 +35,7 @@ typet jsil_union(const typet &type1, const typet &type2);
 class jsil_builtin_code_typet:public code_typet
 {
 public:
-  explicit inline jsil_builtin_code_typet(code_typet &code):
+  explicit jsil_builtin_code_typet(code_typet &code):
     code_typet(code)
   {
     set("jsil_builtin_proceduret", true);
@@ -58,7 +58,7 @@ inline bool is_jsil_builtin_code_type(const typet &type)
 class jsil_spec_code_typet:public code_typet
 {
 public:
-  explicit inline jsil_spec_code_typet(code_typet &code):
+  explicit jsil_spec_code_typet(code_typet &code):
     code_typet(code)
   {
     set("jsil_spec_proceduret", true);
@@ -81,9 +81,9 @@ inline bool is_jsil_spec_code_type(const typet &type)
 class jsil_union_typet:public union_typet
 {
 public:
-  inline jsil_union_typet():union_typet() { }
+  jsil_union_typet():union_typet() { }
 
-  explicit inline jsil_union_typet(const typet &type)
+  explicit jsil_union_typet(const typet &type)
     :jsil_union_typet(std::vector<typet>({type})) { }
 
   explicit jsil_union_typet(const std::vector<typet> &types);

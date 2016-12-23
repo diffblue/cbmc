@@ -240,7 +240,7 @@ protected:
 
   virtual void do_initializer(symbolt &symbol);
 
-  inline static bool is_numeric_type(const typet &src)
+  static bool is_numeric_type(const typet &src)
   {
     return src.id()==ID_complex ||
            src.id()==ID_unsignedbv ||

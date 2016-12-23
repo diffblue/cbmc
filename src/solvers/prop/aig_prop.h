@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class aig_prop_baset:public propt
 {
 public:
-  explicit inline aig_prop_baset(aigt &_dest):dest(_dest)
+  explicit aig_prop_baset(aigt &_dest):dest(_dest)
   {
   }
 
@@ -66,7 +66,7 @@ protected:
 class aig_prop_constraintt:public aig_prop_baset
 {
 public:
-  inline explicit aig_prop_constraintt(aig_plus_constraintst &_dest):
+  explicit aig_prop_constraintt(aig_plus_constraintst &_dest):
     aig_prop_baset(_dest),
     dest(_dest)
   {
@@ -89,7 +89,7 @@ public:
 class aig_prop_solvert:public aig_prop_constraintt
 {
 public:
-  explicit inline aig_prop_solvert(propt &_solver):
+  explicit aig_prop_solvert(propt &_solver):
     aig_prop_constraintt(aig),
     solver(_solver)
   {

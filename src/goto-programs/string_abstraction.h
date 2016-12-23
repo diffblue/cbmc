@@ -67,7 +67,7 @@ protected:
     return to_bitvector_type(type).get_width()==config.ansi_c.char_width;
   }
 
-  inline bool is_ptr_string_struct(const typet &type) const;
+  bool is_ptr_string_struct(const typet &type) const;
 
   void make_type(exprt &dest, const typet &type)
   {

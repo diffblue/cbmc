@@ -16,7 +16,7 @@ class cnft:public propt
 public:
   // For CNF, we don't use index 0 as a matter of principle,
   // so we'll start counting variables at 1.
-  inline cnft():_no_variables(1) { }
+  cnft():_no_variables(1) { }
   virtual ~cnft() { }
 
   virtual literalt land(literalt a, literalt b) override;

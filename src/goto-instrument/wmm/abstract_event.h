@@ -78,18 +78,20 @@ public:
     local=other.local;
   }
 
-  inline bool operator==(const abstract_eventt& other) const
+  bool operator==(const abstract_eventt& other) const
   {
     return (id == other.id);
   }
 
-  inline bool operator<(const abstract_eventt& other) const
+  bool operator<(const abstract_eventt& other) const
   {
     return (id < other.id);
   }
 
-  inline bool is_fence() const {
-    return operation==Fence || operation==Lwfence || operation==ASMfence;}
+  bool is_fence() const
+  {
+    return operation==Fence || operation==Lwfence || operation==ASMfence;
+  }
 
   /* checks the safety of the pair locally (i.e., w/o taking fences
      or dependencies into account -- use is_unsafe on the whole

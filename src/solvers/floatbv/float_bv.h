@@ -25,7 +25,7 @@ public:
   {
   }
 
-  inline exprt operator()(const exprt &src)
+  exprt operator()(const exprt &src)
   {
     return convert(src);
   }

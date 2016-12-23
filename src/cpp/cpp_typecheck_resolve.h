@@ -148,7 +148,7 @@ protected:
     {
     }
 
-    inline bool operator<(const matcht &other) const
+    bool operator<(const matcht &other) const
     {
       return cost<other.cost;
     }

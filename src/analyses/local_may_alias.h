@@ -99,11 +99,11 @@ protected:
 class local_may_alias_factoryt
 {
 public:
-  inline local_may_alias_factoryt():goto_functions(NULL)
+  local_may_alias_factoryt():goto_functions(NULL)
   {
   }
 
-  inline void operator()(const goto_functionst &_goto_functions)
+  void operator()(const goto_functionst &_goto_functions)
   {
     goto_functions=&_goto_functions;
 

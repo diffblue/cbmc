@@ -21,12 +21,12 @@ public:
 
   virtual ~ui_message_handlert();
 
-  inline uit get_ui() const
+  uit get_ui() const
   {
     return _ui;
   }
 
-  inline void set_ui(uit __ui)
+  void set_ui(uit __ui)
   {
     _ui=__ui;
   }

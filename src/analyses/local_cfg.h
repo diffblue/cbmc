@@ -40,7 +40,7 @@ public:
   typedef std::vector<nodet> nodest;
   nodest nodes;
 
-  inline explicit local_cfgt(const goto_programt &_goto_program)
+  explicit local_cfgt(const goto_programt &_goto_program)
   {
     build(_goto_program);
   }

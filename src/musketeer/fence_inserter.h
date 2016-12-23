@@ -64,9 +64,11 @@ public:
   /* normal variables used almost everytime */
   std::map<event_idt, edget>& map_to_e;
   std::map<edget, event_idt>& map_from_e;
-  inline event_idt add_edge(const edget& e) { return var.add_edge(e); }
-  inline event_idt add_invisible_edge(const edget& e) {
-    return invisible_var.add_edge(e);}
+  event_idt add_edge(const edget& e) { return var.add_edge(e); }
+  event_idt add_invisible_edge(const edget& e)
+  {
+    return invisible_var.add_edge(e);
+  }
 
   /* number of contraints */
   std::size_t constraints_number;

@@ -64,17 +64,17 @@ public:
     quantifiers.push_back(quantifier);
   }
 
-  inline void add_quantifier(const quantifiert::typet type, const literalt l)
+  void add_quantifier(const quantifiert::typet type, const literalt l)
   {
     add_quantifier(quantifiert(type, l));
   }
 
-  inline void add_existential_quantifier(const literalt l)
+  void add_existential_quantifier(const literalt l)
   {
     add_quantifier(quantifiert(quantifiert::EXISTENTIAL, l));
   }
 
-  inline void add_universal_quantifier(const literalt l)
+  void add_universal_quantifier(const literalt l)
   {
     add_quantifier(quantifiert(quantifiert::UNIVERSAL, l));
   }

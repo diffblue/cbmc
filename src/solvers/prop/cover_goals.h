@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class cover_goalst:public messaget
 {
 public:
-  explicit inline cover_goalst(prop_convt &_prop_conv):
+  explicit cover_goalst(prop_convt &_prop_conv):
     prop_conv(_prop_conv)
   {
   }
@@ -53,24 +53,24 @@ public:
 
   // statistics
 
-  inline std::size_t number_covered() const
+  std::size_t number_covered() const
   {
     return _number_covered;
   }
 
-  inline unsigned iterations() const
+  unsigned iterations() const
   {
     return _iterations;
   }
 
-  inline goalst::size_type size() const
+  goalst::size_type size() const
   {
     return goals.size();
   }
 
   // managing the goals
 
-  inline void add(const literalt condition)
+  void add(const literalt condition)
   {
     goals.push_back(goalt());
     goals.back().condition=condition;
@@ -86,7 +86,7 @@ public:
     virtual void satisfying_assignment() { }
   };
 
-  inline void register_observer(observert &o)
+  void register_observer(observert &o)
   {
     observers.push_back(&o);
   }

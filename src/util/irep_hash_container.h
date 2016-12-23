@@ -39,7 +39,7 @@ protected:
 
   struct pointer_hasht
   {
-    inline size_t operator()(const void *p) const
+    size_t operator()(const void *p) const
     {
       return (size_t)p;
     }
@@ -55,7 +55,7 @@ protected:
 
   struct vector_hasht
   {
-    inline size_t operator()(const packedt &p) const
+    size_t operator()(const packedt &p) const
     {
       size_t result=p.size(); // seed
       for(auto elem : p)

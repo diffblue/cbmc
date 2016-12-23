@@ -26,7 +26,7 @@ public:
 
   // overloading
 
-  inline bool merge(
+  bool merge(
     const invariant_set_domaint &other,
     locationt from,
     locationt to)

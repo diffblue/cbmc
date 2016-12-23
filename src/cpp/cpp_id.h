@@ -38,22 +38,22 @@ public:
 
   id_classt id_class;
 
-  inline bool is_class() const
+  bool is_class() const
   {
     return id_class==CLASS;
   }
 
-  inline bool is_enum() const
+  bool is_enum() const
   {
     return id_class==ENUM;
   }
 
-  inline bool is_namespace() const
+  bool is_namespace() const
   {
     return id_class==NAMESPACE;
   }
 
-  inline bool is_typedef() const
+  bool is_typedef() const
   {
     return id_class==TYPEDEF;
   }
@@ -68,19 +68,19 @@ public:
   std::string prefix, suffix;
   unsigned compound_counter;
 
-  inline cpp_idt &get_parent() const
+  cpp_idt &get_parent() const
   {
     assert(parent!=NULL);
     return *parent;
   }
 
-  inline void set_parent(cpp_idt &_parent)
+  void set_parent(cpp_idt &_parent)
   {
     assert(_parent.is_scope);
     parent=&_parent;
   }
 
-  inline void clear()
+  void clear()
   {
     *this=cpp_idt();
   }

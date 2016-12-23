@@ -27,13 +27,13 @@ template<typename V>
 class sparse_bitvector_analysist
 {
 public:
-  inline const V& get(const std::size_t value_index) const
+  const V& get(const std::size_t value_index) const
   {
     assert(value_index<values.size());
     return values[value_index]->first;
   }
 
-  inline std::size_t add(const V& value)
+  std::size_t add(const V& value)
   {
     inner_mapt &m=value_map[value.identifier];
 
@@ -102,7 +102,7 @@ public:
   {
   }
 
-  inline void set_bitvector_container(
+  void set_bitvector_container(
     sparse_bitvector_analysist<reaching_definitiont> &_bv_container)
   {
     bv_container=&_bv_container;
@@ -160,7 +160,7 @@ public:
   typedef std::map<locationt, rangest> ranges_at_loct;
 
   const ranges_at_loct& get(const irep_idt &identifier) const;
-  inline const void clear_cache(const irep_idt &identifier) const
+  const void clear_cache(const irep_idt &identifier) const
   {
     export_cache[identifier].clear();
   }

@@ -54,13 +54,13 @@ public:
   void build(const goto_functionst &goto_functions);
   void output(std::ostream &out) const;
 
-  inline loct &operator[] (loc_reft l)
+  loct &operator[] (loc_reft l)
   {
     assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
-  inline const loct &operator[] (loc_reft l) const
+  const loct &operator[] (loc_reft l) const
   {
     assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
@@ -73,14 +73,14 @@ public:
     return tmp;
   }
 
-  inline loc_reft end() const
+  loc_reft end() const
   {
     loc_reft tmp;
     tmp.loc_number=loc_vector.size();
     return tmp;
   }
 
-  inline std::size_t size() const
+  std::size_t size() const
   {
     return loc_vector.size();
   }
@@ -98,7 +98,7 @@ public:
       map[locs[it].target]=it;
   }
 
-  inline loc_reft operator[](const goto_programt::const_targett t) const
+  loc_reft operator[](const goto_programt::const_targett t) const
   {
     mapt::const_iterator it=map.find(t);
     assert(it!=map.end());

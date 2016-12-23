@@ -34,7 +34,7 @@ public:
   // conversion to handle
   virtual literalt convert(const exprt &expr)=0;
 
-  inline literalt operator()(const exprt &expr)
+  literalt operator()(const exprt &expr)
   {
     return convert(expr);
   }

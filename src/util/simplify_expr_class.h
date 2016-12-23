@@ -133,7 +133,7 @@ public:
   typedef std::set<mp_integer> value_listt;
   bool get_values(const exprt &expr, value_listt &value_list);
 
-  inline static bool is_bitvector_type(const typet &type)
+  static bool is_bitvector_type(const typet &type)
   {
     return type.id()==ID_unsignedbv ||
            type.id()==ID_signedbv ||

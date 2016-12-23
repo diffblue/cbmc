@@ -76,14 +76,14 @@ public:
 
   void show(std::ostream &out) const;
 
-  inline void swap(symbol_tablet &other)
+  void swap(symbol_tablet &other)
   {
     symbols.swap(other.symbols);
     symbol_base_map.swap(other.symbol_base_map);
     symbol_module_map.swap(other.symbol_module_map);
   }
 
-  inline bool has_symbol(const irep_idt &name) const
+  bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name)!=symbols.end();
   }

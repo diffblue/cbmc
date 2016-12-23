@@ -22,7 +22,7 @@ public:
   symbol_tablet symbol_table;
   goto_functionst goto_functions;
 
-  inline void clear()
+  void clear()
   {
     symbol_table.clear();
     goto_functions.clear();
@@ -34,11 +34,11 @@ public:
     goto_functions.output(ns, out);
   }
 
-  inline goto_modelt()
+  goto_modelt()
   {
   }
 
-  inline goto_modelt(goto_modelt &&other)
+  goto_modelt(goto_modelt &&other)
   {
     symbol_table.swap(other.symbol_table);
     goto_functions.swap(other.goto_functions);

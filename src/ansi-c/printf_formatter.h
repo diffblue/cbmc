@@ -32,7 +32,7 @@ protected:
   std::list<exprt> operands;
   std::list<exprt>::const_iterator next_operand;
   unsigned format_pos;
-  inline bool eol() const { return format_pos>=format.size(); }
+  bool eol() const { return format_pos>=format.size(); }
 
   class eol_exceptiont { };
 

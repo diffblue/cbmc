@@ -31,7 +31,7 @@ public:
 
   explicit fixedbv_spect(const fixedbv_typet &type);
 
-  inline std::size_t get_fraction_bits() const
+  std::size_t get_fraction_bits() const
   {
     return width-integer_bits;
   }

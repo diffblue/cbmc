@@ -46,7 +46,7 @@ public:
   {
   }
 
-  inline std::size_t width() const
+  std::size_t width() const
   {
     // Add one for the sign bit.
     // Add one if x86 explicit integer bit is used.
@@ -59,25 +59,25 @@ public:
   class floatbv_typet to_type() const;
 
   // the well-know standard formats
-  inline static ieee_float_spect single_precision()
+  static ieee_float_spect single_precision()
   {
     // 32 bits in total
     return ieee_float_spect(23, 8);
   }
 
-  inline static ieee_float_spect double_precision()
+  static ieee_float_spect double_precision()
   {
     // 64 bits in total
     return ieee_float_spect(52, 11);
   }
 
-  inline static ieee_float_spect quadruple_precision()
+  static ieee_float_spect quadruple_precision()
   {
     // IEEE 754 binary128
     return ieee_float_spect(112, 15);
   }
 
-  inline static ieee_float_spect x86_80()
+  static ieee_float_spect x86_80()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
@@ -85,7 +85,7 @@ public:
     return result;
   }
 
-  inline static ieee_float_spect x86_96()
+  static ieee_float_spect x86_96()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
@@ -93,12 +93,12 @@ public:
     return result;
   }
 
-  inline bool operator==(const ieee_float_spect &other) const
+  bool operator==(const ieee_float_spect &other) const
   {
     return f==other.f && e==other.e && x86_extended==other.x86_extended;
   }
 
-  inline bool operator!=(const ieee_float_spect &other) const
+  bool operator!=(const ieee_float_spect &other) const
   {
     return !(*this==other);
   }

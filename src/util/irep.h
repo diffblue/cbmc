@@ -104,22 +104,22 @@ public:
   typedef std::map<irep_namet, irept> named_subt;
   #endif
 
-  inline bool is_nil() const { return id()==ID_nil; }
-  inline bool is_not_nil() const { return id()!=ID_nil; }
+  bool is_nil() const { return id()==ID_nil; }
+  bool is_not_nil() const { return id()!=ID_nil; }
 
-  inline explicit irept(const irep_idt &_id):data(&empty_d)
+  explicit irept(const irep_idt &_id):data(&empty_d)
   {
     id(_id);
   }
 
   #ifdef SHARING
   // constructor for blank irep
-  inline irept():data(&empty_d)
+  irept():data(&empty_d)
   {
   }
 
   // copy constructor
-  inline irept(const irept &irep):data(irep.data)
+  irept(const irept &irep):data(irep.data)
   {
     if(data!=&empty_d)
     {
@@ -135,7 +135,7 @@ public:
   // Copy from rvalue reference.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
-  inline irept(irept &&irep):data(irep.data)
+  irept(irept &&irep):data(irep.data)
   {
     #ifdef IREP_DEBUG
     std::cout << "COPY MOVE\n";
@@ -144,7 +144,7 @@ public:
   }
   #endif
 
-  inline irept &operator=(const irept &irep)
+  irept &operator=(const irept &irep)
   {
     #ifdef IREP_DEBUG
     std::cout << "ASSIGN\n";
@@ -164,7 +164,7 @@ public:
   #ifdef USE_MOVE
   // Note that the move assignment operator does avoid
   // three branches compared to standard operator above.
-  inline irept &operator=(irept &&irep)
+  irept &operator=(irept &&irep)
   {
     #ifdef IREP_DEBUG
     std::cout << "ASSIGN MOVE\n";
@@ -175,31 +175,31 @@ public:
   }
   #endif
 
-  inline ~irept()
+  ~irept()
   {
     remove_ref(data);
   }
 
   #else
-  inline irept()
+  irept()
   {
   }
   #endif
 
-  inline const irep_idt &id() const
+  const irep_idt &id() const
   { return read().data; }
 
-  inline const std::string &id_string() const
+  const std::string &id_string() const
   { return id2string(read().data); }
 
-  inline void id(const irep_idt &_data)
+  void id(const irep_idt &_data)
   { write().data=_data; }
 
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
   irept &add(const irep_namet &name, const irept &irep);
 
-  inline const std::string &get_string(const irep_namet &name) const
+  const std::string &get_string(const irep_namet &name) const
   {
     return id2string(get(name));
   }
@@ -211,9 +211,9 @@ public:
   std::size_t get_size_t(const irep_namet &name) const;
   long long get_long_long(const irep_namet &name) const;
 
-  inline void set(const irep_namet &name, const irep_idt &value)
+  void set(const irep_namet &name, const irep_idt &value)
   { add(name).id(value); }
-  inline void set(const irep_namet &name, const irept &irep)
+  void set(const irep_namet &name, const irept &irep)
   { add(name, irep); }
   void set(const irep_namet &name, const long long value);
 
@@ -223,12 +223,12 @@ public:
 
   bool operator==(const irept &other) const;
 
-  inline bool operator!=(const irept &other) const
+  bool operator!=(const irept &other) const
   {
     return !(*this==other);
   }
 
-  inline void swap(irept &irep)
+  void swap(irept &irep)
   {
     std::swap(irep.data, data);
   }
@@ -238,16 +238,16 @@ public:
 
   int compare(const irept &i) const;
 
-  inline void clear() { *this=irept(); }
+  void clear() { *this=irept(); }
 
-  inline void make_nil() { *this=get_nil_irep(); }
+  void make_nil() { *this=get_nil_irep(); }
 
-  inline subt &get_sub() { return write().sub; } // DANGEROUS
-  inline const subt &get_sub() const { return read().sub; }
-  inline named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
-  inline const named_subt &get_named_sub() const { return read().named_sub; }
-  inline named_subt &get_comments() { return write().comments; } // DANGEROUS
-  inline const named_subt &get_comments() const { return read().comments; }
+  subt &get_sub() { return write().sub; } // DANGEROUS
+  const subt &get_sub() const { return read().sub; }
+  named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
+  const named_subt &get_named_sub() const { return read().named_sub; }
+  named_subt &get_comments() { return write().comments; } // DANGEROUS
+  const named_subt &get_comments() const { return read().comments; }
 
   std::size_t hash() const;
   std::size_t full_hash() const;
@@ -257,7 +257,7 @@ public:
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
 protected:
-  inline static bool is_comment(const irep_namet &name)
+  static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
 public:
@@ -333,12 +333,12 @@ protected:
   void detach();
 
 public:
-  inline const dt &read() const
+  const dt &read() const
   {
     return *data;
   }
 
-  inline dt &write()
+  dt &write()
   {
     detach();
     #ifdef HASH_CODE
@@ -351,12 +351,12 @@ public:
   dt data;
 
 public:
-  inline const dt &read() const
+  const dt &read() const
   {
     return data;
   }
 
-  inline dt &write()
+  dt &write()
   {
     #ifdef HASH_CODE
     data.hash_code=0;
@@ -369,7 +369,7 @@ public:
 // NOLINTNEXTLINE(readability/identifiers)
 struct irep_hash
 {
-  inline std::size_t operator()(const irept &irep) const
+  std::size_t operator()(const irept &irep) const
   {
     return irep.hash();
   }
@@ -378,7 +378,7 @@ struct irep_hash
 // NOLINTNEXTLINE(readability/identifiers)
 struct irep_full_hash
 {
-  inline std::size_t operator()(const irept &irep) const
+  std::size_t operator()(const irept &irep) const
   {
     return irep.full_hash();
   }
@@ -387,7 +387,7 @@ struct irep_full_hash
 // NOLINTNEXTLINE(readability/identifiers)
 struct irep_full_eq
 {
-  inline bool operator()(const irept &i1, const irept &i2) const
+  bool operator()(const irept &i1, const irept &i2) const
   {
     return i1.full_eq(i2);
   }

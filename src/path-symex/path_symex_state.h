@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 struct path_symex_statet
 {
 public:
-  inline path_symex_statet(
+  path_symex_statet(
     var_mapt &_var_map,
     const locst &_locs,
     path_symex_historyt &_path_symex_history):
@@ -98,24 +98,24 @@ public:
 
   bool inside_atomic_section;
 
-  inline unsigned get_current_thread() const
+  unsigned get_current_thread() const
   {
     return current_thread;
   }
 
-  inline void set_current_thread(unsigned _thread)
+  void set_current_thread(unsigned _thread)
   {
     current_thread=_thread;
   }
 
   loc_reft get_pc() const;
 
-  inline goto_programt::const_targett get_instruction() const
+  goto_programt::const_targett get_instruction() const
   {
     return locs[get_pc()].target;
   }
 
-  inline bool is_executable() const
+  bool is_executable() const
   {
     return !threads.empty() &&
            threads[current_thread].active;
@@ -129,28 +129,28 @@ public:
 
   // various state transformers
 
-  inline threadt &add_thread()
+  threadt &add_thread()
   {
     threads.resize(threads.size()+1);
     return threads.back();
   }
 
-  inline void disable_current_thread()
+  void disable_current_thread()
   {
     threads[current_thread].active=false;
   }
 
-  inline loc_reft pc() const
+  loc_reft pc() const
   {
     return threads[current_thread].pc;
   }
 
-  inline void next_pc()
+  void next_pc()
   {
     threads[current_thread].pc.increase();
   }
 
-  inline void set_pc(loc_reft new_pc)
+  void set_pc(loc_reft new_pc)
   {
     threads[current_thread].pc=new_pc;
   }
@@ -160,13 +160,13 @@ public:
   void output(const threadt &thread, std::ostream &out) const;
 
   // instantiate expressions with propagation
-  inline exprt read(const exprt &src)
+  exprt read(const exprt &src)
   {
     return read(src, true);
   }
 
   // instantiate without constant propagation
-  inline exprt read_no_propagate(const exprt &src)
+  exprt read_no_propagate(const exprt &src)
   {
     return read(src, false);
   }
@@ -175,22 +175,22 @@ public:
 
   std::string array_index_as_string(const exprt &) const;
 
-  inline unsigned get_no_thread_interleavings() const
+  unsigned get_no_thread_interleavings() const
   {
     return no_thread_interleavings;
   }
 
-  inline unsigned get_depth() const
+  unsigned get_depth() const
   {
     return depth;
   }
 
-  inline unsigned get_no_branches() const
+  unsigned get_no_branches() const
   {
     return no_branches;
   }
 
-  inline bool last_was_branch() const
+  bool last_was_branch() const
   {
     return !history.is_nil() && history->is_branch();
   }

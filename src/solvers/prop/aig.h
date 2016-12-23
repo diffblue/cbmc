@@ -20,16 +20,16 @@ class aig_nodet
 public:
   literalt a, b;
 
-  inline aig_nodet()
+  aig_nodet()
   {
   }
 
-  inline bool is_and() const
+  bool is_and() const
   {
     return a.var_no()!=literalt::unused_var_no();
   }
 
-  inline bool is_var() const
+  bool is_var() const
   {
     return a.var_no()==literalt::unused_var_no();
   }
@@ -49,7 +49,7 @@ public:
 class aigt
 {
 public:
-  inline aigt()
+  aigt()
   {
   }
 
@@ -61,7 +61,7 @@ public:
   typedef std::vector<nodet> nodest;
   nodest nodes;
 
-  inline void clear()
+  void clear()
   {
     nodes.clear();
   }
@@ -73,22 +73,22 @@ public:
   // should get re-written
   void get_terminals(terminalst &terminals) const;
 
-  inline const aig_nodet &get_node(literalt l) const
+  const aig_nodet &get_node(literalt l) const
   {
     return nodes[l.var_no()];
   }
 
-  inline aig_nodet &get_node(literalt l)
+  aig_nodet &get_node(literalt l)
   {
     return nodes[l.var_no()];
   }
 
-  inline nodest::size_type number_of_nodes() const
+  nodest::size_type number_of_nodes() const
   {
     return nodes.size();
   }
 
-  inline void swap(aigt &g)
+  void swap(aigt &g)
   {
     nodes.swap(g.nodes);
   }
@@ -101,21 +101,21 @@ public:
     return l;
   }
 
-  inline literalt new_var_node()
+  literalt new_var_node()
   {
     literalt l=new_node();
     nodes.back().make_var();
     return l;
   }
 
-  inline literalt new_and_node(literalt a, literalt b)
+  literalt new_and_node(literalt a, literalt b)
   {
     literalt l=new_node();
     nodes.back().make_and(a, b);
     return l;
   }
 
-  inline bool empty() const
+  bool empty() const
   {
     return nodes.empty();
   }
@@ -143,7 +143,7 @@ public:
   typedef std::vector<literalt> constraintst;
   constraintst constraints;
 
-  inline void clear()
+  void clear()
   {
     aigt::clear();
     constraints.clear();

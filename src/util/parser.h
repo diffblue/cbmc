@@ -36,12 +36,12 @@ public:
     last_line.clear();
   }
 
-  inline parsert():in(NULL) { clear(); }
+  parsert():in(NULL) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
 
-  inline bool read(char &ch)
+  bool read(char &ch)
   {
     if(!in->read(&ch, 1)) return false;
 
@@ -58,7 +58,7 @@ public:
 
   virtual bool parse()=0;
 
-  inline bool eof()
+  bool eof()
   {
     return in->eof();
   }
@@ -67,45 +67,45 @@ public:
     const std::string &message,
     const std::string &before);
 
-  inline void inc_line_no()
+  void inc_line_no()
   {
     ++line_no;
     column=1;
   }
 
-  inline void set_line_no(unsigned _line_no)
+  void set_line_no(unsigned _line_no)
   {
     line_no=_line_no;
   }
 
-  inline void set_file(const irep_idt &file)
+  void set_file(const irep_idt &file)
   {
     source_location.set_file(file);
     source_location.set_working_directory(
       get_current_working_directory());
   }
 
-  inline irep_idt get_file() const
+  irep_idt get_file() const
   {
     return source_location.get_file();
   }
 
-  inline unsigned get_line_no() const
+  unsigned get_line_no() const
   {
     return line_no;
   }
 
-  inline unsigned get_column() const
+  unsigned get_column() const
   {
     return column;
   }
 
-  inline void set_column(unsigned _column)
+  void set_column(unsigned _column)
   {
     column=_column;
   }
 
-  inline void set_source_location(exprt &e)
+  void set_source_location(exprt &e)
   {
     // Only set line number when needed, as this destroys sharing.
     if(previous_line_no!=line_no)
@@ -117,12 +117,12 @@ public:
     e.add_source_location()=source_location;
   }
 
-  inline void set_function(const irep_idt &function)
+  void set_function(const irep_idt &function)
   {
     source_location.set_function(function);
   }
 
-  inline void advance_column(unsigned token_width)
+  void advance_column(unsigned token_width)
   {
     column+=token_width;
   }
