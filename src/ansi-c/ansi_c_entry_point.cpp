@@ -51,8 +51,8 @@ exprt::operandst build_function_environment(
 
   for(const auto & p : parameters)
   {
-    irep_idt base_name=p.get_base_name();
-    if(base_name.empty()) base_name="argument#"+i2string(i);
+    irep_idt base_name=p.get_base_name().empty()?
+      ("argument#"+i2string(i)):p.get_base_name();
     irep_idt identifier=id2string(goto_functionst::entry_point())+
       "::"+id2string(base_name);
 
@@ -135,10 +135,12 @@ void record_function_outputs(
 
   for(const auto & p : parameters)
   {
-    irep_idt identifier=p.get_identifier();
-    if(identifier.empty()) continue;
+    if(p.get_identifier().empty())
+      continue;
 
-    const symbolt &symbol = symbol_table.lookup(identifier);
+    irep_idt identifier=p.get_identifier();
+
+    const symbolt &symbol=symbol_table.lookup(identifier);
 
     if(symbol.type.id()==ID_pointer)
     {
@@ -194,7 +196,8 @@ bool ansi_c_entry_point(
       symbol_tablet::symbolst::const_iterator s_it=
         symbol_table.symbols.find(it->second);
 
-      if(s_it==symbol_table.symbols.end()) continue;
+      if(s_it==symbol_table.symbols.end())
+        continue;
 
       if(s_it->second.type.id()==ID_code)
         matches.push_back(it->second);
