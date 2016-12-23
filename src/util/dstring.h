@@ -146,6 +146,7 @@ protected:
 inline const std::string &as_string(const dstring &s)
 { return string_container.get_string(s.get_no()); }
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct dstring_hash
 {
   inline size_t operator()(const dstring &s) const { return s.hash(); }

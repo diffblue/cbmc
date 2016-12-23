@@ -34,6 +34,7 @@ struct string_ptrt
   bool operator==(const string_ptrt &other) const;
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 class string_ptr_hash
 {
 public:

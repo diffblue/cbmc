@@ -475,6 +475,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case SINGLE:     new_type=float_type(); break;
   case DOUBLE:     new_type=double_type(); break;
   case LONGDOUBLE: new_type=long_double_type(); break;
+  // NOLINTNEXTLINE(whitespace/line_length)
   case FLOAT128:   new_type=ieee_float_spect::quadruple_precision().to_type(); break;
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;

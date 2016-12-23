@@ -17,6 +17,7 @@ Date: July 2006
 class xml_irep_convertt
 {
 private:
+  // NOLINTNEXTLINE(readability/identifiers)
   struct ul_hash
   {
     unsigned short operator()(const unsigned long l) const
@@ -25,6 +26,7 @@ private:
     }
   };
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct ul_eq
   {
     bool operator()(const unsigned long l, const unsigned long r) const
@@ -33,6 +35,7 @@ private:
     }
   };
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct irep_full_hash
   {
     size_t operator()(const irept &i) const
@@ -41,6 +44,7 @@ private:
     }
   };
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct irep_content_eq
   {
     bool operator()(const irept &l, const irept &r) const

@@ -171,11 +171,13 @@ protected:
   std::string convert_code(const codet &src);
   virtual std::string convert_code(const codet &src, unsigned indent);
   std::string convert_code_label(const code_labelt &src, unsigned indent);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_switch_case(const code_switch_caset &src, unsigned indent);
   std::string convert_code_asm(const code_asmt &src, unsigned indent);
   std::string convert_code_assign(const code_assignt &src, unsigned indent);
   std::string convert_code_free(const codet &src, unsigned indent);
   std::string convert_code_init(const codet &src, unsigned indent);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_ifthenelse(const code_ifthenelset &src, unsigned indent);
   std::string convert_code_for(const code_fort &src, unsigned indent);
   std::string convert_code_while(const code_whilet &src, unsigned indent);
@@ -192,6 +194,7 @@ protected:
   std::string convert_code_decl(const codet &src, unsigned indent);
   std::string convert_code_decl_block(const codet &src, unsigned indent);
   std::string convert_code_dead(const codet &src, unsigned indent);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_code_function_call(const code_function_callt &src, unsigned indent);
   std::string convert_code_lock(const codet &src, unsigned indent);
   std::string convert_code_unlock(const codet &src, unsigned indent);
@@ -204,23 +207,29 @@ protected:
 
   virtual std::string convert(const exprt &src, unsigned &precedence);
 
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_function_application(const function_application_exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_side_effect_expr_function_call(const side_effect_expr_function_callt &src, unsigned &precedence);
   std::string convert_malloc(const exprt &src, unsigned &precedence);
   std::string convert_nondet(const exprt &src, unsigned &precedence);
   std::string convert_prob_coin(const exprt &src, unsigned &precedence);
   std::string convert_prob_uniform(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_statement_expression(const exprt &src, unsigned &precendence);
 
   virtual std::string convert_symbol(const exprt &src, unsigned &precedence);
   std::string convert_predicate_symbol(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_predicate_next_symbol(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_predicate_passive_symbol(const exprt &src, unsigned &precedence);
   std::string convert_nondet_symbol(const exprt &src, unsigned &precedence);
   std::string convert_quantified_symbol(const exprt &src, unsigned &precedence);
   std::string convert_nondet_bool(const exprt &src, unsigned &precedence);
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
   std::string convert_literal(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
   virtual std::string convert_constant_bool(bool boolean_value);
 
@@ -232,6 +241,7 @@ protected:
   std::string convert_array(const exprt &src, unsigned &precedence);
   std::string convert_array_list(const exprt &src, unsigned &precedence);
   std::string convert_initializer_list(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_designated_initializer(const exprt &src, unsigned &precedence);
   std::string convert_concatenation(const exprt &src, unsigned &precedence);
   std::string convert_sizeof(const exprt &src, unsigned &precedence);

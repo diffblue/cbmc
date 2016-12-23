@@ -45,6 +45,7 @@ protected:
   std::string convert_code_cpp_delete(const exprt &src, unsigned precedence);
   std::string convert_struct(const exprt &src, unsigned &precedence) override;
   std::string convert_code(const codet &src, unsigned indent) override;
+  // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_constant(const constant_exprt &src, unsigned &precedence) override;
 
   std::string convert_rec(

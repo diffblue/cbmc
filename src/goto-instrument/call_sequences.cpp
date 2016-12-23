@@ -199,9 +199,9 @@ protected:
     }
   };
 
-  class state_hash
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct state_hash
   {
-  public:
     std::size_t operator()(const statet &s) const
     {
       size_t pc_hash=

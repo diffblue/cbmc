@@ -567,6 +567,7 @@ void goto_diff_parse_optionst::help()
 {
   std::cout <<
     "\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "* *           GOTO_DIFF " CBMC_VERSION " - Copyright (C) 2016            * *\n"
     "* *            Daniel Kroening, Peter Schrammel             * *\n"
     "* *                 kroening@kroening.com                   * *\n"
@@ -582,6 +583,7 @@ void goto_diff_parse_optionst::help()
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"
     "  --forward-impact |\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "  --backward-impact           output unified diff with forward&backward/forward/backward dependencies\n"
     " --compact-output             output dependencies in compact mode\n"
     "\n"

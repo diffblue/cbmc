@@ -35,11 +35,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef USE_DSTRING
 typedef dstring irep_idt;
 typedef dstring irep_namet;
+// NOLINTNEXTLINE(readability/identifiers)
 typedef dstring_hash irep_id_hash;
 #else
 #include "string_hash.h"
 typedef std::string irep_idt;
 typedef std::string irep_namet;
+// NOLINTNEXTLINE(readability/identifiers)
 typedef string_hash irep_id_hash;
 #endif
 
@@ -368,6 +370,7 @@ public:
   #endif
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct irep_hash
 {
   inline std::size_t operator()(const irept &irep) const
@@ -376,6 +379,7 @@ struct irep_hash
   }
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct irep_full_hash
 {
   inline std::size_t operator()(const irept &irep) const
@@ -384,6 +388,7 @@ struct irep_full_hash
   }
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct irep_full_eq
 {
   inline bool operator()(const irept &i1, const irept &i2) const

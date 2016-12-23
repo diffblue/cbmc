@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class tvt
 {
 public:
+  // NOLINTNEXTLINE(readability/identifiers)
   enum class tv_enumt : unsigned char { TV_FALSE, TV_UNKNOWN, TV_TRUE };
 
   inline bool is_true() const { return value==tv_enumt::TV_TRUE; }

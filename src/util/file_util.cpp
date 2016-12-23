@@ -84,6 +84,7 @@ void delete_directory(const std::string &path)
 
   std::string pattern=path+"\\*";
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct _finddata_t info;
 
   intptr_t handle=_findfirst(pattern.c_str(), &info);

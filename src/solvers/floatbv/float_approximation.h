@@ -31,6 +31,7 @@ protected:
   bvt overapproximating_left_shift(const bvt &src, unsigned dist);
 
 private:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef float_utilst SUB;
 };
 

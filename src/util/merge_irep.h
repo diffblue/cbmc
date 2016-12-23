@@ -45,6 +45,7 @@ protected:
   friend class merged_irepst;
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct merged_irep_hash
 {
   inline std::size_t operator()(const merged_irept &irep) const
@@ -67,6 +68,7 @@ protected:
   friend class merged_irepst;
 };
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct to_be_merged_irep_hash
 {
   inline std::size_t operator()(const to_be_merged_irept &irep) const

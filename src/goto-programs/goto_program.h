@@ -58,6 +58,7 @@ inline bool operator<(
   return order_const_target<codet, exprt>(i1, i2);
 }
 
+// NOLINTNEXTLINE(readability/identifiers)
 typedef struct const_target_hash_templatet<codet, exprt> const_target_hash;
 
 std::list<exprt> objects_read(const goto_programt::instructiont &);
