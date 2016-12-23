@@ -111,18 +111,24 @@ inline std::ostream &operator<<(
 class _rw_set_loct:public rw_set_baset
 {
 public:
-  inline _rw_set_loct(const namespacet &_ns,
-                     value_setst &_value_sets,
-                     goto_programt::const_targett _target
 #ifdef LOCAL_MAY
-                     , local_may_aliast &may
-#endif
-  ):
+  inline _rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target,
+    local_may_aliast &may):
+    rw_set_baset(_ns),
+    value_sets(_value_sets),
+    target(_target),
+    local_may(may)
+#else
+  inline _rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
     rw_set_baset(_ns),
     value_sets(_value_sets),
     target(_target)
-#ifdef LOCAL_MAY
-    , local_may(may)
 #endif
   {
   }
@@ -166,18 +172,20 @@ protected:
 class rw_set_loct:public _rw_set_loct
 {
 public:
-  inline rw_set_loct(const namespacet &_ns,
-                     value_setst &_value_sets,
-                     goto_programt::const_targett _target
 #ifdef LOCAL_MAY
-                     , local_may_aliast &may
+  inline rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target,
+    local_may_aliast &may):
+    _rw_set_loct(_ns, _value_sets, _target, may)
+#else
+  inline rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
+    _rw_set_loct(_ns, _value_sets, _target)
 #endif
-  ):
-    _rw_set_loct(_ns, _value_sets, _target
-#ifdef LOCAL_MAY
-      , may
-#endif
-   )
   {
     compute();
   }
@@ -226,18 +234,22 @@ public:
   /* is var a read or write */
   std::set<irep_idt> set_reads;
 
+#ifdef LOCAL_MAY
   inline rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
-    goto_programt::const_targett _target
-#ifdef LOCAL_MAY
-    , local_may_aliast& may
+    goto_programt::const_targett _target,
+    local_may_aliast& may):
+    _rw_set_loct(_ns, _value_sets, _target, may),
+    dereferencing(false)
+#else
+  inline rw_set_with_trackt(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
+    _rw_set_loct(_ns, _value_sets, _target),
+    dereferencing(false)
 #endif
-  ) : _rw_set_loct(_ns, _value_sets, _target
-#ifdef LOCAL_MAY
-      ,  may
-#endif
-      ), dereferencing(false)
   {
     compute();
   }
