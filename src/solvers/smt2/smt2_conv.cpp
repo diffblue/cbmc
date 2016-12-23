@@ -5149,9 +5149,12 @@ void smt2_convt::find_symbols_rec(
       //          ...
       //          (struct.0.componentN s)))
 
-      for(std::size_t i = 0; i < components.size(); i++)
+      for(struct_union_typet::componentst::const_iterator
+          it=components.begin();
+          it!=components.end();
+          ++it)
       {
-        const struct_union_typet::componentt &component = components[i];
+        const struct_union_typet::componentt &component=*it;
         out << "(define-fun update-" << smt_typename << "."
             << component.get_name() << " "
             << "((s " << smt_typename << ") "
@@ -5161,14 +5164,17 @@ void smt2_convt::find_symbols_rec(
             << "(mk-" << smt_typename
             << " ";
 
-        for(std::size_t j = 0; j < components.size(); j++)
+        for(struct_union_typet::componentst::const_iterator
+            it2=components.begin();
+            it2!=components.end();
+            ++it2)
         {
-          if(j==i)
+          if(it==it2)
             out << "v ";
           else
           {
             out << "(" << smt_typename << "."
-                 << components[j].get_name() << " s) ";
+                << it2->get_name() << " s) ";
           }
         }
 
@@ -5300,8 +5306,8 @@ void smt2_convt::collect_bindings(
   if(expr.operands().empty())
     return;
 
-  for (unsigned i = 0; i < expr.operands().size(); ++i)
-    collect_bindings(expr.operands()[i], map, let_order);
+  Forall_operands(it, expr)
+    collect_bindings(*it, map, let_order);
 
   assert(map.find(expr)==map.end());
 

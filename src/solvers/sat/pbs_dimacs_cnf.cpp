@@ -54,12 +54,11 @@ void pbs_dimacs_cnft::write_dimacs_pb(std::ostream &out)
 
   out << "# NumCoef: " << pb_constraintmap.size() << "\n";
 
-  for(std::map<literalt,unsigned>::const_iterator it=pb_constraintmap.begin();
-      it!=pb_constraintmap.end();++it)
-    {
-      int dimacs_lit = (*it).first.dimacs();
-      out << "v" << dimacs_lit << " c" << ((*it).second) << "\n";
-    }
+  for(const auto &lit_entry : pb_constraintmap)
+  {
+    int dimacs_lit=lit_entry.first.dimacs();
+    out << "v" << dimacs_lit << " c" << lit_entry.second << "\n";
+  }
 
   //std::cout << "exit: No Lit. = " << no_variables () << "\n";
 }

@@ -32,7 +32,7 @@ void interpretert::read(
   std::vector<mp_integer> &dest) const
 {
   // copy memory region
-  for(unsigned i=0; i<dest.size(); i++, ++address)
+  for(auto &d : dest)
   {
     mp_integer value;
 
@@ -41,7 +41,9 @@ void interpretert::read(
     else
       value=0;
 
-    dest[i]=value;
+    d=value;
+
+    ++address;
   }
 }
 

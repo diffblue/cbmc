@@ -138,42 +138,27 @@ void shared_bufferst::add_initialization(goto_programt &goto_program)
   goto_programt::targett t=goto_program.instructions.begin();
   const namespacet ns(symbol_table);
 
-  for(var_mapt::const_iterator
-      it=var_map.begin();
-      it!=var_map.end();
-      it++)
+  for(const auto &vars : var_map)
   {
     source_locationt source_location;
     source_location.make_nil();
 
-    assignment(goto_program, t, source_location, it->second.w_buff0_used,
+    assignment(goto_program, t, source_location, vars.second.w_buff0_used,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.w_buff1_used,
+    assignment(goto_program, t, source_location, vars.second.w_buff1_used,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.flush_delayed,
+    assignment(goto_program, t, source_location, vars.second.flush_delayed,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.read_delayed,
+    assignment(goto_program, t, source_location, vars.second.read_delayed,
       false_exprt());
-    assignment(goto_program, t, source_location, it->second.read_delayed_var,
-      null_pointer_exprt(pointer_typet(it->second.type)));
+    assignment(goto_program, t, source_location, vars.second.read_delayed_var,
+      null_pointer_exprt(pointer_typet(vars.second.type)));
 
-    for(
-      std::vector<irep_idt>::const_iterator l_it=
-        it->second.r_buff0_thds.begin();
-      l_it!=it->second.r_buff0_thds.end();
-      l_it++
-    )
-    {
-      assignment(goto_program, t, source_location, *l_it, false_exprt());
-    }
+    for(const auto &id : vars.second.r_buff0_thds)
+      assignment(goto_program, t, source_location, id, false_exprt());
 
-    for(
-      std::vector<irep_idt>::const_iterator l_it=
-        it->second.r_buff1_thds.begin();
-      l_it!=it->second.r_buff1_thds.end();
-      l_it++
-    )
-      assignment(goto_program, t, source_location, *l_it, false_exprt());
+    for(const auto &id : vars.second.r_buff1_thds)
+      assignment(goto_program, t, source_location, id, false_exprt());
   }
 }
 

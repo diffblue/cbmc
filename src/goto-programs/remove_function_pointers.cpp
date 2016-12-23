@@ -78,7 +78,6 @@ protected:
     for(const auto &s : symbol_table.symbols)
       compute_address_taken_functions(s.second.value, address_taken);
   }
-
 };
 
 /*******************************************************************\

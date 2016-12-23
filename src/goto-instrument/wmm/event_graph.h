@@ -312,9 +312,9 @@ protected:
       static std::list<event_idt> new_order;
 
       /* intersection */
-      for(std::list<event_idt>::iterator it=order->begin();it!=order->end();it++)
-        if(filter.find(*it)!=filter.end())
-          new_order.push_back(*it);
+      for(const auto &evt : *order)
+        if(filter.find(evt)!=filter.end())
+          new_order.push_back(evt);
 
       return &new_order;
     }
@@ -483,11 +483,10 @@ public:
       return true;
 
     // would be true if no cycle in po
-    for(std::list<event_idt>::iterator it=po_order.begin();
-      it!=po_order.end();it++)
-      if(*it==a)
+    for(const auto &evt : po_order)
+      if(evt==a)
         return true;
-      else if(*it==b)
+      else if(evt==b)
         return false;
 
     return false;

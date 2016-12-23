@@ -1299,10 +1299,8 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
       {
         std::string value=op.get_string(ID_value);
 
-        for(std::string::iterator it=value.begin();
-            it!=value.end();
-            ++it)
-          *it=(*it=='0')?'1':'0';
+        for(auto &ch : value)
+          ch=(ch=='0')?'1':'0';
 
         exprt tmp(ID_constant, op.type());
         tmp.set(ID_value, value);

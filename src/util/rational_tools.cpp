@@ -54,12 +54,8 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
   std::string no1, no2;
   char mode=0;
 
-  for(std::string::const_iterator it=value.begin();
-      it!=value.end();
-      ++it)
+  for(const char ch : value)
   {
-    const char ch=*it;
-
     if(isdigit(ch))
     {
       if(mode==0)
