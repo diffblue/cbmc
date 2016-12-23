@@ -3,10 +3,22 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 Whitespaces:
 - Use 2 spaces indent, no tabs.
 - No lines wider than 80 chars.
+  - When line is wider, do the following:
+    - Subsequent lines should be indented two more than the initial line
+    - Break after = if it is part of an assignment
+    - For chained calls, prefer immediately before .
+    - For other operators (e.g. &&, +) prefer immediately after the operator
+    - For brackets, break after the bracket
+      - In the case of function calls, put each argument on a separate line if
+        they do not fit after one line break
 - If a method is bigger than 50 lines, break it into parts.
 - Put matching { } into the same column.
-- No spaces around operators, except &&, ||, and <<
-- Spaces after , and ; inside 'for'
+- No spaces around operators (=, +, ==, ...)
+  Exceptions: Spaces around &&, || and <<
+- Space after comma (parameter lists, argument lists, ...)
+- Space after colon inside 'for'
+- No whitespaces at end of line
+- No whitespaces in blank lines
 - Put argument lists on next line (and ident 2 spaces) if too long
 - Put parameters on separate lines (and ident 2 spaces) if too long
 - No whitespaces around colon for inheritance, 
@@ -16,8 +28,6 @@ Whitespaces:
 - if(...), else, for(...), do, and while(...) are always in a separate line
 - Break expressions in if, for, while if necessary and align them 
   with the first character following the opening parenthesis
-- No whitespaces at end of line
-- Avoid whitespaces in blank lines
 - Use {} instead of ; for the empty statement
 - Single line blocks without { } are allowed, 
   but put braces around multi-line blocks
@@ -29,9 +39,31 @@ Comments:
 - Do not use /* */ except for file and function comment blocks
 - Each source and header file must start with a comment block 
   stating the Module name and Author [will be changed when we roll out doxygen]
-- Each function in the source file (not the header) is preceded 
-  by a comment block stating Name, Inputs,  Outputs and Purpose [will be changed
-  when we roll out doxygen]
+- Each function in the source file (not the header) is preceded
+  by a function comment header consisting of a comment block stating
+  Name, Inputs,  Outputs and Purpose [will be changed when we roll
+  out doxygen]
+   - It should look like this:
+   ```
+   /*******************************************************************\
+
+   Function: class_namet::function_name
+
+    Inputs:
+     arg_name - Description of its purpose
+     long_arg_name - Descriptions should be indented
+                     to match the first line of the
+                     description
+
+    Outputs: A description of what the function returns
+
+    Purpose: A description of what the function does.
+             Again, indentation with the line above
+
+   \*******************************************************************/
+   ```
+- An empty line should appear between the bottom of the function comment header
+  and the function.
 - Put comments on a separate line
 - Use comments to explain the non-obvious
 - Use #if 0 for commenting out source code
@@ -51,6 +83,8 @@ Naming:
 
 Header files:
 - Avoid unnecessary #includes, especially in header files
+- Prefer forward declaration to includes, but forward declare at the top
+  of the header file rather than in line
 - Guard headers with #ifndef CPROVER_DIRECTORIES_FILE_H, etc
 
 C++ features:
@@ -85,6 +119,9 @@ C++ features:
 - We allow to use 3rd-party libraries directly. 
   No wrapper matching the coding rules is required. 
   Allowed libraries are: STL. 
+- Use the auto keyword if and only if one of the following
+  - The type is explictly repeated on the RHS (e.g. a constructor call)
+  - Adding the type will increase confusion (e.g. iterators, function pointers)
 
 Architecture-specific code:
 - Avoid if possible.

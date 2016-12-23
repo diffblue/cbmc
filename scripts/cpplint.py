@@ -169,8 +169,8 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
     The "root" option is similar in function to the --root flag (see example
     above).
-    
-    The "headers" option is similar in function to the --headers flag 
+
+    The "headers" option is similar in function to the --headers flag
     (see example above).
 
     CPPLINT.cfg has an effect on files in the same directory and all
@@ -224,6 +224,7 @@ _ERROR_CATEGORIES = [
     'readability/strings',
     'readability/todo',
     'readability/utf8',
+    'readability/function_comment'
     'runtime/arrays',
     'runtime/casting',
     'runtime/explicit',
@@ -1489,6 +1490,104 @@ class CleansedLines(object):
 
     return collapsed
 
+def IsTemplateArgumentList_DB(clean_lines, linenum, pos):
+    """if lines[linenum][pos] is >, finds out if it is closing bracket
+    of a template argument.
+
+    Finds a matching < (if possible) to the > at position line[linenum][pos]
+    and then  analyzes the string between the two to work out if it could
+    in fact be a template argument list or just some general code.
+
+    Args:
+      clean_lines: A CleansedLines instance containing the file.
+      linenum: The number of the line to check.
+      pos: A position on the line.
+
+    Returns:
+      True if the angled bracket pointed to is the end of a template arguement
+      list
+    """
+    (start_line, start_linenum, start_pos) = OpenExpression(clean_lines, linenum, pos)
+
+    # We didn't find a matching < so clearly not a template argument list
+    if start_pos == -1:
+        return False
+
+    # This collects all the charatcers between the > and matching <
+    # It also reverses it since we don't care about the actual contents
+    # we are just looking to make sure no weird characters (like &&)
+    inbetween_string = ""
+    if linenum == start_linenum:
+      inbetween_string = clean_lines.elided[start_linenum][start_pos:pos + 1]
+    else:
+      while(start_linenum != linenum):
+        inbetween_string += clean_lines.elided[start_linenum][start_pos:]
+        start_linenum += 1
+        start_pos = 0
+      inbetween_string += clean_lines.elided[linenum][0:pos]
+
+    is_simple_template_params = Match('^[<>(::),\w\s]*$', inbetween_string)
+    if is_simple_template_params:
+        return True
+
+    # The operators & or * are accepted within the template arguments
+    # as we can have reference or pointer types in the list
+    # however, they must be followed by a > (excepting white space)
+    # anything else indicates they are being used as a type
+
+    is_looking_for_closing_angle_bracket = False
+    for char in inbetween_string:
+      if char in ['&', '*']:
+        is_looking_for_closing_angle_bracket = True
+      elif is_looking_for_closing_angle_bracket:
+        if char == '>':
+          is_looking_for_closing_angle_bracket = False
+        elif char not in [' ', '\t']:
+          return False
+
+    return True
+
+def OpenExpression(clean_lines, linenum, pos):
+  """If input points to ) or } or ] or >, finds the position that opens it.
+
+  If lines[linenum][pos] points to a ')' or '}' or ']' or '>', finds the
+  linenum/pos that correspond to the closing of the expression.
+
+  Essentially a mirror of what CloseExpression does
+
+  TODO(tkiley): could probably be merged with CloseExpression
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    pos: A position on the line.
+
+  Returns:
+    A tuple (line, linenum, pos) pointer *to* the closing brace, or
+    (line, len(lines), -1) if we never find a close.  Note we ignore
+    strings and comments when matching; and the line we return is the
+    'cleansed' line at linenum.
+  """
+
+  line = clean_lines.elided[linenum]
+  if (line[pos] not in ')}]>'):
+    return (line, clean_lines.NumLines(), -1)
+
+  # Check first line
+  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [])
+  if end_pos > -1:
+    return (line, linenum, end_pos)
+
+  # Continue scanning forward
+  while stack and linenum > 0:
+    linenum -= 1
+    line = clean_lines.elided[linenum]
+    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
+    if end_pos > -1:
+      return (line, linenum, end_pos)
+
+  # Did not find end of expression before end of file, give up
+  return (line, clean_lines.NumLines(), -1)
 
 def FindEndOfExpressionInLine(line, startpos, stack):
   """Find the position just after the end of current parenthesized expression.
@@ -1611,6 +1710,34 @@ def CloseExpression(clean_lines, linenum, pos):
   # Did not find end of expression before end of file, give up
   return (line, clean_lines.NumLines(), -1)
 
+def FindDoStart(clean_lines, linenum):
+  """If found a while (...); find the potential do to match it.
+
+  Work our way up through the lines starting at linenum to find a do
+  that hasn't been matched. This might not succeed as might just be an
+  emtpy while statement.
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The line number with the while(...); on
+
+  Returns:
+    A tuple (found, linenum), found is true if an opening
+    do statement found, false otherwise. The linenum will
+    be the line the do is found on (or -1 if never found)
+  """
+
+  reverse_lines = clean_lines.lines[linenum-1:0:-1]
+  found_linenum = linenum - 1;
+  for line in reverse_lines:
+    if Search(r'^\s*do\s*{?\s*$', line):
+      return True, found_linenum
+    elif Search(r'^\s*}?\s*while\(.*\)\s*;\s*$', line):
+      return False, -1
+    else:
+      found_linenum = found_linenum - 1
+
+  return False, -1
 
 def FindStartOfExpressionInLine(line, endpos, stack):
   """Find position at the matching start of current expression.
@@ -2379,6 +2506,13 @@ class NestingState(object):
   def InTemplateArgumentList(self, clean_lines, linenum, pos):
     """Check if current position is inside template argument list.
 
+    TODO (tkiley): This method seems a little generous for what it
+    considers to be in a template argument list, providing the line
+    between pos and the end contains a > (or even an =) before the
+    end of the line or }, {, ; then it will say yes... For now have
+    added method IsTemplateArgumentList_DB but should work out
+    what the idea with this method is a unify.
+
     Args:
       clean_lines: A CleansedLines instance containing the file.
       linenum: The number of the line to check.
@@ -2947,6 +3081,135 @@ def CheckForNamespaceIndentation(filename, nesting_state, clean_lines, line,
     CheckItemIndentationInNamespace(filename, clean_lines.elided,
                                     line, error)
 
+def CheckForFunctionCommentHeaders(filename, raw_lines, error):
+  """ Check all the lines for functions without function comment headers
+
+  Using the raw original lines (before multi-line comments are removed)
+  find lines that contain functions and checks they have a function comment header
+
+  Args:
+    filename - The name of the file being checked
+    raw_lines - The original, with comments lines
+    error - the function to report errors with
+  """
+  linenum = 0
+  function_state = _FunctionState()
+  for line in raw_lines:
+    joined_line = ''
+    starting_func = False
+    # Look for declaration function_name( but allowing for *, & being attached to the function name
+    # but not being considered part of it
+    regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(\w(\w|::)*))\('#
+    operator_regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(|operator\(.*\)|operator.*))\('
+    operator_match = Match(operator_regexp, line)
+    match_result = Match(regexp, line)
+    function_name = ""
+    if operator_match:
+        function_name = operator_match.group('fnc_name')
+    elif match_result:
+      function_name = match_result.group('fnc_name')
+
+    if operator_match or match_result:
+      # If the name is all caps and underscores, figure it's a macro and
+      # ignore it, unless it's TEST or TEST_F.
+      if function_name == 'TEST' or function_name == 'TEST_F' or (
+        not Match(r'[A-Z_]+$', function_name)):
+        starting_func = True
+
+      if starting_func:
+        body_found = False
+        for start_linenum in xrange(linenum, len(raw_lines)):
+          start_line = raw_lines[start_linenum]
+          if Search(r'{', start_line):
+            body_found = True
+            break
+          elif Search(r';', start_line):
+            body_found = False
+            break
+
+      # body found, i.e. not a declaration
+      if body_found:
+        CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error)
+    linenum += 1
+
+def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error):
+    """ Check each function has a comment header
+
+    Rules for function comment header:
+    1. Header demarked by /*{67}\ at the top
+    2. Header demarked by \*{67}/ at the bottom
+    3. Contains Function: classname::function_name
+    4. Contains Inputs:
+    5. Contains Outputs:
+    6. Contains Purpose:
+    7. new line between function and bottom of comment
+
+    Args:
+      filename - the name of the file
+      raw_lines - all the unmodified lines (including multi-line comments)
+      linenum - the line number of the line to check
+      function_name - the name of the function that was found
+      error - function to report errors with
+
+    """
+
+    function_name = re.escape(function_name)
+
+    header_top_regex = r'^/\*{67}\\$'
+    header_bottom_regex = r'^\\\*{67}/$'
+    function_name_regex = r'Function: (\w+::)?' + function_name+'$'
+
+    found_empty_space = raw_lines[linenum-1] == ""
+
+    header_start = linenum - 2 if found_empty_space else linenum - 1
+    found_header_bottom = Match(header_bottom_regex, raw_lines[header_start])
+
+    if not found_header_bottom:
+      error(filename, linenum, 'readability/function_comment', 4,
+        'Could not find function header comment for ' + function_name)
+      return
+
+    found_header_top = False
+
+    found_function_name = False
+    found_inputs = False
+    found_outputs = False
+    found_purpose = False
+
+    for i in xrange(header_start - 1, 0, -1):
+      if(Match(header_top_regex, raw_lines[i])):
+        found_header_top = True
+        break
+
+      if(Search(r'Inputs:', raw_lines[i])):
+        found_inputs = True
+      elif(Search(r'Outputs:', raw_lines[i])):
+        found_outputs = True
+      elif(Search(r'Purpose:', raw_lines[i])):
+        found_purpose = True
+      elif(Search(r'Function:', raw_lines[i])):
+        found_function_name = True
+        if(not Search(function_name_regex, raw_lines[i])):
+          error(filename, i, 'readability/function_comment', 4,
+            'Function: name in the comment doesn\'t match the function name')
+
+    if found_header_top:
+      if not found_inputs:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Inputs:')
+      if not found_outputs:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Outputs:')
+      if not found_purpose:
+        error(filename, linenum, 'readability/function_comment', 4,
+          'Function header for ' + function_name + ' missing Purpose:')
+    else:
+      error(filename, linenum, 'readability/function_comment', 4,
+        'Could not find top of function header comment for ' + function_name)
+
+    if not found_empty_space:
+        error(filename, linenum, 'readability/function_comment', 4,
+        'Insert an empty line between function header comment and the function ' + function_name)
 
 def CheckForFunctionLengths(filename, clean_lines, linenum,
                             function_state, error):
@@ -3009,6 +3272,7 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
       # No body for the function (or evidence of a non-function) was found.
       error(filename, linenum, 'readability/fn_size', 5,
             'Lint failed to find start of function body.')
+
   elif Match(r'^\}\s*$', line):  # function end
     function_state.Check(error, filename, linenum)
     function_state.End()
@@ -3261,9 +3525,20 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Otherwise not.  Note we only check for non-spaces on *both* sides;
   # sometimes people put non-spaces on one side when aligning ='s among
   # many lines (not that this is behavior that I approve of...)
-  match1 = Search(r'[\s](>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+|\/)', line)
-  match2 = Search(r'(>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
-  if match1 and not Search(r'<<', line) and not Search(r'char \*', line) and not Search(r'\#include', line) and not Search(r'<.*[^\s]>', line):
+  match1 = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
+  match2 = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
+  operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
+  operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
+
+  if match2 and match2.group(1) == '>':
+    res = IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)
+
+  if (match1 and
+    not Search(r'<<', line) and # We ignore the left shift operator since might be a stream and then formatting rules go out of the window
+    not Search(r'char \*', line) and # I don't know why this exception exists?
+    not Search(r'\#include', line) and # I suppose file names could contains operators??
+    #not Search(r'<.*[^\s]>', line)): #  This checks for template declarations (providing they don't run onto next line)
+    not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos)):
 #      and not Search(r'\b(if|while|for) ', line)
 #      # Operators taken from [lex.operators] in C++11 standard.
 #      and not Search(r'(>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=)', line)
@@ -3271,7 +3546,9 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'whitespace/operators', 4,
 #          'Missing spaces around =')
           'Remove spaces around %s' % match1.group(1))
-  elif match2 and not Search(r'<<', line) and not Search(r'<[^\s].*>', line):
+  elif (match2 and
+    not Search(r'<<', line) and
+    not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)):
     error(filename, linenum, 'whitespace/operators', 4,
           'Remove spaces around %s' % match2.group(0))
 
@@ -3281,8 +3558,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'readability/identifiers', 4,
           'Remove spaces around %s' % match.group(0))
 
+# check any inherited classes don't have a space between the type and the :
+  if Search(r'(struct|class)\s[\w_]*\s+:', line):
+    error(filename, linenum, 'readability/identifiers', 4, 'There shouldn\'t be a space between class identifier and :')
+
 #check type definitions end with t
-  if Search(r'(struct|class)\s[\w_]*[^t^;^:](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
+  if Search(r'(struct|class)\s[\w_]*[^t^;^:^\s](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
     error(filename, linenum, 'readability/identifiers', 4,
           'Class or struct identifier should end with t')
 
@@ -3314,7 +3595,7 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Note that && is not included here.  This is because there are too
   # many false positives due to RValue references.
 #  match = Search(r'[^<>=!\s](==|!=|<=|>=|\|\|)[^<>=!\s,;\)]', line)
-  match = Search(r'[^\s](<<|&&|\|\|)[^\s]', line)
+  match = Search(r'[^\s](&&|\|\|)[^\s]', line)
   if match:
     error(filename, linenum, 'whitespace/operators', 3,
           'Missing spaces around %s' % match.group(1))
@@ -3721,51 +4002,25 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
   line = clean_lines.elided[linenum]        # get rid of comments and strings
 
-  if Match(r'\s*{\s*$', line):
-    # We allow an open brace to start a line in the case where someone is using
-    # braces in a block to explicitly create a new scope, which is commonly used
-    # to control the lifetime of stack-allocated variables.  Braces are also
-    # used for brace initializers inside function calls.  We don't detect this
-    # perfectly: we just don't complain if the last non-whitespace character on
-    # the previous non-blank line is ',', ';', ':', '(', '{', or '}', or if the
-    # previous line starts a preprocessor block. We also allow a brace on the
-    # following line if it is part of an array initialization and would not fit
-    # within the 80 character limit of the preceding line.
-    prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
-#    if (not Search(r'[,;:}{(]\s*$', prevline) and
-#        not Match(r'\s*#', prevline) and
-#        not (GetLineWidth(prevline) > _line_length - 2 and '[]' in prevline)):
-#      error(filename, linenum, 'whitespace/braces', 4,
-#            '{ should almost always be at the end of the previous line')
-
-  # An else clause should be on the same line as the preceding closing brace.
-#  if Match(r'\s*else\b\s*(?:if\b|\{|$)', line):
-#    prevline = GetPreviousNonBlankLine(clean_lines, linenum)[0]
-#    if Match(r'\s*}\s*$', prevline):
-#      error(filename, linenum, 'whitespace/newline', 4,
-#            'An else should appear on the same line as the preceding }')
-
-  # If braces come on one side of an else, they should be on both.
-  # However, we have to worry about "else if" that spans multiple lines!
-  if Search(r'else if\s*\(', line):       # could be multi-line if
-    brace_on_left = bool(Search(r'}\s*else if\s*\(', line))
-    # find the ( after the if
-    pos = line.find('else if')
-    pos = line.find('(', pos)
-    if pos > 0:
-      (endline, _, endpos) = CloseExpression(clean_lines, linenum, pos)
-      brace_on_right = endline[endpos:].find('{') != -1
-      if brace_on_left != brace_on_right:    # must be brace after if
-        error(filename, linenum, 'readability/braces', 5,
-              'If an else has a brace on one side, it should have it on both')
-  elif Search(r'}\s*else[^{]*$', line) or Match(r'[^}]*else\s*{', line):
+  # Check for else if/else that are on the same line as the previous brace
+  if Search(r'}\s*else if', line):
     error(filename, linenum, 'readability/braces', 5,
-          'If an else has a brace on one side, it should have it on both')
+        'Else if should be on a new line after closing brace')
+  elif Search(r'}\s*else', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Else should be on a new line after closing brace')
 
-  # Likewise, an else should never have the else clause on the same line
-  if Search(r'\belse [^\s{]', line) and not Search(r'\belse if\b', line):
-    error(filename, linenum, 'whitespace/newline', 4,
-          'Else clause should never be on same line as else (use 2 lines)')
+  # Check for if/else if/else don't have statements on the same line
+  if Search(r'^\s*if\(.*\)\s*\s*{?\s*.+;', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Statement after an if should be on a new line')
+  elif Search(r'else if\(.*\)', line):
+    if Search(r'else if\(.*\)\s*{?\s*.+;', line):
+      error(filename, linenum, 'readability/braces', 5,
+          'Statement after else if should be on a new line')
+  elif Search(r'else\s*{?\s*.+;', line):
+    error(filename, linenum, 'readability/braces', 5,
+        'Statement after else should be on a new line')
 
   # In the same way, a do/while should never be on one line
   if Match(r'\s*do [^\s{]', line):
@@ -3827,6 +4082,21 @@ def CheckBraces(filename, clean_lines, linenum, error):
             error(filename, linenum, 'readability/braces', 4,
                   'If/else bodies with multiple statements require braces')
 
+def CheckDoWhile(filename, clean_lines, linenum, error):
+  """Looks for while of a do while on the same line as the closing brace
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+  if Search(r'}\s*while\s*\(', line):
+    do_found, num = FindDoStart(clean_lines, linenum)
+    if do_found:
+        error(filename, linenum, 'readability/braces', 4,
+            'while statement of do...while loop should be on a separate line to the closing brace')
 
 def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
   """Looks for redundant trailing semicolon.
@@ -3993,7 +4263,17 @@ def CheckEmptyBlockBody(filename, clean_lines, linenum, error):
   # is likely an error.
   line = clean_lines.elided[linenum]
   matched = Match(r'\s*(for|while|if)\s*\(', line)
-  if matched:
+  while_matched = Match(r'\s*(while)\s*\(', line)
+
+  # if it is a do while loop, we have the while clause on a separate line
+  # so need to exclude that
+  do_found = False
+  if while_matched:
+    do_found, num = FindDoStart(clean_lines, linenum)
+
+  is_do_while = while_matched and do_found
+  # either not a while or if we are, we didn't find a do
+  if matched and not is_do_while:
     # Find the end of the conditional expression.
     (end_line, end_linenum, end_pos) = CloseExpression(
         clean_lines, linenum, line.find('('))
@@ -4299,6 +4579,9 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   line = raw_lines[linenum]
   prev = raw_lines[linenum - 1] if linenum > 0 else ''
 
+  elided_line = clean_lines.elided[linenum]
+  elided_prev = clean_lines.elided[linenum - 1] if linenum > 0 else ''
+
   if line.find('\t') != -1:
     error(filename, linenum, 'whitespace/tab', 1,
           'Tab found, replace by spaces')
@@ -4334,20 +4617,20 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
     error(filename, linenum, 'whitespace/indent', 3,
           'Weird number of spaces at line-start.  '
           'Are you using a 2-space indent?')
-    
+
   if line and line[-1].isspace():
     error(filename, linenum, 'whitespace/end_of_line', 4,
           'Line ends in whitespace.  Consider deleting these extra spaces.')
 
-# ensure indentation within parenthesized expressions
+# ensure indentation within parenthesized expressions (only on elided lines since we don't care about comments or strings)
   prev_initial_spaces = 0
   if linenum>0:
     while prev_initial_spaces < len(prev) and prev[prev_initial_spaces] == ' ':
       prev_initial_spaces += 1
-  if Search(r'\([^\)]*,$', line) or Search(r'\(\[^\)]*, $', line):
+  if Search(r'\([^\)]*,$', elided_line) or Search(r'\(\[^\)]*, $', elided_line):
     error(filename, linenum, 'whitespace/indent', 4,
           'If parameters or arguments require a line break, each parameter should be put on its own line.')
-  if (Search(r'\([^\)]*$', prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', prev):
+  if (Search(r'\([^\)]*$', elided_prev) and initial_spaces-2 != prev_initial_spaces) and not Search(r'for|while|if|;', elided_prev):
     error(filename, linenum, 'whitespace/indent', 4,
           'Indent of wrapped parenthesized expression or parameter or argument list should be 2')
 
@@ -4390,6 +4673,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
 
   # Some more style checks
   CheckBraces(filename, clean_lines, linenum, error)
+  CheckDoWhile(filename, clean_lines, linenum, error)
   CheckTrailingSemicolon(filename, clean_lines, linenum, error)
   CheckEmptyBlockBody(filename, clean_lines, linenum, error)
   CheckAccess(filename, clean_lines, linenum, nesting_state, error)
@@ -5270,7 +5554,7 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
 
   # Exclude lines with keywords that tend to look like casts
   context = line[0:match.start(1) - 1]
-  if Match(r'.*\b(?:sizeof|alignof|alignas|[_A-Z][_A-Z0-9]*)\s*$', context):
+  if Match(r'.*\b(?:sizeof|alignof|alignas|catch|[_A-Z][_A-Z0-9]*)\s*$', context):
     return False
 
   # Try expanding current context to see if we one level of
@@ -5661,36 +5945,6 @@ def CheckRedundantVirtual(filename, clean_lines, linenum, error):
 #      break
 
 
-def CheckRedundantOverrideOrFinal(filename, clean_lines, linenum, error):
-  """Check if line contains a redundant "override" or "final" virt-specifier.
-
-  Args:
-    filename: The name of the current file.
-    clean_lines: A CleansedLines instance containing the file.
-    linenum: The number of the line to check.
-    error: The function to call with any errors found.
-  """
-  # Look for closing parenthesis nearby.  We need one to confirm where
-  # the declarator ends and where the virt-specifier starts to avoid
-  # false positives.
-  line = clean_lines.elided[linenum]
-  declarator_end = line.rfind(')')
-  if declarator_end >= 0:
-    fragment = line[declarator_end:]
-  else:
-    if linenum > 1 and clean_lines.elided[linenum - 1].rfind(')') >= 0:
-      fragment = line
-    else:
-      return
-
-  # Check that at most one of "override" or "final" is present, not both
-  if Search(r'\boverride\b', fragment) and Search(r'\bfinal\b', fragment):
-    error(filename, linenum, 'readability/inheritance', 4,
-          ('"override" is redundant since function is '
-           'already declared as "final"'))
-
-
-
 
 # Returns true if we are at a new block, and it is directly
 # inside of a namespace.
@@ -5804,7 +6058,6 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckInvalidIncrement(filename, clean_lines, line, error)
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
-  CheckRedundantOverrideOrFinal(filename, clean_lines, line, error)
   CheckNamespaceOrUsing(filename, clean_lines, line, error)
   for check_fn in extra_check_functions:
     check_fn(filename, clean_lines, line, error)
@@ -5905,6 +6158,7 @@ def ProcessFileData(filename, file_extension, lines, error,
   ResetNolintSuppressions()
 
   CheckForCopyright(filename, lines, error)
+  CheckForFunctionCommentHeaders(filename, lines, error)
   ProcessGlobalSuppresions(lines)
   RemoveMultiLineComments(filename, lines, error)
   clean_lines = CleansedLines(lines)

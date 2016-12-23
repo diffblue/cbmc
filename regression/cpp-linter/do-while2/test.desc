@@ -1,0 +1,7 @@
+CORE
+main.cpp
+
+^main\.cpp:26:  while statement of do...while loop should be on a separate line to the closing brace  \[readability/braces\] \[4\]
+^Total errors found: 1$
+^SIGNAL=0$
+--
