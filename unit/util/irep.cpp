@@ -53,7 +53,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
 #  endif
 #endif
 
-#ifdef HASH_CODE
+#if HASH_CODE
       const std::size_t hash_code_size = sizeof(std::size_t);
 #else
       const std::size_t hash_code_size = 0;

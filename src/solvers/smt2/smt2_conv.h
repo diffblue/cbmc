@@ -16,8 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
 
-#ifndef HASH_CODE
-#include <util/irep_hash_container.h>
+#if !HASH_CODE
+#  include <util/irep_hash_container.h>
 #endif
 
 #include <solvers/prop/prop_conv.h>

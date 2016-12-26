@@ -17,7 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep_ids.h"
 
 #define SHARING
-// #define HASH_CODE
+#ifndef HASH_CODE
+#  define HASH_CODE 1
+#endif
 // #define NAMED_SUB_IS_FORWARD_LIST
 
 #ifdef NAMED_SUB_IS_FORWARD_LIST
@@ -138,7 +140,7 @@ public:
   named_subt named_sub;
   subt sub;
 
-#ifdef HASH_CODE
+#if HASH_CODE
   mutable std::size_t hash_code = 0;
 #endif
 
@@ -147,7 +149,7 @@ public:
     data.clear();
     sub.clear();
     named_sub.clear();
-#ifdef HASH_CODE
+#if HASH_CODE
     hash_code = 0;
 #endif
   }
@@ -157,7 +159,7 @@ public:
     d.data.swap(data);
     d.sub.swap(sub);
     d.named_sub.swap(named_sub);
-#ifdef HASH_CODE
+#if HASH_CODE
     std::swap(d.hash_code, hash_code);
 #endif
   }
@@ -278,7 +280,7 @@ public:
   dt &write()
   {
     detach();
-#ifdef HASH_CODE
+#if HASH_CODE
     data->hash_code = 0;
 #endif
     return *data;
@@ -319,7 +321,7 @@ public:
 
   dt &write()
   {
-#ifdef HASH_CODE
+#if HASH_CODE
     data.hash_code = 0;
 #endif
     return data;

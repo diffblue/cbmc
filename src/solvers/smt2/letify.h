@@ -33,7 +33,7 @@ protected:
     symbol_exprt let_symbol;
   };
 
-#ifdef HASH_CODE
+#if HASH_CODE
   using seen_expressionst = std::unordered_map<exprt, let_count_idt, irep_hash>;
 #else
   using seen_expressionst = irep_hash_mapt<exprt, let_count_idt>;
