@@ -209,7 +209,7 @@ bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
   return false;
 }
 
-/// write to a variable
+#if 0
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
@@ -290,10 +290,11 @@ static bool check_renaming(const exprt &expr)
 
   return false;
 }
+#endif
 
 static void assert_l1_renaming(const exprt &expr)
 {
-  #if 1
+  #if 0
   if(check_renaming_l1(expr))
   {
     std::cerr << expr.pretty() << '\n';
@@ -306,7 +307,7 @@ static void assert_l1_renaming(const exprt &expr)
 
 static void assert_l2_renaming(const exprt &expr)
 {
-  #if 1
+  #if 0
   if(check_renaming(expr))
   {
     std::cerr << expr.pretty() << '\n';
@@ -317,6 +318,7 @@ static void assert_l2_renaming(const exprt &expr)
   #endif
 }
 
+/// write to a variable
 void goto_symex_statet::assignment(
   ssa_exprt &lhs, // L0/L1
   const exprt &rhs,  // L2
