@@ -81,10 +81,11 @@ std::string graphml_witnesst::convert_assign_rec(
     forall_operands(it, assign.rhs())
     {
       index_exprt index(
-          assign.lhs(),
-          from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
-          type.subtype());
-      if(!result.empty()) result+=' ';
+        assign.lhs(),
+        from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+        type.subtype());
+      if(!result.empty())
+        result+=' ';
       result+=convert_assign_rec(identifier, code_assignt(index, *it));
     }
   }
@@ -128,10 +129,11 @@ std::string graphml_witnesst::convert_assign_rec(
       assert(it!=assign.rhs().operands().end());
 
       member_exprt member(
-          assign.lhs(),
-          comp.get_name(),
-          it->type());
-      if(!result.empty()) result+=' ';
+        assign.lhs(),
+        comp.get_name(),
+        it->type());
+      if(!result.empty())
+        result+=' ';
       result+=convert_assign_rec(identifier, code_assignt(member, *it));
       ++it;
 
@@ -181,7 +183,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   for(goto_tracet::stepst::const_iterator
       it=goto_trace.steps.begin();
       it!=goto_trace.steps.end();
-      it++) //we cannot replace this by a ranged for
+      it++) // we cannot replace this by a ranged for
   {
     const source_locationt &source_location=it->pc->source_location;
 
@@ -248,10 +250,11 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     goto_tracet::stepst::const_iterator next=it;
     for(++next;
         next!=goto_trace.steps.end() &&
-        (step_to_node[next->step_nr]==sink ||
-         it->pc==next->pc);
+        (step_to_node[next->step_nr]==sink || it->pc==next->pc);
         ++next)
-      ;
+    {
+      // advance
+    }
     const std::size_t to=
       next==goto_trace.steps.end()?
       sink:step_to_node[next->step_nr];
@@ -345,7 +348,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::DEAD:
     case goto_trace_stept::CONSTRAINT:
     case goto_trace_stept::NONE:
-        ; /* ignore */
+      // ignore
+      break;
     }
 
     it=next;
@@ -381,7 +385,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end();
-      it++, step_nr++) //we cannot replace this by a ranged for
+      it++, step_nr++) // we cannot replace this by a ranged for
   {
     const source_locationt &source_location=it->source.pc->source_location;
 
@@ -442,10 +446,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     std::size_t next_step_nr=step_nr;
     for(++next, ++next_step_nr;
         next!=equation.SSA_steps.end() &&
-        (step_to_node[next_step_nr]==sink ||
-         it->source.pc==next->source.pc);
+        (step_to_node[next_step_nr]==sink || it->source.pc==next->source.pc);
         ++next, ++next_step_nr)
-      ;
+    {
+      // advance
+    }
     const std::size_t to=
       next==equation.SSA_steps.end()?
       sink:step_to_node[next_step_nr];
@@ -514,10 +519,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::DEAD:
     case goto_trace_stept::CONSTRAINT:
     case goto_trace_stept::NONE:
-        ; /* ignore */
+      // ignore
+      break;
     }
 
-    it=next; 
+    it=next;
     step_nr=next_step_nr;
   }
 }

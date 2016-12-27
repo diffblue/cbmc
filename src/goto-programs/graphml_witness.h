@@ -39,7 +39,6 @@ protected:
   std::string convert_assign_rec(
     const irep_idt &identifier,
     const code_assignt &assign);
-
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GRAPHML_WITNESS_H

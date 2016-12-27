@@ -37,7 +37,7 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
   std::string invariant_scope;
 };
 
-class graphmlt : public graph<xml_graph_nodet>
+class graphmlt:public graph<xml_graph_nodet>
 {
 public:
   inline bool has_node(const std::string &node_name) const

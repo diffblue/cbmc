@@ -282,8 +282,12 @@ Function: write_graphml
 bool write_graphml(const graphmlt &src, std::ostream &os)
 {
   xmlt graphml("graphml");
-  graphml.set_attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  graphml.set_attribute("xmlns", "http://graphml.graphdrawing.org/xmlns");
+  graphml.set_attribute(
+    "xmlns:xsi",
+    "http://www.w3.org/2001/XMLSchema-instance");
+  graphml.set_attribute(
+    "xmlns",
+    "http://graphml.graphdrawing.org/xmlns");
 
   // <key attr.name="originFileName" attr.type="string" for="edge"
   //      id="originfile">
@@ -311,7 +315,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "invariant");
   }
 
-  //<key attr.name="invariant.scope" attr.type="string" for="node"
+  // <key attr.name="invariant.scope" attr.type="string" for="node"
   //     id="invariant.scope"/>
   {
     xmlt &key=graphml.new_element("key");
