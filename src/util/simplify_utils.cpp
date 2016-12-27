@@ -120,7 +120,7 @@ static const struct saj_tablet &sort_and_join(
   return saj_table[i];
 }
 
-bool sort_and_join(exprt &expr)
+bool sort_and_join(exprt &expr, bool do_sort)
 {
   bool result=true;
 
@@ -160,7 +160,8 @@ bool sort_and_join(exprt &expr)
 
   // sort it
 
-  result=sort_operands(new_ops) && result;
+  if(do_sort)
+    result=sort_operands(new_ops) && result;
   expr.operands().swap(new_ops);
 
   return result;

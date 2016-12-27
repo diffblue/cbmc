@@ -2188,7 +2188,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
 
   bool result=true;
 
-  result=sort_and_join(expr) && result;
+  result=sort_and_join(expr, false) && result;
 
   if(expr.id()==ID_typecast)
     result=simplify_typecast(expr) && result;
