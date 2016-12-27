@@ -14,6 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool sort_operands(exprt::operandst &operands);
 
-bool sort_and_join(exprt &expr);
+bool sort_and_join(exprt &expr, bool do_sort=true);
 
 #endif // CPROVER_UTIL_SIMPLIFY_UTILS_H
