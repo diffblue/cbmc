@@ -6,6 +6,12 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // This just does memory allocation.
   __CPROVER_HIDE:;
   void *res;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(malloc_size<(1UL<<((sizeof(char*)-1)*8-1)));
   res=__CPROVER_malloc(malloc_size);
 
   // ensure it's not recorded as deallocated
@@ -31,6 +37,12 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // The constructor call is done by the front-end.
   // This just does memory allocation.
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(size*count<(1UL<<((sizeof(char*)-1)*8-1)));
   void *res;
   res=__CPROVER_malloc(size*count);
 

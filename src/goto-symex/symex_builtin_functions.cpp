@@ -62,6 +62,9 @@ void goto_symext::symex_malloc(
     return; // ignore
 
   dynamic_counter++;
+  // we can only encode 254 fresh objects + invalid + null in 8 bits
+  if(dynamic_counter>254)
+    throw "at most 254 distinct dynamic objects are supported";
 
   exprt size=code.op0();
   typet object_type=nil_typet();
@@ -373,6 +376,9 @@ void goto_symext::symex_cpp_new(
   do_array=(code.get(ID_statement)==ID_cpp_new_array);
 
   dynamic_counter++;
+  // we can only encode 254 fresh objects + invalid + null in 8 bits
+  if(dynamic_counter>254)
+    throw "at most 254 distinct dynamic objects are supported";
 
   const std::string count_string(std::to_string(dynamic_counter));
 

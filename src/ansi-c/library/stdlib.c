@@ -92,6 +92,12 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   // realistically, malloc may return NULL,
   // and __CPROVER_malloc doesn't, but no one cares
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(malloc_size<(1UL<<((sizeof(char*)-1)*8-1)));
   void *malloc_res;
   malloc_res=__CPROVER_malloc(malloc_size);
 
@@ -116,6 +122,12 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(alloca_size<(1UL<<((sizeof(char*)-1)*8-1)));
   void *res;
   res=__CPROVER_malloc(alloca_size);
 
@@ -301,6 +313,8 @@ inline long atol(const char *nptr)
 #define __CPROVER_LIMITS_H_INCLUDED
 #endif
 
+inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
+
 inline char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
@@ -330,7 +344,7 @@ inline char *getenv(const char *name)
   // the range.
 
   __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  buffer=(char *)__CPROVER_malloc(buf_size);
+  buffer=(char *)__builtin_alloca(buf_size);
   buffer[buf_size-1]=0;
 
   return buffer;
