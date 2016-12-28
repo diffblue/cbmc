@@ -313,11 +313,12 @@ inline int fflush(FILE *stream)
   // just return nondet
   __CPROVER_HIDE:;
   int return_value;
-  (void)*stream;
+  (void)stream;
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_assert(__CPROVER_get_must(stream, "open"),
-                   "fflush file must be open");
+  if(stream)
+    __CPROVER_assert(__CPROVER_get_must(stream, "open"),
+                     "fflush file must be open");
   #endif
 
   return return_value;
