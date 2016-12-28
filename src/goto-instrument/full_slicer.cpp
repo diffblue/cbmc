@@ -41,14 +41,17 @@ void full_slicert::add_dependencies(
   const dependence_grapht &dep_graph,
   const dep_node_to_cfgt &dep_node_to_cfg)
 {
-  const dependence_grapht::nodet &d_node=
-    dep_graph[dep_graph[node.PC].get_node_id()];
+  if (dep_graph.state_exist(node.PC))
+  {
+    const dependence_grapht::nodet &d_node=
+      dep_graph[dep_graph[node.PC].get_node_id()];
 
-  for(dependence_grapht::edgest::const_iterator
-      it=d_node.in.begin();
-      it!=d_node.in.end();
-      ++it)
-    add_to_queue(queue, dep_node_to_cfg[it->first], node.PC);
+    for(dependence_grapht::edgest::const_iterator
+        it=d_node.in.begin();
+        it!=d_node.in.end();
+        ++it)
+      add_to_queue(queue, dep_node_to_cfg[it->first], node.PC);
+  }
 }
 
 /*******************************************************************\

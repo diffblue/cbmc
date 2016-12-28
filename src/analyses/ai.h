@@ -274,6 +274,14 @@ public:
     ai_baset::clear();
   }
 
+  // this one just finds states
+  virtual const bool state_exist(locationt l) const
+  {
+    typename state_mapt::const_iterator it=state_map.find(l);
+    if(it==state_map.end()) return false;
+    return true;
+  }
+
 protected:
   typedef hash_map_cont<locationt, domainT, const_target_hash> state_mapt;
   state_mapt state_map;
