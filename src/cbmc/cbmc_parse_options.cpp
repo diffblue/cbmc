@@ -868,6 +868,7 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
 
+<<<<<<< c57f66383a75e4e764b58815c18b87ea2672a756
     // full slice?
     if(cmdline.isset("full-slice"))
     {
@@ -977,6 +978,30 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove skips
     remove_skip(goto_functions);
     goto_functions.update();
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      remove_virtual_functions(symbol_table,goto_functions);
+      remove_function_pointers(symbol_table,goto_functions,cmdline.isset("pointer-check"));
+      remove_returns(symbol_table,goto_functions);
+      goto_functions.update();
+
+      //status() << "Performing full inlining" << eom;
+      //goto_inline(goto_functions, ns, ui_message_handler);
+
+      try
+      {
+        full_slicer(goto_functions, ns);
+      }
+
+      catch(const char *error_msg)
+      {
+        error() << error_msg << eom;
+        return 1;
+      }
+    }
   }
 
   catch(const char *e)
