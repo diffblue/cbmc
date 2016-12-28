@@ -106,6 +106,12 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   // realistically, malloc may return NULL,
   // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(malloc_size < (1UL << ((sizeof(char *) - 1) * 8 - 1)));
   void *malloc_res;
   malloc_res = __CPROVER_allocate(malloc_size, 0);
 
@@ -132,6 +138,12 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(alloca_size < (1UL << ((sizeof(char *) - 1) * 8 - 1)));
   void *res;
   res = __CPROVER_allocate(alloca_size, 0);
 
