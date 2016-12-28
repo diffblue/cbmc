@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/i2string.h>
 #include <util/source_location.h>
+#include <util/string_utils.h>
 #include <util/time_stopping.h>
 #include <util/message.h>
 #include <util/json.h>
@@ -381,8 +382,9 @@ void bmct::show_program()
     {
       std::string string_value;
       languages.from_expr(step.ssa_lhs, string_value);
-      std::cout << "(" << count << ") SHARED_" << (step.is_shared_write()?"WRITE":"READ") << "("
-                << string_value <<") " << "\n";
+      std::cout << "(" << count << ") SHARED_"
+                << (step.is_shared_write()?"WRITE":"READ")
+                << "(" << string_value <<")\n";
 
       if(!step.guard.is_true())
       {
@@ -665,13 +667,11 @@ Function: bmct::setup_unwind
 void bmct::setup_unwind()
 {
   const std::string &set=options.get_option("unwindset");
-  std::string::size_type length=set.length();
+  std::vector<std::string> unwindset_loops;
+  split_string(set, ',', unwindset_loops, true, true);
 
-  for(std::string::size_type idx=0; idx<length; idx++)
+  for(auto & val : unwindset_loops)
   {
-    std::string::size_type next=set.find(",", idx);
-    std::string val=set.substr(idx, next-idx);
-
     unsigned thread_nr;
     bool thread_nr_set=false;
 
@@ -695,9 +695,6 @@ void bmct::setup_unwind()
       else
         symex.set_unwind_loop_limit(id, uw);
     }
-
-    if(next==std::string::npos) break;
-    idx=next;
   }
 
   if(options.get_option("unwind")!="")
