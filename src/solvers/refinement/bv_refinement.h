@@ -83,8 +83,8 @@ protected:
   void get_values(approximationt &approximation);
   bool is_in_conflict(approximationt &approximation);
 
-  void check_SAT();
-  void check_UNSAT();
+  virtual void check_SAT();
+  virtual void check_UNSAT();
   bool progress;
 
   // we refine the theory of arrays

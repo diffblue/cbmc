@@ -1,6 +1,6 @@
 CORE
 test_set_length.class
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[assertion.1\] assertion at file test_set_length.java line 8: SUCCESS$

@@ -1,6 +1,6 @@
 KNOWNBUG
 test.c
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"a\")): SUCCESS

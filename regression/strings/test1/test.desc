@@ -1,6 +1,6 @@
 CORE
 test.c
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion c1 == c2: SUCCESS$

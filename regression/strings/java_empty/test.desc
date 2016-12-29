@@ -1,6 +1,6 @@
 CORE
 test_empty.class
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[assertion.1\] assertion at file test_empty.java line 4: SUCCESS$
