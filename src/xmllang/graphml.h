@@ -32,9 +32,37 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
   irep_idt line;
   unsigned thread_nr;
   bool is_violation;
+  bool has_invariant;
+  std::string invariant;
+  std::string invariant_scope;
 };
 
-typedef graph<xml_graph_nodet> graphmlt;
+class graphmlt:public graph<xml_graph_nodet>
+{
+public:
+  inline bool has_node(const std::string &node_name) const
+  {
+    for(const auto & n : nodes)
+      if(n.node_name==node_name)
+        return true;
+
+    return false;
+  }
+
+  const node_indext add_node_if_not_exists(std::string node_name)
+  {
+    for(node_indext i=0; i<nodes.size(); ++i)
+    {
+      if(nodes[i].node_name==node_name)
+        return i;
+    }
+
+    return graph<xml_graph_nodet>::add_node();
+  }
+
+  typedef std::map<std::string, std::string> key_valuest;
+  key_valuest key_values;
+};
 
 bool read_graphml(
   std::istream &is,
