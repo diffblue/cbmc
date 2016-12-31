@@ -193,6 +193,7 @@ public:
     value_sett value_set;
     guardt guard;
     symex_targett::sourcet source;
+    guardt guard_before_branch;
     propagationt propagation;
     unsigned atomic_section_id;
 

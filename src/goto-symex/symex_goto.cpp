@@ -175,6 +175,7 @@ void goto_symext::symex_goto(statet &state)
       state.rename(guard_expr, ns);
     }
 
+    new_state.guard_before_branch=state.guard;
     if(forward)
     {
       new_state.guard.add(guard_expr);
@@ -280,10 +281,38 @@ void goto_symext::phi_function(
 
   if(!variables.empty())
   {
-    diff_guard=goto_state.guard;
+    guardt tmp_guard(goto_state.guard);
+    guardt tmp_guard2(goto_state.guard);
 
     // this gets the diff between the guards
-    diff_guard-=dest_state.guard;
+    // tmp_guard-=dest_state.guard;
+    if(!goto_state.guard_before_branch.is_constant())
+    {
+      assert(tmp_guard2.id()==ID_and);
+
+      if(goto_state.guard_before_branch.id()==ID_and)
+      {
+        assert(tmp_guard2.operands().size()>
+               goto_state.guard_before_branch.operands().size());
+        for(const auto & op : goto_state.guard_before_branch.operands())
+        {
+          // assert(tmp_guard2.operands().front()==op);
+          (void)op;
+          tmp_guard2.operands().erase(tmp_guard2.operands().begin());
+        }
+      }
+      else
+      {
+        assert(tmp_guard2.operands().front()==
+               goto_state.guard_before_branch);
+        tmp_guard2.operands().erase(tmp_guard2.operands().begin());
+      }
+
+      if(tmp_guard2.operands().size()==1)
+        tmp_guard2=tmp_guard2.op0();
+    }
+    // assert(tmp_guard==tmp_guard2);
+    diff_guard=tmp_guard2;
   }
 
   for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator

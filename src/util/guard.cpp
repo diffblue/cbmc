@@ -132,6 +132,22 @@ guardt& guardt::logical_or(const guardt &g2, const namespacet &ns)
   if(g2.is_false() || g1.is_true()) return g1;
   if(g1.is_false() || g2.is_true()) { g1=g2; return g1; }
 
+  {
+    exprt tmp(g2);
+    tmp.make_not();
+
+    if(tmp==g1)
+      g1.make_true();
+    else
+      g1=or_exprt(g1, g2);
+
+    bdd_exprt t(ns);
+    t.from_expr(g1);
+    g1=t.as_expr();
+
+    return g1;
+  }
+
   if(g1.id()!=ID_and || g2.id()!=ID_and)
   {
     exprt tmp(g2);
