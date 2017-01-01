@@ -1029,26 +1029,23 @@ void goto_checkt::pointer_validity_check(
         expr,
         guard);
 
-    if(mode != ID_java)
-    {
-      if(flags.is_unknown() || flags.is_dynamic_heap())
-        add_guarded_claim(
-          not_exprt(deallocated(pointer, ns)),
-          "dereference failure: deallocated dynamic object",
-          "pointer dereference",
-          expr.find_source_location(),
-          expr,
-          guard);
+    if(flags.is_unknown() || flags.is_dynamic_heap())
+      add_guarded_claim(
+        not_exprt(deallocated(pointer, ns)),
+        "dereference failure: deallocated dynamic object",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
 
-      if(flags.is_unknown() || flags.is_dynamic_local())
-        add_guarded_claim(
-          not_exprt(dead_object(pointer, ns)),
-          "dereference failure: dead object",
-          "pointer dereference",
-          expr.find_source_location(),
-          expr,
-          guard);
-    }
+    if(flags.is_unknown() || flags.is_dynamic_local())
+      add_guarded_claim(
+        not_exprt(dead_object(pointer, ns)),
+        "dereference failure: dead object",
+        "pointer dereference",
+        expr.find_source_location(),
+        expr,
+        guard);
 
     if(enable_bounds_check)
     {
