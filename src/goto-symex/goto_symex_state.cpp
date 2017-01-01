@@ -355,6 +355,9 @@ void goto_symex_statet::assignment(
   assert_l2_renaming(lhs);
   assert_l2_renaming(rhs);
 
+  if(is_shared && lhs.type().id()==ID_pointer)
+    throw "Pointer handling for concurrency is unsound";
+
   // for value propagation -- the RHS is L2
 
   if(!is_shared && record_value && constant_propagation(rhs))
