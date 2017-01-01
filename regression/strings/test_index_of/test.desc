@@ -1,6 +1,6 @@
-CORE
+FUTURE
 test.c
---pass
+--string-refine
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion firstSlash == 3: SUCCESS$

@@ -16,7 +16,7 @@ int main()
     // proving the assertions individually seems to be much faster
     //assert(__CPROVER_string_length(s) == i + 5);
     //assert(__CPROVER_string_issuffix(__CPROVER_string_literal("po"), s));
-    assert(__CPROVER_char_at(s, i) == __CPROVER_char_literal("p"));
+    assert(__CPROVER_char_at(s, i) == 'p');
 
     return 0;
 }
