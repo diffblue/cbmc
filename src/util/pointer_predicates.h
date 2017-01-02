@@ -28,9 +28,23 @@ exprt null_object(const exprt &pointer);
 exprt null_pointer(const exprt &pointer);
 exprt integer_address(const exprt &pointer);
 exprt invalid_pointer(const exprt &pointer);
-exprt dynamic_object_lower_bound(const exprt &pointer);
-exprt dynamic_object_upper_bound(const exprt &pointer, const typet &dereference_type, const namespacet &ns);
-exprt object_lower_bound(const exprt &pointer);
-exprt object_upper_bound(const exprt &pointer, const typet &dereference_type, const namespacet &ns);
+exprt dynamic_object_lower_bound(
+  const exprt &pointer,
+  const namespacet &ns,
+  const exprt &offset);
+exprt dynamic_object_upper_bound(
+  const exprt &pointer,
+  const typet &dereference_type,
+  const namespacet &ns,
+  const exprt &access_size);
+exprt object_lower_bound(
+  const exprt &pointer,
+  const namespacet &ns,
+  const exprt &offset);
+exprt object_upper_bound(
+  const exprt &pointer,
+  const typet &dereference_type,
+  const namespacet &ns,
+  const exprt &access_size);
 
 #endif // CPROVER_UTIL_POINTER_PREDICATES_H
