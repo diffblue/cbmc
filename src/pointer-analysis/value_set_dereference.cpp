@@ -425,7 +425,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
           // check lower bound
           guardt tmp_guard(guard);
           tmp_guard.add(is_malloc_object);
-          tmp_guard.add(dynamic_object_lower_bound(pointer_expr));
+          tmp_guard.add(
+            dynamic_object_lower_bound(
+              pointer_expr,
+              ns,
+              nil_exprt()));
           dereference_callback.dereference_failure(
             "pointer dereference",
             "dynamic object lower bound", tmp_guard);
@@ -439,7 +443,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
           guardt tmp_guard(guard);
           tmp_guard.add(is_malloc_object);
-          tmp_guard.add(dynamic_object_upper_bound(pointer_expr, dereference_type, ns));
+          tmp_guard.add(
+            dynamic_object_upper_bound(
+              pointer_expr,
+              dereference_type,
+              ns,
+              size_of_expr(dereference_type, ns)));
           dereference_callback.dereference_failure(
             "pointer dereference",
             "dynamic object upper bound", tmp_guard);
