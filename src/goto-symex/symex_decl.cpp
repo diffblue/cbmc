@@ -45,7 +45,39 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 
   ssa_exprt ssa(expr);
   state.rename(ssa, ns, goto_symex_statet::L1);
-  const irep_idt &l1_identifier=ssa.get_identifier();
+  irep_idt l1_identifier=ssa.get_identifier();
+
+  // inlining may yield multiple declarations of the same identifier
+  // within the same L1 context
+#if 0
+  if(state.level2.current_names.find(l1_identifier)!=
+     state.level2.current_names.end())
+  {
+    // remove the previous one
+    state.level2.current_names.erase(l1_identifier);
+
+    // get L0 name
+    state.get_original_name(ssa);
+    state.rename(ssa, ns, goto_symex_statet::L0);
+    const irep_idt l0_name=ssa.get_identifier();
+
+    unsigned new_l1=state.level1.current_count(l0_name);
+
+    while(state.l1_history.find(l1_identifier)!=state.l1_history.end())
+    {
+      state.level1.increase_counter(l0_name);
+      ++new_l1;
+      ssa.set_level_1(new_l1);
+      l1_identifier=ssa.get_identifier();
+    }
+
+    // now unique -- store
+    state.top().local_objects.insert(l1_identifier);
+    state.l1_history.insert(l1_identifier);
+
+    state.rename(ssa, ns, goto_symex_statet::L1);
+  }
+#endif
 
   // rename type to L2
   state.rename(ssa.type(), l1_identifier, ns);
@@ -77,11 +109,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   state.propagation.remove(l1_identifier);
 
   // L2 renaming
-  // inlining may yield multiple declarations of the same identifier
-  // within the same L1 context
-  if(state.level2.current_names.find(l1_identifier)==
-     state.level2.current_names.end())
-    state.level2.current_names[l1_identifier]=std::make_pair(ssa, 0);
+  state.level2.current_names.insert(
+    std::make_pair(l1_identifier, std::make_pair(ssa, 0)));
   state.level2.increase_counter(l1_identifier);
   const bool record_events=state.record_events;
   state.record_events=false;
