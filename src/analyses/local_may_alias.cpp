@@ -298,7 +298,7 @@ void local_may_aliast::get_rec(
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
 
-    if(statement==ID_malloc)
+    if(statement==ID_allocate)
     {
       dest.insert(objects.number(exprt(ID_dynamic_object)));
     }

@@ -22,7 +22,7 @@ int main()
 {
     // Create node
     struct node *nd;
-    nd = (struct node *)__CPROVER_malloc(sizeof(struct node));
+    nd = (struct node *)__CPROVER_allocate(sizeof(struct node), 0);
 
     // Link node
     struct list_head *hd = &(nd->linkage);

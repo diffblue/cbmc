@@ -12,7 +12,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // for 32-bit systems that yields a maximum allocation of 2^23-1,
   // i.e., just under 8MB
   __CPROVER_assume(malloc_size<(1UL<<((sizeof(char*)-1)*8-1)));
-  res=__CPROVER_malloc(malloc_size);
+  res=__CPROVER_allocate(malloc_size, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -44,7 +44,7 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // i.e., just under 8MB
   __CPROVER_assume(size*count<(1UL<<((sizeof(char*)-1)*8-1)));
   void *res;
-  res=__CPROVER_malloc(size*count);
+  res=__CPROVER_allocate(size*count, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;

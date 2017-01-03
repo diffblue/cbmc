@@ -1095,17 +1095,20 @@ std::string expr2ct::convert_pointer_object_has_type(
   return dest;
 }
 
-std::string expr2ct::convert_malloc(
+std::string expr2ct::convert_allocate(
   const exprt &src,
   unsigned &precedence)
 {
-  if(src.operands().size()!=1)
+  if(src.operands().size()!=2)
     return convert_norep(src, precedence);
 
   unsigned p0;
   std::string op0=convert_with_precedence(src.op0(), p0);
 
-  std::string dest="MALLOC";
+  unsigned p1;
+  std::string op1=convert(src.op0(), p1);
+
+  std::string dest="ALLOCATE";
   dest+='(';
 
   if(src.type().id()==ID_pointer &&
@@ -1115,7 +1118,7 @@ std::string expr2ct::convert_malloc(
     dest+=", ";
   }
 
-  dest+=op0;
+  dest+=op0+", "+op1;
   dest+=')';
 
   return dest;
@@ -3629,8 +3632,8 @@ std::string expr2ct::convert_with_precedence(
       return
         convert_side_effect_expr_function_call(
           to_side_effect_expr_function_call(src), precedence);
-    else if(statement==ID_malloc)
-      return convert_malloc(src, precedence=15);
+    else if(statement==ID_allocate)
+      return convert_allocate(src, precedence=15);
     else if(statement==ID_printf)
       return convert_function(src, "printf", precedence=16);
     else if(statement==ID_nondet)

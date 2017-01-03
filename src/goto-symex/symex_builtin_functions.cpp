@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/expr_util.h>
+#include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
@@ -50,13 +52,13 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   return nil_typet();
 }
 
-void goto_symext::symex_malloc(
+void goto_symext::symex_allocate(
   statet &state,
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=1)
-    throw "malloc expected to have one operand";
+  if(code.operands().size()!=2)
+    throw "allocate expected to have two operands";
 
   if(lhs.is_nil())
     return; // ignore
@@ -166,6 +168,27 @@ void goto_symext::symex_malloc(
   value_symbol.mode=ID_C;
 
   new_symbol_table.add(value_symbol);
+
+  exprt zero_init=code.op1();
+  state.rename(zero_init, ns); // to allow constant propagation
+  simplify(zero_init, ns);
+
+  if(zero_init.is_constant() && !zero_init.is_zero())
+  {
+    null_message_handlert null_message;
+    exprt zero_value=
+      zero_initializer(
+        object_type,
+        code.source_location(),
+        ns,
+        null_message);
+
+    if(zero_value.is_not_nil())
+    {
+      code_assignt assignment(value_symbol.symbol_expr(), zero_value);
+      symex_assign_rec(state, assignment);
+    }
+  }
 
   address_of_exprt rhs;
 

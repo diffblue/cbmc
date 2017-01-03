@@ -92,7 +92,7 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" const void *__CPROVER_dead_object=0;" << '\n';
 
   // malloc
-  out << "extern \"C\" void *__CPROVER_malloc(__CPROVER::size_t size);" << '\n';
+  out << "extern \"C\" void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);" << '\n';
   out << "extern \"C\" const void *__CPROVER_deallocated=0;" << '\n';
   out << "extern \"C\" const void *__CPROVER_malloc_object=0;" << '\n';
   out << "extern \"C\" __CPROVER::size_t __CPROVER_malloc_size;" << '\n';
