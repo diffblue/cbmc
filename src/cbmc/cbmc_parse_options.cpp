@@ -117,7 +117,8 @@ void cbmc_parse_optionst::eval_verbosity()
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10) v=10;
+    if(v>10)
+      v=10;
   }
 
   ui_message_handler.set_verbosity(v);
@@ -192,8 +193,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
   if(cmdline.isset("localize-faults-method"))
-    options.set_option("localize-faults-method",
-                       cmdline.get_value("localize-faults-method"));
+  {
+    options.set_option(
+      "localize-faults-method",
+      cmdline.get_value("localize-faults-method"));
+  }
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
@@ -239,23 +243,29 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("cover"))
     options.set_option("unwinding-assertions", false);
   else
-    options.set_option("unwinding-assertions",
+  {
+    options.set_option(
+      "unwinding-assertions",
       cmdline.isset("unwinding-assertions"));
+  }
 
   // generate unwinding assumptions otherwise
-  options.set_option("partial-loops",
-   cmdline.isset("partial-loops"));
+  options.set_option(
+    "partial-loops",
+    cmdline.isset("partial-loops"));
 
   if(options.get_bool_option("partial-loops") &&
      options.get_bool_option("unwinding-assertions"))
   {
-    error() << "--partial-loops and --unwinding-assertions must not be given together" << eom;
+    error() << "--partial-loops and --unwinding-assertions "
+            << "must not be given together" << eom;
     exit(1); // should contemplate EX_USAGE from sysexits.h
   }
 
   // remove unused equations
-  options.set_option("slice-formula",
-       cmdline.isset("slice-formula"));
+  options.set_option(
+    "slice-formula",
+    cmdline.isset("slice-formula"));
 
   // simplify if conditions and branches
   if(cmdline.isset("no-simplify-if"))
@@ -293,81 +303,84 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   if(cmdline.isset("max-node-refinement"))
-    options.set_option("max-node-refinement", cmdline.get_value("max-node-refinement"));
+    options.set_option(
+      "max-node-refinement",
+      cmdline.get_value("max-node-refinement"));
 
   if(cmdline.isset("aig"))
     options.set_option("aig", true);
 
   // SMT Options
-  bool version_set = false;
+  bool version_set=false;
 
   if(cmdline.isset("smt1"))
   {
     options.set_option("smt1", true);
     options.set_option("smt2", false);
-    version_set = true;
+    version_set=true;
   }
 
   if(cmdline.isset("smt2"))
   {
-    options.set_option("smt1", false);// If both are given, smt2 takes precedence
+    // If both are given, smt2 takes precedence
+    options.set_option("smt1", false);
     options.set_option("smt2", true);
-    version_set = true;
+    version_set=true;
   }
 
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
 
 
-  bool solver_set = false;
+  bool solver_set=false;
 
   if(cmdline.isset("boolector"))
   {
-    options.set_option("boolector", true), solver_set = true;
+    options.set_option("boolector", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt2", true), version_set = true;
+      options.set_option("smt2", true), version_set=true;
   }
 
   if(cmdline.isset("mathsat"))
   {
-    options.set_option("mathsat", true), solver_set = true;
+    options.set_option("mathsat", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt2", true), version_set = true;
+      options.set_option("smt2", true), version_set=true;
   }
 
   if(cmdline.isset("cvc3"))
   {
-    options.set_option("cvc3", true), solver_set = true;
+    options.set_option("cvc3", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt1", true), version_set = true;
+      options.set_option("smt1", true), version_set=true;
   }
 
   if(cmdline.isset("cvc4"))
   {
-    options.set_option("cvc4", true), solver_set = true;
+    options.set_option("cvc4", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt2", true), version_set = true;
+      options.set_option("smt2", true), version_set=true;
   }
 
   if(cmdline.isset("yices"))
   {
-    options.set_option("yices", true), solver_set = true;
+    options.set_option("yices", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt2", true), version_set = true;
+      options.set_option("smt2", true), version_set=true;
   }
 
   if(cmdline.isset("z3"))
   {
-    options.set_option("z3", true), solver_set = true;
+    options.set_option("z3", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt2", true), version_set = true;
+      options.set_option("smt2", true), version_set=true;
   }
 
   if(cmdline.isset("opensmt"))
   {
-    options.set_option("opensmt", true), solver_set = true;
+    options.set_option("opensmt", true), solver_set=true;
     if(!version_set)
-      options.set_option("smt1", true), version_set = true;
+      options.set_option("smt1", true), version_set=true;
   }
 
   if(version_set && !solver_set)
@@ -375,23 +388,23 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     if(cmdline.isset("outfile"))
     {
       // outfile and no solver should give standard compliant SMT-LIB
-      options.set_option("generic", true), solver_set = true;
+      options.set_option("generic", true), solver_set=true;
     }
     else
     {
       if(options.get_bool_option("smt1"))
       {
-        options.set_option("boolector", true), solver_set = true;
+        options.set_option("boolector", true), solver_set=true;
       }
       else
       {
         assert(options.get_bool_option("smt2"));
-        options.set_option("z3", true), solver_set = true;
+        options.set_option("z3", true), solver_set=true;
       }
     }
   }
   // Either have solver and standard version set, or neither.
-  assert(version_set == solver_set);
+  assert(version_set==solver_set);
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
@@ -401,8 +414,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("sat-preprocessor", true);
 
-  options.set_option("pretty-names",
-                     !cmdline.isset("no-pretty-names"));
+  options.set_option(
+    "pretty-names",
+    !cmdline.isset("no-pretty-names"));
 
   if(cmdline.isset("outfile"))
     options.set_option("outfile", cmdline.get_value("outfile"));
@@ -457,7 +471,6 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("module") ||
      cmdline.isset("gen-interface"))
-
   {
     error() << "This version of CBMC has no support for "
                " hardware modules. Please use hw-cbmc." << eom;
@@ -514,7 +527,8 @@ int cbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  if(cmdline.isset("show-reachable-properties")) // may replace --show-properties
+  // may replace --show-properties
+  if(cmdline.isset("show-reachable-properties"))
   {
     const namespacet ns(symbol_table);
 
@@ -668,11 +682,15 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(!cmdline.args.empty())
     {
-      if(parse()) return 6;
-      if(typecheck()) return 6;
+      if(parse())
+        return 6;
+      if(typecheck())
+        return 6;
       int get_modules_ret=get_modules(bmc);
-      if(get_modules_ret!=-1) return get_modules_ret;
-      if(binaries.empty() && final()) return 6;
+      if(get_modules_ret!=-1)
+        return get_modules_ret;
+      if(binaries.empty() && final())
+        return 6;
 
       // we no longer need any parse trees or language files
       clear_parse();
@@ -685,9 +703,14 @@ int cbmc_parse_optionst::get_goto_program(
     {
       status() << "Reading GOTO program from file " << eom;
 
-      if(read_object_and_link(*it, symbol_table, goto_functions,
-                              get_message_handler()))
+      if(read_object_and_link(
+        *it,
+        symbol_table,
+        goto_functions,
+        get_message_handler()))
+      {
         return 6;
+      }
     }
 
     if(!binaries.empty())
@@ -851,7 +874,9 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
-    remove_function_pointers(symbol_table, goto_functions,
+    remove_function_pointers(
+      symbol_table,
+      goto_functions,
       cmdline.isset("pointer-check"));
     remove_virtual_functions(symbol_table, goto_functions);
 
@@ -887,8 +912,10 @@ bool cbmc_parse_optionst::process_goto_program(
     if(cmdline.isset("string-abstraction"))
     {
       status() << "String Abstraction" << eom;
-      string_abstraction(symbol_table,
-        get_message_handler(), goto_functions);
+      string_abstraction(
+        symbol_table,
+        get_message_handler(),
+        goto_functions);
     }
 
     // add failed symbols
@@ -1043,10 +1070,10 @@ void cbmc_parse_optionst::help()
     " cbmc file.c ...              source file names\n"
     "\n"
     "Analysis options:\n"
-    " --show-properties            show the properties, but don't run analysis\n"
+    " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
     " --property id                only check one specific property\n"
-    " --stop-on-fail               stop analysis once a failed property is detected\n"
-    " --trace                      give a counterexample trace for failed properties\n"
+    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
+    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1069,14 +1096,14 @@ void cbmc_parse_optionst::help()
                                        configt::ansi_ct::default_c_standard()==
                                        configt::ansi_ct::c_standardt::C99?"c99":
                                        configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n"
+                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n" // NOLINT(*)
     " --cpp98/03/11                set C++ language standard (default: "
                                    << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98":
+                                       configt::cppt::cpp_standardt::CPP98?"cpp98": // NOLINT(*)
                                        configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03":
+                                       configt::cppt::cpp_standardt::CPP03?"cpp03": // NOLINT(*)
                                        configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n"
+                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n" // NOLINT(*)
     #ifdef _WIN32
     " --gcc                        use GCC as preprocessor\n"
     #endif
@@ -1098,15 +1125,15 @@ void cbmc_parse_optionst::help()
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
-    " --cover CC                   create test-suite with coverage criterion CC\n"
-    " --mm MM                      memory consistency model for concurrent programs\n"
+    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
+    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     "\n"
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     "\n"
     "Semantic transformations:\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     "\n"
     "BMC options:\n"
     " --program-only               only show program expression\n"
@@ -1120,11 +1147,11 @@ void cbmc_parse_optionst::help()
     " --unwinding-assertions       generate unwinding assertions\n"
     " --partial-loops              permit paths with partial loops\n"
     " --no-pretty-names            do not simplify identifiers\n"
-    " --graphml-witness filename   write the witness in GraphML format to filename\n"
+    " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
     "\n"
     "Backend options:\n"
     " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n"
+    " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
     " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
@@ -1135,8 +1162,8 @@ void cbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --outfile filename           output formula to given file\n"
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n"
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n"
+    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
+    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

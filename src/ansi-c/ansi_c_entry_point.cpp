@@ -51,8 +51,8 @@ exprt::operandst build_function_environment(
 
   for(const auto & p : parameters)
   {
-    irep_idt base_name=p.get_base_name();
-    if(base_name.empty()) base_name="argument#"+i2string(i);
+    irep_idt base_name=p.get_base_name().empty()?
+      ("argument#"+i2string(i)):p.get_base_name();
     irep_idt identifier=id2string(goto_functionst::entry_point())+
       "::"+id2string(base_name);
 
@@ -109,15 +109,12 @@ void record_function_outputs(
   code_blockt &init_code,
   symbol_tablet &symbol_table)
 {
-  //const code_typet::parameterst &parameters=
-  //  to_code_type(function.type).parameters();
-
   bool has_return_value=
     to_code_type(function.type).return_type()!=empty_typet();
 
   if(has_return_value)
   {
-    //record return value
+    // record return value
     codet output(ID_output);
     output.operands().resize(2);
 
@@ -138,10 +135,12 @@ void record_function_outputs(
 
   for(const auto & p : parameters)
   {
-    irep_idt identifier=p.get_identifier();
-    if(identifier.empty()) continue;
+    if(p.get_identifier().empty())
+      continue;
 
-    const symbolt &symbol = symbol_table.lookup(identifier);
+    irep_idt identifier=p.get_identifier();
+
+    const symbolt &symbol=symbol_table.lookup(identifier);
 
     if(symbol.type.id()==ID_pointer)
     {
@@ -194,9 +193,11 @@ bool ansi_c_entry_point(
     forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
     {
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(it->second);
+      symbol_tablet::symbolst::const_iterator s_it=
+        symbol_table.symbols.find(it->second);
 
-      if(s_it==symbol_table.symbols.end()) continue;
+      if(s_it==symbol_table.symbols.end())
+        continue;
 
       if(s_it->second.type.id()==ID_code)
         matches.push_back(it->second);
@@ -456,7 +457,9 @@ bool ansi_c_entry_point(
           const exprt &arg1=parameters[1];
 
           exprt index_expr(ID_index, arg1.type().subtype());
-          index_expr.copy_to_operands(argv_symbol.symbol_expr(), gen_zero(index_type()));
+          index_expr.copy_to_operands(
+            argv_symbol.symbol_expr(),
+            gen_zero(index_type()));
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
