@@ -244,7 +244,7 @@ void goto_unwindt::unwind(
       goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
       unwind_log.insert(t_goto, loop_exit->location_number);
 
-      t_goto->make_goto(get_mutable(goto_program, loop_exit));
+      t_goto->make_goto(goto_program.const_cast_target(loop_exit));
       t_goto->source_location=loop_exit->source_location;
       t_goto->function=loop_exit->function;
       t_goto->guard=true_exprt();
@@ -269,7 +269,8 @@ void goto_unwindt::unwind(
 
     // re-direct any branches that go to loop_head to loop_iter
 
-    for(goto_programt::targett t=get_mutable(goto_program, loop_head);
+    for(goto_programt::targett
+        t=goto_program.const_cast_target(loop_head);
         t!=loop_iter; t++)
     {
       if(!t->is_goto())
