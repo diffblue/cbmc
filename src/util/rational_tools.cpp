@@ -6,8 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "std_expr.h"
+#include "rational.h"
 #include "std_types.h"
+
 #include "rational_tools.h"
 
 /*******************************************************************\

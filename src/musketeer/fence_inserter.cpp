@@ -6,7 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/graph.h>
 
 #include <sstream>
@@ -287,14 +286,14 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
 
     if(model==Power || model==Unknown) {
       /* dp variable for e */
-      const std::string name_dp="dp_"+i2string(i);
+      const std::string name_dp="dp_"+std::to_string(i);
       glp_set_col_name(ilp.lp, i, name_dp.c_str());
       glp_set_col_bnds(ilp.lp, i, GLP_LO, 0.0, 0.0);
       glp_set_obj_coef(ilp.lp, i, (has_cost?fence_cost(Dp):0)*freq_sum);
       glp_set_col_kind(ilp.lp, i, GLP_BV);
 
       /* fence variable for e */
-      const std::string name_f="f_"+i2string(i);
+      const std::string name_f="f_"+std::to_string(i);
       glp_set_col_name(ilp.lp, i+1, name_f.c_str());
       glp_set_col_bnds(ilp.lp, i+1, GLP_LO, 0.0, 0.0);
       glp_set_obj_coef(ilp.lp, i+1, (has_cost?fence_cost(Fence):0)*freq_sum);
@@ -303,14 +302,14 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
 // Note: uncomment for br and cf fences
 #if 0
       /* br variable for e */
-      const std::string name_br="br_"+i2string(i);
+      const std::string name_br="br_"+std::to_string(i);
       glp_set_col_name(ilp.lp, i+2, name_br.c_str());
       glp_set_col_bnds(ilp.lp, i+2, GLP_LO, 0.0, 0.0);
       glp_set_obj_coef(ilp.lp, i+2, (has_cost?fence_cost(Branching):0)*freq_sum);
       glp_set_col_kind(ilp.lp, i+2, GLP_BV);
 
       /* cf variable for e */
-      const std::string name_cf="cf_"+i2string(i);
+      const std::string name_cf="cf_"+std::to_string(i);
       glp_set_col_name(ilp.lp, i+3, name_cf.c_str());
       glp_set_col_bnds(ilp.lp, i+3, GLP_LO, 0.0, 0.0);
       glp_set_obj_coef(ilp.lp, i+3, (has_cost?fence_cost(Ctlfence):0)*freq_sum);
@@ -319,7 +318,7 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
 
       if(model==Power) {
         /* lwf variable for e */
-        const std::string name_lwf="lwf_"+i2string(i);
+        const std::string name_lwf="lwf_"+std::to_string(i);
         glp_set_col_name(ilp.lp, i+2/*4*/, name_lwf.c_str());
         glp_set_col_bnds(ilp.lp, i+2/*4*/, GLP_LO, 0.0, 0.0);
         glp_set_obj_coef(ilp.lp, i+2/*4*/,
@@ -329,7 +328,7 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
     }
     else {
       /* fence variable for e */
-      const std::string name_f="f_"+i2string(i);
+      const std::string name_f="f_"+std::to_string(i);
       glp_set_col_name(ilp.lp, i, name_f.c_str());
       glp_set_col_bnds(ilp.lp, i, GLP_LO, 0.0, 0.0);
       glp_set_obj_coef(ilp.lp, i, (has_cost?fence_cost(Fence):0)*freq_sum);
@@ -370,7 +369,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
     /* for all e */
     for(unsigned j=1; j<=c_wr_it->size(); ++j)
     {
-      std::string name="C_"+i2string(i)+"_c_wr_"+i2string(j);
+      std::string name="C_"+std::to_string(i)+"_c_wr_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
       glp_set_row_bnds(ilp.lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
       ++i;
@@ -387,7 +386,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
     /* for all e */
     for(unsigned j=1; j<=c_ww_it->size(); ++j)
     {
-      std::string name="C_"+i2string(i)+"_c_ww_"+i2string(j);
+      std::string name="C_"+std::to_string(i)+"_c_ww_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
       glp_set_row_bnds(ilp.lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
       ++i;
@@ -404,7 +403,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
     /* for all e */
     for(unsigned j=1; j<=c_rw_it->size(); ++j)
     {
-      std::string name="C_"+i2string(i)+"_c_rw_"+i2string(j);
+      std::string name="C_"+std::to_string(i)+"_c_rw_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
       glp_set_row_bnds(ilp.lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
       ++i;
@@ -421,7 +420,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
     /* for all e */
     for(unsigned j=1; j<=c_rr_it->size(); ++j)
     {
-      std::string name="C_"+i2string(i)+"_c_rr_"+i2string(j);
+      std::string name="C_"+std::to_string(i)+"_c_rr_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
       glp_set_row_bnds(ilp.lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
       ++i;
@@ -438,7 +437,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
       /* for all e */
       for(unsigned j=1; j<=c_it->size(); ++j)
       {
-        std::string name="C_"+i2string(i)+"_c_"+i2string(j);
+        std::string name="C_"+std::to_string(i)+"_c_"+std::to_string(j);
         glp_set_row_name(ilp.lp, i, name.c_str());
         glp_set_row_bnds(ilp.lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
         ++i;

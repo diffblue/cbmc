@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/fixedbv.h>
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
@@ -674,7 +673,7 @@ std::string smt1_convt::convert_identifier(const irep_idt &identifier)
     else
     {
       dest+='.';
-      dest.append(i2string(ch));
+      dest.append(std::to_string(ch));
       dest+='.';
     }
   }
@@ -3259,7 +3258,7 @@ void smt1_convt::find_symbols(const exprt &expr)
   {
     if(array_of_map.find(expr)==array_of_map.end())
     {
-      irep_idt id="array_of'"+i2string(array_of_map.size());
+      irep_idt id="array_of'"+std::to_string(array_of_map.size());
       out << "; the following is a poor substitute for lambda i. x" << "\n";
       out << ":extrafuns(("
           << id
@@ -3296,7 +3295,7 @@ void smt1_convt::find_symbols(const exprt &expr)
     if(array_expr_map.find(expr)==array_expr_map.end())
     {
       // introduce a temporary array.
-      irep_idt id="array_init'"+i2string(array_expr_map.size());
+      irep_idt id="array_init'"+std::to_string(array_expr_map.size());
       out << ":extrafuns(("
           << id
           << " ";
@@ -3313,7 +3312,7 @@ void smt1_convt::find_symbols(const exprt &expr)
       string2array_map[expr]=t;
 
       // introduce a temporary array.
-      irep_idt id="string'"+i2string(array_expr_map.size());
+      irep_idt id="string'"+std::to_string(array_expr_map.size());
       out << ":extrafuns(("
           << id
           << " ";

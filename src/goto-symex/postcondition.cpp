@@ -255,7 +255,7 @@ bool postconditiont::is_used(
 
     value_setst::valuest expr_set;
     value_set.get_value_set(expr.op0(), expr_set, ns);
-    hash_set_cont<irep_idt, irep_id_hash> symbols;
+    std::unordered_set<irep_idt, irep_id_hash> symbols;
 
     for(value_setst::valuest::const_iterator
         it=expr_set.begin();

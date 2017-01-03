@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <set>
 
-#include <util/hash_cont.h>
 #include <util/symbol.h>
 #include <util/string_hash.h>
 
@@ -63,7 +62,7 @@ public:
   }
 
   // mapping from function/class/scope names to their cpp_idt
-  typedef hash_map_cont<irep_idt, cpp_idt *, irep_id_hash> id_mapt;
+  typedef std::unordered_map<irep_idt, cpp_idt *, irep_id_hash> id_mapt;
   id_mapt id_map;
 
   cpp_scopet *current_scope_ptr;

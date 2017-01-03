@@ -1,4 +1,4 @@
-#include <util/namespace_utils.h>
+#include <util/type_eq.h>
 
 #include <cegis/instrument/meta_variables.h>
 #include <cegis/invariant/symex/learn/replace_operators.h>

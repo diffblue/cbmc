@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
 #include <util/source_location.h>
@@ -138,7 +137,7 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
 
   do
   {
-    new_symbol.base_name="tmp_return_val$"+i2string(++temporary_counter);
+    new_symbol.base_name="tmp_return_val$"+std::to_string(++temporary_counter);
     new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
   } while(symbol_table.move(new_symbol, symbol_ptr));
 

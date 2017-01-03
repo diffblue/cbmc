@@ -20,7 +20,6 @@ Date: September 2011
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/i2string.h>
 #include <util/message.h>
 
 #include <goto-programs/remove_skip.h>
@@ -79,7 +78,7 @@ void introduce_temporaries(
 
       symbolt new_symbol;
       new_symbol.base_name="$tmp_guard";
-      new_symbol.name=id2string(function)+"$tmp_guard"+i2string(tmp_counter++);
+      new_symbol.name=id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
       new_symbol.type=bool_typet();
       new_symbol.is_static_lifetime=true;
       new_symbol.is_thread_local=true;

@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "config.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
-#include "i2string.h"
 
 #include "std_types.h"
 #include "std_expr.h"
@@ -200,7 +199,7 @@ Function: constant_exprt::integer_constant
 
 constant_exprt constant_exprt::integer_constant(unsigned v)
 {
-  return constant_exprt(i2string(v), integer_typet());
+  return constant_exprt(std::to_string(v), integer_typet());
 }
 
 /*******************************************************************\

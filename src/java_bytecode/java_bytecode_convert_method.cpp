@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/expanding_vector.h>
 #include <util/string2int.h>
-#include <util/i2string.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
@@ -156,7 +155,7 @@ protected:
 
   symbol_exprt tmp_variable(const std::string &prefix, const typet &type)
   {
-    irep_idt base_name=prefix+"_tmp"+i2string(tmp_vars.size());
+    irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
     auxiliary_symbolt tmp_symbol;
@@ -346,7 +345,7 @@ void java_bytecode_convert_methodt::convert(
       {
         const typet &type=parameters[i].type();
         char suffix=java_char_from_type(type);
-        base_name="arg"+i2string(param_index)+suffix;
+        base_name="arg"+std::to_string(param_index)+suffix;
         identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
 
@@ -1525,7 +1524,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     const codet &c=it.second.code;
 
     if(targets.find(address)!=targets.end())
-      code.add(code_labelt(label(i2string(address)), c));
+      code.add(code_labelt(label(std::to_string(address)), c));
     else if(c.get_statement()!=ID_skip)
       code.add(c);
   }

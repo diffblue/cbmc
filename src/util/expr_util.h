@@ -33,13 +33,6 @@ class namespacet;
 exprt gen_zero(const typet &type);
 /*! \copydoc gen_zero(const typet &) */
 exprt gen_one(const typet &type);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_not_old(const exprt &op);
-
-/*! \copydoc gen_zero(const typet &) */
-void gen_and_old(exprt &expr);
-/*! \copydoc gen_zero(const typet &) */
-void gen_or_old(exprt &expr);
 
 /*! \copydoc gen_zero(const typet &) */
 void make_next_state(exprt &);

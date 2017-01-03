@@ -275,7 +275,7 @@ public:
   }
 
 protected:
-  typedef hash_map_cont<locationt, domainT, const_target_hash> state_mapt;
+  typedef std::unordered_map<locationt, domainT, const_target_hash> state_mapt;
   state_mapt state_map;
 
   // this one creates states, if need be

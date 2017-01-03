@@ -104,12 +104,4 @@ protected:
   mapt map;
 };
 
-#define forall_locs(it, locs) \
-  for(locst::loc_vectort::const_iterator it=(locs).loc_vector.begin(); \
-      it!=(locs).loc_vector.end(); it++)
-
-#define Forall_locs(it, locs) \
-  for(exprt::operandst::iterator it=(expr).loc_vector.begin(); \
-      it!=(locs).loc_vector.end(); it++)
-
 #endif // CPROVER_AA_PATH_SYMEX_LOCS_H

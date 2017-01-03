@@ -10,6 +10,7 @@ Date: April 2013
 
 #include <stack>
 #include <iostream>
+#include <unordered_set>
 
 #include <util/std_expr.h>
 
@@ -212,7 +213,7 @@ protected:
     }
   };
 
-  typedef hash_set_cont<statet, state_hash> statest;
+  typedef std::unordered_set<statet, state_hash> statest;
   statest states;
 };
 

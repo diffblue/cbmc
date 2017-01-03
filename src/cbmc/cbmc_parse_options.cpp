@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/unicode.h>
 #include <util/memory_info.h>
-#include <util/i2string.h>
 
 #include <ansi-c/c_preprocess.h>
 

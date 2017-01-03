@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/fixedbv.h>
 #include <util/pointer_offset_size.h>
 #include <util/ieee_float.h>
@@ -928,7 +927,7 @@ void smt2_convt::convert_literal(const literalt l)
     if(l.sign())
       out << ")";
 
-    smt2_identifiers.insert("B"+i2string(l.var_no()));
+    smt2_identifiers.insert("B"+std::to_string(l.var_no()));
   }
 }
 
@@ -962,7 +961,7 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
     case '\\':
     case '&': // we use the & for escaping
       result+='&';
-      result+=i2string(ch);
+      result+=std::to_string(ch);
       result+=';';
       break;
 
@@ -992,19 +991,19 @@ std::string smt2_convt::type2id(const typet &type) const
   if(type.id()==ID_floatbv)
   {
     ieee_float_spect spec(to_floatbv_type(type));
-    return "f"+i2string(spec.width())+"_"+i2string(spec.f);
+    return "f"+std::to_string(spec.width())+"_"+std::to_string(spec.f);
   }
   else if(type.id()==ID_unsignedbv)
   {
-    return "u"+i2string(to_unsignedbv_type(type).get_width());
+    return "u"+std::to_string(to_unsignedbv_type(type).get_width());
   }
   else if(type.id()==ID_c_bool)
   {
-    return "u"+i2string(to_c_bool_type(type).get_width());
+    return "u"+std::to_string(to_c_bool_type(type).get_width());
   }
   else if(type.id()==ID_signedbv)
   {
-    return "s"+i2string(to_signedbv_type(type).get_width());
+    return "s"+std::to_string(to_signedbv_type(type).get_width());
   }
   else if(type.id()==ID_bool)
   {
@@ -4618,7 +4617,7 @@ void smt2_convt::find_symbols(const exprt &expr)
   {
     if(defined_expressions.find(expr)==defined_expressions.end())
     {
-      irep_idt id="array_of."+i2string(defined_expressions.size());
+      irep_idt id="array_of."+std::to_string(defined_expressions.size());
       out << "; the following is a substitute for lambda i. x" << "\n";
       out << "(declare-fun " << id << " () ";
       convert_type(expr.type());
@@ -4642,7 +4641,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     {
       const array_typet &array_type=to_array_type(expr.type());
 
-      irep_idt id="array."+i2string(defined_expressions.size());
+      irep_idt id="array."+std::to_string(defined_expressions.size());
       out << "; the following is a substitute for an array constructor" << "\n";
       out << "(declare-fun " << id << " () ";
       convert_type(array_type);
@@ -4668,7 +4667,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       exprt tmp=to_string_constant(expr).to_array_expr();
       const array_typet &array_type=to_array_type(tmp.type());
 
-      irep_idt id="string."+i2string(defined_expressions.size());
+      irep_idt id="string."+std::to_string(defined_expressions.size());
       out << "; the following is a substitute for a string" << "\n";
       out << "(declare-fun " << id << " () ";
       convert_type(array_type);
@@ -4696,7 +4695,7 @@ void smt2_convt::find_symbols(const exprt &expr)
     {
       if (object_sizes.find(expr)==object_sizes.end())
       {
-        irep_idt id="object_size."+i2string(object_sizes.size());
+        irep_idt id="object_size."+std::to_string(object_sizes.size());
         out << "(declare-fun " << id << " () ";
         convert_type(expr.type());
         out << ")" << "\n";
@@ -4753,7 +4752,7 @@ void smt2_convt::find_symbols(const exprt &expr)
       exprt tmp1=expr;
       for(unsigned i=0; i<tmp1.operands().size(); i++)
         tmp1.operands()[i]=
-          smt2_symbolt("op"+i2string(i), tmp1.operands()[i].type());
+          smt2_symbolt("op"+std::to_string(i), tmp1.operands()[i].type());
 
       exprt tmp2=float_bv(tmp1);
       tmp2=letify(tmp2);
@@ -5015,7 +5014,7 @@ void smt2_convt::find_symbols_rec(
      if(use_datatypes &&
         datatype_map.find(type)==datatype_map.end())
      {
-       std::string smt_typename = "complex."+i2string(datatype_map.size());
+       std::string smt_typename = "complex."+std::to_string(datatype_map.size());
        datatype_map[type] = smt_typename;
 
        out << "(declare-datatypes () ((" << smt_typename << " "
@@ -5045,7 +5044,7 @@ void smt2_convt::find_symbols_rec(
        if(to_integer(vector_type.size(), size))
          INVALIDEXPR("failed to convert vector size to constant");
 
-       std::string smt_typename = "vector."+i2string(datatype_map.size());
+       std::string smt_typename = "vector."+std::to_string(datatype_map.size());
        datatype_map[type] = smt_typename;
 
        out << "(declare-datatypes () ((" << smt_typename << " "
@@ -5068,7 +5067,7 @@ void smt2_convt::find_symbols_rec(
      if(use_datatypes &&
         datatype_map.find(type)==datatype_map.end())
      {
-       std::string smt_typename = "struct."+i2string(datatype_map.size());
+       std::string smt_typename = "struct."+std::to_string(datatype_map.size());
        datatype_map[type] = smt_typename;
        need_decl=true;
      }
@@ -5278,7 +5277,7 @@ void smt2_convt::collect_bindings(
   assert(map.find(expr) == map.end());
 
   symbol_exprt let=
-    symbol_exprt("_let_"+i2string(++let_id_count), expr.type());
+    symbol_exprt("_let_"+std::to_string(++let_id_count), expr.type());
 
   map.insert(std::make_pair(expr, std::make_pair(1, let)));
 

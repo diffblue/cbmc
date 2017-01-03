@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/string2int.h>
-#include <util/i2string.h>
 #include <util/source_location.h>
 #include <util/string_utils.h>
 #include <util/time_stopping.h>
@@ -331,7 +330,7 @@ void bmct::show_program()
       if(!step.guard.is_true())
       {
         languages.from_expr(step.guard, string_value);
-        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
@@ -347,7 +346,7 @@ void bmct::show_program()
       if(!step.guard.is_true())
       {
         languages.from_expr(step.guard, string_value);
-        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
@@ -363,7 +362,7 @@ void bmct::show_program()
       if(!step.guard.is_true())
       {
         languages.from_expr(step.guard, string_value);
-        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 
@@ -389,7 +388,7 @@ void bmct::show_program()
       if(!step.guard.is_true())
       {
         languages.from_expr(step.guard, string_value);
-        std::cout << std::string(i2string(count).size()+3, ' ');
+        std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
 

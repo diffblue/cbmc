@@ -8,10 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "base_type.h"
+#include "rational.h"
 #include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
-#include "namespace_utils.h"
 #include "config.h"
 #include "bv_arithmetic.h"
 #include "std_expr.h"
@@ -478,7 +479,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
     // search for a and -a
     // first gather all the a's with -a
-    typedef hash_map_cont<exprt, exprt::operandst::iterator, irep_hash>
+    typedef std::unordered_map<exprt, exprt::operandst::iterator, irep_hash>
       expr_mapt;
     expr_mapt expr_map;
 

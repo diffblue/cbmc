@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/union_find.h>
 #include <util/threeval.h>
 #include <util/mp_arith.h>
-#include <util/interval_template.h>
 
 #include <pointer-analysis/value_sets.h>
+
+#include "interval_template.h"
 
 class inv_object_storet
 {

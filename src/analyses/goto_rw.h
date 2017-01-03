@@ -84,7 +84,7 @@ public:
   #ifdef USE_DSTRING
   typedef std::map<irep_idt, range_domain_baset*> objectst;
   #else
-  typedef hash_map_cont<irep_idt, range_domain_baset*, string_hash> objectst;
+  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash> objectst;
   #endif
 
   virtual ~rw_range_sett();

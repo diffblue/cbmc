@@ -6,11 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <list>
 #include <set>
 
 #include "get_module.h"
 #include "message.h"
 #include "symbol_table.h"
+
+typedef std::list<const symbolt *> symbolptr_listt;
+
+#define forall_symbolptr_list(it, list) \
+  for(symbolptr_listt::const_iterator it=(list).begin(); \
+      it!=(list).end(); ++it)
+
+#define Forall_symbolptr_list(it, list) \
+  for(symbolptr_listt::iterator it=(list).begin(); \
+      it!=(list).end(); ++it)
 
 /*******************************************************************\
 

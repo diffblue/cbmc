@@ -17,11 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 */
 
 #include <cassert>
+#include <iosfwd>
 #include <vector>
 
-#include "expr.h"
-
 class namespacet;
+class typet;
 
 /*! \brief Maps a big-endian offset to a little-endian offset
 */

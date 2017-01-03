@@ -416,7 +416,7 @@ public:
   inline static irep_idt loop_id(const_targett target)
   {
     return id2string(target->function)+"."+
-           i2string(target->loop_number);
+           std::to_string(target->loop_number);
   }
 
   //! Is the program empty?

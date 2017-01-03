@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/prefix.h>
 
 #include "var_map.h"
@@ -115,5 +114,5 @@ Function: var_mapt::var_infot::ssa_identifier
 irep_idt var_mapt::var_infot::ssa_identifier() const
 {
   return id2string(full_identifier)+
-         "#"+i2string(ssa_counter);
+         "#"+std::to_string(ssa_counter);
 }

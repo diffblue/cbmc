@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <stack>
 
-#include <util/i2string.h>
 
 #include "satcheck_smvsat.h"
 

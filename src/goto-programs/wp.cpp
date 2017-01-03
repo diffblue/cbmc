@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/base_type.h>
-#include <util/i2string.h>
 
 #include "wp.h"
 
@@ -63,7 +62,7 @@ void approximate_nondet_rec(exprt &dest, unsigned &count)
      to_side_effect_expr(dest).get_statement()==ID_nondet)
   {
     count++;
-    dest.set(ID_identifier, "wp::nondet::"+i2string(count));
+    dest.set(ID_identifier, "wp::nondet::"+std::to_string(count));
     dest.id(ID_nondet_symbol);
     return;
   }

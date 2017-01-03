@@ -8,7 +8,6 @@ Date: February 2016
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/cprover_prefix.h>
 #include <util/replace_symbol.h>
 
@@ -41,7 +40,7 @@ protected:
 
   unsigned temporary_counter;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   id_sett summarized;
 
   void code_contracts(goto_functionst::goto_functiont &goto_function);
@@ -297,7 +296,7 @@ const symbolt &code_contractst::new_tmp_symbol(
 
   do
   {
-    new_symbol.base_name="tmp_cc$"+i2string(++temporary_counter);
+    new_symbol.base_name="tmp_cc$"+std::to_string(++temporary_counter);
     new_symbol.name=new_symbol.base_name;
   } while(symbol_table.move(new_symbol, symbol_ptr));
 

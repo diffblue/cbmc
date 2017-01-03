@@ -11,7 +11,6 @@ Date: 2012
 #include <string>
 #include <fstream>
 
-#include <util/i2string.h>
 
 #include "goto2graph.h"
 
@@ -327,7 +326,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     ++e_i)
   {
     ++i;
-    std::string name="e_"+i2string(i);
+    std::string name="e_"+std::to_string(i);
     glp_set_col_name(lp, i, name.c_str());
     glp_set_col_bnds(lp, i, GLP_LO, 0.0, 0.0);
     glp_set_obj_coef(lp, i, cost(*e_i));
@@ -343,7 +342,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     ++C_j)
   {
     ++i;
-    std::string name="C_"+i2string(i);
+    std::string name="C_"+std::to_string(i);
     glp_set_row_name(lp, i, name.c_str());
     glp_set_row_bnds(lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
   }

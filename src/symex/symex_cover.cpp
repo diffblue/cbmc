@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <util/i2string.h>
 #include <util/json_expr.h>
 #include <util/xml_expr.h>
 
@@ -191,8 +190,8 @@ void symex_parse_optionst::report_cover(
           }
         }
       }
-      json_result["totalGoals"]=json_numbert(i2string(property_map.size()));
-      json_result["goalsCovered"]=json_numbert(i2string(goals_covered));
+      json_result["totalGoals"]=json_numbert(std::to_string(property_map.size()));
+      json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
       std::cout << ",\n" << json_result;
       break;
     }

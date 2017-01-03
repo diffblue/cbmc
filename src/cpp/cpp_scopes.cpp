@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ostream>
 
-#include <util/i2string.h>
 
 #include "cpp_scopes.h"
 
@@ -27,7 +26,7 @@ Function: cpp_scopest::new_block_scope
 cpp_scopet &cpp_scopest::new_block_scope()
 {
   unsigned prefix=++current_scope().compound_counter;
-  return new_scope(i2string(prefix), cpp_idt::BLOCK_SCOPE);
+  return new_scope(std::to_string(prefix), cpp_idt::BLOCK_SCOPE);
 }
 
 /*******************************************************************\

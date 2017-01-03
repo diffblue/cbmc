@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <map>
+#include <unordered_map>
 #include <vector>
 
-#include "hash_cont.h"
 
 template <typename T>
 class numbering:public std::vector<T>
@@ -108,7 +108,7 @@ public:
 protected:
   typedef std::vector<T> subt;
 
-  typedef hash_map_cont<T, number_type, hash_fkt> numberst;
+  typedef std::unordered_map<T, number_type, hash_fkt> numberst;
   numberst numbers;
 };
 

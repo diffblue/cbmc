@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
@@ -157,7 +156,7 @@ exprt pointer_logict::pointer_expr(
   if(pointer.object>=objects.size())
   {
     constant_exprt result(type);
-    result.set_value("INVALID-"+i2string(pointer.object));
+    result.set_value("INVALID-"+std::to_string(pointer.object));
     return result;
   }
 

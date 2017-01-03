@@ -119,7 +119,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
   }
   else if(has_prefix(expr.id_string(), "overflow-typecast-"))
   {
-    std::size_t bits=unsafe_c_str2unsigned(expr.id().c_str()+18);
+    std::size_t bits=unsafe_string2unsigned(id2string(expr.id()).substr(18));
 
     const exprt::operandst &operands=expr.operands();
 

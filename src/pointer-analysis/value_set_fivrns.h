@@ -10,6 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
 
+#include <list>
+#include <map>
+#include <string>
+#include <unordered_set>
+
 #include <util/mp_arith.h>
 #include <util/namespace.h>
 #include <util/reference_counting.h>
@@ -186,12 +191,12 @@ public:
     }
   };
 
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
+  typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
   #else
-  typedef hash_map_cont<idt, entryt, string_hash> valuest;
+  typedef std::unordered_map<idt, entryt, string_hash> valuest;
   #endif
 
   void get_value_set(

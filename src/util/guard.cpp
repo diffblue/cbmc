@@ -285,6 +285,10 @@ Function: guardt::is_false
 
 \*******************************************************************/
 
+#define forall_guard(it, guard_list) \
+  for(guardt::guard_listt::const_iterator it=(guard_list).begin(); \
+      it!=(guard_list).end(); ++it)
+
 bool guardt::is_false() const
 {
   forall_guard(it, guard_list)

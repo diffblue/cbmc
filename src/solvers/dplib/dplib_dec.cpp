@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define getpid _getpid
 #endif
 
-#include <util/i2string.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
 
@@ -43,7 +42,7 @@ Function: dplib_temp_filet::dplib_temp_filet
 
 dplib_temp_filet::dplib_temp_filet()
 {
-  temp_out_filename="dplib_dec_out_"+i2string(getpid())+".tmp";
+  temp_out_filename="dplib_dec_out_"+std::to_string(getpid())+".tmp";
 
   temp_out.open(
     temp_out_filename.c_str(),
@@ -95,7 +94,7 @@ decision_proceduret::resultt dplib_dect::dec_solve()
   temp_out.close();
 
   temp_result_filename=
-    "dplib_dec_result_"+i2string(getpid())+".tmp";
+    "dplib_dec_result_"+std::to_string(getpid())+".tmp";
 
   std::string command=
     "dplibl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";

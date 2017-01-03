@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "i2string.h"
 #include "string2int.h"
 #include "options.h"
 
@@ -63,7 +62,7 @@ Function: optionst::set_option
 void optionst::set_option(const std::string &option,
                           const signed int value)
 {
-  set_option(option, i2string(value));
+  set_option(option, std::to_string(value));
 }
 
 /*******************************************************************\
@@ -81,7 +80,7 @@ Function: optionst::set_option
 void optionst::set_option(const std::string &option,
                           const unsigned int value)
 {
-  set_option(option, i2string(value));
+  set_option(option, std::to_string(value));
 }
 
 /*******************************************************************\
@@ -99,7 +98,7 @@ Function: optionst::get_bool_option
 bool optionst::get_bool_option(const std::string &option) const
 {
   const std::string value=get_option(option);
-  return value.empty()?false:(safe_string2int(value)!=0);
+  return value.empty()?false:(std::stoi(value)!=0);
 }
 
 /*******************************************************************\
@@ -117,7 +116,7 @@ Function: optionst::get_signed_int_option
 signed int optionst::get_signed_int_option(const std::string &option) const
 {
   const std::string value=get_option(option);
-  return value.empty()?0:safe_string2int(value);
+  return value.empty()?0:std::stoi(value);
 }
 
 /*******************************************************************\

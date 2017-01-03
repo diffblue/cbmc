@@ -13,7 +13,6 @@ Date: July 2006
 
 #include <util/xml.h>
 #include <util/irep.h>
-#include <util/hash_cont.h>
 
 class xml_irep_convertt {
   private:
@@ -50,9 +49,9 @@ class xml_irep_convertt {
   public:
     class ireps_containert {
       public:
-        typedef hash_map_cont<unsigned long, irept, ul_hash, ul_eq> id_containert;
+        typedef std::unordered_map<unsigned long, irept, ul_hash, ul_eq> id_containert;
         id_containert id_container;
-        typedef hash_map_cont<irept, unsigned long, irep_full_hash, irep_content_eq> content_containert;
+        typedef std::unordered_map<irept, unsigned long, irep_full_hash, irep_content_eq> content_containert;
         content_containert content_container;
         typedef std::map<unsigned, unsigned> id_replace_mapt;
         id_replace_mapt id_replace_map;

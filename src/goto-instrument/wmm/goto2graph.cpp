@@ -21,7 +21,6 @@ Date: 2012
 #include <util/cprover_prefix.h>
 #include <util/options.h>
 #include <util/message.h>
-#include <util/i2string.h>
 #include <util/std_expr.h>
 
 #include "../rw_set.h"
@@ -1771,7 +1770,7 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
     for(unsigned i=0; i<num_sccs; i++)
     {
       std::ofstream local_dot;
-      std::string name = "scc_" + i2string(i) + ".dot";
+      std::string name = "scc_" + std::to_string(i) + ".dot";
       local_dot.open(name.c_str());
 
       local_dot << "digraph G {" << std::endl;

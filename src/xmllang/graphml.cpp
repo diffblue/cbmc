@@ -11,7 +11,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 #include <util/message.h>
 #include <util/string2int.h>
-#include <util/i2string.h>
 
 #include "graphml.h"
 
@@ -599,7 +598,7 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     {
       xmlt &entry=node.new_element("data");
       entry.set_attribute("key", "threadNumber");
-      entry.data=i2string(n.thread_nr);
+      entry.data=std::to_string(n.thread_nr);
     }
 
     // <node id="A14">

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 
 #include "goto_symex.h"
 
@@ -297,12 +296,12 @@ void goto_symext::phi_function(
   statet &dest_state)
 {
   // go over all variables to see what changed
-  hash_set_cont<ssa_exprt, irep_hash> variables;
+  std::unordered_set<ssa_exprt, irep_hash> variables;
 
   goto_state.level2_get_variables(variables);
   dest_state.level2.get_variables(variables);
 
-  for(hash_set_cont<ssa_exprt, irep_hash>::const_iterator
+  for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator
       it=variables.begin();
       it!=variables.end();
       it++)
@@ -333,7 +332,7 @@ void goto_symext::phi_function(
     // only later be removed from level2.current_names by pop_frame
     // once the thread is executed)
     if(!it->get_level_0().empty() &&
-       it->get_level_0()!=i2string(dest_state.source.thread_nr))
+       it->get_level_0()!=std::to_string(dest_state.source.thread_nr))
       continue;
 
     exprt goto_state_rhs=*it, dest_state_rhs=*it;
@@ -427,7 +426,7 @@ void goto_symext::loop_bound_exceeded(
     {
       // Generate VCC for unwinding assertion.
       vcc(negated_cond,
-          "unwinding assertion loop "+i2string(loop_number),
+          "unwinding assertion loop "+std::to_string(loop_number),
           state);
 
       // add to state guard to prevent further assignments

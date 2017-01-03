@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/tempfile.h>
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 #include <util/ieee_float.h>
 
 #include "smt2_dec.h"
@@ -238,7 +237,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<irep_idt, irept, irep_id_hash> valuest;
+  typedef std::unordered_map<irep_idt, irept, irep_id_hash> valuest;
   valuest values;
 
   while(in)
@@ -290,7 +289,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    const irept &value=values["B"+i2string(v)];
+    const irept &value=values["B"+std::to_string(v)];
     boolean_assignment[v]=(value.id()==ID_true);
   }
 

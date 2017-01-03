@@ -20,21 +20,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/arith_tools.h>
-#include <util/c_misc.h>
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
-#include <util/i2string.h>
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/prefix.h>
 #include <util/lispirep.h>
 #include <util/lispexpr.h>
+#include <util/namespace.h>
 #include <util/symbol.h>
 #include <util/suffix.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
 
+#include "c_misc.h"
+#include "c_qualifiers.h"
 #include "expr2c.h"
 #include "c_types.h"
 #include "expr2c_class.h"
@@ -288,11 +289,11 @@ std::string expr2ct::convert_rec(
         return q+"long double"+d;
     }
     const std::size_t fraction_bits=to_fixedbv_type(src).get_fraction_bits();
-    return q+"__CPROVER_fixedbv["+i2string(width)+"]["+i2string(fraction_bits)+"]"+d;
+    return q+"__CPROVER_fixedbv["+std::to_string(width)+"]["+std::to_string(fraction_bits)+"]"+d;
   }
   else if(src.id()==ID_c_bit_field)
   {
-    std::string width=i2string(to_c_bit_field_type(src).get_width());
+    std::string width=std::to_string(to_c_bit_field_type(src).get_width());
     return q+convert(src.subtype())+d+" : "+width;
   }
   else if(src.id()==ID_signedbv ||
@@ -1894,7 +1895,7 @@ std::string expr2ct::convert_symbol(
     dest=src.op0().get_string(ID_identifier);
   else
   {
-    hash_map_cont<irep_idt, irep_idt, irep_id_hash>::const_iterator
+    std::unordered_map<irep_idt, irep_idt, irep_id_hash>::const_iterator
       entry=shorthands.find(id);
     // we might be called from conversion of a type
     if(entry==shorthands.end())

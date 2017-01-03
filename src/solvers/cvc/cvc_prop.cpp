@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <set>
 
-#include <util/i2string.h>
 
 #include "cvc_prop.h"
 
@@ -565,9 +564,9 @@ std::string cvc_propt::cvc_literal(literalt l)
     return "TRUE";
 
   if(l.sign())
-    return "(NOT l"+i2string(l.var_no())+")";
+    return "(NOT l"+std::to_string(l.var_no())+")";
 
-  return "l"+i2string(l.var_no());
+  return "l"+std::to_string(l.var_no());
 }
 
 /*******************************************************************\

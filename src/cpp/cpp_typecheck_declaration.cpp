@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \********************************************************************/
 
-#include <util/i2string.h>
 #include <util/expr_util.h>
 
 #include "cpp_typecheck.h"
@@ -66,7 +65,7 @@ void cpp_typecheckt::convert_anonymous_union(
   new_code.reserve_operands(declaration.declarators().size());
 
   // unnamed object
-  std::string identifier="#anon_union"+i2string(anon_counter++);
+  std::string identifier="#anon_union"+std::to_string(anon_counter++);
 
   irept name(ID_name);
   name.set(ID_identifier, identifier);

@@ -7,9 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <algorithm>
+#include <unordered_set>
 
-#include <util/i2string.h>
-#include <util/hash_cont.h>
 
 #include "set_properties.h"
 
@@ -27,7 +26,7 @@ Function: set_properties
 
 void set_properties(
   goto_programt &goto_program,
-  hash_set_cont<irep_idt, irep_id_hash> &property_set)
+  std::unordered_set<irep_idt, irep_id_hash> &property_set)
 {
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -38,7 +37,7 @@ void set_properties(
 
     irep_idt property_id=it->source_location.get_property_id();
 
-    hash_set_cont<irep_idt, irep_id_hash>::iterator
+    std::unordered_set<irep_idt, irep_id_hash>::iterator
       c_it=property_set.find(property_id);
 
     if(c_it==property_set.end())
@@ -110,7 +109,7 @@ void label_properties(
 
     count++;
 
-    std::string property_id=prefix+i2string(count);
+    std::string property_id=prefix+std::to_string(count);
 
     it->source_location.set_property_id(property_id);
   }
@@ -169,7 +168,7 @@ void set_properties(
   goto_functionst &goto_functions,
   const std::list<std::string> &properties)
 {
-  hash_set_cont<irep_idt, irep_id_hash> property_set;
+  std::unordered_set<irep_idt, irep_id_hash> property_set;
 
   for(std::list<std::string>::const_iterator
       it=properties.begin();

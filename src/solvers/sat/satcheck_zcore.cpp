@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <fstream>
 
-#include <util/i2string.h>
 #include <util/string2int.h>
 
 #include "satcheck_zcore.h"
@@ -100,8 +99,8 @@ propt::resultt satcheck_zcoret::prop_solve()
   // We start counting at 1, thus there is one variable fewer.
   {
     std::string msg=
-      i2string(no_variables()-1)+" variables, "+
-      i2string(no_clauses())+" clauses";
+      std::to_string(no_variables()-1)+" variables, "+
+      std::to_string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

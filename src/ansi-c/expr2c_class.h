@@ -10,13 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_EXPR2C_CLASS_H
 
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
-#include <util/expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/namespace.h>
 
-#include "c_qualifiers.h"
+class c_qualifierst;
+class namespacet;
 
 class expr2ct
 {
@@ -39,10 +40,10 @@ protected:
 
   static std::string indent_str(unsigned indent);
 
-  hash_map_cont<irep_idt,
-                hash_set_cont<irep_idt, irep_id_hash>,
+  std::unordered_map<irep_idt,
+                std::unordered_set<irep_idt, irep_id_hash>,
                 irep_id_hash> ns_collision;
-  hash_map_cont<irep_idt, irep_idt, irep_id_hash> shorthands;
+  std::unordered_map<irep_idt, irep_idt, irep_id_hash> shorthands;
 
   unsigned sizeof_nesting;
 

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
-#include <util/hash_cont.h>
 #include <util/expr.h>
 
 #include <solvers/prop/prop_conv.h>
@@ -33,7 +32,7 @@ public:
   }
 
 protected:
-  typedef hash_map_cont<const exprt, unsigned, irep_hash> elementst;
+  typedef std::unordered_map<const exprt, unsigned, irep_hash> elementst;
   typedef std::map<std::pair<unsigned, unsigned>, literalt> equalitiest;
   typedef std::map<unsigned, exprt> elements_revt;
 
@@ -44,7 +43,7 @@ protected:
     equalitiest equalities;
   };
 
-  typedef hash_map_cont<const typet, typestructt, irep_hash> typemapt;
+  typedef std::unordered_map<const typet, typestructt, irep_hash> typemapt;
 
   typemapt typemap;
 

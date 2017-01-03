@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_expr.h>
 #include <util/json.h>
 #include <util/json_expr.h>
-#include <util/i2string.h>
 
 #include <langapi/language_util.h>
 

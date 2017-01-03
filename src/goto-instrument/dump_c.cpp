@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/suffix.h>
 #include <util/find_symbols.h>
 #include <util/base_type.h>
-#include <util/i2string.h>
 #include <util/cprover_prefix.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -102,7 +101,7 @@ void dump_ct::operator()(std::ostream &os)
   forall_symbols(it, symbols_transparent.symbols)
     copied_symbol_table.add(it->second);
 
-  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> unique_tagst;
+  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> unique_tagst;
   unique_tagst unique_tags;
 
   // add tags to anonymous union/struct/enum,
@@ -148,7 +147,7 @@ void dump_ct::operator()(std::ostream &os)
           unique_entry=unique_tags.insert(std::make_pair(new_tag, 0)))
       {
         new_tag=new_tag_base+"$"+
-          i2string(unique_entry.first->second);
+          std::to_string(unique_entry.first->second);
         ++(unique_entry.first->second);
       }
 

@@ -28,7 +28,7 @@ Function: MetaChar
 
 \*******************************************************************/
 
-void MetaChar(std::string &out, char c, bool inString)
+static void MetaChar(std::string &out, char c, bool inString)
 {
   switch(c)
   {
@@ -101,6 +101,7 @@ void MetaChar(std::string &out, char c, bool inString)
   }
 }
 
+#if 0
 /*******************************************************************\
 
 Function: MetaChar
@@ -113,12 +114,13 @@ Function: MetaChar
 
 \*******************************************************************/
 
-std::string MetaChar(char c)
+static std::string MetaChar(char c)
 {
   std::string result;
   MetaChar(result, c, false);
   return result;
 }
+#endif
 
 /*******************************************************************\
 

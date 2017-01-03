@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/bv_arithmetic.h>
 #include <util/ieee_float.h>
 #include <util/expr_util.h>
@@ -673,6 +672,6 @@ std::string bv_refinementt::approximationt::as_string() const
   #if 0
   return from_expr(expr);
   #else
-  return i2string(id_nr)+"/"+id2string(expr.id());
+  return std::to_string(id_nr)+"/"+id2string(expr.id());
   #endif
 }

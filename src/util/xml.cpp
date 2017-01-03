@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include "string2int.h"
-#include "i2string.h"
 #include "xml.h"
 
 /*******************************************************************\
@@ -148,7 +147,7 @@ void xmlt::escape(const std::string &s, std::ostream &out)
     default:
       // &#0; isn't allowed, but what shall we do?
       if((ch>=0 && ch<' ') || ch==127)
-        out << "&#"+i2string((unsigned char)ch)+";";
+        out << "&#"+std::to_string((unsigned char)ch)+";";
       else
         out << ch;
     }
@@ -194,7 +193,7 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
     default:
       // &#0; isn't allowed, but what shall we do?
       if((ch>=0 && ch<' ') || ch==127)
-        out << "&#"+i2string((unsigned char)ch)+";";
+        out << "&#"+std::to_string((unsigned char)ch)+";";
       else
         out << ch;
     }
@@ -281,7 +280,7 @@ void xmlt::set_attribute(
   const std::string &attribute,
   unsigned value)
 {
-  set_attribute(attribute, i2string(value));
+  set_attribute(attribute, std::to_string(value));
 }
 
 /*******************************************************************\
@@ -300,7 +299,7 @@ void xmlt::set_attribute(
   const std::string &attribute,
   unsigned long value)
 {
-  set_attribute(attribute, i2string(value));
+  set_attribute(attribute, std::to_string(value));
 }
 
 /*******************************************************************\
@@ -319,7 +318,7 @@ void xmlt::set_attribute(
   const std::string &attribute,
   unsigned long long value)
 {
-  set_attribute(attribute, i2string(value));
+  set_attribute(attribute, std::to_string(value));
 }
 
 /*******************************************************************\

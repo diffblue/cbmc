@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 
 #include "boolbv.h"
 
