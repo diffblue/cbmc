@@ -792,7 +792,7 @@ void path_symext::function_call_rec(
 
         symbolt symbol;
         symbol.name=id;
-        symbol.base_name="va_arg"+i2string(va_count);
+        symbol.base_name="va_arg"+std::to_string(va_count);
         symbol.type=rhs.type();
 
         va_count++;
