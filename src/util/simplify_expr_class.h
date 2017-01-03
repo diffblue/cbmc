@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sys/stat.h>
 #endif
 
-#include <map>
 #include <set>
 
 #include "type.h"

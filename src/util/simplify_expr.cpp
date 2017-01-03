@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
+#include "rational.h"
 #include "simplify_expr_class.h"
 #include "simplify_expr.h"
 #include "mp_arith.h"
@@ -47,10 +48,10 @@ public:
   friend class simplify_exprt;
 
   #if 1
-  typedef hash_map_cont<
+  typedef std::unordered_map<
     exprt, exprt, irep_full_hash, irep_full_eq> containert;
   #else
-  typedef hash_map_cont<
+  typedef std::unordered_map<
     exprt, exprt, irep_hash> containert;
   #endif
 

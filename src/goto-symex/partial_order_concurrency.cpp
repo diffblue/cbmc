@@ -8,7 +8,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <limits>
 
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
@@ -62,7 +61,7 @@ Function: partial_order_concurrencyt::add_init_writes
 void partial_order_concurrencyt::add_init_writes(
   symex_target_equationt &equation)
 {
-  hash_set_cont<irep_idt, irep_id_hash> init_done;
+  std::unordered_set<irep_idt, irep_id_hash> init_done;
   bool spawn_seen=false;
 
   symex_target_equationt::SSA_stepst init_steps;
@@ -185,9 +184,9 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
   axiomt axiom)
 {
   if(event->is_shared_write())
-    return id2string(id(event))+"$wclk$"+i2string(axiom);
+    return id2string(id(event))+"$wclk$"+std::to_string(axiom);
   else if(event->is_shared_read())
-    return id2string(id(event))+"$rclk$"+i2string(axiom);
+    return id2string(id(event))+"$rclk$"+std::to_string(axiom);
   else
     assert(false);
 
@@ -227,8 +226,8 @@ symbol_exprt partial_order_concurrencyt::clock(
   {
     assert(is_spawn(event));
     identifier=
-      "t"+i2string(event->source.thread_nr+1)+"$"+
-      i2string(numbering[event])+"$spwnclk$"+i2string(axiom);
+      "t"+std::to_string(event->source.thread_nr+1)+"$"+
+      std::to_string(numbering[event])+"$spwnclk$"+std::to_string(axiom);
   }
   else
     assert(false);

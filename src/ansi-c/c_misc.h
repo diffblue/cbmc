@@ -1,16 +1,16 @@
 /*******************************************************************\
 
-Module:
+Module: ANSI-C Misc Utilities
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UTIL_GCD_H
-#define CPROVER_UTIL_GCD_H
+#ifndef CPROVER_UTIL_C_MISC_H
+#define CPROVER_UTIL_C_MISC_H
 
-#include "mp_arith.h"
+#include <string>
 
-//mp_integer gcd(const mp_integer &a, const mp_integer &b);
+std::string MetaString(const std::string &in);
 
-#endif // CPROVER_UTIL_GCD_H
+#endif // CPROVER_UTIL_C_MISC_H

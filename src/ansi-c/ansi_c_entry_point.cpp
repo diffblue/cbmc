@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
@@ -52,7 +51,7 @@ exprt::operandst build_function_environment(
   for(const auto & p : parameters)
   {
     irep_idt base_name=p.get_base_name();
-    if(base_name.empty()) base_name="argument#"+i2string(i);
+    if(base_name.empty()) base_name="argument#"+std::to_string(i);
     irep_idt identifier=id2string(goto_functionst::entry_point())+
       "::"+id2string(base_name);
 

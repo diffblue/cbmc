@@ -2,8 +2,6 @@
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/irep.h>
-#include <util/hash_cont.h>
-#include <util/i2string.h>
 #include <util/namespace.h>
 #include <util/message.h>
 
@@ -21,16 +19,16 @@ protected:
   const namespacet ns;
   messaget& message;
 
-  hash_map_cont<irep_idt, unsigned, irep_id_hash> map_unique;
+  std::unordered_map<irep_idt, unsigned, irep_id_hash> map_unique;
 
   /* maps const pointer to function (expression + arguments at call)  */
-  hash_map_cont<irep_idt, symbol_exprt, irep_id_hash> pointer_to_fun;
+  std::unordered_map<irep_idt, symbol_exprt, irep_id_hash> pointer_to_fun;
 
   /* maps const pointer to where it was defined in the call function stack */
-  hash_map_cont<irep_idt, unsigned, irep_id_hash> pointer_to_stack;
+  std::unordered_map<irep_idt, unsigned, irep_id_hash> pointer_to_stack;
 
   /* where a const function to inline was the first time invoked */
-  hash_map_cont<irep_idt, unsigned, irep_id_hash> fun_id_to_invok;
+  std::unordered_map<irep_idt, unsigned, irep_id_hash> fun_id_to_invok;
 
   /* stack of callsites: provides functions and location in the goto-program */
   goto_programt::const_targetst callsite_stack;
@@ -176,12 +174,12 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
     {
       /* unique suffix */
       if(map_unique.find(function_id)!=map_unique.end()) {
-        suffix+=i2string(map_unique[function_id]);
+        suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
       }
       else {
         map_unique[function_id]=0;
-        suffix+=i2string(map_unique[function_id]);
+        suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
       }
 
@@ -366,7 +364,7 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
         //cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
 
       // debug
-      for(hash_map_cont<irep_idt, unsigned, irep_id_hash>::const_iterator
+      for(std::unordered_map<irep_idt, unsigned, irep_id_hash>::const_iterator
         it=cfpp.fun_id_to_invok.begin();
         it!=cfpp.fun_id_to_invok.end();
         ++it)

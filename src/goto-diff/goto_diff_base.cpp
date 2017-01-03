@@ -6,7 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/json_expr.h>
 
 #include "goto_diff.h"
@@ -68,7 +67,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     {
       json_objectt json_result;
       json_result["totalNumberOfFunctions"]=
-        json_stringt(i2string(total_functions_count));
+        json_stringt(std::to_string(total_functions_count));
       convert_function_group
         (json_result["newFunctions"].make_array(), new_functions);
       convert_function_group(

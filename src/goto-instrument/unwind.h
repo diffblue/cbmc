@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWIND_H
 #define CPROVER_GOTO_INSTRUMENT_UNWIND_H
 
-#include <util/i2string.h>
 #include <util/json.h>
 #include <util/json_expr.h>
 #include <goto-programs/goto_program.h>

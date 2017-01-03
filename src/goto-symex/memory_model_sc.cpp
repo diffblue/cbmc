@@ -7,7 +7,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 \*******************************************************************/
 
 #include <util/std_expr.h>
-#include <util/i2string.h>
 
 #include "memory_model_sc.h"
 

@@ -9,6 +9,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #ifndef CPROVER_JSIL_JSIL_TYPECHECK_H
 #define CPROVER_JSIL_JSIL_TYPECHECK_H
 
+#include <unordered_set>
+
 #include <util/typecheck.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
@@ -89,7 +91,7 @@ protected:
   virtual std::string to_string(const exprt &expr);
   virtual std::string to_string(const typet &type);
 
-  hash_set_cont<irep_idt, irep_id_hash> already_typechecked;
+  std::unordered_set<irep_idt, irep_id_hash> already_typechecked;
 };
 
 #endif // CPROVER_JSIL_JSIL_TYPECHECK_H

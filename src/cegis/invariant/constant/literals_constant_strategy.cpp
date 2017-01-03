@@ -2,7 +2,6 @@
 
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
-#include <util/namespace_utils.h>
 
 #include <cegis/cegis-util/constant_width.h>
 #include <cegis/instrument/meta_variables.h>

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/expr_util.h>
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
@@ -143,7 +142,7 @@ void goto_symext::symex_malloc(
 
       symbolt size_symbol;
 
-      size_symbol.base_name="dynamic_object_size"+i2string(dynamic_counter);
+      size_symbol.base_name="dynamic_object_size"+std::to_string(dynamic_counter);
       size_symbol.name="symex_dynamic::"+id2string(size_symbol.base_name);
       size_symbol.is_lvalue=true;
       size_symbol.type=tmp_size.type();
@@ -161,7 +160,7 @@ void goto_symext::symex_malloc(
   // value
   symbolt value_symbol;
 
-  value_symbol.base_name="dynamic_object"+i2string(dynamic_counter);
+  value_symbol.base_name="dynamic_object"+std::to_string(dynamic_counter);
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
@@ -249,7 +248,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
       std::string base=id2string(function_identifier)+"::va_arg";
 
       if(has_prefix(id2string(id), base))
-        id=base+i2string(
+        id=base+std::to_string(
           safe_string2unsigned(
             std::string(id2string(id), base.size(), std::string::npos))+1);
       else
@@ -464,7 +463,7 @@ void goto_symext::symex_cpp_new(
 
   dynamic_counter++;
 
-  const std::string count_string(i2string(dynamic_counter));
+  const std::string count_string(std::to_string(dynamic_counter));
 
   // value
   symbolt symbol;

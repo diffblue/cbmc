@@ -2206,7 +2206,7 @@ compound_scope:
         /* nothing */
         {
           unsigned prefix=++PARSER.current_scope().compound_counter;
-          PARSER.new_scope(i2string(prefix)+"::");
+          PARSER.new_scope(std::to_string(prefix)+"::");
         }
         ;
 
@@ -2302,7 +2302,7 @@ iteration_statement:
             if(PARSER.for_has_scope)
             {
               unsigned prefix=++PARSER.current_scope().compound_counter;
-              PARSER.new_scope(i2string(prefix)+"::");
+              PARSER.new_scope(std::to_string(prefix)+"::");
             }
           }
           '(' declaration_or_expression_statement

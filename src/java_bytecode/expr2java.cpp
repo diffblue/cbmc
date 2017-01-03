@@ -8,12 +8,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
+#include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
-#include <util/hash_cont.h>
 #include <util/arith_tools.h>
 
+#include <ansi-c/c_qualifiers.h>
 #include <ansi-c/expr2c_class.h>
 
 #include "java_types.h"
@@ -50,7 +51,7 @@ protected:
     const c_qualifierst &qualifiers,
     const std::string &declarator) override;
 
-  typedef hash_set_cont<std::string, string_hash> id_sett;
+  typedef std::unordered_set<std::string, string_hash> id_sett;
 };
 
 /*******************************************************************\

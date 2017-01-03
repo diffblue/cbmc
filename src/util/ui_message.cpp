@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include "i2string.h"
 #include "xml.h"
 #include "json.h"
 #include "xml_expr.h"
@@ -212,7 +211,7 @@ void ui_message_handlert::print(
       const char *type=level_string(level);
 
       std::string sequence_number_str=
-        sequence_number>=0?i2string(sequence_number):"";
+        sequence_number>=0?std::to_string(sequence_number):"";
 
       ui_msg(type, tmp_message, sequence_number_str, location);
     }

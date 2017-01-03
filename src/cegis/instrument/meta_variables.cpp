@@ -1,5 +1,3 @@
-#include <util/namespace_utils.h>
-
 #include <ansi-c/c_types.h>
 
 #include <goto-programs/goto_functions.h>

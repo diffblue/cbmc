@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <memory>
 
-#include <util/hash_cont.h>
 #include <util/options.h>
 
 #include <solvers/prop/prop.h>

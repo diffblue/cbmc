@@ -108,7 +108,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
         // this is likely an unwinding assertion
         property_id=id2string(
           it->source.pc->source_location.get_function())+".unwind."+
-          i2string(it->source.pc->loop_number);
+          std::to_string(it->source.pc->loop_number);
         goal_map[property_id].description=it->comment;
       }
       else

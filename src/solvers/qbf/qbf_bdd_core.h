@@ -11,7 +11,6 @@ Author: CM Wintersteiger
 
 #include <vector>
 
-#include <util/hash_cont.h>
 
 #include "qdimacs_core.h"
 
@@ -26,7 +25,7 @@ protected:
   typedef std::vector<BDD*> model_bddst;
   model_bddst model_bdds;
 
-  typedef hash_map_cont<unsigned, exprt> function_cachet;
+  typedef std::unordered_map<unsigned, exprt> function_cachet;
   function_cachet function_cache;
 
 public:

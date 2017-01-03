@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/i2string.h>
-#include <util/identifier.h>
 #include <util/expr_util.h>
 
 #include <ansi-c/c_qualifiers.h>
@@ -37,7 +35,7 @@ void cpp_typecheckt::convert_parameter(
 
   if(base_name.empty())
   {
-    base_name="#anon_arg"+i2string(anon_counter++);
+    base_name="#anon_arg"+std::to_string(anon_counter++);
     parameter.set_base_name(base_name);
   }
 

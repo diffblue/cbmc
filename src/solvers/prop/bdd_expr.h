@@ -39,7 +39,7 @@ protected:
   miniBDD::mgr bdd_mgr;
   BDDt root;
 
-  typedef hash_map_cont<exprt, BDDt, irep_hash> expr_mapt;
+  typedef std::unordered_map<exprt, BDDt, irep_hash> expr_mapt;
   expr_mapt expr_map;
   typedef std::map<unsigned, exprt> node_mapt;
   node_mapt node_map;

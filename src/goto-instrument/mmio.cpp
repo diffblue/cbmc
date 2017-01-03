@@ -14,7 +14,6 @@ Date: September 2011
 #include <goto-programs/goto_functions.h>
 
 #if 0
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 #include <util/guard.h>

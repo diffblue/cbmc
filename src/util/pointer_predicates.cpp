@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "cprover_prefix.h"
+#include "namespace.h"
 #include "std_expr.h"
 #include "expr_util.h"
 #include "arith_tools.h"

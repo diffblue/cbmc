@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/rename_symbol.h>
-#include <util/hash_cont.h>
 #include <util/typecheck.h>
 #include <util/std_expr.h>
 
@@ -35,7 +34,7 @@ public:
 
 protected:
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
 
   bool needs_renaming_type(
     const symbolt &old_symbol,
@@ -170,7 +169,7 @@ protected:
   namespacet ns;
 
   // X -> Y iff Y uses X for new symbol type IDs X and Y
-  typedef hash_map_cont<irep_idt, id_sett, irep_id_hash> used_byt;
+  typedef std::unordered_map<irep_idt, id_sett, irep_id_hash> used_byt;
 
   irep_idt rename(irep_idt);
 

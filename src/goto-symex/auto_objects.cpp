@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
@@ -33,7 +32,7 @@ exprt goto_symext::make_auto_object(const typet &type)
   // produce auto-object symbol
   symbolt symbol;
 
-  symbol.base_name="auto_object"+i2string(dynamic_counter);
+  symbol.base_name="auto_object"+std::to_string(dynamic_counter);
   symbol.name="symex::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
   symbol.type=type;

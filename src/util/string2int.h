@@ -13,21 +13,13 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 // These check that the string is indeed a valid number,
 // and fail an assertion otherwise.
-int safe_c_str2int(const char *str, int base=10);
-unsigned safe_c_str2unsigned(const char *str, int base=10);
-
-int safe_string2int(const std::string &str, int base=10);
+// We use those for data types that C++11's std::stoi etc. do not
+// cover.
 unsigned safe_string2unsigned(const std::string &str, int base=10);
 std::size_t safe_string2size_t(const std::string &str, int base=10);
 
-// The safe_* functions will eventually go away, and will be replaced
-// by C++11 std::stoi, std::stol, std::stoll, std::stoul and so on.
-
 // The below mimick C's atoi/atol: any errors are silently ignored.
 // They are meant to replace atoi/atol.
-int unsafe_c_str2int(const char *str, int base=10);
-unsigned unsafe_c_str2unsigned(const char *str, int base=10);
-
 int unsafe_string2int(const std::string &str, int base=10);
 unsigned unsafe_string2unsigned(const std::string &str, int base=10);
 std::size_t unsafe_string2size_t(const std::string &str, int base=10);

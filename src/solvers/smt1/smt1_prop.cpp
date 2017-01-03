@@ -10,7 +10,6 @@ Revisions: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 
 #include <cassert>
 
-#include <util/i2string.h>
 
 #include "smt1_prop.h"
 
@@ -442,7 +441,7 @@ std::string smt1_propt::smt1_literal(literalt l)
   else if(l==const_literal(true))
     return "true";
 
-  std::string v="B"+i2string(l.var_no());
+  std::string v="B"+std::to_string(l.var_no());
 
   if(l.sign())
     return "(not "+v+")";

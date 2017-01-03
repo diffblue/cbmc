@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 
+#include <unordered_set>
+
 #include <util/message.h>
 
 #include "goto_functions.h"
@@ -76,13 +78,13 @@ protected:
     const code_typet &code_type,
     goto_programt &dest);
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> recursion_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> recursion_sett;
   recursion_sett recursion_set;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> no_body_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> no_body_sett;
   no_body_sett no_body_set;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> finished_inlining_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> finished_inlining_sett;
   finished_inlining_sett finished_inlining_set;
 };
 

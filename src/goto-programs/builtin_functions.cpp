@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
+#include <util/rational.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
 #include <util/rational_tools.h>
@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
-#include <util/namespace_utils.h>
 
 #include <linking/zero_initializer.h>
 

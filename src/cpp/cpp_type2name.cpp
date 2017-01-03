@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/type.h>
 #include <util/std_types.h>
-#include <util/i2string.h>
 
 /*******************************************************************\
 
@@ -28,7 +27,7 @@ static std::string do_prefix(const std::string &s)
 {
   if(s.find(',')!=std::string::npos ||
      (s!="" && isdigit(s[0])))
-    return i2string(s.size())+"_"+s;
+    return std::to_string(s.size())+"_"+s;
 
   return s;
 }

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include <util/std_expr.h>
-#include <util/i2string.h>
 
 #include <langapi/language_util.h>
 
@@ -511,7 +510,7 @@ std::string as_string(
         gt_it++)
     {
       if(gt_it!=i.targets.begin()) result+=", ";
-      result+=i2string((*gt_it)->target_number);
+      result+=std::to_string((*gt_it)->target_number);
     }
     return result;
 
@@ -563,7 +562,7 @@ std::string as_string(
     result+="START THREAD ";
 
     if(i.targets.size()==1)
-      result+=i2string(i.targets.front()->target_number);
+      result+=std::to_string(i.targets.front()->target_number);
     return result;
 
   case END_THREAD:

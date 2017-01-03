@@ -403,8 +403,8 @@ bool bmc_covert::operator()()
         if(goal.source_location.is_not_nil())
           result["sourceLocation"]=json(goal.source_location);
       }
-      json_result["totalGoals"]=json_numbert(i2string(goal_map.size()));
-      json_result["goalsCovered"]=json_numbert(i2string(goals_covered));
+      json_result["totalGoals"]=json_numbert(std::to_string(goal_map.size()));
+      json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
 
       json_arrayt &tests_array=json_result["tests"].make_array();
       for(const auto & test : tests)

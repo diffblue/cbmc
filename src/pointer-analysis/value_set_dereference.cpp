@@ -17,11 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/string2int.h>
 #include <util/expr_util.h>
-#include <util/c_misc.h>
 #include <util/base_type.h>
 #include <util/arith_tools.h>
 #include <util/rename.h>
-#include <util/i2string.h>
 #include <util/array_name.h>
 #include <util/config.h>
 #include <util/std_expr.h>
@@ -199,7 +197,7 @@ exprt value_set_dereferencet::dereference(
       // else: produce new symbol
 
       symbolt symbol;
-      symbol.name="symex::invalid_object"+i2string(invalid_counter++);
+      symbol.name="symex::invalid_object"+std::to_string(invalid_counter++);
       symbol.base_name="invalid_object";
       symbol.type=type;
 

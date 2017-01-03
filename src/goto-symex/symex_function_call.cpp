@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/expr_util.h>
-#include <util/i2string.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
@@ -161,18 +160,18 @@ void goto_symext::parameter_assignments(
     // These are va_arg arguments; their types may differ from call to call
     unsigned va_count=0;
     const symbolt *va_sym=0;
-    while(!ns.lookup(id2string(function_identifier)+"::va_arg"+i2string(va_count),
+    while(!ns.lookup(id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
                     va_sym))
       ++va_count;
 
     for( ; it1!=arguments.end(); it1++, va_count++)
     {
-      irep_idt id=id2string(function_identifier)+"::va_arg"+i2string(va_count);
+      irep_idt id=id2string(function_identifier)+"::va_arg"+std::to_string(va_count);
 
       // add to symbol table
       symbolt symbol;
       symbol.name=id;
-      symbol.base_name="va_arg"+i2string(va_count);
+      symbol.base_name="va_arg"+std::to_string(va_count);
       symbol.type=it1->type();
 
       new_symbol_table.move(symbol);

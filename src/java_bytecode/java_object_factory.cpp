@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/namespace.h>
 #include <util/expr_util.h>
 
@@ -192,7 +191,7 @@ symbolt &new_tmp_symbol(symbol_tablet &symbol_table)
 
   do
   {
-    new_symbol.name="tmp_object_factory$"+i2string(++temporary_counter);
+    new_symbol.name="tmp_object_factory$"+std::to_string(++temporary_counter);
     new_symbol.base_name=new_symbol.name;
     new_symbol.mode=ID_java;
   } while(symbol_table.move(new_symbol, symbol_ptr));

@@ -11,7 +11,6 @@ Date: May 2007
 #include <iostream>
 
 #include <util/string2int.h>
-#include <util/i2string.h>
 
 #include "goto_program_irep.h"
 
@@ -49,7 +48,7 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
         it!=instruction.targets.end();
         it++)
     {
-      irept t(i2string((*it)->location_number));
+      irept t(std::to_string((*it)->location_number));
       tgts.move_to_sub(t);
     }
   }

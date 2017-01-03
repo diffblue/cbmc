@@ -16,6 +16,7 @@ Author:
 #endif
 
 #include <fstream>
+#include <unordered_set>
 
 #include <util/message.h>
 #include <util/unicode.h>
@@ -284,7 +285,7 @@ static bool link_functions(
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const hash_set_cont<irep_idt, irep_id_hash> &weak_symbols)
+  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
@@ -409,7 +410,7 @@ bool read_object_and_link(
       message_handler))
     return true;
 
-  typedef hash_set_cont<irep_idt, irep_id_hash> id_sett;
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   id_sett weak_symbols;
   forall_symbols(it, symbol_table.symbols)
     if(it->second.is_weak)

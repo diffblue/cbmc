@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_STRING_CONTAINER_H
 
 #include <list>
+#include <unordered_map>
 #include <vector>
 
-#include "hash_cont.h"
 #include "string_hash.h"
 
 struct string_ptrt
@@ -73,7 +73,7 @@ public:
 
 protected:
   // the 'unsigned' ought to be size_t
-  typedef hash_map_cont<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
+  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
   hash_tablet hash_table;
 
   unsigned get(const char *s);

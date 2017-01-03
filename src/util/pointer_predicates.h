@@ -9,7 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_POINTER_PREDICATES_H
 #define CPROVER_UTIL_POINTER_PREDICATES_H
 
-#include "namespace.h"
+class exprt;
+class namespacet;
+class typet;
 
 exprt same_object(const exprt &p1, const exprt &p2);
 exprt deallocated(const exprt &pointer, const namespacet &ns);

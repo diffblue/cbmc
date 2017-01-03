@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <memory>
 #include <iostream>
 
-#include <util/i2string.h>
 #include <util/namespace.h>
 #include <util/language.h>
 #include <util/cmdline.h>

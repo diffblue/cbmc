@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "parser.h"
-#include "i2string.h"
 
 #ifdef _WIN32
 int isatty(int f)

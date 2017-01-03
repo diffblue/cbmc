@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 

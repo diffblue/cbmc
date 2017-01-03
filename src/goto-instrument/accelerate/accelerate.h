@@ -2,7 +2,6 @@
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
 
 #include <util/namespace.h>
-#include <util/hash_cont.h>
 #include <util/expr.h>
 
 #include <analyses/natural_loops.h>

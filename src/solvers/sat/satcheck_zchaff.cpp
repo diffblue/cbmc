@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 
 #include "satcheck_zchaff.h"
 
@@ -151,8 +150,8 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
 
   {
     std::string msg=
-      i2string(solver->num_variables())+" variables, "+
-      i2string(solver->clauses().size())+" clauses";
+      std::to_string(solver->num_variables())+" variables, "+
+      std::to_string(solver->clauses().size())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

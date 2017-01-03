@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/config.h>
-#include <util/i2string.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
@@ -160,7 +159,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
           struct_typet::componentt component;
           component.type()=padding_type;
-          component.set_name("$bit_field_pad"+i2string(padding_counter++));
+          component.set_name("$bit_field_pad"+std::to_string(padding_counter++));
           component.set_is_padding(true);
 
           it=components.insert(it, component);
@@ -181,7 +180,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
       struct_typet::componentt component;
       component.type()=padding_type;
-      component.set_name("$bit_field_pad"+i2string(padding_counter++));
+      component.set_name("$bit_field_pad"+std::to_string(padding_counter++));
       component.set_is_padding(true);
 
       components.push_back(component);
@@ -256,7 +255,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
         struct_typet::componentt component;
         component.type()=padding_type;
-        component.set_name("$pad"+i2string(padding_counter++));
+        component.set_name("$pad"+std::to_string(padding_counter++));
         component.set_is_padding(true);
 
         it=components.insert(it, component);
@@ -314,7 +313,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       // we insert after any final 'flexible member'
       struct_typet::componentt component;
       component.type()=padding_type;
-      component.set_name("$pad"+i2string(padding_counter++));
+      component.set_name("$pad"+std::to_string(padding_counter++));
       component.set_is_padding(true);
 
       components.push_back(component);

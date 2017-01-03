@@ -14,7 +14,6 @@ Author: Peter Schrammel
 #include "fixedbv.h"
 #include "std_expr.h"
 #include "config.h"
-#include "i2string.h"
 
 #include "json_expr.h"
 
@@ -74,28 +73,28 @@ json_objectt json(
   {
     result["name"]=json_stringt("integer");
     result["width"]=
-      json_numbert(i2string(to_unsignedbv_type(type).get_width()));
+      json_numbert(std::to_string(to_unsignedbv_type(type).get_width()));
   }
   else if(type.id()==ID_signedbv)
   {
     result["name"]=json_stringt("integer");
-    result["width"]=json_numbert(i2string(to_signedbv_type(type).get_width()));
+    result["width"]=json_numbert(std::to_string(to_signedbv_type(type).get_width()));
   }
   else if(type.id()==ID_floatbv)
   {
     result["name"]=json_stringt("float");
-    result["width"]=json_numbert(i2string(to_floatbv_type(type).get_width()));
+    result["width"]=json_numbert(std::to_string(to_floatbv_type(type).get_width()));
   }
   else if(type.id()==ID_bv)
   {
     result["name"]=json_stringt("integer");
-    result["width"]=json_numbert(i2string(to_bv_type(type).get_width()));
+    result["width"]=json_numbert(std::to_string(to_bv_type(type).get_width()));
   }
   else if(type.id()==ID_c_bit_field)
   {
     result["name"]=json_stringt("integer");
     result["width"]=
-      json_numbert(i2string(to_c_bit_field_type(type).get_width()));
+      json_numbert(std::to_string(to_c_bit_field_type(type).get_width()));
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -105,7 +104,7 @@ json_objectt json(
   else if(type.id()==ID_fixedbv)
   {
     result["name"]=json_stringt("fixed");
-    result["width"]=json_numbert(i2string(to_fixedbv_type(type).get_width()));
+    result["width"]=json_numbert(std::to_string(to_fixedbv_type(type).get_width()));
   }
   else if(type.id()==ID_pointer)
   {
@@ -189,7 +188,7 @@ json_objectt json(
 
       result["name"]=json_stringt("integer");
       result["binary"]=json_stringt(expr.get_string(ID_value));
-      result["width"]=json_numbert(i2string(width));
+      result["width"]=json_numbert(std::to_string(width));
 
       const typet &underlying_type=
         type.id()==ID_c_bit_field?type.subtype():
@@ -281,7 +280,7 @@ json_objectt json(
     forall_operands(it, expr)
     {
       json_objectt &e=elements.push_back().make_object();
-      e["index"]=json_numbert(i2string(index));
+      e["index"]=json_numbert(std::to_string(index));
       e["value"]=json(*it, ns);
       index++;
     }

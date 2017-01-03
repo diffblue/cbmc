@@ -36,7 +36,7 @@ protected:
   const namespacet ns;
   const goto_functionst &goto_functions;
 
-  typedef hash_map_cont<irep_idt, unsigned, irep_id_hash> memory_mapt;
+  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> memory_mapt;
   memory_mapt memory_map;
 
   class memory_cellt

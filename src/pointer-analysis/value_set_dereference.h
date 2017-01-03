@@ -9,10 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 
-#include <set>
-#include <string>
+#include <unordered_set>
 
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 
 #include "dereference_callback.h"
@@ -73,7 +71,7 @@ public:
   */
   static bool has_dereference(const exprt &expr);
 
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
+  typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
 private:
   const namespacet &ns;

@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/i2string.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/namespace.h>
@@ -15,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "type2name.h"
 
-typedef hash_map_cont<irep_idt, std::pair<size_t, bool>, irep_id_hash>
+typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
   symbol_numbert;
 
 static std::string type2name(
@@ -64,7 +63,7 @@ static std::string type2name_symbol(
   // new entry, add definition
   if(entry.second)
   {
-    result="SYM#"+i2string(entry.first->second.first);
+    result="SYM#"+std::to_string(entry.first->second.first);
     result+="={";
     result+=type2name(symbol->type, ns, symbol_number);
     result+='}';
@@ -74,7 +73,7 @@ static std::string type2name_symbol(
 #if 0
   // in recursion, print the shorthand only
   else if(entry.first->second.second)
-    result="SYM#"+i2string(entry.first->second.first);
+    result="SYM#"+std::to_string(entry.first->second.first);
   // entering recursion
   else
   {
@@ -85,7 +84,7 @@ static std::string type2name_symbol(
 #else
   // shorthand only as structs/unions are always symbols
   else
-    result="SYM#"+i2string(entry.first->second.first);
+    result="SYM#"+std::to_string(entry.first->second.first);
 #endif
 
   return result;

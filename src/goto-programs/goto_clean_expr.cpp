@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/rename.h>
 #include <util/cprover_prefix.h>
-#include <util/i2string.h>
 
 #include <ansi-c/c_types.h>
 
@@ -40,7 +39,7 @@ symbol_exprt goto_convertt::make_compound_literal(
 
   do
   {
-    new_symbol.base_name="literal$"+i2string(++temporary_counter);
+    new_symbol.base_name="literal$"+std::to_string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.is_static_lifetime=source_location.get_function().empty();
     new_symbol.value=expr;

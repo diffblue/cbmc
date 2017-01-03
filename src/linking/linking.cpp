@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/source_location.h>
 #include <util/base_type.h>
-#include <util/i2string.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
@@ -222,8 +221,8 @@ void linkingt::detailed_conflict_report_rec(
     if(components1.size()!=components2.size())
     {
       msg="number of members is different (";
-      msg+=i2string(components1.size())+'/';
-      msg+=i2string(components2.size())+')';
+      msg+=std::to_string(components1.size())+'/';
+      msg+=std::to_string(components2.size())+')';
     }
     else
       for(std::size_t i=0; i<components1.size(); ++i)
@@ -233,14 +232,14 @@ void linkingt::detailed_conflict_report_rec(
 
         if(components1[i].get_name()!=components2[i].get_name())
         {
-          msg="names of member "+i2string(i)+" differ (";
+          msg="names of member "+std::to_string(i)+" differ (";
           msg+=id2string(components1[i].get_name())+'/';
           msg+=id2string(components2[i].get_name())+')';
           break;
         }
         else if(!base_type_eq(subtype1, subtype2, ns))
         {
-          typedef hash_set_cont<typet, irep_hash> type_sett;
+          typedef std::unordered_set<typet, irep_hash> type_sett;
           type_sett parent_types;
 
           exprt e=conflict_path_before;
@@ -310,22 +309,22 @@ void linkingt::detailed_conflict_report_rec(
     else if(members1.size()!=members2.size())
     {
       msg="number of enum members is different (";
-      msg+=i2string(members1.size())+'/';
-      msg+=i2string(members2.size())+')';
+      msg+=std::to_string(members1.size())+'/';
+      msg+=std::to_string(members2.size())+')';
     }
     else
       for(std::size_t i=0; i<members1.size(); ++i)
       {
         if(members1[i].get_base_name()!=members2[i].get_base_name())
         {
-          msg="names of member "+i2string(i)+" differ (";
+          msg="names of member "+std::to_string(i)+" differ (";
           msg+=id2string(members1[i].get_base_name())+'/';
           msg+=id2string(members2[i].get_base_name())+')';
           break;
         }
         else if(members1[i].get_value()!=members2[i].get_value())
         {
-          msg="values of member "+i2string(i)+" differ (";
+          msg="values of member "+std::to_string(i)+" differ (";
           msg+=id2string(members1[i].get_value())+'/';
           msg+=id2string(members2[i].get_value())+')';
           break;
@@ -350,14 +349,14 @@ void linkingt::detailed_conflict_report_rec(
     if(parameters1.size()!=parameters2.size())
     {
       msg="parameter counts differ (";
-      msg+=i2string(parameters1.size())+'/';
-      msg+=i2string(parameters2.size())+')';
+      msg+=std::to_string(parameters1.size())+'/';
+      msg+=std::to_string(parameters2.size())+')';
     }
     else if(!base_type_eq(return_type1, return_type2, ns))
     {
       conflict_path=
         index_exprt(conflict_path,
-                    constant_exprt(i2string(-1), integer_typet()));
+                    constant_exprt(std::to_string(-1), integer_typet()));
 
       if(depth>0)
         detailed_conflict_report_rec(
@@ -380,7 +379,7 @@ void linkingt::detailed_conflict_report_rec(
         {
           conflict_path=
             index_exprt(conflict_path,
-                        constant_exprt(i2string(i), integer_typet()));
+                        constant_exprt(std::to_string(i), integer_typet()));
 
           if(depth>0)
             detailed_conflict_report_rec(
@@ -498,7 +497,7 @@ irep_idt linkingt::rename(const irep_idt id)
   while(true)
   {
     irep_idt new_identifier=
-      id2string(id)+"$link"+i2string(++cnt);
+      id2string(id)+"$link"+std::to_string(++cnt);
 
     if(main_symbol_table.symbols.find(new_identifier)!=
        main_symbol_table.symbols.end())

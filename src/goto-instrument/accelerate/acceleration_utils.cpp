@@ -22,7 +22,6 @@
 #include <util/options.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/i2string.h>
 #include <util/find_symbols.h>
 #include <util/rename.h>
 #include <util/simplify_expr.h>
@@ -1117,7 +1116,7 @@ symbolt acceleration_utilst::fresh_symbol(std::string base, typet type)
 {
   static int num_symbols = 0;
 
-  std::string name = base + "_" + i2string(num_symbols++);
+  std::string name = base + "_" + std::to_string(num_symbols++);
   symbolt ret;
   ret.module = "scratch";
   ret.name = name;

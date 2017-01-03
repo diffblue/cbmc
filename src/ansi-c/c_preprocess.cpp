@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/config.h>
-#include <util/i2string.h>
 #include <util/message.h>
 #include <util/tempfile.h>
 #include <util/unicode.h>
@@ -773,7 +772,7 @@ bool c_preprocess_gcc_clang(
 
   command +=" -E -undef -D__CPROVER__";
 
-  command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
+  command+=" -D__WORDSIZE="+std::to_string(config.ansi_c.pointer_width);
 
   command+=" -D__DBL_MIN_EXP__=\"(-1021)\"";
   command+=" -D__FLT_MIN__=1.17549435e-38F";
@@ -1091,9 +1090,9 @@ bool c_preprocess_arm(
 
   command="armcc -E -D__CPROVER__";
 
-//  command+=" -D__sizeof_int="+i2string(config.ansi_c.int_width/8);
-//  command+=" -D__sizeof_long="+i2string(config.ansi_c.long_int_width/8);
-//  command+=" -D__sizeof_ptr="+i2string(config.ansi_c.pointer_width/8);
+//  command+=" -D__sizeof_int="+std::to_string(config.ansi_c.int_width/8);
+//  command+=" -D__sizeof_long="+std::to_string(config.ansi_c.long_int_width/8);
+//  command+=" -D__sizeof_ptr="+std::to_string(config.ansi_c.pointer_width/8);
   //command+=" -D__EDG_VERSION__=308";
   //command+=" -D__EDG__";
 //  command+=" -D__CC_ARM=1";
@@ -1108,7 +1107,7 @@ bool c_preprocess_arm(
 
   if(config.ansi_c.os!=configt::ansi_ct::ost::OS_WIN)
   {
-    command+=" -D__WORDSIZE="+i2string(config.ansi_c.pointer_width);
+    command+=" -D__WORDSIZE="+std::to_string(config.ansi_c.pointer_width);
 
     if(config.ansi_c.int_width==16)
       command+=GCC_DEFINES_16;

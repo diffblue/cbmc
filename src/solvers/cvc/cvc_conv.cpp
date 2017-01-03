@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/config.h>
-#include <util/i2string.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
@@ -129,7 +128,7 @@ std::string cvc_convt::cvc_pointer_type()
 {
   assert(config.ansi_c.pointer_width!=0);
   return "[# object: INT, offset: BITVECTOR("+
-         i2string(config.ansi_c.pointer_width)+") #]";
+         std::to_string(config.ansi_c.pointer_width)+") #]";
 }
 
 /*******************************************************************\
@@ -147,7 +146,7 @@ Function: cvc_convt::array_index_type
 std::string cvc_convt::array_index_type()
 {
   return std::string("BITVECTOR(")+
-         i2string(32)+")";
+         std::to_string(32)+")";
 }
 
 /*******************************************************************\
@@ -1304,7 +1303,7 @@ void cvc_convt::set_to(const exprt &expr, bool value)
 
       if(id.type.is_nil())
       {
-        hash_set_cont<irep_idt, irep_id_hash> s_set;
+        std::unordered_set<irep_idt, irep_id_hash> s_set;
 
         ::find_symbols(expr.op1(), s_set);
 
