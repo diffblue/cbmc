@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
+#include <util/string2int.h>
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
 #include <util/expr_util.h>
@@ -368,7 +369,7 @@ void path_symext::symex_va_arg_next(
        */
       if(has_prefix(id2string(id), base))
         id=base
-            +i2string(
+            +std::to_string(
                 safe_string2unsigned(
                     std::string(id2string(id), base.size(), std::string::npos))
                     +1);
@@ -787,7 +788,7 @@ void path_symext::function_call_rec(
         exprt rhs=*call_arguments_it;
 
         irep_idt id=id2string(function_identifier)+"::va_arg"
-            +i2string(va_count);
+            +std::to_string(va_count);
 
         symbolt symbol;
         symbol.name=id;
