@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/rename.h>
 #include <util/cprover_prefix.h>
-#include <util/i2string.h>
 #include <util/symbol.h>
 
 #include <ansi-c/c_types.h>
@@ -427,7 +426,7 @@ void goto_convertt::remove_function_call(
 
     new_base_name+='_';
     new_base_name+=id2string(symbol.base_name);
-    new_base_name+="$"+i2string(++temporary_counter);
+    new_base_name+="$"+std::to_string(++temporary_counter);
 
     new_symbol.base_name=new_base_name;
     new_symbol.mode=symbol.mode;
@@ -501,7 +500,7 @@ void goto_convertt::remove_cpp_new(
 
   auxiliary_symbolt new_symbol;
 
-  new_symbol.base_name="new_ptr$"+i2string(++temporary_counter);
+  new_symbol.base_name="new_ptr$"+std::to_string(++temporary_counter);
   new_symbol.type=expr.type();
   new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
 
@@ -576,7 +575,7 @@ void goto_convertt::remove_malloc(
   {
     auxiliary_symbolt new_symbol;
 
-    new_symbol.base_name="malloc_value$"+i2string(++temporary_counter);
+    new_symbol.base_name="malloc_value$"+std::to_string(++temporary_counter);
     new_symbol.type=expr.type();
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.location=expr.source_location();

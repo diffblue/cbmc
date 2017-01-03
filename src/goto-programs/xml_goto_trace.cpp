@@ -11,7 +11,6 @@ Author: Daniel Kroening
 #include <cassert>
 
 #include <util/xml_expr.h>
-#include <util/i2string.h>
 #include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
@@ -61,14 +60,14 @@ void convert(
         {
           property_id=
             id2string(it.pc->source_location.get_function())+".unwind."+
-            i2string(it.pc->loop_number);
+            std::to_string(it.pc->loop_number);
         }
 
         xmlt &xml_failure=dest.new_element("failure");
 
         xml_failure.set_attribute_bool("hidden", it.hidden);
-        xml_failure.set_attribute("thread", i2string(it.thread_nr));
-        xml_failure.set_attribute("step_nr", i2string(it.step_nr));
+        xml_failure.set_attribute("thread", std::to_string(it.thread_nr));
+        xml_failure.set_attribute("step_nr", std::to_string(it.step_nr));
         xml_failure.set_attribute("reason", id2string(it.comment));
         xml_failure.set_attribute("property", id2string(property_id));
 
@@ -120,11 +119,11 @@ void convert(
         xml_assignment.new_element("value").data=value_string;
 
         xml_assignment.set_attribute_bool("hidden", it.hidden);
-        xml_assignment.set_attribute("thread", i2string(it.thread_nr));
+        xml_assignment.set_attribute("thread", std::to_string(it.thread_nr));
         xml_assignment.set_attribute("identifier", id2string(identifier));
         xml_assignment.set_attribute("base_name", id2string(base_name));
         xml_assignment.set_attribute("display_name", id2string(display_name));
-        xml_assignment.set_attribute("step_nr", i2string(it.step_nr));
+        xml_assignment.set_attribute("step_nr", std::to_string(it.step_nr));
 
         xml_assignment.set_attribute("assignment_type",
           it.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
@@ -145,8 +144,8 @@ void convert(
         xml_output.new_element("text").data=text;
 
         xml_output.set_attribute_bool("hidden", it.hidden);
-        xml_output.set_attribute("thread", i2string(it.thread_nr));
-        xml_output.set_attribute("step_nr", i2string(it.step_nr));
+        xml_output.set_attribute("thread", std::to_string(it.thread_nr));
+        xml_output.set_attribute("step_nr", std::to_string(it.step_nr));
 
         if(xml_location.name!="")
           xml_output.new_element().swap(xml_location);
@@ -166,8 +165,8 @@ void convert(
         xml_input.new_element("input_id").data=id2string(it.io_id);
 
         xml_input.set_attribute_bool("hidden", it.hidden);
-        xml_input.set_attribute("thread", i2string(it.thread_nr));
-        xml_input.set_attribute("step_nr", i2string(it.step_nr));
+        xml_input.set_attribute("thread", std::to_string(it.thread_nr));
+        xml_input.set_attribute("step_nr", std::to_string(it.step_nr));
 
         for(const auto & l_it : it.io_args)
         {
@@ -189,8 +188,8 @@ void convert(
         xmlt &xml_call_return=dest.new_element(tag);
 
         xml_call_return.set_attribute_bool("hidden", it.hidden);
-        xml_call_return.set_attribute("thread", i2string(it.thread_nr));
-        xml_call_return.set_attribute("step_nr", i2string(it.step_nr));
+        xml_call_return.set_attribute("thread", std::to_string(it.thread_nr));
+        xml_call_return.set_attribute("step_nr", std::to_string(it.step_nr));
 
         const symbolt &symbol=ns.lookup(it.identifier);
         xmlt &xml_function=xml_call_return.new_element("function");
@@ -212,8 +211,8 @@ void convert(
           xmlt &xml_location_only=dest.new_element("location-only");
 
           xml_location_only.set_attribute_bool("hidden", it.hidden);
-          xml_location_only.set_attribute("thread", i2string(it.thread_nr));
-          xml_location_only.set_attribute("step_nr", i2string(it.step_nr));
+          xml_location_only.set_attribute("thread", std::to_string(it.thread_nr));
+          xml_location_only.set_attribute("step_nr", std::to_string(it.step_nr));
 
           xml_location_only.new_element().swap(xml_location);
         }

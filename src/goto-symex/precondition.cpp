@@ -171,7 +171,7 @@ void preconditiont::compute_rec(exprt &dest)
 
     value_setst::valuest expr_set;
     value_sets.get_values(target, dest.op0(), expr_set);
-    hash_set_cont<irep_idt, irep_id_hash> symbols;
+    std::unordered_set<irep_idt, irep_id_hash> symbols;
 
     for(value_setst::valuest::const_iterator
         it=expr_set.begin();

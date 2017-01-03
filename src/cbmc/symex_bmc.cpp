@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 
 #include <util/source_location.h>
-#include <util/i2string.h>
 
 #include "symex_bmc.h"
 

@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
@@ -162,7 +161,7 @@ void cpp_typecheckt::typecheck_compound_type(
     // most of these should be named by now; see
     // cpp_declarationt::name_anon_struct_union()
 
-    base_name=std::string("#anon_")+i2string(++anon_counter);
+    base_name=std::string("#anon_")+std::to_string(++anon_counter);
     type.set(ID_C_is_anonymous, true);
     dest_scope=&cpp_scopes.current_scope();
   }
@@ -654,7 +653,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           irep_idt base_name = arg.get_base_name();
 
           if(base_name==irep_idt())
-            base_name="arg"+i2string(i);
+            base_name="arg"+std::to_string(i);
 
           symbolt arg_symb;
           arg_symb.name = id2string(func_symb.name) + "::"+ id2string(base_name);
@@ -1582,7 +1581,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   }
 
   // produce an anonymous member
-  irep_idt base_name="#anon_member"+i2string(components.size());
+  irep_idt base_name="#anon_member"+std::to_string(components.size());
 
   irep_idt identifier=
     cpp_scopes.current_scope().prefix+

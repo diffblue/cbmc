@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // convert expression to boolean formula
 //
 
-#include <util/hash_cont.h>
 #include <util/mp_arith.h>
 #include <util/expr.h>
 #include <util/byte_operators.h>
@@ -111,7 +110,7 @@ protected:
 
   bvt conversion_failed(const exprt &expr);
 
-  typedef hash_map_cont<const exprt, bvt, irep_hash> bv_cachet;
+  typedef std::unordered_map<const exprt, bvt, irep_hash> bv_cachet;
   bv_cachet bv_cache;
 
   bool type_conversion(

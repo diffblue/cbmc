@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 #include <util/expr_util.h>
-#include <util/i2string.h>
 #include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"
@@ -525,9 +524,9 @@ std::string cpp_typecheckt::class_template_identifier(
     if(counter!=0) identifier+=',';
 
     if(it->id()==ID_type)
-      identifier+="Type"+i2string(counter);
+      identifier+="Type"+std::to_string(counter);
     else
-      identifier+="Non_Type"+i2string(counter);
+      identifier+="Non_Type"+std::to_string(counter);
 
     counter++;
   }
@@ -855,7 +854,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 
   assert(type.id()==ID_template);
 
-  std::string id_suffix="template::"+i2string(template_counter++);
+  std::string id_suffix="template::"+std::to_string(template_counter++);
 
   // produce a new scope for the template parameters
   cpp_scopet &template_scope=
@@ -894,7 +893,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     if(declarator.name().is_nil())
     {
       irept name(ID_name);
-      name.set(ID_identifier, "anon#"+i2string(++anon_count));
+      name.set(ID_identifier, "anon#"+std::to_string(++anon_count));
       declarator.name()=cpp_namet();
       declarator.name().get_sub().push_back(name);
     }

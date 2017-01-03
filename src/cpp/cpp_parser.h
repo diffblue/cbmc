@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
-#include <util/hash_cont.h>
 #include <util/string_hash.h>
 #include <util/parser.h>
 #include <util/expr.h>

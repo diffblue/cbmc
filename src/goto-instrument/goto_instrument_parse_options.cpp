@@ -158,7 +158,7 @@ int goto_instrument_parse_optionst::doit()
         int k=-1;
 
         if(unwind)
-          k=safe_string2int (cmdline.get_value("unwind"));
+          k=std::stoi(cmdline.get_value("unwind"));
 
         unwind_sett unwind_set;
 

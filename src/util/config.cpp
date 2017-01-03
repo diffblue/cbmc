@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "cmdline.h"
 #include "simplify_expr.h"
-#include "i2string.h"
 #include "std_expr.h"
 #include "cprover_prefix.h"
 
@@ -539,7 +538,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
   case flavourt::GCC:
     defines.push_back("__mips__");
     defines.push_back("mips");
-    defines.push_back("_MIPS_SZPTR="+i2string(config.ansi_c.pointer_width));
+    defines.push_back("_MIPS_SZPTR="+std::to_string(config.ansi_c.pointer_width));
     break;
 
   case flavourt::VISUAL_STUDIO:

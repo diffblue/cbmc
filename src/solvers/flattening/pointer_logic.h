@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
 
 #include <util/mp_arith.h>
-#include <util/hash_cont.h>
 #include <util/expr.h>
 #include <util/numbering.h>
 

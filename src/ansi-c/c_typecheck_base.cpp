@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/config.h>
 #include <util/std_types.h>
-#include <util/i2string.h>
 
 #include "c_typecheck_base.h"
 #include "expr2c.h"
@@ -655,7 +654,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     // may be anonymous
     if(p_it->get_base_name()==irep_idt())
     {
-      irep_idt base_name="#anon"+i2string(anon_counter++);
+      irep_idt base_name="#anon"+std::to_string(anon_counter++);
       p_it->set_base_name(base_name);
     }
 

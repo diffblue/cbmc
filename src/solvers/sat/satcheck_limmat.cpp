@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 
 #include "satcheck_limmat.h"
 
@@ -156,8 +155,8 @@ propt::resultt satcheck_limmatt::prop_solve()
 
   {
     std::string msg=
-      i2string(maxvar_Limmat(solver))+" variables, "+
-      i2string(clauses_Limmat(solver))+" clauses";
+      std::to_string(maxvar_Limmat(solver))+" variables, "+
+      std::to_string(clauses_Limmat(solver))+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

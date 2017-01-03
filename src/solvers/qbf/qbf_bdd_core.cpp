@@ -9,7 +9,6 @@ Author: CM Wintersteiger
 #include <cassert>
 #include <fstream>
 
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
@@ -192,8 +191,8 @@ propt::resultt qbf_bdd_coret::prop_solve()
   {
     std::string msg=
       solver_text() + ": "+
-      i2string(no_variables())+" variables, "+
-      i2string(matrix->nodeCount())+" nodes";
+      std::to_string(no_variables())+" variables, "+
+      std::to_string(matrix->nodeCount())+" nodes";
     messaget::status() << msg << messaget::eom;
   }
 

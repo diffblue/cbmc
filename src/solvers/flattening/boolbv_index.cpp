@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
-#include <util/i2string.h>
 
 #include "boolbv.h"
 
@@ -124,7 +123,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       std::string identifier=
         "__CPROVER_internal_uniform_array_"+
-        i2string(uniform_array_counter++);
+        std::to_string(uniform_array_counter++);
 
       symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);
@@ -165,7 +164,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       std::string identifier=
         "__CPROVER_internal_actual_array_"+
-        i2string(actual_array_counter++);
+        std::to_string(actual_array_counter++);
 
       symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);

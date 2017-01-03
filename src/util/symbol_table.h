@@ -20,8 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 #include <map>
+#include <unordered_map>
 
-#include "hash_cont.h"
 #include "symbol.h"
 
 #define forall_symbols(it, expr) \
@@ -51,7 +51,7 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
 class symbol_tablet
 {
 public:
-  typedef hash_map_cont<irep_idt, symbolt, irep_id_hash> symbolst;
+  typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
 
   symbolst symbols;
   symbol_base_mapt symbol_base_map;

@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/tempfile.h>
 #include <util/arith_tools.h>
-#include <util/i2string.h>
 #include <util/string2int.h>
 #include <util/prefix.h>
 
@@ -251,7 +250,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
     boolean_assignment.clear();
     boolean_assignment.resize(no_boolean_variables, false);
 
-    typedef hash_map_cont<std::string, valuet, string_hash> valuest;
+    typedef std::unordered_map<std::string, valuet, string_hash> valuest;
     valuest values;
 
     while(std::getline(in, line))
@@ -306,7 +305,7 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
 
     for(unsigned v=0; v<no_boolean_variables; v++)
     {
-      std::string value=values["B"+i2string(v)].value;
+      std::string value=values["B"+std::to_string(v)].value;
       if(value=="") continue;
       boolean_assignment[v]=(value=="1");
     }
@@ -418,7 +417,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, valuet, string_hash> valuest;
+  typedef std::unordered_map<std::string, valuet, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))
@@ -471,7 +470,7 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    std::string value=values["B"+i2string(v)].value;
+    std::string value=values["B"+std::to_string(v)].value;
     if(value=="") continue;
     boolean_assignment[v]=(value=="true");
   }
@@ -499,7 +498,7 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  typedef std::unordered_map<std::string, std::string, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))
@@ -537,7 +536,7 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    std::string value=values["B"+i2string(v)];
+    std::string value=values["B"+std::to_string(v)];
     if(value=="") continue;
     boolean_assignment[v]=(value=="true");
   }
@@ -688,7 +687,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef hash_map_cont<std::string, std::string, string_hash> valuest;
+  typedef std::unordered_map<std::string, std::string, string_hash> valuest;
   valuest values;
 
   while(std::getline(in, line))
@@ -786,7 +785,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   // Booleans
   for(unsigned v=0; v<no_boolean_variables; v++)
   {
-    std::string value=values["B"+i2string(v)];
+    std::string value=values["B"+std::to_string(v)];
     if(value=="") continue;
     boolean_assignment[v]=(value=="true");
   }

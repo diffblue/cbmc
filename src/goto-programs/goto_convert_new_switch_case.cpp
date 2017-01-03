@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/prefix.h>
@@ -2509,7 +2508,7 @@ symbolt &goto_convertt::new_tmp_symbol(
 
   do
   {
-    new_symbol.base_name="tmp_"+suffix+"$"+i2string(++temporary_counter);
+    new_symbol.base_name="tmp_"+suffix+"$"+std::to_string(++temporary_counter);
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.type=type;
     new_symbol.location=source_location;

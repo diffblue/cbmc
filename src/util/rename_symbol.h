@@ -14,14 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 // false: renamed something
 //
 
-#include "hash_cont.h"
-#include "expr.h"
+#include <unordered_map>
+
+#include "irep.h"
+
+class exprt;
+class typet;
 
 class rename_symbolt
 {
 public:
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> expr_mapt;
-  typedef hash_map_cont<irep_idt, irep_idt, irep_id_hash> type_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> expr_mapt;
+  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> type_mapt;
 
   inline void insert_expr(const irep_idt &old_id,
                           const irep_idt &new_id)

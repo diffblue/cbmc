@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/byte_operators.h>
-#include <util/i2string.h>
 #include <util/pointer_offset_size.h>
 #include <util/expr_util.h>
 #include <util/base_type.h>
@@ -319,7 +318,7 @@ void path_symext::symex_malloc(
 
       symbolt size_symbol;
 
-      size_symbol.base_name="dynamic_object_size"+i2string(dynamic_count);
+      size_symbol.base_name="dynamic_object_size"+std::to_string(dynamic_count);
       size_symbol.name="symex::"+id2string(size_symbol.base_name);
       size_symbol.is_lvalue=true;
       size_symbol.type=tmp_size.type();
@@ -338,7 +337,7 @@ void path_symext::symex_malloc(
   // value
   symbolt value_symbol;
 
-  value_symbol.base_name="dynamic_object"+i2string(state.var_map.dynamic_count);
+  value_symbol.base_name="dynamic_object"+std::to_string(state.var_map.dynamic_count);
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;

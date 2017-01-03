@@ -32,7 +32,6 @@ Author: Daniel Kroening
 #include <fcntl.h>
 #endif
 
-#include "i2string.h"
 #include "tempfile.h"
 
 /*******************************************************************\
@@ -122,7 +121,7 @@ std::string get_temporary_file(
   // the path returned by GetTempPath ends with a backslash
   std::string t_template=
     std::string(lpTempPathBuffer)+prefix+
-    i2string(getpid())+".XXXXXX"+suffix;
+    std::to_string(getpid())+".XXXXXX"+suffix;
   #else
   std::string dir="/tmp/";
   const char *TMPDIR_env=getenv("TMPDIR");
@@ -131,7 +130,7 @@ std::string get_temporary_file(
   if(*dir.rbegin()!='/') dir+='/';
 
   std::string t_template=
-    dir+prefix+i2string(getpid())+".XXXXXX"+suffix;
+    dir+prefix+std::to_string(getpid())+".XXXXXX"+suffix;
   #endif
 
   char *t_ptr=strdup(t_template.c_str());

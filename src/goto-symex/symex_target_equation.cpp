@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 
@@ -894,7 +893,7 @@ void symex_target_equationt::convert_io(
         {
           symbol_exprt symbol;
           symbol.type()=tmp.type();
-          symbol.set_identifier("symex::io::"+i2string(io_count++));
+          symbol.set_identifier("symex::io::"+std::to_string(io_count++));
 
           equal_exprt eq(tmp, symbol);
           merge_irep(eq);

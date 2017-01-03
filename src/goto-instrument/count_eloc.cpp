@@ -9,15 +9,16 @@ Date: December 2012
 \*******************************************************************/
 
 #include <iostream>
+#include <unordered_set>
 
 #include <util/prefix.h>
 #include <util/file_util.h>
 
 #include "count_eloc.h"
 
-typedef hash_set_cont<irep_idt, irep_id_hash> linest;
-typedef hash_map_cont<irep_idt, linest, irep_id_hash> filest;
-typedef hash_map_cont<irep_idt, filest, irep_id_hash> working_dirst;
+typedef std::unordered_set<irep_idt, irep_id_hash> linest;
+typedef std::unordered_map<irep_idt, linest, irep_id_hash> filest;
+typedef std::unordered_map<irep_idt, filest, irep_id_hash> working_dirst;
 
 /*******************************************************************\
 

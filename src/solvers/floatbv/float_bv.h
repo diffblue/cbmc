@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
 #define CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
 
-#include <util/i2string.h>
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
 

@@ -10,7 +10,6 @@ Author: Daniel Kroening
 
 #include <cassert>
 
-#include <util/i2string.h>
 #include <util/json_expr.h>
 
 #include <langapi/language_util.h>
@@ -62,14 +61,14 @@ void convert(
         {
           property_id=
             id2string(it.pc->source_location.get_function())+".unwind."+
-            i2string(it.pc->loop_number);
+            std::to_string(it.pc->loop_number);
         }
 
         json_objectt &json_failure=dest_array.push_back().make_object();
 
         json_failure["stepType"]=json_stringt("failure");
         json_failure["hidden"]=jsont::json_boolean(it.hidden);
-        json_failure["thread"]=json_numbert(i2string(it.thread_nr));
+        json_failure["thread"]=json_numbert(std::to_string(it.thread_nr));
         json_failure["reason"]=json_stringt(id2string(it.comment));
         json_failure["property"]=json_stringt(id2string(property_id));
 
@@ -119,7 +118,7 @@ void convert(
         json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
         json_assignment["hidden"]=jsont::json_boolean(it.hidden);
-        json_assignment["thread"]=json_numbert(i2string(it.thread_nr));
+        json_assignment["thread"]=json_numbert(std::to_string(it.thread_nr));
 
         json_assignment["assignmentType"]=
           json_stringt(it.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?
@@ -133,7 +132,7 @@ void convert(
 
         json_output["stepType"]=json_stringt("output");
         json_output["hidden"]=jsont::json_boolean(it.hidden);
-        json_output["thread"]=json_numbert(i2string(it.thread_nr));
+        json_output["thread"]=json_numbert(std::to_string(it.thread_nr));
         json_output["outputID"]=json_stringt(id2string(it.io_id));
 
         json_arrayt &json_values=json_output["values"].make_array();
@@ -157,7 +156,7 @@ void convert(
 
         json_input["stepType"]=json_stringt("input");
         json_input["hidden"]=jsont::json_boolean(it.hidden);
-        json_input["thread"]=json_numbert(i2string(it.thread_nr));
+        json_input["thread"]=json_numbert(std::to_string(it.thread_nr));
         json_input["inputID"]=json_stringt(id2string(it.io_id));
 
         json_arrayt &json_values=json_input["values"].make_array();
@@ -185,7 +184,7 @@ void convert(
 
         json_call_return["stepType"]=json_stringt(tag);
         json_call_return["hidden"]=jsont::json_boolean(it.hidden);
-        json_call_return["thread"]=json_numbert(i2string(it.thread_nr));
+        json_call_return["thread"]=json_numbert(std::to_string(it.thread_nr));
 
         const symbolt &symbol=ns.lookup(it.identifier);
         json_objectt &json_function=json_call_return["function"].make_object();
@@ -208,7 +207,7 @@ void convert(
           json_objectt &json_location_only=dest_array.push_back().make_object();
           json_location_only["stepType"]=json_stringt("location-only");
           json_location_only["hidden"]=jsont::json_boolean(it.hidden);
-          json_location_only["thread"]=json_numbert(i2string(it.thread_nr));
+          json_location_only["thread"]=json_numbert(std::to_string(it.thread_nr));
           json_location_only["sourceLocation"]=json_location;
         }
       }

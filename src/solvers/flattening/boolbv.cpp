@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol.h>
 #include <util/mp_arith.h>
-#include <util/i2string.h>
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
 #include <util/std_types.h>
@@ -800,7 +799,7 @@ void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
   bv_sub.resize(bv.size());
 
   for(std::size_t i=0; i<bv.size(); i++)
-    bv_sub[i].id(i2string(bv[i].get()));
+    bv_sub[i].id(std::to_string(bv[i].get()));
 }
 
 /*******************************************************************\

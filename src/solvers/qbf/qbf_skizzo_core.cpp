@@ -9,7 +9,6 @@ Author: CM Wintersteiger
 #include <cassert>
 #include <fstream>
 
-#include <util/i2string.h>
 #include <util/string2int.h>
 
 #include <cuddObj.hh> // CUDD Library
@@ -102,8 +101,8 @@ propt::resultt qbf_skizzo_coret::prop_solve()
   {
     std::string msg=
       "Skizzo: "+
-      i2string(no_variables())+" variables, "+
-      i2string(no_clauses())+" clauses";
+      std::to_string(no_variables())+" variables, "+
+      std::to_string(no_clauses())+" clauses";
     messaget::status() << msg << messaget::eom;
   }
 

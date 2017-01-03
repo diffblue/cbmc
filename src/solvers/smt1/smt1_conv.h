@@ -13,7 +13,6 @@ Revision: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 #include <sstream>
 #include <set>
 
-#include <util/hash_cont.h>
 #include <util/std_expr.h>
 
 #include <solvers/prop/prop_conv.h>
@@ -155,7 +154,7 @@ protected:
       identifier.value=tmp;
   }
 
-  typedef hash_map_cont<irep_idt, identifiert, irep_id_hash>
+  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
     identifier_mapt;
 
   identifier_mapt identifier_map;

@@ -1,5 +1,5 @@
 SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
-      expr.cpp expr_util.cpp i2string.cpp irep.cpp language.cpp \
+      expr.cpp expr_util.cpp irep.cpp language.cpp \
       lispexpr.cpp lispirep.cpp source_location.cpp message.cpp language_file.cpp \
       mp_arith.cpp namespace.cpp parse_options.cpp rename.cpp \
       replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
@@ -9,7 +9,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       simplify_expr_array.cpp simplify_expr_struct.cpp \
       simplify_expr_boolean.cpp simplify_expr_pointer.cpp \
       get_module.cpp string_hash.cpp string_container.cpp identifier.cpp \
-      rational.cpp options.cpp c_misc.cpp dstring.cpp \
+      rational.cpp options.cpp dstring.cpp \
       find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \
       time_stopping.cpp symbol.cpp irep_hash_container.cpp cout_message.cpp \
       type_eq.cpp guard.cpp array_name.cpp message_stream.cpp \

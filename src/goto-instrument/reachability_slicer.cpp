@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
-#include <util/i2string.h>
 
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>

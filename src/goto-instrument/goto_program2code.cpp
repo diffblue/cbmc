@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
-#include <util/i2string.h>
 
 #include "goto_program2code.h"
 
@@ -2306,10 +2305,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         {
           unsigned count;
           for(count=0;
-              symbol_table.symbols.find("nondet_"+i2string(count))!=
+              symbol_table.symbols.find("nondet_"+std::to_string(count))!=
               symbol_table.symbols.end();
               count++);
-          base_name="nondet_"+i2string(count);
+          base_name="nondet_"+std::to_string(count);
         }
 
         code_typet code_type;

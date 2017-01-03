@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
+#include <unordered_set>
 
 #include "simplify_expr_class.h"
 #include "expr.h"
@@ -146,7 +147,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     {
       // first gather all the a's with !a
 
-      hash_set_cont<exprt, irep_hash> expr_set;
+      std::unordered_set<exprt, irep_hash> expr_set;
 
       forall_operands(it, expr)
         if(it->id()==ID_not &&

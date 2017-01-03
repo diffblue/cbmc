@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
-#include <util/i2string.h>
+#include <util/prefix.h>
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 

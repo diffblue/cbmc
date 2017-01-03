@@ -2,9 +2,9 @@
 
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-#include <util/namespace_utils.h>
 
 #include <cegis/control/value/control_types.h>
 

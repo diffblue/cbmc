@@ -5,7 +5,6 @@
 #include <set>
 
 #include <util/symbol_table.h>
-#include <util/hash_cont.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
@@ -18,7 +17,7 @@
 #include "accelerator.h"
 #include "cone_of_influence.h"
 
-typedef hash_map_cont<exprt, exprt, irep_hash> expr_mapt;
+typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
 
 class acceleration_utilst {
  public:

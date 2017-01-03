@@ -9,7 +9,6 @@ Author: CM Wintersteiger
 #ifndef CPROVER_SOLVERS_QBF_QBF_SQUOLEM_CORE_H
 #define CPROVER_SOLVERS_QBF_QBF_SQUOLEM_CORE_H
 
-#include <util/hash_cont.h>
 #include <quannon/squolem2/squolem2.h>
 
 #include "qdimacs_core.h"
@@ -47,7 +46,7 @@ public:
   virtual const exprt f_get(literalt l);
 
 private:
-  typedef hash_map_cont<unsigned, exprt> function_cachet;
+  typedef std::unordered_map<unsigned, exprt> function_cachet;
     function_cachet function_cache;
 
   const exprt f_get_cnf(WitnessStack *wsp);

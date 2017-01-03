@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <map>
 
-#include <util/i2string.h>
 #include <util/parser.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>

@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_MERGE_IREP_H
 #define CPROVER_UTIL_MERGE_IREP_H
 
+#include <unordered_set>
+
 #include "irep.h"
-#include "hash_cont.h"
 
 class merged_irept:public irept
 {
@@ -82,10 +83,10 @@ public:
   }
 
 protected:
-  typedef hash_set_cont<merged_irept, merged_irep_hash> merged_irep_storet;
+  typedef std::unordered_set<merged_irept, merged_irep_hash> merged_irep_storet;
   merged_irep_storet merged_irep_store;
 
-  typedef hash_set_cont<to_be_merged_irept, to_be_merged_irep_hash> to_be_merged_irep_storet;
+  typedef std::unordered_set<to_be_merged_irept, to_be_merged_irep_hash> to_be_merged_irep_storet;
   to_be_merged_irep_storet to_be_merged_irep_store;
 
   const merged_irept &merged(const irept &);
@@ -101,7 +102,7 @@ public:
   void operator()(irept &);
 
 protected:
-  typedef hash_set_cont<irept, irep_hash> irep_storet;
+  typedef std::unordered_set<irept, irep_hash> irep_storet;
   irep_storet irep_store;
 
   const irept & merged(const irept &irep);
@@ -113,7 +114,7 @@ public:
   void operator()(irept &);
 
 protected:
-  typedef hash_set_cont<irept, irep_full_hash, irep_full_eq> irep_storet;
+  typedef std::unordered_set<irept, irep_full_hash, irep_full_eq> irep_storet;
   irep_storet irep_store;
 
   const irept& merged(const irept &irep);

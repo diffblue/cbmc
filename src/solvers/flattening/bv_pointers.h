@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_POINTERS_H
 
-#include <util/hash_cont.h>
 
 #include "boolbv.h"
 #include "pointer_logic.h"

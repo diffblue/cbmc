@@ -13,7 +13,6 @@ Author: Vincent Nimal
 #include <vector>
 #include <set>
 
-#include <util/i2string.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/prefix.h>

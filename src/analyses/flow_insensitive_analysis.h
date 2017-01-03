@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <queue>
 #include <map>
 #include <iosfwd>
+#include <unordered_set>
 
 #include <goto-programs/goto_functions.h>
 
@@ -44,7 +45,7 @@ public:
   {
   }
 
-  typedef hash_set_cont<exprt, irep_hash> expr_sett;
+  typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
   virtual void get_reference_set(
     const namespacet &ns,

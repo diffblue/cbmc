@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com,
 #include <util/expr_util.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
-#include <util/i2string.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/arith_tools.h>
@@ -126,7 +125,7 @@ void value_set_fivrnst::output_entry(
   {
     const exprt &o=object_numbering[o_it->first];
 
-    std::string result="<"; //+i2string(o_it->first) + ",";
+    std::string result="<"; //+std::to_string(o_it->first) + ",";
 
     if(o.id()==ID_invalid)
     {
@@ -1351,7 +1350,7 @@ void value_set_fivrnst::do_function_call(
   for(unsigned i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
-                                 "argument$"+i2string(i);
+                                 "argument$"+std::to_string(i);
     add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
 //    std::cout << arguments[i] << std::endl;
@@ -1384,7 +1383,7 @@ void value_set_fivrnst::do_function_call(
 
     const exprt v_expr=
       symbol_exprt("value_set::" + id2string(function) + "::" +
-                   "argument$"+i2string(i), it->type());
+                   "argument$"+std::to_string(i), it->type());
 
     exprt actual_lhs=symbol_exprt(identifier, it->type());
     assign(actual_lhs, v_expr, ns, true);
@@ -1411,7 +1410,7 @@ void value_set_fivrnst::do_end_function(
   if(lhs.is_nil()) return;
 
   irep_idt rvs = std::string("value_set::return_value") +
-                 i2string(from_function);
+                 std::to_string(from_function);
   add_var(rvs, "");
   symbol_exprt rhs(rvs, lhs.type());
 
@@ -1511,7 +1510,7 @@ void value_set_fivrnst::apply_code(
     if(code.operands().size()==1)
     {
       irep_idt rvs = std::string("value_set::return_value") +
-                     i2string(from_function);
+                     std::to_string(from_function);
       add_var(rvs, "");
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);

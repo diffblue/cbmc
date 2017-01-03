@@ -91,7 +91,7 @@ exprt convert_float_literal(const std::string &src)
     if(integer_bits==irep_idt())
       fraction_bits=width/2; // default
     else
-      fraction_bits=width-safe_string2int(id2string(integer_bits));
+      fraction_bits=width-std::stoi(id2string(integer_bits));
 
     mp_integer factor=mp_integer(1)<<fraction_bits;
     mp_integer value=significand*factor;

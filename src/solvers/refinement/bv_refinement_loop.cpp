@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <util/i2string.h>
 #include <util/xml.h>
 
 #include "bv_refinement.h"
@@ -87,7 +86,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     if(ui==ui_message_handlert::XML_UI)
     {
       xmlt xml("refinement-iteration");
-      xml.data=i2string(iteration);
+      xml.data=std::to_string(iteration);
       std::cout << xml << '\n';
     }
 
