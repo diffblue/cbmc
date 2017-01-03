@@ -72,21 +72,59 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       return false;
     }
   }
-  else if(expr.id()==ID_or ||
-          expr.id()==ID_and ||
-          expr.id()==ID_xor)
+  else if(expr.id()==ID_xor)
   {
-    if(operands.empty())
-      return true;
-
     bool result=true;
-
-    exprt::operandst::const_iterator last;
-    bool last_set=false;
 
     bool negate=false;
 
-    for(exprt::operandst::iterator it=operands.begin();
+    for(exprt::operandst::const_iterator it=operands.begin();
+        it!=operands.end();)
+    {
+      if(it->type().id()!=ID_bool) return true;
+
+      bool erase;
+
+      if(it->is_true())
+      {
+        erase=true;
+        negate=!negate;
+      }
+      else
+        erase=it->is_false();
+
+      if(erase)
+      {
+        it=operands.erase(it);
+        result=false;
+      }
+      else
+        it++;
+    }
+
+    if(operands.empty())
+    {
+      expr.make_bool(negate);
+      return false;
+    }
+    else if(operands.size()==1)
+    {
+      if(negate)
+        expr.op0().make_not();
+      exprt tmp(operands.front());
+      expr.swap(tmp);
+      return false;
+    }
+
+    return result;
+  }
+  else if(expr.id()==ID_and || expr.id()==ID_or)
+  {
+    std::unordered_set<exprt, irep_hash> expr_set;
+
+    bool result=true;
+
+    for(exprt::operandst::const_iterator it=operands.begin();
         it!=operands.end();)
     {
       if(it->type().id()!=ID_bool)
@@ -106,21 +144,9 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         return false;
       }
 
-      bool erase;
-
-      if(expr.id()==ID_and)
-        erase=is_true;
-      else if(is_true && expr.id()==ID_xor)
-      {
-        erase=true;
-        negate=!negate;
-      }
-      else
-        erase=is_false;
-
-      if(last_set && *it==*last &&
-         (expr.id()==ID_or || expr.id()==ID_and))
-        erase=true; // erase duplicate operands
+      bool erase=
+        (expr.id()==ID_and ? is_true : is_false) ||
+        !expr_set.insert(*it).second;
 
       if(erase)
       {
@@ -128,55 +154,27 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         result=false;
       }
       else
-      {
-        last=it;
-        last_set=true;
         it++;
-      }
     }
 
     // search for a and !a
-    if(expr.id()==ID_and || expr.id()==ID_or)
-    {
-      // first gather all the a's with !a
-
-      std::unordered_set<exprt, irep_hash> expr_set;
-
-      forall_operands(it, expr)
-        if(it->id()==ID_not &&
-           it->operands().size()==1 &&
-           it->type().id()==ID_bool)
-          expr_set.insert(it->op0());
-
-      // now search for a
-
-      if(!expr_set.empty())
+    for(const exprt &op : operands)
+      if(op.id()==ID_not &&
+         op.operands().size()==1 &&
+         op.type().id()==ID_bool &&
+         expr_set.find(op.op0())!=expr_set.end())
       {
-        forall_operands(it, expr)
-        {
-          if(it->id()!=ID_not &&
-             expr_set.find(*it)!=expr_set.end())
-          {
-            expr.make_bool(expr.id()==ID_or);
-            return false;
-          }
-        }
+        expr.make_bool(expr.id()==ID_or);
+        return false;
       }
-    }
 
     if(operands.empty())
     {
-      if(expr.id()==ID_and || negate)
-        expr=true_exprt();
-      else
-        expr=false_exprt();
-
+      expr.make_bool(expr.id()==ID_and);
       return false;
     }
     else if(operands.size()==1)
     {
-      if(negate)
-        expr.op0().make_not();
       exprt tmp(operands.front());
       expr.swap(tmp);
       return false;
