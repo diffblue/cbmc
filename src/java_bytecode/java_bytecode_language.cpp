@@ -34,10 +34,7 @@ Function: java_bytecode_languaget::extensions
 
 std::set<std::string> java_bytecode_languaget::extensions() const
 {
-  std::set<std::string> s;
-  s.insert("class");
-  s.insert("jar");
-  return s;
+  return { "class", "jar" };
 }
 
 /*******************************************************************\

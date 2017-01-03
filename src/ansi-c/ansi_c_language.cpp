@@ -40,10 +40,7 @@ Function: ansi_c_languaget::extensions
 
 std::set<std::string> ansi_c_languaget::extensions() const
 {
-  std::set<std::string> s;
-  s.insert("c");
-  s.insert("i");
-  return s;
+  return { "c", "i" };
 }
 
 /*******************************************************************\
