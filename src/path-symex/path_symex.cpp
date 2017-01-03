@@ -598,7 +598,7 @@ void path_symext::assign_rec(
 
     assert(operands.size()==components.size());
 
-    for(unsigned i=0; i<components.size(); i++)
+    for(std::size_t i=0; i<components.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -620,7 +620,7 @@ void path_symext::assign_rec(
     const exprt::operandst &operands=ssa_lhs.operands();
 
     // split up into elements
-    for(unsigned i=0; i<operands.size(); i++)
+    for(std::size_t i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -637,7 +637,7 @@ void path_symext::assign_rec(
     const exprt::operandst &operands=ssa_lhs.operands();
 
     // split up into elements
-    for(unsigned i=0; i<operands.size(); i++)
+    for(std::size_t i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -749,10 +749,10 @@ void path_symext::function_call_rec(
     const exprt::operandst &call_arguments=call.arguments();
   
     // keep track when va arguments begin.
-    unsigned va_args_start_index=0;
+    std::size_t va_args_start_index=0;
 
     // now assign the argument values to parameters
-    for(unsigned i=0; i<call_arguments.size(); i++)
+    for(std::size_t i=0; i<call_arguments.size(); i++)
     {
       if(i<function_parameters.size())
       {
@@ -778,7 +778,7 @@ void path_symext::function_call_rec(
 
     if(code_type.has_ellipsis())
     {
-      unsigned va_count=0;
+      std::size_t va_count=0;
 
       auto call_arguments_it = std::begin(call_arguments);
       std::advance(call_arguments_it, va_args_start_index);
