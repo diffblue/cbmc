@@ -101,9 +101,7 @@ guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2)
     return g1;
   }
 
-  sort_and_join(g1.expr);
   exprt g2_sorted = g2.as_expr();
-  sort_and_join(g2_sorted);
 
   exprt::operandst &op1 = g1.expr.operands();
   const exprt::operandst &op2 = g2_sorted.operands();
@@ -112,10 +110,10 @@ guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2)
   for(exprt::operandst::const_iterator it2 = op2.begin(); it2 != op2.end();
       ++it2)
   {
-    while(it1 != op1.end() && *it1 < *it2)
-      ++it1;
     if(it1 != op1.end() && *it1 == *it2)
       it1 = op1.erase(it1);
+    else
+      break;
   }
 
   g1.expr = conjunction(op1);
@@ -159,9 +157,7 @@ guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2)
   }
 
   // find common prefix
-  sort_and_join(g1.expr);
   exprt g2_sorted = g2.as_expr();
-  sort_and_join(g2_sorted);
 
   exprt::operandst &op1 = g1.expr.operands();
   const exprt::operandst &op2 = g2_sorted.operands();
