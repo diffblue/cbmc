@@ -51,7 +51,7 @@ exprt::operandst build_function_environment(
   for(const auto & p : parameters)
   {
     irep_idt base_name=p.get_base_name().empty()?
-      ("argument#"+to_string(i)):p.get_base_name();
+      ("argument#"+std::to_string(i)):p.get_base_name();
     irep_idt identifier=id2string(goto_functionst::entry_point())+
       "::"+id2string(base_name);
 
