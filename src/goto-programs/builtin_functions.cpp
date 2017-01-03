@@ -580,8 +580,10 @@ void goto_convertt::do_java_new(
   CHECK_RETURN(object_size.is_not_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_malloc);
+  side_effect_exprt malloc_expr(ID_allocate);
   malloc_expr.copy_to_operands(object_size);
+  // could use true and get rid of the code below
+  malloc_expr.copy_to_operands(false_exprt());
   malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
@@ -618,8 +620,10 @@ void goto_convertt::do_java_new_array(
   CHECK_RETURN(!object_size.is_nil());
 
   // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_malloc);
+  side_effect_exprt malloc_expr(ID_allocate);
   malloc_expr.copy_to_operands(object_size);
+  // code use true and get rid of the code below
+  malloc_expr.copy_to_operands(false_exprt());
   malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);

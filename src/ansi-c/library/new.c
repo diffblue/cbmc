@@ -8,7 +8,7 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // This just does memory allocation.
   __CPROVER_HIDE:;
   void *res;
-  res=__CPROVER_malloc(malloc_size);
+  res = __CPROVER_allocate(malloc_size, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -36,7 +36,7 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // This just does memory allocation.
   __CPROVER_HIDE:;
   void *res;
-  res=__CPROVER_malloc(size*count);
+  res = __CPROVER_allocate(size*count, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;

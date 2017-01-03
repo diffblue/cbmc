@@ -448,18 +448,19 @@ void interpretert::evaluate(
         error() << "nondet not implemented" << eom;
       return;
     }
-    else if(side_effect.get_statement()==ID_malloc)
+    else if(side_effect.get_statement()==ID_allocate)
     {
       if(show)
-        error() << "malloc not fully implemented "
+        error() << "heap memory allocation not fully implemented "
                 << expr.type().subtype().pretty()
                 << eom;
       std::stringstream buffer;
       num_dynamic_objects++;
-      buffer << "interpreter::malloc_object" << num_dynamic_objects;
+      buffer << "interpreter::dynamic_object" << num_dynamic_objects;
       irep_idt id(buffer.str().c_str());
       mp_integer address=build_memory_map(id, expr.type().subtype());
       // TODO: check array of type
+      // TODO: interpret zero-initialization argument
       dest.push_back(address);
       return;
     }

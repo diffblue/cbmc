@@ -60,27 +60,39 @@ inline void abort(void)
 /* FUNCTION: calloc */
 
 #undef calloc
-#undef malloc
 
-inline void *malloc(__CPROVER_size_t malloc_size);
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
+  // realistically, calloc may return NULL,
+  // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
-  void *res;
-  res=malloc(nmemb*size);
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_is_zero_string(res)=1;
-  __CPROVER_zero_string_length(res)=0;
-  //for(int i=0; i<nmemb*size; i++) res[i]=0;
-  #else
-  if(nmemb>1)
-    __CPROVER_array_set(res, 0);
-  else if(nmemb==1)
-    for(__CPROVER_size_t i=0; i<size; ++i)
-      ((char*)res)[i]=0;
-  #endif
-  return res;
+  void *malloc_res;
+  malloc_res = __CPROVER_allocate(nmemb * size, 1);
+
+  // make sure it's not recorded as deallocated
+  __CPROVER_deallocated =
+    (malloc_res == __CPROVER_deallocated) ? 0 : __CPROVER_deallocated;
+
+  // record the object size for non-determistic bounds checking
+  __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_malloc_object =
+    record_malloc ? malloc_res : __CPROVER_malloc_object;
+  __CPROVER_malloc_size = record_malloc ? nmemb * size : __CPROVER_malloc_size;
+  __CPROVER_malloc_is_new_array =
+    record_malloc ? 0 : __CPROVER_malloc_is_new_array;
+
+  // detect memory leaks
+  __CPROVER_bool record_may_leak = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_memory_leak = record_may_leak ? malloc_res : __CPROVER_memory_leak;
+
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_is_zero_string(malloc_res) = 1;
+  __CPROVER_zero_string_length(malloc_res) = 0;
+#endif
+
+  return malloc_res;
 }
 
 /* FUNCTION: malloc */
@@ -92,10 +104,10 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
   // realistically, malloc may return NULL,
-  // and __CPROVER_malloc doesn't, but no one cares
+  // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
   void *malloc_res;
-  malloc_res=__CPROVER_malloc(malloc_size);
+  malloc_res = __CPROVER_allocate(malloc_size, 0);
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -121,7 +133,7 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
   void *res;
-  res=__CPROVER_malloc(alloca_size);
+  res = __CPROVER_allocate(alloca_size, 0);
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;

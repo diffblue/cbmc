@@ -678,7 +678,7 @@ void value_sett::get_value_set_rec(
       // these should be gone
       throw "unexpected function_call sideeffect";
     }
-    else if(statement==ID_malloc)
+    else if(statement==ID_allocate)
     {
       assert(suffix=="");
 

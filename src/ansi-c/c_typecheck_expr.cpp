@@ -2271,16 +2271,16 @@ exprt c_typecheck_baset::do_special_functions(
 
     return abs_expr;
   }
-  else if(identifier==CPROVER_PREFIX "malloc")
+  else if(identifier==CPROVER_PREFIX "allocate")
   {
-    if(expr.arguments().size()!=1)
+    if(expr.arguments().size()!=2)
     {
       err_location(f_op);
-      error() << "malloc expects one operand" << eom;
+      error() << "allocate expects two operands" << eom;
       throw 0;
     }
 
-    exprt malloc_expr=side_effect_exprt(ID_malloc);
+    exprt malloc_expr=side_effect_exprt(ID_allocate);
     malloc_expr.type()=expr.type();
     malloc_expr.add_source_location()=source_location;
     malloc_expr.operands()=expr.arguments();

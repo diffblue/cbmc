@@ -762,7 +762,7 @@ void goto_convertt::convert_assign(
   }
   else if(
     rhs.id() == ID_side_effect &&
-    (rhs.get(ID_statement) == ID_malloc ||
+    (rhs.get(ID_statement) == ID_allocate ||
      rhs.get(ID_statement) == ID_java_new_array_data))
   {
     // just preserve
