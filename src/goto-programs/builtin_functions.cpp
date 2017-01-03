@@ -584,7 +584,7 @@ void goto_convertt::do_java_new(
   malloc_expr.copy_to_operands(object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  malloc_expr.type()=rhs.type();
+  malloc_expr.type()=pointer_typet(object_type);
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
@@ -624,7 +624,7 @@ void goto_convertt::do_java_new_array(
   malloc_expr.copy_to_operands(object_size);
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  malloc_expr.type()=rhs.type();
+  malloc_expr.type()=pointer_typet(object_type);
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
