@@ -10,10 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/byte_operators.h>
 #include <util/i2string.h>
+#include <util/string2int.h>
 #include <util/pointer_offset_size.h>
 #include <util/expr_util.h>
 #include <util/base_type.h>
-
+#include <util/prefix.h>
 #include <ansi-c/c_types.h>
 
 #include <pointer-analysis/dereference.h>
@@ -122,6 +123,11 @@ void path_symext::assign(
     else if(statement==ID_nondet)
     {
       // done in statet:instantiate_rec
+    }
+    else if(statement==ID_gcc_builtin_va_arg_next)
+    {
+      symex_va_arg_next(state, lhs, side_effect_expr);
+      return;
     }
     else
       throw "unexpected side-effect on rhs: "+id2string(statement);
@@ -290,6 +296,103 @@ void path_symext::symex_malloc(
   assign(state, lhs, rhs);
 }
 
+
+/*******************************************************************\
+
+Function: get_old_va_symb
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static irep_idt get_old_va_symbol(
+    const path_symex_statet &state,
+    const exprt &src)
+{
+  if(src.id()==ID_typecast)
+    return get_old_va_symbol(state, to_typecast_expr(src).op());
+  else if(src.id()==ID_address_of)
+  {
+    const exprt &op=to_address_of_expr(src).object();
+
+    if(op.id()==ID_symbol)
+      return to_symbol_expr(op).get_identifier();
+  }
+
+  return irep_idt();
+}
+
+/*******************************************************************\
+
+Function: path_symext::symex_va_arg_next
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void path_symext::symex_va_arg_next(
+    path_symex_statet &state,
+    const exprt &lhs,
+    const side_effect_exprt &code)
+{
+  if(code.operands().size()!=1)
+    throw "va_arg_next expected to have one operand";
+
+  if(lhs.is_nil())
+    return;// ignore
+
+  exprt tmp=state.read(code.op0()); // constant prop on va_arg parameter
+
+  // Get old symbol of va_arg and modify it to generate a new one.
+  irep_idt id=get_old_va_symbol(state, tmp);
+  exprt rhs=gen_zero(lhs.type());
+
+  if(!id.empty())
+  {
+    // strip last name off id to get function name
+    std::size_t pos=id2string(id).rfind("::");
+    if(pos!=std::string::npos)
+    {
+      irep_idt function_identifier=std::string(id2string(id), 0, pos);
+      std::string base=id2string(function_identifier)+"::va_arg";
+
+      /*
+       * Construct the identifier of the va_arg argument such that it
+       * corresponds to the respective one set upon function call
+       */
+      if(has_prefix(id2string(id), base))
+        id=base
+            +i2string(
+                safe_string2unsigned(
+                    std::string(id2string(id), base.size(), std::string::npos))
+                    +1);
+      else
+        id=base+"0";
+
+      const var_mapt::var_infot &var_info=state.var_map[id];
+
+      if(var_info.full_identifier==id)
+      {
+        const path_symex_statet::var_statet &var_state
+          =state.get_var_state(var_info);
+        const exprt symbol_expr=symbol_exprt(id, var_state.ssa_symbol.type());
+        rhs=address_of_exprt(symbol_expr);
+        rhs.make_typecast(lhs.type());
+      }
+    }
+  }
+
+  assign(state, lhs, rhs);
+}
+  
 /*******************************************************************\
 
 Function: path_symext::assign_rec
@@ -644,6 +747,9 @@ void path_symext::function_call_rec(
     const code_typet::parameterst &function_parameters=code_type.parameters();
 
     const exprt::operandst &call_arguments=call.arguments();
+  
+    // keep track when va arguments begin.
+    unsigned va_args_start_index=0;
 
     // now assign the argument values to parameters
     for(unsigned i=0; i<call_arguments.size(); i++)
@@ -654,10 +760,45 @@ void path_symext::function_call_rec(
         irep_idt identifier=function_parameter.get_identifier();
 
         if(identifier==irep_idt())
-          throw "function_call " + id2string(function_identifier) + " no identifier for function parameter";
+          throw "function_call " + id2string(function_identifier)
+              + " no identifier for function parameter";
 
         symbol_exprt lhs(identifier, function_parameter.type());
         exprt rhs=call_arguments[i];
+
+        // lhs/rhs types might not match
+        if(lhs.type()!=rhs.type())
+          rhs.make_typecast(lhs.type());
+
+        assign(state, lhs, rhs);
+      }
+      else if(va_args_start_index==0)
+        va_args_start_index=i;
+    }
+
+    if(code_type.has_ellipsis())
+    {
+      unsigned va_count=0;
+
+      auto call_arguments_it = std::begin(call_arguments);
+      std::advance(call_arguments_it, va_args_start_index);
+      auto call_arguments_end = std::end(call_arguments);
+
+      for(; call_arguments_it!=call_arguments_end; ++call_arguments_it)
+      {
+        exprt rhs=*call_arguments_it;
+
+        irep_idt id=id2string(function_identifier)+"::va_arg"
+            +i2string(va_count);
+
+        symbolt symbol;
+        symbol.name=id;
+        symbol.base_name="va_arg"+i2string(va_count);
+        symbol.type=rhs.type();
+
+        va_count++;
+
+        symbol_exprt lhs=symbol.symbol_expr();
 
         // lhs/rhs types might not match
         if(lhs.type()!=rhs.type())

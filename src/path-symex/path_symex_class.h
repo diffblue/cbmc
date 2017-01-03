@@ -70,6 +70,11 @@ protected:
     const exprt &lhs,
     const side_effect_exprt &code);
 
+  void symex_va_arg_next(
+    path_symex_statet &state,
+    const exprt &lhs,
+    const side_effect_exprt &code);
+
   void assign(
     path_symex_statet &state,
     const exprt &lhs,
