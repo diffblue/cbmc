@@ -277,7 +277,7 @@ void full_slicert::fixedpoint(
 {
   std::vector<cfgt::entryt> dep_node_to_cfg;
   dep_node_to_cfg.reserve(dep_graph.size());
-  for(dependence_grapht::node_indext i=0; i<dep_graph.size(); ++i)
+  for(unsigned i=0; i<dep_graph.size(); ++i)
   {
     cfgt::entry_mapt::const_iterator entry=
       cfg.entry_map.find(dep_graph[i].PC);
@@ -332,6 +332,9 @@ Function: implicit
 static bool implicit(const namespacet &ns, goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
+
+  const irep_idt &statement=target->code.get(ID_statement);
+  if (statement==ID_array_copy) return true;
 
   if (target->is_assume()) return true;
   if(!target->is_assign()) return false;

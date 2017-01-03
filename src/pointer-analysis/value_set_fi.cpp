@@ -1723,7 +1723,7 @@ void value_set_fit::apply_code(
   {
 	  // doesn't do anything
   }
-  else if(statement==ID_output)
+  else if(statement==ID_array_copy)
   {
     // doesn't do anything
   }
