@@ -733,6 +733,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       // do some type adjustment for the arguments,
       // as Java promotes arguments
+      // Also cast pointers since intermediate locals
+      // can be void*.
 
       for(std::size_t i=0; i<parameters.size(); i++)
       {
@@ -740,10 +742,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
         if(type==java_boolean_type() ||
            type==java_char_type() ||
            type==java_byte_type() ||
-           type==java_short_type())
+           type==java_short_type() ||
+           type.id()==ID_pointer)
         {
           assert(i<call.arguments().size());
-          call.arguments()[i].make_typecast(type);
+          if(type!=call.arguments()[i].type())
+            call.arguments()[i].make_typecast(type);
         }
       }
 
@@ -833,12 +837,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX);
 
-      const bool is_array('a' == statement[0]);
+      exprt toassign=op[0];
+      if('a'==statement[0] && toassign.type()!=var.type())
+        toassign=typecast_exprt(toassign, var.type());
 
-      if(is_array)
-        var.type()=op[0].type();
-
-      c=code_assignt(var, op[0]);
+      c=code_assignt(var, toassign);
     }
     else if(statement==patternt("?aload"))
     {
@@ -999,7 +1002,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
-      const typecast_exprt lhs(op[0], pointer_typet());
+      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(number));
