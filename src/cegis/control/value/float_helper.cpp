@@ -5,6 +5,7 @@
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
+#include <util/type_eq.h>
 
 #include <cegis/control/value/control_types.h>
 
