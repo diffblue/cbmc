@@ -250,7 +250,7 @@ Function: java_bytecode_convert_classt::add_array_types
 
 void java_bytecode_convert_classt::add_array_types()
 {
-  const char letters[]="ijsbcfdza";
+  const std::string letters="ijsbcfdza";
 
   for(const char l : letters)
   {
