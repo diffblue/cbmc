@@ -413,7 +413,9 @@ void java_bytecode_convert_methodt::convert(
   method_has_this=code_type.has_this();
 
   tmp_vars.clear();
-  method_symbol.value=convert_instructions(m.instructions, code_type);
+
+  if((!m.is_abstract) && (!m.is_native))
+    method_symbol.value=convert_instructions(m.instructions, code_type);
 
   // do we have the method symbol already?
   const auto s_it=symbol_table.symbols.find(method.get_name());
