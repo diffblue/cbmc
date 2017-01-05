@@ -356,7 +356,7 @@ bool taint_analysist::operator()(
         if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
           continue;
 
-        if(custom_bitvector_analysis[i_it].is_bottom) continue;
+        if(custom_bitvector_analysis[i_it].has_values.is_false()) continue;
 
         exprt result=custom_bitvector_analysis.eval(i_it->guard, i_it);
         exprt result2=simplify_expr(result, ns);
