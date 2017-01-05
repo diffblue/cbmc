@@ -12,6 +12,8 @@ Date: February 2013
 #ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
+#include <util/threeval.h>
+
 #include "ai.h"
 #include "goto_rw.h"
 
@@ -42,6 +44,12 @@ public:
       values.push_back(entry.first);
 
     return entry.first->second;
+  }
+
+  void clear()
+  {
+    value_map.clear();
+    values.clear();
   }
 
 protected:
@@ -83,6 +91,7 @@ class rd_range_domaint:public ai_domain_baset
 public:
   rd_range_domaint():
     ai_domain_baset(),
+    has_values(false),
     bv_container(0)
   {
   }
@@ -106,20 +115,24 @@ public:
   {
     output(out);
   }
-  
+
   void make_top() override final
   {
     values.clear();
+    if(bv_container) bv_container->clear();
+    has_values=tvt(true);
   }
 
   void make_bottom() override final
   {
     values.clear();
+    if(bv_container) bv_container->clear();
+    has_values=tvt(false);
   }
 
   void make_entry() override final
   {
-    values.clear();
+    make_top();
   }
 
   // returns true iff there is s.th. new
@@ -145,6 +158,8 @@ public:
   }
 
 protected:
+  tvt has_values;
+
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
 
   typedef std::set<std::size_t> values_innert;

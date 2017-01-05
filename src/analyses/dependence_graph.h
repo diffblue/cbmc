@@ -13,6 +13,7 @@ Date: August 2013
 #define CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 
 #include <util/graph.h>
+#include <util/threeval.h>
 
 #include "ai.h"
 #include "cfg_dominators.h"
@@ -70,6 +71,7 @@ public:
   typedef graph<dep_nodet>::node_indext node_indext;
 
   dep_graph_domaint():
+    has_values(false),
     node_id(std::numeric_limits<node_indext>::max())
   {
   }
@@ -89,20 +91,22 @@ public:
     std::ostream &out,
     const ai_baset &ai,
     const namespacet &ns) const final override;
-    
+
   void make_top() final override
   {
+    has_values=tvt(true);
     node_id=std::numeric_limits<node_indext>::max();
   }
 
   void make_bottom() final override
   {
+    has_values=tvt(false);
     node_id=std::numeric_limits<node_indext>::max();
   }
 
   void make_entry() final override
   {
-    node_id=std::numeric_limits<node_indext>::max();
+    make_top();
   }
 
   void set_node_id(node_indext id)
@@ -117,6 +121,7 @@ public:
   }
 
 protected:
+  tvt has_values;
   node_indext node_id;
 
   typedef std::set<goto_programt::const_targett> depst;

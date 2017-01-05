@@ -34,7 +34,7 @@ public:
     bool old_reachable=reachable;
     if(src.reachable)
       reachable=true;
-  
+
     bool old_h_s=has_spawn;
     if(src.has_spawn &&
        (from->is_end_function() ||
@@ -66,7 +66,7 @@ public:
       is_threaded=true;
     }
   }
-  
+
   void make_bottom() override final
   {
     reachable=has_spawn=is_threaded=false;
@@ -76,7 +76,7 @@ public:
   {
     reachable=has_spawn=is_threaded=true;
   }
-  
+
   void make_entry() override final
   {
     reachable=true;

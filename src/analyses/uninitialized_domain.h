@@ -11,16 +11,16 @@ Date: January 2010
 #ifndef CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H
 #define CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H
 
+#include <util/threeval.h>
+
 #include "ai.h"
 
 class uninitialized_domaint:public ai_domain_baset
 {
 public:
-  uninitialized_domaint():is_bottom(true)
+  uninitialized_domaint():has_values(false)
   {
   }
-  
-  bool is_bottom;
 
   // Locals that are declared but may not be initialized
   typedef std::set<irep_idt> uninitializedt;
@@ -36,17 +36,17 @@ public:
     std::ostream &out,
     const ai_baset &ai,
     const namespacet &ns) const override final;
-    
+
   void make_top() override final
   {
-    // We don't have a proper 'top', and refuse to do this.
-    assert(false);
+    uninitialized.clear();
+    has_values=tvt(true);
   }
 
   void make_bottom() override final
   {
     uninitialized.clear();
-    is_bottom=true;
+    has_values=tvt(false);
   }
 
   void make_entry() override final
@@ -61,6 +61,8 @@ public:
     locationt to);
 
 protected:
+  tvt has_values;
+
   void assign(const exprt &lhs);
 };
 

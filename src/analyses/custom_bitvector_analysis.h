@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_CUSTOM_BITVECTOR_ANALYSIS_H
 
 #include <util/numbering.h>
+#include <util/threeval.h>
 
 #include "ai.h"
 #include "local_may_alias.h"
@@ -42,20 +43,19 @@ public:
   {
     may_bits.clear();
     must_bits.clear();
-    is_bottom=true;
+    has_values=tvt(false);
   }
 
   void make_top() final override
   {
-    // We don't have a proper top, and refuse to do this.
-    assert(false);
+    may_bits.clear();
+    must_bits.clear();
+    has_values=tvt(true);
   }
 
   void make_entry() final override
   {
-    may_bits.clear();
-    must_bits.clear();
-    is_bottom=false;
+    make_top();
   }
 
   bool merge(
@@ -90,9 +90,9 @@ public:
   vectorst get_rhs(const exprt &) const;
   vectorst get_rhs(const irep_idt &) const;
 
-  bool is_bottom;
+  tvt has_values;
 
-  custom_bitvector_domaint():is_bottom(true)
+  custom_bitvector_domaint():has_values(true)
   {
   }
 

@@ -679,6 +679,13 @@ Function: rd_range_domaint::output
 void rd_range_domaint::output(std::ostream &out) const
 {
   out << "Reaching definitions:" << std::endl;
+
+  if(has_values.is_known())
+  {
+    out << has_values.to_string() << '\n';
+    return;
+  }
+
   for(valuest::const_iterator
       it=values.begin();
       it!=values.end();
@@ -797,7 +804,8 @@ bool rd_range_domaint::merge(
   locationt from,
   locationt to)
 {
-  bool more=false;
+  bool changed=has_values.is_false();
+  has_values=tvt::unknown();
 
   valuest::iterator it=values.begin();
   for(valuest::const_iterator ito=other.values.begin();
@@ -809,7 +817,7 @@ bool rd_range_domaint::merge(
     if(it==values.end() || ito->first<it->first)
     {
       values.insert(*ito);
-      more=true;
+      changed=true;
     }
     else if(it!=values.end())
     {
@@ -817,7 +825,7 @@ bool rd_range_domaint::merge(
 
       if(merge_inner(it->second, ito->second))
       {
-        more=true;
+        changed=true;
         export_cache.erase(it->first);
       }
 
@@ -825,7 +833,7 @@ bool rd_range_domaint::merge(
     }
   }
 
-  return more;
+  return changed;
 }
 
 /*******************************************************************\
@@ -853,7 +861,8 @@ bool rd_range_domaint::merge_shared(
   assert(rd!=0);
 #endif
 
-  bool more=false;
+  bool changed=has_values.is_false();
+  has_values=tvt::unknown();
 
   valuest::iterator it=values.begin();
   for(valuest::const_iterator ito=other.values.begin();
@@ -871,7 +880,7 @@ bool rd_range_domaint::merge_shared(
     if(it==values.end() || ito->first<it->first)
     {
       values.insert(*ito);
-      more=true;
+      changed=true;
     }
     else if(it!=values.end())
     {
@@ -879,7 +888,7 @@ bool rd_range_domaint::merge_shared(
 
       if(merge_inner(it->second, ito->second))
       {
-        more=true;
+        changed=true;
         export_cache.erase(it->first);
       }
 
@@ -887,7 +896,7 @@ bool rd_range_domaint::merge_shared(
     }
   }
 
-  return more;
+  return changed;
 }
 
 /*******************************************************************\

@@ -130,6 +130,8 @@ void global_may_alias_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
+  if(has_values.is_false()) return;
+
   const goto_programt::instructiont &instruction=*from;
 
   switch(instruction.type)
@@ -179,6 +181,12 @@ void global_may_alias_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
+  if(has_values.is_known())
+  {
+    out << has_values.to_string() << '\n';
+    return;
+  }
+
   for(aliasest::const_iterator a_it1=aliases.begin();
       a_it1!=aliases.end();
       a_it1++)
@@ -218,7 +226,8 @@ bool global_may_alias_domaint::merge(
   locationt from,
   locationt to)
 {
-  bool changed=false;
+  bool changed=has_values.is_false();
+  has_values=tvt::unknown();
 
   // do union
   for(aliasest::const_iterator it=b.aliases.begin();

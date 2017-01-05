@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANALYSES_GLOBAL_MAY_ALIAS_H
 
 #include <util/numbering.h>
+#include <util/threeval.h>
 #include <util/union_find.h>
 
 #include "ai.h"
@@ -28,6 +29,10 @@ class global_may_alias_analysist;
 class global_may_alias_domaint:public ai_domain_baset
 {
 public:
+  global_may_alias_domaint():has_values(false)
+  {
+  }
+
   void transform(
     locationt from,
     locationt to,
@@ -47,23 +52,26 @@ public:
   void make_bottom() final override
   {
     aliases.clear();
+    has_values=tvt(false);
   }
 
   void make_top() final override
   {
-    // We don't have a proper top.
-    assert(false);
+    aliases.clear();
+    has_values=tvt(true);
   }
 
   void make_entry() final override
   {
-    aliases.clear();
+    make_top();
   }
 
   typedef union_find<irep_idt> aliasest;
   aliasest aliases;
 
 protected:
+  tvt has_values;
+
   void assign_lhs_aliases(const exprt &, const std::set<irep_idt> &);
   void get_rhs_aliases(const exprt &, std::set<irep_idt> &);
   void get_rhs_aliases_address_of(const exprt &, std::set<irep_idt> &);

@@ -32,7 +32,8 @@ bool dep_graph_domaint::merge(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  bool change=false;
+  bool changed=has_values.is_false();
+  has_values=tvt::unknown();
 
   depst::iterator it=control_deps.begin();
   for(depst::const_iterator ito=src.control_deps.begin();
@@ -44,7 +45,7 @@ bool dep_graph_domaint::merge(
     if(it==control_deps.end() || *ito<*it)
     {
       control_deps.insert(it, *ito);
-      change=true;
+      changed=true;
     }
     else if(it!=control_deps.end())
       ++it;
@@ -60,13 +61,13 @@ bool dep_graph_domaint::merge(
     if(it==data_deps.end() || *ito<*it)
     {
       data_deps.insert(it, *ito);
-      change=true;
+      changed=true;
     }
     else if(it!=data_deps.end())
       ++it;
   }
 
-  return change;
+  return changed;
 }
 
 /*******************************************************************\
