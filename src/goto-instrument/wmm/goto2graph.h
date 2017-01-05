@@ -37,8 +37,8 @@ protected:
   goto_functionst &goto_functions;
 
   /* alternative representation of graph (SCC) */
-  std::map<unsigned,unsigned> map_vertex_gnode;
-  graph<abstract_eventt> egraph_alt;
+  std::map<event_idt,event_idt> map_vertex_gnode;
+  wmm_grapht egraph_alt;
 
   unsigned unique_id;
 
@@ -70,7 +70,7 @@ protected:
   void inline instrument_minimum_interference_inserter(
     const set_of_cyclest& set);
   void inline instrument_my_events_inserter(
-    const set_of_cyclest& set, const std::set<unsigned>& events);
+    const set_of_cyclest& set, const std::set<event_idt>& events);
 
   void inline print_outputs_local(
     const std::set<event_grapht::critical_cyclet>& set,
@@ -92,8 +92,8 @@ protected:
 
     /* pointer to the egraph(s) that we construct */
     event_grapht& egraph;
-    std::vector<std::set<unsigned> >& egraph_SCCs;
-    graph<abstract_eventt>& egraph_alt;
+    std::vector<std::set<event_idt> >& egraph_SCCs;
+    wmm_grapht& egraph_alt;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -158,8 +158,8 @@ protected:
     unsigned max_thread;
 
     /* relations between irep and Reads/Writes */
-    typedef std::multimap<irep_idt,unsigned> id2nodet;
-    typedef std::pair<irep_idt,unsigned> id2node_pairt;
+    typedef std::multimap<irep_idt,event_idt> id2nodet;
+    typedef std::pair<irep_idt,event_idt> id2node_pairt;
     id2nodet map_reads, map_writes;
 
     unsigned write_counter;
@@ -168,7 +168,7 @@ protected:
     unsigned fr_rf_counter;
 
     /* previous nodes (fwd analysis) */
-    typedef std::pair<unsigned,unsigned> nodet;
+    typedef std::pair<event_idt,event_idt> nodet;
     typedef std::map<goto_programt::instructiont::targett,std::set<nodet> >
       incoming_post;
 
@@ -198,8 +198,8 @@ protected:
     data_dpt data_dp;
 
     /* writes and reads to unknown addresses -- conservative */
-    std::set<unsigned> unknown_read_nodes;
-    std::set<unsigned> unknown_write_nodes;
+    std::set<event_idt> unknown_read_nodes;
+    std::set<event_idt> unknown_write_nodes;
 
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
@@ -278,7 +278,7 @@ public:
   event_grapht egraph;
 
   /* graph split into strongly connected components */
-  std::vector<std::set<unsigned> > egraph_SCCs;
+  std::vector<std::set<event_idt> > egraph_SCCs;
 
   /* critical cycles */
   std::set<event_grapht::critical_cyclet> set_of_cycles;
@@ -289,8 +289,8 @@ public:
 
   /* map from function to begin and end of the corresponding part of the
      graph */
-  typedef std::map<irep_idt,std::pair<std::set<unsigned>,
-    std::set<unsigned> > > map_function_nodest;
+  typedef std::map<irep_idt,std::pair<std::set<event_idt>,
+    std::set<event_idt> > > map_function_nodest;
   map_function_nodest map_function_graph;
 
   void print_map_function_graph() const {
@@ -300,13 +300,13 @@ public:
     {
        message.debug() << "FUNCTION " << it->first << ": " << messaget::eom;
        message.debug() << "Start nodes: ";
-       for(std::set<unsigned>::const_iterator in_it=it->second.first.begin();
+       for(std::set<event_idt>::const_iterator in_it=it->second.first.begin();
          in_it!=it->second.first.end();
          ++in_it)
          message.debug() << *in_it << " ";
        message.debug() << messaget::eom;
        message.debug() << "End nodes: ";
-       for(std::set<unsigned>::const_iterator in_it=it->second.second.begin();
+       for(std::set<event_idt>::const_iterator in_it=it->second.second.begin();
          in_it!=it->second.second.end();
          ++in_it)
          message.debug() << *in_it << " ";
@@ -366,11 +366,11 @@ public:
 
   /* strategies for instrumentation */
   void instrument_with_strategy(instrumentation_strategyt strategy);
-  void instrument_my_events(const std::set<unsigned>& events);
+  void instrument_my_events(const std::set<event_idt>& events);
 
   /* retrieves events to filter in the instrumentation choice
      with option --my-events */
-  static std::set<unsigned> extract_my_events();
+  static std::set<event_idt> extract_my_events();
 
   /* sets rendering options */
   void set_rendering_options(bool aligned, bool file, bool function)

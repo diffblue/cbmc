@@ -33,15 +33,15 @@ Function: event_grapht::print_rec_graph
 
 \*******************************************************************/
 
-void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id,
-  std::set<unsigned>& visited)
+void event_grapht::print_rec_graph(std::ofstream& file, event_idt node_id,
+  std::set<event_idt>& visited)
 {
   const abstract_eventt& node=operator[](node_id);
   file << node_id << "[label=\"" << node << ", " << node.source_location <<
     "\"];" << std::endl;
   visited.insert(node_id);
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=po_out(node_id).begin();
     it!=po_out(node_id).end(); ++it)
   {
@@ -51,7 +51,7 @@ void event_grapht::print_rec_graph(std::ofstream& file, unsigned node_id,
       print_rec_graph(file, it->first, visited);
   }
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=com_out(node_id).begin();
     it!=com_out(node_id).end(); ++it)
   {
@@ -75,8 +75,8 @@ Function: event_grapht::print_graph
 
 void event_grapht::print_graph() {
   assert(po_order.size()>0);
-  std::set<unsigned> visited;
-  unsigned root=po_order.front();
+  std::set<event_idt> visited;
+  event_idt root=po_order.front();
   std::ofstream file;
   file.open("graph.dot");
   file << "digraph G {" << std::endl;
@@ -98,8 +98,8 @@ Function: event_grapht::copy_segment
 
 \*******************************************************************/
 
-void event_grapht::explore_copy_segment(std::set<unsigned>& explored,
-  unsigned begin, unsigned end) const
+void event_grapht::explore_copy_segment(std::set<event_idt>& explored,
+  event_idt begin, event_idt end) const
 {
   //std::cout << "explores " << begin << " against " << end << std::endl;
   if(explored.find(begin)!=explored.end())
@@ -110,13 +110,13 @@ void event_grapht::explore_copy_segment(std::set<unsigned>& explored,
   if(begin==end)
     return;
 
-  for(graph<abstract_eventt>::edgest::const_iterator it=po_out(begin).begin();
+  for(wmm_grapht::edgest::const_iterator it=po_out(begin).begin();
     it!=po_out(begin).end();
     ++it)
     explore_copy_segment(explored, it->first, end);
 }
 
-unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
+event_idt event_grapht::copy_segment(event_idt begin, event_idt end)
 {
   const abstract_eventt& begin_event=operator[](begin);
   const abstract_eventt& end_event=operator[](end);
@@ -136,7 +136,7 @@ unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
 
   message.status() << "tries to duplicate between " << begin_event.source_location
     << " and " << end_event.source_location << messaget::eom;
-  std::set<unsigned> covered;
+  std::set<event_idt> covered;
 
   /* collects the nodes of the subgraph */
   explore_copy_segment(covered, begin, end);
@@ -144,17 +144,17 @@ unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
   if(covered.size()==0)
     return end;
 
-//  for(std::set<unsigned>::const_iterator it=covered.begin(); it!=covered.end(); ++it)
+//  for(std::set<event_idt>::const_iterator it=covered.begin(); it!=covered.end(); ++it)
 //    std::cout << "covered: " << *it << std::endl;
 
-  std::map<unsigned, unsigned> orig2copy;
+  std::map<event_idt, event_idt> orig2copy;
 
   /* duplicates nodes */
-  for(std::set<unsigned>::const_iterator it=covered.begin();
+  for(std::set<event_idt>::const_iterator it=covered.begin();
     it!=covered.end();
     ++it)
   {
-    const unsigned new_node=add_node();
+    const event_idt new_node=add_node();
     operator[](new_node)(operator[](*it));
     orig2copy[*it]=new_node;
   }
@@ -164,11 +164,11 @@ unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
   // (working on back-edges...)
 
   /* replicates the po_s forward-edges -- O(#E^2) */
-  for(std::set<unsigned>::const_iterator it_i=covered.begin();
+  for(std::set<event_idt>::const_iterator it_i=covered.begin();
     it_i!=covered.end();
     ++it_i)
   {
-    for(std::set<unsigned>::const_iterator it_j=covered.begin();
+    for(std::set<event_idt>::const_iterator it_j=covered.begin();
       it_j!=covered.end();
       ++it_j)
     {
@@ -186,11 +186,11 @@ unsigned event_grapht::copy_segment(unsigned begin, unsigned end)
 
   // TODO: to move to goto2graph, after po_s construction
   /* replicates the cmp-edges -- O(#E x #G) */
-  for(std::set<unsigned>::const_iterator it_i=covered.begin();
+  for(std::set<event_idt>::const_iterator it_i=covered.begin();
     it_i!=covered.end();
     ++it_i)
   {
-    for(unsigned it_j=0;
+    for(event_idt it_j=0;
       it_j<size();
       ++it_j)
     {
@@ -546,8 +546,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     if(first.unsafe_pair(second,model)
       && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
     {
-      std::list<unsigned>::const_iterator before_first;
-      std::list<unsigned>::const_iterator after_second;
+      std::list<event_idt>::const_iterator before_first;
+      std::list<event_idt>::const_iterator after_second;
 
       before_first = end();
       --before_first;
@@ -580,8 +580,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     if(first.unsafe_pair_lwfence(second,model)
       && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
     {
-      std::list<unsigned>::const_iterator before_first;
-      std::list<unsigned>::const_iterator after_second;
+      std::list<event_idt>::const_iterator before_first;
+      std::list<event_idt>::const_iterator after_second;
 
       before_first = end();
       --before_first;
@@ -1331,7 +1331,7 @@ Function: event_grapht::critical_cyclet::hide_internals
 
 void event_grapht::critical_cyclet::hide_internals(critical_cyclet& reduced)  const
 {
-  std::set<unsigned> reduced_evts;
+  std::set<event_idt> reduced_evts;
   const_iterator first_it, prev_it=end();
 
   /* finds an element first of its thread */

@@ -35,11 +35,11 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet& ns)
   std::ofstream res;
   res.open("results.txt");
 
-  for(std::list<unsigned>::const_iterator st_it=egraph.po_order.begin();
+  for(std::list<event_idt>::const_iterator st_it=egraph.po_order.begin();
     st_it!=egraph.po_order.end(); ++st_it)
   {
     /* pick X */
-    unsigned first=*st_it;
+    event_idt first=*st_it;
     egraph.message.debug() << "first: " << egraph[first].id << messaget::eom;
 
     if(visited_nodes.find(first)!=visited_nodes.end())
@@ -82,14 +82,14 @@ Function: event_grapht::graph_explorert::find_second_event
 \*******************************************************************/
 
 bool event_grapht::graph_pensieve_explorert::find_second_event(
-  unsigned current)
+  event_idt current)
 {
   if(visited_nodes.find(current)!=visited_nodes.end())
     return false;
 
   visited_nodes.insert(current);
 
-  for(graph<abstract_eventt>::edgest::const_iterator
+  for(wmm_grapht::edgest::const_iterator
     it=egraph.po_out(current).begin();
     it!=egraph.po_out(current).end(); ++it)
   {

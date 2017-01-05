@@ -61,24 +61,24 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
         {
           /* also add pos of non-delaying pos+ of cycles, as they could AC or
              BC */
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_in(e_i->first).begin();
             next_it!=egraph.po_in(e_i->first).end();
             ++next_it)
           {
-            std::list<unsigned> new_path;
+            std::list<event_idt> new_path;
             new_path.push_back(e_i->first);
             new_path.push_back(next_it->first);
             fence_inserter.const_graph_visitor.const_graph_explore_AC(egraph,
               next_it->first, new_path);
           }
 
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_out(e_i->second).begin();
             next_it!=egraph.po_out(e_i->second).end();
             ++next_it)
           {
-            std::list<unsigned> new_path;
+            std::list<event_idt> new_path;
             new_path.push_back(e_i->second);
             new_path.push_back(next_it->first);
             fence_inserter.const_graph_visitor.const_graph_explore_BC(egraph,
@@ -105,12 +105,12 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
       else
       {
         /* adds basic pos from this pos^+ */
-        for(graph<abstract_eventt>::edgest::const_iterator
+        for(wmm_grapht::edgest::const_iterator
           next_it=egraph.po_out(e_i.first).begin();
           next_it!=egraph.po_out(e_i.first).end();
           ++next_it)
         {
-          std::list<unsigned> new_path;
+          std::list<event_idt> new_path;
           new_path.push_back(e_i.first);
           new_path.push_back(next_it->first);
           fence_inserter.const_graph_visitor.const_graph_explore(egraph,
@@ -129,12 +129,12 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
         else
         {
           /* adds basic pos from this pos^+ */
-          for(graph<abstract_eventt>::edgest::const_iterator
+          for(wmm_grapht::edgest::const_iterator
             next_it=egraph.po_out(e_i.first).begin();
             next_it!=egraph.po_out(e_i.first).end();
             ++next_it)
           {
-            std::list<unsigned> new_path;
+            std::list<event_idt> new_path;
             new_path.push_back(e_i.first);
             new_path.push_back(next_it->first);
             fence_inserter.const_graph_visitor.const_graph_explore(egraph,
@@ -224,10 +224,10 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
         it!=m_threads.end(); ++it)
         if(k_threads.find(*it)!=k_threads.end())
         {
-          const unsigned a=*m_begin[*it];
-          const unsigned b=*m_end[*it];
-          const unsigned c=*k_begin[*it];
-          const unsigned d=*k_end[*it];
+          const event_idt a=*m_begin[*it];
+          const event_idt b=*m_end[*it];
+          const event_idt c=*k_begin[*it];
+          const event_idt d=*k_end[*it];
 
           if(egraph.are_po_ordered(b,c))
             continue;
@@ -406,8 +406,8 @@ void cycles_visitort::com_constraint(
 #if 0
   event_grapht& egraph=instrumenter.egraph;
 
-  std::list<unsigned>::const_iterator e_it=C_j.begin();
-  std::list<unsigned>::const_iterator next_it=e_it;
+  std::list<event_idt>::const_iterator e_it=C_j.begin();
+  std::list<event_idt>::const_iterator next_it=e_it;
   assert(C_j.size()>0);
   ++next_it;
   for(;  next_it!=C_j.end() && e_it!=C_j.end(); ++e_it, ++next_it)
