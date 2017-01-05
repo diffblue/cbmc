@@ -5080,8 +5080,7 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
       break
     if not is_const:
       error(filename, linenum, 'runtime/arrays', 1,
-            'Do not use variable-length arrays.  Use an appropriately named '
-            "('k' followed by CamelCase) compile-time constant for the size.")
+            'Do not use variable-length arrays.')
 
   # Check for use of unnamed namespaces in header files.  Registration
   # macros are typically OK, so we allow use of "namespace {" on lines
