@@ -3562,10 +3562,16 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   if Search(r'(struct|class)\s[\w_]*\s+:', line):
     error(filename, linenum, 'readability/identifiers', 4, 'There shouldn\'t be a space between class identifier and :')
 
-#check type definitions end with t
-  if Search(r'(struct|class)\s[\w_]*[^t^;^:^\s](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
-    error(filename, linenum, 'readability/identifiers', 4,
-          'Class or struct identifier should end with t')
+  #check type definitions end with t
+  # Look for class declarations and check the final character is a t
+  # Exclude classes in side template argument lists (why?)
+  class_name_match = Search(r'\b(struct|class)\s(?P<class_name>[\w_]+)', line)
+  if class_name_match:
+    class_name = class_name_match.group('class_name')
+    if not class_name.endswith('t'):
+      if not Search(r'\btemplate <', line) and not Search(r'\btemplate<', line):
+        error(filename, linenum, 'readability/identifiers', 4,
+               'Class or struct identifier should end with t')
 
   if Search(r'(struct|class)\s[\w_]*_t(;$|\s|:|$)', line):
     error(filename, linenum, 'readability/identifiers', 4,
