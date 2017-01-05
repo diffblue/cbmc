@@ -3633,17 +3633,6 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
 #        error(filename, linenum, 'whitespace/operators', 3,
 #              'Missing spaces around >')
 
-  # We allow no-spaces around << when used like this: 10<<20, but
-  # not otherwise (particularly, not when used as streams)
-  #
-  # We also allow operators following an opening parenthesis, since
-  # those tend to be macros that deal with operators.
-  match = Search(r'(operator|[^\s(<])(?:L|UL|LL|ULL|l|ul|ll|ull)?<<([^\s,=<])', line)
-  if (match and not (match.group(1).isdigit() and match.group(2).isdigit()) and
-      not (match.group(1) == 'operator' and match.group(2) == ';')):
-    error(filename, linenum, 'whitespace/operators', 3,
-          'Missing spaces around <<')
-
   # We allow no-spaces around >> for almost anything.  This is because
   # C++11 allows ">>" to close nested templates, which accounts for
   # most cases when ">>" is not followed by a space.

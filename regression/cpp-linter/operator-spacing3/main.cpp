@@ -27,4 +27,6 @@ static void fun()
   status()<<"Adding CPROVER library ("<<eom;
 
   int x = 1 << 4;
+
+  result=((result<<1)^it->hash())-result;
 }
