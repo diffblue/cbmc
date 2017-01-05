@@ -3525,12 +3525,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Otherwise not.  Note we only check for non-spaces on *both* sides;
   # sometimes people put non-spaces on one side when aligning ='s among
   # many lines (not that this is behavior that I approve of...)
-  match1 = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
-  match2 = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
-  operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
-  operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
+  left_hand_space_match = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
+  right_hand_space_match = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
+  operator_pos, op_end = left_hand_space_match.span(1) if left_hand_space_match else (-1, -1)
+  operator_pos2, op_end2 = right_hand_space_match.span(1) if right_hand_space_match else (-1, -1)
 
-  if (match1 and
+  if (left_hand_space_match and
     not Search(r'<<', line) and # We ignore the left shift operator since might be a stream and then formatting rules go out of the window
     not Search(r'char \*', line) and # I don't know why this exception exists?
     not Search(r'\#include', line) and # I suppose file names could contains operators??
@@ -3542,12 +3542,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
 #      and not Search(r'operator=', line)):
     error(filename, linenum, 'whitespace/operators', 4,
 #          'Missing spaces around =')
-          'Remove spaces around %s' % match1.group(1))
-  elif (match2 and
+          'Remove spaces around %s' % left_hand_space_match.group(1))
+  elif (right_hand_space_match and
     not Search(r'<<', line) and
     not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)):
     error(filename, linenum, 'whitespace/operators', 4,
-          'Remove spaces around %s' % match2.group(0))
+          'Remove spaces around %s' % right_hand_space_match.group(0))
 
 # these would cause too many false alarms if we checked for one-sided spaces only
   match = Search(r'\s(-|\*)(\s|$)', line)
