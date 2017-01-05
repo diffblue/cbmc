@@ -220,7 +220,7 @@ void weak_memory(
   // collects instructions to instrument, depending on the strategy selected
   if(event_strategy == my_events)
   {
-    const std::set<unsigned> events_set = instrumentert::extract_my_events();
+    const std::set<event_idt> events_set = instrumentert::extract_my_events();
     instrumenter.instrument_my_events(events_set);
   }
   else

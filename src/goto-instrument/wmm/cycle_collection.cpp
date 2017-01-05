@@ -45,7 +45,7 @@ void event_grapht::graph_explorert::filter_thin_air(
   }
 
 #ifdef DEBUG
-  for(std::set<unsigned>::const_iterator it=thin_air_events.begin();
+  for(std::set<event_idt>::const_iterator it=thin_air_events.begin();
     it!=thin_air_events.end();
     ++it)
     egraph.message.debug()<<egraph[*it]<<";";
@@ -71,10 +71,10 @@ void event_grapht::graph_explorert::collect_cycles(
   memory_modelt model)
 {
   /* all the events initially unmarked */
-  for(unsigned i = 0; i<egraph.size(); i++)
+  for(std::size_t i = 0; i<egraph.size(); i++)
     mark[i] = false;
 
-  std::list<unsigned>* order=0;
+  std::list<event_idt>* order=0;
   /* on Power, rfe pairs are also potentially unsafe */
   switch(model)
   {
@@ -100,17 +100,19 @@ void event_grapht::graph_explorert::collect_cycles(
   if(order->empty())
     return;
 
-  for(std::list<unsigned>::const_iterator st_it=order->begin();
-    st_it!=order->end(); ++st_it)
+  for(std::list<event_idt>::const_iterator
+      st_it=order->begin();
+      st_it!=order->end();
+      ++st_it)
   {
-    unsigned source=*st_it;
+    event_idt source=*st_it;
     egraph.message.debug() << "explore " << egraph[source].id << messaget::eom;
     backtrack(set_of_cycles, source, source,
       false, max_po_trans, false, false, false, "", model);
 
     while(!marked_stack.empty())
     {
-      unsigned up=marked_stack.top();
+      event_idt up=marked_stack.top();
       mark[up]=false;
       marked_stack.pop();
     }
@@ -136,17 +138,17 @@ Function: event_grapht::graph_explorert::extract_cycle
 \*******************************************************************/
 
 event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
-  unsigned vertex,
-  unsigned source,
+  event_idt vertex,
+  event_idt source,
   unsigned number)
 {
   critical_cyclet new_cycle(egraph, number);
   bool incycle=false;
-  std::stack<unsigned> stack(point_stack);
+  std::stack<event_idt> stack(point_stack);
 
   while(!stack.empty())
   {
-    unsigned current_vertex=stack.top();
+    event_idt current_vertex=stack.top();
     stack.pop();
 
     egraph.message.debug() << "extract: " << egraph[current_vertex].get_operation()
@@ -186,10 +188,10 @@ Function: event_grapht::graph_explorert::backtrack
 
 bool event_grapht::graph_explorert::backtrack(
   std::set<critical_cyclet> &set_of_cycles,
-  unsigned source,
-  unsigned vertex,
+  event_idt source,
+  event_idt vertex,
   bool unsafe_met, /* unsafe pair for the model met in the visited path */
-  unsigned po_trans, /* po-transition skips still allowed */
+  event_idt po_trans, /* po-transition skips still allowed */
   bool same_var_pair, /* in a thread, tells if we already met one rfi wsi fri */
   bool lwfence_met, /* if we try to skip a lwsync (only valid for lwsyncWR) */
   bool has_to_be_unsafe,
@@ -197,11 +199,11 @@ bool event_grapht::graph_explorert::backtrack(
   memory_modelt model)
 {
 #ifdef DEBUG
-  for(unsigned i=0; i<80; egraph.message.debug() << "-", ++i);
+  for(std::size_t i=0; i<80; egraph.message.debug() << "-", ++i);
   egraph.message.debug() << messaget::eom;
   egraph.message.debug() << "marked size:" << marked_stack.size()
     << messaget::eom;
-  std::stack<unsigned> tmp;
+  std::stack<event_idt> tmp;
   while(!point_stack.empty())
   {
     egraph.message.debug() << point_stack.top() << " | ";
@@ -286,9 +288,9 @@ bool event_grapht::graph_explorert::backtrack(
          re-order also the two writes, which is not permitted on TSO. */
       if(has_to_be_unsafe && point_stack.size() >= 2)
       {
-        const unsigned previous = point_stack.top();
+        const event_idt previous = point_stack.top();
         point_stack.pop();
-        const unsigned preprevious = point_stack.top();
+        const event_idt preprevious = point_stack.top();
         point_stack.push(previous);
         if(!egraph[preprevious].unsafe_pair(this_vertex,model)
           && !(this_vertex.operation==abstract_eventt::Fence
@@ -397,7 +399,7 @@ bool event_grapht::graph_explorert::backtrack(
         w_it=egraph.po_out(vertex).begin();
         w_it!=egraph.po_out(vertex).end(); w_it++)
       {
-        const unsigned w = w_it->first;
+        const event_idt w = w_it->first;
         if(w == source && point_stack.size()>=4
           && (unsafe_met_updated
             || this_vertex.unsafe_pair(egraph[source],model)) )
@@ -440,7 +442,7 @@ bool event_grapht::graph_explorert::backtrack(
       w_it=egraph.com_out(vertex).begin();
       w_it!=egraph.com_out(vertex).end(); w_it++)
     {
-      const unsigned w = w_it->first;
+      const event_idt w = w_it->first;
       if(w < source)
         egraph.remove_com_edge(vertex,w);
       else if(w == source && point_stack.size()>=4
@@ -481,7 +483,7 @@ bool event_grapht::graph_explorert::backtrack(
     {
       while(!marked_stack.empty() && marked_stack.top()!=vertex)
       {
-        unsigned up = marked_stack.top();
+        event_idt up = marked_stack.top();
         marked_stack.pop();
         mark[up] = false;
       }
@@ -526,7 +528,7 @@ bool event_grapht::graph_explorert::backtrack(
   {
     skip_tracked.insert(vertex);
 
-    std::stack<unsigned> tmp;
+    std::stack<event_idt> tmp;
 
     while(marked_stack.size()>0 && marked_stack.top()!=vertex)
     {
@@ -572,7 +574,7 @@ bool event_grapht::graph_explorert::backtrack(
       egraph.po_out(vertex).begin();
       w_it!=egraph.po_out(vertex).end(); w_it++)
     {
-      const unsigned w = w_it->first;
+      const event_idt w = w_it->first;
       f |= backtrack(set_of_cycles, source, w,
         unsafe_met/*_updated*/, (po_trans==0?0:po_trans-1),
         same_var_pair/*_updated*/, is_lwfence, has_to_be_unsafe, avoid_at_the_end,
@@ -583,7 +585,7 @@ bool event_grapht::graph_explorert::backtrack(
     {
       while(!marked_stack.empty() && marked_stack.top()!=vertex)
       {
-        unsigned up = marked_stack.top();
+        event_idt up = marked_stack.top();
         marked_stack.pop();
         mark[up] = false;
       }

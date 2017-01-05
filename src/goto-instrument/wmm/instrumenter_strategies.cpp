@@ -62,7 +62,7 @@ void instrumentert::instrument_with_strategy(instrumentation_strategyt strategy)
   }
   else if(num_sccs!=0)
   {
-    for(unsigned i=0; i<num_sccs; ++i)
+    for(std::size_t i=0; i<num_sccs; ++i)
     {
       switch(strategy)
       {
@@ -319,11 +319,11 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 
   /* sets the variables and coefficients */
   glp_add_cols(lp, edges.size());
-  unsigned i=0;
+  std::size_t i=0;
   for(std::set<event_grapht::critical_cyclet::delayt>::iterator
-    e_i=edges.begin();
-    e_i!=edges.end();
-    ++e_i)
+      e_i=edges.begin();
+      e_i!=edges.end();
+      ++e_i)
   {
     ++i;
     std::string name="e_"+std::to_string(i);
@@ -347,7 +347,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     glp_set_row_bnds(lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
   }
 
-  const unsigned mat_size=set_of_cycles.size()*edges.size();
+  const std::size_t mat_size=set_of_cycles.size()*edges.size();
   message.debug() << "size of the system: " << mat_size
     << messaget::eom;
   int* imat=(int*)malloc(sizeof(int)*(mat_size+1));
@@ -356,8 +356,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 
   /* fills the constraints coeff */
   /* tables read from 1 in glpk -- first row/column ignored */
-  unsigned col=1;
-  unsigned row=1;
+  std::size_t col=1;
+  std::size_t row=1;
   i=1;
   for(std::set<event_grapht::critical_cyclet::delayt>::iterator
     e_i=edges.begin();
@@ -442,7 +442,7 @@ Function: instrumentert::instrument_my_events_inserter
 
 void inline instrumentert::instrument_my_events_inserter(
   const std::set<event_grapht::critical_cyclet>& set,
-  const std::set<unsigned>& my_events)
+  const std::set<event_idt>& my_events)
 {
   for(std::set<event_grapht::critical_cyclet>::const_iterator
     it=set.begin();
@@ -483,7 +483,8 @@ Function: instrumentert::instrument_my_events
 
 \*******************************************************************/
 
-void instrumentert::instrument_my_events(const std::set<unsigned>& my_events)
+void instrumentert::instrument_my_events(
+  const std::set<event_idt>& my_events)
 {
   var_to_instr.clear();
   id2loc.clear();
@@ -493,7 +494,7 @@ void instrumentert::instrument_my_events(const std::set<unsigned>& my_events)
     instrument_my_events_inserter(set_of_cycles, my_events);
   else if(num_sccs!=0)
   {
-    for(unsigned i=0; i<num_sccs; ++i)
+    for(std::size_t i=0; i<num_sccs; ++i)
       instrument_my_events_inserter(set_of_cycles_per_SCC[i], my_events);
   }
   else
@@ -512,18 +513,18 @@ Function: extract_my_events
 
 \*******************************************************************/
 
-std::set<unsigned> instrumentert::extract_my_events()
+std::set<event_idt> instrumentert::extract_my_events()
 {
   std::ifstream file;
   file.open("inst.evt");
-  std::set<unsigned> this_set;
+  std::set<event_idt> this_set;
 
-  unsigned size;
+  std::size_t size;
   file >> size;
 
-  unsigned tmp;
+  std::size_t tmp;
 
-  for(unsigned i=0; i<size; i++)
+  for(std::size_t i=0; i<size; i++)
   {
     file>>tmp;
     this_set.insert(tmp);
