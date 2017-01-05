@@ -1547,6 +1547,42 @@ def IsTemplateArgumentList_DB(clean_lines, linenum, pos):
 
     return True
 
+def ForceOpenExpression(clean_lines, linenum, pos, bracket):
+  """Find an opening bracket matching the specified closing bracket
+
+  Search starting at the position for a matching closing bracket of the
+  same type as bracket.
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    pos: A position on the line.
+    bracket: The style of bracket to match
+
+  Returns:
+    A tuple (line, linenum, pos) pointer *to* the closing brace, or
+    (line, len(lines), -1) if we never find a close.  Note we ignore
+    strings and comments when matching; and the line we return is the
+    'cleansed' line at linenum.
+  """
+  line = clean_lines.elided[linenum]
+
+  # Check first line
+  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [bracket])
+  if end_pos > -1:
+    return (line, linenum, end_pos)
+
+  # Continue scanning forward
+  while stack and linenum > 0:
+    linenum -= 1
+    line = clean_lines.elided[linenum]
+    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
+    if end_pos > -1:
+      return (line, linenum, end_pos)
+
+  # Did not find end of expression before end of file, give up
+  return (line, clean_lines.NumLines(), -1)
+
 def OpenExpression(clean_lines, linenum, pos):
   """If input points to ) or } or ] or >, finds the position that opens it.
 
@@ -1554,6 +1590,8 @@ def OpenExpression(clean_lines, linenum, pos):
   linenum/pos that correspond to the closing of the expression.
 
   Essentially a mirror of what CloseExpression does
+
+  Calls ForceOpenExpression with the bracket type pointed at
 
   TODO(tkiley): could probably be merged with CloseExpression
 
@@ -1572,22 +1610,9 @@ def OpenExpression(clean_lines, linenum, pos):
   line = clean_lines.elided[linenum]
   if (line[pos] not in ')}]>'):
     return (line, clean_lines.NumLines(), -1)
+  else:
+    return ForceOpenExpression(clean_lines, linenum, pos-1, line[pos])
 
-  # Check first line
-  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [])
-  if end_pos > -1:
-    return (line, linenum, end_pos)
-
-  # Continue scanning forward
-  while stack and linenum > 0:
-    linenum -= 1
-    line = clean_lines.elided[linenum]
-    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
-    if end_pos > -1:
-      return (line, linenum, end_pos)
-
-  # Did not find end of expression before end of file, give up
-  return (line, clean_lines.NumLines(), -1)
 
 def FindEndOfExpressionInLine(line, startpos, stack):
   """Find the position just after the end of current parenthesized expression.
@@ -3656,6 +3681,48 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'whitespace/operators', 4,
           'Extra space for operator %s' % match.group(1))
 
+def CheckPointerReferenceSpacing(filename, clean_lines, linenum, error):
+  """Checks the */& are attached to variable names rather than types
+
+  A pointer or reference type should have the */& attached to the variable
+  name rather than the type. I.e. a pointer to an int should be:
+
+      int *var_name;
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+
+  # Find types by looking for word_names that are at the start of the line
+  # If there are followed by a * or & (after an optional ' const')
+  # then they appear to be a reference/pointer type with it attached to
+  # the type rather than the variable
+  wrong_type_match = Search(r'^\s*([\w_])+( const)?(?P<type>[&\*])\s*\w', line)
+
+  if wrong_type_match:
+    # This still could be a false positive, we must
+    # check that we are not inside brackets as then could be just be
+    # operators (multiply and logical AND)
+    pos = wrong_type_match.start(1)
+    _, _, opening_pos = ForceOpenExpression(clean_lines, linenum, pos, ')')
+
+    # If we don't find a matching close brace then we aren't in brackets
+    # so can assume this is a type with the * or & attached to it
+    if opening_pos == -1:
+      op_type = wrong_type_match.group('type')
+      op_word = ""
+      if op_type == '*':
+        op_word = 'Pointer'
+      else:
+        op_word = 'Reference'
+      error(filename, linenum, 'whitespace/operators', 4,
+        op_word + ' type name must have ' + op_type + ' attached to the type name')
+
+
 
 def CheckParenthesisSpacing(filename, clean_lines, linenum, error):
   """Checks for horizontal spacing around parentheses.
@@ -4671,6 +4738,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   CheckAccess(filename, clean_lines, linenum, nesting_state, error)
   CheckSpacing(filename, clean_lines, linenum, nesting_state, error)
   CheckOperatorSpacing(filename, clean_lines, linenum, error)
+  CheckPointerReferenceSpacing(filename, clean_lines, linenum, error)
   CheckParenthesisSpacing(filename, clean_lines, linenum, error)
   CheckCommaSpacing(filename, clean_lines, linenum, error)
   CheckBracesSpacing(filename, clean_lines, linenum, nesting_state, error)

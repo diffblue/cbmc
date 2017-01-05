@@ -17,6 +17,9 @@ Whitespaces:
   Exceptions: Spaces around &&, || and <<
 - Space after comma (parameter lists, argument lists, ...)
 - Space after colon inside 'for'
+- For pointers and references, the */& should be attached to the variable name
+  as oppposed to the tyep. E.g. for a pointer to an int the syntax would be:
+    `int *x;`
 - No whitespaces at end of line
 - No whitespaces in blank lines
 - Put argument lists on next line (and ident 2 spaces) if too long
