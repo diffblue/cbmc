@@ -99,6 +99,9 @@ inline void __delete(void *ptr)
     // non-deterministically record as deallocated
     __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }
 
@@ -128,5 +131,8 @@ inline void __delete_array(void *ptr)
     // non-deterministically record as deallocated
     __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }
