@@ -3530,9 +3530,6 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
   operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
 
-  if match2 and match2.group(1) == '>':
-    res = IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)
-
   if (match1 and
     not Search(r'<<', line) and # We ignore the left shift operator since might be a stream and then formatting rules go out of the window
     not Search(r'char \*', line) and # I don't know why this exception exists?
