@@ -162,6 +162,8 @@ static bool may_be_def_use_pair(
 
   // Adding a test change
 
+  //adding an error
+
   if((w_end!=-1 && w_end <= r_start) || // we < rs
      (r_end!=-1 && w_start >= r_end)) // re < we
     return false;
