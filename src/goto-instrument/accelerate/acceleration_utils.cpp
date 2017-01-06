@@ -62,11 +62,6 @@ void acceleration_utilst::find_modified(
   const goto_programt::instructionst &instructions,
   expr_sett &modified)
 {
-  for(goto_programt::instructionst::const_iterator
-      it=instructions.begin();
-      it!=instructions.end();
-      ++it)
-    find_modified(it, modified);
 }
 
 void acceleration_utilst::find_modified(
