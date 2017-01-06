@@ -176,7 +176,7 @@ static bool may_be_def_use_pair(
 
 /*******************************************************************\
 
-Function: dep_graph_domaint::data_depdendencies
+Function: dep_graph_domaint::data_dependencises
 
   Inputs:
 
