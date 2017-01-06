@@ -192,17 +192,20 @@ void goto_symext::symex_allocate(
 
   address_of_exprt rhs;
 
+  symbol_exprt v=value_symbol.symbol_expr();
+  v.add("#dynamic_guard", state.guard);
+
   if(object_type.id()==ID_array)
   {
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
-    index_expr.array()=value_symbol.symbol_expr();
+    index_expr.array()=v;
     index_expr.index()=from_integer(0, index_type());
     rhs.op0()=index_expr;
   }
   else
   {
-    rhs.op0()=value_symbol.symbol_expr();
+    rhs.op0()=v;
     rhs.type()=pointer_typet(value_symbol.type);
   }
 
