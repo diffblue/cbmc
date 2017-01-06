@@ -242,39 +242,36 @@ Function: dott::do_dot_function_calls
 void dott::do_dot_function_calls(
   std::ostream &out)
 {
-  for(std::list<exprt>::const_iterator
-      it=function_calls.begin();
-      it!=function_calls.end();
-      it++)
+  for(const auto &expr : function_calls)
   {
     std::list<exprt>::const_iterator cit=clusters.begin();
     for(;cit!=clusters.end();cit++)
-      if(cit->get("name")==it->op1().get(ID_identifier))
+      if(cit->get("name")==expr.op1().get(ID_identifier))
         break;
 
     if(cit!=clusters.end())
     {
-      out << it->op0().id() <<
+      out << expr.op0().id() <<
         " -> " "Node_" << cit->get("nr") << "_0" <<
-        " [lhead=\"cluster_" << it->op1().get(ID_identifier) << "\"," <<
+        " [lhead=\"cluster_" << expr.op1().get(ID_identifier) << "\"," <<
         "color=blue];" << std::endl;
     }
     else
     {
-      out << "subgraph \"cluster_" << it->op1().get(ID_identifier) <<
+      out << "subgraph \"cluster_" << expr.op1().get(ID_identifier) <<
         "\" {" << std::endl;
       out << "rank=sink;"<<std::endl;
-      out << "label=\"" << it->op1().get(ID_identifier) << "\";" << std::endl;
+      out << "label=\"" << expr.op1().get(ID_identifier) << "\";" << std::endl;
       out << "Node_" << subgraphscount << "_0 " <<
         "[shape=Mrecord,fontsize=22,label=\"?\"];"
           << std::endl;
       out << "}" << std::endl;
       clusters.push_back(exprt("cluster"));
-      clusters.back().set("name", it->op1().get(ID_identifier));
+      clusters.back().set("name", expr.op1().get(ID_identifier));
       clusters.back().set("nr", subgraphscount);
-      out << it->op0().id() <<
+      out << expr.op0().id() <<
         " -> " "Node_" << subgraphscount << "_0" <<
-        " [lhead=\"cluster_" << it->op1().get("identifier") << "\"," <<
+        " [lhead=\"cluster_" << expr.op1().get("identifier") << "\"," <<
         "color=blue];" << std::endl;
       subgraphscount++;
     }
@@ -300,14 +297,9 @@ void dott::output(std::ostream &out)
 
   std::list<exprt> clusters;
 
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
-  {
+  forall_goto_functions(it, goto_functions)
     if(it->second.body_available())
       write_dot_subgraph(out, id2string(it->first), it->second.body);
-  }
 
   do_dot_function_calls(out);
 
@@ -329,7 +321,7 @@ Function: dott::escape
 
 std::string &dott::escape(std::string &str)
 {
-  for(unsigned i=0; i<str.size(); i++)
+  for(std::string::size_type i=0; i<str.size(); i++)
   {
     if(str[i]=='\n')
     {
@@ -373,9 +365,8 @@ void dott::find_next(
 {
   if(it->is_goto() && !it->guard.is_false())
   {
-    goto_programt::targetst::const_iterator gtit = it->targets.begin();
-    for (; gtit!=it->targets.end(); gtit++)
-      tres.insert((*gtit));
+    for(const auto &target : it->targets)
+      tres.insert(target);
   }
 
   if(it->is_goto() && it->guard.is_true())

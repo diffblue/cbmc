@@ -112,17 +112,17 @@ protected:
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
-      goto_programt::instructionst::iterator i_it,
+      goto_programt::const_targett i_it,
       loop_strategyt replicate_body,
       value_setst& value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
       #endif
     ); // deprecated
-    void inline visit_cfg_backedge(goto_programt::targett targ,
-      goto_programt::targett i_it);
-    void inline visit_cfg_duplicate(goto_programt::targett targ,
-      goto_programt::targett i_it);
+    void inline visit_cfg_backedge(goto_programt::const_targett targ,
+      goto_programt::const_targett i_it);
+    void inline visit_cfg_duplicate(goto_programt::const_targett targ,
+      goto_programt::const_targett i_it);
     void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
       goto_programt::instructionst::iterator& i_it, bool no_dependencies
       #ifdef LOCAL_MAY
@@ -169,11 +169,11 @@ protected:
 
     /* previous nodes (fwd analysis) */
     typedef std::pair<event_idt,event_idt> nodet;
-    typedef std::map<goto_programt::instructiont::targett,std::set<nodet> >
+    typedef std::map<goto_programt::const_targett,std::set<nodet> >
       incoming_post;
 
     incoming_post in_pos;
-    std::set<goto_programt::instructiont::targett> updated;
+    std::set<goto_programt::const_targett> updated;
 
     /* "next nodes" (bwd steps in fwd/bck analysis) */
     incoming_post out_pos;

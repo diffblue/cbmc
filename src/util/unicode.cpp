@@ -198,8 +198,8 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
 
   result.reserve(s.size()); // at least that long
 
-  for(const auto it : s)
-    utf32_to_utf8(it, result);
+  for(const auto c : s)
+    utf32_to_utf8(c, result);
 
   return result;
 }
@@ -222,8 +222,8 @@ std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s)
 
   result.reserve(s.size()); // at least that long
 
-  for(const auto it : s)
-    utf32_to_utf8(it, result);
+  for(const auto c : s)
+    utf32_to_utf8(c, result);
 
   return result;
 }

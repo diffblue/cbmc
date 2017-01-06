@@ -132,11 +132,8 @@ public:
 
   void copy_from(const goto_functions_templatet &other)
   {
-    for(typename function_mapt::const_iterator
-        f_it=other.function_map.begin();
-        f_it!=other.function_map.end();
-        f_it++)
-      function_map[f_it->first].copy_from(f_it->second);
+    for(const auto &fun : other.function_map)
+      function_map[fun.first].copy_from(fun.second);
   }
 
 };
@@ -158,18 +155,15 @@ void goto_functions_templatet<bodyT>::output(
   const namespacet &ns,
   std::ostream& out) const
 {
-  for(typename function_mapt::const_iterator
-      it=function_map.begin();
-      it!=function_map.end();
-      it++)
+  for(const auto &fun : function_map)
   {
-    if(it->second.body_available())
+    if(fun.second.body_available())
     {
       out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
 
-      const symbolt &symbol=ns.lookup(it->first);
+      const symbolt &symbol=ns.lookup(fun.first);
       out << symbol.display_name() << " /* " << symbol.name << " */\n";
-      it->second.body.output(ns, symbol.name, out);
+      fun.second.body.output(ns, symbol.name, out);
 
       out << std::flush;
     }

@@ -60,12 +60,9 @@ void local_cfgt::build(const goto_programt &goto_program)
       if(!instruction.guard.is_true())
         node.successors.push_back(loc_nr+1);
 
-      for(goto_programt::targetst::const_iterator
-          t_it=instruction.targets.begin();
-          t_it!=instruction.targets.end();
-          t_it++)
+      for(const auto &target : instruction.targets)
       {
-        node_nrt l=loc_map.find(*t_it)->second;
+        node_nrt l=loc_map.find(target)->second;
         node.successors.push_back(l);
       }
       break;
@@ -73,12 +70,9 @@ void local_cfgt::build(const goto_programt &goto_program)
     case START_THREAD:
       node.successors.push_back(loc_nr+1);
 
-      for(goto_programt::targetst::const_iterator
-          t_it=instruction.targets.begin();
-          t_it!=instruction.targets.end();
-          t_it++)
+      for(const auto &target : instruction.targets)
       {
-        node_nrt l=loc_map.find(*t_it)->second;
+        node_nrt l=loc_map.find(target)->second;
         node.successors.push_back(l);
       }
       break;

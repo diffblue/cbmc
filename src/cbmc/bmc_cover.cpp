@@ -98,8 +98,8 @@ public:
     {
       std::vector<exprt> tmp;
 
-      for(const auto &it : instances)
-        tmp.push_back(literal_exprt(it.condition));
+      for(const auto &goal_inst : instances)
+        tmp.push_back(literal_exprt(goal_inst.condition));
 
       return disjunction(tmp);
     }
@@ -125,7 +125,7 @@ public:
   {
     bool first=true;
     std::string test;
-    for(const auto & step : goto_trace.steps)
+    for(const auto &step : goto_trace.steps)
     {
       if(step.is_input())
       {
@@ -166,23 +166,23 @@ void bmc_covert::satisfying_assignment()
   tests.push_back(testt());
   testt &test = tests.back();
 
-  for(auto &g_it : goal_map)
+  for(auto &goal_pair : goal_map)
   {
-    goalt &g=g_it.second;
+    goalt &g=goal_pair.second;
 
     // covered already?
     if(g.satisfied) continue;
 
     // check whether satisfied
-    for(const auto &c_it : g.instances)
+    for(const auto &goal_inst : g.instances)
     {
-      literalt cond=c_it.condition;
+      literalt cond=goal_inst.condition;
 
       if(solver.l_get(cond).is_true())
       {
         status() << "Covered " << g.description << messaget::eom;
         g.satisfied=true;
-        test.covered_goals.push_back(g_it.first);
+        test.covered_goals.push_back(goal_pair.first);
         break;
       }
     }
@@ -250,8 +250,8 @@ bool bmc_covert::operator()()
     }
   }
 
-  for(auto & it : bmc.equation.SSA_steps)
-    it.cond_literal=literalt(0, 0);
+  for(auto &step : bmc.equation.SSA_steps)
+    step.cond_literal=literalt(0, 0);
 
   // Do conversion to next solver layer
 
@@ -283,9 +283,9 @@ bool bmc_covert::operator()()
 
   cover_goals.register_observer(*this);
 
-  for(const auto &it : goal_map)
+  for(const auto &g : goal_map)
   {
-    literalt l=solver.convert(it.second.as_expr());
+    literalt l=solver.convert(g.second.as_expr());
     cover_goals.add(l);
   }
 
@@ -306,8 +306,8 @@ bool bmc_covert::operator()()
   // report
   unsigned goals_covered=0;
 
-  for(const auto & it : goal_map)
-    if(it.second.satisfied) goals_covered++;
+  for(const auto &g : goal_map)
+    if(g.second.satisfied) goals_covered++;
 
   switch(bmc.ui)
   {
@@ -315,11 +315,11 @@ bool bmc_covert::operator()()
     {
       status() << "\n** coverage results:" << eom;
 
-      for(const auto & it : goal_map)
+      for(const auto &g : goal_map)
       {
-        const goalt &goal=it.second;
+        const goalt &goal=g.second;
 
-        status() << "[" << it.first << "]";
+        status() << "[" << g.first << "]";
 
         if(goal.source_location.is_not_nil())
           status() << ' ' << goal.source_location;
@@ -337,12 +337,12 @@ bool bmc_covert::operator()()
 
     case ui_message_handlert::XML_UI:
     {
-      for(const auto & it : goal_map)
+      for(const auto &goal_pair : goal_map)
       {
-        const goalt &goal=it.second;
+        const goalt &goal=goal_pair.second;
 
         xmlt xml_result("goal");
-        xml_result.set_attribute("id", id2string(it.first));
+        xml_result.set_attribute("id", id2string(goal_pair.first));
         xml_result.set_attribute("description", goal.description);
         xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
 
@@ -352,7 +352,7 @@ bool bmc_covert::operator()()
         std::cout << xml_result << "\n";
       }
 
-      for(const auto & test : tests)
+      for(const auto &test : tests)
       {
         xmlt xml_result("test");
         if(bmc.options.get_bool_option("trace"))
@@ -363,7 +363,7 @@ bool bmc_covert::operator()()
         {
           xmlt &xml_test=xml_result.new_element("inputs");
 
-          for(const auto & step : test.goto_trace.steps)
+          for(const auto &step : test.goto_trace.steps)
           {
             if(step.is_input())
             {
@@ -376,7 +376,7 @@ bool bmc_covert::operator()()
           }
         }
 
-        for(const auto & goal_id : test.covered_goals)
+        for(const auto &goal_id : test.covered_goals)
         {
           xmlt &xml_goal=xml_result.new_element("goal");
           xml_goal.set_attribute("id", id2string(goal_id));
@@ -391,13 +391,13 @@ bool bmc_covert::operator()()
     {
       json_objectt json_result;
       json_arrayt &goals_array=json_result["goals"].make_array();
-      for(const auto & it : goal_map)
+      for(const auto &goal_pair : goal_map)
       {
-        const goalt &goal=it.second;
+        const goalt &goal=goal_pair.second;
 
         json_objectt &result=goals_array.push_back().make_object();
         result["status"]=json_stringt(goal.satisfied?"satisfied":"failed");
-        result["goal"]=json_stringt(id2string(it.first));
+        result["goal"]=json_stringt(id2string(goal_pair.first));
         result["description"]=json_stringt(goal.description);
 
         if(goal.source_location.is_not_nil())
@@ -407,7 +407,7 @@ bool bmc_covert::operator()()
       json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
 
       json_arrayt &tests_array=json_result["tests"].make_array();
-      for(const auto & test : tests)
+      for(const auto &test : tests)
       {
         json_objectt &result=tests_array.push_back().make_object();
         if(bmc.options.get_bool_option("trace"))
@@ -419,7 +419,7 @@ bool bmc_covert::operator()()
         {
           json_arrayt &json_test=result["inputs"].make_array();
 
-          for(const auto & step : test.goto_trace.steps)
+          for(const auto &step : test.goto_trace.steps)
           {
             if(step.is_input())
             {
@@ -432,7 +432,7 @@ bool bmc_covert::operator()()
           }
         }
         json_arrayt &goal_refs=result["coveredGoals"].make_array();
-        for(const auto & goal_id : test.covered_goals)
+        for(const auto &goal_id : test.covered_goals)
         {
           goal_refs.push_back(json_stringt(id2string(goal_id)));
         }
@@ -457,7 +457,7 @@ bool bmc_covert::operator()()
   {
     std::cout << "Test suite:" << '\n';
 
-    for(const auto & test : tests)
+    for(const auto &test : tests)
       std::cout << get_test(test.goto_trace) << '\n';
   }
 

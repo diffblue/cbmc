@@ -1380,10 +1380,8 @@ void goto_checkt::check_rec(
 
     guardt old_guard=guard;
 
-    for(unsigned i=0; i<expr.operands().size(); i++)
+    for(const auto &op : expr.operands())
     {
-      const exprt &op=expr.operands()[i];
-
       if(!op.is_boolean())
         throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
               op.pretty();
@@ -1553,12 +1551,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     check(i.guard);
 
     // magic ERROR label?
-    for(optionst::value_listt::const_iterator
-        l_it=error_labels.begin();
-        l_it!=error_labels.end();
-        l_it++)
+    for(const auto &label : error_labels)
     {
-      if(std::find(i.labels.begin(), i.labels.end(), *l_it)!=i.labels.end())
+      if(std::find(i.labels.begin(), i.labels.end(), label)!=i.labels.end())
       {
         goto_program_instruction_typet type=
           enable_assert_to_assume?ASSUME:ASSERT;
@@ -1568,7 +1563,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         t->guard=false_exprt();
         t->source_location=i.source_location;
         t->source_location.set_property_class("error label");
-        t->source_location.set_comment("error label "+*l_it);
+        t->source_location.set_comment("error label "+label);
         t->source_location.set("user-provided", true);
       }
     }
@@ -1734,10 +1729,7 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
       }
     }
 
-    for(goto_programt::instructionst::iterator
-        i_it=new_code.instructions.begin();
-        i_it!=new_code.instructions.end();
-        i_it++)
+    Forall_goto_program_instructions(i_it, new_code)
     {
       if(i_it->source_location.is_nil())
       {
@@ -1810,10 +1802,7 @@ void goto_check(
 {
   goto_checkt goto_check(ns, options);
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_functions)
   {
     goto_check.goto_check(it->second);
   }
@@ -1838,10 +1827,7 @@ void goto_check(
   const namespacet ns(goto_model.symbol_table);
   goto_checkt goto_check(ns, options);
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_model.goto_functions.function_map.begin();
-      it!=goto_model.goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_model.goto_functions)
   {
     goto_check.goto_check(it->second);
   }

@@ -234,7 +234,7 @@ public:
     {
       if(!is_goto()) return false;
 
-      for(const auto & t : targets)
+      for(const auto &t : targets)
         if(t->location_number<=location_number)
           return true;
 
@@ -399,7 +399,7 @@ public:
   //! Compute location numbers
   void compute_location_numbers(unsigned &nr)
   {
-    for(auto & i : instructions)
+    for(auto &i : instructions)
       i.location_number=nr++;
   }
 
@@ -461,7 +461,7 @@ template <class codeT, class guardT>
 void goto_program_templatet<codeT, guardT>::compute_loop_numbers()
 {
   unsigned nr=0;
-  for(auto & i : instructions)
+  for(auto &i : instructions)
     if(i.is_backwards_goto())
       i.loop_number=nr++;
 }
@@ -481,7 +481,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
 
   if(i.is_goto())
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
       successors.push_back(t);
 
     if(!i.guard.is_true() && next!=instructions.end())
@@ -489,7 +489,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   }
   else if(i.is_start_thread())
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
       successors.push_back(t);
 
     if(next!=instructions.end())
@@ -530,7 +530,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
 
   if(i.is_goto())
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
       successors.push_back(t);
 
     if(!i.guard.is_true() && next!=instructions.end())
@@ -538,7 +538,7 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   }
   else if(i.is_start_thread())
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
       successors.push_back(t);
 
     if(next!=instructions.end())
@@ -593,14 +593,14 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
 {
   // reset marking
 
-  for(auto & i : instructions)
+  for(auto &i : instructions)
     i.target_number=instructiont::nil_target;
 
   // mark the goto targets
 
-  for(const auto & i : instructions)
+  for(const auto &i : instructions)
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
     {
       if(t!=instructions.end())
         t->target_number=0;
@@ -622,9 +622,9 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
   // check the targets!
   // (this is a consistency check only)
 
-  for(const auto & i : instructions)
+  for(const auto &i : instructions)
   {
-    for(const auto & t : i.targets)
+    for(const auto &t : i.targets)
     {
       if(t!=instructions.end())
       {
@@ -660,9 +660,9 @@ void goto_program_templatet<codeT, guardT>::copy_from(
 
   // Loop over program - 2nd time updates targets
 
-  for(auto & i : instructions)
+  for(auto &i : instructions)
   {
-    for(auto & t : i.targets)
+    for(auto &t : i.targets)
     {
       typename targets_mappingt::iterator
         m_target_it=targets_mapping.find(t);
@@ -682,7 +682,7 @@ void goto_program_templatet<codeT, guardT>::copy_from(
 template <class codeT, class guardT>
 bool goto_program_templatet<codeT, guardT>::has_assertion() const
 {
-  for(const auto & i : instructions)
+  for(const auto &i : instructions)
     if(i.is_assert() && !i.guard.is_true())
       return true;
 
@@ -692,7 +692,7 @@ bool goto_program_templatet<codeT, guardT>::has_assertion() const
 template <class codeT, class guardT>
 void goto_program_templatet<codeT, guardT>::compute_incoming_edges()
 {
-  for(auto & i : instructions)
+  for(auto &i : instructions)
   {
     i.incoming_edges.clear();
   }
@@ -706,7 +706,7 @@ void goto_program_templatet<codeT, guardT>::compute_incoming_edges()
 
     get_successors(it, successors);
 
-    for(const auto & s : successors)
+    for(const auto &s : successors)
     {
       if(s!=instructions.end())
         s->incoming_edges.insert(it);

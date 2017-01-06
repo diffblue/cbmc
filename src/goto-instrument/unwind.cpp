@@ -385,8 +385,7 @@ void goto_unwindt::unwind(
 {
   assert(k>=-1);
 
-  for(goto_programt::const_targett i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end(); i_it++)
+  forall_goto_program_instructions(i_it, goto_program)
   {
     if(!i_it->is_backwards_goto())
       continue;

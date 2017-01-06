@@ -170,16 +170,9 @@ void set_properties(
 {
   std::unordered_set<irep_idt, irep_id_hash> property_set;
 
-  for(std::list<std::string>::const_iterator
-      it=properties.begin();
-      it!=properties.end();
-      it++)
-    property_set.insert(*it);
+  property_set.insert(properties.begin(), properties.end());
 
-  for(goto_functionst::function_mapt::iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  Forall_goto_functions(it, goto_functions)
     if(!it->second.is_inlined())
       set_properties(it->second.body, property_set);
 

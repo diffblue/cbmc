@@ -114,9 +114,6 @@ Function: dirtyt::output
 
 void dirtyt::output(std::ostream &out) const
 {
-  for(id_sett::const_iterator
-      it=dirty.begin();
-      it!=dirty.end();
-      it++)
-    out << *it << std::endl;
+  for(const auto &d : dirty)
+    out << d << std::endl;
 }

@@ -393,15 +393,13 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 
     parameter_map.clear();
 
-    for(code_typet::parameterst::iterator
-        p_it=type.parameters().begin();
-        p_it!=type.parameters().end();
-        p_it++)
+    for(auto &param : type.parameters())
     {
       // turn the declarations into parameters
-      if(p_it->id()==ID_declaration)
+      if(param.id()==ID_declaration)
       {
-        ansi_c_declarationt &declaration=to_ansi_c_declaration(*p_it);
+        ansi_c_declarationt &declaration=
+          to_ansi_c_declaration(param);
 
         code_typet::parametert parameter;
 
@@ -432,7 +430,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         }
 
         // put the parameter in place of the declaration
-        p_it->swap(parameter);
+        param.swap(parameter);
       }
     }
 
@@ -846,16 +844,13 @@ void c_typecheck_baset::typecheck_compound_body(
   old_components.swap(components);
 
   // We get these as declarations!
-  for(struct_union_typet::componentst::iterator
-      it=old_components.begin();
-      it!=old_components.end();
-      it++)
+  for(auto &decl : old_components)
   {
     // the arguments are member declarations or static assertions
-    assert(it->id()==ID_declaration);
+    assert(decl.id()==ID_declaration);
 
     ansi_c_declarationt &declaration=
-      to_ansi_c_declaration(static_cast<exprt &>(*it));
+      to_ansi_c_declaration(static_cast<exprt &>(decl));
 
     if(declaration.get_is_static_assert())
     {
@@ -872,17 +867,15 @@ void c_typecheck_baset::typecheck_compound_body(
       typecheck_type(declaration.type());
       make_already_typechecked(declaration.type());
 
-      for(ansi_c_declarationt::declaratorst::iterator
-          d_it=declaration.declarators().begin();
-          d_it!=declaration.declarators().end();
-          d_it++)
+      for(const auto &declarator : declaration.declarators())
       {
         struct_union_typet::componentt new_component;
 
-        new_component.add_source_location()=d_it->source_location();
-        new_component.set(ID_name, d_it->get_base_name());
-        new_component.set(ID_pretty_name, d_it->get_base_name());
-        new_component.type()=declaration.full_type(*d_it);
+        new_component.add_source_location()=
+          declarator.source_location();
+        new_component.set(ID_name, declarator.get_base_name());
+        new_component.set(ID_pretty_name, declarator.get_base_name());
+        new_component.type()=declaration.full_type(declarator);
 
         typecheck_type(new_component.type());
 
@@ -903,15 +896,12 @@ void c_typecheck_baset::typecheck_compound_body(
   unsigned anon_member_counter=0;
 
   // scan for anonymous members, and name them
-  for(struct_union_typet::componentst::iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  for(auto &member : components)
   {
-    if(it->get_name()!=irep_idt()) continue;
+    if(member.get_name()!=irep_idt()) continue;
 
-    it->set_name("$anon"+std::to_string(anon_member_counter++));
-    it->set_anonymous(true);
+    member.set_name("$anon"+std::to_string(anon_member_counter++));
+    member.set_anonymous(true);
   }
 
   // scan for duplicate members
@@ -926,7 +916,9 @@ void c_typecheck_baset::typecheck_compound_body(
     {
       if(!members.insert(it->get_name()).second)
       {
-        // we do nothing (as gcc won't complain)
+        error().source_location=it->source_location();
+        error() << "duplicate member " << it->get_name() << eom;
+        throw 0;
       }
     }
   }
@@ -1173,9 +1165,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // if the type is marked as 'packed'.
   // gcc/clang may also pick a larger width. Visual Studio doesn't.
 
-  for(auto & it : as_expr.operands())
+  for(auto &op : as_expr.operands())
   {
-    ansi_c_declarationt &declaration=to_ansi_c_declaration(it);
+    ansi_c_declarationt &declaration=to_ansi_c_declaration(op);
     exprt &v=declaration.declarator().value();
 
     if(v.is_not_nil()) // value given?
@@ -1239,15 +1231,12 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     // None, it's anonymous. We generate a tag.
     std::string anon_identifier="#anon_enum";
 
-    for(std::list<c_enum_typet::c_enum_membert>::const_iterator
-        it=enum_members.begin();
-        it!=enum_members.end();
-        it++)
+    for(const auto &member : enum_members)
     {
       anon_identifier+='$';
-      anon_identifier+=id2string(it->get_base_name());
+      anon_identifier+=id2string(member.get_base_name());
       anon_identifier+='=';
-      anon_identifier+=id2string(it->get_value());
+      anon_identifier+=id2string(member.get_value());
     }
 
     if(is_packed)
@@ -1273,11 +1262,8 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   // throw in the enum members as 'body'
   irept::subt &body=enum_tag_symbol.type.add(ID_body).get_sub();
 
-  for(std::list<c_enum_typet::c_enum_membert>::const_iterator
-      it=enum_members.begin();
-      it!=enum_members.end();
-      it++)
-    body.push_back(*it);
+  for(const auto &member : enum_members)
+    body.push_back(member);
 
   // We use a subtype to store the underlying type.
   typet underlying_type=

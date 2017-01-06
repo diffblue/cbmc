@@ -8,7 +8,7 @@ bool all_paths_enumeratort::next(patht &path) {
   if (last_path.empty()) {
     // This is the first time we've been called -- build an initial
     // path.
-    last_path.push_back(loop_header);
+    last_path.push_back(path_nodet(loop_header));
 
     // This shouldn't be able to fail.
     complete_path(last_path, 0);
@@ -60,12 +60,10 @@ int all_paths_enumeratort::backtrack(patht &path) {
 
   unsigned int ret = 0;
 
-  for (goto_programt::targetst::iterator it = succs.begin();
-       it != succs.end();
-       ++it) {
-    if (*it == node.loc) {
+  for (const auto & succ : succs)
+  {
+    if(succ==node.loc)
       break;
-    }
 
     ret++;
   }
@@ -111,11 +109,10 @@ void all_paths_enumeratort::extend_path(patht &path,
 
   goto_program.get_successors(t, succs);
 
-  for (goto_programt::targetst::iterator it = succs.begin();
-       it != succs.end();
-       ++it) {
+  for(const auto &s : succs)
+  {
     if (succ == 0) {
-      next = *it;
+      next=s;
       break;
     }
 

@@ -45,13 +45,8 @@ void goto_inlinet::parameter_assignments(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it2=parameter_types.begin();
-      it2!=parameter_types.end();
-      it2++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it2;
-
     // this is the type the n-th argument should be
     const typet &par_type=ns.follow(parameter.type());
 
@@ -179,13 +174,8 @@ void goto_inlinet::parameter_destruction(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it=parameter_types.begin();
-      it!=parameter_types.end();
-      it++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it;
-
     const irep_idt &identifier=parameter.get_identifier();
 
     if(identifier==irep_idt())

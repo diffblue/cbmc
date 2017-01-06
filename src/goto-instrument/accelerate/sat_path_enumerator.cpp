@@ -99,14 +99,13 @@ void sat_path_enumeratort::find_distinguishing_points() {
     if (succs.size() > 1) {
       // This location has multiple successors -- each successor is a
       // distinguishing point.
-      for (goto_programt::targetst::iterator jt = succs.begin();
-           jt != succs.end();
-           ++jt) {
+      for(const auto &succ : succs)
+      {
         symbolt distinguisher_sym =
           utils.fresh_symbol("polynomial::distinguisher", bool_typet());
         symbol_exprt distinguisher = distinguisher_sym.symbol_expr();
 
-        distinguishing_points[*jt] = distinguisher;
+        distinguishing_points[succ]=distinguisher;
         distinguishers.push_back(distinguisher);
       }
     }
@@ -138,16 +137,15 @@ void sat_path_enumeratort::build_path(
     // to see which branch was taken.
     bool found_branch = false;
 
-    for (goto_programt::targetst::iterator it = succs.begin();
-         it != succs.end();
-         ++it) {
-      exprt &distinguisher = distinguishing_points[*it];
+    for(const auto &succ : succs)
+    {
+      exprt &distinguisher=distinguishing_points[succ];
       bool taken = scratch_program.eval(distinguisher).is_true();
 
       if (taken) {
         if (!found_branch ||
-            ((*it)->location_number < next->location_number)) {
-          next = *it;
+            (succ->location_number < next->location_number)) {
+          next=succ;
         }
 
         found_branch = true;
@@ -269,12 +267,13 @@ void sat_path_enumeratort::build_fixed() {
       // header we're happy & redirect it to our end-of-body sentinel.
       // If it jumps somewhere else, it's part of a nested loop and we
       // kill it.
-      for (goto_programt::targetst::iterator target = t->targets.begin();
-           target != t->targets.end();
-           ++target) {
-        if ((*target)->location_number > t->location_number) {
+      for(const auto &target : t->targets)
+      {
+        if(target->location_number > t->location_number)
+        {
           // A forward jump...
-          if (loop.find(*target) != loop.end()) {
+          if(loop.find(target)!=loop.end())
+          {
             // Case 1: a forward jump within the loop.  Do nothing.
             continue;
           } else {
@@ -284,7 +283,8 @@ void sat_path_enumeratort::build_fixed() {
           }
         } else {
           // A backwards jump...
-          if (*target == loop_header) {
+          if (target==loop_header)
+          {
             // Case 3: a backwards jump to the loop header.  Redirect to sentinel.
             fixedt->targets.clear();
             fixedt->targets.push_back(end);
@@ -302,12 +302,11 @@ void sat_path_enumeratort::build_fixed() {
   // body is the same as the master path.  We do this by assuming that
   // each of the shadow-distinguisher variables is equal to its corresponding
   // master-distinguisher.
-  for (std::list<exprt>::iterator it = distinguishers.begin();
-       it != distinguishers.end();
-       ++it) {
-    exprt &shadow = shadow_distinguishers[*it];
+  for(const auto &expr : distinguishers)
+  {
+    const exprt &shadow=shadow_distinguishers[expr];
 
-    fixed.insert_after(end)->make_assumption(equal_exprt(*it, shadow));
+    fixed.insert_after(end)->make_assumption(equal_exprt(expr, shadow));
   }
 
   // Finally, let's remove all the skips we introduced and fix the
@@ -320,11 +319,8 @@ void sat_path_enumeratort::record_path(scratch_programt &program)
 {
   distinguish_valuest path_val;
 
-  for (std::list<exprt>::iterator it = distinguishers.begin();
-       it != distinguishers.end();
-       ++it) {
-    path_val[*it] = program.eval(*it).is_true();
-  }
+  for(const auto &expr : distinguishers)
+    path_val[expr]=program.eval(expr).is_true();
 
   accelerated_paths.push_back(path_val);
 }

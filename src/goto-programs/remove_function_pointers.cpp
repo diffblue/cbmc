@@ -76,11 +76,8 @@ protected:
   {
     const symbol_tablet &symbol_table=ns.get_symbol_table();
 
-    const symbol_tablet::symbolst &s=symbol_table.symbols;
-
-    for(symbol_tablet::symbolst::const_iterator
-        it=s.begin(); it!=s.end(); ++it)
-      compute_address_taken_functions(it->second.value, address_taken);
+    for(const auto &s : symbol_table.symbols)
+      compute_address_taken_functions(s.second.value, address_taken);
   }
 
 };
@@ -109,10 +106,7 @@ remove_function_pointerst::remove_function_pointerst(
   compute_address_taken_functions(goto_functions, address_taken);
 
   // build type map
-  for(goto_functionst::function_mapt::const_iterator f_it=
-      goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     type_map[f_it->first]=f_it->second.type;
 }
 
@@ -386,25 +380,22 @@ void remove_function_pointerst::remove_function_pointer(
 
   // get all type-compatible functions
   // whose address is ever taken
-  for(type_mapt::const_iterator f_it=
-      type_map.begin();
-      f_it!=type_map.end();
-      f_it++)
+  for(const auto &t : type_map)
   {
     // address taken?
-    if(address_taken.find(f_it->first)==address_taken.end())
+    if(address_taken.find(t.first)==address_taken.end())
       continue;
 
     // type-compatible?
-    if(!is_type_compatible(return_value_used, call_type, f_it->second))
+    if(!is_type_compatible(return_value_used, call_type, t.second))
       continue;
 
-    if(f_it->first=="pthread_mutex_cleanup")
+    if(t.first=="pthread_mutex_cleanup")
       continue;
 
     symbol_exprt expr;
-    expr.type()=f_it->second;
-    expr.set_identifier(f_it->first);
+    expr.type()=t.second;
+    expr.set_identifier(t.first);
     functions.push_back(expr);
   }
 
@@ -419,15 +410,12 @@ void remove_function_pointerst::remove_function_pointer(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
-  for(functionst::const_iterator
-      it=functions.begin();
-      it!=functions.end();
-      it++)
+  for(const auto &fun : functions)
   {
     // call function
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
-    to_code_function_call(t1->code).function()=*it;
+    to_code_function_call(t1->code).function()=fun;
 
     // the signature of the function might not match precisely
     fix_argument_types(to_code_function_call(t1->code));
@@ -439,9 +427,9 @@ void remove_function_pointerst::remove_function_pointer(
 
     // goto to call
     address_of_exprt address_of;
-    address_of.object()=*it;
+    address_of.object()=fun;
     address_of.type()=pointer_typet();
-    address_of.type().subtype()=it->type();
+    address_of.type().subtype()=fun.type();
 
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());

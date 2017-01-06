@@ -59,11 +59,9 @@ Function: goto_convertt::finish_gotos
 
 void goto_convertt::finish_gotos()
 {
-  for(gotost::const_iterator it=targets.gotos.begin();
-      it!=targets.gotos.end();
-      it++)
+  for(const auto &target : targets.gotos)
   {
-    goto_programt::instructiont &i=**it;
+    goto_programt::instructiont &i=*target;
 
     if(i.code.get_statement()=="non-deterministic-goto")
     {
@@ -146,12 +144,9 @@ Function: goto_convertt::finish_computed_gotos
 
 void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 {
-  for(computed_gotost::const_iterator
-      g_it=targets.computed_gotos.begin();
-      g_it!=targets.computed_gotos.end();
-      g_it++)
+  for(const auto &target : targets.computed_gotos)
   {
-    goto_programt::instructiont &i=**g_it;
+    goto_programt::instructiont &i=*target;
     exprt destination=i.code.op0();
 
     assert(destination.id()==ID_dereference);
@@ -164,13 +159,10 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
     i.code=code_expressiont(pointer);
 
     // insert huge case-split
-    for(labelst::const_iterator
-        l_it=targets.labels.begin();
-        l_it!=targets.labels.end();
-        l_it++)
+    for(const auto &label : targets.labels)
     {
       exprt label_expr(ID_label, empty_typet());
-      label_expr.set(ID_identifier, l_it->first);
+      label_expr.set(ID_identifier, label.first);
 
       equal_exprt guard;
 
@@ -178,9 +170,9 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       guard.rhs()=address_of_exprt(label_expr);
 
       goto_programt::targett t=
-        goto_program.insert_after(*g_it);
+        goto_program.insert_after(target);
 
-      t->make_goto(l_it->second);
+      t->make_goto(label.second);
       t->source_location=i.source_location;
       t->guard=guard;
     }

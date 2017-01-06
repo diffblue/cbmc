@@ -132,10 +132,7 @@ void flow_insensitive_analysis_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     out << "////" << std::endl;
     out << "//// Function: " << f_it->first << std::endl;
@@ -268,13 +265,8 @@ bool flow_insensitive_analysis_baset::visit(
   else
     statistics[l]++;
 
-  for(goto_programt::const_targetst::const_iterator
-      it=successors.begin();
-      it!=successors.end();
-      it++)
+  for(const auto &to_l : successors)
   {
-    locationt to_l=*it;
-
     if(to_l==goto_program.instructions.end())
       continue;
 
@@ -492,13 +484,11 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
     get_reference_set(function, values);
 
     // now call all of these
-    for(expr_sett::const_iterator it=values.begin();
-        it!=values.end();
-        it++)
+    for(const auto &v : values)
     {
-      if(it->id()==ID_object_descriptor)
+      if(v.id()==ID_object_descriptor)
       {
-        const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
+        const object_descriptor_exprt &o=to_object_descriptor_expr(v);
 
         // ... but only if they are actually functions.
         goto_functionst::function_mapt::const_iterator it=
@@ -554,10 +544,7 @@ void flow_insensitive_analysis_baset::fixedpoint(
 {
   // do each function at least once
 
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
     if(functions_done.find(it->first)==
        functions_done.end())
     {

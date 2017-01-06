@@ -258,7 +258,7 @@ void build_goto_trace(
       simplify(goto_trace_step.full_lhs_value, ns);
     }
 
-    for(const auto & j : SSA_step.converted_io_args)
+    for(const auto &j : SSA_step.converted_io_args)
     {
       if(j.is_constant() ||
          j.id()==ID_string_constant)
@@ -283,13 +283,13 @@ void build_goto_trace(
 
   // Now assemble into a single goto_trace.
   // This expoits sorted-ness of the map.
-  for(auto & t_it : time_map)
+  for(auto &t_it : time_map)
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 
   // produce the step numbers
   unsigned step_nr=0;
 
-  for(auto & s_it : goto_trace.steps)
+  for(auto &s_it : goto_trace.steps)
     s_it.step_nr=++step_nr;
 }
 

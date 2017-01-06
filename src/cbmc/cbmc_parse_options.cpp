@@ -695,15 +695,12 @@ int cbmc_parse_optionst::get_goto_program(
       clear_parse();
     }
 
-    for(cmdlinet::argst::const_iterator
-        it=binaries.begin();
-        it!=binaries.end();
-        ++it)
+    for(const auto &bin : binaries)
     {
       status() << "Reading GOTO program from file " << eom;
 
       if(read_object_and_link(
-        *it,
+        bin,
         symbol_table,
         goto_functions,
         get_message_handler()))
@@ -936,7 +933,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
       std::set<coverage_criteriont> criteria;
 
-      for(const auto & criterion_string : criteria_strings)
+      for(const auto &criterion_string : criteria_strings)
       {
         coverage_criteriont c;
 
@@ -967,7 +964,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
       status() << "Instrumenting coverage goals" << eom;
 
-      for(const auto & criterion : criteria)
+      for(const auto &criterion : criteria)
         instrument_cover_goals(symbol_table, goto_functions, criterion);
 
       goto_functions.update();

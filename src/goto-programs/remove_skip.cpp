@@ -157,9 +157,8 @@ void remove_skip(goto_programt &goto_program)
 
     // now delete the skips -- we do so after adjusting the
     // gotos to avoid dangling targets
-    for(new_targetst::const_iterator
-        it=new_targets.begin(); it!=new_targets.end(); it++)
-      goto_program.instructions.erase(it->first);
+    for(const auto &new_target : new_targets)
+      goto_program.instructions.erase(new_target.first);
 
     // remove the last skip statement unless it's a target
     goto_program.compute_incoming_edges();

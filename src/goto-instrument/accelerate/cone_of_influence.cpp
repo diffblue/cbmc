@@ -33,19 +33,13 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
 #ifdef DEBUG
     std::cout << "Previous cone: " << std::endl;
 
-    for (expr_sett::iterator it = curr.begin();
-         it != curr.end();
-         ++it) {
-      std::cout << expr2c(*it, ns) << " ";
-    }
+    for(const auto &expr : curr)
+      std::cout << expr2c(expr, ns) << " ";
 
     std::cout << std::endl << "Current cone: " << std::endl;
 
-    for (expr_sett::iterator it = next.begin();
-         it != next.end();
-         ++it) {
-      std::cout << expr2c(*it, ns) << " ";
-    }
+    for(const auto &expr : next)
+      std::cout << expr2c(expr, ns) << " ";
 
     std::cout << std::endl;
 #endif
@@ -110,14 +104,12 @@ void cone_of_influencet::cone_of_influence(
 
     gather_rvalues(assignment.lhs(), lhs_syms);
 
-    for (expr_sett::iterator it = lhs_syms.begin();
-         it != lhs_syms.end();
-         ++it) {
-      if (curr.find(*it) != curr.end()) {
+    for(const auto &expr : lhs_syms)
+      if(curr.find(expr)!=curr.end())
+      {
         care = true;
         break;
       }
-    }
 
     next.erase(assignment.lhs());
 

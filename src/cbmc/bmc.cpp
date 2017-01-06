@@ -669,7 +669,7 @@ void bmct::setup_unwind()
   std::vector<std::string> unwindset_loops;
   split_string(set, ',', unwindset_loops, true, true);
 
-  for(auto & val : unwindset_loops)
+  for(auto &val : unwindset_loops)
   {
     unsigned thread_nr;
     bool thread_nr_set=false;

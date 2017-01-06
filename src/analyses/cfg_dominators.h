@@ -103,10 +103,8 @@ void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
   cfg(program);
 
   // initialise top element
-  for(typename cfgt::entry_mapt::const_iterator
-      e_it=cfg.entry_map.begin();
-      e_it!=cfg.entry_map.end(); ++e_it)
-    top.insert(cfg[e_it->second].PC);
+  for(const auto &node : cfg.entry_map)
+    top.insert(cfg[node.second].PC);
 }
 
 /*******************************************************************\
@@ -151,24 +149,18 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
     bool changed=false;
     typename cfgt::nodet &node=cfg[cfg.entry_map[current]];
     if(node.dominators.empty())
-      for(typename cfgt::edgest::const_iterator
-          p_it=(post_dom?node.out:node.in).begin();
-          !changed && p_it!=(post_dom?node.out:node.in).end();
-          ++p_it)
-        if(!cfg[p_it->first].dominators.empty())
+      for(const auto & edge : (post_dom?node.out:node.in))
+        if(!cfg[edge.first].dominators.empty())
         {
-          node.dominators=cfg[p_it->first].dominators;
+          node.dominators=cfg[edge.first].dominators;
           node.dominators.insert(current);
           changed=true;
         }
 
     // compute intersection of predecessors
-    for(typename cfgt::edgest::const_iterator
-          p_it=(post_dom?node.out:node.in).begin();
-        p_it!=(post_dom?node.out:node.in).end();
-        ++p_it)
+    for(const auto & edge : (post_dom?node.out:node.in))
     {
-      const target_sett &other=cfg[p_it->first].dominators;
+      const target_sett &other=cfg[edge.first].dominators;
       if(other.empty())
         continue;
 
@@ -198,12 +190,9 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 
     if(changed) // fixed point for node reached?
     {
-      for(typename cfgt::edgest::const_iterator
-            s_it=(post_dom?node.in:node.out).begin();
-          s_it!=(post_dom?node.in:node.out).end();
-          ++s_it)
+      for(const auto & edge : (post_dom?node.in:node.out))
       {
-        worklist.push_back(cfg[s_it->first].PC);
+        worklist.push_back(cfg[edge.first].PC);
       }
     }
   }
@@ -224,21 +213,21 @@ Function: cfg_dominators_templatet::output
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
-  for(typename cfgt::entry_mapt::const_iterator
-      it=cfg.entry_map.begin();
-      it!=cfg.entry_map.end(); ++it)
+  for(const auto &node : cfg.entry_map)
   {
-    unsigned n=it->first->location_number;
+    unsigned n=node.first->location_number;
 
     if(post_dom)
       out << n << " post-dominated by ";
     else
       out << n << " dominated by ";
-    for(typename target_sett::const_iterator d_it=it->second.dominators.begin();
-        d_it!=it->second.dominators.end();)
+    for(typename target_sett::const_iterator
+        d_it=node.second.dominators.begin();
+        d_it!=node.second.dominators.end();
+       ) // no d_it++
     {
       out << (*d_it)->location_number;
-      if (++d_it!=it->second.dominators.end())
+      if (++d_it!=node.second.dominators.end())
         out << ", ";
     }
     out << "\n";

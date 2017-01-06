@@ -390,14 +390,12 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
             to_code_decl(it->code).get_identifier(), it));
 
   // declare (and, if necessary, define) locals
-  for(localst::const_iterator l_it=locals.begin();
-      l_it!=locals.end();
-      ++l_it)
+  for(const auto &l : locals)
   {
     goto_programt::targett ref_instr=dest.instructions.begin();
     bool has_decl=false;
 
-    available_declst::const_iterator entry=available_decls.find(l_it->first);
+    available_declst::const_iterator entry=available_decls.find(l.first);
 
     if(available_declst::const_iterator(available_decls.end())!=entry)
     {
@@ -406,7 +404,7 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
     }
 
     goto_programt tmp;
-    make_decl_and_def(tmp, ref_instr, l_it->second, l_it->first);
+    make_decl_and_def(tmp, ref_instr, l.second, l.first);
 
     if(has_decl) ++ref_instr;
     dest.insert_before_swap(ref_instr, tmp);
@@ -974,22 +972,17 @@ const typet& string_abstractiont::build_abstraction_type_rec(const typet &type,
   else if(eff_type.id()==ID_struct || eff_type.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=to_struct_union_type(eff_type);
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
 
     struct_union_typet::componentst new_comp;
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : struct_union_type.components())
     {
-      if(it->get_anonymous()) continue;
-      typet subt=build_abstraction_type_rec(it->type(), known);
+      if(comp.get_anonymous()) continue;
+      typet subt=build_abstraction_type_rec(comp.type(), known);
       if(subt.is_nil()) continue; // also precludes structs with pointers to the same datatype
 
       new_comp.push_back(struct_union_typet::componentt());
-      new_comp.back().set_name(it->get_name());
-      new_comp.back().set_pretty_name(it->get_pretty_name());
+      new_comp.back().set_name(comp.get_name());
+      new_comp.back().set_pretty_name(comp.get_pretty_name());
       new_comp.back().type()=subt;
     }
     if(!new_comp.empty())
@@ -1639,19 +1632,14 @@ goto_programt::targett string_abstractiont::value_assignments(
   else if(lhs.type().id()==ID_struct || lhs.type().id()==ID_union)
   {
     const struct_union_typet &struct_union_type=to_struct_union_type(lhs.type());
-    const struct_union_typet::componentst &components=
-      struct_union_type.components();
 
-    for(struct_union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : struct_union_type.components())
     {
-      assert(!it->get_name().empty());
+      assert(!comp.get_name().empty());
 
       target=value_assignments(dest, target,
-          member_exprt(lhs, it->get_name(), it->type()),
-          member_exprt(rhs, it->get_name(), it->type()));
+          member_exprt(lhs, comp.get_name(), comp.type()),
+          member_exprt(rhs, comp.get_name(), comp.type()));
     }
   }
 

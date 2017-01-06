@@ -70,7 +70,7 @@ void cpp_typecheckt::typecheck()
   // default linkage is "automatic"
   current_linkage_spec=ID_auto;
 
-  for(auto & item : cpp_parse_tree.items)
+  for(auto &item : cpp_parse_tree.items)
     convert(item);
 
   static_and_dynamic_initialization();
@@ -238,7 +238,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
-  for(const auto & d_it : dynamic_initializations)
+  for(const auto &d_it : dynamic_initializations)
   {
     symbolt &symbol=symbol_table.symbols.find(d_it)->second;
 
@@ -411,7 +411,7 @@ void cpp_typecheckt::clean_up()
 
       function_members.reserve(components.size());
 
-      for(const auto & compo_it : components)
+      for(const auto &compo_it : components)
       {
         if(compo_it.get_bool(ID_is_static) ||
            compo_it.get_bool(ID_is_type))

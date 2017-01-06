@@ -46,7 +46,7 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
     binaries.reserve(files.size());
     sources.reserve(files.size());
 
-    for(const auto & file : files)
+    for(const auto &file : files)
     {
       if(is_goto_binary(file))
         binaries.push_back(file);
@@ -60,7 +60,7 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
 
       language_files.set_message_handler(get_message_handler());
 
-      for(const auto & filename : sources)
+      for(const auto &filename : sources)
       {
         #ifdef _MSC_VER
         std::ifstream infile(widen(filename));
@@ -122,11 +122,11 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
       }
     }
 
-    for(const auto & it : binaries)
+    for(const auto &file : binaries)
     {
       status() << "Reading GOTO program from file" << eom;
 
-      if(read_object_and_link(it, *this, get_message_handler()))
+      if(read_object_and_link(file, *this, get_message_handler()))
         return true;
     }
 

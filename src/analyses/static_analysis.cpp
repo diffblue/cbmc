@@ -135,10 +135,7 @@ void static_analysis_baset::output(
   const goto_functionst &goto_functions,
   std::ostream &out) const
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->second.body_available())
     {
@@ -198,10 +195,7 @@ Function: static_analysis_baset::generate_states
 void static_analysis_baset::generate_states(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     generate_states(f_it->second.body);
 }
 
@@ -239,10 +233,7 @@ Function: static_analysis_baset::update
 void static_analysis_baset::update(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
     update(f_it->second.body);
 }
 
@@ -370,13 +361,8 @@ bool static_analysis_baset::visit(
 
   goto_program.get_successors(l, successors);
 
-  for(goto_programt::const_targetst::const_iterator
-      it=successors.begin();
-      it!=successors.end();
-      it++)
+  for(const auto &to_l : successors)
   {
-    locationt to_l=*it;
-
     if(to_l==goto_program.instructions.end())
       continue;
 
@@ -581,13 +567,11 @@ void static_analysis_baset::do_function_call_rec(
     std::unique_ptr<statet> state_from(make_temporary_state(new_state));
 
     // now call all of these
-    for(std::list<exprt>::const_iterator it=values.begin();
-        it!=values.end();
-        it++)
+    for(const auto &value : values)
     {
-      if(it->id()==ID_object_descriptor)
+      if(value.id()==ID_object_descriptor)
       {
-        const object_descriptor_exprt &o=to_object_descriptor_expr(*it);
+        const object_descriptor_exprt &o=to_object_descriptor_expr(value);
         std::unique_ptr<statet> n2(make_temporary_state(new_state));
         do_function_call_rec(l_call, l_return, o.object(), arguments, *n2, goto_functions);
         merge(new_state, *n2, l_return);
@@ -690,21 +674,19 @@ void static_analysis_baset::concurrent_fixedpoint(
   {
     new_shared=false;
 
-    for(thread_wlt::const_iterator it=thread_wl.begin();
-        it!=thread_wl.end();
-        ++it)
+    for(const auto &thread : thread_wl)
     {
       working_sett working_set;
-      put_in_working_set(working_set, it->second);
+      put_in_working_set(working_set, thread.second);
 
-      statet &begin_state=get_state(it->second);
-      merge(begin_state, shared_state, it->second);
+      statet &begin_state=get_state(thread.second);
+      merge(begin_state, shared_state, thread.second);
 
       while(!working_set.empty())
       {
         goto_programt::const_targett l=get_next(working_set);
 
-        visit(l, working_set, *(it->first), goto_functions);
+        visit(l, working_set, *thread.first, goto_functions);
 
         // the underlying domain must make sure that the final state
         // carries all possible values; otherwise we would need to

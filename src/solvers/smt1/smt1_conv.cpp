@@ -2179,8 +2179,8 @@ void smt1_convt::convert_is_dynamic_object(
     {
       out << "(or";
 
-      for(const auto & it : dynamic_objects)
-        out << " (= bv" << it
+      for(const auto &obj : dynamic_objects)
+        out << " (= bv" << obj
             << "[" << BV_ADDR_BITS << "] ?obj)";
 
       out << ")"; // or
@@ -3550,16 +3550,16 @@ void smt1_convt::find_symbols_rec(
     const struct_union_typet::componentst &components=
       to_struct_union_type(type).components();
 
-    for(std::size_t i=0; i<components.size(); i++)
-      find_symbols_rec(components[i].type(), recstack);
+    for(const auto &comp : components)
+      find_symbols_rec(comp.type(), recstack);
   }
   else if(type.id()==ID_code)
   {
     const code_typet::parameterst &parameters=
       to_code_type(type).parameters();
 
-    for(std::size_t i=0; i<parameters.size(); i++)
-      find_symbols_rec(parameters[i].type(), recstack);
+    for(const auto &param : parameters)
+      find_symbols_rec(param.type(), recstack);
 
     find_symbols_rec(to_code_type(type).return_type(), recstack);
   }
@@ -3611,9 +3611,9 @@ exprt smt1_convt::binary2struct(
   e.operands().resize(components.size());
 
   std::size_t index=binary.size();
-  for(std::size_t i=0; i<components.size(); i++)
+  std::size_t i=0;
+  for(const auto &comp : components)
   {
-    const struct_typet::componentt &comp=components[i];
     const typet &sub_type=ns.follow(comp.type());
 
     std::size_t sub_size=boolbv_width(sub_type);
@@ -3624,7 +3624,7 @@ exprt smt1_convt::binary2struct(
     index-=sub_size;
     std::string cval=binary.substr(index, sub_size);
 
-    e.operands()[i]=ce_value(sub_type, "", cval, true);
+    e.operands()[i++]=ce_value(sub_type, "", cval, true);
   }
 
   return e;

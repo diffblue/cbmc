@@ -453,12 +453,8 @@ void interpretert::execute_function_call()
     std::set<irep_idt> locals;
     get_local_identifiers(f_it->second, locals);
 
-    for(std::set<irep_idt>::const_iterator
-        it=locals.begin();
-        it!=locals.end();
-        it++)
+    for(const auto &id : locals)
     {
-      const irep_idt &id=*it;
       const symbolt &symbol=ns.lookup(id);
       unsigned size=get_size(symbol.type);
 
@@ -523,11 +519,8 @@ void interpretert::build_memory_map()
   memory[0].identifier="NULL-OBJECT";
 
   // now do regular static symbols
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
-      it++)
-    build_memory_map(it->second);
+  for(const auto &s : symbol_table.symbols)
+    build_memory_map(s.second);
 
   // for the locals
   stack_pointer=memory.size();
@@ -595,12 +588,9 @@ unsigned interpretert::get_size(const typet &type) const
 
     unsigned sum=0;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : components)
     {
-      const typet &sub_type=it->type();
+      const typet &sub_type=comp.type();
 
       if(sub_type.id()!=ID_code)
         sum+=get_size(sub_type);
@@ -615,12 +605,9 @@ unsigned interpretert::get_size(const typet &type) const
 
     unsigned max_size=0;
 
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : components)
     {
-      const typet &sub_type=it->type();
+      const typet &sub_type=comp.type();
 
       if(sub_type.id()!=ID_code)
         max_size=std::max(max_size, get_size(sub_type));

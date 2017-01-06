@@ -80,7 +80,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   java_bytecode_parse_treet &parse_tree=class_map[class_name];
 
   // First check given JAR files
-  for(const auto & jf : jar_files)
+  for(const auto &jf : jar_files)
   {
     read_jar_file(jf);
 
@@ -108,7 +108,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
 
   // See if we can find it in the class path
 
-  for(const auto & cp : config.java.classpath)
+  for(const auto &cp : config.java.classpath)
   {
     // in a JAR?
     if(has_suffix(cp, ".jar"))

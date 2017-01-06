@@ -58,40 +58,32 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
   dynamic_cast<dimacs_cnft&>(prop).write_dimacs_cnf(out);
 
   // we dump the mapping variable<->literals
-  for(bv_cbmct::symbolst::const_iterator
-      s_it=get_symbols().begin();
-      s_it!=get_symbols().end();
-      s_it++)
+  for(const auto &s : get_symbols())
   {
-    if(s_it->second.is_constant())
-      out << "c " << s_it->first << " "
-          << (s_it->second.is_true()?"TRUE":"FALSE") << "\n";
+    if(s.second.is_constant())
+      out << "c " << s.first << " "
+          << (s.second.is_true()?"TRUE":"FALSE") << "\n";
     else
-      out << "c " << s_it->first << " "
-          << s_it->second.dimacs() << "\n";
+      out << "c " << s.first << " "
+          << s.second.dimacs() << "\n";
   }
 
   // dump mapping for selected bit-vectors
-  const boolbv_mapt &boolbv_map=get_map();
-
-  for(boolbv_mapt::mappingt::const_iterator
-      m_it=boolbv_map.mapping.begin();
-      m_it!=boolbv_map.mapping.end();
-      m_it++)
+  for(const auto &m : get_map().mapping)
   {
-    const boolbv_mapt::literal_mapt &literal_map=m_it->second.literal_map;
+    const boolbv_mapt::literal_mapt &literal_map=m.second.literal_map;
 
     if(literal_map.empty()) continue;
 
-    out << "c " << m_it->first;
+    out << "c " << m.first;
 
-    for(unsigned i=0; i<literal_map.size(); i++)
-      if(!literal_map[i].is_set)
+    for(const auto &lit : literal_map)
+      if(!lit.is_set)
         out << " " << "?";
-      else if(literal_map[i].l.is_constant())
-        out << " " << (literal_map[i].l.is_true()?"TRUE":"FALSE");
+      else if(lit.l.is_constant())
+        out << " " << (lit.l.is_true()?"TRUE":"FALSE");
       else
-        out << " " << literal_map[i].l.dimacs();
+        out << " " << lit.l.dimacs();
 
     out << "\n";
   }

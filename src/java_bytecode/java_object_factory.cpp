@@ -101,7 +101,7 @@ void gen_nondet_init(
     recursion_set.insert(struct_tag);
     assert(!recursion_set.empty());
 
-    for(const auto & component : components)
+    for(const auto &component : components)
     {
       const typet &component_type=component.type();
       irep_idt name=component.get_name();

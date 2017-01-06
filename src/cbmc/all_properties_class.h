@@ -82,11 +82,9 @@ public:
     exprt as_expr() const
     {
       std::vector<exprt> tmp;
-      for(instancest::const_iterator
-          it=instances.begin();
-          it!=instances.end();
-          it++)
-        tmp.push_back(literal_exprt((*it)->cond_literal));
+      tmp.reserve(instances.size());
+      for(const auto &inst : instances)
+        tmp.push_back(literal_exprt(inst->cond_literal));
       return conjunction(tmp);
     }
   };

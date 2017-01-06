@@ -42,10 +42,10 @@ Function: cover_goalst::mark
 void cover_goalst::mark()
 {
   // notify observers
-  for(const auto & o : observers)
+  for(const auto &o : observers)
     o->satisfying_assignment();
 
-  for(auto & g : goals)
+  for(auto &g : goals)
     if(g.status==goalt::statust::UNKNOWN &&
        prop_conv.l_get(g.condition).is_true())
     {
@@ -53,7 +53,7 @@ void cover_goalst::mark()
       _number_covered++;
 
       // notify observers
-      for(const auto & o : observers)
+      for(const auto &o : observers)
         o->goal_covered(g);
     }
 }

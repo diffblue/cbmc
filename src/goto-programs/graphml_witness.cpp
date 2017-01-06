@@ -117,7 +117,7 @@ std::string graphml_witnesst::convert_assign_rec(
 
     exprt::operandst::const_iterator it=
       assign.rhs().operands().begin();
-    for(const auto & comp : components)
+    for(const auto &comp : components)
     {
       if(comp.type().id()==ID_code ||
          comp.get_is_padding() ||

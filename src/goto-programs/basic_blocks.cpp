@@ -33,11 +33,8 @@ void basic_blocks(goto_programt &goto_program,
       i_it!=goto_program.instructions.end();
       i_it++)
     if(i_it->is_goto())
-      for(goto_programt::instructiont::targetst::iterator
-          t_it=i_it->targets.begin();
-          t_it!=i_it->targets.end();
-          t_it++)
-        targets.insert(*t_it);
+      for(const auto &target : i_it->targets)
+        targets.insert(target);
 
   // Scan program
   for(goto_programt::instructionst::iterator

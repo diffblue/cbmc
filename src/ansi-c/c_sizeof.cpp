@@ -122,14 +122,11 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
 
     mp_integer bit_field_width=0;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : components)
     {
-      const typet &sub_type=ns.follow(it->type());
+      const typet &sub_type=ns.follow(comp.type());
 
-      if(it->get_bool(ID_is_type))
+      if(comp.get_bool(ID_is_type))
       {
       }
       else if(sub_type.id()==ID_code)
@@ -163,15 +160,12 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    for(union_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : components)
     {
-      if(it->get_bool(ID_is_type) || it->type().id()==ID_code)
+      if(comp.get_bool(ID_is_type) || comp.type().id()==ID_code)
         continue;
 
-      const typet &sub_type=it->type();
+      const typet &sub_type=comp.type();
 
       exprt tmp;
 
@@ -285,12 +279,9 @@ exprt c_sizeoft::c_offsetof(
 
   mp_integer bit_field_width=0;
 
-  for(struct_typet::componentst::const_iterator
-      it=components.begin();
-      it!=components.end();
-      it++)
+  for(const auto &comp : components)
   {
-    if(it->get_name()==component_name)
+    if(comp.get_name()==component_name)
     {
       // done
       if(bit_field_width!=0)
@@ -298,10 +289,10 @@ exprt c_sizeoft::c_offsetof(
       return dest;
     }
 
-    if(it->get_bool(ID_is_type))
+    if(comp.get_bool(ID_is_type))
       continue;
 
-    const typet &sub_type=ns.follow(it->type());
+    const typet &sub_type=ns.follow(comp.type());
 
     if(sub_type.id()==ID_code)
     {

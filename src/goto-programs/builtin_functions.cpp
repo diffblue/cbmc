@@ -294,7 +294,7 @@ void goto_convertt::do_scanf(
 
       std::size_t argument_number=1;
 
-      for(const auto & t : token_list)
+      for(const auto &t : token_list)
       {
         typet type=get_type(t);
 

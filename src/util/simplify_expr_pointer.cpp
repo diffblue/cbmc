@@ -352,7 +352,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     exprt::operandst ptr_expr;
     exprt::operandst int_expr;
 
-    for(const auto & op : ptr.operands())
+    for(const auto &op : ptr.operands())
     {
       if(op.type().id()==ID_pointer)
         ptr_expr.push_back(op);

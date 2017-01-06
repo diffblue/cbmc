@@ -11,6 +11,7 @@ Author:
 #include <memory>
 
 #include <util/config.h>
+#include <util/options.h>
 #include <util/string2int.h>
 
 #include <goto-programs/remove_function_pointers.h>

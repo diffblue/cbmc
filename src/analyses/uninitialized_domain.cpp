@@ -102,7 +102,7 @@ void uninitialized_domaint::output(
     out << has_values.to_string() << '\n';
   else
   {
-    for(const auto & id : uninitialized)
+    for(const auto &id : uninitialized)
       out << id << '\n';
   }
 }

@@ -42,7 +42,7 @@ class graphmlt:public graph<xml_graph_nodet>
 public:
   inline bool has_node(const std::string &node_name) const
   {
-    for(const auto & n : nodes)
+    for(const auto &n : nodes)
       if(n.node_name==node_name)
         return true;
 

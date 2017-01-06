@@ -235,11 +235,8 @@ void havoc_loopst::havoc_loops()
 {
   // iterate over the (natural) loops in the function
 
-  for(natural_loops_mutablet::loop_mapt::const_iterator
-      l_it=natural_loops.loop_map.begin();
-      l_it!=natural_loops.loop_map.end();
-      l_it++)
-    havoc_loop(l_it->first, l_it->second);
+  for(const auto &loop : natural_loops.loop_map)
+    havoc_loop(loop.first, loop.second);
 }
 
 /*******************************************************************\

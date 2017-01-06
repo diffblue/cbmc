@@ -170,15 +170,12 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
-  for(functionst::const_iterator
-      it=functions.begin();
-      it!=functions.end();
-      it++)
+  for(const auto &fun : functions)
   {
     // call function
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
-    to_code_function_call(t1->code).function()=it->symbol_expr;
+    to_code_function_call(t1->code).function()=fun.symbol_expr;
 
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
@@ -188,12 +185,12 @@ void remove_virtual_functionst::remove_virtual_function(
     if(this_expr.type().id()!=ID_pointer ||
        this_expr.type().id()!=ID_struct)
     {
-      symbol_typet symbol_type(it->class_id);
+      symbol_typet symbol_type(fun.class_id);
       this_expr=typecast_exprt(this_expr, pointer_typet(symbol_type));
     }
 
     exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
-    exprt c_id1=constant_exprt(it->class_id, string_typet());
+    exprt c_id1=constant_exprt(fun.class_id, string_typet());
     exprt c_id2=build_class_identifier(deref);
 
     goto_programt::targett t4=new_code_gotos.add_instruction();
@@ -251,7 +248,7 @@ void remove_virtual_functionst::get_functions(
   std::vector<irep_idt> children=
     class_hierarchy.get_children_trans(class_id);
 
-  for(const auto & child : children)
+  for(const auto &child : children)
   {
     exprt method=get_method(child, component_name);
     if(method.is_not_nil())

@@ -511,19 +511,16 @@ Function: clobber_parse_optionst::report_properties
 void clobber_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
-  for(path_searcht::property_mapt::const_iterator
-      it=property_map.begin();
-      it!=property_map.end();
-      it++)
+  for(const auto &prop_pair : property_map)
   {
     if(get_ui()==ui_message_handlert::XML_UI)
     {
       xmlt xml_result("result");
-      xml_result.set_attribute("claim", id2string(it->first));
+      xml_result.set_attribute("claim", id2string(prop_pair.first));
 
       std::string status_string;
 
-      switch(it->second.status)
+      switch(prop_pair.second.status)
       {
       case path_searcht::PASS: status_string="OK"; break;
       case path_searcht::FAIL: status_string="FAILURE"; break;
@@ -536,9 +533,9 @@ void clobber_parse_optionst::report_properties(
     }
     else
     {
-      status() << "[" << it->first << "] "
-               << it->second.description << ": ";
-      switch(it->second.status)
+      status() << "[" << prop_pair.first << "] "
+               << prop_pair.second.description << ": ";
+      switch(prop_pair.second.status)
       {
       case path_searcht::PASS: status() << "OK"; break;
       case path_searcht::FAIL: status() << "FAILED"; break;
@@ -548,8 +545,8 @@ void clobber_parse_optionst::report_properties(
     }
 
     if(cmdline.isset("show-trace") &&
-       it->second.status==path_searcht::FAIL)
-      show_counterexample(it->second.error_trace);
+       prop_pair.second.status==path_searcht::FAIL)
+      show_counterexample(prop_pair.second.error_trace);
   }
 
   if(!cmdline.isset("property"))
@@ -558,11 +555,8 @@ void clobber_parse_optionst::report_properties(
 
     unsigned failed=0;
 
-    for(path_searcht::property_mapt::const_iterator
-        it=property_map.begin();
-        it!=property_map.end();
-        it++)
-      if(it->second.status==path_searcht::FAIL)
+    for(const auto &prop_pair : property_map)
+      if(prop_pair.second.status==path_searcht::FAIL)
         failed++;
 
     status() << "** " << failed

@@ -152,11 +152,8 @@ void counterexample_beautificationt::operator()(
     prop_minimizet prop_minimize(bv_cbmc);
     prop_minimize.set_message_handler(bv_cbmc.get_message_handler());
 
-    for(guard_countt::const_iterator
-        it=guard_count.begin();
-        it!=guard_count.end();
-        it++)
-      prop_minimize.objective(it->first, it->second);
+    for(const auto &g : guard_count)
+      prop_minimize.objective(g.first, g.second);
 
     // minimize
     prop_minimize();

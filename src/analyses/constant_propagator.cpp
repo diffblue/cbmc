@@ -341,12 +341,9 @@ void constant_propagator_domaint::valuest::output(
   if(is_bottom)
     out << "  bottom\n";
 
-  for(replace_symbolt::expr_mapt::const_iterator
-        it=replace_const.expr_map.begin();
-      it!=replace_const.expr_map.end();
-      ++it)
-    out << ' ' << it->first << "=" <<
-      from_expr(ns, "", it->second) << '\n';
+  for(const auto &replace_pair : replace_const.expr_map)
+    out << ' ' << replace_pair.first << "="
+        << from_expr(ns, "", replace_pair.second) << '\n';
 }
 
 /*******************************************************************\
@@ -401,7 +398,7 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
   for(replace_symbolt::expr_mapt::const_iterator
         it=replace_const.expr_map.begin();
       it!=replace_const.expr_map.end();
-      )
+      ) // no it++
   {
     if(src.replace_const.expr_map.find(it->first) ==
        src.replace_const.expr_map.end())
@@ -413,20 +410,17 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     else ++it;
   }
 
-  for(replace_symbolt::expr_mapt::const_iterator
-      it=src.replace_const.expr_map.begin();
-      it!=src.replace_const.expr_map.end();
-      ++it)
+  for(const auto &src_replace_pair : src.replace_const.expr_map)
   {
-    replace_symbolt::expr_mapt::iterator
-      c_it = replace_const.expr_map.find(it->first);
+    replace_symbolt::expr_mapt::iterator c_it=
+      replace_const.expr_map.find(src_replace_pair.first);
 
-    if(c_it != replace_const.expr_map.end())
+    if(c_it!=replace_const.expr_map.end())
     {
       // values are different, set to top
-      if(c_it->second != it->second)
+      if(c_it->second!=src_replace_pair.second)
       {
-        changed = set_to_top(it->first);
+        changed=set_to_top(src_replace_pair.first);
         assert(changed);
       }
     }
@@ -460,27 +454,24 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
 
   bool changed = false;
 
-  for(replace_symbolt::expr_mapt::const_iterator
-      it=src.replace_const.expr_map.begin();
-      it!=src.replace_const.expr_map.end();
-      ++it)
+  for(const auto &src_replace_pair : src.replace_const.expr_map)
   {
-    replace_symbolt::expr_mapt::iterator
-      c_it = replace_const.expr_map.find(it->first);
+    replace_symbolt::expr_mapt::iterator c_it=
+      replace_const.expr_map.find(src_replace_pair.first);
 
-    if(c_it != replace_const.expr_map.end())
+    if(c_it!=replace_const.expr_map.end())
     {
-      if(c_it->second != it->second)
+      if(c_it->second!=src_replace_pair.second)
       {
         set_to_bottom();
-        changed = true;
+        changed=true;
         break;
       }
     }
     else
     {
-      set_to(it->first, it->second);
-      changed = true;
+      set_to(src_replace_pair.first, src_replace_pair.second);
+      changed=true;
     }
   }
 

@@ -492,18 +492,12 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
 
     unsigned offset=0;
 
-    const struct_typet::componentst &components=
-      struct_type.components();
-
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &comp : struct_type.components())
     {
-      if(it->get_name()==component_name)
+      if(comp.get_name()==component_name)
         break;
 
-      offset+=get_size(it->type());
+      offset+=get_size(comp.type());
     }
 
     return evaluate_address(expr.op0())+offset;

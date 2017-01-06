@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "escape_analysis.h"
 
-#include <iostream>
-
 /*******************************************************************\
 
 Function: escape_domaint::is_tracked
@@ -119,11 +117,9 @@ void escape_domaint::assign_lhs_aliases(
 
       aliases.isolate(identifier);
 
-      for(std::set<irep_idt>::const_iterator it=alias_set.begin();
-          it!=alias_set.end();
-          it++)
+      for(const auto &alias : alias_set)
       {
-        aliases.make_union(identifier, *it);
+        aliases.make_union(identifier, alias);
       }
     }
   }
@@ -195,11 +191,9 @@ void escape_domaint::get_rhs_aliases(
       irep_idt identifier=symbol_expr.get_identifier();
       alias_set.insert(identifier);
 
-      for(aliasest::const_iterator it=aliases.begin();
-          it!=aliases.end();
-          it++)
-        if(aliases.same_set(*it, identifier))
-          alias_set.insert(*it);
+      for(const auto &alias : aliases)
+        if(aliases.same_set(alias, identifier))
+          alias_set.insert(alias);
     }
   }
   else if(rhs.id()==ID_if)
@@ -329,10 +323,9 @@ void escape_domaint::transform(
               std::set<irep_idt> lhs_set;
               get_rhs_aliases(lhs, lhs_set);
 
-              for(std::set<irep_idt>::const_iterator
-                  l_it=lhs_set.begin(); l_it!=lhs_set.end(); l_it++)
+              for(const auto &lhs : lhs_set)
               {
-                cleanup_map[*l_it].cleanup_functions.insert(cleanup_function);
+                cleanup_map[lhs].cleanup_functions.insert(cleanup_function);
               }
             }
           }
@@ -372,16 +365,11 @@ void escape_domaint::output(
     return;
   }
 
-  for(cleanup_mapt::const_iterator it=cleanup_map.begin();
-      it!=cleanup_map.end();
-      it++)
+  for(const auto &cleanup : cleanup_map)
   {
-    out << it->first << ':';
-    for(std::set<irep_idt>::const_iterator
-        c_it=it->second.cleanup_functions.begin();
-        c_it!=it->second.cleanup_functions.end();
-        c_it++)
-      out << ' ' << *c_it;
+    out << cleanup.first << ':';
+    for(const auto &id : cleanup.second.cleanup_functions)
+      out << ' ' << id;
     out << '\n';
   }
 
@@ -435,12 +423,10 @@ bool escape_domaint::merge(
 
   bool changed=false;
 
-  for(cleanup_mapt::const_iterator b_it=b.cleanup_map.begin();
-      b_it!=b.cleanup_map.end();
-      b_it++)
+  for(const auto &cleanup : b.cleanup_map)
   {
-    const std::set<irep_idt> &b_cleanup=b_it->second.cleanup_functions;
-    std::set<irep_idt> &a_cleanup=cleanup_map[b_it->first].cleanup_functions;
+    const std::set<irep_idt> &b_cleanup=cleanup.second.cleanup_functions;
+    std::set<irep_idt> &a_cleanup=cleanup_map[cleanup.first].cleanup_functions;
     unsigned old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size) changed=true;
@@ -514,12 +500,9 @@ void escape_domaint::check_lhs(
 
       unsigned count=0;
 
-      for(aliasest::const_iterator
-          a_it=aliases.begin();
-          a_it!=aliases.end();
-          a_it++)
+      for(const auto &alias : aliases)
       {
-        if(*a_it!=identifier && aliases.same_set(*a_it, identifier))
+        if(alias!=identifier && aliases.same_set(alias, identifier))
           count+=1;
       }
 
@@ -556,11 +539,9 @@ void escape_analysist::insert_cleanup(
 {
   source_locationt source_location=location->source_location;
 
-  for(std::set<irep_idt>::const_iterator c_it=cleanup_functions.begin();
-      c_it!=cleanup_functions.end();
-      c_it++)
+  for(const auto &cleanup : cleanup_functions)
   {
-    symbol_exprt function=ns.lookup(*c_it).symbol_expr();
+    symbol_exprt function=ns.lookup(cleanup).symbol_expr();
     const code_typet &function_type=to_code_type(function.type());
 
     goto_function.body.insert_before_swap(location);
@@ -645,11 +626,17 @@ void escape_analysist::instrument(
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
           insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions2, false, ns);
 
-          for(unsigned i=0; i<cleanup_functions1.size(); i++)
+          for(const auto &c : cleanup_functions1)
+          {
+            (void)c;
             i_it++;
+          }
 
-          for(unsigned i=0; i<cleanup_functions2.size(); i++)
+          for(const auto &c : cleanup_functions2)
+          {
+            (void)c;
             i_it++;
+          }
         }
         break;
 

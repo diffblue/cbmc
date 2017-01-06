@@ -43,12 +43,9 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
   if(!instruction.targets.empty())
   {
     irept &tgts=irep.add(ID_targets);
-    for(goto_programt::targetst::const_iterator it=
-          instruction.targets.begin();
-        it!=instruction.targets.end();
-        it++)
+    for(const auto &target : instruction.targets)
     {
-      irept t(std::to_string((*it)->location_number));
+      irept t(std::to_string(target->location_number));
       tgts.move_to_sub(t);
     }
   }
@@ -58,12 +55,9 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
     irept &lbls = irep.add(ID_labels);
     irept::subt &subs = lbls.get_sub();
     subs.reserve(instruction.labels.size());
-    for(goto_programt::instructiont::labelst::const_iterator it=
-          instruction.labels.begin();
-        it!=instruction.labels.end();
-        it++)
+    for(const auto &label : instruction.labels)
     {
-      subs.push_back(irept(*it));
+      subs.push_back(irept(label));
     }
   }
 }
@@ -95,12 +89,8 @@ void convert(
 
   const irept &lbls=irep.find(ID_labels);
   const irept::subt &lsubs=lbls.get_sub();
-  for (irept::subt::const_iterator it=lsubs.begin();
-       it!=lsubs.end();
-       it++)
-  {
-    instruction.labels.push_back(it->id());
-  }
+  for(const auto &lsub : lsubs)
+    instruction.labels.push_back(lsub.id());
 }
 
 /*******************************************************************\
@@ -119,10 +109,7 @@ void convert( const goto_programt &program, irept &irep )
 {
   irep.id("goto-program");
   irep.get_sub().reserve(program.instructions.size());
-  for (goto_programt::instructionst::const_iterator it=
-          program.instructions.begin();
-       it!=program.instructions.end();
-       it++)
+  forall_goto_program_instructions(it, program)
   {
     irep.get_sub().push_back(irept());
     convert(*it, irep.get_sub().back());
@@ -161,13 +148,9 @@ void convert( const irept &irep, goto_programt &program )
     number_targets_list.push_back(std::list<unsigned>());
     const irept &targets=it->find(ID_targets);
     const irept::subt &tsubs=targets.get_sub();
-    for (irept::subt::const_iterator tit=tsubs.begin();
-         tit!=tsubs.end();
-         tit++)
-    {
+    for (const auto & tsub : tsubs)
       number_targets_list.back().push_back(
-          unsafe_string2unsigned(tit->id_string()));
-    }
+          unsafe_string2unsigned(tsub.id_string()));
   }
 
   program.compute_location_numbers();
@@ -180,14 +163,12 @@ void convert( const irept &irep, goto_programt &program )
       lit!=program.instructions.end() && nit!=number_targets_list.end();
       lit++, nit++)
   {
-    for (std::list<unsigned>::iterator tit=nit->begin();
-         tit!=nit->end();
-         tit++)
+    for(const unsigned t : *nit)
     {
       goto_programt::targett fit=program.instructions.begin();
       for(;fit!=program.instructions.end();fit++)
       {
-        if (fit->location_number==*tit)
+        if (fit->location_number==t)
         {
           lit->targets.push_back(fit);
           break;

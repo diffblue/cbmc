@@ -155,9 +155,8 @@ static std::string shell_quote(const std::string &src)
 
   result+='"';
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(const char ch : src)
   {
-    const char ch=src[i];
     if(ch=='"') result+='"'; // quotes are doubled
     result+=ch;
   }
@@ -192,9 +191,8 @@ static std::string shell_quote(const std::string &src)
   // the single quotes catch everything but themselves!
   result+='\'';
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(const char ch : src)
   {
-    const char ch=src[i];
     if(ch=='\'') result+="'\\''";
     result+=ch;
   }
@@ -527,23 +525,14 @@ bool c_preprocess_visual_studio(
     command_file << "/D__STDC_IEC_559_COMPLEX__=1" << "\n";
     command_file << "/D__STDC_ISO_10646__=1" << "\n";
 
-    for(std::list<std::string>::const_iterator
-        it=config.ansi_c.defines.begin();
-        it!=config.ansi_c.defines.end();
-        it++)
-      command_file << "/D" << shell_quote(*it) << "\n";
+    for(const auto &define : config.ansi_c.defines)
+      command_file << "/D" << shell_quote(define) << "\n";
 
-    for(std::list<std::string>::const_iterator
-        it=config.ansi_c.include_paths.begin();
-        it!=config.ansi_c.include_paths.end();
-        it++)
-      command_file << "/I" << shell_quote(*it) << "\n";
+    for(const auto &include_path : config.ansi_c.include_paths)
+      command_file << "/I" << shell_quote(include_path) << "\n";
 
-       for(std::list<std::string>::const_iterator
-               it=config.ansi_c.include_files.begin();
-               it!=config.ansi_c.include_files.end();
-               it++)
-         command_file << "/FI" << shell_quote(*it) << "\n";
+    for(const auto &include_file : config.ansi_c.include_files)
+      command_file << "/FI" << shell_quote(include_file) << "\n";
 
     // Finally, the file to be preprocessed
     // (this is already in UTF-8).
@@ -670,29 +659,17 @@ bool c_preprocess_codewarrior(
 
   command="mwcceppc -E -P -D__CPROVER__ -ppopt line -ppopt full";
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.defines.begin();
-      it!=config.ansi_c.defines.end();
-      it++)
-    command+=" -D"+shell_quote(*it);
+  for(const auto &define : config.ansi_c.defines)
+    command+=" -D"+shell_quote(define);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.include_paths.begin();
-      it!=config.ansi_c.include_paths.end();
-      it++)
-    command+=" -I"+shell_quote(*it);
+  for(const auto &include_path : config.ansi_c.include_paths)
+    command+=" -I"+shell_quote(include_path);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.include_files.begin();
-      it!=config.ansi_c.include_files.end();
-      it++)
-    command+=" -include "+shell_quote(*it);
+  for(const auto &include_file : config.ansi_c.include_files)
+    command+=" -include "+shell_quote(include_file);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.preprocessor_options.begin();
-      it!=config.ansi_c.preprocessor_options.end();
-      it++)
-    command+=" "+*it;
+  for(const auto &opt : config.ansi_c.preprocessor_options)
+    command+=" "+opt;
 
   int result;
 
@@ -955,29 +932,17 @@ bool c_preprocess_gcc_clang(
   command += " -D __STDC_IEC_559_COMPLEX__=1";
   command += " -D __STDC_ISO_10646__=1";
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.defines.begin();
-      it!=config.ansi_c.defines.end();
-      it++)
-    command+=" -D"+shell_quote(*it);
+  for(const auto &define : config.ansi_c.defines)
+    command+=" -D"+shell_quote(define);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.include_paths.begin();
-      it!=config.ansi_c.include_paths.end();
-      it++)
-    command+=" -I"+shell_quote(*it);
+  for(const auto &include_path : config.ansi_c.include_paths)
+    command+=" -I"+shell_quote(include_path);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.include_files.begin();
-      it!=config.ansi_c.include_files.end();
-      it++)
-    command+=" -include "+shell_quote(*it);
+  for(const auto &include_file : config.ansi_c.include_files)
+    command+=" -include "+shell_quote(include_file);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.preprocessor_options.begin();
-      it!=config.ansi_c.preprocessor_options.end();
-      it++)
-    command+=" "+*it;
+  for(const auto &opt : config.ansi_c.preprocessor_options)
+    command+=" "+opt;
 
   int result;
 
@@ -1121,17 +1086,11 @@ bool c_preprocess_arm(
   command+=" -D__STDC__";
   //command+=" -D__STDC_VERSION__=199901L";
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.defines.begin();
-      it!=config.ansi_c.defines.end();
-      it++)
-    command+=" "+shell_quote("-D"+*it);
+  for(const auto &define : config.ansi_c.defines)
+    command+=" "+shell_quote("-D"+define);
 
-  for(std::list<std::string>::const_iterator
-      it=config.ansi_c.include_paths.begin();
-      it!=config.ansi_c.include_paths.end();
-      it++)
-    command+=" "+shell_quote("-I"+*it);
+  for(const auto &include_path : config.ansi_c.include_paths)
+    command+=" "+shell_quote("-I"+include_path);
 
   int result;
 

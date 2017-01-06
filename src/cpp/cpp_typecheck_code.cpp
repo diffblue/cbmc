@@ -463,7 +463,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   new_code.reserve_operands(declaration.declarators().size());
 
   // Do the declarators (if any)
-  for(auto & declarator : declaration.declarators())
+  for(auto &declarator : declaration.declarators())
   {
     cpp_declarator_convertert cpp_declarator_converter(*this);
     cpp_declarator_converter.is_typedef=is_typedef;

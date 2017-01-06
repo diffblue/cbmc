@@ -96,10 +96,8 @@ void ansi_c_declarationt::output(std::ostream &out) const
 
   out << "Type: " << type().pretty() << "\n";
 
-  for(declaratorst::const_iterator d_it=declarators().begin();
-      d_it!=declarators().end();
-      d_it++)
-    out << "Declarator: " << d_it->pretty() << "\n";
+  for(const auto &declarator : declarators())
+    out << "Declarator: " << declarator.pretty() << "\n";
 }
 
 /*******************************************************************\

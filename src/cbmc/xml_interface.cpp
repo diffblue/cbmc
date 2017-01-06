@@ -57,13 +57,10 @@ void xml_interfacet::get_xml_options(
   const xmlt &xml,
   cmdlinet &cmdline)
 {
-  for(xmlt::elementst::const_iterator
-      e_it=xml.elements.begin();
-      e_it!=xml.elements.end();
-      e_it++)
+  for(const auto &e : xml.elements)
   {
     // recursive call
-    get_xml_options(*e_it, cmdline);
+    get_xml_options(e, cmdline);
   }
 
   if(xml.name=="valueOption")

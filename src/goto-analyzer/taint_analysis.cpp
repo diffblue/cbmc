@@ -68,7 +68,7 @@ void taint_analysist::instrument(
   const namespacet &ns,
   goto_functionst &goto_functions)
 {
-  for(auto & function : goto_functions.function_map)
+  for(auto &function : goto_functions.function_map)
     instrument(ns, function.second);
 }
 
@@ -126,14 +126,14 @@ void taint_analysist::instrument(
 
             class_hierarchyt::idst parents=
               class_hierarchy.get_parents_trans(class_id);
-            for(const auto & p : parents)
+            for(const auto &p : parents)
               identifiers.insert(id2string(p)+suffix);
           }
 
-          for(const auto & rule : taint.rules)
+          for(const auto &rule : taint.rules)
           {
             bool match=false;
-            for(const auto & i : identifiers)
+            for(const auto &i : identifiers)
               if(i==rule.function_identifier ||
                  has_prefix(id2string(i), "java::"+id2string(rule.function_identifier)+":"))
               {
