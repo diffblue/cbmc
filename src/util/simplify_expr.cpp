@@ -1806,6 +1806,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
             index_exprt(
               result,
               from_integer(offset, expr.offset().type()));
+          result.make_typecast(expr.type());
 
           if(!base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
              result.make_typecast(expr.type());
@@ -1866,7 +1867,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
         simplify_member(expr.op());
         expr.offset()=
           from_integer(offset-m_offset_bits/8, expr.offset().type());
-        simplify_rec(expr.offset());
+        simplify_rec(expr);
 
         return false;
       }
