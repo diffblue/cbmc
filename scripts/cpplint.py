@@ -1547,6 +1547,42 @@ def IsTemplateArgumentList_DB(clean_lines, linenum, pos):
 
     return True
 
+def ForceOpenExpression(clean_lines, linenum, pos, bracket):
+  """Find an opening bracket matching the specified closing bracket
+
+  Search starting at the position for a matching closing bracket of the
+  same type as bracket.
+
+  Args:
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    pos: A position on the line.
+    bracket: The style of bracket to match
+
+  Returns:
+    A tuple (line, linenum, pos) pointer *to* the closing brace, or
+    (line, len(lines), -1) if we never find a close.  Note we ignore
+    strings and comments when matching; and the line we return is the
+    'cleansed' line at linenum.
+  """
+  line = clean_lines.elided[linenum]
+
+  # Check first line
+  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [bracket])
+  if end_pos > -1:
+    return (line, linenum, end_pos)
+
+  # Continue scanning forward
+  while stack and linenum > 0:
+    linenum -= 1
+    line = clean_lines.elided[linenum]
+    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
+    if end_pos > -1:
+      return (line, linenum, end_pos)
+
+  # Did not find end of expression before end of file, give up
+  return (line, clean_lines.NumLines(), -1)
+
 def OpenExpression(clean_lines, linenum, pos):
   """If input points to ) or } or ] or >, finds the position that opens it.
 
@@ -1554,6 +1590,8 @@ def OpenExpression(clean_lines, linenum, pos):
   linenum/pos that correspond to the closing of the expression.
 
   Essentially a mirror of what CloseExpression does
+
+  Calls ForceOpenExpression with the bracket type pointed at
 
   TODO(tkiley): could probably be merged with CloseExpression
 
@@ -1572,22 +1610,9 @@ def OpenExpression(clean_lines, linenum, pos):
   line = clean_lines.elided[linenum]
   if (line[pos] not in ')}]>'):
     return (line, clean_lines.NumLines(), -1)
+  else:
+    return ForceOpenExpression(clean_lines, linenum, pos-1, line[pos])
 
-  # Check first line
-  (end_pos, stack) = FindStartOfExpressionInLine(line, pos , [])
-  if end_pos > -1:
-    return (line, linenum, end_pos)
-
-  # Continue scanning forward
-  while stack and linenum > 0:
-    linenum -= 1
-    line = clean_lines.elided[linenum]
-    (end_pos, stack) = FindStartOfExpressionInLine(line, len(line) - 1, stack)
-    if end_pos > -1:
-      return (line, linenum, end_pos)
-
-  # Did not find end of expression before end of file, give up
-  return (line, clean_lines.NumLines(), -1)
 
 def FindEndOfExpressionInLine(line, startpos, stack):
   """Find the position just after the end of current parenthesized expression.
@@ -3525,15 +3550,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   # Otherwise not.  Note we only check for non-spaces on *both* sides;
   # sometimes people put non-spaces on one side when aligning ='s among
   # many lines (not that this is behavior that I approve of...)
-  match1 = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
-  match2 = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
-  operator_pos, op_end = match1.span(1) if match1 else (-1, -1)
-  operator_pos2, op_end2 = match2.span(1) if match2 else (-1, -1)
+  left_hand_space_match = Search(r'[^\s]+[\s](=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|\^|\+[^\+]|\/)', line)
+  right_hand_space_match = Search(r'(=|>=|<=|==|!=|&=|\^=|\|=|\+=|\*=|\/=|\%=|>|<|!|\^|\+|\/)[\s]', line)
+  operator_pos, op_end = left_hand_space_match.span(1) if left_hand_space_match else (-1, -1)
+  operator_pos2, op_end2 = right_hand_space_match.span(1) if right_hand_space_match else (-1, -1)
 
-  if match2 and match2.group(1) == '>':
-    res = IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)
-
-  if (match1 and
+  if (left_hand_space_match and
     not Search(r'<<', line) and # We ignore the left shift operator since might be a stream and then formatting rules go out of the window
     not Search(r'char \*', line) and # I don't know why this exception exists?
     not Search(r'\#include', line) and # I suppose file names could contains operators??
@@ -3545,12 +3567,12 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
 #      and not Search(r'operator=', line)):
     error(filename, linenum, 'whitespace/operators', 4,
 #          'Missing spaces around =')
-          'Remove spaces around %s' % match1.group(1))
-  elif (match2 and
+          'Remove spaces around %s' % left_hand_space_match.group(1))
+  elif (right_hand_space_match and
     not Search(r'<<', line) and
     not IsTemplateArgumentList_DB(clean_lines, linenum, operator_pos2)):
     error(filename, linenum, 'whitespace/operators', 4,
-          'Remove spaces around %s' % match2.group(0))
+          'Remove spaces around %s' % right_hand_space_match.group(0))
 
 # these would cause too many false alarms if we checked for one-sided spaces only
   match = Search(r'\s(-|\*)(\s|$)', line)
@@ -3562,10 +3584,16 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   if Search(r'(struct|class)\s[\w_]*\s+:', line):
     error(filename, linenum, 'readability/identifiers', 4, 'There shouldn\'t be a space between class identifier and :')
 
-#check type definitions end with t
-  if Search(r'(struct|class)\s[\w_]*[^t^;^:^\s](;$|\s|:|$)', line) and not Search(r'^template <', line) and not Search(r'^template<', line):
-    error(filename, linenum, 'readability/identifiers', 4,
-          'Class or struct identifier should end with t')
+  #check type definitions end with t
+  # Look for class declarations and check the final character is a t
+  # Exclude classes in side template argument lists (why?)
+  class_name_match = Search(r'\b(struct|class)\s(?P<class_name>[\w_]+)', line)
+  if class_name_match:
+    class_name = class_name_match.group('class_name')
+    if not class_name.endswith('t'):
+      if not Search(r'\btemplate <', line) and not Search(r'\btemplate<', line):
+        error(filename, linenum, 'readability/identifiers', 4,
+               'Class or struct identifier should end with t')
 
   if Search(r'(struct|class)\s[\w_]*_t(;$|\s|:|$)', line):
     error(filename, linenum, 'readability/identifiers', 4,
@@ -3630,17 +3658,6 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
 #        error(filename, linenum, 'whitespace/operators', 3,
 #              'Missing spaces around >')
 
-  # We allow no-spaces around << when used like this: 10<<20, but
-  # not otherwise (particularly, not when used as streams)
-  #
-  # We also allow operators following an opening parenthesis, since
-  # those tend to be macros that deal with operators.
-  match = Search(r'(operator|[^\s(<])(?:L|UL|LL|ULL|l|ul|ll|ull)?<<([^\s,=<])', line)
-  if (match and not (match.group(1).isdigit() and match.group(2).isdigit()) and
-      not (match.group(1) == 'operator' and match.group(2) == ';')):
-    error(filename, linenum, 'whitespace/operators', 3,
-          'Missing spaces around <<')
-
   # We allow no-spaces around >> for almost anything.  This is because
   # C++11 allows ">>" to close nested templates, which accounts for
   # most cases when ">>" is not followed by a space.
@@ -3663,6 +3680,48 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
   if match:
     error(filename, linenum, 'whitespace/operators', 4,
           'Extra space for operator %s' % match.group(1))
+
+def CheckPointerReferenceSpacing(filename, clean_lines, linenum, error):
+  """Checks the */& are attached to variable names rather than types
+
+  A pointer or reference type should have the */& attached to the variable
+  name rather than the type. I.e. a pointer to an int should be:
+
+      int *var_name;
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+
+  # Find types by looking for word_names that are at the start of the line
+  # If there are followed by a * or & (after an optional ' const')
+  # then they appear to be a reference/pointer type with it attached to
+  # the type rather than the variable
+  wrong_type_match = Search(r'^\s*([\w_])+( const)?(?P<type>[&\*])\s*\w', line)
+
+  if wrong_type_match:
+    # This still could be a false positive, we must
+    # check that we are not inside brackets as then could be just be
+    # operators (multiply and logical AND)
+    pos = wrong_type_match.start(1)
+    _, _, opening_pos = ForceOpenExpression(clean_lines, linenum, pos, ')')
+
+    # If we don't find a matching close brace then we aren't in brackets
+    # so can assume this is a type with the * or & attached to it
+    if opening_pos == -1:
+      op_type = wrong_type_match.group('type')
+      op_word = ""
+      if op_type == '*':
+        op_word = 'Pointer'
+      else:
+        op_word = 'Reference'
+      error(filename, linenum, 'whitespace/operators', 4,
+        op_word + ' type name must have ' + op_type + ' attached to the type name')
+
 
 
 def CheckParenthesisSpacing(filename, clean_lines, linenum, error):
@@ -4679,6 +4738,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   CheckAccess(filename, clean_lines, linenum, nesting_state, error)
   CheckSpacing(filename, clean_lines, linenum, nesting_state, error)
   CheckOperatorSpacing(filename, clean_lines, linenum, error)
+  CheckPointerReferenceSpacing(filename, clean_lines, linenum, error)
   CheckParenthesisSpacing(filename, clean_lines, linenum, error)
   CheckCommaSpacing(filename, clean_lines, linenum, error)
   CheckBracesSpacing(filename, clean_lines, linenum, nesting_state, error)
@@ -5088,8 +5148,7 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
       break
     if not is_const:
       error(filename, linenum, 'runtime/arrays', 1,
-            'Do not use variable-length arrays.  Use an appropriately named '
-            "('k' followed by CamelCase) compile-time constant for the size.")
+            'Do not use variable-length arrays.')
 
   # Check for use of unnamed namespaces in header files.  Registration
   # macros are typically OK, so we allow use of "namespace {" on lines

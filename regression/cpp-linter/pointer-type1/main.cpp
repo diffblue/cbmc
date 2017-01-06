@@ -20,15 +20,18 @@ Function: fun
 
 static void fun()
 {
-  status() << "Adding CPROVER library (" << eom;
+  bool *x=nullptr; // Valid
+  bool* x=nullptr; // Invalid
 
-  int x = 1<<4;
+  int &x=nullptr; // Valid
+  int& x=nullptr; // Invalid
 
-  // Ideally this should produce an error, see operator-spacing3
-  status()<<"Adding CPROVER library ("<<eom;
+  int y=at*bt; // Valid
 
-  // Ideally this should produce an error, see operator-spacing3
-  int x = 1 << 4;
-
-  int y = a<<b;
+  // Probably valid - could be a pointer to type yt or a
+  // variable called yt multilied by z. Would have to know
+  // it is a function call rather than a function declaration
+  foo(
+    x,
+    yt*z);
 }
