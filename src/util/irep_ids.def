@@ -841,6 +841,11 @@ IREP_ID_ONE(statement_list_instructions)
 IREP_ID_ONE(max)
 IREP_ID_ONE(min)
 IREP_ID_ONE(constant_interval)
+// dynamic objects get created during symbolic execution, but need
+// not ever exist on any feasible path; use ID_C_dynamic_guard to
+// store the path condition corresponding to the creation of a
+// dynamic object
+IREP_ID_TWO(C_dynamic_guard, #dynamic_guard)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
