@@ -285,14 +285,22 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         {
           irep_idt identifier=it->lhs_object.get_identifier();
 
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "assumption");
-          code_assignt assign(it->lhs_object, it->lhs_object_value);
-          val.data=convert_assign_rec(identifier, assign);
+          if(id2string(it->lhs_object.get_identifier()).find('$')==
+             std::string::npos &&
+             (!it->lhs_object_value.is_constant() ||
+              !it->lhs_object_value.has_operands() ||
+              !has_prefix(id2string(it->lhs_object_value.op0().get(ID_value)),
+                          "INVALID-")))
+          {
+            xmlt &val=edge.new_element("data");
+            val.set_attribute("key", "assumption");
+            code_assignt assign(it->lhs_object, it->lhs_object_value);
+            val.data=convert_assign_rec(identifier, assign);
 
-          xmlt &val_s=edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          val_s.data=id2string(it->pc->source_location.get_function());
+            xmlt &val_s=edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            val_s.data=id2string(it->pc->source_location.get_function());
+          }
         }
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())
