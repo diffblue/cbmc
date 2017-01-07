@@ -715,6 +715,7 @@ std::string expr2ct::convert_struct_type(
   if(tag!="")
     dest+=" "+id2string(tag);
 
+#if 0
   if(inc_struct_body)
   {
     dest+=" {";
@@ -737,6 +738,7 @@ std::string expr2ct::convert_struct_type(
 
     dest+=" }";
   }
+#endif
 
   dest+=declarator;
 
