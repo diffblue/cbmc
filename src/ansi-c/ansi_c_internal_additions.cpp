@@ -281,7 +281,7 @@ void ansi_c_internal_additions(std::string &code)
     if(config.ansi_c.long_int_width>=64)
     {
       code+="typedef signed __int128 __int128_t;\n"
-            "typedef signed __int128 __uint128_t;\n";
+            "typedef unsigned __int128 __uint128_t;\n";
     }
   }
 
