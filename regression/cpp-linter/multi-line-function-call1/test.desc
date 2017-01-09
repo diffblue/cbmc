@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^main\.cpp:29:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
+^main\.cpp:34:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
+^main\.cpp:43:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
+^main\.cpp:48:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
+^main\.cpp:57:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
+^main\.cpp:62:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
+^main\.cpp:71:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
+^main\.cpp:76:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
+^Total errors found: 8$
+^EXIT=1$
+^SIGNAL=0$
+--
