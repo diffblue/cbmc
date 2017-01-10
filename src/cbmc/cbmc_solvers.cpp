@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>

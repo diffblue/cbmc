@@ -108,15 +108,17 @@ public:
     solvert *solver;
 
     if(options.get_bool_option("dimacs"))
-      solver = get_dimacs();
+      solver=get_dimacs();
     else if(options.get_bool_option("refine"))
-      solver = get_bv_refinement();
+      solver=get_bv_refinement();
+    else if(options.get_bool_option("string-refine"))
+      solver=get_string_refinement();
     else if(options.get_bool_option("smt1"))
-      solver = get_smt1(get_smt1_solver_type());
+      solver=get_smt1(get_smt1_solver_type());
     else if(options.get_bool_option("smt2"))
-      solver = get_smt2(get_smt2_solver_type());
+      solver=get_smt2(get_smt2_solver_type());
     else
-      solver = get_default();
+      solver=get_default();
 
     return std::unique_ptr<solvert>(solver);
   }
@@ -138,6 +140,7 @@ protected:
   solvert *get_default();
   solvert *get_dimacs();
   solvert *get_bv_refinement();
+  solvert *get_string_refinement();
   solvert *get_smt1(smt1_dect::solvert solver);
   solvert *get_smt2(smt2_dect::solvert solver);
 

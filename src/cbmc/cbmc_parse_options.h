@@ -41,6 +41,7 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
+  "(string-refine)" \
   "(aig)(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
