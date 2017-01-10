@@ -28,12 +28,12 @@ safety_checkert::resultt bmc_incremental_one_loopt::step(
   try
   {
     // We count only new assertions.
-    symex.total_vccs=0;
-    symex.remaining_vccs=0;
+    symex().total_vccs=0;
+    symex().remaining_vccs=0;
 
     // perform symbolic execution
     bool symex_done=
-      symex(
+      symex()(
         symex_state,goto_functions,
         goto_functions.function_map.at(goto_functions.entry_point()).body);
 
@@ -63,7 +63,7 @@ safety_checkert::resultt bmc_incremental_one_loopt::step(
     resultt result=safety_checkert::UNKNOWN;
 
     // any properties to check at all?
-    if(symex.remaining_vccs==0)
+    if(symex().remaining_vccs==0)
     {
       report_success();
       result=safety_checkert::SAFE;
@@ -144,12 +144,12 @@ void bmc_incremental_one_loopt::setup_unwind()
   bmct::setup_unwind();
 
   if(options.get_option("unwind-min")!="")
-    symex.incr_min_unwind=options.get_unsigned_int_option("unwind-min");
+    symex().incr_min_unwind=options.get_unsigned_int_option("unwind-min");
   if(options.get_option("unwind-max")!="")
-    symex.incr_max_unwind=options.get_unsigned_int_option("unwind-max");
-  symex.ignore_assertions=(symex.incr_min_unwind>=2) &&
+    symex().incr_max_unwind=options.get_unsigned_int_option("unwind-max");
+  symex().ignore_assertions=(symex().incr_min_unwind>=2) &&
     options.get_bool_option("ignore-assertions-before-unwind-min");
-  symex.incr_loop_id=options.get_option("incremental-check");
+  symex().incr_loop_id=options.get_option("incremental-check");
 
   status() << "Using incremental mode" << eom;
   prop_conv.set_all_frozen();

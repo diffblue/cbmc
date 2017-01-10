@@ -46,7 +46,6 @@ public:
     symex_ptr(new symex_bmct(ns, new_symbol_table, equation)),
     prop_conv(_prop_conv),
     ui(ui_message_handlert::uit::PLAIN)
-
   {
     symex.constant_propagation=options.get_bool_option("propagation");
     symex.record_coverage=
@@ -75,22 +74,20 @@ public:
   }
 
 protected:
+  // for initialization of derived classes
   bmct(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
-    message_handlert &_message_handler,
     prop_convt& _prop_conv,
-    symex_bmct *_symex_ptr):
+    message_handlert &_message_handler):
     safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
     equation(ns),
-    symex_ptr(_symex_ptr),
+    symex_ptr(NULL),
     prop_conv(_prop_conv),
-    ui(ui_message_handlert::PLAIN),
-    symex(dynamic_cast<symex_bmct &>(*symex_ptr))
+    ui(ui_message_handlert::PLAIN)
   {
-    symex.constant_propagation=options.get_bool_option("propagation");
   }
 
   const optionst &options;
@@ -151,7 +148,12 @@ protected:
   friend class fault_localizationt;
 
 private:
-  symex_bmct &symex;
+  // We cannot use a reference member here
+  // because the initialization sequence would not be clean (Clang complains)
+  symex_bmct &symex()
+  {
+    return dynamic_cast<symex_bmct &>(*symex_ptr);
+  }
 };
 
 #endif // CPROVER_CBMC_BMC_H

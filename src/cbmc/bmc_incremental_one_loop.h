@@ -34,13 +34,14 @@ public:
     bmct(
       _options,
       _symbol_table,
-      _message_handler,
       _prop_conv,
-      new symex_bmc_incremental_one_loopt(
-        ns, new_symbol_table, equation, prop_conv)),
-    goto_functions(_goto_functions),
-    symex(dynamic_cast<symex_bmc_incremental_one_loopt &>(*symex_ptr))
-  {}
+      _message_handler),
+    goto_functions(_goto_functions)
+  {
+    symex_ptr=new symex_bmc_incremental_one_loopt(
+      ns, new_symbol_table, equation, prop_conv);
+    symex().constant_propagation=options.get_bool_option("propagation");
+  }
 
   virtual ~bmc_incremental_one_loopt() {}
 
@@ -63,7 +64,10 @@ protected:
   virtual void setup_unwind();
 
 private:
-  symex_bmc_incremental_one_loopt &symex;
+  symex_bmc_incremental_one_loopt &symex()
+  {
+    return dynamic_cast<symex_bmc_incremental_one_loopt &>(*symex_ptr);
+  }
 };
 
 #endif
