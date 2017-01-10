@@ -122,6 +122,8 @@ C++ features:
 - We allow to use 3rd-party libraries directly. 
   No wrapper matching the coding rules is required. 
   Allowed libraries are: STL. 
+- When throwing, omit the brackets, i.e. `throw "error"`.
+- Error messages should start with a lower case letter.
 - Use the auto keyword if and only if one of the following
   - The type is explictly repeated on the RHS (e.g. a constructor call)
   - Adding the type will increase confusion (e.g. iterators, function pointers)
