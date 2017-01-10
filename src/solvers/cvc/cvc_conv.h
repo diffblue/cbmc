@@ -63,6 +63,15 @@ protected:
 
 private:
   void convert_identifier(const std::string &identifier);
+  void convert_typecast_expr(const exprt &expr);
+  void convert_binary_expr(const exprt &expr, const exprt &op);
+  void convert_struct_expr(const exprt &expr);
+  void convert_constant_expr(const exprt &expr);
+  void convert_equality_expr(const exprt &expr);
+  void convert_comparison_expr(const exprt &expr);
+  void convert_plus_expr(const exprt &expr);
+  void convert_minus_expr(const exprt &expr);
+  void convert_with_expr(const exprt &expr);
   void convert_literal(const literalt l);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
