@@ -16,8 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class cvc_convt:public prop_convt
 {
 public:
-  cvc_convt(const namespacet &_ns,
-            std::ostream &_out):
+  cvc_convt(const namespacet &_ns, std::ostream &_out):
     prop_convt(_ns),
     out(_out),
     pointer_logic(_ns),
