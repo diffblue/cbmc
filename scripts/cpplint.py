@@ -3125,7 +3125,7 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
     # Look for declaration function_name( but allowing for *, & being attached to the function name
     # but not being considered part of it
     regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(\w(\w|::)*))\('#
-    operator_regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(|operator\(.*\)|operator.*))\('
+    operator_regexp = r'\w(\w|::|\s|\*|\&)* (\*|\&)?(?P<fnc_name>(\w(\w|::)*::)?(operator\(.*\)|operator.*))\('
     operator_match = Match(operator_regexp, line)
     match_result = Match(regexp, line)
     function_name = ""
