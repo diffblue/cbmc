@@ -37,19 +37,16 @@ IFS=$'\n'
 are_errors=0
 
 for file in $diff_files; do
+  # We build another grep filter the output of the linting script
+  lint_grep_filter="^("
+
+  # Include line 0 errors (e.g. copyright)
+  lint_grep_filter+=$file
+  lint_grep_filter+=":0"
+
   # We first filter only the lines that start with a commit hash
   # Then we filter out the ones that come from the start commit
-  modified_lines=`git blame $git_start..$git_end --line-porcelain $file | grep -E "^[0-9a-f]{40}" | grep -v "$blame_grep_filter"`
-
-  if [ -z "$modified_lines" ]
-  then
-    # No modified lines in this file (perhaps only lines have been deleted)
-    # So we bail on reporting errors on this file
-    continue
-  fi
-
-  # Next we build another grep filter the output of the linting script
-  lint_grep_filter="^("
+  modified_lines=`git blame $git_start..$git_end --line-porcelain $file | grep -E "^[0-9a-f]{40}" | { grep -v "$blame_grep_filter" || true; }`
 
   # For each modified line we find the line number
   for line in $modified_lines; do
@@ -66,13 +63,12 @@ for file in $diff_files; do
 
       # Add the line filter on to the grep expression as we want
       # lines that match any of the line filters
-      lint_grep_filter+=$LINE_FILTER
       lint_grep_filter+="|"
+      lint_grep_filter+=$LINE_FILTER
     fi
   done
 
-  # Knock off the final pipe and add the closing bracket
-  lint_grep_filter=${lint_grep_filter::-1}
+  # Add the closing bracket
   lint_grep_filter+=")"
 
   # Run the linting script and filter by the filter we've build
