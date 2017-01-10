@@ -8,13 +8,14 @@ Date:   December 2016
 
 \*******************************************************************/
 
+#include <unordered_set>
+
 #include <analyses/call_graph.h>
 
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/hash_cont.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
@@ -43,7 +44,7 @@ void slice_global_inits(
   const call_grapht::grapht &graph=call_graph.graph;
 
   std::list<irep_idt> worklist;
-  hash_set_cont<irep_idt, irep_id_hash> functions_reached;
+  std::unordered_set<irep_idt, irep_id_hash> functions_reached;
 
   const irep_idt entry_point=goto_functionst::entry_point();
 
@@ -91,7 +92,7 @@ void slice_global_inits(
       }
     }
 
-    hash_set_cont<irep_idt, irep_id_hash> symbols;
+    std::unordered_set<irep_idt, irep_id_hash> symbols;
   };
 
   symbol_collectort visitor;
@@ -111,7 +112,7 @@ void slice_global_inits(
     }
   }
 
-  const hash_set_cont<irep_idt, irep_id_hash> &symbols=visitor.symbols;
+  const std::unordered_set<irep_idt, irep_id_hash> &symbols=visitor.symbols;
 
   // now remove unnecessary initializations
 
