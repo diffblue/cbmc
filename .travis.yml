@@ -36,7 +36,7 @@ matrix:
       compiler: clang
       env: COMPILER=clang++
     - env: NAME="CPP-LINT"
-      script: DIFF=`git diff --name-only master HEAD` && if [ "$DIFF" != "" ]; then python scripts/cpplint.py $DIFF; fi
+      script: scripts/run_lint.sh master HEAD
 
 script:
   - make -C src minisat2-download
