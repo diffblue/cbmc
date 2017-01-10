@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class cvc_propt:virtual public propt
 {
 public:
-  cvc_propt(std::ostream &_out);
+  explicit cvc_propt(std::ostream &_out);
   virtual ~cvc_propt();
 
   virtual void land(literalt a, literalt b, literalt o);
@@ -52,7 +52,8 @@ public:
   virtual tvt l_get(literalt literal) const
   {
     unsigned v=literal.var_no();
-    if(v>=assignment.size()) return tvt(tvt::tv_enumt::TV_UNKNOWN);
+    if(v>=assignment.size())
+      return tvt(tvt::tv_enumt::TV_UNKNOWN);
     tvt r=assignment[v];
     return literal.sign()?!r:r;
   }
