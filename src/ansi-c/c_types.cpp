@@ -636,7 +636,7 @@ Function: gcc_unsigned_int128_type
 
 typet gcc_unsigned_int128_type()
 {
-  typet result=signedbv_typet(128);
+  typet result=unsignedbv_typet(128);
   result.set(ID_C_c_type, ID_unsigned_int128);
   return result;
 }
