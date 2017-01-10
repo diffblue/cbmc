@@ -3152,9 +3152,9 @@ def CheckForFunctionCommentHeaders(filename, raw_lines, error):
             body_found = False
             break
 
-      # body found, i.e. not a declaration
-      if body_found:
-        CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error)
+          # body found, i.e. not a declaration
+          if body_found:
+            CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error)
     linenum += 1
 
 def CheckForFunctionCommentHeader(filename, raw_lines, linenum, function_name, error):
