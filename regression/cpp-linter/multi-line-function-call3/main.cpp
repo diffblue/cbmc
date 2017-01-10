@@ -44,4 +44,12 @@ static void fun()
   {
     do_something();
   }
+
+  // Correct since if statement
+  if(condition_a&&
+    (condition_b||
+      condition_c))
+  {
+    do_something();
+  }
 }

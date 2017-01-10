@@ -4696,7 +4696,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   #  - ignore the line if it is a for/if etc since rules are different
 
   # Look for an opening bracket that doesn't have a semi-colon on the same line
-  bracket_search = Search(r'(?P<bracket>\()[^;]*$', elided_line)
+  bracket_search = Search(r'[\w_]+\s*(?P<bracket>\()[^;]*$', elided_line)
 
   # Exclude the check if any of these keywords are present
   # They could trip us up as they have different formatting rules to functions
