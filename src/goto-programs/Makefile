@@ -24,7 +24,8 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_instanceof.cpp \
       class_identifier.cpp \
       system_library_symbols.cpp \
-
+      string_refine_preprocess.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 
