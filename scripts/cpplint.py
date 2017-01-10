@@ -4696,7 +4696,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   #  - ignore the line if it is a for/if etc since rules are different
 
   # Look for an opening bracket that doesn't have a semi-colon on the same line
-  bracket_search = Search(r'(?P<bracket>\()[^;]*,[^;]*$', elided_line)
+  bracket_search = Search(r'(?P<bracket>\()[^;]*$', elided_line)
 
   # Exclude the check if any of these keywords are present
   # They could trip us up as they have different formatting rules to functions
@@ -4737,6 +4737,10 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
                     'If parameters or arguments require a line break, each parameter should be put on its own line.')
             # Skip to the end of the bracket
             start_linenum = nested_close_linenum
+          else:
+            if(not Match('^\s*[^,]+,$', arg_line)):
+              error(filename, start_linenum, 'whitespace/indent', 4,
+                    'If parameters or arguments require a line break, each parameter should be put on its own line.')
 
           start_linenum+=1
         # For the final line we also need to check one parameter on it

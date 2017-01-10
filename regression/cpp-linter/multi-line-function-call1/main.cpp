@@ -75,5 +75,14 @@ static void fun()
   var->fun(
       x,
       y);
+
+  // Incorrect
+  fun(
+    x, y);
+
+  // Incorrect
+  fun(
+    x, y,
+    z);
 }
 

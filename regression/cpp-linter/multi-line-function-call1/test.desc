@@ -9,7 +9,9 @@ main.cpp
 ^main\.cpp:62:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
 ^main\.cpp:71:  If parameters or arguments require a line break, each parameter should be put on its own line\.  \[whitespace/indent\] \[4\]
 ^main\.cpp:76:  Indent of wrapped parenthesized expression or parameter or argument list should be 2  \[whitespace/indent\] \[4\]
-^Total errors found: 8$
+^main\.cpp:81:  If parameters or arguments require a line break, the closing bracket should be on the same line as the final parameter  \[whitespace/indent\] \[4\]
+^main\.cpp:85:  If parameters or arguments require a line break, each parameter should be put on its own line.  \[whitespace/indent\] \[4\]
+^Total errors found: 10$
 ^EXIT=1$
 ^SIGNAL=0$
 --
