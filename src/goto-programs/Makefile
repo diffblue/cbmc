@@ -16,7 +16,8 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_returns.cpp osx_fat_reader.cpp remove_complex.cpp \
       goto_trace.cpp xml_goto_trace.cpp vcd_goto_trace.cpp \
       graphml_witness.cpp remove_virtual_functions.cpp \
-      class_hierarchy.cpp show_goto_functions.cpp get_goto_model.cpp
+      class_hierarchy.cpp show_goto_functions.cpp get_goto_model.cpp \
+      slice_global_inits.cpp
 
 INCLUDES= -I ..
 

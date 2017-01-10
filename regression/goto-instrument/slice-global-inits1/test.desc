@@ -1,0 +1,13 @@
+CORE
+main.c
+--slice-global-inits --show-goto-functions
+z = 0;$
+a =
+s2 =
+^EXIT=0$
+^SIGNAL=0$
+--
+x = 0;$
+y = 0;$
+s1 =
+^warning: ignoring

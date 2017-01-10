@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
+#include <goto-programs/slice_global_inits.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -1015,6 +1016,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     nondet_static(ns, goto_functions);
   }
 
+  if(cmdline.isset("slice-global-inits"))
+  {
+    status() << "Slicing away initializations of unused global variables"
+             << eom;
+    slice_global_inits(ns, goto_functions);
+  }
+
   if(cmdline.isset("string-abstraction"))
   {
     status() << "String Abstraction" << eom;
@@ -1371,6 +1379,7 @@ void goto_instrument_parse_optionst::help()
     " --reachability-slice         slice away instructions that can't reach assertions\n"
     " --full-slice                 slice away instructions that don't affect assertions\n"
     " --property id                slice with respect to specific property only\n"
+    " --slice-global-inits         slice away initializations of unused global variables\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n"

@@ -1,6 +1,6 @@
 CORE
 ret.c
-"--escape-analysis --dump-c"
+--escape-analysis --dump-c
 ^EXIT=0$
 ^SIGNAL=0$
 --
