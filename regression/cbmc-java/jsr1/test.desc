@@ -1,0 +1,8 @@
+CORE
+edu/emory/mathcs/backport/java/util/concurrent/ConcurrentHashMap.class
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+\\"statement\\" (\\"jsr\\")
+\\"statement\\" (\\"ret\\")
