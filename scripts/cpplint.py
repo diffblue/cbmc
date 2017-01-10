@@ -4710,7 +4710,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
       # verify that each of the parameters are on separate lines
       if close_linenum != linenum:
         # The first line needs to have no parameters on it
-        if(Search(r'\(.+', elided_line)):
+        if(Search(r'\(+[^\(]+', elided_line)):
           error(filename, linenum, 'whitespace/indent', 4,
                 'If parameters or arguments require a line break, each parameter should be put on its own line.')
 
