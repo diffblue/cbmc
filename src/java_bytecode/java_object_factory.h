@@ -17,7 +17,7 @@ exprt object_factory(
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  int max_nondet_array_length,
+  size_t max_nondet_array_length,
   const source_locationt &);
 
 void gen_nondet_init(
@@ -28,7 +28,7 @@ void gen_nondet_init(
   bool skip_classid = false,
   bool create_dynamic_objects = false,
   bool assume_non_null = false,
-  int max_nondet_array_length = 5);
+  size_t max_nondet_array_length = 5);
 
 exprt get_nondet_bool(const typet&);
 
