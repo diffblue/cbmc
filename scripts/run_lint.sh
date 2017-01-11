@@ -74,7 +74,7 @@ for file in $diff_files; do
   # Run the linting script and filter by the filter we've build
   # of all the modified lines
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=`python scripts/cpplint.py $file 2>&1 | grep -E "$lint_grep_filter"`
+  result=`python scripts/cpplint.py $file 2>&1 | { grep -E "$lint_grep_filter" || true; }`
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
