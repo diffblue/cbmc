@@ -223,6 +223,7 @@ _ERROR_CATEGORIES = [
     'readability/nul',
     'readability/strings',
     'readability/todo',
+    'readability/throw',
     'readability/utf8',
     'readability/function_comment'
     'runtime/arrays',
@@ -5160,6 +5161,20 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
           'Do not use unnamed namespaces in header files.  See '
           'https://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Namespaces'
           ' for more information.')
+
+
+
+  # Check that throw statements don't include the optional bracket
+  # We use raw lines as we want to check the contents of the string too
+  # We require the error message starts with a lower case character
+  raw_line = clean_lines.raw_lines[linenum]
+  if(Match(r'^\s*throw', raw_line)):
+    if(Match(r'^\s*throw\s*\(', raw_line)):
+      error(filename, linenum, 'readability/throw', 4,
+          'Do not include brackets when throwing an error')
+    if(Match(r'\s*throw\s*\(?"[A-Z]', raw_line)):
+      error(filename, linenum, 'readability/throw', 4,
+          'First character of throw error message should be lower case')
 
 
 def CheckGlobalStatic(filename, clean_lines, linenum, error):
