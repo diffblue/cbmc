@@ -11,6 +11,8 @@ Whitespaces:
     - For brackets, break after the bracket
       - In the case of function calls, put each argument on a separate line if
         they do not fit after one line break
+      - Nested function calls do not need to be broken up into separate lines even
+        if the outer function call does.
 - If a method is bigger than 50 lines, break it into parts.
 - Put matching { } into the same column.
 - No spaces around operators (=, +, ==, ...)
