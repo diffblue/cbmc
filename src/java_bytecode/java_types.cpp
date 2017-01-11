@@ -448,7 +448,7 @@ char java_char_from_type(const typet &type)
 
   if(id==ID_signedbv)
   {
-    const unsigned int width(type.get_unsigned_int(ID_width));
+    const size_t width(type.get_unsigned_int(ID_width));
     if(java_int_type().get_unsigned_int(ID_width) == width)
       return 'i';
     else if(java_long_type().get_unsigned_int(ID_width) == width)
@@ -462,7 +462,7 @@ char java_char_from_type(const typet &type)
     return 'c';
   else if(id==ID_floatbv)
   {
-    const unsigned int width(type.get_unsigned_int(ID_width));
+    const size_t width(type.get_unsigned_int(ID_width));
     if(java_float_type().get_unsigned_int(ID_width) == width)
       return 'f';
     else if(java_double_type().get_unsigned_int(ID_width) == width)

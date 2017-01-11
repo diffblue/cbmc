@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
+#include <util/suffix.h>
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
@@ -28,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_entry_point.h"
 #include "java_object_factory.h"
+#include "java_types.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
 
@@ -82,30 +84,75 @@ Function: java_static_lifetime_init
 
 \*******************************************************************/
 
+static bool should_init_symbol(const symbolt& sym)
+{
+  if(sym.type.id()!=ID_code &&
+     sym.is_lvalue &&
+     sym.is_state_var &&
+     sym.is_static_lifetime &&
+     sym.mode==ID_java)
+    return true;
+
+  if(has_prefix(id2string(sym.name),"java::java.lang.String.Literal"))
+    return true;
+
+  return false;
+}
+
 bool java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  unsigned max_nondet_array_length)
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
 
-  // we need to zero out all static variables
+  // we need to zero out all static variables, or nondet-initialize if they're external.
+  // Iterate over a copy of the symtab, as its iterators are invalidated by object_factory:
 
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
-      it++)
+  std::vector<irep_idt> symnames;
+  symnames.reserve(symbol_table.symbols.size());
+  for(const auto& entry : symbol_table.symbols)
+    symnames.push_back(entry.first);
+
+  for(const auto& symname : symnames)
   {
-    if(it->second.type.id()!=ID_code &&
-       it->second.is_lvalue &&
-       it->second.is_state_var &&
-       it->second.is_static_lifetime &&
-       it->second.value.is_not_nil() &&
-       it->second.mode==ID_java)
+    const symbolt& sym=symbol_table.lookup(symname);
+    if(should_init_symbol(sym))
     {
-      code_assignt assignment(it->second.symbol_expr(), it->second.value);
-      code_block.add(assignment);
+      if(sym.value.is_nil() && sym.type!=empty_typet())
+      {
+        bool allow_null=!assume_init_pointers_not_null;
+        if(allow_null)
+        {
+          std::string namestr=id2string(sym.symbol_expr().get_identifier());
+          const std::string suffix="@class_model";
+          // Static '.class' fields are always non-null.
+          if(namestr.size()>=suffix.size() &&
+             namestr.substr(namestr.size()-suffix.size())==suffix)
+            allow_null=false;
+          if(allow_null && has_prefix(
+                             namestr,
+                             "java::java.lang.String.Literal"))
+            allow_null=false;
+        }
+	auto newsym=object_factory(sym.type,
+				   code_block,
+				   allow_null,
+				   symbol_table,
+				   max_nondet_array_length,
+				   source_location);
+	code_assignt assignment(sym.symbol_expr(), newsym);
+	code_block.add(assignment);
+      }
+      else if(sym.value.is_not_nil())
+      {
+	code_assignt assignment(sym.symbol_expr(), sym.value);
+	assignment.add_source_location()=source_location;
+	code_block.add(assignment);
+      }
     }
   }
 
@@ -131,6 +178,11 @@ bool java_static_lifetime_init(
   return false;
 }
 
+static bool is_string_array(const typet& t)
+{
+  typet compare_to=java_type_from_string("[Ljava.lang.String;");
+  return full_eq(t,compare_to);
+}
 
 /*******************************************************************\
 
@@ -147,7 +199,9 @@ Function: java_build_arguments
 exprt::operandst java_build_arguments(
   const symbolt &function,
   code_blockt &init_code,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  bool assume_init_pointers_not_null,
+  unsigned max_nondet_array_length)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -159,13 +213,28 @@ exprt::operandst java_build_arguments(
       param_number<parameters.size();
       param_number++)
   {
-    bool is_this=param_number==0 &&
+    bool is_this=(param_number==0) &&
                  parameters[param_number].get_this();
-    bool allow_null=config.main!="" && !is_this;
+    bool is_default_entry_point=config.main=="";
+    bool is_main=is_default_entry_point;
+    if(!is_main)
+    {
+      bool named_main=has_suffix(config.main,".main");
+      bool has_correct_type=
+        to_code_type(function.type).return_type().id()==ID_empty &&
+        (!to_code_type(function.type).has_this()) &&
+        parameters.size()==1 &&
+        is_string_array(parameters[0].type());
+      is_main=(named_main && has_correct_type);
+    }
+
+    bool allow_null=(!is_main) && (!is_this) && !assume_init_pointers_not_null;
 
     main_arguments[param_number]=
       object_factory(parameters[param_number].type(),
-                     init_code, allow_null, symbol_table);
+                     init_code, allow_null, symbol_table,
+                     max_nondet_array_length,
+                     function.location);
 
     const symbolt &p_symbol=
       symbol_table.lookup(parameters[param_number].get_identifier());
@@ -252,31 +321,16 @@ void java_record_outputs(
   }
 }
 
-/*******************************************************************\
 
-Function: java_entry_point
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool java_entry_point(
+main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,
   const irep_idt &main_class,
   message_handlert &message_handler)
 {
-  // check if the entry point is already there
-  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
-     symbol_table.symbols.end())
-    return false; // silently ignore
+  symbolt symbol;
+  main_function_resultt res;
 
   messaget message(message_handler);
-
-  symbolt symbol; // main function symbol
 
   // find main symbol
   if(config.main!="")
@@ -301,7 +355,10 @@ bool java_entry_point(
       {
         message.error() << "main symbol `" << config.main
                         << "' not found" << messaget::eom;
-        return true;
+        res.main_function=symbol;
+        res.error_found=true;
+        res.stop_convert=true;
+        return res;
       }
       else if(matches.size()==1)
       {
@@ -317,8 +374,10 @@ bool java_entry_point(
           message.error() << "  " << s << '\n';
 
         message.error() << messaget::eom;
-
-        return true;
+        res.main_function=symbol;
+        res.error_found=true;
+        res.stop_convert=true;
+        return res;
       }
     }
     else
@@ -330,10 +389,12 @@ bool java_entry_point(
       {
         message.error() << "main symbol `" << config.main
                         << "' not found" << messaget::eom;
-        return true;
+        res.main_function=symbol;
+        res.error_found=true;
+        res.stop_convert=true;
+        return res;
       }
     }
-
     // function symbol
     symbol=s_it->second;
 
@@ -341,7 +402,10 @@ bool java_entry_point(
     {
       message.error() << "main symbol `" << config.main
                       << "' not a function" << messaget::eom;
-      return true;
+      res.main_function=symbol;
+      res.error_found=true;
+      res.stop_convert=true;
+      return res;
     }
 
     // check if it has a body
@@ -349,7 +413,10 @@ bool java_entry_point(
     {
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
-      return true;
+      res.main_function=symbol;
+      res.error_found=true;
+      res.stop_convert=true;
+      return res;
     }
   }
   else
@@ -359,7 +426,12 @@ bool java_entry_point(
 
     // are we given a main class?
     if(main_class.empty())
-      return false; // silently ignore
+    {
+      res.main_function=symbol;
+      res.error_found=false;
+      res.stop_convert=true;
+      return res; // silently ignore
+    }
 
     std::string entry_method=
       id2string(main_class)+".main";
@@ -382,14 +454,20 @@ bool java_entry_point(
     if(matches.empty())
     {
       // Not found, silently ignore
-      return false;
+      res.main_function=symbol;
+      res.error_found=false;
+      res.stop_convert=true;
+      return res;
     }
 
     if(matches.size()>=2)
     {
       message.error() << "main method in `" << main_class
                       << "' is ambiguous" << messaget::eom;
-      return true; // give up with error, no main
+      res.main_function=symbol;
+      res.error_found=true;
+      res.stop_convert=true;
+      return res;  // give up with error, no main
     }
 
     // function symbol
@@ -400,16 +478,59 @@ bool java_entry_point(
     {
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
-      return true; // give up with error
+      res.main_function=symbol;
+      res.error_found=true;
+      res.stop_convert=true;
+      return res;  // give up with error
     }
   }
+
+  res.main_function=symbol;
+  res.error_found=false;
+  res.stop_convert=false;
+  return res;  // give up with error
+}
+
+/*******************************************************************\
+
+Function: java_entry_point
+
+  Inputs: symbol_table
+          main class
+          message_handler
+          allow pointers in initialization code to be null
+
+ Outputs: true if error occurred on entry point search
+
+ Purpose: find entry point and create initialization code for function
+
+\*******************************************************************/
+
+bool java_entry_point(
+  symbol_tablet &symbol_table,
+  const irep_idt &main_class,
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  size_t max_nondet_array_length)
+{
+  // check if the entry point is already there
+  if(symbol_table.symbols.find(goto_functionst::entry_point())!=
+     symbol_table.symbols.end())
+    return false; // silently ignore
+
+  messaget message(message_handler);
+  main_function_resultt res = get_main_symbol(symbol_table, main_class, message_handler);
+  if(res.stop_convert)
+    return res.stop_convert;
+  symbolt symbol = res.main_function;
 
   assert(!symbol.value.is_nil());
   assert(symbol.type.id()==ID_code);
 
   create_initialize(symbol_table);
 
-  if(java_static_lifetime_init(symbol_table, symbol.location, message_handler))
+  if(java_static_lifetime_init(symbol_table, symbol.location, message_handler,
+			       assume_init_pointers_not_null, max_nondet_array_length))
     return true;
 
   code_blockt init_code;
@@ -460,7 +581,9 @@ bool java_entry_point(
   }
 
   exprt::operandst main_arguments=
-    java_build_arguments(symbol, init_code, symbol_table);
+    java_build_arguments(symbol, init_code, symbol_table,
+                         assume_init_pointers_not_null,
+                         max_nondet_array_length);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);

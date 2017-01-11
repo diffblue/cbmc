@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <string>
+
 #include <util/symbol_table.h>
 #include <util/suffix.h>
 #include <util/config.h>
@@ -39,9 +41,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet& cmd)
   disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   if(cmd.isset("java-max-input-array-length"))
-    max_nondet_array_length=safe_string2int(cmd.get_value("java-max-input-array-length"));
+    max_nondet_array_length=std::stoi(cmd.get_value("java-max-input-array-length"));
   if(cmd.isset("java-max-vla-length"))
-    max_user_array_length=safe_string2int(cmd.get_value("java-max-vla-length"));
+    max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
 }
 
 /*******************************************************************\
@@ -229,11 +231,12 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   java_internal_additions(symbol_table);
 
 
-  std::tuple<symbolt, bool, bool> t = get_main_symbol(symbol_table, main_class, get_message_handler());
-  if(std::get<2>(t))
-    return std::get<1>(t);
+  main_function_resultt res=
+    get_main_symbol(symbol_table, main_class, get_message_handler());
+  if(res.stop_convert)
+    return res.error_found;
 
-  symbolt entry = std::get<0>(t);
+  symbolt entry=res.main_function;
 
   if(java_entry_point(symbol_table,main_class,get_message_handler(),
 		      assume_inputs_non_null,max_nondet_array_length))

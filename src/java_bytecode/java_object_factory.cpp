@@ -37,13 +37,13 @@ class gen_nondet_state {
   code_blockt& init_code;
   std::set<irep_idt> recursion_set;
   bool assume_non_null;
-  int max_nondet_array_length;
+  size_t max_nondet_array_length;
   symbol_tablet& symbol_table;
   namespacet ns;
 
 public:
 
-  gen_nondet_state(code_blockt& ic, bool ann, int mnal, symbol_tablet& st) :
+  gen_nondet_state(code_blockt& ic, bool ann, size_t mnal, symbol_tablet& st) :
     init_code(ic),
     assume_non_null(ann),
     max_nondet_array_length(mnal),
@@ -301,7 +301,7 @@ void gen_nondet_state::gen_nondet_init(
 // Borrowed from java_bytecode_convert.cpp -- todo find a sensible place to factor this.
 static constant_exprt as_number(const mp_integer value, const typet &type)
 {
-  const unsigned int java_int_width(type.get_unsigned_int(ID_width));
+  const size_t java_int_width(type.get_unsigned_int(ID_width));
   const std::string significant_bits(integer2string(value, 2));
   std::string binary_width(java_int_width - significant_bits.length(), '0');
   return constant_exprt(binary_width += significant_bits, type);
@@ -426,7 +426,7 @@ void gen_nondet_init(
   bool skip_classid,
   bool create_dynamic_objects,
   bool assume_non_null,
-  int max_nondet_array_length)
+  size_t max_nondet_array_length)
 {
   gen_nondet_state state(init_code,assume_non_null,max_nondet_array_length,
 			 symbol_table);
@@ -447,7 +447,7 @@ Function: new_tmp_symbol
 
 symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string& prefix)
 {
-  static int temporary_counter=0;
+  static size_t temporary_counter=0;
 
   auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
@@ -497,7 +497,7 @@ exprt object_factory(
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  int max_nondet_array_length,
+  size_t max_nondet_array_length,
   const source_locationt &loc)
 {
   if(type.id()==ID_pointer)
