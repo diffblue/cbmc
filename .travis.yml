@@ -28,17 +28,16 @@ matrix:
             - clang-3.7
       before_install:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.7 90
-      env: COMPILER=clang++-3.7
+      env: COMPILER="clang++-3.7 -stdlib=libc++"
     - os: osx
       compiler: gcc
       env: COMPILER=g++
     - os: osx
       compiler: clang
-      env: COMPILER=clang++
+      env: COMPILER="clang++ -stdlib=libc++"
     - env: NAME="CPP-LINT"
       script: scripts/run_lint.sh master HEAD
 
 script:
   - make -C src minisat2-download
-  - make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
-  - make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
+  - make -C src CXX="$COMPILER" CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
