@@ -12,6 +12,13 @@ then
     exit 1
 fi
 
+if ! [[ -e scripts/cpplint.py ]]
+then
+  echo "Lint script could not be found in the scripts directory"
+  echo "Ensure cpplint.py is inside the scripts directory then run again"
+  exit 1
+fi
+
 git_start=$1
 git_end=$2
 
@@ -74,7 +81,7 @@ for file in $diff_files; do
   # Run the linting script and filter by the filter we've build
   # of all the modified lines
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=`python scripts/cpplint.py $file 2>&1 | grep -E "$lint_grep_filter"`
+  result=`python scripts/cpplint.py $file 2>&1 | { grep -E "$lint_grep_filter" || true; }`
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
