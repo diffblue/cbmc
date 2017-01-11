@@ -12,6 +12,13 @@ then
     exit 1
 fi
 
+if ! [[ -e scripts/cpplint.py ]]
+then
+  echo "Lint script could not be found in the scripts directory"
+  echo "Ensure cpplint.py is inside the scripts directory then run again"
+  exit 1
+fi
+
 git_start=$1
 git_end=$2
 
