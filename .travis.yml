@@ -29,6 +29,7 @@ matrix:
             - libwww-perl
             - clang-3.7
             - libubsan0
+            - libc++-dev
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
@@ -38,7 +39,7 @@ matrix:
       env: COMPILER=g++
     - os: osx
       compiler: clang
-      env: COMPILER="clang++ -stdlib=libc++"
+      env: COMPILER=clang++
     - env: NAME="CPP-LINT"
       script: scripts/run_lint.sh master HEAD || true
 
