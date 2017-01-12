@@ -2,6 +2,8 @@
 
 set -e
 
+script_folder=`dirname $0`
+
 if [[ "$#" -ne 2 ]]
 then
     echo "Script for running the CPP linter only on modified lines."
@@ -12,10 +14,10 @@ then
     exit 1
 fi
 
-if ! [[ -e scripts/cpplint.py ]]
+if ! [[ -e $script_folder/cpplint.py ]]
 then
-  echo "Lint script could not be found in the scripts directory"
-  echo "Ensure cpplint.py is inside the scripts directory then run again"
+  echo "Lint script could not be found in the $script_folder directory"
+  echo "Ensure cpplint.py is inside the $script_folder directory then run again"
   exit 1
 fi
 
@@ -81,7 +83,7 @@ for file in $diff_files; do
   # Run the linting script and filter by the filter we've build
   # of all the modified lines
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=`python scripts/cpplint.py $file 2>&1 | { grep -E "$lint_grep_filter" || true; }`
+  result=`python $script_folder/cpplint.py $file 2>&1 | { grep -E "$lint_grep_filter" || true; }`
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
