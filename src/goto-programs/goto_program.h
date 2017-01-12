@@ -71,4 +71,36 @@ std::string as_string(
   const namespacet &ns,
   const goto_programt::instructiont &);
 
+/*******************************************************************\
+  Class: instruction_iterator_hashert
+
+  Purpose:
+    Function class to get hash of GOTO program instruction iterator
+
+\*******************************************************************/
+class instruction_iterator_hashert
+{
+public:
+  /*******************************************************************\
+    Function: instruction_iterator_hashert::operator()
+
+    Purpose:
+      Hashes iterators based on the memory location of the item pointed
+        to by the iterator
+
+    Inputs:
+      it:
+        An iterator pointing to a GOTO program instruction
+
+    Outputs:
+      A hash value for the iterator
+
+  \*******************************************************************/
+  std::size_t operator() (
+    goto_programt::instructiont::const_targett const it) const
+  {
+    return std::hash<goto_programt::instructiont const*>()(&*it);
+  }
+};
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
