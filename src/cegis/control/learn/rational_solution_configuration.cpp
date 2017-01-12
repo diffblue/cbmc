@@ -1,46 +1,16 @@
 #include <ansi-c/expr2c.h>
 #include <goto-programs/goto_trace.h>
 
-#include <cegis/cegis-util/program_helper.h>
-#include <cegis/learn/constraint_helper.h>
-#include <cegis/learn/insert_counterexample.h>
 #include <cegis/control/value/control_vars.h>
+#include <cegis/control/value/control_solution.h>
 #include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/learn/nondet_solution.h>
-#include <cegis/control/learn/control_symex_learn.h>
+#include <cegis/control/learn/rational_solution_configuration.h>
 
-control_symex_learnt::control_symex_learnt(
-    const control_programt &original_program) :
-    original_program(original_program)
+void rational_solution_configurationt::nondeterminise_solution_configuration(
+    symbol_tablet &st, goto_functionst &gf)
 {
-}
-
-void control_symex_learnt::process(const counterexamplest &counterexamples,
-    const size_t max_solution_size)
-{
-  current_program=original_program;
-  symbol_tablet &st=current_program.st;
-  goto_functionst &gf=current_program.gf;
   nondet_control_solution(st, gf);
-  transform_asserts_to_assumes(gf);
-  const goto_programt::targetst &ce_locs=
-      current_program.counterexample_locations;
-  insert_counterexamples(st, gf, counterexamples, ce_locs);
-  gf.update();
-}
-
-const symbol_tablet &control_symex_learnt::get_symbol_table() const
-{
-  return current_program.st;
-}
-
-const goto_functionst &control_symex_learnt::get_goto_functions() const
-{
-  return current_program.gf;
-}
-
-void control_symex_learnt::set_word_width(const size_t word_width_in_bits) const
-{
 }
 
 namespace
@@ -59,11 +29,12 @@ const struct_exprt &find_solution(const goto_tracet &trace)
 }
 }
 
-void control_symex_learnt::convert(candidatet &current_candidate,
-    const goto_tracet &trace, const size_t max_solution_size) const
+void rational_solution_configurationt::convert(
+    control_solutiont &current_candidate, const goto_tracet &trace,
+    const symbol_tablet &st)
 {
   const struct_exprt &solution=find_solution(trace);
-  const namespacet ns(current_program.st);
+  const namespacet ns(st);
   current_candidate.a=get_a_controller_comp(ns, solution);
   current_candidate.b=get_b_controller_comp(ns, solution);
 }
@@ -84,10 +55,10 @@ void print_array(messaget::mstreamt &os, const array_exprt &array,
 }
 }
 
-void control_symex_learnt::show_candidate(messaget::mstreamt &os,
-    const candidatet &candidate) const
+
+void rational_solution_configurationt::show_candidate(messaget::mstreamt &os,
+    const control_solutiont &candidate, const symbol_tablet &st)
 {
-  const symbol_tablet &st=current_program.st;
   print_array(os, candidate.a, "a", st);
   print_array(os, candidate.b, "b", st);
 }
