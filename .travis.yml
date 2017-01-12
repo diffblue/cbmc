@@ -26,6 +26,7 @@ matrix:
           packages:
             - libwww-perl
             - clang-3.7
+            - libc++-dev
       before_install:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.7 90
       env: COMPILER="clang++-3.7 -stdlib=libc++"
@@ -34,7 +35,7 @@ matrix:
       env: COMPILER=g++
     - os: osx
       compiler: clang
-      env: COMPILER="clang++ -stdlib=libc++"
+      env: COMPILER=clang++
     - env: NAME="CPP-LINT"
       script: scripts/run_lint.sh master HEAD
 
