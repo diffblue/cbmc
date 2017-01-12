@@ -1,7 +1,0 @@
-CORE
-example-a_SCHEMA2_IMPL1.c
---gcc --cegis-control --cegis-statistics --cegis-genetic --cegis-max-size 1 --fixedbv -D _FIXEDBV -D _CONTROL_FLOAT_WIDTH=48
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring

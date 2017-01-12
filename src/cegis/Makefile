@@ -46,7 +46,7 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/genetic/jsa_source_provider.cpp jsa/genetic/dynamic_jsa_test_runner.cpp jsa/genetic/random_jsa_mutate.cpp \
       jsa/genetic/random_jsa_cross.cpp jsa/genetic/jsa_genetic_convert.cpp jsa/genetic/jsa_random.cpp \
       jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \
-      control/facade/control_runner.cpp \
+      control/facade/control_runner.cpp control/facade/rational_solution_configuration.cpp \
       control/preprocessing/control_preprocessing.cpp control/preprocessing/propagate_controller_sizes.cpp \
       control/options/control_program.cpp \
       control/learn/control_symex_learn.cpp control/learn/nondet_solution.cpp \

@@ -1,7 +1,0 @@
-CORE
-example-a_PLANT2_SCHEMA4_IMPL3.c
---gcc --cegis-control --cegis-statistics --cegis-genetic --cegis-max-size 1
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring

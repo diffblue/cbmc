@@ -1,0 +1,1 @@
+struct anonymous3 controller={ .den={ 1.000000, (double)-4.200000e-1f, (double)-3.465000e-1f, (double)-3.915000e-2f }, .den_uncertainty={ 0.000000, 0.000000, 0.000000, 0.000000 }, .den_size=4, .num={ 2.880000e+0, (double)-4.896000e+0f, 2.074000e+0 }, .num_uncertainty={ 0.000000, 0.000000, 0.000000 }, .num_size=3 };

@@ -5,7 +5,6 @@
 #include <cegis/learn/constraint_helper.h>
 #include <cegis/learn/insert_counterexample.h>
 #include <cegis/control/value/control_vars.h>
-#include <cegis/control/value/float_helper.h>
 #include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/learn/nondet_solution.h>
 #include <cegis/control/learn/control_symex_learn.h>
