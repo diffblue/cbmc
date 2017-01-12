@@ -203,3 +203,20 @@ To work with Eclipse, do the following:
 6) Select Project -> Build All
 
 
+CODE COVERAGE
+-------------
+
+Code coverage metrics are provided using gcov and lcov. Ensure that you
+have installed lcov from http://ltp.sourceforge.net/coverage/lcov.php
+note for ubuntu lcov is available in the standard apt-get repos.
+
+To get coverage metrics run the following script from the regression
+directory:
+
+  get_coverage.sh
+
+This will:
+ 1) Rebuild CBMC with gcov enabled
+ 2) Run all the regression tests
+ 3) Collate the coverage metrics
+ 4) Provide an HTML report of the current coverage
