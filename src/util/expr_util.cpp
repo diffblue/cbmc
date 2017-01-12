@@ -236,3 +236,8 @@ if_exprt lift_if(const exprt &src, std::size_t operand_number)
 
   return result;
 }
+
+const exprt &get_underlying_object(const exprt &in)
+{
+  return in.id()!=ID_member ? in : get_underlying_object(in.op0());
+}

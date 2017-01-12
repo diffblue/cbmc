@@ -51,4 +51,6 @@ bool has_subexpr(const exprt &, const irep_idt &);
 /*! lift up an if_exprt one level */
 if_exprt lift_if(const exprt &, std::size_t operand_number);
 
+const exprt &get_underlying_object(const exprt &possible_member);
+
 #endif // CPROVER_UTIL_EXPR_UTIL_H
