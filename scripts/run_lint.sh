@@ -44,6 +44,12 @@ IFS=$'\n'
 are_errors=0
 
 for file in $diff_files; do
+  # If the file has been deleted we don't want to run the linter on it
+  if ! [[ -e $file ]]
+  then
+    continue
+  fi
+
   # We build another grep filter the output of the linting script
   lint_grep_filter="^("
 
