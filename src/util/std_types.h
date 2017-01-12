@@ -810,6 +810,32 @@ public:
     return !p.empty() && p.front().get_this();
   }
 
+  /*******************************************************************\
+    Function: code_typet::get_this
+
+    Purpose:
+      Get the this parameter for the current function type
+
+    Inputs:
+      thisParameter: An output parameter to receive the parametert for
+        the this parameter for the current function
+
+    Outputs:
+      true if the current function type does not have a this parameter
+
+  \*******************************************************************/
+  bool get_this(const parametert *&thisParameter) const
+  {
+    const parameterst &params=parameters();
+    if(params.empty())
+      return true;  // No parameters to function
+    const parametert &possible_fn_this=params.front();
+    if(!possible_fn_this.get_this())
+      return true;  // No this parameter to function
+    thisParameter=&possible_fn_this;
+    return false;
+  }
+
   bool is_KnR() const
   {
     return get_bool(ID_C_KnR);
