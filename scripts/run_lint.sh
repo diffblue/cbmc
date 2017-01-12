@@ -49,7 +49,7 @@ for file in $diff_files; do
 
   # Include line 0 errors (e.g. copyright)
   lint_grep_filter+=$file
-  lint_grep_filter+=":0"
+  lint_grep_filter+=":0:"
 
   # We first filter only the lines that start with a commit hash
   # Then we filter out the ones that come from the start commit
@@ -66,7 +66,7 @@ for file in $diff_files; do
 
       # The format from the linting script is filepath:linenum: [error type]
       # So we build the first bit to filter out relevant lines
-      LINE_FILTER=$file:$LINENUM
+      LINE_FILTER=$file:$LINENUM:
 
       # Add the line filter on to the grep expression as we want
       # lines that match any of the line filters
