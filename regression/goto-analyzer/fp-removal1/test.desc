@@ -3,6 +3,6 @@ main.c
 --show-goto-functions
 
 ^Removing function pointers and virtual functions$
-^\s*IF fp == f2 THEN GOTO 1$
+^\s*f2();
 --
 ^warning: ignoring
