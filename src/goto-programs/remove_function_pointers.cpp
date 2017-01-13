@@ -80,6 +80,26 @@ protected:
       compute_address_taken_functions(s.second.value, address_taken);
   }
 
+private:
+  // These represents our best effors to resolve function pointers more
+  // precisely.
+  // If they suceed they return true and the out parameter will be filled in
+  // appropriately. If they fail, they will return false and the out parameter
+  // will be left untouched.
+  typedef std::list<exprt> functionst;
+
+  bool try_get_precise_call(
+    const exprt &expression, exprt &out_function);
+
+  bool try_get_from_address_of(
+    const exprt &expression, functionst &out_functions);
+
+  bool try_get_call_from_symbol(
+    const exprt &symbol_expr, functionst &out_functions);
+
+  bool try_get_call_from_index(
+    const exprt &index_expr, functionst &out_functions);
+
 };
 
 /*******************************************************************\
@@ -136,6 +156,160 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
   } while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
+}
+
+bool remove_function_pointerst::try_get_precise_call(
+  const exprt &expression,
+  exprt &out_function)
+{
+  if(expression.id()==ID_symbol && expression.type().id()==ID_code)
+  {
+    out_function=to_symbol_expr(expression);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_function_pointerst::try_get_from_address_of(
+  const exprt &expression, functionst &out_functions)
+{
+  if(expression.id()==ID_address_of)
+  {
+    address_of_exprt address_of_expr=to_address_of_expr(expression);
+
+    exprt precise_expr;
+    if(try_get_precise_call(address_of_expr.object(), precise_expr))
+    {
+      out_functions.push_back(precise_expr);
+      return true;
+    }
+    else if(try_get_call_from_symbol(address_of_expr.object(), out_functions))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_function_pointerst::try_get_call_from_symbol(
+  const exprt &symbol_expr, functionst &out_functions)
+{
+  if(symbol_expr.id()==ID_symbol)
+  {
+    const symbolt &symbol=
+      symbol_table.lookup(symbol_expr.get(ID_identifier));
+    exprt looked_up_val=symbol.value;
+    exprt precise_expr;
+    if(try_get_precise_call(looked_up_val, precise_expr))
+    {
+      out_functions.push_back(precise_expr);
+    }
+    else if(try_get_from_address_of(looked_up_val, out_functions))
+    {
+      return true;
+    }
+    else if(try_get_call_from_index(looked_up_val, out_functions))
+    {
+      return true;
+    }
+    else if(try_get_call_from_symbol(looked_up_val, out_functions))
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_function_pointerst::try_get_call_from_index(
+  const exprt &expr, functionst &out_functions)
+{
+  if(expr.id()==ID_index)
+  {
+    index_exprt index_expr=to_index_expr(expr);
+#if 0
+    const exprt &value_expr=index_expr.index();
+    if(value_expr.id()==ID_constant)
+    {
+      // TODO(tkiley): There should be a way of resolving constant indices
+      // to get precisely the right function pointer
+    }
+    else
+#endif
+    {
+      // We don't know what index it is, but we know the value is from the array
+      exprt array_expr=index_expr.array();
+      array_exprt array_val_expr;
+      bool found_array=false;
+      if(array_expr.id()==ID_array)
+      {
+        array_val_expr=to_array_expr(array_expr);
+        found_array=true;
+      }
+      else if(array_expr.id()==ID_symbol)
+      {
+        // Is there some existing code to follow symbols to the real value?
+        const symbolt &array_symbol=
+          symbol_table.lookup(array_expr.get(ID_identifier));
+
+        const exprt &array_value=array_symbol.value;
+        if(array_value.id()==ID_array)
+        {
+          array_val_expr=to_array_expr(array_value);
+          found_array=true;
+        }
+      }
+
+      if(found_array)
+      {
+        for(const exprt &op : array_val_expr.operands())
+        {
+          exprt precise_match;
+          if(try_get_precise_call(op, precise_match))
+          {
+            out_functions.push_back(precise_match);
+          }
+          else if(try_get_from_address_of(op, out_functions))
+          {
+          }
+          else if(try_get_call_from_symbol(op, out_functions))
+          {
+          }
+          else
+          {
+            // return false?
+            // in this case there is an element
+          }
+        }
+
+        return out_functions.size() > 0;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /*******************************************************************\
@@ -364,39 +538,52 @@ void remove_function_pointerst::remove_function_pointer(
 
   const exprt &pointer=function.op0();
 
-  // Is this simple?
-  if(pointer.id()==ID_address_of &&
-     to_address_of_expr(pointer).object().id()==ID_symbol)
+  exprt precise_call;
+  functionst functions;
+  if(try_get_precise_call(pointer, precise_call))
   {
-    to_code_function_call(target->code).function()=
-      to_address_of_expr(pointer).object();
+    to_code_function_call(target->code).function()=precise_call;
     return;
   }
-
-  typedef std::list<exprt> functionst;
-  functionst functions;
-
-  bool return_value_used=code.lhs().is_not_nil();
-
-  // get all type-compatible functions
-  // whose address is ever taken
-  for(const auto &t : type_map)
+  else if(try_get_from_address_of(pointer, functions))
   {
-    // address taken?
-    if(address_taken.find(t.first)==address_taken.end())
-      continue;
 
-    // type-compatible?
-    if(!is_type_compatible(return_value_used, call_type, t.second))
-      continue;
+  }
+  else if(try_get_call_from_symbol(pointer, functions))
+  {
 
-    if(t.first=="pthread_mutex_cleanup")
-      continue;
+  }
+  else if(try_get_call_from_index(pointer, functions))
+  {
 
-    symbol_exprt expr;
-    expr.type()=t.second;
-    expr.set_identifier(t.first);
-    functions.push_back(expr);
+  }
+
+  // if the functions list is still empty we didn't have any luck finding
+  // any valid funcitons (or there are none??)
+  if(functions.size()==0)
+  {
+    bool return_value_used=code.lhs().is_not_nil();
+
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &t : type_map)
+    {
+      // address taken?
+      if(address_taken.find(t.first)==address_taken.end())
+        continue;
+
+      // type-compatible?
+      if(!is_type_compatible(return_value_used, call_type, t.second))
+        continue;
+
+      if(t.first=="pthread_mutex_cleanup")
+        continue;
+
+      symbol_exprt expr;
+      expr.type()=t.second;
+      expr.set_identifier(t.first);
+      functions.push_back(expr);
+    }
   }
 
   // the final target is a skip
