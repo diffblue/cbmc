@@ -82,18 +82,13 @@ protected:
   }
 
 private:
-  // These represents our best effors to resolve function pointers more
-  // precisely.
-  // If they suceed they return true and the out parameter will be filled in
-  // appropriately. If they fail, they will return false and the out parameter
-  // will be left untouched.
   typedef std::list<exprt> functionst;
 
   bool try_get_precise_call(
-    const exprt &expression, exprt &out_function);
+    const exprt &expr, exprt &out_function);
 
   bool try_get_from_address_of(
-    const exprt &expression, functionst &out_functions);
+    const exprt &expr, functionst &out_functions);
 
   bool try_get_call_from_symbol(
     const exprt &symbol_expr, functionst &out_functions);
@@ -165,13 +160,28 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
   return *symbol_ptr;
 }
 
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_precise_call
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a symbol and its value was code.
+          In this case out_function will be the function this is a symbol for.
+
+ Purpose: Find if a symbol is in fact a function that can be used in place
+          of the function pointer
+
+\*******************************************************************/
+
 bool remove_function_pointerst::try_get_precise_call(
-  const exprt &expression,
+  const exprt &expr,
   exprt &out_function)
 {
-  if(expression.id()==ID_symbol && expression.type().id()==ID_code)
+  if(expr.id()==ID_symbol && expr.type().id()==ID_code)
   {
-    out_function=to_symbol_expr(expression);
+    out_function=to_symbol_expr(expr);
   }
   else
   {
@@ -179,12 +189,28 @@ bool remove_function_pointerst::try_get_precise_call(
   }
 }
 
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_from_address_of
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a address_of_exprt and it was able
+          to either pointing to a function or a sybmol. In either of
+          the true cases the out_functions will contain all the functions the
+          address of could be.
+
+ Purpose: Resolve a address of to its real value.
+
+\*******************************************************************/
+
 bool remove_function_pointerst::try_get_from_address_of(
-  const exprt &expression, functionst &out_functions)
+  const exprt &expr, functionst &out_functions)
 {
-  if(expression.id()==ID_address_of)
+  if(expr.id()==ID_address_of)
   {
-    address_of_exprt address_of_expr=to_address_of_expr(expression);
+    address_of_exprt address_of_expr=to_address_of_expr(expr);
 
     exprt precise_expr;
     if(try_get_precise_call(address_of_expr.object(), precise_expr))
@@ -206,6 +232,25 @@ bool remove_function_pointerst::try_get_from_address_of(
     return false;
   }
 }
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_call_from_symbol
+
+  Inputs:
+   symbol_expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a symbol_exprt and it was able
+          to either find a explict function that this points to (in the case
+          where the symbol is a function) or all a set of functions that it
+          could be by following the valu the symbol represents. In either of
+          the true cases the out_functions will contain all the functions the
+          function pointer could point to.
+
+ Purpose: Resolve a symbol to its real value and recursively try and find
+          all posible functions that could be at that position in the array.
+
+\*******************************************************************/
 
 bool remove_function_pointerst::try_get_call_from_symbol(
   const exprt &symbol_expr, functionst &out_functions)
@@ -243,6 +288,25 @@ bool remove_function_pointerst::try_get_call_from_symbol(
   }
 }
 
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_call_from_index
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a index_exprt and it was able
+          to either find a explict function that this points to (in the case
+          where the index is constant) or all the functions within the array
+          that the index is indexing. In either of the true cases the
+          out_functions will contain all the functions the function pointer
+          could point to.
+
+ Purpose: Resolve the index of an array to find all posible functions
+          that could be at that position in the array.
+
+\*******************************************************************/
+
 bool remove_function_pointerst::try_get_call_from_index(
   const exprt &expr, functionst &out_functions)
 {
@@ -275,7 +339,8 @@ bool remove_function_pointerst::try_get_call_from_index(
       }
       else
       {
-        // We don't know what index it is, but we know the value is from the array
+        // We don't know what index it is,
+        // but we know the value is from the array
         for(const exprt &op : array_expr.operands())
         {
           exprt precise_match;
@@ -295,7 +360,6 @@ bool remove_function_pointerst::try_get_call_from_index(
             // in this case there is an element
           }
         }
-
         return out_functions.size() > 0;
       }
     }
@@ -305,6 +369,24 @@ bool remove_function_pointerst::try_get_call_from_index(
     return false;
   }
 }
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_evaluate_index_value
+
+  Inputs:
+   index_expr - The expression of the index of the index expression (e.g.
+                index_exprt::index())
+
+ Outputs: Returns true if was able to find a constant value for the index
+          expression. If true, then out_array_index will be the index within
+          the array that the function pointer is pointing to.
+
+ Purpose: Given an index into an array, resolve, if possible, the index
+          that is being accessed. This deals with symbols and typecasts to
+          constant values.
+
+\*******************************************************************/
 
 bool remove_function_pointerst::try_evaluate_index_value(
   const exprt &index_value_expr, mp_integer &out_array_index)
@@ -339,6 +421,23 @@ bool remove_function_pointerst::try_evaluate_index_value(
     return false;
   }
 }
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_array_from_index
+
+  Inputs:
+   index_expr - The expression of the index in the array
+
+ Outputs: Returns true if was able to find the array associated
+          with the index. If true, then out_array_expr will contain
+          the expression representing the array.
+
+ Purpose: Given an index into an array, resolve the array expression,
+          following symbol expressions through to the actual array
+          expression.
+
+\*******************************************************************/
 
 bool remove_function_pointerst::try_get_array_from_index(
   const index_exprt &index_expr, array_exprt &out_array_expr)
