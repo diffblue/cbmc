@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/arith_tools.h>
 #include <util/replace_expr.h>
 #include <util/expr_util.h>
 #include <util/source_location.h>
@@ -99,6 +100,12 @@ private:
 
   bool try_get_call_from_index(
     const exprt &index_expr, functionst &out_functions);
+
+  bool try_evaluate_index_value(
+    const exprt &index_value_expr, mp_integer &out_array_index);
+
+  bool try_get_array_from_index(
+    const index_exprt &index_expr, array_exprt &out_array_expr);
 
 };
 
@@ -242,42 +249,34 @@ bool remove_function_pointerst::try_get_call_from_index(
   if(expr.id()==ID_index)
   {
     index_exprt index_expr=to_index_expr(expr);
-#if 0
-    const exprt &value_expr=index_expr.index();
-    if(value_expr.id()==ID_constant)
-    {
-      // TODO(tkiley): There should be a way of resolving constant indices
-      // to get precisely the right function pointer
-    }
-    else
-#endif
-    {
-      // We don't know what index it is, but we know the value is from the array
-      exprt array_expr=index_expr.array();
-      array_exprt array_val_expr;
-      bool found_array=false;
-      if(array_expr.id()==ID_array)
-      {
-        array_val_expr=to_array_expr(array_expr);
-        found_array=true;
-      }
-      else if(array_expr.id()==ID_symbol)
-      {
-        // Is there some existing code to follow symbols to the real value?
-        const symbolt &array_symbol=
-          symbol_table.lookup(array_expr.get(ID_identifier));
 
-        const exprt &array_value=array_symbol.value;
-        if(array_value.id()==ID_array)
+    array_exprt array_expr;
+    if(try_get_array_from_index(index_expr, array_expr))
+    {
+      mp_integer value;
+      if(try_evaluate_index_value(index_expr.index(), value))
+      {
+        const exprt &func_expr=array_expr.operands()[integer2size_t(value)];
+        exprt precise_match;
+        if(try_get_precise_call(func_expr, precise_match))
         {
-          array_val_expr=to_array_expr(array_value);
-          found_array=true;
+          out_functions.push_back(precise_match);
+        }
+        else if(try_get_from_address_of(func_expr, out_functions))
+        {
+        }
+        else if(try_get_call_from_symbol(func_expr, out_functions))
+        {
+        }
+        else
+        {
+          return false;
         }
       }
-
-      if(found_array)
+      else
       {
-        for(const exprt &op : array_val_expr.operands())
+        // We don't know what index it is, but we know the value is from the array
+        for(const exprt &op : array_expr.operands())
         {
           exprt precise_match;
           if(try_get_precise_call(op, precise_match))
@@ -299,12 +298,73 @@ bool remove_function_pointerst::try_get_call_from_index(
 
         return out_functions.size() > 0;
       }
-      else
-      {
-        return false;
-      }
     }
+  }
+  else
+  {
+    return false;
+  }
+}
 
+bool remove_function_pointerst::try_evaluate_index_value(
+  const exprt &index_value_expr, mp_integer &out_array_index)
+{
+  if(index_value_expr.id()==ID_constant)
+  {
+    constant_exprt constant_expr=to_constant_expr(index_value_expr);
+    mp_integer array_index;
+    bool errors=to_integer(constant_expr, array_index);
+    if(!errors)
+    {
+      out_array_index=array_index;
+    }
+    return !errors;
+  }
+  else if(index_value_expr.id()==ID_symbol)
+  {
+    // Resolve symbol and try again
+    const symbolt &index_symbol=
+      symbol_table.lookup(index_value_expr.get(ID_identifier));
+
+    return try_evaluate_index_value(index_symbol.value, out_array_index);
+  }
+  else if(index_value_expr.id()==ID_typecast)
+  {
+    // Follow the typecast
+
+    return try_evaluate_index_value(index_value_expr.op0(), out_array_index);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_function_pointerst::try_get_array_from_index(
+  const index_exprt &index_expr, array_exprt &out_array_expr)
+{
+  exprt array_expr=index_expr.array();
+  if(array_expr.id()==ID_array)
+  {
+    out_array_expr=to_array_expr(array_expr);
+    return true;
+  }
+  else if(array_expr.id()==ID_symbol)
+  {
+    // Is there some existing code to follow symbols to the real value?
+    const symbolt &array_symbol=
+      symbol_table.lookup(array_expr.get(ID_identifier));
+
+    const exprt &array_value=array_symbol.value;
+    if(array_value.id()==ID_array)
+    {
+      out_array_expr=to_array_expr(array_value);
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
   else
   {
