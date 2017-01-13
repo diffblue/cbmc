@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+--show-goto-functions
+^Removing function pointers and virtual functions$
+^\s*f3();$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Fails because of the non-trivial index expression can be evaluated
+constantly but isn't

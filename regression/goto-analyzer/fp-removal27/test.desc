@@ -1,0 +1,16 @@
+CORE
+main.c
+--show-goto-functions
+^Removing function pointers and virtual functions$
+^\s*IF fp2 == f1 THEN GOTO 1$
+^\s*IF fp2 == f2 THEN GOTO 2$
+^\s*IF fp2 == f3 THEN GOTO 3$
+^\s*IF fp2 == f4 THEN GOTO 4$
+^\s*IF fp2 == f5 THEN GOTO 5$
+^\s*IF fp2 == f6 THEN GOTO 6$
+^\s*IF fp2 == f7 THEN GOTO 7$
+^\s*IF fp2 == f8 THEN GOTO 8$
+^\s*IF fp2 == f9 THEN GOTO 9$
+^SIGNAL=0$
+--
+^warning: ignoring

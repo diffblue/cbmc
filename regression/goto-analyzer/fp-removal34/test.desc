@@ -1,0 +1,11 @@
+CORE
+main.c
+--show-goto-functions
+
+^Removing function pointers and virtual functions$
+^\s*IF fp_tbl\[(signed long int)i\] == f2 THEN GOTO 1$
+^\s*IF fp_tbl\[(signed long int)i\] == f3 THEN GOTO 2$
+^\s*IF fp_tbl\[(signed long int)i\] == f4 THEN GOTO 3$
+^SIGNAL=0$
+--
+^warning: ignoring
