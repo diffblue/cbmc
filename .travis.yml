@@ -33,7 +33,7 @@ matrix:
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
-      env: COMPILER="clang++-3.7 -stdlib=libc++"
+      env: COMPILER="clang++-3.7 -stdlib=libstdc++"
     - os: osx
       compiler: gcc
       env: COMPILER=g++
