@@ -10,11 +10,11 @@ void f9 (void) { int tk = 9; }
 
 typedef void(*void_fp)(void);
 
-void_fp fp_tbl[] = {f1, f2 ,f3};
+void_fp fp_tbl[] = {f2, f3 ,f4};
 
 // There is a basic check that excludes all functions that aren't used anywhere
 // This ensures that check can't work in this example
-void_fp fp_tbl2[] = {f4, f5 ,f6, f7, f8, f9};
+void_fp fp_tbl2[] = {f1, f5 ,f6, f7, f8, f9};
 
 void func4()
 {
