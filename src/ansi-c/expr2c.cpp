@@ -359,29 +359,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(src);
-
-    std::string dest=q+"struct";
-
-    const irep_idt &tag=struct_type.get_tag();
-    if(tag!="") dest+=" "+id2string(tag);
-    dest+=" {";
-
-    for(struct_typet::componentst::const_iterator
-        it=struct_type.components().begin();
-        it!=struct_type.components().end();
-        it++)
-    {
-      dest+=' ';
-      dest+=convert_rec(it->type(), c_qualifierst(), id2string(it->get_name()));
-      dest+=';';
-    }
-
-    dest+=" }";
-
-    dest+=d;
-
-    return dest;
+    return convert_struct_type(src, q, d);
   }
   else if(src.id()==ID_incomplete_struct)
   {
@@ -517,18 +495,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_array)
   {
-    // The [...] gets attached to the declarator.
-    std::string array_suffix;
-
-    if(to_array_type(src).size().is_nil())
-      array_suffix="[]";
-    else
-      array_suffix="["+convert(to_array_type(src).size())+"]";
-
-    // This won't really parse without declarator.
-    // Note that qualifiers are passed down.
-    return convert_rec(
-      src.subtype(), qualifiers, declarator+array_suffix);
+    return convert_array_type(src, qualifiers, declarator);
   }
   else if(src.id()==ID_incomplete_array)
   {
@@ -704,6 +671,160 @@ std::string expr2ct::convert_rec(
 
     return dest;
   }
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_struct_type
+
+  Inputs:
+          src - the struct type being converted
+          qualifiers - any qualifiers on the type
+          declarator - the declarator on the type
+
+ Outputs: Returns a type declaration for a struct, containing the
+          body of the struct and in that body the padding parameters.
+
+ Purpose: To generate C-like string for defining the given struct
+
+\*******************************************************************/
+std::string expr2ct::convert_struct_type(
+  const typet &src,
+  const std::string &qualifiers_str,
+  const std::string &declarator_str)
+{
+  return convert_struct_type(src, qualifiers_str, declarator_str, true, true);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_struct_type
+
+  Inputs:
+          src - the struct type being converted
+          qualifiers - any qualifiers on the type
+          declarator - the declarator on the type
+          inc_struct_body - when generating the code, should we include
+                            a complete definition of the struct
+          inc_padding_components - should the padding parameters be included
+                                   Note this only makes sense if inc_struct_body
+
+ Outputs: Returns a type declaration for a struct, optionally containing the
+          body of the struct (and in that body, optionally the padding
+          parameters).
+
+ Purpose: To generate C-like string for declaring (or defining) the given struct
+
+\*******************************************************************/
+std::string expr2ct::convert_struct_type(
+  const typet &src,
+  const std::string &qualifiers,
+  const std::string &declarator,
+  bool inc_struct_body,
+  bool inc_padding_components)
+{
+  // Either we are including the body (in which case it makes sense to include
+  // or exclude the parameters) or there is no body so therefore we definitely
+  // shouldn't be including the parameters
+  assert(inc_struct_body || !inc_padding_components);
+
+  const struct_typet &struct_type=to_struct_type(src);
+
+  std::string dest=qualifiers+"struct";
+
+  const irep_idt &tag=struct_type.get_tag();
+  if(tag!="")
+    dest+=" "+id2string(tag);
+
+  if(inc_struct_body)
+  {
+    dest+=" {";
+
+    for(const struct_union_typet::componentt &component :
+      struct_type.components())
+    {
+      // Skip padding parameters unless we including them
+      if(component.get_is_padding() && !inc_padding_components)
+      {
+        continue;
+      }
+
+      dest+=' ';
+      dest+=convert_rec(
+        component.type(),
+        c_qualifierst(),
+        id2string(component.get_name()));
+      dest+=';';
+    }
+
+    dest+=" }";
+  }
+
+  dest+=declarator;
+
+  return dest;
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_array_type
+
+  Inputs:
+          src - The array type to convert
+          qualifier
+          declarator_str
+
+ Outputs: A C-like type declaration of an array
+
+ Purpose: To generate a C-like type declaration of an array. Includes
+          the size of the array in the []
+
+\*******************************************************************/
+
+std::string expr2ct::convert_array_type(
+  const typet &src,
+  const c_qualifierst &qualifiers,
+  const std::string &declarator_str)
+{
+  return convert_array_type(src, qualifiers, declarator_str, true);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_array_type
+
+  Inputs:
+          src - The array type to convert
+          qualifier
+          declarator_str
+          inc_size_if_possible - Should the generated string include
+                                 the size of the array (if it is known).
+
+ Outputs: A C-like type declaration of an array
+
+ Purpose: To generate a C-like type declaration of an array. Optionally
+          can include or exclude the size of the array in the []
+
+\*******************************************************************/
+
+std::string expr2ct::convert_array_type(
+  const typet &src,
+  const c_qualifierst &qualifiers,
+  const std::string &declarator_str,
+  bool inc_size_if_possible)
+{
+  // The [...] gets attached to the declarator.
+  std::string array_suffix;
+
+  if(to_array_type(src).size().is_nil() || !inc_size_if_possible)
+    array_suffix="[]";
+  else
+    array_suffix="["+convert(to_array_type(src).size())+"]";
+
+  // This won't really parse without declarator.
+  // Note that qualifiers are passed down.
+  return convert_rec(
+    src.subtype(), qualifiers, declarator_str+array_suffix);
 }
 
 /*******************************************************************\
@@ -2147,11 +2268,7 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_bool)
   {
-    // C doesn't really have these
-    if(src.is_true())
-      dest="TRUE";
-    else
-      dest="FALSE";
+    dest=convert_constant_bool(src.is_true());
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -2167,11 +2284,7 @@ std::string expr2ct::convert_constant(
 
     if(type.id()==ID_c_bool)
     {
-      // C doesn't really have these
-      if(int_value!=0)
-        dest="TRUE";
-      else
-        dest="FALSE";
+      dest=convert_constant_bool(int_value!=0);
     }
     else if(type==char_type() && type!=signed_int_type() && type!=unsigned_int_type())
     {
@@ -2324,6 +2437,28 @@ std::string expr2ct::convert_constant(
 
 /*******************************************************************\
 
+Function: expr2ct::convert_constant_bool
+
+  Inputs:
+          boolean_value - The value of the constant bool expression
+
+ Outputs: Returns a C-like representation of the boolean value,
+          e.g. TRUE or FALSE.
+
+ Purpose: To get the C-like representation of a given boolean value.
+
+\*******************************************************************/
+std::string expr2ct::convert_constant_bool(bool boolean_value)
+{
+  // C doesn't really have these
+  if(boolean_value)
+    return "TRUE";
+  else
+    return "FALSE";
+}
+
+/*******************************************************************\
+
 Function: expr2ct::convert_struct
 
   Inputs:
@@ -2337,6 +2472,31 @@ Function: expr2ct::convert_struct
 std::string expr2ct::convert_struct(
   const exprt &src,
   unsigned &precedence)
+{
+  return convert_struct(src, precedence, true);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_struct
+
+  Inputs:
+    src - The struct declaration expression
+    precedence
+    include_padding_components - Should the generated C code
+                              include the padding members added
+                              to structs for GOTOs benifit
+
+ Outputs: A string representation of the struct expression
+
+ Purpose: To generate a C-like string representing a struct. Can optionally
+          include the padding parameters.
+
+\*******************************************************************/
+std::string expr2ct::convert_struct(
+  const exprt &src,
+  unsigned &precedence,
+  bool include_padding_components)
 {
   const typet full_type=ns.follow(src.type());
 
@@ -2360,13 +2520,17 @@ std::string expr2ct::convert_struct(
   bool newline=false;
   size_t last_size=0;
 
-  for(struct_typet::componentst::const_iterator
-      c_it=components.begin();
-      c_it!=components.end();
-      c_it++)
+  for(const struct_union_typet::componentt &component :
+    struct_type.components())
   {
     if(o_it->type().id()==ID_code)
       continue;
+
+    if(component.get_is_padding() && !include_padding_components)
+    {
+      ++o_it;
+      continue;
+    }
 
     if(first)
       first=false;
@@ -2391,7 +2555,7 @@ std::string expr2ct::convert_struct(
       newline=false;
 
     dest+='.';
-    dest+=c_it->get_string(ID_name);
+    dest+=component.get_string(ID_name);
     dest+='=';
     dest+=tmp;
 
