@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <util/arith_tools.h>
 #include <util/message.h>
 #include <linking/zero_initializer.h>
@@ -8,6 +10,7 @@
 #include <cegis/control/value/control_vars.h>
 #include <cegis/control/value/control_types.h>
 #include <cegis/control/value/control_solution.h>
+#include <cegis/control/value/control_vector_solution.h>
 #include <cegis/control/options/control_program.h>
 #include <cegis/control/preprocessing/propagate_controller_sizes.h>
 
@@ -57,10 +60,44 @@ struct_exprt to_struct_expr(const symbol_tablet &st,
 void insert_solution(control_programt &program,
     const control_solutiont &solution)
 {
-  goto_functionst &gf=program.gf;
-  goto_programt &init=get_body(gf, CPROVER_INIT);
+  goto_programt &init=get_body(program.gf, CPROVER_INIT);
   const goto_programt::targett pos=get_solution_assignment(init);
   const symbol_tablet &st=program.st;
   const source_locationt &loc=pos->source_location;
   to_code_assign(pos->code).rhs()=to_struct_expr(st, solution, loc);
+}
+
+namespace
+{
+class is_assignment_tot
+{
+  const std::string name;
+public:
+  is_assignment_tot(const std::string &name) :
+      name(name)
+  {
+  }
+
+  bool operator()(const goto_programt::instructiont &instr) const
+  {
+    if (goto_program_instruction_typet::ASSIGN != instr.type) return false;
+    const std::string &var=id2string(get_affected_variable(instr));
+    return name == var;
+  }
+};
+}
+
+void insert_solution(control_programt &program,
+    const control_vector_solutiont &solution)
+{
+  goto_programt &init=get_body(program.gf, CPROVER_INIT);
+  goto_programt::instructionst &instrs=init.instructions;
+  const goto_programt::targett end(instrs.end());
+  const is_assignment_tot pred(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME);
+  const goto_programt::targett it=std::find_if(instrs.begin(), end, pred);
+  assert(end != it);
+  struct_exprt &value=to_struct_expr(to_code_assign(it->code).rhs());
+  const namespacet ns(program.st);
+  exprt &k=get_controller_comp(ns, value, CEGIS_CONTROL_K_MEMBER_NAME);
+  k=solution.K;
 }

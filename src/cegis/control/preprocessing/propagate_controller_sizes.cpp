@@ -6,14 +6,30 @@
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/control/value/control_vars.h>
 
-const exprt &get_controller_comp(const namespacet &ns,
-    const struct_exprt &value, const char * const comp)
+namespace
+{
+template<class struct_exprt_typet, class exprt_typet>
+exprt_typet &get_comp(const namespacet &ns, struct_exprt_typet &value,
+    const char * const comp)
 {
   const struct_typet &type=to_struct_type(ns.follow(value.type()));
   const struct_typet::componentst &comps=type.components();
   for (size_t i=0; i < comps.size(); ++i)
     if (id2string(comps[i].get_name()) == comp) return value.operands()[i];
   assert(!"Solution component not found.");
+}
+}
+
+const exprt &get_controller_comp(const namespacet &ns,
+    const struct_exprt &value, const char * const comp)
+{
+  return get_comp<const struct_exprt, const exprt>(ns, value, comp);
+}
+
+exprt &get_controller_comp(const namespacet &ns, struct_exprt &value,
+    const char * const comp)
+{
+  return get_comp<struct_exprt, exprt>(ns, value, comp);
 }
 
 const array_exprt &get_a_controller_comp(const namespacet &ns,
@@ -28,6 +44,13 @@ const array_exprt &get_b_controller_comp(const namespacet &ns,
 {
   return to_array_expr(
       get_controller_comp(ns, value, CEGIS_CONTROL_B_MEMBER_NAME));
+}
+
+const array_exprt &get_K_controller_comp(const namespacet &ns,
+    const struct_exprt &value)
+{
+  return to_array_expr(
+      get_controller_comp(ns, value, CEGIS_CONTROL_K_MEMBER_NAME));
 }
 
 namespace
@@ -79,6 +102,7 @@ public:
 
 void propagate_controller_sizes(const symbol_tablet &st, goto_functionst &gf)
 {
+  if (!st.has_symbol(CEGIS_CONTROL_SOLUTION_VAR_NAME)) return;
   const symbolt &symbol=st.lookup(CEGIS_CONTROL_SOLUTION_VAR_NAME);
   const struct_exprt &controller_value=to_struct_expr(symbol.value);
   const namespacet ns(st);

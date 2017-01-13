@@ -7,6 +7,10 @@
 #include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/preprocessing/control_preprocessing.h>
 
+// XXX: Debug
+#include <iostream>
+// XXX: Debug
+
 control_preprocessingt::control_preprocessingt(const symbol_tablet &st,
     const goto_functionst &gf) :
     control_program(st, gf)
@@ -15,11 +19,12 @@ control_preprocessingt::control_preprocessingt(const symbol_tablet &st,
 
 namespace
 {
-const char * const excluded_functions[]=
-    { "verify_stability_closedloop_using_dslib", "check_stability_closedloop",
-        "fxp_double_to_fxp", "fxp_to_double", "ft_closedloop_series",
-        "poly_mult", "poly_sum", "internal_pow", "fxp_check",
-        "fxp_control_floatt_to_fxp", "main", "validation" };
+const char * const excluded_functions[]= {
+    "verify_stability_closedloop_using_dslib", "check_stability_closedloop",
+    "fxp_double_to_fxp", "fxp_to_double", "ft_closedloop_series", "poly_mult",
+    "poly_sum", "internal_pow", "fxp_check", "fxp_control_floatt_to_fxp",
+    "main", "validation", "double_matrix_multiplication", "double_sub_matrix",
+    "check_stability" };
 
 bool is_meta(const goto_programt::const_targett pos)
 {
@@ -45,6 +50,12 @@ void control_preprocessingt::operator ()()
   goto_programt::targetst &locs=control_program.counterexample_locations;
   goto_programt &body=get_entry_body(gf);
   collect_counterexample_locations(locs, body, is_meta);
+  // XXX: Debug
+  for (const goto_programt::const_targett target : locs)
+  {
+    std::cout << "<ce>" << target->code.pretty() << "</ce>" << std::endl;
+  }
+  // XXX: Debug
   propagate_controller_sizes(st, gf);
 }
 

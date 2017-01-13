@@ -46,12 +46,14 @@ SRC = danger/meta/meta_variable_names.cpp danger/facade/danger_runner.cpp danger
       jsa/genetic/jsa_source_provider.cpp jsa/genetic/dynamic_jsa_test_runner.cpp jsa/genetic/random_jsa_mutate.cpp \
       jsa/genetic/random_jsa_cross.cpp jsa/genetic/jsa_genetic_convert.cpp jsa/genetic/jsa_random.cpp \
       jsa/genetic/solution_helper.cpp jsa/genetic/jsa_serialiser.cpp jsa/genetic/jsa_paragon_wrapper.cpp \
-      control/facade/control_runner.cpp control/learn/rational_solution_configuration.cpp \
+      control/facade/control_runner.cpp \
+      control/learn/print_control_solution.cpp \
+      control/learn/rational_solution_configuration.cpp control/learn/vector_solution_configuration.cpp \
       control/preprocessing/control_preprocessing.cpp control/preprocessing/propagate_controller_sizes.cpp \
       control/options/control_program.cpp \
       control/learn/nondet_solution.cpp \
       control/simplify/remove_unused_elements.cpp \
-      control/verify/control_symex_verify.cpp control/verify/insert_solution.cpp \
+      control/verify/insert_solution.cpp control/verify/zero_solutions.cpp \
       control/value/float_helper.cpp control/value/control_types.cpp \
       refactor/environment/instrument_state_vars.cpp \
       refactor/instructionset/create_cegis_processor.cpp refactor/instructionset/execute_cegis_program.cpp \

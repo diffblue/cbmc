@@ -9,6 +9,11 @@ const symbol_typet &control_solution_type(const symbol_tablet &st)
   return to_symbol_type(st.lookup(CEGIS_CONTROL_SOLUTION_VAR_NAME).type);
 }
 
+const symbol_typet &control_vector_solution_type(const symbol_tablet &st)
+{
+  return to_symbol_type(st.lookup(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME).type);
+}
+
 namespace
 {
 const struct_typet::componentt &get_comp(const symbol_tablet &st,

@@ -21,6 +21,7 @@
  *
  * @details
  */
+template<class solutiont>
 class control_symex_verifyt
 {
   const control_programt &original_program;
@@ -28,7 +29,7 @@ class control_symex_verifyt
 public:
   typedef control_counterexamplet counterexamplet;
   typedef control_counterexamplest counterexamplest;
-  typedef control_solutiont candidatet;
+  typedef solutiont candidatet;
 
   /**
    * @brief
@@ -90,5 +91,7 @@ public:
       messaget::mstreamt &os,
       const counterexamplet &counterexample) const;
 };
+
+#include "control_symex_verify.inc"
 
 #endif // CPROVER_CEGIS_CONTROL_VERIFY_CONTROL_SYMEX_VERIFY_H

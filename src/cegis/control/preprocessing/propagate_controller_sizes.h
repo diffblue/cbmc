@@ -33,6 +33,20 @@ const exprt &get_controller_comp(
  *
  * @param ns
  * @param value
+ * @param comp
+ */
+exprt &get_controller_comp(
+    const namespacet &ns,
+    struct_exprt &value,
+    const char * const comp);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param ns
+ * @param value
  *
  * @return
  */
@@ -51,6 +65,20 @@ const array_exprt &get_a_controller_comp(
  * @return
  */
 const array_exprt &get_b_controller_comp(
+    const namespacet &ns,
+    const struct_exprt &value);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param ns
+ * @param value
+ *
+ * @return
+ */
+const array_exprt &get_K_controller_comp(
     const namespacet &ns,
     const struct_exprt &value);
 

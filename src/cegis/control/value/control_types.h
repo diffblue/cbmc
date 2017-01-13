@@ -30,6 +30,17 @@ const class symbol_typet &control_solution_type(const class symbol_tablet &st);
  *
  * @return
  */
+const class symbol_typet &control_vector_solution_type(const class symbol_tablet &st);
+
+/**
+ * @brief
+ *
+ * @details
+ *
+ * @param st
+ *
+ * @return
+ */
 const typet &control_float_value_type(const symbol_tablet &st);
 
 /**

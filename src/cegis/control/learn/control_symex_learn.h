@@ -29,7 +29,7 @@ class control_symex_learnt
 public:
   typedef control_counterexamplet counterexamplet;
   typedef control_counterexamplest counterexamplest;
-  typedef control_solutiont candidatet;
+  typedef typename solution_configt::solutiont candidatet;
   /**
    * @brief
    *
