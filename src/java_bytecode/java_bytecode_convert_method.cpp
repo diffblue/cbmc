@@ -172,6 +172,8 @@ protected:
     else
     {
       exprt result=var.symbol_expr;
+      if(!var.is_parameter)
+        used_local_names.insert(to_symbol_expr(result));
       if(do_cast==CAST_AS_NEEDED && t!=result.type())
         result=typecast_exprt(result, t);
       return result;
@@ -289,7 +291,8 @@ protected:
   void convert(const instructiont &);
 
   codet convert_instructions(
-    const instructionst &, const code_typet &);
+    const instructionst &,
+    const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
@@ -588,7 +591,7 @@ void java_bytecode_convert_methodt::convert(
 
   method_symbol.type=member_type;
   if(is_constructor(method))
-    method_symbol.type.set(ID_constructor,true);
+    method_symbol.type.set(ID_constructor, true);
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
 
@@ -620,7 +623,8 @@ const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
   const irep_idt &statement)
 {
   for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
-    if(statement==p->mnemonic) return *p;
+    if(statement==p->mnemonic)
+      return *p;
 
   error() << "failed to find bytecode mnemonic `"
           << statement << '\'' << eom;
@@ -629,14 +633,20 @@ const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
 
 static irep_idt get_if_cmp_operator(const irep_idt &stmt)
 {
-  if(stmt==patternt("if_?cmplt")) return ID_lt;
-  if(stmt==patternt("if_?cmple")) return ID_le;
-  if(stmt==patternt("if_?cmpgt")) return ID_gt;
-  if(stmt==patternt("if_?cmpge")) return ID_ge;
-  if(stmt==patternt("if_?cmpeq")) return ID_equal;
-  if(stmt==patternt("if_?cmpne")) return ID_notequal;
+  if(stmt==patternt("if_?cmplt"))
+    return ID_lt;
+  if(stmt==patternt("if_?cmple"))
+    return ID_le;
+  if(stmt==patternt("if_?cmpgt"))
+    return ID_gt;
+  if(stmt==patternt("if_?cmpge"))
+    return ID_ge;
+  if(stmt==patternt("if_?cmpeq"))
+    return ID_equal;
+  if(stmt==patternt("if_?cmpne"))
+    return ID_notequal;
 
-  throw "Unhandled java comparison instruction";
+  throw "unhandled java comparison instruction";
 }
 
 static constant_exprt as_number(const mp_integer value, const typet &type)
@@ -657,25 +667,33 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
   const dereference_exprt obj_deref(pointer2, class_type);
 
   return member_exprt(
-    obj_deref, fieldref.get(ID_component_name), fieldref.type());
+    obj_deref,
+    fieldref.get(ID_component_name),
+    fieldref.type());
 }
 
-codet get_array_bounds_check(const exprt &arraystruct, const exprt &idx, const source_locationt& original_sloc)
+codet get_array_bounds_check(
+  const exprt &arraystruct,
+  const exprt &idx,
+  const source_locationt& original_sloc)
 {
-  constant_exprt intzero=as_number(0,java_int_type());
-  binary_relation_exprt gezero(idx,ID_ge,intzero);
-  const member_exprt length_field(
-    arraystruct, "length", java_int_type());
-  binary_relation_exprt ltlength(idx,ID_lt,length_field);
+  constant_exprt intzero=as_number(0, java_int_type());
+  binary_relation_exprt gezero(idx, ID_ge, intzero);
+  const member_exprt length_field(arraystruct, "length", java_int_type());
+  binary_relation_exprt ltlength(idx, ID_lt, length_field);
   code_blockt boundschecks;
   boundschecks.add(code_assertt(gezero));
   boundschecks.operands().back().add_source_location()=original_sloc;
-  boundschecks.operands().back().add_source_location().set_comment("Array index < 0");
-  boundschecks.operands().back().add_source_location().set_property_class("array-index-oob-low");
+  boundschecks.operands().back().add_source_location()
+    .set_comment("Array index < 0");
+  boundschecks.operands().back().add_source_location()
+    .set_property_class("array-index-oob-low");
   boundschecks.add(code_assertt(ltlength));
   boundschecks.operands().back().add_source_location()=original_sloc;
-  boundschecks.operands().back().add_source_location().set_comment("Array index >= length");
-  boundschecks.operands().back().add_source_location().set_property_class("array-index-oob-high");
+  boundschecks.operands().back().add_source_location()
+    .set_comment("Array index >= length");
+  boundschecks.operands().back().add_source_location()
+    .set_property_class("array-index-oob-high");
 
   // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
   return boundschecks;
@@ -1000,9 +1018,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       i_it++)
   {
     std::pair<address_mapt::iterator, bool> a_entry=
-      address_map.insert(std::make_pair(
-        i_it->address,
-        converted_instructiont(i_it, code_skipt())));
+      address_map.insert(
+        std::make_pair(
+          i_it->address,
+          converted_instructiont(i_it, code_skipt())));
     assert(a_entry.second);
     // addresses are strictly increasing, hence we must have inserted
     // a new maximal key
@@ -1097,7 +1116,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   setup_local_variables(method,address_map);
 
   std::set<unsigned> working_set;
-  bool assertion_failure = false;
+  bool assertion_failure=false;
 
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
@@ -1109,19 +1128,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
     assert(a_it!=address_map.end());
     working_set.erase(cur);
 
-    if(a_it->second.done) continue;
-    working_set.insert(a_it->second.successors.begin(),
-                       a_it->second.successors.end());
+    if(a_it->second.done)
+      continue;
+    working_set
+      .insert(a_it->second.successors.begin(), a_it->second.successors.end());
 
     instructionst::const_iterator i_it=a_it->second.source;
     stack.swap(a_it->second.stack);
     a_it->second.stack.clear();
     codet &c=a_it->second.code;
 
-    assert(stack.empty() ||
-           a_it->second.predecessors.size()<=1 ||
-           has_prefix(stack.front().get_string(ID_C_base_name),
-                      "$stack"));
+    assert(
+      stack.empty() ||
+      a_it->second.predecessors.size()<=1 ||
+      has_prefix(
+        stack.front().get_string(ID_C_base_name),
+        "$stack"));
 
     irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
@@ -1214,11 +1236,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // Remember that this is triggered by an assertion
       if(statement=="invokespecial" &&
-        as_string(arg0.get(ID_identifier)).find("AssertionError")!=std::string::npos)
+        as_string(arg0.get(ID_identifier))
+         .find("AssertionError")!=std::string::npos)
       {
         assertion_failure=true;
       }
-      const bool use_this(statement != "invokestatic");
+      const bool use_this(statement!="invokestatic");
       const bool is_virtual(
         statement=="invokevirtual" || statement=="invokeinterface");
 
@@ -1229,12 +1252,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(parameters.empty() || !parameters[0].get_this())
         {
-          irep_idt classname = arg0.get(ID_C_class);
-          typet thistype = symbol_typet(classname);
-          // Note invokespecial is used for super-method calls as well as constructors.
+          irep_idt classname=arg0.get(ID_C_class);
+          typet thistype=symbol_typet(classname);
+          // Note invokespecial is used for super-method calls as well as
+          // constructors.
           if(statement=="invokespecial")
           {
-            if(as_string(arg0.get(ID_identifier)).find("<init>")!=std::string::npos)
+            if(as_string(arg0.get(ID_identifier))
+               .find("<init>")!=std::string::npos)
               code_type.set(ID_constructor, true);
             else
               code_type.set("java_super_method_call", true);
@@ -1254,7 +1279,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       source_locationt &source_loc=loc;
 
       call.add_source_location()=source_loc;
-      call.arguments() = pop(parameters.size());
+      call.arguments()=pop(parameters.size());
 
       // double-check a bit
       if(use_this)
@@ -1327,7 +1352,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
 
       call.function().add_source_location()=source_loc;
-      c = call;
+      c=call;
     }
     else if(statement=="return")
     {
@@ -1340,7 +1365,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // conversion.
       assert(op.size()==1 && results.empty());
       exprt r=op[0];
-      if(r.type()!=method_return_type) r=typecast_exprt(r, method_return_type);
+      if(r.type()!=method_return_type)
+        r=typecast_exprt(r, method_return_type);
       c=code_returnt(r);
     }
     else if(statement==patternt("?astore"))
@@ -1355,7 +1381,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt deref(pointer, pointer.type().subtype());
 
       const member_exprt data_ptr(
-        deref, "data", pointer_typet(java_type_from_char(type_char)));
+        deref,
+        "data",
+        pointer_typet(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       typet element_type=data_ptr.type().subtype();
@@ -1364,7 +1392,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt assert_and_put;
       if(!disable_runtime_checks)
       {
-        codet bounds_check=get_array_bounds_check(deref,op[1],i_it->source_location);
+        codet bounds_check=
+          get_array_bounds_check(deref, op[1], i_it->source_location);
         bounds_check.add_source_location()=i_it->source_location;
         assert_and_put.move_to_operands(bounds_check);
       }
@@ -1379,7 +1408,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0], i_it->address, NO_CAST);
+      exprt var=
+        variable(arg0, statement[0], i_it->address, INST_INDEX, NO_CAST);
 
       exprt toassign=op[0];
       if('a'==statement[0] && toassign.type()!=var.type())
@@ -1399,7 +1429,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt deref(pointer, pointer.type().subtype());
 
       const member_exprt data_ptr(
-        deref, "data", pointer_typet(java_type_from_char(type_char)));
+        deref,
+        "data",
+        pointer_typet(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       typet element_type=data_ptr.type().subtype();
@@ -1407,7 +1439,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       if(!disable_runtime_checks)
       {
-        codet bounds_check=get_array_bounds_check(deref,op[1],i_it->source_location);
+        codet bounds_check=
+          get_array_bounds_check(deref, op[1], i_it->source_location);
         bounds_check.add_source_location()=i_it->source_location;
         c=std::move(bounds_check);
       }
@@ -1416,7 +1449,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
+      results[0]=
+        variable(arg0, statement[0], i_it->address, INST_INDEX, CAST_AS_NEEDED);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1524,9 +1558,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(is_double || is_float)
       {
         const ieee_float_spect spec(
-          is_float ?
-          ieee_float_spect::single_precision() :
-          ieee_float_spect::double_precision());
+          is_float?
+            ieee_float_spect::single_precision():
+            ieee_float_spect::double_precision());
 
         ieee_floatt value(spec);
         const typet &arg_type(arg0.type());
@@ -1554,7 +1588,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
 
-      code_ifthenelset code_branch;
+      code_ifthenelset
+        code_branch;
       const irep_idt cmp_op=get_if_cmp_operator(statement);
 
       binary_relation_exprt condition(op[0], cmp_op, op[1]);
@@ -1582,7 +1617,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
 
-      code_ifthenelset code_branch;
+      code_ifthenelset
+        code_branch;
       code_branch.cond()=
         binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
@@ -1599,7 +1635,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
-      code_ifthenelset code_branch;
+      code_ifthenelset
+        code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
@@ -1613,7 +1650,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.empty());
       irep_idt number=to_constant_expr(arg0).get_value();
-      code_ifthenelset code_branch;
+      code_ifthenelset
+        code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
@@ -1626,7 +1664,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i', i_it->address, NO_CAST);
+      code_assign.lhs()=
+        variable(arg0, 'i', i_it->address, INST_INDEX_CONST, NO_CAST);
       code_assign.rhs()=plus_exprt(
         variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
         typecast_exprt(arg1, java_int_type()));
@@ -1668,7 +1707,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const typecast_exprt lhs(op[0], target);
       const typecast_exprt rhs(op[1], target);
 
-      results[0]=typecast_exprt(lshr_exprt(lhs, rhs),op[0].type());
+      results[0]=typecast_exprt(lshr_exprt(lhs, rhs), op[0].type());
     }
     else if(statement==patternt("?add"))
     {
@@ -1715,9 +1754,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const typet t=java_int_type();
 
       results[0]=
-        if_exprt(binary_relation_exprt(op[0], ID_equal, op[1]), gen_zero(t),
-        if_exprt(binary_relation_exprt(op[0], ID_gt, op[1]), from_integer(1, t),
-        from_integer(-1, t)));
+        if_exprt(
+          binary_relation_exprt(op[0], ID_equal, op[1]),
+          gen_zero(t),
+          if_exprt(
+            binary_relation_exprt(op[0], ID_gt, op[1]),
+            from_integer(1, t),
+            from_integer(-1, t)));
     }
     else if(statement==patternt("?cmp?"))
     {
@@ -1929,17 +1972,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!disable_runtime_checks)
       {
         // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=as_number(0,java_int_type());
-        binary_relation_exprt gezero(op[0],ID_ge,intzero);
+        constant_exprt intzero=as_number(0, java_int_type());
+        binary_relation_exprt gezero(op[0], ID_ge, intzero);
         code_assertt check(gezero);
         check.add_source_location().set_comment("Array size < 0");
-        check.add_source_location().set_property_class("array-create-negative-size");
+        check.add_source_location()
+          .set_property_class("array-create-negative-size");
         checkandcreate.move_to_operands(check);
       }
       if(max_array_length!=0)
       {
-        constant_exprt size_limit=as_number(max_array_length,java_int_type());
-        binary_relation_exprt le_max_size(op[0],ID_le,size_limit);
+        constant_exprt size_limit=as_number(max_array_length, java_int_type());
+        binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
         checkandcreate.move_to_operands(assume_le_max_size);
       }
@@ -1950,8 +1994,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="multianewarray")
     {
-      // The first argument is the type, the second argument is the number of dimensions.
-      // The size of each dimension is on the stack.
+      // The first argument is the type, the second argument is the number of
+      // dimensions.  The size of each dimension is on the stack.
       irep_idt number=to_constant_expr(arg1).get_value();
       std::size_t dimension=safe_string2size_t(id2string(number));
 
@@ -2138,8 +2182,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           stackt::const_iterator os_it=a_it2->second.stack.begin();
           for(auto &expr : stack)
           {
-            assert(has_prefix(os_it->get_string(ID_C_base_name),
-                              "$stack"));
+            assert(has_prefix(os_it->get_string(ID_C_base_name), "$stack"));
             symbol_exprt lhs=to_symbol_expr(*os_it);
             code_assignt a(lhs, expr);
             more_code.copy_to_operands(a);

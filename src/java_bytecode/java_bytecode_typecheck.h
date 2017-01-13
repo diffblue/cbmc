@@ -64,8 +64,8 @@ protected:
   virtual std::string to_string(const typet &type);
 
   std::set<irep_idt> already_typechecked;
-  std::map<irep_idt,irep_idt> string_literal_to_symbol_name;
-  std::map<irep_idt,size_t> escaped_string_literal_count;
+  std::map<irep_idt, irep_idt> string_literal_to_symbol_name;
+  std::map<irep_idt, size_t> escaped_string_literal_count;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H

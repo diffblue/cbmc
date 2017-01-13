@@ -209,7 +209,8 @@ Function: java_class_loadert::read_jar_file
 void java_class_loadert::read_jar_file(const irep_idt &file)
 {
   // done already?
-  if(jar_map.find(file)!=jar_map.end()) return;
+  if(jar_map.find(file)!=jar_map.end())
+    return;
 
   #ifndef HAVE_LIBZIP
   error() << "no support for reading JAR files configured" << eom;
@@ -277,7 +278,8 @@ std::string java_class_loadert::file_to_class_name(const std::string &file)
 
   // slash to dot
   for(std::string::iterator it=result.begin(); it!=result.end(); it++)
-    if(*it=='/') *it='.';
+    if(*it=='/')
+      *it='.';
 
   return result;
 }
@@ -301,11 +303,13 @@ std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
   // dots (package name separators) to slash, depending on OS
   for(std::string::iterator it=result.begin(); it!=result.end(); it++)
     if(*it=='.')
+    {
       #ifdef _WIN32
       *it='\\';
       #else
       *it='/';
       #endif
+    }
 
   // add .class suffix
   result+=".class";
