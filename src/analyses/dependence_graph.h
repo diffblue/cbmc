@@ -94,14 +94,20 @@ public:
 
   void make_top() final override
   {
+    assert(node_id!=std::numeric_limits<node_indext>::max());
+
     has_values=tvt(true);
-    node_id=std::numeric_limits<node_indext>::max();
+    control_deps.clear();
+    data_deps.clear();
   }
 
   void make_bottom() final override
   {
+    assert(node_id!=std::numeric_limits<node_indext>::max());
+
     has_values=tvt(false);
-    node_id=std::numeric_limits<node_indext>::max();
+    control_deps.clear();
+    data_deps.clear();
   }
 
   void make_entry() final override
@@ -161,6 +167,7 @@ public:
 
   void initialize(const goto_programt &goto_program)
   {
+    ait<dep_graph_domaint>::initialize(goto_program);
     post_dominators(goto_program);
   }
 
