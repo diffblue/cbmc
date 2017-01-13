@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "type2name.h"
 #include "ansi_c_convert_type.h"
 
+#include <iostream>
+
 /*******************************************************************\
 
 Function: c_typecheck_baset::typecheck_type
@@ -53,12 +55,14 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifiers+=c_qualifierst(type.subtype());
     bool packed=type.get_bool(ID_C_packed);
     exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+    irept _typedef=type.find(ID_typedef);
 
     type.swap(type.subtype());
 
     c_qualifiers.write(type);
     if(packed) type.set(ID_C_packed, true);
     if(alignment.is_not_nil()) type.add(ID_C_alignment, alignment);
+    if(_typedef.is_not_nil()) type.add(ID_typedef, _typedef);
 
     return; // done
   }
@@ -725,11 +729,15 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     // Anonymous? Must come with body.
     assert(have_body);
 
+//    std::cout << "__TYPE: " << type.pretty() << std::endl;
+
     // produce symbol
     symbolt compound_symbol;
     compound_symbol.is_type=true;
     compound_symbol.type=type;
     compound_symbol.location=type.source_location();
+    if(compound_symbol.type.find(ID_typedef).is_not_nil())
+      compound_symbol.pretty_name=compound_symbol.type.get(ID_typedef);
 
     typecheck_compound_body(to_struct_union_type(compound_symbol.type));
 
@@ -737,6 +745,9 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     compound_symbol.base_name="#anon-"+typestr;
     compound_symbol.name="tag-#anon#"+typestr;
     identifier=compound_symbol.name;
+
+//  std::cout << "TYPEDEF: " << compound_symbol.type.get_string(ID_typedef) << std::endl;
+//  std::cout << "BASENAME: " << id2string(compound_symbol.base_name) << std::endl;
 
     // We might already have the same anonymous union/struct,
     // and this is simply ok. Note that the C standard treats

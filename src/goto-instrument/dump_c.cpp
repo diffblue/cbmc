@@ -160,6 +160,9 @@ void dump_ct::operator()(std::ostream &os)
         symbol.type.set(ID_tag, new_tag);
     }
 
+    if(ignore(symbol))
+      ignored_symbol_rec(symbol);
+
     // we don't want to dump in full all definitions
     if(!tag_added && ignore(symbol))
       continue;
@@ -176,6 +179,10 @@ void dump_ct::operator()(std::ostream &os)
       ++it)
   {
     const symbolt &symbol=ns.lookup(*it);
+
+    if(ignore(symbol))
+      continue;
+
     const irep_idt &type_id=symbol.type.id();
 
     if(symbol.is_type &&
@@ -191,6 +198,10 @@ void dump_ct::operator()(std::ostream &os)
 
       if(type_id==ID_c_enum)
         convert_compound_enum(symbol.type, os);
+      else if(symbol.type.find(ID_typedef).is_not_nil())
+      {
+        //skip
+      }
       else
         os << type_to_string(symbol_typet(symbol.name)) << ";\n\n";
     }
@@ -220,6 +231,9 @@ void dump_ct::operator()(std::ostream &os)
   {
     const symbolt &symbol=ns.lookup(*it);
 
+    if(ignore(symbol))
+      continue;
+
     if(symbol.type.id()!=ID_code) continue;
 
     convert_function_declaration(
@@ -237,6 +251,9 @@ void dump_ct::operator()(std::ostream &os)
       ++it)
   {
     const symbolt &symbol=ns.lookup(*it);
+
+    if(ignore(symbol))
+      continue;
 
     if(symbol.is_type &&
         (symbol.type.id()==ID_struct ||
@@ -516,7 +533,12 @@ void dump_ct::convert_compound(
     struct_body << ";" << std::endl;
   }
 
-  os << type_to_string(unresolved);
+
+  if(type.find(ID_typedef).is_not_nil())
+    os << "typedef "+id2string(type.id());
+  else
+    os << type_to_string(unresolved);
+
   if(!base_decls.str().empty())
   {
     assert(language->id()=="cpp");
@@ -543,6 +565,8 @@ void dump_ct::convert_compound(
     os << " __attribute__ ((__transparent_union__))";
   if(type.get_bool(ID_C_packed))
     os << " __attribute__ ((__packed__))";
+  if(type.find(ID_typedef).is_not_nil())
+    os << " " << type.get_string(ID_typedef);
   os << ";";
   os << std::endl;
   os << std::endl;
@@ -672,9 +696,17 @@ void dump_ct::init_system_library_map()
     "pthread_rwlock_unlock", "pthread_rwlock_wrlock",
     "pthread_rwlockattr_destroy", "pthread_rwlockattr_getpshared",
     "pthread_rwlockattr_init", "pthread_rwlockattr_setpshared",
-    "pthread_self", "pthread_setspecific"
+    "pthread_self", "pthread_setspecific",
+    "pthread_mutex_t", "pthread_attr_t", "pthread_cond_t",
+    "tag-__pthread_internal_list", "tag-__pthread_mutex_s"
   };
   ADD_TO_SYSTEM_LIBRARY(pthread_syms, "pthread.h");
+
+  // sys/resource.h
+  const char* sys_resource_syms[]={
+    "getrusage", "tag-rusage"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_resource_syms, "sys/resource.h");
 
   // setjmp.h
   const char* setjmp_syms[]={
@@ -721,7 +753,7 @@ void dump_ct::init_system_library_map()
   const char* string_syms[]={
     "strcat", "strncat", "strchr", "strrchr", "strcmp", "strncmp",
     "strcpy", "strncpy", "strerror", "strlen", "strpbrk", "strspn",
-    "strcspn", "strstr", "strtok"
+    "strcspn", "strstr", "strtok", "memcpy", "memset"
   };
   ADD_TO_SYSTEM_LIBRARY(string_syms, "string.h");
 
@@ -733,6 +765,12 @@ void dump_ct::init_system_library_map()
     "tag-timespec", "tag-timeval"
   };
   ADD_TO_SYSTEM_LIBRARY(time_syms, "time.h");
+
+  // sys/time.h
+  const char* sys_time_syms[]={
+    "gettimeofday", "tag-timezone"
+  };
+  ADD_TO_SYSTEM_LIBRARY(sys_time_syms, "sys/time.h");
 
   // unistd.h
   const char* unistd_syms[]={
@@ -781,6 +819,41 @@ void dump_ct::init_system_library_map()
 
 /*******************************************************************\
 
+Function: dump_ct::ignored_symbol_rec
+
+Inputs:
+
+Outputs:
+
+Purpose: recursively marks symbols that shall be ignored
+
+\*******************************************************************/
+
+void dump_ct::ignored_symbol_rec(const symbolt &symbol)
+{
+  ignored_symbols.insert(id2string(symbol.name));
+
+  if(!(symbol.is_type &&
+       (symbol.type.id()==ID_union ||
+        symbol.type.id()==ID_struct)))
+    return;
+
+  const struct_union_typet &type=
+    to_struct_union_type(ns.follow(symbol.type));
+
+  for(struct_union_typet::componentst::const_iterator
+      it=type.components().begin();
+      it!=type.components().end();
+      it++)
+  {
+    const struct_typet::componentt &comp=*it;
+    if(comp.type().id()==ID_symbol)
+      ignored_symbol_rec(ns.lookup(to_symbol_type(comp.type()).get_identifier()));
+  }
+}
+
+/*******************************************************************\
+
 Function: dump_ct::ignore
 
 Inputs:
@@ -794,6 +867,9 @@ Purpose:
 bool dump_ct::ignore(const symbolt &symbol)
 {
   const std::string &name_str=id2string(symbol.name);
+
+  if(ignored_symbols.find(name_str)!=ignored_symbols.end())
+    return true;
 
   if(has_prefix(name_str, CPROVER_PREFIX) ||
      name_str=="__func__" ||
@@ -826,10 +902,13 @@ bool dump_ct::ignore(const symbolt &symbol)
   }
 
   if(name_str.find("$link")!=std::string::npos)
-    return false;
+    return true;
 
-  system_library_mapt::const_iterator it=
-    system_library_map.find(symbol.name);
+  system_library_mapt::const_iterator it;
+  if(symbol.is_type && symbol.type.find(ID_typedef).is_not_nil())
+    it=system_library_map.find(symbol.type.get_string(ID_typedef));
+  else
+    it=system_library_map.find(symbol.name);
 
   if(it!=system_library_map.end())
   {
@@ -1445,6 +1524,10 @@ std::string dump_ct::type_to_string(const typet &type)
   std::string ret;
   typet t=type;
   cleanup_type(t);
+/*  if((t.id()==ID_union || t.id()==ID_struct) &&
+     t.find(ID_typedef).is_not_nil())
+    return id2string(t.get(ID_typedef));
+*/
   language->from_type(t, ret, ns);
   return ret;
 }

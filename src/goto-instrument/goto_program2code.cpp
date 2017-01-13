@@ -1881,13 +1881,19 @@ Purpose:
 \*******************************************************************/
 
 void goto_program2codet::cleanup_function_call(
-  const exprt &function,
+  exprt &function,
   code_function_callt::argumentst &arguments)
 {
   if(function.id()!=ID_symbol)
     return;
 
   const symbol_exprt &fn=to_symbol_expr(function);
+
+  //clean function identifier
+  std::string name_str=id2string(function.get(ID_identifier));
+  size_t pos=name_str.find("$link");
+  if(pos!=std::string::npos)
+    function.set(ID_identifier,name_str.substr(0,pos));
 
   // don't edit function calls we might have introduced
   const symbolt *s;

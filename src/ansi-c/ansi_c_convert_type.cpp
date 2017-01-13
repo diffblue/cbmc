@@ -253,7 +253,9 @@ Function: ansi_c_convert_typet::write
 
 void ansi_c_convert_typet::write(typet &type)
 {
+  irep_idt _typedef = type.get(ID_typedef);
   type.clear();
+  type.set(ID_typedef,_typedef);
 
   // first, do "other"
 

@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "type2name.h"
 #include "c_storage_spec.h"
 
+#include <iostream>
+
 /*******************************************************************\
 
 Function: c_typecheck_baset::to_string
@@ -95,6 +97,9 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
+//  std::cout << "BASENAME: " << symbol.base_name << std::endl;
+//  std::cout << "TYPE: " << symbol.type.pretty() << std::endl;
+//  std::cout << "FINAL: " << final_type.pretty() << std::endl;
 
   // set a few flags
   symbol.is_lvalue=!symbol.is_type && !symbol.is_macro;
@@ -126,13 +131,23 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
      (final_type.id()==ID_struct ||
       final_type.id()==ID_incomplete_struct))
   {
-    symbol.pretty_name="struct "+id2string(symbol.base_name);
+    if(symbol.type.find(ID_typedef).is_not_nil())
+      symbol.pretty_name=symbol.type.get(ID_typedef);
+    else
+      symbol.pretty_name="struct "+id2string(symbol.base_name);
   }
   else if(symbol.is_type &&
           (final_type.id()==ID_union ||
            final_type.id()==ID_incomplete_union))
   {
-    symbol.pretty_name="union "+id2string(symbol.base_name);
+    if(symbol.type.find(ID_typedef).is_not_nil())
+    {
+      symbol.pretty_name=symbol.type.get(ID_typedef);
+      symbol_table.symbols.find(symbol.type.get(ID_identifier))->second.pretty_name=symbol.type.get(ID_typedef);
+      symbol_table.symbols.find(symbol.type.get(ID_identifier))->second.type.set(ID_typedef,symbol.pretty_name);
+    }
+    else
+      symbol.pretty_name="union "+id2string(symbol.base_name);
   }
   else if(symbol.is_type &&
           (final_type.id()==ID_c_enum ||
@@ -147,6 +162,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 
   // see if we have it already
   symbol_tablet::symbolst::iterator old_it=symbol_table.symbols.find(symbol.name);
+
 
   if(old_it==symbol_table.symbols.end())
   {

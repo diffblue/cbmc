@@ -136,6 +136,16 @@ void ansi_c_parsert::add_declarator(
   irept &declarator)
 {
   assert(declarator.is_not_nil());
+
+  irep_idt typedefd_name="";
+  if(declarator.id()==ID_symbol)
+  {
+    if(declaration.type().id()==ID_symbol)
+    {
+      typedefd_name=declaration.type().get(ID_identifier);
+    }
+  }
+
   ansi_c_declarationt &ansi_c_declaration=
     to_ansi_c_declaration(declaration);
 
@@ -195,6 +205,11 @@ void ansi_c_parsert::add_declarator(
     ansi_c_identifiert &identifier=scope.name_map[base_name];
     identifier.id_class=id_class;
     identifier.prefixed_name=prefixed_name;
+  }
+
+  if(typedefd_name!="")
+  {
+    new_declarator.set(ID_typedef, typedefd_name);
   }
 
   ansi_c_declaration.declarators().push_back(new_declarator);

@@ -137,6 +137,17 @@ typet ansi_c_declarationt::full_type(
 
   *p=type();
 
+  // retain typedef for dump-c
+  if(get_is_typedef())
+    result.set(ID_typedef,declarator.get_name());
+  // If this declaration was declared with a typedef'd type, we record it in the
+  // type of the expression.
+  irep_idt typedef_type=declarator.get(ID_typedef);
+  if(typedef_type!="")
+  {
+    result.set(ID_typedef, typedef_type);
+  }
+
   return result;
 }
 

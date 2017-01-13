@@ -361,7 +361,12 @@ std::string expr2ct::convert_rec(
   {
     const struct_typet &struct_type=to_struct_type(src);
 
-    std::string dest=q+"struct";
+    std::string dest=q;
+
+    if(src.find(ID_typedef).is_not_nil())
+      dest+="typedef struct";
+    else
+      dest+="struct";
 
     const irep_idt &tag=struct_type.get_tag();
     if(tag!="") dest+=" "+id2string(tag);
@@ -379,7 +384,10 @@ std::string expr2ct::convert_rec(
 
     dest+=" }";
 
-    dest+=d;
+    if(src.find(ID_typedef).is_not_nil())
+      dest+=src.get_string(ID_typedef);
+    else
+      dest+=d;
 
     return dest;
   }
@@ -397,7 +405,12 @@ std::string expr2ct::convert_rec(
   {
     const union_typet &union_type=to_union_type(src);
 
-    std::string dest=q+"union";
+    std::string dest=q;
+
+    if(src.find(ID_typedef).is_not_nil())
+      dest+="typedef union";
+    else
+      dest+="union";
 
     const irep_idt &tag=union_type.get_tag();
     if(tag!="") dest+=" "+id2string(tag);
@@ -415,7 +428,10 @@ std::string expr2ct::convert_rec(
 
     dest+=" }";
 
-    dest+=d;
+    if(src.find(ID_typedef).is_not_nil())
+      dest+=src.get_string(ID_typedef);
+    else
+      dest+=d;
 
     return dest;
   }
@@ -539,29 +555,47 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_symbol)
   {
-    const typet &followed=ns.follow(src);
+    symbol_typet symbolic_type=to_symbol_type(src);
+    const irep_idt &typedef_identifer=symbolic_type.get(ID_typedef);
 
-    if(followed.id()==ID_struct)
+    // Providing we have a valid identifer, we can just use that rather than
+    // trying to find the concrete type
+    if(typedef_identifer!="")
     {
-      std::string dest=q+"struct";
-      const irep_idt &tag=to_struct_type(followed).get_tag();
-      if(tag!="") dest+=" "+id2string(tag);
-      dest+=d;
-      return dest;
-    }
-    else if(followed.id()==ID_union)
-    {
-      std::string dest=q+"union";
-      const irep_idt &tag=to_union_type(followed).get_tag();
-      if(tag!="") dest+=" "+id2string(tag);
-      dest+=d;
-      return dest;
+      return q+id2string(typedef_identifer)+d;
     }
     else
-      return convert_rec(followed, new_qualifiers, declarator);
+    {
+      const typet &followed=ns.follow(src);
+
+      if(followed.id()==ID_struct)
+      {
+      if(followed.find(ID_typedef).is_not_nil())
+        return followed.get_string(ID_typedef)+d;
+        std::string dest=q+"struct";
+        const irep_idt &tag=to_struct_type(followed).get_tag();
+        if(tag!="") dest+=" "+id2string(tag);
+        dest+=d;
+        return dest;
+      }
+      else if(followed.id()==ID_union)
+      {
+      if(followed.find(ID_typedef).is_not_nil())
+        return followed.get_string(ID_typedef)+d;
+        std::string dest=q+"union";
+        const irep_idt &tag=to_union_type(followed).get_tag();
+        if(tag!="") dest+=" "+id2string(tag);
+        dest+=d;
+        return dest;
+      }
+      else
+        return convert_rec(followed, new_qualifiers, declarator);
+    }
   }
   else if(src.id()==ID_struct_tag)
   {
+    if(src.find(ID_typedef).is_not_nil())
+      return src.get_string(ID_typedef)+d;
     const struct_tag_typet &struct_tag_type=
       to_struct_tag_type(src);
 
@@ -574,6 +608,8 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_union_tag)
   {
+    if(src.find(ID_typedef).is_not_nil())
+      return src.get_string(ID_typedef)+d;
     const union_tag_typet &union_tag_type=
       to_union_tag_type(src);
 

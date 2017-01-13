@@ -96,7 +96,7 @@ protected:
   void cleanup_code(codet &code, const irep_idt parent_stmt);
 
   void cleanup_function_call(
-    const exprt &function,
+    exprt &function,
     code_function_callt::argumentst &arguments);
 
   void cleanup_code_block(
