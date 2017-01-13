@@ -18,7 +18,7 @@ bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  const bool disable_runtime_checks,
+  bool disable_runtime_checks,
   size_t max_array_length);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H

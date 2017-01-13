@@ -78,7 +78,7 @@ protected:
                                     //  - array bounds check
                                     //  - array size for newarray
   size_t max_nondet_array_length;   // maximal length for non-det array creation
-  size_t max_user_array_length;     // max size for user supplied arrays
+  size_t max_user_array_length;     // max size for user code created arrays
 };
 
 languaget *new_java_bytecode_language();
