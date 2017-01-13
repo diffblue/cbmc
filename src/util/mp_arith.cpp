@@ -260,8 +260,12 @@ mp_integer arith_left_shift(
   if(shift>true_size && a!=mp_integer(0))
     throw "shift value out of range";
 
-  ullong_t result=a.to_ulong()<<shift;
-  return result;
+  llong_t result=a.to_long()<<shift;
+  llong_t mask=
+    true_size<(sizeof(llong_t)*8) ?
+    (1L<<true_size)-1 :
+    -1;
+  return result&mask;
 }
 
 /// arithmetic right shift (loads sign on MSB) bitwise operations only make
@@ -272,14 +276,14 @@ mp_integer arith_right_shift(
   const mp_integer &b,
   std::size_t true_size)
 {
-  ullong_t number=a.to_ulong();
+  llong_t number=a.to_long();
   ullong_t shift=b.to_ulong();
   if(shift>true_size)
     throw "shift value out of range";
 
-  ullong_t sign=(1<<(true_size-1))&number;
-  ullong_t pad=(sign==0) ? 0 : ~((1<<(true_size-shift))-1);
-  ullong_t result=(number>>shift)|pad;
+  llong_t sign=(1<<(true_size-1))&number;
+  llong_t pad=(sign==0) ? 0 : ~((1<<(true_size-shift))-1);
+  llong_t result=(number >> shift)|pad;
   return result;
 }
 
@@ -294,8 +298,17 @@ mp_integer logic_left_shift(
   ullong_t shift=b.to_ulong();
   if(shift>true_size && a!=mp_integer(0))
     throw "shift value out of range";
-
-  ullong_t result=a.to_ulong()<<shift;
+  llong_t result=a.to_long()<<shift;
+  if(true_size<(sizeof(llong_t)*8))
+  {
+    llong_t sign=(1L<<(true_size-1))&result;
+    llong_t mask=(1L<<true_size)-1;
+    // Sign-fill out-of-range bits:
+    if(sign==0)
+      result&=mask;
+    else
+      result|=~mask;
+  }
   return result;
 }
 
@@ -311,7 +324,7 @@ mp_integer logic_right_shift(
   if(shift>true_size)
     throw "shift value out of range";
 
-  ullong_t result=a.to_ulong()>>shift;
+  ullong_t result=((ullong_t)a.to_long()) >> shift;
   return result;
 }
 
@@ -330,7 +343,7 @@ mp_integer rotate_right(
 
   ullong_t revShift=true_size-shift;
   ullong_t filter=1<<(true_size-1);
-  ullong_t result=(number>>shift)|((number<<revShift)&filter);
+  ullong_t result=(number >> shift)|((number<<revShift)&filter);
   return result;
 }
 
@@ -349,6 +362,6 @@ mp_integer rotate_left(
 
   ullong_t revShift=true_size-shift;
   ullong_t filter=1<<(true_size-1);
-  ullong_t result=((number<<shift)&filter)|((number&filter)>>revShift);
+  ullong_t result=((number<<shift)&filter)|((number&filter) >> revShift);
   return result;
 }
