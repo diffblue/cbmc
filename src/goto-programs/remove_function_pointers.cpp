@@ -558,6 +558,12 @@ void remove_function_pointerst::remove_function_pointer(
 
   }
 
+  if(functions.size()==1)
+  {
+    to_code_function_call(target->code).function()=functions.front();
+    return;
+  }
+
   // if the functions list is still empty we didn't have any luck finding
   // any valid funcitons (or there are none??)
   if(functions.size()==0)
