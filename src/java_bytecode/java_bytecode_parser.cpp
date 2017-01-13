@@ -946,7 +946,7 @@ void java_bytecode_parsert::rbytecode(
       break;
 
     default:
-      assert(false && "unknown instruction");
+      throw "unknown JVM bytecode instruction";
     }
     bytecode_index++;
   }

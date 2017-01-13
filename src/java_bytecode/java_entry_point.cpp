@@ -463,7 +463,7 @@ main_function_resultt get_main_symbol(
     if(matches.empty())
     {
       // Not found, silently ignore
-      res.main_function=symbol;
+      res.main_function=symbolt();
       res.error_found=false;
       res.stop_convert=true;
       return res;
@@ -473,7 +473,7 @@ main_function_resultt get_main_symbol(
     {
       message.error() << "main method in `" << main_class
                       << "' is ambiguous" << messaget::eom;
-      res.main_function=symbol;
+      res.main_function=symbolt();
       res.error_found=true;
       res.stop_convert=true;
       return res;  // give up with error, no main

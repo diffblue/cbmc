@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -392,8 +392,8 @@ typet java_type_from_string(const std::string &src)
       const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
          subtype_letter=='[')   // Array-of-arrays
-	subtype_letter='A';
-      typet tmp=java_array_type((char)tolower(subtype_letter));
+        subtype_letter='A';
+      typet tmp=java_array_type(std::tolower(subtype_letter));
       tmp.subtype().set(ID_C_element_type, subtype);
       return tmp;
     }

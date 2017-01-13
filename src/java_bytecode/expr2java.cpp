@@ -506,7 +506,7 @@ std::string expr2javat::convert(
       ")";
   }
   else if(src.id()==ID_java_string_literal)
-    return '"'+id2string(src.get(ID_value))+'"'; // Todo: add escaping as needed
+    return '"'+id2string(src.get(ID_value))+'"'; // TODO: add escaping as needed
   else if(src.id()==ID_constant && (type.id()==ID_bool || type.id()==ID_c_bool))
   {
     if(src.is_true())

@@ -1882,12 +1882,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
-      const auto& fieldname=arg0.get_string(ID_component_name);
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+fieldname);
+      const auto& field_name=arg0.get_string(ID_component_name);
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       results[0]=java_bytecode_promotion(symbol_expr);
 
       // set $assertionDisabled to false
-      if(fieldname.find("$assertionsDisabled")!=std::string::npos)
+      if(field_name.find("$assertionsDisabled")!=std::string::npos)
       {
         exprt e;
         e.make_false();
@@ -1903,8 +1903,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
-      const auto& fieldname=arg0.get_string(ID_component_name);
-      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+fieldname);
+      const auto& field_name=arg0.get_string(ID_component_name);
+      symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
@@ -1968,7 +1968,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      code_blockt checkandcreate;
+      code_blockt check_and_create;
       if(!disable_runtime_checks)
       {
         // TODO make this throw NegativeArrayIndexException instead.
@@ -1978,18 +1978,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
         check.add_source_location().set_comment("Array size < 0");
         check.add_source_location()
           .set_property_class("array-create-negative-size");
-        checkandcreate.move_to_operands(check);
+        check_and_create.move_to_operands(check);
       }
       if(max_array_length!=0)
       {
         constant_exprt size_limit=as_number(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
-        checkandcreate.move_to_operands(assume_le_max_size);
+        check_and_create.move_to_operands(assume_le_max_size);
       }
       const exprt tmp=tmp_variable("newarray", ref_type);
-      checkandcreate.copy_to_operands(code_assignt(tmp, java_new_array));
-      c=std::move(checkandcreate);
+      check_and_create.copy_to_operands(code_assignt(tmp, java_new_array));
+      c=std::move(check_and_create);
       results[0]=tmp;
     }
     else if(statement=="multianewarray")
@@ -2109,7 +2109,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
 
       results[0]=
-        binary_predicate_exprt(op[0], "java_instanceof", arg0);
+        binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
     }
     else if(statement=="monitorenter")
     {

@@ -26,7 +26,7 @@ public:
   java_bytecode_convert_classt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    const bool _disable_runtime_checks,
+    bool _disable_runtime_checks,
     size_t _max_array_length):
     messaget(_message_handler),
     symbol_table(_symbol_table),
@@ -51,7 +51,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
-  size_t max_array_length;
+  const size_t max_array_length;
 
   // conversion
   void convert(const classt &c);
@@ -312,7 +312,7 @@ bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  const bool disable_runtime_checks,
+  bool disable_runtime_checks,
   size_t max_array_length)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
