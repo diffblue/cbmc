@@ -1,0 +1,13 @@
+CORE
+test.class
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+Labels: pc3
+Labels: pc6
+Labels: pc9
+Labels: pc12
+Labels: pc13
+--
+\\"statement\\" (\\"jsr\\")
+\\"statement\\" (\\"ret\\")
