@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 
-namespace {
 class java_bytecode_convert_classt:public messaget
 {
 public:
@@ -61,7 +60,6 @@ protected:
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
 };
-}
 
 /*******************************************************************\
 
@@ -151,7 +149,8 @@ Function: java_bytecode_convert_classt::generate_class_stub
 
 \*******************************************************************/
 
-void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_name)
+void java_bytecode_convert_classt::generate_class_stub(
+  const irep_idt &class_name)
 {
   class_typet class_type;
 
@@ -174,7 +173,8 @@ void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_nam
 
   if(symbol_table.move(new_symbol, class_symbol))
   {
-    warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
+    warning() << "stub class symbol "+
+      id2string(new_symbol.name)+" already exists";
   }
   else
   {
@@ -213,7 +213,8 @@ void java_bytecode_convert_classt::convert(
     new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
     new_symbol.type=field_type;
-    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
+    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
+      "."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
     new_symbol.value=gen_zero(field_type);

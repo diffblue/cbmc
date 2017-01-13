@@ -147,9 +147,6 @@ protected:
   std::string as_string(bool print_cwd) const;
 };
 
-// will go away
-//typedef source_locationt locationt;
-
 std::ostream &operator <<(std::ostream &, const source_locationt &);
 
 #endif // CPROVER_UTIL_SOURCE_LOCATION_H

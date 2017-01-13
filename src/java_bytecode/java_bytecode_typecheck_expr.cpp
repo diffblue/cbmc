@@ -30,7 +30,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     return typecheck_code(to_code(expr));
 
   if(expr.id()==ID_typecast && expr.type().id()==ID_pointer)
-    expr=make_clean_pointer_cast(expr,expr.type(),ns);
+    expr=make_clean_pointer_cast(expr, expr.type(), ns);
 
   // do operands recursively
   Forall_operands(it, expr)
@@ -83,7 +83,8 @@ Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
 
 \*******************************************************************/
 
-void java_bytecode_typecheckt::typecheck_expr_java_new_array(side_effect_exprt &expr)
+void java_bytecode_typecheckt::typecheck_expr_java_new_array(
+  side_effect_exprt &expr)
 {
   assert(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
@@ -133,7 +134,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     identifier_str << unique_num;
 
   irep_idt identifier_id=identifier_str.str();
-  string_literal_to_symbol_name.insert(std::make_pair(value,identifier_id));
+  string_literal_to_symbol_name.insert(std::make_pair(value, identifier_id));
 
   symbolt new_symbol;
   new_symbol.name=identifier_id;
@@ -228,13 +229,13 @@ Function: java_bytecode_typecheckt::typecheck_expr_symbol
 
 void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
 {
-  // The member might be in a parent class or an opaque class, which we resolve here.
+  // The member might be in a parent class or an opaque class, which we resolve
+  // here.
   const irep_idt component_name=expr.get_component_name();
 
   while(1)
   {
-
-    typet &base_type = const_cast<typet&>(ns.follow(expr.struct_op().type()));
+    typet &base_type=const_cast<typet&>(ns.follow(expr.struct_op().type()));
 
     if(base_type.id()!=ID_struct)
       break; // give up
@@ -249,10 +250,12 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     struct_typet::componentst &components=
       struct_type.components();
 
-    if(struct_type.get_bool(ID_incomplete_class)) {
-      // Member doesn't exist. In this case struct_type should be an opaque
+    if(struct_type.get_bool(ID_incomplete_class))
+    {
+      // member doesn't exist. In this case struct_type should be an opaque
       // stub, and we'll add the member to it.
-      components.push_back(struct_typet::componentt(component_name, expr.type()));
+      components
+        .push_back(struct_typet::componentt(component_name, expr.type()));
       components.back().set_base_name(component_name);
       components.back().set_pretty_name(component_name);
       return;

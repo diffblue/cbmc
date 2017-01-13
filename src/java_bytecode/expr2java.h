@@ -19,7 +19,7 @@ class typet;
 class expr2javat:public expr2ct
 {
 public:
-  expr2javat(const namespacet &_ns):expr2ct(_ns) { }
+  explicit expr2javat(const namespacet &_ns):expr2ct(_ns) { }
 
   virtual std::string convert(const exprt &src)
   {
@@ -34,13 +34,21 @@ public:
 protected:
   virtual std::string convert(const exprt &src, unsigned &precedence);
   virtual std::string convert_java_this(const exprt &src, unsigned precedence);
-  virtual std::string convert_java_instanceof(const exprt &src, unsigned precedence);
+  virtual std::string convert_java_instanceof(
+    const exprt &src,
+    unsigned precedence);
   virtual std::string convert_java_new(const exprt &src, unsigned precedence);
-  virtual std::string convert_code_java_delete(const exprt &src, unsigned precedence);
+  virtual std::string convert_code_java_delete(
+    const exprt &src,
+    unsigned precedence);
   virtual std::string convert_struct(const exprt &src, unsigned &precedence);
   virtual std::string convert_code(const codet &src, unsigned indent);
-  virtual std::string convert_constant(const constant_exprt &src, unsigned &precedence);
-  virtual std::string convert_code_function_call(const code_function_callt &src, unsigned indent);
+  virtual std::string convert_constant(
+    const constant_exprt &src,
+    unsigned &precedence);
+  virtual std::string convert_code_function_call(
+    const code_function_callt &src,
+    unsigned indent);
 
   virtual std::string convert_rec(
     const typet &src,

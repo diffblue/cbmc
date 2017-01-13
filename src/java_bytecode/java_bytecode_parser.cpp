@@ -352,7 +352,7 @@ void java_bytecode_parsert::get_class_refs()
       }
       break;
 
-    default:;
+    default:{};
     }
   }
 
@@ -447,7 +447,8 @@ void java_bytecode_parsert::rconstant_pool()
       it++)
   {
     // the first entry isn't used
-    if(it==constant_pool.begin()) continue;
+    if(it==constant_pool.begin())
+      continue;
 
     it->tag=read_u1();
 
@@ -520,7 +521,8 @@ void java_bytecode_parsert::rconstant_pool()
       it++)
   {
     // the first entry isn't used
-    if(it==constant_pool.begin()) continue;
+    if(it==constant_pool.begin())
+      continue;
 
     switch(it->tag)
     {
@@ -637,13 +639,12 @@ void java_bytecode_parsert::rconstant_pool()
       {
         it->expr.id("invokedynamic");
         const pool_entryt &nameandtype_entry=pool_entry(it->ref2);
-        //const pool_entryt &name_entry=pool_entry(nameandtype_entry.ref1);
         typet type=type_entry(nameandtype_entry.ref2);
         it->expr.type()=type;
       }
       break;
 
-    default:;
+    default:{};
     }
   }
 }
@@ -665,7 +666,8 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
   u2 interfaces_count=read_u2();
 
   for(std::size_t i=0; i<interfaces_count; i++)
-    parsed_class.implements.push_back(constant(read_u2()).type().get(ID_C_base_name));
+    parsed_class.implements
+      .push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
 
 /*******************************************************************\
@@ -750,7 +752,8 @@ void java_bytecode_parsert::rbytecode(
     instructiont &instruction=instructions.back();
     instruction.statement=bytecodes[bytecode].mnemonic;
     instruction.address=start_of_instruction;
-    instruction.source_location.set_java_bytecode_index(std::to_string(bytecode_index));
+    instruction.source_location
+      .set_java_bytecode_index(std::to_string(bytecode_index));
 
     switch(bytecodes[bytecode].format)
     {
@@ -787,7 +790,8 @@ void java_bytecode_parsert::rbytecode(
     case 'o': // two byte branch offset, signed
       {
         s2 offset=read_u2();
-        instruction.args.push_back(from_integer(address+offset, integer_typet()));
+        instruction
+          .args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=2;
       break;
@@ -795,7 +799,8 @@ void java_bytecode_parsert::rbytecode(
     case 'O': // four byte branch offset, signed
       {
         s4 offset=read_u4();
-        instruction.args.push_back(from_integer(address+offset, integer_typet()));
+        instruction
+          .args.push_back(from_integer(address+offset, integer_typet()));
       }
       address+=4;
       break;
@@ -809,7 +814,8 @@ void java_bytecode_parsert::rbytecode(
       break;
 
     case 'V':
-      if(wide_instruction) // local variable index (two bytes) plus two signed bytes
+      // local variable index (two bytes) plus two signed bytes
+      if(wide_instruction)
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, integer_typet()));
@@ -848,7 +854,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args
+          .push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
 
         // number of pairs
@@ -860,7 +867,8 @@ void java_bytecode_parsert::rbytecode(
           s4 match=read_u4();
           s4 offset=read_u4();
           instruction.args.push_back(from_integer(match, integer_typet()));
-          instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args
+            .push_back(from_integer(base_offset+offset, integer_typet()));
           address+=8;
         }
       }
@@ -875,7 +883,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args.push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args
+          .push_back(from_integer(base_offset+default_value, integer_typet()));
         address+=4;
 
         // now low value
@@ -891,7 +900,8 @@ void java_bytecode_parsert::rbytecode(
         {
           s4 offset=read_u4();
           instruction.args.push_back(from_integer(i, integer_typet()));
-          instruction.args.push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args
+            .push_back(from_integer(base_offset+offset, integer_typet()));
           address+=4;
         }
       }
@@ -920,7 +930,7 @@ void java_bytecode_parsert::rbytecode(
         case T_SHORT: t.id(ID_short); break;
         case T_INT: t.id(ID_int); break;
         case T_LONG: t.id(ID_long); break;
-        default:;
+        default:{};
         }
         instruction.args.push_back(type_exprt(t));
       }
@@ -1008,10 +1018,10 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
         line_number=it->source_location.get_line();
       else if(!line_number.empty())
         it->source_location.set_line(line_number);
-      it->source_location.set_function("java::"+
-                                       id2string(parse_tree.parsed_class.name)+"."+
-                                       id2string(method.name)+":"+
-                                       method.signature);
+      it->source_location
+        .set_function(
+          "java::"+id2string(parse_tree.parsed_class.name)+"."+
+          id2string(method.name)+":"+method.signature);
     }
 
     // line number of method
@@ -1078,7 +1088,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
   if(attribute_name=="LineNumberTable")
   {
     // address -> instructiont
-    typedef std::map<unsigned, methodt::instructionst::iterator> instruction_mapt;
+    typedef std::map<unsigned,
+                     methodt::instructionst::iterator> instruction_mapt;
     instruction_mapt instruction_map;
 
     for(methodt::instructionst::iterator
@@ -1120,7 +1131,8 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
       method.local_variable_table[i].index=index;
       method.local_variable_table[i].name=pool_entry(name_index).s;
-      method.local_variable_table[i].signature=id2string(pool_entry(descriptor_index).s);
+      method.local_variable_table[i].signature=
+        id2string(pool_entry(descriptor_index).s);
       method.local_variable_table[i].start_pc=start_pc;
       method.local_variable_table[i].length=length;
     }
@@ -1134,96 +1146,106 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     for(size_t i=0; i<stack_map_entries; i++)
     {
       u1 frame_type=read_u1();
-      if(0 <= frame_type && frame_type <= 63)
+      if(0<=frame_type && frame_type<=63)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME;
+        method.stack_map_table[i].type=methodt::stack_map_table_entryt::SAME;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
       }
-      else if(64 <= frame_type && frame_type <= 127)
+      else if(64<=frame_type && frame_type<=127)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
+        method.stack_map_table[i].type=
+          methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(1);
         methodt::verification_type_infot verification_type_info;
         read_verification_type_info(verification_type_info);
-        method.stack_map_table[i].stack[0] = verification_type_info;
+        method.stack_map_table[i].stack[0]=verification_type_info;
       }
-      else if(frame_type == 247)
+      else if(frame_type==247)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
+        method.stack_map_table[i].type=
+          methodt::stack_map_table_entryt::SAME_LOCALS_ONE_STACK_EXTENDED;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(1);
         methodt::verification_type_infot verification_type_info;
-        u2 offset_delta = read_u2();
+        u2 offset_delta=read_u2();
         read_verification_type_info(verification_type_info);
-        method.stack_map_table[i].stack[0] = verification_type_info;
-        method.stack_map_table[i].offset_delta = offset_delta;
+        method.stack_map_table[i].stack[0]=verification_type_info;
+        method.stack_map_table[i].offset_delta=offset_delta;
       }
-      else if(248 <= frame_type && frame_type <= 250)
+      else if(248<=frame_type && frame_type<=250)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::CHOP;
+        method.stack_map_table[i].type=methodt::stack_map_table_entryt::CHOP;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
-        u2 offset_delta = read_u2();
-        method.stack_map_table[i].offset_delta = offset_delta;
+        u2 offset_delta=read_u2();
+        method.stack_map_table[i].offset_delta=offset_delta;
       }
-      else if(frame_type == 251)
+      else if(frame_type==251)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::SAME_EXTENDED;
+        method.stack_map_table[i].type
+          =methodt::stack_map_table_entryt::SAME_EXTENDED;
         method.stack_map_table[i].locals.resize(0);
         method.stack_map_table[i].stack.resize(0);
-        u2 offset_delta = read_u2();
-        method.stack_map_table[i].offset_delta = offset_delta;
+        u2 offset_delta=read_u2();
+        method.stack_map_table[i].offset_delta=offset_delta;
       }
-      else if(252 <= frame_type && frame_type <= 254)
+      else if(252<=frame_type && frame_type<=254)
       {
-        size_t new_locals = (size_t) (frame_type - 251);
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::APPEND;
+        size_t new_locals=(size_t) (frame_type-251);
+        method.stack_map_table[i].type=methodt::stack_map_table_entryt::APPEND;
         method.stack_map_table[i].locals.resize(new_locals);
         method.stack_map_table[i].stack.resize(0);
-        u2 offset_delta = read_u2();
-        method.stack_map_table[i].offset_delta = offset_delta;
-        for(size_t k = 0; k < new_locals; k++)
+        u2 offset_delta=read_u2();
+        method.stack_map_table[i].offset_delta=offset_delta;
+        for(size_t k=0; k<new_locals; k++)
         {
-          method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+          method.stack_map_table[i].locals
+            .push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v=
+            method.stack_map_table[i].locals.back();
           read_verification_type_info(v);
         }
       }
-      else if(frame_type == 255)
+      else if(frame_type==255)
       {
-        method.stack_map_table[i].type = methodt::stack_map_table_entryt::FULL;
-        u2 offset_delta = read_u2();
-        method.stack_map_table[i].offset_delta = offset_delta;
-        u2 number_locals = read_u2();
+        method.stack_map_table[i].type=methodt::stack_map_table_entryt::FULL;
+        u2 offset_delta=read_u2();
+        method.stack_map_table[i].offset_delta=offset_delta;
+        u2 number_locals=read_u2();
         method.stack_map_table[i].locals.resize(number_locals);
-        for (size_t k = 0; k < (size_t) number_locals; k++)
+        for(size_t k=0; k<(size_t) number_locals; k++)
         {
-          method.stack_map_table[i].locals.push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v = method.stack_map_table[i].locals.back();
+          method.stack_map_table[i].locals
+            .push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v=
+            method.stack_map_table[i].locals.back();
           read_verification_type_info(v);
         }
-        u2 number_stack_items = read_u2();
+        u2 number_stack_items=read_u2();
         method.stack_map_table[i].stack.resize(number_stack_items);
-        for (size_t k = 0; k < (size_t) number_stack_items; k++)
+        for(size_t k=0; k<(size_t) number_stack_items; k++)
         {
-          method.stack_map_table[i].stack.push_back(methodt::verification_type_infot());
-          methodt::verification_type_infot &v = method.stack_map_table[i].stack.back();
+          method.stack_map_table[i].stack
+            .push_back(methodt::verification_type_infot());
+          methodt::verification_type_infot &v=
+            method.stack_map_table[i].stack.back();
           read_verification_type_info(v);
         }
       }
       else
-        throw "ERROR: unknown stack frame type encountered";
+        throw "error: unknown stack frame type encountered";
     }
   }
   else
     skip_bytes(attribute_length);
 }
 
-void java_bytecode_parsert::read_verification_type_info(methodt::verification_type_infot& v)
+void java_bytecode_parsert::read_verification_type_info(
+  methodt::verification_type_infot& v)
 {
-  u1 tag = read_u1();
+  u1 tag=read_u1();
   switch(tag)
   {
   case VTYPE_INFO_TOP:
@@ -1256,7 +1278,7 @@ void java_bytecode_parsert::read_verification_type_info(methodt::verification_ty
     v.offset=read_u2();
     break;
   default:
-    throw "ERROR: unknown verification type info encountered";
+    throw "error: unknown verification type info encountered";
   }
 }
 

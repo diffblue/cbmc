@@ -90,7 +90,10 @@ std::string expr2javat::convert_code_function_call(
       unsigned p;
       std::string arg_str=convert(*it, p);
 
-      if(first) first=false; else dest+=", ";
+      if(first)
+        first=false;
+      else
+        dest+=", ";
       // TODO: ggf. Klammern je nach p
       dest+=arg_str;
     }
@@ -218,7 +221,7 @@ std::string expr2javat::convert_constant(
     dest+="(char)'";
 
     if(int_value>=' ' && int_value<127)
-      dest+=(char)(int_value.to_long());
+      dest+=static_cast<char>(int_value.to_long());
     else
     {
       std::string hex=integer2string(int_value, 16);
@@ -332,7 +335,8 @@ std::string expr2javat::convert_rec(
 
     if(code_type.has_ellipsis())
     {
-      if(!parameters.empty()) dest+=", ";
+      if(!parameters.empty())
+        dest+=", ";
       dest+="...";
     }
 
@@ -534,7 +538,7 @@ std::string expr2javat::convert_code(
 
   if(statement==ID_java_new ||
      statement==ID_java_new_array)
-    return convert_java_new(src,indent);
+    return convert_java_new(src, indent);
 
   if(statement==ID_function_call)
     return convert_code_function_call(to_code_function_call(src), indent);
