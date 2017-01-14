@@ -1217,13 +1217,11 @@ void goto_checkt::bounds_check(
 
     add_guarded_claim(
       precond,
-      name+" upper bound",
+      name+" dynamic object upper bound",
       "array bounds",
       expr.find_source_location(),
       expr,
       guard);
-
-    return;
   }
 
   const exprt &size=array_type.id()==ID_array ?
