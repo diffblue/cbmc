@@ -383,8 +383,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return BOOL;
   else if(type.id()==ID_c_bool)
     return BOOL;
-  else if(type.id()==ID_floatbv ||
-          type.id()==ID_fixedbv)
+  else if(type.id()==ID_floatbv)
   {
     if(width<=config.ansi_c.single_width)
       return SINGLE;
@@ -394,6 +393,10 @@ c_typecastt::c_typet c_typecastt::get_c_type(
       return LONGDOUBLE;
     else if(width<=128)
       return FLOAT128;
+  }
+  else if(type.id()==ID_fixedbv)
+  {
+    return FIXEDBV;
   }
   else if(type.id()==ID_pointer)
   {
@@ -728,8 +731,8 @@ void c_typecastt::implicit_typecast_arithmetic(
   if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
   {
     // get the biggest width of both
-    unsigned width1=type1.get_int(ID_width);
-    unsigned width2=type2.get_int(ID_width);
+    std::size_t width1=type1.get_size_t(ID_width);
+    std::size_t width2=type2.get_size_t(ID_width);
 
     // produce type
     typet result_type;
@@ -749,6 +752,30 @@ void c_typecastt::implicit_typecast_arithmetic(
     do_typecast(expr1, result_type);
     do_typecast(expr2, result_type);
 
+    return;
+  }
+  else if(max_type==FIXEDBV)
+  {
+    typet result_type;
+    
+    if(c_type1==FIXEDBV && c_type2==FIXEDBV)
+    {
+      // get bigger of both
+      std::size_t width1=to_fixedbv_type(type1).get_width();
+      std::size_t width2=to_fixedbv_type(type2).get_width();
+      if(width1>=width2)
+        result_type=type1;
+      else
+        result_type=type2;
+    }
+    else if(c_type1==FIXEDBV)
+      result_type=type1;
+    else
+      result_type=type2;
+
+    do_typecast(expr1, result_type);
+    do_typecast(expr2, result_type);
+    
     return;
   }
   else if(max_type==COMPLEX)

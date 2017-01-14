@@ -72,9 +72,10 @@ protected:
                  LONG, ULONG,
                  LONGLONG, ULONGLONG,
                  LARGE_SIGNED_INT, LARGE_UNSIGNED_INT,
-                 INTEGER, // these are unbounded integers
+                 INTEGER, // these are unbounded integers, non-standard
+                 FIXEDBV, // fixed-point, non-standard
                  SINGLE, DOUBLE, LONGDOUBLE, FLOAT128, // float
-                 RATIONAL, REAL, // these are infinite precision
+                 RATIONAL, REAL, // infinite precision, non-standard
                  COMPLEX,
                  VOIDPTR, PTR, OTHER };
 

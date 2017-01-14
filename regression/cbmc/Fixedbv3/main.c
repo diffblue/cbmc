@@ -1,6 +1,6 @@
 int nondet_int();
 
-double d = 0.0;
+__CPROVER_fixedbv[64][32] d = 0.0;
 
 void f1()
 {

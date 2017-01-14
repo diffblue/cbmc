@@ -1,5 +1,5 @@
 int main() {
-  double x;
+  __CPROVER_fixedbv[64][32] x;
   int y;
 
   x=2;
