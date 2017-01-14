@@ -83,6 +83,8 @@ public:
       solver = get_dimacs();
     else if(options.get_bool_option("refine"))
       solver = get_bv_refinement();
+    else if(options.get_bool_option("pass"))
+      solver = get_string_refinement();
     else if(options.get_bool_option("smt1"))
       solver = get_smt1(get_smt1_solver_type());
     else if(options.get_bool_option("smt2"))
@@ -110,6 +112,7 @@ protected:
   solvert* get_default();
   solvert* get_dimacs();
   solvert* get_bv_refinement();
+  solvert* get_string_refinement();
   solvert* get_smt1(smt1_dect::solvert solver);
   solvert* get_smt2(smt2_dect::solvert solver);
 

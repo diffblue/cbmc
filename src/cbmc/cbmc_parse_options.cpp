@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/pass_preprocess.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_returns.h>
@@ -301,6 +302,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if(cmdline.isset("pass"))
+  {
+    options.set_option("pass", true);
+  }
+
   if(cmdline.isset("max-node-refinement"))
     options.set_option(
       "max-node-refinement",
@@ -419,6 +425,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("outfile"))
     options.set_option("outfile", cmdline.get_value("outfile"));
+
+  options.set_option("pass", cmdline.isset("pass"));
 
   if(cmdline.isset("graphml-witness"))
   {
@@ -887,6 +895,12 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
 
+    if(cmdline.isset("pass"))
+    {
+      status() << "PASS Preprocessing " << eom;
+      pass_preprocess(symbol_table, goto_functions);
+    }
+
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
@@ -973,6 +987,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove skips
     remove_skip(goto_functions);
     goto_functions.update();
+
   }
 
   catch(const char *e)
@@ -1157,6 +1172,7 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --pass                       use parameterized array for string solving (experimental)\n"
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

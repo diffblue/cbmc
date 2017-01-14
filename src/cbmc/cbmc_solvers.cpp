@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -320,6 +321,29 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
     options.get_bool_option("refine-arithmetic");
 
   return new cbmc_solver_with_propt(bv_refinement, prop);
+}
+
+/*******************************************************************\
+
+Function: cbmc_solverst::get_string_refinement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+ 
+cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
+{
+  propt *prop;
+  prop=new satcheck_no_simplifiert();
+  prop->set_message_handler(get_message_handler());
+
+  string_refinementt *string_refinement = new string_refinementt(ns, *prop);
+  string_refinement->set_ui(ui);
+  return new cbmc_solver_with_propt(string_refinement, prop);
 }
 
 /*******************************************************************\
