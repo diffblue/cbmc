@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int nondet_int();
 
 __CPROVER_fixedbv[64][32] d = 0.0;
@@ -20,5 +22,5 @@ int main()
 
   d += (x > 3);
 
-  assert(d == 2.0);
+  assert(d == (__CPROVER_fixedbv[64][32])2.0);
 }

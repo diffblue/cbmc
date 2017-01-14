@@ -657,14 +657,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv)
       {
-        // cast from float to int
+        // cast from fixedbv to int
         fixedbvt f(to_constant_expr(expr.op0()));
         expr=from_integer(f.to_integer(), expr_type);
         return false;
       }
       else if(expr_type_id==ID_fixedbv)
       {
-        // float to double or double to float
+        // fixedbv to fixedbv
         fixedbvt f(to_constant_expr(expr.op0()));
         f.round(to_fixedbv_type(expr_type));
         expr=f.to_expr();
@@ -673,20 +673,31 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
     else if(op_type_id==ID_floatbv)
     {
+      ieee_floatt f(to_constant_expr(expr.op0()));
+
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv)
       {
         // cast from float to int
-        ieee_floatt f(to_constant_expr(expr.op0()));
         expr=from_integer(f.to_integer(), expr_type);
         return false;
       }
       else if(expr_type_id==ID_floatbv)
       {
         // float to double or double to float
-        ieee_floatt f(to_constant_expr(expr.op0()));
         f.change_spec(to_floatbv_type(expr_type));
         expr=f.to_expr();
+        return false;
+      }
+      else if(expr_type_id==ID_fixedbv)
+      {
+        fixedbvt fixedbv;
+        fixedbv.spec=fixedbv_spect(to_fixedbv_type(expr_type));
+        ieee_floatt factor(f.spec);
+        factor.from_integer(power(2, fixedbv.spec.get_fraction_bits()));
+        f*=factor;
+        fixedbv.set_value(f.to_integer());
+        expr=fixedbv.to_expr();
         return false;
       }
     }

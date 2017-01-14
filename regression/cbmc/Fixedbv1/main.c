@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int main() {
   __CPROVER_fixedbv[64][32] x;
   int y;
