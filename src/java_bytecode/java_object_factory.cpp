@@ -444,7 +444,7 @@ void java_object_factoryt::gen_nondet_array_init(
     loc,
     false,
     true,
-    /*override_type=*/&element_type);
+    &element_type);
 
   exprt java_one=as_number(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
