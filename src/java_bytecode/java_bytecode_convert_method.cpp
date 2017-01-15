@@ -1007,7 +1007,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
                .find("<init>")!=std::string::npos)
               code_type.set(ID_constructor, true);
             else
-              code_type.set("java_super_method_call", true);
+              code_type.set(ID_java_super_method_call, true);
           }
           pointer_typet object_ref_type(thistype);
           code_typet::parametert this_p(object_ref_type);
