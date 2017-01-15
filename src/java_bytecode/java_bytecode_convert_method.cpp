@@ -1017,11 +1017,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       i_it!=instructions.end();
       i_it++)
   {
+    converted_instructiont ins=converted_instructiont(i_it, code_skipt());
     std::pair<address_mapt::iterator, bool> a_entry=
-      address_map.insert(
-        std::make_pair(
-          i_it->address,
-          converted_instructiont(i_it, code_skipt())));
+      address_map.insert(std::make_pair(i_it->address, ins));
     assert(a_entry.second);
     // addresses are strictly increasing, hence we must have inserted
     // a new maximal key
@@ -1060,7 +1058,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
          i_it->statement=="jsr_w")
       {
         instructionst::const_iterator next=i_it;
-        assert(++next!=instructions.end() && "jsr without valid return address?");
+        assert(
+          ++next!=instructions.end() &&
+          "jsr without valid return address?");
         targets.insert(next->address);
         jsr_ret_targets.push_back(next->address);
       }
@@ -1088,12 +1088,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
   }
 
-  // Draw edges from every `ret` to every `jsr` successor.
-  // Could do better with flow analysis to distinguish multiple subroutines within
-  // the same function.
+  // Draw edges from every `ret` to every `jsr` successor. Could do better with
+  // flow analysis to distinguish multiple subroutines within the same function.
   for(const auto retinst : ret_instructions)
   {
-    auto& a_entry=address_map.at(retinst->address);
+    auto &a_entry=address_map.at(retinst->address);
     a_entry.successors.insert(
       a_entry.successors.end(),
       jsr_ret_targets.begin(),
@@ -1529,7 +1528,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           branches.move_to_operands(g);
         else
         {
-          code_ifthenelset branch;
+          code_ifthenelset
+            branch;
           auto address_ptr=as_number(
             jsr_ret_targets[idx],
             pointer_typet(void_typet(), 64));
@@ -1558,9 +1558,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(is_double || is_float)
       {
         const ieee_float_spect spec(
-          is_float?
-            ieee_float_spect::single_precision():
-            ieee_float_spect::double_precision());
+          is_float?ieee_float_spect::single_precision():
+          ieee_float_spect::double_precision());
 
         ieee_floatt value(spec);
         const typet &arg_type(arg0.type());
@@ -1752,15 +1751,19 @@ codet java_bytecode_convert_methodt::convert_instructions(
       //  1 if op[0] is greater than op[1]
 
       const typet t=java_int_type();
+      exprt one=from_integer(1, t);
+      exprt minus_one=from_integer(-1, t);
+
+      if_exprt greater=if_exprt(
+        binary_relation_exprt(op[0], ID_gt, op[1]),
+        one,
+        minus_one);
 
       results[0]=
         if_exprt(
           binary_relation_exprt(op[0], ID_equal, op[1]),
           gen_zero(t),
-          if_exprt(
-            binary_relation_exprt(op[0], ID_gt, op[1]),
-            from_integer(1, t),
-            from_integer(-1, t)));
+          greater);
     }
     else if(statement==patternt("?cmp?"))
     {
@@ -1779,19 +1782,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // (value1 == NaN || value2 == NaN) ?
       //   nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
 
+      exprt nan_op0=ieee_float_equal_exprt(nan_expr, op[0]);
+      exprt nan_op1=ieee_float_equal_exprt(nan_expr, op[1]);
+      exprt one=from_integer(1, result_type);
+      exprt minus_one=from_integer(-1, result_type);
       results[0]=
         if_exprt(
-          or_exprt(
-            ieee_float_equal_exprt(nan_expr, op[0]),
-            ieee_float_equal_exprt(nan_expr, op[1])),
+          or_exprt(nan_op0, nan_op1),
           nan_result,
           if_exprt(
             ieee_float_equal_exprt(op[0], op[1]),
             gen_zero(result_type),
             if_exprt(
               binary_relation_exprt(op[0], ID_lt, op[1]),
-              from_integer(-1, result_type),
-              from_integer(1, result_type))));
+              minus_one,
+              one)));
     }
     else if(statement==patternt("?cmpl"))
     {
@@ -2200,7 +2205,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         else
         {
           c.make_block();
-          auto& last_statement=to_code_block(c).find_last_statement();
+          auto &last_statement=to_code_block(c).find_last_statement();
           if(last_statement.get_statement()==ID_goto)
           {
             // Insert stack twiddling before branch:
