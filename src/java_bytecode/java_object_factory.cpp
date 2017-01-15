@@ -32,7 +32,7 @@ Function: gen_nondet_init
 
 \*******************************************************************/
 
-class gen_nondet_statet
+class java_object_factoryt
 {
   code_blockt &init_code;
   std::set<irep_idt> recursion_set;
@@ -42,12 +42,16 @@ class gen_nondet_statet
   namespacet ns;
 
 public:
-  gen_nondet_statet(code_blockt& ic, bool ann, size_t mnal, symbol_tablet& st) :
-    init_code(ic),
-    assume_non_null(ann),
-    max_nondet_array_length(mnal),
-    symbol_table(st),
-    ns(st) {}
+  java_object_factoryt(
+    code_blockt& _init_code,
+    bool _assume_non_null,
+    size_t _max_nondet_array_length,
+    symbol_tablet& _symbol_table) :
+    init_code(_init_code),
+    assume_non_null(_assume_non_null),
+    max_nondet_array_length(_max_nondet_array_length),
+    symbol_table(_symbol_table),
+    ns(_symbol_table) {}
 
   exprt allocate_object(
     const exprt&,
@@ -70,7 +74,7 @@ public:
 // Returns false if we can't figure out the size of allocate_type.
 // allocate_type may differ from target_expr, e.g. for target_expr having
 // type int* and allocate_type being an int[10].
-exprt gen_nondet_statet::allocate_object(
+exprt java_object_factoryt::allocate_object(
   const exprt& target_expr,
   const typet& allocate_type,
   const source_locationt &loc,
@@ -106,7 +110,7 @@ exprt gen_nondet_statet::allocate_object(
       malloc_expr.copy_to_operands(object_size);
       typet result_type=pointer_typet(allocate_type);
       malloc_expr.type()=result_type;
-      // Create a symbol for the malloc expression so we can initialise
+      // Create a symbol for the malloc expression so we can initialize
       // without having to do it potentially through a double-deref, which
       // breaks the to-SSA phase.
       symbolt &malloc_sym=new_tmp_symbol(symbol_table, "malloc_site");
@@ -139,7 +143,7 @@ exprt gen_nondet_statet::allocate_object(
 // type regardless. Used at the moment for reference arrays, which are
 // implemented as void* arrays but should be init'd as their true type with
 // appropriate casts.
-void gen_nondet_statet::gen_nondet_init(
+void java_object_factoryt::gen_nondet_init(
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
@@ -177,7 +181,7 @@ void gen_nondet_statet::gen_nondet_init(
     code_labelt set_null_label;
     code_labelt init_done_label;
 
-    static unsigned long synthetic_constructor_count=0;
+    static size_t synthetic_constructor_count=0;
 
     if(!assume_non_null)
     {
@@ -323,7 +327,7 @@ static constant_exprt as_number(const mp_integer value, const typet &type)
   return constant_exprt(binary_width+significant_bits, type);
 }
 
-void gen_nondet_statet::gen_nondet_array_init(
+void java_object_factoryt::gen_nondet_array_init(
   const exprt &expr,
   const source_locationt &loc)
 {
@@ -341,7 +345,7 @@ void gen_nondet_statet::gen_nondet_array_init(
   length_sym.type=java_int_type();
   const auto &length_sym_expr=length_sym.symbol_expr();
 
-  // Initialise array with some undetermined length:
+  // Initialize array with some undetermined length:
   gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false, false);
 
   // Insert assumptions to bound its length:
@@ -356,7 +360,7 @@ void gen_nondet_statet::gen_nondet_array_init(
 
   side_effect_exprt java_new_array(ID_java_new_array, expr.type());
   java_new_array.copy_to_operands(length_sym_expr);
-  java_new_array.set("skip_initialise", true);
+  java_new_array.set("skip_initialize", true);
   java_new_array.type().subtype().set(ID_C_element_type, element_type);
   codet assign=code_assignt(expr, java_new_array);
   assign.add_source_location()=loc;
@@ -459,7 +463,7 @@ void gen_nondet_init(
   bool assume_non_null,
   size_t max_nondet_array_length)
 {
-  gen_nondet_statet state(
+  java_object_factoryt state(
     init_code,
     assume_non_null,
     max_nondet_array_length,
