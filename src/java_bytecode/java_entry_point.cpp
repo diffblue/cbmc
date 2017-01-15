@@ -179,12 +179,6 @@ bool java_static_lifetime_init(
   return false;
 }
 
-static bool is_string_array(const typet& t)
-{
-  typet compare_to=java_type_from_string("[Ljava.lang.String;");
-  return full_eq(t, compare_to);
-}
-
 /*******************************************************************\
 
 Function: java_build_arguments
@@ -221,11 +215,13 @@ exprt::operandst java_build_arguments(
     if(!is_main)
     {
       bool named_main=has_suffix(config.main, ".main");
+      const typet &string_array_type=
+        java_type_from_string("[Ljava.lang.String;");
       bool has_correct_type=
         to_code_type(function.type).return_type().id()==ID_empty &&
         (!to_code_type(function.type).has_this()) &&
         parameters.size()==1 &&
-        is_string_array(parameters[0].type());
+        full_eq(parameters[0].type(), string_array_type);
       is_main=(named_main && has_correct_type);
     }
 
