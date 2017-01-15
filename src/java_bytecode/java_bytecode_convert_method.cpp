@@ -108,6 +108,11 @@ protected:
     INST_INDEX_CONST=3
   } instruction_sizet;
 
+  codet get_array_bounds_check(
+    const exprt &arraystruct,
+    const exprt &idx,
+    const source_locationt& original_sloc);
+
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
     size_t address,
@@ -672,7 +677,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
     fieldref.type());
 }
 
-codet get_array_bounds_check(
+codet java_bytecode_convert_methodt::get_array_bounds_check(
   const exprt &arraystruct,
   const exprt &idx,
   const source_locationt& original_sloc)
@@ -681,22 +686,24 @@ codet get_array_bounds_check(
   binary_relation_exprt gezero(idx, ID_ge, intzero);
   const member_exprt length_field(arraystruct, "length", java_int_type());
   binary_relation_exprt ltlength(idx, ID_lt, length_field);
-  code_blockt boundschecks;
-  boundschecks.add(code_assertt(gezero));
-  boundschecks.operands().back().add_source_location()=original_sloc;
-  boundschecks.operands().back().add_source_location()
+  code_blockt bounds_checks;
+
+  bounds_checks.add(code_assertt(gezero));
+  bounds_checks.operands().back().add_source_location()=original_sloc;
+  bounds_checks.operands().back().add_source_location()
     .set_comment("Array index < 0");
-  boundschecks.operands().back().add_source_location()
+  bounds_checks.operands().back().add_source_location()
     .set_property_class("array-index-oob-low");
-  boundschecks.add(code_assertt(ltlength));
-  boundschecks.operands().back().add_source_location()=original_sloc;
-  boundschecks.operands().back().add_source_location()
+  bounds_checks.add(code_assertt(ltlength));
+
+  bounds_checks.operands().back().add_source_location()=original_sloc;
+  bounds_checks.operands().back().add_source_location()
     .set_comment("Array index >= length");
-  boundschecks.operands().back().add_source_location()
+  bounds_checks.operands().back().add_source_location()
     .set_property_class("array-index-oob-high");
 
   // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
-  return boundschecks;
+  return bounds_checks;
 }
 
 /*******************************************************************\
@@ -1235,7 +1242,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // Remember that this is triggered by an assertion
       if(statement=="invokespecial" &&
-        as_string(arg0.get(ID_identifier))
+         id2string(arg0.get(ID_identifier))
          .find("AssertionError")!=std::string::npos)
       {
         assertion_failure=true;
