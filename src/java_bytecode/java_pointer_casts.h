@@ -9,7 +9,7 @@ Author: DiffBlue
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_POINTER_CASTS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_POINTER_CASTS_H
 
-exprt clean_deref(const exprt ptr);
+exprt clean_deref(const exprt &ptr);
 
 bool find_superclass_with_type(
   exprt &ptr,

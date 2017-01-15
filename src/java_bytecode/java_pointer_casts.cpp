@@ -24,7 +24,7 @@ Function: clean_deref
 
 \*******************************************************************/
 
-exprt clean_deref(const exprt ptr)
+exprt clean_deref(const exprt &ptr)
 {
   return ptr.id()==ID_address_of
              ? ptr.op0()
