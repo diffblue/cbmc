@@ -210,7 +210,7 @@ exprt::operandst java_build_arguments(
   {
     bool is_this=(param_number==0) &&
                  parameters[param_number].get_this();
-    bool is_default_entry_point=config.main=="";
+    bool is_default_entry_point(config.main=="");
     bool is_main=is_default_entry_point;
     if(!is_main)
     {
