@@ -204,10 +204,9 @@ void gen_nondet_statet::gen_nondet_init(
 
       code_ifthenelset
         null_check;
+      exprt null_return=constant_exprt("0", returns_null_sym.type);
       null_check.cond()=
-        notequal_exprt(
-          returns_null,
-          constant_exprt("0", returns_null_sym.type));
+        notequal_exprt(returns_null, null_return);
       null_check.then_case()=code_gotot(fresh_label);
       init_code.move_to_operands(null_check);
     }
@@ -387,8 +386,8 @@ void gen_nondet_statet::gen_nondet_array_init(
   counter.type=length_sym_expr.type();
   exprt counter_expr=counter.symbol_expr();
 
-  init_code.copy_to_operands(
-    code_assignt(counter_expr, as_number(0, java_int_type())));
+  exprt java_zero=as_number(0, java_int_type());
+  init_code.copy_to_operands(code_assignt(counter_expr, java_zero));
 
   std::string head_name=as_string(counter.base_name)+"_header";
   code_labelt init_head_label(head_name, code_skipt());
@@ -429,9 +428,8 @@ void gen_nondet_statet::gen_nondet_array_init(
     true,
     /*override_type=*/&element_type);
 
-  code_assignt incr(
-    counter_expr,
-    plus_exprt(counter_expr, as_number(1, java_int_type())));
+  exprt java_one=as_number(1, java_int_type());
+  code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
   init_code.move_to_operands(incr);
   init_code.move_to_operands(goto_head);
