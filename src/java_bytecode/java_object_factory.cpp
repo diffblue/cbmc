@@ -327,6 +327,20 @@ static constant_exprt as_number(const mp_integer value, const typet &type)
   return constant_exprt(binary_width+significant_bits, type);
 }
 
+/*******************************************************************\
+
+Function: gen_nondet_array_init
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: create code to initialize a Java array with size
+          `max_nondet_array_length`, loop over elements and initialize
+          them
+
+\*******************************************************************/
+
 void java_object_factoryt::gen_nondet_array_init(
   const exprt &expr,
   const source_locationt &loc)
