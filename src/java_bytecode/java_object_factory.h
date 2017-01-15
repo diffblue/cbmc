@@ -25,9 +25,9 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &,
-  bool skip_classid=false,
-  bool create_dynamic_objects=false,
-  bool assume_non_null=false,
+  bool skip_classid,
+  bool create_dynamic_objects,
+  bool assume_non_null,
   size_t max_nondet_array_length=5);
 
 exprt get_nondet_bool(const typet&);
