@@ -15,6 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <util/symbol.h>
+#include <util/std_types.h>
+#include <goto-programs/system_library_symbols.h>
 
 #include "message.h"
 
