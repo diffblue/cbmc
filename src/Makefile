@@ -84,12 +84,12 @@ glucose-download:
 	@rm glucose-syrup.tgz
 
 zlib-download:
-	@echo "Downloading zlib 1.2.10"
-	@lwp-download http://zlib.net/zlib-1.2.10.tar.gz
-	@tar xfz zlib-1.2.10.tar.gz
+	@echo "Downloading zlib 1.2.11"
+	@lwp-download http://zlib.net/zlib-1.2.11.tar.gz
+	@tar xfz zlib-1.2.11.tar.gz
 	@rm -Rf ../zlib
-	@mv zlib-1.2.10 ../zlib
-	@rm zlib-1.2.10.tar.gz
+	@mv zlib-1.2.11 ../zlib
+	@rm zlib-1.2.11.tar.gz
 
 libzip-download:
 	@echo "Downloading libzip 1.1.2"
