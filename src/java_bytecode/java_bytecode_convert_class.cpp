@@ -15,8 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
 
+#include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
+
+#include <linking/zero_initializer.h>
 
 class java_bytecode_convert_classt:public messaget
 {
@@ -215,7 +217,13 @@ void java_bytecode_convert_classt::convert(
       "."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
-    new_symbol.value=gen_zero(field_type);
+    const namespacet ns(symbol_table);
+    new_symbol.value=
+      zero_initializer(
+        field_type,
+        class_symbol.location,
+        ns,
+        get_message_handler());
 
     // Do we have the static field symbol already?
     const auto s_it=symbol_table.symbols.find(new_symbol.name);

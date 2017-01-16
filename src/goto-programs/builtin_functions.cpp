@@ -814,7 +814,12 @@ void goto_convertt::do_java_new_array(
   t_p->source_location=location;
 
   // zero-initialize the data
-  exprt zero_element=gen_zero(data.type().subtype());
+  exprt zero_element=
+    zero_initializer(
+      data.type().subtype(),
+      location,
+      ns,
+      get_message_handler());
   codet array_set(ID_array_set);
   array_set.copy_to_operands(data, zero_element);
   goto_programt::targett t_d=dest.add_instruction(OTHER);
@@ -1646,7 +1651,13 @@ void goto_convertt::do_function_call_symbol(
     {
       goto_programt::targett t=dest.add_instruction(ASSIGN);
       t->source_location=function.source_location();
-      t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
+      exprt zero=
+        zero_initializer(
+          dest_expr.type(),
+          function.source_location(),
+          ns,
+          get_message_handler());
+      t->code=code_assignt(dest_expr, zero);
     }
   }
   else if(identifier=="__sync_fetch_and_add" ||
