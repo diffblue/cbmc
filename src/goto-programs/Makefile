@@ -59,7 +59,6 @@ SRC = basic_blocks.cpp \
       slice_global_inits.cpp \
       string_abstraction.cpp \
       string_instrumentation.cpp \
-      string_refine_preprocess.cpp \
       system_library_symbols.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \
