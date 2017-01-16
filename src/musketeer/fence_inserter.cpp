@@ -147,7 +147,7 @@ void fence_insertert::preprocess()
       e_c_it!=e_i->end();
       ++e_c_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_c_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_c_it)->second, pt_set);
     }
@@ -165,7 +165,7 @@ void fence_insertert::preprocess()
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
@@ -183,7 +183,7 @@ void fence_insertert::preprocess()
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
@@ -201,7 +201,7 @@ void fence_insertert::preprocess()
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
@@ -221,13 +221,13 @@ void fence_insertert::preprocess()
         e_c_it!=e_i->end();
         ++e_c_it)
       {
-        std::set<event_idt> ct_set;
+        std::set<unsigned> ct_set;
         assert( invisible_var.map_to_e.find(*e_c_it)
           != invisible_var.map_to_e.end());
         const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
-        std::set<event_idt> ct_not_powr_set;
+        std::set<unsigned> ct_not_powr_set;
         const_graph_visitor.CT_not_powr(
           invisible_var.map_to_e.find(*e_c_it)->second, ct_not_powr_set);
       }
