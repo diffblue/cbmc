@@ -117,6 +117,11 @@ void goto_inlinet::parameter_assignments(
         {
           actual.make_typecast(par_type);
         }
+        else if(f_partype.id()==ID_floatbv &&
+                f_acttype.id()==ID_floatbv)
+        {
+          actual.make_typecast(par_type);
+        }
         else
         {
           error().source_location=actual.find_source_location();
