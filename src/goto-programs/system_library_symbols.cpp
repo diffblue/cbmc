@@ -10,6 +10,7 @@ Author: Thomas Kiley
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/symbol.h>
+#include <sstream>
 
 system_library_symbolst::system_library_symbolst()
 {
@@ -61,15 +62,27 @@ void system_library_symbolst::init_system_library_map()
     "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh",
     "cbrt", "ceil", "copysign", "cos", "cosh", "erf", "erfc", "exp",
     "exp2", "expm1", "fabs", "fdim", "floor", "fma", "fmax", "fmin",
-    "fmod", "fpclassify", "frexp", "hypot", "ilogb", "isfinite",
-    "isinf", "isnan", "isnormal", "j0", "j1", "jn", "ldexp", "lgamma",
-    "llrint", "llround", "log", "log10", "log1p", "log2", "logb",
-    "lrint", "lround", "modf", "nan", "nearbyint", "nextafter", "pow",
-    "remainder", "remquo", "rint", "round", "scalbln", "scalbn",
-    "signbit", "sin", "sinh", "sqrt", "tan", "tanh", "tgamma",
-    "trunc", "y0", "y1", "yn"
+    "fmod", "fpclassify", "fpclassifyl", "fpclassifyf", "frexp",
+    "hypot", "ilogb", "isfinite", "isinf", "isnan", "isnormal",
+    "j0", "j1", "jn", "ldexp", "lgamma", "llrint", "llround", "log",
+    "log10", "log1p", "log2", "logb", "lrint", "lround", "modf", "nan",
+    "nearbyint", "nextafter", "pow", "remainder", "remquo", "rint",
+    "round", "scalbln", "scalbn", "signbit", "sin", "sinh", "sqrt",
+    "tan", "tanh", "tgamma", "trunc", "y0", "y1", "yn", "isinff",
+    "isinfl", "isnanf", "isnanl"
   };
   add_to_system_library("math.h", math_syms);
+
+  // for some reason the math functions can sometimes be prefixed with
+  // a double underscore
+  std::list<irep_idt> underscore_math_syms;
+  for(const irep_idt &math_sym : math_syms)
+  {
+    std::ostringstream underscore_id;
+    underscore_id << "__" << math_sym;
+    underscore_math_syms.push_back(irep_idt(underscore_id.str()));
+  }
+  add_to_system_library("math.h", underscore_math_syms);
 
   // pthread.h
   std::list<irep_idt> pthread_syms=
@@ -140,7 +153,8 @@ void system_library_symbolst::init_system_library_map()
   {
     "strcat", "strncat", "strchr", "strrchr", "strcmp", "strncmp",
     "strcpy", "strncpy", "strerror", "strlen", "strpbrk", "strspn",
-    "strcspn", "strstr", "strtok"
+    "strcspn", "strstr", "strtok", "strcasecmp", "strncasecmp", "strdup",
+    "memset"
   };
   add_to_system_library("string.h", string_syms);
 
@@ -188,6 +202,27 @@ void system_library_symbolst::init_system_library_map()
     "fstat", "lstat", "stat"
   };
   add_to_system_library("sys/stat.h", sys_stat_syms);
+
+  std::list<irep_idt> fenv_syms=
+  {
+    "fenv_t", "fexcept_t", "feclearexcept", "fegetexceptflag",
+    "feraiseexcept", "fesetexceptflag", "fetestexcept",
+    "fegetround", "fesetround", "fegetenv", "feholdexcept",
+    "fesetenv", "feupdateenv"
+  };
+  add_to_system_library("fenv.h", fenv_syms);
+
+  std::list<irep_idt> errno_syms=
+  {
+    "__error", "__errno_location", "__errno"
+  };
+  add_to_system_library("errno.c", errno_syms);
+
+  std::list<irep_idt> noop_syms=
+  {
+    "__noop"
+  };
+  add_to_system_library("noop.c", noop_syms);
 
 #if 0
   // sys/types.h
@@ -263,6 +298,17 @@ bool system_library_symbolst::is_symbol_internal_symbol(
      name_str=="envp_size'")
     return true;
 
+  // exclude nondet instructions
+  if(has_prefix(name_str, "nondet_"))
+  {
+    return true;
+  }
+
+  if(has_prefix(name_str, "__VERIFIER"))
+  {
+    return true;
+  }
+
   const std::string &file_str=id2string(symbol.location.get_file());
 
   // don't dump internal GCC builtins
@@ -280,6 +326,15 @@ bool system_library_symbolst::is_symbol_internal_symbol(
      symbol.name==ID_gcc_builtin_va_arg)
   {
     out_system_headers.insert("stdarg.h");
+    return true;
+  }
+
+  // don't dump asserts
+  else if(name_str=="__assert_fail" ||
+          name_str=="_assert" ||
+          name_str=="__assert_c99" ||
+          name_str=="_wassert")
+  {
     return true;
   }
 
