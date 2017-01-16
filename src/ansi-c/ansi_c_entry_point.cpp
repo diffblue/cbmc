@@ -73,6 +73,18 @@ exprt::operandst build_function_environment(
 
     init_code.add(decl);
 
+    // nondet init for _Bool
+    if(decl.symbol().type().id()==ID_c_bool)
+    {
+      code_assignt assign(
+        decl.symbol(),
+        typecast_exprt(
+          side_effect_expr_nondett(bool_typet()),
+          decl.symbol().type()));
+
+      init_code.move_to_operands(assign);
+    }
+
     codet input(ID_input);
     input.operands().resize(2);
 

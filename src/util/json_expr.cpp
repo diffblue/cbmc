@@ -265,6 +265,15 @@ json_objectt json(
       result["binary"]=json_stringt(expr.is_true()?"1":"0");
       result["data"]=jsont::json_boolean(expr.is_true());
     }
+    else if(type.id()==ID_c_bool)
+    {
+      result["name"]=json_stringt("integer");
+      result["c_type"]=json_stringt("_Bool");
+      result["binary"]=json_stringt(expr.get_string(ID_value));
+      mp_integer b;
+      to_integer(to_constant_expr(expr), b);
+      result["data"]=json_stringt(integer2string(b));
+    }
     else
     {
       result["name"]=json_stringt("unknown");
