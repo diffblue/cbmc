@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/cprover_prefix.h>
 #include <util/message.h>
 #include <util/config.h>
@@ -63,7 +62,8 @@ static void create_initialize(symbol_tablet &symbol_table)
   symbol_exprt rounding_mode=
     ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
 
-  init_code.add(code_assignt(rounding_mode, gen_zero(rounding_mode.type())));
+  init_code.add(
+    code_assignt(rounding_mode, from_integer(0, rounding_mode.type())));
 
   initialize.value=init_code;
 
@@ -241,10 +241,11 @@ exprt::operandst java_build_arguments(
     // record as an input
     codet input(ID_input);
     input.operands().resize(2);
-    input.op0()=address_of_exprt(
-      index_exprt(
-        string_constantt(p_symbol.base_name),
-        from_integer(0, index_type())));
+    input.op0()=
+      address_of_exprt(
+        index_exprt(
+          string_constantt(p_symbol.base_name),
+          from_integer(0, index_type())));
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
 

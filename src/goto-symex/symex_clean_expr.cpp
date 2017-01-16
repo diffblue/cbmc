@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/cprover_prefix.h>
 #include <util/base_type.h>
 
@@ -78,7 +78,7 @@ void goto_symext::process_array_expr_rec(
     byte_extract_exprt be(byte_extract_id());
     be.type()=type;
     be.op()=expr;
-    be.offset()=gen_zero(index_type());
+    be.offset()=from_integer(0, index_type());
 
     expr.swap(be);
   }

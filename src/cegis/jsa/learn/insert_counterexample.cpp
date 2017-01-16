@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/cegis-util/type_helper.h>
@@ -93,7 +92,8 @@ void add_array_index(jsa_programt &prog)
   pos=body.insert_after(pos);
   const typet type(signed_int_type());
   declare_jsa_meta_variable(st, pos, CE_ARRAY_INDEX, type);
-  pos=assign_jsa_meta_variable(st, gf, pos, CE_ARRAY_INDEX, gen_zero(type));
+  constant_exprt zero=from_integer(0, signed_int_type());
+  pos=assign_jsa_meta_variable(st, gf, pos, CE_ARRAY_INDEX, zero);
 }
 
 symbol_exprt get_ce_array_index(const symbol_tablet &st)
@@ -110,7 +110,7 @@ void add_ce_goto(jsa_programt &prog, const size_t ces_size)
   pos->type=goto_program_instruction_typet::ASSIGN;
   const symbol_exprt lhs(get_ce_array_index(prog.st));
   const typet &type=lhs.type();
-  const plus_exprt inc(lhs, gen_one(type), type);
+  const plus_exprt inc(lhs, from_integer(1, type), type);
   pos->code=code_assignt(lhs, inc);
   pos=body.insert_after(pos);
   pos->source_location=jsa_builtin_source_location();

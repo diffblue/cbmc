@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/threeval.h>
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/symbol.h>
 #include <util/std_expr.h>

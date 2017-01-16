@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/expr_util.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/config.h>
@@ -549,7 +548,7 @@ void string_instrumentationt::do_format_string_read(
           {
             index_exprt index;
             index.array()=temp;
-            index.index()=gen_zero(index_type());
+            index.index()=from_integer(0, index_type());
             index.type()=arg_type.subtype();
             temp=address_of_exprt(index);
           }
@@ -597,7 +596,7 @@ void string_instrumentationt::do_format_string_read(
         {
           index_exprt index;
           index.array()=temp;
-          index.index()=gen_zero(index_type());
+          index.index()=from_integer(0, index_type());
           index.type()=arg_type.subtype();
           temp=address_of_exprt(index);
         }
@@ -664,7 +663,7 @@ void string_instrumentationt::do_format_string_write(
           {
             exprt fwidth = from_integer(token.field_width, unsigned_int_type());
             exprt fw_1(ID_plus, unsigned_int_type());
-            exprt one = gen_one(unsigned_int_type());
+            exprt one=from_integer(1, unsigned_int_type());
             fw_1.move_to_operands(fwidth);
             fw_1.move_to_operands(one); // +1 for 0-char
 
@@ -676,7 +675,7 @@ void string_instrumentationt::do_format_string_write(
             {
               index_exprt index;
               index.array()=argument;
-              index.index()=gen_zero(unsigned_int_type());
+              index.index()=from_integer(0, unsigned_int_type());
               address_of_exprt aof(index);
               fw_lt_bs=binary_relation_exprt(fw_1, ID_le, buffer_size(aof));
             }
@@ -1018,16 +1017,20 @@ void string_instrumentationt::do_strerror(
 
     goto_programt::targett assumption1=tmp.add_instruction();
 
-    assumption1->make_assumption(binary_relation_exprt(
-      symbol_size.symbol_expr(), ID_notequal,
-      gen_zero(symbol_size.type)));
+    assumption1->make_assumption(
+      binary_relation_exprt(
+        symbol_size.symbol_expr(),
+        ID_notequal,
+        from_integer(0, symbol_size.type)));
 
     assumption1->source_location=it->source_location;
   }
 
   // return a pointer to some magic buffer
   exprt index=exprt(ID_index, char_type());
-  index.copy_to_operands(symbol_buf.symbol_expr(), gen_zero(index_type()));
+  index.copy_to_operands(
+    symbol_buf.symbol_expr(),
+    from_integer(0, index_type()));
 
   exprt ptr=exprt(ID_address_of, pointer_typet());
   ptr.type().subtype()=char_type();
@@ -1096,7 +1099,8 @@ void string_instrumentationt::invalidate_buffer(
 
   goto_programt::targett init=dest.add_instruction(ASSIGN);
   init->source_location=target->source_location;
-  init->code=code_assignt(cntr_sym.symbol_expr(), gen_zero(cntr_sym.type));
+  init->code=
+    code_assignt(cntr_sym.symbol_expr(), from_integer(0, cntr_sym.type));
 
   goto_programt::targett check=dest.add_instruction();
   check->source_location=target->source_location;
@@ -1109,7 +1113,7 @@ void string_instrumentationt::invalidate_buffer(
 
   exprt plus(ID_plus, unsigned_int_type());
   plus.copy_to_operands(cntr_sym.symbol_expr());
-  plus.copy_to_operands(gen_one(unsigned_int_type()));
+  plus.copy_to_operands(from_integer(1, unsigned_int_type()));
 
   increment->code=code_assignt(cntr_sym.symbol_expr(), plus);
 
@@ -1130,7 +1134,7 @@ void string_instrumentationt::invalidate_buffer(
   {
     index_exprt index;
     index.array()=buffer;
-    index.index()=gen_zero(index_type());
+    index.index()=from_integer(0, index_type());
     index.type()=buf_type.subtype();
     bufp = address_of_exprt(index);
   }

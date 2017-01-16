@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/expr_util.h>
 #include <util/rename.h>
 #include <util/std_expr.h>
 

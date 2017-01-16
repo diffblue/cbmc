@@ -723,7 +723,7 @@ void value_set_dereferencet::bounds_check(
     }
     else
     {
-      exprt zero=gen_zero(expr.index().type());
+      exprt zero=from_integer(0, expr.index().type());
 
       if(zero.is_nil())
         throw "no zero constant of index type "+
@@ -878,7 +878,7 @@ bool value_set_dereferencet::memory_model_conversion(
 
   if(options.get_bool_option("pointer-check"))
   {
-    equal_exprt offset_not_zero(offset, gen_zero(offset.type()));
+    equal_exprt offset_not_zero(offset, from_integer(0, offset.type()));
     offset_not_zero.make_not();
 
     guardt tmp_guard(guard);
@@ -972,8 +972,8 @@ bool value_set_dereferencet::memory_model_bytes(
     if(!offset.is_zero())
     {
       binary_relation_exprt
-        offset_lower_bound(offset, ID_lt,
-                           gen_zero(offset.type()));
+        offset_lower_bound(
+          offset, ID_lt, from_integer(0, offset.type()));
 
       guardt tmp_guard(guard);
       tmp_guard.add(offset_lower_bound);

@@ -12,7 +12,6 @@ Date: May 2016
 #include <iterator>
 
 #include <util/prefix.h>
-#include <util/expr_util.h>
 
 #include "cover.h"
 

@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
-#include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 
 #include "c_typecheck_base.h"
@@ -949,7 +948,7 @@ void c_typecheck_baset::typecheck_compound_body(
 
         // make it zero-length
         c_type.id(ID_array);
-        c_type.set(ID_size, gen_zero(index_type()));
+        c_type.set(ID_size, from_integer(0, index_type()));
       }
     }
   }

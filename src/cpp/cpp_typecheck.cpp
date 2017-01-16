@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/source_location.h>
 #include <util/symbol.h>

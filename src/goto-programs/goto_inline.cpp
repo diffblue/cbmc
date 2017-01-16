@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include "remove_skip.h"
 #include "goto_inline.h"

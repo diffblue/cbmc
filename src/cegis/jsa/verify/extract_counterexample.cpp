@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <util/expr_util.h>
 #include <goto-programs/goto_trace.h>
 
 #include <cegis/cegis-util/program_helper.h>

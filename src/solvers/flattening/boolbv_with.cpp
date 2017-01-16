@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/endianness_map.h>

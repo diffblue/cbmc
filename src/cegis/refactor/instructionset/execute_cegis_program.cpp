@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/bv_arithmetic.h>
 
 #include <cegis/cegis-util/string_helper.h>
@@ -56,7 +55,7 @@ void call_processor(const symbol_tablet &st, goto_programt::instructiont &instr,
   code_function_callt::argumentst &args=call.arguments();
   const symbolt &prog_symbol=st.lookup(program_name);
   const symbol_exprt prog(prog_symbol.symbol_expr());
-  const index_exprt first_instr(prog, gen_zero(signed_int_type()));
+  const index_exprt first_instr(prog, from_integer(0, signed_int_type()));
   args.push_back(address_of_exprt(first_instr));
   const bv_arithmetict bv(get_size(prog_symbol));
   const mp_integer sz_val(bv.to_integer());

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/decision_procedure.h>
 
 #include <ansi-c/c_types.h>

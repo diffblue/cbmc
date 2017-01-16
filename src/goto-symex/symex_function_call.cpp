@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <cassert>
 
-#include <util/expr_util.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
@@ -135,7 +134,7 @@ void goto_symext::parameter_assignments(
             byte_extract_exprt(
               byte_extract_id(),
               rhs,
-              gen_zero(index_type()),
+              from_integer(0, index_type()),
               parameter_type);
         }
         else

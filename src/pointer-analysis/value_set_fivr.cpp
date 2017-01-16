@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/expr_util.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
@@ -1152,7 +1151,7 @@ void value_set_fivrt::get_reference_set_sharing_rec(
         exprt index_expr(ID_index, expr.type());
         index_expr.operands().resize(2);
         index_expr.op0()=object;
-        index_expr.op1()=gen_zero(index_type());
+        index_expr.op1()=from_integer(0, index_type());
 
         // adjust type?
         if(object.type().id()!="#REF#" &&

@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/namespace.h>
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
@@ -992,7 +991,7 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     {
       equal_exprt tmp;
       tmp.lhs()=expr.op0();
-      tmp.rhs()=gen_zero(expr.op0().type());
+      tmp.rhs()=from_integer(0, expr.op0().type());
       nnf(tmp, !negate);
       expr.swap(tmp);
     }

@@ -236,7 +236,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv) &&
      config.ansi_c.NULL_is_zero)
   {
-    exprt tmp=gen_zero(expr_type);
+    exprt tmp=from_integer(0, expr_type);
     expr.swap(tmp);
     return false;
   }
@@ -516,13 +516,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         if(operand.is_true())
         {
-          expr=gen_one(expr_type);
+          expr=from_integer(1, expr_type);
           assert(expr.is_not_nil());
           return false;
         }
         else if(operand.is_false())
         {
-          expr=gen_zero(expr_type);
+          expr=from_integer(0, expr_type);
           assert(expr.is_not_nil());
           return false;
         }
@@ -1916,7 +1916,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
             el_size<=pointer_offset_bits(expr.op().op2().type(), ns))
     {
       expr.op()=expr.op().op2();
-      expr.offset()=gen_zero(expr.offset().type());
+      expr.offset()=from_integer(0, expr.offset().type());
 
       simplify_byte_extract(expr);
 

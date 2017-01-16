@@ -15,7 +15,6 @@ Date: September 2011
 
 #if 0
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/guard.h>
 #include <util/prefix.h>
 

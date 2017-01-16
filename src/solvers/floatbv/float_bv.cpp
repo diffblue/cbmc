@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
-#include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
@@ -131,8 +130,7 @@ Function: float_bvt::abs
 exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 {
   // we mask away the sign bit, which is the most significand bit
-  std::string mask_str;
-  mask_str.resize(spec.width(), '1');
+  std::string mask_str(spec.width(), '1');
   mask_str[0]='0';
 
   constant_exprt mask(mask_str, op.type());
@@ -155,8 +153,7 @@ Function: float_bvt::negation
 exprt float_bvt::negation(const exprt &op, const ieee_float_spect &spec)
 {
   // we flip the sign bit with an xor
-  std::string mask_str;
-  mask_str.resize(spec.width(), '0');
+  std::string mask_str(spec.width(), '0');
   mask_str[0]='1';
 
   constant_exprt mask(mask_str, op.type());
@@ -218,15 +215,15 @@ exprt float_bvt::is_zero(
   const floatbv_typet &type=to_floatbv_type(src.type());
   std::size_t width=type.get_width();
 
-  std::string mask_str;
-  mask_str.resize(width, '1');
+  std::string mask_str(width, '1');
   mask_str[0]='0';
 
   constant_exprt mask(mask_str, src.type());
 
-  return equal_exprt(
-    bitand_exprt(src, mask),
-    gen_zero(src.type()));
+  ieee_floatt z(type);
+  z.make_zero();
+
+  return equal_exprt(bitand_exprt(src, mask), z.to_expr());
 }
 
 /*******************************************************************\
@@ -485,7 +482,7 @@ exprt float_bvt::to_integer(
   exprt exponent_sign=sign_exprt(unpacked.exponent);
 
   result=
-    if_exprt(exponent_sign, gen_zero(result.type()), result);
+    if_exprt(exponent_sign, from_integer(0, result.type()), result);
 
   // chop out the right number of bits from the result
   typet result_type=
@@ -750,9 +747,12 @@ exprt float_bvt::add_sub(
   //  2. Subnormals mean that addition or subtraction can't round to 0,
   //     thus we can perform this test now
   //  3. The rules for sign are different for zero
-  result.zero = and_exprt(
+  result.zero=
+    and_exprt(
       not_exprt(or_exprt(result.infinity, result.NaN)),
-      equal_exprt(result.fraction, gen_zero(result.fraction.type())));
+      equal_exprt(
+        result.fraction,
+        from_integer(0, result.fraction.type())));
 
   // sign
   exprt add_sub_sign=
@@ -811,7 +811,8 @@ exprt float_bvt::limit_distance(
   exprt upper_bits=
     extractbits_exprt(dist, dist_width-1, nb_bits,
                       unsignedbv_typet(dist_width-nb_bits));
-  exprt upper_bits_zero=equal_exprt(upper_bits, gen_zero(upper_bits.type()));
+  exprt upper_bits_zero=
+    equal_exprt(upper_bits, from_integer(0, upper_bits.type()));
 
   exprt lower_bits=
     extractbits_exprt(dist, nb_bits-1, 0,
@@ -864,7 +865,8 @@ exprt float_bvt::mul(
 
   // Adjust exponent; we are thowing in an extra fraction bit,
   // it has been extended above.
-  result.exponent=plus_exprt(added_exponent, gen_one(new_exponent_type));
+  result.exponent=
+    plus_exprt(added_exponent, from_integer(1, new_exponent_type));
 
   // new sign
   result.sign=notequal_exprt(unpacked1.sign, unpacked2.sign);
@@ -935,7 +937,7 @@ exprt float_bvt::div(
   rem=mod_exprt(fraction1, fraction2);
 
   // is there a remainder?
-  exprt have_remainder=notequal_exprt(rem, gen_zero(rem.type()));
+  exprt have_remainder=notequal_exprt(rem, from_integer(0, rem.type()));
 
   // we throw this into the result, as least-significand bit,
   // to get the right rounding decision
@@ -981,8 +983,11 @@ exprt float_bvt::div(
   exprt force_zero=
     and_exprt(not_exprt(unpacked1.NaN), unpacked2.infinity);
 
-  result.fraction=if_exprt(force_zero,
-    gen_zero(result.fraction.type()), result.fraction);
+  result.fraction=
+    if_exprt(
+      force_zero,
+      from_integer(0, result.fraction.type()),
+      result.fraction);
 
   return rounder(result, rm, spec);
 }
@@ -1221,7 +1226,7 @@ void float_bvt::normalization_shift(
   if(exponent_bits<depth)
     exponent=typecast_exprt(exponent, signedbv_typet(depth));
 
-  exprt exponent_delta=gen_zero(exponent.type());
+  exprt exponent_delta=from_integer(0, exponent.type());
 
   for(int d=depth-1; d>=0; d--)
   {
@@ -1232,7 +1237,7 @@ void float_bvt::normalization_shift(
     const exprt prefix=
       extractbits_exprt(fraction, fraction_bits-1, fraction_bits-distance,
                         unsignedbv_typet(distance));
-    exprt prefix_is_zero=equal_exprt(prefix, gen_zero(prefix.type()));
+    exprt prefix_is_zero=equal_exprt(prefix, from_integer(0, prefix.type()));
 
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
@@ -1296,9 +1301,10 @@ void float_bvt::denormalization_shift(
     from_integer(-bias+1, exponent.type()), exponent);
 
   // use sign bit
-  exprt denormal=and_exprt(
-    not_exprt(sign_exprt(distance)),
-    notequal_exprt(distance, gen_zero(distance.type())));
+  exprt denormal=
+    and_exprt(
+      not_exprt(sign_exprt(distance)),
+      notequal_exprt(distance, from_integer(0, distance.type())));
 
 #if 1
   // Care must be taken to not loose information required for the
@@ -1438,7 +1444,7 @@ exprt float_bvt::fraction_rounding_decision(
     exprt tail=
       extractbits_exprt(fraction, extra_bits-2, 0,
                         unsignedbv_typet(extra_bits-2+1));
-    sticky_bit=notequal_exprt(tail, gen_zero(tail.type()));
+    sticky_bit=notequal_exprt(tail, from_integer(0, tail.type()));
   }
 
   // the rounding bit is the last extra bit
@@ -1578,10 +1584,12 @@ void float_bvt::round_fraction(
     // In case of an overflow or subnormal to normal conversion,
     // the exponent has to be incremented.
     result.exponent=
-      plus_exprt(result.exponent,
-                 if_exprt(or_exprt(overflow, subnormal_to_normal),
-                          gen_one(result.exponent.type()),
-                          gen_zero(result.exponent.type())));
+      plus_exprt(
+        result.exponent,
+        if_exprt(
+          or_exprt(overflow, subnormal_to_normal),
+          from_integer(1, result.exponent.type()),
+          from_integer(0, result.exponent.type())));
 
     // post normalization of the fraction
     // In the case of overflow, set the MSB to 1
@@ -1590,7 +1598,7 @@ void float_bvt::round_fraction(
       result.fraction,
       if_exprt(overflow,
                from_integer(1<<(fraction_size-1), result.fraction.type()),
-               gen_zero(result.fraction.type())));
+               from_integer(0, result.fraction.type())));
 #endif
   }
 }
@@ -1642,7 +1650,9 @@ void float_bvt::round_exponent(
     exprt exponent_too_large=
       and_exprt(
         binary_relation_exprt(old_exponent, ID_ge, max_exponent),
-        notequal_exprt(result.fraction, gen_zero(result.fraction.type())));
+        notequal_exprt(
+          result.fraction,
+          from_integer(0, result.fraction.type())));
 
 #if 1
     // Directed rounding modes round overflow to the maximum normal
@@ -1897,9 +1907,11 @@ exprt float_bvt::sticky_right_shift(
     exprt dist_bit=
       extractbit_exprt(dist, stage);
 
-    sticky=or_exprt(
-        and_exprt(dist_bit,
-                  notequal_exprt(lost_bits, gen_zero(lost_bits.type()))),
+    sticky=
+      or_exprt(
+        and_exprt(
+          dist_bit,
+          notequal_exprt(lost_bits, from_integer(0, lost_bits.type()))),
         sticky);
 
     result=if_exprt(dist_bit, tmp, result);

@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <fstream>
 
-#include <util/expr_util.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
 

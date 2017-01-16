@@ -188,7 +188,7 @@ void goto_checkt::div_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=gen_zero(expr.op1().type());
+  exprt zero=from_integer(0, expr.op1().type());
 
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
@@ -233,7 +233,7 @@ void goto_checkt::undefined_shift_check(
   if(distance_type.id()==ID_signedbv)
   {
     binary_relation_exprt inequality(
-      expr.distance(), ID_ge, gen_zero(distance_type));
+      expr.distance(), ID_ge, from_integer(0, distance_type));
 
     add_guarded_claim(
       inequality,
@@ -289,7 +289,7 @@ void goto_checkt::mod_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=gen_zero(expr.op1().type());
+  exprt zero=from_integer(0, expr.op1().type());
 
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
@@ -802,8 +802,8 @@ void goto_checkt::nan_check(
     // 0/0 = NaN and x/inf = NaN
     // (note that x/0 = +-inf for x!=0 and x!=inf)
     exprt zero_div_zero=and_exprt(
-      ieee_float_equal_exprt(expr.op0(), gen_zero(expr.op0().type())),
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+      ieee_float_equal_exprt(expr.op0(), from_integer(0, expr.op0().type())),
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
     exprt div_inf=unary_exprt(ID_isinf, expr.op1(), bool_typet());
 
@@ -819,10 +819,10 @@ void goto_checkt::nan_check(
     // Inf * 0 is NaN
     exprt inf_times_zero=and_exprt(
       unary_exprt(ID_isinf, expr.op0(), bool_typet()),
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
     exprt zero_times_inf=and_exprt(
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())),
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())),
       unary_exprt(ID_isinf, expr.op0(), bool_typet()));
 
     isnan=or_exprt(inf_times_zero, zero_times_inf);
@@ -1175,7 +1175,7 @@ void goto_checkt::bounds_check(
           effective_offset=plus_exprt(p_offset, effective_offset);
         }
 
-        exprt zero=gen_zero(ode.offset().type());
+        exprt zero=from_integer(0, ode.offset().type());
         assert(zero.is_not_nil());
 
         // the final offset must not be negative

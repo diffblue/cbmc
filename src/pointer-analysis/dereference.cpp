@@ -52,7 +52,7 @@ exprt dereferencet::operator()(const exprt &pointer)
 
   return dereference_rec(
     pointer,
-    gen_zero(index_type()), // offset
+    from_integer(0, index_type()), // offset
     type);
 }
 
@@ -225,7 +225,7 @@ exprt dereferencet::dereference_rec(
     if(to_constant_expr(address).get_value()==ID_NULL) // NULL
     {
       // we turn this into (type *)0
-      exprt zero=gen_zero(index_type());
+      exprt zero=from_integer(0, index_type());
       return dereference_rec(
         typecast_exprt(zero, address.type()), offset, type);
     }

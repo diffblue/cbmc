@@ -280,7 +280,7 @@ void path_symext::symex_malloc(
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
-    index_expr.index()=gen_zero(index_type());
+    index_expr.index()=from_integer(0, index_type());
     rhs.op0()=index_expr;
   }
   else
@@ -510,7 +510,7 @@ void path_symext::assign_rec(
     else if(compound_type.id()==ID_union)
     {
       // rewrite into byte_extract, and do again
-      exprt offset=gen_zero(index_type());
+      exprt offset=from_integer(0, index_type());
 
       byte_extract_exprt
         new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());

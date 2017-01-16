@@ -110,7 +110,7 @@ exprt zero_initializert::zero_initializer_rec(
 
       array_exprt value(array_type);
       value.type().id(ID_array);
-      value.type().set(ID_size, gen_zero(size_type()));
+      value.type().set(ID_size, from_integer(0, size_type()));
       value.add_source_location()=source_location;
       return value;
     }

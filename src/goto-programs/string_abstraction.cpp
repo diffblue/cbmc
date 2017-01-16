@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/expr_util.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
@@ -764,7 +763,7 @@ void string_abstractiont::abstract_function_call(
       assert(type_eq(str_args.back().type().subtype(),
           abstract_type.subtype(), ns));
 
-      index_exprt idx(str_args.back(), gen_zero(index_type()));
+      index_exprt idx(str_args.back(), from_integer(0, index_type()));
       // disable bounds check on that one
       idx.set("bounds_check", false);
 
@@ -1533,8 +1532,15 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
       assert(i2.is_not_nil());
 
       make_type(ptr.offset, build_type(LENGTH));
-      return char_assign(dest, target, new_lhs, i2,
-          ptr.offset.is_nil()?gen_zero(build_type(LENGTH)):ptr.offset);
+      return
+        char_assign(
+          dest,
+          target,
+          new_lhs,
+          i2,
+          ptr.offset.is_nil()?
+            from_integer(0, build_type(LENGTH)):
+            ptr.offset);
     }
   }
 

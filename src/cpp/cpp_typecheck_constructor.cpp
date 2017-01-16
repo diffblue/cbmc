@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 

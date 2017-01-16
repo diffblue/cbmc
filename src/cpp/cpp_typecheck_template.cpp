@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"

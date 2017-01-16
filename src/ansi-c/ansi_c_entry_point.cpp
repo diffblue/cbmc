@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 
 #include <util/namespace.h>
-#include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/std_code.h>
@@ -90,7 +89,7 @@ exprt::operandst build_function_environment(
 
     // record as an input
     input.op0()=address_of_exprt(
-      index_exprt(string_constantt(base_name), gen_zero(index_type())));
+      index_exprt(string_constantt(base_name), from_integer(0, index_type())));
     input.op1()=symbol_expr;
     input.add_source_location()=p.source_location();
 
@@ -131,9 +130,11 @@ void record_function_outputs(
 
     const symbolt &return_symbol=symbol_table.lookup("return'");
 
-    output.op0()=address_of_exprt(
-      index_exprt(string_constantt(return_symbol.base_name),
-                  gen_zero(index_type())));
+    output.op0()=
+      address_of_exprt(
+        index_exprt(
+          string_constantt(return_symbol.base_name),
+          from_integer(0, index_type())));
 
     output.op1()=return_symbol.symbol_expr();
     output.add_source_location()=function.location;
@@ -158,9 +159,11 @@ void record_function_outputs(
       codet output(ID_output);
       output.operands().resize(2);
 
-      output.op0()=address_of_exprt(
-        index_exprt(string_constantt(symbol.base_name),
-                    gen_zero(index_type())));
+      output.op0()=
+        address_of_exprt(
+          index_exprt(
+            string_constantt(symbol.base_name),
+            from_integer(0, index_type())));
       output.op1()=symbol.symbol_expr();
       output.add_source_location()=p.source_location();
 
@@ -350,7 +353,7 @@ bool ansi_c_entry_point(
         codet input(ID_input);
         input.operands().resize(2);
         input.op0()=address_of_exprt(
-          index_exprt(string_constantt("argc"), gen_zero(index_type())));
+          index_exprt(string_constantt("argc"), from_integer(0, index_type())));
         input.op1()=argc_symbol.symbol_expr();
         init_code.move_to_operands(input);
       }
@@ -392,7 +395,7 @@ bool ansi_c_entry_point(
         zero_string.type().subtype()=char_type();
         zero_string.type().set(ID_size, "infinity");
         exprt index(ID_index, char_type());
-        index.copy_to_operands(zero_string, gen_zero(uint_type()));
+        index.copy_to_operands(zero_string, from_integer(0, uint_type()));
         exprt address_of("address_of", pointer_typet());
         address_of.type().subtype()=char_type();
         address_of.copy_to_operands(index);
@@ -470,7 +473,7 @@ bool ansi_c_entry_point(
           exprt index_expr(ID_index, arg1.type().subtype());
           index_expr.copy_to_operands(
             argv_symbol.symbol_expr(),
-            gen_zero(index_type()));
+            from_integer(0, index_type()));
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
@@ -489,7 +492,7 @@ bool ansi_c_entry_point(
 
           exprt index_expr(ID_index, arg2.type().subtype());
           index_expr.copy_to_operands(
-            envp_symbol.symbol_expr(), gen_zero(index_type()));
+            envp_symbol.symbol_expr(), from_integer(0, index_type()));
 
           op2=exprt(ID_address_of, arg2.type());
           op2.move_to_operands(index_expr);
