@@ -32,8 +32,7 @@ namespace
 struct_exprt make_zero(const namespacet &ns, const symbol_typet &type)
 {
   const source_locationt loc(default_cegis_source_location());
-  null_message_handlert msg;
-  return to_struct_expr(zero_initializer(type, loc, ns, msg));
+  return to_struct_expr(zero_initializer(type, loc, ns));
 }
 }
 
@@ -59,6 +58,5 @@ void zero_vector_solutiont::operator ()(
   const namespacet ns(st);
   const array_typet &type=control_vector_solution_type(st);
   const source_locationt loc(default_cegis_source_location());
-  null_message_handlert msg;
-  solution.K=to_array_expr(zero_initializer(type, loc, ns, msg));
+  solution.K=to_array_expr(zero_initializer(type, loc, ns));
 }

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/expanding_vector.h>
 #include <util/string2int.h>

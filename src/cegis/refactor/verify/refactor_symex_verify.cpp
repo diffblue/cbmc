@@ -28,14 +28,13 @@ void refactor_symex_verifyt::process(const candidatet &candidate)
   symbol_tablet &st=current_program.st;
   goto_functionst &gf=current_program.gf;
   const namespacet ns(st);
-  null_message_handlert msg;
   for (const irep_idt &program : current_program.programs)
   {
     symbolt &symbol=st.lookup(program);
     const candidatet::const_iterator it=candidate.find(program);
     if (candidate.end() == it)
     {
-      const exprt zero(zero_initializer(symbol.type, symbol.location, ns, msg));
+      const exprt zero(zero_initializer(symbol.type, symbol.location, ns));
       assign_in_cprover_init(gf, symbol, zero);
     } else assign_in_cprover_init(gf, symbol, it->second);
   }

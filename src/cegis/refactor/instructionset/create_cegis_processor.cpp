@@ -7,8 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
+
+#include <ansi-c/c_types.h>
 #include <linking/zero_initializer.h>
 
 #include <cegis/instrument/literals.h>
@@ -83,8 +84,7 @@ void create_variable_array(symbol_tablet &st, goto_functionst &gf,
   pos->source_location=new_symbol.location;
   const symbol_exprt lhs(st.lookup(name).symbol_expr());
   const namespacet ns(st);
-  null_message_handlert msg;
-  const exprt rhs(zero_initializer(array_type, new_symbol.location, ns, msg));
+  const exprt rhs(zero_initializer(array_type, new_symbol.location, ns));
   pos->code=code_assignt(lhs, rhs);
   body.update();
 }

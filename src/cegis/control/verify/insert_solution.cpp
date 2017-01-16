@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/message.h>
 #include <linking/zero_initializer.h>
 
 #include <cegis/cegis-util/program_helper.h>
@@ -56,8 +55,7 @@ struct_exprt to_struct_expr(const symbol_tablet &st,
   const symbol_typet &type=control_solution_type(st);
   const namespacet ns(st);
   const struct_typet &struct_type=to_struct_type(ns.follow(type));
-  null_message_handlert msg;
-  const exprt zero(zero_initializer(type, loc, ns, msg));
+  const exprt zero(zero_initializer(type, loc, ns));
   struct_exprt result(to_struct_expr(zero));
   struct_exprt::operandst &ops=result.operands();
   set_array(ops, st, struct_type, solution.a, CEGIS_CONTROL_A_MEMBER_NAME);
