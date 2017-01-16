@@ -26,19 +26,11 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "static_show_domain.h"
 
-/*******************************************************************\
-
-Function: static_show_domain
-
-  Inputs: The goto_model to analyze, options giving the domain and output,
-          the message handler and output stream.
-
- Outputs: The abstract domain via out.
-
- Purpose: Runs the analyzer and then prints out the domain.
-
-\*******************************************************************/
-
+/// Runs the analyzer and then prints out the domain.
+/// \par parameters: The goto_model to analyze, options giving the domain and
+///   output,
+/// the message handler and output stream.
+/// \return The abstract domain via out.
 bool static_show_domain(
   const goto_modelt &goto_model,
   const optionst &options,
@@ -64,7 +56,7 @@ bool static_show_domain(
     else if(options.get_bool_option("intervals"))
       domain=new ait<interval_domaint>();
     else if(options.get_bool_option("dependence-graph"))
-      domain=new dependence_grapht(ns);
+      domain=new dependence_grapht(goto_model.goto_functions, ns);
     else if(options.get_bool_option("variable"))
       domain=new ait<variable_sensitivity_domaint>();
   }
@@ -96,9 +88,9 @@ bool static_show_domain(
   m.status() << "Outputting abstract states" << messaget::eom;
 
   if(options.get_bool_option("json"))
-    out << domain->output_json(goto_model);
+    out << domain->output_json(goto_model) << "\n";
   else if(options.get_bool_option("xml"))
-    out << domain->output_xml(goto_model);
+    out << domain->output_xml(goto_model) << "\n";
   else if(options.get_bool_option("dot") &&
           options.get_bool_option("dependence-graph"))
   {

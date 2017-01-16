@@ -485,7 +485,7 @@ int goto_instrument_parse_optionst::doit()
       status() << "Reaching definitions analysis" << eom;
 
       const namespacet ns(symbol_table);
-      reaching_definitions_analysist rd_analysis(ns);
+      reaching_definitions_analysist rd_analysis(ns, goto_functions);
       rd_analysis(goto_functions, ns);
 
       rd_analysis.output(ns, goto_functions, std::cout);
@@ -498,7 +498,7 @@ int goto_instrument_parse_optionst::doit()
       do_indirect_call_and_rtti_removal();
 
       const namespacet ns(symbol_table);
-      dependence_grapht dependence_graph(ns);
+      dependence_grapht dependence_graph(goto_functions, ns);
       dependence_graph(goto_functions, ns);
 
       dependence_graph.output(ns, goto_functions, std::cout);

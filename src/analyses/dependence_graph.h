@@ -70,7 +70,8 @@ public:
 
   dep_graph_domaint():
     has_values(false),
-    node_id(std::numeric_limits<node_indext>::max())
+    node_id(std::numeric_limits<node_indext>::max()),
+    has_changed(false)
   {
   }
 
@@ -99,7 +100,9 @@ public:
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
     has_values=tvt(true);
+    has_changed=false;
     control_deps.clear();
+    control_dep_candidates.clear();
     data_deps.clear();
   }
 
@@ -108,7 +111,9 @@ public:
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
     has_values=tvt(false);
+    has_changed=false;
     control_deps.clear();
+    control_dep_candidates.clear();
     data_deps.clear();
   }
 
@@ -151,9 +156,16 @@ public:
 private:
   tvt has_values;
   node_indext node_id;
+  bool has_changed;
 
-  typedef std::set<goto_programt::const_targett> depst;
-  depst control_deps, data_deps;
+  typedef std::map<goto_programt::const_targett, tvt> control_depst;
+  control_depst control_deps;
+
+  typedef std::set<goto_programt::const_targett> control_dep_candidatest;
+  control_dep_candidatest control_dep_candidates;
+
+  typedef std::map<goto_programt::const_targett, std::set<exprt>> data_depst;
+  data_depst data_deps;
 
   void control_dependencies(
     goto_programt::const_targett from,
@@ -165,6 +177,10 @@ private:
     goto_programt::const_targett to,
     dependence_grapht &dep_graph,
     const namespacet &ns);
+
+  bool merge_control_dependencies(
+    const control_depst &other_control_deps,
+    const control_dep_candidatest &other_control_dep_candidates);
 };
 
 class dependence_grapht:
@@ -175,11 +191,16 @@ public:
   using ait<dep_graph_domaint>::operator[];
   using grapht<dep_nodet>::operator[];
 
+  friend class dep_graph_domaint;
+
   typedef std::map<irep_idt, cfg_post_dominatorst> post_dominators_mapt;
 
-  explicit dependence_grapht(const namespacet &_ns):
-    ns(_ns),
-    rd(ns)
+  explicit dependence_grapht(
+    const goto_functionst &goto_functions,
+    const namespacet &_ns):
+      goto_functions(goto_functions),
+      ns(_ns),
+      rd(ns, goto_functions)
   {
   }
 
@@ -193,12 +214,15 @@ public:
   {
     ait<dep_graph_domaint>::initialize(goto_program);
 
+#if 0
+    // eager computation of postdominators
     if(!goto_program.empty())
     {
       const irep_idt id=goto_programt::get_function_id(goto_program);
       cfg_post_dominatorst &pd=post_dominators[id];
       pd(goto_program);
     }
+#endif
   }
 
   void add_dep(
@@ -211,9 +235,19 @@ public:
     return post_dominators;
   }
 
+  post_dominators_mapt &cfg_post_dominators()
+  {
+    return post_dominators;
+  }
+
   const reaching_definitions_analysist &reaching_definitions() const
   {
     return rd;
+  }
+
+  const goto_functionst &get_goto_functions () const
+  {
+    return goto_functions;
   }
 
   virtual statet &get_state(goto_programt::const_targett l)
@@ -232,6 +266,7 @@ public:
   }
 
 protected:
+  const goto_functionst &goto_functions;
   const namespacet &ns;
 
   post_dominators_mapt post_dominators;

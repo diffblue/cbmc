@@ -1,8 +1,7 @@
 CORE
 main.c
---show-dependence-graph
+--show --dependence-graph --json -
 ^EXIT=0$
 ^SIGNAL=0$
-Data dependencies: .+,.+,.+
 --
 ^warning: ignoring

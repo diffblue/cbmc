@@ -12,6 +12,12 @@ Date: August 2013
 /// \file
 /// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <cassert>
 
 #include <util/json.h>
@@ -26,36 +32,21 @@ bool dep_graph_domaint::merge(
   goto_programt::const_targett from,
   goto_programt::const_targett to)
 {
-  bool changed=has_values.is_false();
+  bool changed=has_values.is_false() || has_changed;
+
+  // handle data dependencies
+  if((has_values.is_false() || has_changed)
+      && data_deps.empty())
+  {
+    data_deps=src.data_deps;
+  }
+
+  changed|=merge_control_dependencies(
+    src.control_deps,
+    src.control_dep_candidates);
+
+  has_changed=false;
   has_values=tvt::unknown();
-
-  depst::iterator it=control_deps.begin();
-  for(const auto &c_dep : src.control_deps)
-  {
-    while(it!=control_deps.end() && *it<c_dep)
-      ++it;
-    if(it==control_deps.end() || c_dep<*it)
-    {
-      control_deps.insert(it, c_dep);
-      changed=true;
-    }
-    else if(it!=control_deps.end())
-      ++it;
-  }
-
-  it=data_deps.begin();
-  for(const auto &d_dep : src.data_deps)
-  {
-    while(it!=data_deps.end() && *it<d_dep)
-      ++it;
-    if(it==data_deps.end() || d_dep<*it)
-    {
-      data_deps.insert(it, d_dep);
-      changed=true;
-    }
-    else if(it!=data_deps.end())
-      ++it;
-  }
 
   return changed;
 }
@@ -67,42 +58,183 @@ void dep_graph_domaint::control_dependencies(
 {
   // Better Slicing of Programs with Jumps and Switches
   // Kumar and Horwitz, FASE'02:
-  // Node N is control dependent on node M iff N postdominates one
-  // but not all of M's CFG successors.
+  // "Node N is control dependent on node M iff N postdominates, in
+  // the CFG, one but not all of M's CFG successors."
   //
-  // candidates for M are from and all existing control-depended on
-  // nodes; from is added if it is a goto or assume instruction
-  if(from->is_goto() ||
-     from->is_assume())
-    control_deps.insert(from);
+  // The "successor" above refers to an immediate successor of M.
+
+  // Candidates for M for "to" are "from" and all existing control
+  // dependencies on nodes. "from" is added if it is a goto or assume
+  // instruction
+
+  // Add new candidates
+
+  if(from->is_goto() || from->is_assume())
+    control_dep_candidates.insert(from);
+  else if(from->is_end_function())
+  {
+    control_dep_candidates.clear();
+    return;
+  }
+
+  if(control_dep_candidates.empty())
+    return;
+
+  // Compute postdominators if needed
+
+  const goto_functionst &goto_functions=dep_graph.goto_functions;
 
   const irep_idt id=goto_programt::get_function_id(from);
-  const cfg_post_dominatorst &pd=dep_graph.cfg_post_dominators().at(id);
+  cfg_post_dominatorst &pd_tmp=dep_graph.cfg_post_dominators()[id];
 
-  // check all candidates for M
-  for(depst::iterator
-      it=control_deps.begin();
-      it!=control_deps.end();
-      ) // no ++it
+  goto_functionst::function_mapt::const_iterator f_it=
+    goto_functions.function_map.find(id);
+
+  if(f_it==goto_functions.function_map.end())
+    return;
+
+  const goto_programt &goto_program=f_it->second.body;
+
+  if(pd_tmp.cfg.size()==0) // have we computed the dominators already?
   {
-    depst::iterator next=it;
-    ++next;
+    pd_tmp(goto_program);
+  }
 
-    // check all CFG successors
+  const cfg_post_dominatorst &pd=pd_tmp;
+
+  // Check all candidates
+
+  for(const auto &cd : control_dep_candidates)
+  {
+    // check all CFG successors of M
     // special case: assumptions also introduce a control dependency
-    bool post_dom_all=!(*it)->is_assume();
+    bool post_dom_all=!cd->is_assume();
     bool post_dom_one=false;
 
     // we could hard-code assume and goto handling here to improve
     // performance
     cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
-      pd.cfg.entry_map.find(*it);
+      pd.cfg.entry_map.find(cd);
 
     assert(e!=pd.cfg.entry_map.end());
 
     const cfg_post_dominatorst::cfgt::nodet &m=
       pd.cfg[e->second];
 
+    // successors of M
+    for(const auto &edge : m.out)
+    {
+      const cfg_post_dominatorst::cfgt::nodet &m_s=
+        pd.cfg[edge.first];
+
+      if(m_s.dominators.find(to)!=m_s.dominators.end())
+        post_dom_one=true;
+      else
+        post_dom_all=false;
+    }
+
+    if(post_dom_all || !post_dom_one)
+    {
+      control_deps.erase(cd);
+    }
+    else
+    {
+      tvt branch=tvt::unknown();
+
+      if(cd->is_goto() && !cd->is_backwards_goto())
+      {
+        goto_programt::const_targett t=cd->get_target();
+        branch=to->location_number>=t->location_number?tvt(false):tvt(true);
+      }
+
+      control_deps.insert(std::make_pair(cd, branch));
+    }
+  }
+
+  // add edges to the graph
+  for(const auto &c_dep : control_deps)
+    dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep.first, to);
+}
+
+#if 0
+void dep_graph_domaint::control_dependencies(
+  goto_programt::const_targett from,
+  goto_programt::const_targett to,
+  dependence_grapht &dep_graph)
+{
+  // Better Slicing of Programs with Jumps and Switches
+  // Kumar and Horwitz, FASE'02:
+  // "Node N is control dependent on node M iff N postdominates, in
+  // the CFG, one but not all of M's CFG successors."
+  //
+  // The "successor" above refers to an immediate successor of M.
+
+  // Candidates for M for "to" are "from" and all existing control
+  // dependencies on nodes. "from" is added if it is a goto or assume
+  // instruction
+  if(from->is_goto())
+  {
+    goto_programt::const_targett next=from;
+    next++;
+
+    tvt branch=next!=to?tvt(true):tvt(false);
+    control_deps.insert(std::make_pair(from, branch));
+  }
+  else if(from->is_assume())
+  {
+    control_deps.insert(std::make_pair(from, tvt::unknown()));
+  }
+
+  if(control_deps.empty())
+    return;
+
+  const goto_functionst &goto_functions=dep_graph.goto_functions;
+
+  const irep_idt id=goto_programt::get_function_id(from);
+  cfg_post_dominatorst &pd_tmp=dep_graph.cfg_post_dominators()[id];
+
+  goto_functionst::function_mapt::const_iterator f_it=
+    goto_functions.function_map.find(id);
+
+  if(f_it==goto_functions.function_map.end())
+    return;
+
+  const goto_programt &goto_program=f_it->second.body;
+
+  if(pd_tmp.cfg.size()==0) // have we computed the dominators already?
+  {
+#ifdef DEBUG
+    std::cout << "Computing dominators for " << id << std::endl;
+#endif
+    pd_tmp(goto_program);
+  }
+
+  const cfg_post_dominatorst &pd=pd_tmp;
+
+  // check all candidates for M, with current node N=to
+  for(control_depst::iterator
+      it=control_deps.begin();
+      it!=control_deps.end();
+      ) // no ++it
+  {
+    const goto_programt::const_targett cd=it->first;
+
+    // check all CFG successors of M
+    // special case: assumptions also introduce a control dependency
+    bool post_dom_all=!cd->is_assume();
+    bool post_dom_one=false;
+
+    // we could hard-code assume and goto handling here to improve
+    // performance
+    cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
+      pd.cfg.entry_map.find(cd);
+
+    assert(e!=pd.cfg.entry_map.end());
+
+    const cfg_post_dominatorst::cfgt::nodet &m=
+      pd.cfg[e->second];
+
+    // successors of M
     for(const auto &edge : m.out)
     {
       const cfg_post_dominatorst::cfgt::nodet &m_s=
@@ -116,14 +248,73 @@ void dep_graph_domaint::control_dependencies(
 
     if(post_dom_all ||
        !post_dom_one)
-      control_deps.erase(it);
-
-    it=next;
+    {
+      it=control_deps.erase(it);
+    }
+    else
+    {
+      it++;
+    }
   }
 
   // add edges to the graph
   for(const auto &c_dep : control_deps)
-    dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, to);
+    dep_graph.add_dep(dep_edget::CTRL, c_dep.first, to);
+}
+#endif
+
+bool dep_graph_domaint::merge_control_dependencies(
+  const control_depst &other_control_deps,
+  const control_dep_candidatest &other_control_dep_candidates)
+{
+  bool changed=false;
+
+  // Merge control dependencies
+
+  control_depst::iterator it=control_deps.begin();
+
+  for(const auto &c_dep : other_control_deps)
+  {
+    // find position to insert
+    while(it!=control_deps.end() && it->first<c_dep.first)
+      ++it;
+
+    if(it==control_deps.end() || c_dep.first<it->first)
+    {
+      // hint points at position that will follow the new element
+      control_deps.insert(it, c_dep);
+      changed=true;
+    }
+    else
+    {
+      assert(it!=control_deps.end());
+      assert(!(it->first<c_dep.first));
+      assert(!(c_dep.first<it->first));
+
+      tvt &branch1=it->second;
+      const tvt &branch2=c_dep.second;
+
+      if(branch1!=branch2 && !branch1.is_unknown())
+      {
+        branch1=tvt::unknown();
+        changed=true;
+      }
+
+      ++it;
+    }
+  }
+
+  // Merge control dependency candidates
+
+  size_t n=control_dep_candidates.size();
+
+  control_dep_candidates.insert(
+      other_control_dep_candidates.begin(),
+      other_control_dep_candidates.end());
+
+  changed|=n!=control_dep_candidates.size();
+
+  return changed;
 }
 
 static bool may_be_def_use_pair(
@@ -156,43 +347,108 @@ void dep_graph_domaint::data_dependencies(
   // data dependencies using def-use pairs
   data_deps.clear();
 
-  // TODO use (future) reaching-definitions-dereferencing rw_set
   value_setst &value_sets=
     dep_graph.reaching_definitions().get_value_sets();
+
+  // objects read and written by instruction
   rw_range_set_value_sett rw_set(ns, value_sets);
-  goto_rw(to, rw_set);
+  goto_rw(to, dep_graph.get_goto_functions(), rw_set);
 
   forall_rw_range_set_r_objects(it, rw_set)
   {
-    const range_domaint &r_ranges=rw_set.get_ranges(it);
-    const rd_range_domaint::ranges_at_loct &w_ranges=
-      dep_graph.reaching_definitions()[to].get(it->first);
+    const irep_idt object=it->first;
 
-    for(const auto &w_range : w_ranges)
+    // ranges for object
+    const range_domaint &r_ranges=rw_set.get_ranges(it);
+
+    const rd_range_domaint &rds=dep_graph.reaching_definitions()[to];
+
+    // reaching definitions for object
+    const rd_range_domaint::ranges_at_loct &w_ranges_at_locs=rds.get(object);
+
+    for(const auto &w_ranges_at_loc : w_ranges_at_locs)
     {
-      bool found=false;
-      for(const auto &wr : w_range.second)
+      const locationt location=w_ranges_at_loc.first;
+      const rd_range_domaint::rangest w_ranges=w_ranges_at_loc.second;
+
+      for(const auto &w_range : w_ranges)
+      {
+        const range_spect w_left=w_range.first;
+        const range_spect w_right=w_range.second;
+
         for(const auto &r_range : r_ranges)
-          if(!found &&
-             may_be_def_use_pair(wr.first, wr.second,
-                                 r_range.first, r_range.second))
+        {
+          const exprt &object_expr=r_range.first;
+
+          const auto &range=r_range.second;
+          const range_spect r_left=range.first;
+          const range_spect r_right=range.second;
+
+          if(may_be_def_use_pair(w_left, w_right, r_left, r_right))
           {
             // found a def-use pair
-            data_deps.insert(w_range.first);
-            found=true;
+            data_deps[location].insert(object_expr);
           }
+        }
+      }
     }
 
-    dep_graph.reaching_definitions()[to].clear_cache(it->first);
+    dep_graph.reaching_definitions()[to].clear_cache(object);
+  }
+
+  // handle return value of no body function
+
+  if(to->is_assign())
+  {
+    const code_assignt &ca=to_code_assign(to->code);
+    const exprt &rhs=ca.rhs();
+
+    if(rhs.id()==ID_side_effect)
+    {
+      const side_effect_exprt &see=to_side_effect_expr(rhs);
+      if(see.get_statement()==ID_nondet)
+      {
+        if(from->is_function_call())
+        {
+          const code_function_callt &cfc=to_code_function_call(from->code);
+          const exprt &call=cfc.function();
+
+          if(call.id()==ID_symbol)
+          {
+            const irep_idt id=to_symbol_expr(call).id();
+            const goto_functionst &goto_functions=dep_graph.goto_functions;
+
+            goto_functionst::function_mapt::const_iterator it=
+              goto_functions.function_map.find(id);
+
+            if(it!=goto_functions.function_map.end())
+            {
+              if(!it->second.body_available()) // body not available
+              {
+                data_deps[from].insert(call);
+              }
+            }
+            else // function not in map
+            {
+              data_deps[from].insert(call);
+            }
+          }
+          else // complex call expression
+          {
+            data_deps[from].insert(call);
+          }
+        }
+      }
+    }
   }
 
   // add edges to the graph
   for(const auto &d_dep : data_deps)
   {
-    // *it might be handled in a future call call to visit only,
+    // d_dep.first might be handled in a future call call to visit only,
     // depending on the sequence of successors; make sure it exists
-    dep_graph.get_state(d_dep);
-    dep_graph.add_dep(dep_edget::kindt::DATA, d_dep, to);
+    dep_graph.get_state(d_dep.first);
+    dep_graph.add_dep(dep_edget::kindt::DATA, d_dep.first, to);
   }
 }
 
@@ -202,6 +458,8 @@ void dep_graph_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
+  assert(!has_values.is_false());
+
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
   assert(dep_graph!=nullptr);
 
@@ -211,30 +469,30 @@ void dep_graph_domaint::transform(
     goto_programt::const_targett next=from;
     ++next;
 
-    if(next==to)
+    if(to==next)
     {
       control_dependencies(from, to, *dep_graph);
     }
     else
     {
-      // edge to function entry point
-
       dep_graph_domaint *s=
         dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
       assert(s!=nullptr);
 
-      depst::iterator it=s->control_deps.begin();
-      for(const auto &c_dep : control_deps)
+      if(s->has_values.is_false())
       {
-        while(it!=s->control_deps.end() && *it<c_dep)
-          ++it;
-        if(it==s->control_deps.end() || c_dep<*it)
-          s->control_deps.insert(it, c_dep);
-        else if(it!=s->control_deps.end())
-          ++it;
+        s->has_values=tvt::unknown();
+        s->has_changed=true;
       }
 
+      // modify abstract state of return location
+      if(s->merge_control_dependencies(
+           control_deps,
+           control_dep_candidates))
+        s->has_changed=true;
+
       control_deps.clear();
+      control_dep_candidates.clear();
     }
   }
   else
@@ -251,31 +509,49 @@ void dep_graph_domaint::output(
   if(!control_deps.empty())
   {
     out << "Control dependencies: ";
-    for(depst::const_iterator
+    for(control_depst::const_iterator
         it=control_deps.begin();
         it!=control_deps.end();
         ++it)
     {
       if(it!=control_deps.begin())
         out << ",";
-      out << (*it)->location_number;
+
+      const goto_programt::const_targett cd=it->first;
+      const tvt branch=it->second;
+
+      out << cd->location_number << " [" << branch << "]";
     }
-    out << '\n';
+    out << "\n";
   }
 
   if(!data_deps.empty())
   {
     out << "Data dependencies: ";
-    for(depst::const_iterator
+    for(data_depst::const_iterator
         it=data_deps.begin();
         it!=data_deps.end();
         ++it)
     {
       if(it!=data_deps.begin())
-        out << ",";
-      out << (*it)->location_number;
+        out << ", ";
+
+      out << it->first->location_number;
+
+      out << " [";
+
+      const auto &expr_list=it->second;
+      for(auto e_it=expr_list.begin(); e_it!=expr_list.end(); e_it++)
+      {
+        if(e_it!=expr_list.begin())
+          out << ", ";
+
+        out << from_expr(ns, "", *e_it);
+      }
+
+      out << "]";
     }
-    out << '\n';
+    out << "\n";
   }
 }
 
@@ -290,21 +566,37 @@ jsont dep_graph_domaint::output_json(
 
   for(const auto &cd : control_deps)
   {
+    const goto_programt::const_targett target=cd.first;
+    const tvt branch=cd.second;
+
     json_objectt &link=graph.push_back().make_object();
+
     link["locationNumber"]=
-      json_numbert(std::to_string(cd->location_number));
-    link["sourceLocation"]=json(cd->source_location);
+      json_numbert(std::to_string(target->location_number));
+    link["sourceLocation"]=json(target->source_location);
     link["type"]=json_stringt("control");
+    link["branch"]=json_stringt(branch.to_string());
   }
 
   for(const auto &dd : data_deps)
   {
+    goto_programt::const_targett target=dd.first;
+    const std::set<exprt> &expr_set=dd.second;
+
     json_objectt &link=graph.push_back().make_object();
     link["locationNumber"]=
-      json_numbert(std::to_string(dd->location_number));
-    link["sourceLocation"]=json(dd->source_location);
-      json_stringt(dd->source_location.as_string());
+      json_numbert(std::to_string(target->location_number));
+    link["sourceLocation"]=json(target->source_location);
     link["type"]=json_stringt("data");
+
+    json_arrayt &expressions=link["expressions"].make_array();
+
+    for(const exprt &e : expr_set)
+    {
+      json_objectt &object=expressions.push_back().make_object();
+      object["expression"]=json_stringt(from_expr(ns, "", e));
+      object["certainty"]=json_stringt("maybe");
+    }
   }
 
   return graph;
@@ -322,7 +614,9 @@ void dependence_grapht::add_dep(
 
   // add_edge is redundant as the subsequent operations also insert
   // entries into the edge maps (implicitly)
+
   // add_edge(n_from, n_to);
+
   nodes[n_from].out[n_to].add(kind);
   nodes[n_to].in[n_from].add(kind);
 }

@@ -290,7 +290,7 @@ void rd_range_domaint::transform_assign(
   reaching_definitions_analysist &rd)
 {
   rw_range_set_value_sett rw_set(ns, rd.get_value_sets());
-  goto_rw(to, rw_set);
+  goto_rw(to, rd.get_goto_functions(), rw_set);
   const bool is_must_alias=rw_set.get_w_set().size()==1;
 
   forall_rw_range_set_w_objects(it, rw_set)
@@ -309,10 +309,16 @@ void rd_range_domaint::transform_assign(
        (!symbol_ptr->is_shared() &&
        !rd.get_is_dirty()(identifier))))
       for(const auto &range : ranges)
-        kill(identifier, range.first, range.second);
+      {
+        const auto &r=range.second;
+        kill(identifier, r.first, r.second);
+      }
 
     for(const auto &range : ranges)
-      gen(from, identifier, range.first, range.second);
+    {
+      const auto &r=range.second;
+      gen(from, identifier, r.first, r.second);
+    }
   }
 }
 

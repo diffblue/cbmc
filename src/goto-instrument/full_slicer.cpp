@@ -321,7 +321,7 @@ void full_slicert::operator()(
   }
 
   // compute program dependence graph (and post-dominators)
-  dependence_grapht dep_graph(ns);
+  dependence_grapht dep_graph(goto_functions, ns);
   dep_graph(goto_functions, ns);
 
   // compute the fixedpoint

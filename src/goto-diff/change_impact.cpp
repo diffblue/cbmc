@@ -298,8 +298,8 @@ change_impactt::change_impactt(
   new_goto_functions(model_new.goto_functions),
   ns_new(model_new.symbol_table),
   unified_diff(model_old, model_new),
-  old_dep_graph(ns_old),
-  new_dep_graph(ns_new)
+  old_dep_graph(model_old.goto_functions, ns_old),
+  new_dep_graph(model_new.goto_functions, ns_new)
 {
   // syntactic difference?
   if(!unified_diff())
