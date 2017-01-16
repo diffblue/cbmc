@@ -245,9 +245,18 @@ Function: exprt::is_true
 
 bool exprt::is_true() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)!=ID_false;
+  if(is_constant())
+  {
+    if(type().id()==ID_bool)
+      return get(ID_value)!=ID_false;
+    else if(type().id()==ID_c_bool)
+    {
+      mp_integer i;
+      to_integer(*this, i);
+      return i!=mp_integer(0);
+    }
+  }
+  return false;
 }
 
 /*******************************************************************\
@@ -264,9 +273,14 @@ Function: exprt::is_false
 
 bool exprt::is_false() const
 {
-  return is_constant() &&
-         type().id()==ID_bool &&
-         get(ID_value)==ID_false;
+  if(is_constant())
+  {
+    if(type().id()==ID_bool)
+      return get(ID_value)==ID_false;
+    else if(type().id()==ID_c_bool)
+      return !is_true();
+  }
+  return false;
 }
 
 /*******************************************************************\
