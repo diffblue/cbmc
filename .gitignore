@@ -32,6 +32,9 @@ regression/cbmc/tests.log
 src/big-int/test-bigint
 src/big-int/test-bigint.exe
 
+# regression/coverage file
+/regression/coverage_**
+
 # files stored by editors
 *~
 
