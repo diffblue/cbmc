@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <sstream>
+
+#include <util/namespace.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
@@ -297,4 +299,35 @@ exprt zero_initializer(
 {
   zero_initializert z_i(ns, message_handler);
   return z_i(type, source_location);
+}
+
+/*******************************************************************\
+
+Function: zero_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt zero_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns)
+{
+  std::ostringstream oss;
+  stream_message_handlert mh(oss);
+
+  try
+  {
+    zero_initializert z_i(ns, mh);
+    return z_i(type, source_location);
+  }
+  catch(int)
+  {
+    throw oss.str();
+  }
 }
