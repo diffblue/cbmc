@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 #include <util/expr_util.h>
+#include <linking/zero_initializer.h>
 
 #include "java_bytecode_convert_method.h"
 #include "bytecode_info.h"
@@ -726,7 +727,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(return_type.id()!=ID_empty)
       {
         results.resize(1);
-        results[0]=nil_exprt();
+        results[0]=
+          zero_initializer(
+            return_type,
+            i_it->source_location,
+            namespacet(symbol_table),
+            get_message_handler());
       }
     }
     else if(statement=="invokeinterface" ||
