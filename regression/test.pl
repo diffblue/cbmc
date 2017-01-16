@@ -19,10 +19,10 @@ my $has_thread_pool = eval
 
 sub run($$$$$) {
   my ($name, $input, $cmd, $options, $output) = @_;
-  my $cmdline = "$cmd $options $input >$output 2>&1";
+  my $cmdline = "$cmd $options '$input' >'$output' 2>&1";
 
   print LOG "Running $cmdline\n";
-  system("bash", "-c", "cd $name ; $cmdline");
+  system("bash", "-c", "cd '$name' ; $cmdline");
   my $exit_value = $? >> 8;
   my $signal_num = $? & 127;
   my $dumped_core = $? & 128;
@@ -40,8 +40,8 @@ sub run($$$$$) {
     }
   }
 
-  system "echo EXIT=$exit_value >>$name/$output";
-  system "echo SIGNAL=$signal_num >>$name/$output";
+  system "echo EXIT=$exit_value >>'$name/$output'";
+  system "echo SIGNAL=$signal_num >>'$name/$output'";
 
   return $failed;
 }
@@ -119,7 +119,7 @@ sub test($$$$$) {
           my $r;
           $result =~ s/\\/\\\\/g;
           $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep $grep_options \$'$result' \"$name/$output\" >/dev/null");
+          system("bash", "-c", "grep $grep_options \$'$result' '$name/$output' >/dev/null");
           $r = ($included ? $? != 0 : $? == 0);
           if($r) {
             print LOG "$result [FAILED]\n";
@@ -304,4 +304,3 @@ print "\n";
 close LOG;
 
 exit $failures;
-
