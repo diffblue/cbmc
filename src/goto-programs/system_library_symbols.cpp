@@ -6,31 +6,26 @@ Author: Thomas Kiley
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs
+
 #include "system_library_symbols.h"
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+#include <util/suffix.h>
 #include <util/symbol.h>
+#include <util/type.h>
 #include <sstream>
 
-system_library_symbolst::system_library_symbolst()
+system_library_symbolst::system_library_symbolst():
+  use_all_headers(false)
 {
   init_system_library_map();
 }
 
-/*******************************************************************\
-
-Function: system_library_symbolst::init_system_library_map
-
-Inputs:
-
-Outputs:
-
-Purpose: To generate a map of header file names -> list of symbols
-         The symbol names are reserved as the header and source files
-         will be compiled in to the goto program.
-
-\*******************************************************************/
-
+/// To generate a map of header file names -> list of symbols The symbol names
+/// are reserved as the header and source files will be compiled in to the goto
+/// program.
 void system_library_symbolst::init_system_library_map()
 {
   // ctype.h
@@ -100,7 +95,10 @@ void system_library_symbolst::init_system_library_map()
     "pthread_rwlock_unlock", "pthread_rwlock_wrlock",
     "pthread_rwlockattr_destroy", "pthread_rwlockattr_getpshared",
     "pthread_rwlockattr_init", "pthread_rwlockattr_setpshared",
-    "pthread_self", "pthread_setspecific"
+    "pthread_self", "pthread_setspecific",
+    /* non-public struct types */
+    "tag-__pthread_internal_list", "tag-__pthread_mutex_s",
+    "pthread_mutex_t"
   };
   add_to_system_library("pthread.h", pthread_syms);
 
@@ -125,7 +123,7 @@ void system_library_symbolst::init_system_library_map()
     "mkstemp", "mktemp", "perror", "printf", "putc", "putchar",
     "puts", "putw", "putwc", "putwchar", "remove", "rewind", "scanf",
     "setbuf", "setbuffer", "setlinebuf", "setvbuf", "snprintf",
-    "sprintf", "sscanf", "strerror", "swprintf", "sys_errlist",
+    "sprintf", "sscanf", "swprintf", "sys_errlist",
     "sys_nerr", "tempnam", "tmpfile", "tmpnam", "ungetc", "ungetwc",
     "vasprintf", "vfprintf", "vfscanf", "vfwprintf", "vprintf",
     "vscanf", "vsnprintf", "vsprintf", "vsscanf", "vswprintf",
@@ -162,9 +160,9 @@ void system_library_symbolst::init_system_library_map()
   std::list<irep_idt> time_syms=
   {
     "asctime", "asctime_r", "ctime", "ctime_r", "difftime", "gmtime",
-    "gmtime_r", "localtime", "localtime_r", "mktime",
+    "gmtime_r", "localtime", "localtime_r", "mktime", "strftime",
     /* non-public struct types */
-    "tag-timespec", "tag-timeval"
+    "tag-timespec", "tag-timeval", "tag-tm"
   };
   add_to_system_library("time.h", time_syms);
 
@@ -185,21 +183,27 @@ void system_library_symbolst::init_system_library_map()
   // sys/select.h
   std::list<irep_idt> sys_select_syms=
   {
-    "select"
+    "select",
+    /* non-public struct types */
+    "fd_set"
   };
   add_to_system_library("sys/select.h", sys_select_syms);
 
   // sys/socket.h
   std::list<irep_idt> sys_socket_syms=
   {
-    "accept", "bind", "connect"
+    "accept", "bind", "connect",
+    /* non-public struct types */
+    "tag-sockaddr"
   };
   add_to_system_library("sys/socket.h", sys_socket_syms);
 
   // sys/stat.h
   std::list<irep_idt> sys_stat_syms=
   {
-    "fstat", "lstat", "stat"
+    "fstat", "lstat", "stat",
+    /* non-public struct types */
+    "tag-stat"
   };
   add_to_system_library("sys/stat.h", sys_stat_syms);
 
@@ -240,22 +244,10 @@ void system_library_symbolst::init_system_library_map()
   add_to_system_library("sys/wait.h", sys_wait_syms);
 }
 
-/*******************************************************************\
-
-Function: system_library_symbolst::add_to_system_library
-
-Inputs:
- header_file - the name of the header file the symbol came from
- symbols - a list of the names of the symbols in the header file
-
-Outputs:
-
-Purpose: To add the symbols from a specific header file to the
-         system library map. The symbol is used as the key so that
-         we can easily look up symbols.
-
-\*******************************************************************/
-
+/// To add the symbols from a specific header file to the system library map.
+/// The symbol is used as the key so that we can easily look up symbols.
+/// \param header_file: the name of the header file the symbol came from
+/// \param symbols: a list of the names of the symbols in the header file
 void system_library_symbolst::add_to_system_library(
   irep_idt header_file,
   std::list<irep_idt> symbols)
@@ -266,25 +258,28 @@ void system_library_symbolst::add_to_system_library(
   }
 }
 
+/// Helper function to call `is_symbol_internal_symbol` on a nameless
+/// fake symbol with the given type, to determine whether the type alone
+/// is sufficient to classify a symbol of that type as internal.
+/// \param type: the type to check
+/// \return True if the type is an internal type. If specific system headers
+///   need to be included, the out_system_headers will contain the headers.
+bool system_library_symbolst::is_type_internal(
+  const typet &type,
+  std::set<std::string> &out_system_headers) const
+{
+  symbolt symbol;
+  symbol.type=type;
+  return is_symbol_internal_symbol(symbol, out_system_headers);
+}
 
-/*******************************************************************\
-
-Function: system_library_symbolst::is_symbol_internal_symbol
-
-Inputs:
- symbol - the symbol to check
-
-Outputs: True if the symbol is an internal symbol. If specific system
-         headers need to be included, the out_system_headers will contain
-         the headers.
-
-Purpose: To find out if a symbol is an internal symbol.
-
-\*******************************************************************/
-
+/// To find out if a symbol is an internal symbol.
+/// \param symbol: the symbol to check
+/// \return True if the symbol is an internal symbol. If specific system headers
+///   need to be included, the out_system_headers will contain the headers.
 bool system_library_symbolst::is_symbol_internal_symbol(
   const symbolt &symbol,
-  std::set<irep_idt> &out_system_headers) const
+  std::set<std::string> &out_system_headers) const
 {
   const std::string &name_str=id2string(symbol.name);
 
@@ -296,6 +291,9 @@ bool system_library_symbolst::is_symbol_internal_symbol(
      name_str=="argv'" ||
      name_str=="envp'" ||
      name_str=="envp_size'")
+    return true;
+
+  if(has_suffix(name_str, "$object"))
     return true;
 
   // exclude nondet instructions
@@ -312,12 +310,7 @@ bool system_library_symbolst::is_symbol_internal_symbol(
   const std::string &file_str=id2string(symbol.location.get_file());
 
   // don't dump internal GCC builtins
-  if((file_str=="gcc_builtin_headers_alpha.h" ||
-      file_str=="gcc_builtin_headers_arm.h" ||
-      file_str=="gcc_builtin_headers_ia32.h" ||
-      file_str=="gcc_builtin_headers_mips.h" ||
-      file_str=="gcc_builtin_headers_power.h" ||
-      file_str=="gcc_builtin_headers_generic.h") &&
+  if(has_prefix(file_str, "gcc_builtin_headers_") &&
      has_prefix(name_str, "__builtin_"))
     return true;
 
@@ -338,14 +331,24 @@ bool system_library_symbolst::is_symbol_internal_symbol(
     return true;
   }
 
-  if(name_str.find("$link")!=std::string::npos)
-    return false;
-
   const auto &it=system_library_map.find(symbol.name);
 
   if(it!=system_library_map.end())
   {
-    out_system_headers.insert(it->second);
+    out_system_headers.insert(id2string(it->second));
+    return true;
+  }
+
+  if(use_all_headers &&
+     has_prefix(file_str, "/usr/include/"))
+  {
+    if(file_str.find("/bits/")==std::string::npos)
+    {
+      // Do not include transitive includes of system headers!
+      std::string::size_type prefix_len=std::string("/usr/include/").size();
+      out_system_headers.insert(file_str.substr(prefix_len));
+    }
+
     return true;
   }
 
