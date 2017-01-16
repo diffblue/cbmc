@@ -183,7 +183,7 @@ Function: java_reference_type
 
 \*******************************************************************/
 
-typet java_reference_type(const typet &subtype)
+reference_typet java_reference_type(const typet &subtype)
 {
   return reference_typet(subtype);
 }

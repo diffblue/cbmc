@@ -47,8 +47,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     if(compo.get_bool("is_pure_virtual"))
     {
       pointer_typet pointer_type(code_type);
-      e = gen_zero(pointer_type);
-      assert(e.is_not_nil());
+      e=null_pointer_exprt(pointer_type);
       value_map[compo.get("virtual_name")] = e;
     }
     else

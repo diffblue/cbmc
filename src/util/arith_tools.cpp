@@ -188,11 +188,7 @@ constant_exprt from_integer(
   else if(type_id==ID_pointer)
   {
     if(int_value==0)
-    {
-      constant_exprt result(type);
-      result.set_value(ID_NULL);
-      return result;
-    }
+      return null_pointer_exprt(to_pointer_type(type));
   }
   else if(type_id==ID_c_bit_field)
   {
