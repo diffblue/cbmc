@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/type_eq.h>
 #include <util/std_types.h>
-#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>

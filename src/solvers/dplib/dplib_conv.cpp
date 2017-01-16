@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/config.h>
-#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
 #include <util/string2int.h>
@@ -393,7 +392,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       {
         convert_dplib_expr(op);
         dplib_prop.out << "/=";
-        convert_dplib_expr(gen_zero(op.type()));
+        convert_dplib_expr(from_integer(0, op.type()));
       }
       else
       {

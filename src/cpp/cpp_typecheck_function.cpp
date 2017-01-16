@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
-
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_template_type.h"

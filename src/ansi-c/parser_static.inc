@@ -1,7 +1,6 @@
 #include <util/std_code.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/string2int.h>
 
 #include "c_types.h"

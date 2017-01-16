@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 
 #include <util/namespace.h>
-#include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/std_code.h>
@@ -118,7 +117,7 @@ bool static_lifetime_init(
       assert(it!=symbol_table.symbols.end());
 
       it->second.type=type;
-      it->second.type.set(ID_size, gen_one(size_type()));
+      it->second.type.set(ID_size, from_integer(1, size_type()));
     }
 
     if(type.id()==ID_incomplete_struct ||

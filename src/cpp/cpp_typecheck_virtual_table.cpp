@@ -12,7 +12,6 @@ Purpose:
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include "cpp_typecheck.h"
 

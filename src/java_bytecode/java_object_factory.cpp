@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
-#include <util/expr_util.h>
 
 #include <linking/zero_initializer.h>
 
@@ -302,7 +301,7 @@ void java_object_factoryt::gen_nondet_init(
       }
       else if(name=="@lock")
       {
-        code_assignt code(me, gen_zero(me.type()));
+        code_assignt code(me, from_integer(0, me.type()));
         code.add_source_location()=loc;
         init_code.copy_to_operands(code);
       }

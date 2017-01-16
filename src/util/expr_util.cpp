@@ -316,7 +316,10 @@ exprt is_not_zero(
   // Note that this returns a proper bool_typet(), not a C/C++ boolean.
   // To get a C/C++ boolean, add a further typecast.
 
-  const typet &src_type=ns.follow(src.type());
+  const typet &src_type=
+    src.type().id()==ID_c_enum_tag?
+    ns.follow_tag(to_c_enum_tag_type(src.type())):
+    ns.follow(src.type());
 
   if(src_type.id()==ID_bool) // already there
     return src; // do nothing
@@ -324,7 +327,7 @@ exprt is_not_zero(
   irep_idt id=
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
-  exprt zero=gen_zero(src_type);
+  exprt zero=from_integer(0, src_type);
   assert(zero.is_not_nil());
 
   binary_exprt comparison(src, id, zero, bool_typet());

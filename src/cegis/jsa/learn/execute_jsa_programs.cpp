@@ -7,8 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
+
 #include <ansi-c/c_types.h>
-#include <util/expr_util.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/meta_variables.h>
@@ -47,7 +48,8 @@ void make_constraint_call(const symbol_tablet &st, goto_functionst &gf,
   args.push_back(address_of_exprt(get_user_heap(gf)));
   args.push_back(address_of_exprt(get_queried_heap(st)));
   const symbol_exprt p(st.lookup(get_cegis_meta_name(JSA_INV)).symbol_expr());
-  args.push_back(address_of_exprt(index_exprt(p, gen_zero(signed_int_type()))));
+  constant_exprt zero=from_integer(0, signed_int_type());
+  args.push_back(address_of_exprt(index_exprt(p, zero)));
   args.push_back(st.lookup(get_cegis_meta_name(JSA_INV_SZ)).symbol_expr());
   make_constraint_call(st, gf, pos, args);
 }
@@ -73,7 +75,8 @@ void make_query_call(jsa_programt &prog, const symbol_tablet &st,
   code_function_callt::argumentst &args=call.arguments();
   args.push_back(address_of_exprt(get_queried_heap(st)));
   const symbol_exprt p(st.lookup(get_cegis_meta_name(JSA_QUERY)).symbol_expr());
-  args.push_back(address_of_exprt(index_exprt(p, gen_zero(signed_int_type()))));
+  constant_exprt zero=from_integer(0, signed_int_type());
+  args.push_back(address_of_exprt(index_exprt(p, zero)));
   args.push_back(st.lookup(get_cegis_meta_name(JSA_QUERY_SZ)).symbol_expr());
   pos->code=call;
 }
@@ -91,7 +94,8 @@ void make_sync_call(const symbol_tablet &st, goto_functionst &gf,
   args.push_back(address_of_exprt(get_user_heap(gf)));
   args.push_back(address_of_exprt(get_queried_heap(st)));
   const symbol_exprt p(st.lookup(get_cegis_meta_name(JSA_QUERY)).symbol_expr());
-  args.push_back(address_of_exprt(index_exprt(p, gen_zero(signed_int_type()))));
+  constant_exprt zero=from_integer(0, signed_int_type());
+  args.push_back(address_of_exprt(index_exprt(p, zero)));
   args.push_back(st.lookup(get_cegis_meta_name(JSA_QUERY_SZ)).symbol_expr());
   pos->code=call;
 }

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/std_types.h>
-#include <util/expr_util.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/simplify_expr.h>
@@ -100,7 +99,7 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
       else
         assert(false);
 
-      expr.op2()=gen_zero(unsigned_int_type());
+      expr.op2()=from_integer(0, unsigned_int_type());
     }
   }
 }
@@ -604,7 +603,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
   exprt &member=static_cast<exprt &>(expr.add(ID_designator));
 
-  exprt result=gen_zero(size_type());
+  exprt result=from_integer(0, size_type());
 
   forall_operands(m_it, member)
   {
@@ -1286,7 +1285,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   {
     index_exprt index;
     index.array()=op;
-    index.index()=gen_zero(index_type());
+    index.index()=from_integer(0, index_type());
     index.type()=op_type.subtype();
     op=address_of_exprt(index);
   }
@@ -2031,7 +2030,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
     // *a is the same as a[0]
     expr.id(ID_index);
     expr.type()=op_type.subtype();
-    expr.copy_to_operands(gen_zero(index_type()));
+    expr.copy_to_operands(from_integer(0, index_type()));
     assert(expr.operands().size()==2);
   }
   else if(op_type.id()==ID_pointer)

@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
-#include <util/expr_util.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/meta_variables.h>
@@ -36,7 +35,7 @@ goto_programt::targett assume_less_than(goto_programt &body,
   pos->type=goto_program_instruction_typet::ASSUME;
   const constant_exprt max_expr(from_integer(max, jsa_internal_index_type()));
   const binary_relation_exprt size_limit(lhs, ID_le, max_expr);
-  const exprt min(gen_one(jsa_internal_index_type()));
+  const exprt min(from_integer(1, jsa_internal_index_type()));
   const binary_relation_exprt min_size(lhs, ID_ge, min);
   pos->guard=and_exprt(min_size, size_limit);
   return pos;
@@ -72,7 +71,7 @@ void declare_jsa_predicates(jsa_programt &prog, const size_t max_sz)
   const bv_arithmetict bv(to_array_type(preds.type()).size());
   const mp_integer::ullong_t num_preds=bv.to_integer().to_ulong();
   const typet sz_type(signed_int_type());
-  const exprt zero(gen_zero(sz_type));
+  const exprt zero(from_integer(0, sz_type));
   const size_t max_pred_size=get_max_pred_size(st);
   for (mp_integer::ullong_t i=0; i < num_preds; ++i)
   {

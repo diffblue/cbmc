@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <functional>
 
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/meta_variables.h>
@@ -163,7 +162,7 @@ public:
 
   void declare_instruction_loop_head()
   {
-    decl(CEGIS_PROC_INSTR_INDEX, gen_zero(cegis_size_type()));
+    decl(CEGIS_PROC_INSTR_INDEX, from_integer(0, cegis_size_type()));
     const member_exprt opcode(cegis_opcode(st, func_name));
     const size_t size(num_instrs(ordered_instructions));
     assume_less(pos=body.insert_after(pos), opcode, size);
@@ -178,7 +177,7 @@ public:
     const char * const base_idx_name=CEGIS_PROC_INSTR_INDEX;
     const std::string idx(meta_name(base_idx_name));
     const symbol_exprt idx_expr(st.lookup(idx).symbol_expr());
-    const plus_exprt rhs(idx_expr, gen_one(idx_expr.type()));
+    const plus_exprt rhs(idx_expr, from_integer(1, idx_expr.type()));
     cegis_assign_local_variable(st, body, pos, func_name, base_idx_name, rhs);
     pos=std::prev(body.instructions.end(), 2);
     const std::string index(meta_name(CEGIS_PROC_INSTR_INDEX));

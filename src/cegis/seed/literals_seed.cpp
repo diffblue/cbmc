@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <iterator>
 
-#include <util/expr_util.h>
+#include <util/arith_tools.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/invariant/util/invariant_constraint_variables.h>
@@ -275,7 +275,8 @@ public:
       const size_t index) const
   {
     const valuest &values=operator[](id);
-    if (values.empty()) return to_constant_expr(gen_zero(type));
+    if(values.empty())
+      return from_integer(0, type);
     return values.at(index % values.size());
   }
 

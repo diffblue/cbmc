@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/expr_util.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
@@ -1136,7 +1135,7 @@ void value_sett::get_reference_set_rec(
       {
         index_exprt index_expr(expr.type());
         index_expr.array()=object;
-        index_expr.index()=gen_zero(index_type());
+        index_expr.index()=from_integer(0, index_type());
 
         // adjust type?
         if(ns.follow(object.type())!=array_type)

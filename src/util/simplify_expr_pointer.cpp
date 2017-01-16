@@ -217,7 +217,7 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
       // we normalize &a[i] to (&a[0])+i
       exprt offset;
       offset.swap(index_expr.op1());
-      index_expr.op1()=gen_zero(offset.type());
+      index_expr.op1()=from_integer(0, offset.type());
 
       exprt addition(ID_plus, expr.type());
       addition.move_to_operands(expr, offset);
@@ -412,7 +412,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   else if(ptr.id()==ID_constant &&
           ptr.get(ID_value)==ID_NULL)
   {
-    expr=gen_zero(expr.type());
+    expr=from_integer(0, expr.type());
 
     simplify_node(expr);
 

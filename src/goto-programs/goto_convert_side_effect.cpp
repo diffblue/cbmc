@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/rename.h>
@@ -197,14 +198,14 @@ void goto_convertt::remove_pre(
 
   if(op_type.id()==ID_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
   }
   else if(op_type.id()==ID_c_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
@@ -213,7 +214,7 @@ void goto_convertt::remove_pre(
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_c_enum_tag)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs.make_typecast(op_type);
@@ -233,7 +234,7 @@ void goto_convertt::remove_pre(
       throw 0;
     }
 
-    exprt constant=gen_one(constant_type);
+    exprt constant=from_integer(1, constant_type);
 
     rhs.copy_to_operands(expr.op0());
     rhs.move_to_operands(constant);
@@ -301,14 +302,14 @@ void goto_convertt::remove_post(
 
   if(op_type.id()==ID_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
   }
   else if(op_type.id()==ID_c_bool)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs=is_not_zero(rhs, ns);
@@ -317,7 +318,7 @@ void goto_convertt::remove_post(
   else if(op_type.id()==ID_c_enum ||
           op_type.id()==ID_c_enum_tag)
   {
-    rhs.copy_to_operands(expr.op0(), gen_one(signed_int_type()));
+    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
     rhs.op0().make_typecast(signed_int_type());
     rhs.type()=signed_int_type();
     rhs.make_typecast(op_type);
@@ -337,7 +338,16 @@ void goto_convertt::remove_post(
       throw 0;
     }
 
-    exprt constant=gen_one(constant_type);
+    exprt constant;
+
+    if(constant_type.id()==ID_complex)
+    {
+      exprt real=from_integer(1, constant_type.subtype());
+      exprt imag=from_integer(0, constant_type.subtype());
+      constant=complex_exprt(real, imag, to_complex_type(constant_type));
+    }
+    else
+      constant=from_integer(1, constant_type);
 
     rhs.copy_to_operands(expr.op0());
     rhs.move_to_operands(constant);

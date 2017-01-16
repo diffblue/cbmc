@@ -6,12 +6,12 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -49,7 +49,7 @@ static void create_initialize(symbol_tablet &symbol_table)
   symbol_exprt rounding_mode=
     ns.lookup(CPROVER_PREFIX "rounding_mode").symbol_expr();
 
-  code_assignt a(rounding_mode, gen_zero(rounding_mode.type()));
+  code_assignt a(rounding_mode, from_integer(0, rounding_mode.type()));
   init_code.add(a);
 
   initialize.value=init_code;

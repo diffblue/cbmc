@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
 #include <util/byte_operators.h>
 #include <util/cprover_prefix.h>
 

@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/config.h>
-#include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/pointer_offset_size.h>
 #include <util/string2int.h>
@@ -349,7 +348,7 @@ void cvc_convt::convert_typecast_expr(const exprt &expr)
     {
       convert_expr(op);
       out << "/=";
-      convert_expr(gen_zero(op.type()));
+      convert_expr(from_integer(0, op.type()));
     }
     else
     {

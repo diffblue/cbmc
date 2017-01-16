@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
-#include <util/expr_util.h>
+
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
@@ -1390,7 +1390,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       code_ifthenelset code_branch;
       code_branch.cond()=
-        binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
+        binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.cond().add_source_location().set_function(method_id);
       code_branch.then_case()=code_gotot(label(number));
@@ -1561,7 +1561,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           nan_result,
           if_exprt(
             ieee_float_equal_exprt(op[0], op[1]),
-            gen_zero(result_type),
+            from_integer(0, result_type),
             if_exprt(
               binary_relation_exprt(op[0], ID_lt, op[1]),
               minus_one,

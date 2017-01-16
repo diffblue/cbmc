@@ -14,7 +14,6 @@ Author: Vincent Nimal
 #include <set>
 
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/message.h>

@@ -7,7 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
+#include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
 #include <cegis/cegis-util/program_helper.h>
@@ -30,7 +30,7 @@ const notequal_exprt get_base_case(const jsa_programt &prog)
 {
   const irep_idt &id=get_affected_variable(*prog.base_case);
   const symbol_exprt symbol(prog.st.lookup(id).symbol_expr());
-  return notequal_exprt(symbol, gen_zero(symbol.type()));
+  return notequal_exprt(symbol, from_integer(0, symbol.type()));
 }
 
 void imply_true(const jsa_programt &prog, goto_programt &body,
@@ -40,10 +40,10 @@ void imply_true(const jsa_programt &prog, goto_programt &body,
   const goto_programt::targett restriction=body.insert_after(pos);
   restriction->type=instr_type;
   const symbol_exprt smb(as_symbol(prog.st, get_affected_variable(*pos)));
-  const notequal_exprt consequent(smb, gen_zero(smb.type()));
+  const notequal_exprt consequent(smb, from_integer(0, smb.type()));
   const irep_idt &sid=get_affected_variable(*prog.inductive_assumption);
   const symbol_exprt si(as_symbol(prog.st, sid));
-  const equal_exprt antecedent(si, gen_zero(si.type()));
+  const equal_exprt antecedent(si, from_integer(0, si.type()));
   const or_exprt safety_implication(antecedent, consequent);
   restriction->guard=and_exprt(get_base_case(prog), safety_implication);
   restriction->source_location=jsa_builtin_source_location();

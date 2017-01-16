@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/replace_expr.h>
-#include <util/expr_util.h>
 #include <util/source_location.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>

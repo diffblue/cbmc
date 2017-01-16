@@ -648,7 +648,7 @@ void smt2_convt::convert_address_of_rec(
     {
       // this is really pointer arithmetic
       exprt new_index_expr=expr;
-      new_index_expr.op1()=gen_zero(index.type());
+      new_index_expr.op1()=from_integer(0, index.type());
 
       exprt address_of_expr(ID_address_of, pointer_typet());
       address_of_expr.type().subtype()=array.type().subtype();
