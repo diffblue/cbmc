@@ -11,6 +11,7 @@ Author: Thomas Kiley
 
 #include <list>
 #include <set>
+#include <string>
 #include <util/irep.h>
 
 class symbolt;
@@ -22,7 +23,7 @@ public:
 
   bool is_symbol_internal_symbol(
     const symbolt &symbol,
-    std::set<irep_idt> &out_system_headers) const;
+    std::set<std::string> &out_system_headers) const;
 
 private:
   void init_system_library_map();
