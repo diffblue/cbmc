@@ -972,7 +972,8 @@ void goto_checkt::pointer_validity_check(
     return;
 
   const exprt &pointer=expr.op0();
-  const typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
+  const pointer_typet &pointer_type=
+    to_pointer_type(ns.follow(pointer.type()));
 
   assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
 
@@ -986,7 +987,7 @@ void goto_checkt::pointer_validity_check(
   {
     if(flags.is_unknown() || flags.is_null())
     {
-      notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+      notequal_exprt not_eq_null(pointer, null_pointer_exprt(pointer_type));
 
       add_guarded_claim(
         not_eq_null,
@@ -1612,7 +1613,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
         if(flags.is_unknown() || flags.is_null())
         {
-          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+          notequal_exprt not_eq_null(
+            pointer,
+            null_pointer_exprt(to_pointer_type(pointer.type())));
 
           add_guarded_claim(
             not_eq_null,
@@ -1651,7 +1654,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
         if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
         {
-          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+          notequal_exprt not_eq_null(
+            pointer,
+            null_pointer_exprt(to_pointer_type(pointer.type())));
 
           add_guarded_claim(
             not_eq_null,
@@ -1718,7 +1723,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         source_locationt source_location;
         source_location.set_function(i.function);
 
-        equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
+        equal_exprt eq(
+          leak_expr,
+          null_pointer_exprt(to_pointer_type(leak.type)));
         add_guarded_claim(
           eq,
           "dynamically allocated memory never freed",

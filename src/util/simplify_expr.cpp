@@ -543,8 +543,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
               operand.is_false() &&
               config.ansi_c.NULL_is_zero)
       {
-        expr=gen_zero(expr_type);
-        assert(expr.is_not_nil());
+        expr=null_pointer_exprt(to_pointer_type(expr_type));
         return false;
       }
     }
