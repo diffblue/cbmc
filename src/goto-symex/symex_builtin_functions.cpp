@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include <linking/zero_initializer.h>
+
 #include "goto_symex.h"
 #include "goto_symex_state.h"
 
@@ -235,7 +237,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
-  exprt rhs=gen_zero(lhs.type());
+  exprt rhs=zero_initializer(lhs.type(), code.source_location(), ns);
 
   if(id!=irep_idt())
   {
