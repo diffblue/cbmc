@@ -170,6 +170,8 @@ void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
 {
   if(generate_opaque_stubs)
   {
+    system_symbols=system_library_symbolst();
+
     for(auto &symbol_entry : symbol_table.symbols)
     {
       if(is_symbol_opaque_function(symbol_entry.second))
@@ -287,14 +289,13 @@ Function: languaget::is_symbol_opaque_function
 
 bool languaget::is_symbol_opaque_function(const symbolt &symbol)
 {
-  // Explictly exclude CPROVER functions since these aren't opaque
-  std::string variable_id_str(symbol.name.c_str());
-  bool is_cprover_function = has_prefix(variable_id_str, CPROVER_PREFIX);
+  std::set<std::string> headers;
+  bool is_internal=system_symbols.is_symbol_internal_symbol(symbol, headers);
 
   return !symbol.is_type &&
     symbol.value.id()==ID_nil &&
     symbol.type.id()==ID_code &&
-    !is_cprover_function;
+    !is_internal;
 }
 
 /*******************************************************************\

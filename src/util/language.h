@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <util/symbol.h>
 #include <util/std_types.h>
+#include <goto-programs/system_library_symbols.h>
 
 #include "message.h"
 
@@ -139,5 +140,7 @@ private:
   void generate_opaque_parameter_symbols(
     symbolt &function_symbol,
     symbol_tablet &symbol_table);
+
+  system_library_symbolst system_symbols;
 };
 #endif // CPROVER_UTIL_LANGUAGE_H
