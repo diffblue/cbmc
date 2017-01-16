@@ -284,7 +284,7 @@ Purpose: To find out if a symbol is an internal symbol.
 
 bool system_library_symbolst::is_symbol_internal_symbol(
   const symbolt &symbol,
-  std::set<irep_idt> &out_system_headers) const
+  std::set<std::string> &out_system_headers) const
 {
   const std::string &name_str=id2string(symbol.name);
 
@@ -345,7 +345,7 @@ bool system_library_symbolst::is_symbol_internal_symbol(
 
   if(it!=system_library_map.end())
   {
-    out_system_headers.insert(it->second);
+    out_system_headers.insert(id2string(it->second));
     return true;
   }
 
