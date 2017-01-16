@@ -14,16 +14,28 @@ Author: CM Wintersteiger
 
 #include <langapi/language_util.h>
 
+#include <solvers/prop/literal.h>
+
 #include <cuddObj.hh> // CUDD Library
 
 /*! \cond */
 // FIX FOR THE CUDD LIBRARY
 
-inline DdNode *
-DD::getNode() const
+/*******************************************************************\
+
+Function: DD::getNode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+inline DdNode *DD::getNode() const
 {
     return node;
-
 } // DD::getNode
 /*! \endcond */
 
@@ -44,7 +56,7 @@ Function: qbf_bdd_certificatet::qbf_bdd_certificatet
 
 qbf_bdd_certificatet::qbf_bdd_certificatet(void) : qdimacs_coret()
 {
-  bdd_manager=new Cudd(0,0);
+  bdd_manager=new Cudd(0, 0);
 }
 
 /*******************************************************************\
@@ -61,11 +73,10 @@ Function: qbf_bdd_certificatet::~qbf_bdd_certificatet
 
 qbf_bdd_certificatet::~qbf_bdd_certificatet(void)
 {
-  for(model_bddst::iterator it=model_bdds.begin();
-      it!=model_bdds.end();
-      it++)
+  for(const BDD* model : model_bdds)
   {
-    if(*it!=NULL) { delete(*it); *it=NULL; }
+    if(model)
+      delete model;
   }
   model_bdds.clear();
 
@@ -127,16 +138,18 @@ Function: qbf_bdd_coret::~qbf_bdd_coret
 
 qbf_bdd_coret::~qbf_bdd_coret()
 {
-  for(bdd_variable_mapt::iterator it=bdd_variable_map.begin();
-      it!=bdd_variable_map.end();
-      it++)
+  for(const BDD* variable : bdd_variable_map)
   {
-    if (*it) { delete(*it); *it=NULL; }
+    if(variable)
+      delete variable;
   }
   bdd_variable_map.clear();
 
-  if(matrix) delete(matrix);
-  matrix=NULL;
+  if(matrix)
+  {
+    delete(matrix);
+    matrix=NULL;
+  }
 }
 
 /*******************************************************************\
@@ -189,17 +202,15 @@ Function: qbf_bdd_coret::prop_solve
 propt::resultt qbf_bdd_coret::prop_solve()
 {
   {
-    std::string msg=
-      solver_text() + ": "+
-      std::to_string(no_variables())+" variables, "+
-      std::to_string(matrix->nodeCount())+" nodes";
-    messaget::status() << msg << messaget::eom;
+    status() << solver_text() << ": "
+             << std::to_string(no_variables()) << " variables, "
+             << std::to_string(matrix->nodeCount()) << " nodes" << eom;
   }
 
   model_bdds.resize(no_variables()+1, NULL);
 
   // Eliminate variables
-  for(quantifierst::const_reverse_iterator it=quantifiers.rbegin();
+  for(auto it=quantifiers.rbegin();
       it!=quantifiers.rend();
       it++)
   {
@@ -212,13 +223,14 @@ propt::resultt qbf_bdd_coret::prop_solve()
         matrix->nodeCount() << " nodes" << std::endl;
       #endif
 
-      BDD* model = new BDD();
+      BDD *model=new BDD();
       const BDD &varbdd=*bdd_variable_map[var];
-      *model = matrix->AndAbstract(varbdd.Xnor(bdd_manager->bddOne()),
-                                   varbdd);
+      *model=matrix->AndAbstract(
+        varbdd.Xnor(bdd_manager->bddOne()),
+        varbdd);
       model_bdds[var]=model;
 
-      *matrix = matrix->ExistAbstract(*bdd_variable_map[var]);
+      *matrix=matrix->ExistAbstract(*bdd_variable_map[var]);
     }
     else if(it->type==quantifiert::UNIVERSAL)
     {
@@ -227,10 +239,10 @@ propt::resultt qbf_bdd_coret::prop_solve()
         matrix->nodeCount() << " nodes" << std::endl;
       #endif
 
-      *matrix = matrix->UnivAbstract(*bdd_variable_map[var]);
+      *matrix=matrix->UnivAbstract(*bdd_variable_map[var]);
     }
     else
-      throw ("Unquantified variable");
+      throw "unquantified variable";
   }
 
   if(*matrix==bdd_manager->bddOne())
@@ -261,7 +273,7 @@ Function: qbf_bdd_coret::is_in_core
 
 bool qbf_bdd_coret::is_in_core(literalt l) const
 {
-  throw ("NYI");
+  throw "nyi";
 }
 
 /*******************************************************************\
@@ -278,7 +290,7 @@ Function: qbf_bdd_coret::m_get
 
 qdimacs_coret::modeltypet qbf_bdd_coret::m_get(literalt a) const
 {
-  throw ("NYI");
+  throw "nyi";
 }
 
 /*******************************************************************\
@@ -299,7 +311,7 @@ literalt qbf_bdd_coret::new_variable()
 
   bdd_variable_map.resize(res.var_no()+1, NULL);
   BDD &var=*(new BDD());
-  var = bdd_manager->bddVar();
+  var=bdd_manager->bddVar();
   bdd_variable_map[res.var_no()]=&var;
 
   return res;
@@ -326,17 +338,17 @@ void qbf_bdd_coret::lcnf(const bvt &bv)
 
   BDD clause(bdd_manager->bddZero());
 
-  for(unsigned long i=0; i<new_bv.size(); i++)
+  for(const literalt &l : new_bv)
   {
-    literalt l=new_bv[i];
     BDD v(*bdd_variable_map[l.var_no()]);
 
-    if(l.sign()) v = ~v;
+    if(l.sign())
+      v=~v;
 
-    clause |= v;
+    clause|=v;
   }
 
-  *matrix &= clause;
+  *matrix&=clause;
 }
 
 /*******************************************************************\
@@ -353,15 +365,17 @@ Function: qbf_bdd_coret::lor
 
 literalt qbf_bdd_coret::lor(literalt a, literalt b)
 {
-  literalt nl = new_variable();
+  literalt nl=new_variable();
 
   BDD abdd(*bdd_variable_map[a.var_no()]);
   BDD bbdd(*bdd_variable_map[b.var_no()]);
 
-  if(a.sign()) abdd = ~abdd;
-  if(b.sign()) bbdd = ~bbdd;
+  if(a.sign())
+    abdd=~abdd;
+  if(b.sign())
+    bbdd=~bbdd;
 
-  *bdd_variable_map[nl.var_no()] |= abdd | bbdd;
+  *bdd_variable_map[nl.var_no()]|=abdd | bbdd;
 
   return nl;
 }
@@ -380,25 +394,26 @@ Function: qbf_bdd_coret::lor
 
 literalt qbf_bdd_coret::lor(const bvt &bv)
 {
-  forall_literals(it, bv)
-    if(*it==const_literal(true))
-      return const_literal(true);
-
-  literalt nl = new_variable();
-
-  BDD &orbdd = *bdd_variable_map[nl.var_no()];
-
-  forall_literals(it, bv)
+  for(const literalt &literal : bv)
   {
-    literalt l=*it;
+    if(literal==const_literal(true))
+      return literal;
+  }
 
-    if(l==const_literal(false))
+  literalt nl=new_variable();
+
+  BDD &orbdd=*bdd_variable_map[nl.var_no()];
+
+  for(const literalt &literal : bv)
+  {
+    if(literal==const_literal(false))
       continue;
 
-    BDD v(*bdd_variable_map[l.var_no()]);
-    if(l.sign()) v = ~v;
+    BDD v(*bdd_variable_map[literal.var_no()]);
+    if(literal.sign())
+      v=~v;
 
-    orbdd |= v;
+    orbdd|=v;
   }
 
   return nl;
@@ -420,23 +435,19 @@ void qbf_bdd_coret::compress_certificate(void)
 {
   status() << "Compressing Certificate" << eom;
 
-  for(quantifierst::const_iterator it=quantifiers.begin();
-      it!=quantifiers.end();
-      it++)
+  for(const quantifiert& quantifier : quantifiers)
   {
-    if(it->type==quantifiert::EXISTENTIAL)
+    if(quantifier.type==quantifiert::EXISTENTIAL)
     {
-      const BDD &var=*bdd_variable_map[it->var_no];
-      const BDD &model=*model_bdds[it->var_no];
+      const BDD &var=*bdd_variable_map[quantifier.var_no];
+      const BDD &model=*model_bdds[quantifier.var_no];
 
       if(model==bdd_manager->bddOne() ||
          model==bdd_manager->bddZero())
       {
-        for(quantifierst::const_iterator it2=it;
-            it2!=quantifiers.end();
-            it2++)
+        for(const quantifiert &quantifier2 : quantifier)
         {
-          BDD &model2=*model_bdds[it2->var_no];
+          BDD &model2=*model_bdds[quantifier2.var_no];
 
           if(model==bdd_manager->bddZero())
             model2=model2.AndAbstract(~var, var);
@@ -464,7 +475,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 {
   quantifiert q;
   if(!find_quantifier(l, q))
-    throw ("No model for unquantified variable");
+    throw "no model for unquantified variable";
 
   // universal?
   if(q.type==quantifiert::UNIVERSAL)
@@ -473,7 +484,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     variable_mapt::const_iterator it=variable_map.find(l.var_no());
 
     if(it==variable_map.end())
-      throw "Variable map error";
+      throw "variable map error";
 
     const exprt &sym=it->second.first;
     unsigned index=it->second.second;
@@ -485,7 +496,8 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     uint_type.set(ID_width, 32);
     extract_expr.copy_to_operands(from_integer(index, uint_type));
 
-    if(l.sign()) extract_expr.negate();
+    if(l.sign())
+      extract_expr.negate();
 
     return extract_expr;
   }
@@ -517,17 +529,17 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     model.PrintMinterm();
     #endif
 
-    int* cube;
+    int *cube;
     DdGen *generator;
-//    CUDD_VALUE_TYPE value;
 
     exprt result=or_exprt();
 
-    Cudd_ForeachPrime(bdd_manager->getManager(),
-                      model.getNode(), model.getNode(),
-                      generator,
-                      cube)
-//    Cudd_ForeachCube(bdd_manager->getManager(), model.getNode(), generator, cube, value)
+    Cudd_ForeachPrime(
+      bdd_manager->getManager(),
+      model.getNode(),
+      model.getNode(),
+      generator,
+      cube)
     {
       exprt prime=and_exprt();
 
@@ -540,7 +552,8 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
 
       for(signed i=0; i<bdd_manager->ReadSize(); i++)
       {
-        if(quantifiers[i].var_no==l.var_no()) break; // is this sound?
+        if(quantifiers[i].var_no==l.var_no())
+          break; // is this sound?
 
         if(cube[i]!=2)
         {
@@ -567,9 +580,10 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       final=false_exprt();
     else if(result.operands().size()==1)
       final=result.op0();
-    else final=result;
+    else
+      final=result;
 
-    function_cache[l.var_no()] = final;
+    function_cache[l.var_no()]=final;
 
     if(l.sign())
       return not_exprt(final);
