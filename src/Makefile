@@ -84,4 +84,41 @@ glucose-download:
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 
-.PHONY: minisat2-download glucose-download
+zlib-download:
+	@echo "Downloading zlib 1.2.11"
+	@lwp-download http://zlib.net/zlib-1.2.11.tar.gz
+	@tar xfz zlib-1.2.11.tar.gz
+	@rm -Rf ../zlib
+	@mv zlib-1.2.11 ../zlib
+	@rm zlib-1.2.11.tar.gz
+
+libzip-download:
+	@echo "Downloading libzip 1.1.2"
+	# The below wants SSL
+	#@lwp-download http://www.nih.at/libzip/libzip-1.1.2.tar.gz
+	@lwp-download http://http.debian.net/debian/pool/main/libz/libzip/libzip_1.1.2.orig.tar.gz
+	@tar xfz libzip_1.1.2.orig.tar.gz
+	@rm -Rf ../libzip
+	@mv libzip-1.1.2 ../libzip
+	@rm libzip_1.1.2.orig.tar.gz
+
+libzip-build:
+	@echo "Building zlib"
+	@(cd ../zlib; ./configure; make)
+	@echo "Building libzip"
+	@(cd ../libzip; BASE=`pwd`; ./configure --with-zlib=$(BASE)/zlib ; make)
+
+ipasir-download:
+	# get the 2016 version of the ipasir package, which contains a few solvers
+	@echo "Download ipasir 2016 package"
+	@(lwp-download http://baldur.iti.kit.edu/sat-competition-2016/downloads/ipasir.zip ../ipasir.zip)
+	@(cd ..; unzip -u ipasir.zip)
+
+ipasir-build: ipasir-download
+	# build libpicaso, and create a libipasir.a in ipasir directory
+	# make sure that the ipasir.h file is located there as well (ships with 2016 package)
+	@echo "Build Picaso 961 from ipasir 2016 package"
+	$(MAKE) -C ../ipasir/sat/picosat961 libipasirpicosat961.a
+	@(cd ../ipasir; ln -sf sat/picosat961/libipasirpicosat961.a libipasir.a)
+
+.PHONY: ipasir-build minisat2-download glucose-download zlib-download libzip-download libzip-build
