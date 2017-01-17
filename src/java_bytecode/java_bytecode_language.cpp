@@ -327,6 +327,13 @@ static void initialise_needed_classes(
       }
     }
   }
+
+  // Also add classes whose instances are magically
+  // created by the JVM and so won't be spotted by
+  // looking for constructors and calls as usual:
+  needed_classes.insert("java::java.lang.String");
+  needed_classes.insert("java::java.lang.Class");
+  needed_classes.insert("java::java.lang.Object");
 }
 
 /*******************************************************************\
