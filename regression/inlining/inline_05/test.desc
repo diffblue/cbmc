@@ -1,0 +1,10 @@
+CORE
+main.c
+--inline
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+recursion.*ignored.*[`]f
+recursion.*ignored.*[`]g
+--
+^warning: ignoring

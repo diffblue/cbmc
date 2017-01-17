@@ -1,0 +1,12 @@
+CORE
+main.c
+--function-inline main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+g[(].*[)];$
+h[(].*[)];$
+--
+f[(].*[)];$
+other_func[(].*[)];$
+^warning: ignoring

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
+#include <util/json.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -104,7 +105,8 @@ void goto_instrument_parse_optionst::eval_verbosity()
   if(cmdline.isset("verbosity"))
   {
     v=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-    if(v>10) v=10;
+    if(v>10)
+      v=10;
   }
 
   ui_message_handler.set_verbosity(v);
@@ -143,6 +145,7 @@ int goto_instrument_parse_optionst::doit()
     register_languages();
 
     get_goto_program();
+
     instrument_goto_program();
 
     {
@@ -368,7 +371,11 @@ int goto_instrument_parse_optionst::doit()
 
       custom_bitvector_analysist custom_bitvector_analysis;
       custom_bitvector_analysis(goto_functions, ns);
-      custom_bitvector_analysis.check(ns, goto_functions, cmdline.isset("xml-ui"), std::cout);
+      custom_bitvector_analysis.check(
+        ns,
+        goto_functions,
+        cmdline.isset("xml-ui"),
+        std::cout);
 
       return 0;
     }
@@ -440,7 +447,8 @@ int goto_instrument_parse_optionst::doit()
       const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
 
-      std::cout << rw_set_functiont(value_set_analysis, ns, goto_functions, main);
+      std::cout <<
+        rw_set_functiont(value_set_analysis, ns, goto_functions, main);
       return 0;
     }
 
@@ -761,12 +769,16 @@ Function: goto_instrument_parse_optionst::do_function_pointer_removal
 
 void goto_instrument_parse_optionst::do_function_pointer_removal()
 {
-  if(function_pointer_removal_done) return;
+  if(function_pointer_removal_done)
+    return;
+
   function_pointer_removal_done=true;
 
   status() << "Function Pointer Removal" << eom;
   remove_function_pointers(
-    symbol_table, goto_functions, cmdline.isset("pointer-check"));
+    symbol_table,
+    goto_functions,
+    cmdline.isset("pointer-check"));
 }
 
 /*******************************************************************\
@@ -783,7 +795,9 @@ Function: goto_instrument_parse_optionst::do_partial_inlining
 
 void goto_instrument_parse_optionst::do_partial_inlining()
 {
-  if(partial_inlining_done) return;
+  if(partial_inlining_done)
+    return;
+
   partial_inlining_done=true;
 
   if(!cmdline.isset("inline"))
@@ -808,7 +822,9 @@ Function: goto_instrument_parse_optionst::do_remove_returns
 
 void goto_instrument_parse_optionst::do_remove_returns()
 {
-  if(remove_returns_done) return;
+  if(remove_returns_done)
+    return;
+
   remove_returns_done=true;
 
   status() << "Removing returns" << eom;
@@ -979,6 +995,92 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("remove-function-pointers"))
     do_function_pointer_removal();
 
+  if(cmdline.isset("function-inline"))
+  {
+    std::string function=cmdline.get_value("function-inline");
+    assert(!function.empty());
+
+    do_function_pointer_removal();
+
+    status() << "Inlining calls of function `" << function << "'" << eom;
+
+    if(!cmdline.isset("log"))
+    {
+      goto_function_inline(
+        goto_functions,
+        function,
+        ns,
+        ui_message_handler,
+        true);
+    }
+    else
+    {
+      std::string filename=cmdline.get_value("log");
+      bool have_file=!filename.empty() && filename!="-";
+
+      jsont result=
+        goto_function_inline_and_log(
+          goto_functions,
+          function,
+          ns,
+          ui_message_handler,
+          true);
+
+      if(have_file)
+      {
+#ifdef _MSC_VER
+        std::ofstream of(widen(filename));
+#else
+        std::ofstream of(filename);
+#endif
+        if(!of)
+          throw "failed to open file "+filename;
+
+        of << result;
+        of.close();
+      }
+      else
+      {
+        std::cout << result << std::endl;
+      }
+    }
+
+    goto_functions.update();
+    goto_functions.compute_loop_numbers();
+  }
+
+  if(cmdline.isset("partial-inline"))
+  {
+    do_function_pointer_removal();
+
+    status() << "Partial inlining" << eom;
+    goto_partial_inline(goto_functions, ns, ui_message_handler, true);
+
+    goto_functions.update();
+    goto_functions.compute_loop_numbers();
+  }
+
+  // now do full inlining, if requested
+  if(cmdline.isset("inline"))
+  {
+    status() << "Function Pointer Removal" << eom;
+    remove_function_pointers(
+      symbol_table,
+      goto_functions,
+      cmdline.isset("pointer-check"));
+
+    if(cmdline.isset("show-custom-bitvector-analysis") ||
+       cmdline.isset("custom-bitvector-analysis"))
+    {
+      do_remove_returns();
+      thread_exit_instrumentation(goto_functions);
+      mutex_init_instrumentation(symbol_table, goto_functions);
+    }
+
+    status() << "Performing full inlining" << eom;
+    goto_inline(goto_functions, ns, ui_message_handler, true);
+  }
+
   if(cmdline.isset("constant-propagator"))
   {
     do_function_pointer_removal();
@@ -1004,15 +1106,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("stack-depth"))
   {
     status() << "Adding check for maximum call stack size" << eom;
-    stack_depth(symbol_table, goto_functions,
-        unsafe_string2unsigned(cmdline.get_value("stack-depth")));
+    stack_depth(
+      symbol_table,
+      goto_functions,
+      unsafe_string2unsigned(cmdline.get_value("stack-depth")));
   }
 
   // ignore default/user-specified initialization of variables with static
   // lifetime
   if(cmdline.isset("nondet-static"))
   {
-    status() << "Adding nondeterministic initialization of static/global variables" << eom;
+    status() << "Adding nondeterministic initialization of static/global "
+                "variables" << eom;
     nondet_static(ns, goto_functions);
   }
 
@@ -1026,8 +1131,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("string-abstraction"))
   {
     status() << "String Abstraction" << eom;
-    string_abstraction(symbol_table,
-      get_message_handler(), goto_functions);
+    string_abstraction(
+      symbol_table,
+      get_message_handler(),
+      goto_functions);
   }
 
   // some analyses require function pointer removal and partial inlining
@@ -1040,7 +1147,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_function_pointer_removal();
     do_partial_inlining();
-    
+
     status() << "Pointer Analysis" << eom;
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_functions);
@@ -1050,7 +1157,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       // removing pointers
       status() << "Removing Pointers" << eom;
       remove_pointers(
-        goto_functions, symbol_table, value_set_analysis);
+        goto_functions,
+        symbol_table,
+        value_set_analysis);
     }
 
     if(cmdline.isset("race-check"))
@@ -1089,12 +1198,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         /* default: instruments all unsafe pairs */
         inst_strategy=all;
 
-      const unsigned unwind_loops =
-        ( cmdline.isset("unwind")?unsafe_string2unsigned(cmdline.get_value("unwind")):0 );
-      const unsigned max_var =
-        ( cmdline.isset("max-var")?unsafe_string2unsigned(cmdline.get_value("max-var")):0 );
-      const unsigned max_po_trans =
-        ( cmdline.isset("max-po-trans")?unsafe_string2unsigned(cmdline.get_value("max-po-trans")):0 );
+      const unsigned unwind_loops=
+        cmdline.isset("unwind")?
+        unsafe_string2unsigned(cmdline.get_value("unwind")):0;
+      const unsigned max_var=
+        cmdline.isset("max-var")?
+        unsafe_string2unsigned(cmdline.get_value("max-var")):0;
+      const unsigned max_po_trans=
+        cmdline.isset("max-po-trans")?
+        unsafe_string2unsigned(cmdline.get_value("max-po-trans")):0;
 
       if(mm=="tso")
       {
@@ -1304,7 +1416,7 @@ void goto_instrument_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *     Goto-Instrument " CBMC_VERSION " - Copyright (C) 2008-2013       * *\n"
+    "* *     Goto-Instrument " CBMC_VERSION " - Copyright (C) 2008-2013       * *\n" // NOLINT(*)
     "* *                    Daniel Kroening                      * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"
@@ -1321,7 +1433,7 @@ void goto_instrument_parse_optionst::help()
     " --dot                        generate CFG graph in DOT format\n"
     " --interpreter                do concrete execution\n"
     " --count-eloc                 count effective lines of code\n"
-    " --list-eloc                  list full path names of lines containing code\n"
+    " --list-eloc                  list full path names of lines containing code\n" // NOLINT(*)
     "\n"
     "Diagnosis:\n"
     " --show-loops                 show the loops in the program\n"
@@ -1330,30 +1442,30 @@ void goto_instrument_parse_optionst::help()
     " --list-symbols               list symbols with type information\n"
     " --show-goto-functions        show goto program\n"
     " --list-undefined-functions   list functions without body\n"
-    " --show-struct-alignment      show struct members that might be concurrently accessed\n"
+    " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
     GOTO_CHECK_HELP
-    " --uninitialized-check        add checks for uninitialized locals (experimental)\n"
+    " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
     " --error-label label          check that label is unreachable\n"
-    " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n"
+    " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
     " --race-check                 add floating-point data race checks\n"
     "\n"
     "Semantic transformations:\n"
-    " --nondet-volatile            makes reads from volatile variables non-deterministic\n"
+    " --nondet-volatile            makes reads from volatile variables non-deterministic\n" // NOLINT(*)
     " --unwind <n>                 unwinds the loops <n> times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     " --unwindset-file <file>      read unwindset from file\n"
     " --partial-loops              permit paths with partial loops\n"
     " --unwinding-assertions       generate unwinding assertions\n"
-    " --continue-as-loops          add loop for remaining iterations after unwound part\n"
+    " --continue-as-loops          add loop for remaining iterations after unwound part\n" // NOLINT(*)
     " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
-    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n"
+    " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"
@@ -1361,34 +1473,37 @@ void goto_instrument_parse_optionst::help()
     " --base-case                  k-induction: do base-case\n"
     " --havoc-loops                over-approximate all loops\n"
     " --accelerate                 add loop accelerators\n"
-    " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n"
+    " --skip-loops <loop-ids>      add gotos to skip selected loops during execution\n" // NOLINT(*)
     "\n"
     "Memory model instrumentations:\n"
     " --mm <tso,pso,rmo,power>     instruments a weak memory model\n"
-    " --scc                        detects critical cycles per SCC (one thread per SCC)\n"
+    " --scc                        detects critical cycles per SCC (one thread per SCC)\n" // NOLINT(*)
     " --one-event-per-cycle        only instruments one event per cycle\n"
     " --minimum-interference       instruments an optimal number of events\n"
-    " --my-events                  only instruments events whose ids appear in inst.evt\n"
-    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n"
+    " --my-events                  only instruments events whose ids appear in inst.evt\n" // NOLINT(*)
+    " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" // NOLINT(*)
     " --no-dependencies            no dependency analysis\n"
     " --no-po-rendering            no representation of the threads in the dot\n"
     " --render-cluster-file        clusterises the dot by files\n"
     " --render-cluster-function    clusterises the dot by functions\n"
     "\n"
     "Slicing:\n"
-    " --reachability-slice         slice away instructions that can't reach assertions\n"
-    " --full-slice                 slice away instructions that don't affect assertions\n"
-    " --property id                slice with respect to specific property only\n"
-    " --slice-global-inits         slice away initializations of unused global variables\n"
+    " --reachability-slice         slice away instructions that can't reach assertions\n" // NOLINT(*)
+    " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
+    " --property id                slice with respect to specific property only\n" // NOLINT(*)
+    " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
     "\n"
     "Further transformations:\n"
-    " --constant-propagator        propagate constants and simplify expressions\n"
+    " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)
     " --inline                     perform full inlining\n"
-    " --remove-function-pointers   replace function pointers by case statement over function calls\n"
+    " --partial-inline             perform partial inlining\n"
+    " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
+    " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
+    " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
     " --add-library                add models of C library functions\n"
     "\n"
     "Other options:\n"
-    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n"
+    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
