@@ -116,6 +116,8 @@ public:
 
   virtual languaget *new_language()=0;
 
+  void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
+
   // constructor / destructor
 
   languaget() { }
