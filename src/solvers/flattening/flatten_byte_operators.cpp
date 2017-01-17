@@ -190,7 +190,8 @@ Function: flatten_byte_update
 
 exprt flatten_byte_update(
   const byte_update_exprt &src,
-  const namespacet &ns)
+  const namespacet &ns,
+  bool negative_offset)
 {
   assert(src.operands().size()==3);
 
@@ -265,44 +266,95 @@ exprt flatten_byte_update(
       {
         exprt result=src.op0();
 
-        for(mp_integer i=0; i<element_size; ++i)
-        {
-          exprt new_value;
+        // Number of potentially affected array cells:
+        mp_integer num_elements=
+          element_size/sub_size+((element_size%sub_size==0)?1:2);
 
-          if(element_size==1)
+        const auto& offset_type=ns.follow(src.op1().type());
+        exprt zero_offset=from_integer(0, offset_type);
+
+        exprt sub_size_expr=from_integer(sub_size, offset_type);
+        exprt element_size_expr=from_integer(element_size, offset_type);
+
+        // First potentially affected cell:
+        div_exprt first_cell(src.op1(), sub_size_expr);
+
+        for(mp_integer i=0; i<num_elements; ++i)
+        {
+          plus_exprt cell_index(first_cell, from_integer(i, offset_type));
+          mult_exprt cell_offset(cell_index, sub_size_expr);
+          index_exprt old_cell_value(src.op0(), cell_index, subtype);
+          bool is_first_cell=i==0;
+          bool is_last_cell=i==num_elements-1;
+
+          exprt new_value;
+          exprt stored_value_offset;
+          if(element_size<=sub_size)
+          {
             new_value=src.op2();
+            stored_value_offset=zero_offset;
+          }
           else
           {
-            exprt i_expr=from_integer(i, ns.follow(src.op1().type()));
+            // Offset to retrieve from the stored value: make sure not to
+            // ask for anything out of range; in the first- or last-cell cases
+            // we will adjust the offset in the byte_update call below.
+            if(is_first_cell)
+              stored_value_offset=zero_offset;
+            else if(is_last_cell)
+              stored_value_offset=
+                from_integer(element_size-sub_size, offset_type);
+            else
+              stored_value_offset=minus_exprt(cell_offset, src.op1());
 
+            auto extract_opcode=
+              src.id()==ID_byte_update_little_endian ?
+              ID_byte_extract_little_endian :
+              src.id()==ID_byte_update_big_endian ?
+              ID_byte_extract_big_endian :
+              throw "unexpected src.id() in flatten_byte_update";
             byte_extract_exprt byte_extract_expr(
-              src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
-              src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
-              throw "unexpected src.id() in flatten_byte_update",
-              array_type.subtype());
+              extract_opcode,
+              element_size<sub_size ? src.op2().type() : subtype);
 
             byte_extract_expr.op()=src.op2();
-            byte_extract_expr.offset()=i_expr;
+            byte_extract_expr.offset()=stored_value_offset;
 
-            new_value=byte_extract_expr;
+            new_value=flatten_byte_extract(byte_extract_expr, ns);
           }
 
-          div_exprt div_offset(src.op1(), from_integer(sub_size, src.op1().type()));
-          mod_exprt mod_offset(src.op1(), from_integer(sub_size, src.op1().type()));
+          // Where does the value we just extracted align in this cell?
+          // This value might be negative, indicating only the most-significant
+          // bytes should be written, to the least-significant bytes of the
+          // target array cell.
+          exprt overwrite_offset;
+          if(is_first_cell)
+            overwrite_offset=mod_exprt(src.op1(), sub_size_expr);
+          else if(is_last_cell)
+          {
+            // This is intentionally negated; passing is_last_cell
+            // to flatten below leads to it being negated again later.
+            overwrite_offset=
+              minus_exprt(
+                minus_exprt(cell_offset, src.op1()),
+                stored_value_offset);
+          }
+          else
+            overwrite_offset=zero_offset;
 
-          index_exprt index_expr(src.op0(), div_offset, array_type.subtype());
+          byte_update_exprt byte_update_expr(
+            src.id(),
+            old_cell_value,
+            overwrite_offset,
+            new_value);
 
-          byte_update_exprt byte_update_expr(src.id(), array_type.subtype());
-          byte_update_expr.op()=index_expr;
-          byte_update_expr.offset()=mod_offset;
-          byte_update_expr.value()=new_value;
-
-          // Call recurisvely, the array is gone!
+          // Call recursively, the array is gone!
+          // The last parameter indicates that the
           exprt flattened_byte_update_expr=
-            flatten_byte_update(byte_update_expr, ns);
+            flatten_byte_update(byte_update_expr, ns, is_last_cell);
 
           with_exprt with_expr(
-            result, div_offset, flattened_byte_update_expr);
+            result, cell_index, flattened_byte_update_expr);
 
           result=with_expr;
         }
@@ -332,17 +384,7 @@ exprt flatten_byte_update(
 
     // build mask
     exprt mask=
-      bitnot_exprt(
-        from_integer(power(2, element_size*8)-1, unsignedbv_typet(width)));
-
-    const typet &offset_type=ns.follow(src.op1().type());
-    mult_exprt offset_times_eight(src.op1(), from_integer(8, offset_type));
-
-    // shift the mask
-    shl_exprt shl_expr(mask, offset_times_eight);
-
-    // do the 'AND'
-    bitand_exprt bitand_expr(src.op0(), mask);
+      from_integer(power(2, element_size*8)-1, unsignedbv_typet(width));
 
     // zero-extend the value, but only if needed
     exprt value_extended;
@@ -354,10 +396,35 @@ exprt flatten_byte_update(
     else
       value_extended=src.op2();
 
-    // shift the value
-    shl_exprt value_shifted(value_extended, offset_times_eight);
+    const typet &offset_type=ns.follow(src.op1().type());
+    mult_exprt offset_times_eight(src.op1(), from_integer(8, offset_type));
 
-    // do the 'OR'
+    binary_predicate_exprt offset_ge_zero(
+      offset_times_eight,
+      ID_ge,
+      from_integer(0, offset_type));
+
+    // Shift the mask and value.
+    // Note either shift might discard some of the new value's bits.
+    exprt mask_shifted;
+    exprt value_shifted;
+    if(negative_offset)
+    {
+      // In this case we shift right, to mask out higher addresses
+      // rather than left to mask out lower ones as usual.
+      mask_shifted=lshr_exprt(mask, offset_times_eight);
+      value_shifted=lshr_exprt(value_extended, offset_times_eight);
+    }
+    else
+    {
+      mask_shifted=shl_exprt(mask, offset_times_eight);
+      value_shifted=shl_exprt(value_extended, offset_times_eight);
+    }
+
+    // original_bits &= ~mask
+    bitand_exprt bitand_expr(src.op0(), bitnot_exprt(mask_shifted));
+
+    // original_bits |= newvalue
     bitor_exprt bitor_expr(bitand_expr, value_shifted);
 
     return bitor_expr;
