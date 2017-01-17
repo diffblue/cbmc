@@ -133,6 +133,24 @@ bool languaget::type_to_name(
 
 /*******************************************************************\
 
+Function: languaget::set_should_generate_opaque_method_stubs
+
+  Inputs:
+          should_generate_stubs - Should stub generation be enabled
+
+ Outputs:
+
+ Purpose: Turn on or off stub generation.
+
+\*******************************************************************/
+void languaget::set_should_generate_opaque_method_stubs(
+  bool should_generate_stubs)
+{
+  generate_opaque_stubs=should_generate_stubs;
+}
+
+/*******************************************************************\
+
 Function: languaget::generate_opaque_method_stubs
 
   Inputs:
@@ -143,27 +161,31 @@ Function: languaget::generate_opaque_method_stubs
  Purpose: When there are opaque methods (e.g. ones where we don't
           have a body), we create a stub function in the goto
           program and mark it as opaque so the interpreter fills in
-          appropriate values for it.
+          appropriate values for it. This will only happen if
+          generate_opaque_stubs is enabled.
 
 \*******************************************************************/
 
 void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
 {
-  for(auto &symbol_entry : symbol_table.symbols)
+  if(generate_opaque_stubs)
   {
-    if(is_symbol_opaque_function(symbol_entry.second))
+    for(auto &symbol_entry : symbol_table.symbols)
     {
-      symbolt &symbol=symbol_entry.second;
-
-      generate_opaque_parameter_symbols(symbol, symbol_table);
-
-      irep_idt return_symbol_id = generate_opaque_stub_body(
-        symbol,
-        symbol_table);
-
-      if(return_symbol_id!=ID_nil)
+      if(is_symbol_opaque_function(symbol_entry.second))
       {
-        symbol.type.set("opaque_method_capture_symbol", return_symbol_id);
+        symbolt &symbol=symbol_entry.second;
+
+        generate_opaque_parameter_symbols(symbol, symbol_table);
+
+        irep_idt return_symbol_id=generate_opaque_stub_body(
+          symbol,
+          symbol_table);
+
+        if(return_symbol_id!=ID_nil)
+        {
+          symbol.type.set("opaque_method_capture_symbol", return_symbol_id);
+        }
       }
     }
   }

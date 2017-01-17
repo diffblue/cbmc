@@ -93,6 +93,28 @@ void language_filest::show_parse(std::ostream &out)
 
 /*******************************************************************\
 
+Function: language_filest::set_should_generate_opqaue_method_stubs
+
+  Inputs:
+          should_generate_stubs - Should stub generation be enabled
+
+ Outputs:
+
+ Purpose: Turn on or off stub generation for all the languages
+
+\*******************************************************************/
+
+void language_filest::set_should_generate_opaque_method_stubs(
+  bool stubs_enabled)
+{
+  for(file_mapt::value_type &language_file_entry : file_map)
+  {
+    languaget *language=language_file_entry.second.language;
+    language->set_should_generate_opaque_method_stubs(stubs_enabled);
+  }
+}
+
+/*******************************************************************\
 Function: language_filest::parse
 
   Inputs:

@@ -112,6 +112,8 @@ public:
 
   virtual languaget *new_language()=0;
 
+  void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
+
   // constructor / destructor
 
   languaget() { }
@@ -129,6 +131,8 @@ protected:
     const code_typet::parametert &parameter);
 
   static irep_idt get_stub_return_symbol_name(const irep_idt &function_id);
+
+  bool generate_opaque_stubs;
 
 private:
   bool is_symbol_opaque_function(const symbolt &symbol);
