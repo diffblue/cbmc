@@ -7,6 +7,14 @@ double d;
 typedef enum T1 { hot, dog, poo, bear } dingos;
 typedef enum T2 { janette, laura, amanda } cranberry;
 
+typedef enum AnonEnum { jim, bob, fred } names;
+
+typedef dingos altdingos;
+typedef dingos diffdingos;
+
+typedef names altnames;
+typedef names diffnames;
+
 typedef float same1;
 typedef float same2;
 
@@ -52,6 +60,9 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof (dingos), unsigned)); // ha!
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (laura)));
 STATIC_ASSERT(__builtin_types_compatible_p(int[5], int[]));
 STATIC_ASSERT(__builtin_types_compatible_p(same1, same2));
+STATIC_ASSERT(__builtin_types_compatible_p(dingos, altdingos));
+STATIC_ASSERT(__builtin_types_compatible_p(diffdingos, altdingos));
+STATIC_ASSERT(__builtin_types_compatible_p(diffnames, altnames));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot) *, int *));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (janette)));
 STATIC_ASSERT(__builtin_types_compatible_p(__int128, signed __int128));
@@ -84,7 +95,6 @@ STATIC_ASSERT(!__builtin_types_compatible_p(__float128, long double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__float128, double));
 STATIC_ASSERT(!__builtin_types_compatible_p(__int128, unsigned __int128));
 #endif
-
 #endif
 
 int main(void)

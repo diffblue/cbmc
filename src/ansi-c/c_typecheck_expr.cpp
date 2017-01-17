@@ -140,6 +140,8 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   if(type1.id()==ID_c_enum)
   {
     if(type2.id()==ID_c_enum) // both are enums
+      // We don't need to remove the typedef flag here since as it is an enum
+      // we have already followed the enum tag to get to the underlying enum
       return type1==type2; // compares the tag
     else if(type2==type1.subtype())
       return true;
@@ -184,18 +186,51 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   }
   else
   {
-    if(type1==type2)
+    if(are_types_equal_ignoring_typedef(type1, type2))
     {
       // Need to distinguish e.g. long int from int or
       // long long int from long int.
       // The rules appear to match those of C++.
-
+      // Isn't this explictly handled by checking type1==type2 (since
+      // operator== recursively checks all sub types).
       if(type1.get(ID_C_c_type)==type2.get(ID_C_c_type))
         return true;
     }
   }
 
   return false;
+}
+
+/*******************************************************************\
+
+Function: c_typecheck_baset::are_types_equal_ignoring_typedef
+
+  Inputs:
+   type1 - the first type to compare
+   type2 - the second type to compare
+
+ Outputs: True if the types are equal
+
+ Purpose: To check whether two types are equal, ignoring if they have a
+          different typedef tag. We do this by explictly removing the
+          ID_C_typedef from the type before comparing. Then we just use
+          operator== to compare the resultant types.
+
+\*******************************************************************/
+bool c_typecheck_baset::are_types_equal_ignoring_typedef(
+  const typet type1, const typet &type2)
+{
+  typet non_typedefd_type1=type1;
+  typet non_typedefd_type2=type2;
+  if(type1.get(ID_C_typedef)!=ID_nil)
+  {
+    non_typedefd_type1.remove(ID_C_typedef);
+  }
+  if(type2.get(ID_C_typedef)!=ID_nil)
+  {
+    non_typedefd_type2.remove(ID_C_typedef);
+  }
+  return non_typedefd_type1==non_typedefd_type2;
 }
 
 /*******************************************************************\
