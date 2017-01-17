@@ -438,6 +438,25 @@ exprt flatten_byte_update(
 
 /*******************************************************************\
 
+Function: flatten_byte_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt flatten_byte_update(
+  const byte_update_exprt &src,
+  const namespacet &ns)
+{
+  return flatten_byte_update(src, ns, false);
+}
+
+/*******************************************************************\
+
 Function: has_byte_operators
 
   Inputs:
@@ -474,7 +493,9 @@ Function: flatten_byte_operators
 
 \*******************************************************************/
 
-exprt flatten_byte_operators(const exprt &src, const namespacet &ns)
+exprt flatten_byte_operators(
+  const exprt &src,
+  const namespacet &ns)
 {
   exprt tmp=src;
 

@@ -20,10 +20,11 @@ exprt flatten_byte_extract(
 
 exprt flatten_byte_update(
   const byte_update_exprt &src,
-  const namespacet &ns,
-  bool negative_offset=false);
+  const namespacet &ns);
 
-exprt flatten_byte_operators(const exprt &src, const namespacet &ns);
+exprt flatten_byte_operators(
+  const exprt &src,
+  const namespacet &ns);
 
 bool has_byte_operator(const exprt &src);
 
