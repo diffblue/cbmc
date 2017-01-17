@@ -10,6 +10,7 @@ Author: Peter Schrammel
 
 #include <util/xml.h>
 #include <util/json.h>
+#include <util/json_expr.h>
 #include <util/xml_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -67,6 +68,38 @@ void show_goto_functions(
       bool is_internal=(has_prefix(id2string(it->first), CPROVER_PREFIX) ||
                         it->first==ID__start);
       json_function["isInternal"]=jsont::json_boolean(is_internal);
+
+      if(it->second.body_available())
+      {
+        json_arrayt json_instruction_array=json_arrayt();
+
+        for(const goto_programt::instructiont &instruction :
+          it->second.body.instructions)
+        {
+          json_objectt instruction_entry=json_objectt();
+
+          std::ostringstream instruction_id_builder;
+          instruction_id_builder << instruction.type;
+
+          instruction_entry["instructionId"]=
+            json_stringt(instruction_id_builder.str());
+
+          instruction_entry["sourceLocation"]=
+            json(instruction.code.source_location());
+
+          std::ostringstream instruction_builder;
+          it->second.body.output_instruction(
+            ns, it->first, instruction_builder, instruction);
+
+          instruction_entry["instruction"]=
+            json_stringt(instruction_builder.str());
+
+
+          json_instruction_array.push_back(instruction_entry);
+        }
+
+        json_function["instructions"] = json_instruction_array;
+      }
     }
     json_objectt json_result;
     json_result["functions"]=json_functions;
