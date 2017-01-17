@@ -84,8 +84,11 @@ void show_goto_functions_jsont::show_goto_functions(
         instruction_entry["instructionId"]=
           json_stringt(instruction_id_builder.str());
 
-        instruction_entry["sourceLocation"]=
-          json(instruction.code.source_location());
+        if(instruction.code.source_location().is_not_nil())
+        {
+          instruction_entry["sourceLocation"]=
+            json(instruction.code.source_location());
+        }
 
         std::ostringstream instruction_builder;
         function.body.output_instruction(
