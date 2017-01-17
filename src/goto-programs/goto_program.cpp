@@ -19,10 +19,15 @@ Author: Daniel Kroening, kroening@kroening.com
 Function: goto_programt::output_instruction
 
   Inputs:
+   ns - the namespace to resolve the expressions in
+   identifier - the identifier used to find a symbol to identify the
+                source language
+   out - the stream to write the goto string to
+   it - an iterator pointing to the instruction to convert
 
- Outputs:
+ Outputs: See below.
 
- Purpose:
+ Purpose: See below.
 
 \*******************************************************************/
 
@@ -32,51 +37,81 @@ std::ostream& goto_programt::output_instruction(
   std::ostream& out,
   instructionst::const_iterator it) const
 {
-  out << "        // " << it->location_number << " ";
+  return output_instruction(ns, identifier, out, *it);
+}
 
-  if(!it->source_location.is_nil())
-    out << it->source_location.as_string();
+/*******************************************************************\
+
+Function: goto_programt::output_instruction
+
+  Inputs:
+   ns - the namespace to resolve the expressions in
+   identifier - the identifier used to find a symbol to identify the
+                source language
+   out - the stream to write the goto string to
+   instruction - the instruction to convert
+
+ Outputs: Appends to out a two line representation of the instruction
+
+ Purpose: Writes to out a two line string representation of the specific
+          instruction. It is of the format:
+          // {location} file {source file} line {line in source file}
+          {representation of the instruction}
+
+\*******************************************************************/
+
+std::ostream &goto_programt::output_instruction(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  std::ostream &out,
+  const goto_program_templatet::instructiont &instruction) const
+{
+  out << "        // " << instruction.location_number << " ";
+
+  if(!instruction.source_location.is_nil())
+    out << instruction.source_location.as_string();
   else
     out << "no location";
 
   out << "\n";
 
-  if(!it->labels.empty())
+  if(!instruction.labels.empty())
   {
     out << "        // Labels:";
-    for(const auto &label : it->labels)
+    for(const auto &label : instruction.labels)
       out << " " << label;
 
     out << '\n';
   }
 
-  if(it->is_target())
-    out << std::setw(6) << it->target_number << ": ";
+  if(instruction.is_target())
+    out << std::setw(6) << instruction.target_number << ": ";
   else
     out << "        ";
 
-  switch(it->type)
+  switch(instruction.type)
   {
   case NO_INSTRUCTION_TYPE:
     out << "NO INSTRUCTION TYPE SET" << '\n';
     break;
 
   case GOTO:
-    if(!it->guard.is_true())
+    if(!instruction.guard.is_true())
     {
       out << "IF "
-          << from_expr(ns, identifier, it->guard)
+          << from_expr(ns, identifier, instruction.guard)
           << " THEN ";
     }
 
     out << "GOTO ";
 
     for(instructiont::targetst::const_iterator
-        gt_it=it->targets.begin();
-        gt_it!=it->targets.end();
+        gt_it=instruction.targets.begin();
+        gt_it!=instruction.targets.end();
         gt_it++)
     {
-      if(gt_it!=it->targets.begin()) out << ", ";
+      if(gt_it!=instruction.targets.begin())
+        out << ", ";
       out << (*gt_it)->target_number;
     }
 
@@ -89,20 +124,20 @@ std::ostream& goto_programt::output_instruction(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    out << from_expr(ns, identifier, it->code) << '\n';
+    out << from_expr(ns, identifier, instruction.code) << '\n';
     break;
 
   case ASSUME:
   case ASSERT:
-    if(it->is_assume())
+    if(instruction.is_assume())
       out << "ASSUME ";
     else
       out << "ASSERT ";
 
     {
-      out << from_expr(ns, identifier, it->guard);
+      out << from_expr(ns, identifier, instruction.guard);
 
-      const irep_idt &comment=it->source_location.get_comment();
+      const irep_idt &comment=instruction.source_location.get_comment();
       if(comment!="") out << " // " << comment;
     }
 
@@ -126,34 +161,35 @@ std::ostream& goto_programt::output_instruction(
 
     {
       const irept::subt &exception_list=
-        it->code.find(ID_exception_list).get_sub();
+        instruction.code.find(ID_exception_list).get_sub();
 
       for(const auto &ex : exception_list)
         out << " " << ex.id();
     }
 
-    if(it->code.operands().size()==1)
-      out << ": " << from_expr(ns, identifier, it->code.op0());
+    if(instruction.code.operands().size()==1)
+      out << ": " << from_expr(ns, identifier, instruction.code.op0());
 
     out << '\n';
     break;
 
   case CATCH:
-    if(!it->targets.empty())
+    if(!instruction.targets.empty())
     {
       out << "CATCH-PUSH ";
 
       unsigned i=0;
       const irept::subt &exception_list=
-        it->code.find(ID_exception_list).get_sub();
-      assert(it->targets.size()==exception_list.size());
+        instruction.code.find(ID_exception_list).get_sub();
+      assert(instruction.targets.size()==exception_list.size());
       for(instructiont::targetst::const_iterator
-          gt_it=it->targets.begin();
-          gt_it!=it->targets.end();
+          gt_it=instruction.targets.begin();
+          gt_it!=instruction.targets.end();
           gt_it++,
           i++)
       {
-        if(gt_it!=it->targets.begin()) out << ", ";
+        if(gt_it!=instruction.targets.begin())
+          out << ", ";
         out << exception_list[i].id() << "->"
             << (*gt_it)->target_number;
       }
@@ -175,8 +211,8 @@ std::ostream& goto_programt::output_instruction(
   case START_THREAD:
     out << "START THREAD ";
 
-    if(it->targets.size()==1)
-      out << it->targets.front()->target_number;
+    if(instruction.targets.size()==1)
+      out << instruction.targets.front()->target_number;
 
     out << '\n';
     break;
