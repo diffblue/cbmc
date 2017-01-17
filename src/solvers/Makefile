@@ -22,6 +22,14 @@ ifneq ($(MINISAT2),)
   override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
 endif
 
+ifneq ($(IPASIR),)
+  IPASIR_SRC=sat/satcheck_ipasir.cpp
+  IPASIR_INCLUDE=-I $(IPASIR)
+  IPASIR_LIB=$(IPASIR)/ipasir.a
+  CP_CXXFLAGS += -DHAVE_IPASIR -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  override CXXFLAGS := $(filter-out -pedantic, $(CXXFLAGS))
+endif
+
 ifneq ($(GLUCOSE),)
   GLUCOSE_SRC=sat/satcheck_glucose.cpp
   GLUCOSE_INCLUDE=-I $(GLUCOSE)
@@ -72,6 +80,7 @@ ifneq ($(LINGELING),)
 endif
 
 SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
+      $(IPASIR_SRC) \
       $(SMVSAT_SRC) $(SQUOLEM2_SRC) $(CUDD_SRC) $(GLUCOSE_SRC) \
       $(PRECOSAT_SRC) $(PICOSAT_SRC) $(LINGELING_SRC) \
       sat/cnf.cpp sat/dimacs_cnf.cpp sat/cnf_clause_list.cpp \
@@ -122,6 +131,7 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
 
 INCLUDES += -I .. \
   $(CHAFF_INCLUDE) $(BOOLEFORCE_INCLUDE) $(MINISAT_INCLUDE) $(MINISAT2_INCLUDE) \
+  $(IPASIR_INCLUDE) \
   $(SMVSAT_INCLUDE) $(SQUOLEM2_INC) $(CUDD_INCLUDE) $(GLUCOSE_INCLUDE) \
 	$(PRECOSAT_INCLUDE) $(PICOSAT_INCLUDE) $(LINGELING_INCLUDE)
 
