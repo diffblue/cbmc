@@ -499,10 +499,11 @@ void ai_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
 {
-  // do each function at least once
+  goto_functionst::function_mapt::const_iterator
+    f_it=goto_functions.function_map.find(goto_functions.entry_point());
 
-  forall_goto_functions(it, goto_functions)
-    fixedpoint(it->second.body, goto_functions, ns);
+  if(f_it!=goto_functions.function_map.end())
+    fixedpoint(f_it->second.body, goto_functions, ns);
 }
 
 /*******************************************************************\
