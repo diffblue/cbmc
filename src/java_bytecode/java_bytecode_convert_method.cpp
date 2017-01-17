@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 #include <limits>
 #include <algorithm>
@@ -392,14 +393,6 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
     return ID_notequal;
 
   throw "unhandled java comparison instruction";
-}
-
-static constant_exprt as_number(const mp_integer value, const typet &type)
-{
-  const std::size_t java_int_width(type.get_unsigned_int(ID_width));
-  const std::string significant_bits(integer2string(value, 2));
-  std::string binary_width(java_int_width-significant_bits.length(), '0');
-  return constant_exprt(binary_width+=significant_bits, type);
 }
 
 static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
@@ -1724,7 +1717,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      code_blockt check_and_create;
+      c=code_blockt();
       if(!disable_runtime_checks)
       {
         // TODO make this throw NegativeArrayIndexException instead.
@@ -1734,18 +1727,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
         check.add_source_location().set_comment("Array size < 0");
         check.add_source_location()
           .set_property_class("array-create-negative-size");
-        check_and_create.move_to_operands(check);
+        c.move_to_operands(check);
       }
       if(max_array_length!=0)
       {
         constant_exprt size_limit=as_number(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
-        check_and_create.move_to_operands(assume_le_max_size);
+        c.move_to_operands(assume_le_max_size);
       }
       const exprt tmp=tmp_variable("newarray", ref_type);
-      check_and_create.copy_to_operands(code_assignt(tmp, java_new_array));
-      c=std::move(check_and_create);
+      c.copy_to_operands(code_assignt(tmp, java_new_array));
       results[0]=tmp;
     }
     else if(statement=="multianewarray")
