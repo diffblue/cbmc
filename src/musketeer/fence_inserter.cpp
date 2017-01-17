@@ -85,7 +85,8 @@ Function: fence_insertert::preprocess
 
 \*******************************************************************/
 
-void fence_insertert::preprocess() {
+void fence_insertert::preprocess()
+{
   process_cycles_selection();
 
   cycles_visitor.po_edges(po);
@@ -103,24 +104,24 @@ void fence_insertert::preprocess() {
     if(filter_cycles(C_j->id))
       continue;
 
-    std::set<unsigned> new_wr_set;
+    std::set<event_idt> new_wr_set;
     cycles_visitor.powr_constraint(*C_j, new_wr_set);
     powr_constraints.push_back(new_wr_set);
 
-    std::set<unsigned> new_ww_set;
+    std::set<event_idt> new_ww_set;
     cycles_visitor.poww_constraint(*C_j, new_ww_set);
     poww_constraints.push_back(new_ww_set);
 
-    std::set<unsigned> new_rw_set;
+    std::set<event_idt> new_rw_set;
     cycles_visitor.porw_constraint(*C_j, new_rw_set);
     porw_constraints.push_back(new_rw_set);
 
-    std::set<unsigned> new_rr_set;
+    std::set<event_idt> new_rr_set;
     cycles_visitor.porr_constraint(*C_j, new_rr_set);
     porr_constraints.push_back(new_rr_set);
 
     if(model==Power || model==Unknown) {
-      std::set<unsigned> new_comset;
+      std::set<event_idt> new_comset;
       cycles_visitor.com_constraint(*C_j, new_comset);
       com_constraints.push_back(new_comset);
     }
@@ -135,72 +136,72 @@ void fence_insertert::preprocess() {
 
   // NEW
   /* first, powr constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=powr_constraints.begin();
     e_i!=powr_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_c_it=e_i->begin();
       e_c_it!=e_i->end();
       ++e_c_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_c_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_c_it)->second, pt_set);
     }
   }
 
   /* then, poww constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=poww_constraints.begin();
     e_i!=poww_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
   }
 
   /* then, porw constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=porw_constraints.begin();
     e_i!=porw_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
   }
 
   /* then, porr constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=porr_constraints.begin();
     e_i!=porr_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
     }
@@ -209,24 +210,24 @@ void fence_insertert::preprocess() {
   if(model==Power || model==Unknown)
   {
     /* finally, Power/ARM constraints for Rfes: for all C_j */
-    for(std::list<std::set<unsigned> >::const_iterator
+    for(std::list<std::set<event_idt> >::const_iterator
       e_i=com_constraints.begin();
       e_i!=com_constraints.end();
       ++e_i)
     {
       /* for all e */
-      for(std::set<unsigned>::const_iterator
+      for(std::set<event_idt>::const_iterator
         e_c_it=e_i->begin();
         e_c_it!=e_i->end();
         ++e_c_it)
       {
-        std::set<unsigned> ct_set;
+        std::set<event_idt> ct_set;
         assert( invisible_var.map_to_e.find(*e_c_it)
           != invisible_var.map_to_e.end());
         const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
-        std::set<unsigned> ct_not_powr_set;
+        std::set<event_idt> ct_not_powr_set;
         const_graph_visitor.CT_not_powr(
           invisible_var.map_to_e.find(*e_c_it)->second, ct_not_powr_set);
       }
@@ -274,7 +275,7 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
         if(filter_cycles(C_j->id)) continue;
 
         /* if(C_j->find( col_to_var(i) )!=C_j->end()) */
-        std::list<unsigned>::const_iterator it;
+        std::list<event_idt>::const_iterator it;
         for(it = C_j->begin(); it!=C_j->end() && col_to_var(i)!=*it; ++it);
 
         if(it!=C_j->end())
@@ -361,13 +362,13 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
 
   /* first the powr: for all C_j */
   for(
-    std::list<std::set<unsigned> >::const_iterator c_wr_it =
+    std::list<std::set<event_idt> >::const_iterator c_wr_it =
       powr_constraints.begin();
     c_wr_it != powr_constraints.end();
     ++c_wr_it)
   {
     /* for all e */
-    for(unsigned j=1; j<=c_wr_it->size(); ++j)
+    for(std::size_t j=1; j<=c_wr_it->size(); ++j)
     {
       std::string name="C_"+std::to_string(i)+"_c_wr_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
@@ -378,13 +379,13 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
 
   /* then the poww: for all C_j */
   for(
-    std::list<std::set<unsigned> >::const_iterator c_ww_it =
+    std::list<std::set<event_idt> >::const_iterator c_ww_it =
       poww_constraints.begin();
     c_ww_it != poww_constraints.end();
     ++c_ww_it)
   {
     /* for all e */
-    for(unsigned j=1; j<=c_ww_it->size(); ++j)
+    for(std::size_t j=1; j<=c_ww_it->size(); ++j)
     {
       std::string name="C_"+std::to_string(i)+"_c_ww_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
@@ -395,13 +396,13 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
 
   /* then the porw: for all C_j */
   for(
-    std::list<std::set<unsigned> >::const_iterator c_rw_it =
+    std::list<std::set<event_idt> >::const_iterator c_rw_it =
       porw_constraints.begin();
     c_rw_it != porw_constraints.end();
     ++c_rw_it)
   {
     /* for all e */
-    for(unsigned j=1; j<=c_rw_it->size(); ++j)
+    for(std::size_t j=1; j<=c_rw_it->size(); ++j)
     {
       std::string name="C_"+std::to_string(i)+"_c_rw_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
@@ -412,13 +413,13 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
 
   /* and finally the porr: for all C_j */
   for(
-    std::list<std::set<unsigned> >::const_iterator c_rr_it =
+    std::list<std::set<event_idt> >::const_iterator c_rr_it =
       porr_constraints.begin();
     c_rr_it != porr_constraints.end();
     ++c_rr_it)
   {
     /* for all e */
-    for(unsigned j=1; j<=c_rr_it->size(); ++j)
+    for(std::size_t j=1; j<=c_rr_it->size(); ++j)
     {
       std::string name="C_"+std::to_string(i)+"_c_rr_"+std::to_string(j);
       glp_set_row_name(ilp.lp, i, name.c_str());
@@ -429,13 +430,13 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
 
   if(model==Power || model==Unknown) {
     for(
-      std::list<std::set<unsigned> >::const_iterator c_it =
+      std::list<std::set<event_idt> >::const_iterator c_it =
         com_constraints.begin();
       c_it != com_constraints.end();
       ++c_it)
     {
       /* for all e */
-      for(unsigned j=1; j<=c_it->size(); ++j)
+      for(std::size_t j=1; j<=c_it->size(); ++j)
       {
         std::string name="C_"+std::to_string(i)+"_c_"+std::to_string(j);
         glp_set_row_name(ilp.lp, i, name.c_str());
@@ -471,18 +472,18 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   i=1;
 
   /* first, powr constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=powr_constraints.begin();
     e_i!=powr_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_c_it=e_i->begin();
       e_c_it!=e_i->end();
       ++e_c_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_c_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_c_it)->second, pt_set);
       /* sum_e' f_e' */
@@ -513,18 +514,18 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   }
 
   /* then, poww constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=poww_constraints.begin();
     e_i!=poww_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
       /* sum_e' (f_e' + lwf_e') */
@@ -555,18 +556,18 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   }
 
   /* then, porw constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=porw_constraints.begin();
     e_i!=porw_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
       /* dp_e + sum_e' (f_e' + lwf_e' + br_e') */
@@ -621,23 +622,23 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   }
 
   /* then, porr constraints: for all C_j */
-  for(std::list<std::set<unsigned> >::const_iterator
+  for(std::list<std::set<event_idt> >::const_iterator
     e_i=porr_constraints.begin();
     e_i!=porr_constraints.end();
     ++e_i)
   {
     /* for all e */
-    for(std::set<unsigned>::const_iterator
+    for(std::set<event_idt>::const_iterator
       e_nc_it=e_i->begin();
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<unsigned> pt_set;
+      std::set<event_idt> pt_set;
       assert(map_to_e.find(*e_nc_it) != map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
 // uncomment for cf
 #if 0
-      std::set<unsigned> it_set;
+      std::set<event_idt> it_set;
       IT(map_to_e.find(*e_nc_it)->second, it_set);
 #endif
       /* dp_e + sum_e' (f_e' + lwf_e') + sum_e'' cf_e'') */
@@ -693,26 +694,26 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   if(model==Power || model==Unknown)
   {
     /* finally, Power/ARM constraints for Rfes: for all C_j */
-    for(std::list<std::set<unsigned> >::const_iterator
+    for(std::list<std::set<event_idt> >::const_iterator
       e_i=com_constraints.begin();
       e_i!=com_constraints.end();
       ++e_i)
     {
       /* for all e */
-      for(std::set<unsigned>::const_iterator
+      for(std::set<event_idt>::const_iterator
         e_c_it=e_i->begin();
         e_c_it!=e_i->end();
         ++e_c_it)
       {
         unsigned possibilities_met=0;
 
-        std::set<unsigned> ct_set;
+        std::set<event_idt> ct_set;
         assert( invisible_var.map_to_e.find(*e_c_it)
           != invisible_var.map_to_e.end());
         const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
-        std::set<unsigned> ct_not_powr_set;
+        std::set<event_idt> ct_not_powr_set;
         const_graph_visitor.CT_not_powr(invisible_var.map_to_e.find(
           *e_c_it)->second, ct_not_powr_set);
 
@@ -784,10 +785,10 @@ void fence_insertert::solve() {
   instrumenter.message.debug() << "3: " << i << messaget::eom;
   assert(i-1==constraints_number);
 
-  const unsigned const_constraints_number=constraints_number;
-  const unsigned const_unique=unique;
+  const std::size_t const_constraints_number=constraints_number;
+  const event_idt const_unique=unique;
 
-  const unsigned mat_size=const_unique*fence_options*const_constraints_number;
+  const std::size_t mat_size=const_unique*fence_options*const_constraints_number;
   instrumenter.message.statistics() << "size of the system: " << mat_size
     << messaget::eom;
   instrumenter.message.statistics() << "# of constraints: "
@@ -1202,13 +1203,13 @@ Function: fence_insertert::print_vars
 void fence_insertert::print_vars() const {
   instrumenter.message.statistics()
     << "---- pos/pos+ (visible) variables ----" << messaget::eom;
-  for(std::map<edget,unsigned>::const_iterator it=map_from_e.begin();
+  for(std::map<edget,event_idt>::const_iterator it=map_from_e.begin();
     it!=map_from_e.end(); ++it)
     instrumenter.message.statistics() << it->first.first << ","
       << it->first.second << messaget::eom;
   instrumenter.message.statistics() << "---- cmp (invisible) variables ----"
     << messaget::eom;
-  for(std::map<edget,unsigned>::const_iterator it=
+  for(std::map<edget,event_idt>::const_iterator it=
     invisible_var.map_from_e.begin();
     it!=invisible_var.map_from_e.end(); ++it)
     instrumenter.message.statistics() << it->first.first << ","

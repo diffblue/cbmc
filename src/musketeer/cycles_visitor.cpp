@@ -30,7 +30,7 @@ Function:
 \*******************************************************************/
 
 /* po^+ /\ U{C_1, ..., C_n} \/ delays */
-void cycles_visitort::po_edges(std::set<unsigned>& edges)
+void cycles_visitort::po_edges(std::set<event_idt>& edges)
 {
   instrumentert& instrumenter=fence_inserter.instrumenter;
 
@@ -176,7 +176,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
       /* computes the largest pos+ in C_j */
       std::map<unsigned,event_grapht::critical_cyclet::const_iterator> m_begin;
       std::map<unsigned,event_grapht::critical_cyclet::const_iterator> m_end;
-      std::set<unsigned> m_threads;
+      std::set<event_idt> m_threads;
 
       unsigned previous_thread=0;
       for(event_grapht::critical_cyclet::const_iterator C_j_it=C_j->begin();
@@ -199,7 +199,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
       /* computes the largest pos+ in C_k */
       std::map<unsigned,event_grapht::critical_cyclet::const_iterator> k_begin;
       std::map<unsigned,event_grapht::critical_cyclet::const_iterator> k_end;
-      std::set<unsigned> k_threads;
+      std::set<event_idt> k_threads;
 
       previous_thread=0;
       for(event_grapht::critical_cyclet::const_iterator C_k_it=C_k->begin();
@@ -220,7 +220,7 @@ void cycles_visitort::po_edges(std::set<unsigned>& edges)
       }
 
       /* if there are some commun threads, take the intersection if relevant */
-      for(std::set<unsigned>::const_iterator it=m_threads.begin();
+      for(std::set<event_idt>::const_iterator it=m_threads.begin();
         it!=m_threads.end(); ++it)
         if(k_threads.find(*it)!=k_threads.end())
         {
@@ -264,7 +264,7 @@ Function:
 /* C_j /\ po^+ /\ poWR */
 void cycles_visitort::powr_constraint(
   const event_grapht::critical_cyclet& C_j,
-  std::set<unsigned>& edges)
+  std::set<event_idt>& edges)
 {
   event_grapht& graph=fence_inserter.instrumenter.egraph;
 
@@ -295,7 +295,7 @@ Function:
 /* C_j /\ po^+ /\ poWW */
 void cycles_visitort::poww_constraint(
   const event_grapht::critical_cyclet& C_j,
-  std::set<unsigned>& edges)
+  std::set<event_idt>& edges)
 {
   event_grapht& graph=fence_inserter.instrumenter.egraph;
 
@@ -326,7 +326,7 @@ Function:
 /* C_j /\ po^+ /\ poRW */
 void cycles_visitort::porw_constraint(
   const event_grapht::critical_cyclet& C_j,
-  std::set<unsigned>& edges)
+  std::set<event_idt>& edges)
 {
   event_grapht& graph=fence_inserter.instrumenter.egraph;
 
@@ -357,7 +357,7 @@ Function:
 /* C_j /\ po^+ /\ poRR */
 void cycles_visitort::porr_constraint(
   const event_grapht::critical_cyclet& C_j,
-  std::set<unsigned>& edges)
+  std::set<event_idt>& edges)
 {
   event_grapht& graph=fence_inserter.instrumenter.egraph;
 
@@ -388,7 +388,7 @@ Function:
 /* C_j /\ comWR */
 void cycles_visitort::com_constraint(
   const event_grapht::critical_cyclet& C_j,
-  std::set<unsigned>& edges)
+  std::set<event_idt>& edges)
 {
   event_grapht& egraph=fence_inserter.instrumenter.egraph;
 

@@ -30,19 +30,19 @@ struct mip_vart
 {
   typedef event_grapht::critical_cyclet::delayt edget;
 
-  unsigned unique;
+  event_idt unique;
 
-  std::map<unsigned, edget> map_to_e;
-  std::map<edget, unsigned> map_from_e;
+  std::map<event_idt, edget> map_to_e;
+  std::map<edget, event_idt> map_from_e;
 
-  unsigned add_edge(const edget &e)
+  event_idt add_edge(const edget &e)
   {
     if(map_from_e.find(e) != map_from_e.end())
       return map_from_e[e];
     else
     {
       ++unique;
-      map_to_e.insert(std::pair<unsigned, edget>(unique, e));
+      map_to_e.insert(std::pair<event_idt, edget>(unique, e));
       map_from_e[e] = unique;
       return unique;
     }
@@ -62,21 +62,21 @@ public:
   instrumentert &instrumenter;
 
   /* normal variables used almost everytime */
-  std::map<unsigned, edget>& map_to_e;
-  std::map<edget, unsigned>& map_from_e;
-  inline unsigned add_edge(const edget& e) { return var.add_edge(e); }
-  inline unsigned add_invisible_edge(const edget& e) {
+  std::map<event_idt, edget>& map_to_e;
+  std::map<edget, event_idt>& map_from_e;
+  inline event_idt add_edge(const edget& e) { return var.add_edge(e); }
+  inline event_idt add_invisible_edge(const edget& e) {
     return invisible_var.add_edge(e);}
 
   /* number of contraints */
-  unsigned constraints_number;
+  std::size_t constraints_number;
   const memory_modelt model;
 
   /* to retrieve the concrete graph edges involved in the (abstract) cycles */
   const_graph_visitort const_graph_visitor;
 
 protected:
-  unsigned& unique;
+  event_idt& unique;
   unsigned fence_options;
 
   /* MIP variables to edges in po^+/\C */
@@ -101,12 +101,12 @@ protected:
   std::string to_string(fence_typet f) const;
 
   /* for the preprocessing */
-  std::set<unsigned> po;
-  std::list<std::set<unsigned> > powr_constraints;
-  std::list<std::set<unsigned> > poww_constraints;
-  std::list<std::set<unsigned> > porw_constraints;
-  std::list<std::set<unsigned> > porr_constraints;
-  std::list<std::set<unsigned> > com_constraints;
+  std::set<event_idt> po;
+  std::list<std::set<event_idt> > powr_constraints;
+  std::list<std::set<event_idt> > poww_constraints;
+  std::list<std::set<event_idt> > porw_constraints;
+  std::list<std::set<event_idt> > porr_constraints;
+  std::list<std::set<event_idt> > com_constraints;
 
   /* to retrieve the edges involved in the cycles */
   cycles_visitort cycles_visitor;
