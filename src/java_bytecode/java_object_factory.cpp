@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 /*******************************************************************\
 
@@ -315,16 +316,6 @@ void java_object_factoryt::gen_nondet_init(
     code.add_source_location()=loc;
     init_code.copy_to_operands(code);
   }
-}
-
-// Borrowed from java_bytecode_convert.cpp -- todo find a sensible place to
-// factor this.
-static constant_exprt as_number(const mp_integer value, const typet &type)
-{
-  const size_t java_int_width(type.get_unsigned_int(ID_width));
-  const std::string significant_bits(integer2string(value, 2));
-  std::string binary_width(java_int_width-significant_bits.length(), '0');
-  return constant_exprt(binary_width+significant_bits, type);
 }
 
 /*******************************************************************\
