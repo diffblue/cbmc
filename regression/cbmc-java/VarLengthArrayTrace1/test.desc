@@ -1,0 +1,10 @@
+CORE
+VarLengthArrayTrace1.class
+--trace
+^EXIT=10$
+^SIGNAL=0$
+dynamic_3_array\[1l\]=10
+--
+^warning: ignoring
+assignment removed
+irep("(\\"nil\\")")
