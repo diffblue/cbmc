@@ -10,7 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SAT_SATCHECK_H
 #define CPROVER_SOLVERS_SAT_SATCHECK_H
 
-// this picks the "default" SAT solver
+// This sets a define for the SAT solver
+// based on set flags that come via the compiler
+// command line.
 
 // #define SATCHECK_ZCHAFF
 // #define SATCHECK_MINISAT1
@@ -20,6 +22,42 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define SATCHECK_PRECOSAT
 // #define SATCHECK_PICOSAT
 // #define SATCHECK_LINGELING
+
+#if defined(HAVE_IPASIR) && !defined(SATCHECK_IPASIR)
+#define SATCHECK_IPASIR
+#endif
+
+#if defined(HAVE_ZCHAFF) && !defined(SATCHECK_ZCHAFF)
+#define SATCHECK_ZCHAFF
+#endif
+
+#if defined(HAVE_MINISAT1) && !defined(SATCHECK_MINISAT1)
+#define SATCHECK_MINISAT1
+#endif
+
+#if defined(HAVE_MINISAT2) && !defined(SATCHECK_MINISAT2)
+#define SATCHECK_MINISAT2
+#endif
+
+#if defined(HAVE_GLUCOSE) && !defined(SATCHECK_GLUCOSE)
+#define SATCHECK_GLUCOSE
+#endif
+
+#if defined(HAVE_BOOLEFORCE) && !defined(SATCHECK_BOOLEFORCE)
+#define SATCHECK_BOOLEFORCE
+#endif
+
+#if defined(HAVE_PRECOSAT) && !defined(SATCHECK_PRECOSAT)
+#define SATCHECK_PRECOSAT
+#endif
+
+#if defined(HAVE_PICOSAT) && !defined(SATCHECK_PICOSAT)
+#define SATCHECK_PICOSAT
+#endif
+
+#if defined(HAVE_LINGELING) && !defined(SATCHECK_LINGELING)
+#define SATCHECK_LINGELING
+#endif
 
 #if defined SATCHECK_ZCHAFF
 
@@ -48,6 +86,13 @@ typedef satcheck_minisat1t satcheck_no_simplifiert;
 
 typedef satcheck_minisat_simplifiert satcheckt;
 typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
+
+#elif defined SATCHECK_IPASIR
+
+#include "satcheck_ipasir.h"
+
+typedef satcheck_ipasirt satcheckt;
+typedef satcheck_ipasirt satcheck_no_simplifiert;
 
 #elif defined SATCHECK_PRECOSAT
 
