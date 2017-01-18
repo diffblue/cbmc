@@ -24,9 +24,10 @@ void func2()
   s2.a = 7;
 }
 
-void func3()
+void func3(int a)
 {
-  func3();
+  if(a>0)
+    func3(a-1);
 }
 
 int main()
@@ -36,7 +37,7 @@ int main()
 
   func2();
 
-  func3();
+  func3(1);
 
   return 0;
 }
