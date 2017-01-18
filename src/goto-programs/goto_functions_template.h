@@ -117,6 +117,7 @@ public:
     compute_incoming_edges();
     compute_target_numbers();
     compute_location_numbers();
+    compute_loop_numbers();
   }
 
   static inline irep_idt entry_point()
