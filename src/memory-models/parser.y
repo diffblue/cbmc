@@ -501,7 +501,7 @@ instruction:
         {
           $$=$1;
           stack($$).id(ID_code);
-          stack($$).set(ID_statement, ID_enum);
+          stack($$).set(ID_statement, ID_c_enum);
           mto($$, $2);
           mto($$, $4);
         }
