@@ -1,4 +1,4 @@
-SRC = symex_main.cpp symex_parseoptions.cpp path_search.cpp
+SRC = path_search.cpp
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
@@ -11,8 +11,15 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../solvers/solvers$(LIBEXT) \
        ../util/util$(LIBEXT) \
        ../goto-symex/adjust_float_expressions$(OBJEXT) \
+       ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
-       ../aa-path-symex/aa-path-symex$(LIBEXT)
+       ../goto-instrument/cover$(OBJEXT) \
+       ../aa-path-symex/aa-path-symex$(LIBEXT) \
+       ../symex/symex_main$(OBJEXT) \
+       ../symex/symex_parse_options$(OBJEXT) \
+       ../symex/symex_cover$(OBJEXT) \
+       ../path-symex/locs$(OBJEXT) ../path-symex/var_map$(OBJEXT) \
+       ../path-symex/path_symex_history$(OBJEXT)
 
 INCLUDES= -I ..
 

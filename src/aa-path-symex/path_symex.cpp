@@ -187,7 +187,7 @@ void path_symext::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
-  if(rhs.id()==ID_sideeffect) // catch side effects on rhs
+  if(rhs.id()==ID_side_effect) // catch side effects on rhs
   {
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
@@ -208,7 +208,7 @@ void path_symext::assign(
   // read the address of the lhs, with propagation
   exprt lhs_address=state.read(address_of_exprt(lhs));
 
-  // now SSA it, no propagation
+  // now SSA the lhs, no propagation
   exprt ssa_lhs=
     state.read_no_propagate(dereference_exprt(lhs_address));
 
@@ -285,7 +285,7 @@ void path_symext::symex_malloc(
       if(tmp_type.is_not_nil())
       {
         // Did the size get multiplied?
-        mp_integer elem_size=pointer_offset_size(state.var_map.ns, tmp_type);
+        mp_integer elem_size=pointer_offset_size(tmp_type, state.var_map.ns);
         mp_integer alloc_size;
         if(elem_size<0 || to_integer(tmp_size, alloc_size))
         {
@@ -395,7 +395,7 @@ void path_symext::assign_rec(
 
   if(ssa_lhs.id()==ID_symbol)
   {
-    // These are expected to the SSA symbols
+    // These are expected to be SSA symbols
     assert(ssa_lhs.get_bool(ID_C_SSA_symbol));
 
     const symbol_exprt &symbol_expr=to_symbol_expr(ssa_lhs);
@@ -471,17 +471,27 @@ void path_symext::assign_rec(
 
     if(compound_type.id()==ID_struct)
     {
-      throw "unexpected struct member on lhs";
+      // We flatten the top-level structs, so this one is inside an
+      // array or a union.
+
+      exprt member_name(ID_member_name);
+      member_name.set(
+        ID_component_name,
+        ssa_lhs_member_expr.get_component_name());
+
+      with_exprt new_rhs(struct_op, member_name, ssa_rhs);
+
+      assign_rec(state, guard, struct_op, new_rhs);
     }
     else if(compound_type.id()==ID_union)
     {
-      // adjust the rhs
-      union_exprt new_rhs;
-      new_rhs.type()=struct_op.type();
-      new_rhs.set_component_name(ssa_lhs_member_expr.get_component_name());
-      new_rhs.op()=ssa_rhs;
+      // rewrite into byte_extract, and do again
+      exprt offset=gen_zero(index_type());
 
-      assign_rec(state, guard, struct_op, new_rhs);
+      byte_extract_exprt
+        new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());
+
+      assign_rec(state, guard, new_lhs, ssa_rhs);
     }
     else
       throw "assign_rec: member expects struct or union type";
@@ -566,7 +576,7 @@ void path_symext::assign_rec(
 
     assert(operands.size()==components.size());
 
-    for(unsigned i=0; i<components.size(); i++)
+    for(std::size_t i=0; i<components.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -588,7 +598,7 @@ void path_symext::assign_rec(
     const exprt::operandst &operands=ssa_lhs.operands();
 
     // split up into elements
-    for(unsigned i=0; i<operands.size(); i++)
+    for(std::size_t i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -605,7 +615,7 @@ void path_symext::assign_rec(
     const exprt::operandst &operands=ssa_lhs.operands();
 
     // split up into elements
-    for(unsigned i=0; i<operands.size(); i++)
+    for(std::size_t i=0; i<operands.size(); i++)
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
@@ -670,7 +680,9 @@ void path_symext::function_call_rec(
     // do we have a body?
     if(function_entry_point==loc_reft())
     {
-      // no body, this is a skip
+      // no body
+
+      // this is a skip
       if(call.lhs().is_not_nil())
         assign(state, call.lhs(), nil_exprt());
 
@@ -686,33 +698,36 @@ void path_symext::function_call_rec(
     thread.call_stack.back().return_lhs=call.lhs();
     thread.call_stack.back().saved_local_vars=thread.local_vars;
 
-    // update statistics
-    state.recursion_map[function_identifier]++;
 
     const code_typet &code_type=function_entry.type;
 
-    const code_typet::argumentst &function_arguments=code_type.arguments();
+    const code_typet::parameterst &function_parameters=code_type.parameters();
 
     const exprt::operandst &call_arguments=call.arguments();
 
-    // now assign the argument values
-    for(unsigned i=0; i<call_arguments.size(); i++)
+    // now assign the argument values to parameters
+    for(std::size_t i=0; i<call_arguments.size(); i++)
     {
-      if(i<function_arguments.size())
+      if(i<function_parameters.size())
       {
-        const code_typet::argumentt &function_argument=function_arguments[i];
-        irep_idt identifier=function_argument.get_identifier();
+        const code_typet::parametert &function_parameter=function_parameters[i];
+        irep_idt identifier=function_parameter.get_identifier();
 
         if(identifier==irep_idt())
-          throw "function_call " + id2string(function_identifier) + " no identifier for function argument";
+          throw "function_call " + id2string(function_identifier)
+              + " no identifier for function parameter";
 
-        symbol_exprt lhs(identifier, function_argument.type());
+        symbol_exprt lhs(identifier, function_parameter.type());
+        exprt rhs=call_arguments[i];
 
         // TODO: need to save+restore
 
-        assign(state, lhs, call_arguments[i]);
+        assign(state, lhs, rhs);
       }
     }
+
+    // update statistics
+    state.recursion_map[function_identifier]++;
 
     // set the new PC
     thread.pc=function_entry_point;
@@ -826,7 +841,7 @@ void path_symext::do_goto(
 
   exprt guard=state.read(instruction.guard);
 
-  if(guard.is_true())
+  if(guard.is_true()) // branch taken always
   {
     state.record_branch_step(true);
     state.set_pc(loc.branch_target);
@@ -1106,6 +1121,10 @@ void path_symext::operator()(
       else if(statement==ID_fence)
       {
         // ignore for SC
+      }
+      else if(statement==ID_input)
+      {
+        // just needs to be recorded
       }
       else
         throw "unexpected OTHER statement: "+id2string(statement);
