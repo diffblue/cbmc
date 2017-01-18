@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 
 #include <limits>
+#include <algorithm>
 
 class patternt
 {
@@ -159,9 +160,8 @@ protected:
     else
     {
       exprt result=var.symbol_expr;
-      if(!var.is_parameter)
-        used_local_names.insert(to_symbol_expr(result));
-      if(do_cast==CAST_AS_NEEDED && t!=result.type()) result=typecast_exprt(result, t);
+      if(do_cast==CAST_AS_NEEDED && t!=result.type())
+        result=typecast_exprt(result, t);
       return result;
     }
   }
@@ -224,6 +224,54 @@ protected:
       stack[stack.size()-o.size()+i]=o[i];
   }
 
+  struct converted_instructiont
+  {
+    converted_instructiont(
+      const instructionst::const_iterator &it,
+      const codet &_code):source(it), code(_code), done(false)
+      {}
+
+    instructionst::const_iterator source;
+    std::list<unsigned> successors;
+    std::set<unsigned> predecessors;
+    codet code;
+    stackt stack;
+    bool done;
+  };
+
+  typedef std::map<unsigned, converted_instructiont> address_mapt;
+
+  struct block_tree_nodet
+  {
+    bool leaf;
+    std::vector<unsigned> branch_addresses;
+    std::vector<block_tree_nodet> branch;
+    block_tree_nodet():leaf(false) {}
+    explicit block_tree_nodet(bool l):leaf(l) {}
+    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
+  };
+
+  static void replace_goto_target(
+    codet &repl,
+    const irep_idt &old_label,
+    const irep_idt &new_label);
+
+  code_blockt &get_block_for_pcrange(
+    block_tree_nodet &tree,
+    code_blockt &this_block,
+    unsigned address_start,
+    unsigned address_limit,
+    unsigned next_block_start_address);
+
+  code_blockt &get_or_create_block_for_pcrange(
+    block_tree_nodet &tree,
+    code_blockt &this_block,
+    unsigned address_start,
+    unsigned address_limit,
+    unsigned next_block_start_address,
+    const address_mapt &amap,
+    bool allow_merge=true);
+
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
   void convert(const instructiont &);
@@ -263,6 +311,13 @@ static void cast_if_necessary(binary_relation_exprt &condition)
   const typet &lhs_type(lhs.type());
   if(lhs_type==rhs.type()) return;
   rhs=typecast_exprt(rhs, lhs_type);
+}
+
+static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
+{
+  const auto to_strip_str=id2string(to_strip);
+  assert(has_prefix(to_strip_str, "java::"));
+  return to_strip_str.substr(6, std::string::npos);
 }
 
 /*******************************************************************\
@@ -326,6 +381,17 @@ void java_bytecode_convert_methodt::convert(
     variables[v.index][number_index_entries].symbol_expr=result;
     variables[v.index][number_index_entries].start_pc=v.start_pc;
     variables[v.index][number_index_entries].length=v.length;
+    symbolt new_symbol;
+    new_symbol.name=identifier;
+    new_symbol.type=t;
+    new_symbol.base_name=v.name;
+    new_symbol.pretty_name=strip_java_namespace_prefix(identifier);
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.is_file_local=true;
+    new_symbol.is_thread_local=true;
+    new_symbol.is_lvalue=true;
+    symbol_table.add(new_symbol);
   }
 
   // set up variables array
@@ -497,6 +563,280 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 
 /*******************************************************************\
 
+Function: replace_goto_target
+
+  Inputs: 'repl', a block of code in which to perform replacement, and
+          an old_label that should be replaced throughout by new_label.
+
+ Outputs: None (side-effects on repl)
+
+ Purpose: Find all goto statements in 'repl' that target 'old_label'
+          and redirect them to 'new_label'.
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::replace_goto_target(
+  codet &repl,
+  const irep_idt &old_label,
+  const irep_idt &new_label)
+{
+  const auto &stmt=repl.get_statement();
+  if(stmt==ID_goto)
+  {
+    auto &g=to_code_goto(repl);
+    if(g.get_destination()==old_label)
+      g.set_destination(new_label);
+  }
+  else
+  {
+    for(auto &op : repl.operands())
+      if(op.id()==ID_code)
+        replace_goto_target(to_code(op), old_label, new_label);
+  }
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::get_block_for_pcrange
+
+  Inputs: 'tree', a code block descriptor, and 'this_block', the corresponding
+          actual code_blockt. 'address_start' and 'address_limit', the Java
+          bytecode offsets searched for. 'next_block_start_address', the
+          bytecode offset of tree/this_block's successor sibling, or UINT_MAX
+          if none exists.
+
+ Outputs: Returns the code_blockt most closely enclosing the given address range.
+
+ Purpose: 'tree' describes a tree of code_blockt objects; this_block is the
+          corresponding block (thus they are both trees with the same shape).
+          The caller is looking for the single block in the tree that most
+          closely encloses bytecode address range [address_start,address_limit).
+          'next_block_start_address' is the start address of 'tree's successor
+          sibling and is used to determine when the range spans out of its bounds.
+
+\*******************************************************************/
+
+code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
+  block_tree_nodet &tree,
+  code_blockt &this_block,
+  unsigned address_start,
+  unsigned address_limit,
+  unsigned next_block_start_address)
+{
+  address_mapt dummy;
+  return get_or_create_block_for_pcrange(
+    tree,
+    this_block,
+    address_start,
+    address_limit,
+    next_block_start_address,
+    dummy,
+    false);
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::get_or_create_block_for_pcrange
+
+  Inputs: See above, plus the bytecode address map 'amap' and 'allow_merge'
+          which is always true except when called from get_block_for_pcrange
+
+ Outputs: See above, plus potential side-effects on 'tree' and 'this_block'
+          as descibed in 'Purpose'
+
+ Purpose: As above, but this version can additionally create a new branch
+          in the block_tree-node and code_blockt trees to envelop the requested
+          address range. For example, if the tree was initially flat, with
+          nodes (1-10), (11-20), (21-30) and the caller asked for range 13-28,
+          this would build a surrounding tree node, leaving the tree of shape
+          (1-10), ^( (11-20), (21-30) )^, and return a reference to the
+          new branch highlighted with ^^.
+          'tree' and 'this_block' trees are always maintained with equal
+          shapes. ('this_block' may additionally contain code_declt children
+          which are ignored for this purpose)
+
+\*******************************************************************/
+
+code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
+  block_tree_nodet &tree,
+  code_blockt &this_block,
+  unsigned address_start,
+  unsigned address_limit,
+  unsigned next_block_start_address,
+  const address_mapt &amap,
+  bool allow_merge)
+{
+  // Check the tree shape invariant:
+  assert(tree.branch.size()==tree.branch_addresses.size());
+
+  // If there are no child blocks, return this.
+  if(tree.leaf)
+    return this_block;
+  assert(!tree.branch.empty());
+
+  // Find child block starting > address_start:
+  const auto afterstart=
+    std::upper_bound(
+      tree.branch_addresses.begin(),
+      tree.branch_addresses.end(),
+      address_start);
+  assert(afterstart!=tree.branch_addresses.begin());
+  auto findstart=afterstart;
+  --findstart;
+  auto child_offset=
+    std::distance(tree.branch_addresses.begin(), findstart);
+
+  // Find child block starting >= address_limit:
+  auto findlim=
+    std::lower_bound(
+      tree.branch_addresses.begin(),
+      tree.branch_addresses.end(),
+      address_limit);
+  unsigned findlim_block_start_address=
+    findlim==tree.branch_addresses.end() ?
+    next_block_start_address :
+    (*findlim);
+
+  // If all children are in scope, return this.
+  if(findstart==tree.branch_addresses.begin() &&
+     findlim==tree.branch_addresses.end())
+    return this_block;
+
+  // Find the child code_blockt where the queried range begins:
+  auto child_iter=this_block.operands().begin();
+  // Skip any top-of-block declarations;
+  // all other children are labelled subblocks.
+  while(child_iter!=this_block.operands().end() &&
+        to_code(*child_iter).get_statement()==ID_decl)
+    ++child_iter;
+  assert(child_iter!=this_block.operands().end());
+  std::advance(child_iter, child_offset);
+  assert(child_iter!=this_block.operands().end());
+  auto &child_label=to_code_label(to_code(*child_iter));
+  auto &child_block=to_code_block(child_label.code());
+
+  bool single_child(afterstart==findlim);
+  if(single_child)
+  {
+    // Range wholly contained within a child block
+    return get_or_create_block_for_pcrange(
+      tree.branch[child_offset],
+      child_block,
+      address_start,
+      address_limit,
+      findlim_block_start_address,
+      amap,
+      allow_merge);
+  }
+
+  // Otherwise we're being asked for a range of subblocks, but not all of them.
+  // If it's legal to draw a new lexical scope around the requested subset,
+  // do so; otherwise just return this block.
+
+  // This can be a new lexical scope if all incoming edges target the
+  // new block header, or come from within the suggested new block.
+
+  // If modifying the block tree is forbidden, give up and return this:
+  if(!allow_merge)
+    return this_block;
+
+  // Check for incoming control-flow edges targeting non-header
+  // blocks of the new proposed block range:
+  auto checkit=amap.find(*findstart);
+  assert(checkit!=amap.end());
+  ++checkit; // Skip the header, which can have incoming edges from outside.
+  for(;
+      checkit!=amap.end() && (checkit->first)<(findlim_block_start_address);
+      ++checkit)
+  {
+    for(auto p : checkit->second.predecessors)
+    {
+      if(p<(*findstart) || p>=findlim_block_start_address)
+      {
+        debug() << "Warning: refusing to create lexical block spanning "
+                << (*findstart) << "-" << findlim_block_start_address
+                << " due to incoming edge " << p << " -> "
+                << checkit->first << eom;
+        return this_block;
+      }
+    }
+  }
+
+  // All incoming edges are acceptable! Create a new block wrapping
+  // the relevant children. Borrow the header block's label, and redirect
+  // any block-internal edges to target the inner header block.
+
+  const irep_idt child_label_name=child_label.get_label();
+  std::string new_label_str=as_string(child_label_name);
+  new_label_str+='$';
+  irep_idt new_label_irep(new_label_str);
+
+  code_labelt newlabel(child_label_name, code_blockt());
+  code_blockt &newblock=to_code_block(newlabel.code());
+  auto nblocks=std::distance(findstart, findlim);
+  assert(nblocks>=2);
+  debug() << "Combining " << std::distance(findstart, findlim)
+          << " blocks for addresses " << (*findstart) << "-"
+          << findlim_block_start_address << eom;
+
+  // Make a new block containing every child of interest:
+  auto &this_block_children=this_block.operands();
+  assert(tree.branch.size()==this_block_children.size());
+  for(auto blockidx=child_offset, blocklim=child_offset+nblocks;
+      blockidx!=blocklim;
+      ++blockidx)
+    newblock.move_to_operands(this_block_children[blockidx]);
+
+  // Relabel the inner header:
+  to_code_label(to_code(newblock.operands()[0])).set_label(new_label_irep);
+  // Relabel internal gotos:
+  replace_goto_target(newblock, child_label_name, new_label_irep);
+
+  // Remove the now-empty sibling blocks:
+  auto delfirst=this_block_children.begin();
+  std::advance(delfirst, child_offset+1);
+  auto dellim=delfirst;
+  std::advance(dellim, nblocks-1);
+  this_block_children.erase(delfirst, dellim);
+  this_block_children[child_offset].swap(newlabel);
+
+  // Perform the same transformation on the index tree:
+  block_tree_nodet newnode;
+  auto branchstart=tree.branch.begin();
+  std::advance(branchstart, child_offset);
+  auto branchlim=branchstart;
+  std::advance(branchlim, nblocks);
+  for(auto branchiter=branchstart; branchiter!=branchlim; ++branchiter)
+    newnode.branch.push_back(std::move(*branchiter));
+  ++branchstart;
+  tree.branch.erase(branchstart, branchlim);
+
+  assert(tree.branch.size()==this_block_children.size());
+
+  auto branchaddriter=tree.branch_addresses.begin();
+  std::advance(branchaddriter, child_offset);
+  auto branchaddrlim=branchaddriter;
+  std::advance(branchaddrlim, nblocks);
+  newnode.branch_addresses.insert(
+    newnode.branch_addresses.begin(),
+    branchaddriter,
+    branchaddrlim);
+
+  ++branchaddriter;
+  tree.branch_addresses.erase(branchaddriter, branchaddrlim);
+
+  tree.branch[child_offset]=std::move(newnode);
+
+  assert(tree.branch.size()==tree.branch_addresses.size());
+
+  return
+    to_code_block(
+      to_code_label(
+        to_code(this_block_children[child_offset])).code());
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
@@ -507,7 +847,7 @@ Function: java_bytecode_convert_methodt::convert_instructions
 
 \*******************************************************************/
 
-static unsigned get_bytecode_type_width(const typet& ty)
+static unsigned get_bytecode_type_width(const typet &ty)
 {
   if(ty.id()==ID_pointer)
     return 32;
@@ -525,23 +865,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   // first pass: get targets and map addresses to instructions
 
-  struct converted_instructiont
-  {
-    converted_instructiont(
-      const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-    {
-    }
-
-    instructionst::const_iterator source;
-    std::list<unsigned> successors;
-    std::set<unsigned> predecessors;
-    codet code;
-    stackt stack;
-    bool done;
-  };
-
-  typedef std::map<unsigned, converted_instructiont> address_mapt;
   address_mapt address_map;
   std::set<unsigned> targets;
 
@@ -1630,8 +1953,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     new_symbol.name=var.get_identifier();
     new_symbol.type=var.type();
     new_symbol.base_name=var.get(ID_C_base_name);
-    new_symbol.pretty_name=
-      id2string(var.get_identifier()).substr(6, std::string::npos);
+    new_symbol.pretty_name=strip_java_namespace_prefix(var.get_identifier());
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
     new_symbol.is_file_local=true;
@@ -1645,17 +1967,90 @@ codet java_bytecode_convert_methodt::convert_instructions(
     code.add(code_declt(var));
   }
 
+  // Try to recover block structure as indicated in the local variable table:
+
+  // The block tree node mirrors the block structure of root_block,
+  // indexing the Java PCs were each subblock starts and ends.
+  block_tree_nodet root;
+  code_blockt root_block;
+
+  bool start_new_block=true;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
     assert(address_pair.first==address_pair.second.source->address);
     const codet &c=address_pair.second.code;
 
-    if(targets.find(address)!=targets.end())
-      code.add(code_labelt(label(std::to_string(address)), c));
-    else if(c.get_statement()!=ID_skip)
-      code.add(c);
+    // Start a new lexical block if this is a branch target:
+    if(!start_new_block)
+      start_new_block=targets.find(address)!=targets.end();
+    // Start a new lexical block if this is a control flow join
+    // (e.g. due to exceptional control flow)
+    if(!start_new_block)
+      start_new_block=address_pair.second.predecessors.size()>1;
+
+    if(start_new_block)
+    {
+      code_labelt newlabel(label(std::to_string(address)), code_blockt());
+      root_block.move_to_operands(newlabel);
+      root.branch.push_back(block_tree_nodet::get_leaf());
+      assert((root.branch_addresses.size()==0 ||
+              root.branch_addresses.back()<address) &&
+             "Block addresses should be unique and increasing");
+      root.branch_addresses.push_back(address);
+    }
+
+    if(c.get_statement()!=ID_skip)
+    {
+      auto &lastlabel=to_code_label(to_code(root_block.operands().back()));
+      auto &add_to_block=to_code_block(lastlabel.code());
+      add_to_block.add(c);
+    }
+    start_new_block=address_pair.second.successors.size()>1;
   }
+
+  for(const auto &vlist : variables)
+  {
+    for(const auto &v : vlist)
+    {
+      if(v.is_parameter)
+        continue;
+      // Merge lexical scopes as far as possible to allow us to
+      // declare these variable scopes faithfully.
+      // Don't insert yet, as for the time being the blocks' only
+      // operands must be other blocks.
+      // The declarations will be inserted in the next pass instead.
+      get_or_create_block_for_pcrange(
+        root,
+        root_block,
+        v.start_pc,
+        v.start_pc+v.length,
+        std::numeric_limits<unsigned>::max(),
+        address_map);
+    }
+  }
+  for(const auto &vlist : variables)
+  {
+    for(const auto &v : vlist)
+    {
+      if(v.is_parameter)
+        continue;
+      // Skip anonymous variables:
+      if(v.symbol_expr.get_identifier()==irep_idt())
+        continue;
+      code_declt d(v.symbol_expr);
+      auto &block=get_block_for_pcrange(
+        root,
+        root_block,
+        v.start_pc,
+        v.start_pc+v.length,
+        std::numeric_limits<unsigned>::max());
+      block.operands().insert(block.operands().begin(), d);
+    }
+  }
+
+  for(auto &block : root_block.operands())
+    code.move_to_operands(block);
 
   return code;
 }
