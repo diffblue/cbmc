@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 
 #include <goto-programs/get_goto_model.h>
+#include <goto-programs/show_goto_functions.h>
 
 class bmct;
 class goto_functionst;
@@ -26,7 +27,8 @@ class optionst;
   "(classpath):(cp):(main-class):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
-  "(show-goto-functions)(show-loops)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
+  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(show-properties)(show-reachable-properties)(property):" \
   "(verbosity):(version)" \

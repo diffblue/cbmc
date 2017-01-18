@@ -575,7 +575,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
-      goto_functions.output(ns, std::cout);
+      show_goto_functions(ns, get_ui(), goto_functions);
       return 0;
     }
 
@@ -1456,7 +1456,7 @@ void goto_instrument_parse_optionst::help()
     " --show-properties            show the properties\n"
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
-    " --show-goto-functions        show goto program\n"
+    HELP_SHOW_GOTO_FUNCTIONS
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"

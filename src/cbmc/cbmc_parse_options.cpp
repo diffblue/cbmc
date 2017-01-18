@@ -1121,7 +1121,7 @@ void cbmc_parse_optionst::help()
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
-    " --show-goto-functions        show goto program\n"
+    HELP_SHOW_GOTO_FUNCTIONS
     "\n"
     "Program instrumentation options:\n"
     GOTO_CHECK_HELP

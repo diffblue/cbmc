@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <analyses/goto_check.h>
 
@@ -43,7 +44,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
-  "(show-goto-functions)(show-value-sets)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
+  "(show-value-sets)" \
   "(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \
   "(show-escape-analysis)(escape-analysis)" \

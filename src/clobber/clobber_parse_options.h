@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 
 #include <analyses/goto_check.h>
+#include <goto-programs/show_goto_functions.h>
 
 class goto_functionst;
 class optionst;
@@ -22,6 +23,7 @@ class optionst;
 #define CLOBBER_OPTIONS \
   "(depth):(context-bound):(unwind):" \
   GOTO_CHECK_OPTIONS \
+  OPT_SHOW_GOTO_FUNCTIONS \
   "(no-assertions)(no-assumptions)" \
   "(error-label):(verbosity):(no-library)" \
   "(version)" \
