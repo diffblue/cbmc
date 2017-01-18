@@ -38,7 +38,6 @@ void print_instr(messaget::mstreamt &os, const namespacet &ns,
   for (; first != last; ++first)
     body.output_instruction(ns, func_name, oss, first);
   std::string result(oss.str());
-  struct_exprt::operandst::const_iterator it=std::next(ops.begin());
   for (size_t i=1; i < ops.size(); ++i)
   {
     std::string nd("*__CPROVER_cegis_variable_array_double[(program + i)->op_");
