@@ -44,7 +44,8 @@ path_searcht::resultt path_searcht::operator()(
   // run concurrently. This could be remedied by piping
   // to individual files or inter-process communication,
   // a performance bottleneck, however.
-  *messaget::mstream.message_handler=NULL;
+  null_message_handlert null_message;
+  set_message_handler(null_message);
 #endif
 
   locst locs(ns);
@@ -58,9 +59,9 @@ path_searcht::resultt path_searcht::operator()(
   queue.push_back(initial_state(var_map, locs, history));
 
   // set up the statistics
-  number_of_paths=0;
   number_of_instructions=0;
   number_of_dropped_states=0;
+  number_of_paths=0;
   number_of_VCCs=0;
   number_of_VCCs_after_simplification=0;
   number_of_failed_properties=0;
@@ -136,10 +137,10 @@ path_searcht::resultt path_searcht::operator()(
     if(state->get_instruction()->is_assert())
     {
       if(show_vcc)
-        do_show_vcc(*state, ns);
+        do_show_vcc(*state);
       else
       {
-        check_assertion(*state, ns);
+        check_assertion(*state);
 
         // all assertions failed?
         if(number_of_failed_properties==property_map.size())
@@ -271,14 +272,15 @@ Function: path_searcht::report_statistics
 void path_searcht::report_statistics()
 {
   // report a bit
-  status() << "Number of paths: "
-           << number_of_paths << messaget::eom;
 
   status() << "Number of instructions: "
            << number_of_instructions << messaget::eom;
 
   status() << "Number of dropped states: "
            << number_of_dropped_states << messaget::eom;
+
+  status() << "Number of paths: "
+           << number_of_paths << messaget::eom;
 
   status() << "Number of fast forward steps: "
            << number_of_fast_forward_steps << messaget::eom;
@@ -323,9 +325,7 @@ Function: path_searcht::do_show_vcc
 
 \*******************************************************************/
 
-void path_searcht::do_show_vcc(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::do_show_vcc(statet &state)
 {
   // keep statistics
   number_of_VCCs++;
@@ -335,11 +335,11 @@ void path_searcht::do_show_vcc(
 
   mstreamt &out=result();
 
-  if(instruction.location.is_not_nil())
-    out << instruction.location << "\n";
+  if(instruction.source_location.is_not_nil())
+    out << instruction.source_location << '\n';
 
-  if(instruction.location.get_comment()!="")
-    out << instruction.location.get_comment() << "\n";
+  if(instruction.source_location.get_comment()!="")
+    out << instruction.source_location.get_comment() << '\n';
 
   unsigned count=1;
 
@@ -351,25 +351,25 @@ void path_searcht::do_show_vcc(
     if(step_ref->guard.is_not_nil())
     {
       std::string string_value=from_expr(ns, "", step_ref->guard);
-      out << "{-" << count << "} " << string_value << "\n";
+      out << "{-" << count << "} " << string_value << '\n';
       count++;
     }
 
-    if((*s_it)->ssa_rhs.is_not_nil())
+    if(step_ref->ssa_rhs.is_not_nil())
     {
-      equal_exprt equality((*s_it)->ssa_lhs, (*s_it)->ssa_rhs);
+      equal_exprt equality(step_ref->ssa_lhs, step_ref->ssa_rhs);
       std::string string_value=from_expr(ns, "", equality);
-      out << "{-" << count << "} " << string_value << "\n";
+      out << "{-" << count << "} " << string_value << '\n';
       count++;
     }
   }
 
-  out << "|--------------------------" << "\n";
+  out << "|--------------------------" << '\n';
 
   exprt assertion=state.read(instruction.guard);
 
   out << "{" << 1 << "} "
-      << from_expr(ns, "", assertion) << "\n";
+      << from_expr(ns, "", assertion) << '\n';
 
   if(!assertion.is_true())
     number_of_VCCs_after_simplification++;
@@ -391,14 +391,17 @@ Function: path_searcht::drop_state
 
 bool path_searcht::drop_state(const statet &state) const
 {
-  // depth
-  if(depth_limit!=-1 && state.get_depth()>depth_limit) return true;
+  // depth limit
+  if(depth_limit_set && state.get_depth()>depth_limit)
+    return true;
 
   // context bound
-  if(context_bound!=-1 && state.get_no_thread_interleavings()) return true;
+  if(context_bound_set && state.get_no_thread_interleavings()>context_bound)
+    return true;
+
 
   // unwinding limit -- loops
-  if(unwind_limit!=-1 && state.get_instruction()->is_backwards_goto())
+  if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
   {
     for(const auto &loop_info : state.unwinding_map)
       if(loop_info.second>unwind_limit)
@@ -406,7 +409,7 @@ bool path_searcht::drop_state(const statet &state) const
   }
 
   // unwinding limit -- recursion
-  if(unwind_limit!=-1 && state.get_instruction()->is_function_call())
+  if(unwind_limit_set && state.get_instruction()->is_function_call())
   {
     for(const auto &rec_info : state.recursion_map)
       if(rec_info.second>unwind_limit)
@@ -428,9 +431,7 @@ Function: path_searcht::check_assertion
 
 \*******************************************************************/
 
-void path_searcht::check_assertion(
-  statet &state,
-  const namespacet &ns)
+void path_searcht::check_assertion(statet &state)
 {
   // keep statistics
   number_of_VCCs++;
@@ -438,13 +439,13 @@ void path_searcht::check_assertion(
   const goto_programt::instructiont &instruction=
     *state.get_instruction();
 
-  irep_idt property_name=instruction.location.get_property_id();
+  irep_idt property_name=instruction.source_location.get_property_id();
   property_entryt &property_entry=property_map[property_name];
 
-  if(property_entry.status==FAIL)
+  if(property_entry.status==FAILURE)
     return; // already failed
   else if(property_entry.status==NOT_REACHED)
-    property_entry.status=PASS; // well, for now!
+    property_entry.status=SUCCESS; // well, for now!
 
   // the assertion in SSA
   exprt assertion=
@@ -469,7 +470,7 @@ void path_searcht::check_assertion(
   if(!state.check_assertion(bv_pointers))
   {
     build_goto_trace(state, bv_pointers, property_entry.error_trace);
-    property_entry.status=FAIL;
+    property_entry.status=FAILURE;
     number_of_failed_properties++;
   }
 
@@ -501,13 +502,14 @@ void path_searcht::initialize_property_map(
         if(!i_it->is_assert())
           continue;
 
-        const locationt &location=i_it->location;
+        const source_locationt &source_location=i_it->source_location;
 
-        irep_idt property_name=location.get_property_id();
+        irep_idt property_name=source_location.get_property_id();
 
         property_entryt &property_entry=property_map[property_name];
         property_entry.status=NOT_REACHED;
-        property_entry.description=location.get_comment();
+        property_entry.description=source_location.get_comment();
+        property_entry.source_location=source_location;
       }
     }
 }

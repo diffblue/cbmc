@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include "locs.h"
-#include "var_map.h"
-#include "path_symex_history.h"
+#include <path-symex/locs.h>
+#include <path-symex/var_map.h>
+#include <path-symex/path_symex_history.h>
 
 // These variables may be defined in this header file only because
 // it is (transitively) included by many essential path-symex files.
