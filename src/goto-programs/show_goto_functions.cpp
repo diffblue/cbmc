@@ -58,7 +58,7 @@ void show_goto_functions(
   case ui_message_handlert::JSON_UI:
   {
     show_goto_functions_jsont json_show_functions(ns);
-    json_show_functions.show_goto_functions(goto_functions);
+    json_show_functions.print_goto_functions(goto_functions, std::cout);
   }
   break;
 
