@@ -44,6 +44,8 @@ public:
     const std::string &extra_options);
 
 protected:
+  ui_message_handlert ui_message_handler;
+
   void get_command_line_options(optionst &options);
 
   bool get_goto_program(
