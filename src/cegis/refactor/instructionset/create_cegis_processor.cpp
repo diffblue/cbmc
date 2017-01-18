@@ -31,7 +31,6 @@ public:
   virtual void operator()(const exprt &expr)
   {
     const typet &type=expr.type();
-    const irep_idt &type_id=type.id();
     if (ID_code != type.id() && !is_empty(type)) types.insert(expr.type());
   }
 };
@@ -131,21 +130,11 @@ symbol_typet create_instruction_type(symbol_tablet &st,
   return symbol_typet(instr_type_name);
 }
 
-const mp_integer get_width(const typet &type)
-{
-  const irep_idt &id_width=type.get(ID_width);
-  assert(!id_width.empty());
-  return string2integer(id2string(id_width));
-}
-
 code_typet create_func_type(const symbol_tablet &st,
     const symbol_typet &instruction_type, const std::string &func_name)
 {
   code_typet code_type;
   code_type.return_type()=empty_typet();
-  const typet &followed_type=namespacet(st).follow(instruction_type);
-  const struct_union_typet &struct_type=to_struct_union_type(followed_type);
-  const struct_union_typet::componentst &comps=struct_type.components();
   const pointer_typet instr_ref_type(instruction_type);
   code_typet::parametert prog(instr_ref_type);
   const char * const prog_base_name=CEGIS_PROC_PROGRAM_PARAM_ID;
