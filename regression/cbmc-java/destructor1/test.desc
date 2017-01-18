@@ -1,0 +1,8 @@
+CORE
+Break.class
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+dead i;
+--
+GOTO 10
