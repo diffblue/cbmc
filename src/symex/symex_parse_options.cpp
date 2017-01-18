@@ -409,8 +409,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      const namespacet ns(goto_model.symbol_table);
-      goto_model.goto_functions.output(ns, std::cout);
+      show_goto_functions(goto_model, get_ui());
       return true;
     }
   }
@@ -677,7 +676,7 @@ void symex_parse_optionst::help()
     " --unsigned-char              make \"char\" unsigned by default\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
-    " --show-goto-functions        show goto program\n"
+    HELP_SHOW_GOTO_FUNCTIONS
     " --ppc-macos                  set MACOS/PPC architecture\n"
     " --mm model                   set memory model (default: sc)\n"
     " --arch                       set architecture (default: "

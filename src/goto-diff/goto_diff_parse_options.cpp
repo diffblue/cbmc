@@ -335,13 +335,8 @@ int goto_diff_parse_optionst::doit()
 
   if(cmdline.isset("show-goto-functions"))
   {
-    //ENHANCE: make UI specific
-    std::cout << "*******************************************************\n";
-    namespacet ns1(goto_model1.symbol_table);
-    goto_model1.goto_functions.output(ns1, std::cout);
-    std::cout << "*******************************************************\n";
-    namespacet ns2(goto_model2.symbol_table);
-    goto_model2.goto_functions.output(ns2, std::cout);
+    show_goto_functions(goto_model1, get_ui());
+    show_goto_functions(goto_model2, get_ui());
     return 0;
   }
 
@@ -513,7 +508,7 @@ bool goto_diff_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      goto_functions.output(ns, std::cout);
+      show_goto_functions(ns, get_ui(), goto_functions);
       return true;
     }
   }
@@ -570,7 +565,7 @@ void goto_diff_parse_optionst::help()
     " goto_diff old new                 goto binaries to be compared\n"
     "\n"
     "Diff options:\n"
-    " --show-functions             show functions (default)\n"
+    HELP_SHOW_GOTO_FUNCTIONS
     " --syntactic                  do syntactic diff (default)\n"
     " -u | --unified               output unified diff\n"
     " --change-impact | \n"

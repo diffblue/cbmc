@@ -406,9 +406,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      namespacet ns(goto_model.symbol_table);
-
-      goto_model.goto_functions.output(ns, std::cout);
+      show_goto_functions(goto_model, get_ui());
       return true;
     }
 
@@ -521,7 +519,7 @@ void goto_analyzer_parse_optionst::help()
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
-    " --show-goto-functions        show goto program\n"
+    HELP_SHOW_GOTO_FUNCTIONS
     " --show-properties            show the properties, but don't run analysis\n"
     "\n"
     "Other options:\n"

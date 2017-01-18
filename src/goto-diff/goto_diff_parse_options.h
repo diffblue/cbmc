@@ -15,6 +15,7 @@ Author: Peter Schrammel
 #include <langapi/language_ui.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include "goto_diff_languages.h"
 
@@ -23,7 +24,7 @@ class optionst;
 
 #define GOTO_DIFF_OPTIONS \
   "(json-ui)" \
-  "(show-goto-functions)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
   "(verbosity):(version)" \
   "u(unified)(change-impact)(forward-impact)(backward-impact)" \
   "(compact-output)"

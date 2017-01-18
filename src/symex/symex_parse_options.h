@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parse_options.h>
 
 #include <goto-programs/get_goto_model.h>
+#include <goto-programs/show_goto_functions.h>
 
 #include <langapi/language_ui.h>
 
@@ -39,7 +40,8 @@ class optionst;
   "(ppc-macos)(unsigned-char)" \
   "(string-abstraction)(no-arch)(arch):(floatbv)(fixedbv)" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  "(show-locs)(show-vcc)(show-properties)(show-goto-functions)" \
+  "(show-locs)(show-vcc)(show-properties)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
   "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
   "(no-simplify)(no-unwinding-assertions)(no-propagation)"
   // the last line is for CBMC-regression testing only
