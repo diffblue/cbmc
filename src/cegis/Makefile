@@ -129,6 +129,8 @@ LIBS = $(DLFCN_LINKFLAGS)
 
 CLEANFILES = cegis$(EXEEXT)
 
+CP_CXXFLAGS += -Wno-unused-label
+
 all: cegis$(EXEEXT)
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
