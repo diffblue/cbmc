@@ -40,7 +40,7 @@ do
   stagedFiles="$stagedFiles $tmpStaging/$file"
 done
 
-output=$(cd $gitRoot; python scripts/cpplint.py $stagedFiles 2>&1)
+output=$(cd $gitRoot; scripts/cpplint.py $stagedFiles 2>&1)
 retval=$?
 
 if [ $retval -ne 0 ]
