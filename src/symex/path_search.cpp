@@ -271,21 +271,18 @@ void path_searcht::do_show_vcc(statet &state)
   std::vector<path_symex_step_reft> steps;
   state.history.build_history(steps);
 
-  for(std::vector<path_symex_step_reft>::const_iterator
-      s_it=steps.begin();
-      s_it!=steps.end();
-      s_it++)
+  for(const auto &step_ref : steps)
   {
-    if((*s_it)->guard.is_not_nil())
+    if(step_ref->guard.is_not_nil())
     {
-      std::string string_value=from_expr(ns, "", (*s_it)->guard);
+      std::string string_value=from_expr(ns, "", step_ref->guard);
       out << "{-" << count << "} " << string_value << '\n';
       count++;
     }
 
-    if((*s_it)->ssa_rhs.is_not_nil())
+    if(step_ref->ssa_rhs.is_not_nil())
     {
-      equal_exprt equality((*s_it)->ssa_lhs, (*s_it)->ssa_rhs);
+      equal_exprt equality(step_ref->ssa_lhs, step_ref->ssa_rhs);
       std::string string_value=from_expr(ns, "", equality);
       out << "{-" << count << "} " << string_value << '\n';
       count++;
@@ -334,22 +331,16 @@ bool path_searcht::drop_state(const statet &state) const
   // unwinding limit -- loops
   if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
   {
-    for(path_symex_statet::unwinding_mapt::const_iterator
-        it=state.unwinding_map.begin();
-        it!=state.unwinding_map.end();
-        it++)
-      if(it->second>unwind_limit)
+    for(const auto &loop_info : state.unwinding_map)
+      if(loop_info.second>unwind_limit)
         return true;
   }
 
   // unwinding limit -- recursion
   if(unwind_limit_set && state.get_instruction()->is_function_call())
   {
-    for(path_symex_statet::recursion_mapt::const_iterator
-        it=state.recursion_map.begin();
-        it!=state.recursion_map.end();
-        it++)
-      if(it->second>unwind_limit)
+    for(const auto &rec_info : state.recursion_map)
+      if(rec_info.second>unwind_limit)
         return true;
   }
 
@@ -461,23 +452,17 @@ Function: path_searcht::initialize_property_map
 void path_searcht::initialize_property_map(
   const goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
+  forall_goto_functions(it, goto_functions)
     if(!it->second.is_inlined())
     {
       const goto_programt &goto_program=it->second.body;
 
-      for(goto_programt::instructionst::const_iterator
-          it=goto_program.instructions.begin();
-          it!=goto_program.instructions.end();
-          it++)
+      forall_goto_program_instructions(i_it, goto_program)
       {
-        if(!it->is_assert())
+        if(!i_it->is_assert())
           continue;
 
-        const source_locationt &source_location=it->source_location;
+        const source_locationt &source_location=i_it->source_location;
 
         irep_idt property_name=source_location.get_property_id();
 
