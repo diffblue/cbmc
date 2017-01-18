@@ -78,6 +78,15 @@ public:
     return id_map[full_identifier];
   }
 
+  void clear()
+  {
+    shared_count=0;
+    local_count=0;
+    nondet_count=0;
+    dynamic_count=0;
+    id_map.clear();
+  }
+
   void init(var_infot &var_info);
 
   const namespacet &ns;
