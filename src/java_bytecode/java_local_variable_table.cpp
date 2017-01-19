@@ -1,8 +1,15 @@
+/*******************************************************************\
+
+Module: Java local variable table processing
+
+Author: Chris Smowton, chris.smowton@diffblue.com
+
+\*******************************************************************/
 
 #include "java_bytecode_convert_method_class.h"
+#include "java_types.h"
 
 #include <util/string2int.h>
-#include "java_types.h"
 
 #include <climits>
 #include <iostream>
@@ -11,8 +18,11 @@
 // This must be done at global scope due to template resolution rules.
 
 template<class T>
-struct procedure_local_cfg_baset<T,const java_bytecode_convert_methodt::address_mapt,unsigned> :
-    public graph<cfg_base_nodet<T, unsigned> >
+struct procedure_local_cfg_baset<
+  T,
+  const java_bytecode_convert_methodt::address_mapt,
+  unsigned> :
+  public graph<cfg_base_nodet<T, unsigned> >
 {
   typedef java_bytecode_convert_methodt::address_mapt address_mapt;
   typedef std::map<unsigned, unsigned> entry_mapt;
@@ -32,50 +42,66 @@ struct procedure_local_cfg_baset<T,const java_bytecode_convert_methodt::address_
     for(const auto& inst : amap)
     {
       for(auto succ : inst.second.successors)
-        this->add_edge(entry_map.at(inst.first),entry_map.at(succ));
+        this->add_edge(entry_map.at(inst.first), entry_map.at(succ));
     }
   }
 
-  unsigned get_first_node(const address_mapt& amap) const { return amap.begin()->first; }
-  unsigned get_last_node(const address_mapt& amap) const { return (--amap.end())->first; }
-  unsigned nodes_empty(const address_mapt& amap) const { return amap.empty(); }
-
+  unsigned get_first_node(const address_mapt& amap) const
+  {
+    return amap.begin()->first;
+  }
+  unsigned get_last_node(const address_mapt& amap) const
+  {
+    return (--amap.end())->first;
+  }
+  unsigned nodes_empty(const address_mapt& amap) const
+  {
+    return amap.empty();
+  }
 };
 
-namespace {
-
-typedef java_bytecode_convert_methodt::holet holet;
-typedef java_bytecode_convert_methodt::local_variable_with_holest local_variable_with_holest;
-typedef java_bytecode_convert_methodt::local_variable_table_with_holest local_variable_table_with_holest;
-typedef java_bytecode_convert_methodt::address_mapt address_mapt;
-typedef java_bytecode_convert_methodt::java_cfg_dominatorst java_cfg_dominatorst;
+typedef java_bytecode_convert_methodt::holet
+  holet;
+typedef java_bytecode_convert_methodt::local_variable_with_holest
+  local_variable_with_holest;
+typedef java_bytecode_convert_methodt::local_variable_table_with_holest
+  local_variable_table_with_holest;
+typedef java_bytecode_convert_methodt::address_mapt
+  address_mapt;
+typedef java_bytecode_convert_methodt::java_cfg_dominatorst
+  java_cfg_dominatorst;
 
 // Comparators for local variables:
 
-static bool lt_index(const local_variable_with_holest& a,
-              const local_variable_with_holest& b)
+static bool lt_index(
+  const local_variable_with_holest& a,
+  const local_variable_with_holest& b)
 {
   return a.var.index<b.var.index;
 }
-static bool lt_startpc(const local_variable_with_holest* a,
-                const local_variable_with_holest* b)
+static bool lt_startpc(
+  const local_variable_with_holest* a,
+  const local_variable_with_holest* b)
 {
   return a->var.start_pc<b->var.start_pc;
 }
 
 // The predecessor map, and a top-sorting comparator:
 
-typedef std::map<local_variable_with_holest*,
-                 std::set<local_variable_with_holest*> > predecessor_mapt;
+typedef std::map<
+  local_variable_with_holest*,
+  std::set<local_variable_with_holest*> >
+  predecessor_mapt;
 
-struct is_predecessor_of
+struct is_predecessor_oft
 {
   const predecessor_mapt& order;
 
-  is_predecessor_of(const predecessor_mapt& _order) : order(_order) {}
+  explicit is_predecessor_oft(const predecessor_mapt& _order) : order(_order) {}
 
-  bool operator()(local_variable_with_holest* a,
-                  local_variable_with_holest* b) const
+  bool operator()(
+    local_variable_with_holest* a,
+    local_variable_with_holest* b) const
   {
     auto findit=order.find(a);
     if(findit==order.end())
@@ -97,7 +123,7 @@ static void gather_transitive_predecessors(
   if(findit==predecessor_map.end())
     return;
   for(const auto pred : findit->second)
-    gather_transitive_predecessors(pred,predecessor_map,result);
+    gather_transitive_predecessors(pred, predecessor_map, result);
 }
 
 static bool is_store_to_slot(
@@ -105,7 +131,7 @@ static bool is_store_to_slot(
   unsigned slotidx)
 {
   const std::string prevstatement=id2string(inst.statement);
-  if(!(prevstatement.size()>=1 && prevstatement.substr(1,5)=="store"))
+  if(!(prevstatement.size()>=1 && prevstatement.substr(1, 5)=="store"))
     return false;
 
   std::string storeslot;
@@ -131,7 +157,7 @@ static void maybe_add_hole(
 {
   assert(to>=from);
   if(to!=from)
-    var.holes.push_back({from,to-from});
+    var.holes.push_back({from, to-from});
 }
 
 static void populate_variable_address_map(
@@ -141,7 +167,7 @@ static void populate_variable_address_map(
 {
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
-    if(it->var.start_pc+it->var.length > live_variable_at_address.size())
+    if(it->var.start_pc+it->var.length>live_variable_at_address.size())
       live_variable_at_address.resize(it->var.start_pc+it->var.length);
 
     for(unsigned idx=it->var.start_pc,
@@ -152,7 +178,6 @@ static void populate_variable_address_map(
       live_variable_at_address[idx]=&*it;
     }
   }
-
 }
 
 static void populate_predecessor_map(
@@ -176,16 +201,22 @@ static void populate_predecessor_map(
     auto old_amapit=amapit;
     --amapit;
     if(old_amapit==amap.end())
-      assert(end_pc>amapit->first &&
-             "Instruction live range doesn't align to instruction boundary?");
+    {
+      assert(
+        end_pc>amapit->first &&
+        "Instruction live range doesn't align to instruction boundary?");
+    }
 
     // Find vartable entries that flow into this one:
     unsigned new_start_pc=it->var.start_pc;
-    for(; amapit->first >= it->var.start_pc; --amapit)
+    for(; amapit->first>=it->var.start_pc; --amapit)
     {
       for(auto pred : amapit->second.predecessors)
       {
-        auto pred_var=(pred < live_variable_at_address.size() ? live_variable_at_address[pred] : 0);
+        auto pred_var=
+          (pred<live_variable_at_address.size() ?
+           live_variable_at_address[pred] :
+           0);
         if(pred_var==&*it)
         {
           // Flow from within same live range?
@@ -200,37 +231,49 @@ static void populate_predecessor_map(
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
           {
-            // These sorts of infeasible edges can occur because jsr handling is presently vague
-            // (any subroutine is assumed to be able to return to any callsite)
-            msg.warning() << "Local variable table: ignoring flow from out of range for " <<
-              it->var.name << " " << pred << " -> " << amapit->first << messaget::eom;
+            // These sorts of infeasible edges can occur because jsr
+            // handling is presently vague (any subroutine is assumed to
+            // be able to return to any callsite)
+            msg.warning() << "Local variable table: ignoring flow from "
+                          << "out of range for " << it->var.name << " "
+                          << pred << " -> " << amapit->first
+                          << messaget::eom;
             continue;
           }
-          if(!is_store_to_slot(*(inst_before_this->second.source),it->var.index))
-            throw "Local variable table: didn't find expected initialising store";
+          if(!is_store_to_slot(
+               *(inst_before_this->second.source),
+               it->var.index))
+          {
+            throw "local variable table: didn't find initialising store";
+          }
           new_start_pc=pred;
         }
-        else {
-          if(pred_var->var.name!=it->var.name || pred_var->var.signature!=it->var.signature)
+        else
+        {
+          if(pred_var->var.name!=it->var.name ||
+             pred_var->var.signature!=it->var.signature)
           {
-            // These sorts of infeasible edges can occur because jsr handling is presently vague
-            // (any subroutine is assumed to be able to return to any callsite)
-            msg.warning() << "Local variable table: ignoring flow from clashing variable for " <<
-              it->var.name << " " << pred << " -> " << amapit->first << messaget::eom;
+            // These sorts of infeasible edges can occur because
+            // jsr handling is presently vague (any subroutine is
+            // assumed to be able to return to any callsite)
+            msg.warning() << "Local variable table: ignoring flow from "
+                          << "clashing variable for "
+                          << it->var.name << " " << pred << " -> "
+                          << amapit->first << messaget::eom;
             continue;
           }
-          // OK, this is a flow from a similar but distinct entry in the local var table.
+          // OK, this is a flow from a similar but
+          // distinct entry in the local var table.
           predecessor_map[&*it].insert(pred_var);
         }
       }
     }
 
-    // If a simple pre-block initialiser was found, add it to the live range now:
+    // If a simple pre-block initialiser was found,
+    // add it to the live range now:
     it->var.length+=(it->var.start_pc-new_start_pc);
     it->var.start_pc=new_start_pc;
-
   }
-
 }
 
 static unsigned get_common_dominator(
@@ -242,25 +285,30 @@ static unsigned get_common_dominator(
   unsigned first_pc=UINT_MAX;
   for(auto v : merge_vars)
   {
-    if(v->var.start_pc < first_pc)
-      first_pc = v->var.start_pc;
+    if(v->var.start_pc<first_pc)
+      first_pc=v->var.start_pc;
   }
 
   std::vector<unsigned> candidate_dominators;
   for(auto v : merge_vars)
   {
-    const auto& dominator_nodeidx=dominator_analysis.cfg.entry_map.at(v->var.start_pc);
-    const auto& this_var_doms=dominator_analysis.cfg[dominator_nodeidx].dominators;
+    const auto& dominator_nodeidx=
+      dominator_analysis.cfg.entry_map.at(v->var.start_pc);
+    const auto& this_var_doms=
+      dominator_analysis.cfg[dominator_nodeidx].dominators;
     for(const auto this_var_dom : this_var_doms)
-      if(this_var_dom <= first_pc)
+      if(this_var_dom<=first_pc)
         candidate_dominators.push_back(this_var_dom);
   }
-  std::sort(candidate_dominators.begin(),candidate_dominators.end());
+  std::sort(candidate_dominators.begin(), candidate_dominators.end());
 
-  // Working from the back, simply find the first PC that occurs merge_vars.size()
-  // times and therefore dominates all vars we seek to merge:
-  for(auto domit=candidate_dominators.rbegin(), domitend=candidate_dominators.rend();
-      domit != domitend; /* Don't increment here */)
+  // Working from the back, simply find the first PC
+  // that occurs merge_vars.size() times and therefore
+  // dominates all vars we seek to merge:
+  for(auto domit=candidate_dominators.rbegin(),
+        domitend=candidate_dominators.rend();
+      domit!=domitend;
+      /* Don't increment here */)
   {
     unsigned repeats=0;
     auto dom=*domit;
@@ -274,7 +322,7 @@ static unsigned get_common_dominator(
       return dom;
   }
 
-  throw "Variable live ranges with no common dominator?";
+  throw "variable live ranges with no common dominator?";
 }
 
 static void populate_live_range_holes(
@@ -283,14 +331,20 @@ static void populate_live_range_holes(
   unsigned expanded_live_range_start)
 {
   std::vector<local_variable_with_holest*> sorted_by_startpc(
-    merge_vars.begin(),merge_vars.end());
-  std::sort(sorted_by_startpc.begin(),sorted_by_startpc.end(),lt_startpc);
+    merge_vars.begin(), merge_vars.end());
+  std::sort(sorted_by_startpc.begin(), sorted_by_startpc.end(), lt_startpc);
 
-  maybe_add_hole(merge_into,expanded_live_range_start,sorted_by_startpc[0]->var.start_pc);
+  maybe_add_hole(
+    merge_into,
+    expanded_live_range_start,
+    sorted_by_startpc[0]->var.start_pc);
   for(unsigned idx=0; idx<sorted_by_startpc.size()-1; ++idx)
-    maybe_add_hole(merge_into,
-                   sorted_by_startpc[idx]->var.start_pc + sorted_by_startpc[idx]->var.length,
-                   sorted_by_startpc[idx+1]->var.start_pc);
+  {
+    maybe_add_hole(
+      merge_into,
+      sorted_by_startpc[idx]->var.start_pc+sorted_by_startpc[idx]->var.length,
+      sorted_by_startpc[idx+1]->var.start_pc);
+  }
 }
 
 static void merge_variable_table_entries(
@@ -299,30 +353,36 @@ static void merge_variable_table_entries(
   const java_cfg_dominatorst& dominator_analysis,
   std::ostream& debug_out)
 {
-  // Because we need a lexically-scoped declaration, we must have the merged variable
+  // Because we need a lexically-scoped declaration,
+  // we must have the merged variable
   // enter scope both in a block that dominates all entries, and which
   // precedes them in program order.
   unsigned found_dominator=
-    get_common_dominator(merge_vars,dominator_analysis);
+    get_common_dominator(merge_vars, dominator_analysis);
 
-  // Populate the holes in the live range (addresses where the new variable
-  // will be in scope, but references to this stack slot should not resolve to it
+  // Populate the holes in the live range
+  // (addresses where the new variable will be in scope,
+  // but references to this stack slot should not resolve to it
   // as it was not visible in the original local variable table)
-  populate_live_range_holes(merge_into,merge_vars,found_dominator);
+  populate_live_range_holes(merge_into, merge_vars, found_dominator);
 
   unsigned last_pc=0;
   for(auto v : merge_vars)
-    if(v->var.start_pc+v->var.length > last_pc)
+  {
+    if(v->var.start_pc+v->var.length>last_pc)
       last_pc=v->var.start_pc+v->var.length;
+  }
 
   // Apply the changes:
   merge_into.var.start_pc=found_dominator;
   merge_into.var.length=last_pc-found_dominator;
 
 #ifdef DEBUG
-  debug_out << "Merged " << merge_vars.size() << " variables named " << merge_into.var.name <<
-    "; new live range " << merge_into.var.start_pc << "-" <<
-    merge_into.var.start_pc + merge_into.var.length << messaget::eom;
+  debug_out << "Merged " << merge_vars.size() << " variables named "
+            << merge_into.var.name << "; new live range "
+            << merge_into.var.start_pc << "-"
+            << merge_into.var.start_pc + merge_into.var.length
+            << messaget::eom;
 #endif
 
   // Nuke the now-subsumed var-table entries:
@@ -331,20 +391,20 @@ static void merge_variable_table_entries(
       v->var.length=0;
 }
 
-} // End anonymous namespace
-
 void java_bytecode_convert_methodt::find_initialisers_for_slot(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
   const address_mapt& amap,
   const java_cfg_dominatorst& dominator_analysis)
 {
-  // Build a simple map from instruction PC to the variable live in this slot at that PC,
-  // and a map from each variable to variables that flow into it:
+  // Build a simple map from instruction PC to the variable
+  // live in this slot at that PC, and a map from each variable
+  // to variables that flow into it:
   std::vector<local_variable_with_holest*> live_variable_at_address;
-  populate_variable_address_map(firstvar,varlimit,live_variable_at_address);
+  populate_variable_address_map(firstvar, varlimit, live_variable_at_address);
 
-  // Now find variables that flow together by walking backwards to find initialisers
+  // Now find variables that flow together by
+  // walking backwards to find initialisers
   // or branches from other live ranges:
   predecessor_mapt predecessor_map;
   populate_predecessor_map(
@@ -355,24 +415,24 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
     predecessor_map,
     get_message_handler());
 
-  // OK, we've established the flows all seem sensible. Now merge vartable entries
-  // according to the predecessor_map:
+  // OK, we've established the flows all seem sensible.
+  // Now merge vartable entries according to the predecessor_map:
 
   // Take the transitive closure of the predecessor map:
   for(auto& kv : predecessor_map)
   {
     std::set<local_variable_with_holest*> closed_preds;
-    gather_transitive_predecessors(kv.first,predecessor_map,closed_preds);
+    gather_transitive_predecessors(kv.first, predecessor_map, closed_preds);
     kv.second=std::move(closed_preds);
   }
 
   // Top-sort so that we get the bottom variables first:
-  is_predecessor_of comp(predecessor_map);
+  is_predecessor_oft comp(predecessor_map);
   std::vector<local_variable_with_holest*> topsorted_vars;
-  for(auto it=firstvar,itend=varlimit; it!=itend; ++it)
+  for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
     topsorted_vars.push_back(&*it);
 
-  std::sort(topsorted_vars.begin(),topsorted_vars.end(),comp);
+  std::sort(topsorted_vars.begin(), topsorted_vars.end(), comp);
 
   // Now merge the entries:
   for(auto merge_into : topsorted_vars)
@@ -389,9 +449,12 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
     const auto& merge_vars=findit->second;
     assert(merge_vars.size()>=2);
 
-    merge_variable_table_entries(*merge_into,merge_vars,dominator_analysis,status());
+    merge_variable_table_entries(
+      *merge_into,
+      merge_vars,
+      dominator_analysis,
+      status());
   }
-
 }
 
 static void walk_to_next_index(
@@ -418,28 +481,29 @@ void java_bytecode_convert_methodt::find_initialisers(
   const java_cfg_dominatorst& dominator_analysis)
 {
   // Handle one stack slot at a time:
-  std::sort(vars.begin(),vars.end(),lt_index);
+  std::sort(vars.begin(), vars.end(), lt_index);
 
   auto it1=vars.begin();
   auto it2=it1;
   auto itend=vars.end();
-  walk_to_next_index(it1,it2,itend);
-  for(; it1!=itend; walk_to_next_index(it1,it2,itend))
-    find_initialisers_for_slot(it1,it2,amap,dominator_analysis);
+  walk_to_next_index(it1, it2, itend);
+  for(; it1!=itend; walk_to_next_index(it1, it2, itend))
+    find_initialisers_for_slot(it1, it2, amap, dominator_analysis);
 }
 
-static void cleanup_var_table(std::vector<local_variable_with_holest>& vars_with_holes)
+static void cleanup_var_table(
+  std::vector<local_variable_with_holest>& vars_with_holes)
 {
   size_t toremove=0;
   for(size_t i=0; i<(vars_with_holes.size()-toremove); ++i)
   {
-    auto& v=vars_with_holes[i];
+    auto &v=vars_with_holes[i];
     if(v.var.length==0)
     {
       // Move to end; consider the new element we've swapped in:
       ++toremove;
       if(i!=vars_with_holes.size()-toremove) // Already where it needs to be?
-        std::swap(v,vars_with_holes[vars_with_holes.size()-toremove]);
+        std::swap(v, vars_with_holes[vars_with_holes.size()-toremove]);
       --i;
     }
   }
@@ -448,8 +512,9 @@ static void cleanup_var_table(std::vector<local_variable_with_holest>& vars_with
   vars_with_holes.resize(vars_with_holes.size()-toremove);
 }
 
-void java_bytecode_convert_methodt::setup_local_variables(const methodt& m,
-                                                          const address_mapt& amap)
+void java_bytecode_convert_methodt::setup_local_variables(
+  const methodt& m,
+  const address_mapt& amap)
 {
   // Compute CFG dominator tree
   java_cfg_dominatorst dominator_analysis;
@@ -462,7 +527,7 @@ void java_bytecode_convert_methodt::setup_local_variables(const methodt& m,
     vars_with_holes.push_back({v, {}});
 
   // Merge variable records:
-  find_initialisers(vars_with_holes,amap,dominator_analysis);
+  find_initialisers(vars_with_holes, amap, dominator_analysis);
 
   // Clean up removed records from the variable table:
   cleanup_var_table(vars_with_holes);
@@ -488,10 +553,10 @@ void java_bytecode_convert_methodt::setup_local_variables(const methodt& m,
     result.set(ID_C_base_name, v.var.name);
 
     variables[v.var.index].push_back(variablet());
-    auto& newv=variables[v.var.index].back();
-    newv.symbol_expr = result;
-    newv.start_pc = v.var.start_pc;
-    newv.length = v.var.length;
+    auto &newv=variables[v.var.index].back();
+    newv.symbol_expr=result;
+    newv.start_pc=v.var.start_pc;
+    newv.length=v.var.length;
     newv.holes=std::move(v.holes);
 
     symbolt new_symbol;
@@ -506,7 +571,6 @@ void java_bytecode_convert_methodt::setup_local_variables(const methodt& m,
     new_symbol.is_lvalue=true;
     symbol_table.add(new_symbol);
   }
-
 }
 
 const java_bytecode_convert_methodt::variablet &
@@ -516,9 +580,9 @@ java_bytecode_convert_methodt::find_variable_for_slot(
 {
   for(const variablet &var : var_list)
   {
-    size_t start_pc = var.start_pc;
-    size_t length = var.length;
-    if (address>=start_pc && address<(start_pc+length))
+    size_t start_pc=var.start_pc;
+    size_t length=var.length;
+    if(address>=start_pc && address<(start_pc+length))
     {
       bool found_hole=false;
       for(auto &hole : var.holes)
@@ -536,7 +600,7 @@ java_bytecode_convert_methodt::find_variable_for_slot(
   // with scope from 0 to INT_MAX
   // as it is at the end of the vector, it will only be taken into account
   // if no other variable is valid
-  size_t list_length = var_list.size();
+  size_t list_length=var_list.size();
   var_list.resize(list_length+1);
   var_list[list_length].start_pc=0;
   var_list[list_length].length=std::numeric_limits<size_t>::max();

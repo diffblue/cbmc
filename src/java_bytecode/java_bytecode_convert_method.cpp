@@ -82,7 +82,8 @@ static void cast_if_necessary(binary_relation_exprt &condition)
   exprt &lhs(condition.lhs());
   exprt &rhs(condition.rhs());
   const typet &lhs_type(lhs.type());
-  if(lhs_type==rhs.type()) return;
+  if(lhs_type==rhs.type())
+    return;
   rhs=typecast_exprt(rhs, lhs_type);
 }
 
@@ -137,7 +138,8 @@ const exprt java_bytecode_convert_methodt::variable(
 }
 
 symbol_exprt java_bytecode_convert_methodt::tmp_variable(
-  const std::string &prefix, const typet &type)
+  const std::string &prefix,
+  const typet &type)
 {
   irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
   irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
@@ -245,9 +247,9 @@ void java_bytecode_convert_methodt::convert(
 
     variables[v.index].push_back(variablet());
     auto &newv=variables[v.index].back();
-    newv.symbol_expr = result;
-    newv.start_pc = v.start_pc;
-    newv.length = v.length;
+    newv.symbol_expr=result;
+    newv.start_pc=v.start_pc;
+    newv.length=v.length;
   }
 
   // set up variables array
