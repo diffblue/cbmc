@@ -60,6 +60,7 @@ struct procedure_local_cfg_baset<
   }
 };
 
+// Grab some class typdefs for brevity:
 typedef java_bytecode_convert_methodt::holet
   holet;
 typedef java_bytecode_convert_methodt::local_variable_with_holest
@@ -112,6 +113,20 @@ struct is_predecessor_oft
 
 // Helper routines for the find-initialisers code below:
 
+/*******************************************************************\
+
+Function: gather_transitive_predecessors
+
+  Inputs: `start`: Variable to find the predecessors of
+          `predecessor_map`: Map from local variables
+                             to sets of predecessors
+ Outputs: `result`: populated with all transitive predecessors of
+                    `start` found in `predecessor_map`
+
+ Purpose: See above
+
+\*******************************************************************/
+
 static void gather_transitive_predecessors(
   local_variable_with_holest* start,
   const predecessor_mapt& predecessor_map,
@@ -126,6 +141,20 @@ static void gather_transitive_predecessors(
     gather_transitive_predecessors(pred, predecessor_map, result);
 }
 
+/*******************************************************************\
+
+Function: is_store_to_slot
+
+  Inputs: `inst`: Java bytecode instruction
+          `slotidx`: local variable slot number
+
+ Outputs: Returns true if `inst` is any form of store instruction
+          targeting slot `slotidx`
+
+ Purpose: See above
+
+\*******************************************************************/
+
 static bool is_store_to_slot(
   const java_bytecode_convert_methodt::instructiont& inst,
   unsigned slotidx)
@@ -137,11 +166,13 @@ static bool is_store_to_slot(
   std::string storeslot;
   if(inst.args.size()==1)
   {
+    // Store with an argument:
     const auto& arg=inst.args[0];
     storeslot=id2string(to_constant_expr(arg).get_value());
   }
   else
   {
+    // Store shorthands, like "store_0", "store_1"
     assert(prevstatement[6]=='_' && prevstatement.size()==8);
     storeslot=prevstatement[7];
     assert(isdigit(storeslot[0]));
@@ -149,6 +180,19 @@ static bool is_store_to_slot(
   auto storeslotidx=safe_string2unsigned(storeslot);
   return storeslotidx==slotidx;
 }
+
+/*******************************************************************\
+
+Function: maybe_add_hole
+
+  Inputs: `from`, `to`: bounds of a gap in `var`'s live range,
+          inclusive and exclusive respectively
+
+ Outputs: Adds a hole to `var`, unless it would be of zero size.
+
+ Purpose: See above
+
+\*******************************************************************/
 
 static void maybe_add_hole(
   local_variable_with_holest& var,
@@ -159,6 +203,22 @@ static void maybe_add_hole(
   if(to!=from)
     var.holes.push_back({from, to-from});
 }
+
+/*******************************************************************\
+
+Function: populate_variable_address_map
+
+  Inputs: `firstvar`-`varlimit`: range of local variable table
+          entries to consider
+
+ Outputs: `live_variable_at_address` is populated with a sequence of
+          local variable table entry pointers, such that
+          `live_variable_at_address[addr]` yields the unique table
+          entry covering that address. Asserts if entries overlap.
+
+ Purpose: See above
+
+\*******************************************************************/
 
 static void populate_variable_address_map(
   local_variable_table_with_holest::iterator firstvar,
@@ -172,13 +232,40 @@ static void populate_variable_address_map(
 
     for(unsigned idx=it->var.start_pc,
           idxlim=it->var.start_pc+it->var.length;
-        idx!=idxlim; ++idx)
+        idx!=idxlim;
+        ++idx)
     {
       assert((!live_variable_at_address[idx]) && "Local variable table clash?");
       live_variable_at_address[idx]=&*it;
     }
   }
 }
+
+/*******************************************************************\
+
+Function: populate_predecessor_map
+
+  Inputs: `firstvar`-`varlimit`: range of local variable table
+            entries to consider
+          `live_variable_at_address`: map from bytecode address
+            to table entry (drawn from firstvar-varlimit) live
+            at that address
+          `amap`: map from bytecode address to instructions
+
+ Outputs: Populates `predecessor_map` with a graph from local variable
+          table entries to their predecessors (table entries which
+          may flow together and thus may be considered the same live
+          range).
+
+ Purpose: Usually a live variable range begins with a store
+          instruction initialising the relevant local variable slot,
+          but instead of or in addition to this, control flow edges
+          may exist from bytecode addresses that fall under a
+          table entry which differs, but which has the same variable
+          name and type descriptor. This indicates a split live
+          range, and will be recorded in the predecessor map.
+
+\*******************************************************************/
 
 static void populate_predecessor_map(
   local_variable_table_with_holest::iterator firstvar,
@@ -198,6 +285,7 @@ static void populate_predecessor_map(
     // Find the last instruction within the live range:
     unsigned end_pc=it->var.start_pc+it->var.length;
     auto amapit=amap.find(end_pc);
+    assert(amapit!=amap.begin());
     auto old_amapit=amapit;
     --amapit;
     if(old_amapit==amap.end())
@@ -228,6 +316,7 @@ static void populate_predecessor_map(
           // Check if this is an initialiser, and if so expand the live range
           // to include it, but don't check its predecessors:
           auto inst_before_this=amapit;
+          assert(inst_before_this!=amap.begin());
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
           {
@@ -276,11 +365,29 @@ static void populate_predecessor_map(
   }
 }
 
+/*******************************************************************\
+
+Function: get_common_dominator
+
+  Inputs: `merge_vars`: Set of variables we want the common dominator
+            for.
+          `dominator_analysis`: Already-initialised dominator tree
+
+ Outputs: Returns the bytecode address of the closest common
+          dominator of all given variable table entries.
+          In the worst case the function entry point should always
+          satisfy this criterion.
+
+ Purpose: Used to find out where to put a variable declaration that
+          subsumes several variable live ranges.
+
+\*******************************************************************/
+
 static unsigned get_common_dominator(
   const std::set<local_variable_with_holest*>& merge_vars,
   const java_cfg_dominatorst& dominator_analysis)
 {
-  assert(merge_vars.size()!=0);
+  assert(!merge_vars.empty());
 
   unsigned first_pc=UINT_MAX;
   for(auto v : merge_vars)
@@ -325,6 +432,24 @@ static unsigned get_common_dominator(
   throw "variable live ranges with no common dominator?";
 }
 
+/*******************************************************************\
+
+Function: populate_live_range_holes
+
+  Inputs: `merge_vars`: a set of 2+ variable table entries to merge
+          `expanded_live_range_start`: address where the merged
+            variable will be declared
+
+ Outputs: Adds holes to `merge_into`, indicating where gaps in the
+          variable's live range fall. For example, if the
+          declaration happens at address 10 and the entries in
+          `merge_into` have live ranges [(20-30), (40-50)] then
+          holes will be added at (10-20) and (30-40).
+
+ Purpose: See above
+
+\*******************************************************************/
+
 static void populate_live_range_holes(
   local_variable_with_holest& merge_into,
   const std::set<local_variable_with_holest*>& merge_vars,
@@ -346,6 +471,22 @@ static void populate_live_range_holes(
       sorted_by_startpc[idx+1]->var.start_pc);
   }
 }
+
+/*******************************************************************\
+
+Function: merge_variable_table_entries
+
+  Inputs: `merge_vars`: a set of 2+ variable table entries to merge
+          `dominator_analysis`: already-calculated dominator tree
+
+ Outputs: Populates `merge_into` as a combined variable table entry,
+          with live range holes if the `merge_vars` entries do not
+          cover a contiguous address range, beginning the combined
+          live range at the common dominator of all `merge_vars`.
+
+ Purpose: See above
+
+\*******************************************************************/
 
 static void merge_variable_table_entries(
   local_variable_with_holest& merge_into,
@@ -390,6 +531,28 @@ static void merge_variable_table_entries(
     if(v!=&merge_into)
       v->var.length=0;
 }
+
+/*******************************************************************\
+
+Function: find_initialisers_for_slot
+
+  Inputs: `firstvar`-`varlimit`: sequence of variable table entries,
+            all of which should concern the same slot index.
+          `amap`: Map from bytecode address to instruction
+
+ Outputs: Side-effect: merges variable table entries which flow into
+          one another (e.g. there are branches from one live range
+          to another without re-initialising the local slot).
+
+ Purpose: Given a sequence of users of the same local variable slot,
+          this figures out which ones are related by control flow,
+          and combines them into a single entry with holes, such that
+          after combination we can create a single
+          declaration per variable table entry,
+          placed at the live range's start address, which may
+          be moved back so that the declaration dominates all uses.
+
+\*******************************************************************/
 
 void java_bytecode_convert_methodt::find_initialisers_for_slot(
   local_variable_table_with_holest::iterator firstvar,
@@ -457,6 +620,23 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   }
 }
 
+/*******************************************************************\
+
+Function: walk_to_next_index
+
+  Inputs: `it1` and `it2`, which are iterators into the same vector,
+          of which `itend` is the end() iterator.
+
+ Outputs: Moves `it1` and `it2` to delimit a sequence of variable
+          table entries with slot index equal to it2->var.index
+          on entering this function, or to both equal itend if
+          it2==itend on entry.
+
+ Purpose: Walk a vector, a contiguous block of entries with equal
+          slot index at a time.
+
+\*******************************************************************/
+
 static void walk_to_next_index(
   local_variable_table_with_holest::iterator& it1,
   local_variable_table_with_holest::iterator& it2,
@@ -475,14 +655,31 @@ static void walk_to_next_index(
   it1=old_it2;
 }
 
+/*******************************************************************\
+
+Function: find_initialisers
+
+  Inputs: `vars`: Local variable table
+          `amap`: Map from bytecode index to instruction
+          `dominator_analysis`: Already computed dominator tree for
+            the Java function described by `amap`
+
+ Outputs: Combines entries in `vars` which flow together
+
+ Purpose: See `find_initialisers_for_slot` above for more detail.
+
+\*******************************************************************/
+
 void java_bytecode_convert_methodt::find_initialisers(
   local_variable_table_with_holest& vars,
   const address_mapt& amap,
   const java_cfg_dominatorst& dominator_analysis)
 {
-  // Handle one stack slot at a time:
+  // Sort table entries by local slot index:
   std::sort(vars.begin(), vars.end(), lt_index);
 
+  // For each block of entries using a particular index,
+  // try to combine them:
   auto it1=vars.begin();
   auto it2=it1;
   auto itend=vars.end();
@@ -490,6 +687,18 @@ void java_bytecode_convert_methodt::find_initialisers(
   for(; it1!=itend; walk_to_next_index(it1, it2, itend))
     find_initialisers_for_slot(it1, it2, amap, dominator_analysis);
 }
+
+/*******************************************************************\
+
+Function: cleanup_var_table
+
+  Inputs: `vars_with_holes`: variable table
+
+ Outputs: Removes zero-size entries from `vars_with_holes`
+
+ Purpose: See above
+
+\*******************************************************************/
 
 static void cleanup_var_table(
   std::vector<local_variable_with_holest>& vars_with_holes)
@@ -504,13 +713,30 @@ static void cleanup_var_table(
       ++toremove;
       if(i!=vars_with_holes.size()-toremove) // Already where it needs to be?
         std::swap(v, vars_with_holes[vars_with_holes.size()-toremove]);
-      --i;
+      --i; // May make i (size_t)-1, but it will immediately be
+           // re-incremented as the loop iterates.
     }
   }
 
   // Remove un-needed entries.
   vars_with_holes.resize(vars_with_holes.size()-toremove);
 }
+
+/*******************************************************************\
+
+Function: setup_local_variables
+
+  Inputs: `m`: Java method
+          `amap`: Map from bytecode indices to instructions in `m`
+
+ Outputs: Populates `this->vars_with_holes` equal to
+          `this->local_variable_table`, only with variable table
+          entries that flow together combined.
+          Also symbol-table registers all locals.
+
+ Purpose: See `find_initialisers_for_slot` above for more detail.
+
+\*******************************************************************/
 
 void java_bytecode_convert_methodt::setup_local_variables(
   const methodt& m,
@@ -573,6 +799,22 @@ void java_bytecode_convert_methodt::setup_local_variables(
   }
 }
 
+/*******************************************************************\
+
+Function: find_variable_for_slot
+
+  Inputs: `address`: Address to find a variable table entry for
+          `var_list`: List of candidates that use the slot we're
+            interested in
+
+ Outputs: Returns the list entry covering this address (taking live
+          range holes into account), or creates/returns an anonymous
+          variable entry if nothing covers `address`.
+
+ Purpose: See above
+
+\*******************************************************************/
+
 const java_bytecode_convert_methodt::variablet &
 java_bytecode_convert_methodt::find_variable_for_slot(
   size_t address,
@@ -597,7 +839,7 @@ java_bytecode_convert_methodt::find_variable_for_slot(
     }
   }
   // add unnamed local variable to end of list at this index
-  // with scope from 0 to INT_MAX
+  // with scope from 0 to SIZE_T_MAX
   // as it is at the end of the vector, it will only be taken into account
   // if no other variable is valid
   size_t list_length=var_list.size();
