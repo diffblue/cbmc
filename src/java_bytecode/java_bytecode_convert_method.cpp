@@ -120,18 +120,27 @@ protected:
   } instruction_sizet;
 
   // return corresponding reference of variable
-  const variablet &find_variable_for_slot(
-    size_t address,
-    variablest &var_list,
-    instruction_sizet inst_size)
+  const variablet &find_variable_for_slot(size_t address, variablest &var_list)
   {
     for(const variablet &var : var_list)
     {
       size_t start_pc=var.start_pc;
       size_t length=var.length;
-      if(address+(size_t)inst_size>=start_pc &&
-         address<start_pc+length)
+      if(address>=start_pc && address<(start_pc+length))
+      {
+        bool found_hole=false;
+        for(auto &hole : var.holes)
+        {
+          if(address>=hole.start_pc && address<(hole.start_pc-hole.length))
+          {
+            found_hole=true;
+            break;
+          }
+        }
+        if(found_hole)
+          continue;
         return var;
+      }
     }
     // add unnamed local variable to end of list at this index
     // with scope from 0 to INT_MAX
@@ -155,7 +164,6 @@ protected:
     const exprt &arg,
     char type_char,
     size_t address,
-    instruction_sizet inst_size,
     variable_cast_argumentt do_cast)
   {
     irep_idt number=to_constant_expr(arg).get_value();
@@ -166,7 +174,7 @@ protected:
 
     // search variable in list for correct frame / address if necessary
     const variablet &var=
-      find_variable_for_slot(address, var_list, inst_size);
+      find_variable_for_slot(address, var_list);
 
     if(var.symbol_expr.get_identifier().empty())
     {
@@ -317,7 +325,7 @@ protected:
   void convert(const instructiont &);
 
   codet convert_instructions(
-    const instructionst &, const code_typet &);
+    const methodt &, const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
@@ -382,6 +390,7 @@ void java_bytecode_convert_methodt::convert(
 
   const irep_idt method_identifier=
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+  method_id=method_identifier;
 
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
@@ -400,38 +409,24 @@ void java_bytecode_convert_methodt::convert(
 
   variables.clear();
 
-  // Do the parameters and locals in the variable table, which is available when
-  // compiled with -g or for methods with many local variables in the latter
-  // case, different variables can have the same index, depending on the
-  // context.
-  //
-  // to calculate which variable to use, one uses the address of the instruction
-  // that uses the variable, the size of the instruction and the start_pc /
-  // length values in the local variable table
+  // find parameter names in the local variable table:
   for(const auto &v : m.local_variable_table)
   {
+    if(v.start_pc!=0) // Local?
+      continue;
+
     typet t=java_type_from_string(v.signature);
     std::ostringstream id_oss;
-    id_oss << method_identifier << "::" << v.start_pc << "::" << v.name;
+    id_oss << method_id << "::" << v.name;
     irep_idt identifier(id_oss.str());
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.name);
-    size_t number_index_entries=variables[v.index].size();
-    variables[v.index].resize(number_index_entries+1);
-    variables[v.index][number_index_entries].symbol_expr=result;
-    variables[v.index][number_index_entries].start_pc=v.start_pc;
-    variables[v.index][number_index_entries].length=v.length;
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=t;
-    new_symbol.base_name=v.name;
-    new_symbol.pretty_name=strip_java_namespace_prefix(identifier);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
-    new_symbol.is_file_local=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_lvalue=true;
-    symbol_table.add(new_symbol);
+
+    variables[v.index].push_back(variablet());
+    auto &newv=variables[v.index].back();
+    newv.symbol_expr = result;
+    newv.start_pc = v.start_pc;
+    newv.length = v.length;
   }
 
   // set up variables array
@@ -533,9 +528,8 @@ void java_bytecode_convert_methodt::convert(
   method_has_this=code_type.has_this();
 
   tmp_vars.clear();
-
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(m.instructions, code_type);
+    method_symbol.value=convert_instructions(m, code_type);
 
   // do we have the method symbol already?
   const auto s_it=symbol_table.symbols.find(method.get_name());
@@ -1309,9 +1303,12 @@ static unsigned get_bytecode_type_width(const typet &ty)
 }
 
 codet java_bytecode_convert_methodt::convert_instructions(
-  const instructionst &instructions,
+  const methodt &method,
   const code_typet &method_type)
 {
+
+  const instructionst& instructions=method.instructions;
+
   // Run a worklist algorithm, assuming that the bytecode has not
   // been tampered with. See "Leroy, X. (2003). Java bytecode
   // verification: algorithms and formalizations. Journal of Automated
@@ -1422,6 +1419,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       a_it->second.predecessors.insert(address.first);
     }
   }
+
+  // Now that the control flow graph is built, set up our local variables
+  // (these require the graph to determine live ranges)
+  setup_local_variables(method,address_map);
 
   std::set<unsigned> working_set;
   if(!instructions.empty())
@@ -1652,7 +1653,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX, NO_CAST);
+      exprt var=variable(arg0, statement[0], i_it->address, NO_CAST);
 
       exprt toassign=op[0];
       if('a'==statement[0] && toassign.type()!=var.type())
@@ -1683,7 +1684,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX, CAST_AS_NEEDED);
+      results[0]=variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1751,7 +1752,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // if(retaddr==5) goto 5; else if(retaddr==10) goto 10; ...
       assert(op.empty() && results.empty());
       code_blockt branches;
-      auto retvar=variable(arg0, 'a', i_it->address, INST_INDEX, NO_CAST);
+      auto retvar=variable(arg0, 'a', i_it->address, NO_CAST);
       assert(!jsr_ret_targets.empty());
       for(size_t idx=0, idxlim=jsr_ret_targets.size(); idx!=idxlim; ++idx)
       {
@@ -1889,9 +1890,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST, NO_CAST);
+      code_assign.lhs()=variable(arg0, 'i', i_it->address, NO_CAST);
       code_assign.rhs()=plus_exprt(
-        variable(arg0, 'i', i_it->address, INST_INDEX_CONST, CAST_AS_NEEDED),
+        variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
         typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
@@ -2424,10 +2425,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // Try to recover block structure as indicated in the local variable table:
 
   // The block tree node mirrors the block structure of root_block,
-  // indexing the Java PCs were each subblock starts and ends.
+  // indexing the Java PCs where each subblock starts and ends.
   block_tree_nodet root;
   code_blockt root_block;
 
+  // First create a simple flat list of basic blocks. We'll add lexical nesting
+  // constructs as variable live-ranges require next.
   bool start_new_block=true;
   for(const auto &address_pair : address_map)
   {
@@ -2492,13 +2495,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // Skip anonymous variables:
       if(v.symbol_expr.get_identifier()==irep_idt())
         continue;
-      code_declt d(v.symbol_expr);
       auto &block=get_block_for_pcrange(
         root,
         root_block,
         v.start_pc,
         v.start_pc+v.length,
         std::numeric_limits<unsigned>::max());
+      code_declt d(v.symbol_expr);
       block.operands().insert(block.operands().begin(), d);
     }
   }
