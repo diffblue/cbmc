@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/cfg_dominators.h>
 
 #include "java_bytecode_convert_method.h"
+#include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
 
@@ -52,282 +53,6 @@ public:
 
 protected:
   const char *p;
-};
-
-class java_bytecode_convert_methodt:public messaget
-{
-public:
-  java_bytecode_convert_methodt(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table)
-  {
-  }
-
-  typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef methodt::instructionst instructionst;
-  typedef methodt::local_variable_tablet local_variable_tablet;
-  typedef methodt::local_variablet local_variablet;
-
-  void operator()(const symbolt &class_symbol, const methodt &method)
-  {
-    convert(class_symbol, method);
-  }
-
-protected:
-  irep_idt method_id;
-  symbol_tablet &symbol_table;
-
-  irep_idt current_method;
-  typet method_return_type;
-
-public:
-  struct holet {
-    unsigned start_pc;
-    unsigned length;
-  };
-
-  struct local_variable_with_holest
-  {
-    local_variablet var;
-    std::vector<holet> holes;
-  };
-
-  typedef std::vector<local_variable_with_holest> local_variable_table_with_holest;
-
-protected:
-  class variablet
-  {
-  public:
-    symbol_exprt symbol_expr;
-    size_t start_pc;
-    size_t length;
-    bool is_parameter;
-    std::vector<holet> holes;
-    variablet() : symbol_expr(), is_parameter(false) {}
-  };
-
-  typedef std::vector<variablet> variablest;
-  expanding_vector<variablest> variables;
-  std::set<symbol_exprt> used_local_names;
-  bool method_has_this;
-
-  typedef enum instruction_sizet
-  {
-    INST_INDEX=2, INST_INDEX_CONST=3
-  } instruction_sizet;
-
-  // return corresponding reference of variable
-  const variablet &find_variable_for_slot(size_t address, variablest &var_list)
-  {
-    for(const variablet &var : var_list)
-    {
-      size_t start_pc=var.start_pc;
-      size_t length=var.length;
-      if(address>=start_pc && address<(start_pc+length))
-      {
-        bool found_hole=false;
-        for(auto &hole : var.holes)
-        {
-          if(address>=hole.start_pc && address<(hole.start_pc-hole.length))
-          {
-            found_hole=true;
-            break;
-          }
-        }
-        if(found_hole)
-          continue;
-        return var;
-      }
-    }
-    // add unnamed local variable to end of list at this index
-    // with scope from 0 to INT_MAX
-    // as it is at the end of the vector, it will only be taken into account
-    // if no other variable is valid
-    size_t list_length=var_list.size();
-    var_list.resize(list_length+1);
-    var_list[list_length].start_pc=0;
-    var_list[list_length].length=std::numeric_limits<size_t>::max();
-    return var_list[list_length];
-  }
-
-  // JVM local variables
-  enum variable_cast_argumentt
-  {
-    CAST_AS_NEEDED,
-    NO_CAST
-  };
-
-  const exprt variable(
-    const exprt &arg,
-    char type_char,
-    size_t address,
-    variable_cast_argumentt do_cast)
-  {
-    irep_idt number=to_constant_expr(arg).get_value();
-
-    std::size_t number_int=safe_string2size_t(id2string(number));
-    typet t=java_type_from_char(type_char);
-    variablest &var_list=variables[number_int];
-
-    // search variable in list for correct frame / address if necessary
-    const variablet &var=
-      find_variable_for_slot(address, var_list);
-
-    if(var.symbol_expr.get_identifier().empty())
-    {
-      // an un-named local variable
-      irep_idt base_name="anonlocal::"+id2string(number)+type_char;
-      irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-      symbol_exprt result(identifier, t);
-      result.set(ID_C_base_name, base_name);
-      used_local_names.insert(result);
-
-      return result;
-    }
-    else
-    {
-      exprt result=var.symbol_expr;
-      if(do_cast==CAST_AS_NEEDED && t!=result.type())
-        result=typecast_exprt(result, t);
-      return result;
-    }
-  }
-
-  // temporary variables
-  std::list<symbol_exprt> tmp_vars;
-
-  symbol_exprt tmp_variable(const std::string &prefix, const typet &type)
-  {
-    irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
-    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-    auxiliary_symbolt tmp_symbol;
-    tmp_symbol.base_name=base_name;
-    tmp_symbol.is_static_lifetime=false;
-    tmp_symbol.mode=ID_java;
-    tmp_symbol.name=identifier;
-    tmp_symbol.type=type;
-    symbol_table.add(tmp_symbol);
-
-    symbol_exprt result(identifier, type);
-    result.set(ID_C_base_name, base_name);
-    tmp_vars.push_back(result);
-
-    return result;
-  }
-
-  // JVM program locations
-  irep_idt label(const irep_idt &address)
-  {
-    return "pc"+id2string(address);
-  }
-
-  // JVM Stack
-  typedef std::vector<exprt> stackt;
-  stackt stack;
-
-  exprt::operandst pop(std::size_t n)
-  {
-    if(stack.size()<n)
-    {
-      error() << "malformed bytecode (pop too high)" << eom;
-      throw 0;
-    }
-
-    exprt::operandst operands;
-    operands.resize(n);
-    for(std::size_t i=0; i<n; i++)
-      operands[i]=stack[stack.size()-n+i];
-
-    stack.resize(stack.size()-n);
-    return operands;
-  }
-
-  void push(const exprt::operandst &o)
-  {
-    stack.resize(stack.size()+o.size());
-
-    for(std::size_t i=0; i<o.size(); i++)
-      stack[stack.size()-o.size()+i]=o[i];
-  }
-
-  struct converted_instructiont
-  {
-    converted_instructiont(
-      const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-      {}
-
-    instructionst::const_iterator source;
-    std::list<unsigned> successors;
-    std::set<unsigned> predecessors;
-    codet code;
-    stackt stack;
-    bool done;
-  };
-
-public:
-  typedef std::map<unsigned, converted_instructiont> address_mapt;
-  typedef cfg_dominators_templatet<const address_mapt,unsigned,false> java_cfg_dominatorst;
-
-protected:
-
-  void find_initialisers(
-    local_variable_table_with_holest& vars,
-    const address_mapt& amap,
-    const java_cfg_dominatorst& doms);
-
-  void find_initialisers_for_slot(
-    local_variable_table_with_holest::iterator firstvar,
-    local_variable_table_with_holest::iterator varlimit,
-    const address_mapt& amap,
-    const java_cfg_dominatorst& doms);
-
-  void setup_local_variables(const methodt& m, const address_mapt& amap);
-
-  struct block_tree_nodet
-  {
-    bool leaf;
-    std::vector<unsigned> branch_addresses;
-    std::vector<block_tree_nodet> branch;
-    block_tree_nodet():leaf(false) {}
-    explicit block_tree_nodet(bool l):leaf(l) {}
-    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
-  };
-
-  static void replace_goto_target(
-    codet &repl,
-    const irep_idt &old_label,
-    const irep_idt &new_label);
-
-  code_blockt &get_block_for_pcrange(
-    block_tree_nodet &tree,
-    code_blockt &this_block,
-    unsigned address_start,
-    unsigned address_limit,
-    unsigned next_block_start_address);
-
-  code_blockt &get_or_create_block_for_pcrange(
-    block_tree_nodet &tree,
-    code_blockt &this_block,
-    unsigned address_start,
-    unsigned address_limit,
-    unsigned next_block_start_address,
-    const address_mapt &amap,
-    bool allow_merge=true);
-
-  // conversion
-  void convert(const symbolt &class_symbol, const methodt &);
-  void convert(const instructiont &);
-
-  codet convert_instructions(
-    const methodt &, const code_typet &);
-
-  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
 
 const size_t SLOTS_PER_INTEGER(1u);
@@ -367,6 +92,102 @@ static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
   assert(has_prefix(to_strip_str, "java::"));
   return to_strip_str.substr(6, std::string::npos);
 }
+
+java_bytecode_convert_methodt::java_bytecode_convert_methodt(
+  symbol_tablet &_symbol_table,
+  message_handlert &_message_handler) :
+  messaget(_message_handler),
+  symbol_table(_symbol_table)
+{
+}
+
+const exprt java_bytecode_convert_methodt::variable(
+  const exprt &arg,
+  char type_char,
+  size_t address,
+  variable_cast_argumentt do_cast)
+{
+  irep_idt number=to_constant_expr(arg).get_value();
+
+  std::size_t number_int=safe_string2size_t(id2string(number));
+  typet t=java_type_from_char(type_char);
+  variablest &var_list=variables[number_int];
+
+  // search variable in list for correct frame / address if necessary
+  const variablet &var=find_variable_for_slot(address, var_list);
+
+  if(var.symbol_expr.get_identifier().empty())
+  {
+    // an un-named local variable
+    irep_idt base_name="anonlocal::"+id2string(number)+type_char;
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+    symbol_exprt result(identifier, t);
+    result.set(ID_C_base_name, base_name);
+    used_local_names.insert(result);
+    return result;
+  }
+  else
+  {
+    exprt result=var.symbol_expr;
+    if(do_cast==CAST_AS_NEEDED && t!=result.type())
+      result=typecast_exprt(result, t);
+    return result;
+  }
+}
+
+symbol_exprt java_bytecode_convert_methodt::tmp_variable(
+  const std::string &prefix, const typet &type)
+{
+  irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
+  irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+  auxiliary_symbolt tmp_symbol;
+  tmp_symbol.base_name=base_name;
+  tmp_symbol.is_static_lifetime=false;
+  tmp_symbol.mode=ID_java;
+  tmp_symbol.name=identifier;
+  tmp_symbol.type=type;
+  symbol_table.add(tmp_symbol);
+
+  symbol_exprt result(identifier, type);
+  result.set(ID_C_base_name, base_name);
+  tmp_vars.push_back(result);
+
+  return result;
+}
+
+irep_idt java_bytecode_convert_methodt::label(const irep_idt &address)
+{
+  return "pc"+id2string(address);
+}
+
+exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
+{
+  if(stack.size()<n)
+  {
+    error() << "malformed bytecode (pop too high)" << eom;
+    throw 0;
+  }
+
+  exprt::operandst operands;
+  operands.resize(n);
+  for(std::size_t i=0; i<n; i++)
+    operands[i]=stack[stack.size()-n+i];
+
+  stack.resize(stack.size()-n);
+  return operands;
+}
+
+void java_bytecode_convert_methodt::push(const exprt::operandst &o)
+{
+  stack.resize(stack.size()+o.size());
+
+  for(std::size_t i=0; i<o.size(); i++)
+    stack[stack.size()-o.size()+i]=o[i];
+}
+
+
 
 /*******************************************************************\
 
@@ -537,420 +358,6 @@ void java_bytecode_convert_methodt::convert(
     symbol_table.symbols.erase(s_it); // erase, we stubbed it
 
   symbol_table.add(method_symbol);
-}
-
-typedef java_bytecode_convert_methodt::holet holet;
-typedef java_bytecode_convert_methodt::local_variable_with_holest local_variable_with_holest;
-typedef java_bytecode_convert_methodt::local_variable_table_with_holest local_variable_table_with_holest;
-
-namespace {
-  bool lt_index(const local_variable_with_holest& a,
-                const local_variable_with_holest& b)
-  {
-    return a.var.index<b.var.index;
-  }
-  bool lt_startpc(const local_variable_with_holest* a,
-                  const local_variable_with_holest* b)
-  {
-    return a->var.start_pc<b->var.start_pc;
-  }
-}
-
-// Convert the address-map to a cfg-graph so we can compute dominators:
-
-typedef java_bytecode_convert_methodt::address_mapt address_mapt;
-typedef java_bytecode_convert_methodt::java_cfg_dominatorst java_cfg_dominatorst;
-
-template<class T>
-struct procedure_local_cfg_baset<T,const address_mapt,unsigned> :
-    public graph<cfg_base_nodet<T, unsigned> >
-{
-  typedef std::map<unsigned, unsigned> entry_mapt;
-  entry_mapt entry_map;
-
-  procedure_local_cfg_baset() {}
-
-  void operator()(const address_mapt& amap)
-  {
-    for(const auto& inst : amap)
-    {
-      // Map instruction PCs onto node indices:
-      entry_map[inst.first]=this->add_node();
-      // Map back:
-      (*this)[entry_map[inst.first]].PC=inst.first;
-    }
-    for(const auto& inst : amap)
-    {
-      for(auto succ : inst.second.successors)
-        this->add_edge(entry_map.at(inst.first),entry_map.at(succ));
-    }
-  }
-
-  unsigned get_first_node(const address_mapt& amap) const { return amap.begin()->first; }
-  unsigned get_last_node(const address_mapt& amap) const { return (--amap.end())->first; }
-  unsigned nodes_empty(const address_mapt& amap) const { return amap.empty(); }
-
-};
-
-typedef java_bytecode_convert_methodt::local_variablet local_variablet;
-typedef std::map<local_variable_with_holest*,
-                 std::set<local_variable_with_holest*> > predecessor_mapt;
-
-struct is_predecessor_of
-{
-  const predecessor_mapt& order;
-
-  is_predecessor_of(const predecessor_mapt& _order) : order(_order) {}
-
-  bool operator()(local_variable_with_holest* a,
-                  local_variable_with_holest* b) const
-  {
-    auto findit=order.find(a);
-    if(findit==order.end())
-      return false;
-    return findit->second.count(b)>0;
-  }
-};
-
-static void gather_transitive_predecessors(
-  local_variable_with_holest* start,
-  const predecessor_mapt& predecessor_map,
-  std::set<local_variable_with_holest*>& result)
-{
-  if(!result.insert(start).second)
-    return;
-  auto findit=predecessor_map.find(start);
-  if(findit==predecessor_map.end())
-    return;
-  for(const auto pred : findit->second)
-    gather_transitive_predecessors(pred,predecessor_map,result);
-}
-
-static bool is_store_to_slot(
-  const java_bytecode_convert_methodt::instructiont& inst,
-  unsigned slotidx)
-{
-  const std::string prevstatement=id2string(inst.statement);
-  if(!(prevstatement.size()>=1 && prevstatement.substr(1,5)=="store"))
-    return false;
-
-  std::string storeslot;
-  if(inst.args.size()==1)
-  {
-    const auto& arg=inst.args[0];
-    storeslot=id2string(to_constant_expr(arg).get_value());
-  }
-  else
-  {
-    assert(prevstatement[6]=='_' && prevstatement.size()==8);
-    storeslot=prevstatement[7];
-    assert(isdigit(storeslot[0]));
-  }
-  auto storeslotidx=safe_string2unsigned(storeslot);
-  return storeslotidx==slotidx;
-}
-
-static void maybe_add_hole(
-  local_variable_with_holest& var,
-  unsigned from,
-  unsigned to)
-{
-  assert(to>=from);
-  if(to!=from)
-    var.holes.push_back({from,to-from});
-}
-
-void java_bytecode_convert_methodt::find_initialisers_for_slot(
-  local_variable_table_with_holest::iterator firstvar,
-  local_variable_table_with_holest::iterator varlimit,
-  const address_mapt& amap,
-  const java_cfg_dominatorst& doms)
-{
-  // Build a simple map from instruction PC to the variable live in this slot at that PC,
-  // and a map from each variable to variables that flow into it:
-
-  std::vector<local_variable_with_holest*> var_map;
-  predecessor_mapt predecessor_map;
-  for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
-  {
-    if(it->var.start_pc+it->var.length > var_map.size())
-      var_map.resize(it->var.start_pc+it->var.length);
-
-    for(unsigned idx=it->var.start_pc,
-          idxlim=it->var.start_pc+it->var.length;
-        idx!=idxlim; ++idx)
-    {
-      assert((!var_map[idx]) && "Local variable table clash?");
-      var_map[idx]=&*it;
-    }
-  }
-
-  // Now find variables that flow together by walking backwards to find initialisers
-  // or branches from other live ranges:
-
-  for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
-  {
-    // Don't alter parameters:
-    if(it->var.start_pc==0)
-      continue;
-
-    // Find the last instruction within the live range:
-    unsigned end_pc=it->var.start_pc+it->var.length;
-    auto amapit=amap.find(end_pc);
-    auto old_amapit=amapit;
-    --amapit;
-    if(old_amapit==amap.end())
-      assert(end_pc>amapit->first &&
-             "Instruction live range doesn't align to instruction boundary?");
-
-    // Find vartable entries that flow into this one:
-    unsigned new_start_pc=it->var.start_pc;
-    for(; amapit->first >= it->var.start_pc; --amapit)
-    {
-      for(auto pred : amapit->second.predecessors)
-      {
-        auto pred_var=var_map[pred];
-        if(pred_var==&*it)
-        {
-          // Flow from within same live range?
-          continue;
-        }
-        else if(!pred_var)
-        {
-          // Flow from out of range?
-          // Check if this is an initialiser, and if so expand the live range
-          // to include it, but don't check its predecessors:
-          auto inst_before_this=amapit;
-          --inst_before_this;
-          if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
-            throw "Local variable table: unexpected flow from out of range";
-          if(!is_store_to_slot(*(inst_before_this->second.source),it->var.index))
-            throw "Local variable table: didn't find expected initialising store";
-          new_start_pc=pred;
-        }
-        else {
-          if(pred_var->var.name!=it->var.name || pred_var->var.signature!=it->var.signature)
-            throw "Local variable table: flow from variable with clashing name or signature";
-          // OK, this is a flow from a similar but distinct entry in the local var table.
-          predecessor_map[&*it].insert(pred_var);
-        }
-      }
-    }
-
-    // If a simple pre-block initialiser was found, add it to the live range now:
-    it->var.length+=(it->var.start_pc-new_start_pc);
-    it->var.start_pc=new_start_pc;
-
-  }
-
-  // OK, we've established the flows all seem sensible. Now merge vartable entries
-  // according to the predecessor_map:
-
-  // Top-sort so that we get the bottom variables first:
-  is_predecessor_of comp(predecessor_map);
-  std::vector<local_variable_with_holest*> topsorted_vars;
-  for(auto it=firstvar,itend=varlimit; it!=itend; ++it)
-    topsorted_vars.push_back(&*it);
-
-  std::sort(topsorted_vars.begin(),topsorted_vars.end(),comp);
-
-  // Now merge the entries:
-  for(auto merge_into : topsorted_vars)
-  {
-    // Already merged into another variable?
-    if(merge_into->var.length==0)
-      continue;
-
-    std::set<local_variable_with_holest*> merge_vars;
-    gather_transitive_predecessors(merge_into,predecessor_map,merge_vars);
-    if(merge_vars.size()==1)
-      continue;
-
-    // Because we need a lexically-scoped declaration, we must have the merged variable
-    // enter scope both in a block that dominates all entries, and which
-    // precedes them in program order.
-    unsigned first_pc=var_map.size();
-    unsigned last_pc=0;
-    for(auto v : merge_vars)
-    {
-      if(v->var.start_pc < first_pc)
-        first_pc = v->var.start_pc;
-      if(v->var.start_pc+v->var.length > last_pc)
-        last_pc=v->var.start_pc+v->var.length;
-    }
-
-    std::vector<unsigned> candidate_dominators;
-    for(auto v : merge_vars)
-    {
-      const auto& this_var_doms=doms.cfg[doms.cfg.entry_map.at(v->var.start_pc)].dominators;
-      for(const auto this_var_dom : this_var_doms)
-        if(this_var_dom <= first_pc)
-          candidate_dominators.push_back(this_var_dom);
-    }
-    std::sort(candidate_dominators.begin(),candidate_dominators.end());
-
-    // Working from the back, simply find the first PC that occurs merge_vars.size()
-    // times and therefore dominates all vars we seek to merge:
-
-    unsigned found_dominator=var_map.size();
-    for(auto domit=candidate_dominators.rbegin(), domitend=candidate_dominators.rend();
-        domit != domitend && found_dominator==var_map.size(); /* Don't increment here */)
-    {
-      unsigned repeats=0;
-      auto dom=*domit;
-      while(domit!=domitend && *domit==dom)
-      {
-        ++domit;
-        ++repeats;
-      }
-      assert(repeats<=merge_vars.size());
-      if(repeats==merge_vars.size())
-        found_dominator=dom;
-    }
-
-    if(found_dominator==var_map.size())
-      throw "Variable live ranges with no common dominator?";
-
-    // Populate the holes in the live range (addresses where the new variable
-    // will be in scope, but references to this stack slot should not resolve to it
-    // as it was not visible in the original local variable table)
-    std::vector<local_variable_with_holest*> sorted_by_startpc(
-      merge_vars.begin(),merge_vars.end());
-    std::sort(sorted_by_startpc.begin(),sorted_by_startpc.end(),lt_startpc);
-
-    maybe_add_hole(*merge_into,found_dominator,sorted_by_startpc[0]->var.start_pc);
-    for(unsigned idx=0; idx<sorted_by_startpc.size()-1; ++idx)
-      maybe_add_hole(*merge_into,
-                     sorted_by_startpc[idx]->var.start_pc + sorted_by_startpc[idx]->var.length,
-                     sorted_by_startpc[idx+1]->var.start_pc);
-
-    // Apply the changes:
-    merge_into->var.start_pc=found_dominator;
-    merge_into->var.length=last_pc-found_dominator;
-
-    #ifdef DEBUG
-    status() << "Merging " << merge_vars.size() << " variables named " << merge_into->var.name <<
-      "; new live range " << merge_into->var.start_pc << "-" <<
-      merge_into->var.start_pc + merge_into->var.length << eom;
-    #endif
-
-    // Nuke the now-subsumed var-table entries:
-    for(auto& v : merge_vars)
-      if(v!=merge_into)
-        v->var.length=0;
-
-  }
-
-}
-
-static void walk_to_next_index(
-  local_variable_table_with_holest::iterator& it1,
-  local_variable_table_with_holest::iterator& it2,
-  local_variable_table_with_holest::iterator itend)
-{
-  if(it2==itend)
-  {
-    it1=itend;
-    return;
-  }
-
-  auto old_it2=it2;
-  auto index=it2->var.index;
-  while(it2!=itend && it2->var.index==index)
-    ++it2;
-  it1=old_it2;
-}
-
-void java_bytecode_convert_methodt::find_initialisers(
-  local_variable_table_with_holest& vars,
-  const address_mapt& amap,
-  const java_cfg_dominatorst& doms)
-{
-  // Handle one stack slot at a time:
-  std::sort(vars.begin(),vars.end(),lt_index);
-
-  auto it1=vars.begin();
-  auto it2=it1;
-  auto itend=vars.end();
-  walk_to_next_index(it1,it2,itend);
-  for(; it1!=itend; walk_to_next_index(it1,it2,itend))
-    find_initialisers_for_slot(it1,it2,amap,doms);
-}
-
-void java_bytecode_convert_methodt::setup_local_variables(const methodt& m,
-                                                          const address_mapt& amap)
-{
-  // Compute CFG dominator tree
-  java_cfg_dominatorst doms;
-  doms(amap);
-
-  // Find out which local variable table entries should be merged:
-  // Wrap each entry so we have somewhere to record live ranges with holes:
-  std::vector<local_variable_with_holest> vars_with_holes;
-  for(const auto& v : m.local_variable_table)
-    vars_with_holes.push_back({v, {}});
-
-  find_initialisers(vars_with_holes,amap,doms);
-
-  // Clean up removed records from the variable table:
-
-  size_t toremove=0;
-  for(size_t i=0; i<(vars_with_holes.size()-toremove); ++i)
-  {
-    auto& v=vars_with_holes[i];
-    if(v.var.length==0)
-    {
-      // Move to end; consider the new element we've swapped in:
-      ++toremove;
-      if(i!=vars_with_holes.size()-toremove) // Already where it needs to be?
-        std::swap(v,vars_with_holes[vars_with_holes.size()-toremove]);
-      --i;
-    }
-  }
-
-  // Remove un-needed entries.
-  vars_with_holes.resize(vars_with_holes.size()-toremove);
-
-  // Do the locals and parameters in the variable table, which is available when
-  // compiled with -g or for methods with many local variables in the latter
-  // case, different variables can have the same index, depending on the
-  // context.
-  //
-  // to calculate which variable to use, one uses the address of the instruction
-  // that uses the variable, the size of the instruction and the start_pc /
-  // length values in the local variable table
-  for(const auto & v : vars_with_holes)
-  {
-    if(v.var.start_pc==0) // Parameter?
-      continue;
-
-    typet t=java_type_from_string(v.var.signature);
-    std::ostringstream id_oss;
-    id_oss << method_id << "::" << v.var.start_pc << "::" << v.var.name;
-    irep_idt identifier(id_oss.str());
-    symbol_exprt result(identifier, t);
-    result.set(ID_C_base_name, v.var.name);
-
-    variables[v.var.index].push_back(variablet());
-    auto& newv=variables[v.var.index].back();
-    newv.symbol_expr = result;
-    newv.start_pc = v.var.start_pc;
-    newv.length = v.var.length;
-    newv.holes=std::move(v.holes);
-
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=t;
-    new_symbol.base_name=v.var.name;
-    new_symbol.pretty_name=id2string(identifier).substr(6, std::string::npos);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
-    new_symbol.is_file_local=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_lvalue=true;
-    symbol_table.add(new_symbol);
-  }
-
 }
 
 /*******************************************************************\
