@@ -1,6 +1,13 @@
+/*******************************************************************\
 
-#ifndef JBCM_CLASS_H
-#define JBCM_CLASS_H
+Module: JAVA Bytecode Language Conversion
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
+#define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 
 #include <util/expanding_vector.h>
 #include <util/message.h>
@@ -41,7 +48,8 @@ protected:
   typet method_return_type;
 
 public:
-  struct holet {
+  struct holet
+  {
     unsigned start_pc;
     unsigned length;
   };
@@ -52,7 +60,8 @@ public:
     std::vector<holet> holes;
   };
 
-  typedef std::vector<local_variable_with_holest> local_variable_table_with_holest;
+  typedef std::vector<local_variable_with_holest>
+    local_variable_table_with_holest;
 
 protected:
   class variablet
@@ -120,10 +129,10 @@ protected:
 
 public:
   typedef std::map<unsigned, converted_instructiont> address_mapt;
-  typedef cfg_dominators_templatet<const address_mapt,unsigned,false> java_cfg_dominatorst;
+  typedef cfg_dominators_templatet<const address_mapt, unsigned, false>
+    java_cfg_dominatorst;
 
 protected:
-
   void find_initialisers(
     local_variable_table_with_holest& vars,
     const address_mapt& amap,
