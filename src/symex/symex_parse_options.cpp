@@ -119,7 +119,7 @@ void symex_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   // all checks supported by goto_check
-  GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -695,7 +695,7 @@ void symex_parse_optionst::help()
     " --function name              set main function name\n"
     "\n"
     "Program instrumentation options:\n"
-    GOTO_CHECK_HELP
+    HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"

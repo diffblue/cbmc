@@ -29,13 +29,13 @@ void goto_check(
   const optionst &options,
   goto_modelt &goto_model);
 
-#define GOTO_CHECK_OPTIONS \
+#define OPT_GOTO_CHECK \
   "(bounds-check)(pointer-check)(memory-leak-check)" \
   "(div-by-zero-check)(signed-overflow-check)(unsigned-overflow-check)" \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)" \
   "(float-overflow-check)(nan-check)"
 
-#define GOTO_CHECK_HELP \
+#define HELP_GOTO_CHECK \
   " --bounds-check               enable array bounds checks\n" \
   " --pointer-check              enable pointer checks\n" \
   " --memory-leak-check          enable memory leak checks\n" \
@@ -48,7 +48,7 @@ void goto_check(
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
 
-#define GOTO_CHECK_PARSE_OPTIONS(cmdline, options) \
+#define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \

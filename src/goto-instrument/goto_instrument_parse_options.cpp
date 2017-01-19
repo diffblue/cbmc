@@ -884,7 +884,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     options.set_option("assert-to-assume", false);
 
   // all checks supported by goto_check
-  GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -1463,7 +1463,7 @@ void goto_instrument_parse_optionst::help()
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
-    GOTO_CHECK_HELP
+    HELP_GOTO_CHECK
     " --uninitialized-check        add checks for uninitialized locals (experimental)\n" // NOLINT(*)
     " --error-label label          check that label is unreachable\n"
     " --stack-depth n              add check that call stack size of non-inlined functions never exceeds n\n" // NOLINT(*)
