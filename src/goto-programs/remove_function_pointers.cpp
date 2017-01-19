@@ -212,7 +212,7 @@ bool remove_function_pointerst::try_get_from_address_of(
 {
   if(expr.id()==ID_address_of)
   {
-    address_of_exprt address_of_expr=to_address_of_expr(expr);
+    const address_of_exprt &address_of_expr=to_address_of_expr(expr);
 
     exprt precise_expr;
     if(try_get_precise_call(address_of_expr.object(), precise_expr))
@@ -261,7 +261,7 @@ bool remove_function_pointerst::try_get_call_from_symbol(
   {
     const symbolt &symbol=
       symbol_table.lookup(symbol_expr.get(ID_identifier));
-    exprt looked_up_val=symbol.value;
+    const exprt &looked_up_val=symbol.value;
     exprt precise_expr;
     if(try_get_precise_call(looked_up_val, precise_expr))
     {
@@ -315,7 +315,7 @@ bool remove_function_pointerst::try_get_call_from_index(
 {
   if(expr.id()==ID_index)
   {
-    index_exprt index_expr=to_index_expr(expr);
+    const index_exprt &index_expr=to_index_expr(expr);
 
     array_exprt array_expr;
     if(try_get_array_from_index(index_expr, array_expr))
@@ -417,7 +417,7 @@ bool remove_function_pointerst::try_evaluate_index_value(
 {
   if(index_value_expr.id()==ID_constant)
   {
-    constant_exprt constant_expr=to_constant_expr(index_value_expr);
+    const constant_exprt &constant_expr=to_constant_expr(index_value_expr);
     mp_integer array_index;
     bool errors=to_integer(constant_expr, array_index);
     if(!errors)
@@ -466,7 +466,7 @@ Function: remove_function_pointerst::try_get_array_from_index
 bool remove_function_pointerst::try_get_array_from_index(
   const index_exprt &index_expr, array_exprt &out_array_expr)
 {
-  exprt array_expr=index_expr.array();
+  const exprt &array_expr=index_expr.array();
   if(array_expr.id()==ID_array)
   {
     out_array_expr=to_array_expr(array_expr);
