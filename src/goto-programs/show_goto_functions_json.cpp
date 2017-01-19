@@ -77,11 +77,8 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
       {
         json_objectt instruction_entry=json_objectt();
 
-        std::ostringstream instruction_id_builder;
-        instruction_id_builder << instruction.type;
-
         instruction_entry["instructionId"]=
-          json_stringt(instruction_id_builder.str());
+          json_stringt(instruction.to_string());
 
         if(instruction.code.source_location().is_not_nil())
         {

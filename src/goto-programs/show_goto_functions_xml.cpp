@@ -91,11 +91,8 @@ xmlt show_goto_functions_xmlt::get_goto_functions(
       {
         xmlt &instruction_entry=xml_instructions.new_element("instruction");
 
-        std::ostringstream instruction_id_builder;
-        instruction_id_builder << instruction.type;
-
         instruction_entry.set_attribute(
-          "instruction_id", instruction_id_builder.str());
+          "instruction_id", instruction.to_string());
 
         if(instruction.code.source_location().is_not_nil())
         {
