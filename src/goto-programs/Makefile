@@ -19,6 +19,7 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       class_hierarchy.cpp show_goto_functions.cpp get_goto_model.cpp \
       slice_global_inits.cpp goto_inline_class.cpp class_identifier.cpp \
       show_goto_functions_json.cpp \
+      show_goto_functions_xml.cpp \
       remove_static_init_loops.cpp remove_instanceof.cpp
 
 INCLUDES= -I ..

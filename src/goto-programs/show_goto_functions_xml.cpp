@@ -9,7 +9,8 @@ Author: Thomas Kiley
 #include <iostream>
 #include <sstream>
 
-#include <util/json_expr.h>
+
+#include <util/xml_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
@@ -17,28 +18,29 @@ Author: Thomas Kiley
 
 #include "goto_functions.h"
 #include "goto_model.h"
-#include "show_goto_functions_json.h"
+
+#include "show_goto_functions_xml.h"
 
 /*******************************************************************\
 
-Function: show_goto_functions_jsont::show_goto_functions_jsont
+Function: show_goto_functions_xmlt::show_goto_functions_xmlt
 
   Inputs:
    ns - the namespace to use to resolve names with
 
  Outputs:
 
- Purpose: For outputing the GOTO program in a readable JSON format.
+ Purpose: For outputing the GOTO program in a readable xml format.
 
 \*******************************************************************/
 
-show_goto_functions_jsont::show_goto_functions_jsont(const namespacet &ns):
+show_goto_functions_xmlt::show_goto_functions_xmlt(const namespacet &ns):
   ns(ns)
 {}
 
 /*******************************************************************\
 
-Function: show_goto_functions_jsont::show_goto_functions
+Function: show_goto_functions_xmlt::show_goto_functions
 
   Inputs:
    goto_functions - the goto functions that make up the program
@@ -46,93 +48,101 @@ Function: show_goto_functions_jsont::show_goto_functions
  Outputs:
 
  Purpose: Walks through all of the functions in the program and returns
-          a JSON object representing all their functions
+          an xml object representing all their functions. Produces output
+          like this:
+          <functions>
+            <function name=main, is_body_available=true, is_internal=false>
+              <instructions>
+                <instruction_id=ASSIGN>
+                  <location file="main.c" line="14"/>
+                    <instruction_value>
+        // 34 file main.c line 1
+        s = { 'a', 'b', 'c', 0 };
+                  </instruction_value>
+                </instruction>
+              </instructions>
+            </function>
+          </functions>
 
 \*******************************************************************/
 
-json_objectt show_goto_functions_jsont::get_goto_functions(
+xmlt show_goto_functions_xmlt::get_goto_functions(
   const goto_functionst &goto_functions)
 {
-  json_arrayt json_functions;
+  xmlt xml_functions=xmlt("functions");
   for(const auto &function_entry : goto_functions.function_map)
   {
     const irep_idt &function_name=function_entry.first;
     const goto_functionst::goto_functiont &function=function_entry.second;
 
-    json_objectt &json_function=
-      json_functions.push_back(jsont()).make_object();
-    json_function["name"]=json_stringt(id2string(function_name));
-    json_function["isBodyAvailable"]=
-      jsont::json_boolean(function.body_available());
+    xmlt &xml_function=xml_functions.new_element("function");
+    xml_function.set_attribute("name", id2string(function_name));
+    xml_function.set_attribute_bool(
+      "is_body_available", function.body_available());
     bool is_internal=(has_prefix(id2string(function_name), CPROVER_PREFIX) ||
                       function_name==ID__start);
-    json_function["isInternal"]=jsont::json_boolean(is_internal);
+    xml_function.set_attribute_bool("is_internal", is_internal);
 
     if(function.body_available())
     {
-      json_arrayt json_instruction_array=json_arrayt();
-
+      xmlt &xml_instructions=xml_function.new_element("instructions");
       for(const goto_programt::instructiont &instruction :
         function.body.instructions)
       {
-        json_objectt instruction_entry=json_objectt();
+        xmlt &instruction_entry=xml_instructions.new_element("instruction");
 
         std::ostringstream instruction_id_builder;
         instruction_id_builder << instruction.type;
 
-        instruction_entry["instructionId"]=
-          json_stringt(instruction_id_builder.str());
+        instruction_entry.set_attribute(
+          "instruction_id", instruction_id_builder.str());
 
         if(instruction.code.source_location().is_not_nil())
         {
-          instruction_entry["sourceLocation"]=
-            json(instruction.code.source_location());
+          instruction_entry.new_element(
+            xml(instruction.code.source_location()));
         }
 
         std::ostringstream instruction_builder;
         function.body.output_instruction(
           ns, function_name, instruction_builder, instruction);
 
-        instruction_entry["instruction"]=
-          json_stringt(instruction_builder.str());
-
-        json_instruction_array.push_back(instruction_entry);
+        xmlt &instruction_value=
+          instruction_entry.new_element("instruction_value");
+        instruction_value.data=instruction_builder.str();
+        instruction_value.elements.clear();
       }
-
-      json_function["instructions"]=json_instruction_array;
     }
   }
-  json_objectt json_result;
-  json_result["functions"]=json_functions;
-  return json_result;
+  return xml_functions;
 }
 
 /*******************************************************************\
 
-Function: show_goto_functions_jsont::print_goto_functions
+Function: show_goto_functions_xmlt::print_goto_functions
 
   Inputs:
    goto_functions - the goto functions that make up the program
    out - the stream to write the object to
    append - should a command and newline be appended to the stream
-            before writing the JSON object. Defaults to true
+            before writing the xml object. Defaults to true
 
  Outputs:
 
- Purpose: Print the json object generated by
-          show_goto_functions_jsont::show_goto_functions to the provided
+ Purpose: Print the xml object generated by
+          show_goto_functions_xmlt::show_goto_functions to the provided
           stream (e.g. std::cout)
 
 \*******************************************************************/
 
-void show_goto_functions_jsont::print_goto_functions(
+void show_goto_functions_xmlt::print_goto_functions(
   const goto_functionst &goto_functions,
   std::ostream &out,
   bool append)
 {
   if(append)
   {
-    out << ",\n";
+    out << "\n";
   }
   out << get_goto_functions(goto_functions);
 }

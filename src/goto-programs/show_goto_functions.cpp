@@ -17,6 +17,7 @@ Author: Peter Schrammel
 
 #include <langapi/language_util.h>
 #include <goto-programs/show_goto_functions_json.h>
+#include <goto-programs/show_goto_functions_xml.h>
 
 #include "show_goto_functions.h"
 #include "goto_functions.h"
@@ -43,15 +44,8 @@ void show_goto_functions(
   {
   case ui_message_handlert::XML_UI:
   {
-    //This only prints the list of functions
-    xmlt xml_functions("functions");
-    forall_goto_functions(it, goto_functions)
-    {
-      xmlt &xml_function=xml_functions.new_element("function");
-      xml_function.set_attribute("name", id2string(it->first));
-    }
-
-    std::cout << xml_functions << std::endl;
+    show_goto_functions_xmlt xml_show_functions(ns);
+    xml_show_functions.print_goto_functions(goto_functions, std::cout);
   }
   break;
 
