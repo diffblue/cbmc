@@ -290,6 +290,9 @@ Function: languaget::is_symbol_opaque_function
 bool languaget::is_symbol_opaque_function(const symbolt &symbol)
 {
   std::set<std::string> headers;
+  // Don't create stubs for symbols like:
+  // __CPROVER_blah (which aren't real external functions)
+  // and strstr (which we will model for ourselves later)
   bool is_internal=system_symbols.is_symbol_internal_symbol(symbol, headers);
 
   return !symbol.is_type &&
