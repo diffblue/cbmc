@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type_eq.h>
 
 #include <ansi-c/c_types.h>
+#include <ansi-c/c_qualifiers.h>
 
 #include "remove_skip.h"
 #include "remove_function_pointers.h"
@@ -182,6 +183,7 @@ bool remove_function_pointerst::try_get_precise_call(
   if(expr.id()==ID_symbol && expr.type().id()==ID_code)
   {
     out_function=to_symbol_expr(expr);
+    return true;
   }
   else
   {
@@ -264,6 +266,7 @@ bool remove_function_pointerst::try_get_call_from_symbol(
     if(try_get_precise_call(looked_up_val, precise_expr))
     {
       out_functions.push_back(precise_expr);
+      return true;
     }
     else if(try_get_from_address_of(looked_up_val, out_functions))
     {
@@ -317,51 +320,72 @@ bool remove_function_pointerst::try_get_call_from_index(
     array_exprt array_expr;
     if(try_get_array_from_index(index_expr, array_expr))
     {
-      mp_integer value;
-      if(try_evaluate_index_value(index_expr.index(), value))
+      // Here we require an array of constant pointers to
+      // code (i.e. the pointers cannot be reassigned).
+      // Since it is an array
+      const typet &array_type=array_expr.type();
+      const typet &array_contents_type=array_type.subtype();
+      c_qualifierst array_qaulifiers;
+      array_qaulifiers.read(array_contents_type);
+      if(array_qaulifiers.is_constant)
       {
-        const exprt &func_expr=array_expr.operands()[integer2size_t(value)];
-        exprt precise_match;
-        if(try_get_precise_call(func_expr, precise_match))
+        mp_integer value;
+        if(try_evaluate_index_value(index_expr.index(), value))
         {
-          out_functions.push_back(precise_match);
-        }
-        else if(try_get_from_address_of(func_expr, out_functions))
-        {
-        }
-        else if(try_get_call_from_symbol(func_expr, out_functions))
-        {
+          const exprt &func_expr=array_expr.operands()[integer2size_t(value)];
+          exprt precise_match;
+          if(try_get_precise_call(func_expr, precise_match))
+          {
+            out_functions.push_back(precise_match);
+            return true;
+          }
+          else if(try_get_from_address_of(func_expr, out_functions))
+          {
+            return true;
+          }
+          else if(try_get_call_from_symbol(func_expr, out_functions))
+          {
+            return true;
+          }
+          else
+          {
+            return false;
+          }
         }
         else
         {
-          return false;
+          // We don't know what index it is,
+          // but we know the value is from the array
+          for(const exprt &op : array_expr.operands())
+          {
+            exprt precise_match;
+            if(try_get_precise_call(op, precise_match))
+            {
+              out_functions.push_back(precise_match);
+            }
+            else if(try_get_from_address_of(op, out_functions))
+            {
+            }
+            else if(try_get_call_from_symbol(op, out_functions))
+            {
+            }
+            else
+            {
+              // return false?
+              // in this case there is an element
+            }
+          }
+          return out_functions.size() > 0;
         }
       }
       else
       {
-        // We don't know what index it is,
-        // but we know the value is from the array
-        for(const exprt &op : array_expr.operands())
-        {
-          exprt precise_match;
-          if(try_get_precise_call(op, precise_match))
-          {
-            out_functions.push_back(precise_match);
-          }
-          else if(try_get_from_address_of(op, out_functions))
-          {
-          }
-          else if(try_get_call_from_symbol(op, out_functions))
-          {
-          }
-          else
-          {
-            // return false?
-            // in this case there is an element
-          }
-        }
-        return out_functions.size() > 0;
+        return false;
       }
+    }
+    else
+    {
+      return false;
     }
   }
   else
