@@ -220,13 +220,9 @@ bool remove_function_pointerst::try_get_from_address_of(
       out_functions.push_back(precise_expr);
       return true;
     }
-    else if(try_get_call_from_symbol(address_of_expr.object(), out_functions))
-    {
-      return true;
-    }
     else
     {
-      return false;
+      return try_get_call_from_symbol(address_of_expr.object(), out_functions);
     }
   }
   else
@@ -268,22 +264,14 @@ bool remove_function_pointerst::try_get_call_from_symbol(
       out_functions.push_back(precise_expr);
       return true;
     }
-    else if(try_get_from_address_of(looked_up_val, out_functions))
-    {
-      return true;
-    }
-    else if(try_get_call_from_index(looked_up_val, out_functions))
-    {
-      return true;
-    }
-    else if(try_get_call_from_symbol(looked_up_val, out_functions))
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    bool found_functions=false;
+    found_functions=
+      found_functions||try_get_from_address_of(looked_up_val, out_functions);
+    found_functions=
+      found_functions||try_get_call_from_index(looked_up_val, out_functions);
+    found_functions=
+      found_functions||try_get_call_from_symbol(looked_up_val, out_functions);
+    return found_functions;
   }
   else
   {
@@ -334,23 +322,19 @@ bool remove_function_pointerst::try_get_call_from_index(
         {
           const exprt &func_expr=array_expr.operands()[integer2size_t(value)];
           exprt precise_match;
+
           if(try_get_precise_call(func_expr, precise_match))
           {
             out_functions.push_back(precise_match);
             return true;
           }
-          else if(try_get_from_address_of(func_expr, out_functions))
-          {
-            return true;
-          }
-          else if(try_get_call_from_symbol(func_expr, out_functions))
-          {
-            return true;
-          }
-          else
-          {
-            return false;
-          }
+          bool found_functions=false;
+          found_functions=
+            found_functions||try_get_from_address_of(func_expr, out_functions);
+          found_functions=
+            found_functions||try_get_call_from_symbol(func_expr, out_functions);
+
+          return found_functions;
         }
         else
         {
@@ -363,17 +347,11 @@ bool remove_function_pointerst::try_get_call_from_index(
             {
               out_functions.push_back(precise_match);
             }
-            else if(try_get_from_address_of(op, out_functions))
-            {
-            }
-            else if(try_get_call_from_symbol(op, out_functions))
-            {
-            }
-            else
-            {
-              // return false?
-              // in this case there is an element
-            }
+            bool found_functions=false;
+            found_functions=
+              found_functions||try_get_from_address_of(op, out_functions);
+            found_functions=
+              found_functions||try_get_call_from_symbol(op, out_functions);
           }
           return out_functions.size() > 0;
         }
@@ -437,7 +415,6 @@ bool remove_function_pointerst::try_evaluate_index_value(
   else if(index_value_expr.id()==ID_typecast)
   {
     // Follow the typecast
-
     return try_evaluate_index_value(index_value_expr.op0(), out_array_index);
   }
   else
@@ -723,23 +700,15 @@ void remove_function_pointerst::remove_function_pointer(
 
   exprt precise_call;
   functionst functions;
+  bool found_functions=false;
   if(try_get_precise_call(pointer, precise_call))
   {
     to_code_function_call(target->code).function()=precise_call;
     return;
   }
-  else if(try_get_from_address_of(pointer, functions))
-  {
-
-  }
-  else if(try_get_call_from_symbol(pointer, functions))
-  {
-
-  }
-  else if(try_get_call_from_index(pointer, functions))
-  {
-
-  }
+  found_functions=found_functions||try_get_from_address_of(pointer, functions);
+  found_functions=found_functions||try_get_call_from_symbol(pointer, functions);
+  found_functions=found_functions||try_get_call_from_index(pointer, functions);
 
   if(functions.size()==1)
   {
@@ -749,7 +718,7 @@ void remove_function_pointerst::remove_function_pointer(
 
   // if the functions list is still empty we didn't have any luck finding
   // any valid funcitons (or there are none??)
-  if(functions.size()==0)
+  if(!found_functions)
   {
     bool return_value_used=code.lhs().is_not_nil();
 
@@ -773,6 +742,10 @@ void remove_function_pointerst::remove_function_pointer(
       expr.set_identifier(t.first);
       functions.push_back(expr);
     }
+  }
+  else
+  {
+    assert(functions.size()>0);
   }
 
   // the final target is a skip
