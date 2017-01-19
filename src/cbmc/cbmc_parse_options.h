@@ -30,7 +30,7 @@ class optionst;
   "D:I:(c89)(c99)(c11)(cpp89)(cpp99)(cpp11)" \
   "(classpath):(cp):(main-class):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
-  GOTO_CHECK_OPTIONS \
+  OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(xml-ui)(xml-interface)(json-ui)" \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(opensmt)(mathsat)" \

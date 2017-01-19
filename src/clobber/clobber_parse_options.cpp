@@ -112,7 +112,7 @@ void clobber_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("unwindset", cmdline.get_value("unwindset"));
 
   // all checks supported by goto_check
-  GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
+  PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -673,7 +673,7 @@ void clobber_parse_optionst::help()
     " --round-to-zero              IEEE floating point rounding mode\n"
     "\n"
     "Program instrumentation options:\n"
-    GOTO_CHECK_HELP
+    HELP_GOTO_CHECK
     " --show-properties            show the properties\n"
     " --no-assertions              ignore user assertions\n"
     " --no-assumptions             ignore user assumptions\n"

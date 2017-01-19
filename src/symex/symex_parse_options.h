@@ -28,7 +28,7 @@ class optionst;
   "(function):" \
   "D:I:" \
   "(depth):(context-bound):(branch-bound):(unwind):" \
-  GOTO_CHECK_OPTIONS \
+  OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \

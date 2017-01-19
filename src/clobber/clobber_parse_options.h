@@ -22,7 +22,7 @@ class optionst;
 
 #define CLOBBER_OPTIONS \
   "(depth):(context-bound):(unwind):" \
-  GOTO_CHECK_OPTIONS \
+  OPT_GOTO_CHECK \
   OPT_SHOW_GOTO_FUNCTIONS \
   "(no-assertions)(no-assumptions)" \
   "(error-label):(verbosity):(no-library)" \
