@@ -27,7 +27,15 @@ class java_bytecode_convert_methodt:public messaget
 public:
   java_bytecode_convert_methodt(
     symbol_tablet &_symbol_table,
-    message_handlert &_message_handler);
+    message_handlert &_message_handler,
+    bool _disable_runtime_checks,
+    size_t _max_array_length):
+    messaget(_message_handler),
+    symbol_table(_symbol_table),
+    disable_runtime_checks(_disable_runtime_checks),
+    max_array_length(_max_array_length)
+  {
+  }
 
   typedef java_bytecode_parse_treet::methodt methodt;
   typedef java_bytecode_parse_treet::instructiont instructiont;
@@ -41,9 +49,11 @@ public:
   }
 
 protected:
-  irep_idt method_id;
   symbol_tablet &symbol_table;
+  const bool disable_runtime_checks;
+  size_t max_array_length;
 
+  irep_idt method_id;
   irep_idt current_method;
   typet method_return_type;
 
@@ -80,8 +90,21 @@ protected:
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
 
+  typedef enum instruction_sizet
+  {
+    INST_INDEX=2,
+    INST_INDEX_CONST=3
+  } instruction_sizet;
+
+  codet get_array_bounds_check(
+    const exprt &arraystruct,
+    const exprt &idx,
+    const source_locationt& original_sloc);
+
   // return corresponding reference of variable
-  const variablet &find_variable_for_slot(size_t address, variablest &var_list);
+  const variablet &find_variable_for_slot(
+    size_t address,
+    variablest &var_list);
 
   // JVM local variables
   enum variable_cast_argumentt
@@ -112,6 +135,8 @@ protected:
 
   void push(const exprt::operandst &o);
 
+  bool is_constructor(const class_typet::methodt &method);
+
   struct converted_instructiont
   {
     converted_instructiont(
@@ -129,7 +154,7 @@ protected:
 
 public:
   typedef std::map<unsigned, converted_instructiont> address_mapt;
-  typedef std::pair<const methodt&, const address_mapt&> method_with_amapt;
+  typedef std::pair<const methodt &, const address_mapt &> method_with_amapt;
   typedef cfg_dominators_templatet<method_with_amapt, unsigned, false>
     java_cfg_dominatorst;
 
@@ -180,7 +205,6 @@ protected:
 
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
-  void convert(const instructiont &);
 
   codet convert_instructions(
     const methodt &,
