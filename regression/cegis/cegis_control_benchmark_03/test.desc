@@ -1,0 +1,7 @@
+CORE
+safety_stability.c
+--gcc --round-to-minus-inf --cegis-control --cegis-statistics --cegis-max-size 1 --cegis-show-iterations -D CPROVER -D _CONTROL_FLOAT_WIDTH=24 -D _CONTORL_RADIX_WIDTH=12 -D NUMBERLOOPS=10
+EXIT=0
+SIGNAL=0
+--
+warning: ignoring
