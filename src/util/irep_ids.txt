@@ -737,6 +737,7 @@ bswap
 java_bytecode_index
 java_instanceof
 java_super_method_call
+skip_initialize
 java_enum_static_unwind
 string_constraint
 string_not_contains_constraint
