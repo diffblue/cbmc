@@ -123,15 +123,20 @@ public:
     class stack_map_table_entryt
     {
     public:
-      enum stack_frame_type { SAME, SAME_LOCALS_ONE_STACK, SAME_LOCALS_ONE_STACK_EXTENDED,
-                              CHOP, SAME_EXTENDED, APPEND, FULL};
+      enum stack_frame_type
+      {
+        SAME, SAME_LOCALS_ONE_STACK, SAME_LOCALS_ONE_STACK_EXTENDED,
+        CHOP, SAME_EXTENDED, APPEND, FULL
+      };
       stack_frame_type type;
       size_t offset_delta;
       size_t chops;
       size_t appends;
 
-      typedef std::vector<verification_type_infot> local_verification_type_infot;
-      typedef std::vector<verification_type_infot> stack_verification_type_infot;
+      typedef std::vector<verification_type_infot>
+        local_verification_type_infot;
+      typedef std::vector<verification_type_infot>
+        stack_verification_type_infot;
 
       local_verification_type_infot locals;
       stack_verification_type_infot stack;
@@ -142,7 +147,10 @@ public:
 
     virtual void output(std::ostream &out) const;
 
-    inline methodt():is_native(false), is_abstract(false), is_synchronized(false)
+    inline methodt():
+      is_native(false),
+      is_abstract(false),
+      is_synchronized(false)
     {
     }
   };
@@ -151,6 +159,7 @@ public:
   {
   public:
     virtual void output(std::ostream &out) const;
+    bool is_enum;
   };
 
   class classt
@@ -158,6 +167,9 @@ public:
   public:
     irep_idt name, extends;
     bool is_abstract;
+    bool is_enum;
+    size_t enum_elements=0;
+
     typedef std::list<irep_idt> implementst;
     implementst implements;
 
