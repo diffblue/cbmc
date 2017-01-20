@@ -1619,17 +1619,15 @@ void cvc_convt::convert_type(const typet &type)
     const struct_typet::componentst &components=
       struct_type.components();
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(struct_typet::componentt component : components)
     {
-      if(it!=components.begin())
+      if(component!=components.front())
         out << ",";
+
       out << " ";
-      out << it->get(ID_name);
+      out << component.get_name();
       out << ": ";
-      convert_type(it->type());
+      convert_type(component.type());
     }
 
     out << " #]";
