@@ -317,21 +317,11 @@ static size_t get_variable_slots(const code_typet::parametert &param)
   return count_slots(0, param);
 }
 
-static bool is_constructor(const class_typet::methodt &method)
+bool is_constructor(const class_typet::methodt &method)
 {
   const std::string &name(id2string(method.get_name()));
   const std::string::size_type &npos(std::string::npos);
   return npos!=name.find("<init>") || npos!=name.find("<clinit>");
-}
-
-static void cast_if_necessary(binary_relation_exprt &condition)
-{
-  exprt &lhs(condition.lhs());
-  exprt &rhs(condition.rhs());
-  const typet &lhs_type(lhs.type());
-  if(lhs_type==rhs.type())
-    return;
-  rhs=typecast_exprt(rhs, lhs_type);
 }
 
 static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
@@ -1600,7 +1590,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       binary_relation_exprt condition(op[0], cmp_op, op[1]);
 
-      cast_if_necessary(condition);
+      exprt &lhs(condition.lhs());
+      exprt &rhs(condition.rhs());
+      const typet &lhs_type(lhs.type());
+      if(lhs_type!=rhs.type())
+        rhs=typecast_exprt(rhs, lhs_type);
+
       code_branch.cond()=condition;
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.then_case()=code_gotot(label(number));
