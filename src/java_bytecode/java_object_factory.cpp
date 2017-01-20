@@ -9,17 +9,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <sstream>
 
+#include <util/arith_tools.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/expr_util.h>
 
+#include <linking/zero_initializer.h>
+
 #include "java_object_factory.h"
 #include "java_types.h"
-#include "java_utils.h"
 
 /*******************************************************************\
 
@@ -33,13 +36,14 @@ Function: gen_nondet_init
 
 \*******************************************************************/
 
-class java_object_factoryt
+class java_object_factoryt:public messaget
 {
   code_blockt &init_code;
   std::set<irep_idt> recursion_set;
   bool assume_non_null;
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
+  message_handlert &message_handler;
   namespacet ns;
 
 public:
@@ -47,12 +51,15 @@ public:
     code_blockt& _init_code,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
-    symbol_tablet& _symbol_table) :
+    symbol_tablet &_symbol_table,
+    message_handlert &_message_handler):
     init_code(_init_code),
     assume_non_null(_assume_non_null),
     max_nondet_array_length(_max_nondet_array_length),
     symbol_table(_symbol_table),
-    ns(_symbol_table) {}
+    message_handler(_message_handler),
+    ns(_symbol_table)
+    {}
 
   exprt allocate_object(
     const exprt&,
@@ -69,7 +76,8 @@ public:
     const source_locationt &loc,
     bool skip_classid,
     bool create_dynamic_objects,
-    const typet *override_type=0);
+    bool override=false,
+    const typet &override_type=empty_typet());
 };
 
 // Returns false if we can't figure out the size of allocate_type.
@@ -151,10 +159,11 @@ void java_object_factoryt::gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   bool create_dynamic_objects,
-  const typet *override_type)
+  bool override,
+  const typet &override_type)
 {
   const typet &type=
-    override_type ? ns.follow(*override_type) : ns.follow(expr.type());
+    override ? ns.follow(override_type) : ns.follow(expr.type());
 
   if(type.id()==ID_pointer)
   {
@@ -199,17 +208,15 @@ void java_object_factoryt::gen_nondet_init(
         code_assignt(expr, null_pointer_exprt(pointer_type));
       set_null_inst.add_source_location()=loc;
 
-      std::ostringstream fresh_label_oss;
-      fresh_label_oss<<"post_synthetic_malloc_"
-          <<(++synthetic_constructor_count);
-      std::string fresh_label=fresh_label_oss.str();
+      std::string fresh_label=
+        "post_synthetic_malloc_"+std::to_string(++synthetic_constructor_count);
       set_null_label=code_labelt(fresh_label, set_null_inst);
 
       init_done_label=code_labelt(fresh_label+"_init_done", code_skipt());
 
-      code_ifthenelset
-        null_check;
-      exprt null_return=constant_exprt("0", returns_null_sym.type);
+      code_ifthenelset null_check;
+      exprt null_return=
+        zero_initializer(returns_null_sym.type, loc, ns, message_handler);
       null_check.cond()=
         notequal_exprt(returns_null, null_return);
       null_check.then_case()=code_gotot(fresh_label);
@@ -343,7 +350,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const typet &element_type=
     static_cast<const typet &>(expr.type().subtype().find(ID_C_element_type));
 
-  auto max_length_expr=as_number(max_nondet_array_length, java_int_type());
+  auto max_length_expr=from_integer(max_nondet_array_length, java_int_type());
 
   typet allocate_type;
   symbolt &length_sym=new_tmp_symbol(symbol_table, "nondet_array_length");
@@ -355,7 +362,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
-    assume1(length_sym_expr, ID_ge, as_number(0, java_int_type()));
+    assume1(length_sym_expr, ID_ge, from_integer(0, java_int_type()));
   binary_relation_exprt
     assume2(length_sym_expr, ID_le, max_length_expr);
   code_assumet assume_inst1(assume1);
@@ -395,7 +402,7 @@ void java_object_factoryt::gen_nondet_array_init(
   counter.type=length_sym_expr.type();
   exprt counter_expr=counter.symbol_expr();
 
-  exprt java_zero=as_number(0, java_int_type());
+  exprt java_zero=from_integer(0, java_int_type());
   init_code.copy_to_operands(code_assignt(counter_expr, java_zero));
 
   std::string head_name=as_string(counter.base_name)+"_header";
@@ -408,8 +415,7 @@ void java_object_factoryt::gen_nondet_array_init(
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 
-  code_ifthenelset
-    done_test;
+  code_ifthenelset done_test;
   done_test.cond()=equal_exprt(counter_expr, length_sym_expr);
   done_test.then_case()=goto_done;
 
@@ -417,8 +423,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Add a redundant if(counter == max_length) break that is easier for the
   // unwinder to understand.
-  code_ifthenelset
-    max_test;
+  code_ifthenelset max_test;
   max_test.cond()=equal_exprt(counter_expr, max_length_expr);
   max_test.then_case()=goto_done;
 
@@ -435,9 +440,10 @@ void java_object_factoryt::gen_nondet_array_init(
     loc,
     false,
     true,
-    &element_type);
+    true,
+    element_type);
 
-  exprt java_one=as_number(1, java_int_type());
+  exprt java_one=from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
   init_code.move_to_operands(incr);
@@ -466,14 +472,22 @@ void gen_nondet_init(
   bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
+  message_handlert &message_handler,
   size_t max_nondet_array_length)
 {
   java_object_factoryt state(
     init_code,
     assume_non_null,
     max_nondet_array_length,
-    symbol_table);
-  state.gen_nondet_init(expr, false, "", loc, skip_classid, create_dyn_objs);
+    symbol_table,
+    message_handler);
+  state.gen_nondet_init(
+    expr,
+    false,
+    "",
+    loc,
+    skip_classid,
+    create_dyn_objs);
 }
 
 /*******************************************************************\
@@ -543,7 +557,8 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &loc)
+  const source_locationt &loc,
+  message_handlert &message_handler)
 {
   if(type.id()==ID_pointer)
   {
@@ -562,6 +577,7 @@ exprt object_factory(
       false,
       false,
       !allow_null,
+      message_handler,
       max_nondet_array_length);
 
     return object;

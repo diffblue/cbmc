@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
-#include "java_utils.h"
 
 #include <limits>
 #include <algorithm>
@@ -415,7 +414,7 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
   const exprt &idx,
   const source_locationt& original_sloc)
 {
-  constant_exprt intzero=as_number(0, java_int_type());
+  constant_exprt intzero=from_integer(0, java_int_type());
   binary_relation_exprt gezero(idx, ID_ge, intzero);
   const member_exprt length_field(arraystruct, "length", java_int_type());
   binary_relation_exprt ltlength(idx, ID_lt, length_field);
@@ -937,7 +936,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         // The stack isn't modified.
         // TODO: convert assertions to exceptions.
         assert(op.size()==1 && results.size()==1);
-        binary_predicate_exprt check(op[0], "java_instanceof", arg0);
+        binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
         c=code_assertt(check);
         c.add_source_location().set_comment("Dynamic cast check");
         c.add_source_location().set_property_class("bad-dynamic-cast");
@@ -1011,12 +1010,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
 
       code_function_callt call;
-      source_locationt loc;
-      loc=i_it->source_location;
+      source_locationt loc=i_it->source_location;
       loc.set_function(method_id);
-      source_locationt &source_loc=loc;
 
-      call.add_source_location()=source_loc;
+      call.add_source_location()=loc;
       call.arguments()=pop(parameters.size());
 
       // double-check a bit
@@ -1089,7 +1086,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
       }
 
-      call.function().add_source_location()=source_loc;
+      call.function().add_source_location()=loc;
       c=call;
     }
     else if(statement=="return")
@@ -1245,7 +1242,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       code_gotot code_goto(label(number));
       c=code_goto;
-      results[0]=as_number(
+      results[0]=from_integer(
         std::next(i_it)->address,
         pointer_typet(void_typet(), 64));
     }
@@ -1267,9 +1264,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           branches.move_to_operands(g);
         else
         {
-          code_ifthenelset
-            branch;
-          auto address_ptr=as_number(
+          code_ifthenelset branch;
+          auto address_ptr=from_integer(
             jsr_ret_targets[idx],
             pointer_typet(void_typet(), 64));
           branch.cond()=equal_exprt(retvar, address_ptr);
@@ -1311,9 +1307,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       else
       {
-        const size_t value(arg0.get_unsigned_int(ID_value));
+        const unsigned value(arg0.get_unsigned_int(ID_value));
         const typet type=java_type_from_char(statement[0]);
-        results[0]=as_number(value, type);
+        results[0]=from_integer(value, type);
       }
     }
     else if(statement==patternt("?ipush"))
@@ -1326,8 +1322,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
 
-      code_ifthenelset
-        code_branch;
+      code_ifthenelset code_branch;
       const irep_idt cmp_op=get_if_cmp_operator(statement);
 
       binary_relation_exprt condition(op[0], cmp_op, op[1]);
@@ -1360,8 +1355,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
 
-      code_ifthenelset
-        code_branch;
+      code_ifthenelset code_branch;
       code_branch.cond()=
         binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
@@ -1378,8 +1372,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
-      code_ifthenelset
-        code_branch;
+      code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
@@ -1393,8 +1386,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.empty());
       irep_idt number=to_constant_expr(arg0).get_value();
-      code_ifthenelset
-        code_branch;
+      code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
       const exprt rhs(gen_zero(lhs.type()));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
@@ -1506,7 +1498,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[0]=
         if_exprt(
           binary_relation_exprt(op[0], ID_equal, op[1]),
-          gen_zero(t),
+          from_integer(0, t),
           greater);
     }
     else if(statement==patternt("?cmp?"))
@@ -1637,11 +1629,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       // set $assertionDisabled to false
       if(field_name.find("$assertionsDisabled")!=std::string::npos)
-      {
-        exprt e;
-        e.make_false();
-        c=code_assignt(symbol_expr, e);
-      }
+        c=code_assignt(symbol_expr, false_exprt());
     }
     else if(statement=="putfield")
     {
@@ -1721,7 +1709,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!disable_runtime_checks)
       {
         // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=as_number(0, java_int_type());
+        constant_exprt intzero=from_integer(0, java_int_type());
         binary_relation_exprt gezero(op[0], ID_ge, intzero);
         code_assertt check(gezero);
         check.add_source_location().set_comment("Array size < 0");
@@ -1731,7 +1719,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       if(max_array_length!=0)
       {
-        constant_exprt size_limit=as_number(max_array_length, java_int_type());
+        constant_exprt size_limit=from_integer(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
         c.move_to_operands(assume_le_max_size);
@@ -1750,7 +1738,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       op=pop(dimension);
       assert(results.size()==1);
 
-      const pointer_typet ref_type=pointer_typet(arg0.type());
+      const pointer_typet ref_type(arg0.type());
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
