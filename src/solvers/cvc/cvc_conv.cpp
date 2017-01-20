@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <cctype>
+#include <string>
 
 #include <util/arith_tools.h>
 #include <util/std_types.h>
@@ -114,8 +115,8 @@ void cvc_convt::convert_binary_expr(const exprt &expr, const exprt &op)
     {
       out << "(0bin";
 
-      for(unsigned i=from_width; i<to_width; i++)
-        out << "0";
+      if(to_width > from_width)
+        out << std::string(to_width-from_width, '0');
 
       out << " @ ";
 
@@ -136,8 +137,8 @@ void cvc_convt::convert_binary_expr(const exprt &expr, const exprt &op)
     {
       out << "(0bin";
 
-      for(unsigned i=1; i<to_width; i++)
-        out << "0";
+      if(to_width > 1)
+        out << std::string(to_width-1, '0');
 
       out << " @ ";
 
