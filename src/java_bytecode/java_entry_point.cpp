@@ -92,10 +92,7 @@ static bool should_init_symbol(const symbolt& sym)
      sym.mode==ID_java)
     return true;
 
-  if(has_prefix(id2string(sym.name), "java::java.lang.String.Literal"))
-    return true;
-
-  return false;
+  return has_prefix(id2string(sym.name), "java::java.lang.String.Literal");
 }
 
 bool java_static_lifetime_init(
@@ -112,8 +109,7 @@ bool java_static_lifetime_init(
   // external. Iterate over a copy of the symtab, as its iterators are
   // invalidated by object_factory:
 
-  std::vector<irep_idt> symnames;
-  symnames.reserve(symbol_table.symbols.size());
+  std::list<irep_idt> symnames;
   for(const auto& entry : symbol_table.symbols)
     symnames.push_back(entry.first);
 
@@ -144,7 +140,8 @@ bool java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
-          source_location);
+          source_location,
+          message_handler);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
       }
@@ -196,7 +193,8 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length)
+  unsigned max_nondet_array_length,
+  message_handlert &message_handler)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -234,7 +232,8 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
-        function.location);
+        function.location,
+        message_handler);
 
     const symbolt &p_symbol=
       symbol_table.lookup(parameters[param_number].get_identifier());
@@ -459,7 +458,7 @@ main_function_resultt get_main_symbol(
     if(matches.empty())
     {
       // Not found, silently ignore
-      res.main_function=symbolt();
+      res.main_function=symbol;
       res.error_found=false;
       res.stop_convert=true;
       return res;
@@ -596,7 +595,8 @@ bool java_entry_point(
       init_code,
       symbol_table,
       assume_init_pointers_not_null,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      message_handler);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);

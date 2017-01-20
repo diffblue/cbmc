@@ -173,8 +173,8 @@ void java_bytecode_convert_classt::generate_class_stub(
 
   if(symbol_table.move(new_symbol, class_symbol))
   {
-    warning() << "stub class symbol "+
-      id2string(new_symbol.name)+" already exists";
+    warning() << "stub class symbol " << new_symbol.name
+              << " already exists" << eom;
   }
   else
   {
@@ -225,10 +225,7 @@ void java_bytecode_convert_classt::convert(
       symbol_table.symbols.erase(s_it); // erase, we stubbed it
 
     if(symbol_table.add(new_symbol))
-    {
-      error() << "failed to add static field symbol" << eom;
-      throw 0;
-    }
+      assert(false && "failed to add static field symbol");
   }
   else
   {
@@ -276,6 +273,8 @@ void java_bytecode_convert_classt::add_array_types()
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
     struct_type.set_tag(symbol_type.get_identifier());
+
+    struct_type.components().reserve(3);
     struct_typet::componentt
       comp0("@java.lang.Object", symbol_typet("java::java.lang.Object"));
     struct_type.components().push_back(comp0);

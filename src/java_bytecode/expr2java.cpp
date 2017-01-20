@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 
 #include <ansi-c/c_qualifiers.h>
+#include <ansi-c/c_misc.h>
 #include <ansi-c/expr2c_class.h>
 
 #include "java_types.h"
@@ -216,7 +217,8 @@ std::string expr2javat::convert_constant(
     dest.reserve(char_representation_length);
 
     mp_integer int_value;
-    to_integer(src, int_value);
+    if(!to_integer(src, int_value))
+      assert(false);
 
     dest+="(char)'";
 
@@ -238,7 +240,8 @@ std::string expr2javat::convert_constant(
   {
     // No byte-literals in Java, so just cast:
     mp_integer int_value;
-    to_integer(src, int_value);
+    if(!to_integer(src, int_value))
+      assert(false);
     std::string dest="(byte)";
     dest+=integer2string(int_value);
     return dest;
@@ -247,7 +250,8 @@ std::string expr2javat::convert_constant(
   {
     // No short-literals in Java, so just cast:
     mp_integer int_value;
-    to_integer(src, int_value);
+    if(!to_integer(src, int_value))
+      assert(false);
     std::string dest="(short)";
     dest+=integer2string(int_value);
     return dest;
@@ -482,7 +486,7 @@ std::string expr2javat::convert(
   const typet &type=ns.follow(src.type());
   if(src.id()=="java-this")
     return convert_java_this(src, precedence=15);
-  if(src.id()=="java_instanceof")
+  if(src.id()==ID_java_instanceof)
     return convert_java_instanceof(src, precedence=15);
   else if(src.id()==ID_side_effect &&
           (src.get(ID_statement)==ID_java_new ||
@@ -506,7 +510,7 @@ std::string expr2javat::convert(
       ")";
   }
   else if(src.id()==ID_java_string_literal)
-    return '"'+id2string(src.get(ID_value))+'"'; // TODO: add escaping as needed
+    return '"'+MetaString(src.get_string(ID_value))+'"';
   else if(src.id()==ID_constant && (type.id()==ID_bool || type.id()==ID_c_bool))
   {
     if(src.is_true())

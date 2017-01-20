@@ -16,7 +16,6 @@ Author: Peter Schrammel
 #include "config.h"
 
 #include "json_expr.h"
-#include <java_bytecode/expr2java.h>
 /*******************************************************************\
 
 Function: json

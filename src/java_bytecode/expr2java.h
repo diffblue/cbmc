@@ -12,10 +12,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <string>
 #include <ansi-c/expr2c_class.h>
 
-class exprt;
-class namespacet;
-class typet;
-
 class expr2javat:public expr2ct
 {
 public:
@@ -56,7 +52,8 @@ protected:
     const std::string &declarator);
 
   // length of string representation of Java Char
-  const std::size_t char_representation_length=14;
+  // representation is '\u0000'
+  const std::size_t char_representation_length=8;
 };
 
 std::string expr2java(const exprt &expr, const namespacet &ns);

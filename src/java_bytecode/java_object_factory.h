@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
+#include <util/message.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
@@ -18,7 +19,8 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &);
+  const source_locationt &,
+  message_handlert &message_handler);
 
 void gen_nondet_init(
   const exprt &expr,
@@ -28,7 +30,9 @@ void gen_nondet_init(
   bool skip_classid,
   bool create_dynamic_objects,
   bool assume_non_null,
+  message_handlert &message_handler,
   size_t max_nondet_array_length=5);
+
 
 exprt get_nondet_bool(const typet&);
 

@@ -1449,7 +1449,7 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     u2 sourcefile_index=read_u2();
     irep_idt sourcefile_name;
 
-    std::string fqn=std::string(id2string(parsed_class.name));
+    std::string fqn(id2string(parsed_class.name));
     size_t last_index=fqn.find_last_of(".");
     if(last_index==std::string::npos)
       sourcefile_name=pool_entry(sourcefile_index).s;
@@ -1457,8 +1457,8 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     {
       std::string packageName=fqn.substr(0, last_index+1);
       std::replace(packageName.begin(), packageName.end(), '.', '/');
-      const std::string &fullFileName=
-        std::string(packageName+id2string(pool_entry(sourcefile_index).s));
+      const std::string
+        &fullFileName=(packageName+id2string(pool_entry(sourcefile_index).s));
       sourcefile_name=fullFileName;
     }
 

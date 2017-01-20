@@ -93,9 +93,9 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
 
 static void escape_non_alnum(std::string& toescape)
 {
-  for(size_t idx=0, lim=toescape.size(); idx!=lim; ++idx)
-    if(!isalnum(toescape[idx]))
-      toescape[idx]='_';
+  for(auto &ch : toescape)
+  if(!isalnum(ch))
+    ch='_';
 }
 
 /*******************************************************************\

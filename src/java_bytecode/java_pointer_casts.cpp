@@ -24,7 +24,7 @@ Function: clean_deref
 
 \*******************************************************************/
 
-exprt clean_deref(const exprt &ptr)
+static exprt clean_deref(const exprt &ptr)
 {
   return ptr.id()==ID_address_of
              ? ptr.op0()
@@ -50,6 +50,7 @@ bool find_superclass_with_type(
   const typet &target_type,
   const namespacet &ns)
 {
+  assert(ptr.type().id()==ID_pointer);
   while(true)
   {
     const typet ptr_base=ns.follow(ptr.type().subtype());
@@ -59,7 +60,7 @@ bool find_superclass_with_type(
 
     const struct_typet &base_struct=to_struct_type(ptr_base);
 
-    if(base_struct.components().size()==0)
+    if(base_struct.components().empty())
       return false;
 
     const typet &first_field_type=
