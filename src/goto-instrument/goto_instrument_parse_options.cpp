@@ -85,6 +85,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "skip_loops.h"
 #include "code_contracts.h"
 #include "unwind.h"
+#include "model_argc_argv.h"
 
 /*******************************************************************\
 
@@ -920,6 +921,24 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
+  namespacet ns(symbol_table);
+
+  // initialize argv with valid pointers
+  if(cmdline.isset("model-argc-argv"))
+  {
+    unsigned max_argc=
+      safe_string2unsigned(cmdline.get_value("model-argc-argv"));
+
+    status() << "Adding up to " << max_argc
+             << " command line arguments" << eom;
+    if(model_argc_argv(
+        symbol_table,
+        goto_functions,
+        max_argc,
+        get_message_handler()))
+      throw 0;
+  }
+
   // we add the library in some cases, as some analyses benefit
 
   if(cmdline.isset("add-library") ||
@@ -932,8 +951,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
   }
-
-  namespacet ns(symbol_table);
 
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
@@ -1501,6 +1518,7 @@ void goto_instrument_parse_optionst::help()
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
     " --add-library                add models of C library functions\n"
+    " --model-argc-argv <n>        model up to <n> command line arguments\n"
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
