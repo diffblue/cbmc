@@ -1,6 +1,6 @@
 CORE
 main.c
---slice-global-inits --show-goto-functions
+--slice-global-inits
 z = 0;$
 a =
 s2 =

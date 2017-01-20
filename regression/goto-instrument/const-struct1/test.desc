@@ -1,6 +1,6 @@
 KNOWNBUG
 main.c
-"--show-symbol-table"
+--show-symbol-table
 ^Type\.*: struct struct_tag_name$
 ^Type\.*: const double$
 ^EXIT=0$
