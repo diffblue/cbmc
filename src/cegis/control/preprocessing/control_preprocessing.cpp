@@ -51,14 +51,13 @@ bool is_meta(const goto_programt::const_targett pos)
       || CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == var;
 }
 
-void add_explicit_nondet_for_extern_vars(goto_programt::targetst &locs,
-    const symbol_tablet &st, goto_functionst &gf)
+void add_explicit_nondet_for_extern_vars(const symbol_tablet &st,
+    goto_functionst &gf)
 {
   goto_programt &entry_body=get_entry_body(gf);
   goto_programt &init_body=get_body(gf, CPROVER_INIT);
   goto_programt::targett entry_pos=entry_body.instructions.begin();
   goto_programt::targett init_pos=std::prev(init_body.instructions.end(), 1);
-  size_t marker_index=locs.size();
   for (const symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
   {
     const symbolt &symbol=id_and_symbol.second;
@@ -88,7 +87,7 @@ void control_preprocessingt::operator ()()
   inline_user_program(st, gf);
   goto_programt::targetst &locs=control_program.counterexample_locations;
   goto_programt &body=get_entry_body(gf);
-  add_explicit_nondet_for_extern_vars(locs, st, gf);
+  add_explicit_nondet_for_extern_vars(st, gf);
   collect_counterexample_locations(locs, body, is_meta);
   // XXX: Debug
   for (const goto_programt::const_targett target : locs)
