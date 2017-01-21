@@ -48,6 +48,8 @@ const digital_system_state_space _controller=
     .nOutputs = NOUTPUTS
 };
 
+extern __CPROVER_EIGEN_fixedbvt K_fxp[4][4];
+
 
 //typedef int __CPROVER_EIGEN_fixedbvt;
 #define __CPROVER_EIGEN_MATRIX_SIZE 3u
@@ -164,9 +166,9 @@ void __CPROVER_EIGEN_charpoly(void) {
 }
 
 /*void init(void) {
-  _controller.K[0][0] = nondet_double();
-  _controller.K[0][1] = nondet_double();
-  _controller.K[0][2] = nondet_double();
+  K_fxp[0][0] = nondet_double();
+  K_fxp[0][1] = nondet_double();
+  K_fxp[0][2] = nondet_double();
 }*/
 
 __CPROVER_EIGEN_fixedbvt __CPROVER_EIGEN_matrix_multiplication_result[4][4];
@@ -197,7 +199,7 @@ void double_matrix_multiplication(void/* unsigned int i1, unsigned int j1, unsig
   //unsigned int __mm_j2;
 #define __mm_m1 _controller.B
   //__CPROVER_EIGEN_fixedbvt __mm_m1[4][4];
-#define __mm_m2 _controller.K
+#define __mm_m2 K_fxp
   //__CPROVER_EIGEN_fixedbvt __mm_m2[4][4];
 #define __mm_m3 __CPROVER_EIGEN_matrix_multiplication_result
   //__CPROVER_EIGEN_fixedbvt __mm_m3[4][4];
@@ -248,7 +250,7 @@ void closed_loop(void)
     NINPUTS,
     NSTATES,
     _controller.B,
-    _controller.K,
+    K_fxp,
     result1);*/
   double_matrix_multiplication();
 
@@ -271,7 +273,7 @@ void closed_loop(void)
     _controller.nInputs,
     _controller.nStates,
     _controller.D,
-    _controller.K,
+    K_fxp,
     result1);
 
   double_sub_matrix(
@@ -288,9 +290,9 @@ int main(void) {
   __CPROVER_EIGEN_charpoly();
   //__CPROVER_assert(check_stability(), "");
   __CPROVER_assume(check_stability() == 0);
-  __CPROVER_EIGEN_fixedbvt __trace_K0 = _controller.K[0][0];
-  __CPROVER_EIGEN_fixedbvt __trace_K1 = _controller.K[0][1];
-  __CPROVER_EIGEN_fixedbvt __trace_K2 = _controller.K[0][2];
+  __CPROVER_EIGEN_fixedbvt __trace_K0 = K_fxp[0][0];
+  __CPROVER_EIGEN_fixedbvt __trace_K1 = K_fxp[0][1];
+  __CPROVER_EIGEN_fixedbvt __trace_K2 = K_fxp[0][2];
   __CPROVER_EIGEN_fixedbvt counterexample_var;
   __CPROVER_assume(0.0 <= counterexample_var && counterexample_var <= 10.0);
   __CPROVER_assert(__trace_K0 > counterexample_var, "");

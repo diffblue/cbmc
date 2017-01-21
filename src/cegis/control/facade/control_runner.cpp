@@ -15,10 +15,6 @@
 #include <cegis/control/verify/zero_solutions.h>
 #include <cegis/control/facade/control_runner.h>
 
-// XXX: Debug
-#include <iostream>
-// XXX: Debug
-
 namespace
 {
 template<class solution_configt, class zero_solutiont>

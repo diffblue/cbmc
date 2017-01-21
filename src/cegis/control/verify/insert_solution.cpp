@@ -96,8 +96,5 @@ void insert_solution(control_programt &program,
   const is_assignment_tot pred(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME);
   const goto_programt::targett it=std::find_if(instrs.begin(), end, pred);
   assert(end != it);
-  struct_exprt &value=to_struct_expr(to_code_assign(it->code).rhs());
-  const namespacet ns(program.st);
-  exprt &k=get_controller_comp(ns, value, CEGIS_CONTROL_K_MEMBER_NAME);
-  k=solution.K;
+  to_code_assign(it->code).rhs()=solution.K;
 }

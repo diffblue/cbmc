@@ -231,7 +231,7 @@ void closed_loop(void)
 
 void inputs_equal_ref_minus_k_times_states(void)
   {
-    __controller_typet states_fxp[NSTATES];
+    __controller_typet states_fxp[NSTATES] = { 0.0 };
     //single input
     __controller_typet result_fxp=zero_type;
 
@@ -453,7 +453,7 @@ int safety_stability(void) {
 #endif
 
 #ifdef CPROVER
-  __controller_typet K_fxp_trace[NSTATES];
+  __controller_typet K_fxp_trace[NSTATES] = { 0.0 };
   __CPROVER_array_copy(K_fxp_trace, K_fxp);
   __CPROVER_assert(0 == 1, "");
 #endif

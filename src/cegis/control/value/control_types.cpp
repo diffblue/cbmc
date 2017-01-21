@@ -9,9 +9,9 @@ const symbol_typet &control_solution_type(const symbol_tablet &st)
   return to_symbol_type(st.lookup(CEGIS_CONTROL_SOLUTION_VAR_NAME).type);
 }
 
-const symbol_typet &control_vector_solution_type(const symbol_tablet &st)
+const array_typet &control_vector_solution_type(const symbol_tablet &st)
 {
-  return to_symbol_type(st.lookup(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME).type);
+  return to_array_type(st.lookup(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME).type);
 }
 
 namespace

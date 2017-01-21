@@ -23,21 +23,19 @@ bool is_solution(const goto_trace_stept &step)
   return CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == id;
 }
 
-const struct_exprt &find_solution(const goto_tracet &trace)
+const array_exprt &find_solution(const goto_tracet &trace)
 {
   const goto_tracet::stepst &steps=trace.steps;
   const auto it=std::find_if(steps.begin(), steps.end(), is_solution);
   assert(steps.end() != it);
-  return to_struct_expr(it->full_lhs_value);
+  return to_array_expr(it->full_lhs_value);
 }
 }
 
 void vector_solution_configurationt::convert(solutiont &current_candidate,
     const goto_tracet &trace, const symbol_tablet &st)
 {
-  const namespacet ns(st);
-  const struct_exprt &value=find_solution(trace);
-  current_candidate.K=get_K_controller_comp(ns, value);
+  current_candidate.K=find_solution(trace);
 }
 
 void vector_solution_configurationt::show_candidate(messaget::mstreamt &os,

@@ -73,20 +73,6 @@ const array_exprt &get_b_controller_comp(
  *
  * @details
  *
- * @param ns
- * @param value
- *
- * @return
- */
-const array_exprt &get_K_controller_comp(
-    const namespacet &ns,
-    const struct_exprt &value);
-
-/**
- * @brief
- *
- * @details
- *
  * @param st
  * @param gf
  */

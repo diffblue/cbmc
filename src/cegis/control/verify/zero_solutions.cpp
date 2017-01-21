@@ -10,12 +10,7 @@
 
 bool is_vector_solution_config(const symbol_tablet &st)
 {
-  if (!st.has_symbol(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME)) return false;
-  const typet &type=st.lookup(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME).type;
-  const typet &resolved=namespacet(st).follow(type);
-  if (ID_struct != resolved.id()) return false;
-  const struct_typet &struct_type=to_struct_type(resolved);
-  return struct_type.has_component(CEGIS_CONTROL_K_MEMBER_NAME);
+  return st.has_symbol(CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME);
 }
 
 zero_rational_solutiont::zero_rational_solutiont(const symbol_tablet &st) :
@@ -52,8 +47,9 @@ void zero_vector_solutiont::operator ()(
     control_vector_solutiont &solution) const
 {
   if (!solution.K.operands().empty()) return;
-  const symbol_typet &type=control_vector_solution_type(st);
   const namespacet ns(st);
-  const struct_exprt zero_struct=make_zero(ns, type);
-  solution.K=get_K_controller_comp(ns, zero_struct);
+  const array_typet &type=control_vector_solution_type(st);
+  const source_locationt loc(default_cegis_source_location());
+  null_message_handlert msg;
+  solution.K=to_array_expr(zero_initializer(type, loc, ns, msg));
 }

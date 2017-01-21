@@ -30,7 +30,7 @@ const class symbol_typet &control_solution_type(const class symbol_tablet &st);
  *
  * @return
  */
-const class symbol_typet &control_vector_solution_type(const class symbol_tablet &st);
+const class array_typet &control_vector_solution_type(const class symbol_tablet &st);
 
 /**
  * @brief
