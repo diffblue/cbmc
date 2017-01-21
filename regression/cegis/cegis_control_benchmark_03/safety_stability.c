@@ -8,7 +8,8 @@
 #include "operators.h"
 
 #ifdef CPROVER
-  #define __DSVERIFIER_assert(x) __CPROVER_assume(x)
+  //#define __DSVERIFIER_assert(x) __CPROVER_assume(x)
+#define __DSVERIFIER_assert(x) __CPROVER_assert(x, "")
 #else
   #include <assert.h>
   #define __DSVERIFIER_assert(x) assert(x)
@@ -441,6 +442,14 @@ void assume_corner_cases_for_states(void) {
   #endif
 #endif
 
+void assert_nonzero_controller(void) {
+  int nonzero_coefficients=0;
+  for (int i = 0; i < NSTATES; ++i) {
+    if (K_fxp[i] != controller_cast(0.0)) ++nonzero_coefficients;
+  }
+  __DSVERIFIER_assert(nonzero_coefficients > 0);
+}
+
 int safety_stability(void) {
 #ifdef INTERVAL
   get_bounds(); //get interval bounds
@@ -453,9 +462,9 @@ int safety_stability(void) {
 #endif
 
 #ifdef CPROVER
-  __controller_typet K_fxp_trace[NSTATES] = { 0.0 };
+  __controller_typet K_fxp_trace[NSTATES] = { controller_cast(0.0) };
   __CPROVER_array_copy(K_fxp_trace, K_fxp);
-  __CPROVER_assert(0 == 1, "");
+  //__CPROVER_assert(0 == 1, "");
 #endif
 
   return 0;
@@ -470,6 +479,7 @@ int main(void) {
       _controller_states[stateIndex] = _state_poles[poleIndex][poleIndex];
     }
 #endif
+  assert_nonzero_controller();
   safety_stability();
 #ifndef CPROVER
   }

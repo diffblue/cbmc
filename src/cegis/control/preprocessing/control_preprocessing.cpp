@@ -54,22 +54,29 @@ bool is_meta(const goto_programt::const_targett pos)
 void add_explicit_nondet_for_extern_vars(goto_programt::targetst &locs,
     const symbol_tablet &st, goto_functionst &gf)
 {
-  goto_programt &entry_body=get_body(gf, CPROVER_INIT);
-  goto_programt::instructionst &instrs=entry_body.instructions;
-  goto_programt::targett pos=std::prev(instrs.end(), 1);
+  goto_programt &entry_body=get_entry_body(gf);
+  goto_programt &init_body=get_body(gf, CPROVER_INIT);
+  goto_programt::targett entry_pos=entry_body.instructions.begin();
+  goto_programt::targett init_pos=std::prev(init_body.instructions.end(), 1);
+  size_t marker_index=locs.size();
   for (const symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
   {
     const symbolt &symbol=id_and_symbol.second;
-    if (!symbol.is_extern) continue;
+    const std::string &name=id2string(id_and_symbol.first);
+    if (!symbol.is_extern || contains(name, CPROVER_PREFIX)) continue;
+    const bool is_solution_var=CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == name
+        || CEGIS_CONTROL_SOLUTION_VAR_NAME == name;
+    goto_programt &body=is_solution_var ? init_body : entry_body;
+    goto_programt::targett &pos=is_solution_var ? init_pos : entry_pos;
     const source_locationt &loc=pos->source_location;
-    pos=entry_body.insert_before(pos);
+    if (is_solution_var) pos=body.insert_before(pos);
+    else pos=body.insert_after(pos);
     pos->source_location=loc;
     pos->type=goto_program_instruction_typet::ASSIGN;
     const side_effect_expr_nondett rhs(symbol.type);
     pos->code=code_assignt(symbol.symbol_expr(), rhs);
   }
   entry_body.update();
-  collect_counterexample_locations(locs, entry_body, is_meta, locs.size());
 }
 }
 
@@ -81,8 +88,8 @@ void control_preprocessingt::operator ()()
   inline_user_program(st, gf);
   goto_programt::targetst &locs=control_program.counterexample_locations;
   goto_programt &body=get_entry_body(gf);
-  collect_counterexample_locations(locs, body, is_meta);
   add_explicit_nondet_for_extern_vars(locs, st, gf);
+  collect_counterexample_locations(locs, body, is_meta);
   // XXX: Debug
   for (const goto_programt::const_targett target : locs)
   {
