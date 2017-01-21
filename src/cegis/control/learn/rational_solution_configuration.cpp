@@ -30,9 +30,8 @@ const struct_exprt &find_solution(const goto_tracet &trace)
 }
 }
 
-void rational_solution_configurationt::convert(
-    solutiont &current_candidate, const goto_tracet &trace,
-    const symbol_tablet &st)
+void rational_solution_configurationt::convert(solutiont &current_candidate,
+    const goto_tracet &trace, const symbol_tablet &st)
 {
   const struct_exprt &solution=find_solution(trace);
   const namespacet ns(st);

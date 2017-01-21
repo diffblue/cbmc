@@ -11,11 +11,11 @@
 #include <cegis/control/preprocessing/control_preprocessing.h>
 #include <goto-programs/remove_returns.h>
 
+#define TMP_MARKER "$tmp"
+
 // XXX: Debug
 #include <iostream>
 // XXX: Debug
-
-#define TMP_MARKER "$tmp"
 
 control_preprocessingt::control_preprocessingt(const symbol_tablet &st,
     const goto_functionst &gf) :
@@ -39,8 +39,11 @@ bool is_meta(const goto_programt::const_targett pos)
   const std::string &func=id2string(loc.get_function());
   for (const char * const excluded : excluded_functions)
     if (contains(func, excluded)) return true;
-  if (goto_program_instruction_typet::ASSIGN != pos->type
-      && goto_program_instruction_typet::DECL != pos->type) return false;
+  if ((goto_program_instruction_typet::ASSIGN != pos->type
+      && goto_program_instruction_typet::DECL != pos->type)
+      || !pos->code.has_operands()
+      || (pos->code.has_operands() && ID_symbol != pos->code.op0().id()))
+    return false;
   const std::string &var=id2string(get_affected_variable(*pos));
   if (contains(var, TMP_MARKER) || contains(var, RETURN_VALUE_SUFFIX)
       || contains(var, CPROVER_PREFIX)) return true;
