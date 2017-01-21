@@ -9,6 +9,7 @@ if [ $? -ne 0 ]; then
     printf "ERROR: Could not create output directoy"
     exit 1
 fi
+output_dir_abs=`cd $output_dir > /dev/null ; pwd`
 
 # Check that the previous command succeded, if not exit.
 command_status()
@@ -49,18 +50,21 @@ lcov -version > $output_dir/cbmc_coverage.out 2>&1
 command_status
 
 # Remove any previous build that may not have coverage in it.
-printf "INFO: Cleaning CBMC build "
-make clean -C ../src >> $output_dir/cbmc_coverage.out 2>&1
+printf "INFO: setting up vpath build "
+cd ../src
+../scripts/vpath-setup.sh coverage-build >> $output_dir_abs/cbmc_coverage.out 2>&1
 command_status
+cd ../regression
 
 printf "INFO: Building CBMC with Code Coverage enabled "
 # Run the usual make target with --coverage to add gcov instrumentation
-make CXXFLAGS="--coverage" LINKFLAGS="--coverage" -C ../src >> $output_dir/cbmc_coverage.out 2>&1
+make CXXFLAGS="--coverage" LINKFLAGS="--coverage" -C ../src/coverage-build/src \
+  >> $output_dir/cbmc_coverage.out 2>&1
 command_status
 
 printf "INFO: Running Regression tests "
 # Run regression tests which will collect the coverage metrics and put them in the src files
-make >> $output_dir/cbmc_coverage.out 2>&1
+make -C ../src/coverage-build/regression >> $output_dir/cbmc_coverage.out 2>&1
 printf "[DONE]\n"
 
 printf "INFO: Gathering coverage metrics "
