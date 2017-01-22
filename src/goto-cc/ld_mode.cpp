@@ -68,8 +68,8 @@ int ld_modet::doit()
   if(cmdline.isset("verbosity"))
     verbosity=unsafe_string2int(cmdline.get_value("verbosity"));
 
-  compiler.ui_message_handler.set_verbosity(verbosity);
-  ui_message_handler.set_verbosity(verbosity);
+  compiler.set_message_handler(get_message_handler());
+  message_handler.set_verbosity(verbosity);
 
   if(produce_hybrid_binary)
     debug() << "LD mode (hybrid)" << eom;
