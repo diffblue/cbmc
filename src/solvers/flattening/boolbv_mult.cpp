@@ -53,14 +53,14 @@ bvt boolbvt::convert_mult(const exprt &expr)
     std::size_t fraction_bits=
       to_fixedbv_type(expr.type()).get_fraction_bits();
 
-    // do a sign extension by fraction_bits bits
-    bv=bv_utils.sign_extension(bv, bv.size()+fraction_bits);
-
     for(exprt::operandst::const_iterator it=operands.begin()+1;
         it!=operands.end(); it++)
     {
       if(it->type()!=expr.type())
         throw "multiplication with mixed types";
+
+      // do a sign extension by fraction_bits bits
+      bv=bv_utils.sign_extension(bv, bv.size()+fraction_bits);
 
       bvt op=convert_bv(*it);
 
@@ -70,10 +70,10 @@ bvt boolbvt::convert_mult(const exprt &expr)
       op=bv_utils.sign_extension(op, bv.size());
 
       bv=bv_utils.signed_multiplier(bv, op);
-    }
 
-    // cut it down again
-    bv.erase(bv.begin(), bv.begin()+fraction_bits);
+      // cut it down again
+      bv.erase(bv.begin(), bv.begin()+fraction_bits);
+    }
 
     return bv;
   }
