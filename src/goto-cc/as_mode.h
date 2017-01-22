@@ -22,11 +22,12 @@ public:
   as_modet(
     goto_cc_cmdlinet &_cmdline,
     const std::string &_base_name,
-    bool _produce_hybrid_binar);
+    bool _produce_hybrid_binary);
 
 protected:
   bool produce_hybrid_binary;
   const std::string native_tool_name;
+  gcc_message_handlert message_handler;
 
   int run_as(); // call as with original command line
 
