@@ -22,8 +22,10 @@ public:
   int doit() final;
   void help_mode() final;
 
-  explicit armcc_modet(armcc_cmdlinet &_armcc_cmdline):
-    goto_cc_modet(_armcc_cmdline, message_handler),
+  armcc_modet(
+    armcc_cmdlinet &_armcc_cmdline,
+    const std::string &_base_name):
+    goto_cc_modet(_armcc_cmdline, _base_name, message_handler),
     cmdline(_armcc_cmdline)
   {
   }

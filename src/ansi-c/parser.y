@@ -2705,6 +2705,10 @@ asm_definition:
         {
           // Not obvious what to do with this.
         }
+        | '{' TOK_ASM_STRING '}'
+        {
+          // Not obvious what to do with this.
+        }
         ;
 
 function_definition:
