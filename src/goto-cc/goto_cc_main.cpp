@@ -18,12 +18,15 @@ Date: May 2006
 #include "armcc_cmdline.h"
 #include "ms_cl_cmdline.h"
 #include "ld_cmdline.h"
+#include "bcc_cmdline.h"
+#include "as_cmdline.h"
+#include "as86_cmdline.h"
 
 #include "gcc_mode.h"
 #include "cw_mode.h"
 #include "ms_cl_mode.h"
 #include "armcc_mode.h"
-#include "ld_mode.h"
+#include "as_mode.h"
 
 /*******************************************************************\
 
@@ -86,8 +89,7 @@ int main(int argc, const char **argv)
     // this is the Visual Studio personality
     ms_cl_cmdlinet cmdline;
     cmdline.parse_env();
-    ms_cl_modet ms_cl_mode(cmdline);
-    ms_cl_mode.base_name=base_name;
+    ms_cl_modet ms_cl_mode(cmdline, base_name);
     return ms_cl_mode.main(argc, argv);
   }
   else if(base_name=="goto-cw" ||
@@ -96,8 +98,7 @@ int main(int argc, const char **argv)
     // this is the CodeWarrior personality,
     // but we use the gcc command line interface
     gcc_cmdlinet cmdline;
-    cw_modet cw_mode(cmdline);
-    cw_mode.base_name=base_name;
+    cw_modet cw_mode(cmdline, base_name);
     return cw_mode.main(argc, argv);
   }
   else if(base_name=="goto-armcc" ||
@@ -105,8 +106,7 @@ int main(int argc, const char **argv)
   {
     // this is the armcc personality
     armcc_cmdlinet cmdline;
-    armcc_modet armcc_mode(cmdline);
-    armcc_mode.base_name=base_name;
+    armcc_modet armcc_mode(cmdline, base_name);
     return armcc_mode.main(argc, argv);
   }
   // handle GCC names like x86_64-apple-darwin14-llvm-gcc-4.2
@@ -118,27 +118,45 @@ int main(int argc, const char **argv)
     // with a GCC-style command-line interface,
     // but also disables CPROVER language extensions
     gcc_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=true;
+    gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
   }
   else if(base_name.find("goto-ld")!=std::string::npos)
   {
     // this simulates "ld" for linking
     ld_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=true;
+    gcc_modet gcc_mode(cmdline, base_name, true);
     return gcc_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-bcc")!=std::string::npos)
+  {
+    // this simulates Bruce's C Compiler
+    bcc_cmdlinet cmdline;
+    // bcc does not build ELF objects -- hybrid mode is used
+    // with -S only
+    gcc_modet gcc_mode(cmdline, base_name, true);
+    return gcc_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-as86")!=std::string::npos)
+  {
+    // assembler used by Bruce's C Compiler
+    as86_cmdlinet cmdline;
+    // as86 does not build ELF objects, no hybrid binaries
+    as_modet as_mode(cmdline, base_name, false);
+    return as_mode.main(argc, argv);
+  }
+  else if(base_name.find("goto-as")!=std::string::npos)
+  {
+    // GNU assembler
+    as_cmdlinet cmdline;
+    as_modet as_mode(cmdline, base_name, true);
+    return as_mode.main(argc, argv);
   }
   else
   {
     // the default personality is GCC-style
     gcc_cmdlinet cmdline;
-    gcc_modet gcc_mode(cmdline);
-    gcc_mode.base_name=base_name;
-    gcc_mode.produce_hybrid_binary=false;
+    gcc_modet gcc_mode(cmdline, base_name, false);
     return gcc_mode.main(argc, argv);
   }
 }

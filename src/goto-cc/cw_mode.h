@@ -20,8 +20,8 @@ public:
   virtual int doit();
   virtual void help_mode();
 
-  explicit cw_modet(gcc_cmdlinet &_gcc_cmdline):
-    goto_cc_modet(_gcc_cmdline),
+  cw_modet(gcc_cmdlinet &_gcc_cmdline, const std::string &_base_name):
+    goto_cc_modet(_gcc_cmdline, _base_name),
     cmdline(_gcc_cmdline)
   {
   }

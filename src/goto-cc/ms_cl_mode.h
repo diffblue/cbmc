@@ -20,8 +20,10 @@ public:
   virtual int doit();
   virtual void help_mode();
 
-  explicit ms_cl_modet(ms_cl_cmdlinet &_ms_cl_cmdline):
-    goto_cc_modet(_ms_cl_cmdline),
+  ms_cl_modet(
+    ms_cl_cmdlinet &_ms_cl_cmdline,
+    const std::string &_base_name):
+    goto_cc_modet(_ms_cl_cmdline, _base_name),
     cmdline(_ms_cl_cmdline)
   {
   }

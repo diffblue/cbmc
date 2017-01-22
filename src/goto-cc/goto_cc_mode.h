@@ -18,19 +18,20 @@ Date: June 2006
 class goto_cc_modet:public language_uit
 {
 public:
-  std::string base_name;
-
   virtual int main(int argc, const char **argv);
   virtual int doit()=0;
   virtual void help_mode()=0;
   virtual void help();
   virtual void usage_error();
 
-  explicit goto_cc_modet(goto_cc_cmdlinet &_cmdline);
+  goto_cc_modet(
+    goto_cc_cmdlinet &_cmdline,
+    const std::string &_base_name);
   ~goto_cc_modet();
 
 protected:
   ui_message_handlert ui_message_handler;
+  const std::string base_name;
   void register_languages();
   goto_cc_cmdlinet &cmdline;
 };

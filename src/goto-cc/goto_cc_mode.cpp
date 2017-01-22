@@ -33,9 +33,12 @@ Function: goto_cc_modet::goto_cc_modet
 
 \*******************************************************************/
 
-goto_cc_modet::goto_cc_modet(goto_cc_cmdlinet &_cmdline):
+goto_cc_modet::goto_cc_modet(
+  goto_cc_cmdlinet &_cmdline,
+  const std::string &_base_name):
   language_uit(_cmdline, ui_message_handler),
   ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
+  base_name(_base_name),
   cmdline(_cmdline)
 {
   register_languages();
@@ -84,6 +87,12 @@ void goto_cc_modet::help()
   "Usage:                       Purpose:\n"
   "\n"
   " --verbosity #               verbosity level\n"
+  " --function name             set entry point to name\n"
+  " --native-compiler cmd       command to invoke as preprocessor/compiler\n"
+  " --native-linker cmd         command to invoke as linker\n"
+  " --native-assembler cmd      command to invoke as assembler (goto-as only)\n"
+  " --print-rejected-preprocessed-source file\n"
+  "                             copy failing (preprocessed) source to file\n"
   "\n";
 }
 
