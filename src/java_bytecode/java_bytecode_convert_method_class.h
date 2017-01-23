@@ -51,7 +51,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
-  size_t max_array_length;
+  const size_t max_array_length;
 
   irep_idt method_id;
   irep_idt current_method;

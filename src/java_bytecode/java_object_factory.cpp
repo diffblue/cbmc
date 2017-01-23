@@ -81,17 +81,30 @@ public:
     const typet &override_type=empty_typet());
 };
 
-// Returns false if we can't figure out the size of allocate_type.
-// allocate_type may differ from target_expr, e.g. for target_expr having
-// type int* and allocate_type being an int[10].
+
+/*******************************************************************\
+
+Function: gen_nondet_array_init
+
+  Inputs: the target expression, desired object type, source location
+          and Boolean whether to create a dynamic object
+
+ Outputs: the allocated object
+
+ Purpose: Returns false if we can't figure out the size of allocate_type.
+          allocate_type may differ from target_expr, e.g. for target_expr
+          having type int* and allocate_type being an int[10].
+
+\*******************************************************************/
+
 exprt java_object_factoryt::allocate_object(
-  const exprt& target_expr,
-  const typet& allocate_type,
+  const exprt &target_expr,
+  const typet &allocate_type,
   const source_locationt &loc,
   bool create_dynamic_objects)
 {
-  const typet& allocate_type_resolved=ns.follow(allocate_type);
-  const typet& target_type=ns.follow(target_expr.type().subtype());
+  const typet &allocate_type_resolved=ns.follow(allocate_type);
+  const typet &target_type=ns.follow(target_expr.type().subtype());
   bool cast_needed=allocate_type_resolved!=target_type;
   if(!create_dynamic_objects)
   {
@@ -197,7 +210,7 @@ void java_object_factoryt::gen_nondet_init(
     if(!assume_non_null)
     {
       auto returns_null_sym=
-          new_tmp_symbol(symbol_table, "opaque_returns_null");
+        new_tmp_symbol(symbol_table, "opaque_returns_null");
       returns_null_sym.type=c_bool_typet(1);
       auto returns_null=returns_null_sym.symbol_expr();
       auto assign_returns_null=
@@ -449,7 +462,6 @@ void java_object_factoryt::gen_nondet_array_init(
   init_code.move_to_operands(init_done_label);
 }
 
-
 /*******************************************************************\
 
 Function: gen_nondet_init
@@ -502,7 +514,7 @@ Function: new_tmp_symbol
 
 symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string& prefix)
 {
-  static size_t temporary_counter=0;
+  static size_t temporary_counter=0; // TODO change this
 
   auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;

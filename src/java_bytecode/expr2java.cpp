@@ -50,7 +50,7 @@ std::string expr2javat::convert_code_function_call(
     unsigned p;
     std::string lhs_str=convert(src.lhs(), p);
 
-    // TODO: ggf. Klammern je nach p
+    // TODO: if necessery add parentheses, dependent on p
     dest+=lhs_str;
     dest+='=';
   }

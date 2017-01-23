@@ -44,7 +44,6 @@ Function: find_superclass_with_type
 
 \*******************************************************************/
 
-
 bool find_superclass_with_type(
   exprt &ptr,
   const typet &target_type,

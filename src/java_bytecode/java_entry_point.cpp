@@ -105,12 +105,12 @@ bool java_static_lifetime_init(
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
 
-  // W need to zero out all static variables, or nondet-initialize if they're
+  // We need to zero out all static variables, or nondet-initialize if they're
   // external. Iterate over a copy of the symtab, as its iterators are
   // invalidated by object_factory:
 
   std::list<irep_idt> symnames;
-  for(const auto& entry : symbol_table.symbols)
+  for(const auto &entry : symbol_table.symbols)
     symnames.push_back(entry.first);
 
   for(const auto& symname : symnames)
