@@ -1,8 +1,8 @@
 CORE
 jar-file2.jar
 --main-class some_class
-^EXIT=10$
+^EXIT=\(10\|6\)$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^\(VERIFICATION FAILED\|No support for reading JAR files\)$
 --
 ^warning: ignoring
