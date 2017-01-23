@@ -412,7 +412,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 codet java_bytecode_convert_methodt::get_array_bounds_check(
   const exprt &arraystruct,
   const exprt &idx,
-  const source_locationt& original_sloc)
+  const source_locationt &original_sloc)
 {
   constant_exprt intzero=from_integer(0, java_int_type());
   binary_relation_exprt gezero(idx, ID_ge, intzero);
@@ -1619,7 +1619,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
-      const auto& field_name=arg0.get_string(ID_component_name);
+      const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       results[0]=java_bytecode_promotion(symbol_expr);
 
@@ -1636,7 +1636,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.empty());
       symbol_exprt symbol_expr(arg0.type());
-      const auto& field_name=arg0.get_string(ID_component_name);
+      const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       c=code_assignt(symbol_expr, op[0]);
     }
@@ -1715,7 +1715,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       if(max_array_length!=0)
       {
-        constant_exprt size_limit=from_integer(max_array_length, java_int_type());
+        constant_exprt size_limit=
+          from_integer(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
         c.move_to_operands(assume_le_max_size);

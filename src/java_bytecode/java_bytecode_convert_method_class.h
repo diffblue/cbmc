@@ -82,7 +82,7 @@ protected:
     size_t length;
     bool is_parameter;
     std::vector<holet> holes;
-    variablet() : symbol_expr(), is_parameter(false) {}
+    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false) {}
   };
 
   typedef std::vector<variablet> variablest;
