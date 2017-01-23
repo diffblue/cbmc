@@ -235,7 +235,7 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
 
   while(1)
   {
-    typet &base_type=const_cast<typet&>(ns.follow(expr.struct_op().type()));
+    typet base_type(ns.follow(expr.struct_op().type()));
 
     if(base_type.id()!=ID_struct)
       break; // give up
