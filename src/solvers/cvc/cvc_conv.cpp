@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <cctype>
+#include <string>
 
 #include <util/arith_tools.h>
 #include <util/std_types.h>
@@ -58,10 +59,549 @@ Function: cvc_convt::l_get
 
 tvt cvc_convt::l_get(literalt l) const
 {
-  if(l.is_true()) return tvt(true);
-  if(l.is_false()) return tvt(false);
+  if(l.is_true())
+    return tvt(true);
+  if(l.is_false())
+    return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_binary_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_binary_expr(const exprt &expr, const exprt &op)
+{
+  unsigned to_width=
+    unsafe_string2unsigned(id2string(expr.type().get(ID_width)));
+
+  if(op.type().id()==ID_signedbv)
+  {
+    unsigned from_width=
+      unsafe_string2unsigned(id2string(op.type().get(ID_width)));
+
+    if(from_width==to_width)
+      convert_expr(op);
+    else if(from_width<to_width)
+    {
+      out << "SX(";
+      convert_expr(op);
+      out << ", " << to_width << ")";
+    }
+    else
+    {
+      out << "(";
+      convert_expr(op);
+      out << ")[" << (to_width-1) << ":0]";
+    }
+  }
+  else if(op.type().id()==ID_unsignedbv)
+  {
+    unsigned from_width=
+      unsafe_string2unsigned(id2string(op.type().get(ID_width)));
+
+    if(from_width==to_width)
+      convert_expr(op);
+    else if(from_width<to_width)
+    {
+      out << "(0bin";
+
+      if(to_width > from_width)
+        out << std::string(to_width-from_width, '0');
+
+      out << " @ ";
+
+      out << "(";
+      convert_expr(op);
+      out << "))";
+    }
+    else
+    {
+      out << "(";
+      convert_expr(op);
+      out << ")[" << (to_width-1) << ":0]";
+    }
+  }
+  else if(op.type().id()==ID_bool)
+  {
+    if(to_width>1)
+    {
+      out << "(0bin";
+
+      if(to_width > 1)
+        out << std::string(to_width-1, '0');
+
+      out << " @ ";
+
+      out << "IF ";
+      convert_expr(op);
+      out << " THEN 0bin1 ELSE 0bin0 ENDIF)";
+    }
+    else
+    {
+      out << "IF ";
+      convert_expr(op);
+      out << " THEN 0bin1 ELSE 0bin0 ENDIF";
+    }
+  }
+  else
+  {
+    throw "todo typecast2 "+op.type().id_string()+
+      " -> "+expr.type().id_string();
+  }
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_constant_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_constant_expr(const exprt &expr)
+{
+  if(expr.type().id()==ID_unsignedbv ||
+     expr.type().id()==ID_signedbv ||
+     expr.type().id()==ID_bv)
+  {
+    const irep_idt &value=expr.get(ID_value);
+
+    if(value.size()==8 ||
+       value.size()==16 ||
+       value.size()==32 ||
+       value.size()==64)
+    {
+      std::size_t w=value.size()/4;
+
+      mp_integer i=binary2integer(id2string(value), false);
+      std::string hex=integer2string(i, 16);
+
+      while(hex.size()<w)
+        hex="0"+hex;
+
+      out << "0hex" << hex;
+    }
+    else
+    {
+      out << "0bin" << value;
+    }
+  }
+  else if(expr.type().id()==ID_pointer)
+  {
+    const irep_idt &value=expr.get(ID_value);
+
+    if(value=="NULL")
+    {
+      out << "(# object:="
+          << pointer_logic.get_null_object()
+          << ", offset:="
+          << bin_zero(config.ansi_c.pointer_width) << " #)";
+    }
+    else
+      throw "unknown pointer constant: "+id2string(value);
+  }
+  else if(expr.type().id()==ID_bool)
+  {
+    if(expr.is_true())
+      out << "TRUE";
+    else if(expr.is_false())
+      out << "FALSE";
+    else
+      throw "unknown boolean constant";
+  }
+  else if(expr.type().id()==ID_array)
+  {
+    out << "ARRAY (i: " << array_index_type() << "):";
+
+    assert(!expr.operands().empty());
+
+    unsigned i=0;
+    forall_operands(it, expr)
+    {
+      if(i==0)
+        out << "\n  IF ";
+      else
+        out << "\n  ELSIF ";
+
+      out << "i=" << array_index(i) << " THEN ";
+      convert_array_value(*it);
+      i++;
+    }
+
+    out << "\n  ELSE ";
+    convert_expr(expr.op0());
+    out << "\n  ENDIF";
+  }
+  else if(expr.type().id()==ID_integer ||
+          expr.type().id()==ID_natural ||
+          expr.type().id()==ID_range)
+  {
+    out << expr.get(ID_value);
+  }
+  else
+    throw "unknown constant: "+expr.type().id_string();
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_plus_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_plus_expr(const exprt &expr)
+{
+  if(expr.operands().size()>=2)
+  {
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
+    {
+      out << "BVPLUS(" << expr.type().get(ID_width);
+
+      forall_operands(it, expr)
+      {
+        out << ", ";
+        convert_expr(*it);
+      }
+
+      out << ")";
+    }
+    else if(expr.type().id()==ID_pointer)
+    {
+      if(expr.operands().size()!=2)
+        throw "pointer arithmetic with more than two operands";
+
+      const exprt *p, *i;
+
+      if(expr.op0().type().id()==ID_pointer)
+      {
+        p=&expr.op0();
+        i=&expr.op1();
+      }
+      else if(expr.op1().type().id()==ID_pointer)
+      {
+        p=&expr.op1();
+        i=&expr.op0();
+      }
+      else
+        throw "unexpected mixture in pointer arithmetic";
+
+      out << "(LET P: " << cvc_pointer_type() << " = ";
+      convert_expr(*p);
+      out << " IN P WITH .offset:=BVPLUS("
+          << config.ansi_c.pointer_width
+          << ", P.offset, ";
+      convert_expr(*i);
+      out << "))";
+    }
+    else
+      throw "unsupported type for +: "+expr.type().id_string();
+  }
+  else if(expr.operands().size()==1)
+  {
+    convert_expr(expr.op0());
+  }
+  else
+    assert(false);
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_typecast_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_typecast_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==1);
+  const exprt &op=expr.op0();
+
+  if(expr.type().id()==ID_bool)
+  {
+    if(op.type().id()==ID_signedbv ||
+       op.type().id()==ID_unsignedbv ||
+       op.type().id()==ID_pointer)
+    {
+      convert_expr(op);
+      out << "/=";
+      convert_expr(gen_zero(op.type()));
+    }
+    else
+    {
+      throw "todo typecast1 "+op.type().id_string()+" -> bool";
+    }
+  }
+  else if(expr.type().id()==ID_signedbv ||
+          expr.type().id()==ID_unsignedbv)
+  {
+    convert_binary_expr(expr, op);
+  }
+  else if(expr.type().id()==ID_pointer)
+  {
+    if(op.type().id()==ID_pointer)
+    {
+      convert_expr(op);
+    }
+    else
+      throw "todo typecast3 "+op.type().id_string()+" -> pointer";
+  }
+  else
+    throw "todo typecast4 ? -> "+expr.type().id_string();
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_struct_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_struct_expr(const exprt &expr)
+{
+  out << "(# ";
+
+  const struct_typet &struct_type=to_struct_type(expr.type());
+
+  const struct_typet::componentst &components=
+    struct_type.components();
+
+  assert(components.size()==expr.operands().size());
+
+  unsigned i=0;
+  for(const struct_union_typet::componentt &component : components)
+  {
+    if(i!=0)
+      out << ", ";
+
+    out << component.get(ID_name);
+    out << ":=";
+    convert_expr(expr.operands()[i]);
+    ++i;
+  }
+
+  out << " #)";
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_equality_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_equality_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+  assert(expr.op0().type()==expr.op1().type());
+
+  if(expr.op0().type().id()==ID_bool)
+  {
+    if(expr.id()==ID_notequal)
+      out << "NOT (";
+
+    out << "(";
+    convert_expr(expr.op0());
+    out << ") <=> (";
+    convert_expr(expr.op1());
+    out << ")";
+    if(expr.id()==ID_notequal)
+      out << ")";
+  }
+  else
+  {
+    out << "(";
+    convert_expr(expr.op0());
+    out << ")";
+    out << (expr.id()==ID_equal?"=":"/=");
+    out << "(";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_comparison_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_comparison_expr(const exprt &expr)
+{
+  assert(expr.operands().size()==2);
+
+  const typet &op_type=expr.op0().type();
+
+  if(op_type.id()==ID_unsignedbv)
+  {
+    if(expr.id()==ID_le)
+      out << "BVLE";
+    else if(expr.id()==ID_lt)
+      out << "BVLT";
+    else if(expr.id()==ID_ge)
+      out << "BVGE";
+    else if(expr.id()==ID_gt)
+      out << "BVGT";
+
+    out << "(";
+    convert_expr(expr.op0());
+    out << ", ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+  else if(op_type.id()==ID_signedbv)
+  {
+    if(expr.id()==ID_le)
+      out << "SBVLE";
+    else if(expr.id()==ID_lt)
+      out << "SBVLT";
+    else if(expr.id()==ID_ge)
+      out << "SBVGE";
+    else if(expr.id()==ID_gt)
+      out << "SBVGT";
+
+    out << "(";
+    convert_expr(expr.op0());
+    out << ", ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+  else
+  {
+    throw "unsupported type for "+expr.id_string()+": "+
+      expr.type().id_string();
+  }
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_minus_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_minus_expr(const exprt &expr)
+{
+  if(expr.operands().size()==2)
+  {
+    if(expr.type().id()==ID_unsignedbv ||
+       expr.type().id()==ID_signedbv)
+    {
+      out << "BVSUB(" << expr.type().get(ID_width) << ", ";
+      convert_expr(expr.op0());
+      out << ", ";
+      convert_expr(expr.op1());
+      out << ")";
+    }
+    else
+      throw "unsupported type for -: "+expr.type().id_string();
+  }
+  else if(expr.operands().size()==1)
+  {
+    convert_expr(expr.op0());
+  }
+  else
+    assert(false);
+}
+
+/*******************************************************************\
+
+Function: cvc_convt::convert_with_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void cvc_convt::convert_with_expr(const exprt &expr)
+{
+  assert(expr.operands().size()>=1);
+  out << "(";
+  convert_expr(expr.op0());
+  out << ")";
+
+  for(unsigned i=1; i<expr.operands().size(); i+=2)
+  {
+    assert((i+1)<expr.operands().size());
+    const exprt &index=expr.operands()[i];
+    const exprt &value=expr.operands()[i+1];
+
+    if(expr.type().id()==ID_struct)
+    {
+      out << " WITH ." << index.get(ID_component_name);
+      out << ":=(";
+      convert_array_value(value);
+      out << ")";
+    }
+    else if(expr.type().id()==ID_union)
+    {
+      out << " WITH ." << index.get(ID_component_name);
+      out << ":=(";
+      convert_array_value(value);
+      out << ")";
+    }
+    else if(expr.type().id()==ID_array)
+    {
+      out << " WITH [";
+      convert_array_index(index);
+      out << "]:=(";
+      convert_array_value(value);
+      out << ")";
+    }
+    else
+    {
+      throw "with expects struct or array type, but got "+
+        expr.type().id_string();
+    }
+  }
 }
 
 /*******************************************************************\
@@ -108,7 +648,11 @@ std::string cvc_convt::bin_zero(unsigned bits)
 {
   assert(bits!=0);
   std::string result="0bin";
-  while(bits!=0) { result+='0'; bits--; }
+  while(bits!=0)
+  {
+    result+='0';
+    bits--;
+  }
   return result;
 }
 
@@ -290,7 +834,8 @@ void cvc_convt::convert_address_of_rec(const exprt &expr)
 
     mp_integer offset=member_offset(
       to_struct_type(struct_op.type()),
-      component_name, ns);
+      component_name,
+      ns);
 
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);
@@ -321,8 +866,6 @@ Function: cvc_convt::convert
 
 literalt cvc_convt::convert(const exprt &expr)
 {
-  //out << "%% E: " << expr << std::endl;
-
   if(expr.type().id()!=ID_bool)
   {
     std::string msg="cvc_convt::convert got "
@@ -541,220 +1084,15 @@ void cvc_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id()==ID_typecast)
   {
-    assert(expr.operands().size()==1);
-    const exprt &op=expr.op0();
-
-    if(expr.type().id()==ID_bool)
-    {
-      if(op.type().id()==ID_signedbv ||
-         op.type().id()==ID_unsignedbv ||
-         op.type().id()==ID_pointer)
-      {
-        convert_expr(op);
-        out << "/=";
-        convert_expr(gen_zero(op.type()));
-      }
-      else
-      {
-        throw "TODO typecast1 "+op.type().id_string()+" -> bool";
-      }
-    }
-    else if(expr.type().id()==ID_signedbv ||
-            expr.type().id()==ID_unsignedbv)
-    {
-      unsigned to_width=unsafe_string2unsigned(id2string(expr.type().get(ID_width)));
-
-      if(op.type().id()==ID_signedbv)
-      {
-        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
-
-        if(from_width==to_width)
-          convert_expr(op);
-        else if(from_width<to_width)
-        {
-          out << "SX(";
-          convert_expr(op);
-          out << ", " << to_width << ")";
-        }
-        else
-        {
-          out << "(";
-          convert_expr(op);
-          out << ")[" << (to_width-1) << ":0]";
-        }
-      }
-      else if(op.type().id()==ID_unsignedbv)
-      {
-        unsigned from_width=unsafe_string2unsigned(id2string(op.type().get(ID_width)));
-
-        if(from_width==to_width)
-          convert_expr(op);
-        else if(from_width<to_width)
-        {
-          out << "(0bin";
-
-          for(unsigned i=from_width; i<to_width; i++)
-            out << "0";
-
-          out << " @ ";
-
-          out << "(";
-          convert_expr(op);
-          out << "))";
-        }
-        else
-        {
-          out << "(";
-          convert_expr(op);
-          out << ")[" << (to_width-1) << ":0]";
-        }
-      }
-      else if(op.type().id()==ID_bool)
-      {
-        if(to_width>1)
-        {
-          out << "(0bin";
-
-          for(unsigned i=1; i<to_width; i++)
-            out << "0";
-
-          out << " @ ";
-
-          out << "IF ";
-          convert_expr(op);
-          out << " THEN 0bin1 ELSE 0bin0 ENDIF)";
-        }
-        else
-        {
-          out << "IF ";
-          convert_expr(op);
-          out << " THEN 0bin1 ELSE 0bin0 ENDIF";
-        }
-      }
-      else
-      {
-        throw "TODO typecast2 "+op.type().id_string()+
-              " -> "+expr.type().id_string();
-      }
-    }
-    else if(expr.type().id()==ID_pointer)
-    {
-      if(op.type().id()==ID_pointer)
-      {
-        convert_expr(op);
-      }
-      else
-        throw "TODO typecast3 "+op.type().id_string()+" -> pointer";
-    }
-    else
-      throw "TODO typecast4 ? -> "+expr.type().id_string();
+    convert_typecast_expr(expr);
   }
   else if(expr.id()==ID_struct)
   {
-    out << "(# ";
-
-    const struct_typet &struct_type=to_struct_type(expr.type());
-
-    const struct_typet::componentst &components=
-      struct_type.components();
-
-    assert(components.size()==expr.operands().size());
-
-    unsigned i=0;
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++, i++)
-    {
-      if(i!=0) out << ", ";
-      out << it->get(ID_name);
-      out << ":=";
-      convert_expr(expr.operands()[i]);
-    }
-
-    out << " #)";
+    convert_struct_expr(expr);
   }
   else if(expr.id()==ID_constant)
   {
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_bv)
-    {
-      const irep_idt &value=expr.get(ID_value);
-
-      if(value.size()==8 ||
-         value.size()==16 ||
-         value.size()==32 ||
-         value.size()==64)
-      {
-        std::size_t w=value.size()/4;
-
-        mp_integer i=binary2integer(id2string(value), false);
-        std::string hex=integer2string(i, 16);
-
-        while(hex.size()<w) hex="0"+hex;
-
-        out << "0hex" << hex;
-      }
-      else
-      {
-        out << "0bin" << value;
-      }
-    }
-    else if(expr.type().id()==ID_pointer)
-    {
-      const irep_idt &value=expr.get(ID_value);
-
-      if(value=="NULL")
-      {
-        out << "(# object:="
-                     << pointer_logic.get_null_object()
-                     << ", offset:="
-                     << bin_zero(config.ansi_c.pointer_width) << " #)";
-      }
-      else
-        throw "unknown pointer constant: "+id2string(value);
-    }
-    else if(expr.type().id()==ID_bool)
-    {
-      if(expr.is_true())
-        out << "TRUE";
-      else if(expr.is_false())
-        out << "FALSE";
-      else
-        throw "unknown boolean constant";
-    }
-    else if(expr.type().id()==ID_array)
-    {
-      out << "ARRAY (i: " << array_index_type() << "):";
-
-      assert(!expr.operands().empty());
-
-      unsigned i=0;
-      forall_operands(it, expr)
-      {
-        if(i==0)
-          out << "\n  IF ";
-        else
-          out << "\n  ELSIF ";
-
-        out << "i=" << array_index(i) << " THEN ";
-        convert_array_value(*it);
-        i++;
-      }
-
-      out << "\n  ELSE ";
-      convert_expr(expr.op0());
-      out << "\n  ENDIF";
-    }
-    else if(expr.type().id()==ID_integer ||
-            expr.type().id()==ID_natural ||
-            expr.type().id()==ID_range)
-    {
-      out << expr.get(ID_value);
-    }
-    else
-      throw "unknown constant: "+expr.type().id_string();
+    convert_constant_expr(expr);
   }
   else if(expr.id()==ID_concatenation ||
           expr.id()==ID_bitand ||
@@ -892,153 +1230,22 @@ void cvc_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_equal ||
           expr.id()==ID_notequal)
   {
-    assert(expr.operands().size()==2);
-    assert(expr.op0().type()==expr.op1().type());
-
-    if(expr.op0().type().id()==ID_bool)
-    {
-      if(expr.id()==ID_notequal) out << "NOT (";
-      out << "(";
-      convert_expr(expr.op0());
-      out << ") <=> (";
-      convert_expr(expr.op1());
-      out << ")";
-      if(expr.id()==ID_notequal) out << ")";
-    }
-    else
-    {
-      out << "(";
-      convert_expr(expr.op0());
-      out << ")";
-      out << (expr.id()==ID_equal?"=":"/=");
-      out << "(";
-      convert_expr(expr.op1());
-      out << ")";
-    }
+    convert_equality_expr(expr);
   }
   else if(expr.id()==ID_le ||
           expr.id()==ID_lt ||
           expr.id()==ID_ge ||
           expr.id()==ID_gt)
   {
-    assert(expr.operands().size()==2);
-
-    const typet &op_type=expr.op0().type();
-
-    if(op_type.id()==ID_unsignedbv)
-    {
-      if(expr.id()==ID_le)
-        out << "BVLE";
-      else if(expr.id()==ID_lt)
-        out << "BVLT";
-      else if(expr.id()==ID_ge)
-        out << "BVGE";
-      else if(expr.id()==ID_gt)
-        out << "BVGT";
-
-      out << "(";
-      convert_expr(expr.op0());
-      out << ", ";
-      convert_expr(expr.op1());
-      out << ")";
-    }
-    else if(op_type.id()==ID_signedbv)
-    {
-      if(expr.id()==ID_le)
-        out << "SBVLE";
-      else if(expr.id()==ID_lt)
-        out << "SBVLT";
-      else if(expr.id()==ID_ge)
-        out << "SBVGE";
-      else if(expr.id()==ID_gt)
-        out << "SBVGT";
-
-      out << "(";
-      convert_expr(expr.op0());
-      out << ", ";
-      convert_expr(expr.op1());
-      out << ")";
-    }
-    else
-      throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
+    convert_comparison_expr(expr);
   }
   else if(expr.id()==ID_plus)
   {
-    if(expr.operands().size()>=2)
-    {
-      if(expr.type().id()==ID_unsignedbv ||
-         expr.type().id()==ID_signedbv)
-      {
-        out << "BVPLUS(" << expr.type().get(ID_width);
-
-        forall_operands(it, expr)
-        {
-          out << ", ";
-          convert_expr(*it);
-        }
-
-        out << ")";
-      }
-      else if(expr.type().id()==ID_pointer)
-      {
-        if(expr.operands().size()!=2)
-          throw "pointer arithmetic with more than two operands";
-
-        const exprt *p, *i;
-
-        if(expr.op0().type().id()==ID_pointer)
-        {
-          p=&expr.op0();
-          i=&expr.op1();
-        }
-        else if(expr.op1().type().id()==ID_pointer)
-        {
-          p=&expr.op1();
-          i=&expr.op0();
-        }
-        else
-          throw "unexpected mixture in pointer arithmetic";
-
-        out << "(LET P: " << cvc_pointer_type() << " = ";
-        convert_expr(*p);
-        out << " IN P WITH .offset:=BVPLUS("
-                     << config.ansi_c.pointer_width
-                     << ", P.offset, ";
-        convert_expr(*i);
-        out << "))";
-      }
-      else
-        throw "unsupported type for +: "+expr.type().id_string();
-    }
-    else if(expr.operands().size()==1)
-    {
-      convert_expr(expr.op0());
-    }
-    else
-      assert(false);
+    convert_plus_expr(expr);
   }
   else if(expr.id()==ID_minus)
   {
-    if(expr.operands().size()==2)
-    {
-      if(expr.type().id()==ID_unsignedbv ||
-         expr.type().id()==ID_signedbv)
-      {
-        out << "BVSUB(" << expr.type().get(ID_width) << ", ";
-        convert_expr(expr.op0());
-        out << ", ";
-        convert_expr(expr.op1());
-        out << ")";
-      }
-      else
-        throw "unsupported type for -: "+expr.type().id_string();
-    }
-    else if(expr.operands().size()==1)
-    {
-      convert_expr(expr.op0());
-    }
-    else
-      assert(false);
+    convert_minus_expr(expr);
   }
   else if(expr.id()==ID_div)
   {
@@ -1154,46 +1361,14 @@ void cvc_convt::convert_expr(const exprt &expr)
       out << ")";
     }
     else
-      throw "unsupported type for "+expr.id_string()+": "+expr.type().id_string();
+    {
+      throw "unsupported type for "+expr.id_string()+": "+
+        expr.type().id_string();
+    }
   }
   else if(expr.id()==ID_with)
   {
-    assert(expr.operands().size()>=1);
-    out << "(";
-    convert_expr(expr.op0());
-    out << ")";
-
-    for(unsigned i=1; i<expr.operands().size(); i+=2)
-    {
-      assert((i+1)<expr.operands().size());
-      const exprt &index=expr.operands()[i];
-      const exprt &value=expr.operands()[i+1];
-
-      if(expr.type().id()==ID_struct)
-      {
-        out << " WITH ." << index.get(ID_component_name);
-        out << ":=(";
-        convert_array_value(value);
-        out << ")";
-      }
-      else if(expr.type().id()==ID_union)
-      {
-        out << " WITH ." << index.get(ID_component_name);
-        out << ":=(";
-        convert_array_value(value);
-        out << ")";
-      }
-      else if(expr.type().id()==ID_array)
-      {
-        out << " WITH [";
-        convert_array_index(index);
-        out << "]:=(";
-        convert_array_value(value);
-        out << ")";
-      }
-      else
-        throw "with expects struct or array type, but got "+expr.type().id_string();
-    }
+    convert_with_expr(expr);
   }
   else if(expr.id()==ID_member)
   {
@@ -1216,7 +1391,7 @@ void cvc_convt::convert_expr(const exprt &expr)
     out << "(";
     convert_expr(expr.op0());
     out << ").object";
-    // TODO, this has the wrong type
+    // TODO(kroening) this has the wrong type
   }
   #endif
   else if(expr.id()==ID_string_constant)
@@ -1240,7 +1415,10 @@ void cvc_convt::convert_expr(const exprt &expr)
       out << "[" << i << ":" << i << "]=0bin1)";
     }
     else
-      throw "unsupported type for "+expr.id_string()+": "+expr.op0().type().id_string();
+    {
+      throw "unsupported type for "+expr.id_string()+": "+
+        expr.op0().type().id_string();
+    }
   }
   else if(expr.id()==ID_replication)
   {
@@ -1258,7 +1436,8 @@ void cvc_convt::convert_expr(const exprt &expr)
 
     for(mp_integer i=0; i<times; ++i)
     {
-      if(i!=0) out << "@";
+      if(i!=0)
+        out << "@";
       out << "v";
     }
 
@@ -1440,16 +1619,15 @@ void cvc_convt::convert_type(const typet &type)
     const struct_typet::componentst &components=
       struct_type.components();
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(struct_typet::componentt component : components)
     {
-      if(it!=components.begin()) out << ",";
+      if(component!=components.front())
+        out << ",";
+
       out << " ";
-      out << it->get(ID_name);
+      out << component.get_name();
       out << ": ";
-      convert_type(it->type());
+      convert_type(component.type());
     }
 
     out << " #]";
