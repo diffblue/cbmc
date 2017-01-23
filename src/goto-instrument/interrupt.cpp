@@ -217,15 +217,12 @@ void nested_interrupts(
     bool race_on_read=false;
     bool race_on_write=false;
 
-    for(isr_rw_set_mapt::const_iterator
-        it=isr_rw_set_map.begin();
-        it!=isr_rw_set_map.end();
-        ++it)
+    for(const auto &it : isr_rw_set_map)
     {
-      if(it->first==function_id)
+      if(it.first==function_id)
         continue;
 
-      const rw_set_function_rect &isr_rw_set=it->second;
+      const rw_set_function_rect &isr_rw_set=it.second;
 
       if(!race_on_read && potential_race_on_read(rw_set, isr_rw_set))
         race_on_read=true;
@@ -279,16 +276,14 @@ void nested_interrupts(
 
   // figure out which objects are read/written by the ISR
   isr_rw_set_mapt isr_rw_set_map;
-  for(isr_mapt::const_iterator
-      isr_it=isr_map.begin();
-      isr_it!=isr_map.end();
-      ++isr_it)
+
+  for(const auto &isr_it : isr_map)
   {
     recursion_sett recursion_set;
     rw_set_function_rect isr_rw_set(
-      value_sets, ns, goto_functions, isr_it->second, recursion_set);
+      value_sets, ns, goto_functions, isr_it.second, recursion_set);
     isr_rw_set_map.insert(
-      std::pair<irep_idt, rw_set_function_rect>(isr_it->second, isr_rw_set));
+      std::pair<irep_idt, rw_set_function_rect>(isr_it.second, isr_rw_set));
   }
 
   // now instrument
