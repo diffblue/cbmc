@@ -241,7 +241,36 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
   warning() << "failed to find field `"
             << component_name << "` in class hierarchy" << eom;
 
-  // We replace by a non-det of same type
+  exprt compound(expr.compound());
+  bool previous_dereference(true);
+
+  // We will search for the dereference in the member expr
+  while(compound.id()!=ID_dereference) 
+  {
+    if(compound.id()==ID_member) 
+    {
+      // If it's a member we go deeper
+      compound=to_member_expr(compound).compound();
+    }
+    else 
+    {
+      // Otherwise, we give up
+      previous_dereference=false;  
+      break; 
+    }
+  }
+
+
+   // Create a non-det of same type
   side_effect_expr_nondett nondet(expr.type());
+
+  if(previous_dereference) 
+  {
+    assert(compound.id()==ID_dereference);
+    // Attach the dereference
+    nondet.set("previous-dereference", compound); 
+  }
+
+  // We replace by the non-det
   expr.swap(nondet);
 }
