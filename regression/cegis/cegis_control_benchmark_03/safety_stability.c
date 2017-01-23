@@ -450,7 +450,7 @@ void assert_nonzero_controller(void) {
   __DSVERIFIER_assert(nonzero_coefficients > 0);
 }
 
-int safety_stability(void) {
+void safety_stability(void) {
 #ifdef INTERVAL
   get_bounds(); //get interval bounds
 #endif
@@ -466,8 +466,6 @@ int safety_stability(void) {
   __CPROVER_array_copy(K_fxp_trace, K_fxp);
   //__CPROVER_assert(0 == 1, "");
 #endif
-
-  return 0;
 }
 
 int main(void) {
@@ -484,4 +482,5 @@ int main(void) {
 #ifndef CPROVER
   }
 #endif
+  return 0;
 }
