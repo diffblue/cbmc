@@ -556,7 +556,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
     goto_programt::const_targett upper_bound,
     codet &dest)
 {
-  code_returnt ret=to_code_return(target->code);
+  const code_returnt &ret=to_code_return(target->code);
 
   // add return instruction unless original code was missing a return
   if(!ret.has_return_value() ||

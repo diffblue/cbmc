@@ -341,14 +341,13 @@ bool flow_insensitive_analysis_baset::do_function_call(
 
     goto_programt temp;
 
+    exprt rhs=side_effect_expr_nondett(code.lhs().type());
+
     goto_programt::targett r=temp.add_instruction();
     r->make_return();
-    r->code=code_returnt();
+    r->code=code_returnt(rhs);
     r->function=f_it->first;
     r->location_number=0;
-
-    exprt rhs=side_effect_expr_nondett(code.lhs().type());
-    r->code.move_to_operands(rhs);
 
     goto_programt::targett t=temp.add_instruction(END_FUNCTION);
     t->code.set(ID_identifier, code.function());
