@@ -265,7 +265,7 @@ json_objectt json(
       if(expr.get(ID_value)==ID_NULL)
         result["data"]=json_stringt("NULL");
     }
-    else if(type.id()==ID_bool || type.id()==ID_c_bool)
+    else if(type.id()==ID_bool)
     {
       result["name"]=json_stringt("boolean");
       result["binary"]=json_stringt(expr.is_true()?"1":"0");

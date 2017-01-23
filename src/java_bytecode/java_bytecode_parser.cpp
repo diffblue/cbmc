@@ -1455,11 +1455,11 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
       sourcefile_name=pool_entry(sourcefile_index).s;
     else
     {
-      std::string packageName=fqn.substr(0, last_index+1);
-      std::replace(packageName.begin(), packageName.end(), '.', '/');
-      const std::string
-        &fullFileName=(packageName+id2string(pool_entry(sourcefile_index).s));
-      sourcefile_name=fullFileName;
+      std::string package_name=fqn.substr(0, last_index+1);
+      std::replace(package_name.begin(), package_name.end(), '.', '/');
+      const std::string &full_file_name=
+        package_name+id2string(pool_entry(sourcefile_index).s);
+      sourcefile_name=full_file_name;
     }
 
     for(methodst::iterator m_it=parsed_class.methods.begin();

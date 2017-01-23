@@ -425,14 +425,14 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
   bounds_checks.operands().back().add_source_location()
     .set_comment("Array index < 0");
   bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-oob-low");
+    .set_property_class("array-index-out-of-bounds-low");
   bounds_checks.add(code_assertt(ltlength));
 
   bounds_checks.operands().back().add_source_location()=original_sloc;
   bounds_checks.operands().back().add_source_location()
     .set_comment("Array index >= length");
   bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-oob-high");
+    .set_property_class("array-index-out-of-bounds-high");
 
   // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
   return bounds_checks;
@@ -795,9 +795,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(i_it->statement=="jsr" ||
          i_it->statement=="jsr_w")
       {
-        instructionst::const_iterator next=i_it;
+        instructionst::const_iterator next=i_it+1;
         assert(
-          ++next!=instructions.end() &&
+          next!=instructions.end() &&
           "jsr without valid return address?");
         targets.insert(next->address);
         jsr_ret_targets.push_back(next->address);
@@ -1750,7 +1750,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!disable_runtime_checks)
       {
         // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=as_number(0, java_int_type());
+        constant_exprt intzero=from_integer(0, java_int_type());
         binary_relation_exprt gezero(op[0], ID_ge, intzero);
         code_assertt check(gezero);
         check.add_source_location().set_comment("Array size < 0");
@@ -1761,7 +1761,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         if(max_array_length!=0)
         {
           constant_exprt size_limit=
-            as_number(max_array_length, java_int_type());
+            from_integer(max_array_length, java_int_type());
           binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
           code_assumet assume_le_max_size(le_max_size);
           checkandcreate.move_to_operands(assume_le_max_size);
