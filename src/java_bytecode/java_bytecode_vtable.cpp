@@ -16,9 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/vtable.h>
 
-namespace
-{
-
 const char ID_virtual_name[] = "virtual_name";
 
 class is_virtual_name_equalt {
@@ -213,7 +210,6 @@ public:
   }
 };
 
-}
 
 /*******************************************************************
 
