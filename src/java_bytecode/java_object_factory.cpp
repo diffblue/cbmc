@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 /*******************************************************************\
 
@@ -223,11 +224,8 @@ void java_object_factoryt::gen_nondet_init(
       init_code.move_to_operands(null_check);
     }
 
-    if(subtype.id()==ID_struct &&
-       has_prefix(id2string(to_struct_type(subtype).get_tag()), "java::array["))
-    {
+    if(java_is_array_type(subtype))
       gen_nondet_array_init(expr, loc);
-    }
     else
     {
       exprt allocated=
