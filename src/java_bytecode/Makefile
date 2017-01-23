@@ -5,7 +5,7 @@ SRC = java_bytecode_language.cpp java_bytecode_parse_tree.cpp \
       java_bytecode_typecheck_type.cpp java_bytecode_internal_additions.cpp \
       java_root_class.cpp java_bytecode_parser.cpp bytecode_info.cpp \
       java_class_loader.cpp jar_file.cpp java_object_factory.cpp \
-      java_bytecode_convert_method.cpp
+      java_bytecode_convert_method.cpp java_local_variable_table.cpp
 
 INCLUDES= -I ..
 

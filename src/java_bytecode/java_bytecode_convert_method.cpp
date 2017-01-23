@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -21,12 +19,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <linking/zero_initializer.h>
 
+#include <goto-programs/cfg.h>
+#include <analyses/cfg_dominators.h>
+
 #include "java_bytecode_convert_method.h"
+#include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
 
 #include <limits>
 #include <algorithm>
+#include <functional>
+#include <unordered_set>
 
 class patternt
 {
@@ -49,237 +53,6 @@ public:
 
 protected:
   const char *p;
-};
-
-class java_bytecode_convert_methodt:public messaget
-{
-public:
-  java_bytecode_convert_methodt(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table)
-  {
-  }
-
-  typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef methodt::instructionst instructionst;
-
-  void operator()(const symbolt &class_symbol, const methodt &method)
-  {
-    convert(class_symbol, method);
-  }
-
-protected:
-  symbol_tablet &symbol_table;
-
-  irep_idt current_method;
-  typet method_return_type;
-
-  class variablet
-  {
-  public:
-    symbol_exprt symbol_expr;
-    size_t start_pc;
-    size_t length;
-    bool is_parameter;
-  };
-
-  typedef std::vector<variablet> variablest;
-  expanding_vector<variablest> variables;
-  std::set<symbol_exprt> used_local_names;
-  bool method_has_this;
-
-  typedef enum instruction_sizet
-  {
-    INST_INDEX=2, INST_INDEX_CONST=3
-  } instruction_sizet;
-
-  // return corresponding reference of variable
-  const variablet &find_variable_for_slot(
-    size_t address,
-    variablest &var_list,
-    instruction_sizet inst_size)
-  {
-    for(const variablet &var : var_list)
-    {
-      size_t start_pc=var.start_pc;
-      size_t length=var.length;
-      if(address+(size_t)inst_size>=start_pc &&
-         address<start_pc+length)
-        return var;
-    }
-    // add unnamed local variable to end of list at this index
-    // with scope from 0 to INT_MAX
-    // as it is at the end of the vector, it will only be taken into account
-    // if no other variable is valid
-    size_t list_length=var_list.size();
-    var_list.resize(list_length+1);
-    var_list[list_length].start_pc=0;
-    var_list[list_length].length=std::numeric_limits<size_t>::max();
-    return var_list[list_length];
-  }
-
-  // JVM local variables
-  enum variable_cast_argumentt
-  {
-    CAST_AS_NEEDED,
-    NO_CAST
-  };
-
-  const exprt variable(
-    const exprt &arg,
-    char type_char,
-    size_t address,
-    instruction_sizet inst_size,
-    variable_cast_argumentt do_cast)
-  {
-    irep_idt number=to_constant_expr(arg).get_value();
-
-    std::size_t number_int=safe_string2size_t(id2string(number));
-    typet t=java_type_from_char(type_char);
-    variablest &var_list=variables[number_int];
-
-    // search variable in list for correct frame / address if necessary
-    const variablet &var=
-      find_variable_for_slot(address, var_list, inst_size);
-
-    if(var.symbol_expr.get_identifier().empty())
-    {
-      // an un-named local variable
-      irep_idt base_name="anonlocal::"+id2string(number)+type_char;
-      irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-      symbol_exprt result(identifier, t);
-      result.set(ID_C_base_name, base_name);
-      used_local_names.insert(result);
-
-      return result;
-    }
-    else
-    {
-      exprt result=var.symbol_expr;
-      if(do_cast==CAST_AS_NEEDED && t!=result.type())
-        result=typecast_exprt(result, t);
-      return result;
-    }
-  }
-
-  // temporary variables
-  std::list<symbol_exprt> tmp_vars;
-
-  symbol_exprt tmp_variable(const std::string &prefix, const typet &type)
-  {
-    irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
-    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
-
-    auxiliary_symbolt tmp_symbol;
-    tmp_symbol.base_name=base_name;
-    tmp_symbol.is_static_lifetime=false;
-    tmp_symbol.mode=ID_java;
-    tmp_symbol.name=identifier;
-    tmp_symbol.type=type;
-    symbol_table.add(tmp_symbol);
-
-    symbol_exprt result(identifier, type);
-    result.set(ID_C_base_name, base_name);
-    tmp_vars.push_back(result);
-
-    return result;
-  }
-
-  // JVM program locations
-  irep_idt label(const irep_idt &address)
-  {
-    return "pc"+id2string(address);
-  }
-
-  // JVM Stack
-  typedef std::vector<exprt> stackt;
-  stackt stack;
-
-  exprt::operandst pop(std::size_t n)
-  {
-    if(stack.size()<n)
-    {
-      error() << "malformed bytecode (pop too high)" << eom;
-      throw 0;
-    }
-
-    exprt::operandst operands;
-    operands.resize(n);
-    for(std::size_t i=0; i<n; i++)
-      operands[i]=stack[stack.size()-n+i];
-
-    stack.resize(stack.size()-n);
-    return operands;
-  }
-
-  void push(const exprt::operandst &o)
-  {
-    stack.resize(stack.size()+o.size());
-
-    for(std::size_t i=0; i<o.size(); i++)
-      stack[stack.size()-o.size()+i]=o[i];
-  }
-
-  struct converted_instructiont
-  {
-    converted_instructiont(
-      const instructionst::const_iterator &it,
-      const codet &_code):source(it), code(_code), done(false)
-      {}
-
-    instructionst::const_iterator source;
-    std::list<unsigned> successors;
-    std::set<unsigned> predecessors;
-    codet code;
-    stackt stack;
-    bool done;
-  };
-
-  typedef std::map<unsigned, converted_instructiont> address_mapt;
-
-  struct block_tree_nodet
-  {
-    bool leaf;
-    std::vector<unsigned> branch_addresses;
-    std::vector<block_tree_nodet> branch;
-    block_tree_nodet():leaf(false) {}
-    explicit block_tree_nodet(bool l):leaf(l) {}
-    static block_tree_nodet get_leaf() { return block_tree_nodet(true); }
-  };
-
-  static void replace_goto_target(
-    codet &repl,
-    const irep_idt &old_label,
-    const irep_idt &new_label);
-
-  code_blockt &get_block_for_pcrange(
-    block_tree_nodet &tree,
-    code_blockt &this_block,
-    unsigned address_start,
-    unsigned address_limit,
-    unsigned next_block_start_address);
-
-  code_blockt &get_or_create_block_for_pcrange(
-    block_tree_nodet &tree,
-    code_blockt &this_block,
-    unsigned address_start,
-    unsigned address_limit,
-    unsigned next_block_start_address,
-    const address_mapt &amap,
-    bool allow_merge=true);
-
-  // conversion
-  void convert(const symbolt &class_symbol, const methodt &);
-  void convert(const instructiont &);
-
-  codet convert_instructions(
-    const instructionst &, const code_typet &);
-
-  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 };
 
 const size_t SLOTS_PER_INTEGER(1u);
@@ -309,7 +82,8 @@ static void cast_if_necessary(binary_relation_exprt &condition)
   exprt &lhs(condition.lhs());
   exprt &rhs(condition.rhs());
   const typet &lhs_type(lhs.type());
-  if(lhs_type==rhs.type()) return;
+  if(lhs_type==rhs.type())
+    return;
   rhs=typecast_exprt(rhs, lhs_type);
 }
 
@@ -319,6 +93,103 @@ static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
   assert(has_prefix(to_strip_str, "java::"));
   return to_strip_str.substr(6, std::string::npos);
 }
+
+java_bytecode_convert_methodt::java_bytecode_convert_methodt(
+  symbol_tablet &_symbol_table,
+  message_handlert &_message_handler) :
+  messaget(_message_handler),
+  symbol_table(_symbol_table)
+{
+}
+
+const exprt java_bytecode_convert_methodt::variable(
+  const exprt &arg,
+  char type_char,
+  size_t address,
+  variable_cast_argumentt do_cast)
+{
+  irep_idt number=to_constant_expr(arg).get_value();
+
+  std::size_t number_int=safe_string2size_t(id2string(number));
+  typet t=java_type_from_char(type_char);
+  variablest &var_list=variables[number_int];
+
+  // search variable in list for correct frame / address if necessary
+  const variablet &var=find_variable_for_slot(address, var_list);
+
+  if(var.symbol_expr.get_identifier().empty())
+  {
+    // an un-named local variable
+    irep_idt base_name="anonlocal::"+id2string(number)+type_char;
+    irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+    symbol_exprt result(identifier, t);
+    result.set(ID_C_base_name, base_name);
+    used_local_names.insert(result);
+    return result;
+  }
+  else
+  {
+    exprt result=var.symbol_expr;
+    if(do_cast==CAST_AS_NEEDED && t!=result.type())
+      result=typecast_exprt(result, t);
+    return result;
+  }
+}
+
+symbol_exprt java_bytecode_convert_methodt::tmp_variable(
+  const std::string &prefix,
+  const typet &type)
+{
+  irep_idt base_name=prefix+"_tmp"+std::to_string(tmp_vars.size());
+  irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
+
+  auxiliary_symbolt tmp_symbol;
+  tmp_symbol.base_name=base_name;
+  tmp_symbol.is_static_lifetime=false;
+  tmp_symbol.mode=ID_java;
+  tmp_symbol.name=identifier;
+  tmp_symbol.type=type;
+  symbol_table.add(tmp_symbol);
+
+  symbol_exprt result(identifier, type);
+  result.set(ID_C_base_name, base_name);
+  tmp_vars.push_back(result);
+
+  return result;
+}
+
+irep_idt java_bytecode_convert_methodt::label(const irep_idt &address)
+{
+  return "pc"+id2string(address);
+}
+
+exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
+{
+  if(stack.size()<n)
+  {
+    error() << "malformed bytecode (pop too high)" << eom;
+    throw 0;
+  }
+
+  exprt::operandst operands;
+  operands.resize(n);
+  for(std::size_t i=0; i<n; i++)
+    operands[i]=stack[stack.size()-n+i];
+
+  stack.resize(stack.size()-n);
+  return operands;
+}
+
+void java_bytecode_convert_methodt::push(const exprt::operandst &o)
+{
+  stack.resize(stack.size()+o.size());
+
+  for(std::size_t i=0; i<o.size(); i++)
+    stack[stack.size()-o.size()+i]=o[i];
+}
+
+
 
 /*******************************************************************\
 
@@ -342,6 +213,7 @@ void java_bytecode_convert_methodt::convert(
 
   const irep_idt method_identifier=
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+  method_id=method_identifier;
 
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
@@ -360,38 +232,24 @@ void java_bytecode_convert_methodt::convert(
 
   variables.clear();
 
-  // Do the parameters and locals in the variable table, which is available when
-  // compiled with -g or for methods with many local variables in the latter
-  // case, different variables can have the same index, depending on the
-  // context.
-  //
-  // to calculate which variable to use, one uses the address of the instruction
-  // that uses the variable, the size of the instruction and the start_pc /
-  // length values in the local variable table
+  // find parameter names in the local variable table:
   for(const auto &v : m.local_variable_table)
   {
+    if(v.start_pc!=0) // Local?
+      continue;
+
     typet t=java_type_from_string(v.signature);
     std::ostringstream id_oss;
-    id_oss << method_identifier << "::" << v.start_pc << "::" << v.name;
+    id_oss << method_id << "::" << v.name;
     irep_idt identifier(id_oss.str());
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.name);
-    size_t number_index_entries=variables[v.index].size();
-    variables[v.index].resize(number_index_entries+1);
-    variables[v.index][number_index_entries].symbol_expr=result;
-    variables[v.index][number_index_entries].start_pc=v.start_pc;
-    variables[v.index][number_index_entries].length=v.length;
-    symbolt new_symbol;
-    new_symbol.name=identifier;
-    new_symbol.type=t;
-    new_symbol.base_name=v.name;
-    new_symbol.pretty_name=strip_java_namespace_prefix(identifier);
-    new_symbol.mode=ID_java;
-    new_symbol.is_type=false;
-    new_symbol.is_file_local=true;
-    new_symbol.is_thread_local=true;
-    new_symbol.is_lvalue=true;
-    symbol_table.add(new_symbol);
+
+    variables[v.index].push_back(variablet());
+    auto &newv=variables[v.index].back();
+    newv.symbol_expr=result;
+    newv.start_pc=v.start_pc;
+    newv.length=v.length;
   }
 
   // set up variables array
@@ -493,9 +351,8 @@ void java_bytecode_convert_methodt::convert(
   method_has_this=code_type.has_this();
 
   tmp_vars.clear();
-
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(m.instructions, code_type);
+    method_symbol.value=convert_instructions(m, code_type);
 
   // do we have the method symbol already?
   const auto s_it=symbol_table.symbols.find(method.get_name());
@@ -855,9 +712,12 @@ static unsigned get_bytecode_type_width(const typet &ty)
 }
 
 codet java_bytecode_convert_methodt::convert_instructions(
-  const instructionst &instructions,
+  const methodt &method,
   const code_typet &method_type)
 {
+
+  const instructionst& instructions=method.instructions;
+
   // Run a worklist algorithm, assuming that the bytecode has not
   // been tampered with. See "Leroy, X. (2003). Java bytecode
   // verification: algorithms and formalizations. Journal of Automated
@@ -968,6 +828,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       a_it->second.predecessors.insert(address.first);
     }
   }
+
+  // Now that the control flow graph is built, set up our local variables
+  // (these require the graph to determine live ranges)
+  setup_local_variables(method,address_map);
 
   std::set<unsigned> working_set;
   if(!instructions.empty())
@@ -1198,7 +1062,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // store value into some local variable
       assert(op.size()==1 && results.empty());
 
-      exprt var=variable(arg0, statement[0], i_it->address, INST_INDEX, NO_CAST);
+      exprt var=variable(arg0, statement[0], i_it->address, NO_CAST);
 
       exprt toassign=op[0];
       if('a'==statement[0] && toassign.type()!=var.type())
@@ -1229,7 +1093,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?load"))
     {
       // load a value from a local variable
-      results[0]=variable(arg0, statement[0], i_it->address, INST_INDEX, CAST_AS_NEEDED);
+      results[0]=variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1297,7 +1161,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // if(retaddr==5) goto 5; else if(retaddr==10) goto 10; ...
       assert(op.empty() && results.empty());
       code_blockt branches;
-      auto retvar=variable(arg0, 'a', i_it->address, INST_INDEX, NO_CAST);
+      auto retvar=variable(arg0, 'a', i_it->address, NO_CAST);
       assert(!jsr_ret_targets.empty());
       for(size_t idx=0, idxlim=jsr_ret_targets.size(); idx!=idxlim; ++idx)
       {
@@ -1435,9 +1299,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="iinc")
     {
       code_assignt code_assign;
-      code_assign.lhs()=variable(arg0, 'i', i_it->address, INST_INDEX_CONST, NO_CAST);
+      code_assign.lhs()=variable(arg0, 'i', i_it->address, NO_CAST);
       code_assign.rhs()=plus_exprt(
-        variable(arg0, 'i', i_it->address, INST_INDEX_CONST, CAST_AS_NEEDED),
+        variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
         typecast_exprt(arg1, java_int_type()));
       c=code_assign;
     }
@@ -1970,10 +1834,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // Try to recover block structure as indicated in the local variable table:
 
   // The block tree node mirrors the block structure of root_block,
-  // indexing the Java PCs were each subblock starts and ends.
+  // indexing the Java PCs where each subblock starts and ends.
   block_tree_nodet root;
   code_blockt root_block;
 
+  // First create a simple flat list of basic blocks. We'll add lexical nesting
+  // constructs as variable live-ranges require next.
   bool start_new_block=true;
   for(const auto &address_pair : address_map)
   {
@@ -2038,13 +1904,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // Skip anonymous variables:
       if(v.symbol_expr.get_identifier()==irep_idt())
         continue;
-      code_declt d(v.symbol_expr);
       auto &block=get_block_for_pcrange(
         root,
         root_block,
         v.start_pc,
         v.start_pc+v.length,
         std::numeric_limits<unsigned>::max());
+      code_declt d(v.symbol_expr);
       block.operands().insert(block.operands().begin(), d);
     }
   }
