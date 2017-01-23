@@ -129,7 +129,8 @@ protected:
 
 public:
   typedef std::map<unsigned, converted_instructiont> address_mapt;
-  typedef cfg_dominators_templatet<const address_mapt, unsigned, false>
+  typedef std::pair<const methodt&, const address_mapt&> method_with_amapt;
+  typedef cfg_dominators_templatet<method_with_amapt, unsigned, false>
     java_cfg_dominatorst;
 
 protected:

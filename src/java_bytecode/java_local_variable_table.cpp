@@ -20,18 +20,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 template<class T>
 struct procedure_local_cfg_baset<
   T,
-  const java_bytecode_convert_methodt::address_mapt,
+  java_bytecode_convert_methodt::method_with_amapt,
   unsigned> :
   public graph<cfg_base_nodet<T, unsigned> >
 {
-  typedef java_bytecode_convert_methodt::address_mapt address_mapt;
+  typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
   typedef std::map<unsigned, unsigned> entry_mapt;
   entry_mapt entry_map;
 
   procedure_local_cfg_baset() {}
 
-  void operator()(const address_mapt& amap)
+  void operator()(const method_with_amapt& args)
   {
+    const auto& amap=args.second;
     for(const auto& inst : amap)
     {
       // Map instruction PCs onto node indices:
@@ -44,19 +45,21 @@ struct procedure_local_cfg_baset<
       for(auto succ : inst.second.successors)
         this->add_edge(entry_map.at(inst.first), entry_map.at(succ));
     }
+    // Add edges declared in the exception table, which don't figure
+    // in the address map successors/predecessors as yet.
   }
 
-  unsigned get_first_node(const address_mapt& amap) const
+  unsigned get_first_node(const method_with_amapt& args) const
   {
-    return amap.begin()->first;
+    return args.second.begin()->first;
   }
-  unsigned get_last_node(const address_mapt& amap) const
+  unsigned get_last_node(const method_with_amapt& args) const
   {
-    return (--amap.end())->first;
+    return (--args.second.end())->first;
   }
-  unsigned nodes_empty(const address_mapt& amap) const
+  unsigned nodes_empty(const method_with_amapt& args) const
   {
-    return amap.empty();
+    return args.second.empty();
   }
 };
 
@@ -744,7 +747,8 @@ void java_bytecode_convert_methodt::setup_local_variables(
 {
   // Compute CFG dominator tree
   java_cfg_dominatorst dominator_analysis;
-  dominator_analysis(amap);
+  method_with_amapt dominator_args(m,amap);
+  dominator_analysis(dominator_args);
 
   // Find out which local variable table entries should be merged:
   // Wrap each entry so we have somewhere to record live ranges with holes:
