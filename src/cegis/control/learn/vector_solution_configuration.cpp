@@ -2,15 +2,41 @@
 
 #include <goto-programs/goto_trace.h>
 
+#include <cegis/cegis-util/program_helper.h>
+#include <cegis/instrument/literals.h>
 #include <cegis/control/value/control_vars.h>
 #include <cegis/control/value/control_vector_solution.h>
 #include <cegis/control/preprocessing/propagate_controller_sizes.h>
 #include <cegis/control/learn/print_control_solution.h>
 #include <cegis/control/learn/vector_solution_configuration.h>
 
+namespace
+{
+bool is_assignment_to_solution_var(const goto_programt::instructiont &instr)
+{
+  if (goto_program_instruction_typet::ASSIGN != instr.type) return false;
+  const std::string &var_name=id2string(get_affected_variable(instr));
+  return CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == var_name;
+}
+}
+
 void vector_solution_configurationt::nondeterminise_solution_configuration(
     symbol_tablet &st, goto_functionst &gf)
 {
+  goto_programt &init_body=get_body(gf, CPROVER_INIT);
+  goto_programt::instructionst &init_instrs=init_body.instructions;
+  const goto_programt::targett assignment=std::find_if(init_instrs.begin(),
+      init_instrs.end(), is_assignment_to_solution_var);
+  goto_programt &entry_body=get_entry_body(gf);
+  const goto_programt::targett first_entry=entry_body.instructions.begin();
+  const goto_programt::targett new_assignment=entry_body.insert_before(
+      first_entry);
+  new_assignment->source_location=first_entry->source_location;
+  new_assignment->type=assignment->type;
+  new_assignment->code=assignment->code;
+  init_body.instructions.erase(assignment);
+  init_body.update();
+  entry_body.update();
 }
 
 namespace
