@@ -1124,18 +1124,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       const dereference_exprt element(data_plus_offset, element_type);
 
-      code_blockt assert_and_put;
+      c=code_blockt();
       if(!disable_runtime_checks)
       {
         codet bounds_check=
           get_array_bounds_check(deref, op[1], i_it->source_location);
         bounds_check.add_source_location()=i_it->source_location;
-        assert_and_put.move_to_operands(bounds_check);
+        c.move_to_operands(bounds_check);
       }
       code_assignt array_put(element, op[2]);
       array_put.add_source_location()=i_it->source_location;
-      assert_and_put.move_to_operands(array_put);
-      c=std::move(assert_and_put);
+      c.move_to_operands(array_put);
       c.add_source_location()=i_it->source_location;
     }
     else if(statement==patternt("?store"))
@@ -1174,10 +1173,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       if(!disable_runtime_checks)
       {
-        codet bounds_check=
-          get_array_bounds_check(deref, op[1], i_it->source_location);
-        bounds_check.add_source_location()=i_it->source_location;
-        c=std::move(bounds_check);
+        c=get_array_bounds_check(deref, op[1], i_it->source_location);
+        c.add_source_location()=i_it->source_location;
       }
       results[0]=java_bytecode_promotion(element);
     }
@@ -1252,7 +1249,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // and write something like:
       // if(retaddr==5) goto 5; else if(retaddr==10) goto 10; ...
       assert(op.empty() && results.empty());
-      code_blockt branches;
+      c=code_blockt();
       auto retvar=variable(arg0, 'a', i_it->address, NO_CAST);
       assert(!jsr_ret_targets.empty());
       for(size_t idx=0, idxlim=jsr_ret_targets.size(); idx!=idxlim; ++idx)
@@ -1261,7 +1258,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         code_gotot g(label(number));
         g.add_source_location()=i_it->source_location;
         if(idx==idxlim-1)
-          branches.move_to_operands(g);
+          c.move_to_operands(g);
         else
         {
           code_ifthenelset branch;
@@ -1272,10 +1269,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
           branch.cond().add_source_location()=i_it->source_location;
           branch.then_case()=g;
           branch.add_source_location()=i_it->source_location;
-          branches.move_to_operands(branch);
+          c.move_to_operands(branch);
         }
       }
-      c=std::move(branches);
     }
     else if(statement=="iconst_m1")
     {
