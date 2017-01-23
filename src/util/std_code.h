@@ -69,7 +69,7 @@ public:
   explicit code_blockt(const std::list<codet> &_list):codet(ID_block)
   {
     operandst &o=operands();
-    o.reserve(_list.size());
+    reserve_operands(_list.size());
     for(std::list<codet>::const_iterator
         it=_list.begin();
         it!=_list.end();
@@ -281,8 +281,7 @@ class code_assumet:public codet
 public:
   inline code_assumet():codet(ID_assume)
   {
-    // will change to resize(1) in the future
-    operands().reserve(1);
+    operands().resize(1);
   }
 
   inline explicit code_assumet(const exprt &expr):codet(ID_assume)
@@ -320,8 +319,7 @@ class code_assertt:public codet
 public:
   inline code_assertt():codet(ID_assert)
   {
-    // will change to resize(1) in the future
-    operands().reserve(1);
+    operands().resize(1);
   }
 
   inline explicit code_assertt(const exprt &expr):codet(ID_assert)
@@ -723,7 +721,8 @@ class code_returnt:public codet
 public:
   inline code_returnt():codet(ID_return)
   {
-    operands().reserve(1);
+    operands().resize(1);
+    op0().make_nil();
   }
 
   explicit inline code_returnt(const exprt &_op):codet(ID_return)
@@ -738,13 +737,14 @@ public:
 
   inline exprt &return_value()
   {
-    operands().resize(1);
     return op0();
   }
 
   inline bool has_return_value() const
   {
-    return operands().size()==1;
+    if(operands().empty())
+      return false; // backwards compatibility
+    return return_value().is_not_nil();
   }
 };
 
@@ -931,7 +931,7 @@ public:
 
   inline explicit code_asmt(const exprt &expr):codet(ID_asm)
   {
-    operands().push_back(expr);
+    copy_to_operands(expr);
   }
 
   inline const irep_idt &get_flavor() const
@@ -969,7 +969,7 @@ public:
 
   inline explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
-    operands().push_back(expr);
+    copy_to_operands(expr);
   }
 
   inline friend code_expressiont &to_code_expression(codet &code)
