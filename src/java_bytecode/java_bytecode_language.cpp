@@ -239,15 +239,13 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 
   symbolt entry=res.main_function;
 
-  if(java_entry_point(
-       symbol_table,
-       main_class,
-       get_message_handler(),
-       assume_inputs_non_null,
-       max_nondet_array_length))
-    return true;
-
-  return false;
+  return(
+    java_entry_point(
+      symbol_table,
+      main_class,
+      get_message_handler(),
+      assume_inputs_non_null,
+      max_nondet_array_length));
 }
 
 /*******************************************************************\

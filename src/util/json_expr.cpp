@@ -16,6 +16,7 @@ Author: Peter Schrammel
 #include "config.h"
 
 #include "json_expr.h"
+
 /*******************************************************************\
 
 Function: json

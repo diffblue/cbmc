@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iostream>
 
+#include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
@@ -71,18 +72,6 @@ static void create_initialize(symbol_tablet &symbol_table)
 }
 
 
-/*******************************************************************\
-
-Function: java_static_lifetime_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool should_init_symbol(const symbolt& sym)
 {
   if(sym.type.id()!=ID_code &&
@@ -94,6 +83,18 @@ static bool should_init_symbol(const symbolt& sym)
 
   return has_prefix(id2string(sym.name), "java::java.lang.String.Literal");
 }
+
+/*******************************************************************\
+
+Function: java_static_lifetime_init
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool java_static_lifetime_init(
   symbol_tablet &symbol_table,
@@ -126,12 +127,11 @@ bool java_static_lifetime_init(
           std::string namestr=id2string(sym.symbol_expr().get_identifier());
           const std::string suffix="@class_model";
           // Static '.class' fields are always non-null.
-          if(namestr.size()>=suffix.size() &&
-             namestr.substr(namestr.size()-suffix.size())==suffix)
+          if(has_suffix(namestr, suffix))
             allow_null=false;
           if(allow_null && has_prefix(
-                             namestr,
-                             "java::java.lang.String.Literal"))
+               namestr,
+               "java::java.lang.String.Literal"))
             allow_null=false;
         }
         auto newsym=object_factory(
@@ -208,7 +208,7 @@ exprt::operandst java_build_arguments(
   {
     bool is_this=(param_number==0) &&
                  parameters[param_number].get_this();
-    bool is_default_entry_point(config.main=="");
+    bool is_default_entry_point(config.main.empty());
     bool is_main=is_default_entry_point;
     if(!is_main)
     {
@@ -244,7 +244,7 @@ exprt::operandst java_build_arguments(
     input.op0()=address_of_exprt(
       index_exprt(
         string_constantt(p_symbol.base_name),
-        gen_zero(index_type())));
+        from_integer(0, index_type())));
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
 
@@ -293,7 +293,7 @@ void java_record_outputs(
       address_of_exprt(
         index_exprt(
           string_constantt(return_symbol.base_name),
-          gen_zero(index_type())));
+          from_integer(0, index_type())));
     output.op1()=return_symbol.symbol_expr();
     output.add_source_location()=function.location;
 
@@ -316,7 +316,7 @@ void java_record_outputs(
         address_of_exprt(
           index_exprt(
             string_constantt(p_symbol.base_name),
-            gen_zero(index_type())));
+            from_integer(0, index_type())));
       output.op1()=main_arguments[param_number];
       output.add_source_location()=function.location;
 
