@@ -124,13 +124,13 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
   std::list<T> worklist;
 
-  if(program.instructions.empty())
+  if(cfg.nodes_empty(program))
     return;
 
   if(post_dom)
-    entry_node = --program.instructions.end();
+    entry_node=cfg.get_last_node(program);
   else
-    entry_node = program.instructions.begin();
+    entry_node=cfg.get_first_node(program);
   typename cfgt::nodet &n=cfg[cfg.entry_map[entry_node]];
   n.dominators.insert(entry_node);
 
@@ -200,6 +200,25 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 
 /*******************************************************************\
 
+Function: dominators_pretty_print_node
+
+  Inputs: `node` to print and stream `out` to pretty-print it to
+
+ Outputs:
+
+ Purpose: Pretty-print a single node in the dominator tree.
+          Supply a specialisation if operator<< is not sufficient.
+
+\*******************************************************************/
+
+template <class T>
+void dominators_pretty_print_node(const T &node, std::ostream &out)
+{
+  out << node;
+}
+
+/*******************************************************************\
+
 Function: cfg_dominators_templatet::output
 
   Inputs:
@@ -215,20 +234,20 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
   for(const auto &node : cfg.entry_map)
   {
-    unsigned n=node.first->location_number;
+    T n=node.first;
 
+    dominators_pretty_print_node(n, out);
     if(post_dom)
-      out << n << " post-dominated by ";
+      out << " post-dominated by ";
     else
-      out << n << " dominated by ";
-    for(typename target_sett::const_iterator
-        d_it=node.second.dominators.begin();
-        d_it!=node.second.dominators.end();
-       ) // no d_it++
+      out << " dominated by ";
+    bool first=true;
+    for(const auto &d : cfg[node.second].dominators)
     {
-      out << (*d_it)->location_number;
-      if (++d_it!=node.second.dominators.end())
+      if(!first)
         out << ", ";
+      first=false;
+      dominators_pretty_print_node(d, out);
     }
     out << "\n";
   }
@@ -239,5 +258,13 @@ typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targe
 
 typedef cfg_dominators_templatet<const goto_programt, goto_programt::const_targett, true>
         cfg_post_dominatorst;
+
+template<>
+inline void dominators_pretty_print_node(
+  const goto_programt::const_targett& node,
+  std::ostream& out)
+{
+  out << node->location_number;
+}
 
 #endif // CPROVER_ANALYSES_CFG_DOMINATORS_H
