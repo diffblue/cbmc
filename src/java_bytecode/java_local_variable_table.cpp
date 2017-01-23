@@ -20,43 +20,71 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 template<class T>
 struct procedure_local_cfg_baset<
   T,
-  const java_bytecode_convert_methodt::address_mapt,
+  java_bytecode_convert_methodt::method_with_amapt,
   unsigned> :
   public graph<cfg_base_nodet<T, unsigned> >
 {
-  typedef java_bytecode_convert_methodt::address_mapt address_mapt;
+  typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
   typedef std::map<unsigned, unsigned> entry_mapt;
   entry_mapt entry_map;
 
   procedure_local_cfg_baset() {}
 
-  void operator()(const address_mapt& amap)
+  void operator()(const method_with_amapt &args)
   {
-    for(const auto& inst : amap)
+    const auto &method=args.first;
+    const auto &amap=args.second;
+    for(const auto &inst : amap)
     {
       // Map instruction PCs onto node indices:
       entry_map[inst.first]=this->add_node();
       // Map back:
       (*this)[entry_map[inst.first]].PC=inst.first;
     }
-    for(const auto& inst : amap)
+    // Add edges declared in the address map:
+    for(const auto &inst : amap)
     {
       for(auto succ : inst.second.successors)
         this->add_edge(entry_map.at(inst.first), entry_map.at(succ));
     }
+    // Next, add edges declared in the exception table, which
+    // don't figure in the address map successors/predecessors as yet:
+    for(const auto &table_entry : method.exception_table)
+    {
+      auto findit=amap.find(table_entry.start_pc);
+      assert(findit!=amap.end() &&
+             "Exception table entry doesn't point to an instruction?");
+      for(; findit->first<table_entry.end_pc; ++findit)
+      {
+        // For now just assume any non-branch
+        // instruction could potentially throw.
+        auto succit=findit;
+        ++succit;
+        if(succit==amap.end())
+          continue;
+        const auto &thisinst=findit->second;
+        if(thisinst.successors.size()==1 &&
+           thisinst.successors.back()==succit->first)
+        {
+          this->add_edge(
+            entry_map.at(findit->first),
+            entry_map.at(table_entry.handler_pc));
+        }
+      }
+    }
   }
 
-  unsigned get_first_node(const address_mapt& amap) const
+  unsigned get_first_node(const method_with_amapt &args) const
   {
-    return amap.begin()->first;
+    return args.second.begin()->first;
   }
-  unsigned get_last_node(const address_mapt& amap) const
+  unsigned get_last_node(const method_with_amapt &args) const
   {
-    return (--amap.end())->first;
+    return (--args.second.end())->first;
   }
-  unsigned nodes_empty(const address_mapt& amap) const
+  unsigned nodes_empty(const method_with_amapt &args) const
   {
-    return amap.empty();
+    return args.second.empty();
   }
 };
 
@@ -75,8 +103,8 @@ typedef java_bytecode_convert_methodt::java_cfg_dominatorst
 // Comparators for local variables:
 
 static bool lt_index(
-  const local_variable_with_holest& a,
-  const local_variable_with_holest& b)
+  const local_variable_with_holest &a,
+  const local_variable_with_holest &b)
 {
   return a.var.index<b.var.index;
 }
@@ -96,9 +124,9 @@ typedef std::map<
 
 struct is_predecessor_oft
 {
-  const predecessor_mapt& order;
+  const predecessor_mapt &order;
 
-  explicit is_predecessor_oft(const predecessor_mapt& _order) : order(_order) {}
+  explicit is_predecessor_oft(const predecessor_mapt &_order) : order(_order) {}
 
   bool operator()(
     local_variable_with_holest* a,
@@ -129,7 +157,7 @@ Function: gather_transitive_predecessors
 
 static void gather_transitive_predecessors(
   local_variable_with_holest* start,
-  const predecessor_mapt& predecessor_map,
+  const predecessor_mapt &predecessor_map,
   std::set<local_variable_with_holest*>& result)
 {
   if(!result.insert(start).second)
@@ -156,7 +184,7 @@ Function: is_store_to_slot
 \*******************************************************************/
 
 static bool is_store_to_slot(
-  const java_bytecode_convert_methodt::instructiont& inst,
+  const java_bytecode_convert_methodt::instructiont &inst,
   unsigned slotidx)
 {
   const std::string prevstatement=id2string(inst.statement);
@@ -167,7 +195,7 @@ static bool is_store_to_slot(
   if(inst.args.size()==1)
   {
     // Store with an argument:
-    const auto& arg=inst.args[0];
+    const auto &arg=inst.args[0];
     storeslot=id2string(to_constant_expr(arg).get_value());
   }
   else
@@ -195,7 +223,7 @@ Function: maybe_add_hole
 \*******************************************************************/
 
 static void maybe_add_hole(
-  local_variable_with_holest& var,
+  local_variable_with_holest &var,
   unsigned from,
   unsigned to)
 {
@@ -271,9 +299,9 @@ static void populate_predecessor_map(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
   const std::vector<local_variable_with_holest*>& live_variable_at_address,
-  const address_mapt& amap,
-  predecessor_mapt& predecessor_map,
-  message_handlert& msg_handler)
+  const address_mapt &amap,
+  predecessor_mapt &predecessor_map,
+  message_handlert &msg_handler)
 {
   messaget msg(msg_handler);
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
@@ -385,7 +413,7 @@ Function: get_common_dominator
 
 static unsigned get_common_dominator(
   const std::set<local_variable_with_holest*>& merge_vars,
-  const java_cfg_dominatorst& dominator_analysis)
+  const java_cfg_dominatorst &dominator_analysis)
 {
   assert(!merge_vars.empty());
 
@@ -399,9 +427,9 @@ static unsigned get_common_dominator(
   std::vector<unsigned> candidate_dominators;
   for(auto v : merge_vars)
   {
-    const auto& dominator_nodeidx=
+    const auto &dominator_nodeidx=
       dominator_analysis.cfg.entry_map.at(v->var.start_pc);
-    const auto& this_var_doms=
+    const auto &this_var_doms=
       dominator_analysis.cfg[dominator_nodeidx].dominators;
     for(const auto this_var_dom : this_var_doms)
       if(this_var_dom<=first_pc)
@@ -451,7 +479,7 @@ Function: populate_live_range_holes
 \*******************************************************************/
 
 static void populate_live_range_holes(
-  local_variable_with_holest& merge_into,
+  local_variable_with_holest &merge_into,
   const std::set<local_variable_with_holest*>& merge_vars,
   unsigned expanded_live_range_start)
 {
@@ -489,10 +517,10 @@ Function: merge_variable_table_entries
 \*******************************************************************/
 
 static void merge_variable_table_entries(
-  local_variable_with_holest& merge_into,
+  local_variable_with_holest &merge_into,
   const std::set<local_variable_with_holest*>& merge_vars,
-  const java_cfg_dominatorst& dominator_analysis,
-  std::ostream& debug_out)
+  const java_cfg_dominatorst &dominator_analysis,
+  std::ostream &debug_out)
 {
   // Because we need a lexically-scoped declaration,
   // we must have the merged variable
@@ -527,7 +555,7 @@ static void merge_variable_table_entries(
 #endif
 
   // Nuke the now-subsumed var-table entries:
-  for(auto& v : merge_vars)
+  for(auto &v : merge_vars)
     if(v!=&merge_into)
       v->var.length=0;
 }
@@ -557,8 +585,8 @@ Function: find_initialisers_for_slot
 void java_bytecode_convert_methodt::find_initialisers_for_slot(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
-  const address_mapt& amap,
-  const java_cfg_dominatorst& dominator_analysis)
+  const address_mapt &amap,
+  const java_cfg_dominatorst &dominator_analysis)
 {
   // Build a simple map from instruction PC to the variable
   // live in this slot at that PC, and a map from each variable
@@ -582,7 +610,7 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   // Now merge vartable entries according to the predecessor_map:
 
   // Take the transitive closure of the predecessor map:
-  for(auto& kv : predecessor_map)
+  for(auto &kv : predecessor_map)
   {
     std::set<local_variable_with_holest*> closed_preds;
     gather_transitive_predecessors(kv.first, predecessor_map, closed_preds);
@@ -609,7 +637,7 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
     if(findit==predecessor_map.end())
       continue;
 
-    const auto& merge_vars=findit->second;
+    const auto &merge_vars=findit->second;
     assert(merge_vars.size()>=2);
 
     merge_variable_table_entries(
@@ -638,8 +666,8 @@ Function: walk_to_next_index
 \*******************************************************************/
 
 static void walk_to_next_index(
-  local_variable_table_with_holest::iterator& it1,
-  local_variable_table_with_holest::iterator& it2,
+  local_variable_table_with_holest::iterator &it1,
+  local_variable_table_with_holest::iterator &it2,
   local_variable_table_with_holest::iterator itend)
 {
   if(it2==itend)
@@ -671,9 +699,9 @@ Function: find_initialisers
 \*******************************************************************/
 
 void java_bytecode_convert_methodt::find_initialisers(
-  local_variable_table_with_holest& vars,
-  const address_mapt& amap,
-  const java_cfg_dominatorst& dominator_analysis)
+  local_variable_table_with_holest &vars,
+  const address_mapt &amap,
+  const java_cfg_dominatorst &dominator_analysis)
 {
   // Sort table entries by local slot index:
   std::sort(vars.begin(), vars.end(), lt_index);
@@ -739,17 +767,18 @@ Function: setup_local_variables
 \*******************************************************************/
 
 void java_bytecode_convert_methodt::setup_local_variables(
-  const methodt& m,
-  const address_mapt& amap)
+  const methodt &m,
+  const address_mapt &amap)
 {
   // Compute CFG dominator tree
   java_cfg_dominatorst dominator_analysis;
-  dominator_analysis(amap);
+  method_with_amapt dominator_args(m, amap);
+  dominator_analysis(dominator_args);
 
   // Find out which local variable table entries should be merged:
   // Wrap each entry so we have somewhere to record live ranges with holes:
   std::vector<local_variable_with_holest> vars_with_holes;
-  for(const auto& v : m.local_variable_table)
+  for(const auto &v : m.local_variable_table)
     vars_with_holes.push_back({v, {}});
 
   // Merge variable records:

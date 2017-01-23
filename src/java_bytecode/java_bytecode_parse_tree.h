@@ -82,8 +82,12 @@ public:
       return instructions.back();
     }
 
-    class exceptiont
+    struct exceptiont
     {
+      std::size_t start_pc;
+      std::size_t end_pc;
+      std::size_t handler_pc;
+      symbol_typet catch_type;
     };
 
     typedef std::vector<exceptiont> exception_tablet;
