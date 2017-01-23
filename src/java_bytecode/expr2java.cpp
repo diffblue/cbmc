@@ -95,7 +95,7 @@ std::string expr2javat::convert_code_function_call(
         first=false;
       else
         dest+=", ";
-      // TODO: ggf. Klammern je nach p
+      // TODO: if necessery add parentheses, dependent on p
       dest+=arg_str;
     }
   }

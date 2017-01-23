@@ -514,7 +514,7 @@ Function: new_tmp_symbol
 
 symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string& prefix)
 {
-  static size_t temporary_counter=0; // TODO change this
+  static size_t temporary_counter=0; // TODO encapsulate as class variable
 
   auxiliary_symbolt new_symbol;
   symbolt *symbol_ptr;
