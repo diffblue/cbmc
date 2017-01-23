@@ -692,10 +692,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
               namespacet(symbol_table).lookup(args[i].get(ID_C_identifier)).symbol_expr());
           }
 
-          code_returnt code_return;
-          code_return.return_value() = expr_call;
-
-          func_symb.value = code_return;
+          func_symb.value=code_returnt(expr_call);
         }
         else
         {

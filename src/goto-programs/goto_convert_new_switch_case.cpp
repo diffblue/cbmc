@@ -1508,7 +1508,7 @@ void goto_convertt::convert_return(
 
     // remove void-typed return value
     if(!result_is_used)
-      new_code.operands().resize(0);
+      new_code.return_value().make_nil();
   }
 
   if(targets.has_return_value)
