@@ -1,8 +1,8 @@
 CORE
 some_jar.jar
 
-^EXIT=0$
+^EXIT=\(0\|6\)$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^\(VERIFICATION SUCCESSFUL\|No support for reading JAR files\)$
 --
 ^warning: ignoring
