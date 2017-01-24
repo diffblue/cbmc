@@ -19,6 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_program_dereferencet:protected dereference_callbackt
 {
 public:
+  // Note: this currently doesn't specify a source language
+  // for the final argument to value_set_dereferencet.
+  // This means that language-inappropriate values such as
+  // (struct A*)some_integer_value in Java, may be returned.
   goto_program_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
@@ -27,7 +31,7 @@ public:
     options(_options),
     ns(_ns),
     value_sets(_value_sets),
-    dereference(_ns, _new_symbol_table, _options, *this) { }
+    dereference(_ns, _new_symbol_table, _options, *this, ID_nil) { }
 
   void dereference_program(
     goto_programt &goto_program,

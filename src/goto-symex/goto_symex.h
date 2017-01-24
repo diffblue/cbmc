@@ -49,6 +49,7 @@ public:
     remaining_vccs(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
+    language_mode(),
     ns(_ns),
     target(_target),
     atomic_section_counter(0),
@@ -94,6 +95,10 @@ public:
 
   optionst options;
   symbol_tablet &new_symbol_table;
+
+  /// language_mode: ID_java, ID_C or another language identifier
+  /// if we know the source language in use, irep_idt() otherwise.
+  irep_idt language_mode;
 
 protected:
   const namespacet &ns;

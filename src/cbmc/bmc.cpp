@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/time_stopping.h>
 #include <util/message.h>
 #include <util/json.h>
+#include <util/cprover_prefix.h>
 
 #include <langapi/mode.h>
 #include <langapi/languages.h>
@@ -430,6 +431,12 @@ safety_checkert::resultt bmct::run(
 
   symex.set_message_handler(get_message_handler());
   symex.options=options;
+
+  {
+    const symbolt *init_symbol;
+    if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
+      symex.language_mode=init_symbol->mode;
+  }  
 
   status() << "Starting Bounded Model Checking" << eom;
 

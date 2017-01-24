@@ -452,6 +452,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     // This is stuff like *((char *)5).
     // This is turned into an access to __CPROVER_memory[...].
 
+    if(language_mode==ID_java)
+    {
+      result.value=nil_exprt();
+      return result;
+    }
+    
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
