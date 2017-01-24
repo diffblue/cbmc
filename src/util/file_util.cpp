@@ -9,6 +9,7 @@ Date: January 2012
 \*******************************************************************/
 
 #include <cerrno>
+#include <cassert>
 
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
@@ -276,10 +277,18 @@ std::string  fileutl_normalise_path(std::string const&  path)
 {
   std::string  result = path;
   std::replace(result.begin(),result.end(),'\\','/');
-  std::string::size_type  pos = 0;
+  std::string::size_type  pos = 0ULL;
+  while((pos = result.find("//",0)) != std::string::npos)
+    result.replace(pos,2,"/");
   while((pos = result.find("/./",0)) != std::string::npos)
     result.replace(pos,3,"/");
-  // TODO: more fixes should be applied (e.g. /../, //, etc.)
+  while((pos = result.find("/../",0)) != std::string::npos)
+  {
+    assert(pos != 0ULL);
+    const std::string::size_type  prev_pos = result.rfind("/",pos-1ULL);
+    assert(pos != std::string::npos);
+    result.replace(prev_pos,pos - prev_pos + 4ULL,"/");
+  }
   return result;
 }
 
