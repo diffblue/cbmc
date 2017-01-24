@@ -109,8 +109,8 @@ static bool lt_index(
   return a.var.index<b.var.index;
 }
 static bool lt_startpc(
-  const local_variable_with_holest* a,
-  const local_variable_with_holest* b)
+  const local_variable_with_holest *a,
+  const local_variable_with_holest *b)
 {
   return a->var.start_pc<b->var.start_pc;
 }
@@ -118,8 +118,8 @@ static bool lt_startpc(
 // The predecessor map, and a top-sorting comparator:
 
 typedef std::map<
-  local_variable_with_holest*,
-  std::set<local_variable_with_holest*> >
+  local_variable_with_holest *,
+  std::set<local_variable_with_holest *> >
   predecessor_mapt;
 
 struct is_predecessor_oft
@@ -129,8 +129,8 @@ struct is_predecessor_oft
   explicit is_predecessor_oft(const predecessor_mapt &_order) : order(_order) {}
 
   bool operator()(
-    local_variable_with_holest* a,
-    local_variable_with_holest* b) const
+    local_variable_with_holest *a,
+    local_variable_with_holest *b) const
   {
     auto findit=order.find(a);
     if(findit==order.end())
@@ -483,7 +483,7 @@ static void populate_live_range_holes(
   const std::set<local_variable_with_holest *> &merge_vars,
   unsigned expanded_live_range_start)
 {
-  std::vector<local_variable_with_holest*> sorted_by_startpc(
+  std::vector<local_variable_with_holest *> sorted_by_startpc(
     merge_vars.begin(), merge_vars.end());
   std::sort(sorted_by_startpc.begin(), sorted_by_startpc.end(), lt_startpc);
 
@@ -591,7 +591,7 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   // Build a simple map from instruction PC to the variable
   // live in this slot at that PC, and a map from each variable
   // to variables that flow into it:
-  std::vector<local_variable_with_holest*> live_variable_at_address;
+  std::vector<local_variable_with_holest *> live_variable_at_address;
   populate_variable_address_map(firstvar, varlimit, live_variable_at_address);
 
   // Now find variables that flow together by
@@ -612,14 +612,14 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   // Take the transitive closure of the predecessor map:
   for(auto &kv : predecessor_map)
   {
-    std::set<local_variable_with_holest*> closed_preds;
+    std::set<local_variable_with_holest *> closed_preds;
     gather_transitive_predecessors(kv.first, predecessor_map, closed_preds);
     kv.second=std::move(closed_preds);
   }
 
   // Top-sort so that we get the bottom variables first:
   is_predecessor_oft comp(predecessor_map);
-  std::vector<local_variable_with_holest*> topsorted_vars;
+  std::vector<local_variable_with_holest *> topsorted_vars;
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
     topsorted_vars.push_back(&*it);
 
