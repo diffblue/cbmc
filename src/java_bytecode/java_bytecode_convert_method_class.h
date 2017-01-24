@@ -223,6 +223,10 @@ protected:
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 
+  void check_static_field_stub(
+    const symbol_exprt &se,
+    const irep_idt &basename);
+
   enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
   void save_stack_entries(
     const std::string &,
