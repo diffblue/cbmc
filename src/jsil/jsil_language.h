@@ -19,20 +19,20 @@ public:
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream);
+    std::ostream &outstream) override;
 
   virtual bool parse(
     std::istream &instream,
-    const std::string &path);
+    const std::string &path) override;
 
   virtual bool typecheck(
     symbol_tablet &context,
-    const std::string &module);
+    const std::string &module) override;
 
   virtual bool final(
-    symbol_tablet &context);
+    symbol_tablet &context) override;
 
-  virtual void show_parse(std::ostream &out);
+  virtual void show_parse(std::ostream &out) override;
 
   virtual ~jsil_languaget();
   jsil_languaget() { }
@@ -40,29 +40,29 @@ public:
   virtual bool from_expr(
     const exprt &expr,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
   virtual bool from_type(
     const typet &type,
     std::string &code,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
   virtual bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
-  virtual languaget *new_language()
+  virtual languaget *new_language() override
   { return new jsil_languaget; }
 
-  virtual std::string id() const { return "jsil"; }
-  virtual std::string description() const
+  virtual std::string id() const override { return "jsil"; }
+  virtual std::string description() const override
   { return "Javascript Intermediate Language"; }
-  virtual std::set<std::string> extensions() const;
+  virtual std::set<std::string> extensions() const override;
 
-  virtual void modules_provided(std::set<std::string> &modules);
-  virtual bool interfaces(symbol_tablet &symbol_table);
+  virtual void modules_provided(std::set<std::string> &modules) override;
+  virtual bool interfaces(symbol_tablet &symbol_table) override;
 
   virtual bool generate_start_function(
     const class symbolt &entry_function_symbol,
