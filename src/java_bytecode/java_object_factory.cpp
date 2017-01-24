@@ -126,8 +126,9 @@ exprt java_object_factoryt::allocate_object(
     // build size expression
     exprt object_size=size_of_expr(allocate_type, namespacet(symbol_table));
 
-    if(allocate_type.id()!=ID_empty && !object_size.is_nil())
+    if(allocate_type.id()!=ID_empty)
     {
+      assert(!object_size.is_nil() && "size of Java objects should be known");
       // malloc expression
       exprt malloc_expr=side_effect_exprt(ID_malloc);
       malloc_expr.copy_to_operands(object_size);
