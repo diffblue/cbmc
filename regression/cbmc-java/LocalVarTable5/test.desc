@@ -1,0 +1,10 @@
+CORE
+test.class
+--show-goto-functions
+dead anonlocal::1i
+dead anonlocal::2i
+dead anonlocal::3a
+dead new_tmp0
+^EXIT=0$
+^SIGNAL=0$
+--
