@@ -99,7 +99,7 @@ protected:
   codet get_array_bounds_check(
     const exprt &arraystruct,
     const exprt &idx,
-    const source_locationt& original_sloc);
+    const source_locationt &original_sloc);
 
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
@@ -160,17 +160,17 @@ public:
 
 protected:
   void find_initialisers(
-    local_variable_table_with_holest& vars,
-    const address_mapt& amap,
-    const java_cfg_dominatorst& doms);
+    local_variable_table_with_holest &vars,
+    const address_mapt &amap,
+    const java_cfg_dominatorst &doms);
 
   void find_initialisers_for_slot(
     local_variable_table_with_holest::iterator firstvar,
     local_variable_table_with_holest::iterator varlimit,
-    const address_mapt& amap,
-    const java_cfg_dominatorst& doms);
+    const address_mapt &amap,
+    const java_cfg_dominatorst &doms);
 
-  void setup_local_variables(const methodt& m, const address_mapt& amap);
+  void setup_local_variables(const methodt &m, const address_mapt &amap);
 
   struct block_tree_nodet
   {

@@ -49,7 +49,7 @@ class java_object_factoryt:public messaget
 
 public:
   java_object_factoryt(
-    code_blockt& _init_code,
+    code_blockt &_init_code,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
     symbol_tablet &_symbol_table,
@@ -63,8 +63,8 @@ public:
     {}
 
   exprt allocate_object(
-    const exprt&,
-    const typet&,
+    const exprt &,
+    const typet &,
     const source_locationt &,
     bool create_dynamic_objects);
 
@@ -512,7 +512,7 @@ Function: new_tmp_symbol
 
 \*******************************************************************/
 
-symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string& prefix)
+symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string &prefix)
 {
   static size_t temporary_counter=0; // TODO encapsulate as class variable
 
@@ -542,7 +542,7 @@ Function: get_nondet_bool
 
 \*******************************************************************/
 
-exprt get_nondet_bool(const typet& type)
+exprt get_nondet_bool(const typet &type)
 {
   // We force this to 0 and 1 and won't consider
   // other values.
