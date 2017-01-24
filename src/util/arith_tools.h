@@ -22,6 +22,9 @@ bool to_integer(const exprt &expr, mp_integer &int_value);
 // returns 'true' on error
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
+// returns 'true' on error
+bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value);
+
 // assert(false) in case of unsupported type
 constant_exprt from_integer(const mp_integer &int_value, const typet &type);
 
