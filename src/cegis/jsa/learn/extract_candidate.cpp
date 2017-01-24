@@ -19,8 +19,9 @@ inline bool is_integer(const std::string & s)
 {
   if (s.empty() || (!isdigit(s[0]) && s[0] != '-' && s[0] != '+')) return false;
   char *p;
-  strtol(s.c_str(), &p, 10);
-  return *p == 0;
+  long result=strtol(s.c_str(), &p, 10);
+  (void)result; // unused as just used for testing string format
+  return *p==0;
 }
 
 bool is_prog_name(const std::string &var_name, const std::string &prefix)
