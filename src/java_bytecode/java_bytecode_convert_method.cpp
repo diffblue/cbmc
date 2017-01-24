@@ -804,6 +804,43 @@ static void gather_symbol_live_ranges(
 
 /*******************************************************************\
 
+Function: java_bytecode_convert_methodt::check_static_field_stub
+
+  Inputs: `se`: Symbol expression referring to a static field
+          `basename`: The static field's basename
+
+ Outputs: Creates a symbol table entry for the static field if one
+          doesn't exist already.
+
+ Purpose: See above
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::check_static_field_stub(
+  const symbol_exprt &symbol_expr,
+  const irep_idt &basename)
+{
+  const auto &id=symbol_expr.get_identifier();
+  if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+  {
+    // Create a stub, to be overwritten if/when the real class is loaded.
+    symbolt new_symbol;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.name=id;
+    new_symbol.base_name=basename;
+    new_symbol.type=symbol_expr.type();
+    new_symbol.pretty_name=new_symbol.name;
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.value.make_nil();
+    symbol_table.add(new_symbol);
+  }
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
