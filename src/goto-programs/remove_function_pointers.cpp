@@ -698,17 +698,14 @@ void remove_function_pointerst::remove_function_pointer(
 
   const exprt &pointer=function.op0();
 
-  exprt precise_call;
   functionst functions;
   bool found_functions=false;
-  if(try_get_precise_call(pointer, precise_call))
-  {
-    to_code_function_call(target->code).function()=precise_call;
-    return;
-  }
 
   const c_qualifierst pointer_qualifers(pointer.type());
 
+  // This can happen for example with
+  // (*(&f2))();
+  // In this case we don't need constant check - implict
   found_functions=found_functions||try_get_from_address_of(pointer, functions);
 
   // If it is a symbol (except in the case where the symbol is the function
@@ -718,8 +715,6 @@ void remove_function_pointerst::remove_function_pointer(
     found_functions=
       found_functions||try_get_call_from_symbol(pointer, functions);
   }
-
-  found_functions=found_functions||try_get_call_from_index(pointer, functions);
 
   if(functions.size()==1)
   {
