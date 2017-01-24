@@ -706,8 +706,19 @@ void remove_function_pointerst::remove_function_pointer(
     to_code_function_call(target->code).function()=precise_call;
     return;
   }
+
+  const c_qualifierst pointer_qualifers(pointer.type());
+
   found_functions=found_functions||try_get_from_address_of(pointer, functions);
-  found_functions=found_functions||try_get_call_from_symbol(pointer, functions);
+
+  // If it is a symbol (except in the case where the symbol is the function
+  // symbol itself) then the symbol must be const or else can be reassigned.
+  if(pointer_qualifers.is_constant)
+  {
+    found_functions=
+      found_functions||try_get_call_from_symbol(pointer, functions);
+  }
+
   found_functions=found_functions||try_get_call_from_index(pointer, functions);
 
   if(functions.size()==1)
