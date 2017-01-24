@@ -352,7 +352,7 @@ void java_bytecode_parsert::get_class_refs()
       }
       break;
 
-    default:{};
+    default:{}
     }
   }
 
@@ -1243,7 +1243,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 }
 
 void java_bytecode_parsert::read_verification_type_info(
-  methodt::verification_type_infot& v)
+  methodt::verification_type_infot &v)
 {
   u1 tag=read_u1();
   switch(tag)

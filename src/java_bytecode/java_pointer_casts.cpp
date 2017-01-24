@@ -89,7 +89,7 @@ Function: look_through_casts
 
 \*******************************************************************/
 
-static const exprt& look_through_casts(const exprt& in)
+static const exprt &look_through_casts(const exprt &in)
 {
   if(in.id()==ID_typecast)
   {

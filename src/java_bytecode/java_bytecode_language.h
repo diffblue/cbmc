@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_languaget:public languaget
 {
 public:
-  virtual void get_language_options(const cmdlinet&);
+  virtual void get_language_options(const cmdlinet &);
 
   virtual bool preprocess(
     std::istream &instream,
@@ -42,7 +42,8 @@ public:
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget():
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
-    max_user_array_length(0) { }
+    max_user_array_length(0)
+    {}
 
   bool from_expr(
     const exprt &expr,

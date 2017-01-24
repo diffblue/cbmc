@@ -156,9 +156,9 @@ Function: gather_transitive_predecessors
 \*******************************************************************/
 
 static void gather_transitive_predecessors(
-  local_variable_with_holest* start,
+  local_variable_with_holest *start,
   const predecessor_mapt &predecessor_map,
-  std::set<local_variable_with_holest*>& result)
+  std::set<local_variable_with_holest*> &result)
 {
   if(!result.insert(start).second)
     return;
@@ -251,7 +251,7 @@ Function: populate_variable_address_map
 static void populate_variable_address_map(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
-  std::vector<local_variable_with_holest*>& live_variable_at_address)
+  std::vector<local_variable_with_holest *> &live_variable_at_address)
 {
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
@@ -298,7 +298,7 @@ Function: populate_predecessor_map
 static void populate_predecessor_map(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
-  const std::vector<local_variable_with_holest*>& live_variable_at_address,
+  const std::vector<local_variable_with_holest *> &live_variable_at_address,
   const address_mapt &amap,
   predecessor_mapt &predecessor_map,
   message_handlert &msg_handler)
@@ -480,7 +480,7 @@ Function: populate_live_range_holes
 
 static void populate_live_range_holes(
   local_variable_with_holest &merge_into,
-  const std::set<local_variable_with_holest*>& merge_vars,
+  const std::set<local_variable_with_holest *> &merge_vars,
   unsigned expanded_live_range_start)
 {
   std::vector<local_variable_with_holest*> sorted_by_startpc(
@@ -518,7 +518,7 @@ Function: merge_variable_table_entries
 
 static void merge_variable_table_entries(
   local_variable_with_holest &merge_into,
-  const std::set<local_variable_with_holest*>& merge_vars,
+  const std::set<local_variable_with_holest *> &merge_vars,
   const java_cfg_dominatorst &dominator_analysis,
   std::ostream &debug_out)
 {
@@ -729,7 +729,7 @@ Function: cleanup_var_table
 \*******************************************************************/
 
 static void cleanup_var_table(
-  std::vector<local_variable_with_holest>& vars_with_holes)
+  std::vector<local_variable_with_holest> &vars_with_holes)
 {
   size_t toremove=0;
   for(size_t i=0; i<(vars_with_holes.size()-toremove); ++i)
@@ -795,7 +795,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
   // to calculate which variable to use, one uses the address of the instruction
   // that uses the variable, the size of the instruction and the start_pc /
   // length values in the local variable table
-  for(const auto & v : vars_with_holes)
+  for(const auto &v : vars_with_holes)
   {
     if(v.var.start_pc==0) // Parameter?
       continue;

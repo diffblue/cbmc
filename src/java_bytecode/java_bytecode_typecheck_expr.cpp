@@ -91,7 +91,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   typecheck_type(type);
 }
 
-static void escape_non_alnum(std::string& toescape)
+static void escape_non_alnum(std::string &toescape)
 {
   for(auto &ch : toescape)
     if(!isalnum(ch))

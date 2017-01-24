@@ -72,7 +72,7 @@ static void create_initialize(symbol_tablet &symbol_table)
 }
 
 
-static bool should_init_symbol(const symbolt& sym)
+static bool should_init_symbol(const symbolt &sym)
 {
   if(sym.type.id()!=ID_code &&
      sym.is_lvalue &&
@@ -110,13 +110,13 @@ bool java_static_lifetime_init(
   // external. Iterate over a copy of the symtab, as its iterators are
   // invalidated by object_factory:
 
-  std::list<irep_idt> symnames;
+  std::list<irep_idt> symbol_names;
   for(const auto &entry : symbol_table.symbols)
-    symnames.push_back(entry.first);
+    symbol_names.push_back(entry.first);
 
-  for(const auto& symname : symnames)
+  for(const auto &symname : symbol_names)
   {
-    const symbolt& sym=symbol_table.lookup(symname);
+    const symbolt &sym=symbol_table.lookup(symname);
     if(should_init_symbol(sym))
     {
       if(sym.value.is_nil() && sym.type!=empty_typet())
