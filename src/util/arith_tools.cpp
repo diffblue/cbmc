@@ -114,6 +114,32 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 
 /*******************************************************************\
 
+Function: to_unsigned_integer
+
+  Inputs: a constant expression and a reference to an unsigned int
+
+ Outputs: an error flag
+
+ Purpose: convert a positive integer expression to an unsigned int
+
+\*******************************************************************/
+
+bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value)
+{
+  mp_integer i;
+  if(to_integer(expr, i))
+    return true;
+  if(i<0)
+    return true;
+  else
+  {
+    uint_value=integer2unsigned(i);
+    return false;
+  }
+}
+
+/*******************************************************************\
+
 Function: from_integer
 
   Inputs:
