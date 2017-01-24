@@ -50,7 +50,6 @@ std::string expr2javat::convert_code_function_call(
     unsigned p;
     std::string lhs_str=convert(src.lhs(), p);
 
-    // TODO: if necessery add parentheses, dependent on p
     dest+=lhs_str;
     dest+='=';
   }
@@ -95,7 +94,6 @@ std::string expr2javat::convert_code_function_call(
         first=false;
       else
         dest+=", ";
-      // TODO: if necessery add parentheses, dependent on p
       dest+=arg_str;
     }
   }
