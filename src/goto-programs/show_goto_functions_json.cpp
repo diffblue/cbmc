@@ -105,6 +105,16 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
 
         instruction_entry["operands"]=operand_array;
 
+        if(!instruction.guard.is_true())
+        {
+          json_objectt guard_object;
+          no_comments_irep_converter.convert_from_irep(
+            instruction.guard,
+            guard_object);
+
+          instruction_entry["guard"]=guard_object;
+        }
+
         json_instruction_array.push_back(instruction_entry);
       }
 
