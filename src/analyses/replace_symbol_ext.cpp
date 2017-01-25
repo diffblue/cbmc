@@ -25,7 +25,7 @@ Function: replace_symbol_extt::replace
 
 bool replace_symbol_extt::replace(exprt &dest) const
 {
-  bool result=true;
+  bool result=true; // nothing changed
 
   // first look at type
 
@@ -38,20 +38,7 @@ bool replace_symbol_extt::replace(exprt &dest) const
   if(!have_to_replace(dest))
     return result;
 
-  // do not replace object in address_of expressions
-  if(dest.id()==ID_address_of)
-  {
-    const exprt &object = to_address_of_expr(dest).object();
-    if(object.id()==ID_symbol)
-    {
-      expr_mapt::const_iterator it=
-        expr_map.find(object.get(ID_identifier));
-
-      if(it!=expr_map.end())
-        return false;
-    }
-  }
-  else if(dest.id()==ID_symbol)
+  if(dest.id()==ID_symbol)
   {
     expr_mapt::const_iterator it=
       expr_map.find(dest.get(ID_identifier));
@@ -77,7 +64,8 @@ bool replace_symbol_extt::replace(exprt &dest) const
   const irept &va_arg_type=dest.find(ID_C_va_arg_type);
 
   if(va_arg_type.is_not_nil() &&
-     !replace_symbolt::replace(static_cast<typet&>(dest.add(ID_C_va_arg_type))))
+     !replace_symbolt::replace(
+       static_cast<typet&>(dest.add(ID_C_va_arg_type))))
     result=false;
 
   return result;
