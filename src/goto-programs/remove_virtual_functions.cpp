@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type_eq.h>
 
 #include "class_hierarchy.h"
+#include "class_identifier.h"
 #include "remove_virtual_functions.h"
 
 /*******************************************************************\
@@ -61,8 +62,6 @@ protected:
   exprt get_method(
     const irep_idt &class_id,
     const irep_idt &component_name) const;
-
-  exprt build_class_identifier(const exprt &);
 };
 
 /*******************************************************************\
@@ -84,48 +83,6 @@ remove_virtual_functionst::remove_virtual_functionst(
   symbol_table(_symbol_table)
 {
   class_hierarchy(symbol_table);
-}
-
-/*******************************************************************\
-
-Function: remove_virtual_functionst::build_class_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-exprt remove_virtual_functionst::build_class_identifier(
-  const exprt &src)
-{
-  // the class identifier is in the root class
-  exprt e=src;
-
-  while(1)
-  {
-    const typet &type=ns.follow(e.type());
-    assert(type.id()==ID_struct);
-
-    const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=struct_type.components();
-    assert(!components.empty());
-
-    member_exprt member_expr(
-      e, components.front().get_name(), components.front().type());
-
-    if(components.front().get_name()=="@class_identifier")
-    {
-      // found it
-      return member_expr;
-    }
-    else
-    {
-      e=member_expr;
-    }
-  }
 }
 
 /*******************************************************************\
@@ -181,22 +138,12 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
-  // Get a pointer from which we can extract a clsid.
-  // If it's already a pointer to an object of some sort, just use it;
-  // if it's void* then use the parent of all possible candidates,
-  // which by the nature of get_functions happens to be the last candidate.
-
   exprt this_expr=code.arguments()[0];
-  assert(this_expr.type().id()==ID_pointer &&
-         "Non-pointer this-arg in remove-virtuals?");
-  const auto &points_to=this_expr.type().subtype();
-  if(points_to==empty_typet())
-  {
-    symbol_typet symbol_type(functions.back().class_id);
-    this_expr=typecast_exprt(this_expr, pointer_typet(symbol_type));
-  }
-  exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
-  exprt c_id2=build_class_identifier(deref);
+  // If necessary, cast to the last candidate function to get the object's clsid.
+  // By the structure of get_functions, this is the parent of all other classes
+  // under consideration.
+  symbol_typet suggested_type(functions.back().class_id);
+  exprt c_id2=get_class_identifier_field(this_expr, suggested_type, ns);
 
   goto_programt::targett last_function;
   for(const auto &fun : functions)
