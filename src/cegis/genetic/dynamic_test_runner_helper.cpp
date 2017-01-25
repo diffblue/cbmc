@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #if !defined(_WIN32) || defined(_HAVE_DLFCN)
 #include <dlfcn.h>
 #endif

@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <util/bv_arithmetic.h>
 #include <util/symbol_table.h>
 #include <util/std_types.h>

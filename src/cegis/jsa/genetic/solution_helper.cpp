@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <numeric>
 
 #include <cegis/jsa/value/jsa_genetic_solution.h>

@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <goto-programs/goto_functions.h>
 
 #include <cegis/wordsize/restrict_bv_size.h>

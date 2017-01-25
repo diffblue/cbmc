@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <cegis/value/program_individual_serialisation.h>
 #include <cegis/invariant/symex/learn/instrument_vars.h>
 #include <cegis/safety/options/safety_program.h>
