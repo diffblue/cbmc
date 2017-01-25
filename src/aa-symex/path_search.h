@@ -22,25 +22,39 @@ public:
   explicit inline path_searcht(const namespacet &_ns):
     safety_checkert(_ns),
     show_vcc(false),
-    depth_limit(-1), // no limit
-    context_bound(-1),
-    unwind_limit(-1)
+    depth_limit_set(false), // no limit
+    context_bound_set(false),
+    unwind_limit_set(false)
   {
   }
 
   virtual resultt operator()(
     const goto_functionst &goto_functions);
 
+  void set_depth_limit(unsigned limit)
+  {
+    depth_limit_set=true;
+    depth_limit=limit;
+  }
+
+  void set_context_bound(unsigned limit)
+  {
+    context_bound_set=true;
+    context_bound=limit;
+  }
+
+  void set_unwind_limit(unsigned limit)
+  {
+    unwind_limit_set=true;
+    unwind_limit=limit;
+  }
+
   bool show_vcc;
 
-  unsigned depth_limit;
-  unsigned context_bound;
-  unsigned unwind_limit;
-
   // statistics
-  unsigned number_of_paths;
   unsigned number_of_instructions;
   unsigned number_of_dropped_states;
+  unsigned number_of_paths;
   unsigned number_of_VCCs;
   unsigned number_of_VCCs_after_simplification;
   unsigned number_of_failed_properties;
@@ -48,13 +62,18 @@ public:
   absolute_timet start_time;
   time_periodt sat_time;
 
-  enum statust { NOT_REACHED, PASS, FAIL };
+  enum statust { NOT_REACHED, SUCCESS, FAILURE };
 
   struct property_entryt
   {
     statust status;
     irep_idt description;
     goto_tracet error_trace;
+    source_locationt source_location;
+
+    inline bool is_success() const { return status==SUCCESS; }
+    inline bool is_failure() const { return status==FAILURE; }
+    inline bool is_not_reached() const { return status==NOT_REACHED; }
   };
 
   typedef std::map<irep_idt, property_entryt> property_mapt;
@@ -73,15 +92,17 @@ protected:
   typedef path_symex_statet statet;
 
   // State queue. Iterators are stable.
+  // The states most recently executed are at the head.
   typedef std::list<statet> queuet;
   queuet queue;
 
+  // search heuristic
   queuet::iterator pick_state();
 
   bool execute(queuet::iterator state, const namespacet &);
 
-  void check_assertion(statet &state, const namespacet &);
-  void do_show_vcc(statet &state, const namespacet &);
+  void check_assertion(statet &state);
+  void do_show_vcc(statet &state);
 
   bool drop_state(const statet &state) const;
 
@@ -89,6 +110,11 @@ protected:
 
   void initialize_property_map(
     const goto_functionst &goto_functions);
+
+  unsigned depth_limit;
+  unsigned context_bound;
+  unsigned unwind_limit;
+  bool depth_limit_set, context_bound_set, unwind_limit_set;
 };
 
 #endif // CPROVER_AA_SYMEX_PATH_SEARCH_H

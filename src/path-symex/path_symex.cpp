@@ -499,7 +499,9 @@ void path_symext::assign_rec(
       // array or a union.
 
       exprt member_name(ID_member_name);
-      member_name.set(ID_component_name, ssa_lhs_member_expr.get_component_name());
+      member_name.set(
+        ID_component_name,
+        ssa_lhs_member_expr.get_component_name());
 
       with_exprt new_rhs(struct_op, member_name, ssa_rhs);
 
@@ -510,7 +512,8 @@ void path_symext::assign_rec(
       // rewrite into byte_extract, and do again
       exprt offset=gen_zero(index_type());
 
-      byte_extract_exprt new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());
+      byte_extract_exprt
+        new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());
 
       assign_rec(state, guard, new_lhs, ssa_rhs);
     }

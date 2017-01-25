@@ -140,6 +140,12 @@ class path_symex_historyt
 public:
   typedef std::vector<path_symex_stept> step_containert;
   step_containert step_container;
+
+  // TODO: consider typedefing path_symex_historyt
+  inline void clear()
+  {
+    step_container.clear();
+  }
 };
 
 inline void path_symex_step_reft::generate_successor()

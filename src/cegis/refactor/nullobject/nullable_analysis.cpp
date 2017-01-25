@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <algorithm>
 #include <functional>
 
@@ -86,7 +95,6 @@ cegis_operand_datat get_operand_signature(const symbol_tablet &st,
   // TODO: Add global vars
   cegis_operand_datat result;
   const code_typet &code_type=to_code_type(st.lookup(method).type);
-  const typet &return_type=code_type.return_type();
   const std::string ret_val_name(get_return_value_name(method));
   if (st.has_symbol(ret_val_name)) result[st.lookup(ret_val_name).type]=1;
   for (const code_typet::parameterst::value_type &param : code_type.parameters())

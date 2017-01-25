@@ -1,14 +1,14 @@
-/*******************************************************************
+/*******************************************************************\
 
- Module: Counterexample-Guided Inductive Synthesis
+Module: Counterexample-Guided Inductive Synthesis
 
- Author: Daniel Kroening, kroening@kroening.com
-         Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H_
-#define CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H_
+#ifndef CPROVER_CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H
+#define CPROVER_CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H
 
 #include <util/message.h>
 
@@ -72,4 +72,4 @@ public:
       const symbol_tablet &st);
 };
 
-#endif /* CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H_ */
+#endif // CPROVER_CEGIS_CONTROL_LEARN_VECTOR_SOLUTION_CONFIGURATION_H

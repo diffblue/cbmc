@@ -29,7 +29,7 @@ void const_graph_visitort::graph_explore(
   event_idt next,
   event_idt end,
   std::list<event_idt> &old_path,
-  std::set<event_idt> &edges)
+  std::set<unsigned> &edges)
 {
   if(next == end) {
     /* inserts all the pos collected from old_path in edges */
@@ -75,8 +75,11 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::const_graph_explore(event_grapht& egraph, event_idt next,
-  event_idt end, std::list<event_idt>& old_path)
+void const_graph_visitort::const_graph_explore(
+  event_grapht& egraph,
+  event_idt next,
+  event_idt end,
+  std::list<event_idt>& old_path)
 {
   if(next == end) {
     /* inserts all the pos collected from old_path in edges */
@@ -122,8 +125,12 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::graph_explore_BC(event_grapht& egraph, event_idt next,
-  std::list<event_idt>& old_path, std::set<event_idt>& edges, bool porw)
+void const_graph_visitort::graph_explore_BC(
+  event_grapht& egraph,
+  event_idt next,
+  std::list<event_idt>& old_path,
+  std::set<unsigned>& edges,
+  bool porw)
 {
   /* TODO: restricts to C_1 U ... U C_n for perf improvement */
   assert(old_path.size() > 0);
@@ -187,8 +194,10 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::const_graph_explore_BC(event_grapht& egraph,
-  event_idt next, std::list<event_idt>& old_path)
+void const_graph_visitort::const_graph_explore_BC(
+  event_grapht& egraph,
+  event_idt next,
+  std::list<event_idt>& old_path)
 {
   /* TODO: restricts to C_1 U ... U C_n */
   assert(old_path.size() > 0);
@@ -250,8 +259,12 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::graph_explore_AC(event_grapht& egraph, event_idt next,
-  std::list<event_idt>& old_path, std::set<event_idt>& edges, bool porw)
+void const_graph_visitort::graph_explore_AC(
+  event_grapht& egraph,
+  event_idt next,
+  std::list<event_idt>& old_path,
+  std::set<unsigned>& edges,
+  bool porw)
 {
   /* TODO: restricts to C_1 U ... U C_n */
   assert(old_path.size() > 0);
@@ -315,8 +328,10 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::const_graph_explore_AC(event_grapht& egraph,
-  event_idt next, std::list<event_idt>& old_path)
+void const_graph_visitort::const_graph_explore_AC(
+  event_grapht& egraph,
+  event_idt next,
+  std::list<event_idt>& old_path)
 {
   /* TODO: restricts to C_1 U ... U C_n */
   assert(old_path.size() > 0);
@@ -379,7 +394,10 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::PT(const edget& e, std::set<event_idt>& edges) {
+void const_graph_visitort::PT(
+  const edget& e,
+  std::set<unsigned>& edges)
+{
   visited_nodes.clear();
 
 //  if(!e.is_po) /* e is in po^+\po */ is_po is a flag set manually, do not
@@ -430,7 +448,10 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::CT(const edget& edge, std::set<event_idt>& edges) {
+void const_graph_visitort::CT(
+  const edget& edge,
+  std::set<unsigned>& edges)
+{
   event_grapht& egraph=fence_inserter.instrumenter.egraph;
 
   /* the edge can be in the reversed order (back-edge) */
@@ -484,8 +505,9 @@ Function:
 
 \*******************************************************************/
 
-void const_graph_visitort::CT_not_powr(const edget& edge,
-  std::set<event_idt>& edges)
+void const_graph_visitort::CT_not_powr(
+  const edget& edge,
+  std::set<unsigned>& edges)
 {
   event_grapht& egraph=fence_inserter.instrumenter.egraph;
 

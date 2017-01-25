@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <algorithm>
 
 #include <util/config.h>
@@ -110,7 +119,6 @@ const goto_ranget &get_second_range(const refactor_programt::sketcht &sketch)
 void make_skip(const goto_programt::targett first,
     const goto_programt::targett last)
 {
-  const auto op(std::mem_fun_ref(&goto_programt::instructiont::make_skip));
   std::for_each(first, last, [](goto_programt::instructiont &instr)
   { if(!instr.is_decl()) instr.make_skip();});
 }

@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/dereference.h>
 
 #include <goto-symex/adjust_float_expressions.h>
+#include <goto-symex/rewrite_union.h>
 
 #include "path_symex_state.h"
 
@@ -153,27 +154,31 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
-  // This has four phases!
+  // This has five phases!
   // 1. Floating-point expression adjustment (rounding mode)
-  // 2. Dereferencing, including propagation of pointers.
-  // 3. Rewriting to SSA symbols
-  // 4. Simplifier
+  // 2. Rewrite unions into byte operators
+  // 3. Dereferencing, including propagation of pointers.
+  // 4. Rewriting to SSA symbols
+  // 5. Simplifier
 
   exprt tmp1=src;
   adjust_float_expressions(tmp1, var_map.ns);
 
+  exprt tmp2=tmp1;
+  rewrite_union(tmp2, var_map.ns);
+
   // we force propagation for dereferencing
-  exprt tmp2=dereference_rec(tmp1, true);
+  exprt tmp3=dereference_rec(tmp2, true);
 
-  exprt tmp3=instantiate_rec(tmp2, propagate);
+  exprt tmp4=instantiate_rec(tmp3, propagate);
 
-  exprt tmp4=simplify_expr(tmp3, var_map.ns);
+  exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
   //std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
-  return tmp4;
+  return tmp5;
 }
 
 /*******************************************************************\
@@ -239,13 +244,13 @@ exprt path_symex_statet::instantiate_rec(
       if(to_integer(array_type.size(), size))
         throw "failed to convert array size";
 
-      unsigned long long size_int=integer2unsigned(size);
+      std::size_t size_int=integer2size_t(size);
 
       array_exprt result(array_type);
       result.operands().resize(size_int);
 
       // split it up into elements
-      for(unsigned long long i=0; i<size_int; ++i)
+      for(std::size_t i=0; i<size_int; ++i)
       {
         exprt index=from_integer(i, array_type.size().type());
         exprt new_src=index_exprt(src, index, subtype);
@@ -277,14 +282,14 @@ exprt path_symex_statet::instantiate_rec(
     if(to_integer(vector_type.size(), size))
       throw "failed to convert vector size";
 
-    unsigned long long int size_int=integer2unsigned(size);
+    std::size_t size_int=integer2size_t(size);
 
     vector_exprt result(vector_type);
     exprt::operandst &operands=result.operands();
     operands.resize(size_int);
 
     // split it up into elements
-    for(unsigned long long i=0; i<size_int; ++i)
+    for(std::size_t i=0; i<size_int; ++i)
     {
       exprt index=from_integer(i, vector_type.size().type());
       exprt new_src=index_exprt(src, index, subtype);
@@ -317,7 +322,7 @@ exprt path_symex_statet::instantiate_rec(
     tmp.op0()=instantiate_rec_address(tmp.op0(), propagate);
     return tmp;
   }
-  else if(src.id()==ID_sideeffect)
+  else if(src.id()==ID_side_effect)
   {
     // could be done separately
     const irep_idt &statement=to_side_effect_expr(src).get_statement();
@@ -354,14 +359,23 @@ exprt path_symex_statet::instantiate_rec(
     }
     else if(compound_type.id()==ID_union)
     {
-      member_exprt tmp=to_member_expr(src);
-      tmp.struct_op()=instantiate_rec(tmp.struct_op(), propagate);
-      return tmp;
+      // should already have been rewritten to byte_extract
+      throw "unexpected union member";
     }
     else
     {
       throw "member expects struct or union type"+src.pretty();
     }
+  }
+  else if(src.id()==ID_byte_extract_little_endian ||
+          src.id()==ID_byte_extract_big_endian)
+  {
+  }
+  else if(src.id()==ID_symbol)
+  {
+    // must be SSA already, or code
+    assert(src.type().id()==ID_code ||
+           src.get_bool(ID_C_SSA_symbol));
   }
 
   if(!src.has_operands())
@@ -474,9 +488,7 @@ exprt path_symex_statet::read_symbol_member_index(
       suffix=index_string+suffix;
     }
     else
-    {
       return nil_exprt();
-    }
 
     // next round
     assert(next.is_not_nil());
@@ -632,7 +644,7 @@ exprt path_symex_statet::instantiate_rec_address(
     #ifdef DEBUG
     std::cout << "SRC: " << src.pretty() << std::endl;
     #endif
-    throw "address of unexpected "+src.id_string();
+    throw "address of unexpected `"+src.id_string()+"'";
   }
 }
 
@@ -726,12 +738,11 @@ bool path_symex_statet::is_feasible(
   // check whether SAT
   switch(decision_procedure())
   {
-  case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE: return true;
 
   case decision_proceduret::D_UNSATISFIABLE: return false;
 
-  case decision_proceduret::D_ERROR: throw "error from decsion procedure";
+  case decision_proceduret::D_ERROR: throw "error from decision procedure";
   }
 
   return true; // not really reachable
@@ -772,7 +783,6 @@ bool path_symex_statet::check_assertion(
   // check whether SAT
   switch(decision_procedure.dec_solve())
   {
-  case decision_proceduret::D_TAUTOLOGY:
   case decision_proceduret::D_SATISFIABLE:
     return false; // error
 

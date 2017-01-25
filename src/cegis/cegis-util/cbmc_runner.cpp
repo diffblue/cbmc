@@ -1,5 +1,11 @@
-#include <algorithm>
-#include <functional>
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
 
 #include <util/config.h>
 #include <util/substitute.h>
@@ -43,43 +49,20 @@ bool is_gcc()
   return configt::ansi_ct::flavourt::GCC == config.ansi_c.mode;
 }
 
-std::vector<std::string> get_args()
+int argc()
 {
-  std::vector<std::string> result= { "cbmc", "--stop-on-fail" };
-  if (is_gcc()) result.push_back("--gcc");
-  return result;
+  return is_gcc()?3:2;
 }
 
-std::vector<const char *> get_argv(const std::vector<std::string> &args)
+const char **argv()
 {
-  std::vector<const char *> result;
-  std::transform(args.begin(), args.end(), std::back_inserter(result),
-      std::mem_fun_ref(&std::string::c_str));
-  return result;
+  static const char* n_gcc[]={"cbmc", "--stop-on-fail", 0};
+  static const char* w_gcc[]={"cbmc", "--stop-on-fail", "--gcc", 0};
+
+  return is_gcc()?w_gcc:n_gcc;
 }
 
-class args_providert
-{
-  const std::vector<std::string> args;
-  std::vector<const char *> arg_ref;
-public:
-  args_providert() :
-      args(get_args()), arg_ref(get_argv(args))
-  {
-  }
-
-  int argc()
-  {
-    return arg_ref.size();
-  }
-
-  const char * *argv()
-  {
-    return arg_ref.data();
-  }
-};
-
-class cbmc_runnert: public args_providert, public cbmc_parse_optionst
+class cbmc_runnert:public cbmc_parse_optionst
 {
   const symbol_tablet &st;
   const goto_functionst &gf;

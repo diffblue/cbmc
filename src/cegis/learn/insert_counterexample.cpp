@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <algorithm>
 
 #include <ansi-c/c_types.h>
@@ -139,7 +148,6 @@ void add_array_declarations(symbol_tablet &st, goto_functionst &gf,
   const constant_exprt sz_expr(from_integer(ces.size(), sz_type));
   const array_valuest array_values(get_array_values(ces));
   const labelled_counterexamplest::value_type &prototype=ces.front();
-  goto_programt &body=get_entry_body(gf);
   goto_programt::targett pos=std::prev(begin);
   for (const labelled_counterexamplest::value_type::value_type &value : prototype)
   {

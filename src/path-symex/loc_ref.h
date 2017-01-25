@@ -16,7 +16,7 @@ class loc_reft
 public:
   unsigned loc_number;
 
-  inline loc_reft next_loc()
+  inline loc_reft next_loc() const
   {
     loc_reft tmp=*this;
     tmp.increase();

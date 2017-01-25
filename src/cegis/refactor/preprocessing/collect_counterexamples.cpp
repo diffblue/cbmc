@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <cegis/cegis-util/counterexample_vars.h>
 #include <cegis/refactor/options/refactor_program.h>
 #include <cegis/refactor/preprocessing/collect_counterexamples.h>
