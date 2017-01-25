@@ -10,6 +10,7 @@ Author: Thomas Kiley
 #include <sstream>
 
 #include <util/json_expr.h>
+#include <util/json_irep.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
@@ -54,6 +55,7 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
   const goto_functionst &goto_functions)
 {
   json_arrayt json_functions;
+  const json_irept no_comments_irep_converter(false);
   for(const auto &function_entry : goto_functions.function_map)
   {
     const irep_idt &function_name=function_entry.first;
@@ -92,6 +94,16 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
 
         instruction_entry["instruction"]=
           json_stringt(instruction_builder.str());
+
+        json_arrayt operand_array;
+        for(const exprt &operand : instruction.code.operands())
+        {
+          json_objectt operand_object;
+          no_comments_irep_converter.convert_from_irep(operand, operand_object);
+          operand_array.push_back(operand_object);
+        }
+
+        instruction_entry["operands"]=operand_array;
 
         json_instruction_array.push_back(instruction_entry);
       }
