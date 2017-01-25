@@ -102,7 +102,6 @@ private:
 
   bool try_get_array_from_index(
     const index_exprt &index_expr, array_exprt &out_array_expr);
-
 };
 
 /*******************************************************************\
@@ -266,11 +265,11 @@ bool remove_function_pointerst::try_get_call_from_symbol(
     }
     bool found_functions=false;
     found_functions=
-      found_functions||try_get_from_address_of(looked_up_val, out_functions);
+      found_functions || try_get_from_address_of(looked_up_val, out_functions);
     found_functions=
-      found_functions||try_get_call_from_index(looked_up_val, out_functions);
+      found_functions || try_get_call_from_index(looked_up_val, out_functions);
     found_functions=
-      found_functions||try_get_call_from_symbol(looked_up_val, out_functions);
+      found_functions || try_get_call_from_symbol(looked_up_val, out_functions);
     return found_functions;
   }
   else
@@ -330,9 +329,11 @@ bool remove_function_pointerst::try_get_call_from_index(
           }
           bool found_functions=false;
           found_functions=
-            found_functions||try_get_from_address_of(func_expr, out_functions);
+            found_functions ||
+              try_get_from_address_of(func_expr, out_functions);
           found_functions=
-            found_functions||try_get_call_from_symbol(func_expr, out_functions);
+            found_functions ||
+              try_get_call_from_symbol(func_expr, out_functions);
 
           return found_functions;
         }
@@ -349,9 +350,9 @@ bool remove_function_pointerst::try_get_call_from_index(
             }
             bool found_functions=false;
             found_functions=
-              found_functions||try_get_from_address_of(op, out_functions);
+              found_functions || try_get_from_address_of(op, out_functions);
             found_functions=
-              found_functions||try_get_call_from_symbol(op, out_functions);
+              found_functions || try_get_call_from_symbol(op, out_functions);
           }
           return out_functions.size() > 0;
         }
@@ -706,14 +707,15 @@ void remove_function_pointerst::remove_function_pointer(
   // This can happen for example with
   // (*(&f2))();
   // In this case we don't need constant check - implict
-  found_functions=found_functions||try_get_from_address_of(pointer, functions);
+  found_functions=found_functions ||
+    try_get_from_address_of(pointer, functions);
 
   // If it is a symbol (except in the case where the symbol is the function
   // symbol itself) then the symbol must be const or else can be reassigned.
   if(pointer_qualifers.is_constant)
   {
     found_functions=
-      found_functions||try_get_call_from_symbol(pointer, functions);
+      found_functions || try_get_call_from_symbol(pointer, functions);
   }
 
   if(functions.size()==1)
