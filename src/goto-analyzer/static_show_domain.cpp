@@ -43,27 +43,21 @@ bool static_show_domain(
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
-      domain = new ait<constant_propagator_domaint>();
-
+      domain=new ait<constant_propagator_domaint>();
     else if(options.get_bool_option("intervals"))
-      domain = new ait<interval_domaint>();
-
-    //else if(options.get_bool_option("non-null"))
-    //  domain = new ait<non_null_domaint>();
-
+      domain=new ait<interval_domaint>();
     else if(options.get_bool_option("dependence-graph"))
-      domain = new dependence_grapht(ns);
-
+      domain=new dependence_grapht(ns);
   }
   else if(options.get_bool_option("concurrent"))
   {
     // Constant and interval don't have merge_shared yet
 #if 0
     if(options.get_bool_option("constants"))
-      domain=new concurrency_aware_ait<constant_propagator_domaint>();
+    domain=new concurrency_aware_ait<constant_propagator_domaint>();
 
     else if(options.get_bool_option("intervals"))
-      domain=new concurrency_aware_ait<interval_domaint>();
+    domain=new concurrency_aware_ait<interval_domaint>();
 
     // else if(options.get_bool_option("non-null"))
     //   domain=new concurrency_aware_ait<non_null_domaint>();
@@ -86,10 +80,11 @@ bool static_show_domain(
     out << domain->output_json(goto_model);
   else if(options.get_bool_option("xml"))
     out << domain->output_xml(goto_model);
-  else if(options.get_bool_option("dot") && options.get_bool_option("dependence-graph"))
+  else if(options.get_bool_option("dot") &&
+          options.get_bool_option("dependence-graph"))
   {
-    dependence_grapht *d = dynamic_cast<dependence_grapht*>(domain);
-    assert(d != NULL);
+    dependence_grapht *d=dynamic_cast<dependence_grapht*>(domain);
+    assert(d!=NULL);
 
     out << "digraph g {\n";
     d->output_dot(out);
@@ -99,5 +94,6 @@ bool static_show_domain(
     domain->output(goto_model, out);
 
   delete domain;
+
   return false;
 }

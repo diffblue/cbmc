@@ -97,21 +97,31 @@ void static_analyzert<analyzerT>::plain_text_report()
                << ']' << ' ';
 
       result() << i_it->source_location;
+
       if(!i_it->source_location.get_comment().empty())
         result() << ", " << i_it->source_location.get_comment();
-      result() << ": ";
-      if(simplified.is_true())
-        { result() << "SUCCESS"; pass++; }
-      else if(simplified.is_false())
-        { result() << "FAILURE (if reachable)"; fail++; }
-      else
-        { result() << "UNKNOWN"; unknown++; }
-      result() << eom;
 
+      result() << ": ";
+
+      if(simplified.is_true())
+      {
+        result() << "SUCCESS"; pass++;
+      }
+      else if(simplified.is_false())
+      {
+        result() << "FAILURE (if reachable)"; fail++;
+      }
+      else
+      {
+        result() << "UNKNOWN"; unknown++;
+      }
+
+      result() << eom;
     }
 
     status() << '\n';
   }
+
   status() << "SUMMARY: " << pass << " pass, " << fail << " fail if reachable, "
            << unknown << " unknown\n";
 }
@@ -191,7 +201,8 @@ void static_analyzert<analyzerT>::xml_report()
       x.set_attribute("file", id2string(i_it->source_location.get_file()));
       x.set_attribute("line", id2string(i_it->source_location.get_line()));
       x.set_attribute(
-        "description", id2string(i_it->source_location.get_comment()));
+        "description",
+        id2string(i_it->source_location.get_comment()));
     }
   }
 
@@ -213,11 +224,11 @@ bool static_analyzer(
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
-      return static_analyzert<ait<constant_propagator_domaint> >
+      return static_analyzert<ait<constant_propagator_domaint>>
         (goto_model, options, message_handler, out)();
 
     else if(options.get_bool_option("intervals"))
-      return static_analyzert<ait<interval_domaint> >
+      return static_analyzert<ait<interval_domaint>>
         (goto_model, options, message_handler, out)();
 
     // else if(options.get_bool_option("non-null"))

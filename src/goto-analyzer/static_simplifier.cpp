@@ -14,13 +14,12 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 #include <fstream>
 
-#include <goto-programs/write_goto_binary.h>
-
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
 
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
+#include <goto-programs/write_goto_binary.h>
 
 #include "static_simplifier.h"
 
@@ -64,7 +63,8 @@ Function: static_simplifiert<analyzerT>::operator()
 
  Outputs: false on success, true on failure.
 
- Purpose: Run the analysis, check the assertions and report in the correct format.
+ Purpose: Run the analysis, check the assertions and report in the
+          correct format.
 
 \*******************************************************************/
 
@@ -78,7 +78,7 @@ bool static_simplifiert<analyzerT>::operator()(void)
   simplify_program();
 
   // Remove obviously unreachable things and (now) unconditional branches
-  if (options.get_bool_option("simplify-slicing"))
+  if(options.get_bool_option("simplify-slicing"))
   {
     status() << "Removing unreachable instructions" << eom;
 
@@ -105,7 +105,8 @@ Function: static_simplifiert<analyzerT>::simplify_guard
 
  Outputs: 1 if simplified, 0 if not.
 
- Purpose: Simplifies the instruction's guard using the information in the abstract domain.
+ Purpose: Simplifies the instruction's guard using the information in
+          the abstract domain.
 
 \*******************************************************************/
 
@@ -114,7 +115,7 @@ unsigned static_simplifiert<analyzerT>::simplify_guard(
   goto_programt::instructionst::iterator &i_it)
 {
   exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
-  unsigned return_value=(simplified==i_it->guard) ? 0 : 1;
+  unsigned return_value=(simplified==i_it->guard)?0:1;
   i_it->guard=simplified;
   return return_value;
 }
@@ -127,7 +128,8 @@ Function: static_simplifiert<analyzerT>::simplify_program
 
  Outputs: None.
 
- Purpose: Simplifies the program using the information in the abstract domain.
+ Purpose: Simplifies the program using the information in the abstract
+          domain.
 
 \*******************************************************************/
 
@@ -173,17 +175,18 @@ void static_simplifiert<analyzerT>::simplify_program()
         code_assignt assign(to_code_assign(i_it->code));
 
         /*
-        ** Simplification needs to be aware of which side of the
-        ** expression it is handling as:
-        **   <i=0, j=1>  i=j
-        ** should simplify to i=1, not to 0=1.
+        Simplification needs to be aware of which side of the
+        expression it is handling as:
+        <i=0, j=1>  i=j
+        should simplify to i=1, not to 0=1.
         */
 
         exprt simp_lhs=domain[i_it].domain_simplify(assign.lhs(), ns, true);
         exprt simp_rhs=domain[i_it].domain_simplify(assign.rhs(), ns, false);
 
         unsigned result=(simp_lhs==assign.lhs() &&
-                         simp_rhs==assign.rhs()) ? 0 : 1;
+                         simp_rhs==assign.rhs())?0:1;
+
         simplified.assigns+=result;
         unmodified.assigns+=(1-result);
 
@@ -222,7 +225,6 @@ void static_simplifiert<analyzerT>::simplify_program()
   // Make sure the references are correct.
   goto_functions.update();
 
-
   status() << "SIMPLIFIED: "
            << " assert: " << simplified.asserts
            << ", assume: " << simplified.assumes
@@ -241,15 +243,12 @@ void static_simplifiert<analyzerT>::simplify_program()
   return;
 }
 
-
-
-
 /*******************************************************************\
 
 Function: static_simplifier
 
-  Inputs: The goto_model to analyze and simplify, options giving the domain,
-          the message handler and output stream.
+  Inputs: The goto_model to analyze and simplify, options giving the
+          domain, the message handler and output stream.
 
  Outputs: The simplified goto binary via out.
 
@@ -266,11 +265,11 @@ bool static_simplifier(
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
-      return static_simplifiert<ait<constant_propagator_domaint> >
+      return static_simplifiert<ait<constant_propagator_domaint>>
         (goto_model, options, message_handler, out)();
 
     else if(options.get_bool_option("intervals"))
-      return static_simplifiert<ait<interval_domaint> >
+      return static_simplifiert<ait<interval_domaint>>
         (goto_model, options, message_handler, out)();
 
     // else if(options.get_bool_option("non-null"))
@@ -282,8 +281,9 @@ bool static_simplifier(
     // Constant and interval don't have merge_shared yet
 #if 0
     if(options.get_bool_option("constants"))
-      return static_simplifiert<concurrency_aware_ait<constant_propagator_domaint> >
-        (goto_model, options, message_handler, out)();
+      return static_simplifiert<
+        concurrency_aware_ait<constant_propagator_domaint>>
+          (goto_model, options, message_handler, out)();
 
     else if(options.get_bool_option("intervals"))
       return static_simplifiert<concurrency_aware_ait<interval_domaint> >
@@ -298,5 +298,6 @@ bool static_simplifier(
   messaget m(message_handler);
   m.status() << "Task / Interpreter / Domain combination not supported"
              << messaget::eom;
+
   return true;
 }
