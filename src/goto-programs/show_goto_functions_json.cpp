@@ -95,15 +95,18 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
         instruction_entry["instruction"]=
           json_stringt(instruction_builder.str());
 
-        json_arrayt operand_array;
-        for(const exprt &operand : instruction.code.operands())
+        if(instruction.code.operands().size()>0)
         {
-          json_objectt operand_object;
-          no_comments_irep_converter.convert_from_irep(operand, operand_object);
-          operand_array.push_back(operand_object);
+          json_arrayt operand_array;
+          for(const exprt &operand : instruction.code.operands())
+          {
+            json_objectt operand_object;
+            no_comments_irep_converter.convert_from_irep(
+              operand, operand_object);
+            operand_array.push_back(operand_object);
+          }
+          instruction_entry["operands"]=operand_array;
         }
-
-        instruction_entry["operands"]=operand_array;
 
         if(!instruction.guard.is_true())
         {
