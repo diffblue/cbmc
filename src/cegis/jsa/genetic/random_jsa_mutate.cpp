@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: Counterexample-Guided Inductive Synthesis
+
+Author: Daniel Kroening, kroening@kroening.com
+        Pascal Kesseli, pascal.kesseli@cs.ox.ac.uk
+
+\*******************************************************************/
+
 #include <cegis/jsa/genetic/jsa_random.h>
 #include <cegis/jsa/genetic/solution_helper.h>
 #include <cegis/jsa/genetic/random_jsa_mutate.h>
