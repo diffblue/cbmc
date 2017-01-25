@@ -31,7 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
-#include <goto-programs/class_hierarchy.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
