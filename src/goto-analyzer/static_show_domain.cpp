@@ -39,7 +39,7 @@ bool static_show_domain(
 {
   ai_baset *domain = NULL;
   namespacet ns(goto_model.symbol_table);
-  
+
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
