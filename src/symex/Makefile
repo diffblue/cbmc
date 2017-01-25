@@ -10,7 +10,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../langapi/langapi$(LIBEXT) \
        ../xmllang/xmllang$(LIBEXT) \
        ../assembler/assembler$(LIBEXT) \
-       ../solvers/solvers$(LIBEXT) \
+       ../solvers/solvers$(LIBEXT) $(LIBSOLVER)  \
        ../util/util$(LIBEXT) \
        ../goto-symex/adjust_float_expressions$(OBJEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \

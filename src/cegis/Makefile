@@ -105,7 +105,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
-      ../solvers/solvers$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT) $(LIBSOLVER)  \
       ../util/util$(LIBEXT) \
       ../goto-instrument/dump_c$(OBJEXT) ../goto-instrument/goto_program2code$(OBJEXT) \
       ../goto-instrument/nondet_static$(OBJEXT) ../goto-instrument/cover$(OBJEXT) \
