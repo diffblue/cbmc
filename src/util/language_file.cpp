@@ -65,6 +65,13 @@ void language_filet::get_modules()
   language->modules_provided(modules);
 }
 
+void language_filet::convert_lazy_method(
+  const irep_idt &id,
+  symbol_tablet &symtab)
+{
+  language->convert_lazy_method(id, symtab);
+}
+
 /*******************************************************************\
 
 Function: language_filest::show_parse
@@ -190,8 +197,17 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       it!=filemap.end(); it++)
   {
     if(it->second.modules.empty())
+    {
       if(it->second.language->typecheck(symbol_table, ""))
         return true;
+      // register lazy methods.
+      // TODO: learn about modules and generalise this
+      // to module-providing languages if required.
+      std::set<irep_idt> lazy_method_ids;
+      it->second.language->lazy_methods_provided(lazy_method_ids);
+      for(const auto &id : lazy_method_ids)
+        lazymethodmap[id]=&it->second;
+    }
   }
 
   // typecheck modules

@@ -48,6 +48,12 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
       std::stoi(cmd.get_value("java-max-input-array-length"));
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
+  if(cmd.isset("lazy-methods-context-sensitive"))
+    lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_SENSITIVE;
+  else if(cmd.isset("lazy-methods"))
+    lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
+  else
+    lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 }
 
 /*******************************************************************\
@@ -352,9 +358,6 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  std::map<irep_idt, std::pair<const symbolt*, const java_bytecode_parse_treet::methodt*> >
-    lazy_methods;
-
   // first convert all
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
@@ -372,13 +375,30 @@ bool java_bytecode_languaget::typecheck(
          get_message_handler(),
          disable_runtime_checks,
          max_user_array_length,
-         lazy_methods))
+         lazy_methods,
+         lazy_methods_mode))
       return true;
   }
 
-  // Now incrementally elaborate methods that are reachable from this entry point:
+  // Now incrementally elaborate methods that are reachable from this entry point.
+  if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
+  {
+    if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
+      return true;
+  }
 
-  // Convert-method will need this to find virtual function targets.
+  // now typecheck all
+  if(java_bytecode_typecheck(
+       symbol_table, get_message_handler()))
+    return true;
+
+  return false;
+}
+
+bool java_bytecode_languaget::do_ci_lazy_method_conversion(
+  symbol_tablet &symbol_table,
+  lazy_methodst &lazy_methods)
+{
   class_hierarchyt ch;
   ch(symbol_table);
 
@@ -432,12 +452,17 @@ bool java_bytecode_languaget::typecheck(
           debug() << "Skip " << mname << eom;
           continue;
         }
-        debug() << "Lazy methods: elaborate " << mname << eom;
+        debug() << "CI lazy methods: elaborate " << mname << eom;
         const auto& parsed_method=findit->second;
-        java_bytecode_convert_method(*parsed_method.first,*parsed_method.second,
-                                     symbol_table,get_message_handler(),
-                                     disable_runtime_checks,max_user_array_length,
-                                     method_worklist2,needed_classes,ch);
+        java_bytecode_convert_method(
+          *parsed_method.first,
+          *parsed_method.second,
+          symbol_table,
+          get_message_handler(),
+          disable_runtime_checks,
+          max_user_array_length,
+          &method_worklist2,
+          &needed_classes);
         gather_virtual_callsites(symbol_table.lookup(mname).value,virtual_callsites);
         any_new_methods=true;
       }
@@ -447,7 +472,7 @@ bool java_bytecode_languaget::typecheck(
     // Given the object types we now know may be created, populate more
     // possible virtual function call targets:
 
-    debug() << "Lazy methods: add virtual method targets (" << virtual_callsites.size() <<
+    debug() << "CI lazy methods: add virtual method targets (" << virtual_callsites.size() <<
       " callsites)" << eom;
 
     for(const auto& callsite : virtual_callsites)
@@ -473,16 +498,31 @@ bool java_bytecode_languaget::typecheck(
     keep_symbols.add(sym.second);
   }
 
-  debug() << "Lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
+  debug() << "CI lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
 
   symbol_table.swap(keep_symbols);
 
-  // now typecheck all
-  if(java_bytecode_typecheck(
-       symbol_table, get_message_handler()))
-    return true;
-
   return false;
+}
+
+void java_bytecode_languaget::lazy_methods_provided(std::set<irep_idt> &methods) const
+{
+  for(const auto &kv : lazy_methods)
+    methods.insert(kv.first);
+}
+
+void java_bytecode_languaget::convert_lazy_method(
+  const irep_idt &id,
+  symbol_tablet &symtab)
+{
+  const auto &lazy_method_entry=lazy_methods.at(id);
+  java_bytecode_convert_method(
+    *lazy_method_entry.first,
+    *lazy_method_entry.second,
+    symtab,
+    get_message_handler(),
+    disable_runtime_checks,
+    max_user_array_length);
 }
 
 /*******************************************************************\

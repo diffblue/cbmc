@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class symbol_tablet;
 class symbolt;
-class class_hierarchyt;
 
 class java_bytecode_convert_methodt:public messaget
 {
@@ -32,16 +31,14 @@ public:
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
     size_t _max_array_length,
-    std::vector<irep_idt>& _needed_methods,
-    std::set<irep_idt>& _needed_classes,
-    const class_hierarchyt& _ch):
+    std::vector<irep_idt> *_needed_methods,
+    std::set<irep_idt> *_needed_classes):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
     needed_methods(_needed_methods),
-    needed_classes(_needed_classes),
-    class_hierarchy(_ch)
+    needed_classes(_needed_classes)
   {
   }
 
@@ -60,9 +57,8 @@ protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
   const size_t max_array_length;
-  std::vector<irep_idt>& needed_methods;
-  std::set<irep_idt>& needed_classes;
-  const class_hierarchyt& class_hierarchy;
+  std::vector<irep_idt> *needed_methods;
+  std::set<irep_idt> *needed_classes;
 
   irep_idt method_id;
   irep_idt current_method;

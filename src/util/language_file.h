@@ -42,6 +42,10 @@ public:
 
   void get_modules();
 
+  void convert_lazy_method(
+    const irep_idt &id,
+    symbol_tablet &symtab);
+
   language_filet(const language_filet &rhs);
 
   language_filet():language(NULL)
@@ -57,8 +61,14 @@ public:
   typedef std::map<std::string, language_filet> filemapt;
   filemapt filemap;
 
+  // Contains pointers into filemapt!
   typedef std::map<std::string, language_modulet> modulemapt;
   modulemapt modulemap;
+
+  // Contains pointers into filemapt!
+  // This is safe-ish as long as this is std::map.
+  typedef std::map<irep_idt, language_filet*> lazymethodmapt;
+  lazymethodmapt lazymethodmap;
 
   void clear_files()
   {
@@ -75,10 +85,23 @@ public:
 
   bool interfaces(symbol_tablet &symbol_table);
 
+  bool has_lazy_method(const irep_idt &id)
+  {
+    return lazymethodmap.count(id);
+  }
+
+  void convert_lazy_method(
+    const irep_idt &id,
+    symbol_tablet &symtab)
+  {
+    return lazymethodmap.at(id)->convert_lazy_method(id, symtab);
+  }
+
   void clear()
   {
     filemap.clear();
     modulemap.clear();
+    lazymethodmap.clear();
   }
 
 protected:

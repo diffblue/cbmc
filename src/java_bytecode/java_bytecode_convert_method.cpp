@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
-#include <goto-programs/class_hierarchy.h>
 #include <analyses/cfg_dominators.h>
 
 #include "java_bytecode_convert_method.h"
@@ -1068,7 +1067,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             if(as_string(arg0.get(ID_identifier))
                .find("<init>")!=std::string::npos)
             {
-              needed_classes.insert(classname);
+              if(needed_classes)
+                needed_classes->insert(classname);
               code_type.set(ID_constructor, true);
             }
             else
@@ -1158,7 +1158,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-        needed_methods.push_back(arg0.get(ID_identifier));
+        if(needed_methods)
+          needed_methods->push_back(arg0.get(ID_identifier));
       }
 
       call.function().add_source_location()=loc;
@@ -1700,8 +1701,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(arg0.type().id()==ID_symbol)
-        needed_classes.insert(to_symbol_type(arg0.type()).get_identifier());
+      if(needed_classes && arg0.type().id()==ID_symbol)
+        needed_classes->insert(to_symbol_type(arg0.type()).get_identifier());
       results[0]=java_bytecode_promotion(symbol_expr);
 
       // set $assertionDisabled to false
@@ -1719,8 +1720,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(arg0.type().id()==ID_symbol)
-        needed_classes.insert(to_symbol_type(arg0.type()).get_identifier());
+      if(needed_classes && arg0.type().id()==ID_symbol)
+        needed_classes->insert(to_symbol_type(arg0.type()).get_identifier());
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
@@ -2184,9 +2185,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   bool disable_runtime_checks,
   size_t max_array_length,
-  std::vector<irep_idt>& needed_methods,
-  std::set<irep_idt>& needed_classes,
-  const class_hierarchyt& ch)
+  std::vector<irep_idt> *needed_methods,
+  std::set<irep_idt> *needed_classes)
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
@@ -2194,8 +2194,7 @@ void java_bytecode_convert_method(
     disable_runtime_checks,
     max_array_length,
     needed_methods,
-    needed_classes,
-    ch);
+    needed_classes);
 
   java_bytecode_convert_method(class_symbol, method);
 }

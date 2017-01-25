@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_root_class.h"
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
+#include "java_bytecode_language.h"
 
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -28,12 +29,14 @@ public:
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
     size_t _max_array_length,
-    lazy_methodst& _lm):
+    lazy_methodst& _lm,
+    lazy_methods_modet _lazy_methods_mode):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
-    lazy_methods(_lm)
+    lazy_methods(_lm),
+    lazy_methods_mode(_lazy_methods_mode)
   {
   }
 
@@ -55,6 +58,7 @@ protected:
   const bool disable_runtime_checks;
   const size_t max_array_length;
   lazy_methodst &lazy_methods;
+  lazy_methods_modet lazy_methods_mode;
 
   // conversion
   void convert(const classt &c);
@@ -143,14 +147,30 @@ void java_bytecode_convert_classt::convert(const classt &c)
       id2string(qualified_classname)+
       "."+id2string(method.name)+
       ":"+method.signature;
+    // Always run the lazy pre-stage, as it symbol-table
+    // registers the function.
     java_bytecode_convert_method_lazy(
-      *class_symbol,method_identifier,method,symbol_table);
-    lazy_methods[method_identifier]=
-      std::make_pair(class_symbol,&method);
+      *class_symbol,
+      method_identifier,
+      method,
+      symbol_table);
+    if(lazy_methods_mode==LAZY_METHODS_MODE_EAGER)
+    {
+      // Upgrade to a fully-realized symbol now:
+      java_bytecode_convert_method(
+        *class_symbol,
+        method,
+        symbol_table,
+        get_message_handler(),
+        disable_runtime_checks,
+        max_array_length);
+    }
+    else
+    {
+      // Wait for our caller to decide what needs elaborating.
+      lazy_methods[method_identifier]=std::make_pair(class_symbol, &method);
+    }
   }
-  //java_bytecode_convert_method(
-  //  *class_symbol, method, symbol_table, get_message_handler(),
-  //  disable_runtime_checks, max_array_length);
 
   // is this a root class?
   if(c.extends.empty())
@@ -339,14 +359,16 @@ bool java_bytecode_convert_class(
   message_handlert &message_handler,
   bool disable_runtime_checks,
   size_t max_array_length,
-  lazy_methodst &lazy_methods)
+  lazy_methodst &lazy_methods,
+  lazy_methods_modet lazy_methods_mode)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
     message_handler,
     disable_runtime_checks,
     max_array_length,
-    lazy_methods);
+    lazy_methods,
+    lazy_methods_mode);
 
   try
   {
