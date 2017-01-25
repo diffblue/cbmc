@@ -352,7 +352,7 @@ void java_bytecode_parsert::get_class_refs()
       }
       break;
 
-    default:{}
+    default: {}
     }
   }
 
