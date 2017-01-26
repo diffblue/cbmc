@@ -7,6 +7,7 @@
 #include <util/language.h>
 #include <util/symbol.h>
 #include <langapi/mode.h>
+#include <memory>
 
 /*******************************************************************\
 
