@@ -1,7 +1,7 @@
-KNOWNBUG
+CORE
 main.c
 --show-symbol-table
-^Type\.*: struct struct_tag_name$
+^Type\.*: const struct struct_tag_name$
 ^Type\.*: const double$
 ^EXIT=0$
 ^SIGNAL=0$
