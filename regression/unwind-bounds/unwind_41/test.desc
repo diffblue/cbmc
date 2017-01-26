@@ -1,0 +1,10 @@
+CORE
+main.c
+--unwind-bounds
+^func.1: 3$
+^func.0: 1$
+^func.2: 1$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

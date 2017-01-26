@@ -24,6 +24,7 @@ SRC = ai.cpp \
       reaching_definitions.cpp \
       static_analysis.cpp \
       uninitialized_domain.cpp \
+      unwind_bounds.cpp \
       variable-sensitivity/abstract_object.cpp \
       variable-sensitivity/abstract_enviroment.cpp \
       variable-sensitivity/abstract_value.cpp \

@@ -145,7 +145,12 @@ class optionst;
   "(show)(verify)(simplify):" \
   "(flow-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
-  "(ignore-unresolved-calls)"
+  "(ignore-unresolved-calls)" \
+  "(unwind-bounds)" \
+  "(unwind-bounds-threshold):" \
+  "(unwindset)" \
+  "(functions-ignore)" \
+  "(functions-full)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

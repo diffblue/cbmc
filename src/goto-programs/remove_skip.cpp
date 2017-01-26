@@ -11,12 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_skip.h"
 
-static bool is_skip(goto_programt::instructionst::iterator it)
+static bool is_skip(
+  goto_programt::instructionst::iterator it,
+  bool remove_labeled)
 {
   // we won't remove labelled statements
   // (think about error labels or the like)
-
-  if(!it->labels.empty())
+  
+  if(!remove_labeled && !it->labels.empty())
     return false;
 
   if(it->is_skip())
@@ -68,12 +70,12 @@ static bool is_skip(goto_programt::instructionst::iterator it)
 }
 
 /// remove unnecessary skip statements
-void remove_skip(goto_programt &goto_program)
+void remove_skip(goto_programt &goto_program, bool remove_labeled)
 {
   // This needs to be a fixed-point, as
   // removing a skip can turn a goto into a skip.
-  std::size_t old_size;
-
+  unsigned old_size;
+  
   do
   {
     old_size=goto_program.instructions.size();
@@ -94,7 +96,7 @@ void remove_skip(goto_programt &goto_program)
       // for collecting labels
       std::list<irep_idt> labels;
 
-      while(is_skip(it))
+      while(is_skip(it, remove_labeled))
       {
         // don't remove the last skip statement,
         // it could be a target
@@ -140,14 +142,15 @@ void remove_skip(goto_programt &goto_program)
 
     // now delete the skips -- we do so after adjusting the
     // gotos to avoid dangling targets
-    for(const auto &new_target : new_targets)
-      goto_program.instructions.erase(new_target.first);
+    for(new_targetst::const_iterator
+        it=new_targets.begin(); it!=new_targets.end(); it++)
+      goto_program.instructions.erase(it->first);
 
     // remove the last skip statement unless it's a target
     goto_program.compute_incoming_edges();
 
     if(!goto_program.instructions.empty() &&
-       is_skip(--goto_program.instructions.end()) &&
+       is_skip(--goto_program.instructions.end(), remove_labeled) &&
        !goto_program.instructions.back().is_target())
       goto_program.instructions.pop_back();
   }
@@ -155,8 +158,8 @@ void remove_skip(goto_programt &goto_program)
 }
 
 /// remove unnecessary skip statements
-void remove_skip(goto_functionst &goto_functions)
+void remove_skip(goto_functionst &goto_functions, bool remove_labeled)
 {
   Forall_goto_functions(f_it, goto_functions)
-    remove_skip(f_it->second.body);
+    remove_skip(f_it->second.body, remove_labeled);
 }

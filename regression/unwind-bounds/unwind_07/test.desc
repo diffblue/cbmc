@@ -1,0 +1,9 @@
+CORE
+main.c
+--unwind-bounds
+^main.1: 3$
+^main.0: 2$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_functions.h"
 
-void remove_skip(goto_programt &goto_program);
-void remove_skip(goto_functionst &goto_functions);
+void remove_skip(goto_programt &goto_program, bool remove_labeled=false);
+void remove_skip(goto_functionst &goto_functions, bool remove_labled=false);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H

@@ -1,0 +1,10 @@
+FUTURE
+main.c
+--unwind-bounds
+^main.0: 3$
+^main.1: 4$
+^main.2: 5$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

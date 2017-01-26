@@ -1,0 +1,10 @@
+THOROUGH
+main.c
+--unwind-bounds
+^main.0: -1$
+^main.1: 100$
+^main.2: 100$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

@@ -182,6 +182,7 @@ public:
 
 protected:
   friend class constant_propagator_domaint;
+  friend class unwind_boundst;
 
   void replace(
     goto_functionst::goto_functiont &,

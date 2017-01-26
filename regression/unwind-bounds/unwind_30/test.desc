@@ -1,0 +1,9 @@
+CORE
+20160804_no_unwind_4.c
+--unwind-bounds
+^memcpy.0: 0$
+^memcpy.1: -1$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
