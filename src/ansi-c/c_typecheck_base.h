@@ -262,10 +262,6 @@ protected:
   asm_label_mapt asm_label_map;
 
   void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);
-
-private:
-  static bool are_types_equal_ignoring_typedef(
-    const typet type1, const typet &type2);
 };
 
 #endif // CPROVER_ANSI_C_C_TYPECHECK_BASE_H
