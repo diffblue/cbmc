@@ -14,6 +14,7 @@ Date: June 2016
 #include <iosfwd>
 #include <vector>
 #include <set>
+#include <unordered_set>
 
 #include <util/guard.h>
 #include <util/std_code.h>
@@ -272,7 +273,7 @@ protected:
   }
 };
 
-typedef hash_set_cont<irep_idt, irep_id_hash> recursion_sett;
+typedef std::unordered_set<irep_idt, irep_id_hash> recursion_sett;
 
 // another producer of read/write sets
 // this time look inside the body of function calls

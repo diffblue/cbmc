@@ -11,12 +11,13 @@ Date: June 2016
 #ifndef CPROVER_INTERRUPT_UTIL_H
 #define CPROVER_INTERRUPT_UTIL_H
 
+#include <unordered_map>
 #include "rw_set.h"
 
 #define CPROVER_ISR_ARRAY_ID "__CPROVER_ISR_ARRAY"
 
-typedef hash_map_cont<unsigned int, irep_idt> isr_mapt;
-typedef hash_map_cont<irep_idt, rw_set_function_rect, irep_id_hash> 
+typedef std::unordered_map<unsigned int, irep_idt> isr_mapt;
+typedef std::unordered_map<irep_idt, rw_set_function_rect, irep_id_hash>
   isr_rw_set_mapt;
 
 symbol_exprt get_isr(
