@@ -6,15 +6,15 @@ Author: Lihao Liang, lihao.liang@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#ifndef CPROVER_MEMORY_MODEL_INTERRUPT_H
-#define CPROVER_MEMORY_MODEL_INTERRUPT_H
+#ifndef CPROVER_GOTO_SYMEX_MEMORY_MODEL_INTERRUPT_H
+#define CPROVER_GOTO_SYMEX_MEMORY_MODEL_INTERRUPT_H
 
 #include "memory_model_sc.h"
 
 class memory_model_interruptt:public memory_model_sct
 {
 public:
-  inline explicit memory_model_interruptt(const namespacet &_ns):
+  explicit memory_model_interruptt(const namespacet &_ns):
     memory_model_sct(_ns)
   {
   }
@@ -32,4 +32,3 @@ private:
 };
 
 #endif
-

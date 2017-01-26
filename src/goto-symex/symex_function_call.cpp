@@ -9,9 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <sstream>
 #include <cassert>
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>

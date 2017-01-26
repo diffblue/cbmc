@@ -424,7 +424,8 @@ safety_checkert::resultt bmct::run(
   else if(mm=="pso")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
   else if(mm=="irq")
-    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_interruptt(ns));
+    memory_model=std::unique_ptr<memory_model_baset>
+      (new memory_model_interruptt(ns));
   else
   {
     error() << "Invalid memory model " << mm
