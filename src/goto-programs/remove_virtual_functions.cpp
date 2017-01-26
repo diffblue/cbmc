@@ -139,9 +139,9 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_gotos;
 
   exprt this_expr=code.arguments()[0];
-  // If necessary, cast to the last candidate function to get the object's clsid.
-  // By the structure of get_functions, this is the parent of all other classes
-  // under consideration.
+  // If necessary, cast to the last candidate function to
+  // get the object's clsid. By the structure of get_functions,
+  // this is the parent of all other classes under consideration.
   symbol_typet suggested_type(functions.back().class_id);
   exprt c_id2=get_class_identifier_field(this_expr, suggested_type, ns);
 
@@ -196,8 +196,10 @@ void remove_virtual_functionst::remove_virtual_function(
     const irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
     it->function=target->function;
-    if(!property_class.empty()) it->source_location.set_property_class(property_class);
-    if(!comment.empty()) it->source_location.set_comment(comment);
+    if(!property_class.empty())
+      it->source_location.set_property_class(property_class);
+    if(!comment.empty())
+      it->source_location.set_comment(comment);
   }
 
   goto_programt::targett next_target=target;
@@ -302,7 +304,8 @@ void remove_virtual_functionst::get_functions(
     const class_hierarchyt::idst &parents=
       class_hierarchy.class_map[c].parents;
 
-    if(parents.empty()) break;
+    if(parents.empty())
+      break;
     c=parents.front();
   }
 
@@ -380,7 +383,6 @@ bool remove_virtual_functionst::remove_virtual_functions(
 
   if(did_something)
   {
-    //remove_skip(goto_program);
     goto_program.update();
   }
 
