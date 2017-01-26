@@ -72,6 +72,7 @@ public:
   public:
     irep_idt base_name;
     bool is_native, is_abstract, is_synchronized;
+    source_locationt source_location;
 
     typedef std::vector<instructiont> instructionst;
     instructionst instructions;
@@ -84,6 +85,7 @@ public:
 
     struct exceptiont
     {
+    public:
       std::size_t start_pc;
       std::size_t end_pc;
       std::size_t handler_pc;

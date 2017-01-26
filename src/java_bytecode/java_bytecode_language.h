@@ -10,13 +10,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
 #include <util/language.h>
+#include <util/cmdline.h>
 
 #include "java_class_loader.h"
+
+#define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 
 class java_bytecode_languaget:public languaget
 {
 public:
-  bool preprocess(
+  virtual void get_language_options(const cmdlinet &);
+
+  virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
     std::ostream &outstream) override;
@@ -34,8 +39,11 @@ public:
 
   void show_parse(std::ostream &out) override;
 
-  ~java_bytecode_languaget() override;
-  java_bytecode_languaget() { }
+  virtual ~java_bytecode_languaget();
+  java_bytecode_languaget():
+    max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
+    max_user_array_length(0)
+    {}
 
   bool from_expr(
     const exprt &expr,
@@ -65,6 +73,15 @@ public:
 protected:
   irep_idt main_class;
   java_class_loadert java_class_loader;
+  bool assume_inputs_non_null;      // assume inputs variables to be non-null
+
+  bool disable_runtime_checks;      // disable run-time checks for java, i.e.,
+                                    // ASSERTS for
+                                    //  - checkcast / instanceof
+                                    //  - array bounds check
+                                    //  - array size for newarray
+  size_t max_nondet_array_length;   // maximal length for non-det array creation
+  size_t max_user_array_length;     // max size for user code created arrays
 };
 
 languaget *new_java_bytecode_language();

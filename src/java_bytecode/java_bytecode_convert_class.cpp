@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -20,15 +18,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 
-namespace {
 class java_bytecode_convert_classt:public messaget
 {
 public:
   java_bytecode_convert_classt(
     symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
+    message_handlert &_message_handler,
+    bool _disable_runtime_checks,
+    size_t _max_array_length):
     messaget(_message_handler),
-    symbol_table(_symbol_table)
+    symbol_table(_symbol_table),
+    disable_runtime_checks(_disable_runtime_checks),
+    max_array_length(_max_array_length)
   {
   }
 
@@ -47,6 +48,8 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
+  const bool disable_runtime_checks;
+  const size_t max_array_length;
 
   // conversion
   void convert(const classt &c);
@@ -55,7 +58,6 @@ protected:
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
 };
-}
 
 /*******************************************************************\
 
@@ -121,7 +123,12 @@ void java_bytecode_convert_classt::convert(const classt &c)
   // now do methods
   for(const auto &method : c.methods)
     java_bytecode_convert_method(
-      *class_symbol, method, symbol_table, get_message_handler());
+      *class_symbol,
+      method,
+      symbol_table,
+      get_message_handler(),
+      disable_runtime_checks,
+      max_array_length);
 
   // is this a root class?
   if(c.extends.empty())
@@ -140,7 +147,8 @@ Function: java_bytecode_convert_classt::generate_class_stub
 
 \*******************************************************************/
 
-void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_name)
+void java_bytecode_convert_classt::generate_class_stub(
+  const irep_idt &class_name)
 {
   class_typet class_type;
 
@@ -163,7 +171,8 @@ void java_bytecode_convert_classt::generate_class_stub(const irep_idt &class_nam
 
   if(symbol_table.move(new_symbol, class_symbol))
   {
-    warning() << "stub class symbol "+id2string(new_symbol.name)+" already exists";
+    warning() << "stub class symbol " << new_symbol.name
+              << " already exists" << eom;
   }
   else
   {
@@ -202,16 +211,19 @@ void java_bytecode_convert_classt::convert(
     new_symbol.name=id2string(class_symbol.name)+"."+id2string(f.name);
     new_symbol.base_name=f.name;
     new_symbol.type=field_type;
-    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+id2string(f.name);
+    new_symbol.pretty_name=id2string(class_symbol.pretty_name)+
+      "."+id2string(f.name);
     new_symbol.mode=ID_java;
     new_symbol.is_type=false;
     new_symbol.value=gen_zero(field_type);
 
+    // Do we have the static field symbol already?
+    const auto s_it=symbol_table.symbols.find(new_symbol.name);
+    if(s_it!=symbol_table.symbols.end())
+      symbol_table.symbols.erase(s_it); // erase, we stubbed it
+
     if(symbol_table.add(new_symbol))
-    {
-      error() << "failed to add static field symbol" << eom;
-      throw 0;
-    }
+      assert(false && "failed to add static field symbol");
   }
   else
   {
@@ -296,10 +308,15 @@ Function: java_bytecode_convert_class
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool disable_runtime_checks,
+  size_t max_array_length)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
-    symbol_table, message_handler);
+    symbol_table,
+    message_handler,
+    disable_runtime_checks,
+    max_array_length);
 
   try
   {

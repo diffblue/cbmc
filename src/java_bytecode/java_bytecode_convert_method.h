@@ -18,6 +18,8 @@ void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler);
+  message_handlert &message_handler,
+  bool disable_runtime_checks,
+  size_t max_array_length);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H

@@ -68,6 +68,11 @@ public:
     return get(ID_comment);
   }
 
+  inline const irep_idt &get_java_bytecode_index() const
+  {
+    return get(ID_java_bytecode_index);
+  }
+
   inline void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -118,6 +123,11 @@ public:
     set(ID_comment, comment);
   }
 
+  inline void set_java_bytecode_index(const irep_idt &index)
+  {
+    set(ID_java_bytecode_index, index);
+  }
+
   inline void set_hide()
   {
     set(ID_hide, true);
@@ -136,9 +146,6 @@ public:
 protected:
   std::string as_string(bool print_cwd) const;
 };
-
-// will go away
-//typedef source_locationt locationt;
 
 std::ostream &operator <<(std::ostream &, const source_locationt &);
 

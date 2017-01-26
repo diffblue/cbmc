@@ -6,9 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <string>
+
 #include <util/symbol_table.h>
 #include <util/suffix.h>
 #include <util/config.h>
+#include <util/cmdline.h>
+#include <util/string2int.h>
 
 #include "java_bytecode_language.h"
 #include "java_bytecode_convert_class.h"
@@ -19,6 +23,29 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader.h"
 
 #include "expr2java.h"
+
+/*******************************************************************\
+
+Function: java_bytecode_languaget::get_language_options
+
+  Inputs: Command-line options
+
+ Outputs: None
+
+ Purpose: Consume options that are java bytecode specific.
+
+\*******************************************************************/
+
+void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
+{
+  disable_runtime_checks=cmd.isset("disable-runtime-check");
+  assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
+  if(cmd.isset("java-max-input-array-length"))
+    max_nondet_array_length=
+      std::stoi(cmd.get_value("java-max-input-array-length"));
+  if(cmd.isset("java-max-vla-length"))
+    max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
+}
 
 /*******************************************************************\
 
@@ -169,7 +196,11 @@ bool java_bytecode_languaget::typecheck(
     debug() << "Converting class " << c_it->first << eom;
 
     if(java_bytecode_convert_class(
-         c_it->second, symbol_table, get_message_handler()))
+         c_it->second,
+         symbol_table,
+         get_message_handler(),
+         disable_runtime_checks,
+         max_user_array_length))
       return true;
   }
 
@@ -200,10 +231,21 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   */
   java_internal_additions(symbol_table);
 
-  if(java_entry_point(symbol_table, main_class, get_message_handler()))
-    return true;
 
-  return false;
+  main_function_resultt res=
+    get_main_symbol(symbol_table, main_class, get_message_handler());
+  if(res.stop_convert)
+    return res.error_found;
+
+  symbolt entry=res.main_function;
+
+  return(
+    java_entry_point(
+      symbol_table,
+      main_class,
+      get_message_handler(),
+      assume_inputs_non_null,
+      max_nondet_array_length));
 }
 
 /*******************************************************************\

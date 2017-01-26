@@ -16,12 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/vtable.h>
 
-namespace {
-bool is_virtual(const class_typet::methodt &method) {
-  return method.get_bool(ID_is_virtual)
-     && !method.get_bool(ID_constructor);
-}
-
 const char ID_virtual_name[] = "virtual_name";
 
 class is_virtual_name_equalt {
@@ -154,6 +148,12 @@ public:
     }
   }
 
+  bool is_virtual(const class_typet::methodt &method)
+  {
+    return method.get_bool(ID_is_virtual)
+      && !method.get_bool(ID_constructor);
+  }
+
   void create_base_vtable_entries(
     struct_exprt &vtable_value,
     const class_typet &class_type,
@@ -210,7 +210,6 @@ public:
   }
 };
 
-}
 
 /*******************************************************************
 

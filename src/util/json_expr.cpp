@@ -45,6 +45,10 @@ json_objectt json(const source_locationt &location)
   if(!location.get_function().empty())
     result["function"]=json_stringt(id2string(location.get_function()));
 
+  if(!location.get_java_bytecode_index().empty())
+    result["bytecode_index"]=
+      json_stringt(id2string(location.get_java_bytecode_index()));
+
   return result;
 }
 
@@ -78,12 +82,14 @@ json_objectt json(
   else if(type.id()==ID_signedbv)
   {
     result["name"]=json_stringt("integer");
-    result["width"]=json_numbert(std::to_string(to_signedbv_type(type).get_width()));
+    result["width"]=
+      json_numbert(std::to_string(to_signedbv_type(type).get_width()));
   }
   else if(type.id()==ID_floatbv)
   {
     result["name"]=json_stringt("float");
-    result["width"]=json_numbert(std::to_string(to_floatbv_type(type).get_width()));
+    result["width"]=
+      json_numbert(std::to_string(to_floatbv_type(type).get_width()));
   }
   else if(type.id()==ID_bv)
   {
@@ -104,7 +110,8 @@ json_objectt json(
   else if(type.id()==ID_fixedbv)
   {
     result["name"]=json_stringt("fixed");
-    result["width"]=json_numbert(std::to_string(to_fixedbv_type(type).get_width()));
+    result["width"]=
+      json_numbert(std::to_string(to_fixedbv_type(type).get_width()));
   }
   else if(type.id()==ID_pointer)
   {
