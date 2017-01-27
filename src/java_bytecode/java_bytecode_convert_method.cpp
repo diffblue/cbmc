@@ -1277,9 +1277,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       code_gotot code_goto(label(number));
       c=code_goto;
-      results[0]=from_integer(
-        std::next(i_it)->address,
-        pointer_typet(void_typet(), 64));
+      results[0]=
+        from_integer(
+          std::next(i_it)->address,
+          unsignedbv_typet(64));
+      results[0].type()=pointer_typet(void_typet(), 64);
     }
     else if(statement=="ret")
     {
@@ -1300,9 +1302,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
         else
         {
           code_ifthenelset branch;
-          auto address_ptr=from_integer(
-            jsr_ret_targets[idx],
-            pointer_typet(void_typet(), 64));
+          auto address_ptr=
+            from_integer(
+              jsr_ret_targets[idx],
+              unsignedbv_typet(64));
+          address_ptr.type()=pointer_typet(void_typet(), 64);
           branch.cond()=equal_exprt(retvar, address_ptr);
           branch.cond().add_source_location()=i_it->source_location;
           branch.then_case()=g;

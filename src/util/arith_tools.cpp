@@ -213,6 +213,7 @@ constant_exprt from_integer(
   }
 
   {
+    assert(false);
     constant_exprt r;
     r.make_nil();
     return r;
