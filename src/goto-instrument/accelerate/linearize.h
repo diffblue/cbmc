@@ -16,8 +16,6 @@ Author: Matt Lewis
 
 #include "Eigen/Eigen"
 
-using namespace Eigen;
-
 /*
  * The idea here is that a linear_recurrencet describes a linear recurrence in
  * the following way:
