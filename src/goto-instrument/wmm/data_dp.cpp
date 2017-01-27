@@ -37,13 +37,21 @@ void data_dpt::dp_analysis(
   {
     if(local_read && it->id==read.id)
     {
-      insert(datat(write.id, (local_write?source_locationt():write.loc), it->eq_class));
+      insert(
+        datat(
+          write.id,
+          (local_write?source_locationt():write.loc),
+          it->eq_class));
       continue;
     }
 
     if(local_write && it->id==write.id)
     {
-      insert(datat(read.id, (local_read?source_locationt():read.loc), it->eq_class));
+      insert(
+        datat(
+          read.id,
+          (local_read?source_locationt():read.loc),
+          it->eq_class));
       continue;
     }
   }
@@ -51,8 +59,10 @@ void data_dpt::dp_analysis(
   if(it==end())
   {
     ++class_nb;
-    insert(datat(read.id, (local_read?source_locationt():read.loc), class_nb));
-    insert(datat(write.id, (local_write?source_locationt():write.loc), class_nb));
+    insert(
+      datat(read.id, (local_read?source_locationt():read.loc), class_nb));
+    insert(
+      datat(write.id, (local_write?source_locationt():write.loc), class_nb));
   }
 }
 
@@ -68,7 +78,8 @@ Function: data_dpt::dp_analysis
 
 \*******************************************************************/
 
-void data_dpt::dp_analysis(const abstract_eventt& read,
+void data_dpt::dp_analysis(
+  const abstract_eventt& read,
   const abstract_eventt& write)
 {
   datat d_read(read.variable, read.source_location);
@@ -123,12 +134,12 @@ bool data_dpt::dp(const abstract_eventt& e1, const abstract_eventt& e2) const
       /* or else, same class */
       if(it1->eq_class==it2->eq_class)
       {
-        //message.debug() << e1<<"-dp->"<<e2 << messaget::eom;
+        // message.debug() << e1<<"-dp->"<<e2 << messaget::eom;
         return true;
       }
     }
   }
-  //message.debug() << e1<<"-x->"<<e2 << messaget::eom;
+  // message.debug() << e1<<"-x->"<<e2 << messaget::eom;
   return false;
 }
 
@@ -217,8 +228,9 @@ void data_dpt::print(messaget& message)
       classed[it->eq_class].insert(it->loc);
   }
 
-  for(std::map<unsigned, std::set<source_locationt> >::const_iterator m_it=classed.begin();
-    m_it!=classed.end(); ++m_it)
+  for(std::map<unsigned, std::set<source_locationt> >::const_iterator
+      m_it=classed.begin();
+      m_it!=classed.end(); ++m_it)
   {
     message.debug() << "class #"<<m_it->first << messaget::eom;
     std::set<source_locationt>::const_iterator l_it;

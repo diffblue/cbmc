@@ -21,7 +21,8 @@ void cone_of_influence(goto_programt &program,
     expr_sett &targets,
     expr_sett &cone);
 
-class cone_of_influencet {
+class cone_of_influencet
+{
  public:
   cone_of_influencet(const goto_programt &_program,
       const symbol_tablet &symbol_table) :

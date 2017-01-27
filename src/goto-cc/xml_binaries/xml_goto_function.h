@@ -14,7 +14,7 @@ Date: June 2006
 #include <util/xml.h>
 #include <goto-programs/goto_functions.h>
 
-void convert( const xmlt&, goto_functionst::goto_functiont& );
-void convert( const goto_functionst::goto_functiont&, xmlt& );
+void convert(const xmlt&, goto_functionst::goto_functiont&);
+void convert(const goto_functionst::goto_functiont&, xmlt&);
 
 #endif // CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_FUNCTION_H

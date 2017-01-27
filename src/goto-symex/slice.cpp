@@ -386,8 +386,10 @@ void simple_slice(symex_target_equationt &equation)
     last_assertion;
 
   if(s_it!=equation.SSA_steps.end())
+  {
     for(s_it++;
         s_it!=equation.SSA_steps.end();
         s_it++)
       s_it->ignore=true;
+  }
 }

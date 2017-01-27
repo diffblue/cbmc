@@ -63,7 +63,9 @@ public:
   irep_idt value; // for text and pattern matching
 };
 
-class format_token_listt : public std::list<format_tokent> { };
+class format_token_listt:public std::list<format_tokent>
+{
+};
 
 format_token_listt parse_format_string(const std::string &);
 

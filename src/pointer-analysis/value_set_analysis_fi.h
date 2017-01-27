@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set_domain_fi.h"
 #include "value_sets.h"
 
-class value_set_analysis_fit :
+class value_set_analysis_fit:
   public value_setst,
   public flow_insensitive_analysist<value_set_domain_fit>
 {

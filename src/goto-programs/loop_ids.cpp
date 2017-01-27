@@ -88,7 +88,7 @@ void show_loop_ids(
       break;
     }
     case ui_message_handlert::JSON_UI:
-      assert(false); //use function below
+      assert(false); // use function below
   }
 }
 
@@ -97,7 +97,7 @@ void show_loop_ids_json(
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
-  assert(ui==ui_message_handlert::JSON_UI); //use function above
+  assert(ui==ui_message_handlert::JSON_UI); // use function above
 
   forall_goto_program_instructions(it, goto_program)
   {

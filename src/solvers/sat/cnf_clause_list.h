@@ -88,8 +88,10 @@ public:
 
   virtual tvt l_get(literalt literal) const
   {
-    if(literal.is_true()) return tvt(true);
-    if(literal.is_false()) return tvt(false);
+    if(literal.is_true())
+      return tvt(true);
+    if(literal.is_false())
+      return tvt(false);
 
     unsigned v=literal.var_no();
 

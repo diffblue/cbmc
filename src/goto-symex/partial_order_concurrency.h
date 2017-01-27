@@ -24,7 +24,8 @@ public:
   typedef eventst::const_iterator event_it;
 
   // the name of a clock variable for a shared read/write
-  typedef enum {
+  typedef enum
+  {
     AX_SC_PER_LOCATION=1,
     AX_NO_THINAIR=2,
     AX_OBSERVATION=4,
@@ -85,7 +86,6 @@ protected:
   // the partial order constraint for two events
   exprt before(event_it e1, event_it e2, unsigned axioms);
   virtual exprt before(event_it e1, event_it e2)=0;
-
 };
 
 #if 0
@@ -191,7 +191,8 @@ class partial_order_concurrencyt
 {
 public:
   // the is-acyclic checks
-  typedef enum {
+  typedef enum
+  {
     AC_UNIPROC=0,
     AC_THINAIR=1,
     AC_GHB=2,
@@ -277,7 +278,7 @@ public:
   }
 
   const namespacet& get_ns() const { return ns; }
-  messaget& get_message() { return message; }
+  messaget &get_message() { return message; }
   std::map<std::string, unsigned> num_concurrency_constraints;
 
 private:
@@ -305,13 +306,15 @@ private:
   symbol_exprt node_symbol(
       const evtt &evt,
       const std::string &prefix) const;
-  std::vector<std::pair<symbol_exprt, symbol_exprt> > atomic_section_bounds[AC_N_AXIOMS];
+  std::vector<std::pair<symbol_exprt, symbol_exprt>>
+    atomic_section_bounds[AC_N_AXIOMS];
 
   std::list<exprt> acyclic_constraints[AC_N_AXIOMS];
   static std::string check_to_string(const acyclict check);
 
   // map point-wise order to a single Boolean symbol
-  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt> > evt_dir_pairt;
+  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt>>
+    evt_dir_pairt;
   typedef std::map<std::pair<evt_dir_pairt, evt_dir_pairt>,
           symbol_exprt> pointwise_mapt;
   pointwise_mapt edge_cache[AC_N_AXIOMS];

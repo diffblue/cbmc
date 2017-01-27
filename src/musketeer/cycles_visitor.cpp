@@ -32,9 +32,9 @@ Function:
 /* po^+ /\ U{C_1, ..., C_n} \/ delays */
 void cycles_visitort::po_edges(std::set<event_idt>& edges)
 {
-  instrumentert& instrumenter=fence_inserter.instrumenter;
+  instrumentert &instrumenter=fence_inserter.instrumenter;
 
-  event_grapht& egraph=instrumenter.egraph;
+  event_grapht &egraph=instrumenter.egraph;
 
   for(std::set<event_grapht::critical_cyclet>::iterator
     C_j=instrumenter.set_of_cycles.begin();
@@ -235,15 +235,15 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
 
           if(egraph.are_po_ordered(b, c))
             continue;
-          else if (egraph.are_po_ordered(d, a))
+          else if(egraph.are_po_ordered(d, a))
             continue;
-          else if (egraph.are_po_ordered(a, c) && egraph.are_po_ordered(b, d))
+          else if(egraph.are_po_ordered(a, c) && egraph.are_po_ordered(b, d))
             fence_inserter.add_edge(edget(c, b));
-          else if (egraph.are_po_ordered(a, c) && egraph.are_po_ordered(d, b))
+          else if(egraph.are_po_ordered(a, c) && egraph.are_po_ordered(d, b))
             fence_inserter.add_edge(edget(c, d));
-          else if (egraph.are_po_ordered(c, a) && egraph.are_po_ordered(b, d))
+          else if(egraph.are_po_ordered(c, a) && egraph.are_po_ordered(b, d))
             fence_inserter.add_edge(edget(a, b));
-          else if (egraph.are_po_ordered(c, a) && egraph.are_po_ordered(d, b))
+          else if(egraph.are_po_ordered(c, a) && egraph.are_po_ordered(d, b))
             fence_inserter.add_edge(edget(a, d));
         }
     }
@@ -270,7 +270,7 @@ void cycles_visitort::powr_constraint(
   const event_grapht::critical_cyclet& C_j,
   std::set<event_idt>& edges)
 {
-  event_grapht& graph=fence_inserter.instrumenter.egraph;
+  event_grapht &graph=fence_inserter.instrumenter.egraph;
 
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
@@ -301,7 +301,7 @@ void cycles_visitort::poww_constraint(
   const event_grapht::critical_cyclet& C_j,
   std::set<event_idt>& edges)
 {
-  event_grapht& graph=fence_inserter.instrumenter.egraph;
+  event_grapht &graph=fence_inserter.instrumenter.egraph;
 
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
@@ -332,7 +332,7 @@ void cycles_visitort::porw_constraint(
   const event_grapht::critical_cyclet& C_j,
   std::set<event_idt>& edges)
 {
-  event_grapht& graph=fence_inserter.instrumenter.egraph;
+  event_grapht &graph=fence_inserter.instrumenter.egraph;
 
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
@@ -363,7 +363,7 @@ void cycles_visitort::porr_constraint(
   const event_grapht::critical_cyclet& C_j,
   std::set<event_idt>& edges)
 {
-  event_grapht& graph=fence_inserter.instrumenter.egraph;
+  event_grapht &graph=fence_inserter.instrumenter.egraph;
 
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
@@ -394,7 +394,7 @@ void cycles_visitort::com_constraint(
   const event_grapht::critical_cyclet& C_j,
   std::set<event_idt>& edges)
 {
-  event_grapht& egraph=fence_inserter.instrumenter.egraph;
+  event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
   for(std::set<edget>::const_iterator it=C_j.unsafe_pairs.begin();
     it!=C_j.unsafe_pairs.end();
@@ -408,7 +408,7 @@ void cycles_visitort::com_constraint(
   }
 
 #if 0
-  event_grapht& egraph=instrumenter.egraph;
+  event_grapht &egraph=instrumenter.egraph;
 
   std::list<event_idt>::const_iterator e_it=C_j.begin();
   std::list<event_idt>::const_iterator next_it=e_it;

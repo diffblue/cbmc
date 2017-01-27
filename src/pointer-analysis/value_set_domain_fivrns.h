@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_fivrns.h"
 
-class value_set_domain_fivrnst :
+class value_set_domain_fivrnst:
   public flow_insensitive_abstract_domain_baset
 {
 public:
@@ -48,11 +48,10 @@ public:
     value_set.get_reference_set(expr, expr_set, ns);
   }
 
-  virtual void clear( void )
+  virtual void clear(void)
   {
     value_set.clear();
   }
-
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_FIVRNS_H

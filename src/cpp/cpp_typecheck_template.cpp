@@ -31,8 +31,10 @@ void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
   template_typet &new_type)
 {
-  const template_typet::template_parameterst &old_parameters=old_type.template_parameters();
-  template_typet::template_parameterst &new_parameters=new_type.template_parameters();
+  const template_typet::template_parameterst &old_parameters=
+    old_type.template_parameters();
+  template_typet::template_parameterst &new_parameters=
+    new_type.template_parameters();
 
   for(std::size_t i=0; i<new_parameters.size(); i++)
   {
@@ -40,7 +42,7 @@ void cpp_typecheckt::salvage_default_arguments(
        old_parameters[i].has_default_argument() &&
        !new_parameters[i].has_default_argument())
     {
-      // TODO! The default may depend on previous parameters!!
+      // TODO The default may depend on previous parameters!!
       new_parameters[i].default_argument()=old_parameters[i].default_argument();
     }
   }
@@ -237,7 +239,8 @@ void cpp_typecheckt::typecheck_class_template(
   if(symbol_table.move(symbol, new_symbol))
   {
     error().source_location=symbol.location;
-    error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
+    error() << "cpp_typecheckt::typecheck_compound_type: "
+            << "symbol_table.move() failed"
             << eom;
     throw 0;
   }
@@ -350,7 +353,8 @@ void cpp_typecheckt::typecheck_function_template(
   if(symbol_table.move(symbol, new_symbol))
   {
     error().source_location=symbol.location;
-    error() << "cpp_typecheckt::typecheck_compound_type: symbol_table.move() failed"
+    error() << "cpp_typecheckt::typecheck_compound_type: "
+            << "symbol_table.move() failed"
             << eom;
     throw 0;
   }
@@ -468,7 +472,8 @@ void cpp_typecheckt::typecheck_class_template_member(
   for(std::size_t i=0; i<instantiated_with.get_sub().size(); i++)
   {
     const cpp_template_args_tct &tc_template_args=
-      static_cast<const cpp_template_args_tct &>(instantiated_with.get_sub()[i]);
+      static_cast<const cpp_template_args_tct &>(
+        instantiated_with.get_sub()[i]);
 
     cpp_declarationt decl_tmp=declaration;
 
@@ -520,7 +525,8 @@ std::string cpp_typecheckt::class_template_identifier(
       it!=template_type.template_parameters().end();
       it++)
   {
-    if(counter!=0) identifier+=',';
+    if(counter!=0)
+      identifier+=',';
 
     if(it->id()==ID_type)
       identifier+="Type"+std::to_string(counter);
@@ -542,7 +548,8 @@ std::string cpp_typecheckt::class_template_identifier(
         it!=partial_specialization_args.arguments().end();
         it++, counter++)
     {
-      if(counter!=0) identifier+=',';
+      if(counter!=0)
+        identifier+=',';
 
       // These are not yet typechecked, as they may depend
       // on unassigned template parameters.
@@ -709,7 +716,7 @@ void cpp_typecheckt::convert_class_template_specialization(
       template_args_tc,
       type);
   }
-  else
+  else // NOLINT(readability/braces)
   #endif
 
   {
@@ -1198,7 +1205,9 @@ void cpp_typecheckt::convert_template_declaration(
     typecheck_class_template(declaration);
     return;
   }
-  else // maybe function template, maybe class template member, maye template variable
+  // maybe function template, maybe class template member, maye
+  // template variable
+  else
   {
     // there should be declarators in either case
     if(declaration.declarators().empty())

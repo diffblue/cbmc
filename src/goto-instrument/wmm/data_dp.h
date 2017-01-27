@@ -49,14 +49,17 @@ struct datat
   }
 };
 
-class data_dpt :public std::set<datat>
+class data_dpt:public std::set<datat>
 {
 public:
   unsigned class_nb;
 
   /* add this dependency in the structure */
   void dp_analysis(const abstract_eventt& read, const abstract_eventt& write);
-  void dp_analysis(const datat& read, bool local_read, const datat& write,
+  void dp_analysis(
+    const datat& read,
+    bool local_read,
+    const datat& write,
     bool local_write);
 
   /* are these two events with a data dependency ? */

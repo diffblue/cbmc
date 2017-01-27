@@ -28,11 +28,13 @@ Function: simplify_exprt::simplify_boolean
 
 bool simplify_exprt::simplify_boolean(exprt &expr)
 {
-  if(!expr.has_operands()) return true;
+  if(!expr.has_operands())
+    return true;
 
   exprt::operandst &operands=expr.operands();
 
-  if(expr.type().id()!=ID_bool) return true;
+  if(expr.type().id()!=ID_bool)
+    return true;
 
   if(expr.id()==ID_implies)
   {
@@ -85,7 +87,8 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
           expr.id()==ID_and ||
           expr.id()==ID_xor)
   {
-    if(operands.empty()) return true;
+    if(operands.empty())
+      return true;
 
     bool result=true;
 
@@ -97,7 +100,8 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     for(exprt::operandst::iterator it=operands.begin();
         it!=operands.end();)
     {
-      if(it->type().id()!=ID_bool) return true;
+      if(it->type().id()!=ID_bool)
+        return true;
 
       bool is_true=it->is_true();
       bool is_false=it->is_false();
@@ -158,6 +162,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       // now search for a
 
       if(!expr_set.empty())
+      {
         forall_operands(it, expr)
         {
           if(it->id()!=ID_not &&
@@ -167,6 +172,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
             return false;
           }
         }
+      }
     }
 
     if(operands.empty())
@@ -207,12 +213,14 @@ Function: simplify_exprt::simplify_not
 
 bool simplify_exprt::simplify_not(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &op=expr.op0();
 
   if(expr.type().id()!=ID_bool ||
-     op.type().id()!=ID_bool) return true;
+     op.type().id()!=ID_bool)
+    return true;
 
   if(op.id()==ID_not) // (not not a) == a
   {

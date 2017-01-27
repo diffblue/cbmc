@@ -82,8 +82,10 @@ void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
 
   forall_nodes(u)
   {
-    if(u->reference_counter==0) continue;
-    if(u->node_number<=1) continue;
+    if(u->reference_counter==0)
+      continue;
+    if(u->node_number<=1)
+      continue;
 
     if(!suppress_zero || u->high.node_number()!=0)
       out << '"' << u->node_number << '"' << " -> "
@@ -135,7 +137,8 @@ void mini_bdd_mgrt::DumpTikZ(
           out << "right of=n" << previous;
 
         out << "] (n" << u->node_number << ") {";
-        if(node_numbers) out << "\\small $" << u->node_number << "$";
+        if(node_numbers)
+          out << "\\small $" << u->node_number << "$";
         out << "};\n";
         previous=u->node_number;
       }
@@ -206,7 +209,8 @@ mini_bddt mini_bdd_applyt::APP(const mini_bddt &x, const mini_bddt &y)
   // dynamic programming
   std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());
   Gt::const_iterator G_it=G.find(key);
-  if(G_it!=G.end()) return G_it->second;
+  if(G_it!=G.end())
+    return G_it->second;
 
   mini_bdd_mgrt *mgr=x.node->mgr;
 
@@ -360,7 +364,8 @@ void mini_bdd_mgrt::DumpTable(std::ostream &out) const
           << it->low.node_number() << " & " << it->high.node_number()
           << " \\\\";
 
-    if(it->node_number==1) out << "\\hline";
+    if(it->node_number==1)
+      out << "\\hline";
 
     out << " % " << it->reference_counter << '\n';
   }
@@ -438,7 +443,11 @@ void cubes(const mini_bddt &u, const std::string &path, std::string &result)
   mini_bdd_mgrt *mgr=u.node->mgr;
   std::string path_low=path;
   std::string path_high=path;
-  if(!path.empty()) { path_low+=" & "; path_high+=" & "; }
+  if(!path.empty())
+  {
+    path_low+=" & ";
+    path_high+=" & ";
+  }
   path_low+='!'+mgr->var_table[u.var()-1].label;
   path_high+=mgr->var_table[u.var()-1].label;
   cubes(u.low(), path_low, result);
@@ -469,7 +478,8 @@ bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment)
   else
   {
     assignment[v.var()]=true;
-    if(OneSat(v.high(), assignment)) return true;
+    if(OneSat(v.high(), assignment))
+      return true;
     assignment[v.var()]=false;
     return OneSat(v.low(), assignment);
   }

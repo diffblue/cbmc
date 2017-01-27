@@ -68,7 +68,8 @@ void memory_info(std::ostream &out)
   // NOLINTNEXTLINE(readability/identifiers)
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
-  task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
+  task_info(
+    current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
   out << "  virtual size: "
       << static_cast<double>(t_info.virtual_size)/1000000 << "m\n";
 

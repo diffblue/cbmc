@@ -269,7 +269,8 @@ void goto_convertt::convert_CPROVER_throw(
   if(targets.throw_set)
   {
     // need to process destructor stack
-    unwind_destructor_stack(code.source_location(), targets.throw_stack_size, dest);
+    unwind_destructor_stack(
+      code.source_location(), targets.throw_stack_size, dest);
 
     // add goto
     goto_programt::targett t=dest.add_instruction();

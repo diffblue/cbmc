@@ -84,7 +84,6 @@ protected:
     {
     }
   };
-
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_SMVSAT_H

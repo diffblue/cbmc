@@ -127,11 +127,11 @@ bool cpp_typecheckt::standard_conversion_function_to_pointer(
     return false;
 
   pointer_typet pointer;
-  pointer.subtype() = func_type;
+  pointer.subtype()=func_type;
 
-  new_expr = exprt(ID_address_of);
+  new_expr=exprt(ID_address_of);
   new_expr.copy_to_operands(expr);
-  new_expr.type() = pointer;
+  new_expr.type()=pointer;
 
   return true;
 }
@@ -255,7 +255,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     std::size_t width=to_signedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
-    new_expr = expr;
+    new_expr=expr;
     new_expr.make_typecast(int_type);
     return true;
   }
@@ -265,7 +265,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     std::size_t width=to_unsignedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
-    new_expr = expr;
+    new_expr=expr;
     if(width==config.ansi_c.int_width)
       int_type.id(ID_unsignedbv);
     new_expr.make_typecast(int_type);
@@ -382,7 +382,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
-  new_expr = expr;
+  new_expr=expr;
   new_expr.make_typecast(type);
   qual_from.write(new_expr.type());
 
@@ -445,7 +445,7 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
-  new_expr = expr;
+  new_expr=expr;
   new_expr.make_typecast(type);
   qual_from.write(new_expr.type());
 
@@ -497,7 +497,7 @@ bool cpp_typecheckt::standard_conversion_floating_point_conversion(
   c_qualifierst qual_from;
 
   qual_from.read(expr.type());
-  new_expr = expr;
+  new_expr=expr;
   new_expr.make_typecast(type);
   qual_from.write(new_expr.type());
 
@@ -561,9 +561,9 @@ bool cpp_typecheckt::standard_conversion_pointer(
   if(simplify_expr(expr, *this).is_zero() &&
      expr.type().id()!=ID_pointer)
   {
-    new_expr = expr;
+    new_expr=expr;
     new_expr.set(ID_value, ID_NULL);
-    new_expr.type() = type;
+    new_expr.type()=type;
     return true;
   }
 
@@ -574,8 +574,8 @@ bool cpp_typecheckt::standard_conversion_pointer(
      expr.type().find("to-member").is_not_nil())
     return false;
 
-  typet sub_from = follow(expr.type().subtype());
-  typet sub_to = follow(type.subtype());
+  typet sub_from=follow(expr.type().subtype());
+  typet sub_to=follow(type.subtype());
 
   // std::nullptr_t to _any_ pointer type
   if(sub_from.id()==ID_nullptr)
@@ -586,7 +586,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   {
     c_qualifierst qual_from;
     qual_from.read(expr.type().subtype());
-    new_expr = expr;
+    new_expr=expr;
     new_expr.make_typecast(type);
     qual_from.write(new_expr.type().subtype());
     return true;
@@ -595,13 +595,13 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // struct * to struct *
   if(sub_from.id()==ID_struct && sub_to.id()==ID_struct)
   {
-    const struct_typet& from_struct = to_struct_type(sub_from);
-    const struct_typet& to_struct = to_struct_type(sub_to);
+    const struct_typet& from_struct=to_struct_type(sub_from);
+    const struct_typet& to_struct=to_struct_type(sub_to);
     if(subtype_typecast(from_struct, to_struct))
     {
       c_qualifierst qual_from;
       qual_from.read(expr.type().subtype());
-      new_expr = expr;
+      new_expr=expr;
       make_ptr_typecast(new_expr, type);
       qual_from.write(new_expr.type().subtype());
       return true;
@@ -671,15 +671,15 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
     if(type.subtype().id()==ID_code  &&
        expr.type().subtype().id()==ID_code)
     {
-      code_typet code1 = to_code_type(expr.type().subtype());
+      code_typet code1=to_code_type(expr.type().subtype());
       assert(code1.parameters().size()>0);
-      code_typet::parametert this1 = code1.parameters()[0];
+      code_typet::parametert this1=code1.parameters()[0];
       assert(this1.get(ID_C_base_name)==ID_this);
       code1.parameters().erase(code1.parameters().begin());
 
-      code_typet code2 = to_code_type(type.subtype());
+      code_typet code2=to_code_type(type.subtype());
       assert(code2.parameters().size()>0);
-      code_typet::parametert this2 = code2.parameters()[0];
+      code_typet::parametert this2=code2.parameters()[0];
       assert(this2.get(ID_C_base_name)==ID_this);
       code2.parameters().erase(code2.parameters().begin());
 
@@ -701,7 +701,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(expr.id()==ID_constant &&
      expr.get(ID_value)==ID_NULL)
   {
-    new_expr = expr;
+    new_expr=expr;
     new_expr.make_typecast(type);
     return true;
   }
@@ -716,7 +716,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(subtype_typecast(to_struct, from_struct))
   {
-    new_expr = expr;
+    new_expr=expr;
     new_expr.make_typecast(type);
     return true;
   }
@@ -868,7 +868,8 @@ bool cpp_typecheckt::standard_conversion_sequence(
       {
         if(!standard_conversion_integral_conversion(curr_expr, type, new_expr))
         {
-          if(!standard_conversion_floating_integral_conversion(curr_expr, type, new_expr))
+          if(!standard_conversion_floating_integral_conversion(
+              curr_expr, type, new_expr))
             return false;
         }
 
@@ -882,8 +883,10 @@ bool cpp_typecheckt::standard_conversion_sequence(
       if(!standard_conversion_floating_point_promotion(curr_expr, new_expr) ||
          new_expr.type() != type)
       {
-        if(!standard_conversion_floating_point_conversion(curr_expr, type, new_expr) &&
-           !standard_conversion_floating_integral_conversion(curr_expr, type, new_expr))
+        if(!standard_conversion_floating_point_conversion(
+            curr_expr, type, new_expr) &&
+           !standard_conversion_floating_integral_conversion(
+             curr_expr, type, new_expr))
           return false;
 
         rank += 3;
@@ -917,7 +920,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       return false;
   }
   else
-    new_expr = curr_expr;
+    new_expr=curr_expr;
 
   curr_expr.swap(new_expr);
 
@@ -928,9 +931,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
     do
     {
-      typet tmp_from = sub_from.subtype();
+      typet tmp_from=sub_from.subtype();
       sub_from.swap(tmp_from);
-      typet tmp_to = sub_to.subtype();
+      typet tmp_to=sub_to.subtype();
       sub_to.swap(tmp_to);
 
       c_qualifierst qual_from;
@@ -944,7 +947,6 @@ bool cpp_typecheckt::standard_conversion_sequence(
         rank+=1;
         break;
       }
-
     }
     while(sub_from.id()==ID_pointer);
 
@@ -953,8 +955,8 @@ bool cpp_typecheckt::standard_conversion_sequence(
   }
   else
   {
-    new_expr = curr_expr;
-    new_expr.type() = type;
+    new_expr=curr_expr;
+    new_expr.type()=type;
   }
 
   return true;
@@ -983,8 +985,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   assert(!is_reference(expr.type()));
   assert(!is_reference(type));
 
-  const typet &from = follow(expr.type());
-  const typet &to = follow(type);
+  const typet &from=follow(expr.type());
+  const typet &to=follow(type);
 
   new_expr.make_nil();
 
@@ -1015,14 +1017,14 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         {
           exprt address(ID_address_of, pointer_typet());
           address.copy_to_operands(expr);
-          address.type().subtype() = expr.type();
+          address.type().subtype()=expr.type();
 
           // simplify address
           if(expr.id()==ID_dereference)
             address=expr.op0();
 
           pointer_typet ptr_sub;
-          ptr_sub.subtype() = type;
+          ptr_sub.subtype()=type;
           c_qualifierst qual_from;
           qual_from.read(expr.type());
           qual_from.write(ptr_sub.subtype());
@@ -1030,7 +1032,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
           exprt deref(ID_dereference);
           deref.copy_to_operands(address);
-          deref.type() = address.type().subtype();
+          deref.type()=address.type().subtype();
 
           // create temporary object
           exprt tmp_object_expr=exprt(ID_side_effect, type);
@@ -1054,14 +1056,14 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
       struct_typet to_struct=to_struct_type(to);
 
-      bool found = false;
+      bool found=false;
 
       for(struct_typet::componentst::const_iterator
-          it = to_struct.components().begin();
+          it=to_struct.components().begin();
           it != to_struct.components().end();
           it++)
       {
-        const irept& component = *it;
+        const irept& component=*it;
 
         if(component.get_bool(ID_from_base))
           continue;
@@ -1080,13 +1082,13 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         // TODO: ellipsis
 
-        const irept &parameters = comp_type.find(ID_parameters);
+        const irept &parameters=comp_type.find(ID_parameters);
 
         if(parameters.get_sub().size() != 2)
           continue;
 
-        exprt curr_arg1 = static_cast<const exprt&> (parameters.get_sub()[1]);
-        typet arg1_type = curr_arg1.type();
+        exprt curr_arg1=static_cast<const exprt&> (parameters.get_sub()[1]);
+        typet arg1_type=curr_arg1.type();
 
         if(is_reference(arg1_type))
         {
@@ -1097,29 +1099,30 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         struct_typet arg1_struct;
         arg1_struct.make_nil();
         {
-          typet tmp = follow(arg1_type);
+          typet tmp=follow(arg1_type);
           if(tmp.id()==ID_struct)
-            arg1_struct = to_struct_type(tmp);
+            arg1_struct=to_struct_type(tmp);
         }
 
-        unsigned tmp_rank = 0;
+        unsigned tmp_rank=0;
         if(arg1_struct.is_nil())
         {
             exprt tmp_expr;
-            if(standard_conversion_sequence(expr, arg1_type, tmp_expr, tmp_rank))
+            if(standard_conversion_sequence(
+                expr, arg1_type, tmp_expr, tmp_rank))
             {
               // check if it's ambiguous
               if(found)
                 return false;
-              found = true;
+              found=true;
 
               if(expr.get_bool(ID_C_lvalue))
                 tmp_expr.set(ID_C_lvalue, true);
 
-              tmp_expr.add_source_location() = expr.source_location();
+              tmp_expr.add_source_location()=expr.source_location();
 
-              exprt func_symb = cpp_symbol_expr(lookup(component.get(ID_name)));
-              func_symb.type() = comp_type;
+              exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
+              func_symb.type()=comp_type;
               {
                 exprt tmp("already_typechecked");
                 tmp.copy_to_operands(func_symb);
@@ -1128,7 +1131,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
               // create temporary object
               side_effect_expr_function_callt ctor_expr;
-              ctor_expr.add_source_location() = expr.source_location();
+              ctor_expr.add_source_location()=expr.source_location();
               ctor_expr.function().swap(func_symb);
               ctor_expr.arguments().push_back(tmp_expr);
               typecheck_side_effect_function_call(ctor_expr);
@@ -1146,35 +1149,37 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           {
               // try derived-to-base conversion
               exprt expr_pfrom(ID_address_of, pointer_typet());
-              expr_pfrom.type().subtype() = expr.type();
+              expr_pfrom.type().subtype()=expr.type();
               expr_pfrom.copy_to_operands(expr);
 
               pointer_typet pto;
-              pto.subtype() = arg1_type;
+              pto.subtype()=arg1_type;
 
               exprt expr_ptmp;
-              tmp_rank = 0;
-              if(standard_conversion_sequence(expr_pfrom, pto, expr_ptmp, tmp_rank))
+              tmp_rank=0;
+              if(standard_conversion_sequence(
+                  expr_pfrom, pto, expr_ptmp, tmp_rank))
               {
                 // check if it's ambiguous
                 if(found)
                   return false;
-                found = true;
+                found=true;
 
                 rank+=tmp_rank;
 
                 // create temporary object
-                exprt expr_deref = exprt(ID_dereference, expr_ptmp.type().subtype());
+                exprt expr_deref=
+                  exprt(ID_dereference, expr_ptmp.type().subtype());
                 expr_deref.set(ID_C_lvalue, true);
                 expr_deref.copy_to_operands(expr_ptmp);
-                expr_deref.add_source_location() = expr.source_location();
+                expr_deref.add_source_location()=expr.source_location();
 
                 exprt new_object("new_object", type);
                 new_object.set(ID_C_lvalue, true);
                 new_object.type().set(ID_C_constant, false);
 
-                exprt func_symb = cpp_symbol_expr(lookup(component.get(ID_name)));
-                func_symb.type() = comp_type;
+                exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
+                func_symb.type()=comp_type;
                 {
                   exprt tmp("already_typechecked");
                   tmp.copy_to_operands(func_symb);
@@ -1182,7 +1187,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                 }
 
                 side_effect_expr_function_callt ctor_expr;
-                ctor_expr.add_source_location() = expr.source_location();
+                ctor_expr.add_source_location()=expr.source_location();
                 ctor_expr.function().swap(func_symb);
                 ctor_expr.arguments().push_back(expr_deref);
                 typecheck_side_effect_function_call(ctor_expr);
@@ -1204,15 +1209,15 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   // conversion operators
   if(from.id()==ID_struct)
   {
-    struct_typet from_struct = to_struct_type(from);
+    struct_typet from_struct=to_struct_type(from);
 
-    bool found = false;
+    bool found=false;
     for(struct_typet::componentst::const_iterator
-        it = from_struct.components().begin();
+        it=from_struct.components().begin();
         it != from_struct.components().end(); it++)
     {
-      const irept& component = *it;
-      const typet comp_type = static_cast<const typet&>(component.find(ID_type));
+      const irept& component=*it;
+      const typet comp_type=static_cast<const typet&>(component.find(ID_type));
 
       if(component.get_bool(ID_from_base))
         continue;
@@ -1233,7 +1238,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       exprt this_expr(expr);
       this_type.set(ID_C_this, true);
 
-      unsigned tmp_rank = 0;
+      unsigned tmp_rank=0;
       exprt tmp_expr;
 
       if(implicit_conversion_sequence(
@@ -1247,13 +1252,13 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         cpp_func_name.get_sub().push_back(func_name);
 
         exprt member_func(ID_member);
-        member_func.add(ID_component_cpp_name) = cpp_func_name;
+        member_func.add(ID_component_cpp_name)=cpp_func_name;
         exprt ac("already_typechecked");
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
         side_effect_expr_function_callt func_expr;
-        func_expr.add_source_location() = expr.source_location();
+        func_expr.add_source_location()=expr.source_location();
         func_expr.function().swap(member_func);
         typecheck_side_effect_function_call(func_expr);
 
@@ -1263,7 +1268,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           // check if it's ambiguous
           if(found)
             return false;
-          found = true;
+          found=true;
 
           rank+=tmp_rank;
           new_expr.swap(tmp_expr);
@@ -1298,8 +1303,8 @@ bool cpp_typecheckt::reference_related(
   assert(is_reference(type));
   assert(!is_reference(expr.type()));
 
-  typet from = follow(expr.type());
-  typet to = follow(type.subtype());
+  typet from=follow(expr.type());
+  typet to=follow(type.subtype());
 
   // need to check #c_type
   if(from.get(ID_C_c_type)!=to.get(ID_C_c_type))
@@ -1420,7 +1425,7 @@ bool cpp_typecheckt::reference_binding(
   assert(is_reference(type));
   assert(!is_reference(expr.type()));
 
-  unsigned backup_rank = rank;
+  unsigned backup_rank=rank;
 
   if(type.get_bool(ID_C_this) &&
      !expr.get_bool(ID_C_lvalue))
@@ -1467,20 +1472,20 @@ bool cpp_typecheckt::reference_binding(
       return true;
     }
 
-    rank = backup_rank;
+    rank=backup_rank;
   }
 
   // conversion operators
-  typet from_type = follow(expr.type());
+  typet from_type=follow(expr.type());
   if(from_type.id()==ID_struct)
   {
-    struct_typet from_struct = to_struct_type(from_type);
+    struct_typet from_struct=to_struct_type(from_type);
 
     for(struct_typet::componentst::const_iterator
-        it = from_struct.components().begin();
+        it=from_struct.components().begin();
         it != from_struct.components().end(); it++)
     {
-      const irept& component = *it;
+      const irept& component=*it;
 
       if(component.get_bool(ID_from_base))
         continue;
@@ -1505,7 +1510,7 @@ bool cpp_typecheckt::reference_binding(
 
       this_type.set(ID_C_this, true);
 
-      unsigned tmp_rank = 0;
+      unsigned tmp_rank=0;
 
       exprt tmp_expr;
       if(implicit_conversion_sequence(
@@ -1519,18 +1524,18 @@ bool cpp_typecheckt::reference_binding(
         cpp_func_name.get_sub().push_back(func_name);
 
         exprt member_func(ID_member);
-        member_func.add(ID_component_cpp_name) = cpp_func_name;
+        member_func.add(ID_component_cpp_name)=cpp_func_name;
         exprt ac("already_typechecked");
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
         side_effect_expr_function_callt func_expr;
-        func_expr.add_source_location() = expr.source_location();
+        func_expr.add_source_location()=expr.source_location();
         func_expr.function().swap(member_func);
         typecheck_side_effect_function_call(func_expr);
 
         // let's check if the returned value binds directly
-        exprt returned_value = func_expr;
+        exprt returned_value=func_expr;
         add_implicit_dereference(returned_value);
 
         if(returned_value.get_bool(ID_C_lvalue) &&
@@ -1540,7 +1545,7 @@ bool cpp_typecheckt::reference_binding(
           assert(returned_value.id()==ID_dereference &&
                  is_reference(returned_value.op0().type()));
 
-          new_expr = returned_value.op0();
+          new_expr=returned_value.op0();
 
           if(returned_value.type() != type.subtype())
           {
@@ -1569,7 +1574,7 @@ bool cpp_typecheckt::reference_binding(
      !expr.get_bool(ID_C_lvalue))
     return false;
 
-  exprt arg_expr = expr;
+  exprt arg_expr=expr;
 
   if(follow(arg_expr.type()).id()==ID_struct)
   {
@@ -1589,7 +1594,7 @@ bool cpp_typecheckt::reference_binding(
     return true;
   }
 
-  rank = backup_rank;
+  rank=backup_rank;
   if(standard_conversion_sequence(expr, type.subtype(), new_expr, rank))
   {
     {
@@ -1597,7 +1602,7 @@ bool cpp_typecheckt::reference_binding(
       exprt tmp=exprt(ID_side_effect, type.subtype());
       tmp.set(ID_statement, ID_temporary_object);
       tmp.add_source_location()=expr.source_location();
-      //tmp.set(ID_C_lvalue, true);
+      // tmp.set(ID_C_lvalue, true);
       tmp.move_to_operands(new_expr);
       new_expr.swap(tmp);
     }
@@ -1635,7 +1640,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   exprt &new_expr,
   unsigned &rank)
 {
-  unsigned backup_rank = rank;
+  unsigned backup_rank=rank;
 
   exprt e=expr;
   add_implicit_dereference(e);
@@ -1653,7 +1658,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   }
   else if(!standard_conversion_sequence(e, type, new_expr, rank))
   {
-    rank = backup_rank;
+    rank=backup_rank;
     if(!user_defined_conversion_sequence(e, type, new_expr, rank))
       return false;
 
@@ -1685,7 +1690,7 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   const typet &type,
   exprt &new_expr)
 {
-  unsigned rank = 0;
+  unsigned rank=0;
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
@@ -1728,7 +1733,7 @@ Function: cpp_typecheck_baset::implicit_typecast
 
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
-  exprt e = expr;
+  exprt e=expr;
 
   if(!implicit_conversion_sequence(e, type, expr))
   {
@@ -1838,8 +1843,8 @@ bool cpp_typecheckt::cast_away_constness(
   const typet &t2) const
 {
   assert(t1.id()==ID_pointer && t2.id()==ID_pointer);
-  typet nt1 = t1;
-  typet nt2 = t2;
+  typet nt1=t1;
+  typet nt2=t2;
 
   if(is_reference(nt1))
     nt1.remove(ID_C_reference);
@@ -1862,7 +1867,7 @@ bool cpp_typecheckt::cast_away_constness(
 
   bool_typet newnt1;
   q1.write(newnt1);
-  snt1.back() = newnt1;
+  snt1.back()=newnt1;
 
   std::vector<typet> snt2;
   snt2.push_back(nt2);
@@ -1877,16 +1882,16 @@ bool cpp_typecheckt::cast_away_constness(
 
   bool_typet newnt2;
   q2.write(newnt2);
-  snt2.back() = newnt2;
+  snt2.back()=newnt2;
 
-  const std::size_t k = snt1.size() < snt2.size() ? snt1.size() : snt2.size();
+  const std::size_t k=snt1.size() < snt2.size() ? snt1.size() : snt2.size();
 
-  for(std::size_t i = k; i > 1; i--)
+  for(std::size_t i=k; i > 1; i--)
   {
-    snt1[snt1.size()-2].subtype() = snt1[snt1.size()-1];
+    snt1[snt1.size()-2].subtype()=snt1[snt1.size()-1];
     snt1.pop_back();
 
-    snt2[snt2.size()-2].subtype() = snt2[snt2.size()-1];
+    snt2[snt2.size()-2].subtype()=snt2[snt2.size()-1];
     snt2.pop_back();
   }
 
@@ -1915,7 +1920,7 @@ bool cpp_typecheckt::const_typecast(
 {
   assert(is_reference(expr.type())==false);
 
-  exprt curr_expr = expr;
+  exprt curr_expr=expr;
 
   if(curr_expr.type().id()==ID_array)
   {
@@ -1937,7 +1942,7 @@ bool cpp_typecheckt::const_typecast(
       return false;
   }
   else
-    new_expr = curr_expr;
+    new_expr=curr_expr;
 
   if(is_reference(type))
   {
@@ -1989,7 +1994,7 @@ bool cpp_typecheckt::dynamic_typecast(
   if(type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e = expr.op0();
+      e=expr.op0();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -2054,7 +2059,7 @@ bool cpp_typecheckt::reinterpret_typecast(
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e = expr.op0();
+      e=expr.op0();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -2103,21 +2108,21 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   if((e.type().id()==ID_unsignedbv ||
       e.type().id()==ID_signedbv ||
-      e.type().id()==ID_bool)
-     && type.id()==ID_pointer
-     && !is_reference(type))
+      e.type().id()==ID_bool) &&
+     type.id()==ID_pointer &&
+     !is_reference(type))
   {
     // integer to pointer
     if(simplify_expr(e, *this).is_zero())
     {
       // NULL
-      new_expr = e;
+      new_expr=e;
       new_expr.set(ID_value, ID_NULL);
-      new_expr.type() = type;
+      new_expr.type()=type;
     }
     else
     {
-      new_expr = e;
+      new_expr=e;
       new_expr.make_typecast(type);
     }
     return true;
@@ -2137,7 +2142,7 @@ bool cpp_typecheckt::reinterpret_typecast(
   if(is_reference(type) && e.get_bool(ID_C_lvalue))
   {
     exprt tmp(ID_address_of, pointer_typet());
-    tmp.type().subtype() = e.type();
+    tmp.type().subtype()=e.type();
     tmp.copy_to_operands(e);
     tmp.make_typecast(type);
     new_expr.swap(tmp);
@@ -2170,7 +2175,7 @@ bool cpp_typecheckt::static_typecast(
   if(check_constantness && type.id()==ID_pointer)
   {
     if(e.id()==ID_dereference && e.get_bool(ID_C_implicit))
-      e = expr.op0();
+      e=expr.op0();
 
     if(e.type().id()==ID_pointer &&
        cast_away_constness(e.type(), type))
@@ -2185,8 +2190,8 @@ bool cpp_typecheckt::static_typecast(
     if(reference_binding(e, type, new_expr, rank))
       return true;
 
-    typet subto = follow(type.subtype());
-    typet from = follow(e.type());
+    typet subto=follow(type.subtype());
+    typet from=follow(e.type());
 
     if(subto.id()==ID_struct && from.id()==ID_struct)
     {
@@ -2202,8 +2207,8 @@ bool cpp_typecheckt::static_typecast(
       if(!qual_to.is_subset_of(qual_from))
         return false;
 
-      struct_typet from_struct = to_struct_type(from);
-      struct_typet subto_struct = to_struct_type(subto);
+      struct_typet from_struct=to_struct_type(from);
+      struct_typet subto_struct=to_struct_type(subto);
 
       if(subtype_typecast(subto_struct, from_struct))
       {
@@ -2227,16 +2232,16 @@ bool cpp_typecheckt::static_typecast(
 
   if(type.id()==ID_empty)
   {
-    new_expr = e;
+    new_expr=e;
     new_expr.make_typecast(type);
     return true;
   }
 
   // int/enum to enum
-  if(type.id()==ID_c_enum_tag && (
-                e.type().id()==ID_signedbv
-             || e.type().id()==ID_unsignedbv
-             || e.type().id()==ID_c_enum_tag))
+  if(type.id()==ID_c_enum_tag &&
+     (e.type().id()==ID_signedbv ||
+      e.type().id()==ID_unsignedbv ||
+      e.type().id()==ID_c_enum_tag))
   {
     new_expr=e;
     new_expr.make_typecast(type);
@@ -2270,8 +2275,8 @@ bool cpp_typecheckt::static_typecast(
     if(type.find("to-member").is_nil()
        && e.type().find("to-member").is_nil())
     {
-      typet to = follow(type.subtype());
-      typet from = follow(e.type().subtype());
+      typet to=follow(type.subtype());
+      typet from=follow(e.type().subtype());
 
       if(from.id()==ID_empty)
       {
@@ -2282,7 +2287,6 @@ bool cpp_typecheckt::static_typecast(
 
       if(to.id()==ID_struct && from.id()==ID_struct)
       {
-
         if(e.get_bool(ID_C_lvalue))
         {
           exprt tmp(e);
@@ -2290,8 +2294,8 @@ bool cpp_typecheckt::static_typecast(
             return false;
         }
 
-        struct_typet from_struct = to_struct_type(from);
-        struct_typet to_struct = to_struct_type(to);
+        struct_typet from_struct=to_struct_type(from);
+        struct_typet to_struct=to_struct_type(to);
         if(subtype_typecast(to_struct, from_struct))
         {
           make_ptr_typecast(e, type);
@@ -2302,21 +2306,23 @@ bool cpp_typecheckt::static_typecast(
 
       return false;
     }
-    else if (type.find("to-member").is_not_nil()
-       && e.type().find("to-member").is_not_nil())
+    else if(type.find("to-member").is_not_nil() &&
+            e.type().find("to-member").is_not_nil())
     {
-      if(type.subtype() != e.type().subtype())
+      if(type.subtype()!=e.type().subtype())
         return false;
 
-      struct_typet from_struct =
-        to_struct_type(follow(static_cast<const typet&>(e.type().find("to-member"))));
+      struct_typet from_struct=
+        to_struct_type(
+          follow(static_cast<const typet&>(e.type().find("to-member"))));
 
-      struct_typet to_struct =
-        to_struct_type(follow(static_cast<const typet&>(type.find("to-member"))));
+      struct_typet to_struct=
+        to_struct_type(
+          follow(static_cast<const typet&>(type.find("to-member"))));
 
       if(subtype_typecast(from_struct, to_struct))
       {
-        new_expr = e;
+        new_expr=e;
         new_expr.make_typecast(type);
         return true;
       }

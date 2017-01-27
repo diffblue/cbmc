@@ -51,7 +51,8 @@ void get_symbols_rec(
       irep_idt id=it->get_identifier();
       const symbolt *s;
       // identifiers for prototypes need not exist
-      if(!ns.lookup(id, s)) new_symbols.insert(id);
+      if(!ns.lookup(id, s))
+        new_symbols.insert(id);
     }
   }
 

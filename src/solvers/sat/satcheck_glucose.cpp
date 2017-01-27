@@ -79,7 +79,8 @@ tvt satcheck_glucose_baset<T>::l_get(literalt a) const
   else
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }

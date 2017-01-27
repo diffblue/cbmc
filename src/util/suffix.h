@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 inline bool has_suffix(const std::string &s, const std::string &suffix)
 {
-  if(suffix.size()>s.size()) return false;
+  if(suffix.size()>s.size())
+    return false;
   return s.compare(s.size()-suffix.size(), std::string::npos, suffix)==0;
 }
 

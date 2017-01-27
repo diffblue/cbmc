@@ -256,7 +256,8 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->is_assert()) i++;
+      if(it->is_assert())
+        i++;
     return i;
   }
 
@@ -266,7 +267,8 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->ignore) i++;
+      if(it->ignore)
+        i++;
     return i;
   }
 

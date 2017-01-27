@@ -89,7 +89,8 @@ void symex_parse_optionst::report_cover(
         if(property.source_location.is_not_nil())
           status() << ' ' << property.source_location;
 
-        if(!property.description.empty()) status() << ' ' << property.description;
+        if(!property.description.empty())
+          status() << ' ' << property.description;
 
         status() << ": " << (property.is_failure()?"SATISFIED":"FAILED")
                  << eom;
@@ -108,8 +109,10 @@ void symex_parse_optionst::report_cover(
 
         xmlt xml_result("result");
         xml_result.set_attribute("goal", id2string(prop_pair.first));
-        xml_result.set_attribute("description", id2string(property.description));
-        xml_result.set_attribute("status", property.is_failure()?"SATISFIED":"FAILED");
+        xml_result.set_attribute(
+          "description", id2string(property.description));
+        xml_result.set_attribute(
+          "status", property.is_failure()?"SATISFIED":"FAILED");
 
         if(property.source_location.is_not_nil())
           xml_result.new_element()=xml(property.source_location);
@@ -137,7 +140,6 @@ void symex_parse_optionst::report_cover(
                     xml(step.io_args.front(), ns);
               }
             }
-
           }
         }
 
@@ -155,7 +157,8 @@ void symex_parse_optionst::report_cover(
         const auto &property=prop_pair.second;
 
         json_objectt &result=result_array.push_back().make_object();
-        result["status"]=json_stringt(property.is_failure()?"satisfied":"failed");
+        result["status"]=
+          json_stringt(property.is_failure()?"satisfied":"failed");
         result["goal"]=json_stringt(id2string(prop_pair.first));
         result["description"]=json_stringt(id2string(property.description));
 
@@ -186,11 +189,11 @@ void symex_parse_optionst::report_cover(
                 json_test.push_back(json_input);
               }
             }
-
           }
         }
       }
-      json_result["totalGoals"]=json_numbert(std::to_string(property_map.size()));
+      json_result["totalGoals"]=
+        json_numbert(std::to_string(property_map.size()));
       json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
       std::cout << ",\n" << json_result;
       break;
@@ -200,7 +203,8 @@ void symex_parse_optionst::report_cover(
   status() << "** " << goals_covered
            << " of " << property_map.size() << " covered ("
            << std::fixed << std::setw(1) << std::setprecision(1)
-           << (property_map.empty()?100.0:100.0*goals_covered/property_map.size())
+           << (property_map.empty()?
+               100.0:100.0*goals_covered/property_map.size())
            << "%)"
            << eom;
 

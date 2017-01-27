@@ -50,7 +50,8 @@ std::string get_current_working_directory()
   unsigned bsize=50;
 
   char *buf=reinterpret_cast<char*>(malloc(sizeof(char)*bsize));
-  if(!buf) abort();
+  if(!buf)
+    abort();
 
   errno=0;
 

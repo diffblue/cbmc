@@ -267,7 +267,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     // these are all trinary
     assert(a.expr.operands().size()==3);
 
-    if(a.over_state==MAX_STATE) return;
+    if(a.over_state==MAX_STATE)
+      return;
 
     ieee_float_spect spec(to_floatbv_type(type));
     ieee_floatt o0(spec), o1(spec);
@@ -377,7 +378,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     assert(a.expr.operands().size()==2);
 
     // already full interpretation?
-    if(a.over_state>0) return;
+    if(a.over_state>0)
+      return;
 
     bv_spect spec(type);
     bv_arithmetict o0(spec), o1(spec);
@@ -469,7 +471,8 @@ Function: bv_refinementt::check_UNSAT
 void bv_refinementt::check_UNSAT(approximationt &a)
 {
   // part of the conflict?
-  if(!is_in_conflict(a)) return;
+  if(!is_in_conflict(a))
+    return;
 
   status() << "Found assumption for `" << a.as_string()
            << "' in proof (state " << a.under_state << ")" << eom;

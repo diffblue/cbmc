@@ -13,7 +13,8 @@ Date: May 2016
 
 #include <goto-programs/goto_model.h>
 
-enum class coverage_criteriont {
+enum class coverage_criteriont
+{
   LOCATION, BRANCH, DECISION, CONDITION,
   PATH, MCDC, ASSERTION, COVER };
 

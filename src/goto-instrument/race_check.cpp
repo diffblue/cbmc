@@ -267,7 +267,8 @@ void race_check(
       // now add assignments for what is written -- set
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -290,7 +291,8 @@ void race_check(
       // now add assignments for what is written -- reset
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -306,7 +308,8 @@ void race_check(
       // now add assertions for what is read and written
       forall_rw_set_r_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -318,7 +321,8 @@ void race_check(
 
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 

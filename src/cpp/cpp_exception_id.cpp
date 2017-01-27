@@ -72,7 +72,6 @@ void cpp_exception_list_rec(
       dest.push_back(id2string(c_type)+suffix);
       return;
     }
-
   }
 }
 

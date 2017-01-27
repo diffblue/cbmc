@@ -192,7 +192,8 @@ int clobber_parse_optionst::doit()
 
     dump_c(goto_functions, true, ns, out);
 
-    status() << "instrumentation complete; compile and execute simulator.c" << eom;
+    status() << "instrumentation complete; compile and execute simulator.c"
+             << eom;
 
     return 0;
   }
@@ -287,7 +288,8 @@ bool clobber_parse_optionst::get_goto_program(
 
       if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
       {
-        error() << "The goto binary has no entry point; please complete linking" << eom;
+        error() << "The goto binary has no entry point; please complete linking"
+                << eom;
         return true;
       }
     }
@@ -317,7 +319,8 @@ bool clobber_parse_optionst::get_goto_program(
 
       if(language==NULL)
       {
-        error() << "failed to figure out type of file `" <<  filename << "'" << eom;
+        error() << "failed to figure out type of file `" <<  filename << "'"
+                << eom;
         return true;
       }
 
@@ -336,10 +339,10 @@ bool clobber_parse_optionst::get_goto_program(
     }
     else
     {
-
-      if(parse()) return true;
-      if(typecheck()) return true;
-      if(final()) return true;
+      if(parse() ||
+         typecheck() ||
+         final())
+        return true;
 
       // we no longer need any parse trees or language files
       clear_parse();
@@ -667,6 +670,7 @@ void clobber_parse_optionst::help()
     #endif
     " --no-arch                    don't set up an architecture\n"
     " --no-library                 disable built-in abstract C library\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --round-to-nearest           IEEE floating point rounding mode (default)\n"
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"

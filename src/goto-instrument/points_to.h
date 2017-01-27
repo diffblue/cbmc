@@ -43,7 +43,8 @@ public:
   const object_id_sett &operator[](const object_idt &object_id)
   {
     value_mapt::const_iterator it=value_map.find(object_id);
-    if(it!=value_map.end()) return it->second;
+    if(it!=value_map.end())
+      return it->second;
     return empty_set;
   }
 

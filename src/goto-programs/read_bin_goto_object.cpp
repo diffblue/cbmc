@@ -67,7 +67,7 @@ bool read_bin_goto_object_v3(
     sym.is_state_var = (flags & (1 << 9))!=0;
     sym.is_parameter = (flags & (1 << 8))!=0;
     sym.is_auxiliary = (flags & (1 << 7))!=0;
-    //sym.binding = (flags & (1 << 6))!=0;
+    // sym.binding = (flags & (1 << 6))!=0;
     sym.is_lvalue = (flags & (1 << 5))!=0;
     sym.is_static_lifetime = (flags & (1 << 4))!=0;
     sym.is_thread_local = (flags & (1 << 3))!=0;
@@ -116,8 +116,9 @@ bool read_bin_goto_object_v3(
       irepconverter.read_string_ref(in); // former event
       instruction.target_number = irepconverter.read_gb_word(in);
       if(instruction.is_target() &&
-          rev_target_map.insert(rev_target_map.end(),
-            std::make_pair(instruction.target_number, itarget))->second!=itarget)
+         rev_target_map.insert(
+           rev_target_map.end(),
+           std::make_pair(instruction.target_number, itarget))->second!=itarget)
         assert(false);
 
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
@@ -131,7 +132,8 @@ bool read_bin_goto_object_v3(
       {
         irep_idt label=irepconverter.read_string_ref(in);
         instruction.labels.push_back(label);
-        if(label=="__CPROVER_HIDE") hidden=true;
+        if(label=="__CPROVER_HIDE")
+          hidden=true;
         // The above info is normally in the type of the goto_functiont object,
         // which should likely be stored in the binary.
       }
@@ -157,7 +159,8 @@ bool read_bin_goto_object_v3(
 
     f.body.update();
 
-    if(hidden) f.make_hidden();
+    if(hidden)
+      f.make_hidden();
   }
 
   functions.compute_location_numbers();
@@ -206,16 +209,18 @@ bool read_bin_goto_object(
       else if(hdr[0]==0x7f && hdr[1]=='E' && hdr[2]=='L' && hdr[3]=='F')
       {
         if(filename!="")
-          message.error() <<
-            "Sorry, but I can't read ELF binary `" << filename << "'" << messaget::eom;
+          message.error() << "Sorry, but I can't read ELF binary `"
+                          << filename << "'" << messaget::eom;
         else
-          message.error() << "Sorry, but I can't read ELF binaries" << messaget::eom;
+          message.error() << "Sorry, but I can't read ELF binaries"
+                          << messaget::eom;
 
         return true;
       }
       else
       {
-        message.error() << "`" << filename << "' is not a goto-binary" << messaget::eom;
+        message.error() << "`" << filename << "' is not a goto-binary"
+                        << messaget::eom;
         return true;
       }
     }
@@ -223,7 +228,7 @@ bool read_bin_goto_object(
 
   irep_serializationt::ireps_containert ic;
   irep_serializationt irepconverter(ic);
-  //symbol_serializationt symbolconverter(ic);
+  // symbol_serializationt symbolconverter(ic);
 
   {
     std::size_t version=irepconverter.read_gb_word(in);

@@ -43,7 +43,8 @@ public:
 
   bool read(char &ch)
   {
-    if(!in->read(&ch, 1)) return false;
+    if(!in->read(&ch, 1))
+      return false;
 
     if(ch=='\n')
     {
@@ -139,23 +140,29 @@ exprt &_newstack(parsert &parser, unsigned &x);
 
 #define stack(x) (PARSER.stack[x])
 #define stack_expr(x) (PARSER.stack[x])
-#define stack_type(x) (static_cast<typet &>(static_cast<irept &>(PARSER.stack[x])))
+#define stack_type(x) \
+  (static_cast<typet &>(static_cast<irept &>(PARSER.stack[x])))
 
 #define YY_INPUT(buf, result, max_size) \
     do { \
         for(result=0; result<max_size;) \
         { \
           char ch; \
-          if(!PARSER.read(ch)) \
+          if(!PARSER.read(ch)) /* NOLINT(readability/braces) */ \
           { \
-            if(result==0) result=YY_NULL; \
+            if(result==0) \
+              result=YY_NULL; \
             break; \
           } \
           \
-          if(ch!='\r') \
+          if(ch!='\r') /* NOLINT(readability/braces) */ \
           { \
             buf[result++]=ch; \
-            if(ch=='\n') { PARSER.inc_line_no(); break; } \
+            if(ch=='\n') /* NOLINT(readability/braces) */ \
+            { \
+              PARSER.inc_line_no(); \
+              break; \
+            } \
           } \
         } \
     } while(0)

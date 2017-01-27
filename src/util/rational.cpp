@@ -158,7 +158,8 @@ Function: rationalt::same_denominator
 
 void rationalt::same_denominator(rationalt &n)
 {
-  if(denominator==n.denominator) return;
+  if(denominator==n.denominator)
+    return;
 
   numerator*=n.denominator;
   n.numerator*=denominator;

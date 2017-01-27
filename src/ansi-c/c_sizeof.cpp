@@ -43,7 +43,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
     // See special treatment for bit-fields below.
     std::size_t bits=to_bitvector_type(type).get_width();
     std::size_t bytes=bits/8;
-    if((bits%8)!=0) bytes++;
+    if((bits%8)!=0)
+      bytes++;
     dest=from_integer(bytes, size_type());
   }
   else if(type.id()==ID_incomplete_c_enum)
@@ -69,7 +70,8 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
 
     std::size_t bits=config.ansi_c.pointer_width;
     std::size_t bytes=bits/8;
-    if((bits%8)!=0) bytes++;
+    if((bits%8)!=0)
+      bytes++;
     dest=from_integer(bytes, size_type());
   }
   else if(type.id()==ID_bool)

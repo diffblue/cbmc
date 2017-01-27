@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prop_conv.h"
 #include "literal_expr.h"
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 
@@ -114,7 +114,8 @@ bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 
     symbolst::const_iterator result=symbols.find(identifier);
 
-    if(result==symbols.end()) return true;
+    if(result==symbols.end())
+      return true;
     dest=result->second;
     return false;
   }
@@ -185,7 +186,8 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
     symbolst::const_iterator result=
       symbols.find(to_symbol_expr(expr).get_identifier());
 
-    if(result==symbols.end()) return true;
+    if(result==symbols.end())
+      return true;
 
     value=prop.l_get(result->second);
     return false;
@@ -198,7 +200,8 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
     if(expr.type().id()==ID_bool &&
        expr.operands().size()==1)
     {
-      if(get_bool(expr.op0(), value)) return true;
+      if(get_bool(expr.op0(), value))
+        return true;
       value=!value;
       return false;
     }
@@ -213,17 +216,26 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
       forall_operands(it, expr)
       {
         tvt tmp;
-        if(get_bool(*it, tmp)) return true;
+        if(get_bool(*it, tmp))
+          return true;
 
         if(expr.id()==ID_and)
         {
-          if(tmp.is_false()) { value=tvt(false); return false; }
+          if(tmp.is_false())
+          {
+            value=tvt(false);
+            return false;
+          }
 
           value=value && tmp;
         }
         else // or
         {
-          if(tmp.is_true()) { value=tvt(true); return false; }
+          if(tmp.is_true())
+          {
+            value=tvt(true);
+            return false;
+          }
 
           value=value || tmp;
         }
@@ -236,7 +248,8 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
   // check cache
 
   cachet::const_iterator cache_result=cache.find(expr);
-  if(cache_result==cache.end()) return true;
+  if(cache_result==cache.end())
+    return true;
 
   value=prop.l_get(cache_result->second);
   return false;
@@ -261,7 +274,8 @@ literalt prop_conv_solvert::convert(const exprt &expr)
      expr.id()==ID_constant)
   {
     literalt literal=convert_bool(expr);
-    if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
+    if(freeze_all && !literal.is_constant())
+      prop.set_frozen(literal);
     return literal;
   }
   // check cache first
@@ -277,7 +291,8 @@ literalt prop_conv_solvert::convert(const exprt &expr)
   // insert into cache
 
   result.first->second=literal;
-  if(freeze_all && !literal.is_constant()) prop.set_frozen(literal);
+  if(freeze_all && !literal.is_constant())
+    prop.set_frozen(literal);
 
   #if 0
   std::cout << literal << "=" << expr << std::endl;
@@ -419,7 +434,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   }
   else if(expr.id()==ID_let)
   {
-    //const let_exprt &let_expr=to_let_expr(expr);
+    // const let_exprt &let_expr=to_let_expr(expr);
     throw "let is todo";
   }
 
@@ -459,7 +474,8 @@ Function: prop_conv_solvert::set_equality_to_true
 
 bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
-  if(!equality_propagation) return true;
+  if(!equality_propagation)
+    return true;
 
   // optimization for constraint of the form
   // new_variable = value
@@ -659,9 +675,9 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   switch(result)
   {
-   case propt::P_SATISFIABLE: return D_SATISFIABLE;
-   case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
-   default: return D_ERROR;
+    case propt::P_SATISFIABLE: return D_SATISFIABLE;
+    case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
+    default: return D_ERROR;
   }
 
   return D_ERROR;

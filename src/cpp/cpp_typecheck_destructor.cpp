@@ -127,7 +127,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
       const symbolt &virtual_table_symbol_var  =
         namespacet(symbol_table).lookup(
-          id2string(virtual_table_symbol_type.name) + "@" + id2string(symbol.name));
+          id2string(virtual_table_symbol_type.name)+"@"+id2string(symbol.name));
 
       exprt var=virtual_table_symbol_var.symbol_expr();
       address_of_exprt address(var);

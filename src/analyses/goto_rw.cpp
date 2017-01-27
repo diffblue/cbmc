@@ -653,7 +653,8 @@ void rw_range_sett::add(
   const range_spect &range_end)
 {
   objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
-    insert(std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+    insert(
+      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
   if(entry->second==0)
     entry->second=new range_domaint();
@@ -936,7 +937,8 @@ void rw_guarded_range_set_value_sett::add(
   const range_spect &range_end)
 {
   objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
-    insert(std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+    insert(
+      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
   if(entry->second==0)
     entry->second=new guarded_range_domaint();
@@ -1040,8 +1042,8 @@ void goto_rw(goto_programt::const_targett target,
     break;
 
   case OTHER:
-    //if it's printf, mark the operands as read here
-    if (target->code.get(ID_statement)==ID_printf)
+    // if it's printf, mark the operands as read here
+    if(target->code.get(ID_statement)==ID_printf)
     {
       forall_expr(it, target->code.operands())
         rw_set.get_objects_rec(target, rw_range_sett::READ, *it);

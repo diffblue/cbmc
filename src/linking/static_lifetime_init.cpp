@@ -45,7 +45,8 @@ bool static_lifetime_init(
   symbol_tablet::symbolst::iterator s_it=
     symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
-  if(s_it==symbol_table.symbols.end()) return false;
+  if(s_it==symbol_table.symbols.end())
+    return false;
 
   symbolt &init_symbol=s_it->second;
 
@@ -71,9 +72,11 @@ bool static_lifetime_init(
 
     const irep_idt &identifier=symbol.name;
 
-    if(!symbol.is_static_lifetime) continue;
+    if(!symbol.is_static_lifetime)
+      continue;
 
-    if(symbol.is_type || symbol.is_macro) continue;
+    if(symbol.is_type || symbol.is_macro)
+      continue;
 
     // special values
     if(identifier==CPROVER_PREFIX "constant_infinity_uint" ||
@@ -131,14 +134,12 @@ bool static_lifetime_init(
 
     if(symbol.value.is_nil())
     {
-
       try
       {
         namespacet ns(symbol_table);
         rhs=zero_initializer(symbol.type, symbol.location, ns, message_handler);
         assert(rhs.is_not_nil());
       }
-
       catch(...)
       {
         return true;

@@ -69,7 +69,8 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
     throw 0;
   }
 
-  if(o2>o1) std::swap(o1, o2);
+  if(o2>o1)
+    std::swap(o1, o2);
 
   // now o2<=o1
 

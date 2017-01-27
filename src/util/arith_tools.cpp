@@ -29,7 +29,8 @@ Function: to_integer
 
 bool to_integer(const exprt &expr, mp_integer &int_value)
 {
-  if(!expr.is_constant()) return true;
+  if(!expr.is_constant())
+    return true;
   return to_integer(to_constant_expr(expr), int_value);
 }
 
@@ -164,7 +165,12 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_natural)
   {
-    if(int_value<0) { constant_exprt r; r.make_nil(); return r; }
+    if(int_value<0)
+    {
+      constant_exprt r;
+      r.make_nil();
+      return r;
+    }
     constant_exprt result(type);
     result.set_value(integer2string(int_value));
     return result;
@@ -343,7 +349,8 @@ Function: mp_min
 
 void mp_min(mp_integer &a, const mp_integer &b)
 {
-  if(b<a) a=b;
+  if(b<a)
+    a=b;
 }
 
 /*******************************************************************\
@@ -360,5 +367,6 @@ Function: mp_max
 
 void mp_max(mp_integer &a, const mp_integer &b)
 {
-  if(b>a) a=b;
+  if(b>a)
+    a=b;
 }

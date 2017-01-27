@@ -125,7 +125,8 @@ std::string jar_filet::get_entry(std::size_t i)
     int bytes_read=
       zip_fread(zip_file, buffer.data(), ZIP_READ_SIZE);
     assert(bytes_read<=ZIP_READ_SIZE);
-    if(bytes_read<=0) break;
+    if(bytes_read<=0)
+      break;
     dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
   }
 
@@ -175,7 +176,8 @@ jar_filet::manifestt jar_filet::get_manifest()
   while(std::getline(in, line))
   {
     std::size_t pos=line.find(':');
-    if(pos==std::string::npos) continue;
+    if(pos==std::string::npos)
+      continue;
     std::string key=line.substr(0, pos);
 
     // skip spaces

@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "read_dimacs_cnf.h"
 
-//#define VERBOSE
+// #define VERBOSE
 
 /*******************************************************************\
 
@@ -63,7 +63,6 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         std::cout << "line" << line << std::endl;
         #endif
         if(!decision.compare(std::string("c")))
-        //              if(!strcasecmp(decision.c_str(),"c"))
         {
           #ifdef VERBOSE
           std::cout << "c " << std::endl;
@@ -72,7 +71,6 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         }
 
         if(!decision.compare(std::string("p")))
-        //              if(!strcasecmp(decision.c_str(),"p"))
         {
           #ifdef VERBOSE
           std::cout << "p " << std::endl;
@@ -80,7 +78,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
           break;
         }
 
-        if(pos_char == std::string::npos) //no char present in the clause
+        if(pos_char == std::string::npos) // no char present in the clause
         {
           int parsed_lit = unsafe_string2int(decision);
           #ifdef VERBOSE
@@ -98,7 +96,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
           }
           else
           {
-            unsigned var = abs(parsed_lit); //because of the const variable
+            unsigned var = abs(parsed_lit); // because of the const variable
             literalt l;
             bool sign = (parsed_lit > 0) ? false : true;
             l.set(var, sign);

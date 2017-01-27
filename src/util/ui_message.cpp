@@ -314,8 +314,8 @@ void ui_message_handlert::json_ui_msg(
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);
 
-  //By convention a leading comma is created by every new array entry.
-  //The first entry is generated in the constructor and does not have
+  // By convention a leading comma is created by every new array entry.
+  // The first entry is generated in the constructor and does not have
   //  a trailing comma.
   std::cout << ",\n" << result;
 }

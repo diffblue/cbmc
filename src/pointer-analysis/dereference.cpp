@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -385,7 +385,8 @@ bool dereferencet::type_compatible(
 
   // bit vectors of same size are ok
   if((object_type.id()==ID_signedbv || object_type.id()==ID_unsignedbv) &&
-     (dereference_type.id()==ID_signedbv || dereference_type.id()==ID_unsignedbv))
+     (dereference_type.id()==ID_signedbv ||
+      dereference_type.id()==ID_unsignedbv))
   {
     return object_type.get(ID_width)==dereference_type.get(ID_width);
   }

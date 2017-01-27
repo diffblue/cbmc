@@ -12,31 +12,38 @@ Author: Matt Lewis
 
 #include "cone_of_influence.h"
 
-//#define DEBUG
+// #define DEBUG
 
-void cone_of_influencet::cone_of_influence(const expr_sett &targets,
-    expr_sett &cone) {
-  if (program.instructions.empty()) {
-    cone = targets;
+void cone_of_influencet::cone_of_influence(
+  const expr_sett &targets,
+  expr_sett &cone)
+{
+  if(program.instructions.empty())
+  {
+    cone=targets;
     return;
   }
 
-  for (goto_programt::instructionst::const_reverse_iterator rit =
-          program.instructions.rbegin();
-       rit != program.instructions.rend();
-       ++rit) {
-    expr_sett curr;// = targets;
+  for(goto_programt::instructionst::const_reverse_iterator
+      rit=program.instructions.rbegin();
+      rit != program.instructions.rend();
+      ++rit)
+  {
+    expr_sett curr; // =targets;
     expr_sett next;
 
-    if (rit == program.instructions.rbegin()) {
-      curr = targets;
-    } else {
+    if(rit == program.instructions.rbegin())
+    {
+      curr=targets;
+    }
+    else
+    {
       get_succs(rit, curr);
     }
 
     cone_of_influence(*rit, curr, next);
 
-    cone_map[rit->location_number] = next;
+    cone_map[rit->location_number]=next;
 
 #ifdef DEBUG
     std::cout << "Previous cone: " << std::endl;
@@ -53,88 +60,107 @@ void cone_of_influencet::cone_of_influence(const expr_sett &targets,
 #endif
   }
 
-  cone = cone_map[program.instructions.front().location_number];
+  cone=cone_map[program.instructions.front().location_number];
 }
 
-void cone_of_influencet::cone_of_influence(const exprt &target,
-    expr_sett &cone) {
+void cone_of_influencet::cone_of_influence(
+  const exprt &target,
+  expr_sett &cone)
+{
   expr_sett s;
   s.insert(target);
   cone_of_influence(s, cone);
 }
 
 void cone_of_influencet::get_succs(
-    goto_programt::instructionst::const_reverse_iterator rit,
-    expr_sett &targets) {
-  if (rit == program.instructions.rbegin()) {
+  goto_programt::instructionst::const_reverse_iterator rit,
+  expr_sett &targets)
+{
+  if(rit == program.instructions.rbegin())
+  {
     return;
   }
 
-  goto_programt::instructionst::const_reverse_iterator next = rit;
+  goto_programt::instructionst::const_reverse_iterator next=rit;
   --next;
 
-  if (rit->is_goto()) {
-    if (!rit->guard.is_false()) {
+  if(rit->is_goto())
+  {
+    if(!rit->guard.is_false())
+    {
       // Branch can be taken.
-      for (goto_programt::targetst::const_iterator t = rit->targets.begin();
-           t != rit->targets.end();
-           ++t) {
-        unsigned int loc = (*t)->location_number;
-        expr_sett &s = cone_map[loc];
+      for(goto_programt::targetst::const_iterator t=rit->targets.begin();
+          t != rit->targets.end();
+          ++t)
+      {
+        unsigned int loc=(*t)->location_number;
+        expr_sett &s=cone_map[loc];
         targets.insert(s.begin(), s.end());
       }
     }
 
-    if (rit->guard.is_true()) {
+    if(rit->guard.is_true())
+    {
       return;
     }
-  } else if (rit->is_assume() || rit->is_assert()) {
-    if (rit->guard.is_false()) {
+  }
+  else if(rit->is_assume() || rit->is_assert())
+  {
+    if(rit->guard.is_false())
+    {
       return;
     }
   }
 
-  unsigned int loc = next->location_number;
-  expr_sett &s = cone_map[loc];
+  unsigned int loc=next->location_number;
+  expr_sett &s=cone_map[loc];
   targets.insert(s.begin(), s.end());
 }
 
 void cone_of_influencet::cone_of_influence(
-    const goto_programt::instructiont &i,
-    const expr_sett &curr,
-    expr_sett &next) {
+  const goto_programt::instructiont &i,
+  const expr_sett &curr,
+  expr_sett &next)
+{
   next.insert(curr.begin(), curr.end());
 
-  if (i.is_assign()) {
-    const code_assignt &assignment = to_code_assign(i.code);
+  if(i.is_assign())
+  {
+    const code_assignt &assignment=to_code_assign(i.code);
     expr_sett lhs_syms;
-    bool care = false;
+    bool care=false;
 
     gather_rvalues(assignment.lhs(), lhs_syms);
 
     for(const auto &expr : lhs_syms)
       if(curr.find(expr)!=curr.end())
       {
-        care = true;
+        care=true;
         break;
       }
 
     next.erase(assignment.lhs());
 
-    if (care) {
+    if(care)
+    {
       gather_rvalues(assignment.rhs(), next);
     }
   }
 }
 
-void cone_of_influencet::gather_rvalues(const exprt &expr, expr_sett &rvals) {
-  if (expr.id() == ID_symbol ||
-      expr.id() == ID_index ||
-      expr.id() == ID_member ||
-      expr.id() == ID_dereference) {
+void cone_of_influencet::gather_rvalues(const exprt &expr, expr_sett &rvals)
+{
+  if(expr.id() == ID_symbol ||
+     expr.id() == ID_index ||
+     expr.id() == ID_member ||
+     expr.id() == ID_dereference)
+  {
     rvals.insert(expr);
-  } else {
-    forall_operands(it, expr) {
+  }
+  else
+  {
+    forall_operands(it, expr)
+    {
       gather_rvalues(*it, rvals);
     }
   }

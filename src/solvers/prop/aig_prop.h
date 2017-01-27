@@ -98,8 +98,11 @@ public:
   aig_plus_constraintst aig;
 
   const std::string solver_text() override
-  { return "conversion into and-inverter graph followed by "+
-           solver.solver_text(); }
+  {
+    return
+      "conversion into and-inverter graph followed by "+
+      solver.solver_text();
+  }
 
   tvt l_get(literalt a) const override;
   resultt prop_solve() override;
@@ -114,9 +117,16 @@ protected:
   propt &solver;
 
   void convert_aig();
-  void usage_count(std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
+  void usage_count(
+    std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
   void compute_phase(std::vector<bool> &n_pos, std::vector<bool> &n_neg);
-  void convert_node(unsigned n, const aigt::nodet &node, bool n_pos, bool n_neg, std::vector<unsigned> &p_usage_count, std::vector<unsigned> &n_usage_count);
+  void convert_node(
+    unsigned n,
+    const aigt::nodet &node,
+    bool n_pos,
+    bool n_neg,
+    std::vector<unsigned> &p_usage_count,
+    std::vector<unsigned> &n_usage_count);
 };
 
 #endif // CPROVER_SOLVERS_PROP_AIG_PROP_H

@@ -246,7 +246,8 @@ Function: narrow_argv
 
 const char **narrow_argv(int argc, const wchar_t **argv_wide)
 {
-  if(argv_wide==NULL) return NULL;
+  if(argv_wide==NULL)
+    return NULL;
 
   // the following never gets deleted
   const char **argv_narrow=new const char *[argc+1];

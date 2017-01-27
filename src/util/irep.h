@@ -153,7 +153,8 @@ public:
     // Ordering is very important here!
     // Consider self-assignment, which may destroy 'irep'
     dt *irep_data=irep.data;
-    if(irep_data!=&empty_d) irep_data->ref_count++;
+    if(irep_data!=&empty_d)
+      irep_data->ref_count++;
 
     remove_ref(data); // this may kill 'irep'
     data=irep_data;

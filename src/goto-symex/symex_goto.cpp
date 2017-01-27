@@ -194,7 +194,8 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
   dereference(guard, state, false);
   state.rename(guard, ns);
 
-  if(!taken) guard.make_not();
+  if(!taken)
+    guard.make_not();
 
   state.guard.guard_expr(guard);
   do_simplify(guard);
@@ -346,7 +347,8 @@ void goto_symext::phi_function(
       if(p_it!=goto_state.propagation.values.end())
         goto_state_rhs=p_it->second;
       else
-        to_ssa_expr(goto_state_rhs).set_level_2(goto_state.level2_current_count(l1_identifier));
+        to_ssa_expr(goto_state_rhs).set_level_2(
+          goto_state.level2_current_count(l1_identifier));
     }
 
     {
@@ -356,7 +358,8 @@ void goto_symext::phi_function(
       if(p_it!=dest_state.propagation.values.end())
         dest_state_rhs=p_it->second;
       else
-        to_ssa_expr(dest_state_rhs).set_level_2(dest_state.level2.current_count(l1_identifier));
+        to_ssa_expr(dest_state_rhs).set_level_2(
+          dest_state.level2.current_count(l1_identifier));
     }
 
     exprt rhs;

@@ -39,7 +39,7 @@ public:
   class critical_cyclet:public std::list<event_idt>
   {
   protected:
-    event_grapht& egraph;
+    event_grapht &egraph;
 
     bool is_not_uniproc() const;
     bool is_not_weak_uniproc() const;
@@ -150,14 +150,15 @@ public:
 
       bool operator==(const delayt& other) const
       {
-        return (is_po ? first==other.first
-          : first==other.first&&second==other.second);
+        return (is_po ? first==other.first :
+                first==other.first && second==other.second);
       }
 
       bool operator<(const delayt& other) const
       {
-        return (is_po ? first<other.first
-          : first<other.first||(first==other.first&&second<other.second));
+        return (is_po ? first<other.first :
+                first<other.first ||
+                (first==other.first && second<other.second));
       }
     };
 
@@ -220,7 +221,7 @@ protected:
     }
 
   protected:
-    event_grapht& egraph;
+    event_grapht &egraph;
 
     /* parameters limiting the exploration */
     unsigned max_var;
@@ -256,9 +257,14 @@ protected:
     void filter_thin_air(std::set<critical_cyclet>& set_of_cycles);
 
   public:
-    graph_explorert(event_grapht& _egraph, unsigned _max_var,
-      unsigned _max_po_trans)
-      :egraph(_egraph), max_var(_max_var), max_po_trans(_max_po_trans), cycle_nb(0)
+    graph_explorert(
+      event_grapht& _egraph,
+      unsigned _max_var,
+      unsigned _max_po_trans):
+      egraph(_egraph),
+      max_var(_max_var),
+      max_po_trans(_max_po_trans),
+      cycle_nb(0)
     {
     }
 
@@ -349,7 +355,7 @@ public:
 
   bool filter_thin_air;
   bool filter_uniproc;
-  messaget& message;
+  messaget &message;
 
   /* data dependencies per thread */
   std::map<unsigned, data_dpt> map_data_dp;
@@ -465,7 +471,8 @@ public:
   event_idt copy_segment(event_idt begin, event_idt end);
 
   /* to keep track of the loop already copied */
-  std::set<std::pair<const abstract_eventt&, const abstract_eventt&> > duplicated_bodies;
+  std::set<std::pair<const abstract_eventt&, const abstract_eventt&>>
+    duplicated_bodies;
 
   bool is_local(event_idt a)
   {

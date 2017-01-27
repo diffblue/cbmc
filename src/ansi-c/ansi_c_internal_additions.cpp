@@ -115,6 +115,7 @@ void ansi_c_internal_additions(std::string &code)
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(__CPROVER_bool assumption);\n"
     "void __VERIFIER_assume(__CPROVER_bool assumption);\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
@@ -145,6 +146,7 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_atomic_end();\n"
     "void __CPROVER_fence(const char *kind, ...);\n"
     "__CPROVER_thread_local unsigned long __CPROVER_thread_id=0;\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
     "unsigned long __CPROVER_next_thread_id=0;\n"
 
@@ -163,14 +165,17 @@ void ansi_c_internal_additions(std::string &code)
     "const void *__CPROVER_dead_object=0;\n"
     "const void *__CPROVER_malloc_object=0;\n"
     "__CPROVER_size_t __CPROVER_malloc_size;\n"
-    "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for the benefit of C++
+    "__CPROVER_bool __CPROVER_malloc_is_new_array=0;\n" // for C++
     "const void *__CPROVER_memory_leak=0;\n"
 
     // this is ANSI-C
+    // NOLINTNEXTLINE(whitespace/line_length)
     "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"
 
     // this is GCC
+    // NOLINTNEXTLINE(whitespace/line_length)
     "extern __CPROVER_thread_local const char __FUNCTION__[__CPROVER_constant_infinity_uint];\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
 
     // float stuff
@@ -192,7 +197,8 @@ void ansi_c_internal_additions(std::string &code)
     "double __CPROVER_inf(void);\n"
     "float __CPROVER_inff(void);\n"
     "long double __CPROVER_infl(void);\n"
-    "int __CPROVER_thread_local __CPROVER_rounding_mode="+std::to_string(config.ansi_c.rounding_mode)+";\n"
+    "int __CPROVER_thread_local __CPROVER_rounding_mode="+
+      std::to_string(config.ansi_c.rounding_mode)+";\n"
 
     // absolute value
     "int __CPROVER_abs(int x);\n"
@@ -203,6 +209,7 @@ void ansi_c_internal_additions(std::string &code)
     "float __CPROVER_fabsf(float x);\n"
 
     // arrays
+    // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
     "void __CPROVER_array_copy(const void *dest, const void *src);\n"
     "void __CPROVER_array_set(const void *dest, ...);\n"
@@ -221,6 +228,7 @@ void ansi_c_internal_additions(std::string &code)
     "  short next_avail;\n"
     "  short next_unread;\n"
     "};\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     "extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];\n"
     // offset to make sure we don't collide with other fds
     "extern const int __CPROVER_pipe_offset;\n"
@@ -328,19 +336,19 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.bool_width, "bool_width");
   code+=architecture_string(config.ansi_c.char_width, "char_width");
   code+=architecture_string(config.ansi_c.short_int_width, "short_int_width");
-  code+=architecture_string(config.ansi_c.long_long_int_width, "long_long_int_width");
+  code+=architecture_string(config.ansi_c.long_long_int_width, "long_long_int_width"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.pointer_width, "pointer_width");
   code+=architecture_string(config.ansi_c.single_width, "single_width");
   code+=architecture_string(config.ansi_c.double_width, "double_width");
-  code+=architecture_string(config.ansi_c.long_double_width, "long_double_width");
+  code+=architecture_string(config.ansi_c.long_double_width, "long_double_width"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.wchar_t_width, "wchar_t_width");
   code+=architecture_string(config.ansi_c.char_is_unsigned, "char_is_unsigned");
-  code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned");
-  code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float");
+  code+=architecture_string(config.ansi_c.wchar_t_is_unsigned, "wchar_t_is_unsigned"); // NOLINT(whitespace/line_length)
+  code+=architecture_string(config.ansi_c.use_fixed_for_float, "fixed_for_float"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size"); // NOLINT(whitespace/line_length)
   code+=architecture_string(static_cast<int>(config.ansi_c.endianness), "endianness"); // NOLINT(whitespace/line_length)
   code+=architecture_string(id2string(config.ansi_c.arch), "arch");
-  code+=architecture_string(configt::ansi_ct::os_to_string(config.ansi_c.os), "os");
+  code+=architecture_string(configt::ansi_ct::os_to_string(config.ansi_c.os), "os"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");
 }

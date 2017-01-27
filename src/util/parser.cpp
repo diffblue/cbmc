@@ -55,7 +55,8 @@ void parsert::parse_error(
   const std::string &before)
 {
   std::string tmp=message;
-  if(before!="") tmp+=" before `"+before+"'";
+  if(before!="")
+    tmp+=" before `"+before+"'";
 
   #if 0
   source_locationt tmp_source_location=source_location;

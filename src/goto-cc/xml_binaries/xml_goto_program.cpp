@@ -38,7 +38,7 @@ void convert(const goto_programt &goto_program,
   {
     xmlt &ins=xml.new_element("instruction");
 
-    if (!inst.location.is_nil())
+    if(!inst.location.is_nil())
     {
       convert(inst.location, ins.new_element("location"));
     }
@@ -69,7 +69,7 @@ void convert(const goto_programt &goto_program,
         case GOTO:
         {
           ins.name="goto";
-          if (!inst.guard.is_true())
+          if(!inst.guard.is_true())
           {
             xmlt &g=ins.new_element("guard");
             convert(inst.guard, g);
@@ -192,7 +192,7 @@ void convert(const goto_programt &goto_program,
         break;
     }
 
-    if (inst.function!="")
+    if(inst.function!="")
     {
       xmlt &fnc=ins.new_element("function");
       fnc.data=id2string(inst.function);
@@ -213,77 +213,77 @@ Function: convert
           and the namespace into the given goto program object.
 
 \*******************************************************************/
-void convert( const xmlt& xml,
-              goto_programt& goto_program)
+
+void convert(const xmlt& xml, goto_programt& goto_program)
 {
   goto_program.clear();
   goto_programt::instructionst &instructions = goto_program.instructions;
 
   xmlt::elementst::const_iterator it = xml.elements.begin();
-  for (; it != xml.elements.end(); it++)
+  for(; it != xml.elements.end(); it++)
   {
     goto_programt::targett inst = goto_program.add_instruction();
     inst->targets.clear();
 
-    if (it->name=="goto")
+    if(it->name=="goto")
     {
       inst->type = GOTO;
     }
-    else if (it->name=="assume")
+    else if(it->name=="assume")
     {
       inst->type = ASSUME;
     }
-    else if (it->name=="assert")
+    else if(it->name=="assert")
     {
       inst->type = ASSERT;
     }
-    else if (it->name=="skip")
+    else if(it->name=="skip")
     {
       inst->type = SKIP;
     }
-    else if (it->name=="end_function")
+    else if(it->name=="end_function")
     {
       inst->type = END_FUNCTION;
     }
-    else if (it->name=="location")
+    else if(it->name=="location")
     {
       inst->type = LOCATION;
     }
-    else if (it->name=="dead")
+    else if(it->name=="dead")
     {
       inst->type = DEAD;
     }
-    else if (it->name=="atomic_begin")
+    else if(it->name=="atomic_begin")
     {
       inst->type = ATOMIC_BEGIN;
     }
-    else if (it->name=="atomic_end")
+    else if(it->name=="atomic_end")
     {
       inst->type = ATOMIC_END;
     }
-    else if (it->name=="return")
+    else if(it->name=="return")
     {
       inst->make_return();
     }
-    else if (it->name=="instruction") // OTHER
+    else if(it->name=="instruction") // OTHER
     {
       inst->make_other();
     }
-    else if (it->name=="assign")
+    else if(it->name=="assign")
     {
       inst->make_other();
       inst->type=ASSIGN;
     }
-    else if (it->name=="functioncall")
+    else if(it->name=="functioncall")
     {
       inst->make_other();
       inst->type=FUNCTION_CALL;
     }
-    else if (it->name=="thread_start")
+    else if(it->name=="thread_start")
     {
       inst->type = START_THREAD;
     }
-    else if (it->name=="thread_end")
+    else if(it->name=="thread_end")
     {
       inst->type = END_THREAD;
     }
@@ -295,21 +295,21 @@ void convert( const xmlt& xml,
     }
 
     xmlt::elementst::const_iterator eit = it->elements.begin();
-    for (; eit != it->elements.end(); eit++)
+    for(; eit != it->elements.end(); eit++)
     {
-      if (eit->name=="location")
+      if(eit->name=="location")
       {
         convert(*eit, inst->location);
       }
-      else if (eit->name=="variables")
+      else if(eit->name=="variables")
       {
       }
-      else if (eit->name=="labels")
+      else if(eit->name=="labels")
       {
         xmlt::elementst::const_iterator lit = eit->elements.begin();
-        for (; lit != eit->elements.end(); lit++)
+        for(; lit != eit->elements.end(); lit++)
         {
-          if (lit->name=="label")
+          if(lit->name=="label")
           {
             std::string ls = lit->get_attribute("name");
             inst->labels.push_back(ls);
@@ -321,24 +321,24 @@ void convert( const xmlt& xml,
           }
         }
       }
-      else if (eit->name=="guard")
+      else if(eit->name=="guard")
       {
         inst->guard.remove("value");
         convert(*eit, inst->guard);
       }
-      else if (eit->name=="code")
+      else if(eit->name=="code")
       {
         convert(*eit, inst->code);
       }
-      else if (eit->name=="targets")
+      else if(eit->name=="targets")
       {
         // Don't do anything here, we'll need a second run for that
       }
-      else if (eit->name=="comment")
+      else if(eit->name=="comment")
       {
         inst->location.set("comment", eit->data);
       }
-      else if (eit->name=="function")
+      else if(eit->name=="function")
       {
         inst->function = eit->data;
       }
@@ -351,21 +351,21 @@ void convert( const xmlt& xml,
   // second run, for targets
   goto_programt::targett ins_it = instructions.begin();
   it = xml.elements.begin();
-  for (; it != xml.elements.end() && ins_it!=instructions.end(); it++)
+  for(; it != xml.elements.end() && ins_it!=instructions.end(); it++)
   {
     xmlt::elementst::const_iterator eit = it->elements.begin();
-    for (; eit != it->elements.end(); eit++)
+    for(; eit != it->elements.end(); eit++)
     {
-      if (eit->name=="targets")
+      if(eit->name=="targets")
       {
         xmlt::elementst::const_iterator tit = eit->elements.begin();
-        for (; tit != eit->elements.end(); tit++)
+        for(; tit != eit->elements.end(); tit++)
         {
-          if (tit->name=="target")
+          if(tit->name=="target")
           {
             goto_programt::targett tins =
               find_instruction(xml, instructions, tit->data);
-            if (tins != instructions.end())
+            if(tins != instructions.end())
             {
               // Here we insert the iterators that somehow seem
               // to be strange afterwards (see line 87)
@@ -391,7 +391,7 @@ void convert( const xmlt& xml,
   // resolve links
   goto_program.update();
 
-  //std::cout << "TNI: " << goto_program.target_numbers.size() << std::endl;
+  // std::cout << "TNI: " << goto_program.target_numbers.size() << std::endl;
 }
 
 /*******************************************************************\
@@ -416,9 +416,9 @@ find_instruction(
   goto_programt::targett ins_it=instructions.begin();
   xmlt::elementst::const_iterator it=xml.elements.begin();
 
-  for (; it != xml.elements.end() && ins_it!=instructions.end(); it++)
+  for(; it != xml.elements.end() && ins_it!=instructions.end(); it++)
   {
-    if (label==it->get_attribute("targetlabel"))
+    if(label==it->get_attribute("targetlabel"))
       return ins_it;
 
     ins_it++;

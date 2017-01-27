@@ -109,7 +109,8 @@ void k_inductiont::process_loop(
     // we can remove everything up to the first assertion
     for(goto_programt::targett t=loop_head; t!=loop_exit; t++)
     {
-      if(t->is_assert()) break;
+      if(t->is_assert())
+        break;
       t->make_skip();
     }
 
@@ -122,7 +123,8 @@ void k_inductiont::process_loop(
     for(goto_programt::targett t=loop_head; t!=end; t++)
     {
       assert(t!=goto_function.body.instructions.end());
-      if(t->is_assert()) t->type=ASSUME;
+      if(t->is_assert())
+        t->type=ASSUME;
     }
 
     // assume the loop condition has become false

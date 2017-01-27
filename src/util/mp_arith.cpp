@@ -120,7 +120,8 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
 {
   mp_integer a(n);
 
-  if(width==0) return "";
+  if(width==0)
+    return "";
 
   bool neg=a.is_negative();
 
@@ -148,8 +149,10 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
     result=result.substr(result.size()-width, width);
 
   if(neg)
+  {
     for(std::size_t i=0; i<result.size(); i++)
       result[i]=(result[i]=='0')?'1':'0';
+  }
 
   return result;
 }
@@ -203,7 +206,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
     unsigned long mask=1;
     mask=mask << (n.size()-1);
     mp_integer top_bit=(n[0]=='1') ? mask : 0;
-    if(is_signed) top_bit.negate();
+    if(is_signed)
+      top_bit.negate();
     mask>>=1;
     unsigned long other_bits=0;
 
@@ -227,7 +231,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   mp_integer mask=1;
   mask=mask << (n.size()-1);
   mp_integer result=(n[0]=='1') ? mask : 0;
-  if(is_signed) result.negate();
+  if(is_signed)
+    result.negate();
   mask=mask>>1;
 
   for(std::string::const_iterator it=++n.begin();

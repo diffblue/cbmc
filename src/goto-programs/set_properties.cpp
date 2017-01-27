@@ -33,7 +33,8 @@ void set_properties(
       it!=goto_program.instructions.end();
       it++)
   {
-    if(!it->is_assert()) continue;
+    if(!it->is_assert())
+      continue;
 
     irep_idt property_id=it->source_location.get_property_id();
 
@@ -85,14 +86,16 @@ void label_properties(
       it!=goto_program.instructions.end();
       it++)
   {
-    if(!it->is_assert()) continue;
+    if(!it->is_assert())
+      continue;
 
     irep_idt function=it->source_location.get_function();
 
     std::string prefix=id2string(function);
     if(it->source_location.get_property_class()!="")
     {
-      if(prefix!="") prefix+=".";
+      if(prefix!="")
+        prefix+=".";
 
       std::string class_infix=
         id2string(it->source_location.get_property_class());
@@ -103,7 +106,8 @@ void label_properties(
       prefix+=class_infix;
     }
 
-    if(prefix!="") prefix+=".";
+    if(prefix!="")
+      prefix+=".";
 
     unsigned &count=property_counters[prefix];
 
@@ -248,7 +252,8 @@ void make_assertions_false(
         i_it!=goto_program.instructions.end();
         i_it++)
     {
-      if(!i_it->is_assert()) continue;
+      if(!i_it->is_assert())
+        continue;
       i_it->guard=false_exprt();
     }
   }

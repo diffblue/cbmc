@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <zchaff_solver.h>
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 
@@ -77,12 +77,13 @@ tvt satcheck_zchaff_baset::l_get(literalt a) const
 
   switch(solver->variable(a.var_no()).value())
   {
-   case 0: result=tvt(false); break;
-   case 1: result=tvt(true); break;
-   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
+    case 0: result=tvt(false); break;
+    case 1: result=tvt(true); break;
+    default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }

@@ -140,7 +140,7 @@ protected:
   const goto_programt::const_targett target;
 
 #ifdef LOCAL_MAY
-  local_may_aliast& local_may;
+  local_may_aliast &local_may;
 #endif
 
   void read(const exprt &expr)

@@ -144,7 +144,6 @@ public:
     return static_cast<const source_locationt &>(
       find(ID_C_source_location));
   }
-
 };
 
 #endif // CPROVER_CPP_CPP_ITEM_H

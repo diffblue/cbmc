@@ -61,12 +61,14 @@ bool boolbvt::literal(
       boolbv_mapt::mappingt::const_iterator it_m=
         map.mapping.find(identifier);
 
-      if(it_m==map.mapping.end()) return true;
+      if(it_m==map.mapping.end())
+        return true;
 
       const boolbv_mapt::map_entryt &map_entry=it_m->second;
 
       assert(bit<map_entry.literal_map.size());
-      if(!map_entry.literal_map[bit].is_set) return true;
+      if(!map_entry.literal_map[bit].is_set)
+        return true;
 
       dest=map_entry.literal_map[bit].l;
       return false;
@@ -156,7 +158,8 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
   // check
   forall_literals(it, cache_result.first->second)
   {
-    if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
+    if(freeze_all && !it->is_constant())
+      prop.set_frozen(*it);
     if(it->var_no()==literalt::unused_var_no())
     {
       error() << "unused_var_no: " << expr.pretty() << eom;
@@ -714,7 +717,8 @@ Function: boolbvt::boolbv_set_equality_to_true
 
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
-  if(!equality_propagation) return true;
+  if(!equality_propagation)
+    return true;
 
   const typet &type=ns.follow(expr.lhs().type());
 
@@ -733,7 +737,8 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     map.set_literals(identifier, type, bv1);
 
-    if(freeze_all) set_frozen(bv1);
+    if(freeze_all)
+      set_frozen(bv1);
 
     return false;
   }
@@ -843,16 +848,20 @@ Function: boolbvt::is_unbounded_array
 
 bool boolbvt::is_unbounded_array(const typet &type) const
 {
-  if(type.id()==ID_symbol) return is_unbounded_array(ns.follow(type));
+  if(type.id()==ID_symbol)
+    return is_unbounded_array(ns.follow(type));
 
-  if(type.id()!=ID_array) return false;
+  if(type.id()!=ID_array)
+    return false;
 
-  if(unbounded_array==U_ALL) return true;
+  if(unbounded_array==U_ALL)
+    return true;
 
   const exprt &size=to_array_type(type).size();
 
   mp_integer s;
-  if(to_integer(size, s)) return true;
+  if(to_integer(size, s))
+    return true;
 
   if(unbounded_array==U_AUTO)
     if(s>1000) // magic number!

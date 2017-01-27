@@ -21,7 +21,7 @@ class const_graph_visitort
 protected:
   typedef event_grapht::critical_cyclet::delayt edget;
 
-  fence_insertert& fence_inserter;
+  fence_insertert &fence_inserter;
   std::set<event_idt> visited_nodes;
 
 public:

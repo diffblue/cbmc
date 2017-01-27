@@ -174,7 +174,8 @@ bool bv_pointerst::convert_address_of_rec(
             array_type.id()==ID_incomplete_array ||
             array_type.id()==ID_string_constant)
     {
-      if(convert_address_of_rec(array, bv)) return true;
+      if(convert_address_of_rec(array, bv))
+        return true;
       assert(bv.size()==bits);
     }
     else
@@ -386,7 +387,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     forall_operands(it, expr)
     {
-      if(it->type().id()==ID_pointer) continue;
+      if(it->type().id()==ID_pointer)
+        continue;
 
       if(it->type().id()!=ID_unsignedbv &&
          it->type().id()!=ID_signedbv)
@@ -630,6 +632,7 @@ exprt bv_pointerst::bv_get_rec(
     if(unknown[bit_nr])
       ch='0';
     else
+    {
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
        case tvt::tv_enumt::TV_FALSE: ch='0'; break;
@@ -637,6 +640,7 @@ exprt bv_pointerst::bv_get_rec(
        case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
+    }
 
     value=ch+value;
 
@@ -846,7 +850,8 @@ void bv_pointerst::do_postponed(
       literalt l1=bv_utils.equal(bv, saved_bv);
       literalt l2=postponed.bv.front();
 
-      if(!is_dynamic) l2=!l2;
+      if(!is_dynamic)
+        l2=!l2;
 
       prop.l_set_to(prop.limplies(l1, l2), true);
     }

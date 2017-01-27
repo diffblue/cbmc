@@ -522,7 +522,8 @@ std::size_t grapht<N>::connected_subgraphs(
 
   for(node_indext src=0; src<size(); src++)
   {
-    if(visited[src]) continue;
+    if(visited[src])
+      continue;
 
     // DFS
 
@@ -601,7 +602,8 @@ void grapht<N>::tarjan(tarjant &t, node_indext v)
       t.scc_stack.pop();
       t.in_scc[vp]=false;
       t.subgraph_nr[vp]=t.scc_count;
-      if(vp==v) break;
+      if(vp==v)
+        break;
     }
 
     t.scc_count++;

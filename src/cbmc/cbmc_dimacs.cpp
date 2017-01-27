@@ -73,7 +73,8 @@ bool cbmc_dimacst::write_dimacs(std::ostream &out)
   {
     const boolbv_mapt::literal_mapt &literal_map=m.second.literal_map;
 
-    if(literal_map.empty()) continue;
+    if(literal_map.empty())
+      continue;
 
     out << "c " << m.first;
 

@@ -156,7 +156,8 @@ bool cpp_typecheck(
   const std::string &module,
   message_handlert &message_handler)
 {
-  cpp_typecheckt cpp_typecheck(cpp_parse_tree, symbol_table, module, message_handler);
+  cpp_typecheckt cpp_typecheck(
+    cpp_parse_tree, symbol_table, module, message_handler);
   return cpp_typecheck.typecheck_main();
 }
 
@@ -281,7 +282,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   dynamic_initializations.clear();
 
-  //block_sini.move_to_operands(block_dini);
+  // block_sini.move_to_operands(block_dini);
 
   // Create the dynamic initialization procedure
   symbolt init_symbol;

@@ -72,7 +72,8 @@ void slice_global_inits(
       if(functions_reached.find(callee)==functions_reached.end())
         worklist.push_back(callee);
     }
-  } while(!worklist.empty());
+  }
+  while(!worklist.empty());
 
   const irep_idt initialize=CPROVER_PREFIX "initialize";
   functions_reached.erase(initialize);

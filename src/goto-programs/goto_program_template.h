@@ -247,7 +247,8 @@ public:
     //! Returns true if the instruction is a backwards branch.
     bool is_backwards_goto() const
     {
-      if(!is_goto()) return false;
+      if(!is_goto())
+        return false;
 
       for(const auto &t : targets)
         if(t->location_number<=location_number)
@@ -321,7 +322,8 @@ public:
     goto_program_templatet<codeT, guardT> &p)
   {
     assert(target!=instructions.end());
-    if(p.instructions.empty()) return;
+    if(p.instructions.empty())
+      return;
     insert_before_swap(target, p.instructions.front());
     targett next=target;
     next++;
@@ -494,7 +496,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   targetst &successors)
 {
   successors.clear();
-  if(target==instructions.end()) return;
+  if(target==instructions.end())
+    return;
 
   targett next=target;
   next++;
@@ -543,7 +546,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   const_targetst &successors) const
 {
   successors.clear();
-  if(target==instructions.end()) return;
+  if(target==instructions.end())
+    return;
 
   const_targett next=target;
   next++;

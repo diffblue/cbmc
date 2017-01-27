@@ -68,7 +68,8 @@ bool parse_json(
 {
   std::ifstream in(filename);
 
-  if(!in) return true;
+  if(!in)
+    return true;
 
   return parse_json(in, filename, message_handler, dest);
 }

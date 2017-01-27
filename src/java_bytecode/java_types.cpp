@@ -345,7 +345,8 @@ typet java_type_from_string(const std::string &src)
   case '(': // function type
     {
       std::size_t e_pos=src.rfind(')');
-      if(e_pos==std::string::npos) return nil_typet();
+      if(e_pos==std::string::npos)
+        return nil_typet();
 
       code_typet result;
 
@@ -387,9 +388,11 @@ typet java_type_from_string(const std::string &src)
     {
       // If this is a reference array, we generate a plain array[reference]
       // with void* members, but note the real type in ID_C_element_type.
-      if(src.size()<=1) return nil_typet();
+      if(src.size()<=1)
+        return nil_typet();
       char subtype_letter=src[1];
-      const typet subtype=java_type_from_string(src.substr(1, std::string::npos));
+      const typet subtype=
+        java_type_from_string(src.substr(1, std::string::npos));
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
          subtype_letter=='[')   // Array-of-arrays
         subtype_letter='A';
@@ -411,11 +414,13 @@ typet java_type_from_string(const std::string &src)
   case 'L':
     {
       // ends on ;
-      if(src[src.size()-1]!=';') return nil_typet();
+      if(src[src.size()-1]!=';')
+        return nil_typet();
       std::string class_name=src.substr(1, src.size()-2);
 
       for(unsigned i=0; i<class_name.size(); i++)
-        if(class_name[i]=='/') class_name[i]='.';
+        if(class_name[i]=='/')
+          class_name[i]='.';
 
       std::string identifier="java::"+class_name;
 
@@ -491,7 +496,8 @@ static std::string slash_to_dot(const std::string &src)
 {
   std::string result=src;
   for(std::string::iterator it=result.begin(); it!=result.end(); it++)
-    if(*it=='/') *it='.';
+    if(*it=='/')
+      *it='.';
   return result;
 }
 

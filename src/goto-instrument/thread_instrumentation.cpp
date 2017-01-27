@@ -45,7 +45,8 @@ Function: thread_exit_instrumentation
 
 void thread_exit_instrumentation(goto_programt &goto_program)
 {
-  if(goto_program.instructions.empty()) return;
+  if(goto_program.instructions.empty())
+    return;
 
   // add assertion that all may flags for mutex-locked are gone
   // at the end
@@ -101,7 +102,8 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
       for(const auto &instruction : f_it->second.body.instructions)
         if(instruction.is_function_call())
         {
-          const exprt &function=to_code_function_call(instruction.code).function();
+          const exprt &function=
+            to_code_function_call(instruction.code).function();
           if(function.id()==ID_symbol)
             thread_fkts.insert(to_symbol_expr(function).get_identifier());
         }

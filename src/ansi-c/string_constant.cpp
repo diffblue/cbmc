@@ -109,7 +109,8 @@ array_exprt string_constantt::to_array_expr() const
     if(ch>=32 && ch<=126)
     {
       std::string ch_str="'";
-      if(ch=='\'' || ch=='\\') ch_str+='\\';
+      if(ch=='\'' || ch=='\\')
+        ch_str+='\\';
       ch_str+=static_cast<char>(ch);
       ch_str+="'";
     }
@@ -147,7 +148,8 @@ bool string_constantt::from_array_expr(const array_exprt &src)
   forall_operands(it, src)
   {
     mp_integer int_value=0;
-    if(to_integer(*it, int_value)) return true;
+    if(to_integer(*it, int_value))
+      return true;
     unsigned unsigned_value=integer2unsigned(int_value);
     value+=static_cast<char>(unsigned_value);
   }

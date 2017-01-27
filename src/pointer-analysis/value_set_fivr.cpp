@@ -27,29 +27,29 @@ const value_set_fivrt::object_map_dt value_set_fivrt::object_map_dt::blank;
 object_numberingt value_set_fivrt::object_numbering;
 hash_numbering<irep_idt, irep_id_hash> value_set_fivrt::function_numbering;
 
-static std::string alloc_adapter_prefix = "alloc_adaptor::";
+static const char *alloc_adapter_prefix="alloc_adaptor::";
 
 #define forall_objects(it, map) \
-  for(object_map_dt::const_iterator (it) = (map).begin(); \
+  for(object_map_dt::const_iterator (it)=(map).begin(); \
   (it)!=(map).end(); \
   (it)++)
 
 #define forall_valid_objects(it, map) \
-  for(object_map_dt::const_iterator (it) = (map).begin(); \
+  for(object_map_dt::const_iterator (it)=(map).begin(); \
   (it)!=(map).end(); \
   (it)++) \
-   if((map).is_valid_at((it)->first, from_function, from_target_index))
+    if((map).is_valid_at((it)->first, from_function, from_target_index))
 
 #define Forall_objects(it, map) \
-  for(object_map_dt::iterator (it) = (map).begin(); \
+  for(object_map_dt::iterator (it)=(map).begin(); \
   (it)!=(map).end(); \
   (it)++)
 
 #define Forall_valid_objects(it, map) \
-  for(object_map_dt::iterator (it) = (map).begin(); \
-  (it)!=(map).end(); \
-  (it)++) \
-   if((map).is_valid_at((it)->first, from_function, from_target_index))
+  for(object_map_dt::iterator (it)=(map).begin(); \
+      (it)!=(map).end(); \
+      (it)++) \
+    if((map).is_valid_at((it)->first, from_function, from_target_index)) /* NOLINT(*) */
 
 /*******************************************************************\
 
@@ -86,7 +86,7 @@ void value_set_fivrt::output(
 //                                         from_target_index)) yes=true;
 //   if (!yes) continue;
 
-//    const object_mapt &object_map = e.object_map;
+//    const object_mapt &object_map=e.object_map;
     object_mapt object_map;
     flatten(e, object_map);
 
@@ -112,8 +112,9 @@ void value_set_fivrt::output(
       #endif
     }
 
-    out << display_name << " = { ";
-    if(object_map.read().size()!=0) out << "\n      ";
+    out << display_name << "={ ";
+    if(object_map.read().size()!=0)
+      out << "\n      ";
 
     std::size_t width=0;
 
@@ -121,27 +122,27 @@ void value_set_fivrt::output(
     {
       const exprt &o=object_numbering[o_it->first];
 
-      std::string result="<"; //+std::to_string(o_it->first) + ",";
+      std::string result="<"; // +std::to_string(o_it->first) + ",";
 
       if(o.id()==ID_invalid)
       {
         result+='#';
         result+=", *, "; // offset unknown
-        if (o.type().id()==ID_unknown)
+        if(o.type().id()==ID_unknown)
           result+='*';
-        else if (o.type().id()==ID_invalid)
+        else if(o.type().id()==ID_invalid)
           result+='#';
         else
           result+=from_type(ns, identifier, o.type());
         result+='>';
       }
-      else if (o.id()==ID_unknown)
+      else if(o.id()==ID_unknown)
       {
         result+='*';
         result+=", *, "; // offset unknown
-        if (o.type().id()==ID_unknown)
+        if(o.type().id()==ID_unknown)
           result+='*';
-        else if (o.type().id()==ID_invalid)
+        else if(o.type().id()==ID_invalid)
           result+='#';
         else
           result+=from_type(ns, identifier, o.type());
@@ -158,11 +159,11 @@ void value_set_fivrt::output(
 
         result+=", ";
 
-        if (o.type().id()==ID_unknown)
+        if(o.type().id()==ID_unknown)
           result+='*';
         else
         {
-          if (o.type().id()=="#REF#")
+          if(o.type().id()=="#REF#")
             result += "#REF#";
           else
             result+=from_type(ns, identifier, o.type());
@@ -178,24 +179,26 @@ void value_set_fivrt::output(
       object_map_dt::validity_rangest::const_iterator vr =
         object_map.read().validity_ranges.find(o_it->first);
 
-      if (vr != object_map.read().validity_ranges.end())
+      if(vr != object_map.read().validity_ranges.end())
       {
-        if (vr->second.empty())
+        if(vr->second.empty())
           std::cout << "        Empty validity record" << std::endl;
         else
-          for (object_map_dt::vrange_listt::const_iterator vit =
+        {
+          for(object_map_dt::vrange_listt::const_iterator vit =
                  vr->second.begin();
                vit!=vr->second.end();
                vit++)
           {
             out << "        valid at " << function_numbering[vit->function] <<
               " [" << vit->from << "," << vit->to << "]";
-            if (from_function==vit->function &&
+            if(from_function==vit->function &&
                 from_target_index>=vit->from &&
                 from_target_index<=vit->to)
               out << " (*)";
             out << std::endl;
           }
+        }
       }
       else
       {
@@ -269,10 +272,10 @@ void value_set_fivrt::flatten_rec(
   std::cout << "FLATTEN_REC: " << e.identifier << e.suffix << std::endl;
   #endif
 
-  std::string identifier = id2string(e.identifier);
+  std::string identifier=id2string(e.identifier);
   assert(seen.find(identifier + e.suffix)==seen.end());
 
-  bool generalize_index = false;
+  bool generalize_index=false;
   std::list<const object_map_dt::vrange_listt*> add_ranges;
 
   seen.insert(identifier + e.suffix);
@@ -281,25 +284,25 @@ void value_set_fivrt::flatten_rec(
   {
     const exprt& o=object_numbering[it->first];
 
-    if (o.type().id()=="#REF#")
+    if(o.type().id()=="#REF#")
     {
-      if (seen.find(o.get(ID_identifier))!=seen.end())
+      if(seen.find(o.get(ID_identifier))!=seen.end())
       {
-                                generalize_index = true;
+        generalize_index=true;
 
-                                object_map_dt::validity_rangest::const_iterator vit=
-                                        e.object_map.read().validity_ranges.find(it->first);
+        object_map_dt::validity_rangest::const_iterator vit=
+          e.object_map.read().validity_ranges.find(it->first);
 
-                                if (vit!=e.object_map.read().validity_ranges.end())
-                                {
-                                        const object_map_dt::vrange_listt &vl = vit->second;
-                                        add_ranges.push_back(&vl);
-                                }
+        if(vit!=e.object_map.read().validity_ranges.end())
+        {
+          const object_map_dt::vrange_listt &vl=vit->second;
+          add_ranges.push_back(&vl);
+        }
         continue;
       }
 
-      valuest::const_iterator fi = values.find(o.get(ID_identifier));
-      if (fi==values.end())
+      valuest::const_iterator fi=values.find(o.get(ID_identifier));
+      if(fi==values.end())
       {
         // this is some static object, keep it in.
         exprt se(ID_symbol, o.type().subtype());
@@ -308,68 +311,67 @@ void value_set_fivrt::flatten_rec(
       }
       else
       {
-                                // we need to flatten_rec wherever the entry
-                                // _started_ to become valid
+        // we need to flatten_rec wherever the entry
+        // _started_ to become valid
 
-                                object_map_dt::validity_rangest::const_iterator ranges_it =
-                                        e.object_map.read().validity_ranges.find(it->first);
-                                if (ranges_it!=e.object_map.read().validity_ranges.end())
-                                {
-                                        for(object_map_dt::vrange_listt::const_iterator r_it =
-                                                                ranges_it->second.begin();
-                                                        r_it!=ranges_it->second.end();
-                                                        r_it++)
-                                        {
-                                          // we only need to check the current function;
-                                          // the entry must have been valid within that function
-                                          if(r_it->function==at_function)
-                                          {
-                                                        object_mapt temp;
-                                                        flatten_rec(fi->second, temp, seen, r_it->function, r_it->from);
+        object_map_dt::validity_rangest::const_iterator ranges_it =
+          e.object_map.read().validity_ranges.find(it->first);
+        if(ranges_it!=e.object_map.read().validity_ranges.end())
+        {
+          for(object_map_dt::vrange_listt::const_iterator r_it =
+              ranges_it->second.begin();
+              r_it!=ranges_it->second.end();
+              r_it++)
+          {
+            // we only need to check the current function;
+            // the entry must have been valid within that function
+            if(r_it->function==at_function)
+            {
+              object_mapt temp;
+              flatten_rec(fi->second, temp, seen, r_it->function, r_it->from);
 
-                                                        for(object_map_dt::iterator t_it=temp.write().begin();
-                              t_it!=temp.write().end();
-                              t_it++)
-                          {
-                            if(t_it->second.offset_is_set &&
-                               it->second.offset_is_set)
-                            {
-                              t_it->second.offset += it->second.offset;
-                            }
-                            else
-                              t_it->second.offset_is_set=false;
-                          }
+              for(object_map_dt::iterator t_it=temp.write().begin();
+                  t_it!=temp.write().end();
+                  t_it++)
+              {
+                if(t_it->second.offset_is_set &&
+                   it->second.offset_is_set)
+                {
+                  t_it->second.offset += it->second.offset;
+                }
+                else
+                  t_it->second.offset_is_set=false;
+              }
 
-                                                        forall_objects(oit, temp.read())
-                                                                insert_from(dest, oit);
-                                          }
-                                        }
-                                }
+              forall_objects(oit, temp.read())
+                insert_from(dest, oit);
+            }
+          }
+        }
       }
-
     }
     else
       insert_from(dest, it);
   }
 
-        if (generalize_index) // this means we had recursive symbols in there
-        {
-                Forall_objects(it, dest.write())
-                {
-                        it->second.offset_is_set = false;
-                        for (std::list<const object_map_dt::vrange_listt*>::const_iterator vit =
-                                                 add_ranges.begin();
-                                         vit!=add_ranges.end();
-                                         vit++)
-                        {
-                                for (object_map_dt::vrange_listt::const_iterator lit =
-                                                         (*vit)->begin();
+  if(generalize_index) // this means we had recursive symbols in there
+  {
+    Forall_objects(it, dest.write())
+    {
+      it->second.offset_is_set=false;
+      for(std::list<const object_map_dt::vrange_listt*>::const_iterator vit =
+          add_ranges.begin();
+          vit!=add_ranges.end();
+          vit++)
+      {
+        for(object_map_dt::vrange_listt::const_iterator lit =
+            (*vit)->begin();
             lit!=(*vit)->end();
             lit++)
-         dest.write().set_valid_at(it->first, *lit);
-     }
-   }
- }
+          dest.write().set_valid_at(it->first, *lit);
+      }
+    }
+  }
 
   seen.erase(identifier + e.suffix);
 }
@@ -478,7 +480,7 @@ void value_set_fivrt::copy_objects(
 {
   forall_valid_objects(it, src.read())
   {
-    dest.write()[it->first] = it->second;
+    dest.write()[it->first]=it->second;
     dest.write().validity_ranges[it->first].push_back(
       object_map_dt::validity_ranget(from_function,
                                      from_target_index,
@@ -511,19 +513,19 @@ void value_set_fivrt::get_value_set(
   forall_objects(it, object_map.read())
   {
     const exprt &object=object_numbering[it->first];
-    if (object.type().id()=="#REF#")
+    if(object.type().id()=="#REF#")
     {
       assert(object.id()==ID_symbol);
 
-                        const irep_idt &ident = object.get(ID_identifier);
-                        valuest::const_iterator v_it = values.find(ident);
+      const irep_idt &ident=object.get(ID_identifier);
+      valuest::const_iterator v_it=values.find(ident);
 
-                        if (v_it!=values.end())
-                        {
-                                object_mapt temp;
-                                flatten(v_it->second, temp);
+      if(v_it!=values.end())
+      {
+        object_mapt temp;
+        flatten(v_it->second, temp);
 
-                                for(object_map_dt::iterator t_it=temp.write().begin();
+        for(object_map_dt::iterator t_it=temp.write().begin();
             t_it!=temp.write().end();
             t_it++)
         {
@@ -537,7 +539,7 @@ void value_set_fivrt::get_value_set(
 
           flat_map.write()[t_it->first]=t_it->second;
         }
-                        }
+      }
     }
     else
       flat_map.write()[it->first]=it->second;
@@ -555,7 +557,9 @@ void value_set_fivrt::get_value_set(
   #endif
 
   #if 0
-  for(std::list<exprt>::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
+  for(std::list<exprt>::const_iterator it=value_set.begin();
+      it!=value_set.end();
+      it++)
     std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
   #endif
 }
@@ -612,7 +616,7 @@ void value_set_fivrt::get_value_set_rec(
 
   if(expr.type().id()=="#REF#")
   {
-    valuest::const_iterator fi = values.find(expr.get(ID_identifier));
+    valuest::const_iterator fi=values.find(expr.get(ID_identifier));
 
     if(fi!=values.end())
     {
@@ -673,26 +677,26 @@ void value_set_fivrt::get_value_set_rec(
   {
     // just keep a reference to the ident in the set
     // (if it exists)
-    irep_idt ident = expr.get_string(ID_identifier)+suffix;
+    irep_idt ident=expr.get_string(ID_identifier)+suffix;
 
-                if(has_prefix(id2string(ident), alloc_adapter_prefix))
-                {
-                  insert_from(dest, expr, 0);
-                        return;
-                }
-                else
-                {
-                        valuest::const_iterator v_it=values.find(ident);
+    if(has_prefix(id2string(ident), alloc_adapter_prefix))
+    {
+      insert_from(dest, expr, 0);
+      return;
+    }
+    else
+    {
+      valuest::const_iterator v_it=values.find(ident);
 
-                        if(v_it!=values.end())
-                        {
-                                typet t("#REF#");
-                                t.subtype() = expr.type();
-                                symbol_exprt sym(ident, t);
-                                insert_from(dest, sym, 0);
-                                return;
-                        }
-                }
+      if(v_it!=values.end())
+      {
+        typet t("#REF#");
+        t.subtype()=expr.type();
+        symbol_exprt sym(ident, t);
+        insert_from(dest, sym, 0);
+        return;
+      }
+    }
   }
   else if(expr.id()==ID_if)
   {
@@ -853,8 +857,9 @@ void value_set_fivrt::get_value_set_rec(
 
       dynamic_object_exprt dynamic_object(dynamic_type);
       // let's make up a `unique' number for this object...
-      dynamic_object.instance()=from_integer(
-                   (from_function << 16) | from_target_index, typet(ID_natural));
+      dynamic_object.instance()=
+        from_integer(
+          (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert_from(dest, dynamic_object, 0);
@@ -868,8 +873,9 @@ void value_set_fivrt::get_value_set_rec(
 
       dynamic_object_exprt dynamic_object(expr.type().subtype());
       // let's make up a unique number for this object...
-      dynamic_object.instance()=from_integer(
-                   (from_function << 16) | from_target_index, typet(ID_natural));
+      dynamic_object.instance()=
+        from_integer(
+          (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert_from(dest, dynamic_object, 0);
@@ -964,13 +970,13 @@ void value_set_fivrt::get_reference_set(
 
   forall_objects(it, object_map.read())
   {
-    const exprt& expr = object_numbering[it->first];
+    const exprt& expr=object_numbering[it->first];
 
-    if (expr.type().id()=="#REF#")
+    if(expr.type().id()=="#REF#")
     {
-      const irep_idt& ident = expr.get(ID_identifier);
-      valuest::const_iterator vit = values.find(ident);
-      if (vit==values.end())
+      const irep_idt& ident=expr.get(ID_identifier);
+      valuest::const_iterator vit=values.find(ident);
+      if(vit==values.end())
       {
         // Assume the variable never was assigned,
         // so assume it's reference set is unknown.
@@ -1045,12 +1051,13 @@ void value_set_fivrt::get_reference_set_sharing_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
+  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
+            << std::endl;
   #endif
 
   if(expr.type().id()=="#REF#")
   {
-    valuest::const_iterator fi = values.find(expr.get(ID_identifier));
+    valuest::const_iterator fi=values.find(expr.get(ID_identifier));
     if(fi!=values.end())
     {
       forall_valid_objects(it, fi->second.object_map.read())
@@ -1082,13 +1089,13 @@ void value_set_fivrt::get_reference_set_sharing_rec(
     // REF's need to be dereferenced manually!
     forall_objects(it, temp.read())
     {
-      const exprt &obj = object_numbering[it->first];
-      if (obj.type().id()=="#REF#")
+      const exprt &obj=object_numbering[it->first];
+      if(obj.type().id()=="#REF#")
       {
-        const irep_idt &ident = obj.get(ID_identifier);
-        valuest::const_iterator v_it = values.find(ident);
+        const irep_idt &ident=obj.get(ID_identifier);
+        valuest::const_iterator v_it=values.find(ident);
 
-        if (v_it!=values.end())
+        if(v_it!=values.end())
         {
           object_mapt t2;
           flatten(v_it->second, t2);
@@ -1117,7 +1124,9 @@ void value_set_fivrt::get_reference_set_sharing_rec(
     }
 
     #if 0
-    for(expr_sett::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
+    for(expr_sett::const_iterator it=value_set.begin();
+        it!=value_set.end();
+        it++)
       std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
     #endif
 
@@ -1288,7 +1297,8 @@ void value_set_fivrt::assign(
       const irep_idt &name=c_it->get(ID_name);
 
       // ignore methods
-      if(subtype.id()==ID_code) continue;
+      if(subtype.id()==ID_code)
+        continue;
 
       exprt lhs_member(ID_member, subtype);
       lhs_member.set(ID_component_name, name);
@@ -1303,7 +1313,7 @@ void value_set_fivrt::assign(
       }
       else
       {
-        if (!base_type_eq(rhs.type(), type, ns))
+        if(!base_type_eq(rhs.type(), type, ns))
           throw
             "type mismatch:\nRHS: "+rhs.type().pretty()+"\n"+
             "LHS: "+type.pretty();
@@ -1430,7 +1440,7 @@ void value_set_fivrt::do_free(
   object_mapt value_set;
   get_value_set(op, value_set, ns);
   entryt e; e.identifier="VP:TEMP";
-  e.object_map = value_set;
+  e.object_map=value_set;
   flatten(e, value_set);
 
   const object_map_dt &object_map=value_set.read();
@@ -1492,7 +1502,7 @@ void value_set_fivrt::do_free(
 
     if(changed)
     {
-      entryt &temp_entry = get_temporary_entry(v_it->second.identifier,
+      entryt &temp_entry=get_temporary_entry(v_it->second.identifier,
                                                v_it->second.suffix);
       temp_entry.object_map=new_object_map;
     }
@@ -1530,7 +1540,7 @@ void value_set_fivrt::assign_rec(
 
   if(lhs.type().id()=="#REF#")
   {
-    const irep_idt &ident = lhs.get(ID_identifier);
+    const irep_idt &ident=lhs.get(ID_identifier);
     object_mapt temp;
     gvs_recursion_sett recset;
     get_value_set_rec(lhs, temp, "", lhs.type().subtype(), ns, recset);
@@ -1557,7 +1567,7 @@ void value_set_fivrt::assign_rec(
        values.find(id2string(identifier)+suffix)!=values.end())
        // otherwise we don't track this value
     {
-      entryt &temp_entry = get_temporary_entry(identifier, suffix);
+      entryt &temp_entry=get_temporary_entry(identifier, suffix);
 
       // check if the right hand side contains a reference to ourselves,
       // in that case we need to include all old values!
@@ -1566,7 +1576,7 @@ void value_set_fivrt::assign_rec(
       if(add_to_sets ||
          recursive_find(identifier, values_rhs, recset))
       {
-        entryt &state_entry = get_entry(identifier, suffix);
+        entryt &state_entry=get_entry(identifier, suffix);
         make_valid_union(temp_entry.object_map, state_entry.object_map);
       }
 
@@ -1582,7 +1592,7 @@ void value_set_fivrt::assign_rec(
       "value_set::dynamic_object"+
       dynamic_object.instance().get_string(ID_value);
 
-    entryt &temp_entry = get_temporary_entry(name, suffix);
+    entryt &temp_entry=get_temporary_entry(name, suffix);
 
     // check if the right hand side contains a reference to ourselves,
     // in that case we need to include all old values!
@@ -1591,7 +1601,7 @@ void value_set_fivrt::assign_rec(
     if(add_to_sets ||
        recursive_find(name, values_rhs, recset))
     {
-      entryt &state_entry = get_entry(name, suffix);
+      entryt &state_entry=get_entry(name, suffix);
       make_valid_union(temp_entry.object_map, state_entry.object_map);
     }
 
@@ -1620,16 +1630,20 @@ void value_set_fivrt::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_array || type.id()==ID_incomplete_array || type.id()=="#REF#");
+    assert(type.id()==ID_array ||
+           type.id()==ID_incomplete_array ||
+           type.id()=="#REF#");
 
-    assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set, add_to_sets);
+    assign_rec(
+      lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set, add_to_sets);
   }
   else if(lhs.id()==ID_member)
   {
     if(lhs.operands().size()!=1)
       throw "member expected to have one operand";
 
-    if(lhs.op0().is_nil()) return;
+    if(lhs.op0().is_nil())
+      return;
 
     const std::string &component_name=lhs.get_string(ID_component_name);
 
@@ -1745,7 +1759,8 @@ void value_set_fivrt::do_function_call(
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
-    if(identifier=="") continue;
+    if(identifier=="")
+      continue;
 
     add_var(identifier, "");
 
@@ -1775,9 +1790,10 @@ void value_set_fivrt::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
 {
-  if(lhs.is_nil()) return;
+  if(lhs.is_nil())
+    return;
 
-  std::string rvs = "value_set::return_value" + std::to_string(from_function);
+  std::string rvs="value_set::return_value" + std::to_string(from_function);
   symbol_exprt rhs(rvs, lhs.type());
 
   assign(lhs, rhs, ns);
@@ -1875,14 +1891,14 @@ void value_set_fivrt::apply_code(
     // this is turned into an assignment
     if(code.operands().size()==1)
     {
-      std::string rvs = "value_set::return_value" + std::to_string(from_function);
+      std::string rvs="value_set::return_value" + std::to_string(from_function);
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);
     }
   }
   else if(statement==ID_input || statement==ID_output)
   {
-	  // doesn't do anything
+    // doesn't do anything
   }
 
   else
@@ -1908,7 +1924,7 @@ bool value_set_fivrt::insert_to(
   unsigned n,
   const objectt &object) const
 {
-  object_map_dt &map = dest.write();
+  object_map_dt &map=dest.write();
   if(map.find(n)==map.end())
   {
 //    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
@@ -1922,7 +1938,7 @@ bool value_set_fivrt::insert_to(
 //    std::cout << "UPD " << n << std::endl;
     objectt &old=map[n];
 
-    bool res = map.set_valid_at(n, to_function, to_target_index);
+    bool res=map.set_valid_at(n, to_function, to_target_index);
 
     if(old.offset_is_set && object.offset_is_set)
     {
@@ -1961,7 +1977,7 @@ bool value_set_fivrt::insert_from(
   unsigned n,
   const objectt &object) const
 {
-  object_map_dt &map = dest.write();
+  object_map_dt &map=dest.write();
   if(map.find(n)==map.end())
   {
 //    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
@@ -1975,7 +1991,7 @@ bool value_set_fivrt::insert_from(
 //    std::cout << "UPD " << n << std::endl;
     objectt &old=map[n];
 
-    bool res = map.set_valid_at(n, from_function, from_target_index);
+    bool res=map.set_valid_at(n, from_function, from_target_index);
 
     if(old.offset_is_set && object.offset_is_set)
     {
@@ -2013,10 +2029,11 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
   unsigned inx,
   const validity_ranget &vr)
 {
-  bool res = false;
+  bool res=false;
 
   for(unsigned i=vr.from; i<=vr.to; i++)
-    if(set_valid_at(inx, vr.function, i)) res = true;
+    if(set_valid_at(inx, vr.function, i))
+      res=true;
 
   return res;
 }
@@ -2038,9 +2055,10 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
   unsigned f,
   unsigned line)
 {
-  if(is_valid_at(inx, f, line)) return false;
+  if(is_valid_at(inx, f, line))
+    return false;
 
-  vrange_listt &ranges = validity_ranges[inx];
+  vrange_listt &ranges=validity_ranges[inx];
   vrange_listt::iterator it=ranges.begin();
 
   while(it->function!=f && it!=ranges.end()) it++; // ffw to function block
@@ -2056,13 +2074,13 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
         it->to++;
 
         // by any chance: does the next one connect to this one?
-        vrange_listt::iterator n_it = it; n_it++;
+        vrange_listt::iterator n_it=it; n_it++;
         if(n_it!=ranges.end() &&
            it->function == n_it->function &&
            it->to+1 == n_it->from)
         {
-          n_it->from = it->from; // connected!
-          it = ranges.erase(it);
+          n_it->from=it->from; // connected!
+          it=ranges.erase(it);
         }
         return true;
       }
@@ -2083,12 +2101,12 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
         // by any chance: does the previous one connect to this one?
         if(it!=ranges.begin())
         {
-          vrange_listt::iterator p_it = it; p_it--;
+          vrange_listt::iterator p_it=it; p_it--;
           if(p_it->function == it->function &&
              p_it->to+1 == it->from)
           {
-            p_it->to = it->to; // connected!
-            it = ranges.erase(it);
+            p_it->to=it->to; // connected!
+            it=ranges.erase(it);
           }
         }
         return true;
@@ -2125,20 +2143,22 @@ bool value_set_fivrt::object_map_dt::is_valid_at(
       std::endl;
   #endif
 
-  validity_rangest::const_iterator vrs = validity_ranges.find(inx);
-  if (vrs!=validity_ranges.end())
+  validity_rangest::const_iterator vrs=validity_ranges.find(inx);
+  if(vrs!=validity_ranges.end())
   {
-    const vrange_listt &ranges = vrs->second;
+    const vrange_listt &ranges=vrs->second;
 
-    object_map_dt::vrange_listt::const_iterator it = ranges.begin();
+    object_map_dt::vrange_listt::const_iterator it=ranges.begin();
 
     while(it->function!=f &&
-          it!=ranges.end()) it++; // ffw to function block
+          it!=ranges.end())
+      it++; // ffw to function block
 
     for( ;
-        it!=ranges.end() && it->function==f && it->from<=line ;
+        it!=ranges.end() && it->function==f && it->from<=line;
         it++)
-      if(it->contains(f, line)) return true;
+      if(it->contains(f, line))
+        return true;
   }
   return false;
 }
@@ -2162,28 +2182,28 @@ bool value_set_fivrt::recursive_find(
 {
   forall_objects(it, rhs.read())
   {
-    const exprt &o = object_numbering[it->first];
+    const exprt &o=object_numbering[it->first];
 
-    if (o.id()==ID_symbol && o.get(ID_identifier)==ident)
+    if(o.id()==ID_symbol && o.get(ID_identifier)==ident)
       return true;
-    else if (o.type().id()=="#REF#")
+    else if(o.type().id()=="#REF#")
     {
-      const irep_idt oid = o.get(ID_identifier);
+      const irep_idt oid=o.get(ID_identifier);
 
-      if (recursion_set.find(oid)!=recursion_set.end())
+      if(recursion_set.find(oid)!=recursion_set.end())
         return false; // we hit some other cycle on the way down
 
       if(oid==ident)
         return true;
       else
       {
-        valuest::const_iterator vit = values.find(oid);
+        valuest::const_iterator vit=values.find(oid);
         if(vit!=values.end())
         {
-          const entryt &e = vit->second;
+          const entryt &e=vit->second;
 
           recursion_set.insert(oid);
-          if (recursive_find(ident, e.object_map, recursion_set))
+          if(recursive_find(ident, e.object_map, recursion_set))
             return true;
           recursion_set.erase(oid);
         }
@@ -2210,13 +2230,13 @@ bool value_set_fivrt::handover(void)
 {
   bool changed=false;
 
-  for (valuest::iterator it=values.begin();
+  for(valuest::iterator it=values.begin();
        it!=values.end();
        it++)
   {
     object_mapt &state_map=it->second.object_map;
 
-    irep_idt ident = id2string(it->second.identifier)+it->second.suffix;
+    irep_idt ident=id2string(it->second.identifier)+it->second.suffix;
 
     valuest::const_iterator t_it=temporary_values.find(ident);
 
@@ -2227,14 +2247,14 @@ bool value_set_fivrt::handover(void)
       {
         if(state_map.write().set_valid_at(o_it->first,
                                           to_function, to_target_index))
-          changed = true;
+          changed=true;
       }
     }
     else
     {
 //      std::cout << "NEW VALUES FOR: " << ident << std::endl;
       if(make_union(state_map, t_it->second.object_map))
-        changed = true;
+        changed=true;
     }
   }
 

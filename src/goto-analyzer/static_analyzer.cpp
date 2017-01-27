@@ -91,7 +91,8 @@ tvt static_analyzert::eval(goto_programt::const_targett t)
   exprt guard=t->guard;
   interval_domaint d=interval_analysis[t];
   d.assume(not_exprt(guard), ns);
-  if(d.is_bottom()) return tvt(true);
+  if(d.is_bottom())
+    return tvt(true);
   return tvt::unknown();
 }
 
@@ -113,7 +114,8 @@ void static_analyzert::plain_text_report()
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
+    if(!f_it->second.body.has_assertion())
+      continue;
 
     if(f_it->first=="__actual_thread_spawn")
       continue;
@@ -122,7 +124,8 @@ void static_analyzert::plain_text_report()
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(!i_it->is_assert()) continue;
+      if(!i_it->is_assert())
+        continue;
 
       tvt r=eval(i_it);
 
@@ -174,14 +177,16 @@ void static_analyzert::json_report(const std::string &file_name)
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
+    if(!f_it->second.body.has_assertion())
+      continue;
 
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(!i_it->is_assert()) continue;
+      if(!i_it->is_assert())
+        continue;
 
       tvt r=eval(i_it);
 
@@ -231,14 +236,16 @@ void static_analyzert::xml_report(const std::string &file_name)
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
+    if(!f_it->second.body.has_assertion())
+      continue;
 
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
-      if(!i_it->is_assert()) continue;
+      if(!i_it->is_assert())
+        continue;
 
       tvt r=eval(i_it);
 
@@ -253,7 +260,8 @@ void static_analyzert::xml_report(const std::string &file_name)
 
       x.set_attribute("file", id2string(i_it->source_location.get_file()));
       x.set_attribute("line", id2string(i_it->source_location.get_line()));
-      x.set_attribute("description", id2string(i_it->source_location.get_comment()));
+      x.set_attribute(
+        "description", id2string(i_it->source_location.get_comment()));
     }
   }
 

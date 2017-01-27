@@ -94,12 +94,13 @@ tvt satcheck_smvsatt::l_get(literalt a) const
 
   switch(sat_instance_value(satsolver, v))
   {
-   case 0: result=tvt(false); break;
-   case 1: result=tvt(true); break;
-   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
+    case 0: result=tvt(false); break;
+    case 1: result=tvt(true); break;
+    default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }

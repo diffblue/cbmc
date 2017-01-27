@@ -104,10 +104,12 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      if(it->type().id()==ID_code) continue;
+      if(it->type().id()==ID_code)
+        continue;
 
       unsigned sub_size=get_size(it->type());
-      if(sub_size==0) continue;
+      if(sub_size==0)
+        continue;
 
       std::vector<mp_integer> tmp;
       evaluate(*it, tmp);

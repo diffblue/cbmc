@@ -20,15 +20,16 @@ Author: Matt Lewis
 #include "sat_path_enumerator.h"
 
 
-class enumerating_loop_accelerationt : public loop_accelerationt {
- public:
+class enumerating_loop_accelerationt:public loop_accelerationt
+{
+public:
   enumerating_loop_accelerationt(
-      symbol_tablet &_symbol_table,
-      goto_functionst &_goto_functions,
-      goto_programt &_goto_program,
-      natural_loops_mutablet::natural_loopt &_loop,
-      goto_programt::targett _loop_header,
-      int _path_limit) :
+    symbol_tablet &_symbol_table,
+    goto_functionst &_goto_functions,
+    goto_programt &_goto_program,
+    natural_loops_mutablet::natural_loopt &_loop,
+    goto_programt::targett _loop_header,
+    int _path_limit):
     symbol_table(_symbol_table),
     goto_functions(_goto_functions),
     goto_program(_goto_program),
@@ -37,18 +38,20 @@ class enumerating_loop_accelerationt : public loop_accelerationt {
     polynomial_accelerator(symbol_table, goto_functions),
     path_limit(_path_limit)
   {
-    //path_enumerator = new all_paths_enumeratort(goto_program, loop, loop_header);
+    // path_enumerator = new all_paths_enumeratort(goto_program, loop,
+    // loop_header);
     path_enumerator = new sat_path_enumeratort(symbol_table, goto_functions,
         goto_program, loop, loop_header);
   }
 
-  ~enumerating_loop_accelerationt() {
+  ~enumerating_loop_accelerationt()
+  {
     delete path_enumerator;
   }
 
   virtual bool accelerate(path_acceleratort &accelerator);
 
- protected:
+protected:
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
   goto_programt &goto_program;

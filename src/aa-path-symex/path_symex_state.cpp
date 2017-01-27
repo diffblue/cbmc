@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -151,7 +151,7 @@ Function: path_symex_statet::read
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
+  // std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
   // This has five phases!
@@ -175,7 +175,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
-  //std::cout << " ==> " << tmp.pretty() << std::endl;
+  // std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
   return tmp5;
@@ -634,7 +634,8 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     if_exprt if_expr=to_if_expr(src);
     if_expr.true_case()=instantiate_rec_address(if_expr.true_case(), propagate);
-    if_expr.false_case()=instantiate_rec_address(if_expr.false_case(), propagate);
+    if_expr.false_case()=
+      instantiate_rec_address(if_expr.false_case(), propagate);
     if_expr.cond()=instantiate_rec(if_expr.cond(), propagate);
     return if_expr;
   }

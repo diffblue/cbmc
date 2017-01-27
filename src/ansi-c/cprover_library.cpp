@@ -118,7 +118,8 @@ void add_library(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  if(src.empty()) return;
+  if(src.empty())
+    return;
 
   std::istringstream in(src);
 

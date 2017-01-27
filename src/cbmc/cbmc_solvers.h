@@ -64,14 +64,14 @@ public:
     }
 
     // use this to get the prop_conv
-    prop_convt& prop_conv() const
+    prop_convt &prop_conv() const
     {
       assert(prop_conv_ptr!=NULL);
       return *prop_conv_ptr;
     }
 
   protected:
-    prop_convt* prop_conv_ptr;
+    prop_convt *prop_conv_ptr;
   };
 
   // returns a solvert object
@@ -107,11 +107,11 @@ protected:
   // use gui format
   language_uit::uit ui;
 
-  solvert* get_default();
-  solvert* get_dimacs();
-  solvert* get_bv_refinement();
-  solvert* get_smt1(smt1_dect::solvert solver);
-  solvert* get_smt2(smt2_dect::solvert solver);
+  solvert *get_default();
+  solvert *get_dimacs();
+  solvert *get_bv_refinement();
+  solvert *get_smt1(smt1_dect::solvert solver);
+  solvert *get_smt2(smt2_dect::solvert solver);
 
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;

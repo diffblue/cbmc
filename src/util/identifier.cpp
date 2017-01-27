@@ -29,7 +29,8 @@ std::string identifiert::as_string() const
   for(componentst::const_iterator it=components.begin();
       it!=components.end(); it++)
   {
-    if(it!=components.begin()) result+=ID_SEPARATOR;
+    if(it!=components.begin())
+      result+=ID_SEPARATOR;
     result+=*it;
   }
 

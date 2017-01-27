@@ -73,12 +73,14 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
       , local_may
 #endif
-      );
-      if(rw_set.empty()) continue;
+      ); // NOLINT(whitespace/parens)
+      if(rw_set.empty())
+        continue;
 
       symbolt new_symbol;
       new_symbol.base_name="$tmp_guard";
-      new_symbol.name=id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
+      new_symbol.name=
+        id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
       new_symbol.type=bool_typet();
       new_symbol.is_static_lifetime=true;
       new_symbol.is_thread_local=true;
@@ -258,7 +260,8 @@ void weak_memory(
     const std::pair<m_itt, m_itt> ran=
       shared_buffers.cycles_loc.equal_range(*it);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
-      message.result() << ((*it)==""?"fence":*it)<<", "<<ran_it->second<<messaget::eom;
+      message.result() << ((*it)==""?"fence":*it) << ", "
+                       << ran_it->second << messaget::eom;
   }
 
   shared_bufferst::cfg_visitort visitor(shared_buffers, symbol_table,

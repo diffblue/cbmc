@@ -29,10 +29,10 @@ class member_offset_iterator
   const struct_typet &type;
   const namespacet &ns;
   size_t bit_field_bits;
- public:
+public:
   member_offset_iterator(const struct_typet& _type,
                          const namespacet& _ns);
-  member_offset_iterator& operator++();
+  member_offset_iterator &operator++();
   const refst& operator*() const { return current; }
   const refst* operator->() const { return &current; }
 };

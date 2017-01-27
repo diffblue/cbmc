@@ -63,7 +63,8 @@ public:
 
   const T &read() const
   {
-    if(d==NULL) return T::blank;
+    if(d==NULL)
+      return T::blank;
     return *d;
   }
 
@@ -100,7 +101,8 @@ protected:
 
     remove_ref(d);
     d=other.d;
-    if(d!=NULL) d->ref_count++;
+    if(d!=NULL)
+      d->ref_count++;
   }
 
 public:
@@ -113,7 +115,8 @@ public:
 template<class T>
 void reference_counting<T>::remove_ref(dt *old_d)
 {
-  if(old_d==NULL) return;
+  if(old_d==NULL)
+    return;
 
   assert(old_d->ref_count!=0);
 
@@ -178,7 +181,8 @@ bool operator==(
   const reference_counting<T> &o1,
   const reference_counting<T> &o2)
 {
-  if(o1.get_d()==o2.get_d()) return true;
+  if(o1.get_d()==o2.get_d())
+    return true;
   return o1.read()==o2.read();
 }
 

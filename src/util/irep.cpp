@@ -143,7 +143,8 @@ Function: irept::remove_ref
 #ifdef SHARING
 void irept::remove_ref(dt *old_data)
 {
-  if(old_data==&empty_d) return;
+  if(old_data==&empty_d)
+    return;
 
   #if 0
   nonrecursive_destructor(old_data);
@@ -199,7 +200,8 @@ void irept::nonrecursive_destructor(dt *old_data)
   {
     dt *d=stack.back();
     stack.erase(--stack.end());
-    if(d==&empty_d) continue;
+    if(d==&empty_d)
+      continue;
 
     assert(d->ref_count!=0);
     d->ref_count--;
@@ -448,7 +450,8 @@ void irept::remove(const irep_namet &name)
   #ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
-  if(it!=s.end() && it->first==name) s.erase(it);
+  if(it!=s.end() && it->first==name)
+    s.erase(it);
   #else
   s.erase(name);
   #endif
@@ -675,11 +678,15 @@ bool irept::ordering(const irept &other) const
   return compare(other)<0;
 
   #if 0
-  if(X.data<Y.data) return true;
-  if(Y.data<X.data) return false;
+  if(X.data<Y.data)
+    return true;
+  if(Y.data<X.data)
+    return false;
 
-  if(X.sub.size()<Y.sub.size()) return true;
-  if(Y.sub.size()<X.sub.size()) return false;
+  if(X.sub.size()<Y.sub.size())
+    return true;
+  if(Y.sub.size()<X.sub.size())
+    return false;
 
   {
     irept::subt::const_iterator it1, it2;
@@ -690,15 +697,19 @@ bool irept::ordering(const irept &other) const
         it1++,
         it2++)
     {
-      if(ordering(*it1, *it2)) return true;
-      if(ordering(*it2, *it1)) return false;
+      if(ordering(*it1, *it2))
+        return true;
+      if(ordering(*it2, *it1))
+        return false;
     }
 
     assert(it1==X.sub.end() && it2==Y.sub.end());
   }
 
-  if(X.named_sub.size()<Y.named_sub.size()) return true;
-  if(Y.named_sub.size()<X.named_sub.size()) return false;
+  if(X.named_sub.size()<Y.named_sub.size())
+    return true;
+  if(Y.named_sub.size()<X.named_sub.size())
+    return false;
 
   {
     irept::named_subt::const_iterator it1, it2;
@@ -709,11 +720,15 @@ bool irept::ordering(const irept &other) const
         it1++,
         it2++)
     {
-      if(it1->first<it2->first) return true;
-      if(it2->first<it1->first) return false;
+      if(it1->first<it2->first)
+        return true;
+      if(it2->first<it1->first)
+        return false;
 
-      if(ordering(it1->second, it2->second)) return true;
-      if(ordering(it2->second, it1->second)) return false;
+      if(ordering(it1->second, it2->second))
+        return true;
+      if(ordering(it2->second, it1->second))
+        return false;
     }
 
     assert(it1==X.named_sub.end() && it2==Y.named_sub.end());
@@ -740,12 +755,15 @@ int irept::compare(const irept &i) const
   int r;
 
   r=id().compare(i.id());
-  if(r!=0) return r;
+  if(r!=0)
+    return r;
 
   const subt::size_type size=get_sub().size(),
         i_size=i.get_sub().size();
-  if(size<i_size) return -1;
-  if(size>i_size) return 1;
+  if(size<i_size)
+    return -1;
+  if(size>i_size)
+    return 1;
 
   {
     irept::subt::const_iterator it1, it2;
@@ -757,7 +775,8 @@ int irept::compare(const irept &i) const
         it2++)
     {
       r=it1->compare(*it2);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
     }
 
     assert(it1==get_sub().end() && it2==i.get_sub().end());
@@ -765,8 +784,10 @@ int irept::compare(const irept &i) const
 
   const named_subt::size_type n_size=get_named_sub().size(),
         i_n_size=i.get_named_sub().size();
-  if(n_size<i_n_size) return -1;
-  if(n_size>i_n_size) return 1;
+  if(n_size<i_n_size)
+    return -1;
+  if(n_size>i_n_size)
+    return 1;
 
   {
     irept::named_subt::const_iterator it1, it2;
@@ -778,10 +799,12 @@ int irept::compare(const irept &i) const
         it2++)
     {
       r=it1->first.compare(it2->first);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
 
       r=it1->second.compare(it2->second);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
     }
 
     assert(it1==get_named_sub().end() &&

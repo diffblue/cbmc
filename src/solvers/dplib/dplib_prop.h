@@ -53,7 +53,8 @@ public:
   virtual tvt l_get(literalt literal) const
   {
     unsigned v=literal.var_no();
-    if(v>=assignment.size()) return tvt::unknown();
+    if(v>=assignment.size())
+      return tvt::unknown();
     tvt r=assignment[v];
     return literal.sign()?!r:r;
   }

@@ -125,7 +125,8 @@ public:
   void from_dimacs(int d)
   {
     bool sign=d<0;
-    if(sign) d=-d;
+    if(sign)
+      d=-d;
     set(d, sign);
   }
 

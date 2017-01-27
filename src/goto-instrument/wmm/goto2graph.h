@@ -49,7 +49,7 @@ protected:
 
   bool inline local(const irep_idt& id);
 
-  void inline add_instr_to_interleaving (
+  void inline add_instr_to_interleaving(
     goto_programt::instructionst::iterator it,
     goto_programt& interleaving);
 
@@ -87,13 +87,13 @@ protected:
   class cfg_visitort
   {
   protected:
-    namespacet& ns;
-    instrumentert& instrumenter;
+    namespacet &ns;
+    instrumentert &instrumenter;
 
     /* pointer to the egraph(s) that we construct */
-    event_grapht& egraph;
-    std::vector<std::set<event_idt> >& egraph_SCCs;
-    wmm_grapht& egraph_alt;
+    event_grapht &egraph;
+    std::vector<std::set<event_idt>> &egraph_SCCs;
+    wmm_grapht &egraph_alt;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -106,7 +106,7 @@ protected:
       #ifdef LOCAL_MAY
       , local_may_aliast local_may
       #endif
-    ) const;
+    ) const; // NOLINT(whitespace/parens)
 
     /* transformers */
     void visit_cfg_thread() const;
@@ -118,7 +118,7 @@ protected:
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
       #endif
-    ); // deprecated
+    ); // deprecated  NOLINT(whitespace/parens)
     void inline visit_cfg_backedge(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
     void inline visit_cfg_duplicate(goto_programt::const_targett targ,
@@ -128,7 +128,7 @@ protected:
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
       #endif
-    );
+    ); // NOLINT(whitespace/parens)
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
     void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
@@ -147,8 +147,8 @@ protected:
       #ifdef LOCAL_MAY
       , local_may_aliast& local_may
       #endif
-    );
-    void visit_cfg_reference_function (irep_idt id_function);
+    ); // NOLINT(whitespace/parens)
+    void visit_cfg_reference_function(irep_idt id_function);
 
  public:
     virtual ~cfg_visitort()
@@ -239,7 +239,8 @@ protected:
       const irep_idt& function)
     {
       /* ignore recursive calls -- underapproximation */
-      try {
+      try
+      {
         /* forbids recursive function */
         enter_function(function);
         const std::set<nodet> empty_in;
@@ -248,7 +249,8 @@ protected:
           function, empty_in, end_out);
         leave_function(function);
       }
-      catch(std::string s) {
+      catch(std::string s)
+      {
         instrumenter.message.warning() << s << messaget::eom;
       }
     }
@@ -272,7 +274,7 @@ protected:
 
 public:
   /* message */
-  messaget& message;
+  messaget &message;
 
   /* graph */
   event_grapht egraph;
@@ -293,7 +295,8 @@ public:
     std::set<event_idt> > > map_function_nodest;
   map_function_nodest map_function_graph;
 
-  void print_map_function_graph() const {
+  void print_map_function_graph() const
+  {
     for(map_function_nodest::const_iterator it=map_function_graph.begin();
        it!=map_function_graph.end();
        ++it)

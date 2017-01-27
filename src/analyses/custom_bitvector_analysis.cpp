@@ -387,7 +387,8 @@ void custom_bitvector_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call=
+        to_code_function_call(instruction.code);
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)

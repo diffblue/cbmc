@@ -68,7 +68,14 @@ protected:
   index_mapt index_map;
 
   // adds array constraints lazily
-  typedef enum lazy_type {ARRAY_ACKERMANN, ARRAY_WITH, ARRAY_IF, ARRAY_OF, ARRAY_TYPECAST} lazy_typet;
+  typedef enum lazy_type
+  {
+    ARRAY_ACKERMANN,
+    ARRAY_WITH,
+    ARRAY_IF,
+    ARRAY_OF,
+    ARRAY_TYPECAST
+  } lazy_typet;
   struct lazy_constraintt
   {
     lazy_typet type;
@@ -90,13 +97,20 @@ protected:
   // adds all the constraints eagerly
   void add_array_constraints();
   void add_array_Ackermann_constraints();
-  void add_array_constraints_equality(const index_sett &index_set, const array_equalityt &array_equality);
-  void add_array_constraints(const index_sett &index_set, const exprt &expr);
-  void add_array_constraints(const index_sett &index_set, const array_equalityt &array_equality);
-  void add_array_constraints_if(const index_sett &index_set, const if_exprt &exprt);
-  void add_array_constraints_with(const index_sett &index_set, const with_exprt &expr);
-  void add_array_constraints_update(const index_sett &index_set, const update_exprt &expr);
-  void add_array_constraints_array_of(const index_sett &index_set, const array_of_exprt &exprt);
+  void add_array_constraints_equality(
+    const index_sett &index_set, const array_equalityt &array_equality);
+  void add_array_constraints(
+    const index_sett &index_set, const exprt &expr);
+  void add_array_constraints(
+    const index_sett &index_set, const array_equalityt &array_equality);
+  void add_array_constraints_if(
+    const index_sett &index_set, const if_exprt &exprt);
+  void add_array_constraints_with(
+    const index_sett &index_set, const with_exprt &expr);
+  void add_array_constraints_update(
+    const index_sett &index_set, const update_exprt &expr);
+  void add_array_constraints_array_of(
+    const index_sett &index_set, const array_of_exprt &exprt);
 
   void update_index_map(bool update_all);
   void update_index_map(std::size_t i);

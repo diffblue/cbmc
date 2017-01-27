@@ -211,7 +211,8 @@ void document_propertiest::get_code(
   const irep_idt &file=source_location.get_file();
   const irep_idt &line=source_location.get_line();
 
-  if(file=="" || line=="") return;
+  if(file=="" || line=="")
+    return;
 
   std::ifstream in(id2string(file));
 
@@ -228,7 +229,8 @@ void document_propertiest::get_code(
   int line_start=line_int-3,
       line_end=line_int+3;
 
-  if(line_start<=1) line_start=1;
+  if(line_start<=1)
+    line_start=1;
 
   // skip line_start-1 lines
 

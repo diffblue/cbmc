@@ -133,7 +133,8 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
       "tmp_return_val$"+std::to_string(++temporary_counter);
     new_symbol.name=
       "remove_function_pointers::"+id2string(new_symbol.base_name);
-  } while(symbol_table.move(new_symbol, symbol_ptr));
+  }
+  while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
 }
@@ -154,7 +155,8 @@ bool remove_function_pointerst::arg_is_type_compatible(
   const typet &call_type,
   const typet &function_type)
 {
-  if(type_eq(call_type, function_type, ns)) return true;
+  if(type_eq(call_type, function_type, ns))
+    return true;
 
   // any integer-vs-enum-vs-pointer is ok
   if(call_type.id()==ID_signedbv ||
@@ -297,7 +299,8 @@ void remove_function_pointerst::fix_return_type(
   goto_programt &dest)
 {
   // are we returning anything at all?
-  if(function_call.lhs().is_nil()) return;
+  if(function_call.lhs().is_nil())
+    return;
 
   const code_typet &code_type=
     to_code_type(ns.follow(function_call.function().type()));
@@ -463,7 +466,8 @@ void remove_function_pointerst::remove_function_pointer(
     it->function=target->function;
     if(!property_class.empty())
       it->source_location.set_property_class(property_class);
-    if(!comment.empty()) it->source_location.set_comment(comment);
+    if(!comment.empty())
+      it->source_location.set_comment(comment);
   }
 
   goto_programt::targett next_target=target;

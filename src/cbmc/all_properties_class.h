@@ -45,7 +45,8 @@ public:
   struct goalt
   {
     // a property holds if all instances of it are true
-    typedef std::vector<symex_target_equationt::SSA_stepst::iterator> instancest;
+    typedef std::vector<symex_target_equationt::SSA_stepst::iterator>
+      instancest;
     instancest instances;
     std::string description;
 

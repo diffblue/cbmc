@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 
@@ -148,11 +148,15 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_struct_tag)
     {
-      return bv_get_rec(bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
+      return
+        bv_get_rec(
+          bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
     }
     else if(type.id()==ID_union_tag)
     {
-      return bv_get_rec(bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
+      return
+        bv_get_rec(
+          bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
     }
     else if(type.id()==ID_struct)
     {
@@ -248,6 +252,7 @@ exprt boolbvt::bv_get_rec(
     if(unknown[bit_nr])
       ch='0';
     else
+    {
       switch(prop.l_get(bv[bit_nr]).get_value())
       {
        case tvt::tv_enumt::TV_FALSE: ch='0'; break;
@@ -255,6 +260,7 @@ exprt boolbvt::bv_get_rec(
        case tvt::tv_enumt::TV_UNKNOWN: ch='0'; break;
        default: assert(false);
       }
+    }
 
     value=ch+value;
   }
@@ -361,7 +367,8 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
   exprt size=simplify_expr(get(size_expr), ns);
 
   // no size, give up
-  if(size.is_nil()) return nil_exprt();
+  if(size.is_nil())
+    return nil_exprt();
 
   // get the numeric value, unless it's infinity
   mp_integer size_mpint;

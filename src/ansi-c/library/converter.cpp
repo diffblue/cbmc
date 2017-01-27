@@ -25,14 +25,19 @@ int main()
   {
     if(has_prefix(line, "/* FUNCTION: "))
     {
-      if(first) first=false; else std::cout << "},\n";
+      if(first)
+        first=false;
+      else
+        std::cout << "},\n";
 
       std::string function=std::string(line, 13, std::string::npos);
       std::size_t pos=function.find(' ');
-      if(pos!=std::string::npos) function=std::string(function, 0, pos);
+      if(pos!=std::string::npos)
+        function=std::string(function, 0, pos);
 
       std::cout << "{ \"" << function << "\",\n";
-      std::cout << "  \"#line 1 \\\"<builtin-library-" << function << ">\\\"\\n\"\n";
+      std::cout << "  \"#line 1 \\\"<builtin-library-"
+                << function << ">\\\"\\n\"\n";
     }
     else if(!first)
     {
@@ -56,7 +61,8 @@ int main()
     }
   }
 
-  if(!first) std::cout << "},\n";
+  if(!first)
+    std::cout << "},\n";
 
   std::cout <<
     "{ 0, 0 }\n"

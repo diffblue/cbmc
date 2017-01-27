@@ -64,7 +64,8 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
     if(using_directive)
     {
       if((*it)->id_class==cpp_idt::NAMESPACE)
-        cpp_scopes.current_scope().add_using_scope(static_cast<cpp_scopet &>(**it));
+        cpp_scopes.current_scope().add_using_scope(
+          static_cast<cpp_scopet &>(**it));
       else
       {
         // we should likely complain about this

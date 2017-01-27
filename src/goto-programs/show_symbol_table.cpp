@@ -68,7 +68,8 @@ void show_symbol_table_plain(
     else
     {
       ptr=get_language_from_mode(symbol.mode);
-      if(ptr==NULL) throw "symbol "+id2string(symbol.name)+" has unknown mode";
+      if(ptr==NULL)
+        throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 
     std::unique_ptr<languaget> p(ptr);
@@ -89,22 +90,38 @@ void show_symbol_table_plain(
     out << "Value.......: " << value_str << '\n';
     out << "Flags.......:";
 
-    if(symbol.is_lvalue)          out << " lvalue";
-    if(symbol.is_static_lifetime) out << " static_lifetime";
-    if(symbol.is_thread_local)    out << " thread_local";
-    if(symbol.is_file_local)      out << " file_local";
-    if(symbol.is_type)            out << " type";
-    if(symbol.is_extern)          out << " extern";
-    if(symbol.is_input)           out << " input";
-    if(symbol.is_output)          out << " output";
-    if(symbol.is_macro)           out << " macro";
-    if(symbol.is_parameter)       out << " parameter";
-    if(symbol.is_auxiliary)       out << " auxiliary";
-    if(symbol.is_weak)            out << " weak";
-    if(symbol.is_property)        out << " property";
-    if(symbol.is_state_var)       out << " state_var";
-    if(symbol.is_exported)        out << " exported";
-    if(symbol.is_volatile)        out << " volatile";
+    if(symbol.is_lvalue)
+      out << " lvalue";
+    if(symbol.is_static_lifetime)
+      out << " static_lifetime";
+    if(symbol.is_thread_local)
+      out << " thread_local";
+    if(symbol.is_file_local)
+      out << " file_local";
+    if(symbol.is_type)
+      out << " type";
+    if(symbol.is_extern)
+      out << " extern";
+    if(symbol.is_input)
+      out << " input";
+    if(symbol.is_output)
+      out << " output";
+    if(symbol.is_macro)
+      out << " macro";
+    if(symbol.is_parameter)
+      out << " parameter";
+    if(symbol.is_auxiliary)
+      out << " auxiliary";
+    if(symbol.is_weak)
+      out << " weak";
+    if(symbol.is_property)
+      out << " property";
+    if(symbol.is_state_var)
+      out << " state_var";
+    if(symbol.is_exported)
+      out << " exported";
+    if(symbol.is_volatile)
+      out << " volatile";
 
     out << '\n';
     out << "Location....: " << symbol.location << '\n';

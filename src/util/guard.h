@@ -21,7 +21,7 @@ public:
     make_true();
   }
 
-  guardt& operator=(const exprt &e)
+  guardt &operator=(const exprt &e)
   {
     *this=static_cast<const guardt&>(e);
 

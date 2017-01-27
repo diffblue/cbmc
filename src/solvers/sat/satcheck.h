@@ -11,14 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // this picks the "default" SAT solver
 
-//#define SATCHECK_ZCHAFF
-//#define SATCHECK_MINISAT1
+// #define SATCHECK_ZCHAFF
+// #define SATCHECK_MINISAT1
 #define SATCHECK_MINISAT2
-//#define SATCHECK_GLUCOSE
-//#define SATCHECK_BOOLEFORCE
-//#define SATCHECK_PRECOSAT
-//#define SATCHECK_PICOSAT
-//#define SATCHECK_LINGELING
+// #define SATCHECK_GLUCOSE
+// #define SATCHECK_BOOLEFORCE
+// #define SATCHECK_PRECOSAT
+// #define SATCHECK_PICOSAT
+// #define SATCHECK_LINGELING
 
 #if defined SATCHECK_ZCHAFF
 

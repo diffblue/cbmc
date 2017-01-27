@@ -73,10 +73,11 @@ public:
     if(get_sub().empty())
       return static_cast<const source_locationt &>(get_nil_irep());
     else
-      return static_cast<const source_locationt &>(get_sub().front().find(ID_C_source_location));
+      return static_cast<const source_locationt &>(
+        get_sub().front().find(ID_C_source_location));
   }
 
-  //void convert(std::string &identifier, std::string &base_name) const;
+  // void convert(std::string &identifier, std::string &base_name) const;
   irep_idt get_base_name() const;
 
   // one of three:
@@ -93,7 +94,8 @@ public:
 
   bool is_operator() const
   {
-    if(get_sub().empty()) return false;
+    if(get_sub().empty())
+      return false;
     return get_sub().front().id()==ID_operator;
   }
 

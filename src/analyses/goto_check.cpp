@@ -39,12 +39,17 @@ public:
     enable_pointer_check=_options.get_bool_option("pointer-check");
     enable_memory_leak_check=_options.get_bool_option("memory-leak-check");
     enable_div_by_zero_check=_options.get_bool_option("div-by-zero-check");
-    enable_signed_overflow_check=_options.get_bool_option("signed-overflow-check");
-    enable_unsigned_overflow_check=_options.get_bool_option("unsigned-overflow-check");
-    enable_pointer_overflow_check=_options.get_bool_option("pointer-overflow-check");
+    enable_signed_overflow_check=
+      _options.get_bool_option("signed-overflow-check");
+    enable_unsigned_overflow_check=
+      _options.get_bool_option("unsigned-overflow-check");
+    enable_pointer_overflow_check=
+      _options.get_bool_option("pointer-overflow-check");
     enable_conversion_check=_options.get_bool_option("conversion-check");
-    enable_undefined_shift_check=_options.get_bool_option("undefined-shift-check");
-    enable_float_overflow_check=_options.get_bool_option("float-overflow-check");
+    enable_undefined_shift_check=
+      _options.get_bool_option("undefined-shift-check");
+    enable_float_overflow_check=
+      _options.get_bool_option("float-overflow-check");
     enable_simplify=_options.get_bool_option("simplify");
     enable_nan_check=_options.get_bool_option("nan-check");
     retain_trivial=_options.get_bool_option("retain-trivial");
@@ -848,9 +853,14 @@ void goto_checkt::nan_check(
     exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
     exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
 
-    isnan=or_exprt(
-      and_exprt(equal_exprt(expr.op0(), minus_inf), equal_exprt(expr.op1(), plus_inf)),
-      and_exprt(equal_exprt(expr.op0(), plus_inf), equal_exprt(expr.op1(), minus_inf)));
+    isnan=
+      or_exprt(
+        and_exprt(
+          equal_exprt(expr.op0(), minus_inf),
+          equal_exprt(expr.op1(), plus_inf)),
+        and_exprt(
+          equal_exprt(expr.op0(), plus_inf),
+          equal_exprt(expr.op1(), minus_inf)));
   }
   else if(expr.id()==ID_minus)
   {
@@ -862,9 +872,14 @@ void goto_checkt::nan_check(
     exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
     exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
 
-    isnan=or_exprt(
-      and_exprt(equal_exprt(expr.op0(), plus_inf), equal_exprt(expr.op1(), plus_inf)),
-      and_exprt(equal_exprt(expr.op0(), minus_inf), equal_exprt(expr.op1(), minus_inf)));
+    isnan=
+      or_exprt(
+        and_exprt(
+          equal_exprt(expr.op0(), plus_inf),
+          equal_exprt(expr.op1(), plus_inf)),
+        and_exprt(
+          equal_exprt(expr.op0(), minus_inf),
+          equal_exprt(expr.op1(), minus_inf)));
   }
   else
     assert(false);
@@ -1693,7 +1708,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
         exprt pointer=i.code.op0().op0();
 
-        if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
+        if(pointer.type().subtype().get(ID_identifier)!=
+           "java::java.lang.AssertionError")
         {
           notequal_exprt not_eq_null(
             pointer,
@@ -1740,8 +1756,12 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
             address_of_expr.make_typecast(lhs.type());
-          exprt rhs=if_exprt(
-            side_effect_expr_nondett(bool_typet()), address_of_expr, lhs, lhs.type());
+          exprt rhs=
+            if_exprt(
+              side_effect_expr_nondett(bool_typet()),
+              address_of_expr,
+              lhs,
+              lhs.type());
           t->source_location=i.source_location;
           t->code=code_assignt(lhs, rhs);
           t->code.add_source_location()=i.source_location;
@@ -1790,7 +1810,8 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
           i_it->source_location.set_line(it->source_location.get_line());
 
         if(it->source_location.get_function()!=irep_idt())
-          i_it->source_location.set_function(it->source_location.get_function());
+          i_it->source_location.set_function(
+            it->source_location.get_function());
 
         if(it->source_location.get_column()!=irep_idt())
           i_it->source_location.set_column(it->source_location.get_column());

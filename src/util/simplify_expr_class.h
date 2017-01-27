@@ -108,7 +108,8 @@ public:
   bool simplify_popcount(exprt &expr);
 
   // auxiliary
-  bool simplify_if_implies(exprt &expr, const exprt &cond, bool truth, bool &new_truth);
+  bool simplify_if_implies(
+    exprt &expr, const exprt &cond, bool truth, bool &new_truth);
   bool simplify_if_recursive(exprt &expr, const exprt &cond, bool truth);
   bool simplify_if_conj(exprt &expr, const exprt &cond);
   bool simplify_if_disj(exprt &expr, const exprt &cond);
@@ -141,7 +142,8 @@ public:
   }
 
   // bit-level conversions
-  exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
+  exprt bits2expr(
+    const std::string &bits, const typet &type, bool little_endian);
   std::string expr2bits(const exprt &expr, bool little_endian);
 
 protected:

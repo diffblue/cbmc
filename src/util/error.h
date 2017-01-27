@@ -22,7 +22,7 @@ public:
     return "";
   }
 
-  virtual ~error_baset() throw ()
+  virtual ~error_baset() throw()
   {
   }
 

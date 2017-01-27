@@ -1502,6 +1502,7 @@ void goto_instrument_parse_optionst::help()
     " --my-events                  only instruments events whose ids appear in inst.evt\n" // NOLINT(*)
     " --cfg-kill                   enables symbolic execution used to reduce spurious cycles\n" // NOLINT(*)
     " --no-dependencies            no dependency analysis\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --no-po-rendering            no representation of the threads in the dot\n"
     " --render-cluster-file        clusterises the dot by files\n"
     " --render-cluster-function    clusterises the dot by functions\n"

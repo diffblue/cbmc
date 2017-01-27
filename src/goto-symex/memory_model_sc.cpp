@@ -137,7 +137,8 @@ void memory_model_sct::thread_spawn(
     {
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
-      if(next_thread==per_thread_map.end()) continue;
+      if(next_thread==per_thread_map.end())
+        continue;
 
       // add a constraint for all events,
       // considering regression/cbmc-concurrency/pthread_create_tso1
@@ -175,7 +176,8 @@ void memory_model_sct::thread_spawn(
     {
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
-      if(next_thread==per_thread_map.end()) continue;
+      if(next_thread==per_thread_map.end())
+        continue;
 
       // For SC and several weaker memory models a memory barrier
       // at the beginning of a thread can simply be ignored, because
@@ -420,7 +422,6 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             add_constraint(equation,
               cond, "fr", r->source);
         }
-
       }
     }
   }

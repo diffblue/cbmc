@@ -207,7 +207,8 @@ void convert(
           json_objectt &json_location_only=dest_array.push_back().make_object();
           json_location_only["stepType"]=json_stringt("location-only");
           json_location_only["hidden"]=jsont::json_boolean(step.hidden);
-          json_location_only["thread"]=json_numbert(std::to_string(step.thread_nr));
+          json_location_only["thread"]=
+            json_numbert(std::to_string(step.thread_nr));
           json_location_only["sourceLocation"]=json_location;
         }
       }

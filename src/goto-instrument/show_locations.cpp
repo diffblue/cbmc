@@ -52,7 +52,8 @@ void show_locations(
 
         l.new_element("line").data=id2string(source_location.get_line());
         l.new_element("file").data=id2string(source_location.get_file());
-        l.new_element("function").data=id2string(source_location.get_function());
+        l.new_element("function").data=
+          id2string(source_location.get_function());
 
         std::cout << xml << std::endl;
       }

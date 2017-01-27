@@ -45,7 +45,6 @@ void ansi_c_declaratort::build(irept &src)
     else if(t.id()==irep_idt() ||
             t.is_nil())
     {
-      //std::cerr << "D: " << src.pretty() << std::endl;
       assert(0);
     }
     else if(t.id()==ID_abstract)
@@ -82,16 +81,26 @@ Function: ansi_c_declarationt::output
 void ansi_c_declarationt::output(std::ostream &out) const
 {
   out << "Flags:";
-  if(get_is_typedef()) out << " is_typedef";
-  if(get_is_enum_constant()) out << " is_enum_constant";
-  if(get_is_static()) out << " is_static";
-  if(get_is_parameter()) out << " is_parameter";
-  if(get_is_global()) out << " is_global";
-  if(get_is_register()) out << " is_register";
-  if(get_is_thread_local()) out << " is_thread_local";
-  if(get_is_inline()) out << " is_inline";
-  if(get_is_extern()) out << " is_extern";
-  if(get_is_static_assert()) out << " is_static_assert";
+  if(get_is_typedef())
+    out << " is_typedef";
+  if(get_is_enum_constant())
+    out << " is_enum_constant";
+  if(get_is_static())
+    out << " is_static";
+  if(get_is_parameter())
+    out << " is_parameter";
+  if(get_is_global())
+    out << " is_global";
+  if(get_is_register())
+    out << " is_register";
+  if(get_is_thread_local())
+    out << " is_thread_local";
+  if(get_is_inline())
+    out << " is_inline";
+  if(get_is_extern())
+    out << " is_extern";
+  if(get_is_static_assert())
+    out << " is_static_assert";
   out << "\n";
 
   out << "Type: " << type().pretty() << "\n";

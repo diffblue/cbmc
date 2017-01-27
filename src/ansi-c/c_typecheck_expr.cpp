@@ -157,7 +157,8 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   else if(type1.id()==ID_array &&
           type2.id()==ID_array)
   {
-    return gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
+    return
+      gcc_types_compatible_p(type1.subtype(), type2.subtype()); // ignore size
   }
   else if(type1.id()==ID_code &&
           type2.id()==ID_code)
@@ -426,7 +427,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     {
       if(it->get(ID_type_arg)==ID_default)
         default_match=static_cast<const exprt &>(it->find(ID_value));
-      else if(op_type==follow(static_cast<const typet &>(it->find(ID_type_arg))))
+      else if(op_type==
+              follow(static_cast<const typet &>(it->find(ID_type_arg))))
         assoc_match=static_cast<const exprt &>(it->find(ID_value));
     }
 
@@ -677,7 +679,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               {
                 if(type.id()==ID_struct)
                 {
-                  exprt o=c_offsetof(to_struct_type(type), c_it->get_name(), *this);
+                  exprt o=
+                    c_offsetof(to_struct_type(type), c_it->get_name(), *this);
 
                   if(o.is_nil())
                   {
@@ -730,7 +733,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       typecheck_expr(index);
 
       exprt sub_size=c_sizeof(type.subtype(), *this);
-      if(index.type()!=size_type()) index.make_typecast(size_type());
+      if(index.type()!=size_type())
+        index.make_typecast(size_type());
       result=plus_exprt(result, mult_exprt(sub_size, index));
 
       typet tmp=type.subtype();
@@ -890,7 +894,9 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   if(symbol.is_macro)
   {
     // preserve enum key
-    //irep_idt base_name=expr.get(ID_C_base_name);
+    #if 0
+    irep_idt base_name=expr.get(ID_C_base_name);
+    #endif
 
     follow_macros(expr);
 
@@ -2168,7 +2174,8 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
   else if(has_prefix(id2string(statement), "assign"))
     typecheck_side_effect_assignment(expr);
   else if(statement==ID_function_call)
-    typecheck_side_effect_function_call(to_side_effect_expr_function_call(expr));
+    typecheck_side_effect_function_call(
+      to_side_effect_expr_function_call(expr));
   else if(statement==ID_statement_expression)
     typecheck_side_effect_statement_expression(expr);
   else if(statement==ID_gcc_conditional_expression)
@@ -2334,7 +2341,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt same_object_expr=same_object(expr.arguments()[0], expr.arguments()[1]);
+    exprt same_object_expr=
+      same_object(expr.arguments()[0], expr.arguments()[1]);
     same_object_expr.add_source_location()=source_location;
 
     return same_object_expr;
@@ -2351,7 +2359,8 @@ exprt c_typecheck_baset::do_special_functions(
     typecheck_function_call_arguments(expr);
 
     exprt get_must_expr=
-      binary_predicate_exprt(expr.arguments()[0], "get_must", expr.arguments()[1]);
+      binary_predicate_exprt(
+        expr.arguments()[0], "get_must", expr.arguments()[1]);
     get_must_expr.add_source_location()=source_location;
 
     return get_must_expr;
@@ -2368,7 +2377,8 @@ exprt c_typecheck_baset::do_special_functions(
     typecheck_function_call_arguments(expr);
 
     exprt get_may_expr=
-      binary_predicate_exprt(expr.arguments()[0], "get_may", expr.arguments()[1]);
+      binary_predicate_exprt(
+        expr.arguments()[0], "get_may", expr.arguments()[1]);
     get_may_expr.add_source_location()=source_location;
 
     return get_may_expr;
@@ -2538,7 +2548,8 @@ exprt c_typecheck_baset::do_special_functions(
           identifier=="__builtin_inf")
   {
     constant_exprt inf_expr=
-      ieee_floatt::plus_infinity(ieee_float_spect::double_precision()).to_expr();
+      ieee_floatt::plus_infinity(
+        ieee_float_spect::double_precision()).to_expr();
     inf_expr.add_source_location()=source_location;
 
     return inf_expr;
@@ -2546,7 +2557,8 @@ exprt c_typecheck_baset::do_special_functions(
   else if(identifier==CPROVER_PREFIX "inff")
   {
     constant_exprt inff_expr=
-      ieee_floatt::plus_infinity(ieee_float_spect::single_precision()).to_expr();
+      ieee_floatt::plus_infinity(
+        ieee_float_spect::single_precision()).to_expr();
     inff_expr.add_source_location()=source_location;
 
     return inff_expr;
@@ -2735,8 +2747,8 @@ exprt c_typecheck_baset::do_special_functions(
     else if(to_integer(expr.arguments()[1], arg1))
     {
       err_location(f_op);
-      error() << "__builtin_object_size expects constant as second argument, but got "
-              << to_string(expr.arguments()[1]) << eom;
+      error() << "__builtin_object_size expects constant as second argument, "
+              << "but got " << to_string(expr.arguments()[1]) << eom;
       throw 0;
     }
 
@@ -3128,14 +3140,20 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
 
   // compare dimension
   mp_integer s0, s1;
-  if(to_integer(type0.size(), s0)) return false;
-  if(to_integer(type1.size(), s1)) return false;
-  if(s0!=s1) return false;
+  if(to_integer(type0.size(), s0))
+    return false;
+  if(to_integer(type1.size(), s1))
+    return false;
+  if(s0!=s1)
+    return false;
 
   // comparse subtype
-  if((type0.subtype().id()==ID_signedbv || type0.subtype().id()==ID_unsignedbv) &&
-     (type1.subtype().id()==ID_signedbv || type1.subtype().id()==ID_unsignedbv) &&
-     to_bitvector_type(type0.subtype()).get_width()==to_bitvector_type(type1.subtype()).get_width())
+  if((type0.subtype().id()==ID_signedbv ||
+      type0.subtype().id()==ID_unsignedbv) &&
+     (type1.subtype().id()==ID_signedbv ||
+      type1.subtype().id()==ID_unsignedbv) &&
+     to_bitvector_type(type0.subtype()).get_width()==
+     to_bitvector_type(type1.subtype()).get_width())
     return true;
 
   return type0.subtype()==type1.subtype();
@@ -3172,11 +3190,13 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(gcc_vector_types_compatible(to_vector_type(o_type0), to_vector_type(o_type1)) &&
+    if(gcc_vector_types_compatible(
+        to_vector_type(o_type0), to_vector_type(o_type1)) &&
        is_number(follow(o_type0.subtype())))
     {
       // Vector arithmetic has fairly strict typing rules, no promotion
-      if(o_type0!=o_type1) op1.make_typecast(op0.type());
+      if(o_type0!=o_type1)
+        op1.make_typecast(op0.type());
       expr.type()=op0.type();
       return;
     }
@@ -3280,7 +3300,8 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     if(follow(o_type0.subtype())==follow(o_type1.subtype()) &&
        is_number(follow(o_type0.subtype())))
     {
-      // {a0, a1, ..., an} >> {b0, b1, ..., bn} == {a0 >> b0, a1 >> b1, ..., an >> bn}
+      // {a0, a1, ..., an} >> {b0, b1, ..., bn} ==
+      // {a0 >> b0, a1 >> b1, ..., an >> bn}
       // Fairly strict typing rules, no promotion
       expr.type()=op0.type();
       return;
@@ -3509,7 +3530,8 @@ Function: c_typecheck_baset::typecheck_side_effect_assignment
 
 \*******************************************************************/
 
-void c_typecheck_baset::typecheck_side_effect_assignment(side_effect_exprt &expr)
+void c_typecheck_baset::typecheck_side_effect_assignment(
+  side_effect_exprt &expr)
 {
   if(expr.operands().size()!=2)
   {

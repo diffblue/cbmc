@@ -82,8 +82,10 @@ Function: smt2_convt::l_get
 
 tvt smt2_convt::l_get(literalt l) const
 {
-  if(l.is_true()) return tvt(true);
-  if(l.is_false()) return tvt(false);
+  if(l.is_true())
+    return tvt(true);
+  if(l.is_false())
+    return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
@@ -163,7 +165,7 @@ void smt2_convt::write_footer(std::ostream &out)
   out << "(check-sat)" << "\n";
   out << "\n";
 
-  if (solver!=BOOLECTOR)
+  if(solver!=BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
       out << "(get-value (|" << id << "|))" << "\n";
@@ -271,7 +273,8 @@ exprt smt2_convt::get(const exprt &expr) const
   {
     const member_exprt &member_expr=to_member_expr(expr);
     exprt tmp=get(member_expr.struct_op());
-    if(tmp.is_nil()) return nil_exprt();
+    if(tmp.is_nil())
+      return nil_exprt();
     return member_exprt(tmp, member_expr.get_component_name(), expr.type());
   }
 
@@ -332,7 +335,8 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(src.get_sub().size()==3 &&
           src.get_sub()[0].id()=="_" &&
-          src.get_sub()[1].id_string().substr(0, 2)=="bv") // (_ bvDECIMAL_VALUE SIZE)
+          // (_ bvDECIMAL_VALUE SIZE)
+          src.get_sub()[1].id_string().substr(0, 2)=="bv")
   {
     value=string2integer(src.get_sub()[1].id_string().substr(2));
   }
@@ -428,7 +432,8 @@ exprt smt2_convt::parse_array(
   if(src.get_sub().size()==4 && src.get_sub()[0].id()=="store")
   {
     // (store array index value)
-    if(src.get_sub().size()!=4) return nil_exprt();
+    if(src.get_sub().size()!=4)
+      return nil_exprt();
 
     exprt array=parse_array(src.get_sub()[1], type);
     exprt index=parse_rec(src.get_sub()[2], type.size().type());
@@ -471,7 +476,8 @@ exprt smt2_convt::parse_union(
   const union_typet::componentt &first=type.components().front();
   std::size_t width=boolbv_width(type);
   exprt value=parse_rec(src, bv_typet(width));
-  if(value.is_nil()) return nil_exprt();
+  if(value.is_nil())
+    return nil_exprt();
   exprt converted=typecast_exprt(value, first.type());
   return union_exprt(first.get_name(), converted, type);
 }
@@ -521,10 +527,12 @@ exprt smt2_convt::parse_struct(
     // These are just flattened, i.e., we expect to see a monster bit vector.
     std::size_t total_width=boolbv_width(type);
     exprt l=parse_literal(src, bv_typet(total_width));
-    if(!l.is_constant()) return nil_exprt();
+    if(!l.is_constant())
+      return nil_exprt();
 
     irep_idt binary=to_constant_expr(l).get_value();
-    if(binary.size()!=total_width) return nil_exprt();
+    if(binary.size()!=total_width)
+      return nil_exprt();
 
     std::size_t offset=0;
 
@@ -1563,7 +1571,8 @@ void smt2_convt::convert_expr(const exprt &expr)
     std::size_t result_width=boolbv_width(expr.type());
 
     // max extract width
-    if(offset_bits>result_width) offset_bits=result_width;
+    if(offset_bits>result_width)
+      offset_bits=result_width;
 
     // too few bits?
     if(result_width>offset_bits)
@@ -1664,7 +1673,8 @@ void smt2_convt::convert_expr(const exprt &expr)
       if(to_integer(expr.op2(), op2_i))
         INVALIDEXPR("extractbits: to_integer failed");
 
-      if(op2_i>op1_i) std::swap(op1_i, op2_i);
+      if(op2_i>op1_i)
+        std::swap(op1_i, op2_i);
 
       // now op1_i>=op2_i
 
@@ -1896,8 +1906,8 @@ void smt2_convt::convert_expr(const exprt &expr)
       convert_expr(expr.op1());
       out << ")))) "; // sign_extend, bvadd/sub let2
       out << "(not (= "
-                      "((_ extract " << width << " " << width << ") ?sum) "
-                      "((_ extract " << (width-1) << " " << (width-1) << ") ?sum)";
+                   "((_ extract " << width << " " << width << ") ?sum) "
+                   "((_ extract " << (width-1) << " " << (width-1) << ") ?sum)";
       out << ")))"; // =, not, let
     }
     else if(op_type.id()==ID_unsignedbv ||
@@ -1935,8 +1945,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ") ((_ sign_extend " << width << ") ";
       convert_expr(expr.op1());
       out << ")) )) ";
-      out << "(or (bvsge prod (_ bv" << power(2, width-1) << " " << width*2 << "))";
-      out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " " << width*2 << ")))))";
+      out << "(or (bvsge prod (_ bv" << power(2, width-1) << " "
+          << width*2 << "))";
+      out << " (bvslt prod (bvneg (_ bv" << power(2, width-1) << " "
+          << width*2 << ")))))";
     }
     else if(op_type.id()==ID_unsignedbv)
     {
@@ -2188,8 +2200,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
              "(_ bv0 " << from_fraction_bits << ")))";
 
       // number negative
-      out << " (= ((_ extract " << (from_width-1) << " " << (from_width-1) << ") ?tcop) "
-             "#b1)";
+      out << " (= ((_ extract " << (from_width-1) << " " << (from_width-1)
+          << ") ?tcop) #b1)";
 
       out << ")"; // and
 
@@ -2800,11 +2812,13 @@ void smt2_convt::flatten_array(const exprt &expr)
 
   for(mp_integer i=size; i!=0; --i)
   {
-    if(i!=1) out << "(concat ";
+    if(i!=1)
+      out << "(concat ";
     out << "(select ?far ";
     convert_expr(from_integer(i-1, array_type.size().type()));
     out << ")";
-    if(i!=1) out << " ";
+    if(i!=1)
+      out << " ";
   }
 
   // close the many parentheses
@@ -3859,7 +3873,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
       out << "(bvor ";
       out << "(bvand ";
-      out << "(bvlshr (_ bv" << power(2, array_width)-1 << " " << array_width << ") ";
+      out << "(bvlshr (_ bv" << power(2, array_width)-1 << " "
+          << array_width << ") ";
       out << "distance?) ";
       convert_expr(expr.old());
       out << ") "; // bvand
@@ -3914,7 +3929,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
       {
         // the member is at the beginning
         out << "(concat "
-            << "((_ extract " << (struct_width-1) << " " << m.width << ") ?withop) ";
+            << "((_ extract " << (struct_width-1) << " "
+                              << m.width << ") ?withop) ";
         convert_expr(value);
         out << ")"; // concat
       }
@@ -3929,7 +3945,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
       {
         // most general case, need two concat-s
         out << "(concat (concat "
-            << "((_ extract " << (struct_width-1) << " " << (m.offset+m.width) << ") ?withop) ";
+            << "((_ extract " << (struct_width-1) << " "
+                              << (m.offset+m.width) << ") ?withop) ";
         convert_expr(value);
         out << ") ((_ extract " << (m.offset-1) << " 0) ?withop)";
         out << ")"; // concat
@@ -4770,7 +4787,8 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       for(unsigned i=0; i<expr.operands().size(); i++)
       {
-        if(i!=0) out << " ";
+        if(i!=0)
+          out << " ";
         out << "(op" << i << ' ';
         convert_type(expr.operands()[i].type());
         out << ')';

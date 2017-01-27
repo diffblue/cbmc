@@ -277,7 +277,8 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
     unsigned char ch=in.get();
     res|=(size_t(ch&0x7f))<<shift_distance;
     shift_distance+=7;
-    if((ch&0x80)==0) break;
+    if((ch&0x80)==0)
+      break;
   }
 
   return res;
@@ -301,7 +302,8 @@ void write_gb_string(std::ostream &out, const std::string &s)
       it!=s.end();
       ++it)
   {
-    if(*it==0 || *it=='\\') out.put('\\'); // escape specials
+    if(*it==0 || *it=='\\')
+      out.put('\\'); // escape specials
     out << *it;
   }
 
@@ -389,7 +391,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
 
   if(id>=ireps_container.string_rev_map.size())
     ireps_container.string_rev_map.resize(1+id*2,
-      std::pair<bool, irep_idt>( false, irep_idt() ));
+      std::pair<bool, irep_idt>(false, irep_idt()));
 
   if(ireps_container.string_rev_map[id].first)
   {

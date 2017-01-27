@@ -572,7 +572,8 @@ bool boolbvt::type_conversion(
         {
           std::size_t offset=dest_offsets[i];
           std::size_t comp_width=boolbv_width(dest_comp[i].type());
-          if(comp_width==0) continue;
+          if(comp_width==0)
+            continue;
 
           op_mapt::const_iterator it=
             op_map.find(dest_comp[i].get_name());

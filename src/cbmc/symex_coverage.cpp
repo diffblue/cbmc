@@ -219,7 +219,8 @@ void goto_program_coverage_recordt::compute_line_coverage(
     if(entry.second)
     {
       ++lines_total;
-      if(is_branch) ++branches_total;
+      if(is_branch)
+        ++branches_total;
     }
 
     // mark as branch if any instruction in this source code line is
@@ -414,7 +415,8 @@ bool symex_coveraget::output_report(
   build_cobertura(goto_functions, xml_coverage);
 
   os << "<?xml version=\"1.0\"?>\n";
-  os << "<!DOCTYPE coverage SYSTEM \"http://cobertura.sourceforge.net/xml/coverage-04.dtd\">\n";
+  os << "<!DOCTYPE coverage SYSTEM \""
+     << "http://cobertura.sourceforge.net/xml/coverage-04.dtd\">\n";
   os << xml_coverage;
 
   return !os.good();

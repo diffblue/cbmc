@@ -50,7 +50,8 @@ protected:
 
   void offset_arithmetic(bvt &bv, const mp_integer &x);
   void offset_arithmetic(bvt &bv, const mp_integer &factor, const exprt &index);
-  void offset_arithmetic(bvt &bv, const mp_integer &factor, const bvt &index_bv);
+  void offset_arithmetic(
+    bvt &bv, const mp_integer &factor, const bvt &index_bv);
 
   struct postponedt
   {

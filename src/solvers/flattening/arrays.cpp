@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #include <cassert>
 #include <iostream>
@@ -134,7 +134,7 @@ void arrayst::collect_indices(const exprt &expr)
   else
   {
     const index_exprt &e = to_index_expr(expr);
-    collect_indices(e.index()); //necessary?
+    collect_indices(e.index()); // necessary?
 
     const typet &array_op_type=ns.follow(e.array().type());
 
@@ -190,7 +190,7 @@ void arrayst::collect_arrays(const exprt &a)
     index_expr.index()=a.op1();
     record_array_index(index_expr);
   }
-  else if(a.id()==ID_update) //TODO: is this obsolete?
+  else if(a.id()==ID_update) // TODO: is this obsolete?
   {
     if(a.operands().size()!=3)
       throw "update expected to have three operands";
@@ -247,7 +247,8 @@ void arrayst::collect_arrays(const exprt &a)
   else if(a.id()==ID_member)
   {
     if(to_member_expr(a).struct_op().id()!=ID_symbol)
-      throw "unexpected array expression: member with `"+a.op0().id_string()+"'";
+      throw
+        "unexpected array expression: member with `"+a.op0().id_string()+"'";
   }
   else if(a.id()==ID_constant ||
           a.id()==ID_array ||
@@ -301,12 +302,12 @@ Function: arrayst::add_array_constraint
 
 void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
 {
-  if (lazy_arrays && refine)
+  if(lazy_arrays && refine)
   {
     // lazily add the constraint
-    if (incremental_cache)
+    if(incremental_cache)
     {
-      if (expr_map.find(lazy.lazy) == expr_map.end())
+      if(expr_map.find(lazy.lazy) == expr_map.end())
       {
         lazy_array_constraints.push_back(lazy);
         expr_map[lazy.lazy] = true;
@@ -353,7 +354,7 @@ void arrayst::add_array_constraints()
 
     add_array_constraints(index_map[arrays.find_number(i)], a);
 
-    //we have to update before it gets used in the next add_* call
+    // we have to update before it gets used in the next add_* call
     update_index_map(false);
   }
 
@@ -441,10 +442,10 @@ void arrayst::add_array_Ackermann_constraints()
 
             equal_exprt values_equal(index_expr1, index_expr2);
 
-            //add constraint
+            // add constraint
             lazy_constraintt lazy(ARRAY_ACKERMANN,
               or_exprt(literal_exprt(!indices_equal_lit), values_equal));
-            add_array_constraint(lazy, true); //added lazily
+            add_array_constraint(lazy, true); // added lazily
 
 #if 0 // old code for adding, not significantly faster
             prop.lcnf(!indices_equal_lit, convert(values_equal));
@@ -490,8 +491,10 @@ void arrayst::update_index_map(bool update_all)
   //     (and we cannot do that in record_array_index())
   //  -- equivalence classes have been merged
   if(update_all)
+  {
     for(std::size_t i=0; i<arrays.size(); i++)
       update_index_map(i);
+  }
   else
   {
     for(std::set<std::size_t>::const_iterator
@@ -502,7 +505,7 @@ void arrayst::update_index_map(bool update_all)
   }
 
 #ifdef DEBUG
-  //print index sets
+  // print index sets
   for(index_mapt::const_iterator
       i1=index_map.begin();
       i1!=index_map.end();
@@ -513,9 +516,10 @@ void arrayst::update_index_map(bool update_all)
         i2++)
       std::cout << "Index set (" << i1->first << " = "
                 << arrays.find_number(i1->first) << " = "
-                << from_expr(ns, "", arrays[arrays.find_number(i1->first)]) << "): "
+                << from_expr(ns, "", arrays[arrays.find_number(i1->first)])
+                << "): "
                 << from_expr(ns, "", *i2) << std::endl;
-   std::cout << "-----" << std::endl;
+  std::cout << "-----" << std::endl;
 #endif
 }
 
@@ -634,14 +638,16 @@ void arrayst::add_array_constraints(
       // add constraint
       lazy_constraintt lazy(ARRAY_TYPECAST,
         equal_exprt(index_expr1, index_expr2));
-      add_array_constraint(lazy, false); //added immediately
+      add_array_constraint(lazy, false); // added immediately
     }
   }
   else if(expr.id()==ID_index)
   {
   }
   else
-    throw "unexpected array expression (add_array_constraints): `"+expr.id_string()+"'";
+    throw
+      "unexpected array expression (add_array_constraints): `"+
+        expr.id_string()+"'";
 }
 
 /*******************************************************************\
@@ -679,7 +685,7 @@ void arrayst::add_array_constraints_with(
     }
 
      lazy_constraintt lazy(ARRAY_WITH, equal_exprt(index_expr, value));
-     add_array_constraint(lazy, false); //added immediately
+     add_array_constraint(lazy, false); // added immediately
   }
 
   // use other array index applications for "else" case
@@ -720,7 +726,7 @@ void arrayst::add_array_constraints_with(
         // add constraint
         lazy_constraintt lazy(ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
-        add_array_constraint(lazy, false); //added immediately
+        add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster
         {
@@ -859,7 +865,7 @@ void arrayst::add_array_constraints_array_of(
 
     // add constraint
     lazy_constraintt lazy(ARRAY_OF, equal_exprt(index_expr, expr.op0()));
-    add_array_constraint(lazy, false); //added immediately
+    add_array_constraint(lazy, false); // added immediately
   }
 }
 
@@ -909,7 +915,7 @@ void arrayst::add_array_constraints_if(
     lazy_constraintt lazy(ARRAY_IF,
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); //added immediately
+    add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster
     prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
@@ -937,9 +943,9 @@ void arrayst::add_array_constraints_if(
     // add implication
     lazy_constraintt lazy(ARRAY_IF, or_exprt(literal_exprt(cond_lit),
                           equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); //added immediately
+    add_array_constraint(lazy, false); // added immediately
 
-#if 0 //old code for adding, not significantly faster
+#if 0 // old code for adding, not significantly faster
     prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
 #endif
   }

@@ -91,7 +91,10 @@ public:
     return insert(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
@@ -313,9 +316,10 @@ protected:
 
   void flatten(const entryt &e, object_mapt &dest) const;
 
-  void flatten_rec( const entryt&,
-                    object_mapt&,
-                    flatten_seent&) const;
+  void flatten_rec(
+    const entryt&,
+    object_mapt&,
+    flatten_seent&) const;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H

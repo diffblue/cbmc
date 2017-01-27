@@ -48,7 +48,7 @@ bool simplify_exprt::simplify_bswap(exprt &expr)
 
     // take apart
     for(std::size_t bit=0; bit<width; bit+=8)
-      bytes.push_back((value>>bit)%256);
+      bytes.push_back((value >> bit)%256);
 
     // put back together, but backwards
     mp_integer new_value=0;
@@ -103,7 +103,8 @@ bool simplify_exprt::simplify_mult(exprt &expr)
       it!=operands.end();)
   {
     // if one of the operands is not a number return
-    if(!is_number(it->type())) return true;
+    if(!is_number(it->type()))
+      return true;
 
     // if one of the operands is zero the result is zero
     // note: not true on IEEE floating point arithmetic
@@ -128,7 +129,8 @@ bool simplify_exprt::simplify_mult(exprt &expr)
       if(found)
       {
         // update the constant factor
-        if(!constant->mul(*it)) do_erase=true;
+        if(!constant->mul(*it))
+          do_erase=true;
       }
       else
       {
@@ -492,8 +494,10 @@ bool simplify_exprt::simplify_plus(exprt &expr)
     // now search for a
     Forall_expr(it, operands)
     {
-      if(expr_map.empty()) break;
-      else if(it->id()==ID_unary_minus) continue;
+      if(expr_map.empty())
+        break;
+      else if(it->id()==ID_unary_minus)
+        continue;
 
       expr_mapt::iterator itm=expr_map.find(*it);
 
@@ -1042,7 +1046,8 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
       if(distance>=0)
       {
         mp_integer new_value=value/power(2, distance);
-        if(value<0 && new_value==0) new_value=-1;
+        if(value<0 && new_value==0)
+          new_value=-1;
 
         expr=from_integer(new_value, expr.type());
         return false;
@@ -1281,11 +1286,13 @@ Function: simplify_exprt::simplify_bitnot
 
 bool simplify_exprt::simplify_bitnot(exprt &expr)
 {
-  if(!expr.has_operands()) return true;
+  if(!expr.has_operands())
+    return true;
 
   exprt::operandst &operands=expr.operands();
 
-  if(operands.size()!=1) return true;
+  if(operands.size()!=1)
+    return true;
 
   exprt &op=operands.front();
 
@@ -1329,9 +1336,11 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
 
-  if(expr.type().id()!=ID_bool) return true;
+  if(expr.type().id()!=ID_bool)
+    return true;
 
-  if(operands.size()!=2) return true;
+  if(operands.size()!=2)
+    return true;
 
   exprt tmp0=expr.op0();
   exprt tmp1=expr.op1();
@@ -1923,7 +1932,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       // rules below do not hold for >=
       if(operand.id()==ID_unary_minus)
       {
-        if(operand.operands().size()!=1) return true;
+        if(operand.operands().size()!=1)
+          return true;
         exprt tmp;
         tmp.swap(operand.op0());
         operand.swap(tmp);

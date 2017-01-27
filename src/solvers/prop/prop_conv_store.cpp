@@ -116,7 +116,7 @@ void prop_conv_storet::constraintt::replay(prop_convt &dest) const
     break;
 
   case CONVERT:
-    //dest.prop.set_equal(dest.convert_rest(expr), literal);
+    // dest.prop.set_equal(dest.convert_rest(expr), literal);
     break;
 
   default:

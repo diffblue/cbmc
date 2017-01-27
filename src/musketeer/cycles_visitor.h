@@ -20,7 +20,7 @@ class cycles_visitort
 protected:
   typedef event_grapht::critical_cyclet::delayt edget;
 
-  fence_insertert& fence_inserter;
+  fence_insertert &fence_inserter;
 
 public:
   explicit cycles_visitort(fence_insertert& _fi)

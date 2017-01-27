@@ -189,8 +189,8 @@ void _rw_set_loct::read_write_rec(
       if(it->id()==ID_unknown)
       {
         /* as an under-approximation */
-        //std::cout << "Sorry, LOCAL_MAY too imprecise. Omitting some variables."
-        //  << std::endl;
+        // std::cout << "Sorry, LOCAL_MAY too imprecise. "
+        //           << Omitting some variables." << std::endl;
         irep_idt object=ID_unknown;
 
         entryt &entry=r_entries[object];
@@ -219,7 +219,6 @@ void _rw_set_loct::read_write_rec(
   else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-
   }
   else if(expr.id()==ID_if)
   {
@@ -269,8 +268,9 @@ void rw_set_functiont::compute_rec(const exprt &function)
 #ifdef LOCAL_MAY
       local_may_aliast local_may(f_it->second);
 #if 0
-      for(goto_functionst::function_mapt::const_iterator g_it=goto_functions.function_map.begin();
-        g_it!=goto_functions.function_map.end(); ++g_it)
+      for(goto_functionst::function_mapt::const_iterator
+          g_it=goto_functions.function_map.begin();
+          g_it!=goto_functions.function_map.end(); ++g_it)
         local_may(g_it->second);
 #endif
 #endif
@@ -281,7 +281,7 @@ void rw_set_functiont::compute_rec(const exprt &function)
 #ifdef LOCAL_MAY
         , local_may
 #endif
-        );
+        ); // NOLINT(whitespace/parens)
       }
     }
   }

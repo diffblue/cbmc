@@ -258,16 +258,16 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
     throw 0;
   }
   else if(expr.id()==ID_symbol)
-    typecheck_symbol_expr(to_symbol_expr (expr));
+    typecheck_symbol_expr(to_symbol_expr(expr));
   else if(expr.id()==ID_constant)
   {
   }
   else
   {
     // expressions are expected not to have type set just yet
-    assert(expr.type().is_nil()||expr.type().id().empty());
+    assert(expr.type().is_nil() || expr.type().id().empty());
 
-    if (expr.id()==ID_null ||
+    if(expr.id()==ID_null ||
         expr.id()=="undefined" ||
         expr.id()==ID_empty)
       typecheck_expr_constant(expr);
@@ -306,7 +306,8 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
       typecheck_expr_unary_num(expr);
       expr.type()=floatbv_typet();
     }
-    else if(expr.id()=="num_to_string") {
+    else if(expr.id()=="num_to_string")
+    {
       typecheck_expr_unary_num(expr);
       expr.type()=string_typet();
     }
@@ -518,7 +519,7 @@ void jsil_typecheckt::typecheck_expr_index(exprt &expr)
   make_type_compatible(expr.op1(), string_typet(), true);
 
   // special case for function identifiers
-  if (expr.op1().id()=="fid" || expr.op1().id()=="constructid")
+  if(expr.op1().id()=="fid" || expr.op1().id()=="constructid")
     expr.type()=code_typet();
   else
     expr.type()=jsil_value_type();
@@ -783,7 +784,7 @@ void jsil_typecheckt::typecheck_exp_binary_equal(exprt &expr)
     throw 0;
   }
 
- // operands can be of any types
+  // operands can be of any types
 
   expr.type()=bool_typet();
 }
@@ -1141,7 +1142,8 @@ void jsil_typecheckt::typecheck_function_call(
 
         for(std::size_t i=0; i<codet.parameters().size(); i++)
         {
-          if(i>=call.arguments().size()) break;
+          if(i>=call.arguments().size())
+            break;
 
           const typet &param_type=codet.parameters()[i].type();
 

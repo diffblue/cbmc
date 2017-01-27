@@ -103,8 +103,10 @@ public:
 protected:
   // helpers
   ieee_float_spect get_spec(const exprt &);
-  exprt get_exponent(const exprt &, const ieee_float_spect &); // still biased
-  exprt get_fraction(const exprt &, const ieee_float_spect &); // without hidden bit
+  // still biased
+  exprt get_exponent(const exprt &, const ieee_float_spect &);
+  // without hidden bit
+  exprt get_fraction(const exprt &, const ieee_float_spect &);
   exprt sign_bit(const exprt &);
 
   exprt exponent_all_ones(const exprt &, const ieee_float_spect &);

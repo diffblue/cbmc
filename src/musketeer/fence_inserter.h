@@ -78,7 +78,7 @@ public:
   const_graph_visitort const_graph_visitor;
 
 protected:
-  event_idt& unique;
+  event_idt &unique;
   unsigned fence_options;
 
   /* MIP variables to edges in po^+/\C */
@@ -90,7 +90,10 @@ protected:
   /* MIP matrix construction */
   void mip_set_var(ilpt& ilp, unsigned& i);
   void mip_set_cst(ilpt& ilp, unsigned& i);
-  void mip_fill_matrix(ilpt& ilp, unsigned& i, unsigned const_constraints_number,
+  void mip_fill_matrix(
+    ilpt &ilp,
+    unsigned &i,
+    unsigned const_constraints_number,
     unsigned const_unique);
 
   /* preprocessing (necessary as glpk static) and solving */

@@ -29,7 +29,8 @@ Function: bv_spect::to_type
 
 typet bv_spect::to_type() const
 {
-  if(is_signed) return signedbv_typet(width);
+  if(is_signed)
+    return signedbv_typet(width);
   return unsignedbv_typet(width);
 }
 
@@ -184,7 +185,8 @@ Function: bv_arithmetict::pack
 
 mp_integer bv_arithmetict::pack() const
 {
-  if(value>=0) return value;
+  if(value>=0)
+    return value;
   return value+power(2, spec.width);
 }
 

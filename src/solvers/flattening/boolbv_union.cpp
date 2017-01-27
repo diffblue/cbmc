@@ -50,7 +50,8 @@ bvt boolbvt::convert_union(const union_exprt &expr)
   }
   else
   {
-    assert(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
+    assert(
+      config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
 
     endianness_mapt map_u(expr.type(), false, ns);
     endianness_mapt map_op(expr.op0().type(), false, ns);

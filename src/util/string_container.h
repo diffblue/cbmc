@@ -72,7 +72,8 @@ public:
 
 protected:
   // the 'unsigned' ought to be size_t
-  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
+  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash>
+    hash_tablet;
   hash_tablet hash_table;
 
   unsigned get(const char *s);

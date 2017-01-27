@@ -78,7 +78,8 @@ std::string get_temporary_directory(const std::string &name_template)
     char t[1000];
     strncpy(t, prefixed_name_template.c_str(), 1000);
     const char *td = mkdtemp(t);
-    if(!td) throw "mkdtemp failed";
+    if(!td)
+      throw "mkdtemp failed";
     result=std::string(td);
   #endif
 

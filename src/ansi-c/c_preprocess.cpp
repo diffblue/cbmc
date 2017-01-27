@@ -157,7 +157,8 @@ static std::string shell_quote(const std::string &src)
 
   for(const char ch : src)
   {
-    if(ch=='"') result+='"'; // quotes are doubled
+    if(ch=='"')
+      result+='"'; // quotes are doubled
     result+=ch;
   }
 
@@ -193,7 +194,8 @@ static std::string shell_quote(const std::string &src)
 
   for(const char ch : src)
   {
-    if(ch=='\'') result+="'\\''";
+    if(ch=='\'')
+      result+="'\\''";
     result+=ch;
   }
 
@@ -410,9 +412,11 @@ Function: is_dot_i_file
 static bool is_dot_i_file(const std::string &path)
 {
   const char *ext=strrchr(path.c_str(), '.');
-  if(ext==NULL) return false;
+  if(ext==NULL)
+    return false;
   if(std::string(ext)==".i" ||
-     std::string(ext)==".ii") return true;
+     std::string(ext)==".ii")
+    return true;
   return false;
 }
 
@@ -428,11 +432,19 @@ Function: c_preprocess
 
 \*******************************************************************/
 
-bool c_preprocess_codewarrior(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_arm(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_gcc_clang(const std::string &, std::ostream &, message_handlert &, configt::ansi_ct::preprocessort);
-bool c_preprocess_none(const std::string &, std::ostream &, message_handlert &);
-bool c_preprocess_visual_studio(const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_codewarrior(
+  const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_arm(
+  const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_gcc_clang(
+  const std::string &,
+  std::ostream &,
+  message_handlert &,
+  configt::ansi_ct::preprocessort);
+bool c_preprocess_none(
+  const std::string &, std::ostream &, message_handlert &);
+bool c_preprocess_visual_studio(
+  const std::string &, std::ostream &, message_handlert &);
 
 bool c_preprocess(
   const std::string &path,
@@ -445,10 +457,14 @@ bool c_preprocess(
     return c_preprocess_codewarrior(path, outstream, message_handler);
 
   case configt::ansi_ct::preprocessort::GCC:
-    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
+    return
+      c_preprocess_gcc_clang(
+        path, outstream, message_handler, config.ansi_c.preprocessor);
 
   case configt::ansi_ct::preprocessort::CLANG:
-    return c_preprocess_gcc_clang(path, outstream, message_handler, config.ansi_c.preprocessor);
+    return
+      c_preprocess_gcc_clang(
+        path, outstream, message_handler, config.ansi_c.preprocessor);
 
   case configt::ansi_ct::preprocessort::VISUAL_STUDIO:
     return c_preprocess_visual_studio(path, outstream, message_handler);
@@ -806,6 +822,7 @@ bool c_preprocess_gcc_clang(
   command+=" -D__DEC64_MAX__=9.999999999999999E384DD";
   command+=" -D__DEC64_MANT_DIG__=16";
   command+=" -D__DEC32_MAX_EXP__=96";
+  // NOLINTNEXTLINE(whitespace/line_length)
   command+=" -D__DEC128_SUBNORMAL_MIN__=0.000000000000000000000000000000001E-6143DL";
   command+=" -D__LDBL_MANT_DIG__=64";
   command+=" -D__CONSTANT_CFSTRINGS__=1";
@@ -814,7 +831,7 @@ bool c_preprocess_gcc_clang(
   command+=" -D__pic__=2";
   command+=" -D__FLT_DIG__=6";
   command+=" -D__FLT_MAX_EXP__=128";
-  //command+=" -D__BLOCKS__=1";
+  // command+=" -D__BLOCKS__=1";
   command+=" -D__DBL_MANT_DIG__=53";
   command+=" -D__DEC64_MIN__=1E-383DD";
   command+=" -D__LDBL_MIN_EXP__=\"(-16381)\"";
@@ -1060,10 +1077,10 @@ bool c_preprocess_arm(
 //  command+=" -D__sizeof_int="+std::to_string(config.ansi_c.int_width/8);
 //  command+=" -D__sizeof_long="+std::to_string(config.ansi_c.long_int_width/8);
 //  command+=" -D__sizeof_ptr="+std::to_string(config.ansi_c.pointer_width/8);
-  //command+=" -D__EDG_VERSION__=308";
-  //command+=" -D__EDG__";
+  // command+=" -D__EDG_VERSION__=308";
+  // command+=" -D__EDG__";
 //  command+=" -D__CC_ARM=1";
-  //command+=" -D__ARMCC_VERSION=410000";
+  // command+=" -D__ARMCC_VERSION=410000";
 //  command+=" -D__arm__";
 
 //  if(config.ansi_c.endianness==configt::ansi_ct::IS_BIG_ENDIAN)
@@ -1086,7 +1103,7 @@ bool c_preprocess_arm(
 
   // Standard Defines, ANSI9899 6.10.8
   command+=" -D__STDC__";
-  //command+=" -D__STDC_VERSION__=199901L";
+  // command+=" -D__STDC_VERSION__=199901L";
 
   for(const auto &define : config.ansi_c.defines)
     command+=" "+shell_quote("-D"+define);

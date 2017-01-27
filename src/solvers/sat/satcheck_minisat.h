@@ -62,7 +62,7 @@ public:
 
   virtual const std::string solver_text() override;
   simple_prooft &get_resolution_proof();
-  //void set_partition_id(unsigned p_id);
+  // void set_partition_id(unsigned p_id);
 
 protected:
   // NOLINTNEXTLINE(readability/identifiers)

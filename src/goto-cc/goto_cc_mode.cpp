@@ -76,6 +76,7 @@ void goto_cc_modet::help()
 {
   std::cout <<
   "\n"
+  // NOLINTNEXTLINE(whitespace/line_length)
   "* *         goto-cc " CBMC_VERSION "  - Copyright (C) 2006-2014          * *\n"
   "* *        Daniel Kroening, Christoph Wintersteiger         * *\n"
   "* *                 kroening@kroening.com                   * *\n"

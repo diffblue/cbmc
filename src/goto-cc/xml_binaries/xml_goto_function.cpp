@@ -25,9 +25,9 @@ Function: convert
 
 \*******************************************************************/
 
-void convert( const goto_functionst::goto_functiont& function, xmlt& xml)
+void convert(const goto_functionst::goto_functiont& function, xmlt& xml)
 {
-  if (function.body_available)
+  if(function.body_available)
     convert(function.body, xml);
 }
 
@@ -44,7 +44,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert( const xmlt& xml, goto_functionst::goto_functiont& function)
+void convert(const xmlt& xml, goto_functionst::goto_functiont& function)
 {
   function.body.clear();
   convert(xml, function.body);

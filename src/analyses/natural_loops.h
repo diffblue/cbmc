@@ -36,7 +36,7 @@ public:
 
   void output(std::ostream &) const;
 
-  const cfg_dominators_templatet<P, T, false>& get_dominator_info() const
+  const cfg_dominators_templatet<P, T, false> &get_dominator_info() const
   {
     return cfg_dominators;
   }

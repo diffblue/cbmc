@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex.h"
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -304,7 +304,8 @@ void path_symext::symex_malloc(
             mp_integer elements=alloc_size/elem_size;
 
             if(elements*elem_size==alloc_size)
-              object_type=array_typet(tmp_type, from_integer(elements, tmp_size.type()));
+              object_type=
+                array_typet(tmp_type, from_integer(elements, tmp_size.type()));
           }
         }
       }
@@ -329,8 +330,6 @@ void path_symext::symex_malloc(
       size_symbol.type=tmp_size.type();
       size_symbol.mode=ID_C;
 
-      //state.var_map(size_symbol.name, suffix, size_symbol.type);
-
       assign(state,
              size_symbol.symbol_expr(),
              size);
@@ -342,14 +341,13 @@ void path_symext::symex_malloc(
   // value
   symbolt value_symbol;
 
-  value_symbol.base_name="dynamic_object"+std::to_string(state.var_map.dynamic_count);
+  value_symbol.base_name=
+    "dynamic_object"+std::to_string(state.var_map.dynamic_count);
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type=object_type;
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
-
-  //state.var_map(value_symbol.name, suffix, value_symbol.type);
 
   address_of_exprt rhs;
 
@@ -391,11 +389,11 @@ void path_symext::assign_rec(
   const exprt &ssa_lhs,
   const exprt &ssa_rhs)
 {
-  //const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
+  // const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
 
   #ifdef DEBUG
   std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
-  //std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
+  // std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
   #endif
 
   if(ssa_lhs.id()==ID_symbol)
@@ -586,7 +584,8 @@ void path_symext::assign_rec(
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(member_exprt(ssa_rhs, components[i].get_name(), components[i].type()),
+        simplify_expr(
+          member_exprt(ssa_rhs, components[i].get_name(), components[i].type()),
           state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
@@ -608,7 +607,11 @@ void path_symext::assign_rec(
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(index_exprt(ssa_rhs, from_integer(i, index_type()), array_type.subtype()),
+        simplify_expr(
+          index_exprt(
+            ssa_rhs,
+            from_integer(i, index_type()),
+            array_type.subtype()),
           state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
@@ -625,7 +628,11 @@ void path_symext::assign_rec(
     {
       exprt new_rhs=
         ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(index_exprt(ssa_rhs, from_integer(i, index_type()), vector_type.subtype()),
+        simplify_expr(
+          index_exprt(
+            ssa_rhs,
+            from_integer(i, index_type()),
+            vector_type.subtype()),
           state.var_map.ns);
       assign_rec(state, guard, operands[i], new_rhs);
     }
@@ -677,7 +684,9 @@ void path_symext::function_call_rec(
       state.locs.function_map.find(function_identifier);
 
     if(f_it==state.locs.function_map.end())
-      throw "failed to find `"+id2string(function_identifier)+"' in function_map";
+      throw
+        "failed to find `"+id2string(function_identifier)+
+        "' in function_map";
 
     const locst::function_entryt &function_entry=f_it->second;
 
@@ -697,7 +706,8 @@ void path_symext::function_call_rec(
     }
 
     // push a frame on the call stack
-    path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
+    path_symex_statet::threadt &thread=
+      state.threads[state.get_current_thread()];
     thread.call_stack.push_back(path_symex_statet::framet());
     thread.call_stack.back().current_function=function_identifier;
     thread.call_stack.back().return_location=thread.pc.next_loc();
@@ -748,7 +758,7 @@ void path_symext::function_call_rec(
     const if_exprt &if_expr=to_if_expr(function);
     exprt guard=if_expr.cond();
 
-    if (state.is_lazy())
+    if(state.is_lazy())
     {
       const exprt &case_expr=state.restore_branch()?
         if_expr.true_case():if_expr.false_case();
@@ -762,7 +772,8 @@ void path_symext::function_call_rec(
         path_symex_statet &false_state=further_states.back();
         false_state.record_branch_step(false);
         false_state.history->guard=not_exprt(guard);
-        function_call_rec(further_states.back(), call, if_expr.false_case(), further_states);
+        function_call_rec(
+          further_states.back(), call, if_expr.false_case(), further_states);
       }
 
       // do the true-case in 'state'
@@ -893,11 +904,10 @@ void path_symext::do_goto(
 #endif
 
 #ifdef PATH_SYMEX_FORK
-    if (pid==-1)
-      // forking failed so continue as if PATH_SYMEX_FORK were undefined
+    // forking failed so continue as if PATH_SYMEX_FORK were undefined
+    if(pid==-1) // NOLINT(readability/braces)
 #endif
     {
-
 #ifdef PATH_SYMEX_LAZY_STATE
       // lazily copy the state into 'further_states'
       further_states.push_back(path_symex_statet::lazy_copy(state));
@@ -913,9 +923,9 @@ void path_symext::do_goto(
   }
 
 #ifdef PATH_SYMEX_FORK
-  if (pid!=0)
-    // parent process (regardless of any possible fork errors)
-    // should finish to explore all current 'further_states'
+  // parent process (regardless of any possible fork errors)
+  // should finish to explore all current 'further_states'
+  if(pid!=0) // NOLINT(readability/braces)
 #endif
   {
     // branch not taken case
@@ -1024,7 +1034,8 @@ void path_symext::operator()(
 
       // ordering of the following matters due to vector instability
       path_symex_statet::threadt &new_thread=state.add_thread();
-      path_symex_statet::threadt &old_thread=state.threads[state.get_current_thread()];
+      path_symex_statet::threadt &old_thread=
+        state.threads[state.get_current_thread()];
       new_thread.pc=loc.branch_target;
       new_thread.local_vars=old_thread.local_vars;
     }
@@ -1036,7 +1047,7 @@ void path_symext::operator()(
     break;
 
   case GOTO:
-    if (state.is_lazy())
+    if(state.is_lazy())
       do_goto(state, state.restore_branch());
     else
       do_goto(state, further_states);
@@ -1103,7 +1114,8 @@ void path_symext::operator()(
 
   case FUNCTION_CALL:
     state.record_step();
-    function_call(state, to_code_function_call(instruction.code), further_states);
+    function_call(
+      state, to_code_function_call(instruction.code), further_states);
     break;
 
   case OTHER:

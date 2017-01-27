@@ -34,7 +34,8 @@ protected:
   // make the vector large enough to contain 'n'
   void check_index(typename std::vector<T>::size_type n)
   {
-    if(n>=subt::size()) subt::resize(n+1);
+    if(n>=subt::size())
+      subt::resize(n+1);
   }
 };
 

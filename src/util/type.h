@@ -30,7 +30,8 @@ public:
   const typet &subtype() const
   #ifdef SUBTYPE_IN_GETSUB
   {
-    if(get_sub().empty()) return static_cast<const typet &>(get_nil_irep());
+    if(get_sub().empty())
+      return static_cast<const typet &>(get_nil_irep());
     return static_cast<const typet &>(get_sub().front());
   }
   #else
@@ -41,7 +42,8 @@ public:
   #ifdef SUBTYPE_IN_GETSUB
   {
     subt &sub=get_sub();
-    if(sub.empty()) sub.resize(1);
+    if(sub.empty())
+      sub.resize(1);
     return static_cast<typet &>(sub.front());
   }
   #else
@@ -154,13 +156,13 @@ public:
 };
 
 #define forall_subtypes(it, type) \
-  if((type).has_subtypes()) \
+  if((type).has_subtypes()) /* NOLINT(readability/braces) */ \
     for(typet::subtypest::const_iterator it=(type).subtypes().begin(), \
         it##_end=(type).subtypes().end(); \
         it!=it##_end; ++it)
 
 #define Forall_subtypes(it, type) \
-  if((type).has_subtypes()) \
+  if((type).has_subtypes()) /* NOLINT(readability/braces) */ \
     for(typet::subtypest::iterator it=(type).subtypes().begin(); \
         it!=(type).subtypes().end(); ++it)
 

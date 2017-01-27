@@ -33,7 +33,8 @@ static bool is_skip(goto_programt::instructionst::iterator it)
 
   if(it->is_goto())
   {
-    if(it->guard.is_false()) return true;
+    if(it->guard.is_false())
+      return true;
 
     if(it->targets.size()!=1)
       return false;
@@ -49,7 +50,8 @@ static bool is_skip(goto_programt::instructionst::iterator it)
 
   if(it->is_other())
   {
-    if(it->code.is_nil()) return true;
+    if(it->code.is_nil())
+      return true;
 
     const irep_idt &statement=it->code.get_statement();
 
@@ -97,7 +99,8 @@ void remove_skip(goto_programt &goto_program)
     old_size=goto_program.instructions.size();
 
     // maps deleted instructions to their replacement
-    typedef std::map<goto_programt::targett, goto_programt::targett> new_targetst;
+    typedef std::map<goto_programt::targett, goto_programt::targett>
+      new_targetst;
     new_targetst new_targets;
 
     // remove skip statements

@@ -77,7 +77,8 @@ public:
   // is 'a' a root?
   bool is_root(size_type a) const
   {
-    if(a>=size()) return true;
+    if(a>=size())
+      return true;
     // a root is its own parent
     return nodes[a].parent==a;
   }
@@ -97,14 +98,16 @@ public:
   // size of the set that 'a' is in
   size_type count(size_type a) const
   {
-    if(a>=size()) return 1;
+    if(a>=size())
+      return 1;
     return nodes[find(a)].count;
   }
 
   // make the array large enough to contain 'a'
   void check_index(size_type a)
   {
-    if(a>=size()) resize(a+1);
+    if(a>=size())
+      resize(a+1);
   }
 
   // number of disjoint sets
@@ -112,7 +115,8 @@ public:
   {
     size_type c=0;
     for(size_type i=0; i<nodes.size(); i++)
-      if(is_root(i)) c++;
+      if(is_root(i))
+        c++;
     return c;
   }
 

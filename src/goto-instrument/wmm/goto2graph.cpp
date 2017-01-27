@@ -27,7 +27,7 @@ Date: 2012
 #include "fence.h"
 #include "goto2graph.h"
 
-//#define PRINT_UNSAFES
+// #define PRINT_UNSAFES
 
 
 /*******************************************************************\
@@ -44,9 +44,10 @@ Function: instrumentert::local
 
 bool inline instrumentert::local(const irep_idt& id)
 {
-  std::string identifier = id2string(id);
+  std::string identifier=id2string(id);
 
-  if(has_prefix(identifier, "symex_invalid") || has_prefix(identifier, "symex::invalid"))
+  if(has_prefix(identifier, "symex_invalid") ||
+     has_prefix(identifier, "symex::invalid"))
   {
     /* symex_invalid and symex::invalid_object generated when pointer analysis
        fails */
@@ -62,7 +63,7 @@ bool inline instrumentert::local(const irep_idt& id)
     has_prefix(identifier, "__unbuffered_"))
     return true;
 
-  const size_t pos = identifier.find("[]");
+  const size_t pos=identifier.find("[]");
 
   if(pos!=std::string::npos)
   {
@@ -72,7 +73,7 @@ bool inline instrumentert::local(const irep_idt& id)
 
   try
   {
-    const symbolt& symbol = ns.lookup(identifier);
+    const symbolt& symbol=ns.lookup(identifier);
 
     if(!symbol.is_static_lifetime)
       return true; /* these are local */
@@ -123,38 +124,47 @@ unsigned instrumentert::goto2graph_cfg(
     goto_functions.entry_point());
 
   std::vector<std::size_t> subgraph_index;
-  num_sccs = egraph_alt.SCCs(subgraph_index);
+  num_sccs=egraph_alt.SCCs(subgraph_index);
   assert(egraph_SCCs.empty());
   egraph_SCCs.resize(num_sccs, std::set<event_idt>());
-  for(std::map<event_idt, event_idt>::const_iterator it=map_vertex_gnode.begin();
-    it!=map_vertex_gnode.end();
-    it++)
+  for(std::map<event_idt, event_idt>::const_iterator
+      it=map_vertex_gnode.begin();
+      it!=map_vertex_gnode.end();
+      it++)
   {
-    const std::size_t sg = subgraph_index[it->second];
+    const std::size_t sg=subgraph_index[it->second];
     egraph_SCCs[sg].insert(it->first);
   }
 
-  message.status() <<"Number of threads detected: "<<visitor.max_thread<< messaget::eom;
+  message.status() << "Number of threads detected: "
+                   << visitor.max_thread << messaget::eom;
 
   /* SCCs which could host critical cycles */
-  unsigned interesting_sccs = 0;
+  unsigned interesting_sccs=0;
   for(unsigned i=0; i<num_sccs; i++)
     if(egraph_SCCs[i].size()>3)
       interesting_sccs++;
 
-  message.statistics() <<"Graph with "<<egraph_alt.size()<<" nodes has "
-    <<interesting_sccs<<" interesting SCCs"<<messaget::eom;
+  message.statistics() << "Graph with " << egraph_alt.size() << " nodes has "
+                       << interesting_sccs << " interesting SCCs"
+                       << messaget::eom;
 
-  message.statistics() <<"Number of reads: "<<visitor.read_counter<<messaget::eom;
-  message.statistics() <<"Number of writes: "<<visitor.write_counter<<messaget::eom;
-  message.statistics() <<"Number of wse: "<<visitor.ws_counter<<messaget::eom;
-  message.statistics() <<"Number of rfe/fre: "<<visitor.fr_rf_counter<<messaget::eom;
+  message.statistics() << "Number of reads: " << visitor.read_counter
+                       << messaget::eom;
+  message.statistics() << "Number of writes: " << visitor.write_counter
+                       << messaget::eom;
+  message.statistics() << "Number of wse: " << visitor.ws_counter
+                       << messaget::eom;
+  message.statistics() << "Number of rfe/fre: " << visitor.fr_rf_counter
+                       << messaget::eom;
   std::size_t instr_counter=0;
-  for(goto_functionst::function_mapt::const_iterator it=goto_functions.function_map.begin();
+  for(goto_functionst::function_mapt::const_iterator
+      it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       ++it)
     instr_counter+=it->second.body.instructions.size();
-  message.statistics() <<"Number of goto-instructions: "<<instr_counter<<messaget::eom;
+  message.statistics() << "Number of goto-instructions: "
+                       << instr_counter<<messaget::eom;
 
   return visitor.max_thread;
 }
@@ -186,7 +196,8 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 {
   /* flow: egraph */
 
-  instrumenter.message.debug() << "visit function "<<function << messaget::eom;
+  instrumenter.message.debug() << "visit function "
+                               << function << messaget::eom;
 
   if(function==CPROVER_PREFIX "initialize")
   {
@@ -223,7 +234,6 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       /* break the flow */
       visit_cfg_thread();
     }
-
     else if(instruction.is_atomic_begin() || instruction.is_atomic_end())
     {
       /* break the flow (def 1) or add full barrier (def 2) */
@@ -236,7 +246,6 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       visit_cfg_propagate(i_it);
       #endif
     }
-
     /* a:=b -o-> Rb -po-> Wa */
     else if(instruction.is_assign())
     {
@@ -244,47 +253,40 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 #ifdef LOCAL_MAY
         , local_may
 #endif
-      );
+      ); // NOLINT(whitespace/parens)
     }
-
     else if(is_fence(instruction, instrumenter.ns))
     {
       instrumenter.message.debug() << "Constructing a fence" << messaget::eom;
       visit_cfg_fence(i_it);
     }
-
     else if(model!=TSO && is_lwfence(instruction, instrumenter.ns))
     {
       visit_cfg_lwfence(i_it);
     }
-
     else if(model==TSO && is_lwfence(instruction, instrumenter.ns))
     {
       /* propagation */
       visit_cfg_skip(i_it);
     }
-
     else if(instruction.is_other()
       && instruction.code.get_statement()==ID_fence)
     {
       visit_cfg_asm_fence(i_it);
     }
-
     else if(instruction.is_function_call())
     {
       visit_cfg_function_call(value_sets, i_it, model,
         no_dependencies, replicate_body);
     }
-
     else if(instruction.is_goto())
     {
       visit_cfg_goto(i_it, replicate_body, value_sets
 #ifdef LOCAL_MAY
         , local_may
 #endif
-      );
+      ); // NOLINT(whitespace/parens)
     }
-
 #ifdef CONTEXT_INSENSITIVE
     else if(instruction.is_return())
     {
@@ -292,7 +294,6 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       add_all_pos(it, out_nodes[function], in_pos[i_it]);
     }
 #endif
-
     else
     {
       /* propagates */
@@ -304,8 +305,8 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   egraph.map_data_dp.insert(new_dp);
   data_dp.print(instrumenter.message);
 
-  if(instrumenter.goto_functions.function_map[function].body
-    .instructions.size() <= 0)
+  if(instrumenter.goto_functions.function_map[function]
+     .body.instructions.empty())
   {
     /* empty set of ending edges */
   }
@@ -375,7 +376,7 @@ Function: instrumentert::visit_cfg_reference_function
 /* Warning: we iterate here over the successive instructions of the
    regardless of the gotos. This function has to be called *AFTER*
    an exploration of the function constructing the graph. */
-void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
+void inline instrumentert::cfg_visitort::visit_cfg_reference_function(
   irep_idt id_function)
 {
   if(instrumenter.map_function_graph.find(id_function)!=
@@ -410,10 +411,10 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
     {
       /* connects the previous nodes to those ones */
       for(std::set<nodet>::const_iterator to=in_pos[targ].begin();
-        to!=in_pos[targ].end(); ++to)
+          to!=in_pos[targ].end(); ++to)
         in_nodes.insert(to->first);
       for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
-        from!=in_pos[i_it].end(); ++from)
+          from!=in_pos[i_it].end(); ++from)
         out_nodes.insert(from->first);
     }
     else
@@ -421,14 +422,14 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
       instrumenter.message.debug() << "else case" << messaget::eom;
       /* connects NEXT nodes following the targets -- bwd analysis */
       for(goto_programt::instructionst::iterator cur=i_it;
-        cur!=targ; --cur)
+          cur!=targ; --cur)
       {
         instrumenter.message.debug() << "i" << messaget::eom;
         for(const auto &in : cur->incoming_edges)
         {
           instrumenter.message.debug() << "t" << messaget::eom;
-          if(in_pos.find(in)!=in_pos.end()
-            && updated.find(in)!=updated.end())
+          if(in_pos.find(in)!=in_pos.end() &&
+             updated.find(in)!=updated.end())
           {
             /* out_pos[in].insert(in_pos[in])*/
             add_all_pos(it1, out_pos[in], in_pos[in]);
@@ -445,10 +446,10 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function (
       if(out_pos.find(targ)!=out_pos.end())
       {
         for(std::set<nodet>::const_iterator to=out_pos[targ].begin();
-          to!=out_pos[targ].end(); ++to)
+            to!=out_pos[targ].end(); ++to)
           in_nodes.insert(to->first);
         for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
-          from!=in_pos[i_it].end(); ++from)
+            from!=in_pos[i_it].end(); ++from)
           out_nodes.insert(from->first);
       }
     }
@@ -511,7 +512,7 @@ bool instrumentert::cfg_visitort::contains_shared_array(
       #ifdef LOCAL_MAY
       , local_may
       #endif
-    );
+    ); // NOLINT(whitespace/parens)
     instrumenter.message.debug() << "Writes: "<<rw_set.w_entries.size()
       <<"; Reads:"<<rw_set.r_entries.size() << messaget::eom;
 
@@ -571,13 +572,14 @@ void inline instrumentert::cfg_visitort::visit_cfg_body(
 
       bool duplicate_this=false;
 
-      switch(replicate_body) {
+      switch(replicate_body)
+      {
         case arrays_only:
           duplicate_this=contains_shared_array(target, i_it, value_sets
             #ifdef LOCAL_MAY
             , local_may
             #endif
-          );
+          ); // NOLINT(whitespace/parens)
           break;
         case all_loops:
           duplicate_this=true;
@@ -608,10 +610,12 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_duplicate
 \*******************************************************************/
 
 void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
-  goto_programt::const_targett targ, goto_programt::const_targett i_it)
+  goto_programt::const_targett targ,
+  goto_programt::const_targett i_it)
 {
   instrumenter.message.status() << "Duplication..." << messaget::eom;
-  const goto_functionst::goto_functiont& fun=instrumenter.goto_functions.function_map[i_it->function];
+  const goto_functionst::goto_functiont &fun=
+    instrumenter.goto_functions.function_map[i_it->function];
 
   bool found_pos=false;
   goto_programt::const_targett new_targ=targ;
@@ -659,8 +663,10 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
       alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
 #if 0
       const event_idt end=egraph.copy_segment(begin_it->first, end_it->first);
-      const event_idt alt_end=alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
-      //in_pos[i_it].insert(nodet(end, alt_end)); // copied; no need for back-edge!
+      const event_idt alt_end=
+        alt_copy_segment(egraph_alt, begin_it->second, end_it->second);
+      // copied; no need for back-edge!
+      // in_pos[i_it].insert(nodet(end, alt_end));
 #endif
     }
   }
@@ -679,7 +685,8 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_backedge
 \*******************************************************************/
 
 void inline instrumentert::cfg_visitort::visit_cfg_backedge(
-  goto_programt::const_targett targ, goto_programt::const_targett i_it)
+  goto_programt::const_targett targ,
+  goto_programt::const_targett i_it)
 {
   /* if in_pos was updated at this program point */
   if(updated.find(targ)!=updated.end())
@@ -693,8 +700,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
         {
           if(egraph[from->first].thread!=egraph[to->first].thread)
              continue;
-          instrumenter.message.debug() << from->first<<"-po->"
-            <<to->first << messaget::eom;
+          instrumenter.message.debug() << from->first << "-po->"
+                                       << to->first << messaget::eom;
           egraph.add_po_back_edge(from->first, to->first);
           egraph_alt.add_edge(from->second, to->second);
         }
@@ -705,7 +712,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
 
     /* connects NEXT nodes following the targets -- bwd analysis */
     for(goto_programt::const_targett cur=i_it;
-      cur!=targ; --cur)
+        cur!=targ; --cur)
     {
       for(const auto &in : cur->incoming_edges)
       {
@@ -725,10 +732,11 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
 
     /* connects the previous nodes to those ones */
     if(out_pos.find(targ)!=out_pos.end())
+    {
       for(std::set<nodet>::const_iterator to=out_pos[targ].begin();
-        to!=out_pos[targ].end(); ++to)
+          to!=out_pos[targ].end(); ++to)
         for(std::set<nodet>::const_iterator from=in_pos[i_it].begin();
-          from!=in_pos[i_it].end(); ++from)
+            from!=in_pos[i_it].end(); ++from)
           if(from->first!=to->first)
           {
             if(egraph[from->first].thread!=egraph[to->first].thread)
@@ -738,6 +746,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
             egraph.add_po_back_edge(from->first, to->first);
             egraph_alt.add_edge(from->second, to->second);
           }
+    }
   }
 }
 
@@ -778,7 +787,7 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
 #ifdef LOCAL_MAY
     , local_may
 #endif
-    );
+    ); // NOLINT(whitespace/parens)
   }
 }
 
@@ -811,7 +820,8 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
   const exprt& fun=to_code_function_call(instruction.code).function();
   const irep_idt& fun_id=to_symbol_expr(fun).get_identifier();
   /* ignore recursive calls -- underapproximation */
-  try {
+  try
+  {
     enter_function(fun_id);
     #ifdef CONTEXT_INSENSITIVE
     stack_fun.push(cur_fun);
@@ -823,12 +833,14 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     {
       /* do not inline it, connect to an existing subgraph or create a new
          one */
-      if(instrumenter.map_function_graph.find(fun_id)!=instrumenter.map_function_graph.end())
+      if(instrumenter.map_function_graph.find(fun_id)!=
+         instrumenter.map_function_graph.end())
       {
         /* connects to existing */
         /* TODO */
       }
-      else {
+      else
+      {
         /* just inlines */
         /* TODO */
         visit_cfg_function(value_sets, model, no_dependencies, fun_id, s,
@@ -836,7 +848,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
         updated.insert(i_it);
       }
     }
-    else
+    else // NOLINT(readability/braces)
     #endif
     {
       /* normal inlining strategy */
@@ -850,9 +862,11 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     cur_fun=stack_fun.pop();
     #endif
   }
-  catch(std::string s) {
-    instrumenter.message.warning() << "Sorry, doesn't handle recursion (function "
-      << fun_id << "; .cpp) " << s<< messaget::eom;
+  catch(std::string s)
+  {
+    instrumenter.message.warning() << "sorry, doesn't handle recursion "
+                                   << "(function " << fun_id << "; .cpp) "
+                                   << s << messaget::eom;
   }
 }
 
@@ -883,6 +897,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
 
   for(const auto &in : instruction.incoming_edges)
     if(in_pos.find(in)!=in_pos.end())
+    {
       for(const auto &node : in_pos[in])
       {
         if(egraph[node.first].thread!=thread)
@@ -892,6 +907,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
         egraph.add_po_edge(node.first, new_fence_node);
         egraph_alt.add_edge(node.second, new_fence_gnode);
       }
+    }
 
   in_pos[i_it].clear();
   in_pos[i_it].insert(nodet(new_fence_node, new_fence_gnode));
@@ -933,6 +949,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
 
   for(const auto &in : instruction.incoming_edges)
     if(in_pos.find(in)!=in_pos.end())
+    {
       for(const auto &node : in_pos[in])
       {
         if(egraph[node.first].thread!=thread)
@@ -942,6 +959,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
         egraph.add_po_edge(node.first, new_fence_node);
         egraph_alt.add_edge(node.second, new_fence_gnode);
       }
+    }
 
   in_pos[i_it].clear();
   in_pos[i_it].insert(nodet(new_fence_node, new_fence_gnode));
@@ -977,7 +995,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 #ifdef LOCAL_MAY
     , local_may
 #endif
-  );
+  ); // NOLINT(whitespace/parens)
 
   event_idt previous=std::numeric_limits<event_idt>::max();
   event_idt previous_gnode=std::numeric_limits<event_idt>::max();
@@ -1031,6 +1049,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     for(const auto &in : instruction.incoming_edges)
     {
       if(in_pos.find(in)!=in_pos.end())
+      {
         for(const auto &node : in_pos[in])
         {
            if(egraph[node.first].thread!=thread)
@@ -1040,6 +1059,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
            egraph.add_po_edge(node.first, new_read_node);
            egraph_alt.add_edge(node.second, new_read_gnode);
         }
+      }
     }
 
     map_reads.insert(id2node_pairt(read, new_read_node));
@@ -1048,10 +1068,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 
     /* creates Read <-com-> Write ... */
     const std::pair<id2nodet::iterator, id2nodet::iterator>
-      with_same_var = map_writes.equal_range(read);
+      with_same_var=map_writes.equal_range(read);
     for(id2nodet::iterator id_it=with_same_var.first;
       id_it!=with_same_var.second; id_it++)
-      if(egraph[id_it->second].thread != new_read_event.thread)
+      if(egraph[id_it->second].thread!=new_read_event.thread)
       {
         instrumenter.message.debug() << id_it->second<<"<-com->"
           <<new_read_node << messaget::eom;
@@ -1070,7 +1090,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       unknown_write_nodes.begin();
       id_it!=unknown_write_nodes.end();
       ++id_it)
-      if(egraph[*id_it].thread != new_read_event.thread)
+      if(egraph[*id_it].thread!=new_read_event.thread)
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_read_node << messaget::eom;
@@ -1092,7 +1112,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        write is the irep_id in the code;
        new_write_event is the corresponding abstract event;
        new_write_node is the node in the graph */
-    const irep_idt& write = w_it->second.object;
+    const irep_idt& write=w_it->second.object;
 
     instrumenter.message.debug() << "WRITE: " << write << messaget::eom;
 
@@ -1101,7 +1121,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       continue;
 
     ++write_counter;
-    //assert(write_expr);
+    // assert(write_expr);
 
     /* creates Write */
     const abstract_eventt new_write_event(abstract_eventt::Write,
@@ -1132,26 +1152,30 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
       egraph_alt.add_edge(previous_gnode, new_write_gnode);
     }
     else
+    {
       for(const auto &in : instruction.incoming_edges)
       {
         if(in_pos.find(in)!=in_pos.end())
+        {
           for(const auto &node : in_pos[in])
           {
-           if(egraph[node.first].thread!=thread)
-             continue;
+            if(egraph[node.first].thread!=thread)
+              continue;
             instrumenter.message.debug() << node.first<<"-po->"
               <<new_write_node << messaget::eom;
             egraph.add_po_edge(node.first, new_write_node);
             egraph_alt.add_edge(node.second, new_write_gnode);
           }
+        }
       }
+    }
 
     /* creates Write <-com-> Read */
     const std::pair<id2nodet::iterator, id2nodet::iterator>
       r_with_same_var=map_reads.equal_range(write);
     for(id2nodet::iterator idr_it=r_with_same_var.first;
-      idr_it!=r_with_same_var.second; idr_it++)
-      if(egraph[idr_it->second].thread != new_write_event.thread)
+        idr_it!=r_with_same_var.second; idr_it++)
+      if(egraph[idr_it->second].thread!=new_write_event.thread)
       {
         instrumenter.message.debug() <<idr_it->second<<"<-com->"
           <<new_write_node << messaget::eom;
@@ -1169,7 +1193,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     const std::pair<id2nodet::iterator, id2nodet::iterator>
       w_with_same_var=map_writes.equal_range(write);
     for(id2nodet::iterator idw_it=w_with_same_var.first;
-      idw_it!=w_with_same_var.second; idw_it++)
+        idw_it!=w_with_same_var.second; idw_it++)
       if(egraph[idw_it->second].thread!=new_write_event.thread)
       {
         instrumenter.message.debug() << idw_it->second<<"<-com->"
@@ -1186,10 +1210,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 
     /* for unknown writes */
     for(std::set<event_idt>::const_iterator id_it=
-      unknown_write_nodes.begin();
-      id_it!=unknown_write_nodes.end();
-      ++id_it)
-      if(egraph[*id_it].thread != new_write_event.thread)
+        unknown_write_nodes.begin();
+        id_it!=unknown_write_nodes.end();
+        ++id_it)
+      if(egraph[*id_it].thread!=new_write_event.thread)
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_write_node << messaget::eom;
@@ -1205,10 +1229,10 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 
     /* for unknown reads */
     for(std::set<event_idt>::const_iterator id_it=
-      unknown_read_nodes.begin();
-      id_it!=unknown_read_nodes.end();
-      ++id_it)
-      if(egraph[*id_it].thread != new_write_event.thread)
+        unknown_read_nodes.begin();
+        id_it!=unknown_read_nodes.end();
+        ++id_it)
+      if(egraph[*id_it].thread!=new_write_event.thread)
       {
         instrumenter.message.debug() << *id_it<<"<-com->"
           <<new_write_node << messaget::eom;
@@ -1224,8 +1248,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 
 
     map_writes.insert(id2node_pairt(write, new_write_node));
-    previous = new_write_node;
-    previous_gnode = new_write_gnode;
+    previous=new_write_node;
+    previous_gnode=new_write_gnode;
   }
 
   if(previous!=std::numeric_limits<event_idt>::max())
@@ -1298,6 +1322,7 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
 
   for(const auto &in : instruction.incoming_edges)
     if(in_pos.find(in)!=in_pos.end())
+    {
       for(const auto &node : in_pos[in])
       {
         instrumenter.message.debug() << node.first<<"-po->"<<new_fence_node
@@ -1305,6 +1330,7 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
         egraph.add_po_edge(node.first, new_fence_node);
         egraph_alt.add_edge(node.second, new_fence_gnode);
       }
+    }
 #if 0
   std::set<nodet> s;
   s.insert(nodet(new_fence_node, new_fence_gnode));
@@ -1346,25 +1372,21 @@ Function: intrumentert::add_instr_to_interleaving
 
 \*******************************************************************/
 
-void inline instrumentert::add_instr_to_interleaving (
+void inline instrumentert::add_instr_to_interleaving(
   goto_programt::instructionst::iterator it,
   goto_programt& interleaving)
 {
-  if(
-    it->is_return() ||
-    it->is_throw() ||
-    it->is_catch() ||
-    it->is_skip() ||
-    it->is_dead() ||
-    it->is_start_thread() ||
-    it->is_end_thread()
-  )
+  if(it->is_return() ||
+     it->is_throw() ||
+     it->is_catch() ||
+     it->is_skip() ||
+     it->is_dead() ||
+     it->is_start_thread() ||
+     it->is_end_thread())
     return;
 
-  if(
-    it->is_atomic_begin() ||
-    it->is_atomic_end()
-  )
+  if(it->is_atomic_begin() ||
+     it->is_atomic_end())
   {
     /* atomicity not checked here for the moment */
     return;
@@ -1377,7 +1399,7 @@ void inline instrumentert::add_instr_to_interleaving (
   }
 
   /* add this instruction to the interleaving */
-  goto_programt::targett current_instruction = interleaving.add_instruction();
+  goto_programt::targett current_instruction=interleaving.add_instruction();
   goto_programt::instructiont new_instruction(*it);
   current_instruction->swap(new_instruction);
 }
@@ -1404,20 +1426,20 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   {
     --e_it;
 
-    const abstract_eventt& current_event = egraph[*e_it];
-    const source_locationt& current_location = current_event.source_location;
+    const abstract_eventt& current_event=egraph[*e_it];
+    const source_locationt& current_location=current_event.source_location;
 
     /* select relevant thread (po) -- or function contained in this thread */
-    goto_programt* current_po=0;
-    bool thread_found = false;
+    goto_programt *current_po=0;
+    bool thread_found=false;
 
     Forall_goto_functions(f_it, goto_functions)
     {
       forall_goto_program_instructions(p_it, f_it->second.body)
         if(p_it->source_location==current_location)
         {
-          current_po = &f_it->second.body;
-          thread_found = true;
+          current_po=&f_it->second.body;
+          thread_found=true;
           break;
         }
 
@@ -1426,18 +1448,18 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     }
     assert(current_po);
 
-    const wmm_grapht::edgest& pos_cur = egraph.po_out(*e_it);
-    const wmm_grapht::edgest& pos_next = egraph.po_out(*(++e_it));
+    const wmm_grapht::edgest& pos_cur=egraph.po_out(*e_it);
+    const wmm_grapht::edgest& pos_next=egraph.po_out(*(++e_it));
     --e_it;
 
-    bool exists_n = false;
+    bool exists_n=false;
 
     for(wmm_grapht::edgest::const_iterator edge_it=pos_cur.begin();
       edge_it!=pos_cur.end(); edge_it++)
     {
       if(pos_next.find(edge_it->first)!=pos_next.end())
       {
-        exists_n = true;
+        exists_n=true;
         break;
       }
     }
@@ -1465,14 +1487,14 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
       --e_it;
 
       /* find the portion of the thread to add */
-      const abstract_eventt& next_event = egraph[*(++e_it--)];
-      const source_locationt& next_location = next_event.source_location;
+      const abstract_eventt& next_event=egraph[*(++e_it--)];
+      const source_locationt& next_location=next_event.source_location;
 
-      bool in_cycle = false;
+      bool in_cycle=false;
       Forall_goto_program_instructions(it, *current_po)
       {
         if(it->source_location==current_location)
-          in_cycle = true;
+          in_cycle=true;
 
         /* do not add the last instruction now -- will be done at
            the next iteration */
@@ -1492,12 +1514,12 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     {
       for(const auto &t : int_it->targets)
       {
-        bool target_in_cycle = false;
+        bool target_in_cycle=false;
 
         forall_goto_program_instructions(targ, interleaving)
           if(targ==t)
           {
-            target_in_cycle = true;
+            target_in_cycle=true;
             break;
           }
 
@@ -1519,14 +1541,14 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   map.insert(p);
 
   goto_functionst this_interleaving;
-  this_interleaving.function_map = map;
+  this_interleaving.function_map=map;
   optionst no_option;
   null_message_handlert no_message;
 
   #if 0
   bmct bmc(no_option, symbol_table, no_message);
 
-  bool is_spurious = bmc.run(this_interleaving);
+  bool is_spurious=bmc.run(this_interleaving);
 
   message.debug() << "CFG:"<<is_spurious << messaget::eom;
   return is_spurious;
@@ -1557,15 +1579,15 @@ void instrumentert::cfg_cycles_filter()
       it!=set_of_cycles.end();
     )
     {
-      bool erased = false;
-      std::set<event_grapht::critical_cyclet>::iterator next = it;
+      bool erased=false;
+      std::set<event_grapht::critical_cyclet>::iterator next=it;
       ++next;
       if(is_cfg_spurious(*it))
       {
-        erased = true;
+        erased=true;
         set_of_cycles.erase(it);
       }
-      it = next;
+      it=next;
       if(!erased)
         ++it;
     }
@@ -1578,15 +1600,15 @@ void instrumentert::cfg_cycles_filter()
         it!=set_of_cycles_per_SCC[i].end();
       )
       {
-        bool erased = false;
-        std::set<event_grapht::critical_cyclet>::iterator next = it;
+        bool erased=false;
+        std::set<event_grapht::critical_cyclet>::iterator next=it;
         ++next;
         if(is_cfg_spurious(*it))
         {
-          erased = true;
+          erased=true;
           set_of_cycles_per_SCC[i].erase(it);
         }
-        it = next;
+        it=next;
         if(!erased)
           ++it;
       }
@@ -1619,8 +1641,8 @@ void inline instrumentert::print_outputs_local(
 {
   /* to represent the po aligned in the dot */
   std::map<unsigned, std::set<event_idt> > same_po;
-  unsigned max_thread = 0;
-  unsigned colour = 0;
+  unsigned max_thread=0;
+  unsigned colour=0;
 
   /* to represent the files as clusters */
   std::map<irep_idt, std::set<event_idt> > same_file;
@@ -1645,7 +1667,7 @@ void inline instrumentert::print_outputs_local(
     for(std::list<event_idt>::const_iterator it_e=it->begin();
       it_e!=it->end(); it_e++)
     {
-      const abstract_eventt& ev = egraph[*it_e];
+      const abstract_eventt& ev=egraph[*it_e];
 
       if(render_po_aligned)
         same_po[ev.thread].insert(*it_e);
@@ -1654,7 +1676,7 @@ void inline instrumentert::print_outputs_local(
       else if(render_by_file)
         same_file[ev.source_location.get_file()].insert(*it_e);
       if(ev.thread>max_thread)
-        max_thread = ev.thread;
+        max_thread=ev.thread;
 
       if(var_to_instr.find(ev.variable)!=var_to_instr.end()
         && id2loc.find(ev.variable)!=id2loc.end())
@@ -1668,6 +1690,7 @@ void inline instrumentert::print_outputs_local(
 
   /* aligns events by po */
   if(render_po_aligned)
+  {
     for(unsigned i=0; i<=max_thread; i++)
       if(!same_po[i].empty())
       {
@@ -1678,14 +1701,17 @@ void inline instrumentert::print_outputs_local(
           dot << egraph[*it].id << ";";
         dot << "};" << std::endl;
       }
+  }
 
   /* clusters events by file/function */
   if(render_by_file || render_by_function)
+  {
     for(std::map<irep_idt, std::set<event_idt> >::const_iterator it=
       same_file.begin();
       it!=same_file.end(); it++)
     {
-      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{" << std::endl;
+      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{"
+          << std::endl;
       dot << "  label=\"" << it->first << "\";" << std::endl;
       for(std::set<event_idt>::const_iterator ev_it=it->second.begin();
         ev_it!=it->second.end(); ev_it++)
@@ -1694,17 +1720,19 @@ void inline instrumentert::print_outputs_local(
       }
       dot << "};" << std::endl;
     }
+  }
 
   /* variable table for "all" */
-  for(unsigned i=0; i<80; ++i) table << "-";
-  for(std::map<std::string, std::string>::const_iterator m_it=map_id2var.begin();
-    m_it!=map_id2var.end();
-    ++m_it)
+  table << std::string(80, '-');
+  for(std::map<std::string, std::string>::const_iterator
+      m_it=map_id2var.begin();
+      m_it!=map_id2var.end();
+      ++m_it)
   {
     table << std::endl << "| " << m_it->first << " : " << m_it->second;
   }
   table << std::endl;
-  for(unsigned i=0; i<80; ++i) table << "-";
+  table << std::string(80, '-');
   table << std::endl;
 }
 
@@ -1734,7 +1762,7 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
     for(unsigned i=0; i<num_sccs; i++)
     {
       std::ofstream local_dot;
-      std::string name = "scc_" + std::to_string(i) + ".dot";
+      std::string name="scc_" + std::to_string(i) + ".dot";
       local_dot.open(name.c_str());
 
       local_dot << "digraph G {" << std::endl;
@@ -1773,10 +1801,10 @@ Function: instrumentert::collect_cycles_by_SCCs
 \*******************************************************************/
 
 #if 1
-//#ifdef _WIN32
+// #ifdef _WIN32
 void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
 {
-  unsigned scc = 0;
+  unsigned scc=0;
   set_of_cycles_per_SCC.resize(num_sccs,
     std::set<event_grapht::critical_cyclet>());
   for(std::vector<std::set<event_idt> >::const_iterator it=egraph_SCCs.begin();
@@ -1788,7 +1816,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
 class pthread_argumentt
 {
 public:
-  instrumentert& instr;
+  instrumentert &instr;
   memory_modelt mem;
   const std::set<event_idt>& filter;
   std::set<event_grapht::critical_cyclet>& cycles;
@@ -1803,7 +1831,7 @@ public:
 };
 
 /* wraper */
-void* collect_cycles_in_thread(void* arg)
+void *collect_cycles_in_thread(void *arg)
 {
   /* arguments */
   pthread_argumentt *p_arg=reinterpret_cast<pthread_argumentt*>(arg);
@@ -1819,7 +1847,7 @@ void* collect_cycles_in_thread(void* arg)
 
 void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
 {
-  const unsigned number_of_sccs = num_sccs;
+  const unsigned number_of_sccs=num_sccs;
   std::set<unsigned> interesting_SCCs;
 
   unsigned scc=0;
@@ -1829,7 +1857,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
     std::set<event_grapht::critical_cyclet>());
 
   for(std::vector<std::set<unsigned> >::const_iterator it=egraph_SCCs.begin();
-    it!=egraph_SCCs.end(); it++)
+      it!=egraph_SCCs.end(); it++)
     if(it->size()>=4)
     {
       interesting_SCCs.insert(scc);
@@ -1845,7 +1873,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
   for(unsigned i=0; i<number_of_sccs; i++)
     if(interesting_SCCs.find(i)!=interesting_SCCs.end())
     {
-      int rc = pthread_join(threads[i], NULL);
+      int rc=pthread_join(threads[i], NULL);
       message.status()<<(rc!=0?"Failure ":"Success ")
         <<"in joining thread for SCC #"<<i<<messaget::eom;
     }

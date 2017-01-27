@@ -100,7 +100,8 @@ public:
 
   int compare(const dstringt &b) const
   {
-    if(no==b.no) return 0; // equal
+    if(no==b.no)
+      return 0; // equal
     return as_string().compare(b.as_string());
   }
 

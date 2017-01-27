@@ -94,7 +94,8 @@ protected:
   {
     std::vector<mp_integer> v;
     evaluate(expr, v);
-    if(v.size()!=1) throw "invalid boolean value";
+    if(v.size()!=1)
+      throw "invalid boolean value";
     return v.front()!=0;
   }
 

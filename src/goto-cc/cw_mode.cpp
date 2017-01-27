@@ -176,8 +176,10 @@ int cw_modet::doit()
       std::cout << "  " << (*it) << std::endl;
     }
 
-    std::cout << "Output file (object): " << compiler.output_file_object << std::endl;
-    std::cout << "Output file (executable): " << compiler.output_file_executable << std::endl;
+    std::cout << "Output file (object): "
+              << compiler.output_file_object << std::endl;
+    std::cout << "Output file (executable): "
+              << compiler.output_file_executable << std::endl;
   }
 
   // Parse input program, convert to goto program, write output
@@ -198,5 +200,6 @@ Function: cw_modet::help_mode
 
 void cw_modet::help_mode()
 {
-  std::cout << "goto-cw understands the options of gcc (mwcc mode) plus the following.\n\n";
+  std::cout << "goto-cw understands the options of "
+            << "gcc (mwcc mode) plus the following.\n\n";
 }

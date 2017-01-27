@@ -1091,7 +1091,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "Analysis options:\n"
     " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
-    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n"
+    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)

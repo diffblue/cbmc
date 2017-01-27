@@ -12,7 +12,8 @@ Author: Matt Lewis
 #include "path.h"
 #include "accelerator.h"
 
-class loop_accelerationt {
+class loop_accelerationt
+{
  public:
   virtual bool accelerate(path_acceleratort &accelerator) = 0;
 };

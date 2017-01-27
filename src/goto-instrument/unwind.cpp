@@ -7,8 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-//#define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif

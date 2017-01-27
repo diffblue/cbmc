@@ -29,7 +29,8 @@ Function: simplify_exprt::simplify_isinf
 
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(ns.follow(expr.op0().type()).id()!=ID_floatbv)
     return true;
@@ -58,7 +59,8 @@ Function: simplify_exprt::simplify_isnan
 
 bool simplify_exprt::simplify_isnan(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -84,7 +86,8 @@ Function: simplify_exprt::simplify_isnormal
 
 bool simplify_exprt::simplify_isnormal(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -111,7 +114,8 @@ Function: simplify_exprt::simplify_abs
 #if 0
 bool simplify_exprt::simplify_abs(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -164,7 +168,8 @@ Function: simplify_exprt::simplify_sign
 #if 0
 bool simplify_exprt::simplify_sign(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -427,9 +432,11 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 
   exprt::operandst &operands=expr.operands();
 
-  if(expr.type().id()!=ID_bool) return true;
+  if(expr.type().id()!=ID_bool)
+    return true;
 
-  if(operands.size()!=2) return true;
+  if(operands.size()!=2)
+    return true;
 
   // types must match
   if(expr.op0().type()!=expr.op1().type())

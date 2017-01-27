@@ -114,7 +114,8 @@ std::string linkingt::type_to_string_verbose(
     std::string result=followed.id_string();
 
     const std::string &tag=followed.get_string(ID_tag);
-    if(tag!="") result+=" "+tag;
+    if(tag!="")
+      result+=" "+tag;
     result+=" {\n";
 
     const struct_union_typet::componentst &components=
@@ -225,6 +226,7 @@ void linkingt::detailed_conflict_report_rec(
       msg+=std::to_string(components2.size())+')';
     }
     else
+    {
       for(std::size_t i=0; i<components1.size(); ++i)
       {
         const typet &subtype1=components1[i].type();
@@ -284,13 +286,13 @@ void linkingt::detailed_conflict_report_rec(
                 c);
               msg.swap(msg_bak);
             }
-
           }
 
           if(parent_types.find(t1)==parent_types.end())
             break;
         }
       }
+    }
   }
   else if(t1.id()==ID_c_enum)
   {
@@ -313,6 +315,7 @@ void linkingt::detailed_conflict_report_rec(
       msg+=std::to_string(members2.size())+')';
     }
     else
+    {
       for(std::size_t i=0; i<members1.size(); ++i)
       {
         if(members1[i].get_base_name()!=members2[i].get_base_name())
@@ -330,6 +333,7 @@ void linkingt::detailed_conflict_report_rec(
           break;
         }
       }
+    }
 
     msg+="\nenum declarations at\n";
     msg+=t1.source_location().as_string()+" and\n";
@@ -370,6 +374,7 @@ void linkingt::detailed_conflict_report_rec(
         msg="return types differ";
     }
     else
+    {
       for(std::size_t i=0; i<parameters1.size(); i++)
       {
         const typet &subtype1=parameters1[i].type();
@@ -395,6 +400,7 @@ void linkingt::detailed_conflict_report_rec(
           break;
         }
       }
+    }
   }
   else
     msg="conflict on POD";
@@ -1502,7 +1508,6 @@ void linkingt::copy_symbols()
     else
       duplicate_non_type_symbol(old_symbol, new_symbol);
   }
-
 }
 
 /*******************************************************************\

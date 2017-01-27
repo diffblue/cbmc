@@ -269,7 +269,8 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
 {
   if(type.id()==ID_pointer)
   {
-    switch(track_options) {
+    switch(track_options)
+    {
       case TRACK_ALL_POINTERS:
         { return true; break; }
       case TRACK_FUNCTION_POINTERS:
@@ -277,7 +278,7 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         if(type.id()==ID_pointer)
         {
           const typet *t = &type;
-          while (t->id()==ID_pointer) t = &(t->subtype());
+          while(t->id()==ID_pointer) t = &(t->subtype());
 
           return (t->id()==ID_code);
         }
@@ -301,7 +302,8 @@ bool value_set_analysis_fivrt::check_type(const typet &type)
         it!=components.end();
         it++)
     {
-      if(check_type(it->type())) return true;
+      if(check_type(it->type()))
+        return true;
     }
   }
   else if(type.id()==ID_array)

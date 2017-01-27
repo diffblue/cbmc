@@ -54,7 +54,7 @@ public:
     {
     }
 
-    entryt& operator[](const goto_programt::const_targett &t)
+    entryt &operator[](const goto_programt::const_targett &t)
     {
       std::pair<iterator, bool> e=insert(std::make_pair(t, 0));
 

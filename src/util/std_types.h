@@ -385,7 +385,8 @@ public:
       assert(it->id()==ID_base);
       const irept &type=it->find(ID_type);
       assert(type.id()==ID_symbol);
-      if(type.get(ID_identifier)==id) return true;
+      if(type.get(ID_identifier)==id)
+        return true;
     }
 
     return false;

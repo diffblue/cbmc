@@ -11,7 +11,7 @@ Author: Peter Schrammel
 
 #include <util/replace_symbol.h>
 
-class replace_symbol_extt : public replace_symbolt
+class replace_symbol_extt:public replace_symbolt
 {
 public:
   virtual bool replace(exprt &dest) const;

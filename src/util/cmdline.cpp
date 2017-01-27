@@ -78,7 +78,8 @@ Function: cmdlinet::isset
 bool cmdlinet::isset(char option) const
 {
   int i=getoptnr(option);
-  if(i<0) return false;
+  if(i<0)
+    return false;
   return options[i].isset;
 }
 
@@ -97,7 +98,8 @@ Function: cmdlinet::isset
 bool cmdlinet::isset(const char *option) const
 {
   int i=getoptnr(option);
-  if(i<0) return false;
+  if(i<0)
+    return false;
   return options[i].isset;
 }
 
@@ -116,8 +118,10 @@ Function: cmdlinet::get_value
 std::string cmdlinet::get_value(char option) const
 {
   int i=getoptnr(option);
-  if(i<0) return "";
-  if(options[i].values.empty()) return "";
+  if(i<0)
+    return "";
+  if(options[i].values.empty())
+    return "";
   return options[i].values.front();
 }
 
@@ -136,7 +140,8 @@ Function: cmdlinet::set
 void cmdlinet::set(const std::string &option)
 {
   int i=getoptnr(option);
-  if(i<0) return; // ignore
+  if(i<0)
+    return; // ignore
   options[i].isset=true;
 }
 
@@ -155,7 +160,8 @@ Function: cmdlinet::set
 void cmdlinet::set(const std::string &option, const std::string &value)
 {
   int i=getoptnr(option);
-  if(i<0) return; // ignore
+  if(i<0)
+    return; // ignore
   options[i].isset=true;
   options[i].values.push_back(value);
 }
@@ -194,8 +200,10 @@ Function: cmdlinet::get_value
 std::string cmdlinet::get_value(const char *option) const
 {
   int i=getoptnr(option);
-  if(i<0) return "";
-  if(options[i].values.empty()) return "";
+  if(i<0)
+    return "";
+  if(options[i].values.empty())
+    return "";
   return options[i].values.front();
 }
 
@@ -211,7 +219,8 @@ Function: cmdlinet::get_values
 
 \*******************************************************************/
 
-const std::list<std::string>& cmdlinet::get_values(const std::string &option) const
+const std::list<std::string>& cmdlinet::get_values(
+  const std::string &option) const
 {
   int i=getoptnr(option);
   assert(i>=0);
@@ -296,7 +305,8 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
       for(optstring++; optstring[0]!=')' && optstring[0]!=0; optstring++)
         option.optstring+=optstring[0];
 
-      if(optstring[0]==')') optstring++;
+      if(optstring[0]==')')
+        optstring++;
     }
     else
     {
@@ -341,15 +351,18 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
           optnr=getoptnr(argv[i]+1);
       }
 
-      if(optnr<0) return true;
+      if(optnr<0)
+        return true;
       options[optnr].isset=true;
       if(options[optnr].hasval)
       {
         if(argv[i][2]==0 || options[optnr].islong)
         {
           i++;
-          if(i==argc) return true;
-          if(argv[i][0]=='-' && argv[i][1]!=0) return true;
+          if(i==argc)
+            return true;
+          if(argv[i][0]=='-' && argv[i][1]!=0)
+            return true;
           options[optnr].values.push_back(argv[i]);
         }
         else

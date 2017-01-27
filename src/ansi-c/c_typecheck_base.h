@@ -175,11 +175,15 @@ protected:
   virtual void typecheck_expr_sizeof(exprt &expr);
   virtual void typecheck_expr_alignof(exprt &expr);
   virtual void typecheck_expr_function_identifier(exprt &expr);
-  virtual void typecheck_side_effect_gcc_conditional_expression(side_effect_exprt &expr);
-  virtual void typecheck_side_effect_function_call(side_effect_expr_function_callt &expr);
+  virtual void typecheck_side_effect_gcc_conditional_expression(
+    side_effect_exprt &expr);
+  virtual void typecheck_side_effect_function_call(
+    side_effect_expr_function_callt &expr);
   virtual void typecheck_side_effect_assignment(side_effect_exprt &expr);
-  virtual void typecheck_side_effect_statement_expression(side_effect_exprt &expr);
-  virtual void typecheck_function_call_arguments(side_effect_expr_function_callt &expr);
+  virtual void typecheck_side_effect_statement_expression(
+    side_effect_exprt &expr);
+  virtual void typecheck_function_call_arguments(
+    side_effect_expr_function_callt &expr);
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
 
   virtual void make_index_type(exprt &expr);
@@ -235,7 +239,8 @@ protected:
   void typecheck_symbol(symbolt &symbol);
   void typecheck_new_symbol(symbolt &symbol);
   void typecheck_redefinition_type(symbolt &old_symbol, symbolt &new_symbol);
-  void typecheck_redefinition_non_type(symbolt &old_symbol, symbolt &new_symbol);
+  void typecheck_redefinition_non_type(
+    symbolt &old_symbol, symbolt &new_symbol);
   void typecheck_function_body(symbolt &symbol);
 
   virtual void do_initializer(symbolt &symbol);

@@ -74,7 +74,8 @@ void value_set_analysist::convert(
   {
     const source_locationt &location=i_it->source_location;
 
-    if(location==previous_location) continue;
+    if(location==previous_location)
+      continue;
 
     if(location.is_nil() || location.get_file()==irep_idt())
       continue;

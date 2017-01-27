@@ -140,7 +140,8 @@ void fence_weak_memory(
     instrumenter.cfg_cycles_filter();
 
   /* selects method, infers fences then outputs them */
-  switch(mode) {
+  switch(mode)
+  {
     case INFER:
     {
       fence_insertert fence_inserter(instrumenter, model);

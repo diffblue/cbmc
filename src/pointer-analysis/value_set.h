@@ -81,7 +81,10 @@ public:
     return insert(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert(dest, object_numbering.number(src), objectt(offset));
   }

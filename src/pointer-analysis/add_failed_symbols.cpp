@@ -43,7 +43,8 @@ Function: add_failed_symbol
 
 void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
-  if(!symbol.is_lvalue) return;
+  if(!symbol.is_lvalue)
+    return;
 
   if(symbol.type.get(ID_C_failed_symbol)!="")
     return;

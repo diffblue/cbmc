@@ -74,14 +74,16 @@ public:
   bool get_attribute_bool(const std::string &attribute) const
   {
     attributest::const_iterator i=attributes.find(attribute);
-    if(i!=attributes.end()) return (i->second=="true");
+    if(i!=attributes.end())
+      return (i->second=="true");
     return false;
   }
 
   std::string get_element(const std::string &element) const
   {
     elementst::const_iterator i=find(element);
-    if(i!=elements.end()) return i->data;
+    if(i!=elements.end())
+      return i->data;
     return "";
   }
 

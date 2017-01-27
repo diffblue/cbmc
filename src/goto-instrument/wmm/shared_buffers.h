@@ -92,15 +92,13 @@ public:
     goto_programt::targett &t,
     const source_locationt &source_location,
     const irep_idt &read_object,
-    const irep_idt &write_object
-  );
+    const irep_idt &write_object);
 
   void flush_read(
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &write_object
-  );
+    const irep_idt &write_object);
 
   void write(
     goto_programt &goto_program,
@@ -149,7 +147,8 @@ public:
     namespacet ns(symbol_table);
 
     const symbolt &symbol=ns.lookup(id);
-    if(symbol.is_thread_local) return false;
+    if(symbol.is_thread_local)
+      return false;
     if(has_prefix(id2string(id), CPROVER_PREFIX))
       return false;
 
@@ -180,8 +179,7 @@ public:
     symbol_tablet &symbol_table,
     goto_programt &goto_program,
     memory_modelt model,
-    goto_functionst &goto_functions
-  );
+    goto_functionst &goto_functions);
 
   void affected_by_delay(
     symbol_tablet &symbol_table,
@@ -191,9 +189,9 @@ public:
   class cfg_visitort
   {
   protected:
-    shared_bufferst& shared_buffers;
-    symbol_tablet& symbol_table;
-    goto_functionst& goto_functions;
+    shared_bufferst &shared_buffers;
+    symbol_tablet &symbol_table;
+    goto_functionst &goto_functions;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -242,7 +240,7 @@ protected:
   bool cav11;
 
   /* message */
-  messaget& message;
+  messaget &message;
 
   irep_idt add(
     const irep_idt &object,

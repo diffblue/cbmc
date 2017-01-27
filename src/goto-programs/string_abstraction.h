@@ -76,10 +76,14 @@ protected:
       dest.make_typecast(type);
   }
 
-  goto_programt::targett abstract(goto_programt &dest, goto_programt::targett it);
-  goto_programt::targett abstract_assign(goto_programt &dest, goto_programt::targett it);
-  goto_programt::targett abstract_pointer_assign(goto_programt &dest, goto_programt::targett it);
-  goto_programt::targett abstract_char_assign(goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract(
+    goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_assign(
+    goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_pointer_assign(
+    goto_programt &dest, goto_programt::targett it);
+  goto_programt::targett abstract_char_assign(
+    goto_programt &dest, goto_programt::targett it);
 
   goto_programt::targett char_assign(
     goto_programt &dest,

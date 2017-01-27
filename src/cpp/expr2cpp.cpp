@@ -311,7 +311,8 @@ std::string expr2cppt::convert_rec(
 
     forall_irep(it, arguments)
     {
-      if(it!=arguments.begin()) dest+=", ";
+      if(it!=arguments.begin())
+        dest+=", ";
 
       const exprt &argument=(const exprt &)*it;
 
@@ -359,7 +360,8 @@ std::string expr2cppt::convert_rec(
           it!=args.end();
           ++it)
       {
-        if(it!=args.begin()) dest+=", ";
+        if(it!=args.begin())
+          dest+=", ";
         dest+=convert_rec(it->type(), c_qualifierst(), "");
       }
 
@@ -407,7 +409,8 @@ std::string expr2cppt::convert_rec(
 
     if(code_type.has_ellipsis())
     {
-      if(!parameters.empty()) dest+=", ";
+      if(!parameters.empty())
+        dest+=", ";
       dest+="...";
     }
 

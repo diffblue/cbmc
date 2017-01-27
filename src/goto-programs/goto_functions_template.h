@@ -136,7 +136,6 @@ public:
     for(const auto &fun : other.function_map)
       function_map[fun.first].copy_from(fun.second);
   }
-
 };
 
 /*******************************************************************\

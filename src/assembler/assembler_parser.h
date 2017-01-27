@@ -49,7 +49,7 @@ public:
   {
     parsert::clear();
     instructions.clear();
-    //assembler_scanner_init();
+    // assembler_scanner_init();
   }
 };
 

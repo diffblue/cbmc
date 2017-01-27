@@ -30,7 +30,8 @@ Function: printf_formattert::make_type
 const exprt printf_formattert::make_type(
   const exprt &src, const typet &dest)
 {
-  if(src.type()==dest) return src;
+  if(src.type()==dest)
+    return src;
   exprt tmp=src;
   tmp.make_typecast(dest);
   simplify(tmp, ns);
@@ -160,22 +161,26 @@ void printf_formattert::process_format(std::ostream &out)
 
   case 'f':
   case 'F':
-    if(next_operand==operands.end()) break;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), double_type()));
     break;
 
   case 'g':
   case 'G':
-    if(format_constant.precision==0) format_constant.precision=1;
-    if(next_operand==operands.end()) break;
+    if(format_constant.precision==0)
+      format_constant.precision=1;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), double_type()));
     break;
 
   case 's':
     {
-      if(next_operand==operands.end()) break;
+      if(next_operand==operands.end())
+        break;
       // this is the address of a string
       const exprt &op=*(next_operand++);
       if(op.id()==ID_address_of &&
@@ -188,25 +193,29 @@ void printf_formattert::process_format(std::ostream &out)
     break;
 
   case 'd':
-    if(next_operand==operands.end()) break;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), signed_int_type()));
     break;
 
   case 'D':
-    if(next_operand==operands.end()) break;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), signed_long_int_type()));
     break;
 
   case 'u':
-    if(next_operand==operands.end()) break;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), unsigned_int_type()));
     break;
 
   case 'U':
-    if(next_operand==operands.end()) break;
+    if(next_operand==operands.end())
+      break;
     out << format_constant(
       make_type(*(next_operand++), unsigned_long_int_type()));
     break;

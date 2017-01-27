@@ -230,7 +230,7 @@ private:
     const values_innert &other);
 };
 
-class reaching_definitions_analysist :
+class reaching_definitions_analysist:
   public concurrency_aware_ait<rd_range_domaint>,
   public sparse_bitvector_analysist<reaching_definitiont>
 {

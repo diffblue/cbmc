@@ -264,7 +264,7 @@ void escape_domaint::transform(
     return;
 
   // upcast of ai
-  //escape_analysist &ea=
+  // escape_analysist &ea=
   //  static_cast<escape_analysist &>(ai);
 
   const goto_programt::instructiont &instruction=*from;
@@ -303,7 +303,8 @@ void escape_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call=
+        to_code_function_call(instruction.code);
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)
@@ -607,7 +608,13 @@ void escape_analysist::instrument(
 
           std::set<irep_idt> cleanup_functions;
           operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
-          insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, false, ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_assign.lhs(),
+            cleanup_functions,
+            false,
+            ns);
         }
         break;
 
@@ -634,8 +641,20 @@ void escape_analysist::instrument(
 
           d.check_lhs(code_dead.symbol(), cleanup_functions2);
 
-          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
-          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions2, false, ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_dead.symbol(),
+            cleanup_functions1,
+            true,
+            ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_dead.symbol(),
+            cleanup_functions2,
+            false,
+            ns);
 
           for(const auto &c : cleanup_functions1)
           {

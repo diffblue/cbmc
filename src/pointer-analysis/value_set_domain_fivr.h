@@ -47,11 +47,10 @@ public:
     value_set.get_reference_set(expr, expr_set, ns);
   }
 
-  virtual void clear( void )
+  virtual void clear(void)
   {
     value_set.clear();
   }
-
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_FIVR_H

@@ -80,8 +80,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
     if(expr.operands().size()==2)
     {
       bool result=true;
-      if(!simplify_address_of_arg(expr.op0())) result=false;
-      if(!simplify_rec(expr.op1())) result=false;
+      if(!simplify_address_of_arg(expr.op0()))
+        result=false;
+      if(!simplify_rec(expr.op1()))
+        result=false;
 
       // rewrite (*(type *)int) [index] by
       // pushing the index inside
@@ -117,7 +119,8 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
     if(expr.operands().size()==1)
     {
       bool result=true;
-      if(!simplify_address_of_arg(expr.op0())) result=false;
+      if(!simplify_address_of_arg(expr.op0()))
+        result=false;
 
       const typet &op_type=ns.follow(expr.op0().type());
 
@@ -159,9 +162,12 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
     if(expr.operands().size()==3)
     {
       bool result=true;
-      if(!simplify_rec(expr.op0())) result=false;
-      if(!simplify_address_of_arg(expr.op1())) result=false;
-      if(!simplify_address_of_arg(expr.op2())) result=false;
+      if(!simplify_rec(expr.op0()))
+        result=false;
+      if(!simplify_address_of_arg(expr.op1()))
+        result=false;
+      if(!simplify_address_of_arg(expr.op2()))
+        result=false;
 
       // op0 is a constant?
       if(expr.op0().is_true())
@@ -200,9 +206,11 @@ Function: simplify_exprt::simplify_address_of
 
 bool simplify_exprt::simplify_address_of(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
-  if(ns.follow(expr.type()).id()!=ID_pointer) return true;
+  if(ns.follow(expr.type()).id()!=ID_pointer)
+    return true;
 
   exprt &object=expr.op0();
 
@@ -252,7 +260,8 @@ Function: simplify_exprt::simplify_pointer_offset
 
 bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &ptr=expr.op0();
 
@@ -267,11 +276,13 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     return false;
   }
 
-  if(ptr.type().id()!=ID_pointer) return true;
+  if(ptr.type().id()!=ID_pointer)
+    return true;
 
   if(ptr.id()==ID_address_of)
   {
-    if(ptr.operands().size()!=1) return true;
+    if(ptr.operands().size()!=1)
+      return true;
 
     mp_integer offset=compute_pointer_offset(ptr.op0(), ns);
 
@@ -283,7 +294,8 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   }
   else if(ptr.id()==ID_typecast) // pointer typecast
   {
-    if(ptr.operands().size()!=1) return true;
+    if(ptr.operands().size()!=1)
+      return true;
 
     const typet &op_type=ns.follow(ptr.op0().type());
 
@@ -377,7 +389,8 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     mp_integer element_size=
       pointer_offset_size(pointer_type.subtype(), ns);
 
-    if(element_size==0) return true;
+    if(element_size==0)
+      return true;
 
     // this might change the type of the pointer!
     exprt pointer_offset(ID_pointer_offset, expr.type());
@@ -455,8 +468,10 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   assert(tmp0.id()==ID_address_of);
   assert(tmp1.id()==ID_address_of);
 
-  if(tmp0.operands().size()!=1) return true;
-  if(tmp1.operands().size()!=1) return true;
+  if(tmp0.operands().size()!=1)
+    return true;
+  if(tmp1.operands().size()!=1)
+    return true;
 
   if(tmp0.op0().id()==ID_symbol &&
      tmp1.op0().id()==ID_symbol)
@@ -531,7 +546,8 @@ Function: simplify_exprt::simplify_pointer_object
 
 bool simplify_exprt::simplify_pointer_object(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &op=expr.op0();
 
@@ -570,7 +586,8 @@ Function: simplify_exprt::simplify_dynamic_object
 
 bool simplify_exprt::simplify_dynamic_object(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &op=expr.op0();
 
@@ -587,7 +604,8 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
 
   bool result=true;
 
-  if(!simplify_object(op)) result=false;
+  if(!simplify_object(op))
+    result=false;
 
   // NULL is not dynamic
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
@@ -636,13 +654,15 @@ Function: simplify_exprt::simplify_invalid_pointer
 
 bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &op=expr.op0();
 
   bool result=true;
 
-  if(!simplify_object(op)) result=false;
+  if(!simplify_object(op))
+    result=false;
 
   // NULL is not invalid
   if(op.id()==ID_constant && op.get(ID_value)==ID_NULL)
@@ -675,7 +695,8 @@ Function: simplify_exprt::objects_equal
 
 tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
 {
-  if(a==b) return tvt(true);
+  if(a==b)
+    return tvt(true);
 
   if(a.id()==ID_address_of && b.id()==ID_address_of &&
      a.operands().size()==1 && b.operands().size()==1)
@@ -710,7 +731,8 @@ Function: simplify_exprt::objects_equal_address_of
 
 tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 {
-  if(a==b) return tvt(true);
+  if(a==b)
+    return tvt(true);
 
   if(a.id()==ID_symbol && b.id()==ID_symbol)
   {
@@ -745,13 +767,15 @@ Function: simplify_exprt::simplify_object_size
 
 bool simplify_exprt::simplify_object_size(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   exprt &op=expr.op0();
 
   bool result=true;
 
-  if(!simplify_object(op)) result=false;
+  if(!simplify_object(op))
+    result=false;
 
   if(op.id()==ID_address_of && op.operands().size()==1)
   {
@@ -801,7 +825,8 @@ Function: simplify_exprt::simplify_good_pointer
 
 bool simplify_exprt::simplify_good_pointer(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   // we expand the definition
   exprt def=good_pointer_def(expr.op0(), ns);

@@ -128,8 +128,8 @@ void convert(
         xml_assignment.set_attribute("step_nr", std::to_string(step.step_nr));
 
         xml_assignment.set_attribute("assignment_type",
-          step.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?"actual_parameter":
-          "state");
+          step.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?
+          "actual_parameter":"state");
 
         if(step.lhs_object_value.is_not_nil())
           xml_assignment.new_element("value_expression").
@@ -197,7 +197,8 @@ void convert(
 
         const symbolt &symbol=ns.lookup(step.identifier);
         xmlt &xml_function=xml_call_return.new_element("function");
-        xml_function.set_attribute("display_name", id2string(symbol.display_name()));
+        xml_function.set_attribute(
+          "display_name", id2string(symbol.display_name()));
         xml_function.set_attribute("identifier", id2string(step.identifier));
         xml_function.new_element()=xml(symbol.location);
 
@@ -215,8 +216,10 @@ void convert(
           xmlt &xml_location_only=dest.new_element("location-only");
 
           xml_location_only.set_attribute_bool("hidden", step.hidden);
-          xml_location_only.set_attribute("thread", std::to_string(step.thread_nr));
-          xml_location_only.set_attribute("step_nr", std::to_string(step.step_nr));
+          xml_location_only.set_attribute(
+            "thread", std::to_string(step.thread_nr));
+          xml_location_only.set_attribute(
+            "step_nr", std::to_string(step.step_nr));
 
           xml_location_only.new_element().swap(xml_location);
         }

@@ -174,7 +174,8 @@ exprt value_set_dereferencet::dereference(
         it=values.begin();
         it!=values.end();
         it++)
-      if(it->value.is_nil()) may_fail=true;
+      if(it->value.is_nil())
+        may_fail=true;
   }
 
   if(may_fail)
@@ -465,7 +466,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=nil_exprt();
       return result;
     }
-    
+
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 

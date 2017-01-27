@@ -35,8 +35,8 @@ void gettimeofday(struct timeval* p, struct timezone *tz)
     FILETIME ft;
   } _now;
 
-  GetSystemTimeAsFileTime( &(_now.ft) );
-  p->tv_usec=(long)((_now.ns100 / 10LL) % 1000000LL );
+  GetSystemTimeAsFileTime(&(_now.ft));
+  p->tv_usec=(long)((_now.ns100 / 10LL) % 1000000LL);
   p->tv_sec= (long)((_now.ns100-(116444736000000000LL))/10000000LL);
 }
 #endif

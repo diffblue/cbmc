@@ -179,7 +179,8 @@ void path_searcht::report_statistics()
 
   #if 0
   for(unsigned l=0; l<loc_data.size(); l++)
-    if(!loc_data[l].visited) status() << "NV: " << l << eom;
+    if(!loc_data[l].visited)
+      status() << "NV: " << l << eom;
   #endif
 
   // report a bit
@@ -379,7 +380,8 @@ void path_searcht::check_assertion(statet &state)
   exprt assertion=
     state.read(instruction.guard);
 
-  if(assertion.is_true()) return; // no error, trivially
+  if(assertion.is_true())
+    return; // no error, trivially
 
   // keep statistics
   number_of_VCCs_after_simplification++;

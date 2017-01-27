@@ -50,7 +50,8 @@ void c_storage_spect::read(const typet &type)
   }
   else if(type.id()==ID_msc_declspec)
   {
-    const exprt &as_expr=static_cast<const exprt &>(static_cast<const irept &>(type));
+    const exprt &as_expr=
+      static_cast<const exprt &>(static_cast<const irept &>(type));
     forall_operands(it, as_expr)
       if(it->id()==ID_thread)
         is_thread_local=true;

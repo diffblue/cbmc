@@ -89,15 +89,20 @@ public:
     size_t size(void) const { return objmap.size(); }
     void clear(void) { objmap.clear(); validity_ranges.clear(); }
 
-    objectt& operator[](unsigned k) {
+    objectt &operator[](unsigned k)
+    {
       return objmap[k];
     }
 
     // operator[] is the only way to insert something!
-    std::pair<iterator, bool> insert (const std::pair<unsigned, objectt>&)
-      { assert(false); }
+    std::pair<iterator, bool> insert(const std::pair<unsigned, objectt>&)
+    {
+      assert(false);
+    }
     iterator insert(iterator, const std::pair<unsigned, objectt>&)
-      { assert(false); }
+    {
+      assert(false);
+    }
 
     class validity_ranget
     {
@@ -148,14 +153,20 @@ public:
     return insert_to(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert_to(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert_to(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert_to(dest, object_numbering.number(src), objectt(offset));
   }
 
   bool insert_to(object_mapt &dest, unsigned n, const objectt &object) const;
 
-  bool insert_to(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert_to(
+    object_mapt &dest,
+    const exprt &expr,
+    const objectt &object) const
   {
     return insert_to(dest, object_numbering.number(expr), object);
   }
@@ -170,14 +181,20 @@ public:
     return insert_from(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert_from(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert_from(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert_from(dest, object_numbering.number(src), objectt(offset));
   }
 
   bool insert_from(object_mapt &dest, unsigned n, const objectt &object) const;
 
-  bool insert_from(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert_from(
+    object_mapt &dest,
+    const exprt &expr,
+    const objectt &object) const
   {
     return insert_from(dest, object_numbering.number(expr), object);
   }

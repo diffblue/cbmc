@@ -51,7 +51,7 @@ protected:
   // prefix to variables which is set in typecheck_declaration
   irep_idt proc_name;
 
-  void update_expr_type (exprt &expr, const typet &type);
+  void update_expr_type(exprt &expr, const typet &type);
   void make_type_compatible(exprt &expr, const typet &type, bool must);
   void typecheck_type_symbol(symbolt &symbol) {}
   void typecheck_non_type_symbol(symbolt &symbol);
@@ -83,7 +83,7 @@ protected:
   void typecheck_block(codet &code);
   void typecheck_ifthenelse(code_ifthenelset &code);
   void typecheck_assign(code_assignt &code);
-  void typecheck_try_catch (code_try_catcht &code);
+  void typecheck_try_catch(code_try_catcht &code);
   void typecheck_type(typet &type);
   irep_idt add_prefix(const irep_idt &ds);
 

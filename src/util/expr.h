@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "type.h"
 
 #define forall_operands(it, expr) \
-  if((expr).has_operands()) \
+  if((expr).has_operands()) /* NOLINT(readability/braces) */ \
     for(exprt::operandst::const_iterator it=(expr).operands().begin(), \
         it##_end=(expr).operands().end(); \
         it!=it##_end; ++it)
 
 #define Forall_operands(it, expr) \
-  if((expr).has_operands()) \
+  if((expr).has_operands()) /* NOLINT(readability/braces) */ \
     for(exprt::operandst::iterator it=(expr).operands().begin(); \
         it!=(expr).operands().end(); ++it)
 

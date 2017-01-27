@@ -724,7 +724,7 @@ static void gather_symbol_live_ranges(
   {
     const auto &symexpr=to_symbol_expr(e);
     auto findit=
-      result.insert({
+      result.insert({ // NOLINT(whitespace/braces)
         symexpr.get_identifier(),
         java_bytecode_convert_methodt::variablet()});
     auto &var=findit.first->second;

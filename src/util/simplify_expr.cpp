@@ -79,7 +79,8 @@ Function: simplify_exprt::simplify_abs
 
 bool simplify_exprt::simplify_abs(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -130,7 +131,8 @@ Function: simplify_exprt::simplify_sign
 
 bool simplify_exprt::simplify_sign(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -171,7 +173,8 @@ Function: simplify_exprt::simplify_popcount
 
 bool simplify_exprt::simplify_popcount(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   if(expr.op0().is_constant())
   {
@@ -186,7 +189,8 @@ bool simplify_exprt::simplify_popcount(exprt &expr)
         std::size_t result;
 
         for(result=0; value!=0; value=value>>1)
-          if(value.is_odd()) result++;
+          if(value.is_odd())
+            result++;
 
         expr=from_integer(result, expr.type());
 
@@ -212,7 +216,8 @@ Function: simplify_exprt::simplify_typecast
 
 bool simplify_exprt::simplify_typecast(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   const typet &expr_type=ns.follow(expr.type());
   const typet &op_type=ns.follow(expr.op0().type());
@@ -774,7 +779,8 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
 {
   const exprt &pointer=to_dereference_expr(expr).pointer();
 
-  if(pointer.type().id()!=ID_pointer) return true;
+  if(pointer.type().id()!=ID_pointer)
+    return true;
 
   if(pointer.id()==ID_if && pointer.operands().size()==3)
   {
@@ -1076,8 +1082,10 @@ bool simplify_exprt::simplify_if_branch(
     fresult = simplify_if_recursive(falseexpr, cond, false) && fresult;
   }
 
-  if(!tresult) simplify_rec(trueexpr);
-  if(!fresult) simplify_rec(falseexpr);
+  if(!tresult)
+    simplify_rec(trueexpr);
+  if(!fresult)
+    simplify_rec(falseexpr);
 
   return tresult && fresult;
 }
@@ -1121,7 +1129,8 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
       }
     }
 
-    if(!tmp) simplify_rec(expr);
+    if(!tmp)
+      simplify_rec(expr);
 
     result=tmp && result;
   }
@@ -1836,7 +1845,8 @@ std::string simplify_exprt::expr2bits(
     forall_operands(it, expr)
     {
       std::string tmp=expr2bits(*it, little_endian);
-      if(tmp.empty()) return tmp; // failed
+      if(tmp.empty())
+        return tmp; // failed
       result+=tmp;
     }
     return result;
@@ -1847,7 +1857,8 @@ std::string simplify_exprt::expr2bits(
     forall_operands(it, expr)
     {
       std::string tmp=expr2bits(*it, little_endian);
-      if(tmp.empty()) return tmp; // failed
+      if(tmp.empty())
+        return tmp; // failed
       result+=tmp;
     }
     return result;
@@ -2018,7 +2029,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   }
 
   // rethink the remaining code to correctly handle big endian
-  if(expr.id()!=ID_byte_extract_little_endian) return true;
+  if(expr.id()!=ID_byte_extract_little_endian)
+    return true;
 
   // get type of object
   const typet &op_type=ns.follow(expr.op().type());
@@ -2100,7 +2112,8 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
               offset*8+el_size<=m_offset_bits+m_size &&
               m_offset_bits%8==0)
       {
-        expr.op()=member_exprt(expr.op(), component.get_name(), component.type());
+        expr.op()=
+          member_exprt(expr.op(), component.get_name(), component.type());
         simplify_member(expr.op());
         expr.offset()=
           from_integer(offset-m_offset_bits/8, expr.offset().type());
@@ -2172,7 +2185,8 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
    *             value)
    */
 
-  if(expr.id()!=ID_byte_update_little_endian) return true;
+  if(expr.id()!=ID_byte_update_little_endian)
+    return true;
 
   if(value.id()==ID_with)
   {
@@ -2185,8 +2199,10 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       /* the simplification can be used only if
          root and offset of update and extract
          are the same */
-      if(!(root==extract.op())) return true;
-      if(!(offset==extract.offset())) return true;
+      if(!(root==extract.op()))
+        return true;
+      if(!(offset==extract.offset()))
+        return true;
 
       const typet& tp=ns.follow(with.type());
       if(tp.id()==ID_struct)
@@ -2448,7 +2464,8 @@ Function: simplify_exprt::simplify_node
 
 bool simplify_exprt::simplify_node(exprt &expr)
 {
-  if(!expr.has_operands()) return true;
+  if(!expr.has_operands())
+    return true;
 
   // #define DEBUGX
 
@@ -2618,7 +2635,8 @@ bool simplify_exprt::simplify_rec(exprt &expr)
 
   result=simplify_node_preorder(tmp);
 
-  if(!simplify_node(tmp)) result=false;
+  if(!simplify_node(tmp))
+    result=false;
 
   #if 1
   replace_mapt::const_iterator it=local_replace_map.find(tmp);

@@ -110,7 +110,8 @@ static void write_dimacs_clause(
   {
     out << clause[j].dimacs() << " ";
     // newline to avoid overflow in sat checkers
-    if((j&15)==0 && j!=0 && break_lines) out << "\n";
+    if((j&15)==0 && j!=0 && break_lines)
+      out << "\n";
   }
 
   out << "0" << "\n";

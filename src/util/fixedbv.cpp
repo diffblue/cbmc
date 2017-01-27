@@ -149,7 +149,8 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
     mp_integer p=power(2, old_fraction_bits-new_fraction_bits);
     mp_integer div=v/p;
     mp_integer rem=v%p;
-    if(rem<0) rem=-rem;
+    if(rem<0)
+      rem=-rem;
 
     if(rem*2>=p)
     {

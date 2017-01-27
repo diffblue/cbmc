@@ -46,7 +46,8 @@ ansi_c_id_classt ansi_c_parsert::lookup(
 
     if(n_it!=it->name_map.end())
     {
-      assert(id2string(n_it->second.prefixed_name)==it->prefix+id2string(scope_name));
+      assert(id2string(n_it->second.prefixed_name)==
+             it->prefix+id2string(scope_name));
       identifier=n_it->second.prefixed_name;
       return n_it->second.id_class;
     }

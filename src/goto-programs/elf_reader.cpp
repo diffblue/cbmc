@@ -152,7 +152,8 @@ std::string elf_readert::get_string(std::streampos index) const
   {
     char ch;
     in.read(&ch, 1);
-    if(ch==0) break;
+    if(ch==0)
+      break;
     result+=ch;
   }
 
@@ -174,7 +175,8 @@ Function: elf_readert::has_section
 bool elf_readert::has_section(const std::string &name) const
 {
   for(unsigned i=0; i<number_of_sections; i++)
-    if(section_name(i)==name) return true;
+    if(section_name(i)==name)
+      return true;
 
   return false;
 }

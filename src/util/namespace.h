@@ -65,11 +65,21 @@ public:
   explicit namespacet(const symbol_tablet &_symbol_table)
   { symbol_table1=&_symbol_table; symbol_table2=NULL; }
 
-  namespacet(const symbol_tablet &_symbol_table1, const symbol_tablet &_symbol_table2)
-  { symbol_table1=&_symbol_table1; symbol_table2=&_symbol_table2; }
+  namespacet(
+    const symbol_tablet &_symbol_table1,
+    const symbol_tablet &_symbol_table2)
+  {
+    symbol_table1=&_symbol_table1;
+    symbol_table2=&_symbol_table2;
+  }
 
-  namespacet(const symbol_tablet *_symbol_table1, const symbol_tablet *_symbol_table2)
-  { symbol_table1=_symbol_table1; symbol_table2=_symbol_table2; }
+  namespacet(
+    const symbol_tablet *_symbol_table1,
+    const symbol_tablet *_symbol_table2)
+  {
+    symbol_table1=_symbol_table1;
+    symbol_table2=_symbol_table2;
+  }
 
   using namespace_baset::lookup;
 
@@ -94,7 +104,8 @@ public:
   {
   }
 
-  explicit multi_namespacet(const symbol_tablet &symbol_table):namespacet(NULL, NULL)
+  explicit multi_namespacet(
+    const symbol_tablet &symbol_table):namespacet(NULL, NULL)
   {
     add(symbol_table);
   }

@@ -136,8 +136,12 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp.type()=type;
-        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
-                                    *this, get_message_handler());
+        exprt zero=
+          zero_initializer(
+            full_type.subtype(),
+            value.source_location(),
+            *this,
+            get_message_handler());
         tmp.operands().resize(integer2size_t(array_size), zero);
       }
     }
@@ -189,8 +193,12 @@ exprt c_typecheck_baset::do_initializer_rec(
       {
         // fill up
         tmp2.type()=type;
-        exprt zero=zero_initializer(full_type.subtype(), value.source_location(),
-                                    *this, get_message_handler());
+        exprt zero=
+          zero_initializer(
+            full_type.subtype(),
+            value.source_location(),
+            *this,
+            get_message_handler());
         tmp2.operands().resize(integer2size_t(array_size), zero);
       }
     }
@@ -441,7 +449,12 @@ void c_typecheck_baset::do_designated_initializer(
             to_array_type(full_type).size().is_nil()))
         {
           // we are willing to grow an incomplete or zero-sized array
-          exprt zero=zero_initializer(full_type.subtype(), value.source_location(), *this, get_message_handler());
+          exprt zero=
+            zero_initializer(
+              full_type.subtype(),
+              value.source_location(),
+              *this,
+              get_message_handler());
           dest->operands().resize(integer2size_t(index)+1, zero);
 
           // todo: adjust type!
@@ -500,7 +513,12 @@ void c_typecheck_baset::do_designated_initializer(
         // Note that gcc issues a warning if the union component is switched.
         // Build a union expression from given component.
         union_exprt union_expr(type);
-        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.op()=
+          zero_initializer(
+            component.type(),
+            value.source_location(),
+            *this,
+            get_message_handler());
         union_expr.add_source_location()=value.source_location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
@@ -554,10 +572,16 @@ void c_typecheck_baset::do_designated_initializer(
 
       if(!components.empty())
       {
-        const union_typet::componentt &component=union_type.components().front();
+        const union_typet::componentt &component=
+          union_type.components().front();
 
         union_exprt union_expr(type);
-        union_expr.op()=zero_initializer(component.type(), value.source_location(), *this, get_message_handler());
+        union_expr.op()=
+          zero_initializer(
+            component.type(),
+            value.source_location(),
+            *this,
+            get_message_handler());
         union_expr.add_source_location()=value.source_location();
         union_expr.set_component_name(component.get_name());
         *dest=union_expr;
@@ -669,9 +693,11 @@ void c_typecheck_baset::increment_designator(designatort &designator)
         entry.subtype=components[entry.index].type();
     }
 
-    if(entry.index<entry.size) return; // done
+    if(entry.index<entry.size)
+      return; // done
 
-    if(designator.size()==1) return; // done
+    if(designator.size()==1)
+      return; // done
 
     // pop entry
     designator.pop_entry();
@@ -746,7 +772,8 @@ designatort c_typecheck_baset::make_designator(
     else if(full_type.id()==ID_struct ||
             full_type.id()==ID_union)
     {
-      const struct_union_typet &struct_union_type=to_struct_union_type(full_type);
+      const struct_union_typet &struct_union_type=
+        to_struct_union_type(full_type);
 
       if(d_op.id()!=ID_member)
       {
@@ -865,7 +892,9 @@ exprt c_typecheck_baset::do_initializer_list(
      full_type.id()==ID_vector)
   {
     // start with zero everywhere
-    result=zero_initializer(type, value.source_location(), *this, get_message_handler());
+    result=
+      zero_initializer(
+        type, value.source_location(), *this, get_message_handler());
   }
   else if(full_type.id()==ID_array)
   {
@@ -878,7 +907,9 @@ exprt c_typecheck_baset::do_initializer_list(
     else
     {
       // start with zero everywhere
-      result=zero_initializer(type, value.source_location(), *this, get_message_handler());
+      result=
+        zero_initializer(
+          type, value.source_location(), *this, get_message_handler());
     }
 
     // 6.7.9, 14: An array of character type may be initialized by a character

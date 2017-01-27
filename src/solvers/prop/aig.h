@@ -123,7 +123,8 @@ public:
   void print(std::ostream &out) const;
   void print(std::ostream &out, literalt a) const;
   void output_dot_node(std::ostream &out, nodest::size_type v) const;
-  void output_dot_edge(std::ostream &out, nodest::size_type v, literalt l) const;
+  void output_dot_edge(
+    std::ostream &out, nodest::size_type v, literalt l) const;
   void output_dot(std::ostream &out) const;
 
   std::string label(nodest::size_type v) const;

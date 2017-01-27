@@ -53,10 +53,23 @@ public:
   { lcnf_bv.resize(2); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf(lcnf_bv); }
 
   void lcnf(literalt l0, literalt l1, literalt l2)
-  { lcnf_bv.resize(3); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf(lcnf_bv); }
+  {
+    lcnf_bv.resize(3);
+    lcnf_bv[0]=l0;
+    lcnf_bv[1]=l1;
+    lcnf_bv[2]=l2;
+    lcnf(lcnf_bv);
+  }
 
   void lcnf(literalt l0, literalt l1, literalt l2, literalt l3)
-  { lcnf_bv.resize(4); lcnf_bv[0]=l0; lcnf_bv[1]=l1; lcnf_bv[2]=l2; lcnf_bv[3]=l3; lcnf(lcnf_bv); }
+  {
+    lcnf_bv.resize(4);
+    lcnf_bv[0]=l0;
+    lcnf_bv[1]=l1;
+    lcnf_bv[2]=l2;
+    lcnf_bv[3]=l3;
+    lcnf(lcnf_bv);
+  }
 
   virtual void lcnf(const bvt &bv)=0;
   virtual bool has_set_to() const { return true; }

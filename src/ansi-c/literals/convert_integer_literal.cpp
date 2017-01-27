@@ -141,7 +141,8 @@ exprt convert_integer_literal(const std::string &src)
     is_signed=true;
     c_type=ID_signed_long_int;
   }
-  else if(FITS(config.ansi_c.long_int_width, false) && long_cnt!=2) // unsigned long int
+  // unsigned long int
+  else if(FITS(config.ansi_c.long_int_width, false) && long_cnt!=2)
   {
     width=config.ansi_c.long_int_width;
     is_signed=false;
@@ -153,7 +154,8 @@ exprt convert_integer_literal(const std::string &src)
     is_signed=true;
     c_type=ID_signed_long_long_int;
   }
-  else if(FITS(config.ansi_c.long_long_int_width, false)) // unsigned long long int
+  // unsigned long long int
+  else if(FITS(config.ansi_c.long_long_int_width, false))
   {
     width=config.ansi_c.long_long_int_width;
     is_signed=false;

@@ -18,14 +18,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/cfg_dominators.h>
 
-//#define DEBUG_FULL_SLICERT
+// #define DEBUG_FULL_SLICERT
 #if 0
-useful for debugging:
+useful for debugging (remove NOLINT)
 goto-instrument --full-slice a.out c.out
 goto-instrument --show-goto-functions c.out > c.goto
 echo 'digraph g {' > c.dot ; cat c.goto | \
-  grep 'ins:[[:digit:]]\+ req by' | grep '^[[:space:]]*//' | \
-  perl -n -e '/file .*(.) line (\d+) column ins:(\d+) req by:([\d,]+).*/; $f=$3; $t=$4; @tt=split(",",$t); print "n$f [label=\"$f\"];\n"; print "n$f -> n$_;\n" foreach(@tt);' >> c.dot ; \
+  NOLINT(*) grep 'ins:[[:digit:]]\+ req by' | grep '^[[:space:]]*//' | \
+  NOLINT(*) perl -n -e '/file .*(.) line (\d+) column ins:(\d+) req by:([\d,]+).*/; $f=$3; $t=$4; @tt=split(",",$t); print "n$f [label=\"$f\"];\n"; print "n$f -> n$_;\n" foreach(@tt);' >> c.dot ; \
   echo '}' >> c.dot ; tred c.dot > c-red.dot ; \
   dot -Tpdf -oc-red.pdf c-red.dot
 #endif

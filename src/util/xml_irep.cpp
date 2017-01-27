@@ -74,7 +74,7 @@ void convert(
   irep.id(ID_nil);
 
   xmlt::elementst::const_iterator it = xml.elements.begin();
-  for (; it != xml.elements.end(); it++)
+  for(; it != xml.elements.end(); it++)
   {
     if(it->name=="id")
     {

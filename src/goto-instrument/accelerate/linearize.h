@@ -31,6 +31,8 @@ struct linear_recurrencet
   std::vector<exprt> vars;
 };
 
-bool linearize(symex_target_equationt &equation, linear_recurrencet &recurrence);
+bool linearize(
+  symex_target_equationt &equation,
+  linear_recurrencet &recurrence);
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_LINEARIZE_H

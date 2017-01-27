@@ -138,7 +138,8 @@ std::ostream &goto_programt::output_instruction(
       out << from_expr(ns, identifier, instruction.guard);
 
       const irep_idt &comment=instruction.source_location.get_comment();
-      if(comment!="") out << " // " << comment;
+      if(comment!="")
+        out << " // " << comment;
     }
 
     out << '\n';
@@ -541,7 +542,8 @@ std::string as_string(
         gt_it!=i.targets.end();
         gt_it++)
     {
-      if(gt_it!=i.targets.begin()) result+=", ";
+      if(gt_it!=i.targets.begin())
+        result+=", ";
       result+=std::to_string((*gt_it)->target_number);
     }
     return result;
@@ -565,7 +567,8 @@ std::string as_string(
 
     {
       const irep_idt &comment=i.source_location.get_comment();
-      if(comment!="") result+=" /* "+id2string(comment)+" */";
+      if(comment!="")
+        result+=" /* "+id2string(comment)+" */";
     }
     return result;
 

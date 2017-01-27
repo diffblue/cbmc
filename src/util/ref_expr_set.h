@@ -32,7 +32,8 @@ public:
 
   bool empty() const
   {
-    if(d==NULL) return true;
+    if(d==NULL)
+      return true;
     return d->expr_set.empty();
   }
 
@@ -48,9 +49,11 @@ public:
 
   bool make_union(const ref_expr_sett &s2)
   {
-    if(s2.d==NULL) return false;
+    if(s2.d==NULL)
+      return false;
 
-    if(s2.d==d) return false;
+    if(s2.d==d)
+      return false;
 
     if(d==NULL)
     {
@@ -68,7 +71,8 @@ public:
     tmp.insert(s2.begin(), s2.end());
 
     // anything new?
-    if(tmp.size()==old_size) return false;
+    if(tmp.size()==old_size)
+      return false;
     move(tmp);
     return true;
   }

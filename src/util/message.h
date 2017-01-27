@@ -85,7 +85,8 @@ public:
   //  9 + progress information
   // 10 + debug info
 
-  enum message_levelt {
+  enum message_levelt
+  {
     M_ERROR=1, M_WARNING=2, M_RESULT=4, M_STATUS=6,
     M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10
   };

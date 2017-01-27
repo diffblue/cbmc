@@ -134,7 +134,8 @@ symbolt &cpp_declarator_convertert::convert(
 
       if(c_it==cpp_typecheck.symbol_table.symbols.end())
       {
-        cpp_typecheck.error().source_location=declarator.name().source_location();
+        cpp_typecheck.error().source_location=
+          declarator.name().source_location();
         cpp_typecheck.error() << "member `" << base_name
                               << "' not found in scope `"
                               << scope->identifier << "'"
@@ -236,7 +237,8 @@ symbolt &cpp_declarator_convertert::convert(
     {
       cpp_scopet::id_sett id_set;
 
-      scope->lookup_identifier(symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
+      scope->lookup_identifier(
+        symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
 
       if(id_set.empty())
       {
@@ -283,8 +285,10 @@ void cpp_declarator_convertert::combine_types(
     {
       for(unsigned i=0; i<decl_code_type.parameters().size(); i++)
       {
-        const code_typet::parametert &decl_parameter=decl_code_type.parameters()[i];
-        code_typet::parametert &symbol_parameter=symbol_code_type.parameters()[i];
+        const code_typet::parametert &decl_parameter=
+          decl_code_type.parameters()[i];
+        code_typet::parametert &symbol_parameter=
+          symbol_code_type.parameters()[i];
 
         // first check type
         if(decl_parameter.type()!=symbol_parameter.type())
@@ -297,9 +301,11 @@ void cpp_declarator_convertert::combine_types(
                                   << "': parameter " << (i+1)
                                   << " type mismatch\n"
                                   << "previous type: "
-                                  << cpp_typecheck.to_string(symbol_parameter.type())
+                                  << cpp_typecheck.to_string(
+                                       symbol_parameter.type())
                                   << "\nnew type: "
-                                  << cpp_typecheck.to_string(decl_parameter.type())
+                                  << cpp_typecheck.to_string(
+                                       decl_parameter.type())
                                   << messaget::eom;
             throw 0;
           }
@@ -309,7 +315,8 @@ void cpp_declarator_convertert::combine_types(
         {
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
           symbol_parameter.set_identifier(decl_parameter.get_identifier());
-          symbol_parameter.add_source_location()=decl_parameter.source_location();
+          symbol_parameter.add_source_location()=
+            decl_parameter.source_location();
         }
       }
 
@@ -688,7 +695,6 @@ Function: cpp_declarator_convertert::operator_overloading_rules
 void cpp_declarator_convertert::operator_overloading_rules(
   const symbolt &symbol)
 {
-
 }
 
 /*******************************************************************\
@@ -721,9 +727,10 @@ void cpp_declarator_convertert::main_function_rules(
     if(return_type!=signed_int_type())
     {
       // Too many embedded compilers ignore this rule.
-      //
-      //cpp_typecheck.error().source_location=symbol.location);
-      //throw "main must return int";
+      #if 0
+      cpp_typecheck.error().source_location=symbol.location;
+      throw "main must return int";
+      #endif
     }
   }
 }

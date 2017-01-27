@@ -18,7 +18,7 @@ Author: Vincent Nimal
 
 class instrumentert;
 
-class fence_assert_insertert : public fence_insertert
+class fence_assert_insertert:public fence_insertert
 {
 protected:
   std::set<unsigned> selected_cycles;

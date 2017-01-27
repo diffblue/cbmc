@@ -145,7 +145,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     assert(parameters.size()>=1);
     code_typet::parametert &this_parameter_expr=parameters.front();
     function_scope.this_expr=exprt(ID_symbol, this_parameter_expr.type());
-    function_scope.this_expr.set(ID_identifier, this_parameter_expr.get(ID_C_identifier));
+    function_scope.this_expr.set(
+      ID_identifier, this_parameter_expr.get(ID_C_identifier));
   }
   else
     function_scope.this_expr.make_nil();
@@ -208,8 +209,10 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   {
     const typet &pointer=it->type();
     const typet &symbol =pointer.subtype();
-    if(symbol.get_bool(ID_C_constant)) result+="const$";
-    if(symbol.get_bool(ID_C_volatile)) result+="volatile$";
+    if(symbol.get_bool(ID_C_constant))
+      result+="const$";
+    if(symbol.get_bool(ID_C_volatile))
+      result+="volatile$";
     result+="this";
     first=false;
     it++;
@@ -219,7 +222,10 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
 
   for(; it!=parameters.end(); it++)
   {
-    if(first) first=false; else result+=',';
+    if(first)
+      first=false;
+    else
+      result+=',';
     typet tmp_type=it->type();
     result+=cpp_type2name(it->type());
   }

@@ -58,12 +58,33 @@ public:
   {
   }
 
-  abstract_eventt(operationt _op, unsigned _th, irep_idt _var,
-    unsigned _id, source_locationt _loc, bool _local,
-    bool WRf, bool WWf, bool RRf, bool RWf, bool WWc, bool RWc, bool RRc)
-    :operation(_op), thread(_th), variable(_var), id(_id),
-      source_location(_loc), local(_local), WRfence(RWf), WWfence(WWf), RRfence(RRf),
-      RWfence(WRf), WWcumul(WWc), RWcumul(RWc), RRcumul(RRc)
+  abstract_eventt(
+    operationt _op,
+    unsigned _th,
+    irep_idt _var,
+    unsigned _id,
+    source_locationt _loc,
+    bool _local,
+    bool WRf,
+    bool WWf,
+    bool RRf,
+    bool RWf,
+    bool WWc,
+    bool RWc,
+    bool RRc):
+    operation(_op),
+    thread(_th),
+    variable(_var),
+    id(_id),
+    source_location(_loc),
+    local(_local),
+    WRfence(RWf),
+    WWfence(WWf),
+    RRfence(RRf),
+    RWfence(WRf),
+    WWcumul(WWc),
+    RWcumul(RWc),
+    RRcumul(RRc)
   {
   }
 
@@ -130,13 +151,17 @@ public:
   bool is_corresponding_fence(const abstract_eventt& first,
     const abstract_eventt& second) const
   {
-    return (WRfence && first.operation==Write && second.operation==Read)
-      || ((WWfence||WWcumul) && first.operation==Write
-         && second.operation==Write)
-      || ((RWfence||RWcumul) && first.operation==Read
-         && second.operation==Write)
-      || ((RRfence||RRcumul) && first.operation==Read
-         && second.operation==Read);
+    return
+      (WRfence && first.operation==Write && second.operation==Read) ||
+      ((WWfence || WWcumul) &&
+       first.operation==Write &&
+       second.operation==Write) ||
+      ((RWfence || RWcumul) &&
+       first.operation==Read &&
+       second.operation==Write) ||
+      ((RRfence || RRcumul) &&
+       first.operation==Read &&
+       second.operation==Read);
   }
 
   bool is_direct() const { return WWfence || WRfence || RRfence || RWfence; }

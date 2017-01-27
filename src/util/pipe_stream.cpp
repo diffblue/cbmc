@@ -91,27 +91,27 @@ int pipe_streamt::run()
     return -1;
 
   // Create new output read handle and the input write handles
-  if (!DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
+  if(!DuplicateHandle(GetCurrentProcess(), hOutputReadTmp,
                        GetCurrentProcess(),
                        &hOutputRead,
                        0, FALSE, // uninheritable.
                        DUPLICATE_SAME_ACCESS))
     return -1;
 
-  if (!DuplicateHandle(GetCurrentProcess(), hInputWriteTmp,
+  if(!DuplicateHandle(GetCurrentProcess(), hInputWriteTmp,
                        GetCurrentProcess(),
                        &hInputWrite,
                        0, FALSE, //  uninheritable.
                        DUPLICATE_SAME_ACCESS))
     return -1;
 
-  if(!CloseHandle(hOutputReadTmp)||!CloseHandle(hInputWriteTmp))
+  if(!CloseHandle(hOutputReadTmp) || !CloseHandle(hInputWriteTmp))
     return -1;
 
   // now execute the child process
   STARTUPINFOW si;
 
-  ZeroMemory (&si, sizeof(STARTUPINFO));
+  ZeroMemory(&si, sizeof(STARTUPINFO));
   si.cb=sizeof(STARTUPINFO);
   si.dwFlags=STARTF_USESTDHANDLES;
   si.hStdOutput=hOutputWrite;
@@ -227,7 +227,7 @@ int pipe_streamt::wait()
   if(WaitForSingleObject(pi.hProcess, INFINITE)==WAIT_FAILED)
     return -1;
 
-  GetExitCodeProcess (pi.hProcess, &status);
+  GetExitCodeProcess(pi.hProcess, &status);
   return status;
   #else
   if(pid<=0)
@@ -384,13 +384,13 @@ std::streambuf::int_type filedescriptor_streambuft::underflow()
     return traits_type::eof();
   #else
   ssize_t len=read(proc_out, eback(), READ_BUFFER_SIZE);
-  if (len==-1)
+  if(len==-1)
     return traits_type::eof();
   #endif
 
   setg(eback(), eback(), eback()+(sizeof(char_type)*len));
 
-  if (len==0)
+  if(len==0)
     return traits_type::eof();
 
   return traits_type::to_int_type(*gptr());

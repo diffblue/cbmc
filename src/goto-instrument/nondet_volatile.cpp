@@ -29,7 +29,8 @@ bool is_volatile(
   const symbol_tablet &symbol_table,
   const typet &src)
 {
-  if(src.get_bool(ID_C_volatile)) return true;
+  if(src.get_bool(ID_C_volatile))
+    return true;
 
   if(src.id()==ID_symbol)
   {

@@ -113,9 +113,11 @@ bool cpp_typecheck_fargst::match(
   for(const auto &parameter : parameters)
   {
     // read
-    // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
+    // http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/topic/
+    //   com.ibm.xlcpp8a.doc/language/ref/implicit_conversion_sequences.htm
     //
-    // The following are the three categories of conversion sequences in order from best to worst:
+    // The following are the three categories of conversion sequences
+    // in order from best to worst:
     // * Standard conversion sequences
     // * User-defined conversion sequences
     // * Ellipsis conversion sequences
@@ -145,7 +147,8 @@ bool cpp_typecheck_fargst::match(
 
     #if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
-              << " -> " << cpp_typecheck.to_string(parameter.type()) << std::endl;
+              << " -> " << cpp_typecheck.to_string(parameter.type())
+              << std::endl;
     #endif
 
     // can we do the standard conversion sequence?

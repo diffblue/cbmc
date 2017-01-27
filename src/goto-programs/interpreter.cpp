@@ -53,7 +53,8 @@ void interpretert::operator()()
   {
     show_state();
     command();
-    if(!done) step();
+    if(!done)
+      step();
   }
 }
 
@@ -81,7 +82,8 @@ void interpretert::show_state()
               << function->first << "'" << std::endl;
   }
   else
-    function->second.body.output_instruction(ns, function->first, std::cout, PC);
+    function->second.body.output_instruction(
+      ns, function->first, std::cout, PC);
 
   std::cout << std::endl;
 }
@@ -465,7 +467,8 @@ void interpretert::execute_function_call()
         for(unsigned i=0; i<stack_pointer; i++)
         {
           unsigned address=stack_pointer+i;
-          if(address>=memory.size()) memory.resize(address+1);
+          if(address>=memory.size())
+            memory.resize(address+1);
           memory[address].value=0;
           memory[address].identifier=id;
           memory[address].offset=i;

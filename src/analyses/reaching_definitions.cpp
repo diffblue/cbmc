@@ -302,11 +302,13 @@ void rd_range_domaint::transform_end_function(
     if(!rd.get_is_threaded()(call) ||
        (!ns.lookup(identifier).is_shared() &&
         !rd.get_is_dirty()(identifier)))
+    {
       for(const auto &id : new_value.second)
       {
         const reaching_definitiont &v=bv_container->get(id);
         kill(v.identifier, v.bit_begin, v.bit_end);
       }
+    }
 
     for(const auto &id : new_value.second)
     {
@@ -827,8 +829,8 @@ bool rd_range_domaint::merge_shared(
   {
     const irep_idt &identifier=value.first;
 
-    if(!ns.lookup(identifier).is_shared() /*&&
-       !rd.get_is_dirty()(identifier)*/)
+    if(!ns.lookup(identifier).is_shared()
+       /*&& !rd.get_is_dirty()(identifier)*/)
       continue;
 
     while(it!=values.end() && it->first<value.first)

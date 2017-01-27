@@ -33,7 +33,8 @@ void endianness_mapt::output(std::ostream &out) const
       it!=map.end();
       ++it)
   {
-    if(it!=map.begin()) out << ", ";
+    if(it!=map.begin())
+      out << ", ";
     out << *it;
   }
 }
@@ -73,7 +74,8 @@ Function: endianness_mapt::build_little_endian
 void endianness_mapt::build_little_endian(const typet &src)
 {
   mp_integer s=pointer_offset_bits(src, ns); // error is -1
-  if(s<=0) return;
+  if(s<=0)
+    return;
 
   std::size_t new_size=map.size()+integer2size_t(s);
   map.reserve(new_size);
@@ -165,7 +167,8 @@ void endianness_mapt::build_big_endian(const typet &src)
     // everything else (unions in particular)
     // is treated like a byte-array
     mp_integer s=pointer_offset_bits(src, ns); // error is -1
-    if(s<=0) return;
+    if(s<=0)
+      return;
 
     std::size_t new_size=map.size()+integer2size_t(s);
     map.reserve(new_size);

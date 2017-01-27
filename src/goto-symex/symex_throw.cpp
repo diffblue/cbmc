@@ -38,7 +38,8 @@ void goto_symext::symex_throw(statet &state)
   {
     const goto_symex_statet::framet &frame=*s_it;
 
-    if(frame.catch_map.empty()) continue;
+    if(frame.catch_map.empty())
+      continue;
 
     for(irept::subt::const_iterator
         e_it=exceptions_thrown.begin();

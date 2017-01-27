@@ -148,20 +148,24 @@ void aigt::print(
 
     if(node.is_and())
     {
-      if(a.sign()) out << "!(";
+      if(a.sign())
+        out << "!(";
       print(out, node.a);
       out << " & ";
       print(out, node.b);
-      if(a.sign()) out << ")";
+      if(a.sign())
+        out << ")";
     }
     else if(node.is_var())
     {
-      if(a.sign()) out << "!";
+      if(a.sign())
+        out << "!";
       out << label(node_nr);\
     }
     else
     {
-      if(a.sign()) out << "!";
+      if(a.sign())
+        out << "!";
       out << "unknown(" << node_nr << ")";
     }
   }
@@ -227,7 +231,8 @@ void aigt::output_dot_edge(
   else
   {
     out << l.var_no() << " -> " << v;
-    if(l.sign()) out << " [arrowhead=odiamond]";
+    if(l.sign())
+      out << " [arrowhead=odiamond]";
   }
 
   out << "\n";

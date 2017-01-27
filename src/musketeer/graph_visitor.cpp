@@ -31,22 +31,25 @@ void const_graph_visitort::graph_explore(
   std::list<event_idt> &old_path,
   std::set<unsigned> &edges)
 {
-  if(next == end) {
+  if(next==end)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       /* it should be a po_s, and not a po_s^+ */
       assert(egraph.has_po_edge(*it, *next_it));
       edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
   }
-  else if(egraph.po_out(next).size()==0) {
+  else if(egraph.po_out(next).size()==0)
+  {
     /* this path is not connecting a to b => return */
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
@@ -81,22 +84,25 @@ void const_graph_visitort::const_graph_explore(
   event_idt end,
   std::list<event_idt>& old_path)
 {
-  if(next == end) {
+  if(next==end)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       /* it should be a po_s, and not a po_s^+ */
       assert(egraph.has_po_edge(*it, *next_it));
       fence_inserter.add_edge(edget(*it, *next_it));
     }
   }
-  else if(egraph.po_out(next).size()==0) {
+  else if(egraph.po_out(next).size()==0)
+  {
     /* this path is not connecting a to b => return */
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
@@ -133,10 +139,12 @@ void const_graph_visitort::graph_explore_BC(
   bool porw)
 {
   /* TODO: restricts to C_1 U ... U C_n for perf improvement */
-  assert(old_path.size() > 0);
+  assert(old_path.size()>0);
 
-  fence_inserter.instrumenter.message.debug() << "(BC) explore " << old_path.front()
-    << " --...--> " << next << messaget::eom;
+  fence_inserter.instrumenter.message.debug() << "(BC) explore "
+                                              << old_path.front()
+                                              << " --...--> " << next
+                                              << messaget::eom;
 
   if(visited_nodes.find(next)!=visited_nodes.end())
      return;
@@ -154,12 +162,13 @@ void const_graph_visitort::graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos) {
+  if(egraph.po_out(next).size()==0 || no_other_pos)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       const abstract_eventt& e1=egraph[*it];
       const abstract_eventt& e2=egraph[*next_it];
@@ -170,7 +179,8 @@ void const_graph_visitort::graph_explore_BC(
     }
     assert(it!=old_path.end());
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
@@ -219,12 +229,13 @@ void const_graph_visitort::const_graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos) {
+  if(egraph.po_out(next).size()==0 || no_other_pos)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       const abstract_eventt& e1=egraph[*it];
       const abstract_eventt& e2=egraph[*next_it];
@@ -235,7 +246,8 @@ void const_graph_visitort::const_graph_explore_BC(
     // NEW
     assert(it!=old_path.end());
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(next).begin();
       next_it!=egraph.po_out(next).end();
@@ -289,12 +301,13 @@ void const_graph_visitort::graph_explore_AC(
       break;
     }
 
-  if(egraph.po_in(next).size()==0 || no_other_pos) {
+  if(egraph.po_in(next).size()==0 || no_other_pos)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       const abstract_eventt& e1=egraph[*next_it];
       const abstract_eventt& e2=egraph[*it];
@@ -305,7 +318,8 @@ void const_graph_visitort::graph_explore_AC(
     }
     assert(it!=old_path.end());
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(next).begin();
       next_it!=egraph.po_in(next).end();
@@ -355,12 +369,13 @@ void const_graph_visitort::const_graph_explore_AC(
     }
 
   /* if beginning of the thread */
-  if(egraph.po_in(next).size()==0 || no_other_pos) {
+  if(egraph.po_in(next).size()==0 || no_other_pos)
+  {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
     std::list<event_idt>::const_iterator next_it=it;
     ++next_it;
-    for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
+    for( ; next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       const abstract_eventt& e1=egraph[*next_it];
       const abstract_eventt& e2=egraph[*it];
@@ -371,7 +386,8 @@ void const_graph_visitort::const_graph_explore_AC(
     // NEW
     assert(it!=old_path.end());
   }
-  else {
+  else
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(next).begin();
       next_it!=egraph.po_in(next).end();
@@ -409,7 +425,7 @@ void const_graph_visitort::PT(
   if(list_po_out.find(e.second)==list_po_out.end())
   {
 #ifdef BTWN1
-    event_grapht& egraph=fence_inserter.instrumenter.egraph;
+    event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
     /* all the pos inbetween */
     for(wmm_grapht::edgest::const_iterator
@@ -454,7 +470,7 @@ void const_graph_visitort::CT(
   const edget& edge,
   std::set<unsigned>& edges)
 {
-  event_grapht& egraph=fence_inserter.instrumenter.egraph;
+  event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
   /* the edge can be in the reversed order (back-edge) */
   const abstract_eventt& test_first=egraph[edge.first];
@@ -470,7 +486,8 @@ void const_graph_visitort::CT(
   visited_nodes.clear();
 
   /* if one event only on this thread of the cycle, discard */
-  if(egraph.po_in(first).size() > 0)
+  if(!egraph.po_in(first).empty())
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(first).begin();
       next_it!=egraph.po_in(first).end();
@@ -481,8 +498,10 @@ void const_graph_visitort::CT(
       new_path.push_back(next_it->first);
       graph_explore_AC(egraph, next_it->first, new_path, edges);
     }
+  }
 
-  if(egraph.po_out(second).size() > 0)
+  if(!egraph.po_out(second).empty())
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(second).begin();
       next_it!=egraph.po_out(second).end();
@@ -493,6 +512,7 @@ void const_graph_visitort::CT(
       new_path.push_back(next_it->first);
       graph_explore_BC(egraph, next_it->first, new_path, edges);
     }
+  }
 }
 
 /*******************************************************************\
@@ -511,7 +531,7 @@ void const_graph_visitort::CT_not_powr(
   const edget& edge,
   std::set<unsigned>& edges)
 {
-  event_grapht& egraph=fence_inserter.instrumenter.egraph;
+  event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
   /* the edge can be in the reversed order (back-edge) */
   const abstract_eventt& test_first=egraph[edge.first];
@@ -526,7 +546,8 @@ void const_graph_visitort::CT_not_powr(
   /* TODO: AC + restricts to C_1 U ... U C_n */
   visited_nodes.clear();
 
-  if(egraph.po_in(first).size() > 0)
+  if(!egraph.po_in(first).empty())
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_in(first).begin();
       next_it!=egraph.po_in(first).end();
@@ -537,8 +558,10 @@ void const_graph_visitort::CT_not_powr(
       new_path.push_back(next_it->first);
       graph_explore_AC(egraph, next_it->first, new_path, edges, true);
     }
+  }
 
-  if(egraph.po_out(second).size() > 0)
+  if(!egraph.po_out(second).empty())
+  {
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(second).begin();
       next_it!=egraph.po_out(second).end();
@@ -549,4 +572,5 @@ void const_graph_visitort::CT_not_powr(
       new_path.push_back(next_it->first);
       graph_explore_BC(egraph, next_it->first, new_path, edges, true);
     }
+  }
 }

@@ -20,7 +20,8 @@ Author: Matt Lewis
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
 
-class path_acceleratort {
+class path_acceleratort
+{
  public:
   path_acceleratort(patht &_path,
                goto_programt &pure,
@@ -46,7 +47,8 @@ class path_acceleratort {
     overflow_path.copy_from(that.overflow_path);
   }
 
-  void clear() {
+  void clear()
+  {
     path.clear();
     pure_accelerator.clear();
     overflow_path.clear();

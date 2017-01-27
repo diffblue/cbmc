@@ -52,7 +52,8 @@ exprt make_binary(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
 
-  if(operands.size()<=2) return expr;
+  if(operands.size()<=2)
+    return expr;
 
   exprt previous=operands.front();
 
@@ -194,7 +195,8 @@ Function: has_subexpr
 
 bool has_subexpr(const exprt &src, const irep_idt &id)
 {
-  if(src.id()==id) return true;
+  if(src.id()==id)
+    return true;
 
   forall_operands(it, src)
     if(has_subexpr(*it, id))

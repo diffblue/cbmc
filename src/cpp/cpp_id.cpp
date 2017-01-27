@@ -115,10 +115,14 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
 
   for(unsigned i=0; i<indent; i++) out << ' ';
   out << "  flags:";
-  if(is_constructor) out << " constructor";
-  if(is_scope) out << " scope";
-  if(is_member) out << " member";
-  if(is_static_member) out << " static_member";
+  if(is_constructor)
+    out << " constructor";
+  if(is_scope)
+    out << " scope";
+  if(is_member)
+    out << " member";
+  if(is_static_member)
+    out << " static_member";
   out << std::endl;
 
   for(unsigned i=0; i<indent; i++) out << ' ';
@@ -159,19 +163,19 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
 {
   switch(id_class)
   {
-   case cpp_idt::UNKNOWN:            out << "UNKNOWN"; break;
-   case cpp_idt::SYMBOL:             out << "SYMBOL"; break;
-   case cpp_idt::TYPEDEF:            out << "TYPEDEF"; break;
-   case cpp_idt::CLASS:              out << "CLASS"; break;
-   case cpp_idt::TEMPLATE:           out << "TEMPLATE"; break;
-   case cpp_idt::TEMPLATE_PARAMETER: out << "TEMPLATE_PARAMETER"; break;
-   case cpp_idt::ROOT_SCOPE:         out << "ROOT_SCOPE"; break;
-   case cpp_idt::BLOCK_SCOPE:        out << "BLOCK_SCOPE"; break;
-   case cpp_idt::TEMPLATE_SCOPE:     out << "TEMPLATE_SCOPE"; break;
-   case cpp_idt::NAMESPACE:          out << "NAMESPACE"; break;
+    case cpp_idt::UNKNOWN:            out << "UNKNOWN"; break;
+    case cpp_idt::SYMBOL:             out << "SYMBOL"; break;
+    case cpp_idt::TYPEDEF:            out << "TYPEDEF"; break;
+    case cpp_idt::CLASS:              out << "CLASS"; break;
+    case cpp_idt::TEMPLATE:           out << "TEMPLATE"; break;
+    case cpp_idt::TEMPLATE_PARAMETER: out << "TEMPLATE_PARAMETER"; break;
+    case cpp_idt::ROOT_SCOPE:         out << "ROOT_SCOPE"; break;
+    case cpp_idt::BLOCK_SCOPE:        out << "BLOCK_SCOPE"; break;
+    case cpp_idt::TEMPLATE_SCOPE:     out << "TEMPLATE_SCOPE"; break;
+    case cpp_idt::NAMESPACE:          out << "NAMESPACE"; break;
 
-   default:
-    out << "(OTHER)";
+    default:
+      out << "(OTHER)";
   }
 
   return out;

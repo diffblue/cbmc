@@ -167,7 +167,6 @@ Function: jsil_languaget::final
 
 bool jsil_languaget::final(symbol_tablet &symbol_table)
 {
-
   if(jsil_entry_point(
       symbol_table,
       get_message_handler()))

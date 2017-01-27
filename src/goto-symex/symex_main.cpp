@@ -65,7 +65,8 @@ void goto_symext::vcc(
   // now try simplifier on it
   do_simplify(expr);
 
-  if(expr.is_true()) return;
+  if(expr.is_true())
+    return;
 
   state.guard.guard_expr(expr);
 
@@ -91,7 +92,8 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
 
   do_simplify(simplified_cond);
 
-  if(simplified_cond.is_true()) return;
+  if(simplified_cond.is_true())
+    return;
 
   if(state.threads.size()==1)
   {
@@ -179,7 +181,7 @@ void goto_symext::operator()(
        state.source.thread_nr+1<state.threads.size())
     {
       unsigned t=state.source.thread_nr+1;
-      //std::cout << "********* Now executing thread " << t << std::endl;
+      // std::cout << "********* Now executing thread " << t << std::endl;
       state.switch_to_thread(t);
     }
   }
@@ -250,10 +252,10 @@ void goto_symext::symex_step(
   statet &state)
 {
   #if 0
-  std::cout << "\ninstruction type is " << state.source.pc->type << std::endl;
-  std::cout << "Location: " << state.source.pc->source_location << std::endl;
-  std::cout << "Guard: " << from_expr(ns, "", state.guard.as_expr()) << std::endl;
-  std::cout << "Code: " << from_expr(ns, "", state.source.pc->code) << std::endl;
+  std::cout << "\ninstruction type is " << state.source.pc->type << '\n';
+  std::cout << "Location: " << state.source.pc->source_location << '\n';
+  std::cout << "Guard: " << from_expr(ns, "", state.guard.as_expr()) << '\n';
+  std::cout << "Code: " << from_expr(ns, "", state.source.pc->code) << '\n';
   #endif
 
   assert(!state.threads.empty());
@@ -313,7 +315,8 @@ void goto_symext::symex_step(
     if(!state.guard.is_false())
     {
       std::string msg=id2string(state.source.pc->source_location.get_comment());
-      if(msg=="") msg="assertion";
+      if(msg=="")
+        msg="assertion";
       exprt tmp(instruction.guard);
       clean_expr(tmp, state, false);
       vcc(tmp, msg, state);

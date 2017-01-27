@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include "cnf.h"
-//#define VERBOSE
+// #define VERBOSE
 
 /*******************************************************************\
 
@@ -233,9 +233,12 @@ Function: cnft::land
 
 literalt cnft::land(const bvt &bv)
 {
-  if(bv.empty()) return const_literal(true);
-  if(bv.size()==1) return bv[0];
-  if(bv.size()==2) return land(bv[0], bv[1]);
+  if(bv.empty())
+    return const_literal(true);
+  if(bv.size()==1)
+    return bv[0];
+  if(bv.size()==2)
+    return land(bv[0], bv[1]);
 
   for(const auto l : bv)
     if(l.is_false())
@@ -282,9 +285,12 @@ Function: cnft::lor
 
 literalt cnft::lor(const bvt &bv)
 {
-  if(bv.empty()) return const_literal(false);
-  if(bv.size()==1) return bv[0];
-  if(bv.size()==2) return lor(bv[0], bv[1]);
+  if(bv.empty())
+    return const_literal(false);
+  if(bv.size()==1)
+    return bv[0];
+  if(bv.size()==2)
+    return lor(bv[0], bv[1]);
 
   for(const auto l : bv)
     if(l.is_true())
@@ -331,9 +337,12 @@ Function: cnft::lxor
 
 literalt cnft::lxor(const bvt &bv)
 {
-  if(bv.empty()) return const_literal(false);
-  if(bv.size()==1) return bv[0];
-  if(bv.size()==2) return lxor(bv[0], bv[1]);
+  if(bv.empty())
+    return const_literal(false);
+  if(bv.size()==1)
+    return bv[0];
+  if(bv.size()==2)
+    return lxor(bv[0], bv[1]);
 
   literalt literal=const_literal(false);
 
@@ -357,11 +366,12 @@ Function: cnft::land
 
 literalt cnft::land(literalt a, literalt b)
 {
-  if(a.is_true()) return b;
-  if(b.is_true()) return a;
-  if(a.is_false()) return a;
-  if(b.is_false()) return b;
-  if(a==b) return a;
+  if(a.is_true() || b.is_false())
+    return b;
+  if(b.is_true() || a.is_false())
+    return a;
+  if(a==b)
+    return a;
 
   literalt o=new_variable();
   gate_and(a, b, o);
@@ -382,11 +392,12 @@ Function: cnft::lor
 
 literalt cnft::lor(literalt a, literalt b)
 {
-  if(a.is_false()) return b;
-  if(b.is_false()) return a;
-  if(a.is_true()) return a;
-  if(b.is_true()) return b;
-  if(a==b) return a;
+  if(a.is_false() || b.is_true())
+    return b;
+  if(b.is_false() || a.is_true())
+    return a;
+  if(a==b)
+    return a;
 
   literalt o=new_variable();
   gate_or(a, b, o);
@@ -407,12 +418,18 @@ Function: cnft::lxor
 
 literalt cnft::lxor(literalt a, literalt b)
 {
-  if(a.is_false()) return b;
-  if(b.is_false()) return a;
-  if(a.is_true()) return !b;
-  if(b.is_true()) return !a;
-  if(a==b) return const_literal(false);
-  if(a==!b) return const_literal(true);
+  if(a.is_false())
+    return b;
+  if(b.is_false())
+    return a;
+  if(a.is_true())
+    return !b;
+  if(b.is_true())
+    return !a;
+  if(a==b)
+    return const_literal(false);
+  if(a==!b)
+    return const_literal(true);
 
   literalt o=new_variable();
   gate_xor(a, b, o);
@@ -502,16 +519,20 @@ Function: cnft::lselect
 // Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.
 
 #define COMPACT_ITE
-//#define OPTIMAL_COMPACT_ITE
+// #define OPTIMAL_COMPACT_ITE
 
 literalt cnft::lselect(literalt a, literalt b, literalt c)
-{ // a?b:c = (a AND b) OR (/a AND c)
+{
+  // a?b:c = (a AND b) OR (/a AND c)
+  if(a.is_constant())
+    return a.sign() ? b : c;
+  if(b==c)
+    return b;
 
-  if(a.is_constant()) return a.sign() ? b : c;
-  if(b==c) return b;
-
-  if(b.is_constant()) return b.sign() ? lor(a, c) : land(!a, c);
-  if(c.is_constant()) return c.sign() ? lor(!a, b) : land(a, b);
+  if(b.is_constant())
+    return b.sign() ? lor(a, c) : land(!a, c);
+  if(c.is_constant())
+    return c.sign() ? lor(!a, b) : land(a, b);
 
   #ifdef COMPACT_ITE
 
@@ -521,14 +542,14 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
 
   bvt lits;
 
-  lcnf( a, !c,  o);
-  lcnf( a,  c, !o);
+  lcnf(a, !c,  o);
+  lcnf(a,  c, !o);
   lcnf(!a, !b,  o);
   lcnf(!a,  b, !o);
 
   #ifdef OPTIMAL_COMPACT_ITE
   // additional clauses to enable better propagation
-  lcnf( b,  c, !o);
+  lcnf(b,  c, !o);
   lcnf(!b, !c,  o);
   #endif
 
@@ -605,7 +626,8 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
   dest.clear();
 
   // empty clause! this is UNSAT
-  if(bv.empty()) return false;
+  if(bv.empty())
+    return false;
 
   // first check simple things
 
@@ -624,7 +646,8 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
       continue; // will remove later
 
     if(l.var_no()>=_no_variables)
-      std::cout << "l.var_no()=" << l.var_no() << " _no_variables=" << _no_variables << std::endl;
+      std::cout << "l.var_no()=" << l.var_no()
+                << " _no_variables=" << _no_variables << std::endl;
 
     assert(l.var_no()<_no_variables);
   }

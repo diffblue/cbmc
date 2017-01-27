@@ -27,20 +27,22 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 #include "acceleration_utils.h"
 
-class disjunctive_polynomial_accelerationt : public loop_accelerationt {
- public:
-  disjunctive_polynomial_accelerationt(symbol_tablet &_symbol_table,
-                          goto_functionst &_goto_functions,
-                          goto_programt &_goto_program,
-                          natural_loops_mutablet::natural_loopt &_loop,
-                          goto_programt::targett _loop_header) :
-      symbol_table(_symbol_table),
-      ns(symbol_table),
-      goto_functions(_goto_functions),
-      goto_program(_goto_program),
-      loop(_loop),
-      loop_header(_loop_header),
-      utils(symbol_table, goto_functions, loop_counter)
+class disjunctive_polynomial_accelerationt:public loop_accelerationt
+{
+public:
+  disjunctive_polynomial_accelerationt(
+    symbol_tablet &_symbol_table,
+    goto_functionst &_goto_functions,
+    goto_programt &_goto_program,
+    natural_loops_mutablet::natural_loopt &_loop,
+    goto_programt::targett _loop_header):
+    symbol_table(_symbol_table),
+    ns(symbol_table),
+    goto_functions(_goto_functions),
+    goto_program(_goto_program),
+    loop(_loop),
+    loop_header(_loop_header),
+    utils(symbol_table, goto_functions, loop_counter)
   {
     loop_counter = nil_exprt();
     find_distinguishing_points();
@@ -50,19 +52,21 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
 
   virtual bool accelerate(path_acceleratort &accelerator);
 
-  bool fit_polynomial(exprt &target,
-                      polynomialt &polynomial,
-                      patht &path);
+  bool fit_polynomial(
+    exprt &target,
+    polynomialt &polynomial,
+    patht &path);
 
   bool find_path(patht &path);
 
- protected:
-  void assert_for_values(scratch_programt &program,
-                         std::map<exprt, exprt> &values,
-                         std::set<std::pair<expr_listt, exprt> > &coefficients,
-                         int num_unwindings,
-                         goto_programt &loop_body,
-                         exprt &target);
+protected:
+  void assert_for_values(
+    scratch_programt &program,
+    std::map<exprt, exprt> &values,
+    std::set<std::pair<expr_listt, exprt> > &coefficients,
+    int num_unwindings,
+    goto_programt &loop_body,
+    exprt &target);
   void cone_of_influence(const exprt &target, expr_sett &cone);
 
   void find_distinguishing_points();
@@ -93,4 +97,5 @@ class disjunctive_polynomial_accelerationt : public loop_accelerationt {
   std::list<distinguish_valuest> accelerated_paths;
 };
 
+// NOLINTNEXTLINE(whitespace/line_length)
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_DISJUNCTIVE_POLYNOMIAL_ACCELERATION_H

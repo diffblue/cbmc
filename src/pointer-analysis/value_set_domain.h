@@ -53,7 +53,6 @@ public:
   {
     value_set.get_reference_set(expr, dest, ns);
   }
-
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H

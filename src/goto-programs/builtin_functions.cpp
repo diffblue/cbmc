@@ -232,7 +232,8 @@ void goto_convertt::do_printf(
   if(f_id==CPROVER_PREFIX "printf" ||
      f_id=="printf")
   {
-    typet return_type=static_cast<const typet &>(function.type().find(ID_return_type));
+    typet return_type=
+      static_cast<const typet &>(function.type().find(ID_return_type));
     side_effect_exprt printf_code(ID_printf, return_type);
 
     printf_code.operands()=arguments;
@@ -289,7 +290,8 @@ void goto_convertt::do_scanf(
     if(!get_string_constant(arguments[0], format_string))
     {
       // use our model
-      format_token_listt token_list=parse_format_string(id2string(format_string));
+      format_token_listt token_list=
+        parse_format_string(id2string(format_string));
 
       std::size_t argument_number=1;
 
@@ -313,7 +315,8 @@ void goto_convertt::do_scanf(
               to_array_type(type).size()=size;
 
               const symbolt &tmp_symbol=
-                new_tmp_symbol(type, "scanf_string", dest, function.source_location());
+                new_tmp_symbol(
+                  type, "scanf_string", dest, function.source_location());
 
               exprt rhs=
                 address_of_exprt(
@@ -327,7 +330,8 @@ void goto_convertt::do_scanf(
               array_copy_statement.operands().resize(2);
               array_copy_statement.op0()=ptr;
 \              array_copy_statement.op1()=rhs;
-              array_copy_statement.add_source_location()=function.source_location();
+              array_copy_statement.add_source_location()=
+                function.source_location();
 
               copy(array_copy_statement, OTHER, dest);
               #else
@@ -573,7 +577,8 @@ void goto_convertt::do_cpp_new(
 
     code_function_callt new_call;
     new_call.function()=new_symbol;
-    if(new_array) new_call.arguments().push_back(count);
+    if(new_array)
+      new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
     new_call.set("#type", lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
@@ -585,7 +590,8 @@ void goto_convertt::do_cpp_new(
   {
     // call __placement_new
     exprt new_symbol=
-      ns.lookup(new_array?"__placement_new_array":"__placement_new").symbol_expr();
+      ns.lookup(
+        new_array?"__placement_new_array":"__placement_new").symbol_expr();
 
     const code_typet &code_type=
       to_code_type(new_symbol.type());
@@ -602,7 +608,8 @@ void goto_convertt::do_cpp_new(
 
     code_function_callt new_call;
     new_call.function()=new_symbol;
-    if(new_array) new_call.arguments().push_back(count);
+    if(new_array)
+      new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
     new_call.arguments().push_back(rhs.op0()); // memory location
     new_call.set("#type", lhs.type().subtype());
@@ -655,7 +662,8 @@ void set_class_identifier(
     to_struct_type(ns.follow(expr.type()));
   const struct_typet::componentst &components=struct_type.components();
 
-  if(components.empty()) return;
+  if(components.empty())
+    return;
   assert(!expr.operands().empty());
 
   if(components.front().get_name()=="@class_identifier")
@@ -728,8 +736,10 @@ void goto_convertt::do_java_new(
 
   // zero-initialize the object
   dereference_exprt deref(lhs, object_type);
-  exprt zero_object=zero_initializer(object_type, location, ns, get_message_handler());
-  set_class_identifier(to_struct_expr(zero_object), ns, to_symbol_type(object_type));
+  exprt zero_object=
+    zero_initializer(object_type, location, ns, get_message_handler());
+  set_class_identifier(
+    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
   goto_programt::targett t_i=dest.add_instruction(ASSIGN);
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
@@ -800,13 +810,19 @@ void goto_convertt::do_java_new_array(
 
   // if it's an array, we need to set the length field
   dereference_exprt deref(lhs, object_type);
-  member_exprt length(deref, struct_type.components()[1].get_name(), struct_type.components()[1].type());
+  member_exprt length(
+    deref,
+    struct_type.components()[1].get_name(),
+    struct_type.components()[1].type());
   goto_programt::targett t_s=dest.add_instruction(ASSIGN);
   t_s->code=code_assignt(length, rhs.op0());
   t_s->source_location=location;
 
   // we also need to allocate space for the data
-  member_exprt data(deref, struct_type.components()[2].get_name(), struct_type.components()[2].type());
+  member_exprt data(
+    deref,
+    struct_type.components()[2].get_name(),
+    struct_type.components()[2].type());
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
   data_cpp_new_expr.set(ID_size, rhs.op0());
   goto_programt::targett t_p=dest.add_instruction(ASSIGN);
@@ -847,7 +863,8 @@ void goto_convertt::do_java_new_array(
     inc.op0()=tmp_i;
     inc.op1()=plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
 
-    dereference_exprt deref_expr(plus_exprt(data, tmp_i), data.type().subtype());
+    dereference_exprt deref_expr(
+      plus_exprt(data, tmp_i), data.type().subtype());
 
     for_loop.init()=code_assignt(tmp_i, from_integer(0, tmp_i.type()));
     for_loop.cond()=binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
@@ -1213,7 +1230,8 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
   }
-  else if(has_prefix(id2string(identifier), "java::java.lang.AssertionError.<init>:"))
+  else if(has_prefix(
+      id2string(identifier), "java::java.lang.AssertionError.<init>:"))
   {
     // insert function call anyway
     code_function_callt function_call;
@@ -1237,7 +1255,8 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment("assertion at "+function.source_location().as_string());
+    t->source_location.set_comment(
+      "assertion at "+function.source_location().as_string());
   }
   else if(identifier=="assert" &&
           !ns.lookup(identifier).location.get_function().empty())
@@ -1255,7 +1274,8 @@ void goto_convertt::do_function_call_symbol(
     t->source_location=function.source_location();
     t->source_location.set("user-provided", true);
     t->source_location.set_property_class(ID_assertion);
-    t->source_location.set_comment("assertion "+id2string(from_expr(ns, "", t->guard)));
+    t->source_location.set_comment(
+      "assertion "+id2string(from_expr(ns, "", t->guard)));
 
     // let's double-check the type of the argument
     if(t->guard.type().id()!=ID_bool)
@@ -1341,7 +1361,8 @@ void goto_convertt::do_function_call_symbol(
           has_prefix(id2string(identifier), "__VERIFIER_nondet_"))
   {
     // make it a side effect if there is an LHS
-    if(lhs.is_nil()) return;
+    if(lhs.is_nil())
+      return;
 
     exprt rhs;
 
@@ -1368,7 +1389,8 @@ void goto_convertt::do_function_call_symbol(
   else if(has_prefix(id2string(identifier), CPROVER_PREFIX "uninterpreted_"))
   {
     // make it a side effect if there is an LHS
-    if(lhs.is_nil()) return;
+    if(lhs.is_nil())
+      return;
 
     function_application_exprt rhs;
     rhs.type()=lhs.type();
@@ -1421,7 +1443,8 @@ void goto_convertt::do_function_call_symbol(
 
     // This has been seen in Solaris 11.
     // Signature:
-    // void __assert_c99(const char *desc, const char *file, int line, const char *func);
+    // void __assert_c99(
+    //   const char *desc, const char *file, int line, const char *func);
 
     // _wassert is Windows. The arguments are
     // L"expression", L"file.c", line
@@ -1809,7 +1832,8 @@ void goto_convertt::do_function_call_symbol(
     // These are type-polymorphic, which makes it hard to put
     // them into ansi-c/library.
 
-    // bool __sync_bool_compare_and_swap (type *ptr, type oldval, type newval, ...)
+    // bool __sync_bool_compare_and_swap(
+    //   type *ptr, type oldval, type newval, ...)
 
     if(arguments.size()<3)
     {
@@ -1868,7 +1892,8 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="__sync_val_compare_and_swap")
   {
-    // type __sync_val_compare_and_swap (type *ptr, type oldval, type newval, ...)
+    // type __sync_val_compare_and_swap(
+    //   type *ptr, type oldval, type newval, ...)
     if(arguments.size()<3)
     {
       error().source_location=function.find_source_location();

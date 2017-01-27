@@ -117,7 +117,7 @@ void dott::write_dot_subgraph(
         else
         {
           std::string t = from_expr(ns, "", it->guard);
-          while (t[ t.size()-1 ]=='\n')
+          while(t[ t.size()-1 ]=='\n')
             t = t.substr(0, t.size()-1);
           tmp << escape(t) << "?";
         }
@@ -125,14 +125,14 @@ void dott::write_dot_subgraph(
       else if(it->is_assume())
       {
         std::string t = from_expr(ns, "", it->guard);
-        while (t[ t.size()-1 ]=='\n')
+        while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp << "Assume\\n(" << escape(t) << ")";
       }
       else if(it->is_assert())
       {
         std::string t = from_expr(ns, "", it->guard);
-        while (t[ t.size()-1 ]=='\n')
+        while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp << "Assert\\n(" << escape(t) << ")";
       }
@@ -151,7 +151,7 @@ void dott::write_dot_subgraph(
       else if(it->is_function_call())
       {
         std::string t = from_expr(ns, "", it->code);
-        while (t[ t.size()-1 ]=='\n')
+        while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp.str(escape(t));
 
@@ -168,7 +168,7 @@ void dott::write_dot_subgraph(
               it->is_other())
       {
         std::string t = from_expr(ns, "", it->code);
-        while (t[ t.size()-1 ]=='\n')
+        while(t[ t.size()-1 ]=='\n')
           t = t.substr(0, t.size()-1);
         tmp.str(escape(t));
       }
@@ -207,11 +207,11 @@ void dott::write_dot_subgraph(
 
       typedef std::set<goto_programt::const_targett> t;
 
-      for (t::iterator trit=tres.begin();
+      for(t::iterator trit=tres.begin();
            trit!=tres.end();
            trit++)
         write_edge(out, *it, **trit, tlabel);
-      for (t::iterator frit=fres.begin();
+      for(t::iterator frit=fres.begin();
           frit!=fres.end();
           frit++)
         write_edge(out, *it, **frit, flabel);
@@ -245,7 +245,7 @@ void dott::do_dot_function_calls(
   for(const auto &expr : function_calls)
   {
     std::list<exprt>::const_iterator cit=clusters.begin();
-    for(;cit!=clusters.end();cit++)
+    for( ; cit!=clusters.end(); cit++)
       if(cit->get("name")==expr.op1().get(ID_identifier))
         break;
 

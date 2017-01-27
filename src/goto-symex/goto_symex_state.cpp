@@ -132,7 +132,8 @@ void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
   const irep_idt l0_name=ssa_expr.get_l1_object_identifier();
 
   current_namest::const_iterator it=current_names.find(l0_name);
-  if(it==current_names.end()) return;
+  if(it==current_names.end())
+    return;
 
   // rename!
   ssa_expr.set_level_1(it->second.second);
@@ -316,18 +317,23 @@ static bool check_renaming(const typet &type)
 
 static bool check_renaming_l1(const exprt &expr)
 {
-  if(check_renaming(expr.type())) return true;
+  if(check_renaming(expr.type()))
+    return true;
 
   if(expr.id()==ID_symbol)
   {
-    if(!expr.get_bool(ID_C_SSA_symbol)) return expr.type().id()!=ID_code;
-    if(!to_ssa_expr(expr).get_level_2().empty()) return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type()) return true;
+    if(!expr.get_bool(ID_C_SSA_symbol))
+      return expr.type().id()!=ID_code;
+    if(!to_ssa_expr(expr).get_level_2().empty())
+      return true;
+    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+      return true;
   }
   else
   {
     forall_operands(it, expr)
-      if(check_renaming_l1(*it)) return true;
+      if(check_renaming_l1(*it))
+        return true;
   }
 
   return false;
@@ -335,7 +341,8 @@ static bool check_renaming_l1(const exprt &expr)
 
 static bool check_renaming(const exprt &expr)
 {
-  if(check_renaming(expr.type())) return true;
+  if(check_renaming(expr.type()))
+    return true;
 
   if(expr.id()==ID_address_of &&
      expr.op0().id()==ID_symbol)
@@ -346,14 +353,18 @@ static bool check_renaming(const exprt &expr)
            check_renaming(expr.op0().op1());
   else if(expr.id()==ID_symbol)
   {
-    if(!expr.get_bool(ID_C_SSA_symbol)) return expr.type().id()!=ID_code;
-    if(to_ssa_expr(expr).get_level_2().empty()) return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type()) return true;
+    if(!expr.get_bool(ID_C_SSA_symbol))
+      return expr.type().id()!=ID_code;
+    if(to_ssa_expr(expr).get_level_2().empty())
+      return true;
+    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+      return true;
   }
   else
   {
     forall_operands(it, expr)
-      if(check_renaming(*it)) return true;
+      if(check_renaming(*it))
+        return true;
   }
 
   return false;
@@ -507,14 +518,17 @@ void goto_symex_statet::set_ssa_indices(
     break;
 
   case L1:
-    if(!ssa_expr.get_level_2().empty()) return;
-    if(!ssa_expr.get_level_1().empty()) return;
+    if(!ssa_expr.get_level_2().empty())
+      return;
+    if(!ssa_expr.get_level_1().empty())
+      return;
     level0(ssa_expr, ns, source.thread_nr);
     level1(ssa_expr);
     break;
 
   case L2:
-    if(!ssa_expr.get_level_2().empty()) return;
+    if(!ssa_expr.get_level_2().empty())
+      return;
     level0(ssa_expr, ns, source.thread_nr);
     level1(ssa_expr);
     ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
@@ -621,7 +635,8 @@ void goto_symex_statet::rename(
       expr.type()=to_with_expr(expr).old().type();
     else if(expr.id()==ID_if)
     {
-      assert(to_if_expr(expr).true_case().type()==to_if_expr(expr).false_case().type());
+      assert(to_if_expr(expr).true_case().type()==
+             to_if_expr(expr).false_case().type());
       expr.type()=to_if_expr(expr).true_case().type();
     }
   }

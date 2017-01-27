@@ -305,10 +305,14 @@ void invariant_sett::add(
   unsigned s_r=eq_set.find(p.second);
 
   for(unsigned f=0; f<eq_set.size(); f++)
+  {
     if(eq_set.find(f)==f_r)
+    {
       for(unsigned s=0; s<eq_set.size(); s++)
         if(eq_set.find(s)==s_r)
           dest.insert(std::pair<unsigned, unsigned>(f, s));
+    }
+  }
 }
 
 /*******************************************************************\
@@ -334,7 +338,9 @@ void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
   mp_integer c;
 
   for(unsigned i=0; i<eq_set.size(); i++)
+  {
     if(eq_set.find(i)==r)
+    {
       if(object_store->is_constant(i))
       {
         if(constant_seen)
@@ -346,6 +352,8 @@ void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
         else
           constant_seen=true;
       }
+    }
+  }
 
   // replicate <= and != constraints
 
@@ -979,7 +987,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   }
   else if(expr.id()==ID_and)
   {
-    if(negate) expr.id(ID_or);
+    if(negate)
+      expr.id(ID_or);
 
     Forall_operands(it, expr)
       nnf(*it, negate);
@@ -1179,7 +1188,7 @@ std::string inv_object_storet::to_string(
   unsigned a,
   const irep_idt &identifier) const
 {
-  //return from_expr(ns, "", get_expr(a));
+  // return from_expr(ns, "", get_expr(a));
   return id2string(map[a]);
 }
 

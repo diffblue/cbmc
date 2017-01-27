@@ -22,12 +22,13 @@ Author: Vincent Nimal
 
 #include "propagate_const_function_pointers.h"
 
-class const_function_pointer_propagationt {
+class const_function_pointer_propagationt
+{
 protected:
-  symbol_tablet& symbol_table;
-  goto_functionst& goto_functions;
+  symbol_tablet &symbol_table;
+  goto_functionst &goto_functions;
   const namespacet ns;
-  messaget& message;
+  messaget &message;
 
   std::unordered_map<irep_idt, unsigned, irep_id_hash> map_unique;
 
@@ -43,7 +44,8 @@ protected:
   /* stack of callsites: provides functions and location in the goto-program */
   goto_programt::const_targetst callsite_stack;
 
-  bool resolve(const irep_idt& symb,
+  bool resolve(
+    const irep_idt& symb,
     symbol_exprt& goto_function,
     unsigned& stack_scope)
   {
@@ -51,7 +53,8 @@ protected:
       << pointer_to_fun[symb].get_identifier() << messaget::eom;
     if(pointer_to_fun.find(symb)==pointer_to_fun.end())
       return false;
-    else {
+    else
+    {
       goto_function=pointer_to_fun[symb];
       stack_scope=pointer_to_stack[symb];
       return true;
@@ -82,17 +85,20 @@ protected:
     return true;
   }
 
-  bool remove(const irep_idt& symb) {
-    //assert(pointer_to_fun.find(symb)!=pointer_to_fun.end());
+  bool remove(const irep_idt& symb)
+  {
+    assert(pointer_to_fun.find(symb)!=pointer_to_fun.end());
     pointer_to_fun.erase(symb);
     return true;
   }
 
-  bool has(const irep_idt& symb) const {
+  bool has(const irep_idt& symb) const
+  {
     return pointer_to_fun.find(symb)!=pointer_to_fun.end();
   }
 
-  symbol_exprt get(const irep_idt& symb) {
+  symbol_exprt get(const irep_idt& symb)
+  {
     return pointer_to_fun[symb];
   }
 
@@ -108,7 +114,7 @@ protected:
   class arg_stackt: public std::set<irep_idt>
   {
   protected:
-    const_function_pointer_propagationt& cfpp;
+    const_function_pointer_propagationt &cfpp;
 
   public:
     explicit arg_stackt(const_function_pointer_propagationt& _cfpp):
@@ -128,7 +134,8 @@ public:
 
   /* Note that it only propagates from MAIN, following the CFG, without
      resolving non-constant function pointers. */
-  void propagate() {
+  void propagate()
+  {
     propagate(goto_functionst::entry_point());
   }
 };
@@ -183,11 +190,13 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
     if(current_call>stack_scope)
     {
       /* unique suffix */
-      if(map_unique.find(function_id)!=map_unique.end()) {
+      if(map_unique.find(function_id)!=map_unique.end())
+      {
         suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
       }
-      else {
+      else
+      {
         map_unique[function_id]=0;
         suffix+=std::to_string(map_unique[function_id]);
         ++map_unique[function_id];
@@ -207,7 +216,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         it!=function_dup.body.instructions.end(); ++it)
         it->function=function_new_id;
 
-      assert(goto_functions.function_map[function_new_id].body.instructions.size()>0);
+      assert(goto_functions.function_map[function_new_id].
+             body.instructions.size()>0);
 
       /* removes in definition the argument leading to the const_function */
       code_typet::parameterst& args=function_dup.type.parameters();
@@ -255,9 +265,9 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       }
 
       assert(it->source_location==(*callsite)->source_location);
-      exprt& function_called=to_code_function_call(it->code).function();
+      exprt &function_called=to_code_function_call(it->code).function();
       assert(function_called.id()==ID_symbol);
-      symbol_exprt& symbol_fun_called=to_symbol_expr(function_called);
+      symbol_exprt &symbol_fun_called=to_symbol_expr(function_called);
       symbol_fun_called.set_identifier(
         id2string(symbol_fun_called.get_identifier())+last_suffix);
 
@@ -267,7 +277,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       for(code_function_callt::argumentst::iterator arg_it=args.begin();
         arg_it!=args.end(); ++arg_it)
       {
-        if(arg_it->id()==ID_symbol) {
+        if(arg_it->id()==ID_symbol)
+        {
           const symbol_exprt& symb_arg=to_symbol_expr(*arg_it);
           if(symb_arg.get_identifier()==const_function.get_identifier()
             || (pointer_to_fun.find(symb_arg.get_identifier())
@@ -275,7 +286,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
               && pointer_to_fun[symb_arg.get_identifier()]==const_function) )
             args.erase(arg_it);
         }
-        else if(arg_it->id()==ID_address_of) {
+        else if(arg_it->id()==ID_address_of)
+        {
           const address_of_exprt& add_arg=to_address_of_expr(*arg_it);
           if(add_arg.object().id()==ID_symbol
             && to_symbol_expr(add_arg.object()).get_identifier()
@@ -286,7 +298,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
 
       new_callsite_stack.push_back(it);
     }
-    else {
+    else
+    {
       message.debug() << "we first modify the first caller" << messaget::eom;
 
       /* initially, inlines the callee function in the duplicate of the last
@@ -318,7 +331,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   }
 
   /* and updates the call_stack and callsite_stack */
-  //new_callsite_stack.splice(new_callsite_stack.end(), callsite_stack,
+  // new_callsite_stack.splice(new_callsite_stack.end(), callsite_stack,
   //  callsite, callsite_stack.end());
   for(goto_programt::const_targetst::const_iterator it=callsite;
     it!=callsite_stack.end(); ++it)
@@ -370,7 +383,8 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
     if(arg_it->id()!=ID_symbol && arg_it->id()!=ID_address_of)
       continue;
 
-    if(arg_it->id()==ID_address_of) {
+    if(arg_it->id()==ID_address_of)
+    {
       if(to_address_of_expr(*arg_it).object().id()!=ID_symbol)
         continue;
 
@@ -378,8 +392,8 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
       assert(arg_expr.id()==ID_symbol);
       const symbol_exprt& arg_symbol_expr=to_symbol_expr(arg_expr);
 
-      //const symbolt& arg_symbol=
-        //cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
+      // const symbolt& arg_symbol=
+        // cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
 
       // debug
       for(std::unordered_map<irep_idt, unsigned, irep_id_hash>::const_iterator
@@ -394,7 +408,8 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
       cfpp.message.debug() << "SET: insert " << cor_arg_it->get_base_name()
         << messaget::eom;
     }
-    else {
+    else
+    {
       cfpp.message.debug() << "fun: " << const_function.get_identifier()
         << " - arg: (symb) " << cfpp.symbol_table
           .lookup(to_symbol_expr(*arg_it).get_identifier()).base_name
@@ -404,7 +419,8 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
       const symbolt& arg_symbol=
         cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
 
-      if(cfpp.has(arg_symbol.base_name)) {
+      if(cfpp.has(arg_symbol.base_name))
+      {
         cfpp.add(cor_arg_it->get_base_name(), cfpp.get(arg_symbol.base_name),
           cfpp.fun_id_to_invok[arg_symbol.base_name]);
         insert(cor_arg_it->get_base_name());
@@ -427,9 +443,11 @@ Function:
 
 \*******************************************************************/
 
-void const_function_pointer_propagationt::arg_stackt::remove_args() {
+void const_function_pointer_propagationt::arg_stackt::remove_args()
+{
   /* remove the parameter names */
-  for(const_iterator arg_it=begin(); arg_it!=end(); ++arg_it) {
+  for(const_iterator arg_it=begin(); arg_it!=end(); ++arg_it)
+  {
     cfpp.remove(*arg_it);
     cfpp.message.debug() << "SET: remove " << *arg_it << messaget::eom;
   }
@@ -450,21 +468,22 @@ Function:
 void const_function_pointer_propagationt::propagate(
   const irep_idt& function_id)
 {
-  if(goto_functions.function_map.find(function_id)
-    ==goto_functions.function_map.end())
+  if(goto_functions.function_map.find(function_id)==
+     goto_functions.function_map.end())
     return;
 
   goto_functionst::goto_functiont& function=
     goto_functions.function_map[function_id];
 
   if(functions_met.find(function_id)!=functions_met.end())
-   return;
+    return;
 
   functions_met.insert(function_id);
 
   Forall_goto_program_instructions(it, function.body)
   {
-    if(it->is_assign()) {
+    if(it->is_assign())
+    {
       /* is it an assignment of function pointer? */
       const code_assignt& assign=to_code_assign(it->code);
       const exprt& lhs=assign.lhs();
@@ -489,15 +508,18 @@ void const_function_pointer_propagationt::propagate(
 
       add(symbol_lhs.base_name, symbol_rhs);
     }
-    else if(it->is_function_call()) {
+    else if(it->is_function_call())
+    {
       callsite_stack.push_front(it);
 
       const exprt& fun=to_code_function_call(it->code).function();
 
       /* if it is a function pointer */
-      if(fun.id()==ID_dereference) {
+      if(fun.id()==ID_dereference)
+      {
         const exprt& fun_pointer=to_dereference_expr(fun).pointer();
-        if(fun_pointer.id()!=ID_symbol) {
+        if(fun_pointer.id()!=ID_symbol)
+        {
           callsite_stack.pop_front();
           continue;
         }
@@ -529,11 +551,13 @@ void const_function_pointer_propagationt::propagate(
           /* restores the context */
           callsite_stack.swap(context);
         }
-        else {
+        else
+        {
           /* no. Ignore it and leave it to the remove_function_pointers */
         }
       }
-      else if(fun.id()==ID_symbol) {
+      else if(fun.id()==ID_symbol)
+      {
         message.debug() << "Propagates through " << to_symbol_expr(fun)
           .get_identifier() << messaget::eom;
 
@@ -551,7 +575,8 @@ void const_function_pointer_propagationt::propagate(
 
       callsite_stack.pop_front();
     }
-    else if(it->is_end_function()) {
+    else if(it->is_end_function())
+    {
       functions_met.erase(function_id);
       return;
     }
