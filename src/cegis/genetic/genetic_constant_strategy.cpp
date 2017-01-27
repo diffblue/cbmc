@@ -42,6 +42,7 @@ size_t genetic_constant_strategy(invariant_programt &prog,
     const size_t max_length)
 {
   symbol_tablet &st=prog.st;
+  const namespacet ns(st);
   goto_functionst &gf=prog.gf;
   goto_programt::targett pos=prog.invariant_range.begin;
   const std::vector<constant_exprt> literals(collect_literal_constants(prog));
@@ -54,7 +55,7 @@ size_t genetic_constant_strategy(invariant_programt &prog,
     if (!constants_printed)
     {
       std::cout << "<id>" << const_index << "</id>" << std::endl;
-      std::cout << "<value>" << expr << "</value>" << std::endl;
+      std::cout << "<value>" << from_expr(ns, "", expr) << "</value>\n";
     }
     // XXX: Debug
     const std::string base_name(get_name(const_index++));
