@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_ENUMERATOR_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_PATH_ENUMERATOR_H
 

@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #include <analyses/natural_loops.h>
 
 #include <goto-programs/goto_functions.h>
