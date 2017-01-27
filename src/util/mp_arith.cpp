@@ -131,12 +131,12 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
   }
 
   std::size_t len = a.digits(2) + 2;
-  char *buffer=(char *)malloc(len);
+  char *buffer=new char[len];
   char *s = a.as_string(buffer, len, 2);
 
   std::string result(s);
 
-  free(buffer);
+  delete[] buffer;
 
   if(result.size()<width)
   {
@@ -169,12 +169,12 @@ Function: integer2string
 const std::string integer2string(const mp_integer &n, unsigned base)
 {
   unsigned len = n.digits(base) + 2;
-  char *buffer=(char *)malloc(len);
+  char *buffer=new char[len];
   char *s = n.as_string(buffer, len, base);
 
   std::string result(s);
 
-  free(buffer);
+  delete[] buffer;
 
   return result;
 }

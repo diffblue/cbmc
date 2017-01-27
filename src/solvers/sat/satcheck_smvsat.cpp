@@ -140,7 +140,7 @@ void satcheck_smvsatt::lcnf(const bvt &bv)
   if(process_clause(bv, tmp))
     return;
 
-  int lits[tmp.size()+1];
+  int *lits=new int[tmp.size()+1];
 
   for(unsigned i=0; i<tmp.size(); i++)
     lits[i]=tmp[i].dimacs();
@@ -151,6 +151,8 @@ void satcheck_smvsatt::lcnf(const bvt &bv)
   sat_instance_add_clause(satsolver, lits);
 
   clause_counter++;
+
+  delete[] lits;
 }
 
 /*******************************************************************\
@@ -250,7 +252,7 @@ void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
   if(process_clause(bv, tmp))
     return;
 
-  int lits[tmp.size()+1];
+  int *lits=new int[tmp.size()+1];
 
   for(unsigned i=0; i<tmp.size(); i++)
     lits[i]=tmp[i].dimacs();
@@ -264,6 +266,8 @@ void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
     partition_numbers.resize(clause_id+1, -1);
 
   partition_numbers[clause_id]=partition_no;
+
+  delete[] lits;
 }
 
 /*******************************************************************\

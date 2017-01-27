@@ -1822,8 +1822,8 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
   const unsigned number_of_sccs = num_sccs;
   std::set<unsigned> interesting_SCCs;
 
-  unsigned scc = 0;
-  pthread_t* threads = (pthread_t*)malloc((num_sccs+1)*sizeof(pthread_t));
+  unsigned scc=0;
+  pthread_t *threads=new pthread_t[num_sccs+1];
 
   set_of_cycles_per_SCC.resize(num_sccs,
     std::set<event_grapht::critical_cyclet>());
@@ -1849,5 +1849,7 @@ void instrumentert::collect_cycles_by_SCCs(memory_modelt model)
       message.status()<<(rc!=0?"Failure ":"Success ")
         <<"in joining thread for SCC #"<<i<<messaget::eom;
     }
+
+  delete[] threads;
 }
 #endif

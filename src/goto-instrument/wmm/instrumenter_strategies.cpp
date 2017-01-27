@@ -350,9 +350,9 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   const std::size_t mat_size=set_of_cycles.size()*edges.size();
   message.debug() << "size of the system: " << mat_size
     << messaget::eom;
-  int* imat=(int*)malloc(sizeof(int)*(mat_size+1));
-  int* jmat=(int*)malloc(sizeof(int)*(mat_size+1));
-  double* vmat=(double*)malloc(sizeof(double)*(mat_size+1));
+  int *imat=new int[mat_size+1];
+  int *jmat=new int[mat_size+1];
+  double *vmat=new double[mat_size+1];
 
   /* fills the constraints coeff */
   /* tables read from 1 in glpk -- first row/column ignored */
@@ -419,9 +419,9 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   }
 
   glp_delete_prob(lp);
-  free(imat);
-  free(jmat);
-  free(vmat);
+  delete[] imat;
+  delete[] jmat;
+  delete[] vmat;
 #else
   throw "sorry, minimum interference option requires glpk; "
         "please recompile goto-instrument with glpk";

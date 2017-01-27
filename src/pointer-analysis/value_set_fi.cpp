@@ -26,7 +26,7 @@ const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank;
 object_numberingt value_set_fit::object_numbering;
 hash_numbering<irep_idt, irep_id_hash> value_set_fit::function_numbering;
 
-static std::string alloc_adapter_prefix = "alloc_adaptor::";
+static const char *alloc_adapter_prefix="alloc_adaptor::";
 
 #define forall_objects(it, map) \
   for(object_map_dt::const_iterator (it) = (map).begin(); \
