@@ -1220,8 +1220,10 @@ def Error(filename, linenum, category, confidence, message):
       sys.stderr.write('%s:%s: warning: %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
     else:
+      fileinfo = FileInfo(filename)
+      path_from_root = fileinfo.RepositoryName()
       sys.stderr.write('%s:%s:  %s  [%s] [%d]\n' % (
-          filename, linenum, message, category, confidence))
+          path_from_root, linenum, message, category, confidence))
 
 
 # Matches standard C++ escape sequences per 2.13.2.3 of the C++ standard.
@@ -6469,13 +6471,18 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
     return
 
   # Note, if no dot is found, this will give the entire filename as the ext.
-  file_extension = filename[filename.rfind('.') + 1:]
+  fileinfo = FileInfo(filename)
+  path_from_root = fileinfo.RepositoryName()
+  file_extension = fileinfo.Extension()
+  if not file_extension:
+    file_extension = filename[filename.rfind('.')]
+  file_extension = file_extension[1:]
 
   # When reading from stdin, the extension is unknown, so no cpplint tests
   # should rely on the extension.
   if filename != '-' and file_extension not in _valid_extensions:
     sys.stderr.write('Ignoring %s; not a valid file name '
-                     '(%s)\n' % (filename, ', '.join(_valid_extensions)))
+                     '(%s)\n' % (path_from_root, ', '.join(_valid_extensions)))
   else:
     ProcessFileData(filename, file_extension, lines, Error,
                     extra_check_functions)
@@ -6498,7 +6505,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
         Error(filename, linenum, 'whitespace/newline', 1,
               'Unexpected \\r (^M) found; better to use only \\n')
 
-  sys.stdout.write('Done processing %s\n' % filename)
+  sys.stdout.write('Done processing %s\n' % path_from_root)
   _RestoreFilters()
 
 

@@ -24,6 +24,7 @@ cleanup()
 trap cleanup EXIT
 
 tmpStaging=$(mktemp -d)
+touch $tmpStaging/.git
 
 # Copy contents of staged version of files to temporary staging area
 # because we only want the staged version that will be commited and not
