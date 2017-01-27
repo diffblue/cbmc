@@ -176,7 +176,7 @@ protected:
   typedef std::pair<unsigned, symbol_exprt> let_count_idt;
   typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
   unsigned let_id_count;
-  const static unsigned LET_COUNT=2;
+  static const unsigned LET_COUNT=2;
 
   class let_visitort:public expr_visitort
   {

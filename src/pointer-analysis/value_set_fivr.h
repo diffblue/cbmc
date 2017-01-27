@@ -70,7 +70,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt blank;
+    static const object_map_dt blank;
 
     typedef std::map<unsigned, objectt> objmapt;
     objmapt objmap;

@@ -69,7 +69,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt blank;
+    static const object_map_dt blank;
   };
 
   exprt to_expr(object_map_dt::const_iterator it) const;
