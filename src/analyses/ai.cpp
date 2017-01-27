@@ -135,9 +135,9 @@ jsont ai_baset::output_json(
   forall_goto_program_instructions(i_it, goto_program)
   {
     json_objectt location;
-    location["location_number"]=
+    location["locationNumber"]=
       json_numbert(std::to_string(i_it->location_number));
-    location["source_location"]=
+    location["sourceLocation"]=
       json_stringt(i_it->source_location.as_string());
     location["domain"]=find_state(i_it).output_json(*this, ns);
 
