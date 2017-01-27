@@ -158,7 +158,7 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   }
 
   while (!file.eof ()) {
-    std::getline(file,read_line);
+    std::getline(file, read_line);
     parse_events(read_line);
   }
 
@@ -216,13 +216,13 @@ Function: parse_events
 void symex_slice_by_tracet::parse_events(std::string read_line) {
   if (read_line == "")
     return;
-  bool parity = strstr(read_line.c_str(),"!")==NULL;
-  bool universe = strstr(read_line.c_str(),"?")!=NULL;
-  bool has_values = strstr(read_line.c_str()," ")!=NULL;
+  bool parity = strstr(read_line.c_str(), "!")==NULL;
+  bool universe = strstr(read_line.c_str(), "?")!=NULL;
+  bool has_values = strstr(read_line.c_str(), " ")!=NULL;
   std::cout << "Trace: " << read_line << std::endl;
   std::vector<irep_idt> value_v;
   if (has_values) {
-    std::string::size_type sloc = read_line.find(" ",0);
+    std::string::size_type sloc = read_line.find(" ", 0);
     std::string values = (read_line.substr(sloc, read_line.size()-1));
     size_t length = values.length();
     for(size_t idx = 0; idx < length; idx++) {
@@ -232,13 +232,13 @@ void symex_slice_by_tracet::parse_events(std::string read_line) {
       if(next == std::string::npos) break;
       idx = next;
     }
-    read_line = read_line.substr(0,sloc);
+    read_line = read_line.substr(0, sloc);
   }
   sigma_vals.push_back(value_v);
   if (universe)
     parity = false;
   if (!parity)
-    read_line = read_line.substr(1,read_line.size()-1);
+    read_line = read_line.substr(1, read_line.size()-1);
   std::set<irep_idt> eis;
   size_t vlength = read_line.length();
   for(size_t vidx = 0; vidx < vlength; vidx++) {
@@ -314,14 +314,14 @@ void symex_slice_by_tracet::compute_ts_back(
           merge_map_back.push_back(t_copy);
           std::set<exprt> empty_impls;
           merge_impl_cache_back.push_back
-            (std::pair<bool,std::set<exprt> >(false, empty_impls));
+            (std::pair<bool, std::set<exprt> >(false, empty_impls));
           merge.push_back(merge_sym);
         }
       }
 
       for(size_t j = 0; j < t.size(); j++) {
         exprt u_lhs = exprt(ID_and, typet(ID_bool));
-        if ((j < sigma.size()) && (matches(sigma[j],event))) {
+        if ((j < sigma.size()) && (matches(sigma[j], event))) {
           u_lhs.operands().reserve(2);
           u_lhs.copy_to_operands(guard);
           if (!sigma_vals[j].empty()) {
@@ -469,7 +469,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     }
     else if(guard.id()==ID_and)
     {
-      Forall_operands(git,guard)
+      Forall_operands(git, guard)
       {
         exprt neg_expr=*git;
         neg_expr.make_not();
@@ -640,7 +640,7 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
     s.insert(e_copy);
     return s;
   } else if (e.id() == ID_and) { // Descend into and
-    Forall_operands(it,e) {
+    Forall_operands(it, e) {
       std::set<exprt> r = implied_guards(*it);
       for (std::set<exprt>::iterator i = r.begin();
            i != r.end(); i++) {
@@ -650,7 +650,7 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
     return s;
   } else if (e.id() == ID_or) { // Descend into or
     std::vector<std::set<exprt> > rs;
-    Forall_operands(it,e) {
+    Forall_operands(it, e) {
       rs.push_back(implied_guards(*it));
     }
     for (std::set<exprt>::iterator i = rs.front().begin();

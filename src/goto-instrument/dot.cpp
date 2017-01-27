@@ -118,7 +118,7 @@ void dott::write_dot_subgraph(
         {
           std::string t = from_expr(ns, "", it->guard);
           while (t[ t.size()-1 ]=='\n')
-            t = t.substr(0,t.size()-1);
+            t = t.substr(0, t.size()-1);
           tmp << escape(t) << "?";
         }
       }
@@ -126,14 +126,14 @@ void dott::write_dot_subgraph(
       {
         std::string t = from_expr(ns, "", it->guard);
         while (t[ t.size()-1 ]=='\n')
-          t = t.substr(0,t.size()-1);
+          t = t.substr(0, t.size()-1);
         tmp << "Assume\\n(" << escape(t) << ")";
       }
       else if(it->is_assert())
       {
         std::string t = from_expr(ns, "", it->guard);
         while (t[ t.size()-1 ]=='\n')
-          t = t.substr(0,t.size()-1);
+          t = t.substr(0, t.size()-1);
         tmp << "Assert\\n(" << escape(t) << ")";
       }
       else if(it->is_skip())
@@ -152,7 +152,7 @@ void dott::write_dot_subgraph(
       {
         std::string t = from_expr(ns, "", it->code);
         while (t[ t.size()-1 ]=='\n')
-          t = t.substr(0,t.size()-1);
+          t = t.substr(0, t.size()-1);
         tmp.str(escape(t));
 
         exprt fc;
@@ -169,7 +169,7 @@ void dott::write_dot_subgraph(
       {
         std::string t = from_expr(ns, "", it->code);
         while (t[ t.size()-1 ]=='\n')
-          t = t.substr(0,t.size()-1);
+          t = t.substr(0, t.size()-1);
         tmp.str(escape(t));
       }
       else if(it->is_start_thread())

@@ -56,7 +56,7 @@ public:
 
     entryt& operator[](const goto_programt::const_targett &t)
     {
-      std::pair<iterator,bool> e=insert(std::make_pair(t, 0));
+      std::pair<iterator, bool> e=insert(std::make_pair(t, 0));
 
       if(e.second)
         e.first->second=container.add_node();

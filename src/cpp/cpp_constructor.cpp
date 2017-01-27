@@ -226,7 +226,7 @@ codet cpp_typecheckt::cpp_constructor(
 
       side_effect_exprt assign(ID_assign);
       assign.add_source_location()=source_location;
-      assign.move_to_operands(member,val);
+      assign.move_to_operands(member, val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp;
       code_exp.expression()=assign;

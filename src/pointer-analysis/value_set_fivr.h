@@ -93,9 +93,9 @@ public:
     }
 
     // operator[] is the only way to insert something!
-    std::pair<iterator,bool> insert (const std::pair<unsigned,objectt>&)
+    std::pair<iterator, bool> insert (const std::pair<unsigned, objectt>&)
       { assert(false); }
-    iterator insert(iterator, const std::pair<unsigned,objectt>&)
+    iterator insert(iterator, const std::pair<unsigned, objectt>&)
       { assert(false); }
 
     class validity_ranget
@@ -121,7 +121,7 @@ public:
     };
 
     typedef std::list<validity_ranget> vrange_listt;
-    typedef std::map<unsigned,vrange_listt> validity_rangest;
+    typedef std::map<unsigned, vrange_listt> validity_rangest;
     validity_rangest validity_ranges;
 
     bool set_valid_at(unsigned inx, unsigned f, unsigned line);

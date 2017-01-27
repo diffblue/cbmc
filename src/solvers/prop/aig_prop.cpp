@@ -266,7 +266,7 @@ void aig_prop_baset::set_equal(literalt a, literalt b)
 {
 #ifdef USE_AIG_COMPACT
   // The compact encoding should reduce this
-  l_set_to_true(lequal(a,b));
+  l_set_to_true(lequal(a, b));
 
 #else
   // we produce two constraints:

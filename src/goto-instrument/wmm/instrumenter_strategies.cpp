@@ -116,13 +116,13 @@ void inline instrumentert::instrument_all_inserter(
       const abstract_eventt& first_ev=egraph[p_it->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(first_ev.variable, first_ev.source_location));
       if(!p_it->is_po)
       {
         const abstract_eventt& second_ev = egraph[p_it->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(second_ev.variable, second_ev.source_location));
       }
     }
   }
@@ -176,13 +176,13 @@ void inline instrumentert::instrument_one_event_per_cycle_inserter(
       const abstract_eventt& first_ev=egraph[p_it->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(first_ev.variable, first_ev.source_location));
       if(!p_it->is_po)
       {
         const abstract_eventt& second_ev=egraph[p_it->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(second_ev.variable, second_ev.source_location));
       }
       break;
     }
@@ -407,13 +407,13 @@ void inline instrumentert::instrument_minimum_interference_inserter(
       const abstract_eventt& first_ev=egraph[e_i->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(first_ev.variable, first_ev.source_location));
       if(!e_i->is_po)
       {
         const abstract_eventt& second_ev=egraph[e_i->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(second_ev.variable, second_ev.source_location));
       }
     }
   }
@@ -457,13 +457,13 @@ void inline instrumentert::instrument_my_events_inserter(
         const abstract_eventt& first_ev=egraph[p_it->first];
         var_to_instr.insert(first_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+          std::pair<irep_idt, source_locationt>(first_ev.variable, first_ev.source_location));
         if(!p_it->is_po && my_events.find(p_it->second)!=my_events.end())
         {
           const abstract_eventt& second_ev=egraph[p_it->second];
           var_to_instr.insert(second_ev.variable);
           id2loc.insert(
-            std::pair<irep_idt,source_locationt>(second_ev.variable,
+            std::pair<irep_idt, source_locationt>(second_ev.variable,
               second_ev.source_location));
         }
       }

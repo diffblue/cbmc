@@ -162,8 +162,8 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
       for(; C_j_it!=C_j->end(); ++C_j_it)
       {
         for(; C_k_it!=C_k->end()
-          && !egraph.are_po_ordered(*C_j_it,*C_k_it)
-          && !egraph.are_po_ordered(*C_k_it,*C_j_it); ++C_k_it);
+          && !egraph.are_po_ordered(*C_j_it, *C_k_it)
+          && !egraph.are_po_ordered(*C_k_it, *C_j_it); ++C_k_it);
 
         if(C_k_it!=C_k->end())
           break;
@@ -174,8 +174,8 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
 #endif
 
       /* computes the largest pos+ in C_j */
-      std::map<unsigned,event_grapht::critical_cyclet::const_iterator> m_begin;
-      std::map<unsigned,event_grapht::critical_cyclet::const_iterator> m_end;
+      std::map<unsigned, event_grapht::critical_cyclet::const_iterator> m_begin;
+      std::map<unsigned, event_grapht::critical_cyclet::const_iterator> m_end;
       std::set<event_idt> m_threads;
 
       unsigned previous_thread=0;
@@ -197,8 +197,8 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
       }
 
       /* computes the largest pos+ in C_k */
-      std::map<unsigned,event_grapht::critical_cyclet::const_iterator> k_begin;
-      std::map<unsigned,event_grapht::critical_cyclet::const_iterator> k_end;
+      std::map<unsigned, event_grapht::critical_cyclet::const_iterator> k_begin;
+      std::map<unsigned, event_grapht::critical_cyclet::const_iterator> k_end;
       std::set<event_idt> k_threads;
 
       previous_thread=0;
@@ -229,18 +229,18 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
           const event_idt c=*k_begin[*it];
           const event_idt d=*k_end[*it];
 
-          if(egraph.are_po_ordered(b,c))
+          if(egraph.are_po_ordered(b, c))
             continue;
-          else if (egraph.are_po_ordered(d,a))
+          else if (egraph.are_po_ordered(d, a))
             continue;
-          else if (egraph.are_po_ordered(a,c) && egraph.are_po_ordered(b,d))
-            fence_inserter.add_edge(edget(c,b));
-          else if (egraph.are_po_ordered(a,c) && egraph.are_po_ordered(d,b))
-            fence_inserter.add_edge(edget(c,d));
-          else if (egraph.are_po_ordered(c,a) && egraph.are_po_ordered(b,d))
-            fence_inserter.add_edge(edget(a,b));
-          else if (egraph.are_po_ordered(c,a) && egraph.are_po_ordered(d,b))
-            fence_inserter.add_edge(edget(a,d));
+          else if (egraph.are_po_ordered(a, c) && egraph.are_po_ordered(b, d))
+            fence_inserter.add_edge(edget(c, b));
+          else if (egraph.are_po_ordered(a, c) && egraph.are_po_ordered(d, b))
+            fence_inserter.add_edge(edget(c, d));
+          else if (egraph.are_po_ordered(c, a) && egraph.are_po_ordered(b, d))
+            fence_inserter.add_edge(edget(a, b));
+          else if (egraph.are_po_ordered(c, a) && egraph.are_po_ordered(d, b))
+            fence_inserter.add_edge(edget(a, d));
         }
     }
 #else

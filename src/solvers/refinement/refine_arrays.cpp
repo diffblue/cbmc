@@ -65,7 +65,7 @@ void bv_refinementt::arrays_overapproximated()
   while(it != lazy_array_constraints.end())
   {
     satcheck_no_simplifiert sat_check;
-    bv_pointerst solver(ns,sat_check);
+    bv_pointerst solver(ns, sat_check);
     solver.unbounded_array=bv_pointerst::U_ALL;
 
     exprt current = (*it).lazy;
@@ -146,7 +146,7 @@ void bv_refinementt::freeze_lazy_constraints()
       l_it != lazy_array_constraints.end(); ++l_it)
   {
     std::set<symbol_exprt> symbols;
-    find_symbols(l_it->lazy,symbols);
+    find_symbols(l_it->lazy, symbols);
     for(std::set<symbol_exprt>::const_iterator it = symbols.begin();
         it != symbols.end(); ++it)
     {

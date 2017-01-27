@@ -287,7 +287,7 @@ bvt float_utilst::conversion(
     // normalise it!
     if(dest_spec.e > spec.e)
     {
-      normalization_shift(result.fraction,result.exponent);
+      normalization_shift(result.fraction, result.exponent);
     }
 
     // the flags get copied
@@ -1763,7 +1763,7 @@ bvt float_utilst::sticky_right_shift(
         lost_bits=result;
 
       sticky=prop.lor(
-          prop.land(dist[stage],prop.lor(lost_bits)),
+          prop.land(dist[stage], prop.lor(lost_bits)),
           sticky);
 
       result=bv_utils.select(dist[stage], tmp, result);

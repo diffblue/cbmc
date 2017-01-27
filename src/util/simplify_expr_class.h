@@ -40,7 +40,7 @@ public:
     do_simplify_if(true),
     ns(_ns)
 #ifdef DEBUG_ON_DEMAND
-    ,debug_on(false)
+    , debug_on(false)
 #endif
   {
 #ifdef DEBUG_ON_DEMAND

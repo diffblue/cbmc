@@ -37,7 +37,7 @@ protected:
   goto_functionst &goto_functions;
 
   /* alternative representation of graph (SCC) */
-  std::map<event_idt,event_idt> map_vertex_gnode;
+  std::map<event_idt, event_idt> map_vertex_gnode;
   wmm_grapht egraph_alt;
 
   unsigned unique_id;
@@ -158,8 +158,8 @@ protected:
     unsigned max_thread;
 
     /* relations between irep and Reads/Writes */
-    typedef std::multimap<irep_idt,event_idt> id2nodet;
-    typedef std::pair<irep_idt,event_idt> id2node_pairt;
+    typedef std::multimap<irep_idt, event_idt> id2nodet;
+    typedef std::pair<irep_idt, event_idt> id2node_pairt;
     id2nodet map_reads, map_writes;
 
     unsigned write_counter;
@@ -168,8 +168,8 @@ protected:
     unsigned fr_rf_counter;
 
     /* previous nodes (fwd analysis) */
-    typedef std::pair<event_idt,event_idt> nodet;
-    typedef std::map<goto_programt::const_targett,std::set<nodet> >
+    typedef std::pair<event_idt, event_idt> nodet;
+    typedef std::map<goto_programt::const_targett, std::set<nodet> >
       incoming_post;
 
     incoming_post in_pos;
@@ -188,7 +188,7 @@ protected:
     /* to keep track of the functions (and their start/end nodes) */
     std::stack<irep_idt> stack_fun;
     irep_idt cur_fun;
-    std::map<irep_idt,std::set<nodet> > in_nodes, out_nodes;
+    std::map<irep_idt, std::set<nodet> > in_nodes, out_nodes;
     #endif
 
     /* current thread number */
@@ -289,7 +289,7 @@ public:
 
   /* map from function to begin and end of the corresponding part of the
      graph */
-  typedef std::map<irep_idt,std::pair<std::set<event_idt>,
+  typedef std::map<irep_idt, std::pair<std::set<event_idt>,
     std::set<event_idt> > > map_function_nodest;
   map_function_nodest map_function_graph;
 
@@ -319,8 +319,8 @@ public:
   /* TODO: those maps are here to interface easily with weak_mem.cpp,
      but a rewriting of weak_mem can eliminate them */
   std::set<irep_idt> var_to_instr;
-  std::multimap<irep_idt,source_locationt> id2loc;
-  std::multimap<irep_idt,source_locationt> id2cycloc;
+  std::multimap<irep_idt, source_locationt> id2loc;
+  std::multimap<irep_idt, source_locationt> id2cycloc;
 
   instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f,
     messaget& _message)
@@ -342,7 +342,7 @@ public:
   /* collects directly all the cycles in the graph */
   void collect_cycles(memory_modelt model)
   {
-    egraph.collect_cycles(set_of_cycles,model);
+    egraph.collect_cycles(set_of_cycles, model);
     num_sccs = 0;
   }
 
@@ -358,7 +358,7 @@ public:
     unsigned _max_po_trans = 0,
     bool _ignore_arrays = false)
   {
-    egraph.set_parameters_collection(_max_var,_max_po_trans,_ignore_arrays);
+    egraph.set_parameters_collection(_max_var, _max_po_trans, _ignore_arrays);
   }
 
   /* builds the relations between unsafe pairs in the critical cycles and

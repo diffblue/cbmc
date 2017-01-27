@@ -2994,7 +2994,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
       out << value << ".0";
     else
     {
-      out << "(/ " << value.substr(0,pos) << ".0 "
+      out << "(/ " << value.substr(0, pos) << ".0 "
                    << value.substr(pos+1) << ".0)";
     }
   }

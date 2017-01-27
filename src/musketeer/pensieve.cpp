@@ -63,7 +63,7 @@ void fence_pensieve(
   message.status() << "Abstract event graph computed" << messaget::eom;
 
   if(input_max_po_trans!=0)
-    instrumenter.set_parameters_collection(0,input_max_po_trans);
+    instrumenter.set_parameters_collection(0, input_max_po_trans);
   else
     instrumenter.set_parameters_collection(max_thds);
 

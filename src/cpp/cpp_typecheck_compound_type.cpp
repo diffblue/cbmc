@@ -542,7 +542,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
     else // virtual
     {
       component.type().set(ID_C_is_virtual, true);
-      component.type().set("#virtual_name",virtual_name);
+      component.type().set("#virtual_name", virtual_name);
 
       // Check if it is a pure virtual method
       if(is_virtual)
@@ -680,7 +680,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
            code_type.return_type().id()!=ID_destructor)
         {
           side_effect_expr_function_callt expr_call;
-          expr_call.function() = symbol_exprt(component.get_name(),component.type());
+          expr_call.function() = symbol_exprt(component.get_name(), component.type());
           expr_call.type() = to_code_type(component.type()).return_type();
           expr_call.arguments().reserve(args.size());
           expr_call.arguments().push_back(late_cast);
@@ -696,7 +696,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         else
         {
           code_function_callt code_func;
-          code_func.function() = symbol_exprt(component.get_name(),component.type());
+          code_func.function() = symbol_exprt(component.get_name(), component.type());
           code_func.arguments().reserve(args.size());
           code_func.arguments().push_back(late_cast);
 
@@ -1821,7 +1821,7 @@ void cpp_typecheckt::get_bases(
       to_struct_type(lookup(it->find(ID_type).get(ID_identifier)).type);
 
     set_bases.insert(base.get(ID_name));
-    get_bases(base,set_bases);
+    get_bases(base, set_bases);
   }
 }
 
@@ -1857,7 +1857,7 @@ void cpp_typecheckt::get_virtual_bases(
     if(it->get_bool(ID_virtual))
       vbases.push_back(base.get(ID_name));
 
-    get_virtual_bases(base,vbases);
+    get_virtual_bases(base, vbases);
   }
 }
 

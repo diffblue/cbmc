@@ -129,7 +129,7 @@ void arrayst::collect_indices(const exprt &expr)
 {
   if(expr.id()!=ID_index)
   {
-    forall_operands(op,expr) collect_indices(*op);
+    forall_operands(op, expr) collect_indices(*op);
   }
   else
   {
@@ -513,8 +513,8 @@ void arrayst::update_index_map(bool update_all)
         i2++)
       std::cout << "Index set (" << i1->first << " = "
                 << arrays.find_number(i1->first) << " = "
-                << from_expr(ns,"",arrays[arrays.find_number(i1->first)]) << "): "
-                << from_expr(ns,"",*i2) << std::endl;
+                << from_expr(ns, "", arrays[arrays.find_number(i1->first)]) << "): "
+                << from_expr(ns, "", *i2) << std::endl;
    std::cout << "-----" << std::endl;
 #endif
 }
@@ -679,7 +679,7 @@ void arrayst::add_array_constraints_with(
     }
 
      lazy_constraintt lazy(ARRAY_WITH, equal_exprt(index_expr, value));
-     add_array_constraint(lazy,false); //added immediately
+     add_array_constraint(lazy, false); //added immediately
   }
 
   // use other array index applications for "else" case
@@ -720,7 +720,7 @@ void arrayst::add_array_constraints_with(
         // add constraint
         lazy_constraintt lazy(ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
-        add_array_constraint(lazy,false); //added immediately
+        add_array_constraint(lazy, false); //added immediately
 
 #if 0 // old code for adding, not significantly faster
         {

@@ -294,8 +294,8 @@ literalt bv_utilst::full_adder(
     else if(constantProp == 0)
     {
       // At least one input bit is 0
-      carry_out = prop.land(x,y);
-      sum = prop.lxor(x,y);
+      carry_out = prop.land(x, y);
+      sum = prop.lxor(x, y);
     }
     else
     {
@@ -1884,7 +1884,7 @@ void bv_utilst::cond_implies_equal(
   }
   else
   {
-    prop.limplies(cond, equal(a,b));
+    prop.limplies(cond, equal(a, b));
   }
 
   return;

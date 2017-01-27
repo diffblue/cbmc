@@ -242,7 +242,7 @@ void weak_memory(
   shared_buffers.cycles_r_loc = instrumenter.id2cycloc; // places in the cycles
 
   // for reads delays
-  shared_buffers.affected_by_delay(symbol_table,value_sets,goto_functions);
+  shared_buffers.affected_by_delay(symbol_table, value_sets, goto_functions);
 
   for(std::set<irep_idt>::iterator it=
     shared_buffers.affected_by_delay_set.begin();
@@ -254,8 +254,8 @@ void weak_memory(
   for(std::set<irep_idt>::iterator it=shared_buffers.cycles.begin();
     it!=shared_buffers.cycles.end(); it++)
   {
-    typedef std::multimap<irep_idt,source_locationt>::iterator m_itt;
-    const std::pair<m_itt,m_itt> ran=
+    typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+    const std::pair<m_itt, m_itt> ran=
       shared_buffers.cycles_loc.equal_range(*it);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
       message.result() << ((*it)==""?"fence":*it)<<", "<<ran_it->second<<messaget::eom;

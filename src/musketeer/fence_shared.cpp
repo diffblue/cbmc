@@ -29,7 +29,7 @@ Author: Vincent Nimal
 #include <analyses/local_may_alias.h>
 #endif
 
-#define OUTPUT(s,fence,file,line,id,type)  s<<fence<<"|"<<file<<"|"<<line<<"|"\
+#define OUTPUT(s, fence, file, line, id, type)  s<<fence<<"|"<<file<<"|"<<line<<"|"\
   <<id<<"|"<<type<<std::endl
 
 class simple_insertiont {
@@ -120,7 +120,7 @@ public:
     value_setst& _value_sets,
     const symbol_tablet& _symbol_table,
     const goto_functionst& _goto_functions)
-    :simple_insertiont(_message, _value_sets,_symbol_table,_goto_functions)
+    :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
 

@@ -195,9 +195,9 @@ void fault_localizationt::localize_linear(lpointst &lpoints)
   for(size_t i=0; i<v.size(); ++i)
   {
     v[i]=tvt(tvt::tv_enumt::TV_TRUE);
-    if(!check(lpoints,v)) update_scores(lpoints,v);
+    if(!check(lpoints, v)) update_scores(lpoints, v);
     v[i]=tvt(tvt::tv_enumt::TV_FALSE);
-    if(!check(lpoints,v)) update_scores(lpoints,v);
+    if(!check(lpoints, v)) update_scores(lpoints, v);
     v[i]=tvt(tvt::tv_enumt::TV_UNKNOWN);
   }
 }

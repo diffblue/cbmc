@@ -2086,7 +2086,7 @@ void smt1_convt::convert_constant(
       out << value << ".0";
     else
     {
-      out << "(/ " << value.substr(0,pos) << ".0 "
+      out << "(/ " << value.substr(0, pos) << ".0 "
                    << value.substr(pos+1) << ".0)";
     }
   }

@@ -83,7 +83,7 @@ void constant_propagator_domaint::transform(
 
 #ifdef DEBUG
   std::cout << "before:\n";
-  output(std::cout,ai,ns);
+  output(std::cout, ai, ns);
 #endif
 
   if(from->is_decl())
@@ -143,7 +143,7 @@ void constant_propagator_domaint::transform(
   }
 #ifdef DEBUG
   std::cout << "after:\n";
-  output(std::cout,ai,ns);
+  output(std::cout, ai, ns);
 #endif
 }
 
@@ -165,7 +165,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   const namespacet &ns)
 {
 #ifdef DEBUG
-  std::cout << "two_way_propagate_rec: " << from_expr(ns,"",expr) << '\n';
+  std::cout << "two_way_propagate_rec: " << from_expr(ns, "", expr) << '\n';
 #endif
   bool change = false;
 
@@ -363,7 +363,7 @@ void constant_propagator_domaint::output(
   const ai_baset &ai,
   const namespacet &ns) const
 {
-  values.output(out,ns);
+  values.output(out, ns);
 }
 
 /*******************************************************************\

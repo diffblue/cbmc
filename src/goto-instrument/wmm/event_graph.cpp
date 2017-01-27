@@ -399,7 +399,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     const data_dpt& data_dp=egraph.map_data_dp[first.thread];
 
     /* if data dp between linking the pair, safe */
-    if(first.thread==second.thread && data_dp.dp(first,second))
+    if(first.thread==second.thread && data_dp.dp(first, second))
       continue;
 
     /* AC and BC conditions */
@@ -417,8 +417,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     if(s_it==n_it)
     {
       /* there is no lwfence between the pair */
-      if(first.unsafe_pair(second,model)
-        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+      if(first.unsafe_pair(second, model)
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it, *s_it)))
       {
         const_iterator before_first;
         const_iterator after_second;
@@ -449,7 +449,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
             return true;
           else
           {
-            const delayt delay(*it,*s_it,(first.thread==second.thread));
+            const delayt delay(*it, *s_it, (first.thread==second.thread));
             unsafe_pairs.insert(delay);
             unsafe_met=true;
           }
@@ -459,8 +459,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     else
     {
       /* one (or more) lwfence between the pair */
-      if(first.unsafe_pair_lwfence(second,model)
-        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+      if(first.unsafe_pair_lwfence(second, model)
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it, *s_it)))
       {
         const_iterator before_first;
         const_iterator after_second;
@@ -491,7 +491,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
             return true;
           else
           {
-            const delayt delay(*it,*s_it,(first.thread==second.thread));
+            const delayt delay(*it, *s_it, (first.thread==second.thread));
             unsafe_pairs.insert(delay);
             unsafe_met=true;
           }
@@ -527,7 +527,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   const data_dpt& data_dp = egraph.map_data_dp[first.thread];
 
   /* if data dp between linking the pair, safe */
-  if(first.thread==second.thread && data_dp.dp(first,second))
+  if(first.thread==second.thread && data_dp.dp(first, second))
     return unsafe_met;
 
   /* AC and BC conditions */
@@ -543,8 +543,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   if(s_it==begin())
   {
     /* no lwfence between the pair */
-    if(first.unsafe_pair(second,model)
-      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    if(first.unsafe_pair(second, model)
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(), *s_it)))
     {
       std::list<event_idt>::const_iterator before_first;
       std::list<event_idt>::const_iterator after_second;
@@ -567,7 +567,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
       {
         if(!fast)
         {
-          const delayt delay(back(),*s_it,(first.thread==second.thread));
+          const delayt delay(back(), *s_it, (first.thread==second.thread));
           unsafe_pairs.insert(delay);
         }
         return true;
@@ -577,8 +577,8 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   else
   {
     /* one (or more) lwfence between the pair */
-    if(first.unsafe_pair_lwfence(second,model)
-      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    if(first.unsafe_pair_lwfence(second, model)
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(), *s_it)))
     {
       std::list<event_idt>::const_iterator before_first;
       std::list<event_idt>::const_iterator after_second;
@@ -601,7 +601,7 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
       {
         if(!fast)
         {
-          const delayt delay(back(),*s_it,(first.thread==second.thread));
+          const delayt delay(back(), *s_it, (first.thread==second.thread));
           unsafe_pairs.insert(delay);
         }
       return true;
@@ -687,7 +687,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
     const data_dpt& data_dp = egraph.map_data_dp[first.thread];
 
     /* if data dp between linking the pair, safe */
-    if(first.thread==second.thread && data_dp.dp(first,second))
+    if(first.thread==second.thread && data_dp.dp(first, second))
       continue;
 
     /* AC and BC conditions */
@@ -704,7 +704,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
         AC_it++)
         if(egraph[*AC_it].operation==abstract_eventt::ASMfence
           && egraph[*AC_it].is_cumul()
-          && egraph[*AC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+          && egraph[*AC_it].is_corresponding_fence(egraph[*it], egraph[*s_it]))
         {
           AC = true;
           break;
@@ -719,7 +719,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
           AC_it++)
           if(egraph[*AC_it].operation==abstract_eventt::ASMfence
             && egraph[*AC_it].is_cumul()
-            && egraph[*AC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+            && egraph[*AC_it].is_corresponding_fence(egraph[*it], egraph[*s_it]))
           {
             AC = true;
             break;
@@ -745,7 +745,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
         BC_it--)
         if(egraph[*BC_it].operation==abstract_eventt::ASMfence
           && egraph[*BC_it].is_cumul()
-          && egraph[*BC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+          && egraph[*BC_it].is_corresponding_fence(egraph[*it], egraph[*s_it]))
 
         {
           BC = true;
@@ -761,7 +761,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
           BC_it--)
           if(egraph[*BC_it].operation==abstract_eventt::ASMfence
           && egraph[*BC_it].is_cumul()
-          && egraph[*BC_it].is_corresponding_fence(egraph[*it],egraph[*s_it]))
+          && egraph[*BC_it].is_corresponding_fence(egraph[*it], egraph[*s_it]))
 
           {
             BC = true;
@@ -777,14 +777,14 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
       --it;
 
       /* no lwfence between the pair */
-      if(first.unsafe_pair(second,model)
-        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+      if(first.unsafe_pair(second, model)
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it, *s_it)))
       {
         if(fast)
           return true;
         else
         {
-          const delayt delay(*it,*s_it,(first.thread==second.thread));
+          const delayt delay(*it, *s_it, (first.thread==second.thread));
           unsafe_pairs.insert(delay);
           unsafe_met = true;
         }
@@ -796,13 +796,13 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
 
       /* one (or more) lwfence between the pair */
       if(first.unsafe_pair_asm(second, model, fences_met)
-        && (first.thread!=second.thread || egraph.are_po_ordered(*it,*s_it)))
+        && (first.thread!=second.thread || egraph.are_po_ordered(*it, *s_it)))
       {
         if(fast)
           return true;
         else
         {
-          const delayt delay(*it,*s_it,(first.thread==second.thread));
+          const delayt delay(*it, *s_it, (first.thread==second.thread));
           unsafe_pairs.insert(delay);
           unsafe_met = true;
         }
@@ -836,7 +836,7 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
   const data_dpt& data_dp = egraph.map_data_dp[first.thread];
 
   /* if data dp between linking the pair, safe */
-  if(first.thread==second.thread && data_dp.dp(first,second))
+  if(first.thread==second.thread && data_dp.dp(first, second))
     return unsafe_met;
 
   /* AC and BC conditions */
@@ -918,12 +918,12 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
   if(s_it==begin())
   {
     /* no lwfence between the pair */
-    if(first.unsafe_pair(second,model)
-      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    if(first.unsafe_pair(second, model)
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(), *s_it)))
     {
       if(!fast)
       {
-        const delayt delay(back(),*s_it,(first.thread==second.thread));
+        const delayt delay(back(), *s_it, (first.thread==second.thread));
         unsafe_pairs.insert(delay);
       }
       return true;
@@ -932,12 +932,12 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(memory_modelt model,
   else
   {
     /* one (or more) lwfence between the pair */
-    if(first.unsafe_pair_asm(second,model,fences_met)
-      && (first.thread!=second.thread || egraph.are_po_ordered(back(),*s_it)))
+    if(first.unsafe_pair_asm(second, model, fences_met)
+      && (first.thread!=second.thread || egraph.are_po_ordered(back(), *s_it)))
     {
       if(!fast)
       {
-        const delayt delay(back(),*s_it,(first.thread==second.thread));
+        const delayt delay(back(), *s_it, (first.thread==second.thread));
         unsafe_pairs.insert(delay);
       }
       return true;
@@ -1081,7 +1081,7 @@ bool event_grapht::critical_cyclet::is_not_thin_air() const
     /* data dependencies */
     const data_dpt& dep=egraph.map_data_dp[current.thread];
 
-    if(dep.dp(current,next))
+    if(dep.dp(current, next))
       continue;
 
     return true;
@@ -1098,7 +1098,7 @@ bool event_grapht::critical_cyclet::is_not_thin_air() const
   /* data dependencies */
   const data_dpt& dep=egraph.map_data_dp[current.thread];
 
-  if(dep.dp(current,next))
+  if(dep.dp(current, next))
     return false;
 
   return true;
@@ -1248,8 +1248,8 @@ Function: event_grapht::critical_cyclet::print_detail
 
 std::string event_grapht::critical_cyclet::print_detail(
   const critical_cyclet& reduced,
-  std::map<std::string,std::string>& map_id2var,
-  std::map<std::string,std::string>& map_var2id,
+  std::map<std::string, std::string>& map_id2var,
+  std::map<std::string, std::string>& map_var2id,
   memory_modelt model) const
 {
   std::string cycle;
@@ -1289,8 +1289,8 @@ Function: event_grapht::critical_cyclet::print_all
 
 std::string event_grapht::critical_cyclet::print_all(
   memory_modelt model,
-  std::map<std::string,std::string>& map_id2var,
-  std::map<std::string,std::string>& map_var2id,
+  std::map<std::string, std::string>& map_id2var,
+  std::map<std::string, std::string>& map_var2id,
   bool hide_internals) const
 {
   std::string cycle;

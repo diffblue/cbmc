@@ -39,8 +39,8 @@ void const_graph_visitort::graph_explore(
     for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       /* it should be a po_s, and not a po_s^+ */
-      assert(egraph.has_po_edge(*it,*next_it));
-      edges.insert(fence_inserter.add_edge(edget(*it,*next_it)));
+      assert(egraph.has_po_edge(*it, *next_it));
+      edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
   }
   else if(egraph.po_out(next).size()==0) {
@@ -89,8 +89,8 @@ void const_graph_visitort::const_graph_explore(
     for(;next_it!=old_path.end() && it!=old_path.end(); ++it, ++next_it)
     {
       /* it should be a po_s, and not a po_s^+ */
-      assert(egraph.has_po_edge(*it,*next_it));
-      fence_inserter.add_edge(edget(*it,*next_it));
+      assert(egraph.has_po_edge(*it, *next_it));
+      fence_inserter.add_edge(edget(*it, *next_it));
     }
   }
   else if(egraph.po_out(next).size()==0) {
@@ -163,9 +163,10 @@ void const_graph_visitort::graph_explore_BC(
     {
       const abstract_eventt& e1=egraph[*it];
       const abstract_eventt& e2=egraph[*next_it];
-      if(!porw || (e1.operation==abstract_eventt::Read
-        && e2.operation==abstract_eventt::Write))
-        edges.insert(fence_inserter.add_edge(edget(*it,*next_it)));
+      if(!porw ||
+         (e1.operation==abstract_eventt::Read &&
+          e2.operation==abstract_eventt::Write))
+        edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
     assert(it!=old_path.end());
   }
@@ -229,7 +230,7 @@ void const_graph_visitort::const_graph_explore_BC(
       const abstract_eventt& e2=egraph[*next_it];
       if((e1.operation==abstract_eventt::Read
         && e2.operation==abstract_eventt::Write))
-        fence_inserter.add_edge(edget(*it,*next_it));
+        fence_inserter.add_edge(edget(*it, *next_it));
     }
     // NEW
     assert(it!=old_path.end());
@@ -297,9 +298,10 @@ void const_graph_visitort::graph_explore_AC(
     {
       const abstract_eventt& e1=egraph[*next_it];
       const abstract_eventt& e2=egraph[*it];
-      if(!porw || (e1.operation==abstract_eventt::Read
-        && e2.operation==abstract_eventt::Write))
-        edges.insert(fence_inserter.add_edge(edget(*next_it,*it)));
+      if(!porw ||
+         (e1.operation==abstract_eventt::Read &&
+          e2.operation==abstract_eventt::Write))
+        edges.insert(fence_inserter.add_edge(edget(*next_it, *it)));
     }
     assert(it!=old_path.end());
   }
@@ -362,9 +364,9 @@ void const_graph_visitort::const_graph_explore_AC(
     {
       const abstract_eventt& e1=egraph[*next_it];
       const abstract_eventt& e2=egraph[*it];
-      if((e1.operation==abstract_eventt::Read
-        && e2.operation==abstract_eventt::Write))
-        fence_inserter.add_edge(edget(*next_it,*it));
+      if(e1.operation==abstract_eventt::Read &&
+         e2.operation==abstract_eventt::Write)
+        fence_inserter.add_edge(edget(*next_it, *it));
     }
     // NEW
     assert(it!=old_path.end());

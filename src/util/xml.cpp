@@ -339,7 +339,7 @@ void xmlt::set_attribute(
   if ((value[0]=='\"' && value[value.size()-1]=='\"') ||
       (value[0]=='\'' && value[value.size()-1]=='\''))
   {
-    attributes[attribute]=value.substr(1,value.size()-2);
+    attributes[attribute]=value.substr(1, value.size()-2);
   }
   else
   {

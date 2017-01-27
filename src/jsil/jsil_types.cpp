@@ -449,7 +449,7 @@ jsil_union_typet jsil_union_typet::intersect_with(
   auto &elements2=other.components();
   jsil_union_typet result;
   auto &elements=result.components();
-  elements.resize(std::min(elements1.size(),elements2.size()));
+  elements.resize(std::min(elements1.size(), elements2.size()));
   std::vector<union_typet::componentt>::iterator it=std::set_intersection(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),

@@ -282,7 +282,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       expr.type()=e1.type();
       expr.op1().swap(e1);
     }
-    else if(implicit_conversion_sequence(expr.op2(),expr.op1().type(), e2))
+    else if(implicit_conversion_sequence(expr.op2(), expr.op1().type(), e2))
     {
       expr.type()=e2.type();
       expr.op2().swap(e2);

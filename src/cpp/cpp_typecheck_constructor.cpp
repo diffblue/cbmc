@@ -334,7 +334,7 @@ void cpp_typecheckt::default_cpctor(
     if(mem_it->get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier,mem_it->get(ID_base_name));
+      name.set(ID_identifier, mem_it->get(ID_base_name));
       name.add_source_location()=source_location;
 
       cpp_namet cppname;
@@ -556,7 +556,7 @@ void cpp_typecheckt::default_assignop_value(
 
       exprt::operandst empty_operands;
       for(mp_integer i = 0; i < size; ++i)
-        copy_array(source_location, mem_name,i,arg_name,block);
+        copy_array(source_location, mem_name, i, arg_name, block);
     }
     else
       copy_member(source_location, mem_name, arg_name, block);
@@ -906,7 +906,7 @@ void cpp_typecheckt::full_member_initialization(
     if(mem_it->get_bool("is_vtptr"))
     {
       exprt name(ID_name);
-      name.set(ID_identifier,mem_it->get(ID_base_name));
+      name.set(ID_identifier, mem_it->get(ID_base_name));
       name.add_source_location() = mem_it->source_location();
 
       cpp_namet cppname;

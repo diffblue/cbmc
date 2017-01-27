@@ -79,9 +79,9 @@ public:
   // variables in the cycles
   std::set<irep_idt> cycles;
   // events instrumented: var->locations in the code
-  std::multimap<irep_idt,source_locationt> cycles_loc;
+  std::multimap<irep_idt, source_locationt> cycles_loc;
   // events in cycles: var->locations (for read instrumentations)
-  std::multimap<irep_idt,source_locationt> cycles_r_loc;
+  std::multimap<irep_idt, source_locationt> cycles_r_loc;
 
   const varst &operator()(const irep_idt &object);
 

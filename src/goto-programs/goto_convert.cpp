@@ -1714,7 +1714,7 @@ void goto_convertt::convert_goto(
   t->code=code;
 
   // remember it to do target later
-  targets.gotos.push_back(std::make_pair(t,targets.destructor_stack));
+  targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
 }
 
 /*******************************************************************\

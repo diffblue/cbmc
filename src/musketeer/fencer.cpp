@@ -78,7 +78,7 @@ void fence_weak_memory(
 
   // collects cycles, directly or by SCCs
   if(input_max_var!=0 || input_max_po_trans!=0)
-    instrumenter.set_parameters_collection(input_max_var,input_max_po_trans,
+    instrumenter.set_parameters_collection(input_max_var, input_max_po_trans,
       ignore_arrays);
   else
     instrumenter.set_parameters_collection(max_thds, 0, ignore_arrays);

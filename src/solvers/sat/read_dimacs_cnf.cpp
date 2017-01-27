@@ -56,7 +56,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
       if(pos!=std::string::npos)
       {
         std::string decision = line.substr(0, pos);
-        line.erase(0,pos+1);
+        line.erase(0, pos+1);
         #ifdef VERBOSE
         std::cout << "i am here\n";
         std::cout << decision << std::endl;

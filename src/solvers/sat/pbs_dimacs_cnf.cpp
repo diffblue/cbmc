@@ -31,7 +31,7 @@ void pbs_dimacs_cnft::write_dimacs_pb(std::ostream &out)
 
   //std::cout << "enter: No Lit. = " << no_variables () << "\n";
 
-  for(std::map<literalt,unsigned>::const_iterator it=pb_constraintmap.begin();
+  for(std::map<literalt, unsigned>::const_iterator it=pb_constraintmap.begin();
       it != pb_constraintmap.end (); ++it)
     d_sum += ((*it).second);
 
@@ -83,7 +83,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   if(!pbs_path.empty()) {
     command += pbs_path;
-    if (command.substr(command.length(),1) != "/")
+    if (command.substr(command.length(), 1) != "/")
       command += "/";
   }
 
@@ -143,7 +143,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   while(file && !file.eof ())
     {
-      std::getline(file,line);
+      std::getline(file, line);
       if(strstr(line.c_str(),
                 "Variable Assignments Satisfying CNF Formula:")!=NULL)
         {
@@ -163,30 +163,30 @@ bool pbs_dimacs_cnft::pbs_solve()
           //std::cout << "\n";
           //print ("Finished reading assignments.\n");
         }
-      else if (strstr(line.c_str(),"SAT... SUM") != NULL)
+      else if (strstr(line.c_str(), "SAT... SUM") != NULL)
         {
           //print (line);
-          sscanf(line.c_str(),"%*s %*s %*s %d", &opt_sum);
+          sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
         }
-      else if (strstr(line.c_str(),"SAT - All implied") != NULL)
+      else if (strstr(line.c_str(), "SAT - All implied") != NULL)
         {
           //print (line);
-          sscanf(line.c_str(),"%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d", &opt_sum);
+          sscanf(line.c_str(), "%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d", &opt_sum);
         }
-      else if (strstr(line.c_str(),"SAT... Solution") != NULL)
+      else if (strstr(line.c_str(), "SAT... Solution") != NULL)
         {
           //print(line);
-          sscanf(line.c_str(),"%*s %*s %*s %d", &opt_sum);
+          sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
         }
-      else if (strstr(line.c_str(),"Optimal Soln") != NULL)
+      else if (strstr(line.c_str(), "Optimal Soln") != NULL)
         {
           //print(line);
-          if (strstr(line.c_str(),"time out") != NULL)
+          if (strstr(line.c_str(), "time out") != NULL)
             {
               print (6, "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT.\n");
               return satisfied;
             }
-          sscanf(line.c_str(),"%*s %*s %*s %d", &opt_sum);
+          sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
         }
     }
 

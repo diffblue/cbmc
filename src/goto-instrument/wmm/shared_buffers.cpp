@@ -265,7 +265,7 @@ void shared_bufferst::delay_read(
   assignment(goto_program, target, source_location, vars.read_delayed_var,
     read_object);
 
-  const irep_idt& new_var=add_fresh_var(write_object,unique(),vars.type);
+  const irep_idt& new_var=add_fresh_var(write_object, unique(), vars.type);
 
   assignment(goto_program, target, source_location, vars.read_new_var, new_var);
 
@@ -578,8 +578,8 @@ void shared_bufferst::nondet_flush(
   if(!tso_pso_rmo)
     if(cycles.find(object)!=cycles.end())
     {
-      typedef std::multimap<irep_idt,source_locationt>::iterator m_itt;
-      std::pair<m_itt,m_itt> ran=cycles_loc.equal_range(object);
+      typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+      std::pair<m_itt, m_itt> ran=cycles_loc.equal_range(object);
       for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
         if(ran_it->second==source_location)
         {
@@ -1119,8 +1119,8 @@ bool shared_bufferst::is_buffered_in_general(
   }
   else
   {
-    typedef std::multimap<irep_idt,source_locationt>::iterator m_itt;
-    std::pair<m_itt,m_itt> ran=cycles_loc.equal_range(identifier);
+    typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+    std::pair<m_itt, m_itt> ran=cycles_loc.equal_range(identifier);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
       if(ran_it->second==source_location)
         return true; // not to instrument
@@ -1170,7 +1170,7 @@ void shared_bufferst::affected_by_delay(
             message.debug() <<"debug: "<<id2string(w_it->second.object)
               <<" reads from "<<id2string(r_it->second.object)
               <<messaget::eom;
-            if(is_buffered_in_general(ns, r_it->second.symbol_expr,true))
+            if(is_buffered_in_general(ns, r_it->second.symbol_expr, true))
               //shouldn't it be true? false => overapprox
               affected_by_delay_set.insert(w_it->second.object);
           }
@@ -1239,7 +1239,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
           // add all the written values (which are not instrumentations)
           // in a set
           forall_rw_set_w_entries(w_it, rw_set)
-            if(shared_buffers.is_buffered(ns, w_it->second.symbol_expr,false))
+            if(shared_buffers.is_buffered(ns, w_it->second.symbol_expr, false))
               past_writes.insert(w_it->second.object);
 
           goto_programt::instructiont original_instruction;
@@ -1260,7 +1260,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
             shared_buffers.flush_read(
               goto_program, i_it, source_location, e_it->second.object);
 
-            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,false))
+            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr, false))
               shared_buffers.nondet_flush(
                 goto_program, i_it, source_location, e_it->second.object,
                 current_thread,
@@ -1273,18 +1273,18 @@ void shared_bufferst::cfg_visitort::weak_memory(
             // if one of the previous read was to buffer, then delays the read
             if(model==RMO || model==Power)
             forall_rw_set_r_entries(r_it, rw_set)
-              if(shared_buffers.is_buffered(ns, r_it->second.symbol_expr,true))
+              if(shared_buffers.is_buffered(ns, r_it->second.symbol_expr, true))
               {
                 shared_buffers.delay_read(
                   goto_program, i_it, source_location, r_it->second.object,
                   e_it->second.object);
               }
 
-            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,true))
+            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr, true))
             {
               shared_buffers.write(
                 goto_program, i_it, source_location,
-                e_it->second.object,original_instruction,
+                e_it->second.object, original_instruction,
                 current_thread);
             }
             else
@@ -1331,7 +1331,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     read_delayed_expr,
                     if_exprt(
                       choice1_expr,
-                      dereference_exprt(new_read_expr,vars.type),
+                      dereference_exprt(new_read_expr, vars.type),
                       to_replace_expr),
                     to_replace_expr);//original_instruction.code.op1());
 
@@ -1351,7 +1351,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
           // without affecting the memory, restore the previous memory value
           // (buffer flush delay)
           forall_rw_set_r_entries(e_it, rw_set)
-            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr,false))
+            if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr, false))
             {
               shared_buffers.message.debug() << "flush restore: "
                 << e_it->second.object << messaget::eom;

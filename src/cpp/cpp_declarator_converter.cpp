@@ -241,7 +241,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(id_set.empty())
       {
         cpp_idt &identifier=
-          cpp_typecheck.cpp_scopes.put_into_scope(symbol,*scope);
+          cpp_typecheck.cpp_scopes.put_into_scope(symbol, *scope);
         identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
       }
     }

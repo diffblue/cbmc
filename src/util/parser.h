@@ -141,7 +141,7 @@ exprt &_newstack(parsert &parser, unsigned &x);
 #define stack_expr(x) (PARSER.stack[x])
 #define stack_type(x) (static_cast<typet &>(static_cast<irept &>(PARSER.stack[x])))
 
-#define YY_INPUT(buf,result,max_size) \
+#define YY_INPUT(buf, result, max_size) \
     do { \
         for(result=0; result<max_size;) \
         { \

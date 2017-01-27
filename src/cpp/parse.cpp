@@ -4024,7 +4024,7 @@ bool Parser::rCastOperatorName(irept &name)
       return false;
   }
 
-  merge_types(cv1,type_name);
+  merge_types(cv1, type_name);
 
   if(!optCvQualify(cv2))
     return false;

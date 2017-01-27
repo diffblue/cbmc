@@ -61,7 +61,7 @@ void convert(const goto_programt &goto_program,
       // std::cout << "Targetlabel found!" << std::endl;
       tmp.str("");
       tmp << inst.target_number;
-      ins.set_attribute("targetlabel",tmp.str());
+      ins.set_attribute("targetlabel", tmp.str());
     }
 
     switch(inst.type)

@@ -42,7 +42,7 @@ class pbs_dimacs_cnft:public dimacs_cnft
   int goal;
   int opt_sum;
 
-  std::map<literalt,unsigned> pb_constraintmap;
+  std::map<literalt, unsigned> pb_constraintmap;
 
   bool pbs_solve();
 

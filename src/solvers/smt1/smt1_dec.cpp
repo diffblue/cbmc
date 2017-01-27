@@ -561,14 +561,14 @@ bool smt1_dect::string_to_expr_z3(
   const std::string &value,
   exprt &e) const
 {
-  if(value.substr(0,2)=="bv")
+  if(value.substr(0, 2)=="bv")
   {
     std::string v=value.substr(2, value.find('[')-2);
     size_t p = value.find('[')+1;
     std::string w=value.substr(p, value.find(']')-p);
 
-    std::string binary=integer2binary(string2integer(v,10),
-                                      integer2unsigned(string2integer(w,10)));
+    std::string binary=integer2binary(string2integer(v, 10),
+                                      integer2unsigned(string2integer(w, 10)));
 
     if(type.id()==ID_struct)
     {
@@ -587,7 +587,7 @@ bool smt1_dect::string_to_expr_z3(
 
     return true;
   }
-  else if(value.substr(0,6)=="(const") // const arrays
+  else if(value.substr(0, 6)=="(const") // const arrays
   {
     std::string av = value.substr(7, value.length()-8);
 
@@ -603,7 +603,7 @@ bool smt1_dect::string_to_expr_z3(
 
     return true;
   }
-  else if(value.substr(0,6)=="(store")
+  else if(value.substr(0, 6)=="(store")
   {
     size_t p1=value.rfind(' ')+1;
     size_t p2=value.rfind(' ', p1-2)+1;
@@ -637,7 +637,7 @@ bool smt1_dect::string_to_expr_z3(
     e = true_exprt();
     return true;
   }
-  else if(value.substr(0,8)=="array_of")
+  else if(value.substr(0, 8)=="array_of")
   {
     // We assume that array_of has only concrete arguments...
     irep_idt id(value);
@@ -655,7 +655,7 @@ bool smt1_dect::string_to_expr_z3(
     constant_exprt result;
     result.type()=rational_typet();
 
-    if(value.substr(0,4)=="val!")
+    if(value.substr(0, 4)=="val!")
       result.set_value(value.substr(4));
     else
       result.set_value(value);
@@ -701,7 +701,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       ; //ignore
     else
     {
-      assert(line.substr(0,13)=="  :assumption");
+      assert(line.substr(0, 13)=="  :assumption");
       std::size_t pos=line.find('(');
 
       if(pos!=std::string::npos)
@@ -716,17 +716,17 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
           var = ops.substr(0, blank);
           val = ops.substr(blank+1, ops.length()-blank);
 
-          if((var.length()>=4 && var.substr(0,4)=="cvc3") ||
-             (val.length()>=4 && val.substr(0,4)=="cvc3") ||
+          if((var.length()>=4 && var.substr(0, 4)=="cvc3") ||
+             (val.length()>=4 && val.substr(0, 4)=="cvc3") ||
              var==val)
             continue;
-          else if((var.substr(0,9)=="array_of'") ||
-                  (var.substr(0,2)=="bv" && val.substr(0,2)!="bv"))
+          else if((var.substr(0, 9)=="array_of'") ||
+                  (var.substr(0, 2)=="bv" && val.substr(0, 2)!="bv"))
           {
             std::string t=var; var=val; val=t;
           }
         }
-        else if(line.substr(pos+1,3)=="not")
+        else if(line.substr(pos+1, 3)=="not")
         {
           var = line.substr(pos+5, line.length()-pos-6);
           val = "false";
@@ -753,14 +753,14 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
     std::string value=values[conv_id];
     if(value=="") continue;
 
-    if(value.substr(0,2)=="bv")
+    if(value.substr(0, 2)=="bv")
     {
       std::string v=value.substr(2, value.find('[')-2);
       size_t p = value.find('[')+1;
       std::string w=value.substr(p, value.find(']')-p);
 
-      std::string binary=integer2binary(string2integer(v,10),
-                                        integer2unsigned(string2integer(w,10)));
+      std::string binary=integer2binary(string2integer(v, 10),
+                                        integer2unsigned(string2integer(w, 10)));
 
       set_value(it->second, "", binary);
     }
@@ -768,7 +768,7 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       it->second.value=false_exprt();
     else if(value=="true")
       it->second.value=true_exprt();
-    else if(value.substr(0,8)=="array_of")
+    else if(value.substr(0, 8)=="array_of")
     {
       // We assume that array_of has only concrete arguments...
       irep_idt id(value);

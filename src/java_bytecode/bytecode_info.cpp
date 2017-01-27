@@ -146,7 +146,7 @@ struct bytecode_infot const bytecode_info[]= {
 { "ineg",           0x74, ' ', 1, 1, 'i' }, // value → result; negate int
 { "instanceof",     0xc1, 'C', 1, 1, ' ' }, // objectref → result; determines if an object objectref is of a given type, identified by class reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "invokedynamic",  0xba, 'I', 0, 0, ' ' }, // [arg1, [arg2 ...]] →; invokes a dynamic method identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
-{ "invokeinterface",0xb9, 'I', 0, 0, ' ' }, // objectref, [arg1, arg2, ...] →; invokes an interface method on object objectref, where the interface method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+{ "invokeinterface", 0xb9, 'I', 0, 0, ' ' }, // objectref, [arg1, arg2, ...] →; invokes an interface method on object objectref, where the interface method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "invokespecial",  0xb7, 'C', 0, 0, ' ' }, // objectref, [arg1, arg2, ...] →; invoke instance method on object objectref, where the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "invokestatic",   0xb8, 'C', 0, 0, ' ' }, // [arg1, arg2, ...] →; invoke a static method, where the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 { "invokevirtual",  0xb6, 'C', 0, 0, ' ' }, // objectref, [arg1, arg2, ...] →; invoke virtual method on object objectref, where the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)

@@ -98,7 +98,7 @@ struct saj_tablet
                irep_idt()  }},
   { ID_xor,   {ID_bool       ,
                irep_idt()  }},
-  { ID_bitand,{ID_unsignedbv ,
+  { ID_bitand, {ID_unsignedbv ,
                ID_signedbv   ,
                ID_floatbv    ,
                ID_fixedbv    ,
@@ -108,12 +108,12 @@ struct saj_tablet
                ID_floatbv    ,
                ID_fixedbv    ,
                irep_idt()  }},
-  { ID_bitxor,{ID_unsignedbv ,
+  { ID_bitxor, {ID_unsignedbv ,
                ID_signedbv   ,
                ID_floatbv    ,
                ID_fixedbv    ,
                irep_idt()  }},
-  { irep_idt(),{ irep_idt() }}
+  { irep_idt(), { irep_idt() }}
 };
 
 static bool sort_and_join(

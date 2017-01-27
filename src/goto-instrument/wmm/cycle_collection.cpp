@@ -292,7 +292,7 @@ bool event_grapht::graph_explorert::backtrack(
         point_stack.pop();
         const event_idt preprevious = point_stack.top();
         point_stack.push(previous);
-        if(!egraph[preprevious].unsafe_pair(this_vertex,model)
+        if(!egraph[preprevious].unsafe_pair(this_vertex, model)
           && !(this_vertex.operation==abstract_eventt::Fence
             || egraph[preprevious].operation==abstract_eventt::Fence
             || this_vertex.operation==abstract_eventt::Lwfence
@@ -311,7 +311,7 @@ bool event_grapht::graph_explorert::backtrack(
        this means that we can have at most 2 consecutive events by po
        with the same variable, and two variables per thread (fences are
        not taken into account) */
-    if(!point_stack.empty() && egraph.are_po_ordered(point_stack.top(),vertex)
+    if(!point_stack.empty() && egraph.are_po_ordered(point_stack.top(), vertex)
       && this_vertex.operation!=abstract_eventt::Fence
       && this_vertex.operation!=abstract_eventt::Lwfence
       && this_vertex.operation!=abstract_eventt::ASMfence
@@ -333,7 +333,7 @@ bool event_grapht::graph_explorert::backtrack(
     }
 
     /* constraint 1.b */
-    if(!point_stack.empty() && egraph.are_po_ordered(point_stack.top(),vertex)
+    if(!point_stack.empty() && egraph.are_po_ordered(point_stack.top(), vertex)
       && this_vertex.operation!=abstract_eventt::Fence
       && this_vertex.operation!=abstract_eventt::Lwfence
       && this_vertex.operation!=abstract_eventt::ASMfence
@@ -380,9 +380,9 @@ bool event_grapht::graph_explorert::backtrack(
     if(!point_stack.empty())
     {
       const abstract_eventt& prev_vertex = egraph[point_stack.top()];
-      unsafe_met_updated |= (prev_vertex.unsafe_pair(this_vertex,model)
+      unsafe_met_updated |= (prev_vertex.unsafe_pair(this_vertex, model)
         && !(prev_vertex.thread==this_vertex.thread
-          && egraph.map_data_dp[this_vertex.thread].dp(prev_vertex,this_vertex)));
+          && egraph.map_data_dp[this_vertex.thread].dp(prev_vertex, this_vertex)));
       if (unsafe_met_updated && !unsafe_met
         && egraph.are_po_ordered(point_stack.top(), vertex))
         has_to_be_unsafe_updated=true;
@@ -402,7 +402,7 @@ bool event_grapht::graph_explorert::backtrack(
         const event_idt w = w_it->first;
         if(w == source && point_stack.size()>=4
           && (unsafe_met_updated
-            || this_vertex.unsafe_pair(egraph[source],model)) )
+            || this_vertex.unsafe_pair(egraph[source], model)) )
         {
           critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
           not_thin_air = !egraph.filter_thin_air || new_cycle.is_not_thin_air();
@@ -418,7 +418,7 @@ bool event_grapht::graph_explorert::backtrack(
             new_cycle.is_unsafe(model) /*&&
             new_cycle.is_unsafe_asm(model)*/)
           {
-            egraph.message.debug() << new_cycle.print_name(model,false)
+            egraph.message.debug() << new_cycle.print_name(model, false)
               << messaget::eom;
             set_of_cycles.insert(new_cycle);
 #if 0
@@ -444,10 +444,10 @@ bool event_grapht::graph_explorert::backtrack(
     {
       const event_idt w = w_it->first;
       if(w < source)
-        egraph.remove_com_edge(vertex,w);
+        egraph.remove_com_edge(vertex, w);
       else if(w == source && point_stack.size()>=4
         && (unsafe_met_updated
-          || this_vertex.unsafe_pair(egraph[source],model)) )
+          || this_vertex.unsafe_pair(egraph[source], model)) )
       {
         critical_cyclet new_cycle = extract_cycle(vertex, source, cycle_nb++);
         not_thin_air = !egraph.filter_thin_air || new_cycle.is_not_thin_air();
@@ -463,7 +463,7 @@ bool event_grapht::graph_explorert::backtrack(
           new_cycle.is_unsafe(model) /*&&
           new_cycle.is_unsafe_asm(model)*/)
         {
-          egraph.message.debug() << new_cycle.print_name(model,false)
+          egraph.message.debug() << new_cycle.print_name(model, false)
             << messaget::eom;
           set_of_cycles.insert(new_cycle);
 #if 0
@@ -517,7 +517,7 @@ bool event_grapht::graph_explorert::backtrack(
   if( skip_tracked.find(vertex)==skip_tracked.end() ) // 25 oct
   if( not_thin_air
     && !get_com_only && (po_trans > 1 || po_trans==0)
-    && !point_stack.empty() && egraph.are_po_ordered(point_stack.top(),vertex)
+    && !point_stack.empty() && egraph.are_po_ordered(point_stack.top(), vertex)
     && this_vertex.operation!=abstract_eventt::Fence
     && ( this_vertex.operation!=abstract_eventt::Lwfence
       || egraph[point_stack.top()].operation==abstract_eventt::Write)

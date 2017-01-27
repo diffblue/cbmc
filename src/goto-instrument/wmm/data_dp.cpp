@@ -71,9 +71,9 @@ Function: data_dpt::dp_analysis
 void data_dpt::dp_analysis(const abstract_eventt& read,
   const abstract_eventt& write)
 {
-  datat d_read(read.variable,read.source_location);
-  datat d_write(write.variable,write.source_location);
-  dp_analysis(d_read,read.local,d_write,write.local);
+  datat d_read(read.variable, read.source_location);
+  datat d_write(write.variable, write.source_location);
+  dp_analysis(d_read, read.local, d_write, write.local);
 }
 
 /*******************************************************************\
@@ -203,7 +203,7 @@ void data_dpt::print(messaget& message)
 {
 #ifdef DEBUG
   const_iterator it;
-  std::map<unsigned,std::set<source_locationt> > classed;
+  std::map<unsigned, std::set<source_locationt> > classed;
 
   for(it=begin(); it!=end(); ++it)
   {
@@ -217,7 +217,7 @@ void data_dpt::print(messaget& message)
       classed[it->eq_class].insert(it->loc);
   }
 
-  for(std::map<unsigned,std::set<source_locationt> >::const_iterator m_it=classed.begin();
+  for(std::map<unsigned, std::set<source_locationt> >::const_iterator m_it=classed.begin();
     m_it!=classed.end(); ++m_it)
   {
     message.debug() << "class #"<<m_it->first << messaget::eom;

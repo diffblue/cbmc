@@ -98,14 +98,14 @@ public:
      critical cycle for this) */
   bool unsafe_pair(const abstract_eventt &next, memory_modelt model) const
   {
-    return unsafe_pair_lwfence_param(next,model,false);
+    return unsafe_pair_lwfence_param(next, model, false);
   }
 
   bool unsafe_pair_lwfence(
     const abstract_eventt &next,
     memory_modelt model) const
   {
-    return unsafe_pair_lwfence_param(next,model,true);
+    return unsafe_pair_lwfence_param(next, model, true);
   }
 
   bool unsafe_pair_asm(
