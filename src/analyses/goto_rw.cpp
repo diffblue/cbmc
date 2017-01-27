@@ -653,7 +653,7 @@ void rw_range_sett::add(
   const range_spect &range_end)
 {
   objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
-    insert(std::make_pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+    insert(std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
   if(entry->second==0)
     entry->second=new range_domaint();
@@ -936,7 +936,7 @@ void rw_guarded_range_set_value_sett::add(
   const range_spect &range_end)
 {
   objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
-    insert(std::make_pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+    insert(std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
   if(entry->second==0)
     entry->second=new guarded_range_domaint();
