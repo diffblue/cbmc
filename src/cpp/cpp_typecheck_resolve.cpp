@@ -1886,7 +1886,9 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return result;

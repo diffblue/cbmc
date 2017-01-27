@@ -2303,11 +2303,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
         if(base_name=="")
         {
-          unsigned count;
-          for(count=0;
-              symbol_table.symbols.find("nondet_"+std::to_string(count))!=
-              symbol_table.symbols.end();
-              count++);
+          unsigned count=0;
+          while(symbol_table.symbols.find("nondet_"+std::to_string(count))!=
+                symbol_table.symbols.end())
+            ++count;
           base_name="nondet_"+std::to_string(count);
         }
 

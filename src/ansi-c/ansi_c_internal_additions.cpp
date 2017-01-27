@@ -13,50 +13,50 @@ Author: Daniel Kroening, kroening@kroening.com
 const char gcc_builtin_headers_generic[]=
 "# 1 \"gcc_builtin_headers_generic.h\"\n"
 #include "gcc_builtin_headers_generic.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
-;
+; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_2[]=
 #include "gcc_builtin_headers_ia32-2.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[]=
 "# 1 \"gcc_builtin_headers_alpha.h\"\n"
 #include "gcc_builtin_headers_alpha.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_arm[]=
 "# 1 \"gcc_builtin_headers_arm.h\"\n"
 #include "gcc_builtin_headers_arm.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_mips[]=
 "# 1 \"gcc_builtin_headers_mips.h\"\n"
 #include "gcc_builtin_headers_mips.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_power[]=
 "# 1 \"gcc_builtin_headers_power.h\"\n"
 #include "gcc_builtin_headers_power.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char arm_builtin_headers[]=
 "# 1 \"arm_builtin_headers.h\"\n"
 #include "arm_builtin_headers.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char cw_builtin_headers[]=
 "# 1 \"cw_builtin_headers.h\"\n"
 #include "cw_builtin_headers.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 const char clang_builtin_headers[]=
 "# 1 \"clang_builtin_headers.h\"\n"
 #include "clang_builtin_headers.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 /*******************************************************************\
 

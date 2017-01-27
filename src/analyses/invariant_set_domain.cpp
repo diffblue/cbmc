@@ -81,7 +81,9 @@ void invariant_set_domaint::transform(
     invariant_set.make_threaded();
     break;
 
-  default:;
-    // do nothing
+  default:
+    {
+      // do nothing
+    }
   }
 }

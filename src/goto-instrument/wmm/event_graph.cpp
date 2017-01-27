@@ -379,8 +379,10 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
     /* selects the next event which is not a weak fence */
     const_iterator s_it=next;
 
-    for(; s_it!=end() && egraph[*s_it].operation==abstract_eventt::Lwfence;
-      ++s_it);
+    for( ; s_it!=end() && egraph[*s_it].operation==abstract_eventt::Lwfence;
+        ++s_it)
+    {
+    }
 
     if(s_it==end())
       continue;
@@ -512,7 +514,10 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   /* selects the next event which is not a weak fence */
   const_iterator s_it;
   for(s_it=begin();
-    s_it!=end() && egraph[*s_it].operation==abstract_eventt::Lwfence; s_it++);
+      s_it!=end() && egraph[*s_it].operation==abstract_eventt::Lwfence;
+      s_it++)
+  {
+  }
 
   /* if the whole cycle has been explored */
   if(s_it==end())
@@ -1366,7 +1371,7 @@ void event_grapht::critical_cyclet::hide_internals(critical_cyclet& reduced)  co
         reduced.push_back(*cur_it);
         reduced_evts.insert(*cur_it);
       }
-      for(; next_it!=end() && egraph[*next_it].is_fence(); ++next_it);
+      for(; next_it!=end() && egraph[*next_it].is_fence(); ++next_it) {}
       assert(next_it != end());
       if(reduced_evts.find(*next_it) == reduced_evts.end())
       {
@@ -1393,7 +1398,7 @@ void event_grapht::critical_cyclet::hide_internals(critical_cyclet& reduced)  co
         reduced.push_back(*cur_it);
         reduced_evts.insert(*cur_it);
       }
-      for(; next_it!=end() && egraph[*next_it].is_fence(); ++next_it);
+      for(; next_it!=end() && egraph[*next_it].is_fence(); ++next_it) {}
       assert(next_it != end());
       if(reduced_evts.find(*next_it) == reduced_evts.end())
       {

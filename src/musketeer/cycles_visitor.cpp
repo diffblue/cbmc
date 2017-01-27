@@ -161,9 +161,13 @@ void cycles_visitort::po_edges(std::set<event_idt>& edges)
       event_grapht::critical_cyclet::const_iterator C_k_it=C_k->begin();
       for(; C_j_it!=C_j->end(); ++C_j_it)
       {
-        for(; C_k_it!=C_k->end()
-          && !egraph.are_po_ordered(*C_j_it, *C_k_it)
-          && !egraph.are_po_ordered(*C_k_it, *C_j_it); ++C_k_it);
+        for( ;
+            C_k_it!=C_k->end() &&
+            !egraph.are_po_ordered(*C_j_it, *C_k_it) &&
+            !egraph.are_po_ordered(*C_k_it, *C_j_it);
+            ++C_k_it)
+        {
+        }
 
         if(C_k_it!=C_k->end())
           break;

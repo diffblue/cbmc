@@ -698,7 +698,9 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
       res = D_UNSATISFIABLE;
     else if(line.find("Current scope level")!=std::string::npos ||
             line.find("Variable Assignment")!=std::string::npos)
-      ; //ignore
+    {
+      //ignore
+    }
     else
     {
       assert(line.substr(0, 13)=="  :assumption");

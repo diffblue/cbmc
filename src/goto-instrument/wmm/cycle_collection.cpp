@@ -199,7 +199,7 @@ bool event_grapht::graph_explorert::backtrack(
   memory_modelt model)
 {
 #ifdef DEBUG
-  for(std::size_t i=0; i<80; egraph.message.debug() << "-", ++i);
+  egraph.message.debug() << std::string(80, '-');
   egraph.message.debug() << messaget::eom;
   egraph.message.debug() << "marked size:" << marked_stack.size()
     << messaget::eom;

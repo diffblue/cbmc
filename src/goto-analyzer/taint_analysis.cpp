@@ -226,7 +226,9 @@ void taint_analysist::instrument(
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     if(!tmp.empty())

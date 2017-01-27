@@ -1002,7 +1002,9 @@ void symex_target_equationt::SSA_stept::output(
     case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
     case PHI: out << "PHI"; break;
     case GUARD: out << "GUARD"; break;
-    default:;
+    default:
+      {
+      }
     }
 
     out << ")" << std::endl;

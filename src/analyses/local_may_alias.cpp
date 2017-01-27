@@ -478,7 +478,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     for(local_cfgt::successorst::const_iterator

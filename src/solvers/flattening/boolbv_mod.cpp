@@ -24,6 +24,7 @@ bvt boolbvt::convert_mod(const mod_exprt &expr)
 {
   if(expr.type().id()==ID_floatbv)
   {
+    // TODO
   }
 
   if(expr.type().id()!=ID_unsignedbv &&

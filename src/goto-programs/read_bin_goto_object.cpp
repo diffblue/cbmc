@@ -193,7 +193,9 @@ bool read_bin_goto_object(
     hdr[2]=in.get();
 
     if(hdr[0]=='G' && hdr[1]=='B' && hdr[2]=='F')
-      ;
+    {
+      // OK!
+    }
     else
     {
       hdr[3]=in.get();

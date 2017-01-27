@@ -2135,7 +2135,7 @@ bool value_set_fivrt::object_map_dt::is_valid_at(
     while(it->function!=f &&
           it!=ranges.end()) it++; // ffw to function block
 
-    for(;
+    for( ;
         it!=ranges.end() && it->function==f && it->from<=line ;
         it++)
       if(it->contains(f, line)) return true;

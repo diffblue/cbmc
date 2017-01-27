@@ -274,7 +274,9 @@ void string_instrumentationt::instrument(
     do_function_call(dest, it);
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 

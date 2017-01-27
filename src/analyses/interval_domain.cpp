@@ -123,7 +123,9 @@ void interval_domaint::transform(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 

@@ -952,7 +952,9 @@ bool c_preprocess_gcc_clang(
   {
   case configt::ansi_ct::flavourt::GCC_C: command+=" -x c"; break;
   case configt::ansi_ct::flavourt::GCC_CPP: command+=" -x c++"; break;
-  default:;
+  default:
+    {
+    }
   }
   #endif
 

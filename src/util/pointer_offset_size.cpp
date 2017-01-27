@@ -39,7 +39,7 @@ member_offset_iterator& member_offset_iterator::operator++()
     {
       // take the extra bytes needed
       std::size_t w=to_c_bit_field_type(comp.type()).get_width();
-      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8);
+      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8) {}
       bit_field_bits-=w;
     }
     else
@@ -306,7 +306,7 @@ exprt member_offset_expr(
     {
       std::size_t w=to_c_bit_field_type(it->type()).get_width();
       std::size_t bytes;
-      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
       bit_field_bits-=w;
       result=plus_exprt(result, from_integer(bytes, result.type()));
     }
@@ -407,7 +407,7 @@ exprt size_of_expr(
       {
         std::size_t w=to_c_bit_field_type(it->type()).get_width();
         std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
         bit_field_bits-=w;
         result=plus_exprt(result, from_integer(bytes, result.type()));
       }

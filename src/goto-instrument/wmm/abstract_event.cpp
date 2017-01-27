@@ -73,7 +73,9 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt& next,
       || (thread!=next.thread && operation==Write && next.operation==Read
         && variable==next.variable));
 
-  case Unknown:;
+  case Unknown:
+    {
+    }
   }
   assert(false);
   /* unknown memory model */
@@ -130,7 +132,9 @@ bool abstract_eventt::unsafe_pair_asm(const abstract_eventt& next,
       || (thread!=next.thread && operation==Write && next.operation==Read
         && variable==next.variable));
 
-  case Unknown:;
+  case Unknown:
+    {
+    }
   }
   assert(false);
   /* unknown memory model */

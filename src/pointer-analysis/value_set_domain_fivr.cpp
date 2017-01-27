@@ -58,7 +58,9 @@ bool value_set_domain_fivrt::transform(
       break;
     }
 
-  default:;
+  default:
+    {
+    }
   }
 
   return value_set.handover();

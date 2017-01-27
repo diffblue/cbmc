@@ -343,7 +343,9 @@ std::list<exprt> expressions_read(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return dest;
@@ -381,7 +383,9 @@ std::list<exprt> expressions_written(
     dest.push_back(to_code_assign(instruction.code).lhs());
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return dest;

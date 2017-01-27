@@ -158,10 +158,7 @@ public:
   void trim_after(stepst::iterator s)
   {
     assert(s!=steps.end());
-    s++;
-    for(;
-        s!=steps.end();
-        s=steps.erase(s));
+    steps.erase(++s, steps.end());
   }
 };
 

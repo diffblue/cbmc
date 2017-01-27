@@ -321,13 +321,7 @@ void build_goto_trace(
       s_it1++)
     if(s_it1->is_assert() && !s_it1->cond_value)
     {
-      s_it1++;
-
-      for(goto_tracet::stepst::iterator
-          s_it2=s_it1;
-          s_it2!=goto_trace.steps.end();
-          s_it2=goto_trace.steps.erase(s_it2));
-
+      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
       break;
     }
 }

@@ -157,7 +157,9 @@ void global_may_alias_domaint::transform(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 

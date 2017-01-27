@@ -74,7 +74,7 @@ Function: lispexprt::parse
 
 bool lispexprt::parse(const std::string &s)
 {
-  unsigned ptr=0;
+  std::string::size_type ptr=0;
   return parse(s, ptr);
 }
 
@@ -90,15 +90,18 @@ Function: lispexprt::parse
 
 \*******************************************************************/
 
-bool lispexprt::parse(const std::string &s, unsigned &ptr)
+bool lispexprt::parse(
+  const std::string &s,
+  std::string::size_type &ptr)
 {
   clear();
   value="";
 
-  if(ptr>=s.size()) return true;
+  if(ptr==std::string::npos || ptr>=s.size()) return true;
 
   // we ignore whitespace
-  for(; ptr<s.size() && (s[ptr]==' ' || s[ptr]=='\t'); ptr++);
+  ptr=s.find_first_not_of(" \t", ptr);
+  if(ptr==std::string::npos) return true;
 
   if(s[ptr]=='(') // LispCons
   {
@@ -170,7 +173,7 @@ bool lispexprt::parse(const std::string &s, unsigned &ptr)
   }
 
   // we ignore whitespace
-  for(; ptr<s.size() && (s[ptr]==' ' || s[ptr]=='\t'); ptr++);
+  ptr=s.find_first_not_of(" \t", ptr);
 
   return false;
 }

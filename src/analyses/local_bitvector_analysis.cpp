@@ -379,7 +379,9 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     for(const auto &succ : node.successors)

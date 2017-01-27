@@ -261,7 +261,7 @@ mp_integer address_bits(const mp_integer &size)
 {
   mp_integer result, x=2;
 
-  for(result=1; x<size; result+=1, x*=2);
+  for(result=1; x<size; result+=1, x*=2) {}
 
   return result;
 }
@@ -299,7 +299,9 @@ mp_integer power(const mp_integer &base,
       }
     case 1: return 1;
     case 0: return 0;
-    default:;
+    default:
+      {
+      }
     }
   }
 

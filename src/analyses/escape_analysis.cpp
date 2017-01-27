@@ -339,7 +339,9 @@ void escape_domaint::transform(
     // This is the edge to the call site.
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 
@@ -649,7 +651,9 @@ void escape_analysist::instrument(
         }
         break;
 
-      default:;
+      default:
+        {
+        }
       }
     }
 

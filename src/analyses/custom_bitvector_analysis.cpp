@@ -542,7 +542,9 @@ void custom_bitvector_domaint::transform(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 

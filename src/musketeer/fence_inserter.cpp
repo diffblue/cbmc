@@ -276,7 +276,9 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
 
         /* if(C_j->find( col_to_var(i) )!=C_j->end()) */
         std::list<event_idt>::const_iterator it;
-        for(it = C_j->begin(); it!=C_j->end() && col_to_var(i)!=*it; ++it);
+        for(it=C_j->begin(); it!=C_j->end() && col_to_var(i)!=*it; ++it)
+        {
+        }
 
         if(it!=C_j->end())
           freq_sum += freq_table[C_j->id];

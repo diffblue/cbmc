@@ -109,7 +109,9 @@ bool points_tot::transform(const cfgt::nodet &e)
     // these are like assignments for the arguments
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return result;

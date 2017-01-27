@@ -185,7 +185,9 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_conditions(t->code);
 
-  default:;
+  default:
+    {
+    }
   }
 
   return std::set<exprt>();
@@ -1035,7 +1037,9 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_decisions(t->code);
 
-  default:;
+  default:
+    {
+    }
   }
 
   return std::set<exprt>();
@@ -1347,7 +1351,9 @@ void instrument_cover_goals(
         i_it->make_skip();
       break;
 
-    default:;
+    default:
+      {
+      }
     }
   }
 

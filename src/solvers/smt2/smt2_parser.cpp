@@ -288,7 +288,9 @@ void smt2_parsert::operator()()
     case ';': // comment
       // skip until newline
       while(in.get(ch) && ch!='\n')
-        ; // ignore
+      {
+        // ignore
+      }
       break;
 
     case '(':

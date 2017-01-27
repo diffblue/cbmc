@@ -19,7 +19,7 @@ struct cprover_library_entryt
   const char *model;
 } cprover_library[]=
 #include "cprover_library.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 /*******************************************************************\
 

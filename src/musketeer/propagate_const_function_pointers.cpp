@@ -247,8 +247,12 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       goto_programt::targett it=new_instructions.begin();
       // beurk -- should use location_number or something unique per
       // instruction but shared between two copies of a same goto-program
-      for(; it->source_location!=(*callsite)->source_location
-        && it!=new_instructions.end(); ++it);
+      for( ;
+          it->source_location!=(*callsite)->source_location &&
+          it!=new_instructions.end();
+          ++it)
+      {
+      }
 
       assert(it->source_location==(*callsite)->source_location);
       exprt& function_called=to_code_function_call(it->code).function();
@@ -292,8 +296,12 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       goto_programt::targett it=new_instructions.begin();
       // beurk -- should use location_number or something unique per
       // instruction but shared between two copies of a same goto-program
-      for(; it->source_location!=(*callsite)->source_location
-        && it!=new_instructions.end(); ++it);
+      for( ;
+          it->source_location!=(*callsite)->source_location &&
+          it!=new_instructions.end();
+          ++it)
+      {
+      }
 
       message.debug() << "callsite targetted: " << (*callsite)->source_location
         << " function: " << const_function.get_identifier() << messaget::eom;

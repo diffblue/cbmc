@@ -72,11 +72,10 @@ inline bool operator!= (const std::string &a, const lispsymbolt &b)
 
 class lispexprt:public std::vector<lispexprt>
 {
- public:
+public:
   enum { String, Symbol, Number, List } type;
   lispsymbolt value;
   std::string expr2string() const;
-  bool parse(const std::string &s, unsigned &ptr);
   bool parse(const std::string &s);
   bool is_nil() const
   { return type==Symbol && value=="nil"; }
@@ -87,6 +86,9 @@ class lispexprt:public std::vector<lispexprt>
     type=Symbol;
     value="nil";
   }
+
+protected:
+  bool parse(const std::string &s, std::string::size_type &ptr);
 };
 
 inline std::ostream& operator<<(

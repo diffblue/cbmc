@@ -179,7 +179,9 @@ void output_vcd(
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
   }
 }

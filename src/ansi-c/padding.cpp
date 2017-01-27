@@ -225,7 +225,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
         std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
         bit_field_bits-=w;
         offset+=bytes;
         continue;
