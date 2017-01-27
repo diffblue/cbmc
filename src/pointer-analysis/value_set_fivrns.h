@@ -105,11 +105,15 @@ public:
       unsigned function;
       unsigned from, to;
 
-      validity_ranget(void) :
-        function(0),from(0), to(0) {};
+      validity_ranget(void):
+        function(0), from(0), to(0)
+      {
+      }
 
-      validity_ranget(unsigned fnc, unsigned f, unsigned t) :
-        function(fnc),from(f), to(t) {};
+      validity_ranget(unsigned fnc, unsigned f, unsigned t):
+        function(fnc), from(f), to(t)
+      {
+      }
 
       bool contains(unsigned f, unsigned line) const
       {

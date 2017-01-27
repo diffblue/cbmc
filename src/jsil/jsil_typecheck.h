@@ -53,7 +53,7 @@ protected:
 
   void update_expr_type (exprt &expr, const typet &type);
   void make_type_compatible(exprt &expr, const typet &type, bool must);
-  void typecheck_type_symbol(symbolt &symbol) {};
+  void typecheck_type_symbol(symbolt &symbol) {}
   void typecheck_non_type_symbol(symbolt &symbol);
   void typecheck_symbol_expr(symbol_exprt &symbol_expr);
   void typecheck_expr_side_effect_throw(side_effect_expr_throwt &expr);

@@ -32,8 +32,8 @@ public:
   size_t size() const { return index_list.size(); }
   const entryt &operator[](size_t i) const { return index_list[i]; }
   entryt &operator[](size_t i) { return index_list[i]; }
-  const entryt &back() const { return index_list.back(); };
-  const entryt &front() const { return index_list.front(); };
+  const entryt &back() const { return index_list.back(); }
+  const entryt &front() const { return index_list.front(); }
 
   designatort() { }
 
