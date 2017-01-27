@@ -11,7 +11,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "cnf.h"
 
-namespace PrecoSat
+namespace PrecoSat // NOLINT(readability/namespace)
 {
   class Solver;
 }

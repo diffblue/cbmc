@@ -240,11 +240,11 @@ bool java_bytecode_vtable(
   return factory.has_error;
 }
 
-namespace
+static void create_vtable_type(
+  const irep_idt &vt_name,
+  symbol_tablet &symbol_table,
+  const symbolt &class_symbol)
 {
-
-void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
-    const symbolt &class_symbol) {
   symbolt vt_symb_type;
   vt_symb_type.name = vt_name;
   vt_symb_type.base_name = vtnamest::get_type_base(
@@ -259,10 +259,9 @@ void create_vtable_type(const irep_idt &vt_name, symbol_tablet &symbol_table,
   assert(!symbol_table.add(vt_symb_type));
 }
 
-const char ID_isvtptr[] = "is_vtptr";
-const char ID_vtable_pointer[] = "@vtable_pointer";
+#define ID_vtable_pointer "@vtable_pointer"
 
-void add_vtable_pointer_member(
+static void add_vtable_pointer_member(
   const irep_idt &vt_name,
   symbolt &class_symbol)
 {
@@ -272,12 +271,10 @@ void add_vtable_pointer_member(
   comp.set_name(ID_vtable_pointer);
   comp.set_base_name(ID_vtable_pointer);
   comp.set_pretty_name(ID_vtable_pointer);
-  comp.set(ID_isvtptr, true);
+  comp.set("is_vtptr", true);
 
   struct_typet &class_type=to_struct_type(class_symbol.type);
   class_type.components().push_back(comp);
-}
-
 }
 
 /*******************************************************************
@@ -343,10 +340,6 @@ void create_vtable_pointer(symbolt &class_symbol)
   add_vtable_pointer_member(vttype, class_symbol);
 }
 
-namespace {
-const char NAME_SEP = '.';
-}
-
 /*******************************************************************
 
  Function: get_virtual_name
@@ -362,14 +355,12 @@ const char NAME_SEP = '.';
 void set_virtual_name(class_typet::methodt &method)
 {
   const std::string &name(id2string(method.get(ID_name)));
-  const std::string::size_type vname_start(name.find_last_of(NAME_SEP) + 1);
+  const std::string::size_type vname_start(name.find_last_of('.') + 1);
   std::string virtual_name(name.substr(vname_start));
   method.set(ID_virtual_name, virtual_name);
 }
 
-namespace {
-
-exprt get_ref(
+static exprt get_ref(
   const exprt &this_obj,
   const symbol_typet &target_type)
 {
@@ -382,18 +373,13 @@ exprt get_ref(
   return dereference_exprt(cast, target_type);
 }
 
-const char JAVA_NS[] = "java::";
-const size_t JAVA_NS_LENGTH(6);
-const char CLS_MTD_SEP(':');
-const char NSEP('.');
-
-std::string get_full_class_name(const std::string &name) {
-  const bool has_prefix(name.find(JAVA_NS) != std::string::npos);
-  const std::string::size_type offset(has_prefix ? JAVA_NS_LENGTH : 0);
-  const std::string::size_type end(name.find_first_of(CLS_MTD_SEP, offset));
-  const std::string::size_type last_sep(name.rfind(NSEP, end));
+static std::string get_full_class_name(const std::string &name) {
+  const bool has_prefix(name.find("java::") != std::string::npos);
+  const std::string::size_type offset=
+    has_prefix ? std::string("java::").size() : 0;
+  const std::string::size_type end(name.find_first_of(':', offset));
+  const std::string::size_type last_sep(name.rfind('.', end));
   return name.substr(0, last_sep);
-}
 }
 
 /*******************************************************************

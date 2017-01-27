@@ -22,15 +22,13 @@ Function: has_start_thread
 
 \*******************************************************************/
 
-namespace {
-bool has_start_thread(const goto_programt &goto_program)
+static bool has_start_thread(const goto_programt &goto_program)
 {
   for(const auto &instruction : goto_program.instructions)
     if(instruction.is_start_thread())
       return true;
 
   return false;
-}
 }
 
 /*******************************************************************\

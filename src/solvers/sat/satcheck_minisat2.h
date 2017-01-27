@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // when used incrementally, as variables may disappear
 // unless set to 'frozen'.
 
-namespace Minisat
+namespace Minisat // NOLINT(readability/namespace)
 {
   class Solver;
   class SimpSolver;
