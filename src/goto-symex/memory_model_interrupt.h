@@ -20,7 +20,7 @@ public:
   }
 
   virtual void operator()(symex_target_equationt &equation);
-  
+
 protected:
   void read_from(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);

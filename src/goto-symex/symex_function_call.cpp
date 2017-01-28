@@ -242,13 +242,13 @@ void goto_symext::symex_function_call_symbol(
   if(state.is_start_thread)
   {
     state.is_start_thread=false;
- 
+
     #ifdef DEBUG
     std::cout << "Thread id: " << identifier << std::endl;
     std::cout << "Priority: " << state.source.priority << std::endl;
     #endif
   }
- 
+
   if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);

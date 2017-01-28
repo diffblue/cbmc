@@ -24,7 +24,8 @@ public:
   typedef eventst::const_iterator event_it;
 
   // the name of a clock variable for a shared read/write
-  typedef enum {
+  typedef enum
+  {
     AX_SC_PER_LOCATION=1,
     AX_NO_THINAIR=2,
     AX_OBSERVATION=4,
@@ -207,7 +208,8 @@ class partial_order_concurrencyt
 {
 public:
   // the is-acyclic checks
-  typedef enum {
+  typedef enum
+  {
     AC_UNIPROC=0,
     AC_THINAIR=1,
     AC_GHB=2,

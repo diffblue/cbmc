@@ -30,7 +30,7 @@ void memory_model_interruptt::operator()(symex_target_equationt &equation)
   build_event_lists(equation);
   build_clock_type(equation);
   build_per_thread_map(equation, per_thread_map);
- 
+
   program_order(equation);
   read_from(equation);
   write_serialization_external(equation);
@@ -62,10 +62,10 @@ void memory_model_interruptt::read_from(symex_target_equationt &equation)
 
     if(w->source.thread_nr!=r->source.thread_nr &&
        w->source.priority>=r->source.priority)
-    { 
-      // must use before(w, r) instead of c_it.second 
+    {
+      // must use before(w, r) instead of c_it.second
       exprt cond=implies_exprt(
-        and_exprt(before(w, r), w->guard, r->guard), 
+        and_exprt(before(w, r), w->guard, r->guard),
         last(w, r));
       add_constraint(
         equation, cond, "rf-irq", r->source);
@@ -102,7 +102,7 @@ void memory_model_interruptt::write_serialization_external(
       add_constraint(
         equation,
         implies_exprt(
-          and_exprt(s, w1->guard, w2->guard), 
+          and_exprt(s, w1->guard, w2->guard),
           last(w1, w2)),
         "ws-irq",
         w1->source);
@@ -114,7 +114,7 @@ void memory_model_interruptt::write_serialization_external(
       add_constraint(
         equation,
         implies_exprt(
-          and_exprt(not_exprt(s), w1->guard, w2->guard), 
+          and_exprt(not_exprt(s), w1->guard, w2->guard),
           last(w2, w1)),
         "ws-irq",
         w1->source);
@@ -141,11 +141,11 @@ void memory_model_interruptt::from_read(symex_target_equationt &equation)
 
   for(const auto &ww_pair_it : ww_pairs)
   {
-    const event_it w_prime=ww_pair_it.first.first; 
+    const event_it w_prime=ww_pair_it.first.first;
     const event_it w=ww_pair_it.first.second;
     const exprt &ws1=ww_pair_it.second.first;
     const exprt &ws2=ww_pair_it.second.second;
-     
+
     // smells like cubic
     for(const auto &c_it : choice_symbols)
     {
@@ -153,10 +153,10 @@ void memory_model_interruptt::from_read(symex_target_equationt &equation)
       const exprt &rf=c_it.second;
       exprt cond;
       cond.make_nil();
-    
+
       if(c_it.first.second==w_prime && !ws1.is_false() &&
          r->source.priority>=w->source.priority &&
-         r->source.thread_nr!=w->source.thread_nr) 
+         r->source.thread_nr!=w->source.thread_nr)
       {
         // the guard of w_prime follows from rf; with rfi
         // optimisation such as the previous write_symbol_primed

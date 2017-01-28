@@ -55,7 +55,8 @@ public:
     }
   };
 
-  typedef enum {
+  typedef enum
+  {
     STATE, HIDDEN, VISIBLE_ACTUAL_PARAMETER, HIDDEN_ACTUAL_PARAMETER, PHI, GUARD
   } assignment_typet;
 
