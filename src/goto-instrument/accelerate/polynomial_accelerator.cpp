@@ -706,7 +706,7 @@ exprt polynomial_acceleratort::precondition(patht &path) {
                  lhs.id() == ID_dereference) {
         continue;
       } else {
-        throw "Couldn't take WP of " + expr2c(lhs, ns) + " = " + expr2c(rhs, ns);
+        throw "couldn't take WP of " + expr2c(lhs, ns) + "=" + expr2c(rhs, ns);
       }
     } else if (t->is_assume() || t->is_assert()) {
       ret = implies_exprt(t->guard, ret);

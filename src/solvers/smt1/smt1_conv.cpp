@@ -1549,6 +1549,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
 
@@ -1580,6 +1581,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
   }
@@ -1707,6 +1709,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast2 "+src_type.id_string()+
             " -> "+dest_type.id_string();
     }
@@ -1863,10 +1866,12 @@ void smt1_convt::convert_typecast(
       }
     }
     else
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast3 "+src_type.id_string()+" -> pointer";
   }
   else if(dest_type.id()==ID_range)
   {
+    // NOLINTNEXTLINE(readability/throw)
     throw "TODO range typecast";
   }
   else if(dest_type.id()==ID_c_bit_field)
@@ -1884,6 +1889,7 @@ void smt1_convt::convert_typecast(
     }
   }
   else
+    // NOLINTNEXTLINE(readability/throw)
     throw "TODO typecast4 ? -> "+dest_type.id_string();
 }
 
@@ -3696,7 +3702,7 @@ void smt1_convt::flatten_array(const exprt &op)
   const exprt &size=array_type.size();
 
   if(size.id()!=ID_constant)
-    throw ("non-constant size array cannot be flattened.");
+    throw "non-constant size array cannot be flattened";
 
   mp_integer sizei;
   if(to_integer(size, sizei))

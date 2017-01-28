@@ -95,8 +95,8 @@ void symex_slice_by_tracet::slice_by_trace(std::string trace_files,
       simplify(copy_last, ns);
       implications.insert(copy_last);
     }
-    else if (!(g_copy.id() == ID_constant)) {
-      throw "Guards should only be and, symbol, constant, or not.";
+    else if(!(g_copy.id() == ID_constant)) {
+      throw "guards should only be and, symbol, constant, or `not'";
     }
   }
 
@@ -135,8 +135,8 @@ void symex_slice_by_tracet::read_trace(std::string filename)
 {
   std::cout << "Reading trace from file " << filename << std::endl;
   std::ifstream file(filename);
-  if (file.fail())
-    throw "Failed to read from trace file.";
+  if(file.fail())
+    throw "failed to read from trace file";
 
   // In case not the first trace read
   alphabet.clear();
@@ -247,7 +247,7 @@ void symex_slice_by_tracet::parse_events(std::string read_line) {
     eis.insert(event);
     if ((!alphabet.empty()) && ((alphabet.count(event) != 0) !=
                                 alphabet_parity))
-      throw ("Trace uses symbol not in alphabet: " + event);
+      throw "trace uses symbol not in alphabet: "+event;
     if(vnext == std::string::npos) break;
     vidx = vnext;
   }

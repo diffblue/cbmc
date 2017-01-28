@@ -132,7 +132,7 @@ static std::string type2name(
     result+='l';
 
   if(type.id()==irep_idt())
-    throw "Empty type encountered.";
+    throw "empty type encountered";
   else if(type.id()==ID_empty)
     result+='V';
   else if(type.id()==ID_signedbv)
@@ -249,9 +249,7 @@ static std::string type2name(
   else if(type.id()==ID_vector)
     result+="VEC"+type.get_string(ID_size);
   else
-    throw (std::string("Unknown type '") +
-           type.id_string() +
-           "' encountered.");
+    throw "unknown type '"+type.id_string()+"' encountered";
 
   if(type.has_subtype())
   {

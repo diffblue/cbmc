@@ -56,7 +56,7 @@ void goto_symext::symex_atomic_end(statet &state)
   if(state.guard.is_false()) return;
 
   if(state.atomic_section_id==0)
-    throw "ATOMIC_END unmatched";
+    throw "ATOMIC_END unmatched"; // NOLINT(readability/throw)
 
   const unsigned atomic_section_id=state.atomic_section_id;
   state.atomic_section_id=0;

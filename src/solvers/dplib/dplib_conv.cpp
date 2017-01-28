@@ -396,6 +396,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       }
       else
       {
+        // NOLINTNEXTLINE(readability/throw)
         throw "TODO typecast1 "+op.type().id_string()+" -> bool";
       }
     }
@@ -473,6 +474,7 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
       }
       else
       {
+        // NOLINTNEXTLINE(readability/throw)
         throw "TODO typecast2 "+op.type().id_string()+
               " -> "+expr.type().id_string();
       }
@@ -484,9 +486,11 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
         convert_dplib_expr(op);
       }
       else
+        // NOLINTNEXTLINE(readability/throw)
         throw "TODO typecast3 "+op.type().id_string()+" -> pointer";
     }
     else
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast4 ? -> "+expr.type().id_string();
   }
   else if(expr.id()==ID_struct)

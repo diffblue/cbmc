@@ -118,7 +118,7 @@ std::string get_temporary_file(
       lpTempPathBuffer); // buffer for path
 
   if(dwRetVal>MAX_PATH || (dwRetVal==0))
-    throw "GetTempPath failed";
+    throw "GetTempPath failed"; // NOLINT(readability/throw)
 
   // the path returned by GetTempPath ends with a backslash
   std::string t_template=

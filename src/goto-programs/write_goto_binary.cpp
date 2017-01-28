@@ -166,7 +166,7 @@ bool write_goto_binary(
       irepconverter);
 
   default:
-    throw "Unknown goto binary version";
+    throw "unknown goto binary version";
   }
 
   return false;

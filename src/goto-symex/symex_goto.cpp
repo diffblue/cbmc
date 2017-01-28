@@ -237,7 +237,7 @@ void goto_symext::merge_gotos(statet &state)
 
     // check atomic section
     if(state.atomic_section_id!=goto_state.atomic_section_id)
-      throw "Atomic sections differ across branches";
+      throw "atomic sections differ across branches";
 
     // do SSA phi functions
     phi_function(goto_state, state);

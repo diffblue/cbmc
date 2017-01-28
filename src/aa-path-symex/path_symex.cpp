@@ -774,6 +774,7 @@ void path_symext::function_call_rec(
     }
   }
   else
+    // NOLINTNEXTLINE(readability/throw) as message is correctly uppercase
     throw "TODO: function_call "+function.id_string();
 }
 
@@ -1049,7 +1050,7 @@ void path_symext::operator()(
 
   case THROW:
     state.record_step();
-    throw "THROW not yet implemented";
+    throw "THROW not yet implemented"; // NOLINT(readability/throw)
 
   case ASSUME:
     state.record_step();
@@ -1088,7 +1089,7 @@ void path_symext::operator()(
 
   case ATOMIC_END:
     if(!state.inside_atomic_section)
-      throw "ATOMIC_END unmatched";
+      throw "ATOMIC_END unmatched"; // NOLINT(readability/throw)
 
     state.record_step();
     state.next_pc();

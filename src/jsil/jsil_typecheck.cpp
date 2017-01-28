@@ -87,7 +87,7 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
     const irep_idt &id=to_symbol_expr(expr).get_identifier();
 
     if(!symbol_table.has_symbol(id))
-      throw "Unexpected symbol: "+id2string(id);
+      throw "unexpected symbol: "+id2string(id);
 
     symbolt &s=symbol_table.lookup(id);
     if(s.type.id().empty() || s.type.is_nil())
@@ -1285,7 +1285,7 @@ void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
     // Do nothing
   }
   else
-    throw "Non type symbol value expected code, but got "+
+    throw "non-type symbol value expected code, but got "+
       symbol.value.pretty();
 }
 

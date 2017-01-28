@@ -339,8 +339,7 @@ void inline fence_insertert::mip_set_var(ilpt& ilp,
     }
   }
 #else
-  throw "Sorry, musketeer requires glpk; please recompile\
-    musketeer with glpk.";
+  throw "sorry, musketeer requires glpk; please recompile musketeer with glpk";
 #endif
 }
 
@@ -448,8 +447,7 @@ void inline fence_insertert::mip_set_cst(ilpt& ilp, unsigned& i)
     }
   }
 #else
-  throw "Sorry, musketeer requires glpk; please recompile\
-    musketeer with glpk.";
+  throw "sorry, musketeer requires glpk; please recompile musketeer with glpk";
 #endif
 }
 
@@ -751,8 +749,7 @@ void inline fence_insertert::mip_fill_matrix(ilpt& ilp, unsigned& i,
   instrumenter.message.debug() << "3: " << i << " row: " << row
     << messaget::eom;
 #else
-  throw "Sorry, musketeer requires glpk; please recompile\
-    musketeer with glpk.";
+  throw "sorry, musketeer requires glpk; please recompile musketeer with glpk";
 #endif
 }
 
@@ -866,8 +863,7 @@ void fence_insertert::solve() {
     }
   }
 #else
-  throw "Sorry, musketeer requires glpk; please recompile\
-    musketeer with glpk.";
+  throw "sorry, musketeer requires glpk; please recompile musketeer with glpk";
 #endif
 }
 

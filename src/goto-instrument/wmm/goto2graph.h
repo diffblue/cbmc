@@ -222,7 +222,7 @@ protected:
     void inline enter_function(const irep_idt& function)
     {
       if(functions_met.find(function)!=functions_met.end())
-        throw ("Sorry, doesn't handle recursive function for the moment");
+        throw "sorry, doesn't handle recursive function for the moment";
       functions_met.insert(function);
     }
 

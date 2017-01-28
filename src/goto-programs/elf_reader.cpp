@@ -36,7 +36,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
      elf32_header.e_ident[1]!='E' ||
      elf32_header.e_ident[2]!='L' ||
      elf32_header.e_ident[3]!='F')
-   throw "ELF header malformed (magic)";
+    throw "ELF header malformed (magic)"; // NOLINT(readability/throw)
 
   elf_class=(elf_classt)elf32_header.e_ident[4];
 
@@ -49,7 +49,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     else if(ei_data==2)
       little_endian=false;
     else
-      throw "ELF32 header malformed (EI_DATA)";
+      throw "ELF32 header malformed (EI_DATA)"; // NOLINT(readability/throw)
 
     if(elf32_header.e_version!=1)
       throw "unknown ELF32 version";
@@ -57,7 +57,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // get offset for section header
     if(elf32_header.e_shoff==0 ||
        elf32_header.e_shnum==0)
-      throw "ELF32 without section header";
+      throw "ELF32 without section header"; // NOLINT(readability/throw)
 
     elf32_section_header_table.resize(elf32_header.e_shnum);
     number_of_sections=elf32_header.e_shnum;
@@ -77,7 +77,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // string table
     unsigned string_table_nr=elf32_header.e_shstrndx;
     if(string_table_nr>=elf32_section_header_table.size())
-      throw "ELF32 without string table";
+      throw "ELF32 without string table"; // NOLINT(readability/throw)
 
     string_table_offset=section_offset(string_table_nr);
   }
@@ -96,7 +96,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     else if(ei_data==2)
       little_endian=false;
     else
-      throw "ELF64 header malformed (EI_DATA)";
+      throw "ELF64 header malformed (EI_DATA)"; // NOLINT(readability/throw)
 
     if(elf64_header.e_version!=1)
       throw "unknown ELF64 version";
@@ -104,7 +104,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // get offset for section header
     if(elf64_header.e_shoff==0 ||
        elf64_header.e_shnum==0)
-      throw "ELF64 without section header";
+      throw "ELF64 without section header"; // NOLINT(readability/throw)
 
     elf64_section_header_table.resize(elf64_header.e_shnum);
     number_of_sections=elf64_header.e_shnum;
@@ -124,7 +124,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     // string table
     unsigned string_table_nr=elf64_header.e_shstrndx;
     if(string_table_nr>=elf64_section_header_table.size())
-      throw "ELF64 without string table";
+      throw "ELF64 without string table"; // NOLINT(readability/throw)
 
     string_table_offset=section_offset(string_table_nr);
   }

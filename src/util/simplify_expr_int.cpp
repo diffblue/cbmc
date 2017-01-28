@@ -1997,7 +1997,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     {
       mp_integer i;
       if(to_integer(expr.op1(), i))
-        throw "Bit-vector constant unexpectedly non-integer";
+        throw "bit-vector constant unexpectedly non-integer";
 
       if(i==max)
       {
@@ -2023,7 +2023,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     {
       mp_integer i;
       if(to_integer(expr.op1(), i))
-        throw "Bit-vector constant unexpectedly non-integer";
+        throw "bit-vector constant unexpectedly non-integer";
 
       if(i==max)
       {

@@ -123,7 +123,7 @@ void polynomialt::from_expr(const exprt &expr) {
     from_expr(expr.op0());
   } else {
     // Don't know how to handle this operation... Bail out.
-    throw "Couldn't polynomialize";
+    throw "couldn't polynomialize";
   }
 }
 

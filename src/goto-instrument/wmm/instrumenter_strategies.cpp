@@ -205,7 +205,7 @@ void inline instrumentert::instrument_one_read_per_cycle_inserter(
   const std::set<event_grapht::critical_cyclet>& set_of_cycles)
 {
   /* TODO */
-  throw "Read first strategy not implemented yet.";
+  throw "read first strategy not implemented yet";
 }
 
 /*******************************************************************\
@@ -224,7 +224,7 @@ void inline instrumentert::instrument_one_write_per_cycle_inserter(
   const std::set<event_grapht::critical_cyclet>& set_of_cycles)
 {
   /* TODO */
-  throw "Write first strategy not implemented yet.";
+  throw "write first strategy not implemented yet";
 }
 
 /*******************************************************************\
@@ -423,8 +423,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   free(jmat);
   free(vmat);
 #else
-  throw "Sorry, minimum interference option requires glpk; "
-        "please recompile goto-instrument with glpk.";
+  throw "sorry, minimum interference option requires glpk; "
+        "please recompile goto-instrument with glpk";
 #endif
 }
 

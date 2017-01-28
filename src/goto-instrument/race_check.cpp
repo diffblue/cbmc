@@ -402,7 +402,7 @@ void race_check(
     m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
-    throw "Race check instrumentation needs an entry point";
+    throw "race check instrumentation needs an entry point";
 
   goto_programt &main=m_it->second.body;
   w_guards.add_initialization(main);

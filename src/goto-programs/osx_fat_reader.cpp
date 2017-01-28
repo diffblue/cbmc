@@ -68,7 +68,7 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
     throw "failed to read OSX fat header";
 
   if(!is_osx_fat_magic(reinterpret_cast<char*>(&(fh.magic))))
-    throw "OSX fat header malformed (magic)";
+    throw "OSX fat header malformed (magic)"; // NOLINT(readability/throw)
 
   assert(sizeof(fh.nfat_arch)==4);
   unsigned narch=__builtin_bswap32(fh.nfat_arch);

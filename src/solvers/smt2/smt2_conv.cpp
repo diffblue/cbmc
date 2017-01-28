@@ -1963,6 +1963,7 @@ void smt2_convt::convert_expr(const exprt &expr)
           expr.id()==ID_exists)
   {
     if(solver==MATHSAT)
+      // NOLINTNEXTLINE(readability/throw)
       throw "MathSAT does not support quantifiers";
 
     if(expr.id()==ID_forall)

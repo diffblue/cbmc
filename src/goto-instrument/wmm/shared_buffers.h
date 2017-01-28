@@ -40,7 +40,7 @@ public:
   void set_cav11(memory_modelt model)
   {
     if(model!=TSO)
-      throw "Sorry, CAV11 only available for TSO";
+      throw "sorry, CAV11 only available for TSO";
     cav11 = true;
   }
 

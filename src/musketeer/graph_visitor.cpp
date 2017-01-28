@@ -430,7 +430,7 @@ void const_graph_visitort::PT(
        check whether e.first-po-> edge.first /\ edge.second-po->e.second,
        using egraph.are_po_ordered. */
 #else
-    throw "BTWN definition not selected!";
+    throw "BTWN definition not selected!"; // NOLINT(readability/throw)
 #endif
   }
   else

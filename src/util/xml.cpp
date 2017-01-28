@@ -386,7 +386,7 @@ std::string xmlt::unescape(const std::string &str)
         result+=c;
       }
       else
-        throw "XML escape code not implemented";
+        throw "XML escape code not implemented"; // NOLINT(readability/throw)
     }
     else
       result+=*it;

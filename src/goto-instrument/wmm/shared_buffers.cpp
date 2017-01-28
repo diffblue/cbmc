@@ -181,7 +181,7 @@ void shared_bufferst::add_initialization_code(goto_functionst &goto_functions)
     m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
-    throw "Weak memory instrumentation needs an entry point";
+    throw "weak memory instrumentation needs an entry point";
 
   goto_programt &main=m_it->second.body;
   add_initialization(main);

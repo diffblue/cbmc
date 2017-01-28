@@ -546,18 +546,21 @@ void goto_symext::symex_trace(
   const code_function_callt &code)
 {
   if(code.arguments().size()<2)
-    throw "CBMC_trace expects at least two arguments";
+    // NOLINTNEXTLINE(readability/throw)
+    throw "symex_trace expects at least two arguments";
 
   int debug_thresh=unsafe_string2int(options.get_option("debug-level"));
 
   mp_integer debug_lvl;
 
   if(to_integer(code.arguments()[0], debug_lvl))
+    // NOLINTNEXTLINE(readability/throw)
     throw "CBMC_trace expects constant as first argument";
 
   if(code.arguments()[1].id()!="implicit_address_of" ||
      code.arguments()[1].operands().size()!=1 ||
      code.arguments()[1].op0().id()!=ID_string_constant)
+    // NOLINTNEXTLINE(readability/throw)
     throw "CBMC_trace expects string constant as second argument";
 
   if(mp_integer(debug_thresh)>=debug_lvl)
