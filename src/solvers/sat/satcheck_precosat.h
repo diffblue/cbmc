@@ -13,7 +13,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 namespace PrecoSat // NOLINT(readability/namespace)
 {
-  class Solver;
+class Solver; // NOLINT(readability/identifiers)
 }
 
 class satcheck_precosatt:public cnf_solvert

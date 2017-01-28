@@ -18,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 namespace Minisat // NOLINT(readability/namespace)
 {
-  class Solver;
-  class SimpSolver;
+class Solver; // NOLINT(readability/identifiers)
+class SimpSolver; // NOLINT(readability/identifiers)
 }
 
 template<typename T>
