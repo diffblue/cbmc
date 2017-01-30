@@ -61,8 +61,7 @@ void constant_propagator_domaint::transform(
     dynamic_cast<constant_propagator_ait *>(&ai);
   bool have_dirty=(cp!=nullptr);
 
-  if(values.is_bottom)
-    return;
+  assert(!values.is_bottom);
 
   if(from->is_decl())
   {
@@ -95,6 +94,8 @@ void constant_propagator_domaint::transform(
     else
     {
       two_way_propagate_rec(g, ns);
+      assert(!values.is_bottom); // for now
+      // While two-way propagation is disabled this should be impossible.
     }
   }
   else if(from->is_dead())
@@ -194,6 +195,8 @@ void constant_propagator_domaint::transform(
     }
   }
 
+  assert(from->is_goto() || !values.is_bottom);
+
 #ifdef DEBUG
   std::cout << "After:\n";
   output(std::cout, ai, ns);
@@ -212,6 +215,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
   bool change=false;
 
+#if 0
   if(expr.id()==ID_and)
   {
     // need a fixed point here to get the most out of it
@@ -221,7 +225,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
       forall_operands(it, expr)
         if(two_way_propagate_rec(*it, ns))
-          change = true;
+          change=true;
     }
     while(change);
   }
@@ -231,12 +235,13 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     const exprt &rhs=expr.op1();
 
     // two-way propagation
-    valuest copy_values = values;
+    valuest copy_values=values;
     assign_rec(copy_values, lhs, rhs, ns);
     if(!values.is_constant(rhs) || values.is_constant(lhs))
        assign_rec(values, rhs, lhs, ns);
-    change = values.meet(copy_values);
+    change=values.meet(copy_values);
   }
+#endif
 
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << change << '\n';
