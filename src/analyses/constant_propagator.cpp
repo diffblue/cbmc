@@ -61,8 +61,7 @@ void constant_propagator_domaint::transform(
     dynamic_cast<constant_propagator_ait *>(&ai);
   bool have_dirty=(cp!=nullptr);
 
-  if(values.is_bottom)
-    return;
+  assert(!values.is_bottom);
 
   if(from->is_decl())
   {
@@ -95,6 +94,12 @@ void constant_propagator_domaint::transform(
     else
     {
       two_way_propagate_rec(g, ns);
+      // If two way propagate is enabled then it may be possible to detect
+      // that the branch condition is infeasible and thus the domain should
+      // be set to bottom.  Without it the domain will only be set to bottom
+      // if the guard expression is trivially (i.e. without context) false.
+      INVARIANT(!values.is_bottom,
+                "Without two-way propagation this should be impossible.");
     }
   }
   else if(from->is_dead())
@@ -192,6 +197,9 @@ void constant_propagator_domaint::transform(
     }
   }
 
+  INVARIANT(from->is_goto() || !values.is_bottom,
+            "Transform only sets bottom by using branch conditions");
+
 #ifdef DEBUG
   std::cout << "After:\n";
   output(std::cout, ai, ns);
@@ -210,6 +218,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
   bool change=false;
 
+#if 0
   if(expr.id()==ID_and)
   {
     // need a fixed point here to get the most out of it
@@ -219,7 +228,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
       forall_operands(it, expr)
         if(two_way_propagate_rec(*it, ns))
-          change = true;
+          change=true;
     }
     while(change);
   }
@@ -229,12 +238,13 @@ bool constant_propagator_domaint::two_way_propagate_rec(
     const exprt &rhs=expr.op1();
 
     // two-way propagation
-    valuest copy_values = values;
+    valuest copy_values=values;
     assign_rec(copy_values, lhs, rhs, ns);
     if(!values.is_constant(rhs) || values.is_constant(lhs))
        assign_rec(values, rhs, lhs, ns);
-    change = values.meet(copy_values);
+    change=values.meet(copy_values);
   }
+#endif
 
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << change << '\n';
