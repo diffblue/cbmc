@@ -385,7 +385,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;
-    remove_function_pointers(goto_model, cmdline.isset("pointer-check"));
+    remove_function_pointers(
+      get_message_handler(), goto_model, cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove Java throw and catch

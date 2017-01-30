@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/type_eq.h>
+#include <util/message.h>
 
 #include <ansi-c/c_types.h>
 
@@ -29,10 +30,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class remove_function_pointerst
+class remove_function_pointerst:public messaget
 {
 public:
   remove_function_pointerst(
+    message_handlert &_message_handler,
     symbol_tablet &_symbol_table,
     bool _add_safety_assertion,
     const goto_functionst &goto_functions);
@@ -92,9 +94,11 @@ Function: remove_function_pointerst::remove_function_pointerst
 \*******************************************************************/
 
 remove_function_pointerst::remove_function_pointerst(
+  message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
   bool _add_safety_assertion,
   const goto_functionst &goto_functions):
+  messaget(_message_handler),
   ns(_symbol_table),
   symbol_table(_symbol_table),
   add_safety_assertion(_add_safety_assertion)
@@ -540,13 +544,14 @@ Function: remove_function_pointers
 \*******************************************************************/
 
 bool remove_function_pointers(
+  message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   goto_programt &goto_program,
   bool add_safety_assertion)
 {
   remove_function_pointerst
-    rfp(symbol_table, add_safety_assertion, goto_functions);
+    rfp(_message_handler, symbol_table, add_safety_assertion, goto_functions);
 
   return rfp.remove_function_pointers(goto_program);
 }
@@ -564,12 +569,13 @@ Function: remove_function_pointers
 \*******************************************************************/
 
 void remove_function_pointers(
+  message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool add_safety_assertion)
 {
   remove_function_pointerst
-    rfp(symbol_table, add_safety_assertion, goto_functions);
+    rfp(_message_handler, symbol_table, add_safety_assertion, goto_functions);
 
   rfp(goto_functions);
 }
@@ -587,10 +593,13 @@ Function: remove_function_pointers
 \*******************************************************************/
 
 void remove_function_pointers(
+  message_handlert &_message_handler,
   goto_modelt &goto_model,
   bool add_safety_assertion)
 {
   remove_function_pointers(
-    goto_model.symbol_table, goto_model.goto_functions,
+    _message_handler,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
     add_safety_assertion);
 }

@@ -806,6 +806,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
 
   status() << "Function Pointer Removal" << eom;
   remove_function_pointers(
+    get_message_handler(),
     symbol_table,
     goto_functions,
     cmdline.isset("pointer-check"));

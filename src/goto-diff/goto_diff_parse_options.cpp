@@ -487,6 +487,7 @@ bool goto_diff_parse_optionst::process_goto_program(
     // remove function pointers
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(
+      get_message_handler(),
       symbol_table,
       goto_functions,
       cmdline.isset("pointer-check"));
