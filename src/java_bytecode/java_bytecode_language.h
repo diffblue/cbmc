@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_languaget:public languaget
 {
 public:
-  virtual void get_language_options(const cmdlinet &);
+  virtual void get_language_options(const cmdlinet &) override;
 
   virtual bool preprocess(
     std::istream &instream,

@@ -19,10 +19,14 @@ class symbol_tablet;
 class exprt;
 class namespacet;
 class typet;
+class cmdlinet;
 
 class languaget:public messaget
 {
 public:
+  // Parse language-specific options
+  virtual void get_language_options(const cmdlinet &) {}
+
   // parse file
 
   virtual bool preprocess(

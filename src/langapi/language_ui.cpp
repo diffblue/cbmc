@@ -121,6 +121,7 @@ bool language_uit::parse(const std::string &filename)
 
   languaget &language=*lf.language;
   language.set_message_handler(get_message_handler());
+  language.get_language_options(_cmdline);
 
   status() << "Parsing " << filename << eom;
 
