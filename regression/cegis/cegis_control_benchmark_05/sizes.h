@@ -1,0 +1,6 @@
+#define __PLANT_DEN_SIZE 3
+#define __PLANT_NUM_SIZE 2
+#define __CONTROLLER_DEN_SIZE 4
+#define __CONTROLLER_NUM_SIZE 3
+#define SOLUTION_DEN_SIZE 4
+#define SOLUTION_NUM_SIZE 3
