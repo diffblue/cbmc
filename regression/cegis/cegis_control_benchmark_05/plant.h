@@ -1,0 +1,1 @@
+struct anonymous3 plant={ .den={ (control_floatt)1.000000, (control_floatt)-2.000000f, (control_floatt)1.000000 }, .den_uncertainty={ (control_floatt)0.000000, (control_floatt)0.000000, (control_floatt)0.000000 }, .den_size=3, .num={ (control_floatt)1.250000e-1, (control_floatt)1.250000e-1 }, .num_uncertainty={ (control_floatt)0.000000, (control_floatt)0.000000 }, .num_size=2 };
