@@ -170,8 +170,6 @@ const exprt java_bytecode_convert_methodt::variable(
   else
   {
     exprt result=var.symbol_expr;
-    if(!var.is_parameter)
-      used_local_names.insert(to_symbol_expr(result));
     if(do_cast==CAST_AS_NEEDED && t!=result.type())
       result=typecast_exprt(result, t);
     return result;
