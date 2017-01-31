@@ -15,6 +15,8 @@ Date: June 2016
 #include "rw_set.h"
 
 #define CPROVER_ISR_ARRAY_ID "__CPROVER_ISR_ARRAY"
+#define CPROVER_ENABLE_ISR  "__CPROVER_enable_isr"
+#define CPROVER_DISABLE_ISR "__CPROVER_disable_isr"
 
 typedef std::unordered_map<unsigned int, irep_idt> isr_mapt;
 typedef std::unordered_map<irep_idt, rw_set_function_rect, irep_id_hash>

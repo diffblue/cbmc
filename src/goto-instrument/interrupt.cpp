@@ -291,7 +291,9 @@ void nested_interrupts(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
        f_it->first!=goto_functionst::entry_point() &&
-       f_it->first!=sched_f.get_identifier())
+       f_it->first!=sched_f.get_identifier() &&
+       f_it->first!=CPROVER_ENABLE_ISR &&
+       f_it->first!=CPROVER_DISABLE_ISR)
       nested_interrupts(
         value_sets, symbol_table,
 #ifdef LOCAL_MAY
