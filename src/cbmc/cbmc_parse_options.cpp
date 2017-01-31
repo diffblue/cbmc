@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_static_init_loops.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -220,6 +221,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all checks supported by goto_check
   GOTO_CHECK_PARSE_OPTIONS(cmdline, options);
+
+  // unwind loops in java enum static initialization
+  if(cmdline.isset("java-unwind-enum-static"))
+    options.set_option("java-unwind-enum-static", true);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -540,6 +545,9 @@ int cbmc_parse_optionst::doit()
 
   if(set_properties(goto_functions))
     return 7; // should contemplate EX_USAGE from sysexits.h
+
+  if(options.get_bool_option("java-unwind-enum-static"))
+    remove_static_init_loops(symbol_table, goto_functions, options);
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
@@ -1126,6 +1134,10 @@ void cbmc_parse_optionst::help()
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-max-vla-length        limit the length of user-code-created arrays\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)

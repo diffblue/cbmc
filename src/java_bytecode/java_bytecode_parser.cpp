@@ -264,6 +264,7 @@ Function: java_bytecode_parsert::rClassFile
 #define ACC_ABSTRACT     0x0400
 #define ACC_STRICT       0x0800
 #define ACC_SYNTHETIC    0x1000
+#define ACC_ENUM         0x4000
 
 #ifdef _MSC_VER
 #define UNUSED
@@ -295,10 +296,11 @@ void java_bytecode_parsert::rClassFile()
 
   classt &parsed_class=parse_tree.parsed_class;
 
-  u2 UNUSED access_flags=read_u2();
+  u2 access_flags=read_u2();
   u2 this_class=read_u2();
   u2 super_class=read_u2();
 
+  parsed_class.is_enum=(access_flags&ACC_ENUM)!=0;
   parsed_class.name=
     constant(this_class).type().get(ID_C_base_name);
 
@@ -309,6 +311,12 @@ void java_bytecode_parsert::rClassFile()
   rinterfaces(parsed_class);
   rfields(parsed_class);
   rmethods(parsed_class);
+
+  // count elements of enum
+  if(parsed_class.is_enum)
+    for(fieldt &field : parse_tree.parsed_class.fields)
+      if(field.is_enum)
+        parse_tree.parsed_class.enum_elements++;
 
   u2 attributes_count=read_u2();
 
@@ -698,6 +706,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     field.name=pool_entry(name_index).s;
     field.is_static=(access_flags&ACC_STATIC)!=0;
     field.is_final=(access_flags&ACC_FINAL)!=0;
+    field.is_enum=(access_flags&ACC_ENUM)!=0;
     field.signature=id2string(pool_entry(descriptor_index).s);
 
     for(std::size_t j=0; j<attributes_count; j++)

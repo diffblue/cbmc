@@ -34,6 +34,8 @@ void java_bytecode_parse_treet::classt::swap(
 {
   other.name.swap(name);
   other.extends.swap(extends);
+  other.is_enum=is_enum;
+  other.enum_elements=enum_elements;
   std::swap(other.is_abstract, is_abstract);
   other.implements.swap(implements);
   other.fields.swap(fields);
@@ -61,10 +63,7 @@ void java_bytecode_parse_treet::output(std::ostream &out) const
   for(class_refst::const_iterator it=class_refs.begin();
       it!=class_refs.end();
       it++)
-  {
     out << "  " << *it << '\n';
-  }
-
 }
 
 /*******************************************************************\
@@ -88,7 +87,8 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   }
 
   out << "class " << name;
-  if(!extends.empty()) out << " extends " << extends;
+  if(!extends.empty())
+    out << " extends " << extends;
   out << " {" << '\n';
 
   for(fieldst::const_iterator
@@ -139,7 +139,10 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
     bool first=true;
     for(const auto &element_value_pair : element_value_pairs)
     {
-      if(first) first=false; else out << ", ";
+      if(first)
+        first=false;
+      else
+        out << ", ";
       element_value_pair.output(out);
     }
 
@@ -159,7 +162,8 @@ Function: java_bytecode_parse_treet::annotationt::element_value_pairt::output
 
 \*******************************************************************/
 
-void java_bytecode_parse_treet::annotationt::element_value_pairt::output(std::ostream &out) const
+void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
+  std::ostream &out) const
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -233,7 +237,8 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
     for(std::vector<exprt>::const_iterator
         a_it=i.args.begin(); a_it!=i.args.end(); a_it++)
     {
-      if(a_it!=i.args.begin()) out << ',';
+      if(a_it!=i.args.begin())
+        out << ',';
       #if 0
       out << ' ' << from_expr(*a_it);
       #else

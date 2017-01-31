@@ -79,6 +79,10 @@ void java_bytecode_convert_classt::convert(const classt &c)
 
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
+  if(c.is_enum)
+    class_type.set(
+      ID_java_enum_static_unwind,
+      std::to_string(c.enum_elements+1));
 
   if(!c.extends.empty())
   {
