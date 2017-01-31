@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
-#include <util/expr_util.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
 #include <util/json.h>

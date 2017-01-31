@@ -8,9 +8,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include "arith_tools.h"
+#include "fixedbv.h"
+#include "ieee_float.h"
 #include "std_types.h"
 #include "std_expr.h"
+
+#include "arith_tools.h"
 
 /*******************************************************************\
 
@@ -185,11 +188,7 @@ constant_exprt from_integer(
   else if(type_id==ID_pointer)
   {
     if(int_value==0)
-    {
-      constant_exprt result(type);
-      result.set_value(ID_NULL);
-      return result;
-    }
+      return null_pointer_exprt(to_pointer_type(type));
   }
   else if(type_id==ID_c_bit_field)
   {
@@ -198,8 +197,23 @@ constant_exprt from_integer(
     result.set_value(integer2binary(int_value, width));
     return result;
   }
+  else if(type_id==ID_fixedbv)
+  {
+    fixedbvt fixedbv;
+    fixedbv.spec=to_fixedbv_type(type);
+    fixedbv.from_integer(int_value);
+    return fixedbv.to_expr();
+  }
+  else if(type_id==ID_floatbv)
+  {
+    ieee_floatt ieee_float;
+    ieee_float.spec=to_floatbv_type(type);
+    ieee_float.from_integer(int_value);
+    return ieee_float.to_expr();
+  }
 
   {
+    assert(false);
     constant_exprt r;
     r.make_nil();
     return r;

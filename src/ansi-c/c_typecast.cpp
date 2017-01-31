@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -853,7 +854,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
   {
     index_exprt index;
     index.array()=expr;
-    index.index()=gen_zero(index_type());
+    index.index()=from_integer(0, index_type());
     index.type()=src_type.subtype();
     expr=address_of_exprt(index);
     if(ns.follow(expr.type())!=ns.follow(dest_type))

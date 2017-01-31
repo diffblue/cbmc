@@ -1,5 +1,18 @@
 /*******************************************************************\
 
+Module: C++ Language Type Checking
+
+Author: Daniel Kroening, kroening@cs.cmu.edu
+
+\*******************************************************************/
+
+#include <util/std_types.h>
+#include <util/std_expr.h>
+
+#include "cpp_typecheck.h"
+
+/*******************************************************************\
+
 Function: cpp_typecheckt::do_virtual_table
 
 Inputs:
@@ -9,12 +22,6 @@ Outputs:
 Purpose:
 
 \*******************************************************************/
-
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/expr_util.h>
-
-#include "cpp_typecheck.h"
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {
@@ -48,8 +55,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     if(compo.get_bool("is_pure_virtual"))
     {
       pointer_typet pointer_type(code_type);
-      e = gen_zero(pointer_type);
-      assert(e.is_not_nil());
+      e=null_pointer_exprt(pointer_type);
       value_map[compo.get("virtual_name")] = e;
     }
     else

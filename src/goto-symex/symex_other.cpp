@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/expr_util.h>
+#include <util/arith_tools.h>
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
@@ -116,7 +116,7 @@ void goto_symext::symex_other(
       byte_extract_exprt be(byte_extract_id());
       be.type()=clean_code.op0().type();
       be.op()=clean_code.op1();
-      be.offset()=gen_zero(index_type());
+      be.offset()=from_integer(0, index_type());
 
       clean_code.op1()=be;
     }

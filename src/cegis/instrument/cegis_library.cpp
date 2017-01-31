@@ -7,12 +7,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
-
 #include <goto-programs/goto_convert_functions.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/cprover_library.h>
+
+#include <linking/zero_initializer.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/instrument/meta_variables.h>
@@ -78,7 +78,11 @@ goto_programt::targett init_array(const symbol_tablet &st, goto_programt &body,
   pos->source_location=default_cegis_source_location();
   const symbol_exprt array(st.lookup(name).symbol_expr());
   const array_typet &type=to_array_type(array.type());
-  pos->code=code_assignt(array, array_of_exprt(gen_zero(type.subtype()), type));
+  const namespacet ns(st);
+  pos->code=
+    code_assignt(
+      array,
+      zero_initializer(type, pos->source_location, ns));
   return pos;
 }
 

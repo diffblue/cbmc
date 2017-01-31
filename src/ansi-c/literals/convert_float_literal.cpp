@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/ieee_float.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string2int.h>
-#include <util/expr_util.h>
 
 #include "../c_types.h"
 #include "parse_float.h"
@@ -142,7 +142,7 @@ exprt convert_float_literal(const std::string &src)
     complex_type.subtype()=result.type();
     exprt complex_expr(ID_complex, complex_type);
     complex_expr.operands().resize(2);
-    complex_expr.op0()=gen_zero(result.type());
+    complex_expr.op0()=from_integer(0, result.type());
     complex_expr.op1()=result;
     return complex_expr;
   }

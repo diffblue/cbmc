@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/expr_util.h>
 #include <util/byte_operators.h>
 
 #include <ansi-c/c_types.h>
@@ -42,7 +42,7 @@ void rewrite_union(
 
     if(op_type.id()==ID_union)
     {
-      exprt offset=gen_zero(index_type());
+      exprt offset=from_integer(0, index_type());
       byte_extract_exprt tmp(byte_extract_id(), op, offset, expr.type());
       expr=tmp;
     }
@@ -50,7 +50,7 @@ void rewrite_union(
   else if(expr.id()==ID_union)
   {
     const union_exprt &union_expr=to_union_expr(expr);
-    exprt offset=gen_zero(index_type());
+    exprt offset=from_integer(0, index_type());
     side_effect_expr_nondett nondet(expr.type());
     byte_update_exprt tmp(
       byte_update_id(), nondet, offset, union_expr.op());

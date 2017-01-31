@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cstdlib>
 
-#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
@@ -19,6 +18,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_types.h>
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_sizeof.h>
+
+#include <linking/zero_initializer.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -1036,15 +1037,12 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   {
     // Default value, e.g., int()
     typecheck_type(expr.type());
-    exprt new_expr=gen_zero(expr.type());
-
-    if(new_expr.is_nil())
-    {
-      error().source_location=expr.find_source_location();
-      error() << "no default value for `" << to_string(expr.type())
-              << "'" << eom;
-      throw 0;
-    }
+    exprt new_expr=
+      ::zero_initializer(
+        expr.type(),
+        expr.find_source_location(),
+        *this,
+        get_message_handler());
 
     new_expr.add_source_location()=expr.source_location();
     expr=new_expr;

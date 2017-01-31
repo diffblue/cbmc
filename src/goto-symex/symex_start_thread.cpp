@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/message.h>
-
 #include <linking/zero_initializer.h>
 
 #include "goto_symex.h"
@@ -116,10 +114,7 @@ void goto_symext::symex_start_thread(statet &state)
 
     exprt rhs=symbol.value;
     if(rhs.is_nil())
-    {
-      null_message_handlert null_message;
-      rhs=zero_initializer(symbol.type, symbol.location, ns, null_message);
-    }
+      rhs=zero_initializer(symbol.type, symbol.location, ns);
 
     guardt guard;
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);

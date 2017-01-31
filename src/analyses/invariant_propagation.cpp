@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/symbol_table.h>

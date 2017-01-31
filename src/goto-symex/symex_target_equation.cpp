@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include <langapi/language_util.h>
 #include <solvers/prop/prop_conv.h>

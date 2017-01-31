@@ -7,7 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/base_type.h>
-#include <util/expr_util.h>
 #include <util/byte_operators.h>
 #include <util/arith_tools.h>
 
@@ -37,7 +36,7 @@ bvt boolbvt::convert_member(const member_exprt &expr)
     return convert_bv(
       byte_extract_exprt(byte_extract_id(),
                          struct_op,
-                         gen_zero(integer_typet()),
+                         from_integer(0, integer_typet()),
                          expr.type()));
   }
   else if(struct_op_type.id()==ID_struct)

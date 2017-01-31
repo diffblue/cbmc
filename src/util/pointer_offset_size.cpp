@@ -268,7 +268,7 @@ exprt member_offset_expr(
     return member_offset_expr(
       to_struct_type(type), member_expr.get_component_name(), ns);
   else if(type.id()==ID_union)
-    return gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
   else
     return nil_exprt();
 }
@@ -292,7 +292,7 @@ exprt member_offset_expr(
 {
   const struct_typet::componentst &components=type.components();
 
-  exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+  exprt result=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
   std::size_t bit_field_bits=0;
 
   for(struct_typet::componentst::const_iterator
@@ -395,7 +395,7 @@ exprt size_of_expr(
     const struct_typet::componentst &components=
       struct_type.components();
 
-    exprt result=gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+    exprt result=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
     std::size_t bit_field_bits=0;
 
     for(struct_typet::componentst::const_iterator
@@ -482,7 +482,7 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_bool)
   {
-    return gen_one(signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(1, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_pointer)
   {
@@ -497,7 +497,7 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_code)
   {
-    return gen_zero(signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_string)
   {

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
@@ -79,8 +79,9 @@ code_function_callt function_to_call(
   call.arguments().resize(1);
   call.arguments()[0]=
     typecast_exprt(
-      address_of_exprt(index_exprt(
-        function_id_string, gen_zero(index_type()))),
+      address_of_exprt(
+        index_exprt(
+          function_id_string, from_integer(0, index_type()))),
       to_code_type(s_it->second.type).parameters()[0].type());
 
   return call;

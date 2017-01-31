@@ -45,7 +45,6 @@ void jsa_symex_learnt::process(const counterexamplest &counterexamples,
 
 void jsa_symex_learnt::process(const size_t max_solution_size)
 {
-  null_message_handlert msg;
   const namespacet ns(original_program.st);
   counterexamplest counterexamples(1);
   counterexamplet &counterexample=counterexamples.front();
@@ -55,7 +54,7 @@ void jsa_symex_learnt::process(const size_t max_solution_size)
     const irep_idt &key=pos->labels.front();
     const typet &type=get_affected_type(*pos);
     const source_locationt &loc=pos->source_location;
-    const exprt value(zero_initializer(type, loc, ns, msg));
+    const exprt value(zero_initializer(type, loc, ns));
     counterexample.insert(std::make_pair(key, value));
   }
   process(counterexamples, max_solution_size);

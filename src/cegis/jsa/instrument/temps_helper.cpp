@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <ansi-c/c_types.h>
 
 #include <goto-programs/remove_returns.h>
@@ -39,7 +38,7 @@ goto_programt::targett zero_jsa_temps(jsa_programt &prog,
   {
     if (!is_tmp(symbol)) continue;
     const symbol_exprt lhs(symbol.second.symbol_expr());
-    pos=jsa_assign(st, gf, pos, lhs, gen_zero(lhs.type()));
+    pos=jsa_assign(st, gf, pos, lhs, from_integer(0, lhs.type()));
   }
   return pos;
 }
@@ -77,7 +76,7 @@ void add_zero_jsa_temps_to_pred_exec(jsa_programt &prog)
       const constant_exprt index(from_integer(i, signed_int_type()));
       const index_exprt elem(ops, index);
       const dereference_exprt lhs(elem, jsa_word_type());
-      const exprt rhs(gen_zero(lhs.type()));
+      const exprt rhs(from_integer(0, lhs.type()));
       pos=cegis_assign(st, body, pos, lhs, rhs, loc);
     }
     move_labels(body, return_pos, pos);

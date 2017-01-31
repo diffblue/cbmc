@@ -188,7 +188,7 @@ void goto_checkt::div_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=gen_zero(expr.op1().type());
+  exprt zero=from_integer(0, expr.op1().type());
 
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
@@ -233,7 +233,7 @@ void goto_checkt::undefined_shift_check(
   if(distance_type.id()==ID_signedbv)
   {
     binary_relation_exprt inequality(
-      expr.distance(), ID_ge, gen_zero(distance_type));
+      expr.distance(), ID_ge, from_integer(0, distance_type));
 
     add_guarded_claim(
       inequality,
@@ -289,7 +289,7 @@ void goto_checkt::mod_by_zero_check(
 
   // add divison by zero subgoal
 
-  exprt zero=gen_zero(expr.op1().type());
+  exprt zero=from_integer(0, expr.op1().type());
 
   if(zero.is_nil())
     throw "no zero of argument type of operator "+expr.id_string();
@@ -802,8 +802,8 @@ void goto_checkt::nan_check(
     // 0/0 = NaN and x/inf = NaN
     // (note that x/0 = +-inf for x!=0 and x!=inf)
     exprt zero_div_zero=and_exprt(
-      ieee_float_equal_exprt(expr.op0(), gen_zero(expr.op0().type())),
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+      ieee_float_equal_exprt(expr.op0(), from_integer(0, expr.op0().type())),
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
     exprt div_inf=unary_exprt(ID_isinf, expr.op1(), bool_typet());
 
@@ -819,10 +819,10 @@ void goto_checkt::nan_check(
     // Inf * 0 is NaN
     exprt inf_times_zero=and_exprt(
       unary_exprt(ID_isinf, expr.op0(), bool_typet()),
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())));
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
 
     exprt zero_times_inf=and_exprt(
-      ieee_float_equal_exprt(expr.op1(), gen_zero(expr.op1().type())),
+      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())),
       unary_exprt(ID_isinf, expr.op0(), bool_typet()));
 
     isnan=or_exprt(inf_times_zero, zero_times_inf);
@@ -972,7 +972,8 @@ void goto_checkt::pointer_validity_check(
     return;
 
   const exprt &pointer=expr.op0();
-  const typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
+  const pointer_typet &pointer_type=
+    to_pointer_type(ns.follow(pointer.type()));
 
   assert(base_type_eq(pointer_type.subtype(), expr.type(), ns));
 
@@ -986,7 +987,7 @@ void goto_checkt::pointer_validity_check(
   {
     if(flags.is_unknown() || flags.is_null())
     {
-      notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+      notequal_exprt not_eq_null(pointer, null_pointer_exprt(pointer_type));
 
       add_guarded_claim(
         not_eq_null,
@@ -1175,7 +1176,7 @@ void goto_checkt::bounds_check(
           effective_offset=plus_exprt(p_offset, effective_offset);
         }
 
-        exprt zero=gen_zero(ode.offset().type());
+        exprt zero=from_integer(0, ode.offset().type());
         assert(zero.is_not_nil());
 
         // the final offset must not be negative
@@ -1612,7 +1613,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
         if(flags.is_unknown() || flags.is_null())
         {
-          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+          notequal_exprt not_eq_null(
+            pointer,
+            null_pointer_exprt(to_pointer_type(pointer.type())));
 
           add_guarded_claim(
             not_eq_null,
@@ -1651,7 +1654,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
 
         if(pointer.type().subtype().get(ID_identifier)!="java::java.lang.AssertionError")
         {
-          notequal_exprt not_eq_null(pointer, gen_zero(pointer.type()));
+          notequal_exprt not_eq_null(
+            pointer,
+            null_pointer_exprt(to_pointer_type(pointer.type())));
 
           add_guarded_claim(
             not_eq_null,
@@ -1718,7 +1723,9 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
         source_locationt source_location;
         source_location.set_function(i.function);
 
-        equal_exprt eq(leak_expr, gen_zero(ns.follow(leak.type)));
+        equal_exprt eq(
+          leak_expr,
+          null_pointer_exprt(to_pointer_type(leak.type)));
         add_guarded_claim(
           eq,
           "dynamically allocated memory never freed",

@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <sstream>
+
+#include <util/namespace.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
@@ -72,25 +74,42 @@ exprt zero_initializert::zero_initializer_rec(
 {
   const irep_idt &type_id=type.id();
 
-  if(type_id==ID_bool)
+  if(type_id==ID_unsignedbv ||
+     type_id==ID_signedbv ||
+     type_id==ID_pointer ||
+     type_id==ID_c_enum ||
+     type_id==ID_incomplete_c_enum ||
+     type_id==ID_c_bit_field ||
+     type_id==ID_bool ||
+     type_id==ID_c_bool ||
+     type_id==ID_floatbv ||
+     type_id==ID_fixedbv)
   {
-    exprt result=false_exprt();
+    exprt result=from_integer(0, type);
     result.add_source_location()=source_location;
     return result;
   }
-  else if(type_id==ID_unsignedbv ||
-          type_id==ID_signedbv ||
-          type_id==ID_floatbv ||
-          type_id==ID_fixedbv ||
-          type_id==ID_pointer ||
-          type_id==ID_complex ||
-          type_id==ID_c_enum ||
-          type_id==ID_incomplete_c_enum ||
-          type_id==ID_c_enum_tag ||
-          type_id==ID_c_bit_field ||
-          type_id==ID_c_bool)
+  else if(type_id==ID_rational ||
+          type_id==ID_real)
   {
-    exprt result=gen_zero(type);
+    constant_exprt result(ID_0, type);
+    result.add_source_location()=source_location;
+    return result;
+  }
+  else if(type_id==ID_verilog_signedbv ||
+          type_id==ID_verilog_unsignedbv)
+  {
+    std::size_t width=to_bitvector_type(type).get_width();
+    std::string value(width, '0');
+
+    constant_exprt result(value, type);
+    result.add_source_location()=source_location;
+    return result;
+  }
+  else if(type_id==ID_complex)
+  {
+    exprt sub_zero=zero_initializer_rec(type.subtype(), source_location);
+    complex_exprt result(sub_zero, sub_zero, to_complex_type(type));
     result.add_source_location()=source_location;
     return result;
   }
@@ -110,7 +129,7 @@ exprt zero_initializert::zero_initializer_rec(
 
       array_exprt value(array_type);
       value.type().id(ID_array);
-      value.type().set(ID_size, gen_zero(size_type()));
+      value.type().set(ID_size, from_integer(0, size_type()));
       value.add_source_location()=source_location;
       return value;
     }
@@ -264,6 +283,27 @@ exprt zero_initializert::zero_initializer_rec(
 
     return result;
   }
+  else if(type_id==ID_c_enum_tag)
+  {
+    return
+      zero_initializer_rec(
+        ns.follow_tag(to_c_enum_tag_type(type)),
+        source_location);
+  }
+  else if(type_id==ID_struct_tag)
+  {
+    return
+      zero_initializer_rec(
+        ns.follow_tag(to_struct_tag_type(type)),
+        source_location);
+  }
+  else if(type_id==ID_union_tag)
+  {
+    return
+      zero_initializer_rec(
+        ns.follow_tag(to_union_tag_type(type)),
+        source_location);
+  }
   else if(type_id==ID_string)
   {
     return constant_exprt(irep_idt(), type);
@@ -297,4 +337,35 @@ exprt zero_initializer(
 {
   zero_initializert z_i(ns, message_handler);
   return z_i(type, source_location);
+}
+
+/*******************************************************************\
+
+Function: zero_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt zero_initializer(
+  const typet &type,
+  const source_locationt &source_location,
+  const namespacet &ns)
+{
+  std::ostringstream oss;
+  stream_message_handlert mh(oss);
+
+  try
+  {
+    zero_initializert z_i(ns, mh);
+    return z_i(type, source_location);
+  }
+  catch(int)
+  {
+    throw oss.str();
+  }
 }

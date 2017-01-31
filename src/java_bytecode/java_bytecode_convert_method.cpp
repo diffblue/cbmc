@@ -10,13 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/expanding_vector.h>
 #include <util/string2int.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
-#include <util/expr_util.h>
+
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
@@ -943,7 +944,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(statement=="aconst_null")
     {
       assert(results.size()==1);
-      results[0]=gen_zero(java_reference_type(void_typet()));
+      results[0]=null_pointer_exprt(java_reference_type(void_typet()));
     }
     else if(statement=="athrow")
     {
@@ -1276,9 +1277,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       code_gotot code_goto(label(number));
       c=code_goto;
-      results[0]=from_integer(
-        std::next(i_it)->address,
-        pointer_typet(void_typet(), 64));
+      results[0]=
+        from_integer(
+          std::next(i_it)->address,
+          unsignedbv_typet(64));
+      results[0].type()=pointer_typet(void_typet(), 64);
     }
     else if(statement=="ret")
     {
@@ -1299,9 +1302,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
         else
         {
           code_ifthenelset branch;
-          auto address_ptr=from_integer(
-            jsr_ret_targets[idx],
-            pointer_typet(void_typet(), 64));
+          auto address_ptr=
+            from_integer(
+              jsr_ret_targets[idx],
+              unsignedbv_typet(64));
+          address_ptr.type()=pointer_typet(void_typet(), 64);
           branch.cond()=equal_exprt(retvar, address_ptr);
           branch.cond().add_source_location()=i_it->source_location;
           branch.then_case()=g;
@@ -1390,7 +1395,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       code_ifthenelset code_branch;
       code_branch.cond()=
-        binary_relation_exprt(op[0], id, gen_zero(op[0].type()));
+        binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.cond().add_source_location().set_function(method_id);
       code_branch.then_case()=code_gotot(label(number));
@@ -1407,7 +1412,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
-      const exprt rhs(gen_zero(lhs.type()));
+      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(number));
       code_branch.then_case().add_source_location()=i_it->source_location;
@@ -1421,7 +1426,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
-      const exprt rhs(gen_zero(lhs.type()));
+      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(number));
       code_branch.then_case().add_source_location()=i_it->source_location;
@@ -1561,7 +1566,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           nan_result,
           if_exprt(
             ieee_float_equal_exprt(op[0], op[1]),
-            gen_zero(result_type),
+            from_integer(0, result_type),
             if_exprt(
               binary_relation_exprt(op[0], ID_lt, op[1]),
               minus_one,

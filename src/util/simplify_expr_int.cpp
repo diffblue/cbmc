@@ -110,7 +110,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     if(it->is_zero() &&
        it->type().id()!=ID_floatbv)
     {
-      expr=gen_zero(expr.type());
+      expr=from_integer(0, expr.type());
       return false;
     }
 
@@ -353,7 +353,7 @@ bool simplify_exprt::simplify_mod(exprt &expr)
       if((ok1 && int_value1==1) ||
          (ok0 && int_value0==0))
       {
-        expr=gen_zero(expr.type());
+        expr=from_integer(0, expr.type());
         return false;
       }
 
@@ -469,7 +469,8 @@ bool simplify_exprt::simplify_plus(exprt &expr)
           {
             if(!const_sum->sum(*it))
             {
-              *it=gen_zero(it->type());
+              *it=from_integer(0, it->type());
+              assert(it->is_not_nil());
               result=false;
             }
           }
@@ -498,8 +499,9 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
       if(itm!=expr_map.end())
       {
-        *(itm->second)=gen_zero(expr.type());
-        *it=gen_zero(expr.type());
+        *(itm->second)=from_integer(0, expr.type());
+        *it=from_integer(0, expr.type());
+        assert(it->is_not_nil());
         expr_map.erase(itm);
         result=false;
       }
@@ -525,7 +527,8 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
   if(operands.empty())
   {
-    expr=gen_zero(expr.type());
+    expr=from_integer(0, expr.type());
+    assert(expr.is_not_nil());
     return false;
   }
   else if(operands.size()==1)
@@ -599,12 +602,10 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
     if(operands[0]==operands[1])
     {
-      exprt zero=gen_zero(expr.type());
-      if(zero.is_not_nil())
-      {
-        expr=zero;
-        return false;
-      }
+      exprt zero=from_integer(0, expr.type());
+      assert(zero.is_not_nil());
+      expr=zero;
+      return false;
     }
   }
 
@@ -985,7 +986,7 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
       // this is to guard against large values of distance
       if(distance>=width)
       {
-        expr=gen_zero(expr.type());
+        expr=from_integer(0, expr.type());
         return false;
       }
       else if(distance>=0)
@@ -1010,7 +1011,7 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
       // this is to guard against large values of distance
       if(distance>=width)
       {
-        expr=gen_zero(expr.type());
+        expr=from_integer(0, expr.type());
         return false;
       }
       else if(distance>=0)
@@ -1589,8 +1590,8 @@ bool simplify_exprt::eliminate_common_addends(
        op0.type().id()!=ID_complex)
     {
       // elimination!
-      op0=gen_zero(op0.type());
-      op1=gen_zero(op1.type());
+      op0=from_integer(0, op0.type());
+      op1=from_integer(0, op1.type());
       return false;
     }
   }
@@ -1823,7 +1824,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
         exprt op=expr.op0().op0();
         expr.op0().swap(op);
         if(expr.op0().type().id()!=ID_pointer)
-          expr.op1()=gen_zero(expr.op0().type());
+          expr.op1()=from_integer(0, expr.op0().type());
         else
           expr.op1().type()=expr.op0().type();
         simplify_inequality(expr); // do again!
@@ -1854,7 +1855,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
           if(!to_integer(*it, i))
           {
             constant+=i;
-            *it=gen_zero(it->type());
+            *it=from_integer(0, it->type());
+            assert(it->is_not_nil());
             changed=true;
           }
         }

@@ -11,10 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
-#include <util/expr_util.h>
 #include <util/base_type.h>
 #include <util/prefix.h>
 #include <ansi-c/c_types.h>
+
+#include <linking/zero_initializer.h>
 
 #include <pointer-analysis/dereference.h>
 
@@ -280,7 +281,7 @@ void path_symext::symex_malloc(
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
-    index_expr.index()=gen_zero(index_type());
+    index_expr.index()=from_integer(0, index_type());
     rhs.op0()=index_expr;
   }
   else
@@ -352,7 +353,11 @@ void path_symext::symex_va_arg_next(
 
   // Get old symbol of va_arg and modify it to generate a new one.
   irep_idt id=get_old_va_symbol(state, tmp);
-  exprt rhs=gen_zero(lhs.type());
+  exprt rhs=
+    zero_initializer(
+      lhs.type(),
+      code.source_location(),
+      state.var_map.ns);
 
   if(!id.empty())
   {
@@ -510,7 +515,7 @@ void path_symext::assign_rec(
     else if(compound_type.id()==ID_union)
     {
       // rewrite into byte_extract, and do again
-      exprt offset=gen_zero(index_type());
+      exprt offset=from_integer(0, index_type());
 
       byte_extract_exprt
         new_lhs(byte_update_id(), struct_op, offset, ssa_rhs.type());

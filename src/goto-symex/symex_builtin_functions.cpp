@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
@@ -21,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 
 #include <ansi-c/c_types.h>
+
+#include <linking/zero_initializer.h>
 
 #include "goto_symex.h"
 #include "goto_symex_state.h"
@@ -176,7 +177,7 @@ void goto_symext::symex_malloc(
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
-    index_expr.index()=gen_zero(index_type());
+    index_expr.index()=from_integer(0, index_type());
     rhs.op0()=index_expr;
   }
   else
@@ -236,7 +237,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
-  exprt rhs=gen_zero(lhs.type());
+  exprt rhs=zero_initializer(lhs.type(), code.source_location(), ns);
 
   if(id!=irep_idt())
   {
@@ -498,7 +499,9 @@ void goto_symext::symex_cpp_new(
   if(do_array)
   {
     exprt index_expr(ID_index, code.type().subtype());
-    index_expr.copy_to_operands(symbol.symbol_expr(), gen_zero(index_type()));
+    index_expr.copy_to_operands(
+      symbol.symbol_expr(),
+      from_integer(0, index_type()));
     rhs.move_to_operands(index_expr);
   }
   else

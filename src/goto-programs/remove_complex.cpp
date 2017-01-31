@@ -8,7 +8,7 @@ Date:   September 2014
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
+#include <util/arith_tools.h>
 
 #include "remove_complex.h"
 
@@ -166,7 +166,7 @@ void remove_complex(exprt &expr)
         struct_expr.operands().resize(2);
 
         struct_expr.op0()=typecast_exprt(expr.op0(), subtype);
-        struct_expr.op1()=gen_zero(subtype);
+        struct_expr.op1()=from_integer(0, subtype);
         struct_expr.add_source_location()=expr.source_location();
 
         expr=struct_expr;

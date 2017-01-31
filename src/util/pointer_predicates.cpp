@@ -450,7 +450,7 @@ exprt object_lower_bound(const exprt &pointer)
 {
   exprt offset=pointer_offset(pointer);
 
-  exprt zero=gen_zero(offset.type());
+  exprt zero=from_integer(0, offset.type());
   assert(zero.is_not_nil());
 
   return binary_relation_exprt(offset, ID_lt, zero);

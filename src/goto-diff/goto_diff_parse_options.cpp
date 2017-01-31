@@ -13,7 +13,6 @@ Author: Peter Schrammel
 
 #include <util/string2int.h>
 #include <util/config.h>
-#include <util/expr_util.h>
 #include <util/language.h>
 #include <util/options.h>
 

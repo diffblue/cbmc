@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include "pointer_arithmetic.h"
 
@@ -76,7 +76,7 @@ void pointer_arithmetict::read(const exprt &src)
         add_to_offset(index_expr.index());
         // produce &x[0] + i instead of &x[i]
         exprt new_src=src;
-        new_src.op0().op1()=gen_zero(index_expr.index().type());
+        new_src.op0().op1()=from_integer(0, index_expr.index().type());
         make_pointer(new_src);
       }
     }

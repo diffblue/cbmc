@@ -7,7 +7,6 @@ Author: Vincent Nimal
 \*******************************************************************/
 
 #include <util/cprover_prefix.h>
-#include <util/expr_util.h>
 #include <util/message.h>
 
 #include <goto-programs/remove_skip.h>

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 
 #include <cegis/cegis-util/program_helper.h>
 #include <cegis/cegis-util/counterexample_vars.h>
@@ -73,7 +72,7 @@ void create_ce_arrays(symbol_tablet &st, goto_functionst &gf,
 void create_ce_array_indexes(const std::set<irep_idt> &ce_keys,
     symbol_tablet &st, goto_functionst &gf)
 {
-  const exprt zero(gen_zero(signed_int_type()));
+  const exprt zero(from_integer(0, signed_int_type()));
   declare_global_meta_variable(st, gf, CE_ARRAY_INDEX, zero);
   goto_programt &body=get_body(gf, CONSTRAINT_CALLER_ID);
   goto_programt::targett pos=body.instructions.begin();

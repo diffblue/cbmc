@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include <linking/zero_initializer.h>
+
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
@@ -648,7 +650,7 @@ void smt2_convt::convert_address_of_rec(
     {
       // this is really pointer arithmetic
       exprt new_index_expr=expr;
-      new_index_expr.op1()=gen_zero(index.type());
+      new_index_expr.op1()=from_integer(0, index.type());
 
       exprt address_of_expr(ID_address_of, pointer_typet());
       address_of_expr.type().subtype()=array.type().subtype();
@@ -2062,7 +2064,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << "(not (= ";
       convert_expr(src);
       out << " ";
-      convert_expr(gen_zero(src_type));
+      convert_expr(
+        zero_initializer(src_type, expr.source_location(), ns));
       out << "))";
     }
     else if(src_type.id()==ID_floatbv)
@@ -2088,7 +2091,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     out << "(not (= ";
     convert_expr(src);
     out << " ";
-    convert_expr(gen_zero(src_type));
+    convert_expr(
+      zero_initializer(src_type, expr.source_location(), ns));
     out << ")) "; // not, =
     out << " (_ bv1 " << to_width << ")";
     out << " (_ bv0 " << to_width << ")";

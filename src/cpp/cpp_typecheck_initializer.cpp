@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/expr_util.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
@@ -296,7 +295,7 @@ void cpp_typecheckt::zero_initializer(
     typet enum_type(ID_unsignedbv);
     enum_type.add(ID_width)=final_type.find(ID_width);
 
-    exprt zero(gen_zero(enum_type));
+    exprt zero(from_integer(0, enum_type));
     zero.make_typecast(type);
     already_typechecked(zero);
 

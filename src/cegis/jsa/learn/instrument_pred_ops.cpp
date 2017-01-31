@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 #include <util/arith_tools.h>
 #include <util/bv_arithmetic.h>
-#include <util/expr_util.h>
 #include <util/type_eq.h>
 
 #include <cegis/cegis-util/program_helper.h>
@@ -71,7 +70,7 @@ void mark_dead(goto_programt &body, goto_programt::targett pos,
   pos=body.insert_after(pos);
   pos->type=goto_program_instruction_typet::ASSIGN;
   pos->source_location=jsa_builtin_source_location();
-  pos->code=code_assignt(op_elem, gen_zero(op_elem.type()));
+  pos->code=code_assignt(op_elem, from_integer(0, op_elem.type()));
 }
 }
 

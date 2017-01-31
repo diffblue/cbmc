@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/rational.h>
 #include <util/replace_expr.h>
-#include <util/expr_util.h>
 #include <util/rational_tools.h>
 #include <util/source_location.h>
 #include <util/cprover_prefix.h>
@@ -316,8 +315,11 @@ void goto_convertt::do_scanf(
               const symbolt &tmp_symbol=
                 new_tmp_symbol(type, "scanf_string", dest, function.source_location());
 
-              exprt rhs=address_of_exprt(
-                index_exprt(tmp_symbol.symbol_expr(), gen_zero(index_type())));
+              exprt rhs=
+                address_of_exprt(
+                  index_exprt(
+                    tmp_symbol.symbol_expr(),
+                    from_integer(0, index_type())));
 
               // now use array copy
               codet array_copy_statement;
@@ -812,7 +814,12 @@ void goto_convertt::do_java_new_array(
   t_p->source_location=location;
 
   // zero-initialize the data
-  exprt zero_element=gen_zero(data.type().subtype());
+  exprt zero_element=
+    zero_initializer(
+      data.type().subtype(),
+      location,
+      ns,
+      get_message_handler());
   codet array_set(ID_array_set);
   array_set.copy_to_operands(data, zero_element);
   goto_programt::targett t_d=dest.add_instruction(OTHER);
@@ -838,11 +845,11 @@ void goto_convertt::do_java_new_array(
     side_effect_exprt inc(ID_assign);
     inc.operands().resize(2);
     inc.op0()=tmp_i;
-    inc.op1()=plus_exprt(tmp_i, gen_one(tmp_i.type()));
+    inc.op1()=plus_exprt(tmp_i, from_integer(1, tmp_i.type()));
 
     dereference_exprt deref_expr(plus_exprt(data, tmp_i), data.type().subtype());
 
-    for_loop.init()=code_assignt(tmp_i, gen_zero(tmp_i.type()));
+    for_loop.init()=code_assignt(tmp_i, from_integer(0, tmp_i.type()));
     for_loop.cond()=binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
     for_loop.iter()=inc;
     for_loop.body()=code_skipt();
@@ -1644,7 +1651,13 @@ void goto_convertt::do_function_call_symbol(
     {
       goto_programt::targett t=dest.add_instruction(ASSIGN);
       t->source_location=function.source_location();
-      t->code=code_assignt(dest_expr, gen_zero(dest_expr.type()));
+      exprt zero=
+        zero_initializer(
+          dest_expr.type(),
+          function.source_location(),
+          ns,
+          get_message_handler());
+      t->code=code_assignt(dest_expr, zero);
     }
   }
   else if(identifier=="__sync_fetch_and_add" ||

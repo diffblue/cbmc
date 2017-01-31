@@ -10,7 +10,6 @@ Author:
 
 #include <util/config.h>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>

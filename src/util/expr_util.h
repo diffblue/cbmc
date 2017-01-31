@@ -30,14 +30,9 @@ class namespacet;
 /*! \deprecated This function will eventually be removed. Use functions from
  * \ref util/std_expr.h instead.
 */
-exprt gen_zero(const typet &type);
-/*! \copydoc gen_zero(const typet &) */
-exprt gen_one(const typet &type);
-
-/*! \copydoc gen_zero(const typet &) */
 void make_next_state(exprt &);
 
-/*! \copydoc splits an expression with >=3 operands into nested binary expressions */
+/*! splits an expression with >=3 operands into nested binary expressions */
 exprt make_binary(const exprt &);
 
 /*! converts an udpate expr into a (possibly nested) with expression */

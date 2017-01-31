@@ -1,10 +1,16 @@
 default: tests.log
 
 test:
-	@../test.pl -c ../../../src/cbmc/cbmc
+	@if ! ../test.pl -c ../../../src/cbmc/cbmc ; then \
+		../failed-tests-printer.pl ; \
+		exit 1 ; \
+	fi
 
 tests.log: ../test.pl
-	@../test.pl -c ../../../src/cbmc/cbmc
+	@if ! ../test.pl -c ../../../src/cbmc/cbmc ; then \
+		../failed-tests-printer.pl ; \
+		exit 1 ; \
+	fi
 
 show:
 	@for dir in *; do \

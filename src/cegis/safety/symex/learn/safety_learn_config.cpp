@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <util/expr_util.h>
+#include <util/arith_tools.h>
 
 #include <cegis/danger/meta/literals.h>
 
@@ -65,7 +65,7 @@ void safety_learn_configt::process(const size_t max_solution_size)
   constraint_varst ce_vars;
   get_invariant_constraint_vars(ce_vars, original_program);
   const typet type(cegis_default_integer_type());  // XXX: Currently single data type
-  const exprt zero(gen_zero(type));
+  const exprt zero(from_integer(0, type));
   counterexamplet dummy_ce;
   dummy_ce.x.push_back(counterexamplet::assignmentst());
   counterexamplet::assignmentst &x=dummy_ce.x.front();
