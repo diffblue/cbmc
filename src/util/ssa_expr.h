@@ -67,15 +67,9 @@ public:
     #if 0
     return get_l1_object().get_identifier();
     #else
-    // the above is the clean version, this is the fast one, making
-    // use of internal knowledge about identifier names
-    std::string l1_o_id=id2string(get_identifier());
-    std::string::size_type fs_suffix=l1_o_id.find_first_of(".[#");
-
-    if(fs_suffix!=std::string::npos)
-      l1_o_id.resize(fs_suffix);
-
-    return l1_o_id;
+    // the above is the clean version, this is the fast one, using
+    // an identifier cached during build_identifier
+    return get(ID_L1_object_identifier);
     #endif
   }
 
@@ -130,10 +124,12 @@ public:
     const irep_idt &l1=get_level_1();
     const irep_idt &l2=get_level_2();
 
-    set_identifier(build_identifier(get_original_expr(), l0, l1, l2));
+    auto idpair=build_identifier(get_original_expr(), l0, l1, l2);
+    set_identifier(idpair.first);
+    set(ID_L1_object_identifier, idpair.second);
   }
 
-  static irep_idt build_identifier(
+  static std::pair<irep_idt, irep_idt> build_identifier(
     const exprt &src,
     const irep_idt &l0,
     const irep_idt &l1,
