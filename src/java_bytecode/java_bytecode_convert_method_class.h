@@ -73,7 +73,6 @@ public:
   typedef std::vector<local_variable_with_holest>
     local_variable_table_with_holest;
 
-protected:
   class variablet
   {
   public:
@@ -85,6 +84,7 @@ protected:
     variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false) {}
   };
 
+ protected:
   typedef std::vector<variablet> variablest;
   expanding_vector<variablest> variables;
   std::set<symbol_exprt> used_local_names;

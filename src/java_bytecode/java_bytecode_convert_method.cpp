@@ -712,6 +712,43 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
         to_code(this_block_children[child_offset])).code());
 }
 
+static void gather_symbol_live_ranges(
+  unsigned pc,
+  const exprt &e,
+  std::map<irep_idt, java_bytecode_convert_methodt::variablet> &result)
+{
+  if(e.id()==ID_symbol)
+  {
+    const auto &symexpr=to_symbol_expr(e);
+    auto findit=
+      result.insert({
+        symexpr.get_identifier(),
+        java_bytecode_convert_methodt::variablet()});
+    auto &var=findit.first->second;
+    if(findit.second)
+    {
+      var.symbol_expr=symexpr;
+      var.start_pc=pc;
+      var.length=1;
+    }
+    else
+    {
+      if(pc<var.start_pc)
+      {
+        var.length+=(var.start_pc-pc);
+        var.start_pc=pc;
+      }
+      else
+      {
+        var.length=std::max(var.length, (pc-var.start_pc)+1);
+      }
+    }
+  }
+  else
+    forall_operands(it, e)
+      gather_symbol_live_ranges(pc, *it, result);
+}
+
 /*******************************************************************\
 
 Function: java_bytecode_convert_methodt::convert_instructions
@@ -1959,10 +1996,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // review successor computation of athrow!
   code_blockt code;
 
-  // locals
+  // Add anonymous locals to the symtab:
   for(const auto &var : used_local_names)
   {
-    code.add(code_declt(var));
     symbolt new_symbol;
     new_symbol.name=var.get_identifier();
     new_symbol.type=var.type();
@@ -1974,11 +2010,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
     new_symbol.is_thread_local=true;
     new_symbol.is_lvalue=true;
     symbol_table.add(new_symbol);
-  }
-  // temporaries
-  for(const auto &var : tmp_vars)
-  {
-    code.add(code_declt(var));
   }
 
   // Try to recover block structure as indicated in the local variable table:
@@ -2025,44 +2056,61 @@ codet java_bytecode_convert_methodt::convert_instructions(
     start_new_block=address_pair.second.successors.size()>1;
   }
 
+  // Find out where temporaries are used:
+  std::map<irep_idt, variablet> temporary_variable_live_ranges;
+  for(const auto &aentry : address_map)
+    gather_symbol_live_ranges(
+      aentry.first,
+      aentry.second.code,
+      temporary_variable_live_ranges);
+
+  std::vector<const variablet*> vars_to_process;
   for(const auto &vlist : variables)
-  {
     for(const auto &v : vlist)
-    {
-      if(v.is_parameter)
-        continue;
-      // Merge lexical scopes as far as possible to allow us to
-      // declare these variable scopes faithfully.
-      // Don't insert yet, as for the time being the blocks' only
-      // operands must be other blocks.
-      // The declarations will be inserted in the next pass instead.
-      get_or_create_block_for_pcrange(
-        root,
-        root_block,
-        v.start_pc,
-        v.start_pc+v.length,
-        std::numeric_limits<unsigned>::max(),
-        address_map);
-    }
+      vars_to_process.push_back(&v);
+
+  for(const auto &v : tmp_vars)
+    vars_to_process.push_back(
+      &temporary_variable_live_ranges.at(v.get_identifier()));
+
+  for(const auto &v : used_local_names)
+    vars_to_process.push_back(
+      &temporary_variable_live_ranges.at(v.get_identifier()));
+
+  for(const auto vp : vars_to_process)
+  {
+    const auto &v=*vp;
+    if(v.is_parameter)
+      continue;
+    // Merge lexical scopes as far as possible to allow us to
+    // declare these variable scopes faithfully.
+    // Don't insert yet, as for the time being the blocks' only
+    // operands must be other blocks.
+    // The declarations will be inserted in the next pass instead.
+    get_or_create_block_for_pcrange(
+      root,
+      root_block,
+      v.start_pc,
+      v.start_pc+v.length,
+      std::numeric_limits<unsigned>::max(),
+      address_map);
   }
-  for(const auto &vlist : variables)
+  for(const auto vp : vars_to_process)
   {
-    for(const auto &v : vlist)
-    {
-      if(v.is_parameter)
-        continue;
-      // Skip anonymous variables:
-      if(v.symbol_expr.get_identifier()==irep_idt())
-        continue;
-      auto &block=get_block_for_pcrange(
-        root,
-        root_block,
-        v.start_pc,
-        v.start_pc+v.length,
-        std::numeric_limits<unsigned>::max());
-      code_declt d(v.symbol_expr);
-      block.operands().insert(block.operands().begin(), d);
-    }
+    const auto &v=*vp;
+    if(v.is_parameter)
+      continue;
+    // Skip anonymous variables:
+    if(v.symbol_expr.get_identifier()==irep_idt())
+      continue;
+    auto &block=get_block_for_pcrange(
+      root,
+      root_block,
+      v.start_pc,
+      v.start_pc+v.length,
+      std::numeric_limits<unsigned>::max());
+    code_declt d(v.symbol_expr);
+    block.operands().insert(block.operands().begin(), d);
   }
 
   for(auto &block : root_block.operands())
