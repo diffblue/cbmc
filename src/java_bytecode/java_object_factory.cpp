@@ -189,8 +189,9 @@ void java_object_factoryt::gen_nondet_init(
     {
       const struct_typet &struct_type=to_struct_type(subtype);
       const irep_idt struct_tag=struct_type.get_tag();
-
-      if(recursion_set.find(struct_tag)!=recursion_set.end())
+      // set to null if found in recursion set and not a sub-type
+      if(recursion_set.find(struct_tag)!=recursion_set.end() &&
+         struct_tag==class_identifier)
       {
         // make null
         null_pointer_exprt null_pointer_expr(pointer_type);
