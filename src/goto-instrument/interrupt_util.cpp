@@ -199,7 +199,7 @@ Function: build_isr_map
 
 void build_isr_map(const namespacet &ns, isr_mapt &isr_map)
 {
-  const symbolt &threads=ns.lookup(CPROVER_ISR_ARRAY_ID);
+  const symbolt &threads=ns.lookup(CPROVER_ISR_ARRAY);
   const array_exprt &thread_array_expr=to_array_expr(threads.value);
   unsigned int i=0;
 

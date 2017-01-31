@@ -14,7 +14,7 @@ Date: June 2016
 #include <unordered_map>
 #include "rw_set.h"
 
-#define CPROVER_ISR_ARRAY_ID "__CPROVER_ISR_ARRAY"
+#define CPROVER_ISR_ARRAY "__CPROVER_isr_array"
 #define CPROVER_ENABLE_ISR  "__CPROVER_enable_isr"
 #define CPROVER_DISABLE_ISR "__CPROVER_disable_isr"
 
