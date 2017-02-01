@@ -1145,6 +1145,40 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     slice_global_inits(ns, goto_functions);
   }
 
+  if(cmdline.isset("remove-unreachable-functions"))
+  {
+    status() << "Removing functions that are not reachable from the entry point"
+             << eom;
+
+    const irep_idt &entry_point=goto_functionst::entry_point();
+
+    goto_functionst::function_mapt::const_iterator e_it;
+    e_it=goto_functions.function_map.find(entry_point);
+
+    if(e_it==goto_functions.function_map.end())
+      throw "entry point not found";
+
+    call_grapht call_graph(goto_functions);
+    call_graph();
+
+    std::unordered_set<irep_idt, irep_id_hash> reachable_functions;
+    call_graph.compute_reachable(entry_point, reachable_functions);
+
+    for(goto_functionst::function_mapt::iterator it=
+          goto_functions.function_map.begin();
+        it!=goto_functions.function_map.end();)
+    {
+      const irep_idt &id=it->first;
+
+      if(reachable_functions.find(id)==reachable_functions.end())
+        it=goto_functions.function_map.erase(it);
+      else
+        it++;
+    }
+
+    goto_functions.update();
+  }
+
   if(cmdline.isset("string-abstraction"))
   {
     do_indirect_call_and_rtti_removal();
@@ -1507,6 +1541,7 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
+    " --remove-unreachable-functions  remove unreachable functions\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)

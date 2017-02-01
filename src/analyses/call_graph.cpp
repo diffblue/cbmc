@@ -14,11 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "call_graph.h"
 
-call_grapht::call_grapht()
-{
-}
-
-call_grapht::call_grapht(const goto_functionst &goto_functions)
+void call_grapht::operator()()
 {
   forall_goto_functions(f_it, goto_functions)
   {
@@ -49,6 +45,35 @@ void call_grapht::add(
   graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
 }
 
+void call_grapht::compute_reachable(
+  const irep_idt entry_point,
+  std::unordered_set<irep_idt, irep_id_hash> &reachable_functions)
+{
+  assert(reachable_functions.empty());
+  std::list<irep_idt> worklist;
+  const goto_functionst::function_mapt::const_iterator e_it=
+    goto_functions.function_map.find(entry_point);
+  assert(e_it!=goto_functions.function_map.end());
+  worklist.push_back(entry_point);
+  do
+  {
+    const irep_idt id=worklist.front();
+    worklist.pop_front();
+
+    reachable_functions.insert(id);
+
+    const auto &p=graph.equal_range(id);
+
+    for(auto it=p.first; it!=p.second; it++)
+    {
+      const irep_idt callee=it->second;
+
+      if(reachable_functions.find(callee)==reachable_functions.end())
+        worklist.push_back(callee);
+    }
+  }
+  while(!worklist.empty());
+}
 void call_grapht::output_dot(std::ostream &out) const
 {
   out << "digraph call_graph {\n";
