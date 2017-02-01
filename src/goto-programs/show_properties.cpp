@@ -110,6 +110,9 @@ void show_properties_json(
       json_properties.push_back(jsont()).make_object();
     json_property["name"]=json_stringt(id2string(property_id));
     json_property["class"]=json_stringt(id2string(property_class));
+    if(!source_location.get_basic_block_covered_lines().empty())
+      json_property["covered_lines"]=
+        json_stringt(id2string(source_location.get_basic_block_covered_lines()));
     json_property["sourceLocation"]=json(source_location);
     json_property["description"]=json_stringt(id2string(description));
     json_property["expression"]=

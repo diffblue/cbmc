@@ -818,6 +818,7 @@ IREP_ID_ONE(skip_initialize)
 IREP_ID_ONE(is_nondet_nullable)
 IREP_ID_ONE(java_array_access)
 IREP_ID_ONE(java_member_access)
+IREP_ID_ONE(basic_block_covered_lines)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
