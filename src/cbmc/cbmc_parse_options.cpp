@@ -39,6 +39,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
 
+#include <goto-symex/rewrite_union.h>
+#include <goto-symex/adjust_float_expressions.h>
+
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/cover.h>
@@ -898,10 +901,13 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
+    rewrite_union(goto_functions, ns);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_functions, ns);
 
     // ignore default/user-specified initialization
     // of variables with static lifetime

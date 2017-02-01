@@ -12,8 +12,80 @@ Date:   September 2014
 
 #include "remove_vector.h"
 
-void remove_vector(typet &);
-void remove_vector(exprt &);
+/*******************************************************************\
+
+Function: have_to_remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool have_to_remove_vector(const typet &type);
+
+static bool have_to_remove_vector(const exprt &expr)
+{
+  if(expr.type().id()==ID_vector)
+  {
+    if(expr.id()==ID_plus || expr.id()==ID_minus ||
+       expr.id()==ID_mult || expr.id()==ID_div ||
+       expr.id()==ID_mod  || expr.id()==ID_bitxor ||
+       expr.id()==ID_bitand || expr.id()==ID_bitor)
+      return true;
+    else if(expr.id()==ID_unary_minus || expr.id()==ID_bitnot)
+      return true;
+    else if(expr.id()==ID_vector)
+      return true;
+  }
+
+  if(have_to_remove_vector(expr.type()))
+    return true;
+
+  forall_operands(it, expr)
+    if(have_to_remove_vector(*it))
+      return true;
+
+  return false;
+}
+
+/*******************************************************************\
+
+Function: have_to_remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+static bool have_to_remove_vector(const typet &type)
+{
+  if(type.id()==ID_struct || type.id()==ID_union)
+  {
+    const struct_union_typet &struct_union_type=
+      to_struct_union_type(type);
+
+    for(struct_union_typet::componentst::const_iterator
+        it=struct_union_type.components().begin();
+        it!=struct_union_type.components().end();
+        it++)
+      if(have_to_remove_vector(it->type()))
+        return true;
+  }
+  else if(type.id()==ID_pointer ||
+          type.id()==ID_complex ||
+          type.id()==ID_array)
+    return have_to_remove_vector(type.subtype());
+  else if(type.id()==ID_vector)
+    return true;
+
+  return false;
+}
 
 /*******************************************************************\
 
@@ -27,8 +99,13 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(exprt &expr)
+static void remove_vector(typet &);
+
+static void remove_vector(exprt &expr)
 {
+  if(!have_to_remove_vector(expr))
+    return;
+
   Forall_operands(it, expr)
     remove_vector(*it);
 
@@ -109,8 +186,11 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(typet &type)
+static void remove_vector(typet &type)
 {
+  if(!have_to_remove_vector(type))
+    return;
+
   if(type.id()==ID_struct || type.id()==ID_union)
   {
     struct_union_typet &struct_union_type=
@@ -155,7 +235,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(symbolt &symbol)
+static void remove_vector(symbolt &symbol)
 {
   remove_vector(symbol.value);
   remove_vector(symbol.type);
@@ -173,7 +253,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(symbol_tablet &symbol_table)
+static void remove_vector(symbol_tablet &symbol_table)
 {
   Forall_symbols(it, symbol_table.symbols)
     remove_vector(it->second);
@@ -214,7 +294,7 @@ Purpose: removes vector data type
 
 \*******************************************************************/
 
-void remove_vector(goto_functionst &goto_functions)
+static void remove_vector(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     remove_vector(it->second);
