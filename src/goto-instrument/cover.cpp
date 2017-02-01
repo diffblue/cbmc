@@ -15,9 +15,11 @@ Date: May 2016
 
 #include <algorithm>
 #include <iterator>
+#include <unordered_set>
 
 #include <util/prefix.h>
 #include <util/message.h>
+#include <util/string2int.h>
 
 class basic_blockst
 {
@@ -31,6 +33,11 @@ public:
     {
       if(next_is_target || it->is_target())
         block_count++;
+
+      const irep_idt &line=it->source_location.get_line();
+      if(!line.empty())
+        block_line_cover_map[block_count]
+          .insert(unsafe_string2unsigned(id2string(line)));
 
       block_map[it]=block_count;
 
@@ -46,6 +53,24 @@ public:
         it->is_goto() || it->is_function_call();
 #endif
     }
+
+    // create list of covered lines as CSV string and set as property of source
+    // location of basic block
+    for(const auto &cover_set : block_line_cover_map)
+    {
+      std::string covered_lines;
+      bool first=true;
+      for(const auto &line_number : cover_set.second)
+      {
+        if(first)
+          first=false;
+        else
+          covered_lines+=",";
+        covered_lines+=std::to_string(line_number);
+      }
+      source_location_map[cover_set.first]
+        .set_basic_block_covered_lines(covered_lines);
+    }
   }
 
   // map program locations to block numbers
@@ -55,6 +80,11 @@ public:
   // map block numbers to source code locations
   typedef std::map<unsigned, source_locationt> source_location_mapt;
   source_location_mapt source_location_map;
+
+  // map block numbers to set of line numbers
+  typedef std::map<unsigned, std::unordered_set<unsigned> >
+    block_line_cover_mapt;
+  block_line_cover_mapt block_line_cover_map;
 
   inline unsigned operator[](goto_programt::const_targett t)
   {
@@ -304,7 +334,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
   const std::set<exprt> &decisions)
 {
   // To obtain the 1st-level controlling conditions
-  std::set<exprt> controlling = collect_mcdc_controlling(decisions);
+  std::set<exprt> controlling=collect_mcdc_controlling(decisions);
 
   std::set<exprt> result;
   // For each controlling condition, to check if it contains
@@ -495,7 +525,7 @@ void remove_repetition(std::set<exprt> &exprs)
      **/
     for(auto &y : new_exprs)
     {
-      bool iden = true;
+      bool iden=true;
       for(auto &c : conditions)
       {
         std::set<signed> signs1=sign_of_expr(c, x);
@@ -537,7 +567,7 @@ void remove_repetition(std::set<exprt> &exprs)
   }
 
   // update the original ''exprs''
-  exprs = new_exprs;
+  exprs=new_exprs;
 }
 
 /// To evaluate the value of expr ''src'', according to the atomic expr values
@@ -672,7 +702,8 @@ bool is_mcdc_pair(
 
   if(diff_count==1)
     return true;
-  else return false;
+  else
+    return false;
 }
 
 /// To check if we can find the mcdc pair of the input ''expr_set'' regarding
@@ -774,7 +805,8 @@ void minimize_mcdc_controlling(
     {
       controlling=new_controlling;
     }
-    else break;
+    else
+      break;
   }
 }
 
@@ -1062,9 +1094,12 @@ void instrument_cover_goals(
         const std::set<exprt> decisions=collect_decisions(i_it);
 
         std::set<exprt> both;
-        std::set_union(conditions.begin(), conditions.end(),
-                       decisions.begin(), decisions.end(),
-                       inserter(both, both.end()));
+        std::set_union(
+          conditions.begin(),
+          conditions.end(),
+          decisions.begin(),
+          decisions.end(),
+          inserter(both, both.end()));
 
         const source_locationt source_location=i_it->source_location;
 
@@ -1151,7 +1186,10 @@ void instrument_cover_goals(
        f_it->second.is_hidden())
       continue;
 
-    instrument_cover_goals(symbol_table, f_it->second.body, criterion);
+    instrument_cover_goals(
+      symbol_table,
+      f_it->second.body,
+      criterion);
   }
 }
 
