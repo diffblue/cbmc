@@ -104,6 +104,8 @@ void remove_virtual_functionst::remove_virtual_function(
   const code_function_callt &code=
     to_code_function_call(target->code);
 
+  const auto &vcall_source_loc=target->source_location;
+
   const exprt &function=code.function();
   assert(function.id()==ID_virtual_function);
   assert(!code.arguments().empty());
@@ -133,6 +135,8 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt final_skip;
 
   goto_programt::targett t_final=final_skip.add_instruction();
+  t_final->source_location=vcall_source_loc;
+
   t_final->make_skip();
 
   // build the calls and gotos
@@ -161,6 +165,7 @@ void remove_virtual_functionst::remove_virtual_function(
     if(insertit.second)
     {
       goto_programt::targett t1=new_code_calls.add_instruction();
+      t1->source_location=vcall_source_loc;
       if(!fun.symbol_expr.get_identifier().empty())
       {
       // call function
@@ -179,6 +184,7 @@ void remove_virtual_functionst::remove_virtual_function(
       insertit.first->second=t1;
       // goto final
       goto_programt::targett t3=new_code_calls.add_instruction();
+      t3->source_location=vcall_source_loc;
       t3->make_goto(t_final, true_exprt());
     }
 
@@ -188,6 +194,7 @@ void remove_virtual_functionst::remove_virtual_function(
     {
       exprt c_id1=constant_exprt(fun.class_id, string_typet());
       goto_programt::targett t4=new_code_gotos.add_instruction();
+      t4->source_location=vcall_source_loc;
       t4->make_goto(insertit.first->second, equal_exprt(c_id1, c_id2));
     }
   }
