@@ -1,0 +1,500 @@
+/*******************************************************************\
+
+Module: Goto Programs
+
+Author: Thomas Kiley, thomas.kiley@diffblue.com
+
+\*******************************************************************/
+
+#include <ansi-c/c_qualifiers.h>
+#include <util/simplify_expr.h>
+#include <util/arith_tools.h>
+
+#include "remove_const_function_pointers.h"
+
+remove_const_function_pointerst::remove_const_function_pointerst(
+  message_handlert &message_handler,
+  const exprt &base_expression,
+  const namespacet &ns,
+  const symbol_tablet &symbol_table):
+    messaget(message_handler),
+    original_expression(base_expression),
+    ns(ns),
+    symbol_table(symbol_table)
+{}
+
+bool remove_const_function_pointerst::operator()(
+  functionst &out_functions)
+{
+  return try_resolve_function_call(original_expression, out_functions);
+}
+
+exprt remove_const_function_pointerst::resolve_symbol(
+  const symbol_exprt &symbol_expr) const
+{
+  const symbolt &symbol=
+    symbol_table.lookup(symbol_expr.get_identifier());
+  return symbol.value;
+}
+
+bool remove_const_function_pointerst::try_resolve_function_call(
+  const exprt &expr, remove_const_function_pointerst::functionst &out_functions)
+{
+  const exprt &simplified_expr=simplify_expr(expr, ns);
+  if(simplified_expr.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(simplified_expr);
+    return try_resolve_index_of_function_call(index_expr, out_functions);
+  }
+  else if(simplified_expr.id()==ID_member)
+  {
+    const member_exprt &member_expr=to_member_expr(simplified_expr);
+    const exprt &owner_expr=member_expr.compound();
+    // Squash the struct
+    expressionst out_expressions;
+    bool is_const=false;
+    bool resolved=try_resolve_expression(owner_expr, out_expressions, is_const);
+    if(resolved)
+    {
+      for(const exprt &expression:out_expressions)
+      {
+        if(expression.id()!=ID_struct)
+        {
+          return false;
+        }
+        else
+        {
+          struct_exprt struct_expr=to_struct_expr(expression);
+          const exprt &component_value=
+            struct_expr.operands()[member_expr.get_component_number()];
+          // TODO: copy into out_functions rather than supply direct like
+          bool resolved=
+            try_resolve_function_call(component_value, out_functions);
+          if(!resolved)
+          {
+            return false;
+          }
+        }
+      }
+
+      return true;
+
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else if(simplified_expr.id()==ID_address_of)
+  {
+    address_of_exprt address_expr=to_address_of_expr(simplified_expr);
+    return try_resolve_function_call(address_expr.object(), out_functions);
+  }
+  else if(simplified_expr.id()==ID_symbol)
+  {
+    if(simplified_expr.type().id()==ID_code)
+    {
+      out_functions.insert(simplified_expr);
+      return true;
+    }
+    else
+    {
+      const c_qualifierst pointer_qualifers(simplified_expr.type());
+      if(!pointer_qualifers.is_constant)
+      {
+        debug() << "Can't optimize FP since symbol "
+                << simplified_expr.get(ID_identifier) << " is not const" << eom;
+        return false;
+      }
+
+      const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
+      return try_resolve_function_call(symbol_value, out_functions);
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+// Take an index of, squash its array and squash its index
+// If we can get a precise number, try_resolve_function_call on its value
+// otherwise try_resolve_function_call on each and return the union of them all
+bool remove_const_function_pointerst::try_resolve_index_of_function_call(
+  const index_exprt &index_expr, functionst &out_functions)
+{
+  // Get the array(s) it belongs to
+  expressionst potential_array_exprs;
+  bool is_const=false;
+  bool resolved_array=
+    try_resolve_expression(index_expr.array(), potential_array_exprs, is_const);
+  if(resolved_array)
+  {
+    for(const exprt &potential_array_expr : potential_array_exprs)
+    {
+      if(potential_array_expr.id()==ID_array)
+      {
+        // We require either the type of the values of the array or
+        // the array itself to be constant.
+        const typet &array_type=potential_array_expr.type();
+        const typet &array_contents_type=array_type.subtype();
+        c_qualifierst array_qaulifiers;
+        array_qaulifiers.read(array_contents_type);
+
+        if(array_qaulifiers.is_constant || is_const)
+        {
+          // Get the index if we can
+          mp_integer value;
+          if(try_resolve_index_value(index_expr.index(), value))
+          {
+            functionst array_out_functions;
+            const exprt &func_expr=
+              potential_array_expr.operands()[integer2size_t(value)];
+            bool resolved_value=
+              try_resolve_function_call(func_expr, array_out_functions);
+
+            if(resolved_value)
+            {
+              out_functions.insert(
+                array_out_functions.begin(),
+                array_out_functions.end());
+            }
+          }
+          else
+          {
+            // We don't know what index it is,
+            // but we know the value is from the array
+            for(const exprt &array_entry : potential_array_expr.operands())
+            {
+              functionst potential_functions;
+              bool resolved_value=
+                try_resolve_function_call(array_entry, potential_functions);
+
+              if(resolved_value)
+              {
+                for(const exprt &potential_function : potential_functions)
+                {
+                  if(potential_function.is_zero())
+                  {
+                    continue;
+                  }
+                  else
+                  {
+                    out_functions.insert(
+                      potential_functions.begin(),
+                      potential_functions.end());
+                  }
+                }
+              }
+              else
+              {
+                return false;
+              }
+            }
+          }
+        }
+        else
+        {
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_const_function_pointerst::try_resolve_expression(
+  const exprt &expr, expressionst &out_resolved_expression, bool &out_is_const)
+{
+  const exprt &simplified_expr=simplify_expr(expr, ns);
+  if(simplified_expr.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(simplified_expr);
+    expressionst out_array_expressions;
+    bool resolved_array=
+      try_resolve_index_of(index_expr, out_array_expressions, out_is_const);
+    if(resolved_array)
+    {
+      out_resolved_expression.insert(
+        out_resolved_expression.end(),
+        out_array_expressions.begin(),
+        out_array_expressions.end());
+    }
+
+    return resolved_array;
+  }
+  else if(simplified_expr.id()==ID_member)
+  {
+    // Get the component it belongs to
+    const member_exprt &member_expr=to_member_expr(simplified_expr);
+
+    expressionst potential_structs;
+    bool is_struct_const;
+    try_resolve_expression(
+      member_expr.compound(), potential_structs, is_struct_const);
+
+    bool all_components_const=true;
+    for(const exprt &potential_struct : potential_structs)
+    {
+      if(potential_struct.id()==ID_struct)
+      {
+        struct_exprt struct_expr=to_struct_expr(potential_struct);
+        const exprt &component_value=
+          struct_expr.operands()[member_expr.get_component_number()];
+        expressionst out_expressions;
+        bool component_const=false;
+        bool resolved=
+          try_resolve_expression(
+            component_value, out_expressions, component_const);
+        if(resolved)
+        {
+          out_resolved_expression.insert(
+            out_resolved_expression.end(),
+            out_expressions.begin(),
+            out_expressions.end());
+
+          all_components_const=
+            all_components_const && component_const;
+        }
+        else
+        {
+          return false;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+    out_is_const=all_components_const||is_struct_const;
+    return true;
+  }
+  else if(simplified_expr.id()==ID_dereference)
+  {
+    // We had a pointer, we need to check both the pointer
+    // type can't be changed, and what it what pointing to
+    // can't be changed
+    const dereference_exprt &deref=to_dereference_expr(simplified_expr);
+    expressionst pointer_values;
+    bool pointer_const;
+    bool resolved=
+      try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
+    if(resolved)
+    {
+      for(const exprt &pointer_val : pointer_values)
+      {
+        if(pointer_val.id()==ID_address_of)
+        {
+          address_of_exprt address_expr=to_address_of_expr(pointer_val);
+          bool object_const=false;
+          expressionst out_object_values;
+          bool resolved=
+            try_resolve_expression(
+              address_expr.object(), out_object_values, object_const);
+
+          if(resolved)
+          {
+            out_resolved_expression.insert(
+              out_resolved_expression.end(),
+              out_object_values.begin(),
+              out_object_values.end());
+          }
+        }
+        else
+        {
+          return false;
+        }
+      }
+      out_is_const=is_expression_const(deref) && pointer_const;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else if(simplified_expr.id()==ID_symbol)
+  {
+    const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
+    bool is_symbol_const=is_expression_const(simplified_expr);
+    bool is_symbol_value_const=false;
+    bool resolved_expression=
+      try_resolve_expression(
+      symbol_value,
+      out_resolved_expression,
+      is_symbol_value_const);
+
+    // If we have a symbol, it is only const if the value it is assigned
+    // is const and it is in fact const.
+    out_is_const=is_symbol_const && is_symbol_const;
+    return resolved_expression;
+  }
+  // TOOD: probably need to do something with pointers or address_of
+  // and const since a const pointer to a non-const value is useless
+  else
+  {
+    out_is_const=is_expression_const(expr);
+    out_resolved_expression.push_back(expr);
+    return true;
+  }
+}
+
+bool remove_const_function_pointerst::try_resolve_index_value(
+  const exprt &expr, mp_integer &out_array_index)
+{
+  expressionst index_value_expressions;
+  bool is_const=false;
+  bool resolved=try_resolve_expression(expr, index_value_expressions, is_const);
+  if(resolved)
+  {
+    if(index_value_expressions.size()==1 &&
+       index_value_expressions.front().id()==ID_constant)
+    {
+      const constant_exprt &constant_expr=
+        to_constant_expr(index_value_expressions.front());
+      mp_integer array_index;
+      bool errors=to_integer(constant_expr, array_index);
+      if(!errors)
+      {
+        out_array_index=array_index;
+      }
+      return !errors;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+// Takes an index of, squashes its array and index
+// if index is resolvable
+bool remove_const_function_pointerst::try_resolve_index_of(
+  const index_exprt &index_expr,
+  expressionst &out_expressions,
+  bool &out_is_const)
+{
+  // Get the array(s) it belongs to
+  expressionst potential_array_exprs;
+  bool array_const=false;
+  bool resolved_array=
+    try_resolve_expression(
+      index_expr.array(),
+      potential_array_exprs,
+      array_const);
+
+  if(resolved_array)
+  {
+    bool all_possible_const=true;
+    for(const exprt &potential_array_expr : potential_array_exprs)
+    {
+      all_possible_const=
+        all_possible_const &&
+        is_type_const(potential_array_expr.type().subtype());
+
+      if(potential_array_expr.id()==ID_array)
+      {
+        // Get the index if we can
+        mp_integer value;
+        if(try_resolve_index_value(index_expr.index(), value))
+        {
+          expressionst array_out_functions;
+          const exprt &func_expr=
+            potential_array_expr.operands()[integer2size_t(value)];
+          bool value_const=false;
+          bool resolved_value=
+            try_resolve_expression(func_expr, array_out_functions, value_const);
+
+          if(resolved_value)
+          {
+            out_expressions.insert(
+              out_expressions.end(),
+              array_out_functions.begin(),
+              array_out_functions.end());
+          }
+          else
+          {
+            return false;
+          }
+        }
+        else
+        {
+          // We don't know what index it is,
+          // but we know the value is from the array
+          for(const exprt &array_entry : potential_array_expr.operands())
+          {
+            expressionst array_contents;
+            bool is_entry_const;
+            bool resolved_value=
+              try_resolve_expression(
+                array_entry, array_contents, is_entry_const);
+
+            if(resolved_value)
+            {
+              for(const exprt &resolved_array_entry : array_contents)
+              {
+                if(resolved_array_entry .is_zero())
+                {
+                  continue;
+                }
+                else
+                {
+                  out_expressions.push_back(resolved_array_entry);
+                }
+              }
+            }
+            else
+            {
+              return false;
+            }
+          }
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    out_is_const=all_possible_const || array_const;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool remove_const_function_pointerst::is_expression_const(
+  const exprt &expression) const
+{
+  return is_type_const(expression.type());
+}
+
+bool remove_const_function_pointerst::is_type_const(const typet &type) const
+{
+  c_qualifierst qualifers(type);
+  if(type.id()==ID_array)
+  {
+    c_qualifierst array_type_qualifers(type.subtype());
+    return qualifers.is_constant || array_type_qualifers.is_constant;
+  }
+  else
+  {
+    return qualifers.is_constant;
+  }
+}

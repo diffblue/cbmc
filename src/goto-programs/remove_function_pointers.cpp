@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "remove_function_pointers.h"
 #include "compute_called_functions.h"
+#include "remove_const_function_pointers.h"
 
 /*******************************************************************\
 
@@ -343,40 +344,48 @@ void remove_function_pointerst::remove_function_pointer(
   assert(function.operands().size()==1);
 
   const exprt &pointer=function.op0();
+  remove_const_function_pointerst::functionst functions;
+  remove_const_function_pointerst fpr(
+    get_message_handler(), pointer, ns, symbol_table);
 
-  // Is this simple?
-  if(pointer.id()==ID_address_of &&
-     to_address_of_expr(pointer).object().id()==ID_symbol)
+  bool found_functions=fpr(functions);
+
+  if(functions.size()==1)
   {
-    to_code_function_call(target->code).function()=
-      to_address_of_expr(pointer).object();
+    to_code_function_call(target->code).function()=*functions.cbegin();
     return;
   }
 
-  typedef std::list<exprt> functionst;
-  functionst functions;
-
-  bool return_value_used=code.lhs().is_not_nil();
-
-  // get all type-compatible functions
-  // whose address is ever taken
-  for(const auto &t : type_map)
+  if(!found_functions)
   {
-    // address taken?
-    if(address_taken.find(t.first)==address_taken.end())
-      continue;
+    debug() << "Failed to optimize away the function pointer\n"
+            << "The type was " << pointer.id() << " "
+            << "irep dump:\n"
+            << pointer.pretty()
+            << eom;
 
-    // type-compatible?
-    if(!is_type_compatible(return_value_used, call_type, t.second))
-      continue;
+    bool return_value_used=code.lhs().is_not_nil();
 
-    if(t.first=="pthread_mutex_cleanup")
-      continue;
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &t : type_map)
+    {
+      // address taken?
+      if(address_taken.find(t.first)==address_taken.end())
+        continue;
 
-    symbol_exprt expr;
-    expr.type()=t.second;
-    expr.set_identifier(t.first);
-    functions.push_back(expr);
+      // type-compatible?
+      if(!is_type_compatible(return_value_used, call_type, t.second))
+        continue;
+
+      if(t.first=="pthread_mutex_cleanup")
+        continue;
+
+      symbol_exprt expr;
+      expr.type()=t.second;
+      expr.set_identifier(t.first);
+        functions.insert(expr);
+    }
   }
 
   // the final target is a skip
