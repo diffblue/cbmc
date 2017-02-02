@@ -232,25 +232,18 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
             // but we know the value is from the array
             for(const exprt &array_entry : potential_array_expr.operands())
             {
+              if(array_entry.is_zero())
+              {
+                continue;
+              }
               functionst potential_functions;
               bool resolved_value=
                 try_resolve_function_call(array_entry, potential_functions);
 
               if(resolved_value)
               {
-                for(const exprt &potential_function : potential_functions)
-                {
-                  if(potential_function.is_zero())
-                  {
-                    continue;
-                  }
-                  else
-                  {
-                    out_functions.insert(
-                      potential_functions.begin(),
-                      potential_functions.end());
-                  }
-                }
+                out_functions.insert(
+                  potential_functions.begin(), potential_functions.end());
               }
               else
               {
