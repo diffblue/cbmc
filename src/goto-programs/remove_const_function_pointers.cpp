@@ -65,9 +65,14 @@ bool remove_const_function_pointerst::try_resolve_function_call(
         }
         else
         {
-          struct_exprt struct_expr=to_struct_expr(expression);
+
+          struct_typet struct_type=to_struct_type(ns.follow(expression.type()));
+          size_t component_number=
+            struct_type.component_number(member_expr.get_component_name());
+
+          const struct_exprt &struct_expr=to_struct_expr(expression);
           const exprt &component_value=
-            struct_expr.operands()[member_expr.get_component_number()];
+            struct_expr.operands()[component_number];
           // TODO: copy into out_functions rather than supply direct like
           bool component_const=is_expression_const(component_value);
 
@@ -383,7 +388,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
           return false;
         }
       }
-      out_is_const=is_expression_const(deref) && pointer_const;
+      out_is_const=pointer_const;
       return true;
     }
     else
@@ -422,17 +427,26 @@ bool remove_const_function_pointerst::try_resolve_expression(
   {
     const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
     bool is_symbol_const=is_expression_const(simplified_expr);
-    bool is_symbol_value_const=false;
-    bool resolved_expression=
-      try_resolve_expression(
-      symbol_value,
-      out_resolved_expression,
-      is_symbol_value_const);
+    //if(is_symbol_const)
+    {
+      bool is_symbol_value_const=false;
+      bool resolved_expression=
+        try_resolve_expression(
+          symbol_value,
+          out_resolved_expression,
+          is_symbol_value_const);
 
-    // If we have a symbol, it is only const if the value it is assigned
-    // is const and it is in fact const.
-    out_is_const=is_symbol_const && is_symbol_const;
-    return resolved_expression;
+      // If we have a symbol, it is only const if the value it is assigned
+      // is const and it is in fact const.
+      out_is_const=is_symbol_value_const && is_symbol_const;
+      return resolved_expression;
+    }
+    /*else
+    {
+      // If the symbol isn't const, we can't know what its value is so
+      // we carry on
+      return false;
+    }*/
   }
   // TOOD: probably need to do something with pointers or address_of
   // and const since a const pointer to a non-const value is useless
