@@ -27,6 +27,7 @@ matrix:
             - libwww-perl
             - clang-3.7
             - libc++-dev
+	    - libstdc++-5-dev
       before_install:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.7 90
       env: COMPILER="clang++-3.7 -stdlib=libstdc++"
@@ -42,3 +43,4 @@ matrix:
 script:
   - make -C src minisat2-download
   - make -C src CXX="$COMPILER" CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
+  - make -C src CXX="$COMPILER" CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
