@@ -41,6 +41,6 @@ matrix:
 script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     make -C src minisat2-download &&
-    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 &&
+    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O0 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 &&
     make -C regression test &&
-    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
+    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O0 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
