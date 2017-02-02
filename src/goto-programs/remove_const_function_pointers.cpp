@@ -52,8 +52,9 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     const exprt &owner_expr=member_expr.compound();
     // Squash the struct
     expressionst out_expressions;
-    bool is_const=false;
-    bool resolved=try_resolve_expression(owner_expr, out_expressions, is_const);
+    bool struct_is_const=false;
+    bool resolved=
+      try_resolve_expression(owner_expr, out_expressions, struct_is_const);
     if(resolved)
     {
       for(const exprt &expression:out_expressions)
@@ -68,9 +69,18 @@ bool remove_const_function_pointerst::try_resolve_function_call(
           const exprt &component_value=
             struct_expr.operands()[member_expr.get_component_number()];
           // TODO: copy into out_functions rather than supply direct like
-          bool resolved=
-            try_resolve_function_call(component_value, out_functions);
-          if(!resolved)
+          bool component_const=is_expression_const(component_value);
+
+          if(component_const || struct_is_const)
+          {
+            bool resolved=
+              try_resolve_function_call(component_value, out_functions);
+            if(!resolved)
+            {
+              return false;
+            }
+          }
+          else
           {
             return false;
           }
