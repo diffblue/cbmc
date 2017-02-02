@@ -1,7 +1,7 @@
-class instanceof1
+class instanceof4
 {
   public static void main(String[] args)
   {
-    assert args instanceof Object;
+    assert "" instanceof String;
   }
 };
