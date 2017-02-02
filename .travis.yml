@@ -1,6 +1,6 @@
 language: cpp
 
-sudo: required
+sudo: false
 
 matrix:
   include:
@@ -14,7 +14,7 @@ matrix:
             - libwww-perl
             - g++-5
       before_install:
-        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 90
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       env: COMPILER=g++-5
     - os: linux
       compiler: clang
@@ -27,7 +27,7 @@ matrix:
             - libwww-perl
             - clang-3.7
       before_install:
-        - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.7 90
+        - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       env: COMPILER=clang++-3.7
     - os: osx
       compiler: gcc
@@ -39,6 +39,8 @@ matrix:
       script: scripts/run_lint.sh master HEAD || true
 
 script:
-  - make -C src minisat2-download
-  - make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 && make -C regression test
-  - make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
+  - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
+    make -C src minisat2-download &&
+    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 &&
+    make -C regression test &&
+    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
