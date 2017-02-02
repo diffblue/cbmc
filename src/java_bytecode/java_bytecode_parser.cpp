@@ -300,6 +300,7 @@ void java_bytecode_parsert::rClassFile()
   u2 this_class=read_u2();
   u2 super_class=read_u2();
 
+  parsed_class.is_abstract=(access_flags&ACC_ABSTRACT)!=0;
   parsed_class.is_enum=(access_flags&ACC_ENUM)!=0;
   parsed_class.name=
     constant(this_class).type().get(ID_C_base_name);

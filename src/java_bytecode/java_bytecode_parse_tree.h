@@ -166,8 +166,8 @@ public:
   {
   public:
     irep_idt name, extends;
-    bool is_abstract;
-    bool is_enum;
+    bool is_abstract=false;
+    bool is_enum=false;
     size_t enum_elements=0;
 
     typedef std::list<irep_idt> implementst;
