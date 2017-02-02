@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>  // for size_t
 #include <vector>
 
+#include "irep_hash.h"
 #include "numbering.h"
 
 class irept;
@@ -19,9 +20,9 @@ class irept;
 class irep_hash_container_baset
 {
 public:
-  unsigned number(const irept &irep);
+  size_t number(const irept &irep);
 
-  irep_hash_container_baset(bool _full):full(_full)
+  explicit irep_hash_container_baset(bool _full):full(_full)
   {
   }
 
@@ -44,20 +45,21 @@ protected:
     }
   };
 
-  typedef std::unordered_map<const void *, unsigned, pointer_hash> ptr_hasht;
+  typedef std::unordered_map<const void *, size_t, pointer_hash>
+    ptr_hasht;
   ptr_hasht ptr_hash;
 
   // this is the second level: content
 
-  typedef std::vector<unsigned> packedt;
+  typedef std::vector<size_t> packedt;
 
   struct vector_hash
   {
     inline size_t operator()(const packedt &p) const
     {
-      size_t result=p.size();
-      for(unsigned i=0; i<p.size(); i++)
-        result^=p[i]<<i;
+      size_t result=p.size(); // seed
+      for(auto elem : p)
+        result=hash_combine(result, elem);
       return result;
     }
   };
