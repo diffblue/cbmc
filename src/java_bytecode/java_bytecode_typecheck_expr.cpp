@@ -10,9 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/prefix.h>
+#include <util/arith_tools.h>
+#include <util/unicode.h>
 
 #include "java_bytecode_typecheck.h"
 #include "java_pointer_casts.h"
+#include "java_types.h"
 
 /*******************************************************************\
 
@@ -112,6 +115,15 @@ static std::string escape_non_alnum(const std::string &toescape)
   return escaped.str();
 }
 
+static array_exprt utf16_to_array(const std::wstring& in)
+{
+  const auto jchar=java_char_type();
+  array_exprt ret(array_typet(jchar, infinity_exprt(java_int_type())));
+  for(const auto c : in)
+    ret.copy_to_operands(from_integer(c, jchar));
+  return ret;
+}
+
 /*******************************************************************\
 
 Function: java_bytecode_typecheckt::typecheck_expr_java_string_literal
@@ -136,14 +148,14 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   auto findit=symbol_table.symbols.find(escaped_symbol_name);
   if(findit!=symbol_table.symbols.end())
   {
-    expr=findit->second.symbol_expr();
+    expr=address_of_exprt(findit->second.symbol_expr());
     return;
   }
 
   // Create a new symbol:
   symbolt new_symbol;
   new_symbol.name=escaped_symbol_name;
-  new_symbol.type=pointer_typet(string_type);
+  new_symbol.type=string_type;
   new_symbol.base_name="Literal";
   new_symbol.pretty_name=value;
   new_symbol.mode=ID_java;
@@ -151,13 +163,56 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   new_symbol.is_lvalue=true;
   new_symbol.is_static_lifetime=true; // These are basically const global data.
 
+  if(string_refinement_enabled)
+  {
+    // Initialise the string with a constant utf-16 array:
+    symbolt array_symbol;
+    array_symbol.name=escaped_symbol_name+"_constarray";
+    array_symbol.type=array_typet(
+      java_char_type(), infinity_exprt(java_int_type()));
+    array_symbol.base_name="Literal_constarray";
+    array_symbol.pretty_name=value;
+    array_symbol.mode=ID_java;
+    array_symbol.is_type=false;
+    array_symbol.is_lvalue=true;
+    // These are basically const global data:
+    array_symbol.is_static_lifetime=true;
+    array_symbol.is_state_var=true;
+    auto literal_array=utf16_to_array(
+      utf8_to_utf16_little_endian(id2string(value)));
+    array_symbol.value=literal_array;
+
+    if(symbol_table.add(array_symbol))
+      throw "failed to add constarray symbol to symtab";
+
+    symbol_typet jlo_symbol("java::java.lang.Object");
+    const auto& jlo_struct=to_struct_type(ns.follow(jlo_symbol));
+    const auto& jls_struct=to_struct_type(ns.follow(string_type));
+
+    struct_exprt literal_init(new_symbol.type);
+    struct_exprt jlo_init(jlo_symbol);
+    jlo_init.copy_to_operands(
+      constant_exprt("java::java.lang.String",
+                     jlo_struct.components()[0].type()));
+    jlo_init.copy_to_operands(
+      from_integer(0, jlo_struct.components()[1].type()));
+    literal_init.move_to_operands(jlo_init);
+    literal_init.copy_to_operands(
+      from_integer(literal_array.operands().size(),
+                   jls_struct.components()[1].type()));
+    literal_init.copy_to_operands(
+      address_of_exprt(array_symbol.symbol_expr()));
+
+    new_symbol.value=literal_init;
+  }
+
   if(symbol_table.add(new_symbol))
   {
     error() << "failed to add string literal symbol to symbol table" << eom;
     throw 0;
   }
 
-  expr=new_symbol.symbol_expr();
+  expr=address_of_exprt(new_symbol.symbol_expr());
 }
 
 /*******************************************************************\

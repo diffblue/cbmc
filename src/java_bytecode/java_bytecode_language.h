@@ -104,6 +104,7 @@ protected:
   size_t max_user_array_length;     // max size for user code created arrays
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
+  bool string_refinement_enabled;
 };
 
 languaget *new_java_bytecode_language();
