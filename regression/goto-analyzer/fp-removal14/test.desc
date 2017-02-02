@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---show-goto-functions
+--show-goto-functions --verbosity 10
 
 ^Removing function pointers and virtual functions$
 ^\s*f3();$

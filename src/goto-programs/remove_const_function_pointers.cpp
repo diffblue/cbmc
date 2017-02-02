@@ -90,6 +90,72 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     address_of_exprt address_expr=to_address_of_expr(simplified_expr);
     return try_resolve_function_call(address_expr.object(), out_functions);
   }
+  else if(simplified_expr.id()==ID_dereference)
+  {
+    // We had a pointer, we need to check both the pointer
+    // type can't be changed, and what it what pointing to
+    // can't be changed
+    const dereference_exprt &deref=to_dereference_expr(simplified_expr);
+    expressionst pointer_values;
+    bool pointer_const;
+    bool resolved=
+      try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
+    if(resolved && is_expression_const(deref))
+    {
+      for(const exprt &pointer_val : pointer_values)
+      {
+        if(pointer_val.id()==ID_address_of)
+        {
+          address_of_exprt address_expr=to_address_of_expr(pointer_val);
+          functionst out_object_values;
+          bool resolved=
+            try_resolve_function_call(
+              address_expr.object(), out_object_values);
+
+          if(resolved)
+          {
+            out_functions.insert(
+              out_object_values.begin(),
+              out_object_values.end());
+          }
+          else
+          {
+            return false;
+          }
+        }
+        else
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else if(simplified_expr.id()==ID_typecast)
+  {
+    // We simply ignore typecasts and assume they are valid
+    // I thought simplify_expr would deal with this, but for example
+    // a cast from a 32 bit width int to a 64bit width int it doesn't seem
+    // to allow
+    typecast_exprt typecast_expr=to_typecast_expr(simplified_expr);
+    functionst typecast_values;
+    bool resolved=
+      try_resolve_function_call(typecast_expr.op(), typecast_values);
+
+    if(resolved)
+    {
+      out_functions.insert(typecast_values.begin(), typecast_values.end());
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
   else if(simplified_expr.id()==ID_symbol)
   {
     if(simplified_expr.type().id()==ID_code)

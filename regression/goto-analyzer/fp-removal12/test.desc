@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---show-goto-functions
+--show-goto-functions --verbosity 10
 
 ^Removing function pointers and virtual functions$
 ^\s*f3();$
@@ -8,8 +8,5 @@ main.c
 --
 ^warning: ignoring
 --
-This test is marked as a KNOWNBUG as it is possible for the function
-pointer to be optimized away. Currently goto-analyzer falls back to
-assuming it could be any type compatible function.
-
-Issue: https://github.com/diffblue/cbmc/issues/476
+This is currently failing because the const is being ignored inside
+the struct
