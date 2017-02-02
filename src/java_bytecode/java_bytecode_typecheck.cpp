@@ -126,10 +126,11 @@ Function: java_bytecode_typecheck
 
 bool java_bytecode_typecheck(
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool string_refinement_enabled)
 {
   java_bytecode_typecheckt java_bytecode_typecheck(
-    symbol_table, message_handler);
+    symbol_table, message_handler, string_refinement_enabled);
   return java_bytecode_typecheck.typecheck_main();
 }
 
