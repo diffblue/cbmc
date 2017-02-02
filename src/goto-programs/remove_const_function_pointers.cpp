@@ -322,6 +322,33 @@ bool remove_const_function_pointerst::try_resolve_expression(
       return false;
     }
   }
+  else if(simplified_expr.id()==ID_typecast)
+  {
+    // We simply ignore typecasts and assume they are valid
+    // I thought simplify_expr would deal with this, but for example
+    // a cast from a 32 bit width int to a 64bit width int it doesn't seem
+    // to allow
+    typecast_exprt typecast_expr=to_typecast_expr(simplified_expr);
+    expressionst typecast_values;
+    bool typecast_const;
+    bool resolved=
+      try_resolve_expression(
+        typecast_expr.op(), typecast_values, typecast_const);
+
+    if(resolved)
+    {
+      out_resolved_expression.insert(
+        out_resolved_expression.end(),
+        typecast_values.begin(),
+        typecast_values.end());
+      out_is_const=typecast_const;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
   else if(simplified_expr.id()==ID_symbol)
   {
     const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
@@ -342,8 +369,8 @@ bool remove_const_function_pointerst::try_resolve_expression(
   // and const since a const pointer to a non-const value is useless
   else
   {
-    out_is_const=is_expression_const(expr);
-    out_resolved_expression.push_back(expr);
+    out_is_const=is_expression_const(simplified_expr);
+    out_resolved_expression.push_back(simplified_expr);
     return true;
   }
 }
