@@ -14,6 +14,12 @@
 class symbol_tablet;
 class goto_functionst;
 
+#define OPT_FUNCTIONS \
+  "(function):"
+
+#define HELP_FUNCTIONS \
+  " --function name              set main function name\n"
+
 class rebuild_goto_start_functiont: public messaget
 {
 public:
