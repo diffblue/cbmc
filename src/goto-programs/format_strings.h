@@ -30,12 +30,29 @@ public:
   typedef enum { ALTERNATE, ZERO_PAD, LEFT_ADJUST,
                  SIGNED_SPACE, SIGN, ASTERISK } flag_typet;
 
-  typedef enum { LEN_h, LEN_hh, LEN_l, LEN_ll, LEN_L, LEN_j, LEN_t } length_modifierst;
+  typedef enum
+  {
+    LEN_undef, LEN_h, LEN_hh, LEN_l, LEN_ll,
+    LEN_L, LEN_j, LEN_t
+  } length_modifierst;
 
-  typedef enum { SIGNED_DEC, UNSIGNED_DEC, UNSIGNED_OCT, UNSIGNED_HEX } representationt;
+  typedef enum
+  {
+    SIGNED_undef, SIGNED_DEC, UNSIGNED_DEC,
+    UNSIGNED_OCT, UNSIGNED_HEX
+  } representationt;
 
-  explicit format_tokent(token_typet _type) : type(_type) { }
-  format_tokent(): type(UNKNOWN) { }
+  explicit format_tokent(token_typet _type)
+    : type(_type),
+      length_modifier(LEN_undef),
+      representation(SIGNED_undef)
+    { }
+  format_tokent():
+    type(UNKNOWN),
+    length_modifier(LEN_undef),
+    representation(SIGNED_undef)
+    { }
+
 
   token_typet type;
   std::list<flag_typet> flags;
