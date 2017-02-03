@@ -15,7 +15,21 @@ Date: May 2016
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
-#include <util/cmdline.h>
+
+class coverage_goalst
+{
+public:
+  static coverage_goalst get_coverage_goals(const std::string &coverage,
+                                      message_handlert &message_handler);
+  void add_goal(source_locationt goal);
+  bool is_existing_goal(source_locationt source_location) const;
+  void set_no_trivial_tests(const bool trivial);
+  const bool get_no_trivial_tests();
+
+private:
+  std::vector<source_locationt> existing_goals;
+  bool no_trivial_tests;
+};
 
 enum class coverage_criteriont
 {
@@ -24,18 +38,31 @@ enum class coverage_criteriont
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  coverage_criteriont,
+  bool function_only=false);
+
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont);
+  coverage_criteriont,
+  bool function_only=false);
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont);
+  coverage_criteriont,
+  const coverage_goalst &goals,
+  bool function_only=false,
+  bool ignore_trivial=false);
 
 bool instrument_cover_goals(
   const cmdlinet &cmdline,
   const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  message_handlert &msgh);
+  goto_programt &goto_program,
+  coverage_criteriont,
+  const coverage_goalst &goals,
+  bool function_only=false,
+  bool ignore_trivial=false);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H
