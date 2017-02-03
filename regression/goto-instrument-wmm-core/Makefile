@@ -31,4 +31,3 @@ show:
 			vim -o "$$dir/*.c" "$$dir/*.out"; \
 		fi; \
 	done;
-

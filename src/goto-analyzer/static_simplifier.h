@@ -12,7 +12,6 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 #include <iosfwd>
 
 #include <util/message.h>
-#include <util/namespace.h>
 #include <util/options.h>
 
 #include <goto-programs/goto_model.h>

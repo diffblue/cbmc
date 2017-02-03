@@ -6,7 +6,14 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <fstream>
+#include <memory>
 
 #include <util/message.h>
 #include <util/json.h>
@@ -37,13 +44,17 @@ bool static_show_domain(
   message_handlert &message_handler,
   std::ostream &out)
 {
-  ai_baset *domain = NULL;
+  ai_baset *domain=nullptr;
+
   namespacet ns(goto_model.symbol_table);
 
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
-      domain=new ait<constant_propagator_domaint>();
+    {
+      //domain=new ait<constant_propagator_domaint>();
+      domain=new constant_propagator_ait(goto_model.goto_functions);
+    }
     else if(options.get_bool_option("intervals"))
       domain=new ait<interval_domaint>();
     else if(options.get_bool_option("dependence-graph"))
@@ -64,7 +75,7 @@ bool static_show_domain(
 #endif
   }
 
-  if(domain==NULL)
+  if(domain==nullptr)
   {
     messaget m(message_handler);
     m.status() << "Task / Interpreter / Domain combination not supported"

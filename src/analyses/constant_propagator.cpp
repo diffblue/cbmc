@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Constant Propagation
+Module: Constant propagation
 
 Author: Peter Schrammel
 
@@ -13,6 +13,7 @@ Author: Peter Schrammel
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
+#include <util/cprover_prefix.h>
 
 #include "constant_propagator.h"
 
@@ -41,7 +42,7 @@ void constant_propagator_domaint::assign_rec(
 
   exprt tmp=rhs;
   values.replace_const(tmp);
-  tmp=simplify_expr(tmp, ns);
+  simplify(tmp, ns);
 
   if(tmp.is_constant())
     values.set_to(s, tmp);
@@ -139,13 +140,13 @@ void constant_propagator_domaint::transform(
 
       if(to==next)
       {
-        if(id=="__CPROVER_set_must" ||
-           id=="__CPROVER_get_must" ||
-           id=="__CPROVER_set_may" ||
-           id=="__CPROVER_get_may" ||
-           id=="__CPROVER_cleanup" ||
-           id=="__CPROVER_clear_may" ||
-           id=="__CPROVER_clear_must")
+        if(id==CPROVER_PREFIX "set_must" ||
+           id==CPROVER_PREFIX "get_must" ||
+           id==CPROVER_PREFIX "set_may" ||
+           id==CPROVER_PREFIX "get_may" ||
+           id==CPROVER_PREFIX "cleanup" ||
+           id==CPROVER_PREFIX "clear_may" ||
+           id==CPROVER_PREFIX "clear_must")
         {
           // no effect on constants
         }
@@ -166,17 +167,19 @@ void constant_propagator_domaint::transform(
         const code_typet &code_type=to_code_type(symbol.type);
         const code_typet::parameterst &parameters=code_type.parameters();
 
-        const code_function_callt::argumentst &arguments
-          =function_call.arguments();
+        const code_function_callt::argumentst &arguments=
+          function_call.arguments();
 
-        unsigned n=std::min(arguments.size(), parameters.size());
-
-        for(unsigned i=0; i<n; i++)
+        code_typet::parameterst::const_iterator p_it=parameters.begin();
+        for(const auto &arg : arguments)
         {
-          const symbol_exprt &parameter_expr
-            =symbol_exprt(parameters[i].get_identifier(), arguments[i].type());
+          if(p_it==parameters.end())
+            break;
 
-          assign_rec(values, parameter_expr, arguments[i], ns);
+          const symbol_exprt parameter_expr(p_it->get_identifier(), arg.type());
+          assign_rec(values, parameter_expr, arg, ns);
+
+          ++p_it;
         }
       }
     }
@@ -201,18 +204,8 @@ void constant_propagator_domaint::transform(
 
     const code_typet &type=to_code_type(symbol.type);
 
-    typedef code_typet::parameterst parameterst;
-    const parameterst &parameters=type.parameters();
-
-    for(parameterst::const_iterator it=parameters.begin();
-        it!=parameters.end(); it++)
-    {
-      // normal parameter
-      const irep_idt par=it->get_identifier();
-
-      // this erases the parameter from the map
-      values.set_to_top(par);
-    }
+    for(const auto &param : type.parameters())
+      values.set_to_top(param.get_identifier());
   }
 
   assert(from->is_goto() || !values.is_bottom);
@@ -245,6 +238,7 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
   bool change=false;
 
+  // this seems to be buggy at present
 #if 0
   if(expr.id()==ID_and)
   {
@@ -282,32 +276,35 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
 /*******************************************************************\
 
-Function: constant_propagator_domaint::domain_simplify
+Function: constant_propagator_domaint::simplify
 
   Inputs: The condition to simplify and its namespace.
 
  Outputs: The simplified condition.
 
  Purpose: Simplify the condition given context-sensitive knowledge
-          from the domain.
+          from the abstract state.
 
 \*******************************************************************/
 
-exprt constant_propagator_domaint::domain_simplify(
-  const exprt &condition,
+bool constant_propagator_domaint::ai_simplify(
+  exprt &condition,
   const namespacet &ns,
   const bool lhs) const
 {
   if(lhs)
   {
     // For now do not simplify the left hand sides of assignments
-    return condition;
+    return true;
   }
   else
   {
-    exprt e(condition);
-    values.replace_const(e);
-    return simplify_expr(e, ns);
+    bool b;
+
+    b=values.replace_const.replace(condition);
+    b&=simplify(condition, ns);
+
+    return b;
   }
 }
 
@@ -396,17 +393,12 @@ Function: constant_propagator_domaint::valuest::set_to_top
 
 bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
 {
-  replace_symbolt::expr_mapt::iterator r_it
-    =replace_const.expr_map.find(id);
+  replace_symbolt::expr_mapt::size_type n_erased=
+    replace_const.expr_map.erase(id);
 
-  if(r_it!=replace_const.expr_map.end())
-  {
-    assert(!is_bottom);
-    replace_const.expr_map.erase(r_it);
-    return true;
-  }
+  assert(n_erased==0 || !is_bottom);
 
-  return false;
+  return n_erased>0;
 }
 
 /*******************************************************************\
@@ -425,7 +417,7 @@ void constant_propagator_domaint::valuest::set_dirty_to_top(
   const dirtyt &dirty,
   const namespacet &ns)
 {
-  typedef replace_symbol_extt::expr_mapt expr_mapt;
+  typedef replace_symbolt::expr_mapt expr_mapt;
   expr_mapt &expr_map=replace_const.expr_map;
 
   for(expr_mapt::iterator it=expr_map.begin();
@@ -475,12 +467,9 @@ void constant_propagator_domaint::valuest::output(
     return;
   }
 
-  for(replace_symbolt::expr_mapt::const_iterator
-      it=replace_const.expr_map.begin();
-      it!=replace_const.expr_map.end();
-      ++it)
+  for(const auto &p : replace_const.expr_map)
   {
-    out << ' ' << it->first << "=" << from_expr(ns, "", it->second) << '\n';
+    out << ' ' << p.first << "=" << from_expr(ns, "", p.second) << '\n';
   }
 }
 
@@ -518,10 +507,6 @@ Function: constant_propagator_domaint::valuest::merge
 
 bool constant_propagator_domaint::valuest::merge(const valuest &src)
 {
-  // dummy
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
   // nothing to do
   if(src.is_bottom)
     return false;
@@ -539,8 +524,8 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
   bool changed=false;
 
-  replace_symbol_extt::expr_mapt &expr_map=replace_const.expr_map;
-  const replace_symbol_extt::expr_mapt &src_expr_map=src.replace_const.expr_map;
+  replace_symbolt::expr_mapt &expr_map=replace_const.expr_map;
+  const replace_symbolt::expr_mapt &src_expr_map=src.replace_const.expr_map;
 
   // handle top
   if(src_expr_map.empty())
@@ -549,8 +534,6 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
     changed=!expr_map.empty();
 
     set_to_top();
-    assert(expr_map.empty());
-    assert(!is_bottom);
 
     return changed;
   }
@@ -607,29 +590,26 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
   if(src.is_bottom || is_bottom)
     return false;
 
-  bool changed = false;
+  bool changed=false;
 
-  for(replace_symbolt::expr_mapt::const_iterator
-      it=src.replace_const.expr_map.begin();
-      it!=src.replace_const.expr_map.end();
-      ++it)
+  for(const auto &m : src.replace_const.expr_map)
   {
     replace_symbolt::expr_mapt::iterator
-      c_it = replace_const.expr_map.find(it->first);
+      c_it=replace_const.expr_map.find(m.first);
 
     if(c_it!=replace_const.expr_map.end())
     {
-      if(c_it->second!=it->second)
+      if(c_it->second!=m.second)
       {
         set_to_bottom();
-        changed = true;
+        changed=true;
         break;
       }
     }
     else
     {
-      set_to(it->first, it->second);
-      changed = true;
+      set_to(m.first, m.second);
+      changed=true;
     }
   }
 
@@ -653,31 +633,7 @@ bool constant_propagator_domaint::merge(
   locationt from,
   locationt to)
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
-#if 0
-  if(to->is_skip())
-  {
-    std::cout << "This:\n";
-    values.output(std::cout, ns);
-    std::cout << "Other:\n";
-    other.values.output(std::cout, ns);
-  }
-#endif
-
-  bool b;
-  b=values.merge(other.values);
-
-#if 0
-  if(to->is_skip())
-  {
-    std::cout << "Merge result:\n";
-    values.output(std::cout, ns);
-  }
-#endif
-
-  return b;
+  return values.merge(other.values);
 }
 
 /*******************************************************************\
@@ -729,13 +685,13 @@ void constant_propagator_ait::replace(
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
       s_it->second.values.replace_const(it->guard);
-      it->guard = simplify_expr(it->guard, ns);
+      simplify(it->guard, ns);
     }
     else if(it->is_assign())
     {
       exprt &rhs=to_code_assign(it->code).rhs();
       s_it->second.values.replace_const(rhs);
-      rhs=simplify_expr(rhs, ns);
+      simplify(rhs, ns);
       if(rhs.id()==ID_constant)
         rhs.add_source_location()=it->code.op0().source_location();
     }
@@ -743,7 +699,8 @@ void constant_propagator_ait::replace(
     {
       s_it->second.values.replace_const(
         to_code_function_call(it->code).function());
-      simplify_expr(to_code_function_call(it->code).function(), ns);
+
+      simplify(to_code_function_call(it->code).function(), ns);
 
       exprt::operandst &args=
         to_code_function_call(it->code).arguments();
@@ -752,7 +709,7 @@ void constant_propagator_ait::replace(
           o_it!=args.end(); ++o_it)
       {
         s_it->second.values.replace_const(*o_it);
-        *o_it=simplify_expr(*o_it, ns);
+        simplify(*o_it, ns);
       }
     }
     else if(it->is_other())

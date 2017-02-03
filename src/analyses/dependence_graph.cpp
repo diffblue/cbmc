@@ -12,6 +12,7 @@ Date: August 2013
 #include <cassert>
 
 #include <util/json.h>
+#include <util/json_expr.h>
 
 #include "goto_rw.h"
 
@@ -359,41 +360,33 @@ Function: dep_graph_domaint::output_json
 
 \*******************************************************************/
 
-
 jsont dep_graph_domaint::output_json(
   const ai_baset &ai,
   const namespacet &ns) const
 {
   json_arrayt graph;
 
-  for(dep_graph_domaint::depst::const_iterator cdi=control_deps.begin();
-      cdi!=control_deps.end();
-      ++cdi)
+  for(const auto &cd : control_deps)
   {
     json_objectt &link=graph.push_back().make_object();
-    link["location_number"]=
-      json_numbert(std::to_string((*cdi)->location_number));
-    link["source_location"]=
-      json_stringt((*cdi)->source_location.as_string());
+    link["locationNumber"]=
+      json_numbert(std::to_string(cd->location_number));
+    link["sourceLocation"]=json(cd->source_location);
     link["type"]=json_stringt("control");
   }
 
-  for(dep_graph_domaint::depst::const_iterator ddi=data_deps.begin();
-      ddi!=data_deps.end();
-      ++ddi)
+  for(const auto &dd : data_deps)
   {
     json_objectt &link=graph.push_back().make_object();
-    link["location_number"]=
-      json_numbert(std::to_string((*ddi)->location_number));
-    link["source_location"]=
-      json_stringt((*ddi)->source_location.as_string());
+    link["locationNumber"]=
+      json_numbert(std::to_string(dd->location_number));
+    link["sourceLocation"]=json(dd->source_location);
+      json_stringt(dd->source_location.as_string());
     link["type"]=json_stringt("data");
   }
 
   return graph;
 }
-
-
 
 /*******************************************************************\
 
