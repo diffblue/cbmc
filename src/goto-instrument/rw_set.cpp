@@ -2,9 +2,9 @@
 
 Module: Race Detection for Threaded Goto Programs
 
-Author: Daniel Kroening
+Author: Daniel Kroening, Lihao Liang
 
-Date: February 2006
+Date: June 2016
 
 \*******************************************************************/
 
@@ -289,5 +289,129 @@ void rw_set_functiont::compute_rec(const exprt &function)
   {
     compute_rec(to_if_expr(function).true_case());
     compute_rec(to_if_expr(function).false_case());
+  }
+} 
+
+/*******************************************************************\
+
+Function: rw_set_loc_rect::compute_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void rw_set_loc_rect::compute_rec(recursion_sett &recursion_set)
+{
+  if(target->is_function_call())
+  {
+    // look into function body
+    // get function name
+    code_function_callt deref_code=
+      to_code_function_call(target->code);
+    const exprt &function=deref_code.function();
+    const irep_idt &identifier=function.get(ID_identifier);
+
+    // if not seen before
+    if(recursion_set.find(identifier)==recursion_set.end())
+    {
+      recursion_set.insert(identifier);
+
+      if(function.id()==ID_symbol)
+      {
+        const irep_idt &id=to_symbol_expr(function).get_identifier();
+
+        goto_functionst::function_mapt::const_iterator f_it=
+          goto_functions.function_map.find(id);
+
+        if(f_it!=goto_functions.function_map.end())
+        {
+          const goto_programt &body=f_it->second.body;
+
+          forall_goto_program_instructions(i_it, body)
+          {
+            *this+=rw_set_loc_rect(ns, value_sets, i_it,
+#ifdef LOCAL_MAY
+              local_may,
+#endif
+              goto_functions, recursion_set);
+          }
+        }
+      }
+      else if(function.id()==ID_if)
+      {
+        *this+=rw_set_function_rect(
+          value_sets, ns, goto_functions, to_if_expr(function).true_case(), recursion_set);
+        *this+=rw_set_function_rect(
+          value_sets, ns, goto_functions, to_if_expr(function).false_case(), recursion_set);
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: rw_set_function_rect::compute_func_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void rw_set_function_rect::compute_func_rec(
+const exprt &function, recursion_sett &recursion_set)
+{
+  if(function.id()==ID_symbol)
+  {
+    const irep_idt &id=to_symbol_expr(function).get_identifier();
+    compute_func_rec(id, recursion_set);
+  }
+  else if(function.id()==ID_if)
+  {
+    compute_func_rec(to_if_expr(function).true_case(), recursion_set);
+    compute_func_rec(to_if_expr(function).false_case(), recursion_set);
+  }
+}
+
+/*******************************************************************\
+
+Function: rw_set_function_rect::compute_func_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void rw_set_function_rect::compute_func_rec(
+const irep_idt &function, recursion_sett &recursion_set)
+{
+  goto_functionst::function_mapt::const_iterator f_it=
+    goto_functions.function_map.find(function);
+
+  if(f_it!=goto_functions.function_map.end())
+  {
+    const goto_programt &body=f_it->second.body;
+
+#ifdef LOCAL_MAY
+    local_may_aliast local_may(f_it->second);
+#endif
+
+    forall_goto_program_instructions(i_it, body)
+    {
+      *this+=rw_set_loc_rect(ns, value_sets, i_it,
+#ifdef LOCAL_MAY
+        local_may,
+#endif
+        goto_functions, recursion_set);
+    }
   }
 }
