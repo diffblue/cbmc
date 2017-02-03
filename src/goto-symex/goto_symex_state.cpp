@@ -29,6 +29,7 @@ Function: goto_symex_statet::goto_symex_statet
 
 goto_symex_statet::goto_symex_statet():
   depth(0),
+  is_start_thread(false),
   symex_target(NULL),
   atomic_section_id(0),
   record_events(true)
@@ -1104,4 +1105,8 @@ void goto_symex_statet::switch_to_thread(unsigned t)
   source.pc=threads[t].pc;
 
   guard=threads[t].guard;
+
+  // set priority
+  is_start_thread=true;
+  source.priority=threads[t].priority;
 }

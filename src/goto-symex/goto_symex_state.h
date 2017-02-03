@@ -30,6 +30,7 @@ public:
   // distance from entry
   unsigned depth;
 
+  bool is_start_thread;
   guardt guard;
   symex_targett::sourcet source;
   symex_targett *symex_target;
@@ -316,9 +317,11 @@ public:
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
     unsigned atomic_section_id;
+    unsigned priority;
 
     threadt():
-      atomic_section_id(0)
+      atomic_section_id(0),
+      priority(0)
     {
     }
   };

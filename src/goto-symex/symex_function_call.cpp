@@ -9,6 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -239,6 +242,16 @@ void goto_symext::symex_function_call_symbol(
   const irep_idt &identifier=
     to_symbol_expr(code.function()).get_identifier();
 
+  if(state.is_start_thread)
+  {
+    state.is_start_thread=false;
+ 
+    #ifdef DEBUG
+    std::cout << "Thread id: " << identifier << std::endl;
+    std::cout << "Priority: " << state.source.priority << std::endl;
+    #endif
+  }
+ 
   if(identifier=="CBMC_trace")
   {
     symex_trace(state, code);

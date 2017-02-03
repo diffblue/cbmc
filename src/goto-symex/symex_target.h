@@ -28,10 +28,12 @@ public:
     unsigned thread_nr;
     goto_programt::const_targett pc;
     bool is_set;
+    unsigned priority;
 
     sourcet():
       thread_nr(0),
-      is_set(false)
+      is_set(false),
+      priority(0)
     {
     }
 
@@ -39,14 +41,16 @@ public:
       goto_programt::const_targett _pc):
       thread_nr(0),
       pc(_pc),
-      is_set(true)
+      is_set(true),
+      priority(0)
     {
     }
 
     explicit sourcet(const goto_programt &_goto_program):
       thread_nr(0),
       pc(_goto_program.instructions.begin()),
-      is_set(true)
+      is_set(true),
+      priority(0)
     {
     }
   };
