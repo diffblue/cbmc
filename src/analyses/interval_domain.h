@@ -90,8 +90,8 @@ public:
     return bottom;
   }
 
-  virtual exprt domain_simplify(
-    const exprt &condition,
+  virtual bool ai_simplify(
+    exprt &condition,
     const namespacet &ns,
     const bool lhs=false) const;
 

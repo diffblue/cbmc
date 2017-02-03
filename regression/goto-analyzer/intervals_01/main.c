@@ -3,7 +3,7 @@
 int main()
 {
   int i, j=20;
-  
+
   if(i>=20)
     assert(i>=10);
 

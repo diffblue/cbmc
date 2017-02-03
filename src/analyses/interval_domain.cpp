@@ -528,25 +528,28 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
 
 /*******************************************************************\
 
-Function: interval_domaint::domain_simplify
+Function: interval_domaint::simplify
 
   Inputs: The expression to simplify.
 
  Outputs: A simplified version of the expression.
 
- Purpose: Uses the domain to simplify a given expression using context-specific information.
+ Purpose: Uses the abstract state to simplify a given expression
+          using context-specific information.
 
 \*******************************************************************/
 
-exprt interval_domaint::domain_simplify(
-  const exprt &condition,
+bool interval_domaint::ai_simplify(
+  exprt &condition,
   const namespacet &ns,
   const bool lhs) const
 {
+  bool unchanged=true;
+
   if(lhs)
   {
     // For now do not simplify the left hand side of assignments
-    return condition;
+    return true;
   }
 
   interval_domaint d(*this);
@@ -565,9 +568,8 @@ exprt interval_domaint::domain_simplify(
 
     if(!a.join(d))
     {
-      exprt e;
-      e.make_true();
-      return e;
+      unchanged=condition.is_true();
+      condition.make_true();
     }
   }
   else if(condition.id()==ID_symbol)
@@ -579,11 +581,10 @@ exprt interval_domaint::domain_simplify(
     d.assume(not_exprt(condition), ns);
     if(d.is_bottom())
     {
-      exprt e;
-      e.make_true();
-      return e;
+      unchanged=condition.is_true();
+      condition.make_true();
     }
   }
 
-  return condition;
+  return unchanged;
 }

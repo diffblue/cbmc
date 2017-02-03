@@ -37,7 +37,10 @@ public:
     type_map.insert(std::pair<irep_idt, typet>(identifier, type));
   }
 
-  virtual bool replace(exprt &dest) const;
+  virtual bool replace(
+    exprt &dest,
+    const bool replace_with_const=true) const;
+
   virtual bool replace(typet &dest) const;
 
   void operator()(exprt &dest) const

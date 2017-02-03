@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 #include <iosfwd>
-#include <sstream>
 
 #include <util/json.h>
 #include <util/xml.h>
@@ -60,24 +59,11 @@ public:
 
   virtual jsont output_json(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    json_stringt json(out.str());
-    return json;
-  }
+    const namespacet &ns) const;
 
   virtual xmlt output_xml(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    xmlt xml("domain");
-    xml.data=out.str();
-    return xml;
-  }
+    const namespacet &ns) const;
 
   // no states
   virtual void make_bottom()=0;
@@ -97,14 +83,16 @@ public:
   // Return true if "this" has changed.
 
   // This method allows an expression to be simplified / evaluated using the
-  // current value of the domain.  It is used to evaluate assertions and in
-  // program simplification
-  virtual exprt domain_simplify(
-    const exprt &condition,
+  // current state.  It is used to evaluate assertions and in program
+  // simplification
+
+  // return true if unchanged
+  virtual bool ai_simplify(
+    exprt &condition,
     const namespacet &ns,
     const bool lhs=false) const
   {
-    return condition;
+    return true;
   }
 };
 

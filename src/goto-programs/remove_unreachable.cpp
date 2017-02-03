@@ -61,4 +61,3 @@ void remove_unreachable(goto_functionst &goto_functions)
   Forall_goto_functions(f_it, goto_functions)
     remove_unreachable(f_it->second.body);
 }
-

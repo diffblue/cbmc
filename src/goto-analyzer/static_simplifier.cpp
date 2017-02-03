@@ -52,7 +52,7 @@ protected:
   analyzerT domain;
 
   void simplify_program(void);
-  unsigned simplify_guard(goto_programt::instructionst::iterator &i_it);
+  bool simplify_guard(goto_programt::instructionst::iterator &i_it);
 };
 
 /*******************************************************************\
@@ -96,30 +96,6 @@ bool static_simplifiert<analyzerT>::operator()(void)
   return write_goto_binary(out, ns.get_symbol_table(), goto_functions);
 }
 
-
-/*******************************************************************\
-
-Function: static_simplifiert<analyzerT>::simplify_guard
-
-  Inputs: An iterator pointing to an instruction.
-
- Outputs: 1 if simplified, 0 if not.
-
- Purpose: Simplifies the instruction's guard using the information in
-          the abstract domain.
-
-\*******************************************************************/
-
-template<class analyzerT>
-unsigned static_simplifiert<analyzerT>::simplify_guard(
-  goto_programt::instructionst::iterator &i_it)
-{
-  exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
-  unsigned return_value=(simplified==i_it->guard)?0:1;
-  i_it->guard=simplified;
-  return return_value;
-}
-
 /*******************************************************************\
 
 Function: static_simplifiert<analyzerT>::simplify_program
@@ -138,6 +114,13 @@ void static_simplifiert<analyzerT>::simplify_program()
 {
   struct counterst
   {
+    counterst() :
+      asserts(0),
+      assumes(0),
+      gotos(0),
+      assigns(0),
+      function_calls(0) {}
+
     unsigned asserts;
     unsigned assumes;
     unsigned gotos;
@@ -145,8 +128,8 @@ void static_simplifiert<analyzerT>::simplify_program()
     unsigned function_calls;
   };
 
-  counterst simplified={0, 0, 0, 0, 0};
-  counterst unmodified={0, 0, 0, 0, 0};
+  counterst simplified;
+  counterst unmodified;
 
   Forall_goto_functions(f_it, goto_functions)
   {
@@ -154,70 +137,66 @@ void static_simplifiert<analyzerT>::simplify_program()
     {
       if(i_it->is_assert())
       {
-        unsigned result=simplify_guard(i_it);
-        simplified.asserts+=result;
-        unmodified.asserts+=(1-result);
+        bool unchanged=domain[i_it].ai_simplify(i_it->guard, ns);
+
+        if(unchanged)
+          unmodified.asserts++;
+        else
+          simplified.asserts++;
       }
       else if(i_it->is_assume())
       {
-        unsigned result=simplify_guard(i_it);
-        simplified.assumes+=result;
-        unmodified.assumes+=(1-result);
+        bool unchanged=domain[i_it].ai_simplify(i_it->guard, ns);
+
+        if(unchanged)
+          unmodified.assumes++;
+        else
+          simplified.assumes++;
       }
       else if(i_it->is_goto())
       {
-        unsigned result=simplify_guard(i_it);
-        simplified.gotos+=result;
-        unmodified.gotos+=(1-result);
+        bool unchanged=domain[i_it].ai_simplify(i_it->guard, ns);
+
+        if(unchanged)
+          unmodified.gotos++;
+        else
+          simplified.gotos++;
       }
       else if(i_it->is_assign())
       {
-        code_assignt assign(to_code_assign(i_it->code));
+        code_assignt &assign=to_code_assign(i_it->code);
 
-        /*
-        Simplification needs to be aware of which side of the
-        expression it is handling as:
-        <i=0, j=1>  i=j
-        should simplify to i=1, not to 0=1.
-        */
+        // Simplification needs to be aware of which side of the
+        // expression it is handling as:
+        // <i=0, j=1>  i=j
+        // should simplify to i=1, not to 0=1.
 
-        exprt simp_lhs=domain[i_it].domain_simplify(assign.lhs(), ns, true);
-        exprt simp_rhs=domain[i_it].domain_simplify(assign.rhs(), ns, false);
+        bool unchanged_lhs=
+          domain[i_it].ai_simplify(assign.lhs(), ns, true);
 
-        unsigned result=(simp_lhs==assign.lhs() &&
-                         simp_rhs==assign.rhs())?0:1;
+        bool unchanged_rhs=
+          domain[i_it].ai_simplify(assign.rhs(), ns, false);
 
-        simplified.assigns+=result;
-        unmodified.assigns+=(1-result);
-
-        assign.lhs()=simp_lhs;
-        assign.rhs()=simp_rhs;
-        i_it->code=assign;
+        if(unchanged_lhs && unchanged_rhs)
+          unmodified.assigns++;
+        else
+          simplified.assigns++;
       }
       else if(i_it->is_function_call())
       {
-        unsigned result=0;
-        code_function_callt fcall(to_code_function_call(i_it->code));
+        code_function_callt &fcall=to_code_function_call(i_it->code);
 
-        exprt new_function=domain[i_it].domain_simplify(fcall.function(), ns);
-        result|=(new_function==fcall.function()) ? 0 : 1;
-        fcall.function()=new_function;
+        bool unchanged=domain[i_it].ai_simplify(fcall.function(), ns);
 
         exprt::operandst &args=fcall.arguments();
 
-        for(exprt::operandst::iterator o_it=args.begin();
-            o_it!=args.end();
-            ++o_it)
-        {
-          exprt new_arg=domain[i_it].domain_simplify(*o_it, ns);
-          result|=(new_arg==*o_it) ? 0 : 1;
-          *o_it=new_arg;
-        }
+        for(auto &o : args)
+          unchanged&=domain[i_it].ai_simplify(o, ns);
 
-        i_it->code=fcall;
-
-        simplified.function_calls+=result;
-        unmodified.function_calls+=(1-result);
+        if(unchanged)
+          unmodified.function_calls++;
+        else
+          simplified.function_calls++;
       }
     }
   }
@@ -225,14 +204,14 @@ void static_simplifiert<analyzerT>::simplify_program()
   // Make sure the references are correct.
   goto_functions.update();
 
-  status() << "SIMPLIFIED: "
+  status() << "Simplified: "
            << " assert: " << simplified.asserts
            << ", assume: " << simplified.assumes
            << ", goto: " << simplified.gotos
            << ", assigns: " << simplified.assigns
            << ", function calls: " << simplified.function_calls
            << "\n"
-           << "UNMODIFIED: "
+           << "Unmodified: "
            << " assert: " << unmodified.asserts
            << ", assume: " << unmodified.assumes
            << ", goto: " << unmodified.gotos

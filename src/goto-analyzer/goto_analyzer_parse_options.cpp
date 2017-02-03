@@ -678,7 +678,7 @@ void goto_analyzer_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2016 ";
+    "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
@@ -702,7 +702,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Abstract interpreter options:\n"
     " --flow-sensitive             use flow-sensitive abstract interpreter\n"
-    " --concurrent                 use concurrent abstract interpreter\n"
+    " --concurrent                 use concurrency-aware abstract interpreter\n"
     "\n"
     "Domain options:\n"
     " --constants                  constant domain\n"
