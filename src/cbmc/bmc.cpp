@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/memory_model_sc.h>
 #include <goto-symex/memory_model_tso.h>
 #include <goto-symex/memory_model_pso.h>
+#include <goto-symex/memory_model_interrupt.h>
 
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
@@ -422,10 +423,12 @@ safety_checkert::resultt bmct::run(
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_tsot(ns));
   else if(mm=="pso")
     memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
+  else if(mm=="irq")
+    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_interruptt(ns));
   else
   {
     error() << "Invalid memory model " << mm
-            << " -- use one of sc, tso, pso" << eom;
+            << " -- use one of sc, tso, pso, irq" << eom;
     return safety_checkert::ERROR;
   }
 
