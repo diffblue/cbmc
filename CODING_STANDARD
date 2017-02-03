@@ -92,6 +92,35 @@ Header files:
   of the header file rather than in line
 - Guard headers with #ifndef CPROVER_DIRECTORIES_FILE_H, etc
 
+Make files
+- Each source file should appear on a separate line
+- The final source file should still be followed by a trailing slash
+- The last line should be a comment to not be deleted, i.e. should look like:
+```
+SRC = source_file.cpp \
+      source_file2.cpp \
+      # Empty last line
+```
+- This ensures the Makefiles can be easily merged.
+
+Program Command Line Options
+- Each program contains a program_name_parse_optionst class which should
+  contain a define PROGRAM_NAME_PARSE_OPTIONS which is a string of all the
+  parse options in brackets (with a colon after the bracket if it takes a
+  parameter)
+- Each parameter should be one per line to yield easy merging
+- If parameters are shared between programs, they should be pulled out into
+  a common file and then included using a define
+- The defines should be OPT_FLAG_NAMES which should go into the OPTIONS define
+- The defines should include HELP_FLAG_NAMES which should contain the help
+  output of the format:
+  ```
+  " --flag                explanations\n" \
+  " --another flag        more explanation\n" \
+   <-------30 chars------>
+- The defines may include PARSE_OPTIONS_FLAG_NAMES which move the options
+  from the command line into the options
+
 C++ features:
 - Do not use namespaces.
 - Prefer use of 'typedef' insted of 'using'.
