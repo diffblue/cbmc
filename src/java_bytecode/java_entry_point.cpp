@@ -543,7 +543,12 @@ bool java_entry_point(
        max_nondet_array_length))
     return true;
 
-  return generate_java_start_function(symbol, symbol_table, message_handler);
+  return generate_java_start_function(
+    symbol,
+    symbol_table,
+    message_handler,
+    assume_init_pointers_not_null,
+    max_nondet_array_length);
 }
 
 /*******************************************************************\
@@ -565,7 +570,9 @@ Function: generate_start_function
 bool generate_java_start_function(
   const symbolt &symbol,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  size_t max_nondet_array_length)
 {
   messaget message(message_handler);
   code_blockt init_code;

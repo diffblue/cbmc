@@ -104,7 +104,9 @@ bool java_bytecode_languaget::generate_start_function(
   return generate_java_start_function(
     entry_function_symbol,
     symbol_table,
-    get_message_handler());
+    get_message_handler(),
+    assume_inputs_non_null,
+    max_nondet_array_length);
 }
 
 /*******************************************************************\
