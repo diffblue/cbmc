@@ -69,7 +69,7 @@ bool rebuild_goto_start_functiont::operator()(
       symbol_table);
 
   // Remove the function from the goto_functions so it is copied back in
-  // from the symbol table
+  // from the symbol table during goto_convert
   if(!return_code)
   {
     const auto &start_function=

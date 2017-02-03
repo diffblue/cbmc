@@ -6,6 +6,8 @@ DIRS = ansi-c \
        cpp \
        goto-analyzer \
        goto-cc-cbmc \
+       goto-cc-goto-analyzer \
+       goto-cc-goto-symex \
        goto-diff \
        goto-gcc \
        goto-instrument \

@@ -494,6 +494,7 @@ void goto_analyzer_parse_optionst::help()
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"

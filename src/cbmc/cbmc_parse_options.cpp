@@ -1009,7 +1009,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
-    " --function name              set main function name\n"
+    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
