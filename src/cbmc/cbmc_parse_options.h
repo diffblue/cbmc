@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <langapi/language_ui.h>
 
@@ -23,7 +24,8 @@ class goto_functionst;
 class optionst;
 
 #define CBMC_OPTIONS \
-  "(program-only)(function):(preprocess)(slice-by-trace):" \
+  "(program-only)(preprocess)(slice-by-trace):" \
+  OPT_FUNCTIONS \
   "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \

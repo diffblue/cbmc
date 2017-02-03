@@ -1,0 +1,9 @@
+CORE
+main.c
+"--function fun --show-goto-functions"
+
+^\s*return.=fun(x);$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring

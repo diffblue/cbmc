@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/unicode.h>
 
+#include <goto-programs/rebuild_goto_start_function.h>
+
 #include <langapi/mode.h>
 #include <langapi/language_ui.h>
 
@@ -32,7 +34,8 @@ Function: get_goto_modelt::operator()
 
 \*******************************************************************/
 
-bool get_goto_modelt::operator()(const std::vector<std::string> &files)
+bool get_goto_modelt::operator()(
+  const std::vector<std::string> &files)
 {
   if(files.empty())
   {
@@ -128,6 +131,20 @@ bool get_goto_modelt::operator()(const std::vector<std::string> &files)
 
       if(read_object_and_link(file, *this, get_message_handler()))
         return true;
+    }
+
+    if(config.main!="")
+    {
+      const std::string &function_id=config.main;
+      rebuild_goto_start_functiont start_function_rebuilder(
+        get_message_handler(),
+        symbol_table,
+        goto_functions);
+
+      if(start_function_rebuilder(function_id))
+      {
+        return true;
+      }
     }
 
     if(!binaries.empty())

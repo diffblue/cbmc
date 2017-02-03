@@ -697,7 +697,7 @@ void symex_parse_optionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
-    " --function name              set main function name\n"
+    HELP_FUNCTIONS
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

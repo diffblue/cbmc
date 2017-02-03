@@ -84,7 +84,7 @@ bool rebuild_goto_start_functiont::operator()(const irep_idt &entry_function)
       symbol_table);
 
   // Remove the function from the goto_functions so is copied back in
-  // from the symbol table
+  // from the symbol table during goto_convert
   if(!return_code)
   {
     const auto &start_function=goto_functions.function_map.find(ID__start);
