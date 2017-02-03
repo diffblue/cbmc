@@ -305,6 +305,8 @@ void memory_model_sct::write_serialization_external(
         // s -> w_evt1 before w_evt2; !s -> w_evt2 before w_evt1
 
         symbol_exprt s=nondet_bool_symbol("ws-ext");
+        ww_pair_symbols[
+          std::make_pair(*w_it1, *w_it2)]=s;
 
         // write-to-write edge
         add_constraint(
@@ -378,6 +380,8 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
           ws1=before(*w_prime, *w);
           ws2=before(*w, *w_prime);
         }
+        
+        ww_pairs[std::make_pair(*w_prime, *w)]=std::make_pair(ws1, ws2);
 
         // smells like cubic
         for(choice_symbolst::const_iterator

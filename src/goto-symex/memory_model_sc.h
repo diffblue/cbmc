@@ -36,6 +36,14 @@ protected:
   void program_order(symex_target_equationt &equation);
   void from_read(symex_target_equationt &equation);
   void write_serialization_external(symex_target_equationt &equation);
+
+  // W-W pair
+  // built by write_serialization_external()
+  choice_symbolst ww_pair_symbols;
+  // built by from_read()
+  typedef std::map<
+    std::pair<event_it, event_it>, std::pair<exprt, exprt> > ww_pairst;
+  ww_pairst ww_pairs;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_SC_H
