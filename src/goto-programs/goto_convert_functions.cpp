@@ -76,6 +76,9 @@ void goto_convert_functionst::goto_convert()
 
   forall_symbols(it, symbol_table.symbols)
   {
+    // For each code symbol that:
+    // isn't a macro or type(?? - can a code symbol also be a type?)
+    // is one of the supported languages (either C, C++, Java or JSIL)
     if(!it->second.is_type &&
        !it->second.is_macro &&
        it->second.type.id()==ID_code &&
