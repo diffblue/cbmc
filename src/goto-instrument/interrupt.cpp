@@ -2,11 +2,15 @@
 
 Module: Interrupt Instrumentation
 
-Author: Daniel Kroening
+Author: Daniel Kroening, Lihao Liang
 
-Date: September 2011
+Date: June 2016
 
 \*******************************************************************/
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/cprover_prefix.h>
 #include <util/std_expr.h>
@@ -17,66 +21,11 @@ Date: September 2011
 #include <goto-programs/goto_functions.h>
 
 #include "interrupt.h"
-#include "rw_set.h"
+#include "interrupt_util.h"
 
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>
 #endif
-
-/*******************************************************************\
-
-Function: poential_race_on_read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool potential_race_on_read(
-  const rw_set_baset &code_rw_set,
-  const rw_set_baset &isr_rw_set)
-{
-  // R/W race?
-  forall_rw_set_r_entries(e_it, code_rw_set)
-  {
-    if(isr_rw_set.has_w_entry(e_it->first))
-      return true;
-  }
-
-  return false;
-}
-
-/*******************************************************************\
-
-Function: poential_race_on_write
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool potential_race_on_write(
-  const rw_set_baset &code_rw_set,
-  const rw_set_baset &isr_rw_set)
-{
-  // W/R or W/W?
-  forall_rw_set_w_entries(e_it, code_rw_set)
-  {
-    if(isr_rw_set.has_r_entry(e_it->first))
-      return true;
-
-    if(isr_rw_set.has_w_entry(e_it->first))
-      return true;
-  }
-
-  return false;
-}
 
 /*******************************************************************\
 
@@ -187,51 +136,6 @@ void interrupt(
 
 /*******************************************************************\
 
-Function: get_isr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-symbol_exprt get_isr(
-  const symbol_tablet &symbol_table,
-  const irep_idt &interrupt_handler)
-{
-  std::list<symbol_exprt> matches;
-
-  forall_symbol_base_map(m_it, symbol_table.symbol_base_map, interrupt_handler)
-  {
-    // look it up
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(m_it->second);
-
-    if(s_it==symbol_table.symbols.end()) continue;
-
-    if(s_it->second.type.id()==ID_code)
-      matches.push_back(s_it->second.symbol_expr());
-  }
-
-  if(matches.empty())
-    throw "interrupt handler `"+id2string(interrupt_handler)+"' not found";
-
-  if(matches.size()>=2)
-    throw "interrupt handler `"+id2string(interrupt_handler)+"' is ambiguous";
-
-  symbol_exprt isr=matches.front();
-
-  if(!to_code_type(isr.type()).parameters().empty())
-    throw "interrupt handler `"+id2string(interrupt_handler)+
-          "' must not have parameters";
-
-  return isr;
-}
-
-/*******************************************************************\
-
 Function: interrupt
 
   Inputs:
@@ -268,6 +172,133 @@ void interrupt(
         f_it->second,
 #endif
         f_it->second.body, isr, isr_rw_set);
+
+  goto_functions.update();
+}
+
+/*******************************************************************\
+
+Function: nested_interrupts
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: partial-order reduction for nested interrupts
+
+\*******************************************************************/
+
+void nested_interrupts(
+  value_setst &value_sets,
+  const symbol_tablet &symbol_table,
+#ifdef LOCAL_MAY
+  const goto_functionst::goto_functiont& goto_function,
+#endif
+  goto_programt &goto_program,
+  const symbol_exprt &scheduling_function,
+  const isr_rw_set_mapt &isr_rw_set_map)
+{
+  const namespacet ns(symbol_table);
+
+  Forall_goto_program_instructions(i_it, goto_program)
+  {
+
+#ifdef LOCAL_MAY
+    local_may_aliast local_may(goto_function);
+#endif
+    rw_set_loct rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+    );
+
+    // potential race?
+    bool race_on_read=false;
+    bool race_on_write=false;
+
+    for(isr_rw_set_mapt::const_iterator
+        it=isr_rw_set_map.begin();
+        it!=isr_rw_set_map.end();
+        ++it)
+    {
+      const rw_set_function_rect &isr_rw_set=it->second;
+
+      if(!race_on_read && potential_race_on_read(rw_set, isr_rw_set))
+        race_on_read=true;
+      if(!race_on_write && potential_race_on_write(rw_set, isr_rw_set))
+        race_on_write=true;
+
+      if (race_on_write)
+        break;
+    }
+
+    if(race_on_read || race_on_write)
+      insert_function_before_instruction(goto_program, i_it, scheduling_function);
+
+    if(race_on_write)
+      insert_function_after_instruction(goto_program, i_it, scheduling_function);
+  }
+}
+
+/*******************************************************************\
+
+Function: nested_interrupts
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void nested_interrupts(
+  value_setst &value_sets,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  const irep_idt &scheduling_function)
+{
+  // look up the scheduling function
+  symbol_exprt sched_f=get_isr(symbol_table, scheduling_function);
+
+  // look up all ISRs
+  const namespacet ns(symbol_table);
+  isr_mapt isr_map;
+  build_isr_map(ns, isr_map);
+
+  if(isr_map.size()<=0) {
+    #ifdef DEBUG
+    std::cout << "No interrupt handlers found" << std::endl;
+    #endif
+    return;
+  }
+
+  // figure out which objects are read/written by the ISR
+  isr_rw_set_mapt isr_rw_set_map;
+  for(isr_mapt::const_iterator
+      isr_it=isr_map.begin();
+      isr_it!=isr_map.end();
+      ++isr_it)
+  {
+    recursion_sett recursion_set;
+    rw_set_function_rect isr_rw_set(
+      value_sets, ns, goto_functions, isr_it->second, recursion_set);
+    isr_rw_set_map.insert(
+      std::pair<irep_idt, rw_set_function_rect>(isr_it->second, isr_rw_set));
+  }
+
+  // now instrument
+
+  Forall_goto_functions(f_it, goto_functions)
+    if(f_it->first!=CPROVER_PREFIX "initialize" &&
+       f_it->first!=goto_functionst::entry_point() &&
+       f_it->first!=sched_f.get_identifier())
+      nested_interrupts(
+        value_sets, symbol_table,
+#ifdef LOCAL_MAY
+        f_it->second,
+#endif
+        f_it->second.body, sched_f, isr_rw_set_map);
 
   goto_functions.update();
 }
