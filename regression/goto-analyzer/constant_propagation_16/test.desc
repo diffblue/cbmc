@@ -1,8 +1,7 @@
-FUTURE
-constant_propagation_16.c
---constants --verify
+CORE
+main.c
+--show --constants
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_16.c line 9 function main, assertion y==0: FAILURE (if reachable)$
 --
 ^warning: ignoring

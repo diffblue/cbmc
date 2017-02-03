@@ -1,9 +1,8 @@
 FUTURE
-constant_propagation_10.c
---constants --simplify out.goto
+main.c
+--constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^SIMPLIFIED:  assert: 1, assume: 0, goto: 4, assigns: 10, function calls: 0$
-^UNMODIFIED:  assert: 0, assume: 0, goto: 1, assigns: 10, function calls: 2$
+^\[main.assertion.1\] file main.c line 10 function main, assertion a\[0\]==2: Failure$
 --
 ^warning: ignoring
