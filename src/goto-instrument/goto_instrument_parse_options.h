@@ -96,7 +96,7 @@ protected:
 
   void eval_verbosity();
 
-  void do_function_pointer_removal();
+  void do_indirect_call_and_rtti_removal(bool force=false);
   void do_partial_inlining();
   void do_remove_returns();
 

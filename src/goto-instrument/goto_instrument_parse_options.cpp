@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
@@ -246,7 +248,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-value-sets"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
 
       // recalculate numbers, etc.
@@ -263,7 +265,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-global-may-alias"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
       do_remove_returns();
       parameter_assignments(symbol_table, goto_functions);
@@ -281,7 +283,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-local-bitvector-analysis"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
       parameter_assignments(symbol_table, goto_functions);
 
@@ -305,7 +307,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
       do_remove_returns();
       parameter_assignments(symbol_table, goto_functions);
@@ -331,7 +333,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-escape-analysis"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
       do_remove_returns();
       parameter_assignments(symbol_table, goto_functions);
@@ -351,7 +353,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("custom-bitvector-analysis"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
       do_remove_returns();
       parameter_assignments(symbol_table, goto_functions);
@@ -382,7 +384,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-points-to"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
 
       // recalculate numbers, etc.
@@ -399,7 +401,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-intervals"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
       do_partial_inlining();
 
       // recalculate numbers, etc.
@@ -433,7 +435,7 @@ int goto_instrument_parse_optionst::doit()
 
       if(!cmdline.isset("inline"))
       {
-        do_function_pointer_removal();
+        do_indirect_call_and_rtti_removal();
         do_partial_inlining();
 
         // recalculate numbers, etc.
@@ -460,7 +462,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-reaching-definitions"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
 
       const namespacet ns(symbol_table);
       reaching_definitions_analysist rd_analysis(ns);
@@ -483,7 +485,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-dependence-graph"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
 
       const namespacet ns(symbol_table);
       dependence_grapht dependence_graph(ns);
@@ -674,7 +676,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("accelerate"))
     {
-      do_function_pointer_removal();
+      do_indirect_call_and_rtti_removal();
 
       namespacet ns(symbol_table);
 
@@ -757,7 +759,7 @@ int goto_instrument_parse_optionst::doit()
 
 /*******************************************************************\
 
-Function: goto_instrument_parse_optionst::do_function_pointer_removal
+Function: goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal
 
   Inputs:
 
@@ -767,9 +769,10 @@ Function: goto_instrument_parse_optionst::do_function_pointer_removal
 
 \*******************************************************************/
 
-void goto_instrument_parse_optionst::do_function_pointer_removal()
+void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
+  bool force)
 {
-  if(function_pointer_removal_done)
+  if(function_pointer_removal_done && !force)
     return;
 
   function_pointer_removal_done=true;
@@ -779,6 +782,10 @@ void goto_instrument_parse_optionst::do_function_pointer_removal()
     symbol_table,
     goto_functions,
     cmdline.isset("pointer-check"));
+  status() << "Virtual function removal" << eom;
+  remove_virtual_functions(symbol_table, goto_functions);
+  status() << "Java instanceof removal" << eom;
+  remove_instanceof(symbol_table, goto_functions);
 }
 
 /*******************************************************************\
@@ -954,7 +961,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -980,7 +987,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("escape-analysis"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
     do_partial_inlining();
     do_remove_returns();
     parameter_assignments(symbol_table, goto_functions);
@@ -1009,14 +1016,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
   if(cmdline.isset("function-inline"))
   {
     std::string function=cmdline.get_value("function-inline");
     assert(!function.empty());
 
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
     status() << "Inlining calls of function `" << function << "'" << eom;
 
@@ -1067,7 +1074,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("partial-inline"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
     status() << "Partial inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler, true);
@@ -1079,11 +1086,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    status() << "Function Pointer Removal" << eom;
-    remove_function_pointers(
-      symbol_table,
-      goto_functions,
-      cmdline.isset("pointer-check"));
+    do_indirect_call_and_rtti_removal(/*force=*/true);
 
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -1099,7 +1102,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("constant-propagator"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
     status() << "Propagating Constants" << eom;
 
@@ -1161,7 +1164,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("isr") ||
      cmdline.isset("concurrency"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
     do_partial_inlining();
 
     status() << "Pointer Analysis" << eom;
@@ -1400,7 +1403,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    do_function_pointer_removal();
+    do_indirect_call_and_rtti_removal();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
