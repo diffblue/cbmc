@@ -37,7 +37,7 @@ protected:
 
   // this is the first level: address of the content
 
-  struct pointer_hash
+  struct pointer_hasht
   {
     inline size_t operator()(const void *p) const
     {
@@ -45,7 +45,7 @@ protected:
     }
   };
 
-  typedef std::unordered_map<const void *, size_t, pointer_hash>
+  typedef std::unordered_map<const void *, size_t, pointer_hasht>
     ptr_hasht;
   ptr_hasht ptr_hash;
 
@@ -53,7 +53,7 @@ protected:
 
   typedef std::vector<size_t> packedt;
 
-  struct vector_hash
+  struct vector_hasht
   {
     inline size_t operator()(const packedt &p) const
     {
@@ -64,7 +64,7 @@ protected:
     }
   };
 
-  typedef hash_numbering<packedt, vector_hash> numberingt;
+  typedef hash_numbering<packedt, vector_hasht> numberingt;
   numberingt numbering;
 
   void pack(const irept &irep, packedt &);
