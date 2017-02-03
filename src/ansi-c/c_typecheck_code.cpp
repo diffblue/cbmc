@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: c_typecheck_baset::init
+Function: c_typecheck_baset::start_typecheck_code
 
   Inputs:
 
