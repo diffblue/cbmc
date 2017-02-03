@@ -202,7 +202,8 @@ public:
     }
 
     // the below replicate levelt2 member functions
-    void level2_get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
+    void level2_get_variables(
+      std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
       for(level2t::current_namest::const_iterator
           it=level2_current_names.begin();
@@ -221,7 +222,8 @@ public:
 
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
-  typedef std::map<goto_programt::const_targett, goto_state_listt> goto_state_mapt;
+  typedef std::map<goto_programt::const_targett, goto_state_listt>
+          goto_state_mapt;
 
   // stack frames -- these are used for function calls and
   // for exceptions
@@ -302,9 +304,11 @@ public:
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>
+          read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
+          written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
 

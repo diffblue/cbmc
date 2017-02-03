@@ -323,13 +323,15 @@ private:
   inline symbol_exprt node_symbol(
       const evtt &evt,
       const std::string &prefix) const;
-  std::vector<std::pair<symbol_exprt, symbol_exprt> > atomic_section_bounds[AC_N_AXIOMS];
+  std::vector<std::pair<symbol_exprt, symbol_exprt> >
+    atomic_section_bounds[AC_N_AXIOMS];
 
   std::list<exprt> acyclic_constraints[AC_N_AXIOMS];
   static std::string check_to_string(const acyclict check);
 
   // map point-wise order to a single Boolean symbol
-  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt> > evt_dir_pairt;
+  typedef std::pair<evtt const*,
+          std::pair<unsigned, evtt::event_dirt> > evt_dir_pairt;
   typedef std::map<std::pair<evt_dir_pairt, evt_dir_pairt>,
           symbol_exprt> pointwise_mapt;
   pointwise_mapt edge_cache[AC_N_AXIOMS];
