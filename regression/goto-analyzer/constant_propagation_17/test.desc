@@ -1,9 +1,0 @@
-FUTURE
-constant_propagation_17.c
---constants --verify
-^EXIT=0$
-^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_17.c line 11 function main, assertion a\[0\]==1 || a\[0\]==2: SUCCESS$
-^\[main.assertion.2\] file constant_propagation_17.c line 12 function main, assertion a\[0\]==1 && a\[0\]==2: FAILURE$
---
-^warning: ignoring
