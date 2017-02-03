@@ -34,8 +34,8 @@ void java_bytecode_parse_treet::classt::swap(
 {
   other.name.swap(name);
   other.extends.swap(extends);
-  other.is_enum=is_enum;
-  other.enum_elements=enum_elements;
+  std::swap(other.is_enum, is_enum);
+  std::swap(other.enum_elements, enum_elements);
   std::swap(other.is_abstract, is_abstract);
   other.implements.swap(implements);
   other.fields.swap(fields);
