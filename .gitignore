@@ -25,12 +25,9 @@ src/util/irep_ids.inc
 
 # regression/test files
 *.out
-regression/ansi-c/tests.log
-regression/symex/tests.log
-regression/cbmc-java/tests.log
-regression/cbmc/tests.log
-src/big-int/test-bigint
-src/big-int/test-bigint.exe
+regression/**/tests.log
+regression/**/*.gb
+regression/**/*.smt2
 
 # regression/coverage file
 /regression/coverage_**
@@ -81,6 +78,10 @@ src/symex/symex
 src/symex/symex.exe
 src/goto-diff/goto-diff
 src/goto-diff/goto-diff.exe
+src/clobber/clobber
+src/clobber/clobber.exe
+src/big-int/test-bigint
+src/big-int/test-bigint.exe
 
 # build tools
 src/ansi-c/file_converter
