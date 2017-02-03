@@ -190,7 +190,8 @@ void memory_model_sct::thread_spawn(
           n_it!=next_thread->second.end() &&
           (*n_it)->is_memory_barrier();
           ++n_it)
-        ;
+        {
+        }
 
       if(n_it!=next_thread->second.end())
         add_constraint(
