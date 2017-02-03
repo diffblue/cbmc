@@ -1,7 +1,7 @@
 CORE
 main.c
 --show-symbol-table
-^Type\.*: const struct struct_tag_name$
+^Type\.*: volatile struct struct_tag_name$
 ^Type\.*: const double$
 ^EXIT=0$
 ^SIGNAL=0$
