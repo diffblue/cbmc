@@ -1298,7 +1298,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // Scheduling function
     if(cmdline.isset("scheduling-function"))
     {
-      status() << "Instrumenting scheduling function for nested interrupts" << eom;
+      status() << "Instrumenting scheduling function for nested interrupts"
+               << eom;
       nested_interrupts(
         value_set_analysis,
         symbol_table,

@@ -268,8 +268,10 @@ void rw_set_functiont::compute_rec(const exprt &function)
 #ifdef LOCAL_MAY
       local_may_aliast local_may(f_it->second);
 #if 0
-      for(goto_functionst::function_mapt::const_iterator g_it=goto_functions.function_map.begin();
-        g_it!=goto_functions.function_map.end(); ++g_it)
+      for(goto_functionst::function_mapt::const_iterator
+          g_it=goto_functions.function_map.begin();
+          g_it!=goto_functions.function_map.end();
+          ++g_it)
         local_may(g_it->second);
 #endif
 #endif
@@ -342,10 +344,10 @@ void rw_set_loc_rect::compute_rec(recursion_sett &recursion_set)
       }
       else if(function.id()==ID_if)
       {
-        *this+=rw_set_function_rect(
-          value_sets, ns, goto_functions, to_if_expr(function).true_case(), recursion_set);
-        *this+=rw_set_function_rect(
-          value_sets, ns, goto_functions, to_if_expr(function).false_case(), recursion_set);
+        *this+=rw_set_function_rect(value_sets, ns, goto_functions,
+          to_if_expr(function).true_case(), recursion_set);
+        *this+=rw_set_function_rect(value_sets, ns, goto_functions,
+          to_if_expr(function).false_case(), recursion_set);
       }
     }
   }

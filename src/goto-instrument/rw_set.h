@@ -351,7 +351,8 @@ protected:
   recursion_sett &recursion_set;
 
   void compute_func_rec(const exprt &function, recursion_sett &recursion_set);
-  void compute_func_rec(const irep_idt &function, recursion_sett &recursion_set);
+  void compute_func_rec(const irep_idt &function,
+    recursion_sett &recursion_set);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_RW_SET_H

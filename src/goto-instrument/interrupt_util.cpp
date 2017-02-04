@@ -206,7 +206,8 @@ void build_isr_map(const namespacet &ns, isr_mapt &isr_map)
 
   forall_operands(thread_it, thread_array_expr)
   {
-    const irep_idt &thread_name=to_string_constant(thread_it->op0().op0()).get_value();
+    const irep_idt &thread_name=
+      to_string_constant(thread_it->op0().op0()).get_value();
     isr_map[i]=thread_name;
     i++;
   }

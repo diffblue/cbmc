@@ -233,10 +233,12 @@ void nested_interrupts(
     }
 
     if(race_on_read || race_on_write)
-      insert_function_before_instruction(goto_program, i_it, scheduling_function);
+      insert_function_before_instruction(
+        goto_program, i_it, scheduling_function);
 
     if(race_on_write)
-      insert_function_after_instruction(goto_program, i_it, scheduling_function);
+      insert_function_after_instruction(
+        goto_program, i_it, scheduling_function);
   }
 }
 
