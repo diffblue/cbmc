@@ -189,7 +189,7 @@ void _rw_set_loct::read_write_rec(
       if(it->id()==ID_unknown)
       {
         /* as an under-approximation */
-        //std::cout << "Sorry, LOCAL_MAY too imprecise. Omitting some variables."
+        // std::cout << "Sorry, LOCAL_MAY too imprecise. Omitting some variables."
         //  << std::endl;
         irep_idt object=ID_unknown;
 
@@ -219,7 +219,6 @@ void _rw_set_loct::read_write_rec(
   else if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-
   }
   else if(expr.id()==ID_if)
   {
@@ -290,7 +289,7 @@ void rw_set_functiont::compute_rec(const exprt &function)
     compute_rec(to_if_expr(function).true_case());
     compute_rec(to_if_expr(function).false_case());
   }
-} 
+}
 
 /*******************************************************************\
 

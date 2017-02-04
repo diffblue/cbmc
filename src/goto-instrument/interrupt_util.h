@@ -30,10 +30,10 @@ bool potential_race_on_read(
   const rw_set_baset &code_rw_set,
   const rw_set_baset &isr_rw_set);
 
- bool potential_race_on_write(
+bool potential_race_on_write(
   const rw_set_baset &code_rw_set,
   const rw_set_baset &isr_rw_set);
- 
+
 void insert_function_before_instruction(
   goto_programt &goto_program,
   goto_programt::targett &i_it,
@@ -45,7 +45,7 @@ void insert_function_after_instruction(
   const symbol_exprt &function);
 
 void build_isr_map(
-  const namespacet &ns, 
+  const namespacet &ns,
   isr_mapt &isr_map);
 
 #endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_UTIL_H

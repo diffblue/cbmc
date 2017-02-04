@@ -34,13 +34,14 @@ symbol_exprt get_isr(
     // look it up
     symbol_tablet::symbolst::const_iterator s_it=
       symbol_table.symbols.find(m_it->second);
-    
-    if(s_it==symbol_table.symbols.end()) continue;
-  
+
+    if(s_it==symbol_table.symbols.end())
+      continue;
+
     if(s_it->second.type.id()==ID_code)
       matches.push_back(s_it->second.symbol_expr());
   }
-  
+
   if(matches.empty())
     throw "interrupt handler `"+id2string(interrupt_handler)+"' not found";
 
@@ -48,7 +49,7 @@ symbol_exprt get_isr(
     throw "interrupt handler `"+id2string(interrupt_handler)+"' is ambiguous";
 
   symbol_exprt isr=matches.front();
-  
+
   if(!to_code_type(isr.type()).parameters().empty())
     throw "interrupt handler `"+id2string(interrupt_handler)+
           "' must not have parameters";
@@ -78,7 +79,7 @@ bool potential_race_on_read(
     if(isr_rw_set.has_w_entry(e_it->first))
       return true;
   }
-  
+
   return false;
 }
 
@@ -107,7 +108,7 @@ bool potential_race_on_write(
     if(isr_rw_set.has_w_entry(e_it->first))
       return true;
   }
-  
+
   return false;
 }
 
@@ -134,11 +135,11 @@ void insert_function_before_instruction(
 
   const source_locationt &source_location=
     original_instruction.source_location;
-  
+
   code_function_callt function_call;
   function_call.add_source_location()=source_location;
   function_call.function()=function;
-  
+
   goto_programt::targett t_call=i_it;
   goto_programt::targett t_orig=goto_program.insert_after(t_call);
 
@@ -147,7 +148,7 @@ void insert_function_before_instruction(
   t_call->function=original_instruction.function;
 
   t_orig->swap(original_instruction);
-  
+
   i_it=t_orig; // the for loop already counts us up
 }
 
@@ -170,20 +171,20 @@ void insert_function_after_instruction(
 {
   goto_programt::targett t_orig=i_it;
   t_orig++;
-  
+
   goto_programt::targett t_call=goto_program.insert_after(i_it);
-  
+
   const source_locationt &source_location=i_it->source_location;
-  
+
   code_function_callt function_call;
   function_call.add_source_location()=source_location;
   function_call.function()=function;
-  
+
   t_call->make_function_call(function_call);
   t_call->source_location=source_location;
   t_call->function=i_it->function;
 
-  i_it=t_call; // the for loop already counts us up      
+  i_it=t_call; // the for loop already counts us up
 }
 
 /*******************************************************************\

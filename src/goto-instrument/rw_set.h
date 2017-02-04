@@ -136,7 +136,7 @@ protected:
   const goto_programt::const_targett target;
 
 #ifdef LOCAL_MAY
-  local_may_aliast& local_may;
+  local_may_aliast &local_may;
 #endif
 
   inline void read(const exprt &expr)
@@ -179,7 +179,7 @@ public:
 #ifdef LOCAL_MAY
       , may
 #endif
-   )
+    )
   {
     compute();
   }
@@ -251,7 +251,8 @@ protected:
   bool dereferencing;
   std::vector<entryt> dereferenced;
 
-  void track_deref(const entryt& entry, bool read) {
+  void track_deref(const entryt& entry, bool read)
+  {
     if(dereferencing && dereferenced.size()==0)
     {
       dereferenced.insert(dereferenced.begin(), entry);
@@ -263,11 +264,13 @@ protected:
         dereferenced.front().object));
   }
 
-  void set_track_deref() {
+  void set_track_deref()
+  {
     dereferencing=true;
   }
 
-  void reset_track_deref() {
+  void reset_track_deref()
+  {
     dereferencing=false;
     dereferenced.clear();
   }

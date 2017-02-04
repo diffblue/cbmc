@@ -203,7 +203,6 @@ void nested_interrupts(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-
 #ifdef LOCAL_MAY
     local_may_aliast local_may(goto_function);
 #endif
@@ -229,7 +228,7 @@ void nested_interrupts(
       if(!race_on_write && potential_race_on_write(rw_set, isr_rw_set))
         race_on_write=true;
 
-      if (race_on_write)
+      if(race_on_write)
         break;
     }
 
@@ -267,7 +266,8 @@ void nested_interrupts(
   isr_mapt isr_map;
   build_isr_map(ns, isr_map);
 
-  if(isr_map.size()<=0) {
+  if(isr_map.size()<=0)
+  {
     #ifdef DEBUG
     std::cout << "No interrupt handlers found" << std::endl;
     #endif
