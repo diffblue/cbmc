@@ -8,8 +8,8 @@ Date: June 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_INTERRUPT_UTIL_H
-#define CPROVER_INTERRUPT_UTIL_H
+#ifndef CPROVER_GOTO_INSTRUMENT_INTERRUPT_UTIL_H
+#define CPROVER_GOTO_INSTRUMENT_INTERRUPT_UTIL_H
 
 #include <unordered_map>
 #include "rw_set.h"
@@ -48,4 +48,4 @@ void build_isr_map(
   const namespacet &ns, 
   isr_mapt &isr_map);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_UTIL_H
