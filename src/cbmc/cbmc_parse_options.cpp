@@ -550,6 +550,8 @@ int cbmc_parse_optionst::doit()
   if(set_properties(goto_functions))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
+  // unwinds <clinit> loops to number of enum elements
+  // side effect: add this as explicit unwind to unwind set
   if(options.get_bool_option("java-unwind-enum-static"))
     remove_static_init_loops(symbol_table, goto_functions, options);
 
