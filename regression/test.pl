@@ -4,6 +4,8 @@ use subs;
 use strict;
 use warnings;
 
+use Cwd;
+
 my $has_thread_pool = eval
 {
   # "http://www.cpan.org/authors/id/J/JW/JWU/Thread-Pool-Simple/Thread-Pool-Simple-0.25.tar.gz"
@@ -61,13 +63,9 @@ sub test($$$$$) {
   my ($name, $test, $t_level, $cmd, $ign) = @_;
   my ($level, $input, $options, $grep_options, @results) = load("$test");
 
-  # If the 4th line starts with a '-' we use that line as options to pass to
-  # grep when matching all lines in this test
-  if($grep_options =~ /^-/) {
-    print "\nActivating perl flags: $grep_options\n";
-  }
-  else {
-    # No grep options so stick this back into the results array
+  # If the 4th line is activate-multi-line-match we enable multi-line checks
+  if($grep_options ne "activate-multi-line-match") {
+    # No such flag, so we add it back in
     unshift @results, $grep_options;
     $grep_options = "";
   }
@@ -117,10 +115,43 @@ sub test($$$$$) {
           $included--;
         } else {
           my $r;
-          $result =~ s/\\/\\\\/g;
-          $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
-          system("bash", "-c", "grep $grep_options \$'$result' '$name/$output' >/dev/null");
-          $r = ($included ? $? != 0 : $? == 0);
+
+          my $dir = getcwd();
+          my $abs_path = "$dir/$name/$output";
+          open(my $fh => $abs_path) || die "Cannot open '$name/$output': $!";
+
+          # Multi line therefore we run each check across the whole output
+          if($grep_options eq "activate-multi-line-match") {
+            local $/ = undef;
+            binmode $fh;
+            my $whole_file = <$fh>;
+            my $is_match = $whole_file =~ /$result/;
+            $r = ($included ? !$is_match : $is_match);
+          }
+          else
+          {
+            my $found_line = 0;
+            while(my $line = <$fh>) {
+              if($line =~ /$result/) {
+                # We've found the line, therefore if it is included we set
+                # the result to 0 (OK) If it is excluded, we set the result
+                # to 1 (FAILED)
+                $r = !$included;
+                $found_line = 1;
+                last;
+              }
+            }
+
+            if($found_line == 0) {
+              # None of the lines matched, therefore the result is set to
+              # 0 (OK) if and only if the line was not meant to be included
+              $r = $included;
+            }
+
+          }
+          close($fh);
+
+
           if($r) {
             print LOG "$result [FAILED]\n";
             $failed = 1;
@@ -185,7 +216,7 @@ follows the format specified below. Any line starting with // will be ignored.
 <level>
 <main source>
 <options>
-<grep_options>
+<activate-multi-line-match>
 <required patterns>
 --
 <disallowed patterns>
@@ -193,16 +224,15 @@ follows the format specified below. Any line starting with // will be ignored.
 <comment text>
 
 where
-  <level>                is one of CORE, THOROUGH, FUTURE or KNOWNBUG
-  <main source>          is a file with extension .c/.i/.gb/.cpp/.ii/.xml/.class/.jar
-  <options>              additional options to be passed to CMD
-  <grep_options>         additional flags to be passed to grep when checking required
-                         patterns (this is optional, if the line stats with a `-'
-                         it will be used as grep options. Otherwise, it will be
-                         considered part of the required patterns)
-  <required patterns>    one or more lines of regualar expressions that must occur in the output
-  <disallowed patterns>  one or more lines of expressions that must not occur in output
-  <comment text>         free form text
+  <level>                         is one of CORE, THOROUGH, FUTURE or KNOWNBUG
+  <main source>                   is a file with extension .c/.i/.gb/.cpp/.ii/.xml/.class/.jar
+  <options>                       additional options to be passed to CMD
+  <activate-multi-line-match>     The fourth line can optionally be activate-multi-line-match, if this is the
+                                  case then each of the rules will be matched over multiple lines (so can contain)
+                                  the new line symbol (\\n) inside them.
+  <required patterns>             one or more lines of regualar expressions that must occur in the output
+  <disallowed patterns>           one or more lines of expressions that must not occur in output
+  <comment text>                  free form text
 
 EOF
   exit 1;
