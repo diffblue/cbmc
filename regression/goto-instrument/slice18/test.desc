@@ -1,6 +1,6 @@
-CORE
+KNOWNBUG
 main.c
---floatbv --full-slice
+--full-slice
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
-CORE
+KNOWNBUG
 main.c
---unwind 2 --full-slice
+--full-slice
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
