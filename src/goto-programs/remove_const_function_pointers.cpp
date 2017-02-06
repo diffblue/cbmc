@@ -73,14 +73,19 @@ bool remove_const_function_pointerst::try_resolve_function_call(
           const struct_exprt &struct_expr=to_struct_expr(expression);
           const exprt &component_value=
             struct_expr.operands()[component_number];
-          // TODO: copy into out_functions rather than supply direct like
           bool component_const=is_expression_const(component_value);
 
           if(component_const || struct_is_const)
           {
+            functionst component_functions;
             bool resolved=
-              try_resolve_function_call(component_value, out_functions);
-            if(!resolved)
+              try_resolve_function_call(component_value, component_functions);
+            if(resolved)
+            {
+              out_functions.insert(
+                component_functions.begin(), component_functions.end());
+            }
+            else
             {
               return false;
             }
