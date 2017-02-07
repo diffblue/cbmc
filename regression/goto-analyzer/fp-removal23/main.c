@@ -24,6 +24,9 @@ const struct action rec = { .fun = f2 };
 const void_fp fp_all[] = {f1, f2 ,f3, f4, f5 ,f6, f7, f8, f9};
 
 void func(int i){
+
+  // Illegal:
+  //rec.fun = &f5;
    const void_fp fp = rec.fun;
    fp();
 }
