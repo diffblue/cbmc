@@ -125,7 +125,11 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     bool pointer_const;
     bool resolved=
       try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
-    if(resolved && is_expression_const(deref))
+
+    // Here we require that the value we are dereferencing is const
+    // The actual type doesn't matter since we are on the RHS so what matters
+    // is where this gets stored, but the value stored matters
+    if(resolved && pointer_const)
     {
       for(const exprt &pointer_val : pointer_values)
       {
