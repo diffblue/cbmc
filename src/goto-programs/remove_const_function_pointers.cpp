@@ -73,7 +73,12 @@ bool remove_const_function_pointerst::try_resolve_function_call(
           const struct_exprt &struct_expr=to_struct_expr(expression);
           const exprt &component_value=
             struct_expr.operands()[component_number];
-          bool component_const=is_expression_const(component_value);
+
+          // Find out if the component is constant
+          struct_union_typet::componentt component=
+            struct_type.components()[component_number];
+
+          bool component_const=is_type_const(component.type());
 
           if(component_const || struct_is_const)
           {
