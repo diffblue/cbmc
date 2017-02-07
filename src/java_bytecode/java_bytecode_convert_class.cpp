@@ -53,7 +53,16 @@ public:
       convert(parse_tree.parsed_class);
     else if(string_refinement_enabled &&
             parse_tree.parsed_class.name=="java.lang.String")
-      add_string_type();
+      add_string_type("java.lang.String");
+    else if(string_refinement_enabled &&
+            parse_tree.parsed_class.name=="java.lang.StringBuilder")
+      add_string_type("java.lang.StringBuilder");
+    else if(string_refinement_enabled &&
+            parse_tree.parsed_class.name=="java.lang.CharSequence")
+      add_string_type("java.lang.CharSequence");
+    else if(string_refinement_enabled &&
+            parse_tree.parsed_class.name=="java.lang.StringBuffer")
+      add_string_type("java.lang.StringBuffer");
     else
       generate_class_stub(parse_tree.parsed_class.name);
   }
@@ -75,7 +84,7 @@ protected:
 
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
-  void add_string_type();
+  void add_string_type(const irep_idt &class_name);
 };
 
 void java_bytecode_convert_classt::convert(const classt &c)
@@ -349,10 +358,11 @@ bool java_bytecode_convert_class(
 
 /// Implements the java.lang.String type in the case that we provide an internal
 /// implementation.
-void java_bytecode_convert_classt::add_string_type()
+/// \param class_name: a name for the class such as "java.lang.String"
+void java_bytecode_convert_classt::add_string_type(const irep_idt &class_name)
 {
   class_typet string_type;
-  string_type.set_tag("java.lang.String");
+  string_type.set_tag(class_name);
   string_type.components().resize(3);
   string_type.components()[0].set_name("@java.lang.Object");
   string_type.components()[0].set_pretty_name("@java.lang.Object");
@@ -370,8 +380,8 @@ void java_bytecode_convert_classt::add_string_type()
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
   symbolt string_symbol;
-  string_symbol.name="java::java.lang.String";
-  string_symbol.base_name="java.lang.String";
+  string_symbol.name="java::"+id2string(class_name);
+  string_symbol.base_name=id2string(class_name);
   string_symbol.type=string_type;
   string_symbol.is_type=true;
 
@@ -383,8 +393,8 @@ void java_bytecode_convert_classt::add_string_type()
   symbolt string_equals_symbol;
   string_equals_symbol.name=
     "java::java.lang.String.equals:(Ljava/lang/Object;)Z";
-  string_equals_symbol.base_name="java.lang.String.equals";
-  string_equals_symbol.pretty_name="java.lang.String.equals";
+  string_equals_symbol.base_name=id2string(class_name)+".equals";
+  string_equals_symbol.pretty_name=id2string(class_name)+".equals";
   string_equals_symbol.mode=ID_java;
 
   code_typet string_equals_type;
