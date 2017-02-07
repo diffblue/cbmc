@@ -331,44 +331,52 @@ bool remove_const_function_pointerst::try_resolve_expression(
 
     expressionst potential_structs;
     bool is_struct_const;
-    try_resolve_expression(
-      member_expr.compound(), potential_structs, is_struct_const);
+    bool resolved_struct=
+      try_resolve_expression(
+        member_expr.compound(), potential_structs, is_struct_const);
 
-    bool all_components_const=true;
-    for(const exprt &potential_struct : potential_structs)
+    if(resolved_struct)
     {
-      if(potential_struct.id()==ID_struct)
+      bool all_components_const=true;
+      for(const exprt &potential_struct : potential_structs)
       {
-        struct_exprt struct_expr=to_struct_expr(potential_struct);
-        const exprt &component_value=
-          struct_expr.operands()[member_expr.get_component_number()];
-        expressionst out_expressions;
-        bool component_const=false;
-        bool resolved=
-          try_resolve_expression(
-            component_value, out_expressions, component_const);
-        if(resolved)
+        if(potential_struct.id()==ID_struct)
         {
-          out_resolved_expression.insert(
-            out_resolved_expression.end(),
-            out_expressions.begin(),
-            out_expressions.end());
+          struct_exprt struct_expr=to_struct_expr(potential_struct);
+          const exprt &component_value=
+            struct_expr.operands()[member_expr.get_component_number()];
+          expressionst out_expressions;
+          bool component_const=false;
+          bool resolved=
+            try_resolve_expression(
+              component_value, out_expressions, component_const);
+          if(resolved)
+          {
+            out_resolved_expression.insert(
+              out_resolved_expression.end(),
+              out_expressions.begin(),
+              out_expressions.end());
 
-          all_components_const=
-            all_components_const && component_const;
+            all_components_const=
+              all_components_const && component_const;
+          }
+          else
+          {
+            return false;
+          }
         }
         else
         {
           return false;
         }
       }
-      else
-      {
-        return false;
-      }
+      out_is_const=all_components_const||is_struct_const;
+      return true;
     }
-    out_is_const=all_components_const||is_struct_const;
-    return true;
+    else
+    {
+      return false;
+    }
   }
   else if(simplified_expr.id()==ID_dereference)
   {
