@@ -1719,7 +1719,11 @@ void value_set_fit::apply_code(
   }
   else if(statement==ID_input || statement==ID_output)
   {
-	  // doesn't do anything
+    // doesn't do anything
+  }
+  else if(statement==ID_output)
+  {
+    // doesn't do anything
   }
   else
     throw

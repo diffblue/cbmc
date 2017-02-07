@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check --full-slice
+^EXIT=0$
+^SIGNAL=0$
+^size of program expression: 678 steps$
+^simple slicing removed 24 assignments$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
