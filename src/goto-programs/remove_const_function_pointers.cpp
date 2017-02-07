@@ -250,6 +250,10 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
                 array_out_functions.begin(),
                 array_out_functions.end());
             }
+            else
+            {
+              return false;
+            }
           }
           else
           {
