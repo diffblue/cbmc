@@ -1,0 +1,8 @@
+KNOWNBUG
+main.c
+--full-slice
+^EXIT=6$
+^SIGNAL=0$
+^\-\-full\-slice does not support C/Pthreads yet$
+--
+^warning: ignoring
