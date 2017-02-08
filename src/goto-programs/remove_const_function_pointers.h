@@ -54,6 +54,12 @@ private:
   bool is_expression_const(const exprt &expression) const;
   bool is_type_const(const typet &type) const;
 
+  exprt get_component_value(
+    const struct_exprt &struct_expr, const member_exprt &member_expr);
+
+  typet get_component_type(
+    const struct_exprt &struct_expr, const member_exprt &member_expr);
+
   const exprt original_expression;
   const namespacet &ns;
   const symbol_tablet &symbol_table;

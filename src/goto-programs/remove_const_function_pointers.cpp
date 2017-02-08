@@ -65,20 +65,13 @@ bool remove_const_function_pointerst::try_resolve_function_call(
         }
         else
         {
-
-          struct_typet struct_type=to_struct_type(ns.follow(expression.type()));
-          size_t component_number=
-            struct_type.component_number(member_expr.get_component_name());
-
           const struct_exprt &struct_expr=to_struct_expr(expression);
           const exprt &component_value=
-            struct_expr.operands()[component_number];
+            get_component_value(struct_expr, member_expr);
 
-          // Find out if the component is constant
-          struct_union_typet::componentt component=
-            struct_type.components()[component_number];
-
-          bool component_const=is_type_const(component.type());
+          const typet &component_type=
+            get_component_type(struct_expr, member_expr);
+          bool component_const=is_type_const(component_type);
 
           if(component_const || struct_is_const)
           {
@@ -344,7 +337,12 @@ bool remove_const_function_pointerst::try_resolve_expression(
         {
           struct_exprt struct_expr=to_struct_expr(potential_struct);
           const exprt &component_value=
-            struct_expr.operands()[member_expr.get_component_number()];
+            get_component_value(struct_expr, member_expr);
+          const typet &component_type=
+            get_component_type(struct_expr, member_expr);
+
+          all_components_const&=is_type_const(component_type);
+
           expressionst out_expressions;
           bool component_const=false;
           bool resolved=
@@ -356,9 +354,6 @@ bool remove_const_function_pointerst::try_resolve_expression(
               out_resolved_expression.end(),
               out_expressions.begin(),
               out_expressions.end());
-
-            all_components_const=
-              all_components_const && component_const;
           }
           else
           {
@@ -627,4 +622,57 @@ bool remove_const_function_pointerst::is_type_const(const typet &type) const
   {
     return qualifers.is_constant;
   }
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::get_component_value
+
+  Inputs:
+   struct_expr - The expression of the structure being accessed
+   member_expr - The expression saying which component is being accessed
+
+ Outputs: Returns the value of a specific component for a given struct
+          expression.
+
+ Purpose: To extract the value of the specific component within a struct
+
+\*******************************************************************/
+
+exprt remove_const_function_pointerst::get_component_value(
+  const struct_exprt &struct_expr, const member_exprt &member_expr)
+{
+  const struct_typet &struct_type=to_struct_type(ns.follow(struct_expr.type()));
+  size_t component_number=
+    struct_type.component_number(member_expr.get_component_name());
+
+  return struct_expr.operands()[component_number];
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::get_component_type
+
+  Inputs:
+   struct_expr - The expression of the structure being accessed
+   member_expr - The expression saying which component is being accessed
+
+ Outputs: Returns the type of the component. Note this may be differenent to
+          the type of its value (e.g. it may be a const pointer but its value
+          could just be a pointer).
+
+ Purpose: To extract the type of the specific component within a struct
+
+\*******************************************************************/
+
+typet remove_const_function_pointerst::get_component_type(
+  const struct_exprt &struct_expr, const member_exprt &member_expr)
+{
+  const struct_typet &struct_type=to_struct_type(ns.follow(struct_expr.type()));
+  size_t component_number=
+    struct_type.component_number(member_expr.get_component_name());
+  struct_union_typet::componentt component=
+    struct_type.components()[component_number];
+
+  return component.type();
 }
