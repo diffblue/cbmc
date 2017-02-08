@@ -13,9 +13,10 @@ matrix:
           packages:
             - libwww-perl
             - g++-5
+            - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
-      env: COMPILER=g++-5
+      env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
     - os: linux
       compiler: clang
       addons:
@@ -26,9 +27,10 @@ matrix:
           packages:
             - libwww-perl
             - clang-3.7
+            - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
-      env: COMPILER=clang++-3.7
+      env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
     - os: osx
       compiler: gcc
       env: COMPILER=g++
@@ -41,6 +43,6 @@ matrix:
 script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     make -C src minisat2-download &&
-    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 &&
-    make -C regression test &&
-    make -C src CXX=$COMPILER CXXFLAGS="-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
+    make -C src LIBS=-lubsan CXX=$COMPILER CXXFLAGS="$SAN_FLAGS -Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare" -j2 &&
+    env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test &&
+    make -C src CXX=$COMPILER CXXFLAGS=$FLAGS -j2 aa-symex.dir cegis.dir clobber.dir memory-models.dir musketeer.dir
