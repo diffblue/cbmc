@@ -12,6 +12,10 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include "remove_const_function_pointers.h"
 
+#define LOG(message, irep) \
+  debug() << "Case " << __LINE__ << " : " << message << "\n" \
+          << irep.pretty() << eom;
+
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
   const exprt &base_expression,
@@ -118,6 +122,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
       {
         if(expression.id()!=ID_struct)
         {
+          LOG("Squash of member access didn't result in a struct", expression);
           return false;
         }
         else
@@ -138,11 +143,17 @@ bool remove_const_function_pointerst::try_resolve_function_call(
             }
             else
             {
+              LOG(
+                "Couldn't resolve functions call from component value",
+                component_value);
               return false;
             }
           }
           else
           {
+            LOG(
+              "Struct was not const so can't resolve values on it",
+              struct_expr);
             return false;
           }
         }
@@ -153,13 +164,20 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     }
     else
     {
+      LOG("Failed to squash struct member access", owner_expr);
       return false;
     }
   }
   else if(simplified_expr.id()==ID_address_of)
   {
     address_of_exprt address_expr=to_address_of_expr(simplified_expr);
-    return try_resolve_function_call(address_expr.object(), out_functions);
+    bool resolved=
+      try_resolve_function_call(address_expr.object(), out_functions);
+    if(!resolved)
+    {
+      LOG("Failed to resolve address of", address_expr);
+    }
+    return resolved;
   }
   else if(simplified_expr.id()==ID_dereference)
   {
@@ -195,11 +213,15 @@ bool remove_const_function_pointerst::try_resolve_function_call(
           }
           else
           {
+            LOG("Failed to resolver pointers value", address_expr);
             return false;
           }
         }
         else
         {
+          LOG(
+            "Squashing dereference did not result in an address of",
+            pointer_val);
           return false;
         }
       }
@@ -207,6 +229,14 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     }
     else
     {
+      if(!resolved)
+      {
+        LOG("Failed to squash dereference", deref);
+      }
+      else if(!pointer_const)
+      {
+        LOG("Dereferenced value was not const so can't dereference", deref);
+      }
       return false;
     }
   }
@@ -228,6 +258,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     }
     else
     {
+      LOG("Failed to squash typecast", simplified_expr);
       return false;
     }
   }
@@ -240,11 +271,13 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     }
     else
     {
+      LOG("Non const symbol wasn't squashed", simplified_expr);
       return false;
     }
   }
   else
   {
+    LOG("Unrecognised expression", simplified_expr);
     return false;
   }
 }
@@ -293,6 +326,7 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
             }
             else
             {
+              LOG("Could not resolve expression in array", func_expr);
               return false;
             }
           }
@@ -317,6 +351,7 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
               }
               else
               {
+                LOG("Could not resolve expression in array", array_entry);
                 return false;
               }
             }
@@ -324,11 +359,13 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
         }
         else
         {
+          LOG("Array and its contents are not const", potential_array_expr);
           return false;
         }
       }
       else
       {
+        LOG("Squashing index did not result in an array", potential_array_expr);
         return false;
       }
     }
@@ -337,6 +374,7 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
   }
   else
   {
+    LOG("Could not resolve arary", index_expr);
     return false;
   }
 }
@@ -351,12 +389,17 @@ bool remove_const_function_pointerst::try_resolve_expression(
     expressionst out_array_expressions;
     bool resolved_array=
       try_resolve_index_of(index_expr, out_array_expressions, out_is_const);
+
     if(resolved_array)
     {
       out_resolved_expression.insert(
         out_resolved_expression.end(),
         out_array_expressions.begin(),
         out_array_expressions.end());
+    }
+    else
+    {
+      LOG("Could not resolve array", index_expr);
     }
 
     return resolved_array;
@@ -396,11 +439,15 @@ bool remove_const_function_pointerst::try_resolve_expression(
           }
           else
           {
+            LOG("Could not resolve component value", component_value);
             return false;
           }
         }
         else
         {
+          LOG(
+            "Squashing member access did not resolve in a struct",
+            potential_struct);
           return false;
         }
       }
@@ -409,6 +456,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
     }
     else
     {
+      LOG("Failed to squash struct access", member_expr);
       return false;
     }
   }
@@ -445,9 +493,15 @@ bool remove_const_function_pointerst::try_resolve_expression(
 
             all_objects_const&=object_const;
           }
+          else
+          {
+            LOG("Failed to resolve value of a dereference", address_expr);
+          }
         }
         else
         {
+          LOG(
+            "Squashing dereference did not result in an address", pointer_val);
           return false;
         }
       }
@@ -456,6 +510,14 @@ bool remove_const_function_pointerst::try_resolve_expression(
     }
     else
     {
+      if(!resolved)
+      {
+        LOG("Failed to resolve pointer of dereference", deref);
+      }
+      else if(!pointer_const)
+      {
+        LOG("Pointer value not const so can't squash", deref);
+      }
       return false;
     }
   }
@@ -483,11 +545,13 @@ bool remove_const_function_pointerst::try_resolve_expression(
     }
     else
     {
+      LOG("Could not resolve typecast value", typecast_expr);
       return false;
     }
   }
   else if(simplified_expr.id()==ID_symbol)
   {
+    LOG("Non const symbol will not be squashed", simplified_expr);
     return false;
   }
   // TOOD: probably need to do something with pointers or address_of
@@ -580,6 +644,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
           }
           else
           {
+            LOG("Failed to resolve array value", func_expr);
             return false;
           }
         }
@@ -611,6 +676,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
             }
             else
             {
+              LOG("Failed to resolve array value", array_entry);
               return false;
             }
           }
@@ -618,6 +684,9 @@ bool remove_const_function_pointerst::try_resolve_index_of(
       }
       else
       {
+        LOG(
+          "Squashing index of did not result in an array",
+          potential_array_expr);
         return false;
       }
     }
@@ -627,6 +696,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
   }
   else
   {
+    LOG("Failed to squash index of to array expression", index_expr);
     return false;
   }
 }
