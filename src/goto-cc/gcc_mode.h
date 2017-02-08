@@ -11,13 +11,15 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_GCC_MODE_H
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
+#include <util/cout_message.h>
+
 #include "goto_cc_mode.h"
 
 class gcc_modet:public goto_cc_modet
 {
 public:
-  virtual int doit();
-  virtual void help_mode();
+  int doit() final;
+  void help_mode() final;
 
   gcc_modet(
     goto_cc_cmdlinet &_cmdline,
@@ -25,11 +27,13 @@ public:
     bool _produce_hybrid_binary);
 
 protected:
+  gcc_message_handlert gcc_message_handler;
+
   const bool produce_hybrid_binary;
 
   const bool act_as_ld;
   std::string native_tool_name;
-
+  
   int preprocess(
     const std::string &language,
     const std::string &src,
