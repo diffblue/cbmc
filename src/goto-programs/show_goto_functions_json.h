@@ -19,8 +19,8 @@ class show_goto_functions_jsont
 public:
   explicit show_goto_functions_jsont(const namespacet &ns);
 
-  json_objectt get_goto_functions(const goto_functionst &goto_functions);
-  void print_goto_functions(
+  json_objectt convert(const goto_functionst &goto_functions);
+  void operator()(
     const goto_functionst &goto_functions, std::ostream &out, bool append=true);
 
 private:

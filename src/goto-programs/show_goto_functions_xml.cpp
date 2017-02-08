@@ -40,7 +40,7 @@ show_goto_functions_xmlt::show_goto_functions_xmlt(const namespacet &ns):
 
 /*******************************************************************\
 
-Function: show_goto_functions_xmlt::show_goto_functions
+Function: show_goto_functions_xmlt::convert
 
   Inputs:
    goto_functions - the goto functions that make up the program
@@ -66,7 +66,7 @@ Function: show_goto_functions_xmlt::show_goto_functions
 
 \*******************************************************************/
 
-xmlt show_goto_functions_xmlt::get_goto_functions(
+xmlt show_goto_functions_xmlt::convert(
   const goto_functionst &goto_functions)
 {
   xmlt xml_functions=xmlt("functions");
@@ -116,7 +116,7 @@ xmlt show_goto_functions_xmlt::get_goto_functions(
 
 /*******************************************************************\
 
-Function: show_goto_functions_xmlt::print_goto_functions
+Function: show_goto_functions_xmlt::operator()
 
   Inputs:
    goto_functions - the goto functions that make up the program
@@ -132,7 +132,7 @@ Function: show_goto_functions_xmlt::print_goto_functions
 
 \*******************************************************************/
 
-void show_goto_functions_xmlt::print_goto_functions(
+void show_goto_functions_xmlt::operator()(
   const goto_functionst &goto_functions,
   std::ostream &out,
   bool append)
@@ -141,5 +141,5 @@ void show_goto_functions_xmlt::print_goto_functions(
   {
     out << "\n";
   }
-  out << get_goto_functions(goto_functions);
+  out << convert(goto_functions);
 }

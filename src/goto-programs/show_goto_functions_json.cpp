@@ -39,7 +39,7 @@ show_goto_functions_jsont::show_goto_functions_jsont(const namespacet &ns):
 
 /*******************************************************************\
 
-Function: show_goto_functions_jsont::show_goto_functions
+Function: show_goto_functions_jsont::convert
 
   Inputs:
    goto_functions - the goto functions that make up the program
@@ -51,7 +51,7 @@ Function: show_goto_functions_jsont::show_goto_functions
 
 \*******************************************************************/
 
-json_objectt show_goto_functions_jsont::get_goto_functions(
+json_objectt show_goto_functions_jsont::convert(
   const goto_functionst &goto_functions)
 {
   json_arrayt json_functions;
@@ -131,7 +131,7 @@ json_objectt show_goto_functions_jsont::get_goto_functions(
 
 /*******************************************************************\
 
-Function: show_goto_functions_jsont::print_goto_functions
+Function: show_goto_functions_jsont::operator()
 
   Inputs:
    goto_functions - the goto functions that make up the program
@@ -147,7 +147,7 @@ Function: show_goto_functions_jsont::print_goto_functions
 
 \*******************************************************************/
 
-void show_goto_functions_jsont::print_goto_functions(
+void show_goto_functions_jsont::operator()(
   const goto_functionst &goto_functions,
   std::ostream &out,
   bool append)
@@ -156,5 +156,5 @@ void show_goto_functions_jsont::print_goto_functions(
   {
     out << ",\n";
   }
-  out << get_goto_functions(goto_functions);
+  out << convert(goto_functions);
 }

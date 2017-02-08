@@ -19,8 +19,8 @@ class show_goto_functions_xmlt
 public:
   explicit show_goto_functions_xmlt(const namespacet &ns);
 
-  xmlt get_goto_functions(const goto_functionst &goto_functions);
-  void print_goto_functions(
+  xmlt convert(const goto_functionst &goto_functions);
+  void operator()(
     const goto_functionst &goto_functions, std::ostream &out, bool append=true);
 
 private:

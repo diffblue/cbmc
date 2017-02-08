@@ -45,14 +45,14 @@ void show_goto_functions(
   case ui_message_handlert::XML_UI:
   {
     show_goto_functions_xmlt xml_show_functions(ns);
-    xml_show_functions.print_goto_functions(goto_functions, std::cout);
+    xml_show_functions(goto_functions, std::cout);
   }
   break;
 
   case ui_message_handlert::JSON_UI:
   {
     show_goto_functions_jsont json_show_functions(ns);
-    json_show_functions.print_goto_functions(goto_functions, std::cout);
+    json_show_functions(goto_functions, std::cout);
   }
   break;
 
