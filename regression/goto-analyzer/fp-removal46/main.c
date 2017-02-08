@@ -27,7 +27,11 @@ typedef struct fp_cc
 
 void func(){
   const void_fp meta_fp = &f3;
+  const void_fp meta_fp2 = &f4;
+
+  fp_cc container_container2 = { .container = &meta_fp2, .x = 4 };
   fp_cc container_container = { .container = &meta_fp, .x = 4 };
+  container_container = container_container2;
 
   // Illegal:
   //meta_fp = &f4;

@@ -29,6 +29,7 @@ void func(int i){
   // Illegal
   //pts=&other_thing;
   // thing.go=&f6;
+  thing = other_thing;
    const void_fp fp = pts->go;
 
    fp();

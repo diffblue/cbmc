@@ -18,6 +18,7 @@ struct state
   const void_fp go;
 };
 struct state thing = {0, &f2};
+struct state other_thing = {0, &f4};
 struct state const * const pts = &thing;
 
 
@@ -26,6 +27,7 @@ struct state const * const pts = &thing;
 const void_fp fp_all[] = {f1, f2 ,f3, f4, f5 ,f6, f7, f8, f9};
 
 void func(int i){
+  thing = other_thing;
    pts->go();
 }
 

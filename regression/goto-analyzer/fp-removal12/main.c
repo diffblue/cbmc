@@ -25,14 +25,14 @@ typedef struct fp_container
 
 
 void func(){
-  fp_container container = { .fp_tbl = {f2 ,f3, f4} };
-  fp_container container2 = { .fp_tbl = {f5 ,f6, f7} };
+  const fp_container container = { .fp_tbl = {f2 ,f3, f4} };
+  const fp_container container2 = { .fp_tbl = {f5 ,f6, f7} };
   // Illegal:
-  // container = container2;
+  //container = container2;
   const void_fp fp = container.fp_tbl[1];
   fp();
 }
 
-void main(){
+int main(){
   func();
 }

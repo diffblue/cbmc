@@ -126,11 +126,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
           const exprt &component_value=
             get_component_value(struct_expr, member_expr);
 
-          const typet &component_type=
-            get_component_type(struct_expr, member_expr);
-          bool component_const=is_type_const(component_type);
-
-          if(component_const || struct_is_const)
+          if(struct_is_const)
           {
             functionst component_functions;
             bool resolved=
@@ -387,7 +383,6 @@ bool remove_const_function_pointerst::try_resolve_expression(
 
     if(resolved_struct)
     {
-      bool all_components_const=true;
       for(const exprt &potential_struct : potential_structs)
       {
         if(potential_struct.id()==ID_struct)
@@ -395,10 +390,6 @@ bool remove_const_function_pointerst::try_resolve_expression(
           struct_exprt struct_expr=to_struct_expr(potential_struct);
           const exprt &component_value=
             get_component_value(struct_expr, member_expr);
-          const typet &component_type=
-            get_component_type(struct_expr, member_expr);
-
-          all_components_const&=is_type_const(component_type);
 
           expressionst out_expressions;
           bool component_const=false;
@@ -422,7 +413,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
           return false;
         }
       }
-      out_is_const=all_components_const||is_struct_const;
+      out_is_const=is_struct_const;
       return true;
     }
     else
@@ -704,32 +695,4 @@ exprt remove_const_function_pointerst::get_component_value(
     struct_type.component_number(member_expr.get_component_name());
 
   return struct_expr.operands()[component_number];
-}
-
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::get_component_type
-
-  Inputs:
-   struct_expr - The expression of the structure being accessed
-   member_expr - The expression saying which component is being accessed
-
- Outputs: Returns the type of the component. Note this may be differenent to
-          the type of its value (e.g. it may be a const pointer but its value
-          could just be a pointer).
-
- Purpose: To extract the type of the specific component within a struct
-
-\*******************************************************************/
-
-typet remove_const_function_pointerst::get_component_type(
-  const struct_exprt &struct_expr, const member_exprt &member_expr)
-{
-  const struct_typet &struct_type=to_struct_type(ns.follow(struct_expr.type()));
-  size_t component_number=
-    struct_type.component_number(member_expr.get_component_name());
-  struct_union_typet::componentt component=
-    struct_type.components()[component_number];
-
-  return component.type();
 }
