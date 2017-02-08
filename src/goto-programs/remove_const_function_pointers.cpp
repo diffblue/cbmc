@@ -240,16 +240,7 @@ bool remove_const_function_pointerst::try_resolve_function_call(
     }
     else
     {
-      const c_qualifierst pointer_qualifers(simplified_expr.type());
-      if(!pointer_qualifers.is_constant)
-      {
-        debug() << "Can't optimize FP since symbol "
-                << simplified_expr.get(ID_identifier) << " is not const" << eom;
-        return false;
-      }
-
-      const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
-      return try_resolve_function_call(symbol_value, out_functions);
+      return false;
     }
   }
   else
@@ -497,19 +488,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
   }
   else if(simplified_expr.id()==ID_symbol)
   {
-    const exprt &symbol_value=resolve_symbol(to_symbol_expr(simplified_expr));
-    bool is_symbol_const=is_expression_const(simplified_expr);
-    bool is_symbol_value_const=false;
-    bool resolved_expression=
-      try_resolve_expression(
-        symbol_value,
-        out_resolved_expression,
-        is_symbol_value_const);
-
-    // If we have a symbol, it is only const if the value it is assigned
-    // is const and it is in fact const.
-    out_is_const=is_symbol_const;
-    return resolved_expression;
+    return false;
   }
   // TOOD: probably need to do something with pointers or address_of
   // and const since a const pointer to a non-const value is useless
