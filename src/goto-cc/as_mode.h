@@ -11,6 +11,8 @@ Date: July 2016
 #ifndef CPROVER_GOTO_CC_AS_MODE_H
 #define CPROVER_GOTO_CC_AS_MODE_H
 
+#include <util/cout_message.h>
+
 #include "goto_cc_mode.h"
 
 class as_modet:public goto_cc_modet
@@ -25,9 +27,9 @@ public:
     bool _produce_hybrid_binary);
 
 protected:
-  bool produce_hybrid_binary;
-  const std::string native_tool_name;
   gcc_message_handlert message_handler;
+  const bool produce_hybrid_binary;
+  const std::string native_tool_name;
 
   int run_as(); // call as with original command line
 

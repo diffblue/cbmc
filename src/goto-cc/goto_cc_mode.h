@@ -31,9 +31,9 @@ public:
   ~goto_cc_modet();
 
 protected:
-  void register_languages();
   goto_cc_cmdlinet &cmdline;
   const std::string base_name;
+  void register_languages();
 };
 
 #endif // CPROVER_GOTO_CC_GOTO_CC_MODE_H

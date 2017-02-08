@@ -27,13 +27,13 @@ public:
     bool _produce_hybrid_binary);
 
 protected:
+  gcc_message_handlert gcc_message_handler;
+
   const bool produce_hybrid_binary;
 
   const bool act_as_ld;
   std::string native_tool_name;
   
-  gcc_message_handlert gcc_message_handler;
-
   int preprocess(
     const std::string &language,
     const std::string &src,
