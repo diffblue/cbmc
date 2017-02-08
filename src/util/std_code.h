@@ -1122,6 +1122,36 @@ inline const side_effect_expr_throwt &to_side_effect_expr_throw(
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<const side_effect_expr_throwt &>(expr);
 }
+/*! \brief A side effect that pushes/pops a catch handler
+*/
+class side_effect_expr_catcht:public side_effect_exprt
+{
+public:
+  inline side_effect_expr_catcht():side_effect_exprt(ID_push_catch)
+  {
+  }
+  // TODO: change to ID_catch
+  inline explicit side_effect_expr_catcht(const irept &exception_list):
+    side_effect_exprt(ID_push_catch)
+  {
+    set(ID_exception_list, exception_list);
+  }
+};
+
+static inline side_effect_expr_catcht &to_side_effect_expr_catch(exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_push_catch);
+  return static_cast<side_effect_expr_catcht &>(expr);
+}
+
+static inline const side_effect_expr_catcht &to_side_effect_expr_catch(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_push_catch);
+  return static_cast<const side_effect_expr_catcht &>(expr);
+}
 
 /*! \brief A try/catch block
 */
