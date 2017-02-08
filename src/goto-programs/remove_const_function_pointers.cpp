@@ -26,7 +26,64 @@ remove_const_function_pointerst::remove_const_function_pointerst(
 bool remove_const_function_pointerst::operator()(
   functionst &out_functions)
 {
-  return try_resolve_function_call(original_expression, out_functions);
+  // Replace all const symbols with their values
+  exprt non_symbol_expression=replace_const_symbols(original_expression);
+  return try_resolve_function_call(non_symbol_expression, out_functions);
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::replace_const_symbols
+
+  Inputs:
+   expression - The expression to resolve symbols in
+
+ Outputs: Returns a modified version of the expression, with all
+          const symbols resolved to their actual values.
+
+ Purpose: To collapse the symbols down to their values where possible
+          This takes a very general approach, recreating the expr tree
+          exactly as it was and ignoring what type of expressions are found
+          and instead recurses over all the operands.
+
+\*******************************************************************/
+
+exprt remove_const_function_pointerst::replace_const_symbols(
+  const exprt &expression) const
+{
+  if(expression.id()==ID_symbol)
+  {
+    if(is_expression_const(expression))
+    {
+      const symbolt &symbol=
+        symbol_table.lookup(expression.get(ID_identifier));
+      if(symbol.type.id()!=ID_code)
+      {
+        const exprt &symbol_value=symbol.value;
+        return replace_const_symbols(symbol_value);
+      }
+      else
+      {
+        return expression;
+      }
+    }
+    else
+    {
+      return expression;
+    }
+  }
+  else
+  {
+    exprt const_symbol_cleared_expr=expression;
+    const_symbol_cleared_expr.operands().clear();
+    for(const exprt &op : expression.operands())
+    {
+      exprt const_symbol_cleared_op=replace_const_symbols(op);
+      const_symbol_cleared_expr.operands().push_back(const_symbol_cleared_op);
+    }
+
+    return const_symbol_cleared_expr;
+  }
 }
 
 exprt remove_const_function_pointerst::resolve_symbol(

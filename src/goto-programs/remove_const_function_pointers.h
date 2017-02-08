@@ -29,6 +29,7 @@ public:
   bool operator()(functionst &out_functions);
 
 private:
+  exprt replace_const_symbols(const exprt &expression) const;
   exprt resolve_symbol(const symbol_exprt &symbol_expr) const;
 
   // recursive functions for dealing with the function pointer
