@@ -3,6 +3,6 @@ main.c
 
 ^EXIT=\(64\|1\)$
 ^SIGNAL=0$
-^file main.c line 4: duplicate member x$
+^main.c:4:1: error: duplicate member .*$
 ^CONVERSION ERROR$
 --
