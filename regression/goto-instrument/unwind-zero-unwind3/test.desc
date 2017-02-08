@@ -1,0 +1,9 @@
+CORE
+main.c
+--unwind 0
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+ASSUME FALSE
+^warning: ignoring

@@ -7,6 +7,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+//#define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 #include <goto-programs/goto_functions.h>
@@ -312,7 +318,7 @@ void goto_unwindt::unwind(
 
       goto_programt::const_targett t=i_it->get_target();
 
-      if(t->location_number>=loop_head->location_number ||
+      if(t->location_number>=loop_head->location_number &&
          t->location_number<loop_exit->location_number)
       {
         i_it->set_target(t_skip);
@@ -385,10 +391,21 @@ void goto_unwindt::unwind(
 {
   assert(k>=-1);
 
-  forall_goto_program_instructions(i_it, goto_program)
+  for(goto_programt::const_targett i_it=goto_program.instructions.begin();
+      i_it!=goto_program.instructions.end();)
   {
+#ifdef DEBUG
+    symbol_tablet st;
+    namespacet ns(st);
+    std::cout << "Instruction:\n";
+    goto_program.output_instruction(ns, "", std::cout, i_it);
+#endif
+
     if(!i_it->is_backwards_goto())
+    {
+      i_it++;
       continue;
+    }
 
     const irep_idt func=i_it->function;
     assert(!func.empty());
@@ -398,7 +415,10 @@ void goto_unwindt::unwind(
     int final_k=get_k(func, loop_number, k, unwind_set);
 
     if(final_k==-1)
+    {
+      i_it++;
       continue;
+    }
 
     goto_programt::const_targett loop_head=i_it->get_target();
     goto_programt::const_targett loop_exit=i_it;
@@ -409,7 +429,6 @@ void goto_unwindt::unwind(
 
     // necessary as we change the goto program in the previous line
     i_it=loop_exit;
-    i_it--; // as for loop first increments
   }
 }
 
@@ -439,6 +458,10 @@ void goto_unwindt::operator()(
 
     if(!goto_function.body_available())
       continue;
+
+#ifdef DEBUG
+    std::cout << "Function: " << it->first << std::endl;
+#endif
 
     goto_programt &goto_program=goto_function.body;
 
