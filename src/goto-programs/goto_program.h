@@ -28,6 +28,12 @@ public:
     std::ostream &out,
     instructionst::const_iterator it) const;
 
+  std::ostream &output_instruction(
+    const class namespacet &ns,
+    const irep_idt &identifier,
+    std::ostream &out,
+    const instructiont &instruction) const;
+
   goto_programt() { }
 
   // get the variables in decl statements
