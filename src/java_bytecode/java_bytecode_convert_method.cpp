@@ -1107,6 +1107,25 @@ codet java_bytecode_convert_methodt::convert_instructions(
             get_message_handler());
       }
     }
+    // replace calls to CProver.assume
+    else if(statement=="invokestatic" &&
+            id2string(arg0.get(ID_identifier))==
+            "java::org.cprover.CProver.assume:(Z)V")
+    {
+      const code_typet &code_type=to_code_type(arg0.type());
+      // sanity check: function has the right number of args
+      assert(code_type.parameters().size()==1);
+
+      exprt operand = pop(1)[0];
+      // we may need to adjust the type of the argument
+      if(operand.type()!=bool_typet())
+        operand.make_typecast(bool_typet());
+
+      c=code_assumet(operand);
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      c.add_source_location()=loc;
+    }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
             statement=="invokevirtual" ||
