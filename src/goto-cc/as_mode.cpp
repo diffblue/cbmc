@@ -22,6 +22,7 @@ Author: Michael Tautschnig
 #include <util/tempdir.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/cout_message.h>
 
 #include <cbmc/version.h>
 
@@ -79,7 +80,7 @@ as_modet::as_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
   bool _produce_hybrid_binary):
-  goto_cc_modet(_cmdline, _base_name),
+  goto_cc_modet(_cmdline, _base_name, message_handler),
   produce_hybrid_binary(_produce_hybrid_binary),
   native_tool_name(assembler_name(cmdline, base_name))
 {
@@ -137,7 +138,7 @@ int as_modet::doit()
   if(cmdline.isset("verbosity"))
     verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
 
-  ui_message_handler.set_verbosity(verbosity);
+  message_handler.set_verbosity(verbosity);
 
   if(act_as_as86)
   {

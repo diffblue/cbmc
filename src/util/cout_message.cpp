@@ -135,3 +135,79 @@ void console_message_handlert::print(
     std::cerr << message << '\n' << std::flush;
   #endif
 }
+
+/*******************************************************************\
+
+Function: gcc_message_handlert::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void gcc_message_handlert::print(
+  unsigned level,
+  const std::string &message,
+  int sequence_number,
+  const source_locationt &location)
+{
+  const irep_idt file=location.get_file();
+  const irep_idt line=location.get_line();
+  const irep_idt column=location.get_column();
+  const irep_idt function=location.get_function();
+  
+  std::string dest;
+
+  if(!function.empty())
+  {
+    if(!file.empty())
+      dest+=id2string(file)+":";
+    if(dest!="") dest+=' ';
+    dest+="In function '"+id2string(function)+"':\n";
+  }
+
+  if(!line.empty())
+  {
+    if(!file.empty())
+      dest+=id2string(file)+":";
+
+    dest+=id2string(line)+":";
+
+    if(column.empty())
+      dest+="1: ";
+    else
+      dest+=id2string(column)+": ";
+
+    if(level==message_clientt::M_ERROR)
+      dest+="error: ";
+    else if(level==message_clientt::M_WARNING)
+      dest+="warning: ";
+  }
+
+  dest+=message;
+
+  print(level, dest);
+}
+
+/*******************************************************************\
+
+Function: gcc_message_handlert::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void gcc_message_handlert::print(
+  unsigned level,
+  const std::string &message)
+{
+  // gcc appears to send everything to cerr
+  std::cerr << message << '\n' << std::flush;
+}
