@@ -215,7 +215,7 @@ void java_bytecode_convert_method_lazy(
   {
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(class_symbol.base_name)+"()";
-    member_type.set(ID_constructor,true);
+    member_type.set(ID_constructor, true);
   }
   else
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
@@ -1167,7 +1167,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         assert(use_this);
         assert(!call.arguments().empty());
         call.function()=arg0;
-        // Populate needed methods later, once we know what object types can exist.
+        // Populate needed methods later,
+        // once we know what object types can exist.
       }
       else
       {

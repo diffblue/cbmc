@@ -257,8 +257,12 @@ static void get_virtual_method_targets(
   auto child_classes=class_hierarchy.get_children_trans(call_class);
   for(const auto& child_class : child_classes)
   {
-    auto child_method=get_virtual_method_target(needed_classes,call_basename,
-                                                child_class,symbol_table);
+    auto child_method=
+      get_virtual_method_target(
+        needed_classes,
+        call_basename,
+        child_class,
+        symbol_table);
     if(child_method!=irep_idt())
       needed_methods.push_back(child_method);
   }
@@ -266,8 +270,12 @@ static void get_virtual_method_targets(
   irep_idt parent_class_id=call_class;
   while(1)
   {
-    auto parent_method=get_virtual_method_target(needed_classes,call_basename,
-                                                 parent_class_id,symbol_table);
+    auto parent_method=
+      get_virtual_method_target(
+        needed_classes,
+        call_basename,
+        parent_class_id,
+        symbol_table);
     if(parent_method!=irep_idt())
     {
       needed_methods.push_back(parent_method);
@@ -301,7 +309,6 @@ static void get_virtual_method_targets(
     symbol.mode=ID_java;
     symbol_table.add(symbol);
   }
-
 }
 
 /*******************************************************************\
@@ -317,7 +324,9 @@ Function: gather_virtual_callsites
 
 \*******************************************************************/
 
-static void gather_virtual_callsites(const exprt& e, std::vector<const code_function_callt*>& result)
+static void gather_virtual_callsites(
+  const exprt& e,
+  std::vector<const code_function_callt*>& result)
 {
   if(e.id()!=ID_code)
     return;
@@ -326,8 +335,8 @@ static void gather_virtual_callsites(const exprt& e, std::vector<const code_func
      to_code_function_call(c).function().id()==ID_virtual_function)
     result.push_back(&to_code_function_call(c));
   else
-    forall_operands(it,e)
-      gather_virtual_callsites(*it,result);
+    forall_operands(it, e)
+      gather_virtual_callsites(*it, result);
 }
 
 /*******************************************************************\
@@ -344,7 +353,10 @@ Function: gather_needed_globals
 
 \*******************************************************************/
 
-static void gather_needed_globals(const exprt& e, const symbol_tablet& symbol_table, symbol_tablet& needed)
+static void gather_needed_globals(
+  const exprt& e,
+  const symbol_tablet& symbol_table,
+  symbol_tablet& needed)
 {
   if(e.id()==ID_symbol)
   {
@@ -353,8 +365,8 @@ static void gather_needed_globals(const exprt& e, const symbol_tablet& symbol_ta
       needed.add(sym);
   }
   else
-    forall_operands(opit,e)
-      gather_needed_globals(*opit,symbol_table,needed);
+    forall_operands(opit, e)
+      gather_needed_globals(*opit, symbol_table, needed);
 }
 
 /*******************************************************************\
@@ -383,15 +395,16 @@ static void gather_field_types(
   for(const auto& field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(),ns,needed_classes);
+      gather_field_types(field.type(), ns, needed_classes);
     else if(field.type().id()==ID_pointer)
     {
       // Skip array primitive pointers, for example:
       if(field.type().subtype().id()!=ID_symbol)
-	continue;
-      const auto& field_classid=to_symbol_type(field.type().subtype()).get_identifier();
+        continue;
+      const auto& field_classid=
+        to_symbol_type(field.type().subtype()).get_identifier();
       if(needed_classes.insert(field_classid).second)
-	gather_field_types(field.type().subtype(),ns,needed_classes);
+        gather_field_types(field.type().subtype(), ns, needed_classes);
     }
   }
 }
@@ -427,12 +440,14 @@ static void initialise_needed_classes(
     {
       if(param.type().id()==ID_pointer)
       {
-        const auto& param_classid=to_symbol_type(param.type().subtype()).get_identifier();
-        std::vector<irep_idt> class_and_parents=ch.get_parents_trans(param_classid);
+        const auto& param_classid=
+          to_symbol_type(param.type().subtype()).get_identifier();
+        std::vector<irep_idt> class_and_parents=
+          ch.get_parents_trans(param_classid);
         class_and_parents.push_back(param_classid);
         for(const auto& classid : class_and_parents)
           needed_classes.insert(classid);
-        gather_field_types(param.type().subtype(),ns,needed_classes);
+        gather_field_types(param.type().subtype(), ns, needed_classes);
       }
     }
   }
@@ -483,7 +498,8 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
-  // Now incrementally elaborate methods that are reachable from this entry point.
+  // Now incrementally elaborate methods
+  // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
     if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
@@ -508,7 +524,8 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
 
-  auto main_function=get_main_symbol(symbol_table,main_class,get_message_handler(),true);
+  auto main_function=
+    get_main_symbol(symbol_table, main_class, get_message_handler(), true);
   if(main_function.stop_convert)
   {
     // Failed, mark all functions in the given main class(es) reachable.
@@ -519,7 +536,8 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
       reachable_classes=main_jar_classes;
     for(const auto& classname : reachable_classes)
     {
-      const auto& methods=java_class_loader.class_map.at(classname).parsed_class.methods;
+      const auto& methods=
+        java_class_loader.class_map.at(classname).parsed_class.methods;
       for(const auto& method : methods)
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
@@ -533,18 +551,22 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(method_worklist2,namespacet(symbol_table),ch,needed_classes);
+  initialise_needed_classes(
+    method_worklist2,
+    namespacet(symbol_table),
+    ch,
+    needed_classes);
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt*> virtual_callsites;
 
   bool any_new_methods;
-  do {
-
+  do
+  {
     any_new_methods=false;
     while(method_worklist2.size()!=0)
     {
-      std::swap(method_worklist1,method_worklist2);
+      std::swap(method_worklist1, method_worklist2);
       for(const auto& mname : method_worklist1)
       {
         if(!methods_already_populated.insert(mname).second)
@@ -566,7 +588,9 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           max_user_array_length,
           &method_worklist2,
           &needed_classes);
-        gather_virtual_callsites(symbol_table.lookup(mname).value,virtual_callsites);
+        gather_virtual_callsites(
+          symbol_table.lookup(mname).value,
+          virtual_callsites);
         any_new_methods=true;
       }
       method_worklist1.clear();
@@ -575,14 +599,16 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     // Given the object types we now know may be created, populate more
     // possible virtual function call targets:
 
-    debug() << "CI lazy methods: add virtual method targets (" << virtual_callsites.size() <<
-      " callsites)" << eom;
+    debug() << "CI lazy methods: add virtual method targets ("
+            << virtual_callsites.size()
+            << " callsites)"
+            << eom;
 
     for(const auto& callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
-      get_virtual_method_targets(*callsite,needed_classes,method_worklist2,
-				 symbol_table,ch);
+      get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
+				 symbol_table, ch);
     }
 
   } while(any_new_methods);
@@ -594,14 +620,20 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   {
     if(sym.second.is_static_lifetime)
       continue;
-    if(lazy_methods.count(sym.first) && !methods_already_populated.count(sym.first))
+    if(lazy_methods.count(sym.first) &&
+       !methods_already_populated.count(sym.first))
+    {
       continue;
+    }
     if(sym.second.type.id()==ID_code)
-      gather_needed_globals(sym.second.value,symbol_table,keep_symbols);
+      gather_needed_globals(sym.second.value, symbol_table, keep_symbols);
     keep_symbols.add(sym.second);
   }
 
-  debug() << "CI lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
+  debug() << "CI lazy methods: removed "
+          << symbol_table.symbols.size() - keep_symbols.symbols.size()
+          << " unreachable methods and globals"
+          << eom;
 
   symbol_table.swap(keep_symbols);
 
