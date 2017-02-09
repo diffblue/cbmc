@@ -35,6 +35,7 @@ void func(int i){
 
    // Illegal
    // stable_table[1] = another_table;
+   // stable_table[1].fp = f5;
    fp();
 }
 
