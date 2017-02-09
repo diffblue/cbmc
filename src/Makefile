@@ -108,4 +108,12 @@ libzip-build:
 	@echo "Building libzip"
 	@(cd ../libzip; BASE=`pwd`; ./configure --with-zlib=$(BASE)/zlib ; make)
 
-.PHONY: minisat2-download glucose-download zlib-download libzip-download libzip-build
+cprover-jar-build:
+	@echo "Building org.cprover.jar"
+	@(cd java_bytecode/library/; \
+	mkdir -p target; \
+	javac -d target/ `find src/ -name "*.java"`; \
+	cd target; jar cf org.cprover.jar `find . -name "*.class"`; \
+	mv org.cprover.jar ../../../)
+
+.PHONY: minisat2-download glucose-download zlib-download libzip-download libzip-build cprover-jar-build
