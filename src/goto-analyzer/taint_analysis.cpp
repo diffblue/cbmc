@@ -386,7 +386,7 @@ bool taint_analysist::operator()(
         if(use_json)
         {
           json_objectt json;
-          json["bug_class"]=
+          json["bugClass"]=
             json_stringt(id2string(i_it->source_location.get_property_class()));
           json["file"]=
             json_stringt(id2string(i_it->source_location.get_file()));

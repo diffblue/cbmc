@@ -11,6 +11,7 @@ Date: April 2016
 #include <sstream>
 
 #include <util/json.h>
+#include <util/json_expr.h>
 #include <util/file_util.h>
 
 #include <analyses/cfg_dominators.h>
@@ -133,12 +134,12 @@ static void add_to_json(
   assert(end_function->is_end_function());
 
   entry["function"]=json_stringt(id2string(end_function->function));
-  entry["file name"]=
+  entry["fileName"]=
     json_stringt(concat_dir_file(
         id2string(end_function->source_location.get_working_directory()),
         id2string(end_function->source_location.get_file())));
 
-  json_arrayt &dead_ins=entry["unreachable instructions"].make_array();
+  json_arrayt &dead_ins=entry["unreachableInstructions"].make_array();
 
   for(dead_mapt::const_iterator it=dead_map.begin();
       it!=dead_map.end();
@@ -160,7 +161,7 @@ static void add_to_json(
     // print info for file actually with full path
     json_objectt &i_entry=dead_ins.push_back().make_object();
     const source_locationt &l=it->second->source_location;
-    i_entry["source location"]=json_stringt(l.as_string_with_cwd());
+    i_entry["sourceLocation"]=json(l);
     i_entry["statement"]=json_stringt(s);
   }
 }
