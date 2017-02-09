@@ -177,6 +177,25 @@ const exprt java_bytecode_convert_methodt::variable(
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_convert_method_lazy
+
+  Inputs: `class_symbol`: class this method belongs to
+          `method_identifier`: fully qualified method name, including
+            type signature (e.g. "x.y.z.f:(I)")
+          `m`: parsed method object to convert
+          `symbol_table`: global symbol table (will be modified)
+
+ Outputs:
+
+ Purpose: This creates a method symbol in the symtab, but doesn't
+          actually perform method conversion just yet. The caller
+          should call java_bytecode_convert_method later to give the
+          symbol/method a body.
+
+\*******************************************************************/
+
 void java_bytecode_convert_method_lazy(
   const symbolt& class_symbol,
   const irep_idt method_identifier,
