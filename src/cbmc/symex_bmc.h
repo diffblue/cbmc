@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/goto_symex.h>
 
+#include "symex_coverage.h"
+
 class symex_bmct:
   public goto_symext,
   public messaget
@@ -48,6 +50,15 @@ public:
   {
     loop_limits[id]=limit;
   }
+
+  bool output_coverage_report(
+    const goto_functionst &goto_functions,
+    const std::string &path) const
+  {
+    return symex_coverage.generate_report(goto_functions, path);
+  }
+
+  bool record_coverage;
 
 protected:
   // We have
@@ -85,6 +96,8 @@ protected:
   virtual void no_body(const irep_idt &identifier);
 
   std::unordered_set<irep_idt, irep_id_hash> body_warnings;
+
+  symex_coveraget symex_coverage;
 };
 
 #endif // CPROVER_CBMC_SYMEX_BMC_H

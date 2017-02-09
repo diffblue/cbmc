@@ -1,7 +1,7 @@
 CORE
 main.c
 --verbosity 2
-^file main.c line 3 function fun: function has return void but a return statement returning signed int$
+^main.c:3:1: warning: function has return void but a return statement returning signed int$
 ^SIGNAL=0$
 
 --

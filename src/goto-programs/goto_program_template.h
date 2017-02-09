@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <set>
 #include <limits>
+#include <sstream>
+#include <string>
 
 #include <util/namespace.h>
 #include <util/symbol_table.h>
@@ -239,6 +241,13 @@ public:
           return true;
 
       return false;
+    }
+
+    std::string to_string() const
+    {
+      std::ostringstream instruction_id_builder;
+      instruction_id_builder << type;
+      return instruction_id_builder.str();
     }
   };
 

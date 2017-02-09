@@ -10,11 +10,14 @@ Author: Peter Schrammel
 
 #include <util/xml.h>
 #include <util/json.h>
+#include <util/json_expr.h>
 #include <util/xml_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
 #include <langapi/language_util.h>
+#include <goto-programs/show_goto_functions_json.h>
+#include <goto-programs/show_goto_functions_xml.h>
 
 #include "show_goto_functions.h"
 #include "goto_functions.h"
@@ -41,36 +44,15 @@ void show_goto_functions(
   {
   case ui_message_handlert::XML_UI:
   {
-    //This only prints the list of functions
-    xmlt xml_functions("functions");
-    forall_goto_functions(it, goto_functions)
-    {
-      xmlt &xml_function=xml_functions.new_element("function");
-      xml_function.set_attribute("name", id2string(it->first));
-    }
-
-    std::cout << xml_functions << std::endl;
+    show_goto_functions_xmlt xml_show_functions(ns);
+    xml_show_functions(goto_functions, std::cout);
   }
   break;
 
   case ui_message_handlert::JSON_UI:
   {
-    //This only prints the list of functions
-    json_arrayt json_functions;
-    forall_goto_functions(it, goto_functions)
-    {
-      json_objectt &json_function=
-        json_functions.push_back(jsont()).make_object();
-      json_function["name"]=json_stringt(id2string(it->first));
-      json_function["isBodyAvailable"]=
-        jsont::json_boolean(it->second.body_available());
-      bool is_internal=(has_prefix(id2string(it->first), CPROVER_PREFIX) ||
-                        it->first==ID__start);
-      json_function["isInternal"]=jsont::json_boolean(is_internal);
-    }
-    json_objectt json_result;
-    json_result["functions"]=json_functions;
-    std::cout << ",\n" << json_result;
+    show_goto_functions_jsont json_show_functions(ns);
+    json_show_functions(goto_functions, std::cout);
   }
   break;
 

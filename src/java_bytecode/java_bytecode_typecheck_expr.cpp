@@ -128,8 +128,8 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   escape_non_alnum(escaped);
   identifier_str << "java::java.lang.String.Literal." << escaped;
   // Avoid naming clashes by virtue of escaping:
-  size_t unique_num=escaped_string_literal_count[identifier_str.str()];
-  unique_num++;
+  // NOTE this increments the count stored in the map.
+  size_t unique_num=++(escaped_string_literal_count[identifier_str.str()]);
   if(unique_num!=1)
     identifier_str << unique_num;
 
@@ -254,10 +254,14 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     {
       // member doesn't exist. In this case struct_type should be an opaque
       // stub, and we'll add the member to it.
-      components
+      symbolt &symbol_table_type=
+        symbol_table.lookup("java::"+id2string(struct_type.get_tag()));
+      auto &add_to_components=
+        to_struct_type(symbol_table_type.type).components();
+      add_to_components
         .push_back(struct_typet::componentt(component_name, expr.type()));
-      components.back().set_base_name(component_name);
-      components.back().set_pretty_name(component_name);
+      add_to_components.back().set_base_name(component_name);
+      add_to_components.back().set_pretty_name(component_name);
       return;
     }
 

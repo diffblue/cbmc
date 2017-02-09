@@ -21,7 +21,7 @@ Function: irep_hash_container_baset::number
 
 \*******************************************************************/
 
-unsigned irep_hash_container_baset::number(const irept &irep)
+size_t irep_hash_container_baset::number(const irept &irep)
 {
   // the ptr-hash provides a speedup of up to 3x
 
@@ -32,7 +32,7 @@ unsigned irep_hash_container_baset::number(const irept &irep)
 
   packedt packed;
   pack(irep, packed);
-  unsigned id=numbering.number(packed);
+  size_t id=numbering.number(packed);
 
   ptr_hash[&irep.read()]=id;
 
