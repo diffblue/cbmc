@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
+#include <analyses/dirty.h>
+
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -102,7 +104,10 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
      state.level2.current_names.end())
     state.level2.current_names[l1_identifier]=std::make_pair(ssa, 0);
   state.level2.increase_counter(l1_identifier);
+  const bool record_events=state.record_events;
+  state.record_events=false;
   state.rename(ssa, ns);
+  state.record_events=record_events;
 
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden
@@ -116,4 +121,13 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     ssa,
     state.source,
     hidden?symex_targett::HIDDEN:symex_targett::STATE);
+
+  assert(state.dirty);
+  if((*state.dirty)(ssa.get_object_name()) &&
+     state.atomic_section_id==0)
+    target.shared_write(
+      state.guard.as_expr(),
+      ssa,
+      state.atomic_section_id,
+      state.source);
 }

@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_types.h>
 
+#include <analyses/dirty.h>
+
 #include "goto_symex.h"
 
 /*******************************************************************\
@@ -395,6 +397,7 @@ void goto_symext::pop_frame(statet &state)
     state.level1.restore_from(frame.old_level1);
 
     // clear function-locals from L2 renaming
+    assert(state.dirty);
     for(goto_symex_statet::renaming_levelt::current_namest::iterator
         c_it=state.level2.current_names.begin();
         c_it!=state.level2.current_names.end();
@@ -402,7 +405,9 @@ void goto_symext::pop_frame(statet &state)
     {
       const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
       // could use iteration over local_objects as l1_o_id is prefix
-      if(frame.local_objects.find(l1_o_id)==frame.local_objects.end())
+      if(frame.local_objects.find(l1_o_id)==frame.local_objects.end() ||
+         (state.threads.size()>1 &&
+          (*state.dirty)(c_it->second.first.get_object_name())))
       {
         ++c_it;
         continue;

@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
+#include <analyses/dirty.h>
+
 #include "goto_symex_state.h"
 
 /*******************************************************************\
@@ -31,7 +33,8 @@ goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
   atomic_section_id(0),
-  record_events(true)
+  record_events(true),
+  dirty(0)
 {
   threads.resize(1);
   new_frame();
@@ -640,17 +643,16 @@ bool goto_symex_statet::l2_thread_read_encoding(
   ssa_exprt &expr,
   const namespacet &ns)
 {
-  if(!record_events)
-    return false;
-
   // do we have threads?
   if(threads.size()<=1)
     return false;
 
   // is it a shared object?
+  assert(dirty!=0);
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
-     !ns.lookup(obj_identifier).is_shared())
+     (!ns.lookup(obj_identifier).is_shared() &&
+      !(*dirty)(obj_identifier)))
     return false;
 
   ssa_exprt ssa_l1=expr;
@@ -754,9 +756,18 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return true;
   }
 
-  // produce a fresh L2 name
   if(level2.current_names.find(l1_identifier)==level2.current_names.end())
     level2.current_names[l1_identifier]=std::make_pair(ssa_l1, 0);
+
+  // No event and no fresh index, but avoid constant propagation
+  if(!record_events)
+  {
+    set_ssa_indices(ssa_l1, ns, L2);
+    expr=ssa_l1;
+    return true;
+  }
+
+  // produce a fresh L2 name
   level2.increase_counter(l1_identifier);
   set_ssa_indices(ssa_l1, ns, L2);
   expr=ssa_l1;
@@ -792,9 +803,11 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
+  assert(dirty!=0);
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
-     !ns.lookup(obj_identifier).is_shared())
+     (!ns.lookup(obj_identifier).is_shared() &&
+      !(*dirty)(obj_identifier)))
     return false; // not shared
 
   // see whether we are within an atomic section

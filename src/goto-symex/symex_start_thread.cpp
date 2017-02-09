@@ -88,10 +88,12 @@ void goto_symext::symex_start_thread(statet &state)
 
     // make copy
     ssa_exprt rhs=c_it->second.first;
-    state.rename(rhs, ns);
 
     guardt guard;
+    const bool record_events=state.record_events;
+    state.record_events=false;
     symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+    state.record_events=record_events;
   }
 
   // initialize all variables marked thread-local
