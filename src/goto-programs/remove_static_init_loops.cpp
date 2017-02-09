@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/message.h>
+#include <util/suffix.h>
 #include <util/string2int.h>
 
 #include "remove_static_init_loops.h"
@@ -56,6 +57,10 @@ void remove_static_init_loopst::unwind_enum_static(
         const std::string java_clinit="<clinit>:()V";
         const std::string &fname=id2string(ins.function);
         size_t class_prefix_length=fname.find_last_of('.');
+        // is Java function and static init?
+        const symbolt &function_name=symbol_table.lookup(ins.function);
+        if(!(function_name.mode==ID_java && has_suffix(fname, java_clinit)))
+          continue;
         assert(
           class_prefix_length!=std::string::npos &&
           "could not identify class name");
@@ -65,23 +70,16 @@ void remove_static_init_loopst::unwind_enum_static(
         size_t unwinds=class_type.get_size_t(ID_java_enum_static_unwind);
 
         unwind_max=std::max(unwind_max, unwinds);
-        if(fname.length()>java_clinit.length())
+        if(unwinds>0)
         {
-          // extend unwindset with unwinds for <clinit> of enum
-          if(fname.compare(
-            fname.length()-java_clinit.length(),
-            java_clinit.length(),
-            java_clinit)==0 && unwinds>0)
-          {
-            const std::string &set=options.get_option("unwindset");
-            std::string newset;
-            if(set!="")
-              newset=",";
-            newset+=
-              id2string(ins.function)+"."+std::to_string(loop_id)+":"+
-              std::to_string(unwinds);
-            options.set_option("unwindset", set+newset);
-          }
+          const std::string &set=options.get_option("unwindset");
+          std::string newset;
+          if(set!="")
+            newset=",";
+          newset+=
+            id2string(ins.function)+"."+std::to_string(loop_id)+":"+
+            std::to_string(unwinds);
+          options.set_option("unwindset", set+newset);
         }
       }
     }
