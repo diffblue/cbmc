@@ -179,6 +179,27 @@ bool java_bytecode_languaget::parse(
   return false;
 }
 
+/*******************************************************************\
+
+Function: get_virtual_method_target
+
+  Inputs: `needed_classes`: set of classes that can be instantiated.
+            Any potential callee not in this set will be ignored.
+          `call_basename`: unqualified function name with type
+            signature (e.g. "f:(I)")
+          `classname`: class name that may define or override a
+            function named `call_basename`.
+          `symbol_table`: global symtab
+
+ Outputs: Returns the fully qualified name of `classname`'s definition
+          of `call_basename` if found and `classname` is present in
+          `needed_classes`, or irep_idt() otherwise.
+
+ Purpose: Find a virtual callee, if one is defined and the callee type
+          is known to exist.
+
+\*******************************************************************/
+
 static irep_idt get_virtual_method_target(
   const std::set<irep_idt>& needed_classes,
   const irep_idt& call_basename,
@@ -194,6 +215,27 @@ static irep_idt get_virtual_method_target(
   else
     return irep_idt();
 }
+
+/*******************************************************************\
+
+Function: get_virtual_method_target
+
+  Inputs: `c`: function call whose potential target functions should
+            be determined.
+          `needed_classes`: set of classes that can be instantiated.
+            Any potential callee not in this set will be ignored.
+          `symbol_table`: global symtab
+          `class_hierarchy`: global class hierarchy
+
+ Outputs: Populates `needed_methods` with all possible `c` callees,
+          taking `needed_classes` into account (virtual function
+          overrides defined on classes that are not 'needed' are
+          ignored)
+
+ Purpose: Find possible callees, excluding types that are not known
+          to be instantiated.
+
+\*******************************************************************/
 
 static void get_virtual_method_targets(
   const code_function_callt& c,
@@ -262,6 +304,19 @@ static void get_virtual_method_targets(
 
 }
 
+/*******************************************************************\
+
+Function: gather_virtual_callsites
+
+  Inputs: `e`: expression tree to search
+
+ Outputs: Populates `result` with pointers to each function call
+            within e that calls a virtual function.
+
+ Purpose: See output
+
+\*******************************************************************/
+
 static void gather_virtual_callsites(const exprt& e, std::vector<const code_function_callt*>& result)
 {
   if(e.id()!=ID_code)
@@ -275,6 +330,20 @@ static void gather_virtual_callsites(const exprt& e, std::vector<const code_func
       gather_virtual_callsites(*it,result);
 }
 
+/*******************************************************************\
+
+Function: gather_needed_globals
+
+  Inputs: `e`: expression tree to search
+          `symbol_table`: global symtab
+
+ Outputs: Populates `needed` with global variable symbols referenced
+          from `e` or its children.
+
+ Purpose: See output
+
+\*******************************************************************/
+
 static void gather_needed_globals(const exprt& e, const symbol_tablet& symbol_table, symbol_tablet& needed)
 {
   if(e.id()==ID_symbol)
@@ -287,6 +356,23 @@ static void gather_needed_globals(const exprt& e, const symbol_tablet& symbol_ta
     forall_operands(opit,e)
       gather_needed_globals(*opit,symbol_table,needed);
 }
+
+/*******************************************************************\
+
+Function: gather_field_types
+
+  Inputs: `class_type`: root of class tree to search
+          `ns`: global namespace
+
+ Outputs: Populates `needed_classes` with all Java reference types
+            reachable starting at `class_type`. For example if
+            `class_type` is `symbol_typet("java::A")` and A has a B
+            field, then `B` (but not `A`) will be added to
+            `needed_classes`.
+
+ Purpose: See output
+
+\*******************************************************************/
 
 static void gather_field_types(
   const typet& class_type,
@@ -309,6 +395,23 @@ static void gather_field_types(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: initialise_needed_classes
+
+  Inputs: `entry_points`: list of fully-qualified function names that
+            we should assume are reachable
+          `ns`: global namespace
+          `ch`: global class hierarchy
+
+ Outputs: Populates `needed_classes` with all Java reference types
+            whose references may be passed, directly or indirectly,
+            to any of the functions in `entry_points`.
+
+ Purpose: See output
+
+\*******************************************************************/
 
 static void initialise_needed_classes(
   const std::vector<irep_idt>& entry_points,
