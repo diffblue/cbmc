@@ -428,7 +428,8 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
-  // Now incrementally elaborate methods that are reachable from this entry point.
+  // Now incrementally elaborate methods
+  // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
     if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
@@ -446,7 +447,8 @@ bool java_bytecode_languaget::typecheck(
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
 
-  auto main_function=get_main_symbol(symbol_table,main_class,get_message_handler(),true);
+  auto main_function=
+    get_main_symbol(symbol_table, main_class, get_message_handler(), true);
   if(main_function.stop_convert)
   {
     // Failed, mark all functions in the given main class(es) reachable.
@@ -457,7 +459,8 @@ bool java_bytecode_languaget::typecheck(
       reachable_classes=main_jar_classes;
     for(const auto& classname : reachable_classes)
     {
-      const auto& methods=java_class_loader.class_map.at(classname).parsed_class.methods;
+      const auto& methods=
+        java_class_loader.class_map.at(classname).parsed_class.methods;
       for(const auto& method : methods)
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
@@ -471,18 +474,22 @@ bool java_bytecode_languaget::typecheck(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(method_worklist2,namespacet(symbol_table),ch,needed_classes);
+  initialise_needed_classes(
+    method_worklist2,
+    namespacet(symbol_table),
+    ch,
+    needed_classes);
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt*> virtual_callsites;
 
   bool any_new_methods;
-  do {
-
+  do
+  {
     any_new_methods=false;
     while(method_worklist2.size()!=0)
     {
-      std::swap(method_worklist1,method_worklist2);
+      std::swap(method_worklist1, method_worklist2);
       for(const auto& mname : method_worklist1)
       {
         if(!methods_already_populated.insert(mname).second)
@@ -504,7 +511,9 @@ bool java_bytecode_languaget::typecheck(
           max_user_array_length,
           &method_worklist2,
           &needed_classes);
-        gather_virtual_callsites(symbol_table.lookup(mname).value,virtual_callsites);
+        gather_virtual_callsites(
+          symbol_table.lookup(mname).value,
+          virtual_callsites);
         any_new_methods=true;
       }
       method_worklist1.clear();
@@ -513,14 +522,16 @@ bool java_bytecode_languaget::typecheck(
     // Given the object types we now know may be created, populate more
     // possible virtual function call targets:
 
-    debug() << "CI lazy methods: add virtual method targets (" << virtual_callsites.size() <<
-      " callsites)" << eom;
+    debug() << "CI lazy methods: add virtual method targets ("
+            << virtual_callsites.size()
+            << " callsites)"
+            << eom;
 
     for(const auto& callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
-      get_virtual_method_targets(*callsite,needed_classes,method_worklist2,
-				 symbol_table,ch);
+      get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
+				 symbol_table, ch);
     }
 
   } while(any_new_methods);
@@ -532,14 +543,20 @@ bool java_bytecode_languaget::typecheck(
   {
     if(sym.second.is_static_lifetime)
       continue;
-    if(lazy_methods.count(sym.first) && !methods_already_populated.count(sym.first))
+    if(lazy_methods.count(sym.first) &&
+       !methods_already_populated.count(sym.first))
+    {
       continue;
+    }
     if(sym.second.type.id()==ID_code)
-      gather_needed_globals(sym.second.value,symbol_table,keep_symbols);
+      gather_needed_globals(sym.second.value, symbol_table, keep_symbols);
     keep_symbols.add(sym.second);
   }
 
-  debug() << "CI lazy methods: removed " << symbol_table.symbols.size() - keep_symbols.symbols.size() << " unreachable methods and globals" << eom;
+  debug() << "CI lazy methods: removed "
+          << symbol_table.symbols.size() - keep_symbols.symbols.size()
+          << " unreachable methods and globals"
+          << eom;
 
   symbol_table.swap(keep_symbols);
 
