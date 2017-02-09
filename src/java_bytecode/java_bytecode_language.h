@@ -23,7 +23,11 @@ enum lazy_methods_modet
   LAZY_METHODS_MODE_CONTEXT_SENSITIVE
 };
 
-typedef std::map<irep_idt, std::pair<const symbolt*, const java_bytecode_parse_treet::methodt*> >
+typedef std::pair<
+          const symbolt*,
+          const java_bytecode_parse_treet::methodt*>
+  lazy_method_valuet;
+typedef std::map<irep_idt, lazy_method_valuet>
   lazy_methodst;
 
 class java_bytecode_languaget:public languaget
