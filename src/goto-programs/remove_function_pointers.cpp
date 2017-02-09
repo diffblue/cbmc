@@ -350,6 +350,14 @@ void remove_function_pointerst::remove_function_pointer(
 
   bool found_functions=fpr(functions);
 
+  // Consistency checks
+  // Reported optimized function pointer call, but didn't find any functions
+  assert(!found_functions || !functions.empty());
+
+  // Reported didn't optimize function pointer call, but did find some
+  // functions to replace with
+  assert(found_functions || functions.empty());
+
   if(functions.size()==1)
   {
     to_code_function_call(target->code).function()=*functions.cbegin();
@@ -358,12 +366,6 @@ void remove_function_pointerst::remove_function_pointer(
 
   if(!found_functions)
   {
-    debug() << "Failed to optimize away the function pointer\n"
-            << "The type was " << pointer.id() << " "
-            << "irep dump:\n"
-            << pointer.pretty()
-            << eom;
-
     bool return_value_used=code.lhs().is_not_nil();
 
     // get all type-compatible functions
