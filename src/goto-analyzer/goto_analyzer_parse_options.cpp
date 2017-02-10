@@ -278,6 +278,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     status() << "Domain defaults to --constants" << eom;
     options.set_option("constants", true);
   }
+
+  if(cmdline.isset("ignore-unresolved-calls"))
+    options.set_option("ignore-unresolved-calls", true);
 }
 
 /*******************************************************************\
