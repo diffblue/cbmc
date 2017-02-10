@@ -12,6 +12,7 @@ Date: June 2003
 #define CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 
 #include "goto_model.h"
+#include <util/message.h>
 
 // remove indirect function calls
 // and replace by case-split
