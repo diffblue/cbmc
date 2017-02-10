@@ -149,11 +149,15 @@ sub test($$$$$) {
     }
   } else {
     print LOG "Execution [SKIPPED]\n";
+    return 2;
   }
 
   print LOG "\n";
 
-  return $failed;
+  # if the test is a KNOWNBUG then the test should fail
+  my $should_fail = $level eq 8;
+
+  return ($should_fail != $failed);
 }
 
 sub dirs() {

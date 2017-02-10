@@ -7,9 +7,23 @@ test:
 		exit 1; \
 	fi
 
+	@echo "Testing KNOWNBUG fail"
+
+	@if ! ../test.pl -c ../program_runner.sh -K ; then \
+		../failed-tests-printer.pl ; \
+		exit 1; \
+	fi
+
 tests.log:
 	pwd
 	@if ! ../test.pl -c ../program_runner.sh ; then \
+		../failed-tests-printer.pl ; \
+		exit 1; \
+	fi
+
+	@echo "Testing KNOWNBUG fail"
+
+	@if ! ../test.pl -c ../program_runner.sh -K ; then \
 		../failed-tests-printer.pl ; \
 		exit 1; \
 	fi
