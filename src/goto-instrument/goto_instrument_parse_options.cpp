@@ -507,17 +507,7 @@ int goto_instrument_parse_optionst::doit()
       reaching_definitions_analysist rd_analysis(ns);
       rd_analysis(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          rd_analysis.output(ns, f_it->second.body, std::cout);
-        }
-      }
+      rd_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
     }
@@ -530,18 +520,7 @@ int goto_instrument_parse_optionst::doit()
       dependence_grapht dependence_graph(ns);
       dependence_graph(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          dependence_graph.output(ns, f_it->second.body, std::cout);
-        }
-      }
-
+      dependence_graph.output(ns, goto_functions, std::cout);
       dependence_graph.output_dot(std::cout);
 
       return 0;
