@@ -15,6 +15,3 @@ main.c
 ^SIGNAL=0$
 --
 ^warning: ignoring
---
-This shouldn't work because the pointer can be assigned to a different
-struct after initial assignment.

@@ -7,9 +7,3 @@ main.c
 ^SIGNAL=0$
 --
 ^warning: ignoring
---
-This test is marked as a KNOWNBUG as it is possible for the function
-pointer to be optimized away. Currently goto-analyzer falls back to
-assuming it could be any type compatible function.
-
-Issue: https://github.com/diffblue/cbmc/issues/476

@@ -1,15 +1,14 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-void f1 (void) { printf("%i", 1); }
-void f2 (void) { printf("%i", 2); }
-void f3 (void) { printf("%i", 3); }
-void f4 (void) { printf("%i", 4); }
-void f5 (void) { printf("%i", 5); }
-void f6 (void) { printf("%i", 6); }
-void f7 (void) { printf("%i", 7); }
-void f8 (void) { printf("%i", 8); }
-void f9 (void) { printf("%i", 9); }
+void f1 (void) { printf("%i\n", 1); }
+void f2 (void) { printf("%i\n", 2); }
+void f3 (void) { printf("%i\n", 3); }
+void f4 (void) { printf("%i\n", 4); }
+void f5 (void) { printf("%i\n", 5); }
+void f6 (void) { printf("%i\n", 6); }
+void f7 (void) { printf("%i\n", 7); }
+void f8 (void) { printf("%i\n", 8); }
+void f9 (void) { printf("%i\n", 9); }
 
 typedef void(*void_fp)(void);
 
@@ -31,7 +30,8 @@ typedef struct fp_cc
 
 
 
-void func(){
+void func()
+{
   const fp_container container = {.y = 10, .pointer = f3};
   const fp_container container2 = {.y = 10, .pointer = f4};
   const fp_cc container_container = { .container = &container, .x = 4 };
@@ -43,6 +43,7 @@ void func(){
   (*container_container.container).pointer();
 }
 
-int main(){
+int main()
+{
   func();
 }
