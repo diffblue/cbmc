@@ -377,88 +377,29 @@ Function: remove_const_function_pointerst::try_resolve_index_of_function_call
 bool remove_const_function_pointerst::try_resolve_index_of_function_call(
   const index_exprt &index_expr, functionst &out_functions)
 {
-  // Get the array(s) it belongs to
-  expressionst potential_array_exprs;
-  bool is_const=false;
-  bool resolved_array=
-    try_resolve_expression(index_expr.array(), potential_array_exprs, is_const);
-  if(resolved_array)
+  expressionst potential_array_values;
+  bool array_const;
+  try_resolve_index_of(index_expr, potential_array_values, array_const);
+  if(array_const)
   {
-    for(const exprt &potential_array_expr : potential_array_exprs)
+    for(const exprt &array_value : potential_array_values)
     {
-      if(potential_array_expr.id()==ID_array)
+      functionst array_out_functions;
+      bool resolved_value=
+        try_resolve_function_call(array_value, array_out_functions);
+
+      if(resolved_value)
       {
-        // We require either the type of the values of the array or
-        // the array itself to be constant.
-        const typet &array_type=potential_array_expr.type();
-        const typet &array_contents_type=array_type.subtype();
-        c_qualifierst array_qaulifiers;
-        array_qaulifiers.read(array_contents_type);
-
-        if(array_qaulifiers.is_constant || is_const)
-        {
-          // Get the index if we can
-          mp_integer value;
-          if(try_resolve_index_value(index_expr.index(), value))
-          {
-            functionst array_out_functions;
-            const exprt &func_expr=
-              potential_array_expr.operands()[integer2size_t(value)];
-            bool resolved_value=
-              try_resolve_function_call(func_expr, array_out_functions);
-
-            if(resolved_value)
-            {
-              out_functions.insert(
-                array_out_functions.begin(),
-                array_out_functions.end());
-            }
-            else
-            {
-              LOG("Could not resolve expression in array", func_expr);
-              return false;
-            }
-          }
-          else
-          {
-            // We don't know what index it is,
-            // but we know the value is from the array
-            for(const exprt &array_entry : potential_array_expr.operands())
-            {
-              if(array_entry.is_zero())
-              {
-                continue;
-              }
-              functionst potential_functions;
-              bool resolved_value=
-                try_resolve_function_call(array_entry, potential_functions);
-
-              if(resolved_value)
-              {
-                out_functions.insert(
-                  potential_functions.begin(), potential_functions.end());
-              }
-              else
-              {
-                LOG("Could not resolve expression in array", array_entry);
-                return false;
-              }
-            }
-          }
-        }
-        else
-        {
-          LOG("Array and its contents are not const", potential_array_expr);
-          return false;
-        }
+        out_functions.insert(
+          array_out_functions.begin(),
+          array_out_functions.end());
       }
       else
       {
-        LOG("Squashing index did not result in an array", potential_array_expr);
+        LOG("Could not resolve expression in array", array_value);
         return false;
       }
     }
-
     return true;
   }
   else
