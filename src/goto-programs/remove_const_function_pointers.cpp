@@ -181,157 +181,23 @@ bool remove_const_function_pointerst::try_resolve_function_call(
   else if(simplified_expr.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(simplified_expr);
-    const exprt &owner_expr=member_expr.compound();
-    // Squash the struct
-    expressionst out_expressions;
-    bool struct_is_const=false;
-    bool resolved=
-      try_resolve_expression(owner_expr, out_expressions, struct_is_const);
-    if(resolved)
-    {
-      for(const exprt &expression:out_expressions)
-      {
-        if(expression.id()!=ID_struct)
-        {
-          LOG("Squash of member access didn't result in a struct", expression);
-          return false;
-        }
-        else
-        {
-          const struct_exprt &struct_expr=to_struct_expr(expression);
-          const exprt &component_value=
-            get_component_value(struct_expr, member_expr);
-
-          if(struct_is_const)
-          {
-            functionst component_functions;
-            bool resolved=
-              try_resolve_function_call(component_value, component_functions);
-            if(resolved)
-            {
-              out_functions.insert(
-                component_functions.begin(), component_functions.end());
-            }
-            else
-            {
-              LOG(
-                "Couldn't resolve functions call from component value",
-                component_value);
-              return false;
-            }
-          }
-          else
-          {
-            LOG(
-              "Struct was not const so can't resolve values on it",
-              struct_expr);
-            return false;
-          }
-        }
-      }
-
-      return true;
-
-    }
-    else
-    {
-      LOG("Failed to squash struct member access", owner_expr);
-      return false;
-    }
+    return try_resolve_member_function_call(member_expr, out_functions);
   }
   else if(simplified_expr.id()==ID_address_of)
   {
     address_of_exprt address_expr=to_address_of_expr(simplified_expr);
-    bool resolved=
-      try_resolve_function_call(address_expr.object(), out_functions);
-    if(!resolved)
-    {
-      LOG("Failed to resolve address of", address_expr);
-    }
-    return resolved;
+    return try_resolve_address_of_function_call(
+      address_expr, out_functions);
   }
   else if(simplified_expr.id()==ID_dereference)
   {
-    // We had a pointer, we need to check both the pointer
-    // type can't be changed, and what it what pointing to
-    // can't be changed
     const dereference_exprt &deref=to_dereference_expr(simplified_expr);
-    expressionst pointer_values;
-    bool pointer_const;
-    bool resolved=
-      try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
-
-    // Here we require that the value we are dereferencing is const
-    // The actual type doesn't matter since we are on the RHS so what matters
-    // is where this gets stored, but the value stored matters
-    if(resolved && pointer_const)
-    {
-      for(const exprt &pointer_val : pointer_values)
-      {
-        if(pointer_val.id()==ID_address_of)
-        {
-          address_of_exprt address_expr=to_address_of_expr(pointer_val);
-          functionst out_object_values;
-          bool resolved=
-            try_resolve_function_call(
-              address_expr.object(), out_object_values);
-
-          if(resolved)
-          {
-            out_functions.insert(
-              out_object_values.begin(),
-              out_object_values.end());
-          }
-          else
-          {
-            LOG("Failed to resolver pointers value", address_expr);
-            return false;
-          }
-        }
-        else
-        {
-          LOG(
-            "Squashing dereference did not result in an address of",
-            pointer_val);
-          return false;
-        }
-      }
-      return true;
-    }
-    else
-    {
-      if(!resolved)
-      {
-        LOG("Failed to squash dereference", deref);
-      }
-      else if(!pointer_const)
-      {
-        LOG("Dereferenced value was not const so can't dereference", deref);
-      }
-      return false;
-    }
+    return try_resolve_dereference_function_call(deref, out_functions);
   }
   else if(simplified_expr.id()==ID_typecast)
   {
-    // We simply ignore typecasts and assume they are valid
-    // I thought simplify_expr would deal with this, but for example
-    // a cast from a 32 bit width int to a 64bit width int it doesn't seem
-    // to allow
     typecast_exprt typecast_expr=to_typecast_expr(simplified_expr);
-    functionst typecast_values;
-    bool resolved=
-      try_resolve_function_call(typecast_expr.op(), typecast_values);
-
-    if(resolved)
-    {
-      out_functions.insert(typecast_values.begin(), typecast_values.end());
-      return true;
-    }
-    else
-    {
-      LOG("Failed to squash typecast", simplified_expr);
-      return false;
-    }
+    return try_resolve_typecast_function_call(typecast_expr, out_functions);
   }
   else if(simplified_expr.id()==ID_symbol)
   {
@@ -405,6 +271,237 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
   else
   {
     LOG("Could not resolve arary", index_expr);
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::try_resolve_member_function_call
+
+  Inputs:
+   member_expr - The member expression to resolve to possible function calls
+   out_functions - The functions this expression could be
+
+ Outputs: Returns true if it was able to resolve the member expression to some
+          specific functions. If this is the case, out_functions will contain
+          the possible functions.
+
+ Purpose: To resolve an expression to the specific function calls it can
+          be. Specifically, this function deals with member expressions
+          by using try_resolve_member and then recursing on its value.
+
+\*******************************************************************/
+
+bool remove_const_function_pointerst::try_resolve_member_function_call(
+  const member_exprt &member_expr, functionst &out_functions)
+{
+  const exprt &owner_expr=member_expr.compound();
+  // Squash the struct
+  expressionst out_expressions;
+  bool struct_is_const=false;
+  bool resolved=
+    try_resolve_expression(owner_expr, out_expressions, struct_is_const);
+  if(resolved)
+  {
+    for(const exprt &expression:out_expressions)
+    {
+      if(expression.id()!=ID_struct)
+      {
+        LOG("Squash of member access didn't result in a struct", expression);
+        return false;
+      }
+      else
+      {
+        const struct_exprt &struct_expr=to_struct_expr(expression);
+        const exprt &component_value=
+          get_component_value(struct_expr, member_expr);
+
+        if(struct_is_const)
+        {
+          functionst component_functions;
+          bool resolved=
+            try_resolve_function_call(component_value, component_functions);
+          if(resolved)
+          {
+            out_functions.insert(
+              component_functions.begin(), component_functions.end());
+          }
+          else
+          {
+            LOG(
+              "Couldn't resolve functions call from component value",
+              component_value);
+            return false;
+          }
+        }
+        else
+        {
+          LOG(
+            "Struct was not const so can't resolve values on it",
+            struct_expr);
+          return false;
+        }
+      }
+    }
+
+    return true;
+
+  }
+  else
+  {
+    LOG("Failed to squash struct member access", owner_expr);
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::try_resolve_address_of_function_call
+
+  Inputs:
+   address_expr - The address_of expression to resolve to possible function
+                  calls
+   out_functions - The functions this expression could be
+
+ Outputs: Returns true if it was able to resolve the address_of expression to
+          some specific functions. If this is the case, out_functions will
+          contain the possible functions.
+
+ Purpose: To resolve an expression to the specific function calls it can
+          be. Specifically, this function deals with address_os expressions.
+
+\*******************************************************************/
+
+bool remove_const_function_pointerst::try_resolve_address_of_function_call(
+  const address_of_exprt &address_expr, functionst &out_functions)
+{
+  bool resolved=
+    try_resolve_function_call(address_expr.object(), out_functions);
+  if(!resolved)
+  {
+    LOG("Failed to resolve address of", address_expr);
+  }
+  return resolved;
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::try_resolve_dereference_function_call
+
+  Inputs:
+   deref_expr - The dereference expression to resolve to possible function calls
+   out_functions - The functions this expression could be
+
+ Outputs: Returns true if it was able to resolve the dereference expression to
+          some specific functions. If this is the case, out_functions will
+          contain the possible functions.
+
+ Purpose: To resolve an expression to the specific function calls it can
+          be. Specifically, this function deals with dereference expressions
+          by using try_resolve_dereferebce and then recursing on its value.
+
+\*******************************************************************/
+
+bool remove_const_function_pointerst::try_resolve_dereference_function_call(
+  const dereference_exprt &deref, functionst &out_functions)
+{
+  // We had a pointer, we need to check both the pointer
+  // type can't be changed, and what it what pointing to
+  // can't be changed
+  expressionst pointer_values;
+  bool pointer_const;
+  bool resolved=
+    try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
+
+  // Here we require that the value we are dereferencing is const
+  // The actual type doesn't matter since we are on the RHS so what matters
+  // is where this gets stored, but the value stored matters
+  if(resolved && pointer_const)
+  {
+    for(const exprt &pointer_val : pointer_values)
+    {
+      if(pointer_val.id()==ID_address_of)
+      {
+        address_of_exprt address_expr=to_address_of_expr(pointer_val);
+        functionst out_object_values;
+        bool resolved=
+          try_resolve_function_call(
+            address_expr.object(), out_object_values);
+
+        if(resolved)
+        {
+          out_functions.insert(
+            out_object_values.begin(),
+            out_object_values.end());
+        }
+        else
+        {
+          LOG("Failed to resolver pointers value", address_expr);
+          return false;
+        }
+      }
+      else
+      {
+        LOG(
+          "Squashing dereference did not result in an address of",
+          pointer_val);
+        return false;
+      }
+    }
+    return true;
+  }
+  else
+  {
+    if(!resolved)
+    {
+      LOG("Failed to squash dereference", deref);
+    }
+    else if(!pointer_const)
+    {
+      LOG("Dereferenced value was not const so can't dereference", deref);
+    }
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_const_function_pointerst::try_resolve_typecast_function_call
+
+  Inputs:
+   typecast_expr - The typecast expression to resolve to possible function calls
+   out_functions - The functions this expression could be
+
+ Outputs: Returns true if it was able to resolve the typecast expression to
+          some specific functions. If this is the case, out_functions will
+          contain the possible functions.
+
+ Purpose: To resolve an expression to the specific function calls it can
+          be. Specifically, this function deals with typecast expressions
+          by looking at the type cast values.
+
+\*******************************************************************/
+
+bool remove_const_function_pointerst::try_resolve_typecast_function_call(
+  const typecast_exprt &typecast_expr, functionst &out_functions)
+{
+  // We simply ignore typecasts and assume they are valid
+  // I thought simplify_expr would deal with this, but for example
+  // a cast from a 32 bit width int to a 64bit width int it doesn't seem
+  // to allow
+  functionst typecast_values;
+  bool resolved=
+    try_resolve_function_call(typecast_expr.op(), typecast_values);
+
+  if(resolved)
+  {
+    out_functions.insert(typecast_values.begin(), typecast_values.end());
+    return true;
+  }
+  else
+  {
+    LOG("Failed to squash typecast", typecast_expr);
     return false;
   }
 }

@@ -38,6 +38,18 @@ private:
   bool try_resolve_index_of_function_call(
     const index_exprt &index_expr, functionst &out_functions);
 
+  bool try_resolve_member_function_call(
+    const member_exprt &member_expr, functionst &out_functions);
+
+  bool try_resolve_address_of_function_call(
+    const address_of_exprt &address_expr, functionst &out_functions);
+
+  bool try_resolve_dereference_function_call(
+    const dereference_exprt &deref, functionst &out_functions);
+
+  bool try_resolve_typecast_function_call(
+    const typecast_exprt &typecast_expr, functionst &out_functions);
+
   // recursive functions for dealing with the auxiliary elements
   bool try_resolve_expression(
     const exprt &expr,
