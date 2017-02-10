@@ -35,6 +35,9 @@ private:
   // recursive functions for dealing with the function pointer
   bool try_resolve_function_call(const exprt &expr, functionst &out_functions);
 
+  bool try_resolve_function_calls(
+    const expressionst &exprs, functionst &out_functions);
+
   bool try_resolve_index_of_function_call(
     const index_exprt &index_expr, functionst &out_functions);
 

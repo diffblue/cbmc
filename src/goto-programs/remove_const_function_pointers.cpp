@@ -235,6 +235,47 @@ bool remove_const_function_pointerst::try_resolve_function_call(
 
 /*******************************************************************\
 
+Function: remove_const_function_pointerst::try_resolve_function_calls
+
+  Inputs:
+   exprs - The expressions to evaluate
+   out_functions - The functions these expressions resolve to
+
+ Outputs: Returns true if able to resolve each of the expressions down
+          to one or more functions.
+
+ Purpose: To resolve a collection of expressions to the specific function
+          calls they can be. Returns a collection if and only if all of
+          them can be resolved.
+
+\*******************************************************************/
+
+bool remove_const_function_pointerst::try_resolve_function_calls(
+  const expressionst &exprs, functionst &out_functions)
+{
+  for(const exprt &value : exprs)
+  {
+    functionst potential_out_functions;
+    bool resolved_value=
+      try_resolve_function_call(value, potential_out_functions);
+
+    if(resolved_value)
+    {
+      out_functions.insert(
+        potential_out_functions.begin(),
+        potential_out_functions.end());
+    }
+    else
+    {
+      LOG("Could not resolve expression in array", value);
+      return false;
+    }
+  }
+  return true;
+}
+
+/*******************************************************************\
+
 Function: remove_const_function_pointerst::try_resolve_index_of_function_call
 
   Inputs:
@@ -274,25 +315,7 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
     return false;
   }
 
-  for(const exprt &array_value : potential_array_values)
-  {
-    functionst array_out_functions;
-    bool resolved_value=
-      try_resolve_function_call(array_value, array_out_functions);
-
-    if(resolved_value)
-    {
-      out_functions.insert(
-        array_out_functions.begin(),
-        array_out_functions.end());
-    }
-    else
-    {
-      LOG("Could not resolve expression in array", array_value);
-      return false;
-    }
-  }
-  return true;
+  return try_resolve_function_calls(potential_array_values, out_functions);
 }
 
 /*******************************************************************\
@@ -333,24 +356,7 @@ bool remove_const_function_pointerst::try_resolve_member_function_call(
     return false;
   }
 
-  for(const exprt &struct_component_value : potential_component_values)
-  {
-    functionst struct_out_functions;
-    bool resolved_value=
-      try_resolve_function_call(struct_component_value, struct_out_functions);
-
-    if(resolved_value)
-    {
-      out_functions.insert(
-        struct_out_functions.begin(), struct_out_functions.end());
-    }
-    else
-    {
-      LOG("Could not resolve expression in array", struct_component_value);
-      return false;
-    }
-  }
-  return true;
+  return try_resolve_function_calls(potential_component_values, out_functions);
 }
 
 /*******************************************************************\
@@ -421,24 +427,7 @@ bool remove_const_function_pointerst::try_resolve_dereference_function_call(
     return false;
   }
 
-  for(const exprt &deref_value : potential_deref_values)
-  {
-    functionst struct_out_functions;
-    bool resolved_value=
-      try_resolve_function_call(deref_value, struct_out_functions);
-
-    if(resolved_value)
-    {
-      out_functions.insert(
-        struct_out_functions.begin(), struct_out_functions.end());
-    }
-    else
-    {
-      LOG("Could not resolve expression after dereference", deref_value);
-      return false;
-    }
-  }
-  return true;
+  return try_resolve_function_calls(potential_deref_values, out_functions);
 }
 
 /*******************************************************************\
