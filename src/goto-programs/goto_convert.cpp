@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -2674,24 +2675,21 @@ symbolt &goto_convertt::new_tmp_symbol(
   goto_programt &dest,
   const source_locationt &source_location)
 {
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.base_name="tmp_"+suffix+"$"+std::to_string(++temporary_counter);
-    new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.type=type;
-    new_symbol.location=source_location;
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
+  symbolt &new_symbol=
+    get_fresh_aux_symbol(
+      type,
+      tmp_symbol_prefix,
+      "tmp_"+suffix,
+      source_location,
+      irep_idt(),
+      symbol_table);
 
   code_declt decl;
-  decl.symbol()=symbol_ptr->symbol_expr();
+  decl.symbol()=new_symbol.symbol_expr();
   decl.add_source_location()=source_location;
   convert_decl(decl, dest);
 
-  return *symbol_ptr;
+  return new_symbol;
 }
 
 /*******************************************************************\

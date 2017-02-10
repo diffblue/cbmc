@@ -22,6 +22,7 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       irep_ids.cpp byte_operators.cpp string2int.cpp file_util.cpp \
       memory_info.cpp pipe_stream.cpp irep_hash.cpp endianness_map.cpp \
       ssa_expr.cpp json_irep.cpp json_expr.cpp \
+      fresh_symbol.cpp \
       string_utils.cpp
 
 INCLUDES= -I ..

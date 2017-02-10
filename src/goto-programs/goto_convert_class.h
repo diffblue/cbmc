@@ -32,7 +32,7 @@ public:
     symbol_table(_symbol_table),
     ns(_symbol_table),
     temporary_counter(0),
-    tmp_symbol_prefix("goto_convertt::")
+    tmp_symbol_prefix("goto_convertt")
   {
   }
 
