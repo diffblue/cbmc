@@ -52,8 +52,10 @@ bool static_show_domain(
   {
     if(options.get_bool_option("constants"))
     {
-      //domain=new ait<constant_propagator_domaint>();
-      domain=new constant_propagator_ait(goto_model.goto_functions);
+      domain=
+        new constant_propagator_ait(
+          goto_model.goto_functions,
+          options.get_bool_option("ignore-unresolved-calls"));
     }
     else if(options.get_bool_option("intervals"))
       domain=new ait<interval_domaint>();
