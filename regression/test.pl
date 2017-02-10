@@ -116,42 +116,26 @@ sub test($$$$$) {
         } else {
           my $r;
 
-          my $dir = getcwd();
-          my $abs_path = "$dir/$name/$output";
-          open(my $fh => $abs_path) || die "Cannot open '$name/$output': $!";
-
           # Multi line therefore we run each check across the whole output
           if($grep_options eq "activate-multi-line-match") {
+            my $dir = getcwd();
+            my $abs_path = "$dir/$name/$output";
+            open(my $fh => $abs_path) || die "Cannot open '$name/$output': $!";
+
             local $/ = undef;
             binmode $fh;
             my $whole_file = <$fh>;
             my $is_match = $whole_file =~ /$result/;
             $r = ($included ? !$is_match : $is_match);
+            close($fh);
           }
           else
           {
-            my $found_line = 0;
-            while(my $line = <$fh>) {
-              if($line =~ /$result/) {
-                # We've found the line, therefore if it is included we set
-                # the result to 0 (OK) If it is excluded, we set the result
-                # to 1 (FAILED)
-                $r = !$included;
-                $found_line = 1;
-                last;
-              }
-            }
-
-            if($found_line == 0) {
-              # None of the lines matched, therefore the result is set to
-              # 0 (OK) if and only if the line was not meant to be included
-              $r = $included;
-            }
-
+            $result =~ s/\\/\\\\/g;
+            $result =~ s/([^\\])\$/$1\\r\\\\?\$/;
+            system("bash", "-c", "grep \$'$result' '$name/$output' >/dev/null");
+            $r = ($included ? $? != 0 : $? == 0);
           }
-          close($fh);
-
-
           if($r) {
             print LOG "$result [FAILED]\n";
             $failed = 1;
