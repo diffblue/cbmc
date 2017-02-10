@@ -170,51 +170,65 @@ Function: remove_const_function_pointerst::try_resolve_function_call
 \*******************************************************************/
 
 bool remove_const_function_pointerst::try_resolve_function_call(
-  const exprt &expr, remove_const_function_pointerst::functionst &out_functions)
+  const exprt &expr, functionst &out_functions)
 {
+  assert(out_functions.empty());
   const exprt &simplified_expr=simplify_expr(expr, ns);
+  bool resolved=false;
+  functionst resolved_functions;
   if(simplified_expr.id()==ID_index)
   {
     const index_exprt &index_expr=to_index_expr(simplified_expr);
-    return try_resolve_index_of_function_call(index_expr, out_functions);
+    resolved=try_resolve_index_of_function_call(index_expr, resolved_functions);
   }
   else if(simplified_expr.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(simplified_expr);
-    return try_resolve_member_function_call(member_expr, out_functions);
+    resolved=try_resolve_member_function_call(member_expr, resolved_functions);
   }
   else if(simplified_expr.id()==ID_address_of)
   {
     address_of_exprt address_expr=to_address_of_expr(simplified_expr);
-    return try_resolve_address_of_function_call(
-      address_expr, out_functions);
+    resolved=try_resolve_address_of_function_call(
+      address_expr, resolved_functions);
   }
   else if(simplified_expr.id()==ID_dereference)
   {
     const dereference_exprt &deref=to_dereference_expr(simplified_expr);
-    return try_resolve_dereference_function_call(deref, out_functions);
+    resolved=try_resolve_dereference_function_call(deref, resolved_functions);
   }
   else if(simplified_expr.id()==ID_typecast)
   {
     typecast_exprt typecast_expr=to_typecast_expr(simplified_expr);
-    return try_resolve_typecast_function_call(typecast_expr, out_functions);
+    resolved=
+      try_resolve_typecast_function_call(typecast_expr, resolved_functions);
   }
   else if(simplified_expr.id()==ID_symbol)
   {
     if(simplified_expr.type().id()==ID_code)
     {
-      out_functions.insert(simplified_expr);
-      return true;
+      resolved_functions.insert(simplified_expr);
+      resolved=true;
     }
     else
     {
       LOG("Non const symbol wasn't squashed", simplified_expr);
-      return false;
+      resolved=false;
     }
   }
   else
   {
     LOG("Unrecognised expression", simplified_expr);
+    resolved=false;
+  }
+
+  if(resolved)
+  {
+    out_functions.insert(resolved_functions.begin(), resolved_functions.end());
+    return true;
+  }
+  else
+  {
     return false;
   }
 }
@@ -404,7 +418,7 @@ Function: remove_const_function_pointerst::try_resolve_dereference_function_call
 \*******************************************************************/
 
 bool remove_const_function_pointerst::try_resolve_dereference_function_call(
-  const dereference_exprt &deref, functionst &out_functions)
+  const dereference_exprt &deref_expr, functionst &out_functions)
 {
   // We had a pointer, we need to check both the pointer
   // type can't be changed, and what it what pointing to
@@ -412,7 +426,7 @@ bool remove_const_function_pointerst::try_resolve_dereference_function_call(
   expressionst pointer_values;
   bool pointer_const;
   bool resolved=
-    try_resolve_expression(deref.pointer(), pointer_values, pointer_const);
+    try_resolve_expression(deref_expr.pointer(), pointer_values, pointer_const);
 
   // Here we require that the value we are dereferencing is const
   // The actual type doesn't matter since we are on the RHS so what matters
@@ -455,11 +469,11 @@ bool remove_const_function_pointerst::try_resolve_dereference_function_call(
   {
     if(!resolved)
     {
-      LOG("Failed to squash dereference", deref);
+      LOG("Failed to squash dereference", deref_expr);
     }
     else if(!pointer_const)
     {
-      LOG("Dereferenced value was not const so can't dereference", deref);
+      LOG("Dereferenced value was not const so can't dereference", deref_expr);
     }
     return false;
   }
