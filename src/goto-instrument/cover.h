@@ -19,16 +19,15 @@ Date: May 2016
 class coverage_goalst
 {
 public:
-  static coverage_goalst get_coverage_goals(const std::string &coverage,
-                                      message_handlert &message_handler);
+  static bool get_coverage_goals(
+    const std::string &coverage,
+    message_handlert &message_handler,
+    coverage_goalst &goals);
   void add_goal(source_locationt goal);
   bool is_existing_goal(source_locationt source_location) const;
-  void set_no_trivial_tests(const bool trivial);
-  const bool get_no_trivial_tests();
 
 private:
   std::vector<source_locationt> existing_goals;
-  bool no_trivial_tests;
 };
 
 enum class coverage_criteriont
