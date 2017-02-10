@@ -259,34 +259,40 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
 {
   expressionst potential_array_values;
   bool array_const;
-  try_resolve_index_of(index_expr, potential_array_values, array_const);
-  if(array_const)
-  {
-    for(const exprt &array_value : potential_array_values)
-    {
-      functionst array_out_functions;
-      bool resolved_value=
-        try_resolve_function_call(array_value, array_out_functions);
+  bool resolved=
+    try_resolve_index_of(index_expr, potential_array_values, array_const);
 
-      if(resolved_value)
-      {
-        out_functions.insert(
-          array_out_functions.begin(),
-          array_out_functions.end());
-      }
-      else
-      {
-        LOG("Could not resolve expression in array", array_value);
-        return false;
-      }
-    }
-    return true;
-  }
-  else
+  if(!resolved)
   {
-    LOG("Could not resolve arary", index_expr);
+    LOG("Could not resolve array", index_expr);
     return false;
   }
+
+  if(!array_const)
+  {
+    LOG("Array not const", index_expr);
+    return false;
+  }
+
+  for(const exprt &array_value : potential_array_values)
+  {
+    functionst array_out_functions;
+    bool resolved_value=
+      try_resolve_function_call(array_value, array_out_functions);
+
+    if(resolved_value)
+    {
+      out_functions.insert(
+        array_out_functions.begin(),
+        array_out_functions.end());
+    }
+    else
+    {
+      LOG("Could not resolve expression in array", array_value);
+      return false;
+    }
+  }
+  return true;
 }
 
 /*******************************************************************\
@@ -310,63 +316,41 @@ Function: remove_const_function_pointerst::try_resolve_member_function_call
 bool remove_const_function_pointerst::try_resolve_member_function_call(
   const member_exprt &member_expr, functionst &out_functions)
 {
-  const exprt &owner_expr=member_expr.compound();
-  // Squash the struct
-  expressionst out_expressions;
-  bool struct_is_const=false;
+  expressionst potential_component_values;
+  bool struct_const;
   bool resolved=
-    try_resolve_expression(owner_expr, out_expressions, struct_is_const);
-  if(resolved)
+    try_resolve_member(member_expr, potential_component_values, struct_const);
+
+  if(!resolved)
   {
-    for(const exprt &expression:out_expressions)
-    {
-      if(expression.id()!=ID_struct)
-      {
-        LOG("Squash of member access didn't result in a struct", expression);
-        return false;
-      }
-      else
-      {
-        const struct_exprt &struct_expr=to_struct_expr(expression);
-        const exprt &component_value=
-          get_component_value(struct_expr, member_expr);
-
-        if(struct_is_const)
-        {
-          functionst component_functions;
-          bool resolved=
-            try_resolve_function_call(component_value, component_functions);
-          if(resolved)
-          {
-            out_functions.insert(
-              component_functions.begin(), component_functions.end());
-          }
-          else
-          {
-            LOG(
-              "Couldn't resolve functions call from component value",
-              component_value);
-            return false;
-          }
-        }
-        else
-        {
-          LOG(
-            "Struct was not const so can't resolve values on it",
-            struct_expr);
-          return false;
-        }
-      }
-    }
-
-    return true;
-
-  }
-  else
-  {
-    LOG("Failed to squash struct member access", owner_expr);
+    LOG("Could not resolve struct", member_expr);
     return false;
   }
+
+  if(!struct_const)
+  {
+    LOG("Struct was not const so can't resolve values on it", member_expr);
+    return false;
+  }
+
+  for(const exprt &struct_component_value : potential_component_values)
+  {
+    functionst struct_out_functions;
+    bool resolved_value=
+      try_resolve_function_call(struct_component_value, struct_out_functions);
+
+    if(resolved_value)
+    {
+      out_functions.insert(
+        struct_out_functions.begin(), struct_out_functions.end());
+    }
+    else
+    {
+      LOG("Could not resolve expression in array", struct_component_value);
+      return false;
+    }
+  }
+  return true;
 }
 
 /*******************************************************************\
@@ -420,63 +404,41 @@ Function: remove_const_function_pointerst::try_resolve_dereference_function_call
 bool remove_const_function_pointerst::try_resolve_dereference_function_call(
   const dereference_exprt &deref_expr, functionst &out_functions)
 {
-  // We had a pointer, we need to check both the pointer
-  // type can't be changed, and what it what pointing to
-  // can't be changed
-  expressionst pointer_values;
-  bool pointer_const;
+  expressionst potential_deref_values;
+  bool deref_const;
   bool resolved=
-    try_resolve_expression(deref_expr.pointer(), pointer_values, pointer_const);
+    try_resolve_dereference(deref_expr, potential_deref_values, deref_const);
 
-  // Here we require that the value we are dereferencing is const
-  // The actual type doesn't matter since we are on the RHS so what matters
-  // is where this gets stored, but the value stored matters
-  if(resolved && pointer_const)
+  if(!resolved)
   {
-    for(const exprt &pointer_val : pointer_values)
-    {
-      if(pointer_val.id()==ID_address_of)
-      {
-        address_of_exprt address_expr=to_address_of_expr(pointer_val);
-        functionst out_object_values;
-        bool resolved=
-          try_resolve_function_call(
-            address_expr.object(), out_object_values);
-
-        if(resolved)
-        {
-          out_functions.insert(
-            out_object_values.begin(),
-            out_object_values.end());
-        }
-        else
-        {
-          LOG("Failed to resolver pointers value", address_expr);
-          return false;
-        }
-      }
-      else
-      {
-        LOG(
-          "Squashing dereference did not result in an address of",
-          pointer_val);
-        return false;
-      }
-    }
-    return true;
-  }
-  else
-  {
-    if(!resolved)
-    {
-      LOG("Failed to squash dereference", deref_expr);
-    }
-    else if(!pointer_const)
-    {
-      LOG("Dereferenced value was not const so can't dereference", deref_expr);
-    }
+    LOG("Failed to squash dereference", deref_expr);
     return false;
   }
+
+  if(!deref_const)
+  {
+    LOG("Dereferenced value was not const so can't dereference", deref_expr);
+    return false;
+  }
+
+  for(const exprt &deref_value : potential_deref_values)
+  {
+    functionst struct_out_functions;
+    bool resolved_value=
+      try_resolve_function_call(deref_value, struct_out_functions);
+
+    if(resolved_value)
+    {
+      out_functions.insert(
+        struct_out_functions.begin(), struct_out_functions.end());
+    }
+    else
+    {
+      LOG("Could not resolve expression after dereference", deref_value);
+      return false;
+    }
+  }
+  return true;
 }
 
 /*******************************************************************\
