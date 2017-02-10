@@ -56,16 +56,31 @@ private:
     expressionst &out_resolved_expression,
     bool &out_is_const);
 
-  bool try_resolve_index_value(
-    const exprt &index_value_expr, mp_integer &out_array_index);
-
   bool try_resolve_index_of(
     const index_exprt &index_expr,
     expressionst &out_expressions,
     bool &out_is_const);
 
+  bool try_resolve_member(
+    const member_exprt &member_expr,
+    expressionst &out_expressions,
+    bool &out_is_const);
+
+  bool try_resolve_dereference(
+    const dereference_exprt &deref_expr,
+    expressionst &out_expressions,
+    bool &out_is_const);
+
+  bool try_resolve_typecast(
+    const typecast_exprt &typecast_expr,
+    expressionst &out_expressions,
+    bool &out_is_const);
+
   bool is_expression_const(const exprt &expression) const;
   bool is_type_const(const typet &type) const;
+
+  bool try_resolve_index_value(
+    const exprt &index_value_expr, mp_integer &out_array_index);
 
   exprt get_component_value(
     const struct_exprt &struct_expr, const member_exprt &member_expr);
