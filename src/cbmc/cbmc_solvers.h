@@ -57,7 +57,7 @@ public:
       prop_conv_ptr = _prop_conv;
     }
 
-    ~solvert()
+    virtual ~solvert()
     {
       assert(prop_conv_ptr!=NULL);
       delete prop_conv_ptr;
