@@ -123,7 +123,7 @@ public:
     assert(_prop!=NULL);
   }
 
-  ~cbmc_solver_with_propt()
+  virtual ~cbmc_solver_with_propt()
   {
     delete prop;
   }
@@ -157,8 +157,6 @@ public:
   ~cbmc_solver_with_aigpropt()
   {
     // delete prop before the AIG
-    delete prop;
-    prop=NULL;
     delete aig;
   }
 
@@ -189,8 +187,6 @@ public:
   ~cbmc_solver_with_filet()
   {
     // delete the prop before the file
-    delete prop_conv_ptr;
-    prop_conv_ptr=NULL;
     delete out;
   }
 
