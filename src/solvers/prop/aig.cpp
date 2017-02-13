@@ -8,7 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <ostream>
-
+#include <string>
 
 #include "aig.h"
 
