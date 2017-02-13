@@ -67,9 +67,9 @@ void language_filet::get_modules()
 
 void language_filet::convert_lazy_method(
   const irep_idt &id,
-  symbol_tablet &symtab)
+  symbol_tablet &symbol_table)
 {
-  language->convert_lazy_method(id, symtab);
+  language->convert_lazy_method(id, symbol_table);
 }
 
 /*******************************************************************\
@@ -86,8 +86,8 @@ Function: language_filest::show_parse
 
 void language_filest::show_parse(std::ostream &out)
 {
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
     it->second.language->show_parse(out);
 }
 
@@ -105,8 +105,8 @@ Function: language_filest::parse
 
 bool language_filest::parse()
 {
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
   {
     // open file
 
@@ -152,8 +152,8 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 {
   // typecheck interfaces
 
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
   {
     if(it->second.language->interfaces(symbol_table))
       return true;
@@ -163,8 +163,8 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 
   unsigned collision_counter=0;
 
-  for(filemapt::iterator fm_it=filemap.begin();
-      fm_it!=filemap.end(); fm_it++)
+  for(file_mapt::iterator fm_it=file_map.begin();
+      fm_it!=file_map.end(); fm_it++)
   {
     const language_filet::modulest &modules=
       fm_it->second.modules;
@@ -177,7 +177,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       // these may collide, and then get renamed
       std::string module_name=*mo_it;
 
-      while(modulemap.find(module_name)!=modulemap.end())
+      while(module_map.find(module_name)!=module_map.end())
       {
         module_name=*mo_it+"#"+std::to_string(collision_counter);
         collision_counter++;
@@ -186,15 +186,15 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       language_modulet module;
       module.file=&fm_it->second;
       module.name=module_name;
-      modulemap.insert(
+      module_map.insert(
         std::pair<std::string, language_modulet>(module.name, module));
     }
   }
 
   // typecheck files
 
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
   {
     if(it->second.modules.empty())
     {
@@ -206,14 +206,14 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       std::set<irep_idt> lazy_method_ids;
       it->second.language->lazy_methods_provided(lazy_method_ids);
       for(const auto &id : lazy_method_ids)
-        lazymethodmap[id]=&it->second;
+        lazy_method_map[id]=&it->second;
     }
   }
 
   // typecheck modules
 
-  for(modulemapt::iterator it=modulemap.begin();
-      it!=modulemap.end(); it++)
+  for(module_mapt::iterator it=module_map.begin();
+      it!=module_map.end(); it++)
   {
     if(typecheck_module(symbol_table, it->second))
       return true;
@@ -239,8 +239,8 @@ bool language_filest::final(
 {
   std::set<std::string> languages;
 
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
   {
     if(languages.insert(it->second.language->id()).second)
       if(it->second.language->final(symbol_table))
@@ -265,8 +265,8 @@ Function: language_filest::interfaces
 bool language_filest::interfaces(
   symbol_tablet &symbol_table)
 {
-  for(filemapt::iterator it=filemap.begin();
-      it!=filemap.end(); it++)
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
   {
     if(it->second.language->interfaces(symbol_table))
       return true;
@@ -293,9 +293,9 @@ bool language_filest::typecheck_module(
 {
   // check module map
 
-  modulemapt::iterator it=modulemap.find(module);
+  module_mapt::iterator it=module_map.find(module);
 
-  if(it==modulemap.end())
+  if(it==module_map.end())
   {
     error() << "found no file that provides module " << module << eom;
     return true;

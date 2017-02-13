@@ -201,10 +201,10 @@ Function: java_bytecode_convert_method_lazy
 \*******************************************************************/
 
 void java_bytecode_convert_method_lazy(
-  const symbolt& class_symbol,
-  const irep_idt method_identifier,
+  const symbolt &class_symbol,
+  const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
-  symbol_tablet& symbol_table)
+  symbol_tablet &symbol_table)
 {
   symbolt method_symbol;
   typet member_type=java_type_from_string(m.signature);
@@ -217,12 +217,14 @@ void java_bytecode_convert_method_lazy(
 
   if(method_symbol.base_name=="<init>")
   {
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
-                              id2string(class_symbol.base_name)+"()";
+    method_symbol.pretty_name=
+      id2string(class_symbol.pretty_name)+"."+
+      id2string(class_symbol.base_name)+"()";
     member_type.set(ID_constructor, true);
   }
   else
-    method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
+    method_symbol.pretty_name=
+      id2string(class_symbol.pretty_name)+"."+
       id2string(m.base_name)+"()";
 
   // do we need to add 'this' as a parameter?
@@ -261,7 +263,7 @@ void java_bytecode_convert_methodt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
   method_id=method_identifier;
 
-  const auto& old_sym=symbol_table.lookup(method_identifier);
+  const auto &old_sym=symbol_table.lookup(method_identifier);
 
   typet member_type=old_sym.type;
   code_typet &code_type=to_code_type(member_type);
