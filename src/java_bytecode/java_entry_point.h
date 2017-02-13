@@ -29,6 +29,6 @@ main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,
   const irep_idt &main_class,
   message_handlert &,
-  bool allow_no_body = false);
+  bool allow_no_body=false);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

@@ -29,13 +29,13 @@ public:
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
     size_t _max_array_length,
-    lazy_methodst& _lm,
+    lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
-    lazy_methods(_lm),
+    lazy_methods(_lazy_methods),
     lazy_methods_mode(_lazy_methods_mode)
   {
   }

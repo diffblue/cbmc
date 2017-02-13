@@ -156,7 +156,7 @@ bool java_bytecode_languaget::parse(
     {
       status() << "JAR file without entry point: loading it all" << eom;
       java_class_loader.load_entire_jar(path);
-      for(const auto& kv : java_class_loader.jar_map.at(path).entries)
+      for(const auto &kv : java_class_loader.jar_map.at(path).entries)
         main_jar_classes.push_back(kv.first);
     }
     else
@@ -201,10 +201,10 @@ Function: get_virtual_method_target
 \*******************************************************************/
 
 static irep_idt get_virtual_method_target(
-  const std::set<irep_idt>& needed_classes,
-  const irep_idt& call_basename,
-  const irep_idt& classname,
-  const symbol_tablet& symbol_table)
+  const std::set<irep_idt> &needed_classes,
+  const irep_idt &call_basename,
+  const irep_idt &classname,
+  const symbol_tablet &symbol_table)
 {
   // Program-wide, is this class ever instantiated?
   if(!needed_classes.count(classname))
@@ -238,24 +238,24 @@ Function: get_virtual_method_target
 \*******************************************************************/
 
 static void get_virtual_method_targets(
-  const code_function_callt& c,
-  const std::set<irep_idt>& needed_classes,
-  std::vector<irep_idt>& needed_methods,
-  symbol_tablet& symbol_table,
-  const class_hierarchyt& class_hierarchy)
+  const code_function_callt &c,
+  const std::set<irep_idt> &needed_classes,
+  std::vector<irep_idt> &needed_methods,
+  symbol_tablet &symbol_table,
+  const class_hierarchyt &class_hierarchy)
 {
-  const auto& called_function=c.function();
+  const auto &called_function=c.function();
   assert(called_function.id()==ID_virtual_function);
 
-  const auto& call_class=called_function.get(ID_C_class);
+  const auto &call_class=called_function.get(ID_C_class);
   assert(call_class!=irep_idt());
-  const auto& call_basename=called_function.get(ID_component_name);
+  const auto &call_basename=called_function.get(ID_component_name);
   assert(call_basename!=irep_idt());
 
   auto old_size=needed_methods.size();
 
   auto child_classes=class_hierarchy.get_children_trans(call_class);
-  for(const auto& child_class : child_classes)
+  for(const auto &child_class : child_classes)
   {
     auto child_method=
       get_virtual_method_target(
@@ -288,8 +288,8 @@ static void get_virtual_method_targets(
         break;
       else
       {
-        const auto& entry=findit->second;
-        if(entry.parents.size()==0)
+        const auto &entry=findit->second;
+        if(entry.parents.empty())
           break;
         else
           parent_class_id=entry.parents[0];
@@ -325,12 +325,12 @@ Function: gather_virtual_callsites
 \*******************************************************************/
 
 static void gather_virtual_callsites(
-  const exprt& e,
-  std::vector<const code_function_callt*>& result)
+  const exprt &e,
+  std::vector<const code_function_callt *> &result)
 {
   if(e.id()!=ID_code)
     return;
-  const codet& c=to_code(e);
+  const codet &c=to_code(e);
   if(c.get_statement()==ID_function_call &&
      to_code_function_call(c).function().id()==ID_virtual_function)
     result.push_back(&to_code_function_call(c));
@@ -354,13 +354,13 @@ Function: gather_needed_globals
 \*******************************************************************/
 
 static void gather_needed_globals(
-  const exprt& e,
-  const symbol_tablet& symbol_table,
-  symbol_tablet& needed)
+  const exprt &e,
+  const symbol_tablet &symbol_table,
+  symbol_tablet &needed)
 {
   if(e.id()==ID_symbol)
   {
-    const auto& sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
+    const auto &sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
     if(sym.is_static_lifetime)
       needed.add(sym);
   }
@@ -387,12 +387,12 @@ Function: gather_field_types
 \*******************************************************************/
 
 static void gather_field_types(
-  const typet& class_type,
-  const namespacet& ns,
-  std::set<irep_idt>& needed_classes)
+  const typet &class_type,
+  const namespacet &ns,
+  std::set<irep_idt> &needed_classes)
 {
-  const auto& underlying_type=to_struct_type(ns.follow(class_type));
-  for(const auto& field : underlying_type.components())
+  const auto &underlying_type=to_struct_type(ns.follow(class_type));
+  for(const auto &field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
       gather_field_types(field.type(), ns, needed_classes);
@@ -401,7 +401,7 @@ static void gather_field_types(
       // Skip array primitive pointers, for example:
       if(field.type().subtype().id()!=ID_symbol)
         continue;
-      const auto& field_classid=
+      const auto &field_classid=
         to_symbol_type(field.type().subtype()).get_identifier();
       if(needed_classes.insert(field_classid).second)
         gather_field_types(field.type().subtype(), ns, needed_classes);
@@ -411,7 +411,7 @@ static void gather_field_types(
 
 /*******************************************************************\
 
-Function: initialise_needed_classes
+Function: initialize_needed_classes
 
   Inputs: `entry_points`: list of fully-qualified function names that
             we should assume are reachable
@@ -426,26 +426,26 @@ Function: initialise_needed_classes
 
 \*******************************************************************/
 
-static void initialise_needed_classes(
-  const std::vector<irep_idt>& entry_points,
-  const namespacet& ns,
-  const class_hierarchyt& ch,
-  std::set<irep_idt>& needed_classes)
+static void initialize_needed_classes(
+  const std::vector<irep_idt> &entry_points,
+  const namespacet &ns,
+  const class_hierarchyt &ch,
+  std::set<irep_idt> &needed_classes)
 {
-  for(const auto& mname : entry_points)
+  for(const auto &mname : entry_points)
   {
-    const auto& symbol=ns.lookup(mname);
-    const auto& mtype=to_code_type(symbol.type);
-    for(const auto& param : mtype.parameters())
+    const auto &symbol=ns.lookup(mname);
+    const auto &mtype=to_code_type(symbol.type);
+    for(const auto &param : mtype.parameters())
     {
       if(param.type().id()==ID_pointer)
       {
-        const auto& param_classid=
+        const auto &param_classid=
           to_symbol_type(param.type().subtype()).get_identifier();
         std::vector<irep_idt> class_and_parents=
           ch.get_parents_trans(param_classid);
         class_and_parents.push_back(param_classid);
-        for(const auto& classid : class_and_parents)
+        for(const auto &classid : class_and_parents)
           needed_classes.insert(classid);
         gather_field_types(param.type().subtype(), ns, needed_classes);
       }
@@ -534,11 +534,11 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
       reachable_classes.push_back(main_class);
     else
       reachable_classes=main_jar_classes;
-    for(const auto& classname : reachable_classes)
+    for(const auto &classname : reachable_classes)
     {
-      const auto& methods=
+      const auto &methods=
         java_class_loader.class_map.at(classname).parsed_class.methods;
-      for(const auto& method : methods)
+      for(const auto &method : methods)
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
           id2string(method.name)+":"+
@@ -551,7 +551,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(
+  initialize_needed_classes(
     method_worklist2,
     namespacet(symbol_table),
     ch,
@@ -567,7 +567,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     while(method_worklist2.size()!=0)
     {
       std::swap(method_worklist1, method_worklist2);
-      for(const auto& mname : method_worklist1)
+      for(const auto &mname : method_worklist1)
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
@@ -578,7 +578,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           continue;
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
-        const auto& parsed_method=findit->second;
+        const auto &parsed_method=findit->second;
         java_bytecode_convert_method(
           *parsed_method.first,
           *parsed_method.second,
@@ -604,7 +604,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
             << " callsites)"
             << eom;
 
-    for(const auto& callsite : virtual_callsites)
+    for(const auto &callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
@@ -616,7 +616,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
 
-  for(const auto& sym : symbol_table.symbols)
+  for(const auto &sym : symbol_table.symbols)
   {
     if(sym.second.is_static_lifetime)
       continue;

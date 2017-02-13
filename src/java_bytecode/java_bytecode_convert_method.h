@@ -48,7 +48,7 @@ inline void java_bytecode_convert_method(
 
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
-  const irep_idt method_identifier,
+  const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &,
   symbol_tablet &symbol_table);
 
