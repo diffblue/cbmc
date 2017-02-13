@@ -79,8 +79,8 @@ private:
     expressionst &out_expressions,
     bool &out_is_const);
 
-  bool is_expression_const(const exprt &expression) const;
-  bool is_type_const(const typet &type) const;
+  bool is_const_expression(const exprt &expression) const;
+  bool is_const_type(const typet &type) const;
 
   bool try_resolve_index_value(
     const exprt &index_value_expr, mp_integer &out_array_index);

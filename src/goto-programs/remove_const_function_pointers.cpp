@@ -96,7 +96,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
 {
   if(expression.id()==ID_symbol)
   {
-    if(is_expression_const(expression))
+    if(is_const_expression(expression))
     {
       const symbolt &symbol=
         symbol_table.lookup(expression.get(ID_identifier));
@@ -540,7 +540,7 @@ bool remove_const_function_pointerst::try_resolve_expression(
   else
   {
     resolved_expressions.push_back(simplified_expr);
-    is_resolved_expression_const=is_expression_const(simplified_expr);
+    is_resolved_expression_const=is_const_expression(simplified_expr);
     resolved=true;
   }
 
@@ -653,7 +653,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
     {
       all_possible_const=
         all_possible_const &&
-        is_type_const(potential_array_expr.type().subtype());
+        is_const_type(potential_array_expr.type().subtype());
 
       if(potential_array_expr.id()==ID_array)
       {
@@ -953,10 +953,10 @@ Function: remove_const_function_pointerst::is_expression_const
 
 \*******************************************************************/
 
-bool remove_const_function_pointerst::is_expression_const(
+bool remove_const_function_pointerst::is_const_expression(
   const exprt &expression) const
 {
-  return is_type_const(expression.type());
+  return is_const_type(expression.type());
 }
 
 /*******************************************************************\
@@ -973,7 +973,7 @@ Function: remove_const_function_pointerst::is_type_const
 
 \*******************************************************************/
 
-bool remove_const_function_pointerst::is_type_const(const typet &type) const
+bool remove_const_function_pointerst::is_const_type(const typet &type) const
 {
   c_qualifierst qualifers(type);
   if(type.id()==ID_array)
