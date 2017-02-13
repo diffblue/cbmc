@@ -457,11 +457,11 @@ bool java_bytecode_languaget::typecheck(
       reachable_classes.push_back(main_class);
     else
       reachable_classes=main_jar_classes;
-    for(const auto& classname : reachable_classes)
+    for(const auto &classname : reachable_classes)
     {
-      const auto& methods=
+      const auto &methods=
         java_class_loader.class_map.at(classname).parsed_class.methods;
-      for(const auto& method : methods)
+      for(const auto &method : methods)
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
           id2string(method.name)+":"+
@@ -474,7 +474,7 @@ bool java_bytecode_languaget::typecheck(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialise_needed_classes(
+  initialize_needed_classes(
     method_worklist2,
     namespacet(symbol_table),
     ch,
@@ -490,7 +490,7 @@ bool java_bytecode_languaget::typecheck(
     while(method_worklist2.size()!=0)
     {
       std::swap(method_worklist1, method_worklist2);
-      for(const auto& mname : method_worklist1)
+      for(const auto &mname : method_worklist1)
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
@@ -501,7 +501,7 @@ bool java_bytecode_languaget::typecheck(
           continue;
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
-        const auto& parsed_method=findit->second;
+        const auto &parsed_method=findit->second;
         java_bytecode_convert_method(
           *parsed_method.first,
           *parsed_method.second,
@@ -527,7 +527,7 @@ bool java_bytecode_languaget::typecheck(
             << " callsites)"
             << eom;
 
-    for(const auto& callsite : virtual_callsites)
+    for(const auto &callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
       get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
@@ -539,7 +539,7 @@ bool java_bytecode_languaget::typecheck(
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
 
-  for(const auto& sym : symbol_table.symbols)
+  for(const auto &sym : symbol_table.symbols)
   {
     if(sym.second.is_static_lifetime)
       continue;
