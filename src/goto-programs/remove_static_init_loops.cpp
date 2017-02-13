@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <algorithm>
+
 #include <util/message.h>
 #include <util/suffix.h>
 #include <util/string2int.h>
