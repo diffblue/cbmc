@@ -17,6 +17,7 @@ Date: May 2016
 #include <iterator>
 #include <unordered_set>
 
+#include <util/format_number_range.h>
 #include <util/prefix.h>
 #include <util/message.h>
 #include <util/string2int.h>
@@ -55,19 +56,15 @@ public:
     }
 
     // create list of covered lines as CSV string and set as property of source
-    // location of basic block
+    // location of basic block, compress to ranges if applicable
+    format_number_ranget format_lines;
     for(const auto &cover_set : block_line_cover_map)
     {
-      std::string covered_lines;
-      bool first=true;
-      for(const auto &line_number : cover_set.second)
-      {
-        if(first)
-          first=false;
-        else
-          covered_lines+=",";
-        covered_lines+=std::to_string(line_number);
-      }
+      assert(!cover_set.second.empty());
+      std::vector<unsigned>
+        line_list{cover_set.second.begin(), cover_set.second.end()};
+
+      std::string covered_lines=format_lines(line_list);
       source_location_map[cover_set.first]
         .set_basic_block_covered_lines(covered_lines);
     }
