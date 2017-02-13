@@ -38,6 +38,7 @@ public:
     message_handlert &_message_handler,
     symbol_tablet &_symbol_table,
     bool _add_safety_assertion,
+    bool only_resolve_const_fps,
     const goto_functionst &goto_functions);
 
   void operator()(goto_functionst &goto_functions);
@@ -48,6 +49,14 @@ protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
   bool add_safety_assertion;
+
+  // We can optionally halt the FP removal if we aren't able to use
+  // remove_const_function_pointerst to sucessfully narrow to a small
+  // subset of possible functions and just leave the function pointer
+  // as it is.
+  // This can be activated in goto-instrument using
+  // --remove-const-function-pointers instead of --remove-function-pointers
+  bool only_resolve_const_fps;
 
   void remove_function_pointer(
     goto_programt &goto_program,
@@ -97,12 +106,13 @@ Function: remove_function_pointerst::remove_function_pointerst
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
-  bool _add_safety_assertion,
+  bool _add_safety_assertion, bool only_resolve_const_fps,
   const goto_functionst &goto_functions):
   messaget(_message_handler),
   ns(_symbol_table),
   symbol_table(_symbol_table),
-  add_safety_assertion(_add_safety_assertion)
+  add_safety_assertion(_add_safety_assertion),
+  only_resolve_const_fps(only_resolve_const_fps)
 {
   compute_address_taken_in_symbols(address_taken);
   compute_address_taken_functions(goto_functions, address_taken);
@@ -366,6 +376,17 @@ void remove_function_pointerst::remove_function_pointer(
 
   if(!found_functions)
   {
+    if(only_resolve_const_fps)
+    {
+      // If this mode is enabled, we only remove function pointers
+      // that we can resolve either to an exact funciton, or an exact subset
+      // (e.g. a variable index in a constant array).
+      // Since we haven't found functions, we would now resort to
+      // replacing the function pointer with any function with a valid signature
+      // Since we don't want to do that, we abort.
+      return;
+    }
+
     bool return_value_used=code.lhs().is_not_nil();
 
     // get all type-compatible functions
@@ -554,15 +575,20 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
-bool remove_function_pointers(
-  message_handlert &_message_handler,
+bool remove_function_pointers(message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   goto_programt &goto_program,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointerst
-    rfp(_message_handler, symbol_table, add_safety_assertion, goto_functions);
+    rfp(
+      _message_handler,
+      symbol_table,
+      add_safety_assertion,
+      only_remove_const_fps,
+      goto_functions);
 
   return rfp.remove_function_pointers(goto_program);
 }
@@ -583,10 +609,16 @@ void remove_function_pointers(
   message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointerst
-    rfp(_message_handler, symbol_table, add_safety_assertion, goto_functions);
+    rfp(
+      _message_handler,
+      symbol_table,
+      add_safety_assertion,
+      only_remove_const_fps,
+      goto_functions);
 
   rfp(goto_functions);
 }
@@ -603,14 +635,15 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
-void remove_function_pointers(
-  message_handlert &_message_handler,
+void remove_function_pointers(message_handlert &_message_handler,
   goto_modelt &goto_model,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointers(
     _message_handler,
     goto_model.symbol_table,
     goto_model.goto_functions,
-    add_safety_assertion);
+    add_safety_assertion,
+    only_remove_const_fps);
 }

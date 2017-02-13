@@ -95,4 +95,11 @@ private:
   const symbol_tablet &symbol_table;
 };
 
+#define OPT_REMOVE_CONST_FUNCTION_POINTERS \
+  "(remove-const-function-pointers)"
+
+#define HELP_REMOVE_CONST_FUNCTION_POINTERS \
+  " --remove-const-function-pointers    Remove function pointers that are constant or constant part of an array\n" // NOLINT(*)
+
+
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H

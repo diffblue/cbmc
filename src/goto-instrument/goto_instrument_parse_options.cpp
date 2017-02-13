@@ -820,6 +820,39 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
 
 /*******************************************************************\
 
+Function: goto_instrument_parse_optionst::do_remove_const_function_pointers_only
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Remove function pointers that can be resolved by analysing
+          const variables (i.e. can be resolved using
+          remove_const_function_pointers). Function pointers that cannot
+          be resolved will be left as function pointers.
+
+\*******************************************************************/
+
+void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
+{
+  // Don't bother if we've already done a full function pointer
+  // removal.
+  if(function_pointer_removal_done)
+  {
+    return;
+  }
+
+  status() << "Removing const function pointers only" << eom;
+  remove_function_pointers(
+    get_message_handler(),
+    symbol_table,
+    goto_functions,
+    cmdline.isset("pointer-check"),
+    true); // abort if we can't resolve via const pointers
+}
+
+/*******************************************************************\
+
 Function: goto_instrument_parse_optionst::do_partial_inlining
 
   Inputs:
@@ -1046,7 +1079,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
+  {
     do_indirect_call_and_rtti_removal();
+  }
+  else if(cmdline.isset("remove-const-function-pointers"))
+  {
+    do_remove_const_function_pointers_only();
+  }
 
   if(cmdline.isset("function-inline"))
   {
@@ -1556,6 +1595,7 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     "\n"
