@@ -28,6 +28,7 @@ matrix:
           packages:
             - libwww-perl
             - clang-3.7
+            - libstdc++-5-dev
             - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
