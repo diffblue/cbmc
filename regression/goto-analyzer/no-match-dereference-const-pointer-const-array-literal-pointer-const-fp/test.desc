@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --verbosity 10
+--show-goto-functions --verbosity 10 --pointer-check
 
 ^Removing function pointers and virtual functions$
 ^\s*IF \*container_ptr->fp_tbl\[(signed long int)1\] == f1 THEN GOTO 1$

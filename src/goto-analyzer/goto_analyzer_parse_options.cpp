@@ -541,6 +541,9 @@ void goto_analyzer_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-properties            show the properties, but don't run analysis\n"
     "\n"
+    "Program instrumentation options:\n"
+    HELP_GOTO_CHECK
+    "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
     "\n";
