@@ -114,7 +114,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/bv_cbmc$(OBJEXT) ../cbmc/counterexample_beautification$(OBJEXT) \
       ../cbmc/show_vcc$(OBJEXT) \
       ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
-      ../cbmc/fault_localization$(OBJEXT)
+      ../cbmc/fault_localization$(OBJEXT) \
+      ../cbmc/symex_coverage$(OBJEXT)
 
 INCLUDES= -I ..
 
