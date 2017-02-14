@@ -209,8 +209,8 @@ Function: xml_goto_program_convertt::convert
 
 \*******************************************************************/
 void xml_goto_program_convertt::convert(
-  const xmlt& xml,
-  goto_programt& goto_program)
+  const xmlt &xml,
+  goto_programt &goto_program)
 {
   goto_program.clear();
   goto_programt::instructionst &instructions=goto_program.instructions;

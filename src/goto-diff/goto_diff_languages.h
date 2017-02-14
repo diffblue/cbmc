@@ -16,7 +16,7 @@ class goto_diff_languagest:public language_uit
 {
 public:
   explicit goto_diff_languagest(
-    const cmdlinet& cmdline,
+    const cmdlinet &cmdline,
     ui_message_handlert &ui_message_handler) :
   language_uit(cmdline, ui_message_handler)
   {

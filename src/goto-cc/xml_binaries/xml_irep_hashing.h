@@ -22,7 +22,7 @@ private:
   {
     unsigned short operator()(const unsigned long l) const
     {
-      return (l & 0xFFFF);
+      return (l &0xFFFF);
     }
   };
 
@@ -76,7 +76,7 @@ public:
       }
   };
 
-  explicit xml_irep_convertt(ireps_containert& ic):ireps_container(ic)
+  explicit xml_irep_convertt(ireps_containert &ic):ireps_container(ic)
   {
   };
 

@@ -40,7 +40,7 @@ Purpose:
 \*******************************************************************/
 
 bool cpp_typecheckt::find_parent(
-  const symbolt& symb,
+  const symbolt &symb,
   const irep_idt &base_name,
   irep_idt &identifier)
 {
@@ -850,7 +850,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // must be the address of a function
     code_typet &code_type=to_code_type(op.type().subtype());
 
-    code_typet::parameterst& args=code_type.parameters();
+    code_typet::parameterst &args=code_type.parameters();
     if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
     {
       // it's a pointer to member function
@@ -2967,7 +2967,7 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::convert_pmop(exprt& expr)
+void cpp_typecheckt::convert_pmop(exprt &expr)
 {
   assert(expr.id()=="pointer-to-member");
   assert(expr.operands().size() == 2);

@@ -202,7 +202,7 @@ void value_set_fit::flatten_rec(
 
   forall_objects(it, e.object_map.read())
   {
-    const exprt& o=object_numbering[it->first];
+    const exprt &o=object_numbering[it->first];
 
     if(o.type().id()=="#REF#")
     {
@@ -844,11 +844,11 @@ void value_set_fit::get_reference_set(
 
   forall_objects(it, object_map.read())
   {
-    const exprt& expr = object_numbering[it->first];
+    const exprt &expr = object_numbering[it->first];
 
     if(expr.type().id()=="#REF#")
     {
-      const irep_idt& ident = expr.get(ID_identifier);
+      const irep_idt &ident = expr.get(ID_identifier);
       valuest::const_iterator vit = values.find(ident);
       if(vit==values.end())
       {

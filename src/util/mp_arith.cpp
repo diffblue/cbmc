@@ -76,7 +76,7 @@ Function: <<
 
 \*******************************************************************/
 
-std::ostream& operator<<(std::ostream& out, const mp_integer &n)
+std::ostream &operator<<(std::ostream &out, const mp_integer &n)
 {
   out << integer2string(n);
   return out;

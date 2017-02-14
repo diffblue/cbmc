@@ -47,9 +47,9 @@ public:
   struct entry_mapt:
     public std::map<goto_programt::const_targett, entryt>
   {
-    grapht< cfg_base_nodet<T, I> > & container;
+    grapht< cfg_base_nodet<T, I> > &container;
 
-    explicit entry_mapt(grapht< cfg_base_nodet<T, I> > & _container):
+    explicit entry_mapt(grapht< cfg_base_nodet<T, I> > &_container):
       container(_container)
     {
     }

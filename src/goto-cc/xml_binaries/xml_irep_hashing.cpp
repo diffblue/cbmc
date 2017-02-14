@@ -322,7 +322,7 @@ Function: xml_irep_convertt::insert
 
 unsigned long xml_irep_convertt::insert(
   unsigned long id,
-  const irept& i)
+  const irept &i)
 {
   ireps_containert::content_containert::const_iterator sit;
   sit=find_irep_by_content(i);
@@ -360,7 +360,7 @@ Function: xml_irep_convertt::insert
 
 unsigned long xml_irep_convertt::insert(
   const std::string &id,
-  const irept& i)
+  const irept &i)
 {
   return insert(string_to_long(id), i);
 }

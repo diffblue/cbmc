@@ -272,7 +272,7 @@ exprt flatten_byte_update(
         mp_integer num_elements=
           element_size/sub_size+((element_size%sub_size==0)?1:2);
 
-        const auto& offset_type=ns.follow(src.op1().type());
+        const auto &offset_type=ns.follow(src.op1().type());
         exprt zero_offset=from_integer(0, offset_type);
 
         exprt sub_size_expr=from_integer(sub_size, offset_type);

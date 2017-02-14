@@ -553,7 +553,7 @@ void rw_range_sett::get_objects_typecast(
   const range_spect &range_start,
   const range_spect &size)
 {
-  const exprt& op=tc.op();
+  const exprt &op=tc.op();
 
   range_spect new_size=
     to_range_spect(pointer_offset_bits(op.type(), ns));

@@ -80,7 +80,7 @@ public:
 
   std::map<locationt, unsigned> statistics;
 
-  bool seen(const locationt& l)
+  bool seen(const locationt &l)
   {
     return (seen_locations.find(l)!=seen_locations.end());
   }

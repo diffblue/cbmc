@@ -30,7 +30,7 @@ Function:
 \*******************************************************************/
 
 /* po^+ /\ U{C_1, ..., C_n} \/ delays */
-void cycles_visitort::po_edges(std::set<event_idt>& edges)
+void cycles_visitort::po_edges(std::set<event_idt> &edges)
 {
   instrumentert &instrumenter=fence_inserter.instrumenter;
 
@@ -267,8 +267,8 @@ Function:
 
 /* C_j /\ po^+ /\ poWR */
 void cycles_visitort::powr_constraint(
-  const event_grapht::critical_cyclet& C_j,
-  std::set<event_idt>& edges)
+  const event_grapht::critical_cyclet &C_j,
+  std::set<event_idt> &edges)
 {
   event_grapht &graph=fence_inserter.instrumenter.egraph;
 
@@ -298,8 +298,8 @@ Function:
 
 /* C_j /\ po^+ /\ poWW */
 void cycles_visitort::poww_constraint(
-  const event_grapht::critical_cyclet& C_j,
-  std::set<event_idt>& edges)
+  const event_grapht::critical_cyclet &C_j,
+  std::set<event_idt> &edges)
 {
   event_grapht &graph=fence_inserter.instrumenter.egraph;
 
@@ -329,8 +329,8 @@ Function:
 
 /* C_j /\ po^+ /\ poRW */
 void cycles_visitort::porw_constraint(
-  const event_grapht::critical_cyclet& C_j,
-  std::set<event_idt>& edges)
+  const event_grapht::critical_cyclet &C_j,
+  std::set<event_idt> &edges)
 {
   event_grapht &graph=fence_inserter.instrumenter.egraph;
 
@@ -360,8 +360,8 @@ Function:
 
 /* C_j /\ po^+ /\ poRR */
 void cycles_visitort::porr_constraint(
-  const event_grapht::critical_cyclet& C_j,
-  std::set<event_idt>& edges)
+  const event_grapht::critical_cyclet &C_j,
+  std::set<event_idt> &edges)
 {
   event_grapht &graph=fence_inserter.instrumenter.egraph;
 
@@ -391,8 +391,8 @@ Function:
 
 /* C_j /\ comWR */
 void cycles_visitort::com_constraint(
-  const event_grapht::critical_cyclet& C_j,
-  std::set<event_idt>& edges)
+  const event_grapht::critical_cyclet &C_j,
+  std::set<event_idt> &edges)
 {
   event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
@@ -416,8 +416,8 @@ void cycles_visitort::com_constraint(
   ++next_it;
   for(;  next_it!=C_j.end() && e_it!=C_j.end(); ++e_it, ++next_it)
   {
-    const abstract_eventt& e1=egraph[*e_it];
-    const abstract_eventt& e2=egraph[*next_it];
+    const abstract_eventt &e1=egraph[*e_it];
+    const abstract_eventt &e2=egraph[*next_it];
 
     if(e1.operation==abstract_eventt::Write
       && e2.operation==abstract_eventt::Read
@@ -431,8 +431,8 @@ void cycles_visitort::com_constraint(
   assert(e_it!=C_j.end());
   next_it=C_j.begin();
 
-  const abstract_eventt& e1=egraph[*e_it];
-  const abstract_eventt& e2=egraph[*next_it];
+  const abstract_eventt &e1=egraph[*e_it];
+  const abstract_eventt &e2=egraph[*next_it];
 
   if(e1.operation==abstract_eventt::Write
     && e2.operation==abstract_eventt::Read

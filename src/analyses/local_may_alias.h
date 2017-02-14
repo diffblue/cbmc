@@ -112,7 +112,7 @@ public:
         target_map[i_it]=f_it->first;
   }
 
-  local_may_aliast & operator()(const irep_idt &fkt)
+  local_may_aliast &operator()(const irep_idt &fkt)
   {
     assert(goto_functions!=NULL);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);
@@ -126,7 +126,7 @@ public:
               new local_may_aliast(f_it2->second)));
   }
 
-  local_may_aliast & operator()(goto_programt::const_targett t)
+  local_may_aliast &operator()(goto_programt::const_targett t)
   {
     target_mapt::const_iterator t_it=
       target_map.find(t);

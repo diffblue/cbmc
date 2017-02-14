@@ -219,7 +219,7 @@ Function: cmdlinet::get_values
 
 \*******************************************************************/
 
-const std::list<std::string>& cmdlinet::get_values(
+const std::list<std::string> &cmdlinet::get_values(
   const std::string &option) const
 {
   int i=getoptnr(option);

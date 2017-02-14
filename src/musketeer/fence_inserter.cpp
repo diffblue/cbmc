@@ -873,7 +873,7 @@ void fence_insertert::solve()
     {
       /* insert that fence */
       assert(map_to_e.find(col_to_var(j))!=map_to_e.end());
-      const edget& delay=map_to_e.find(col_to_var(j))->second;
+      const edget &delay=map_to_e.find(col_to_var(j))->second;
       instrumenter.message.statistics() << delay.first << " -> "
         << delay.second << " : " << to_string(col_to_fence(j))
         << messaget::eom;
@@ -927,7 +927,7 @@ void fence_insertert::print_to_file()
     ++it)
   {
     std::ostringstream s;
-    const abstract_eventt& first=instrumenter.egraph[it->first.first];
+    const abstract_eventt &first=instrumenter.egraph[it->first.first];
 
     s << to_string(it->second) << "|" << first.source_location.get_file()
       << "|" << first.source_location.get_line() << "|"
@@ -966,8 +966,8 @@ void fence_insertert::print_to_file_2()
     ++it)
   {
     std::ostringstream s;
-    const abstract_eventt& first=instrumenter.egraph[it->first.first];
-    const abstract_eventt& second=instrumenter.egraph[it->first.second];
+    const abstract_eventt &first=instrumenter.egraph[it->first.first];
+    const abstract_eventt &second=instrumenter.egraph[it->first.second];
 
     s << to_string(it->second) << "|" << first.source_location.get_file()
     << "|" << first.source_location.get_line() << "|"
@@ -1007,8 +1007,8 @@ void fence_insertert::print_to_file_3()
     ++it)
   {
     std::ostringstream s;
-    const abstract_eventt& first=instrumenter.egraph[it->first.first];
-    const abstract_eventt& second=instrumenter.egraph[it->first.second];
+    const abstract_eventt &first=instrumenter.egraph[it->first.first];
+    const abstract_eventt &second=instrumenter.egraph[it->first.second];
 
     try
     {
@@ -1060,8 +1060,8 @@ void fence_insertert::print_to_file_4()
       ++it)
   {
     std::ostringstream s;
-    const abstract_eventt& first=instrumenter.egraph[it->first.first];
-    const abstract_eventt& second=instrumenter.egraph[it->first.second];
+    const abstract_eventt &first=instrumenter.egraph[it->first.first];
+    const abstract_eventt &second=instrumenter.egraph[it->first.second];
 
     try
     {
@@ -1261,7 +1261,7 @@ Function: fence_insertert::get_type
 
 \*******************************************************************/
 
-typet fence_insertert::get_type(const irep_idt& id)
+typet fence_insertert::get_type(const irep_idt &id)
 {
   std::string copy=id2string(id);
   /* if we picked an array, removes [] that rw_set added */
@@ -1321,14 +1321,14 @@ Function: fence_insertert::type_component
 typet fence_insertert::type_component(
   std::list<std::string>::const_iterator it,
   std::list<std::string>::const_iterator end,
-  const typet& type)
+  const typet &type)
 {
   if(it==end)
     return type;
 
   if(type.id()==ID_struct)
   {
-    const struct_union_typet& str=to_struct_union_type(type);
+    const struct_union_typet &str=to_struct_union_type(type);
     typet comp_type=str.component_type(*it);
     ++it;
     return type_component(it, end, comp_type);

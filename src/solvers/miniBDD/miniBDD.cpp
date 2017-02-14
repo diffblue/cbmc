@@ -422,11 +422,11 @@ mini_bddt exists(const mini_bddt &u, const unsigned var)
 mini_bddt substitute(const mini_bddt &t, unsigned var, const mini_bddt &tp)
 {
   // t[var/tp] =
-  //  ( tp & t[var/1]) |
-  //  (!tp & t[var/0])
+  //  ( tp &t[var/1]) |
+  //  (!tp &t[var/0])
 
-  return ( tp & restrict(t, var, true)) |
-         ((!tp) & restrict(t, var, false));
+  return ( tp &restrict(t, var, true)) |
+         ((!tp) &restrict(t, var, false));
 }
 
 void cubes(const mini_bddt &u, const std::string &path, std::string &result)

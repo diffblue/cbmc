@@ -167,20 +167,20 @@ void utf32_to_utf8(unsigned int c, std::string &result)
   else if(c<=0x7ff)
   {
     result+=static_cast<char>((c >> 6)   | 0xc0);
-    result+=static_cast<char>((c & 0x3f) | 0x80);
+    result+=static_cast<char>((c &0x3f) | 0x80);
   }
   else if(c<=0xffff)
   {
     result+=static_cast<char>((c >> 12)         | 0xe0);
-    result+=static_cast<char>(((c >> 6) & 0x3f) | 0x80);
-    result+=static_cast<char>((c & 0x3f)        | 0x80);
+    result+=static_cast<char>(((c >> 6) &0x3f) | 0x80);
+    result+=static_cast<char>((c &0x3f)        | 0x80);
   }
   else
   {
     result+=static_cast<char>((c >> 18)         | 0xf0);
-    result+=static_cast<char>(((c >> 12) & 0x3f)| 0x80);
-    result+=static_cast<char>(((c >> 6) & 0x3f) | 0x80);
-    result+=static_cast<char>((c & 0x3f)        | 0x80);
+    result+=static_cast<char>(((c >> 12) &0x3f)| 0x80);
+    result+=static_cast<char>(((c >> 6) &0x3f) | 0x80);
+    result+=static_cast<char>((c &0x3f)        | 0x80);
   }
 }
 

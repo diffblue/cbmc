@@ -21,14 +21,14 @@ int main()
     auto x=mgr.Var("x");
     auto y=mgr.Var("y");
     auto z=mgr.Var("z");
-    result=x | (y & z);
+    result=x | (y &z);
   }
   #elif 0
   {
     auto y=mgr.Var("y");
     auto x=mgr.Var("x");
     auto z=mgr.Var("z");
-    result=x | (y & z);
+    result=x | (y &z);
   }
   #elif 0
   {

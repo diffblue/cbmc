@@ -1201,7 +1201,7 @@ void value_sett::get_reference_set_rec(
         // We cannot introduce a cast from scalar to non-scalar,
         // thus, we can only adjust the types of structs and unions.
 
-        const typet& final_object_type = ns.follow(object.type());
+        const typet &final_object_type = ns.follow(object.type());
 
         if(final_object_type.id()==ID_struct ||
            final_object_type.id()==ID_union)

@@ -22,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 
 member_offset_iterator::member_offset_iterator(
-  const struct_typet& _type,
-  const namespacet& _ns):
+  const struct_typet &_type,
+  const namespacet &_ns):
   current({0, 0}),
   type(_type),
   ns(_ns),
@@ -35,7 +35,7 @@ member_offset_iterator &member_offset_iterator::operator++()
 {
   if(current.second!=-1) // Already failed?
   {
-    const auto& comp=type.components()[current.first];
+    const auto &comp=type.components()[current.first];
     if(comp.type().id()==ID_c_bit_field)
     {
       // take the extra bytes needed
@@ -653,20 +653,20 @@ exprt build_sizeof_expr(
 }
 
 bool get_subexpression_at_offset(
-  exprt& result,
+  exprt &result,
   mp_integer offset,
-  const typet& target_type_raw,
-  const namespacet& ns)
+  const typet &target_type_raw,
+  const namespacet &ns)
 {
-  const typet& source_type=ns.follow(result.type());
-  const typet& target_type=ns.follow(target_type_raw);
+  const typet &source_type=ns.follow(result.type());
+  const typet &target_type=ns.follow(target_type_raw);
 
   if(offset==0 && source_type==target_type)
     return true;
 
   if(source_type.id()==ID_struct)
   {
-    const auto& st=to_struct_type(source_type);
+    const auto &st=to_struct_type(source_type);
     const struct_typet::componentst &components=st.components();
     member_offset_iterator offsets(st, ns);
     while(offsets->first<components.size() &&
@@ -711,10 +711,10 @@ bool get_subexpression_at_offset(
 }
 
 bool get_subexpression_at_offset(
-  exprt& result,
-  const exprt& offset,
-  const typet& target_type,
-  const namespacet& ns)
+  exprt &result,
+  const exprt &offset,
+  const typet &target_type,
+  const namespacet &ns)
 {
   mp_integer offset_const;
   if(to_integer(offset, offset_const))

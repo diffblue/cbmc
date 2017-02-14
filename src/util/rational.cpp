@@ -218,7 +218,7 @@ Function: operator<<
 
 \*******************************************************************/
 
-std::ostream& operator<<(std::ostream& out, const rationalt &a)
+std::ostream &operator<<(std::ostream &out, const rationalt &a)
 {
   std::string d=integer2string(a.get_numerator());
   if(a.get_denominator()!=1)

@@ -316,7 +316,7 @@ protected:
       const goto_programt &goto_program,
       const namespacet &ns,
       const irep_idt &function,
-      goto_programt::const_targett& target) const;
+      goto_programt::const_targett &target) const;
 };
 
 /*******************************************************************\
@@ -515,8 +515,8 @@ void change_impactt::propogate_dep_forward(
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] & data_flag)
-        || (change_impact[src->function][src] & ctrl_flag))
+    if((change_impact[src->function][src] &data_flag)
+        || (change_impact[src->function][src] &ctrl_flag))
       continue;
     if(it->second.get() == dep_edget::DATA
         || it->second.get() == dep_edget::BOTH)
@@ -554,8 +554,8 @@ void change_impactt::propogate_dep_back(
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] & data_flag)
-        || (change_impact[src->function][src] & ctrl_flag))
+    if((change_impact[src->function][src] &data_flag)
+        || (change_impact[src->function][src] &ctrl_flag))
     {
       continue;
     }
@@ -853,7 +853,7 @@ void change_impactt::output_instruction(char prefix,
     const goto_programt &goto_program,
     const namespacet &ns,
     const irep_idt &function,
-    goto_programt::const_targett& target) const
+    goto_programt::const_targett &target) const
 {
   if(compact_output)
   {

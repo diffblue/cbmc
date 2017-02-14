@@ -50,7 +50,7 @@ void fence_weak_memory(
   bool hide_internals,
   bool print_graph,
   infer_modet mode,
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   bool ignore_arrays)
 {
   messaget message(message_handler);

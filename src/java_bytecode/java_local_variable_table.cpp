@@ -412,7 +412,7 @@ Function: get_common_dominator
 \*******************************************************************/
 
 static unsigned get_common_dominator(
-  const std::set<local_variable_with_holest*>& merge_vars,
+  const std::set<local_variable_with_holest*> &merge_vars,
   const java_cfg_dominatorst &dominator_analysis)
 {
   assert(!merge_vars.empty());

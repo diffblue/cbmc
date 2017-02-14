@@ -45,9 +45,9 @@ protected:
   goto_programt::const_targetst callsite_stack;
 
   bool resolve(
-    const irep_idt& symb,
-    symbol_exprt& goto_function,
-    unsigned& stack_scope)
+    const irep_idt &symb,
+    symbol_exprt &goto_function,
+    unsigned &stack_scope)
   {
     message.debug() << "I resolve " << symb << " with "
       << pointer_to_fun[symb].get_identifier() << messaget::eom;
@@ -66,38 +66,38 @@ protected:
      Yes! Pure propagation of pointers only intra-proc. At call, arguments
      and pointed functions stored in the table -- no need to keep the match
      between two pointers inter-proc. */
-  bool add(const irep_idt& symb, const symbol_exprt& goto_function)
+  bool add(const irep_idt &symb, const symbol_exprt &goto_function)
   {
     return add(symb, goto_function, callsite_stack.size());
   }
 
-  bool add(const irep_idt& symb,
-    const symbol_exprt& goto_function,
+  bool add(const irep_idt &symb,
+    const symbol_exprt &goto_function,
     unsigned scope)
   {
     pointer_to_fun[symb]=goto_function;
     pointer_to_stack[symb]=scope;
 
-    const symbolt& function_symb=ns.lookup(goto_function.get_identifier());
+    const symbolt &function_symb=ns.lookup(goto_function.get_identifier());
     if(fun_id_to_invok.find(function_symb.base_name)==fun_id_to_invok.end())
       fun_id_to_invok[function_symb.base_name]=scope;
 
     return true;
   }
 
-  bool remove(const irep_idt& symb)
+  bool remove(const irep_idt &symb)
   {
     assert(pointer_to_fun.find(symb)!=pointer_to_fun.end());
     pointer_to_fun.erase(symb);
     return true;
   }
 
-  bool has(const irep_idt& symb) const
+  bool has(const irep_idt &symb) const
   {
     return pointer_to_fun.find(symb)!=pointer_to_fun.end();
   }
 
-  symbol_exprt get(const irep_idt& symb)
+  symbol_exprt get(const irep_idt &symb)
   {
     return pointer_to_fun[symb];
   }
@@ -105,9 +105,9 @@ protected:
   /* to keep track of the visited functions and avoid recursion */
   std::set<irep_idt> functions_met;
 
-  void propagate(const irep_idt& function);
+  void propagate(const irep_idt &function);
 
-  void dup_caller_and_inline_callee(const symbol_exprt& function,
+  void dup_caller_and_inline_callee(const symbol_exprt &function,
     unsigned stack_scope);
 
   /* to keep track of the constant function pointers passed as arguments */
@@ -117,17 +117,17 @@ protected:
     const_function_pointer_propagationt &cfpp;
 
   public:
-    explicit arg_stackt(const_function_pointer_propagationt& _cfpp):
+    explicit arg_stackt(const_function_pointer_propagationt &_cfpp):
       cfpp(_cfpp)
     {}
-    void add_args(const symbol_exprt& const_function,
+    void add_args(const symbol_exprt &const_function,
       goto_programt::instructionst::iterator it);
     void remove_args();
   };
 
 public:
-  const_function_pointer_propagationt(symbol_tablet& _symbol_table,
-    goto_functionst& _goto_functions, messaget& _message)
+  const_function_pointer_propagationt(symbol_tablet &_symbol_table,
+    goto_functionst &_goto_functions, messaget &_message)
     :symbol_table(_symbol_table), goto_functions(_goto_functions),
       ns(_symbol_table), message(_message)
   {}
@@ -155,7 +155,7 @@ Function:
 \*******************************************************************/
 
 void const_function_pointer_propagationt::dup_caller_and_inline_callee(
-  const symbol_exprt& const_function,
+  const symbol_exprt &const_function,
   unsigned stack_scope)
 {
   assert(callsite_stack.size()>0);
@@ -207,7 +207,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         << messaget::eom;
       const irep_idt function_new_id=id2string(function_id)+suffix;
 
-      goto_functionst::goto_functiont& function_dup=
+      goto_functionst::goto_functiont &function_dup=
         goto_functions.function_map[function_new_id];
       function_dup.copy_from(goto_functions.function_map[function_id]);
       pfunction_dup=&function_dup;
@@ -220,7 +220,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
              body.instructions.size()>0);
 
       /* removes in definition the argument leading to the const_function */
-      code_typet::parameterst& args=function_dup.type.parameters();
+      code_typet::parameterst &args=function_dup.type.parameters();
       for(code_typet::parameterst::iterator it=args.begin();
         it!=args.end(); ++it)
       {
@@ -230,7 +230,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       }
 
       /* updates the table of symbols */
-      const symbolt& fun_symb=ns.lookup(function_id);
+      const symbolt &fun_symb=ns.lookup(function_id);
       symbolt dup_fun_symb;
       dup_fun_symb=fun_symb;
       dup_fun_symb.name=id2string(dup_fun_symb.name)+suffix;
@@ -252,7 +252,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         << messaget::eom;
 
       /* sets the call to the previous newly duplicated function */
-      goto_programt::instructionst& new_instructions=
+      goto_programt::instructionst &new_instructions=
         pfunction_dup->body.instructions;
       goto_programt::targett it=new_instructions.begin();
       // beurk -- should use location_number or something unique per
@@ -272,14 +272,14 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         id2string(symbol_fun_called.get_identifier())+last_suffix);
 
       /* removes the constant pointer from the arguments passed at call */
-      code_function_callt::argumentst& args=to_code_function_call(it->code)
+      code_function_callt::argumentst &args=to_code_function_call(it->code)
         .arguments();
       for(code_function_callt::argumentst::iterator arg_it=args.begin();
         arg_it!=args.end(); ++arg_it)
       {
         if(arg_it->id()==ID_symbol)
         {
-          const symbol_exprt& symb_arg=to_symbol_expr(*arg_it);
+          const symbol_exprt &symb_arg=to_symbol_expr(*arg_it);
           if(symb_arg.get_identifier()==const_function.get_identifier()
             || (pointer_to_fun.find(symb_arg.get_identifier())
               !=pointer_to_fun.end()
@@ -288,7 +288,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         }
         else if(arg_it->id()==ID_address_of)
         {
-          const address_of_exprt& add_arg=to_address_of_expr(*arg_it);
+          const address_of_exprt &add_arg=to_address_of_expr(*arg_it);
           if(add_arg.object().id()==ID_symbol
             && to_symbol_expr(add_arg.object()).get_identifier()
               ==const_function.get_identifier())
@@ -304,7 +304,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
 
       /* initially, inlines the callee function in the duplicate of the last
          caller */
-      goto_programt::instructionst& new_instructions=
+      goto_programt::instructionst &new_instructions=
         pfunction_dup->body.instructions;
       goto_programt::targett it=new_instructions.begin();
       // beurk -- should use location_number or something unique per
@@ -355,12 +355,12 @@ Function:
 \*******************************************************************/
 
 void const_function_pointer_propagationt::arg_stackt::add_args(
-  const symbol_exprt& const_function,
+  const symbol_exprt &const_function,
   goto_programt::instructionst::iterator it)
 {
   /* if constant pointers passed as arguments, add the names of the parameters
      in the function definition to the map */
-  const code_function_callt::argumentst& arg=
+  const code_function_callt::argumentst &arg=
     to_code_function_call(it->code).arguments();
 
   /* retrieve the corresponding parameters expressions in the
@@ -368,7 +368,7 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
   assert(cfpp.goto_functions.function_map.find(
     const_function.get_identifier())!=cfpp.goto_functions.function_map.end());
 
-  goto_functionst::goto_functiont& cor_function=
+  goto_functionst::goto_functiont &cor_function=
     cfpp.goto_functions.function_map[const_function.get_identifier()];
 
   code_typet::parameterst::const_iterator cor_arg_it=
@@ -388,11 +388,11 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
       if(to_address_of_expr(*arg_it).object().id()!=ID_symbol)
         continue;
 
-      const exprt& arg_expr=to_address_of_expr(*arg_it).object();
+      const exprt &arg_expr=to_address_of_expr(*arg_it).object();
       assert(arg_expr.id()==ID_symbol);
-      const symbol_exprt& arg_symbol_expr=to_symbol_expr(arg_expr);
+      const symbol_exprt &arg_symbol_expr=to_symbol_expr(arg_expr);
 
-      // const symbolt& arg_symbol=
+      // const symbolt &arg_symbol=
         // cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
 
       // debug
@@ -415,8 +415,8 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
           .lookup(to_symbol_expr(*arg_it).get_identifier()).base_name
         << messaget::eom;
 
-      const symbol_exprt& arg_symbol_expr=to_symbol_expr(*arg_it);
-      const symbolt& arg_symbol=
+      const symbol_exprt &arg_symbol_expr=to_symbol_expr(*arg_it);
+      const symbolt &arg_symbol=
         cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
 
       if(cfpp.has(arg_symbol.base_name))
@@ -466,13 +466,13 @@ Function:
 \*******************************************************************/
 
 void const_function_pointer_propagationt::propagate(
-  const irep_idt& function_id)
+  const irep_idt &function_id)
 {
   if(goto_functions.function_map.find(function_id)==
      goto_functions.function_map.end())
     return;
 
-  goto_functionst::goto_functiont& function=
+  goto_functionst::goto_functiont &function=
     goto_functions.function_map[function_id];
 
   if(functions_met.find(function_id)!=functions_met.end())
@@ -485,25 +485,25 @@ void const_function_pointer_propagationt::propagate(
     if(it->is_assign())
     {
       /* is it an assignment of function pointer? */
-      const code_assignt& assign=to_code_assign(it->code);
-      const exprt& lhs=assign.lhs();
-      const exprt& rhs=assign.rhs();
+      const code_assignt &assign=to_code_assign(it->code);
+      const exprt &lhs=assign.lhs();
+      const exprt &rhs=assign.rhs();
 
       /* rhs has to be an address to a function */
       if(rhs.id()!=ID_address_of)
         continue;
-      const address_of_exprt& addr_rhs=to_address_of_expr(rhs);
+      const address_of_exprt &addr_rhs=to_address_of_expr(rhs);
 
       if(addr_rhs.object().id()!=ID_symbol
         || addr_rhs.object().type().id()!=ID_code)
         continue;
-      const symbol_exprt& symbol_rhs=to_symbol_expr(addr_rhs.object());
+      const symbol_exprt &symbol_rhs=to_symbol_expr(addr_rhs.object());
 
       /* lhs must be a pointer */
       if(lhs.id()!=ID_symbol || lhs.type().id()!=ID_pointer)
         continue;
-      const symbol_exprt& symbol_expr_lhs=to_symbol_expr(lhs);
-      const symbolt& symbol_lhs=
+      const symbol_exprt &symbol_expr_lhs=to_symbol_expr(lhs);
+      const symbolt &symbol_lhs=
         symbol_table.lookup(symbol_expr_lhs.get_identifier());
 
       add(symbol_lhs.base_name, symbol_rhs);
@@ -512,20 +512,20 @@ void const_function_pointer_propagationt::propagate(
     {
       callsite_stack.push_front(it);
 
-      const exprt& fun=to_code_function_call(it->code).function();
+      const exprt &fun=to_code_function_call(it->code).function();
 
       /* if it is a function pointer */
       if(fun.id()==ID_dereference)
       {
-        const exprt& fun_pointer=to_dereference_expr(fun).pointer();
+        const exprt &fun_pointer=to_dereference_expr(fun).pointer();
         if(fun_pointer.id()!=ID_symbol)
         {
           callsite_stack.pop_front();
           continue;
         }
 
-        const symbol_exprt& fun_symbol_expr=to_symbol_expr(fun_pointer);
-        const symbolt& fun_symbol=
+        const symbol_exprt &fun_symbol_expr=to_symbol_expr(fun_pointer);
+        const symbolt &fun_symbol=
           symbol_table.lookup(fun_symbol_expr.get_identifier());
         symbol_exprt const_function;
         unsigned stack_scope=0;
@@ -562,8 +562,8 @@ void const_function_pointer_propagationt::propagate(
           .get_identifier() << messaget::eom;
 
         /* just propagate */
-        const symbol_exprt& fun_symbol_expr=to_symbol_expr(fun);
-        const irep_idt& fun_id=fun_symbol_expr.get_identifier();
+        const symbol_exprt &fun_symbol_expr=to_symbol_expr(fun);
+        const irep_idt &fun_id=fun_symbol_expr.get_identifier();
 
         arg_stackt arg_stack(*this);
         arg_stack.add_args(fun_symbol_expr, it);
@@ -598,9 +598,9 @@ Function:
 \*******************************************************************/
 
 void propagate_const_function_pointers(
-  symbol_tablet& symbol_table,
-  goto_functionst& goto_functions,
-  message_handlert& message_handler)
+  symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &message_handler)
 {
   messaget message(message_handler);
   const_function_pointer_propagationt propagation(symbol_table,

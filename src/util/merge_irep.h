@@ -107,7 +107,7 @@ protected:
   typedef std::unordered_set<irept, irep_hash> irep_storet;
   irep_storet irep_store;
 
-  const irept & merged(const irept &irep);
+  const irept &merged(const irept &irep);
 };
 
 class merge_full_irept
@@ -119,7 +119,7 @@ protected:
   typedef std::unordered_set<irept, irep_full_hash, irep_full_eq> irep_storet;
   irep_storet irep_store;
 
-  const irept& merged(const irept &irep);
+  const irept &merged(const irept &irep);
 };
 
 #endif // CPROVER_UTIL_MERGE_IREP_H

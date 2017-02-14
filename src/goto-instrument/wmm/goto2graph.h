@@ -47,38 +47,38 @@ protected:
   bool render_by_file;
   bool render_by_function;
 
-  bool inline local(const irep_idt& id);
+  bool inline local(const irep_idt &id);
 
   void inline add_instr_to_interleaving(
     goto_programt::instructionst::iterator it,
-    goto_programt& interleaving);
+    goto_programt &interleaving);
 
   /* deprecated */
-  bool is_cfg_spurious(const event_grapht::critical_cyclet& cyc);
+  bool is_cfg_spurious(const event_grapht::critical_cyclet &cyc);
 
-  unsigned cost(const event_grapht::critical_cyclet::delayt& e);
+  unsigned cost(const event_grapht::critical_cyclet::delayt &e);
 
   typedef std::set<event_grapht::critical_cyclet> set_of_cyclest;
   void inline instrument_all_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_event_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_read_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_write_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_minimum_interference_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_my_events_inserter(
-    const set_of_cyclest& set, const std::set<event_idt>& events);
+    const set_of_cyclest &set, const std::set<event_idt> &events);
 
   void inline print_outputs_local(
-    const std::set<event_grapht::critical_cyclet>& set,
-    std::ofstream& dot,
-    std::ofstream& ref,
-    std::ofstream& output,
-    std::ofstream& all,
-    std::ofstream& table,
+    const std::set<event_grapht::critical_cyclet> &set,
+    std::ofstream &dot,
+    std::ofstream &ref,
+    std::ofstream &output,
+    std::ofstream &all,
+    std::ofstream &table,
     memory_modelt model,
     bool hide_internals);
 
@@ -102,7 +102,7 @@ protected:
     bool contains_shared_array(
       goto_programt::const_targett targ,
       goto_programt::const_targett i_it,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast local_may
       #endif
@@ -114,26 +114,26 @@ protected:
     void visit_cfg_body(
       goto_programt::const_targett i_it,
       loop_strategyt replicate_body,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
     ); // deprecated  NOLINT(whitespace/parens)
     void inline visit_cfg_backedge(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
     void inline visit_cfg_duplicate(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
-    void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
-      goto_programt::instructionst::iterator& i_it, bool no_dependencies
+    void visit_cfg_assign(value_setst &value_sets, namespacet &ns,
+      goto_programt::instructionst::iterator &i_it, bool no_dependencies
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
     ); // NOLINT(whitespace/parens)
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
     void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_function_call(value_setst& value_sets,
+    void visit_cfg_function_call(value_setst &value_sets,
       goto_programt::instructionst::iterator i_it,
       memory_modelt model,
       bool no_dependenciess,
@@ -143,9 +143,9 @@ protected:
       /* forces the duplication of all the loops, with array or not
          otherwise, duplication of loops with array accesses only */
       loop_strategyt replicate_body,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
     ); // NOLINT(whitespace/parens)
     void visit_cfg_reference_function(irep_idt id_function);
@@ -204,7 +204,7 @@ protected:
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
 
-    cfg_visitort(namespacet& _ns, instrumentert& _instrumenter)
+    cfg_visitort(namespacet &_ns, instrumentert &_instrumenter)
     :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
       egraph_SCCs(_instrumenter.egraph_SCCs),
       egraph_alt(_instrumenter.egraph_alt)
@@ -219,14 +219,14 @@ protected:
       coming_from = 0;
     }
 
-    void inline enter_function(const irep_idt& function)
+    void inline enter_function(const irep_idt &function)
     {
       if(functions_met.find(function)!=functions_met.end())
         throw "sorry, doesn't handle recursive function for the moment";
       functions_met.insert(function);
     }
 
-    void inline leave_function(const irep_idt& function)
+    void inline leave_function(const irep_idt &function)
     {
       functions_met.erase(function);
     }
@@ -236,7 +236,7 @@ protected:
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      const irep_idt& function)
+      const irep_idt &function)
     {
       /* ignore recursive calls -- underapproximation */
       try
@@ -258,18 +258,18 @@ protected:
     // TODO: move the visitor outside, and inherit
     virtual void visit_cfg_function(
       /* value_sets and options */
-      value_setst& value_sets,
+      value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
       /* functino to analyse */
-      const irep_idt& function,
+      const irep_idt &function,
       /* incoming edges */
-      const std::set<nodet>& initial_vertex,
+      const std::set<nodet> &initial_vertex,
       /* outcoming edges */
-      std::set<nodet>& ending_vertex);
+      std::set<nodet> &ending_vertex);
 
-    bool inline local(const irep_idt& i);
+    bool inline local(const irep_idt &i);
   };
 
 public:
@@ -325,8 +325,8 @@ public:
   std::multimap<irep_idt, source_locationt> id2loc;
   std::multimap<irep_idt, source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f,
-    messaget& _message)
+  instrumentert(symbol_tablet &_symbol_table, goto_functionst &_goto_f,
+    messaget &_message)
     :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true),
       render_by_file(false), render_by_function(false), message(_message),
       egraph(_message)
@@ -336,7 +336,7 @@ public:
   /* abstracts goto-programs in abstract event graph, and computes
      the thread numbering and returns the max number */
   unsigned goto2graph_cfg(
-    value_setst& value_sets,
+    value_setst &value_sets,
     memory_modelt model,
     bool no_dependencies,
     /* forces the duplication, with arrays or not; otherwise, arrays only */
@@ -369,7 +369,7 @@ public:
 
   /* strategies for instrumentation */
   void instrument_with_strategy(instrumentation_strategyt strategy);
-  void instrument_my_events(const std::set<event_idt>& events);
+  void instrument_my_events(const std::set<event_idt> &events);
 
   /* retrieves events to filter in the instrumentation choice
      with option --my-events */

@@ -153,7 +153,7 @@ Function: goto_functions_templatet::output
 template <class bodyT>
 void goto_functions_templatet<bodyT>::output(
   const namespacet &ns,
-  std::ostream& out) const
+  std::ostream &out) const
 {
   for(const auto &fun : function_map)
   {

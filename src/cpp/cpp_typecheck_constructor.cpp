@@ -416,8 +416,8 @@ Function: cpp_typecheckt::default_assignop
 \*******************************************************************/
 
 void cpp_typecheckt::default_assignop(
-  const symbolt& symbol,
-  cpp_declarationt& cpctor)
+  const symbolt &symbol,
+  cpp_declarationt &cpctor)
 {
   source_locationt source_location=symbol.type.source_location();
 
@@ -674,7 +674,7 @@ void cpp_typecheckt::check_member_initializers(
         if(type.id()!=ID_symbol)
           continue;
 
-        const symbolt& symb=lookup(type.get(ID_identifier));
+        const symbolt &symb=lookup(type.get(ID_identifier));
         if(symb.type.id()!=ID_struct)
           break;
 
@@ -779,7 +779,7 @@ void cpp_typecheckt::full_member_initialization(
 
       while(!vbases.empty())
       {
-        const symbolt& symb=lookup(vbases.front());
+        const symbolt &symb=lookup(vbases.front());
         if(!cpp_is_pod(symb.type))
         {
           // default initializer
@@ -922,10 +922,10 @@ void cpp_typecheckt::full_member_initialization(
       cpp_namet cppname;
       cppname.move_to_sub(name);
 
-      const symbolt& virtual_table_symbol_type =
+      const symbolt &virtual_table_symbol_type =
         lookup(mem_it->type().subtype().get(ID_identifier));
 
-      const symbolt& virtual_table_symbol_var  =
+      const symbolt &virtual_table_symbol_var  =
         lookup(id2string(virtual_table_symbol_type.name) + "@" +
             id2string(struct_union_type.get(ID_name)));
 
@@ -1034,7 +1034,7 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
       cit++)
   {
     // Skip non-ctor
-    const struct_typet::componentt& component=*cit;
+    const struct_typet::componentt &component=*cit;
 
     if(component.type().id()!=ID_code ||
        to_code_type(component.type()).return_type().id() !=ID_constructor)
@@ -1044,7 +1044,7 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
     if(component.get_bool(ID_from_base))
       continue;
 
-    const code_typet& code_type=to_code_type(component.type());
+    const code_typet &code_type=to_code_type(component.type());
 
     const code_typet::parameterst &parameters=code_type.parameters();
 
@@ -1092,14 +1092,14 @@ Function: cpp_typecheckt::find_assignop
 
 \*******************************************************************/
 
-bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
+bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
 {
-  const struct_typet& struct_type=to_struct_type(symbol.type);
-  const struct_typet::componentst& components=struct_type.components();
+  const struct_typet &struct_type=to_struct_type(symbol.type);
+  const struct_typet::componentst &components=struct_type.components();
 
   for(std::size_t i=0; i < components.size(); i++)
   {
-    const struct_typet::componentt& component=components[i];
+    const struct_typet::componentt &component=components[i];
 
     if(component.get(ID_base_name)!="operator=")
       continue;
@@ -1110,9 +1110,9 @@ bool cpp_typecheckt::find_assignop(const symbolt& symbol) const
     if(component.get_bool(ID_from_base))
        continue;
 
-    const code_typet&  code_type=to_code_type(component.type());
+    const code_typet &code_type=to_code_type(component.type());
 
-    const code_typet::parameterst& args=code_type.parameters();
+    const code_typet::parameterst &args=code_type.parameters();
 
     if(args.size()!=2)
       continue;

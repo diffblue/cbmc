@@ -522,9 +522,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         if(comp.get("virtual_name")==virtual_name)
         {
           is_virtual=true;
-          const code_typet& code_type=to_code_type(comp.type());
+          const code_typet &code_type=to_code_type(comp.type());
           assert(code_type.parameters().size()>0);
-          const typet& pointer_type=code_type.parameters()[0].type();
+          const typet &pointer_type=code_type.parameters()[0].type();
           assert(pointer_type.id()==ID_pointer);
           virtual_bases.insert(pointer_type.subtype().get(ID_identifier));
         }
@@ -649,7 +649,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // change the type of the 'this' pointer
         code_typet &code_type=to_code_type(func_symb.type);
-        code_typet::parametert& arg= code_type.parameters().front();
+        code_typet::parametert &arg= code_type.parameters().front();
         arg.type().subtype().set(ID_identifier, virtual_base);
 
         // create symbols for the parameters
@@ -1850,7 +1850,7 @@ Purpose:
 \*******************************************************************/
 
 void cpp_typecheckt::get_virtual_bases(
-  const struct_typet& type,
+  const struct_typet &type,
   std::list<irep_idt> &vbases) const
 {
   if(std::find(vbases.begin(), vbases.end(), type.get(ID_name))!=vbases.end())
@@ -1913,7 +1913,7 @@ Purpose:
 
 void cpp_typecheckt::make_ptr_typecast(
   exprt &expr,
-  const typet & dest_type)
+  const typet &dest_type)
 {
   typet src_type=expr.type();
 

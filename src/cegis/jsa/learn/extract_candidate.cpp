@@ -24,7 +24,7 @@ namespace
 typedef std::pair<size_t, array_exprt> encoded_programt;
 typedef std::vector<encoded_programt> encoded_programst;
 
-inline bool is_integer(const std::string & s)
+inline bool is_integer(const std::string &s)
 {
   if (s.empty() || (!isdigit(s[0]) && s[0] != '-' && s[0] != '+')) return false;
   char *p;

@@ -516,7 +516,7 @@ Function: jsil_union_typet::to_type()
 
 \*******************************************************************/
 
-const typet& jsil_union_typet::to_type() const
+const typet &jsil_union_typet::to_type() const
 {
   auto &elements=components();
   if(elements.size()==1)

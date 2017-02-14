@@ -38,12 +38,12 @@ struct datat
   {
   }
 
-  bool operator==(const datat& d) const
+  bool operator==(const datat &d) const
   {
     return id==d.id && loc==d.loc;
   }
 
-  bool operator<(const datat& d2) const
+  bool operator<(const datat &d2) const
   {
     return id<d2.id || (id==d2.id && loc<d2.loc);
   }
@@ -55,21 +55,21 @@ public:
   unsigned class_nb;
 
   /* add this dependency in the structure */
-  void dp_analysis(const abstract_eventt& read, const abstract_eventt& write);
+  void dp_analysis(const abstract_eventt &read, const abstract_eventt &write);
   void dp_analysis(
-    const datat& read,
+    const datat &read,
     bool local_read,
-    const datat& write,
+    const datat &write,
     bool local_write);
 
   /* are these two events with a data dependency ? */
-  bool dp(const abstract_eventt& e1, const abstract_eventt& e2) const;
+  bool dp(const abstract_eventt &e1, const abstract_eventt &e2) const;
 
   /* routine to maintain partitioning */
   void dp_merge();
 
   /* printing */
-  void print(messaget& message);
+  void print(messaget &message);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H

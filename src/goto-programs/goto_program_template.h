@@ -598,10 +598,10 @@ void goto_program_templatet<codeT, guardT>::update()
 }
 
 template <class codeT, class guardT>
-std::ostream& goto_program_templatet<codeT, guardT>::output(
+std::ostream &goto_program_templatet<codeT, guardT>::output(
   const namespacet &ns,
   const irep_idt &identifier,
-  std::ostream& out) const
+  std::ostream &out) const
 {
   // output program
 
@@ -636,7 +636,7 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
   // number the targets properly
   unsigned cnt=0;
 
-  for(auto & i : instructions)
+  for(auto &i : instructions)
   {
     if(i.is_target())
     {

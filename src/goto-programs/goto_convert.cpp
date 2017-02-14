@@ -121,7 +121,7 @@ void goto_convertt::finish_gotos(goto_programt &dest)
       // We don't currently handle variables *entering* scope, which is illegal
       // for C++ non-pod types and impossible in Java in any case.
       auto goto_stack=g_it.second;
-      const auto& label_stack=l_it->second.second;
+      const auto &label_stack=l_it->second.second;
       bool stack_is_prefix=true;
       if(label_stack.size()>goto_stack.size())
         stack_is_prefix=false;
@@ -237,7 +237,7 @@ Function: goto_convertt::finish_guarded_gotos
 
 void goto_convertt::finish_guarded_gotos(goto_programt &dest)
 {
-  for(auto& gg : guarded_gotos)
+  for(auto &gg : guarded_gotos)
   {
     // Check if any destructor code has been inserted:
     bool destructor_present=false;

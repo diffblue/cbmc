@@ -65,7 +65,7 @@ public:
   }
 };
 
-std::ostream& operator<<(std::ostream &out, const timert &timer)
+std::ostream &operator<<(std::ostream &out, const timert &timer)
 {
   return out << timer.total_time();
 }

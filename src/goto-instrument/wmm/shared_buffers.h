@@ -28,7 +28,7 @@ class shared_bufferst
 {
 public:
   shared_bufferst(symbol_tablet &_symbol_table, unsigned _nb_threads,
-    messaget& _message):
+    messaget &_message):
     symbol_table(_symbol_table),
     nb_threads(_nb_threads+1),
     uniq(0),
@@ -202,8 +202,8 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst& _shared, symbol_tablet& _symbol_table,
-      goto_functionst& _goto_functions)
+    cfg_visitort(shared_bufferst &_shared, symbol_tablet &_symbol_table,
+      goto_functionst &_goto_functions)
       :shared_buffers(_shared), symbol_table(_symbol_table),
         goto_functions(_goto_functions)
     {
@@ -214,7 +214,7 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    const irep_idt& function,
+    const irep_idt &function,
     memory_modelt model);
   };
 

@@ -31,10 +31,10 @@ Function: goto_programt::output_instruction
 
 \*******************************************************************/
 
-std::ostream& goto_programt::output_instruction(
+std::ostream &goto_programt::output_instruction(
   const class namespacet &ns,
   const irep_idt &identifier,
-  std::ostream& out,
+  std::ostream &out,
   instructionst::const_iterator it) const
 {
   return output_instruction(ns, identifier, out, *it);

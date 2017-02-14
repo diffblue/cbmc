@@ -349,8 +349,8 @@ std::string expr2cppt::convert_rec(
 
     if(src.subtype().id()==ID_code)
     {
-      const code_typet& code_type = to_code_type(src.subtype());
-      const typet& return_type = code_type.return_type();
+      const code_typet &code_type = to_code_type(src.subtype());
+      const typet &return_type = code_type.return_type();
       dest=convert_rec(return_type, c_qualifierst(), "")+" "+dest;
 
       const code_typet::parameterst &args = code_type.parameters();

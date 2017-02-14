@@ -145,7 +145,7 @@ void rd_range_domaint::transform_dead(
   const namespacet &ns,
   locationt from)
 {
-  const irep_idt& identifier=
+  const irep_idt &identifier=
     to_symbol_expr(to_code_dead(from->code).symbol()).get_identifier();
 
   valuest::iterator entry=values.find(identifier);
@@ -243,7 +243,7 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const symbol_exprt& fn_symbol_expr=to_symbol_expr(code.function());
+    const symbol_exprt &fn_symbol_expr=to_symbol_expr(code.function());
     const code_typet &code_type=
       to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
 
@@ -869,7 +869,7 @@ Function: rd_range_domaint::get
 
 \*******************************************************************/
 
-const rd_range_domaint::ranges_at_loct& rd_range_domaint::get(
+const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
   const irep_idt &identifier) const
 {
   populate_cache(identifier);

@@ -44,7 +44,7 @@ bvt boolbvt::convert_struct(const struct_exprt &expr)
   std::size_t offset=0;
 
   exprt::operandst::const_iterator op_it=expr.operands().begin();
-  for(const auto & comp : components)
+  for(const auto &comp : components)
   {
     const typet &subtype=comp.type();
     const exprt &op=*op_it;

@@ -45,7 +45,7 @@ public:
     return operator()(expr.get_identifier());
   }
 
-  const id_sett& get_dirty_ids() const
+  const id_sett &get_dirty_ids() const
   {
     return dirty;
   }

@@ -127,7 +127,7 @@ Function: aigt::print
 \*******************************************************************/
 
 void aigt::print(
-  std::ostream& out,
+  std::ostream &out,
   literalt a) const
 {
   if(a==const_literal(false))
@@ -215,7 +215,7 @@ Function: aigt::output_dot_edge
 \*******************************************************************/
 
 void aigt::output_dot_edge(
-  std::ostream& out,
+  std::ostream &out,
   nodest::size_type v,
   literalt l) const
 {
@@ -250,7 +250,7 @@ Function: aigt::output_dot
 
 \*******************************************************************/
 
-void aigt::output_dot(std::ostream& out) const
+void aigt::output_dot(std::ostream &out) const
 {
   // constant TRUE
   out << "TRUE [label=\"TRUE\", shape=box]" << "\n";

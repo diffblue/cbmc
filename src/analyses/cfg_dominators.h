@@ -275,8 +275,8 @@ typedef cfg_dominators_templatet<
 
 template<>
 inline void dominators_pretty_print_node(
-  const goto_programt::const_targett& node,
-  std::ostream& out)
+  const goto_programt::const_targett &node,
+  std::ostream &out)
 {
   out << node->location_number;
 }

@@ -25,7 +25,7 @@ Function: event_grapht::graph_explorert::filter_thin_air
 
 \*******************************************************************/
 void event_grapht::graph_explorert::filter_thin_air(
-  std::set<critical_cyclet>& set_of_cycles)
+  std::set<critical_cyclet> &set_of_cycles)
 {
   for(std::set<critical_cyclet>::const_iterator it=set_of_cycles.begin();
       it!=set_of_cycles.end(); )
@@ -67,7 +67,7 @@ Function: event_grapht::graph_explorert::collect_cycles
 \*******************************************************************/
 
 void event_grapht::graph_explorert::collect_cycles(
-  std::set<critical_cyclet>& set_of_cycles,
+  std::set<critical_cyclet> &set_of_cycles,
   memory_modelt model)
 {
   /* all the events initially unmarked */
@@ -246,7 +246,7 @@ bool event_grapht::graph_explorert::backtrack(
 
   bool not_thin_air=true;
 
-  const abstract_eventt& this_vertex=egraph[vertex];
+  const abstract_eventt &this_vertex=egraph[vertex];
 
   /* if a thread starts with variable x, the last event of this thread in the
      cycle cannot be with x */
@@ -384,7 +384,7 @@ bool event_grapht::graph_explorert::backtrack(
 
     if(!point_stack.empty())
     {
-      const abstract_eventt& prev_vertex=egraph[point_stack.top()];
+      const abstract_eventt &prev_vertex=egraph[point_stack.top()];
       unsafe_met_updated|=
         prev_vertex.unsafe_pair(this_vertex, model) &&
         !(prev_vertex.thread==this_vertex.thread &&

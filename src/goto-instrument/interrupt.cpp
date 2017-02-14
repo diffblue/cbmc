@@ -94,7 +94,7 @@ void interrupt(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program,
   const symbol_exprt &interrupt_handler,

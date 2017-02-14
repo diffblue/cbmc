@@ -20,7 +20,7 @@ void race_check(
   value_setst &value_sets,
   class symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program
 );

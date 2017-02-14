@@ -91,7 +91,7 @@ protected:
   bool parse(const std::string &s, std::string::size_type &ptr);
 };
 
-inline std::ostream& operator<<(
+inline std::ostream &operator<<(
   std::ostream &out,
   const lispexprt &expr)
 {

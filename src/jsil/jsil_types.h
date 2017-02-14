@@ -94,7 +94,7 @@ public:
 
   bool is_subtype(const jsil_union_typet &other) const;
 
-  const typet& to_type() const;
+  const typet &to_type() const;
 };
 
 inline jsil_union_typet &to_jsil_union_type(typet &type)

@@ -214,7 +214,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const xmlt& xml, goto_programt& goto_program)
+void convert(const xmlt &xml, goto_programt &goto_program)
 {
   goto_program.clear();
   goto_programt::instructionst &instructions = goto_program.instructions;

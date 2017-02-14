@@ -38,7 +38,7 @@ void fence_pensieve(
   bool render_file,
   bool render_function,
   bool naive_mode,
-  message_handlert& message_handler)
+  message_handlert &message_handler)
 {
   messaget message(message_handler);
 

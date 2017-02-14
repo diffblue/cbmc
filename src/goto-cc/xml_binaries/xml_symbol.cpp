@@ -23,7 +23,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const symbolt& sym, xmlt &root)
+void convert(const symbolt &sym, xmlt &root)
 {
   xmlt &xmlsym = root.new_element("symbol");
   xmlsym.set_attribute("name", id2string(sym.name));
@@ -80,7 +80,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const xmlt &xmlsym, symbolt& symbol)
+void convert(const xmlt &xmlsym, symbolt &symbol)
 {
   symbol.name=xmlsym.get_attribute("name");
 

@@ -50,7 +50,7 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  messaget& message)
+  messaget &message)
 {
   namespacet ns(symbol_table);
   unsigned tmp_counter=0;
@@ -124,8 +124,8 @@ Function: weak_memory
 
 void weak_memory(
   memory_modelt model,
-  value_setst& value_sets,
-  symbol_tablet& symbol_table,
+  value_setst &value_sets,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool SCC,
   instrumentation_strategyt event_strategy,
@@ -140,7 +140,7 @@ void weak_memory(
   bool render_function,
   bool cav11_option,
   bool hide_internals,
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   bool ignore_arrays)
 {
   messaget message(message_handler);

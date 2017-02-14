@@ -33,7 +33,7 @@ public:
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    prop_convt& _prop_conv):
+    prop_convt &_prop_conv):
     safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),

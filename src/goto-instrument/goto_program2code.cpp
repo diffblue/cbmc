@@ -29,7 +29,7 @@ Purpose:
 
 \*******************************************************************/
 
-static const exprt& skip_typecast(const exprt &expr)
+static const exprt &skip_typecast(const exprt &expr)
 {
   if(expr.id()!=ID_typecast)
     return expr;

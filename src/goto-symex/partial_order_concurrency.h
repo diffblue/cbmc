@@ -258,7 +258,7 @@ public:
       const std::string &po_name,
       const evtt &n1,
       const evtt &n2,
-      const exprt& cond);
+      const exprt &cond);
   void add_partial_order_constraint(
       const acyclict check,
       const std::string &po_name,
@@ -268,16 +268,16 @@ public:
       const evtt &n2,
       const unsigned n2_step,
       const evtt::event_dirt n2_o_d,
-      const exprt& cond);
+      const exprt &cond);
 
   const evtt* first_of(const evtt &e1, const evtt &e2) const;
-  const numbered_evtst& get_thread(const evtt &e) const;
-  const numbered_per_thread_evtst& get_all_threads() const
+  const numbered_evtst &get_thread(const evtt &e) const;
+  const numbered_per_thread_evtst &get_all_threads() const
   {
     return per_thread_evt_no;
   }
 
-  const namespacet& get_ns() const { return ns; }
+  const namespacet &get_ns() const { return ns; }
   messaget &get_message() { return message; }
   std::map<std::string, unsigned> num_concurrency_constraints;
 
@@ -357,7 +357,7 @@ private:
   void print_graph(
       const adj_matrixt &graph,
       const std::string &edge_label,
-      namespacet const& ns) const;
+      namespacet const &ns) const;
 };
 #endif
 

@@ -30,19 +30,19 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
   for(unsigned i=0; i < struct_type.components().size(); i++)
   {
-    const struct_typet::componentt& compo=struct_type.components()[i];
+    const struct_typet::componentt &compo=struct_type.components()[i];
     if(!compo.get_bool("is_virtual"))
       continue;
 
-    const code_typet& code_type=to_code_type(compo.type());
+    const code_typet &code_type=to_code_type(compo.type());
     assert(code_type.parameters().size() > 0);
 
-    const pointer_typet& pointer_type =
+    const pointer_typet &pointer_type =
       static_cast<const pointer_typet&>(code_type.parameters()[0].type());
 
     irep_idt class_id=pointer_type.subtype().get("identifier");
 
-    std::map<irep_idt, exprt>& value_map =
+    std::map<irep_idt, exprt> &value_map =
       vt_value_maps[class_id];
 
 
@@ -65,10 +65,10 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
   for(std::map<irep_idt, std::map<irep_idt, exprt> >::const_iterator cit =
       vt_value_maps.begin(); cit!=vt_value_maps.end(); cit++)
   {
-    const std::map<irep_idt, exprt>& value_map=cit->second;
+    const std::map<irep_idt, exprt> &value_map=cit->second;
 
-    const symbolt& late_cast_symb=namespacet(symbol_table).lookup(cit->first);
-    const symbolt& vt_symb_type=
+    const symbolt &late_cast_symb=namespacet(symbol_table).lookup(cit->first);
+    const symbolt &vt_symb_type=
       namespacet(symbol_table).lookup(
         "virtual_table::"+id2string(late_cast_symb.name));
 
@@ -91,11 +91,11 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
     for(unsigned i=0; i < vt_type.components().size(); i++)
     {
-      const struct_typet::componentt& compo=vt_type.components()[i];
+      const struct_typet::componentt &compo=vt_type.components()[i];
       std::map<irep_idt, exprt>::const_iterator cit2 =
         value_map.find(compo.get("base_name"));
       assert(cit2!=value_map.end());
-      const exprt& value=cit2->second;
+      const exprt &value=cit2->second;
       assert(value.type()==compo.type());
       values.operands().push_back(value);
     }

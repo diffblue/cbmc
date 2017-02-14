@@ -44,29 +44,29 @@ public:
     bool is_not_uniproc() const;
     bool is_not_weak_uniproc() const;
 
-    std::string print_detail(const critical_cyclet& reduced,
-      std::map<std::string, std::string>& map_id2var,
-      std::map<std::string, std::string>& map_var2id,
+    std::string print_detail(const critical_cyclet &reduced,
+      std::map<std::string, std::string> &map_id2var,
+      std::map<std::string, std::string> &map_var2id,
       memory_modelt model) const;
-    std::string print_name(const critical_cyclet& redyced,
+    std::string print_name(const critical_cyclet &redyced,
       memory_modelt model) const;
 
-    bool check_AC(const_iterator s_it, const abstract_eventt& first,
-      const abstract_eventt& second) const;
-    bool check_BC(const_iterator it, const abstract_eventt& first,
-      const abstract_eventt& second) const;
+    bool check_AC(const_iterator s_it, const abstract_eventt &first,
+      const abstract_eventt &second) const;
+    bool check_BC(const_iterator it, const abstract_eventt &first,
+      const abstract_eventt &second) const;
 
   public:
     unsigned id;
 
     bool has_user_defined_fence;
 
-    critical_cyclet(event_grapht& _egraph, unsigned _id)
+    critical_cyclet(event_grapht &_egraph, unsigned _id)
       :egraph(_egraph), id(_id), has_user_defined_fence(false)
     {
     }
 
-    void operator()(const critical_cyclet& cyc)
+    void operator()(const critical_cyclet &cyc)
     {
       clear();
       for(const_iterator it=cyc.begin(); it!=cyc.end(); it++)
@@ -96,7 +96,7 @@ public:
 
     /* removes internal events (e.g. podWW Rfi gives podWR)
        from.hide_internals(&target) */
-    void hide_internals(critical_cyclet& reduced) const;
+    void hide_internals(critical_cyclet &reduced) const;
 
     /* checks whether there is at leat one pair which is unsafe
        (takes fences and dependencies into account), and adds
@@ -148,13 +148,13 @@ public:
       {
       }
 
-      bool operator==(const delayt& other) const
+      bool operator==(const delayt &other) const
       {
         return (is_po ? first==other.first :
                 first==other.first && second==other.second);
       }
 
-      bool operator<(const delayt& other) const
+      bool operator<(const delayt &other) const
       {
         return (is_po ? first<other.first :
                 first<other.first ||
@@ -189,14 +189,14 @@ public:
     std::string print_unsafes() const;
     std::string print_output() const;
     std::string print_all(memory_modelt model,
-      std::map<std::string, std::string>& map_id2var,
-      std::map<std::string, std::string>& map_var2id,
+      std::map<std::string, std::string> &map_id2var,
+      std::map<std::string, std::string> &map_var2id,
       bool hide_internals) const;
 
     void print_dot(std::ostream &str,
       unsigned colour, memory_modelt model) const;
 
-    bool operator<(const critical_cyclet& other) const
+    bool operator<(const critical_cyclet &other) const
     {
       return ( ((std::list<event_idt>) *this) < (std::list<event_idt>)other);
     }
@@ -254,11 +254,11 @@ protected:
 
     /* after the collection, eliminates the executions forbidden by an
        indirect thin-air */
-    void filter_thin_air(std::set<critical_cyclet>& set_of_cycles);
+    void filter_thin_air(std::set<critical_cyclet> &set_of_cycles);
 
   public:
     graph_explorert(
-      event_grapht& _egraph,
+      event_grapht &_egraph,
       unsigned _max_var,
       unsigned _max_po_trans):
       egraph(_egraph),
@@ -278,7 +278,7 @@ protected:
     critical_cyclet extract_cycle(event_idt vertex,
       event_idt source, unsigned number_of_cycles);
 
-    bool backtrack(std::set<critical_cyclet>& set_of_cycles,
+    bool backtrack(std::set<critical_cyclet> &set_of_cycles,
       event_idt source,
       event_idt vertex,
       bool unsafe_met,
@@ -291,7 +291,7 @@ protected:
 
     /* Tarjan 1972 adapted and modified for events + po-transitivity */
     void collect_cycles(
-      std::set<critical_cyclet>& set_of_cycles,
+      std::set<critical_cyclet> &set_of_cycles,
       memory_modelt model);
   };
 
@@ -299,11 +299,11 @@ protected:
   class graph_conc_explorert:public graph_explorert
   {
   protected:
-    const std::set<event_idt>& filter;
+    const std::set<event_idt> &filter;
 
   public:
-    graph_conc_explorert(event_grapht& _egraph, unsigned _max_var,
-      unsigned _max_po_trans, const std::set<event_idt>& _filter)
+    graph_conc_explorert(event_grapht &_egraph, unsigned _max_var,
+      unsigned _max_po_trans, const std::set<event_idt> &_filter)
       :graph_explorert(_egraph, _max_var, _max_po_trans), filter(_filter)
     {
     }
@@ -336,17 +336,17 @@ protected:
     bool find_second_event(event_idt source);
 
   public:
-    graph_pensieve_explorert(event_grapht& _egraph, unsigned _max_var,
+    graph_pensieve_explorert(event_grapht &_egraph, unsigned _max_var,
       unsigned _max_po_trans)
       :graph_explorert(_egraph, _max_var, _max_po_trans), naive(false)
     {}
 
     void set_naive() {naive=true;}
-    void collect_pairs(namespacet& ns);
+    void collect_pairs(namespacet &ns);
   };
 
 public:
-  explicit event_grapht(messaget& _message):
+  explicit event_grapht(messaget &_message):
     filter_thin_air(true),
     filter_uniproc(true),
     message(_message)
@@ -466,7 +466,7 @@ public:
 
   /* copies the sub-graph G between begin and end into G', connects
      G.end with G'.begin, and returns G'.end */
-  void explore_copy_segment(std::set<event_idt>& explored, event_idt begin,
+  void explore_copy_segment(std::set<event_idt> &explored, event_idt begin,
     event_idt end) const;
   event_idt copy_segment(event_idt begin, event_idt end);
 
@@ -508,19 +508,19 @@ public:
 
   /* prints to graph.dot */
   void print_graph();
-  void print_rec_graph(std::ofstream& file, event_idt node_id,
-    std::set<event_idt>& visited);
+  void print_rec_graph(std::ofstream &file, event_idt node_id,
+    std::set<event_idt> &visited);
 
   /* Tarjan 1972 adapted and modified for events + po-transitivity */
-  void collect_cycles(std::set<critical_cyclet>& set_of_cycles,
+  void collect_cycles(std::set<critical_cyclet> &set_of_cycles,
     memory_modelt model,
-    const std::set<event_idt>& filter)
+    const std::set<event_idt> &filter)
   {
     graph_conc_explorert exploration(*this, max_var, max_po_trans, filter);
     exploration.collect_cycles(set_of_cycles, model);
   }
 
-  void collect_cycles(std::set<critical_cyclet>& set_of_cycles,
+  void collect_cycles(std::set<critical_cyclet> &set_of_cycles,
     memory_modelt model)
   {
     graph_explorert exploration(*this, max_var, max_po_trans);
@@ -539,13 +539,13 @@ public:
 
   /* collects all the pairs of events with respectively at least one cmp,
      regardless of the architecture (Pensieve'05 strategy) */
-  void collect_pairs(namespacet& ns)
+  void collect_pairs(namespacet &ns)
   {
     graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
     exploration.collect_pairs(ns);
   }
 
-  void collect_pairs_naive(namespacet& ns)
+  void collect_pairs_naive(namespacet &ns)
   {
     graph_pensieve_explorert exploration(*this, max_var, max_po_trans);
     exploration.set_naive();

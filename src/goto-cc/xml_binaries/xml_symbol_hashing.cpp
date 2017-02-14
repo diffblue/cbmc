@@ -23,7 +23,7 @@ Function: xml_symbol_convertt::convert
 
 \*******************************************************************/
 
-void xml_symbol_convertt::convert(const symbolt& sym, xmlt &root)
+void xml_symbol_convertt::convert(const symbolt &sym, xmlt &root)
 {
   xmlt &xmlsym = root.new_element("symbol");
   irepcache.push_back(irept());
@@ -43,7 +43,7 @@ Function: xml_symbol_convertt::convert
 
 \*******************************************************************/
 
-void xml_symbol_convertt::convert(const xmlt &xmlsym, symbolt& symbol)
+void xml_symbol_convertt::convert(const xmlt &xmlsym, symbolt &symbol)
 {
   irept t;
 

@@ -96,7 +96,7 @@ protected:
 
   goto_programt::targett value_assignments(goto_programt &dest,
       goto_programt::targett it,
-      const exprt& lhs, const exprt& rhs);
+      const exprt &lhs, const exprt &rhs);
 
   goto_programt::targett value_assignments_if(
     goto_programt &dest,
@@ -106,7 +106,7 @@ protected:
   goto_programt::targett value_assignments_string_struct(
     goto_programt &dest,
     goto_programt::targett target,
-    const exprt& lhs, const exprt& rhs);
+    const exprt &lhs, const exprt &rhs);
 
   typedef enum { IS_ZERO, LENGTH, SIZE } whatt;
 
@@ -127,8 +127,8 @@ protected:
 
   exprt build_unknown(whatt what, bool write);
   exprt build_unknown(const typet &type, bool write);
-  const typet& build_abstraction_type(const typet &type);
-  const typet& build_abstraction_type_rec(const typet &type,
+  const typet &build_abstraction_type(const typet &type);
+  const typet &build_abstraction_type_rec(const typet &type,
       const abstraction_types_mapt &known);
   bool build_pointer(const exprt &object, exprt &dest, bool write);
   void build_new_symbol(const symbolt &symbol,
@@ -145,7 +145,7 @@ protected:
   void abstract(goto_programt &dest);
 
   void add_str_arguments(
-      const irep_idt& name,
+      const irep_idt &name,
       goto_functionst::goto_functiont &fct);
 
   void add_argument(

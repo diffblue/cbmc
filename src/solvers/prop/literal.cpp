@@ -22,7 +22,7 @@ Function: operator <<
 
 \*******************************************************************/
 
-std::ostream & operator << (std::ostream &out, literalt l)
+std::ostream &operator << (std::ostream &out, literalt l)
 {
   if(l.is_constant())
     return out << (l.is_true()?"true":"false");

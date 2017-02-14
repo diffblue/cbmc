@@ -47,7 +47,7 @@ public:
   bool subtype_typecast(
     const typet &from,
     const typet &to,
-    std::string& err);
+    std::string &err);
 
   bool integral_conversion(
     const typet &src_type,
@@ -59,8 +59,8 @@ public:
 
   void make_ptr_typecast(
     exprt &expr,
-    const typet & src_type,
-    const typet & dest_type);
+    const typet &src_type,
+    const typet &dest_type);
 
   cpp_typecheckt &cpp_typecheck;
 };

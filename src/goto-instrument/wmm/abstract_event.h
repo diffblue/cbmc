@@ -23,7 +23,7 @@ Date: 2012
 class abstract_eventt:public graph_nodet<empty_edget>
 {
 protected:
-  bool unsafe_pair_lwfence_param(const abstract_eventt& next,
+  bool unsafe_pair_lwfence_param(const abstract_eventt &next,
     memory_modelt model, bool lwsync_met) const;
 
 public:
@@ -89,7 +89,7 @@ public:
   }
 
   /* post declaration (through graph) -- doesn't copy */
-  void operator()(const abstract_eventt& other)
+  void operator()(const abstract_eventt &other)
   {
     operation=other.operation;
     thread=other.thread;
@@ -99,12 +99,12 @@ public:
     local=other.local;
   }
 
-  bool operator==(const abstract_eventt& other) const
+  bool operator==(const abstract_eventt &other) const
   {
     return (id == other.id);
   }
 
-  bool operator<(const abstract_eventt& other) const
+  bool operator<(const abstract_eventt &other) const
   {
     return (id < other.id);
   }
@@ -148,8 +148,8 @@ public:
     return "?";
   }
 
-  bool is_corresponding_fence(const abstract_eventt& first,
-    const abstract_eventt& second) const
+  bool is_corresponding_fence(const abstract_eventt &first,
+    const abstract_eventt &second) const
   {
     return
       (WRfence && first.operation==Write && second.operation==Read) ||
@@ -175,8 +175,8 @@ public:
   }
 };
 
-inline std::ostream& operator<<(
-  std::ostream& s,
+inline std::ostream &operator<<(
+  std::ostream &s,
   const abstract_eventt &e)
 {
   return s << e.get_operation() << e.variable;

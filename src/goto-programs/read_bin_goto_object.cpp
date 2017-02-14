@@ -57,23 +57,23 @@ bool read_bin_goto_object_v3(
 
     std::size_t flags=irepconverter.read_gb_word(in);
 
-    sym.is_weak = (flags & (1 << 16))!=0;
-    sym.is_type = (flags & (1 << 15))!=0;
-    sym.is_property = (flags & (1 << 14))!=0;
-    sym.is_macro = (flags & (1 << 13))!=0;
-    sym.is_exported = (flags & (1 << 12))!=0;
-    sym.is_input = (flags & (1 << 11))!=0;
-    sym.is_output = (flags & (1 << 10))!=0;
-    sym.is_state_var = (flags & (1 << 9))!=0;
-    sym.is_parameter = (flags & (1 << 8))!=0;
-    sym.is_auxiliary = (flags & (1 << 7))!=0;
-    // sym.binding = (flags & (1 << 6))!=0;
-    sym.is_lvalue = (flags & (1 << 5))!=0;
-    sym.is_static_lifetime = (flags & (1 << 4))!=0;
-    sym.is_thread_local = (flags & (1 << 3))!=0;
-    sym.is_file_local = (flags & (1 << 2))!=0;
-    sym.is_extern = (flags & (1 << 1))!=0;
-    sym.is_volatile = (flags & 1)!=0;
+    sym.is_weak = (flags &(1 << 16))!=0;
+    sym.is_type = (flags &(1 << 15))!=0;
+    sym.is_property = (flags &(1 << 14))!=0;
+    sym.is_macro = (flags &(1 << 13))!=0;
+    sym.is_exported = (flags &(1 << 12))!=0;
+    sym.is_input = (flags &(1 << 11))!=0;
+    sym.is_output = (flags &(1 << 10))!=0;
+    sym.is_state_var = (flags &(1 << 9))!=0;
+    sym.is_parameter = (flags &(1 << 8))!=0;
+    sym.is_auxiliary = (flags &(1 << 7))!=0;
+    // sym.binding = (flags &(1 << 6))!=0;
+    sym.is_lvalue = (flags &(1 << 5))!=0;
+    sym.is_static_lifetime = (flags &(1 << 4))!=0;
+    sym.is_thread_local = (flags &(1 << 3))!=0;
+    sym.is_file_local = (flags &(1 << 2))!=0;
+    sym.is_extern = (flags &(1 << 1))!=0;
+    sym.is_volatile = (flags &1)!=0;
 
     if(!sym.is_type && sym.type.id()==ID_code)
     {

@@ -84,7 +84,7 @@ public:
   void output(std::ostream &out) const;
 
 protected:
-  virtual void track_deref(const entryt& entry, bool read) {}
+  virtual void track_deref(const entryt &entry, bool read) {}
   virtual void set_track_deref() {}
   virtual void reset_track_deref() {}
 
@@ -239,7 +239,7 @@ public:
     const namespacet &_ns,
     value_setst &_value_sets,
     goto_programt::const_targett _target,
-    local_may_aliast& may):
+    local_may_aliast &may):
     _rw_set_loct(_ns, _value_sets, _target, may),
     dereferencing(false)
 #else
@@ -261,7 +261,7 @@ protected:
   bool dereferencing;
   std::vector<entryt> dereferenced;
 
-  void track_deref(const entryt& entry, bool read)
+  void track_deref(const entryt &entry, bool read)
   {
     if(dereferencing && dereferenced.size()==0)
     {

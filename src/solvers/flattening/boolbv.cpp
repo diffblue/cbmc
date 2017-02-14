@@ -137,7 +137,7 @@ Function: boolbvt::convert_bv
 
 \*******************************************************************/
 
-const bvt& boolbvt::convert_bv(const exprt &expr)
+const bvt &boolbvt::convert_bv(const exprt &expr)
 {
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=

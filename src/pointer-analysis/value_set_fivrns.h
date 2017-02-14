@@ -33,7 +33,7 @@ public:
   static object_numberingt object_numbering;
   static hash_numbering<irep_idt, irep_id_hash> function_numbering;
 
-  void set_from(const irep_idt& function, unsigned inx)
+  void set_from(const irep_idt &function, unsigned inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;

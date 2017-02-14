@@ -87,7 +87,7 @@ void dott::write_dot_subgraph(
   out << "subgraph \"cluster_" << name << "\" {" << std::endl;
   out << "label=\"" << name << "\";" << std::endl;
 
-  const goto_programt::instructionst& instructions =
+  const goto_programt::instructionst &instructions =
     goto_program.instructions;
 
   if(instructions.empty())

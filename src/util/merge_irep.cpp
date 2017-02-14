@@ -181,7 +181,7 @@ Function: merge_irept::merged
 
 \*******************************************************************/
 
-const irept& merge_irept::merged(const irept &irep)
+const irept &merge_irept::merged(const irept &irep)
 {
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())
@@ -253,7 +253,7 @@ Function: merge_full_irept::merged
 
 \*******************************************************************/
 
-const irept& merge_full_irept::merged(const irept &irep)
+const irept &merge_full_irept::merged(const irept &irep)
 {
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())

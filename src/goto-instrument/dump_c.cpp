@@ -1001,7 +1001,7 @@ Purpose:
 \*******************************************************************/
 
 void dump_ct::convert_function_declaration(
-    const symbolt& symbol,
+    const symbolt &symbol,
     const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,

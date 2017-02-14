@@ -276,7 +276,7 @@ void shared_bufferst::delay_read(
   assignment(goto_program, target, source_location, vars.read_delayed_var,
     read_object);
 
-  const irep_idt& new_var=add_fresh_var(write_object, unique(), vars.type);
+  const irep_idt &new_var=add_fresh_var(write_object, unique(), vars.type);
 
   assignment(goto_program, target, source_location, vars.read_new_var, new_var);
 
@@ -1205,7 +1205,7 @@ Function: weak_memory_cfg
 
 void shared_bufferst::cfg_visitort::weak_memory(
   value_setst &value_sets,
-  const irep_idt& function,
+  const irep_idt &function,
   memory_modelt model)
 {
   shared_buffers.message.debug() << "visit function "<< function
@@ -1450,7 +1450,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     }
     else if(instruction.is_function_call())
     {
-      const exprt& fun=to_code_function_call(instruction.code).function();
+      const exprt &fun=to_code_function_call(instruction.code).function();
       weak_memory(value_sets, to_symbol_expr(fun).get_identifier(), model);
     }
   }

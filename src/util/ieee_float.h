@@ -296,7 +296,7 @@ protected:
   static mp_integer base10_digits(const mp_integer &src);
 };
 
-inline std::ostream& operator<<(
+inline std::ostream &operator<<(
   std::ostream &out,
   const ieee_floatt &f)
 {

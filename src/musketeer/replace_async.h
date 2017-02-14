@@ -41,7 +41,7 @@ void replace_async(
             assert(fct.arguments().size()>=4);
             code_function_callt new_call;
             /* takes the 3rd argument (pointer to the function to call) */
-            const exprt& fct_name=fct.arguments()[2];
+            const exprt &fct_name=fct.arguments()[2];
 
             if(fct_name.id()==ID_address_of)
             {

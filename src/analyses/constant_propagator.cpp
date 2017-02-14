@@ -35,7 +35,7 @@ void constant_propagator_domaint::assign_rec(
   const exprt &lhs, const exprt &rhs,
   const namespacet &ns)
 {
-  const typet & rhs_type = ns.follow(rhs.type());
+  const typet &rhs_type = ns.follow(rhs.type());
 
 #ifdef DEBUG
   std::cout << "assign: " << from_expr(ns, "", lhs)

@@ -27,6 +27,6 @@ void fence_pensieve(
   bool render_file,
   bool render_function,
   bool naive_mode,
-  message_handlert& message_handler);
+  message_handlert &message_handler);
 
 #endif // CPROVER_MUSKETEER_PENSIEVE_H

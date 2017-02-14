@@ -435,7 +435,7 @@ void qbf_bdd_coret::compress_certificate(void)
 {
   status() << "Compressing Certificate" << eom;
 
-  for(const quantifiert& quantifier : quantifiers)
+  for(const quantifiert &quantifier : quantifiers)
   {
     if(quantifier.type==quantifiert::EXISTENTIAL)
     {

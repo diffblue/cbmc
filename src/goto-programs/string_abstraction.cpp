@@ -264,7 +264,7 @@ Function: string_abstractiont::add_str_arguments
 \*******************************************************************/
 
 void string_abstractiont::add_str_arguments(
-    const irep_idt & name,
+    const irep_idt &name,
     goto_functionst::goto_functiont &fct)
 {
   symbol_tablet::symbolst::iterator sym_entry=symbol_table.symbols.find(name);
@@ -913,7 +913,7 @@ Function: string_abstractiont::build_abstraction_type
 
 \*******************************************************************/
 
-const typet& string_abstractiont::build_abstraction_type(const typet &type)
+const typet &string_abstractiont::build_abstraction_type(const typet &type)
 {
   const typet &eff_type=ns.follow(type);
   abstraction_types_mapt::const_iterator map_entry=
@@ -944,7 +944,7 @@ Function: string_abstractiont::build_abstraction_type_rec
 
 \*******************************************************************/
 
-const typet& string_abstractiont::build_abstraction_type_rec(const typet &type,
+const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     const abstraction_types_mapt &known)
 {
   const typet &eff_type=ns.follow(type);
@@ -966,7 +966,7 @@ const typet& string_abstractiont::build_abstraction_type_rec(const typet &type,
       map_entry.first->second=pointer_typet(string_struct);
     else
     {
-      const typet& subt=build_abstraction_type_rec(eff_type.subtype(), known);
+      const typet &subt=build_abstraction_type_rec(eff_type.subtype(), known);
       if(!subt.is_nil())
       {
         if(eff_type.id()==ID_array)
@@ -1467,7 +1467,7 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   while(rhsp->id()==ID_typecast)
     rhsp=&(rhsp->op0());
 
-  const typet& abstract_type=build_abstraction_type(lhs.type());
+  const typet &abstract_type=build_abstraction_type(lhs.type());
   if(abstract_type.is_nil())
     return target;
 
@@ -1636,8 +1636,8 @@ Function: string_abstractiont::value_assignments
 goto_programt::targett string_abstractiont::value_assignments(
   goto_programt &dest,
   goto_programt::targett target,
-  const exprt& lhs,
-  const exprt& rhs)
+  const exprt &lhs,
+  const exprt &rhs)
 {
   if(rhs.id()==ID_if)
     return value_assignments_if(dest, target, lhs, to_if_expr(rhs));
@@ -1695,7 +1695,7 @@ Function: string_abstractiont::value_assignments_if
 goto_programt::targett string_abstractiont::value_assignments_if(
   goto_programt &dest,
   goto_programt::targett target,
-  const exprt& lhs, const if_exprt& rhs)
+  const exprt &lhs, const if_exprt &rhs)
 {
   goto_programt tmp;
 
@@ -1745,7 +1745,7 @@ Function: string_abstractiont::value_assignments_string_struct
 goto_programt::targett string_abstractiont::value_assignments_string_struct(
     goto_programt &dest,
     goto_programt::targett target,
-    const exprt& lhs, const exprt& rhs)
+    const exprt &lhs, const exprt &rhs)
 {
   // copy all the values
   goto_programt tmp;

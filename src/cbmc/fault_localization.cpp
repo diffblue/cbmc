@@ -120,7 +120,7 @@ Function: fault_localizationt::check
 \*******************************************************************/
 
 bool fault_localizationt::check(const lpointst &lpoints,
-                                const lpoints_valuet& value)
+                                const lpoints_valuet &value)
 {
   assert(value.size()==lpoints.size());
   bvt assumptions;
@@ -158,7 +158,7 @@ Function: fault_localizationt::update_scores
 \*******************************************************************/
 
 void fault_localizationt::update_scores(lpointst &lpoints,
-                                        const lpoints_valuet& value)
+                                        const lpoints_valuet &value)
 {
   for(auto &l : lpoints)
   {

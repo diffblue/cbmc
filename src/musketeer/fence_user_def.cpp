@@ -22,7 +22,7 @@ Function:
 \*******************************************************************/
 
 bool fence_user_def_insertert::contains_user_def(
-  const event_grapht::critical_cyclet& cycle) const
+  const event_grapht::critical_cyclet &cycle) const
 {
   /* DEPRECATED: user-inserted fences now detected at cycle collection */
   #if 0

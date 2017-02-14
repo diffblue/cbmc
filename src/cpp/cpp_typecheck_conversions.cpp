@@ -595,8 +595,8 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // struct * to struct *
   if(sub_from.id()==ID_struct && sub_to.id()==ID_struct)
   {
-    const struct_typet& from_struct=to_struct_type(sub_from);
-    const struct_typet& to_struct=to_struct_type(sub_to);
+    const struct_typet &from_struct=to_struct_type(sub_from);
+    const struct_typet &to_struct=to_struct_type(sub_to);
     if(subtype_typecast(from_struct, to_struct))
     {
       c_qualifierst qual_from;
@@ -1063,7 +1063,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           it != to_struct.components().end();
           it++)
       {
-        const irept& component=*it;
+        const irept &component=*it;
 
         if(component.get_bool(ID_from_base))
           continue;
@@ -1071,7 +1071,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(component.get_bool("is_explicit"))
           continue;
 
-        const typet& comp_type =
+        const typet &comp_type =
           static_cast<const typet&>(component.find(ID_type));
 
         if(comp_type.id() !=ID_code)
@@ -1216,7 +1216,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         it=from_struct.components().begin();
         it != from_struct.components().end(); it++)
     {
-      const irept& component=*it;
+      const irept &component=*it;
       const typet comp_type=static_cast<const typet&>(component.find(ID_type));
 
       if(component.get_bool(ID_from_base))
@@ -1485,7 +1485,7 @@ bool cpp_typecheckt::reference_binding(
         it=from_struct.components().begin();
         it != from_struct.components().end(); it++)
     {
-      const irept& component=*it;
+      const irept &component=*it;
 
       if(component.get_bool(ID_from_base))
         continue;
@@ -1493,7 +1493,7 @@ bool cpp_typecheckt::reference_binding(
       if(!component.get_bool("is_cast_operator"))
         continue;
 
-      const code_typet& component_type =
+      const code_typet &component_type =
         to_code_type(static_cast<const typet&>(component.find(ID_type)));
 
       // otherwise it cannot bind directly (not an lvalue)

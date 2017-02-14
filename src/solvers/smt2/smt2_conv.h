@@ -200,8 +200,8 @@ protected:
   exprt letify(exprt &expr);
   exprt letify_rec(
     exprt &expr,
-    std::vector<exprt>& let_order,
-    const seen_expressionst& map,
+    std::vector<exprt> &let_order,
+    const seen_expressionst &map,
     unsigned i);
 
   void collect_bindings(

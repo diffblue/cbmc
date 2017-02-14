@@ -237,7 +237,7 @@ Function: race_check
 void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
-  L_M_ARG(const goto_functionst::goto_functiont& goto_function)
+  L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
   w_guardst &w_guards)
 {
@@ -355,7 +355,7 @@ void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program)
 {

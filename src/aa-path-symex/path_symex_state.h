@@ -83,7 +83,7 @@ public:
 
   // like initial state except that branches are copied from "other"
   // and history will be 'nil'
-  static path_symex_statet lazy_copy(path_symex_statet& other)
+  static path_symex_statet lazy_copy(path_symex_statet &other)
   {
     // allow compiler to use RVO
     return path_symex_statet(
@@ -281,7 +281,7 @@ protected:
 
   // On first call, O(N) where N is the length of the execution path
   // leading to this state. Subsequent calls run in constant time.
-  const branchest& get_branches()
+  const branchest &get_branches()
   {
     if(!branches.empty() || history.is_nil())
       return branches;

@@ -282,7 +282,7 @@ exprt partial_order_concurrencyt::before(
   {
     const axiomt ax=axiom_bits[i];
 
-    if((axioms & ax)==0)
+    if((axioms &ax)==0)
       continue;
 
     if(e1->atomic_section_id!=0 &&

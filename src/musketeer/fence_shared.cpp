@@ -37,9 +37,9 @@ class simple_insertiont
 protected:
   messaget &message;
   value_setst &value_sets;
-  const symbol_tablet& symbol_table;
+  const symbol_tablet &symbol_table;
   const namespacet ns;
-  const goto_functionst& goto_functions;
+  const goto_functionst &goto_functions;
 
   struct
   {
@@ -106,10 +106,10 @@ protected:
 
 public:
   explicit simple_insertiont(
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :message(_message), value_sets(_value_sets), symbol_table(_symbol_table),
       ns(_symbol_table), goto_functions(_goto_functions)
   {}
@@ -131,10 +131,10 @@ protected:
 
 public:
   fence_all_sharedt(
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
@@ -145,18 +145,18 @@ class fence_all_shared_aegt:public fence_all_sharedt
 protected:
   void compute();
   std::set<irep_idt> visited_functions;
-  void fence_all_shared_aeg_explore(const goto_programt& code
+  void fence_all_shared_aeg_explore(const goto_programt &code
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
   ); // NOLINT(whitespace/parens)
 
 public:
   fence_all_shared_aegt(
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :fence_all_sharedt(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
@@ -166,14 +166,14 @@ class fence_volatilet:public simple_insertiont
 {
 protected:
   void compute();
-  bool is_volatile(const typet& src) const;
+  bool is_volatile(const typet &src) const;
 
 public:
   fence_volatilet(
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
@@ -271,7 +271,7 @@ void fence_volatilet::compute()
           {
             message.debug() << "debug: "
               << id2string(w_it->second.object) << messaget::eom;
-            const symbolt& var=ns.lookup(w_it->second.object);
+            const symbolt &var=ns.lookup(w_it->second.object);
             if(is_volatile(var.type))
             {
               message.debug() << "volatile: "
@@ -295,7 +295,7 @@ void fence_volatilet::compute()
           {
             message.debug() << "debug: "
               << id2string(r_it->second.object) << messaget::eom;
-            const symbolt& var=ns.lookup(r_it->second.object);
+            const symbolt &var=ns.lookup(r_it->second.object);
             #if 0
             // NOLINTNEXTLINE(readability/braces)
             if(var.is_volatile && !var.is_thread_local)
@@ -357,7 +357,7 @@ void fence_all_sharedt::compute()
 
         try
         {
-          const symbolt& var=ns.lookup(w_it->second.object);
+          const symbolt &var=ns.lookup(w_it->second.object);
           message.debug() << "debug: "
             << id2string(w_it->second.object) << " shared: " << var.is_shared()
             << " loc: " << w_it->second.symbol_expr.source_location()
@@ -366,12 +366,12 @@ void fence_all_sharedt::compute()
           {
             /* this variable has perhaps been discovered after dereferencing
                a pointer. We want to report this pointer */
-            std::map<const irep_idt, const irep_idt>& ref=
+            std::map<const irep_idt, const irep_idt> &ref=
               rw_set.dereferenced_from;
             if(ref.find(w_it->second.object)!=ref.end())
             {
               const irep_idt from=ref[w_it->second.object];
-              const rw_set_baset::entryt& entry=
+              const rw_set_baset::entryt &entry=
                 rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
                 rw_set.r_entries[from] :
                 rw_set.w_entries[from];
@@ -403,7 +403,7 @@ void fence_all_sharedt::compute()
 
         try
         {
-          const symbolt& var=ns.lookup(r_it->second.object);
+          const symbolt &var=ns.lookup(r_it->second.object);
           message.debug() << "debug: "
             << id2string(r_it->second.object) << " shared: "
             << var.is_shared() << " loc: "
@@ -463,7 +463,7 @@ void fence_all_shared_aegt::compute()
 {
   message.status() << "--------" << messaget::eom;
 
-  const goto_functionst::goto_functiont& main=
+  const goto_functionst::goto_functiont &main=
     goto_functions.function_map.find(goto_functionst::entry_point())->second;
   #ifdef LOCAL_MAY
   local_may_aliast local_may(main);
@@ -477,9 +477,9 @@ void fence_all_shared_aegt::compute()
 }
 
 void fence_all_shared_aegt::fence_all_shared_aeg_explore(
-  const goto_programt& code
+  const goto_programt &code
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
 )
 {
@@ -487,12 +487,12 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
   {
     if(i_it->is_function_call())
     {
-      const exprt& fun=to_code_function_call(i_it->code).function();
+      const exprt &fun=to_code_function_call(i_it->code).function();
 
       if(fun.id()!=goto_functionst::entry_point())
         continue;
 
-      const irep_idt& fun_id=to_symbol_expr(fun).get_identifier();
+      const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
 
       if(visited_functions.find(fun_id)!=visited_functions.end())
         continue;
@@ -519,7 +519,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
 
       try
       {
-        const symbolt& var=ns.lookup(w_it->second.object);
+        const symbolt &var=ns.lookup(w_it->second.object);
         message.debug() << "debug: "
           << id2string(w_it->second.object) << " shared: "
           << var.is_shared() << " loc: "
@@ -533,7 +533,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
           if(ref.find(w_it->second.object)!=ref.end())
           {
             const irep_idt from=ref[w_it->second.object];
-            const rw_set_baset::entryt& entry=
+            const rw_set_baset::entryt &entry=
                 rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
                 rw_set.r_entries[from] :
                 rw_set.w_entries[from];
@@ -566,7 +566,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
 
       try
       {
-        const symbolt& var=ns.lookup(r_it->second.object);
+        const symbolt &var=ns.lookup(r_it->second.object);
         message.debug() << "debug: "
           << id2string(r_it->second.object) << " shared: "
           <<var.is_shared() << " loc: "
@@ -580,7 +580,7 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
           if(ref.find(r_it->second.object)!=ref.end())
           {
             const irep_idt from=ref[r_it->second.object];
-            const rw_set_baset::entryt& entry=
+            const rw_set_baset::entryt &entry=
               rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
               rw_set.r_entries[from] :
               rw_set.w_entries[from];
@@ -622,7 +622,7 @@ Function:
 \*******************************************************************/
 
 void fence_all_shared(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -646,7 +646,7 @@ Function:
 \*******************************************************************/
 
 void fence_all_shared_aeg(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -670,7 +670,7 @@ Function:
 \*******************************************************************/
 
 void fence_volatile(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)

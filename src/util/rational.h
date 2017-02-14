@@ -86,12 +86,12 @@ public:
 
   void invert();
 
-  const mp_integer& get_numerator() const
+  const mp_integer &get_numerator() const
   {
     return numerator;
   }
 
-  const mp_integer& get_denominator() const
+  const mp_integer &get_denominator() const
   {
     return denominator;
   }
@@ -131,7 +131,7 @@ inline rationalt operator/(const rationalt &a, const rationalt &b)
   return tmp;
 }
 
-std::ostream& operator<<(std::ostream& out, const rationalt &a);
+std::ostream &operator<<(std::ostream &out, const rationalt &a);
 
 rationalt inverse(const rationalt &n);
 

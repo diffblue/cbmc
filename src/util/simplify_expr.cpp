@@ -2204,7 +2204,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       if(!(offset==extract.offset()))
         return true;
 
-      const typet& tp=ns.follow(with.type());
+      const typet &tp=ns.follow(with.type());
       if(tp.id()==ID_struct)
       {
         const struct_typet &struct_type=to_struct_type(tp);
@@ -2238,7 +2238,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
         mp_integer i=pointer_offset_size(tp.subtype(), ns);
         if(i!=-1)
         {
-          const exprt& index=with.where();
+          const exprt &index=with.where();
           mult_exprt index_offset(index, from_integer(i, index.type()));
           simplify_node(index_offset);
 

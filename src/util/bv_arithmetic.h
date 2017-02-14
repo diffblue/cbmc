@@ -107,7 +107,7 @@ public:
   bool operator!=(const bv_arithmetict &other);
   bool operator==(int i);
 
-  std::ostream& operator<<(std::ostream &out)
+  std::ostream &operator<<(std::ostream &out)
   {
     return out << to_ansi_c_string();
   }

@@ -42,7 +42,7 @@ Function: instrumentert::local
 
 \*******************************************************************/
 
-bool inline instrumentert::local(const irep_idt& id)
+bool inline instrumentert::local(const irep_idt &id)
 {
   std::string identifier=id2string(id);
 
@@ -73,7 +73,7 @@ bool inline instrumentert::local(const irep_idt& id)
 
   try
   {
-    const symbolt& symbol=ns.lookup(identifier);
+    const symbolt &symbol=ns.lookup(identifier);
 
     if(!symbol.is_static_lifetime)
       return true; /* these are local */
@@ -90,7 +90,7 @@ bool inline instrumentert::local(const irep_idt& id)
   }
 }
 
-bool inline instrumentert::cfg_visitort::local(const irep_idt& i)
+bool inline instrumentert::cfg_visitort::local(const irep_idt &i)
 {
   return instrumenter.local(i);
 }
@@ -110,7 +110,7 @@ Function: instrumentert::goto2graph_cfg
 \*******************************************************************/
 
 unsigned instrumentert::goto2graph_cfg(
-  value_setst& value_sets,
+  value_setst &value_sets,
   memory_modelt model,
   bool no_dependencies,
   loop_strategyt duplicate_body)
@@ -183,16 +183,16 @@ Function: instrumentert::cfg_visitort::visit_cfg_function
 
 void instrumentert::cfg_visitort::visit_cfg_function(
     /* value_sets and options */
-    value_setst& value_sets,
+    value_setst &value_sets,
     memory_modelt model,
     bool no_dependencies,
     loop_strategyt replicate_body,
     /* function to analyse */
-    const irep_idt& function,
+    const irep_idt &function,
     /* incoming edges */
-    const std::set<instrumentert::cfg_visitort::nodet>& initial_vertex,
+    const std::set<instrumentert::cfg_visitort::nodet> &initial_vertex,
     /* outcoming edges */
-    std::set<instrumentert::cfg_visitort::nodet>& ending_vertex)
+    std::set<instrumentert::cfg_visitort::nodet> &ending_vertex)
 {
   /* flow: egraph */
 
@@ -213,7 +213,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   Forall_goto_program_instructions(i_it,
     instrumenter.goto_functions.function_map[function].body)
   {
-    goto_programt::instructiont& instruction=*i_it;
+    goto_programt::instructiont &instruction=*i_it;
 
     /* thread marking */
     if(instruction.is_start_thread())
@@ -334,7 +334,7 @@ Function: instrumentert::visit_cfg_propagate
 void inline instrumentert::cfg_visitort::visit_cfg_propagate(
   goto_programt::instructionst::iterator i_it)
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
   /* propagation */
   in_pos[i_it].clear();
   for(const auto &in : instruction.incoming_edges)
@@ -384,7 +384,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function(
     return;
 
   /* gets the body of the function */
-  goto_programt::instructionst& body=instrumenter.goto_functions
+  goto_programt::instructionst &body=instrumenter.goto_functions
     .function_map[id_function].body.instructions;
 
   if(body.empty())
@@ -471,7 +471,7 @@ Function: alt_copy_segment
 
 \*******************************************************************/
 
-event_idt alt_copy_segment(wmm_grapht& alt_egraph,
+event_idt alt_copy_segment(wmm_grapht &alt_egraph,
   event_idt begin, event_idt end)
 {
   /* no need to duplicate the loop nodes for the SCC-detection graph -- a
@@ -495,7 +495,7 @@ Function: instrumentert::visit_cfg_visitort::contains_shared_array
 bool instrumentert::cfg_visitort::contains_shared_array(
   goto_programt::const_targett targ,
   goto_programt::const_targett i_it,
-  value_setst& value_sets
+  value_setst &value_sets
   #ifdef LOCAL_MAY
   , local_may_aliast local_may
   #endif
@@ -555,9 +555,9 @@ Function: instrumentert::visit_cfg_visitort::visit_cfg_body
 void inline instrumentert::cfg_visitort::visit_cfg_body(
   goto_programt::const_targett i_it,
   loop_strategyt replicate_body,
-  value_setst& value_sets
+  value_setst &value_sets
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
 )
 {
@@ -642,8 +642,8 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
   }
 
   /* appends the body once more */
-  const std::set<nodet>& up_set=in_pos[(found_pos ? new_targ : targ)];
-  const std::set<nodet>& down_set=in_pos[i_it];
+  const std::set<nodet> &up_set=in_pos[(found_pos ? new_targ : targ)];
+  const std::set<nodet> &down_set=in_pos[i_it];
 
   for(std::set<nodet>::const_iterator begin_it=up_set.begin();
     begin_it!=up_set.end(); ++begin_it)
@@ -765,13 +765,13 @@ Function: instrumentert::visit_cfg_goto
 void instrumentert::cfg_visitort::visit_cfg_goto(
   goto_programt::instructionst::iterator i_it,
   loop_strategyt replicate_body,
-  value_setst& value_sets
+  value_setst &value_sets
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
 )
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
 
   /* propagates */
   visit_cfg_propagate(i_it);
@@ -804,21 +804,21 @@ Function: intrumentert::visit_cfg_function_call
 \*******************************************************************/
 
 void instrumentert::cfg_visitort::visit_cfg_function_call(
-  value_setst& value_sets,
+  value_setst &value_sets,
   goto_programt::instructionst::iterator i_it,
   memory_modelt model,
   bool no_dependencies,
   loop_strategyt replicate_body)
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
   std::set<nodet> s;
   for(const auto &in : instruction.incoming_edges)
     if(in_pos.find(in)!=in_pos.end())
       for(const auto &node : in_pos[in])
         s.insert(node);
 
-  const exprt& fun=to_code_function_call(instruction.code).function();
-  const irep_idt& fun_id=to_symbol_expr(fun).get_identifier();
+  const exprt &fun=to_code_function_call(instruction.code).function();
+  const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
   /* ignore recursive calls -- underapproximation */
   try
   {
@@ -885,7 +885,7 @@ Function: instrumentert::visit_cfg_lwfence
 void instrumentert::cfg_visitort::visit_cfg_lwfence(
   goto_programt::instructionst::iterator i_it)
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
   const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
     thread, "f", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
@@ -929,7 +929,7 @@ Function: instrumentert::visit_cfg_lwfence
 void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   goto_programt::instructionst::iterator i_it)
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
   bool WRfence=instruction.code.get_bool(ID_WRfence);
   bool WWfence=instruction.code.get_bool(ID_WWfence);
   bool RRfence=instruction.code.get_bool(ID_RRfence);
@@ -979,16 +979,16 @@ Function: instrumentert::visit_cfg_assign
 \*******************************************************************/
 
 void instrumentert::cfg_visitort::visit_cfg_assign(
-  value_setst& value_sets,
-  namespacet& ns,
-  goto_programt::instructionst::iterator& i_it,
+  value_setst &value_sets,
+  namespacet &ns,
+  goto_programt::instructionst::iterator &i_it,
   bool no_dependencies
 #ifdef LOCAL_MAY
   , local_may_aliast &local_may
 #endif
   )
 {
-  goto_programt::instructiont& instruction=*i_it;
+  goto_programt::instructiont &instruction=*i_it;
 
   /* Read (Rb) */
   rw_set_loct rw_set(ns, value_sets, i_it
@@ -1015,7 +1015,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        read is the irep_id of the read in the code;
        new_read_event is the corresponding abstract event;
        new_read_node is the node in the graph */
-    const irep_idt& read=r_it->second.object;
+    const irep_idt &read=r_it->second.object;
 
     /* skip local variables */
     if(local(read))
@@ -1112,7 +1112,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
        write is the irep_id in the code;
        new_write_event is the corresponding abstract event;
        new_write_node is the node in the graph */
-    const irep_idt& write=w_it->second.object;
+    const irep_idt &write=w_it->second.object;
 
     instrumenter.message.debug() << "WRITE: " << write << messaget::eom;
 
@@ -1270,8 +1270,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     forall_rw_set_w_entries(write_it, rw_set)
       forall_rw_set_r_entries(read_it, rw_set)
       {
-        const irep_idt& write=write_it->second.object;
-        const irep_idt& read=read_it->second.object;
+        const irep_idt &write=write_it->second.object;
+        const irep_idt &read=read_it->second.object;
         instrumenter.message.debug() << "dp: Write:"<<write<<"; Read:"<<read
           << messaget::eom;
         const datat read_p(read, instruction.source_location);
@@ -1283,8 +1283,8 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     forall_rw_set_r_entries(read2_it, rw_set)
       forall_rw_set_r_entries(read_it, rw_set)
       {
-        const irep_idt& read2=read2_it->second.object;
-        const irep_idt& read=read_it->second.object;
+        const irep_idt &read2=read2_it->second.object;
+        const irep_idt &read=read_it->second.object;
         if(read2==read)
           continue;
         const datat read_p(read, instruction.source_location);
@@ -1310,7 +1310,7 @@ Function: instrumentert::visit_cfg_fence
 void instrumentert::cfg_visitort::visit_cfg_fence(
   goto_programt::instructionst::iterator i_it)
 {
-  const goto_programt::instructiont& instruction=*i_it;
+  const goto_programt::instructiont &instruction=*i_it;
   const abstract_eventt new_fence_event(abstract_eventt::Fence,
     thread, "F", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
@@ -1374,7 +1374,7 @@ Function: intrumentert::add_instr_to_interleaving
 
 void inline instrumentert::add_instr_to_interleaving(
   goto_programt::instructionst::iterator it,
-  goto_programt& interleaving)
+  goto_programt &interleaving)
 {
   if(it->is_return() ||
      it->is_throw() ||
@@ -1416,7 +1416,7 @@ Function: instrumentert::is_cfg_spurious
 
 \*******************************************************************/
 
-bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
+bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
 {
   message.debug() << "spurious by CFG? " << messaget::eom;
   goto_programt interleaving;
@@ -1426,8 +1426,8 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
   {
     --e_it;
 
-    const abstract_eventt& current_event=egraph[*e_it];
-    const source_locationt& current_location=current_event.source_location;
+    const abstract_eventt &current_event=egraph[*e_it];
+    const source_locationt &current_location=current_event.source_location;
 
     /* select relevant thread (po) -- or function contained in this thread */
     goto_programt *current_po=0;
@@ -1448,8 +1448,8 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
     }
     assert(current_po);
 
-    const wmm_grapht::edgest& pos_cur=egraph.po_out(*e_it);
-    const wmm_grapht::edgest& pos_next=egraph.po_out(*(++e_it));
+    const wmm_grapht::edgest &pos_cur=egraph.po_out(*e_it);
+    const wmm_grapht::edgest &pos_next=egraph.po_out(*(++e_it));
     --e_it;
 
     bool exists_n=false;
@@ -1487,8 +1487,8 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet& cyc)
       --e_it;
 
       /* find the portion of the thread to add */
-      const abstract_eventt& next_event=egraph[*(++e_it--)];
-      const source_locationt& next_location=next_event.source_location;
+      const abstract_eventt &next_event=egraph[*(++e_it--)];
+      const source_locationt &next_location=next_event.source_location;
 
       bool in_cycle=false;
       Forall_goto_program_instructions(it, *current_po)
@@ -1630,12 +1630,12 @@ Function: instrumentert::print_outputs
 \*******************************************************************/
 
 void inline instrumentert::print_outputs_local(
-  const std::set<event_grapht::critical_cyclet>& set,
-  std::ofstream& dot,
-  std::ofstream& ref,
-  std::ofstream& output,
-  std::ofstream& all,
-  std::ofstream& table,
+  const std::set<event_grapht::critical_cyclet> &set,
+  std::ofstream &dot,
+  std::ofstream &ref,
+  std::ofstream &output,
+  std::ofstream &all,
+  std::ofstream &table,
   memory_modelt model,
   bool hide_internals)
 {
@@ -1667,7 +1667,7 @@ void inline instrumentert::print_outputs_local(
     for(std::list<event_idt>::const_iterator it_e=it->begin();
       it_e!=it->end(); it_e++)
     {
-      const abstract_eventt& ev=egraph[*it_e];
+      const abstract_eventt &ev=egraph[*it_e];
 
       if(render_po_aligned)
         same_po[ev.thread].insert(*it_e);
@@ -1818,13 +1818,13 @@ class pthread_argumentt
 public:
   instrumentert &instr;
   memory_modelt mem;
-  const std::set<event_idt>& filter;
-  std::set<event_grapht::critical_cyclet>& cycles;
+  const std::set<event_idt> &filter;
+  std::set<event_grapht::critical_cyclet> &cycles;
 
-  pthread_argumentt(instrumentert& _instr,
+  pthread_argumentt(instrumentert &_instr,
     memory_modelt _mem,
-    const std::set<event_idt>& _filter,
-    std::set<event_grapht::critical_cyclet>& _cycles)
+    const std::set<event_idt> &_filter,
+    std::set<event_grapht::critical_cyclet> &_cycles)
     :instr(_instr), mem(_mem), filter(_filter), cycles(_cycles)
   {
   }

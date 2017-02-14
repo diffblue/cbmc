@@ -149,7 +149,7 @@ void convert(const irept &irep, goto_programt &program)
     number_targets_list.push_back(std::list<unsigned>());
     const irept &targets=it->find(ID_targets);
     const irept::subt &tsubs=targets.get_sub();
-    for(const auto & tsub : tsubs)
+    for(const auto &tsub : tsubs)
       number_targets_list.back().push_back(
           unsafe_string2unsigned(tsub.id_string()));
   }

@@ -36,7 +36,7 @@ void weak_memory(
   bool render_function,
   bool cav11_option,
   bool hide_internals,
-  message_handlert& message,
+  message_handlert &message,
   bool ignore_arrays);
 
 void introduce_temporaries(
@@ -47,6 +47,6 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  messaget& message);
+  messaget &message);
 
 #endif // CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H
