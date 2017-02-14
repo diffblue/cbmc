@@ -9,6 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
+//#define MINIZ_HEADER_FILE_ONLY
+#define _LARGEFILE64_SOURCE 1
+#include "miniz_zip.h"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -16,9 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class jar_filet
 {
 public:
-  jar_filet():zip(nullptr) { }
+  jar_filet():mz_ok(false) { }
 
-  explicit jar_filet(const std::string &file_name):zip(nullptr)
+  inline explicit jar_filet(const std::string &file_name)
   {
     open(file_name);
   }
@@ -28,7 +32,8 @@ public:
   void open(const std::string &);
 
   // Test for error; 'true' means we are good.
-  explicit operator bool() const { return zip!=nullptr; }
+  inline explicit operator bool() const { return true;  // TODO
+  }
 
   typedef std::vector<std::string> indext;
   indext index;
@@ -39,7 +44,8 @@ public:
   manifestt get_manifest();
 
 protected:
-  void *zip;
+  mz_zip_archive zip;
+  bool mz_ok;
 };
 
 class jar_poolt
