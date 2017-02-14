@@ -6,14 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstring>
 #include <cassert>
 #include <sstream>
 
 #include "jar_file.h"
-
-#ifdef HAVE_LIBZIP
-#include <zip.h>
-#endif
 
 /*******************************************************************\
 
@@ -29,33 +26,32 @@ Function: jar_filet::open
 
 void jar_filet::open(const std::string &filename)
 {
-  #ifdef HAVE_LIBZIP
-  if(zip!=nullptr)
-    // NOLINTNEXTLINE(readability/identifiers)
-    zip_close(static_cast<struct zip *>(zip));
+  if(!mz_ok)
+  {
+    memset(&zip, 0, sizeof(zip));
+    mz_bool mz_open=mz_zip_reader_init_file(&zip, filename.c_str(), 0);
+    mz_ok=mz_open==MZ_TRUE;
+  }
 
-  int zip_error;
-  zip=zip_open(filename.c_str(), 0, &zip_error);
-
-  if(zip!=nullptr)
+  if(mz_ok)
   {
     std::size_t number_of_files=
-      // NOLINTNEXTLINE(readability/identifiers)
-      zip_get_num_entries(static_cast<struct zip *>(zip), 0);
+      mz_zip_reader_get_num_files(&zip);
 
     index.reserve(number_of_files);
 
     for(std::size_t i=0; i<number_of_files; i++)
     {
-      std::string file_name=
-        // NOLINTNEXTLINE(readability/identifiers)
-        zip_get_name(static_cast<struct zip *>(zip), i, 0);
+      mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
+      char *filename_char=new char[filename_length+1];
+      mz_uint filename_len=
+        mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
+      assert(filename_length==filename_len);
+      std::string file_name(filename_char);
+      delete[] filename_char;
       index.push_back(file_name);
     }
   }
-  #else
-  zip=nullptr;
-  #endif
 }
 
 /*******************************************************************\
@@ -72,11 +68,11 @@ Function: jar_filet::~jar_filet
 
 jar_filet::~jar_filet()
 {
-  #ifdef HAVE_LIBZIP
-  if(zip!=nullptr)
-    // NOLINTNEXTLINE(readability/identifiers)
-    zip_close(static_cast<struct zip *>(zip));
-  #endif
+  if(mz_ok)
+  {
+    mz_zip_reader_end(&zip);
+    mz_ok=false;
+  }
 }
 
 /*******************************************************************\
@@ -91,47 +87,29 @@ Function: jar_filet::get_entry
 
 \*******************************************************************/
 
-#define ZIP_READ_SIZE 10000
-
 std::string jar_filet::get_entry(std::size_t i)
 {
-  if(zip==nullptr)
+  if(!mz_ok)
     return std::string("");
 
   assert(i<index.size());
 
   std::string dest;
 
-  #ifdef HAVE_LIBZIP
-  void *zip_e=zip; // zip is both a type and a non-type
-  // NOLINTNEXTLINE(readability/identifiers)
-  struct zip *zip_p=static_cast<struct zip*>(zip_e);
-
-  // NOLINTNEXTLINE(readability/identifiers)
-  struct zip_file *zip_file=zip_fopen_index(zip_p, i, 0);
-
-  if(zip_file==NULL)
-  {
-    zip_close(zip_p);
-    zip=nullptr;
-    return std::string(""); // error
-  }
-
+  mz_zip_archive_file_stat file_stat;
+  memset(&file_stat, 0, sizeof(file_stat));
+  mz_bool stat_ok=mz_zip_reader_file_stat(&zip, i, &file_stat);
+  if(stat_ok!=MZ_TRUE)
+    return std::string();
   std::vector<char> buffer;
-  buffer.resize(ZIP_READ_SIZE);
+  size_t bufsize=file_stat.m_uncomp_size;
+  buffer.resize(bufsize);
+  mz_bool read_ok=
+    mz_zip_reader_extract_to_mem(&zip, i, buffer.data(), bufsize, 0);
+  if(read_ok!=MZ_TRUE)
+    return std::string();
 
-  while(true)
-  {
-    int bytes_read=
-      zip_fread(zip_file, buffer.data(), ZIP_READ_SIZE);
-    assert(bytes_read<=ZIP_READ_SIZE);
-    if(bytes_read<=0)
-      break;
-    dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
-  }
-
-  zip_fclose(zip_file);
-  #endif
+  dest.insert(dest.end(), buffer.begin(), buffer.end());
 
   return dest;
 }
