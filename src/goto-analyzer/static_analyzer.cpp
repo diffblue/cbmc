@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include "static_analyzer.h"
 
@@ -239,6 +240,10 @@ bool static_analyzer(
     else if(options.get_bool_option("intervals"))
       return static_analyzert<ait<interval_domaint>>
         (goto_model, options, message_handler, out)();
+
+    else if(options.get_bool_option("variable"))
+      return static_analyzert<ait<variable_sensitivity_domaint>>(
+        goto_model, options, message_handler, out)();
 
     // else if(options.get_bool_option("non-null"))
     //   return static_analyzert<ait<non_null_domaint> >
