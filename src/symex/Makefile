@@ -17,7 +17,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/cover$(OBJEXT) \
        ../json/json$(LIBEXT) \
-       ../path-symex/path-symex$(LIBEXT)
+       ../path-symex/path-symex$(LIBEXT) \
+       ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -38,9 +39,6 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)

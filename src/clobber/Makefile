@@ -15,7 +15,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/dump_c$(OBJEXT) \
-       ../goto-instrument/goto_program2code$(OBJEXT)
+       ../goto-instrument/goto_program2code$(OBJEXT) \
+       ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 

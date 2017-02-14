@@ -5,11 +5,8 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = miniz$(LIBEXT)
+CLEANFILES = miniz$(OBJEXT)
 
-all: miniz$(LIBEXT)
+all: miniz$(OBJEXT)
 
 ###############################################################################
-
-miniz$(LIBEXT): $(OBJ)
-	$(LINKLIB)

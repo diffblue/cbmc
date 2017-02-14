@@ -138,7 +138,6 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
-    #ifdef HAVE_LIBZIP
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
@@ -162,11 +161,6 @@ bool java_bytecode_languaget::parse(
     }
     else
       java_class_loader.add_jar_file(path);
-
-    #else
-    error() << "No support for reading JAR files" << eom;
-    return true;
-    #endif
   }
   else
     assert(false);
