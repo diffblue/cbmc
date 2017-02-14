@@ -216,8 +216,15 @@ public:
     }
 
     //! Uniquely identify an invalid target or location
+    #if (defined _MSC_VER && _MSC_VER <= 1800)
+    // Visual Studio <= 2013 does not support constexpr, making
+    // numeric_limits::max() unviable for a static const member
+    static const unsigned nil_target=
+      static_cast<unsigned>(-1);
+    #else
     static const unsigned nil_target=
       std::numeric_limits<unsigned>::max();
+    #endif
 
     //! A globally unique number to identify a program location.
     //! It's guaranteed to be ordered in program order within
