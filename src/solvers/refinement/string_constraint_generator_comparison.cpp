@@ -31,6 +31,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 
   string_exprt s1=add_axioms_for_string_expr(args(f, 2)[0]);
   string_exprt s2=add_axioms_for_string_expr(args(f, 2)[1]);
+  typet index_type=s1.length().type();
 
   // We want to write:
   // eq <=> (s1.length=s2.length  &&forall i<s1.length. s1[i]=s2[i])
@@ -43,12 +44,12 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   implies_exprt a1(eq, s1.axiom_for_has_same_length_as(s2));
   axioms.push_back(a1);
 
-  symbol_exprt qvar=fresh_univ_index("QA_equal");
+  symbol_exprt qvar=fresh_univ_index("QA_equal", index_type);
   string_constraintt a2(qvar, s1.length(), eq, equal_exprt(s1[qvar], s2[qvar]));
   axioms.push_back(a2);
 
-  symbol_exprt witness=fresh_exist_index("witness_unequal");
-  exprt zero=from_integer(0, get_index_type());
+  symbol_exprt witness=fresh_exist_index("witness_unequal", index_type);
+  exprt zero=from_integer(0, index_type);
   and_exprt bound_witness(
     binary_relation_exprt(witness, ID_lt, s1.length()),
     binary_relation_exprt(witness, ID_ge, zero));
@@ -115,11 +116,13 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
 
   symbol_exprt eq=fresh_boolean("equal_ignore_case");
   typecast_exprt tc_eq(eq, f.type());
-  exprt char_a=constant_char('a');
-  exprt char_A=constant_char('A');
-  exprt char_Z=constant_char('Z');
   string_exprt s1=add_axioms_for_string_expr(args(f, 2)[0]);
   string_exprt s2=add_axioms_for_string_expr(args(f, 2)[1]);
+  typet char_type=to_refined_string_type(s1.type()).get_char_type();
+  exprt char_a=constant_char('a', char_type);
+  exprt char_A=constant_char('A', char_type);
+  exprt char_Z=constant_char('Z', char_type);
+  typet index_type=s1.length().type();
 
   // We add axioms:
   // a1 : eq => |s1|=|s2|
@@ -130,14 +133,15 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   implies_exprt a1(eq, s1.axiom_for_has_same_length_as(s2));
   axioms.push_back(a1);
 
-  symbol_exprt qvar=fresh_univ_index("QA_equal_ignore_case");
+  symbol_exprt qvar=fresh_univ_index("QA_equal_ignore_case", index_type);
   exprt constr2=character_equals_ignore_case(
     s1[qvar], s2[qvar], char_a, char_A, char_Z);
   string_constraintt a2(qvar, s1.length(), eq, constr2);
   axioms.push_back(a2);
 
-  symbol_exprt witness=fresh_exist_index("witness_unequal_ignore_case");
-  exprt zero=from_integer(0, get_index_type());
+  symbol_exprt witness=fresh_exist_index(
+    "witness_unequal_ignore_case", index_type);
+  exprt zero=from_integer(0, witness.type());
   and_exprt bound_witness(
     binary_relation_exprt(witness, ID_lt, s1.length()),
     binary_relation_exprt(witness, ID_ge, zero));
@@ -172,12 +176,13 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
 {
   string_exprt str=add_axioms_for_string_expr(args(f, 1)[0]);
   typet return_type=f.type();
+  typet index_type=str.length().type();
 
   // initialisation of the missing pool variable
   std::map<irep_idt, string_exprt>::iterator it;
   for(it=symbol_to_string.begin(); it!=symbol_to_string.end(); it++)
     if(hash.find(it->second)==hash.end())
-      hash[it->second]=string_exprt::fresh_symbol("hash", return_type);
+      hash[it->second]=fresh_symbol("hash", return_type);
 
   // for each string s. either:
   //   c1: hash(str)=hash(s)
@@ -187,7 +192,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   // WARNING: the specification may be incomplete
   for(it=symbol_to_string.begin(); it!=symbol_to_string.end(); it++)
   {
-    symbol_exprt i=fresh_exist_index("index_hash");
+    symbol_exprt i=fresh_exist_index("index_hash", index_type);
     equal_exprt c1(hash[it->second], hash[str]);
     not_exprt c2(equal_exprt(it->second.length(), str.length()));
     and_exprt c3(
@@ -220,7 +225,8 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   string_exprt s1=add_axioms_for_string_expr(args(f, 2)[0]);
   string_exprt s2=add_axioms_for_string_expr(args(f, 2)[1]);
   const typet &return_type=f.type();
-  symbol_exprt res=string_exprt::fresh_symbol("compare_to", return_type);
+  symbol_exprt res=fresh_symbol("compare_to", return_type);
+  typet index_type=s1.length().type();
 
   // In the lexicographic comparison, x is the first point where the two
   // strings differ.
@@ -241,11 +247,11 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   implies_exprt a1(res_null, s1.axiom_for_has_same_length_as(s2));
   axioms.push_back(a1);
 
-  symbol_exprt i=fresh_univ_index("QA_compare_to");
+  symbol_exprt i=fresh_univ_index("QA_compare_to", index_type);
   string_constraintt a2(i, s1.length(), res_null, equal_exprt(s1[i], s2[i]));
   axioms.push_back(a2);
 
-  symbol_exprt x=fresh_exist_index("index_compare_to");
+  symbol_exprt x=fresh_exist_index("index_compare_to", index_type);
   equal_exprt ret_char_diff(
     res,
     minus_exprt(
@@ -300,19 +306,18 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
 {
   string_exprt str=add_axioms_for_string_expr(args(f, 1)[0]);
   const typet &return_type=f.type();
+  typet index_type=str.length().type();
 
   // initialisation of the missing pool variable
   std::map<irep_idt, string_exprt>::iterator it;
   for(it=symbol_to_string.begin(); it!=symbol_to_string.end(); it++)
     if(pool.find(it->second)==pool.end())
-      pool[it->second]=string_exprt::fresh_symbol("pool", return_type);
+      pool[it->second]=fresh_symbol("pool", return_type);
 
   // intern(str)=s_0 || s_1 || ...
   // for each string s.
   //    intern(str)=intern(s) || |str|!=|s|
   //    || (|str|==|s| &&exists i<|s|. s[i]!=str[i])
-
-  // symbol_exprt intern=string_exprt::fresh_symbol("intern",return_type);
 
   exprt disj=false_exprt();
   for(it=symbol_to_string.begin(); it!=symbol_to_string.end(); it++)
@@ -326,7 +331,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   for(it=symbol_to_string.begin(); it!=symbol_to_string.end(); it++)
     if(it->second!=str)
     {
-      symbol_exprt i=fresh_exist_index("index_intern");
+      symbol_exprt i=fresh_exist_index("index_intern", index_type);
       axioms.push_back(
         or_exprt(
           equal_exprt(pool[it->second], pool[str]),

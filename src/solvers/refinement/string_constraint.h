@@ -111,7 +111,7 @@ class string_not_contains_constraintt: public exprt
 {
 public:
   // string_not contains_constraintt are formula of the form:
-  // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
+  // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s0[x+y] != s1[y]
 
   string_not_contains_constraintt(
     exprt univ_lower_bound,
@@ -119,8 +119,8 @@ public:
     exprt premise,
     exprt exists_bound_inf,
     exprt exists_bound_sup,
-    exprt s0,
-    exprt s1) :
+    const string_exprt &s0,
+    const string_exprt &s1):
   exprt(ID_string_not_contains_constraint)
   {
     copy_to_operands(univ_lower_bound, univ_bound_sup, premise);
@@ -153,14 +153,14 @@ public:
     return operands()[4];
   }
 
-  const exprt &s0() const
+  const string_exprt &s0() const
   {
-    return operands()[5];
+    return to_string_expr(operands()[5]);
   }
 
-  const exprt &s1() const
+  const string_exprt &s1() const
   {
-    return operands()[6];
+    return to_string_expr(operands()[6]);
   }
 };
 
