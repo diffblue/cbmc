@@ -212,11 +212,6 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
   if(jar_map.find(file)!=jar_map.end())
     return;
 
-  #ifndef HAVE_LIBZIP
-  error() << "no support for reading JAR files configured" << eom;
-  return;
-  #endif
-
   jar_filet &jar_file=jar_pool(id2string(file));
 
   if(!jar_file)

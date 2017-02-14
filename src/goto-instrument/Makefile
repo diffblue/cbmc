@@ -37,7 +37,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../solvers/solvers$(LIBEXT)
+      ../solvers/solvers$(LIBEXT) \
+      ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -53,9 +54,6 @@ all: goto-instrument$(EXEEXT)
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(LIB_GLPK),)
