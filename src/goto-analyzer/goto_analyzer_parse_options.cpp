@@ -48,6 +48,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/interval_domain.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>
@@ -284,6 +285,12 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("non-null", true);
       options.set_option("domain set", true);
     }
+    // "variable" is deprecated but still supported
+    else if(cmdline.isset("variable") || cmdline.isset("variable-sensitivity"))
+    {
+      options.set_option("variable-sensitivity", true);
+      options.set_option("domain set", true);
+    }
 
     // Reachability questions, when given with a domain swap from specific
     // to general tasks so that they can use the domain & parameterisations.
@@ -344,6 +351,10 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
       domain=new ait<non_null_domaint>();
     }
 #endif
+    else if(options.get_bool_option("variable-sensitivity"))
+    {
+      domain=new ait<variable_sensitivity_domaint>();
+    }
   }
   else if(options.get_bool_option("concurrent"))
   {
@@ -368,6 +379,10 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(
       domain=new concurrency_aware_ait<non_null_domaint>();
     }
 #endif
+    else if(options.get_bool_option("variable-sensitivity"))
+    {
+      domain=new concurrency_aware_ait<variable_sensitivity_domaint>();
+    }
 #endif
   }
 
@@ -745,6 +760,7 @@ void goto_analyzer_parse_optionst::help()
     " --intervals                  interval domain\n"
     " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    " --variable-sensitivity       a highly configurable non-relational domain"
     "\n"
     "Output options:\n"
     " --text file_name             output results in plain text to given file\n"

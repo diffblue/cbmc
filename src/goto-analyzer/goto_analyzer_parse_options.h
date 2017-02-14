@@ -144,6 +144,8 @@ class optionst;
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
+  "(variable)" \
+  "(variable-sensitivity)" \
   "(constants)" \
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \
