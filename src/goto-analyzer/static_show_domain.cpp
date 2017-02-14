@@ -22,6 +22,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include "static_show_domain.h"
 
@@ -64,6 +65,8 @@ bool static_show_domain(
       domain=new ait<interval_domaint>();
     else if(options.get_bool_option("dependence-graph"))
       domain=new dependence_grapht(ns);
+    else if(options.get_bool_option("variable"))
+      domain=new ait<variable_sensitivity_domaint>();
   }
   else if(options.get_bool_option("concurrent"))
   {

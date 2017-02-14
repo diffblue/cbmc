@@ -16,6 +16,7 @@ Author: Lucas Cordeiro, lucas.cordeiro@cs.ox.ac.uk
 
 #include <analyses/interval_domain.h>
 #include <analyses/constant_propagator.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unreachable.h>
@@ -253,6 +254,10 @@ bool static_simplifier(
     else if(options.get_bool_option("intervals"))
       return static_simplifiert<ait<interval_domaint>>
         (goto_model, options, message_handler, out)();
+
+    else if(options.get_bool_option("variable"))
+      return static_simplifiert<ait<variable_sensitivity_domaint>>(
+        goto_model, options, message_handler, out)();
 
     // else if(options.get_bool_option("non-null"))
     //   return static_simplifiert<ait<non_null_domaint> >
