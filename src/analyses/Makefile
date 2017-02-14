@@ -33,6 +33,9 @@ SRC = ai.cpp \
       static_analysis.cpp \
       uncaught_exceptions_analysis.cpp \
       uninitialized_domain.cpp \
+      variable-sensitivity/abstract_object.cpp \
+      variable-sensitivity/abstract_enviroment.cpp \
+      variable-sensitivity/variable_sensitivity_domain.cpp \
       # Empty last line
 
 INCLUDES= -I ..
