@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-f[(].*[)];$
-g[(].*[)];$
-h[(].*[)];$
+f[\(].*[\)];$
+g[\(].*[\)];$
+h[\(].*[\)];$
 ^warning: ignoring

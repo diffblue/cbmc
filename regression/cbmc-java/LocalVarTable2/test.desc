@@ -4,4 +4,4 @@ LocalVarTable2.class
 ^EXIT=0$
 ^SIGNAL=0$
 --
-return_value.*(void \*)i
+return_value.*\(void \*\)i

@@ -4,8 +4,8 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-f[(].*[)];$
-g[(].*[)];$
-h[(].*[)];$
+f[\(].*[\)];$
+g[\(].*[\)];$
+h[\(].*[\)];$
 --
 ^warning: ignoring

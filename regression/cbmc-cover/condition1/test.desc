@@ -13,6 +13,6 @@ main.c
 ^\[main.coverage.8] file main.c line 14 function main condition .* true: SATISFIED
 ^\[main.coverage.9] file main.c line 16 function main condition .* false: FAILED
 ^\[main.coverage.10] file main.c line 16 function main condition .* true: SATISFIED
-^\*\* 9 of 10 covered (90.0%)
+^\*\* 9 of 10 covered \(90.0%\)
 --
 ^warning: ignoring

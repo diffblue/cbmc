@@ -5,5 +5,5 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-main[(].*[)];
+main[\(].*[\)];
 ^warning: ignoring

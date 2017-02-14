@@ -9,6 +9,6 @@ main.c
 ^\[main.coverage.4\] file main.c line 13 function main block 4: SATISFIED$
 ^\[foo.coverage.1\] file main.c line 5 function foo block 1: FAILED$
 ^\[foo.coverage.2\] file main.c line 6 function foo block 2: FAILED$
-^\*\* 2 of 6 covered (33.3%)
+^\*\* 2 of 6 covered \(33.3%\)
 --
 ^warning: ignoring

@@ -3,8 +3,8 @@ main.c
 --gcc --danger --cegis-statistics --cegis-genetic
 ^EXIT=0$
 ^SIGNAL=0$
-^.*__CPROVER_danger_D0_x *= *[(]unsigned *int[)]x *- *DANGER_CONSTANT_2u;$
-^.*__CPROVER_danger_R0_x_0 *= *DANGER_CONSTANT_3u *- *[(]unsigned *int[)]x;$
-^.*__CPROVER_danger_S0_x_0 *= *[(]unsigned *int[)]x *<< *[(]unsigned *int[)]x;$
+^.*__CPROVER_danger_D0_x *= *[\(]unsigned *int[\)]x *- *DANGER_CONSTANT_2u;$
+^.*__CPROVER_danger_R0_x_0 *= *DANGER_CONSTANT_3u *- *[\(]unsigned *int[\)]x;$
+^.*__CPROVER_danger_S0_x_0 *= *[\(]unsigned *int[\)]x *<< *[\(]unsigned *int[\)]x;$
 --
 ^warning: ignoring

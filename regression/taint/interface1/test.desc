@@ -3,6 +3,6 @@ interface1.class
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$
-^file interface1.java line 18: There is a flow! (taint rule sink_rule)$
+^file interface1.java line 18: There is a flow! \(taint rule sink_rule\)$
 --
 ^warning: ignoring

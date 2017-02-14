@@ -3,7 +3,7 @@ main.c
 --gcc --safety --cegis-statistics --cegis-genetic
 ^EXIT=0$
 ^SIGNAL=0$
-^.*__CPROVER_danger_D0_x *= *[(]unsigned *int[)][(][(]unsigned *int[)]x *<= *[(]unsigned *int[)]x *&& *[(]unsigned *int[)]x *<= *DANGER_CONSTANT_3u[)];$
-^.*__CPROVER_danger_R0_x_0 *= *~[(][(]unsigned *int[)]x[)];$
+^.*__CPROVER_danger_D0_x *= *[\(]unsigned *int[\)][\(][\(]unsigned *int[\)]x *<= *[\(]unsigned *int[\)]x *&& *[\(]unsigned *int[\)]x *<= *DANGER_CONSTANT_3u[\)];$
+^.*__CPROVER_danger_R0_x_0 *= *~[\(][\(]unsigned *int[\)]x[\)];$
 --
 ^warning: ignoring

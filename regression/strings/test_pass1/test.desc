@@ -3,6 +3,6 @@ test.c
 --string-refine
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"a\")): SUCCESS
-^\[main.assertion.2\] assertion !__CPROVER_uninterpreted_string_equal_func(t, __CPROVER_uninterpreted_string_literal_func(\"a\")): FAILURE$
-^\*\* 1 of 2 failed (2 iterations)$
+^\[main.assertion.1\] assertion __CPROVER_uninterpreted_string_equal_func\(t, __CPROVER_uninterpreted_string_literal_func\(\"a\"\)): SUCCESS
+^\[main.assertion.2\] assertion !__CPROVER_uninterpreted_string_equal_func\(t, __CPROVER_uninterpreted_string_literal_func\(\"a\"\)): FAILURE$
+^\*\* 1 of 2 failed \(2 iterations\)$

@@ -3,8 +3,8 @@ test.c
 --string-refine
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_string_length(s) == i + 5: SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_string_issuffix(__CPROVER_string_literal(\"po\"),s): SUCCESS$
-^\[main.assertion.3\] assertion __CPROVER_char_at(s, i) == .p.: SUCCESS$
-^\[main.assertion.4\] assertion __CPROVER_string_issuffix(__CPROVER_string_literal(\"p!o\"), s): FAILURE$
+^\[main.assertion.1\] assertion __CPROVER_string_length\(s\) == i \+ 5: SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_string_issuffix\(__CPROVER_string_literal\(\"po\"\),s\): SUCCESS$
+^\[main.assertion.3\] assertion __CPROVER_char_at\(s, i\) == .p.: SUCCESS$
+^\[main.assertion.4\] assertion __CPROVER_string_issuffix\(__CPROVER_string_literal\(\"p!o\"\), s\): FAILURE$
 --

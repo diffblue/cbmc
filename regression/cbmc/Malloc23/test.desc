@@ -5,8 +5,8 @@ main.c
 ^SIGNAL=0$
 pointer outside dynamic object bounds in \*p: FAILURE
 pointer outside dynamic object bounds in \*p: FAILURE
-pointer outside dynamic object bounds in p2\[(signed long int)1\]: FAILURE
-pointer outside dynamic object bounds in p2\[(signed long int)0\]: FAILURE
-\*\* 4 of 36 failed (3 iterations)
+pointer outside dynamic object bounds in p2\[\(signed long int\)1\]: FAILURE
+pointer outside dynamic object bounds in p2\[\(signed long int\)0\]: FAILURE
+\*\* 4 of 36 failed \(3 iterations\)
 --
 ^warning: ignoring
