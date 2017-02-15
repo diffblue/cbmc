@@ -58,11 +58,17 @@ void constant_propagator_domaint::transform(
   output(std::cout, ai, ns);
 #endif
 
+  // When the domain is used with constant_propagator_ait,
+  // information about dirty variables and config flags are
+  // available. Otherwise, the below will be null and we use default
+  // values
   const constant_propagator_ait *cp=
     dynamic_cast<constant_propagator_ait *>(&ai);
   bool have_dirty=(cp!=nullptr);
 
-  assert(!values.is_bottom);
+  // INVARIANT(!values.is_bottom);
+  if(values.is_bottom)
+    return;
 
   if(from->is_decl())
   {
@@ -315,7 +321,7 @@ bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
   replace_symbolt::expr_mapt::size_type n_erased=
     replace_const.expr_map.erase(id);
 
-  INVARIANT(n_erased==0 || !is_bottom, "bottom => 0 erased");
+  INVARIANT(n_erased==0 || !is_bottom, "bottom should have no elements at all");
 
   return n_erased>0;
 }
