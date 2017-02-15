@@ -586,8 +586,8 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           get_message_handler(),
           disable_runtime_checks,
           max_user_array_length,
-          &method_worklist2,
-          &needed_classes);
+          safe_pointer<std::vector<irep_idt> >::create_non_null(&method_worklist2),
+          safe_pointer<std::set<irep_idt> >::create_non_null(&needed_classes));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
           virtual_callsites);
