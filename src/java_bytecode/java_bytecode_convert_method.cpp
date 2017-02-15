@@ -1742,8 +1742,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       if(needed_classes && arg0.type().id()==ID_symbol)
+      {
         needed_classes->insert(
           to_symbol_type(arg0.type()).get_identifier());
+      }
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.

@@ -24,8 +24,8 @@ enum lazy_methods_modet
 };
 
 typedef std::pair<
-          const symbolt*,
-          const java_bytecode_parse_treet::methodt*>
+          const symbolt *,
+          const java_bytecode_parse_treet::methodt *>
   lazy_method_valuet;
 typedef std::map<irep_idt, lazy_method_valuet>
   lazy_methodst;

@@ -502,6 +502,7 @@ bool java_bytecode_languaget::typecheck(
   // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
+    // ci: context-insensitive.
     if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
       return true;
   }
@@ -513,6 +514,32 @@ bool java_bytecode_languaget::typecheck(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_languaget::do_ci_lazy_method_conversion
+
+  Inputs: `symbol_table`: global symbol table
+          `lazy_methods`: map from method names to relevant symbol
+                          and parsed-method objects.
+
+ Outputs: Elaborates lazily-converted methods that may be reachable
+          starting from the main entry point (usually provided with
+          the --function command-line option) (side-effect on the
+          symbol_table). Returns false on success.
+
+ Purpose: Uses a simple context-insensitive ('ci') analysis to
+          determine which methods may be reachable from the main
+          entry point. In brief, static methods are reachable if we
+          find a callsite in another reachable site, while virtual
+          methods are reachable if we find a virtual callsite
+          targeting a compatible type *and* a constructor callsite
+          indicating an object of that type may be instantiated (or
+          evidence that an object of that type exists before the
+          main function is entered, such as being passed as a
+          parameter).
+
+\*******************************************************************/
 
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
@@ -558,7 +585,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     needed_classes);
 
   std::set<irep_idt> methods_already_populated;
-  std::vector<const code_function_callt*> virtual_callsites;
+  std::vector<const code_function_callt *> virtual_callsites;
 
   bool any_new_methods;
   do
@@ -586,8 +613,10 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           get_message_handler(),
           disable_runtime_checks,
           max_user_array_length,
-          safe_pointer<std::vector<irep_idt> >::create_non_null(&method_worklist2),
-          safe_pointer<std::set<irep_idt> >::create_non_null(&needed_classes));
+          safe_pointer<std::vector<irep_idt> >::create_non_null(
+            &method_worklist2),
+          safe_pointer<std::set<irep_idt> >::create_non_null(
+            &needed_classes));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
           virtual_callsites);
@@ -607,11 +636,15 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     for(const auto &callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
-      get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
-				 symbol_table, ch);
+      get_virtual_method_targets(
+        *callsite,
+        needed_classes,
+        method_worklist2,
+        symbol_table,
+        ch);
     }
-
-  } while(any_new_methods);
+  }
+  while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
@@ -640,11 +673,48 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   return false;
 }
 
-void java_bytecode_languaget::lazy_methods_provided(std::set<irep_idt> &methods) const
+/*******************************************************************\
+
+Function: java_bytecode_languaget::lazy_methods_provided
+
+  Inputs: None
+
+ Outputs: Populates `methods` with the complete list of lazy methods
+          that are available to convert (those which are valid
+          parameters for `convert_lazy_method`)
+
+ Purpose: Provide feedback to `language_filest` so that when asked
+          for a lazy method, it can delegate to this instance of
+          java_bytecode_languaget.
+
+\*******************************************************************/
+
+void java_bytecode_languaget::lazy_methods_provided(
+  std::set<irep_idt> &methods) const
 {
   for(const auto &kv : lazy_methods)
     methods.insert(kv.first);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_languaget::convert_lazy_method
+
+  Inputs: `id`: method ID to convert
+          `symtab`: global symbol table
+
+ Outputs: Amends the symbol table entry for function `id`, which
+          should be a lazy method provided by this instance of
+          `java_bytecode_languaget`. It should initially have a nil
+          value. After this method completes, it will have a value
+          representing the method body, identical to that produced
+          using eager method conversion.
+
+ Purpose: Promote a lazy-converted method (one whose type is known
+          but whose body hasn't been converted) into a fully-
+          elaborated one.
+
+\*******************************************************************/
 
 void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &id,
