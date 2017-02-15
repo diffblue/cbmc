@@ -11,6 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 #include <iosfwd>
+#include <sstream>
+
+#include <util/json.h>
+#include <util/xml.h>
+#include <util/expr.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -53,6 +58,27 @@ public:
   {
   }
 
+  virtual jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const
+  {
+    std::ostringstream out;
+    output(out, ai, ns);
+    json_stringt json(out.str());
+    return json;
+  }
+
+  virtual xmlt output_xml(
+    const ai_baset &ai,
+    const namespacet &ns) const
+  {
+    std::ostringstream out;
+    output(out, ai, ns);
+    xmlt xml("domain");
+    xml.data=out.str();
+    return xml;
+  }
+
   // no states
   virtual void make_bottom()=0;
 
@@ -69,6 +95,17 @@ public:
   //
   // This computes the join between "this" and "b".
   // Return true if "this" has changed.
+
+  // This method allows an expression to be simplified / evaluated using the
+  // current value of the domain.  It is used to evaluate assertions and in
+  // program simplification
+  virtual exprt domain_simplify(
+    const exprt &condition,
+    const namespacet &ns,
+    const bool lhs=false) const
+  {
+    return condition;
+  }
 };
 
 // don't use me -- I am just a base class
@@ -157,6 +194,58 @@ public:
     output(ns, goto_function.body, "", out);
   }
 
+
+  virtual jsont output_json(
+    const namespacet &ns,
+    const goto_functionst &goto_functions) const;
+
+  jsont output_json(
+    const goto_modelt &goto_model) const
+  {
+    const namespacet ns(goto_model.symbol_table);
+    return output_json(ns, goto_model.goto_functions);
+  }
+
+  jsont output_json(
+    const namespacet &ns,
+    const goto_programt &goto_program) const
+  {
+    return output_json(ns, goto_program, "");
+  }
+
+  jsont output_json(
+    const namespacet &ns,
+    const goto_functionst::goto_functiont &goto_function) const
+  {
+    return output_json(ns, goto_function.body, "");
+  }
+
+
+  virtual xmlt output_xml(
+    const namespacet &ns,
+    const goto_functionst &goto_functions) const;
+
+  xmlt output_xml(
+    const goto_modelt &goto_model) const
+  {
+    const namespacet ns(goto_model.symbol_table);
+    return output_xml(ns, goto_model.goto_functions);
+  }
+
+  xmlt output_xml(
+    const namespacet &ns,
+    const goto_programt &goto_program) const
+  {
+    return output_xml(ns, goto_program, "");
+  }
+
+  xmlt output_xml(
+    const namespacet &ns,
+    const goto_functionst::goto_functiont &goto_function) const
+  {
+    return output_xml(ns, goto_function.body, "");
+  }
+
 protected:
   // overload to add a factory
   virtual void initialize(const goto_programt &);
@@ -171,6 +260,17 @@ protected:
     const goto_programt &goto_program,
     const irep_idt &identifier,
     std::ostream &out) const;
+
+  virtual jsont output_json(
+    const namespacet &ns,
+    const goto_programt &goto_program,
+    const irep_idt &identifier) const;
+
+  virtual xmlt output_xml(
+    const namespacet &ns,
+    const goto_programt &goto_program,
+    const irep_idt &identifier) const;
+
 
   // the work-queue is sorted by location number
   typedef std::map<unsigned, locationt> working_sett;

@@ -12,3 +12,9 @@ show:
 			vim -o "$$dir/*.java" "$$dir/*.out"; \
 		fi; \
 	done;
+
+clean:
+	find . -name *.*~ | xargs rm -f
+	find . -name *.out | xargs rm -f
+	find . -name *.goto | xargs rm -f
+	rm -f tests.log	

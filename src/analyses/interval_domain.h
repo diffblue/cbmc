@@ -40,10 +40,15 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const override final;
 
+  bool join(const interval_domaint &b);
+
   bool merge(
     const interval_domaint &b,
     locationt from,
-    locationt to);
+    locationt to)
+  {
+    return join(b);
+  }
 
   // no states
   void make_bottom() override final
@@ -84,6 +89,11 @@ public:
   {
     return bottom;
   }
+
+  virtual exprt domain_simplify(
+    const exprt &condition,
+    const namespacet &ns,
+    const bool lhs=false) const;
 
 protected:
   bool bottom;

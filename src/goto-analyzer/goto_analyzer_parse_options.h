@@ -35,10 +35,15 @@ class optionst;
   "(gcc)(arch):" \
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
-  "(json):(xml):" \
+  "(json):(xml):(text):(dot):" \
   "(unreachable-instructions)" \
   "(intervals)(show-intervals)" \
-  "(non-null)(show-non-null)"
+  "(non-null)(show-non-null)" \
+  "(constants)" \
+  "(dependence-graph)" \
+  "(show)(verify)(simplify):" \
+  "(flow-sensitive)(concurrent)" \
+  "(no-simplify-slicing)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

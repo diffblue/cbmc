@@ -81,6 +81,158 @@ void ai_baset::output(
 
 /*******************************************************************\
 
+Function: ai_baset::output_json
+
+  Inputs: The namespace and goto_functions
+
+ Outputs: The JSON object
+
+ Purpose: Output the domains for the whole program as JSON
+
+\*******************************************************************/
+
+jsont ai_baset::output_json(
+  const namespacet &ns,
+  const goto_functionst &goto_functions) const
+{
+  json_objectt result;
+
+  forall_goto_functions(f_it, goto_functions)
+  {
+    if(f_it->second.body_available())
+    {
+      result[id2string(f_it->first)]=
+        output_json(ns, f_it->second.body, f_it->first);
+    }
+    else
+    {
+      result[id2string(f_it->first)]=json_arrayt();
+    }
+  }
+
+  return result;
+}
+
+/*******************************************************************\
+
+Function: ai_baset::output_json
+
+  Inputs: The namespace, goto_program and it's identifier
+
+ Outputs: The JSON object
+
+ Purpose: Output the domains for a single function as JSON
+
+\*******************************************************************/
+
+jsont ai_baset::output_json(
+  const namespacet &ns,
+  const goto_programt &goto_program,
+  const irep_idt &identifier) const
+{
+  json_arrayt contents;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    json_objectt location;
+    location["location_number"]=
+      json_numbert(std::to_string(i_it->location_number));
+    location["source_location"]=
+      json_stringt(i_it->source_location.as_string());
+    location["domain"]=find_state(i_it).output_json(*this, ns);
+
+    // Ideally we need output_instruction_json
+    std::ostringstream out;
+    goto_program.output_instruction(ns, identifier, out, i_it);
+    location["instruction"]=json_stringt(out.str());
+
+    contents.push_back(location);
+  }
+
+  return contents;
+}
+
+/*******************************************************************\
+
+Function: ai_baset::output_xml
+
+  Inputs: The namespace and goto_functions
+
+ Outputs: The XML object
+
+ Purpose: Output the domains for the whole program as XML
+
+\*******************************************************************/
+
+xmlt ai_baset::output_xml(
+  const namespacet &ns,
+  const goto_functionst &goto_functions) const
+{
+  xmlt program("program");
+
+  forall_goto_functions(f_it, goto_functions)
+  {
+    xmlt function("function");
+    function.set_attribute("name", id2string(f_it->first));
+    function.set_attribute(
+      "body_available",
+      f_it->second.body_available() ? "true" : "false");
+
+    if(f_it->second.body_available())
+    {
+      function.new_element(output_xml(ns, f_it->second.body, f_it->first));
+    }
+
+    program.new_element(function);
+  }
+
+  return program;
+}
+
+/*******************************************************************\
+
+Function: ai_baset::output_xml
+
+  Inputs: The namespace, goto_program and it's identifier
+
+ Outputs: The XML object
+
+ Purpose: Output the domains for a single function as XML
+
+\*******************************************************************/
+
+xmlt ai_baset::output_xml(
+  const namespacet &ns,
+  const goto_programt &goto_program,
+  const irep_idt &identifier) const
+{
+  xmlt function_body;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    xmlt location;
+    location.set_attribute(
+      "location_number",
+      std::to_string(i_it->location_number));
+    location.set_attribute(
+      "source_location",
+      i_it->source_location.as_string());
+
+    location.new_element(find_state(i_it).output_xml(*this, ns));
+
+    // Ideally we need output_instruction_xml
+    std::ostringstream out;
+    goto_program.output_instruction(ns, identifier, out, i_it);
+    location.set_attribute("instruction", out.str());
+
+    function_body.new_element(location);
+  }
+
+  return function_body;
+}
+
+/*******************************************************************\
+
 Function: ai_baset::entry_state
 
   Inputs:

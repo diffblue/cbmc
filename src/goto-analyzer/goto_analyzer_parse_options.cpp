@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
 
+#include <analyses/is_threaded.h>
+#include <analyses/goto_check.h>
 #include <analyses/local_may_alias.h>
 
 #include <langapi/mode.h>
@@ -47,6 +49,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
+#include "static_show_domain.h"
+#include "static_simplifier.h"
 
 /*******************************************************************\
 
@@ -170,6 +174,112 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
   #endif
+
+
+  // Output format choice
+  options.set_option("text", false);
+  options.set_option("json", false);
+  options.set_option("xml", false);
+  options.set_option("dot", false);
+  options.set_option("outfile", "-");
+
+  if(cmdline.isset("text"))
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", cmdline.get_value("text"));
+  }
+  else if(cmdline.isset("json"))
+  {
+    options.set_option("json", true);
+    options.set_option("outfile", cmdline.get_value("json"));
+  }
+  else if(cmdline.isset("xml"))
+  {
+    options.set_option("xml", true);
+    options.set_option("outfile", cmdline.get_value("xml"));
+  }
+  else if (cmdline.isset("dot"))
+  {
+    options.set_option("dot", true);
+    options.set_option("outfile", cmdline.get_value("dot"));
+  }
+  else
+  {
+    options.set_option("text", true);
+  }
+
+
+  // Task options
+  options.set_option(    "show", false);
+  options.set_option(  "verify", false);
+  options.set_option("simplify", false);
+
+  if(cmdline.isset("show") ||
+      cmdline.isset("show-intervals") ||
+      cmdline.isset("show-non-null"))
+    options.set_option("show", true);
+  else if(cmdline.isset("verify"))
+    options.set_option("verify", true);
+  else if(cmdline.isset("simplify"))
+  {
+    options.set_option("simplify", true);
+    options.set_option("outfile", cmdline.get_value("simplify"));
+  }
+
+  if(!(options.get_bool_option("show")  ||
+    options.get_bool_option("verify")  ||
+    options.get_bool_option("simplify")))
+  {
+    status() << "Task defaults to --show" << eom;
+    options.set_option("show", true);
+  }
+
+  // For development allow slicing to be disabled in the simplify task
+  options.set_option("simplify-slicing", !(cmdline.isset("no-simplify-slicing")));
+
+  // Abstract interpreter choice
+  options.set_option("flow-sensitive", false);
+  options.set_option("concurrent", false);
+
+  if(cmdline.isset("flow-sensitive"))
+    options.set_option("flow-sensitive", true);
+  else if(cmdline.isset("concurrent"))
+    options.set_option("concurrent", true);
+  else
+  {
+    is_threadedt is_threaded(goto_model.goto_functions);
+    bool contains_concurrent_code=is_threaded();
+
+    options.set_option("flow-sensitive", !contains_concurrent_code);
+    options.set_option("concurrent",  contains_concurrent_code);
+  }
+
+
+  // Domain choice
+  options.set_option("constants", false);
+  options.set_option("intervals", false);
+  options.set_option("non-null", false);
+  options.set_option("dependence-graph", false);
+
+  if(cmdline.isset("intervals") ||
+     cmdline.isset("show-intervals"))
+    options.set_option("intervals", true);
+  else if(cmdline.isset("non-null") ||
+          cmdline.isset("show-non-null"))
+    options.set_option("non-null", true);
+  else if(cmdline.isset("constants"))
+    options.set_option("constants", true);
+  else if (cmdline.isset("dependence-graph"))
+    options.set_option("dependence-graph", true);
+    
+  if (!(options.get_bool_option("constants")  ||
+        options.get_bool_option("intervals")  ||
+        options.get_bool_option("non-null") ||
+        options.get_bool_option("dependence-graph")))
+  {
+    status() << "Domain defaults to --constants" << eom;
+    options.set_option("constants", true);
+  }
 }
 
 /*******************************************************************\
@@ -186,94 +296,112 @@ Function: goto_analyzer_parse_optionst::doit
 
 int goto_analyzer_parse_optionst::doit()
 {
-  if(cmdline.isset("version"))
+  try
   {
-    std::cout << CBMC_VERSION << std::endl;
-    return 0;
-  }
-
-  //
-  // command line options
-  //
-
-  optionst options;
-  get_command_line_options(options);
-  eval_verbosity();
-
-  //
-  // Print a banner
-  //
-  status() << "GOTO-ANALYSER version " CBMC_VERSION " "
-           << sizeof(void *)*8 << "-bit "
-           << config.this_architecture() << " "
-           << config.this_operating_system() << eom;
-
-  register_languages();
-
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline.args))
-    return 6;
-
-  if(process_goto_program(options))
-    return 6;
-
-  if(cmdline.isset("taint"))
-  {
-    std::string taint_file=cmdline.get_value("taint");
-
-    if(cmdline.isset("show-taint"))
+    if(cmdline.isset("version"))
     {
-      taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
-      return 0;
+	std::cout << CBMC_VERSION << std::endl;
+	return 0;
     }
-    else
-    {
-      std::string json_file=cmdline.get_value("json");
-      bool result=
-        taint_analysis(goto_model, taint_file, get_message_handler(), false, json_file);
-      return result?10:0;
-    }
-  }
 
-  if(cmdline.isset("unreachable-instructions"))
-  {
-    const std::string json_file=cmdline.get_value("json");
+    //
+    // command line options
+    //
+    
+    optionst options;
+    get_command_line_options(options);
+    eval_verbosity();
 
-    if(json_file.empty())
-      unreachable_instructions(goto_model, false, std::cout);
-    else if(json_file=="-")
-      unreachable_instructions(goto_model, true, std::cout);
-    else
+    //
+    // Print a banner
+    //
+    status() << "GOTO-ANALYSER version " CBMC_VERSION " "
+	     << sizeof(void *)*8 << "-bit "
+	     << config.this_architecture() << " "
+	     << config.this_operating_system() << eom;
+
+    register_languages();
+
+    goto_model.set_message_handler(get_message_handler());
+
+    if(goto_model(cmdline.args))
+      return 6;
+
+    if(process_goto_program(options))
+      return 6;
+
+    if(cmdline.isset("taint"))
     {
-      std::ofstream ofs(json_file);
-      if(!ofs)
+      std::string taint_file=cmdline.get_value("taint");
+
+      if(cmdline.isset("show-taint"))
       {
-        error() << "Failed to open json output `"
-                << json_file << "'" << eom;
-        return 6;
+	taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
+	return 0;
+      }
+      else
+      {
+	std::string json_file=cmdline.get_value("json");
+	bool result=taint_analysis(
+	  goto_model,
+          taint_file,
+          get_message_handler(),
+          false,
+          json_file);
+        return result?10:0;
+      }
+    }
+
+    if(cmdline.isset("unreachable-instructions"))
+    {
+      const std::string json_file=cmdline.get_value("json");
+
+      if(json_file.empty())
+	unreachable_instructions(goto_model, false, std::cout);
+      else if(json_file=="-")
+	unreachable_instructions(goto_model, true, std::cout);
+      else
+      {
+	std::ofstream ofs(json_file);
+	if(!ofs)
+	{
+	  error() << "Failed to open json output `"
+		  << json_file << "'" << eom;
+	  return 6;
+	}
+
+	unreachable_instructions(goto_model, true, ofs);
       }
 
-      unreachable_instructions(goto_model, true, ofs);
+      return 0;
     }
 
-    return 0;
-  }
-
-  if(cmdline.isset("show-local-may-alias"))
-  {
-    namespacet ns(goto_model.symbol_table);
-
-    forall_goto_functions(it, goto_model.goto_functions)
+    if(cmdline.isset("show-local-may-alias"))
     {
-      std::cout << ">>>>\n";
-      std::cout << ">>>> " << it->first << '\n';
-      std::cout << ">>>>\n";
-      local_may_aliast local_may_alias(it->second);
-      local_may_alias.output(std::cout, it->second, ns);
-      std::cout << '\n';
+      namespacet ns(goto_model.symbol_table);
+
+      forall_goto_functions(it, goto_model.goto_functions)
+      {
+	std::cout << ">>>>\n";
+	std::cout << ">>>> " << it->first << '\n';
+	std::cout << ">>>>\n";
+	local_may_aliast local_may_alias(it->second);
+	local_may_alias.output(std::cout, it->second, ns);
+	std::cout << '\n';
+      }
+
+      return 0;
     }
 
+    label_properties(goto_model);
+
+    if(cmdline.isset("show-properties"))
+    {
+      show_properties(goto_model, get_ui());
+      return 0;
+    }
+
+<<<<<<< HEAD
     return 0;
   }
 
@@ -288,26 +416,117 @@ int goto_analyzer_parse_optionst::doit()
   if(set_properties())
     return 7;
 
-  if(cmdline.isset("show-intervals"))
+
+  // Output file factory
+  std::ostream *out;
+  const std::string outfile=options.get_option("outfile");
+  if(outfile=="-")
+    out=&std::cout;
+  else
   {
-    show_intervals(goto_model, std::cout);
-    return 0;
+    out=new std::ofstream(outfile);
+    if(!*out)
+    {
+      error() << "Failed to open output file `"
+              << outfile << "'" << eom;
+      return 6;
+=======
+    if(set_properties())
+      return 7;
+  
+
+    // Output file factory
+    std::ostream *out;
+    const std::string outfile = options.get_option("outfile");
+    if (outfile == "-")
+      out = &std::cout;
+    else
+    {
+      out = new std::ofstream(outfile);
+      if(!*out)
+      {
+	error() << "Failed to open output file `"
+		<< outfile << "'" << eom;
+	return 6;
+      }
+>>>>>>> 1f65b1a... Catch exceptions thrown in doit().
+    }
+
+
+<<<<<<< HEAD
+  // Run the analysis
+  bool result=true;
+  if(options.get_bool_option("show"))
+    result=static_show_domain(goto_model, options, get_message_handler(), *out);
+
+  else if(options.get_bool_option("verify"))
+    result=   static_analyzer(goto_model, options, get_message_handler(), *out);
+
+  else if(options.get_bool_option("simplify"))
+    result= static_simplifier(goto_model, options, get_message_handler(), *out);
+  else
+  {
+    error() << "No task given" << eom;
+    return 6;
   }
 
-  if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
-  {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
-  }
+  if(out!=&std::cout)
+    delete out;
 
+  return result?10:0;
+
+
+=======
+    // Run the analysis
+    bool result = true;
+    if (options.get_bool_option("show"))
+      result = static_show_domain(goto_model, options, get_message_handler(), *out);
+
+    else if (options.get_bool_option("verify"))
+      result =    static_analyzer(goto_model, options, get_message_handler(), *out);
+
+    else if (options.get_bool_option("simplify"))
+      result =  static_simplifier(goto_model, options, get_message_handler(), *out);
+    else
+    {
+      error() << "No task given" << eom;
+      return 6;
+    }
+  
+    if (out != &std::cout)
+      delete out;
+  
+  return result?10:0;
+  
+>>>>>>> 1f65b1a... Catch exceptions thrown in doit().
+  // Final defensive error case
   error() << "no analysis option given -- consider reading --help"
           << eom;
   return 6;
+  }
+  catch(const char *e)
+  {
+    error() << e << eom;
+    return 6;
+  }
+
+  catch(const std::string e)
+  {
+    error() << e << eom;
+    return 6;
+  }
+
+  catch(int x)
+  {
+    return x;
+  }
+
+  catch(std::bad_alloc)
+  {
+    error() << "Out of memory" << eom;
+    return 6;
+  }
+
 }
 
 /*******************************************************************\
@@ -479,16 +698,30 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
+    "Task options:\n"
+    " --show                       display the abstract domains\n"
+    " --verify                     use the abstract domains to check assertions\n"
+    " --simplify file_name         use the abstract domains to simplify the program\n"
     "\n"
-    " --taint file_name            perform taint analysis using rules in given file\n"
-    " --unreachable-instructions   list dead code\n"
-    " --intervals                  interval analysis\n"
-    " --non-null                   non-null analysis\n"
+    "Abstract interpreter options:\n"
+    " --flow-sensitive             use flow-sensitive abstract interpreter\n"
+    " --concurrent                 use concurrent abstract interpreter\n"
     "\n"
-    "Analysis options:\n"
+    "Domain options:\n"
+    " --constants                  constant abstraction\n"
+    " --intervals                  interval abstraction\n"
+    " --non-null                   non-null abstraction\n"
+    " --dependence-graph           dependency relation between instructions\n"
+    "\n"
+    "Output options:\n"
+    " --text file_name             output results in plain text to given file\n"
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
+    " --dot file_name              output results in DOT format to given file\n"
+    "\n"
+    "Other analyses:\n"
+    " --taint file_name            perform taint analysis using rules in given file\n"
+    " --unreachable-instructions   list dead code\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"

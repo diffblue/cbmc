@@ -20,6 +20,61 @@ Author: Peter Schrammel
 
 /*******************************************************************\
 
+Function: concatenate_array_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt concatenate_array_id(
+		const exprt &array, const exprt &index,
+		const typet &type)
+{
+  std::string a, idx, identifier;
+  a = array.get_string(ID_identifier);
+
+  if (index.id()==ID_typecast)
+    idx = index.op0().get_string(ID_value);
+  else
+    idx = index.get_string(ID_value);
+
+  mp_integer i=string2integer(idx);
+  identifier=a+"["+integer2string(i)+"]";
+  symbol_exprt new_expr(identifier, type);
+
+  return new_expr;
+}
+
+/*******************************************************************\
+
+Function: concatenate_array_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+exprt concatenate_array_id(
+		const exprt &array, const mp_integer &index,
+		const typet &type)
+{
+  std::string a, identifier;
+  a = array.get_string(ID_identifier);
+  identifier=a+"["+integer2string(index)+"]";
+  symbol_exprt new_expr(identifier, type);
+
+  return new_expr;
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::assign_rec
 
   Inputs:
@@ -35,6 +90,7 @@ void constant_propagator_domaint::assign_rec(
   const exprt &lhs, const exprt &rhs,
   const namespacet &ns)
 {
+  const typet & lhs_type = ns.follow(lhs.type());
   const typet & rhs_type = ns.follow(rhs.type());
 
 #ifdef DEBUG
@@ -42,7 +98,28 @@ void constant_propagator_domaint::assign_rec(
             << " := " << from_type(ns, "", rhs_type) << std::endl;
 #endif
 
-  if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
+  if(lhs.id()==ID_symbol && rhs.id()==ID_if)
+  {
+	exprt cond=rhs.op0();
+	assert(cond.operands().size()==2);
+	if(values.is_constant(cond.op0())
+			&& values.is_constant(cond.op1()))
+	{
+      if(cond.op0().id()==ID_index)
+      {
+    	exprt index=cond.op0();
+        exprt new_expr=concatenate_array_id(index.op0(), index.op1(), index.type());
+        values.replace_const(new_expr);
+        cond.op0()=new_expr;
+        cond = simplify_expr(cond,ns);
+      }
+      else
+        assert(0);
+
+      assign(values, to_symbol_expr(lhs), cond, ns);
+	}
+  }
+  else if(lhs.id()==ID_symbol && rhs_type.id()!=ID_array
                          && rhs_type.id()!=ID_struct
                          && rhs_type.id()!=ID_union)
   {
@@ -50,6 +127,27 @@ void constant_propagator_domaint::assign_rec(
       assign(values, to_symbol_expr(lhs), rhs, ns);
     else
       values.set_to_top(to_symbol_expr(lhs));
+  }
+  else if(lhs.id()==ID_symbol && lhs_type.id()==ID_array
+		                       && rhs_type.id()==ID_array)
+  {
+	exprt new_expr;
+	mp_integer idx=0;
+    forall_operands(it, rhs)
+	{
+  	  new_expr=concatenate_array_id(lhs, idx, it->type());
+  	  assign(values, to_symbol_expr(new_expr), *it, ns);
+  	  idx = idx +1;
+	}
+  }
+  else if (lhs.id()==ID_index)
+  {
+	if (values.is_constant(lhs.op1())
+	 && values.is_constant(rhs))
+	{
+	  exprt new_expr=concatenate_array_id(lhs.op0(), lhs.op1(), rhs.type());
+      assign(values, to_symbol_expr(new_expr), rhs, ns);
+	}
   }
 #if 0
   else //TODO: could make field or array element-sensitive
@@ -106,12 +204,22 @@ void constant_propagator_domaint::transform(
   else if(from->is_goto())
   {
     exprt g;
+
     if(from->get_target()==to)
       g = simplify_expr(from->guard, ns);
     else
       g = simplify_expr(not_exprt(from->guard), ns);
 
-    two_way_propagate_rec(g, ns);
+    if (g.is_false())
+     values.set_to_bottom();
+    else
+    {
+      //TODO: we need to support widening!
+      if (g.is_constant())
+        values.set_to_top();
+      else
+        two_way_propagate_rec(g, ns);
+    }
   }
   else if(from->is_dead())
   {
@@ -141,6 +249,7 @@ void constant_propagator_domaint::transform(
     else
       values.set_to_top();
   }
+
 #ifdef DEBUG
   std::cout << "after:\n";
   output(std::cout,ai,ns);
@@ -226,6 +335,56 @@ void constant_propagator_domaint::assign(
 
 /*******************************************************************\
 
+Function: constant_propagator_domaint::domain_simplify
+
+  Inputs: The condition to simplify and its namespace.
+
+ Outputs: The simplified condition.
+
+ Purpose: Simplify the condition given context-sensitive knowledge from the domain.
+
+\*******************************************************************/
+
+exprt constant_propagator_domaint::domain_simplify (const exprt &condition,
+						    const namespacet &ns,
+						    const bool lhs) const
+{
+  if (lhs) {
+    // For now do not simplify the left hand sides of assignments
+    return condition;
+  } else {
+    exprt e(condition);
+    values.replace_const(e);
+    return simplify_expr(e, ns);
+  }
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::is_array_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::valuest::is_array_constant(const exprt &expr) const
+{
+  exprt new_expr = concatenate_array_id(expr.op0(),
+		  expr.op1(), expr.type());
+
+  if (replace_const.expr_map.find(to_symbol_expr(new_expr).get_identifier()) ==
+         replace_const.expr_map.end())
+    return false;
+
+  return true;
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_domaint::valuest::is_constant
 
   Inputs:
@@ -250,6 +409,9 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
     if(replace_const.expr_map.find(to_symbol_expr(expr).get_identifier()) ==
        replace_const.expr_map.end())
       return false;
+
+  if (expr.id()==ID_index)
+	return is_array_constant(expr);
 
   if(expr.id()==ID_address_of)
     return is_constant_address_of(to_address_of_expr(expr).object());
@@ -400,38 +562,25 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
       it!=replace_const.expr_map.end();
       ) // no it++
   {
-    if(src.replace_const.expr_map.find(it->first) ==
-       src.replace_const.expr_map.end())
+    const replace_symbolt::expr_mapt::const_iterator
+      b_it=src.replace_const.expr_map.find(it->first);
+
+    if(b_it==src.replace_const.expr_map.end())
     {
       //cannot use set_to_top here
-      replace_const.expr_map.erase(it++);
+      replace_const.expr_map.erase(it);
       changed = true;
+      break;
     }
-    else ++it;
-  }
-
-  for(const auto &src_replace_pair : src.replace_const.expr_map)
-  {
-    replace_symbolt::expr_mapt::iterator c_it=
-      replace_const.expr_map.find(src_replace_pair.first);
-
-    if(c_it!=replace_const.expr_map.end())
+    else
     {
-      // values are different, set to top
-      if(c_it->second!=src_replace_pair.second)
-      {
-        changed=set_to_top(src_replace_pair.first);
-        assert(changed);
-      }
+      const exprt previous=it->second;
+      replace_const.expr_map[b_it->first]=b_it->second;
+      if (it->second != previous) changed = true;
+
+      it++;
     }
-    // is not in "this", ignore
-    else { }
   }
-
-#ifdef DEBUG
-  std::cout << "merged: " << changed << '\n';
-#endif
-
   return changed;
 }
 
@@ -520,6 +669,34 @@ void constant_propagator_ait::replace(
 
 /*******************************************************************\
 
+Function: constant_propagator_ait::replace_array_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void constant_propagator_ait::replace_array_symbol(exprt &expr)
+{
+  if (expr.id()==ID_index)
+	expr = concatenate_array_id(expr.op0(),
+			  expr.op1(), expr.type());
+
+  Forall_operands(it, expr)
+  {
+	if (it->id()==ID_equal)
+	  replace_array_symbol(it->op0());
+	else if (it->id()==ID_index)
+	  replace_array_symbol(expr.op0());
+  }
+
+}
+
+/*******************************************************************\
+
 Function: constant_propagator_ait::replace
 
   Inputs:
@@ -546,6 +723,7 @@ void constant_propagator_ait::replace(
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
+      replace_array_symbol(it->guard);
       s_it->second.values.replace_const(it->guard);
       it->guard = simplify_expr(it->guard, ns);
     }
@@ -554,6 +732,8 @@ void constant_propagator_ait::replace(
       exprt &rhs = to_code_assign(it->code).rhs();
       s_it->second.values.replace_const(rhs);
       rhs = simplify_expr(rhs, ns);
+      if (rhs.id()==ID_constant)
+        rhs.add_source_location()=it->code.op0().source_location();
     }
     else if(it->is_function_call())
     {

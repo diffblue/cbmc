@@ -11,6 +11,8 @@ Date: August 2013
 
 #include <cassert>
 
+#include <util/json.h>
+
 #include "goto_rw.h"
 
 #include "dependence_graph.h"
@@ -328,6 +330,54 @@ void dep_graph_domaint::output(
     out << std::endl;
   }
 }
+
+/*******************************************************************\
+
+Function: dep_graph_domaint::output_json
+
+  Inputs: The abstract interpreter and the namespace.
+
+ Outputs: The domain, formatted as a JSON object.
+
+ Purpose: Outputs the current value of the domain.
+
+\*******************************************************************/
+
+
+jsont dep_graph_domaint::output_json(
+  const ai_baset &ai,
+  const namespacet &ns) const
+{
+  json_arrayt graph;
+
+  for(dep_graph_domaint::depst::const_iterator cdi=control_deps.begin();
+      cdi!=control_deps.end();
+      ++cdi)
+  {
+    json_objectt &link=graph.push_back().make_object();
+    link["location_number"]=
+      json_numbert(std::to_string((*cdi)->location_number));
+    link["source_location"]=
+      json_stringt((*cdi)->source_location.as_string());
+    link["type"]=json_stringt("control");
+  }
+
+  for(dep_graph_domaint::depst::const_iterator ddi=data_deps.begin();
+      ddi!=data_deps.end();
+      ++ddi)
+  {
+    json_objectt &link=graph.push_back().make_object();
+    link["location_number"]=
+      json_numbert(std::to_string((*ddi)->location_number));
+    link["source_location"]=
+      json_stringt((*ddi)->source_location.as_string());
+    link["type"]=json_stringt("data");
+  }
+
+  return graph;
+}
+
+
 
 /*******************************************************************\
 
