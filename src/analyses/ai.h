@@ -40,9 +40,9 @@ public:
 
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from the last instruction (END_FUNCTION)
-  //    of the function to the instruction _following_ the call site
-  //    (this also needs to set the LHS, if applicable)
+  // b) there is an edge from the last instruction (END_FUNCTION) of
+  //    the function to the instruction _following_ the call site (this
+  //    also needs to set the LHS, if applicable)
 
   virtual void transform(
     locationt from,
@@ -207,7 +207,6 @@ public:
   {
     return output_json(ns, goto_function.body, "");
   }
-
 
   virtual xmlt output_xml(
     const namespacet &ns,
