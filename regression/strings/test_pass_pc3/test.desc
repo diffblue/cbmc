@@ -3,6 +3,6 @@ test.c
 --string-refine
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_string_length(s3) == 0: FAILURE$
-^\[main.assertion.2\] assertion __CPROVER_string_length(s3) < 2: SUCCESS$
+^\[main.assertion.1\] assertion __CPROVER_string_length\(s3\) == 0: FAILURE$
+^\[main.assertion.2\] assertion __CPROVER_string_length\(s3\) < 2: SUCCESS$
 ^VERIFICATION FAILED$

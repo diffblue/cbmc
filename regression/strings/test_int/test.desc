@@ -3,8 +3,8 @@ test.c
 --string-refine
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_char_at(s,0) == .1.: SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_char_at(s,1) == .2.: SUCCESS$
+^\[main.assertion.1\] assertion __CPROVER_char_at\(s,0\) == .1.: SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_char_at\(s,1\) == .2.: SUCCESS$
 ^\[main.assertion.3\] assertion j == 234: SUCCESS$
-^\[main.assertion.4\] assertion j < 233 || __CPROVER_char_at(s,2) == .4.: FAILURE$
+^\[main.assertion.4\] assertion j < 233 || __CPROVER_char_at\(s,2\) == .4.: FAILURE$
 --

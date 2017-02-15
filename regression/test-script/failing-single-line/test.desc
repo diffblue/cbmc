@@ -1,0 +1,8 @@
+KNOWNBUG
+program.c
+
+^Goodbye$
+--
+--
+This isn't really a known bug perse, instead this test should fail (since these
+are tests of the test runner).

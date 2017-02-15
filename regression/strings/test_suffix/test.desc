@@ -3,6 +3,6 @@ test.c
 --string-refine
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_string_issuffix(__CPROVER_string_literal("po"),s): SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_string_issuffix(__CPROVER_string_literal("pp"),s): FAILURE$
+^\[main.assertion.1\] assertion __CPROVER_string_issuffix\(__CPROVER_string_literal\("po"\),s\): SUCCESS$
+^\[main.assertion.2\] assertion __CPROVER_string_issuffix\(__CPROVER_string_literal\("pp"\),s\): FAILURE$
 --

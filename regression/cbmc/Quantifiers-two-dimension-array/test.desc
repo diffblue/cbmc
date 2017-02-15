@@ -6,7 +6,7 @@ main.c
 ^\[main.assertion.2\] assertion a\[.*\]\[.*\] == 1: SUCCESS$
 ^\[main.assertion.3\] assertion a\[.*\]\[.*\] == 1: SUCCESS$
 ^\[main.assertion.4\] assertion a\[.*\]\[.*\] == 2: SUCCESS$
-^\[main.assertion.5\] assertion tmp_if_expr$3: SUCCESS$
+^\[main.assertion.5\] assertion tmp_if_expr\$3: SUCCESS$
 
-^\*\* 0 of 5 failed (1 iteration)$
+^\*\* 0 of 5 failed \(1 iteration\)$
 ^VERIFICATION SUCCESSFUL$

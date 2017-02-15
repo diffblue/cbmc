@@ -2,8 +2,8 @@ CORE
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] assertion tmp_if_expr$1: FAILURE$
-^\[main.assertion.2\] assertion tmp_if_expr$2: SUCCESS$
+^\[main.assertion.1\] assertion tmp_if_expr\$1: FAILURE$
+^\[main.assertion.2\] assertion tmp_if_expr\$2: SUCCESS$
 
-^\*\* 1 of 2 failed (2 iterations)$
+^\*\* 1 of 2 failed \(2 iterations\)$
 ^\VERIFICATION FAILED$

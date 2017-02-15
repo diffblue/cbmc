@@ -6,6 +6,6 @@ main.c
 ^\[main.coverage.1] file main.c line 8 function main condition .*: SATISFIED$
 ^\[main.coverage.2] file main.c line 9 function main condition .*: SATISFIED$
 ^\[main.coverage.3] file main.c line 13 function main condition .*: FAILED$
-^\*\* 2 of 3 covered (66.7%)$
+^\*\* 2 of 3 covered \(66.7%\)$
 --
 ^warning: ignoring

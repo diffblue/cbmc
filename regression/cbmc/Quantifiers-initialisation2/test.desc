@@ -8,5 +8,5 @@ main.c
 ^\[main.assertion.4\] forall c\[\]: SUCCESS$
 ^\[main.assertion.5\] assertion c\[.*\] >= c\[.*\]: SUCCESS$
 
-^\*\* 1 of 5 failed (2 iterations)$
+^\*\* 1 of 5 failed \(2 iterations\)$
 ^VERIFICATION FAILED$

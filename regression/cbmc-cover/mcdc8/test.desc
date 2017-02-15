@@ -3,11 +3,11 @@ main.c
 --cover mcdc
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 9 function main MC/DC independence condition `c != FALSE && a != FALSE && !(b != FALSE).* SATISFIED$
-^\[main.coverage.2\] file main.c line 9 function main MC/DC independence condition `c != FALSE && !(a != FALSE) && b != FALSE.* SATISFIED$
-^\[main.coverage.3\] file main.c line 9 function main MC/DC independence condition `c != FALSE && !(a != FALSE) && !(b != FALSE).* SATISFIED$
-^\[main.coverage.4\] file main.c line 9 function main MC/DC independence condition `!(c != FALSE) && a != FALSE && !(b != FALSE).* SATISFIED$
-^\*\* .* of .* covered (100.0%)$
+^\[main.coverage.1\] file main.c line 9 function main MC/DC independence condition `c != FALSE && a != FALSE && !\(b != FALSE\).* SATISFIED$
+^\[main.coverage.2\] file main.c line 9 function main MC/DC independence condition `c != FALSE && !\(a != FALSE\) && b != FALSE.* SATISFIED$
+^\[main.coverage.3\] file main.c line 9 function main MC/DC independence condition `c != FALSE && !\(a != FALSE\) && !\(b != FALSE\).* SATISFIED$
+^\[main.coverage.4\] file main.c line 9 function main MC/DC independence condition `!\(c != FALSE\) && a != FALSE && !\(b != FALSE\).* SATISFIED$
+^\*\* .* of .* covered \(100.0%\)$
 ^\*\* Used 6 iterations$
 --
 ^warning: ignoring

@@ -4,5 +4,5 @@ test.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion c == .p.: SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_char_at(u,2) == .p.: FAILURE$
+^\[main.assertion.2\] assertion __CPROVER_char_at\(u,2\) == .p.: FAILURE$
 --

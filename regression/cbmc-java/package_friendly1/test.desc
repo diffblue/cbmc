@@ -1,8 +1,8 @@
 CORE
 main.class
 package_friendly1.class package_friendly2.class --show-goto-functions
-^main[.]main[(][)].*$
-^package_friendly2[.]operation2[(][)].*$
+^main[.]main[\(][\)].*$
+^package_friendly2[.]operation2[\(][\)].*$
 ^EXIT=0$
 ^SIGNAL=0$
 --

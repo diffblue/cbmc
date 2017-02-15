@@ -1,0 +1,9 @@
+KNOWNBUG
+program.c
+
+activate-multi-line-match
+Hello\nAnother\nWorld
+--
+--
+This isn't really a known bug perse, instead this test should fail (since these
+are tests of the test runner).

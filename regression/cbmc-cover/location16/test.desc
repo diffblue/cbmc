@@ -12,6 +12,6 @@ main.c
 ^\[func.coverage.5\] file main.c line 13 function func block 5: FAILED$
 ^\[func.coverage.6\] file main.c line 15 function func block 6: FAILED$
 ^\[func.coverage.7\] file main.c line 16 function func block 7: SATISFIED$
-^\*\* 4 of 9 covered (44.4%)
+^\*\* 4 of 9 covered \(44.4%\)
 --
 ^warning: ignoring

@@ -4,5 +4,5 @@ edu/emory/mathcs/backport/java/util/concurrent/ConcurrentHashMap.class
 ^EXIT=0$
 ^SIGNAL=0$
 --
-\\"statement\\" (\\"jsr\\")
-\\"statement\\" (\\"ret\\")
+\\"statement\\" \(\\"jsr\\"\)
+\\"statement\\" \(\\"ret\\"\)

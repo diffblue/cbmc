@@ -4,6 +4,6 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.4\] assertion data\[1\]==31: FAILURE$
-^\*\* 1 of 5 failed (2 iterations)$
+^\*\* 1 of 5 failed \(2 iterations\)$
 --
 ^warning: ignoring
