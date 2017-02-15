@@ -1720,7 +1720,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       if(needed_classes && arg0.type().id()==ID_symbol)
-        needed_classes->insert(to_symbol_type(arg0.type()).get_identifier());
+      {
+        needed_classes->insert(
+          to_symbol_type(arg0.type()).get_identifier());
+      }
       results[0]=java_bytecode_promotion(symbol_expr);
 
       // set $assertionDisabled to false
@@ -1739,7 +1742,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
       if(needed_classes && arg0.type().id()==ID_symbol)
-        needed_classes->insert(to_symbol_type(arg0.type()).get_identifier());
+        needed_classes->insert(
+          to_symbol_type(arg0.type()).get_identifier());
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
@@ -2203,8 +2207,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   bool disable_runtime_checks,
   size_t max_array_length,
-  std::vector<irep_idt> *needed_methods,
-  std::set<irep_idt> *needed_classes)
+  safe_pointer<std::vector<irep_idt> > needed_methods,
+  safe_pointer<std::set<irep_idt> > needed_classes)
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
