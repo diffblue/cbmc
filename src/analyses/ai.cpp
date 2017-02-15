@@ -57,7 +57,7 @@ xmlt ai_domain_baset::output_xml(
 {
   std::ostringstream out;
   output(out, ai, ns);
-  xmlt xml("domain");
+  xmlt xml("abstract_state");
   xml.data=out.str();
   return xml;
 }
@@ -185,7 +185,7 @@ jsont ai_baset::output_json(
       json_numbert(std::to_string(i_it->location_number));
     location["sourceLocation"]=
       json_stringt(i_it->source_location.as_string());
-    location["domain"]=find_state(i_it).output_json(*this, ns);
+    location["abstractState"]=find_state(i_it).output_json(*this, ns);
 
     // Ideally we need output_instruction_json
     std::ostringstream out;

@@ -71,7 +71,7 @@ Function: static_simplifiert<analyzerT>::operator()
 template<class analyzerT>
 bool static_simplifiert<analyzerT>::operator()(void)
 {
-  status() << "Performing analysis" << eom;
+  status() << "Computing abstract states" << eom;
   domain(goto_functions, ns);
 
   status() << "Simplifying program" << eom;
@@ -241,6 +241,9 @@ bool static_simplifier(
   message_handlert &message_handler,
   std::ostream &out)
 {
+  messaget m(message_handler);
+  m.status() << "Selecting abstract domain" << messaget::eom;
+
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
@@ -274,7 +277,6 @@ bool static_simplifier(
 #endif
   }
 
-  messaget m(message_handler);
   m.status() << "Task / Interpreter / Domain combination not supported"
              << messaget::eom;
 
