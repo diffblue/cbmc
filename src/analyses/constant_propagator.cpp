@@ -91,7 +91,9 @@ void constant_propagator_domaint::transform(
     ignore_unresolved_calls=cp->ignore_unresolved_calls;
   }
 
-  assert(!values.is_bottom);
+  //assert(!values.is_bottom);
+  if(values.is_bottom)
+    return;
 
   if(from->is_decl())
   {
