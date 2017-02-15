@@ -432,6 +432,7 @@ bool java_bytecode_languaget::typecheck(
   // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
+    // ci: context-insensitive.
     if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
       return true;
   }
@@ -481,7 +482,7 @@ bool java_bytecode_languaget::typecheck(
     needed_classes);
 
   std::set<irep_idt> methods_already_populated;
-  std::vector<const code_function_callt*> virtual_callsites;
+  std::vector<const code_function_callt *> virtual_callsites;
 
   bool any_new_methods;
   do
@@ -509,8 +510,10 @@ bool java_bytecode_languaget::typecheck(
           get_message_handler(),
           disable_runtime_checks,
           max_user_array_length,
-          safe_pointer<std::vector<irep_idt> >::create_non_null(&method_worklist2),
-          safe_pointer<std::set<irep_idt> >::create_non_null(&needed_classes));
+          safe_pointer<std::vector<irep_idt> >::create_non_null(
+            &method_worklist2),
+          safe_pointer<std::set<irep_idt> >::create_non_null(
+            &needed_classes));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
           virtual_callsites);
@@ -530,11 +533,15 @@ bool java_bytecode_languaget::typecheck(
     for(const auto &callsite : virtual_callsites)
     {
       // This will also create a stub if a virtual callsite has no targets.
-      get_virtual_method_targets(*callsite, needed_classes, method_worklist2,
-				 symbol_table, ch);
+      get_virtual_method_targets(
+        *callsite,
+        needed_classes,
+        method_worklist2,
+        symbol_table,
+        ch);
     }
-
-  } while(any_new_methods);
+  }
+  while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
