@@ -534,6 +534,11 @@ _SEARCH_C_FILE = re.compile(r'\b(?:LINT_C_FILE|'
 # Match string that indicates we're working on a Linux Kernel file.
 _SEARCH_KERNEL_FILE = re.compile(r'\b(?:LINT_KERNEL_FILE)')
 
+# Commands for sed to fix the problem
+_SED_FIXUPS = {
+  "Remove spaces around =": "s/ = /=/",
+}
+
 _regexp_compile_cache = {}
 
 # {str, set(int)}: a map from error categories to sets of linenumbers
@@ -1220,6 +1225,13 @@ def Error(filename, linenum, category, confidence, message):
     elif _cpplint_state.output_format == 'eclipse':
       sys.stderr.write('%s:%s: warning: %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
+    elif _cpplint_state.output_format == 'sed':
+      if message in _SED_FIXUPS:
+        sys.stderr.write("sed -i '%s%s' %s # %s  [%s] [%d]\n" % (
+            linenum, _SED_FIXUPS[message], filename, message, category, confidence))
+      else:
+        sys.stderr.write('# %s:%s:  "%s"  [%s] [%d]\n' % (
+            filename, linenum, message, category, confidence))
     else:
       fileinfo = FileInfo(filename)
       path_from_root = fileinfo.RepositoryName()
@@ -6563,7 +6575,7 @@ def ParseArguments(args):
     if opt == '--help':
       PrintUsage(None)
     elif opt == '--output':
-      if val not in ('emacs', 'vs7', 'eclipse'):
+      if val not in ('emacs', 'vs7', 'eclipse', 'sed'):
         PrintUsage('The only allowed output formats are emacs, vs7 and eclipse.')
       output_format = val
     elif opt == '--verbose':
