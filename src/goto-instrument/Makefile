@@ -2,8 +2,8 @@ SRC = goto_instrument_parse_options.cpp rw_set.cpp \
       document_properties.cpp goto_instrument_languages.cpp \
       uninitialized.cpp full_slicer.cpp k_induction.cpp \
       object_id.cpp show_locations.cpp points_to.cpp \
-      alignment_checks.cpp race_check.cpp \
-      nondet_volatile.cpp interrupt.cpp function.cpp branch.cpp \
+      alignment_checks.cpp race_check.cpp nondet_volatile.cpp \
+      interrupt.cpp interrupt_util.cpp function.cpp branch.cpp \
       mmio.cpp stack_depth.cpp nondet_static.cpp \
       concurrency.cpp dump_c.cpp dot.cpp havoc_loops.cpp \
       call_sequences.cpp unwind.cpp function_modifies.cpp \

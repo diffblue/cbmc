@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(call-graph)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
+  "(nondet-volatile)(scheduling-function):" \
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
