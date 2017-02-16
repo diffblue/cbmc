@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009 Google Inc. All rights reserved.
 #
@@ -76,9 +77,15 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
   Flags:
 
-    output=vs7
+    output=emacs|vs7|eclipse|sed|gsed
       By default, the output is formatted to ease emacs parsing.  Visual Studio
-      compatible output (vs7) may also be used.  Other formats are unsupported.
+      (vs7) or eclipse (eclipse) compatible output may also be used.
+
+      The sed format outputs sed commands that should fix the reported errors.
+      Note that this requires gnu sed. If that is installed as gsed on your system
+      (common on MacOS e.g. with homebrew) you can use the gsed output format.
+      Sed commands are written to stdout, not stderr, so you should be able to
+      pipe output straight to bash to run the fixes.
 
     verbose=#
       Specify a number 0-5 to restrict errors to certain verbosity levels.
@@ -533,6 +540,21 @@ _SEARCH_C_FILE = re.compile(r'\b(?:LINT_C_FILE|'
 # Match string that indicates we're working on a Linux Kernel file.
 _SEARCH_KERNEL_FILE = re.compile(r'\b(?:LINT_KERNEL_FILE)')
 
+# Commands for sed to fix the problem
+_SED_FIXUPS = {
+  "Remove spaces around =": "s/ = /=/",
+  "Remove spaces around !=": "s/ != /!=/",
+  "Remove space before ( in if (": "s/if (/if(/",
+  "Remove space before ( in for (": "s/for (/for(/",
+  "Remove space before ( in while (": "s/while (/while(/",
+  "Remove space before ( in switch (": "s/switch (/switch(/",
+  "Should have a space between // and comment": 's/\/\//\/\/ /',
+  "Missing space before {": r's/\([^ ]\){/\1 {/',
+  "Tab found, replace by spaces": r's/\t/  /',
+  "Line ends in whitespace.  Consider deleting these extra spaces.": r's/\s*$//',
+  #"Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
+}
+
 _regexp_compile_cache = {}
 
 # {str, set(int)}: a map from error categories to sets of linenumbers
@@ -939,7 +961,7 @@ class _CppLintState(object):
     for category, count in self.errors_by_category.iteritems():
       sys.stderr.write('Category \'%s\' errors found: %d\n' %
                        (category, count))
-    sys.stdout.write('Total errors found: %d\n' % self.error_count)
+    sys.stdout.write('# Total errors found: %d\n' % self.error_count)
 
 _cpplint_state = _CppLintState()
 
@@ -1219,6 +1241,13 @@ def Error(filename, linenum, category, confidence, message):
     elif _cpplint_state.output_format == 'eclipse':
       sys.stderr.write('%s:%s: warning: %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
+    elif _cpplint_state.output_format in ['sed', 'gsed']:
+      if message in _SED_FIXUPS:
+        sys.stdout.write(_cpplint_state.output_format + " -i '%s%s' %s # %s  [%s] [%d]\n" % (
+            linenum, _SED_FIXUPS[message], filename, message, category, confidence))
+      else:
+        sys.stderr.write('# %s:%s:  "%s"  [%s] [%d]\n' % (
+            filename, linenum, message, category, confidence))
     else:
       fileinfo = FileInfo(filename)
       path_from_root = fileinfo.RepositoryName()
@@ -6505,7 +6534,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
         Error(filename, linenum, 'whitespace/newline', 1,
               'Unexpected \\r (^M) found; better to use only \\n')
 
-  sys.stdout.write('Done processing %s\n' % path_from_root)
+  sys.stdout.write('# Done processing %s\n' % path_from_root)
   _RestoreFilters()
 
 
@@ -6562,7 +6591,7 @@ def ParseArguments(args):
     if opt == '--help':
       PrintUsage(None)
     elif opt == '--output':
-      if val not in ('emacs', 'vs7', 'eclipse'):
+      if val not in ('emacs', 'vs7', 'eclipse', 'sed', 'gsed'):
         PrintUsage('The only allowed output formats are emacs, vs7 and eclipse.')
       output_format = val
     elif opt == '--verbose':
