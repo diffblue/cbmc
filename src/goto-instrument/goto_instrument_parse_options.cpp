@@ -52,6 +52,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/reaching_definitions.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
+#include <analyses/is_threaded.h>
 
 #include <cbmc/version.h>
 
@@ -242,6 +243,31 @@ int goto_instrument_parse_optionst::doit()
           {
             std::cout << result << std::endl;
           }
+        }
+      }
+    }
+
+    if(cmdline.isset("show-threaded"))
+    {
+      namespacet ns(symbol_table);
+
+      is_threadedt is_threaded(goto_functions);
+
+      forall_goto_functions(f_it, goto_functions)
+      {
+        std::cout << "////" << std::endl;
+        std::cout << "//// Function: " << f_it->first << std::endl;
+        std::cout << "////" << std::endl;
+        std::cout << std::endl;
+
+        const goto_programt &goto_program=f_it->second.body;
+
+        forall_goto_program_instructions(i_it, goto_program)
+        {
+          goto_program.output_instruction(ns, "", std::cout, i_it);
+          std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
+                    << std::endl;
+          std::cout << std::endl;
         }
       }
     }
