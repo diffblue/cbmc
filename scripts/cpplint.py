@@ -77,9 +77,15 @@ Syntax: cpplint.py [--verbose=#] [--output=vs7] [--filter=-x,+y,...]
 
   Flags:
 
-    output=vs7
+    output=emacs|vs7|eclipse|sed|gsed
       By default, the output is formatted to ease emacs parsing.  Visual Studio
-      compatible output (vs7) may also be used.  Other formats are unsupported.
+      (vs7) or eclipse (eclipse) compatible output may also be used.
+
+      The sed format outputs sed commands that should fix the reported errors.
+      Note that this requires gnu sed. If that is installed as gsed on your system
+      (common on MacOS e.g. with homebrew) you can use the gsed output format.
+      Sed commands are written to stdout, not stderr, so you should be able to
+      pipe output straight to bash to run the fixes.
 
     verbose=#
       Specify a number 0-5 to restrict errors to certain verbosity levels.
