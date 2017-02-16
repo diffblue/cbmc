@@ -545,6 +545,7 @@ _SED_FIXUPS = {
   "Should have a space between // and comment": 's/\/\//\/\/ /',
   "Missing space before {": r's/\([^ ]\){/\1 {/',
   "Tab found, replace by spaces": r's/\t/  /',
+  "Line ends in whitespace.  Consider deleting these extra spaces.": r's/\s*$//',
   #"Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
 }
 
