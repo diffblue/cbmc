@@ -1235,9 +1235,9 @@ def Error(filename, linenum, category, confidence, message):
     elif _cpplint_state.output_format == 'eclipse':
       sys.stderr.write('%s:%s: warning: %s  [%s] [%d]\n' % (
           filename, linenum, message, category, confidence))
-    elif _cpplint_state.output_format == 'sed':
+    elif _cpplint_state.output_format in ['sed', 'gsed']:
       if message in _SED_FIXUPS:
-        sys.stderr.write("sed -i '%s%s' %s # %s  [%s] [%d]\n" % (
+        sys.stderr.write(_cpplint_state.output_format + " -i '%s%s' %s # %s  [%s] [%d]\n" % (
             linenum, _SED_FIXUPS[message], filename, message, category, confidence))
       else:
         sys.stderr.write('# %s:%s:  "%s"  [%s] [%d]\n' % (
@@ -6585,7 +6585,7 @@ def ParseArguments(args):
     if opt == '--help':
       PrintUsage(None)
     elif opt == '--output':
-      if val not in ('emacs', 'vs7', 'eclipse', 'sed'):
+      if val not in ('emacs', 'vs7', 'eclipse', 'sed', 'gsed'):
         PrintUsage('The only allowed output formats are emacs, vs7 and eclipse.')
       output_format = val
     elif opt == '--verbose':
