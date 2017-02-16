@@ -537,6 +537,11 @@ _SEARCH_KERNEL_FILE = re.compile(r'\b(?:LINT_KERNEL_FILE)')
 # Commands for sed to fix the problem
 _SED_FIXUPS = {
   "Remove spaces around =": "s/ = /=/",
+  "Remove spaces around !=": "s/ != /!=/",
+  "Remove space before ( in if (": "s/if (/if(/",
+  "Remove space before ( in for (": "s/for (/for(/",
+  "Remove space before ( in while (": "s/while (/while(/",
+  "Remove space before ( in switch (": "s/switch (/switch(/",
 }
 
 _regexp_compile_cache = {}
