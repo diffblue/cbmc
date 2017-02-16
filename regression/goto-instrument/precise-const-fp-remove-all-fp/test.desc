@@ -2,6 +2,6 @@ CORE
 main.c
 --verbosity 10 --pointer-check --remove-function-pointers
 
-^\s*f2();
+^\s*f2\(\);
 --
 ^warning: ignoring

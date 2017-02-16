@@ -3,6 +3,6 @@ main.c
 --show-goto-functions --verbosity 10 --pointer-check
 
 ^Removing function pointers and virtual functions$
-^\s*f2();
+^\s*f2\(\);
 --
 ^warning: ignoring
