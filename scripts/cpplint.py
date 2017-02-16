@@ -542,6 +542,7 @@ _SED_FIXUPS = {
   "Remove space before ( in for (": "s/for (/for(/",
   "Remove space before ( in while (": "s/while (/while(/",
   "Remove space before ( in switch (": "s/switch (/switch(/",
+  #"Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
 }
 
 _regexp_compile_cache = {}
