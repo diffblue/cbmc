@@ -955,7 +955,7 @@ class _CppLintState(object):
     for category, count in self.errors_by_category.iteritems():
       sys.stderr.write('Category \'%s\' errors found: %d\n' %
                        (category, count))
-    sys.stdout.write('Total errors found: %d\n' % self.error_count)
+    sys.stdout.write('# Total errors found: %d\n' % self.error_count)
 
 _cpplint_state = _CppLintState()
 
@@ -1237,7 +1237,7 @@ def Error(filename, linenum, category, confidence, message):
           filename, linenum, message, category, confidence))
     elif _cpplint_state.output_format in ['sed', 'gsed']:
       if message in _SED_FIXUPS:
-        sys.stderr.write(_cpplint_state.output_format + " -i '%s%s' %s # %s  [%s] [%d]\n" % (
+        sys.stdout.write(_cpplint_state.output_format + " -i '%s%s' %s # %s  [%s] [%d]\n" % (
             linenum, _SED_FIXUPS[message], filename, message, category, confidence))
       else:
         sys.stderr.write('# %s:%s:  "%s"  [%s] [%d]\n' % (
@@ -6528,7 +6528,7 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
         Error(filename, linenum, 'whitespace/newline', 1,
               'Unexpected \\r (^M) found; better to use only \\n')
 
-  sys.stdout.write('Done processing %s\n' % path_from_root)
+  sys.stdout.write('# Done processing %s\n' % path_from_root)
   _RestoreFilters()
 
 
