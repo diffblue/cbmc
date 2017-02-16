@@ -552,7 +552,9 @@ _SED_FIXUPS = {
   "Missing space before {": r's/\([^ ]\){/\1 {/',
   "Tab found, replace by spaces": r's/\t/  /',
   "Line ends in whitespace.  Consider deleting these extra spaces.": r's/\s*$//',
-  #"Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
+  # "Statement after an if should be on a new line": r's/^\(\s*\)if *\(([^()]*)\) *\(.*\)$/\1if\2\n\1  \3/', # Single layer of nested bracets
+  # "Statement after an if should be on a new line": r's/^\(\s*\)if *\((\([^()]\|([^()]*)\)*)\) *\(.*\)$/\1if\2\n\1  \4/', # Max 2 layers of nested bracets; messes up line numbers for other errors.
+  # "Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
 }
 
 _regexp_compile_cache = {}
