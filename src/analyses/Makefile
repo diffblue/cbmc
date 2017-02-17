@@ -26,6 +26,8 @@ SRC = ai.cpp \
       uninitialized_domain.cpp \
       variable-sensitivity/abstract_object.cpp \
       variable-sensitivity/abstract_enviroment.cpp \
+      variable-sensitivity/abstract_value.cpp \
+      variable-sensitivity/constant_abstract_value.cpp \
       variable-sensitivity/variable_sensitivity_domain.cpp \
       # Empty last line
 
