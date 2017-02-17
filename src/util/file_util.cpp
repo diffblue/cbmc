@@ -286,7 +286,8 @@ std::string  fileutl_normalise_path(std::string const&  path)
   {
     assert(pos != 0ULL);
     const std::string::size_type  prev_pos = result.rfind("/",pos-1ULL);
-    assert(pos != std::string::npos);
+    if(prev_pos == std::string::npos)
+      break;
     result.replace(prev_pos,pos - prev_pos + 4ULL,"/");
   }
   return result;
