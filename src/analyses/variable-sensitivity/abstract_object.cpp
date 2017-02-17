@@ -130,7 +130,7 @@ Function: abstract_objectt::merge
 abstract_object_pointert abstract_objectt::merge(
   const abstract_object_pointert op, bool &out_any_modifications)
 {
-  assert(this->type==op->type);
+  assert(type==op->type);
   abstract_object_pointert m=abstract_object_pointert(new abstract_objectt(*this));
   m->merge_state(abstract_object_pointert(new abstract_objectt(*this)), op);
   out_any_modifications=!(*m==*this);
