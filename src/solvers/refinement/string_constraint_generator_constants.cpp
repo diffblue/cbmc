@@ -101,7 +101,7 @@ string_exprt string_constraint_generatort::add_axioms_from_literal(
   else
   {
     // Java string constant
-    assert(refined_string_typet::is_unrefined_string_type(arg.type()));
+    assert(arg.id()==ID_symbol);
     const exprt &s=arg.op0();
 
     // It seems the value of the string is lost,

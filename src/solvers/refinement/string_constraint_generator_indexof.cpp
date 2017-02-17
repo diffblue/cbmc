@@ -163,14 +163,16 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   else
     assert(false);
 
-  if(refined_string_typet::is_java_string_pointer_type(c.type()))
+  if(c.type().id()==ID_unsignedbv)
+  {
+    return add_axioms_for_index_of(
+      str, typecast_exprt(c, ref_type.get_char_type()), from_index);
+  }
+  else
   {
     string_exprt sub=add_axioms_for_string_expr(c);
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
-  else
-    return add_axioms_for_index_of(
-      str, typecast_exprt(c, ref_type.get_char_type()), from_index);
 }
 
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
@@ -248,12 +250,14 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   else
     assert(false);
 
-  if(refined_string_typet::is_java_string_pointer_type(c.type()))
+  if(c.type().id()==ID_unsignedbv)
+  {
+    return add_axioms_for_last_index_of(
+      str, typecast_exprt(c, ref_type.get_char_type()), from_index);
+  }
+  else
   {
     string_exprt sub=add_axioms_for_string_expr(c);
     return add_axioms_for_last_index_of_string(str, sub, from_index);
   }
-  else
-    return add_axioms_for_last_index_of(
-      str, typecast_exprt(c, ref_type.get_char_type()), from_index);
 }

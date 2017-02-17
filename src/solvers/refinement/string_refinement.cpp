@@ -115,7 +115,7 @@ bvt string_refinementt::convert_symbol(const exprt &expr)
   const irep_idt &identifier=expr.get(ID_identifier);
   assert(!identifier.empty());
 
-  if(refined_string_typet::is_unrefined_string_type(type))
+  if(refined_string_typet::is_refined_string_type(type))
   {
     string_exprt str=
       generator.find_or_add_string_of_symbol(to_symbol_expr(expr));
@@ -166,7 +166,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
     if(expr.rhs().id()==ID_typecast)
     {
       exprt uncast=to_typecast_expr(expr.rhs()).op();
-      if(refined_string_typet::is_unrefined_string_type(uncast.type()))
+      if(refined_string_typet::is_refined_string_type(uncast.type()))
       {
         debug() << "(sr) detected casted string" << eom;
         symbol_exprt sym=to_symbol_expr(expr.lhs());
@@ -175,7 +175,7 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
       }
     }
 
-    if(refined_string_typet::is_unrefined_string_type(type))
+    if(refined_string_typet::is_refined_string_type(type))
     {
       symbol_exprt sym=to_symbol_expr(expr.lhs());
       generator.set_string_symbol_equal_to_expr(sym, expr.rhs());

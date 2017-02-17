@@ -150,10 +150,10 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
   const if_exprt &expr)
 {
   assert(
-    refined_string_typet::is_unrefined_string_type(expr.true_case().type()));
+    refined_string_typet::is_c_string_type(expr.true_case().type()));
   string_exprt t=add_axioms_for_string_expr(expr.true_case());
   assert(
-    refined_string_typet::is_unrefined_string_type(expr.false_case().type()));
+    refined_string_typet::is_c_string_type(expr.false_case().type()));
   string_exprt f=add_axioms_for_string_expr(expr.false_case());
   const refined_string_typet &ref_type=to_refined_string_type(t.type());
   const typet &index_type=ref_type.get_index_type();

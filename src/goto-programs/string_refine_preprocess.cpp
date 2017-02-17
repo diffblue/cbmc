@@ -22,7 +22,125 @@ Date:   September 2016
 
 #include "string_refine_preprocess.h"
 
-/*******************************************************************    \
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_string_pointer_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java string pointers
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_pointer_type(const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pt=to_pointer_type(type);
+    const typet &subtype=pt.subtype();
+    return is_java_string_type(subtype);
+  }
+  return false;
+}
+
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_string_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java string
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_type(const typet &type)
+{
+  if(type.id()==ID_symbol)
+  {
+    const irep_idt &tag=to_symbol_type(type).get_identifier();
+    return tag=="java::java.lang.String";
+  }
+  else if(type.id()==ID_struct)
+  {
+    const irep_idt &tag=to_struct_type(type).get_tag();
+    return tag=="java.lang.String";
+  }
+  return false;
+}
+
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_string_builder_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java string builder
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_builder_type(const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pt=to_pointer_type(type);
+    const typet &subtype=pt.subtype();
+    if(subtype.id()==ID_struct)
+    {
+      const irep_idt &tag=to_struct_type(subtype).get_tag();
+      return tag=="java.lang.StringBuilder";
+    }
+  }
+  return false;
+}
+
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_string_builder_pointer_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java StringBuilder
+          pointers
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_builder_pointer_type(
+  const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pt=to_pointer_type(type);
+    const typet &subtype=pt.subtype();
+    return is_java_string_builder_type(subtype);
+  }
+  return false;
+}
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_char_sequence_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java char sequence
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_char_sequence_type(const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pt=to_pointer_type(type);
+    const typet &subtype=pt.subtype();
+    if(subtype.id()==ID_struct)
+    {
+      const irep_idt &tag=to_struct_type(subtype).get_tag();
+      return tag=="java.lang.CharSequence";
+    }
+  }
+  return false;
+}
+
+/*******************************************************************\
 
 Function: string_refine_preprocesst::fresh_array
 
@@ -114,8 +232,8 @@ Function: string_refine_preprocesst::get_data_and_length_type_of_string
 void string_refine_preprocesst::get_data_and_length_type_of_string(
   const exprt &expr, typet &data_type, typet &length_type)
 {
-  assert(refined_string_typet::is_java_string_type(expr.type()) ||
-         refined_string_typet::is_java_string_builder_type(expr.type()));
+  assert(is_java_string_type(expr.type()) ||
+         is_java_string_builder_type(expr.type()));
   typet object_type=ns.follow(expr.type());
   const struct_typet &struct_type=to_struct_type(object_type);
   for(const auto &component : struct_type.components())
@@ -146,7 +264,7 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
   const exprt &rhs,
   const source_locationt &location)
 {
-  if(refined_string_typet::is_java_string_pointer_type(rhs.type()))
+  if(is_java_string_pointer_type(rhs.type()))
   {
     auto pair=java_to_cprover_strings.insert(
       std::pair<exprt, exprt>(rhs, nil_exprt()));
@@ -183,7 +301,7 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
     return pair.first->second;
   }
   else if(rhs.id()==ID_typecast &&
-          refined_string_typet::is_java_string_pointer_type(rhs.op0().type()))
+          is_java_string_pointer_type(rhs.op0().type()))
   {
     exprt new_rhs=make_cprover_string_assign(
       goto_program, target, rhs.op0(), location);
@@ -303,8 +421,7 @@ void string_refine_preprocesst::make_string_assign(
   const source_locationt &location,
   const std::string &signature)
 {
-  assert(refined_string_typet::is_java_string_pointer_type(
-           function_type.return_type()));
+  assert(is_java_string_pointer_type(function_type.return_type()));
   dereference_exprt deref(lhs, lhs.type().subtype());
   typet object_type=ns.follow(deref.type());
   exprt object_size=size_of_expr(object_type, ns);
@@ -371,8 +488,7 @@ void string_refine_preprocesst::make_assign(
   const source_locationt &loc,
   const std::string &sig)
 {
-  if(refined_string_typet::is_java_string_pointer_type(
-       function_type.return_type()))
+  if(is_java_string_pointer_type(function_type.return_type()))
     make_string_assign(
       goto_program, target, lhs, function_type, function_name, arg, loc, sig);
   else
@@ -404,8 +520,8 @@ void string_refine_preprocesst::make_string_copy(
   const source_locationt &location)
 {
   // TODO : treat CharSequence and StringBuffer
-  assert(refined_string_typet::is_java_string_pointer_type(lhs.type()) ||
-         refined_string_typet::is_java_string_builder_pointer_type(lhs.type()));
+  assert(is_java_string_pointer_type(lhs.type()) ||
+         is_java_string_builder_pointer_type(lhs.type()));
   exprt deref=dereference_exprt(lhs, lhs.type().subtype());
 
   typet length_type, data_type;
@@ -451,8 +567,7 @@ void string_refine_preprocesst::make_string_function(
   const source_locationt &location,
   const std::string &signature)
 {
-  if(refined_string_typet::is_java_string_pointer_type(
-       function_type.return_type()))
+  if(is_java_string_pointer_type(function_type.return_type()))
     make_string_assign(
       goto_program,
       target,
@@ -633,8 +748,7 @@ void string_refine_preprocesst::make_to_char_array_function(
 
   assert(!function_call.arguments().empty());
   const exprt &string_argument=function_call.arguments()[0];
-  assert(refined_string_typet::is_java_string_pointer_type(
-           string_argument.type()));
+  assert(is_java_string_pointer_type(string_argument.type()));
 
   dereference_exprt deref(string_argument, string_argument.type().subtype());
   typet length_type, data_type;
@@ -870,7 +984,7 @@ exprt::operandst string_refine_preprocesst::process_arguments(
       {
         while(arg.id()==ID_typecast)
           arg=arg.op0();
-        if(!refined_string_typet::is_java_string_type(arg.type()))
+        if(!is_java_string_type(arg.type()))
           arg=typecast_exprt(arg, jls_ptr);
       }
       exprt arg2=make_cprover_string_assign(
