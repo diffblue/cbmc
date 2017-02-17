@@ -49,6 +49,16 @@ class string_refine_preprocesst:public messaget
  private:
   void initialize_string_function_table();
 
+  static bool is_java_string_pointer_type(const typet &type);
+
+  static bool is_java_string_type(const typet &type);
+
+  static bool is_java_string_builder_type(const typet &type);
+
+  static bool is_java_string_builder_pointer_type(const typet &type);
+
+  static bool is_java_char_sequence_type(const typet &type);
+
   symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
   symbol_exprt new_symbol(
