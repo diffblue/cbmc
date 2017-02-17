@@ -30,8 +30,10 @@ Function: expr_eq
 bool expr_eq(const exprt &expr1, const exprt &expr2)
 {
   exprt e1=expr1, e2=expr2;
-  if(expr1.id()==ID_typecast) e1=expr1.op0();
-  if(expr2.id()==ID_typecast) e2=expr2.op0();
+  if(expr1.id()==ID_typecast)
+    e1=expr1.op0();
+  if(expr2.id()==ID_typecast)
+    e2=expr2.op0();
   return e1==e2;
 }
 
@@ -65,9 +67,11 @@ exprt get_quantifier_var_min(
      */
     for(auto &x : quantifier_expr.operands())
     {
-      if(x.id()!=ID_not) continue;
+      if(x.id()!=ID_not)
+        continue;
       exprt y=x.op0();
-      if(y.id()!=ID_ge) continue;
+      if(y.id()!=ID_ge)
+        continue;
       if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
       {
         return y.op1();
@@ -82,7 +86,8 @@ exprt get_quantifier_var_min(
      */
     for(auto &x : quantifier_expr.operands())
     {
-      if(x.id()!=ID_ge) continue;
+      if(x.id()!=ID_ge)
+        continue;
       if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
       {
         return x.op1();
@@ -121,7 +126,8 @@ exprt get_quantifier_var_max(
      */
     for(auto &x : quantifier_expr.operands())
     {
-      if(x.id()!=ID_ge) continue;
+      if(x.id()!=ID_ge)
+        continue;
       if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
       {
         exprt over_expr=x.op1();
@@ -146,9 +152,11 @@ exprt get_quantifier_var_max(
      */
     for(auto &x : quantifier_expr.operands())
     {
-      if(x.id()!=ID_not) continue;
+      if(x.id()!=ID_not)
+        continue;
       exprt y=x.op0();
-      if(y.id()!=ID_ge) continue;
+      if(y.id()!=ID_ge)
+        continue;
       if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
       {
         exprt over_expr=y.op1();
@@ -283,7 +291,8 @@ void boolbvt::post_process_quantifiers()
 {
   std::set<exprt> instances;
 
-  if(quantifier_list.empty()) return;
+  if(quantifier_list.empty())
+    return;
 
   for(auto it=quantifier_list.begin();
       it!=quantifier_list.end();

@@ -68,7 +68,8 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   // 'name' needs to be set, or we produce mal-formed
   // XML.
 
-  if(name=="") return;
+  if(name=="")
+    return;
 
   do_indent(out, indent);
 
@@ -77,7 +78,8 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   for(const auto &attribute : attributes)
   {
     // it.first needs to be non-empty
-    if(attribute.first.empty()) continue;
+    if(attribute.first.empty())
+      continue;
     out << ' ' << attribute.first
         << '=' << '"';
     escape_attribute(attribute.second, out);
@@ -336,10 +338,10 @@ void xmlt::set_attribute(
   const std::string &attribute,
   const std::string &value)
 {
-  if ((value[0]=='\"' && value[value.size()-1]=='\"') ||
+  if((value[0]=='\"' && value[value.size()-1]=='\"') ||
       (value[0]=='\'' && value[value.size()-1]=='\''))
   {
-    attributes[attribute]=value.substr(1,value.size()-2);
+    attributes[attribute]=value.substr(1, value.size()-2);
   }
   else
   {
@@ -377,16 +379,19 @@ std::string xmlt::unescape(const std::string &str)
       while(it!=str.end() && *it!=';')
         tmp+=*it++;
 
-      if(tmp=="gt") result+='>';
-      else if(tmp=="lt") result+='<';
-      else if(tmp=="amp") result+='&';
+      if(tmp=="gt")
+        result+='>';
+      else if(tmp=="lt")
+        result+='<';
+      else if(tmp=="amp")
+        result+='&';
       else if(tmp[0]=='#' && tmp[1]!='x')
       {
         char c=unsafe_string2int(tmp.substr(1, tmp.size()-1));
         result+=c;
       }
       else
-        throw "XML escape code not implemented";
+        throw "XML escape code not implemented"; // NOLINT(readability/throw)
     }
     else
       result+=*it;

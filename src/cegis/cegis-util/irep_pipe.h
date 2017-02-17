@@ -43,7 +43,7 @@ public:
    * should close automaticall, <code>false</code>
    * otherwise.
    */
-  irep_pipet(bool auto_close);
+  explicit irep_pipet(bool auto_close);
 
   /**
    * @brief Optionally closing destructor.

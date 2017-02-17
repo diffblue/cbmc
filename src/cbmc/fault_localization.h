@@ -39,7 +39,7 @@ public:
   safety_checkert::resultt operator()();
   safety_checkert::resultt stop_on_fail();
 
-  //override bmc_all_propertiest
+  // override bmc_all_propertiest
   virtual void goal_covered(const cover_goalst::goalt &);
 
 protected:
@@ -51,7 +51,8 @@ protected:
   symex_target_equationt::SSA_stepst::const_iterator failed;
 
   // the list of localization points up to the failed property
-  struct lpointt {
+  struct lpointt
+  {
     goto_programt::const_targett target;
     unsigned score;
   };
@@ -68,15 +69,15 @@ protected:
 
   // specify an lpoint combination to check
   typedef std::vector<tvt> lpoints_valuet;
-  bool check(const lpointst &lpoints, const lpoints_valuet& value);
+  bool check(const lpointst &lpoints, const lpoints_valuet &value);
   void update_scores(lpointst &lpoints,
-                     const lpoints_valuet& value);
+                     const lpoints_valuet &value);
 
   // localization method: flip each point
   void localize_linear(lpointst &lpoints);
 
   // localization method: TBD
-  //void localize_TBD(
+  // void localize_TBD(
   //  prop_convt &prop_conv);
 
   symex_target_equationt::SSA_stepst::const_iterator get_failed_property();
@@ -86,10 +87,10 @@ protected:
 
   void report(irep_idt goal_id);
 
-  //override bmc_all_propertiest
+  // override bmc_all_propertiest
   virtual void report(const cover_goalst &cover_goals);
 
-  //override bmc_all_propertiest
+  // override bmc_all_propertiest
   virtual void do_before_solving()
   {
     freeze_guards();

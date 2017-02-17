@@ -40,7 +40,7 @@ public:
     do_simplify_if(true),
     ns(_ns)
 #ifdef DEBUG_ON_DEMAND
-    ,debug_on(false)
+    , debug_on(false)
 #endif
   {
 #ifdef DEBUG_ON_DEMAND
@@ -108,7 +108,8 @@ public:
   bool simplify_popcount(exprt &expr);
 
   // auxiliary
-  bool simplify_if_implies(exprt &expr, const exprt &cond, bool truth, bool &new_truth);
+  bool simplify_if_implies(
+    exprt &expr, const exprt &cond, bool truth, bool &new_truth);
   bool simplify_if_recursive(exprt &expr, const exprt &cond, bool truth);
   bool simplify_if_conj(exprt &expr, const exprt &cond);
   bool simplify_if_disj(exprt &expr, const exprt &cond);
@@ -133,7 +134,7 @@ public:
   typedef std::set<mp_integer> value_listt;
   bool get_values(const exprt &expr, value_listt &value_list);
 
-  inline static bool is_bitvector_type(const typet &type)
+  static bool is_bitvector_type(const typet &type)
   {
     return type.id()==ID_unsignedbv ||
            type.id()==ID_signedbv ||
@@ -141,7 +142,8 @@ public:
   }
 
   // bit-level conversions
-  exprt bits2expr(const std::string &bits, const typet &type, bool little_endian);
+  exprt bits2expr(
+    const std::string &bits, const typet &type, bool little_endian);
   std::string expr2bits(const exprt &expr, bool little_endian);
 
 protected:

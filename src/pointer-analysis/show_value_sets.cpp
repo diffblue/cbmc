@@ -44,7 +44,9 @@ void show_value_sets(
     value_set_analysis.output(goto_functions, std::cout);
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 
@@ -79,6 +81,8 @@ void show_value_sets(
     value_set_analysis.output(goto_program, std::cout);
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }

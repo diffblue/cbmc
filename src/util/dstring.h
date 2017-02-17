@@ -13,14 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_container.h"
 
-class dstring
+class dstringt
 {
 public:
   // this is safe for static objects
   #ifdef __GNUC__
   constexpr
   #endif
-  dstring():no(0)
+  dstringt():no(0)
   {
   }
 
@@ -29,7 +29,7 @@ public:
   #ifdef __GNUC__
   constexpr
   #endif
-  dstring(unsigned _no, unsigned):no(_no)
+  dstringt(unsigned _no, unsigned):no(_no)
   {
   }
 
@@ -40,48 +40,50 @@ public:
   #endif
 
   // this one is not safe for static objects
-  inline dstring(const char *s):no(string_container[s])
+  // NOLINTNEXTLINE(runtime/explicit)
+  dstringt(const char *s):no(string_container[s])
   {
   }
 
   // this one is not safe for static objects
-  inline dstring(const std::string &s):no(string_container[s])
+  // NOLINTNEXTLINE(runtime/explicit)
+  dstringt(const std::string &s):no(string_container[s])
   {
   }
 
   // access
 
-  inline bool empty() const
+  bool empty() const
   {
     return no==0; // string 0 is exactly the empty string
   }
 
-  inline char operator[](size_t i) const
+  char operator[](size_t i) const
   {
     return as_string()[i];
   }
 
   // the pointer is guaranteed to be stable
-  inline const char *c_str() const
+  const char *c_str() const
   {
     return as_string().c_str();
   }
 
-  inline size_t size() const
+  size_t size() const
   {
     return as_string().size();
   }
 
   // ordering -- not the same as lexicographical ordering
 
-  inline bool operator< (const dstring &b) const { return no<b.no; }
+  bool operator< (const dstringt &b) const { return no<b.no; }
 
   // comparison with same type
 
-  inline bool operator==(const dstring &b) const
+  bool operator==(const dstringt &b) const
   { return no==b.no; } // really fast equality testing
 
-  inline bool operator!=(const dstring &b) const
+  bool operator!=(const dstringt &b) const
   { return no!=b.no; } // really fast equality testing
 
   // comparison with other types
@@ -91,48 +93,44 @@ public:
 
   bool operator==(const std::string &b) const { return as_string()==b; }
   bool operator!=(const std::string &b) const { return as_string()!=b; }
-  bool operator< (const std::string &b) const { return as_string()< b; }
-  bool operator> (const std::string &b) const { return as_string()> b; }
+  bool operator<(const std::string &b) const { return as_string()<b; }
+  bool operator>(const std::string &b) const { return as_string()>b; }
   bool operator<=(const std::string &b) const { return as_string()<=b; }
   bool operator>=(const std::string &b) const { return as_string()>=b; }
 
-  int compare(const dstring &b) const
+  int compare(const dstringt &b) const
   {
-    if(no==b.no) return 0; // equal
+    if(no==b.no)
+      return 0; // equal
     return as_string().compare(b.as_string());
-  }
-
-  inline friend bool ordering(const dstring &a, const dstring &b)
-  {
-    return a.no<b.no;
   }
 
   // modifying
 
-  inline void clear()
+  void clear()
   { no=0; }
 
-  inline void swap(dstring &b)
+  void swap(dstringt &b)
   { unsigned t=no; no=b.no; b.no=t; }
 
-  inline dstring &operator=(const dstring &b)
+  dstringt &operator=(const dstringt &b)
   { no=b.no; return *this; }
 
-  // friends
+  // output
 
-  inline friend std::ostream &operator<<(std::ostream &out, const dstring &a)
+  std::ostream &operator<<(std::ostream &out) const
   {
-    return out << a.as_string();
-  }
-
-  inline friend size_t hash_string(const dstring &s)
-  {
-    return s.hash();
+    return out << as_string();
   }
 
   // non-standard
 
-  inline unsigned get_no() const
+  unsigned get_no() const
+  {
+    return no;
+  }
+
+  size_t hash() const
   {
     return no;
   }
@@ -141,26 +139,28 @@ protected:
   unsigned no;
 
   // the reference returned is guaranteed to be stable
-  inline const std::string &as_string() const
+  const std::string &as_string() const
   { return string_container.get_string(no); }
-
-  inline size_t hash() const
-  {
-    return no;
-  }
 };
 
 // the reference returned is guaranteed to be stable
-inline const std::string &as_string(const dstring &s)
+inline const std::string &as_string(const dstringt &s)
 { return string_container.get_string(s.get_no()); }
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct dstring_hash
 {
-  inline size_t operator()(const dstring &s) const { return hash_string(s); }
+  size_t operator()(const dstringt &s) const { return s.hash(); }
 };
 
-size_t hash_string(const dstring &s);
+inline size_t hash_string(const dstringt &s)
+{
+  return s.hash();
+}
 
-std::ostream &operator << (std::ostream &out, const dstring &a);
+inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
+{
+  return a.operator<<(out);
+}
 
 #endif // CPROVER_UTIL_DSTRING_H

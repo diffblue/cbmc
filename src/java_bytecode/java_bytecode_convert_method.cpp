@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/expanding_vector.h>
 #include <util/string2int.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
@@ -36,25 +35,30 @@ Author: Daniel Kroening, kroening@kroening.com
 class patternt
 {
 public:
-  explicit inline patternt(const char *_p):p(_p)
+  explicit patternt(const char *_p):p(_p)
   {
   }
 
   // match with '?'
-  friend bool operator==(const irep_idt &what, const patternt &pattern)
+  bool operator==(const irep_idt &what) const
   {
     for(std::size_t i=0; i<what.size(); i++)
-      if(pattern.p[i]==0)
+      if(p[i]==0)
         return false;
-      else if(pattern.p[i]!='?' && pattern.p[i]!=what[i])
+      else if(p[i]!='?' && p[i]!=what[i])
         return false;
 
-    return pattern.p[what.size()]==0;
+    return p[what.size()]==0;
   }
 
 protected:
   const char *p;
 };
+
+static bool operator==(const irep_idt &what, const patternt &pattern)
+{
+  return pattern==what;
+}
 
 const size_t SLOTS_PER_INTEGER(1u);
 const size_t INTEGER_WIDTH(64u);
@@ -720,7 +724,7 @@ static void gather_symbol_live_ranges(
   {
     const auto &symexpr=to_symbol_expr(e);
     auto findit=
-      result.insert({
+      result.insert({ // NOLINT(whitespace/braces)
         symexpr.get_identifier(),
         java_bytecode_convert_methodt::variablet()});
     auto &var=findit.first->second;

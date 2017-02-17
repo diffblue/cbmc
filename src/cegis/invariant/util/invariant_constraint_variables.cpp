@@ -49,7 +49,7 @@ class counterexample_variable_collectort
 {
   invariant_symbol_set &vars;
 public:
-  counterexample_variable_collectort(invariant_symbol_set &vars) :
+  explicit counterexample_variable_collectort(invariant_symbol_set &vars) :
       vars(vars)
   {
   }

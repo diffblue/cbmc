@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_wrappert:public virtual propt
 {
  public:
-  prop_wrappert(propt &_prop):propt(_prop), p(_prop) { }
+  explicit prop_wrappert(propt &_prop):propt(_prop), p(_prop) { }
   virtual ~prop_wrappert() { }
 
   virtual literalt constant(bool value)

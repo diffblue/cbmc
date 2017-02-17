@@ -55,12 +55,12 @@ public:
   }
   #endif
 
-  inline exprt &default_argument()
+  exprt &default_argument()
   {
     return static_cast<exprt &>(add(ID_C_default_value));
   }
 
-  inline const exprt &default_argument() const
+  const exprt &default_argument() const
   {
     return static_cast<const exprt &>(find(ID_C_default_value));
   }

@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: A minimalistic BDD library, following Bryant's original paper
+        and Andersen's lecture notes
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <iostream>
 
 #include "miniBDD.h"
@@ -12,14 +21,14 @@ int main()
     auto x=mgr.Var("x");
     auto y=mgr.Var("y");
     auto z=mgr.Var("z");
-    result=x | (y & z);
+    result=x | (y &z);
   }
   #elif 0
   {
     auto y=mgr.Var("y");
     auto x=mgr.Var("x");
     auto z=mgr.Var("z");
-    result=x | (y & z);
+    result=x | (y &z);
   }
   #elif 0
   {

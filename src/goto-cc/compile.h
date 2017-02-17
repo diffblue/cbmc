@@ -45,7 +45,7 @@ public:
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
 
-  compilet(cmdlinet &_cmdline);
+  explicit compilet(cmdlinet &_cmdline);
 
   ~compilet();
 
@@ -61,10 +61,14 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file( const std::string &, const symbol_tablet &,
-                          goto_functionst &);
-  bool write_bin_object_file( const std::string&, const symbol_tablet &,
-                              goto_functionst& );
+  bool write_object_file(
+    const std::string &,
+    const symbol_tablet &,
+    goto_functionst &);
+  bool write_bin_object_file(
+    const std::string &,
+    const symbol_tablet &,
+    goto_functionst &);
 
 protected:
   cmdlinet &cmdline;

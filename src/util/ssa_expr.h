@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class ssa_exprt:public symbol_exprt
 {
 public:
-  inline ssa_exprt()
+  ssa_exprt()
   {
     set(ID_C_SSA_symbol, true);
   }
@@ -24,7 +24,7 @@ public:
   /*! \brief Constructor
    * \param expr Expression to be converted to SSA symbol
   */
-  inline explicit ssa_exprt(const exprt &expr):
+  explicit ssa_exprt(const exprt &expr):
     symbol_exprt(expr.type())
   {
     set(ID_C_SSA_symbol, true);
@@ -32,24 +32,24 @@ public:
     update_identifier();
   }
 
-  inline void update_type()
+  void update_type()
   {
     static_cast<exprt &>(add(ID_expression)).type()=type();
   }
 
-  inline const exprt &get_original_expr() const
+  const exprt &get_original_expr() const
   {
     return static_cast<const exprt &>(find(ID_expression));
   }
 
-  inline const irep_idt &get_object_name() const
+  const irep_idt &get_object_name() const
   {
     object_descriptor_exprt ode;
     ode.object()=get_original_expr();
     return to_symbol_expr(ode.root_object()).get_identifier();
   }
 
-  inline const ssa_exprt get_l1_object() const
+  const ssa_exprt get_l1_object() const
   {
     object_descriptor_exprt ode;
     ode.object()=get_original_expr();
@@ -62,7 +62,7 @@ public:
     return root;
   }
 
-  inline const irep_idt get_l1_object_identifier() const
+  const irep_idt get_l1_object_identifier() const
   {
     #if 0
     return get_l1_object().get_identifier();
@@ -73,47 +73,47 @@ public:
     #endif
   }
 
-  inline const irep_idt get_original_name() const
+  const irep_idt get_original_name() const
   {
     ssa_exprt o(get_original_expr());
     return o.get_identifier();
   }
 
-  inline void set_level_0(unsigned i)
+  void set_level_0(unsigned i)
   {
     set(ID_L0, i);
     update_identifier();
   }
 
-  inline void set_level_1(unsigned i)
+  void set_level_1(unsigned i)
   {
     set(ID_L1, i);
     update_identifier();
   }
 
-  inline void set_level_2(unsigned i)
+  void set_level_2(unsigned i)
   {
     set(ID_L2, i);
     update_identifier();
   }
 
-  inline void remove_level_2()
+  void remove_level_2()
   {
     remove(ID_L2);
     update_identifier();
   }
 
-  inline const irep_idt get_level_0() const
+  const irep_idt get_level_0() const
   {
     return get(ID_L0);
   }
 
-  inline const irep_idt get_level_1() const
+  const irep_idt get_level_1() const
   {
     return get(ID_L1);
   }
 
-  inline const irep_idt get_level_2() const
+  const irep_idt get_level_2() const
   {
     return get(ID_L2);
   }
@@ -146,7 +146,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
+inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
   assert(expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol) &&
@@ -157,7 +157,7 @@ extern inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 /*! \copydoc to_ssa_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline ssa_exprt &to_ssa_expr(exprt &expr)
+inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
   assert(expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol) &&
@@ -165,7 +165,7 @@ extern inline ssa_exprt &to_ssa_expr(exprt &expr)
   return static_cast<ssa_exprt &>(expr);
 }
 
-extern inline bool is_ssa_expr(const exprt &expr)
+inline bool is_ssa_expr(const exprt &expr)
 {
   return expr.id()==ID_symbol &&
          expr.get_bool(ID_C_SSA_symbol);

@@ -23,7 +23,7 @@ public:
   std::size_t width;
   bool is_signed;
 
-  bv_spect(const typet &type)
+  explicit bv_spect(const typet &type)
   {
     from_type(type);
   }
@@ -38,6 +38,11 @@ public:
   mp_integer min_value() const;
 
   typet to_type() const;
+
+  bool operator==(const bv_spect &other) const
+  {
+    return width==other.width && is_signed==other.is_signed;
+  }
 };
 
 class bv_arithmetict
@@ -45,7 +50,7 @@ class bv_arithmetict
 public:
   bv_spect spec;
 
-  bv_arithmetict(const bv_spect &_spec):
+  explicit bv_arithmetict(const bv_spect &_spec):
     spec(_spec), value(0)
   {
   }
@@ -54,7 +59,7 @@ public:
   {
   }
 
-  bv_arithmetict(const exprt &expr)
+  explicit bv_arithmetict(const exprt &expr)
   {
     from_expr(expr);
   }
@@ -88,23 +93,23 @@ public:
   exprt to_expr() const;
   void from_expr(const exprt &expr);
 
-  bv_arithmetict &operator /= (const bv_arithmetict &other);
-  bv_arithmetict &operator *= (const bv_arithmetict &other);
-  bv_arithmetict &operator += (const bv_arithmetict &other);
-  bv_arithmetict &operator -= (const bv_arithmetict &other);
-  bv_arithmetict &operator %= (const bv_arithmetict &other);
+  bv_arithmetict &operator/=(const bv_arithmetict &other);
+  bv_arithmetict &operator*=(const bv_arithmetict &other);
+  bv_arithmetict &operator+=(const bv_arithmetict &other);
+  bv_arithmetict &operator-=(const bv_arithmetict &other);
+  bv_arithmetict &operator%=(const bv_arithmetict &other);
 
-  friend bool operator < (const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator <=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator > (const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator >=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b);
-  friend bool operator ==(const bv_arithmetict &a, int i);
+  bool operator<(const bv_arithmetict &other);
+  bool operator<=(const bv_arithmetict &other);
+  bool operator>(const bv_arithmetict &other);
+  bool operator>=(const bv_arithmetict &other);
+  bool operator==(const bv_arithmetict &other);
+  bool operator!=(const bv_arithmetict &other);
+  bool operator==(int i);
 
-  friend std::ostream& operator << (std::ostream &out, const bv_arithmetict &f)
+  std::ostream &operator<<(std::ostream &out)
   {
-    return out << f.to_ansi_c_string();
+    return out << to_ansi_c_string();
   }
 
   // turn into natural number representation
@@ -118,13 +123,5 @@ protected:
   // puts the value back into its range
   void adjust();
 };
-
-bool operator < (const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator <=(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator > (const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator >=(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator ==(const bv_arithmetict &a, const bv_arithmetict &b);
-bool operator !=(const bv_arithmetict &a, const bv_arithmetict &b);
-std::ostream& operator << (std::ostream &, const bv_arithmetict &);
 
 #endif // CPROVER_UTIL_BV_ARITHMETIC_H

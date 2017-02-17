@@ -33,7 +33,7 @@ public:
   static object_numberingt object_numbering;
   static hash_numbering<irep_idt, irep_id_hash> function_numbering;
 
-  void set_from(const irep_idt& function, unsigned inx)
+  void set_from(const irep_idt &function, unsigned inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;
@@ -71,12 +71,14 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt blank;
+    static const object_map_dt blank;
 
     typedef std::map<unsigned, objectt> objmapt;
     objmapt objmap;
 
+    // NOLINTNEXTLINE(readability/identifiers)
     typedef objmapt::const_iterator const_iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
     typedef objmapt::iterator iterator;
 
     const_iterator find(unsigned k) { return objmap.find(k); }
@@ -87,15 +89,20 @@ public:
     size_t size(void) const { return objmap.size(); }
     void clear(void) { objmap.clear(); validity_ranges.clear(); }
 
-    objectt& operator[](unsigned k) {
+    objectt &operator[](unsigned k)
+    {
       return objmap[k];
     }
 
     // operator[] is the only way to insert something!
-    std::pair<iterator,bool> insert (const std::pair<unsigned,objectt>&)
-      { assert(false); }
-    iterator insert(iterator, const std::pair<unsigned,objectt>&)
-      { assert(false); }
+    std::pair<iterator, bool> insert(const std::pair<unsigned, objectt>&)
+    {
+      assert(false);
+    }
+    iterator insert(iterator, const std::pair<unsigned, objectt>&)
+    {
+      assert(false);
+    }
 
     class validity_ranget
     {
@@ -103,11 +110,15 @@ public:
       unsigned function;
       unsigned from, to;
 
-      validity_ranget(void) :
-        function(0),from(0), to(0) {};
+      validity_ranget(void):
+        function(0), from(0), to(0)
+      {
+      }
 
-      validity_ranget(unsigned fnc, unsigned f, unsigned t) :
-        function(fnc),from(f), to(t) {};
+      validity_ranget(unsigned fnc, unsigned f, unsigned t):
+        function(fnc), from(f), to(t)
+      {
+      }
 
       bool contains(unsigned f, unsigned line) const
       {
@@ -116,7 +127,7 @@ public:
     };
 
     typedef std::list<validity_ranget> vrange_listt;
-    typedef std::map<unsigned,vrange_listt> validity_rangest;
+    typedef std::map<unsigned, vrange_listt> validity_rangest;
     validity_rangest validity_ranges;
 
     bool set_valid_at(unsigned inx, unsigned f, unsigned line);
@@ -142,14 +153,20 @@ public:
     return insert_to(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert_to(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert_to(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert_to(dest, object_numbering.number(src), objectt(offset));
   }
 
   bool insert_to(object_mapt &dest, unsigned n, const objectt &object) const;
 
-  bool insert_to(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert_to(
+    object_mapt &dest,
+    const exprt &expr,
+    const objectt &object) const
   {
     return insert_to(dest, object_numbering.number(expr), object);
   }
@@ -164,14 +181,20 @@ public:
     return insert_from(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert_from(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert_from(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert_from(dest, object_numbering.number(src), objectt(offset));
   }
 
   bool insert_from(object_mapt &dest, unsigned n, const objectt &object) const;
 
-  bool insert_from(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert_from(
+    object_mapt &dest,
+    const exprt &expr,
+    const objectt &object) const
   {
     return insert_from(dest, object_numbering.number(expr), object);
   }

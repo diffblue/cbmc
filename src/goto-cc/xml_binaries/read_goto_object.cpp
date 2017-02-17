@@ -49,12 +49,12 @@ bool read_goto_object(
   xml_parser.in = &in;
   xml_parser.set_message_handler(message_handler);
 
-  if (xml_parser.parse())
+  if(xml_parser.parse())
     return true;
 
   xmlt &top = xml_parser.parse_tree.element;
 
-  if (top.get_attribute("version")!=XML_VERSION)
+  if(top.get_attribute("version")!=XML_VERSION)
   {
     message.error() <<
       "The input was compiled with a different version of "
@@ -75,7 +75,7 @@ bool read_goto_object(
         sec_it++)
     {
       xmlt sec = *sec_it;
-      if (sec.name=="irep_hash_map")
+      if(sec.name=="irep_hash_map")
       {
         for(xmlt::elementst::const_iterator
             irep_it = sec.elements.begin();
@@ -87,7 +87,7 @@ bool read_goto_object(
           irepconverter.insert(irep_it->get_attribute("id"), i);
         }
       }
-      else if (sec.name=="symbols")
+      else if(sec.name=="symbols")
       {
         for(xmlt::elementst::const_iterator
             sym_it = sec.elements.begin();
@@ -109,7 +109,7 @@ bool read_goto_object(
           symbol_table.add(symbol);
         }
       }
-      else if (sec.name=="functions")
+      else if(sec.name=="functions")
       {
         for(xmlt::elementst::const_iterator
             fun_it = sec.elements.begin();
@@ -117,7 +117,7 @@ bool read_goto_object(
             fun_it++)
         {
           std::string fname = fun_it->get_attribute("name");
-          //std::cout << "Adding function body: " << fname << std::endl;
+          // std::cout << "Adding function body: " << fname << std::endl;
           goto_functionst::goto_functiont &f = functions.function_map[fname];
           gfconverter.convert(*fun_it, f);
         }
@@ -128,7 +128,6 @@ bool read_goto_object(
                         << "' in object file." << messaget::eom;
         return true;
       }
-
     }
   }
   else

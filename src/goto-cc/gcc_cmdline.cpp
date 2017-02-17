@@ -382,7 +382,8 @@ bool gcc_cmdlinet::parse_arguments(
           else
             set(argv_i, "");
         }
-        else if(has_prefix(argv_i, std::string(*o)+"=")) // concatenated with "="
+        // concatenated with "="
+        else if(has_prefix(argv_i, std::string(*o)+"="))
         {
           found=true;
           set(*o, argv_i.substr(strlen(*o)+1));

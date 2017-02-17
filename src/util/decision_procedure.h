@@ -32,10 +32,10 @@ public:
   // the expression must be of Boolean type
   virtual void set_to(const exprt &expr, bool value)=0;
 
-  inline void set_to_true(const exprt &expr)
+  void set_to_true(const exprt &expr)
   { set_to(expr, true); }
 
-  inline void set_to_false(const exprt &expr)
+  void set_to_false(const exprt &expr)
   { set_to(expr, false); }
 
   // solve the problem
@@ -44,7 +44,7 @@ public:
   // will eventually be protected, use below call operator
   virtual resultt dec_solve()=0;
 
-  inline resultt operator()()
+  resultt operator()()
   {
     return dec_solve();
   }
@@ -59,7 +59,7 @@ protected:
   const namespacet &ns;
 };
 
-static inline decision_proceduret & operator << (
+inline decision_proceduret &operator<<(
   decision_proceduret &dest,
   const exprt &src)
 {

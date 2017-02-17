@@ -30,7 +30,7 @@ string_ptrt::string_ptrt(const char *_s):s(_s), len(strlen(_s))
 
 /*******************************************************************\
 
-Function: operator==
+Function: string_ptrt::operator==
 
   Inputs:
 
@@ -40,11 +40,12 @@ Function: operator==
 
 \*******************************************************************/
 
-bool operator==(const string_ptrt a, const string_ptrt b)
+bool string_ptrt::operator==(const string_ptrt &other) const
 {
-  if(a.len!=b.len) return false;
-  if(a.len==0) return true;
-  return memcmp(a.s, b.s, a.len)==0;
+  if(len!=other.len)
+    return false;
+
+  return len==0 || memcmp(s, other.s, len)==0;
 }
 
 /*******************************************************************\

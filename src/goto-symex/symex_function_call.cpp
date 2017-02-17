@@ -161,13 +161,15 @@ void goto_symext::parameter_assignments(
     // These are va_arg arguments; their types may differ from call to call
     unsigned va_count=0;
     const symbolt *va_sym=0;
-    while(!ns.lookup(id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
-                    va_sym))
+    while(!ns.lookup(
+        id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
+        va_sym))
       ++va_count;
 
     for( ; it1!=arguments.end(); it1++, va_count++)
     {
-      irep_idt id=id2string(function_identifier)+"::va_arg"+std::to_string(va_count);
+      irep_idt id=
+        id2string(function_identifier)+"::va_arg"+std::to_string(va_count);
 
       // add to symbol table
       symbolt symbol;
@@ -547,10 +549,11 @@ void goto_symext::return_assignment(statet &state)
 
       if(!base_type_eq(assignment.lhs().type(),
                        assignment.rhs().type(), ns))
-        throw "goto_symext::return_assignment type mismatch at "+
-              instruction.source_location.as_string()+":\n"+
-              "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
-              "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
+        throw
+          "goto_symext::return_assignment type mismatch at "+
+          instruction.source_location.as_string()+":\n"+
+          "assignment.lhs().type():\n"+assignment.lhs().type().pretty()+"\n"+
+          "assignment.rhs().type():\n"+assignment.rhs().type().pretty();
 
       symex_assign_rec(state, assignment);
     }

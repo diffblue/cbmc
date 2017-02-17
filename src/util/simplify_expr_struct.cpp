@@ -29,7 +29,8 @@ Function: simplify_exprt::simplify_member
 
 bool simplify_exprt::simplify_member(exprt &expr)
 {
-  if(expr.operands().size()!=1) return true;
+  if(expr.operands().size()!=1)
+    return true;
 
   const irep_idt &component_name=
     to_member_expr(expr).get_component_name();
@@ -168,7 +169,8 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
       // add member offset to index
       mp_integer offset_int=member_offset(struct_type, component_name, ns);
-      if(offset_int==-1) return true;
+      if(offset_int==-1)
+        return true;
 
       const exprt &struct_offset=op.op1();
       exprt member_offset=from_integer(offset_int, struct_offset.type());

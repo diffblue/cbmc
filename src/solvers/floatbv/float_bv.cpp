@@ -43,12 +43,20 @@ exprt float_bvt::convert(const exprt &expr)
 
     if(dest_type.id()==ID_signedbv &&
        src_type.id()==ID_floatbv) // float -> signed
-      return to_signed_integer(
-        expr.op0(), to_signedbv_type(dest_type).get_width(), expr.op1(), get_spec(expr.op0()));
+      return
+        to_signed_integer(
+          expr.op0(),
+          to_signedbv_type(dest_type).get_width(),
+          expr.op1(),
+          get_spec(expr.op0()));
     else if(dest_type.id()==ID_unsignedbv &&
             src_type.id()==ID_floatbv) // float -> unsigned
-      return to_unsigned_integer(
-        expr.op0(), to_unsignedbv_type(dest_type).get_width(), expr.op1(), get_spec(expr.op0()));
+      return
+        to_unsigned_integer(
+          expr.op0(),
+          to_unsignedbv_type(dest_type).get_width(),
+          expr.op1(),
+          get_spec(expr.op0()));
     else if(src_type.id()==ID_signedbv &&
             dest_type.id()==ID_floatbv) // signed -> float
       return from_signed_integer(
@@ -59,7 +67,9 @@ exprt float_bvt::convert(const exprt &expr)
         expr.op0(), expr.op1(), get_spec(expr));
     else if(dest_type.id()==ID_floatbv &&
             src_type.id()==ID_floatbv) // float -> float
-      return conversion(expr.op0(), expr.op1(), get_spec(expr.op0()), get_spec(expr));
+      return
+        conversion(
+          expr.op0(), expr.op1(), get_spec(expr.op0()), get_spec(expr));
     else
       return nil_exprt();
   }
@@ -305,8 +315,10 @@ Function: float_bvt::rounding_mode_bitst::get
 void float_bvt::rounding_mode_bitst::get(const exprt &rm)
 {
   exprt round_to_even_const=from_integer(ieee_floatt::ROUND_TO_EVEN, rm.type());
-  exprt round_to_plus_inf_const=from_integer(ieee_floatt::ROUND_TO_PLUS_INF, rm.type());
-  exprt round_to_minus_inf_const=from_integer(ieee_floatt::ROUND_TO_MINUS_INF, rm.type());
+  exprt round_to_plus_inf_const=
+    from_integer(ieee_floatt::ROUND_TO_PLUS_INF, rm.type());
+  exprt round_to_minus_inf_const=
+    from_integer(ieee_floatt::ROUND_TO_MINUS_INF, rm.type());
   exprt round_to_zero_const=from_integer(ieee_floatt::ROUND_TO_ZERO, rm.type());
 
   round_to_even=equal_exprt(rm, round_to_even_const);
@@ -625,8 +637,10 @@ exprt float_bvt::subtract_exponents(
   std::size_t old_width2=to_signedbv_type(src2.exponent.type()).get_width();
   assert(old_width1==old_width2);
 
-  exprt extended_exponent1=typecast_exprt(src1.exponent, signedbv_typet(old_width1+1));
-  exprt extended_exponent2=typecast_exprt(src2.exponent, signedbv_typet(old_width2+1));
+  exprt extended_exponent1=
+    typecast_exprt(src1.exponent, signedbv_typet(old_width1+1));
+  exprt extended_exponent2=
+    typecast_exprt(src2.exponent, signedbv_typet(old_width2+1));
 
   assert(extended_exponent1.type()==extended_exponent2.type());
 
@@ -684,8 +698,10 @@ exprt float_bvt::add_sub(
   // pad fractions with 3 zeros from below
   exprt three_zeros=from_integer(0, unsignedbv_typet(3));
   // add 4 to spec.f because unpacked new_fraction has the hidden bit
-  const exprt fraction1_padded=concatenation_exprt(new_fraction1, three_zeros, unsignedbv_typet(spec.f+4));
-  const exprt fraction2_padded=concatenation_exprt(new_fraction2, three_zeros, unsignedbv_typet(spec.f+4));
+  const exprt fraction1_padded=
+    concatenation_exprt(new_fraction1, three_zeros, unsignedbv_typet(spec.f+4));
+  const exprt fraction2_padded=
+    concatenation_exprt(new_fraction2, three_zeros, unsignedbv_typet(spec.f+4));
 
   // shift new_fraction2
   exprt sticky_bit;
@@ -702,8 +718,10 @@ exprt float_bvt::add_sub(
                                     fraction2_shifted.type()));
 
   // need to have two extra fraction bits for addition and rounding
-  const exprt fraction1_ext=typecast_exprt(fraction1_shifted, unsignedbv_typet(spec.f+4+2));
-  const exprt fraction2_ext=typecast_exprt(fraction2_stickied, unsignedbv_typet(spec.f+4+2));
+  const exprt fraction1_ext=
+    typecast_exprt(fraction1_shifted, unsignedbv_typet(spec.f+4+2));
+  const exprt fraction2_ext=
+    typecast_exprt(fraction2_stickied, unsignedbv_typet(spec.f+4+2));
 
   unbiased_floatt result;
 
@@ -717,10 +735,13 @@ exprt float_bvt::add_sub(
       plus_exprt(fraction1_ext, fraction2_ext));
 
   // sign of result
-  std::size_t width = to_bitvector_type(result.fraction.type()).get_width();
-  exprt fraction_sign=sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
-  result.fraction=typecast_exprt(abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
-                                unsignedbv_typet(width));
+  std::size_t width=to_bitvector_type(result.fraction.type()).get_width();
+  exprt fraction_sign=
+    sign_exprt(typecast_exprt(result.fraction, signedbv_typet(width)));
+  result.fraction=
+    typecast_exprt(
+      abs_exprt(typecast_exprt(result.fraction, signedbv_typet(width))),
+      unsignedbv_typet(width));
 
   result.exponent=bigger_exponent;
 
@@ -942,12 +963,15 @@ exprt float_bvt::div(
   // we throw this into the result, as least-significand bit,
   // to get the right rounding decision
   result.fraction=
-    concatenation_exprt(result.fraction, have_remainder, unsignedbv_typet(div_width+1));
+    concatenation_exprt(
+      result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
   // We will subtract the exponents;
   // to account for overflow, we add a bit.
-  const exprt exponent1=typecast_exprt(unpacked1.exponent, signedbv_typet(spec.e+1));
-  const exprt exponent2=typecast_exprt(unpacked2.exponent, signedbv_typet(spec.e+1));
+  const exprt exponent1=
+    typecast_exprt(unpacked1.exponent, signedbv_typet(spec.e+1));
+  const exprt exponent2=
+    typecast_exprt(unpacked2.exponent, signedbv_typet(spec.e+1));
 
   // subtract exponents
   exprt added_exponent=minus_exprt(exponent1, exponent2);
@@ -1061,7 +1085,8 @@ exprt float_bvt::relation(
     {
       exprt and_bv(ID_and, bool_typet());
       and_bv.copy_to_operands(less_than3);
-      and_bv.copy_to_operands(not_exprt(bitwise_equal)); // for the case of two negative numbers
+      // for the case of two negative numbers
+      and_bv.copy_to_operands(not_exprt(bitwise_equal));
       and_bv.copy_to_operands(not_exprt(both_zero));
       and_bv.copy_to_operands(not_exprt(nan));
 

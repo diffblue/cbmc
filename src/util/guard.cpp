@@ -177,8 +177,13 @@ Function: operator |=
 
 guardt &operator |= (guardt &g1, const guardt &g2)
 {
-  if(g2.is_false() || g1.is_true()) return g1;
-  if(g1.is_false() || g2.is_true()) { g1=g2; return g1; }
+  if(g2.is_false() || g1.is_true())
+    return g1;
+  if(g1.is_false() || g2.is_true())
+  {
+    g1=g2;
+    return g1;
+  }
 
   if(g1.id()!=ID_and || g2.id()!=ID_and)
   {
@@ -229,7 +234,8 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     it1=op1.erase(it1);
   }
 
-  if(n_op2.empty()) return g1;
+  if(n_op2.empty())
+    return g1;
 
   // end of common prefix
   exprt and_expr1=conjunction(n_op1);

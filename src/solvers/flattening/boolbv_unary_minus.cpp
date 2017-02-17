@@ -81,8 +81,7 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 
       if(type.subtype().id()==ID_floatbv)
       {
-        float_utilst float_utils(prop);
-        float_utils.spec=to_floatbv_type(subtype);
+        float_utilst float_utils(prop, to_floatbv_type(subtype));
         tmp_result=float_utils.negate(tmp_op);
       }
       else
@@ -109,8 +108,7 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
   else if(bvtype==IS_FLOAT && op_bvtype==IS_FLOAT)
   {
     assert(!no_overflow);
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
+    float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.negate(op_bv);
   }
   else if((op_bvtype==IS_SIGNED || op_bvtype==IS_UNSIGNED) &&

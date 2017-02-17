@@ -24,7 +24,8 @@ public:
   typedef eventst::const_iterator event_it;
 
   // the name of a clock variable for a shared read/write
-  typedef enum {
+  typedef enum
+  {
     AX_SC_PER_LOCATION=1,
     AX_NO_THINAIR=2,
     AX_OBSERVATION=4,
@@ -63,7 +64,7 @@ protected:
   }
 
   // produces an address ID for an event
-  inline irep_idt address(event_it event) const
+  irep_idt address(event_it event) const
   {
     ssa_exprt tmp=event->ssa_lhs;
     tmp.remove_level_2();
@@ -85,7 +86,6 @@ protected:
   // the partial order constraint for two events
   exprt before(event_it e1, event_it e2, unsigned axioms);
   virtual exprt before(event_it e1, event_it e2)=0;
-
 };
 
 #if 0
@@ -104,6 +104,7 @@ class numbered_evtst
 
 public:
   typedef std::vector<evtt const*> ordered_evtst;
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef ordered_evtst::const_iterator const_iterator;
   typedef std::map<evtt const*, ordered_evtst::size_type> ordered_evts_mapt;
 
@@ -190,7 +191,8 @@ class partial_order_concurrencyt
 {
 public:
   // the is-acyclic checks
-  typedef enum {
+  typedef enum
+  {
     AC_UNIPROC=0,
     AC_THINAIR=1,
     AC_GHB=2,
@@ -256,7 +258,7 @@ public:
       const std::string &po_name,
       const evtt &n1,
       const evtt &n2,
-      const exprt& cond);
+      const exprt &cond);
   void add_partial_order_constraint(
       const acyclict check,
       const std::string &po_name,
@@ -266,17 +268,17 @@ public:
       const evtt &n2,
       const unsigned n2_step,
       const evtt::event_dirt n2_o_d,
-      const exprt& cond);
+      const exprt &cond);
 
   const evtt* first_of(const evtt &e1, const evtt &e2) const;
-  const numbered_evtst& get_thread(const evtt &e) const;
-  const numbered_per_thread_evtst& get_all_threads() const
+  const numbered_evtst &get_thread(const evtt &e) const;
+  const numbered_per_thread_evtst &get_all_threads() const
   {
     return per_thread_evt_no;
   }
 
-  const namespacet& get_ns() const { return ns; }
-  messaget& get_message() { return message; }
+  const namespacet &get_ns() const { return ns; }
+  messaget &get_message() { return message; }
   std::map<std::string, unsigned> num_concurrency_constraints;
 
 private:
@@ -301,16 +303,18 @@ private:
   // map between events and (symbolic) integers
   typet node_type;
   std::map<evtt const*, unsigned> barrier_id;
-  inline symbol_exprt node_symbol(
+  symbol_exprt node_symbol(
       const evtt &evt,
       const std::string &prefix) const;
-  std::vector<std::pair<symbol_exprt, symbol_exprt> > atomic_section_bounds[AC_N_AXIOMS];
+  std::vector<std::pair<symbol_exprt, symbol_exprt>>
+    atomic_section_bounds[AC_N_AXIOMS];
 
   std::list<exprt> acyclic_constraints[AC_N_AXIOMS];
   static std::string check_to_string(const acyclict check);
 
   // map point-wise order to a single Boolean symbol
-  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt> > evt_dir_pairt;
+  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt>>
+    evt_dir_pairt;
   typedef std::map<std::pair<evt_dir_pairt, evt_dir_pairt>,
           symbol_exprt> pointwise_mapt;
   pointwise_mapt edge_cache[AC_N_AXIOMS];
@@ -353,7 +357,7 @@ private:
   void print_graph(
       const adj_matrixt &graph,
       const std::string &edge_label,
-      namespacet const& ns) const;
+      namespacet const &ns) const;
 };
 #endif
 

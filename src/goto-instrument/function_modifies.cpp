@@ -46,7 +46,8 @@ void function_modifiest::get_modifies_lhs(
   else if(lhs.id()==ID_if)
   {
     get_modifies_lhs(local_may_alias, t, to_if_expr(lhs).true_case(), modifies);
-    get_modifies_lhs(local_may_alias, t, to_if_expr(lhs).false_case(), modifies);
+    get_modifies_lhs(
+      local_may_alias, t, to_if_expr(lhs).false_case(), modifies);
   }
 }
 

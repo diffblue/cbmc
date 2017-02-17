@@ -72,7 +72,8 @@ void parameter_assignmentst::do_function_calls(
       {
         irep_idt p_identifier=code_type.parameters()[nr].get_identifier();
 
-        if(p_identifier.empty()) continue;
+        if(p_identifier.empty())
+          continue;
 
         if(nr<function_call.arguments().size())
         {
@@ -82,7 +83,8 @@ void parameter_assignmentst::do_function_calls(
           const symbolt &lhs_symbol=ns.lookup(p_identifier);
           symbol_exprt lhs=lhs_symbol.symbol_expr();
           exprt rhs=function_call.arguments()[nr];
-          if(rhs.type()!=lhs.type()) rhs.make_typecast(lhs.type());
+          if(rhs.type()!=lhs.type())
+            rhs.make_typecast(lhs.type());
           t->code=code_assignt(lhs, rhs);
           t->function=i_it->function;
         }

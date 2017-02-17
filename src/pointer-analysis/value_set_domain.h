@@ -21,7 +21,7 @@ public:
 
   // overloading
 
-  inline bool merge(const value_set_domaint &other, locationt to)
+  bool merge(const value_set_domaint &other, locationt to)
   {
     return value_set.make_union(other.value_set);
   }
@@ -53,7 +53,6 @@ public:
   {
     value_set.get_reference_set(expr, dest, ns);
   }
-
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H

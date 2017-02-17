@@ -15,7 +15,7 @@ Date: 2013
 
 #include "event_graph.h"
 
-#define OUTPUT(s,fence,file,line,id,type)  \
+#define OUTPUT(s, fence, file, line, id, type)  \
   s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<std::endl
 
 /*******************************************************************\
@@ -30,7 +30,7 @@ Function: event_grapht::graph_explorert::collect_pairs
 
 \*******************************************************************/
 
-void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet& ns)
+void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
 {
   std::ofstream res;
   res.open("results.txt");
@@ -52,14 +52,17 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet& ns)
     /* find Y s.t. X --po-- Y and Y --cmp-- B, by rules (2) + (4) */
     if(find_second_event(first))
     {
-      const abstract_eventt& first_event=egraph[first];
+      const abstract_eventt &first_event=egraph[first];
 
-      try {
+      try
+      {
         /* directly outputs */
         OUTPUT(res, "fence", first_event.source_location.get_file(),
           first_event.source_location.get_line(), first_event.variable,
             first_event.operation);
-      } catch (std::string s) {
+      }
+      catch(std::string s)
+      {
         egraph.message.warning() << "failed to find" << s << messaget::eom;
         continue;
       }

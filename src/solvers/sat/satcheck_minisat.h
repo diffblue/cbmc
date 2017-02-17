@@ -27,7 +27,7 @@ public:
   virtual resultt prop_solve() override;
   virtual tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv) override final;
+  virtual void lcnf(const bvt &bv) final;
 
   virtual void set_assignment(literalt a, bool value) override;
 
@@ -41,6 +41,7 @@ public:
   virtual bool is_in_conflict(literalt l) const override;
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   class Solver *solver;
   void add_variables();
   bvt assumptions;
@@ -61,9 +62,10 @@ public:
 
   virtual const std::string solver_text() override;
   simple_prooft &get_resolution_proof();
-  //void set_partition_id(unsigned p_id);
+  // void set_partition_id(unsigned p_id);
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   class Proof *proof;
   class minisat_prooft *minisat_proof;
 };

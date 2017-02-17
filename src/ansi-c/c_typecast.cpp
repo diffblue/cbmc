@@ -137,7 +137,8 @@ bool check_c_implicit_typecast(
      !dest_type.subtype().get_bool(ID_C_constant))
     return true;
 
-  if(src_type==dest_type) return false;
+  if(src_type==dest_type)
+    return false;
 
   const irep_idt &src_type_id=src_type.id();
 
@@ -149,60 +150,65 @@ bool check_c_implicit_typecast(
 
   if(src_type_id==ID_natural)
   {
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_integer) return false;
-    if(dest_type.id()==ID_real) return false;
-    if(dest_type.id()==ID_complex) return false;
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_signedbv) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_integer ||
+       dest_type.id()==ID_real ||
+       dest_type.id()==ID_complex ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_integer)
   {
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_real) return false;
-    if(dest_type.id()==ID_complex) return false;
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_signedbv) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_pointer) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_real ||
+       dest_type.id()==ID_complex ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_pointer ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_real)
   {
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_complex) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_complex ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_rational)
   {
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_complex) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_complex ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_bool)
   {
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_integer) return false;
-    if(dest_type.id()==ID_real) return false;
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_signedbv) return false;
-    if(dest_type.id()==ID_pointer) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_c_enum) return false;
-    if(dest_type.id()==ID_c_enum_tag) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_integer ||
+       dest_type.id()==ID_real ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_pointer ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_c_enum ||
+       dest_type.id()==ID_c_enum_tag ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_unsignedbv ||
           src_type_id==ID_signedbv ||
@@ -211,34 +217,36 @@ bool check_c_implicit_typecast(
           src_type_id==ID_incomplete_c_enum ||
           src_type_id==ID_c_bool)
   {
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_integer) return false;
-    if(dest_type.id()==ID_real) return false;
-    if(dest_type.id()==ID_rational) return false;
-    if(dest_type.id()==ID_signedbv) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_pointer) return false;
-    if(dest_type.id()==ID_c_enum) return false;
-    if(dest_type.id()==ID_c_enum_tag) return false;
-    if(dest_type.id()==ID_incomplete_c_enum) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_integer ||
+       dest_type.id()==ID_real ||
+       dest_type.id()==ID_rational ||
+       dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_pointer ||
+       dest_type.id()==ID_c_enum ||
+       dest_type.id()==ID_c_enum_tag ||
+       dest_type.id()==ID_incomplete_c_enum ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_floatbv ||
           src_type_id==ID_fixedbv)
   {
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_integer) return false;
-    if(dest_type.id()==ID_real) return false;
-    if(dest_type.id()==ID_rational) return false;
-    if(dest_type.id()==ID_signedbv) return false;
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_floatbv) return false;
-    if(dest_type.id()==ID_fixedbv) return false;
-    if(dest_type.id()==ID_complex) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_integer ||
+       dest_type.id()==ID_real ||
+       dest_type.id()==ID_rational ||
+       dest_type.id()==ID_signedbv ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_floatbv ||
+       dest_type.id()==ID_fixedbv ||
+       dest_type.id()==ID_complex)
+      return false;
   }
   else if(src_type_id==ID_complex)
   {
@@ -272,12 +280,14 @@ bool check_c_implicit_typecast(
     }
 
     if(dest_type.id()==ID_array &&
-       src_type.subtype()==dest_type.subtype()) return false;
+       src_type.subtype()==dest_type.subtype())
+      return false;
 
-    if(dest_type.id()==ID_bool) return false;
-    if(dest_type.id()==ID_c_bool) return false;
-    if(dest_type.id()==ID_unsignedbv) return false;
-    if(dest_type.id()==ID_signedbv) return false;
+    if(dest_type.id()==ID_bool ||
+       dest_type.id()==ID_c_bool ||
+       dest_type.id()==ID_unsignedbv ||
+       dest_type.id()==ID_signedbv)
+      return false;
   }
   else if(src_type_id==ID_vector)
   {
@@ -312,7 +322,8 @@ Function: c_typecastt::follow_with_qualifiers
 
 typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 {
-  if(src_type.id()!=ID_symbol) return src_type;
+  if(src_type.id()!=ID_symbol)
+    return src_type;
 
   typet result_type=src_type;
 
@@ -475,6 +486,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case SINGLE:     new_type=float_type(); break;
   case DOUBLE:     new_type=double_type(); break;
   case LONGDOUBLE: new_type=long_double_type(); break;
+  // NOLINTNEXTLINE(whitespace/line_length)
   case FLOAT128:   new_type=ieee_float_spect::quadruple_precision().to_type(); break;
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
@@ -620,7 +632,7 @@ void c_typecastt::implicit_typecast_followed(
         // build union constructor
         exprt union_expr(ID_union, orig_dest_type);
         union_expr.move_to_operands(expr);
-        if(!full_eq(src_type, src_type_no_const))
+        if(!src_type.full_eq(src_type_no_const))
           do_typecast(union_expr.op0(), src_type_no_const);
         union_expr.set(ID_component_name, comp.get_name());
         expr=union_expr;
@@ -667,8 +679,12 @@ void c_typecastt::implicit_typecast_followed(
       {
         // ok
       }
-      else if((is_number(src_sub) || src_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag) &&
-              (is_number(dest_sub) || dest_sub.id()==ID_c_enum || src_sub.id()==ID_c_enum_tag))
+      else if((is_number(src_sub) ||
+               src_sub.id()==ID_c_enum ||
+               src_sub.id()==ID_c_enum_tag) &&
+              (is_number(dest_sub) ||
+               dest_sub.id()==ID_c_enum ||
+               src_sub.id()==ID_c_enum_tag))
       {
         // Also generous: between any to scalar types it's ok.
         // We should probably check the size.
@@ -758,7 +774,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   else if(max_type==FIXEDBV)
   {
     typet result_type;
-    
+
     if(c_type1==FIXEDBV && c_type2==FIXEDBV)
     {
       // get bigger of both
@@ -776,7 +792,7 @@ void c_typecastt::implicit_typecast_arithmetic(
 
     do_typecast(expr1, result_type);
     do_typecast(expr2, result_type);
-    
+
     return;
   }
   else if(max_type==COMPLEX)

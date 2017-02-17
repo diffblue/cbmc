@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_OVERFLOW_INSTRUMENTER_H
 
@@ -11,7 +19,8 @@
 
 #include "cone_of_influence.h"
 
-class overflow_instrumentert {
+class overflow_instrumentert
+{
  public:
   overflow_instrumentert(goto_programt &_program,
       const exprt &_overflow_var,
@@ -25,7 +34,9 @@ class overflow_instrumentert {
 
   void add_overflow_checks();
   void add_overflow_checks(goto_programt::targett t);
-  void add_overflow_checks(goto_programt::targett t, goto_programt::targetst &added);
+  void add_overflow_checks(
+    goto_programt::targett t,
+    goto_programt::targetst &added);
 
   void overflow_expr(const exprt &expr, expr_sett &cases);
   void overflow_expr(const exprt &expr, exprt &overflow);

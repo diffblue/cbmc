@@ -32,14 +32,22 @@ Function: local_bitvector_analysist::flagst::print
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
-  if(is_unknown()) out << "+unknown";
-  if(is_uninitialized()) out << "+uninitialized";
-  if(is_uses_offset()) out << "+uses_offset";
-  if(is_dynamic_local()) out << "+dynamic_local";
-  if(is_dynamic_heap()) out << "+dynamic_heap";
-  if(is_null()) out << "+null";
-  if(is_static_lifetime()) out << "+static_lifetime";
-  if(is_integer_address()) out << "+integer_address";
+  if(is_unknown())
+    out << "+unknown";
+  if(is_uninitialized())
+    out << "+uninitialized";
+  if(is_uses_offset())
+    out << "+uses_offset";
+  if(is_dynamic_local())
+    out << "+dynamic_local";
+  if(is_dynamic_heap())
+    out << "+dynamic_heap";
+  if(is_null())
+    out << "+null";
+  if(is_static_lifetime())
+    out << "+static_lifetime";
+  if(is_integer_address())
+    out << "+integer_address";
 }
 
 /*******************************************************************\
@@ -86,9 +94,11 @@ Function: local_bitvector_analysist::is_tracked
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
-  if(it==locals.locals_map.end()) return false;
-  if(it->second.id()!=ID_pointer) return false;
-  if(dirty(identifier)) return false;
+  if(it==locals.locals_map.end() ||
+     it->second.id()!=ID_pointer ||
+     dirty(identifier))
+    return false;
+
   return true;
 }
 
@@ -130,7 +140,8 @@ void local_bitvector_analysist::assign_lhs(
   }
   else if(lhs.id()==ID_member)
   {
-    assign_lhs(to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest);
   }
   else if(lhs.id()==ID_typecast)
   {
@@ -313,7 +324,8 @@ Function: local_bitvector_analysist::build
 
 void local_bitvector_analysist::build(const goto_functiont &goto_function)
 {
-  if(cfg.nodes.empty()) return;
+  if(cfg.nodes.empty())
+    return;
 
   work_queuet work_queue;
   work_queue.push(0);
@@ -342,33 +354,46 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
     case ASSIGN:
       {
         const code_assignt &code_assign=to_code_assign(instruction.code);
-        assign_lhs(code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
       }
       break;
 
     case DECL:
       {
         const code_declt &code_decl=to_code_decl(instruction.code);
-        assign_lhs(code_decl.symbol(), exprt(ID_uninitialized), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_decl.symbol(),
+          exprt(ID_uninitialized),
+          loc_info_src,
+          loc_info_dest);
       }
       break;
 
     case DEAD:
       {
         const code_deadt &code_dead=to_code_dead(instruction.code);
-        assign_lhs(code_dead.symbol(), exprt(ID_uninitialized), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_dead.symbol(),
+          exprt(ID_uninitialized),
+          loc_info_src,
+          loc_info_dest);
       }
       break;
 
     case FUNCTION_CALL:
       {
-        const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+        const code_function_callt &code_function_call=
+          to_code_function_call(instruction.code);
         if(code_function_call.lhs().is_not_nil())
-          assign_lhs(code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+          assign_lhs(
+            code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     for(const auto &succ : node.successors)

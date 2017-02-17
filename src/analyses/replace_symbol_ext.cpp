@@ -70,7 +70,8 @@ bool replace_symbol_extt::replace(exprt &dest) const
   const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
 
   if(c_sizeof_type.is_not_nil() &&
-     !replace_symbolt::replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type))))
+     !replace_symbolt::replace(
+       static_cast<typet&>(dest.add(ID_C_c_sizeof_type))))
     result=false;
 
   const irept &va_arg_type=dest.find(ID_C_va_arg_type);

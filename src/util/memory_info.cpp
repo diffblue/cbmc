@@ -40,6 +40,7 @@ Function: memory_info
 void memory_info(std::ostream &out)
 {
   #ifdef __linux__
+  // NOLINTNEXTLINE(readability/identifiers)
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << "\n";
   out << "  number of free chunks: " << m.ordblks << "\n";
@@ -64,14 +65,19 @@ void memory_info(std::ostream &out)
   #endif
 
   #ifdef __APPLE__
+  // NOLINTNEXTLINE(readability/identifiers)
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
-  task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
-  out << "  virtual size: " << (double)t_info.virtual_size/1000000 << "m\n";
+  task_info(
+    current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
+  out << "  virtual size: "
+      << static_cast<double>(t_info.virtual_size)/1000000 << "m\n";
 
   malloc_statistics_t t;
   malloc_zone_statistics(NULL, &t);
-  out << "  max_size_in_use: " << (double)t.max_size_in_use/1000000 << "m\n";
-  out << "  size_allocated: " << (double)t.size_allocated/1000000 << "m\n";
+  out << "  max_size_in_use: "
+      << static_cast<double>(t.max_size_in_use)/1000000 << "m\n";
+  out << "  size_allocated: "
+      << static_cast<double>(t.size_allocated)/1000000 << "m\n";
   #endif
 }

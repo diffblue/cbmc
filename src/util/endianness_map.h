@@ -28,7 +28,7 @@ class typet;
 class endianness_mapt
 {
 public:
-  inline endianness_mapt(
+  endianness_mapt(
     const typet &type,
     bool little_endian,
     const namespacet &_ns):ns(_ns)
@@ -36,7 +36,7 @@ public:
     build(type, little_endian);
   }
 
-  inline size_t map_bit(size_t bit) const
+  size_t map_bit(size_t bit) const
   {
     assert(bit<map.size());
     size_t result=map[bit];
@@ -44,7 +44,7 @@ public:
     return result;
   }
 
-  inline size_t number_of_bits() const
+  size_t number_of_bits() const
   {
     return map.size();
   }
@@ -61,7 +61,7 @@ protected:
   void build_big_endian(const typet &type);
 };
 
-extern inline std::ostream &operator << (
+inline std::ostream &operator<<(
   std::ostream &out,
   const endianness_mapt &m)
 {

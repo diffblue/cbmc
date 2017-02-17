@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class lispsymbolt:public std::string
 {
  public:
+  // NOLINTNEXTLINE(runtime/explicit)
   lispsymbolt(const char *a):std::string(a)
   {
   }
@@ -33,48 +34,48 @@ class lispsymbolt:public std::string
   {
   }
 
+  // NOLINTNEXTLINE(runtime/explicit)
   lispsymbolt(const std::string &a):std::string(a)
   {
   }
 
-  friend bool operator== (const lispsymbolt &a, const lispsymbolt &b)
-  { return strcasecmp(a.c_str(), b.c_str())==0; }
+  bool operator== (const lispsymbolt &b) const
+  { return strcasecmp(c_str(), b.c_str())==0; }
 
-  friend bool operator!= (const lispsymbolt &a, const lispsymbolt &b)
-  { return strcasecmp(a.c_str(), b.c_str())!=0; }
+  bool operator!= (const lispsymbolt &b) const
+  { return strcasecmp(c_str(), b.c_str())!=0; }
 
-  friend bool operator== (const lispsymbolt &a, const char *b)
-  { return strcasecmp(a.c_str(), b)==0; }
+  bool operator== (const char *b) const
+  { return strcasecmp(c_str(), b)==0; }
 
-  friend bool operator!= (const lispsymbolt &a, const char *b)
-  { return strcasecmp(a.c_str(), b)!=0; }
-
-  friend bool operator== (const char *a, const lispsymbolt &b)
-  { return strcasecmp(a, b.c_str())==0; }
-
-  friend bool operator!= (const char *a, const lispsymbolt &b)
-  { return strcasecmp(a, b.c_str())!=0; }
-
-  friend bool operator== (const lispsymbolt &a, const std::string &b)
-  { return strcasecmp(a.c_str(), b.c_str())==0; }
-
-  friend bool operator!= (const lispsymbolt &a, const std::string &b)
-  { return strcasecmp(a.c_str(), b.c_str())!=0; }
-
-  friend bool operator== (const std::string &a, const lispsymbolt &b)
-  { return strcasecmp(a.c_str(), b.c_str())==0; }
-
-  friend bool operator!= (const std::string &a, const lispsymbolt &b)
-  { return strcasecmp(a.c_str(), b.c_str())!=0; }
+  bool operator!= (const char *b) const
+  { return strcasecmp(c_str(), b)!=0; }
 };
+
+inline bool operator== (const char *a, const lispsymbolt &b)
+{ return strcasecmp(a, b.c_str())==0; }
+
+inline bool operator!= (const char *a, const lispsymbolt &b)
+{ return strcasecmp(a, b.c_str())!=0; }
+
+inline bool operator== (const lispsymbolt &a, const std::string &b)
+{ return strcasecmp(a.c_str(), b.c_str())==0; }
+
+inline bool operator!= (const lispsymbolt &a, const std::string &b)
+{ return strcasecmp(a.c_str(), b.c_str())!=0; }
+
+inline bool operator== (const std::string &a, const lispsymbolt &b)
+{ return strcasecmp(a.c_str(), b.c_str())==0; }
+
+inline bool operator!= (const std::string &a, const lispsymbolt &b)
+{ return strcasecmp(a.c_str(), b.c_str())!=0; }
 
 class lispexprt:public std::vector<lispexprt>
 {
- public:
+public:
   enum { String, Symbol, Number, List } type;
   lispsymbolt value;
   std::string expr2string() const;
-  bool parse(const std::string &s, unsigned &ptr);
   bool parse(const std::string &s);
   bool is_nil() const
   { return type==Symbol && value=="nil"; }
@@ -86,12 +87,16 @@ class lispexprt:public std::vector<lispexprt>
     value="nil";
   }
 
-  friend std::ostream& operator<< (std::ostream& out, const lispexprt &expr)
-  {
-    out << expr.expr2string();
-    return out;
-  }
+protected:
+  bool parse(const std::string &s, std::string::size_type &ptr);
 };
+
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const lispexprt &expr)
+{
+  return out << expr.expr2string();
+}
 
 std::string escape(const std::string &s);
 

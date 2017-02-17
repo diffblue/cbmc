@@ -41,7 +41,8 @@ bool goto_program_dereferencet::has_failed_symbol(
     const irep_idt &failed_symbol=
       ptr_symbol.type.get("#failed_symbol");
 
-    if(failed_symbol==irep_idt()) return false;
+    if(failed_symbol==irep_idt())
+      return false;
 
     return !ns.lookup(failed_symbol, symbol);
   }
@@ -416,10 +417,13 @@ void goto_program_dereferencet::dereference_instruction(
     code_function_callt &function_call=to_code_function_call(to_code(i.code));
 
     if(function_call.lhs().is_not_nil())
-      dereference_expr(function_call.lhs(), checks_only, value_set_dereferencet::WRITE);
+      dereference_expr(
+        function_call.lhs(), checks_only, value_set_dereferencet::WRITE);
 
-    dereference_expr(function_call.function(), checks_only, value_set_dereferencet::READ);
-    dereference_expr(function_call.op2(), checks_only, value_set_dereferencet::READ);
+    dereference_expr(
+      function_call.function(), checks_only, value_set_dereferencet::READ);
+    dereference_expr(
+      function_call.op2(), checks_only, value_set_dereferencet::READ);
   }
   else if(i.is_return())
   {

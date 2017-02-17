@@ -103,7 +103,7 @@ Function: instrumentert::instrument_all_inserter
 \*******************************************************************/
 
 void inline instrumentert::instrument_all_inserter(
-  const std::set<event_grapht::critical_cyclet>& set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
 {
   for(std::set<event_grapht::critical_cyclet>::const_iterator
     it=(set_of_cycles).begin();
@@ -113,16 +113,18 @@ void inline instrumentert::instrument_all_inserter(
       p_it=it->unsafe_pairs.begin();
       p_it!=it->unsafe_pairs.end(); ++p_it)
     {
-      const abstract_eventt& first_ev=egraph[p_it->first];
+      const abstract_eventt &first_ev=egraph[p_it->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(
+          first_ev.variable, first_ev.source_location));
       if(!p_it->is_po)
       {
-        const abstract_eventt& second_ev = egraph[p_it->second];
+        const abstract_eventt &second_ev = egraph[p_it->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(
+            second_ev.variable, second_ev.source_location));
       }
     }
   }
@@ -141,7 +143,7 @@ Function: instrumentert::instrument_one_event_per_cycle
 \*******************************************************************/
 
 void inline instrumentert::instrument_one_event_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet>& set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
 {
   /* to keep track of the delayed pair, and to avoid the instrumentation
      of two pairs in a same cycle */
@@ -173,16 +175,18 @@ void inline instrumentert::instrument_one_event_per_cycle_inserter(
       p_it!=it->unsafe_pairs.end(); ++p_it)
     {
       delayed.insert(*p_it);
-      const abstract_eventt& first_ev=egraph[p_it->first];
+      const abstract_eventt &first_ev=egraph[p_it->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(
+          first_ev.variable, first_ev.source_location));
       if(!p_it->is_po)
       {
-        const abstract_eventt& second_ev=egraph[p_it->second];
+        const abstract_eventt &second_ev=egraph[p_it->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(
+            second_ev.variable, second_ev.source_location));
       }
       break;
     }
@@ -202,10 +206,10 @@ Function: instrumentert::instrument_one_read_per_cycle
 \*******************************************************************/
 
 void inline instrumentert::instrument_one_read_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet>& set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
 {
   /* TODO */
-  throw "Read first strategy not implemented yet.";
+  throw "read first strategy not implemented yet";
 }
 
 /*******************************************************************\
@@ -221,10 +225,10 @@ Function: instrumentert::instrument_one_write_per_cycle
 \*******************************************************************/
 
 void inline instrumentert::instrument_one_write_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet>& set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
 {
   /* TODO */
-  throw "Write first strategy not implemented yet.";
+  throw "write first strategy not implemented yet";
 }
 
 /*******************************************************************\
@@ -240,7 +244,7 @@ Function: instrumentert::cost
 \*******************************************************************/
 
 unsigned inline instrumentert::cost(
-  const event_grapht::critical_cyclet::delayt& e)
+  const event_grapht::critical_cyclet::delayt &e)
 {
   /* cost(poW*)=1
      cost(poRW)=cost(rfe)=2
@@ -267,7 +271,7 @@ Function: instrumentert::instrument_minimum_interference
 \*******************************************************************/
 
 void inline instrumentert::instrument_minimum_interference_inserter(
-  const std::set<event_grapht::critical_cyclet>& set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
 {
   /* Idea:
      We solve this by a linear programming approach,
@@ -304,7 +308,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
       ++e_i)
       edges.insert(*e_i);
 
-  glp_prob* lp;
+  glp_prob *lp;
   glp_iocp parm;
   glp_init_iocp(&parm);
   parm.msg_lev=GLP_MSG_OFF;
@@ -350,9 +354,9 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   const std::size_t mat_size=set_of_cycles.size()*edges.size();
   message.debug() << "size of the system: " << mat_size
     << messaget::eom;
-  int* imat=(int*)malloc(sizeof(int)*(mat_size+1));
-  int* jmat=(int*)malloc(sizeof(int)*(mat_size+1));
-  double* vmat=(double*)malloc(sizeof(double)*(mat_size+1));
+  int *imat=new int[mat_size+1];
+  int *jmat=new int[mat_size+1];
+  double *vmat=new double[mat_size+1];
 
   /* fills the constraints coeff */
   /* tables read from 1 in glpk -- first row/column ignored */
@@ -404,27 +408,29 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     ++i;
     if(glp_mip_col_val(lp, i)>=1)
     {
-      const abstract_eventt& first_ev=egraph[e_i->first];
+      const abstract_eventt &first_ev=egraph[e_i->first];
       var_to_instr.insert(first_ev.variable);
       id2loc.insert(
-        std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+        std::pair<irep_idt, source_locationt>(
+          first_ev.variable, first_ev.source_location));
       if(!e_i->is_po)
       {
-        const abstract_eventt& second_ev=egraph[e_i->second];
+        const abstract_eventt &second_ev=egraph[e_i->second];
         var_to_instr.insert(second_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(second_ev.variable,second_ev.source_location));
+          std::pair<irep_idt, source_locationt>(
+            second_ev.variable, second_ev.source_location));
       }
     }
   }
 
   glp_delete_prob(lp);
-  free(imat);
-  free(jmat);
-  free(vmat);
+  delete[] imat;
+  delete[] jmat;
+  delete[] vmat;
 #else
-  throw "Sorry, minimum interference option requires glpk; "
-        "please recompile goto-instrument with glpk.";
+  throw "sorry, minimum interference option requires glpk; "
+        "please recompile goto-instrument with glpk";
 #endif
 }
 
@@ -441,8 +447,8 @@ Function: instrumentert::instrument_my_events_inserter
 \*******************************************************************/
 
 void inline instrumentert::instrument_my_events_inserter(
-  const std::set<event_grapht::critical_cyclet>& set,
-  const std::set<event_idt>& my_events)
+  const std::set<event_grapht::critical_cyclet> &set,
+  const std::set<event_idt> &my_events)
 {
   for(std::set<event_grapht::critical_cyclet>::const_iterator
     it=set.begin();
@@ -454,16 +460,17 @@ void inline instrumentert::instrument_my_events_inserter(
     {
       if(my_events.find(p_it->first)!=my_events.end())
       {
-        const abstract_eventt& first_ev=egraph[p_it->first];
+        const abstract_eventt &first_ev=egraph[p_it->first];
         var_to_instr.insert(first_ev.variable);
         id2loc.insert(
-          std::pair<irep_idt,source_locationt>(first_ev.variable,first_ev.source_location));
+          std::pair<irep_idt, source_locationt>(
+            first_ev.variable, first_ev.source_location));
         if(!p_it->is_po && my_events.find(p_it->second)!=my_events.end())
         {
-          const abstract_eventt& second_ev=egraph[p_it->second];
+          const abstract_eventt &second_ev=egraph[p_it->second];
           var_to_instr.insert(second_ev.variable);
           id2loc.insert(
-            std::pair<irep_idt,source_locationt>(second_ev.variable,
+            std::pair<irep_idt, source_locationt>(second_ev.variable,
               second_ev.source_location));
         }
       }
@@ -484,7 +491,7 @@ Function: instrumentert::instrument_my_events
 \*******************************************************************/
 
 void instrumentert::instrument_my_events(
-  const std::set<event_idt>& my_events)
+  const std::set<event_idt> &my_events)
 {
   var_to_instr.clear();
   id2loc.clear();
@@ -526,7 +533,7 @@ std::set<event_idt> instrumentert::extract_my_events()
 
   for(std::size_t i=0; i<size; i++)
   {
-    file>>tmp;
+    file >> tmp;
     this_set.insert(tmp);
   }
 

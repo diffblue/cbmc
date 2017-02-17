@@ -32,7 +32,7 @@ public:
   static object_numberingt object_numbering;
   static hash_numbering<irep_idt, irep_id_hash> function_numbering;
 
-  void set_from(const irep_idt& function, unsigned inx)
+  void set_from(const irep_idt &function, unsigned inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;
@@ -69,7 +69,7 @@ public:
   {
   public:
     object_map_dt() {}
-    const static object_map_dt blank;
+    static const object_map_dt blank;
   };
 
   exprt to_expr(object_map_dt::const_iterator it) const;
@@ -91,7 +91,10 @@ public:
     return insert(dest, object_numbering.number(src), objectt());
   }
 
-  bool insert(object_mapt &dest, const exprt &src, const mp_integer &offset) const
+  bool insert(
+    object_mapt &dest,
+    const exprt &src,
+    const mp_integer &offset) const
   {
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
@@ -313,9 +316,10 @@ protected:
 
   void flatten(const entryt &e, object_mapt &dest) const;
 
-  void flatten_rec( const entryt&,
-                    object_mapt&,
-                    flatten_seent&) const;
+  void flatten_rec(
+    const entryt&,
+    object_mapt&,
+    flatten_seent&) const;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H

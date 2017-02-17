@@ -65,7 +65,7 @@ void __CPROVER_danger_execute(struct __CPROVER_cegis_instructiont *program,
           else if (opcode < 2)
     __CPROVER_cegis_opcode_1: result=op0 * op1;
           else
-    __CPROVER_cegis_opcode_2: result=op0 & op1;
+    __CPROVER_cegis_opcode_2: result=op0 &op1;
         else
           if (opcode < 5)
             if  (opcode < 4)

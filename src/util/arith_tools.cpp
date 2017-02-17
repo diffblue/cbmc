@@ -29,7 +29,8 @@ Function: to_integer
 
 bool to_integer(const exprt &expr, mp_integer &int_value)
 {
-  if(!expr.is_constant()) return true;
+  if(!expr.is_constant())
+    return true;
   return to_integer(to_constant_expr(expr), int_value);
 }
 
@@ -164,7 +165,12 @@ constant_exprt from_integer(
   }
   else if(type_id==ID_natural)
   {
-    if(int_value<0) { constant_exprt r; r.make_nil(); return r; }
+    if(int_value<0)
+    {
+      constant_exprt r;
+      r.make_nil();
+      return r;
+    }
     constant_exprt result(type);
     result.set_value(integer2string(int_value));
     return result;
@@ -226,14 +232,13 @@ constant_exprt from_integer(
   else if(type_id==ID_fixedbv)
   {
     fixedbvt fixedbv;
-    fixedbv.spec=to_fixedbv_type(type);
+    fixedbv.spec=fixedbv_spect(to_fixedbv_type(type));
     fixedbv.from_integer(int_value);
     return fixedbv.to_expr();
   }
   else if(type_id==ID_floatbv)
   {
-    ieee_floatt ieee_float;
-    ieee_float.spec=to_floatbv_type(type);
+    ieee_floatt ieee_float(to_floatbv_type(type));
     ieee_float.from_integer(int_value);
     return ieee_float.to_expr();
   }
@@ -262,7 +267,7 @@ mp_integer address_bits(const mp_integer &size)
 {
   mp_integer result, x=2;
 
-  for(result=1; x<size; result+=1, x*=2);
+  for(result=1; x<size; result+=1, x*=2) {}
 
   return result;
 }
@@ -300,7 +305,9 @@ mp_integer power(const mp_integer &base,
       }
     case 1: return 1;
     case 0: return 0;
-    default:;
+    default:
+      {
+      }
     }
   }
 
@@ -342,7 +349,8 @@ Function: mp_min
 
 void mp_min(mp_integer &a, const mp_integer &b)
 {
-  if(b<a) a=b;
+  if(b<a)
+    a=b;
 }
 
 /*******************************************************************\
@@ -359,5 +367,6 @@ Function: mp_max
 
 void mp_max(mp_integer &a, const mp_integer &b)
 {
-  if(b>a) a=b;
+  if(b>a)
+    a=b;
 }

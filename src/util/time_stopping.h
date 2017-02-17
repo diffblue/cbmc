@@ -17,15 +17,15 @@ Date: February 2004
 class fine_timet
 {
 public:
-  inline fine_timet():t(0)
+  fine_timet():t(0)
   {
   }
 
-  inline explicit fine_timet(unsigned long long _t):t(_t)
+  explicit fine_timet(unsigned long long _t):t(_t)
   {
   }
 
-  inline unsigned long long get_t() const
+  unsigned long long get_t() const
   {
     return t;
   }
@@ -42,30 +42,30 @@ protected:
 class time_periodt:public fine_timet
 {
 public:
-  inline time_periodt()
+  time_periodt()
   {
   }
 
-  inline explicit time_periodt(unsigned long long _t):fine_timet(_t)
+  explicit time_periodt(unsigned long long _t):fine_timet(_t)
   {
   }
 
   std::string as_string() const;
 
-  inline time_periodt &operator+=(const time_periodt &other)
+  time_periodt &operator+=(const time_periodt &other)
   {
     t+=other.t;
     return *this;
   }
 
-  inline time_periodt operator+(const time_periodt &other)
+  time_periodt operator+(const time_periodt &other)
   {
     time_periodt tmp=*this;
     tmp.t+=other.t;
     return tmp;
   }
 
-  inline time_periodt operator-(const time_periodt &other)
+  time_periodt operator-(const time_periodt &other)
   {
     return time_periodt(t-other.t);
   }
@@ -74,15 +74,15 @@ public:
 class absolute_timet:public fine_timet
 {
 public:
-  inline absolute_timet()
+  absolute_timet()
   {
   }
 
-  inline explicit absolute_timet(unsigned long long _t):fine_timet(_t)
+  explicit absolute_timet(unsigned long long _t):fine_timet(_t)
   {
   }
 
-  inline time_periodt operator-(const absolute_timet &other)
+  time_periodt operator-(const absolute_timet &other)
   {
     return time_periodt(t-other.t);
   }

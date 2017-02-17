@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_symext
 {
 public:
-  inline path_symext()
+  path_symext()
   {
   }
 
@@ -80,7 +80,7 @@ protected:
     const exprt &lhs,
     const exprt &rhs);
 
-  inline void assign(
+  void assign(
     path_symex_statet &state,
     const code_assignt &assignment)
   {

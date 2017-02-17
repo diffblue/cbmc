@@ -19,7 +19,7 @@ struct cprover_library_entryt
   const char *model;
 } cprover_library[]=
 #include "cprover_library.inc"
-;
+; // NOLINT(whitespace/semicolon)
 
 /*******************************************************************\
 
@@ -118,7 +118,8 @@ void add_library(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  if(src.empty()) return;
+  if(src.empty())
+    return;
 
   std::istringstream in(src);
 

@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 
@@ -20,7 +28,7 @@ class shared_bufferst
 {
 public:
   shared_bufferst(symbol_tablet &_symbol_table, unsigned _nb_threads,
-    messaget& _message):
+    messaget &_message):
     symbol_table(_symbol_table),
     nb_threads(_nb_threads+1),
     uniq(0),
@@ -32,7 +40,7 @@ public:
   void set_cav11(memory_modelt model)
   {
     if(model!=TSO)
-      throw "Sorry, CAV11 only available for TSO";
+      throw "sorry, CAV11 only available for TSO";
     cav11 = true;
   }
 
@@ -71,9 +79,9 @@ public:
   // variables in the cycles
   std::set<irep_idt> cycles;
   // events instrumented: var->locations in the code
-  std::multimap<irep_idt,source_locationt> cycles_loc;
+  std::multimap<irep_idt, source_locationt> cycles_loc;
   // events in cycles: var->locations (for read instrumentations)
-  std::multimap<irep_idt,source_locationt> cycles_r_loc;
+  std::multimap<irep_idt, source_locationt> cycles_r_loc;
 
   const varst &operator()(const irep_idt &object);
 
@@ -84,15 +92,13 @@ public:
     goto_programt::targett &t,
     const source_locationt &source_location,
     const irep_idt &read_object,
-    const irep_idt &write_object
-  );
+    const irep_idt &write_object);
 
   void flush_read(
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
-    const irep_idt &write_object
-  );
+    const irep_idt &write_object);
 
   void write(
     goto_programt &goto_program,
@@ -141,7 +147,8 @@ public:
     namespacet ns(symbol_table);
 
     const symbolt &symbol=ns.lookup(id);
-    if(symbol.is_thread_local) return false;
+    if(symbol.is_thread_local)
+      return false;
     if(has_prefix(id2string(id), CPROVER_PREFIX))
       return false;
 
@@ -172,8 +179,7 @@ public:
     symbol_tablet &symbol_table,
     goto_programt &goto_program,
     memory_modelt model,
-    goto_functionst &goto_functions
-  );
+    goto_functionst &goto_functions);
 
   void affected_by_delay(
     symbol_tablet &symbol_table,
@@ -183,9 +189,9 @@ public:
   class cfg_visitort
   {
   protected:
-    shared_bufferst& shared_buffers;
-    symbol_tablet& symbol_table;
-    goto_functionst& goto_functions;
+    shared_bufferst &shared_buffers;
+    symbol_tablet &symbol_table;
+    goto_functionst &goto_functions;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -196,8 +202,8 @@ public:
     std::set<irep_idt> past_writes;
 
   public:
-    cfg_visitort(shared_bufferst& _shared, symbol_tablet& _symbol_table,
-      goto_functionst& _goto_functions)
+    cfg_visitort(shared_bufferst &_shared, symbol_tablet &_symbol_table,
+      goto_functionst &_goto_functions)
       :shared_buffers(_shared), symbol_table(_symbol_table),
         goto_functions(_goto_functions)
     {
@@ -208,7 +214,7 @@ public:
 
   void weak_memory(
     value_setst &value_sets,
-    const irep_idt& function,
+    const irep_idt &function,
     memory_modelt model);
   };
 
@@ -234,7 +240,7 @@ protected:
   bool cav11;
 
   /* message */
-  messaget& message;
+  messaget &message;
 
   irep_idt add(
     const irep_idt &object,

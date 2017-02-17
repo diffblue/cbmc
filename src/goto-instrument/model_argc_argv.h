@@ -8,8 +8,8 @@ Date: April 2016
 
 \*******************************************************************/
 
-#ifndef CPROVER_MODEL_ARGC_ARGV_H
-#define CPROVER_MODEL_ARGC_ARGV_H
+#ifndef CPROVER_GOTO_INSTRUMENT_MODEL_ARGC_ARGV_H
+#define CPROVER_GOTO_INSTRUMENT_MODEL_ARGC_ARGV_H
 
 class goto_functionst;
 class message_handlert;
@@ -21,4 +21,4 @@ bool model_argc_argv(
   unsigned max_argc,
   message_handlert &message_handler);
 
-#endif
+#endif // CPROVER_GOTO_INSTRUMENT_MODEL_ARGC_ARGV_H

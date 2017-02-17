@@ -127,7 +127,8 @@ void full_slicert::operator()(
               req_it!=cfg[e].required_by.end();
               ++req_it)
           {
-            if(req_it!=cfg[e].required_by.begin()) c+=",";
+            if(req_it!=cfg[e].required_by.begin())
+              c+=",";
             c+=std::to_string(*req_it);
           }
           i_it->source_location.set_column(c);  // for show-goto-functions
@@ -286,12 +287,16 @@ protected:
     goto_program_change_impactt &old_impact,
     goto_program_change_impactt &new_impact);
 
-  void propogate_dep_back(const dependence_grapht::nodet &d_node,
-  		const dependence_grapht &dep_graph,
-  		goto_functions_change_impactt &change_impact, bool del);
-  void propogate_dep_forward(const dependence_grapht::nodet &d_node,
-  		const dependence_grapht &dep_graph,
-  		goto_functions_change_impactt &change_impact, bool del);
+  void propogate_dep_back(
+    const dependence_grapht::nodet &d_node,
+    const dependence_grapht &dep_graph,
+    goto_functions_change_impactt &change_impact,
+    bool del);
+  void propogate_dep_forward(
+    const dependence_grapht::nodet &d_node,
+    const dependence_grapht &dep_graph,
+    goto_functions_change_impactt &change_impact,
+    bool del);
 
   void output_change_impact(
     const irep_idt &function,
@@ -311,7 +316,7 @@ protected:
       const goto_programt &goto_program,
       const namespacet &ns,
       const irep_idt &function,
-      goto_programt::const_targett& target) const;
+      goto_programt::const_targett &target) const;
 };
 
 /*******************************************************************\
@@ -440,10 +445,18 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
 
-          if(impact_mode == BACKWARD || impact_mode == BOTH)
-            propogate_dep_back(d_node, old_dep_graph, old_change_impact, true);
-          if(impact_mode == FORWARD || impact_mode == BOTH)
-            propogate_dep_forward(d_node, old_dep_graph, old_change_impact, true);
+          if(impact_mode==BACKWARD || impact_mode==BOTH)
+            propogate_dep_back(
+              d_node,
+              old_dep_graph,
+              old_change_impact,
+              true);
+          if(impact_mode==FORWARD || impact_mode==BOTH)
+            propogate_dep_forward(
+              d_node,
+              old_dep_graph,
+              old_change_impact,
+              true);
         }
         old_impact[o_it]|=DELETED;
         ++o_it;
@@ -455,10 +468,18 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
 
-          if(impact_mode == BACKWARD || impact_mode == BOTH)
-            propogate_dep_back(d_node, new_dep_graph, new_change_impact, false);
-          if(impact_mode == FORWARD || impact_mode == BOTH)
-            propogate_dep_forward(d_node, new_dep_graph, new_change_impact, false);
+          if(impact_mode==BACKWARD || impact_mode==BOTH)
+            propogate_dep_back(
+              d_node,
+              new_dep_graph,
+              new_change_impact,
+              false);
+          if(impact_mode==FORWARD || impact_mode==BOTH)
+            propogate_dep_forward(
+              d_node,
+              new_dep_graph,
+              new_change_impact,
+              false);
         }
         new_impact[n_it]|=NEW;
         ++n_it;
@@ -480,9 +501,12 @@ Function: change_impactt::propogate_dep_forward
 
 \*******************************************************************/
 
-void change_impactt::propogate_dep_forward(const dependence_grapht::nodet &d_node,
-		const dependence_grapht &dep_graph,
-		goto_functions_change_impactt &change_impact, bool del) {
+void change_impactt::propogate_dep_forward(
+  const dependence_grapht::nodet &d_node,
+  const dependence_grapht &dep_graph,
+  goto_functions_change_impactt &change_impact,
+  bool del)
+{
   for(dependence_grapht::edgest::const_iterator it = d_node.out.begin();
       it != d_node.out.end(); ++it)
   {
@@ -491,8 +515,8 @@ void change_impactt::propogate_dep_forward(const dependence_grapht::nodet &d_nod
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] & data_flag)
-        || (change_impact[src->function][src] & ctrl_flag))
+    if((change_impact[src->function][src] &data_flag)
+        || (change_impact[src->function][src] &ctrl_flag))
       continue;
     if(it->second.get() == dep_edget::DATA
         || it->second.get() == dep_edget::BOTH)
@@ -516,9 +540,12 @@ Function: change_impactt::propogate_dep_back
 
 \*******************************************************************/
 
-void change_impactt::propogate_dep_back(const dependence_grapht::nodet &d_node,
-		const dependence_grapht &dep_graph,
-		goto_functions_change_impactt &change_impact, bool del) {
+void change_impactt::propogate_dep_back(
+  const dependence_grapht::nodet &d_node,
+  const dependence_grapht &dep_graph,
+  goto_functions_change_impactt &change_impact,
+  bool del)
+{
   for(dependence_grapht::edgest::const_iterator it = d_node.in.begin();
       it != d_node.in.end(); ++it)
   {
@@ -527,8 +554,8 @@ void change_impactt::propogate_dep_back(const dependence_grapht::nodet &d_node,
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] & data_flag)
-        || (change_impact[src->function][src] & ctrl_flag))
+    if((change_impact[src->function][src] &data_flag)
+        || (change_impact[src->function][src] &ctrl_flag))
     {
       continue;
     }
@@ -826,7 +853,7 @@ void change_impactt::output_instruction(char prefix,
     const goto_programt &goto_program,
     const namespacet &ns,
     const irep_idt &function,
-    goto_programt::const_targett& target) const
+    goto_programt::const_targett &target) const
 {
   if(compact_output)
   {
@@ -834,10 +861,11 @@ void change_impactt::output_instruction(char prefix,
       return;
     const irep_idt &file=target->source_location.get_file();
     const irep_idt &line=target->source_location.get_line();
-    if (!file.empty() && !line.empty())
+    if(!file.empty() && !line.empty())
       std::cout << prefix << " " << id2string(file)
-          << " " << id2string(line) << std::endl;
-  } else
+                << " " << id2string(line) << std::endl;
+  }
+  else
   {
     std::cout << prefix;
     goto_program.output_instruction(ns, function, std::cout, target);

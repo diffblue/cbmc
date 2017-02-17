@@ -20,7 +20,7 @@ struct string_ptrt
   const char *s;
   size_t len;
 
-  inline const char *c_str() const
+  const char *c_str() const
   {
     return s;
   }
@@ -31,11 +31,10 @@ struct string_ptrt
   {
   }
 
-  friend bool operator==(const string_ptrt a, const string_ptrt b);
+  bool operator==(const string_ptrt &other) const;
 };
 
-bool operator==(const string_ptrt a, const string_ptrt b);
-
+// NOLINTNEXTLINE(readability/identifiers)
 class string_ptr_hash
 {
 public:
@@ -45,12 +44,12 @@ public:
 class string_containert
 {
 public:
-  inline unsigned operator[](const char *s)
+  unsigned operator[](const char *s)
   {
     return get(s);
   }
 
-  inline unsigned operator[](const std::string &s)
+  unsigned operator[](const std::string &s)
   {
     return get(s);
   }
@@ -60,20 +59,21 @@ public:
   ~string_containert();
 
   // the pointer is guaranteed to be stable
-  inline const char *c_str(size_t no) const
+  const char *c_str(size_t no) const
   {
     return string_vector[no]->c_str();
   }
 
   // the reference is guaranteed to be stable
-  inline const std::string &get_string(size_t no) const
+  const std::string &get_string(size_t no) const
   {
     return *string_vector[no];
   }
 
 protected:
   // the 'unsigned' ought to be size_t
-  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash> hash_tablet;
+  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash>
+    hash_tablet;
   hash_tablet hash_table;
 
   unsigned get(const char *s);

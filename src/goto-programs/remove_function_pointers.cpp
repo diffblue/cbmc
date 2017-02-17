@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 #include <util/config.h>
-#include <util/std_expr.h>
 #include <util/type_eq.h>
 
 #include <ansi-c/c_types.h>
@@ -65,8 +64,9 @@ protected:
     const typet &function_type);
 
   void fix_argument_types(code_function_callt &function_call);
-  void fix_return_type(code_function_callt &function_call,
-                       goto_programt &dest);
+  void fix_return_type(
+    code_function_callt &function_call,
+    goto_programt &dest);
 
   symbolt &new_tmp_symbol();
 
@@ -78,7 +78,6 @@ protected:
     for(const auto &s : symbol_table.symbols)
       compute_address_taken_functions(s.second.value, address_taken);
   }
-
 };
 
 /*******************************************************************\
@@ -130,9 +129,12 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
 
   do
   {
-    new_symbol.base_name="tmp_return_val$"+std::to_string(++temporary_counter);
-    new_symbol.name="remove_function_pointers::"+id2string(new_symbol.base_name);
-  } while(symbol_table.move(new_symbol, symbol_ptr));
+    new_symbol.base_name=
+      "tmp_return_val$"+std::to_string(++temporary_counter);
+    new_symbol.name=
+      "remove_function_pointers::"+id2string(new_symbol.base_name);
+  }
+  while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
 }
@@ -153,7 +155,8 @@ bool remove_function_pointerst::arg_is_type_compatible(
   const typet &call_type,
   const typet &function_type)
 {
-  if(type_eq(call_type, function_type, ns)) return true;
+  if(type_eq(call_type, function_type, ns))
+    return true;
 
   // any integer-vs-enum-vs-pointer is ok
   if(call_type.id()==ID_signedbv ||
@@ -296,7 +299,8 @@ void remove_function_pointerst::fix_return_type(
   goto_programt &dest)
 {
   // are we returning anything at all?
-  if(function_call.lhs().is_nil()) return;
+  if(function_call.lhs().is_nil())
+    return;
 
   const code_typet &code_type=
     to_code_type(ns.follow(function_call.function().type()));
@@ -460,8 +464,10 @@ void remove_function_pointerst::remove_function_pointer(
     irep_idt comment=it->source_location.get_comment();
     it->source_location=target->source_location;
     it->function=target->function;
-    if(!property_class.empty()) it->source_location.set_property_class(property_class);
-    if(!comment.empty()) it->source_location.set_comment(comment);
+    if(!property_class.empty())
+      it->source_location.set_property_class(property_class);
+    if(!comment.empty())
+      it->source_location.set_comment(comment);
   }
 
   goto_programt::targett next_target=target;

@@ -68,29 +68,24 @@ public:
     // is_transparent_union isn't checked
   }
 
-  friend bool operator == (
-    const c_qualifierst &a,
-    const c_qualifierst &b)
+  bool operator==(const c_qualifierst &other) const
   {
-    return a.is_constant==b.is_constant &&
-           a.is_volatile==b.is_volatile &&
-           a.is_restricted==b.is_restricted &&
-           a.is_atomic==b.is_atomic &&
-           a.is_ptr32==b.is_ptr32 &&
-           a.is_ptr64==b.is_ptr64 &&
-           a.is_transparent_union==b.is_transparent_union &&
-           a.is_noreturn==b.is_noreturn;
+    return is_constant==other.is_constant &&
+           is_volatile==other.is_volatile &&
+           is_restricted==other.is_restricted &&
+           is_atomic==other.is_atomic &&
+           is_ptr32==other.is_ptr32 &&
+           is_ptr64==other.is_ptr64 &&
+           is_transparent_union==other.is_transparent_union &&
+           is_noreturn==other.is_noreturn;
   }
 
-  friend bool operator != (
-    const c_qualifierst &a,
-    const c_qualifierst &b)
+  bool operator!=(const c_qualifierst &other) const
   {
-    return !(a==b);
+    return !(*this==other);
   }
 
-  c_qualifierst &operator += (
-    const c_qualifierst &b)
+  c_qualifierst &operator+=(const c_qualifierst &b)
   {
     is_constant|=b.is_constant;
     is_volatile|=b.is_volatile;
@@ -103,10 +98,10 @@ public:
     return *this;
   }
 
-  friend unsigned count(const c_qualifierst &q)
+  unsigned count() const
   {
-    return q.is_constant+q.is_volatile+q.is_restricted+q.is_atomic+
-           q.is_ptr32+q.is_ptr64+q.is_noreturn;
+    return is_constant+is_volatile+is_restricted+is_atomic+
+           is_ptr32+is_ptr64+is_noreturn;
   }
 };
 

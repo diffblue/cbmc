@@ -132,7 +132,7 @@ static std::string type2name(
     result+='l';
 
   if(type.id()==irep_idt())
-    throw "Empty type encountered.";
+    throw "empty type encountered";
   else if(type.id()==ID_empty)
     result+='V';
   else if(type.id()==ID_signedbv)
@@ -169,13 +169,15 @@ static std::string type2name(
         it!=parameters.end();
         it++)
     {
-      if(it!=parameters.begin()) result+='|';
+      if(it!=parameters.begin())
+        result+='|';
       result+=type2name(it->type(), ns, symbol_number);
     }
 
     if(t.has_ellipsis())
     {
-      if(!parameters.empty()) result+='|';
+      if(!parameters.empty())
+        result+='|';
       result+="...";
     }
 
@@ -206,8 +208,10 @@ static std::string type2name(
   {
     assert(parent_is_sym_check);
     parent_is_sym_check=false;
-    if(type.id()==ID_struct) result+="ST";
-    if(type.id()==ID_union) result+="UN";
+    if(type.id()==ID_struct)
+      result+="ST";
+    if(type.id()==ID_union)
+      result+="UN";
     const struct_union_typet &t=to_struct_union_type(type);
     const struct_union_typet::componentst &components = t.components();
     result+='[';
@@ -216,7 +220,8 @@ static std::string type2name(
         it!=components.end();
         it++)
     {
-      if(it!=components.begin()) result+='|';
+      if(it!=components.begin())
+        result+='|';
       result+=type2name(it->type(), ns, symbol_number);
       result+="'"+it->get_string(ID_name)+"'";
     }
@@ -237,7 +242,8 @@ static std::string type2name(
         it!=members.end();
         ++it)
     {
-      if(it!=members.begin()) result+='|';
+      if(it!=members.begin())
+        result+='|';
       result+=id2string(it->get_value());
       result+="'"+id2string(it->get_identifier())+"'";
     }
@@ -249,9 +255,7 @@ static std::string type2name(
   else if(type.id()==ID_vector)
     result+="VEC"+type.get_string(ID_size);
   else
-    throw (std::string("Unknown type '") +
-           type.id_string() +
-           "' encountered.");
+    throw "unknown type '"+type.id_string()+"' encountered";
 
   if(type.has_subtype())
   {

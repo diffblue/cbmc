@@ -81,15 +81,17 @@ class cnf_clause_list_assignmentt:public cnf_clause_listt
 public:
   typedef std::vector<tvt> assignmentt;
 
-  inline assignmentt &get_assignment()
+  assignmentt &get_assignment()
   {
     return assignment;
   }
 
   virtual tvt l_get(literalt literal) const
   {
-    if(literal.is_true()) return tvt(true);
-    if(literal.is_false()) return tvt(false);
+    if(literal.is_true())
+      return tvt(true);
+    if(literal.is_false())
+      return tvt(false);
 
     unsigned v=literal.var_no();
 

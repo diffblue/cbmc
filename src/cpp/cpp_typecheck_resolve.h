@@ -133,26 +133,26 @@ protected:
 
   struct matcht
   {
-    unsigned cost;
+    std::size_t cost;
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
-    matcht(cpp_template_args_tct _s_args,
-           cpp_template_args_tct _f_args,
-           irep_idt _id):
-      cost((unsigned)_s_args.arguments().size()),
-           specialization_args(_s_args),
-           full_args(_f_args),
-           id(_id)
+    matcht(
+      cpp_template_args_tct _s_args,
+      cpp_template_args_tct _f_args,
+      irep_idt _id):
+      cost(_s_args.arguments().size()),
+      specialization_args(_s_args),
+      full_args(_f_args),
+      id(_id)
     {
     }
+
+    bool operator<(const matcht &other) const
+    {
+      return cost<other.cost;
+    }
   };
-
-  inline friend bool operator < (const matcht &m1, const matcht &m2)
-  {
-    return m1.cost<m2.cost;
-  }
-
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H

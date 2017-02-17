@@ -14,11 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 // use this only if you want to have something
 // derived from CSolver
 // otherwise, use satcheck_zchafft
+// NOLINTNEXTLINE(readability/identifiers)
+class CSolver;
 
 class satcheck_zchaff_baset:public cnf_clause_listt
 {
 public:
-  satcheck_zchaff_baset(class CSolver *_solver);
+  explicit satcheck_zchaff_baset(CSolver *_solver);
   virtual ~satcheck_zchaff_baset();
 
   virtual const std::string solver_text();
@@ -27,13 +29,13 @@ public:
   virtual void set_assignment(literalt a, bool value);
   virtual void copy_cnf();
 
-  class CSolver *zchaff_solver()
+  CSolver *zchaff_solver()
   {
     return solver;
   }
 
 protected:
-  class CSolver *solver;
+  CSolver *solver;
 
   typedef enum { INIT, SAT, UNSAT, ERROR } statust;
   statust status;

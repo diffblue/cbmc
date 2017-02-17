@@ -10,7 +10,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include "natural_loops.h"
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 

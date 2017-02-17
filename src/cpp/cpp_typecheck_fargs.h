@@ -44,7 +44,7 @@ public:
 
   void add_object(const exprt &expr)
   {
-    //if(!in_use) return;
+    // if(!in_use) return;
     has_object=true;
     operands.insert(operands.begin(), expr);
   }

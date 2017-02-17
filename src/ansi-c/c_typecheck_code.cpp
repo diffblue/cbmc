@@ -249,7 +249,8 @@ void c_typecheck_baset::typecheck_block(codet &code)
 
   Forall_operands(it1, code)
   {
-    if(it1->is_nil()) continue;
+    if(it1->is_nil())
+      continue;
 
     codet &code_op=to_code(*it1);
 
@@ -264,7 +265,7 @@ void c_typecheck_baset::typecheck_block(codet &code)
         code_ptr=&to_code(code_ptr->op0());
       }
 
-      //codet &label_op=*code_ptr;
+      // codet &label_op=*code_ptr;
 
       new_ops.move_to_operands(code_op);
     }
@@ -470,7 +471,8 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
     return false;
   else if(type.id()==ID_array)
   {
-    if(to_array_type(type).size().is_nil()) return false;
+    if(to_array_type(type).size().is_nil())
+      return false;
     return is_complete_type(type.subtype());
   }
   else if(type.id()==ID_struct || type.id()==ID_union)
@@ -598,13 +600,17 @@ void c_typecheck_baset::typecheck_for(codet &code)
     code_blockt code_block;
     code_block.add_source_location()=code.source_location();
     if(to_code(code.op3()).get_statement()==ID_block)
+    {
       code_block.set(
         ID_C_end_location,
         to_code_block(to_code(code.op3())).end_location());
+    }
     else
+    {
       code_block.set(
         ID_C_end_location,
-        code.op3().source_location());;
+        code.op3().source_location());
+    }
 
     code_block.reserve_operands(2);
     code_block.move_to_operands(code.op0());
@@ -899,7 +905,9 @@ void c_typecheck_baset::typecheck_return(codet &code)
     {
       // gcc doesn't actually complain, it just warns!
       // We'll put a zero here, which is dubious.
-      exprt zero=zero_initializer(return_type, code.source_location(), *this, get_message_handler());
+      exprt zero=
+        zero_initializer(
+          return_type, code.source_location(), *this, get_message_handler());
       code.copy_to_operands(zero);
     }
   }

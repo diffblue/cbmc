@@ -82,7 +82,8 @@ void partial_order_concurrencyt::add_init_writes(
 
     const irep_idt &a=address(e_it);
 
-    if(init_done.find(a)!=init_done.end()) continue;
+    if(init_done.find(a)!=init_done.end())
+      continue;
 
     if(spawn_seen ||
        e_it->is_shared_read() ||
@@ -159,7 +160,8 @@ void partial_order_concurrencyt::build_event_lists(
       a_it++)
   {
     const a_rect &a_rec=a_it->second;
-    if(a_rec.reads.empty()) continue;
+    if(a_rec.reads.empty())
+      continue;
 
     statistics() << "Shared " << a_it->first << ": "
                  << a_rec.reads.size() << "R/"
@@ -265,11 +267,13 @@ Function: partial_order_concurrencyt::before
 exprt partial_order_concurrencyt::before(
   event_it e1, event_it e2, unsigned axioms)
 {
-  const axiomt axiom_bits[]={
+  const axiomt axiom_bits[]=
+  {
     AX_SC_PER_LOCATION,
     AX_NO_THINAIR,
     AX_OBSERVATION,
-    AX_PROPAGATION };
+    AX_PROPAGATION
+  };
 
   exprt::operandst ops;
   ops.reserve(sizeof(axiom_bits)/sizeof(axiomt));
@@ -278,7 +282,8 @@ exprt partial_order_concurrencyt::before(
   {
     const axiomt ax=axiom_bits[i];
 
-    if((axioms & ax)==0) continue;
+    if((axioms &ax)==0)
+      continue;
 
     if(e1->atomic_section_id!=0 &&
        e1->atomic_section_id==e2->atomic_section_id)

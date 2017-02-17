@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -131,7 +131,8 @@ path_symex_statet::var_statet &path_symex_statet::get_var_state(
 
   var_valt &var_val=
     var_info.is_shared()?shared_vars:threads[current_thread].local_vars;
-  if(var_val.size()<=var_info.number) var_val.resize(var_info.number+1);
+  if(var_val.size()<=var_info.number)
+    var_val.resize(var_info.number+1);
   return var_val[var_info.number];
 }
 
@@ -150,7 +151,7 @@ Function: path_symex_statet::read
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  //std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
+  // std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
   #endif
 
   // This has five phases!
@@ -174,7 +175,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
-  //std::cout << " ==> " << tmp.pretty() << std::endl;
+  // std::cout << " ==> " << tmp.pretty() << std::endl;
   #endif
 
   return tmp5;
@@ -633,7 +634,8 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     if_exprt if_expr=to_if_expr(src);
     if_expr.true_case()=instantiate_rec_address(if_expr.true_case(), propagate);
-    if_expr.false_case()=instantiate_rec_address(if_expr.false_case(), propagate);
+    if_expr.false_case()=
+      instantiate_rec_address(if_expr.false_case(), propagate);
     if_expr.cond()=instantiate_rec(if_expr.cond(), propagate);
     return if_expr;
   }
@@ -771,7 +773,8 @@ bool path_symex_statet::check_assertion(
   exprt assertion=read(instruction.guard);
 
   // trivial?
-  if(assertion.is_true()) return true; // no error
+  if(assertion.is_true())
+    return true; // no error
 
   // the path constraint
   decision_procedure << history;

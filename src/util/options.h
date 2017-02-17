@@ -35,7 +35,7 @@ public:
     set_option(option, std::string(value));
   }
 
-  inline void set_option(const std::string &option, const value_listt &values)
+  void set_option(const std::string &option, const value_listt &values)
   {
     option_map[option]=values;
   }
@@ -43,7 +43,7 @@ public:
   optionst() { }
   ~optionst() { }
 
-  inline optionst &operator=(const optionst &other)
+  optionst &operator=(const optionst &other)
   {
     option_map=other.option_map;
     return *this;

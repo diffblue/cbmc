@@ -23,19 +23,19 @@ public:
   typedef std::stack<jsont, std::vector<jsont> > stackt;
   stackt stack;
 
-  inline jsont &top() { return stack.top(); }
+  jsont &top() { return stack.top(); }
 
   virtual bool parse() override
   {
     return yyjsonparse()!=0;
   }
 
-  inline void push(const jsont &x)
+  void push(const jsont &x)
   {
     stack.push(x);
   }
 
-  inline void pop(jsont &dest)
+  void pop(jsont &dest)
   {
     assert(!stack.empty());
     dest.swap(stack.top());

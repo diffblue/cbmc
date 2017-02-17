@@ -40,7 +40,8 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
   for(auto &g : goal_map)
   {
     // failed already?
-    if(g.second.status==goalt::statust::FAILURE) continue;
+    if(g.second.status==goalt::statust::FAILURE)
+      continue;
 
     // check whether failed
     for(auto &c : g.second.instances)
@@ -204,12 +205,14 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
                  << eom;
 
       if(bmc.options.get_bool_option("trace"))
+      {
         for(const auto &g : goal_map)
           if(g.second.status==goalt::statust::FAILURE)
           {
             std::cout << "\n" << "Trace for " << g.first << ":" << "\n";
             show_goto_trace(std::cout, bmc.ns, g.second.goto_trace);
           }
+      }
 
       status() << "\n** " << cover_goals.number_covered()
                << " of " << cover_goals.size() << " failed ("
@@ -257,7 +260,6 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       std::cout << ",\n" << json_result;
     }
     break;
-
   }
 }
 

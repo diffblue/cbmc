@@ -23,7 +23,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const symbolt& sym, xmlt &root)
+void convert(const symbolt &sym, xmlt &root)
 {
   xmlt &xmlsym = root.new_element("symbol");
   xmlsym.set_attribute("name", id2string(sym.name));
@@ -49,9 +49,9 @@ void convert(const symbolt& sym, xmlt &root)
   flags.set_attribute_bool("input", sym.is_input);
   flags.set_attribute_bool("output", sym.is_output);
   flags.set_attribute_bool("macro", sym.is_macro);
-  //flags.set_attribute_bool("actual", sym.is_actual);
-  //flags.set_attribute_bool("binding", sym.binding);
-  //flags.set_attribute_bool("free_var", sym.free_var);
+  // flags.set_attribute_bool("actual", sym.is_actual);
+  // flags.set_attribute_bool("binding", sym.binding);
+  // flags.set_attribute_bool("free_var", sym.free_var);
   flags.set_attribute_bool("statevar", sym.is_state_var);
 
   xmlt &mode = flags.new_element("mode");
@@ -60,7 +60,7 @@ void convert(const symbolt& sym, xmlt &root)
   flags.new_element("base_name").data=id2string(sym.base_name);
   flags.new_element("module").data=id2string(sym.module);
 
-  if (sym.pretty_name.size()>0)
+  if(sym.pretty_name.size()>0)
     flags.new_element("pretty_name").data=id2string(sym.pretty_name);
 
   xmlt &xmlloc = xmlsym.new_element("location");
@@ -80,7 +80,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert(const xmlt &xmlsym, symbolt& symbol)
+void convert(const xmlt &xmlsym, symbolt &symbol)
 {
   symbol.name=xmlsym.get_attribute("name");
 
@@ -89,13 +89,13 @@ void convert(const xmlt &xmlsym, symbolt& symbol)
       it!=xmlsym.elements.end();
       it++)
   {
-    if (it->name=="type")
+    if(it->name=="type")
     {
       convert(*it, symbol.type);
     }
-    else if (it->name=="value")
+    else if(it->name=="value")
     {
-      if (it->data=="compiled")
+      if(it->data=="compiled")
       {
         symbol.value.id("code");
       }
@@ -104,7 +104,7 @@ void convert(const xmlt &xmlsym, symbolt& symbol)
         convert(*it, symbol.value);
       }
     }
-    else if (it->name=="flags")
+    else if(it->name=="flags")
     {
       symbol.is_lvalue = it->get_attribute_bool("lvalue");
       symbol.is_static_lifetime = it->get_attribute_bool("static_lifetime");
@@ -116,9 +116,9 @@ void convert(const xmlt &xmlsym, symbolt& symbol)
       symbol.is_input = it->get_attribute_bool("input");
       symbol.is_output = it->get_attribute_bool("output");
       symbol.is_macro = it->get_attribute_bool("macro");
-      //symbol.is_actual = it->get_attribute_bool("actual");
-      //symbol.binding = it->get_attribute_bool("binding");
-      //symbol.free_var = it->get_attribute_bool("free_var");
+      // symbol.is_actual = it->get_attribute_bool("actual");
+      // symbol.binding = it->get_attribute_bool("binding");
+      // symbol.free_var = it->get_attribute_bool("free_var");
       symbol.is_state_var = it->get_attribute_bool("statevar");
 
       for(xmlt::elementst::const_iterator

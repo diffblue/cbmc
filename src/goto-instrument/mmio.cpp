@@ -28,6 +28,8 @@ Date: September 2011
 #include <analyses/local_may_alias.h>
 #endif
 
+#include "mmio.h"
+
 /*******************************************************************\
 
 Function: mmio
@@ -44,7 +46,7 @@ void mmio(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program)
 {
@@ -64,9 +66,10 @@ void mmio(
 #ifdef LOCAL_MAY
         , local_may
 #endif
-      );
+      ); // NOLINT(whitespace/parens)
 
-      if(rw_set.empty()) continue;
+      if(rw_set.empty())
+        continue;
 
       #if 0
       goto_programt::instructiont original_instruction;
@@ -82,7 +85,8 @@ void mmio(
       forall_rw_set_entries(e_it, rw_set)
         if(e_it->second.r)
         {
-          const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
+          const shared_bufferst::varst &vars=
+            shared_buffers(e_it->second.object);
           irep_idt choice0=shared_buffers.choice("0");
           irep_idt choice1=shared_buffers.choice("1");
 
@@ -101,8 +105,10 @@ void mmio(
           exprt choice1_rhs=and_exprt(nondet_bool_expr, w_used1_expr);
 
           // throw 2 Boolean dice
-          shared_buffers.assignment(goto_program, i_it, location, choice0, choice0_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, choice1, choice1_rhs);
+          shared_buffers.assignment(
+            goto_program, i_it, location, choice0, choice0_rhs);
+          shared_buffers.assignment(
+            goto_program, i_it, location, choice1, choice1_rhs);
 
           exprt lhs=symbol_exprt(e_it->second.object, vars.type);
 
@@ -111,29 +117,46 @@ void mmio(
               if_exprt(choice1_expr, w_buff1_expr, lhs));
 
           // write one of the buffer entries
-          shared_buffers.assignment(goto_program, i_it, location, e_it->second.object, value);
+          shared_buffers.assignment(
+            goto_program, i_it, location, e_it->second.object, value);
 
           // update 'used' flags
           exprt w_used0_rhs=if_exprt(choice0_expr, false_exprt(), w_used0_expr);
-          exprt w_used1_rhs=and_exprt(if_exprt(choice1_expr, false_exprt(), w_used1_expr), w_used0_expr);
+          exprt w_used1_rhs=
+            and_exprt(
+              if_exprt(
+                choice1_expr,
+                false_exprt(),
+                w_used1_expr),
+              w_used0_expr);
 
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, w_used0_rhs);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, w_used1_rhs);
+          shared_buffers.assignment(
+            goto_program, i_it, location, vars.w_used0, w_used0_rhs);
+          shared_buffers.assignment(
+            goto_program, i_it, location, vars.w_used1, w_used1_rhs);
         }
 
       // now rotate the write buffers for anything that is written
       forall_rw_set_entries(e_it, rw_set)
         if(e_it->second.w)
         {
-          const shared_bufferst::varst &vars=shared_buffers(e_it->second.object);
+          const shared_bufferst::varst &vars=
+            shared_buffers(e_it->second.object);
 
           // w_used1=w_used0; w_used0=true;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used1, vars.w_used0);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_used0, true_exprt());
+          shared_buffers.assignment(
+            goto_program, i_it, location, vars.w_used1, vars.w_used0);
+          shared_buffers.assignment(
+            goto_program, i_it, location, vars.w_used0, true_exprt());
 
           // w_buff1=w_buff0; w_buff0=RHS;
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
-          shared_buffers.assignment(goto_program, i_it, location, vars.w_buff0, original_instruction.code.op1());
+          shared_buffers.assignment(
+            goto_program, i_it, location, vars.w_buff1, vars.w_buff0);
+          shared_buffers.assignment(
+            goto_program,
+            i_it, location,
+            vars.w_buff0,
+            original_instruction.code.op1());
         }
 
       // ATOMIC_END

@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class legacy_message_streamt:public message_clientt
 {
 public:
-  legacy_message_streamt(message_handlert &_message_handler):
+  explicit legacy_message_streamt(message_handlert &_message_handler):
     message_clientt(_message_handler),
     error_found(false),
     saved_error_location(static_cast<const source_locationt &>(get_nil_irep())),
@@ -33,10 +33,17 @@ public:
   virtual std::string to_string(const exprt &expr) { return expr.pretty(); }
   virtual std::string to_string(const typet &type) { return type.pretty(); }
 
-  void err_location(const exprt &expr) { saved_error_location=expr.find_source_location(); }
-  void err_location(const typet &type) { saved_error_location=type.source_location(); }
-  void err_location(const irept &irep) { saved_error_location=static_cast<const source_locationt &>(irep.find(ID_C_source_location)); }
-  void err_location(const source_locationt &_location) { saved_error_location=_location; }
+  void err_location(const exprt &expr)
+  { saved_error_location=expr.find_source_location(); }
+  void err_location(const typet &type)
+  { saved_error_location=type.source_location(); }
+  void err_location(const irept &irep)
+  {
+    saved_error_location=
+      static_cast<const source_locationt &>(irep.find(ID_C_source_location));
+  }
+  void err_location(const source_locationt &_location)
+  { saved_error_location=_location; }
 
   void error_msg(const std::string &message)
   {
@@ -95,7 +102,7 @@ public:
 
   std::ostringstream str;
 
-  inline std::ostream &error()
+  std::ostream &error()
   {
     return str;
   }
@@ -131,8 +138,10 @@ protected:
 
   void send_msg(unsigned level, const std::string &message)
   {
-    if(message=="") return;
-    if(level<=1) error_found=true;
+    if(message=="")
+      return;
+    if(level<=1)
+      error_found=true;
 
     if(message_handler!=NULL)
       message_handler->print(

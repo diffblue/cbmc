@@ -86,7 +86,7 @@ public:
 
  protected:
   typedef std::vector<variablet> variablest;
-  expanding_vector<variablest> variables;
+  expanding_vectort<variablest> variables;
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
 

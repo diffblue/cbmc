@@ -14,7 +14,7 @@ Author:
 class float_approximationt:public float_utilst
 {
 public:
-  float_approximationt(propt &_prop):
+  explicit float_approximationt(propt &_prop):
     float_utilst(_prop),
     over_approximate(false),
     partial_interpretation(false)
@@ -31,6 +31,7 @@ protected:
   bvt overapproximating_left_shift(const bvt &src, unsigned dist);
 
 private:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef float_utilst SUB;
 };
 

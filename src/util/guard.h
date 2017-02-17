@@ -21,7 +21,7 @@ public:
     make_true();
   }
 
-  guardt& operator=(const exprt &e)
+  guardt &operator=(const exprt &e)
   {
     *this=static_cast<const guardt&>(e);
 
@@ -35,7 +35,7 @@ public:
     add(guard);
   }
 
-  //exprt as_expr(guard_listt::const_iterator it) const;
+  // exprt as_expr(guard_listt::const_iterator it) const;
 
   exprt as_expr() const
   {
@@ -65,8 +65,6 @@ public:
   {
     guard_list.swap(g.guard_list);
   }
-
-  friend std::ostream &operator << (std::ostream &out, const guardt &g);
 
   size_type size() const
   {

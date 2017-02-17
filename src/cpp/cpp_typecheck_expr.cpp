@@ -40,7 +40,7 @@ Purpose:
 \*******************************************************************/
 
 bool cpp_typecheckt::find_parent(
-  const symbolt& symb,
+  const symbolt &symb,
   const irep_idt &base_name,
   irep_idt &identifier)
 {
@@ -48,7 +48,7 @@ bool cpp_typecheckt::find_parent(
   {
     if(lookup(bit->find(ID_type).get(ID_identifier)).base_name == base_name)
     {
-      identifier = bit->find(ID_type).get(ID_identifier);
+      identifier=bit->find(ID_type).get(ID_identifier);
       return true;
     }
   }
@@ -268,21 +268,21 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     qual2.read(expr.op2().type());
 
     if(qual1.is_subset_of(qual2))
-      expr.type() = expr.op1().type();
+      expr.type()=expr.op1().type();
     else
-      expr.type() = expr.op2().type();
+      expr.type()=expr.op2().type();
   }
   else
   {
-    exprt e1 = expr.op1();
-    exprt e2 = expr.op2();
+    exprt e1=expr.op1();
+    exprt e2=expr.op2();
 
     if(implicit_conversion_sequence(expr.op1(), expr.op2().type(), e1))
     {
       expr.type()=e1.type();
       expr.op1().swap(e1);
     }
-    else if(implicit_conversion_sequence(expr.op2(),expr.op1().type(), e2))
+    else if(implicit_conversion_sequence(expr.op2(), expr.op1().type(), e2))
     {
       expr.type()=e2.type();
       expr.op2().swap(e2);
@@ -294,21 +294,21 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       // array-to-pointer conversion
 
       index_exprt index1;
-      index1.array() = expr.op1();
-      index1.index() = from_integer(0, index_type());
-      index1.type() = expr.op1().type().subtype();
+      index1.array()=expr.op1();
+      index1.index()=from_integer(0, index_type());
+      index1.type()=expr.op1().type().subtype();
 
       index_exprt index2;
-      index2.array() = expr.op2();
-      index2.index() = from_integer(0, index_type());
-      index2.type() = expr.op2().type().subtype();
+      index2.array()=expr.op2();
+      index2.index()=from_integer(0, index_type());
+      index2.type()=expr.op2().type().subtype();
 
       address_of_exprt addr1(index1);
       address_of_exprt addr2(index2);
 
-      expr.op1() = addr1;
-      expr.op2() = addr2;
-      expr.type() = addr1.type();
+      expr.op1()=addr1;
+      expr.op2()=addr2;
+      expr.type()=addr1.type();
       return;
     }
     else
@@ -474,7 +474,8 @@ void cpp_typecheckt::typecheck_function_expr(
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=
+        expr.source_location();
 
       function_call.function()=
         static_cast<const exprt &>(
@@ -608,7 +609,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
     // See if the struct decalares the cast operator as a member
-    bool found_in_struct = false;
+    bool found_in_struct=false;
     assert(!expr.operands().empty());
     typet t0(follow(expr.op0().type()));
 
@@ -628,7 +629,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         if(!it->get_bool(ID_from_base) &&
            it->get(ID_base_name) == op_name)
         {
-          found_in_struct = true;
+          found_in_struct=true;
           break;
         }
       }
@@ -687,7 +688,8 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       cpp_namet cpp_name;
       cpp_name.get_sub().push_back(irept(ID_name));
       cpp_name.get_sub().back().set(ID_identifier, op_name);
-      cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
+      cpp_name.get_sub().back().add(ID_C_source_location)=
+        expr.source_location();
 
       // turn this into a function call
       side_effect_expr_function_callt function_call;
@@ -795,7 +797,6 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           return true;
         }
       }
-
     }
 
   return false;
@@ -835,7 +836,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   {
     // we take the address of the method.
     assert(expr.op0().id()==ID_member);
-    exprt symb = cpp_symbol_expr(lookup(expr.op0().get(ID_component_name)));
+    exprt symb=cpp_symbol_expr(lookup(expr.op0().get(ID_component_name)));
     exprt address(ID_address_of, typet(ID_pointer));
     address.copy_to_operands(symb);
     address.type().subtype()=symb.type();
@@ -847,15 +848,15 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
      expr.op0().get_bool(ID_C_implicit))
   {
     // must be the address of a function
-    code_typet& code_type = to_code_type(op.type().subtype());
+    code_typet &code_type=to_code_type(op.type().subtype());
 
-    code_typet::parameterst& args = code_type.parameters();
+    code_typet::parameterst &args=code_type.parameters();
     if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
     {
       // it's a pointer to member function
       typet symbol(ID_symbol);
       symbol.set(ID_identifier, code_type.get(ID_C_member_name));
-      expr.op0().type().add("to-member") = symbol;
+      expr.op0().type().add("to-member")=symbol;
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
@@ -1769,7 +1770,8 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       result.set_identifier(identifier);
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(
+        code_typet::parametert(ptr_arg.type().subtype()));
       t.parameters().push_back(code_typet::parametert(signed_int_type()));
       t.return_type()=empty_typet();
       result.type()=t;
@@ -1785,7 +1787,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       if(fargs.operands.size()!=3)
       {
         error().source_location=source_location;
-        error () << identifier << " expects three arguments" << eom;
+        error() << identifier << " expects three arguments" << eom;
         throw 0;
       }
 
@@ -1804,7 +1806,8 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       result.set_identifier(identifier);
       code_typet t;
       t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
-      t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+      t.parameters().push_back(
+        code_typet::parametert(ptr_arg.type().subtype()));
       t.parameters().push_back(code_typet::parametert(signed_int_type()));
       t.return_type()=ptr_arg.type().subtype();
       result.type()=t;
@@ -1907,8 +1910,10 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     else if(identifier=="__atomic_compare_exchange_n" ||
             identifier=="__atomic_compare_exchange")
     {
-      // bool __atomic_compare_exchange_n(type *ptr, type *expected, type desired, bool weak, int success_memorder, int failure_memorder)
-      // bool __atomic_compare_exchange(type *ptr, type *expected, type *desired, bool weak, int success_memorder, int failure_memorder)
+      // bool __atomic_compare_exchange_n(type *ptr, type *expected, type
+      // desired, bool weak, int success_memorder, int failure_memorder)
+      // bool __atomic_compare_exchange(type *ptr, type *expected, type
+      // *desired, bool weak, int success_memorder, int failure_memorder)
 
       if(fargs.operands.size()!=6)
       {
@@ -1954,7 +1959,8 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       if(identifier=="__atomic_compare_exchange")
         t.parameters().push_back(code_typet::parametert(ptr_arg.type()));
       else
-        t.parameters().push_back(code_typet::parametert(ptr_arg.type().subtype()));
+        t.parameters().push_back(
+          code_typet::parametert(ptr_arg.type().subtype()));
 
       t.parameters().push_back(code_typet::parametert(c_bool_type()));
       t.parameters().push_back(code_typet::parametert(signed_int_type()));
@@ -2122,7 +2128,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
           ptrmem.operands().push_back(
             cpp_scopes.current_scope().this_expr);
 
-          ptrmem.add(ID_component_cpp_name) = expr;
+          ptrmem.add(ID_component_cpp_name)=expr;
 
           ptrmem.add_source_location()=source_location;
           typecheck_expr_ptrmember(ptrmem, fargs);
@@ -2185,7 +2191,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // For virtual functions, it is important to check whether
   // the function name is qualified. If it is qualified, then
   // the call is not virtual.
-  bool is_qualified = false;
+  bool is_qualified=false;
 
   if(expr.function().id()==ID_member ||
      expr.function().id()==ID_ptrmember)
@@ -2233,7 +2239,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     {
       exprt typecast("explicit-typecast");
       typecast.type()=pod;
-      typecast.add_source_location() = expr.source_location();
+      typecast.add_source_location()=expr.source_location();
       typecast.copy_to_operands(expr.arguments().front());
       typecheck_expr_explicit_typecast(typecast);
       expr.swap(typecast);
@@ -2332,8 +2338,10 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       }
 
       // get the virtual table
-      typet this_type =  to_code_type(expr.function().type()).parameters().front().type();
-      irep_idt vtable_name = this_type.subtype().get_string(ID_identifier) +"::@vtable_pointer";
+      typet this_type=
+        to_code_type(expr.function().type()).parameters().front().type();
+      irep_idt vtable_name=
+        this_type.subtype().get_string(ID_identifier) +"::@vtable_pointer";
 
       const struct_typet &vt_struct=
         to_struct_type(follow(this_type.subtype()));
@@ -2346,12 +2354,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       vtptr_member.set(ID_component_name, vtable_name);
 
       // look for the right entry
-      irep_idt vtentry_component_name = vt_compo.type().subtype().get_string(ID_identifier)
-        + "::" + expr.function().type().get_string("#virtual_name");
+      irep_idt vtentry_component_name=
+        vt_compo.type().subtype().get_string(ID_identifier)+"::"+
+        expr.function().type().get_string("#virtual_name");
 
       exprt vtentry_member(ID_ptrmember);
       vtentry_member.copy_to_operands(vtptr_member);
-      vtentry_member.set(ID_component_name, vtentry_component_name );
+      vtentry_member.set(ID_component_name, vtentry_component_name);
       typecheck_expr(vtentry_member);
 
       assert(vtentry_member.type().id()==ID_pointer);
@@ -2389,7 +2398,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     cppname.get_sub().push_back(name);
 
     exprt member(ID_member);
-    member.add(ID_component_cpp_name) = cppname;
+    member.add(ID_component_cpp_name)=cppname;
 
     member.move_to_operands(op0);
 
@@ -2422,7 +2431,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     const typet &this_type=parameters[0].type();
 
     // change type from 'constructor' to object type
-    expr.type() = this_type.subtype();
+    expr.type()=this_type.subtype();
 
     // create temporary object
     exprt tmp_object_expr(ID_side_effect, this_type.subtype());
@@ -2486,7 +2495,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     codet new_code(ID_expression);
     new_code.copy_to_operands(expr);
 
-    tmp_object_expr.add(ID_initializer) = new_code;
+    tmp_object_expr.add(ID_initializer)=new_code;
     expr.swap(tmp_object_expr);
     return;
   }
@@ -2618,7 +2627,7 @@ Purpose:
 \*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_side_effect(
- side_effect_exprt &expr)
+  side_effect_exprt &expr)
 {
   const irep_idt &statement=expr.get(ID_statement);
 
@@ -2708,7 +2717,7 @@ void cpp_typecheckt::typecheck_method_application(
     }
     else
     {
-      exprt this_arg = member_expr.op0();
+      exprt this_arg=member_expr.op0();
       implicit_typecast(this_arg, this_type);
       assert(is_reference(this_arg.type()));
       this_arg.type().remove(ID_C_reference);
@@ -2859,8 +2868,8 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   // Turn into an operator call
 
-  std::string str_op = "operator";
-  bool post = false;
+  std::string str_op="operator";
+  bool post=false;
 
   if(expr.get(ID_statement)==ID_preincrement)
     str_op += "++";
@@ -2869,12 +2878,12 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   else if(expr.get(ID_statement)==ID_postincrement)
   {
     str_op += "++";
-    post = true;
+    post=true;
   }
   else if(expr.get(ID_statement)==ID_postdecrement)
   {
     str_op += "--";
-    post = true;
+    post=true;
   }
   else
   {
@@ -2958,7 +2967,7 @@ Purpose:
 
 \*******************************************************************/
 
-void cpp_typecheckt::convert_pmop(exprt& expr)
+void cpp_typecheckt::convert_pmop(exprt &expr)
 {
   assert(expr.id()=="pointer-to-member");
   assert(expr.operands().size() == 2);
@@ -2971,13 +2980,13 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
     throw 0;
   }
 
-  typet t0 = expr.op0().type().id()==ID_pointer ?
+  typet t0=expr.op0().type().id()==ID_pointer ?
   expr.op0().type().subtype():  expr.op0().type();
 
   typet t1((const typet&)expr.op1().type().find("to-member"));
 
-  t0 = follow(t0);
-  t1 = follow(t1);
+  t0=follow(t0);
+  t1=follow(t1);
 
   if(t0.id()!=ID_struct)
   {
@@ -2986,8 +2995,8 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
     throw 0;
   }
 
-  const struct_typet &from_struct = to_struct_type(t0);
-  const struct_typet &to_struct = to_struct_type(t1);
+  const struct_typet &from_struct=to_struct_type(t0);
+  const struct_typet &to_struct=to_struct_type(t1);
 
   if(!subtype_typecast(from_struct, to_struct))
   {
@@ -3009,7 +3018,7 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
   {
     if(expr.op0().id()==ID_dereference)
     {
-      exprt tmp = expr.op0().op0();
+      exprt tmp=expr.op0().op0();
       expr.op0().swap(tmp);
     }
     else
@@ -3017,7 +3026,7 @@ void cpp_typecheckt::convert_pmop(exprt& expr)
       assert(expr.op0().get_bool(ID_C_lvalue));
       exprt address_of(ID_address_of, typet(ID_pointer));
       address_of.copy_to_operands(expr.op0());
-      address_of.type().subtype() = address_of.op0().type();
+      address_of.type().subtype()=address_of.op0().type();
       expr.op0().swap(address_of);
     }
   }
@@ -3050,7 +3059,7 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
     assert(it != symbol_table.symbols.end());
 
-    symbolt &func_symb = it->second;
+    symbolt &func_symb=it->second;
 
     if(func_symb.value.id()=="cpp_not_typechecked")
       func_symb.value.set("is_used", true);
@@ -3158,7 +3167,6 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
       expr.swap(new_binary_expr);
     }
   }
-
 }
 
 /*******************************************************************\

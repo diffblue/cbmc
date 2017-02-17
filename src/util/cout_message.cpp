@@ -39,7 +39,8 @@ void cout_message_handlert::print(
     std::cout << message << '\n';
 
     // We flush for level 6 or below.
-    if(level<=6) std::cout << std::flush;
+    if(level<=6)
+      std::cout << std::flush;
   }
 }
 
@@ -158,14 +159,15 @@ void gcc_message_handlert::print(
   const irep_idt line=location.get_line();
   const irep_idt column=location.get_column();
   const irep_idt function=location.get_function();
-  
+
   std::string dest;
 
   if(!function.empty())
   {
     if(!file.empty())
       dest+=id2string(file)+":";
-    if(dest!="") dest+=' ';
+    if(dest!="")
+      dest+=' ';
     dest+="In function '"+id2string(function)+"':\n";
   }
 

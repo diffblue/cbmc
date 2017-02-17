@@ -22,7 +22,7 @@ struct ref_expr_set_dt
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
   expr_sett expr_set;
 
-  const static ref_expr_set_dt blank;
+  static const ref_expr_set_dt blank;
 };
 
 class ref_expr_sett:public reference_counting<ref_expr_set_dt>
@@ -32,25 +32,28 @@ public:
 
   bool empty() const
   {
-    if(d==NULL) return true;
+    if(d==NULL)
+      return true;
     return d->expr_set.empty();
   }
 
-  inline const expr_sett &expr_set() const
+  const expr_sett &expr_set() const
   {
     return read().expr_set;
   }
 
-  inline expr_sett &expr_set_write()
+  expr_sett &expr_set_write()
   {
     return write().expr_set;
   }
 
   bool make_union(const ref_expr_sett &s2)
   {
-    if(s2.d==NULL) return false;
+    if(s2.d==NULL)
+      return false;
 
-    if(s2.d==d) return false;
+    if(s2.d==d)
+      return false;
 
     if(d==NULL)
     {
@@ -68,7 +71,8 @@ public:
     tmp.insert(s2.begin(), s2.end());
 
     // anything new?
-    if(tmp.size()==old_size) return false;
+    if(tmp.size()==old_size)
+      return false;
     move(tmp);
     return true;
   }

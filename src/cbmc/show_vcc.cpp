@@ -45,7 +45,8 @@ void bmct::show_vcc_plain(std::ostream &out)
       s_it!=equation.SSA_steps.end();
       s_it++)
   {
-    if(!s_it->is_assert()) continue;
+    if(!s_it->is_assert())
+      continue;
 
     if(s_it->source.pc->source_location.is_not_nil())
       out << s_it->source.pc->source_location << "\n";
@@ -62,6 +63,7 @@ void bmct::show_vcc_plain(std::ostream &out)
 
     for(unsigned count=1; p_it!=last_it; p_it++)
       if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
+      {
         if(!p_it->ignore)
         {
           std::string string_value;
@@ -76,6 +78,7 @@ void bmct::show_vcc_plain(std::ostream &out)
 
           count++;
         }
+      }
 
     out << "|--------------------------" << "\n";
 
@@ -114,7 +117,8 @@ void bmct::show_vcc_json(std::ostream &out)
       s_it!=equation.SSA_steps.end();
       s_it++)
   {
-    if(!s_it->is_assert()) continue;
+    if(!s_it->is_assert())
+      continue;
 
     // vcc object
     json_objectt &object=json_vccs.push_back(jsont()).make_object();

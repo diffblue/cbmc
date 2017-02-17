@@ -36,8 +36,8 @@ public:
 
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from the last instruction (END_FUNCTION) of the function
-  //    to the instruction _following_ the call site
+  // b) there is an edge from the last instruction (END_FUNCTION)
+  //    of the function to the instruction _following_ the call site
   //    (this also needs to set the LHS, if applicable)
 
   virtual void transform(
@@ -87,7 +87,7 @@ public:
   {
   }
 
-  inline void operator()(
+  void operator()(
     const goto_programt &goto_program,
     const namespacet &ns)
   {
@@ -97,7 +97,7 @@ public:
     fixedpoint(goto_program, goto_functions, ns);
   }
 
-  inline void operator()(
+  void operator()(
     const goto_functionst &goto_functions,
     const namespacet &ns)
   {
@@ -106,7 +106,7 @@ public:
     fixedpoint(goto_functions, ns);
   }
 
-  inline void operator()(const goto_modelt &goto_model)
+  void operator()(const goto_modelt &goto_model)
   {
     const namespacet ns(goto_model.symbol_table);
     initialize(goto_model.goto_functions);
@@ -114,7 +114,7 @@ public:
     fixedpoint(goto_model.goto_functions, ns);
   }
 
-  inline void operator()(
+  void operator()(
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
@@ -133,7 +133,7 @@ public:
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
-  inline void output(
+  void output(
     const goto_modelt &goto_model,
     std::ostream &out) const
   {
@@ -141,7 +141,7 @@ public:
     output(ns, goto_model.goto_functions, out);
   }
 
-  inline void output(
+  void output(
     const namespacet &ns,
     const goto_programt &goto_program,
     std::ostream &out) const
@@ -149,7 +149,7 @@ public:
     output(ns, goto_program, "", out);
   }
 
-  inline void output(
+  void output(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function,
     std::ostream &out) const
@@ -254,21 +254,25 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  inline domainT &operator[](locationt l)
+  domainT &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
-  inline const domainT &operator[](locationt l) const
+  const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
-  virtual void clear() override
+  void clear() override
   {
     state_map.clear();
     ai_baset::clear();
@@ -285,25 +289,28 @@ protected:
   }
 
   // this one just finds states
-  virtual const statet &find_state(locationt l) const override
+  const statet &find_state(locationt l) const override
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
-  virtual bool merge(const statet &src, locationt from, locationt to) override
+  bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
-    return static_cast<domainT &>(dest).merge(static_cast<const domainT &>(src), from, to);
+    return static_cast<domainT &>(dest).merge(
+      static_cast<const domainT &>(src), from, to);
   }
 
-  virtual statet *make_temporary_state(const statet &s) override
+  statet *make_temporary_state(const statet &s) override
   {
     return new domainT(static_cast<const domainT &>(s));
   }
 
-  virtual void fixedpoint(
+  void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {
@@ -315,7 +322,7 @@ private:
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
 
   // not implemented in sequential analyses
-  virtual bool merge_shared(
+  bool merge_shared(
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
@@ -336,18 +343,19 @@ public:
   {
   }
 
-  virtual bool merge_shared(
+  bool merge_shared(
     const statet &src,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     const namespacet &ns) override
   {
     statet &dest=this->get_state(to);
-    return static_cast<domainT &>(dest).merge_shared(static_cast<const domainT &>(src), from, to, ns);
+    return static_cast<domainT &>(dest).merge_shared(
+      static_cast<const domainT &>(src), from, to, ns);
   }
 
 protected:
-  virtual void fixedpoint(
+  void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {

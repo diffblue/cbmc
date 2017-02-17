@@ -22,9 +22,12 @@ Function: boolbvt::convert_mod
 
 bvt boolbvt::convert_mod(const mod_exprt &expr)
 {
+  #if 0
+  // TODO
   if(expr.type().id()==ID_floatbv)
   {
   }
+  #endif
 
   if(expr.type().id()!=ID_unsignedbv &&
      expr.type().id()!=ID_signedbv)

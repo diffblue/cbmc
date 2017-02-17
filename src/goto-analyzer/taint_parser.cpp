@@ -57,7 +57,8 @@ bool taint_parser(
     if(!it->is_object())
     {
       messaget message(message_handler);
-      message.error() << "expecting an array of objects in the taint file, but got "
+      message.error() << "expecting an array of objects "
+                      << "in the taint file, but got "
                       << *it << messaget::eom;
       return true;
     }
@@ -114,7 +115,8 @@ bool taint_parser(
     {
       messaget message(message_handler);
       message.error() << "taint rule must have \"where\""
-                      << " which is \"return_value\" or \"this\" or \"parameter1\"..."
+                      << " which is \"return_value\" or \"this\" "
+                      << "or \"parameter1\"..."
                       << messaget::eom;
       return true;
     }
@@ -143,7 +145,8 @@ Function: taint_parse_treet::rulet::output
 
 void taint_parse_treet::rulet::output(std::ostream &out) const
 {
-  if(!id.empty()) out << id << ": ";
+  if(!id.empty())
+    out << id << ": ";
 
   switch(kind)
   {
@@ -157,7 +160,8 @@ void taint_parse_treet::rulet::output(std::ostream &out) const
   switch(where)
   {
   case THIS: out << "this in " << function_identifier; break;
-  case PARAMETER: out << "parameter " << parameter_number << " of " << function_identifier; break;
+  case PARAMETER: out << "parameter " << parameter_number << " of "
+                      << function_identifier; break;
   case RETURN_VALUE: out << "return value of " << function_identifier; break;
   }
 

@@ -24,7 +24,7 @@ class compare_constantt
 {
   const namespacet ns;
 public:
-  compare_constantt(const invariant_programt &program) :
+  explicit compare_constantt(const invariant_programt &program) :
       ns(program.st)
   {
   }

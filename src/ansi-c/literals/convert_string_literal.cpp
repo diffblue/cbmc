@@ -109,8 +109,10 @@ exprt convert_string_literal(const std::string &src)
     if(ch!='L' && ch!='u' && ch!='U' && ch!='"')
       continue;
 
-    if(ch=='L') wide=ch;
-    if((ch=='u' || ch=='U') && i+1<src.size() && src[i+1]=='"') wide=ch;
+    if(ch=='L')
+      wide=ch;
+    if((ch=='u' || ch=='U') && i+1<src.size() && src[i+1]=='"')
+      wide=ch;
 
     // find start of sequence
     unsigned j=i;

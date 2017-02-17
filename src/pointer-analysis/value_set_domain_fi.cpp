@@ -62,8 +62,10 @@ bool value_set_domain_fit::transform(
     }
     break;
 
-  default:;
-    // do nothing
+  default:
+    {
+      // do nothing
+    }
   }
 
   return (value_set.changed);

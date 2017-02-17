@@ -37,7 +37,7 @@ protected:
   goto_functionst &goto_functions;
 
   /* alternative representation of graph (SCC) */
-  std::map<event_idt,event_idt> map_vertex_gnode;
+  std::map<event_idt, event_idt> map_vertex_gnode;
   wmm_grapht egraph_alt;
 
   unsigned unique_id;
@@ -47,38 +47,38 @@ protected:
   bool render_by_file;
   bool render_by_function;
 
-  bool inline local(const irep_idt& id);
+  bool inline local(const irep_idt &id);
 
-  void inline add_instr_to_interleaving (
+  void inline add_instr_to_interleaving(
     goto_programt::instructionst::iterator it,
-    goto_programt& interleaving);
+    goto_programt &interleaving);
 
   /* deprecated */
-  bool is_cfg_spurious(const event_grapht::critical_cyclet& cyc);
+  bool is_cfg_spurious(const event_grapht::critical_cyclet &cyc);
 
-  unsigned cost(const event_grapht::critical_cyclet::delayt& e);
+  unsigned cost(const event_grapht::critical_cyclet::delayt &e);
 
   typedef std::set<event_grapht::critical_cyclet> set_of_cyclest;
   void inline instrument_all_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_event_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_read_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_one_write_per_cycle_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_minimum_interference_inserter(
-    const set_of_cyclest& set);
+    const set_of_cyclest &set);
   void inline instrument_my_events_inserter(
-    const set_of_cyclest& set, const std::set<event_idt>& events);
+    const set_of_cyclest &set, const std::set<event_idt> &events);
 
   void inline print_outputs_local(
-    const std::set<event_grapht::critical_cyclet>& set,
-    std::ofstream& dot,
-    std::ofstream& ref,
-    std::ofstream& output,
-    std::ofstream& all,
-    std::ofstream& table,
+    const std::set<event_grapht::critical_cyclet> &set,
+    std::ofstream &dot,
+    std::ofstream &ref,
+    std::ofstream &output,
+    std::ofstream &all,
+    std::ofstream &table,
     memory_modelt model,
     bool hide_internals);
 
@@ -87,13 +87,13 @@ protected:
   class cfg_visitort
   {
   protected:
-    namespacet& ns;
-    instrumentert& instrumenter;
+    namespacet &ns;
+    instrumentert &instrumenter;
 
     /* pointer to the egraph(s) that we construct */
-    event_grapht& egraph;
-    std::vector<std::set<event_idt> >& egraph_SCCs;
-    wmm_grapht& egraph_alt;
+    event_grapht &egraph;
+    std::vector<std::set<event_idt>> &egraph_SCCs;
+    wmm_grapht &egraph_alt;
 
     /* for thread marking (dynamic) */
     unsigned current_thread;
@@ -102,11 +102,11 @@ protected:
     bool contains_shared_array(
       goto_programt::const_targett targ,
       goto_programt::const_targett i_it,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
       , local_may_aliast local_may
       #endif
-    ) const;
+    ) const; // NOLINT(whitespace/parens)
 
     /* transformers */
     void visit_cfg_thread() const;
@@ -114,26 +114,26 @@ protected:
     void visit_cfg_body(
       goto_programt::const_targett i_it,
       loop_strategyt replicate_body,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
-    ); // deprecated
+    ); // deprecated  NOLINT(whitespace/parens)
     void inline visit_cfg_backedge(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
     void inline visit_cfg_duplicate(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
-    void visit_cfg_assign(value_setst& value_sets, namespacet& ns,
-      goto_programt::instructionst::iterator& i_it, bool no_dependencies
+    void visit_cfg_assign(value_setst &value_sets, namespacet &ns,
+      goto_programt::instructionst::iterator &i_it, bool no_dependencies
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
-    );
+    ); // NOLINT(whitespace/parens)
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
     void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_function_call(value_setst& value_sets,
+    void visit_cfg_function_call(value_setst &value_sets,
       goto_programt::instructionst::iterator i_it,
       memory_modelt model,
       bool no_dependenciess,
@@ -143,12 +143,12 @@ protected:
       /* forces the duplication of all the loops, with array or not
          otherwise, duplication of loops with array accesses only */
       loop_strategyt replicate_body,
-      value_setst& value_sets
+      value_setst &value_sets
       #ifdef LOCAL_MAY
-      , local_may_aliast& local_may
+      , local_may_aliast &local_may
       #endif
-    );
-    void visit_cfg_reference_function (irep_idt id_function);
+    ); // NOLINT(whitespace/parens)
+    void visit_cfg_reference_function(irep_idt id_function);
 
  public:
     virtual ~cfg_visitort()
@@ -158,8 +158,8 @@ protected:
     unsigned max_thread;
 
     /* relations between irep and Reads/Writes */
-    typedef std::multimap<irep_idt,event_idt> id2nodet;
-    typedef std::pair<irep_idt,event_idt> id2node_pairt;
+    typedef std::multimap<irep_idt, event_idt> id2nodet;
+    typedef std::pair<irep_idt, event_idt> id2node_pairt;
     id2nodet map_reads, map_writes;
 
     unsigned write_counter;
@@ -168,8 +168,8 @@ protected:
     unsigned fr_rf_counter;
 
     /* previous nodes (fwd analysis) */
-    typedef std::pair<event_idt,event_idt> nodet;
-    typedef std::map<goto_programt::const_targett,std::set<nodet> >
+    typedef std::pair<event_idt, event_idt> nodet;
+    typedef std::map<goto_programt::const_targett, std::set<nodet> >
       incoming_post;
 
     incoming_post in_pos;
@@ -188,7 +188,7 @@ protected:
     /* to keep track of the functions (and their start/end nodes) */
     std::stack<irep_idt> stack_fun;
     irep_idt cur_fun;
-    std::map<irep_idt,std::set<nodet> > in_nodes, out_nodes;
+    std::map<irep_idt, std::set<nodet> > in_nodes, out_nodes;
     #endif
 
     /* current thread number */
@@ -204,7 +204,7 @@ protected:
     /* set of functions visited so far -- we don't handle recursive functions */
     std::set<irep_idt> functions_met;
 
-    cfg_visitort(namespacet& _ns, instrumentert& _instrumenter)
+    cfg_visitort(namespacet &_ns, instrumentert &_instrumenter)
     :ns(_ns), instrumenter(_instrumenter), egraph(_instrumenter.egraph),
       egraph_SCCs(_instrumenter.egraph_SCCs),
       egraph_alt(_instrumenter.egraph_alt)
@@ -219,14 +219,14 @@ protected:
       coming_from = 0;
     }
 
-    void inline enter_function(const irep_idt& function)
+    void inline enter_function(const irep_idt &function)
     {
       if(functions_met.find(function)!=functions_met.end())
-        throw ("Sorry, doesn't handle recursive function for the moment");
+        throw "sorry, doesn't handle recursive function for the moment";
       functions_met.insert(function);
     }
 
-    void inline leave_function(const irep_idt& function)
+    void inline leave_function(const irep_idt &function)
     {
       functions_met.erase(function);
     }
@@ -236,10 +236,11 @@ protected:
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      const irep_idt& function)
+      const irep_idt &function)
     {
       /* ignore recursive calls -- underapproximation */
-      try {
+      try
+      {
         /* forbids recursive function */
         enter_function(function);
         const std::set<nodet> empty_in;
@@ -248,7 +249,8 @@ protected:
           function, empty_in, end_out);
         leave_function(function);
       }
-      catch(std::string s) {
+      catch(std::string s)
+      {
         instrumenter.message.warning() << s << messaget::eom;
       }
     }
@@ -256,23 +258,23 @@ protected:
     // TODO: move the visitor outside, and inherit
     virtual void visit_cfg_function(
       /* value_sets and options */
-      value_setst& value_sets,
+      value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
       /* functino to analyse */
-      const irep_idt& function,
+      const irep_idt &function,
       /* incoming edges */
-      const std::set<nodet>& initial_vertex,
+      const std::set<nodet> &initial_vertex,
       /* outcoming edges */
-      std::set<nodet>& ending_vertex);
+      std::set<nodet> &ending_vertex);
 
-    bool inline local(const irep_idt& i);
+    bool inline local(const irep_idt &i);
   };
 
 public:
   /* message */
-  messaget& message;
+  messaget &message;
 
   /* graph */
   event_grapht egraph;
@@ -289,11 +291,12 @@ public:
 
   /* map from function to begin and end of the corresponding part of the
      graph */
-  typedef std::map<irep_idt,std::pair<std::set<event_idt>,
+  typedef std::map<irep_idt, std::pair<std::set<event_idt>,
     std::set<event_idt> > > map_function_nodest;
   map_function_nodest map_function_graph;
 
-  void print_map_function_graph() const {
+  void print_map_function_graph() const
+  {
     for(map_function_nodest::const_iterator it=map_function_graph.begin();
        it!=map_function_graph.end();
        ++it)
@@ -319,11 +322,11 @@ public:
   /* TODO: those maps are here to interface easily with weak_mem.cpp,
      but a rewriting of weak_mem can eliminate them */
   std::set<irep_idt> var_to_instr;
-  std::multimap<irep_idt,source_locationt> id2loc;
-  std::multimap<irep_idt,source_locationt> id2cycloc;
+  std::multimap<irep_idt, source_locationt> id2loc;
+  std::multimap<irep_idt, source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet& _symbol_table, goto_functionst& _goto_f,
-    messaget& _message)
+  instrumentert(symbol_tablet &_symbol_table, goto_functionst &_goto_f,
+    messaget &_message)
     :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true),
       render_by_file(false), render_by_function(false), message(_message),
       egraph(_message)
@@ -333,7 +336,7 @@ public:
   /* abstracts goto-programs in abstract event graph, and computes
      the thread numbering and returns the max number */
   unsigned goto2graph_cfg(
-    value_setst& value_sets,
+    value_setst &value_sets,
     memory_modelt model,
     bool no_dependencies,
     /* forces the duplication, with arrays or not; otherwise, arrays only */
@@ -342,7 +345,7 @@ public:
   /* collects directly all the cycles in the graph */
   void collect_cycles(memory_modelt model)
   {
-    egraph.collect_cycles(set_of_cycles,model);
+    egraph.collect_cycles(set_of_cycles, model);
     num_sccs = 0;
   }
 
@@ -358,7 +361,7 @@ public:
     unsigned _max_po_trans = 0,
     bool _ignore_arrays = false)
   {
-    egraph.set_parameters_collection(_max_var,_max_po_trans,_ignore_arrays);
+    egraph.set_parameters_collection(_max_var, _max_po_trans, _ignore_arrays);
   }
 
   /* builds the relations between unsafe pairs in the critical cycles and
@@ -366,7 +369,7 @@ public:
 
   /* strategies for instrumentation */
   void instrument_with_strategy(instrumentation_strategyt strategy);
-  void instrument_my_events(const std::set<event_idt>& events);
+  void instrument_my_events(const std::set<event_idt> &events);
 
   /* retrieves events to filter in the instrumentation choice
      with option --my-events */

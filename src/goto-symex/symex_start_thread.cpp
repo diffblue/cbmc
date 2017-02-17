@@ -24,7 +24,8 @@ Function: goto_symext::symex_start_thread
 
 void goto_symext::symex_start_thread(statet &state)
 {
-  if(state.guard.is_false()) return;
+  if(state.guard.is_false())
+    return;
 
   // we don't allow spawning threads out of atomic sections
   // this would require amendments to ordering constraints
@@ -45,7 +46,7 @@ void goto_symext::symex_start_thread(statet &state)
   // put into thread vector
   std::size_t t=state.threads.size();
   state.threads.push_back(statet::threadt());
-  //statet::threadt &cur_thread=state.threads[state.source.thread_nr];
+  // statet::threadt &cur_thread=state.threads[state.source.thread_nr];
   statet::threadt &new_thread=state.threads.back();
   new_thread.pc=thread_target;
   new_thread.guard=state.guard;
@@ -92,7 +93,8 @@ void goto_symext::symex_start_thread(statet &state)
     guardt guard;
     const bool record_events=state.record_events;
     state.record_events=false;
-    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+    symex_assign_symbol(
+      state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
     state.record_events=record_events;
   }
 
@@ -119,6 +121,7 @@ void goto_symext::symex_start_thread(statet &state)
       rhs=zero_initializer(symbol.type, symbol.location, ns);
 
     guardt guard;
-    symex_assign_symbol(state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+    symex_assign_symbol(
+      state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
   }
 }

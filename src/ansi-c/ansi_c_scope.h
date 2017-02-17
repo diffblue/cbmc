@@ -30,7 +30,8 @@ class ansi_c_scopet
 public:
   // This maps "scope names" (tag-X, label-X, X) to
   // ansi_c_identifiert.
-  typedef std::unordered_map<irep_idt, ansi_c_identifiert, irep_id_hash> name_mapt;
+  typedef std::unordered_map<irep_idt, ansi_c_identifiert, irep_id_hash>
+    name_mapt;
   name_mapt name_map;
 
   std::string prefix;

@@ -308,7 +308,8 @@ void dep_graph_domaint::output(
         it!=control_deps.end();
         ++it)
     {
-      if(it!=control_deps.begin()) out << ",";
+      if(it!=control_deps.begin())
+        out << ",";
       out << (*it)->location_number;
     }
     out << std::endl;
@@ -322,7 +323,8 @@ void dep_graph_domaint::output(
         it!=data_deps.end();
         ++it)
     {
-      if(it!=data_deps.begin()) out << ",";
+      if(it!=data_deps.begin())
+        out << ",";
       out << (*it)->location_number;
     }
     out << std::endl;
@@ -353,7 +355,7 @@ void dependence_grapht::add_dep(
 
   // add_edge is redundant as the subsequent operations also insert
   // entries into the edge maps (implicitly)
-  //add_edge(n_from, n_to);
+  // add_edge(n_from, n_to);
   nodes[n_from].out[n_to].add(kind);
   nodes[n_to].in[n_from].add(kind);
 }

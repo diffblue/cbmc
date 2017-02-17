@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_scopest
 {
 public:
-  inline cpp_scopest()
+  cpp_scopest()
   {
     current_scope_ptr=&root_scope;
   }
@@ -27,7 +27,7 @@ public:
   typedef std::set<cpp_scopet *> scope_sett;
   typedef std::set<cpp_idt *> id_sett;
 
-  inline cpp_scopet &current_scope()
+  cpp_scopet &current_scope()
   {
     return *current_scope_ptr;
   }
@@ -44,7 +44,7 @@ public:
     return n;
   }
 
-  inline cpp_scopet &new_namespace(const irep_idt &new_scope_name)
+  cpp_scopet &new_namespace(const irep_idt &new_scope_name)
   {
     return new_scope(new_scope_name, cpp_idt::NAMESPACE);
   }
@@ -101,7 +101,7 @@ public:
   void go_to(cpp_idt &id)
   {
     assert(id.is_scope);
-    current_scope_ptr=(cpp_scopet *)&id;
+    current_scope_ptr=static_cast<cpp_scopet*>(&id);
   }
 
   // move up to next global scope
@@ -125,7 +125,7 @@ protected:
 class cpp_save_scopet
 {
 public:
-  cpp_save_scopet(cpp_scopest &_cpp_scopes):
+  explicit cpp_save_scopet(cpp_scopest &_cpp_scopes):
     cpp_scopes(_cpp_scopes),
     saved_scope(_cpp_scopes.current_scope_ptr)
   {

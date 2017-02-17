@@ -31,7 +31,8 @@ void unsigned_union_find::make_union(size_type j, size_type k)
   j=find(j);
   k=find(k);
 
-  if(j==k) return; // already in same set
+  if(j==k)
+    return; // already in same set
 
   // weight it
 
@@ -71,7 +72,8 @@ void unsigned_union_find::isolate(size_type a)
     size_type c=nodes[a].count;
 
     // already isolated?
-    if(c==1) return;
+    if(c==1)
+      return;
 
     assert(c>=2);
 
@@ -86,7 +88,7 @@ void unsigned_union_find::isolate(size_type a)
   // get its root
   size_type r=find(a);
 
-  //assert(r!=a);
+  // assert(r!=a);
 
   nodes[r].count--;
   nodes[a].parent=a;
@@ -214,7 +216,8 @@ Function: unsigned_union_find::find
 
 unsigned_union_find::size_type unsigned_union_find::find(size_type a) const
 {
-  if(a>=size()) return a;
+  if(a>=size())
+    return a;
 
   while(!is_root(a))
   {

@@ -122,13 +122,15 @@ bool compilet::doit()
   }
 
   if(source_files.size()>0)
-    if(compile()) return true;
+    if(compile())
+      return true;
 
   if(mode==LINK_LIBRARY ||
      mode==COMPILE_LINK ||
      mode==COMPILE_LINK_EXECUTABLE)
   {
-    if(link()) return true;
+    if(link())
+      return true;
   }
 
   return false;
@@ -223,9 +225,9 @@ bool compilet::add_input_file(const std::string &file_name)
 
     // add the files from "ar t"
     #ifdef _WIN32
-    if(file_name[0]!='/' && file_name[1]!=':')
+    if(file_name[0]!='/' && file_name[1]!=':') // NOLINT(readability/braces)
     #else
-    if(file_name[0]!='/')
+    if(file_name[0]!='/') // NOLINT(readability/braces)
     #endif
     {
       cmd << "ar t " <<
@@ -250,7 +252,7 @@ bool compilet::add_input_file(const std::string &file_name)
       {
         if(ch!='\n')
         {
-          line+=(char)ch;
+          line+=static_cast<char>(ch);
         }
         else
         {
@@ -414,7 +416,8 @@ bool compilet::link()
     convert_symbols(compiled_functions);
   }
 
-  if(write_object_file(output_file_executable, symbol_table, compiled_functions))
+  if(write_object_file(
+      output_file_executable, symbol_table, compiled_functions))
     return true;
 
   return false;
@@ -500,7 +503,8 @@ Function: compilet::parse
 
 bool compilet::parse(const std::string &file_name)
 {
-  if(file_name=="-") return parse_stdin();
+  if(file_name=="-")
+    return parse_stdin();
 
   #ifdef _MSC_VER
   std::ifstream infile(widen(file_name));

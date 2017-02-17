@@ -145,7 +145,7 @@ void rd_range_domaint::transform_dead(
   const namespacet &ns,
   locationt from)
 {
-  const irep_idt& identifier=
+  const irep_idt &identifier=
     to_symbol_expr(to_code_dead(from->code).symbol()).get_identifier();
 
   valuest::iterator entry=values.find(identifier);
@@ -243,7 +243,7 @@ void rd_range_domaint::transform_function_call(
         ++it;
     }
 
-    const symbol_exprt& fn_symbol_expr=to_symbol_expr(code.function());
+    const symbol_exprt &fn_symbol_expr=to_symbol_expr(code.function());
     const code_typet &code_type=
       to_code_type(ns.lookup(fn_symbol_expr.get_identifier()).type);
 
@@ -302,11 +302,13 @@ void rd_range_domaint::transform_end_function(
     if(!rd.get_is_threaded()(call) ||
        (!ns.lookup(identifier).is_shared() &&
         !rd.get_is_dirty()(identifier)))
+    {
       for(const auto &id : new_value.second)
       {
         const reaching_definitiont &v=bv_container->get(id);
         kill(v.identifier, v.bit_begin, v.bit_end);
       }
+    }
 
     for(const auto &id : new_value.second)
     {
@@ -827,8 +829,8 @@ bool rd_range_domaint::merge_shared(
   {
     const irep_idt &identifier=value.first;
 
-    if(!ns.lookup(identifier).is_shared() /*&&
-       !rd.get_is_dirty()(identifier)*/)
+    if(!ns.lookup(identifier).is_shared()
+       /*&& !rd.get_is_dirty()(identifier)*/)
       continue;
 
     while(it!=values.end() && it->first<value.first)
@@ -867,7 +869,7 @@ Function: rd_range_domaint::get
 
 \*******************************************************************/
 
-const rd_range_domaint::ranges_at_loct& rd_range_domaint::get(
+const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
   const irep_idt &identifier) const
 {
   populate_cache(identifier);
@@ -896,9 +898,12 @@ Function: reaching_definitions_analysist::~reaching_definitions_analysist
 
 reaching_definitions_analysist::~reaching_definitions_analysist()
 {
-  if(is_dirty) delete is_dirty;
-  if(is_threaded) delete is_threaded;
-  if(value_sets) delete value_sets;
+  if(is_dirty)
+    delete is_dirty;
+  if(is_threaded)
+    delete is_threaded;
+  if(value_sets)
+    delete value_sets;
 }
 
 /*******************************************************************\

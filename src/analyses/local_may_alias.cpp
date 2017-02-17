@@ -101,14 +101,14 @@ void local_may_aliast::assign_lhs(
       {
         if(objects[i].id()==ID_symbol)
         {
-          const irep_idt &identifier=to_symbol_expr(objects[i]).get_identifier();
+          const irep_idt &identifier=
+            to_symbol_expr(objects[i]).get_identifier();
 
           if(dirty(identifier) || !locals.is_local(identifier))
           {
             loc_info_dest.aliases.isolate(i);
             loc_info_dest.aliases.make_union(i, unknown_object);
           }
-
         }
       }
     }
@@ -119,7 +119,8 @@ void local_may_aliast::assign_lhs(
   }
   else if(lhs.id()==ID_member)
   {
-    assign_lhs(to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest);
+    assign_lhs(
+      to_member_expr(lhs).struct_op(), rhs, loc_info_src, loc_info_dest);
   }
   else if(lhs.id()==ID_typecast)
   {
@@ -382,7 +383,8 @@ Function: local_may_aliast::build
 
 void local_may_aliast::build(const goto_functiont &goto_function)
 {
-  if(cfg.nodes.empty()) return;
+  if(cfg.nodes.empty())
+    return;
 
   work_queuet work_queue;
 
@@ -403,7 +405,8 @@ void local_may_aliast::build(const goto_functiont &goto_function)
   {
     const irep_idt &identifier=it->get_identifier();
     if(is_tracked(identifier))
-      loc_infos[0].points_to[objects.number(identifier)].objects.insert(unknown_object);
+      loc_infos[0].points_to[objects.number(identifier)].objects.insert(
+        unknown_object);
   }
   #endif
 
@@ -414,7 +417,8 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       l_it++)
   {
     if(is_tracked(l_it->first))
-      loc_infos[0].aliases.make_union(objects.number(l_it->second), unknown_object);
+      loc_infos[0].aliases.make_union(
+        objects.number(l_it->second), unknown_object);
   }
   #endif
 
@@ -433,29 +437,34 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     case ASSIGN:
       {
         const code_assignt &code_assign=to_code_assign(instruction.code);
-        assign_lhs(code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
       }
       break;
 
     case DECL:
       {
         const code_declt &code_decl=to_code_decl(instruction.code);
-        assign_lhs(code_decl.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_decl.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
       }
       break;
 
     case DEAD:
       {
         const code_deadt &code_dead=to_code_dead(instruction.code);
-        assign_lhs(code_dead.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
+        assign_lhs(
+          code_dead.symbol(), nil_exprt(), loc_info_src, loc_info_dest);
       }
       break;
 
     case FUNCTION_CALL:
       {
-        const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+        const code_function_callt &code_function_call=
+          to_code_function_call(instruction.code);
         if(code_function_call.lhs().is_not_nil())
-          assign_lhs(code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
+          assign_lhs(
+            code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
 
         // this might invalidate all pointers that are
         // a) local and dirty
@@ -464,20 +473,22 @@ void local_may_aliast::build(const goto_functiont &goto_function)
         {
           if(objects[i].id()==ID_symbol)
           {
-            const irep_idt &identifier=to_symbol_expr(objects[i]).get_identifier();
+            const irep_idt &identifier=
+              to_symbol_expr(objects[i]).get_identifier();
 
             if(dirty(identifier) || !locals.is_local(identifier))
             {
               loc_info_dest.aliases.isolate(i);
               loc_info_dest.aliases.make_union(i, unknown_object);
             }
-
           }
         }
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     for(local_cfgt::successorst::const_iterator

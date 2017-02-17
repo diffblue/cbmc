@@ -11,6 +11,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "cnf.h"
 
+// NOLINTNEXTLINE(readability/identifiers)
 struct LGL;
 
 class satcheck_lingelingt:public cnf_solvert
@@ -33,6 +34,7 @@ public:
   virtual void set_frozen(literalt a);
 
 protected:
+  // NOLINTNEXTLINE(readability/identifiers)
   struct LGL * solver;
   bvt assumptions;
 };

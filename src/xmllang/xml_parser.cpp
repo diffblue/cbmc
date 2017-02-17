@@ -69,7 +69,8 @@ bool parse_xml(
 {
   std::ifstream in(filename);
 
-  if(!in) return true;
+  if(!in)
+    return true;
 
   return parse_xml(in, filename, message_handler, dest);
 }

@@ -118,7 +118,7 @@ protected:
   void convert_initializer(symbolt &symbol);
   void convert_function(symbolt &symbol);
 
-  void convert_pmop(exprt& expr);
+  void convert_pmop(exprt &expr);
 
   void convert_anonymous_union(
     cpp_declarationt &declaration,
@@ -253,15 +253,15 @@ protected:
     cpp_declarationt &ctor) const;
 
   void default_cpctor(
-    const symbolt&, cpp_declarationt& cpctor) const;
+    const symbolt&, cpp_declarationt &cpctor) const;
 
   void default_assignop(
-      const symbolt& symbol, cpp_declarationt& cpctor);
+      const symbolt &symbol, cpp_declarationt &cpctor);
 
   void default_assignop_value(
-      const symbolt& symbol, cpp_declaratort& declarator);
+      const symbolt &symbol, cpp_declaratort &declarator);
 
-  void default_dtor(const symbolt& symb, cpp_declarationt& dtor);
+  void default_dtor(const symbolt &symb, cpp_declarationt &dtor);
 
   codet dtor(const symbolt &symb);
 
@@ -278,20 +278,20 @@ protected:
     const struct_union_typet &struct_union_type,
     irept &initializers);
 
-  bool find_cpctor(const symbolt& symbol)const;
-  bool find_assignop(const symbolt& symbol)const;
-  bool find_dtor(const symbolt& symbol)const;
+  bool find_cpctor(const symbolt &symbol)const;
+  bool find_assignop(const symbolt &symbol)const;
+  bool find_dtor(const symbolt &symbol)const;
 
   bool find_parent(
-    const symbolt& symb,
+    const symbolt &symb,
     const irep_idt &base_name,
     irep_idt &identifier);
 
   bool get_component(
     const source_locationt &source_location,
-    const exprt& object,
-    const irep_idt& component_name,
-    exprt& member);
+    const exprt &object,
+    const irep_idt &component_name,
+    exprt &member);
 
   void new_temporary(const source_locationt &source_location,
                      const typet &,
@@ -309,16 +309,16 @@ protected:
 
   void add_base_components(
         const struct_typet &from,
-        const irep_idt& access,
+        const irep_idt &access,
         struct_typet &to,
-        std::set<irep_idt>& bases,
-        std::set<irep_idt>& vbases,
+        std::set<irep_idt> &bases,
+        std::set<irep_idt> &vbases,
         bool is_virtual);
 
   bool cast_away_constness(const typet &t1,
                            const typet &t2) const;
 
-  void do_virtual_table(const symbolt& symbol);
+  void do_virtual_table(const symbolt &symbol);
 
   // we need to be able to delay the typechecking
   // of method bodies to handle methods with
@@ -384,7 +384,7 @@ protected:
 
   void put_compound_into_scope(const struct_union_typet::componentt &component);
   void typecheck_compound_body(symbolt &symbol);
-  void typecheck_compound_body(struct_union_typet &type) { assert(false); };
+  void typecheck_compound_body(struct_union_typet &type) { assert(false); }
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies(method_bodiest &);
   void typecheck_compound_bases(struct_typet &type);
@@ -568,7 +568,7 @@ public:
 
   void make_ptr_typecast(
     exprt &expr,
-    const typet & dest_type);
+    const typet &dest_type);
 
   // the C++ typecasts
 

@@ -66,11 +66,12 @@ bvt boolbvt::convert_with(const exprt &expr)
   {
     bv.swap(prev_bv);
 
-    convert_with(expr.op0().type(),
-                 ops[op_no],
-                 ops[op_no+1],
-                 prev_bv,
-                 bv);
+    convert_with(
+      expr.op0().type(),
+      ops[op_no],
+      ops[op_no+1],
+      prev_bv,
+      bv);
   }
 
   return bv;
@@ -106,7 +107,8 @@ void boolbvt::convert_with(
           type.id()==ID_signedbv)
     return convert_with_bv(type, op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_struct)
-    return convert_with_struct(to_struct_type(type), op1, op2, prev_bv, next_bv);
+    return
+      convert_with_struct(to_struct_type(type), op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_union)
     return convert_with_union(to_union_type(type), op1, op2, prev_bv, next_bv);
   else if(type.id()==ID_symbol)
@@ -276,7 +278,6 @@ void boolbvt::convert_with_struct(
       it!=components.end();
       it++)
   {
-
     const typet &subtype=it->type();
 
     std::size_t sub_width=boolbv_width(subtype);
@@ -348,7 +349,8 @@ void boolbvt::convert_with_union(
   }
   else
   {
-    assert(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
+    assert(
+      config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_BIG_ENDIAN);
 
     endianness_mapt map_u(type, false, ns);
     endianness_mapt map_op2(op2.type(), false, ns);

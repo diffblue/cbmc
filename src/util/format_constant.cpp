@@ -35,7 +35,8 @@ std::string format_constantt::operator()(const exprt &expr)
        expr.type().id()==ID_signedbv)
     {
       mp_integer i;
-      if(to_integer(expr, i)) return "(number conversion failed)";
+      if(to_integer(expr, i))
+        return "(number conversion failed)";
 
       return integer2string(i);
     }

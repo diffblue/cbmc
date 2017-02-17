@@ -12,7 +12,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "satcheck_picosat.h"
 
-extern "C" {
+extern "C"
+{
 #include <picosat.h>
 }
 
@@ -39,7 +40,7 @@ tvt satcheck_picosatt::l_get(literalt a) const
 
   tvt result;
 
-  if((int)a.var_no()>picosat_variables(picosat))
+  if(static_cast<int>(a.var_no())>picosat_variables(picosat))
     return tvt(tvt::tv_enumt::TV_UNKNOWN);
 
   const int val=picosat_deref(picosat, a.dimacs());

@@ -24,7 +24,7 @@ public:
     compute(goto_functions);
   }
 
-  inline bool operator()(const goto_programt::const_targett t) const
+  bool operator()(const goto_programt::const_targett t) const
   {
     return is_threaded_set.find(t)!=is_threaded_set.end();
   }

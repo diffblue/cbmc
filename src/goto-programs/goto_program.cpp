@@ -31,10 +31,10 @@ Function: goto_programt::output_instruction
 
 \*******************************************************************/
 
-std::ostream& goto_programt::output_instruction(
+std::ostream &goto_programt::output_instruction(
   const class namespacet &ns,
   const irep_idt &identifier,
-  std::ostream& out,
+  std::ostream &out,
   instructionst::const_iterator it) const
 {
   return output_instruction(ns, identifier, out, *it);
@@ -138,7 +138,8 @@ std::ostream &goto_programt::output_instruction(
       out << from_expr(ns, identifier, instruction.guard);
 
       const irep_idt &comment=instruction.source_location.get_comment();
-      if(comment!="") out << " // " << comment;
+      if(comment!="")
+        out << " // " << comment;
     }
 
     out << '\n';
@@ -343,7 +344,9 @@ std::list<exprt> expressions_read(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return dest;
@@ -381,7 +384,9 @@ std::list<exprt> expressions_written(
     dest.push_back(to_code_assign(instruction.code).lhs());
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 
   return dest;
@@ -537,7 +542,8 @@ std::string as_string(
         gt_it!=i.targets.end();
         gt_it++)
     {
-      if(gt_it!=i.targets.begin()) result+=", ";
+      if(gt_it!=i.targets.begin())
+        result+=", ";
       result+=std::to_string((*gt_it)->target_number);
     }
     return result;
@@ -561,7 +567,8 @@ std::string as_string(
 
     {
       const irep_idt &comment=i.source_location.get_comment();
-      if(comment!="") result+=" /* "+id2string(comment)+" */";
+      if(comment!="")
+        result+=" /* "+id2string(comment)+" */";
     }
     return result;
 

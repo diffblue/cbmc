@@ -26,7 +26,7 @@ const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank;
 object_numberingt value_set_fit::object_numbering;
 hash_numbering<irep_idt, irep_id_hash> value_set_fit::function_numbering;
 
-static std::string alloc_adapter_prefix = "alloc_adaptor::";
+static const char *alloc_adapter_prefix="alloc_adaptor::";
 
 #define forall_objects(it, map) \
   for(object_map_dt::const_iterator (it) = (map).begin(); \
@@ -100,7 +100,7 @@ void value_set_fit::output(
         result="<";
         result+=from_expr(ns, identifier, o);
         result+=", *, "; // offset unknown
-        if (o.type().id()==ID_unknown)
+        if(o.type().id()==ID_unknown)
           result+='*';
         else
           result+=from_type(ns, identifier, o.type());
@@ -117,7 +117,7 @@ void value_set_fit::output(
 
         result+=", ";
 
-        if (o.type().id()==ID_unknown)
+        if(o.type().id()==ID_unknown)
           result+='*';
         else
           result+=from_type(ns, identifier, o.type());
@@ -135,7 +135,8 @@ void value_set_fit::output(
       if(next!=object_map.read().end())
       {
         out << ", ";
-        if(width>=40) out << "\n      ";
+        if(width>=40)
+          out << "\n      ";
       }
     }
 
@@ -201,18 +202,18 @@ void value_set_fit::flatten_rec(
 
   forall_objects(it, e.object_map.read())
   {
-    const exprt& o=object_numbering[it->first];
+    const exprt &o=object_numbering[it->first];
 
-    if (o.type().id()=="#REF#")
+    if(o.type().id()=="#REF#")
     {
-      if (seen.find(o.get(ID_identifier))!=seen.end())
+      if(seen.find(o.get(ID_identifier))!=seen.end())
       {
         generalize_index = true;
         continue;
       }
 
       valuest::const_iterator fi = values.find(o.get(ID_identifier));
-      if (fi==values.end())
+      if(fi==values.end())
       {
         // this is some static object, keep it in.
         exprt se(ID_symbol, o.type().subtype());
@@ -240,13 +241,12 @@ void value_set_fit::flatten_rec(
         forall_objects(oit, temp.read())
           insert(dest, oit);
       }
-
     }
     else
       insert(dest, it);
   }
 
-  if (generalize_index) // this means we had recursive symbols in there
+  if(generalize_index) // this means we had recursive symbols in there
   {
     Forall_objects(it, dest.write())
       it->second.offset_is_set = false;
@@ -388,14 +388,14 @@ void value_set_fit::get_value_set(
   forall_objects(it, object_map.read())
   {
     const exprt &object=object_numbering[it->first];
-    if (object.type().id()=="#REF#")
+    if(object.type().id()=="#REF#")
     {
       assert(object.id()==ID_symbol);
 
       const irep_idt &ident = object.get(ID_identifier);
       valuest::const_iterator v_it = values.find(ident);
 
-      if (v_it!=values.end())
+      if(v_it!=values.end())
       {
         object_mapt temp;
         flatten(v_it->second, temp);
@@ -482,7 +482,8 @@ void value_set_fit::get_value_set_rec(
   gvs_recursion_sett &recursion_set) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
+  std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr)
+            << std::endl;
   std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
   std::cout << std::endl;
   #endif
@@ -726,8 +727,9 @@ void value_set_fit::get_value_set_rec(
 
       dynamic_object_exprt dynamic_object(dynamic_type);
       // let's make up a `unique' number for this object...
-      dynamic_object.instance()=from_integer(
-                   (from_function << 16) | from_target_index, typet(ID_natural));
+      dynamic_object.instance()=
+        from_integer(
+          (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert(dest, dynamic_object, 0);
@@ -740,8 +742,9 @@ void value_set_fit::get_value_set_rec(
       assert(expr.type().id()==ID_pointer);
 
       dynamic_object_exprt dynamic_object(expr.type().subtype());
-      dynamic_object.instance()=from_integer(
-                   (from_function << 16) | from_target_index, typet(ID_natural));
+      dynamic_object.instance()=
+        from_integer(
+          (from_function << 16) | from_target_index, typet(ID_natural));
       dynamic_object.valid()=true_exprt();
 
       insert(dest, dynamic_object, 0);
@@ -841,13 +844,13 @@ void value_set_fit::get_reference_set(
 
   forall_objects(it, object_map.read())
   {
-    const exprt& expr = object_numbering[it->first];
+    const exprt &expr = object_numbering[it->first];
 
-    if (expr.type().id()=="#REF#")
+    if(expr.type().id()=="#REF#")
     {
-      const irep_idt& ident = expr.get(ID_identifier);
+      const irep_idt &ident = expr.get(ID_identifier);
       valuest::const_iterator vit = values.find(ident);
-      if (vit==values.end())
+      if(vit==values.end())
       {
         // Assume the variable never was assigned,
         // so assume it's reference set is unknown.
@@ -922,7 +925,8 @@ void value_set_fit::get_reference_set_sharing_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr) << std::endl;
+  std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
+            << std::endl;
   #endif
 
   if(expr.type().id()=="#REF#")
@@ -960,12 +964,12 @@ void value_set_fit::get_reference_set_sharing_rec(
     forall_objects(it, temp.read())
     {
       const exprt &obj = object_numbering[it->first];
-      if (obj.type().id()=="#REF#")
+      if(obj.type().id()=="#REF#")
       {
         const irep_idt &ident = obj.get(ID_identifier);
         valuest::const_iterator v_it = values.find(ident);
 
-        if (v_it!=values.end())
+        if(v_it!=values.end())
         {
           object_mapt t2;
           flatten(v_it->second, t2);
@@ -994,7 +998,9 @@ void value_set_fit::get_reference_set_sharing_rec(
     }
 
     #if 0
-    for(expr_sett::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
+    for(expr_sett::const_iterator it=value_set.begin();
+        it!=value_set.end();
+        it++)
       std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
     #endif
 
@@ -1161,7 +1167,8 @@ void value_set_fit::assign(
       const irep_idt &name=c_it->get(ID_name);
 
       // ignore methods
-      if(subtype.id()==ID_code) continue;
+      if(subtype.id()==ID_code)
+        continue;
 
       exprt lhs_member(ID_member, subtype);
       lhs_member.set(ID_component_name, name);
@@ -1434,7 +1441,7 @@ void value_set_fit::assign_rec(
     {
       entryt &entry = get_entry(identifier, suffix);
 
-      if (make_union(entry.object_map, values_rhs))
+      if(make_union(entry.object_map, values_rhs))
         changed = true;
     }
   }
@@ -1447,7 +1454,7 @@ void value_set_fit::assign_rec(
       "value_set::dynamic_object"+
       dynamic_object.instance().get_string(ID_value);
 
-    if (make_union(get_entry(name, suffix).object_map, values_rhs))
+    if(make_union(get_entry(name, suffix).object_map, values_rhs))
       changed = true;
   }
   else if(lhs.id()==ID_dereference)
@@ -1473,7 +1480,9 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_array || type.id()==ID_incomplete_array || type.id()=="#REF#");
+    assert(type.id()==ID_array ||
+           type.id()==ID_incomplete_array ||
+           type.id()=="#REF#");
 
     assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
   }
@@ -1482,7 +1491,8 @@ void value_set_fit::assign_rec(
     if(lhs.operands().size()!=1)
       throw "member expected to have one operand";
 
-    if(lhs.op0().is_nil()) return;
+    if(lhs.op0().is_nil())
+      return;
 
     const std::string &component_name=lhs.get_string(ID_component_name);
 
@@ -1579,7 +1589,8 @@ void value_set_fit::do_function_call(
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
-    if(identifier=="") continue;
+    if(identifier.empty())
+      continue;
 
     add_var(identifier, "");
 
@@ -1609,7 +1620,8 @@ void value_set_fit::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
 {
-  if(lhs.is_nil()) return;
+  if(lhs.is_nil())
+    return;
 
   std::string rvs = "value_set::return_value" + std::to_string(from_function);
   symbol_exprt rhs(rvs, lhs.type());
@@ -1709,7 +1721,7 @@ void value_set_fit::apply_code(
     // this is turned into an assignment
     if(code.operands().size()==1)
     {
-      std::string rvs = "value_set::return_value" + std::to_string(from_function);
+      std::string rvs="value_set::return_value"+std::to_string(from_function);
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);
     }
@@ -1719,7 +1731,7 @@ void value_set_fit::apply_code(
   }
   else if(statement==ID_input || statement==ID_output)
   {
-	  // doesn't do anything
+    // doesn't do anything
   }
   else
     throw

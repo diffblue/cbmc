@@ -21,8 +21,8 @@ class message_handlert;
    functions-based exploration in remove_function_pointers. */
 
 void propagate_const_function_pointers(
-  symbol_tablet& symbol_tables,
-  goto_functionst& goto_functions,
-  message_handlert& message_handler);
+  symbol_tablet &symbol_tables,
+  goto_functionst &goto_functions,
+  message_handlert &message_handler);
 
 #endif // CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H

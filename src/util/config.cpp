@@ -538,7 +538,8 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
   case flavourt::GCC:
     defines.push_back("__mips__");
     defines.push_back("mips");
-    defines.push_back("_MIPS_SZPTR="+std::to_string(config.ansi_c.pointer_width));
+    defines.push_back(
+      "_MIPS_SZPTR="+std::to_string(config.ansi_c.pointer_width));
     break;
 
   case flavourt::VISUAL_STUDIO:
@@ -1041,7 +1042,8 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.os=ansi_ct::ost::NO_OS;
   ansi_c.arch="none";
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
-  ansi_c.NULL_is_zero=(size_t)((void*)0)==0;
+  // NOLINTNEXTLINE(readability/casting)
+  ansi_c.NULL_is_zero=reinterpret_cast<size_t>((void*)0)==0;
 
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
@@ -1241,7 +1243,7 @@ bool configt::set(const cmdlinet &cmdline)
     assert(ansi_c.pointer_width==sizeof(void *)*8);
     assert(ansi_c.single_width==sizeof(float)*8);
     assert(ansi_c.double_width==sizeof(double)*8);
-    assert(ansi_c.char_is_unsigned==(char(255)==255));
+    assert(ansi_c.char_is_unsigned==(static_cast<char>(255)==255));
 
     #ifndef _WIN32
     // On Windows, long double width varies by compiler
@@ -1389,7 +1391,9 @@ static irep_idt string_from_ns(
      tmp.op0().operands().size()!=2 ||
      tmp.op0().op0().id()!=ID_string_constant)
   {
-    throw "symbol table configuration entry `"+id2string(id)+"' is not a string constant";
+    throw
+      "symbol table configuration entry `"+id2string(id)+
+      "' is not a string constant";
   }
 
   return tmp.op0().op0().get(ID_value);
@@ -1421,12 +1425,14 @@ static unsigned unsigned_from_ns(
   simplify(tmp, ns);
 
   if(tmp.id()!=ID_constant)
-    throw "symbol table configuration entry `"+id2string(id)+"' is not a constant";
+    throw
+      "symbol table configuration entry `"+id2string(id)+"' is not a constant";
 
   mp_integer int_value;
 
   if(to_integer(to_constant_expr(tmp), int_value))
-    throw "failed to convert symbol table configuration entry `"+id2string(id)+"'";
+    throw
+      "failed to convert symbol table configuration entry `"+id2string(id)+"'";
 
   return integer2unsigned(int_value);
 }
@@ -1493,7 +1499,7 @@ void configt::set_from_symbol_table(
   else
     ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
 
-  //NULL_is_zero=from_ns("NULL_is_zero");
+  // NULL_is_zero=from_ns("NULL_is_zero");
   ansi_c.NULL_is_zero=true;
 
   // mode, preprocessor (and all preprocessor command line options),
@@ -1547,7 +1553,8 @@ irep_idt configt::this_architecture()
     this_arch="mips64";
     #endif
   #elif __powerpc__
-    #if defined(__ppc64__) || defined(__PPC64__) || defined(__powerpc64__) || defined(__POWERPC64__)
+    #if defined(__ppc64__) || defined(__PPC64__) || \
+        defined(__powerpc64__) || defined(__POWERPC64__)
       #ifdef __LITTLE_ENDIAN__
       this_arch="ppc64le";
       #else
@@ -1629,7 +1636,8 @@ void configt::set_classpath(const std::string &cp)
       current+=cp[pos];
   }
 
-  if(!current.empty()) java.classpath.push_back(current);
+  if(!current.empty())
+    java.classpath.push_back(current);
 }
 
 /*******************************************************************\

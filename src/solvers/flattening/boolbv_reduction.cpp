@@ -46,7 +46,7 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
   {
     switch(op)
     {
-    case O_OR:  l=prop.lor (l, op_bv[i]); break;
+    case O_OR:  l=prop.lor(l, op_bv[i]); break;
     case O_AND: l=prop.land(l, op_bv[i]); break;
     case O_XOR: l=prop.lxor(l, op_bv[i]); break;
     }
@@ -110,9 +110,12 @@ bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
       {
         switch(op)
         {
-        case O_OR:  l0=prop.lor (l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
-        case O_AND: l0=prop.land(l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
-        case O_XOR: l0=prop.lxor(l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
+        case O_OR:
+          l0=prop.lor(l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
+        case O_AND:
+          l0=prop.land(l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
+        case O_XOR:
+          l0=prop.lxor(l0, op_bv[i]); l1=prop.lor(l1, op_bv[i+1]); break;
         }
       }
 

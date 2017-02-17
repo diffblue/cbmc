@@ -34,7 +34,9 @@ std::size_t to_be_merged_irept::hash() const
   forall_named_irep(it, named_sub)
   {
     result=hash_combine(result, hash_string(it->first));
-    result=hash_combine(result, static_cast<const merged_irept &>(it->second).hash());
+    result=
+      hash_combine(
+        result, static_cast<const merged_irept &>(it->second).hash());
   }
 
   result=hash_finalize(result, named_sub.size()+sub.size());
@@ -56,15 +58,18 @@ Function: to_be_merged_irept::operator==
 
 bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
 {
-  if(id()!=other.id()) return false;
+  if(id()!=other.id())
+    return false;
 
   const irept::subt &sub=get_sub();
   const irept::subt &o_sub=other.get_sub();
   const irept::named_subt &named_sub=get_named_sub();
   const irept::named_subt &o_named_sub=other.get_named_sub();
 
-  if(sub.size()!=o_sub.size()) return true;
-  if(named_sub.size()!=o_named_sub.size()) return true;
+  if(sub.size()!=o_sub.size())
+    return true;
+  if(named_sub.size()!=o_named_sub.size())
+    return true;
 
   {
     irept::subt::const_iterator s_it=sub.begin();
@@ -139,7 +144,9 @@ const merged_irept &merged_irepst::merged(const irept &irep)
   if(result.second) // really new, record
     merged_irep_store.insert(merged_irept(new_irep));
 
-  return static_cast<const merged_irept &>(static_cast<const irept &>(*result.first));
+  return
+    static_cast<const merged_irept &>(
+      static_cast<const irept &>(*result.first));
 }
 
 /*******************************************************************\
@@ -174,7 +181,7 @@ Function: merge_irept::merged
 
 \*******************************************************************/
 
-const irept& merge_irept::merged(const irept &irep)
+const irept &merge_irept::merged(const irept &irep)
 {
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())
@@ -246,7 +253,7 @@ Function: merge_full_irept::merged
 
 \*******************************************************************/
 
-const irept& merge_full_irept::merged(const irept &irep)
+const irept &merge_full_irept::merged(const irept &irep)
 {
   irep_storet::const_iterator entry=irep_store.find(irep);
   if(entry!=irep_store.end())

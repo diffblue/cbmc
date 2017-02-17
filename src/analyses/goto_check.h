@@ -40,10 +40,10 @@ void goto_check(
   " --pointer-check              enable pointer checks\n" \
   " --memory-leak-check          enable memory leak checks\n" \
   " --div-by-zero-check          enable division by zero checks\n" \
-  " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" \
-  " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n" \
-  " --pointer-overflow-check     enable pointer arithmetic over- and underflow checks\n" \
-  " --conversion-check           check whether values can be represented after type cast\n" \
+  " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */ \
+  " --unsigned-overflow-check    enable arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */  \
+  " --pointer-overflow-check     enable pointer arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */  \
+  " --conversion-check           check whether values can be represented after type cast\n" /* NOLINT(whitespace/line_length) */  \
   " --undefined-shift-check      check shift greater than bit-width\n" \
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
@@ -53,12 +53,12 @@ void goto_check(
   options.set_option("pointer-check", cmdline.isset("pointer-check")); \
   options.set_option("memory-leak-check", cmdline.isset("memory-leak-check")); \
   options.set_option("div-by-zero-check", cmdline.isset("div-by-zero-check")); \
-  options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); \
-  options.set_option("unsigned-overflow-check", cmdline.isset("unsigned-overflow-check")); \
-  options.set_option("pointer-overflow-check", cmdline.isset("pointer-overflow-check")); \
+  options.set_option("signed-overflow-check", cmdline.isset("signed-overflow-check")); /* NOLINT(whitespace/line_length) */  \
+  options.set_option("unsigned-overflow-check", cmdline.isset("unsigned-overflow-check")); /* NOLINT(whitespace/line_length) */  \
+  options.set_option("pointer-overflow-check", cmdline.isset("pointer-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("conversion-check", cmdline.isset("conversion-check")); \
-  options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); \
-  options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); \
+  options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); /* NOLINT(whitespace/line_length) */  \
+  options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("nan-check", cmdline.isset("nan-check"))
 
 #endif // CPROVER_ANALYSES_GOTO_CHECK_H

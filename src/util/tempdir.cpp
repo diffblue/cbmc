@@ -50,7 +50,7 @@ std::string get_temporary_directory(const std::string &name_template)
     DWORD dwRetVal = GetTempPathA(dwBufSize, lpPathBuffer);
 
     if(dwRetVal > dwBufSize || (dwRetVal == 0))
-      throw "GetTempPath failed";
+      throw "GetTempPath failed"; // NOLINT(readability/throw)
 
     char t[MAX_PATH];
 
@@ -58,7 +58,7 @@ std::string get_temporary_directory(const std::string &name_template)
 
     UINT uRetVal=GetTempFileNameA(lpPathBuffer, "TLO", 0, t);
     if(uRetVal == 0)
-      throw "GetTempFileName failed";
+      throw "GetTempFileName failed"; // NOLINT(readability/throw)
 
     unlink(t);
     if(_mkdir(t)!=0)
@@ -78,7 +78,8 @@ std::string get_temporary_directory(const std::string &name_template)
     char t[1000];
     strncpy(t, prefixed_name_template.c_str(), 1000);
     const char *td = mkdtemp(t);
-    if(!td) throw "mkdtemp failed";
+    if(!td)
+      throw "mkdtemp failed";
     result=std::string(td);
   #endif
 

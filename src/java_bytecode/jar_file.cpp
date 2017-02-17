@@ -31,6 +31,7 @@ void jar_filet::open(const std::string &filename)
 {
   #ifdef HAVE_LIBZIP
   if(zip!=nullptr)
+    // NOLINTNEXTLINE(readability/identifiers)
     zip_close(static_cast<struct zip *>(zip));
 
   int zip_error;
@@ -39,6 +40,7 @@ void jar_filet::open(const std::string &filename)
   if(zip!=nullptr)
   {
     std::size_t number_of_files=
+      // NOLINTNEXTLINE(readability/identifiers)
       zip_get_num_entries(static_cast<struct zip *>(zip), 0);
 
     index.reserve(number_of_files);
@@ -46,6 +48,7 @@ void jar_filet::open(const std::string &filename)
     for(std::size_t i=0; i<number_of_files; i++)
     {
       std::string file_name=
+        // NOLINTNEXTLINE(readability/identifiers)
         zip_get_name(static_cast<struct zip *>(zip), i, 0);
       index.push_back(file_name);
     }
@@ -71,6 +74,7 @@ jar_filet::~jar_filet()
 {
   #ifdef HAVE_LIBZIP
   if(zip!=nullptr)
+    // NOLINTNEXTLINE(readability/identifiers)
     zip_close(static_cast<struct zip *>(zip));
   #endif
 }
@@ -99,12 +103,16 @@ std::string jar_filet::get_entry(std::size_t i)
   std::string dest;
 
   #ifdef HAVE_LIBZIP
-  struct zip_file *zip_file=
-    zip_fopen_index(static_cast<struct zip *>(zip), i, 0);
+  void *zip_e=zip; // zip is both a type and a non-type
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct zip *zip_p=static_cast<struct zip*>(zip_e);
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct zip_file *zip_file=zip_fopen_index(zip_p, i, 0);
 
   if(zip_file==NULL)
   {
-    zip_close(static_cast<struct zip *>(zip));
+    zip_close(zip_p);
     zip=nullptr;
     return std::string(""); // error
   }
@@ -117,7 +125,8 @@ std::string jar_filet::get_entry(std::size_t i)
     int bytes_read=
       zip_fread(zip_file, buffer.data(), ZIP_READ_SIZE);
     assert(bytes_read<=ZIP_READ_SIZE);
-    if(bytes_read<=0) break;
+    if(bytes_read<=0)
+      break;
     dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
   }
 
@@ -167,7 +176,8 @@ jar_filet::manifestt jar_filet::get_manifest()
   while(std::getline(in, line))
   {
     std::size_t pos=line.find(':');
-    if(pos==std::string::npos) continue;
+    if(pos==std::string::npos)
+      continue;
     std::string key=line.substr(0, pos);
 
     // skip spaces

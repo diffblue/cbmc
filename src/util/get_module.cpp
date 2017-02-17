@@ -45,7 +45,8 @@ const symbolt &get_module_by_name(
 
   forall_symbol_base_map(it, symbol_table.symbol_base_map, module)
   {
-    symbol_tablet::symbolst::const_iterator it2=symbol_table.symbols.find(it->second);
+    symbol_tablet::symbolst::const_iterator it2=
+      symbol_table.symbols.find(it->second);
 
     if(it2==symbol_table.symbols.end())
       continue;

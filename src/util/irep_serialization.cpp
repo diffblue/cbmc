@@ -180,7 +180,7 @@ Function: irep_serializationt::insert_on_write
 
 std::size_t irep_serializationt::insert_on_write(std::size_t h)
 {
-  std::pair<ireps_containert::ireps_on_writet::const_iterator,bool> res=
+  std::pair<ireps_containert::ireps_on_writet::const_iterator, bool> res=
     ireps_container.ireps_on_write.insert(
       std::make_pair(h, ireps_container.ireps_on_write.size()));
 
@@ -216,7 +216,7 @@ std::size_t irep_serializationt::insert_on_read(
   else
   {
     ireps_container.ireps_on_read[id]=
-      std::pair<bool,irept>(true, i);
+      std::pair<bool, irept>(true, i);
   }
 
   return id;
@@ -277,7 +277,8 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
     unsigned char ch=in.get();
     res|=(size_t(ch&0x7f))<<shift_distance;
     shift_distance+=7;
-    if((ch&0x80)==0) break;
+    if((ch&0x80)==0)
+      break;
   }
 
   return res;
@@ -301,7 +302,8 @@ void write_gb_string(std::ostream &out, const std::string &s)
       it!=s.end();
       ++it)
   {
-    if(*it==0 || *it=='\\') out.put('\\'); // escape specials
+    if(*it==0 || *it=='\\')
+      out.put('\\'); // escape specials
     out << *it;
   }
 
@@ -389,7 +391,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
 
   if(id>=ireps_container.string_rev_map.size())
     ireps_container.string_rev_map.resize(1+id*2,
-      std::pair<bool,irep_idt>( false, irep_idt() ));
+      std::pair<bool, irep_idt>(false, irep_idt()));
 
   if(ireps_container.string_rev_map[id].first)
   {
@@ -399,7 +401,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
   {
     irep_idt s=read_gb_string(in);
     ireps_container.string_rev_map[id] =
-      std::pair<bool,irep_idt>(true, s);
+      std::pair<bool, irep_idt>(true, s);
     return ireps_container.string_rev_map[id].second;
   }
 }

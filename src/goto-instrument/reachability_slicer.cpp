@@ -47,7 +47,8 @@ void reachability_slicert::fixedpoint_assertions(
     cfgt::nodet &node=cfg[e];
     queue.pop();
 
-    if(node.reaches_assertion) continue;
+    if(node.reaches_assertion)
+      continue;
 
     node.reaches_assertion=true;
 

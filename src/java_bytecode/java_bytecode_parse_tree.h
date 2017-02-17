@@ -60,7 +60,7 @@ public:
 
     virtual void output(std::ostream &out) const = 0;
 
-    inline membert():
+    membert():
       is_public(false), is_protected(false), is_private(false),
       is_static(false), is_final(false)
     {
@@ -147,7 +147,7 @@ public:
 
     virtual void output(std::ostream &out) const;
 
-    inline methodt():
+    methodt():
       is_native(false),
       is_abstract(false),
       is_synchronized(false)
@@ -179,13 +179,13 @@ public:
     methodst methods;
     annotationst annotations;
 
-    inline fieldt &add_field()
+    fieldt &add_field()
     {
       fields.push_back(fieldt());
       return fields.back();
     }
 
-    inline methodt &add_method()
+    methodt &add_method()
     {
       methods.push_back(methodt());
       return methods.back();
@@ -212,7 +212,7 @@ public:
 
   bool loading_successful;
 
-  inline java_bytecode_parse_treet():loading_successful(false)
+  java_bytecode_parse_treet():loading_successful(false)
   {
   }
 };

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+// NOLINT(build/header_guard) as this file is also symlinked
 #ifndef CPROVER_PATH_SYMEX_BUILD_GOTO_TRACE_H
 #define CPROVER_PATH_SYMEX_BUILD_GOTO_TRACE_H
 

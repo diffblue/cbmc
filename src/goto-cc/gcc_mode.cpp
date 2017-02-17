@@ -193,7 +193,8 @@ int gcc_modet::doit()
     // Compilation continues, don't exit!
 
     if(act_as_ld)
-      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION ")\n";
+      std::cout << "GNU ld version 2.16.91 20050610 (goto-cc " CBMC_VERSION
+                << ")\n";
     else if(act_as_bcc)
       std::cout << "bcc: version 0.16.17 (goto-cc " CBMC_VERSION ")\n";
     else
@@ -324,12 +325,18 @@ int gcc_modet::doit()
 
   switch(compiler.mode)
   {
-  case compilet::LINK_LIBRARY: debug() << "Linking a library only" << eom; break;
-  case compilet::COMPILE_ONLY: debug() << "Compiling only" << eom; break;
-  case compilet::ASSEMBLE_ONLY: debug() << "Assembling only" << eom; break;
-  case compilet::PREPROCESS_ONLY: debug() << "Preprocessing only" << eom; break;
-  case compilet::COMPILE_LINK: debug() << "Compiling and linking a library" << eom; break;
-  case compilet::COMPILE_LINK_EXECUTABLE: debug() << "Compiling and linking an executable" << eom; break;
+  case compilet::LINK_LIBRARY:
+    debug() << "Linking a library only" << eom; break;
+  case compilet::COMPILE_ONLY:
+    debug() << "Compiling only" << eom; break;
+  case compilet::ASSEMBLE_ONLY:
+    debug() << "Assembling only" << eom; break;
+  case compilet::PREPROCESS_ONLY:
+    debug() << "Preprocessing only" << eom; break;
+  case compilet::COMPILE_LINK:
+    debug() << "Compiling and linking a library" << eom; break;
+  case compilet::COMPILE_LINK_EXECUTABLE:
+    debug() << "Compiling and linking an executable" << eom; break;
   default: assert(false);
   }
 
@@ -481,13 +488,15 @@ int gcc_modet::doit()
         if(arg_it!=cmdline.parsed_argv.end())
         {
           language=arg_it->arg;
-          if(language=="none") language="";
+          if(language=="none")
+            language="";
         }
       }
       else if(has_prefix(arg_it->arg, "-x"))
       {
         language=std::string(arg_it->arg, 2, std::string::npos);
-        if(language=="none") language="";
+        if(language=="none")
+          language="";
       }
     }
   }
@@ -903,7 +912,9 @@ Function: gcc_modet::help_mode
 void gcc_modet::help_mode()
 {
   if(act_as_ld)
-    std::cout << "goto-ld understands the options of ld plus the following.\n\n";
+    std::cout << "goto-ld understands the options of "
+              << "ld plus the following.\n\n";
   else
-    std::cout << "goto-cc understands the options of gcc plus the following.\n\n";
+    std::cout << "goto-cc understands the options of "
+              << "gcc plus the following.\n\n";
 }

@@ -32,28 +32,28 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final override;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final override;
+    const namespacet &ns) const final;
 
-  void make_bottom() final override
+  void make_bottom() final
   {
     may_bits.clear();
     must_bits.clear();
     has_values=tvt(false);
   }
 
-  void make_top() final override
+  void make_top() final
   {
     may_bits.clear();
     must_bits.clear();
     has_values=tvt(true);
   }
 
-  void make_entry() final override
+  void make_entry() final
   {
     make_top();
   }
@@ -101,7 +101,7 @@ public:
     const exprt &src,
     custom_bitvector_analysist &) const;
 
-protected:
+private:
   typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
@@ -132,7 +132,10 @@ class custom_bitvector_analysist:public ait<custom_bitvector_domaint>
 {
 public:
   void instrument(goto_functionst &);
-  void check(const namespacet &, const goto_functionst &, bool xml, std::ostream &);
+  void check(
+    const namespacet &,
+    const goto_functionst &,
+    bool xml, std::ostream &);
 
   exprt eval(const exprt &src, locationt loc)
   {

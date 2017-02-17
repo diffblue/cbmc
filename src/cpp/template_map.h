@@ -65,7 +65,7 @@ public:
 class cpp_saved_template_mapt
 {
 public:
-  cpp_saved_template_mapt(template_mapt &map):
+  explicit cpp_saved_template_mapt(template_mapt &map):
     old_map(map), map(map)
   {
   }

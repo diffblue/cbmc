@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <map>
 #include <set>
-#include <cstdlib> // abort()
 
 #include <util/symbol.h>
 #include <util/mp_arith.h>
@@ -28,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-//#define DEBUG
+// #define DEBUG
 
 /*******************************************************************\
 
@@ -62,12 +61,14 @@ bool boolbvt::literal(
       boolbv_mapt::mappingt::const_iterator it_m=
         map.mapping.find(identifier);
 
-      if(it_m==map.mapping.end()) return true;
+      if(it_m==map.mapping.end())
+        return true;
 
       const boolbv_mapt::map_entryt &map_entry=it_m->second;
 
       assert(bit<map_entry.literal_map.size());
-      if(!map_entry.literal_map[bit].is_set) return true;
+      if(!map_entry.literal_map[bit].is_set)
+        return true;
 
       dest=map_entry.literal_map[bit].l;
       return false;
@@ -136,14 +137,16 @@ Function: boolbvt::convert_bv
 
 \*******************************************************************/
 
-const bvt& boolbvt::convert_bv(const exprt &expr)
+const bvt &boolbvt::convert_bv(const exprt &expr)
 {
   // check cache first
   std::pair<bv_cachet::iterator, bool> cache_result=
     bv_cache.insert(std::make_pair(expr, bvt()));
   if(!cache_result.second)
   {
-    //std::cerr << "Cache hit on " << expr << "\n";
+    #ifdef DEBUG
+    std::cout << "Cache hit on " << expr << "\n";
+    #endif
     return cache_result.first->second;
   }
 
@@ -155,7 +158,8 @@ const bvt& boolbvt::convert_bv(const exprt &expr)
   // check
   forall_literals(it, cache_result.first->second)
   {
-    if(freeze_all && !it->is_constant()) prop.set_frozen(*it);
+    if(freeze_all && !it->is_constant())
+      prop.set_frozen(*it);
     if(it->var_no()==literalt::unused_var_no())
     {
       error() << "unused_var_no: " << expr.pretty() << eom;
@@ -328,7 +332,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_array_of(to_array_of_expr(expr));
   else if(expr.id()==ID_let)
   {
-    //const let_exprt &let_expr=to_let_expr(expr);
+    // const let_exprt &let_expr=to_let_expr(expr);
     throw "let is todo";
   }
   else if(expr.id()==ID_function_application)
@@ -349,8 +353,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     assert(expr.operands().size()==2);
     bvt bv0=convert_bitvector(expr.op0());
     bvt bv1=convert_bitvector(expr.op1());
-    float_utilst float_utils(prop);
-    float_utils.spec=to_floatbv_type(expr.type());
+    float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     bvt bv=expr.id()==ID_float_debug1?
       float_utils.debug1(bv0, bv1):
       float_utils.debug2(bv0, bv1);
@@ -557,8 +560,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.operands().size()!=2)
       throw "notequal expects two operands";
 
-    return !convert_equality(
-        equal_exprt(expr.op0(), expr.op1()));
+    return !convert_equality(equal_exprt(expr.op0(), expr.op1()));
   }
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
@@ -644,8 +646,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_NaN(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)
@@ -660,8 +661,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return prop.land(
         !float_utils.is_infinity(bv),
         !float_utils.is_NaN(bv));
@@ -678,8 +678,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_infinity(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)
@@ -694,8 +693,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(expr.op0().type());
+      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
       return float_utils.is_normal(bv);
     }
     else if(expr.op0().type().id()==ID_fixedbv)
@@ -719,7 +717,8 @@ Function: boolbvt::boolbv_set_equality_to_true
 
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
-  if(!equality_propagation) return true;
+  if(!equality_propagation)
+    return true;
 
   const typet &type=ns.follow(expr.lhs().type());
 
@@ -738,7 +737,8 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 
     map.set_literals(identifier, type, bv1);
 
-    if(freeze_all) set_frozen(bv1);
+    if(freeze_all)
+      set_frozen(bv1);
 
     return false;
   }
@@ -848,16 +848,20 @@ Function: boolbvt::is_unbounded_array
 
 bool boolbvt::is_unbounded_array(const typet &type) const
 {
-  if(type.id()==ID_symbol) return is_unbounded_array(ns.follow(type));
+  if(type.id()==ID_symbol)
+    return is_unbounded_array(ns.follow(type));
 
-  if(type.id()!=ID_array) return false;
+  if(type.id()!=ID_array)
+    return false;
 
-  if(unbounded_array==U_ALL) return true;
+  if(unbounded_array==U_ALL)
+    return true;
 
   const exprt &size=to_array_type(type).size();
 
   mp_integer s;
-  if(to_integer(size, s)) return true;
+  if(to_integer(size, s))
+    return true;
 
   if(unbounded_array==U_AUTO)
     if(s>1000) // magic number!

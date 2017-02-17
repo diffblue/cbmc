@@ -94,12 +94,13 @@ tvt satcheck_smvsatt::l_get(literalt a) const
 
   switch(sat_instance_value(satsolver, v))
   {
-   case 0: result=tvt(false); break;
-   case 1: result=tvt(true); break;
-   default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
+    case 0: result=tvt(false); break;
+    case 1: result=tvt(true); break;
+    default: result=tvt(tvt::tv_enumt::TV_UNKNOWN); break;
   }
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }
@@ -140,7 +141,7 @@ void satcheck_smvsatt::lcnf(const bvt &bv)
   if(process_clause(bv, tmp))
     return;
 
-  int lits[tmp.size()+1];
+  int *lits=new int[tmp.size()+1];
 
   for(unsigned i=0; i<tmp.size(); i++)
     lits[i]=tmp[i].dimacs();
@@ -151,6 +152,8 @@ void satcheck_smvsatt::lcnf(const bvt &bv)
   sat_instance_add_clause(satsolver, lits);
 
   clause_counter++;
+
+  delete[] lits;
 }
 
 /*******************************************************************\
@@ -250,7 +253,7 @@ void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
   if(process_clause(bv, tmp))
     return;
 
-  int lits[tmp.size()+1];
+  int *lits=new int[tmp.size()+1];
 
   for(unsigned i=0; i<tmp.size(); i++)
     lits[i]=tmp[i].dimacs();
@@ -264,6 +267,8 @@ void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
     partition_numbers.resize(clause_id+1, -1);
 
   partition_numbers[clause_id]=partition_no;
+
+  delete[] lits;
 }
 
 /*******************************************************************\
@@ -282,6 +287,7 @@ void satcheck_smvsat_interpolatort::interpolate(exprt &dest)
 {
   // crate instance
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct interpolator *interpolator_satsolver=
     new_interpolator(satsolver);
 
@@ -314,17 +320,18 @@ Function: satcheck_smvsat_interpolatort::build_aig
 \*******************************************************************/
 
 void satcheck_smvsat_interpolatort::build_aig(
+  // NOLINTNEXTLINE(readability/identifiers)
   struct interpolator &interpolator_satsolver,
   int output,
   exprt &dest)
 {
-  std::stack<entry> stack;
+  std::stack<entryt> stack;
 
-  stack.push(entry(output, &dest));
+  stack.push(entryt(output, &dest));
 
   while(!stack.empty())
   {
-    entry x=stack.top();
+    entryt x=stack.top();
     stack.pop();
 
     bool invert=x.g<0;
@@ -349,8 +356,8 @@ void satcheck_smvsat_interpolatort::build_aig(
       unsigned g0=interpolator_satsolver.aig_arg(n, 0);
       unsigned g1=interpolator_satsolver.aig_arg(n, 1);
 
-      stack.push(entry(g0, &e.op0()));
-      stack.push(entry(g1, &e.op1()));
+      stack.push(entryt(g0, &e.op0()));
+      stack.push(entryt(g1, &e.op1()));
     }
 
     if(invert)

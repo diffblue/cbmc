@@ -63,12 +63,20 @@ bool boolbvt::type_conversion(
   bvtypet src_bvtype=get_bvtype(src_type);
 
   if(src_bvtype==IS_C_BIT_FIELD)
-    return type_conversion(
-      c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns), src, dest_type, dest);
+    return
+      type_conversion(
+        c_bit_field_replacement_type(to_c_bit_field_type(src_type), ns),
+        src,
+        dest_type,
+        dest);
 
   if(dest_bvtype==IS_C_BIT_FIELD)
-    return type_conversion(
-      src_type, src, c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns), dest);
+    return
+      type_conversion(
+        src_type,
+        src,
+        c_bit_field_replacement_type(to_c_bit_field_type(dest_type), ns),
+        dest);
 
   std::size_t src_width=src.size();
   std::size_t dest_width=boolbv_width(dest_type);
@@ -98,8 +106,16 @@ bool boolbvt::type_conversion(
       bvt lower, upper, lower_res, upper_res;
       lower.assign(src.begin(), src.begin()+src.size()/2);
       upper.assign(src.begin()+src.size()/2, src.end());
-      type_conversion(ns.follow(src_type.subtype()), lower, ns.follow(dest_type.subtype()), lower_res);
-      type_conversion(ns.follow(src_type.subtype()), upper, ns.follow(dest_type.subtype()), upper_res);
+      type_conversion(
+        ns.follow(src_type.subtype()),
+        lower,
+        ns.follow(dest_type.subtype()),
+        lower_res);
+      type_conversion(
+        ns.follow(src_type.subtype()),
+        upper,
+        ns.follow(dest_type.subtype()),
+        upper_res);
       assert(lower_res.size()+upper_res.size()==dest_width);
       dest=lower_res;
       dest.insert(dest.end(), upper_res.begin(), upper_res.end());
@@ -183,13 +199,13 @@ bool boolbvt::type_conversion(
 
       case IS_SIGNED: // signed to float
       case IS_C_ENUM:
-        float_utils.spec=to_floatbv_type(dest_type);
+        float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
         dest=float_utils.from_signed_integer(src);
         return false;
 
       case IS_UNSIGNED: // unsigned to float
       case IS_C_BOOL: // _Bool to float
-        float_utils.spec=to_floatbv_type(dest_type);
+        float_utils.spec=ieee_float_spect(to_floatbv_type(dest_type));
         dest=float_utils.from_unsigned_integer(src);
         return false;
 
@@ -204,8 +220,7 @@ bool boolbvt::type_conversion(
           // bool to float
 
           // build a one
-          ieee_floatt f;
-          f.spec=to_floatbv_type(dest_type);
+          ieee_floatt f(to_floatbv_type(dest_type));
           f.from_integer(1);
 
           dest=convert_bv(f.to_expr());
@@ -226,10 +241,12 @@ bool boolbvt::type_conversion(
     {
       // fixed to fixed
 
-      std::size_t dest_fraction_bits=to_fixedbv_type(dest_type).get_fraction_bits(),
-                  dest_int_bits=dest_width-dest_fraction_bits;
-      std::size_t op_fraction_bits=to_fixedbv_type(src_type).get_fraction_bits(),
-                  op_int_bits=src_width-op_fraction_bits;
+      std::size_t dest_fraction_bits=
+        to_fixedbv_type(dest_type).get_fraction_bits();
+      std::size_t dest_int_bits=dest_width-dest_fraction_bits;
+      std::size_t op_fraction_bits=
+        to_fixedbv_type(src_type).get_fraction_bits();
+      std::size_t op_int_bits=src_width-op_fraction_bits;
 
       dest.resize(dest_width);
 
@@ -498,8 +515,7 @@ bool boolbvt::type_conversion(
 
     if(src_bvtype==IS_FLOAT)
     {
-      float_utilst float_utils(prop);
-      float_utils.spec=to_floatbv_type(src_type);
+      float_utilst float_utils(prop, to_floatbv_type(src_type));
       dest[0]=!float_utils.is_zero(src);
     }
     else if(src_bvtype==IS_C_BOOL)
@@ -520,8 +536,7 @@ bool boolbvt::type_conversion(
     }
     else if(dest_type.id()==ID_struct)
     {
-      const struct_typet &dest_struct =
-        to_struct_type(dest_type);
+      const struct_typet &dest_struct=to_struct_type(dest_type);
 
       if(src_type.id()==ID_struct)
       {
@@ -529,8 +544,7 @@ bool boolbvt::type_conversion(
 
         dest.resize(dest_width, const_literal(false));
 
-        const struct_typet &op_struct =
-          to_struct_type(src_type);
+        const struct_typet &op_struct=to_struct_type(src_type);
 
         const struct_typet::componentst &dest_comp=
           dest_struct.components();
@@ -558,7 +572,8 @@ bool boolbvt::type_conversion(
         {
           std::size_t offset=dest_offsets[i];
           std::size_t comp_width=boolbv_width(dest_comp[i].type());
-          if(comp_width==0) continue;
+          if(comp_width==0)
+            continue;
 
           op_mapt::const_iterator it=
             op_map.find(dest_comp[i].get_name());
@@ -592,7 +607,6 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
-
   }
 
   return true;

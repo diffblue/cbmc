@@ -72,8 +72,7 @@ smt2_temp_filet::smt2_temp_filet()
 
   temp_out.open(
     temp_out_filename.c_str(),
-    std::ios_base::out | std::ios_base::trunc
-  );
+    std::ios_base::out | std::ios_base::trunc);
 }
 
 /*******************************************************************\

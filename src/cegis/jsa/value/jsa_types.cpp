@@ -44,7 +44,7 @@ symbol_typet jsa_invariant_instruction_type()
   return symbol_typet(INV_INSTR_TYPE);
 }
 
-array_typet jsa_invariant_type(const exprt & size)
+array_typet jsa_invariant_type(const exprt &size)
 {
   return array_typet(jsa_invariant_instruction_type(), size);
 }

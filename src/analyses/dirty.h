@@ -35,17 +35,17 @@ public:
 
   void output(std::ostream &out) const;
 
-  inline bool operator()(const irep_idt &id) const
+  bool operator()(const irep_idt &id) const
   {
     return dirty.find(id)!=dirty.end();
   }
 
-  inline bool operator()(const symbol_exprt &expr) const
+  bool operator()(const symbol_exprt &expr) const
   {
     return operator()(expr.get_identifier());
   }
 
-  inline const id_sett& get_dirty_ids() const
+  const id_sett &get_dirty_ids() const
   {
     return dirty;
   }
@@ -60,8 +60,9 @@ protected:
   void find_dirty_address_of(const exprt &expr);
 };
 
-static inline std::ostream &operator << (
-  std::ostream &out, const dirtyt &dirty)
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const dirtyt &dirty)
 {
   dirty.output(out);
   return out;

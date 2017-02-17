@@ -37,7 +37,7 @@ class add_x0_placeholdert
   symbol_tablet &st;
   goto_functionst &gf;
 public:
-  add_x0_placeholdert(danger_programt &prog) :
+  explicit add_x0_placeholdert(danger_programt &prog) :
       prog(prog), st(prog.st), gf(prog.gf)
   {
   }

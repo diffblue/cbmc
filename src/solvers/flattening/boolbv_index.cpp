@@ -130,8 +130,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       equal_exprt value_equality(result, array.op0());
 
-      binary_relation_exprt lower_bound(from_integer(0, index.type()), ID_le, index);
-      binary_relation_exprt upper_bound(index, ID_lt, from_integer(array_size, index.type()));
+      binary_relation_exprt lower_bound(
+        from_integer(0, index.type()), ID_le, index);
+      binary_relation_exprt upper_bound(
+        index, ID_lt, from_integer(array_size, index.type()));
 
       if(lower_bound.lhs().is_nil() ||
          upper_bound.rhs().is_nil())
@@ -347,7 +349,7 @@ bvt boolbvt::convert_index(
     // The assertion below is disabled as we want to be able
     // to run CBMC without simplifier.
     // Expression simplification should remove these cases
-    //assert(array.id()!=ID_array_of &&
+    // assert(array.id()!=ID_array_of &&
     //       array.id()!=ID_array);
     // If not there are large improvements possible as above
 

@@ -141,7 +141,8 @@ bool read_goto_binary(
 
         std::ifstream temp_in(tempname, std::ios::binary);
         if(!temp_in)
-          messaget(message_handler).error() << "failed to read temp binary" << messaget::eom;
+          messaget(message_handler).error() << "failed to read temp binary"
+                                            << messaget::eom;
         const bool read_err=read_bin_goto_object(
           temp_in, filename, symbol_table, goto_functions, message_handler);
         temp_in.close();
@@ -191,7 +192,8 @@ bool is_goto_binary(const std::string &filename)
   std::ifstream in(filename, std::ios::binary);
   #endif
 
-  if(!in) return false;
+  if(!in)
+    return false;
 
   // We accept two forms:
   // 1. goto binaries, marked with 0x7f GBF
@@ -214,7 +216,8 @@ bool is_goto_binary(const std::string &filename)
     {
       in.seekg(0);
       elf_readert elf_reader(in);
-      if(elf_reader.has_section("goto-cc")) return true;
+      if(elf_reader.has_section("goto-cc"))
+        return true;
     }
 
     catch(...)
@@ -229,7 +232,8 @@ bool is_goto_binary(const std::string &filename)
     {
       in.seekg(0);
       osx_fat_readert osx_fat_reader(in);
-      if(osx_fat_reader.has_gb()) return true;
+      if(osx_fat_reader.has_gb())
+        return true;
     }
 
     catch(...)

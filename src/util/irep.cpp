@@ -143,7 +143,8 @@ Function: irept::remove_ref
 #ifdef SHARING
 void irept::remove_ref(dt *old_data)
 {
-  if(old_data==&empty_d) return;
+  if(old_data==&empty_d)
+    return;
 
   #if 0
   nonrecursive_destructor(old_data);
@@ -199,7 +200,8 @@ void irept::nonrecursive_destructor(dt *old_data)
   {
     dt *d=stack.back();
     stack.erase(--stack.end());
-    if(d==&empty_d) continue;
+    if(d==&empty_d)
+      continue;
 
     assert(d->ref_count!=0);
     d->ref_count--;
@@ -310,7 +312,7 @@ const irep_idt &irept::get(const irep_namet &name) const
   if(it==s.end() ||
      it->first!=name)
   {
-    const static irep_idt empty;
+    static const irep_idt empty;
     return empty;
   }
   #else
@@ -318,7 +320,7 @@ const irep_idt &irept::get(const irep_namet &name) const
 
   if(it==s.end())
   {
-    const static irep_idt empty;
+    static const irep_idt empty;
     return empty;
   }
   #endif
@@ -448,7 +450,8 @@ void irept::remove(const irep_namet &name)
   #ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
-  if(it!=s.end() && it->first==name) s.erase(it);
+  if(it!=s.end() && it->first==name)
+    s.erase(it);
   #else
   s.erase(name);
   #endif
@@ -557,7 +560,7 @@ irept &irept::add(const irep_namet &name, const irept &irep)
 
 /*******************************************************************\
 
-Function: operator==
+Function: irept::operator==
 
   Inputs:
 
@@ -572,18 +575,19 @@ unsigned long long irep_cmp_cnt=0;
 unsigned long long irep_cmp_ne_cnt=0;
 #endif
 
-bool operator==(const irept &i1, const irept &i2)
+bool irept::operator==(const irept &other) const
 {
   #ifdef IREP_HASH_STATS
   ++irep_cmp_cnt;
   #endif
   #ifdef SHARING
-  if(i1.data==i2.data) return true;
+  if(data==other.data)
+    return true;
   #endif
 
-  if(i1.id()!=i2.id() ||
-     i1.get_sub()!=i2.get_sub() || // recursive call
-     i1.get_named_sub()!=i2.get_named_sub()) // recursive call
+  if(id()!=other.id() ||
+     get_sub()!=other.get_sub() || // recursive call
+     get_named_sub()!=other.get_named_sub()) // recursive call
   {
     #ifdef IREP_HASH_STATS
     ++irep_cmp_ne_cnt;
@@ -598,7 +602,7 @@ bool operator==(const irept &i1, const irept &i2)
 
 /*******************************************************************\
 
-Function: full_eq
+Function: irept::full_eq
 
   Inputs:
 
@@ -608,27 +612,30 @@ Function: full_eq
 
 \*******************************************************************/
 
-bool full_eq(const irept &i1, const irept &i2)
+bool irept::full_eq(const irept &other) const
 {
   #ifdef SHARING
-  if(i1.data==i2.data) return true;
+  if(data==other.data)
+    return true;
   #endif
 
-  if(i1.id()!=i2.id()) return false;
+  if(id()!=other.id())
+    return false;
 
-  const irept::subt &i1_sub=i1.get_sub();
-  const irept::subt &i2_sub=i2.get_sub();
-  const irept::named_subt &i1_named_sub=i1.get_named_sub();
-  const irept::named_subt &i2_named_sub=i2.get_named_sub();
-  const irept::named_subt &i1_comments=i1.get_comments();
-  const irept::named_subt &i2_comments=i2.get_comments();
+  const irept::subt &i1_sub=get_sub();
+  const irept::subt &i2_sub=other.get_sub();
+  const irept::named_subt &i1_named_sub=get_named_sub();
+  const irept::named_subt &i2_named_sub=other.get_named_sub();
+  const irept::named_subt &i1_comments=get_comments();
+  const irept::named_subt &i2_comments=other.get_comments();
 
-  if(i1_sub.size()      !=i2_sub.size()) return false;
-  if(i1_named_sub.size()!=i2_named_sub.size()) return false;
-  if(i1_comments.size() !=i2_comments.size()) return false;
+  if(i1_sub.size()!=i2_sub.size() ||
+     i1_named_sub.size()!=i2_named_sub.size() ||
+     i1_comments.size()!=i2_comments.size())
+    return false;
 
-  for(unsigned i=0; i<i1_sub.size(); i++)
-    if(!full_eq(i1_sub[i], i2_sub[i]))
+  for(std::size_t i=0; i<i1_sub.size(); i++)
+    if(!i1_sub[i].full_eq(i2_sub[i]))
       return false;
 
   {
@@ -637,7 +644,7 @@ bool full_eq(const irept &i1, const irept &i2)
 
     for(; i1_it!=i1_named_sub.end(); i1_it++, i2_it++)
       if(i1_it->first!=i2_it->first ||
-         !full_eq(i1_it->second, i2_it->second))
+         !i1_it->second.full_eq(i2_it->second))
         return false;
   }
 
@@ -647,7 +654,7 @@ bool full_eq(const irept &i1, const irept &i2)
 
     for(; i1_it!=i1_comments.end(); i1_it++, i2_it++)
       if(i1_it->first!=i2_it->first ||
-         !full_eq(i1_it->second, i2_it->second))
+         !i1_it->second.full_eq(i2_it->second))
         return false;
   }
 
@@ -656,7 +663,7 @@ bool full_eq(const irept &i1, const irept &i2)
 
 /*******************************************************************\
 
-Function: ordering
+Function: irept::ordering
 
   Inputs:
 
@@ -666,16 +673,20 @@ Function: ordering
 
 \*******************************************************************/
 
-bool ordering(const irept &X, const irept &Y)
+bool irept::ordering(const irept &other) const
 {
-  return X.compare(Y)<0;
+  return compare(other)<0;
 
   #if 0
-  if(X.data<Y.data) return true;
-  if(Y.data<X.data) return false;
+  if(X.data<Y.data)
+    return true;
+  if(Y.data<X.data)
+    return false;
 
-  if(X.sub.size()<Y.sub.size()) return true;
-  if(Y.sub.size()<X.sub.size()) return false;
+  if(X.sub.size()<Y.sub.size())
+    return true;
+  if(Y.sub.size()<X.sub.size())
+    return false;
 
   {
     irept::subt::const_iterator it1, it2;
@@ -686,15 +697,19 @@ bool ordering(const irept &X, const irept &Y)
         it1++,
         it2++)
     {
-      if(ordering(*it1, *it2)) return true;
-      if(ordering(*it2, *it1)) return false;
+      if(ordering(*it1, *it2))
+        return true;
+      if(ordering(*it2, *it1))
+        return false;
     }
 
     assert(it1==X.sub.end() && it2==Y.sub.end());
   }
 
-  if(X.named_sub.size()<Y.named_sub.size()) return true;
-  if(Y.named_sub.size()<X.named_sub.size()) return false;
+  if(X.named_sub.size()<Y.named_sub.size())
+    return true;
+  if(Y.named_sub.size()<X.named_sub.size())
+    return false;
 
   {
     irept::named_subt::const_iterator it1, it2;
@@ -705,11 +720,15 @@ bool ordering(const irept &X, const irept &Y)
         it1++,
         it2++)
     {
-      if(it1->first<it2->first) return true;
-      if(it2->first<it1->first) return false;
+      if(it1->first<it2->first)
+        return true;
+      if(it2->first<it1->first)
+        return false;
 
-      if(ordering(it1->second, it2->second)) return true;
-      if(ordering(it2->second, it1->second)) return false;
+      if(ordering(it1->second, it2->second))
+        return true;
+      if(ordering(it2->second, it1->second))
+        return false;
     }
 
     assert(it1==X.named_sub.end() && it2==Y.named_sub.end());
@@ -736,12 +755,15 @@ int irept::compare(const irept &i) const
   int r;
 
   r=id().compare(i.id());
-  if(r!=0) return r;
+  if(r!=0)
+    return r;
 
   const subt::size_type size=get_sub().size(),
         i_size=i.get_sub().size();
-  if(size<i_size) return -1;
-  if(size>i_size) return 1;
+  if(size<i_size)
+    return -1;
+  if(size>i_size)
+    return 1;
 
   {
     irept::subt::const_iterator it1, it2;
@@ -753,7 +775,8 @@ int irept::compare(const irept &i) const
         it2++)
     {
       r=it1->compare(*it2);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
     }
 
     assert(it1==get_sub().end() && it2==i.get_sub().end());
@@ -761,8 +784,10 @@ int irept::compare(const irept &i) const
 
   const named_subt::size_type n_size=get_named_sub().size(),
         i_n_size=i.get_named_sub().size();
-  if(n_size<i_n_size) return -1;
-  if(n_size>i_n_size) return 1;
+  if(n_size<i_n_size)
+    return -1;
+  if(n_size>i_n_size)
+    return 1;
 
   {
     irept::named_subt::const_iterator it1, it2;
@@ -774,10 +799,12 @@ int irept::compare(const irept &i) const
         it2++)
     {
       r=it1->first.compare(it2->first);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
 
       r=it1->second.compare(it2->second);
-      if(r!=0) return r;
+      if(r!=0)
+        return r;
     }
 
     assert(it1==get_named_sub().end() &&
@@ -790,7 +817,7 @@ int irept::compare(const irept &i) const
 
 /*******************************************************************\
 
-Function: operator<
+Function: irept::operator<
 
   Inputs:
 
@@ -800,9 +827,9 @@ Function: operator<
 
 \*******************************************************************/
 
-bool operator<(const irept &X, const irept &Y)
+bool irept::operator<(const irept &other) const
 {
-  return ordering(X, Y);
+  return ordering(other);
 }
 
 /*******************************************************************\
@@ -926,7 +953,7 @@ Function: irept::pretty
 
 std::string irept::pretty(unsigned indent, unsigned max_indent) const
 {
-  if (max_indent > 0 && indent > max_indent)
+  if(max_indent>0 && indent>max_indent)
     return "";
 
   std::string result;

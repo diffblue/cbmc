@@ -1,8 +1,8 @@
 /*******************************************************************\
 
-   Class: interpretert
+Module: Interpreter for GOTO Programs
 
- Purpose: interpreter for GOTO programs
+Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
@@ -28,8 +28,6 @@ public:
   }
 
   void operator()();
-
-  friend class simplify_evaluatet;
 
 protected:
   const symbol_tablet &symbol_table;
@@ -96,7 +94,8 @@ protected:
   {
     std::vector<mp_integer> v;
     evaluate(expr, v);
-    if(v.size()!=1) throw "invalid boolean value";
+    if(v.size()!=1)
+      throw "invalid boolean value";
     return v.front()!=0;
   }
 

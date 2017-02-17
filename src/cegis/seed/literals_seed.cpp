@@ -32,7 +32,7 @@ class is_same_symbolt
 {
   const irep_idt &name;
 public:
-  is_same_symbolt(const irep_idt &name) :
+  explicit is_same_symbolt(const irep_idt &name) :
       name(name)
   {
   }
@@ -51,7 +51,7 @@ class add_symbolt
 {
   keyst &keys;
 public:
-  add_symbolt(keyst &keys) :
+  explicit add_symbolt(keyst &keys) :
       keys(keys)
   {
   }
@@ -67,7 +67,7 @@ class compare_literalt
 {
   const constant_exprt &literal;
 public:
-  compare_literalt(const constant_exprt &literal) :
+  explicit compare_literalt(const constant_exprt &literal) :
       literal(literal)
   {
   }
@@ -82,7 +82,7 @@ class add_literalt
 {
   valuest &values;
 public:
-  add_literalt(valuest &values) :
+  explicit add_literalt(valuest &values) :
       values(values)
   {
   }
@@ -178,7 +178,7 @@ class is_keyt
 {
   const exprt::operandst &ops;
 public:
-  is_keyt(const exprt::operandst &ops) :
+  explicit is_keyt(const exprt::operandst &ops) :
       ops(ops)
   {
   }
@@ -212,7 +212,7 @@ class scrape_literalst: public const_expr_visitort
   std::deque<keyst> keys;
   pool_storaget &pool;
 public:
-  scrape_literalst(pool_storaget &p) :
+  explicit scrape_literalst(pool_storaget &p) :
       pool(p)
   {
     std::transform(p.begin(), p.end(), std::back_inserter(keys), &get_first);

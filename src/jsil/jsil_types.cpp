@@ -24,7 +24,7 @@ Function: jsil_any_type
 
 typet jsil_any_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_empty_type(),
                           jsil_reference_type(),
                           jsil_value_type()
@@ -45,7 +45,7 @@ Function: jsil_value_or_empty_type
 
 typet jsil_value_or_empty_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_value_type(),
                           jsil_empty_type()
                           });
@@ -65,7 +65,7 @@ Function: jsil_value_or_reference_type
 
 typet jsil_value_or_reference_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_value_type(),
                           jsil_reference_type()
                           });
@@ -85,7 +85,7 @@ Function: jsil_value_type
 
 typet jsil_value_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_undefined_type(),
                           jsil_null_type(),
                           jsil_prim_type(),
@@ -107,7 +107,7 @@ Function: jsil_prim_type
 
 typet jsil_prim_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           floatbv_typet(),
                           string_typet(),
                           bool_typet()
@@ -128,7 +128,7 @@ Function: jsil_reference_type
 
 typet jsil_reference_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_member_reference_type(),
                           jsil_variable_reference_type()
                           });
@@ -182,7 +182,7 @@ Function: jsil_object_type
 
 typet jsil_object_type()
 {
-  return jsil_union_typet({
+  return jsil_union_typet({ // NOLINT(whitespace/braces)
                           jsil_user_object_type(),
                           jsil_builtin_object_type()
                           });
@@ -449,7 +449,7 @@ jsil_union_typet jsil_union_typet::intersect_with(
   auto &elements2=other.components();
   jsil_union_typet result;
   auto &elements=result.components();
-  elements.resize(std::min(elements1.size(),elements2.size()));
+  elements.resize(std::min(elements1.size(), elements2.size()));
   std::vector<union_typet::componentt>::iterator it=std::set_intersection(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),
@@ -516,7 +516,7 @@ Function: jsil_union_typet::to_type()
 
 \*******************************************************************/
 
-const typet& jsil_union_typet::to_type() const
+const typet &jsil_union_typet::to_type() const
 {
   auto &elements=components();
   if(elements.size()==1)

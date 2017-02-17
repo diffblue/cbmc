@@ -69,7 +69,8 @@ void dump_ct::operator()(std::ostream &os)
   {
     symbolt &symbol=it->second;
 
-    if(symbol.type.id()!=ID_code) continue;
+    if(symbol.type.id()!=ID_code)
+      continue;
 
     code_typet &code_type=to_code_type(symbol.type);
     code_typet::parameterst &parameters=code_type.parameters();
@@ -138,7 +139,8 @@ void dump_ct::operator()(std::ostream &os)
         symbol.type.get_string(ID_tag);
 
       std::string::size_type tag_pos=new_tag.rfind("tag-");
-      if(tag_pos!=std::string::npos) new_tag.erase(0, tag_pos+4);
+      if(tag_pos!=std::string::npos)
+        new_tag.erase(0, tag_pos+4);
       const std::string new_tag_base=new_tag;
 
       for(std::pair<unique_tagst::iterator, bool>
@@ -220,7 +222,8 @@ void dump_ct::operator()(std::ostream &os)
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    if(symbol.type.id()!=ID_code) continue;
+    if(symbol.type.id()!=ID_code)
+      continue;
 
     convert_function_declaration(
       symbol,
@@ -253,7 +256,8 @@ void dump_ct::operator()(std::ostream &os)
       it!=system_headers.end();
       ++it)
     os << "#include <" << *it << ">" << std::endl;
-  if(!system_headers.empty()) os << std::endl;
+  if(!system_headers.empty())
+    os << std::endl;
 
   if(global_var_stream.str().find("NULL")!=std::string::npos ||
      func_body_stream.str().find("NULL")!=std::string::npos)
@@ -354,7 +358,8 @@ void dump_ct::convert_compound(
   }
   else if(type.id()==ID_array || type.id()==ID_pointer)
   {
-    if(!recursive) return;
+    if(!recursive)
+      return;
 
     convert_compound(type.subtype(), type.subtype(), recursive, os);
 
@@ -623,7 +628,8 @@ Purpose:
 void dump_ct::init_system_library_map()
 {
   // ctype.h
-  const char* ctype_syms[]={
+  const char* ctype_syms[]=
+  {
     "isalnum", "isalpha", "isblank", "iscntrl", "isdigit", "isgraph",
     "islower", "isprint", "ispunct", "isspace", "isupper", "isxdigit",
     "tolower", "toupper"
@@ -631,19 +637,22 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(ctype_syms, "ctype.h");
 
   // fcntl.h
-  const char* fcntl_syms[]={
+  const char* fcntl_syms[]=
+  {
     "creat", "fcntl", "open"
   };
   ADD_TO_SYSTEM_LIBRARY(fcntl_syms, "fcntl.h");
 
   // locale.h
-  const char* locale_syms[]={
+  const char* locale_syms[]=
+  {
     "setlocale"
   };
   ADD_TO_SYSTEM_LIBRARY(locale_syms, "locale.h");
 
   // math.h
-  const char* math_syms[]={
+  const char* math_syms[]=
+  {
     "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh",
     "cbrt", "ceil", "copysign", "cos", "cosh", "erf", "erfc", "exp",
     "exp2", "expm1", "fabs", "fdim", "floor", "fma", "fmax", "fmin",
@@ -658,7 +667,8 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(math_syms, "math.h");
 
   // pthread.h
-  const char* pthread_syms[]={
+  const char* pthread_syms[]=
+  {
     "pthread_cleanup_pop", "pthread_cleanup_push",
     "pthread_cond_broadcast", "pthread_cond_destroy",
     "pthread_cond_init", "pthread_cond_signal",
@@ -677,14 +687,16 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(pthread_syms, "pthread.h");
 
   // setjmp.h
-  const char* setjmp_syms[]={
+  const char* setjmp_syms[]=
+  {
     "_longjmp", "_setjmp", "longjmp", "longjmperror", "setjmp",
     "siglongjmp", "sigsetjmp"
   };
   ADD_TO_SYSTEM_LIBRARY(setjmp_syms, "setjmp.h");
 
   // stdio.h
-  const char* stdio_syms[]={
+  const char* stdio_syms[]=
+  {
     "asprintf", "clearerr", "fclose", "fdopen", "feof", "ferror",
     "fflush", "fgetc", "fgetln", "fgetpos", "fgets", "fgetwc",
     "fgetws", "fileno", "fopen", "fprintf", "fpurge", "fputc",
@@ -707,7 +719,8 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(stdio_syms, "stdio.h");
 
   // stdlib.h
-  const char* stdlib_syms[]={
+  const char* stdlib_syms[]=
+  {
     "abort", "abs", "atexit", "atof", "atoi", "atol", "atoll",
     "bsearch", "calloc", "div", "exit", "free", "getenv", "labs",
     "ldiv", "llabs", "lldiv", "malloc", "mblen", "mbstowcs", "mbtowc",
@@ -718,7 +731,8 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(stdlib_syms, "stdlib.h");
 
   // string.h
-  const char* string_syms[]={
+  const char* string_syms[]=
+  {
     "strcat", "strncat", "strchr", "strrchr", "strcmp", "strncmp",
     "strcpy", "strncpy", "strerror", "strlen", "strpbrk", "strspn",
     "strcspn", "strstr", "strtok"
@@ -726,7 +740,8 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(string_syms, "string.h");
 
   // time.h
-  const char* time_syms[]={
+  const char* time_syms[]=
+  {
     "asctime", "asctime_r", "ctime", "ctime_r", "difftime", "gmtime",
     "gmtime_r", "localtime", "localtime_r", "mktime",
     /* non-public struct types */
@@ -735,7 +750,8 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(time_syms, "time.h");
 
   // unistd.h
-  const char* unistd_syms[]={
+  const char* unistd_syms[]=
+  {
     "_exit", "access", "alarm", "chdir", "chown", "close", "dup",
     "dup2", "execl", "execle", "execlp", "execv", "execve", "execvp",
     "fork", "fpathconf", "getcwd", "getegid", "geteuid", "getgid",
@@ -748,32 +764,37 @@ void dump_ct::init_system_library_map()
   ADD_TO_SYSTEM_LIBRARY(unistd_syms, "unistd.h");
 
   // sys/select.h
-  const char* sys_select_syms[]={
+  const char* sys_select_syms[]=
+  {
     "select"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_select_syms, "sys/select.h");
 
   // sys/socket.h
-  const char* sys_socket_syms[]={
+  const char* sys_socket_syms[]=
+  {
     "accept", "bind", "connect"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_socket_syms, "sys/socket.h");
 
   // sys/stat.h
-  const char* sys_stat_syms[]={
+  const char* sys_stat_syms[]=
+  {
     "fstat", "lstat", "stat"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_stat_syms, "sys/stat.h");
 
   /*
   // sys/types.h
-  const char* sys_types_syms[]={
+  const char* sys_types_syms[]=
+  {
   };
   ADD_TO_SYSTEM_LIBRARY(sys_types_syms, "sys/types.h");
   */
 
   // sys/wait.h
-  const char* sys_wait_syms[]={
+  const char* sys_wait_syms[]=
+  {
     "wait", "waitpid"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_wait_syms, "sys/wait.h");
@@ -980,7 +1001,7 @@ Purpose:
 \*******************************************************************/
 
 void dump_ct::convert_function_declaration(
-    const symbolt& symbol,
+    const symbolt &symbol,
     const bool skip_main,
     std::ostream &os_decl,
     std::ostream &os_body,
@@ -1068,7 +1089,7 @@ static bool find_block_position_rec(
   if(!root.has_operands())
     return false;
 
-  code_blockt* our_dest=0;
+  code_blockt *our_dest=0;
 
   exprt::operandst &operands=root.operands();
   exprt::operandst::iterator first_found=operands.end();
@@ -1093,7 +1114,8 @@ static bool find_block_position_rec(
       found=syms.find(identifier)!=syms.end();
     }
 
-    if(!found) continue;
+    if(!found)
+      continue;
 
     if(!our_dest)
     {
@@ -1170,7 +1192,7 @@ void dump_ct::insert_local_static_decls(
     std::list<irep_idt> redundant;
     cleanup_decl(d, redundant, type_decls);
 
-    code_blockt* dest_ptr=0;
+    code_blockt *dest_ptr=0;
     exprt::operandst::iterator before=b.operands().end();
 
     // some use of static variables might be optimised out if it is
@@ -1219,7 +1241,7 @@ void dump_ct::insert_local_type_decls(
     // another hack to ensure symbols inside types are seen
     skip.type()=type;
 
-    code_blockt* dest_ptr=0;
+    code_blockt *dest_ptr=0;
     exprt::operandst::iterator before=b.operands().end();
 
     // we might not find it in case a transparent union type cast

@@ -33,12 +33,33 @@ void message_handlert::print(
   const irep_idt &column=location.get_column();
   const irep_idt &function=location.get_function();
 
-  if(!file.empty())     { if(dest!="") dest+=' '; dest+="file "+id2string(file); }
-  if(!line.empty())     { if(dest!="") dest+=' '; dest+="line "+id2string(line); }
-  if(!column.empty())   { if(dest!="") dest+=' '; dest+="column "+id2string(column); }
-  if(!function.empty()) { if(dest!="") dest+=' '; dest+="function "+id2string(function); }
+  if(!file.empty())
+  {
+    if(dest!="")
+      dest+=' ';
+    dest+="file "+id2string(file);
+  }
+  if(!line.empty())
+  {
+    if(dest!="")
+      dest+=' ';
+    dest+="line "+id2string(line);
+  }
+  if(!column.empty())
+  {
+    if(dest!="")
+      dest+=' ';
+    dest+="column "+id2string(column);
+  }
+  if(!function.empty())
+  {
+    if(dest!="")
+      dest+=' ';
+    dest+="function "+id2string(function);
+  }
 
-  if(dest!="") dest+=": ";
+  if(dest!="")
+    dest+=": ";
   dest+=message;
 
   print(level, dest);

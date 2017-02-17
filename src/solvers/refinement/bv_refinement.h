@@ -24,8 +24,11 @@ public:
   virtual decision_proceduret::resultt dec_solve();
 
   virtual std::string decision_procedure_text() const
-  { return "refinement loop with "+prop.solver_text(); }
+  {
+    return "refinement loop with "+prop.solver_text();
+  }
 
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef bv_pointerst SUB;
 
   // maximal number of times we refine a formula node
@@ -108,7 +111,6 @@ protected:
 
   // use gui format
   language_uit::uit ui;
-
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H

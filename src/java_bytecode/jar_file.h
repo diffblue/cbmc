@@ -18,7 +18,7 @@ class jar_filet
 public:
   jar_filet():zip(nullptr) { }
 
-  inline explicit jar_filet(const std::string &file_name):zip(nullptr)
+  explicit jar_filet(const std::string &file_name):zip(nullptr)
   {
     open(file_name);
   }
@@ -28,7 +28,7 @@ public:
   void open(const std::string &);
 
   // Test for error; 'true' means we are good.
-  inline explicit operator bool() const { return zip!=nullptr; }
+  explicit operator bool() const { return zip!=nullptr; }
 
   typedef std::vector<std::string> indext;
   indext index;

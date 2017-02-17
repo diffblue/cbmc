@@ -225,7 +225,8 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
      src.id()==ID_union)
   {
     const struct_union_typet &struct_union_type=to_struct_union_type(src);
-    const struct_union_typet::componentst &components=struct_union_type.components();
+    const struct_union_typet::componentst &components=
+      struct_union_type.components();
 
     for(struct_union_typet::componentst::const_iterator
         it=components.begin();
@@ -246,8 +247,8 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
     {
       find_symbols(kind, *it, dest);
 
-      //irep_idt identifier=it->get_identifier();
-      //if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
+      // irep_idt identifier=it->get_identifier();
+      // if(identifier!=irep_idt() && (kind==F_TYPE || kind==F_BOTH))
       //  dest.insert(identifier);
     }
   }

@@ -16,7 +16,7 @@ class cnft:public propt
 public:
   // For CNF, we don't use index 0 as a matter of principle,
   // so we'll start counting variables at 1.
-  inline cnft():_no_variables(1) { }
+  cnft():_no_variables(1) { }
   virtual ~cnft() { }
 
   virtual literalt land(literalt a, literalt b) override;
@@ -29,7 +29,8 @@ public:
   virtual literalt lnor(literalt a, literalt b) override;
   virtual literalt lequal(literalt a, literalt b) override;
   virtual literalt limplies(literalt a, literalt b) override;
-  virtual literalt lselect(literalt a, literalt b, literalt c) override; // a?b:c
+  // a?b:c
+  virtual literalt lselect(literalt a, literalt b, literalt c) override;
   virtual literalt new_variable() override;
   virtual size_t no_variables() const override { return _no_variables; }
   virtual void set_no_variables(size_t no) { _no_variables=no; }
@@ -53,7 +54,8 @@ protected:
   static bool is_all(const bvt &bv, literalt l)
   {
     forall_literals(it, bv)
-      if(*it!=l) return false;
+      if(*it!=l)
+        return false;
     return true;
   }
 };

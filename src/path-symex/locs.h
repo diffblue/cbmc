@@ -18,10 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 struct loct
 {
 public:
-  loct(goto_programt::const_targett _target,
-       const irep_idt &_function):
-       target(_target),
-       function(_function)
+  loct(
+    goto_programt::const_targett _target,
+    const irep_idt &_function):
+    target(_target),
+    function(_function)
   {
   }
 
@@ -49,19 +50,19 @@ public:
   typedef std::map<irep_idt, function_entryt> function_mapt;
   function_mapt function_map;
 
-  locst(const namespacet &_ns);
+  explicit locst(const namespacet &_ns);
   void build(const goto_functionst &goto_functions);
   void output(std::ostream &out) const;
 
-  inline loct &operator[] (loc_reft l)
+  loct &operator[] (loc_reft l)
   {
-    assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
+    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
-  inline const loct &operator[] (loc_reft l) const
+  const loct &operator[] (loc_reft l) const
   {
-    assert(l.loc_number>=0 && l.loc_number < loc_vector.size());
+    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
@@ -72,14 +73,14 @@ public:
     return tmp;
   }
 
-  inline loc_reft end() const
+  loc_reft end() const
   {
     loc_reft tmp;
     tmp.loc_number=loc_vector.size();
     return tmp;
   }
 
-  inline std::size_t size() const
+  std::size_t size() const
   {
     return loc_vector.size();
   }
@@ -97,7 +98,7 @@ public:
       map[locs[it].target]=it;
   }
 
-  inline loc_reft operator[](const goto_programt::const_targett t) const
+  loc_reft operator[](const goto_programt::const_targett t) const
   {
     mapt::const_iterator it=map.find(t);
     assert(it!=map.end());

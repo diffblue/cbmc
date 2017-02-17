@@ -84,7 +84,8 @@ void remove_returnst::replace_returns(
     auxiliary_symbolt new_symbol;
     new_symbol.is_static_lifetime=true;
     new_symbol.module=function_symbol.module;
-    new_symbol.base_name=id2string(function_symbol.base_name)+RETURN_VALUE_SUFFIX;
+    new_symbol.base_name=
+      id2string(function_symbol.base_name)+RETURN_VALUE_SUFFIX;
     new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
     new_symbol.mode=function_symbol.mode;
     new_symbol.type=return_type;
@@ -147,7 +148,8 @@ void remove_returnst::do_function_calls(
       // Do we return anything?
       if(old_type.return_type()!=empty_typet())
       {
-        // replace "lhs=f(...)" by "f(...); lhs=f#return_value; DEAD f#return_value;"
+        // replace "lhs=f(...)" by
+        // "f(...); lhs=f#return_value; DEAD f#return_value;"
         assert(function_call.function().id()==ID_symbol);
 
         const irep_idt function_id=
@@ -158,10 +160,13 @@ void remove_returnst::do_function_calls(
           f_it=goto_functions.function_map.find(function_id);
 
         if(f_it==goto_functions.function_map.end())
-          throw "failed to find function `"+id2string(function_id)+"' in function map";
+          throw
+            "failed to find function `"+id2string(function_id)+
+            "' in function map";
 
         // fix the type
-        to_code_type(function_call.function().type()).return_type()=empty_typet();
+        to_code_type(function_call.function().type()).return_type()=
+          empty_typet();
 
         if(function_call.lhs().is_not_nil())
         {
@@ -171,7 +176,8 @@ void remove_returnst::do_function_calls(
           {
             symbol_exprt return_value;
             return_value.type()=function_call.lhs().type();
-            return_value.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
+            return_value.set_identifier(
+              id2string(function_id)+RETURN_VALUE_SUFFIX);
             rhs=return_value;
           }
           else

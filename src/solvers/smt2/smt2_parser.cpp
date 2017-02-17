@@ -206,7 +206,8 @@ void smt2_parsert::get_quoted_symbol()
   char ch;
   while(in.get(ch))
   {
-    if(ch=='|') return; // done
+    if(ch=='|')
+      return; // done
     buffer+=ch;
   }
 
@@ -281,14 +282,16 @@ void smt2_parsert::operator()()
     case '\n':
     case '\r':
     case '\t':
-    case (char)160: // non-breaking space
+    case static_cast<char>(160): // non-breaking space
       // skip any whitespace
       break;
 
     case ';': // comment
       // skip until newline
       while(in.get(ch) && ch!='\n')
-        ; // ignore
+      {
+        // ignore
+      }
       break;
 
     case '(':
@@ -317,19 +320,22 @@ void smt2_parsert::operator()()
     case '|': // quoted symbol
       get_quoted_symbol();
       symbol();
-      if(open_parentheses==0) return; // done
+      if(open_parentheses==0)
+        return; // done
       break;
 
     case '"': // string literal
       get_string_literal();
       string_literal();
-      if(open_parentheses==0) return; // done
+      if(open_parentheses==0)
+        return; // done
       break;
 
     case ':': // keyword
       get_simple_symbol();
       keyword();
-      if(open_parentheses==0) return; // done
+      if(open_parentheses==0)
+        return; // done
       break;
 
     case '#':
@@ -351,7 +357,8 @@ void smt2_parsert::operator()()
           return;
         }
 
-        if(open_parentheses==0) return; // done
+        if(open_parentheses==0)
+          return; // done
       }
       else
       {
@@ -366,14 +373,16 @@ void smt2_parsert::operator()()
         in.unget();
         get_decimal_numeral();
         numeral();
-        if(open_parentheses==0) return; // done
+        if(open_parentheses==0)
+          return; // done
       }
       else if(is_simple_symbol_character(ch))
       {
         in.unget();
         get_simple_symbol();
         symbol();
-        if(open_parentheses==0) return; // done
+        if(open_parentheses==0)
+          return; // done
       }
       else
       {

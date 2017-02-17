@@ -26,6 +26,7 @@ std::size_t unsafe_string2size_t(const std::string &str, int base=10);
 
 // Same for atoll
 long long int unsafe_string2signedlonglong(const std::string &str, int base=10);
-long long unsigned int unsafe_string2unsignedlonglong(const std::string &str, int base=10);
+long long unsigned int unsafe_string2unsignedlonglong(
+  const std::string &str, int base=10);
 
 #endif // CPROVER_UTIL_STRING2INT_H

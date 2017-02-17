@@ -272,17 +272,21 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  inline T &operator[](locationt l)
+  T &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
-  inline const T &operator[](locationt l) const
+  const T &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
@@ -304,14 +308,18 @@ protected:
   virtual statet &get_state(locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 
   virtual const statet &get_state(locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end()) throw "failed to find state";
+    if(it==state_map.end())
+      throw "failed to find state";
+
     return it->second;
   }
 

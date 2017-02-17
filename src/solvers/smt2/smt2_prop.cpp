@@ -37,7 +37,7 @@ smt2_propt::smt2_propt(
   out << "(set-info :source \"" << source << "\")" << "\n";
   out << "(set-option :produce-models true)" << "\n";
 
-  if (core_enabled)
+  if(core_enabled)
   {
     out << "(set-option :produce-unsat-cores true)" << "\n";
   }
@@ -167,8 +167,10 @@ Function: smt2_propt::lxor
 
 literalt smt2_propt::lxor(const bvt &bv)
 {
-  if(bv.empty()) return const_literal(false);
-  if(bv.size()==1) return bv[0];
+  if(bv.empty())
+    return const_literal(false);
+  if(bv.size()==1)
+    return bv[0];
 
   out << "\n";
 
@@ -199,11 +201,16 @@ Function: smt2_propt::land
 
 literalt smt2_propt::land(literalt a, literalt b)
 {
-  if(a==const_literal(true)) return b;
-  if(b==const_literal(true)) return a;
-  if(a==const_literal(false)) return const_literal(false);
-  if(b==const_literal(false)) return const_literal(false);
-  if(a==b) return a;
+  if(a==const_literal(true))
+    return b;
+  if(b==const_literal(true))
+    return a;
+  if(a==const_literal(false))
+    return const_literal(false);
+  if(b==const_literal(false))
+    return const_literal(false);
+  if(a==b)
+    return a;
 
   out << "\n";
 
@@ -232,11 +239,16 @@ Function: smt2_propt::lor
 
 literalt smt2_propt::lor(literalt a, literalt b)
 {
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return const_literal(true);
-  if(b==const_literal(true)) return const_literal(true);
-  if(a==b) return a;
+  if(a==const_literal(false))
+    return b;
+  if(b==const_literal(false))
+    return a;
+  if(a==const_literal(true))
+    return const_literal(true);
+  if(b==const_literal(true))
+    return const_literal(true);
+  if(a==b)
+    return a;
 
   out << "\n";
 
@@ -265,10 +277,14 @@ Function: smt2_propt::lxor
 
 literalt smt2_propt::lxor(literalt a, literalt b)
 {
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return !b;
-  if(b==const_literal(true)) return !a;
+  if(a==const_literal(false))
+    return b;
+  if(b==const_literal(false))
+    return a;
+  if(a==const_literal(true))
+    return !b;
+  if(b==const_literal(true))
+    return !a;
 
   out << "\n";
 
@@ -365,14 +381,21 @@ Function: smt2_propt::lselect
 
 literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
 {
-  if(a==const_literal(true)) return b;
-  if(a==const_literal(false)) return c;
-  if(b==c) return b;
+  if(a==const_literal(true))
+    return b;
+  if(a==const_literal(false))
+    return c;
+  if(b==c)
+    return b;
 
-  if(a==const_literal(false)) return b;
-  if(b==const_literal(false)) return a;
-  if(a==const_literal(true)) return !b;
-  if(b==const_literal(true)) return !a;
+  if(a==const_literal(false))
+    return b;
+  if(b==const_literal(false))
+    return a;
+  if(a==const_literal(true))
+    return !b;
+  if(b==const_literal(true))
+    return !a;
 
   out << "\n";
 
@@ -512,11 +535,14 @@ Function: smt2_propt::l_get
 
 tvt smt2_propt::l_get(literalt literal) const
 {
-  if(literal.is_true()) return tvt(true);
-  if(literal.is_false()) return tvt(false);
+  if(literal.is_true())
+    return tvt(true);
+  if(literal.is_false())
+    return tvt(false);
 
   unsigned v=literal.var_no();
-  if(v>=assignment.size()) return tvt(tvt::tv_enumt::TV_UNKNOWN);
+  if(v>=assignment.size())
+    return tvt(tvt::tv_enumt::TV_UNKNOWN);
   tvt r=assignment[v];
   return literal.sign()?!r:r;
 }
@@ -535,7 +561,8 @@ Function: smt2_propt::set_assignment
 
 void smt2_propt::set_assignment(literalt literal, bool value)
 {
-  if(literal.is_true() || literal.is_false()) return;
+  if(literal.is_true() || literal.is_false())
+    return;
 
   unsigned v=literal.var_no();
   assert(v<assignment.size());

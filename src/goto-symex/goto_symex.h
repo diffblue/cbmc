@@ -244,32 +244,77 @@ protected:
 
   virtual void do_simplify(exprt &expr);
 
-  //virtual void symex_block(statet &state, const codet &code);
+  // virtual void symex_block(statet &state, const codet &code);
   void symex_assign_rec(statet &state, const code_assignt &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
 
   typedef symex_targett::assignment_typet assignment_typet;
 
-  void symex_assign_rec(statet &state, const exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_symbol(statet &state, const ssa_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_typecast(statet &state, const typecast_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_array(statet &state, const index_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_struct_member(statet &state, const member_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_if(statet &state, const if_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
-  void symex_assign_byte_extract(statet &state, const byte_extract_exprt &lhs, const exprt &full_lhs, const exprt &rhs, guardt &guard, assignment_typet assignment_type);
+  void symex_assign_rec(
+    statet &state,
+    const exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_symbol(
+    statet &state,
+    const ssa_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_typecast(
+    statet &state,
+    const typecast_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_array(
+    statet &state,
+    const index_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_struct_member(
+    statet &state,
+    const member_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_if(
+    statet &state,
+    const if_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
+  void symex_assign_byte_extract(
+    statet &state,
+    const byte_extract_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    guardt &guard,
+    assignment_typet assignment_type);
 
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
 
-  virtual void symex_gcc_builtin_va_arg_next(statet &state, const exprt &lhs, const side_effect_exprt &code);
-  virtual void symex_malloc        (statet &state, const exprt &lhs, const side_effect_exprt &code);
-  virtual void symex_cpp_delete    (statet &state, const codet &code);
-  virtual void symex_cpp_new       (statet &state, const exprt &lhs, const side_effect_exprt &code);
-  virtual void symex_fkt           (statet &state, const code_function_callt &code);
-  virtual void symex_macro         (statet &state, const code_function_callt &code);
-  virtual void symex_trace         (statet &state, const code_function_callt &code);
-  virtual void symex_printf        (statet &state, const exprt &lhs, const exprt &rhs);
-  virtual void symex_input         (statet &state, const codet &code);
-  virtual void symex_output        (statet &state, const codet &code);
+  virtual void symex_gcc_builtin_va_arg_next(
+    statet &state, const exprt &lhs, const side_effect_exprt &code);
+  virtual void symex_malloc(
+    statet &state, const exprt &lhs, const side_effect_exprt &code);
+  virtual void symex_cpp_delete(statet &state, const codet &code);
+  virtual void symex_cpp_new(
+    statet &state, const exprt &lhs, const side_effect_exprt &code);
+  virtual void symex_fkt(statet &state, const code_function_callt &code);
+  virtual void symex_macro(statet &state, const code_function_callt &code);
+  virtual void symex_trace(statet &state, const code_function_callt &code);
+  virtual void symex_printf(statet &state, const exprt &lhs, const exprt &rhs);
+  virtual void symex_input(statet &state, const codet &code);
+  virtual void symex_output(statet &state, const codet &code);
 
   static unsigned nondet_count;
   static unsigned dynamic_counter;

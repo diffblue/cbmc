@@ -34,7 +34,7 @@ public:
   std::list<typet> other;
 
   cpp_convert_typet() { }
-  cpp_convert_typet(const typet &type) { read(type); }
+  explicit cpp_convert_typet(const typet &type) { read(type); }
 
 protected:
   void read_rec(const typet &type);

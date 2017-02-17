@@ -24,7 +24,7 @@ public:
   // Trivial, conjunctive interval domain for both float
   // and integers. The categorization 'float' and 'integers'
   // is done by is_int and is_float.
-  
+
   interval_domaint():bottom(true)
   {
   }
@@ -33,12 +33,12 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) override final;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const override final;
+    const namespacet &ns) const final;
 
   bool merge(
     const interval_domaint &b,
@@ -46,7 +46,7 @@ public:
     locationt to);
 
   // no states
-  void make_bottom() override final
+  void make_bottom() final
   {
     int_map.clear();
     float_map.clear();
@@ -54,14 +54,14 @@ public:
   }
 
   // all states
-  void make_top() override final
+  void make_top() final
   {
     int_map.clear();
     float_map.clear();
     bottom=false;
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     make_top();
   }
@@ -70,22 +70,22 @@ public:
 
   void assume(const exprt &, const namespacet &);
 
-  inline static bool is_int(const typet &src)
+  static bool is_int(const typet &src)
   {
     return src.id()==ID_signedbv || src.id()==ID_unsignedbv;
   }
 
-  inline static bool is_float(const typet &src)
+  static bool is_float(const typet &src)
   {
     return src.id()==ID_floatbv;
   }
 
-  inline bool is_bottom() const
+  bool is_bottom() const
   {
     return bottom;
   }
 
-protected:
+private:
   bool bottom;
 
   typedef std::map<irep_idt, integer_intervalt> int_mapt;

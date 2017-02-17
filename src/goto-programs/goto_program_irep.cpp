@@ -80,7 +80,8 @@ void convert(
 {
   instruction.code=static_cast<const codet &>(irep.find(ID_code));
   instruction.function = irep.find(ID_function).id();
-  instruction.source_location = static_cast<const source_locationt &>(irep.find(ID_location));
+  instruction.source_location=
+    static_cast<const source_locationt &>(irep.find(ID_location));
   instruction.type = static_cast<goto_program_instruction_typet>(
                   unsafe_string2unsigned(irep.find(ID_type).id_string()));
   instruction.guard = static_cast<const exprt&>(irep.find(ID_guard));
@@ -105,7 +106,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert( const goto_programt &program, irept &irep )
+void convert(const goto_programt &program, irept &irep)
 {
   irep.id("goto-program");
   irep.get_sub().reserve(program.instructions.size());
@@ -128,7 +129,7 @@ Function: convert
 
 \*******************************************************************/
 
-void convert( const irept &irep, goto_programt &program )
+void convert(const irept &irep, goto_programt &program)
 {
   assert(irep.id()=="goto-program");
 
@@ -138,7 +139,7 @@ void convert( const irept &irep, goto_programt &program )
 
   // convert instructions back
   const irept::subt &subs = irep.get_sub();
-  for (irept::subt::const_iterator it=subs.begin();
+  for(irept::subt::const_iterator it=subs.begin();
        it!=subs.end();
        it++)
   {
@@ -148,7 +149,7 @@ void convert( const irept &irep, goto_programt &program )
     number_targets_list.push_back(std::list<unsigned>());
     const irept &targets=it->find(ID_targets);
     const irept::subt &tsubs=targets.get_sub();
-    for (const auto & tsub : tsubs)
+    for(const auto &tsub : tsubs)
       number_targets_list.back().push_back(
           unsafe_string2unsigned(tsub.id_string()));
   }
@@ -166,16 +167,16 @@ void convert( const irept &irep, goto_programt &program )
     for(const unsigned t : *nit)
     {
       goto_programt::targett fit=program.instructions.begin();
-      for(;fit!=program.instructions.end();fit++)
+      for( ; fit!=program.instructions.end(); fit++)
       {
-        if (fit->location_number==t)
+        if(fit->location_number==t)
         {
           lit->targets.push_back(fit);
           break;
         }
       }
 
-      if (fit==program.instructions.end())
+      if(fit==program.instructions.end())
       {
         std::cout << "Warning: could not resolve target link "
                   << "during irep->goto_program translation." << std::endl;

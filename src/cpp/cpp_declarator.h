@@ -31,20 +31,32 @@ public:
   }
 
   cpp_namet &name() { return static_cast<cpp_namet &>(add(ID_name)); }
-  const cpp_namet &name() const { return static_cast<const cpp_namet &>(find(ID_name)); }
+  const cpp_namet &name() const
+  {
+    return static_cast<const cpp_namet &>(find(ID_name));
+  }
 
   exprt &value() { return static_cast<exprt &>(add(ID_value)); }
-  const exprt &value() const { return static_cast<const exprt &>(find(ID_value)); }
+  const exprt &value() const
+  {
+    return static_cast<const exprt &>(find(ID_value));
+  }
 
   // initializers for function arguments
   exprt &init_args() { return static_cast<exprt&>(add("init_args")); }
-  const exprt &init_args() const { return static_cast<const exprt&>(find("init_args")); }
+  const exprt &init_args() const
+  {
+    return static_cast<const exprt&>(find("init_args"));
+  }
 
   irept &method_qualifier() { return add(ID_method_qualifier); }
   const irept &method_qualifier() const { return find(ID_method_qualifier); }
 
   irept &member_initializers() { return add(ID_member_initializers); }
-  const irept &member_initializers() const { return find(ID_member_initializers); }
+  const irept &member_initializers() const
+  {
+    return find(ID_member_initializers);
+  }
 
   irept &throw_decl() { return add("throw_decl"); }
   const irept &throw_decl() const { return find("throw_decl"); }

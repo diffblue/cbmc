@@ -127,7 +127,7 @@ Function: aigt::print
 \*******************************************************************/
 
 void aigt::print(
-  std::ostream& out,
+  std::ostream &out,
   literalt a) const
 {
   if(a==const_literal(false))
@@ -148,20 +148,24 @@ void aigt::print(
 
     if(node.is_and())
     {
-      if(a.sign()) out << "!(";
+      if(a.sign())
+        out << "!(";
       print(out, node.a);
       out << " & ";
       print(out, node.b);
-      if(a.sign()) out << ")";
+      if(a.sign())
+        out << ")";
     }
     else if(node.is_var())
     {
-      if(a.sign()) out << "!";
+      if(a.sign())
+        out << "!";
       out << label(node_nr);\
     }
     else
     {
-      if(a.sign()) out << "!";
+      if(a.sign())
+        out << "!";
       out << "unknown(" << node_nr << ")";
     }
   }
@@ -211,7 +215,7 @@ Function: aigt::output_dot_edge
 \*******************************************************************/
 
 void aigt::output_dot_edge(
-  std::ostream& out,
+  std::ostream &out,
   nodest::size_type v,
   literalt l) const
 {
@@ -227,7 +231,8 @@ void aigt::output_dot_edge(
   else
   {
     out << l.var_no() << " -> " << v;
-    if(l.sign()) out << " [arrowhead=odiamond]";
+    if(l.sign())
+      out << " [arrowhead=odiamond]";
   }
 
   out << "\n";
@@ -245,7 +250,7 @@ Function: aigt::output_dot
 
 \*******************************************************************/
 
-void aigt::output_dot(std::ostream& out) const
+void aigt::output_dot(std::ostream &out) const
 {
   // constant TRUE
   out << "TRUE [label=\"TRUE\", shape=box]" << "\n";

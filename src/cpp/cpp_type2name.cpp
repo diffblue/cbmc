@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/type.h>
 #include <util/std_types.h>
 
+#include "cpp_type2name.h"
+
 /*******************************************************************\
 
 Function: do_prefix
@@ -64,7 +66,10 @@ static void irep2name(const irept &irep, std::string &result)
 
   forall_named_irep(it, irep.get_named_sub())
   {
-    if(first) first=false; else result+=',';
+    if(first)
+      first=false;
+    else
+      result+=',';
 
     result+=do_prefix(name2string(it->first));
 
@@ -79,7 +84,10 @@ static void irep2name(const irept &irep, std::string &result)
        it->first==ID_C_volatile ||
        it->first==ID_C_restricted)
     {
-      if(first) first=false; else result+=',';
+      if(first)
+        first=false;
+      else
+        result+=',';
       result+=do_prefix(name2string(it->first));
       result+='=';
       std::string tmp;
@@ -89,7 +97,10 @@ static void irep2name(const irept &irep, std::string &result)
 
   forall_irep(it, irep.get_sub())
   {
-    if(first) first=false; else result+=',';
+    if(first)
+      first=false;
+    else
+      result+=',';
     std::string tmp;
     irep2name(*it, tmp);
     result+=tmp;
@@ -171,7 +182,8 @@ std::string cpp_type2name(const typet &type)
         arg_it!=parameters.end();
         arg_it++)
     {
-      if(arg_it!=parameters.begin()) result+=',';
+      if(arg_it!=parameters.begin())
+        result+=',';
       result+=cpp_type2name(arg_it->type());
     }
 

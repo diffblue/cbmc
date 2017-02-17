@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 #include "goto_symex_state.h"
 
-//#define USE_UPDATE
+// #define USE_UPDATE
 
 /*******************************************************************\
 
@@ -178,26 +178,33 @@ void goto_symext::symex_assign_rec(
 {
   if(lhs.id()==ID_symbol &&
      lhs.get_bool(ID_C_SSA_symbol))
-    symex_assign_symbol(state, to_ssa_expr(lhs), full_lhs, rhs, guard, assignment_type);
+    symex_assign_symbol(
+      state, to_ssa_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_index)
-    symex_assign_array(state, to_index_expr(lhs), full_lhs, rhs, guard, assignment_type);
+    symex_assign_array(
+      state, to_index_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_member)
   {
     const typet &type=ns.follow(to_member_expr(lhs).struct_op().type());
     if(type.id()==ID_struct)
-      symex_assign_struct_member(state, to_member_expr(lhs), full_lhs, rhs, guard, assignment_type);
+      symex_assign_struct_member(
+        state, to_member_expr(lhs), full_lhs, rhs, guard, assignment_type);
     else if(type.id()==ID_union)
     {
       // should have been replaced by byte_extract
       throw "symex_assign_rec: unexpected assignment to union member";
     }
     else
-      throw "symex_assign_rec: unexpected assignment to member of `"+type.id_string()+"'";
+      throw
+        "symex_assign_rec: unexpected assignment to member of `"+
+        type.id_string()+"'";
   }
   else if(lhs.id()==ID_if)
-    symex_assign_if(state, to_if_expr(lhs), full_lhs, rhs, guard, assignment_type);
+    symex_assign_if(
+      state, to_if_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_typecast)
-    symex_assign_typecast(state, to_typecast_expr(lhs), full_lhs, rhs, guard, assignment_type);
+    symex_assign_typecast(
+      state, to_typecast_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_string_constant ||
           lhs.id()=="NULL-object" ||
           lhs.id()=="zero_string" ||
@@ -232,7 +239,8 @@ void goto_symext::symex_assign_rec(
       new_rhs.op1()=rhs;
     }
 
-    symex_assign_rec(state, lhs.op0(), full_lhs, new_rhs, guard, assignment_type);
+    symex_assign_rec(
+      state, lhs.op0(), full_lhs, new_rhs, guard, assignment_type);
   }
   else
     throw "assignment to `"+lhs.id_string()+"' not handled";
@@ -275,7 +283,12 @@ void goto_symext::symex_assign_symbol(
   do_simplify(ssa_rhs);
 
   ssa_exprt ssa_lhs=lhs;
-  state.assignment(ssa_lhs, ssa_rhs, ns, options.get_bool_option("simplify"), constant_propagation);
+  state.assignment(
+    ssa_lhs,
+    ssa_rhs,
+    ns,
+    options.get_bool_option("simplify"),
+    constant_propagation);
 
   exprt ssa_full_lhs=full_lhs;
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
@@ -289,7 +302,8 @@ void goto_symext::symex_assign_symbol(
 
   // do the assignment
   const symbolt &symbol=ns.lookup(ssa_lhs.get_original_expr());
-  if(symbol.is_auxiliary) assignment_type=symex_targett::HIDDEN;
+  if(symbol.is_auxiliary)
+    assignment_type=symex_targett::HIDDEN;
 
   target.assignment(
     tmp_guard.as_expr(),
@@ -518,14 +532,16 @@ void goto_symext::symex_assign_if(
   if(!renamed_guard.is_false())
   {
     guard.add(renamed_guard);
-    symex_assign_rec(state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
+    symex_assign_rec(
+      state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
     guard.swap(old_guard);
   }
 
   if(!renamed_guard.is_true())
   {
     guard.add(not_exprt(renamed_guard));
-    symex_assign_rec(state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
+    symex_assign_rec(
+      state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
     guard.swap(old_guard);
   }
 }

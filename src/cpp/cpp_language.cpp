@@ -177,11 +177,13 @@ bool cpp_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  if(module=="") return false;
+  if(module=="")
+    return false;
 
   symbol_tablet new_symbol_table;
 
-  if(cpp_typecheck(cpp_parse_tree, new_symbol_table, module, get_message_handler()))
+  if(cpp_typecheck(
+      cpp_parse_tree, new_symbol_table, module, get_message_handler()))
     return true;
 
   return linking(symbol_table, new_symbol_table, get_message_handler());
@@ -412,7 +414,7 @@ bool cpp_languaget::to_expr(
   else
   {
     // TODO
-    //expr.swap(cpp_parser.parse_tree.declarations.front());
+    // expr.swap(cpp_parser.parse_tree.declarations.front());
 
     // typecheck it
     result=cpp_typecheck(expr, get_message_handler(), ns);

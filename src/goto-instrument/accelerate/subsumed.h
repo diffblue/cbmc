@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H
 
@@ -8,7 +16,8 @@
 class subsumed_patht
 {
 public:
-  subsumed_patht(patht &_subsumed) {
+  explicit subsumed_patht(patht &_subsumed)
+  {
     patht::iterator it = subsumed.begin();
     subsumed.insert(it, _subsumed.begin(), _subsumed.end());
   }

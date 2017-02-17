@@ -109,8 +109,8 @@ void concurrency_instrumentationt::instrument(exprt &expr)
       if(v_it!=shared_vars.end())
       {
         index_exprt new_expr;
-        //new_expr.array()=symbol_expr();
-        //new_expr.index()=symbol_expr();
+        // new_expr.array()=symbol_expr();
+        // new_expr.index()=symbol_expr();
 
         replace_symbol.insert(identifier, new_expr);
       }
@@ -151,7 +151,7 @@ void concurrency_instrumentationt::instrument(
       code_function_callt &code=to_code_function_call(it->code);
       instrument(code.function());
 
-      //instrument(code.lhs(), LHS);
+      // instrument(code.lhs(), LHS);
       Forall_expr(it, code.arguments())
         instrument(*it);
     }
@@ -210,7 +210,6 @@ void concurrency_instrumentationt::collect(const exprt &expr)
       }
     }
   }
-
 }
 
 /*******************************************************************\
@@ -307,6 +306,7 @@ void concurrency(
   class symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  concurrency_instrumentationt concurrency_instrumentation(value_sets, symbol_table);
+  concurrency_instrumentationt concurrency_instrumentation(
+    value_sets, symbol_table);
   concurrency_instrumentation(goto_functions);
 }

@@ -121,7 +121,7 @@ void goto_convertt::finish_gotos(goto_programt &dest)
       // We don't currently handle variables *entering* scope, which is illegal
       // for C++ non-pod types and impossible in Java in any case.
       auto goto_stack=g_it.second;
-      const auto& label_stack=l_it->second.second;
+      const auto &label_stack=l_it->second.second;
       bool stack_is_prefix=true;
       if(label_stack.size()>goto_stack.size())
         stack_is_prefix=false;
@@ -237,7 +237,7 @@ Function: goto_convertt::finish_guarded_gotos
 
 void goto_convertt::finish_guarded_gotos(goto_programt &dest)
 {
-  for(auto& gg : guarded_gotos)
+  for(auto &gg : guarded_gotos)
   {
     // Check if any destructor code has been inserted:
     bool destructor_present=false;
@@ -470,7 +470,7 @@ void goto_convertt::convert_gcc_switch_case_range(
   goto_programt tmp;
   convert(to_code(code.op2()), tmp);
 
-  //goto_programt::targett target=tmp.instructions.begin();
+  // goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
   #if 0
@@ -1005,7 +1005,6 @@ void goto_convertt::convert_cpp_delete(
     if(code.get_statement()==ID_cpp_delete_array)
     {
       // build loop
-
     }
     else if(code.get_statement()==ID_cpp_delete)
     {
@@ -1294,7 +1293,8 @@ void goto_convertt::convert_while(
   z->source_location=source_location;
 
   goto_programt tmp_branch;
-  generate_conditional_branch(boolean_negate(cond), z, source_location, tmp_branch);
+  generate_conditional_branch(
+    boolean_negate(cond), z, source_location, tmp_branch);
 
   // do the v label
   goto_programt::targett v=tmp_branch.instructions.begin();
@@ -1570,7 +1570,8 @@ void goto_convertt::convert_break(
   }
 
   // need to process destructor stack
-  unwind_destructor_stack(code.source_location(), targets.break_stack_size, dest);
+  unwind_destructor_stack(
+    code.source_location(), targets.break_stack_size, dest);
 
   // add goto
   goto_programt::targett t=dest.add_instruction();
@@ -1684,7 +1685,8 @@ void goto_convertt::convert_continue(
   }
 
   // need to process destructor stack
-  unwind_destructor_stack(code.source_location(), targets.continue_stack_size, dest);
+  unwind_destructor_stack(
+    code.source_location(), targets.continue_stack_size, dest);
 
   // add goto
   goto_programt::targett t=dest.add_instruction();
@@ -1714,7 +1716,7 @@ void goto_convertt::convert_goto(
   t->code=code;
 
   // remember it to do target later
-  targets.gotos.push_back(std::make_pair(t,targets.destructor_stack));
+  targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
 }
 
 /*******************************************************************\
@@ -2277,7 +2279,8 @@ void goto_convertt::generate_ifthenelse(
     // The above conjunction deliberately excludes the instance
     // if(some) { label: goto somewhere; }
     // Don't perform the transformation here, as code might get inserted into
-    // the true case to perform destructors. This will be attempted in finish_guarded_gotos.
+    // the true case to perform destructors.
+    // This will be attempted in finish_guarded_gotos.
     is_guarded_goto=true;
   }
 
@@ -2366,7 +2369,7 @@ void goto_convertt::generate_ifthenelse(
   // Note this depends on the fact that `instructions` is a std::list
   // and so goto-program-destructive-append preserves iterator validity.
   if(is_guarded_goto)
-    guarded_gotos.push_back({
+    guarded_gotos.push_back({ // NOLINT(whitespace/braces)
       tmp_v.instructions.begin(),
       tmp_w.instructions.begin(),
       guard});
@@ -2398,7 +2401,8 @@ Function: goto_convertt::generate_conditional_branch
 static bool has_and_or(const exprt &expr)
 {
   forall_operands(it, expr)
-    if(has_and_or(*it)) return true;
+    if(has_and_or(*it))
+      return true;
 
   if(expr.id()==ID_and || expr.id()==ID_or)
     return true;
@@ -2573,7 +2577,7 @@ bool goto_convertt::get_string_constant(
             binary2integer(id2string(to_constant_expr(*it).get_value()), true));
 
           if(i!=0) // to skip terminating 0
-            result+=char(i);
+            result+=static_cast<char>(i);
         }
 
       return value=result, false;
@@ -2679,7 +2683,8 @@ symbolt &goto_convertt::new_tmp_symbol(
     new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
     new_symbol.type=type;
     new_symbol.location=source_location;
-  } while(symbol_table.move(new_symbol, symbol_ptr));
+  }
+  while(symbol_table.move(new_symbol, symbol_ptr));
 
   code_declt decl;
   decl.symbol()=symbol_ptr->symbol_expr();

@@ -84,7 +84,8 @@ void link_to_library(
     }
 
     // done?
-    if(missing_functions.empty()) break;
+    if(missing_functions.empty())
+      break;
 
     add_cprover_library(missing_functions, symbol_table, message_handler);
 
@@ -96,6 +97,5 @@ void link_to_library(
 
       added_functions.insert(id);
     }
-
   }
 }

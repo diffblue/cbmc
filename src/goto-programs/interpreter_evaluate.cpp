@@ -32,7 +32,7 @@ void interpretert::read(
   std::vector<mp_integer> &dest) const
 {
   // copy memory region
-  for(unsigned i=0; i<dest.size(); i++, ++address)
+  for(auto &d : dest)
   {
     mp_integer value;
 
@@ -41,7 +41,9 @@ void interpretert::read(
     else
       value=0;
 
-    dest[i]=value;
+    d=value;
+
+    ++address;
   }
 }
 
@@ -102,10 +104,12 @@ void interpretert::evaluate(
 
     forall_operands(it, expr)
     {
-      if(it->type().id()==ID_code) continue;
+      if(it->type().id()==ID_code)
+        continue;
 
       unsigned sub_size=get_size(it->type());
-      if(sub_size==0) continue;
+      if(sub_size==0)
+        continue;
 
       std::vector<mp_integer> tmp;
       evaluate(*it, tmp);
@@ -262,14 +266,13 @@ void interpretert::evaluate(
     if(expr.type().id()==ID_fixedbv)
     {
       fixedbvt f;
-      f.spec=to_fixedbv_type(expr.type());
+      f.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
       f.from_integer(1);
       result=f.get_value();
     }
     else if(expr.type().id()==ID_floatbv)
     {
-      ieee_floatt f;
-      f.spec=to_floatbv_type(expr.type());
+      ieee_floatt f(to_floatbv_type(expr.type()));
       f.from_integer(1);
       result=f.pack();
     }
@@ -285,8 +288,8 @@ void interpretert::evaluate(
         if(expr.type().id()==ID_fixedbv)
         {
           fixedbvt f1, f2;
-          f1.spec=to_fixedbv_type(expr.type());
-          f2.spec=to_fixedbv_type(it->type());
+          f1.spec=fixedbv_spect(to_fixedbv_type(expr.type()));
+          f2.spec=fixedbv_spect(to_fixedbv_type(it->type()));
           f1.set_value(result);
           f2.set_value(tmp.front());
           f1*=f2;
@@ -294,9 +297,8 @@ void interpretert::evaluate(
         }
         else if(expr.type().id()==ID_floatbv)
         {
-          ieee_floatt f1, f2;
-          f1.spec=to_floatbv_type(expr.type());
-          f2.spec=to_floatbv_type(it->type());
+          ieee_floatt f1(to_floatbv_type(expr.type()));
+          ieee_floatt f2(to_floatbv_type(it->type()));
           f1.unpack(result);
           f2.unpack(tmp.front());
           f1*=f2;

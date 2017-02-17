@@ -106,7 +106,8 @@ Function: is_condition
 
 bool is_condition(const exprt &src)
 {
-  if(src.type().id()!=ID_bool) return false;
+  if(src.type().id()!=ID_bool)
+    return false;
 
   // conditions are 'atomic predicates'
   if(src.id()==ID_and || src.id()==ID_or ||
@@ -185,7 +186,9 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_conditions(t->code);
 
-  default:;
+  default:
+    {
+    }
   }
 
   return std::set<exprt>();
@@ -477,15 +480,18 @@ std::set<exprt> collect_mcdc_controlling_nested(
           std::set<exprt> co=
             replacement_conjunction(res, operands, i);
           s2.insert(co.begin(), co.end());
-          if(res.size() > 0) break;
+          if(!res.empty())
+            break;
         }
         // if there is no change x.r.t current operands of ''x'',
         // i.e., they are all atomic, we reserve ''x''
-        if(!changed) s2.insert(x);
+        if(!changed)
+          s2.insert(x);
       }
       // update ''s1'' and check if change happens
       s1=s2;
-      if(!changed) {break;}
+      if(!changed)
+        break;
       s2.clear();
     }
 
@@ -542,11 +548,13 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
   for(auto &x : ops)
   {
     exprt y(x);
-    if(y == e) signs.insert(+1);
+    if(y==e)
+      signs.insert(+1);
     else if(y.id()==ID_not)
     {
       y.make_not();
-      if(y==e) signs.insert(-1);
+      if(y==e)
+        signs.insert(-1);
       if(!is_condition(y))
       {
         std::set<signed> re=sign_of_expr(e, y);
@@ -582,9 +590,9 @@ void remove_repetition(std::set<exprt> &exprs)
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
-  for(auto &x: exprs)
+  for(auto &x : exprs)
   {
-    std::set<exprt> new_conditions = collect_conditions(x);
+    std::set<exprt> new_conditions=collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
   }
   // exprt that contains multiple (inconsistent) signs should
@@ -602,12 +610,13 @@ void remove_repetition(std::set<exprt> &exprs)
         break;
       }
     }
-    if(kept) new_exprs.insert(x);
+    if(kept)
+      new_exprs.insert(x);
   }
   exprs=new_exprs;
   new_exprs.clear();
 
-  for(auto &x: exprs)
+  for(auto &x : exprs)
   {
     bool red=false;
     /**
@@ -616,7 +625,7 @@ void remove_repetition(std::set<exprt> &exprs)
      * and ''y'' are identical iff they have the
      * same sign for every atomic condition ''c''.
      **/
-    for(auto &y: new_exprs)
+    for(auto &y : new_exprs)
     {
       bool iden = true;
       for(auto &c : conditions)
@@ -632,7 +641,8 @@ void remove_repetition(std::set<exprt> &exprs)
         }
         else
         {
-          if(s1==0 && s2==0) continue;
+          if(s1==0 && s2==0)
+            continue;
           // it is easy to check non-equivalence
           if(*(signs1.begin())!=*(signs2.begin()))
           {
@@ -654,7 +664,8 @@ void remove_repetition(std::set<exprt> &exprs)
     }
     // an expr is added into ''new_exprs''
     // if it is not found repetitive
-    if(!red) new_exprs.insert(x);
+    if(!red)
+      new_exprs.insert(x);
   }
 
   // update the original ''exprs''
@@ -708,13 +719,13 @@ bool eval_expr(
     no_op.make_not();
     return !eval_expr(atomic_exprs, no_op);
   }
-  else //if(is_condition(src))
+  else // if(is_condition(src))
   {
     // ''src'' should be guaranteed to be consistent
     // with ''atomic_exprs''
     if(atomic_exprs.find(src)->second==+1)
       return true;
-    else //if(atomic_exprs.find(src)->second==-1)
+    else // if(atomic_exprs.find(src)->second==-1)
       return false;
   }
 }
@@ -739,14 +750,15 @@ std::map<exprt, signed> values_of_atomic_exprs(
   for(auto &c : conditions)
   {
     std::set<signed> signs=sign_of_expr(c, e);
-    if(signs.size()==0)
+    if(signs.empty())
     {
       // ''c'' is not contained in ''e''
       atomic_exprs.insert(std::pair<exprt, signed>(c, 0));
       continue;
     }
     // we do not consider inconsistent expr ''e''
-    if(signs.size()!=1) continue;
+    if(signs.size()!=1)
+      continue;
 
     atomic_exprs.insert(
       std::pair<exprt, signed>(c, *signs.begin()));
@@ -778,7 +790,8 @@ bool is_mcdc_pair(
   const exprt &decision)
 {
   // An controlling expr cannot be mcdc pair of itself
-  if(e1==e2) return false;
+  if(e1==e2)
+    return false;
 
   // To obtain values of each atomic condition within ''e1''
   // and ''e2''
@@ -791,7 +804,7 @@ bool is_mcdc_pair(
   signed cs1=atomic_exprs_e1.find(c)->second;
   signed cs2=atomic_exprs_e2.find(c)->second;
   // a mcdc pair should both contain ''c'', i.e., sign=+1 or -1
-  if(cs1==0||cs2==0)
+  if(cs1==0 || cs2==0)
     return false;
 
   // A mcdc pair regarding an atomic expr ''c''
@@ -817,12 +830,14 @@ bool is_mcdc_pair(
   {
     if(e1_it->second!=e2_it->second)
     diff_count++;
-    if(diff_count>1) break;
+    if(diff_count>1)
+      break;
     e1_it++;
     e2_it++;
   }
 
-  if(diff_count==1) return true;
+  if(diff_count==1)
+    return true;
   else return false;
 }
 
@@ -882,9 +897,9 @@ void minimize_mcdc_controlling(
 {
   // to obtain the set of atomic conditions
   std::set<exprt> conditions;
-  for(auto &x: controlling)
+  for(auto &x : controlling)
   {
-    std::set<exprt> new_conditions = collect_conditions(x);
+    std::set<exprt> new_conditions=collect_conditions(x);
     conditions.insert(new_conditions.begin(), new_conditions.end());
   }
 
@@ -913,7 +928,8 @@ void minimize_mcdc_controlling(
       // To create a new ''controlling'' set without ''x''
       new_controlling.clear();
       for(auto &y : controlling)
-        if(y!=x) new_controlling.insert(y);
+        if(y!=x)
+          new_controlling.insert(y);
 
       bool removing_x=true;
       // For each atomic expr condition ''c'', to check if its is
@@ -1035,7 +1051,9 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
   case FUNCTION_CALL:
     return collect_decisions(t->code);
 
-  default:;
+  default:
+    {
+    }
   }
 
   return std::set<exprt>();
@@ -1064,8 +1082,9 @@ void instrument_cover_goals(
 
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
-     has_prefix(id2string(goto_program.instructions.front().source_location.get_file()),
-                "<builtin-library-"))
+     has_prefix(
+       id2string(goto_program.instructions.front().source_location.get_file()),
+       "<builtin-library-"))
     return;
 
   const irep_idt coverage_criterion=as_string(criterion);
@@ -1131,7 +1150,8 @@ void instrument_cover_goals(
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
             i_it->source_location.set_comment(comment);
-            i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
+            i_it->source_location.set(
+              ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
 
             i_it++;
@@ -1296,7 +1316,7 @@ void instrument_cover_goals(
 
           std::string comment_t=description+" `"+p_string+"' true";
           goto_program.insert_before_swap(i_it);
-          //i_it->make_assertion(p);
+          // i_it->make_assertion(p);
           i_it->make_assertion(not_exprt(p));
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
@@ -1305,7 +1325,7 @@ void instrument_cover_goals(
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
-          //i_it->make_assertion(not_exprt(p));
+          // i_it->make_assertion(not_exprt(p));
           i_it->make_assertion(p);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_f);
@@ -1314,7 +1334,7 @@ void instrument_cover_goals(
         }
 
         std::set<exprt> controlling;
-        //controlling=collect_mcdc_controlling(decisions);
+        // controlling=collect_mcdc_controlling(decisions);
         controlling=collect_mcdc_controlling_nested(decisions);
         remove_repetition(controlling);
         // for now, we restrict to the case of a single ''decision'';
@@ -1330,7 +1350,7 @@ void instrument_cover_goals(
 
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(p));
-          //i_it->make_assertion(p);
+          // i_it->make_assertion(p);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(description);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
@@ -1347,10 +1367,11 @@ void instrument_cover_goals(
         i_it->make_skip();
       break;
 
-    default:;
+    default:
+      {
+      }
     }
   }
-
 }
 
 /*******************************************************************\

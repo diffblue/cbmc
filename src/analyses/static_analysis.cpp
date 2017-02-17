@@ -572,7 +572,8 @@ void static_analysis_baset::do_function_call_rec(
       {
         const object_descriptor_exprt &o=to_object_descriptor_expr(value);
         std::unique_ptr<statet> n2(make_temporary_state(new_state));
-        do_function_call_rec(l_call, l_return, o.object(), arguments, *n2, goto_functions);
+        do_function_call_rec(
+          l_call, l_return, o.object(), arguments, *n2, goto_functions);
         merge(new_state, *n2, l_return);
       }
     }

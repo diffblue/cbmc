@@ -8,6 +8,8 @@ Date: January 2012
 
 \*******************************************************************/
 
+#include <cerrno>
+
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
@@ -15,7 +17,6 @@ Date: January 2012
     defined(__CYGWIN__) || \
     defined(__MACH__)
 #include <unistd.h>
-#include <cerrno>
 #include <dirent.h>
 #include <cstdlib>
 #include <cstdio>
@@ -25,7 +26,6 @@ Date: January 2012
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
-#include <cerrno>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
@@ -49,15 +49,16 @@ std::string get_current_working_directory()
 {
   unsigned bsize=50;
 
-  char *buf=(char*)malloc(sizeof(char)*bsize);
-  if(!buf) abort();
+  char *buf=reinterpret_cast<char*>(malloc(sizeof(char)*bsize));
+  if(!buf)
+    abort();
 
   errno=0;
 
   while(buf && getcwd(buf, bsize-1)==NULL && errno==ERANGE)
   {
     bsize*=2;
-    buf=(char*)realloc(buf, sizeof(char)*bsize);
+    buf=reinterpret_cast<char*>(realloc(buf, sizeof(char)*bsize));
   }
 
   std::string working_directory=buf;
@@ -84,6 +85,7 @@ void delete_directory(const std::string &path)
 
   std::string pattern=path+"\\*";
 
+  // NOLINTNEXTLINE(readability/identifiers)
   struct _finddata_t info;
 
   intptr_t handle=_findfirst(pattern.c_str(), &info);
@@ -105,7 +107,7 @@ void delete_directory(const std::string &path)
     struct dirent *ent;
 
     while((ent=readdir(dir))!=NULL)
-      remove((path + "/" + ent->d_name).c_str());
+      remove((path+"/"+ent->d_name).c_str());
 
     closedir(dir);
   }
@@ -128,8 +130,9 @@ Function: concat_dir_file
 
 \*******************************************************************/
 
-std::string concat_dir_file(const std::string &directory,
-                            const std::string &file_name)
+std::string concat_dir_file(
+  const std::string &directory,
+  const std::string &file_name)
 {
   #ifdef _WIN32
   return  (file_name.size()>1 &&

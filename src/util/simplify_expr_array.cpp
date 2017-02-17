@@ -63,7 +63,8 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
     const exprt &lambda_expr=array;
 
-    if(lambda_expr.operands().size()!=2) return true;
+    if(lambda_expr.operands().size()!=2)
+      return true;
 
     if(expr.op1().type()==lambda_expr.op0().type())
     {
@@ -79,7 +80,8 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
     const exprt &with_expr=array;
 
-    if(with_expr.operands().size()!=3) return true;
+    if(with_expr.operands().size()!=3)
+      return true;
 
     if(with_expr.op1()==expr.op1())
     {
@@ -203,7 +205,8 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // to byte_extract(s, o+offset, sub_type)
 
       mp_integer sub_size=pointer_offset_size(array_type.subtype(), ns);
-      if(sub_size==-1) return true;
+      if(sub_size==-1)
+        return true;
 
       // add offset to index
       mult_exprt offset(from_integer(sub_size, array.op1().type()), index);

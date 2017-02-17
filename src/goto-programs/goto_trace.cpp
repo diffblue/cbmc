@@ -177,7 +177,10 @@ std::string trace_value_binary(
 
     forall_operands(it, expr)
     {
-      if(result=="") result="{ "; else result+=", ";
+      if(result=="")
+        result="{ ";
+      else
+        result+=", ";
       result+=trace_value_binary(*it, ns);
     }
 
@@ -189,7 +192,8 @@ std::string trace_value_binary(
 
     forall_operands(it, expr)
     {
-      if(it!=expr.operands().begin()) result+=", ";
+      if(it!=expr.operands().begin())
+        result+=", ";
       result+=trace_value_binary(*it, ns);
     }
 
@@ -380,9 +384,11 @@ void show_goto_trace(
 
         // see if the full lhs is something clean
         if(is_index_member_symbol(step.full_lhs))
-          trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+          trace_value(
+            out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
         else
-          trace_value(out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
+          trace_value(
+            out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
       }
       break;
 
@@ -415,7 +421,8 @@ void show_goto_trace(
             l_it!=step.io_args.end();
             l_it++)
         {
-          if(l_it!=step.io_args.begin()) out << ";";
+          if(l_it!=step.io_args.begin())
+            out << ";";
           out << " " << from_expr(ns, "", *l_it);
 
           // the binary representation
@@ -435,7 +442,8 @@ void show_goto_trace(
           l_it!=step.io_args.end();
           l_it++)
       {
-        if(l_it!=step.io_args.begin()) out << ";";
+        if(l_it!=step.io_args.begin())
+          out << ";";
         out << " " << from_expr(ns, "", *l_it);
 
         // the binary representation

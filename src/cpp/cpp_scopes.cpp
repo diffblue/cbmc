@@ -55,7 +55,7 @@ cpp_idt &cpp_scopest::put_into_scope(
     cpp_scopest::id_mapt::iterator id_it = id_map.find(symbol.name);
     if(id_it == id_map.end())
     {
-      irep_idt block_base_name(std::string("$block:") + symbol.base_name.c_str());
+      irep_idt block_base_name(std::string("$block:")+symbol.base_name.c_str());
       cpp_idt &id = scope.insert(block_base_name);
       id.id_class=cpp_idt::BLOCK_SCOPE;
       id.identifier=symbol.name;

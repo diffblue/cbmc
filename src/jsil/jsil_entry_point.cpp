@@ -89,9 +89,11 @@ bool jsil_entry_point(
     forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
     {
       // look it up
-      symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(it->second);
+      symbol_tablet::symbolst::const_iterator s_it=
+        symbol_table.symbols.find(it->second);
 
-      if(s_it==symbol_table.symbols.end()) continue;
+      if(s_it==symbol_table.symbols.end())
+        continue;
 
       if(s_it->second.type.id()==ID_code)
         matches.push_back(it->second);
@@ -119,7 +121,8 @@ bool jsil_entry_point(
     main_symbol=ID_main;
 
   // look it up
-  symbol_tablet::symbolst::const_iterator s_it=symbol_table.symbols.find(main_symbol);
+  symbol_tablet::symbolst::const_iterator s_it=
+    symbol_table.symbols.find(main_symbol);
 
   if(s_it==symbol_table.symbols.end())
   {

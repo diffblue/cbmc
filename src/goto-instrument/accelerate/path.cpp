@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #include <iostream>
 
 #include <goto-programs/goto_program.h>

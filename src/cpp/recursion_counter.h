@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class recursion_countert
 {
 public:
-  recursion_countert(unsigned &_cnt):cnt(_cnt)
+  explicit recursion_countert(unsigned &_cnt):cnt(_cnt)
   {
     cnt++;
   }

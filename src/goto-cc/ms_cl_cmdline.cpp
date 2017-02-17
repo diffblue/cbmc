@@ -64,11 +64,13 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
 
       if(options[i]=="--verbosity" ||
          options[i]=="--function")
+      {
         if(i<options.size()-1)
         {
           set(options[i], options[i+1]);
           i++; // skip ahead
         }
+      }
     }
     else if(!options[i].empty() && options[i][0]=='@')
     {
@@ -182,7 +184,8 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
 
     if(!in)
     {
-      if(!dest.empty()) in.clear();
+      if(!dest.empty())
+        in.clear();
       break;
     }
 
@@ -229,8 +232,8 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   std::string line;
   getline(infile, line);
   if(line.size()>=2 &&
-     line[0]==char(0xff) &&
-     line[1]==char(0xfe))
+     line[0]==static_cast<char>(0xff) &&
+     line[1]==static_cast<char>(0xfe))
   {
     // Unicode, UTF-16 little endian
 
@@ -255,9 +258,9 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
     #endif
   }
   else if(line.size()>=3 &&
-          line[0]==char(0xef) &&
-          line[1]==char(0xbb) &&
-          line[2]==char(0xbf))
+          line[0]==static_cast<char>(0xef) &&
+          line[1]==static_cast<char>(0xbb) &&
+          line[2]==static_cast<char>(0xbf))
   {
     // This is the UTF-8 BOM. We can proceed as usual, since
     // we use UTF-8 internally.
@@ -294,8 +297,10 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   // on one line (cannot span multiple lines).  Response files can have
   // comments that begin with the # symbol.
 
-  if(line.empty()) return;
-  if(line[0]=='#') return; // comment
+  if(line.empty())
+    return;
+  if(line[0]=='#')
+    return; // comment
 
   std::vector<std::string> options;
   std::string option;
@@ -306,7 +311,8 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 
     if(ch==' ' && !in_quotes)
     {
-      if(!option.empty()) options.push_back(option);
+      if(!option.empty())
+        options.push_back(option);
       option.clear();
     }
     else if(ch=='"')
@@ -317,7 +323,8 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
       option+=ch;
   }
 
-  if(!option.empty()) options.push_back(option);
+  if(!option.empty())
+    options.push_back(option);
 
   parse(options);
 }
@@ -486,7 +493,8 @@ const char *ms_cl_prefixes[]=
 
 void ms_cl_cmdlinet::process_cl_option(const std::string &s)
 {
-  if(s=="") return;
+  if(s=="")
+    return;
 
   if(s[0]!='/' && s[0]!='-')
   {

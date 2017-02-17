@@ -93,7 +93,7 @@ codet cpp_typecheckt::cpp_constructor(
     /*if(cpp_is_pod(tmp_type))
     {
       code_expressiont new_code;
-      exprt op_tc = operands.front();
+      exprt op_tc=operands.front();
       typecheck_expr(op_tc);
        // Override constantness
       object_tc.type().set("#constant", false);
@@ -110,7 +110,7 @@ codet cpp_typecheckt::cpp_constructor(
       codet new_code(ID_block);
 
       // for each element of the array, call the default constructor
-      for(mp_integer i = 0; i < s; ++i)
+      for(mp_integer i=0; i < s; ++i)
       {
         exprt::operandst tmp_operands;
 
@@ -209,14 +209,14 @@ codet cpp_typecheckt::cpp_constructor(
     codet block(ID_block);
     for(std::size_t i=0; i < struct_type.components().size(); i++)
     {
-      const irept &component = struct_type.components()[i];
-      if(component.get(ID_base_name) != "@most_derived")
+      const irept &component=struct_type.components()[i];
+      if(component.get(ID_base_name)!="@most_derived")
         continue;
 
       exprt member(ID_member, bool_typet());
       member.set(ID_component_name, component.get(ID_name));
       member.copy_to_operands(object_tc);
-      member.add_source_location() = source_location;
+      member.add_source_location()=source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
       exprt val=false_exprt();
@@ -226,7 +226,7 @@ codet cpp_typecheckt::cpp_constructor(
 
       side_effect_exprt assign(ID_assign);
       assign.add_source_location()=source_location;
-      assign.move_to_operands(member,val);
+      assign.move_to_operands(member, val);
       typecheck_side_effect_assignment(assign);
       code_expressiont code_exp;
       code_exp.expression()=assign;
@@ -279,23 +279,23 @@ codet cpp_typecheckt::cpp_constructor(
       function_call.op1().copy_to_operands(*it);
 
     typecheck_side_effect_function_call(function_call);
-    assert(function_call.get(ID_statement) == ID_temporary_object);
+    assert(function_call.get(ID_statement)==ID_temporary_object);
 
     exprt &initializer =
       static_cast<exprt &>(function_call.add(ID_initializer));
 
-    assert(initializer.id()==ID_code
-           && initializer.get(ID_statement)==ID_expression);
+    assert(initializer.id()==ID_code &&
+           initializer.get(ID_statement)==ID_expression);
 
-    side_effect_expr_function_callt& func_ini =
+    side_effect_expr_function_callt &func_ini=
       to_side_effect_expr_function_call(initializer.op0());
 
-    exprt& tmp_this = func_ini.arguments().front();
-    assert(tmp_this.id() == ID_address_of
-           && tmp_this.op0().id() == "new_object");
+    exprt &tmp_this=func_ini.arguments().front();
+    assert(tmp_this.id()==ID_address_of
+           && tmp_this.op0().id()=="new_object");
 
     exprt address_of(ID_address_of, typet(ID_pointer));
-    address_of.type().subtype() = object_tc.type();
+    address_of.type().subtype()=object_tc.type();
     address_of.copy_to_operands(object_tc);
     tmp_this.swap(address_of);
 
@@ -339,9 +339,9 @@ void cpp_typecheckt::new_temporary(
   tmp_object_expr.add_source_location()= source_location;
 
   exprt new_object(ID_new_object);
-  new_object.add_source_location() = tmp_object_expr.source_location();
+  new_object.add_source_location()=tmp_object_expr.source_location();
   new_object.set(ID_C_lvalue, true);
-  new_object.type() = tmp_object_expr.type();
+  new_object.type()=tmp_object_expr.type();
 
   already_typechecked(new_object);
 

@@ -13,7 +13,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 class expr2jsilt:public expr2ct
 {
 public:
-  expr2jsilt(const namespacet &_ns):expr2ct(_ns) { }
+  explicit expr2jsilt(const namespacet &_ns):expr2ct(_ns) { }
 
   virtual std::string convert(const exprt &src)
   {

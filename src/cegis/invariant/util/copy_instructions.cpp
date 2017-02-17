@@ -104,7 +104,7 @@ class skip_removert
   typedef std::map<goto_programt::targett, goto_programt::targett> skipst;
   skipst skips;
 public:
-  skip_removert(goto_programt::instructionst &instrs) :
+  explicit skip_removert(goto_programt::instructionst &instrs) :
       instrs(instrs)
   {
   }

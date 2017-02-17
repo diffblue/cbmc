@@ -99,11 +99,11 @@ protected:
 class local_may_alias_factoryt
 {
 public:
-  inline local_may_alias_factoryt():goto_functions(NULL)
+  local_may_alias_factoryt():goto_functions(NULL)
   {
   }
 
-  inline void operator()(const goto_functionst &_goto_functions)
+  void operator()(const goto_functionst &_goto_functions)
   {
     goto_functions=&_goto_functions;
 
@@ -112,11 +112,13 @@ public:
         target_map[i_it]=f_it->first;
   }
 
-  local_may_aliast & operator()(const irep_idt &fkt)
+  local_may_aliast &operator()(const irep_idt &fkt)
   {
     assert(goto_functions!=NULL);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);
-    if(f_it!=fkt_map.end()) return *f_it->second;
+    if(f_it!=fkt_map.end())
+      return *f_it->second;
+
     goto_functionst::function_mapt::const_iterator f_it2=
       goto_functions->function_map.find(fkt);
     assert(f_it2!=goto_functions->function_map.end());
@@ -124,7 +126,7 @@ public:
               new local_may_aliast(f_it2->second)));
   }
 
-  local_may_aliast & operator()(goto_programt::const_targett t)
+  local_may_aliast &operator()(goto_programt::const_targett t)
   {
     target_mapt::const_iterator t_it=
       target_map.find(t);

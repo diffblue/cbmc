@@ -16,7 +16,7 @@ class replace_name_visitort: public expr_visitort
 {
   const replacementst &repl;
 public:
-  replace_name_visitort(const replacementst &repl) :
+  explicit replace_name_visitort(const replacementst &repl) :
       repl(repl)
   {
   }

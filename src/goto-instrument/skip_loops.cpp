@@ -38,12 +38,16 @@ static bool skip_loops(
   loop_idst::const_iterator l_it=loop_ids.begin();
   Forall_goto_program_instructions(it, goto_program)
   {
-    if(l_it==loop_ids.end()) break;
-    if(!it->is_backwards_goto()) continue;
+    if(l_it==loop_ids.end())
+      break;
+    if(!it->is_backwards_goto())
+      continue;
 
     const unsigned loop_id=it->loop_number;
-    if(*l_it<loop_id) break; // error handled below
-    if(*l_it>loop_id) continue;
+    if(*l_it<loop_id)
+      break; // error handled below
+    if(*l_it>loop_id)
+      continue;
 
     goto_programt::targett loop_head=it->get_target();
     goto_programt::targett next=it;
@@ -91,14 +95,16 @@ static bool parse_loop_ids(
     std::string val=loop_ids.substr(idx, next-idx);
     std::string::size_type delim=val.rfind(".");
 
-    if(delim==std::string::npos) return true;
+    if(delim==std::string::npos)
+      return true;
 
     std::string fn=val.substr(0, delim);
     unsigned nr=safe_string2unsigned(val.substr(delim+1));
 
     loop_map[fn].insert(nr);
 
-    if(next==std::string::npos) break;
+    if(next==std::string::npos)
+      break;
     idx=next;
   }
 

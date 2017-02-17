@@ -66,8 +66,10 @@ Function: smt1_convt::l_get
 
 tvt smt1_convt::l_get(literalt l) const
 {
-  if(l.is_true()) return tvt(true);
-  if(l.is_false()) return tvt(false);
+  if(l.is_true())
+    return tvt(true);
+  if(l.is_false())
+    return tvt(false);
   assert(l.var_no()<boolean_assignment.size());
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
@@ -157,7 +159,8 @@ exprt smt1_convt::get(const exprt &expr) const
   {
     const member_exprt &member_expr=to_member_expr(expr);
     exprt tmp=get(member_expr.struct_op());
-    if(tmp.is_nil()) return nil_exprt();
+    if(tmp.is_nil())
+      return nil_exprt();
     return member_exprt(tmp, member_expr.get_component_name(), expr.type());
   }
   else if(expr.id()==ID_index)
@@ -165,7 +168,8 @@ exprt smt1_convt::get(const exprt &expr) const
     const index_exprt &index_expr=to_index_expr(expr);
     exprt tmp_array=get(index_expr.array());
     exprt tmp_index=get(index_expr.index());
-    if(tmp_array.is_nil() || tmp_index.is_nil()) return nil_exprt();
+    if(tmp_array.is_nil() || tmp_index.is_nil())
+      return nil_exprt();
     return index_exprt(tmp_array, tmp_index, expr.type());
   }
   else if(expr.id()==ID_constant)
@@ -173,7 +177,8 @@ exprt smt1_convt::get(const exprt &expr) const
   else if(expr.id()==ID_typecast)
   {
     exprt tmp=get(to_typecast_expr(expr).op());
-    if(tmp.is_nil()) return nil_exprt();
+    if(tmp.is_nil())
+      return nil_exprt();
     return typecast_exprt(tmp, expr.type());
   }
 
@@ -232,7 +237,8 @@ exprt smt1_convt::ce_value(
       binary2integer(
         value.substr(0, BV_ADDR_BITS), false));
 
-    p.offset=binary2integer(value.substr(BV_ADDR_BITS, std::string::npos), true);
+    p.offset=
+      binary2integer(value.substr(BV_ADDR_BITS, std::string::npos), true);
 
     result.copy_to_operands(pointer_logic.pointer_expr(p, type));
 
@@ -285,13 +291,15 @@ exprt smt1_convt::ce_value(
     {
       exprt value_expr=ce_value(subtype, "", value, in_struct);
 
-      if(index=="") return nil_exprt();
+      if(index=="")
+        return nil_exprt();
 
       // use index, recusive call
       exprt index_expr=
         ce_value(signedbv_typet(index.size()), "", index, false);
 
-      if(index_expr.is_nil()) return nil_exprt();
+      if(index_expr.is_nil())
+        return nil_exprt();
 
       exprt array_list("array-list", type);
       array_list.copy_to_operands(index_expr, value_expr);
@@ -336,10 +344,12 @@ Function: smt1_convt::array_index
 
 void smt1_convt::array_index(const exprt &expr)
 {
-  if(expr.type().id()==ID_integer) return convert_expr(expr, true);
+  if(expr.type().id()==ID_integer)
+    return convert_expr(expr, true);
 
   typet t=array_index_type();
-  if(t==expr.type()) return convert_expr(expr, true);
+  if(t==expr.type())
+    return convert_expr(expr, true);
   exprt tmp(ID_typecast, t);
   tmp.copy_to_operands(expr);
   convert_expr(tmp, true);
@@ -566,7 +576,6 @@ void smt1_convt::convert_byte_update(
       out << ")"; // concat
     }
   }
-
 }
 
 /*******************************************************************\
@@ -1067,7 +1076,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
     std::size_t op_width=boolbv_width(expr.op0().type());
-    signed int ext=(int)boolbv_width(expr.type())-(int)BV_ADDR_BITS;
+    signed int ext=boolbv_width(expr.type())-BV_ADDR_BITS;
 
     if(ext>0)
       out << "(zero_extend[" << ext << "] ";
@@ -1079,7 +1088,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     convert_expr(expr.op0(), true);
     out << ")";
 
-    if(ext>0) out << ")";
+    if(ext>0)
+      out << ")";
   }
   else if(expr.id()=="is_dynamic_object")
   {
@@ -1379,8 +1389,10 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
       out << ") (sign_extend[" << width << "] ";
       convert_expr(expr.op1(), true);
       out << "))) "; // sign_extend, bvmul, ?prod
-      out << "(or (bvsge ?prod (bv" << power(2, width-1) << "[" << width*2 << "]))";
-      out << " (bvslt ?prod (bvneg (bv" << power(2, width-1) << "[" << width*2 << "])))";
+      out << "(or (bvsge ?prod (bv" << power(2, width-1)
+          << "[" << width*2 << "]))";
+      out << " (bvslt ?prod (bvneg (bv" << power(2, width-1)
+          << "[" << width*2 << "])))";
       out << "))"; // or, let
     }
     else if(op_type.id()==ID_unsignedbv)
@@ -1549,6 +1561,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
 
@@ -1580,6 +1593,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast1 "+src_type.id_string()+" -> bool";
     }
   }
@@ -1707,6 +1721,7 @@ void smt1_convt::convert_typecast(
     }
     else
     {
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast2 "+src_type.id_string()+
             " -> "+dest_type.id_string();
     }
@@ -1863,10 +1878,12 @@ void smt1_convt::convert_typecast(
       }
     }
     else
+      // NOLINTNEXTLINE(readability/throw)
       throw "TODO typecast3 "+src_type.id_string()+" -> pointer";
   }
   else if(dest_type.id()==ID_range)
   {
+    // NOLINTNEXTLINE(readability/throw)
     throw "TODO range typecast";
   }
   else if(dest_type.id()==ID_c_bit_field)
@@ -1884,6 +1901,7 @@ void smt1_convt::convert_typecast(
     }
   }
   else
+    // NOLINTNEXTLINE(readability/throw)
     throw "TODO typecast4 ? -> "+dest_type.id_string();
 }
 
@@ -1937,14 +1955,16 @@ void smt1_convt::convert_struct(const exprt &expr)
 
       if(op.type().id()!=ID_code)
       {
-        if(!first) out << " ";
+        if(!first)
+          out << " ";
 
         if(op.type().id()==ID_array)
           flatten_array(op);
         else
           convert_expr(op, true);
 
-        if(!first) out << ")"; // concat
+        if(!first)
+          out << ")"; // concat
         first=false;
       }
     }
@@ -2023,7 +2043,8 @@ void smt1_convt::convert_constant(
 
     std::size_t width=boolbv_width(expr.type());
 
-    if(value<0) value=power(2, width)+value;
+    if(value<0)
+      value=power(2, width)+value;
 
     out << "bv" << value
         << "[" << width << "]";
@@ -2086,7 +2107,7 @@ void smt1_convt::convert_constant(
       out << value << ".0";
     else
     {
-      out << "(/ " << value.substr(0,pos) << ".0 "
+      out << "(/ " << value.substr(0, pos) << ".0 "
                    << value.substr(pos+1) << ".0)";
     }
   }
@@ -2729,7 +2750,7 @@ void smt1_convt::convert_with(const exprt &expr)
       out << ")"; // concat
 
       // shift it to the index
-      if (width>=array_index_bits)
+      if(width>=array_index_bits)
         out << " (zero_extend[" << width-array_index_bits << "]";
       else
         out << " (extract[" << width-1 << ":0]";
@@ -2746,7 +2767,7 @@ void smt1_convt::convert_with(const exprt &expr)
 
       // shift it to the index
       out << ")";
-      if (width>=array_index_bits)
+      if(width>=array_index_bits)
         out << " (zero_extend[" << width-array_index_bits << "]";
       else
         out << " (extract[" << width-1 << ":0]";
@@ -2796,7 +2817,7 @@ void smt1_convt::convert_with(const exprt &expr)
       out << ")"; // concat
 
       // shift it to the index
-      if (width>=array_index_bits)
+      if(width>=array_index_bits)
         out << " (zero_extend[" << width-array_index_bits << "]";
       else
         out << " (extract[" << width-1 << ":0]";
@@ -2812,7 +2833,7 @@ void smt1_convt::convert_with(const exprt &expr)
       convert_expr(value, true);
       // shift it to the index
       out << ")";
-      if (width>=array_index_bits)
+      if(width>=array_index_bits)
         out << " (zero_extend[" << width-array_index_bits << "]";
       else
         out << " (extract[" << width-1 << ":0]";
@@ -2871,7 +2892,8 @@ void smt1_convt::convert_with(const exprt &expr)
         out << ")";
       }
 
-      if(offset!=0) out << " (concat";
+      if(offset!=0)
+        out << " (concat";
 
       out << " ";
       convert_expr(value, true);
@@ -2884,7 +2906,8 @@ void smt1_convt::convert_with(const exprt &expr)
         out << ")"; // concat
       }
 
-      if(offset+width!=total_width) out << ")"; // concat
+      if(offset+width!=total_width)
+        out << ")"; // concat
     }
   }
   else if(expr_type.id()==ID_union)
@@ -3031,7 +3054,7 @@ void smt1_convt::convert_index(const index_exprt &expr, bool bool_as_bv)
     out << "(extract[" << elem_width-1 <<  ":0] ";
     out << "(bvlshr ";
     convert_expr(expr.array(), true);
-    if (width>=array_index_bits)
+    if(width>=array_index_bits)
       out << " (zero_extend[" << width-array_index_bits << "]";
     else
       out << " (extract[" << width-1 << ":0]";
@@ -3326,7 +3349,6 @@ void smt1_convt::find_symbols(const exprt &expr)
       array_expr_map[t]=id;
     }
   }
-
 }
 
 /*******************************************************************\
@@ -3696,7 +3718,7 @@ void smt1_convt::flatten_array(const exprt &op)
   const exprt &size=array_type.size();
 
   if(size.id()!=ID_constant)
-    throw ("non-constant size array cannot be flattened.");
+    throw "non-constant size array cannot be flattened";
 
   mp_integer sizei;
   if(to_integer(size, sizei))
@@ -3727,7 +3749,8 @@ void smt1_convt::flatten_array(const exprt &op)
     out << " ";
     out << "bv" << i << "[" << array_index_bits << "]";
     out << ")";
-    if(i!=0) out << ")"; // concat
+    if(i!=0)
+      out << ")"; // concat
   }
 
   #if 0

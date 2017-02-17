@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H
 
@@ -15,7 +23,8 @@
 #include "scratch_program.h"
 #include "acceleration_utils.h"
 
-class acceleratet {
+class acceleratet
+{
  public:
   acceleratet(goto_programt &_program,
               goto_functionst &_goto_functions,
@@ -95,7 +104,8 @@ class acceleratet {
   subsumed_pathst subsumed;
   acceleration_utilst utils;
 
-  typedef std::map<goto_programt::targett, goto_programt::targetst> overflow_mapt;
+  typedef std::map<goto_programt::targett, goto_programt::targetst>
+    overflow_mapt;
   overflow_mapt overflow_locs;
 
   expr_mapt dirty_vars_map;

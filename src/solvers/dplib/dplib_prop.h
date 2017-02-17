@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class dplib_propt:virtual public propt
 {
 public:
-  dplib_propt(std::ostream &_out);
+  explicit dplib_propt(std::ostream &_out);
   virtual ~dplib_propt() { }
 
   virtual void land(literalt a, literalt b, literalt o);
@@ -43,7 +43,7 @@ public:
   virtual literalt new_variable();
   virtual size_t no_variables() const { return _no_variables; }
   virtual void set_no_variables(size_t no) { assert(false); }
-  //virtual unsigned no_clauses()=0;
+  // virtual unsigned no_clauses()=0;
 
   virtual void lcnf(const bvt &bv);
 
@@ -53,7 +53,8 @@ public:
   virtual tvt l_get(literalt literal) const
   {
     unsigned v=literal.var_no();
-    if(v>=assignment.size()) return tvt::unknown();
+    if(v>=assignment.size())
+      return tvt::unknown();
     tvt r=assignment[v];
     return literal.sign()?!r:r;
   }

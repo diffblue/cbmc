@@ -241,15 +241,18 @@ exprt good_pointer_def(
   exprt good_dynamic_tmp1=
     or_exprt(
       not_exprt(malloc_object(pointer, ns)),
-      and_exprt(not_exprt(dynamic_object_lower_bound(
-                    pointer,
-                    ns,
-                    nil_exprt())),
-                not_exprt(dynamic_object_upper_bound(
-                    pointer,
-                    dereference_type,
-                    ns,
-                    size_of_expr(dereference_type, ns)))));
+      and_exprt(
+        not_exprt(
+          dynamic_object_lower_bound(
+            pointer,
+            ns,
+            nil_exprt())),
+        not_exprt(
+          dynamic_object_upper_bound(
+            pointer,
+            dereference_type,
+            ns,
+            size_of_expr(dereference_type, ns)))));
 
   exprt good_dynamic_tmp2=
     and_exprt(not_exprt(deallocated(pointer, ns)),

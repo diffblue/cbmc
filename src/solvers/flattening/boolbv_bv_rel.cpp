@@ -46,8 +46,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     {
       if(bvtype0==IS_FLOAT)
       {
-        float_utilst float_utils(prop);
-        float_utils.spec=to_floatbv_type(op0.type());
+        float_utilst float_utils(prop, to_floatbv_type(op0.type()));
 
         if(rel==ID_le)
           return float_utils.relation(bv0, float_utilst::LE, bv1);

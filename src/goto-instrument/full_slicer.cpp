@@ -99,7 +99,8 @@ void full_slicert::add_decl_dead(
   queuet &queue,
   decl_deadt &decl_dead)
 {
-  if(decl_dead.empty()) return;
+  if(decl_dead.empty())
+    return;
 
   find_symbols_sett syms;
   find_symbols(node.PC->code, syms);
@@ -111,7 +112,8 @@ void full_slicert::add_decl_dead(
       ++it)
   {
     decl_deadt::iterator entry=decl_dead.find(*it);
-    if(entry==decl_dead.end()) continue;
+    if(entry==decl_dead.end())
+      continue;
 
     while(!entry->second.empty())
     {
@@ -325,10 +327,12 @@ static bool implicit(goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
 
-  if(!target->is_assign()) return false;
+  if(!target->is_assign())
+    return false;
 
   const code_assignt &a=to_code_assign(target->code);
-  if(a.lhs().id()!=ID_symbol) return false;
+  if(a.lhs().id()!=ID_symbol)
+    return false;
 
   const symbol_exprt &s=to_symbol_expr(a.lhs());
 
@@ -415,7 +419,8 @@ void full_slicert::operator()(
               req_it!=cfg[e].required_by.end();
               ++req_it)
           {
-            if(req_it!=cfg[e].required_by.begin()) c+=",";
+            if(req_it!=cfg[e].required_by.begin())
+              c+=",";
             c+=std::to_string(*req_it);
           }
           i_it->source_location.set_column(c);  // for show-goto-functions

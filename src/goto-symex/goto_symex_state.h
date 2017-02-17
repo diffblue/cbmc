@@ -140,7 +140,6 @@ public:
     {
       values.erase(identifier);
     }
-
   } propagation;
 
   typedef enum { L0=0, L1=1, L2=2 } levelt;
@@ -204,7 +203,8 @@ public:
     }
 
     // the below replicate levelt2 member functions
-    void level2_get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
+    void level2_get_variables(
+      std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
       for(level2t::current_namest::const_iterator
           it=level2_current_names.begin();
@@ -223,7 +223,8 @@ public:
 
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
-  typedef std::map<goto_programt::const_targett, goto_state_listt> goto_state_mapt;
+  typedef std::map<goto_programt::const_targett, goto_state_listt>
+    goto_state_mapt;
 
   // stack frames -- these are used for function calls and
   // for exceptions
@@ -273,40 +274,42 @@ public:
 
   typedef std::vector<framet> call_stackt;
 
-  inline call_stackt &call_stack()
+  call_stackt &call_stack()
   {
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
 
-  inline const call_stackt &call_stack() const
+  const call_stackt &call_stack() const
   {
     assert(source.thread_nr<threads.size());
     return threads[source.thread_nr].call_stack;
   }
 
-  inline framet &top()
+  framet &top()
   {
     assert(!call_stack().empty());
     return call_stack().back();
   }
 
-  inline const framet &top() const
+  const framet &top() const
   {
     assert(!call_stack().empty());
     return call_stack().back();
   }
 
-  inline framet &new_frame() { call_stack().push_back(framet()); return top(); }
-  inline void pop_frame() { call_stack().pop_back(); }
-  inline const framet &previous_frame() { return *(--(--call_stack().end())); }
+  framet &new_frame() { call_stack().push_back(framet()); return top(); }
+  void pop_frame() { call_stack().pop_back(); }
+  const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>
+    read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash> written_in_atomic_sectiont;
+  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
+    written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
 

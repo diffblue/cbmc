@@ -40,7 +40,8 @@ void resolution_prooft<T>::build_core(std::vector<bool> &in_core)
     typename clausest::size_type c_id=s.top();
     s.pop();
 
-    if(seen[c_id]) continue;
+    if(seen[c_id])
+      continue;
     seen[c_id]=true;
 
     const T &c=clauses[c_id];

@@ -53,7 +53,8 @@ void interpretert::operator()()
   {
     show_state();
     command();
-    if(!done) step();
+    if(!done)
+      step();
   }
 }
 
@@ -81,7 +82,8 @@ void interpretert::show_state()
               << function->first << "'" << std::endl;
   }
   else
-    function->second.body.output_instruction(ns, function->first, std::cout, PC);
+    function->second.body.output_instruction(
+      ns, function->first, std::cout, PC);
 
   std::cout << std::endl;
 }
@@ -175,7 +177,7 @@ void interpretert::step()
 
   case RETURN:
     if(call_stack.empty())
-      throw "RETURN without call";
+      throw "RETURN without call"; // NOLINT(readability/throw)
 
     if(PC->code.operands().size()==1 &&
        call_stack.top().return_value_address!=0)
@@ -197,20 +199,20 @@ void interpretert::step()
     break;
 
   case START_THREAD:
-    throw "START_THREAD not yet implemented";
+    throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
 
   case END_THREAD:
-    throw "END_THREAD not yet implemented";
+    throw "END_THREAD not yet implemented"; // NOLINT(readability/throw)
     break;
 
   case ATOMIC_BEGIN:
-    throw "ATOMIC_BEGIN not yet implemented";
+    throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
 
   case ATOMIC_END:
-    throw "ATOMIC_END not yet implemented";
+    throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
 
   case DEAD:
-    throw "DEAD not yet implemented";
+    throw "DEAD not yet implemented"; // NOLINT(readability/throw)
 
   default:
     throw "encountered instruction with undefined instruction type";
@@ -465,7 +467,8 @@ void interpretert::execute_function_call()
         for(unsigned i=0; i<stack_pointer; i++)
         {
           unsigned address=stack_pointer+i;
-          if(address>=memory.size()) memory.resize(address+1);
+          if(address>=memory.size())
+            memory.resize(address+1);
           memory[address].value=0;
           memory[address].identifier=id;
           memory[address].offset=i;

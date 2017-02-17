@@ -327,16 +327,19 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     if(symbol_expr.id() == ID_symbol &&
        symbol_expr.type().id()!=ID_code)
     {
-      // maybe the name of the member collides with a parameter of the constructor
+      // maybe the name of the member collides with a parameter of the
+      // constructor
       symbol_expr.make_nil();
       cpp_typecheck_fargst fargs;
-      exprt dereference(ID_dereference, cpp_scopes.current_scope().this_expr.type().subtype());
+      exprt dereference(
+        ID_dereference, cpp_scopes.current_scope().this_expr.type().subtype());
       dereference.copy_to_operands(cpp_scopes.current_scope().this_expr);
       fargs.add_object(dereference);
 
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
-        cpp_scopes.go_to(*(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
+        cpp_scopes.go_to(
+          *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
         symbol_expr=resolve(member, cpp_typecheck_resolvet::VAR, fargs);
       }
 
@@ -470,7 +473,8 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     const symbolt &symbol=
       cpp_declarator_converter.convert(declaration, declarator);
 
-    if(is_typedef) continue;
+    if(is_typedef)
+      continue;
 
     codet decl_statement(ID_decl);
     decl_statement.reserve_operands(2);

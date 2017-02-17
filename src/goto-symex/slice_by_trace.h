@@ -14,12 +14,13 @@ Author: Alex Groce (agroce@gmail.com)
 class symex_slice_by_tracet
 {
 public:
-  symex_slice_by_tracet(const namespacet &_ns):ns(_ns)
+  explicit symex_slice_by_tracet(const namespacet &_ns):ns(_ns)
   {
   }
 
-  void slice_by_trace(std::string trace_files,
-                      symex_target_equationt &equation);
+  void slice_by_trace(
+    std::string trace_files,
+    symex_target_equationt &equation);
 
  protected:
   const namespacet &ns;
@@ -69,9 +70,9 @@ public:
 
   void assign_merges(symex_target_equationt &equation);
 
-  std::set<exprt> implied_guards (exprt e);
+  std::set<exprt> implied_guards(exprt e);
 
-  bool implies_false (exprt e);
+  bool implies_false(exprt e);
 };
 
 #endif // CPROVER_GOTO_SYMEX_SLICE_BY_TRACE_H

@@ -41,7 +41,8 @@ public:
         break;
       case DATA:
       case CTRL:
-        if(kind!=_kind) kind=BOTH;
+        if(kind!=_kind)
+          kind=BOTH;
         break;
       case BOTH:
         break;
@@ -68,7 +69,7 @@ struct dep_nodet:public graph_nodet<dep_edget>
 class dep_graph_domaint:public ai_domain_baset
 {
 public:
-  typedef graph<dep_nodet>::node_indext node_indext;
+  typedef grapht<dep_nodet>::node_indext node_indext;
 
   dep_graph_domaint():
     has_values(false),
@@ -85,14 +86,14 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     ai_baset &ai,
-    const namespacet &ns) final override;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final override;
+    const namespacet &ns) const final;
 
-  void make_top() final override
+  void make_top() final
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -101,7 +102,7 @@ public:
     data_deps.clear();
   }
 
-  void make_bottom() final override
+  void make_bottom() final
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -110,7 +111,7 @@ public:
     data_deps.clear();
   }
 
-  void make_entry() final override
+  void make_entry() final
   {
     make_top();
   }
@@ -126,7 +127,7 @@ public:
     return node_id;
   }
 
-protected:
+private:
   tvt has_values;
   node_indext node_id;
 
@@ -147,11 +148,11 @@ protected:
 
 class dependence_grapht:
   public ait<dep_graph_domaint>,
-  public graph<dep_nodet>
+  public grapht<dep_nodet>
 {
 public:
   using ait<dep_graph_domaint>::operator[];
-  using graph<dep_nodet>::operator[];
+  using grapht<dep_nodet>::operator[];
 
   explicit dependence_grapht(const namespacet &_ns):
     ns(_ns),

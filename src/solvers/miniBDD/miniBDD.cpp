@@ -1,3 +1,12 @@
+/*******************************************************************\
+
+Module: A minimalistic BDD library, following Bryant's original paper
+        and Andersen's lecture notes
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include <cassert>
 
 #include <iostream>
@@ -7,10 +16,7 @@
 #define forall_nodes(it) for(nodest::const_iterator it=nodes.begin(); \
   it!=nodes.end(); it++)
 
-namespace miniBDD
-{
-
-void node::remove_reference()
+void mini_bdd_nodet::remove_reference()
 {
   assert(reference_counter!=0);
 
@@ -18,7 +24,7 @@ void node::remove_reference()
 
   if(reference_counter==0 && node_number>=2)
   {
-    mgr::reverse_keyt reverse_key(var, low, high);
+    mini_bdd_mgrt::reverse_keyt reverse_key(var, low, high);
     mgr->reverse_map.erase(reverse_key);
     low.clear();
     high.clear();
@@ -26,7 +32,7 @@ void node::remove_reference()
   }
 }
 
-BDD mgr::Var(const std::string &label)
+mini_bddt mini_bdd_mgrt::Var(const std::string &label)
 {
   var_table.push_back(var_table_entryt(label));
   true_bdd.node->var=var_table.size()+1;
@@ -34,7 +40,7 @@ BDD mgr::Var(const std::string &label)
   return mk(var_table.size(), false_bdd, true_bdd);
 }
 
-void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
+void mini_bdd_mgrt::DumpDot(std::ostream &out, bool suppress_zero) const
 {
   out << "digraph BDD {\n";
 
@@ -76,8 +82,10 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
 
   forall_nodes(u)
   {
-    if(u->reference_counter==0) continue;
-    if(u->node_number<=1) continue;
+    if(u->reference_counter==0)
+      continue;
+    if(u->node_number<=1)
+      continue;
 
     if(!suppress_zero || u->high.node_number()!=0)
       out << '"' << u->node_number << '"' << " -> "
@@ -95,7 +103,7 @@ void mgr::DumpDot(std::ostream &out, bool suppress_zero) const
   out << "}\n";
 }
 
-void mgr::DumpTikZ(
+void mini_bdd_mgrt::DumpTikZ(
   std::ostream &out,
   bool suppress_zero,
   bool node_numbers) const
@@ -129,7 +137,8 @@ void mgr::DumpTikZ(
           out << "right of=n" << previous;
 
         out << "] (n" << u->node_number << ") {";
-        if(node_numbers) out << "\\small $" << u->node_number << "$";
+        if(node_numbers)
+          out << "\\small $" << u->node_number << "$";
         out << "};\n";
         previous=u->node_number;
       }
@@ -172,24 +181,27 @@ void mgr::DumpTikZ(
   out << "\\end{tikzpicture}\n";
 }
 
-class apply
+class mini_bdd_applyt
 {
 public:
-  inline explicit apply(bool (*_fkt)(bool, bool)):fkt(_fkt)
+  inline explicit mini_bdd_applyt(bool (*_fkt)(bool, bool)):fkt(_fkt)
   {
   }
 
-  BDD operator()(const BDD &x, const BDD &y) { return APP(x, y); }
+  mini_bddt operator()(const mini_bddt &x, const mini_bddt &y)
+  {
+    return APP(x, y);
+  }
 
 protected:
   bool (*fkt)(bool, bool);
-  BDD APP(const BDD &x, const BDD &y);
+  mini_bddt APP(const mini_bddt &x, const mini_bddt &y);
 
-  typedef std::map<std::pair<unsigned, unsigned>, BDD> Gt;
+  typedef std::map<std::pair<unsigned, unsigned>, mini_bddt> Gt;
   Gt G;
 };
 
-BDD apply::APP(const BDD &x, const BDD &y)
+mini_bddt mini_bdd_applyt::APP(const mini_bddt &x, const mini_bddt &y)
 {
   assert(x.is_initialized() && y.is_initialized());
   assert(x.node->mgr==y.node->mgr);
@@ -197,14 +209,15 @@ BDD apply::APP(const BDD &x, const BDD &y)
   // dynamic programming
   std::pair<unsigned, unsigned> key(x.node_number(), y.node_number());
   Gt::const_iterator G_it=G.find(key);
-  if(G_it!=G.end()) return G_it->second;
+  if(G_it!=G.end())
+    return G_it->second;
 
-  mgr *mgr=x.node->mgr;
+  mini_bdd_mgrt *mgr=x.node->mgr;
 
-  BDD u;
+  mini_bddt u;
 
   if(x.is_constant() && y.is_constant())
-    u=BDD(fkt(x.is_true(), y.is_true())?mgr->True():mgr->False());
+    u=mini_bddt(fkt(x.is_true(), y.is_true())?mgr->True():mgr->False());
   else if(x.var()==y.var())
     u=mgr->mk(x.var(),
               APP(x.low(), y.low()),
@@ -228,24 +241,24 @@ bool equal_fkt(bool x, bool y)
   return x==y;
 }
 
-BDD BDD::operator ==(const BDD &other) const
+mini_bddt mini_bddt::operator==(const mini_bddt &other) const
 {
-  return apply(equal_fkt)(*this, other);
+  return mini_bdd_applyt(equal_fkt)(*this, other);
 }
 
 bool xor_fkt(bool x, bool y)
 {
-  return x ^ y;
+  return x^y;
 }
 
-BDD BDD::operator ^(const BDD &other) const
+mini_bddt mini_bddt::operator^(const mini_bddt &other) const
 {
-  return apply(xor_fkt)(*this, other);
+  return mini_bdd_applyt(xor_fkt)(*this, other);
 }
 
-BDD BDD::operator !() const
+mini_bddt mini_bddt::operator!() const
 {
-  return node->mgr->True() ^ *this;
+  return node->mgr->True()^*this;
 }
 
 bool and_fkt(bool x, bool y)
@@ -253,9 +266,9 @@ bool and_fkt(bool x, bool y)
   return x && y;
 }
 
-BDD BDD::operator &(const BDD &other) const
+mini_bddt mini_bddt::operator&(const mini_bddt &other) const
 {
-  return apply(and_fkt)(*this, other);
+  return mini_bdd_applyt(and_fkt)(*this, other);
 }
 
 bool or_fkt(bool x, bool y)
@@ -263,25 +276,28 @@ bool or_fkt(bool x, bool y)
   return x || y;
 }
 
-BDD BDD::operator |(const BDD &other) const
+mini_bddt mini_bddt::operator|(const mini_bddt &other) const
 {
-  return apply(or_fkt)(*this, other);
+  return mini_bdd_applyt(or_fkt)(*this, other);
 }
 
-mgr::mgr()
+mini_bdd_mgrt::mini_bdd_mgrt()
 {
   // add true/false nodes
-  nodes.push_back(node(this, 0, 0, BDD(), BDD()));
-  false_bdd=BDD(&nodes.back());
-  nodes.push_back(node(this, 1, 1, BDD(), BDD()));
-  true_bdd=BDD(&nodes.back());
+  nodes.push_back(mini_bdd_nodet(this, 0, 0, mini_bddt(), mini_bddt()));
+  false_bdd=mini_bddt(&nodes.back());
+  nodes.push_back(mini_bdd_nodet(this, 1, 1, mini_bddt(), mini_bddt()));
+  true_bdd=mini_bddt(&nodes.back());
 }
 
-mgr::~mgr()
+mini_bdd_mgrt::~mini_bdd_mgrt()
 {
 }
 
-BDD mgr::mk(unsigned var, const BDD &low, const BDD &high)
+mini_bddt mini_bdd_mgrt::mk(
+  unsigned var,
+  const mini_bddt &low,
+  const mini_bddt &high)
 {
   assert(var<=var_table.size());
 
@@ -293,15 +309,15 @@ BDD mgr::mk(unsigned var, const BDD &low, const BDD &high)
     reverse_mapt::const_iterator it=reverse_map.find(reverse_key);
 
     if(it!=reverse_map.end())
-      return BDD(it->second);
+      return mini_bddt(it->second);
     else
     {
-      node *n;
+      mini_bdd_nodet *n;
 
       if(free.empty())
       {
         unsigned new_number=nodes.back().node_number+1;
-        nodes.push_back(node(this, var, new_number, low, high));
+        nodes.push_back(mini_bdd_nodet(this, var, new_number, low, high));
         n=&nodes.back();
       }
       else // reuse a node
@@ -314,22 +330,23 @@ BDD mgr::mk(unsigned var, const BDD &low, const BDD &high)
       }
 
       reverse_map[reverse_key]=n;
-      return BDD(n);
+      return mini_bddt(n);
     }
   }
 }
 
-bool operator < (const mgr::reverse_keyt &x,
-                 const mgr::reverse_keyt &y)
+bool mini_bdd_mgrt::reverse_keyt::operator<(
+  const mini_bdd_mgrt::reverse_keyt &other) const
 {
-  if(x.var<y.var) return true;
-  if(x.var>y.var) return false;
-  if(x.low<y.low) return true;
-  if(x.low>y.low) return false;
-  return x.high<y.high;
+  if(var<other.var || low<other.low)
+    return true;
+  if(var>other.var || low>other.low)
+    return false;
+
+  return high<other.high;
 }
 
-void mgr::DumpTable(std::ostream &out) const
+void mini_bdd_mgrt::DumpTable(std::ostream &out) const
 {
   out << "\\# & \\mathit{var} & \\mathit{low} &"
          " \\mathit{high} \\\\\\hline\n";
@@ -347,7 +364,8 @@ void mgr::DumpTable(std::ostream &out) const
           << it->low.node_number() << " & " << it->high.node_number()
           << " \\\\";
 
-    if(it->node_number==1) out << "\\hline";
+    if(it->node_number==1)
+      out << "\\hline";
 
     out << " % " << it->reference_counter << '\n';
   }
@@ -361,23 +379,23 @@ public:
   {
   }
 
-  BDD operator()(const BDD &u) { return RES(u); }
+  mini_bddt operator()(const mini_bddt &u) { return RES(u); }
 
 protected:
   const unsigned var;
   const bool value;
 
-  BDD RES(const BDD &u);
+  mini_bddt RES(const mini_bddt &u);
 };
 
-BDD restrictt::RES(const BDD &u)
+mini_bddt restrictt::RES(const mini_bddt &u)
 {
   // replace 'var' in 'u' by constant 'value'
 
   assert(u.is_initialized());
-  mgr *mgr=u.node->mgr;
+  mini_bdd_mgrt *mgr=u.node->mgr;
 
-  BDD t;
+  mini_bddt t;
 
   if(u.var()>var)
     t=u;
@@ -389,29 +407,29 @@ BDD restrictt::RES(const BDD &u)
   return t;
 }
 
-BDD restrict(const BDD &u, unsigned var, const bool value)
+mini_bddt restrict(const mini_bddt &u, unsigned var, const bool value)
 {
   return restrictt(var, value)(u);
 }
 
-BDD exists(const BDD &u, const unsigned var)
+mini_bddt exists(const mini_bddt &u, const unsigned var)
 {
   // u[var/0] OR u[var/1]
   return restrict(u, var, false) |
          restrict(u, var, true);
 }
 
-BDD substitute(const BDD &t, unsigned var, const BDD &tp)
+mini_bddt substitute(const mini_bddt &t, unsigned var, const mini_bddt &tp)
 {
   // t[var/tp] =
-  //  ( tp & t[var/1]) |
-  //  (!tp & t[var/0])
+  //  ( tp &t[var/1]) |
+  //  (!tp &t[var/0])
 
-  return ( tp & restrict(t, var, true)) |
-         ((!tp) & restrict(t, var, false));
+  return ( tp &restrict(t, var, true)) |
+         ((!tp) &restrict(t, var, false));
 }
 
-void cubes(const BDD &u, const std::string &path, std::string &result)
+void cubes(const mini_bddt &u, const std::string &path, std::string &result)
 {
   if(u.is_false())
     return;
@@ -422,17 +440,21 @@ void cubes(const BDD &u, const std::string &path, std::string &result)
     return;
   }
 
-  mgr *mgr=u.node->mgr;
+  mini_bdd_mgrt *mgr=u.node->mgr;
   std::string path_low=path;
   std::string path_high=path;
-  if(!path.empty()) { path_low+=" & "; path_high+=" & "; }
+  if(!path.empty())
+  {
+    path_low+=" & ";
+    path_high+=" & ";
+  }
   path_low+='!'+mgr->var_table[u.var()-1].label;
   path_high+=mgr->var_table[u.var()-1].label;
   cubes(u.low(), path_low, result);
   cubes(u.high(), path_high, result);
 }
 
-std::string cubes(const BDD &u)
+std::string cubes(const mini_bddt &u)
 {
   if(u.is_false())
     return "false\n";
@@ -446,7 +468,7 @@ std::string cubes(const BDD &u)
   }
 }
 
-bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment)
+bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment)
 {
   // http://www.ecs.umass.edu/ece/labs/vlsicad/ece667/reading/somenzi99bdd.pdf
   if(v.is_true())
@@ -456,10 +478,9 @@ bool OneSat(const BDD &v, std::map<unsigned, bool> &assignment)
   else
   {
     assignment[v.var()]=true;
-    if(OneSat(v.high(), assignment)) return true;
+    if(OneSat(v.high(), assignment))
+      return true;
     assignment[v.var()]=false;
     return OneSat(v.low(), assignment);
   }
 }
-
-} // namespace miniBDD

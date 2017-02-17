@@ -62,11 +62,13 @@ public:
   instrumentert &instrumenter;
 
   /* normal variables used almost everytime */
-  std::map<event_idt, edget>& map_to_e;
-  std::map<edget, event_idt>& map_from_e;
-  inline event_idt add_edge(const edget& e) { return var.add_edge(e); }
-  inline event_idt add_invisible_edge(const edget& e) {
-    return invisible_var.add_edge(e);}
+  std::map<event_idt, edget> &map_to_e;
+  std::map<edget, event_idt> &map_from_e;
+  event_idt add_edge(const edget &e) { return var.add_edge(e); }
+  event_idt add_invisible_edge(const edget &e)
+  {
+    return invisible_var.add_edge(e);
+  }
 
   /* number of contraints */
   std::size_t constraints_number;
@@ -76,7 +78,7 @@ public:
   const_graph_visitort const_graph_visitor;
 
 protected:
-  event_idt& unique;
+  event_idt &unique;
   unsigned fence_options;
 
   /* MIP variables to edges in po^+/\C */
@@ -86,9 +88,12 @@ protected:
   mip_vart invisible_var;
 
   /* MIP matrix construction */
-  void mip_set_var(ilpt& ilp, unsigned& i);
-  void mip_set_cst(ilpt& ilp, unsigned& i);
-  void mip_fill_matrix(ilpt& ilp, unsigned& i, unsigned const_constraints_number,
+  void mip_set_var(ilpt &ilp, unsigned &i);
+  void mip_set_cst(ilpt &ilp, unsigned &i);
+  void mip_fill_matrix(
+    ilpt &ilp,
+    unsigned &i,
+    unsigned const_constraints_number,
     unsigned const_unique);
 
   /* preprocessing (necessary as glpk static) and solving */
@@ -165,7 +170,7 @@ public:
   void print_to_file_4();
 
   /* TODO: to be replaced eventually by ns.lookup and basename */
-  static std::string remove_extra(const irep_idt& id)
+  static std::string remove_extra(const irep_idt &id)
   {
      const std::string copy=id2string(id);
      return remove_extra(copy);

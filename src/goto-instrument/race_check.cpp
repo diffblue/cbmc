@@ -25,12 +25,17 @@ Date: February 2006
 
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>
+#define L_M_ARG(x) x,
+#define L_M_LAST_ARG(x) , x
+#else
+#define L_M_ARG(x)
+#define L_M_LAST_ARG(x)
 #endif
 
 class w_guardst
 {
 public:
-  w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
+  explicit w_guardst(symbol_tablet &_symbol_table):symbol_table(_symbol_table)
   {
   }
 
@@ -232,9 +237,7 @@ Function: race_check
 void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
-#ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
-#endif
+  L_M_ARG(const goto_functionst::goto_functiont &goto_function)
   goto_programt &goto_program,
   w_guardst &w_guards)
 {
@@ -250,11 +253,7 @@ void race_check(
 
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it
-#ifdef LOCAL_MAY
-      , local_may
-#endif
-      );
+      rw_set_loct rw_set(ns, value_sets, i_it L_M_LAST_ARG(local_may));
 
       if(!has_shared_entries(ns, rw_set))
         continue;
@@ -268,7 +267,8 @@ void race_check(
       // now add assignments for what is written -- set
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -291,7 +291,8 @@ void race_check(
       // now add assignments for what is written -- reset
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -307,7 +308,8 @@ void race_check(
       // now add assertions for what is read and written
       forall_rw_set_r_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -319,7 +321,8 @@ void race_check(
 
       forall_rw_set_w_entries(e_it, rw_set)
       {
-        if(!is_shared(ns, e_it->second.symbol_expr)) continue;
+        if(!is_shared(ns, e_it->second.symbol_expr))
+          continue;
 
         goto_programt::targett t=goto_program.insert_before(i_it);
 
@@ -352,17 +355,18 @@ void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program)
 {
   w_guardst w_guards(symbol_table);
 
-  race_check(value_sets, symbol_table,
-#ifdef LOCAL_MAY
-    goto_function,
-#endif
-    goto_program, w_guards);
+  race_check(
+    value_sets,
+    symbol_table,
+    L_M_ARG(goto_function)
+    goto_program,
+    w_guards);
 
   w_guards.add_initialization(goto_program);
   goto_program.update();
@@ -390,18 +394,19 @@ void race_check(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->first!=goto_functionst::entry_point() &&
        f_it->first!=CPROVER_PREFIX "initialize")
-      race_check(value_sets, symbol_table,
-#ifdef LOCAL_MAY
-        f_it->second,
-#endif
-        f_it->second.body, w_guards);
+      race_check(
+        value_sets,
+        symbol_table,
+        L_M_ARG(f_it->second)
+        f_it->second.body,
+        w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator
     m_it=goto_functions.function_map.find(goto_functions.entry_point());
 
   if(m_it==goto_functions.function_map.end())
-    throw "Race check instrumentation needs an entry point";
+    throw "race check instrumentation needs an entry point";
 
   goto_programt &main=m_it->second.body;
   w_guards.add_initialization(main);

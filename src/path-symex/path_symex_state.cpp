@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -135,7 +135,8 @@ path_symex_statet::var_statet &path_symex_statet::get_var_state(
 
   var_valt &var_val=
     var_info.is_shared()?shared_vars:threads[current_thread].local_vars;
-  if(var_val.size()<=var_info.number) var_val.resize(var_info.number+1);
+  if(var_val.size()<=var_info.number)
+    var_val.resize(var_info.number+1);
   return var_val[var_info.number];
 }
 
@@ -229,7 +230,8 @@ bool path_symex_statet::check_assertion(
   exprt assertion=read(instruction.guard);
 
   // trivial?
-  if(assertion.is_true()) return true; // no error
+  if(assertion.is_true())
+    return true; // no error
 
   // the path constraint
   decision_procedure << history;

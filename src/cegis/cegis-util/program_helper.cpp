@@ -65,7 +65,7 @@ class id_searcht: public const_expr_visitort
   const irep_idt &id;
   bool found;
 public:
-  id_searcht(const irep_idt &id) :
+  explicit id_searcht(const irep_idt &id) :
       id(id), found(false)
   {
   }

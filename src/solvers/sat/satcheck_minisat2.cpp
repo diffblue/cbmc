@@ -79,7 +79,8 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
   else
     return tvt::unknown();
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }

@@ -34,7 +34,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
   if(symbol.is_type)
   {
-    if(symbol.value.is_nil()) return;
+    if(symbol.value.is_nil())
+      return;
 
     if(symbol.value.id()!=ID_type)
     {
@@ -321,7 +322,8 @@ void cpp_typecheckt::zero_initializer(
   else
   {
     exprt value=
-      ::zero_initializer(final_type, source_location, *this, get_message_handler());
+      ::zero_initializer(
+        final_type, source_location, *this, get_message_handler());
 
     code_assignt assign;
     assign.lhs()=object;

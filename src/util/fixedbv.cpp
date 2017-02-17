@@ -60,7 +60,7 @@ Function: fixedbvt::from_expr
 
 void fixedbvt::from_expr(const constant_exprt &expr)
 {
-  spec=to_fixedbv_type(expr.type());
+  spec=fixedbv_spect(to_fixedbv_type(expr.type()));
   v=binary2integer(id2string(expr.get_value()), true);
 }
 
@@ -149,11 +149,15 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
     mp_integer p=power(2, old_fraction_bits-new_fraction_bits);
     mp_integer div=v/p;
     mp_integer rem=v%p;
-    if(rem<0) rem=-rem;
+    if(rem<0)
+      rem=-rem;
 
     if(rem*2>=p)
     {
-      if(v<0) --div; else ++div;
+      if(v<0)
+        --div;
+      else
+        ++div;
     }
 
     result=div;

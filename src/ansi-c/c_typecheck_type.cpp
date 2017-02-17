@@ -56,8 +56,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
     type.swap(type.subtype());
 
     c_qualifiers.write(type);
-    if(packed) type.set(ID_C_packed, true);
-    if(alignment.is_not_nil()) type.add(ID_C_alignment, alignment);
+    if(packed)
+      type.set(ID_C_packed, true);
+    if(alignment.is_not_nil())
+      type.add(ID_C_alignment, alignment);
 
     return; // done
   }
@@ -147,15 +149,22 @@ void c_typecheck_baset::typecheck_type(typet &type)
         else
         {
           assert(config.ansi_c.long_long_int_width==64);
-          result=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+          result=
+            is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
         }
       }
       else if(mode=="__TI__") // 128 bits
         result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
       else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
-        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(2, size_type()));
+        result=
+          vector_typet(
+            is_signed?signed_int_type():unsigned_int_type(),
+            from_integer(2, size_type()));
       else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
-        result=vector_typet(is_signed?signed_int_type():unsigned_int_type(), from_integer(4, size_type()));
+        result=
+          vector_typet(
+            is_signed?signed_int_type():unsigned_int_type(),
+            from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();
 
@@ -241,7 +250,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     error() << "only a pointer can be 'restrict'" << eom;
     throw 0;
   }
-
 }
 
 /*******************************************************************\
@@ -425,7 +433,8 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
           // make visible now, later parameters might use it
           parameter_map[identifier]=type;
           parameter.set_base_name(declaration.declarator().get_base_name());
-          parameter.add_source_location()=declaration.declarator().source_location();
+          parameter.add_source_location()=
+            declaration.declarator().source_location();
         }
 
         // put the parameter in place of the declaration
@@ -550,11 +559,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       assert(current_symbol_id!=irep_idt());
 
-      const symbolt &base_symbol=
-        lookup(
-          //base_symbol_identifier!=irep_idt()?
-          //base_symbol_identifier:
-          current_symbol_id);
+      const symbolt &base_symbol=lookup(current_symbol_id);
 
       // Need to pull out! We insert new symbol.
       source_locationt source_location=size.find_source_location();
@@ -568,7 +573,8 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
         temp_identifier=id2string(base_symbol.name)+suffix;
         count++;
       }
-      while(symbol_table.symbols.find(temp_identifier)!=symbol_table.symbols.end());
+      while(symbol_table.symbols.find(temp_identifier)!=
+            symbol_table.symbols.end());
 
       // add the symbol to symbol table
       auxiliary_symbolt new_symbol;
@@ -899,7 +905,8 @@ void c_typecheck_baset::typecheck_compound_body(
   // scan for anonymous members, and name them
   for(auto &member : components)
   {
-    if(member.get_name()!=irep_idt()) continue;
+    if(member.get_name()!=irep_idt())
+      continue;
 
     member.set_name("$anon"+std::to_string(anon_member_counter++));
     member.set_anonymous(true);
@@ -1192,8 +1199,10 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
       }
     }
 
-    if(value<min_value) min_value=value;
-    if(value>max_value) max_value=value;
+    if(value<min_value)
+      min_value=value;
+    if(value>max_value)
+      max_value=value;
 
     typet constant_type=
       enum_constant_type(min_value, max_value);
@@ -1579,8 +1588,10 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     type=symbol.type;
     c_qualifiers.write(type);
 
-    if(is_packed) type.set(ID_C_packed, true);
-    if(alignment.is_not_nil()) type.set(ID_C_alignment, alignment);
+    if(is_packed)
+      type.set(ID_C_packed, true);
+    if(alignment.is_not_nil())
+      type.set(ID_C_alignment, alignment);
   }
 
   // CPROVER extensions

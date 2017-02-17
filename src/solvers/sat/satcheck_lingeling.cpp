@@ -12,7 +12,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "satcheck_lingeling.h"
 
-extern "C" {
+extern "C"
+{
 #include <lglib.h>
 }
 

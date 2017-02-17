@@ -238,9 +238,11 @@ exprt flatten_byte_update(
           else
           {
             byte_extract_exprt byte_extract_expr(
-              src.id()==ID_byte_update_little_endian?ID_byte_extract_little_endian:
-              src.id()==ID_byte_update_big_endian?ID_byte_extract_big_endian:
-              throw "unexpected src.id() in flatten_byte_update",
+              src.id()==ID_byte_update_little_endian?
+                ID_byte_extract_little_endian:
+                src.id()==ID_byte_update_big_endian?
+                  ID_byte_extract_big_endian:
+                    throw "unexpected src.id() in flatten_byte_update",
               subtype);
 
             byte_extract_expr.op()=src.op2();
@@ -270,7 +272,7 @@ exprt flatten_byte_update(
         mp_integer num_elements=
           element_size/sub_size+((element_size%sub_size==0)?1:2);
 
-        const auto& offset_type=ns.follow(src.op1().type());
+        const auto &offset_type=ns.follow(src.op1().type());
         exprt zero_offset=from_integer(0, offset_type);
 
         exprt sub_size_expr=from_integer(sub_size, offset_type);
@@ -364,8 +366,9 @@ exprt flatten_byte_update(
     }
     else
     {
-      throw "flatten_byte_update can only do arrays of scalars right now, but got "+
-            subtype.id_string();
+      throw
+        "flatten_byte_update can only do arrays of scalars right now, "
+        "but got "+subtype.id_string();
     }
   }
   else if(t.id()==ID_signedbv ||
@@ -390,9 +393,11 @@ exprt flatten_byte_update(
     exprt value_extended;
 
     if(width>integer2unsigned(element_size)*8)
-      value_extended=concatenation_exprt(
-        from_integer(0, unsignedbv_typet(width-integer2unsigned(element_size)*8)),
-        src.op2(), t);
+      value_extended=
+        concatenation_exprt(
+          from_integer(
+            0, unsignedbv_typet(width-integer2unsigned(element_size)*8)),
+          src.op2(), t);
     else
       value_extended=src.op2();
 
@@ -476,7 +481,8 @@ bool has_byte_operator(const exprt &src)
     return true;
 
   forall_operands(it, src)
-    if(has_byte_operator(*it)) return true;
+    if(has_byte_operator(*it))
+      return true;
 
   return false;
 }

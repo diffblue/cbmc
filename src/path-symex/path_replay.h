@@ -14,11 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class path_replayt
 {
 public:
-  inline path_replayt()
+  path_replayt()
   {
   }
 
-  inline explicit path_replayt(const path_symex_statet &src)
+  explicit path_replayt(const path_symex_statet &src)
   {
     get_branches(src.history);
   }

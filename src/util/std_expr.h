@@ -31,19 +31,19 @@ Author: Daniel Kroening, kroening@kroening.com
 class transt:public exprt
 {
 public:
-  inline transt()
+  transt()
   {
     id(ID_trans);
     operands().resize(3);
   }
 
-  inline exprt &invar() { return op0(); }
-  inline exprt &init()  { return op1(); }
-  inline exprt &trans() { return op2(); }
+  exprt &invar() { return op0(); }
+  exprt &init()  { return op1(); }
+  exprt &trans() { return op2(); }
 
-  inline const exprt &invar() const { return op0(); }
-  inline const exprt &init()  const { return op1(); }
-  inline const exprt &trans() const { return op2(); }
+  const exprt &invar() const { return op0(); }
+  const exprt &init()  const { return op1(); }
+  const exprt &trans() const { return op2(); }
 };
 
 /*! \brief Cast a generic exprt to a \ref transt
@@ -56,7 +56,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const transt &to_trans_expr(const exprt &expr)
+inline const transt &to_trans_expr(const exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
   return static_cast<const transt &>(expr);
@@ -65,7 +65,7 @@ extern inline const transt &to_trans_expr(const exprt &expr)
 /*! \copydoc to_trans(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline transt &to_trans_expr(exprt &expr)
+inline transt &to_trans_expr(exprt &expr)
 {
   assert(expr.id()==ID_trans && expr.operands().size()==3);
   return static_cast<transt &>(expr);
@@ -76,14 +76,14 @@ extern inline transt &to_trans_expr(exprt &expr)
 class symbol_exprt:public exprt
 {
 public:
-  inline symbol_exprt():exprt(ID_symbol)
+  symbol_exprt():exprt(ID_symbol)
   {
   }
 
   /*! \brief Constructor
    * \param identifier Name of symbol
   */
-  inline explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
+  explicit symbol_exprt(const irep_idt &identifier):exprt(ID_symbol)
   {
     set_identifier(identifier);
   }
@@ -91,7 +91,7 @@ public:
   /*! \brief Constructor
    * \param  type Type of symbol
   */
-  inline explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
+  explicit symbol_exprt(const typet &type):exprt(ID_symbol, type)
   {
   }
 
@@ -99,18 +99,19 @@ public:
    * \param identifier Name of symbol
    * \param  type Type of symbol
   */
-  inline symbol_exprt(const irep_idt &identifier,
-                      const typet &type):exprt(ID_symbol, type)
+  symbol_exprt(
+    const irep_idt &identifier,
+    const typet &type):exprt(ID_symbol, type)
   {
     set_identifier(identifier);
   }
 
-  inline void set_identifier(const irep_idt &identifier)
+  void set_identifier(const irep_idt &identifier)
   {
     set(ID_identifier, identifier);
   }
 
-  inline const irep_idt &get_identifier() const
+  const irep_idt &get_identifier() const
   {
     return get(ID_identifier);
   }
@@ -121,14 +122,14 @@ public:
 class decorated_symbol_exprt:public symbol_exprt
 {
 public:
-  inline decorated_symbol_exprt()
+  decorated_symbol_exprt()
   {
   }
 
   /*! \brief Constructor
    * \param identifier Name of symbol
   */
-  inline explicit decorated_symbol_exprt(const irep_idt &identifier):
+  explicit decorated_symbol_exprt(const irep_idt &identifier):
     symbol_exprt(identifier)
   {
   }
@@ -136,7 +137,7 @@ public:
   /*! \brief Constructor
    * \param  type Type of symbol
   */
-  inline explicit decorated_symbol_exprt(const typet &type):
+  explicit decorated_symbol_exprt(const typet &type):
     symbol_exprt(type)
   {
   }
@@ -145,38 +146,38 @@ public:
    * \param identifier Name of symbol
    * \param  type Type of symbol
   */
-  inline decorated_symbol_exprt(
+  decorated_symbol_exprt(
     const irep_idt &identifier,
     const typet &type):symbol_exprt(identifier, type)
   {
   }
 
-  inline bool is_static_lifetime() const
+  bool is_static_lifetime() const
   {
     return get_bool(ID_C_static_lifetime);
   }
 
-  inline void set_static_lifetime()
+  void set_static_lifetime()
   {
     return set(ID_C_static_lifetime, true);
   }
 
-  inline void clear_static_lifetime()
+  void clear_static_lifetime()
   {
     remove(ID_C_static_lifetime);
   }
 
-  inline bool is_thread_local() const
+  bool is_thread_local() const
   {
     return get_bool(ID_C_thread_local);
   }
 
-  inline void set_thread_local()
+  void set_thread_local()
   {
     return set(ID_C_thread_local, true);
   }
 
-  inline void clear_thread_local()
+  void clear_thread_local()
   {
     remove(ID_C_thread_local);
   }
@@ -192,7 +193,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const symbol_exprt &to_symbol_expr(const exprt &expr)
+inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 {
   assert(expr.id()==ID_symbol && !expr.has_operands());
   return static_cast<const symbol_exprt &>(expr);
@@ -201,7 +202,7 @@ extern inline const symbol_exprt &to_symbol_expr(const exprt &expr)
 /*! \copydoc to_symbol_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline symbol_exprt &to_symbol_expr(exprt &expr)
+inline symbol_exprt &to_symbol_expr(exprt &expr)
 {
   assert(expr.id()==ID_symbol && !expr.has_operands());
   return static_cast<symbol_exprt &>(expr);
@@ -212,17 +213,17 @@ extern inline symbol_exprt &to_symbol_expr(exprt &expr)
 class unary_exprt:public exprt
 {
 public:
-  inline unary_exprt()
+  unary_exprt()
   {
     operands().resize(1);
   }
 
-  inline explicit unary_exprt(const irep_idt &_id):exprt(_id)
+  explicit unary_exprt(const irep_idt &_id):exprt(_id)
   {
     operands().resize(1);
   }
 
-  inline unary_exprt(
+  unary_exprt(
     const irep_idt &_id,
     const exprt &_op):
     exprt(_id, _op.type())
@@ -230,14 +231,14 @@ public:
     copy_to_operands(_op);
   }
 
-  inline unary_exprt(
+  unary_exprt(
     const irep_idt &_id,
     const typet &_type):exprt(_id, _type)
   {
     operands().resize(1);
   }
 
-  inline unary_exprt(
+  unary_exprt(
     const irep_idt &_id,
     const exprt &_op,
     const typet &_type):
@@ -246,12 +247,12 @@ public:
     copy_to_operands(_op);
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op0();
   }
 
-  inline exprt &op()
+  exprt &op()
   {
     return op0();
   }
@@ -267,7 +268,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const unary_exprt &to_unary_expr(const exprt &expr)
+inline const unary_exprt &to_unary_expr(const exprt &expr)
 {
   assert(expr.operands().size()==1);
   return static_cast<const unary_exprt &>(expr);
@@ -276,7 +277,7 @@ extern inline const unary_exprt &to_unary_expr(const exprt &expr)
 /*! \copydoc to_unary_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline unary_exprt &to_unary_expr(exprt &expr)
+inline unary_exprt &to_unary_expr(exprt &expr)
 {
   assert(expr.operands().size()==1);
   return static_cast<unary_exprt &>(expr);
@@ -287,11 +288,11 @@ extern inline unary_exprt &to_unary_expr(exprt &expr)
 class abs_exprt:public unary_exprt
 {
 public:
-  inline abs_exprt()
+  abs_exprt()
   {
   }
 
-  inline explicit abs_exprt(const exprt &_op):
+  explicit abs_exprt(const exprt &_op):
     unary_exprt(ID_abs, _op, _op.type())
   {
   }
@@ -307,7 +308,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const abs_exprt &to_abs_expr(const exprt &expr)
+inline const abs_exprt &to_abs_expr(const exprt &expr)
 {
   assert(expr.id()==ID_abs && expr.operands().size()==1);
   return static_cast<const abs_exprt &>(expr);
@@ -316,7 +317,7 @@ extern inline const abs_exprt &to_abs_expr(const exprt &expr)
 /*! \copydoc to_abs_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline abs_exprt &to_abs_expr(exprt &expr)
+inline abs_exprt &to_abs_expr(exprt &expr)
 {
   assert(expr.id()==ID_abs && expr.operands().size()==1);
   return static_cast<abs_exprt &>(expr);
@@ -327,18 +328,18 @@ extern inline abs_exprt &to_abs_expr(exprt &expr)
 class unary_minus_exprt:public unary_exprt
 {
 public:
-  inline unary_minus_exprt():unary_exprt(ID_unary_minus)
+  unary_minus_exprt():unary_exprt(ID_unary_minus)
   {
   }
 
-  inline unary_minus_exprt(
+  unary_minus_exprt(
     const exprt &_op,
     const typet &_type):
     unary_exprt(ID_unary_minus, _op, _type)
   {
   }
 
-  explicit inline unary_minus_exprt(const exprt &_op):
+  explicit unary_minus_exprt(const exprt &_op):
     unary_exprt(ID_unary_minus, _op, _op.type())
   {
   }
@@ -354,7 +355,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
+inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 {
   assert(expr.id()==ID_unary_minus && expr.operands().size()==1);
   return static_cast<const unary_minus_exprt &>(expr);
@@ -363,7 +364,7 @@ extern inline const unary_minus_exprt &to_unary_minus_expr(const exprt &expr)
 /*! \copydoc to_unary_minus_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
+inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 {
   assert(expr.id()==ID_unary_minus && expr.operands().size()==1);
   return static_cast<unary_minus_exprt &>(expr);
@@ -375,23 +376,23 @@ extern inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
 class predicate_exprt:public exprt
 {
 public:
-  inline predicate_exprt():exprt(irep_idt(), bool_typet())
+  predicate_exprt():exprt(irep_idt(), bool_typet())
   {
   }
 
-  explicit inline predicate_exprt(const irep_idt &_id):
+  explicit predicate_exprt(const irep_idt &_id):
     exprt(_id, bool_typet())
   {
   }
 
-  inline predicate_exprt(
+  predicate_exprt(
     const irep_idt &_id,
     const exprt &_op):exprt(_id, bool_typet())
   {
     copy_to_operands(_op);
   }
 
-  inline predicate_exprt(
+  predicate_exprt(
     const irep_idt &_id,
     const exprt &_op0,
     const exprt &_op1):exprt(_id, bool_typet())
@@ -406,16 +407,16 @@ public:
 class unary_predicate_exprt:public unary_exprt
 {
 public:
-  inline unary_predicate_exprt():unary_exprt(irep_idt(), bool_typet())
+  unary_predicate_exprt():unary_exprt(irep_idt(), bool_typet())
   {
   }
 
-  explicit inline unary_predicate_exprt(const irep_idt &_id):
+  explicit unary_predicate_exprt(const irep_idt &_id):
     unary_exprt(_id, bool_typet())
   {
   }
 
-  inline unary_predicate_exprt(
+  unary_predicate_exprt(
     const irep_idt &_id,
     const exprt &_op):unary_exprt(_id, _op, bool_typet())
   {
@@ -431,11 +432,11 @@ protected:
 class sign_exprt:public unary_predicate_exprt
 {
 public:
-  inline sign_exprt()
+  sign_exprt()
   {
   }
 
-  inline explicit sign_exprt(const exprt &_op):
+  explicit sign_exprt(const exprt &_op):
     unary_predicate_exprt(ID_sign, _op)
   {
   }
@@ -446,24 +447,24 @@ public:
 class binary_exprt:public exprt
 {
 public:
-  inline binary_exprt()
+  binary_exprt()
   {
     operands().resize(2);
   }
 
-  inline explicit binary_exprt(const irep_idt &_id):exprt(_id)
+  explicit binary_exprt(const irep_idt &_id):exprt(_id)
   {
     operands().resize(2);
   }
 
-  inline binary_exprt(
+  binary_exprt(
     const irep_idt &_id,
     const typet &_type):exprt(_id, _type)
   {
     operands().resize(2);
   }
 
-  inline binary_exprt(
+  binary_exprt(
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs):
@@ -472,7 +473,7 @@ public:
     copy_to_operands(_lhs, _rhs);
   }
 
-  inline binary_exprt(
+  binary_exprt(
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs,
@@ -496,7 +497,7 @@ protected:
  *
  * \ingroup gr_std_expr
 */
-extern inline const binary_exprt &to_binary_expr(const exprt &expr)
+inline const binary_exprt &to_binary_expr(const exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<const binary_exprt &>(expr);
@@ -505,7 +506,7 @@ extern inline const binary_exprt &to_binary_expr(const exprt &expr)
 /*! \copydoc to_binary_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline binary_exprt &to_binary_expr(exprt &expr)
+inline binary_exprt &to_binary_expr(exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<binary_exprt &>(expr);
@@ -517,16 +518,16 @@ extern inline binary_exprt &to_binary_expr(exprt &expr)
 class binary_predicate_exprt:public binary_exprt
 {
 public:
-  inline binary_predicate_exprt():binary_exprt(irep_idt(), bool_typet())
+  binary_predicate_exprt():binary_exprt(irep_idt(), bool_typet())
   {
   }
 
-  explicit inline binary_predicate_exprt(const irep_idt &_id):
+  explicit binary_predicate_exprt(const irep_idt &_id):
     binary_exprt(_id, bool_typet())
   {
   }
 
-  inline binary_predicate_exprt(
+  binary_predicate_exprt(
     const exprt &_op0,
     const irep_idt &_id,
     const exprt &_op1):binary_exprt(_op0, _id, _op1, bool_typet())
@@ -539,15 +540,16 @@ public:
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
-  inline binary_relation_exprt()
+  binary_relation_exprt()
   {
   }
 
-  inline explicit binary_relation_exprt(const irep_idt &id):binary_predicate_exprt(id)
+  explicit binary_relation_exprt(const irep_idt &id):
+    binary_predicate_exprt(id)
   {
   }
 
-  inline binary_relation_exprt(
+  binary_relation_exprt(
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs):
@@ -555,22 +557,22 @@ public:
   {
   }
 
-  inline exprt &lhs()
+  exprt &lhs()
   {
     return op0();
   }
 
-  inline const exprt &lhs() const
+  const exprt &lhs() const
   {
     return op0();
   }
 
-  inline exprt &rhs()
+  exprt &rhs()
   {
     return op1();
   }
 
-  inline const exprt &rhs() const
+  const exprt &rhs() const
   {
     return op1();
   }
@@ -586,7 +588,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
+inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<const binary_relation_exprt &>(expr);
@@ -595,7 +597,7 @@ extern inline const binary_relation_exprt &to_binary_relation_expr(const exprt &
 /*! \copydoc to_binary_relation_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
+inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<binary_relation_exprt &>(expr);
@@ -606,18 +608,18 @@ extern inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 class plus_exprt:public binary_exprt
 {
 public:
-  inline plus_exprt():binary_exprt(ID_plus)
+  plus_exprt():binary_exprt(ID_plus)
   {
   }
 
-  inline plus_exprt(
+  plus_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_plus, _rhs)
   {
   }
 
-  inline plus_exprt(
+  plus_exprt(
     const exprt &_lhs,
     const exprt &_rhs,
     const typet &_type):
@@ -636,7 +638,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const plus_exprt &to_plus_expr(const exprt &expr)
+inline const plus_exprt &to_plus_expr(const exprt &expr)
 {
   assert(expr.id()==ID_plus && expr.operands().size()>=2);
   return static_cast<const plus_exprt &>(expr);
@@ -645,7 +647,7 @@ extern inline const plus_exprt &to_plus_expr(const exprt &expr)
 /*! \copydoc to_plus_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline plus_exprt &to_plus_expr(exprt &expr)
+inline plus_exprt &to_plus_expr(exprt &expr)
 {
   assert(expr.id()==ID_plus && expr.operands().size()>=2);
   return static_cast<plus_exprt &>(expr);
@@ -656,11 +658,11 @@ extern inline plus_exprt &to_plus_expr(exprt &expr)
 class minus_exprt:public binary_exprt
 {
 public:
-  inline minus_exprt():binary_exprt(ID_minus)
+  minus_exprt():binary_exprt(ID_minus)
   {
   }
 
-  inline minus_exprt(
+  minus_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_minus, _rhs)
@@ -678,7 +680,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const minus_exprt &to_minus_expr(const exprt &expr)
+inline const minus_exprt &to_minus_expr(const exprt &expr)
 {
   assert(expr.id()==ID_minus && expr.operands().size()>=2);
   return static_cast<const minus_exprt &>(expr);
@@ -687,7 +689,7 @@ extern inline const minus_exprt &to_minus_expr(const exprt &expr)
 /*! \copydoc to_minus_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline minus_exprt &to_minus_expr(exprt &expr)
+inline minus_exprt &to_minus_expr(exprt &expr)
 {
   assert(expr.id()==ID_minus && expr.operands().size()>=2);
   return static_cast<minus_exprt &>(expr);
@@ -698,11 +700,11 @@ extern inline minus_exprt &to_minus_expr(exprt &expr)
 class mult_exprt:public binary_exprt
 {
 public:
-  inline mult_exprt():binary_exprt(ID_mult)
+  mult_exprt():binary_exprt(ID_mult)
   {
   }
 
-  inline mult_exprt(
+  mult_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_mult, _rhs)
@@ -720,7 +722,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const mult_exprt &to_mult_expr(const exprt &expr)
+inline const mult_exprt &to_mult_expr(const exprt &expr)
 {
   assert(expr.id()==ID_mult && expr.operands().size()>=2);
   return static_cast<const mult_exprt &>(expr);
@@ -729,7 +731,7 @@ extern inline const mult_exprt &to_mult_expr(const exprt &expr)
 /*! \copydoc to_mult_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline mult_exprt &to_mult_expr(exprt &expr)
+inline mult_exprt &to_mult_expr(exprt &expr)
 {
   assert(expr.id()==ID_mult && expr.operands().size()>=2);
   return static_cast<mult_exprt &>(expr);
@@ -740,11 +742,11 @@ extern inline mult_exprt &to_mult_expr(exprt &expr)
 class div_exprt:public binary_exprt
 {
 public:
-  inline div_exprt():binary_exprt(ID_div)
+  div_exprt():binary_exprt(ID_div)
   {
   }
 
-  inline div_exprt(
+  div_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_div, _rhs)
@@ -762,7 +764,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const div_exprt &to_div_expr(const exprt &expr)
+inline const div_exprt &to_div_expr(const exprt &expr)
 {
   assert(expr.id()==ID_div && expr.operands().size()==2);
   return static_cast<const div_exprt &>(expr);
@@ -771,7 +773,7 @@ extern inline const div_exprt &to_div_expr(const exprt &expr)
 /*! \copydoc to_div_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline div_exprt &to_div_expr(exprt &expr)
+inline div_exprt &to_div_expr(exprt &expr)
 {
   assert(expr.id()==ID_div && expr.operands().size()==2);
   return static_cast<div_exprt &>(expr);
@@ -782,11 +784,11 @@ extern inline div_exprt &to_div_expr(exprt &expr)
 class mod_exprt:public binary_exprt
 {
 public:
-  inline mod_exprt():binary_exprt(ID_mod)
+  mod_exprt():binary_exprt(ID_mod)
   {
   }
 
-  inline mod_exprt(
+  mod_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_mod, _rhs)
@@ -804,7 +806,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const mod_exprt &to_mod_expr(const exprt &expr)
+inline const mod_exprt &to_mod_expr(const exprt &expr)
 {
   assert(expr.id()==ID_mod && expr.operands().size()==2);
   return static_cast<const mod_exprt &>(expr);
@@ -813,7 +815,7 @@ extern inline const mod_exprt &to_mod_expr(const exprt &expr)
 /*! \copydoc to_mod_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline mod_exprt &to_mod_expr(exprt &expr)
+inline mod_exprt &to_mod_expr(exprt &expr)
 {
   assert(expr.id()==ID_mod && expr.operands().size()==2);
   return static_cast<mod_exprt &>(expr);
@@ -824,11 +826,11 @@ extern inline mod_exprt &to_mod_expr(exprt &expr)
 class rem_exprt:public binary_exprt
 {
 public:
-  inline rem_exprt():binary_exprt(ID_rem)
+  rem_exprt():binary_exprt(ID_rem)
   {
   }
 
-  inline rem_exprt(
+  rem_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
     binary_exprt(_lhs, ID_rem, _rhs)
@@ -846,7 +848,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const rem_exprt &to_rem_expr(const exprt &expr)
+inline const rem_exprt &to_rem_expr(const exprt &expr)
 {
   assert(expr.id()==ID_rem && expr.operands().size()==2);
   return static_cast<const rem_exprt &>(expr);
@@ -855,7 +857,7 @@ extern inline const rem_exprt &to_rem_expr(const exprt &expr)
 /*! \copydoc to_rem_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline rem_exprt &to_rem_expr(exprt &expr)
+inline rem_exprt &to_rem_expr(exprt &expr)
 {
   assert(expr.id()==ID_rem && expr.operands().size()==2);
   return static_cast<rem_exprt &>(expr);
@@ -866,14 +868,14 @@ extern inline rem_exprt &to_rem_expr(exprt &expr)
 class power_exprt:public binary_exprt
 {
  public:
-  inline power_exprt():binary_exprt(ID_power)
+  power_exprt():binary_exprt(ID_power)
   {
   }
 
-  inline power_exprt(
-      const exprt &_base,
-      const exprt &_exp):
-      binary_exprt(_base, ID_power, _exp)
+  power_exprt(
+    const exprt &_base,
+    const exprt &_exp):
+    binary_exprt(_base, ID_power, _exp)
   {
   }
 };
@@ -888,7 +890,7 @@ class power_exprt:public binary_exprt
  *
  * \ingroup gr_std_expr
 */
-extern inline const power_exprt &to_power_expr(const exprt &expr)
+inline const power_exprt &to_power_expr(const exprt &expr)
 {
   assert(expr.id()==ID_power && expr.operands().size()==2);
   return static_cast<const power_exprt &>(expr);
@@ -897,7 +899,7 @@ extern inline const power_exprt &to_power_expr(const exprt &expr)
 /*! \copydoc to_power_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline power_exprt &to_power_expr(exprt &expr)
+inline power_exprt &to_power_expr(exprt &expr)
 {
   assert(expr.id()==ID_power && expr.operands().size()==2);
   return static_cast<power_exprt &>(expr);
@@ -908,14 +910,14 @@ extern inline power_exprt &to_power_expr(exprt &expr)
 class factorial_power_exprt:public binary_exprt
 {
  public:
-  inline factorial_power_exprt():binary_exprt(ID_factorial_power)
+  factorial_power_exprt():binary_exprt(ID_factorial_power)
   {
   }
 
-  inline factorial_power_exprt(
-      const exprt &_base,
-      const exprt &_exp):
-      binary_exprt(_base, ID_factorial_power, _exp)
+  factorial_power_exprt(
+    const exprt &_base,
+    const exprt &_exp):
+    binary_exprt(_base, ID_factorial_power, _exp)
   {
   }
 };
@@ -930,7 +932,7 @@ class factorial_power_exprt:public binary_exprt
  *
  * \ingroup gr_std_expr
 */
-extern inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
+inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
   assert(expr.id()==ID_factorial_power && expr.operands().size()==2);
   return static_cast<const factorial_power_exprt &>(expr);
@@ -939,7 +941,7 @@ extern inline const factorial_power_exprt &to_factorial_power_expr(const exprt &
 /*! \copydoc to_factorial_power_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline factorial_power_exprt &to_factorial_expr(exprt &expr)
+inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 {
   assert(expr.id()==ID_factorial_power && expr.operands().size()==2);
   return static_cast<factorial_power_exprt &>(expr);
@@ -950,11 +952,11 @@ extern inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 class equal_exprt:public binary_relation_exprt
 {
 public:
-  inline equal_exprt():binary_relation_exprt(ID_equal)
+  equal_exprt():binary_relation_exprt(ID_equal)
   {
   }
 
-  inline equal_exprt(const exprt &_lhs, const exprt &_rhs):
+  equal_exprt(const exprt &_lhs, const exprt &_rhs):
     binary_relation_exprt(_lhs, ID_equal, _rhs)
   {
   }
@@ -970,7 +972,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const equal_exprt &to_equal_expr(const exprt &expr)
+inline const equal_exprt &to_equal_expr(const exprt &expr)
 {
   assert(expr.id()==ID_equal && expr.operands().size()==2);
   return static_cast<const equal_exprt &>(expr);
@@ -979,7 +981,7 @@ extern inline const equal_exprt &to_equal_expr(const exprt &expr)
 /*! \copydoc to_equal_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline equal_exprt &to_equal_expr(exprt &expr)
+inline equal_exprt &to_equal_expr(exprt &expr)
 {
   assert(expr.id()==ID_equal && expr.operands().size()==2);
   return static_cast<equal_exprt &>(expr);
@@ -990,11 +992,11 @@ extern inline equal_exprt &to_equal_expr(exprt &expr)
 class notequal_exprt:public binary_relation_exprt
 {
 public:
-  inline notequal_exprt():binary_relation_exprt(ID_notequal)
+  notequal_exprt():binary_relation_exprt(ID_notequal)
   {
   }
 
-  inline notequal_exprt(const exprt &_lhs, const exprt &_rhs):
+  notequal_exprt(const exprt &_lhs, const exprt &_rhs):
     binary_relation_exprt(_lhs, ID_notequal, _rhs)
   {
   }
@@ -1010,7 +1012,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const notequal_exprt &to_notequal_expr(const exprt &expr)
+inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 {
   assert(expr.id()==ID_notequal && expr.operands().size()==2);
   return static_cast<const notequal_exprt &>(expr);
@@ -1019,7 +1021,7 @@ extern inline const notequal_exprt &to_notequal_expr(const exprt &expr)
 /*! \copydoc to_notequal_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline notequal_exprt &to_notequal_expr(exprt &expr)
+inline notequal_exprt &to_notequal_expr(exprt &expr)
 {
   assert(expr.id()==ID_notequal && expr.operands().size()==2);
   return static_cast<notequal_exprt &>(expr);
@@ -1030,23 +1032,23 @@ extern inline notequal_exprt &to_notequal_expr(exprt &expr)
 class index_exprt:public exprt
 {
 public:
-  inline index_exprt():exprt(ID_index)
+  index_exprt():exprt(ID_index)
   {
     operands().resize(2);
   }
 
-  explicit inline index_exprt(const typet &_type):exprt(ID_index, _type)
+  explicit index_exprt(const typet &_type):exprt(ID_index, _type)
   {
     operands().resize(2);
   }
 
-  inline index_exprt(const exprt &_array, const exprt &_index):
+  index_exprt(const exprt &_array, const exprt &_index):
     exprt(ID_index, _array.type().subtype())
   {
     copy_to_operands(_array, _index);
   }
 
-  inline index_exprt(
+  index_exprt(
     const exprt &_array,
     const exprt &_index,
     const typet &_type):
@@ -1055,36 +1057,24 @@ public:
     copy_to_operands(_array, _index);
   }
 
-  inline exprt &array()
+  exprt &array()
   {
     return op0();
   }
 
-  inline const exprt &array() const
+  const exprt &array() const
   {
     return op0();
   }
 
-  inline exprt &index()
+  exprt &index()
   {
     return op1();
   }
 
-  inline const exprt &index() const
+  const exprt &index() const
   {
     return op1();
-  }
-
-  friend inline const index_exprt &to_index_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_index && expr.operands().size()==2);
-    return static_cast<const index_exprt &>(expr);
-  }
-
-  friend inline index_exprt &to_index_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_index && expr.operands().size()==2);
-    return static_cast<index_exprt &>(expr);
   }
 };
 
@@ -1098,47 +1088,44 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const index_exprt &to_index_expr(const exprt &expr);
+inline const index_exprt &to_index_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_index && expr.operands().size()==2);
+  return static_cast<const index_exprt &>(expr);
+}
+
 /*! \copydoc to_index_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-index_exprt &to_index_expr(exprt &expr);
+inline index_exprt &to_index_expr(exprt &expr)
+{
+  assert(expr.id()==ID_index && expr.operands().size()==2);
+  return static_cast<index_exprt &>(expr);
+}
 
 /*! \brief array constructor from single element
 */
 class array_of_exprt:public unary_exprt
 {
 public:
-  inline array_of_exprt():unary_exprt(ID_array_of)
+  array_of_exprt():unary_exprt(ID_array_of)
   {
   }
 
-  explicit inline array_of_exprt(
+  explicit array_of_exprt(
     const exprt &_what, const array_typet &_type):
     unary_exprt(ID_array_of, _what, _type)
   {
   }
 
-  inline exprt &what()
+  exprt &what()
   {
     return op0();
   }
 
-  inline const exprt &what() const
+  const exprt &what() const
   {
     return op0();
-  }
-
-  friend inline const array_of_exprt &to_array_of_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_array_of && expr.operands().size()==1);
-    return static_cast<const array_of_exprt &>(expr);
-  }
-
-  friend inline array_of_exprt &to_array_of_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_array_of && expr.operands().size()==1);
-    return static_cast<array_of_exprt &>(expr);
   }
 };
 
@@ -1152,36 +1139,33 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const array_of_exprt &to_array_of_expr(const exprt &expr);
+inline const array_of_exprt &to_array_of_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_array_of && expr.operands().size()==1);
+  return static_cast<const array_of_exprt &>(expr);
+}
+
 /*! \copydoc to_array_of_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-array_of_exprt &to_array_of_expr(exprt &expr);
+inline array_of_exprt &to_array_of_expr(exprt &expr)
+{
+  assert(expr.id()==ID_array_of && expr.operands().size()==1);
+  return static_cast<array_of_exprt &>(expr);
+}
 
 /*! \brief array constructor from list of elements
 */
 class array_exprt:public exprt
 {
 public:
-  inline array_exprt():exprt(ID_array)
+  array_exprt():exprt(ID_array)
   {
   }
 
-  explicit inline array_exprt(const array_typet &_type):
+  explicit array_exprt(const array_typet &_type):
     exprt(ID_array, _type)
   {
-  }
-
-  friend inline const array_exprt &to_array_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_array);
-    return static_cast<const array_exprt &>(expr);
-  }
-
-  friend inline array_exprt &to_array_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_array);
-    return static_cast<array_exprt &>(expr);
   }
 };
 
@@ -1195,36 +1179,33 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const array_exprt &to_array_expr(const exprt &expr);
+inline const array_exprt &to_array_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_array);
+  return static_cast<const array_exprt &>(expr);
+}
+
 /*! \copydoc to_array_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-array_exprt &to_array_expr(exprt &expr);
+inline array_exprt &to_array_expr(exprt &expr)
+{
+  assert(expr.id()==ID_array);
+  return static_cast<array_exprt &>(expr);
+}
 
 /*! \brief array constructor from list of elements
 */
 class vector_exprt:public exprt
 {
 public:
-  inline vector_exprt():exprt(ID_vector)
+  vector_exprt():exprt(ID_vector)
   {
   }
 
-  explicit inline vector_exprt(const vector_typet &_type):
+  explicit vector_exprt(const vector_typet &_type):
     exprt(ID_vector, _type)
   {
-  }
-
-  friend inline const vector_exprt &to_vector_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_vector);
-    return static_cast<const vector_exprt &>(expr);
-  }
-
-  friend inline vector_exprt &to_vector_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_vector);
-    return static_cast<vector_exprt &>(expr);
   }
 };
 
@@ -1238,27 +1219,36 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const vector_exprt &to_vector_expr(const exprt &expr);
+inline const vector_exprt &to_vector_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_vector);
+  return static_cast<const vector_exprt &>(expr);
+}
+
 /*! \copydoc to_vector_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-vector_exprt &to_vector_expr(exprt &expr);
+inline vector_exprt &to_vector_expr(exprt &expr)
+{
+  assert(expr.id()==ID_vector);
+  return static_cast<vector_exprt &>(expr);
+}
 
 /*! \brief union constructor from single element
 */
 class union_exprt:public unary_exprt
 {
 public:
-  inline union_exprt():unary_exprt(ID_union)
+  union_exprt():unary_exprt(ID_union)
   {
   }
 
-  explicit inline union_exprt(const typet &_type):
+  explicit union_exprt(const typet &_type):
     unary_exprt(ID_union, _type)
   {
   }
 
-  explicit inline union_exprt(
+  explicit union_exprt(
     const irep_idt &_component_name,
     const exprt &_value,
     const typet &_type):
@@ -1267,34 +1257,22 @@ public:
     set_component_name(_component_name);
   }
 
-  friend inline const union_exprt &to_union_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_union && expr.operands().size()==1);
-    return static_cast<const union_exprt &>(expr);
-  }
-
-  friend inline union_exprt &to_union_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_union && expr.operands().size()==1);
-    return static_cast<union_exprt &>(expr);
-  }
-
-  inline irep_idt get_component_name() const
+  irep_idt get_component_name() const
   {
     return get(ID_component_name);
   }
 
-  inline void set_component_name(const irep_idt &component_name)
+  void set_component_name(const irep_idt &component_name)
   {
     set(ID_component_name, component_name);
   }
 
-  inline std::size_t get_component_number() const
+  std::size_t get_component_number() const
   {
     return get_size_t(ID_component_number);
   }
 
-  inline void set_component_number(std::size_t component_number)
+  void set_component_number(std::size_t component_number)
   {
     set(ID_component_number, component_number);
   }
@@ -1310,36 +1288,33 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const union_exprt &to_union_expr(const exprt &expr);
+inline const union_exprt &to_union_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_union && expr.operands().size()==1);
+  return static_cast<const union_exprt &>(expr);
+}
+
 /*! \copydoc to_union_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-union_exprt &to_union_expr(exprt &expr);
+inline union_exprt &to_union_expr(exprt &expr)
+{
+  assert(expr.id()==ID_union && expr.operands().size()==1);
+  return static_cast<union_exprt &>(expr);
+}
 
 /*! \brief struct constructor from list of elements
 */
 class struct_exprt:public exprt
 {
 public:
-  inline struct_exprt():exprt(ID_struct)
+  struct_exprt():exprt(ID_struct)
   {
   }
 
-  explicit inline struct_exprt(const typet &_type):
+  explicit struct_exprt(const typet &_type):
     exprt(ID_struct, _type)
   {
-  }
-
-  friend inline const struct_exprt &to_struct_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_struct);
-    return static_cast<const struct_exprt &>(expr);
-  }
-
-  friend inline struct_exprt &to_struct_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_struct);
-    return static_cast<struct_exprt &>(expr);
   }
 };
 
@@ -1353,48 +1328,57 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const struct_exprt &to_struct_expr(const exprt &expr);
+inline const struct_exprt &to_struct_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_struct);
+  return static_cast<const struct_exprt &>(expr);
+}
+
 /*! \copydoc to_struct_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-struct_exprt &to_struct_expr(exprt &expr);
+inline struct_exprt &to_struct_expr(exprt &expr)
+{
+  assert(expr.id()==ID_struct);
+  return static_cast<struct_exprt &>(expr);
+}
 
 /*! \brief complex constructor from a pair of numbers
 */
 class complex_exprt:public binary_exprt
 {
 public:
-  inline complex_exprt():binary_exprt(ID_complex)
+  complex_exprt():binary_exprt(ID_complex)
   {
   }
 
-  explicit inline complex_exprt(const complex_typet &_type):
+  explicit complex_exprt(const complex_typet &_type):
     binary_exprt(ID_complex, _type)
   {
   }
 
-  explicit inline complex_exprt(
+  explicit complex_exprt(
     const exprt &_real, const exprt &_imag, const complex_typet &_type):
     binary_exprt(_real, ID_complex, _imag, _type)
   {
   }
 
-  inline exprt real()
+  exprt real()
   {
     return op0();
   }
 
-  inline const exprt &real() const
+  const exprt &real() const
   {
     return op0();
   }
 
-  inline exprt imag()
+  exprt imag()
   {
     return op1();
   }
 
-  inline const exprt &imag() const
+  const exprt &imag() const
   {
     return op1();
   }
@@ -1410,7 +1394,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-static inline const complex_exprt &to_complex_expr(const exprt &expr)
+inline const complex_exprt &to_complex_expr(const exprt &expr)
 {
   assert(expr.id()==ID_complex && expr.operands().size()==2);
   return static_cast<const complex_exprt &>(expr);
@@ -1419,7 +1403,7 @@ static inline const complex_exprt &to_complex_expr(const exprt &expr)
 /*! \copydoc to_complex_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-static inline complex_exprt &to_complex_expr(exprt &expr)
+inline complex_exprt &to_complex_expr(exprt &expr)
 {
   assert(expr.id()==ID_complex && expr.operands().size()==2);
   return static_cast<complex_exprt &>(expr);
@@ -1432,7 +1416,7 @@ class namespacet;
 class object_descriptor_exprt:public exprt
 {
 public:
-  inline object_descriptor_exprt():exprt(ID_object_descriptor)
+  object_descriptor_exprt():exprt(ID_object_descriptor)
   {
     operands().resize(2);
     op0().id(ID_unknown);
@@ -1441,12 +1425,12 @@ public:
 
   void build(const exprt &expr, const namespacet &ns);
 
-  inline exprt &object()
+  exprt &object()
   {
     return op0();
   }
 
-  inline const exprt &object() const
+  const exprt &object() const
   {
     return op0();
   }
@@ -1464,26 +1448,14 @@ public:
     return *p;
   }
 
-  inline exprt &offset()
+  exprt &offset()
   {
     return op1();
   }
 
-  inline const exprt &offset() const
+  const exprt &offset() const
   {
     return op1();
-  }
-
-  friend inline const object_descriptor_exprt &to_object_descriptor_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
-    return static_cast<const object_descriptor_exprt &>(expr);
-  }
-
-  friend inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
-    return static_cast<object_descriptor_exprt &>(expr);
   }
 };
 
@@ -1497,61 +1469,60 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const object_descriptor_exprt &to_object_descriptor_expr(const exprt &expr);
+inline const object_descriptor_exprt &to_object_descriptor_expr(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
+  return static_cast<const object_descriptor_exprt &>(expr);
+}
+
 /*! \copydoc to_object_descriptor_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-object_descriptor_exprt &to_object_descriptor_expr(exprt &expr);
+inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
+{
+  assert(expr.id()==ID_object_descriptor && expr.operands().size()==2);
+  return static_cast<object_descriptor_exprt &>(expr);
+}
 
 /*! \brief TO_BE_DOCUMENTED
 */
 class dynamic_object_exprt:public exprt
 {
 public:
-  inline dynamic_object_exprt():exprt(ID_dynamic_object)
+  dynamic_object_exprt():exprt(ID_dynamic_object)
   {
     operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
 
-  inline explicit dynamic_object_exprt(const typet &type):exprt(ID_dynamic_object, type)
+  explicit dynamic_object_exprt(const typet &type):
+    exprt(ID_dynamic_object, type)
   {
     operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
 
-  inline exprt &instance()
+  exprt &instance()
   {
     return op0();
   }
 
-  inline const exprt &instance() const
+  const exprt &instance() const
   {
     return op0();
   }
 
-  inline exprt &valid()
+  exprt &valid()
   {
     return op1();
   }
 
-  inline const exprt &valid() const
+  const exprt &valid() const
   {
     return op1();
-  }
-
-  friend inline const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr)
-  {
-    assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
-    return static_cast<const dynamic_object_exprt &>(expr);
-  }
-
-  friend inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
-  {
-    assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
-    return static_cast<dynamic_object_exprt &>(expr);
   }
 };
 
@@ -1565,33 +1536,44 @@ public:
  *
  * \ingroup gr_std_expr
 */
-const dynamic_object_exprt &to_dynamic_object_expr(const exprt &expr);
+inline const dynamic_object_exprt &to_dynamic_object_expr(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
+  return static_cast<const dynamic_object_exprt &>(expr);
+}
+
 /*! \copydoc to_dynamic_object_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-dynamic_object_exprt &to_dynamic_object_expr(exprt &expr);
+inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
+{
+  assert(expr.id()==ID_dynamic_object && expr.operands().size()==2);
+  return static_cast<dynamic_object_exprt &>(expr);
+}
 
 /*! \brief semantic type conversion
 */
 class typecast_exprt:public exprt
 {
 public:
-  inline explicit typecast_exprt(const typet &_type):exprt(ID_typecast, _type)
+  explicit typecast_exprt(const typet &_type):exprt(ID_typecast, _type)
   {
     operands().resize(1);
   }
 
-  inline typecast_exprt(const exprt &op, const typet &_type):exprt(ID_typecast, _type)
+  typecast_exprt(const exprt &op, const typet &_type):
+    exprt(ID_typecast, _type)
   {
     copy_to_operands(op);
   }
 
-  inline exprt &op()
+  exprt &op()
   {
     return op0();
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op0();
   }
@@ -1607,7 +1589,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const typecast_exprt &to_typecast_expr(const exprt &expr)
+inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 {
   assert(expr.id()==ID_typecast && expr.operands().size()==1);
   return static_cast<const typecast_exprt &>(expr);
@@ -1616,7 +1598,7 @@ extern inline const typecast_exprt &to_typecast_expr(const exprt &expr)
 /*! \copydoc to_typecast_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline typecast_exprt &to_typecast_expr(exprt &expr)
+inline typecast_exprt &to_typecast_expr(exprt &expr)
 {
   assert(expr.id()==ID_typecast && expr.operands().size()==1);
   return static_cast<typecast_exprt &>(expr);
@@ -1627,11 +1609,11 @@ extern inline typecast_exprt &to_typecast_expr(exprt &expr)
 class floatbv_typecast_exprt:public binary_exprt
 {
 public:
-  inline floatbv_typecast_exprt():binary_exprt(ID_floatbv_typecast)
+  floatbv_typecast_exprt():binary_exprt(ID_floatbv_typecast)
   {
   }
 
-  inline floatbv_typecast_exprt(
+  floatbv_typecast_exprt(
     const exprt &op,
     const exprt &rounding,
     const typet &_type):binary_exprt(ID_floatbv_typecast, _type)
@@ -1639,22 +1621,22 @@ public:
     copy_to_operands(op, rounding);
   }
 
-  inline exprt &op()
+  exprt &op()
   {
     return op0();
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op0();
   }
 
-  inline exprt &rounding_mode()
+  exprt &rounding_mode()
   {
     return op1();
   }
 
-  inline const exprt &rounding_mode() const
+  const exprt &rounding_mode() const
   {
     return op1();
   }
@@ -1670,7 +1652,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
+inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt &expr)
 {
   assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
   return static_cast<const floatbv_typecast_exprt &>(expr);
@@ -1679,7 +1661,7 @@ extern inline const floatbv_typecast_exprt &to_floatbv_typecast_expr(const exprt
 /*! \copydoc to_floatbv_typecast_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
+inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 {
   assert(expr.id()==ID_floatbv_typecast && expr.operands().size()==2);
   return static_cast<floatbv_typecast_exprt &>(expr);
@@ -1690,21 +1672,28 @@ extern inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 class and_exprt:public exprt
 {
 public:
-  inline and_exprt():exprt(ID_and, bool_typet())
+  and_exprt():exprt(ID_and, bool_typet())
   {
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1):exprt(ID_and, bool_typet())
+  and_exprt(const exprt &op0, const exprt &op1):
+    exprt(ID_and, bool_typet())
   {
     copy_to_operands(op0, op1);
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_and, bool_typet())
+  and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
+    exprt(ID_and, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
 
-  inline and_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_and, bool_typet())
+  and_exprt(
+    const exprt &op0,
+    const exprt &op1,
+    const exprt &op2,
+    const exprt &op3):
+    exprt(ID_and, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
@@ -1732,7 +1721,7 @@ exprt conjunction(const exprt::operandst &);
  *
  * \ingroup gr_std_expr
 */
-extern inline const and_exprt &to_and_expr(const exprt &expr)
+inline const and_exprt &to_and_expr(const exprt &expr)
 {
   assert(expr.id()==ID_and);
   return static_cast<const and_exprt &>(expr);
@@ -1741,7 +1730,7 @@ extern inline const and_exprt &to_and_expr(const exprt &expr)
 /*! \copydoc to_and_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline and_exprt &to_and_expr(exprt &expr)
+inline and_exprt &to_and_expr(exprt &expr)
 {
   assert(expr.id()==ID_and);
   return static_cast<and_exprt &>(expr);
@@ -1752,11 +1741,11 @@ extern inline and_exprt &to_and_expr(exprt &expr)
 class implies_exprt:public binary_exprt
 {
 public:
-  inline implies_exprt():binary_exprt(ID_implies, bool_typet())
+  implies_exprt():binary_exprt(ID_implies, bool_typet())
   {
   }
 
-  inline implies_exprt(const exprt &op0, const exprt &op1):
+  implies_exprt(const exprt &op0, const exprt &op1):
     binary_exprt(op0, ID_implies, op1, bool_typet())
   {
   }
@@ -1772,7 +1761,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const implies_exprt &to_implies_expr(const exprt &expr)
+inline const implies_exprt &to_implies_expr(const exprt &expr)
 {
   assert(expr.id()==ID_implies && expr.operands().size()==2);
   return static_cast<const implies_exprt &>(expr);
@@ -1781,7 +1770,7 @@ extern inline const implies_exprt &to_implies_expr(const exprt &expr)
 /*! \copydoc to_implies_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline implies_exprt &to_implies_expr(exprt &expr)
+inline implies_exprt &to_implies_expr(exprt &expr)
 {
   assert(expr.id()==ID_implies && expr.operands().size()==2);
   return static_cast<implies_exprt &>(expr);
@@ -1792,21 +1781,27 @@ extern inline implies_exprt &to_implies_expr(exprt &expr)
 class or_exprt:public exprt
 {
 public:
-  inline or_exprt():exprt(ID_or, bool_typet())
+  or_exprt():exprt(ID_or, bool_typet())
   {
   }
 
-  inline or_exprt(const exprt &op0, const exprt &op1):exprt(ID_or, bool_typet())
+  or_exprt(const exprt &op0, const exprt &op1):exprt(ID_or, bool_typet())
   {
     copy_to_operands(op0, op1);
   }
 
-  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):exprt(ID_or, bool_typet())
+  or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
+    exprt(ID_or, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
 
-  inline or_exprt(const exprt &op0, const exprt &op1, const exprt &op2, const exprt &op3):exprt(ID_or, bool_typet())
+  or_exprt(
+    const exprt &op0,
+    const exprt &op1,
+    const exprt &op2,
+    const exprt &op3):
+    exprt(ID_or, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
@@ -1834,7 +1829,7 @@ exprt disjunction(const exprt::operandst &);
  *
  * \ingroup gr_std_expr
 */
-extern inline const or_exprt &to_or_expr(const exprt &expr)
+inline const or_exprt &to_or_expr(const exprt &expr)
 {
   assert(expr.id()==ID_or);
   return static_cast<const or_exprt &>(expr);
@@ -1843,7 +1838,7 @@ extern inline const or_exprt &to_or_expr(const exprt &expr)
 /*! \copydoc to_or_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline or_exprt &to_or_expr(exprt &expr)
+inline or_exprt &to_or_expr(exprt &expr)
 {
   assert(expr.id()==ID_or);
   return static_cast<or_exprt &>(expr);
@@ -1854,11 +1849,11 @@ extern inline or_exprt &to_or_expr(exprt &expr)
 class bitnot_exprt:public unary_exprt
 {
 public:
-  inline bitnot_exprt():unary_exprt(ID_bitnot)
+  bitnot_exprt():unary_exprt(ID_bitnot)
   {
   }
 
-  explicit inline bitnot_exprt(const exprt &op):
+  explicit bitnot_exprt(const exprt &op):
     unary_exprt(ID_bitnot, op)
   {
   }
@@ -1869,11 +1864,11 @@ public:
 class bitor_exprt:public exprt
 {
 public:
-  inline bitor_exprt():exprt(ID_bitor)
+  bitor_exprt():exprt(ID_bitor)
   {
   }
 
-  inline bitor_exprt(const exprt &_op0, const exprt &_op1):
+  bitor_exprt(const exprt &_op0, const exprt &_op1):
     exprt(ID_bitor, _op0.type())
   {
     copy_to_operands(_op0, _op1);
@@ -1890,7 +1885,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const bitor_exprt &to_bitor_expr(const exprt &expr)
+inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 {
   assert(expr.id()==ID_bitor);
   return static_cast<const bitor_exprt &>(expr);
@@ -1899,7 +1894,7 @@ extern inline const bitor_exprt &to_bitor_expr(const exprt &expr)
 /*! \copydoc to_bitor_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline bitor_exprt &to_bitor_expr(exprt &expr)
+inline bitor_exprt &to_bitor_expr(exprt &expr)
 {
   assert(expr.id()==ID_bitor);
   return static_cast<bitor_exprt &>(expr);
@@ -1910,11 +1905,11 @@ extern inline bitor_exprt &to_bitor_expr(exprt &expr)
 class bitxor_exprt:public exprt
 {
 public:
-  inline bitxor_exprt():exprt(ID_bitxor)
+  bitxor_exprt():exprt(ID_bitxor)
   {
   }
 
-  inline bitxor_exprt(const exprt &_op0, const exprt &_op1):
+  bitxor_exprt(const exprt &_op0, const exprt &_op1):
     exprt(ID_bitxor, _op0.type())
   {
     copy_to_operands(_op0, _op1);
@@ -1931,7 +1926,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
+inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 {
   assert(expr.id()==ID_bitxor);
   return static_cast<const bitxor_exprt &>(expr);
@@ -1940,7 +1935,7 @@ extern inline const bitxor_exprt &to_bitxor_expr(const exprt &expr)
 /*! \copydoc to_bitxor_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline bitxor_exprt &to_bitxor_expr(exprt &expr)
+inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 {
   assert(expr.id()==ID_bitxor);
   return static_cast<bitxor_exprt &>(expr);
@@ -1951,11 +1946,11 @@ extern inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 class bitand_exprt:public exprt
 {
 public:
-  inline bitand_exprt():exprt(ID_bitand)
+  bitand_exprt():exprt(ID_bitand)
   {
   }
 
-  inline bitand_exprt(const exprt &_op0, const exprt &_op1):
+  bitand_exprt(const exprt &_op0, const exprt &_op1):
     exprt(ID_bitand, _op0.type())
   {
     copy_to_operands(_op0, _op1);
@@ -1972,7 +1967,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const bitand_exprt &to_bitand_expr(const exprt &expr)
+inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 {
   assert(expr.id()==ID_bitand);
   return static_cast<const bitand_exprt &>(expr);
@@ -1981,7 +1976,7 @@ extern inline const bitand_exprt &to_bitand_expr(const exprt &expr)
 /*! \copydoc to_bitand_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline bitand_exprt &to_bitand_expr(exprt &expr)
+inline bitand_exprt &to_bitand_expr(exprt &expr)
 {
   assert(expr.id()==ID_bitand);
   return static_cast<bitand_exprt &>(expr);
@@ -1992,37 +1987,41 @@ extern inline bitand_exprt &to_bitand_expr(exprt &expr)
 class shift_exprt:public binary_exprt
 {
 public:
-  explicit inline shift_exprt(const irep_idt &_id):binary_exprt(_id)
+  explicit shift_exprt(const irep_idt &_id):binary_exprt(_id)
   {
   }
 
-  inline shift_exprt(const irep_idt &_id, const typet &_type):binary_exprt(_id, _type)
+  shift_exprt(const irep_idt &_id, const typet &_type):
+    binary_exprt(_id, _type)
   {
   }
 
-  inline shift_exprt(const exprt &_src, const irep_idt &_id, const exprt &_distance):
+  shift_exprt(const exprt &_src, const irep_idt &_id, const exprt &_distance):
     binary_exprt(_src, _id, _distance)
   {
   }
 
-  shift_exprt(const exprt &_src, const irep_idt &_id, const std::size_t _distance);
+  shift_exprt(
+    const exprt &_src,
+    const irep_idt &_id,
+    const std::size_t _distance);
 
-  inline exprt &op()
+  exprt &op()
   {
     return op0();
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op0();
   }
 
-  inline exprt &distance()
+  exprt &distance()
   {
     return op1();
   }
 
-  inline const exprt &distance() const
+  const exprt &distance() const
   {
     return op1();
   }
@@ -2038,7 +2037,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const shift_exprt &to_shift_expr(const exprt &expr)
+inline const shift_exprt &to_shift_expr(const exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<const shift_exprt &>(expr);
@@ -2047,7 +2046,7 @@ extern inline const shift_exprt &to_shift_expr(const exprt &expr)
 /*! \copydoc to_shift_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline shift_exprt &to_shift_expr(exprt &expr)
+inline shift_exprt &to_shift_expr(exprt &expr)
 {
   assert(expr.operands().size()==2);
   return static_cast<shift_exprt &>(expr);
@@ -2058,15 +2057,17 @@ extern inline shift_exprt &to_shift_expr(exprt &expr)
 class shl_exprt:public shift_exprt
 {
 public:
-  inline shl_exprt():shift_exprt(ID_shl)
+  shl_exprt():shift_exprt(ID_shl)
   {
   }
 
-  inline shl_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_shl, _distance)
+  shl_exprt(const exprt &_src, const exprt &_distance):
+    shift_exprt(_src, ID_shl, _distance)
   {
   }
 
-  shl_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_shl, _distance)
+  shl_exprt(const exprt &_src, const std::size_t _distance):
+    shift_exprt(_src, ID_shl, _distance)
   {
   }
 };
@@ -2076,15 +2077,17 @@ public:
 class ashr_exprt:public shift_exprt
 {
 public:
-  inline ashr_exprt():shift_exprt(ID_ashr)
+  ashr_exprt():shift_exprt(ID_ashr)
   {
   }
 
-  inline ashr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_ashr, _distance)
+  ashr_exprt(const exprt &_src, const exprt &_distance):
+    shift_exprt(_src, ID_ashr, _distance)
   {
   }
 
-  inline ashr_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_ashr, _distance)
+  ashr_exprt(const exprt &_src, const std::size_t _distance):
+    shift_exprt(_src, ID_ashr, _distance)
   {
   }
 };
@@ -2094,15 +2097,17 @@ public:
 class lshr_exprt:public shift_exprt
 {
 public:
-  inline lshr_exprt():shift_exprt(ID_lshr)
+  lshr_exprt():shift_exprt(ID_lshr)
   {
   }
 
-  inline lshr_exprt(const exprt &_src, const exprt &_distance):shift_exprt(_src, ID_lshr, _distance)
+  lshr_exprt(const exprt &_src, const exprt &_distance):
+    shift_exprt(_src, ID_lshr, _distance)
   {
   }
 
-  inline lshr_exprt(const exprt &_src, const std::size_t _distance):shift_exprt(_src, ID_lshr, _distance)
+  lshr_exprt(const exprt &_src, const std::size_t _distance):
+    shift_exprt(_src, ID_lshr, _distance)
   {
   }
 };
@@ -2112,37 +2117,38 @@ public:
 class replication_exprt:public binary_exprt
 {
 public:
-  inline replication_exprt():binary_exprt(ID_replication)
+  replication_exprt():binary_exprt(ID_replication)
   {
   }
 
-  explicit inline replication_exprt(const typet &_type):binary_exprt(ID_replication, _type)
+  explicit replication_exprt(const typet &_type):
+    binary_exprt(ID_replication, _type)
   {
   }
 
-  inline replication_exprt(const exprt &_times, const exprt &_src):
+  replication_exprt(const exprt &_times, const exprt &_src):
     binary_exprt(_times, ID_replication, _src)
   {
   }
 
   replication_exprt(const unsigned _times, const exprt &_src);
 
-  inline exprt &times()
+  exprt &times()
   {
     return op0();
   }
 
-  inline const exprt &times() const
+  const exprt &times() const
   {
     return op0();
   }
 
-  inline exprt &op()
+  exprt &op()
   {
     return op1();
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op1();
   }
@@ -2158,7 +2164,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const replication_exprt &to_replication_expr(const exprt &expr)
+inline const replication_exprt &to_replication_expr(const exprt &expr)
 {
   assert(expr.id()==ID_replication && expr.operands().size()==2);
   return static_cast<const replication_exprt &>(expr);
@@ -2167,7 +2173,7 @@ extern inline const replication_exprt &to_replication_expr(const exprt &expr)
 /*! \copydoc to_replication_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline replication_exprt &to_replication_expr(exprt &expr)
+inline replication_exprt &to_replication_expr(exprt &expr)
 {
   assert(expr.id()==ID_replication && expr.operands().size()==2);
   return static_cast<replication_exprt &>(expr);
@@ -2178,11 +2184,11 @@ extern inline replication_exprt &to_replication_expr(exprt &expr)
 class extractbit_exprt:public binary_predicate_exprt
 {
 public:
-  inline extractbit_exprt():binary_predicate_exprt(ID_extractbit)
+  extractbit_exprt():binary_predicate_exprt(ID_extractbit)
   {
   }
 
-  inline extractbit_exprt(
+  extractbit_exprt(
     const exprt &_src,
     const exprt &_index):binary_predicate_exprt(_src, ID_extractbit, _index)
   {
@@ -2223,7 +2229,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
+inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 {
   assert(expr.id()==ID_extractbit && expr.operands().size()==2);
   return static_cast<const extractbit_exprt &>(expr);
@@ -2232,7 +2238,7 @@ extern inline const extractbit_exprt &to_extractbit_expr(const exprt &expr)
 /*! \copydoc to_extractbit_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline extractbit_exprt &to_extractbit_expr(exprt &expr)
+inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 {
   assert(expr.id()==ID_extractbit && expr.operands().size()==2);
   return static_cast<extractbit_exprt &>(expr);
@@ -2243,13 +2249,13 @@ extern inline extractbit_exprt &to_extractbit_expr(exprt &expr)
 class extractbits_exprt:public exprt
 {
 public:
-  inline extractbits_exprt():exprt(ID_extractbits)
+  extractbits_exprt():exprt(ID_extractbits)
   {
     operands().resize(3);
   }
 
   // the ordering upper-lower matches the SMT-LIB
-  inline extractbits_exprt(
+  extractbits_exprt(
     const exprt &_src,
     const exprt &_upper,
     const exprt &_lower,
@@ -2293,7 +2299,6 @@ public:
   {
     return op2();
   }
-
 };
 
 /*! \brief Cast a generic exprt to an \ref extractbits_exprt
@@ -2306,7 +2311,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
+inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 {
   assert(expr.id()==ID_extractbits && expr.operands().size()==3);
   return static_cast<const extractbits_exprt &>(expr);
@@ -2315,7 +2320,7 @@ extern inline const extractbits_exprt &to_extractbits_expr(const exprt &expr)
 /*! \copydoc to_extractbits_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline extractbits_exprt &to_extractbits_expr(exprt &expr)
+inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 {
   assert(expr.id()==ID_extractbits && expr.operands().size()==3);
   return static_cast<extractbits_exprt &>(expr);
@@ -2332,18 +2337,18 @@ public:
     copy_to_operands(op);
   }
 
-  explicit address_of_exprt():
+  address_of_exprt():
     exprt(ID_address_of, pointer_typet())
   {
     operands().resize(1);
   }
 
-  inline exprt &object()
+  exprt &object()
   {
     return op0();
   }
 
-  inline const exprt &object() const
+  const exprt &object() const
   {
     return op0();
   }
@@ -2359,7 +2364,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const address_of_exprt &to_address_of_expr(const exprt &expr)
+inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 {
   assert(expr.id()==ID_address_of && expr.operands().size()==1);
   return static_cast<const address_of_exprt &>(expr);
@@ -2368,7 +2373,7 @@ extern inline const address_of_exprt &to_address_of_expr(const exprt &expr)
 /*! \copydoc to_address_of_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline address_of_exprt &to_address_of_expr(exprt &expr)
+inline address_of_exprt &to_address_of_expr(exprt &expr)
 {
   assert(expr.id()==ID_address_of && expr.operands().size()==1);
   return static_cast<address_of_exprt &>(expr);
@@ -2379,22 +2384,22 @@ extern inline address_of_exprt &to_address_of_expr(exprt &expr)
 class not_exprt:public exprt
 {
 public:
-  inline explicit not_exprt(const exprt &op):exprt(ID_not, bool_typet())
+  explicit not_exprt(const exprt &op):exprt(ID_not, bool_typet())
   {
     copy_to_operands(op);
   }
 
-  inline not_exprt():exprt(ID_not, bool_typet())
+  not_exprt():exprt(ID_not, bool_typet())
   {
     operands().resize(1);
   }
 
-  inline exprt &op()
+  exprt &op()
   {
     return op0();
   }
 
-  inline const exprt &op() const
+  const exprt &op() const
   {
     return op0();
   }
@@ -2410,7 +2415,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const not_exprt &to_not_expr(const exprt &expr)
+inline const not_exprt &to_not_expr(const exprt &expr)
 {
   assert(expr.id()==ID_not && expr.operands().size()==1);
   return static_cast<const not_exprt &>(expr);
@@ -2419,7 +2424,7 @@ extern inline const not_exprt &to_not_expr(const exprt &expr)
 /*! \copydoc to_not_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline not_exprt &to_not_expr(exprt &expr)
+inline not_exprt &to_not_expr(exprt &expr)
 {
   assert(expr.id()==ID_not && expr.operands().size()==1);
   return static_cast<not_exprt &>(expr);
@@ -2430,32 +2435,35 @@ extern inline not_exprt &to_not_expr(exprt &expr)
 class dereference_exprt:public exprt
 {
 public:
-  inline explicit dereference_exprt(const typet &type):exprt(ID_dereference, type)
+  explicit dereference_exprt(const typet &type):
+    exprt(ID_dereference, type)
   {
     operands().resize(1);
   }
 
-  inline explicit dereference_exprt(const exprt &op):exprt(ID_dereference)
+  explicit dereference_exprt(const exprt &op):
+    exprt(ID_dereference)
   {
     copy_to_operands(op);
   }
 
-  inline dereference_exprt(const exprt &op, const typet &type):exprt(ID_dereference, type)
+  dereference_exprt(const exprt &op, const typet &type):
+    exprt(ID_dereference, type)
   {
     copy_to_operands(op);
   }
 
-  inline dereference_exprt():exprt(ID_dereference)
+  dereference_exprt():exprt(ID_dereference)
   {
     operands().resize(1);
   }
 
-  inline exprt &pointer()
+  exprt &pointer()
   {
     return op0();
   }
 
-  inline const exprt &pointer() const
+  const exprt &pointer() const
   {
     return op0();
   }
@@ -2471,7 +2479,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const dereference_exprt &to_dereference_expr(const exprt &expr)
+inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 {
   assert(expr.id()==ID_dereference && expr.operands().size()==1);
   return static_cast<const dereference_exprt &>(expr);
@@ -2480,7 +2488,7 @@ extern inline const dereference_exprt &to_dereference_expr(const exprt &expr)
 /*! \copydoc to_dereference_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline dereference_exprt &to_dereference_expr(exprt &expr)
+inline dereference_exprt &to_dereference_expr(exprt &expr)
 {
   assert(expr.id()==ID_dereference && expr.operands().size()==1);
   return static_cast<dereference_exprt &>(expr);
@@ -2491,49 +2499,53 @@ extern inline dereference_exprt &to_dereference_expr(exprt &expr)
 class if_exprt:public exprt
 {
 public:
-  inline if_exprt(const exprt &cond, const exprt &t, const exprt &f):
+  if_exprt(const exprt &cond, const exprt &t, const exprt &f):
     exprt(ID_if, t.type())
   {
     copy_to_operands(cond, t, f);
   }
 
-  inline if_exprt(const exprt &cond, const exprt &t, const exprt &f, const typet &type):
+  if_exprt(
+    const exprt &cond,
+    const exprt &t,
+    const exprt &f,
+    const typet &type):
     exprt(ID_if, type)
   {
     copy_to_operands(cond, t, f);
   }
 
-  inline if_exprt():exprt(ID_if)
+  if_exprt():exprt(ID_if)
   {
     operands().resize(3);
   }
 
-  inline exprt &cond()
+  exprt &cond()
   {
     return op0();
   }
 
-  inline const exprt &cond() const
+  const exprt &cond() const
   {
     return op0();
   }
 
-  inline exprt &true_case()
+  exprt &true_case()
   {
     return op1();
   }
 
-  inline const exprt &true_case() const
+  const exprt &true_case() const
   {
     return op1();
   }
 
-  inline exprt &false_case()
+  exprt &false_case()
   {
     return op2();
   }
 
-  inline const exprt &false_case() const
+  const exprt &false_case() const
   {
     return op2();
   }
@@ -2549,7 +2561,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const if_exprt &to_if_expr(const exprt &expr)
+inline const if_exprt &to_if_expr(const exprt &expr)
 {
   assert(expr.id()==ID_if && expr.operands().size()==3);
   return static_cast<const if_exprt &>(expr);
@@ -2558,7 +2570,7 @@ extern inline const if_exprt &to_if_expr(const exprt &expr)
 /*! \copydoc to_if_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline if_exprt &to_if_expr(exprt &expr)
+inline if_exprt &to_if_expr(exprt &expr)
 {
   assert(expr.id()==ID_if && expr.operands().size()==3);
   return static_cast<if_exprt &>(expr);
@@ -2580,37 +2592,37 @@ public:
     copy_to_operands(_old, _where, _new_value);
   }
 
-  inline with_exprt():exprt(ID_with)
+  with_exprt():exprt(ID_with)
   {
     operands().resize(3);
   }
 
-  inline exprt &old()
+  exprt &old()
   {
     return op0();
   }
 
-  inline const exprt &old() const
+  const exprt &old() const
   {
     return op0();
   }
 
-  inline exprt &where()
+  exprt &where()
   {
     return op1();
   }
 
-  inline const exprt &where() const
+  const exprt &where() const
   {
     return op1();
   }
 
-  inline exprt &new_value()
+  exprt &new_value()
   {
     return op2();
   }
 
-  inline const exprt &new_value() const
+  const exprt &new_value() const
   {
     return op2();
   }
@@ -2626,7 +2638,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const with_exprt &to_with_expr(const exprt &expr)
+inline const with_exprt &to_with_expr(const exprt &expr)
 {
   assert(expr.id()==ID_with && expr.operands().size()==3);
   return static_cast<const with_exprt &>(expr);
@@ -2635,7 +2647,7 @@ extern inline const with_exprt &to_with_expr(const exprt &expr)
 /*! \copydoc to_with_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline with_exprt &to_with_expr(exprt &expr)
+inline with_exprt &to_with_expr(exprt &expr)
 {
   assert(expr.id()==ID_with && expr.operands().size()==3);
   return static_cast<with_exprt &>(expr);
@@ -2644,18 +2656,18 @@ extern inline with_exprt &to_with_expr(exprt &expr)
 class index_designatort:public exprt
 {
 public:
-  inline explicit index_designatort(const exprt &_index):
+  explicit index_designatort(const exprt &_index):
     exprt(ID_index_designator)
   {
     copy_to_operands(_index);
   }
 
-  inline const exprt &index() const
+  const exprt &index() const
   {
     return op0();
   }
 
-  inline exprt &index()
+  exprt &index()
   {
     return op0();
   }
@@ -2671,7 +2683,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const index_designatort &to_index_designator(const exprt &expr)
+inline const index_designatort &to_index_designator(const exprt &expr)
 {
   assert(expr.id()==ID_index_designator && expr.operands().size()==1);
   return static_cast<const index_designatort &>(expr);
@@ -2680,7 +2692,7 @@ extern inline const index_designatort &to_index_designator(const exprt &expr)
 /*! \copydoc to_index_designator(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline index_designatort &to_index_designator(exprt &expr)
+inline index_designatort &to_index_designator(exprt &expr)
 {
   assert(expr.id()==ID_index_designator && expr.operands().size()==1);
   return static_cast<index_designatort &>(expr);
@@ -2689,7 +2701,7 @@ extern inline index_designatort &to_index_designator(exprt &expr)
 class member_designatort:public exprt
 {
 public:
-  inline explicit member_designatort(const irep_idt &_component_name):
+  explicit member_designatort(const irep_idt &_component_name):
     exprt(ID_member_designator)
   {
     set(ID_component_name, _component_name);
@@ -2711,7 +2723,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const member_designatort &to_member_designator(const exprt &expr)
+inline const member_designatort &to_member_designator(const exprt &expr)
 {
   assert(expr.id()==ID_member_designator && expr.operands().size()==0);
   return static_cast<const member_designatort &>(expr);
@@ -2720,7 +2732,7 @@ extern inline const member_designatort &to_member_designator(const exprt &expr)
 /*! \copydoc to_member_designator(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline member_designatort &to_member_designator(exprt &expr)
+inline member_designatort &to_member_designator(exprt &expr)
 {
   assert(expr.id()==ID_member_designator && expr.operands().size()==0);
   return static_cast<member_designatort &>(expr);
@@ -2740,24 +2752,24 @@ public:
     copy_to_operands(_old, _designator, _new_value);
   }
 
-  inline explicit update_exprt(const typet &_type):
+  explicit update_exprt(const typet &_type):
     exprt(ID_update, _type)
   {
     operands().resize(3);
   }
 
-  inline update_exprt():exprt(ID_update)
+  update_exprt():exprt(ID_update)
   {
     operands().resize(3);
     op1().id(ID_designator);
   }
 
-  inline exprt &old()
+  exprt &old()
   {
     return op0();
   }
 
-  inline const exprt &old() const
+  const exprt &old() const
   {
     return op0();
   }
@@ -2766,22 +2778,22 @@ public:
   // 1) member_designator or
   // 2) index_designator
   // as defined above
-  inline exprt::operandst &designator()
+  exprt::operandst &designator()
   {
     return op1().operands();
   }
 
-  inline const exprt::operandst &designator() const
+  const exprt::operandst &designator() const
   {
     return op1().operands();
   }
 
-  inline exprt &new_value()
+  exprt &new_value()
   {
     return op2();
   }
 
-  inline const exprt &new_value() const
+  const exprt &new_value() const
   {
     return op2();
   }
@@ -2797,7 +2809,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const update_exprt &to_update_expr(const exprt &expr)
+inline const update_exprt &to_update_expr(const exprt &expr)
 {
   assert(expr.id()==ID_update && expr.operands().size()==3);
   return static_cast<const update_exprt &>(expr);
@@ -2806,7 +2818,7 @@ extern inline const update_exprt &to_update_expr(const exprt &expr)
 /*! \copydoc to_update_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline update_exprt &to_update_expr(exprt &expr)
+inline update_exprt &to_update_expr(exprt &expr)
 {
   assert(expr.id()==ID_update && expr.operands().size()==3);
   return static_cast<update_exprt &>(expr);
@@ -2827,37 +2839,37 @@ public:
     copy_to_operands(_array, _index, _new_value);
   }
 
-  inline array_update_exprt():exprt(ID_array_update)
+  array_update_exprt():exprt(ID_array_update)
   {
     operands().resize(3);
   }
 
-  inline exprt &array()
+  exprt &array()
   {
     return op0();
   }
 
-  inline const exprt &array() const
+  const exprt &array() const
   {
     return op0();
   }
 
-  inline exprt &index()
+  exprt &index()
   {
     return op1();
   }
 
-  inline const exprt &index() const
+  const exprt &index() const
   {
     return op1();
   }
 
-  inline exprt &new_value()
+  exprt &new_value()
   {
     return op2();
   }
 
-  inline const exprt &new_value() const
+  const exprt &new_value() const
   {
     return op2();
   }
@@ -2873,7 +2885,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const array_update_exprt &to_array_update_expr(const exprt &expr)
+inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 {
   assert(expr.id()==ID_array_update && expr.operands().size()==3);
   return static_cast<const array_update_exprt &>(expr);
@@ -2882,7 +2894,7 @@ extern inline const array_update_exprt &to_array_update_expr(const exprt &expr)
 /*! \copydoc to_array_update_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline array_update_exprt &to_array_update_expr(exprt &expr)
+inline array_update_exprt &to_array_update_expr(exprt &expr)
 {
   assert(expr.id()==ID_array_update && expr.operands().size()==3);
   return static_cast<array_update_exprt &>(expr);
@@ -2894,71 +2906,76 @@ extern inline array_update_exprt &to_array_update_expr(exprt &expr)
 class member_exprt:public exprt
 {
 public:
-  inline explicit member_exprt(const exprt &op):exprt(ID_member)
+  explicit member_exprt(const exprt &op):exprt(ID_member)
   {
     copy_to_operands(op);
   }
 
-  inline explicit member_exprt(const typet &_type):exprt(ID_member, _type)
+  explicit member_exprt(const typet &_type):exprt(ID_member, _type)
   {
     operands().resize(1);
   }
 
-  inline member_exprt(const exprt &op, const irep_idt &component_name):exprt(ID_member)
+  member_exprt(const exprt &op, const irep_idt &component_name):
+    exprt(ID_member)
   {
     copy_to_operands(op);
     set_component_name(component_name);
   }
 
-  inline member_exprt(const exprt &op, const irep_idt &component_name, const typet &_type):exprt(ID_member, _type)
+  member_exprt(
+    const exprt &op,
+    const irep_idt &component_name,
+    const typet &_type):
+    exprt(ID_member, _type)
   {
     copy_to_operands(op);
     set_component_name(component_name);
   }
 
-  inline member_exprt():exprt(ID_member)
+  member_exprt():exprt(ID_member)
   {
     operands().resize(1);
   }
 
-  inline irep_idt get_component_name() const
+  irep_idt get_component_name() const
   {
     return get(ID_component_name);
   }
 
-  inline void set_component_name(const irep_idt &component_name)
+  void set_component_name(const irep_idt &component_name)
   {
     set(ID_component_name, component_name);
   }
 
-  inline std::size_t get_component_number() const
+  std::size_t get_component_number() const
   {
     return get_size_t(ID_component_number);
   }
 
-  inline void set_component_number(std::size_t component_number)
+  void set_component_number(std::size_t component_number)
   {
     set(ID_component_number, component_number);
   }
 
   // will go away, use compound()
-  inline const exprt &struct_op() const
+  const exprt &struct_op() const
   {
     return op0();
   }
 
   // will go away, use compound()
-  inline exprt &struct_op()
+  exprt &struct_op()
   {
     return op0();
   }
 
-  inline const exprt &compound() const
+  const exprt &compound() const
   {
     return op0();
   }
 
-  inline exprt &compound()
+  exprt &compound()
   {
     return op0();
   }
@@ -2994,12 +3011,12 @@ inline member_exprt &to_member_expr(exprt &expr)
 class isnan_exprt:public unary_predicate_exprt
 {
 public:
-  inline explicit isnan_exprt(const exprt &op):
+  explicit isnan_exprt(const exprt &op):
     unary_predicate_exprt(ID_isnan, op)
   {
   }
 
-  inline isnan_exprt():unary_predicate_exprt(ID_isnan)
+  isnan_exprt():unary_predicate_exprt(ID_isnan)
   {
   }
 };
@@ -3034,12 +3051,12 @@ inline isnan_exprt &to_isnan_expr(exprt &expr)
 class isinf_exprt:public unary_predicate_exprt
 {
 public:
-  inline explicit isinf_exprt(const exprt &op):
+  explicit isinf_exprt(const exprt &op):
     unary_predicate_exprt(ID_isinf, op)
   {
   }
 
-  inline isinf_exprt():unary_predicate_exprt(ID_isinf)
+  isinf_exprt():unary_predicate_exprt(ID_isinf)
   {
   }
 };
@@ -3074,12 +3091,12 @@ inline isinf_exprt &to_isinf_expr(exprt &expr)
 class isfinite_exprt:public unary_predicate_exprt
 {
 public:
-  inline explicit isfinite_exprt(const exprt &op):
+  explicit isfinite_exprt(const exprt &op):
     unary_predicate_exprt(ID_isfinite, op)
   {
   }
 
-  inline isfinite_exprt():unary_predicate_exprt(ID_isfinite)
+  isfinite_exprt():unary_predicate_exprt(ID_isfinite)
   {
   }
 };
@@ -3114,12 +3131,12 @@ inline isfinite_exprt &to_isfinite_expr(exprt &expr)
 class isnormal_exprt:public unary_predicate_exprt
 {
 public:
-  inline explicit isnormal_exprt(const exprt &op):
+  explicit isnormal_exprt(const exprt &op):
     unary_predicate_exprt(ID_isnormal, op)
   {
   }
 
-  inline isnormal_exprt():unary_predicate_exprt(ID_isnormal)
+  isnormal_exprt():unary_predicate_exprt(ID_isnormal)
   {
   }
 };
@@ -3154,11 +3171,11 @@ inline isnormal_exprt &to_isnormal_expr(exprt &expr)
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
 public:
-  inline ieee_float_equal_exprt():binary_relation_exprt(ID_ieee_float_equal)
+  ieee_float_equal_exprt():binary_relation_exprt(ID_ieee_float_equal)
   {
   }
 
-  inline ieee_float_equal_exprt(const exprt &_lhs, const exprt &_rhs):
+  ieee_float_equal_exprt(const exprt &_lhs, const exprt &_rhs):
     binary_relation_exprt(_lhs, ID_ieee_float_equal, _rhs)
   {
   }
@@ -3174,7 +3191,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
+inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt &expr)
 {
   assert(expr.id()==ID_ieee_float_equal && expr.operands().size()==2);
   return static_cast<const ieee_float_equal_exprt &>(expr);
@@ -3183,7 +3200,7 @@ extern inline const ieee_float_equal_exprt &to_ieee_float_equal_expr(const exprt
 /*! \copydoc to_ieee_float_equal_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
+inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 {
   assert(expr.id()==ID_ieee_float_equal && expr.operands().size()==2);
   return static_cast<ieee_float_equal_exprt &>(expr);
@@ -3194,11 +3211,12 @@ extern inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 class ieee_float_notequal_exprt:public binary_relation_exprt
 {
 public:
-  inline ieee_float_notequal_exprt():binary_relation_exprt(ID_ieee_float_notequal)
+  ieee_float_notequal_exprt():
+    binary_relation_exprt(ID_ieee_float_notequal)
   {
   }
 
-  inline ieee_float_notequal_exprt(const exprt &_lhs, const exprt &_rhs):
+  ieee_float_notequal_exprt(const exprt &_lhs, const exprt &_rhs):
     binary_relation_exprt(_lhs, ID_ieee_float_notequal, _rhs)
   {
   }
@@ -3214,7 +3232,8 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(const exprt &expr)
+inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(
+  const exprt &expr)
 {
   assert(expr.id()==ID_ieee_float_notequal && expr.operands().size()==2);
   return static_cast<const ieee_float_notequal_exprt &>(expr);
@@ -3223,7 +3242,7 @@ extern inline const ieee_float_notequal_exprt &to_ieee_float_notequal_expr(const
 /*! \copydoc to_ieee_float_notequal_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
+inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
 {
   assert(expr.id()==ID_ieee_float_notequal && expr.operands().size()==2);
   return static_cast<ieee_float_notequal_exprt &>(expr);
@@ -3234,43 +3253,47 @@ extern inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr
 class ieee_float_op_exprt:public exprt
 {
 public:
-  inline ieee_float_op_exprt()
+  ieee_float_op_exprt()
   {
     operands().resize(3);
   }
 
-  inline ieee_float_op_exprt(const exprt &_lhs, const irep_idt &_id, const exprt &_rhs, const exprt &_rm):
+  ieee_float_op_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs,
+    const exprt &_rm):
     exprt(_id)
   {
     copy_to_operands(_lhs, _rhs, _rm);
   }
 
-  inline exprt &lhs()
+  exprt &lhs()
   {
     return op0();
   }
 
-  inline const exprt &lhs() const
+  const exprt &lhs() const
   {
     return op0();
   }
 
-  inline exprt &rhs()
+  exprt &rhs()
   {
     return op1();
   }
 
-  inline const exprt &rhs() const
+  const exprt &rhs() const
   {
     return op1();
   }
 
-  inline exprt &rounding_mode()
+  exprt &rounding_mode()
   {
     return op2();
   }
 
-  inline const exprt &rounding_mode() const
+  const exprt &rounding_mode() const
   {
     return op2();
   }
@@ -3286,7 +3309,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
+inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr)
 {
   assert(expr.operands().size()==3);
   return static_cast<const ieee_float_op_exprt &>(expr);
@@ -3295,7 +3318,7 @@ extern inline const ieee_float_op_exprt &to_ieee_float_op_expr(const exprt &expr
 /*! \copydoc to_ieee_float_op_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
+inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 {
   assert(expr.operands().size()==3);
   return static_cast<ieee_float_op_exprt &>(expr);
@@ -3306,11 +3329,11 @@ extern inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
 class type_exprt:public exprt
 {
 public:
-  inline type_exprt():exprt(ID_type)
+  type_exprt():exprt(ID_type)
   {
   }
 
-  inline explicit type_exprt(const typet &type):exprt(ID_type, type)
+  explicit type_exprt(const typet &type):exprt(ID_type, type)
   {
   }
 };
@@ -3320,26 +3343,26 @@ public:
 class constant_exprt:public exprt
 {
 public:
-  inline constant_exprt():exprt(ID_constant)
+  constant_exprt():exprt(ID_constant)
   {
   }
 
-  inline explicit constant_exprt(const typet &type):exprt(ID_constant, type)
+  explicit constant_exprt(const typet &type):exprt(ID_constant, type)
   {
   }
 
-  inline constant_exprt(const irep_idt &_value, const typet &_type):
+  constant_exprt(const irep_idt &_value, const typet &_type):
     exprt(ID_constant, _type)
   {
     set_value(_value);
   }
 
-  inline const irep_idt &get_value() const
+  const irep_idt &get_value() const
   {
     return get(ID_value);
   }
 
-  inline void set_value(const irep_idt &value)
+  void set_value(const irep_idt &value)
   {
     set(ID_value, value);
   }
@@ -3379,7 +3402,7 @@ inline constant_exprt &to_constant_expr(exprt &expr)
 class true_exprt:public constant_exprt
 {
 public:
-  inline true_exprt():constant_exprt(bool_typet())
+  true_exprt():constant_exprt(bool_typet())
   {
     set_value(ID_true);
   }
@@ -3390,7 +3413,7 @@ public:
 class false_exprt:public constant_exprt
 {
 public:
-  inline false_exprt():constant_exprt(bool_typet())
+  false_exprt():constant_exprt(bool_typet())
   {
     set_value(ID_false);
   }
@@ -3401,7 +3424,7 @@ public:
 class nil_exprt:public exprt
 {
 public:
-  inline nil_exprt():exprt(static_cast<const exprt &>(get_nil_irep()))
+  nil_exprt():exprt(static_cast<const exprt &>(get_nil_irep()))
   {
   }
 };
@@ -3460,7 +3483,8 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const function_application_exprt &to_function_application_expr(const exprt &expr)
+inline const function_application_exprt &to_function_application_expr(
+  const exprt &expr)
 {
   assert(expr.id()==ID_function_application && expr.operands().size()==2);
   return static_cast<const function_application_exprt &>(expr);
@@ -3469,7 +3493,7 @@ extern inline const function_application_exprt &to_function_application_expr(con
 /*! \copydoc to_function_application_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline function_application_exprt &to_function_application_expr(exprt &expr)
+inline function_application_exprt &to_function_application_expr(exprt &expr)
 {
   assert(expr.id()==ID_function_application && expr.operands().size()==2);
   return static_cast<function_application_exprt &>(expr);
@@ -3485,16 +3509,16 @@ extern inline function_application_exprt &to_function_application_expr(exprt &ex
 class concatenation_exprt:public exprt
 {
 public:
-  inline concatenation_exprt():exprt(ID_concatenation)
+  concatenation_exprt():exprt(ID_concatenation)
   {
   }
 
-  explicit inline concatenation_exprt(const typet &_type):
+  explicit concatenation_exprt(const typet &_type):
     exprt(ID_concatenation, _type)
   {
   }
 
-  explicit inline concatenation_exprt(
+  explicit concatenation_exprt(
     const exprt &_op0, const exprt &_op1, const typet &_type):
     exprt(ID_concatenation, _type)
   {
@@ -3512,7 +3536,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
+inline const concatenation_exprt &to_concatenation_expr(const exprt &expr)
 {
   assert(expr.id()==ID_concatenation);
   return static_cast<const concatenation_exprt &>(expr);
@@ -3521,7 +3545,7 @@ extern inline const concatenation_exprt &to_concatenation_expr(const exprt &expr
 /*! \copydoc to_concatenation_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
+inline concatenation_exprt &to_concatenation_expr(exprt &expr)
 {
   assert(expr.id()==ID_concatenation);
   return static_cast<concatenation_exprt &>(expr);
@@ -3532,7 +3556,7 @@ extern inline concatenation_exprt &to_concatenation_expr(exprt &expr)
 class infinity_exprt:public exprt
 {
 public:
-  inline explicit infinity_exprt(const typet &_type):
+  explicit infinity_exprt(const typet &_type):
     exprt(ID_infinity, _type)
   {
   }
@@ -3543,7 +3567,7 @@ public:
 class let_exprt:public exprt
 {
 public:
-  inline let_exprt():exprt(ID_let)
+  let_exprt():exprt(ID_let)
   {
     operands().resize(3);
     op0()=symbol_exprt();
@@ -3590,7 +3614,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const let_exprt &to_let_expr(const exprt &expr)
+inline const let_exprt &to_let_expr(const exprt &expr)
 {
   assert(expr.id()==ID_let && expr.operands().size()==3);
   return static_cast<const let_exprt &>(expr);
@@ -3599,7 +3623,7 @@ extern inline const let_exprt &to_let_expr(const exprt &expr)
 /*! \copydoc to_let_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline let_exprt &to_let_expr(exprt &expr)
+inline let_exprt &to_let_expr(exprt &expr)
 {
   assert(expr.id()==ID_let && expr.operands().size()==3);
   return static_cast<let_exprt &>(expr);
@@ -3610,7 +3634,7 @@ extern inline let_exprt &to_let_expr(exprt &expr)
 class forall_exprt:public exprt
 {
 public:
-  inline forall_exprt():exprt(ID_forall)
+  forall_exprt():exprt(ID_forall)
   {
     operands().resize(2);
     op0()=symbol_exprt();
@@ -3642,7 +3666,7 @@ public:
 class exists_exprt:public exprt
 {
 public:
-  inline exists_exprt():exprt(ID_exists)
+  exists_exprt():exprt(ID_exists)
   {
     operands().resize(2);
     op0()=symbol_exprt();

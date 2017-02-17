@@ -16,20 +16,20 @@ Author: Daniel Kroening, kroening@kroening.com
 class literal_exprt:public predicate_exprt
 {
 public:
-  inline explicit literal_exprt(literalt a):
+  explicit literal_exprt(literalt a):
     predicate_exprt(ID_literal)
   {
     set_literal(a);
   }
 
-  inline literalt get_literal() const
+  literalt get_literal() const
   {
     literalt result;
     result.set(literalt::var_not(get_long_long(ID_literal)));
     return result;
   }
 
-  inline void set_literal(literalt a)
+  void set_literal(literalt a)
   {
     set(ID_literal, a.get());
   }
@@ -45,7 +45,7 @@ public:
  *
  * \ingroup gr_std_expr
 */
-extern inline const literal_exprt &to_literal_expr(const exprt &expr)
+inline const literal_exprt &to_literal_expr(const exprt &expr)
 {
   assert(expr.id()==ID_literal && !expr.has_operands());
   return static_cast<const literal_exprt &>(expr);
@@ -54,7 +54,7 @@ extern inline const literal_exprt &to_literal_expr(const exprt &expr)
 /*! \copydoc to_literal_expr(const exprt &)
  * \ingroup gr_std_expr
 */
-extern inline literal_exprt &to_literal_expr(exprt &expr)
+inline literal_exprt &to_literal_expr(exprt &expr)
 {
   assert(expr.id()==ID_literal && !expr.has_operands());
   return static_cast<literal_exprt &>(expr);

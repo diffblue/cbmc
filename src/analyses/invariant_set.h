@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class inv_object_storet
 {
 public:
-  inv_object_storet(const namespacet &_ns):ns(_ns)
+  explicit inv_object_storet(const namespacet &_ns):ns(_ns)
   {
   }
 

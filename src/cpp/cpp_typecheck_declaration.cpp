@@ -24,7 +24,8 @@ Function: cpp_typecheckt::convert
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {
   // see if the declaration is empty
-  if(declaration.is_empty()) return;
+  if(declaration.is_empty())
+    return;
 
   // Record the function bodies so we can check them later.
   // This function is used recursively, so we save them.
@@ -81,9 +82,9 @@ void cpp_typecheckt::convert_anonymous_union(
 
   if(!cpp_is_pod(declaration.type()))
   {
-   error().source_location=follow(declaration.type()).source_location();
-   error() << "anonymous union is not POD" << eom;
-   throw 0;
+    error().source_location=follow(declaration.type()).source_location();
+    error() << "anonymous union is not POD" << eom;
+    throw 0;
   }
 
   codet decl_statement(ID_decl);
@@ -197,7 +198,9 @@ void cpp_typecheckt::convert_non_template_declaration(
     if(declaration.find(ID_C_template).is_not_nil())
     {
       symbol.type.set(ID_C_template, declaration.find(ID_C_template));
-      symbol.type.set(ID_C_template_arguments, declaration.find(ID_C_template_arguments));
+      symbol.type.set(
+        ID_C_template_arguments,
+        declaration.find(ID_C_template_arguments));
     }
 
     // replace declarator by symbol expression

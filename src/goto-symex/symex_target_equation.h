@@ -172,19 +172,28 @@ public:
 
     bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
     bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
     bool is_goto() const            { return type==goto_trace_stept::GOTO; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
     bool is_location() const        { return type==goto_trace_stept::LOCATION; }
     bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
     bool is_decl() const            { return type==goto_trace_stept::DECL; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_shared_read() const     { return type==goto_trace_stept::SHARED_READ; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_shared_write() const    { return type==goto_trace_stept::SHARED_WRITE; }
     bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_memory_barrier() const  { return type==goto_trace_stept::MEMORY_BARRIER; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
     bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
 
     // we may choose to hide
@@ -247,7 +256,8 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->is_assert()) i++;
+      if(it->is_assert())
+        i++;
     return i;
   }
 
@@ -257,7 +267,8 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->ignore) i++;
+      if(it->ignore)
+        i++;
     return i;
   }
 
@@ -301,14 +312,18 @@ protected:
   void merge_ireps(SSA_stept &SSA_step);
 };
 
-extern inline bool operator<(
+inline bool operator<(
   const symex_target_equationt::SSA_stepst::const_iterator a,
   const symex_target_equationt::SSA_stepst::const_iterator b)
 {
   return &(*a)<&(*b);
 }
 
-std::ostream &operator<<(std::ostream &out, const symex_target_equationt::SSA_stept &step);
-std::ostream &operator<<(std::ostream &out, const symex_target_equationt &equation);
+std::ostream &operator<<(
+  std::ostream &out,
+  const symex_target_equationt::SSA_stept &step);
+std::ostream &operator<<(
+  std::ostream &out,
+  const symex_target_equationt &equation);
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H

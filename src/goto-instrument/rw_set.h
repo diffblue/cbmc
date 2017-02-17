@@ -32,7 +32,7 @@ Date: February 2006
 class rw_set_baset
 {
 public:
-  rw_set_baset(const namespacet &_ns)
+  explicit rw_set_baset(const namespacet &_ns)
     :ns(_ns)
   {
   }
@@ -59,24 +59,24 @@ public:
     std::swap(other.w_entries, w_entries);
   }
 
-  inline rw_set_baset &operator += (const rw_set_baset &other)
+  rw_set_baset &operator+=(const rw_set_baset &other)
   {
     r_entries.insert(other.r_entries.begin(), other.r_entries.end());
     w_entries.insert(other.w_entries.begin(), other.w_entries.end());
     return *this;
   }
 
-  inline bool empty() const
+  bool empty() const
   {
     return r_entries.empty() && w_entries.empty();
   }
 
-  inline bool has_w_entry(irep_idt object) const
+  bool has_w_entry(irep_idt object) const
   {
     return w_entries.find(object)!=w_entries.end();
   }
 
-  inline bool has_r_entry(irep_idt object) const
+  bool has_r_entry(irep_idt object) const
   {
     return r_entries.find(object)!=r_entries.end();
   }
@@ -84,14 +84,14 @@ public:
   void output(std::ostream &out) const;
 
 protected:
-  virtual void track_deref(const entryt& entry, bool read) {}
+  virtual void track_deref(const entryt &entry, bool read) {}
   virtual void set_track_deref() {}
   virtual void reset_track_deref() {}
 
   const namespacet &ns;
 };
 
-extern inline std::ostream & operator << (
+inline std::ostream &operator<<(
   std::ostream &out, const rw_set_baset &rw_set)
 {
   rw_set.output(out);
@@ -111,18 +111,24 @@ extern inline std::ostream & operator << (
 class _rw_set_loct:public rw_set_baset
 {
 public:
-  inline _rw_set_loct(const namespacet &_ns,
-                     value_setst &_value_sets,
-                     goto_programt::const_targett _target
 #ifdef LOCAL_MAY
-                     , local_may_aliast &may
-#endif
-  ):
+  _rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target,
+    local_may_aliast &may):
+    rw_set_baset(_ns),
+    value_sets(_value_sets),
+    target(_target),
+    local_may(may)
+#else
+  _rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
     rw_set_baset(_ns),
     value_sets(_value_sets),
     target(_target)
-#ifdef LOCAL_MAY
-    , local_may(may)
 #endif
   {
   }
@@ -134,20 +140,20 @@ protected:
   const goto_programt::const_targett target;
 
 #ifdef LOCAL_MAY
-  local_may_aliast& local_may;
+  local_may_aliast &local_may;
 #endif
 
-  inline void read(const exprt &expr)
+  void read(const exprt &expr)
   {
     read_write_rec(expr, true, false, "", guardt());
   }
 
-  inline void read(const exprt &expr, const guardt &guard)
+  void read(const exprt &expr, const guardt &guard)
   {
     read_write_rec(expr, true, false, "", guard);
   }
 
-  inline void write(const exprt &expr)
+  void write(const exprt &expr)
   {
     read_write_rec(expr, false, true, "", guardt());
   }
@@ -166,18 +172,20 @@ protected:
 class rw_set_loct:public _rw_set_loct
 {
 public:
-  inline rw_set_loct(const namespacet &_ns,
-                     value_setst &_value_sets,
-                     goto_programt::const_targett _target
 #ifdef LOCAL_MAY
-                     , local_may_aliast &may
+  rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target,
+    local_may_aliast &may):
+    _rw_set_loct(_ns, _value_sets, _target, may)
+#else
+  rw_set_loct(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
+    _rw_set_loct(_ns, _value_sets, _target)
 #endif
-  ):
-    _rw_set_loct(_ns, _value_sets, _target
-#ifdef LOCAL_MAY
-      , may
-#endif
-   )
   {
     compute();
   }
@@ -226,18 +234,22 @@ public:
   /* is var a read or write */
   std::set<irep_idt> set_reads;
 
-  inline rw_set_with_trackt(
+#ifdef LOCAL_MAY
+  rw_set_with_trackt(
     const namespacet &_ns,
     value_setst &_value_sets,
-    goto_programt::const_targett _target
-#ifdef LOCAL_MAY
-    , local_may_aliast& may
+    goto_programt::const_targett _target,
+    local_may_aliast &may):
+    _rw_set_loct(_ns, _value_sets, _target, may),
+    dereferencing(false)
+#else
+  rw_set_with_trackt(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target):
+    _rw_set_loct(_ns, _value_sets, _target),
+    dereferencing(false)
 #endif
-  ) : _rw_set_loct(_ns, _value_sets, _target
-#ifdef LOCAL_MAY
-      ,  may
-#endif
-      ), dereferencing(false)
   {
     compute();
   }
@@ -249,7 +261,8 @@ protected:
   bool dereferencing;
   std::vector<entryt> dereferenced;
 
-  void track_deref(const entryt& entry, bool read) {
+  void track_deref(const entryt &entry, bool read)
+  {
     if(dereferencing && dereferenced.size()==0)
     {
       dereferenced.insert(dereferenced.begin(), entry);
@@ -257,15 +270,17 @@ protected:
         set_reads.insert(entry.object);
     }
     else if(dereferencing && dereferenced.size()>0)
-      dereferenced_from.insert(std::make_pair(entry.object,
-        dereferenced.front().object));
+      dereferenced_from.insert(
+        std::make_pair(entry.object, dereferenced.front().object));
   }
 
-  void set_track_deref() {
+  void set_track_deref()
+  {
     dereferencing=true;
   }
 
-  void reset_track_deref() {
+  void reset_track_deref()
+  {
     dereferencing=false;
     dereferenced.clear();
   }

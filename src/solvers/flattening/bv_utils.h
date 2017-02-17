@@ -19,13 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 // Shares variables between var == const tests for registered variables.
 // Gives ~15% memory savings on some programs using constant arrays
 // but seems to give a run-time penalty.
-//#define COMPACT_EQUAL_CONST
+// #define COMPACT_EQUAL_CONST
 
 
 class bv_utilst
 {
 public:
-  inline bv_utilst(propt &_prop):prop(_prop) { }
+  explicit bv_utilst(propt &_prop):prop(_prop) { }
 
   typedef enum { SIGNED, UNSIGNED } representationt;
 
@@ -45,14 +45,24 @@ public:
   // bit-wise negation
   bvt inverted(const bvt &op);
 
-  literalt full_adder(const literalt a, const literalt b, const literalt carry_in, literalt &carry_out);
+  literalt full_adder(
+    const literalt a,
+    const literalt b,
+    const literalt carry_in,
+    literalt &carry_out);
   literalt carry(literalt a, literalt b, literalt c);
 
   bvt add_sub(const bvt &op0, const bvt &op1, bool subtract);
   bvt add_sub(const bvt &op0, const bvt &op1, literalt subtract);
-  bvt add_sub_no_overflow(const bvt &op0, const bvt &op1, bool subtract, representationt rep);
+  bvt add_sub_no_overflow(
+    const bvt &op0,
+    const bvt &op1,
+    bool subtract,
+    representationt rep);
+
   bvt add(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, false); }
   bvt sub(const bvt &op0, const bvt &op1) { return add_sub(op0, op1, true); }
+
   literalt overflow_add(const bvt &op0, const bvt &op1, representationt rep);
   literalt overflow_sub(const bvt &op0, const bvt &op1, representationt rep);
   literalt carry_out(const bvt &op0, const bvt &op1, literalt carry_in);
@@ -64,32 +74,43 @@ public:
   bvt unsigned_multiplier(const bvt &op0, const bvt &op1);
   bvt signed_multiplier(const bvt &op0, const bvt &op1);
   bvt multiplier(const bvt &op0, const bvt &op1, representationt rep);
-  bvt multiplier_no_overflow(const bvt &op0, const bvt &op1, representationt rep);
+  bvt multiplier_no_overflow(
+    const bvt &op0,
+    const bvt &op1,
+    representationt rep);
 
-  bvt divider(const bvt &op0, const bvt &op1,
-               representationt rep)
+  bvt divider(const bvt &op0, const bvt &op1, representationt rep)
   {
     bvt res, rem;
     divider(op0, op1, res, rem, rep);
     return res;
   }
 
-  bvt remainder(const bvt &op0, const bvt &op1,
-                representationt rep)
+  bvt remainder(const bvt &op0, const bvt &op1, representationt rep)
   {
     bvt res, rem;
     divider(op0, op1, res, rem, rep);
     return rem;
   }
 
-  void divider(const bvt &op0, const bvt &op1,
-               bvt &res, bvt &rem, representationt rep);
+  void divider(
+    const bvt &op0,
+    const bvt &op1,
+    bvt &res,
+    bvt &rem,
+    representationt rep);
 
-  void signed_divider(const bvt &op0, const bvt &op1,
-                      bvt &res, bvt &rem);
+  void signed_divider(
+    const bvt &op0,
+    const bvt &op1,
+    bvt &res,
+    bvt &rem);
 
-  void unsigned_divider(const bvt &op0, const bvt &op1,
-                        bvt &res, bvt &rem);
+  void unsigned_divider(
+    const bvt &op0,
+    const bvt &op1,
+    bvt &res,
+    bvt &rem);
 
   #ifdef COMPACT_EQUAL_CONST
   typedef std::set<bvt> equal_const_registeredt;
@@ -100,7 +121,7 @@ public:
   typedef std::map<var_constant_pairt, literalt> equal_const_cachet;
   equal_const_cachet equal_const_cache;
 
-  literalt equal_const_rec (bvt &var, bvt &constant);
+  literalt equal_const_rec(bvt &var, bvt &constant);
   literalt equal_const(const bvt &var, const bvt &constant);
   #endif
 
@@ -130,14 +151,18 @@ public:
   literalt is_all_ones(const bvt &op)
   { return prop.land(op); }
 
-  literalt lt_or_le(bool or_equal,
-                    const bvt &bv0,
-                    const bvt &bv1,
-                    representationt rep);
+  literalt lt_or_le(
+    bool or_equal,
+    const bvt &bv0,
+    const bvt &bv1,
+    representationt rep);
 
   // id is one of ID_lt, le, gt, ge, equal, notequal
-  literalt rel(const bvt &bv0, irep_idt id, const bvt &bv1,
-               representationt rep);
+  literalt rel(
+    const bvt &bv0,
+    irep_idt id,
+    const bvt &bv1,
+    representationt rep);
 
   literalt unsigned_less_than(const bvt &bv0, const bvt &bv1);
   literalt signed_less_than(const bvt &bv0, const bvt &bv1);
@@ -190,8 +215,11 @@ public:
 protected:
   propt &prop;
 
-  void adder(bvt &sum, const bvt &op,
-             literalt carry_in, literalt &carry_out);
+  void adder(
+    bvt &sum,
+    const bvt &op,
+    literalt carry_in,
+    literalt &carry_out);
 
   void adder_no_overflow(
     bvt &sum,

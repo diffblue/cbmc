@@ -35,6 +35,7 @@ void get_local_identifiers(
   for(const auto &param : parameters)
   {
     const irep_idt &identifier=param.get_identifier();
-    if(identifier!="") dest.insert(identifier);
+    if(identifier!="")
+      dest.insert(identifier);
   }
 }

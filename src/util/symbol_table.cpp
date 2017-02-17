@@ -27,8 +27,10 @@ bool symbol_tablet::add(const symbolt &symbol)
   if(!symbols.insert(std::pair<irep_idt, symbolt>(symbol.name, symbol)).second)
     return true;
 
-  symbol_base_map.insert(std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
-  symbol_module_map.insert(std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
+  symbol_base_map.insert(
+    std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
+  symbol_module_map.insert(
+    std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
 
   return false;
 }
@@ -58,8 +60,10 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
     return true;
   }
 
-  symbol_base_map.insert(std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
-  symbol_module_map.insert(std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
+  symbol_base_map.insert(
+    std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
+  symbol_module_map.insert(
+    std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
 
   result.first->second.swap(symbol);
   new_symbol=&result.first->second;

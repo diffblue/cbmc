@@ -157,7 +157,9 @@ Function: unsafe_string2signedlonglong
 
 \*******************************************************************/
 
-signed long long int unsafe_string2signedlonglong(const std::string &str, int base)
+signed long long int unsafe_string2signedlonglong(
+  const std::string &str,
+  int base)
 {
   return str2number<signed long long int>(str.c_str(), base, false);
 }
@@ -174,7 +176,9 @@ Function: unsafe_string2unsignedlonglong
 
 \*******************************************************************/
 
-unsigned long long int unsafe_string2unsignedlonglong(const std::string &str, int base)
+unsigned long long int unsafe_string2unsignedlonglong(
+  const std::string &str,
+  int base)
 {
   return str2number<unsigned long long int>(str.c_str(), base, false);
 }

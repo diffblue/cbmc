@@ -110,7 +110,8 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   }
   else if(type.id()==ID_msc_based)
   {
-    const exprt &as_expr=static_cast<const exprt &>(static_cast<const irept &>(type));
+    const exprt &as_expr=
+      static_cast<const exprt &>(static_cast<const irept &>(type));
     assert(as_expr.operands().size()==1);
     msc_based=as_expr.op0();
   }
@@ -405,7 +406,8 @@ void ansi_c_convert_typet::write(typet &type)
 
     type.id(ID_bool);
   }
-  else if(complex_cnt && !char_cnt && !signed_cnt && !unsigned_cnt && !short_cnt && !gcc_int128_cnt)
+  else if(complex_cnt && !char_cnt && !signed_cnt && !unsigned_cnt &&
+          !short_cnt && !gcc_int128_cnt)
   {
     // the "default" for complex is double
     type=double_type();
@@ -467,7 +469,8 @@ void ansi_c_convert_typet::write(typet &type)
       else if(int32_cnt)
         type=is_signed?signed_int_type():unsigned_int_type();
       else if(int64_cnt) // Visual Studio: equivalent to long long int
-        type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        type=
+          is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
       else
         assert(false);
     }

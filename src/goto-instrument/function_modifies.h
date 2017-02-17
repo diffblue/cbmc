@@ -37,7 +37,7 @@ public:
     const exprt &,
     modifiest &);
 
-  inline void operator()(const exprt &function, modifiest &modifies)
+  void operator()(const exprt &function, modifiest &modifies)
   {
     get_modifies_function(function, modifies);
   }

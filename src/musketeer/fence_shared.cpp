@@ -15,14 +15,13 @@ Author: Vincent Nimal
 
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/cprover_prefix.h>
 #include <util/message.h>
 
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-instrument/wmm/goto2graph.h>
 #include <goto-instrument/rw_set.h>
-//#include <goto-instrument/nondet_volatile.h>
+// #include <goto-instrument/nondet_volatile.h>
 
 #include "fence_shared.h"
 
@@ -30,18 +29,20 @@ Author: Vincent Nimal
 #include <analyses/local_may_alias.h>
 #endif
 
-#define OUTPUT(s,fence,file,line,id,type)  s<<fence<<"|"<<file<<"|"<<line<<"|"\
-  <<id<<"|"<<type<<std::endl
+#define OUTPUT(s, fence, file, line, id, type)  \
+  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<std::endl
 
-class simple_insertiont {
+class simple_insertiont
+{
 protected:
-  messaget& message;
-  value_setst& value_sets;
-  const symbol_tablet& symbol_table;
+  messaget &message;
+  value_setst &value_sets;
+  const symbol_tablet &symbol_table;
   const namespacet ns;
-  const goto_functionst& goto_functions;
+  const goto_functionst &goto_functions;
 
-  struct {
+  struct
+  {
     std::list<symbol_exprt> writes;
     std::list<symbol_exprt> reads;
   } fenced_edges;
@@ -62,10 +63,16 @@ protected:
     {
       std::ostringstream s;
 
-      if(it->source_location().as_string().empty()) continue;
+      if(it->source_location().as_string().empty())
+        continue;
 
-      OUTPUT(s, "fence", it->source_location().get_file(), it->source_location().get_line(),
-        ns.lookup(it->get_identifier()).base_name, "Write");
+      OUTPUT(
+        s,
+        "fence",
+        it->source_location().get_file(),
+        it->source_location().get_line(),
+        ns.lookup(it->get_identifier()).base_name,
+        "Write");
       non_redundant_display.insert(s.str());
     }
 
@@ -75,10 +82,16 @@ protected:
     {
       std::ostringstream s;
 
-      if(it->source_location().as_string().empty()) continue;
+      if(it->source_location().as_string().empty())
+        continue;
 
-      OUTPUT(s, "fence", it->source_location().get_file(), it->source_location().get_line(),
-        ns.lookup(it->get_identifier()).base_name, "Read");
+      OUTPUT(
+        s,
+        "fence",
+        it->source_location().get_file(),
+        it->source_location().get_line(),
+        ns.lookup(it->get_identifier()).base_name,
+        "Read");
       non_redundant_display.insert(s.str());
     }
 
@@ -92,18 +105,19 @@ protected:
   }
 
 public:
-  explicit simple_insertiont (
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+  explicit simple_insertiont(
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :message(_message), value_sets(_value_sets), symbol_table(_symbol_table),
       ns(_symbol_table), goto_functions(_goto_functions)
   {}
 
   virtual ~simple_insertiont() {}
 
-  void do_it() {
+  void do_it()
+  {
     compute();
     print_to_file();
   }
@@ -116,12 +130,12 @@ protected:
   void compute();
 
 public:
-  fence_all_sharedt (
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
-    :simple_insertiont(_message, _value_sets,_symbol_table,_goto_functions)
+  fence_all_sharedt(
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
+    :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
 
@@ -131,18 +145,18 @@ class fence_all_shared_aegt:public fence_all_sharedt
 protected:
   void compute();
   std::set<irep_idt> visited_functions;
-  void fence_all_shared_aeg_explore(const goto_programt& code
+  void fence_all_shared_aeg_explore(const goto_programt &code
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
-);
+  ); // NOLINT(whitespace/parens)
 
 public:
-  fence_all_shared_aegt (
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+  fence_all_shared_aegt(
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :fence_all_sharedt(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
@@ -152,14 +166,14 @@ class fence_volatilet:public simple_insertiont
 {
 protected:
   void compute();
-  bool is_volatile(const typet& src) const;
+  bool is_volatile(const typet &src) const;
 
 public:
-  fence_volatilet (
-    messaget& _message,
-    value_setst& _value_sets,
-    const symbol_tablet& _symbol_table,
-    const goto_functionst& _goto_functions)
+  fence_volatilet(
+    messaget &_message,
+    value_setst &_value_sets,
+    const symbol_tablet &_symbol_table,
+    const goto_functionst &_goto_functions)
     :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
   {}
 };
@@ -178,11 +192,13 @@ Function: is_volatile
 
 \*******************************************************************/
 
-bool fence_volatilet::is_volatile (const typet &src) const
+bool fence_volatilet::is_volatile(const typet &src) const
 {
-  if(src.get_bool(ID_C_volatile)) return true;
+  if(src.get_bool(ID_C_volatile))
+    return true;
 
-//  std::cout << "type: " << src << " has sub: " << src.subtypes().empty() /*src.has_subtypes()*/ <<  std::endl;
+//  std::cout << "type: " << src << " has sub: "
+//  << src.subtypes().empty() /*src.has_subtypes()*/ <<  std::endl;
   if(src.id()==ID_symbol)
   {
     symbol_tablet::symbolst::const_iterator s_it=
@@ -206,7 +222,7 @@ bool fence_volatilet::is_volatile (const typet &src) const
       it!=src.subtypes().end();
       ++it)
     {
-      //std::cout << *it << std::endl;
+      // std::cout << *it << std::endl;
       vol|=is_volatile(*it);
       if(vol)
         break;
@@ -239,28 +255,32 @@ void fence_volatilet::compute()
     local_may_aliast local_may(f_it->second);
     #endif
 
-    forall_goto_program_instructions(i_it, f_it->second.body) {
+    forall_goto_program_instructions(i_it, f_it->second.body)
+    {
         rw_set_loct rw_set(ns, value_sets, i_it
         #ifdef LOCAL_MAY
         , local_may
         #endif
-        );
+        ); // NOLINT(whitespace/parens)
         forall_rw_set_w_entries(w_it, rw_set)
         {
           if(has_prefix(id2string(w_it->second.object), CPROVER_PREFIX))
             continue;
 
-          try {
+          try
+          {
             message.debug() << "debug: "
               << id2string(w_it->second.object) << messaget::eom;
-            const symbolt& var=ns.lookup(w_it->second.object);
+            const symbolt &var=ns.lookup(w_it->second.object);
             if(is_volatile(var.type))
             {
               message.debug() << "volatile: "
                 << id2string(w_it->second.object) << messaget::eom;
               fenced_edges.writes.push_front(w_it->second.symbol_expr);
             }
-          } catch (std::string s) {
+          }
+          catch(std::string s)
+          {
             message.warning() << "failed to find" << s
               << messaget::eom;
             continue;
@@ -275,8 +295,9 @@ void fence_volatilet::compute()
           {
             message.debug() << "debug: "
               << id2string(r_it->second.object) << messaget::eom;
-            const symbolt& var=ns.lookup(r_it->second.object);
+            const symbolt &var=ns.lookup(r_it->second.object);
             #if 0
+            // NOLINTNEXTLINE(readability/braces)
             if(var.is_volatile && !var.is_thread_local)
             #endif
             if(is_volatile(var.type))
@@ -319,102 +340,109 @@ void fence_all_sharedt::compute()
     local_may_aliast local_may(f_it->second);
 #endif
 
-    forall_goto_program_instructions(i_it, f_it->second.body) {
-        if(i_it->is_function_call())
+    forall_goto_program_instructions(i_it, f_it->second.body)
+    {
+      if(i_it->is_function_call())
+        continue;
+
+      rw_set_with_trackt rw_set(ns, value_sets, i_it
+#ifdef LOCAL_MAY
+      , local_may
+#endif
+      ); // NOLINT(whitespace/parens)
+      forall_rw_set_w_entries(w_it, rw_set)
+      {
+        if(has_prefix(id2string(w_it->second.object), CPROVER_PREFIX))
           continue;
 
-        rw_set_with_trackt rw_set(ns, value_sets, i_it
-#ifdef LOCAL_MAY
-        , local_may
-#endif
-        );
-        forall_rw_set_w_entries(w_it, rw_set)
+        try
         {
-          if(has_prefix(id2string(w_it->second.object), CPROVER_PREFIX))
-            continue;
-
-          try {
-            const symbolt& var=ns.lookup(w_it->second.object);
-            message.debug() << "debug: "
-              << id2string(w_it->second.object) << " shared: " << var.is_shared()
-              << " loc: " << w_it->second.symbol_expr.source_location()
-              << messaget::eom;
-            if(var.is_shared())
+          const symbolt &var=ns.lookup(w_it->second.object);
+          message.debug() << "debug: "
+            << id2string(w_it->second.object) << " shared: " << var.is_shared()
+            << " loc: " << w_it->second.symbol_expr.source_location()
+            << messaget::eom;
+          if(var.is_shared())
+          {
+            /* this variable has perhaps been discovered after dereferencing
+               a pointer. We want to report this pointer */
+            std::map<const irep_idt, const irep_idt> &ref=
+              rw_set.dereferenced_from;
+            if(ref.find(w_it->second.object)!=ref.end())
             {
-              /* this variable has perhaps been discovered after dereferencing
-                 a pointer. We want to report this pointer */
-              std::map<const irep_idt, const irep_idt>& ref=
-                rw_set.dereferenced_from;
-              if(ref.find(w_it->second.object)!=ref.end())
-              {
-                const irep_idt from=ref[w_it->second.object];
-                const rw_set_baset::entryt& entry= (
-                  rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
-                  rw_set.r_entries[from] :
-                  rw_set.w_entries[from]
-                );
-                message.debug() << "shared: (through "
-                  << id2string(w_it->second.object) << ") " << entry.object
-                  << messaget::eom;
-                fenced_edges.writes.push_front(entry.symbol_expr);
-              }
-              else {
-                message.debug() << "shared: "
-                  << id2string(w_it->second.object) << " -> "
-                  << w_it->second.object << messaget::eom;
-                fenced_edges.writes.push_front(w_it->second.symbol_expr);
-              }
+              const irep_idt from=ref[w_it->second.object];
+              const rw_set_baset::entryt &entry=
+                rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+                rw_set.r_entries[from] :
+                rw_set.w_entries[from];
+              message.debug() << "shared: (through "
+                << id2string(w_it->second.object) << ") " << entry.object
+                << messaget::eom;
+              fenced_edges.writes.push_front(entry.symbol_expr);
             }
-          } catch (std::string s) {
-            message.warning() << "failed to find" << s
-              << messaget::eom;
-            continue;
+            else
+            {
+              message.debug() << "shared: "
+                << id2string(w_it->second.object) << " -> "
+                << w_it->second.object << messaget::eom;
+              fenced_edges.writes.push_front(w_it->second.symbol_expr);
+            }
           }
         }
-        forall_rw_set_r_entries(r_it, rw_set)
+        catch(std::string s)
         {
-          if(has_prefix(id2string(r_it->second.object), CPROVER_PREFIX))
-            continue;
+          message.warning() << "failed to find" << s
+            << messaget::eom;
+          continue;
+        }
+      }
+      forall_rw_set_r_entries(r_it, rw_set)
+      {
+        if(has_prefix(id2string(r_it->second.object), CPROVER_PREFIX))
+          continue;
 
-          try {
-            const symbolt& var=ns.lookup(r_it->second.object);
-            message.debug() << "debug: "
-              << id2string(r_it->second.object) << " shared: "
-              << var.is_shared() << " loc: "
-              << r_it->second.symbol_expr.source_location() << messaget::eom;
-            if(var.is_shared())
+        try
+        {
+          const symbolt &var=ns.lookup(r_it->second.object);
+          message.debug() << "debug: "
+            << id2string(r_it->second.object) << " shared: "
+            << var.is_shared() << " loc: "
+            << r_it->second.symbol_expr.source_location() << messaget::eom;
+          if(var.is_shared())
+          {
+            /* this variable has perhaps been discovered after dereferencing
+               a pointer. We want to report this pointer */
+            std::map<const irep_idt, const irep_idt>&
+              ref=rw_set.dereferenced_from;
+            if(ref.find(r_it->second.object)!=ref.end())
             {
-              /* this variable has perhaps been discovered after dereferencing
-                 a pointer. We want to report this pointer */
-              std::map<const irep_idt, const irep_idt>&
-                ref=rw_set.dereferenced_from;
-              if(ref.find(r_it->second.object)!=ref.end())
-              {
-                const irep_idt from=ref[r_it->second.object];
-                const rw_set_baset::entryt& entry=(
-                  rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
-                  rw_set.r_entries[from] :
-                  rw_set.w_entries[from]
-                );
+              const irep_idt from=ref[r_it->second.object];
+              const rw_set_baset::entryt &entry=
+                rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
+                rw_set.r_entries[from] :
+                rw_set.w_entries[from];
 
-                message.debug() << "shared: (through "
-                  << id2string(r_it->second.object) << ") " << entry.object
-                  << messaget::eom;
-                fenced_edges.reads.push_front(entry.symbol_expr);
-              }
-              else {
-                message.debug() << "shared: "
-                  << id2string(r_it->second.object) << " -> "
-                  << r_it->second.object << messaget::eom;
-                fenced_edges.reads.push_front(r_it->second.symbol_expr);
-              }
+              message.debug() << "shared: (through "
+                << id2string(r_it->second.object) << ") " << entry.object
+                << messaget::eom;
+              fenced_edges.reads.push_front(entry.symbol_expr);
             }
-          } catch (std::string s) {
-            message.warning() << "failed to find" << s
-              << messaget::eom;
-            continue;
+            else
+            {
+              message.debug() << "shared: "
+                << id2string(r_it->second.object) << " -> "
+                << r_it->second.object << messaget::eom;
+              fenced_edges.reads.push_front(r_it->second.symbol_expr);
+            }
           }
-       }
+        }
+        catch(std::string s)
+        {
+          message.warning() << "failed to find" << s
+            << messaget::eom;
+          continue;
+        }
+     }
     }
   }
 }
@@ -435,7 +463,7 @@ void fence_all_shared_aegt::compute()
 {
   message.status() << "--------" << messaget::eom;
 
-  const goto_functionst::goto_functiont& main=
+  const goto_functionst::goto_functiont &main=
     goto_functions.function_map.find(goto_functionst::entry_point())->second;
   #ifdef LOCAL_MAY
   local_may_aliast local_may(main);
@@ -445,33 +473,37 @@ void fence_all_shared_aegt::compute()
 #ifdef LOCAL_MAY
   , local_may
 #endif
-  );
+  ); // NOLINT(whitespace/parens)
 }
 
-void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& code
+void fence_all_shared_aegt::fence_all_shared_aeg_explore(
+  const goto_programt &code
 #ifdef LOCAL_MAY
-  , local_may_aliast& local_may
+  , local_may_aliast &local_may
 #endif
 )
 {
-  forall_goto_program_instructions(i_it, code) {
+  forall_goto_program_instructions(i_it, code)
+  {
     if(i_it->is_function_call())
     {
-      const exprt& fun=to_code_function_call(i_it->code).function();
+      const exprt &fun=to_code_function_call(i_it->code).function();
 
-      if(fun.id()!=goto_functionst::entry_point()) continue;
+      if(fun.id()!=goto_functionst::entry_point())
+        continue;
 
-      const irep_idt& fun_id=to_symbol_expr(fun).get_identifier();
+      const irep_idt &fun_id=to_symbol_expr(fun).get_identifier();
 
       if(visited_functions.find(fun_id)!=visited_functions.end())
         continue;
 
       visited_functions.insert(fun_id);
-      fence_all_shared_aeg_explore(goto_functions.function_map.find(fun_id)->second.body
+      fence_all_shared_aeg_explore(
+        goto_functions.function_map.find(fun_id)->second.body
 #ifdef LOCAL_MAY
         , local_may
 #endif
-      );
+      ); // NOLINT(whitespace/parens)
       visited_functions.erase(fun_id);
     }
 
@@ -479,14 +511,15 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
       #ifdef LOCAL_MAY
       , local_may
       #endif
-    );
+    ); // NOLINT(whitespace/parens)
     forall_rw_set_w_entries(w_it, rw_set)
     {
       if(has_prefix(id2string(w_it->second.object), CPROVER_PREFIX))
         continue;
 
-      try {
-        const symbolt& var=ns.lookup(w_it->second.object);
+      try
+      {
+        const symbolt &var=ns.lookup(w_it->second.object);
         message.debug() << "debug: "
           << id2string(w_it->second.object) << " shared: "
           << var.is_shared() << " loc: "
@@ -500,25 +533,27 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           if(ref.find(w_it->second.object)!=ref.end())
           {
             const irep_idt from=ref[w_it->second.object];
-            const rw_set_baset::entryt& entry=(
+            const rw_set_baset::entryt &entry=
                 rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
                 rw_set.r_entries[from] :
-                rw_set.w_entries[from]
-            );
+                rw_set.w_entries[from];
 
             message.debug() << "shared: (through "
               << id2string(w_it->second.object) << ") " << entry.object
               << messaget::eom;
             fenced_edges.writes.push_front(entry.symbol_expr);
           }
-          else {
+          else
+          {
             message.debug() << "shared: "
               << id2string(w_it->second.object) << " -> "
               << w_it->second.object << messaget::eom;
             fenced_edges.writes.push_front(w_it->second.symbol_expr);
           }
         }
-      } catch (std::string s) {
+      }
+      catch(std::string s)
+      {
         message.warning() << "failed to find" << s
           << messaget::eom;
         continue;
@@ -529,8 +564,9 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
       if(has_prefix(id2string(r_it->second.object), CPROVER_PREFIX))
         continue;
 
-      try {
-        const symbolt& var=ns.lookup(r_it->second.object);
+      try
+      {
+        const symbolt &var=ns.lookup(r_it->second.object);
         message.debug() << "debug: "
           << id2string(r_it->second.object) << " shared: "
           <<var.is_shared() << " loc: "
@@ -544,25 +580,27 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(const goto_programt& co
           if(ref.find(r_it->second.object)!=ref.end())
           {
             const irep_idt from=ref[r_it->second.object];
-            const rw_set_baset::entryt& entry=(
+            const rw_set_baset::entryt &entry=
               rw_set.set_reads.find(from)!=rw_set.set_reads.end() ?
               rw_set.r_entries[from] :
-              rw_set.w_entries[from]
-            );
+              rw_set.w_entries[from];
 
             message.debug() << "shared: (through "
               << id2string(r_it->second.object) << ") " << entry.object
               << messaget::eom;
             fenced_edges.reads.push_front(entry.symbol_expr);
           }
-          else {
+          else
+          {
             message.debug() << "shared: "
               << id2string(r_it->second.object) << " -> "
               << r_it->second.object << messaget::eom;
             fenced_edges.reads.push_front(r_it->second.symbol_expr);
           }
         }
-      } catch (std::string s) {
+      }
+      catch(std::string s)
+      {
         message.warning() << "failed to find" << s
           << messaget::eom;
         continue;
@@ -584,7 +622,7 @@ Function:
 \*******************************************************************/
 
 void fence_all_shared(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -608,7 +646,7 @@ Function:
 \*******************************************************************/
 
 void fence_all_shared_aeg(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -632,7 +670,7 @@ Function:
 \*******************************************************************/
 
 void fence_volatile(
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   value_setst &value_sets,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)

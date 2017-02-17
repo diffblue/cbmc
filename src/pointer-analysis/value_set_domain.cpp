@@ -57,7 +57,9 @@ void value_set_domaint::transform(
     }
     break;
 
-  default:;
-    // do nothing
+  default:
+    {
+      // do nothing
+    }
   }
 }

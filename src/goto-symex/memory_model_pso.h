@@ -14,7 +14,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_psot:public memory_model_tsot
 {
 public:
-  inline explicit memory_model_psot(const namespacet &_ns):
+  explicit memory_model_psot(const namespacet &_ns):
     memory_model_tsot(_ns)
   {
   }

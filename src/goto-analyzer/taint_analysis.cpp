@@ -117,12 +117,12 @@ void taint_analysist::instrument(
           irep_idt class_id=function.get(ID_C_class);
           if(class_id.empty())
           {
-
           }
           else
           {
             std::string suffix=
-              std::string(id2string(identifier), class_id.size(), std::string::npos);
+              std::string(
+                id2string(identifier), class_id.size(), std::string::npos);
 
             class_hierarchyt::idst parents=
               class_hierarchy.get_parents_trans(class_id);
@@ -135,7 +135,9 @@ void taint_analysist::instrument(
             bool match=false;
             for(const auto &i : identifiers)
               if(i==rule.function_identifier ||
-                 has_prefix(id2string(i), "java::"+id2string(rule.function_identifier)+":"))
+                 has_prefix(
+                   id2string(i),
+                   "java::"+id2string(rule.function_identifier)+":"))
               {
                 match=true;
                 break;
@@ -165,7 +167,8 @@ void taint_analysist::instrument(
 
               case taint_parse_treet::rulet::PARAMETER:
                 {
-                  unsigned nr=have_this?rule.parameter_number:rule.parameter_number-1;
+                  unsigned nr=
+                    have_this?rule.parameter_number:rule.parameter_number-1;
                   if(function_call.arguments().size()>nr)
                     where=function_call.arguments()[nr];
                 }
@@ -187,7 +190,8 @@ void taint_analysist::instrument(
                   codet code_set_may("set_may");
                   code_set_may.operands().resize(2);
                   code_set_may.op0()=where;
-                  code_set_may.op1()=address_of_exprt(string_constantt(rule.taint));
+                  code_set_may.op1()=
+                    address_of_exprt(string_constantt(rule.taint));
                   goto_programt::targett t=tmp.add_instruction();
                   t->make_other(code_set_may);
                   t->source_location=instruction.source_location;
@@ -202,7 +206,8 @@ void taint_analysist::instrument(
                   get_may.op1()=address_of_exprt(string_constantt(rule.taint));
                   t->make_assertion(not_exprt(get_may));
                   t->source_location=instruction.source_location;
-                  t->source_location.set_property_class("taint rule "+id2string(rule.id));
+                  t->source_location.set_property_class(
+                    "taint rule "+id2string(rule.id));
                   t->source_location.set_comment(rule.message);
                 }
                 break;
@@ -212,21 +217,23 @@ void taint_analysist::instrument(
                   codet code_clear_may("clear_may");
                   code_clear_may.operands().resize(2);
                   code_clear_may.op0()=where;
-                  code_clear_may.op1()=address_of_exprt(string_constantt(rule.taint));
+                  code_clear_may.op1()=
+                    address_of_exprt(string_constantt(rule.taint));
                   goto_programt::targett t=tmp.add_instruction();
                   t->make_other(code_clear_may);
                   t->source_location=instruction.source_location;
                 }
                 break;
               }
-
             }
           }
         }
       }
       break;
 
-    default:;
+    default:
+      {
+      }
     }
 
     if(!tmp.empty())
@@ -297,7 +304,8 @@ bool taint_analysist::operator()(
     else
     {
       status() << "No entry point found; "
-                  "we will consider the heads of all functions as reachable" << eom;
+               << "we will consider the heads of all functions as reachable"
+               << eom;
 
       goto_programt end, gotos, calls;
 
@@ -341,7 +349,8 @@ bool taint_analysist::operator()(
 
     forall_goto_functions(f_it, goto_functions)
     {
-      if(!f_it->second.body.has_assertion()) continue;
+      if(!f_it->second.body.has_assertion())
+        continue;
 
       const symbolt &symbol=ns.lookup(f_it->first);
 
@@ -352,31 +361,37 @@ bool taint_analysist::operator()(
 
       forall_goto_program_instructions(i_it, f_it->second.body)
       {
-        if(!i_it->is_assert()) continue;
+        if(!i_it->is_assert())
+          continue;
         if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
           continue;
 
-        if(custom_bitvector_analysis[i_it].has_values.is_false()) continue;
+        if(custom_bitvector_analysis[i_it].has_values.is_false())
+          continue;
 
         exprt result=custom_bitvector_analysis.eval(i_it->guard, i_it);
         exprt result2=simplify_expr(result, ns);
 
-        if(result2.is_true()) continue;
+        if(result2.is_true())
+          continue;
 
         if(first)
         {
           first=false;
           if(!use_json)
             std::cout << "\n"
-                         "******** Function " << symbol.display_name() << '\n';
+                      << "******** Function " << symbol.display_name() << '\n';
         }
 
         if(use_json)
         {
           json_objectt json;
-          json["bug_class"]=json_stringt(id2string(i_it->source_location.get_property_class()));
-          json["file"]=json_stringt(id2string(i_it->source_location.get_file()));
-          json["line"]=json_numbert(id2string(i_it->source_location.get_line()));
+          json["bug_class"]=
+            json_stringt(id2string(i_it->source_location.get_property_class()));
+          json["file"]=
+            json_stringt(id2string(i_it->source_location.get_file()));
+          json["line"]=
+            json_numbert(id2string(i_it->source_location.get_line()));
           json_result.array.push_back(json);
         }
         else
@@ -386,7 +401,8 @@ bool taint_analysist::operator()(
             std::cout << ": " << i_it->source_location.get_comment();
 
           if(!i_it->source_location.get_property_class().empty())
-            std::cout << " (" << i_it->source_location.get_property_class() << ")";
+            std::cout << " ("
+                      << i_it->source_location.get_property_class() << ")";
 
           std::cout << '\n';
         }
@@ -450,5 +466,9 @@ bool taint_analysis(
   taint_analysist taint_analysis;
   taint_analysis.set_message_handler(message_handler);
   return taint_analysis(
-    taint_file_name, goto_model.symbol_table, goto_model.goto_functions, show_full, json_file_name);
+    taint_file_name,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    show_full,
+    json_file_name);
 }

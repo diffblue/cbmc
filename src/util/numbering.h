@@ -16,9 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 
 template <typename T>
+// NOLINTNEXTLINE(readability/identifiers)
 class numbering:public std::vector<T>
 {
 public:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef std::size_t number_type;
 
   number_type number(const T &a)
@@ -37,7 +39,7 @@ public:
     return (result.first)->second;
   }
 
-  inline number_type operator()(const T &a)
+  number_type operator()(const T &a)
   {
     return number(a);
   }
@@ -67,9 +69,11 @@ protected:
 };
 
 template <typename T, class hash_fkt>
+// NOLINTNEXTLINE(readability/identifiers)
 class hash_numbering:public std::vector<T>
 {
 public:
+  // NOLINTNEXTLINE(readability/identifiers)
   typedef unsigned int number_type;
 
   number_type number(const T &a)

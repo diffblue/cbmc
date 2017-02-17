@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class identifiert
 {
 public:
-  identifiert(const std::string &s)
+  explicit identifiert(const std::string &s)
   { parse(s); }
 
   identifiert()

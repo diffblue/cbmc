@@ -38,7 +38,7 @@ Function: already_typechecked
 
 \*******************************************************************/
 
-extern inline void already_typechecked(irept &irep)
+inline void already_typechecked(irept &irep)
 {
   exprt tmp("already_typechecked");
   tmp.copy_to_operands(static_cast<exprt &>(irep));

@@ -109,7 +109,8 @@ Function: namespace_baset::follow
 
 const typet &namespace_baset::follow(const typet &src) const
 {
-  if(src.id()!=ID_symbol) return src;
+  if(src.id()!=ID_symbol)
+    return src;
 
   const symbolt *symbol=&lookup(src);
 
@@ -117,7 +118,8 @@ const typet &namespace_baset::follow(const typet &src) const
   while(true)
   {
     assert(symbol->is_type);
-    if(symbol->type.id()!=ID_symbol) return symbol->type;
+    if(symbol->type.id()!=ID_symbol)
+      return symbol->type;
     symbol=&lookup(symbol->type);
   }
 }

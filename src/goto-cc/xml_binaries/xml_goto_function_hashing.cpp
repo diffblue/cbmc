@@ -24,11 +24,12 @@ Function: xml_goto_function_convertt::convert
 
 \*******************************************************************/
 
-void
-xml_goto_function_convertt::convert( const goto_functionst::goto_functiont& function, xmlt& xml)
+void xml_goto_function_convertt::convert(
+  const goto_functionst::goto_functiont &function,
+  xmlt &xml)
 {
   xml_goto_program_convertt gpconverter(ireps_container);
-  if (function.body_available)
+  if(function.body_available)
     gpconverter.convert(function.body, xml);
 }
 
@@ -45,8 +46,9 @@ Function: xml_goto_function_convertt::convert
 
 \*******************************************************************/
 
-void
-xml_goto_function_convertt::convert( const xmlt& xml, goto_functionst::goto_functiont& function)
+void xml_goto_function_convertt::convert(
+  const xmlt &xml,
+  goto_functionst::goto_functiont &function)
 {
   xml_goto_program_convertt gpconverter(ireps_container);
   function.body.clear();

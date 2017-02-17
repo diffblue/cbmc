@@ -29,7 +29,8 @@ Function: pointer_logict::is_dynamic_object
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {
-  if(expr.type().get_bool("#dynamic")) return true;
+  if(expr.type().get_bool("#dynamic"))
+    return true;
 
   if(expr.id()==ID_symbol)
     if(has_prefix(id2string(to_symbol_expr(expr).get_identifier()),
@@ -199,11 +200,13 @@ exprt pointer_logict::object_rec(
     mp_integer size=
       pointer_offset_size(src.type().subtype(), ns);
 
-    if(size==0) return src;
+    if(size==0)
+      return src;
 
     mp_integer index=offset/size;
     mp_integer rest=offset%size;
-    if(rest<0) rest=-rest;
+    if(rest<0)
+      rest=-rest;
 
     index_exprt tmp(src.type().subtype());
     tmp.index()=from_integer(index, typet(ID_integer));
@@ -216,7 +219,8 @@ exprt pointer_logict::object_rec(
     const struct_typet::componentst &components=
       to_struct_type(src.type()).components();
 
-    if(offset<0) return src;
+    if(offset<0)
+      return src;
 
     mp_integer current_offset=0;
 

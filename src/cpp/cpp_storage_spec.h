@@ -36,13 +36,13 @@ public:
   bool is_thread_local() const { return get_bool(ID_thread_local); }
   bool is_asm()          const { return get_bool(ID_asm); }
 
-  void set_static      () { set(ID_static, true); }
-  void set_extern      () { set(ID_extern, true); }
-  void set_auto        () { set(ID_auto, true); }
-  void set_register    () { set(ID_register, true); }
-  void set_mutable     () { set(ID_mutable, true); }
+  void set_static()       { set(ID_static, true); }
+  void set_extern()       { set(ID_extern, true); }
+  void set_auto()         { set(ID_auto, true); }
+  void set_register()     { set(ID_register, true); }
+  void set_mutable()      { set(ID_mutable, true); }
   void set_thread_local() { set(ID_thread_local, true); }
-  void set_asm         () { set(ID_asm, true); }
+  void set_asm()          { set(ID_asm, true); }
 
   bool is_empty() const
   {

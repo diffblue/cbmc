@@ -77,7 +77,7 @@ symbol_typet jsa_invariant_instruction_type();
  *
  * @return
  */
-array_typet jsa_invariant_type(const exprt & size);
+array_typet jsa_invariant_type(const exprt &size);
 
 /**
  * @brief
@@ -97,7 +97,7 @@ symbol_typet jsa_query_instruction_type();
  *
  * @return
  */
-array_typet jsa_query_type(const exprt & size);
+array_typet jsa_query_type(const exprt &size);
 
 /**
  * @brief

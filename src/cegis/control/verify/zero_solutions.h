@@ -37,7 +37,7 @@ public:
    *
    * @param st
    */
-  zero_rational_solutiont(const symbol_tablet &st);
+  explicit zero_rational_solutiont(const symbol_tablet &st);
 
   /**
    * @brief
@@ -65,7 +65,7 @@ public:
    *
    * @param st
    */
-  zero_vector_solutiont(const symbol_tablet &st);
+  explicit zero_vector_solutiont(const symbol_tablet &st);
 
   /**
    * @brief

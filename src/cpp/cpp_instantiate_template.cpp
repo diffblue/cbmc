@@ -41,7 +41,10 @@ std::string cpp_typecheckt::template_suffix(
       it!=arguments.end();
       it++)
   {
-    if(first) first=false; else result+=',';
+    if(first)
+      first=false;
+    else
+      result+=',';
 
     const exprt expr=*it;
 
@@ -180,10 +183,12 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   new_symbol.location=template_symbol.location;
   new_symbol.type=typet(ID_incomplete_struct);
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
-  if(template_symbol.type.get_bool(ID_C_class)) new_symbol.type.set(ID_C_class, true);
+  if(template_symbol.type.get_bool(ID_C_class))
+    new_symbol.type.set(ID_C_class, true);
   new_symbol.type.set(ID_template_class_instance, true);
   new_symbol.type.add_source_location()=template_symbol.location;
-  new_symbol.type.set("specialization_template_args", specialization_template_args);
+  new_symbol.type.set(
+    "specialization_template_args", specialization_template_args);
   new_symbol.type.set("full_template_args", full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
   new_symbol.mode=template_symbol.mode;
@@ -222,7 +227,8 @@ Function: cpp_typecheckt::elaborate_class_template
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
-  if(type.id()!=ID_symbol) return;
+  if(type.id()!=ID_symbol)
+    return;
 
   const symbolt &symbol=lookup(type);
 
@@ -235,8 +241,10 @@ void cpp_typecheckt::elaborate_class_template(
     instantiate_template(
       type.source_location(),
       lookup(t_type.get(ID_identifier)),
-      static_cast<const cpp_template_args_tct &>(t_type.find("specialization_template_args")),
-      static_cast<const cpp_template_args_tct &>(t_type.find("full_template_args")));
+      static_cast<const cpp_template_args_tct &>(
+        t_type.find("specialization_template_args")),
+      static_cast<const cpp_template_args_tct &>(
+        t_type.find("full_template_args")));
   }
 }
 
@@ -295,7 +303,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "A: <";
   forall_expr(it, specialization_template_args.arguments())
   {
-    if(it!=specialization_template_args.arguments().begin()) std::cout << ", ";
+    if(it!=specialization_template_args.arguments().begin())
+      std::cout << ", ";
     if(it->id()==ID_type)
       std::cout << to_string(it->type());
     else

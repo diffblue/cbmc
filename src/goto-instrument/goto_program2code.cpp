@@ -29,7 +29,7 @@ Purpose:
 
 \*******************************************************************/
 
-static const exprt& skip_typecast(const exprt &expr)
+static const exprt &skip_typecast(const exprt &expr)
 {
   if(expr.id()!=ID_typecast)
     return expr;
@@ -920,10 +920,12 @@ goto_programt::const_targett goto_program2codet::get_cases(
         assert(cases.back().value.is_not_nil());
 
         if(first_target==goto_program.instructions.end() ||
-           first_target->location_number > cases.back().case_start->location_number)
+           first_target->location_number>
+           cases.back().case_start->location_number)
           first_target=cases.back().case_start;
         if(last_target==goto_program.instructions.end() ||
-           last_target->location_number < cases.back().case_start->location_number)
+           last_target->location_number<
+           cases.back().case_start->location_number)
           last_target=cases.back().case_start;
 
         unique_targets.insert(cases.back().case_start);
@@ -1034,7 +1036,8 @@ bool goto_program2codet::remove_default(
       ++it)
   {
     // ignore empty cases
-    if(it->case_last==goto_program.instructions.end()) continue;
+    if(it->case_last==goto_program.instructions.end())
+      continue;
 
     // the last case before default is the most interesting
     cases_listt::const_iterator last=--cases.end();
@@ -1076,7 +1079,8 @@ bool goto_program2codet::remove_default(
       continue;
 
     // fall-through is ok
-    if(!it->case_last->is_goto()) continue;
+    if(!it->case_last->is_goto())
+      continue;
 
     return false;
   }
@@ -1103,7 +1107,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 {
   // try to figure out whether this was a switch/case
   exprt eq_cand=target->guard;
-  if(eq_cand.id()==ID_or) eq_cand=eq_cand.op0();
+  if(eq_cand.id()==ID_or)
+    eq_cand=eq_cand.op0();
 
   if(target->is_backwards_goto() ||
      eq_cand.id()!=ID_equal ||
@@ -1310,11 +1315,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return target;
     }
 
-    has_else=before_else->is_goto() &&
+    has_else=
+      before_else->is_goto() &&
       before_else->get_target()->location_number > end_if->location_number &&
       before_else->guard.is_true() &&
       (upper_bound==goto_program.instructions.end() ||
-       upper_bound->location_number >= before_else->get_target()->location_number);
+       upper_bound->location_number>=
+       before_else->get_target()->location_number);
 
     if(has_else)
       end_if=before_else->get_target();
@@ -1351,8 +1358,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       target=convert_instruction(target, end_if, to_code(i.else_case()));
   }
   else
+  {
     for(++target; target!=end_if; ++target)
       target=convert_instruction(target, end_if, to_code(i.then_case()));
+  }
 
   dest.move_to_operands(i);
   return --target;
@@ -1614,8 +1623,8 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   // use pthreads if "code in new thread" is a function call to a function with
   // suitable signature
   if(thread_start->is_function_call() &&
-      to_code_function_call(to_code(thread_start->code)).arguments().size()==1 &&
-      after_thread_start==thread_end)
+     to_code_function_call(to_code(thread_start->code)).arguments().size()==1 &&
+     after_thread_start==thread_end)
   {
     const code_function_callt &cf=
       to_code_function_call(to_code(thread_start->code));
@@ -2239,7 +2248,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   if(expr.id()==ID_union ||
      expr.id()==ID_struct)
   {
-    if(no_typecast) return;
+    if(no_typecast)
+      return;
 
     assert(expr.type().id()==ID_symbol);
 
@@ -2276,11 +2286,15 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
           it!=symbol_table.symbols.end();
           it++)
       {
-        if(it->second.type.id()!=ID_code) continue;
-        if(!has_prefix(id2string(it->second.base_name), "nondet_")) continue;
+        if(it->second.type.id()!=ID_code)
+          continue;
+        if(!has_prefix(id2string(it->second.base_name), "nondet_"))
+          continue;
         const code_typet &code_type=to_code_type(it->second.type);
-        if(!type_eq(code_type.return_type(), expr.type(), ns)) continue;
-        if(!code_type.parameters().empty()) continue;
+        if(!type_eq(code_type.return_type(), expr.type(), ns))
+          continue;
+        if(!code_type.parameters().empty())
+          continue;
         id=it->second.name;
         break;
       }
@@ -2303,11 +2317,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
         if(base_name=="")
         {
-          unsigned count;
-          for(count=0;
-              symbol_table.symbols.find("nondet_"+std::to_string(count))!=
-              symbol_table.symbols.end();
-              count++);
+          unsigned count=0;
+          while(symbol_table.symbols.find("nondet_"+std::to_string(count))!=
+                symbol_table.symbols.end())
+            ++count;
           base_name="nondet_"+std::to_string(count);
         }
 

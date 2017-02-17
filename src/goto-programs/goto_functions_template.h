@@ -27,22 +27,22 @@ public:
   typedef std::vector<irep_idt> parameter_identifierst;
   parameter_identifierst parameter_identifiers;
 
-  inline bool body_available() const
+  bool body_available() const
   {
     return !body.instructions.empty();
   }
 
-  inline bool is_inlined() const
+  bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
   }
 
-  inline bool is_hidden() const
+  bool is_hidden() const
   {
     return type.get_bool(ID_C_hide);
   }
 
-  inline void make_hidden()
+  void make_hidden()
   {
     type.set(ID_C_hide, true);
   }
@@ -88,7 +88,7 @@ public:
   typedef std::map<irep_idt, goto_functiont> function_mapt;
   function_mapt function_map;
 
-  inline goto_functions_templatet()
+  goto_functions_templatet()
   {
   }
 
@@ -98,7 +98,7 @@ public:
     assert(src.function_map.empty());
   }
 
-  inline void clear()
+  void clear()
   {
     function_map.clear();
   }
@@ -126,7 +126,7 @@ public:
     return ID__start;
   }
 
-  inline void swap(goto_functions_templatet &other)
+  void swap(goto_functions_templatet &other)
   {
     function_map.swap(other.function_map);
   }
@@ -136,7 +136,6 @@ public:
     for(const auto &fun : other.function_map)
       function_map[fun.first].copy_from(fun.second);
   }
-
 };
 
 /*******************************************************************\
@@ -154,7 +153,7 @@ Function: goto_functions_templatet::output
 template <class bodyT>
 void goto_functions_templatet<bodyT>::output(
   const namespacet &ns,
-  std::ostream& out) const
+  std::ostream &out) const
 {
   for(const auto &fun : function_map)
   {

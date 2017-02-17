@@ -63,7 +63,8 @@ public:
   {
     for(parsed_argvt::const_iterator
         it=parsed_argv.begin(); it!=parsed_argv.end(); it++)
-      if(it->is_infile_name) return true;
+      if(it->is_infile_name)
+        return true;
     return false;
   }
 

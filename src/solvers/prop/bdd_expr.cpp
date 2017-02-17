@@ -25,7 +25,7 @@ Function: bdd_exprt::from_expr_rec
 
 \*******************************************************************/
 
-bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
+mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
 
@@ -40,8 +40,8 @@ bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
     assert(expr.operands().size()>=2);
     exprt bin_expr=make_binary(expr);
 
-    bdd_exprt::BDDt op0=from_expr_rec(bin_expr.op0());
-    bdd_exprt::BDDt op1=from_expr_rec(bin_expr.op1());
+    mini_bddt op0=from_expr_rec(bin_expr.op0());
+    mini_bddt op1=from_expr_rec(bin_expr.op1());
 
     return expr.id()==ID_and ? (op0&op1) :
            (expr.id()==ID_or ? (op0|op1) : (op0^op1));
@@ -50,8 +50,8 @@ bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
   {
     const implies_exprt &imp_expr=to_implies_expr(expr);
 
-    bdd_exprt::BDDt n_op0=!from_expr_rec(imp_expr.op0());
-    bdd_exprt::BDDt op1=from_expr_rec(imp_expr.op1());
+    mini_bddt n_op0=!from_expr_rec(imp_expr.op0());
+    mini_bddt op1=from_expr_rec(imp_expr.op1());
 
     return n_op0|op1;
   }
@@ -61,8 +61,8 @@ bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
   {
     const equal_exprt &eq_expr=to_equal_expr(expr);
 
-    bdd_exprt::BDDt op0=from_expr_rec(eq_expr.op0());
-    bdd_exprt::BDDt op1=from_expr_rec(eq_expr.op1());
+    mini_bddt op0=from_expr_rec(eq_expr.op0());
+    mini_bddt op1=from_expr_rec(eq_expr.op1());
 
     return op0==op1;
   }
@@ -70,8 +70,8 @@ bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
   {
     assert(expr.operands().size()==2);
 
-    bdd_exprt::BDDt op0=from_expr_rec(expr.op0());
-    bdd_exprt::BDDt op1=from_expr_rec(expr.op1());
+    mini_bddt op0=from_expr_rec(expr.op0());
+    mini_bddt op1=from_expr_rec(expr.op1());
 
     return op0==op1;
   }
@@ -79,16 +79,16 @@ bdd_exprt::BDDt bdd_exprt::from_expr_rec(const exprt &expr)
   {
     const if_exprt &if_expr=to_if_expr(expr);
 
-    bdd_exprt::BDDt cond=from_expr_rec(if_expr.cond());
-    bdd_exprt::BDDt t_case=from_expr_rec(if_expr.true_case());
-    bdd_exprt::BDDt f_case=from_expr_rec(if_expr.false_case());
+    mini_bddt cond=from_expr_rec(if_expr.cond());
+    mini_bddt t_case=from_expr_rec(if_expr.true_case());
+    mini_bddt f_case=from_expr_rec(if_expr.false_case());
 
     return ((!cond)|t_case)&(cond|f_case);
   }
   else
   {
     std::pair<expr_mapt::iterator, bool> entry=
-      expr_map.insert(std::make_pair(expr, bdd_exprt::BDDt()));
+      expr_map.insert(std::make_pair(expr, mini_bddt()));
 
     if(entry.second)
     {
@@ -132,7 +132,7 @@ Function: bdd_exprt::as_expr
 
 \*******************************************************************/
 
-exprt bdd_exprt::as_expr(const bdd_exprt::BDDt &r) const
+exprt bdd_exprt::as_expr(const mini_bddt &r) const
 {
   if(r.is_constant())
   {

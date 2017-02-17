@@ -47,11 +47,11 @@ public:
   {
   }
 
-  //The solver class (that takes care of allocated objects)
+  // The solver class (that takes care of allocated objects)
   class solvert
   {
   public:
-    solvert(prop_convt* _prop_conv)
+    explicit solvert(prop_convt* _prop_conv)
     {
       assert(_prop_conv!=NULL);
       prop_conv_ptr = _prop_conv;
@@ -63,18 +63,18 @@ public:
       delete prop_conv_ptr;
     }
 
-    //use this to get the prop_conv
-    prop_convt& prop_conv() const
+    // use this to get the prop_conv
+    prop_convt &prop_conv() const
     {
       assert(prop_conv_ptr!=NULL);
       return *prop_conv_ptr;
     }
 
   protected:
-    prop_convt* prop_conv_ptr;
+    prop_convt *prop_conv_ptr;
   };
 
-  //returns a solvert object
+  // returns a solvert object
   virtual std::unique_ptr<solvert> get_solver()
   {
     solvert *solver;
@@ -107,19 +107,18 @@ protected:
   // use gui format
   language_uit::uit ui;
 
-  solvert* get_default();
-  solvert* get_dimacs();
-  solvert* get_bv_refinement();
-  solvert* get_smt1(smt1_dect::solvert solver);
-  solvert* get_smt2(smt2_dect::solvert solver);
+  solvert *get_default();
+  solvert *get_dimacs();
+  solvert *get_bv_refinement();
+  solvert *get_smt1(smt1_dect::solvert solver);
+  solvert *get_smt2(smt2_dect::solvert solver);
 
   smt1_dect::solvert get_smt1_solver_type() const;
   smt2_dect::solvert get_smt2_solver_type() const;
 
-  //consistency checks during solver creation
+  // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();
-
 };
 
 #endif // CPROVER_CBMC_CBMC_SOLVERS_H

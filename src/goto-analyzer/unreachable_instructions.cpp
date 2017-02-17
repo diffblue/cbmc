@@ -191,7 +191,8 @@ void unreachable_instructions(
 
   forall_goto_functions(f_it, goto_model.goto_functions)
   {
-    if(!f_it->second.body_available()) continue;
+    if(!f_it->second.body_available())
+      continue;
 
     const goto_programt &goto_program=f_it->second.body;
     dead_mapt dead_map;

@@ -33,7 +33,7 @@ public:
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    prop_convt& _prop_conv):
+    prop_convt &_prop_conv):
     safety_checkert(ns, _message_handler),
     options(_options),
     ns(_symbol_table, new_symbol_table),
@@ -52,10 +52,6 @@ public:
 
   // additional stuff
   expr_listt bmc_constraints;
-
-  friend class cbmc_satt;
-  friend class hw_cbmc_satt;
-  friend class counterexample_beautification_greedyt;
 
   void set_ui(language_uit::uit _ui) { ui=_ui; }
 
@@ -107,7 +103,7 @@ protected:
   void output_graphml(
     resultt result,
     const goto_functionst &goto_functions);
-  
+
   bool cover(
     const goto_functionst &goto_functions,
     const optionst::value_listt &criteria);

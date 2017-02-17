@@ -220,7 +220,8 @@ exprt zero_initializert::zero_initializer_rec(
         value.copy_to_operands(code_value);
       }
       else
-        value.copy_to_operands(zero_initializer_rec(it->type(), source_location));
+        value.copy_to_operands(
+          zero_initializer_rec(it->type(), source_location));
     }
 
     value.add_source_location()=source_location;
@@ -246,7 +247,8 @@ exprt zero_initializert::zero_initializer_rec(
         it++)
     {
       // skip methods
-      if(it->type().id()==ID_code) continue;
+      if(it->type().id()==ID_code)
+        continue;
 
       mp_integer bits=pointer_offset_bits(it->type(), ns);
 

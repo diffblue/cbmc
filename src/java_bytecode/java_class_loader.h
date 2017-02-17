@@ -28,7 +28,7 @@ public:
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
 
-  inline void add_jar_file(const std::string &f)
+  void add_jar_file(const std::string &f)
   {
     jar_files.push_back(f);
   }

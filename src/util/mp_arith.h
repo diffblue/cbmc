@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "big-int/bigint.hh"
 
+// NOLINTNEXTLINE(readability/identifiers)
 typedef BigInt mp_integer;
 
-std::ostream& operator<<(std::ostream &, const mp_integer &);
+std::ostream &operator<<(std::ostream &, const mp_integer &);
 mp_integer operator>>(const mp_integer &, const mp_integer &);
 mp_integer operator<<(const mp_integer &, const mp_integer &);
 

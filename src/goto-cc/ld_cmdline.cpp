@@ -353,7 +353,8 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
         found=true;
         set(os, argv[i]+os.size()+1);
       }
-      else if(os.size()>2 && has_prefix("-"+argv_i, os+"=")) // concatenated, long as short
+      // concatenated, long as short
+      else if(os.size()>2 && has_prefix("-"+argv_i, os+"="))
       {
         found=true;
         set(os, argv[i]+os.size()+1-1);
@@ -363,7 +364,8 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     if(!found)
     {
       // unrecognized option
-      std::cerr << "Warning: uninterpreted ld option '" << argv_i << "'" << std::endl;
+      std::cerr << "Warning: uninterpreted ld option '" << argv_i
+                << "'" << std::endl;
     }
   }
 

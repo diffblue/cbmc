@@ -267,7 +267,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     // these are all trinary
     assert(a.expr.operands().size()==3);
 
-    if(a.over_state==MAX_STATE) return;
+    if(a.over_state==MAX_STATE)
+      return;
 
     ieee_float_spect spec(to_floatbv_type(type));
     ieee_floatt o0(spec), o1(spec);
@@ -317,7 +318,7 @@ void bv_refinementt::check_SAT(approximationt &a)
               << "==" << integer2binary(result.pack(), spec.width()) << eom;
     #endif
 
-    //if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
+    // if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
 
     if(a.over_state<max_node_refinement)
     {
@@ -377,7 +378,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     assert(a.expr.operands().size()==2);
 
     // already full interpretation?
-    if(a.over_state>0) return;
+    if(a.over_state>0)
+      return;
 
     bv_spect spec(type);
     bv_arithmetict o0(spec), o1(spec);
@@ -410,19 +412,22 @@ void bv_refinementt::check_SAT(approximationt &a)
       {
         r=bv_utils.multiplier(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else if(a.expr.id()==ID_div)
       {
         r=bv_utils.divider(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else if(a.expr.id()==ID_mod)
       {
         r=bv_utils.remainder(
           a.op0_bv, a.op1_bv,
-          a.expr.type().id()==ID_signedbv?bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+          a.expr.type().id()==ID_signedbv?
+            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
       }
       else
         assert(0);
@@ -434,7 +439,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   }
   else if(type.id()==ID_fixedbv)
   {
-    //TODO: not implemented
+    // TODO: not implemented
     assert(0);
   }
   else
@@ -466,7 +471,8 @@ Function: bv_refinementt::check_UNSAT
 void bv_refinementt::check_UNSAT(approximationt &a)
 {
   // part of the conflict?
-  if(!is_in_conflict(a)) return;
+  if(!is_in_conflict(a))
+    return;
 
   status() << "Found assumption for `" << a.as_string()
            << "' in proof (state " << a.under_state << ")" << eom;
@@ -478,7 +484,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
   if(a.expr.type().id()==ID_floatbv)
   {
     const floatbv_typet &floatbv_type=to_floatbv_type(a.expr.type());
-    ieee_float_spect spec=floatbv_type;
+    ieee_float_spect spec(floatbv_type);
 
     a.under_assumptions.reserve(a.op0_bv.size()+a.op1_bv.size());
 

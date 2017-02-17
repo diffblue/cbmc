@@ -16,10 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 // when used incrementally, as variables may disappear
 // unless set to 'frozen'.
 
-namespace Glucose
+namespace Glucose // NOLINT(readability/namespace)
 {
-  class Solver;
-  class SimpSolver;
+class Solver; // NOLINT(readability/identifiers)
+class SimpSolver; // NOLINT(readability/identifiers)
 }
 
 template<typename T>

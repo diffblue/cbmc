@@ -105,7 +105,6 @@ exprt build_full_lhs_rec(
     tmp.op0()=build_full_lhs_rec(prop_conv, ns, tmp.op0(), src_ssa.op0());
 
     // re-write into big case-split
-
   }
 
   return src_original;
@@ -227,7 +226,8 @@ void build_goto_trace(
     goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
     if(SSA_step.ssa_lhs.is_not_nil())
-      goto_trace_step.lhs_object=ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
+      goto_trace_step.lhs_object=
+        ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
     else
       goto_trace_step.lhs_object.make_nil();
     goto_trace_step.type=SSA_step.type;
@@ -321,13 +321,7 @@ void build_goto_trace(
       s_it1++)
     if(s_it1->is_assert() && !s_it1->cond_value)
     {
-      s_it1++;
-
-      for(goto_tracet::stepst::iterator
-          s_it2=s_it1;
-          s_it2!=goto_trace.steps.end();
-          s_it2=goto_trace.steps.erase(s_it2));
-
+      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
       break;
     }
 }

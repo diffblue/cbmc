@@ -143,7 +143,8 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
   else
     result=tvt(tvt::tv_enumt::TV_UNKNOWN);
 
-  if(a.sign()) result=!result;
+  if(a.sign())
+    result=!result;
 
   return result;
 }
@@ -179,7 +180,6 @@ Function: satcheck_minisat1_baset::add_variables
 
 void satcheck_minisat1_baset::add_variables()
 {
-
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
 }

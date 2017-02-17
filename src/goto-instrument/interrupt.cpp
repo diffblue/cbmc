@@ -94,7 +94,7 @@ void interrupt(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
 #ifdef LOCAL_MAY
-  const goto_functionst::goto_functiont& goto_function,
+  const goto_functionst::goto_functiont &goto_function,
 #endif
   goto_programt &goto_program,
   const symbol_exprt &interrupt_handler,
@@ -113,7 +113,7 @@ void interrupt(
 #ifdef LOCAL_MAY
       , local_may
 #endif
-    );
+    ); // NOLINT(whitespace/parens)
 
     // potential race?
     bool race_on_read=potential_race_on_read(rw_set, isr_rw_set);
@@ -209,7 +209,8 @@ symbol_exprt get_isr(
     symbol_tablet::symbolst::const_iterator s_it=
       symbol_table.symbols.find(m_it->second);
 
-    if(s_it==symbol_table.symbols.end()) continue;
+    if(s_it==symbol_table.symbols.end())
+      continue;
 
     if(s_it->second.type.id()==ID_code)
       matches.push_back(s_it->second.symbol_expr());

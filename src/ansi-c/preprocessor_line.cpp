@@ -37,7 +37,8 @@ void preprocessor_line(
   while(*ptr==' ' || *ptr=='\t') ptr++;
 
   // skip #
-  if(*ptr!='#') return;
+  if(*ptr!='#')
+    return;
   ptr++;
 
   // skip WS

@@ -53,7 +53,8 @@ floatbv_typet ieee_float_spect::to_type() const
   floatbv_typet result;
   result.set_f(f);
   result.set_width(width());
-  if(x86_extended) result.set(ID_x86_extended, true);
+  if(x86_extended)
+    result.set(ID_x86_extended, true);
   return result;
 }
 
@@ -111,7 +112,8 @@ void ieee_float_spect::from_type(const floatbv_typet &type)
   assert(f<width);
   e=width-f-1;
   x86_extended=type.get_bool(ID_x86_extended);
-  if(x86_extended) e=e-1; // no hidden bit
+  if(x86_extended)
+    e=e-1; // no hidden bit
 }
 
 /*******************************************************************\
@@ -174,7 +176,7 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
       }
       else // _exponent<0
       {
-        if(true)//base10_digits(fraction)+_exponent<-4)
+        if(true) // base10_digits(fraction)+_exponent<-4)
           result+=to_string_scientific(format_spec.precision);
         else
           result+=to_string_decimal(format_spec.precision);
@@ -226,9 +228,11 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
 {
   std::string result;
 
-  if(sign_flag) result+='-';
+  if(sign_flag)
+    result+='-';
 
-  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
+  if((NaN_flag || infinity_flag) && !sign_flag)
+    result+='+';
 
   // special cases
   if(NaN_flag)
@@ -280,7 +284,8 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
         mp_integer remainder=_fraction%r;
         _fraction/=r;
         // not sure if this is the right kind of rounding here
-        if(remainder>=r/2) ++_fraction;
+        if(remainder>=r/2)
+          ++_fraction;
         position=precision;
       }
 
@@ -328,9 +333,11 @@ std::string ieee_floatt::to_string_scientific(std::size_t precision) const
 {
   std::string result;
 
-  if(sign_flag) result+='-';
+  if(sign_flag)
+    result+='-';
 
-  if((NaN_flag || infinity_flag) && !sign_flag) result+='+';
+  if((NaN_flag || infinity_flag) && !sign_flag)
+    result+='+';
 
   // special cases
   if(NaN_flag)
@@ -505,7 +512,8 @@ mp_integer ieee_floatt::pack() const
   mp_integer result=0;
 
   // sign bit
-  if(sign_flag) result+=power(2, spec.e+spec.f);
+  if(sign_flag)
+    result+=power(2, spec.e+spec.f);
 
   if(NaN_flag)
   {
@@ -639,7 +647,8 @@ void ieee_floatt::build(
 {
   sign_flag=_fraction<0;
   fraction=_fraction;
-  if(sign_flag) fraction=-fraction;
+  if(sign_flag)
+    fraction=-fraction;
   exponent=_exponent;
   exponent+=spec.f;
   align();
@@ -664,7 +673,8 @@ void ieee_floatt::from_base10(
   NaN_flag=infinity_flag=false;
   sign_flag=_fraction<0;
   fraction=_fraction;
-  if(sign_flag) fraction=-fraction;
+  if(sign_flag)
+    fraction=-fraction;
   exponent=spec.f;
   exponent+=_exponent;
 
@@ -746,22 +756,22 @@ void ieee_floatt::align()
   mp_integer f_power=power(2, spec.f);
   mp_integer f_power_next=power(2, spec.f+1);
 
-  std::size_t lowPower2 = fraction.floorPow2();
+  std::size_t lowPower2=fraction.floorPow2();
   mp_integer exponent_offset=0;
 
-  if (lowPower2 < spec.f) // too small
+  if(lowPower2<spec.f) // too small
   {
-    exponent_offset -= (spec.f - lowPower2);
+    exponent_offset-=(spec.f-lowPower2);
 
-    assert(fraction * power(2,(spec.f - lowPower2)) >= f_power);
-    assert(fraction * power(2,(spec.f - lowPower2)) < f_power_next);
+    assert(fraction*power(2, (spec.f-lowPower2))>=f_power);
+    assert(fraction*power(2, (spec.f-lowPower2))<f_power_next);
   }
-  else if (lowPower2 > spec.f)  // too large
+  else if(lowPower2>spec.f)  // too large
   {
-    exponent_offset += (lowPower2 - spec.f);
+    exponent_offset+=(lowPower2-spec.f);
 
-    assert(fraction / power(2,(lowPower2 - spec.f)) >= f_power);
-    assert(fraction / power(2,(lowPower2 - spec.f)) < f_power_next);
+    assert(fraction/power(2, (lowPower2-spec.f))>=f_power);
+    assert(fraction/power(2, (lowPower2-spec.f))<f_power_next);
   }
 
   mp_integer biased_exponent=exponent+exponent_offset+spec.bias();
@@ -930,35 +940,49 @@ Function: operator /=
 
 \*******************************************************************/
 
-ieee_floatt &ieee_floatt::operator /= (const ieee_floatt &other)
+ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
 {
   assert(other.spec.f==spec.f);
 
   // NaN/x = NaN
-  if(NaN_flag) return *this;
+  if(NaN_flag)
+    return *this;
 
   // x/NaN = NaN
-  if(other.NaN_flag) { make_NaN(); return *this; }
+  if(other.NaN_flag)
+  {
+    make_NaN();
+    return *this;
+  }
 
   // 0/0 = NaN
-  if(is_zero() && other.is_zero()) { make_NaN(); return *this; }
+  if(is_zero() && other.is_zero())
+  {
+    make_NaN();
+    return *this;
+  }
 
   // x/0 = +-inf
   if(other.is_zero())
   {
     infinity_flag=true;
-    if(other.sign_flag) negate();
+    if(other.sign_flag)
+      negate();
     return *this;
   }
 
   // x/inf = NaN
   if(other.infinity_flag)
   {
-    if(infinity_flag) { make_NaN(); return *this; }
+    if(infinity_flag)
+    {
+      make_NaN();
+      return *this;
+    }
 
-    bool old_sign = sign_flag;
+    bool old_sign=sign_flag;
     make_zero();
-    sign_flag = old_sign;
+    sign_flag=old_sign;
 
     if(other.sign_flag)
       negate();
@@ -967,7 +991,8 @@ ieee_floatt &ieee_floatt::operator /= (const ieee_floatt &other)
   } // inf/x = inf
   else if(infinity_flag)
   {
-    if(other.sign_flag) negate();
+    if(other.sign_flag)
+      negate();
 
     return *this;
   }
@@ -981,7 +1006,8 @@ ieee_floatt &ieee_floatt::operator /= (const ieee_floatt &other)
 
   fraction/=other.fraction;
 
-  if(other.sign_flag) negate();
+  if(other.sign_flag)
+    negate();
 
   align();
 
@@ -1000,12 +1026,14 @@ Function: operator *=
 
 \*******************************************************************/
 
-ieee_floatt &ieee_floatt::operator *= (const ieee_floatt &other)
+ieee_floatt &ieee_floatt::operator*=(const ieee_floatt &other)
 {
   assert(other.spec.f==spec.f);
 
-  if(other.NaN_flag) make_NaN();
-  if(NaN_flag) return *this;
+  if(other.NaN_flag)
+    make_NaN();
+  if(NaN_flag)
+    return *this;
 
   if(infinity_flag || other.infinity_flag)
   {
@@ -1016,7 +1044,8 @@ ieee_floatt &ieee_floatt::operator *= (const ieee_floatt &other)
       return *this;
     }
 
-    if(other.sign_flag) negate();
+    if(other.sign_flag)
+      negate();
     infinity_flag=true;
     return *this;
   }
@@ -1025,7 +1054,8 @@ ieee_floatt &ieee_floatt::operator *= (const ieee_floatt &other)
   exponent-=spec.f;
   fraction*=other.fraction;
 
-  if(other.sign_flag) negate();
+  if(other.sign_flag)
+    negate();
 
   align();
 
@@ -1044,18 +1074,21 @@ Function: operator +=
 
 \*******************************************************************/
 
-ieee_floatt &ieee_floatt::operator += (const ieee_floatt &other)
+ieee_floatt &ieee_floatt::operator+=(const ieee_floatt &other)
 {
   ieee_floatt _other=other;
 
   assert(_other.spec==spec);
 
-  if(other.NaN_flag) make_NaN();
-  if(NaN_flag) return *this;
+  if(other.NaN_flag)
+    make_NaN();
+  if(NaN_flag)
+    return *this;
 
   if(infinity_flag && other.infinity_flag)
   {
-    if(sign_flag==other.sign_flag) return *this;
+    if(sign_flag==other.sign_flag)
+      return *this;
     make_NaN();
     return *this;
   }
@@ -1102,8 +1135,10 @@ ieee_floatt &ieee_floatt::operator += (const ieee_floatt &other)
 
   assert(exponent==_other.exponent);
 
-  if(sign_flag) fraction.negate();
-  if(_other.sign_flag) _other.fraction.negate();
+  if(sign_flag)
+    fraction.negate();
+  if(_other.sign_flag)
+    _other.fraction.negate();
 
   fraction+=_other.fraction;
 
@@ -1119,7 +1154,8 @@ ieee_floatt &ieee_floatt::operator += (const ieee_floatt &other)
   else // fraction!=0
   {
     sign_flag=(fraction<0);
-    if(sign_flag) fraction.negate();
+    if(sign_flag)
+      fraction.negate();
   }
 
   align();
@@ -1139,7 +1175,7 @@ Function: operator -=
 
 \*******************************************************************/
 
-ieee_floatt &ieee_floatt::operator -= (const ieee_floatt &other)
+ieee_floatt &ieee_floatt::operator-=(const ieee_floatt &other)
 {
   ieee_floatt _other=other;
   _other.sign_flag=!_other.sign_flag;
@@ -1148,7 +1184,7 @@ ieee_floatt &ieee_floatt::operator -= (const ieee_floatt &other)
 
 /*******************************************************************\
 
-Function: operator <
+Function: ieee_floatt::operator<
 
   Inputs:
 
@@ -1158,54 +1194,55 @@ Function: operator <
 
 \*******************************************************************/
 
-bool operator < (const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator<(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
+  if(NaN_flag || other.NaN_flag)
+    return false;
 
   // check both zero?
-  if(a.is_zero() && b.is_zero())
+  if(is_zero() && other.is_zero())
     return false;
 
   // one of them zero?
-  if(a.is_zero())
-    return !b.sign_flag;
-  else if(b.is_zero())
-    return a.sign_flag;
+  if(is_zero())
+    return !other.sign_flag;
+  else if(other.is_zero())
+    return sign_flag;
 
   // check sign
-  if(a.sign_flag!=b.sign_flag)
-    return a.sign_flag;
+  if(sign_flag!=other.sign_flag)
+    return sign_flag;
 
   // handle infinity
-  if(a.infinity_flag)
+  if(infinity_flag)
   {
-    if(b.infinity_flag)
+    if(other.infinity_flag)
       return false;
     else
-      return a.sign_flag;
+      return sign_flag;
   }
-  else if(b.infinity_flag)
-    return !a.sign_flag;
+  else if(other.infinity_flag)
+    return !sign_flag;
 
   // check exponent
-  if(a.exponent!=b.exponent)
+  if(exponent!=other.exponent)
   {
-    if(a.sign_flag) // both negative
-      return a.exponent>b.exponent;
+    if(sign_flag) // both negative
+      return exponent>other.exponent;
     else
-      return a.exponent<b.exponent;
+      return exponent<other.exponent;
   }
 
   // check significand
-  if(a.sign_flag) // both negative
-    return a.fraction>b.fraction;
+  if(sign_flag) // both negative
+    return fraction>other.fraction;
   else
-    return a.fraction<b.fraction;
+    return fraction<other.fraction;
 }
 
 /*******************************************************************\
 
-Function: operator <=
+Function: ieee_floatt::operator<=
 
   Inputs:
 
@@ -1215,30 +1252,32 @@ Function: operator <=
 
 \*******************************************************************/
 
-bool operator <=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator<=(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
+  if(NaN_flag || other.NaN_flag)
+    return false;
 
   // check zero
-  if(a.is_zero() && b.is_zero())
+  if(is_zero() && other.is_zero())
     return true;
 
   // handle infinity
-  if(a.infinity_flag && b.infinity_flag && a.sign_flag==b.sign_flag)
+  if(infinity_flag && other.infinity_flag &&
+     sign_flag==other.sign_flag)
     return true;
 
-  if(!a.infinity_flag && !b.infinity_flag &&
-     a.sign_flag==b.sign_flag &&
-     a.exponent==b.exponent &&
-     a.fraction==b.fraction)
+  if(!infinity_flag && !other.infinity_flag &&
+     sign_flag==other.sign_flag &&
+     exponent==other.exponent &&
+     fraction==other.fraction)
     return true;
 
-  return a<b;
+  return *this<other;
 }
 
 /*******************************************************************\
 
-Function: operator >
+Function: ieee_floatt::operator>
 
   Inputs:
 
@@ -1248,14 +1287,14 @@ Function: operator >
 
 \*******************************************************************/
 
-bool operator > (const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator>(const ieee_floatt &other) const
 {
-  return b < a;
+  return other<*this;
 }
 
 /*******************************************************************\
 
-Function: operator >=
+Function: ieee_floatt::operator>=
 
   Inputs:
 
@@ -1265,14 +1304,14 @@ Function: operator >=
 
 \*******************************************************************/
 
-bool operator >=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator>=(const ieee_floatt &other) const
 {
-  return b <= a;
+  return other<=*this;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: ieee_floatt::operator==
 
   Inputs:
 
@@ -1282,29 +1321,31 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator==(const ieee_floatt &other) const
 {
   // packed equality!
-  if(a.NaN_flag && b.NaN_flag)
+  if(NaN_flag && other.NaN_flag)
     return true;
-  else if(a.NaN_flag || b.NaN_flag)
+  else if(NaN_flag || other.NaN_flag)
     return false;
 
-  if(a.infinity_flag && b.infinity_flag &&
-     a.sign_flag == b.sign_flag) return true;
-  else if(a.infinity_flag || b.infinity_flag)
+  if(infinity_flag && other.infinity_flag &&
+     sign_flag==other.sign_flag)
+    return true;
+  else if(infinity_flag || other.infinity_flag)
     return false;
 
-  //if(a.is_zero() && b.is_zero()) return true;
+  // if(a.is_zero() && b.is_zero()) return true;
 
-  return a.exponent==b.exponent &&
-         a.fraction==b.fraction &&
-         a.sign_flag==b.sign_flag;
+  return
+    exponent==other.exponent &&
+    fraction==other.fraction &&
+    sign_flag==other.sign_flag;
 }
 
 /*******************************************************************\
 
-Function: ieee_equal
+Function: ieee_floatt::ieee_equal
 
   Inputs:
 
@@ -1314,17 +1355,19 @@ Function: ieee_equal
 
 \*******************************************************************/
 
-bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::ieee_equal(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return false;
-  if(a.is_zero() && b.is_zero()) return true;
-  assert(a.spec==b.spec);
-  return a==b;
+  if(NaN_flag || other.NaN_flag)
+    return false;
+  if(is_zero() && other.is_zero())
+    return true;
+  assert(spec==other.spec);
+  return *this==other;
 }
 
 /*******************************************************************\
 
-Function: operator ==
+Function: ieee_floatt::operator==
 
   Inputs:
 
@@ -1334,17 +1377,16 @@ Function: operator ==
 
 \*******************************************************************/
 
-bool operator ==(const ieee_floatt &a, int i)
+bool ieee_floatt::operator==(int i) const
 {
-  ieee_floatt other;
-  other.spec=a.spec;
+  ieee_floatt other(spec);
   other.from_integer(i);
-  return a==other;
+  return *this==other;
 }
 
 /*******************************************************************\
 
-Function: operator !=
+Function: ieee_floatt::operator!=
 
   Inputs:
 
@@ -1354,14 +1396,14 @@ Function: operator !=
 
 \*******************************************************************/
 
-bool operator !=(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::operator!=(const ieee_floatt &other) const
 {
-  return !(a==b);
+  return !(*this==other);
 }
 
 /*******************************************************************\
 
-Function: ieee_not_equal
+Function: ieee_floatt::ieee_not_equal
 
   Inputs:
 
@@ -1371,12 +1413,14 @@ Function: ieee_not_equal
 
 \*******************************************************************/
 
-bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b)
+bool ieee_floatt::ieee_not_equal(const ieee_floatt &other) const
 {
-  if(a.NaN_flag || b.NaN_flag) return true; // !!!
-  if(a.is_zero() && b.is_zero()) return false;
-  assert(a.spec==b.spec);
-  return a!=b;
+  if(NaN_flag || other.NaN_flag)
+    return true; // !!!
+  if(is_zero() && other.is_zero())
+    return false;
+  assert(spec==other.spec);
+  return *this!=other;
 }
 
 /*******************************************************************\
@@ -1396,7 +1440,8 @@ void ieee_floatt::change_spec(const ieee_float_spect &dest_spec)
   mp_integer _exponent=exponent-spec.f;
   mp_integer _fraction=fraction;
 
-  if(sign_flag) _fraction.negate();
+  if(sign_flag)
+    _fraction.negate();
 
   spec=dest_spec;
 
@@ -1423,7 +1468,7 @@ Function: ieee_floatt::from_expr
 
 void ieee_floatt::from_expr(const constant_exprt &expr)
 {
-  spec=to_floatbv_type(expr.type());
+  spec=ieee_float_spect(to_floatbv_type(expr.type()));
   unpack(binary2integer(id2string(expr.get_value()), false));
 }
 
@@ -1441,7 +1486,8 @@ Function: ieee_floatt::to_integer
 
 mp_integer ieee_floatt::to_integer() const
 {
-  if(NaN_flag || infinity_flag || is_zero()) return 0;
+  if(NaN_flag || infinity_flag || is_zero())
+    return 0;
 
   mp_integer result=fraction;
 
@@ -1537,7 +1583,7 @@ Function: ieee_floatt::make_NaN
 void ieee_floatt::make_NaN()
 {
   NaN_flag=true;
-  //sign=false;
+  // sign=false;
   exponent=0;
   fraction=0;
   infinity_flag=false;
@@ -1558,7 +1604,7 @@ Function: ieee_floatt::make_fltmax
 void ieee_floatt::make_fltmax()
 {
   mp_integer bit_pattern=
-    power(2, spec.e+spec.f)-1 - power(2,spec.f);
+    power(2, spec.e+spec.f)-1-power(2, spec.f);
   unpack(bit_pattern);
 }
 
@@ -1632,7 +1678,7 @@ Function: ieee_floatt::is_double
 
 bool ieee_floatt::is_double() const
 {
-  return spec.f == 52 && spec.e == 11;
+  return spec.f==52 && spec.e==11;
 }
 
 /*******************************************************************\
@@ -1649,7 +1695,7 @@ Function: ieee_floatt::is_float
 
 bool ieee_floatt::is_float() const
 {
-  return spec.f == 23 && spec.e == 8;
+  return spec.f==23 && spec.e==8;
 }
 
 /*******************************************************************\
@@ -1685,16 +1731,16 @@ double ieee_floatt::to_double() const
       return std::numeric_limits<double>::quiet_NaN();
   }
 
-  mp_integer i = pack();
+  mp_integer i=pack();
   assert(i.is_ulong());
 
-  a.i = i.to_ulong();
+  a.i=i.to_ulong();
   return a.f;
 }
 
 /*******************************************************************\
 
-Function: ieee_floatt:to_float
+Function: ieee_floatt::to_float
 
   Inputs:
 
@@ -1707,7 +1753,7 @@ Function: ieee_floatt:to_float
 
 float ieee_floatt::to_float() const
 {
-  if(sizeof(unsigned) != sizeof(float))
+  if(sizeof(unsigned)!=sizeof(float))
   {
     throw "ieee_floatt::to_float not supported on this architecture";
   }
@@ -1730,10 +1776,10 @@ float ieee_floatt::to_float() const
       return std::numeric_limits<float>::quiet_NaN();
   }
 
-  mp_integer i = pack();
+  mp_integer i=pack();
   assert(i.is_ulong());
 
-  a.i = (unsigned) i.to_ulong();
+  a.i=i.to_ulong();
   return a.f;
 }
 
@@ -1756,7 +1802,7 @@ void ieee_floatt::next_representable(bool greater)
   if(is_NaN())
     return;
 
-  bool old_sign = get_sign();
+  bool old_sign=get_sign();
 
   if(is_zero())
   {
@@ -1768,7 +1814,7 @@ void ieee_floatt::next_representable(bool greater)
 
   if(is_infinity())
   {
-    if(get_sign() == greater)
+    if(get_sign()==greater)
     {
       make_fltmax();
       set_sign(old_sign);
@@ -1778,23 +1824,13 @@ void ieee_floatt::next_representable(bool greater)
 
   bool dir;
   if(greater)
-  {
-    if(get_sign())
-      dir = false;
-    else
-      dir = true;
-  }
+    dir=!get_sign();
   else
-  {
-    if(get_sign())
-      dir = true;
-    else
-      dir = false;
-  }
+    dir=get_sign();
 
   set_sign(false);
 
-  mp_integer old = pack();
+  mp_integer old=pack();
   if(dir)
     ++old;
   else
@@ -1802,18 +1838,6 @@ void ieee_floatt::next_representable(bool greater)
 
   unpack(old);
 
-  //sign change impossible (zero case caught earler)
+  // sign change impossible (zero case caught earler)
   set_sign(old_sign);
-
-  //mp_integer new_exp = exponent;
-  //mp_integer new_frac = fraction + dir;
-
-  //std::cout << exponent << ":" << fraction << std::endl;
-  //std::cout << new_exp << ":" << new_frac << std::endl;
-
-  //if(get_sign())
-  //  new_frac.negate();
-
-  //new_exp -= spec.f;
-  //build(new_frac, new_exp);
 }

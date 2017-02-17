@@ -33,7 +33,6 @@ public:
   rename_symbolt rename_symbol;
 
 protected:
-
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
 
   bool needs_renaming_type(

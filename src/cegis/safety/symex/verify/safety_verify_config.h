@@ -51,7 +51,7 @@ public:
    *
    * @param program
    */
-  safety_verify_configt(const safety_programt &program);
+  explicit safety_verify_configt(const safety_programt &program);
 
   /**
    * @brief

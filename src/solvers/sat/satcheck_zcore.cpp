@@ -119,7 +119,8 @@ propt::resultt satcheck_zcoret::prop_solve()
   system(std::string("zchaff_verify "+cnf_file+" > "+output_file).c_str());
 
   // get core
-  system(std::string("zcore "+cnf_file+" "+trace_file+" >> "+output_file).c_str());
+  system(
+    std::string("zcore "+cnf_file+" "+trace_file+" >> "+output_file).c_str());
 
   in_core.clear();
 
@@ -130,25 +131,29 @@ propt::resultt satcheck_zcoret::prop_solve()
     while(true)
     {
       std::string line;
-      if(!std::getline(in, line)) break;
+      if(!std::getline(in, line))
+        break;
 
-      if(!(line.substr(0,1)=="c" || line.substr(0,1)=="p"))
+      if(!(line.substr(0, 1)=="c" || line.substr(0, 1)=="p"))
       {
         const char *p=line.c_str();
 
         while(true)
         {
           int l=unsafe_str2int(p);
-          if(l==0) break;
+          if(l==0)
+            break;
 
-          if(l<0) l=-l;
+          if(l<0)
+            l=-l;
 
           in_core.insert(l);
 
           // next one
           const char *q=strchr(p, ' ');
           while(*q==' ') q++;
-          if(q==NULL) break;
+          if(q==NULL)
+            break;
           p=q;
         }
       }
@@ -159,9 +164,9 @@ propt::resultt satcheck_zcoret::prop_solve()
     return P_ERROR;
 
   remove(cnf_file.c_str());
-  //remove(core_file.c_str());
+  // remove(core_file.c_str());
   remove(trace_file.c_str());
-  //remove(output_file.c_str());
+  // remove(output_file.c_str());
 
   return P_UNSATISFIABLE;
 }

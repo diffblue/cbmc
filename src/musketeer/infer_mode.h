@@ -9,7 +9,8 @@
 #ifndef CPROVER_MUSKETEER_INFER_MODE_H
 #define CPROVER_MUSKETEER_INFER_MODE_H
 
-typedef enum {
+typedef enum
+{
   INFER=0,
   USER_DEF=1,
   USER_ASSERT=2

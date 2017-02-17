@@ -164,9 +164,12 @@ void goto_convertt::rewrite_boolean(exprt &expr)
   exprt::operandst &ops=expr.operands();
 
   // start with last one
-  for(int i=int(ops.size())-1; i>=0; i--)
+  for(exprt::operandst::reverse_iterator
+      it=ops.rbegin();
+      it!=ops.rend();
+      ++it)
   {
-    exprt &op=ops[i];
+    exprt &op=*it;
 
     if(!op.is_boolean())
     {
@@ -216,7 +219,8 @@ void goto_convertt::clean_expr(
   //   compound assignments
   //   compound literals
 
-  if(!needs_cleaning(expr)) return;
+  if(!needs_cleaning(expr))
+    return;
 
   if(expr.id()==ID_and || expr.id()==ID_or)
   {
@@ -398,7 +402,8 @@ void goto_convertt::clean_expr(
     {
       // need to do separately to prevent that
       // the operands of expr get 'cleaned'
-      remove_statement_expression(to_side_effect_expr(expr), dest, result_is_used);
+      remove_statement_expression(
+        to_side_effect_expr(expr), dest, result_is_used);
       return;
     }
     else if(statement==ID_assign)
@@ -429,7 +434,9 @@ void goto_convertt::clean_expr(
     else if(statement==ID_function_call)
     {
       if(to_side_effect_expr_function_call(expr).function().id()==ID_symbol &&
-         to_symbol_expr(to_side_effect_expr_function_call(expr).function()).get_identifier()=="__noop")
+         to_symbol_expr(
+           to_side_effect_expr_function_call(expr).
+           function()).get_identifier()=="__noop")
       {
         // __noop needs special treatment, as arguments are not
         // evaluated

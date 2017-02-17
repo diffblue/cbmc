@@ -50,7 +50,7 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  messaget& message)
+  messaget &message)
 {
   namespacet ns(symbol_table);
   unsigned tmp_counter=0;
@@ -73,12 +73,14 @@ void introduce_temporaries(
 #ifdef LOCAL_MAY
       , local_may
 #endif
-      );
-      if(rw_set.empty()) continue;
+      ); // NOLINT(whitespace/parens)
+      if(rw_set.empty())
+        continue;
 
       symbolt new_symbol;
       new_symbol.base_name="$tmp_guard";
-      new_symbol.name=id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
+      new_symbol.name=
+        id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
       new_symbol.type=bool_typet();
       new_symbol.is_static_lifetime=true;
       new_symbol.is_thread_local=true;
@@ -122,8 +124,8 @@ Function: weak_memory
 
 void weak_memory(
   memory_modelt model,
-  value_setst& value_sets,
-  symbol_tablet& symbol_table,
+  value_setst &value_sets,
+  symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool SCC,
   instrumentation_strategyt event_strategy,
@@ -138,7 +140,7 @@ void weak_memory(
   bool render_function,
   bool cav11_option,
   bool hide_internals,
-  message_handlert& message_handler,
+  message_handlert &message_handler,
   bool ignore_arrays)
 {
   messaget message(message_handler);
@@ -242,7 +244,7 @@ void weak_memory(
   shared_buffers.cycles_r_loc = instrumenter.id2cycloc; // places in the cycles
 
   // for reads delays
-  shared_buffers.affected_by_delay(symbol_table,value_sets,goto_functions);
+  shared_buffers.affected_by_delay(symbol_table, value_sets, goto_functions);
 
   for(std::set<irep_idt>::iterator it=
     shared_buffers.affected_by_delay_set.begin();
@@ -254,11 +256,12 @@ void weak_memory(
   for(std::set<irep_idt>::iterator it=shared_buffers.cycles.begin();
     it!=shared_buffers.cycles.end(); it++)
   {
-    typedef std::multimap<irep_idt,source_locationt>::iterator m_itt;
-    const std::pair<m_itt,m_itt> ran=
+    typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+    const std::pair<m_itt, m_itt> ran=
       shared_buffers.cycles_loc.equal_range(*it);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
-      message.result() << ((*it)==""?"fence":*it)<<", "<<ran_it->second<<messaget::eom;
+      message.result() << ((*it)==""?"fence":*it) << ", "
+                       << ran_it->second << messaget::eom;
   }
 
   shared_bufferst::cfg_visitort visitor(shared_buffers, symbol_table,

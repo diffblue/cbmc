@@ -212,7 +212,8 @@ void havoc_loopst::get_modifies(
 
       // return value assignment
       if(lhs.is_not_nil())
-        function_modifies.get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
+        function_modifies.get_modifies_lhs(
+          local_may_alias, *i_it, lhs, modifies);
 
       function_modifies(code_function_call.function(), modifies);
     }

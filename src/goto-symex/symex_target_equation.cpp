@@ -619,7 +619,7 @@ Function: symex_target_equationt::convert
 \*******************************************************************/
 
 void symex_target_equationt::convert(
-   prop_convt &prop_conv)
+  prop_convt &prop_conv)
 {
   convert_guards(prop_conv);
   convert_assignments(prop_conv);
@@ -981,11 +981,16 @@ void symex_target_equationt::SSA_stept::output(
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT: out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::ASSUME: out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::LOCATION: out << "LOCATION" << std::endl; break;
-  case goto_trace_stept::INPUT: out << "INPUT" << std::endl; break;
-  case goto_trace_stept::OUTPUT: out << "OUTPUT" << std::endl; break;
+  case goto_trace_stept::ASSERT:
+    out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
+  case goto_trace_stept::ASSUME:
+    out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
+  case goto_trace_stept::LOCATION:
+    out << "LOCATION" << std::endl; break;
+  case goto_trace_stept::INPUT:
+    out << "INPUT" << std::endl; break;
+  case goto_trace_stept::OUTPUT:
+    out << "OUTPUT" << std::endl; break;
 
   case goto_trace_stept::DECL:
     out << "DECL" << std::endl;
@@ -1002,23 +1007,36 @@ void symex_target_equationt::SSA_stept::output(
     case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
     case PHI: out << "PHI"; break;
     case GUARD: out << "GUARD"; break;
-    default:;
+    default:
+      {
+      }
     }
 
     out << ")" << std::endl;
     break;
 
-  case goto_trace_stept::DEAD: out << "DEAD" << std::endl; break;
-  case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION_CALL" << std::endl; break;
-  case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION_RETURN" << std::endl; break;
-  case goto_trace_stept::CONSTRAINT: out << "CONSTRAINT" << std::endl; break;
-  case goto_trace_stept::SHARED_READ: out << "SHARED READ" << std::endl; break;
-  case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE" << std::endl; break;
-  case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMIC_BEGIN" << std::endl; break;
-  case goto_trace_stept::ATOMIC_END: out << "AUTOMIC_END" << std::endl; break;
-  case goto_trace_stept::SPAWN: out << "SPAWN" << std::endl; break;
-  case goto_trace_stept::MEMORY_BARRIER: out << "MEMORY_BARRIER" << std::endl; break;
-  case goto_trace_stept::GOTO: out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
+  case goto_trace_stept::DEAD:
+    out << "DEAD" << std::endl; break;
+  case goto_trace_stept::FUNCTION_CALL:
+    out << "FUNCTION_CALL" << std::endl; break;
+  case goto_trace_stept::FUNCTION_RETURN:
+    out << "FUNCTION_RETURN" << std::endl; break;
+  case goto_trace_stept::CONSTRAINT:
+    out << "CONSTRAINT" << std::endl; break;
+  case goto_trace_stept::SHARED_READ:
+    out << "SHARED READ" << std::endl; break;
+  case goto_trace_stept::SHARED_WRITE:
+    out << "SHARED WRITE" << std::endl; break;
+  case goto_trace_stept::ATOMIC_BEGIN:
+    out << "ATOMIC_BEGIN" << std::endl; break;
+  case goto_trace_stept::ATOMIC_END:
+    out << "AUTOMIC_END" << std::endl; break;
+  case goto_trace_stept::SPAWN:
+    out << "SPAWN" << std::endl; break;
+  case goto_trace_stept::MEMORY_BARRIER:
+    out << "MEMORY_BARRIER" << std::endl; break;
+  case goto_trace_stept::GOTO:
+    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
 
   default: assert(false);
   }

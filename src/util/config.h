@@ -128,7 +128,6 @@ public:
     void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
     void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
     void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
-
   } cpp;
 
   struct verilogt

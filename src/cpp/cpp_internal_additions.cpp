@@ -71,8 +71,11 @@ void cpp_internal_additions(std::ostream &out)
 
   // auxiliaries for new/delete
   out << "extern \"C\" void *__new(__typeof__(sizeof(int)));" << '\n';
+  // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" void *__new_array(__typeof__(sizeof(int)), __typeof__(sizeof(int)));" << '\n';
+  // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" void *__placement_new(__typeof__(sizeof(int)), void *);" << '\n';
+  // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" void *__placement_new_array(__typeof__(sizeof(int)), __typeof__(sizeof(int)), void *);" << '\n';
   out << "extern \"C\" void __delete(void *);" << '\n';
   out << "extern \"C\" void __delete_array(void *);" << '\n';
@@ -95,7 +98,7 @@ void cpp_internal_additions(std::ostream &out)
          "bool assertion, const char *description);" << '\n';
 
   // CPROVER extensions
-  out << "extern \"C\" const unsigned __CPROVER::constant_infinity_uint;" << '\n';
+  out << "extern \"C\" const unsigned __CPROVER::constant_infinity_uint;\n";
   out << "extern \"C\" void __CPROVER_initialize();" << '\n';
   out << "extern \"C\" void __CPROVER::input(const char *id, ...);" << '\n';
   out << "extern \"C\" void __CPROVER::output(const char *id, ...);" << '\n';
@@ -104,9 +107,10 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" void __CPROVER::atomic_end();" << '\n';
 
   // pointers
-  out << "extern \"C\" unsigned __CPROVER_POINTER_OBJECT(const void *p);" << '\n';
+  out << "extern \"C\" unsigned __CPROVER_POINTER_OBJECT(const void *p);\n";
   out << "extern \"C\" signed __CPROVER_POINTER_OFFSET(const void *p);" << '\n';
   out << "extern \"C\" bool __CPROVER_DYNAMIC_OBJECT(const void *p);" << '\n';
+  // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" extern unsigned char __CPROVER_memory[__CPROVER::constant_infinity_uint];" << '\n';
   out << "extern \"C\" const void *__CPROVER_dead_object=0;" << '\n';
 
@@ -120,8 +124,9 @@ void cpp_internal_additions(std::ostream &out)
   out << "extern \"C\" int __CPROVER_rounding_mode;" << '\n';
 
   // arrays
+  // NOLINTNEXTLINE(whitespace/line_length)
   out << "bool __CPROVER::array_equal(const void array1[], const void array2[]);" << '\n';
-  out << "void __CPROVER::array_copy(const void dest[], const void src[]);" << '\n';
+  out << "void __CPROVER::array_copy(const void dest[], const void src[]);\n";
   out << "void __CPROVER::array_set(const void dest[], ...);" << '\n';
 
   // GCC stuff, but also for ARM

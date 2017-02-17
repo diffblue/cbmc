@@ -28,11 +28,12 @@ protected:
 public:
   // constructors
   rationalt():numerator(0), denominator(1) { }
-  rationalt(const mp_integer &i):numerator(i), denominator(1) { }
-  rationalt(int i):numerator(i), denominator(1) { }
+  explicit rationalt(const mp_integer &i):numerator(i), denominator(1) { }
+  explicit rationalt(int i):numerator(i), denominator(1) { }
 
   rationalt &operator+=(const rationalt &n);
   rationalt &operator-=(const rationalt &n);
+  rationalt &operator-();
   rationalt &operator*=(const rationalt &n);
   rationalt &operator/=(const rationalt &n);
 
@@ -85,44 +86,52 @@ public:
 
   void invert();
 
-  friend rationalt operator+(const rationalt &a, const rationalt &b)
+  const mp_integer &get_numerator() const
   {
-    rationalt tmp(a);
-    tmp+=b;
-    return tmp;
+    return numerator;
   }
 
-  friend rationalt operator-(const rationalt &a, const rationalt &b)
+  const mp_integer &get_denominator() const
   {
-    rationalt tmp(a);
-    tmp-=b;
-    return tmp;
+    return denominator;
   }
-
-  friend rationalt operator-(const rationalt &a)
-  {
-    rationalt tmp(a);
-    tmp.numerator.negate();
-    return tmp;
-  }
-
-  friend rationalt operator*(const rationalt &a, const rationalt &b)
-  {
-    rationalt tmp(a);
-    tmp*=b;
-    return tmp;
-  }
-
-  friend rationalt operator/(const rationalt &a, const rationalt &b)
-  {
-    rationalt tmp(a);
-    tmp/=b;
-    return tmp;
-  }
-
-  friend std::ostream& operator<< (std::ostream& out, const rationalt &a);
-  friend constant_exprt from_rational(const rationalt &n);
 };
+
+inline rationalt operator+(const rationalt &a, const rationalt &b)
+{
+  rationalt tmp(a);
+  tmp+=b;
+  return tmp;
+}
+
+inline rationalt operator-(const rationalt &a, const rationalt &b)
+{
+  rationalt tmp(a);
+  tmp-=b;
+  return tmp;
+}
+
+inline rationalt operator-(const rationalt &a)
+{
+  rationalt tmp(a);
+  return -tmp;
+}
+
+inline rationalt operator*(const rationalt &a, const rationalt &b)
+{
+  rationalt tmp(a);
+  tmp*=b;
+  return tmp;
+}
+
+inline rationalt operator/(const rationalt &a, const rationalt &b)
+{
+  rationalt tmp(a);
+  tmp/=b;
+  return tmp;
+}
+
+std::ostream &operator<<(std::ostream &out, const rationalt &a);
 
 rationalt inverse(const rationalt &n);
 

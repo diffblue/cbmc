@@ -42,7 +42,8 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
       for(const auto &base : bases)
       {
         irep_idt parent=base.find(ID_type).get(ID_identifier);
-        if(parent.empty()) continue;
+        if(parent.empty())
+          continue;
 
         class_map[parent].children.push_back(it->first);
         class_map[it->first].parents.push_back(parent);
@@ -68,7 +69,8 @@ void class_hierarchyt::get_children_trans_rec(
   idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
-  if(it==class_map.end()) return;
+  if(it==class_map.end())
+    return;
   const entryt &entry=it->second;
 
   for(const auto &child : entry.children)
@@ -96,7 +98,8 @@ void class_hierarchyt::get_parents_trans_rec(
   idst &dest) const
 {
   class_mapt::const_iterator it=class_map.find(c);
-  if(it==class_map.end()) return;
+  if(it==class_map.end())
+    return;
   const entryt &entry=it->second;
 
   for(const auto &child : entry.parents)

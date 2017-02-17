@@ -102,7 +102,7 @@ public:
    *
    * @details
    */
-  explicit refactor_programt();
+  refactor_programt();
 
   /**
    * @brief

@@ -11,7 +11,8 @@ Date: 2012
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_WMM_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_WMM_H
 
-typedef enum {
+typedef enum
+{
   Unknown=-1,
   TSO=0,
   PSO=1,
@@ -19,7 +20,8 @@ typedef enum {
   Power=3
 } memory_modelt;
 
-typedef enum {
+typedef enum
+{
   all=0,
   min_interference=1,
   read_first=2,
@@ -28,7 +30,8 @@ typedef enum {
   one_event_per_cycle=5
 } instrumentation_strategyt;
 
-typedef enum {
+typedef enum
+{
   arrays_only=0,
   all_loops=1,
   no_loop=2

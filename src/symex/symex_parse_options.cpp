@@ -213,16 +213,20 @@ int symex_parse_optionst::doit()
     path_search.set_message_handler(get_message_handler());
 
     if(cmdline.isset("depth"))
-      path_search.set_depth_limit(unsafe_string2unsigned(cmdline.get_value("depth")));
+      path_search.set_depth_limit(
+        unsafe_string2unsigned(cmdline.get_value("depth")));
 
     if(cmdline.isset("context-bound"))
-      path_search.set_context_bound(unsafe_string2unsigned(cmdline.get_value("context-bound")));
+      path_search.set_context_bound(
+        unsafe_string2unsigned(cmdline.get_value("context-bound")));
 
     if(cmdline.isset("branch-bound"))
-      path_search.set_branch_bound(unsafe_string2unsigned(cmdline.get_value("branch-bound")));
+      path_search.set_branch_bound(
+        unsafe_string2unsigned(cmdline.get_value("branch-bound")));
 
     if(cmdline.isset("unwind"))
-      path_search.set_unwind_limit(unsafe_string2unsigned(cmdline.get_value("unwind")));
+      path_search.set_unwind_limit(
+        unsafe_string2unsigned(cmdline.get_value("unwind")));
 
     if(cmdline.isset("dfs"))
       path_search.set_dfs();
@@ -308,7 +312,8 @@ bool symex_parse_optionst::set_properties()
   try
   {
     if(cmdline.isset("property"))
-      ::set_properties(goto_model.goto_functions, cmdline.get_values("property"));
+      ::set_properties(
+        goto_model.goto_functions, cmdline.get_values("property"));
   }
 
   catch(const char *e)
@@ -668,9 +673,12 @@ void symex_parse_optionst::help()
     " symex file.c ...             source file names\n"
     "\n"
     "Analysis options:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --show-properties            show the properties, but don't run analysis\n"
     " --property id                only check one specific property\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --stop-on-fail               stop analysis once a failed property is detected\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --trace                      give a counterexample trace for failed properties\n"
     "\n"
     "Frontend options:\n"
@@ -697,6 +705,7 @@ void symex_parse_optionst::help()
     #endif
     " --no-arch                    don't set up an architecture\n"
     " --no-library                 disable built-in abstract C library\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --round-to-nearest           IEEE floating point rounding mode (default)\n"
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"

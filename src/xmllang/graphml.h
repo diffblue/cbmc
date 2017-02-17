@@ -37,10 +37,10 @@ struct xml_graph_nodet:public graph_nodet<xml_edget>
   std::string invariant_scope;
 };
 
-class graphmlt:public graph<xml_graph_nodet>
+class graphmlt:public grapht<xml_graph_nodet>
 {
 public:
-  inline bool has_node(const std::string &node_name) const
+  bool has_node(const std::string &node_name) const
   {
     for(const auto &n : nodes)
       if(n.node_name==node_name)
@@ -57,7 +57,7 @@ public:
         return i;
     }
 
-    return graph<xml_graph_nodet>::add_node();
+    return grapht<xml_graph_nodet>::add_node();
   }
 
   typedef std::map<std::string, std::string> key_valuest;

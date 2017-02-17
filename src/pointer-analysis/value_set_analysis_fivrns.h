@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com,
 #include "value_set_domain_fivrns.h"
 #include "value_sets.h"
 
-class value_set_analysis_fivrnst :
+class value_set_analysis_fivrnst:
   public value_setst,
   public flow_insensitive_analysist<value_set_domain_fivrnst>
 {

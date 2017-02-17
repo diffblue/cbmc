@@ -21,32 +21,34 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_size.h"
 
-member_offset_iterator::member_offset_iterator(const struct_typet& _type,
-                                               const namespacet& _ns) :
-  current({0,0}),
+member_offset_iterator::member_offset_iterator(
+  const struct_typet &_type,
+  const namespacet &_ns):
+  current({0, 0}),
   type(_type),
   ns(_ns),
   bit_field_bits(0)
 {
 }
 
-member_offset_iterator& member_offset_iterator::operator++()
+member_offset_iterator &member_offset_iterator::operator++()
 {
   if(current.second!=-1) // Already failed?
   {
-    const auto& comp=type.components()[current.first];
+    const auto &comp=type.components()[current.first];
     if(comp.type().id()==ID_c_bit_field)
     {
       // take the extra bytes needed
       std::size_t w=to_c_bit_field_type(comp.type()).get_width();
-      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8);
+      for(; w>bit_field_bits; ++current.second, bit_field_bits+=8) {}
       bit_field_bits-=w;
     }
     else
     {
       const typet &subtype=comp.type();
       mp_integer sub_size=pointer_offset_size(subtype, ns);
-      if(sub_size==-1) current.second=-1; // give up
+      if(sub_size==-1)
+        current.second=-1; // give up
       else current.second+=sub_size;
     }
   }
@@ -72,7 +74,7 @@ mp_integer member_offset(
   const namespacet &ns)
 {
   const struct_typet::componentst &components=type.components();
-  member_offset_iterator offsets(type,ns);
+  member_offset_iterator offsets(type, ns);
 
   for(struct_typet::componentst::const_iterator
       it=components.begin();
@@ -103,7 +105,8 @@ mp_integer pointer_offset_size(
   const namespacet &ns)
 {
   mp_integer bits=pointer_offset_bits(type, ns);
-  if(bits==-1) return -1;
+  if(bits==-1)
+    return -1;
   return bits/8+(((bits%8)==0)?0:1);
 }
 
@@ -173,7 +176,8 @@ mp_integer pointer_offset_bits(
     {
       const typet &subtype=it->type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
-      if(sub_size==-1) return -1;
+      if(sub_size==-1)
+        return -1;
       result+=sub_size;
     }
 
@@ -196,7 +200,8 @@ mp_integer pointer_offset_bits(
     {
       const typet &subtype=it->type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
-      if(sub_size>result) result=sub_size;
+      if(sub_size>result)
+        result=sub_size;
     }
 
     return result;
@@ -300,13 +305,14 @@ exprt member_offset_expr(
       it!=components.end();
       it++)
   {
-    if(it->get_name()==member) break;
+    if(it->get_name()==member)
+      break;
 
     if(it->type().id()==ID_c_bit_field)
     {
       std::size_t w=to_c_bit_field_type(it->type()).get_width();
       std::size_t bytes;
-      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+      for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
       bit_field_bits-=w;
       result=plus_exprt(result, from_integer(bytes, result.type()));
     }
@@ -314,7 +320,8 @@ exprt member_offset_expr(
     {
       const typet &subtype=it->type();
       exprt sub_size=size_of_expr(subtype, ns);
-      if(sub_size.is_nil()) return nil_exprt(); // give up
+      if(sub_size.is_nil())
+        return nil_exprt(); // give up
       result=plus_exprt(result, sub_size);
     }
   }
@@ -343,12 +350,14 @@ exprt size_of_expr(
   if(type.id()==ID_array)
   {
     exprt sub=size_of_expr(type.subtype(), ns);
-    if(sub.is_nil()) return nil_exprt();
+    if(sub.is_nil())
+      return nil_exprt();
 
     // get size
     exprt size=to_array_type(type).size();
 
-    if(size.is_nil()) return nil_exprt();
+    if(size.is_nil())
+      return nil_exprt();
 
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
@@ -362,12 +371,14 @@ exprt size_of_expr(
   else if(type.id()==ID_vector)
   {
     exprt sub=size_of_expr(type.subtype(), ns);
-    if(sub.is_nil()) return nil_exprt();
+    if(sub.is_nil())
+      return nil_exprt();
 
     // get size
     exprt size=to_vector_type(type).size();
 
-    if(size.is_nil()) return nil_exprt();
+    if(size.is_nil())
+      return nil_exprt();
 
     if(size.type()!=sub.type())
       size.make_typecast(sub.type());
@@ -380,7 +391,8 @@ exprt size_of_expr(
   else if(type.id()==ID_complex)
   {
     exprt sub=size_of_expr(type.subtype(), ns);
-    if(sub.is_nil()) return nil_exprt();
+    if(sub.is_nil())
+      return nil_exprt();
 
     const exprt size=from_integer(2, sub.type());
 
@@ -407,7 +419,7 @@ exprt size_of_expr(
       {
         std::size_t w=to_c_bit_field_type(it->type()).get_width();
         std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
         bit_field_bits-=w;
         result=plus_exprt(result, from_integer(bytes, result.type()));
       }
@@ -415,7 +427,8 @@ exprt size_of_expr(
       {
         const typet &subtype=it->type();
         exprt sub_size=size_of_expr(subtype, ns);
-        if(sub_size.is_nil()) return nil_exprt();
+        if(sub_size.is_nil())
+          return nil_exprt();
 
         result=plus_exprt(result, sub_size);
       }
@@ -447,12 +460,14 @@ exprt size_of_expr(
       {
         std::size_t bits=to_c_bit_field_type(subtype).get_width();
         sub_size=bits/8;
-        if((bits%8)!=0) ++sub_size;
+        if((bits%8)!=0)
+          ++sub_size;
       }
       else
         sub_size=pointer_offset_size(subtype, ns);
 
-      if(sub_size>result) result=sub_size;
+      if(sub_size>result)
+        result=sub_size;
     }
 
     return from_integer(result, signedbv_typet(config.ansi_c.pointer_width));
@@ -466,14 +481,16 @@ exprt size_of_expr(
   {
     std::size_t width=to_bitvector_type(type).get_width();
     std::size_t bytes=width/8;
-    if(bytes*8!=width) bytes++;
+    if(bytes*8!=width)
+      bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_c_enum)
   {
     std::size_t width=to_bitvector_type(type.subtype()).get_width();
     std::size_t bytes=width/8;
-    if(bytes*8!=width) bytes++;
+    if(bytes*8!=width)
+      bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_c_enum_tag)
@@ -488,7 +505,8 @@ exprt size_of_expr(
   {
     std::size_t width=config.ansi_c.pointer_width;
     std::size_t bytes=width/8;
-    if(bytes*8!=width) bytes++;
+    if(bytes*8!=width)
+      bytes++;
     return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
   }
   else if(type.id()==ID_symbol)
@@ -600,7 +618,8 @@ exprt build_sizeof_expr(
 
   mp_integer type_size=-1, val=-1;
 
-  if(type.is_not_nil()) type_size=pointer_offset_size(type, ns);
+  if(type.is_not_nil())
+    type_size=pointer_offset_size(type, ns);
 
   if(type_size<0 ||
      to_integer(expr, val) ||
@@ -634,33 +653,39 @@ exprt build_sizeof_expr(
 }
 
 bool get_subexpression_at_offset(
-  exprt& result,
+  exprt &result,
   mp_integer offset,
-  const typet& target_type_raw,
-  const namespacet& ns)
+  const typet &target_type_raw,
+  const namespacet &ns)
 {
-  const typet& source_type=ns.follow(result.type());
-  const typet& target_type=ns.follow(target_type_raw);
+  const typet &source_type=ns.follow(result.type());
+  const typet &target_type=ns.follow(target_type_raw);
 
   if(offset==0 && source_type==target_type)
     return true;
 
   if(source_type.id()==ID_struct)
   {
-    const auto& st=to_struct_type(source_type);
+    const auto &st=to_struct_type(source_type);
     const struct_typet::componentst &components=st.components();
-    member_offset_iterator offsets(st,ns);
-    while(offsets->first<components.size() && offsets->second!=-1 && offsets->second<=offset)
+    member_offset_iterator offsets(st, ns);
+    while(offsets->first<components.size() &&
+          offsets->second!=-1 &&
+          offsets->second<=offset)
     {
       auto nextit=offsets;
       ++nextit;
       if((offsets->first+1)==components.size() || offset<nextit->second)
       {
-	// This field might be, or might contain, the answer.
-	result=member_exprt(result,
-			    components[offsets->first].get_name(),
-			    components[offsets->first].type());
-	return get_subexpression_at_offset(result, offset - offsets->second, target_type, ns);
+        // This field might be, or might contain, the answer.
+        result=
+          member_exprt(
+            result,
+            components[offsets->first].get_name(),
+            components[offsets->first].type());
+        return
+          get_subexpression_at_offset(
+            result, offset-offsets->second, target_type, ns);
       }
       ++offsets;
     }
@@ -668,31 +693,31 @@ bool get_subexpression_at_offset(
   }
   else if(source_type.id()==ID_array)
   {
-    // A cell of the array might be, or contain, the subexpression we're looking for.
-    const auto& at=to_array_type(source_type);
-    mp_integer elem_size=pointer_offset_size(at.subtype(),ns);
+    // A cell of the array might be, or contain, the subexpression
+    // we're looking for.
+    const auto &at=to_array_type(source_type);
+    mp_integer elem_size=pointer_offset_size(at.subtype(), ns);
     if(elem_size==-1)
       return false;
-    mp_integer cellidx=offset / elem_size;
+    mp_integer cellidx=offset/elem_size;
     if(cellidx < 0 || !cellidx.is_long())
       return false;
-    offset=offset % elem_size;
-    result=index_exprt(result,from_integer(cellidx,unsignedbv_typet(64)));
-    return get_subexpression_at_offset(result,offset,target_type,ns);
+    offset=offset%elem_size;
+    result=index_exprt(result, from_integer(cellidx, unsignedbv_typet(64)));
+    return get_subexpression_at_offset(result, offset, target_type, ns);
   }
   else
     return false;
-
 }
 
 bool get_subexpression_at_offset(
-  exprt& result,
-  const exprt& offset,
-  const typet& target_type,
-  const namespacet& ns)
+  exprt &result,
+  const exprt &offset,
+  const typet &target_type,
+  const namespacet &ns)
 {
   mp_integer offset_const;
-  if(to_integer(offset,offset_const))
+  if(to_integer(offset, offset_const))
     return false;
-  return get_subexpression_at_offset(result,offset_const,target_type,ns);
+  return get_subexpression_at_offset(result, offset_const, target_type, ns);
 }

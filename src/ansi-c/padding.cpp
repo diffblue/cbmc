@@ -159,7 +159,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
           struct_typet::componentt component;
           component.type()=padding_type;
-          component.set_name("$bit_field_pad"+std::to_string(padding_counter++));
+          component.set_name(
+            "$bit_field_pad"+std::to_string(padding_counter++));
           component.set_is_padding(true);
 
           it=components.insert(it, component);
@@ -225,7 +226,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
         std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8);
+        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
         bit_field_bits-=w;
         offset+=bytes;
         continue;
@@ -319,7 +320,6 @@ void add_padding(struct_typet &type, const namespacet &ns)
       components.push_back(component);
     }
   }
-
 }
 
 /*******************************************************************\

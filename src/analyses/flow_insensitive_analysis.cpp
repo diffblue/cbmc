@@ -174,7 +174,8 @@ Function: flow_insensitive_analysis_baset::get_next
 
 \*******************************************************************/
 
-flow_insensitive_analysis_baset::locationt flow_insensitive_analysis_baset::get_next(
+flow_insensitive_analysis_baset::locationt
+flow_insensitive_analysis_baset::get_next(
   working_sett &working_set)
 {
   assert(!working_set.empty());
@@ -259,7 +260,7 @@ bool flow_insensitive_analysis_baset::visit(
   goto_program.get_successors(l, successors);
 
   seen_locations.insert(l);
-  if (statistics.find(l)==statistics.end())
+  if(statistics.find(l)==statistics.end())
     statistics[l]=1;
   else
     statistics[l]++;
@@ -492,7 +493,7 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
         goto_functionst::function_mapt::const_iterator it=
           goto_functions.function_map.find(o.object().get(ID_identifier));
 
-        if (it!=goto_functions.function_map.end())
+        if(it!=goto_functions.function_map.end())
         {
           new_data =
             do_function_call_rec(

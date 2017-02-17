@@ -27,7 +27,17 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
-  typedef enum { GENERIC, BOOLECTOR, CVC3, CVC4, MATHSAT, OPENSMT, YICES, Z3 } solvert;
+  typedef enum
+  {
+    GENERIC,
+    BOOLECTOR,
+    CVC3,
+    CVC4,
+    MATHSAT,
+    OPENSMT,
+    YICES,
+    Z3
+  } solvert;
 
   smt2_convt(
     const namespacet &_ns,
@@ -163,27 +173,26 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  typedef std::pair<unsigned, symbol_exprt> let_count_id;
-  typedef std::unordered_map<exprt, let_count_id, irep_hash> seen_expressionst;
+  typedef std::pair<unsigned, symbol_exprt> let_count_idt;
+  typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
   unsigned let_id_count;
-  const static unsigned LET_COUNT = 2;
+  static const unsigned LET_COUNT=2;
 
-  class let_visitort : public expr_visitort
+  class let_visitort:public expr_visitort
   {
     const seen_expressionst &let_map;
 
   public:
-    let_visitort(const seen_expressionst &map):let_map(map) { }
+    explicit let_visitort(const seen_expressionst &map):let_map(map) { }
 
     void operator()(exprt &expr)
     {
-      seen_expressionst::const_iterator it = let_map.find(expr);
-      if (it != let_map.end() &&
-          it->second.first >= LET_COUNT)
+      seen_expressionst::const_iterator it=let_map.find(expr);
+      if(it!=let_map.end() &&
+         it->second.first>=LET_COUNT)
       {
-        symbol_exprt symb = it->second.second;
-        expr = symb;
-        return;
+        symbol_exprt symb=it->second.second;
+        expr=symb;
       }
     }
   };
@@ -191,8 +200,8 @@ protected:
   exprt letify(exprt &expr);
   exprt letify_rec(
     exprt &expr,
-    std::vector<exprt>& let_order,
-    const seen_expressionst& map,
+    std::vector<exprt> &let_order,
+    const seen_expressionst &map,
     unsigned i);
 
   void collect_bindings(
@@ -224,13 +233,13 @@ protected:
       exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
 
-    inline const irep_idt &get_identifier() const
+    const irep_idt &get_identifier() const
     {
       return get(ID_identifier);
     }
   };
 
-  inline const smt2_symbolt &to_smt2_symbol(const exprt &expr)
+  const smt2_symbolt &to_smt2_symbol(const exprt &expr)
   {
     assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
     return static_cast<const smt2_symbolt&>(expr);

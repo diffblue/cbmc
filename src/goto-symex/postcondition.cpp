@@ -81,7 +81,8 @@ void postcondition(
   {
     postconditiont postcondition(ns, value_set, *it, s);
     postcondition.compute(dest);
-    if(dest.is_false()) return;
+    if(dest.is_false())
+      return;
   }
 }
 

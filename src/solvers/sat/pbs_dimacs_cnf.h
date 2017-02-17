@@ -17,7 +17,7 @@ Author: Alex Groce
 
 class pbs_dimacs_cnft:public dimacs_cnft
 {
- public:
+public:
   pbs_dimacs_cnft():
     optimize(false),
     maximize(false),
@@ -42,7 +42,7 @@ class pbs_dimacs_cnft:public dimacs_cnft
   int goal;
   int opt_sum;
 
-  std::map<literalt,unsigned> pb_constraintmap;
+  std::map<literalt, unsigned> pb_constraintmap;
 
   bool pbs_solve();
 
@@ -53,10 +53,11 @@ class pbs_dimacs_cnft:public dimacs_cnft
   // dummy functions
 
   virtual const std::string solver_text()
-    { return "PBS - Pseudo Boolean/CNF Solver and Optimizer"; }
+  {
+    return "PBS - Pseudo Boolean/CNF Solver and Optimizer";
+  }
 
- protected:
-
+protected:
   std::set<int> assigned;
 };
 

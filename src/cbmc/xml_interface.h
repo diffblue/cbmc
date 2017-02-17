@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class xml_interfacet
 {
 public:
-  xml_interfacet(cmdlinet &_cmdline)
+  explicit xml_interfacet(cmdlinet &_cmdline)
   {
     get_xml_options(_cmdline);
   }

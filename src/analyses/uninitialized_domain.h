@@ -30,26 +30,26 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) override final;
+    const namespacet &ns) final;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const override final;
+    const namespacet &ns) const final;
 
-  void make_top() override final
+  void make_top() final
   {
     uninitialized.clear();
     has_values=tvt(true);
   }
 
-  void make_bottom() override final
+  void make_bottom() final
   {
     uninitialized.clear();
     has_values=tvt(false);
   }
 
-  void make_entry() override final
+  void make_entry() final
   {
     make_top();
   }
@@ -60,7 +60,7 @@ public:
     locationt from,
     locationt to);
 
-protected:
+private:
   tvt has_values;
 
   void assign(const exprt &lhs);

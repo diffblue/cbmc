@@ -70,7 +70,7 @@ void parse_field_width(
   }
 
   std::string tmp;
-  for(;isdigit(*it); it++) tmp+=*it;
+  for( ; isdigit(*it); it++) tmp+=*it;
   curtok.field_width=string2integer(tmp);
 }
 
@@ -102,7 +102,7 @@ void parse_precision(
     else
     {
       std::string tmp;
-      for(;isdigit(*it); it++) tmp+=*it;
+      for( ; isdigit(*it); it++) tmp+=*it;
       curtok.precision=string2integer(tmp);
     }
   }
@@ -127,13 +127,15 @@ void parse_length_modifier(
   if(*it=='h')
   {
     it++;
-    if(*it=='h') it++;
+    if(*it=='h')
+      it++;
     curtok.length_modifier = format_tokent::LEN_h;
   }
   else if(*it=='l')
   {
     it++;
-    if(*it=='l') it++;
+    if(*it=='l')
+      it++;
     curtok.length_modifier = format_tokent::LEN_l;
   }
   else if(*it=='L')
@@ -173,11 +175,23 @@ void parse_conversion_specifier(
   switch(*it)
   {
     case 'd':
-    case 'i': curtok.type=format_tokent::INT; curtok.representation=format_tokent::SIGNED_DEC; break;
-    case 'o': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_OCT; break;
-    case 'u': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_DEC; break;
+    case 'i':
+      curtok.type=format_tokent::INT;
+      curtok.representation=format_tokent::SIGNED_DEC;
+      break;
+    case 'o':
+      curtok.type=format_tokent::INT;
+      curtok.representation=format_tokent::UNSIGNED_OCT;
+      break;
+    case 'u':
+      curtok.type=format_tokent::INT;
+      curtok.representation=format_tokent::UNSIGNED_DEC;
+      break;
     case 'x':
-    case 'X': curtok.type=format_tokent::INT; curtok.representation=format_tokent::UNSIGNED_HEX; break;
+    case 'X':
+      curtok.type=format_tokent::INT;
+      curtok.representation=format_tokent::UNSIGNED_HEX;
+      break;
     case 'e':
     case 'E': curtok.type=format_tokent::FLOAT; break;
     case 'f':
@@ -203,14 +217,14 @@ void parse_conversion_specifier(
         }
       }
 
-      for(;it!=arg_string.end() && *it!=']'; it++)
+      for( ; it!=arg_string.end() && *it!=']'; it++)
         tmp+=*it;
 
       break;
     }
 
-    default: throw std::string("unsupported format conversion specifier: `") +
-                               *it + "'";
+    default:
+      throw std::string("unsupported format conversion specifier: `")+*it+"'";
   }
   it++;
 }
@@ -254,7 +268,7 @@ format_token_listt parse_format_string(const std::string &arg_string)
         token_list.push_back(format_tokent(format_tokent::TEXT));
 
       std::string tmp;
-      for(;it!=arg_string.end() && *it!='%';it++)
+      for( ; it!=arg_string.end() && *it!='%'; it++)
         tmp+=*it;
 
       assert(!token_list.empty());

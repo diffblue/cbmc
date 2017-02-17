@@ -65,11 +65,21 @@ public:
   explicit namespacet(const symbol_tablet &_symbol_table)
   { symbol_table1=&_symbol_table; symbol_table2=NULL; }
 
-  namespacet(const symbol_tablet &_symbol_table1, const symbol_tablet &_symbol_table2)
-  { symbol_table1=&_symbol_table1; symbol_table2=&_symbol_table2; }
+  namespacet(
+    const symbol_tablet &_symbol_table1,
+    const symbol_tablet &_symbol_table2)
+  {
+    symbol_table1=&_symbol_table1;
+    symbol_table2=&_symbol_table2;
+  }
 
-  namespacet(const symbol_tablet *_symbol_table1, const symbol_tablet *_symbol_table2)
-  { symbol_table1=_symbol_table1; symbol_table2=_symbol_table2; }
+  namespacet(
+    const symbol_tablet *_symbol_table1,
+    const symbol_tablet *_symbol_table2)
+  {
+    symbol_table1=_symbol_table1;
+    symbol_table2=_symbol_table2;
+  }
 
   using namespace_baset::lookup;
 
@@ -94,7 +104,8 @@ public:
   {
   }
 
-  explicit multi_namespacet(const symbol_tablet &symbol_table):namespacet(NULL, NULL)
+  explicit multi_namespacet(
+    const symbol_tablet &symbol_table):namespacet(NULL, NULL)
   {
     add(symbol_table);
   }
@@ -105,7 +116,7 @@ public:
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
   virtual unsigned get_max(const std::string &prefix) const;
 
-  inline void add(const symbol_tablet &symbol_table)
+  void add(const symbol_tablet &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);
   }

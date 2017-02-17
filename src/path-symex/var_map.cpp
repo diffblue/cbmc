@@ -28,7 +28,7 @@ Function: var_mapt::var_infot::operator()
 
 \*******************************************************************/
 
-var_mapt::var_infot & var_mapt::operator()(
+var_mapt::var_infot &var_mapt::operator()(
   const irep_idt &symbol,
   const irep_idt &suffix,
   const typet &type)

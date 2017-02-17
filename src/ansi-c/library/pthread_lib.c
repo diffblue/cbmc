@@ -448,7 +448,7 @@ inline int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock)
 {
   __CPROVER_HIDE:;
   __CPROVER_atomic_begin();
-  if((*(signed char *)lock & 2)!=0) { __CPROVER_atomic_end(); return 1; }
+  if((*(signed char *)lock &2)!=0) { __CPROVER_atomic_end(); return 1; }
   (*(signed char *)lock)|=1;
   __CPROVER_atomic_end();
   return 0;

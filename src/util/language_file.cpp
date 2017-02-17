@@ -44,7 +44,8 @@ Function: language_filet::~language_filet
 
 language_filet::~language_filet()
 {
-  if(language!=NULL) delete language;
+  if(language!=NULL)
+    delete language;
 }
 
 /*******************************************************************\

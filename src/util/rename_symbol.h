@@ -27,8 +27,8 @@ public:
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> expr_mapt;
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> type_mapt;
 
-  inline void insert_expr(const irep_idt &old_id,
-                          const irep_idt &new_id)
+  void insert_expr(const irep_idt &old_id,
+                   const irep_idt &new_id)
   {
     expr_map.insert(std::pair<irep_idt, irep_idt>(old_id, new_id));
   }
@@ -36,18 +36,18 @@ public:
   void insert(const class symbol_exprt &old_expr,
               const class symbol_exprt &new_expr);
 
-  inline void insert_type(const irep_idt &old_id,
-                          const irep_idt &new_id)
+  void insert_type(const irep_idt &old_id,
+                   const irep_idt &new_id)
   {
     type_map.insert(std::pair<irep_idt, irep_idt>(old_id, new_id));
   }
 
-  inline void operator()(exprt &dest) const
+  void operator()(exprt &dest) const
   {
     rename(dest);
   }
 
-  inline void operator()(typet &dest) const
+  void operator()(typet &dest) const
   {
     rename(dest);
   }

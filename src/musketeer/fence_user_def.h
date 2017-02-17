@@ -18,7 +18,7 @@ Author: Vincent Nimal
 
 class instrumentert;
 
-class fence_user_def_insertert : public fence_insertert
+class fence_user_def_insertert:public fence_insertert
 {
 protected:
   std::set<unsigned> selected_cycles;
@@ -29,18 +29,20 @@ protected:
   virtual void process_cycles_selection();
 
   // overload for base class
-  virtual bool filter_cycles (unsigned cycles_id) const
+  virtual bool filter_cycles(unsigned cycles_id) const
   {
     return selected_cycles.find(cycles_id)==selected_cycles.end();
   }
 
 public:
-  explicit fence_user_def_insertert(instrumentert &instr)
-    :fence_insertert(instr) {
+  explicit fence_user_def_insertert(instrumentert &instr):
+    fence_insertert(instr)
+  {
   }
 
-  fence_user_def_insertert(instrumentert &instr, memory_modelt _model)
-    :fence_insertert(instr, _model) {
+  fence_user_def_insertert(instrumentert &instr, memory_modelt _model):
+    fence_insertert(instr, _model)
+  {
   }
 };
 

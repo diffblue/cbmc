@@ -68,7 +68,8 @@ void custom_bitvector_domaint::set_bit(
   modet mode)
 {
   irep_idt id=object2id(lhs);
-  if(!id.empty()) set_bit(id, bit_nr, mode);
+  if(!id.empty())
+    set_bit(id, bit_nr, mode);
 }
 
 /*******************************************************************\
@@ -133,7 +134,8 @@ void custom_bitvector_domaint::assign_lhs(
   const vectorst &vectors)
 {
   irep_idt id=object2id(lhs);
-  if(!id.empty()) assign_lhs(id, vectors);
+  if(!id.empty())
+    assign_lhs(id, vectors);
 }
 
 /*******************************************************************\
@@ -183,10 +185,12 @@ custom_bitvector_domaint::vectorst
   vectorst vectors;
 
   bitst::const_iterator may_it=may_bits.find(identifier);
-  if(may_it!=may_bits.end()) vectors.may_bits=may_it->second;
+  if(may_it!=may_bits.end())
+    vectors.may_bits=may_it->second;
 
   bitst::const_iterator must_it=must_bits.find(identifier);
-  if(must_it!=must_bits.end()) vectors.must_bits=must_it->second;
+  if(must_it!=must_bits.end())
+    vectors.must_bits=must_it->second;
 
   return vectors;
 }
@@ -323,7 +327,8 @@ void custom_bitvector_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false()) return;
+  if(has_values.is_false())
+    return;
 
   // upcast of ai
   custom_bitvector_analysist &cba=
@@ -382,7 +387,8 @@ void custom_bitvector_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call=
+        to_code_function_call(instruction.code);
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)
@@ -526,7 +532,8 @@ void custom_bitvector_domaint::transform(
     {
       exprt guard=instruction.guard;
 
-      if(to!=from->get_target()) guard.make_not();
+      if(to!=from->get_target())
+        guard.make_not();
 
       exprt result=eval(guard, cba);
       exprt result2=simplify_expr(result, ns);
@@ -536,7 +543,9 @@ void custom_bitvector_domaint::transform(
     }
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 
@@ -633,7 +642,8 @@ bool custom_bitvector_domaint::merge(
     bit_vectort &a_bits=may_bits[bit.first];
     bit_vectort old=a_bits;
     a_bits|=bit.second;
-    if(old!=a_bits) changed=true;
+    if(old!=a_bits)
+      changed=true;
   }
 
   // now do MUST
@@ -651,7 +661,8 @@ bool custom_bitvector_domaint::merge(
     {
       bit_vectort old=bit.second;
       bit.second&=bit.second;
-      if(old!=bit.second) changed=true;
+      if(old!=bit.second)
+        changed=true;
     }
   }
 
@@ -706,7 +717,8 @@ bool custom_bitvector_domaint::has_get_must_or_may(const exprt &src)
     return true;
 
   forall_operands(it, src)
-    if(has_get_must_or_may(*it)) return true;
+    if(has_get_must_or_may(*it))
+      return true;
 
   return false;
 }
@@ -742,9 +754,8 @@ exprt custom_bitvector_domaint::eval(
         if(src.id()=="get_may")
         {
           for(const auto &bit : may_bits)
-          {
-            if(get_bit(bit.second, bit_nr)) return true_exprt();
-          }
+            if(get_bit(bit.second, bit_nr))
+              return true_exprt();
 
           return false_exprt();
         }
@@ -824,8 +835,10 @@ void custom_bitvector_analysist::check(
 
   forall_goto_functions(f_it, goto_functions)
   {
-    if(!f_it->second.body.has_assertion()) continue;
+    if(!f_it->second.body.has_assertion())
+       continue;
 
+    // TODO this is a hard-coded hack
     if(f_it->first=="__actual_thread_spawn")
       continue;
 
@@ -842,7 +855,8 @@ void custom_bitvector_analysist::check(
         if(!custom_bitvector_domaint::has_get_must_or_may(i_it->guard))
           continue;
 
-        if(operator[](i_it).has_values.is_false()) continue;
+        if(operator[](i_it).has_values.is_false())
+          continue;
 
         exprt tmp=eval(i_it->guard, i_it);
         result=simplify_expr(tmp, ns);

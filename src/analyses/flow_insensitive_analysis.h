@@ -28,7 +28,7 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
-  virtual void initialize( const namespacet &ns )=0;
+  virtual void initialize(const namespacet &ns)=0;
 
   virtual bool transform(
     const namespacet &ns,
@@ -59,7 +59,6 @@ public:
   virtual void clear(void)=0;
 
 protected:
-  friend class flow_insensitive_analysis_baset;
   bool changed;
   // utilities
 
@@ -81,12 +80,12 @@ public:
 
   std::map<locationt, unsigned> statistics;
 
-  bool seen( const locationt& l )
+  bool seen(const locationt &l)
   {
     return (seen_locations.find(l)!=seen_locations.end());
   }
 
-  flow_insensitive_analysis_baset(const namespacet &_ns):
+  explicit flow_insensitive_analysis_baset(const namespacet &_ns):
     ns(_ns),
     initialized(false)
   {
@@ -225,7 +224,7 @@ class flow_insensitive_analysist:public flow_insensitive_analysis_baset
 {
 public:
   // constructor
-  flow_insensitive_analysist(const namespacet &_ns):
+  explicit flow_insensitive_analysist(const namespacet &_ns):
     flow_insensitive_analysis_baset(_ns)
   {
   }
@@ -238,8 +237,8 @@ public:
     flow_insensitive_analysis_baset::clear();
   }
 
-  inline T& get_data() { return state; }
-  inline const T& get_data() const { return state; }
+  T &get_data() { return state; }
+  const T &get_data() const { return state; }
 
 protected:
   T state; // one global state

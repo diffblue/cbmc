@@ -31,7 +31,8 @@ void uninitialized_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false()) return;
+  if(has_values.is_false())
+    return;
 
   switch(from->type)
   {

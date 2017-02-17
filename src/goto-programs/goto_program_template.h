@@ -23,27 +23,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 
-typedef enum { NO_INSTRUCTION_TYPE=0,
-               GOTO=1,          // branch, possibly guarded
-               ASSUME=2,        // non-failing guarded self loop
-               ASSERT=3,        // assertions
-               OTHER=4,         // anything else
-               SKIP=5,          // just advance the PC
-               START_THREAD=6,  // spawns an asynchronous thread
-               END_THREAD=7,    // end the current thread
-               LOCATION=8,      // semantically like SKIP
-               END_FUNCTION=9,  // exit point of a function
-               ATOMIC_BEGIN=10, // marks a block without interleavings
-               ATOMIC_END=11,   // end of a block without interleavings
-               RETURN=12,       // set function return value (no control-flow change)
-               ASSIGN=13,       // assignment lhs:=rhs
-               DECL=14,         // declare a local variable
-               DEAD=15,         // marks the end-of-live of a local variable
-               FUNCTION_CALL=16,// call a function
-               THROW=17,        // throw an exception
-               CATCH=18         // catch an exception
-             }
-  goto_program_instruction_typet;
+typedef enum
+{
+  NO_INSTRUCTION_TYPE=0,
+  GOTO=1,           // branch, possibly guarded
+  ASSUME=2,         // non-failing guarded self loop
+  ASSERT=3,         // assertions
+  OTHER=4,          // anything else
+  SKIP=5,           // just advance the PC
+  START_THREAD=6,   // spawns an asynchronous thread
+  END_THREAD=7,     // end the current thread
+  LOCATION=8,       // semantically like SKIP
+  END_FUNCTION=9,   // exit point of a function
+  ATOMIC_BEGIN=10,  // marks a block without interleavings
+  ATOMIC_END=11,    // end of a block without interleavings
+  RETURN=12,        // set function return value (no control-flow change)
+  ASSIGN=13,        // assignment lhs:=rhs
+  DECL=14,          // declare a local variable
+  DEAD=15,          // marks the end-of-live of a local variable
+  FUNCTION_CALL=16, // call a function
+  THROW=17,         // throw an exception
+  CATCH=18          // catch an exception
+} goto_program_instruction_typet;
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
@@ -59,7 +60,7 @@ public:
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  inline goto_program_templatet(const goto_program_templatet &src)
+  goto_program_templatet(const goto_program_templatet &src)
   {
     // DO NOT COPY ME! I HAVE POINTERS IN ME!
     assert(src.instructions.empty());
@@ -69,7 +70,7 @@ public:
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  inline goto_program_templatet &operator=(const goto_program_templatet &src)
+  goto_program_templatet &operator=(const goto_program_templatet &src)
   {
     // DO NOT COPY ME! I HAVE POINTERS IN ME!
     assert(src.instructions.empty());
@@ -99,22 +100,22 @@ public:
 
     // The below will eventually become a single target only.
     //! the target for gotos and for start_thread nodes
-    typedef typename std::list<class instructiont>::iterator targett;
-    typedef typename std::list<class instructiont>::const_iterator const_targett;
+    typedef typename std::list<instructiont>::iterator targett;
+    typedef typename std::list<instructiont>::const_iterator const_targett;
     typedef std::list<targett> targetst;
     typedef std::list<const_targett> const_targetst;
 
     targetst targets;
 
     // for the usual case of a single target
-    inline targett get_target() const
+    targett get_target() const
     {
       assert(targets.size()==1);
       return targets.front();
     }
 
     // for the usual case of a single target
-    inline void set_target(targett t)
+    void set_target(targett t)
     {
       targets.clear();
       targets.push_back(t);
@@ -128,11 +129,11 @@ public:
     std::set<targett> incoming_edges;
 
     //! is this node a branch target?
-    inline bool is_target() const
+    bool is_target() const
     { return target_number!=nil_target; }
 
     //! clear the node
-    inline void clear(goto_program_instruction_typet _type)
+    void clear(goto_program_instruction_typet _type)
     {
       type=_type;
       targets.clear();
@@ -140,53 +141,58 @@ public:
       code.make_nil();
     }
 
-    inline void make_goto() { clear(GOTO); }
-    inline void make_return() { clear(RETURN); }
-    inline void make_function_call(const codeT &_code) { clear(FUNCTION_CALL); code=_code; }
-    inline void make_skip() { clear(SKIP); }
-    inline void make_throw() { clear(THROW); }
-    inline void make_catch() { clear(CATCH); }
-    inline void make_assertion(const guardT &g) { clear(ASSERT); guard=g; }
-    inline void make_assumption(const guardT &g) { clear(ASSUME); guard=g; }
-    inline void make_assignment() { clear(ASSIGN); }
-    inline void make_other(const codeT &_code) { clear(OTHER); code=_code; }
-    inline void make_decl() { clear(DECL); }
-    inline void make_dead() { clear(DEAD); }
-    inline void make_atomic_begin() { clear(ATOMIC_BEGIN); }
-    inline void make_atomic_end() { clear(ATOMIC_END); }
+    void make_goto() { clear(GOTO); }
+    void make_return() { clear(RETURN); }
+    void make_skip() { clear(SKIP); }
+    void make_throw() { clear(THROW); }
+    void make_catch() { clear(CATCH); }
+    void make_assertion(const guardT &g) { clear(ASSERT); guard=g; }
+    void make_assumption(const guardT &g) { clear(ASSUME); guard=g; }
+    void make_assignment() { clear(ASSIGN); }
+    void make_other(const codeT &_code) { clear(OTHER); code=_code; }
+    void make_decl() { clear(DECL); }
+    void make_dead() { clear(DEAD); }
+    void make_atomic_begin() { clear(ATOMIC_BEGIN); }
+    void make_atomic_end() { clear(ATOMIC_END); }
 
-    inline void make_goto(targett _target)
+    void make_goto(targett _target)
     {
       make_goto();
       targets.push_back(_target);
     }
 
-    inline void make_goto(targett _target, const guardT &g)
+    void make_goto(targett _target, const guardT &g)
     {
       make_goto(_target);
       guard=g;
     }
 
-    inline bool is_goto         () const { return type==GOTO;          }
-    inline bool is_return       () const { return type==RETURN;        }
-    inline bool is_assign       () const { return type==ASSIGN;        }
-    inline bool is_function_call() const { return type==FUNCTION_CALL; }
-    inline bool is_throw        () const { return type==THROW; }
-    inline bool is_catch        () const { return type==CATCH;         }
-    inline bool is_skip         () const { return type==SKIP;          }
-    inline bool is_location     () const { return type==LOCATION;      }
-    inline bool is_other        () const { return type==OTHER;         }
-    inline bool is_decl         () const { return type==DECL;          }
-    inline bool is_dead         () const { return type==DEAD;          }
-    inline bool is_assume       () const { return type==ASSUME;        }
-    inline bool is_assert       () const { return type==ASSERT;        }
-    inline bool is_atomic_begin () const { return type==ATOMIC_BEGIN;  }
-    inline bool is_atomic_end   () const { return type==ATOMIC_END;    }
-    inline bool is_start_thread () const { return type==START_THREAD;  }
-    inline bool is_end_thread   () const { return type==END_THREAD;    }
-    inline bool is_end_function () const { return type==END_FUNCTION;  }
+    void make_function_call(const codeT &_code)
+    {
+      clear(FUNCTION_CALL);
+      code=_code;
+    }
 
-    inline instructiont():
+    bool is_goto         () const { return type==GOTO;          }
+    bool is_return       () const { return type==RETURN;        }
+    bool is_assign       () const { return type==ASSIGN;        }
+    bool is_function_call() const { return type==FUNCTION_CALL; }
+    bool is_throw        () const { return type==THROW;         }
+    bool is_catch        () const { return type==CATCH;         }
+    bool is_skip         () const { return type==SKIP;          }
+    bool is_location     () const { return type==LOCATION;      }
+    bool is_other        () const { return type==OTHER;         }
+    bool is_decl         () const { return type==DECL;          }
+    bool is_dead         () const { return type==DEAD;          }
+    bool is_assume       () const { return type==ASSUME;        }
+    bool is_assert       () const { return type==ASSERT;        }
+    bool is_atomic_begin () const { return type==ATOMIC_BEGIN;  }
+    bool is_atomic_end   () const { return type==ATOMIC_END;    }
+    bool is_start_thread () const { return type==START_THREAD;  }
+    bool is_end_thread   () const { return type==END_THREAD;    }
+    bool is_end_function () const { return type==END_FUNCTION;  }
+
+    instructiont():
       source_location(static_cast<const source_locationt &>(get_nil_irep())),
       type(NO_INSTRUCTION_TYPE),
       guard(true_exprt()),
@@ -195,7 +201,7 @@ public:
     {
     }
 
-    inline instructiont(goto_program_instruction_typet _type):
+    explicit instructiont(goto_program_instruction_typet _type):
       source_location(static_cast<const source_locationt &>(get_nil_irep())),
       type(_type),
       guard(true_exprt()),
@@ -241,7 +247,8 @@ public:
     //! Returns true if the instruction is a backwards branch.
     bool is_backwards_goto() const
     {
-      if(!is_goto()) return false;
+      if(!is_goto())
+        return false;
 
       for(const auto &t : targets)
         if(t->location_number<=location_number)
@@ -258,7 +265,7 @@ public:
     }
   };
 
-  typedef std::list<class instructiont> instructionst;
+  typedef std::list<instructiont> instructionst;
 
   typedef typename instructionst::iterator targett;
   typedef typename instructionst::const_iterator const_targett;
@@ -310,10 +317,13 @@ public:
 
   //! Insertion that preserves jumps to "target".
   //! The program p is destroyed.
-  void insert_before_swap(targett target, goto_program_templatet<codeT, guardT> &p)
+  void insert_before_swap(
+    targett target,
+    goto_program_templatet<codeT, guardT> &p)
   {
     assert(target!=instructions.end());
-    if(p.instructions.empty()) return;
+    if(p.instructions.empty())
+      return;
     insert_before_swap(target, p.instructions.front());
     targett next=target;
     next++;
@@ -323,21 +333,21 @@ public:
 
   //! Insertion before the given target
   //! \return newly inserted location
-  inline targett insert_before(targett target)
+  targett insert_before(targett target)
   {
     return instructions.insert(target, instructiont());
   }
-  
+
   //! Insertion before the given target
   //! \return newly inserted location
-  inline targett insert_before(const_targett target)
+  targett insert_before(const_targett target)
   {
     return instructions.insert(target, instructiont());
   }
 
   //! Insertion after the given target
   //! \return newly inserted location
-  inline targett insert_after(targett target)
+  targett insert_after(targett target)
   {
     targett t=target;
     t++;
@@ -345,7 +355,7 @@ public:
   }
 
   //! Appends the given program, which is destroyed
-  inline void destructive_append(goto_program_templatet<codeT, guardT> &p)
+  void destructive_append(goto_program_templatet<codeT, guardT> &p)
   {
     instructions.splice(instructions.end(),
                         p.instructions);
@@ -354,29 +364,27 @@ public:
 
   //! Inserts the given program at the given location.
   //! The program is destroyed.
-  inline void destructive_insert(
+  void destructive_insert(
     targett target,
     goto_program_templatet<codeT, guardT> &p)
   {
-    instructions.splice(target,
-                        p.instructions);
+    instructions.splice(target, p.instructions);
     // BUG: The iterators to p-instructions are invalidated!
   }
 
   //! Inserts the given program at the given location.
   //! The program is destroyed.
-  inline void destructive_insert(
+  void destructive_insert(
     const_targett target,
     goto_program_templatet<codeT, guardT> &p)
   {
-    instructions.splice(target,
-                        p.instructions);
+    instructions.splice(target, p.instructions);
     // BUG: The iterators to p-instructions are invalidated!
   }
 
   //! Adds an instruction at the end.
   //! \return The newly added instruction.
-  inline targett add_instruction()
+  targett add_instruction()
   {
     instructions.push_back(instructiont());
     return --instructions.end();
@@ -384,7 +392,7 @@ public:
 
   //! Adds an instruction of given type at the end.
   //! \return The newly added instruction.
-  inline targett add_instruction(goto_program_instruction_typet type)
+  targett add_instruction(goto_program_instruction_typet type)
   {
     instructions.push_back(instructiont(type));
     return --instructions.end();
@@ -397,7 +405,7 @@ public:
     std::ostream &out) const;
 
   //! Output goto-program to given stream
-  inline std::ostream &output(std::ostream &out) const
+  std::ostream &output(std::ostream &out) const
   {
     return output(namespacet(symbol_tablet()), "", out);
   }
@@ -420,7 +428,7 @@ public:
   }
 
   //! Compute location numbers
-  inline void compute_location_numbers()
+  void compute_location_numbers()
   {
     unsigned nr=0;
     compute_location_numbers(nr);
@@ -433,14 +441,14 @@ public:
   void update();
 
   //! Human-readable loop name
-  inline static irep_idt loop_id(const_targett target)
+  static irep_idt loop_id(const_targett target)
   {
     return id2string(target->function)+"."+
            std::to_string(target->loop_number);
   }
 
   //! Is the program empty?
-  inline bool empty() const
+  bool empty() const
   {
     return instructions.empty();
   }
@@ -455,13 +463,13 @@ public:
   }
 
   //! Swap the goto program
-  inline void swap(goto_program_templatet<codeT, guardT> &program)
+  void swap(goto_program_templatet<codeT, guardT> &program)
   {
     program.instructions.swap(instructions);
   }
 
   //! Clear the goto program
-  inline void clear()
+  void clear()
   {
     instructions.clear();
   }
@@ -488,7 +496,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   targetst &successors)
 {
   successors.clear();
-  if(target==instructions.end()) return;
+  if(target==instructions.end())
+    return;
 
   targett next=target;
   next++;
@@ -537,7 +546,8 @@ void goto_program_templatet<codeT, guardT>::get_successors(
   const_targetst &successors) const
 {
   successors.clear();
-  if(target==instructions.end()) return;
+  if(target==instructions.end())
+    return;
 
   const_targett next=target;
   next++;
@@ -588,10 +598,10 @@ void goto_program_templatet<codeT, guardT>::update()
 }
 
 template <class codeT, class guardT>
-std::ostream& goto_program_templatet<codeT, guardT>::output(
+std::ostream &goto_program_templatet<codeT, guardT>::output(
   const namespacet &ns,
   const irep_idt &identifier,
-  std::ostream& out) const
+  std::ostream &out) const
 {
   // output program
 
@@ -626,7 +636,7 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
   // number the targets properly
   unsigned cnt=0;
 
-  for(auto & i : instructions)
+  for(auto &i : instructions)
   {
     if(i.is_target())
     {
@@ -649,7 +659,6 @@ void goto_program_templatet<codeT, guardT>::compute_target_numbers()
       }
     }
   }
-
 }
 
 template <class codeT, class guardT>
@@ -743,7 +752,7 @@ inline bool order_const_target(
 template <class codeT, class guardT>
 struct const_target_hash_templatet
 {
-  inline std::size_t operator()(
+  std::size_t operator()(
     const typename goto_program_templatet<codeT, guardT>::const_targett t) const
   { return t->location_number; }
 };

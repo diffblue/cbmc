@@ -30,22 +30,26 @@ public:
     id=identifier;
   }
 
-  friend std::ostream &operator << (std::ostream &out, const object_idt &x)
+  bool operator<(const object_idt &other) const
   {
-    return out << x.id;
+    return id<other.id;
   }
 
-  friend inline bool operator < (const object_idt &a, const object_idt &b)
+  const irep_idt &get_id() const
   {
-    return a.id < b.id;
+    return id;
   }
 
 protected:
   irep_idt id;
 };
 
-inline std::ostream &operator << (std::ostream &, const object_idt &);
-inline bool operator < (const object_idt &a, const object_idt &b);
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const object_idt &object_id)
+{
+  return out << object_id.get_id();
+}
 
 typedef std::set<object_idt> object_id_sett;
 

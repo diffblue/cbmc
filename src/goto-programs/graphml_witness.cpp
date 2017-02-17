@@ -415,7 +415,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
-      std::to_string(it->source.pc->location_number)+"."+std::to_string(step_nr);
+      std::to_string(it->source.pc->location_number)+"."+
+      std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
     graphml[node].thread_nr=it->source.thread_nr;

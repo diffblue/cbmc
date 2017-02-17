@@ -76,7 +76,7 @@ Function: <<
 
 \*******************************************************************/
 
-std::ostream& operator<<(std::ostream& out, const mp_integer &n)
+std::ostream &operator<<(std::ostream &out, const mp_integer &n)
 {
   out << integer2string(n);
   return out;
@@ -120,7 +120,8 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
 {
   mp_integer a(n);
 
-  if(width==0) return "";
+  if(width==0)
+    return "";
 
   bool neg=a.is_negative();
 
@@ -131,12 +132,12 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
   }
 
   std::size_t len = a.digits(2) + 2;
-  char *buffer=(char *)malloc(len);
+  char *buffer=new char[len];
   char *s = a.as_string(buffer, len, 2);
 
   std::string result(s);
 
-  free(buffer);
+  delete[] buffer;
 
   if(result.size()<width)
   {
@@ -148,8 +149,10 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
     result=result.substr(result.size()-width, width);
 
   if(neg)
+  {
     for(std::size_t i=0; i<result.size(); i++)
       result[i]=(result[i]=='0')?'1':'0';
+  }
 
   return result;
 }
@@ -169,12 +172,12 @@ Function: integer2string
 const std::string integer2string(const mp_integer &n, unsigned base)
 {
   unsigned len = n.digits(base) + 2;
-  char *buffer=(char *)malloc(len);
+  char *buffer=new char[len];
   char *s = n.as_string(buffer, len, base);
 
   std::string result(s);
 
-  free(buffer);
+  delete[] buffer;
 
   return result;
 }
@@ -203,7 +206,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
     unsigned long mask=1;
     mask=mask << (n.size()-1);
     mp_integer top_bit=(n[0]=='1') ? mask : 0;
-    if(is_signed) top_bit.negate();
+    if(is_signed)
+      top_bit.negate();
     mask>>=1;
     unsigned long other_bits=0;
 
@@ -227,7 +231,8 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   mp_integer mask=1;
   mask=mask << (n.size()-1);
   mp_integer result=(n[0]=='1') ? mask : 0;
-  if(is_signed) result.negate();
+  if(is_signed)
+    result.negate();
   mask=mask>>1;
 
   for(std::string::const_iterator it=++n.begin();

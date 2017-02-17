@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 template<typename T>
+// NOLINTNEXTLINE(readability/identifiers)
 class reference_counting
 {
 public:
-  inline reference_counting():d(NULL)
+  reference_counting():d(NULL)
   {
   }
 
@@ -25,7 +26,7 @@ public:
   }
 
   // copy constructor
-  inline reference_counting(const reference_counting &other):d(other.d)
+  reference_counting(const reference_counting &other):d(other.d)
   {
     if(d!=NULL)
     {
@@ -37,7 +38,7 @@ public:
     }
   }
 
-  inline reference_counting &operator=(const reference_counting &other)
+  reference_counting &operator=(const reference_counting &other)
   {
     copy_from(other);
     return *this;
@@ -60,13 +61,14 @@ public:
     d=NULL;
   }
 
-  inline const T &read() const
+  const T &read() const
   {
-    if(d==NULL) return T::blank;
+    if(d==NULL)
+      return T::blank;
     return *d;
   }
 
-  inline T &write()
+  T &write()
   {
     detatch();
     return *d;
@@ -99,11 +101,12 @@ protected:
 
     remove_ref(d);
     d=other.d;
-    if(d!=NULL) d->ref_count++;
+    if(d!=NULL)
+      d->ref_count++;
   }
 
 public:
-  inline dt *get_d() const
+  dt *get_d() const
   {
     return d;
   }
@@ -112,7 +115,8 @@ public:
 template<class T>
 void reference_counting<T>::remove_ref(dt *old_d)
 {
-  if(old_d==NULL) return;
+  if(old_d==NULL)
+    return;
 
   assert(old_d->ref_count!=0);
 
@@ -177,7 +181,8 @@ bool operator==(
   const reference_counting<T> &o1,
   const reference_counting<T> &o2)
 {
-  if(o1.get_d()==o2.get_d()) return true;
+  if(o1.get_d()==o2.get_d())
+    return true;
   return o1.read()==o2.read();
 }
 

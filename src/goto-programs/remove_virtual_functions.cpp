@@ -46,7 +46,7 @@ protected:
   {
   public:
     functiont() {}
-    explicit functiont(const irep_idt& _class_id) :
+    explicit functiont(const irep_idt &_class_id) :
       class_id(_class_id)
     {}
 
@@ -260,7 +260,7 @@ void remove_virtual_functionst::get_child_functions_rec(
   if(findit==class_hierarchy.class_map.end())
     return;
 
-  for(const auto & child : findit->second.children)
+  for(const auto &child : findit->second.children)
   {
     exprt method=get_method(child, component_name);
     functiont function(child);

@@ -84,7 +84,8 @@ void precondition(
   {
     preconditiont precondition(ns, value_sets, target, *it, s);
     precondition.compute(dest);
-    if(dest.is_false()) return;
+    if(dest.is_false())
+      return;
   }
 }
 

@@ -123,7 +123,8 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
 {
   // strip ASSERT
   line=std::string(line, strlen("ASSERT "), std::string::npos);
-  if(line=="") return;
+  if(line=="")
+    return;
 
   // bit-vector
   if(line[0]=='(')
@@ -135,7 +136,8 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     std::string identifier=std::string(line, 1, pos-1);
 
     // get value
-    if(!std::getline(in, line)) return;
+    if(!std::getline(in, line))
+      return;
 
     // skip spaces
     pos=0;
@@ -143,7 +145,8 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
 
     // get final ")"
     std::string::size_type pos2=line.rfind(')');
-    if(pos2==std::string::npos) return;
+    if(pos2==std::string::npos)
+      return;
 
     std::string value=std::string(line, pos, pos2-pos);
 
@@ -163,7 +166,8 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
       value=tvt(false);
     }
 
-    if(line=="") return;
+    if(line=="")
+      return;
 
     if(line[0]=='l')
     {

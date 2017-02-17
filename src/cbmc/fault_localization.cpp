@@ -120,7 +120,7 @@ Function: fault_localizationt::check
 \*******************************************************************/
 
 bool fault_localizationt::check(const lpointst &lpoints,
-                                const lpoints_valuet& value)
+                                const lpoints_valuet &value)
 {
   assert(value.size()==lpoints.size());
   bvt assumptions;
@@ -158,7 +158,7 @@ Function: fault_localizationt::update_scores
 \*******************************************************************/
 
 void fault_localizationt::update_scores(lpointst &lpoints,
-                                        const lpoints_valuet& value)
+                                        const lpoints_valuet &value)
 {
   for(auto &l : lpoints)
   {
@@ -195,9 +195,11 @@ void fault_localizationt::localize_linear(lpointst &lpoints)
   for(size_t i=0; i<v.size(); ++i)
   {
     v[i]=tvt(tvt::tv_enumt::TV_TRUE);
-    if(!check(lpoints,v)) update_scores(lpoints,v);
+    if(!check(lpoints, v))
+      update_scores(lpoints, v);
     v[i]=tvt(tvt::tv_enumt::TV_FALSE);
-    if(!check(lpoints,v)) update_scores(lpoints,v);
+    if(!check(lpoints, v))
+      update_scores(lpoints, v);
     v[i]=tvt(tvt::tv_enumt::TV_UNKNOWN);
   }
 }
@@ -216,7 +218,7 @@ Function: fault_localizationt::run
 
 void fault_localizationt::run(irep_idt goal_id)
 {
- // find failed property
+  // find failed property
   failed=get_failed_property();
   assert(failed!=bmc.equation.SSA_steps.end());
 
@@ -236,7 +238,7 @@ void fault_localizationt::run(irep_idt goal_id)
   //  if(options.get_option("localize-faults-method")=="TBD")
   localize_linear(lpoints);
 
-  //clear assumptions
+  // clear assumptions
   bvt assumptions;
   bmc.prop_conv.set_assumptions(assumptions);
 }
@@ -374,7 +376,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
       bmc.error_trace();
     }
 
-    //localize faults
+    // localize faults
     run(ID_nil);
     status() << "\n** Most likely fault location:" << eom;
     report(ID_nil);
@@ -407,7 +409,8 @@ void fault_localizationt::goal_covered(
   for(auto &g : goal_map)
   {
     // failed already?
-    if(g.second.status==goalt::statust::FAILURE) continue;
+    if(g.second.status==goalt::statust::FAILURE)
+      continue;
 
     // check whether failed
     for(auto &c : g.second.instances)
@@ -422,7 +425,7 @@ void fault_localizationt::goal_covered(
         build_goto_trace(bmc.equation, next, solver, bmc.ns,
                          g.second.goto_trace);
 
-        //localize faults
+        // localize faults
         run(g.first);
 
         break;
@@ -456,7 +459,8 @@ void fault_localizationt::report(
       status() << "\n** Most likely fault location:" << eom;
       for(auto &g : goal_map)
       {
-        if(g.second.status!=goalt::statust::FAILURE) continue;
+        if(g.second.status!=goalt::statust::FAILURE)
+          continue;
         report(g.first);
       }
     }

@@ -260,10 +260,11 @@ void escape_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false()) return;
+  if(has_values.is_false())
+    return;
 
   // upcast of ai
-  //escape_analysist &ea=
+  // escape_analysist &ea=
   //  static_cast<escape_analysist &>(ai);
 
   const goto_programt::instructiont &instruction=*from;
@@ -302,7 +303,8 @@ void escape_domaint::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code_function_call=to_code_function_call(instruction.code);
+      const code_function_callt &code_function_call=
+        to_code_function_call(instruction.code);
       const exprt &function=code_function_call.function();
 
       if(function.id()==ID_symbol)
@@ -338,7 +340,9 @@ void escape_domaint::transform(
     // This is the edge to the call site.
     break;
 
-  default:;
+  default:
+    {
+    }
   }
 }
 
@@ -386,12 +390,17 @@ void escape_domaint::output(
       if(aliases.is_root(a_it1) && a_it1!=a_it2 &&
          aliases.same_set(a_it1, a_it2))
       {
-        if(first) { out << "Aliases: " << *a_it1; first=false; }
+        if(first)
+        {
+          out << "Aliases: " << *a_it1;
+          first=false;
+        }
         out << ' ' << *a_it2;
       }
     }
 
-    if(!first) out << '\n';
+    if(!first)
+      out << '\n';
   }
 }
 
@@ -429,7 +438,8 @@ bool escape_domaint::merge(
     std::set<irep_idt> &a_cleanup=cleanup_map[cleanup.first].cleanup_functions;
     unsigned old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
-    if(a_cleanup.size()!=old_size) changed=true;
+    if(a_cleanup.size()!=old_size)
+      changed=true;
   }
 
   // kill empty ones
@@ -554,8 +564,10 @@ void escape_analysist::insert_cleanup(
     {
       typet param_type=function_type.parameters().front().type();
       exprt arg=lhs;
-      if(is_object) arg=address_of_exprt(arg);
-      if(arg.type()!=param_type) arg.make_typecast(param_type);
+      if(is_object)
+        arg=address_of_exprt(arg);
+      if(arg.type()!=param_type)
+        arg.make_typecast(param_type);
       code.arguments().push_back(arg);
     }
 
@@ -596,7 +608,13 @@ void escape_analysist::instrument(
 
           std::set<irep_idt> cleanup_functions;
           operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
-          insert_cleanup(f_it->second, i_it, code_assign.lhs(), cleanup_functions, false, ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_assign.lhs(),
+            cleanup_functions,
+            false,
+            ns);
         }
         break;
 
@@ -623,8 +641,20 @@ void escape_analysist::instrument(
 
           d.check_lhs(code_dead.symbol(), cleanup_functions2);
 
-          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
-          insert_cleanup(f_it->second, i_it, code_dead.symbol(), cleanup_functions2, false, ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_dead.symbol(),
+            cleanup_functions1,
+            true,
+            ns);
+          insert_cleanup(
+            f_it->second,
+            i_it,
+            code_dead.symbol(),
+            cleanup_functions2,
+            false,
+            ns);
 
           for(const auto &c : cleanup_functions1)
           {
@@ -640,7 +670,9 @@ void escape_analysist::instrument(
         }
         break;
 
-      default:;
+      default:
+        {
+        }
       }
     }
 

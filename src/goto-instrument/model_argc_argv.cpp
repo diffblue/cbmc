@@ -93,25 +93,24 @@ bool model_argc_argv(
   // guaranteed by POSIX (_POSIX_ARG_MAX):
   // http://pubs.opengroup.org/onlinepubs/009695399/basedefs/limits.h.html
   std::ostringstream oss;
-  oss <<
-    "int ARGC;\n\
-     char *ARGV[1];\n\
-     void " CPROVER_PREFIX "initialize()\n\
-     {\n\
-	     unsigned next=0u;\n\
-       " CPROVER_PREFIX "assume(ARGC>=1);\n\
-       " CPROVER_PREFIX "assume(ARGC<=" << max_argc << ");\n\
-       " CPROVER_PREFIX "thread_local static char arg_string[4096];\n\
-       for(unsigned i=0u; i<ARGC && i<" << max_argc << "; ++i)\n\
-       {\n\
-         unsigned len;\n\
-         " CPROVER_PREFIX "assume(len<4096);\n\
-         " CPROVER_PREFIX "assume(next+len<4096);\n\
-         " CPROVER_PREFIX "assume(arg_string[next+len]==0);\n\
-         ARGV[i]=&(arg_string[next]);\n\
-         next+=len+1;\n\
-       }\n\
-     }";
+  oss << "int ARGC;\n"
+      << "char *ARGV[1];\n"
+      << "void " CPROVER_PREFIX "initialize()\n"
+      << "{\n"
+      << "  unsigned next=0u;\n"
+      << "  " CPROVER_PREFIX "assume(ARGC>=1);\n"
+      << "  " CPROVER_PREFIX "assume(ARGC<=" << max_argc << ");\n"
+      << "  " CPROVER_PREFIX "thread_local static char arg_string[4096];\n"
+      << "  for(unsigned i=0u; i<ARGC && i<" << max_argc << "; ++i)\n"
+      << "  {\n"
+      << "    unsigned len;\n"
+      << "    " CPROVER_PREFIX "assume(len<4096);\n"
+      << "    " CPROVER_PREFIX "assume(next+len<4096);\n"
+      << "    " CPROVER_PREFIX "assume(arg_string[next+len]==0);\n"
+      << "    ARGV[i]=&(arg_string[next]);\n"
+      << "    next+=len+1;\n"
+      << "  }\n"
+      << "}";
   std::istringstream iss(oss.str());
 
   ansi_c_languaget ansi_c_language;

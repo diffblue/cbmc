@@ -171,7 +171,8 @@ void bmc_covert::satisfying_assignment()
     goalt &g=goal_pair.second;
 
     // covered already?
-    if(g.satisfied) continue;
+    if(g.satisfied)
+      continue;
 
     // check whether satisfied
     for(const auto &goal_inst : g.instances)
@@ -200,13 +201,7 @@ void bmc_covert::satisfying_assignment()
       s_it1++)
     if(s_it1->is_assume() && !s_it1->cond_value)
     {
-      s_it1++;
-
-      for(goto_tracet::stepst::iterator
-          s_it2=s_it1;
-          s_it2!=goto_trace.steps.end();
-          s_it2=goto_trace.steps.erase(s_it2));
-
+      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
       break;
     }
 
@@ -257,7 +252,7 @@ bool bmc_covert::operator()()
 
   bmc.do_conversion();
 
-  //bmc.equation.output(std::cout);
+  // bmc.equation.output(std::cout);
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
@@ -269,7 +264,7 @@ bool bmc_covert::operator()()
     {
       assert(it->source.pc->is_assert());
       exprt c=
-        conjunction({
+        conjunction({ // NOLINT(whitespace/braces)
           literal_exprt(it->guard_literal),
           literal_exprt(!it->cond_literal) });
       literalt l_c=solver.convert(c);
@@ -307,7 +302,8 @@ bool bmc_covert::operator()()
   unsigned goals_covered=0;
 
   for(const auto &g : goal_map)
-    if(g.second.satisfied) goals_covered++;
+    if(g.second.satisfied)
+      goals_covered++;
 
   switch(bmc.ui)
   {
@@ -324,7 +320,8 @@ bool bmc_covert::operator()()
         if(goal.source_location.is_not_nil())
           status() << ' ' << goal.source_location;
 
-        if(!goal.description.empty()) status() << ' ' << goal.description;
+        if(!goal.description.empty())
+          status() << ' ' << goal.description;
 
         status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
                  << eom;

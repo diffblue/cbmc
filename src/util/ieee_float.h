@@ -30,7 +30,7 @@ public:
 
   mp_integer bias() const;
 
-  ieee_float_spect(const floatbv_typet &type)
+  explicit ieee_float_spect(const floatbv_typet &type)
   {
     from_type(type);
   }
@@ -41,11 +41,12 @@ public:
   {
   }
 
-  ieee_float_spect(std::size_t _f, std::size_t _e):f(_f), e(_e), x86_extended(false)
+  ieee_float_spect(std::size_t _f, std::size_t _e):
+    f(_f), e(_e), x86_extended(false)
   {
   }
 
-  inline std::size_t width() const
+  std::size_t width() const
   {
     // Add one for the sign bit.
     // Add one if x86 explicit integer bit is used.
@@ -58,25 +59,25 @@ public:
   class floatbv_typet to_type() const;
 
   // the well-know standard formats
-  inline static ieee_float_spect single_precision()
+  static ieee_float_spect single_precision()
   {
     // 32 bits in total
     return ieee_float_spect(23, 8);
   }
 
-  inline static ieee_float_spect double_precision()
+  static ieee_float_spect double_precision()
   {
     // 64 bits in total
     return ieee_float_spect(52, 11);
   }
 
-  inline static ieee_float_spect quadruple_precision()
+  static ieee_float_spect quadruple_precision()
   {
     // IEEE 754 binary128
     return ieee_float_spect(112, 15);
   }
 
-  inline static ieee_float_spect x86_80()
+  static ieee_float_spect x86_80()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
@@ -84,7 +85,7 @@ public:
     return result;
   }
 
-  inline static ieee_float_spect x86_96()
+  static ieee_float_spect x86_96()
   {
     // Intel, not IEEE
     ieee_float_spect result(63, 15);
@@ -92,21 +93,16 @@ public:
     return result;
   }
 
-  inline friend bool operator == (
-    const ieee_float_spect &a, const ieee_float_spect &b)
+  bool operator==(const ieee_float_spect &other) const
   {
-    return a.f==b.f && a.e==b.e && a.x86_extended==b.x86_extended;
+    return f==other.f && e==other.e && x86_extended==other.x86_extended;
   }
 
-  inline friend bool operator != (
-    const ieee_float_spect &a, const ieee_float_spect &b)
+  bool operator!=(const ieee_float_spect &other) const
   {
-    return !(a==b);
+    return !(*this==other);
   }
 };
-
-bool operator == (const ieee_float_spect &a, const ieee_float_spect &b);
-bool operator != (const ieee_float_spect &a, const ieee_float_spect &b);
 
 class ieee_floatt
 {
@@ -114,11 +110,12 @@ public:
   // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
   // is the IEEE default.
   // The numbering below is what x86 uses in the control word.
-  typedef enum {
+  typedef enum
+  {
     ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,
     ROUND_TO_PLUS_INF=2,  ROUND_TO_ZERO=3,
-    UNKNOWN, NONDETERMINISTIC }
-    rounding_modet;
+    UNKNOWN, NONDETERMINISTIC
+  } rounding_modet;
 
   rounding_modet rounding_mode;
 
@@ -128,6 +125,17 @@ public:
     rounding_mode(ROUND_TO_EVEN),
     spec(_spec), sign_flag(false), exponent(0), fraction(0),
     NaN_flag(false), infinity_flag(false)
+  {
+  }
+
+  explicit ieee_floatt(const floatbv_typet &type):
+    rounding_mode(ROUND_TO_EVEN),
+    spec(ieee_float_spect(type)),
+    sign_flag(false),
+    exponent(0),
+    fraction(0),
+    NaN_flag(false),
+    infinity_flag(false)
   {
   }
 
@@ -202,7 +210,10 @@ public:
       next_representable(false);
   }
 
-  bool is_zero() const { return !NaN_flag && !infinity_flag && fraction==0 && exponent==0; }
+  bool is_zero() const
+  {
+    return !NaN_flag && !infinity_flag && fraction==0 && exponent==0;
+  }
   bool get_sign() const { return sign_flag; }
   bool is_NaN() const { return NaN_flag; }
   bool is_infinity() const { return !NaN_flag && infinity_flag; }
@@ -245,35 +256,30 @@ public:
   std::string to_string_scientific(std::size_t precision) const;
   std::string format(const format_spect &format_spec) const;
 
-  friend inline std::ostream& operator << (std::ostream &out, const ieee_floatt &f)
-  {
-    return out << f.to_ansi_c_string();
-  }
-
   // expressions
   constant_exprt to_expr() const;
   void from_expr(const constant_exprt &expr);
 
   // the usual opertors
-  ieee_floatt &operator /= (const ieee_floatt &other);
-  ieee_floatt &operator *= (const ieee_floatt &other);
-  ieee_floatt &operator += (const ieee_floatt &other);
-  ieee_floatt &operator -= (const ieee_floatt &other);
+  ieee_floatt &operator/=(const ieee_floatt &other);
+  ieee_floatt &operator*=(const ieee_floatt &other);
+  ieee_floatt &operator+=(const ieee_floatt &other);
+  ieee_floatt &operator-=(const ieee_floatt &other);
 
-  friend bool operator < (const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator <=(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator > (const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator >=(const ieee_floatt &a, const ieee_floatt &b);
+  bool operator<(const ieee_floatt &other) const;
+  bool operator<=(const ieee_floatt &other) const;
+  bool operator>(const ieee_floatt &other) const;
+  bool operator>=(const ieee_floatt &other) const;
 
   // warning: these do packed equality, not IEEE equality
   // e.g., NAN==NAN
-  friend bool operator ==(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator !=(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool operator ==(const ieee_floatt &a, int i);
+  bool operator==(const ieee_floatt &other) const;
+  bool operator!=(const ieee_floatt &other) const;
+  bool operator==(int i) const;
 
   // these do IEEE equality, i.e., NAN!=NAN
-  friend bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
-  friend bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
+  bool ieee_equal(const ieee_floatt &other) const;
+  bool ieee_not_equal(const ieee_floatt &other) const;
 
 protected:
   void divide_and_round(mp_integer &fraction, const mp_integer &factor);
@@ -290,14 +296,11 @@ protected:
   static mp_integer base10_digits(const mp_integer &src);
 };
 
-bool operator < (const ieee_floatt &a, const ieee_floatt &b);
-bool operator <=(const ieee_floatt &a, const ieee_floatt &b);
-bool operator > (const ieee_floatt &a, const ieee_floatt &b);
-bool operator >=(const ieee_floatt &a, const ieee_floatt &b);
-bool operator ==(const ieee_floatt &a, const ieee_floatt &b);
-bool operator !=(const ieee_floatt &a, const ieee_floatt &b);
-std::ostream& operator << (std::ostream &, const ieee_floatt &);
-bool ieee_equal(const ieee_floatt &a, const ieee_floatt &b);
-bool ieee_not_equal(const ieee_floatt &a, const ieee_floatt &b);
+inline std::ostream &operator<<(
+  std::ostream &out,
+  const ieee_floatt &f)
+{
+  return out << f.to_ansi_c_string();
+}
 
 #endif // CPROVER_UTIL_IEEE_FLOAT_H

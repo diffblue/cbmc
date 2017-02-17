@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+Module: Loop Acceleration
+
+Author: Matt Lewis
+
+\*******************************************************************/
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_CONE_OF_INFLUENCE_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_CONE_OF_INFLUENCE_H
 
@@ -13,7 +21,8 @@ void cone_of_influence(goto_programt &program,
     expr_sett &targets,
     expr_sett &cone);
 
-class cone_of_influencet {
+class cone_of_influencet
+{
  public:
   cone_of_influencet(const goto_programt &_program,
       const symbol_tablet &symbol_table) :

@@ -20,7 +20,7 @@ class osx_fat_readert
 public:
   explicit osx_fat_readert(std::ifstream &in);
 
-  inline bool has_gb() const { return has_gb_arch; }
+  bool has_gb() const { return has_gb_arch; }
 
   bool extract_gb(
     const std::string &source,

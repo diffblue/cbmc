@@ -84,7 +84,8 @@ public:
   #ifdef USE_DSTRING
   typedef std::map<irep_idt, range_domain_baset*> objectst;
   #else
-  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash> objectst;
+  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash>
+    objectst;
   #endif
 
   virtual ~rw_range_sett();
@@ -94,17 +95,17 @@ public:
   {
   }
 
-  const objectst & get_r_set() const
+  const objectst &get_r_set() const
   {
     return r_range_set;
   }
 
-  const objectst & get_w_set() const
+  const objectst &get_w_set() const
   {
     return w_range_set;
   }
 
-  const range_domaint& get_ranges(objectst::const_iterator it) const
+  const range_domaint &get_ranges(objectst::const_iterator it) const
   {
     assert(dynamic_cast<range_domaint*>(it->second)!=0);
     return *static_cast<range_domaint*>(it->second);
@@ -210,7 +211,7 @@ protected:
     const range_spect &range_end);
 };
 
-inline std::ostream & operator << (
+inline std::ostream &operator << (
   std::ostream &out,
   const rw_range_sett &rw_set)
 {
@@ -273,7 +274,7 @@ public:
   {
   }
 
-  const guarded_range_domaint& get_ranges(objectst::const_iterator it) const
+  const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
     assert(dynamic_cast<guarded_range_domaint*>(it->second)!=0);
     return *static_cast<guarded_range_domaint*>(it->second);
