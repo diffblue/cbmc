@@ -59,6 +59,11 @@ public:
     type_map.clear();
   }
 
+  bool empty() const
+  {
+    return expr_map.empty() && type_map.empty();
+  }
+
   replace_symbolt();
   virtual ~replace_symbolt();
 

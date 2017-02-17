@@ -79,6 +79,10 @@ void constant_propagator_domaint::transform(
   output(std::cout, ai, ns);
 #endif
 
+  // When the domain is used with constant_propagator_ait,
+  // information about dirty variables and config flags are
+  // available. Otherwise, the below will be null and we use default
+  // values
   const constant_propagator_ait *cp=
     dynamic_cast<constant_propagator_ait *>(&ai);
 
@@ -91,7 +95,7 @@ void constant_propagator_domaint::transform(
     ignore_unresolved_calls=cp->ignore_unresolved_calls;
   }
 
-  //assert(!values.is_bottom);
+  // assert(!values.is_bottom);
   if(values.is_bottom)
     return;
 

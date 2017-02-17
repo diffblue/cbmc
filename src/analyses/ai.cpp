@@ -572,7 +572,12 @@ bool ai_baset::do_function_call(
     assert(l_end->is_end_function());
 
     // do edge from end of function to instruction after call
-    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_end)));
+    const statet &end_state=get_state(l_end);
+
+    if(end_state.is_bottom())
+      return false; // function exit point not reachable
+
+    std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
     tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
