@@ -1,6 +1,6 @@
 CORE
 main.c
---constants --verify
+--variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 11 function main, assertion i\s*<\s*51: Unknown$

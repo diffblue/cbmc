@@ -1,6 +1,6 @@
 FUTURE
 main.c
---constants --verify
+--variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file main.c line 9 function main, assertion y==0: Failure (if reachable)$
