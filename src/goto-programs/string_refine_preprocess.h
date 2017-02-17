@@ -22,10 +22,6 @@ class string_refine_preprocesst:public messaget
   symbol_tablet & symbol_table;
   goto_functionst & goto_functions;
 
-  // String builders maps the different names of a same StringBuilder object
-  // to a unique expression.
-  std::map<exprt, exprt> string_builders;
-
   // Map name of Java string functions to there equivalent in the solver
   std::map<irep_idt, irep_idt> side_effect_functions;
   std::map<irep_idt, irep_idt> string_functions;
@@ -37,7 +33,9 @@ class string_refine_preprocesst:public messaget
 
   std::map<irep_idt, std::string> signatures;
   std::map<exprt, exprt> hidden_strings;
+#if 0 // We cannot use this map since side effects may modify strings
   std::map<exprt, exprt> java_to_cprover_strings;
+#endif
 
   // unique id for each newly created symbols
   int next_symbol_id;
@@ -49,6 +47,8 @@ class string_refine_preprocesst:public messaget
  private:
   void initialize_string_function_table();
 
+  static bool check_java_type(const typet &type, const std::string &tag);
+
   static bool is_java_string_pointer_type(const typet &type);
 
   static bool is_java_string_type(const typet &type);
@@ -58,6 +58,20 @@ class string_refine_preprocesst:public messaget
   static bool is_java_string_builder_pointer_type(const typet &type);
 
   static bool is_java_char_sequence_type(const typet &type);
+
+  static bool is_java_char_sequence_pointer_type(const typet &type);
+
+  static bool is_java_char_array_type(const typet &type);
+
+  static bool is_java_char_array_pointer_type(const typet &type);
+
+  static bool implements_java_char_sequence(const typet &type)
+  {
+      return
+        is_java_char_sequence_pointer_type(type) ||
+        is_java_string_builder_pointer_type(type) ||
+        is_java_string_pointer_type(type);
+  }
 
   symbol_exprt new_tmp_symbol(const std::string &name, const typet &type);
 
@@ -105,6 +119,9 @@ class string_refine_preprocesst:public messaget
   void declare_function(irep_idt function_name, const typet &type);
 
   void get_data_and_length_type_of_string(
+    const exprt &expr, typet &data_type, typet &length_type);
+
+  void get_data_and_length_type_of_char_array(
     const exprt &expr, typet &data_type, typet &length_type);
 
   function_application_exprt build_function_application(
@@ -200,7 +217,6 @@ class string_refine_preprocesst:public messaget
     goto_programt::targett &i_it,
     const irep_idt &function_name,
     const std::string &signature,
-    size_t index,
     bool assign_first_arg=false,
     bool skip_first_arg=false);
 
