@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <cassert>
+#include <string>
 
 #include "format_number_range.h"
 
@@ -77,9 +78,16 @@ std::string format_number_ranget::operator()(std::vector<unsigned> &numbers)
                 number_range+=
                   std::to_string(start_number)+","+std::to_string(last_number);
               else
-                number_range+=
-                  std::to_string(start_number)+","+std::to_string(last_number)+
-                  std::to_string(end_number);
+              {
+                if(start_number+1==last_number && last_number+1==number)
+                  number_range+=
+                    std::to_string(start_number)+"-"+std::to_string(end_number);
+                else
+                  number_range+=
+                    std::to_string(start_number)+
+                    ","+std::to_string(last_number)+
+                    ","+std::to_string(end_number);
+              }
             }
             start_number=number;
             last_number=number;
