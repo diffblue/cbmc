@@ -14,6 +14,7 @@ Date:   September 2016
 
 #include <goto-programs/goto_model.h>
 #include <util/ui_message.h>
+#include <util/string_expr.h>
 
 class string_refine_preprocesst:public messaget
 {
@@ -29,27 +30,20 @@ class string_refine_preprocesst:public messaget
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
   typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
 
-  // String builders maps the different names of a same StringBuilder object
-  // to a unique expression.
-  expr_mapt string_builders;
-
   // Map name of Java string functions to there equivalent in the solver
   id_mapt side_effect_functions;
   id_mapt string_functions;
   id_mapt c_string_functions;
   id_mapt string_function_calls;
-  id_mapt string_of_char_array_functions;
-  id_mapt string_of_char_array_function_calls;
-  id_mapt side_effect_char_array_functions;
 
   std::unordered_map<irep_idt, std::string, irep_id_hash> signatures;
-  expr_mapt hidden_strings;
-  expr_mapt java_to_cprover_strings;
 
   // unique id for each newly created symbols
   int next_symbol_id;
 
   void initialize_string_function_table();
+
+  static bool check_java_type(const typet &type, const std::string &tag);
 
   static bool is_java_string_pointer_type(const typet &type);
 
@@ -60,6 +54,20 @@ class string_refine_preprocesst:public messaget
   static bool is_java_string_builder_pointer_type(const typet &type);
 
   static bool is_java_char_sequence_type(const typet &type);
+
+  static bool is_java_char_sequence_pointer_type(const typet &type);
+
+  static bool is_java_char_array_type(const typet &type);
+
+  static bool is_java_char_array_pointer_type(const typet &type);
+
+  static bool implements_java_char_sequence(const typet &type)
+  {
+      return
+        is_java_char_sequence_pointer_type(type) ||
+        is_java_string_builder_pointer_type(type) ||
+        is_java_string_pointer_type(type);
+  }
 
   symbol_exprt fresh_array(
     const typet &type, const source_locationt &location);
@@ -110,6 +118,9 @@ class string_refine_preprocesst:public messaget
   void get_data_and_length_type_of_string(
     const exprt &expr, typet &data_type, typet &length_type);
 
+  void get_data_and_length_type_of_char_array(
+    const exprt &expr, typet &data_type, typet &length_type);
+
   function_application_exprt build_function_application(
     const irep_idt &function_name,
     const typet &type,
@@ -136,27 +147,16 @@ class string_refine_preprocesst:public messaget
     const source_locationt &location,
     const std::string &signature);
 
-  void make_assign(
-    goto_programt &goto_program,
-    goto_programt::targett &target,
-    const exprt &lhs,
-    const code_typet &function_type,
-    const irep_idt &function_name,
-    const exprt::operandst &arg,
-    const source_locationt &loc,
-    const std::string &sig);
-
   exprt make_cprover_string_assign(
     goto_programt &goto_program,
     goto_programt::targett &target,
     const exprt &rhs,
     const source_locationt &location);
 
-  void make_string_copy(
+  string_exprt make_cprover_char_array_assign(
     goto_programt &goto_program,
     goto_programt::targett &target,
-    const exprt &lhs,
-    const exprt &argument,
+    const exprt &rhs,
     const source_locationt &location);
 
   void make_string_function(
@@ -191,33 +191,6 @@ class string_refine_preprocesst:public messaget
 
   void make_to_char_array_function(
     goto_programt &goto_program, goto_programt::targett &);
-
-  exprt make_cprover_char_array_assign(
-    goto_programt &goto_program,
-    goto_programt::targett &target,
-    const exprt &rhs,
-    const source_locationt &location);
-
-  void make_char_array_function(
-    goto_programt &goto_program,
-    goto_programt::targett &target,
-    const irep_idt &function_name,
-    const std::string &signature,
-    std::size_t index,
-    bool assign_first_arg=false,
-    bool skip_first_arg=false);
-
-  void make_char_array_function_call(
-    goto_programt &goto_program,
-    goto_programt::targett &target,
-    const irep_idt &function_name,
-    const std::string &signature);
-
-  void make_char_array_side_effect(
-    goto_programt &goto_program,
-    goto_programt::targett &target,
-    const irep_idt &function_name,
-    const std::string &signature);
 
   void replace_string_calls(goto_functionst::function_mapt::iterator f_it);
 };
