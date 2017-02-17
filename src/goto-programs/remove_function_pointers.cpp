@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/arith_tools.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
@@ -16,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type_eq.h>
 
 #include <ansi-c/c_types.h>
+#include <ansi-c/c_qualifiers.h>
 
 #include "remove_skip.h"
 #include "remove_function_pointers.h"
@@ -79,6 +81,26 @@ protected:
       compute_address_taken_functions(s.second.value, address_taken);
   }
 
+private:
+  typedef std::list<exprt> functionst;
+
+  bool try_get_precise_call(
+    const exprt &expr, exprt &out_function);
+
+  bool try_get_from_address_of(
+    const exprt &expr, functionst &out_functions);
+
+  bool try_get_call_from_symbol(
+    const exprt &symbol_expr, functionst &out_functions);
+
+  bool try_get_call_from_index(
+    const exprt &index_expr, functionst &out_functions);
+
+  bool try_evaluate_index_value(
+    const exprt &index_value_expr, mp_integer &out_array_index);
+
+  bool try_get_array_from_index(
+    const index_exprt &index_expr, array_exprt &out_array_expr);
 };
 
 /*******************************************************************\
@@ -135,6 +157,319 @@ symbolt &remove_function_pointerst::new_tmp_symbol()
   } while(symbol_table.move(new_symbol, symbol_ptr));
 
   return *symbol_ptr;
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_precise_call
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a symbol and its value was code.
+          In this case out_function will be the function this is a symbol for.
+
+ Purpose: Find if a symbol is in fact a function that can be used in place
+          of the function pointer
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_get_precise_call(
+  const exprt &expr,
+  exprt &out_function)
+{
+  if(expr.id()==ID_symbol && expr.type().id()==ID_code)
+  {
+    out_function=to_symbol_expr(expr);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_from_address_of
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a address_of_exprt and it was able
+          to either pointing to a function or a sybmol. In either of
+          the true cases the out_functions will contain all the functions the
+          address of could be.
+
+ Purpose: Resolve a address of to its real value.
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_get_from_address_of(
+  const exprt &expr, functionst &out_functions)
+{
+  if(expr.id()==ID_address_of)
+  {
+    const address_of_exprt &address_of_expr=to_address_of_expr(expr);
+
+    exprt precise_expr;
+    if(try_get_precise_call(address_of_expr.object(), precise_expr))
+    {
+      out_functions.push_back(precise_expr);
+      return true;
+    }
+    else
+    {
+      return try_get_call_from_symbol(address_of_expr.object(), out_functions);
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_call_from_symbol
+
+  Inputs:
+   symbol_expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a symbol_exprt and it was able
+          to either find a explict function that this points to (in the case
+          where the symbol is a function) or all a set of functions that it
+          could be by following the valu the symbol represents. In either of
+          the true cases the out_functions will contain all the functions the
+          function pointer could point to.
+
+ Purpose: Resolve a symbol to its real value and recursively try and find
+          all posible functions that could be at that position in the array.
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_get_call_from_symbol(
+  const exprt &symbol_expr, functionst &out_functions)
+{
+  if(symbol_expr.id()==ID_symbol)
+  {
+    const symbolt &symbol=
+      symbol_table.lookup(symbol_expr.get(ID_identifier));
+    const exprt &looked_up_val=symbol.value;
+    exprt precise_expr;
+    if(try_get_precise_call(looked_up_val, precise_expr))
+    {
+      out_functions.push_back(precise_expr);
+      return true;
+    }
+    bool found_functions=false;
+    found_functions=
+      found_functions || try_get_from_address_of(looked_up_val, out_functions);
+    found_functions=
+      found_functions || try_get_call_from_index(looked_up_val, out_functions);
+    found_functions=
+      found_functions || try_get_call_from_symbol(looked_up_val, out_functions);
+    return found_functions;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_call_from_index
+
+  Inputs:
+   expr - The expression that is the value of the function pointer.
+
+ Outputs: Returns true if the expression is a index_exprt and it was able
+          to either find a explict function that this points to (in the case
+          where the index is constant) or all the functions within the array
+          that the index is indexing. In either of the true cases the
+          out_functions will contain all the functions the function pointer
+          could point to.
+
+ Purpose: Resolve the index of an array to find all posible functions
+          that could be at that position in the array.
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_get_call_from_index(
+  const exprt &expr, functionst &out_functions)
+{
+  if(expr.id()==ID_index)
+  {
+    const index_exprt &index_expr=to_index_expr(expr);
+
+    array_exprt array_expr;
+    if(try_get_array_from_index(index_expr, array_expr))
+    {
+      // Here we require an array of constant pointers to
+      // code (i.e. the pointers cannot be reassigned).
+      // Since it is an array
+      const typet &array_type=array_expr.type();
+      const typet &array_contents_type=array_type.subtype();
+      c_qualifierst array_qaulifiers;
+      array_qaulifiers.read(array_contents_type);
+      if(array_qaulifiers.is_constant)
+      {
+        mp_integer value;
+        if(try_evaluate_index_value(index_expr.index(), value))
+        {
+          const exprt &func_expr=array_expr.operands()[integer2size_t(value)];
+          exprt precise_match;
+
+          if(try_get_precise_call(func_expr, precise_match))
+          {
+            out_functions.push_back(precise_match);
+            return true;
+          }
+          bool found_functions=false;
+          found_functions=
+            found_functions ||
+              try_get_from_address_of(func_expr, out_functions);
+          found_functions=
+            found_functions ||
+              try_get_call_from_symbol(func_expr, out_functions);
+
+          return found_functions;
+        }
+        else
+        {
+          // We don't know what index it is,
+          // but we know the value is from the array
+          for(const exprt &op : array_expr.operands())
+          {
+            exprt precise_match;
+            if(try_get_precise_call(op, precise_match))
+            {
+              out_functions.push_back(precise_match);
+            }
+            bool found_functions=false;
+            found_functions=
+              found_functions || try_get_from_address_of(op, out_functions);
+            found_functions=
+              found_functions || try_get_call_from_symbol(op, out_functions);
+          }
+          return out_functions.size() > 0;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_evaluate_index_value
+
+  Inputs:
+   index_expr - The expression of the index of the index expression (e.g.
+                index_exprt::index())
+
+ Outputs: Returns true if was able to find a constant value for the index
+          expression. If true, then out_array_index will be the index within
+          the array that the function pointer is pointing to.
+
+ Purpose: Given an index into an array, resolve, if possible, the index
+          that is being accessed. This deals with symbols and typecasts to
+          constant values.
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_evaluate_index_value(
+  const exprt &index_value_expr, mp_integer &out_array_index)
+{
+  if(index_value_expr.id()==ID_constant)
+  {
+    const constant_exprt &constant_expr=to_constant_expr(index_value_expr);
+    mp_integer array_index;
+    bool errors=to_integer(constant_expr, array_index);
+    if(!errors)
+    {
+      out_array_index=array_index;
+    }
+    return !errors;
+  }
+  else if(index_value_expr.id()==ID_symbol)
+  {
+    // Resolve symbol and try again
+    const symbolt &index_symbol=
+      symbol_table.lookup(index_value_expr.get(ID_identifier));
+
+    return try_evaluate_index_value(index_symbol.value, out_array_index);
+  }
+  else if(index_value_expr.id()==ID_typecast)
+  {
+    // Follow the typecast
+    return try_evaluate_index_value(index_value_expr.op0(), out_array_index);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: remove_function_pointerst::try_get_array_from_index
+
+  Inputs:
+   index_expr - The expression of the index in the array
+
+ Outputs: Returns true if was able to find the array associated
+          with the index. If true, then out_array_expr will contain
+          the expression representing the array.
+
+ Purpose: Given an index into an array, resolve the array expression,
+          following symbol expressions through to the actual array
+          expression.
+
+\*******************************************************************/
+
+bool remove_function_pointerst::try_get_array_from_index(
+  const index_exprt &index_expr, array_exprt &out_array_expr)
+{
+  const exprt &array_expr=index_expr.array();
+  if(array_expr.id()==ID_array)
+  {
+    out_array_expr=to_array_expr(array_expr);
+    return true;
+  }
+  else if(array_expr.id()==ID_symbol)
+  {
+    // Is there some existing code to follow symbols to the real value?
+    const symbolt &array_symbol=
+      symbol_table.lookup(array_expr.get(ID_identifier));
+
+    const exprt &array_value=array_symbol.value;
+    if(array_value.id()==ID_array)
+    {
+      out_array_expr=to_array_expr(array_value);
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    return false;
+  }
 }
 
 /*******************************************************************\
@@ -363,39 +698,61 @@ void remove_function_pointerst::remove_function_pointer(
 
   const exprt &pointer=function.op0();
 
-  // Is this simple?
-  if(pointer.id()==ID_address_of &&
-     to_address_of_expr(pointer).object().id()==ID_symbol)
+  functionst functions;
+  bool found_functions=false;
+
+  const c_qualifierst pointer_qualifers(pointer.type());
+
+  // This can happen for example with
+  // (*(&f2))();
+  // In this case we don't need constant check - implict
+  found_functions=found_functions ||
+    try_get_from_address_of(pointer, functions);
+
+  // If it is a symbol (except in the case where the symbol is the function
+  // symbol itself) then the symbol must be const or else can be reassigned.
+  if(pointer_qualifers.is_constant)
   {
-    to_code_function_call(target->code).function()=
-      to_address_of_expr(pointer).object();
+    found_functions=
+      found_functions || try_get_call_from_symbol(pointer, functions);
+  }
+
+  if(functions.size()==1)
+  {
+    to_code_function_call(target->code).function()=functions.front();
     return;
   }
 
-  typedef std::list<exprt> functionst;
-  functionst functions;
-
-  bool return_value_used=code.lhs().is_not_nil();
-
-  // get all type-compatible functions
-  // whose address is ever taken
-  for(const auto &t : type_map)
+  // if the functions list is still empty we didn't have any luck finding
+  // any valid funcitons (or there are none??)
+  if(!found_functions)
   {
-    // address taken?
-    if(address_taken.find(t.first)==address_taken.end())
-      continue;
+    bool return_value_used=code.lhs().is_not_nil();
 
-    // type-compatible?
-    if(!is_type_compatible(return_value_used, call_type, t.second))
-      continue;
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &t : type_map)
+    {
+      // address taken?
+      if(address_taken.find(t.first)==address_taken.end())
+        continue;
 
-    if(t.first=="pthread_mutex_cleanup")
-      continue;
+      // type-compatible?
+      if(!is_type_compatible(return_value_used, call_type, t.second))
+        continue;
 
-    symbol_exprt expr;
-    expr.type()=t.second;
-    expr.set_identifier(t.first);
-    functions.push_back(expr);
+      if(t.first=="pthread_mutex_cleanup")
+        continue;
+
+      symbol_exprt expr;
+      expr.type()=t.second;
+      expr.set_identifier(t.first);
+      functions.push_back(expr);
+    }
+  }
+  else
+  {
+    assert(functions.size()>0);
   }
 
   // the final target is a skip
