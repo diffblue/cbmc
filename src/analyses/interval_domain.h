@@ -33,12 +33,12 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final;
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final;
+    const namespacet &ns) const override;
 
   bool join(const interval_domaint &b);
 
@@ -51,7 +51,7 @@ public:
   }
 
   // no states
-  void make_bottom() final
+  void make_bottom() final override
   {
     int_map.clear();
     float_map.clear();
@@ -59,16 +59,28 @@ public:
   }
 
   // all states
-  void make_top() final
+  void make_top() final override
   {
     int_map.clear();
     float_map.clear();
     bottom=false;
   }
 
-  void make_entry() final
+  void make_entry() final override
   {
     make_top();
+  }
+
+  bool is_bottom() const override final
+  {
+    // assert(!bottom || (int_map.empty() && float_map.empty()));
+
+    return bottom;
+  }
+
+  bool is_top() const override final
+  {
+    return !bottom && int_map.empty() && float_map.empty();
   }
 
   exprt make_expression(const symbol_exprt &) const;
@@ -85,15 +97,10 @@ public:
     return src.id()==ID_floatbv;
   }
 
-  bool is_bottom() const
-  {
-    return bottom;
-  }
-
   virtual bool ai_simplify(
     exprt &condition,
     const namespacet &ns,
-    const bool lhs=false) const;
+    const bool lhs=false) const override final;
 
 protected:
   bool bottom;

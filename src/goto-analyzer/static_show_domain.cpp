@@ -6,7 +6,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>

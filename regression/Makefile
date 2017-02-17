@@ -19,4 +19,3 @@ clean:
 			$(MAKE) -C "$$dir" clean; \
 		fi; \
 	done;
-
