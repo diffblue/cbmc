@@ -40,7 +40,7 @@ matrix:
       compiler: clang
       env: COMPILER=clang++
     - env: NAME="CPP-LINT"
-      script: scripts/run_lint.sh master HEAD || true
+      script: scripts/travis_lint.sh || true
 
 script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
