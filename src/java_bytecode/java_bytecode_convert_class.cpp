@@ -27,11 +27,13 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
-    size_t _max_array_length):
+    size_t _max_array_length,
+    bool _string_refinement_enabled):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
-    max_array_length(_max_array_length)
+    max_array_length(_max_array_length),
+    string_refinement_enabled(_string_refinement_enabled)
   {
   }
 
@@ -41,6 +43,9 @@ public:
 
     if(parse_tree.loading_successful)
       convert(parse_tree.parsed_class);
+    else if(string_refinement_enabled &&
+            parse_tree.parsed_class.name=="java.lang.String")
+      add_string_type();
     else
       generate_class_stub(parse_tree.parsed_class.name);
   }
@@ -52,6 +57,7 @@ protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
   const size_t max_array_length;
+  bool string_refinement_enabled;
 
   // conversion
   void convert(const classt &c);
@@ -59,6 +65,7 @@ protected:
 
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
+  void add_string_type();
 };
 
 /*******************************************************************\
@@ -322,13 +329,15 @@ bool java_bytecode_convert_class(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   bool disable_runtime_checks,
-  size_t max_array_length)
+  size_t max_array_length,
+  bool string_refinement_enabled)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
     message_handler,
     disable_runtime_checks,
-    max_array_length);
+    max_array_length,
+    string_refinement_enabled);
 
   try
   {
@@ -351,4 +360,64 @@ bool java_bytecode_convert_class(
   }
 
   return true;
+}
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_classt::add_string_type
+
+ Purpose: Implements the java.lang.String type in the case that
+          we provide an internal implementation.
+
+\*******************************************************************/
+
+void java_bytecode_convert_classt::add_string_type()
+{
+  class_typet string_type;
+  string_type.set_tag("java.lang.String");
+  string_type.components().resize(3);
+  string_type.components()[0].set_name("@java.lang.Object");
+  string_type.components()[0].type()=symbol_typet("java::java.lang.Object");
+  string_type.components()[1].set_name("length");
+  string_type.components()[1].set_pretty_name("length");
+  string_type.components()[1].type()=java_int_type();
+  string_type.components()[2].set_name("data");
+  string_type.components()[2].set_pretty_name("data");
+  // Use a pointer-to-unbounded-array instead of a pointer-to-char.
+  // Saves some casting in the string refinement algorithm but may
+  // be unnecessary.
+  string_type.components()[2].type()=pointer_typet(
+    array_typet(java_char_type(), infinity_exprt(java_int_type())));
+  string_type.add_base(symbol_typet("java::java.lang.Object"));
+
+  symbolt string_symbol;
+  string_symbol.name="java::java.lang.String";
+  string_symbol.base_name="java.lang.String";
+  string_symbol.type=string_type;
+  string_symbol.is_type=true;
+
+  symbol_table.add(string_symbol);
+
+  // Also add a stub of `String.equals` so that remove-virtual-functions
+  // generates a check for Object.equals vs. String.equals.
+  // No need to fill it in, as pass_preprocess will replace the calls again.
+  symbolt string_equals_symbol;
+  string_equals_symbol.name=
+    "java::java.lang.String.equals:(Ljava/lang/Object;)Z";
+  string_equals_symbol.base_name="java.lang.String.equals";
+  string_equals_symbol.pretty_name="java.lang.String.equals";
+  string_equals_symbol.mode=ID_java;
+
+  code_typet string_equals_type;
+  string_equals_type.return_type()=java_boolean_type();
+  code_typet::parametert thisparam;
+  thisparam.set_this();
+  thisparam.type()=pointer_typet(symbol_typet(string_symbol.name));
+  code_typet::parametert otherparam;
+  otherparam.type()=pointer_typet(symbol_typet("java::java.lang.Object"));
+  string_equals_type.parameters().push_back(thisparam);
+  string_equals_type.parameters().push_back(otherparam);
+  string_equals_symbol.type=std::move(string_equals_type);
+
+  symbol_table.add(string_equals_symbol);
 }

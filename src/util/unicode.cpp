@@ -7,6 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <cstring>
+#include <locale>
+#include <codecvt>
+#include <sstream>
+#include <iomanip>
 
 #include "unicode.h"
 
@@ -257,4 +261,43 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
     argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
 
   return argv_narrow;
+}
+
+std::wstring utf8_to_utf16_big_endian(const std::string& in)
+{
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
+  return converter.from_bytes(in);
+}
+
+std::wstring utf8_to_utf16_little_endian(const std::string& in)
+{
+  const std::codecvt_mode mode=std::codecvt_mode::little_endian;
+
+  // default largest value codecvt_utf8_utf16 reads without error is 0x10ffff
+  // see: http://en.cppreference.com/w/cpp/locale/codecvt_utf8_utf16
+  const unsigned long maxcode=0x10ffff;
+
+  typedef std::codecvt_utf8_utf16<wchar_t, maxcode, mode> codecvt_utf8_utf16t;
+  std::wstring_convert<codecvt_utf8_utf16t> converter;
+  return converter.from_bytes(in);
+}
+
+std::string utf16_little_endian_to_ascii(const std::wstring& in)
+{
+  std::ostringstream result;
+  std::locale loc;
+  for(const auto c : in)
+  {
+    if(c<=255 && isprint(c, loc))
+      result << (unsigned char)c;
+    else
+    {
+      result << "\\u"
+             << std::hex
+             << std::setw(4)
+             << std::setfill('0')
+             << (unsigned int)c;
+    }
+  }
+  return result.str();
 }

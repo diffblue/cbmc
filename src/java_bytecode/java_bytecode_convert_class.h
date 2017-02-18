@@ -19,6 +19,7 @@ bool java_bytecode_convert_class(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   bool disable_runtime_checks,
-  size_t max_array_length);
+  size_t max_array_length,
+  bool string_refinement_enabled);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
