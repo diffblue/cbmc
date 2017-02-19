@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <iomanip>
+
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
@@ -91,11 +93,23 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   typecheck_type(type);
 }
 
-static void escape_non_alnum(std::string &toescape)
+static std::string escape_non_alnum(const std::string &toescape)
 {
+  std::ostringstream escaped;
   for(auto &ch : toescape)
-    if(!isalnum(ch))
-      ch='_';
+  {
+    if(ch=='_')
+      escaped << "__";
+    else if(isalnum(ch))
+      escaped << ch;
+    else
+      escaped << '_'
+              << std::hex
+              << std::setfill('0')
+              << std::setw(2)
+              << (unsigned int)ch;
+  }
+  return escaped.str();
 }
 
 /*******************************************************************\
@@ -115,29 +129,20 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   const irep_idt value=expr.get(ID_value);
   const symbol_typet string_type("java::java.lang.String");
 
-  auto findit=string_literal_to_symbol_name.find(value);
-  if(findit!=string_literal_to_symbol_name.end())
+  std::string escaped_symbol_name=
+    "java::java.lang.String.Literal.";
+  escaped_symbol_name+=escape_non_alnum(id2string(value));
+
+  auto findit=symbol_table.symbols.find(escaped_symbol_name);
+  if(findit!=symbol_table.symbols.end())
   {
-    expr=symbol_exprt(findit->second, pointer_typet(string_type));
+    expr=findit->second.symbol_expr();
     return;
   }
 
   // Create a new symbol:
-  std::ostringstream identifier_str;
-  std::string escaped=id2string(value);
-  escape_non_alnum(escaped);
-  identifier_str << "java::java.lang.String.Literal." << escaped;
-  // Avoid naming clashes by virtue of escaping:
-  // NOTE this increments the count stored in the map.
-  size_t unique_num=++(escaped_string_literal_count[identifier_str.str()]);
-  if(unique_num!=1)
-    identifier_str << unique_num;
-
-  irep_idt identifier_id=identifier_str.str();
-  string_literal_to_symbol_name.insert(std::make_pair(value, identifier_id));
-
   symbolt new_symbol;
-  new_symbol.name=identifier_id;
+  new_symbol.name=escaped_symbol_name;
   new_symbol.type=pointer_typet(string_type);
   new_symbol.base_name="Literal";
   new_symbol.pretty_name=value;
