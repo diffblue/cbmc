@@ -1,6 +1,6 @@
 template <class T> struct A
 {
-  A(T i):i(i){}
+  A(T i):i(i) {}
   T i;
 };
 

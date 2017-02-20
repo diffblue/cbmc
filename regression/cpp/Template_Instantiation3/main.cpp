@@ -7,7 +7,7 @@ struct sc_ufixed
   {
   }
 
-  sc_ufixed<X*2, Y*2> multiply (const sc_ufixed<X,Y> &op) const
+  sc_ufixed<X*2, Y*2> multiply (const sc_ufixed<X, Y> &op) const
   {
     unsigned int result = this->value * op.value;
     return sc_ufixed<X*2, Y*2>(result);
