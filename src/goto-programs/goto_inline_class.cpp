@@ -683,8 +683,16 @@ void goto_inlinet::expand_function_call(
         arguments,
         constrain);
 
+      progress() << "Inserting " << identifier << " into caller" << eom;
+      progress() << "Number of instructions: "
+                 << cached.body.instructions.size() << eom;
+
       if(!caching)
       {
+        progress() << "Removing " << identifier << " from cache" << eom;
+        progress() << "Number of instructions: "
+                   << cached.body.instructions.size() << eom;
+
         inline_log.cleanup(cached.body);
         cache.erase(identifier);
       }
@@ -950,6 +958,11 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   goto_functiont &cached=cache[identifier];
   assert(cached.body.empty());
+
+  progress() << "Creating copy of " << identifier << eom;
+  progress() << "Number of instructions: "
+             << goto_function.body.instructions.size() << eom;
+
   cached.copy_from(goto_function); // location numbers not changed
   inline_log.copy_from(goto_function.body, cached.body);
 
