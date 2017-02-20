@@ -550,7 +550,7 @@ _SED_FIXUPS = {
   "Remove space before ( in switch (": "s/switch (/switch(/",
   "Should have a space between // and comment": 's/\/\//\/\/ /',
   "Missing space before {": r's/\([^ ]\){/\1 {/',
-  "Tab found, replace by spaces": r's/\t/  /',
+  "Tab found, replace by spaces": r's/\t/  /g',
   "Line ends in whitespace.  Consider deleting these extra spaces.": r's/\s*$//',
   "You don't need a ; after a }": r's/};/}/',
   "Missing space after ,": r's/,\([^ ]\)/, \1/',
