@@ -1,13 +1,13 @@
 struct A {};
 
 struct B {
-	 explicit B(A&){}
+   explicit B(A&){}
 };
 
-void test(const B& b){};
+void test(const B& b){}
 
 int main()
 {
-	A a;
-	test(a); // conversion error
+  A a;
+  test(a); // conversion error
 }

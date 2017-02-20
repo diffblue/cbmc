@@ -1,9 +1,9 @@
 struct A
 {
-	int f();
+  int f();
 };
 
 int main()
 {
-	int i = (int) A::f;
+  int i = (int) A::f;
 }

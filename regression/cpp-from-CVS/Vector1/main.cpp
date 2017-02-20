@@ -30,9 +30,9 @@ void sort(vector<int>& c)
 */
 int main()
 {
-	vector<int> vec;
-	vec.resize(0);
-	__CPROVER_assert(vec.size()==0, "vec size == 0");
+  vector<int> vec;
+  vec.resize(0);
+  __CPROVER_assert(vec.size()==0, "vec size == 0");
 /*	vec.push_back(2);
 	vec.push_back(1);
 	vec.push_back(4);

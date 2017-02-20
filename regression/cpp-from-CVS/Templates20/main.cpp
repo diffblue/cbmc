@@ -3,7 +3,7 @@
 struct A
 {
     int i;
-    A():i(10){}
+    A():i(10) {}
 
   private:
     A(const A& a); // disabled
@@ -14,7 +14,7 @@ class B:  A {
   public:
     T t;
     B(){};
-    int get_i(){return i;}
+    int get_i() {return i;}
   private:
     B(B<T>& b); // disabled
 };
@@ -24,8 +24,8 @@ template <>
 class B<bool>:  A {
   public:
     bool b;
-    B():b(true){};
-    int get_i(){return i;}
+    B():b(true){}
+    int get_i() {return i;}
   private:
     B(B<bool>& b); // disabled
 };
