@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/unicode.h>
 
+#include <linking/zero_initializer.h>
+
 #include "java_bytecode_typecheck.h"
 #include "java_pointer_casts.h"
 #include "java_types.h"
@@ -163,8 +165,26 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   new_symbol.is_lvalue=true;
   new_symbol.is_static_lifetime=true; // These are basically const global data.
 
+  // Regardless of string refinement setting, at least initialize
+  // the literal with @clsid = String and @lock = false:
+  symbol_typet jlo_symbol("java::java.lang.Object");
+  const auto& jlo_struct=to_struct_type(ns.follow(jlo_symbol));
+  struct_exprt jlo_init(jlo_symbol);
+  const auto& jls_struct=to_struct_type(ns.follow(string_type));
+
+  jlo_init.copy_to_operands(
+    constant_exprt("java::java.lang.String",
+                   jlo_struct.components()[0].type()));
+  jlo_init.copy_to_operands(
+    from_integer(0, jlo_struct.components()[1].type()));
+
+  // If string refinement *is* around, populate the actual
+  // contents as well:
   if(string_refinement_enabled)
   {
+    struct_exprt literal_init(new_symbol.type);
+    literal_init.move_to_operands(jlo_init);
+
     // Initialise the string with a constant utf-16 array:
     symbolt array_symbol;
     array_symbol.name=escaped_symbol_name+"_constarray";
@@ -185,18 +205,6 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     if(symbol_table.add(array_symbol))
       throw "failed to add constarray symbol to symtab";
 
-    symbol_typet jlo_symbol("java::java.lang.Object");
-    const auto& jlo_struct=to_struct_type(ns.follow(jlo_symbol));
-    const auto& jls_struct=to_struct_type(ns.follow(string_type));
-
-    struct_exprt literal_init(new_symbol.type);
-    struct_exprt jlo_init(jlo_symbol);
-    jlo_init.copy_to_operands(
-      constant_exprt("java::java.lang.String",
-                     jlo_struct.components()[0].type()));
-    jlo_init.copy_to_operands(
-      from_integer(0, jlo_struct.components()[1].type()));
-    literal_init.move_to_operands(jlo_init);
     literal_init.copy_to_operands(
       from_integer(literal_array.operands().size(),
                    jls_struct.components()[1].type()));
@@ -204,6 +212,32 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
       address_of_exprt(array_symbol.symbol_expr()));
 
     new_symbol.value=literal_init;
+  }
+  else if(jls_struct.components().size()>=1 &&
+          jls_struct.components()[0].get_name()=="@java.lang.Object")
+  {
+    // Case where something defined java.lang.String, so it has
+    // a proper base class (always java.lang.Object in practical
+    // JDKs seen so far)
+    struct_exprt literal_init(new_symbol.type);
+    literal_init.move_to_operands(jlo_init);
+    for(const auto &comp : jls_struct.components())
+    {
+      if(comp.get_name()=="@java.lang.Object")
+        continue;
+      // Other members of JDK's java.lang.String we don't understand
+      // without string-refinement. Just zero-init them; consider using
+      // test-gen-like nondet object trees instead.
+      literal_init.copy_to_operands(
+        zero_initializer(comp.type(), expr.source_location(), ns));
+    }
+    new_symbol.value=literal_init;
+  }
+  else if(jls_struct.get_bool(ID_incomplete_class))
+  {
+    // Case where java.lang.String was stubbed, and so directly defines
+    // @class_identifier and @lock:
+    new_symbol.value=jlo_init;
   }
 
   if(symbol_table.add(new_symbol))
