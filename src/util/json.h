@@ -206,7 +206,7 @@ public:
 class json_falset:public jsont
 {
 public:
-  json_falset():jsont(J_TRUE) { }
+  json_falset():jsont(J_FALSE) { }
 };
 
 class json_nullt:public jsont
