@@ -2,7 +2,7 @@
 class base
 {
 public:
-    virtual ~base(){}
+    virtual ~base() {}
     virtual int func(void)
     {
         printf ("In base, returning 1");
@@ -13,7 +13,7 @@ public:
 class derived : public base
 {
 public:
-    virtual ~derived(){}
+    virtual ~derived() {}
     virtual int func(void)
     {
         printf ("In derived, returning 2");

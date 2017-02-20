@@ -4,14 +4,14 @@
 
 template <class A, class B>
 struct whatever {
-	int f00 (const B b) {
-		typedef	decltype(static_cast<A>(b)) T;
-		T z;
-		return 1;
-	}
+  int f00 (const B b) {
+    typedef  decltype(static_cast<A>(b)) T;
+    T z;
+    return 1;
+  }
 };
 
-whatever<int,float> thing;
+whatever<int, float> thing;
 
 int main()
 {

@@ -7,10 +7,10 @@ struct sc_ufixed
   {
   }
 
-  sc_ufixed<X*2,Y*2> multiply (const sc_ufixed<X,Y> &op) const
+  sc_ufixed<X*2, Y*2> multiply (const sc_ufixed<X,Y> &op) const
   {
     unsigned int result = this->value * op.value;
-    return sc_ufixed<X*2,Y*2>(result);
+    return sc_ufixed<X*2, Y*2>(result);
   }
 
 };
@@ -18,7 +18,7 @@ struct sc_ufixed
 const sc_ufixed<1, 1> one(1U);
 
 int main (void) {
-  //const sc_ufixed<1, 1> one(1U);
+  // const sc_ufixed<1, 1> one(1U);
   one.multiply(one);
   return 0;
 }

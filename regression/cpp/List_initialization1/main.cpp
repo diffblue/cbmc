@@ -26,7 +26,7 @@ int main()
   int y { 1 };
   x={ 1 };
   x=int { 1 };
-  x=(int){ 1 };
+  x=(int){ 1 }
   p=new int { 1 };
   some_function({1});
 }
