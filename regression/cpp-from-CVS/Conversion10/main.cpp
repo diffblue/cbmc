@@ -4,7 +4,7 @@ struct B {
    explicit B(A&){}
 };
 
-void test(const B& b){}
+void test(const B& b) {}
 
 int main()
 {

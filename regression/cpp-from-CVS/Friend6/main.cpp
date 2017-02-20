@@ -8,7 +8,7 @@ struct A {
 class B {
   int i;
   public:
-  B():i(10){}
+  B():i(10) {}
   friend class A<int>;
 };
 

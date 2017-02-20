@@ -24,7 +24,7 @@ template <>
 class B<bool>:  A {
   public:
     bool b;
-    B():b(true){}
+    B():b(true) {}
     int get_i() {return i;}
   private:
     B(B<bool>& b); // disabled

@@ -1,7 +1,7 @@
 class C
 {
   public:
-    C(int& v):v(v){}
+    C(int& v):v(v) {}
     int v;
 };
 
