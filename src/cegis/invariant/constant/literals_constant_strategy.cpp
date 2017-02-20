@@ -49,17 +49,17 @@ public:
 
   virtual void operator()(const exprt &expr)
   {
-    if (ID_constant != expr.id()) return;
+    if(ID_constant != expr.id()) return;
     const typet &expr_type=expr.type();
     const irep_idt &type_id=expr_type.id();
-    if (ID_unsignedbv != type_id && ID_signedbv != type_id) return;
+    if(ID_unsignedbv != type_id && ID_signedbv != type_id) return;
     const constant_exprt constant(to_constant_expr(expr));
     const bv_arithmetict bv(constant);
     const mp_integer value=bv.to_integer();
     constants.insert(from_integer(value, type));
     // XXX: Add constant +/- 1?
-    //constants.insert(from_integer(value + 1, type));
-    //constants.insert(from_integer(value - 1, type));
+    // constants.insert(from_integer(value + 1, type));
+    // constants.insert(from_integer(value - 1, type));
   }
 
   void operator()(const goto_programt::instructiont &instr)
@@ -101,7 +101,7 @@ size_t literals_constant_strategy(invariant_programt &program,
 {
   const std::vector<constant_exprt> lit(collect_literal_constants(program));
   size_t max_word_width=0u;
-  for (const constant_exprt &expr : lit)
+  for(const constant_exprt &expr : lit)
   {
     add_danger_constant(program, expr);
     // XXX: Add negation of every constant?

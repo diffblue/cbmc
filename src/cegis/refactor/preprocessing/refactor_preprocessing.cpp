@@ -35,29 +35,29 @@ void refactor_preprocessingt::operator()()
   symbol_tablet &st=original_program.st;
   goto_functionst &gf=original_program.gf;
   const refactoring_typet type(get_refactoring_type(options));
-  switch (type)
+  switch(type)
   {
   case refactoring_typet::NULL_OBJECT:
     collect_nullobject_ranges(original_program);
     break;
   }
   create_constraint_function_caller(original_program);
-  for (refactor_programt::sketcht &s : original_program.sketches)
+  for(refactor_programt::sketcht &s : original_program.sketches)
   {
     collect_state_vars(s.state_vars, s.spec_range.first, s.spec_range.second);
     collect_state_vars(s.state_vars, s.input_range.first, s.input_range.second);
   }
-  switch (type)
+  switch(type)
   {
   case refactoring_typet::NULL_OBJECT:
     const std::set<irep_idt> null_meths(get_nullable_methods(original_program));
-    for (const irep_idt &m : null_meths)
+    for(const irep_idt &m : null_meths)
     {
       const cegis_operand_datat op_data(get_operand_signature(st, m));
       const std::string proc(create_cegis_processor(st, gf, op_data));
       const std::string prog(declare_cegis_program(st, gf, proc));
       original_program.programs.insert(prog);
-      for (refactor_programt::sketcht &s : original_program.sketches)
+      for(refactor_programt::sketcht &s : original_program.sketches)
       {
         const goto_programt::targett first=s.input_range.first;
         const goto_programt::targett last=s.input_range.second;
@@ -84,7 +84,7 @@ void refactor_preprocessingt::operator()(const size_t max_length)
   current_program=original_program;
   symbol_tablet &st=current_program.st;
   set_cegis_processor_sizes(st, max_length);
-  for (const refactor_programt::sketcht &sketch : current_program.sketches)
+  for(const refactor_programt::sketcht &sketch : current_program.sketches)
   {
     set_cegis_processor_sizes(st, sketch.input_range, max_length);
     set_cegis_processor_sizes(st, sketch.spec_range, max_length);

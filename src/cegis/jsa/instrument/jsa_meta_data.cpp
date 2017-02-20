@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 bool is_jsa_heap(const typet &type)
 {
   const irep_idt &type_id=type.id();
-  if (ID_symbol == type_id)
+  if(ID_symbol == type_id)
     return id2string(to_symbol_type(type).get_identifier()) == JSA_HEAP_TAG;
-  if (ID_struct != type_id) return false;
+  if(ID_struct != type_id) return false;
   const irep_idt tag(to_struct_type(type).get_tag());
   return id2string(tag) == JSA_HEAP_TAG;
 }
@@ -53,6 +53,6 @@ source_locationt jsa_builtin_source_location()
 bool is_jsa_const(const symbol_exprt &symbol)
 {
   const std::string &id=id2string(symbol.get_identifier());
-  if (std::string::npos != id.find(JSA_CONSTANT_PREFIX)) return true;
+  if(std::string::npos != id.find(JSA_CONSTANT_PREFIX)) return true;
   return symbol.type().get_bool(ID_C_constant);
 }

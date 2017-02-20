@@ -41,7 +41,7 @@ void execute_and_remove(task_poolt::handlerst &handlers, const pid_t pid,
     const int status)
 {
   const task_poolt::handlerst::iterator it=handlers.find(pid);
-  if (handlers.end() != it)
+  if(handlers.end() != it)
   {
     it->second(status);
     handlers.erase(it);
@@ -54,10 +54,10 @@ void cleanup(task_poolt::task_idst &task_ids, task_poolt::handlerst &handlers)
 #ifndef _WIN32
   std::map<task_poolt::task_idt, int> joined;
   int status;
-  for (pid_t child_pid=waitpid(-1, &status, WNOHANG); child_pid > 0; child_pid=
+  for(pid_t child_pid=waitpid(-1, &status, WNOHANG); child_pid > 0; child_pid=
       waitpid(-1, &status, WNOHANG))
     joined.insert(std::make_pair(child_pid, status));
-  for (const std::pair<task_poolt::task_idt, int> &task : joined)
+  for(const std::pair<task_poolt::task_idt, int> &task : joined)
   {
     const task_poolt::task_idt id=task.first;
     execute_and_remove(handlers, id, task.second);
@@ -72,7 +72,7 @@ void cleanup(task_poolt::task_idst &task_ids, task_poolt::handlerst &handlers)
 bool erase_if_managed(task_poolt::task_idst &ids, const task_poolt::task_idt id)
 {
   const task_poolt::task_idst::iterator task_id=ids.find(id);
-  if (ids.end() == task_id) return false;
+  if(ids.end() == task_id) return false;
   ids.erase(task_id);
   return true;
 }
@@ -86,12 +86,12 @@ task_poolt::task_idt task_poolt::schedule(const taskt &task)
   cleanup(task_ids, handlers);
 #ifndef _WIN32
   const pid_t child_pid=fork();
-  if (child_pid == -1)
+  if(child_pid == -1)
   {
     perror(FORK_ERROR);
     throw std::runtime_error(FORK_ERROR);
   }
-  if (child_pid)
+  if(child_pid)
   {
     task_ids.insert(child_pid);
     return child_pid;
@@ -124,15 +124,15 @@ task_poolt::task_idt task_poolt::schedule(const taskt &task,
 void task_poolt::cancel(const task_idt id)
 {
 #ifndef _WIN32
-  if (!erase_if_managed(task_ids, id)) return;
+  if(!erase_if_managed(task_ids, id)) return;
   int status;
   size_t wait_count=0;
   do
   {
     kill(id, SIGTERM);
     usleep(20000);
-  } while (!waitpid(id, &status, WNOHANG) && ++wait_count < MAX_WAIT);
-  if (wait_count >= MAX_WAIT)
+  } while(!waitpid(id, &status, WNOHANG) && ++wait_count < MAX_WAIT);
+  if(wait_count >= MAX_WAIT)
   {
     kill(id, SIGKILL);
     waitpid(id, &status, 0);
@@ -146,7 +146,7 @@ void task_poolt::cancel(const task_idt id)
 void task_poolt::join(const task_idt id)
 {
 #ifndef _WIN32
-  if (!erase_if_managed(task_ids, id)) return;
+  if(!erase_if_managed(task_ids, id)) return;
   int status;
   waitpid(id, &status, 0);
   execute_and_remove(handlers, id, status);
@@ -160,7 +160,7 @@ void task_poolt::join_all()
 #ifndef _WIN32
   const size_t num_children=task_ids.size();
   int status;
-  for (size_t i=0; i < num_children; ++i)
+  for(size_t i=0; i < num_children; ++i)
   {
     const pid_t pid=waitpid(-1, &status, 0);
     assert(pid > 0);

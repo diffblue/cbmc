@@ -222,7 +222,7 @@ void to_irep(irept &result, const bool success,
 
 void from_irep(danger_verify_configt::counterexamplet &ce, const irept &result)
 {
-  forall_named_irep(it, result.get_named_sub()){
+  forall_named_irep(it, result.get_named_sub()) {
   const exprt &expr=static_cast<const exprt &>(it->second);
   ce.insert(std::make_pair(it->first, expr));
 }
@@ -232,7 +232,7 @@ void from_irep(bool &success, danger_verify_configt::counterexamplest &ces,
     const irept &result)
 {
   success=result.get_bool(RESULT);
-  forall_irep(it, result.get_sub()){
+  forall_irep(it, result.get_sub()) {
   ces.push_back(danger_verify_configt::counterexamplet());
   danger_verify_configt::counterexamplet &ce=ces.back();
   from_irep(ce, *it);
@@ -242,7 +242,7 @@ void from_irep(bool &success, danger_verify_configt::counterexamplest &ces,
 
 void parallel_danger_verify_taskt::operator()()
 {
-  switch (mode)
+  switch(mode)
   {
   case modet::FULL:
     success=run_bmc<danger_config_fullt>(new_ces, options, config, candidate);
@@ -294,7 +294,7 @@ void parallel_danger_verify_poolt::schedule(parallel_danger_verify_taskt::modet 
   parallel_danger_verify_taskt &task=tasks.back();
 #ifndef _WIN32
   const pid_t child_pid=fork();
-  if (child_pid) return task.set_parent_mode(child_pid);
+  if(child_pid) return task.set_parent_mode(child_pid);
 #endif
   task();
 #ifndef _WIN32
@@ -322,7 +322,7 @@ void operator()(parallel_danger_verify_taskt &task) const
 #endif
   bool success=false;
   task.read_counterexamples(success, counterexamples);
-  if (!success) this->success=false;
+  if(!success) this->success=false;
 }
 };
 }

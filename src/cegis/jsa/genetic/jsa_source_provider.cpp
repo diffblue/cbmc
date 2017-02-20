@@ -82,7 +82,7 @@ void add_temp_clean(std::string &result, const symbol_tablet &st)
   result+="void __CPROVER_jsa_internal__clear_temps(void)\n{\n";
   const size_t num_temps=count_tmps(st);
   assert(num_temps >= 1);
-  for (size_t i=1; i <= num_temps; ++i)
+  for(size_t i=1; i <= num_temps; ++i)
   {
     result+="  *" JSA_PRED_RES_OPS "[";
     result+=std::to_string(i);
@@ -111,7 +111,7 @@ void add_main_body(std::string &result, const jsa_symex_learnt &lcfg)
 void fix_return_values(std::string &result)
 {
   std::string::size_type pos=result.find(RETURN_VALUE_ASSIGNMENT);
-  while (std::string::npos != pos)
+  while(std::string::npos != pos)
   {
     const std::string::size_type start=result.rfind(' ', pos);
     const std::string::size_type value=result.find('=', pos);
@@ -122,7 +122,7 @@ void fix_return_values(std::string &result)
     pos=result.find(RETURN_VALUE_ASSIGNMENT, start);
   }
   pos=result.find(RETURN_VALUE_SUFFIX);
-  while (std::string::npos != pos)
+  while(std::string::npos != pos)
   {
     const std::string::size_type end=result.rfind("= ", pos);
     const std::string::size_type start=result.rfind(' ', end - 2);
@@ -158,7 +158,7 @@ void remove_line_with(std::string &result, const std::string &value)
 
 void remove_predicates(std::string &result, const size_t num_preds)
 {
-  for (size_t i=0; i < num_preds; ++i)
+  for(size_t i=0; i < num_preds; ++i)
   {
     std::string base_name="__CPROVER_jsa_predicate_";
     base_name+=std::to_string(i);
@@ -175,7 +175,7 @@ void declare_predicates(std::string &result, const size_t num_preds,
     const std::string::size_type pos)
 {
   std::string source;
-  for (size_t i=0; i < num_preds; ++i)
+  for(size_t i=0; i < num_preds; ++i)
   {
     std::string base_name("__CPROVER_jsa_predicate_");
     base_name+=std::to_string(i);
@@ -215,14 +215,14 @@ void insert_counterexample(std::string &result)
   std::string::size_type pos=result.find(CE_ASSIGNMENT_MARKER);
   size_t heap_count=0;
   size_t word_count=0;
-  while (std::string::npos != pos)
+  while(std::string::npos != pos)
   {
     const std::string::size_type line_start=result.rfind("  ", pos);
     const std::string::size_type line_end=result.find('\n', pos);
     const std::string line(result.substr(line_start, line_end - line_start));
     const std::string::size_type stmt_end=result.find(';', pos);
     std::string value("= ");
-    if (is_heap(line))
+    if(is_heap(line))
     {
       value+="__CPROVER_jsa_counterexample_heaps[";
       value+=std::to_string(heap_count++);
@@ -246,7 +246,7 @@ void cleanup(std::string &result)
 
 const std::string &jsa_source_providert::operator ()()
 {
-  if (!source.empty()) return source;
+  if(!source.empty()) return source;
   add_jsa_defines(source, lcfg);
   add_includes_and_globals(source);
   add_temp_clean(source, lcfg.get_symbol_table());

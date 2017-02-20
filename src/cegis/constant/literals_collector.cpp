@@ -47,10 +47,10 @@ public:
 
   virtual void operator()(const exprt &expr)
   {
-    if (ID_constant != expr.id()) return;
+    if(ID_constant != expr.id()) return;
     const typet &expr_type=expr.type();
     const irep_idt &type_id=expr_type.id();
-    if (ID_unsignedbv != type_id && ID_signedbv != type_id) return;
+    if(ID_unsignedbv != type_id && ID_signedbv != type_id) return;
     const constant_exprt constant(to_constant_expr(expr));
     const bv_arithmetict bv(constant);
     const mp_integer::llong_t value=bv.to_integer().to_long();
@@ -59,7 +59,7 @@ public:
 
   void operator()(const goto_programt::instructiont &instr)
   {
-    if (is_builtin(instr.source_location)) return;
+    if(is_builtin(instr.source_location)) return;
     instr.code.visit(*this);
     instr.guard.visit(*this);
   }

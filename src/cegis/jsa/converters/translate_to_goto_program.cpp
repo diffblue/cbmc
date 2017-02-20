@@ -52,7 +52,7 @@ void convert(goto_programt::instructionst &result, const jsa_programt &prog,
   const instruction_sett instr_set(get_pred_instruction_set(prog.gf));
   assert(__CPROVER_JSA_NUM_PRED_INSTRUCTIONS == instr_set.size());
   copy_instructionst copy;
-  for (const __CPROVER_jsa_pred_instructiont &instr : solution)
+  for(const __CPROVER_jsa_pred_instructiont &instr : solution)
   {
     const instruction_sett::const_iterator it=instr_set.find(instr.opcode);
     assert(instr_set.end() != it);
@@ -73,7 +73,7 @@ void convert(goto_programt::instructionst &result, const jsa_programt &prog,
   std::vector<__CPROVER_jsa_query_instructiont>::const_iterator instr=solution.begin();
   const __CPROVER_jsa_query_instructiont &prefix=*instr++;
   copy_instructionst copy;
-  for (; instr != solution.end(); ++instr)
+  for(; instr != solution.end(); ++instr)
   {
     const instruction_sett::const_iterator it=instr_set.begin();
     const size_t previous_size=result.size();

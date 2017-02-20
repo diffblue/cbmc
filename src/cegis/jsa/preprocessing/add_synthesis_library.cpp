@@ -28,7 +28,7 @@ namespace
 {
 void add_placenholder(symbol_tablet &st, const irep_idt &id)
 {
-  if (st.has_symbol(id)) return;
+  if(st.has_symbol(id)) return;
   symbolt symbol;
   symbol.name=id;
   symbol.base_name=symbol.name;
@@ -43,7 +43,7 @@ void add_placenholder(symbol_tablet &st, const irep_idt &id)
 std::string get_array_size(const typet &type)
 {
   const irep_idt &type_id=type.id();
-  if (ID_array == type_id)
+  if(ID_array == type_id)
   {
     const bv_arithmetict bv(to_array_type(type).size());
     return std::to_string(bv.to_integer().to_ulong());
@@ -71,14 +71,14 @@ std::string get_sizes(const symbol_tablet &st)
 std::vector<irep_idt> get_functions(const symbol_tablet &st)
 {
   std::vector<irep_idt> functions;
-  for (const symbol_tablet::symbolst::value_type &symbol : st.symbols)
-    if (ID_code == symbol.second.type.id()) functions.push_back(symbol.first);
+  for(const symbol_tablet::symbolst::value_type &symbol : st.symbols)
+    if(ID_code == symbol.second.type.id()) functions.push_back(symbol.first);
   return functions;
 }
 
 bool is_jsa_constant(const symbolt &symbol)
 {
-  if (!symbol.is_static_lifetime) return false;
+  if(!symbol.is_static_lifetime) return false;
   const std::string &name=id2string(symbol.name);
   return std::string::npos != name.find(JSA_CONSTANT_PREFIX)
       || std::string::npos != name.find(JSA_STATIC_META_VAR_PREFIX);
@@ -95,8 +95,8 @@ void zero_new_global_vars(const symbol_tablet &st, goto_functionst &gf)
   goto_programt::targett pos=std::prev(body.instructions.end(), 2);
   const source_locationt loc(jsa_builtin_source_location());
   const namespacet ns(st);
-  for (const symbol_tablet::symbolst::value_type &symbol : st.symbols)
-    if (is_jsa_constant(symbol.second))
+  for(const symbol_tablet::symbolst::value_type &symbol : st.symbols)
+    if(is_jsa_constant(symbol.second))
     {
       pos=body.insert_after(pos);
       pos->type=goto_program_instruction_typet::ASSIGN;
@@ -143,7 +143,7 @@ void add_jsa_library(jsa_programt &prog, const size_t max_sz,
   assert(!linking(st, blank, msg));
   goto_functionst &gf=prog.gf;
   const std::vector<irep_idt> new_funcs(get_functions(blank));
-  for (const irep_idt &func_name : new_funcs)
+  for(const irep_idt &func_name : new_funcs)
     goto_convert(func_name, st, gf, msg);
   zero_new_global_vars(blank, gf);
   gf.compute_loop_numbers();

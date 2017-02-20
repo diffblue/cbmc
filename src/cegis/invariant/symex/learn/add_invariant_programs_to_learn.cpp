@@ -116,7 +116,7 @@ goto_programt::targett add_invariant_progs_to_learn(invariant_programt &prog,
 {
   const invariant_programt::invariant_loopst loops(prog.get_loops());
   goto_programt::targett pos=prog.invariant_range.begin;
-  if (loops.empty()) return pos;
+  if(loops.empty()) return pos;
   const declare_programst declare_progs(prog, max_sol_sz, --pos);
   return std::for_each(loops.begin(), loops.end(), declare_progs).get_pos();
 }

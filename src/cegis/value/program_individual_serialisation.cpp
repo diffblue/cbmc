@@ -21,11 +21,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool is_program_individual_decl(const goto_trace_stept &step)
 {
-  if (goto_trace_stept::DECL != step.type) return false;
+  if(goto_trace_stept::DECL != step.type) return false;
   const exprt &value=step.full_lhs_value;
-  if (ID_array != value.id()) return false;
+  if(ID_array != value.id()) return false;
   const typet &type=value.type().subtype();
-  if (ID_struct != type.id()) return false;
+  if(ID_struct != type.id()) return false;
   const std::string &tname=id2string(to_struct_type(type).get_tag());
   const char * const danger_tag=CEGIS_INSTRUCTION_TYPE_NAME+4;
   return std::string::npos != tname.find(danger_tag);
@@ -56,11 +56,11 @@ program_individualt to_program_individual(const invariant_programt &prog,
 {
   program_individualt individual;
   individual.fitness=0u;
-  for (const goto_trace_stept &step : trace.steps)
-    if (is_program_individual_decl(step))
+  for(const goto_trace_stept &step : trace.steps)
+    if(is_program_individual_decl(step))
     {
       program_individualt::programt prog;
-      for (const exprt &op : step.full_lhs_value.operands())
+      for(const exprt &op : step.full_lhs_value.operands())
       {
         const struct_exprt &instr=to_struct_expr(op);
         prog.push_back(to_program_individual_instruction(instr));
@@ -76,13 +76,13 @@ program_individualt to_program_individual(const danger_programt &prog,
   const invariant_programt &inv_prog=prog;
   program_individualt individual(to_program_individual(inv_prog, trace));
   const program_individualt::programt empty;
-  if (!prog.loops.empty() && prog.loops.front().skolem_choices.empty())
+  if(!prog.loops.empty() && prog.loops.front().skolem_choices.empty())
   {
     const size_t num_progs=individual.programs.size();
     assert(num_progs == prog.use_ranking ? 2 : 1);
     individual.programs.push_back(empty);
   }
-  if (!prog.use_ranking)
+  if(!prog.use_ranking)
   {
     assert(individual.programs.size() == 2);
     individual.programs.insert(std::next(individual.programs.begin()), empty);
@@ -116,17 +116,17 @@ void serialise(irept &sdu, const program_individualt &individual)
 {
   irept programs;
   irept::subt &program_list=programs.get_sub();
-  for (const program_individualt::programt &prog : individual.programs)
+  for(const program_individualt::programt &prog : individual.programs)
   {
     irept program;
     irept::subt &instr_list=program.get_sub();
-    for (const program_individualt::instructiont &instr : prog)
+    for(const program_individualt::instructiont &instr : prog)
     {
       irept instruction;
       instruction.set(OPCODE, instr.opcode);
       irept ops;
       irept::subt &ops_list=ops.get_sub();
-      for (const program_individualt::instructiont::opt op : instr.ops)
+      for(const program_individualt::instructiont::opt op : instr.ops)
         ops_list.push_back(singleton_irep(op));
       instruction.set(OPS, ops);
       instr_list.push_back(instruction);
@@ -136,7 +136,7 @@ void serialise(irept &sdu, const program_individualt &individual)
   sdu.set(PROGRAMS, programs);
   irept x0;
   irept::subt &x0_list=x0.get_sub();
-  for (const program_individualt::x0t::value_type value : individual.x0)
+  for(const program_individualt::x0t::value_type value : individual.x0)
     x0_list.push_back(singleton_irep(value));
   sdu.set(X0, x0);
   sdu.set(FITNESS, individual.fitness);
@@ -148,17 +148,17 @@ void deserialise(program_individualt &individual, const irept &sdu)
   typedef irept::named_subt::const_iterator const_iterator;
   const const_iterator programs=named_sub.find(PROGRAMS);
   assert(named_sub.end() != programs);
-  for (const irept &program : programs->second.get_sub())
+  for(const irept &program : programs->second.get_sub())
   {
     program_individualt::programt prog;
-    for (const irept &instruction : program.get_sub())
+    for(const irept &instruction : program.get_sub())
     {
       program_individualt::instructiont instr;
       instr.opcode=instruction.get_long_long(OPCODE);
       const irept::named_subt &named_sub=instruction.get_named_sub();
       const const_iterator ops=named_sub.find(OPS);
       assert(named_sub.end() != ops);
-      for (const irept &op : ops->second.get_sub())
+      for(const irept &op : ops->second.get_sub())
         instr.ops.push_back(get_value(op));
       prog.push_back(instr);
     }
@@ -166,7 +166,7 @@ void deserialise(program_individualt &individual, const irept &sdu)
   }
   const irept::named_subt::const_iterator x0=named_sub.find(X0);
   assert(named_sub.end() != x0);
-  for (const irept &value : x0->second.get_sub())
+  for(const irept &value : x0->second.get_sub())
     individual.x0.push_back(get_value(value));
   individual.fitness=sdu.get_long_long(FITNESS);
 }

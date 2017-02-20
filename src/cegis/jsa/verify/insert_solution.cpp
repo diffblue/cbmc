@@ -53,7 +53,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
   std::vector<goto_programt::targett> pred_begins;
   pos=first;
   size_t idx=0;
-  for (const jsa_solutiont::predicatest::value_type &pred : preds)
+  for(const jsa_solutiont::predicatest::value_type &pred : preds)
   {
     assert(!pred.empty());
     pos=body.insert_after(pos);
@@ -75,7 +75,7 @@ void add_predicates(jsa_programt &prog, const jsa_solutiont::predicatest &preds)
     pos->targets.push_back(end);
   }
   assert(pred_begins.size() == preds.size());
-  for (auto it=pred_begins.begin(); it != std::prev(pred_begins.end()); ++it)
+  for(auto it=pred_begins.begin(); it != std::prev(pred_begins.end()); ++it)
   {
     const goto_programt::targett &pos=*it;
     pos->targets.push_back(*std::next(it));
@@ -118,7 +118,7 @@ void insert_sync_call(const symbol_tablet &st, const goto_functionst &gf,
     const goto_programt::instructionst &query)
 {
   assert(!query.empty());
-  if (query.empty()) return;
+  if(query.empty()) return;
   const exprt &it_arg=get_iterator_arg(query.front().code);
   code_function_callt sync;
   code_function_callt::argumentst &sync_args=sync.arguments();
@@ -136,7 +136,7 @@ void make_full_query_call(const symbol_tablet &st, const goto_functionst &gf,
     goto_programt &body, goto_programt::targett pos,
     const goto_programt::instructionst &query)
 {
-  if (query.empty()) return;
+  if(query.empty()) return;
   pos=insert_before_preserve_labels(body, pos);
   pos->type=goto_program_instruction_typet::FUNCTION_CALL;
   pos->source_location=jsa_builtin_source_location();
@@ -151,7 +151,7 @@ void make_full_query_call(const symbol_tablet &st, const goto_functionst &gf,
 void insert_before(jsa_programt &jsa_prog, goto_programt &body,
     const goto_programt::targett &pos, const goto_programt::instructionst &prog)
 {
-  if (prog.empty()) return;
+  if(prog.empty()) return;
   const goto_programt::targett insert_after=std::prev(pos);
   copy_instructions(body.instructions, insert_after, prog);
   zero_jsa_temps(jsa_prog, insert_after);

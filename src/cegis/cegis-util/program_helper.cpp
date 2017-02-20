@@ -76,8 +76,8 @@ public:
 
   virtual void operator()(const exprt &expr)
   {
-    if (ID_symbol != expr.id() || found) return;
-    if (id == to_symbol_expr(expr).get_identifier()) found=true;
+    if(ID_symbol != expr.id() || found) return;
+    if(id == to_symbol_expr(expr).get_identifier()) found=true;
   }
 
   bool is_found()
@@ -98,33 +98,33 @@ bool is_nondet(goto_programt::const_targett target,
     goto_programt::const_targett end)
 {
   const goto_programt::instructiont &instr=*target;
-  switch (instr.type)
+  switch(instr.type)
   {
   case goto_program_instruction_typet::DECL:
   {
     goto_programt::const_targett next=std::next(target);
-    if (next == end) return true;
-    if (goto_program_instruction_typet::FUNCTION_CALL == next->type)
+    if(next == end) return true;
+    if(goto_program_instruction_typet::FUNCTION_CALL == next->type)
     {
-      if (to_code_function_call(next->code).lhs().is_not_nil()) return false;
+      if(to_code_function_call(next->code).lhs().is_not_nil()) return false;
       else ++next;
     }
     const goto_programt::instructiont next_instr=*next;
-    if (goto_program_instruction_typet::ASSIGN != next_instr.type) return true;
+    if(goto_program_instruction_typet::ASSIGN != next_instr.type) return true;
     const irep_idt id(get_affected_variable(instr));
-    if (id != get_affected_variable(next_instr)) return true;
+    if(id != get_affected_variable(next_instr)) return true;
     return contains(to_code_assign(next_instr.code).rhs(), id);
   }
   case goto_program_instruction_typet::ASSIGN:
   {
     const exprt &rhs=to_code_assign(instr.code).rhs();
-    if (ID_side_effect != rhs.id()) return false;
+    if(ID_side_effect != rhs.id()) return false;
     return ID_nondet == to_side_effect_expr(rhs).get_statement();
   }
   case goto_program_instruction_typet::FUNCTION_CALL:
   {
     const code_function_callt &call=to_code_function_call(instr.code);
-    if (call.lhs().is_not_nil()) return false;
+    if(call.lhs().is_not_nil()) return false;
   }
   default:
     return false;
@@ -139,7 +139,7 @@ bool is_return_value_name(const std::string &name)
 
 const typet &get_affected_type(const goto_programt::instructiont &instr)
 {
-  switch (instr.type)
+  switch(instr.type)
   {
   case goto_program_instruction_typet::DECL:
     return to_code_decl(instr.code).symbol().type();
@@ -154,7 +154,7 @@ const typet &get_affected_type(const goto_programt::instructiont &instr)
 
 const irep_idt &get_affected_variable(const goto_programt::instructiont &instr)
 {
-  switch (instr.type)
+  switch(instr.type)
   {
   case goto_program_instruction_typet::DECL:
     return to_code_decl(instr.code).get_identifier();
@@ -172,8 +172,8 @@ goto_programt::targetst find_nondet_instructions(goto_programt &body)
   goto_programt::targetst result;
   goto_programt::instructionst &instrs=body.instructions;
   const goto_programt::targett end(instrs.end());
-  for (goto_programt::targett it=instrs.begin(); it != end; ++it)
-    if (is_nondet(it, end)) result.push_back(it);
+  for(goto_programt::targett it=instrs.begin(); it != end; ++it)
+    if(is_nondet(it, end)) result.push_back(it);
   return result;
 }
 
@@ -183,18 +183,18 @@ const char NS_SEP[]="::";
 }
 bool is_global_const(const irep_idt &name, const typet &type)
 {
-  if (!type.get_bool(ID_C_constant)) return false;
+  if(!type.get_bool(ID_C_constant)) return false;
   const std::string &n=id2string(name);
-  if (std::string::npos != n.find(CEGIS_CONSTANT_PREFIX)) return true;
+  if(std::string::npos != n.find(CEGIS_CONSTANT_PREFIX)) return true;
   return std::string::npos == n.find(NS_SEP);
 }
 
 void move_labels(goto_programt::instructionst &body,
     const goto_programt::targett &from, const goto_programt::targett &to)
 {
-  for (goto_programt::instructiont &instr : body)
-    for (goto_programt::targett &target : instr.targets)
-      if (from == target) target=to;
+  for(goto_programt::instructiont &instr : body)
+    for(goto_programt::targett &target : instr.targets)
+      if(from == target) target=to;
 }
 
 void move_labels(goto_programt &body, const goto_programt::targett &from,
@@ -213,7 +213,7 @@ goto_programt::targett insert_before_preserve_labels(goto_programt &body,
 
 bool is_builtin(const source_locationt &loc)
 {
-  if (loc.is_nil()) return true;
+  if(loc.is_nil()) return true;
   const std::string &file=id2string(loc.get_file());
   return file.empty() || file.at(0) == '<';
 }
@@ -251,7 +251,7 @@ void cegis_assign(const symbol_tablet &st, goto_programt::instructiont &instr,
   instr.source_location=loc;
   const namespacet ns(st);
   const typet &type=lhs.type();
-  if (type_eq(type, rhs.type(), ns)) instr.code=code_assignt(lhs, rhs);
+  if(type_eq(type, rhs.type(), ns)) instr.code=code_assignt(lhs, rhs);
   else instr.code=code_assignt(lhs, typecast_exprt(rhs, type));
 }
 

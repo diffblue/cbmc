@@ -45,11 +45,11 @@ public:
 
   virtual void operator()(const exprt &expr)
   {
-    if (ID_symbol != expr.id()) return;
+    if(ID_symbol != expr.id()) return;
     const std::string &id=id2string(to_symbol_expr(expr).get_identifier());
-    if (std::string::npos != id.find(OPCODE_SIGNIFIER)) return;
+    if(std::string::npos != id.find(OPCODE_SIGNIFIER)) return;
     const std::string::size_type op_id_pos=id.find(OP_SIGNIFIER);
-    if (std::string::npos == op_id_pos) return;
+    if(std::string::npos == op_id_pos) return;
     const std::string::size_type value_pos=op_id_pos + strlen(OP_SIGNIFIER);
     const mp_integer::llong_t v=string2integer(id.substr(value_pos)).to_long();
     const size_t op_id=static_cast<size_t>(v);
@@ -64,7 +64,7 @@ public:
 
   const count_ops &operator()(const goto_programt::instructionst &instrs)
   {
-    for (const goto_programt::instructiont &instr : instrs)
+    for(const goto_programt::instructiont &instr : instrs)
       this->operator()(instr);
     return *this;
   }
@@ -93,7 +93,7 @@ public:
 void initialise(instruction_set_infot &info, instruction_sett &ins,
     const std::function<const goto_programt&(void)> &body_provider)
 {
-  if (!info.empty()) return;
+  if(!info.empty()) return;
   const goto_programt &body=body_provider();
   ins=extract_instruction_set(body);
   const transform_to_info op;

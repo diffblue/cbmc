@@ -20,7 +20,7 @@ namespace
 const typet &get_type(const goto_programt::targett &target)
 {
   const goto_programt::instructiont &instr=*target;
-  switch (instr.type)
+  switch(instr.type)
   {
   case goto_program_instruction_typet::DECL:
     return to_code_decl(instr.code).symbol().type();

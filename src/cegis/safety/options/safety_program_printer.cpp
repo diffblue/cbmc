@@ -32,7 +32,7 @@ public:
   void operator()(const goto_programt::instructionst &prog)
   {
     os << "Invariant " << func_count++ << ": " << messaget::endl;
-    for (goto_programt::const_targett it=prog.begin(); it != prog.end(); ++it)
+    for(goto_programt::const_targett it=prog.begin(); it != prog.end(); ++it)
       body_printer.output_instruction(ns, "", os, it);
   }
 };

@@ -22,18 +22,18 @@ void random_jsa_mutatet::operator()(individualt &lhs,
   lhs=rhs;
   size_t mutation_index=random.rand() % get_num_genetic_targets(lhs);
   const size_t num_inv_instrs=lhs.invariant.size();
-  if (mutation_index < num_inv_instrs)
+  if(mutation_index < num_inv_instrs)
     return random.havoc(lhs.invariant[mutation_index]);
   mutation_index-=num_inv_instrs;
-  for (individualt::predicatet &pred : lhs.predicates)
+  for(individualt::predicatet &pred : lhs.predicates)
   {
     const size_t num_instrs=pred.size() * OPERANDS_PER_JSA_PREDICATE_INSTRUCTION;
-    if (mutation_index >= num_instrs) { mutation_index-=num_instrs; continue; }
+    if(mutation_index >= num_instrs) { mutation_index-=num_instrs; continue; }
 
     individualt::predicatet::value_type &instr=pred[mutation_index / OPERANDS_PER_JSA_PREDICATE_INSTRUCTION];
     individualt::predicatet::value_type tmp(instr);
     random.havoc(tmp);
-    switch (mutation_index % OPERANDS_PER_JSA_PREDICATE_INSTRUCTION)
+    switch(mutation_index % OPERANDS_PER_JSA_PREDICATE_INSTRUCTION)
     {
     case 0: instr.op0=tmp.op0; return;
     case 1: instr.op1=tmp.op1; return;

@@ -44,7 +44,7 @@ class extract_counterexamplet
   {
     const goto_programt::instructiont::labelst::const_iterator it=
         find_ceq_label(step.pc);
-    if (step.pc->labels.end() == it) return false;
+    if(step.pc->labels.end() == it) return false;
     const irep_idt &label=*it;
     const size_t original_size=q.size();
     q.erase(
@@ -61,7 +61,7 @@ public:
 
   void finalise()
   {
-    for (const goto_programt::targett &pos : q)
+    for(const goto_programt::targett &pos : q)
     {
       const irep_idt &var=get_affected_variable(*pos);
       const exprt value(from_integer(0, get_affected_type(*pos)));
@@ -77,7 +77,7 @@ public:
 
   void operator()(const goto_trace_stept &step)
   {
-    if (!should_extract(step)) return;
+    if(!should_extract(step)) return;
     const symbol_exprt &lhs=step.lhs_object;
     result.insert(std::make_pair(lhs.get_identifier(), step.lhs_object_value));
   }
@@ -91,7 +91,7 @@ void invariant_extract_counterexample(counterexamplet &result,
   const goto_tracet::stepst &s=trace.steps;
   extract_counterexamplet extract(result, quantifiers);
   typedef goto_tracet::stepst::const_iterator itt;
-  for (itt it=s.begin(); it != s.end() && !extract.is_done(); ++it)
+  for(itt it=s.begin(); it != s.end() && !extract.is_done(); ++it)
     extract(*it);
   extract.finalise();
   const size_t new_entries=result.size() - existing_entries;

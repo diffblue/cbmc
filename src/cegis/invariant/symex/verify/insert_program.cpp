@@ -27,10 +27,10 @@ public:
 
   virtual void operator()(exprt &expr)
   {
-    if (ID_symbol != expr.id()) return;
+    if(ID_symbol != expr.id()) return;
     symbol_exprt &symbol=to_symbol_expr(expr);
-    for (replacementst::const_iterator it=repl.begin(); it != repl.end(); ++it)
-      if (symbol.get_identifier() == it->first)
+    for(replacementst::const_iterator it=repl.begin(); it != repl.end(); ++it)
+      if(symbol.get_identifier() == it->first)
         symbol.set_identifier(it->second);
   }
 };
@@ -64,9 +64,9 @@ void insert_program(goto_programt &body, goto_programt::targett pos,
   insert_instrt insert_instr(copy_instr, body, pos, replacements);
   goto_programt::const_targett first=prog.begin();
   goto_programt::const_targett last=prog.end();
-  if (first == last) return;
+  if(first == last) return;
   --last;
-  for (; first != last; ++first)
+  for(; first != last; ++first)
     insert_instr(first);
   copy_instr.finalize(++pos, last);
 }

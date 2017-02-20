@@ -27,7 +27,7 @@ goto_programt::targetst unify(
     const refactor_programt::counterexample_locationst &locs)
 {
   goto_programt::targetst result;
-  for (const refactor_programt::counterexample_locationst::value_type &entry : locs)
+  for(const refactor_programt::counterexample_locationst::value_type &entry : locs)
   {
     const goto_programt::targetst &rhs=entry.second;
     std::copy(rhs.begin(), rhs.end(), std::back_inserter(result));
@@ -39,7 +39,7 @@ std::set<irep_idt> get_all_keys(
     const refactor_programt::counterexample_locationst &locs)
 {
   std::set<irep_idt> keys;
-  for (const refactor_programt::counterexample_locationst::value_type &entry : locs)
+  for(const refactor_programt::counterexample_locationst::value_type &entry : locs)
   {
     const goto_programt::targetst &rhs=entry.second;
     std::transform(rhs.begin(), rhs.end(), std::inserter(keys, keys.begin()),
@@ -52,12 +52,12 @@ std::set<irep_idt> get_all_keys(
 void create_ce_arrays(symbol_tablet &st, goto_functionst &gf,
     const labelled_counterexamplest &ces)
 {
-  if (ces.empty()) return;
+  if(ces.empty()) return;
   const typet sz_type(signed_int_type());
   const constant_exprt sz_expr(from_integer(ces.size(), sz_type));
   const array_valuest array_values(get_array_values(ces));
   const labelled_counterexamplest::value_type &prototype=ces.front();
-  for (const labelled_counterexamplest::value_type::value_type &value : prototype)
+  for(const labelled_counterexamplest::value_type::value_type &value : prototype)
   {
     const labelled_assignmentst::value_type::first_type loc_id=value.first;
     const array_valuest::const_iterator array_val=array_values.find(loc_id);
@@ -80,7 +80,7 @@ void create_ce_array_indexes(const std::set<irep_idt> &ce_keys,
   pos=init;
   const source_locationt &loc=pos->source_location;
   const irep_idt &function=pos->function;
-  for (const irep_idt &key : ce_keys)
+  for(const irep_idt &key : ce_keys)
   {
     const std::string name(get_ce_value_index_name(key));
     declare_global_meta_variable(st, name, zero.type());
@@ -126,13 +126,13 @@ const index_exprt get_array_val_expr(const symbol_tablet &st,
 void assign_ce_values(symbol_tablet &st, goto_functionst &gf,
     const refactor_programt::counterexample_locationst &ce_locs)
 {
-  for (const refactor_programt::counterexample_locationst::value_type ce_loc : ce_locs)
+  for(const refactor_programt::counterexample_locationst::value_type ce_loc : ce_locs)
   {
-    for (goto_programt::targett pos : ce_loc.second)
+    for(goto_programt::targett pos : ce_loc.second)
     {
       const irep_idt &label=get_counterexample_marker(pos);
       const index_exprt value(get_array_val_expr(st, label));
-      switch (pos->type)
+      switch(pos->type)
       {
       case ASSIGN:
         to_code_assign(pos->code).rhs()=value;

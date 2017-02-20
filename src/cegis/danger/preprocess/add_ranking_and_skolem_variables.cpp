@@ -68,7 +68,7 @@ public:
     goto_programt::targett pos=im.Gx;
     ++pos;
     const size_t ranking_count=1; // XXX: Lexicographical ranking?
-    if (use_ranking) for (size_t i=0; i < ranking_count; ++i)
+    if(use_ranking) for (size_t i=0; i < ranking_count; ++i)
     {
       pos=declare_cegis_meta_variable(st, gf, pos, get_Rx(loop_id, i), type);
       dm.Rx.push_back(pos);
@@ -77,7 +77,7 @@ public:
     const create_skolem_meta_variablest create_sklm(st, gf, loop_id, dm, pos);
     std::for_each(sklm.begin(), sklm.end(), create_sklm);
     pos=im.Ix_prime;
-    if (use_ranking) for (size_t i=0; i < ranking_count; ++i)
+    if(use_ranking) for (size_t i=0; i < ranking_count; ++i)
     {
       const std::string rx_prime(get_Rx_prime(loop_id, i));
       pos=declare_cegis_meta_variable(st, gf, pos, rx_prime, type);
