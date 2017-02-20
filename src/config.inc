@@ -1,9 +1,15 @@
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
-# Variables you may want to override
-#CXXFLAGS = -Wall -O0 -g -Werror -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
-#CXXFLAGS = -std=c++11
+# Enable all warnings
+#CXXFLAGS += -Wall -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
+
+# Treat warnings as errors
+#CXXFLAGS += -Werror
+
+# Select optimisation or debug info
+#CXXFLAGS += -O2 -DNDEBUG
+#CXXFLAGS += -O0 -g
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk
