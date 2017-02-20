@@ -1052,6 +1052,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     std::string function=cmdline.get_value("function-inline");
     assert(!function.empty());
 
+    bool caching=!cmdline.isset("no-caching");
+
     do_indirect_call_and_rtti_removal();
 
     status() << "Inlining calls of function `" << function << "'" << eom;
@@ -1063,7 +1065,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         function,
         ns,
         ui_message_handler,
-        true);
+        true,
+        caching);
     }
     else
     {
@@ -1076,7 +1079,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           function,
           ns,
           ui_message_handler,
-          true);
+          true,
+          caching);
 
       if(have_file)
       {
@@ -1548,6 +1552,7 @@ void goto_instrument_parse_optionst::help()
     " --inline                     perform full inlining\n"
     " --partial-inline             perform partial inlining\n"
     " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
+    " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
     " --add-library                add models of C library functions\n"

@@ -682,6 +682,12 @@ void goto_inlinet::expand_function_call(
         function,
         arguments,
         constrain);
+
+      if(!caching)
+      {
+        inline_log.cleanup(cached.body);
+        cache.erase(identifier);
+      }
     }
     else
     {
@@ -1146,6 +1152,29 @@ void goto_inlinet::output_inline_map(
 
 /*******************************************************************\
 
+Function: output_cache
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_inlinet::output_cache(std::ostream &out) const
+{
+  for(auto it=cache.begin(); it!=cache.end(); it++)
+  {
+    if(it!=cache.begin())
+      out << ", ";
+
+    out << it->first << "\n";
+  }
+}
+
+/*******************************************************************\
+
 Function: cleanup
 
   Inputs:
@@ -1257,8 +1286,9 @@ void goto_inlinet::goto_inline_logt::copy_from(
     assert(it1->location_number==it2->location_number);
 
     log_mapt::const_iterator l_it=log_map.find(it1);
-    if(l_it!=log_map.end())
+    if(l_it!=log_map.end()) // a segment starts here
     {
+      // as 'to' is a fresh copy
       assert(log_map.find(it2)==log_map.end());
 
       goto_inline_log_infot info=l_it->second;
