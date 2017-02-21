@@ -1,0 +1,8 @@
+CORE
+NondetFloat.class
+--function NondetFloat.foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
