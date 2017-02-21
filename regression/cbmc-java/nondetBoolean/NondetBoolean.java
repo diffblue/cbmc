@@ -5,5 +5,6 @@ class NondetBoolean
     static void foo()
     {
         boolean x = CProver.nondetBoolean();
+        assert x == false;
     }
 }
