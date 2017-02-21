@@ -117,7 +117,19 @@ static std::string escape_non_alnum(const std::string &toescape)
   return escaped.str();
 }
 
-static array_exprt utf16_to_array(const std::wstring& in)
+/*******************************************************************\
+
+Function: utf16_to_array
+
+  Inputs: `in`: wide string to convert
+
+ Outputs: Returns a Java char array containing the same wchars.
+
+ Purpose: Convert UCS-2 or UTF-16 to an array expression.
+
+\*******************************************************************/
+
+static array_exprt utf16_to_array(const std::wstring &in)
 {
   const auto jchar=java_char_type();
   array_exprt ret(array_typet(jchar, infinity_exprt(java_int_type())));
@@ -168,15 +180,18 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   // Regardless of string refinement setting, at least initialize
   // the literal with @clsid = String and @lock = false:
   symbol_typet jlo_symbol("java::java.lang.Object");
-  const auto& jlo_struct=to_struct_type(ns.follow(jlo_symbol));
+  const auto &jlo_struct=to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
-  const auto& jls_struct=to_struct_type(ns.follow(string_type));
+  const auto &jls_struct=to_struct_type(ns.follow(string_type));
 
   jlo_init.copy_to_operands(
-    constant_exprt("java::java.lang.String",
-                   jlo_struct.components()[0].type()));
+    constant_exprt(
+      "java::java.lang.String",
+      jlo_struct.components()[0].type()));
   jlo_init.copy_to_operands(
-    from_integer(0, jlo_struct.components()[1].type()));
+    from_integer(
+      0,
+      jlo_struct.components()[1].type()));
 
   // If string refinement *is* around, populate the actual
   // contents as well:
@@ -185,7 +200,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     struct_exprt literal_init(new_symbol.type);
     literal_init.move_to_operands(jlo_init);
 
-    // Initialise the string with a constant utf-16 array:
+    // Initialize the string with a constant utf-16 array:
     symbolt array_symbol;
     array_symbol.name=escaped_symbol_name+"_constarray";
     array_symbol.type=array_typet(
@@ -203,7 +218,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
     array_symbol.value=literal_array;
 
     if(symbol_table.add(array_symbol))
-      throw "failed to add constarray symbol to symtab";
+      throw "failed to add constarray symbol to symbol table";
 
     literal_init.copy_to_operands(
       from_integer(literal_array.operands().size(),
