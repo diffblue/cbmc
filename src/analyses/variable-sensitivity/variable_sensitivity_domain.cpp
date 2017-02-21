@@ -13,6 +13,10 @@ Date: April 2016
 
 #include "variable_sensitivity_domain.h"
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 
 /*******************************************************************\
 
@@ -33,6 +37,12 @@ void variable_sensitivity_domaint::transform(
     ai_baset &ai,
     const namespacet &ns)
 {
+  #ifdef DEBUG
+  std::cout << "Transform from/to:\n";
+  std::cout << from->location_number << " --> "
+            << to->location_number << std::endl;
+  #endif
+
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)
   {
@@ -214,15 +224,28 @@ bool variable_sensitivity_domaint::merge(
   locationt from,
   locationt to)
 {
+  #ifdef DEBUG
+  std::cout << "Merging from/to:\n "
+            << from->location_number << " --> "
+            << to->location_number << std::endl;
+  #endif
+
   // Use the abstract_environment merge
   bool any_changes=abstract_state.merge(b.abstract_state);
   if(abstract_state.get_is_bottom() && !is_set_to_bottom)
   {
     is_set_to_bottom=true;
+#ifdef DEBUG
+    std::cout << "\tsetting to bottom" << std::endl;
+#endif
     return true;
   }
   else
   {
+#ifdef DEBUG
+    std::cout << "\tmodified: " << (any_changes ? "true" : "false")
+              << std::endl;
+#endif
     return any_changes;
   }
 }
