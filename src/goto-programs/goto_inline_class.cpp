@@ -1312,13 +1312,13 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
     object["call"]=json_numbert(std::to_string(info.call_location_number));
     object["function"]=json_stringt(info.function.c_str());
 
-    json_arrayt &json_orig=object["original_segment"].make_array();
+    json_arrayt &json_orig=object["originalSegment"].make_array();
     json_orig.push_back()=json_numbert(std::to_string(
       info.begin_location_number));
     json_orig.push_back()=json_numbert(std::to_string(
       info.end_location_number));
 
-    json_arrayt &json_new=object["inlined_segment"].make_array();
+    json_arrayt &json_new=object["inlinedSegment"].make_array();
     json_new.push_back()=json_numbert(std::to_string(start->location_number));
     json_new.push_back()=json_numbert(std::to_string(end->location_number));
   }
