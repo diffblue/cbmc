@@ -857,6 +857,15 @@ static unsigned get_bytecode_type_width(const typet &ty)
   return ty.get_unsigned_int(ID_width);
 }
 
+static bool statement_is_static_with_name(
+    const irep_idt& statement,
+    const exprt& arg0,
+    const irep_idt& desired_name)
+{ 
+  return statement == "invokestatic" && 
+    id2string(arg0.get(ID_identifier)) == desired_name;
+}
+
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
   const code_typet &method_type)
@@ -1093,9 +1102,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
     }
     // replace calls to CProver.assume
-    else if(statement=="invokestatic" &&
-            id2string(arg0.get(ID_identifier))==
-            "java::org.cprover.CProver.assume:(Z)V")
+    else if(statement_is_static_with_name(
+          statement,
+          arg0,
+          "java::org.cprover.CProver.assume:(Z)V"))
     {
       const code_typet &code_type=to_code_type(arg0.type());
       // sanity check: function has the right number of args
@@ -1111,6 +1121,30 @@ codet java_bytecode_convert_methodt::convert_instructions(
       loc.set_function(method_id);
       c.add_source_location()=loc;
     }
+
+    //  boolean
+    else if(statement_is_static_with_name(
+          statement,
+          arg0,
+          "java::org.cprover.CProver.nondetBoolean:()Z")
+    {
+      //  TODO
+    }
+    //  byte
+    //  char
+    //  short
+    //  int
+    //  long
+    //  float 
+    //  double
+    else if(statement_is_static_with_name(
+          statement,
+          arg0,
+          "java::org.cprover.CProver.nondetBoolean:()I")
+    {
+      //  TODO
+    }
+
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
             statement=="invokevirtual" ||
