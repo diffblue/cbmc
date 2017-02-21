@@ -13,6 +13,9 @@
 #include <analyses/ai.h>
 
 
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 /*******************************************************************\
 
@@ -305,6 +308,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   // if it is new, or merge with the existing key if it is not present
 
   bool modified=false;
+
   for(const auto &entry:env.map)
   {
     if(map.find(entry.first)==map.end())
@@ -322,10 +326,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       abstract_object_pointert new_object=map[entry.first]->merge(
         entry.second, object_modified);
 
-      if(object_modified)
-      {
-        modified=true;
-      }
+      modified|=object_modified;
       map[entry.first]=new_object;
 
     }
@@ -335,6 +336,9 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       map.erase(entry.first);
       is_bottom=false;
       modified=true;
+#ifdef DEBUG
+      std::cout << "Removing " << entry.first.get_identifier() << std::endl;
+#endif
     }
   }
 
@@ -349,7 +353,11 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   for(const map_keyt &key_to_remove : to_remove)
   {
     map.erase(key_to_remove);
+#ifdef DEBUG
+    std::cout << "Removing " << key_to_remove.get_identifier() << std::endl;
+#endif
   }
+
   return modified;
 }
 
