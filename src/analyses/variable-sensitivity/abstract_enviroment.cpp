@@ -8,6 +8,7 @@
 #include "abstract_enviroment.h"
 #include <functional>
 #include <stack>
+#include <map>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/ai.h>
@@ -154,14 +155,10 @@ bool abstract_environmentt::assign(
 
   while (s.id() != ID_symbol)
   {
-    if (s.id() == ID_index || s.id() == ID_member)
+    if (s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
     {
       stactions.push(s);
       s = s.op0();
-    }
-    else if (s.id() == ID_dereference)
-    {
-      // LOL, nope!
     }
     else
     {
@@ -173,19 +170,71 @@ bool abstract_environmentt::assign(
 
   const symbol_exprt &symbol_expr(to_symbol_expr(s));
 
-  if (!stactions.empty())
+  abstract_object_pointert final_value;
+
+  if(!stactions.empty())
   {
-    throw "not yet implemented";
+    const exprt & next_expr=stactions.top();
+    stactions.pop();
+
+    typedef std::function<
+      abstract_object_pointert(abstract_object_pointert)> stacion_functiont;
+
+    // Each handler takes the abstract object referenced, copies it,
+    // writes according to the type of expression (e.g. for ID_member)
+    // we would (should!) have an abstract_struct_objectt which has a
+    // write_member which will attempt to update the abstract object for the
+    // relevant member. This modified abstract object is returned and this
+    // is inserted back into the map
+    static std::map<irep_idt,stacion_functiont> handlers=
+    {
+      {
+        ID_index, [&](const abstract_object_pointert lhs_object)
+        {
+          // TODO(tkiley): At this point we would cast the AO pointer to an
+          // array_abstract_objectt
+          // Then we copy the AO and write to it
+          // cast_ao->write(popped_stack, index_expr, value)
+          // Which will continue down the stack
+           return abstract_object_factory(lhs_object->type, true);
+        }
+      },
+      {
+        ID_member, [&](const abstract_object_pointert lhs_object)
+        {
+          // TODO(tkiley): Same as with index
+          return abstract_object_factory(lhs_object->type, true);
+        }
+      },
+      {
+        ID_dereference, [&](const abstract_object_pointert lhs_object)
+        {
+          // TODO(tkiley): Same as with index
+          return abstract_object_factory(lhs_object->type, true);
+        }
+      }
+    };
+
+    // We added something to the stack that we couldn't deal with
+    assert(handlers.find(next_expr.id())!=handlers.end());
+    final_value=handlers[next_expr.id()](value);
   }
+  else
+  {
+    // We can assign the AO directly to the symbol
+    final_value=value;
+  }
+
+  // Write the value for the root symbol back into the map
   if (value->is_top())
   {
     map.erase(symbol_expr);
+
   }
   else
   {
     map[symbol_expr]=value;
   }
-
   return true;
 }
 
@@ -453,6 +502,7 @@ bool abstract_environmentt::get_is_top() const
 }
 
 /*******************************************************************\
+
 Function: abstract_environmentt::output
 
   Inputs:
