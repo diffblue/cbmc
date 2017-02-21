@@ -15,6 +15,9 @@ with open(sys.argv[1], "r") as f:
   diff = unidiff.PatchSet(f)
   for diff_file in diff:
     filename = diff_file.target_file
+    # Skip files deleted in the tip (b side of the diff):
+    if filename == "/dev/null":
+      continue
     assert filename.startswith("b/")
     filename = os.path.join(repository_root, filename[2:])
     added_lines.add((filename, 0))
