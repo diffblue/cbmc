@@ -857,13 +857,12 @@ static unsigned get_bytecode_type_width(const typet &ty)
   return ty.get_unsigned_int(ID_width);
 }
 
-static bool statement_is_static_with_name(
-    const irep_idt& statement,
-    const exprt& arg0,
-    const irep_idt& desired_name)
-{ 
-  return statement == "invokestatic" && 
-    id2string(arg0.get(ID_identifier)) == desired_name;
+static bool statement_is_static_with_name(const irep_idt &statement,
+                                          const exprt &arg0,
+                                          const char *desired_name)
+{
+  return statement == "invokestatic" &&
+         id2string(arg0.get(ID_identifier)) == desired_name;
 }
 
 codet java_bytecode_convert_methodt::convert_instructions(
@@ -1101,48 +1100,97 @@ codet java_bytecode_convert_methodt::convert_instructions(
             get_message_handler());
       }
     }
+
     // replace calls to CProver.assume
-    else if(statement_is_static_with_name(
-          statement,
-          arg0,
-          "java::org.cprover.CProver.assume:(Z)V"))
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.assume:(Z)V"))
     {
-      const code_typet &code_type=to_code_type(arg0.type());
+      const code_typet &code_type = to_code_type(arg0.type());
       // sanity check: function has the right number of args
-      assert(code_type.parameters().size()==1);
+      assert(code_type.parameters().size() == 1);
 
       exprt operand = pop(1)[0];
       // we may need to adjust the type of the argument
-      if(operand.type()!=bool_typet())
+      if (operand.type() != bool_typet())
         operand.make_typecast(bool_typet());
 
-      c=code_assumet(operand);
-      source_locationt loc=i_it->source_location;
+      c = code_assumet(operand);
+      source_locationt loc = i_it->source_location;
       loc.set_function(method_id);
-      c.add_source_location()=loc;
+      c.add_source_location() = loc;
     }
 
-    //  boolean
-    else if(statement_is_static_with_name(
-          statement,
-          arg0,
-          "java::org.cprover.CProver.nondetBoolean:()Z")
+    //  if the statement is a nondet boolean
+    else if (statement_is_static_with_name(
+                 statement, arg0,
+                 "java::org.cprover.CProver.nondetBoolean:()Z"))
     {
-      //  TODO
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_boolean_type());
+      results[0].add_source_location() = i_it->source_location;
     }
-    //  byte
-    //  char
-    //  short
-    //  int
-    //  long
-    //  float 
-    //  double
-    else if(statement_is_static_with_name(
-          statement,
-          arg0,
-          "java::org.cprover.CProver.nondetBoolean:()I")
+
+    //  if the statement is a nondet byte
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetByte:()B"))
     {
-      //  TODO
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_byte_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet char
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetChar:()C"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_char_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet short
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetShort:()S"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_short_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet int
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetInt:()I"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_int_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet long
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetLong:()J"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_long_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet float
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetFloat:()F"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_float_type());
+      results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  if the statement is a nondet double
+    else if (statement_is_static_with_name(
+                 statement, arg0, "java::org.cprover.CProver.nondetDouble:()D"))
+    {
+      results.resize(1);
+      results[0] = side_effect_expr_nondett(java_double_type());
+      results[0].add_source_location() = i_it->source_location;
     }
 
     else if(statement=="invokeinterface" ||

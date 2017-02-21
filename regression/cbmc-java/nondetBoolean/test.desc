@@ -1,8 +1,6 @@
 CORE
 NondetBoolean.class
 --function NondetBoolean.foo
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring

@@ -1,8 +1,6 @@
 CORE
 NondetChar.class
 --function NondetChar.foo
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
