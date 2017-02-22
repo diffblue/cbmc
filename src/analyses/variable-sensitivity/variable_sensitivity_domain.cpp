@@ -250,6 +250,43 @@ bool variable_sensitivity_domaint::merge(
   }
 }
 
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::ai_simplify
+
+  Inputs:
+   condition - the expression to evaluate to true or false
+   ns - the namespace
+   lhs - is the expression on the left hand side
+
+ Outputs: True if simplified the condition. False otherwise. condition
+          will be updated with the simplified condition if it has worked
+
+ Purpose: To resolve a condition down to a possibly known boolean value
+
+\*******************************************************************/
+
+bool variable_sensitivity_domaint::ai_simplify(
+  exprt &condition, const namespacet &ns, const bool lhs) const
+{
+  if (lhs)
+    return false;
+  else
+  {
+    sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition);
+    exprt c = res->to_constant();
+
+    if (c.id() == ID_nil)
+      return false;
+    else
+    {
+      bool b = (condition!=c);
+      condition = c;
+      return b;
+    }
+  }
+}
+
 bool variable_sensitivity_domaint::is_bottom() const
 {
   return is_set_to_bottom && abstract_state.get_is_bottom();
