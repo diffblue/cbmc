@@ -5,6 +5,7 @@ Module: JAVA Bytecode Language Conversion
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -994,15 +995,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   while(!working_set.empty())
   {
-    std::set<unsigned>::iterator cur=working_set.begin();
-    address_mapt::iterator a_it=address_map.find(*cur);
-    assert(a_it!=address_map.end());
+    std::set<unsigned>::iterator cur = working_set.begin();
+    address_mapt::iterator a_it = address_map.find(*cur);
+    assert(a_it != address_map.end());
     working_set.erase(cur);
 
-    if(a_it->second.done)
+    if (a_it->second.done)
+    {
       continue;
-    working_set
-      .insert(a_it->second.successors.begin(), a_it->second.successors.end());
+    }
+
+    working_set.insert(a_it->second.successors.begin(),
+                       a_it->second.successors.end());
 
     instructionst::const_iterator i_it=a_it->second.source;
     stack.swap(a_it->second.stack);
@@ -1017,8 +1021,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         "$stack"));
 
     irep_idt statement=i_it->statement;
-    exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
-    exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
+    exprt arg0 = i_it->args.size() >= 1 ? i_it->args[0] : nil_exprt();
+    exprt arg1 = i_it->args.size() >= 2 ? i_it->args[1] : nil_exprt();
 
     const bytecode_infot &bytecode_info=get_bytecode_info(statement);
 
@@ -1191,6 +1195,45 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results.resize(1);
       results[0] = side_effect_expr_nondett(java_double_type());
       results[0].add_source_location() = i_it->source_location;
+    }
+
+    //  To catch the return type of the nondet call, we have to check the
+    //  next statement for an assignment.
+    //  Check that the statement is static, with the correct signature, and
+    //  that the working set still has remaining items.
+    else if (statement == "invokestatic" &&
+             has_prefix(id2string(arg0.get(ID_identifier)),
+                        "java::org.cprover.CProver.nondet:()L") &&
+             !working_set.empty())
+    {
+      //  For the type search to succeed, the next instruction must be a
+      //  checkcast.
+      //  Find the next item in the working set, and look up that item in the
+      //  address map.
+      address_mapt::iterator next_it = address_map.find(*working_set.begin());
+      assert(next_it != address_map.end());
+
+      //  Create somewhere to store the result, and set the source location.
+      results.resize(1);
+      results[0].add_source_location() = i_it->source_location;
+
+      instructionst::const_iterator next_source_it = next_it->second.source;
+      //  If the next item is a checkcast with a 'symbol' argument:
+      if (next_source_it->statement == "checkcast" &&
+          next_source_it->args.size() >= 1 &&
+          next_source_it->args[0].type().id() == ID_symbol)
+      {
+        //  We assume that the nondet expression has the symbol type.
+        results[0] = side_effect_expr_nondett(
+            java_reference_type(next_source_it->args[0].type()));
+      }
+      else
+      {
+        //  If the next item is not a checkcast, we create a nondet Object
+        //  instead.
+        results[0] = side_effect_expr_nondett(
+            java_reference_type(symbol_typet("java::java.lang.Object")));
+      }
     }
 
     else if(statement=="invokeinterface" ||
