@@ -196,7 +196,7 @@ bool abstract_environmentt::assign(
           // Then we copy the AO and write to it
           // cast_ao->write(popped_stack, index_expr, value)
           // Which will continue down the stack
-           return abstract_object_factory(lhs_object->type, true);
+           return abstract_object_factory(lhs_object->get_type(), true);
         }
       },
       {
@@ -216,7 +216,7 @@ bool abstract_environmentt::assign(
           const abstract_object_pointert lhs_object, std::stack<exprt> stack)
         {
           // TODO(tkiley): Same as with index
-          return abstract_object_factory(lhs_object->type, true);
+          return abstract_object_factory(lhs_object->get_type(), true);
         }
       }
     };
