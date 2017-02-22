@@ -43,13 +43,17 @@ public:
     locationt from,
     locationt to);
 
+  bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns,
+    const bool lhs=false) const override;
+
   bool is_bottom() const override;
   bool is_top() const override;
 
 private:
   abstract_environmentt abstract_state;
   bool is_set_to_bottom;
-
 
 };
 
