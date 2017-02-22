@@ -5,13 +5,13 @@ int myfunc(int a, int b)
   return a+b;
 }
 
-int foo (int iX, int iY)
+int foo(int iX, int iY)
 {
   return iX + iY;
-  assert(myfunc(iX,iY)==8);
+  myfunc(iX, iY);
 }
 
 int main(void)
 {
-  assert(foo(5,3)==8);
+  foo(5, 3);
 }

@@ -8,5 +8,5 @@ int foo (int iX, int iY)
 
 int main(void)
 {
-  assert(foo(5,3)==8);
+  foo(5, 3);
 }

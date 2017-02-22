@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.coverage.1\] file main.c line 5 function main function main entry point: SATISFIED$
-^\[main.coverage.2\] file main.c line 6 function main function main block 3 branch false: SATISFIED$
-^\[main.coverage.3\] file main.c line 6 function main function main block 3 branch true: SATISFIED$
+^\[main.coverage.2\] file main.c line 6 function main function main block .* branch false: SATISFIED$
+^\[main.coverage.3\] file main.c line 6 function main function main block .* branch true: SATISFIED$
 --
 ^warning: ignoring
