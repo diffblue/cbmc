@@ -20,7 +20,6 @@ show:
 	done;
 
 clean:
-	find . -name *.*~ | xargs rm -f
-	find . -name *.out | xargs rm -f
-	find . -name *.goto | xargs rm -f
-	rm -f tests.log	
+	find -name '*.out' -execdir $(RM) '{}' \;
+	find -name '*.gb' -execdir $(RM) '{}' \;
+	$(RM) tests.log

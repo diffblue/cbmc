@@ -14,5 +14,5 @@ show:
 	done;
 
 clean:
-	rm -f tests.log
-	rm -f */main.out
+	$(RM) tests.log
+	$(RM) */main.out
