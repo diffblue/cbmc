@@ -296,13 +296,13 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet type, bool top) const
+  const typet type, bool top, bool bottom) const
 {
   // TODO (tkiley): Here we should look at some config file
   if(type.id()==ID_signedbv)
   {
     return abstract_object_pointert(
-      new constant_abstract_valuet(type, top, false));
+      new constant_abstract_valuet(type, top, bottom));
   }
   else
   {

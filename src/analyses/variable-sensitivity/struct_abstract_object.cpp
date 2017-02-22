@@ -113,9 +113,10 @@ Function: struct_abstract_objectt::read_component
 abstract_object_pointert struct_abstract_objectt::read_component(
   const abstract_environmentt &environment, const member_exprt &member_expr)
 {
-  // Presumably reading from a bottom struct is bad?
-  assert(!bottom);
-  return environment.abstract_object_factory(member_expr.type(), true);
+  // If we are bottom then so are the components
+  // otherwise the components could be anything
+  return environment.abstract_object_factory(
+    member_expr.type(), !is_bottom(), is_bottom());
 }
 
 /*******************************************************************\
@@ -142,10 +143,16 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
   const std::stack<exprt> stack,
   const member_exprt &member_expr)
 {
-  // Return a copy of this set to top
-  sharing_ptrt<struct_abstract_objectt> copy(
-    new struct_abstract_objectt(*this));
-  copy->top=true;
-  copy->bottom=false;
-  return copy;
+  if(is_top())
+  {
+    return sharing_ptrt<struct_abstract_objectt>(this);
+  }
+  else
+  {
+    sharing_ptrt<struct_abstract_objectt> copy(
+      new struct_abstract_objectt(*this));
+    copy->top=false;
+    copy->bottom=true;
+    return copy;
+  }
 }
