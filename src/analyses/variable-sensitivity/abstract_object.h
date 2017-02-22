@@ -28,7 +28,7 @@ class constant_exprt;
     const abstract_object_pointert op, \
     bool &out_any_modifications) \
   {\
-    assert(this->type==op->type); \
+    assert(type==op->get_type()); \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
       >::type current_typet; \
     \
@@ -88,7 +88,7 @@ public:
 
   virtual bool operator==(const abstract_objectt &other) const;
 
-  //protected
+protected:
   typet type;
   bool top;
   bool bottom;
