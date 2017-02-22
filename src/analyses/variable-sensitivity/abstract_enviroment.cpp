@@ -36,7 +36,7 @@ abstract_object_pointert abstract_environmentt::eval(
   const exprt &expr) const
 {
   typedef std::function<abstract_object_pointert(const exprt &)> eval_handlert;
-  static std::map<irep_idt, eval_handlert> handlers=
+  std::map<irep_idt, eval_handlert> handlers=
   {
     {
       ID_symbol, [&](const exprt &expr)
