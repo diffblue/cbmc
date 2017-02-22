@@ -110,6 +110,12 @@ abstract_object_pointert abstract_environmentt::eval(
         return abstract_object_pointert(
           new abstract_objectt(expr.type(), true, false));
       }
+    },
+    {
+      ID_equal, [&](const exprt &expr)
+      {
+        return eval_logical(expr);
+      }
     }
   };
   #if 0
@@ -542,7 +548,45 @@ void abstract_environmentt::output(
 abstract_object_pointert abstract_environmentt::eval_logical(
   const exprt &e) const
 {
-  throw "not implemented";
+  typedef std::function<abstract_object_pointert(const exprt &)> eval_handlert;
+  std::map<irep_idt, eval_handlert> handlers=
+  {
+    {
+      ID_equal, [&](const exprt &expr)
+      {
+        abstract_object_pointert lhs=eval(expr.op0());
+        abstract_object_pointert rhs=eval(expr.op1());
+
+        const exprt &lhs_value=lhs->to_constant();
+        const exprt &rhs_value=rhs->to_constant();
+
+        if(lhs_value.id()==ID_nil || rhs_value.id()==ID_nil)
+        {
+          // One or both of the values is unknown so therefore we can't conclude
+          // whether this is true or false
+          return abstract_object_pointert(
+            new abstract_objectt(expr.type(), true, false));
+        }
+        else
+        {
+          bool logical_result=lhs_value==rhs_value;
+          if(logical_result)
+          {
+            return abstract_object_pointert(
+              new constant_abstract_valuet(true_exprt()));
+          }
+          else
+          {
+            return abstract_object_pointert(
+              new constant_abstract_valuet(false_exprt()));
+          }
+        }
+      }
+    }
+  };
+
+  assert(handlers.find(e.id())!=handlers.end());
+  return handlers[e.id()](e);
 }
 
 abstract_object_pointert abstract_environmentt::eval_rest(const exprt &e) const
