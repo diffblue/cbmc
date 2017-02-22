@@ -235,6 +235,8 @@ bool bmc_covert::operator()()
   // This maps property IDs to 'goalt'
   forall_goto_functions(f_it, goto_functions)
   {
+    // Functions are already inlined.
+    if(f_it->second.is_inlined()) continue;
     forall_goto_program_instructions(i_it, f_it->second.body)
     {
       if(i_it->is_assert())
