@@ -1222,25 +1222,27 @@ codet java_bytecode_convert_methodt::convert_instructions(
       instructionst::const_iterator next_source_it = next_it->second.source;
       //  If the next item is a checkcast with a 'symbol' argument:
 
-      const auto java_object_type =
-          (next_source_it->statement == "checkcast" &&
-           next_source_it->args.size() >= 1 &&
-           next_source_it->args[0].type().id() == ID_symbol)
-              ? next_source_it->args[0].type()
-              : symbol_typet("java::java.lang.Object");
+      assert(next_source_it->statement == "checkcast");
+      assert(next_source_it->args.size() >= 1);
+      assert(next_source_it->args[0].type().id() == ID_symbol);
+      const auto java_object_type = next_source_it->args[0].type();
 
 #ifdef DEBUG
-      std::cerr << java_object_type.pretty() << '\n';
-      std::cerr << symbol_table << '\n';
+      std::cerr << "java_object_type: " << java_object_type.pretty() << '\n';
+      std::cerr << "symbol_table: " << symbol_table << '\n';
 #endif
 
       code_blockt init_code;
-      results[0] = object_factory(
-          java_reference_type(java_object_type), init_code, true, symbol_table,
-          max_array_length, i_it->source_location, get_message_handler());
+      results[0] = object_factory(java_reference_type(java_object_type),
+                                  init_code,
+                                  true,
+                                  symbol_table,
+                                  max_array_length,
+                                  i_it->source_location,
+                                  get_message_handler());
 
 #ifdef DEBUG
-      std::cerr << init_code.pretty() << '\n';
+      std::cerr << "init_code: " << init_code.pretty() << '\n';
 #endif
 
       c = init_code;
