@@ -1,0 +1,140 @@
+CBMC version 5.6 64-bit x86_64 linux
+Parsing nondetGenericNoAssignment/NondetGenericNoAssignment.class
+Java main class: nondetGenericNoAssignment.NondetGenericNoAssignment
+Converting
+Generating GOTO Program
+Adding goto-destructor code on jump to pc12
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Partial Inlining
+Generic Property Instrumentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+_start /* _start */
+        // 0 no location
+        __CPROVER_initialize();
+        // 1 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        NondetGenericNoAssignment.callWithoutAssignment:()V();
+        // 2 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+java.lang.Object.<init>() /* java::java.lang.Object.<init>:()V */
+        // 3 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        tmp_object_factory$1 = this;
+        // 4 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        tmp_object_factory$1->@lock = false;
+        // 5 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+java.lang.AssertionError.<init>() /* java::java.lang.AssertionError.<init>:()V */
+        // 6 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        tmp_object_factory$2 = this;
+        // 7 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        tmp_object_factory$2->@lock = false;
+        // 8 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+java.lang.Class.desiredAssertionStatus() /* java::java.lang.Class.desiredAssertionStatus:()Z */
+        // 9 
+        tmp_object_factory$3 = NONDET(boolean);
+        // 10 no location
+        java.lang.Class.desiredAssertionStatus:()Z#return_value = tmp_object_factory$3;
+        // 11 no location
+        GOTO 1
+        // 12 no location
+        java.lang.Class.desiredAssertionStatus:()Z#return_value = tmp_object_factory$3;
+        // 13 no location
+     1: END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NondetGenericNoAssignment.NondetGenericNoAssignment() /* java::NondetGenericNoAssignment.<init>:()V */
+        // 14 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<init>:()V bytecode_index 1
+        // Labels: pc0
+        &this->@java.lang.Object . java.lang.Object.<init>:()V();
+        // 15 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NondetGenericNoAssignment.callWithoutAssignment() /* java::NondetGenericNoAssignment.callWithoutAssignment:()V */
+        // 16 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 0
+        // Labels: pc0
+        $assertionsDisabled = false;
+        // 17 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 1
+        IF (int)$assertionsDisabled != 0 THEN GOTO 1
+        // 18 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 3
+        // Labels: pc6
+        SKIP
+        // 19 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 3
+        IF (void *)NONDET(struct java.lang.Object *) == null THEN GOTO 1
+        // 20 no location
+        // Labels: pc12
+        struct java.lang.AssertionError *new_tmp0;
+        // 21 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 4
+        new_tmp0 = MALLOC(struct java.lang.AssertionError, 5L);
+        // 22 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 4
+        *new_tmp0 = { .@class_identifier="java::java.lang.AssertionError",
+    .@lock=false };
+        // 23 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 6
+        new_tmp0 . java.lang.AssertionError.<init>:()V();
+        // 24 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 6
+        ASSERT false // assertion at file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 6
+        // 25 no location
+        dead new_tmp0;
+        // 26 file NondetGenericNoAssignment.java line 8 function java::NondetGenericNoAssignment.callWithoutAssignment:()V bytecode_index 8
+        // Labels: pc20
+     1: GOTO 2
+        // 27 no location
+     2: END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NondetGenericNoAssignment.<clinit>() /* java::NondetGenericNoAssignment.<clinit>:()V */
+        // 28 no location
+        int $stack_tmp1;
+        // 29 no location
+        // Labels: pc0
+        boolean return_tmp0;
+        // 30 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 1
+        &NondetGenericNoAssignment@class_model . java.lang.Class.desiredAssertionStatus:()Z();
+        // 31 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 1
+        return_tmp0 = java.lang.Class.desiredAssertionStatus:()Z#return_value;
+        // 32 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 1
+        dead java.lang.Class.desiredAssertionStatus:()Z#return_value;
+        // 33 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 2
+        IF !((int)return_tmp0 != 0) THEN GOTO 1
+        // 34 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 2
+        dead return_tmp0;
+        // 35 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 2
+        GOTO 2
+        // 36 no location
+     1: dead return_tmp0;
+        // 37 no location
+        // Labels: pc8
+        $stack_tmp1 = 1;
+        // 38 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 4
+        GOTO 3
+        // 39 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 5
+        // Labels: pc12
+     2: SKIP
+        // 40 no location
+        $stack_tmp1 = 0;
+        // 41 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 6
+        // Labels: pc13
+     3: $assertionsDisabled = (boolean)$stack_tmp1;
+        // 42 file NondetGenericNoAssignment.java line 3 function java::NondetGenericNoAssignment.<clinit>:()V bytecode_index 7
+        dead $stack_tmp1;
+        // 43 no location
+        END_FUNCTION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+__CPROVER_initialize /* __CPROVER_initialize */
+        // 44 no location
+        __CPROVER_rounding_mode = 0;
+        // 45 file NondetGenericNoAssignment.java line 7 function java::NondetGenericNoAssignment.callWithoutAssignment:()V
+        $assertionsDisabled = false;
+        // 46 no location
+        NondetGenericNoAssignment.<clinit>:()V();
+        // 47 no location
+        END_FUNCTION
