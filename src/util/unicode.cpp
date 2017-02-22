@@ -263,11 +263,35 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
   return argv_narrow;
 }
 
+/*******************************************************************\
+
+Function: utf8_to_utf16_big_endian
+
+  Inputs: String in UTF-8 format
+
+ Outputs: String in UTF-16BE format
+
+ Purpose: Note this requires g++-5 libstdc++ / libc++ / MSVC2010+
+
+\*******************************************************************/
+
 std::wstring utf8_to_utf16_big_endian(const std::string& in)
 {
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
   return converter.from_bytes(in);
 }
+
+/*******************************************************************\
+
+Function: utf8_to_utf16_little_endian
+
+  Inputs: String in UTF-8 format
+
+ Outputs: String in UTF-16LE format
+
+ Purpose: Note this requires g++-5 libstdc++ / libc++ / MSVC2010+
+
+\*******************************************************************/
 
 std::wstring utf8_to_utf16_little_endian(const std::string& in)
 {
@@ -281,6 +305,19 @@ std::wstring utf8_to_utf16_little_endian(const std::string& in)
   std::wstring_convert<codecvt_utf8_utf16t> converter;
   return converter.from_bytes(in);
 }
+
+/*******************************************************************\
+
+Function: utf16_little_endian_to_ascii
+
+  Inputs: String in UTF-16LE format
+
+ Outputs: String in US-ASCII format, with \uxxxx escapes for other
+          characters
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string utf16_little_endian_to_ascii(const std::wstring& in)
 {
