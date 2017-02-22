@@ -24,7 +24,7 @@ public:
   virtual bool assume(const exprt &expr);
 
   virtual abstract_object_pointert abstract_object_factory(
-    const typet type, bool top = true) const;
+    const typet type, bool top=true, bool bottom=false) const;
   // For converting constants in the program
   // Maybe these two should be compacted to one call...
   virtual abstract_object_pointert abstract_object_factory(
