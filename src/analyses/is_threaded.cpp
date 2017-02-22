@@ -15,41 +15,33 @@ class is_threaded_domaint:public ai_domain_baset
 {
 public:
   bool reachable;
-  bool has_spawn;
   bool is_threaded;
 
-  inline is_threaded_domaint():
+  is_threaded_domaint():
     reachable(false),
-    has_spawn(false),
     is_threaded(false)
   {
     // this is bottom
   }
 
-  inline bool merge(
+  bool merge(
     const is_threaded_domaint &src,
     locationt from,
     locationt to)
   {
+    // assert(src.reachable);
+
+    if(!src.reachable)
+      return false;
+
     bool old_reachable=reachable;
-    if(src.reachable)
-      reachable=true;
+    bool old_is_threaded=is_threaded;
 
-    bool old_h_s=has_spawn;
-    if(src.has_spawn &&
-       (from->is_end_function() ||
-        from->function==to->function))
-      has_spawn=true;
-
-    bool old_i_t=is_threaded;
-    if(has_spawn ||
-       (src.is_threaded &&
-       !from->is_end_function()))
-      is_threaded=true;
+    reachable=true;
+    is_threaded|=src.is_threaded;
 
     return old_reachable!=reachable ||
-           old_i_t!=is_threaded ||
-           old_h_s!=has_spawn;
+           old_is_threaded!=is_threaded;
   }
 
   void transform(
@@ -58,30 +50,31 @@ public:
     ai_baset &ai,
     const namespacet &ns) final
   {
+    // assert(reachable);
+
     if(!reachable)
       return;
-    if(from->is_start_thread() ||
-       to->is_end_thread())
-    {
-      has_spawn=true;
+
+    if(from->is_start_thread())
       is_threaded=true;
-    }
   }
 
   void make_bottom() final
   {
-    reachable=has_spawn=is_threaded=false;
+    reachable=false;
+    is_threaded=false;
   }
 
   void make_top() final
   {
-    reachable=has_spawn=is_threaded=true;
+    reachable=true;
+    is_threaded=true;
   }
 
   void make_entry() final
   {
     reachable=true;
-    has_spawn=is_threaded=false;
+    is_threaded=false;
   }
 };
 
