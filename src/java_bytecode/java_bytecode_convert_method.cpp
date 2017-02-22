@@ -22,9 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <analyses/cfg_dominators.h>
 
+#include "bytecode_info.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
+#include "java_object_factory.h"
+#include "java_opaque_method_stubs.h"
 #include "java_types.h"
 
 #include <limits>
@@ -1219,21 +1221,29 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       instructionst::const_iterator next_source_it = next_it->second.source;
       //  If the next item is a checkcast with a 'symbol' argument:
-      if (next_source_it->statement == "checkcast" &&
-          next_source_it->args.size() >= 1 &&
-          next_source_it->args[0].type().id() == ID_symbol)
-      {
-        //  We assume that the nondet expression has the symbol type.
-        results[0] = side_effect_expr_nondett(
-            java_reference_type(next_source_it->args[0].type()));
-      }
-      else
-      {
-        //  If the next item is not a checkcast, we create a nondet Object
-        //  instead.
-        results[0] = side_effect_expr_nondett(
-            java_reference_type(symbol_typet("java::java.lang.Object")));
-      }
+
+      const auto java_object_type =
+          (next_source_it->statement == "checkcast" &&
+           next_source_it->args.size() >= 1 &&
+           next_source_it->args[0].type().id() == ID_symbol)
+              ? next_source_it->args[0].type()
+              : symbol_typet("java::java.lang.Object");
+
+#ifdef DEBUG
+      std::cerr << java_object_type.pretty() << '\n';
+      std::cerr << symbol_table << '\n';
+#endif
+
+      code_blockt init_code;
+      results[0] = object_factory(
+          java_reference_type(java_object_type), init_code, true, symbol_table,
+          max_array_length, i_it->source_location, get_message_handler());
+
+#ifdef DEBUG
+      std::cerr << init_code.pretty() << '\n';
+#endif
+
+      c = init_code;
     }
 
     else if(statement=="invokeinterface" ||
