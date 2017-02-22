@@ -1156,6 +1156,8 @@ void cbmc_parse_optionst::help()
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    "--java-max-recursion-depth    max recursion depth for nondet init of recursive objects\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"

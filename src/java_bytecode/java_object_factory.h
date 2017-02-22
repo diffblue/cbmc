@@ -19,6 +19,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_recursion_depth,
   const source_locationt &,
   message_handlert &message_handler);
 
@@ -31,7 +32,8 @@ void gen_nondet_init(
   bool create_dynamic_objects,
   bool assume_non_null,
   message_handlert &message_handler,
-  size_t max_nondet_array_length=5);
+  size_t max_nondet_array_length,
+  size_t max_recursion_depth);
 
 
 exprt get_nondet_bool(const typet &);

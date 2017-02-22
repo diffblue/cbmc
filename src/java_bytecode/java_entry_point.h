@@ -16,7 +16,8 @@ bool java_entry_point(
   const irep_idt &main_class,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  size_t max_nondet_array_length);
+  size_t max_nondet_array_length,
+  size_t max_recursive_depth);
 
 typedef struct
 {

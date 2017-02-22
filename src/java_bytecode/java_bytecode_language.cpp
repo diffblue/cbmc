@@ -48,6 +48,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   if(cmd.isset("java-max-input-array-length"))
     max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
+  if(cmd.isset("java-max-recursion-depth"))
+    max_recursion_depth=
+      std::stoi(cmd.get_value("java-max-recursion-depth"));
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
   if(cmd.isset("lazy-methods-context-sensitive"))
@@ -791,7 +794,8 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
       main_class,
       get_message_handler(),
       assume_inputs_non_null,
-      max_nondet_array_length));
+      max_nondet_array_length,
+      max_recursion_depth));
 }
 
 /*******************************************************************\

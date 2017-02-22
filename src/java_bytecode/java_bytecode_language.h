@@ -56,7 +56,8 @@ public:
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget():
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
-    max_user_array_length(0)
+    max_user_array_length(0),
+    max_recursion_depth(0)
     {}
 
   bool from_expr(
@@ -106,6 +107,7 @@ protected:
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
   std::string java_cp_include_files;
+  size_t max_recursion_depth;       // maximal depth for recursive objects
 };
 
 languaget *new_java_bytecode_language();

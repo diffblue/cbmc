@@ -56,6 +56,7 @@ class optionst;
   "(graphml-witness):" \
   "(java-max-vla-length):(java-unwind-enum-static)" \
   "(java-cp-include-files):" \
+  "(java-max-recursion-depth):" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
