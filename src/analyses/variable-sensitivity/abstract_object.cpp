@@ -6,10 +6,17 @@
 
 \*******************************************************************/
 
-#include "abstract_object.h"
 #include <iostream>
+
 #include <util/type.h>
 #include <util/std_expr.h>
+#include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <analyses/variable-sensitivity/constant_abstract_value.h>
+
+#include <util/simplify_expr.h>
+#include <util/namespace.h>
+
+#include "abstract_object.h"
 
 /*******************************************************************\
 
@@ -138,13 +145,48 @@ abstract_object_pointert abstract_objectt::merge(
   return m;
 }
 
-#if 0
-abstract_object_pointert abstract_objectt::expression_transform_logical(
-  const exprt &expr, abstract_environmentt &environment)
+abstract_object_pointert abstract_objectt::expression_transform_binary(
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns) const
 {
+  assert(expr.operands().size()==2);
 
+  abstract_object_pointert lhs_abstract_object=environment.eval(expr.op0(), ns);
+  abstract_object_pointert rhs_abstract_object=environment.eval(expr.op1(), ns);
+
+  const exprt &lhs_value=lhs_abstract_object->to_constant();
+  const exprt &rhs_value=rhs_abstract_object->to_constant();
+
+  if(lhs_value.id()==ID_nil || rhs_value.id()==ID_nil)
+  {
+    // One or both of the values is unknown so therefore we can't conclude
+    // whether this is true or false
+    return abstract_object_pointert(
+      new abstract_objectt(expr.type(), true, false));
+  }
+  else
+  {
+    exprt constant_replaced_expr=expr;
+    constant_replaced_expr.operands()[0]=lhs_value;
+    constant_replaced_expr.operands()[1]=rhs_value;
+    exprt simplified=simplify_expr(constant_replaced_expr, ns);
+    if(simplified.is_constant())
+    {
+      constant_exprt constant_expr=to_constant_expr(simplified);
+
+      // TODO(tkiley): This should be going through the abstract_object_factory
+      // but at the moment this produces a two value abstraction for type bool
+      // so for now we force it to be the constant abstraction
+      return abstract_object_pointert(
+        new constant_abstract_valuet(constant_expr));
+    }
+    else
+    {
+      return environment.abstract_object_factory(expr.type(), true, false);
+    }
+  }
 }
-#endif
 
 /*******************************************************************\
 
