@@ -8,7 +8,13 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H
 
+#include <stack>
 #include <analyses/variable-sensitivity/abstract_object.h>
+
+class abstract_environmentt;
+class index_exprt;
+
+
 
 class array_abstract_objectt:public abstract_objectt
 {
@@ -20,6 +26,15 @@ public:
 
   CLONE
   MERGE(abstract_objectt)
+
+  virtual abstract_object_pointert read_index(
+    const abstract_environmentt &env, const index_exprt &index) const;
+
+  virtual sharing_ptrt<array_abstract_objectt> write_index(
+    abstract_environmentt &environment,
+    const std::stack<exprt> stack, const index_exprt &index_expr,
+    const abstract_object_pointert value,
+    bool merging_write);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H
