@@ -9,9 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
-//#define MINIZ_HEADER_FILE_ONLY
 #define _LARGEFILE64_SOURCE 1
-#include "miniz_zip.h"
+#include "miniz/miniz.h"
 
 #include <string>
 #include <vector>
