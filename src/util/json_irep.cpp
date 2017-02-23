@@ -10,12 +10,14 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #include "json.h"
 #include "json_irep.h"
 
+#include <algorithm>
+
 /*******************************************************************\
 
 Function: json_irept::json_irept
 
   Inputs:
-   include_comments - when generating the JSON, should the comments
+   include_comments - when writing JSON, should the comments
                       sub tree be included.
 
  Outputs:
@@ -131,3 +133,39 @@ void json_irept::convert_named_sub_tree(
   }
 }
 
+/*******************************************************************\
+
+Function: json_irept::convert_from_json
+
+  Inputs: input - json object to convert
+
+ Outputs: result - irep equivalent of input
+
+ Purpose: Deserialize a JSON irep representation.
+
+\*******************************************************************/
+
+void json_irept::convert_from_json(const jsont &in, irept &out) const
+{
+  std::vector<std::string> have_keys;
+  for(const auto &keyval : in.object)
+    have_keys.push_back(keyval.first);
+  std::sort(have_keys.begin(), have_keys.end());
+  if(have_keys!=std::vector<std::string>{"comment", "id", "namedSub", "sub"})
+    throw "irep JSON representation is missing one of needed keys: "
+      "'id', 'sub', 'namedSub', 'comment'";
+
+  out.id(in["id"].value);
+
+  for(const auto &sub : in["sub"].array)
+  {
+    out.get_sub().push_back(irept());
+    convert_from_json(sub, out.get_sub().back());
+  }
+
+  for(const auto &named_sub : in["namedSub"].object)
+    convert_from_json(named_sub.second, out.get_named_sub()[named_sub.first]);
+
+  for(const auto &comment : in["comment"].object)
+    convert_from_json(comment.second, out.get_comments()[comment.first]);
+}
