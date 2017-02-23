@@ -11,6 +11,7 @@
 class typet;
 class constant_exprt;
 class abstract_environmentt;
+class namespacet;
 
 #include <util/expr.h>
 #include <memory>
@@ -80,12 +81,15 @@ public:
     const abstract_object_pointert op, bool &out_any_modifications);
 
   // Interface for transforms
-  //abstract_object_pointert expression_transform_logical(const exprt &expr, abstract_environmentt &environment);
+  abstract_object_pointert expression_transform_binary(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns) const;
 
   virtual exprt to_constant() const;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const class namespacet &ns);
+    std::ostream &out, const class ai_baset &ai, const namespacet &ns);
 
   CLONE
 
