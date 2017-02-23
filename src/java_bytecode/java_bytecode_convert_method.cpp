@@ -1203,10 +1203,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     //  next statement for an assignment.
     //  Check that the statement is static, with the correct signature, and
     //  that the working set still has remaining items.
-    else if (statement == "invokestatic" &&
+    else if (!working_set.empty() && statement == "invokestatic" &&
              has_prefix(id2string(arg0.get(ID_identifier)),
-                        "java::org.cprover.CProver.nondet:()L") &&
-             !working_set.empty())
+                        "java::org.cprover.CProver.nondet:()L"))
     {
       //  For the type search to succeed, the next instruction must be a
       //  checkcast.
@@ -1215,37 +1214,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
       address_mapt::iterator next_it = address_map.find(*working_set.begin());
       assert(next_it != address_map.end());
 
-      //  Create somewhere to store the result, and set the source location.
-      results.resize(1);
-      results[0].add_source_location() = i_it->source_location;
-
       instructionst::const_iterator next_source_it = next_it->second.source;
-      //  If the next item is a checkcast with a 'symbol' argument:
 
+      //  Check that the statement is a checkcast with an argument of the
+      //  correct type.
       assert(next_source_it->statement == "checkcast");
       assert(next_source_it->args.size() >= 1);
       assert(next_source_it->args[0].type().id() == ID_symbol);
       const auto java_object_type = next_source_it->args[0].type();
 
-#ifdef DEBUG
-      std::cerr << "java_object_type: " << java_object_type.pretty() << '\n';
-      std::cerr << "symbol_table: " << symbol_table << '\n';
-#endif
-
-      code_blockt init_code;
-      results[0] = object_factory(java_reference_type(java_object_type),
-                                  init_code,
-                                  true,
-                                  symbol_table,
-                                  max_array_length,
-                                  i_it->source_location,
-                                  get_message_handler());
-
-#ifdef DEBUG
-      std::cerr << "init_code: " << init_code.pretty() << '\n';
-#endif
-
-      c = init_code;
+      //  Create somewhere to store the result, and set the source location.
+      results.resize(1);
+      results[0].add_source_location() = i_it->source_location;
+      //  Set the result to a nondet of the correct type.
+      results[0] =
+        side_effect_expr_nondett(java_reference_type(java_object_type));
     }
 
     else if(statement=="invokeinterface" ||
