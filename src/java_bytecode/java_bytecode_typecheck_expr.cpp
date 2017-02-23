@@ -24,8 +24,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 
 java_bytecode_typecheckt::java_bytecode_typecheckt(
-  symbol_tablet &_symbol_table, message_handlert &_message_handler)
-  : typecheckt(_message_handler), symbol_table(_symbol_table), ns(symbol_table)
+  symbol_tablet &_symbol_table,
+  message_handlert &_message_handler,
+  size_t _max_nondet_array_length)
+  : typecheckt(_message_handler),
+    symbol_table(_symbol_table),
+    ns(symbol_table),
+    max_nondet_array_length(_max_nondet_array_length)
 {
 }
 
@@ -68,9 +73,6 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     }
     else if (statement == ID_nondet)
     {
-      //  TODO set this properly.
-      size_t max_nondet_array_length = 100;
-
       const typet &type = expr.type();
 
       code_blockt init_code;
