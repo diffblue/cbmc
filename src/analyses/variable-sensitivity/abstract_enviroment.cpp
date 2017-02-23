@@ -12,6 +12,8 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/ai.h>
 
 
@@ -87,35 +89,23 @@ abstract_object_pointert abstract_environmentt::eval(
     {
       ID_dereference, [&](const exprt &expr)
       {
-  #if 0
         dereference_exprt dereference(to_dereference_expr(expr));
-  #endif
-        // TODO(tkiley): eval the pointer to (hopefully) get an
-        // abstract_pointer_objectt then use that to get an AO for a specific
-        // value.
-        // For now, just return top
-        return abstract_object_pointert(
-          new abstract_objectt(expr.type(), true, false));
+        sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
+          std::dynamic_pointer_cast<pointer_abstract_objectt>(
+            eval(dereference.pointer()));
+
+        return pointer_abstract_object->read_dereference(*this);
       }
     },
     {
       ID_index, [&](const exprt &expr)
       {
-#if 0
         index_exprt index_expr(to_index_expr(expr));
-#endif
-        // TODO(tkiley): eval the array to (hopefully) get an
-        // abstract_array_objectt then use that to get an AO for a specific
-        // index.
-        // For now, just return top
-        return abstract_object_pointert(
-          new abstract_objectt(expr.type(), true, false));
-      }
-    },
-    {
-      ID_equal, [&](const exprt &expr)
-      {
-        return eval_logical(expr);
+        sharing_ptrt<array_abstract_objectt> array_abstract_object=
+          std::dynamic_pointer_cast<array_abstract_objectt>(
+            eval(index_expr.array()));
+
+        return array_abstract_object->read_index(*this, index_expr);
       }
     }
   };
@@ -203,12 +193,12 @@ bool abstract_environmentt::assign(
           std::stack<exprt> stack,
           abstract_object_pointert rhs_object)
         {
-          // TODO(tkiley): At this point we would cast the AO pointer to an
-          // array_abstract_objectt
-          // Then we copy the AO and write to it
-          // cast_ao->write(popped_stack, index_expr, value)
-          // Which will continue down the stack
-           return abstract_object_factory(lhs_object->get_type(), true);
+          sharing_ptrt<array_abstract_objectt> array_abstract_object=
+            std::dynamic_pointer_cast<array_abstract_objectt>(lhs_object);
+          sharing_ptrt<array_abstract_objectt> modified_array=
+            array_abstract_object->write_index(
+              *this, stactions, to_index_expr(next_expr), rhs_object, false);
+          return modified_array;
         }
       },
       {
@@ -231,8 +221,12 @@ bool abstract_environmentt::assign(
           std::stack<exprt> stack,
           abstract_object_pointert rhs_object)
         {
-          // TODO(tkiley): Same as with index
-          return abstract_object_factory(lhs_object->get_type(), true);
+          sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
+            std::dynamic_pointer_cast<pointer_abstract_objectt>(lhs_object);
+          sharing_ptrt<pointer_abstract_objectt> modified_pointer=
+            pointer_abstract_object->write_dereference(
+              *this, stactions, rhs_object, false);
+          return modified_pointer;
         }
       }
     };
