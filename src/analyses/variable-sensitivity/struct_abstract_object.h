@@ -33,7 +33,8 @@ public:
   virtual sharing_ptrt<struct_abstract_objectt> write_component(
     const abstract_environmentt &environment,
     const std::stack<exprt> stack,
-    const member_exprt &member_expr);
+    const member_exprt &member_expr,
+    const abstract_object_pointert value);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H

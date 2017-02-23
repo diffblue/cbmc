@@ -138,6 +138,14 @@ abstract_object_pointert abstract_objectt::merge(
   return m;
 }
 
+#if 0
+abstract_object_pointert abstract_objectt::expression_transform_logical(
+  const exprt &expr, abstract_environmentt &environment)
+{
+
+}
+#endif
+
 /*******************************************************************\
 
 Function: abstract_objectt::is_top
