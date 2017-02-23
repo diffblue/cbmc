@@ -93,12 +93,23 @@ public final class CProver
     return 0;
   }
 
-  public static <T> T nondet(boolean allowNull)
+  public static <T> T nondetWithNull()
   {
     if (enableNondet)
     {
       throw new RuntimeException(
-        "Cannot execute program with CProver.nondet<T>()");
+        "Cannot execute program with CProver.nondetWithNull<T>()");
+    }
+
+    return null;
+  }
+
+  public static <T> T nondetWithoutNull()
+  {
+    if (enableNondet)
+    {
+      throw new RuntimeException(
+        "Cannot execute program with CProver.nondetWithoutNull<T>()");
     }
 
     return null;

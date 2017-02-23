@@ -1203,11 +1203,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     //  next statement for an assignment.
     //  Check that the statement is static, with the correct signature, and
     //  that the working set still has remaining items.
-    //  TODO this will break if the user edits cprover.CProver and adds another
-    //  method that begins with 'nondetWith'.
     else if (!working_set.empty() && statement == "invokestatic" &&
              has_prefix(id2string(arg0.get(ID_identifier)),
-                        "java::org.cprover.CProver.nondetWith"))
+                        "java::org.cprover.CProver.nondet:()L"))
     {
       //  For the type search to succeed, the next instruction must be a
       //  checkcast.
@@ -1228,16 +1226,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       //  Create somewhere to store the result, and set the source location.
       results.resize(1);
       results[0].add_source_location() = i_it->source_location;
-
-      auto nondet_result =
-        side_effect_expr_nondett(java_reference_type(java_object_type));
-      //  If the function call contains 'nondetWithNull' then allow nulls.
-      nondet_result.set_allow_null(
-        has_prefix(id2string(arg0.get(ID_identifier)),
-                   "java::org.cprover.CProver.nondetWithNull"));
-
       //  Set the result to a nondet of the correct type.
-      results[0] = nondet_result;
+      results[0] =
+        side_effect_expr_nondett(java_reference_type(java_object_type));
     }
 
     else if(statement=="invokeinterface" ||
@@ -1841,7 +1832,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[2]=op[1];
       results[3]=op[2];
     }
-    // dup2* behaviour depends on the size of the operands on the stack
+    // dup2* behaviour depends on the size of the operands on the
+    // stack
     else if(statement=="dup2")
     {
       assert(!stack.empty() && results.empty());

@@ -1042,7 +1042,31 @@ public:
     side_effect_exprt(ID_nondet, _type)
   {
   }
+
+  inline void set_allow_null(bool a)
+  {
+    set(ID_nondet_allow_null, a);
+  }
+
+  inline bool get_allow_null() const
+  {
+    return get_bool(ID_nondet_allow_null);
+  }
 };
+
+static inline const side_effect_expr_nondett &
+  to_side_effect_expr_nondet(const side_effect_exprt &expr)
+{
+  assert(expr.get_statement() == ID_nondet);
+  return static_cast<const side_effect_expr_nondett &>(expr);
+}
+
+static inline side_effect_expr_nondett &
+  to_side_effect_expr_nondet(side_effect_exprt &expr)
+{
+  assert(expr.get_statement() == ID_nondet);
+  return static_cast<side_effect_expr_nondett &>(expr);
+}
 
 /*! \brief A function call side effect
 */
