@@ -77,6 +77,10 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
       const side_effect_expr_nondett &nondet_expr =
         to_side_effect_expr_nondet(side_effect_expr);
 
+#ifdef DEBUG
+      std::cerr << "nondet_expr: " << nondet_expr.pretty() << '\n';
+#endif
+
       const typet &type = nondet_expr.type();
       const auto allow_null = nondet_expr.get_allow_null();
 
