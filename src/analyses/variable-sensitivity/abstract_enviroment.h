@@ -19,9 +19,10 @@ class abstract_environmentt
 {
 public:
   // These three are really the heart of the method
-  virtual abstract_object_pointert eval(const exprt &expr) const;
+  virtual abstract_object_pointert eval(
+    const exprt &expr, const namespacet &ns) const;
   virtual bool assign(const exprt &expr, const abstract_object_pointert value);
-  virtual bool assume(const exprt &expr);
+  virtual bool assume(const exprt &expr, const namespacet &ns);
 
   virtual abstract_object_pointert abstract_object_factory(
     const typet type, bool top=true, bool bottom=false) const;
@@ -50,7 +51,8 @@ protected:
   bool is_bottom;
 
  // We may need to break out more of these cases into these
- virtual abstract_object_pointert eval_logical(const exprt &e) const;
+ virtual abstract_object_pointert eval_binary_operations(
+    const exprt &e, const namespacet &ns) const;
 
  // Hook for domain specific handling of operators
  virtual abstract_object_pointert eval_rest(const exprt &e) const;
