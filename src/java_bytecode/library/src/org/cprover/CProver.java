@@ -93,7 +93,7 @@ public final class CProver
     return 0;
   }
 
-  public static <T> T nondet()
+  public static <T> T nondet(boolean allowNull)
   {
     if (enableNondet)
     {

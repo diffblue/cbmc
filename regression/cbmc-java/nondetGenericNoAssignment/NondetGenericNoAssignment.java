@@ -4,6 +4,6 @@ class NondetGenericNoAssignment
 {
   static void callWithoutAssignment()
   {
-    assert CProver.nondet() == null;
+    assert CProver.nondetWithNull() == null;
   }
 }

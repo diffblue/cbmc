@@ -7,7 +7,7 @@ class NondetGenericImplicitType
   static void callWithImplicitType()
   {
     //  User may cast to incompatible type.
-    Foo foo = CProver.nondet();
+    Foo foo = CProver.nondetWithNull();
     assert foo == null;
   }
 }
