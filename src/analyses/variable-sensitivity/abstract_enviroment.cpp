@@ -35,6 +35,7 @@ Function: abstract_environmentt::eval
 abstract_object_pointert abstract_environmentt::eval(
   const exprt &expr) const
 {
+  assert(!is_bottom);
   typedef std::function<abstract_object_pointert(const exprt &)> eval_handlert;
   std::map<irep_idt, eval_handlert> handlers=
   {
@@ -368,58 +369,62 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
 
-  bool modified=false;
 
-  for(const auto &entry:env.map)
+
+  if(is_bottom)
   {
-    if(map.find(entry.first)==map.end())
+    *this=env;
+    return !env.is_bottom;
+  }
+  else if(env.is_bottom)
+  {
+    return false;
+  }
+  else
+  {
+    bool modified=false;
+    for(const auto &entry:env.map)
     {
-      // We only add new stuff if we are bottom
-      if(is_bottom)
+      if(map.find(entry.first)!=map.end())
       {
-        map[entry.first] = entry.second;
-        modified=true;
-      }
-    }
-    else
-    {
-      bool object_modified=false;
-      abstract_object_pointert new_object=map[entry.first]->merge(
-        entry.second, object_modified);
+        bool object_modified=false;
+        abstract_object_pointert new_object=map[entry.first]->merge(
+          entry.second, object_modified);
 
       modified|=object_modified;
-      map[entry.first]=new_object;
+        map[entry.first]=new_object;
 
-    }
+      }
 
-    if(map[entry.first]->is_top())
-    {
-      map.erase(entry.first);
-      is_bottom=false;
-      modified=true;
+      if(map[entry.first]->is_top())
+      {
+        map.erase(entry.first);
+        modified=true;
 #ifdef DEBUG
       std::cout << "Removing " << entry.first.get_identifier() << std::endl;
 #endif
+      }
     }
-  }
 
-  std::vector<map_keyt> to_remove;
-  for(const auto &entry : map)
-  {
-    if(env.map.find(entry.first)==env.map.end())
+    std::vector<map_keyt> to_remove;
+    for(const auto &entry : map)
     {
-      to_remove.push_back(entry.first);
+      if(env.map.find(entry.first)==env.map.end())
+      {
+        to_remove.push_back(entry.first);
+      }
     }
-  }
-  for(const map_keyt &key_to_remove : to_remove)
-  {
-    map.erase(key_to_remove);
+    for(const map_keyt &key_to_remove : to_remove)
+    {
+      map.erase(key_to_remove);
 #ifdef DEBUG
     std::cout << "Removing " << key_to_remove.get_identifier() << std::endl;
 #endif
-  }
+      modified=true;
+    }
 
-  return modified;
+    return modified;
+  }
 }
 
 /*******************************************************************\

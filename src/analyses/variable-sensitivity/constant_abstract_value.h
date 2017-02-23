@@ -28,15 +28,13 @@ public:
 
   virtual exprt to_constant (void) const;
 
-  virtual bool operator==(const abstract_objectt &other) const;
-
   virtual void output(
     std::ostream &out,
     const class ai_baset &ai,
     const class namespacet &ns);
 
 protected :
-  void merge_state(
+  bool merge_state(
     constant_abstract_value_pointert op1,
     constant_abstract_value_pointert op2);
 

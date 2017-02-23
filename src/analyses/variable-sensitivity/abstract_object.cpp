@@ -105,12 +105,14 @@ Function: abstract_objectt::merge_state
 
 \*******************************************************************/
 
-void abstract_objectt::merge_state(
+bool abstract_objectt::merge_state(
   const abstract_object_pointert op1, const abstract_object_pointert op2)
 {
   top=op1->top||op2->top;
   bottom=op1->bottom && op2->bottom;
+
   assert(!(top && bottom));
+  return top!=op1->top || bottom!=op1->bottom;
 }
 
 /*******************************************************************\
@@ -132,8 +134,7 @@ abstract_object_pointert abstract_objectt::merge(
 {
   assert(type==op->type);
   abstract_object_pointert m=abstract_object_pointert(new abstract_objectt(*this));
-  m->merge_state(abstract_object_pointert(new abstract_objectt(*this)), op);
-  out_any_modifications=!(*m==*this);
+  out_any_modifications=m->merge_state(abstract_object_pointert(this), op);
   return m;
 }
 
@@ -223,23 +224,4 @@ void abstract_objectt::output(
   {
     out << "Unknown";
   }
-}
-
-/*******************************************************************\
-
-Function: abstract_objectt::operator==
-
-  Inputs:
-   other - the abstract_object to compare
-
- Outputs: Returns true if the two abstract objects are equivalent
-
- Purpose: Check to AOs are representing the same value according to
-          their sensitivity.
-
-\*******************************************************************/
-
-bool abstract_objectt::operator==(const abstract_objectt &other) const
-{
-  return top==other.top && bottom==other.bottom;
 }
