@@ -10,6 +10,7 @@
 
 class typet;
 class constant_exprt;
+class abstract_environmentt;
 
 #include <util/expr.h>
 #include <memory>
@@ -77,6 +78,9 @@ public:
   // It uses merge state to
   virtual abstract_object_pointert merge(
     const abstract_object_pointert op, bool &out_any_modifications);
+
+  // Interface for transforms
+  //abstract_object_pointert expression_transform_logical(const exprt &expr, abstract_environmentt &environment);
 
   virtual exprt to_constant() const;
 
