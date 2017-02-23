@@ -42,8 +42,7 @@ class constant_exprt;
     current_type_ptrt m=current_type_ptrt(new current_typet(*this)); \
     if (n!= NULL) \
     { \
-      m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
-      out_any_modifications=!(*this==*m); \
+      out_any_modifications=m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
       return m; \
     } \
     else \
@@ -71,7 +70,7 @@ public:
   virtual bool is_bottom() const;
 
   // Sets the state of this object
-  void merge_state(
+  bool merge_state(
     const abstract_object_pointert op1, const abstract_object_pointert op2);
 
   // This is both the interface and the base case of the recursion
@@ -85,8 +84,6 @@ public:
     std::ostream &out, const class ai_baset &ai, const class namespacet &ns);
 
   CLONE
-
-  virtual bool operator==(const abstract_objectt &other) const;
 
 protected:
   typet type;
