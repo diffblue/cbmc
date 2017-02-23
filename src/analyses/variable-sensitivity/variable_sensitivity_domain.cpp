@@ -66,7 +66,7 @@ void variable_sensitivity_domaint::transform(
       const code_assignt &inst = to_code_assign(instruction.code);
 
       // TODO : check return values
-      abstract_object_pointert r = abstract_state.eval(inst.rhs());
+      abstract_object_pointert r = abstract_state.eval(inst.rhs(), ns);
       abstract_state.assign(inst.lhs(), r);
     }
     break;
@@ -89,7 +89,7 @@ void variable_sensitivity_domaint::transform(
     break;
 
   case ASSUME:
-    abstract_state.assume(instruction.guard);
+    abstract_state.assume(instruction.guard, ns);
     break;
 
   case FUNCTION_CALL:
@@ -256,7 +256,7 @@ bool variable_sensitivity_domaint::ai_simplify(
     return false;
   else
   {
-    sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition);
+    sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition, ns);
     exprt c = res->to_constant();
 
     if (c.id() == ID_nil)
