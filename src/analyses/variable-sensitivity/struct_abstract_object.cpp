@@ -127,6 +127,7 @@ Function: struct_abstract_objectt::write_component
    environment - the abstract environment
    stack - the remaining stack of expressions on the LHS to evaluate
    member_expr - the expression uses to access a specific component
+   value - the value we are trying to write to the component
 
  Outputs: The struct_abstract_objectt representing the result of writing
           to a specific component. In this case this will always be top
@@ -146,7 +147,8 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
 {
   if(is_top())
   {
-    return sharing_ptrt<struct_abstract_objectt>(this);
+    return sharing_ptrt<struct_abstract_objectt>(
+      new struct_abstract_objectt(*this));
   }
   else
   {
