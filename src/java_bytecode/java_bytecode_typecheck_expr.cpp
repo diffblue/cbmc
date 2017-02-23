@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iomanip>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/std_expr.h>
 #include <util/prefix.h>
@@ -16,8 +19,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include "java_bytecode_typecheck.h"
+#include "java_object_factory.h"
 #include "java_pointer_casts.h"
 #include "java_types.h"
+
+java_bytecode_typecheckt::java_bytecode_typecheckt(
+  symbol_tablet &_symbol_table, message_handlert &_message_handler)
+  : typecheckt(_message_handler), symbol_table(_symbol_table), ns(symbol_table)
+{
+}
 
 /*******************************************************************\
 
@@ -47,11 +57,33 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_symbol(to_symbol_expr(expr));
   else if(expr.id()==ID_side_effect)
   {
-    const irep_idt &statement=to_side_effect_expr(expr).get_statement();
-    if(statement==ID_java_new)
+    const irep_idt &statement = to_side_effect_expr(expr).get_statement();
+    if (statement == ID_java_new)
+    {
       typecheck_expr_java_new(to_side_effect_expr(expr));
-    else if(statement==ID_java_new_array)
+    }
+    else if (statement == ID_java_new_array)
+    {
       typecheck_expr_java_new_array(to_side_effect_expr(expr));
+    }
+    else if (statement == ID_nondet)
+    {
+      //  TODO set this properly.
+      size_t max_nondet_array_length = 100;
+
+      const typet &type = expr.type();
+
+      code_blockt init_code;
+      expr = object_factory(type,
+                            init_code,
+                            true,
+                            symbol_table,
+                            max_nondet_array_length,
+                            type.source_location(),
+                            get_message_handler());
+
+      typecheck_code(init_code);
+    }
   }
   else if(expr.id()==ID_java_string_literal)
     typecheck_expr_java_string_literal(expr);
