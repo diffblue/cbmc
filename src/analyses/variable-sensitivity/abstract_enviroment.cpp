@@ -184,7 +184,10 @@ bool abstract_environmentt::assign(
 
     typedef std::function<
       abstract_object_pointert(
-        abstract_object_pointert, std::stack<exprt>)> stacion_functiont;
+        abstract_object_pointert,  // The symbol we are modifying
+        std::stack<exprt>, // The remaining stack
+        abstract_object_pointert)> // The value we are writing.
+        stacion_functiont;
 
     // Each handler takes the abstract object referenced, copies it,
     // writes according to the type of expression (e.g. for ID_member)
@@ -192,11 +195,13 @@ bool abstract_environmentt::assign(
     // write_member which will attempt to update the abstract object for the
     // relevant member. This modified abstract object is returned and this
     // is inserted back into the map
-    static std::map<irep_idt,stacion_functiont> handlers=
+    std::map<irep_idt,stacion_functiont> handlers=
     {
       {
         ID_index, [&](
-          const abstract_object_pointert lhs_object, std::stack<exprt> stack)
+          const abstract_object_pointert lhs_object,
+          std::stack<exprt> stack,
+          abstract_object_pointert rhs_object)
         {
           // TODO(tkiley): At this point we would cast the AO pointer to an
           // array_abstract_objectt
@@ -208,19 +213,23 @@ bool abstract_environmentt::assign(
       },
       {
         ID_member, [&](
-          const abstract_object_pointert lhs_object, std::stack<exprt> stack)
+          const abstract_object_pointert lhs_object,
+          std::stack<exprt> stack,
+          abstract_object_pointert rhs_object)
         {
           sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
             std::dynamic_pointer_cast<struct_abstract_objectt>(lhs_object);
           sharing_ptrt<struct_abstract_objectt> modified_struct=
             struct_abstract_object->write_component(
-              *this, stactions, to_member_expr(next_expr));
+              *this, stactions, to_member_expr(next_expr), rhs_object);
           return modified_struct;
         }
       },
       {
         ID_dereference, [&](
-          const abstract_object_pointert lhs_object, std::stack<exprt> stack)
+          const abstract_object_pointert lhs_object,
+          std::stack<exprt> stack,
+          abstract_object_pointert rhs_object)
         {
           // TODO(tkiley): Same as with index
           return abstract_object_factory(lhs_object->get_type(), true);
@@ -230,7 +239,7 @@ bool abstract_environmentt::assign(
 
     // We added something to the stack that we couldn't deal with
     assert(handlers.find(next_expr.id())!=handlers.end());
-    final_value=handlers[next_expr.id()](value, stactions);
+    final_value=handlers[next_expr.id()](map[symbol_expr], stactions, value);
   }
   else
   {
