@@ -26,6 +26,7 @@ target_link_libraries(java-unit
         goto-programs
         goto-instrument-lib
         cbmc-lib
+        json-symtab-language
 )
 
 add_test(

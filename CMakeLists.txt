@@ -66,6 +66,7 @@ set_target_properties(
     goto-symex
     jsil
     json
+    json-symtab-language
     langapi
     linking
     pointer-analysis

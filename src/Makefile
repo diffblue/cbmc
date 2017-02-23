@@ -12,6 +12,7 @@ DIRS = analyses \
        goto-symex \
        jsil \
        json \
+       json-symtab-language \
        langapi \
        linking \
        pointer-analysis \
@@ -41,7 +42,7 @@ cpp.dir: ansi-c.dir linking.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
-           jsil.dir
+           jsil.dir json-symtab-language.dir
 
 solvers.dir: util.dir langapi.dir
 

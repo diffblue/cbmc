@@ -17,6 +17,7 @@ target_link_libraries(cbmc-lib
     goto-programs
     goto-symex
     json
+    json-symtab-language
     langapi
     linking
     pointer-analysis

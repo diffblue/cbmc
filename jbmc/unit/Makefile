@@ -108,6 +108,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
               $(CPROVER_DIR)/src/cpp/cpp$(LIBEXT) \
               $(CPROVER_DIR)/src/json/json$(LIBEXT) \
+              $(CPROVER_DIR)/src/json-symtab-language/json-symtab-language$(LIBEXT) \
               $(CPROVER_DIR)/src/linking/linking$(LIBEXT) \
               $(CPROVER_DIR)/src/util/util$(LIBEXT) \
               $(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) \
