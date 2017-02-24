@@ -14,9 +14,8 @@ Date:   September 2016
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/string_expr.h>
+#include <util/refined_string_type.h>
 #include <goto-programs/class_identifier.h>
-// TODO: refined_string_type should be moved to util
-#include <solvers/refinement/refined_string_type.h>
 #include <java_bytecode/java_types.h>
 
 #include "string_refine_preprocess.h"
