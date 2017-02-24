@@ -250,14 +250,14 @@ bool abstract_environmentt::assign(
   }
 
   // Write the value for the root symbol back into the map
-  if (value->is_top())
+  if (final_value->is_top())
   {
     map.erase(symbol_expr);
 
   }
   else
   {
-    map[symbol_expr]=value;
+    map[symbol_expr]=final_value;
   }
   return true;
 }
