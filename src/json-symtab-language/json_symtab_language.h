@@ -35,6 +35,11 @@ public:
     return true;
   }
 
+  virtual std::set<std::string> extensions() const override
+  {
+    return {"json_symtab"};
+  }
+
   std::unique_ptr<languaget> new_language() override
   {
     return util_make_unique<json_symtab_languaget>();
@@ -49,5 +54,10 @@ public:
 protected:
   jsont parsed_json_file;
 };
+
+inline std::unique_ptr<languaget> new_json_symtab_language()
+{
+  return util_make_unique<json_symtab_languaget>();
+}
 
 #endif
