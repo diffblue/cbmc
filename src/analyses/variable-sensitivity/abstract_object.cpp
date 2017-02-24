@@ -145,46 +145,63 @@ abstract_object_pointert abstract_objectt::merge(
   return m;
 }
 
-abstract_object_pointert abstract_objectt::expression_transform_binary(
+/*******************************************************************\
+
+Function: abstract_objectt::expression_transform
+
+  Inputs:
+   expr - the expression to evaluate and find the result of it. this will
+          be the symbol referred to be op0()
+
+ Outputs: Returns the abstract_object representing the result of this expression
+          to the maximum precision available.
+
+ Purpose: To try and resolve different expressions with the maximum level
+          of precision available.
+
+\*******************************************************************/
+
+abstract_object_pointert abstract_objectt::expression_transform(
   const exprt &expr,
   const abstract_environmentt &environment,
   const namespacet &ns) const
 {
-  assert(expr.operands().size()==2);
-
-  abstract_object_pointert lhs_abstract_object=environment.eval(expr.op0(), ns);
-  abstract_object_pointert rhs_abstract_object=environment.eval(expr.op1(), ns);
-
-  const exprt &lhs_value=lhs_abstract_object->to_constant();
-  const exprt &rhs_value=rhs_abstract_object->to_constant();
-
-  if(lhs_value.id()==ID_nil || rhs_value.id()==ID_nil)
+  exprt constant_replaced_expr=expr;
+  constant_replaced_expr.operands().clear();
+  for(const exprt &op : expr.operands())
   {
-    // One or both of the values is unknown so therefore we can't conclude
-    // whether this is true or false
-    return abstract_object_pointert(
-      new abstract_objectt(expr.type(), true, false));
-  }
-  else
-  {
-    exprt constant_replaced_expr=expr;
-    constant_replaced_expr.operands()[0]=lhs_value;
-    constant_replaced_expr.operands()[1]=rhs_value;
-    exprt simplified=simplify_expr(constant_replaced_expr, ns);
-    if(simplified.is_constant())
+    abstract_object_pointert lhs_abstract_object=environment.eval(op, ns);
+    const exprt &lhs_value=lhs_abstract_object->to_constant();
+
+    if(lhs_value.is_nil())
     {
-      constant_exprt constant_expr=to_constant_expr(simplified);
-
-      // TODO(tkiley): This should be going through the abstract_object_factory
-      // but at the moment this produces a two value abstraction for type bool
-      // so for now we force it to be the constant abstraction
+      // One of the values is true so we can't really do anything more with
+      // this expression and should just return top for the result
       return abstract_object_pointert(
-        new constant_abstract_valuet(constant_expr));
+        new abstract_objectt(expr.type(), true, false));
     }
     else
     {
-      return environment.abstract_object_factory(expr.type(), true, false);
+      // rebuild the operands list with constant versions of
+      // any symbols
+      constant_replaced_expr.operands().push_back(lhs_value);
     }
+  }
+
+  exprt simplified=simplify_expr(constant_replaced_expr, ns);
+  if(simplified.is_constant())
+  {
+    constant_exprt constant_expr=to_constant_expr(simplified);
+
+    // TODO(tkiley): This should be going through the abstract_object_factory
+    // but at the moment this produces a two value abstraction for type bool
+    // so for now we force it to be the constant abstraction
+    return abstract_object_pointert(
+      new constant_abstract_valuet(constant_expr));
+  }
+  else
+  {
+    return environment.abstract_object_factory(expr.type(), true, false);
   }
 }
 

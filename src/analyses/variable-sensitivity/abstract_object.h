@@ -81,7 +81,7 @@ public:
     const abstract_object_pointert op, bool &out_any_modifications);
 
   // Interface for transforms
-  abstract_object_pointert expression_transform_binary(
+  abstract_object_pointert expression_transform(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns) const;
