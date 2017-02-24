@@ -21,7 +21,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
 #include <util/string_expr.h>
-#include <solvers/refinement/refined_string_type.h>
+#include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
 class string_constraint_generatort

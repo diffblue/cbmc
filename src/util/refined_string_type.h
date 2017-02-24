@@ -16,8 +16,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   `content` of type `content_type`. This module also defines functions to
 ///   recognise the C and java string types.
 
-#ifndef CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
-#define CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
+#ifndef CPROVER_UTIL_REFINED_STRING_TYPE_H
+#define CPROVER_UTIL_REFINED_STRING_TYPE_H
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
