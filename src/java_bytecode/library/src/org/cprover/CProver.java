@@ -93,26 +93,25 @@ public final class CProver
     return 0;
   }
 
-  public static <T> T nondetWithNull()
+  //  Set a variable to a nondeterminate state, which may be null.
+  public static <T> void nondetWithNull(T t)
   {
     if (enableNondet)
     {
       throw new RuntimeException(
-        "Cannot execute program with CProver.nondetWithNull<T>()");
+        "Cannot execute program with CProver.nondetWithNull<T>(T)");
     }
-
-    return null;
   }
 
-  public static <T> T nondetWithoutNull()
+  //  Set a variable to a nondeterminate state, which must NOT be nullptr, but
+  //  reference fields of the object may be null.
+  public static <T> void nondetWithoutNull(T t)
   {
     if (enableNondet)
     {
       throw new RuntimeException(
-        "Cannot execute program with CProver.nondetWithoutNull<T>()");
+        "Cannot execute program with CProver.nondetWithoutNull<T>(T)");
     }
-
-    return null;
   }
 
   public static void assume(boolean condition) 
