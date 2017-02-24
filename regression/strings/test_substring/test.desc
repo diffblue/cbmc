@@ -1,10 +1,10 @@
 FUTURE
 test.c
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_string_equal\(t,__CPROVER_string_literal\("cd"\)): SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_string_equal\(t,__CPROVER_string_literal\("cc"\)): FAILURE$
-^\[main.assertion.3\] assertion !__CPROVER_string_equal\(t,__CPROVER_string_literal\("bc"\)): SUCCESS$
-^\[main.assertion.4\] assertion !__CPROVER_string_equal\(t,__CPROVER_string_literal\("cd"\)): FAILURE$
+^\[.*assertion.1\].* SUCCESS$
+^\[.*assertion.2\].* FAILURE$
+^\[.*assertion.3\].* SUCCESS$
+^\[.*assertion.4\].* FAILURE$
 --
