@@ -121,9 +121,9 @@ abstract_object_pointert abstract_environmentt::eval(
   {
     // No special handling required by the abstract environment
     // delegate to the abstract object
-    if(expr.operands().size()==2)
+    if(expr.operands().size()>0)
     {
-      return eval_binary_operations(expr, ns);
+      return eval_expression(expr, ns);
     }
     else
     {
@@ -561,13 +561,13 @@ void abstract_environmentt::output(
   out << "}\n";
 }
 
-abstract_object_pointert abstract_environmentt::eval_binary_operations(
+abstract_object_pointert abstract_environmentt::eval_expression(
   const exprt &e, const namespacet &ns) const
 {
   // Delegate responsibility of resolving to a boolean abstract object
   // to the abstract object being compared against
   abstract_object_pointert lhs=eval(e.op0(), ns);
-  return lhs->expression_transform_binary(e, *this, ns);
+  return lhs->expression_transform(e, *this, ns);
 }
 
 abstract_object_pointert abstract_environmentt::eval_rest(const exprt &e) const

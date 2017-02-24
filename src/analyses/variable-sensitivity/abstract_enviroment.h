@@ -51,7 +51,7 @@ protected:
   bool is_bottom;
 
  // We may need to break out more of these cases into these
- virtual abstract_object_pointert eval_binary_operations(
+ virtual abstract_object_pointert eval_expression(
     const exprt &e, const namespacet &ns) const;
 
  // Hook for domain specific handling of operators
