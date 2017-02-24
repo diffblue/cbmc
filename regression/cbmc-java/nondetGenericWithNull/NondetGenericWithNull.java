@@ -1,8 +1,6 @@
 import org.cprover.CProver;
 
-class A { }
-
-class B { A a; }
+class B { int a; }
 
 class NondetGenericWithNull
 {
@@ -11,5 +9,6 @@ class NondetGenericWithNull
     B b = null;
     CProver.nondetWithNull(b);
     assert b != null;
+    assert b.a != 0;
   }
 }

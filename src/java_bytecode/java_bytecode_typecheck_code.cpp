@@ -6,7 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include "java_bytecode_typecheck.h"
+#include "java_object_factory.h"
 
 /*******************************************************************\
 
@@ -27,16 +32,49 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
   if(statement==ID_assign)
   {
     code_assignt &code_assign=to_code_assign(code);
+
+    //  Now that we've (possibly) converted nondet calls into actual code,
+    //  we can continue typechecking each side.
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
 
     if(code_assign.lhs().type()!=code_assign.rhs().type())
       code_assign.rhs().make_typecast(code_assign.lhs().type());
   }
+  else if(statement==ID_nondet_initializer_block)
+  {
+    //  Cast the expression to a 'nondet initializer block'.
+    const auto &nondet=to_nondet_initializer_block(code);
+    //  Find the type of the nondet expression.
+    const auto &nondet_argument=nondet.statement_to_initialize();
+
+    //  Create code to initialize the nondet object.
+    code_blockt init_code;
+    const auto output=object_factory(
+      nondet_argument.type(),
+      init_code,
+      nondet.get_allow_null(),
+      symbol_table,
+      max_nondet_array_length,
+      nondet_argument.source_location(),
+      get_message_handler());
+
+    //  Create a new code block, containing the generated init_code, followed by
+    //  the an assignment setting the passed variable to the newly-initialized
+    //  value.
+    code_blockt new_code(
+      std::list<codet>{init_code, code_assignt(nondet_argument, output)});
+
+    //  Replace the current code with the newly-created code, and typecheck it.
+    code=new_code;
+    typecheck_code(new_code);
+  }
   else if(statement==ID_block)
   {
-    Forall_operands(it, code)
+    Forall_operands(it, to_code_block(code))
+    {
       typecheck_code(to_code(*it));
+    }
   }
   else if(statement==ID_label)
   {

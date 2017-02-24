@@ -1108,136 +1108,118 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
 
     // replace calls to CProver.assume
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.assume:(Z)V"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.assume:(Z)V"))
     {
-      const code_typet &code_type = to_code_type(arg0.type());
+      const code_typet &code_type=to_code_type(arg0.type());
       // sanity check: function has the right number of args
-      assert(code_type.parameters().size() == 1);
+      assert(code_type.parameters().size()==1);
 
-      exprt operand = pop(1)[0];
+      exprt operand=pop(1)[0];
       // we may need to adjust the type of the argument
-      if (operand.type() != bool_typet())
+      if(operand.type()!=bool_typet())
         operand.make_typecast(bool_typet());
 
-      c = code_assumet(operand);
-      source_locationt loc = i_it->source_location;
+      c=code_assumet(operand);
+      source_locationt loc=i_it->source_location;
       loc.set_function(method_id);
-      c.add_source_location() = loc;
+      c.add_source_location()=loc;
     }
 
     //  if the statement is a nondet boolean
-    else if (statement_is_static_with_name(
-                 statement, arg0,
-                 "java::org.cprover.CProver.nondetBoolean:()Z"))
+    else if(statement_is_static_with_name(
+                statement, arg0,
+                "java::org.cprover.CProver.nondetBoolean:()Z"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_boolean_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_boolean_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet byte
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetByte:()B"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetByte:()B"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_byte_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_byte_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet char
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetChar:()C"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetChar:()C"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_char_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_char_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet short
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetShort:()S"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetShort:()S"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_short_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_short_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet int
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetInt:()I"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetInt:()I"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_int_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_int_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet long
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetLong:()J"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetLong:()J"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_long_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_long_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet float
-    else if (statement_is_static_with_name(
-                 statement, arg0, "java::org.cprover.CProver.nondetFloat:()F"))
+    else if(statement_is_static_with_name(
+                statement, arg0, "java::org.cprover.CProver.nondetFloat:()F"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_float_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_float_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  if the statement is a nondet double
-    else if (statement_is_static_with_name(
+    else if(statement_is_static_with_name(
                  statement, arg0, "java::org.cprover.CProver.nondetDouble:()D"))
     {
       results.resize(1);
-      results[0] = side_effect_expr_nondett(java_double_type());
-      results[0].add_source_location() = i_it->source_location;
+      results[0]=side_effect_expr_nondett(java_double_type());
+      results[0].add_source_location()=i_it->source_location;
     }
 
     //  To catch the return type of the nondet call, we have to check the
     //  next statement for an assignment.
-    //  Check that the statement is static, with the correct signature, and
-    //  that the working set still has remaining items.
-    //  TODO this will break if the user edits cprover.CProver and adds another
-    //  method that begins with 'nondetWith'.
-    else if (!working_set.empty() && statement == "invokestatic" &&
-             has_prefix(id2string(arg0.get(ID_identifier)),
-                        "java::org.cprover.CProver.nondetWith"))
+    //  Check that the statement is static, with the correct signature.
+    else if(statement=="invokestatic" &&
+            has_prefix(id2string(arg0.get(ID_identifier)),
+                       "java::org.cprover.CProver.nondetWith"))
     {
-      //  For the type search to succeed, the next instruction must be a
-      //  checkcast.
-      //  Find the next item in the working set, and look up that item in the
-      //  address map.
-      address_mapt::iterator next_it = address_map.find(*working_set.begin());
-      assert(next_it != address_map.end());
+      const code_typet &code_type=to_code_type(arg0.type());
+      // Check function has the right number of args.
+      assert(code_type.parameters().size()==1);
 
-      instructionst::const_iterator next_source_it = next_it->second.source;
-
-      //  Check that the statement is a checkcast with an argument of the
-      //  correct type.
-      assert(next_source_it->statement == "checkcast");
-      assert(next_source_it->args.size() >= 1);
-      assert(next_source_it->args[0].type().id() == ID_symbol);
-      const auto java_object_type = next_source_it->args[0].type();
-
-      //  Create somewhere to store the result, and set the source location.
-      results.resize(1);
-      results[0].add_source_location() = i_it->source_location;
-
-      auto nondet_result =
-        side_effect_expr_nondett(java_reference_type(java_object_type));
-      //  If the function call contains 'nondetWithNull' then allow nulls.
-      nondet_result.set_allow_null(
+      // Find whether the signature is for the nullable version or not.
+      const bool allow_null=
         has_prefix(id2string(arg0.get(ID_identifier)),
-                   "java::org.cprover.CProver.nondetWithNull"));
+                   "java::org.cprover.CProver.nondetWithNull");
 
-      //  Set the result to a nondet of the correct type.
-      results[0] = nondet_result;
+      c=nondet_initializer_blockt(
+        to_symbol_expr(to_typecast_expr(pop(1)[0]).op()), allow_null);
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      c.add_source_location()=loc;
     }
 
     else if(statement=="invokeinterface" ||

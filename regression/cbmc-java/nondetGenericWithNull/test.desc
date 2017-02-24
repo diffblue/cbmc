@@ -1,0 +1,6 @@
+CORE
+NondetGenericWithNull.class
+--function NondetGenericWithNull.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

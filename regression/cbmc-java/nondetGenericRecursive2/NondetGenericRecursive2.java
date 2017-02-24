@@ -1,15 +1,25 @@
 import org.cprover.CProver;
 
-class B { int a; }
+class A
+{
+}
 
-class C { B b; }
+class B
+{
+  A a;
+}
 
-class NondetGenericWithoutNull
+class C
+{
+  B b;
+}
+
+class NondetGenericRecursive2
 {
   static void foo()
   {
     C c = null;
     CProver.nondetWithoutNull(c);
-    assert c != null;
+    assert c.b.a != null;
   }
 }

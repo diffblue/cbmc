@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include "java_bytecode_typecheck.h"
-#include "java_object_factory.h"
 #include "java_pointer_casts.h"
 #include "java_types.h"
 
@@ -71,29 +70,6 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     else if (statement == ID_java_new_array)
     {
       typecheck_expr_java_new_array(side_effect_expr);
-    }
-    else if (statement == ID_nondet)
-    {
-      const side_effect_expr_nondett &nondet_expr =
-        to_side_effect_expr_nondet(side_effect_expr);
-
-#ifdef DEBUG
-      std::cerr << "nondet_expr: " << nondet_expr.pretty() << '\n';
-#endif
-
-      const typet &type = nondet_expr.type();
-      const auto allow_null = nondet_expr.get_allow_null();
-
-      code_blockt init_code;
-      expr = object_factory(type,
-                            init_code,
-                            allow_null,
-                            symbol_table,
-                            max_nondet_array_length,
-                            type.source_location(),
-                            get_message_handler());
-
-      typecheck_code(init_code);
     }
   }
   else if(expr.id()==ID_java_string_literal)

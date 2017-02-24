@@ -6,6 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <cassert>
 
 #include <util/cprover_prefix.h>
@@ -905,6 +909,7 @@ void goto_convertt::convert_assign(
 
     copy(new_assign, ASSIGN, dest);
   }
+
   else
   {
     clean_expr(rhs, dest);
