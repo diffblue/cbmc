@@ -172,3 +172,13 @@ Output:
 - Use '\n' instead of std::endl
 
 You are allowed to break rules if you have a good reason to do so.
+
+Pre-commit hook to run cpplint locally
+--------------------------------------
+To install the hook
+cp .githooks/pre-commit .git/hooks/pre-commit
+or use a symbolic link.
+Then, when running git commit, you should get the linter output
+(if any) before being prompted to enter a commit message.
+To bypass the check (e.g. if there was a false positive),
+add the option --no-verify.
