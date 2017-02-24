@@ -15,6 +15,7 @@
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/ai.h>
+#include <util/simplify_expr.h>
 
 
 #ifdef DEBUG
@@ -108,31 +109,27 @@ abstract_object_pointert abstract_environmentt::eval(
       }
     }
   };
-  #if 0
-  [&](const exprt &expr)
-        {
-          return abstract_object_factory(
-            expr.type(), to_constant_expr(expr));
-        }
-      }
-#endif
-  const auto &handler=handlers.find(expr.id());
+
+  // first try to collapse constant folding
+  const exprt &simplified_expr=simplify_expr(expr, ns);
+
+  const auto &handler=handlers.find(simplified_expr.id());
   if(handler==handlers.cend())
   {
     // No special handling required by the abstract environment
     // delegate to the abstract object
-    if(expr.operands().size()>0)
+    if(simplified_expr.operands().size()>0)
     {
-      return eval_expression(expr, ns);
+      return eval_expression(simplified_expr, ns);
     }
     else
     {
-      return abstract_object_factory(expr.type(), true);
+      return abstract_object_factory(simplified_expr.type(), true);
     }
   }
   else
   {
-    return handler->second(expr);
+    return handler->second(simplified_expr);
   }
 }
 
@@ -317,7 +314,7 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet type, bool top, bool bottom) const
 {
   // TODO (tkiley): Here we should look at some config file
-  if(type.id()==ID_signedbv)
+  if(type.id()==ID_signedbv || type.id()==ID_bool || type.id()==ID_c_bool)
   {
     return abstract_object_pointert(
       new constant_abstract_valuet(type, top, bottom));
@@ -347,7 +344,7 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
   const typet type, const constant_exprt e) const
 {
   assert(type==e.type());
-  if(type.id()==ID_signedbv)
+  if(type.id()==ID_signedbv || type.id()==ID_bool || type.id()==ID_c_bool)
   {
     return abstract_object_pointert(
       new constant_abstract_valuet(e));
