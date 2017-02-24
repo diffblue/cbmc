@@ -4,12 +4,14 @@ class A { }
 
 class B { A a; }
 
+class C { B b; }
+
 class NondetGenericWithoutNull
 {
   static void foo()
   {
-    B b = null;
-    CProver.nondetWithoutNull(b);
-    assert b != null;
+    C c = null;
+    CProver.nondetWithoutNull(c);
+    assert c != null;
   }
 }
