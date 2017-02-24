@@ -1,8 +1,0 @@
-FUTURE
-test_suffix.class
---string-refine
-^EXIT=10$
-^SIGNAL=0$
-^\[assertion.1\] assertion at file test_suffix.java line 12: SUCCESS$
-^\[assertion.2\] assertion at file test_suffix.java line 13: FAILURE$
---
