@@ -1,0 +1,7 @@
+FUTURE
+test_intern.class
+--refine-strings
+^EXIT=0$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 9.* SUCCESS$
+--

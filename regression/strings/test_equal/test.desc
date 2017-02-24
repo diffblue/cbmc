@@ -1,8 +1,8 @@
 FUTURE
 test.c
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main.assertion.1\] assertion __CPROVER_string_equal\(s, __CPROVER_string_literal\("pippo"\)): SUCCESS$
-^\[main.assertion.2\] assertion __CPROVER_string_equal\(s, __CPROVER_string_literal\("mippo"\)): FAILURE$
+^\[.*.assertion.1\].* SUCCESS$
+^\[.*.assertion.2\].* FAILURE$
 --
