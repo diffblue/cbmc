@@ -1,4 +1,4 @@
-#include <assert.h>
+
 const int xLen = 10;
 const int Alen = 2;
 const int Blen = 1;

@@ -32,10 +32,7 @@ public:
     locationt from,
     locationt to)
   {
-    // assert(src.reachable);
-
-    if(!src.reachable)
-      return false;
+    assert(src.reachable);
 
     bool old_reachable=reachable;
     bool old_is_threaded=is_threaded;
@@ -53,10 +50,7 @@ public:
     ai_baset &ai,
     const namespacet &ns) final override
   {
-    // assert(reachable);
-
-    if(!reachable)
-      return;
+    assert(reachable);
 
     if(from->is_start_thread())
       is_threaded=true;
