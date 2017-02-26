@@ -1,0 +1,8 @@
+FUTURE
+StringBuilderChars03.class
+--string-refine --unwind 100
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
