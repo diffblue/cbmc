@@ -347,34 +347,15 @@ inline code_assertt &to_code_assert(codet &code)
 class nondet_initializer_blockt:public codet
 {
 public:
-  inline nondet_initializer_blockt(
-    const exprt &symbol_expr,
-    bool allow_null):
-    codet(ID_nondet_initializer_block)
-  {
-    copy_to_operands(symbol_expr);
-    set_allow_null(allow_null);
-  }
+  nondet_initializer_blockt(const exprt &symbol_expr, bool allow_null);
 
-  inline const exprt &statement_to_initialize() const
-  {
-    return op0();
-  }
+  const exprt &statement_to_initialize() const;
 
-  inline exprt &statement_to_initialize()
-  {
-    return op0();
-  }
+  exprt &statement_to_initialize();
 
-  inline void set_allow_null(bool b)
-  {
-    set(ID_nondet_allow_null, b);
-  }
+  void set_allow_null(bool b);
 
-  inline bool get_allow_null() const
-  {
-    return get_bool(ID_nondet_allow_null);
-  }
+  bool get_allow_null() const;
 };
 
 static inline const nondet_initializer_blockt &
@@ -1096,7 +1077,7 @@ public:
 static inline const side_effect_expr_nondett &
   to_side_effect_expr_nondet(const exprt &expr)
 {
-  const auto& x = to_side_effect_expr(expr);
+  const auto &x = to_side_effect_expr(expr);
   assert(x.get_statement() == ID_nondet);
   return static_cast<const side_effect_expr_nondett &>(x);
 }
@@ -1104,7 +1085,7 @@ static inline const side_effect_expr_nondett &
 static inline side_effect_expr_nondett &
   to_side_effect_expr_nondet(exprt &expr)
 {
-  auto& x = to_side_effect_expr(expr);
+  auto &x = to_side_effect_expr(expr);
   assert(x.get_statement() == ID_nondet);
   return static_cast<side_effect_expr_nondett &>(x);
 }
