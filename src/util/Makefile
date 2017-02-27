@@ -43,6 +43,7 @@ SRC = arith_tools.cpp \
       message.cpp \
       mp_arith.cpp \
       namespace.cpp \
+      nondet_ifthenelse.cpp \
       options.cpp \
       parse_options.cpp \
       parser.cpp \
@@ -52,6 +53,7 @@ SRC = arith_tools.cpp \
       rational.cpp \
       rational_tools.cpp \
       ref_expr_set.cpp \
+      refined_string_type.cpp \
       rename.cpp \
       rename_symbol.cpp \
       replace_expr.cpp \
