@@ -48,10 +48,6 @@ public:
     return components()[0].type();
   }
 
-  // For C the unrefined string type is __CPROVER_string
-
-  static bool is_c_string_type(const typet &type);
-
   static bool is_refined_string_type(const typet &type);
 
   constant_exprt index_of_int(int i) const
