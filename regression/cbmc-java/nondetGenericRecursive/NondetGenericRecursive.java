@@ -18,8 +18,7 @@ class NondetGenericRecursive
 {
   static void foo()
   {
-    C c = null;
-    CProver.nondetWithNull(c);
+    C c = CProver.nondetWithNull();
     assert c == null;
   }
 }

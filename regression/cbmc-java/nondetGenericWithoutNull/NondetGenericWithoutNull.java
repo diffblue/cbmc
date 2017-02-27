@@ -8,8 +8,7 @@ class NondetGenericWithoutNull
 {
   static void foo()
   {
-    C c = null;
-    CProver.nondetWithoutNull(c);
+    C c = CProver.nondetWithoutNull();
     assert c != null;
   }
 }
