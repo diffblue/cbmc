@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/language.h>
 #include <util/cmdline.h>
 #include <util/unicode.h>
+#include <util/std_types.h>
 
 #include "language_ui.h"
 #include "mode.h"
@@ -262,9 +263,9 @@ void language_uit::show_symbol_table_plain(
   // we want to sort alphabetically
   std::set<std::string> symbols;
 
-  forall_symbols(it, symbol_table.symbols)
-    symbols.insert(id2string(it->first));
-
+  for(const auto &symbol_entry : symbol_table.symbols)
+    symbols.insert(id2string(symbol_entry.first));
+  
   const namespacet ns(symbol_table);
 
   for(const std::string &id : symbols)
@@ -296,12 +297,20 @@ void language_uit::show_symbol_table_plain(
       continue;
     }
 
-    out << "Symbol......: " << symbol.name << '\n' << std::flush;
-    out << "Pretty name.: " << symbol.pretty_name << '\n';
+    if (!(symbol.type.id() == ID_code))
+      continue;
+
+    if (!(symbol.is_file_local))
+      continue;
+
+    out << "Symbol......: " << symbol.name << "\n\n" << std::flush;
+    continue;
+    out << "Pretty name.: " << symbol.pretty_name << "\n\n";
     out << "Module......: " << symbol.module << '\n';
     out << "Base name...: " << symbol.base_name << '\n';
     out << "Mode........: " << symbol.mode << '\n';
     out << "Type........: " << type_str << '\n';
+    out << "Is Function.: " << (symbol.type.id() == ID_code ? "True" : "False") << '\n';
     out << "Value.......: " << value_str << '\n';
     out << "Flags.......:";
 

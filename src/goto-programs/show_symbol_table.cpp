@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/language.h>
+#include <util/std_types.h>
 #include <langapi/mode.h>
 
 #include "goto_model.h"
@@ -52,8 +53,8 @@ void show_symbol_table_plain(
   // we want to sort alphabetically
   std::set<std::string> symbols;
 
-  forall_symbols(it, goto_model.symbol_table.symbols)
-    symbols.insert(id2string(it->first));
+  for(const auto &symbol_entry : goto_model.symbol_table.symbols)
+    symbols.insert(id2string(symbol_entry.first));
 
   const namespacet ns(goto_model.symbol_table);
 
@@ -86,6 +87,7 @@ void show_symbol_table_plain(
     out << "Base name...: " << symbol.base_name << '\n';
     out << "Mode........: " << symbol.mode << '\n';
     out << "Type........: " << type_str << '\n';
+    out << "Is Function.: " << (symbol.type.id() == ID_code) ? "TRUE" : "FALSE" << '\n';
     out << "Value.......: " << value_str << '\n';
     out << "Flags.......:";
 
