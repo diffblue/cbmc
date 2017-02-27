@@ -13,6 +13,7 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/ai.h>
 #include <util/simplify_expr.h>
@@ -62,7 +63,7 @@ abstract_object_pointert abstract_environmentt::eval(
       ID_constant, [&](const exprt &expr)
       {
         return abstract_object_factory(
-          expr.type(), to_constant_expr(expr));
+          expr.type(), to_constant_expr(expr), ns);
       }
     },
     {
@@ -79,12 +80,12 @@ abstract_object_pointert abstract_environmentt::eval(
     {
       ID_address_of, [&](const exprt &expr)
       {
-#if 0
-        address_of_exprt address_expr(to_address_of_expr(expr));
-#endif
-        // TODO(tkiley): This needs special handling
-        // For now just return top
-        return abstract_object_factory(expr.type(), true, false);
+        sharing_ptrt<pointer_abstract_objectt> pointer_object=
+          std::dynamic_pointer_cast<pointer_abstract_objectt>(
+            abstract_object_factory(expr.type(), expr, ns));
+
+        // Store the abstract object in the pointer
+        return pointer_object;
       }
     },
     {
@@ -341,6 +342,11 @@ abstract_object_pointert abstract_environmentt::abstract_object_factory(
     return abstract_object_pointert(
       new constant_abstract_valuet(type, top, bottom));
   }
+  else if(type.id()==ID_pointer)
+  {
+    return abstract_object_pointert(
+      new constant_pointer_abstract_objectt(type, top, bottom, *this));
+  }
   else
   {
     return abstract_object_pointert(new abstract_objectt(type, top, false));
@@ -363,13 +369,18 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet type, const constant_exprt e) const
+  const typet type, const exprt e, const namespacet &ns) const
 {
   assert(type==e.type());
   if(type.id()==ID_signedbv || type.id()==ID_bool || type.id()==ID_c_bool)
   {
     return abstract_object_pointert(
       new constant_abstract_valuet(e));
+  }
+  else if(type.id()==ID_pointer)
+  {
+    return abstract_object_pointert(
+      new constant_pointer_abstract_objectt(e, *this, ns));
   }
   else
   {

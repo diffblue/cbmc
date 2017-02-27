@@ -23,7 +23,7 @@ public:
   explicit pointer_abstract_objectt(const typet &type);
   pointer_abstract_objectt(const typet &type, bool top, bool bottom);
   explicit pointer_abstract_objectt(const pointer_abstract_objectt &old);
-  explicit pointer_abstract_objectt(const constant_exprt &expr);
+  explicit pointer_abstract_objectt(const exprt &e);
 
   CLONE
   MERGE(abstract_objectt)

@@ -86,8 +86,8 @@ Function: pointer_abstract_objectt::pointer_abstract_objectt
 
 \*******************************************************************/
 
-pointer_abstract_objectt::pointer_abstract_objectt(const constant_exprt &e):
-  abstract_objectt(e)
+pointer_abstract_objectt::pointer_abstract_objectt(const exprt &e):
+    abstract_objectt(e)
 {
   assert(e.type().id()==ID_pointer);
 }

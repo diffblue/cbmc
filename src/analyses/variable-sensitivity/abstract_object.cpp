@@ -87,7 +87,7 @@ Function: abstract_objectt::abstract_objectt
 
 \*******************************************************************/
 
-abstract_objectt::abstract_objectt(const constant_exprt &expr):
+abstract_objectt::abstract_objectt(const exprt &expr):
 type(expr.type()), top(true), bottom(false)
 {}
 
