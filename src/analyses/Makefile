@@ -29,6 +29,7 @@ SRC = ai.cpp \
       variable-sensitivity/abstract_value.cpp \
       variable-sensitivity/array_abstract_object.cpp \
       variable-sensitivity/constant_abstract_value.cpp \
+      variable-sensitivity/constant_pointer_abstract_object.cpp \
       variable-sensitivity/pointer_abstract_object.cpp \
       variable-sensitivity/struct_abstract_object.cpp \
       variable-sensitivity/variable_sensitivity_domain.cpp \

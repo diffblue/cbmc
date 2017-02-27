@@ -17,7 +17,7 @@ public:
  abstract_valuet(const typet &type);
  abstract_valuet(const typet &type, bool top, bool bottom);
  abstract_valuet(const abstract_valuet &old);
- abstract_valuet(const constant_exprt &expr);
+ abstract_valuet(const exprt &expr);
 
  CLONE
  MERGE(abstract_objectt)
