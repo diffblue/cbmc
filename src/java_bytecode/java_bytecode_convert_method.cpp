@@ -1037,8 +1037,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         "$stack"));
 
     irep_idt statement=i_it->statement;
-    exprt arg0 = i_it->args.size() >= 1 ? i_it->args[0] : nil_exprt();
-    exprt arg1 = i_it->args.size() >= 2 ? i_it->args[1] : nil_exprt();
+    exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
+    exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
 
     const bytecode_infot &bytecode_info=get_bytecode_info(statement);
 
@@ -1212,8 +1212,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[0].add_source_location()=i_it->source_location;
     }
 
-    // To catch the return type of the nondet call, we have to check the
-    // next statement for an assignment.
     // Check that the statement is static, with the correct signature.
     else if(statement=="invokestatic" &&
             has_prefix(id2string(arg0.get(ID_identifier)),
@@ -1228,8 +1226,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
         has_prefix(id2string(arg0.get(ID_identifier)),
                    "java::org.cprover.CProver.nondetWithNull");
 
+      const exprt operand=pop(1)[0];
       c=nondet_initializer_blockt(
-        to_symbol_expr(to_typecast_expr(pop(1)[0]).op()), allow_null);
+        to_symbol_expr(to_typecast_expr(operand).op()), allow_null);
+
       source_locationt loc=i_it->source_location;
       loc.set_function(method_id);
       c.add_source_location()=loc;

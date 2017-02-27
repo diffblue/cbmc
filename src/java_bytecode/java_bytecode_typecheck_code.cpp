@@ -33,8 +33,6 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
   {
     code_assignt &code_assign=to_code_assign(code);
 
-    //  Now that we've (possibly) converted nondet calls into actual code,
-    //  we can continue typechecking each side.
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
 
