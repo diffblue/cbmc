@@ -93,4 +93,16 @@ void func(int unknown)
   array[i] = i;
   i = i+1;
   array[i] = i;
+
+  typedef struct
+  {
+    int a;
+    int b;
+  } struct_t;
+
+  struct_t s;
+  s.a = 1;
+
+  assert(s.a == 1);
+  assert(s.a == 2);
 }
