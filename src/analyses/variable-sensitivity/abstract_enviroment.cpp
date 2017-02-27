@@ -238,7 +238,19 @@ bool abstract_environmentt::assign(
 
     // We added something to the stack that we couldn't deal with
     assert(handlers.find(next_expr.id())!=handlers.end());
-    final_value=handlers[next_expr.id()](map[symbol_expr], stactions, value);
+    assert(value);
+
+    // The symbol is not in the map - it is therefore top
+    abstract_object_pointert symbol_object;
+    if(map.find(symbol_expr)==map.end())
+    {
+      symbol_object=abstract_object_factory(symbol_expr.type(), true, false);
+    }
+    else
+    {
+      symbol_object=map[symbol_expr];
+    }
+    final_value=handlers[next_expr.id()](symbol_object, stactions, value);
   }
   else
   {
