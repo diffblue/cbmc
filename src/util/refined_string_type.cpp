@@ -27,13 +27,15 @@ refined_string_typet::refined_string_typet(
   array_typet char_array(char_type, infinite_index);
   components().emplace_back("length", index_type);
   components().emplace_back("content", char_array);
+  set_tag(CPROVER_PREFIX"refined_string_type");
 }
 
 /// \par parameters: a type
-/// \return Boolean telling whether the type is that of C strings
-bool refined_string_typet::is_c_string_type(const typet &type)
+/// \return Boolean telling whether the input is a refined string type
+bool refined_string_typet::is_refined_string_type(const typet &type)
 {
   return
     type.id()==ID_struct &&
-    to_struct_type(type).get_tag()==CPROVER_PREFIX"string";
+    to_struct_type(type).get_tag()==CPROVER_PREFIX"refined_string_type";
 }
+
