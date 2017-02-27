@@ -19,7 +19,8 @@ class NondetGenericArray
 {
   static void foo()
   {
-    C c = CProver.nondetWithoutNull();
+    C c = null;
+    CProver.nondetWithoutNull(c);
     assert c.b.a != null;
     assert c.b.a.ints != null;
   }
