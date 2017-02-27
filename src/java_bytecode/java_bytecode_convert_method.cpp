@@ -183,6 +183,68 @@ const exprt java_bytecode_convert_methodt::variable(
 
 /*******************************************************************\
 
+Function: java_bytecode_convert_method_lazy
+
+  Inputs: `class_symbol`: class this method belongs to
+          `method_identifier`: fully qualified method name, including
+            type signature (e.g. "x.y.z.f:(I)")
+          `m`: parsed method object to convert
+          `symbol_table`: global symbol table (will be modified)
+
+ Outputs:
+
+ Purpose: This creates a method symbol in the symtab, but doesn't
+          actually perform method conversion just yet. The caller
+          should call java_bytecode_convert_method later to give the
+          symbol/method a body.
+
+\*******************************************************************/
+
+void java_bytecode_convert_method_lazy(
+  const symbolt &class_symbol,
+  const irep_idt &method_identifier,
+  const java_bytecode_parse_treet::methodt &m,
+  symbol_tablet &symbol_table)
+{
+  symbolt method_symbol;
+  typet member_type=java_type_from_string(m.signature);
+
+  method_symbol.name=method_identifier;
+  method_symbol.base_name=m.base_name;
+  method_symbol.mode=ID_java;
+  method_symbol.location=m.source_location;
+  method_symbol.location.set_function(method_identifier);
+
+  if(method_symbol.base_name=="<init>")
+  {
+    method_symbol.pretty_name=
+      id2string(class_symbol.pretty_name)+"."+
+      id2string(class_symbol.base_name)+"()";
+    member_type.set(ID_constructor, true);
+  }
+  else
+    method_symbol.pretty_name=
+      id2string(class_symbol.pretty_name)+"."+
+      id2string(m.base_name)+"()";
+
+  // do we need to add 'this' as a parameter?
+  if(!m.is_static)
+  {
+    code_typet &code_type=to_code_type(member_type);
+    code_typet::parameterst &parameters=code_type.parameters();
+    code_typet::parametert this_p;
+    const reference_typet object_ref_type(symbol_typet(class_symbol.name));
+    this_p.type()=object_ref_type;
+    this_p.set_this();
+    parameters.insert(parameters.begin(), this_p);
+  }
+
+  method_symbol.type=member_type;
+  symbol_table.add(method_symbol);
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert
 
   Inputs:
@@ -197,28 +259,16 @@ void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m)
 {
-  typet member_type=java_type_from_string(m.signature);
-
-  assert(member_type.id()==ID_code);
-
   const irep_idt method_identifier=
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
   method_id=method_identifier;
 
+  const auto &old_sym=symbol_table.lookup(method_identifier);
+
+  typet member_type=old_sym.type;
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
-
-  // do we need to add 'this' as a parameter?
-  if(!m.is_static)
-  {
-    code_typet::parametert this_p;
-    const reference_typet object_ref_type(
-      symbol_typet(class_symbol.name));
-    this_p.type()=object_ref_type;
-    this_p.set_this();
-    parameters.insert(parameters.begin(), this_p);
-  }
 
   variables.clear();
 
@@ -347,10 +397,10 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value=convert_instructions(m, code_type);
 
-  // do we have the method symbol already?
+  // Replace the existing stub symbol with the real deal:
   const auto s_it=symbol_table.symbols.find(method.get_name());
-  if(s_it!=symbol_table.symbols.end())
-    symbol_table.symbols.erase(s_it); // erase, we stubbed it
+  assert(s_it!=symbol_table.symbols.end());
+  symbol_table.symbols.erase(s_it);
 
   symbol_table.add(method_symbol);
 }
@@ -1037,7 +1087,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
           {
             if(as_string(arg0.get(ID_identifier))
                .find("<init>")!=std::string::npos)
+            {
+              if(needed_classes)
+                needed_classes->insert(classname);
               code_type.set(ID_constructor, true);
+            }
             else
               code_type.set(ID_java_super_method_call, true);
           }
@@ -1119,11 +1173,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
         assert(use_this);
         assert(!call.arguments().empty());
         call.function()=arg0;
+        // Populate needed methods later,
+        // once we know what object types can exist.
       }
       else
       {
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
+        if(needed_methods)
+          needed_methods->push_back(arg0.get(ID_identifier));
       }
 
       call.function().add_source_location()=loc;
@@ -1665,6 +1723,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+      if(needed_classes && arg0.type().id()==ID_symbol)
+      {
+        needed_classes->insert(
+          to_symbol_type(arg0.type()).get_identifier());
+      }
       results[0]=java_bytecode_promotion(symbol_expr);
 
       // set $assertionDisabled to false
@@ -1682,6 +1745,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+      if(needed_classes && arg0.type().id()==ID_symbol)
+      {
+        needed_classes->insert(
+          to_symbol_type(arg0.type()).get_identifier());
+      }
       c=code_assignt(symbol_expr, op[0]);
     }
     else if(statement==patternt("?2?")) // i2c etc.
@@ -2144,13 +2212,17 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   bool disable_runtime_checks,
-  size_t max_array_length)
+  size_t max_array_length,
+  safe_pointer<std::vector<irep_idt> > needed_methods,
+  safe_pointer<std::set<irep_idt> > needed_classes)
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
     message_handler,
     disable_runtime_checks,
-    max_array_length);
+    max_array_length,
+    needed_methods,
+    needed_classes);
 
   java_bytecode_convert_method(class_symbol, method);
 }

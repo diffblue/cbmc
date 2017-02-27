@@ -339,7 +339,8 @@ void remove_virtual_functionst::get_functions(
     component_name,
     functions);
 
-  functions.push_back(root_function);
+  if(root_function.symbol_expr!=symbol_exprt())
+    functions.push_back(root_function);
 }
 
 /*******************************************************************\

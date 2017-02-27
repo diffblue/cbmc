@@ -544,8 +544,8 @@ bool compilet::parse(const std::string &file_name)
 
   language_filet language_file;
 
-  std::pair<language_filest::filemapt::iterator, bool>
-  res=language_files.filemap.insert(
+  std::pair<language_filest::file_mapt::iterator, bool>
+  res=language_files.file_map.insert(
     std::pair<std::string, language_filet>(file_name, language_file));
 
   language_filet &lf=res.first->second;
@@ -736,7 +736,7 @@ bool compilet::parse_source(const std::string &file_name)
     return true;
 
   // so we remove it from the list afterwards
-  language_files.filemap.erase(file_name);
+  language_files.file_map.erase(file_name);
   return false;
 }
 

@@ -13,8 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/safe_pointer.h>
 #include <analyses/cfg_dominators.h>
 #include "java_bytecode_parse_tree.h"
+#include "java_bytecode_convert_class.h"
 
 #include <vector>
 #include <list>
@@ -29,11 +31,15 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     bool _disable_runtime_checks,
-    size_t _max_array_length):
+    size_t _max_array_length,
+    safe_pointer<std::vector<irep_idt> > _needed_methods,
+    safe_pointer<std::set<irep_idt> > _needed_classes):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     disable_runtime_checks(_disable_runtime_checks),
-    max_array_length(_max_array_length)
+    max_array_length(_max_array_length),
+    needed_methods(_needed_methods),
+    needed_classes(_needed_classes)
   {
   }
 
@@ -52,6 +58,8 @@ protected:
   symbol_tablet &symbol_table;
   const bool disable_runtime_checks;
   const size_t max_array_length;
+  safe_pointer<std::vector<irep_idt> > needed_methods;
+  safe_pointer<std::set<irep_idt> > needed_classes;
 
   irep_idt method_id;
   irep_idt current_method;
