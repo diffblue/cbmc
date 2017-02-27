@@ -94,13 +94,12 @@ pointer_abstract_objectt::pointer_abstract_objectt(const exprt &e):
 
 /*******************************************************************\
 
-Function: array_abstract_objectt::read_index
+Function: pointer_abstract_objectt::read_dereference
 
   Inputs:
    env - the environment
-   index - the expression used to access the specific value in the array
 
- Outputs: An abstract object representing the value in the array
+ Outputs: An abstract object representing the value being pointed to
 
  Purpose: A helper function to read elements from an array. More precise
           abstractions may override this to provide more precise results.
@@ -118,30 +117,33 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
 
 /*******************************************************************\
 
-Function: abstract_object_pointert array_abstract_objectt
+Function: pointer_abstract_objectt::write_dereference
 
   Inputs:
    environment - the abstract environment
    stack - the remaining stack of expressions on the LHS to evaluate
-   index_expr - the expression uses to access a specific index
-   value - the value we are trying to assign to that value in the array
-   merging_write - ?
+   value - the value we are trying to assign to what the pointer is
+           pointing to
+   merging_write - is it a merging write (i.e. we aren't certain
+                   we are writing to this particular pointer therefore
+                   the value should be merged with whatever is already there
+                   or we are certain we are writing to this pointer so
+                   therefore the value can be replaced
 
- Outputs: The struct_abstract_objectt representing the result of writing
-          to a specific component. In this case this will always be top
-          as we are not tracking the value of this struct.
+ Outputs: A modified abstract object representing this pointer after it
+          has been written to.
 
- Purpose: A helper function to evaluate writing to a component of a struct.
-          More precise abstractions may override this to
-          update what they are storing for a specific component.
+ Purpose: A helper function to evaluate writing to a pointers value. More
+          precise abstractions may override this provide more precise results.
 
 \*******************************************************************/
 
-sharing_ptrt<pointer_abstract_objectt> pointer_abstract_objectt::write_dereference(
-  abstract_environmentt &environment,
-  const std::stack<exprt> stack,
-  const abstract_object_pointert value,
-  bool merging_write)
+sharing_ptrt<pointer_abstract_objectt>
+  pointer_abstract_objectt::write_dereference(
+    abstract_environmentt &environment,
+    const std::stack<exprt> stack,
+    const abstract_object_pointert value,
+    bool merging_write)
 {
   if(is_top())
   {
