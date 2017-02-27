@@ -107,13 +107,13 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<array_abstract_objectt>(
       followed_type, top, bottom, e, ns);
   case POINTER_SENSITIVE:
-    return initialize_abstract_object<pointer_abstract_objectt>(
+    return initialize_abstract_object<constant_pointer_abstract_objectt>(
       followed_type, top, bottom, e, ns);
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<pointer_abstract_objectt>(
       followed_type, top, bottom, e, ns);
   case STRUCT_SENSITIVE:
-    return initialize_abstract_object<struct_abstract_objectt>(
+    return initialize_abstract_object<full_struct_abstract_objectt>(
       followed_type, top, bottom, e, ns);
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<struct_abstract_objectt>(

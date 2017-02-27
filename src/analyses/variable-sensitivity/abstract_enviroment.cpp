@@ -6,6 +6,7 @@
 
 \*******************************************************************/
 #include "abstract_enviroment.h"
+
 #include <functional>
 #include <stack>
 #include <map>
@@ -18,6 +19,7 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/ai.h>
 #include <util/simplify_expr.h>
+
 
 
 #ifdef DEBUG
@@ -72,6 +74,7 @@ abstract_object_pointert abstract_environmentt::eval(
       ID_member, [&](const exprt &expr)
       {
         member_exprt member_expr(to_member_expr(expr));
+
         sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
           std::dynamic_pointer_cast<struct_abstract_objectt>(
             eval(member_expr.compound(), ns));
@@ -225,8 +228,11 @@ bool abstract_environmentt::assign(
     final_value=value;
   }
 
+  const typet &lhs_type=ns.follow(symbol_expr.type());
+  const typet &rhs_type=ns.follow(final_value->type());
+
   // Write the value for the root symbol back into the map
-  assert(symbol_expr.type() == final_value->type());
+  assert(lhs_type==rhs_type);
   if (final_value->is_top())
   {
     map.erase(symbol_expr);
@@ -321,6 +327,7 @@ abstract_object_pointert abstract_environmentt::write(
         sharing_ptrt<struct_abstract_objectt> modified_struct=
           struct_abstract_object->write_component(
             *this,
+            ns,
             stack,
             to_member_expr(next_expr),
             rhs_object,
