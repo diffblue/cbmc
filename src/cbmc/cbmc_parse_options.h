@@ -43,6 +43,7 @@ class optionst;
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
+  OPT_SHOW_FILE_FUNCTIONS \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \

@@ -39,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/rebuild_goto_start_function.h>
+#include <goto-programs/show_file_functions.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -434,6 +435,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("stop-on-fail", true);
     options.set_option("trace", true);
   }
+  if(cmdline.isset("show-file-functions"))
+    options.set_option("show-file-functions", true);
+
 }
 
 /*******************************************************************\
@@ -742,6 +746,12 @@ int cbmc_parse_optionst::get_goto_program(
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table();
+      return 0;
+    }
+
+    if(cmdline.isset("show-file-functions"))
+    {
+      show_file_functions(std::cout, symbol_table);
       return 0;
     }
 
@@ -1144,6 +1154,7 @@ void cbmc_parse_optionst::help()
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
+    HELP_SHOW_FILE_FUNCTIONS
     HELP_SHOW_GOTO_FUNCTIONS
     "\n"
     "Program instrumentation options:\n"
