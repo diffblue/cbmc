@@ -23,7 +23,11 @@ SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
       memory_info.cpp pipe_stream.cpp irep_hash.cpp endianness_map.cpp \
       ssa_expr.cpp json_irep.cpp json_expr.cpp \
       fresh_symbol.cpp \
-      format_number_range.cpp string_utils.cpp nondet_ifthenelse.cpp
+      format_number_range.cpp \
+      nondet_ifthenelse.cpp \
+      string_utils.cpp \
+      refined_string_type.cpp \
+      #Empty last line
 
 INCLUDES= -I ..
 
