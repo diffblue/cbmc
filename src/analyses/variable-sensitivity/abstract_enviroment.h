@@ -29,7 +29,7 @@ public:
   // For converting constants in the program
   // Maybe these two should be compacted to one call...
   virtual abstract_object_pointert abstract_object_factory(
-    const typet type, const constant_exprt e) const;
+    const typet type, const exprt e, const namespacet &ns) const;
 
 
   virtual bool merge(const abstract_environmentt &env);

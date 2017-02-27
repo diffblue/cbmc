@@ -21,7 +21,7 @@ public:
  constant_abstract_valuet(typet t);
  constant_abstract_valuet(typet t, bool tp, bool bttm);
  constant_abstract_valuet(const constant_abstract_valuet &old);
- constant_abstract_valuet(const constant_exprt e);
+ constant_abstract_valuet(const exprt e);
 
   CLONE
   MERGE(abstract_valuet)

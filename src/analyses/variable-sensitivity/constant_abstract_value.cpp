@@ -22,7 +22,7 @@ constant_abstract_valuet::constant_abstract_valuet(
     abstract_valuet(old), value(old.value)
 {}
 
-constant_abstract_valuet::constant_abstract_valuet(const constant_exprt e):
+constant_abstract_valuet::constant_abstract_valuet(const exprt e):
   abstract_valuet(e), value(e)
 {
   top=false;
