@@ -44,8 +44,6 @@ symex.dir: languages goto-programs.dir pointer-analysis.dir \
            goto-symex.dir linking.dir analyses.dir solvers.dir \
            path-symex.dir goto-instrument.dir
 
-aa-symex.dir: symex.dir aa-path-symex.dir
-
 # building for a particular directory
 
 $(patsubst %, %.dir, $(DIRS)):
