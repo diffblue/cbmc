@@ -63,11 +63,11 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
   {
     auto &side_effect_expr = to_side_effect_expr(expr);
     const irep_idt &statement = side_effect_expr.get_statement();
-    if (statement == ID_java_new)
+    if(statement==ID_java_new)
     {
       typecheck_expr_java_new(side_effect_expr);
     }
-    else if (statement == ID_java_new_array)
+    else if(statement==ID_java_new_array)
     {
       typecheck_expr_java_new_array(side_effect_expr);
     }

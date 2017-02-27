@@ -1018,7 +1018,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     assert(a_it!=address_map.end());
     working_set.erase(cur);
 
-    if (a_it->second.done)
+    if(a_it->second.done)
       continue;
 
     working_set.insert(
