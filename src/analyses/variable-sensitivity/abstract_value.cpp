@@ -67,6 +67,6 @@ abstract_valuet::abstract_valuet(const abstract_valuet &old):
   abstract_objectt(old)
 {}
 
-abstract_valuet::abstract_valuet(const constant_exprt &expr):
+abstract_valuet::abstract_valuet(const exprt &expr):
   abstract_objectt(expr)
 {}
