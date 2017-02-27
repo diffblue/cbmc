@@ -46,7 +46,6 @@ public:
   virtual abstract_object_pointert abstract_object_factory(
     const typet &type, const exprt &e, const namespacet &ns) const;
 
-
   virtual bool merge(const abstract_environmentt &env);
 
   // This should be used as a default case / everything else has failed
