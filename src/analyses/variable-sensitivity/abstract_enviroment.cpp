@@ -290,24 +290,30 @@ Function: abstract_environmentt::assume
 
 bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
 {
+  // We should only attempt to assume Boolean things
+  // This should be enforced by the well-structured-ness of the goto-program
+  assert(expr.type().id()==ID_bool);
+
+  // Evaluate the expression
   abstract_object_pointert res = eval(expr, ns);
-  std::string not_implemented_string=__func__;
-  not_implemented_string.append(" not implemented");
-  throw not_implemented_string;
-  // Need abstract_booleant
-#if 0
-  abstract_booleant *b = dynamic_cast<abstract_booleant>(res);
 
-  assert(b != NULL);
+  exprt possibly_constant = res->to_constant();
 
-  if (b->to_constant().is_false())
+  if (possibly_constant.id()!=ID_nil)  // I.E. actually a value
   {
-    make_bottom();
-    return true;
+    assert(possibly_constant.type().id()==ID_bool); // Should be of the right type
+
+    if (possibly_constant.is_false())
+    {
+      bool currently_bottom = get_is_bottom();
+      make_bottom();
+      return !currently_bottom;
+    }
   }
-  else
-    return false;
-#endif
+
+  // TODO - need a way of converting x==23 into an assign for the value of x
+
+  return false;
 }
 
 
