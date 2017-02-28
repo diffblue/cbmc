@@ -288,6 +288,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("ignore-unresolved-calls"))
     options.set_option("ignore-unresolved-calls", true);
+
+  // Configuration of variable sensitivity
+  options.set_option("pointers", cmdline.isset("pointers"));
+  options.set_option("arrays", cmdline.isset("arrays"));
+  options.set_option("structs", cmdline.isset("structs"));
 }
 
 /*******************************************************************\
