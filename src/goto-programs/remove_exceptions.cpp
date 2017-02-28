@@ -7,11 +7,13 @@ Author: Cristina David
 Date:   December 2016
 
 \*******************************************************************/
-#define DEBUG
+
 #ifdef DEBUG
 #include <iostream>
 #endif
+
 #include <stack>
+#include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -47,19 +49,20 @@ protected:
 
   void instrument_exception_handlers(
     const goto_functionst::function_mapt::iterator &);
-
   void add_gotos(
     const goto_functionst::function_mapt::iterator &);
 
   void add_throw_gotos(
     const goto_functionst::function_mapt::iterator &,
     const goto_programt::instructionst::iterator &,
-    const stack_catcht &);
+    const stack_catcht &,
+    std::vector<exprt> &);
 
   void add_function_call_gotos(
     const goto_functionst::function_mapt::iterator &,
     const goto_programt::instructionst::iterator &,
-    const stack_catcht &);
+    const stack_catcht &,
+    std::vector<exprt> &);
 };
 
 /*******************************************************************\
@@ -134,7 +137,6 @@ void remove_exceptionst::add_exceptional_returns(
       rhs_expr_null);
     t_null->function=function_id;
   }
-  return;
 }
 
 /*******************************************************************\
@@ -318,11 +320,13 @@ Purpose: instruments each throw with conditional GOTOS to the
 void remove_exceptionst::add_throw_gotos(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
-  const remove_exceptionst::stack_catcht &stack_catch)
+  const remove_exceptionst::stack_catcht &stack_catch,
+  std::vector<exprt> &locals)
 {
   assert(instr_it->type==THROW);
 
   goto_programt &goto_program=func_it->second.body;
+  const irep_idt &function_id=func_it->first;
 
   assert(instr_it->code.operands().size()==1);
 
@@ -340,6 +344,11 @@ void remove_exceptionst::add_throw_gotos(
     t_end->source_location=instr_it->source_location;
     t_end->function=instr_it->function;
   }
+
+  // find the symbol corresponding to the caught exceptions
+  const symbolt &exc_symbol=
+        symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+  symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add GOTOs implementing the dynamic dispatch of the
   // exception handlers
@@ -359,14 +368,20 @@ void remove_exceptionst::add_throw_gotos(
       // use instanceof to check that this is the correct handler
       symbol_typet type(stack_catch[i][j].first);
       type_exprt expr(type);
-      // find the symbol corresponding to the caught exceptions
-      exprt exc_symbol=instr_it->code;
-      while(exc_symbol.id()!=ID_symbol)
-        exc_symbol=exc_symbol.op0();
 
-      binary_predicate_exprt check(exc_symbol, ID_java_instanceof, expr);
+      binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);
       t_exc->guard=check;
     }
+  }
+
+  // add dead instructions
+  for(const auto &local : locals)
+  {
+    goto_programt::targett t_dead=goto_program.insert_after(instr_it);
+    t_dead->make_dead();
+    t_dead->code=code_deadt(local);
+    t_dead->source_location=instr_it->source_location;
+    t_dead->function=instr_it->function;
   }
 }
 
@@ -386,7 +401,8 @@ Purpose: instruments each function call that may escape exceptions
 void remove_exceptionst::add_function_call_gotos(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
-  const stack_catcht &stack_catch)
+  const stack_catcht &stack_catch,
+  std::vector<exprt> &locals)
 {
   assert(instr_it->type==FUNCTION_CALL);
 
@@ -403,7 +419,7 @@ void remove_exceptionst::add_function_call_gotos(
 
   if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX))
   {
-    // dynamic dispatch of the escaped exception
+    // we may have an escaping exception
     const symbolt &callee_exc_symbol=
       symbol_table.lookup(id2string(callee_id)+EXC_SUFFIX);
     symbol_exprt callee_exc=callee_exc_symbol.symbol_expr();
@@ -429,11 +445,20 @@ void remove_exceptionst::add_function_call_gotos(
       }
     }
 
+    // add dead instructions
+    for(const auto &local : locals)
+    {
+      goto_programt::targett t_dead=goto_program.insert_after(instr_it);
+      t_dead->make_dead();
+      t_dead->code=code_deadt(local);
+      t_dead->source_location=instr_it->source_location;
+      t_dead->function=instr_it->function;
+    }
+
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(
       callee_exc,
       null_pointer_exprt(pointer_typet(empty_typet())));
-    // jump to the next instruction
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_goto(next_it);
     t_null->source_location=instr_it->source_location;
@@ -458,20 +483,54 @@ Purpose: instruments each throw and function calls that may escape exceptions
 void remove_exceptionst::add_gotos(
   const goto_functionst::function_mapt::iterator &func_it)
 {
-  // Stack of try-catch blocks
-  stack_catcht stack_catch;
-
+  stack_catcht stack_catch; // stack of try-catch blocks
+  std::vector<std::vector<exprt>> stack_locals; // stack of local vars
+  std::vector<exprt> locals;
+  bool skip_dead=false;
   goto_programt &goto_program=func_it->second.body;
 
   if(goto_program.empty())
     return;
   Forall_goto_program_instructions(instr_it, goto_program)
   {
+    if(!instr_it->labels.empty())
+      skip_dead=false;
+    if(instr_it->is_decl())
+    {
+      code_declt decl=to_code_decl(instr_it->code);
+      locals.push_back(decl.symbol());
+    }
+    if(instr_it->is_dead())
+    {
+      code_deadt dead=to_code_dead(instr_it->code);
+      auto it=std::find(locals.begin(),
+                        locals.end(),
+                        dead.symbol());
+      // avoid DEAD re-declarations
+      if(it==locals.end())
+      {
+        if(skip_dead)
+        {
+          // this DEAD has been already added by a throw
+          instr_it->make_skip();
+        }
+      }
+      else
+      {
+        locals.erase(it);
+      }
+    }
     // it's a CATCH but not a handler
-    if(instr_it->type==CATCH && !instr_it->code.has_operands())
+    else if(instr_it->type==CATCH && !instr_it->code.has_operands())
     {
       if(instr_it->targets.empty()) // pop
       {
+        // pop the local vars stack
+        if(!stack_locals.empty())
+        {
+          locals=stack_locals.back();
+          stack_locals.pop_back();
+        }
         // pop from the stack if possible
         if(!stack_catch.empty())
         {
@@ -486,6 +545,9 @@ void remove_exceptionst::add_gotos(
       }
       else // push
       {
+        stack_locals.push_back(locals);
+        locals.clear();
+
         remove_exceptionst::catch_handlerst exception;
         stack_catch.push_back(exception);
         remove_exceptionst::catch_handlerst &last_exception=
@@ -505,16 +567,16 @@ void remove_exceptionst::add_gotos(
           i++;
         }
       }
-
       instr_it->make_skip();
     }
     else if(instr_it->type==THROW)
     {
-      add_throw_gotos(func_it, instr_it, stack_catch);
+      skip_dead=true;
+      add_throw_gotos(func_it, instr_it, stack_catch, locals);
     }
     else if(instr_it->type==FUNCTION_CALL)
     {
-      add_function_call_gotos(func_it, instr_it, stack_catch);
+      add_function_call_gotos(func_it, instr_it, stack_catch, locals);
     }
   }
 }
