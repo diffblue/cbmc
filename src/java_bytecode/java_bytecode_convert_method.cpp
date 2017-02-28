@@ -2195,7 +2195,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     std::vector<irep_idt> exception_ids;
     std::vector<irep_idt> handler_labels;
 
-    // add the CATCH-PUSH instruction(s)
+    // for each try-catch add a CATCH-PUSH instruction
+    // each CATCH-PUSH records a list of all the handler labels
+    // together with a list of all the exception ids
+
     // be aware of different try-catch blocks with the same starting pc
     std::size_t pos=0;
     size_t end_pc=0;
@@ -2215,8 +2218,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
            method.exception_table[pos].end_pc==end_pc)
         {
           exception_ids.push_back(
-            method.exception_table[pos].
-            catch_type.get_identifier());
+            method.exception_table[pos].catch_type.get_identifier());
           // record the exception handler in the CATCH-PUSH
           // instruction by generating a label corresponding to
           // the handler's pc
@@ -2413,6 +2415,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // First create a simple flat list of basic blocks. We'll add lexical nesting
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
+  int previous_address=-1;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
@@ -2426,6 +2429,16 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // (e.g. due to exceptional control flow)
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
+    // Start a new lexical block if we've just entered a try block
+    if(!start_new_block && previous_address!=-1)
+    {
+      for(const auto &exception_row : method.exception_table)
+        if(exception_row.start_pc==previous_address)
+        {
+          start_new_block=true;
+          break;
+        }
+    }
 
     if(start_new_block)
     {
@@ -2445,6 +2458,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       add_to_block.add(c);
     }
     start_new_block=address_pair.second.successors.size()>1;
+
+    previous_address=address;
   }
 
   // Find out where temporaries are used:
