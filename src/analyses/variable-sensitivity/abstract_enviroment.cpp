@@ -9,6 +9,7 @@
 #include <functional>
 #include <stack>
 #include <map>
+#include <ostream>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
@@ -169,7 +170,10 @@ bool abstract_environmentt::assign(
     {
       // Attempting to assign to something unreasonable
       // Your goto-program is broken
-      throw "die_horribly";
+      std::ostringstream error_builder;
+      error_builder << "unsupported assign ";
+      error_builder << s.id();
+      throw error_builder.str();
     }
   }
 
