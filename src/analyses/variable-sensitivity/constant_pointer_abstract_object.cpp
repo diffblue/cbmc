@@ -336,29 +336,45 @@ sharing_ptrt<pointer_abstract_objectt>
   }
   else
   {
+    // If not an address, we don't know what we are pointing to
+    if(value.id()!=ID_address_of)
+    {
+      return pointer_abstract_objectt::write_dereference(
+        environment, ns, stack, new_value, merging_write);
+    }
+
+    const address_of_exprt &address_expr=to_address_of_expr(value);
+
+    sharing_ptrt<constant_pointer_abstract_objectt> copy=
+      sharing_ptrt<constant_pointer_abstract_objectt>(
+        new constant_pointer_abstract_objectt(*this));
+
     if(stack.empty())
     {
-      sharing_ptrt<constant_pointer_abstract_objectt> copy=
-        sharing_ptrt<constant_pointer_abstract_objectt>(
-          new constant_pointer_abstract_objectt(*this));
+      // We should not be changing the type of an abstract object
+      assert(new_value->get_type()==type.subtype());
+
 
       if(merging_write)
       {
-        abstract_object_pointert pointed_value=environment.eval(value, ns);
+        abstract_object_pointert pointed_value=
+          environment.eval(address_expr.object(), ns);
         bool modifications;
         pointed_value->merge(new_value, modifications);
       }
       else
       {
-        environment.assign(value, new_value, ns);
+        environment.assign(address_expr.object(), new_value, ns);
       }
-      return copy;
     }
     else
     {
-      abstract_object_pointert pointed_value=environment.eval(value, ns);
-      return std::dynamic_pointer_cast<constant_pointer_abstract_objectt>(
-        environment.write(pointed_value, new_value, stack, ns, merging_write));
+      abstract_object_pointert pointed_value=
+        environment.eval(address_expr.object(), ns);
+      environment.write(pointed_value, new_value, stack, ns, merging_write);
+
+      // but the pointer itself does not change!
     }
+    return copy;
   }
 }
