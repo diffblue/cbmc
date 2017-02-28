@@ -21,14 +21,16 @@ public:
   explicit struct_abstract_objectt(const typet &type);
   struct_abstract_objectt(const typet &type, bool top, bool bottom);
   explicit struct_abstract_objectt(const struct_abstract_objectt &old);
-  explicit struct_abstract_objectt(const constant_exprt &expr);
+  explicit struct_abstract_objectt(const exprt &expr);
 
   CLONE
   MERGE(abstract_objectt)
 
   // struct interface
   virtual abstract_object_pointert read_component(
-    const abstract_environmentt &environment, const member_exprt &member_expr);
+    const abstract_environmentt &environment,
+    const member_exprt &member_expr,
+    const namespacet& ns);
 
   virtual sharing_ptrt<struct_abstract_objectt> write_component(
     const abstract_environmentt &environment,

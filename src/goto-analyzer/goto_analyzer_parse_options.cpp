@@ -46,6 +46,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/unicode.h>
 
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+
 #include <cbmc/version.h>
 
 #include "goto_analyzer_parse_options.h"
@@ -466,6 +468,9 @@ int goto_analyzer_parse_optionst::doit()
 
     if(set_properties())
       return 7;
+
+    // Store options in static variable_sensitivity_object_factory object
+    variable_sensitivity_object_factoryt::instance().set_options(options);
 
     // Output file factory
     std::ostream *out;

@@ -113,7 +113,7 @@ abstract_object_pointert pointer_abstract_objectt::read_dereference(
   pointer_typet pointer_type(to_pointer_type(type));
   const typet &pointed_to_type=pointer_type.subtype();
 
-  return env.abstract_object_factory(pointed_to_type, true, false);
+  return env.abstract_object_factory(pointed_to_type, ns, true, false);
 }
 
 /*******************************************************************\

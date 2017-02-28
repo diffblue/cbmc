@@ -86,7 +86,7 @@ Function: struct_abstract_objectt::struct_abstract_objectt
 
 \*******************************************************************/
 
-struct_abstract_objectt::struct_abstract_objectt(const constant_exprt &e):
+struct_abstract_objectt::struct_abstract_objectt(const exprt &e):
   abstract_objectt(e)
 {
   assert(e.type().id()==ID_struct);
@@ -111,12 +111,14 @@ Function: struct_abstract_objectt::read_component
 \*******************************************************************/
 
 abstract_object_pointert struct_abstract_objectt::read_component(
-  const abstract_environmentt &environment, const member_exprt &member_expr)
+  const abstract_environmentt &environment,
+  const member_exprt &member_expr,
+  const namespacet& ns)
 {
   // If we are bottom then so are the components
   // otherwise the components could be anything
   return environment.abstract_object_factory(
-    member_expr.type(), !is_bottom(), is_bottom());
+    member_expr.type(), ns, !is_bottom(), is_bottom());
 }
 
 /*******************************************************************\

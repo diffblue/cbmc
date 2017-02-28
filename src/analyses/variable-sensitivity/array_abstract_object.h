@@ -22,13 +22,15 @@ public:
   explicit array_abstract_objectt(const typet &type);
   array_abstract_objectt(const typet &type, bool top, bool bottom);
   explicit array_abstract_objectt(const array_abstract_objectt &old);
-  explicit array_abstract_objectt(const constant_exprt &expr);
+  explicit array_abstract_objectt(const exprt &expr);
 
   CLONE
   MERGE(abstract_objectt)
 
   virtual abstract_object_pointert read_index(
-    const abstract_environmentt &env, const index_exprt &index) const;
+    const abstract_environmentt &env,
+    const index_exprt &index,
+    const namespacet &ns) const;
 
   virtual sharing_ptrt<array_abstract_objectt> write_index(
     abstract_environmentt &environment,
