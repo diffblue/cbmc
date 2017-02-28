@@ -80,8 +80,7 @@ public:
   // no states
   virtual void make_bottom() override;
 
-  // all states -- the analysis doesn't use this,
-  // and domains may refuse to implement it.
+  // all states
   virtual void make_top() override;
 
   // a reasonable entry-point state
