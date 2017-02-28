@@ -79,15 +79,16 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => |substring|>=offset>=from_index
+  // a1 : contains => |str|-|substring|>=offset>=from_index
   // a2 : !contains => offset=-1
-  // a3 : forall 0 <= witness<substring.length.
-  //   contains => str[witness+offset]=substring[witness]
+  // a3 : forall 0<=witness<|substring|.
+  //        contains => str[witness+offset]=substring[witness]
 
   implies_exprt a1(
     contains,
     and_exprt(
-      str.axiom_for_is_longer_than(plus_exprt(substring.length(), offset)),
+      str.axiom_for_is_longer_than(plus_exprt_with_overflow_check(
+        substring.length(), offset)),
       binary_relation_exprt(offset, ID_ge, from_index)));
   axioms.push_back(a1);
 
@@ -125,7 +126,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   implies_exprt a1(
     contains,
     and_exprt(
-      str.axiom_for_is_longer_than(plus_exprt(substring.length(), offset)),
+      str.axiom_for_is_longer_than(
+        plus_exprt_with_overflow_check(substring.length(), offset)),
       binary_relation_exprt(offset, ID_le, from_index)));
   axioms.push_back(a1);
 
@@ -150,7 +152,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  string_exprt str=add_axioms_for_string_expr(args[0]);
+  string_exprt str=get_string_expr(args[0]);
   const exprt &c=args[1];
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   assert(f.type()==ref_type.get_index_type());
@@ -163,14 +165,15 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   else
     assert(false);
 
-  if(c.type().id()==ID_unsignedbv)
+  if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
     return add_axioms_for_index_of(
       str, typecast_exprt(c, ref_type.get_char_type()), from_index);
   }
   else
   {
-    string_exprt sub=add_axioms_for_string_expr(c);
+    assert(refined_string_typet::is_refined_string_type(c.type()));
+    string_exprt sub=get_string_expr(c);
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
 }
@@ -192,7 +195,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 
   exprt index1=from_integer(1, index_type);
   exprt minus1=from_integer(-1, index_type);
-  exprt from_index_plus_one=plus_exprt(from_index, index1);
+  exprt from_index_plus_one=plus_exprt_with_overflow_check(from_index, index1);
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
     binary_relation_exprt(index, ID_lt, from_index_plus_one));
@@ -237,7 +240,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  string_exprt str=add_axioms_for_string_expr(args[0]);
+  string_exprt str=get_string_expr(args[0]);
   exprt c=args[1];
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   exprt from_index;
@@ -250,14 +253,14 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   else
     assert(false);
 
-  if(c.type().id()==ID_unsignedbv)
+  if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
     return add_axioms_for_last_index_of(
       str, typecast_exprt(c, ref_type.get_char_type()), from_index);
   }
   else
   {
-    string_exprt sub=add_axioms_for_string_expr(c);
+    string_exprt sub=get_string_expr(c);
     return add_axioms_for_last_index_of_string(str, sub, from_index);
   }
 }

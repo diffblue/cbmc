@@ -33,8 +33,8 @@ string_exprt string_constraint_generatort::add_axioms_for_insert(
 string_exprt string_constraint_generatort::add_axioms_for_insert(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
-  string_exprt s2=add_axioms_for_string_expr(args(f, 3)[2]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
+  string_exprt s2=get_string_expr(args(f, 3)[2]);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 
@@ -47,7 +47,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_int(
   const function_application_exprt &f)
 {
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
   string_exprt s2=add_axioms_from_int(
     args(f, 3)[2], MAX_INTEGER_LENGTH, ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
@@ -62,7 +62,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_long(
   const function_application_exprt &f)
 {
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
   string_exprt s2=add_axioms_from_int(args(f, 3)[2], MAX_LONG_LENGTH, ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
@@ -76,7 +76,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_bool(
   const function_application_exprt &f)
 {
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
   string_exprt s2=add_axioms_from_bool(args(f, 3)[2], ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
@@ -89,7 +89,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_bool(
 string_exprt string_constraint_generatort::add_axioms_for_insert_char(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(s1.type());
   string_exprt s2=add_axioms_from_char(args(f, 3)[2], ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
@@ -103,8 +103,9 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_char(
 string_exprt string_constraint_generatort::add_axioms_for_insert_double(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
-  string_exprt s2=add_axioms_from_float(args(f, 3)[2]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
+  const refined_string_typet &ref_type=to_refined_string_type(s1.type());
+  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type, true);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 
@@ -116,8 +117,9 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_double(
 string_exprt string_constraint_generatort::add_axioms_for_insert_float(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 3)[0]);
-  string_exprt s2=add_axioms_from_float(args(f, 3)[2]);
+  string_exprt s1=get_string_expr(args(f, 3)[0]);
+  const refined_string_typet &ref_type=to_refined_string_type(s1.type());
+  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type, false);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 
@@ -145,7 +147,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_char_array(
     offset=from_integer(0, count.type());
   }
 
-  string_exprt str=add_axioms_for_string_expr(f.arguments()[0]);
+  string_exprt str=get_string_expr(f.arguments()[0]);
   const exprt &length=f.arguments()[2];
   const exprt &data=f.arguments()[3];
   string_exprt arr=add_axioms_from_char_array(

@@ -24,15 +24,15 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 
   // We add axioms:
   // a1 : isprefix => |str| >= |prefix|+offset
-  // a2 : forall 0<=qvar<prefix.length. isprefix =>
-  //   s0[witness+offset]=s2[witness]
-  // a3 : !isprefix => |str| < |prefix|+offset
-  //   || (|str| >= |prefix|+offset &&0<=witness<|prefix|
-  //     &&str[witness+ofsset]!=prefix[witness])
+  // a2 : forall 0<=qvar<|prefix|. isprefix => s0[witness+offset]=s2[witness]
+  // a3 : !isprefix =>
+  //        |str|<|prefix|+offset ||
+  //        (0<=witness<|prefix| && str[witness+offset]!=prefix[witness])
 
   implies_exprt a1(
     isprefix,
-    str.axiom_for_is_longer_than(plus_exprt(prefix.length(), offset)));
+    str.axiom_for_is_longer_than(plus_exprt_with_overflow_check(
+      prefix.length(), offset)));
   axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_isprefix", index_type);
@@ -40,7 +40,8 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     qvar,
     prefix.length(),
     isprefix,
-    equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
+    equal_exprt(str[plus_exprt_with_overflow_check(qvar, offset)],
+                prefix[qvar]));
   axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_isprefix", index_type);
@@ -48,14 +49,13 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     axiom_for_is_positive_index(witness),
     and_exprt(
       prefix.axiom_for_is_strictly_longer_than(witness),
-      notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness])));
+      notequal_exprt(str[plus_exprt_with_overflow_check(witness, offset)],
+                     prefix[witness])));
   or_exprt s0_notpref_s1(
     not_exprt(
-      str.axiom_for_is_longer_than(plus_exprt(prefix.length(), offset))),
-    and_exprt(
-      witness_diff,
       str.axiom_for_is_longer_than(
-        plus_exprt(prefix.length(), offset))));
+        plus_exprt_with_overflow_check(prefix.length(), offset))),
+    witness_diff);
 
   implies_exprt a3(not_exprt(isprefix), s0_notpref_s1);
   axioms.push_back(a3);
@@ -73,8 +73,8 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
-  string_exprt s0=add_axioms_for_string_expr(args[swap_arguments?1:0]);
-  string_exprt s1=add_axioms_for_string_expr(args[swap_arguments?0:1]);
+  string_exprt s0=get_string_expr(args[swap_arguments?1:0]);
+  string_exprt s1=get_string_expr(args[swap_arguments?0:1]);
   exprt offset;
   if(args.size()==2)
     offset=from_integer(0, s0.length().type());
@@ -97,7 +97,7 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
   // a2 : s0 => is_empty
 
   symbol_exprt is_empty=fresh_boolean("is_empty");
-  string_exprt s0=add_axioms_for_string_expr(args(f, 1)[0]);
+  string_exprt s0=get_string_expr(args(f, 1)[0]);
   axioms.push_back(implies_exprt(is_empty, s0.axiom_for_has_length(0)));
   axioms.push_back(implies_exprt(s0.axiom_for_has_length(0), is_empty));
   return typecast_exprt(is_empty, f.type());
@@ -118,8 +118,8 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
 
   symbol_exprt issuffix=fresh_boolean("issuffix");
   typecast_exprt tc_issuffix(issuffix, f.type());
-  string_exprt s0=add_axioms_for_string_expr(args[swap_arguments?1:0]);
-  string_exprt s1=add_axioms_for_string_expr(args[swap_arguments?0:1]);
+  string_exprt s0=get_string_expr(args[swap_arguments?1:0]);
+  string_exprt s1=get_string_expr(args[swap_arguments?0:1]);
   const typet &index_type=s0.length().type();
 
   // We add axioms:
@@ -127,7 +127,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   // a2 : forall witness<s1.length.
   //     issufix => s1[witness]=s0[witness + s0.length-s1.length]
   // a3 : !issuffix =>
-  //   s1.length > s0.length
+  //   (s1.length > s0.length && witness=-1)
   //     || (s1.length > witness>=0
   //       &&s1[witness]!=s0[witness + s0.length-s1.length]
 
@@ -145,7 +145,8 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   exprt shifted=plus_exprt(
     witness, minus_exprt(s1.length(), s0.length()));
   or_exprt constr3(
-    s0.axiom_for_is_strictly_longer_than(s1),
+    and_exprt(s0.axiom_for_is_strictly_longer_than(s1),
+              equal_exprt(witness, from_integer(-1, index_type))),
     and_exprt(
       notequal_exprt(s0[witness], s1[shifted]),
       and_exprt(
@@ -166,9 +167,10 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   symbol_exprt contains=fresh_boolean("contains");
   typecast_exprt tc_contains(contains, f.type());
-  string_exprt s0=add_axioms_for_string_expr(args(f, 2)[0]);
-  string_exprt s1=add_axioms_for_string_expr(args(f, 2)[1]);
-  const typet &index_type=s0.type();
+  string_exprt s0=get_string_expr(args(f, 2)[0]);
+  string_exprt s1=get_string_expr(args(f, 2)[1]);
+  const refined_string_typet ref_type=to_refined_string_type(s0.type());
+  const typet &index_type=ref_type.get_index_type();
 
   // We add axioms:
   // a1 : contains => s0.length >= s1.length

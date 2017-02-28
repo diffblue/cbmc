@@ -21,6 +21,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
 #include <util/string_expr.h>
+#include <util/replace_expr.h>
 #include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
@@ -72,21 +73,20 @@ public:
   symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);
+  string_exprt get_string_expr(const exprt &expr);
+  string_exprt convert_java_string_to_string_exprt(
+    const exprt &underlying);
+  plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
-  // We maintain a map from symbols to strings.
-  std::map<irep_idt, string_exprt> symbol_to_string;
+  // Maps unresolved symbols to the string_exprt that was created for them
+  std::map<irep_idt, string_exprt> unresolved_symbols;
 
-  string_exprt find_or_add_string_of_symbol(const symbol_exprt &sym);
 
-  void assign_to_symbol(
-    const symbol_exprt &sym, const string_exprt &expr)
-  {
-    symbol_to_string[sym.get_identifier()]=expr;
-  }
+  string_exprt find_or_add_string_of_symbol(
+    const symbol_exprt &sym,
+    const refined_string_typet &ref_type);
 
-  string_exprt add_axioms_for_string_expr(const exprt &expr);
-  void set_string_symbol_equal_to_expr(
-    const symbol_exprt &sym, const exprt &str);
+  string_exprt add_axioms_for_refined_string(const exprt &expr);
 
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
@@ -102,6 +102,8 @@ private:
   const std::size_t MAX_LONG_LENGTH=20;
   const std::size_t MAX_FLOAT_LENGTH=15;
   const std::size_t MAX_DOUBLE_LENGTH=30;
+
+  std::map<function_application_exprt, exprt> function_application_cache;
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
@@ -124,6 +126,9 @@ private:
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
   exprt add_axioms_for_hash_code(const function_application_exprt &f);
+  // To each string on which hash_code was called we associate a symbol
+  // representing the return value of the hash_code function.
+  std::map<string_exprt, exprt> hash_code_of_string;
 
   exprt add_axioms_for_is_empty(const function_application_exprt &f);
   exprt add_axioms_for_is_prefix(
@@ -231,7 +236,9 @@ private:
   // the start for negative number
   string_exprt add_axioms_from_float(const function_application_exprt &f);
   string_exprt add_axioms_from_float(
-    const exprt &f, bool double_precision=false);
+    const exprt &f,
+    const refined_string_typet &ref_type,
+    bool double_precision);
 
   // Add axioms corresponding to the String.valueOf(D) java function
   // TODO: the specifications is only partial
@@ -260,6 +267,7 @@ private:
   string_exprt add_axioms_for_code_point(
     const exprt &code_point, const refined_string_typet &ref_type);
   string_exprt add_axioms_for_java_char_array(const exprt &char_array);
+  exprt add_axioms_for_char_pointer(const function_application_exprt &fun);
   string_exprt add_axioms_for_if(const if_exprt &expr);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);
 
@@ -277,6 +285,8 @@ private:
     const function_application_exprt &f);
 
   exprt add_axioms_for_parse_int(const function_application_exprt &f);
+  exprt add_axioms_for_correct_number_format(
+    const string_exprt &str, std::size_t max_size=10);
   exprt add_axioms_for_to_char_array(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
 
@@ -284,6 +294,9 @@ private:
   // TODO: this does not work at the moment because of the way we treat
   // string pointers
   symbol_exprt add_axioms_for_intern(const function_application_exprt &f);
+
+  // Pool used for the intern method
+  std::map<string_exprt, symbol_exprt> intern_of_string;
 
   // Tells which language is used. C and Java are supported
   irep_idt mode;
@@ -300,14 +313,8 @@ private:
   exprt int_of_hex_char(const exprt &chr) const;
   exprt is_high_surrogate(const exprt &chr) const;
   exprt is_low_surrogate(const exprt &chr) const;
-  static exprt character_equals_ignore_case(
+  exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
-
-  // Pool used for the intern method
-  std::map<string_exprt, symbol_exprt> pool;
-
-  // Used to determine whether hashcode should be equal
-  std::map<string_exprt, symbol_exprt> hash;
 };
 
 #endif
