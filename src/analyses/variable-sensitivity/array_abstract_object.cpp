@@ -85,7 +85,7 @@ Function: array_abstract_objectt::array_abstract_objectt
 
 \*******************************************************************/
 
-array_abstract_objectt::array_abstract_objectt(const constant_exprt &e):
+array_abstract_objectt::array_abstract_objectt(const exprt &e):
   abstract_objectt(e)
 {
   assert(e.type().id()==ID_array);
@@ -107,14 +107,16 @@ Function: array_abstract_objectt::read_index
 \*******************************************************************/
 
 abstract_object_pointert array_abstract_objectt::read_index(
-  const abstract_environmentt &env, const index_exprt &index) const
+  const abstract_environmentt &env,
+  const index_exprt &index,
+  const namespacet& ns) const
 {
   array_typet array_type(to_array_type(type));
   const typet &subtype=array_type.subtype();
 
   // if we are bottom then so are the values in the array
   // otherwise the values are top
-  return env.abstract_object_factory(subtype, !is_bottom(), is_bottom());
+  return env.abstract_object_factory(subtype, ns, !is_bottom(), is_bottom());
 }
 
 /*******************************************************************\
