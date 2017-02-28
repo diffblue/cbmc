@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.1)
+
+#   CBMC only uses part of minisat2.
+#   This CMakeLists is designed to build just the parts that are needed.
+
+add_library(minisat2-condensed
+    minisat/simp/SimpSolver.cc
+    minisat/core/Solver.cc
+)
+
+target_include_directories(minisat2-condensed
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+install(TARGETS minisat2-condensed EXPORT minisat-condensed-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+install(DIRECTORY . DESTINATION include FILES_MATCHING PATTERN "*.h")
