@@ -130,6 +130,48 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 
 /*******************************************************************\
 
+Function: constant_pointer_abstract_objectt::merge_state
+
+  Inputs:
+   op1 - the first pointer abstract object
+   op2 - the second pointer abstract object
+
+ Outputs: Returns true if this changed from op1
+
+ Purpose: Set this abstract object to be the result of merging two
+          other abstract objects. This handles the case where if they are
+          both pointing to the same object we keep the value.
+
+\*******************************************************************/
+
+bool constant_pointer_abstract_objectt::merge_state(
+  const constant_pointer_abstract_pointert op1,
+  const constant_pointer_abstract_pointert op2)
+{
+  bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
+  if(top || bottom)
+  {
+    return parent_merge_change;
+  }
+  else
+  {
+    if(op1->value==op2->value)
+    {
+      value=op1->value;
+      return false;
+    }
+    else
+    {
+      top=true;
+      value=nullptr;
+      assert(!bottom);
+      return !op1->top;
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: constant_pointer_abstract_objectt::to_constant
 
   Inputs:
