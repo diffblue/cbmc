@@ -63,7 +63,8 @@ Function: string_constraint_generatort::add_axioms_from_float
 string_exprt string_constraint_generatort::add_axioms_from_float(
   const function_application_exprt &f)
 {
-  return add_axioms_from_float(args(f, 1)[0], false);
+  const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  return add_axioms_from_float(args(f, 1)[0], ref_type, false);
 }
 
 /*******************************************************************\
@@ -81,7 +82,8 @@ Function: string_constraint_generatort::add_axioms_from_double
 string_exprt string_constraint_generatort::add_axioms_from_double(
   const function_application_exprt &f)
 {
-  return add_axioms_from_float(args(f, 1)[0], true);
+  const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  return add_axioms_from_float(args(f, 1)[0], ref_type, true);
 }
 
 /*******************************************************************\
@@ -99,13 +101,12 @@ Function: string_constraint_generatort::add_axioms_from_float
 \*******************************************************************/
 
 string_exprt string_constraint_generatort::add_axioms_from_float(
-  const exprt &f, bool double_precision)
+  const exprt &f, const refined_string_typet &ref_type, bool double_precision)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  string_exprt res=fresh_string(ref_type);
   const typet &index_type=ref_type.get_index_type();
   const typet &char_type=ref_type.get_char_type();
-  string_exprt res=fresh_string(ref_type);
-  const exprt &index24=from_integer(24, ref_type.get_index_type());
+  const exprt &index24=from_integer(24, index_type);
   axioms.push_back(res.axiom_for_is_shorter_than(index24));
 
   string_exprt magnitude=fresh_string(ref_type);
@@ -610,7 +611,7 @@ Function: string_constraint_generatort::add_axioms_for_parse_int
 exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 1)[0]);
+  string_exprt str=get_string_expr(args(f, 1)[0]);
   const typet &type=f.type();
   symbol_exprt i=fresh_symbol("parsed_int", type);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
