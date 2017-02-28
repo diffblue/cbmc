@@ -172,6 +172,28 @@ void remove_exceptionst::instrument_exception_handler(
   instr_it->make_skip();
 }
 
+/// finds the instruction where the exceptional output is set or the end of the
+/// function if no such output exists
+static goto_programt::targett get_exceptional_output(
+  goto_programt &goto_program)
+{
+  Forall_goto_program_instructions(it, goto_program)
+  {
+    const irep_idt &statement=it->code.get_statement();
+    if(statement==ID_output)
+    {
+      assert(it->code.operands().size()>=2);
+      const exprt &expr=it->code.op1();
+      assert(expr.id()==ID_symbol);
+      const symbol_exprt &symbol=to_symbol_expr(expr);
+      if(id2string(symbol.get_identifier()).find(EXC_SUFFIX)
+         !=std::string::npos)
+        return it;
+    }
+  }
+  return goto_program.get_end_function();
+}
+
 /// instruments each throw with conditional GOTOS to the  corresponding
 /// exception handlers
 void remove_exceptionst::instrument_throw(
@@ -188,13 +210,14 @@ void remove_exceptionst::instrument_throw(
   assert(instr_it->code.operands().size()==1);
 
   // find the end of the function
-  goto_programt::targett end_function=goto_program.get_end_function();
-  if(end_function!=instr_it)
+  goto_programt::targett exceptional_output=
+    get_exceptional_output(goto_program);
+  if(exceptional_output!=instr_it)
   {
     // jump to the end of the function
     // this will appear after the GOTO-based dynamic dispatch below
     goto_programt::targett t_end=goto_program.insert_after(instr_it);
-    t_end->make_goto(end_function);
+    t_end->make_goto(exceptional_output);
     t_end->source_location=instr_it->source_location;
     t_end->function=instr_it->function;
   }
@@ -282,13 +305,14 @@ void remove_exceptionst::instrument_function_call(
     symbol_exprt callee_exc=callee_exc_symbol.symbol_expr();
 
     // find the end of the function
-    goto_programt::targett end_function=goto_program.get_end_function();
-    if(end_function!=instr_it)
+    goto_programt::targett exceptional_output=
+      get_exceptional_output(goto_program);
+    if(exceptional_output!=instr_it)
     {
       // jump to the end of the function
       // this will appear after the GOTO-based dynamic dispatch below
       goto_programt::targett t_end=goto_program.insert_after(instr_it);
-      t_end->make_goto(end_function);
+      t_end->make_goto(exceptional_output);
       t_end->source_location=instr_it->source_location;
       t_end->function=instr_it->function;
     }
