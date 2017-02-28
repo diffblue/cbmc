@@ -56,7 +56,7 @@ void variable_sensitivity_domaint::transform(
     // Assign to top is the same as removing
     abstract_object_pointert top_object=
       abstract_state.abstract_object_factory(
-        to_code_dead(instruction.code).symbol().type(), true);
+        to_code_dead(instruction.code).symbol().type(), ns, true);
     abstract_state.assign(
       to_code_dead(instruction.code).symbol(), top_object, ns);
     }

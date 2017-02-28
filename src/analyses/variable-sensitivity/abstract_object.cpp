@@ -201,7 +201,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
   }
   else
   {
-    return environment.abstract_object_factory(expr.type(), true, false);
+    return environment.abstract_object_factory(expr.type(), ns, true, false);
   }
 }
 

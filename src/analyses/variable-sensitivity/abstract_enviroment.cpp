@@ -13,8 +13,8 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
-#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/ai.h>
 #include <util/simplify_expr.h>
 
@@ -22,7 +22,6 @@
 #ifdef DEBUG
 #include <iostream>
 #endif
-
 /*******************************************************************\
 
 Function: abstract_environmentt::eval
@@ -51,7 +50,7 @@ abstract_object_pointert abstract_environmentt::eval(
         const auto &symbol_entry=map.find(symbol);
         if(symbol_entry==map.cend())
         {
-          return abstract_object_factory(expr.type(), true);
+          return abstract_object_factory(expr.type(), ns, true);
         }
         else
         {
@@ -74,7 +73,7 @@ abstract_object_pointert abstract_environmentt::eval(
           std::dynamic_pointer_cast<struct_abstract_objectt>(
             eval(member_expr.compound(), ns));
 
-        return struct_abstract_object->read_component(*this, member_expr);
+        return struct_abstract_object->read_component(*this, member_expr, ns);
       }
     },
     {
@@ -107,7 +106,7 @@ abstract_object_pointert abstract_environmentt::eval(
           std::dynamic_pointer_cast<array_abstract_objectt>(
             eval(index_expr.array(), ns));
 
-        return array_abstract_object->read_index(*this, index_expr);
+        return array_abstract_object->read_index(*this, index_expr, ns);
       }
     }
   };
@@ -126,7 +125,7 @@ abstract_object_pointert abstract_environmentt::eval(
     }
     else
     {
-      return abstract_object_factory(simplified_expr.type(), true);
+      return abstract_object_factory(simplified_expr.type(), ns, true);
     }
   }
   else
@@ -186,7 +185,8 @@ bool abstract_environmentt::assign(
     abstract_object_pointert symbol_object;
     if(map.find(symbol_expr)==map.end())
     {
-      symbol_object=abstract_object_factory(symbol_expr.type(), true, false);
+      symbol_object=abstract_object_factory(
+        symbol_expr.type(), ns, true, false);
     }
     else
     {
@@ -378,6 +378,7 @@ Function: abstract_environmentt::abstract_object_factory
   Inputs:
    type - the type of the object whose state should be tracked
    top - does the type of the object start as top
+   bottom - does the type of the object start as bottom in the two-value domain
 
  Outputs: The abstract object that has been created
 
@@ -387,23 +388,10 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet type, bool top, bool bottom) const
+  const typet &type, const namespacet &ns, bool top, bool bottom) const
 {
-  // TODO (tkiley): Here we should look at some config file
-  if(type.id()==ID_signedbv || type.id()==ID_bool || type.id()==ID_c_bool)
-  {
-    return abstract_object_pointert(
-      new constant_abstract_valuet(type, top, bottom));
-  }
-  else if(type.id()==ID_pointer)
-  {
-    return abstract_object_pointert(
-      new constant_pointer_abstract_objectt(type, top, bottom, *this));
-  }
-  else
-  {
-    return abstract_object_pointert(new abstract_objectt(type, top, false));
-  }
+  exprt empty_constant_expr=exprt();
+  return abstract_object_factory(type, top, bottom, empty_constant_expr, ns);
 }
 
 /*******************************************************************\
@@ -422,23 +410,34 @@ Function: abstract_environmentt::abstract_object_factory
 \*******************************************************************/
 
 abstract_object_pointert abstract_environmentt::abstract_object_factory(
-  const typet type, const exprt e, const namespacet &ns) const
+  const typet &type, const exprt &e, const namespacet &ns) const
 {
-  assert(type==e.type());
-  if(type.id()==ID_signedbv || type.id()==ID_bool || type.id()==ID_c_bool)
-  {
-    return abstract_object_pointert(
-      new constant_abstract_valuet(e));
-  }
-  else if(type.id()==ID_pointer)
-  {
-    return abstract_object_pointert(
-      new constant_pointer_abstract_objectt(e, *this, ns));
-  }
-  else
-  {
-    return abstract_object_pointert(new abstract_objectt(e));
-  }
+  return abstract_object_factory(type, false, false, e, ns);
+}
+
+/*******************************************************************\
+
+Function: abstract_environmentt::abstract_object_factory
+
+  Inputs:
+   type - the type of the object whose state should be tracked
+   top - does the type of the object start as top in the two-value domain
+   bottom - does the type of the object start as bottom in the two-value domain
+   expr - the starting value of the symbol if top and bottom are both false
+
+ Outputs: The abstract object that has been created
+
+ Purpose: Look at the configuration for the sensitivity and create an
+          appropriate abstract_object
+
+\*******************************************************************/
+
+abstract_object_pointert abstract_environmentt::abstract_object_factory(
+  const typet &type, bool top, bool bottom, const exprt &e,
+  const namespacet &ns) const
+{
+  return variable_sensitivity_object_factoryt::instance().get_abstract_object(
+    type, top, bottom, e, ns);
 }
 
 /*******************************************************************\
@@ -650,9 +649,4 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // to the abstract object being compared against
   abstract_object_pointert lhs=eval(e.op0(), ns);
   return lhs->expression_transform(e, *this, ns);
-}
-
-abstract_object_pointert abstract_environmentt::eval_rest(const exprt &e) const
-{
-  return abstract_object_factory(e.type());
 }
