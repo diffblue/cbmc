@@ -20,16 +20,37 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_refinement.h>
 
 #include <sstream>
+#include <iomanip>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
 #include <util/replace_expr.h>
+#include <util/refined_string_type.h>
+#include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <langapi/language_util.h>
+#include <java_bytecode/java_types.h>
+
+/*******************************************************************\
+
+Constructor: string_refinementt
+
+     Inputs: a namespace, a decision procedure, a bound on the number
+             of refinements and a boolean flag `concretize_result`
+
+    Purpose: refinement_bound is a bound on the number of refinement allowed.
+             if `concretize_result` is set to true, at the end of the decision
+             procedure, the solver try to find a concrete value for each
+             character
+
+\*******************************************************************/
 
 string_refinementt::string_refinementt(
-  const namespacet &_ns, propt &_prop, unsigned refinement_bound):
+  const namespacet &_ns,
+  propt &_prop,
+  unsigned refinement_bound):
   supert(_ns, _prop),
   use_counter_example(false),
+  do_concretizing(false),
   initial_loop_bound(refinement_bound)
 { }
 
@@ -46,15 +67,27 @@ void string_refinementt::set_mode()
 /// display the current index set, for debugging
 void string_refinementt::display_index_set()
 {
+  std::size_t count=0;
+  std::size_t count_current=0;
   for(const auto &i : index_set)
   {
     const exprt &s=i.first;
-    debug() << "IS(" << from_expr(s) << ")=={";
+    debug() << "IS(" << from_expr(s) << ")=={" << eom;
 
     for(auto j : i.second)
-      debug() << from_expr(j) << "; ";
+    {
+      if(current_index_set[i.first].find(j)!=current_index_set[i.first].end())
+      {
+        count_current++;
+        debug() << "**";
+      }
+      debug() << "  " << from_expr(j) << ";" << eom;
+      count++;
+    }
     debug() << "}"  << eom;
   }
+  debug() << count << " elements in index set (" << count_current
+          << " newly added)" << eom;
 }
 
 /// compute the index set for all formulas, instantiate the formulas with the
@@ -85,117 +118,322 @@ void string_refinementt::add_instantiations()
   }
 }
 
-/// if the expression is a function application, we convert it using our own
-/// convert_function_application method
-/// \par parameters: an expression
-/// \return a literal
-literalt string_refinementt::convert_rest(const exprt &expr)
+/*******************************************************************\
+
+Function: string_refinementt::add_symbol_to_symbol_map()
+
+  Inputs: a symbol and the expression to map it to
+
+ Purpose: keeps a map of symbols to expressions, such as none of the
+          mapped values exist as a key
+
+\*******************************************************************/
+
+void string_refinementt::add_symbol_to_symbol_map
+(const exprt &lhs, const exprt &rhs)
 {
+  assert(lhs.id()==ID_symbol);
+
+  // We insert the mapped value of the rhs, if it exists.
+  auto it=symbol_resolve.find(rhs);
+  const exprt &new_rhs=it!=symbol_resolve.end()?it->second:rhs;
+
+  symbol_resolve[lhs]=new_rhs;
+  reverse_symbol_resolve[new_rhs].push_back(lhs);
+
+  std::list<exprt> symbols_to_update_with_new_rhs(reverse_symbol_resolve[rhs]);
+  for(exprt item : symbols_to_update_with_new_rhs)
+  {
+    symbol_resolve[item]=new_rhs;
+    reverse_symbol_resolve[new_rhs].push_back(item);
+  }
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::set_char_array_equality()
+
+  Inputs: the rhs and lhs of an equality over character arrays
+
+ Purpose: add axioms if the rhs is a character array
+
+\*******************************************************************/
+
+void string_refinementt::set_char_array_equality(
+  const exprt &lhs, const exprt &rhs)
+{
+  assert(lhs.id()==ID_symbol);
+
+  if(rhs.id()==ID_array && rhs.type().id()==ID_array)
+  {
+    const typet &index_type=to_array_type(rhs.type()).size().type();
+    for(size_t i=0, ilim=rhs.operands().size(); i!=ilim; ++i)
+    {
+      // Introduce axioms to map symbolic rhs to its char array.
+      index_exprt arraycell(rhs, from_integer(i, index_type));
+      equal_exprt arrayeq(arraycell, rhs.operands()[i]);
+      add_lemma(arrayeq, false);
+#if 0
+      generator.axioms.push_back(arrayeq);
+#endif
+    }
+  }
+  // At least for Java (as it is currently pre-processed), we need not consider
+  // other cases, because all character arrays find themselves on the rhs of an
+  // equality. Note that this might not be the case for other languages.
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::substitute_function_applications()
+
+  Inputs: an expression containing function applications
+
+ Outputs: an epression containing no function application
+
+ Purpose: remove functions applications and create the necessary
+          axioms
+
+\*******************************************************************/
+
+exprt string_refinementt::substitute_function_applications(exprt expr)
+{
+  for(size_t i=0; i<expr.operands().size(); ++i)
+  {
+    // TODO: only copy when necessary
+    exprt op(expr.operands()[i]);
+    expr.operands()[i]=substitute_function_applications(op);
+  }
+
   if(expr.id()==ID_function_application)
   {
-    // can occur in __CPROVER_assume
-    bvt bv=convert_function_application(to_function_application_expr(expr));
-    assert(bv.size()==1);
-    return bv[0];
+    function_application_exprt f=to_function_application_expr(expr);
+    return generator.add_axioms_for_function_application(f);
   }
-  else
+
+  return expr;
+}
+
+bool string_refinementt::is_char_array(const typet &type) const
+{
+  if(type.id()==ID_symbol)
+    return is_char_array(ns.follow(type));
+
+  return (type.id()==ID_array && type.subtype()==java_char_type());
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::boolbv_set_equality_to_true
+
+  Inputs: the lhs and rhs of an equality expression
+
+ Outputs: false if the lemmas were added successfully, true otherwise
+
+ Purpose: add lemmas to the solver corresponding to the given equation
+
+\*******************************************************************/
+
+bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
+                                                       const exprt &rhs)
+{
+  if(is_char_array(rhs.type()))
   {
-    return supert::convert_rest(expr);
+    set_char_array_equality(lhs, rhs);
+    if(rhs.id() == ID_symbol || rhs.id() == ID_array)
+    {
+      add_symbol_to_symbol_map(lhs, rhs);
+      return false;
+    }
+    else if(rhs.id() == ID_nondet_symbol)
+    {
+      add_symbol_to_symbol_map(
+        lhs, generator.fresh_symbol("nondet_array", lhs.type()));
+      return false;
+    }
+    else
+    {
+      debug() << "string_refinement warning: not handling char_array: "
+              << from_expr(rhs) << eom;
+      return true;
+    }
   }
-}
-
-/// if the expression as string type, look up for the string in the list of
-/// string symbols that we maintain, and convert it; otherwise use the method of
-/// the parent class
-/// \par parameters: an expression
-/// \return a bitvector
-bvt string_refinementt::convert_symbol(const exprt &expr)
-{
-  const typet &type=expr.type();
-  const irep_idt &identifier=expr.get(ID_identifier);
-  assert(!identifier.empty());
-
-  if(refined_string_typet::is_refined_string_type(type))
+  if(refined_string_typet::is_refined_string_type(rhs.type()))
   {
-    string_exprt str=
-      generator.find_or_add_string_of_symbol(to_symbol_expr(expr));
-    bvt bv=convert_bv(str);
-    return bv;
+    exprt refined_rhs=generator.add_axioms_for_refined_string(rhs);
+    add_symbol_to_symbol_map(lhs, refined_rhs);
+    return false;
   }
-  else
-    return supert::convert_symbol(expr);
+  // Other cases are to be handled by supert::set_to.
+  return true;
 }
 
-/// generate an expression, add lemmas stating that this expression corresponds
-/// to the result of the given function call, and convert this expression
-/// \par parameters: a function_application
-/// \return a bitvector
-bvt string_refinementt::convert_function_application
-(const function_application_exprt &expr)
+/*******************************************************************\
+
+Function: string_refinementt::concretize_results
+
+ Purpose: For each string whose length has been solved, add constants
+          to the index set to force the solver to pick concrete values
+          for each character, and fill the map `found_length`
+
+\*******************************************************************/
+
+void string_refinementt::concretize_results()
 {
-  debug() << "string_refinementt::convert_function_application "
-          << from_expr(expr) << eom;
-  exprt f=generator.add_axioms_for_function_application(expr);
-  return convert_bv(f);
+  for(const auto& it : symbol_resolve)
+  {
+    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    {
+      string_exprt str=to_string_expr(it.second);
+      exprt length=current_model[str.length()];
+      exprt content=str.content();
+      replace_expr(symbol_resolve, content);
+      found_length[content]=length;
+      mp_integer found_length;
+      if(!to_integer(length, found_length))
+      {
+        assert(found_length.is_long());
+        if(found_length < 0)
+        {
+          debug() << "concretize_results: WARNING found length is negative"
+                  << eom;
+        }
+        else
+        {
+          size_t concretize_limit=found_length.to_long();
+          concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
+                MAX_CONCRETE_STRING_SIZE:concretize_limit;
+          exprt content_expr=str.content();
+          replace_expr(current_model, content_expr);
+          for(size_t i=0; i<concretize_limit; ++i)
+          {
+            auto i_expr=from_integer(i, str.length().type());
+            debug() << "Concretizing " << from_expr(content_expr)
+                    << " / " << i << eom;
+            current_index_set[str.content()].insert(i_expr);
+          }
+        }
+      }
+    }
+  }
+  add_instantiations();
 }
 
-/// add lemmas to the solver corresponding to the given equation
-/// \par parameters: an equality expression
-/// \return a Boolean flag to signal a proble
-bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
-{
-  if(!equality_propagation)
-    return true;
+/*******************************************************************\
 
-  // We should not do that everytime, but I cannot find
-  // another good entry point
+Function: string_refinementt::concretize_lengths
+
+ Purpose: For each string whose length has been solved, add constants
+          to the map `found_length`
+
+\*******************************************************************/
+
+void string_refinementt::concretize_lengths()
+{
+  for(const auto& it : symbol_resolve)
+  {
+    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    {
+      string_exprt str=to_string_expr(it.second);
+      exprt length=current_model[str.length()];
+      exprt content=str.content();
+      replace_expr(symbol_resolve, content);
+      found_length[content]=length;
+     }
+  }
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::set_to
+
+  Inputs: an expression and the value to set it to
+
+ Purpose: add lemmas representing the setting of an expression to a
+          given value
+
+\*******************************************************************/
+
+void string_refinementt::set_to(const exprt &expr, bool value)
+{
+  assert(equality_propagation);
+
+  // TODO: remove the mode field of generator since we should be language
+  // independent.
+  // We only set the mode once.
   if(generator.get_mode()==ID_unknown)
     set_mode();
 
-  typet type=ns.follow(expr.lhs().type());
-
-  if(expr.lhs().id()==ID_symbol &&
-     // We can have affectation of string from StringBuilder or CharSequence
-     // type==ns.follow(expr.rhs().type()) &&
-     type.id()!=ID_bool)
+  if(expr.id()==ID_equal)
   {
-    debug() << "string_refinementt " << from_expr(expr.lhs()) << " <- "
-            << from_expr(expr.rhs()) << eom;
+    equal_exprt eq_expr=to_equal_expr(expr);
 
-
-    if(expr.rhs().id()==ID_typecast)
+    if(eq_expr.lhs().type()!=eq_expr.rhs().type())
     {
-      exprt uncast=to_typecast_expr(expr.rhs()).op();
-      if(refined_string_typet::is_refined_string_type(uncast.type()))
+      debug() << "(sr::set_to) WARNING: ignoring "
+              << from_expr(expr) << " [inconsistent types]" << eom;
+      return;
+    }
+
+    if(expr.type().id()!=ID_bool)
+    {
+      error() << "string_refinementt::set_to got non-boolean operand: "
+              << expr.pretty() << eom;
+      throw 0;
+    }
+
+    // Preprocessing to remove function applications.
+    const exprt &lhs=eq_expr.lhs();
+    debug() << "(sr::set_to) " << from_expr(lhs)
+            << " = " << from_expr(eq_expr.rhs()) << eom;
+
+    // TODO: See if this happens at all.
+    if(lhs.id()!=ID_symbol)
+    {
+      debug() << "(sr::set_to) WARNING: ignoring "
+              << from_expr(expr) << eom;
+      return;
+    }
+
+    exprt subst_rhs=substitute_function_applications(eq_expr.rhs());
+    if(eq_expr.lhs().type()!=subst_rhs.type())
+    {
+      if(eq_expr.lhs().type().id() != ID_array ||
+         subst_rhs.type().id() != ID_array ||
+         eq_expr.lhs().type().subtype() != subst_rhs.type().subtype())
       {
-        debug() << "(sr) detected casted string" << eom;
-        symbol_exprt sym=to_symbol_expr(expr.lhs());
-        generator.set_string_symbol_equal_to_expr(sym, uncast);
-        return false;
+        debug() << "(sr::set_to) WARNING: ignoring "
+                << from_expr(expr) << " [inconsistent types after substitution]"
+                << eom;
+        return;
+      }
+      else
+      {
+        debug() << "(sr::set_to) accepting arrays with "
+                << "same subtype but different sizes" << eom;
       }
     }
 
-    if(refined_string_typet::is_refined_string_type(type))
+    if(value)
     {
-      symbol_exprt sym=to_symbol_expr(expr.lhs());
-      generator.set_string_symbol_equal_to_expr(sym, expr.rhs());
-      return false;
+      if(!add_axioms_for_string_assigns(lhs, subst_rhs))
+        return;
     }
-    else if(type==ns.follow(expr.rhs().type()))
+    else
     {
-      if(is_unbounded_array(type))
-        return true;
-      bvt bv1=convert_bv(expr.rhs());
-      const irep_idt &identifier=
-        to_symbol_expr(expr.lhs()).get_identifier();
-      map.set_literals(identifier, type, bv1);
-      if(freeze_all)
-        set_frozen(bv1);
-      return false;
+      // TODO: Something should also be done if value is false.
+      assert(!is_char_array(eq_expr.rhs().type()));
+      assert(!refined_string_typet::is_refined_string_type(
+        eq_expr.rhs().type()));
     }
-  }
 
-  return true;
+    non_string_axioms.push_back(std::make_pair(equal_exprt(lhs, subst_rhs),
+                                               value));
+  }
+  // We keep a list of the axioms to give to supert::set_to in order to
+  // substitute the symbols in dec_solve().
+  else
+    non_string_axioms.push_back(std::make_pair(expr, value));
 }
 
 /// use a refinement loop to instantiate universal axioms, call the sat solver,
@@ -203,7 +441,18 @@ bool string_refinementt::boolbv_set_equality_to_true(const equal_exprt &expr)
 /// \return result of the decision procedure
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
-  for(const exprt &axiom : generator.axioms)
+  // Substitute all symbols to char arrays in the axioms to give to
+  // supert::set_to().
+  for(std::pair<exprt, bool> &pair : non_string_axioms)
+  {
+    replace_expr(symbol_resolve, pair.first);
+    debug() << "super::set_to " << from_expr(pair.first) << eom;
+    supert::set_to(pair.first, pair.second);
+  }
+
+  for(exprt &axiom : generator.axioms)
+  {
+    replace_expr(symbol_resolve, axiom);
     if(axiom.id()==ID_string_constraint)
     {
       string_constraintt c=to_string_constraint(axiom);
@@ -224,6 +473,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       add_lemma(axiom);
     }
+  }
 
   initial_index_set(universal_axioms);
   update_index_set(cur);
@@ -244,6 +494,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       else
       {
         debug() << "check_SAT: the model is correct" << eom;
+        concretize_lengths();
         return D_SATISFIABLE;
       }
 
@@ -260,7 +511,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       if(current_index_set.empty())
       {
         debug() << "current index set is empty" << eom;
-        return D_SATISFIABLE;
+        if(do_concretizing)
+        {
+          concretize_results();
+          do_concretizing=false;
+        }
+        else
+        {
+          debug() << "check_SAT: the model is correct and "
+                  << "does not need concretizing" << eom;
+          return resultt::D_SATISFIABLE;
+        }
       }
 
       display_index_set();
@@ -296,104 +557,456 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 }
 
 /// add the given lemma to the solver
-/// \par parameters: a lemma
-void string_refinementt::add_lemma(const exprt &lemma, bool add_to_index_set)
+/// \par parameters: a lemma and Boolean value stating whether the lemma should
+/// be added to the index set.
+void string_refinementt::add_lemma(
+  const exprt &lemma, bool _simplify, bool add_to_index_set)
 {
   if(!seen_instances.insert(lemma).second)
     return;
 
-  if(lemma.is_true())
+  if(add_to_index_set)
+    cur.push_back(lemma);
+
+  exprt simple_lemma=lemma;
+  if(_simplify)
+    simplify(simple_lemma, ns);
+
+  if(simple_lemma.is_true())
   {
+#if 0
     debug() << "string_refinementt::add_lemma : tautology" << eom;
+#endif
     return;
   }
 
-  debug() << "adding lemma " << from_expr(lemma) << eom;
+  debug() << "adding lemma " << from_expr(simple_lemma) << eom;
 
-  prop.l_set_to_true(convert(lemma));
-  if(add_to_index_set)
-    cur.push_back(lemma);
+  prop.l_set_to_true(convert(simple_lemma));
+}
+
+/// get a model of an array and put it in a certain form. If the size cannot be
+/// obtained or if it is too big, return an empty array.
+/// \par parameters: an expression representing an array and an expression
+/// representing an integer
+/// \return an array expression or an array_of_exprt
+exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
+{
+  exprt arr_val=get_array(arr);
+  exprt size_val=supert::get(size);
+  size_val=simplify_expr(size_val, ns);
+  typet char_type=arr.type().subtype();
+  typet index_type=size.type();
+  array_typet empty_ret_type(char_type, from_integer(0, index_type));
+  array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
+
+  if(size_val.id()!=ID_constant)
+  {
+#if 0
+    debug() << "(sr::get_array) string of unknown size: "
+            << from_expr(size_val) << eom;
+#endif
+    return empty_ret;
+  }
+
+  unsigned n;
+  if(to_unsigned_integer(to_constant_expr(size_val), n))
+  {
+#if 0
+    debug() << "(sr::get_array) size is not valid" << eom;
+#endif
+    return empty_ret;
+  }
+
+  array_typet ret_type(char_type, from_integer(n, index_type));
+  array_exprt ret(ret_type);
+
+  if(n>MAX_CONCRETE_STRING_SIZE)
+  {
+#if 0
+    debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
+#endif
+    return empty_ret;
+  }
+
+  if(n==0)
+  {
+#if 0
+    debug() << "(sr::get_array) empty string" << eom;
+#endif
+    return empty_ret;
+  }
+
+  std::vector<unsigned> concrete_array(n);
+
+  if(arr_val.id()=="array-list")
+  {
+    for(size_t i=0; i<arr_val.operands().size()/2; i++)
+    {
+      exprt index=arr_val.operands()[i*2];
+      unsigned idx;
+      if(!to_unsigned_integer(to_constant_expr(index), idx))
+      {
+        if(idx<n)
+        {
+          exprt value=arr_val.operands()[i*2+1];
+          to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
+        }
+      }
+    }
+  }
+  else if(arr_val.id()==ID_array)
+  {
+    for(size_t i=0; i<arr_val.operands().size() && i<n; i++)
+    {
+      unsigned c;
+      exprt op=arr_val.operands()[i];
+      if(op.id()==ID_constant)
+      {
+        to_unsigned_integer(to_constant_expr(op), c);
+        concrete_array[i]=c;
+      }
+    }
+  }
+  else
+  {
+#if 0
+    debug() << "unable to get array-list value of " << from_expr(arr)
+            << " of size " << n << eom;
+#endif
+    return array_of_exprt(from_integer(0, char_type), ret_type);
+  }
+
+  for(size_t i=0; i<n; i++)
+  {
+    exprt c_expr=from_integer(concrete_array[i], char_type);
+    ret.move_to_operands(c_expr);
+  }
+
+  return ret;
+}
+
+
+/// get a model of an array of unknown size and infer the size if possible
+/// \par parameters: an expression representing an array
+/// \return an expression
+exprt string_refinementt::get_array(const exprt &arr) const
+{
+  exprt arr_model=supert::get(arr);
+  if(arr_model.id()==ID_array)
+  {
+    array_typet &arr_type=to_array_type(arr_model.type());
+    arr_type.size()=from_integer(
+      arr_model.operands().size(), arr_type.size().type());
+  }
+  return arr_model;
 }
 
 /// convert the content of a string to a more readable representation. This
 /// should only be used for debbuging.
 /// \par parameters: a constant array expression and a integer expression
 /// \return a string
-std::string string_refinementt::string_of_array(
-  const exprt &arr, const exprt &size) const
+std::string string_refinementt::string_of_array(const array_exprt &arr)
 {
-  if(size.id()!=ID_constant)
-    return "string of unknown size";
   unsigned n;
-  if(to_unsigned_integer(to_constant_expr(size), n))
-    n=0;
+  if(arr.type().id()!=ID_array)
+      return std::string("");
 
-  if(n>MAX_CONCRETE_STRING_SIZE)
-    return "very long string";
-  if(n==0)
-    return "\"\"";
+  exprt size_expr=to_array_type(arr.type()).size();
+  assert(size_expr.id()==ID_constant);
+  to_unsigned_integer(to_constant_expr(size_expr), n);
+  std::string str(n, '?');
 
-  std::ostringstream buf;
-  buf << "\"";
-  exprt val=get(arr);
+  std::ostringstream result;
+  std::locale loc;
 
-  if(val.id()=="array-list")
+  for(size_t i=0; i<arr.operands().size() && i<n; i++)
   {
-    for(size_t i=0; i<val.operands().size()/2; i++)
+    // TODO: factorize with utf16_little_endian_to_ascii
+    unsigned c;
+    exprt arr_i=arr.operands()[i];
+    assert(arr_i.id()==ID_constant);
+    to_unsigned_integer(to_constant_expr(arr_i), c);
+    if(c<=255 && c>=32)
+      result << (unsigned char) c;
+    else
     {
-      exprt index=val.operands()[i*2];
-      unsigned idx;
-      if(!to_unsigned_integer(to_constant_expr(index), idx))
-      {
-        if(idx<n)
-        {
-          exprt value=val.operands()[i*2+1];
-          unsigned c;
-          if(!to_unsigned_integer(to_constant_expr(value), c))
-            buf << static_cast<char>(c);
-        }
-      }
+      result << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+             << (unsigned int) c;
     }
   }
-  else
-  {
-    return "unable to get array-list";
-  }
 
-  buf << "\"";
-  return buf.str();
+  return result.str();
 }
 
-/// gets a model of an array and put it in a certain form
-/// \par parameters: an array expression and a integer expression
-/// \return a string expression
-exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
+/// Fill in `current_model` by mapping the variables created by the solver to
+/// constant expressions given by the current model
+void string_refinementt::fill_model()
 {
-  exprt val=get(arr);
-  typet char_type=arr.type().subtype();
-  typet index_type=size.type();
-
-  if(val.id()=="array-list")
+  for(auto it : symbol_resolve)
   {
-    array_typet ret_type(char_type, infinity_exprt(index_type));
-    exprt ret=array_of_exprt(from_integer(0, char_type), ret_type);
-
-    for(size_t i=0; i<val.operands().size()/2; i++)
+    if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
-      exprt index=val.operands()[i*2];
-      assert(index.type()==index_type);
-      exprt value=val.operands()[i*2+1];
-      assert(value.type()==char_type);
-      ret=with_exprt(ret, index, value);
+      string_exprt refined=to_string_expr(it.second);
+      // TODO: check whith this is necessary:
+      replace_expr(symbol_resolve, refined);
+      const exprt &econtent=refined.content();
+      const exprt &elength=refined.length();
+
+      exprt len=supert::get(elength);
+      len=simplify_expr(len, ns);
+      exprt arr=get_array(econtent, len);
+
+      current_model[elength]=len;
+      current_model[econtent]=arr;
+      debug() << from_expr(to_symbol_expr(it.first)) << "="
+              << from_expr(refined);
+
+      if(arr.id()==ID_array)
+        debug() << " = \"" << string_of_array(to_array_expr(arr))
+                << "\" (size:" << from_expr(len) << ")"<< eom;
+      else
+        debug() << " = " << from_expr(arr) << " (size:" << from_expr(len)
+                << ")" << eom;
     }
-    return ret;
+    else
+    {
+      assert(is_char_array(it.second.type()));
+      exprt arr=it.second;
+      replace_expr(symbol_resolve, arr);
+      replace_expr(current_model, arr);
+      exprt arr_model=get_array(arr);
+      current_model[it.first]=arr_model;
+
+      debug() << from_expr(to_symbol_expr(it.first)) << "="
+              << from_expr(arr) << " = " << from_expr(arr_model) << "" << eom;
+    }
+  }
+
+  for(auto it : generator.boolean_symbols)
+  {
+      debug() << "" << it.get_identifier() << " := "
+              << from_expr(supert::get(it)) << eom;
+      current_model[it]=supert::get(it);
+  }
+
+  for(auto it : generator.index_symbols)
+  {
+     debug() << "" << it.get_identifier() << " := "
+              << from_expr(supert::get(it)) << eom;
+     current_model[it]=supert::get(it);
+  }
+}
+
+/// Create a new expression where 'with' expressions on arrays are replaced by
+/// 'if' expressions. e.g. for an array access arr[x], where: `arr :=
+/// array_of(12) with {0:=24} with {2:=42}` the constructed expression will be:
+/// `index==0 ? 24 : index==2 ? 42 : 12`
+/// \param expr: A (possibly nested) 'with' expression on an `array_of`
+///   expression
+/// \param index: An index with which to build the equality condition
+/// \return An expression containing no 'with' expression
+exprt string_refinementt::substitute_array_with_expr(
+  const exprt &expr, const exprt &index) const
+{
+  if(expr.id()==ID_with)
+  {
+    const with_exprt &with_expr=to_with_expr(expr);
+    const exprt &then_expr=with_expr.new_value();
+    exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
+    const typet &type=then_expr.type();
+    assert(else_expr.type()==type);
+    return if_exprt(
+      equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
   }
   else
   {
-    debug() << "unable to get array-list value of "
-            << from_expr(val) << eom;
-    return arr;
+    // Only handle 'with' expressions on 'array_of' expressions.
+    assert(expr.id()==ID_array_of);
+    return to_array_of_expr(expr).what();
   }
+}
+
+/// create an equivalent expression where array accesses and 'with' expressions
+/// are replaced by 'if' expressions, in particular:
+///  * for an array access `arr[x]`, where:
+///    `arr := {12, 24, 48}` the constructed expression will be:
+///    `index==0 ? 12 : index==1 ? 24 : 48`
+///  * for an array access `arr[x]`, where:
+///    `arr := array_of(12) with {0:=24} with {2:=42}` the constructed
+///    expression will be: `index==0 ? 24 : index==2 ? 42 : 12`
+///  * for an array access `(g1?arr1:arr2)[x]` where `arr1 := {12}` and
+///    `arr2 := {34}`, the constructed expression will be: `g1 ? 12 : 34`
+/// \param expr: an expression containing array accesses
+/// \return an expression containing no array access
+void string_refinementt::substitute_array_access(exprt &expr) const
+{
+  for(auto &op : expr.operands())
+    substitute_array_access(op);
+
+  if(expr.id()==ID_index)
+  {
+    index_exprt &index_expr=to_index_expr(expr);
+
+    if(index_expr.array().id()==ID_symbol)
+    {
+      expr=index_expr;
+      return;
+    }
+
+    if(index_expr.array().id()==ID_with)
+    {
+      expr=substitute_array_with_expr(
+        index_expr.array(), index_expr.index());
+      return;
+    }
+
+    if(index_expr.array().id()==ID_array_of)
+    {
+      expr=to_array_of_expr(index_expr.array()).op();
+      return;
+    }
+
+    if(index_expr.array().id()==ID_if)
+    {
+      // Substitute recursively in branches of conditional expressions
+      if_exprt if_expr=to_if_expr(index_expr.array());
+      exprt true_case=index_exprt(if_expr.true_case(), index_expr.index());
+      substitute_array_access(true_case);
+      exprt false_case=index_exprt(if_expr.false_case(), index_expr.index());
+      substitute_array_access(false_case);
+      expr=if_exprt(if_expr.cond(), true_case, false_case);
+      return;
+    }
+
+    assert(index_expr.array().id()==ID_array);
+    array_exprt &array_expr=to_array_expr(index_expr.array());
+
+    assert(!array_expr.operands().empty());
+    size_t last_index=array_expr.operands().size()-1;
+
+    const typet &char_type=index_expr.array().type().subtype();
+    exprt ite=array_expr.operands().back();
+
+    if(ite.type()!=char_type)
+    {
+      // We have to manualy set the type for unknown values
+      assert(ite.id()==ID_unknown);
+      ite.type()=char_type;
+    }
+
+    auto op_it=++array_expr.operands().rbegin();
+
+    for(size_t i=last_index-1;
+        op_it!=array_expr.operands().rend(); ++op_it, --i)
+    {
+      equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
+      if(op_it->type()!=char_type)
+      {
+        assert(op_it->id()==ID_unknown);
+        op_it->type()=char_type;
+      }
+      ite=if_exprt(equals, *op_it, ite);
+    }
+    expr=ite;
+  }
+}
+
+/// Negates the constraint to be fed to a solver. The intended usage is to find
+/// an assignement of the universal variable that would violate the axiom. To
+/// avoid false positives, the symbols other than the universal variable should
+/// have been replaced by their valuation in the current model.
+/// \pre Symbols other than the universal variable should have been replaced by
+///   their valuation in the current model.
+/// \param axiom: the not_contains constraint to add the negation of
+/// \param val: the existential witness for the axiom
+/// \param univ_var: the universal variable for the negation of the axiom
+/// \return: the negation of the axiom under the current evaluation
+exprt string_refinementt::negation_of_not_contains_constraint(
+  const string_not_contains_constraintt &axiom,
+  const exprt &val,
+  const symbol_exprt &univ_var)
+{
+  exprt lbu=axiom.univ_lower_bound();
+  exprt ubu=axiom.univ_upper_bound();
+  if(lbu.id()==ID_constant && ubu.id()==ID_constant)
+  {
+    mp_integer lb_int, ub_int;
+    to_integer(to_constant_expr(lbu), lb_int);
+    to_integer(to_constant_expr(ubu), ub_int);
+    if(ub_int<=lb_int)
+    {
+      debug() << "empty constraint with current model" << eom;
+      return false_exprt();
+    }
+  }
+
+  exprt lbe=axiom.exists_lower_bound();
+  exprt ube=axiom.exists_upper_bound();
+
+  if(axiom.premise()==false_exprt())
+  {
+    debug() << "(string_refinement::check_axioms) adding false" << eom;
+    return false_exprt();
+  }
+
+  // Witness is the Skolem function for the existential, which we evaluate at
+  // univ_var.
+  and_exprt univ_bounds(
+    binary_relation_exprt(lbu, ID_le, univ_var),
+    binary_relation_exprt(ubu, ID_gt, univ_var));
+  and_exprt exists_bounds(
+    binary_relation_exprt(lbe, ID_le, val),
+    binary_relation_exprt(ube, ID_gt, val));
+  equal_exprt equal_chars(
+    axiom.s0()[plus_exprt(univ_var, val)],
+    axiom.s1()[val]);
+  and_exprt negaxiom(univ_bounds, axiom.premise(), exists_bounds, equal_chars);
+
+  debug() << "(sr::check_axioms) negated not_contains axiom: "
+          << from_expr(ns, "", negaxiom) << eom;
+  substitute_array_access(negaxiom);
+  return negaxiom;
+}
+
+/// Negates the constraint to be fed to a solver. The intended usage is to find
+/// an assignement of the universal variable that would violate the axiom. To
+/// avoid false positives, the symbols other than the universal variable should
+/// have been replaced by their valuation in the current model.
+/// \pre Symbols other than the universal variable should have been replaced by
+///   their valuation in the current model.
+/// \param axiom: the not_contains constraint to add the negation of
+/// \return: the negation of the axiom under the current evaluation
+exprt string_refinementt::negation_of_constraint(
+  const string_constraintt &axiom)
+{
+  exprt lb=axiom.lower_bound();
+  exprt ub=axiom.upper_bound();
+  if(lb.id()==ID_constant && ub.id()==ID_constant)
+  {
+    mp_integer lb_int, ub_int;
+    to_integer(to_constant_expr(lb), lb_int);
+    to_integer(to_constant_expr(ub), ub_int);
+    if(ub_int<=lb_int)
+    {
+      debug() << "empty constraint with current model" << eom;
+      solver << false_exprt();
+      return;
+    }
+  }
+
+  if(axiom.premise()==false_exprt())
+  {
+      debug() << "(string_refinement::check_axioms) adding false" << eom;
+      solver << false_exprt();
+      return;
+  }
+
+  and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
+  and_exprt negaxiom(premise, not_exprt(axiom.body()));
+
+  debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
+  solver << negaxiom;
 }
 
 /// return true if the current model satisfies all the axioms
@@ -404,38 +1017,7 @@ bool string_refinementt::check_axioms()
           << "===========================================" << eom;
   debug() << "string_refinementt::check_axioms: build the"
           << " interpretation from the model of the prop_solver" << eom;
-  replace_mapt fmodel;
-
-  for(auto it : generator.symbol_to_string)
-  {
-    string_exprt refined=it.second;
-    const exprt &econtent=refined.content();
-    const exprt &elength=refined.length();
-
-    exprt len=get(elength);
-    exprt arr=get_array(econtent, len);
-
-    fmodel[elength]=len;
-    fmodel[econtent]=arr;
-    debug() << it.first << "=" << from_expr(it.second)
-            << " of length " << from_expr(len) <<" := " << eom
-            << from_expr(get(econtent)) << eom
-            << string_of_array(econtent, len) << eom;
-  }
-
-  for(auto it : generator.boolean_symbols)
-  {
-    debug() << "" << it.get_identifier() << " := "
-            << from_expr(get(it)) << eom;
-    fmodel[it]=get(it);
-  }
-
-  for(auto it : generator.index_symbols)
-  {
-    debug() << "" << it.get_identifier() << " := "
-            << from_expr(get(it)) << eom;
-    fmodel[it]=get(it);
-  }
+  fill_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
@@ -445,21 +1027,27 @@ bool string_refinementt::check_axioms()
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
     const string_constraintt &axiom=universal_axioms[i];
+    symbol_exprt univ_var=axiom.univ_var();
+    exprt bound_inf=axiom.lower_bound();
+    exprt bound_sup=axiom.upper_bound();
+    exprt prem=axiom.premise();
+    exprt body=axiom.body();
 
-    exprt negaxiom=and_exprt(axiom.premise(), not_exprt(axiom.body()));
-    replace_expr(fmodel, negaxiom);
-
-    debug() << "negaxiom: " << from_expr(negaxiom) << eom;
+    string_constraintt axiom_in_model(
+      univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
 
     satcheck_no_simplifiert sat_check;
     supert solver(ns, sat_check);
-    solver << negaxiom;
+    add_negation_of_constraint_to_solver(axiom_in_model, solver);
 
     switch(solver())
     {
     case decision_proceduret::D_SATISFIABLE:
       {
-        exprt val=solver.get(axiom.univ_var());
+        exprt val=solver.get(axiom_in_model.univ_var());
+        debug() << "string constraint can be violated for "
+                << axiom_in_model.univ_var().get_identifier()
+                << " = " << from_expr(val) << eom;
         violated[i]=val;
       }
       break;
@@ -505,10 +1093,8 @@ bool string_refinementt::check_axioms()
         exprt body(axiom.body());
         implies_exprt instance(premise, body);
         replace_expr(axiom.univ_var(), val, instance);
-        if(seen_instances.insert(instance).second)
-          add_lemma(instance);
-        else
-          debug() << "instance already seen" << eom;
+        debug() << "adding counter example " << from_expr(instance) << eom;
+        add_lemma(instance);
       }
     }
 
@@ -564,13 +1150,13 @@ std::map<exprt, int> string_refinementt::map_representation_of_sum(
 ///   times given by the corresponding integer in the map. For a map x -> 2, y
 ///   -> -1 would give an expression $x + x - y$.
 exprt string_refinementt::sum_over_map(
-  std::map<exprt, int> &m, bool negated) const
+  std::map<exprt, int> &m, const typet &type, bool negated) const
 {
   exprt sum=nil_exprt();
   mp_integer constants=0;
   typet index_type;
   if(m.empty())
-    return nil_exprt();
+    return from_integer(0, type);
   else
     index_type=m.begin()->first.type();
 
@@ -605,12 +1191,20 @@ exprt string_refinementt::sum_over_map(
       default:
         if(second>1)
         {
-          for(int i=0; i<second; i++)
+          if(sum.is_nil())
+            sum=t;
+          else
+            plus_exprt(sum, t);
+          for(int i=1; i<second; i++)
             sum=plus_exprt(sum, t);
         }
-        else
+        else if(second<-1)
         {
-          for(int i=0; i>second; i--)
+          if(sum.is_nil())
+            sum=unary_minus_exprt(t);
+          else
+            sum=minus_exprt(sum, t);
+          for(int i=-1; i>second; i--)
             sum=minus_exprt(sum, t);
         }
       }
@@ -629,7 +1223,7 @@ exprt string_refinementt::sum_over_map(
 exprt string_refinementt::simplify_sum(const exprt &f) const
 {
   std::map<exprt, int> map=map_representation_of_sum(f);
-  return sum_over_map(map);
+  return sum_over_map(map, f.type());
 }
 
 /// \par parameters: a symbol qvar, an expression val, an expression f
@@ -666,7 +1260,7 @@ exprt string_refinementt::compute_inverse_function(
   }
 
   elems.erase(it);
-  return sum_over_map(elems, neg);
+  return sum_over_map(elems, f.type(), neg);
 }
 
 
@@ -688,7 +1282,7 @@ public:
   }
 };
 
-/// looks for the symbol and return true if it is found
+/// look for the symbol and return true if it is found
 /// \par parameters: an index expression and a symbol qvar
 /// \return a Boolean
 static bool find_qvar(const exprt index, const symbol_exprt &qvar)
@@ -719,6 +1313,27 @@ void string_refinementt::update_index_set(const std::vector<exprt> &cur)
 /// add to the index set all the indices that appear in the formula and the
 /// upper bound minus one
 /// \par parameters: a string constraint
+void string_refinementt::add_to_index_set(const exprt &s, exprt i)
+{
+  simplify(i, ns);
+  if(i.id()==ID_constant)
+  {
+    mp_integer mpi;
+    to_integer(i, mpi);
+    if(mpi<0)
+    {
+      debug() << "add_to_index_set : ignoring negative number " << mpi << eom;
+      return;
+    }
+  }
+  if(index_set[s].insert(i).second)
+  {
+    debug() << "adding to index set of " << from_expr(s)
+            << ": " << from_expr(i) << eom;
+    current_index_set[s].insert(i);
+  }
+}
+
 void string_refinementt::initial_index_set(const string_constraintt &axiom)
 {
   symbol_exprt qvar=axiom.univ_var();
@@ -739,8 +1354,7 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var)
       {
-        current_index_set[s].insert(i);
-        index_set[s].insert(i);
+        add_to_index_set(s, i);
       }
       else
       {
@@ -750,8 +1364,7 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
           axiom.upper_bound(),
           from_integer(1, axiom.upper_bound().type()));
         replace_expr(qvar, kminus1, e);
-        current_index_set[s].insert(e);
-        index_set[s].insert(e);
+        add_to_index_set(s, e);
       }
     }
     else
@@ -777,12 +1390,7 @@ void string_refinementt::update_index_set(const exprt &formula)
       const exprt &i=cur.op1();
       assert(s.type().id()==ID_array);
       exprt simplified=simplify_sum(i);
-      if(index_set[s].insert(simplified).second)
-      {
-        debug() << "adding to index set of " << from_expr(s)
-                << ": " << from_expr(simplified) << eom;
-        current_index_set[s].insert(simplified);
-      }
+      add_to_index_set(s, simplified);
     }
     else
     {
@@ -829,10 +1437,9 @@ exprt find_index(const exprt &expr, const exprt &str)
   catch (exprt i) { return i; }
 }
 
-
-/// \par parameters: an universaly quantified formula `axiom`, an array of char
+/// \par parameters: a universally quantified formula `axiom`, an array of char
 /// variable `str`, and an index expression `val`.
-/// \return substitute `qvar` the universaly quantified variable of `axiom`, by
+/// \return substitute `qvar` the universally quantified variable of `axiom`, by
 ///   an index `val`, in `axiom`, so that the index used for `str` equals `val`.
 ///   For instance, if `axiom` corresponds to $\forall q. s[q+x]='a' &&
 ///   t[q]='b'$, `instantiate(axom,s,v)` would return an expression for
@@ -858,7 +1465,10 @@ exprt string_refinementt::instantiate(
   return implies_exprt(bounds, instance);
 }
 
-
+/// instantiate a quantified formula representing `not_contains` by substituting
+/// the quantifiers and generating axioms
+/// \par parameters: a quantified formula representing `not_contains`, and a
+/// list to which to add the created lemmas to
 void string_refinementt::instantiate_not_contains(
   const string_not_contains_constraintt &axiom, std::list<exprt> &new_lemmas)
 {
@@ -908,4 +1518,59 @@ void string_refinementt::instantiate_not_contains(
         and_exprt(and_exprt(c1, c2), and_exprt(c3, c4)));
       new_lemmas.push_back(witness_bounds);
     }
+}
+
+/// replace array-lists by 'with' expressions
+/// \par parameters: an expression containing array-list expressions
+/// \return an epression containing no array-list
+exprt string_refinementt::substitute_array_lists(exprt expr) const
+{
+  for(size_t i=0; i<expr.operands().size(); ++i)
+  {
+    // TODO: only copy when necessary
+    exprt op(expr.operands()[i]);
+    expr.operands()[i]=substitute_array_lists(op);
+  }
+
+  if(expr.id()=="array-list")
+  {
+    assert(expr.operands().size()>=2);
+    typet &char_type=expr.operands()[1].type();
+    array_typet arr_type(char_type, infinity_exprt(char_type));
+    array_of_exprt new_arr(from_integer(0, char_type),
+                           arr_type);
+
+    with_exprt ret_expr(new_arr,
+                        expr.operands()[0],
+                        expr.operands()[1]);
+
+    for(size_t i=2; i<expr.operands().size()/2; i++)
+    {
+      ret_expr=with_exprt(ret_expr,
+                          expr.operands()[i*2],
+                          expr.operands()[i*2+1]);
+    }
+    return ret_expr;
+  }
+
+  return expr;
+}
+
+/// evaluation of the expression in the current model
+/// \par parameters: an expression
+/// \return an expression
+exprt string_refinementt::get(const exprt &expr) const
+{
+  exprt ecopy(expr);
+  replace_expr(symbol_resolve, ecopy);
+  if(is_char_array(ecopy.type()))
+  {
+    auto it=found_length.find(ecopy);
+    if(it!=found_length.end())
+      return get_array(ecopy, it->second);
+  }
+
+  ecopy=supert::get(ecopy);
+
+  return substitute_array_lists(ecopy);
 }

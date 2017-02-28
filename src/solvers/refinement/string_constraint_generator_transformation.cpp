@@ -24,7 +24,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 string_exprt string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 2)[0]);
+  string_exprt s1=get_string_expr(args(f, 2)[0]);
   exprt k=args(f, 2)[1];
   const refined_string_typet &ref_type=to_refined_string_type(s1.type());
   string_exprt res=fresh_string(ref_type);
@@ -63,7 +63,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   assert(args.size()>=2);
-  string_exprt str=add_axioms_for_string_expr(args[0]);
+  string_exprt str=get_string_expr(args[0]);
   exprt i(args[1]);
   exprt j;
   if(args.size()==3)
@@ -89,7 +89,6 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 {
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &index_type=ref_type.get_index_type();
-  symbol_exprt idx=fresh_exist_index("index_substring", index_type);
   assert(start.type()==index_type);
   assert(end.type()==index_type);
   string_exprt res=fresh_string(ref_type);
@@ -112,8 +111,11 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   // Warning: check what to do if the string is not long enough
   axioms.push_back(str.axiom_for_is_longer_than(end));
 
-  string_constraintt a4(
-    idx, res.length(), equal_exprt(res[idx], str[plus_exprt(start, idx)]));
+  symbol_exprt idx=fresh_univ_index("QA_index_substring", index_type);
+  string_constraintt a4(idx,
+                        res.length(),
+                        equal_exprt(res[idx],
+                        str[plus_exprt_with_overflow_check(start, idx)]));
   axioms.push_back(a4);
   return res;
 }
@@ -124,7 +126,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 string_exprt string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &index_type=ref_type.get_index_type();
   string_exprt res=fresh_string(ref_type);
@@ -143,7 +145,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   // a8 : forall n<|s1|, s[idx+n]=s1[n]
   // a9 : (s[m]>' ' &&s[m+|s1|-1]>' ') || m=|s|
 
-  exprt a1=str.axiom_for_is_longer_than(plus_exprt(idx, res.length()));
+  exprt a1=str.axiom_for_is_longer_than(
+    plus_exprt_with_overflow_check(idx, res.length()));
   axioms.push_back(a1);
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
@@ -165,7 +168,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   axioms.push_back(a6);
 
   symbol_exprt n2=fresh_univ_index("QA_index_trim2", index_type);
-  minus_exprt bound(str.length(), plus_exprt(idx, res.length()));
+  minus_exprt bound(str.length(), plus_exprt_with_overflow_check(idx,
+                                                                 res.length()));
   binary_relation_exprt eqn2(
     str[plus_exprt(idx, plus_exprt(res.length(), n2))],
     ID_le,
@@ -180,7 +184,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   axioms.push_back(a8);
 
   minus_exprt index_before(
-    plus_exprt(idx, res.length()), from_integer(1, index_type));
+    plus_exprt_with_overflow_check(idx, res.length()),
+      from_integer(1, index_type));
   binary_relation_exprt no_space_before(str[index_before], ID_gt, space_char);
   or_exprt a9(
     equal_exprt(idx, str.length()),
@@ -197,7 +202,7 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
 string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -241,7 +246,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
 string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -288,7 +293,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 string_exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   string_exprt res=fresh_string(ref_type);
   with_exprt sarrnew(str.content(), args(f, 3)[1], args(f, 3)[2]);
@@ -313,7 +318,7 @@ string_exprt string_constraint_generatort::add_axioms_for_char_set(
 string_exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const exprt &old_char=args(f, 3)[1];
   const exprt &new_char=args(f, 3)[2];
@@ -347,10 +352,12 @@ string_exprt string_constraint_generatort::add_axioms_for_replace(
 string_exprt string_constraint_generatort::add_axioms_for_delete_char_at(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 2)[0]);
+  string_exprt str=get_string_expr(args(f, 2)[0]);
   exprt index_one=from_integer(1, str.length().type());
   return add_axioms_for_delete(
-    str, args(f, 2)[1], plus_exprt(args(f, 2)[1], index_one));
+    str,
+    args(f, 2)[1],
+    plus_exprt_with_overflow_check(args(f, 2)[1], index_one));
 }
 
 /// add axioms stating that the returned string corresponds to the input one
@@ -376,6 +383,6 @@ string_exprt string_constraint_generatort::add_axioms_for_delete(
 string_exprt string_constraint_generatort::add_axioms_for_delete(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   return add_axioms_for_delete(str, args(f, 3)[1], args(f, 3)[2]);
 }

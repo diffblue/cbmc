@@ -55,7 +55,6 @@ public:
     return operands()[4];
   }
 
-
  private:
   string_constraintt();
 
