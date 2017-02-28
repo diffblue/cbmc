@@ -538,6 +538,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
         {
           exprt value=arr_val.operands()[i*2+1];
           to_unsigned_integer(to_constant_expr(value), concrete_array[i]);
+          to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
         }
       }
     }
