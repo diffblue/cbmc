@@ -152,9 +152,12 @@ Function: abstract_environmentt::assign
 bool abstract_environmentt::assign(
   const exprt &expr, const abstract_object_pointert value)
 {
+  assert(value);
+
+  // Build a stack of index, member and dereference accesses which
+  // we will work through the relevant abstract objects
   exprt s = expr;
   std::stack<exprt> stactions;    // I'm not a continuation, honest guv'
-
   while (s.id() != ID_symbol)
   {
     if (s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
@@ -172,76 +175,12 @@ bool abstract_environmentt::assign(
 
   const symbol_exprt &symbol_expr(to_symbol_expr(s));
 
+  // This is the root abstract object that is in the map of abstract objects
+  // It might not have the same type as value if the above stack isn't empty
   abstract_object_pointert final_value;
 
   if(!stactions.empty())
   {
-    const exprt & next_expr=stactions.top();
-    stactions.pop();
-
-    typedef std::function<
-      abstract_object_pointert(
-        abstract_object_pointert,  // The symbol we are modifying
-        std::stack<exprt>, // The remaining stack
-        abstract_object_pointert)> // The value we are writing.
-        stacion_functiont;
-
-    // Each handler takes the abstract object referenced, copies it,
-    // writes according to the type of expression (e.g. for ID_member)
-    // we would (should!) have an abstract_struct_objectt which has a
-    // write_member which will attempt to update the abstract object for the
-    // relevant member. This modified abstract object is returned and this
-    // is inserted back into the map
-    std::map<irep_idt,stacion_functiont> handlers=
-    {
-      {
-        ID_index, [&](
-          const abstract_object_pointert lhs_object,
-          std::stack<exprt> stack,
-          abstract_object_pointert rhs_object)
-        {
-          sharing_ptrt<array_abstract_objectt> array_abstract_object=
-            std::dynamic_pointer_cast<array_abstract_objectt>(lhs_object);
-          sharing_ptrt<array_abstract_objectt> modified_array=
-            array_abstract_object->write_index(
-              *this, stactions, to_index_expr(next_expr), rhs_object, false);
-          return modified_array;
-        }
-      },
-      {
-        ID_member, [&](
-          const abstract_object_pointert lhs_object,
-          std::stack<exprt> stack,
-          abstract_object_pointert rhs_object)
-        {
-          sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-            std::dynamic_pointer_cast<struct_abstract_objectt>(lhs_object);
-          sharing_ptrt<struct_abstract_objectt> modified_struct=
-            struct_abstract_object->write_component(
-              *this, stactions, to_member_expr(next_expr), rhs_object);
-          return modified_struct;
-        }
-      },
-      {
-        ID_dereference, [&](
-          const abstract_object_pointert lhs_object,
-          std::stack<exprt> stack,
-          abstract_object_pointert rhs_object)
-        {
-          sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
-            std::dynamic_pointer_cast<pointer_abstract_objectt>(lhs_object);
-          sharing_ptrt<pointer_abstract_objectt> modified_pointer=
-            pointer_abstract_object->write_dereference(
-              *this, stactions, rhs_object, false);
-          return modified_pointer;
-        }
-      }
-    };
-
-    // We added something to the stack that we couldn't deal with
-    assert(handlers.find(next_expr.id())!=handlers.end());
-    assert(value);
-
     // The symbol is not in the map - it is therefore top
     abstract_object_pointert symbol_object;
     if(map.find(symbol_expr)==map.end())
@@ -252,7 +191,7 @@ bool abstract_environmentt::assign(
     {
       symbol_object=map[symbol_expr];
     }
-    final_value=handlers[next_expr.id()](symbol_object, stactions, value);
+    final_value=write(symbol_object, value, stactions, false);
   }
   else
   {
@@ -264,13 +203,123 @@ bool abstract_environmentt::assign(
   if (final_value->is_top())
   {
     map.erase(symbol_expr);
-
   }
   else
   {
     map[symbol_expr]=final_value;
   }
   return true;
+}
+
+/*******************************************************************\
+
+Function: abstract_object_pointert abstract_environmentt::write
+
+  Inputs:
+   lhs - the abstract object for the left hand side of the write (i.e. the one
+         to update).
+   rhs - the value we are trying to write to the left hand side
+   remaining_stack - what is left of the stack before the rhs can replace or be
+                     merged with the rhs
+   merge_write - Are re replacing the left hand side with the right hand side
+                 (e.g. we know for a fact that we are overwriting this object)
+                 or could the write in fact not take place and therefore we
+                 should merge to model the case where it did not.
+
+ Outputs: A modified version of the rhs after the write has taken place
+
+ Purpose: Write an abstract object onto another respecting a stack of
+          member, index and dereference access. This ping-pongs between
+          this method and the relevant write methods in abstract_struct,
+          abstract_pointer and abstract_array until the stack is empty
+
+\*******************************************************************/
+abstract_object_pointert abstract_environmentt::write(
+  abstract_object_pointert lhs,
+  abstract_object_pointert rhs,
+  std::stack<exprt> remaining_stack,
+  bool merge_write)
+{
+  assert(!remaining_stack.empty());
+  const exprt & next_expr=remaining_stack.top();
+  remaining_stack.pop();
+
+  typedef std::function<
+    abstract_object_pointert(
+      abstract_object_pointert,  // The symbol we are modifying
+      std::stack<exprt>, // The remaining stack
+      abstract_object_pointert)> // The value we are writing.
+      stacion_functiont;
+
+  // Each handler takes the abstract object referenced, copies it,
+  // writes according to the type of expression (e.g. for ID_member)
+  // we would (should!) have an abstract_struct_objectt which has a
+  // write_member which will attempt to update the abstract object for the
+  // relevant member. This modified abstract object is returned and this
+  // is inserted back into the map
+  std::map<irep_idt, stacion_functiont> handlers=
+  {
+    {
+      ID_index, [&](
+        const abstract_object_pointert lhs_object,
+        std::stack<exprt> stack,
+        abstract_object_pointert rhs_object)
+      {
+        sharing_ptrt<array_abstract_objectt> array_abstract_object=
+          std::dynamic_pointer_cast<array_abstract_objectt>(lhs_object);
+
+        sharing_ptrt<array_abstract_objectt> modified_array=
+          array_abstract_object->write_index(
+            *this,
+            stack,
+            to_index_expr(next_expr),
+            rhs_object,
+            merge_write);
+
+        return modified_array;
+      }
+    },
+    {
+      ID_member, [&](
+        const abstract_object_pointert lhs_object,
+        std::stack<exprt> stack,
+        abstract_object_pointert rhs_object)
+      {
+        sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
+          std::dynamic_pointer_cast<struct_abstract_objectt>(lhs_object);
+
+        sharing_ptrt<struct_abstract_objectt> modified_struct=
+          struct_abstract_object->write_component(
+            *this,
+            stack,
+            to_member_expr(next_expr),
+            rhs_object,
+            merge_write);
+
+        return modified_struct;
+      }
+    },
+    {
+      ID_dereference, [&](
+        const abstract_object_pointert lhs_object,
+        std::stack<exprt> stack,
+        abstract_object_pointert rhs_object)
+      {
+        sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
+          std::dynamic_pointer_cast<pointer_abstract_objectt>(lhs_object);
+
+        sharing_ptrt<pointer_abstract_objectt> modified_pointer=
+          pointer_abstract_object->write_dereference(
+            *this, stack, rhs_object, merge_write);
+
+        return modified_pointer;
+      }
+    }
+  };
+
+  // We added something to the stack that we couldn't deal with
+  assert(handlers.find(next_expr.id())!=handlers.end());
+  return handlers[next_expr.id()](lhs, remaining_stack, rhs);
 }
 
 /*******************************************************************\
