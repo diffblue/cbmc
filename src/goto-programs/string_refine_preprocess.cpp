@@ -326,8 +326,7 @@ void string_refine_preprocesst::get_data_and_length_type_of_string(
 {
   assert(is_java_string_type(expr.type()) ||
          is_java_string_builder_type(expr.type()) ||
-         is_java_char_sequence_type(expr.type())
-         );
+         is_java_char_sequence_type(expr.type()));
   typet object_type=ns.follow(expr.type());
   assert(object_type.id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(object_type);
@@ -361,56 +360,42 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
 {
   if(implements_java_char_sequence(rhs.type()))
   {
-    #if 0
-    auto pair=java_to_cprover_strings.insert(
-      std::make_pair(rhs, nil_exprt()));
+    // We do the following assignments:
+    // 1 cprover_string_length= *(rhs->length)
+    // 2 cprover_string_array = *(rhs->data)
+    // 3 cprover_string = { cprover_string_length; cprover_string_array }
 
-    if(pair.second)
-    {
-#endif
-      // We do the following assignments:
-      // 1 cprover_string_length= *(rhs->length)
-      // 2 cprover_string_array = *(rhs->data)
-      // 3 cprover_string = { cprover_string_length; cprover_string_array }
+    dereference_exprt deref(rhs, rhs.type().subtype());
+    typet data_type, length_type;
+    get_data_and_length_type_of_string(deref, data_type, length_type);
+    std::list<code_assignt> assignments;
 
-      dereference_exprt deref(rhs, rhs.type().subtype());
-      typet data_type, length_type;
-      get_data_and_length_type_of_string(deref, data_type, length_type);
-      std::list<code_assignt> assignments;
+    // 1) cprover_string_length= *(rhs->length)
+    symbol_exprt length_lhs=new_symbol(
+    "cprover_string_length", length_type);
 
-      // 1) cprover_string_length= *(rhs->length)
-      symbol_exprt length_lhs=new_symbol(
-        "cprover_string_length", length_type);
+    member_exprt deref_length(deref, "length", length_type);
+    assignments.emplace_back(length_lhs, deref_length);
 
-      member_exprt deref_length(deref, "length", length_type);
-      assignments.emplace_back(length_lhs, deref_length);
+    // 2) cprover_string_array = *(rhs->data)
+    symbol_exprt array_lhs=new_symbol(
+    "cprover_string_array", data_type.subtype());
+    member_exprt data(deref, "data", data_type);
+    dereference_exprt deref_data(data, data_type.subtype());
+    assignments.emplace_back(array_lhs, deref_data);
 
-      // 2) cprover_string_array = *(rhs->data)
-      symbol_exprt array_lhs=new_symbol(
-        "cprover_string_array", data_type.subtype());
-      member_exprt data(deref, "data", data_type);
-      dereference_exprt deref_data(data, data_type.subtype());
-      assignments.emplace_back(array_lhs, deref_data);
+    // 3) cprover_string = { cprover_string_length; cprover_string_array }
+    // This assignment is useful for finding witnessing strings for counter
+    // examples
+    refined_string_typet ref_type(length_type, java_char_type());
+    string_exprt new_rhs(length_lhs, array_lhs, ref_type);
 
-      // 3) cprover_string = { cprover_string_length; cprover_string_array }
-      // This assignment is useful for finding witnessing strings for counter
-      // examples
-      refined_string_typet ref_type(length_type, java_char_type());
-      string_exprt new_rhs(length_lhs, array_lhs, ref_type);
+    symbol_exprt lhs=new_symbol("cprover_string", new_rhs.type());
+    assignments.emplace_back(lhs, new_rhs);
 
-      symbol_exprt lhs=new_symbol("cprover_string", new_rhs.type());
-      assignments.emplace_back(lhs, new_rhs);
-
-      insert_assignments(goto_program, i_it, assignments);
-      i_it=goto_program.insert_after(i_it);
-      return new_rhs;
-
- #if 0
-      //pair.first->second=lhs;
-      pair.first->second=new_rhs;
-    }
-    return pair.first->second;
-#endif
+    insert_assignments(goto_program, i_it, assignments);
+    i_it=goto_program.insert_after(i_it);
+    return new_rhs;
   }
   else if(rhs.id()==ID_typecast &&
           implements_java_char_sequence(rhs.op0().type()))
@@ -560,10 +545,8 @@ void string_refine_preprocesst::make_string_assign(
   // Adding a string expr in the map
   refined_string_typet ref_type(length_type, data_type.subtype().subtype());
   string_exprt str(tmp_length, tmp_array, ref_type);
-  symbol_exprt cprover_string_sym=new_tmp_symbol("tmp_cprover_string", ref_type);
-#if 0
-  java_to_cprover_strings[lhs]=cprover_string_sym;
-#endif
+  symbol_exprt cprover_string_sym=new_tmp_symbol("tmp_cprover_string",
+                                                 ref_type);
 
   std::list<code_assignt> assigns;
   assigns.emplace_back(lhs, malloc_expr);
@@ -838,7 +821,7 @@ void string_refine_preprocesst::make_string_function_side_effect(
   const std::string &signature)
 {
   const code_function_callt &function_call=to_code_function_call(i_it->code);
-  code_assignt assign(function_call.lhs(),function_call.arguments()[0]);
+  code_assignt assign(function_call.lhs(), function_call.arguments()[0]);
   make_string_function(
     goto_program, i_it, function_name, signature, true, false);
   if(assign.lhs().is_not_nil())
@@ -944,7 +927,7 @@ exprt string_refine_preprocesst::make_cprover_char_array_assign(
   const source_locationt &location)
 {
   typet type=ns.follow(rhs.type());
-  assert(type.id()==ID_struct && 
+  assert(type.id()==ID_struct &&
          to_struct_type(type).get_tag()=="java::array[char]");
 
   // We do the following assignments:
@@ -1029,7 +1012,8 @@ void string_refine_preprocesst::make_char_array_function(
   if(function_name==ID_cprover_string_copy_func)
   {
     assert(is_java_char_array_pointer_type(args[start_index].type()));
-    dereference_exprt char_array(args[start_index], args[start_index].type().subtype());
+    dereference_exprt char_array(args[start_index],
+                                 args[start_index].type().subtype());
     exprt string=make_cprover_char_array_assign(
       goto_program, i_it, char_array, location);
 
@@ -1258,15 +1242,6 @@ void string_refine_preprocesst::replace_string_calls(
 
         if(uncasted.id()==ID_typecast)
           uncasted=to_typecast_expr(uncasted).op0();
-
-  #if 0
-        if(implements_java_char_sequence(uncasted.type()))
-        {
-          auto it=java_to_cprover_strings.find(uncasted);
-          if(it!=java_to_cprover_strings.end())
-            java_to_cprover_strings.insert(std::make_pair(assignment.lhs(), it->second));
-        }
-#endif
 
         if(new_rhs.id()==ID_function_application)
         {
@@ -1554,7 +1529,6 @@ void string_refine_preprocesst::initialize_string_function_table()
   signatures["java::java.lang.StringBuilder.insert:(ILjava/lang/String;)"
              "Ljava/lang/StringBuilder;"]="SISS";
   signatures["java::java.lang.String.intern:()Ljava/lang/String;"]="SV";
-
 }
 
 /*******************************************************************\
