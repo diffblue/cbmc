@@ -35,6 +35,10 @@ public:
   CLONE
   MERGE(pointer_abstract_objectt)
 
+  bool merge_state(
+    const constant_pointer_abstract_pointert op1,
+    const constant_pointer_abstract_pointert op2);
+
   exprt to_constant() const;
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns);
 
