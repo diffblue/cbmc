@@ -5,6 +5,7 @@
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/array_abstract_object.h>
+#include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <util/options.h>
 
 

@@ -16,21 +16,17 @@ private:
   typedef sharing_ptrt<constant_pointer_abstract_objectt>
     constant_pointer_abstract_pointert;
 public:
-  constant_pointer_abstract_objectt(
-    const typet &type, const abstract_environmentt &enviroment);
+  constant_pointer_abstract_objectt(const typet &type);
 
   constant_pointer_abstract_objectt(
     const typet &type,
     bool top,
-    bool bottom, const abstract_environmentt &enviroment);
+    bool bottom);
 
   constant_pointer_abstract_objectt(
     const constant_pointer_abstract_objectt &old);
 
-  constant_pointer_abstract_objectt(
-    const exprt &expr,
-    const abstract_environmentt &enviroment,
-    const namespacet &ns);
+  constant_pointer_abstract_objectt(const exprt &expr);
 
   CLONE
   MERGE(pointer_abstract_objectt)
@@ -54,6 +50,7 @@ public:
 
 private:
   exprt value;
+
 
 
 };
