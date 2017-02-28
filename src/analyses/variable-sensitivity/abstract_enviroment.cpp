@@ -96,7 +96,7 @@ abstract_object_pointert abstract_environmentt::eval(
           std::dynamic_pointer_cast<pointer_abstract_objectt>(
             eval(dereference.pointer(), ns));
 
-        return pointer_abstract_object->read_dereference(*this);
+        return pointer_abstract_object->read_dereference(*this, ns);
       }
     },
     {
@@ -142,6 +142,7 @@ Function: abstract_environmentt::assign
   Inputs:
    expr - the expression to assign to
    value - the value to assign to the expression
+   ns - the namespace
 
  Outputs: A boolean, true if the assignment has changed the domain.
 
@@ -150,7 +151,7 @@ Function: abstract_environmentt::assign
 \*******************************************************************/
 
 bool abstract_environmentt::assign(
-  const exprt &expr, const abstract_object_pointert value)
+  const exprt &expr, const abstract_object_pointert value, const namespacet &ns)
 {
   assert(value);
 
@@ -191,7 +192,7 @@ bool abstract_environmentt::assign(
     {
       symbol_object=map[symbol_expr];
     }
-    final_value=write(symbol_object, value, stactions, false);
+    final_value=write(symbol_object, value, stactions, ns, false);
   }
   else
   {
@@ -221,6 +222,7 @@ Function: abstract_object_pointert abstract_environmentt::write
    rhs - the value we are trying to write to the left hand side
    remaining_stack - what is left of the stack before the rhs can replace or be
                      merged with the rhs
+   ns - the namespace
    merge_write - Are re replacing the left hand side with the right hand side
                  (e.g. we know for a fact that we are overwriting this object)
                  or could the write in fact not take place and therefore we
@@ -234,10 +236,12 @@ Function: abstract_object_pointert abstract_environmentt::write
           abstract_pointer and abstract_array until the stack is empty
 
 \*******************************************************************/
+
 abstract_object_pointert abstract_environmentt::write(
   abstract_object_pointert lhs,
   abstract_object_pointert rhs,
   std::stack<exprt> remaining_stack,
+  const namespacet &ns,
   bool merge_write)
 {
   assert(!remaining_stack.empty());
@@ -310,7 +314,7 @@ abstract_object_pointert abstract_environmentt::write(
 
         sharing_ptrt<pointer_abstract_objectt> modified_pointer=
           pointer_abstract_object->write_dereference(
-            *this, stack, rhs_object, merge_write);
+            *this, ns, stack, rhs_object, merge_write);
 
         return modified_pointer;
       }
