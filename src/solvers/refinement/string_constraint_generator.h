@@ -96,7 +96,7 @@ private:
   const std::size_t MAX_FLOAT_LENGTH=15;
   const std::size_t MAX_DOUBLE_LENGTH=30;
 
-  std::map<function_application_exprt,exprt> function_application_cache;
+  std::map<function_application_exprt, exprt> function_application_cache;
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
@@ -305,7 +305,6 @@ private:
   exprt is_low_surrogate(const exprt &chr) const;
   exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
-
 };
 
 #endif

@@ -16,7 +16,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/cprover_prefix.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
-#include <util/replace_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_refinement.h>
 #include <langapi/language_util.h>
@@ -126,7 +125,7 @@ void string_refinementt::add_symbol_to_symbol_map
   reverse_symbol_resolve[new_rhs].push_back(lhs);
 
   std::list<exprt> symbols_to_update_with_new_rhs(reverse_symbol_resolve[rhs]);
-  for(exprt item:symbols_to_update_with_new_rhs)
+  for(exprt item : symbols_to_update_with_new_rhs)
   {
     symbol_resolve[item]=new_rhs;
     reverse_symbol_resolve[new_rhs].push_back(item);
@@ -154,8 +153,8 @@ void string_refinementt::set_char_array_equality(
     for(size_t i=0, ilim=rhs.operands().size(); i!=ilim; ++i)
     {
       // Introduce axioms to map symbolic rhs to its char array.
-      index_exprt arraycell(rhs, from_integer(i,index_type));
-      equal_exprt arrayeq(arraycell,rhs.operands()[i]);
+      index_exprt arraycell(rhs, from_integer(i, index_type));
+      equal_exprt arrayeq(arraycell, rhs.operands()[i]);
       generator.axioms.push_back(arrayeq);
     }
   }
@@ -503,7 +502,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   }
 
   unsigned n;
-  if(to_unsigned_integer(to_constant_expr(size), n))
+  if(to_unsigned_integer(to_constant_expr(size_val), n))
   {
     debug() << "(sr::get_array) size is not a valid";
     return empty_ret;
@@ -524,7 +523,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
     return empty_ret;
   }
 
-  unsigned concrete_array[n];
+  std::vector<unsigned> concrete_array(n);
 
   if(arr_val.id()=="array-list")
   {
@@ -537,7 +536,6 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
         if(idx<n)
         {
           exprt value=arr_val.operands()[i*2+1];
-          to_unsigned_integer(to_constant_expr(value), concrete_array[i]);
           to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
         }
       }
@@ -561,8 +559,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 
   for(size_t i=0; i<n; i++)
   {
-    unsigned c=concrete_array[i];
-    exprt c_expr=from_integer(c, char_type);
+    exprt c_expr=from_integer(concrete_array[i], char_type);
     ret.move_to_operands(c_expr);
   }
 
@@ -630,7 +627,7 @@ replace_mapt string_refinementt::fill_model()
 {
   replace_mapt fmodel;
 
-  for(auto it:symbol_resolve)
+  for(auto it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {

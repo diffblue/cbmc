@@ -381,7 +381,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     function_application_exprt new_expr(expr);
     // TODO: This part needs some improvement.
     // Stripping the symbol name is not a very robust process.
-    new_expr.function() = symbol_exprt(str_id.substr(0,pos+4));
+    new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
     assert(get_mode()==ID_java);
     new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
 
@@ -402,7 +402,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   if(pos!=std::string::npos)
   {
     function_application_exprt new_expr(expr);
-    new_expr.function() = symbol_exprt(str_id.substr(0,pos+4));
+    new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
     new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
 
     auto res_it=function_application_cache.insert(std::make_pair(new_expr,

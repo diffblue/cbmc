@@ -289,7 +289,8 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   axioms.push_back(a3);
 
   symbol_exprt i2=fresh_univ_index("QA_compare_to", index_type);
-  string_constraintt a4(i2, x, not_exprt(res_null), equal_exprt(s1[i2], s2[i2]));
+  string_constraintt a4(
+    i2, x, not_exprt(res_null), equal_exprt(s1[i2], s2[i2]));
   axioms.push_back(a4);
 
   return res;
