@@ -105,6 +105,8 @@ void variable_sensitivity_domaint::transform(
   case ASSERT:
     // Conditions on the program, do not alter the data or information
     // flow and thus can be ignored.
+    // Checking of assertions can only be reasonably done once the fix-point
+    // has been computed, i.e. after all of the calls to transform.
     break;
 
   case SKIP:
@@ -238,14 +240,16 @@ bool variable_sensitivity_domaint::merge(
 Function: variable_sensitivity_domaint::ai_simplify
 
   Inputs:
-   condition - the expression to evaluate to true or false
+   condition - the expression to simplify
    ns - the namespace
    lhs - is the expression on the left hand side
 
  Outputs: True if simplified the condition. False otherwise. condition
           will be updated with the simplified condition if it has worked
 
- Purpose: To resolve a condition down to a possibly known boolean value
+ Purpose: Use the information in the domain to simplify the expression
+          with respect to the current location.  This may be able to
+          reduce some values to constants.
 
 \*******************************************************************/
 
