@@ -78,4 +78,19 @@ void func(int unknown)
   int x = 4;
   int * xp = &x;
   int * yp = xp;
+
+  int ** ypp = &yp;
+  **ypp = *yp;
+
+  int i;
+  int array[4];
+
+  i = 0;
+  array[i] = i;
+  i = i+1;
+  array[i] = i;
+  i = i+1;
+  array[i] = i;
+  i = i+1;
+  array[i] = i;
 }
