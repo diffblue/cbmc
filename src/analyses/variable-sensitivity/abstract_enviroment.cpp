@@ -28,6 +28,7 @@ Function: abstract_environmentt::eval
 
   Inputs:
    expr - the expression to evaluate
+   ns - the current namespace
 
  Outputs: The abstract_object representing the value of the expression
 
@@ -141,7 +142,7 @@ Function: abstract_environmentt::assign
    expr - the expression to assign to
    value - the value to assign to the expression
 
- Outputs: ?
+ Outputs: A boolean, true if the assignment has changed the domain.
 
  Purpose: Assign a value to an expression
 
@@ -276,11 +277,14 @@ bool abstract_environmentt::assign(
 Function: abstract_environmentt::assume
 
   Inputs:
-   expr - the expression inside the assume
+   expr - the expression that is to be assumed
+   ns - the current namespace
 
- Outputs: ?
+ Outputs: True if the assume changed the domain.
 
- Purpose: ?
+ Purpose: Reduces the domain to (an over-approximation) of the cases
+          when the the expression holds.  Used to implement assume
+          statements and conditional branches.
 
 \*******************************************************************/
 
@@ -374,9 +378,9 @@ Function: abstract_environmentt::merge
   Inputs:
    env - the other environment
 
- Outputs: ?
+ Outputs: A Boolean, true when the merge has changed something
 
- Purpose: ?
+ Purpose: Computes the join between "this" and "b"
 
 \*******************************************************************/
 
@@ -454,7 +458,7 @@ Function: abstract_environmentt::havoc
   Inputs:
    havoc_string - debug string to track down havoc causing.
 
- Outputs:
+ Outputs: None
 
  Purpose: Set the domain to top
 
@@ -470,9 +474,9 @@ void abstract_environmentt::havoc(const std::string &havoc_string)
 
 Function: abstract_environmentt::make_top
 
-  Inputs:
+  Inputs: None
 
- Outputs:
+ Outputs: None
 
  Purpose: Set the domain to top
 
@@ -481,7 +485,6 @@ Function: abstract_environmentt::make_top
 void abstract_environmentt::make_top()
 {
   // since we assume anything is not in the map is top this is sufficient
-  // TODO: need a flag for bottom
   map.clear();
   is_bottom=false;
 }
@@ -490,9 +493,9 @@ void abstract_environmentt::make_top()
 
 Function: abstract_environmentt::make_bottom
 
-  Inputs:
+  Inputs: None
 
- Outputs:
+ Outputs: None
 
  Purpose: Set the domain to top
 
@@ -544,10 +547,10 @@ Function: abstract_environmentt::output
 
   Inputs:
    out - the stream to write to
-   ai - ?
-   ns - ?
+   ai - the abstract interpreter that contains this domain
+   ns - the current namespace
 
- Outputs:
+ Outputs: None
 
  Purpose: Print out all the values in the abstract object map
 
