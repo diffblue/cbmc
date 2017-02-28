@@ -1,5 +1,14 @@
 #include <assert.h>
 
+
+// To demonstrate run
+// $ goto-analyzer main.c --variable --verify --pointers --structs
+// Will show the asserts
+
+// To see the pointer optimizations run
+// $ goto-analyzer main.c --variable --simplify out.gb --pointers --structs
+// $ goto-analyzer out.gb --show-goto-functions
+
 void func(int unknwon);
 int main()
 {
@@ -19,7 +28,7 @@ void func(int unknown)
   }
 
   // Knows we took if statement so can conclude assertion is true
-  assert(j==2);
+  assert(j==3); // Verified
 
   int value=4;
 
@@ -63,7 +72,9 @@ void func(int unknown)
   assert(pp2v==&p2v); // success (even though p2v has changed)
   assert(*p2v==10); // unknown since we don't know anymore what p2v points to
   assert(**pp2v==10); // unknown
-  // Run with --simplify says yp = &x
+
+  // Running this through --simplify will yield:
+  // yp = &x
   int x = 4;
   int * xp = &x;
   int * yp = xp;
