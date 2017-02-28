@@ -267,8 +267,9 @@ Function: abstract_objectt::output
 
   Inputs:
    out - the stream to write to
-   ai - ?
-   ns - ?
+   ai - the abstract interpreter that contains the abstract domain
+        (that contains the object ... )
+   ns - the current namespace
 
  Outputs:
 
