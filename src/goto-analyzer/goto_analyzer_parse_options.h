@@ -146,6 +146,7 @@ class optionst;
   "(non-null)(show-non-null)" \
   "(variable)" \
   "(variable-sensitivity)" \
+  "(pointers)(arrays)(structs)" \
   "(constants)" \
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \
