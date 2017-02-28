@@ -1,5 +1,6 @@
 #include <assert.h>
 
+void func(int unknwon);
 int main()
 {
   func(4);
@@ -7,6 +8,7 @@ int main()
 
 
 // Pass in an unknown to show when we don't know what branch is taken
+
 void func(int unknown)
 {
   int i=0, j=2;
@@ -33,6 +35,16 @@ void func(int unknown)
   assert(*p2v==10);
   assert(**pp2v==10);
 
+  *p2v = 15;
+  assert(value==15);
+  assert(*p2v==15);
+  assert(**pp2v==15);
+
+  **pp2v = 20;
+  assert(value==20);
+  assert(*p2v==20);
+  assert(**pp2v==20);
+
   int other = 5;
   p2v = &other;
 
@@ -51,7 +63,6 @@ void func(int unknown)
   assert(pp2v==&p2v); // success (even though p2v has changed)
   assert(*p2v==10); // unknown since we don't know anymore what p2v points to
   assert(**pp2v==10); // unknown
-
   // Run with --simplify says yp = &x
   int x = 4;
   int * xp = &x;
