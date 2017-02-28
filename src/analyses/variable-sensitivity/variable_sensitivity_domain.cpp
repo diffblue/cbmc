@@ -74,17 +74,15 @@ void variable_sensitivity_domaint::transform(
   case GOTO:
     {
       // TODO(tkiley): add support for flow sensitivity
-#if 0
-      if (flow_sensitivity == FLOW_SENSITIVE)
+      if (1) // (flow_sensitivity == FLOW_SENSITIVE)
       {
         locationt next=from;
         next++;
         if(next==to)
-          assume(not_exprt(instruction.guard));
+          abstract_state.assume(not_exprt(instruction.guard), ns);
         else
-          assume(instruction.guard);
+          abstract_state.assume(instruction.guard, ns);
       }
-#endif
     }
     break;
 
