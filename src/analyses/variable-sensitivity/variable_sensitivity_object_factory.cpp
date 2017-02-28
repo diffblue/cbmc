@@ -78,7 +78,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
           new array_abstract_objectt(followed_type, top, false));
       case POINTER_SENSITIVE:
         return abstract_object_pointert(
-        new pointer_abstract_objectt(followed_type, top, false));
+        new constant_pointer_abstract_objectt(followed_type, top, false));
       case POINTER_INSENSITIVE:
         return abstract_object_pointert(
           new pointer_abstract_objectt(followed_type, top, false));
@@ -107,7 +107,8 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
       case ARRAY_INSENSITIVE:
         return abstract_object_pointert(new array_abstract_objectt(e));
       case POINTER_SENSITIVE:
-        return abstract_object_pointert(new pointer_abstract_objectt(e));
+        return abstract_object_pointert(
+          new constant_pointer_abstract_objectt(e));
       case POINTER_INSENSITIVE:
         return abstract_object_pointert(new pointer_abstract_objectt(e));
       case STRUCT_SENSITIVE:
