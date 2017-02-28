@@ -139,6 +139,7 @@ class optionst;
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)" \
   "(variable)" \
+  "(pointers)(arrays)(structs)" \
   "(constants)" \
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \
