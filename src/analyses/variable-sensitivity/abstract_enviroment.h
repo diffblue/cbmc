@@ -22,13 +22,18 @@ public:
   // These three are really the heart of the method
   virtual abstract_object_pointert eval(
     const exprt &expr, const namespacet &ns) const;
-  virtual bool assign(const exprt &expr, const abstract_object_pointert value);
+  virtual bool assign(
+    const exprt &expr,
+    const abstract_object_pointert value,
+    const namespacet &ns);
   virtual bool assume(const exprt &expr, const namespacet &ns);
 
-  virtual abstract_object_pointert write(abstract_object_pointert lhs,
-   abstract_object_pointert rhs,
-   std::stack<exprt> remaining_stack,
-   bool merge_write);
+  virtual abstract_object_pointert write(
+    abstract_object_pointert lhs,
+    abstract_object_pointert rhs,
+    std::stack<exprt> remaining_stack,
+    const namespacet &ns,
+    bool merge_write);
 
   virtual abstract_object_pointert abstract_object_factory(
     const typet type, bool top=true, bool bottom=false) const;
