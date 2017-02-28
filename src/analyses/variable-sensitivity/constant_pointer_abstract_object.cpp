@@ -27,7 +27,7 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &t, const abstract_environmentt &enviroment):
+  const typet &t):
     pointer_abstract_objectt(t)
 {
   assert(t.id()==ID_pointer);
@@ -51,7 +51,7 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const typet &t, bool tp, bool bttm, const abstract_environmentt &enviroment):
+  const typet &t, bool tp, bool bttm):
     pointer_abstract_objectt(t, tp, bttm)
 {
   assert(t.id()==ID_pointer);
@@ -90,9 +90,7 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const exprt &e,
-  const abstract_environmentt &enviroment,
-  const namespacet &ns):
+  const exprt &e):
     pointer_abstract_objectt(e)
 {
   assert(e.type().id()==ID_pointer);
