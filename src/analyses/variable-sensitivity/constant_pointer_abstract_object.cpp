@@ -316,25 +316,27 @@ sharing_ptrt<pointer_abstract_objectt>
   }
   else
   {
-    // TODO(tkiley): support the stack
-    assert(stack.empty());
-
-    sharing_ptrt<constant_pointer_abstract_objectt> copy=
-      sharing_ptrt<constant_pointer_abstract_objectt>(
-        new constant_pointer_abstract_objectt(*this));
-
-    // for
-    // environment.assign()
-
-    if(merging_write)
+    if(stack.empty())
     {
-      bool modifications;
-      copy->value=value->merge(new_value, modifications);
+      sharing_ptrt<constant_pointer_abstract_objectt> copy=
+        sharing_ptrt<constant_pointer_abstract_objectt>(
+          new constant_pointer_abstract_objectt(*this));
+
+      if(merging_write)
+      {
+        bool modifications;
+        copy->value=value->merge(new_value, modifications);
+      }
+      else
+      {
+        copy->value=new_value;
+      }
+      return copy;
     }
     else
     {
-      copy->value=new_value;
+      return std::dynamic_pointer_cast<constant_pointer_abstract_objectt>(
+        environment.write(value, new_value, stack, merging_write));
     }
-    return copy;
   }
 }
