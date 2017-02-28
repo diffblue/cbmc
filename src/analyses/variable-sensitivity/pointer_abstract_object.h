@@ -30,10 +30,11 @@ public:
 
   // pointer interface
   virtual abstract_object_pointert read_dereference(
-    const abstract_environmentt &env) const;
+    const abstract_environmentt &env, const namespacet &ns) const;
 
   virtual sharing_ptrt<pointer_abstract_objectt> write_dereference(
     abstract_environmentt &environment,
+    const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
     bool merging_write);
