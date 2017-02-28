@@ -10,6 +10,7 @@
 
 #include <map>
 #include <memory>
+#include <stack>
 
 #include <util/std_expr.h>
 #include <util/message.h>
@@ -23,6 +24,11 @@ public:
     const exprt &expr, const namespacet &ns) const;
   virtual bool assign(const exprt &expr, const abstract_object_pointert value);
   virtual bool assume(const exprt &expr, const namespacet &ns);
+
+  virtual abstract_object_pointert write(abstract_object_pointert lhs,
+   abstract_object_pointert rhs,
+   std::stack<exprt> remaining_stack,
+   bool merge_write);
 
   virtual abstract_object_pointert abstract_object_factory(
     const typet type, bool top=true, bool bottom=false) const;
@@ -56,6 +62,8 @@ protected:
 
  // Hook for domain specific handling of operators
  virtual abstract_object_pointert eval_rest(const exprt &e) const;
+
+
 
  typedef symbol_exprt map_keyt;
  std::map<map_keyt, abstract_object_pointert> map;

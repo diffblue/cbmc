@@ -34,7 +34,7 @@ public:
     const abstract_environmentt &environment,
     const std::stack<exprt> stack,
     const member_exprt &member_expr,
-    const abstract_object_pointert value);
+    const abstract_object_pointert value, bool merging_write);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H

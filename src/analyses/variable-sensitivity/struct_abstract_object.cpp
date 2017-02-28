@@ -143,7 +143,8 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
   const abstract_environmentt &environment,
   const std::stack<exprt> stack,
   const member_exprt &member_expr,
-  const abstract_object_pointert value)
+  const abstract_object_pointert value,
+  bool merging_write)
 {
   if(is_top())
   {
