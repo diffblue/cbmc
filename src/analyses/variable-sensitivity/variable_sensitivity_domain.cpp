@@ -10,6 +10,7 @@ Date: April 2016
 
 
 #include <util/message.h>
+#include <util/simplify_expr.h>
 
 #include "variable_sensitivity_domain.h"
 
@@ -256,7 +257,50 @@ bool variable_sensitivity_domaint::ai_simplify(
   exprt &condition, const namespacet &ns, const bool lhs) const
 {
   if (lhs)
-    return false;
+  {
+    // Care must be taken here to give something that is still writable
+    if (condition.id()==ID_index)
+    {
+      index_exprt ie = to_index_expr(condition);
+      exprt index = ie.index();
+      bool changed = ai_simplify(index, ns, false);
+      if (changed)
+      {
+        ie.index() = index;
+        condition = simplify_expr(ie, ns);
+      }
+
+      return changed;
+    }
+    else if (condition.id()==ID_dereference)
+    {
+      dereference_exprt de = to_dereference_expr(condition);
+      exprt pointer = de.pointer();
+      bool changed = ai_simplify(pointer, ns, false);
+      if (changed)
+      {
+        de.pointer() = pointer;
+        condition = simplify_expr(de, ns);  // So *(&x) -> x
+      }
+
+      return changed;
+    }
+    else if (condition.id()==ID_member)
+    {
+      member_exprt me = to_member_expr(condition);
+      exprt compound = me.compound();
+      bool changed = ai_simplify(compound, ns, true); // <-- true!
+      if (changed)
+      {
+        me.compound() = compound;
+        condition = simplify_expr(me, ns);
+      }
+
+      return changed;
+    }
+    else
+      return false;
+  }
   else
   {
     sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition, ns);
@@ -271,6 +315,7 @@ bool variable_sensitivity_domaint::ai_simplify(
       return b;
     }
   }
+  assert(0); // All conditions should be handled
 }
 
 bool variable_sensitivity_domaint::is_bottom() const
