@@ -244,6 +244,9 @@ protected:
     const exprt::operandst &arguments,
     statet &new_state);
 
+  virtual bool should_enter_function(const irep_idt&) { return true; }
+  virtual void transform_function_stub(const irep_idt&, statet& state, locationt l_call, locationt l_return) {}
+
   // abstract methods
 
   virtual void generate_state(locationt l)=0;

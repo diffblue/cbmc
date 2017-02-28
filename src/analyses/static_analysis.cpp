@@ -422,8 +422,12 @@ void static_analysis_baset::do_function_call(
 {
   const goto_functionst::goto_functiont &goto_function=f_it->second;
 
-  if(!goto_function.body_available())
-    return; // do nothing
+  if((!goto_function.body_available()) || !should_enter_function(f_it->first))
+  {
+    // Per default do nothing, but a subclass might transform across the stubbed callsite.
+    transform_function_stub(f_it->first,new_state,l_call,l_return);
+    return;
+  }
 
   assert(!goto_function.body.instructions.empty());
 
