@@ -98,6 +98,7 @@ Function: pointer_abstract_objectt::read_dereference
 
   Inputs:
    env - the environment
+   ns - the namespace
 
  Outputs: An abstract object representing the value being pointed to
 
@@ -107,7 +108,7 @@ Function: pointer_abstract_objectt::read_dereference
 \*******************************************************************/
 
 abstract_object_pointert pointer_abstract_objectt::read_dereference(
-  const abstract_environmentt &env) const
+  const abstract_environmentt &env, const namespacet &ns) const
 {
   pointer_typet pointer_type(to_pointer_type(type));
   const typet &pointed_to_type=pointer_type.subtype();
@@ -121,6 +122,7 @@ Function: pointer_abstract_objectt::write_dereference
 
   Inputs:
    environment - the abstract environment
+   ns - the namespace
    stack - the remaining stack of expressions on the LHS to evaluate
    value - the value we are trying to assign to what the pointer is
            pointing to
@@ -141,6 +143,7 @@ Function: pointer_abstract_objectt::write_dereference
 sharing_ptrt<pointer_abstract_objectt>
   pointer_abstract_objectt::write_dereference(
     abstract_environmentt &environment,
+    const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
     bool merging_write)

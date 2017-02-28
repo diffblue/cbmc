@@ -43,16 +43,17 @@ public:
   void output(std::ostream &out, const ai_baset &ai, const namespacet &ns);
 
   abstract_object_pointert read_dereference(
-    const abstract_environmentt &env) const;
+    const abstract_environmentt &env, const namespacet &ns) const;
 
   sharing_ptrt<pointer_abstract_objectt> write_dereference(
     abstract_environmentt &environment,
+    const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
     bool merging_write);
 
 private:
-  abstract_object_pointert value;
+  exprt value;
 
 
 };

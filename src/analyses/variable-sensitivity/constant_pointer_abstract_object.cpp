@@ -10,6 +10,7 @@
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <analyses/ai.h>
 #include "constant_pointer_abstract_object.h"
 
 /*******************************************************************\
@@ -30,7 +31,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(t)
 {
   assert(t.id()==ID_pointer);
-  value=enviroment.abstract_object_factory(t.subtype(), true, false);
+  value=nil_exprt();
 }
 
 /*******************************************************************\
@@ -54,7 +55,7 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(t, tp, bttm)
 {
   assert(t.id()==ID_pointer);
-  value=enviroment.abstract_object_factory(t.subtype(), top, bottom);
+  value=nil_exprt();
 }
 
 /*******************************************************************\
@@ -100,8 +101,8 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   // can create a pointer
   if(e.id()==ID_address_of)
   {
-    address_of_exprt address_expr(to_address_of_expr(e));
-    value=enviroment.eval(address_expr.object(), ns);
+    //address_of_exprt address_expr(to_address_of_expr(e));
+    value=e;
     top=false;
   }
   else
@@ -111,19 +112,19 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
       constant_exprt constant_expr(to_constant_expr(e));
       if(constant_expr.get_value()==ID_NULL)
       {
-        value=nullptr;
+        value=e;
         top=false;
       }
       else
       {
         // TODO(tkiley): These should probably be logged.
         // unknown type
-        value=enviroment.abstract_object_factory(type.subtype(), true, false);
+        value=nil_exprt();
       }
     }
     else
     {
-      value=enviroment.abstract_object_factory(type.subtype(), true, false);
+      value=nil_exprt();
     }
   }
 }
@@ -163,7 +164,7 @@ bool constant_pointer_abstract_objectt::merge_state(
     else
     {
       top=true;
-      value=nullptr;
+      value=nil_exprt();
       assert(!bottom);
       return !op1->top;
     }
@@ -195,16 +196,9 @@ exprt constant_pointer_abstract_objectt::to_constant() const
   }
   else
   {
-    if(value==nullptr)
-    {
-      return null_pointer_exprt(to_pointer_type(type));
-    }
-    else
-    {
-      const exprt &value_expr=value->to_constant();
-      address_of_exprt address_expr(value_expr);
-      return address_expr;
-    }
+    // TODO(tkiley): I think we would like to eval this before using it
+    // in the to_constant.
+    return value;
   }
 }
 
@@ -233,14 +227,25 @@ void constant_pointer_abstract_objectt::output(
   }
   else
   {
-    if(value==nullptr)
+    if(value.id()==ID_constant && value.get(ID_value)==ID_NULL)
     {
       out << "NULL";
     }
     else
     {
       out << "ptr ->(";
-      value->output(out, ai, ns);
+      if(value.id()==ID_address_of)
+      {
+        const address_of_exprt &address_expr(to_address_of_expr(value));
+        if(address_expr.object().id()==ID_symbol)
+        {
+          const symbol_exprt &symbol_pointed_to(
+            to_symbol_expr(address_expr.object()));
+
+          out << symbol_pointed_to.get_identifier();
+        }
+      }
+
       out << ")";
     }
   }
@@ -252,6 +257,7 @@ Function: constant_pointer_abstract_objectt::read_dereference
 
   Inputs:
    env - the environment
+   ns - the namespace
 
  Outputs: An abstract object representing the value this pointer is pointing
           to
@@ -263,18 +269,30 @@ Function: constant_pointer_abstract_objectt::read_dereference
 \*******************************************************************/
 
 abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
-  const abstract_environmentt &env) const
+  const abstract_environmentt &env, const namespacet &ns) const
 {
-  if(top || bottom || value==nullptr)
+  if(top || bottom || value.id()==ID_nil)
   {
     // Return top if dereferencing a null pointer or we are top
-    bool is_value_top = top || value==nullptr;
+    bool is_value_top = top || value.id()==ID_nil;
     return env.abstract_object_factory(
       type.subtype(), is_value_top, !is_value_top);
   }
   else
   {
-    return value;
+    if(value.id()==ID_address_of)
+    {
+      return env.eval(value.op0(), ns);
+    }
+    else if(value.id()==ID_constant)
+    {
+      // Reading a null pointer, return top
+      return env.abstract_object_factory(type.subtype(), true, false);
+    }
+    else
+    {
+      return env.abstract_object_factory(type.subtype(), true, false);
+    }
   }
 }
 
@@ -284,6 +302,7 @@ Function: constant_pointer_abstract_objectt::write_dereference
 
   Inputs:
    environment - the environment
+   ns - the namespace
    stack - the remaining stack
    new_value - the value to write to the dereferenced pointer
    merging_write - is it a merging write (i.e. we aren't certain
@@ -305,6 +324,7 @@ Function: constant_pointer_abstract_objectt::write_dereference
 sharing_ptrt<pointer_abstract_objectt>
   constant_pointer_abstract_objectt::write_dereference(
     abstract_environmentt &environment,
+    const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert new_value,
     bool merging_write)
@@ -312,7 +332,7 @@ sharing_ptrt<pointer_abstract_objectt>
   if(top || bottom)
   {
     return pointer_abstract_objectt::write_dereference(
-      environment, stack, new_value, merging_write);
+      environment, ns, stack, new_value, merging_write);
   }
   else
   {
@@ -324,19 +344,21 @@ sharing_ptrt<pointer_abstract_objectt>
 
       if(merging_write)
       {
+        abstract_object_pointert pointed_value=environment.eval(value, ns);
         bool modifications;
-        copy->value=value->merge(new_value, modifications);
+        pointed_value->merge(new_value, modifications);
       }
       else
       {
-        copy->value=new_value;
+        environment.assign(value, new_value, ns);
       }
       return copy;
     }
     else
     {
+      abstract_object_pointert pointed_value=environment.eval(value, ns);
       return std::dynamic_pointer_cast<constant_pointer_abstract_objectt>(
-        environment.write(value, new_value, stack, merging_write));
+        environment.write(pointed_value, new_value, stack, ns, merging_write));
     }
   }
 }
