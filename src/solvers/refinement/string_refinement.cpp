@@ -10,11 +10,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 \*******************************************************************/
 
+#include <sstream>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
 #include <util/replace_expr.h>
 #include <solvers/sat/satcheck.h>
-#include <sstream>
 #include <solvers/refinement/string_refinement.h>
 #include <langapi/language_util.h>
 
@@ -254,7 +254,7 @@ Function: string_refinementt::dec_solve
 
  Outputs: result of the decision procedure
 
- Purpose: use a refinement loop to instantiate universal axioms, 
+ Purpose: use a refinement loop to instantiate universal axioms,
           call the sat solver, and instantiate more indexes if needed.
 
 \*******************************************************************/
@@ -271,11 +271,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       string_not_contains_constraintt nc_axiom=
         to_string_not_contains_constraint(axiom);
-      array_typet witness_type
-        (refined_string_typet::index_type(),
-         infinity_exprt(refined_string_typet::index_type()));
+      refined_string_typet rtype=to_refined_string_type(nc_axiom.s0().type());
+      const typet &index_type=rtype.get_index_type();
+      array_typet witness_type(index_type, infinity_exprt(index_type));
       generator.witness[nc_axiom]=
-        string_exprt::fresh_symbol("not_contains_witness", witness_type);
+        generator.fresh_symbol("not_contains_witness", witness_type);
       not_contains_axioms.push_back(nc_axiom);
     }
     else
@@ -464,23 +464,20 @@ Function: string_refinementt::get_array
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
   exprt val=get(arr);
-  typet chart;
-  if(arr.type().subtype()==generator.get_char_type())
-    chart=generator.get_char_type();
-  else
-    assert(false);
+  typet char_type=arr.type().subtype();
+  typet index_type=size.type();
 
   if(val.id()=="array-list")
   {
-    array_typet ret_type(chart, infinity_exprt(generator.get_index_type()));
-    exprt ret=array_of_exprt(generator.constant_char(0), ret_type);
+    array_typet ret_type(char_type, infinity_exprt(index_type));
+    exprt ret=array_of_exprt(from_integer(0, char_type), ret_type);
 
     for(size_t i=0; i<val.operands().size()/2; i++)
     {
       exprt index=val.operands()[i*2];
-      assert(index.type()==generator.get_index_type());
+      assert(index.type()==index_type);
       exprt value=val.operands()[i*2+1];
-      assert(value.type()==generator.get_char_type());
+      assert(value.type()==char_type);
       ret=with_exprt(ret, index, value);
     }
     return ret;
@@ -580,11 +577,11 @@ bool string_refinementt::check_axioms()
   debug() << "there are " << not_contains_axioms.size()
           << " not_contains axioms" << eom;
 
-  exprt zero=from_integer(0, generator.get_index_type());
-
-  for(size_t i=0; i<not_contains_axioms.size(); i++)
+  for(auto nc_axiom : not_contains_axioms)
   {
-    exprt witness=generator.get_witness_of(not_contains_axioms[i], zero);
+    typet index_type=nc_axiom.s0().length().type();
+    exprt zero=from_integer(0, index_type);
+    exprt witness=generator.get_witness_of(nc_axiom, zero);
     exprt val=get(witness);
     violated_not_contains=true;
   }
@@ -687,8 +684,13 @@ Function: string_refinementt::sum_over_map
 exprt string_refinementt::sum_over_map(
   std::map<exprt, int> &m, bool negated) const
 {
-  exprt sum=from_integer(0, generator.get_index_type());
+  exprt sum=nil_exprt();
   mp_integer constants=0;
+  typet index_type;
+  if(m.empty())
+    return nil_exprt();
+  else
+    index_type=m.begin()->first.type();
 
   for(const auto &term : m)
   {
@@ -705,14 +707,14 @@ exprt string_refinementt::sum_over_map(
       switch(second)
       {
       case -1:
-        if(sum==from_integer(0, generator.get_index_type()))
+        if(sum.is_nil())
           sum=unary_minus_exprt(t);
         else
           sum=minus_exprt(sum, t);
         break;
 
       case 1:
-        if(sum==from_integer(0, generator.get_index_type()))
+        if(sum.is_nil())
           sum=t;
         else
           sum=plus_exprt(sum, t);
@@ -733,8 +735,11 @@ exprt string_refinementt::sum_over_map(
     }
   }
 
-  exprt index_const=from_integer(constants, generator.get_index_type());
-  return plus_exprt(sum, index_const);
+  exprt index_const=from_integer(constants, index_type);
+  if(sum.is_not_nil())
+    return plus_exprt(sum, index_const);
+  else
+    return index_const;
 }
 
 /*******************************************************************\
@@ -910,7 +915,7 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
         exprt e(i);
         minus_exprt kminus1(
           axiom.upper_bound(),
-          from_integer(1, generator.get_index_type()));
+          from_integer(1, axiom.upper_bound().type()));
         replace_expr(qvar, kminus1, e);
         current_index_set[s].insert(e);
         index_set[s].insert(e);
@@ -1041,7 +1046,7 @@ exprt string_refinementt::instantiate(
   exprt bounds=and_exprt(
     axiom.univ_within_bounds(),
     binary_relation_exprt(
-      from_integer(0, generator.get_index_type()), ID_le, val));
+      from_integer(0, val.type()), ID_le, val));
   replace_expr(axiom.univ_var(), r, bounds);
   return implies_exprt(bounds, instance);
 }
@@ -1077,7 +1082,7 @@ void string_refinementt::instantiate_not_contains(
       new_lemmas.push_back(lemma);
       // we put bounds on the witnesses:
       // 0 <= v <= |s0| - |s1| ==> 0 <= v+w[v] < |s0| && 0 <= w[v] < |s1|
-      exprt zero=from_integer(0, generator.get_index_type());
+      exprt zero=from_integer(0, val.type());
       binary_relation_exprt c1(zero, ID_le, plus_exprt(val, witness));
       binary_relation_exprt c2
         (to_string_expr(s0).length(), ID_gt, plus_exprt(val, witness));

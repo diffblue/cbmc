@@ -6,29 +6,27 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVERS_REFINEMENT_STRING_EXPR_H
-#define CPROVER_SOLVERS_REFINEMENT_STRING_EXPR_H
+#ifndef CPROVER_UTIL_STRING_EXPR_H
+#define CPROVER_UTIL_STRING_EXPR_H
 
-#include <langapi/language_ui.h>
+#include <util/std_expr.h>
+#include <util/arith_tools.h>
 
-#include <ansi-c/c_types.h>
-#include <solvers/refinement/bv_refinement.h>
-#include <solvers/refinement/refined_string_type.h>
-
-
-// Expressions that encode strings
 class string_exprt: public struct_exprt
 {
 public:
-  // Initialize string from the type of characters
-  explicit string_exprt(typet char_type);
+  string_exprt(): struct_exprt() {}
 
-  // Default uses C character type
-  string_exprt() : string_exprt(char_type()) {}
+  explicit string_exprt(typet type): struct_exprt(type)
+  {
+    operands().resize(2);
+  }
 
-  // Generate a new symbol of the given type with a prefix
-  static symbol_exprt fresh_symbol(
-    const irep_idt &prefix, const typet &type=bool_typet());
+  string_exprt(const exprt &_length, const exprt &_content, typet type):
+    struct_exprt(type)
+  {
+    copy_to_operands(_length, _content);
+  }
 
   // Expression corresponding to the length of the string
   const exprt &length() const { return op0(); }
@@ -37,12 +35,6 @@ public:
   // Expression corresponding to the content (array of characters) of the string
   const exprt &content() const { return op1(); }
   exprt &content() { return op1(); }
-
-  // Type of the expression as a refined string type
-  const refined_string_typet &refined_type() const
-  {
-    return to_refined_string_type(type());
-  }
 
   static exprt within_bounds(const exprt &idx, const exprt &bound);
 
@@ -54,7 +46,7 @@ public:
 
   index_exprt operator[] (int i) const
   {
-    return index_exprt(content(), refined_type().index_of_int(i));
+    return index_exprt(content(), from_integer(i, length().type()));
   }
 
   // Comparison on the length of the strings
@@ -84,7 +76,7 @@ public:
 
   binary_relation_exprt axiom_for_is_strictly_longer_than(int i) const
   {
-    return axiom_for_is_strictly_longer_than(refined_type().index_of_int(i));
+    return axiom_for_is_strictly_longer_than(from_integer(i, length().type()));
   }
 
   binary_relation_exprt axiom_for_is_shorter_than(
@@ -101,7 +93,7 @@ public:
 
   binary_relation_exprt axiom_for_is_shorter_than(int i) const
   {
-    return axiom_for_is_shorter_than(refined_type().index_of_int(i));
+    return axiom_for_is_shorter_than(from_integer(i, length().type()));
   }
 
   binary_relation_exprt axiom_for_is_strictly_shorter_than(
@@ -129,22 +121,24 @@ public:
 
   equal_exprt axiom_for_has_length(int i) const
   {
-    return axiom_for_has_length(refined_type().index_of_int(i));
+    return axiom_for_has_length(from_integer(i, length().type()));
   }
-
-  static irep_idt extract_java_string(const symbol_exprt &s);
-
-  static unsigned next_symbol_id;
 
   friend inline string_exprt &to_string_expr(exprt &expr);
 };
 
-
 inline string_exprt &to_string_expr(exprt &expr)
 {
   assert(expr.id()==ID_struct);
+  assert(expr.operands().size()==2);
   return static_cast<string_exprt &>(expr);
 }
 
+inline const string_exprt &to_string_expr(const exprt &expr)
+{
+  assert(expr.id()==ID_struct);
+  assert(expr.operands().size()==2);
+  return static_cast<const string_exprt &>(expr);
+}
 
 #endif
