@@ -1,6 +1,6 @@
 CORE
 NondetGenericWithoutNull.class
 --function NondetGenericWithoutNull.foo
-^VERIFICATION SUCCESSFUL$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
