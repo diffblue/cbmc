@@ -118,6 +118,11 @@ void static_analyzert<analyzerT>::plain_text_report()
         result() << "Failure (if reachable)";
         fail++;
       }
+      else if(domain[i_it].is_bottom())
+      {
+        result() << "Success (unreachable)";
+        pass++;
+      }
       else
       {
         result() << "Unknown";
