@@ -21,10 +21,27 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
+/*******************************************************************\
+
+Constructor: string_refinementt
+
+     Inputs: a namespace, a decision procedure, a bound on the number
+             of refinements and a boolean flag `concretize_result`
+
+    Purpose: refinement_bound is a bound on the number of refinement allowed.
+             if `concretize_result` is set to true, at the end of the decision
+             procedure, the solver try to find a concrete value for each
+             character
+
+\*******************************************************************/
+
 string_refinementt::string_refinementt(
-  const namespacet &_ns, propt &_prop, unsigned refinement_bound):
+  const namespacet &_ns,
+  propt &_prop,
+  unsigned refinement_bound):
   supert(_ns, _prop),
   use_counter_example(false),
+  do_concretizing(false),
   initial_loop_bound(refinement_bound)
 { }
 
@@ -194,7 +211,7 @@ exprt string_refinementt::substitute_function_applications(exprt expr)
   return expr;
 }
 
-bool string_refinementt::is_char_array(const typet &type)
+bool string_refinementt::is_char_array(const typet &type) const
 {
   if(type.id()==ID_symbol)
     return is_char_array(ns.follow(type));
@@ -220,7 +237,12 @@ bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
   if(is_char_array(rhs.type()))
   {
     set_char_array_equality(lhs, rhs);
-    add_symbol_to_symbol_map(lhs, rhs);
+    if(rhs.id() != ID_nondet_symbol)
+      add_symbol_to_symbol_map(lhs, rhs);
+    else
+      add_symbol_to_symbol_map(
+        lhs, generator.fresh_symbol("nondet_array", lhs.type()));
+
     return false;
   }
   if(refined_string_typet::is_refined_string_type(rhs.type()))
@@ -231,6 +253,46 @@ bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
   }
   // Other cases are to be handled by supert::set_to.
   return true;
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::concretize_results
+
+ Purpose: For each string whose length has been solved, add constants
+          to the index set to force the solver to pick concrete values
+          for each character
+
+\*******************************************************************/
+
+void string_refinementt::concretize_results()
+{
+  for(const auto& it : symbol_resolve)
+  {
+    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    {
+      string_exprt str=to_string_expr(it.second);
+      exprt length=current_model[str.length()];
+      mp_integer found_length;
+      if(!to_integer(length, found_length))
+      {
+        assert(found_length.is_long() && found_length >= 0);
+        size_t concretize_limit=found_length.to_long();
+        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
+          MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        exprt content_expr=str.content();
+        replace_expr(current_model, content_expr);
+        for(size_t i=0; i<concretize_limit; ++i)
+        {
+          auto i_expr=from_integer(i, str.length().type());
+          debug() << "Concretizing " << from_expr(content_expr)
+                  << " / " << i << eom;
+          current_index_set[str.content()].insert(i_expr);
+        }
+      }
+    }
+  }
+  add_instantiations();
 }
 
 /*******************************************************************\
@@ -397,7 +459,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       if(current_index_set.empty())
       {
         debug() << "current index set is empty" << eom;
-        return D_SATISFIABLE;
+        if(do_concretizing)
+        {
+          concretize_results();
+          do_concretizing=false;
+        }
+        else
+          return D_SATISFIABLE;
       }
 
       display_index_set();
@@ -488,7 +556,7 @@ Function: string_refinementt::get_array
 
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
 {
-  exprt arr_val=get(arr);
+  exprt arr_val=get_array(arr);
   exprt size_val=get(size);
   typet char_type=arr.type().subtype();
   typet index_type=size.type();
@@ -566,6 +634,32 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size)
   return ret;
 }
 
+
+/*******************************************************************\
+
+Function: string_refinementt::get_array
+
+  Inputs: an expression representing an array
+
+ Outputs: an expression
+
+ Purpose: get a model of an array of unknown size and infer the size if
+          possible
+
+\*******************************************************************/
+
+exprt string_refinementt::get_array(const exprt &arr)
+{
+  exprt arr_model=supert::get(arr);
+  if(arr_model.id()==ID_array)
+  {
+    array_typet &arr_type=to_array_type(arr_model.type());
+    arr_type.size()=from_integer(
+      arr_model.operands().size(), arr_type.size().type());
+  }
+  return arr_model;
+}
+
 /*******************************************************************\
 
 Function: string_refinementt::string_of_array
@@ -616,56 +710,64 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
 
 Function: string_refinementt::fill_model
 
- Outputs: a replace map
-
- Purpose: maps the variable created by the solver to constant expressions
-          given by the current model
+ Purpose: Fill in `current_model` by mapping the variables created by
+          the solver to constant expressions given by the current model
 
 \*******************************************************************/
 
-replace_mapt string_refinementt::fill_model()
+void string_refinementt::fill_model()
 {
-  replace_mapt fmodel;
-
   for(auto it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
       string_exprt refined=to_string_expr(it.second);
+      // TODO: check whith this is necessary:
       replace_expr(symbol_resolve, refined);
       const exprt &econtent=refined.content();
       const exprt &elength=refined.length();
 
-      exprt len=get(elength);
+      exprt len=supert::get(elength);
       exprt arr=get_array(econtent, len);
 
-      fmodel[elength]=len;
-      fmodel[econtent]=arr;
-
+      current_model[elength]=len;
+      current_model[econtent]=arr;
       debug() << from_expr(to_symbol_expr(it.first)) << "="
               << from_expr(refined);
+
       if(arr.id()==ID_array)
         debug() << " = \"" << string_of_array(to_array_expr(arr))
                 << "\" (size:" << from_expr(len) << ")"<< eom;
       else
           debug() << " = " << from_expr(arr) << "" << eom;
     }
+    else
+    {
+      assert(is_char_array(it.second.type()));
+      exprt arr=it.second;
+      replace_expr(symbol_resolve, arr);
+      replace_expr(current_model, arr);
+      exprt arr_model=get_array(arr);
+      current_model[it.first]=arr_model;
+
+      debug() << from_expr(to_symbol_expr(it.first)) << "="
+              << from_expr(arr) << " = " << from_expr(arr_model) << "" << eom;
+    }
   }
 
   for(auto it : generator.boolean_symbols)
   {
       debug() << "" << it.get_identifier() << " := "
-              << from_expr(get(it)) << eom;
-      fmodel[it]=get(it);
+              << from_expr(supert::get(it)) << eom;
+      current_model[it]=supert::get(it);
   }
 
   for(auto it : generator.index_symbols)
   {
-      debug() << "" << it.get_identifier() << " := "
-              << from_expr(get(it)) << eom;
-      fmodel[it]=get(it);
+     debug() << "" << it.get_identifier() << " := "
+              << from_expr(supert::get(it)) << eom;
+     current_model[it]=supert::get(it);
   }
-  return fmodel;
 }
 
 /*******************************************************************\
@@ -730,7 +832,7 @@ bool string_refinementt::check_axioms()
           << "===========================================" << eom;
   debug() << "string_refinementt::check_axioms: build the"
           << " interpretation from the model of the prop_solver" << eom;
-  replace_mapt fmodel=fill_model();
+  fill_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
@@ -746,10 +848,10 @@ bool string_refinementt::check_axioms()
     exprt prem=axiom.premise();
     exprt body=axiom.body();
 
-    replace_expr(fmodel, bound_inf);
-    replace_expr(fmodel, bound_sup);
-    replace_expr(fmodel, prem);
-    replace_expr(fmodel, body);
+    replace_expr(current_model, bound_inf);
+    replace_expr(current_model, bound_sup);
+    replace_expr(current_model, prem);
+    replace_expr(current_model, body);
     string_constraintt axiom_in_model(
       univ_var, bound_inf, bound_sup, prem, body);
 
@@ -1319,4 +1421,24 @@ void string_refinementt::instantiate_not_contains(
         and_exprt(and_exprt(c1, c2), and_exprt(c3, c4)));
       new_lemmas.push_back(witness_bounds);
     }
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::get
+
+  Inputs: an expression
+
+ Outputs: an expression
+
+ Purpose: evaluation of the expression in the current model
+
+\*******************************************************************/
+
+exprt string_refinementt::get(const exprt &expr) const
+{
+  exprt ecopy(expr);
+  replace_expr(symbol_resolve, ecopy);
+  replace_expr(current_model, ecopy);
+  return supert::get(ecopy);
 }
