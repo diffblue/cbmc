@@ -22,6 +22,7 @@ bool java_bytecode_convert_class(
   bool disable_runtime_checks,
   size_t max_array_length,
   lazy_methodst &,
-  lazy_methods_modet);
+  lazy_methods_modet,
+  bool string_refinement_enabled);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
