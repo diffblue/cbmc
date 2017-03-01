@@ -342,36 +342,6 @@ inline code_assertt &to_code_assert(codet &code)
   return static_cast<code_assertt &>(code);
 }
 
-/*! \brief A block of code which sets its parameter to a nondet value.
- */
-class nondet_initializer_blockt:public codet
-{
-public:
-  nondet_initializer_blockt(const exprt &symbol_expr, bool allow_null);
-
-  const exprt &statement_to_initialize() const;
-
-  exprt &statement_to_initialize();
-
-  void set_allow_null(bool b);
-
-  bool get_allow_null() const;
-};
-
-static inline const nondet_initializer_blockt &
-  to_nondet_initializer_block(const codet &code)
-{
-  assert(code.get_statement()==ID_nondet_initializer_block);
-  return static_cast<const nondet_initializer_blockt &>(code);
-}
-
-static inline nondet_initializer_blockt &
-  to_nondet_initializer_block(codet &code)
-{
-  assert(code.get_statement()==ID_nondet_initializer_block);
-  return static_cast<nondet_initializer_blockt &>(code);
-}
-
 /*! \brief An if-then-else
 */
 class code_ifthenelset:public codet
