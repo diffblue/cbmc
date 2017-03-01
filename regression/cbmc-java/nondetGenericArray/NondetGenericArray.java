@@ -19,7 +19,7 @@ class NondetGenericArray
 {
   static void foo()
   {
-    C c = CProver.nondetWithoutNull();
+    C c = CProver.nondetWithNull();
     CProver.assume(c != null);
     CProver.assume(c.b != null);
     CProver.assume(c.b.a != null);
