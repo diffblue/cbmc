@@ -5,6 +5,7 @@ Module: JAVA Bytecode Language Conversion
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -1117,10 +1118,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     // we throw away the first statement in an exception handler
     // as we don't know if a function call had a normal or exceptional return
-    size_t e;
-    for(e=0; e<method.exception_table.size(); ++e)
+    auto it=method.exception_table.begin();
+    for(; it!=method.exception_table.end(); ++it)
     {
-      if(cur_pc==method.exception_table[e].handler_pc)
+      if(cur_pc==it->handler_pc)
       {
         exprt exc_var=variable(
           arg0, statement[0],
@@ -1137,7 +1138,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         catch_handler_expr.get_sub().resize(1);
         catch_handler_expr.get_sub()[0]=exc_var;
 
-        codet catch_handler=code_expressiont(catch_handler_expr);
+        code_expressiont catch_handler(catch_handler_expr);
         code_labelt newlabel(label(std::to_string(cur_pc)),
                              code_blockt());
 
@@ -1151,7 +1152,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
     }
 
-    if(e<method.exception_table.size())
+    if(it!=method.exception_table.end())
     {
       // go straight to the next statement
       continue;
@@ -2201,7 +2202,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     // be aware of different try-catch blocks with the same starting pc
     std::size_t pos=0;
-    size_t end_pc=0;
+    std::size_t end_pc=0;
     while(pos<method.exception_table.size())
     {
       // check if this is the beginning of a try block
@@ -2248,7 +2249,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         catch_push_expr.set(ID_label, labels);
 
         code_blockt try_block;
-        codet catch_push=code_expressiont(catch_push_expr);
+        code_expressiont catch_push(catch_push_expr);
         try_block.move_to_operands(catch_push);
         try_block.move_to_operands(c);
         c=try_block;
@@ -2275,8 +2276,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // add the CATCH-POP before the end of the try block
       if(cur_pc<exception_row.end_pc &&
-        !working_set.empty() &&
-        *working_set.begin()==exception_row.end_pc)
+         !working_set.empty() &&
+         *working_set.begin()==exception_row.end_pc)
       {
         // have we already added a CATCH-POP for the current try-catch?
         // (each row corresponds to a handler)
@@ -2290,7 +2291,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // add CATCH_POP instruction
           side_effect_expr_catcht catch_pop_expr;
           code_blockt end_try_block;
-          codet catch_pop=code_expressiont(catch_pop_expr);
+          code_expressiont catch_pop(catch_pop_expr);
           catch_pop.set(ID_exception_list, get_nil_irep());
           catch_pop.set(ID_label, get_nil_irep());
           end_try_block.move_to_operands(c);
