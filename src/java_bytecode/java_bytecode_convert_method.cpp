@@ -2083,7 +2083,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // for each try-catch add a CATCH-PUSH instruction
     // each CATCH-PUSH records a list of all the handler labels
     // together with a list of all the exception ids
-    
+
     // be aware of different try-catch blocks with the same starting pc
     std::size_t pos=0;
     std::size_t end_pc=0;
@@ -2124,7 +2124,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         for(size_t i=0; i<exception_ids.size(); ++i)
           result.get_sub()[i].id(exception_ids[i]);
         catch_push_expr.set(ID_exception_list, result);
-        
+
         // add the labels corresponding to the handlers
         irept labels(ID_label);
         labels.get_sub().resize(handler_labels.size());
@@ -2324,7 +2324,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           break;
         }
     }
-    
+
     if(start_new_block)
     {
       code_labelt newlabel(label(std::to_string(address)), code_blockt());

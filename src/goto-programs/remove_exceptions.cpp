@@ -414,36 +414,12 @@ void remove_exceptionst::instrument_exceptions(
     return;
   Forall_goto_program_instructions(instr_it, goto_program)
   {
-    // this flag is used to skip DEAD redeclaration
-    if(!instr_it->labels.empty())
-      skip_dead=false;
-
     if(instr_it->is_decl())
     {
       code_declt decl=to_code_decl(instr_it->code);
       locals.push_back(decl.symbol());
     }
-    else if(instr_it->is_dead())
-    {
-      code_deadt dead=to_code_dead(instr_it->code);
-      auto it=std::find(locals.begin(),
-                        locals.end(),
-                        dead.symbol());
-      // avoid DEAD re-declarations
-      if(it==locals.end())
-      {
-        if(skip_dead)
-        {
-          // this DEAD has been already added by a throw
-          instr_it->make_skip();
-        }
-      }
-      else
-      {
-        locals.erase(it);
-      }
-    }
-    // it's a CATCH but not a handler
+    // it's a CATCH but not a handler (as it has no operands)
     else if(instr_it->type==CATCH && !instr_it->code.has_operands())
     {
       if(instr_it->targets.empty()) // pop
@@ -492,14 +468,13 @@ void remove_exceptionst::instrument_exceptions(
       }
       instr_it->make_skip();
     }
-    // handler
+    // CATCH handler
     else if(instr_it->type==CATCH && instr_it->code.has_operands())
     {
       instrument_exception_handler(func_it, instr_it);
     }
     else if(instr_it->type==THROW)
     {
-      skip_dead=true;
       instrument_throw(func_it, instr_it, stack_catch, locals);
     }
     else if(instr_it->type==FUNCTION_CALL)
