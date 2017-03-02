@@ -1,5 +1,12 @@
-#ifndef VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
-#define VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
+/*******************************************************************\
+
+ Module: analyses variable-sensitivity
+
+ Author: Owen Jones owen.jones@diffblue.com
+
+\*******************************************************************/
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
 
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
@@ -22,7 +29,7 @@ public:
   void set_options(optionst &options);
 
 private:
-  variable_sensitivity_object_factoryt()
+  variable_sensitivity_object_factoryt():initialized(false)
   {}
   static variable_sensitivity_object_factoryt s_instance;
   enum ABSTRACT_OBJECT_TYPET
@@ -36,12 +43,56 @@ private:
     STRUCT_SENSITIVE,
     STRUCT_INSENSITIVE
   };
-  ABSTRACT_OBJECT_TYPET get_abstract_object_type(
-    const typet type, const namespacet &ns);
+  ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
+  template <class abstract_object_class>
+  abstract_object_pointert initialize_abstract_object(
+    const typet type, bool top, bool bottom, const exprt &e,
+    const namespacet &ns);
   bool has_variables_flag;
   bool has_structs_flag;
   bool has_arrays_flag;
   bool has_pointers_flag;
+  bool initialized;
 };
 
-#endif // VARIABLE_SENSITIVITY_OBJECT_FACTORY_H
+/*******************************************************************\
+
+Function: variable_sensitivity_object_factoryt::initialize_abstract_object
+
+ Inputs:
+  abstract_object_classt - the class to use for the abstract object
+  type - the type of the variable
+  top - whether the abstract object should be top in the two-value domain
+  bottom - whether the abstract object should be bottom in the two-value domain
+  e - if top and bottom are false this expression is used as the starting
+      pointer for the abstract object
+  ns - namespace, used when following the input type
+
+ Outputs: An abstract object of the appropriate type.
+
+ Purpose: Initialize the abstract object class and return it.
+
+\*******************************************************************/
+
+template <class abstract_object_classt>
+abstract_object_pointert variable_sensitivity_object_factoryt::
+  initialize_abstract_object(
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const namespacet &ns)
+{
+  if(top || bottom)
+  {
+    return abstract_object_pointert(
+      new abstract_object_classt(type, top, bottom));
+  }
+  else
+  {
+    assert(type==e.type());
+    return abstract_object_pointert(new abstract_object_classt(e));
+  }
+}
+
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_OBJECT_FACTORY_H // NOLINT(*)
