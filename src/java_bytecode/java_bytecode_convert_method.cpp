@@ -5,7 +5,6 @@ Module: JAVA Bytecode Language Conversion
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -804,6 +803,43 @@ static void gather_symbol_live_ranges(
 
 /*******************************************************************\
 
+Function: java_bytecode_convert_methodt::check_static_field_stub
+
+  Inputs: `se`: Symbol expression referring to a static field
+          `basename`: The static field's basename
+
+ Outputs: Creates a symbol table entry for the static field if one
+          doesn't exist already.
+
+ Purpose: See above
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::check_static_field_stub(
+  const symbol_exprt &symbol_expr,
+  const irep_idt &basename)
+{
+  const auto &id=symbol_expr.get_identifier();
+  if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+  {
+    // Create a stub, to be overwritten if/when the real class is loaded.
+    symbolt new_symbol;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.name=id;
+    new_symbol.base_name=basename;
+    new_symbol.type=symbol_expr.type();
+    new_symbol.pretty_name=new_symbol.name;
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.value.make_nil();
+    symbol_table.add(new_symbol);
+  }
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
@@ -1055,6 +1091,25 @@ codet java_bytecode_convert_methodt::convert_instructions(
             namespacet(symbol_table),
             get_message_handler());
       }
+    }
+    // replace calls to CProver.assume
+    else if(statement=="invokestatic" &&
+            id2string(arg0.get(ID_identifier))==
+            "java::org.cprover.CProver.assume:(Z)V")
+    {
+      const code_typet &code_type=to_code_type(arg0.type());
+      // sanity check: function has the right number of args
+      assert(code_type.parameters().size()==1);
+
+      exprt operand = pop(1)[0];
+      // we may need to adjust the type of the argument
+      if(operand.type()!=bool_typet())
+        operand.make_typecast(bool_typet());
+
+      c=code_assumet(operand);
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      c.add_source_location()=loc;
     }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||

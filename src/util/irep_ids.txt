@@ -737,6 +737,7 @@ bswap
 java_bytecode_index
 java_instanceof
 java_super_method_call
+skip_initialize
 java_enum_static_unwind
 string_constraint
 string_not_contains_constraint
@@ -801,3 +802,4 @@ cprover_string_to_lower_case_func
 cprover_string_to_upper_case_func
 cprover_string_trim_func
 cprover_string_value_of_func
+basic_block_covered_lines
