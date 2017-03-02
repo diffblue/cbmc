@@ -1,12 +1,32 @@
+/*******************************************************************\
+
+ Module: analyses variable-sensitivity
+
+ Author: Owen Jones, owen.jones@diffblue.com
+
+\*******************************************************************/
 #include "variable_sensitivity_object_factory.h"
 #include "util/namespace.h"
 
 variable_sensitivity_object_factoryt
   variable_sensitivity_object_factoryt::s_instance;
 
+/*******************************************************************\
+
+Function: variable_sensitivity_object_factoryt::get_abstract_object_type
+
+ Inputs:
+  type - the type of the variable the abstract object is meant to represent
+
+ Outputs: An enum indicating the abstract object type to use.
+
+ Purpose: Decide which abstract object type to use for the variable in question.
+
+\*******************************************************************/
+
 variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   variable_sensitivity_object_factoryt::get_abstract_object_type(
-  const typet type, const namespacet &ns)
+  const typet type)
 {
   ABSTRACT_OBJECT_TYPET abstract_object_type=TWO_VALUE;
 
@@ -18,111 +38,109 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   }
   else if(type.id()==ID_array)
   {
-    if(has_arrays_flag)
-    {
-      abstract_object_type=ARRAY_SENSITIVE;
-    }
-    else
-    {
-      abstract_object_type=ARRAY_INSENSITIVE;
-    }
+    abstract_object_type=has_arrays_flag?ARRAY_SENSITIVE:ARRAY_INSENSITIVE;
   }
   else if(type.id()==ID_pointer)
   {
-    if(has_pointers_flag)
-    {
-      abstract_object_type=POINTER_SENSITIVE;
-    }
-    else
-    {
-      abstract_object_type=POINTER_INSENSITIVE;
-    }
+    abstract_object_type=
+      has_pointers_flag?POINTER_SENSITIVE:POINTER_INSENSITIVE;
   }
   else if(type.id()==ID_struct)
   {
-    if(has_structs_flag)
-    {
-      abstract_object_type=STRUCT_SENSITIVE;
-    }
-    else
-    {
-      abstract_object_type=STRUCT_INSENSITIVE;
-    }
+    abstract_object_type=has_structs_flag?STRUCT_SENSITIVE:STRUCT_INSENSITIVE;
+  }
+  else if(type.id()==ID_union)
+  {
+    // TODO: deal with unions
   }
 
-  // TODO: deal with unions
   return abstract_object_type;
 }
 
+/*******************************************************************\
+
+Function: variable_sensitivity_object_factoryt::get_abstract_object
+
+ Inputs:
+  type - the type of the variable
+  top - whether the abstract object should be top in the two-value domain
+  bottom - whether the abstract object should be bottom in the two-value domain
+  e - if top and bottom are false this expression is used as the starting
+      pointer for the abstract object
+  ns - namespace, used when following the input type
+
+ Outputs: An abstract object of the appropriate type.
+
+ Purpose: Get the appropriate abstract object for the variable under
+          consideration.
+
+\*******************************************************************/
 
 abstract_object_pointert variable_sensitivity_object_factoryt::
   get_abstract_object(
-    const typet type, bool top, bool bottom, const exprt &e,
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
     const namespacet &ns)
 {
-  typet followed_type = ns.follow(type);
-  ABSTRACT_OBJECT_TYPET abstract_object_type=get_abstract_object_type(followed_type, ns);
-
-  if(top || bottom)
+  if(!initialized)
   {
-    switch(abstract_object_type)
-    {
-      case CONSTANT:
-        return abstract_object_pointert(
-          new constant_abstract_valuet(followed_type, top, bottom));
-      case ARRAY_SENSITIVE:
-        return abstract_object_pointert(
-        new array_abstract_objectt(followed_type, top, false));
-      case ARRAY_INSENSITIVE:
-        return abstract_object_pointert(
-          new array_abstract_objectt(followed_type, top, false));
-      case POINTER_SENSITIVE:
-        return abstract_object_pointert(
-        new constant_pointer_abstract_objectt(followed_type, top, false));
-      case POINTER_INSENSITIVE:
-        return abstract_object_pointert(
-          new pointer_abstract_objectt(followed_type, top, false));
-      case STRUCT_SENSITIVE:
-        return abstract_object_pointert(
-        new struct_abstract_objectt(followed_type, top, false));
-      case STRUCT_INSENSITIVE:
-        return abstract_object_pointert(
-          new struct_abstract_objectt(followed_type, top, false));
-      case TWO_VALUE:
-        return abstract_object_pointert(new abstract_objectt(followed_type, top, false));
-      default:
-        assert(false);
-        return abstract_object_pointert(new abstract_objectt(followed_type, top, false));
-    }
+    throw "variable_sensitivity_object_factoryt::get_abstract_object() " \
+      "called without first calling " \
+      "variable_sensitivity_object_factoryt::set_options()\n";
   }
-  else
+
+  typet followed_type=ns.follow(type);
+  ABSTRACT_OBJECT_TYPET abstract_object_type=
+    get_abstract_object_type(followed_type);
+
+  switch(abstract_object_type)
   {
-    assert(followed_type==e.type());
-    switch(abstract_object_type)
-    {
-      case CONSTANT:
-        return abstract_object_pointert(new constant_abstract_valuet(e));
-      case ARRAY_SENSITIVE:
-        return abstract_object_pointert(new array_abstract_objectt(e));
-      case ARRAY_INSENSITIVE:
-        return abstract_object_pointert(new array_abstract_objectt(e));
-      case POINTER_SENSITIVE:
-        return abstract_object_pointert(
-          new constant_pointer_abstract_objectt(e));
-      case POINTER_INSENSITIVE:
-        return abstract_object_pointert(new pointer_abstract_objectt(e));
-      case STRUCT_SENSITIVE:
-        return abstract_object_pointert(new struct_abstract_objectt(e));
-      case STRUCT_INSENSITIVE:
-        return abstract_object_pointert(new struct_abstract_objectt(e));
-      case TWO_VALUE:
-        return abstract_object_pointert(new abstract_objectt(e));
-      default:
-        assert(false);
-        return abstract_object_pointert(new abstract_objectt(e));
-    }
+  case CONSTANT:
+    return initialize_abstract_object<constant_abstract_valuet>(
+      followed_type, top, bottom, e, ns);
+  case ARRAY_SENSITIVE:
+    return initialize_abstract_object<array_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case ARRAY_INSENSITIVE:
+    return initialize_abstract_object<array_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case POINTER_SENSITIVE:
+    return initialize_abstract_object<pointer_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case POINTER_INSENSITIVE:
+    return initialize_abstract_object<pointer_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case STRUCT_SENSITIVE:
+    return initialize_abstract_object<struct_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case STRUCT_INSENSITIVE:
+    return initialize_abstract_object<struct_abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  case TWO_VALUE:
+    return initialize_abstract_object<abstract_objectt>(
+      followed_type, top, bottom, e, ns);
+  default:
+    assert(false);
+    return initialize_abstract_object<abstract_objectt>(
+      followed_type, top, bottom, e, ns);
   }
 }
+
+/*******************************************************************\
+
+Function: variable_sensitivity_object_factoryt::set_options
+
+ Inputs:
+  options - the command line options
+
+ Outputs:
+
+ Purpose: Called once to record the appropriate variables from the command line
+          options so that they can be accessed easily when they are needed.
+
+\*******************************************************************/
 
 void variable_sensitivity_object_factoryt::set_options(optionst &options)
 {
@@ -130,4 +148,5 @@ void variable_sensitivity_object_factoryt::set_options(optionst &options)
   has_structs_flag=options.get_bool_option("structs");
   has_arrays_flag=options.get_bool_option("arrays");
   has_pointers_flag=options.get_bool_option("pointers");
+  initialized=true;
 }
