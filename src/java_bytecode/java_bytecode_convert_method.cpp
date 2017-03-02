@@ -483,6 +483,10 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value=convert_instructions(m, code_type);
 
+#ifdef DEBUG
+  std::cerr << method_symbol.value.pretty() << '\n';
+#endif
+
   remove_assert_after_generic_nondet(method_symbol.value);
 
   // Replace the existing stub symbol with the real deal:
@@ -1300,12 +1304,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[0].add_source_location()=i_it->source_location;
     }
 
-    else if(statement=="invokestatic" &&
-            has_prefix(id2string(arg0.get(ID_identifier)),
-                       "java::org.cprover.CProver.nondetWith") &&
-            !working_set.empty())
+    else if(
+      statement=="invokestatic" &&
+      std::regex_match(
+        id2string(arg0.get(ID_identifier)),
+        std::regex(
+          ".*org.cprover.CProver.(nondetWithNull|nondetWithoutNull).*")) &&
+      !working_set.empty())
     {
-      // Currently unused.
       const auto working_set_begin=working_set.begin();
       const auto next_address=address_map.find(*working_set_begin);
       assert(next_address!=address_map.end());
