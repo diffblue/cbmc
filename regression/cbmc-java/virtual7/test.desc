@@ -9,4 +9,3 @@ IF "java::D".*THEN GOTO [67]
 IF "java::C".*THEN GOTO [67]
 --
 IF "java::A".*THEN GOTO
-GOTO 9
