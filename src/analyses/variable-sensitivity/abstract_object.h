@@ -4,6 +4,22 @@
 
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
+ abstract_objectt is the top of the inheritance heirarchy of objects
+ used to represent individual variables in the general non-relational
+ domain.  It is a two element abstraction (i.e. it is either top or
+ bottom).  Within the hierachy of objects under it, child classes are
+ more precise abstractions (the converse doesn't hold to avoid
+ diamonds and inheriting unnecessary fields).  Thus the common parent
+ of two classes is an abstraction capable of representing both.  This
+ is important for understanding merge.
+
+ These objects are intended to be used in a copy-on-write style, which
+ is why their interface differs a bit from ai_domain_baset's
+ modify-in-place style of interface.
+
+ Although these can represent bottom (this variable cannot take any
+ value) it is not common for them to do so.
+
 \*******************************************************************/
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
@@ -53,6 +69,24 @@ class namespacet;
         abstract_object_pointert(op), out_any_modifications); \
     } \
   } \
+
+/* Merge is designed to allow different abstractions to be merged
+ * gracefully.  There are two real use-cases for this:
+ *
+ *  1. Having different abstractions for the variable in different
+ *     parts of the program.
+ *  2. Allowing different domains to write to ambiguous locations
+ *     for example, if a stores multiple values (maybe one per
+ *     location) with a constant for each, i does not represent one
+ *     single value (top, non-unit interval, etc.) and v is something
+ *     other than constant, then
+ *         a[i] = v
+ *     will cause this to happen.
+ *
+ * To handle this, merge finds the most specific class that is a
+ * parent to both classes and generates a new object of that type.
+ * The actual state is then merged by merge_state.
+ */
 
 template<class T>
 using sharing_ptrt=std::shared_ptr<T>;

@@ -150,6 +150,25 @@ Function: abstract_environmentt::assign
 
  Purpose: Assign a value to an expression
 
+ Assign is in principe simple, it updates the map with the new
+ abstract object.  The challenge is how to handle write to compound
+ objects, for example:
+    a[i].x.y = 23;
+ In this case we clearly want to update a, but we need to delegate to
+ the object in a so that it updates the right part of it (depending on
+ what kind of array abstraction it is).  So, as we find the variable
+ ('a' in this case) we build a stack of which part of it is accessed.
+
+ As abstractions may split the assignment into multiple write (for
+ example pointers that could point to several locations, arrays with
+ non-constant indexes), each of which has to handle the rest of the
+ compound write, thus the stack is passed (to write, which does the
+ actual updating) as an explicit argument rather than just via
+ recursion.
+
+ The same use case (but for the opposite reason; because you will only
+ update one of the multiple objects) is also why a merge_write flag is
+ needed.
 \*******************************************************************/
 
 bool abstract_environmentt::assign(
@@ -352,7 +371,9 @@ Function: abstract_environmentt::assume
 bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
 {
   // We should only attempt to assume Boolean things
-  // This should be enforced by the well-structured-ness of the goto-program
+  // This should be enforced by the well-structured-ness of the
+  // goto-program and the way assume is used.
+
   assert(expr.type().id()==ID_bool);
 
   // Evaluate the expression
@@ -372,8 +393,23 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
     }
   }
 
-  // TODO - split up conjuncts and deal with each part separately
-  // TODO - need a way of converting x==23 into an assign for the value of x
+  /* TODO : full implementation here
+   * Note that this is *very* syntax dependent so some normalisation would help
+   * 1. split up conjucts, handle each part separately
+   * 2. check how many variables the term contains
+   *     0 = this should have been simplified away
+   *    2+ = ignore as this is a non-relational domain
+   *     1 = extract the expression for the variable,
+   *         care must be taken for things like a[i]
+   *         which can be used if i can be resolved to a constant
+   * 3. use abstract_object_factory to build an abstract_objectt
+   *    of the correct type (requires a little extension)
+   *    This allows constant domains to handle x==23,
+   *    intervals to handle x < 4, etc.
+   * 4. eval the current value of the variable
+   * 5. compute the meet (not merge!) of the two abstract_objectt's
+   * 6. assign the new value back to the environment.
+   */
 
   return false;
 }
