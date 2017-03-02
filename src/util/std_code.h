@@ -1127,10 +1127,10 @@ inline const side_effect_expr_throwt &to_side_effect_expr_throw(
 class side_effect_expr_catcht:public side_effect_exprt
 {
 public:
-  inline side_effect_expr_catcht():side_effect_exprt(ID_push_catch)
+  side_effect_expr_catcht():side_effect_exprt(ID_push_catch)
   {
   }
-  inline explicit side_effect_expr_catcht(const irept &exception_list):
+  explicit side_effect_expr_catcht(const irept &exception_list):
     side_effect_exprt(ID_push_catch)
   {
     set(ID_exception_list, exception_list);
