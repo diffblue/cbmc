@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
 #include "java_object_factory.h"
-#include "java_opaque_method_stubs.h"
 #include "java_types.h"
 
 #include <limits>
