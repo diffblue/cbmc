@@ -43,6 +43,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
+  string_refinement_enabled=cmd.isset("string-refine");
   if(cmd.isset("java-max-input-array-length"))
     max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
@@ -494,7 +495,8 @@ bool java_bytecode_languaget::typecheck(
          disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
-         lazy_methods_mode))
+         lazy_methods_mode,
+         string_refinement_enabled))
       return true;
   }
 
@@ -509,7 +511,7 @@ bool java_bytecode_languaget::typecheck(
 
   // now typecheck all
   if(java_bytecode_typecheck(
-       symbol_table, get_message_handler()))
+       symbol_table, get_message_handler(), string_refinement_enabled))
     return true;
 
   return false;
