@@ -1,3 +1,10 @@
+5.8
+===
+
+* GOTO-INSTRUMENT: --reachability-slice can be used with --property to slice
+  down to a single property only.
+
+
 5.7
 ===
 
