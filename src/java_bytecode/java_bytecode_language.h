@@ -16,6 +16,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 
+enum lazy_methods_modet
+{
+  LAZY_METHODS_MODE_EAGER,
+  LAZY_METHODS_MODE_CONTEXT_INSENSITIVE,
+  LAZY_METHODS_MODE_CONTEXT_SENSITIVE
+};
+
+typedef std::pair<
+          const symbolt *,
+          const java_bytecode_parse_treet::methodt *>
+  lazy_method_valuet;
+typedef std::map<irep_idt, lazy_method_valuet>
+  lazy_methodst;
+
 class java_bytecode_languaget:public languaget
 {
 public:
@@ -69,9 +83,15 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
+  virtual void lazy_methods_provided(std::set<irep_idt> &) const override;
+  virtual void convert_lazy_method(
+    const irep_idt &id, symbol_tablet &) override;
 
 protected:
+  bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);
+
   irep_idt main_class;
+  std::vector<irep_idt> main_jar_classes;
   java_class_loadert java_class_loader;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
 
@@ -82,6 +102,9 @@ protected:
                                     //  - array size for newarray
   size_t max_nondet_array_length;   // maximal length for non-det array creation
   size_t max_user_array_length;     // max size for user code created arrays
+  lazy_methodst lazy_methods;
+  lazy_methods_modet lazy_methods_mode;
+  bool string_refinement_enabled;
 };
 
 languaget *new_java_bytecode_language();

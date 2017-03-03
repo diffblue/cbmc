@@ -42,6 +42,10 @@ public:
 
   void get_modules();
 
+  void convert_lazy_method(
+    const irep_idt &id,
+    symbol_tablet &symbol_table);
+
   language_filet(const language_filet &rhs);
 
   language_filet():language(NULL)
@@ -54,15 +58,21 @@ public:
 class language_filest:public messaget
 {
 public:
-  typedef std::map<std::string, language_filet> filemapt;
-  filemapt filemap;
+  typedef std::map<std::string, language_filet> file_mapt;
+  file_mapt file_map;
 
-  typedef std::map<std::string, language_modulet> modulemapt;
-  modulemapt modulemap;
+  // Contains pointers into file_mapt!
+  typedef std::map<std::string, language_modulet> module_mapt;
+  module_mapt module_map;
+
+  // Contains pointers into filemapt!
+  // This is safe-ish as long as this is std::map.
+  typedef std::map<irep_idt, language_filet *> lazy_method_mapt;
+  lazy_method_mapt lazy_method_map;
 
   void clear_files()
   {
-    filemap.clear();
+    file_map.clear();
   }
 
   bool parse();
@@ -75,10 +85,26 @@ public:
 
   bool interfaces(symbol_tablet &symbol_table);
 
+  bool has_lazy_method(const irep_idt &id)
+  {
+    return lazy_method_map.count(id);
+  }
+
+  // The method must have been added to the symbol table and registered
+  // in lazy_method_map (currently always in language_filest::typecheck)
+  // for this to be legal.
+  void convert_lazy_method(
+    const irep_idt &id,
+    symbol_tablet &symbol_table)
+  {
+    return lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+  }
+
   void clear()
   {
-    filemap.clear();
-    modulemap.clear();
+    file_map.clear();
+    module_map.clear();
+    lazy_method_map.clear();
   }
 
 protected:

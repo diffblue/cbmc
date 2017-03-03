@@ -25,7 +25,7 @@ Function: string_constraint_generatort::extract_java_string
 \*******************************************************************/
 
 irep_idt string_constraint_generatort::extract_java_string(
-  const symbol_exprt &s) const
+  const symbol_exprt &s)
 {
   std::string tmp=id2string(s.get_identifier());
   std::string prefix("java::java.lang.String.Literal.");
@@ -48,9 +48,9 @@ Function: string_constraint_generatort::add_axioms_for_constant
 \*******************************************************************/
 
 string_exprt string_constraint_generatort::add_axioms_for_constant(
-  irep_idt sval)
+  irep_idt sval, const refined_string_typet &ref_type)
 {
-  string_exprt res(get_char_type());
+  string_exprt res=fresh_string(ref_type);
   std::string c_str=id2string(sval);
   std::wstring str;
 
@@ -65,13 +65,13 @@ string_exprt string_constraint_generatort::add_axioms_for_constant(
 
   for(std::size_t i=0; i<str.size(); i++)
   {
-    exprt idx=from_integer(i, get_index_type());
-    exprt c=from_integer(str[i], get_char_type());
+    exprt idx=from_integer(i, ref_type.get_index_type());
+    exprt c=from_integer(str[i], ref_type.get_char_type());
     equal_exprt lemma(res[idx], c);
     axioms.push_back(lemma);
   }
 
-  exprt s_length=from_integer(str.size(), get_index_type());
+  exprt s_length=from_integer(str.size(), ref_type.get_index_type());
 
   axioms.push_back(res.axiom_for_has_length(s_length));
   return res;
@@ -93,7 +93,8 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   const function_application_exprt &f)
 {
   assert(f.arguments().empty());
-  string_exprt res(get_char_type());
+  const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  string_exprt res=fresh_string(ref_type);
   axioms.push_back(res.axiom_for_has_length(0));
   return res;
 }
@@ -139,5 +140,6 @@ string_exprt string_constraint_generatort::add_axioms_from_literal(
     sval=extract_java_string(to_symbol_expr(s));
   }
 
-  return add_axioms_for_constant(sval);
+  const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  return add_axioms_for_constant(sval, ref_type);
 }

@@ -49,6 +49,15 @@ public:
   virtual void modules_provided(std::set<std::string> &modules)
   { }
 
+  // add lazy functions provided to set
+
+  virtual void lazy_methods_provided(std::set<irep_idt> &methods) const
+  { }
+
+  // populate a lazy method
+  virtual void convert_lazy_method(const irep_idt &id, symbol_tablet &)
+  { }
+
   // final adjustments, e.g., initialization and call to main()
 
   virtual bool final(
