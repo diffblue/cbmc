@@ -17,14 +17,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
-#include <ansi-c/c_types.h>
-#include <java_bytecode/java_types.h>
 
 // Internal type used for string refinement
 class refined_string_typet: public struct_typet
 {
 public:
-  explicit refined_string_typet(typet char_type);
+  refined_string_typet(const typet &index_type, const typet &char_type);
 
   // Type for the content (list of characters) of a string
   const array_typet &get_content_type() const
@@ -33,7 +31,7 @@ public:
     return to_array_type(components()[1].type());
   }
 
-  const typet &get_char_type()
+  const typet &get_char_type() const
   {
     assert(components().size()==2);
     return components()[0].type();
@@ -42,16 +40,6 @@ public:
   const typet &get_index_type() const
   {
     return get_content_type().size().type();
-  }
-
-  static typet index_type()
-  {
-    return signed_int_type();
-  }
-
-  static typet java_index_type()
-  {
-    return java_int_type();
   }
 
   // For C the unrefined string type is __CPROVER_string, for java it is a
@@ -66,22 +54,6 @@ public:
   static bool is_java_string_builder_type(const typet &type);
 
   static bool is_java_char_sequence_type(const typet &type);
-
-  static typet get_char_type(const exprt &expr)
-  {
-    if(is_c_string_type(expr.type()))
-      return char_type();
-    else
-      return java_char_type();
-  }
-
-  static typet get_index_type(const exprt &expr)
-  {
-    if(is_c_string_type(expr.type()))
-      return index_type();
-    else
-      return java_index_type();
-  }
 
   static bool is_unrefined_string_type(const typet &type)
   {

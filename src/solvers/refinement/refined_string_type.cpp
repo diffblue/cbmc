@@ -10,9 +10,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#include <solvers/refinement/refined_string_type.h>
-#include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
+
+#include "refined_string_type.h"
 
 /*******************************************************************\
 
@@ -22,11 +22,12 @@ Constructor: refined_string_typet::refined_string_typet
 
 \*******************************************************************/
 
-refined_string_typet::refined_string_typet(typet char_type)
+refined_string_typet::refined_string_typet(
+  const typet &index_type, const typet &char_type)
 {
-  infinity_exprt infinite_index(refined_string_typet::index_type());
+  infinity_exprt infinite_index(index_type);
   array_typet char_array(char_type, infinite_index);
-  components().emplace_back("length", refined_string_typet::index_type());
+  components().emplace_back("length", index_type);
   components().emplace_back("content", char_array);
 }
 

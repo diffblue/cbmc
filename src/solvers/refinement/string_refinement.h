@@ -13,11 +13,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
-#include <langapi/language_ui.h>
-
-#include <solvers/refinement/bv_refinement.h>
+#include <util/string_expr.h>
 #include <solvers/refinement/string_constraint.h>
-#include <solvers/refinement/string_expr.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 // Defines a limit on the string witnesses we will output.
