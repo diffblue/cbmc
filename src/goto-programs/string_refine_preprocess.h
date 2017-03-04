@@ -17,6 +17,10 @@ Date:   September 2016
 
 class string_refine_preprocesst:public messaget
 {
+ public:
+  string_refine_preprocesst(
+    symbol_tablet &, goto_functionst &, message_handlert &);
+
  private:
   namespacet ns;
   symbol_tablet & symbol_table;
@@ -24,29 +28,24 @@ class string_refine_preprocesst:public messaget
 
   // String builders maps the different names of a same StringBuilder object
   // to a unique expression.
-  std::map<exprt, exprt> string_builders;
+  std::unordered_map<exprt, exprt> string_builders;
 
   // Map name of Java string functions to there equivalent in the solver
-  std::map<irep_idt, irep_idt> side_effect_functions;
-  std::map<irep_idt, irep_idt> string_functions;
-  std::map<irep_idt, irep_idt> c_string_functions;
-  std::map<irep_idt, irep_idt> string_function_calls;
-  std::map<irep_idt, irep_idt> string_of_char_array_functions;
-  std::map<irep_idt, irep_idt> string_of_char_array_function_calls;
-  std::map<irep_idt, irep_idt> side_effect_char_array_functions;
+  std::unordered_map<irep_idt, irep_idt> side_effect_functions;
+  std::unordered_map<irep_idt, irep_idt> string_functions;
+  std::unordered_map<irep_idt, irep_idt> c_string_functions;
+  std::unordered_map<irep_idt, irep_idt> string_function_calls;
+  std::unordered_map<irep_idt, irep_idt> string_of_char_array_functions;
+  std::unordered_map<irep_idt, irep_idt> string_of_char_array_function_calls;
+  std::unordered_map<irep_idt, irep_idt> side_effect_char_array_functions;
 
-  std::map<irep_idt, std::string> signatures;
-  std::map<exprt, exprt> hidden_strings;
-  std::map<exprt, exprt> java_to_cprover_strings;
+  std::unordered_map<irep_idt, std::string> signatures;
+  std::unordered_map<exprt, exprt> hidden_strings;
+  std::unordered_map<exprt, exprt> java_to_cprover_strings;
 
   // unique id for each newly created symbols
   int next_symbol_id;
 
- public:
-  string_refine_preprocesst(
-    symbol_tablet &, goto_functionst &, message_handlert &);
-
- private:
   void initialize_string_function_table();
 
   static bool is_java_string_pointer_type(const typet &type);
@@ -200,7 +199,7 @@ class string_refine_preprocesst:public messaget
     goto_programt::targett &i_it,
     const irep_idt &function_name,
     const std::string &signature,
-    size_t index,
+    std::size_t index,
     bool assign_first_arg=false,
     bool skip_first_arg=false);
 
