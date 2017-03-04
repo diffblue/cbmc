@@ -105,6 +105,7 @@ protected:
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
+  std::string java_cp_include_files;
 };
 
 languaget *new_java_bytecode_language();

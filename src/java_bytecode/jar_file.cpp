@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstring>
 #include <cassert>
 #include <sstream>
-
 #include "jar_file.h"
+#include <util/suffix.h>
 
 /*******************************************************************\
 
@@ -24,7 +24,7 @@ Function: jar_filet::open
 
 \*******************************************************************/
 
-void jar_filet::open(const std::string &filename)
+void jar_filet::open(std::string &java_cp_include_files, const std::string &filename)
 {
   if(!mz_ok)
   {
@@ -38,8 +38,7 @@ void jar_filet::open(const std::string &filename)
     std::size_t number_of_files=
       mz_zip_reader_get_num_files(&zip);
 
-    index.reserve(number_of_files);
-
+    size_t filtered_index=0;
     for(std::size_t i=0; i<number_of_files; i++)
     {
       mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
@@ -48,8 +47,17 @@ void jar_filet::open(const std::string &filename)
         mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
       assert(filename_length==filename_len);
       std::string file_name(filename_char);
+      std::smatch string_matcher;
+      std::regex matcher(java_cp_include_files);
+      // load .class files only if they match regex
+      if(std::regex_match(file_name, string_matcher, matcher) ||
+         !has_suffix(file_name, ".class"))
+      {
+        index.push_back(file_name);
+        filtered_jar[filtered_index]=i;
+        filtered_index++;
+      }
       delete[] filename_char;
-      index.push_back(file_name);
     }
   }
 }
@@ -96,16 +104,17 @@ std::string jar_filet::get_entry(std::size_t i)
 
   std::string dest;
 
+  size_t real_index=filtered_jar[i];
   mz_zip_archive_file_stat file_stat;
   memset(&file_stat, 0, sizeof(file_stat));
-  mz_bool stat_ok=mz_zip_reader_file_stat(&zip, i, &file_stat);
+  mz_bool stat_ok=mz_zip_reader_file_stat(&zip, real_index, &file_stat);
   if(stat_ok!=MZ_TRUE)
     return std::string();
   std::vector<char> buffer;
   size_t bufsize=file_stat.m_uncomp_size;
   buffer.resize(bufsize);
   mz_bool read_ok=
-    mz_zip_reader_extract_to_mem(&zip, i, buffer.data(), bufsize, 0);
+    mz_zip_reader_extract_to_mem(&zip, real_index, buffer.data(), bufsize, 0);
   if(read_ok!=MZ_TRUE)
     return std::string();
 

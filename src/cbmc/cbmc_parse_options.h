@@ -55,6 +55,7 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
   "(java-max-vla-length):(java-unwind-enum-static)" \
+  "(java-cp-include-files):" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)

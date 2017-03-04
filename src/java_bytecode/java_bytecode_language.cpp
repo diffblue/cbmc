@@ -55,6 +55,10 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
+  if(cmd.isset("java-cp-include-files"))
+    java_cp_include_files=cmd.get_value("java-cp-include-files");
+  else
+    java_cp_include_files=".*";
 }
 
 /*******************************************************************\
@@ -129,6 +133,7 @@ bool java_bytecode_languaget::parse(
   const std::string &path)
 {
   java_class_loader.set_message_handler(get_message_handler());
+  java_class_loader.set_java_cp_include_files(java_cp_include_files);
 
   // look at extension
   if(has_suffix(path, ".class"))
