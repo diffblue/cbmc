@@ -3456,8 +3456,9 @@ public:
     operands().resize(2);
   }
 
-  function_application_exprt(const symbol_exprt &_function, const typet &_type)
-    :function_application_exprt(_type)
+  function_application_exprt(
+    const symbol_exprt &_function, const typet &_type):
+      function_application_exprt(_type)
   {
     function()=_function;
   }
