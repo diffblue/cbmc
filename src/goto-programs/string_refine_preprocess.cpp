@@ -837,7 +837,7 @@ void string_refine_preprocesst::make_char_array_function(
   goto_programt::targett &i_it,
   const irep_idt &function_name,
   const std::string &signature,
-  size_t index,
+  std::size_t index,
   bool assign_first_arg,
   bool skip_first_arg)
 {
@@ -1370,13 +1370,13 @@ Constructor: string_refine_preprocesst::string_refine_preprocesst
 string_refine_preprocesst::string_refine_preprocesst(
   symbol_tablet &_symbol_table,
   goto_functionst &_goto_functions,
-  message_handlert &_message_handler)
-  :messaget(_message_handler),
-   symbol_table(_symbol_table),
-   ns(_symbol_table),
-   goto_functions(_goto_functions),
-   jls_ptr(symbol_typet("java::java.lang.String")),
-   next_symbol_id(0)
+  message_handlert &_message_handler):
+    messaget(_message_handler),
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
+    goto_functions(_goto_functions),
+    jls_ptr(symbol_typet("java::java.lang.String")),
+    next_symbol_id(0)
 {
   initialize_string_function_table();
   Forall_goto_functions(it, goto_functions)
