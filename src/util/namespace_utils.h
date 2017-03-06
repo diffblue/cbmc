@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// THIS FILE IS DEPRECATED
+#ifndef CPROVER_UTIL_NAMESPACE_UTILS_H
+#define CPROVER_UTIL_NAMESPACE_UTILS_H
 
-#ifndef CPROVER_NAMESPACE_UTILS_H
-#define CPROVER_NAMESPACE_UTILS_H
+// THIS FILE IS DEPRECATED
 
 #include <functional>
 #include "namespace.h"
@@ -103,7 +103,7 @@ public:
 class namespace_utilst:public virtual namespace_utils_baset
 {
  public:
-  namespace_utilst(const namespacet &_ns):__ns(_ns){}
+  explicit namespace_utilst(const namespacet &_ns):__ns(_ns) {}
 
  protected:
   const namespacet &__ns;
