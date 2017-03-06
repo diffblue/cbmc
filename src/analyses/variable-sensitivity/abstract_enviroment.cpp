@@ -179,6 +179,13 @@ bool abstract_environmentt::assign(
 {
   assert(value);
 
+  if(value->is_bottom())
+  {
+    bool bottom_at_start=this->is_bottom();
+    this->make_bottom();
+    return !bottom_at_start;
+  }
+
   // Build a stack of index, member and dereference accesses which
   // we will work through the relevant abstract objects
   exprt s = expr;
