@@ -51,13 +51,14 @@ public:
    * function. So, an iterator to any such element is actually an iterator to
    * an edge of the call graph.
    */
-  typedef grapht::const_iterator  call_edge_iteratort;
+  typedef grapht::const_iterator call_edge_iteratort;
 
   /**
    * Since a call graph is implemented as a multimap, we use ranges
    * of call graph edges to represent out-edges from a node (a function)
    */
-  typedef std::pair<call_edge_iteratort,call_edge_iteratort>  call_edges_ranget;
+  typedef
+    std::pair<call_edge_iteratort, call_edge_iteratort> call_edges_ranget;
 
   /**
    * It returns a range of edges represented by a pair of iterators. The
@@ -105,12 +106,12 @@ Typical usage:
  // Let's assume there is 'goto_modelt GM' and 'call_grapht CG'
  std::vector<irep_idt>  result; // Here we will store the topological order.
  {
-   std::unordered_set<irep_idt,dstring_hash>  processed;
+   std::unordered_set<irep_idt, dstring_hash>  processed;
    for (auto const&  elem : GM.goto_functions.function_map)
-     partial_topological_order(CG,elem.first,processed,result);
+     partial_topological_order(CG, elem.first, processed, result);
    // Now we reverse the result to get the classic (partial)
    // topological order instead of the inverted one.
-   std::reverse(result.begin(),result.end());
+   std::reverse(result.begin(), result.end());
  }
  std::cout << "A (partial) topological order of my call graph is: ";
  for (irep_idt const&  fn_name : result)
@@ -118,11 +119,10 @@ Typical usage:
 
 \*******************************************************************/
 void  inverted_partial_topological_order(
-    call_grapht const&  call_graph,
-    irep_idt const&  start_function,
-    std::unordered_set<irep_idt,dstring_hash>&  processed_functions,
-    std::vector<irep_idt>&  output
-    );
+  call_grapht const &call_graph,
+  irep_idt const &start_function,
+  std::unordered_set<irep_idt, dstring_hash> &processed_functions,
+  std::vector<irep_idt> &output);
 
 void get_inverted_topological_order(
   call_grapht const& call_graph,
@@ -130,40 +130,34 @@ void get_inverted_topological_order(
   std::vector<irep_idt>& output);
 
 bool  exists_direct_call(
-    call_grapht const&  call_graph,
-    irep_idt const&  caller,
-    irep_idt const&  callee
-    );
+  call_grapht const &call_graph,
+  irep_idt const &caller,
+  irep_idt const &callee);
 
 bool  exists_direct_or_indirect_call(
-    call_grapht const&  call_graph,
-    irep_idt const&  caller,
-    irep_idt const&  callee,
-    std::unordered_set<irep_idt,dstring_hash>&  ignored_functions
-    );
+  call_grapht const &call_graph,
+  irep_idt const &caller,
+  irep_idt const &callee,
+  std::unordered_set<irep_idt, dstring_hash> &ignored_functions);
 
 bool  exists_direct_or_indirect_call(
-    call_grapht const&  call_graph,
-    irep_idt const&  caller,
-    irep_idt const&  callee
-    );
+  call_grapht const &call_graph,
+  irep_idt const &caller,
+  irep_idt const &callee);
 
 void compute_inverted_call_graph(
-    call_grapht const&  original_call_graph,
-    call_grapht&  output_inverted_call_graph
-    );
+  call_grapht const &original_call_graph,
+  call_grapht &output_inverted_call_graph);
 
-void find_leaves_bellow_function(
-    call_grapht const&  call_graph,
-    irep_idt const&  function,
-    std::unordered_set<irep_idt,dstring_hash>&  to_avoid,
-    std::unordered_set<irep_idt,dstring_hash>&  output
-    );
+void find_leaves_below_function(
+  call_grapht const &call_graph,
+  irep_idt const &function,
+  std::unordered_set<irep_idt, dstring_hash> &to_avoid,
+  std::unordered_set<irep_idt, dstring_hash> &output);
 
-void find_leaves_bellow_function(
-    call_grapht const&  call_graph,
-    irep_idt const&  function,
-    std::unordered_set<irep_idt,dstring_hash>&  output
-    );
+void find_leaves_below_function(
+  call_grapht const &call_graph,
+  irep_idt const &function,
+  std::unordered_set<irep_idt, dstring_hash> &output);
 
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
