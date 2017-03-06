@@ -32,7 +32,7 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
 
   if(type.id()==ID_signedbv || type.id()==ID_unsignedbv ||
     type.id()==ID_floatbv || type.id()==ID_fixedbv ||
-    type.id()==ID_c_bool)
+    type.id()==ID_c_bool || type.id()==ID_bool)
   {
     abstract_object_type=CONSTANT;
   }
