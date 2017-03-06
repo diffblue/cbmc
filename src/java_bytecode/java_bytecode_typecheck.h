@@ -43,7 +43,7 @@ public:
   {
   }
 
-  virtual ~java_bytecode_typecheckt() { }
+  virtual ~java_bytecode_typecheckt() = default;
 
   virtual void typecheck();
   virtual void typecheck_expr(exprt &expr);

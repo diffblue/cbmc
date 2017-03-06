@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 
 #include <langapi/mode.h>
+#include <goto-programs/system_library_symbols.h>
 
 class dump_ct
 {
@@ -30,7 +31,7 @@ public:
     language(factory())
   {
     if(use_system_headers)
-      init_system_library_map();
+      system_symbols=system_library_symbolst();
   }
 
   virtual ~dump_ct()
@@ -51,20 +52,14 @@ protected:
 
   std::set<std::string> system_headers;
 
-  typedef std::unordered_map<irep_idt, std::string, irep_id_hash>
-    system_library_mapt;
-  system_library_mapt system_library_map;
+  system_library_symbolst system_symbols;
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
     declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
-  void init_system_library_map();
-
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);
-
-  bool ignore(const symbolt &symbol);
 
   static std::string indent(const unsigned n)
   {

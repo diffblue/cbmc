@@ -1,0 +1,6 @@
+CORE
+NondetGenericRecursive.class
+--function NondetGenericRecursive.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

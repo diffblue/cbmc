@@ -1,0 +1,6 @@
+CORE
+NondetLong.class
+--function NondetLong.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

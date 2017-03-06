@@ -1,0 +1,6 @@
+CORE
+NondetByte.class
+--function NondetByte.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

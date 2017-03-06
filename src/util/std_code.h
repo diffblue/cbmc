@@ -1044,6 +1044,22 @@ public:
   }
 };
 
+static inline const side_effect_expr_nondett &
+  to_side_effect_expr_nondet(const exprt &expr)
+{
+  const auto &x = to_side_effect_expr(expr);
+  assert(x.get_statement() == ID_nondet);
+  return static_cast<const side_effect_expr_nondett &>(x);
+}
+
+static inline side_effect_expr_nondett &
+  to_side_effect_expr_nondet(exprt &expr)
+{
+  auto &x = to_side_effect_expr(expr);
+  assert(x.get_statement() == ID_nondet);
+  return static_cast<side_effect_expr_nondett &>(x);
+}
+
 /*! \brief A function call side effect
 */
 class side_effect_expr_function_callt:public side_effect_exprt

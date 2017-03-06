@@ -6,7 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include "java_bytecode_typecheck.h"
+#include "java_object_factory.h"
 
 /*******************************************************************\
 
@@ -27,6 +32,7 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
   if(statement==ID_assign)
   {
     code_assignt &code_assign=to_code_assign(code);
+
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
 
@@ -35,8 +41,10 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
   }
   else if(statement==ID_block)
   {
-    Forall_operands(it, code)
+    Forall_operands(it, to_code_block(code))
+    {
       typecheck_code(to_code(*it));
+    }
   }
   else if(statement==ID_label)
   {

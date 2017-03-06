@@ -177,3 +177,4 @@ const codet &codet::last_statement() const
 
   return *this;
 }
+

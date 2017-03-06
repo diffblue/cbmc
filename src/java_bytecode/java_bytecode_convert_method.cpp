@@ -22,15 +22,101 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <analyses/cfg_dominators.h>
 
+#include "bytecode_info.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
+#include "java_object_factory.h"
 #include "java_types.h"
 
 #include <limits>
 #include <algorithm>
 #include <functional>
 #include <unordered_set>
+#include <regex>
+
+/*******************************************************************\
+
+Function: traverse_expr_tree
+
+  Inputs: `expr`: an expression tree to traverse
+          `parents`: will hold previously-visited nodes
+          `func`: will be called on each node, takes the node and the `parents`
+                  stack as arguments
+
+ Outputs: None
+
+ Purpose: Abstracts the process of calling a function on each node of the 
+          expression tree.
+
+\*******************************************************************/
+
+template <typename Func>
+static void traverse_expr_tree(
+  exprt &expr,
+  std::vector<exprt*> &parents,
+  Func func)
+{
+  const auto& parents_ref=parents;
+  func(expr, parents_ref);
+
+  parents.push_back(&expr);
+  for(auto &op : expr.operands())
+  {
+    traverse_expr_tree(op, parents, func);
+  }
+  parents.pop_back();
+}
+
+/*******************************************************************\
+
+Function: traverse_expr_tree
+
+  Inputs: `expr`: an expression tree
+
+ Outputs: None
+
+ Purpose: Looks for a symbol node with identifier 'nondetWith(out?)Null'.
+          Finds the following statement, checks if it is an "assert", and
+          replaces it with a code_skipt if so.
+
+\*******************************************************************/
+
+static void remove_assert_after_generic_nondet(exprt &expr)
+{
+  std::vector<exprt*> parents;
+  traverse_expr_tree(
+    expr,
+    parents,
+    [] (exprt &expr, const std::vector<exprt*>& parents)
+    {
+      const std::regex id_regex(
+        ".*org.cprover.CProver.(nondetWithNull|nondetWithoutNull).*");
+      if(expr.id()==ID_symbol &&
+         std::regex_match(as_string(to_symbol_expr(expr).get_identifier()),
+                          id_regex))
+      {
+        assert(2<=parents.size());
+        const auto before_1=*(parents.end()-1);
+        const auto before_2=*(parents.end()-2);
+
+        for(auto it=before_2->operands().begin(),
+                 end=before_2->operands().end();
+            it!=end;
+            ++it)
+        {
+          if(&(*it)==before_1)
+          {
+            assert(it+1!=end);
+            if((it+1)->id()==ID_code &&
+               to_code(*(it+1)).get_statement()=="assert")
+            {
+              *(it+1)=code_skipt();
+            }
+          }
+        }
+      }
+    });
+}
 
 class patternt
 {
@@ -397,7 +483,15 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value=convert_instructions(m, code_type);
 
+#ifdef DEBUG
+  std::cerr << method_symbol.value.pretty() << '\n';
+#endif
+
+  remove_assert_after_generic_nondet(method_symbol.value);
+
   // Replace the existing stub symbol with the real deal:
+
+  // do we have the method symbol already?
   const auto s_it=symbol_table.symbols.find(method.get_name());
   assert(s_it!=symbol_table.symbols.end());
   symbol_table.symbols.erase(s_it);
@@ -804,6 +898,74 @@ static void gather_symbol_live_ranges(
 
 /*******************************************************************\
 
+Function: java_bytecode_convert_methodt::check_static_field_stub
+
+  Inputs: `se`: Symbol expression referring to a static field
+          `basename`: The static field's basename
+
+ Outputs: Creates a symbol table entry for the static field if one
+          doesn't exist already.
+
+ Purpose: See above
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::check_static_field_stub(
+  const symbol_exprt &symbol_expr,
+  const irep_idt &basename)
+{
+  const auto &id=symbol_expr.get_identifier();
+  if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+  {
+    // Create a stub, to be overwritten if/when the real class is loaded.
+    symbolt new_symbol;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.name=id;
+    new_symbol.base_name=basename;
+    new_symbol.type=symbol_expr.type();
+    new_symbol.pretty_name=new_symbol.name;
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.value.make_nil();
+    symbol_table.add(new_symbol);
+  }
+}
+
+static unsigned get_bytecode_type_width(const typet &ty)
+{
+  if(ty.id()==ID_pointer)
+    return 32;
+  return ty.get_unsigned_int(ID_width);
+}
+
+/*******************************************************************\
+
+Function: statement_is_static_with_name
+
+Inputs: `statement`: A statement to check.
+        `arg0`: The first argument of the statement.
+        `desired_name`: The desired identifier of arg0.
+
+ Outputs: True if statement matches "invokestatic" and arg0's identifier
+          matches the desired name, false otherwise.
+
+ Purpose: Used to match nondet library methods concisely.
+
+\*******************************************************************/
+
+static bool statement_is_static_with_name(
+  const irep_idt &statement,
+  const exprt &arg0,
+  const std::string &desired_name)
+{
+  return statement=="invokestatic" &&
+         id2string(arg0.get(ID_identifier))==desired_name;
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
@@ -813,13 +975,6 @@ Function: java_bytecode_convert_methodt::convert_instructions
  Purpose:
 
 \*******************************************************************/
-
-static unsigned get_bytecode_type_width(const typet &ty)
-{
-  if(ty.id()==ID_pointer)
-    return 32;
-  return ty.get_unsigned_int(ID_width);
-}
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
@@ -957,8 +1112,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
     if(a_it->second.done)
       continue;
-    working_set
-      .insert(a_it->second.successors.begin(), a_it->second.successors.end());
+
+    working_set.insert(
+      a_it->second.successors.begin(), a_it->second.successors.end());
 
     instructionst::const_iterator i_it=a_it->second.source;
     stack.swap(a_it->second.stack);
@@ -1056,6 +1212,137 @@ codet java_bytecode_convert_methodt::convert_instructions(
             get_message_handler());
       }
     }
+
+    // replace calls to CProver.assume
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.assume:(Z)V"))
+    {
+      const code_typet &code_type=to_code_type(arg0.type());
+      // sanity check: function has the right number of args
+      assert(code_type.parameters().size()==1);
+
+      exprt operand=pop(1)[0];
+      // we may need to adjust the type of the argument
+      if(operand.type()!=bool_typet())
+        operand.make_typecast(bool_typet());
+
+      c=code_assumet(operand);
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      c.add_source_location()=loc;
+    }
+
+    // if the statement is a nondet boolean
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetBoolean:()Z"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_boolean_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet byte
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetByte:()B"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_byte_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet char
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetChar:()C"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_char_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet short
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetShort:()S"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_short_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet int
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetInt:()I"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_int_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet long
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetLong:()J"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_long_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet float
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetFloat:()F"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_float_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    // if the statement is a nondet double
+    else if(statement_is_static_with_name(
+              statement, arg0, "java::org.cprover.CProver.nondetDouble:()D"))
+    {
+      results.resize(1);
+      results[0]=side_effect_expr_nondett(java_double_type());
+      results[0].add_source_location()=i_it->source_location;
+    }
+
+    else if(
+      statement=="invokestatic" &&
+      std::regex_match(
+        id2string(arg0.get(ID_identifier)),
+        std::regex(
+          ".*org.cprover.CProver.(nondetWithNull|nondetWithoutNull).*")) &&
+      !working_set.empty())
+    {
+      const auto working_set_begin=working_set.begin();
+      const auto next_address=address_map.find(*working_set_begin);
+      assert(next_address!=address_map.end());
+
+      // Find the correct return type.
+      const auto next_source=next_address->second.source;
+      const auto next_statement=next_source->statement;
+      assert(next_statement=="checkcast");
+      assert(next_source->args.size()>=1);
+      const auto return_type=pointer_typet(next_source->args[0].type());
+
+      // Reconstruct a function call with the correct return type.
+      code_function_callt call;
+
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      call.add_source_location()=loc;
+      call.function().add_source_location()=loc;
+
+      // Update the pointed-to type.
+      auto func_type=arg0.type();
+      to_code_type(func_type).return_type()=return_type;
+
+      call.function()=symbol_exprt(arg0.get(ID_identifier), func_type);
+      call.lhs()=tmp_variable("return", return_type);
+
+      results.resize(1);
+      results[0]=java_bytecode_promotion(call.lhs());
+      c=call;
+    }
+
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
             statement=="invokevirtual" ||
@@ -1657,8 +1944,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[2]=op[1];
       results[3]=op[2];
     }
-    // dup2* behaviour depends on the size of the operands on the
-    // stack
+    // dup2* behaviour depends on the size of the operands on the stack
     else if(statement=="dup2")
     {
       assert(!stack.empty() && results.empty());
@@ -2216,6 +2502,14 @@ void java_bytecode_convert_method(
   safe_pointer<std::vector<irep_idt> > needed_methods,
   safe_pointer<std::set<irep_idt> > needed_classes)
 {
+  if(class_symbol.name=="org.cprover.CProver" &&
+     (method.name=="nondetWithNull" ||
+      method.name=="nondetWithoutNull"))
+  {
+    // Ignore these methods, rely on default stubbing behaviour.
+    return;
+  }
+
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
     message_handler,
