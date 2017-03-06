@@ -217,7 +217,7 @@ Function: constant_pointer_abstract_objectt::output
 \*******************************************************************/
 
 void constant_pointer_abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns)
+  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
   if(is_top() || is_bottom())
   {

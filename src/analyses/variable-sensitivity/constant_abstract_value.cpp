@@ -39,7 +39,7 @@ exprt constant_abstract_valuet::to_constant() const
 }
 
 void constant_abstract_valuet::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns)
+  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
   if(!is_top() && !is_bottom())
   {

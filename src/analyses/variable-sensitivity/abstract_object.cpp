@@ -290,7 +290,7 @@ Function: abstract_objectt::output
 \*******************************************************************/
 
 void abstract_objectt::output(
-  std::ostream &out, const ai_baset &ai, const namespacet &ns)
+  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
   if(top)
   {
