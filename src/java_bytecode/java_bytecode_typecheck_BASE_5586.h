@@ -21,8 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool java_bytecode_typecheck(
   symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  bool string_refinement_enabled);
+  message_handlert &message_handler);
 
 bool java_bytecode_typecheck(
   exprt &expr,
@@ -34,16 +33,14 @@ class java_bytecode_typecheckt:public typecheckt
 public:
   java_bytecode_typecheckt(
     symbol_tablet &_symbol_table,
-    message_handlert &_message_handler,
-    bool _string_refinement_enabled):
+    message_handlert &_message_handler):
     typecheckt(_message_handler),
     symbol_table(_symbol_table),
-    ns(symbol_table),
-    string_refinement_enabled(_string_refinement_enabled)
+    ns(symbol_table)
   {
   }
 
-  virtual ~java_bytecode_typecheckt() = default;
+  virtual ~java_bytecode_typecheckt() { }
 
   virtual void typecheck();
   virtual void typecheck_expr(exprt &expr);
@@ -51,7 +48,6 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const namespacet ns;
-  bool string_refinement_enabled;
 
   void typecheck_type_symbol(symbolt &);
   void typecheck_non_type_symbol(symbolt &);

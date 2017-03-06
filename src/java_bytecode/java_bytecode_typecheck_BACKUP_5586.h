@@ -32,6 +32,7 @@ bool java_bytecode_typecheck(
 class java_bytecode_typecheckt:public typecheckt
 {
 public:
+<<<<<<< 37f0ac9399d6923b9c41a8eb78358382e8c824b5
   java_bytecode_typecheckt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
@@ -43,7 +44,13 @@ public:
   {
   }
 
+  virtual ~java_bytecode_typecheckt() { }
+=======
+  java_bytecode_typecheckt(symbol_tablet &_symbol_table,
+                           message_handlert &_message_handler);
+
   virtual ~java_bytecode_typecheckt() = default;
+>>>>>>> Add nondet recursive expansion to typecheck_expr
 
   virtual void typecheck();
   virtual void typecheck_expr(exprt &expr);
