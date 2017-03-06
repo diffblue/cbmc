@@ -127,10 +127,14 @@ public:
 
   CLONE
 
-protected:
+private:      // To enforce copy-on-write these are private and have read-only accessors
   typet t;
-  bool top;
   bool bottom;
+protected:  // TODO - remove
+  bool top;
+
+protected:    // The one exception is merge_state in descendent classes, which needs this
+  void make_top() { top=true; }
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H

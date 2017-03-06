@@ -32,7 +32,7 @@ Function: abstract_objectt::abstract_objectt
 \*******************************************************************/
 
 abstract_objectt::abstract_objectt(const typet &type):
-t(type), top(true), bottom(false)
+t(type), bottom(false), top(true)
 {}
 
 /*******************************************************************\
@@ -52,7 +52,7 @@ Function: abstract_objectt::abstract_objectt
 \*******************************************************************/
 
 abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
-  t(type), top(top), bottom(bottom)
+  t(type), bottom(bottom), top(top)
 {
   assert(!(top && bottom));
 }
@@ -71,7 +71,7 @@ Function: abstract_objectt::abstract_objectt
 \*******************************************************************/
 
 abstract_objectt::abstract_objectt(const abstract_objectt &old):
-  t(old.t), top(old.top), bottom(old.bottom)
+  t(old.t), bottom(old.bottom), top(old.top)
 {}
 
 /*******************************************************************\
@@ -88,7 +88,7 @@ Function: abstract_objectt::abstract_objectt
 \*******************************************************************/
 
 abstract_objectt::abstract_objectt(const exprt &expr):
-t(expr.type()), top(true), bottom(false)
+t(expr.type()), bottom(false), top(true)
 {}
 
 /*******************************************************************\

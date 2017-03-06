@@ -23,14 +23,12 @@ constant_abstract_valuet::constant_abstract_valuet(
 {}
 
 constant_abstract_valuet::constant_abstract_valuet(const exprt e):
-  abstract_valuet(e), value(e)
-{
-  top=false;
-}
+  abstract_valuet(e.type(), false, false), value(e)
+{}
 
 exprt constant_abstract_valuet::to_constant() const
 {
-  if(!top && !bottom)
+  if(!is_top() && !is_bottom())
   {
     return this->value;
   }
@@ -43,7 +41,7 @@ exprt constant_abstract_valuet::to_constant() const
 void constant_abstract_valuet::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns)
 {
-  if(!top && !bottom)
+  if(!is_top() && !is_bottom())
   {
     out << to_constant_expr(value).get_value();
   }
@@ -58,7 +56,7 @@ bool constant_abstract_valuet::merge_state(
   constant_abstract_value_pointert op2)
 {
   bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
-  if (!top && !bottom)
+  if (!is_top() && !is_bottom())
   {
     if (op1->value==op2->value)
     {
@@ -67,11 +65,11 @@ bool constant_abstract_valuet::merge_state(
     }
     else // values different
     {
-      top=true;
-      assert(bottom==false);
+      make_top();
+      assert(is_bottom()==false);
       // Clear out the expression
       value=exprt();
-      return !op1->top;
+      return !op1->is_top();
     }
   }
   else // either top or bottom
