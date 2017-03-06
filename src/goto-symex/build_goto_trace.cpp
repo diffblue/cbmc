@@ -109,6 +109,63 @@ exprt adjust_lhs_object(
   return nil_exprt();
 }
 
+/// set internal field for variable assignment related to dynamic_object[0-9]
+/// and dynamic_[0-9]_array.
+void hide_dynamic_object(
+  const exprt &expr,
+  goto_trace_stept &goto_trace_step,
+  const namespacet &ns)
+{
+  if(expr.id()==ID_symbol)
+  {
+    const irep_idt &id=to_ssa_expr(expr).get_original_name();
+    const symbolt *symbol;
+    if(!ns.lookup(id, symbol))
+    {
+      bool result=symbol->type.get_bool("#dynamic");
+      if(result)
+        goto_trace_step.hidden=true;
+    }
+  }
+  else
+  {
+    forall_operands(it, expr)
+      hide_dynamic_object(*it, goto_trace_step, ns);
+  }
+}
+
+/// set internal for variables assignments related to dynamic_object and CPROVER
+/// internal functions (e.g., __CPROVER_initialize)
+void update_fields_to_hidden(
+  const symex_target_equationt::SSA_stept &SSA_step,
+  goto_trace_stept &goto_trace_step,
+  const namespacet &ns)
+{
+  // hide dynamic_object in both lhs and rhs expressions
+  hide_dynamic_object(SSA_step.ssa_lhs, goto_trace_step, ns);
+  hide_dynamic_object(SSA_step.ssa_rhs, goto_trace_step, ns);
+
+  // hide internal CPROVER functions (e.g., __CPROVER_initialize)
+  if(SSA_step.is_function_call())
+  {
+    if(SSA_step.source.pc->source_location.as_string().empty())
+      goto_trace_step.hidden=true;
+  }
+
+  // set internal field to input and output steps
+  if(goto_trace_step.type==goto_trace_stept::typet::OUTPUT ||
+      goto_trace_step.type==goto_trace_stept::typet::INPUT)
+  {
+    goto_trace_step.hidden=true;
+  }
+
+  // set internal field to _start function-return step
+  if(SSA_step.source.pc->function==goto_functionst::entry_point())
+  {
+    goto_trace_step.internal=true;
+  }
+}
+
 void build_goto_trace(
   const symex_target_equationt &target,
   symex_target_equationt::SSA_stepst::const_iterator end_step,
@@ -215,6 +272,9 @@ void build_goto_trace(
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
+
+    // hide specific variables in the counterexample trace
+    update_fields_to_hidden(SSA_step, goto_trace_step, ns);
 
     goto_trace_step.assignment_type=
       (it->is_assignment()&&
