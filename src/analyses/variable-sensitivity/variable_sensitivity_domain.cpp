@@ -318,12 +318,37 @@ bool variable_sensitivity_domaint::ai_simplify(
   assert(0); // All conditions should be handled
 }
 
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::is_bottom
+
+  Inputs:
+
+ Outputs: True if the domain is bottom (i.e. unreachable).
+
+ Purpose: Find out if the domain is currently unreachable.
+
+\*******************************************************************/
+
 bool variable_sensitivity_domaint::is_bottom() const
 {
-  return abstract_state.get_is_bottom();
+  return abstract_state.is_bottom();
 }
 
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::is_top
+
+  Inputs:
+
+ Outputs: True if the domain is top
+
+ Purpose: Is the domain completely top at this state
+
+\*******************************************************************/
 bool variable_sensitivity_domaint::is_top() const
 {
-  return abstract_state.get_is_top();
+  return abstract_state.is_top();
 }
+
+
