@@ -31,9 +31,11 @@ Date: January 2012
 
 #ifdef _WIN32
 #include <io.h>
+#define NOMINMAX // Don't define 'min', masking std::min
 #include <windows.h>
 #include <direct.h>
 #include <Shlwapi.h>
+#undef NOMINMAX
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
