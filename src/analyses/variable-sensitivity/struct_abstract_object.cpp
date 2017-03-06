@@ -155,10 +155,7 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
   }
   else
   {
-    sharing_ptrt<struct_abstract_objectt> copy(
-      new struct_abstract_objectt(*this));
-    copy->top=false;
-    copy->bottom=true;
-    return copy;
+    return sharing_ptrt<struct_abstract_objectt>(
+      new struct_abstract_objectt(type(), false, true));
   }
 }

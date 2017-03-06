@@ -156,10 +156,7 @@ sharing_ptrt<pointer_abstract_objectt>
   }
   else
   {
-    sharing_ptrt<pointer_abstract_objectt> copy(
-      new pointer_abstract_objectt(*this));
-    copy->top=false;
-    copy->bottom=true;
-    return copy;
+    return sharing_ptrt<pointer_abstract_objectt>(
+      new pointer_abstract_objectt(type(), false, true));
   }
 }

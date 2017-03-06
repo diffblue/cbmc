@@ -148,7 +148,7 @@ bool constant_pointer_abstract_objectt::merge_state(
   const constant_pointer_abstract_pointert op2)
 {
   bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
-  if(top || bottom)
+  if(is_top() || is_bottom())
   {
     return parent_merge_change;
   }
@@ -161,10 +161,10 @@ bool constant_pointer_abstract_objectt::merge_state(
     }
     else
     {
-      top=true;
+      make_top();
       value=nil_exprt();
-      assert(!bottom);
-      return !op1->top;
+      assert(!is_bottom());
+      return !op1->is_top();
     }
   }
 }
@@ -188,7 +188,7 @@ Function: constant_pointer_abstract_objectt::to_constant
 
 exprt constant_pointer_abstract_objectt::to_constant() const
 {
-  if(top || bottom)
+  if(is_top() || is_bottom())
   {
     return pointer_abstract_objectt::to_constant();
   }
@@ -219,7 +219,7 @@ Function: constant_pointer_abstract_objectt::output
 void constant_pointer_abstract_objectt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns)
 {
-  if(top || bottom)
+  if(is_top() || is_bottom())
   {
     pointer_abstract_objectt::output(out, ai, ns);
   }
@@ -269,10 +269,10 @@ Function: constant_pointer_abstract_objectt::read_dereference
 abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env, const namespacet &ns) const
 {
-  if(top || bottom || value.id()==ID_nil)
+  if(is_top() || is_bottom() || value.id()==ID_nil)
   {
     // Return top if dereferencing a null pointer or we are top
-    bool is_value_top = top || value.id()==ID_nil;
+    bool is_value_top = is_top() || value.id()==ID_nil;
     return env.abstract_object_factory(
       type().subtype(), ns, is_value_top, !is_value_top);
   }
@@ -327,7 +327,7 @@ sharing_ptrt<pointer_abstract_objectt>
     const abstract_object_pointert new_value,
     bool merging_write)
 {
-  if(top || bottom)
+  if(is_top() || is_bottom())
   {
     return pointer_abstract_objectt::write_dereference(
       environment, ns, stack, new_value, merging_write);
