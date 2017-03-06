@@ -11,8 +11,10 @@ BUILD_ENV = AUTO
 #CXXFLAGS += -O2 -DNDEBUG
 #CXXFLAGS += -O0 -g
 
-CXXFLAGS += -DUSE_BOOST
-LIBS=-lboost_filesystem -lboost_system
+ifeq ($(shell uname),Linux)
+  CXXFLAGS += -DUSE_BOOST
+  LIBS=-lboost_filesystem -lboost_system
+endif
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk
