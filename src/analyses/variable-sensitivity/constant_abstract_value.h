@@ -31,7 +31,7 @@ public:
   virtual void output(
     std::ostream &out,
     const class ai_baset &ai,
-    const class namespacet &ns);
+    const class namespacet &ns) const;
 
 protected :
   bool merge_state(

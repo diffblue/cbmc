@@ -123,7 +123,7 @@ public:
   virtual exprt to_constant() const;
 
   virtual void output(
-    std::ostream &out, const class ai_baset &ai, const namespacet &ns);
+    std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
   CLONE
 
