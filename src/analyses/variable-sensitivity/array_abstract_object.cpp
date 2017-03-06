@@ -158,10 +158,7 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   }
   else
   {
-    sharing_ptrt<array_abstract_objectt> copy(
-      new array_abstract_objectt(*this));
-    copy->top=false;
-    copy->bottom=true;
-    return copy;
+    return sharing_ptrt<array_abstract_objectt>(
+      new array_abstract_objectt(type(), false, true));
   }
 }
