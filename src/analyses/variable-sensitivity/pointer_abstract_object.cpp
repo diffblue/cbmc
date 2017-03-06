@@ -110,7 +110,7 @@ Function: pointer_abstract_objectt::read_dereference
 abstract_object_pointert pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env, const namespacet &ns) const
 {
-  pointer_typet pointer_type(to_pointer_type(type));
+  pointer_typet pointer_type(to_pointer_type(type()));
   const typet &pointed_to_type=pointer_type.subtype();
 
   return env.abstract_object_factory(pointed_to_type, ns, true, false);

@@ -40,7 +40,7 @@ Function: abstract_environmentt::eval
 abstract_object_pointert abstract_environmentt::eval(
   const exprt &expr, const namespacet &ns) const
 {
-  if (is_bottom)
+  if (bottom)
     return abstract_object_factory(expr.type(), ns, false, true);
 
   typedef std::function<abstract_object_pointert(const exprt &)> eval_handlert;
@@ -226,7 +226,7 @@ bool abstract_environmentt::assign(
   }
 
   // Write the value for the root symbol back into the map
-  assert(symbol_expr.type() == final_value->get_type());
+  assert(symbol_expr.type() == final_value->type());
   if (final_value->is_top())
   {
     map.erase(symbol_expr);
@@ -387,7 +387,7 @@ bool abstract_environmentt::assume(const exprt &expr, const namespacet &ns)
 
     if (possibly_constant.is_false())
     {
-      bool currently_bottom = get_is_bottom();
+      bool currently_bottom = is_bottom();
       make_bottom();
       return !currently_bottom;
     }
@@ -508,12 +508,12 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
 
 
 
-  if(is_bottom)
+  if(bottom)
   {
     *this=env;
-    return !env.is_bottom;
+    return !env.bottom;
   }
-  else if(env.is_bottom)
+  else if(env.bottom)
   {
     return false;
   }
@@ -599,7 +599,7 @@ void abstract_environmentt::make_top()
 {
   // since we assume anything is not in the map is top this is sufficient
   map.clear();
-  is_bottom=false;
+  bottom=false;
 }
 
 /*******************************************************************\
@@ -617,12 +617,12 @@ Function: abstract_environmentt::make_bottom
 void abstract_environmentt::make_bottom()
 {
   map.clear();
-  is_bottom=true;
+  bottom=true;
 }
 
 /*******************************************************************\
 
-Function: abstract_environmentt::get_is_bottom
+Function: abstract_environmentt::is_bottom
 
   Inputs:
 
@@ -632,14 +632,14 @@ Function: abstract_environmentt::get_is_bottom
 
 \*******************************************************************/
 
-bool abstract_environmentt::get_is_bottom() const
+bool abstract_environmentt::is_bottom() const
 {
-  return map.empty() && is_bottom;
+  return map.empty() && bottom;
 }
 
 /*******************************************************************\
 
-Function: abstract_environmentt::get_is_top
+Function: abstract_environmentt::is_top
 
   Inputs:
 
@@ -649,9 +649,9 @@ Function: abstract_environmentt::get_is_top
 
 \*******************************************************************/
 
-bool abstract_environmentt::get_is_top() const
+bool abstract_environmentt::is_top() const
 {
-  return map.empty() && !is_bottom;
+  return map.empty() && !bottom;
 }
 
 /*******************************************************************\
