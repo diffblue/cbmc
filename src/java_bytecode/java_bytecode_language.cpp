@@ -494,7 +494,8 @@ bool java_bytecode_languaget::typecheck(
          disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
-         lazy_methods_mode))
+         lazy_methods_mode,
+         string_refinement_enabled))
       return true;
   }
 

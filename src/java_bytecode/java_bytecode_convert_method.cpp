@@ -483,10 +483,6 @@ void java_bytecode_convert_methodt::convert(
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value=convert_instructions(m, code_type);
 
-#ifdef DEBUG
-  std::cerr << method_symbol.value.pretty() << '\n';
-#endif
-
   remove_assert_after_generic_nondet(method_symbol.value);
 
   // Replace the existing stub symbol with the real deal:

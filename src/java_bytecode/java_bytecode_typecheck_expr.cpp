@@ -22,17 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_pointer_casts.h"
 #include "java_types.h"
 
-java_bytecode_typecheckt::java_bytecode_typecheckt(
-  symbol_tablet &_symbol_table,
-  message_handlert &_message_handler,
-  size_t _max_nondet_array_length)
-  : typecheckt(_message_handler),
-    symbol_table(_symbol_table),
-    ns(symbol_table),
-    max_nondet_array_length(_max_nondet_array_length)
-{
-}
-
 /*******************************************************************\
 
 Function: java_bytecode_typecheckt::typecheck_expr
