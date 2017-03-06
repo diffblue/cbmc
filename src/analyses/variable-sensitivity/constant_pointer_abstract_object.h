@@ -36,7 +36,8 @@ public:
     const constant_pointer_abstract_pointert op2);
 
   exprt to_constant() const;
-  void output(std::ostream &out, const ai_baset &ai, const namespacet &ns);
+  void output(
+    std::ostream &out, const ai_baset &ai, const namespacet &ns) const;
 
   abstract_object_pointert read_dereference(
     const abstract_environmentt &env, const namespacet &ns) const;
