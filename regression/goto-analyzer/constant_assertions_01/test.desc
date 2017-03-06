@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --variable
+^\[main.assertion.1\] file main.c .* assertion 0: Failure \(if reachable\)$
+^\[main.assertion.2\] file main.c .* assertion 0 && 1: Failure \(if reachable\)$
+^\[main.assertion.3\] file main.c .* assertion 0 || 0: Failure \(if reachable\)$
+^\[main.assertion.4\] file main.c .* assertion 0 && x: Failure \(if reachable\)$
+^\[main.assertion.5\] file main.c .* assertion y && 0: Failure \(if reachable\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
