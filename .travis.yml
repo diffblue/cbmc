@@ -14,6 +14,8 @@ matrix:
             - libwww-perl
             - g++-5
             - libubsan0
+            - libboost-system-dev
+            - libboost-filesystem-dev
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
@@ -30,6 +32,8 @@ matrix:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
+            - libboost-system-dev
+            - libboost-filesystem-dev
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
