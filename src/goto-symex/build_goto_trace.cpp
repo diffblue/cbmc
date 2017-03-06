@@ -214,6 +214,9 @@ void build_goto_trace(
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
 
+    // hide specific variables in the counterexample trace
+    update_fields_to_hidden(SSA_step, goto_trace_step, ns);
+
     goto_trace_step.assignment_type=
       (it->is_assignment()&&
        (SSA_step.assignment_type==
