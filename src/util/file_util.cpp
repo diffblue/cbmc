@@ -28,6 +28,7 @@ Date: January 2012
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
+#include <Shlwapi.h>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
@@ -268,9 +269,19 @@ std::string  fileutl_concatenate_file_paths(std::string const&  left_path,
 
 std::string  fileutl_absolute_path(std::string const&  path)
 {
-  // TODO: portability - this implementation won't probably work on Windows...
-  std::vector<char> buffer(10000,0);
-  return realpath(path.c_str(),&buffer.at(0));
+#if defined(WIN32)
+  DWORD buffer_length = GetFullPathName(path.c_str(), 0, nullptr, nullptr);
+  std::vector<char> buffer(buffer_length);
+  DWORD actual_length = GetFullPathName(path.c_str(), buffer_length, &(buffer[0]), nullptr);
+  if(actual_length != buffer_length - 1)
+    throw "fileutl_absolute_path: GetFullPathName failed";
+  return std::string(&(buffer[0]));
+#else
+  char *absolute = realpath(path.c_str(), nullptr);
+  std::string ret(absolute);
+  free(absolute);
+  return ret;
+#endif
 }
 
 std::string  fileutl_normalise_path(std::string const&  path)
