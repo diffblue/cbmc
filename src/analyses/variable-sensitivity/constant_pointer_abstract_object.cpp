@@ -274,7 +274,7 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
     // Return top if dereferencing a null pointer or we are top
     bool is_value_top = top || value.id()==ID_nil;
     return env.abstract_object_factory(
-      type.subtype(), ns, is_value_top, !is_value_top);
+      type().subtype(), ns, is_value_top, !is_value_top);
   }
   else
   {
@@ -285,11 +285,11 @@ abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
     else if(value.id()==ID_constant)
     {
       // Reading a null pointer, return top
-      return env.abstract_object_factory(type.subtype(), ns, true, false);
+      return env.abstract_object_factory(type().subtype(), ns, true, false);
     }
     else
     {
-      return env.abstract_object_factory(type.subtype(), ns, true, false);
+      return env.abstract_object_factory(type().subtype(), ns, true, false);
     }
   }
 }
@@ -350,7 +350,7 @@ sharing_ptrt<pointer_abstract_objectt>
     if(stack.empty())
     {
       // We should not be changing the type of an abstract object
-      assert(new_value->get_type()==type.subtype());
+      assert(new_value->type()==type().subtype());
 
 
       if(merging_write)
