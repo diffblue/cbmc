@@ -111,7 +111,7 @@ abstract_object_pointert array_abstract_objectt::read_index(
   const index_exprt &index,
   const namespacet& ns) const
 {
-  array_typet array_type(to_array_type(type));
+  array_typet array_type(to_array_type(type()));
   const typet &subtype=array_type.subtype();
 
   // if we are bottom then so are the values in the array

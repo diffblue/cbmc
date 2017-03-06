@@ -57,14 +57,14 @@ public:
   void make_top();
   void make_bottom();
 
-  bool get_is_bottom() const;
-  bool get_is_top() const;
+  bool is_bottom() const;
+  bool is_top() const;
 
   void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
 protected:
-  bool is_bottom;
+  bool bottom;
 
  // We may need to break out more of these cases into these
  virtual abstract_object_pointert eval_expression(
