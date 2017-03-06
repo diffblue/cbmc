@@ -1,9 +1,17 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
 #include "namespace_utils.h"
 #include "symbol.h"
 #include <goto-programs/remove_returns.h>
 
-
 /*******************************************************************\
+
   Function: namespace_utils_baset::does_symbol_match
 
   Purpose:
@@ -19,6 +27,7 @@
     Whether the exprt was actually a symbolt matching a predicate
 
 \*******************************************************************/
+
 bool namespace_utils_baset::does_symbol_match(
   const exprt &lvalue,
   std::function<bool(symbolt)> predicate) const
@@ -32,6 +41,7 @@ bool namespace_utils_baset::does_symbol_match(
 }
 
 /*******************************************************************\
+
   Function: namespace_utils_baset::is_parameter
 
   Purpose:
@@ -45,6 +55,7 @@ bool namespace_utils_baset::does_symbol_match(
     Whether the exprt was actually a parameter symbol
 
 \*******************************************************************/
+
 bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
 {
   return does_symbol_match(
@@ -53,6 +64,7 @@ bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
 }
 
 /*******************************************************************\
+
   Function: namespace_utils_baset::is_static
 
   Purpose:
@@ -66,6 +78,7 @@ bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
     Whether the exprt was actually a static symbol
 
 \*******************************************************************/
+
 bool namespace_utils_baset::is_static(const exprt &lvalue) const
 {
   // TODO: Also check for static member accesses
@@ -75,6 +88,7 @@ bool namespace_utils_baset::is_static(const exprt &lvalue) const
 }
 
 /*******************************************************************\
+
   Function: namespace_utils_baset::is_auxiliary_variable
 
   Purpose:
@@ -88,6 +102,7 @@ bool namespace_utils_baset::is_static(const exprt &lvalue) const
     Whether the exprt was actually an auxiliary variable symbol
 
 \*******************************************************************/
+
 bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
 {
   return does_symbol_match(
@@ -96,6 +111,7 @@ bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
 }
 
 /*******************************************************************\
+
   Function: namespace_utils_baset::is_return_value_auxiliary
 
   Purpose:
@@ -109,6 +125,7 @@ bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
     Whether the exprt was actually an auxiliary return value symbol
 
 \*******************************************************************/
+
 bool namespace_utils_baset::is_return_value_auxiliary(const exprt &lvalue) const
 {
   return
