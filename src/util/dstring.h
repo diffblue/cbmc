@@ -123,16 +123,6 @@ public:
     return out << as_string();
   }
 
-  friend size_t hash_string(const dstring &s)
-  {
-    return s.hash();
-  }
-
-  friend size_t const_hash_string(const dstring &s)
-  {
-    return hash_string(string_container.get_string(s.no));
-  }
-
   // non-standard
 
   unsigned get_no() const
@@ -167,6 +157,12 @@ inline size_t hash_string(const dstringt &s)
 {
   return s.hash();
 }
+
+inline size_t const_hash_string(const dstringt &s)
+{
+  return hash_string(string_container.get_string(s.get_no()));
+}
+
 
 inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
 {
