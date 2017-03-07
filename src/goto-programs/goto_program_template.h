@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
+#include <util/irep_hash.h>
 
 typedef enum
 {
@@ -262,6 +263,11 @@ public:
       std::ostringstream instruction_id_builder;
       instruction_id_builder << type;
       return instruction_id_builder.str();
+    }
+
+    std::size_t const_hash() const
+    {
+      return hash_combine(code.const_hash(),guard.const_hash());
     }
   };
 
