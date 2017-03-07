@@ -23,6 +23,7 @@ public:
   void set_java_cp_include_files(std::string &java_cp_include_files)
   {
     jar_pool.set_java_cp_include_files(java_cp_include_files);
+    jar_pool.set_message_handler(get_message_handler());
   }
 
   // maps class names to the parse trees

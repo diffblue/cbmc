@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <map>
 #include <regex>
+#include <util/message.h>
 
-class jar_filet
+class jar_filet:public messaget
 {
 public:
   jar_filet():mz_ok(false) { }
@@ -48,7 +49,7 @@ protected:
   std::map<int, int> index_map;
 };
 
-class jar_poolt
+class jar_poolt:public messaget
 {
 public:
   void set_java_cp_include_files(std::string &_java_cp_include_files)
@@ -62,6 +63,7 @@ public:
     if(it==file_map.end())
     {
       jar_filet &jar_file=file_map[file_name];
+      jar_file.set_message_handler(get_message_handler());
       jar_file.open(java_cp_include_files, file_name);
       return jar_file;
     }
