@@ -40,6 +40,9 @@ set(lingeling_source
 set(booleforce_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_booleforce.cpp
 )
+set(minibdd_source
+    ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD/example.cpp
+)
 
 file(GLOB_RECURSE sources "*.cpp")
 list(REMOVE_ITEM sources
@@ -54,6 +57,7 @@ list(REMOVE_ITEM sources
     ${picosat_source}
     ${lingeling_source}
     ${booleforce_source}
+    ${minibdd_source}
 )
 
 add_library(solvers ${sources})

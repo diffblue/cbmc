@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.2)
 
 #   TODO
 #   -[ ] Documentation target.
 #   -[ ] Testing target.
 #   -[ ] Automatically generate .class files from .java in java regression tests.
 #   -[ ] Install profiles.
+#   -[ ] Specify one of many different solver libraries.
 #   -[x] Code signing.
 #   -[x] Cprover jar build.
 
@@ -12,6 +13,8 @@ project(CBMC)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
+
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-deprecated-register)
 
 find_package(BISON)
 find_package(FLEX)
@@ -79,12 +82,15 @@ ExternalProject_Add(zlib-extern
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
 )
 
+set(libzip_lib ${extern_location}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}zip${CMAKE_SHARED_LIBRARY_SUFFIX})
+
 #   libzip download
 ExternalProject_Add(libzip-extern
     DEPENDS zlib-extern
     PREFIX ${extern_location}
     URL http://http.debian.net/debian/pool/main/libz/libzip/libzip_1.1.2.orig.tar.gz
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCMAKE_MODULE_PATH:PATH=<INSTALL_DIR>
+    BUILD_BYPRODUCTS ${libzip_lib}
 )
 
 set(extern_include_directory ${extern_location}/include)
@@ -95,10 +101,12 @@ file(MAKE_DIRECTORY ${libzip_include_directory})
 
 add_library(zip SHARED IMPORTED)
 set_target_properties(zip PROPERTIES 
-    IMPORTED_LOCATION ${extern_location}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}zip${CMAKE_SHARED_LIBRARY_SUFFIX}
+    IMPORTED_LOCATION ${libzip_lib}
     INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory};${libzip_include_directory}"
 )
 add_dependencies(zip libzip-extern)
+
+set(minisat_lib ${extern_location}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minisat2-condensed${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 #   minisat download
 #   This downloads minisat2, then patches it.
@@ -110,11 +118,12 @@ ExternalProject_Add(minisat2-extern
     PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat-2.2.1-patch
           COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat2_CMakeLists.txt CMakeLists.txt
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+    BUILD_BYPRODUCTS ${minisat_lib}
 )
 
 add_library(minisat2-condensed STATIC IMPORTED)
 set_target_properties(minisat2-condensed PROPERTIES 
-    IMPORTED_LOCATION ${extern_location}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minisat2-condensed${CMAKE_STATIC_LIBRARY_SUFFIX}
+    IMPORTED_LOCATION ${minisat_lib}
     INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory}"
 )
 add_dependencies(minisat2-condensed minisat2-extern)
@@ -128,7 +137,6 @@ endfunction(add_executable)
 
 #   By default we don't add targets to ALL.
 #   These still get built if other targets depend on them, though.
-add_subdirectory(aa-path-symex EXCLUDE_FROM_ALL)
 add_subdirectory(analyses EXCLUDE_FROM_ALL)
 add_subdirectory(ansi-c EXCLUDE_FROM_ALL)
 add_subdirectory(assembler EXCLUDE_FROM_ALL)
@@ -151,7 +159,6 @@ add_subdirectory(cegis EXCLUDE_FROM_ALL)
 
 #   Modules which depend on optional modules.
 add_subdirectory(musketeer)
-add_subdirectory(aa-symex)
 add_subdirectory(clobber)
 
 #   These are the targets we want to build by default.
