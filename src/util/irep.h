@@ -252,6 +252,7 @@ public:
 
   std::size_t hash() const;
   std::size_t full_hash() const;
+  std::size_t const_hash() const;
 
   bool full_eq(const irept &other) const;
 

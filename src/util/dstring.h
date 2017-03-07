@@ -123,6 +123,16 @@ public:
     return out << as_string();
   }
 
+  friend size_t hash_string(const dstring &s)
+  {
+    return s.hash();
+  }
+
+  friend size_t const_hash_string(const dstring &s)
+  {
+    return hash_string(string_container.get_string(s.no));
+  }
+
   // non-standard
 
   unsigned get_no() const
