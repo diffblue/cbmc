@@ -1,5 +1,5 @@
-FUTURE
-test_init.class
+KNOWNBUG
+test_insert_multiple.class
 --string-refine
 ^EXIT=0$
 ^SIGNAL=0$

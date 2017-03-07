@@ -1,9 +1,0 @@
-FUTURE
-test_char_array.class
---string-refine
-^EXIT=10$
-^SIGNAL=0$
-^\[.*assertion.1\].* line 11.* SUCCESS$
-^\[.*assertion.2\].* line 12.* SUCCESS$
-^\[.*assertion.3\].* line 13.* FAILURE$
---

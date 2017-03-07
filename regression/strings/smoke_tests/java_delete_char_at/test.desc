@@ -1,5 +1,5 @@
-FUTURE
-test_init.class
+KNOWNBUG
+test_delete_char_at.class
 --string-refine
 ^EXIT=0$
 ^SIGNAL=0$
