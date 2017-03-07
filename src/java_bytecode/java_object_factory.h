@@ -22,6 +22,13 @@ exprt object_factory(
   const source_locationt &,
   message_handlert &message_handler);
 
+enum update_in_placet
+{
+  NO_UPDATE_IN_PLACE,
+  MAY_UPDATE_IN_PLACE,
+  MUST_UPDATE_IN_PLACE
+};
+
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
@@ -31,7 +38,8 @@ void gen_nondet_init(
   bool create_dynamic_objects,
   bool assume_non_null,
   message_handlert &message_handler,
-  size_t max_nondet_array_length=5);
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place=NO_UPDATE_IN_PLACE);
 
 
 exprt get_nondet_bool(const typet &);

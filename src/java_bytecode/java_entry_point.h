@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 
+#define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"
+
 bool java_entry_point(
   class symbol_tablet &symbol_table,
   const irep_idt &main_class,

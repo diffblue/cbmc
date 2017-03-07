@@ -483,7 +483,8 @@ void gen_nondet_init(
   bool create_dyn_objs,
   bool assume_non_null,
   message_handlert &message_handler,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place)
 {
   java_object_factoryt state(
     init_code,
