@@ -100,7 +100,7 @@ Function: full_struct_abstract_objectt::full_struct_abstract_objectt
 full_struct_abstract_objectt::full_struct_abstract_objectt(const exprt &e):
   struct_abstract_objectt(e)
 {
-  assert(e.type().id()==ID_struct);
+  //assert(e.type().id()==ID_struct);
   assert(verify());
 }
 
@@ -236,8 +236,10 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
     if(merging_write)
     {
       if(is_top()) // struct is top
+      {
         assert(copy->verify());
         return copy;
+      }
 
       assert(!copy->map.empty());
 
@@ -246,8 +248,10 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
       struct_mapt::iterator it=m.find(c);
 
       if(it==m.end()) // component is top
+      {
         assert(copy->verify());
         return copy;
+      }
 
       bool dummy;
 

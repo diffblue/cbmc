@@ -188,10 +188,10 @@ abstract_object_pointert abstract_objectt::expression_transform(
 
     if(lhs_value.is_nil())
     {
-      // One of the values is true so we can't really do anything more with
+      // One of the values is not resolvable to a constant
+      // so we can't really do anything more with
       // this expression and should just return top for the result
-      return abstract_object_pointert(
-        new abstract_objectt(expr.type(), true, false));
+      return environment.abstract_object_factory(expr.type(), ns, true, false);
     }
     else
     {
