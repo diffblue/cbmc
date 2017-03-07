@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cctype>
 
+#include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/ieee_float.h>
@@ -227,6 +228,23 @@ pointer_typet java_array_type(const char subtype)
   symbol_type.set(ID_C_element_type, java_type_from_char(subtype));
 
   return pointer_typet(symbol_type);
+}
+
+/*******************************************************************\
+
+Function: is_java_array_tag
+
+  Inputs: Struct tag 'tag'
+
+ Outputs: True if the given struct is a Java array
+
+ Purpose: See above
+
+\*******************************************************************/
+
+bool is_java_array_tag(const irep_idt& tag)
+{
+  return has_prefix(id2string(tag), "java::array[");
 }
 
 /*******************************************************************\
