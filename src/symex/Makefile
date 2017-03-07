@@ -17,7 +17,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/cover$(OBJEXT) \
        ../path-symex/path-symex$(LIBEXT) \
-       ../miniz/miniz$(OBJEXT)
+       ../miniz/miniz$(OBJEXT) \
+       ../json/json$(LIBEXT)
 
 INCLUDES= -I ..
 

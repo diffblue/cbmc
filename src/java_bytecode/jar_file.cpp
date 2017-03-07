@@ -8,10 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 #include <cassert>
-#include <sstream>
+#include <json/json_parser.h>
+#include <unordered_set>
 #include "jar_file.h"
 #include <util/suffix.h>
-
+#include <iostream>
 /*******************************************************************\
 
 Function: jar_filet::open
@@ -24,7 +25,9 @@ Function: jar_filet::open
 
 \*******************************************************************/
 
-void jar_filet::open(std::string &java_cp_include_files, const std::string &filename)
+void jar_filet::open(
+  std::string &java_cp_include_files,
+  const std::string &filename)
 {
   if(!mz_ok)
   {
@@ -35,6 +38,32 @@ void jar_filet::open(std::string &java_cp_include_files, const std::string &file
 
   if(mz_ok)
   {
+    // '@' signals file reading with list of class files to load
+    bool regex_match=java_cp_include_files[0]!='@';
+    std::regex regex_matcher;
+    std::smatch string_matcher;
+    std::unordered_set<std::string> set_matcher;
+    jsont json_cp_config;
+    if(regex_match)
+      regex_matcher=std::regex(java_cp_include_files);
+    else
+    {
+      assert(java_cp_include_files.length()>1);
+      if(parse_json(
+           java_cp_include_files.substr(1),
+           get_message_handler(),
+           json_cp_config))
+        throw "cannot read JSON input configuration for JAR loading";
+      assert(json_cp_config.is_object() && "JSON has wrong format");
+      jsont include_files=json_cp_config["classFiles"];
+      assert(include_files.is_array() && "JSON has wrong format");
+      for(const jsont &file_entry : include_files.array)
+      {
+        assert(file_entry.is_string());
+        set_matcher.insert(file_entry.value);
+      }
+    }
+
     std::size_t number_of_files=
       mz_zip_reader_get_num_files(&zip);
 
@@ -47,11 +76,16 @@ void jar_filet::open(std::string &java_cp_include_files, const std::string &file
         mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
       assert(filename_length==filename_len);
       std::string file_name(filename_char);
-      std::smatch string_matcher;
-      std::regex matcher(java_cp_include_files);
-      // load .class files only if they match regex
-      if(std::regex_match(file_name, string_matcher, matcher) ||
-         !has_suffix(file_name, ".class"))
+
+      // non-class files are loaded in any case
+      bool add_file=!has_suffix(file_name, ".class");
+      // load .class file only if they match regex
+      if(regex_match)
+        add_file|=std::regex_match(file_name, string_matcher, regex_matcher);
+      // load .class file only if it is in the match set
+      else
+        add_file|=set_matcher.count(file_name)>0;
+      if(add_file)
       {
         index.push_back(file_name);
         filtered_jar[filtered_index]=i;
