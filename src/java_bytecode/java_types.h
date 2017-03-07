@@ -46,4 +46,6 @@ char java_char_from_type(const typet &type);
 typet java_bytecode_promotion(const typet &);
 exprt java_bytecode_promotion(const exprt &);
 
+bool is_java_array_tag(const irep_idt& tag);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
