@@ -115,7 +115,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/show_vcc$(OBJEXT) \
       ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
       ../cbmc/fault_localization$(OBJEXT) \
-      ../cbmc/symex_coverage$(OBJEXT)
+      ../cbmc/symex_coverage$(OBJEXT) \
+      ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -137,9 +138,6 @@ all: cegis$(EXEEXT)
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ###############################################################################

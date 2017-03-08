@@ -13,7 +13,8 @@ OBJ += ../big-int/big-int$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
-      ../langapi/langapi$(LIBEXT)
+      ../langapi/langapi$(LIBEXT) \
+      ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -31,9 +32,6 @@ all: goto-cc$(EXEEXT)
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(wildcard ../jsil/Makefile),)

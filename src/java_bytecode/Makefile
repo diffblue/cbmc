@@ -15,11 +15,6 @@ include ../common
 
 CLEANFILES = java_bytecode$(LIBEXT)
 
-ifneq ($(wildcard $(LIBZIPINC)),)
-  INCLUDES += -I $(LIBZIPINC)
-  CP_CXXFLAGS += -DHAVE_LIBZIP
-endif
-
 all: java_bytecode$(LIBEXT)
 
 ###############################################################################
