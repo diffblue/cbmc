@@ -30,7 +30,7 @@ public:
    * store funtions (nodes). It only stores edges (from caller to callee).
    * So, the resulting graph would not show not-called functions.
    */
-  void output_dot(goto_functionst const&  functions, std::ostream &out) const;
+  void output_dot(const goto_functionst &functions, std::ostream &out) const;
 
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
@@ -66,14 +66,14 @@ public:
    * iterator the end of the range (that edge does NOT belong to the range).
    *
    * Usage:
-   *  irep_idt const  caller_name = "foo";
-   *  call_grapht::call_edges_ranget const  range =
+   *  const irep_idt caller_name = "foo";
+   *  const call_grapht::call_edges_ranget range =
    *      my_call_graph.out_edges(caller_name);
    *  std::cout << "Callees of " << caller_name << " are: ";
-   *  for (auto  it = range.first; it != range.second; ++it)
+   *  for (auto it = range.first; it != range.second; ++it)
    *    std::cout << it->second << ", ";
    */
-  call_edges_ranget  out_edges(irep_idt const&  caller) const;
+  call_edges_ranget out_edges(const irep_idt &caller) const;
 };
 
 /*******************************************************************\
@@ -107,57 +107,57 @@ Typical usage:
  std::vector<irep_idt>  result; // Here we will store the topological order.
  {
    std::unordered_set<irep_idt, dstring_hash>  processed;
-   for (auto const&  elem : GM.goto_functions.function_map)
+   for (const auto &elem : GM.goto_functions.function_map)
      partial_topological_order(CG, elem.first, processed, result);
    // Now we reverse the result to get the classic (partial)
    // topological order instead of the inverted one.
    std::reverse(result.begin(), result.end());
  }
  std::cout << "A (partial) topological order of my call graph is: ";
- for (irep_idt const&  fn_name : result)
+ for (const irep_idt &fn_name : result)
    std::cout << fn_name << ", ";
 
 \*******************************************************************/
-void  inverted_partial_topological_order(
-  call_grapht const &call_graph,
-  irep_idt const &start_function,
+void inverted_partial_topological_order(
+  const call_grapht &call_graph,
+  const irep_idt &start_function,
   std::unordered_set<irep_idt, dstring_hash> &processed_functions,
   std::vector<irep_idt> &output);
 
 void get_inverted_topological_order(
-  call_grapht const& call_graph,
-  goto_functionst const& functions,
-  std::vector<irep_idt>& output);
+  const call_grapht &call_graph,
+  const goto_functionst &functions,
+  std::vector<irep_idt> &output);
 
-bool  exists_direct_call(
-  call_grapht const &call_graph,
-  irep_idt const &caller,
-  irep_idt const &callee);
+bool exists_direct_call(
+  const call_grapht &call_graph,
+  const irep_idt &caller,
+  const irep_idt &callee);
 
-bool  exists_direct_or_indirect_call(
-  call_grapht const &call_graph,
-  irep_idt const &caller,
-  irep_idt const &callee,
+bool exists_direct_or_indirect_call(
+  const call_grapht &call_graph,
+  const irep_idt &caller,
+  const irep_idt &callee,
   std::unordered_set<irep_idt, dstring_hash> &ignored_functions);
 
-bool  exists_direct_or_indirect_call(
-  call_grapht const &call_graph,
-  irep_idt const &caller,
-  irep_idt const &callee);
+bool exists_direct_or_indirect_call(
+  const call_grapht &call_graph,
+  const irep_idt &caller,
+  const irep_idt &callee);
 
 void compute_inverted_call_graph(
-  call_grapht const &original_call_graph,
+  const call_grapht &original_call_graph,
   call_grapht &output_inverted_call_graph);
 
 void find_leaves_below_function(
-  call_grapht const &call_graph,
-  irep_idt const &function,
+  const call_grapht &call_graph,
+  const irep_idt &function,
   std::unordered_set<irep_idt, dstring_hash> &to_avoid,
   std::unordered_set<irep_idt, dstring_hash> &output);
 
 void find_leaves_below_function(
-  call_grapht const &call_graph,
-  irep_idt const &function,
+  const call_grapht &call_graph,
+  const irep_idt &function,
   std::unordered_set<irep_idt, dstring_hash> &output);
 
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
