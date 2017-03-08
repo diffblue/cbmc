@@ -16,6 +16,11 @@ ifeq ($(shell uname),Linux)
   LIBS=-lboost_filesystem -lboost_system
 endif
 
+# On Windows this Makefile is subject to sed s/BUILD_ENV.*/BUILD_ENV = MSVC,
+# so we can't directly test BUILD_ENV here.
+SELF_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
+include $(SELF_DIR)add_shlwapi.inc
+
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk
 
