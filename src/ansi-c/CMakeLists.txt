@@ -32,7 +32,7 @@ make_inc(cw_builtin_headers)
 make_inc(clang_builtin_headers)
 
 file(GLOB_RECURSE sources "*.cpp")
-add_library(ansi-c 
+add_library(ansi-c
     ${sources}
     ${BISON_parser_OUTPUTS}
     ${FLEX_scanner_OUTPUTS}

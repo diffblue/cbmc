@@ -6,4 +6,4 @@ add_library(goto-programs ${sources})
 
 generic_includes(goto-programs)
 
-target_link_libraries(goto-programs util ansi-c assembler)
+target_link_libraries(goto-programs util ansi-c assembler langapi)

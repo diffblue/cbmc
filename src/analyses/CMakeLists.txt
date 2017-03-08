@@ -3,4 +3,4 @@ add_library(analyses ${sources})
 
 generic_includes(analyses)
 
-target_link_libraries(analyses goto-programs pointer-analysis)
+target_link_libraries(analyses util goto-programs pointer-analysis)
