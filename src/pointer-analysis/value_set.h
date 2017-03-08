@@ -32,6 +32,7 @@ public:
     const namespacet &);
 
   unsigned location_number;
+  irep_idt function;
   static object_numberingt object_numbering;
 
   typedef irep_idt idt;

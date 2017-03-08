@@ -39,6 +39,7 @@ public:
   {
     value_set.clear();
     value_set.location_number=l->location_number;
+    value_set.function=l->function;
   }
 
   virtual void transform(
