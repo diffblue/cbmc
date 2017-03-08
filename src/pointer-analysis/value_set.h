@@ -113,7 +113,10 @@ public:
     {
     }
 
-    entryt(const idt &_identifier, const std::string &_suffix, const typet &_declared_on_type):
+    entryt(
+      const idt &_identifier,
+      const std::string &_suffix,
+      const typet &_declared_on_type):
       identifier(_identifier),
       suffix(_suffix),
       declared_on_type(_declared_on_type)
