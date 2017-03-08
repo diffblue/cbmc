@@ -63,7 +63,9 @@ public:
       break;
 
     case END_FUNCTION:
-      value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
+      value_set.do_end_function(
+        static_analysis_baset::get_return_lhs(to_l),
+        ns);
       break;
 
     case RETURN:
