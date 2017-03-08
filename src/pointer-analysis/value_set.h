@@ -174,11 +174,11 @@ public:
     const exprt &expr,
     const namespacet &ns);
 
-  void apply_code(
+  virtual void apply_code(
     const codet &code,
     const namespacet &ns);
 
-  void assign(
+  virtual void assign(
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
@@ -205,20 +205,20 @@ public:
     const namespacet &ns) const;
 
 protected:
-  void get_value_set_rec(
+  virtual void get_value_set_rec(
     const exprt &expr,
     object_mapt &dest,
     const std::string &suffix,
     const typet &original_type,
     const namespacet &ns) const;
 
-  void get_value_set(
+  virtual void get_value_set(
     const exprt &expr,
     object_mapt &dest,
     const namespacet &ns,
     bool is_simplified) const;
 
-  void get_reference_set(
+  virtual void get_reference_set(
     const exprt &expr,
     object_mapt &dest,
     const namespacet &ns) const
@@ -226,16 +226,16 @@ protected:
     get_reference_set_rec(expr, dest, ns);
   }
 
-  void get_reference_set_rec(
+  virtual void get_reference_set_rec(
     const exprt &expr,
     object_mapt &dest,
     const namespacet &ns) const;
 
-  void dereference_rec(
+  virtual void dereference_rec(
     const exprt &src,
     exprt &dest) const;
 
-  void assign_rec(
+  virtual void assign_rec(
     const exprt &lhs,
     const object_mapt &values_rhs,
     const std::string &suffix,
