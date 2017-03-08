@@ -102,7 +102,7 @@ public:
     object_mapt object_map;
     idt identifier;
     std::string suffix;
-
+    typet declared_on_type;
     entryt()
     {
     }
@@ -110,6 +110,13 @@ public:
     entryt(const idt &_identifier, const std::string &_suffix):
       identifier(_identifier),
       suffix(_suffix)
+    {
+    }
+
+    entryt(const idt &_identifier, const std::string &_suffix, const typet &_declared_on_type):
+      identifier(_identifier),
+      suffix(_suffix),
+      declared_on_type(_declared_on_type)
     {
     }
   };
