@@ -69,6 +69,7 @@ struct dep_nodet:public graph_nodet<dep_edget>
 class dep_graph_domaint:public ai_domain_baset
 {
 public:
+  typedef std::set<goto_programt::const_targett> depst;
   typedef grapht<dep_nodet>::node_indext node_indext;
 
   dep_graph_domaint():
@@ -111,6 +112,16 @@ public:
     data_deps.clear();
   }
 
+  const depst& get_control_deps()
+  {
+    return control_deps;
+  }
+
+  const depst& get_data_deps()
+  {
+    return data_deps;
+  }
+
   void make_entry() final
   {
     make_top();
@@ -131,7 +142,6 @@ private:
   tvt has_values;
   node_indext node_id;
 
-  typedef std::set<goto_programt::const_targett> depst;
   depst control_deps, data_deps;
 
   void control_dependencies(
