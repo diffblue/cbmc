@@ -75,36 +75,8 @@ endmacro(add_if_library)
 include(ExternalProject)
 set(extern_location ${CMAKE_CURRENT_BINARY_DIR}/extern)
 
-#   zlib download
-ExternalProject_Add(zlib-extern
-    PREFIX ${extern_location}
-    URL http://zlib.net/zlib-1.2.11.tar.gz
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-)
-
-set(libzip_lib ${extern_location}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}zip${CMAKE_SHARED_LIBRARY_SUFFIX})
-
-#   libzip download
-ExternalProject_Add(libzip-extern
-    DEPENDS zlib-extern
-    PREFIX ${extern_location}
-    URL http://http.debian.net/debian/pool/main/libz/libzip/libzip_1.1.2.orig.tar.gz
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCMAKE_MODULE_PATH:PATH=<INSTALL_DIR>
-    BUILD_BYPRODUCTS ${libzip_lib}
-)
-
 set(extern_include_directory ${extern_location}/include)
 file(MAKE_DIRECTORY ${extern_include_directory})
-
-set(libzip_include_directory ${extern_location}/lib/libzip/include)
-file(MAKE_DIRECTORY ${libzip_include_directory})
-
-add_library(zip SHARED IMPORTED)
-set_target_properties(zip PROPERTIES 
-    IMPORTED_LOCATION ${libzip_lib}
-    INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory};${libzip_include_directory}"
-)
-add_dependencies(zip libzip-extern)
 
 set(minisat_lib ${extern_location}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minisat2-condensed${CMAKE_STATIC_LIBRARY_SUFFIX})
 
@@ -122,7 +94,7 @@ ExternalProject_Add(minisat2-extern
 )
 
 add_library(minisat2-condensed STATIC IMPORTED)
-set_target_properties(minisat2-condensed PROPERTIES 
+set_target_properties(minisat2-condensed PROPERTIES
     IMPORTED_LOCATION ${minisat_lib}
     INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory}"
 )
@@ -131,7 +103,7 @@ add_dependencies(minisat2-condensed minisat2-extern)
 #   Override add_executable to automatically sign the target on OSX.
 function(add_executable name)
     _add_executable(${name} ${ARGN})
-    set_target_properties(${name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY 
+    set_target_properties(${name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
         "Developer ID Application: Daniel Kroening")
 endfunction(add_executable)
 
@@ -156,6 +128,7 @@ add_subdirectory(util EXCLUDE_FROM_ALL)
 add_subdirectory(xmllang EXCLUDE_FROM_ALL)
 add_subdirectory(java_bytecode EXCLUDE_FROM_ALL)
 add_subdirectory(cegis EXCLUDE_FROM_ALL)
+add_subdirectory(miniz EXCLUDE_FROM_ALL)
 
 #   Modules which depend on optional modules.
 add_subdirectory(musketeer)
