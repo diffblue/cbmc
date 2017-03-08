@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H
 
 #include <util/ui_message.h>
+#include "value_set_analysis.h"
 
 class goto_functionst;
 class goto_programt;
-class value_set_analysist;
 
 void show_value_sets(
   ui_message_handlert::uit ui,
