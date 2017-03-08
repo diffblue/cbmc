@@ -174,7 +174,7 @@ bool postconditiont::is_used(
     // aliasing may happen here
 
     value_setst::valuest expr_set;
-    value_set.get_value_set(expr.op0(), expr_set, ns);
+    value_set.read_value_set(expr.op0(), expr_set, ns);
     std::unordered_set<irep_idt, irep_id_hash> symbols;
 
     for(value_setst::valuest::const_iterator

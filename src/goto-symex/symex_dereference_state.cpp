@@ -81,7 +81,7 @@ void symex_dereference_statet::get_value_set(
   const exprt &expr,
   value_setst::valuest &value_set)
 {
-  state.value_set.get_value_set(expr, value_set, goto_symex.ns);
+  state.value_set.read_value_set(expr, value_set, goto_symex.ns);
 
   #if 0
   std::cout << "**************************\n";
