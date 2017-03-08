@@ -1062,6 +1062,29 @@ void value_sett::get_reference_set(
     dest.push_back(to_expr(it));
 }
 
+static void strip_casts(exprt& e, const namespacet& ns, const typet& target_type_raw)
+{
+  const auto& target_type=ns.follow(target_type_raw);
+  while(true)
+  {
+    if(e.id()==ID_typecast)
+      e=e.op0();
+    else if(e.id()==ID_member)
+    {
+      auto& mem=to_member_expr(e);
+      const auto& struct_type=to_struct_type(ns.follow(e.op0().type()));
+      if(mem.get_component_name()==struct_type.components()[0].get_name())
+        e=e.op0();
+      else
+        return;
+    }
+    else
+      return;
+    if(ns.follow(e.type())==target_type)
+      return;
+  }
+}
+
 /*******************************************************************\
 
 Function: value_sett::get_reference_set_rec
@@ -1208,7 +1231,13 @@ void value_sett::get_reference_set_rec(
         {
           // adjust type?
           if(ns.follow(struct_op.type())!=final_object_type)
+          {
+            // Avoid an infinite loop of casting by stripping typecasts
+            // and address-of-first-members first.
+            strip_casts(member_expr.op0(),ns,struct_op.type());
+            if(ns.follow(member_expr.op0().type())!=ns.follow(struct_op.type()))
             member_expr.op0().make_typecast(struct_op.type());
+          }
 
           insert(dest, member_expr, o);
         }
@@ -1492,7 +1521,6 @@ void value_sett::assign_rec(
   if(lhs.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
-
     entryt &e=get_entry(entryt(identifier, suffix), lhs.type(), ns);
 
     if(add_to_sets)
