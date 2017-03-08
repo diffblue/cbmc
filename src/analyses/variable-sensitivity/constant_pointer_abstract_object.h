@@ -35,19 +35,19 @@ public:
     const constant_pointer_abstract_pointert op1,
     const constant_pointer_abstract_pointert op2);
 
-  exprt to_constant() const;
+  exprt to_constant() const override;
   void output(
-    std::ostream &out, const ai_baset &ai, const namespacet &ns) const;
+    std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
 
   abstract_object_pointert read_dereference(
-    const abstract_environmentt &env, const namespacet &ns) const;
+    const abstract_environmentt &env, const namespacet &ns) const override;
 
   sharing_ptrt<pointer_abstract_objectt> write_dereference(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
-    bool merging_write);
+    bool merging_write) override;
 
 private:
   exprt value;
