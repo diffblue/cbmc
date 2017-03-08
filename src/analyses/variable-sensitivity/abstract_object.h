@@ -34,7 +34,7 @@ class namespacet;
 
 
 #define CLONE \
-  virtual abstract_objectt* clone() const \
+  virtual abstract_objectt* clone() const override \
   { \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
       >::type current_typet; \
@@ -44,7 +44,7 @@ class namespacet;
 #define MERGE(parent_typet) \
   virtual abstract_object_pointert merge( \
     const abstract_object_pointert op, \
-    bool &out_any_modifications) \
+    bool &out_any_modifications) override \
   {\
     assert(type()==op->type()); \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
@@ -125,7 +125,12 @@ public:
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
-  CLONE
+  virtual abstract_objectt* clone() const  // Macro is not used as this does not override
+  {
+    typedef std::remove_const<std::remove_reference<decltype(*this)>::type
+      >::type current_typet;
+    return new current_typet(*this);
+  }
 
 private:      // To enforce copy-on-write these are private and have read-only accessors
   typet t;
