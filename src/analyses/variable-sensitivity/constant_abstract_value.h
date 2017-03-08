@@ -26,12 +26,12 @@ public:
   CLONE
   MERGE(abstract_valuet)
 
-  virtual exprt to_constant (void) const;
+  virtual exprt to_constant (void) const override;
 
   virtual void output(
     std::ostream &out,
     const class ai_baset &ai,
-    const class namespacet &ns) const;
+    const class namespacet &ns) const override;
 
 protected :
   bool merge_state(
