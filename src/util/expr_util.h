@@ -17,8 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 */
 
 #include "irep.h"
+#include "expr.h"
 
-class exprt;
+#include <vector>
+
 class symbol_exprt;
 class update_exprt;
 class with_exprt;
@@ -50,5 +52,60 @@ bool has_subexpr(const exprt &, const irep_idt &);
 
 /*! lift up an if_exprt one level */
 if_exprt lift_if(const exprt &, std::size_t operand_number);
+
+/*******************************************************************\
+
+Function: traverse_expr_tree
+
+  Inputs: `expr`: an expression tree to traverse
+          `parents`: will hold previously-visited nodes
+          `func`: will be called on each node, takes the node and the `parents`
+                  stack as arguments
+
+ Outputs: None
+
+ Purpose: Abstracts the process of calling a function on each node of the
+          expression tree.
+
+\*******************************************************************/
+
+template <typename Func>
+inline void traverse_expr_tree(
+  exprt &expr,
+  std::vector<exprt *> &parents,
+  Func func)
+{
+  const auto &parents_ref=parents;
+  func(expr, parents_ref);
+
+  parents.push_back(&expr);
+  for(auto &op : expr.operands())
+  {
+    traverse_expr_tree(op, parents, func);
+  }
+  parents.pop_back();
+}
+
+/*******************************************************************\
+
+Function: traverse_expr_tree
+
+  Inputs: `expr`: an expression tree to traverse
+          `func`: will be called on each node, takes the node and the `parents`
+                  stack as arguments
+
+ Outputs: None
+
+ Purpose: Behaves exactly like traverse_expr_tree with three arguments, but
+          sets up the `parents` vector internally.
+
+\*******************************************************************/
+
+template <typename Func>
+inline void traverse_expr_tree(exprt &expr, Func &&func)
+{
+  std::vector<exprt *> parents;
+  traverse_expr_tree(expr, parents, std::forward<Func>(func));
+}
 
 #endif // CPROVER_UTIL_EXPR_UTIL_H

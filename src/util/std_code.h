@@ -1047,17 +1047,17 @@ public:
 static inline const side_effect_expr_nondett &
   to_side_effect_expr_nondet(const exprt &expr)
 {
-  const auto &x = to_side_effect_expr(expr);
-  assert(x.get_statement() == ID_nondet);
-  return static_cast<const side_effect_expr_nondett &>(x);
+  const auto &side_effect_expr=to_side_effect_expr(expr);
+  assert(side_effect_expr.get_statement() == ID_nondet);
+  return static_cast<const side_effect_expr_nondett &>(side_effect_expr);
 }
 
 static inline side_effect_expr_nondett &
   to_side_effect_expr_nondet(exprt &expr)
 {
-  auto &x = to_side_effect_expr(expr);
-  assert(x.get_statement() == ID_nondet);
-  return static_cast<side_effect_expr_nondett &>(x);
+  auto &side_effect_expr=to_side_effect_expr(expr);
+  assert(side_effect_expr.get_statement() == ID_nondet);
+  return static_cast<side_effect_expr_nondett &>(side_effect_expr);
 }
 
 /*! \brief A function call side effect

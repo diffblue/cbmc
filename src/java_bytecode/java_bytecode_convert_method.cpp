@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/expr_util.h>
 
 #include <linking/zero_initializer.h>
 
@@ -33,39 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <functional>
 #include <unordered_set>
 #include <regex>
-
-/*******************************************************************\
-
-Function: traverse_expr_tree
-
-  Inputs: `expr`: an expression tree to traverse
-          `parents`: will hold previously-visited nodes
-          `func`: will be called on each node, takes the node and the `parents`
-                  stack as arguments
-
- Outputs: None
-
- Purpose: Abstracts the process of calling a function on each node of the 
-          expression tree.
-
-\*******************************************************************/
-
-template <typename Func>
-static void traverse_expr_tree(
-  exprt &expr,
-  std::vector<exprt*> &parents,
-  Func func)
-{
-  const auto& parents_ref=parents;
-  func(expr, parents_ref);
-
-  parents.push_back(&expr);
-  for(auto &op : expr.operands())
-  {
-    traverse_expr_tree(op, parents, func);
-  }
-  parents.pop_back();
-}
+#include <iterator>
 
 /*******************************************************************\
 
@@ -83,21 +52,19 @@ Function: traverse_expr_tree
 
 static void remove_assert_after_generic_nondet(exprt &expr)
 {
-  std::vector<exprt*> parents;
   traverse_expr_tree(
     expr,
-    parents,
-    [] (exprt &expr, const std::vector<exprt*>& parents)
+    [] (exprt &expr, const std::vector<exprt *> &parents)
     {
       const std::regex id_regex(
         ".*org.cprover.CProver.(nondetWithNull|nondetWithoutNull).*");
       if(expr.id()==ID_symbol &&
-         std::regex_match(as_string(to_symbol_expr(expr).get_identifier()),
+         std::regex_match(id2string(to_symbol_expr(expr).get_identifier()),
                           id_regex))
       {
         assert(2<=parents.size());
-        const auto before_1=*(parents.end()-1);
-        const auto before_2=*(parents.end()-2);
+        const auto before_1=*std::prev(parents.end(), 1);
+        const auto before_2=*std::prev(parents.end(), 2);
 
         for(auto it=before_2->operands().begin(),
                  end=before_2->operands().end();
@@ -106,11 +73,12 @@ static void remove_assert_after_generic_nondet(exprt &expr)
         {
           if(&(*it)==before_1)
           {
-            assert(it+1!=end);
-            if((it+1)->id()==ID_code &&
-               to_code(*(it+1)).get_statement()=="assert")
+            const auto next_it=std::next(it);
+            assert(next_it!=end);
+            if(next_it->id()==ID_code &&
+               to_code(*next_it).get_statement()=="assert")
             {
-              *(it+1)=code_skipt();
+              *next_it=code_skipt();
             }
           }
         }
@@ -929,11 +897,23 @@ void java_bytecode_convert_methodt::check_static_field_stub(
   }
 }
 
-static unsigned get_bytecode_type_width(const typet &ty)
+/*******************************************************************\
+
+Function: get_bytecode_type_width
+
+  Inputs: `type`: A bytecode type.
+
+ Outputs: The width of the type, in bits.
+
+ Purpose: Used to check the size of the item on the top of the stack.
+
+\*******************************************************************/
+
+static unsigned get_bytecode_type_width(const typet &type)
 {
-  if(ty.id()==ID_pointer)
+  if(type.id()==ID_pointer)
     return 32;
-  return ty.get_unsigned_int(ID_width);
+  return type.get_unsigned_int(ID_width);
 }
 
 /*******************************************************************\

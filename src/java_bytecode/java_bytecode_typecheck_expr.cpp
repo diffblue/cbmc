@@ -50,8 +50,8 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_symbol(to_symbol_expr(expr));
   else if(expr.id()==ID_side_effect)
   {
-    auto &side_effect_expr = to_side_effect_expr(expr);
-    const irep_idt &statement = side_effect_expr.get_statement();
+    auto &side_effect_expr=to_side_effect_expr(expr);
+    const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_java_new)
     {
       typecheck_expr_java_new(side_effect_expr);
