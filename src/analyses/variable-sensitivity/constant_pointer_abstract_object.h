@@ -43,7 +43,7 @@ public:
     const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
-    bool merging_write) override;
+    bool merging_write) const override;
 
 protected:
   bool merge_state(

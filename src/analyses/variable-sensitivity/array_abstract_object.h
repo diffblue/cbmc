@@ -36,7 +36,7 @@ public:
     abstract_environmentt &environment,
     const std::stack<exprt> stack, const index_exprt &index_expr,
     const abstract_object_pointert value,
-    bool merging_write);
+    bool merging_write) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H

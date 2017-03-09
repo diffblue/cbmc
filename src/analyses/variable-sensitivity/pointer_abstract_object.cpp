@@ -146,7 +146,7 @@ sharing_ptrt<pointer_abstract_objectt>
     const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
-    bool merging_write)
+    bool merging_write) const
 {
   if(is_top())
   {
