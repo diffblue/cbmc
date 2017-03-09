@@ -31,10 +31,6 @@ public:
   CLONE
   MERGE(pointer_abstract_objectt)
 
-  bool merge_state(
-    const constant_pointer_abstract_pointert op1,
-    const constant_pointer_abstract_pointert op2);
-
   exprt to_constant() const override;
   void output(
     std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
@@ -48,6 +44,11 @@ public:
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
     bool merging_write) override;
+
+protected:
+  bool merge_state(
+    const constant_pointer_abstract_pointert op1,
+    const constant_pointer_abstract_pointert op2);
 
 private:
   exprt value;
