@@ -62,6 +62,8 @@ public:
   void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
+  bool verify() const;
+
 protected:
   bool bottom;
 

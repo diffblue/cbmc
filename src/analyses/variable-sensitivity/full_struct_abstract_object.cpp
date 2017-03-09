@@ -35,6 +35,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(const typet &t):
   struct_abstract_objectt(t)
 {
   assert(t.id()==ID_struct);
+  assert(verify());
 }
 
 /*******************************************************************\
@@ -58,6 +59,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
     struct_abstract_objectt(t, top, bottom)
 {
   assert(t.id()==ID_struct);
+  assert(verify());
 }
 
 /*******************************************************************\
@@ -77,7 +79,8 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const full_struct_abstract_objectt &old):
     struct_abstract_objectt(old)
 {
-
+    map=old.map;
+    assert(verify());
 }
 
 /*******************************************************************\
@@ -98,6 +101,7 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(const exprt &e):
   struct_abstract_objectt(e)
 {
   assert(e.type().id()==ID_struct);
+  assert(verify());
 }
 
 /*******************************************************************\
@@ -203,7 +207,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
     irep_idt c=member_expr.get_component_name();
     copy->map[c]=
       environment.write(copy->map[c], value, stack, ns, merging_write);
-
+    assert(copy->verify());
     return copy;
   }
   else
@@ -220,6 +224,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
     if(merging_write)
     {
       if(is_top()) // struct is top
+        assert(copy->verify());
         return copy;
 
       assert(!copy->map.empty());
@@ -229,6 +234,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
       struct_mapt::iterator it=m.find(c);
 
       if(it==m.end()) // component is top
+        assert(copy->verify());
         return copy;
 
       bool dummy;
@@ -243,8 +249,14 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
       assert(!copy->is_bottom());
     }
 
+    assert(copy->verify());
     return copy;
   }
+}
+
+bool full_struct_abstract_objectt::verify() const
+{
+  return is_top() || is_bottom() || !map.empty();
 }
 
 /*******************************************************************\
@@ -271,6 +283,7 @@ bool full_struct_abstract_objectt::merge_state(
   if(is_top() || is_bottom())
   {
     map.clear();
+    assert(verify());
     return changed;
   }
 
@@ -278,11 +291,15 @@ bool full_struct_abstract_objectt::merge_state(
   assert(!op1->is_bottom() && !op2->is_bottom());
 
   if(op2->is_bottom())
+  {
+    assert(verify());
     return false;
+  }
 
   if(op1->is_bottom())
   {
     map=op2->map;
+    assert(verify());
     return true;
   }
 
@@ -353,6 +370,8 @@ bool full_struct_abstract_objectt::merge_state(
       }
     }
   }
+
+  assert(verify());
 
   return modified;
 }

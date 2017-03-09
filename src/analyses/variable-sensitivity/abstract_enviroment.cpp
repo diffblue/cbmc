@@ -700,6 +700,30 @@ void abstract_environmentt::output(
   out << "}\n";
 }
 
+/*******************************************************************\
+
+Function: abstract_environmentt::verify
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Check there aren't any null pointer mapped values
+
+\*******************************************************************/
+
+bool abstract_environmentt::verify() const
+{
+  for(const auto &entry : map)
+  {
+    if(!entry.second)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 abstract_object_pointert abstract_environmentt::eval_expression(
   const exprt &e, const namespacet &ns) const
 {
