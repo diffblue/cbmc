@@ -38,6 +38,7 @@ protected :
     constant_abstract_value_pointert op1,
     constant_abstract_value_pointert op2);
 
+private :
   exprt value;
 
 };
