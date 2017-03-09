@@ -49,6 +49,7 @@ private:
   struct_mapt map;
 
 protected:
+  bool verify() const;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
   bool merge_state(
