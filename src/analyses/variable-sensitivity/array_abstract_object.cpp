@@ -145,7 +145,7 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   const std::stack<exprt> stack,
   const index_exprt &index_expr,
   const abstract_object_pointert value,
-  bool merging_write)
+  bool merging_write) const
 {
   // TODO(tkiley): Should this in fact havoc since we can't verify
   // that we are not writing past the end of the array - Martin said

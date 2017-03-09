@@ -113,7 +113,7 @@ Function: struct_abstract_objectt::read_component
 abstract_object_pointert struct_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const member_exprt &member_expr,
-  const namespacet& ns)
+  const namespacet& ns) const
 {
   // If we are bottom then so are the components
   // otherwise the components could be anything
@@ -147,7 +147,7 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
   const abstract_object_pointert value,
-  bool merging_write)
+  bool merging_write) const
 {
   if(is_top())
   {
