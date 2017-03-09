@@ -149,10 +149,11 @@ Function: abstract_objectt::merge
 \*******************************************************************/
 
 abstract_object_pointert abstract_objectt::merge(
-  const abstract_object_pointert op, bool &out_any_modifications)
+  const abstract_object_pointert op, bool &out_any_modifications) const
 {
   assert(t==op->t);
-  abstract_object_pointert m=abstract_object_pointert(new abstract_objectt(*this));
+  internal_abstract_object_pointert m=
+    internal_abstract_object_pointert(new abstract_objectt(*this));
   out_any_modifications=m->merge_state(abstract_object_pointert(this), op);
   return m;
 }

@@ -44,7 +44,7 @@ class namespacet;
 #define MERGE(parent_typet) \
   virtual abstract_object_pointert merge( \
     const abstract_object_pointert op, \
-    bool &out_any_modifications) override \
+    bool &out_any_modifications) const override \
   {\
     assert(type()==op->type()); \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
@@ -55,9 +55,10 @@ class namespacet;
       "parent_typet in MERGE must be parent class of the current type"); \
     \
     typedef sharing_ptrt<current_typet> current_type_ptrt; \
+    typedef internal_sharing_ptrt<current_typet> this_ptrt; \
     /*Cast the supplied type to the current type to facilitate double dispatch*/ \
-    current_type_ptrt n=std::dynamic_pointer_cast<current_typet>(op); \
-    current_type_ptrt m=current_type_ptrt(new current_typet(*this)); \
+    current_type_ptrt n=std::dynamic_pointer_cast<current_typet const>(op); \
+    this_ptrt m=this_ptrt(new current_typet(*this)); \
     if (n!= NULL) \
     { \
       out_any_modifications=m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
@@ -89,7 +90,7 @@ class namespacet;
  */
 
 template<class T>
-using sharing_ptrt=std::shared_ptr<T>;
+using sharing_ptrt=std::shared_ptr<const T>;
 
 typedef sharing_ptrt<class abstract_objectt> abstract_object_pointert;
 
@@ -109,7 +110,7 @@ public:
   // It uses merge state to produce a new object of the most
   // specific common parent type and is thus copy-on-write safe.
   virtual abstract_object_pointert merge(
-    const abstract_object_pointert op, bool &out_any_modifications);
+    const abstract_object_pointert op, bool &out_any_modifications) const;
 
   // Interface for transforms
   abstract_object_pointert expression_transform(
@@ -129,13 +130,20 @@ public:
     return new current_typet(*this);
   }
 
-private:      // To enforce copy-on-write these are private and have read-only accessors
+private:
+  // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
-protected:  // TODO - remove
+protected:
+  template<class T>
+  using internal_sharing_ptrt=std::shared_ptr<T>;
+
+  typedef internal_sharing_ptrt<class abstract_objectt>
+    internal_abstract_object_pointert;
+
   bool top;
 
-protected:    // The one exception is merge_state in descendent classes, which needs this
+  // The one exception is merge_state in descendent classes, which needs this
   void make_top() { top=true; }
 
   // Sets the state of this object

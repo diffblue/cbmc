@@ -121,7 +121,7 @@ Function: struct_abstract_objectt::read_component
 abstract_object_pointert full_struct_abstract_objectt::read_component(
   const abstract_environmentt &environment,
   const member_exprt &member_expr,
-  const namespacet& ns)
+  const namespacet& ns) const
 {
 #ifdef DEBUG
   std::cout << "Reading component " << member_expr.get_component_name()
@@ -180,7 +180,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
   const std::stack<exprt> &stack,
   const member_exprt &member_expr,
   const abstract_object_pointert value,
-  bool merging_write)
+  bool merging_write) const
 {
 #ifdef DEBUG
   std::cout << "Writing component " << member_expr.get_component_name()
@@ -197,7 +197,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
   // we only handle one level currently
   if(!stack.empty())
   {
-    sharing_ptrt<full_struct_abstract_objectt> copy(
+    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
       new full_struct_abstract_objectt(*this));
 
     irep_idt c=member_expr.get_component_name();
@@ -208,7 +208,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
   }
   else
   {
-    sharing_ptrt<full_struct_abstract_objectt> copy(
+    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
       new full_struct_abstract_objectt(*this));
 
 #ifdef DEBUG
