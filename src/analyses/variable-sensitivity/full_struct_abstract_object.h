@@ -29,12 +29,6 @@ public:
   CLONE
   MERGE(struct_abstract_objectt)
 
-  // Set the state of this to the merge result of op1 and op2 and
-  // return if the result is different from op1
-  bool merge_state(
-    const sharing_ptrt<full_struct_abstract_objectt> op1,
-    const sharing_ptrt<full_struct_abstract_objectt> op2);
-
   // struct interface
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
@@ -49,9 +43,18 @@ public:
     const abstract_object_pointert value,
     bool merging_write) override;
 
+private:
   // no entry means component is top
   typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
   struct_mapt map;
+
+protected:
+  // Set the state of this to the merge result of op1 and op2 and
+  // return if the result is different from op1
+  bool merge_state(
+    const sharing_ptrt<full_struct_abstract_objectt> op1,
+    const sharing_ptrt<full_struct_abstract_objectt> op2);
+
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ONE_LEVEL_STRUCT_ABSTRACT_OBJECT_H
