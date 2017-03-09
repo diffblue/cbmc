@@ -105,12 +105,9 @@ public:
   virtual bool is_top() const;
   virtual bool is_bottom() const;
 
-  // Sets the state of this object
-  bool merge_state(
-    const abstract_object_pointert op1, const abstract_object_pointert op2);
-
   // This is both the interface and the base case of the recursion
-  // It uses merge state to
+  // It uses merge state to produce a new object of the most
+  // specific common parent type and is thus copy-on-write safe.
   virtual abstract_object_pointert merge(
     const abstract_object_pointert op, bool &out_any_modifications);
 
@@ -140,6 +137,10 @@ protected:  // TODO - remove
 
 protected:    // The one exception is merge_state in descendent classes, which needs this
   void make_top() { top=true; }
+
+  // Sets the state of this object
+  bool merge_state(
+    const abstract_object_pointert op1, const abstract_object_pointert op2);
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
