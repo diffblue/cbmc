@@ -50,6 +50,7 @@ void cover_goalst::mark()
        prop_conv.l_get(g.condition).is_true())
     {
       g.status=goalt::statust::COVERED;
+      g.seconds=(current_time()-start_time);
       _number_covered++;
 
       // notify observers

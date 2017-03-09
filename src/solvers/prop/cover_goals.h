@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_PROP_COVER_GOALS_H
 
 #include <util/message.h>
+#include <util/time_stopping.h>
 
 #include "prop_conv.h"
 
@@ -29,6 +30,7 @@ public:
   explicit cover_goalst(prop_convt &_prop_conv):
     prop_conv(_prop_conv)
   {
+    start_time=current_time();
   }
 
   virtual ~cover_goalst();
@@ -41,6 +43,7 @@ public:
   struct goalt
   {
     literalt condition;
+    time_periodt seconds;
     enum class statust { UNKNOWN, COVERED, UNCOVERED, ERROR } status;
 
     goalt():status(statust::UNKNOWN)
@@ -91,7 +94,26 @@ public:
     observers.push_back(&o);
   }
 
+  inline void print_goals_stats(std::ostream &out)
+  {
+    out << '\n';
+    out <<"**#START" << '\n';
+    out << "block-id,hit-count,time(s)" << '\n';
+    for(std::list<goalt>::const_iterator
+        g_it=goals.begin();
+        g_it!=goals.end();
+        g_it++)
+    {
+        if(g_it->status == goalt::statust::COVERED)
+        {
+          out << "0,0," << g_it->seconds << '\n';
+        }
+    }
+    out <<"#END" << '\n';
+  }
+
 protected:
+  absolute_timet start_time;
   std::size_t _number_covered;
   unsigned _iterations;
   prop_convt &prop_conv;

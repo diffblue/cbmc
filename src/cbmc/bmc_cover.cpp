@@ -459,7 +459,7 @@ bool bmc_covert::operator()()
     for(const auto &test : tests)
       std::cout << get_test(test.goto_trace) << '\n';
   }
-
+  cover_goals.print_goals_stats(std::cout);
   return false;
 }
 
