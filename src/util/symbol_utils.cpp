@@ -1,18 +1,18 @@
 /*******************************************************************\
 
-Module:
+Module: Symbol utilities
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Nathan Phillips, nathan.phillips@diffblue.com
 
 \*******************************************************************/
 
-#include "namespace_utils.h"
+#include "symbol_utils.h"
 #include "symbol.h"
 #include <goto-programs/remove_returns.h>
 
 /*******************************************************************\
 
-  Function: namespace_utils_baset::does_symbol_match
+  Function: symbol_utilst::does_symbol_match
 
   Purpose:
     Checks whether an exprt is actually a symbolt matching a predicate
@@ -28,21 +28,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-bool namespace_utils_baset::does_symbol_match(
+bool symbol_utilst::does_symbol_match(
   const exprt &lvalue,
   std::function<bool(symbolt)> predicate) const
 {
   if(lvalue.id()!=ID_symbol)
     return false;
   const symbolt *symbol;
-  if(lookup(lvalue.get(ID_identifier), symbol))
+  if(ns.lookup(lvalue.get(ID_identifier), symbol))
     return false;
   return predicate(*symbol);
 }
 
 /*******************************************************************\
 
-  Function: namespace_utils_baset::is_parameter
+  Function: symbol_utilst::is_parameter
 
   Purpose:
     Checks whether an exprt is actually a parameter symbol
@@ -56,7 +56,7 @@ bool namespace_utils_baset::does_symbol_match(
 
 \*******************************************************************/
 
-bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
+bool symbol_utilst::is_parameter(const exprt &lvalue) const
 {
   return does_symbol_match(
     lvalue,
@@ -65,7 +65,7 @@ bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
 
 /*******************************************************************\
 
-  Function: namespace_utils_baset::is_static
+  Function: symbol_utilst::is_static
 
   Purpose:
     Checks whether an exprt is actually a static symbol
@@ -79,7 +79,7 @@ bool namespace_utils_baset::is_parameter(const exprt &lvalue) const
 
 \*******************************************************************/
 
-bool namespace_utils_baset::is_static(const exprt &lvalue) const
+bool symbol_utilst::is_static(const exprt &lvalue) const
 {
   // TODO: Also check for static member accesses
   return does_symbol_match(
@@ -89,7 +89,7 @@ bool namespace_utils_baset::is_static(const exprt &lvalue) const
 
 /*******************************************************************\
 
-  Function: namespace_utils_baset::is_auxiliary_variable
+  Function: symbol_utilst::is_auxiliary_variable
 
   Purpose:
     Checks whether an exprt is actually an auxiliary variable symbol
@@ -103,7 +103,7 @@ bool namespace_utils_baset::is_static(const exprt &lvalue) const
 
 \*******************************************************************/
 
-bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
+bool symbol_utilst::is_auxiliary_variable(const exprt &lvalue) const
 {
   return does_symbol_match(
     lvalue,
@@ -112,7 +112,7 @@ bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
 
 /*******************************************************************\
 
-  Function: namespace_utils_baset::is_return_value_auxiliary
+  Function: symbol_utilst::is_return_value_auxiliary
 
   Purpose:
     Checks whether an exprt is actually an auxiliary return value symbol
@@ -126,7 +126,7 @@ bool namespace_utils_baset::is_auxiliary_variable(const exprt &lvalue) const
 
 \*******************************************************************/
 
-bool namespace_utils_baset::is_return_value_auxiliary(const exprt &lvalue) const
+bool symbol_utilst::is_return_value_auxiliary(const exprt &lvalue) const
 {
   return
     does_symbol_match(
