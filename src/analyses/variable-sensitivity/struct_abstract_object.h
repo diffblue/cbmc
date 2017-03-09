@@ -30,7 +30,7 @@ public:
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
     const member_exprt &member_expr,
-    const namespacet &ns);
+    const namespacet &ns) const;
 
   virtual sharing_ptrt<struct_abstract_objectt> write_component(
     abstract_environmentt &environment,
@@ -38,7 +38,7 @@ public:
     const std::stack<exprt> &stack,
     const member_exprt &member_expr,
     const abstract_object_pointert value,
-    bool merging_write);
+    bool merging_write) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H

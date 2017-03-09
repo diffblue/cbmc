@@ -37,7 +37,7 @@ public:
     const namespacet &ns,
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
-    bool merging_write);
+    bool merging_write) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_POINTER_ABSTRACT_OBJECT_H
