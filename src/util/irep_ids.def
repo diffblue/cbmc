@@ -811,6 +811,7 @@ IREP_ID_ONE(cprover_string_trim_func)
 IREP_ID_ONE(cprover_string_value_of_func)
 IREP_ID_ONE(array_replace)
 IREP_ID_ONE(switch_case_number)
+IREP_ID_ONE(cprover_string_array_of_char_pointer_func)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
