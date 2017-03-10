@@ -776,7 +776,6 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   */
   java_internal_additions(symbol_table);
 
-
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, get_message_handler());
   if(res.stop_convert)

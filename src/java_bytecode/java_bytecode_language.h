@@ -52,7 +52,7 @@ public:
     symbol_tablet &context,
     const std::string &module) override;
 
-  bool final(
+  virtual bool final(
     symbol_tablet &context) override;
 
   void show_parse(std::ostream &out) override;

@@ -239,7 +239,8 @@ void java_record_outputs(
     codet output(ID_output);
     output.operands().resize(2);
 
-    const symbolt &return_symbol=symbol_table.lookup("return'");
+    const symbolt &return_symbol=
+      symbol_table.lookup(JAVA_ENTRY_POINT_RETURN_SYMBOL);
 
     output.op0()=
       address_of_exprt(
@@ -542,7 +543,7 @@ bool java_entry_point(
     auxiliary_symbolt return_symbol;
     return_symbol.mode=ID_C;
     return_symbol.is_static_lifetime=false;
-    return_symbol.name="return'";
+    return_symbol.name=JAVA_ENTRY_POINT_RETURN_SYMBOL;
     return_symbol.base_name="return";
     return_symbol.type=to_code_type(symbol.type).return_type();
 
