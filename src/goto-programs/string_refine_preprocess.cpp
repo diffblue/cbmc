@@ -348,7 +348,10 @@ void string_refine_preprocesst::make_normal_assign(
   const std::string &signature)
 {
   if(function_name==ID_cprover_string_copy_func)
+  {
+    assert(arguments.size()>0);
     make_string_copy(goto_program, i_it, lhs, arguments[0], location);
+  }
   else
   {
     function_application_exprt rhs(
@@ -382,6 +385,9 @@ void string_refine_preprocesst::insert_assignments(
   goto_programt::targett &i_it,
   const std::list<code_assignt> &va)
 {
+  if(va.empty())
+    return;
+
   auto i=va.begin();
   i_it->make_assignment();
   i_it->code=*i;
