@@ -523,22 +523,61 @@ void goto_checkt::conversion_check(
   }
 }
 
+/*******************************************************************\
+
+Function: overflow_check_flag_set
+
+  Inputs: Expression `e`
+
+ Outputs: Returns true if the frontend has flagged this expression
+          for overflow checking.
+
+ Purpose: See output.
+
+\*******************************************************************/
+
+static bool overflow_check_flag_set(const exprt &e)
+{
+  return e.get_bool("overflow_check");
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::integer_overflow_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_checkt::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
 {
   if(!enable_signed_overflow_check &&
-     !enable_unsigned_overflow_check)
+     !enable_unsigned_overflow_check &&
+     !overflow_check_flag_set(expr))
     return;
 
   // First, check type.
   const typet &type=ns.follow(expr.type());
 
-  if(type.id()==ID_signedbv && !enable_signed_overflow_check)
+  if(type.id()==ID_signedbv &&
+     !enable_signed_overflow_check &&
+     !overflow_check_flag_set(expr))
+  {
     return;
+  }
 
-  if(type.id()==ID_unsignedbv && !enable_unsigned_overflow_check)
+  if(type.id()==ID_unsignedbv &&
+     !enable_unsigned_overflow_check &&
+     !overflow_check_flag_set(expr))
+  {
     return;
+  }
 
   // add overflow subgoal
 

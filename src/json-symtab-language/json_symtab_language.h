@@ -47,7 +47,7 @@ public:
 
   bool generate_support_functions(symbol_tablet &symbol_table) override
   {
-    // TODO: Is this correct?
+    // Not implemented.
     return true;
   }
 
