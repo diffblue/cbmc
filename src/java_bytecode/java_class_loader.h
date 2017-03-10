@@ -20,6 +20,7 @@ class java_class_loadert:public messaget
 {
 public:
   java_bytecode_parse_treet &operator()(const irep_idt &);
+
   void set_java_cp_include_files(std::string &java_cp_include_files)
   {
     jar_pool.set_java_cp_include_files(java_cp_include_files);

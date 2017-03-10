@@ -8,11 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 #include <cassert>
-#include <json/json_parser.h>
 #include <unordered_set>
-#include "jar_file.h"
+
+#include <json/json_parser.h>
 #include <util/suffix.h>
-#include <iostream>
+#include "jar_file.h"
 /*******************************************************************\
 
 Function: jar_filet::open
@@ -54,9 +54,11 @@ void jar_filet::open(
            get_message_handler(),
            json_cp_config))
         throw "cannot read JSON input configuration for JAR loading";
-      assert(json_cp_config.is_object() && "JSON has wrong format");
+      if(!json_cp_config.is_object())
+        throw "the JSON file has a wrong format";
       jsont include_files=json_cp_config["classFiles"];
-      assert(include_files.is_array() && "JSON has wrong format");
+      if(!include_files.is_array())
+        throw "the JSON file has a wrong format";
       for(const jsont &file_entry : include_files.array)
       {
         assert(file_entry.is_string());
@@ -84,7 +86,7 @@ void jar_filet::open(
         add_file|=std::regex_match(file_name, string_matcher, regex_matcher);
       // load .class file only if it is in the match set
       else
-        add_file|=set_matcher.count(file_name)>0;
+        add_file|=set_matcher.find(file_name)!=set_matcher.end();
       if(add_file)
       {
         index.push_back(file_name);

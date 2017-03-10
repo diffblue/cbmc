@@ -22,14 +22,13 @@ class jar_filet:public messaget
 {
 public:
   jar_filet():mz_ok(false) { }
-  inline explicit jar_filet(const std::string &file_name) { }
 
   ~jar_filet();
 
   void open(std::string &java_cp_include_files, const std::string &);
 
   // Test for error; 'true' means we are good.
-  inline explicit operator bool() const { return mz_ok; }
+  explicit operator bool() const { return mz_ok; }
 
   typedef std::vector<std::string> indext;
   indext index;
@@ -45,8 +44,6 @@ public:
 protected:
   mz_zip_archive zip;
   bool mz_ok;
-  std::string matcher;
-  std::map<int, int> index_map;
 };
 
 class jar_poolt:public messaget
@@ -56,9 +53,11 @@ public:
   {
     java_cp_include_files=_java_cp_include_files;
   }
+
   jar_filet &operator()(const std::string &file_name)
   {
-    assert(!java_cp_include_files.empty() && "class regexp cannot be empty");
+    if(java_cp_include_files.empty())
+      throw "class regexp cannot be empty";
     file_mapt::iterator it=file_map.find(file_name);
     if(it==file_map.end())
     {
