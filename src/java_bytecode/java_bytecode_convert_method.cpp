@@ -74,8 +74,8 @@ static void remove_assert_after_generic_nondet(exprt &expr)
           if(&(*it)==before_1)
           {
             const auto next_it=std::next(it);
-            assert(next_it!=end);
-            if(next_it->id()==ID_code &&
+            if(next_it!=end &&
+               next_it->id()==ID_code &&
                to_code(*next_it).get_statement()=="assert")
             {
               *next_it=code_skipt();
@@ -1288,6 +1288,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
           ".*org.cprover.CProver.(nondetWithNull|nondetWithoutNull).*")) &&
       !working_set.empty())
     {
+      // Get the nondet function code type.
+      auto func_type=to_code_type(arg0.type());
+
+      // Find the next instruction.
       const auto working_set_begin=working_set.begin();
       const auto next_address=address_map.find(*working_set_begin);
       assert(next_address!=address_map.end());
@@ -1295,9 +1299,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // Find the correct return type.
       const auto next_source=next_address->second.source;
       const auto next_statement=next_source->statement;
-      assert(next_statement=="checkcast");
-      assert(next_source->args.size()>=1);
-      const auto return_type=pointer_typet(next_source->args[0].type());
+      // The next return type is the casted-to type *if* the next statement is
+      // a checkcast. Otherwise, we leave it as-is.
+      const auto return_type=
+        (next_statement=="checkcast" && next_source->args.size()>=1) ?
+        pointer_typet(next_source->args[0].type()) :
+        func_type.return_type();
 
       // Reconstruct a function call with the correct return type.
       code_function_callt call;
@@ -1306,11 +1313,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       loc.set_function(method_id);
       call.add_source_location()=loc;
       call.function().add_source_location()=loc;
-
-      // Update the pointed-to type.
-      auto func_type=arg0.type();
-      to_code_type(func_type).return_type()=return_type;
-
+      func_type.return_type()=return_type;
       call.function()=symbol_exprt(arg0.get(ID_identifier), func_type);
       call.lhs()=tmp_variable("return", return_type);
 
