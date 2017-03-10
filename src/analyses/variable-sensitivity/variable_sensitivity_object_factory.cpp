@@ -101,7 +101,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<constant_abstract_valuet>(
       followed_type, top, bottom, e, ns);
   case ARRAY_SENSITIVE:
-    return initialize_abstract_object<array_abstract_objectt>(
+    return initialize_abstract_object<constant_array_abstract_objectt>(
       followed_type, top, bottom, e, ns);
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<array_abstract_objectt>(
