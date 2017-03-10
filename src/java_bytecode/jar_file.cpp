@@ -69,7 +69,6 @@ void jar_filet::open(
     std::size_t number_of_files=
       mz_zip_reader_get_num_files(&zip);
 
-    size_t filtered_index=0;
     for(std::size_t i=0; i<number_of_files; i++)
     {
       mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
@@ -89,9 +88,10 @@ void jar_filet::open(
         add_file|=set_matcher.find(file_name)!=set_matcher.end();
       if(add_file)
       {
-        index.push_back(file_name);
-        filtered_jar[filtered_index]=i;
-        filtered_index++;
+        if(has_suffix(file_name, ".class"))
+          status() << "read class file " << file_name
+                   << " from " << filename << eom;
+        filtered_jar[file_name]=i;
       }
       delete[] filename_char;
     }
@@ -131,16 +131,17 @@ Function: jar_filet::get_entry
 
 \*******************************************************************/
 
-std::string jar_filet::get_entry(std::size_t i)
+std::string jar_filet::get_entry(const irep_idt &name)
 {
   if(!mz_ok)
     return std::string("");
 
-  assert(i<index.size());
-
   std::string dest;
 
-  size_t real_index=filtered_jar[i];
+  auto entry=filtered_jar.find(name);
+  assert(entry!=filtered_jar.end());
+
+  size_t real_index=entry->second;
   mz_zip_archive_file_stat file_stat;
   memset(&file_stat, 0, sizeof(file_stat));
   mz_bool stat_ok=mz_zip_reader_file_stat(&zip, real_index, &file_stat);
@@ -173,24 +174,11 @@ Function: jar_filet::get_manifest
 
 jar_filet::manifestt jar_filet::get_manifest()
 {
-  std::size_t i=0;
-  bool found=false;
-
-  for(const auto &e : index)
-  {
-    if(e=="META-INF/MANIFEST.MF")
-    {
-      found=true;
-      break;
-    }
-
-    i++;
-  }
-
-  if(!found)
+  auto entry=filtered_jar.find("META-INF/MANIFEST.MF");
+  if(entry==filtered_jar.end())
     return manifestt();
 
-  std::string dest=get_entry(i);
+  std::string dest=get_entry(entry->first);
   std::istringstream in(dest);
 
   manifestt manifest;

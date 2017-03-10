@@ -30,13 +30,11 @@ public:
   // Test for error; 'true' means we are good.
   explicit operator bool() const { return mz_ok; }
 
-  typedef std::vector<std::string> indext;
-  indext index;
   // map internal index to real index in jar central directory
-  typedef std::map<int, int> filtered_jart;
+  typedef std::map<irep_idt, size_t> filtered_jart;
   filtered_jart filtered_jar;
 
-  std::string get_entry(std::size_t i);
+  std::string get_entry(const irep_idt &);
 
   typedef std::map<std::string, std::string> manifestt;
   manifestt get_manifest();
