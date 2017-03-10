@@ -1062,6 +1062,26 @@ void value_sett::get_reference_set(
     dest.push_back(to_expr(it));
 }
 
+/*******************************************************************\
+
+Function: strip_casts
+
+  Inputs: `e`: expression to strip
+          `ns`: global namespace
+          `target_type_raw`: if in the course of stripping casts we
+            end up at an expression with this type, stop stripping.
+
+ Outputs: Side-effect on `e`: remove typecasts and address-of-first-
+          struct-member expressions until either we find an underlying
+          expression of type `target_type_raw`, or we run out of
+          strippable expressions.
+
+ Purpose: Cleanly cast `e` to a given type if possible, avoiding the
+          possibility of ever-expanding towers of typecasts (either
+          explict or via taking address of first member).
+
+\*******************************************************************/
+
 static void strip_casts(
   exprt &e,
   const namespacet &ns,
@@ -1083,6 +1103,7 @@ static void strip_casts(
     }
     else
       return;
+
     if(ns.follow(e.type())==target_type)
       return;
   }
