@@ -34,7 +34,9 @@ public:
 
   virtual sharing_ptrt<array_abstract_objectt> write_index(
     abstract_environmentt &environment,
-    const std::stack<exprt> stack, const index_exprt &index_expr,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const index_exprt &index_expr,
     const abstract_object_pointert value,
     bool merging_write) const;
 };

@@ -142,6 +142,7 @@ Function: abstract_object_pointert array_abstract_objectt
 
 sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   abstract_environmentt &environment,
+  const namespacet &ns,
   const std::stack<exprt> stack,
   const index_exprt &index_expr,
   const abstract_object_pointert value,
