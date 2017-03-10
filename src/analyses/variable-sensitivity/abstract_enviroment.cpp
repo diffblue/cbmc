@@ -314,6 +314,7 @@ abstract_object_pointert abstract_environmentt::write(
         sharing_ptrt<array_abstract_objectt> modified_array=
           array_abstract_object->write_index(
             *this,
+            ns,
             stack,
             to_index_expr(next_expr),
             rhs_object,
