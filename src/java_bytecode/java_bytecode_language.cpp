@@ -56,29 +56,36 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
+
   if(cmd.isset("java-cp-include-files"))
-    java_cp_include_files=cmd.get_value("java-cp-include-files");
-  else
-    java_cp_include_files=".*";
-  // load file list from JSON file
-  if(java_cp_include_files[0]=='@')
   {
-    jsont json_cp_config;
-    if(parse_json(
-         java_cp_include_files.substr(1),
-         get_message_handler(),
-         json_cp_config))
-      throw "cannot read JSON input configuration for JAR loading";
-    assert(json_cp_config.is_object() && "JSON has wrong format");
-    jsont include_files=json_cp_config["jar"];
-    assert(include_files.is_array() && "JSON has wrong format");
-    // add jars from JSON config file to classpath
-    for(const jsont &file_entry : include_files.array)
+    java_cp_include_files=cmd.get_value("java-cp-include-files");
+    // load file list from JSON file
+    if(java_cp_include_files[0]=='@')
     {
-      assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
-      config.java.classpath.push_back(file_entry.value);
+      jsont json_cp_config;
+      if(parse_json(
+           java_cp_include_files.substr(1),
+           get_message_handler(),
+           json_cp_config))
+        throw "cannot read JSON input configuration for JAR loading";
+
+      if(!json_cp_config.is_object())
+        throw "the JSON file has a wrong format";
+      jsont include_files=json_cp_config["jar"];
+      if(!include_files.is_array())
+         throw "the JSON file has a wrong format";
+
+      // add jars from JSON config file to classpath
+      for(const jsont &file_entry : include_files.array)
+      {
+        assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
+        config.java.classpath.push_back(file_entry.value);
+      }
     }
   }
+  else
+    java_cp_include_files=".*";
 }
 
 /*******************************************************************\
