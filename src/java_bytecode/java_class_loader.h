@@ -48,7 +48,7 @@ public:
   public:
     struct entryt
     {
-      std::size_t index;
+      std::string class_file_name;
     };
 
     // class name to index map
