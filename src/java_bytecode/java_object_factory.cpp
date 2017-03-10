@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/namespace.h>
+#include <util/nondet_bool.h>
+#include <util/nondet_ifthenelse.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 
@@ -51,25 +53,6 @@ static symbolt &new_tmp_symbol(
     symbol_table);
 }
 
-/*******************************************************************\
-
-Function: get_nondet_bool
-
- Inputs: Desired type (C_bool or plain bool)
-
- Outputs: nondet expr of that type
-
- Purpose:
-
-\*******************************************************************/
-
-static exprt get_nondet_bool(const typet &type)
-{
-  // We force this to 0 and 1 and won't consider
-  // other values.
-  return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
-}
-
 class java_object_factoryt
 {
   code_blockt &init_code;
@@ -78,6 +61,17 @@ class java_object_factoryt
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
   namespacet ns;
+
+  void set_null(
+    const exprt &expr,
+    const pointer_typet &ptr_type,
+    const source_locationt &);
+
+  void gen_pointer_target_init(
+    const exprt &expr,
+    const typet &target_type,
+    bool create_dynamic_objects,
+    const source_locationt &);
 
 public:
   java_object_factoryt(
@@ -192,6 +186,87 @@ exprt java_object_factoryt::allocate_object(
 
 /*******************************************************************\
 
+Function: java_object_factoryt::set_null
+
+  Inputs: `expr`: pointer-typed lvalue expression to initialise
+          `ptr_type`: pointer type to write
+
+ Outputs:
+
+ Purpose: Adds an instruction to `init_code` null-initialising
+          `expr`.
+
+\*******************************************************************/
+
+void java_object_factoryt::set_null(
+  const exprt &expr,
+  const pointer_typet &ptr_type,
+  const source_locationt &loc)
+{
+  null_pointer_exprt null_pointer_expr(ptr_type);
+  code_assignt code(expr, null_pointer_expr);
+  code.add_source_location()=loc;
+  init_code.move_to_operands(code);
+}
+
+/*******************************************************************\
+
+Function: java_object_factoryt::gen_pointer_target_init
+
+  Inputs: `expr`: pointer-typed lvalue expression to initialise
+          `target_type`: structure type to initialise, which may
+            not match *expr (for example, expr might be void*)
+          `create_dynamic_objects`: if true, use malloc to allocate
+            objects; otherwise generate fresh static symbols.
+
+ Outputs:
+
+ Purpose: Initialises an object tree rooted at `expr`, allocating
+          child objects as necessary and nondet-initialising their
+          members.
+
+\*******************************************************************/
+
+void java_object_factoryt::gen_pointer_target_init(
+  const exprt &expr,
+  const typet &target_type,
+  bool create_dynamic_objects,
+  const source_locationt &loc)
+{
+  if(target_type.id()==ID_struct &&
+     has_prefix(
+       id2string(to_struct_type(target_type).get_tag()),
+       "java::array["))
+  {
+    gen_nondet_array_init(expr, loc);
+  }
+  else
+  {
+    exprt target=
+      allocate_object(
+        expr,
+        target_type,
+        loc,
+        create_dynamic_objects);
+    exprt init_expr;
+    if(target.id()==ID_address_of)
+      init_expr=target.op0();
+    else
+      init_expr=
+        dereference_exprt(target, target.type().subtype());
+    gen_nondet_init(
+      init_expr,
+      false,
+      "",
+      loc,
+      create_dynamic_objects,
+      false,
+      typet());
+  }
+}
+
+/*******************************************************************\
+
 Function: java_object_factoryt::gen_nondet_init
 
  Inputs:
@@ -238,65 +313,33 @@ void java_object_factoryt::gen_nondet_init(
       if(recursion_set.find(struct_tag)!=recursion_set.end() &&
          struct_tag==class_identifier)
       {
-        // make null
-        null_pointer_exprt null_pointer_expr(pointer_type);
-        code_assignt code(expr, null_pointer_expr);
-        code.add_source_location()=loc;
-        init_code.copy_to_operands(code);
-
+        set_null(expr, pointer_type, loc);
         return;
       }
     }
 
-    code_labelt set_null_label;
-    code_labelt init_done_label;
+    nondet_ifthenelset init_null_diamond(
+      init_code,
+      symbol_table,
+      loc,
+      ID_java,
+      "nondet_ptr_is_null");
 
     if(!assume_non_null)
     {
-      auto set_null_inst=
-        code_assignt(expr, null_pointer_exprt(pointer_type));
-      set_null_inst.add_source_location()=loc;
-
-      static size_t synthetic_constructor_count=0;
-      std::string fresh_label=
-        "post_synthetic_malloc_"+std::to_string(++synthetic_constructor_count);
-      set_null_label=code_labelt(fresh_label, set_null_inst);
-
-      init_done_label=code_labelt(fresh_label+"_init_done", code_skipt());
-
-      code_ifthenelset null_check;
-      exprt null_return=from_integer(0, c_bool_typet(1));
-      null_check.cond()=
-        notequal_exprt(get_nondet_bool(c_bool_typet(1)), null_return);
-      null_check.then_case()=code_gotot(fresh_label);
-      init_code.move_to_operands(null_check);
+      init_null_diamond.begin_if();
+      set_null(expr, pointer_type, loc);
+      init_null_diamond.begin_else();
     }
 
-    if(java_is_array_type(subtype))
-      gen_nondet_array_init(expr, loc);
-    else
-    {
-      exprt allocated=
-        allocate_object(expr, subtype, loc, create_dynamic_objects);
-      exprt init_expr;
-      if(allocated.id()==ID_address_of)
-        init_expr=allocated.op0();
-      else
-        init_expr=dereference_exprt(allocated, allocated.type().subtype());
-      gen_nondet_init(
-        init_expr,
-        false,
-        "",
-        loc,
-        create_dynamic_objects);
-    }
+    gen_pointer_target_init(
+      expr,
+      subtype,
+      create_dynamic_objects,
+      loc);
 
     if(!assume_non_null)
-    {
-      init_code.copy_to_operands(code_gotot(init_done_label.get_label()));
-      init_code.move_to_operands(set_null_label);
-      init_code.move_to_operands(init_done_label);
-    }
+      init_null_diamond.finish();
   }
   else if(type.id()==ID_struct)
   {
