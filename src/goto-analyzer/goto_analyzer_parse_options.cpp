@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
@@ -387,7 +388,9 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_function_pointers(goto_model, cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
-    // Java instanceof -> clsid comparison:
+    // remove Java throw and catch
+    remove_exceptions(goto_model);
+    // remove rtti
     remove_instanceof(goto_model);
 
     // do partial inlining

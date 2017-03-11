@@ -738,6 +738,7 @@ java_bytecode_index
 java_instanceof
 java_super_method_call
 java_enum_static_unwind
+push_catch
 string_constraint
 string_not_contains_constraint
 cprover_char_literal_func
