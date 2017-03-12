@@ -13,8 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 const char *irep_ids_table[]=
 {
-  #include "irep_ids.inc"
-  NULL
+#define IREP_ID_ONE(id) #id,
+#define IREP_ID_TWO(id, str) #str,
+
+#include "irep_ids.def"
+
+  NULL,
 };
 
 /*******************************************************************\
