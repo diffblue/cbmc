@@ -11,7 +11,7 @@ Author: Reuben Thomas, reuben.thomas@me.com
 
 #include "dstring.h"
 
-enum class idt:unsigned short
+enum class idt:unsigned
 {
 #define IREP_ID_ONE(the_id) id_##the_id,
 #define IREP_ID_TWO(the_id, str) id_##the_id,
@@ -22,11 +22,9 @@ enum class idt:unsigned short
 #ifdef USE_DSTRING
 
 #define IREP_ID_ONE(the_id)                                                    \
-  static const dstringt ID_##the_id(                                           \
-      static_cast<unsigned short>(idt::id_##the_id), 0);
+  static const dstringt ID_##the_id(static_cast<unsigned>(idt::id_##the_id));
 #define IREP_ID_TWO(the_id, str)                                               \
-  static const dstringt ID_##the_id(                                           \
-      static_cast<unsigned short>(idt::id_##the_id), 0);
+  static const dstringt ID_##the_id(static_cast<unsigned>(idt::id_##the_id));
 
 #else
 
