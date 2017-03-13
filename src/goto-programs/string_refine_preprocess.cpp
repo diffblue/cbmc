@@ -243,7 +243,6 @@ void string_refine_preprocesst::get_data_and_length_type_of_string(
   assert(is_java_string_type(expr.type()) ||
          is_java_string_builder_type(expr.type()));
   typet object_type=ns.follow(expr.type());
-  assert(object_type.id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(object_type);
   for(auto component : struct_type.components())
     if(component.get_name()=="length")
