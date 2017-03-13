@@ -303,7 +303,8 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
       std::list<code_assignt> assignments;
       assignments.emplace_back(array_lhs, deref_data);
       assignments.emplace_back(lhs, new_rhs);
-      insert_assignments(goto_program, target, target->function, location, assignments);
+      insert_assignments(
+        goto_program, target, target->function, location, assignments);
       target=goto_program.insert_after(target);
       pair.first->second=lhs;
     }
@@ -548,7 +549,8 @@ void string_refine_preprocesst::make_string_copy(
     tmp_data, dereference_exprt(rhs_data, data_type.subtype()));
   assignments.emplace_back(lhs_data, address_of_exprt(tmp_data));
 
-  insert_assignments(goto_program, target, target->function, location, assignments);
+  insert_assignments(
+    goto_program, target, target->function, location, assignments);
 }
 
 /*******************************************************************\
@@ -771,8 +773,9 @@ void string_refine_preprocesst::make_to_char_array_function(
   exprt rhs_length=get_length(deref, length_type);
   exprt lhs_length=get_length(deref_lhs, length_type);
   assignments.emplace_back(lhs_length, rhs_length);
+  source_locationt location=target->source_location;
   insert_assignments(
-    goto_program, target, target->function, target->source_location, assignments);
+    goto_program, target, target->function, location, assignments);
 }
 
 /*******************************************************************\
@@ -816,7 +819,8 @@ exprt string_refine_preprocesst::make_cprover_char_array_assign(
   std::list<code_assignt> assignments;
   assignments.emplace_back(array_lhs, array_rhs);
   assignments.emplace_back(lhs, new_rhs);
-  insert_assignments(goto_program, target, target->function, location, assignments);
+  insert_assignments(
+    goto_program, target, target->function, location, assignments);
   target=goto_program.insert_after(target);
   return lhs;
 }
@@ -981,7 +985,8 @@ exprt::operandst string_refine_preprocesst::process_arguments(
         if(!is_java_string_type(arg.type()))
           arg=typecast_exprt(arg, jls_ptr);
       }
-      exprt arg2=make_cprover_string_assign(goto_program, target, arg, location);
+      exprt arg2=make_cprover_string_assign(
+        goto_program, target, arg, location);
       new_arguments.push_back(arg2);
     }
   }
@@ -1058,7 +1063,8 @@ void string_refine_preprocesst::replace_string_calls(
 
         it=string_function_calls.find(function_id);
         if(it!=string_function_calls.end())
-          make_string_function_call(goto_program, target, it->second, signature);
+          make_string_function_call(
+            goto_program, target, it->second, signature);
 
         it=string_of_char_array_functions.find(function_id);
         if(it!=string_of_char_array_functions.end())
