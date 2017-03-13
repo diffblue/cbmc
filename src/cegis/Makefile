@@ -116,7 +116,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cbmc/cbmc_dimacs$(OBJEXT) ../cbmc/all_properties$(OBJEXT) \
       ../cbmc/fault_localization$(OBJEXT) \
       ../cbmc/symex_coverage$(OBJEXT) \
-      ../miniz/miniz$(OBJEXT)
+      ../miniz/miniz$(OBJEXT) \
+      ../json/json$(LIBEXT)
 
 INCLUDES= -I ..
 

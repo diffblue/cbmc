@@ -98,7 +98,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
       debug() << "Getting class `" << class_name << "' from JAR "
               << jf << eom;
 
-      std::string data=jar_pool(jf).get_entry(jm_it->second.index);
+      std::string data=jar_pool(jf).get_entry(jm_it->second.class_file_name);
 
       std::istringstream istream(data);
 
@@ -129,7 +129,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
         debug() << "Getting class `" << class_name << "' from JAR "
                 << cp << eom;
 
-        std::string data=jar_pool(cp).get_entry(jm_it->second.index);
+        std::string data=jar_pool(cp).get_entry(jm_it->second.class_file_name);
 
         std::istringstream istream(data);
 
@@ -223,11 +223,10 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
   debug() << "adding JAR file `" << file << "'" << eom;
 
   auto &jm=jar_map[file];
-  std::size_t number_of_files=jar_file.index.size();
 
-  for(std::size_t i=0; i<number_of_files; i++)
+  for(auto &jar_entry : jar_file.filtered_jar)
   {
-    std::string file_name=jar_file.index[i];
+    std::string file_name=id2string(jar_entry.first);
 
     // does it end on .class?
     if(has_suffix(file_name, ".class"))
@@ -235,7 +234,7 @@ void java_class_loadert::read_jar_file(const irep_idt &file)
       irep_idt class_name=file_to_class_name(file_name);
 
       // record
-      jm.entries[class_name].index=i;
+      jm.entries[class_name].class_file_name=file_name;
     }
   }
 }
