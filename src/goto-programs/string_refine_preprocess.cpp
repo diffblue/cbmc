@@ -303,7 +303,7 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
       std::list<code_assignt> assignments;
       assignments.emplace_back(array_lhs, deref_data);
       assignments.emplace_back(lhs, new_rhs);
-      insert_assignments(goto_program, target, assignments);
+      insert_assignments(goto_program, target, target->function, location, assignments);
       target=goto_program.insert_after(target);
       pair.first->second=lhs;
     }
@@ -382,6 +382,8 @@ Function: string_refine_preprocesst::insert_assignments
 void string_refine_preprocesst::insert_assignments(
   goto_programt &goto_program,
   goto_programt::targett &target,
+  const irep_idt &function,
+  const source_locationt &location,
   const std::list<code_assignt> &va)
 {
   if(va.empty())
@@ -390,11 +392,15 @@ void string_refine_preprocesst::insert_assignments(
   auto i=va.begin();
   target->make_assignment();
   target->code=*i;
+  target->function=function;
+  target->source_location=location;
   for(i++; i!=va.end(); i++)
   {
     target=goto_program.insert_after(target);
     target->make_assignment();
     target->code=*i;
+    target->function=function;
+    target->source_location=location;
   }
 }
 
@@ -466,7 +472,7 @@ void string_refine_preprocesst::make_string_assign(
   assigns.emplace_back(lhs_length, tmp_length);
   assigns.emplace_back(tmp_array, rhs_data);
   assigns.emplace_back(lhs_data, address_of_exprt(tmp_array));
-  insert_assignments(goto_program, target, assigns);
+  insert_assignments(goto_program, target, target->function, location, assigns);
 }
 
 /*******************************************************************\
@@ -546,7 +552,7 @@ void string_refine_preprocesst::make_string_copy(
     tmp_data, dereference_exprt(rhs_data, data_type.subtype()));
   assignments.emplace_back(lhs_data, address_of_exprt(tmp_data));
 
-  insert_assignments(goto_program, target, assignments);
+  insert_assignments(goto_program, target, target->function, location, assignments);
 }
 
 /*******************************************************************\
@@ -769,7 +775,8 @@ void string_refine_preprocesst::make_to_char_array_function(
   exprt rhs_length=get_length(deref, length_type);
   exprt lhs_length=get_length(deref_lhs, length_type);
   assignments.emplace_back(lhs_length, rhs_length);
-  insert_assignments(goto_program, target, assignments);
+  insert_assignments(
+    goto_program, target, target->function, target->source_location, assignments);
 }
 
 /*******************************************************************\
@@ -813,7 +820,7 @@ exprt string_refine_preprocesst::make_cprover_char_array_assign(
   std::list<code_assignt> assignments;
   assignments.emplace_back(array_lhs, array_rhs);
   assignments.emplace_back(lhs, new_rhs);
-  insert_assignments(goto_program, target, assignments);
+  insert_assignments(goto_program, target, target->function, location, assignments);
   target=goto_program.insert_after(target);
   return lhs;
 }
@@ -1377,11 +1384,11 @@ string_refine_preprocesst::string_refine_preprocesst(
   goto_functionst &_goto_functions,
   message_handlert &_message_handler):
     messaget(_message_handler),
-    symbol_table(_symbol_table),
     ns(_symbol_table),
+    symbol_table(_symbol_table),
     goto_functions(_goto_functions),
-    jls_ptr(symbol_typet("java::java.lang.String")),
-    next_symbol_id(0)
+    next_symbol_id(0),
+    jls_ptr(symbol_typet("java::java.lang.String"))
 {
   initialize_string_function_table();
   Forall_goto_functions(it, goto_functions)
