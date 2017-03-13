@@ -63,11 +63,52 @@ void symex_bmct::symex_step(
     last_source_location=source_location;
   }
 
-  if(record_coverage &&
-     !state.guard.is_false())
-    symex_coverage.covered(state.source.pc);
+  const goto_programt::const_targett cur_pc=state.source.pc;
 
   goto_symext::symex_step(goto_functions, state);
+
+  if(record_coverage &&
+     // is the instruction being executed
+     !state.guard.is_false() &&
+     // avoid an invalid iterator in state.source.pc
+     (!cur_pc->is_end_function() ||
+      cur_pc->function!=ID__start) &&
+     // ignore transition to next instruction when goto points elsewhere
+     (!cur_pc->is_goto() ||
+      cur_pc->get_target()==state.source.pc ||
+      !cur_pc->guard.is_true()))
+    symex_coverage.covered(cur_pc, state.source.pc);
+}
+
+/*******************************************************************\
+
+Function: symex_bmct::merge_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void symex_bmct::merge_goto(
+  const statet::goto_statet &goto_state,
+  statet &state)
+{
+  const goto_programt::const_targett prev_pc=goto_state.source.pc;
+  const guardt prev_guard=goto_state.guard;
+
+  goto_symext::merge_goto(goto_state, state);
+
+  assert(prev_pc->is_goto());
+  if(record_coverage &&
+     // could the branch possibly be taken?
+     !prev_guard.is_false() &&
+     !state.guard.is_false() &&
+     // branches only, no single-successor goto
+     !prev_pc->guard.is_true())
+    symex_coverage.covered(prev_pc, state.source.pc);
 }
 
 /*******************************************************************\
