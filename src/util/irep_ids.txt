@@ -511,6 +511,9 @@ overflow_mult overflow-*
 overflow_unary_minus overflow-unary-
 object_descriptor
 dynamic_object
+is_most_recent_allocation
+most_recent_allocation
+any_allocation
 object_size
 good_pointer
 integer_address
