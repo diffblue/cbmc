@@ -351,82 +351,24 @@ void language_uit::show_symbol_table_plain(
 
 /*******************************************************************\
 
-Function: language_uit::list_extended_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void language_uit::list_extended_symbols(
-  const namespacet ns,
-  const std::string symbol,
-  const typet type,
-  std::unique_ptr<languaget> &p,
-  std::ostream &out)
-{
-  if (type.id()==ID_array)
-  {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    mp_integer mp_count;
-    to_integer(size_expr, mp_count);
-    unsigned count=integer2unsigned(mp_count);
-    for(unsigned int i=0;i<count;i++)
-    {
-      std::stringstream buffer;
-      buffer << symbol << "[" << i << "]";
-      list_extended_symbols(ns,buffer.str(),ns.follow(type.subtype()),p,out);
-    }
-  }
-  else if (type.id()==ID_struct)
-  {
-    const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=struct_type.components();
-    for(struct_typet::componentst::const_iterator it=components.begin();
-	          it!=components.end();++it)
-	  {
-      std::stringstream buffer;
-      buffer << symbol << "." << it->get_name();
-      list_extended_symbols(ns,buffer.str(),ns.follow(it->type()),p,out);
-	  }
-  }
-  else 
-  {
-    std::string type_str;
-    p->from_type(type, type_str, ns);
-    out << "{&" << symbol << "," << type_str << "};" << std::endl;
-  }
-}
-
-
-
-/*******************************************************************\
-
 Function: language_uit::build_array_from_static_symbol_table
 
-  Inputs:
+  Inputs: out - maps variable names to types
+ 
+ Outputs: N/A
 
- Outputs:
-
- Purpose:
+ Purpose: builds a list of static variables and maps them to types
 
 \*******************************************************************/
-unsigned language_uit::build_array_from_static_symbol_table(
-    std::ostream &address_out, 
-    std::ostream &type_out)
+void language_uit::build_array_from_static_symbol_table(
+    std::map<std::string, std::string>& out)
 {
-  unsigned count = 0;
-  std::stringstream types;
-  std::stringstream addresses;
   const namespacet ns(symbol_table);
 
   std::set<std::string> symbols;
   forall_symbols(it, symbol_table.symbols)
     symbols.insert(id2string(it->first));
- 
+
   for(const std::string &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
@@ -439,7 +381,7 @@ unsigned language_uit::build_array_from_static_symbol_table(
       if(ptr == nullptr) 
         throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
-  
+
     std::unique_ptr<languaget> p(ptr);
     std::string type_str;
     std::string value_str;
@@ -449,53 +391,36 @@ unsigned language_uit::build_array_from_static_symbol_table(
 
     if(symbol.value.is_not_nil())
       p->from_expr(symbol.value, value_str, ns);
-  
+
     if((symbol.is_static_lifetime) && (!symbol.location.is_built_in()))
     {
       const typet type = ns.follow(symbol.type);
-    	std::stringstream buffer;
-    	buffer << symbol.base_name;
-      build_entry(ns,type,p,buffer.str(),addresses,types,count);
+      std::stringstream buffer;
+      buffer << symbol.base_name;
+      build_entry(ns,type,p,buffer.str(),out);
     }
-    continue;
   }
-  if(count > 0)
-  {
-    address_out << "void* __input_addresses[] = {" 
-                  << addresses.str()
-                  << "};";
-    type_out << "int __input_type[] = {"
-                 << types.str()
-                 << "};";
-  }
-  else
-  {
-    address_out << "static void* __input_addresses = 0;";
-    type_out  << "static int* __input_type = 0;";
-  }
-  return count;
 }
 
 /*******************************************************************\
 
 Function: language_uit::build_entry
 
-  Inputs:
+  Inputs: 
 
- Outputs:
+ Outputs: N/A
 
- Purpose:
+ Purpose: Retrieves the names and types of static variable
+          Recursively handles arrays and structures
 
 \*******************************************************************/
 void language_uit::build_entry(const namespacet ns,
     const typet type, 
     std::unique_ptr<languaget> &p,
     const std::string name, 
-    std::ostream &addresses,
-    std::ostream &types,
-    unsigned &count)
+    std::map<std::string,std::string> &out)
 {
-  if (type.id() == ID_array)
+  if(type.id() == ID_array)
   {
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
     mp_integer mp_count;
@@ -505,11 +430,10 @@ void language_uit::build_entry(const namespacet ns,
     {
       std::stringstream buffer;
       buffer << name  << "[" << i << "]";
-      build_entry(ns,ns.follow(type.subtype()),p,
-          buffer.str(),addresses,types,count);
+      build_entry(ns,ns.follow(type.subtype()),p,buffer.str(),out);
     }
   }
-  else if (type.id() == ID_struct)
+  else if(type.id() == ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=struct_type.components();
@@ -518,34 +442,13 @@ void language_uit::build_entry(const namespacet ns,
     {
       std::stringstream buffer;
       buffer << name << "." << it->get_name();
-      build_entry(ns,ns.follow(type.subtype()),p,
-          buffer.str(),addresses,types,count);
+      build_entry(ns,ns.follow(type.subtype()),p,buffer.str(),out);
     }
   }
   else
   {
-    if(name == "argc")
-      return;
     std::string type_str;
     p->from_type(type, type_str, ns);
-    if(count != 0)
-    {
-      types << ",";
-      addresses << ",";
-    }
-    addresses << "&" << name;
-    static const std::unordered_map<std::string,unsigned> type_map 
-      = {{"unsigned int",0},{"signed int",1},
-         {"char",2},{"unsigned long int", 3},{"signed long long int",4},
-         {"unsigned long long int",5},{"float",6},{"double",7},
-         {"signed char",2},{"unsigned char",8},{"signed short int",9},
-         {"unsigned short int",10},{"signed long int",11}};
-    auto it = type_map.find(type_str);
-    if(it == type_map.end())
-      //used for debugging.
-      types << type_str;
-    else
-      types << it->second;
-    count += 1;
+    out.insert({name,type_str});
   }
 }

@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table.h>
 #include <util/ui_message.h>
 #include <util/namespace.h>
+#include <map>
+#include <string>
 #include <memory>
 
 class cmdlinet;
@@ -42,19 +44,15 @@ public:
   virtual void show_symbol_table(bool brief=false);
   virtual void show_symbol_table_plain(std::ostream &out, bool brief);
   virtual void show_symbol_table_xml_ui(bool brief);
-  virtual unsigned build_array_from_static_symbol_table(                         
-         std::ostream &address_out,std::ostream &type_out);   
-
-  virtual void build_entry(const namespacet ns,
-      typet type, 
+  
+  virtual void build_array_from_static_symbol_table(
+      std::map<std::string,std::string>& out);
+  virtual void build_entry(
+      const namespacet ns,
+      const typet type,
       std::unique_ptr<languaget> &p,
-      const std::string name, 
-      std::ostream &addresses,
-      std::ostream &types,
-      unsigned &count);
-
-  void list_extended_symbols(const namespacet ns,const std::string symbol,
-    const typet type,std::unique_ptr<languaget> &p,std::ostream &out);
+      const std::string name,
+      std::map<std::string, std::string>& out);
 
   typedef ui_message_handlert::uit uit;
 
