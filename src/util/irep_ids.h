@@ -22,9 +22,11 @@ enum class idt:unsigned
 #ifdef USE_DSTRING
 
 #define IREP_ID_ONE(the_id)                                                    \
-  static const dstringt ID_##the_id(static_cast<unsigned>(idt::id_##the_id));
+  static const dstringt ID_##the_id=                                           \
+    dstringt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
 #define IREP_ID_TWO(the_id, str)                                               \
-  static const dstringt ID_##the_id(static_cast<unsigned>(idt::id_##the_id));
+  static const dstringt ID_##the_id=                                           \
+    dstringt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
 
 #else
 
@@ -35,6 +37,6 @@ enum class idt:unsigned
 
 #endif
 
-#include "irep_ids.def"
+#include "irep_ids.def" // NOLINT(build/include)
 
 #endif

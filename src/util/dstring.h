@@ -27,12 +27,12 @@ public:
   }
 
   // this is safe for static objects
-  // marked explicit to avoid accidental conversions
   #ifdef __GNUC__
   constexpr
   #endif
-  explicit dstringt(unsigned _no):no(_no)
+  static dstringt make_from_table_index(unsigned no)
   {
+    return dstringt(no);
   }
 
   #if 0
@@ -138,6 +138,13 @@ public:
   }
 
 private:
+  #ifdef __GNUC__
+  constexpr
+  #endif
+  explicit dstringt(unsigned _no):no(_no)
+  {
+  }
+
   unsigned no;
 
   // the reference returned is guaranteed to be stable
