@@ -244,7 +244,7 @@ void string_refine_preprocesst::get_data_and_length_type_of_string(
          is_java_string_builder_type(expr.type()));
   typet object_type=ns.follow(expr.type());
   const struct_typet &struct_type=to_struct_type(object_type);
-  for(auto component : struct_type.components())
+  for(const auto &component : struct_type.components())
     if(component.get_name()=="length")
       length_type=component.type();
     else if(component.get_name()=="data")
