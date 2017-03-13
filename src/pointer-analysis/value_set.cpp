@@ -195,6 +195,16 @@ void value_sett::output(
       else
       {
         result="<"+from_expr(ns, identifier, o)+", ";
+        if(o.id()==ID_dynamic_object)
+        {
+          dynamic_object_exprt::recencyt recency=
+            to_dynamic_object_expr(o).get_recency();
+
+          if(recency==dynamic_object_exprt::recencyt::MOST_RECENT_ALLOCATION)
+            result+=as_string(ID_most_recent_allocation)+", ";
+          else if(recency==dynamic_object_exprt::recencyt::ANY_ALLOCATION)
+            result+=as_string(ID_any_allocation)+", ";
+        }
 
         if(o_it->second.offset_is_set)
           result+=integer2string(o_it->second.offset)+"";

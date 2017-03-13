@@ -1490,6 +1490,8 @@ inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
 class dynamic_object_exprt:public exprt
 {
 public:
+  enum recencyt { MOST_RECENT_ALLOCATION, ANY_ALLOCATION, RECENCY_UNSET };
+
   dynamic_object_exprt():exprt(ID_dynamic_object)
   {
     operands().resize(2);
@@ -1503,6 +1505,40 @@ public:
     operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
+  }
+
+  explicit dynamic_object_exprt(bool recent):
+    exprt(ID_dynamic_object)
+  {
+    operands().resize(2);
+    op0().id(ID_unknown);
+    op1().id(ID_unknown);
+    set_recency(recent);
+  }
+
+  dynamic_object_exprt(const typet &type, bool recent):
+    exprt(ID_dynamic_object, type)
+  {
+    operands().resize(2);
+    op0().id(ID_unknown);
+    op1().id(ID_unknown);
+    set_recency(recent);
+  }
+
+  recencyt get_recency() const
+  {
+    if(get(ID_is_most_recent_allocation)==ID_most_recent_allocation)
+      return MOST_RECENT_ALLOCATION;
+    else if(get(ID_is_most_recent_allocation)==ID_any_allocation)
+      return ANY_ALLOCATION;
+    else
+      return RECENCY_UNSET;
+  }
+
+  void set_recency(bool recent)
+  {
+    set(ID_is_most_recent_allocation,
+      (recent ? ID_most_recent_allocation : ID_any_allocation));
   }
 
   exprt &instance()
