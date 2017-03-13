@@ -26,22 +26,25 @@ class string_refine_preprocesst:public messaget
   symbol_tablet & symbol_table;
   goto_functionst & goto_functions;
 
+  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
+  typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
+
   // String builders maps the different names of a same StringBuilder object
   // to a unique expression.
-  std::unordered_map<exprt, exprt> string_builders;
+  expr_mapt string_builders;
 
   // Map name of Java string functions to there equivalent in the solver
-  std::unordered_map<irep_idt, irep_idt> side_effect_functions;
-  std::unordered_map<irep_idt, irep_idt> string_functions;
-  std::unordered_map<irep_idt, irep_idt> c_string_functions;
-  std::unordered_map<irep_idt, irep_idt> string_function_calls;
-  std::unordered_map<irep_idt, irep_idt> string_of_char_array_functions;
-  std::unordered_map<irep_idt, irep_idt> string_of_char_array_function_calls;
-  std::unordered_map<irep_idt, irep_idt> side_effect_char_array_functions;
+  id_mapt side_effect_functions;
+  id_mapt string_functions;
+  id_mapt c_string_functions;
+  id_mapt string_function_calls;
+  id_mapt string_of_char_array_functions;
+  id_mapt string_of_char_array_function_calls;
+  id_mapt side_effect_char_array_functions;
 
-  std::unordered_map<irep_idt, std::string> signatures;
-  std::unordered_map<exprt, exprt> hidden_strings;
-  std::unordered_map<exprt, exprt> java_to_cprover_strings;
+  std::unordered_map<irep_idt, std::string, irep_id_hash> signatures;
+  expr_mapt hidden_strings;
+  expr_mapt java_to_cprover_strings;
 
   // unique id for each newly created symbols
   int next_symbol_id;
@@ -84,6 +87,8 @@ class string_refine_preprocesst:public messaget
   void insert_assignments(
     goto_programt &goto_program,
     goto_programt::targett &target,
+    const irep_idt &function,
+    const source_locationt &location,
     const std::list<code_assignt> &va);
 
   exprt replace_string_pointer(const exprt &in);
