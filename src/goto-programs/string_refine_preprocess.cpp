@@ -456,11 +456,7 @@ void string_refine_preprocesst::make_string_assign(
   member_exprt lhs_data(deref, "data", tmp_array.type());
 
   // lhs=malloc(String *)
-
-  if(object_size.is_nil())
-    debug() << "string_refine_preprocesst::make_string_assign "
-            << "got nil object_size" << eom;
-
+  assert(object_size.is_not_nil()); // got nil object_size
   side_effect_exprt malloc_expr(ID_malloc);
   malloc_expr.copy_to_operands(object_size);
   malloc_expr.type()=pointer_typet(object_type);
