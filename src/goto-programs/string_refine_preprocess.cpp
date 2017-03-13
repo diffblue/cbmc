@@ -382,8 +382,8 @@ Function: string_refine_preprocesst::insert_assignments
 void string_refine_preprocesst::insert_assignments(
   goto_programt &goto_program,
   goto_programt::targett &target,
-  const irep_idt &function,
-  const source_locationt &location,
+  irep_idt function,
+  source_locationt location,
   const std::list<code_assignt> &va)
 {
   if(va.empty())
@@ -693,7 +693,7 @@ void string_refine_preprocesst::make_string_function_side_effect(
   const irep_idt &function_name,
   const std::string &signature)
 {
-  const code_function_callt &function_call=to_code_function_call(target->code);
+  const code_function_callt function_call=to_code_function_call(target->code);
   string_builders[function_call.lhs()]=function_call.arguments()[0];
   make_string_function(
     goto_program, target, function_name, signature, true, false);
