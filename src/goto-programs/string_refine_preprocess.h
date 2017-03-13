@@ -87,8 +87,8 @@ class string_refine_preprocesst:public messaget
   void insert_assignments(
     goto_programt &goto_program,
     goto_programt::targett &target,
-    const irep_idt &function,
-    const source_locationt &location,
+    irep_idt function,
+    source_locationt location,
     const std::list<code_assignt> &va);
 
   exprt replace_string_pointer(const exprt &in);
