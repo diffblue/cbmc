@@ -83,7 +83,7 @@ class string_refine_preprocesst:public messaget
 
   void insert_assignments(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const std::list<code_assignt> &va);
 
   exprt replace_string_pointer(const exprt &in);
@@ -92,7 +92,7 @@ class string_refine_preprocesst:public messaget
   // assignments for strings as string_exprt
   exprt::operandst process_arguments(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt::operandst &arguments,
     const source_locationt &location,
     const std::string &signature="");
@@ -114,7 +114,7 @@ class string_refine_preprocesst:public messaget
 
   void make_normal_assign(
     goto_programt &goto_program,
-    goto_programt::targett i_it,
+    goto_programt::targett target,
     const exprt &lhs,
     const code_typet &function_type,
     const irep_idt &function_name,
@@ -124,7 +124,7 @@ class string_refine_preprocesst:public messaget
 
   void make_string_assign(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &lhs,
     const code_typet &function_type,
     const irep_idt &function_name,
@@ -134,7 +134,7 @@ class string_refine_preprocesst:public messaget
 
   void make_assign(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &lhs,
     const code_typet &function_type,
     const irep_idt &function_name,
@@ -144,20 +144,20 @@ class string_refine_preprocesst:public messaget
 
   exprt make_cprover_string_assign(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &rhs,
     const source_locationt &location);
 
   void make_string_copy(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &lhs,
     const exprt &argument,
     const source_locationt &location);
 
   void make_string_function(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature,
     bool assign_first_arg=false,
@@ -165,7 +165,7 @@ class string_refine_preprocesst:public messaget
 
   void make_string_function(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &lhs,
     const code_typet &function_type,
     const irep_idt &function_name,
@@ -175,13 +175,13 @@ class string_refine_preprocesst:public messaget
 
   void make_string_function_call(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature);
 
   void make_string_function_side_effect(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature);
 
@@ -190,13 +190,13 @@ class string_refine_preprocesst:public messaget
 
   exprt make_cprover_char_array_assign(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const exprt &rhs,
     const source_locationt &location);
 
   void make_char_array_function(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature,
     std::size_t index,
@@ -205,13 +205,13 @@ class string_refine_preprocesst:public messaget
 
   void make_char_array_function_call(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature);
 
   void make_char_array_side_effect(
     goto_programt &goto_program,
-    goto_programt::targett &i_it,
+    goto_programt::targett &target,
     const irep_idt &function_name,
     const std::string &signature);
 

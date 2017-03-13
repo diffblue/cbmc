@@ -268,7 +268,7 @@ Function: string_refine_preprocesst::make_cprover_string_assign
 
 exprt string_refine_preprocesst::make_cprover_string_assign(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &rhs,
   const source_locationt &location)
 {
@@ -303,8 +303,8 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
       std::list<code_assignt> assignments;
       assignments.emplace_back(array_lhs, deref_data);
       assignments.emplace_back(lhs, new_rhs);
-      insert_assignments(goto_program, i_it, assignments);
-      i_it=goto_program.insert_after(i_it);
+      insert_assignments(goto_program, target, assignments);
+      target=goto_program.insert_after(target);
       pair.first->second=lhs;
     }
     return pair.first->second;
@@ -313,7 +313,7 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
           is_java_string_pointer_type(rhs.op0().type()))
   {
     exprt new_rhs=make_cprover_string_assign(
-      goto_program, i_it, rhs.op0(), location);
+      goto_program, target, rhs.op0(), location);
     return typecast_exprt(new_rhs, rhs.type());
   }
   else
@@ -338,7 +338,7 @@ Function: string_refine_preprocesst::make_normal_assign
 
 void string_refine_preprocesst::make_normal_assign(
   goto_programt &goto_program,
-  goto_programt::targett i_it,
+  goto_programt::targett target,
   const exprt &lhs,
   const code_typet &function_type,
   const irep_idt &function_name,
@@ -349,7 +349,7 @@ void string_refine_preprocesst::make_normal_assign(
   if(function_name==ID_cprover_string_copy_func)
   {
     assert(arguments.size()>0);
-    make_string_copy(goto_program, i_it, lhs, arguments[0], location);
+    make_string_copy(goto_program, target, lhs, arguments[0], location);
   }
   else
   {
@@ -359,13 +359,13 @@ void string_refine_preprocesst::make_normal_assign(
     declare_function(function_name, function_type);
 
     exprt::operandst processed_arguments=process_arguments(
-      goto_program, i_it, arguments, location, signature);
+      goto_program, target, arguments, location, signature);
     rhs.arguments()=processed_arguments;
 
     code_assignt assignment(lhs, rhs);
     assignment.add_source_location()=location;
-    i_it->make_assignment();
-    i_it->code=assignment;
+    target->make_assignment();
+    target->code=assignment;
   }
 }
 
@@ -381,20 +381,20 @@ Function: string_refine_preprocesst::insert_assignments
 
 void string_refine_preprocesst::insert_assignments(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const std::list<code_assignt> &va)
 {
   if(va.empty())
     return;
 
   auto i=va.begin();
-  i_it->make_assignment();
-  i_it->code=*i;
+  target->make_assignment();
+  target->code=*i;
   for(i++; i!=va.end(); i++)
   {
-    i_it=goto_program.insert_after(i_it);
-    i_it->make_assignment();
-    i_it->code=*i;
+    target=goto_program.insert_after(target);
+    target->make_assignment();
+    target->code=*i;
   }
 }
 
@@ -416,7 +416,7 @@ Function: string_refine_preprocesst::make_string_assign
 
 void string_refine_preprocesst::make_string_assign(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &lhs,
   const code_typet &function_type,
   const irep_idt &function_name,
@@ -440,7 +440,7 @@ void string_refine_preprocesst::make_string_assign(
     symbol_exprt(fnamed), data_type.subtype());
 
   exprt::operandst processed_arguments=process_arguments(
-    goto_program, i_it, arguments, location, signature);
+    goto_program, target, arguments, location, signature);
   rhs_length.arguments()=processed_arguments;
   rhs_data.arguments()=processed_arguments;
 
@@ -466,7 +466,7 @@ void string_refine_preprocesst::make_string_assign(
   assigns.emplace_back(lhs_length, tmp_length);
   assigns.emplace_back(tmp_array, rhs_data);
   assigns.emplace_back(lhs_data, address_of_exprt(tmp_array));
-  insert_assignments(goto_program, i_it, assigns);
+  insert_assignments(goto_program, target, assigns);
 }
 
 /*******************************************************************\
@@ -485,7 +485,7 @@ Function: string_refine_preprocesst::make_assign
 
 void string_refine_preprocesst::make_assign(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &lhs,
   const code_typet &function_type,
   const irep_idt &function_name,
@@ -495,10 +495,10 @@ void string_refine_preprocesst::make_assign(
 {
   if(is_java_string_pointer_type(function_type.return_type()))
     make_string_assign(
-      goto_program, i_it, lhs, function_type, function_name, arg, loc, sig);
+      goto_program, target, lhs, function_type, function_name, arg, loc, sig);
   else
     make_normal_assign(
-      goto_program, i_it, lhs, function_type, function_name, arg, loc, sig);
+      goto_program, target, lhs, function_type, function_name, arg, loc, sig);
 }
 
 /*******************************************************************\
@@ -519,7 +519,7 @@ Function: string_refine_preprocesst::make_string_copy
 
 void string_refine_preprocesst::make_string_copy(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &lhs,
   const exprt &argument,
   const source_locationt &location)
@@ -546,7 +546,7 @@ void string_refine_preprocesst::make_string_copy(
     tmp_data, dereference_exprt(rhs_data, data_type.subtype()));
   assignments.emplace_back(lhs_data, address_of_exprt(tmp_data));
 
-  insert_assignments(goto_program, i_it, assignments);
+  insert_assignments(goto_program, target, assignments);
 }
 
 /*******************************************************************\
@@ -563,7 +563,7 @@ Function: string_refine_preprocesst::make_string_function
 
 void string_refine_preprocesst::make_string_function(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &lhs,
   const code_typet &function_type,
   const irep_idt &function_name,
@@ -574,7 +574,7 @@ void string_refine_preprocesst::make_string_function(
   if(is_java_string_pointer_type(function_type.return_type()))
     make_string_assign(
       goto_program,
-      i_it,
+      target,
       lhs,
       function_type,
       function_name,
@@ -584,7 +584,7 @@ void string_refine_preprocesst::make_string_function(
   else
     make_normal_assign(
       goto_program,
-      i_it,
+      target,
       lhs,
       function_type,
       function_name,
@@ -610,13 +610,13 @@ Function: string_refine_preprocesst::make_string_function
 
 void string_refine_preprocesst::make_string_function(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature,
   bool assign_first_arg,
   bool skip_first_arg)
 {
-  code_function_callt &function_call=to_code_function_call(i_it->code);
+  code_function_callt &function_call=to_code_function_call(target->code);
   code_typet function_type=to_code_type(function_call.function().type());
   code_typet new_type;
   const source_locationt &loc=function_call.source_location();
@@ -649,7 +649,7 @@ void string_refine_preprocesst::make_string_function(
   new_type.return_type()=lhs.type();
 
   make_string_function(
-    goto_program, i_it, lhs, new_type, function_name, args, loc, signature);
+    goto_program, target, lhs, new_type, function_name, args, loc, signature);
 }
 
 /*******************************************************************\
@@ -665,12 +665,12 @@ Function: string_refine_preprocesst::make_string_function_call
 
 void string_refine_preprocesst::make_string_function_call(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature)
 {
   make_string_function(
-    goto_program, i_it, function_name, signature, true, true);
+    goto_program, target, function_name, signature, true, true);
 }
 
 /*******************************************************************\
@@ -687,14 +687,14 @@ Function: string_refine_preprocesst::make_string_function_side_effect
 
 void string_refine_preprocesst::make_string_function_side_effect(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature)
 {
-  const code_function_callt &function_call=to_code_function_call(i_it->code);
+  const code_function_callt &function_call=to_code_function_call(target->code);
   string_builders[function_call.lhs()]=function_call.arguments()[0];
   make_string_function(
-    goto_program, i_it, function_name, signature, true, false);
+    goto_program, target, function_name, signature, true, false);
 }
 
 /*******************************************************************\
@@ -739,9 +739,9 @@ Function: string_refine_preprocesst::make_to_char_array_function
 \*******************************************************************/
 
 void string_refine_preprocesst::make_to_char_array_function(
-  goto_programt &goto_program, goto_programt::targett &i_it)
+  goto_programt &goto_program, goto_programt::targett &target)
 {
-  const code_function_callt &function_call=to_code_function_call(i_it->code);
+  const code_function_callt &function_call=to_code_function_call(target->code);
 
   assert(function_call.arguments().size()>=1);
   const exprt &string_argument=function_call.arguments()[0];
@@ -769,7 +769,7 @@ void string_refine_preprocesst::make_to_char_array_function(
   exprt rhs_length=get_length(deref, length_type);
   exprt lhs_length=get_length(deref_lhs, length_type);
   assignments.emplace_back(lhs_length, rhs_length);
-  insert_assignments(goto_program, i_it, assignments);
+  insert_assignments(goto_program, target, assignments);
 }
 
 /*******************************************************************\
@@ -788,7 +788,7 @@ Function: string_refine_preprocesst::make_cprover_char_array_assign
 
 exprt string_refine_preprocesst::make_cprover_char_array_assign(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt &rhs,
   const source_locationt &location)
 {
@@ -813,8 +813,8 @@ exprt string_refine_preprocesst::make_cprover_char_array_assign(
   std::list<code_assignt> assignments;
   assignments.emplace_back(array_lhs, array_rhs);
   assignments.emplace_back(lhs, new_rhs);
-  insert_assignments(goto_program, i_it, assignments);
-  i_it=goto_program.insert_after(i_it);
+  insert_assignments(goto_program, target, assignments);
+  target=goto_program.insert_after(target);
   return lhs;
 }
 
@@ -839,14 +839,14 @@ Function: string_refine_preprocesst::make_char_array_function
 
 void string_refine_preprocesst::make_char_array_function(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature,
   std::size_t index,
   bool assign_first_arg,
   bool skip_first_arg)
 {
-  code_function_callt &function_call=to_code_function_call(i_it->code);
+  code_function_callt &function_call=to_code_function_call(target->code);
   code_typet function_type=to_code_type(function_call.function().type());
   code_typet new_function_type;
   const source_locationt &location=function_call.source_location();
@@ -867,7 +867,7 @@ void string_refine_preprocesst::make_char_array_function(
     function_call.arguments()[index],
     function_call.arguments()[index].type().subtype());
   exprt string=make_cprover_char_array_assign(
-    goto_program, i_it, char_array, location);
+    goto_program, target, char_array, location);
 
   std::size_t start_index=skip_first_arg?1:0;
   for(std::size_t i=start_index; i<args.size(); i++)
@@ -883,7 +883,7 @@ void string_refine_preprocesst::make_char_array_function(
 
   make_string_function(
     goto_program,
-    i_it,
+    target,
     lhs,
     new_function_type,
     function_name,
@@ -905,12 +905,12 @@ Function: string_refine_preprocesst::make_char_array_function_call
 
 void string_refine_preprocesst::make_char_array_function_call(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature)
 {
   make_char_array_function(
-    goto_program, i_it, function_name, signature, 1, true, true);
+    goto_program, target, function_name, signature, 1, true, true);
 }
 
 /*******************************************************************\
@@ -927,13 +927,13 @@ Function: string_refine_preprocesst::make_char_array_side_effect
 
 void string_refine_preprocesst::make_char_array_side_effect(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const irep_idt &function_name,
   const std::string &signature)
 {
   make_char_array_function(
-    goto_program, i_it, function_name, signature, 1, true, false);
-  code_function_callt &function_call=to_code_function_call(i_it->code);
+    goto_program, target, function_name, signature, 1, true, false);
+  code_function_callt &function_call=to_code_function_call(target->code);
   string_builders[function_call.lhs()]=function_call.arguments()[0];
 }
 
@@ -956,7 +956,7 @@ Function: string_refine_preprocesst::process_arguments
 
 exprt::operandst string_refine_preprocesst::process_arguments(
   goto_programt &goto_program,
-  goto_programt::targett &i_it,
+  goto_programt::targett &target,
   const exprt::operandst &arguments,
   const source_locationt &location,
   const std::string &signature)
@@ -978,7 +978,7 @@ exprt::operandst string_refine_preprocesst::process_arguments(
         if(!is_java_string_type(arg.type()))
           arg=typecast_exprt(arg, jls_ptr);
       }
-      exprt arg2=make_cprover_string_assign(goto_program, i_it, arg, location);
+      exprt arg2=make_cprover_string_assign(goto_program, target, arg, location);
       new_arguments.push_back(arg2);
     }
   }
@@ -1025,11 +1025,11 @@ void string_refine_preprocesst::replace_string_calls(
 {
   goto_programt &goto_program=f_it->second.body;
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  Forall_goto_program_instructions(target, goto_program)
   {
-    if(i_it->is_function_call())
+    if(target->is_function_call())
     {
-      code_function_callt &function_call=to_code_function_call(i_it->code);
+      code_function_callt &function_call=to_code_function_call(target->code);
       for(auto arg : function_call.arguments())
       {
         auto sb_it=string_builders.find(arg);
@@ -1046,42 +1046,42 @@ void string_refine_preprocesst::replace_string_calls(
         auto it=string_functions.find(function_id);
         if(it!=string_functions.end())
           make_string_function(
-            goto_program, i_it, it->second, signature, false, false);
+            goto_program, target, it->second, signature, false, false);
 
         it=side_effect_functions.find(function_id);
         if(it!=side_effect_functions.end())
           make_string_function_side_effect(
-            goto_program, i_it, it->second, signature);
+            goto_program, target, it->second, signature);
 
         it=string_function_calls.find(function_id);
         if(it!=string_function_calls.end())
-          make_string_function_call(goto_program, i_it, it->second, signature);
+          make_string_function_call(goto_program, target, it->second, signature);
 
         it=string_of_char_array_functions.find(function_id);
         if(it!=string_of_char_array_functions.end())
           make_char_array_function(
-            goto_program, i_it, it->second, signature, 0);
+            goto_program, target, it->second, signature, 0);
 
         it=string_of_char_array_function_calls.find(function_id);
         if(it!=string_of_char_array_function_calls.end())
           make_char_array_function_call(
-            goto_program, i_it, it->second, signature);
+            goto_program, target, it->second, signature);
 
         it=side_effect_char_array_functions.find(function_id);
         if(it!=side_effect_char_array_functions.end())
           make_char_array_side_effect(
-            goto_program, i_it, it->second, signature);
+            goto_program, target, it->second, signature);
 
         if(function_id==irep_idt("java::java.lang.String.toCharArray:()[C"))
-          make_to_char_array_function(goto_program, i_it);
+          make_to_char_array_function(goto_program, target);
       }
     }
     else
     {
-      if(i_it->is_assign())
+      if(target->is_assign())
       {
         // In assignments we replace string literals and C string functions
-        code_assignt assignment=to_code_assign(i_it->code);
+        code_assignt assignment=to_code_assign(target->code);
 
         exprt new_rhs=assignment.rhs();
         code_assignt new_assignment(assignment.lhs(), new_rhs);
@@ -1102,8 +1102,8 @@ void string_refine_preprocesst::replace_string_calls(
         }
 
         new_assignment.add_source_location()=assignment.source_location();
-        i_it->make_assignment();
-        i_it->code=new_assignment;
+        target->make_assignment();
+        target->code=new_assignment;
       }
     }
   }
