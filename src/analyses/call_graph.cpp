@@ -107,7 +107,16 @@ void call_grapht::add(
 void call_grapht::add(const irep_idt &caller, const irep_idt &callee,
   const map_from_edges_to_call_locationst::mapped_type &call_sites)
 {
-  add(caller,callee);
+  bool exists=false;
+  const call_grapht::call_edges_ranget range=out_edges(caller);
+  for (auto it=range.first; it!=range.second; ++it)
+    if(it->second==callee)
+    {
+      exists=true;
+      break;
+    }
+  if(!exists)
+    add(caller,callee);
   std::copy(
     call_sites.cbegin(),call_sites.cend(),
     std::back_inserter(map_from_edges_to_call_locations[{caller,callee}]));
@@ -300,7 +309,7 @@ void compute_inverted_call_graph(
         {elem.first,elem.second}));
 }
 
-void find_leaves_bellow_function(
+void find_leaves_below_function(
     call_grapht const&  call_graph,
     irep_idt const&  function,
     std::unordered_set<irep_idt,dstring_hash>&  to_avoid,
@@ -316,15 +325,79 @@ void find_leaves_bellow_function(
     output.insert(function);
   else
     for (auto  it = range.first; it != range.second; ++it)
-      find_leaves_bellow_function(call_graph,it->second,to_avoid,output);
+      find_leaves_below_function(call_graph,it->second,to_avoid,output);
 }
 
-void find_leaves_bellow_function(
+void find_leaves_below_function(
     call_grapht const&  call_graph,
     irep_idt const&  function,
     std::unordered_set<irep_idt,dstring_hash>&  output
     )
 {
   std::unordered_set<irep_idt,dstring_hash>  to_avoid;
-  find_leaves_bellow_function(call_graph,function,to_avoid,output);
+  find_leaves_below_function(call_graph,function,to_avoid,output);
+}
+
+void find_direct_or_indirect_callees_of_function(
+  const call_grapht &call_graph,
+  const irep_idt &function,
+  std::unordered_set<irep_idt,dstring_hash> &output)
+{
+  std::unordered_set<irep_idt,dstring_hash> leaves;
+  find_leaves_below_function(call_graph,function,output,leaves);
+  output.insert(leaves.cbegin(),leaves.cend());
+}
+
+void find_nearest_common_callees(
+  const call_grapht &call_graph,
+  const std::set<irep_idt> &functions,
+  std::set<irep_idt> &output)
+{
+  if(functions.empty())
+    return;
+  if(functions.size()==1UL)
+  {
+    output.insert(*functions.cbegin());
+    return;
+  }
+
+  std::map<irep_idt,std::size_t> counting;
+  for(const auto &elem : call_graph.graph)
+  {
+    counting[elem.first]=0U;
+    counting[elem.second]=0U;
+  }
+  for(const auto &fn : functions)
+  {
+    std::unordered_set<irep_idt,dstring_hash> callees;
+    find_direct_or_indirect_callees_of_function(call_graph,fn,callees);
+    assert(callees.count(fn)==1U);
+    for(const auto &callee : callees)
+      ++counting[callee];
+  }
+
+  std::set<irep_idt> leaves;
+  for(const auto &elem : counting)
+    if(elem.second!=0U)
+    {
+      const call_grapht::call_edges_ranget range=
+        call_graph.out_edges(elem.first);
+      if(range.first==range.second)
+        leaves.insert(elem.first);
+    }
+
+  for(auto &elem : counting)
+    if(leaves.count(elem.first)!=0UL)
+      output.insert(elem.first);
+    else if(elem.second!=0U && elem.second<functions.size())
+    {
+      const call_grapht::call_edges_ranget range=
+        call_graph.out_edges(elem.first);
+      for(auto it=range.first; it!=range.second; ++it)
+      {
+        auto cit=counting.find(it->second);
+        if(cit->second==functions.size())
+          output.insert(cit->first);
+      }
+    }
 }

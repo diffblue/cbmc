@@ -164,18 +164,28 @@ void compute_inverted_call_graph(
     call_grapht&  output_inverted_call_graph
     );
 
-void find_leaves_bellow_function(
+void find_leaves_below_function(
     call_grapht const&  call_graph,
     irep_idt const&  function,
     std::unordered_set<irep_idt,dstring_hash>&  to_avoid,
     std::unordered_set<irep_idt,dstring_hash>&  output
     );
 
-void find_leaves_bellow_function(
+void find_leaves_below_function(
     call_grapht const&  call_graph,
     irep_idt const&  function,
     std::unordered_set<irep_idt,dstring_hash>&  output
     );
+
+void find_direct_or_indirect_callees_of_function(
+  const call_grapht &call_graph,
+  const irep_idt &function,
+  std::unordered_set<irep_idt,dstring_hash> &output);
+
+void find_nearest_common_callees(
+  const call_grapht &call_graph,
+  const std::set<irep_idt> &functions,
+  std::set<irep_idt> &output);
 
 /**
  * The "callee" must be a DIRECT callee of the "caller" in the "call_graph".
