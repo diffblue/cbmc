@@ -1,4 +1,4 @@
-public class test_append_char
+public class test_append_object
 {
    public static void main(/*String[] args*/)
    {
