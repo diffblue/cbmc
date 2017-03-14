@@ -103,7 +103,10 @@ public:
     const exprt &expr,
     value_setst::valuest &dest)
   {
-    (*this)[l].value_set.get_value_set(expr, dest, baset::ns);
+    ((const value_sett&)(*this)[l].value_set).get_value_set(
+      expr,
+      dest,
+      baset::ns);
   }
 };
 
