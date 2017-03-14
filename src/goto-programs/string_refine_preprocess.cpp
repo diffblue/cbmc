@@ -1038,7 +1038,7 @@ void string_refine_preprocesst::replace_string_calls(
     if(target->is_function_call())
     {
       code_function_callt &function_call=to_code_function_call(target->code);
-      for(auto arg : function_call.arguments())
+      for(auto &arg : function_call.arguments())
       {
         auto sb_it=string_builders.find(arg);
         if(sb_it!=string_builders.end())
