@@ -21,6 +21,7 @@ Date: May 2016
 #include <util/prefix.h>
 #include <util/message.h>
 #include <util/string2int.h>
+#include <util/cprover_prefix.h>
 
 #include <json/json_parser.h>
 
@@ -146,13 +147,10 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
     // get the lines array
     if((*it)["lines"].is_array())
     {
-      for(jsont::arrayt::const_iterator
-          itg=(*it)["lines"].array.begin();
-          itg!=(*it)["lines"].array.end();
-          itg++)
+      for(const jsont & entry : (*it)["lines"].array)
       {
         // get the line of each existing goal
-        line=(*itg)["number"].value;
+        line=entry["number"].value;
         source_location.set_line(line);
         goals.set_goals(source_location);
       }
