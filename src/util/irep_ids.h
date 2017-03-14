@@ -9,7 +9,11 @@ Author: Reuben Thomas, reuben.thomas@me.com
 #ifndef CPROVER_UTIL_IREP_IDS_H
 #define CPROVER_UTIL_IREP_IDS_H
 
+#define USE_DSTRING
+
+#ifdef USE_DSTRING
 #include "dstring.h"
+#endif
 
 enum class idt:unsigned
 {
@@ -21,19 +25,13 @@ enum class idt:unsigned
 
 #ifdef USE_DSTRING
 
-#define IREP_ID_ONE(the_id)                                                    \
-  static const dstringt ID_##the_id=                                           \
-    dstringt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
-#define IREP_ID_TWO(the_id, str)                                               \
-  static const dstringt ID_##the_id=                                           \
-    dstringt::make_from_table_index(static_cast<unsigned>(idt::id_##the_id));
+#define IREP_ID_ONE(the_id) extern const dstringt ID_##the_id;
+#define IREP_ID_TWO(the_id, str) extern const dstringt ID_##the_id;
 
 #else
 
-#define IREP_ID_ONE(the_id)                                                    \
-  static const std::string ID_##the_id(#the_id);
-#define IREP_ID_TWO(the_id, str)                                               \
-  static const std::string ID_##the_id(#the_id);
+#define IREP_ID_ONE(the_id) extern const std::string ID_##the_id;
+#define IREP_ID_TWO(the_id, str) extern const std::string ID_##the_id;
 
 #endif
 
