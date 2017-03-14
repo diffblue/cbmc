@@ -94,24 +94,6 @@ public:
     observers.push_back(&o);
   }
 
-  inline void print_goals_stats(std::ostream &out)
-  {
-    out << '\n';
-    out <<"**#START" << '\n';
-    out << "block-id,hit-count,time(s)" << '\n';
-    for(std::list<goalt>::const_iterator
-        g_it=goals.begin();
-        g_it!=goals.end();
-        g_it++)
-    {
-        if(g_it->status == goalt::statust::COVERED)
-        {
-          out << "0,0," << g_it->seconds << '\n';
-        }
-    }
-    out <<"#END" << '\n';
-  }
-
 protected:
   absolute_timet start_time;
   std::size_t _number_covered;
