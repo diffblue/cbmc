@@ -15,6 +15,7 @@ Date: May 2016
 #include <util/format_number_range.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
+#include <util/cprover_prefix.h>
 
 #include <json/json_parser.h>
 
@@ -171,13 +172,10 @@ coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
     // get the lines array
     if((*it)["lines"].is_array())
     {
-      for(jsont::arrayt::const_iterator
-          itg=(*it)["lines"].array.begin();
-          itg!=(*it)["lines"].array.end();
-          itg++)
+      for(const jsont & entry : (*it)["lines"].array)
       {
         // get the line of each existing goal
-        line=(*itg)["number"].value;
+        line=entry["number"].value;
         source_location.set_line(line);
         goals.set_goals(source_location);
       }
@@ -1605,7 +1603,7 @@ void instrument_cover_goals(
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==ID__start ||
-       f_it->first=="__CPROVER_initialize")
+       f_it->first==CPROVER_PREFIX "initialize")
       continue;
 
     instrument_cover_goals(
