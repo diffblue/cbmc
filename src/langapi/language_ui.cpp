@@ -378,7 +378,7 @@ void language_uit::build_array_from_static_symbol_table(
     else
     {
       ptr=get_language_from_mode(symbol.mode);
-      if(ptr == nullptr) 
+      if(ptr == nullptr)
         throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 
@@ -397,7 +397,7 @@ void language_uit::build_array_from_static_symbol_table(
       const typet type = ns.follow(symbol.type);
       std::stringstream buffer;
       buffer << symbol.base_name;
-      build_entry(ns,type,p,buffer.str(),out);
+      build_entry(ns, type, p, buffer.str(), out);
     }
   }
 }
@@ -415,10 +415,10 @@ Function: language_uit::build_entry
 
 \*******************************************************************/
 void language_uit::build_entry(const namespacet ns,
-    const typet type, 
+    const typet type,
     std::unique_ptr<languaget> &p,
-    const std::string name, 
-    std::map<std::string,std::string> &out)
+    const std::string name,
+    std::map<std::string, std::string> &out)
 {
   if(type.id() == ID_array)
   {
@@ -426,11 +426,11 @@ void language_uit::build_entry(const namespacet ns,
     mp_integer mp_count;
     to_integer(size_expr, mp_count);
     unsigned count=integer2unsigned(mp_count);
-    for(unsigned int i=0;i<count;i++)
+    for(unsigned int i=0; i<count; i++)
     {
       std::stringstream buffer;
       buffer << name  << "[" << i << "]";
-      build_entry(ns,ns.follow(type.subtype()),p,buffer.str(),out);
+      build_entry(ns, ns.follow(type.subtype()), p, buffer.str(), out);
     }
   }
   else if(type.id() == ID_struct)
@@ -438,17 +438,17 @@ void language_uit::build_entry(const namespacet ns,
     const struct_typet &struct_type=to_struct_type(type);
     const struct_typet::componentst &components=struct_type.components();
     for(struct_typet::componentst::const_iterator it=components.begin();
-        it!=components.end();++it)
+        it!=components.end(); ++it)
     {
       std::stringstream buffer;
       buffer << name << "." << it->get_name();
-      build_entry(ns,ns.follow(type.subtype()),p,buffer.str(),out);
+      build_entry(ns, ns.follow(type.subtype()), p, buffer.str(), out);
     }
   }
   else
   {
     std::string type_str;
     p->from_type(type, type_str, ns);
-    out.insert({name,type_str});
+    out.insert({name, type_str});
   }
 }

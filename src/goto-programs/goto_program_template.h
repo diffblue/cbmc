@@ -267,7 +267,7 @@ public:
 
     std::size_t const_hash() const
     {
-      return hash_combine(code.const_hash(),guard.const_hash());
+      return hash_combine(code.const_hash(), guard.const_hash());
     }
   };
 
