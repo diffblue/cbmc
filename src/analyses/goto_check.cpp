@@ -111,6 +111,7 @@ protected:
   conditionst address_check(const exprt &address, const exprt &size);
   void integer_overflow_check(const exprt &, const guardt &);
   void conversion_check(const exprt &, const guardt &);
+  void ranged_type_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
   void rw_ok_check(exprt &);
@@ -350,6 +351,66 @@ void goto_checkt::mod_by_zero_check(
     expr,
     guard);
 }
+
+/*******************************************************************\
+
+Function: range_check_flag_set
+
+  Inputs: Expression `e`
+
+ Outputs: Returns true if the frontend has flagged this expression
+          for range checking.
+
+ Purpose: See output.
+
+\*******************************************************************/
+
+static bool range_check_flag_set(const exprt &e)
+{
+  return e.get_bool("range_check");
+}
+
+void goto_checkt::ranged_type_check(const exprt &expr, const guardt &guard)
+{
+  if(!range_check_flag_set(expr))
+    return;
+
+  const typet &real_type = ns.follow(expr.type());
+  if(real_type.id() != ID_signedbv)
+    return;
+  const exprt &lower_bound =
+    static_cast<const exprt &>(real_type.find("lower_bound"));
+  const exprt &upper_bound =
+    static_cast<const exprt &>(real_type.find("upper_bound"));
+
+  binary_relation_exprt no_overflow_upper(ID_le);
+  no_overflow_upper.lhs() = expr.op0();
+  no_overflow_upper.rhs() = upper_bound;
+
+  binary_relation_exprt no_overflow_lower(ID_ge);
+  no_overflow_lower.lhs() = expr.op0();
+  no_overflow_lower.rhs() = lower_bound;
+
+  add_guarded_claim(
+    and_exprt(no_overflow_lower, no_overflow_upper),
+    "overflow on bounded type conversion",
+    "overflow",
+    expr.find_source_location(),
+    expr,
+    guard);
+}
+
+/*******************************************************************\
+
+Function: goto_checkt::conversion_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_checkt::conversion_check(
   const exprt &expr,
@@ -1524,7 +1585,10 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     }
   }
   else if(expr.id()==ID_typecast)
+  {
     conversion_check(expr, guard);
+    ranged_type_check(expr, guard);
+  }
   else if(expr.id()==ID_le || expr.id()==ID_lt ||
           expr.id()==ID_ge || expr.id()==ID_gt)
     pointer_rel_check(expr, guard);
