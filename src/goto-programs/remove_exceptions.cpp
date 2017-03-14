@@ -24,6 +24,8 @@ Date:   December 2016
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <analyses/uncaught_exceptions_analysis.h>
+
 class remove_exceptionst
 {
   typedef std::vector<std::pair<
@@ -31,8 +33,11 @@ class remove_exceptionst
   typedef std::vector<catch_handlerst> stack_catcht;
 
 public:
-  explicit remove_exceptionst(symbol_tablet &_symbol_table):
-    symbol_table(_symbol_table)
+  explicit remove_exceptionst(
+    symbol_tablet &_symbol_table,
+    std::map<irep_idt, std::set<irep_idt>> &_exceptions_map):
+    symbol_table(_symbol_table),
+    exceptions_map(_exceptions_map)
   {
   }
 
@@ -41,6 +46,7 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
+  std::map<irep_idt, std::set<irep_idt>> &exceptions_map;
 
   void add_exceptional_returns(
     const goto_functionst::function_mapt::iterator &);
@@ -108,12 +114,25 @@ void remove_exceptionst::add_exceptional_returns(
   // function calls that may escape exceptions. However, this will
   // require multiple passes.
   bool add_exceptional_var=false;
+  bool has_uncaught_exceptions=false;
   forall_goto_program_instructions(instr_it, goto_program)
-    if(instr_it->is_throw() || instr_it->is_function_call())
+  {
+    if(instr_it->is_function_call())
+    {
+      const exprt &function_expr=
+        to_code_function_call(instr_it->code).function();
+      assert(function_expr.id()==ID_symbol);
+      const irep_idt &function_name=
+        to_symbol_expr(function_expr).get_identifier();
+      has_uncaught_exceptions=!exceptions_map[function_name].empty();
+    }
+
+    if(instr_it->is_throw() || has_uncaught_exceptions)
     {
       add_exceptional_var=true;
       break;
     }
+  }
 
   if(add_exceptional_var)
   {
@@ -490,13 +509,19 @@ void remove_exceptions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_exceptionst remove_exceptions(symbol_table);
+  const namespacet ns(symbol_table);
+  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
+  uncaught_exceptions(goto_functions, ns, exceptions_map);
+  remove_exceptionst remove_exceptions(symbol_table, exceptions_map);
   remove_exceptions(goto_functions);
 }
 
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(goto_modelt &goto_model)
 {
-  remove_exceptionst remove_exceptions(goto_model.symbol_table);
+  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
+  remove_exceptionst remove_exceptions(
+    goto_model.symbol_table,
+    exceptions_map);
   remove_exceptions(goto_model.goto_functions);
 }
