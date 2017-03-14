@@ -808,11 +808,12 @@ void value_sett::get_value_set_rec(
       const typet &dynamic_type=
         static_cast<const typet &>(expr.find("#type"));
 
-      dynamic_object_exprt dynamic_object(dynamic_type);
-      dynamic_object.set_instance(location_number);
-      dynamic_object.valid()=true_exprt();
+      // Create the most-recent-allocation dynamic-object
+      dynamic_object_exprt dynamic_object_recent(dynamic_type, true);
+      dynamic_object_recent.set_instance(location_number);
+      dynamic_object_recent.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object_recent, 0);
     }
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
