@@ -148,6 +148,8 @@ inline std::size_t basic_hash_finalize(
   return h1;
 }
 
+// Boost uses the symbol hash_combine, if you're getting problems here then
+//  you've probably included a Boost header after this one
 #define hash_combine(h1, h2) \
   basic_hash_combine<sizeof(std::size_t)*8>(h1, h2)
 #define hash_finalize(h1, len) \
