@@ -265,9 +265,9 @@ public:
       return instruction_id_builder.str();
     }
 
-    std::size_t const_hash() const
+    std::size_t stable_hash() const
     {
-      return hash_combine(code.const_hash(), guard.const_hash());
+      return hash_combine(code.stable_hash(), guard.stable_hash());
     }
   };
 
