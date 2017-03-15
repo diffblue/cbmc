@@ -31,11 +31,21 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
 }
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(
-  const exprt &expr):
-    array_abstract_objectt(expr)
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    array_abstract_objectt(expr, environment, ns)
 {
-  //const array_exprt &starting_expr=to_array_expr(expr);
-
+  if(expr.id()==ID_array)
+  {
+    int index=0;
+    for(const exprt &entry : expr.operands())
+    {
+      map[mp_integer(index)]=environment.eval(entry, ns);
+      ++index;
+    }
+    top=false;
+  }
 }
 
 void constant_array_abstract_objectt::output(

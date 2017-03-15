@@ -26,7 +26,10 @@ public:
   constant_pointer_abstract_objectt(
     const constant_pointer_abstract_objectt &old);
 
-  constant_pointer_abstract_objectt(const exprt &expr);
+  constant_pointer_abstract_objectt(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   CLONE
   MERGE(pointer_abstract_objectt)

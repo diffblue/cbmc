@@ -27,7 +27,11 @@ public:
     return s_instance;
   }
   abstract_object_pointert get_abstract_object(
-    const typet type, bool top, bool bottom, const exprt &e,
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const abstract_environmentt &environment,
     const namespacet &ns);
   void set_options(optionst &options);
 
@@ -49,7 +53,11 @@ private:
   ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
   template <class abstract_object_class>
   abstract_object_pointert initialize_abstract_object(
-    const typet type, bool top, bool bottom, const exprt &e,
+    const typet type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const abstract_environmentt &enviroment,
     const namespacet &ns);
   bool has_variables_flag;
   bool has_structs_flag;
@@ -84,6 +92,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     bool top,
     bool bottom,
     const exprt &e,
+    const abstract_environmentt &enviroment,
     const namespacet &ns)
 {
   if(top || bottom)
@@ -94,7 +103,8 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   else
   {
     assert(type==ns.follow(e.type()));
-    return abstract_object_pointert(new abstract_object_classt(e));
+    return abstract_object_pointert(
+      new abstract_object_classt(e, enviroment, ns));
   }
 }
 

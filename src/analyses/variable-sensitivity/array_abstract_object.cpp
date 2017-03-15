@@ -85,8 +85,11 @@ Function: array_abstract_objectt::array_abstract_objectt
 
 \*******************************************************************/
 
-array_abstract_objectt::array_abstract_objectt(const exprt &e):
-  abstract_objectt(e)
+array_abstract_objectt::array_abstract_objectt(
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    abstract_objectt(e, environment, ns)
 {
   assert(e.type().id()==ID_array);
 }

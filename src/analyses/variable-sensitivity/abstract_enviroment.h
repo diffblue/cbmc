@@ -76,7 +76,11 @@ protected:
 
 private:
   abstract_object_pointert abstract_object_factory(
-    const typet &type, bool top, bool bottom, const exprt &e,
+    const typet &type,
+    bool top,
+    bool bottom,
+    const exprt &e,
+    const abstract_environmentt &eviroment,
     const namespacet &ns) const;
 };
 

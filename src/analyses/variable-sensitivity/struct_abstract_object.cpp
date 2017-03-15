@@ -8,6 +8,7 @@
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/namespace.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
 #include "struct_abstract_object.h"
@@ -86,10 +87,13 @@ Function: struct_abstract_objectt::struct_abstract_objectt
 
 \*******************************************************************/
 
-struct_abstract_objectt::struct_abstract_objectt(const exprt &e):
-  abstract_objectt(e)
+struct_abstract_objectt::struct_abstract_objectt(
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+  abstract_objectt(e, environment, ns)
 {
-//  assert(e.type().id()==ID_struct);
+  assert(ns.follow(e.type()).id()==ID_struct);
 }
 
 /*******************************************************************\

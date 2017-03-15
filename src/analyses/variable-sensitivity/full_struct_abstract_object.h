@@ -24,7 +24,10 @@ public:
   full_struct_abstract_objectt(const typet &type, bool top, bool bottom);
 
   explicit full_struct_abstract_objectt(const full_struct_abstract_objectt &old);
-  explicit full_struct_abstract_objectt(const exprt &expr);
+  explicit full_struct_abstract_objectt(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   CLONE
   MERGE(struct_abstract_objectt)

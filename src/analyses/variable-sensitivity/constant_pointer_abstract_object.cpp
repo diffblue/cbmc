@@ -90,8 +90,10 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 \*******************************************************************/
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
-  const exprt &e):
-    pointer_abstract_objectt(e)
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    pointer_abstract_objectt(e, environment, ns)
 {
   assert(e.type().id()==ID_pointer);
 
