@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
@@ -894,7 +895,9 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(symbol_table, goto_functions);
-    // Java instanceof -> clsid comparison:
+    // remove catch and throw
+    remove_exceptions(symbol_table, goto_functions);
+    // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
 
     // full slice?
@@ -1155,6 +1158,7 @@ void cbmc_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"

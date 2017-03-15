@@ -474,6 +474,14 @@ public:
     instructions.clear();
   }
 
+  targett get_end_function()
+  {
+    assert(!instructions.empty());
+    targett end_function=--instructions.end();
+    assert(end_function->is_end_function());
+    return end_function;
+  }
+
   //! Copy a full goto program, preserving targets
   void copy_from(const goto_program_templatet<codeT, guardT> &src);
 

@@ -48,8 +48,6 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    cd cbmc-git/src
    make minisat2-download
-   make libzip-download zlib-download
-   make libzip-build
    make
 
 
@@ -126,8 +124,6 @@ Follow these instructions:
 
    cd cbmc-git/src
    make minisat2-download
-   make libzip-download zlib-download
-   make libzip-build
    make
 
 
