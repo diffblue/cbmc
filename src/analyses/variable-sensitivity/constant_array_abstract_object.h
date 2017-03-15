@@ -13,6 +13,7 @@
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
 class ai_baset;
+class abstract_environmentt;
 
 class constant_array_abstract_objectt:public array_abstract_objectt
 {
@@ -24,7 +25,10 @@ public:
   explicit constant_array_abstract_objectt(typet type);
   constant_array_abstract_objectt(typet type, bool top, bool bottom);
   constant_array_abstract_objectt(const constant_array_abstract_objectt &old);
-  constant_array_abstract_objectt(const exprt &expr);
+  constant_array_abstract_objectt(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   CLONE
   MERGE(array_abstract_objectt)

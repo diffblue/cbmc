@@ -97,10 +97,12 @@ Function: full_struct_abstract_objectt::full_struct_abstract_objectt
 
 \*******************************************************************/
 
-full_struct_abstract_objectt::full_struct_abstract_objectt(const exprt &e):
-  struct_abstract_objectt(e)
+full_struct_abstract_objectt::full_struct_abstract_objectt(
+  const exprt &e,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    struct_abstract_objectt(e, environment, ns)
 {
-  //assert(e.type().id()==ID_struct);
   assert(verify());
 }
 

@@ -18,10 +18,13 @@ private:
     constant_abstract_value_pointert;
 
 public:
- constant_abstract_valuet(typet t);
- constant_abstract_valuet(typet t, bool tp, bool bttm);
- constant_abstract_valuet(const constant_abstract_valuet &old);
- constant_abstract_valuet(const exprt e);
+  explicit constant_abstract_valuet(typet t);
+  constant_abstract_valuet(typet t, bool tp, bool bttm);
+  constant_abstract_valuet(const constant_abstract_valuet &old);
+  constant_abstract_valuet(
+    const exprt e,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   CLONE
   MERGE(abstract_valuet)
@@ -40,7 +43,6 @@ protected :
 
 private :
   exprt value;
-
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ABSTRACT_VALUE_H

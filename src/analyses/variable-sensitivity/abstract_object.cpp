@@ -80,15 +80,20 @@ Function: abstract_objectt::abstract_objectt
 
   Inputs:
    expr - the expression to use as the starting pointer for an abstract object
+   environment - The environment this abstract object is being created in
+   ns - the namespace
 
  Outputs:
 
- Purpose:
+ Purpose: Construct an abstract object from the expression
 
 \*******************************************************************/
 
-abstract_objectt::abstract_objectt(const exprt &expr):
-t(expr.type()), bottom(false), top(true)
+abstract_objectt::abstract_objectt(
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    t(expr.type()), bottom(false), top(true)
 {}
 
 /*******************************************************************\
@@ -210,11 +215,11 @@ abstract_object_pointert abstract_objectt::expression_transform(
     // but at the moment this produces a two value abstraction for type bool
     // so for now we force it to be the constant abstraction
     return abstract_object_pointert(
-      new constant_abstract_valuet(constant_expr));
+      new constant_abstract_valuet(constant_expr, environment, ns));
   }
   else
   {
-    return environment.abstract_object_factory(expr.type(), ns, true, false);
+    return environment.abstract_object_factory(expr.type(), expr, ns);
   }
 }
 
