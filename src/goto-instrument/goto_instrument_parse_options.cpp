@@ -1432,6 +1432,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
+    remove_returns(symbol_table, goto_functions);
     do_indirect_call_and_rtti_removal();
 
     status() << "Performing a full slice" << eom;
