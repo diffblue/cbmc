@@ -67,6 +67,24 @@ abstract_valuet::abstract_valuet(const abstract_valuet &old):
   abstract_objectt(old)
 {}
 
-abstract_valuet::abstract_valuet(const exprt &expr):
-  abstract_objectt(expr)
+/*******************************************************************\
+
+Function: abstract_valuet::abstract_valuet
+
+  Inputs:
+   expr - the expression to use as the starting pointer for an abstract object
+   environment - The environment this abstract object is being created in
+   ns - the namespace
+
+ Outputs:
+
+ Purpose: Construct an abstract value from the expression
+
+\*******************************************************************/
+
+abstract_valuet::abstract_valuet(
+  const exprt &expr,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    abstract_objectt(expr, environment, ns)
 {}

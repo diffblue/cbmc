@@ -82,6 +82,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     bool top,
     bool bottom,
     const exprt &e,
+    const abstract_environmentt &environment,
     const namespacet &ns)
 {
   if(!initialized)
@@ -99,32 +100,32 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   {
   case CONSTANT:
     return initialize_abstract_object<constant_abstract_valuet>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
     return initialize_abstract_object<constant_array_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case ARRAY_INSENSITIVE:
     return initialize_abstract_object<array_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case POINTER_SENSITIVE:
     return initialize_abstract_object<constant_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case POINTER_INSENSITIVE:
     return initialize_abstract_object<pointer_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case STRUCT_SENSITIVE:
     return initialize_abstract_object<full_struct_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<struct_abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   case TWO_VALUE:
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   default:
     assert(false);
     return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, ns);
+      followed_type, top, bottom, e, environment, ns);
   }
 }
 

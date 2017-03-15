@@ -21,7 +21,10 @@ public:
   explicit struct_abstract_objectt(const typet &type);
   struct_abstract_objectt(const typet &type, bool top, bool bottom);
   explicit struct_abstract_objectt(const struct_abstract_objectt &old);
-  explicit struct_abstract_objectt(const exprt &expr);
+  explicit struct_abstract_objectt(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
   CLONE
   MERGE(abstract_objectt)
