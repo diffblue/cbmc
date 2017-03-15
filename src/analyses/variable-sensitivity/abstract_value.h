@@ -14,13 +14,16 @@
 class abstract_valuet:public abstract_objectt
 {
 public:
- abstract_valuet(const typet &type);
- abstract_valuet(const typet &type, bool top, bool bottom);
- abstract_valuet(const abstract_valuet &old);
- abstract_valuet(const exprt &expr);
+  explicit abstract_valuet(const typet &type);
+  abstract_valuet(const typet &type, bool top, bool bottom);
+  abstract_valuet(const abstract_valuet &old);
+  abstract_valuet(
+    const exprt &expr,
+    const abstract_environmentt &environment,
+    const namespacet &ns);
 
- CLONE
- MERGE(abstract_objectt)
+  CLONE
+  MERGE(abstract_objectt)
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_H

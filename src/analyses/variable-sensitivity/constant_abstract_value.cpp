@@ -22,8 +22,11 @@ constant_abstract_valuet::constant_abstract_valuet(
     abstract_valuet(old), value(old.value)
 {}
 
-constant_abstract_valuet::constant_abstract_valuet(const exprt e):
-  abstract_valuet(e.type(), false, false), value(e)
+constant_abstract_valuet::constant_abstract_valuet(
+  const exprt e,
+  const abstract_environmentt &environment,
+  const namespacet &ns):
+    abstract_valuet(e.type(), false, false), value(e)
 {}
 
 exprt constant_abstract_valuet::to_constant() const
