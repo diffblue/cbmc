@@ -79,7 +79,7 @@ void call_grapht::add(
 
 void call_grapht::swap(call_grapht &other)
 {
-  std::swap(graph,other.graph);
+  std::swap(graph, other.graph);
   std::swap(map_from_edges_to_call_locations,
             other.map_from_edges_to_call_locations);
 }
@@ -109,17 +109,17 @@ void call_grapht::add(const irep_idt &caller, const irep_idt &callee,
 {
   bool exists=false;
   const call_grapht::call_edges_ranget range=out_edges(caller);
-  for (auto it=range.first; it!=range.second; ++it)
+  for(auto it=range.first; it!=range.second; ++it)
     if(it->second==callee)
     {
       exists=true;
       break;
     }
   if(!exists)
-    add(caller,callee);
+    add(caller, callee);
   std::copy(
-    call_sites.cbegin(),call_sites.cend(),
-    std::back_inserter(map_from_edges_to_call_locations[{caller,callee}]));
+    call_sites.cbegin(), call_sites.cend(),
+    std::back_inserter(map_from_edges_to_call_locations[{caller, callee}]));
 }
 
 
@@ -146,9 +146,9 @@ void call_grapht::output_dot(std::ostream &out) const
         << " [label=\"{";
     bool first=true;
     for(const auto instr_it :
-        get_map_from_edges_to_call_locations().at({edge.first,edge.second}))
+        get_map_from_edges_to_call_locations().at({edge.first, edge.second}))
     {
-      if (!first)
+      if(!first)
         out << ",";
       out << instr_it->location_number;
       first=false;
@@ -400,7 +400,7 @@ void compute_inverted_call_graph(
   assert(output_inverted_call_graph.graph.empty());
   for(const auto &elem : original_call_graph.graph)
     output_inverted_call_graph.add(
-      elem.second,elem.first,
+      elem.second, elem.first,
       original_call_graph.get_map_from_edges_to_call_locations().at(
         {elem.first, elem.second}));
 }
@@ -467,11 +467,11 @@ void find_leaves_below_function(
 void find_direct_or_indirect_callees_of_function(
   const call_grapht &call_graph,
   const irep_idt &function,
-  std::unordered_set<irep_idt,dstring_hash> &output)
+  std::unordered_set<irep_idt, dstring_hash> &output)
 {
-  std::unordered_set<irep_idt,dstring_hash> leaves;
-  find_leaves_below_function(call_graph,function,output,leaves);
-  output.insert(leaves.cbegin(),leaves.cend());
+  std::unordered_set<irep_idt, dstring_hash> leaves;
+  find_leaves_below_function(call_graph, function, output, leaves);
+  output.insert(leaves.cbegin(), leaves.cend());
 }
 
 void find_nearest_common_callees(
@@ -487,7 +487,7 @@ void find_nearest_common_callees(
     return;
   }
 
-  std::map<irep_idt,std::size_t> counting;
+  std::map<irep_idt, std::size_t> counting;
   for(const auto &elem : call_graph.graph)
   {
     counting[elem.first]=0U;
@@ -495,8 +495,8 @@ void find_nearest_common_callees(
   }
   for(const auto &fn : functions)
   {
-    std::unordered_set<irep_idt,dstring_hash> callees;
-    find_direct_or_indirect_callees_of_function(call_graph,fn,callees);
+    std::unordered_set<irep_idt, dstring_hash> callees;
+    find_direct_or_indirect_callees_of_function(call_graph, fn, callees);
     assert(callees.count(fn)==1U);
     for(const auto &callee : callees)
       ++counting[callee];

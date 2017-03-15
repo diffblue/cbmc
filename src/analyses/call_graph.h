@@ -174,7 +174,7 @@ void find_leaves_below_function(
 void find_direct_or_indirect_callees_of_function(
   const call_grapht &call_graph,
   const irep_idt &function,
-  std::unordered_set<irep_idt,dstring_hash> &output);
+  std::unordered_set<irep_idt, dstring_hash> &output);
 
 void find_nearest_common_callees(
   const call_grapht &call_graph,
@@ -190,7 +190,7 @@ get_call_sites(
   irep_idt const&  caller,
   irep_idt const&  callee)
 {
-  return call_graph.get_map_from_edges_to_call_locations().at({caller,callee});
+  return call_graph.get_map_from_edges_to_call_locations().at({caller, callee});
 }
 
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
