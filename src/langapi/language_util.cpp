@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/language.h>
 #include <util/std_expr.h>
 
+#include "pretty_printer.h"
 #include "language_util.h"
 #include "mode.h"
 
@@ -48,6 +49,37 @@ static languaget* get_language(
   return ptr;
 }
 
+std::vector<pretty_printer_factoryt> registered_pretty_printers;
+
+void register_global_pretty_printer(pretty_printer_factoryt new_printer)
+{
+  registered_pretty_printers.push_back(new_printer);
+}
+
+static std::vector<std::unique_ptr<pretty_printert>> get_pretty_printer_stack(
+  const namespacet &ns,
+  std::unique_ptr<pretty_printert> language_printer)
+{
+  std::vector<std::unique_ptr<pretty_printert>> ret;
+  ret.push_back(std::unique_ptr<pretty_printert>(new norep_pretty_printert()));
+  for(const auto &factory : registered_pretty_printers)
+    ret.push_back(factory(ns));
+  ret.push_back(std::move(language_printer));
+
+  // Link the printers together (used for deferral of expressions
+  // a particular printer can't handle)
+  for(std::size_t i=0; i<ret.size()-1; ++i)
+    ret[i+1]->set_next_pretty_printer(ret[i].get());
+
+  // Give all printers in the chain a pointer to the top, for use
+  // printing subexpressions that others should have a chance
+  // to handle:
+  for(std::size_t i=0; i<ret.size(); ++i)
+    ret[i]->set_top_pretty_printer(ret.back().get());
+
+  return ret;
+}
+
 /*******************************************************************\
 
 Function: from_expr
@@ -66,11 +98,8 @@ std::string from_expr(
   const exprt &expr)
 {
   std::unique_ptr<languaget> p(get_language(ns, identifier));
-
-  std::string result;
-  p->from_expr(expr, result, ns);
-
-  return result;
+  auto printers=get_pretty_printer_stack(ns, p->get_pretty_printer(ns));
+  return printers.back()->convert(expr);
 }
 
 /*******************************************************************\
@@ -91,11 +120,8 @@ std::string from_type(
   const typet &type)
 {
   std::unique_ptr<languaget> p(get_language(ns, identifier));
-
-  std::string result;
-  p->from_type(type, result, ns);
-
-  return result;
+  auto printers=get_pretty_printer_stack(ns, p->get_pretty_printer(ns));
+  return printers.back()->convert(type);
 }
 
 /*******************************************************************\

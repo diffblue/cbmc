@@ -62,6 +62,9 @@ public:
     std::string &code,
     const namespacet &ns) override;
 
+  std::unique_ptr<pretty_printert>
+    get_pretty_printer(const namespacet &) override;
+
   bool type_to_name(
     const typet &type,
     std::string &name,

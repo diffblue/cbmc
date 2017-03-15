@@ -48,6 +48,9 @@ public:
     std::string &code,
     const namespacet &ns);
 
+  std::unique_ptr<pretty_printert>
+    get_pretty_printer(const namespacet &);
+
   virtual bool to_expr(
     const std::string &code,
     const std::string &module,

@@ -10,6 +10,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/get_base_name.h>
 
 #include "expr2jsil.h"
+#include "expr2jsil_class.h"
 #include "jsil_convert.h"
 #include "jsil_entry_point.h"
 #include "jsil_internal_additions.h"
@@ -254,6 +255,24 @@ bool jsil_languaget::from_type(
 {
   code=type2jsil(type, ns);
   return false;
+}
+
+/*******************************************************************\
+
+Function: jsil_languaget::get_pretty_printer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::unique_ptr<pretty_printert>
+jsil_languaget::get_pretty_printer(const namespacet &ns)
+{
+  return std::unique_ptr<pretty_printert>(new expr2jsilt(ns));
 }
 
 /*******************************************************************\

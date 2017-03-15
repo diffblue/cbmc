@@ -70,6 +70,9 @@ public:
     std::string &code,
     const namespacet &ns) override;
 
+  std::unique_ptr<pretty_printert>
+    get_pretty_printer(const namespacet &) override;
+
   bool to_expr(
     const std::string &code,
     const std::string &module,

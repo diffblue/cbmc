@@ -9,7 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_LANGAPI_LANGUAGE_UTIL_H
 #define CPROVER_LANGAPI_LANGUAGE_UTIL_H
 
+#include <memory>
+#include <functional>
+
 #include <util/irep.h>
+#include <langapi/pretty_printer.h>
 
 class exprt;
 class namespacet;
@@ -28,6 +32,11 @@ std::string from_type(
   const typet &type);
 
 std::string from_type(const typet &type);
+
+typedef std::function<std::unique_ptr<pretty_printert>(const namespacet &)>
+  pretty_printer_factoryt;
+
+void register_global_pretty_printer(pretty_printer_factoryt);
 
 exprt to_expr(
   const namespacet &ns,

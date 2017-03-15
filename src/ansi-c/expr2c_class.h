@@ -16,17 +16,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
+#include <langapi/pretty_printer.h>
+
 class c_qualifierst;
 class namespacet;
 
-class expr2ct
+class expr2ct:public pretty_printert
 {
 public:
   explicit expr2ct(const namespacet &_ns):ns(_ns), sizeof_nesting(0) { }
   virtual ~expr2ct() { }
 
-  virtual std::string convert(const typet &src);
-  virtual std::string convert(const exprt &src);
+  std::string convert(const typet &src) override;
+  std::string convert(const exprt &src) override;
 
   void get_shorthands(const exprt &expr);
 

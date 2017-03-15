@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"
+#include "expr2c_class.h"
 #include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
 #include "type2name.h"
@@ -281,6 +282,24 @@ bool ansi_c_languaget::from_type(
 {
   code=type2c(type, ns);
   return false;
+}
+
+/*******************************************************************\
+
+Function: ansi_c_languaget::get_pretty_printer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::unique_ptr<pretty_printert>
+ansi_c_languaget::get_pretty_printer(const namespacet &ns)
+{
+  return std::unique_ptr<pretty_printert>(new expr2ct(ns));
 }
 
 /*******************************************************************\

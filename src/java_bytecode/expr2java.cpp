@@ -565,6 +565,8 @@ std::string expr2java(const exprt &expr, const namespacet &ns)
 {
   expr2javat expr2java(ns);
   expr2java.get_shorthands(expr);
+  norep_pretty_printert norep;
+  expr2java.set_next_pretty_printer(&norep);
   return expr2java.convert(expr);
 }
 
@@ -583,5 +585,7 @@ Function: type2java
 std::string type2java(const typet &type, const namespacet &ns)
 {
   expr2javat expr2java(ns);
+  norep_pretty_printert norep;
+  expr2java.set_next_pretty_printer(&norep);
   return expr2java.convert(type);
 }

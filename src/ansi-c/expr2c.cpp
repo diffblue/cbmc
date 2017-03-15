@@ -204,6 +204,7 @@ Function: expr2ct::convert
 
 std::string expr2ct::convert(const typet &src)
 {
+  assert(next_pretty_printer && "Next pretty-printer should be set");
   return convert_rec(src, c_qualifierst(), "");
 }
 
@@ -679,14 +680,7 @@ std::string expr2ct::convert_rec(
     return q+"__attribute__(("+id2string(src.id())+")) void"+d;
   }
 
-  {
-    lispexprt lisp;
-    irep2lisp(src, lisp);
-    std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
-    dest+=d;
-
-    return dest;
-  }
+  return next_pretty_printer->convert(src);
 }
 
 /*******************************************************************\
@@ -5009,7 +5003,7 @@ std::string expr2ct::convert(
     return convert(src.type());
 
   // no C language expression for internal representation
-  return convert_norep(src, precedence);
+  return next_pretty_printer->convert(src);
 }
 
 /*******************************************************************\
@@ -5046,7 +5040,9 @@ std::string expr2c(const exprt &expr, const namespacet &ns)
 {
   std::string code;
   expr2ct expr2c(ns);
+  norep_pretty_printert norep;
   expr2c.get_shorthands(expr);
+  expr2c.set_next_pretty_printer(&norep);
   return expr2c.convert(expr);
 }
 
@@ -5065,6 +5061,8 @@ Function: type2c
 std::string type2c(const typet &type, const namespacet &ns)
 {
   expr2ct expr2c(ns);
+  norep_pretty_printert norep;
+  expr2c.set_next_pretty_printer(&norep);
   // expr2c.get_shorthands(expr);
   return expr2c.convert(type);
 }
