@@ -13,10 +13,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/language_file.h>
 #include <util/symbol_table.h>
 #include <util/ui_message.h>
-#include <util/namespace.h>
-#include <map>
-#include <string>
-#include <memory>
 
 class cmdlinet;
 
@@ -44,15 +40,6 @@ public:
   virtual void show_symbol_table(bool brief=false);
   virtual void show_symbol_table_plain(std::ostream &out, bool brief);
   virtual void show_symbol_table_xml_ui(bool brief);
-
-  virtual void build_array_from_static_symbol_table(
-      std::map<std::string, std::string>& out);
-  virtual void build_entry(
-      const namespacet ns,
-      const typet type,
-      std::unique_ptr<languaget> &p,
-      const std::string name,
-      std::map<std::string, std::string>& out);
 
   typedef ui_message_handlert::uit uit;
 

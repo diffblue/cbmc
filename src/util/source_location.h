@@ -138,15 +138,7 @@ public:
     return get_bool(ID_hide);
   }
 
-  inline bool is_built_in() const
-  {
-    std::string file=get_file().c_str();
-    std::string built_in="<built-in-";//as in "<built-in-additions>";
-    std::string built_in2="<builtin-";//as in "<builtin-architecture-strings>";
-    bool is_built_in=!file.compare(0,built_in.length(),built_in);
-    is_built_in|=!file.compare(0,built_in2.length(),built_in2);
-    return is_built_in;
-  }
+  bool is_built_in() const;
 
   static const source_locationt &nil()
   {

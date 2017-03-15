@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "source_location.h"
 #include "file_util.h"
+#include "prefix.h"
 
 /*******************************************************************\
 
@@ -92,4 +93,26 @@ std::ostream &operator << (
     return out;
   out << source_location.as_string();
   return out;
+}
+
+/*******************************************************************\
+
+Function: is_build_in
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool source_locationt::is_built_in() const
+{
+  std::string file=get_file().c_str();
+  std::string built_in="<built-in-"; // "<built-in-additions>";
+  std::string built_in2="<builtin-"; // "<builtin-architecture-strings>";
+  bool is_built_in=has_prefix(file, built_in);
+  is_built_in|=has_prefix(file, built_in2);
+  return is_built_in;
 }

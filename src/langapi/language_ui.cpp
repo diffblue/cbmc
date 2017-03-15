@@ -14,9 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/language.h>
 #include <util/cmdline.h>
 #include <util/unicode.h>
-#include <util/mp_arith.h>
-#include <util/arith_tools.h>
-#include <util/std_types.h>
 
 #include "language_ui.h"
 #include "mode.h"
@@ -346,109 +343,5 @@ void language_uit::show_symbol_table_plain(
     out << "Location....: " << symbol.location << '\n';
 
     out << '\n' << std::flush;
-  }
-}
-
-/*******************************************************************\
-
-Function: language_uit::build_array_from_static_symbol_table
-
-  Inputs: out - maps variable names to types
- 
- Outputs: N/A
-
- Purpose: builds a list of static variables and maps them to types
-
-\*******************************************************************/
-void language_uit::build_array_from_static_symbol_table(
-    std::map<std::string, std::string>& out)
-{
-  const namespacet ns(symbol_table);
-
-  std::set<std::string> symbols;
-  forall_symbols(it, symbol_table.symbols)
-    symbols.insert(id2string(it->first));
-
-  for(const std::string &id : symbols)
-  {
-    const symbolt &symbol=ns.lookup(id);
-    languaget *ptr;
-    if(symbol.mode=="")
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr == nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
-
-    std::unique_ptr<languaget> p(ptr);
-    std::string type_str;
-    std::string value_str;
-
-    if(symbol.type.is_not_nil())
-      p->from_type(symbol.type, type_str, ns);
-
-    if(symbol.value.is_not_nil())
-      p->from_expr(symbol.value, value_str, ns);
-
-    if((symbol.is_static_lifetime) && (!symbol.location.is_built_in()))
-    {
-      const typet type = ns.follow(symbol.type);
-      std::stringstream buffer;
-      buffer << symbol.base_name;
-      build_entry(ns, type, p, buffer.str(), out);
-    }
-  }
-}
-
-/*******************************************************************\
-
-Function: language_uit::build_entry
-
-  Inputs: 
-
- Outputs: N/A
-
- Purpose: Retrieves the names and types of static variable
-          Recursively handles arrays and structures
-
-\*******************************************************************/
-void language_uit::build_entry(const namespacet ns,
-    const typet type,
-    std::unique_ptr<languaget> &p,
-    const std::string name,
-    std::map<std::string, std::string> &out)
-{
-  if(type.id() == ID_array)
-  {
-    const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    mp_integer mp_count;
-    to_integer(size_expr, mp_count);
-    unsigned count=integer2unsigned(mp_count);
-    for(unsigned int i=0; i<count; i++)
-    {
-      std::stringstream buffer;
-      buffer << name  << "[" << i << "]";
-      build_entry(ns, ns.follow(type.subtype()), p, buffer.str(), out);
-    }
-  }
-  else if(type.id() == ID_struct)
-  {
-    const struct_typet &struct_type=to_struct_type(type);
-    const struct_typet::componentst &components=struct_type.components();
-    for(struct_typet::componentst::const_iterator it=components.begin();
-        it!=components.end(); ++it)
-    {
-      std::stringstream buffer;
-      buffer << name << "." << it->get_name();
-      build_entry(ns, ns.follow(type.subtype()), p, buffer.str(), out);
-    }
-  }
-  else
-  {
-    std::string type_str;
-    p->from_type(type, type_str, ns);
-    out.insert({name, type_str});
   }
 }
