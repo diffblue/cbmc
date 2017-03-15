@@ -147,13 +147,13 @@ public:
   jsont &push_back(const jsont &json)
   {
     array.push_back(json);
-    return static_cast<jsont &>(array.back());
+    return array.back();
   }
 
   jsont &push_back()
   {
     array.push_back(jsont());
-    return static_cast<jsont &>(array.back());
+    return array.back();
   }
 };
 
