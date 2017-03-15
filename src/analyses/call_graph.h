@@ -23,23 +23,31 @@ public:
   explicit call_grapht(const goto_functionst &);
 
   void output_dot(std::ostream &out) const;
-
-  /**
-   * It writes this into the passed stream in the Graphviz's DOT format.
-   * The method accepts also functions, because the callgraph does not
-   * store funtions (nodes). It only stores edges (from caller to callee).
-   * So, the resulting graph would not show not-called functions.
-   */
-  void output_dot(const goto_functionst &functions, std::ostream &out) const;
-
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
 
   typedef std::multimap<irep_idt, irep_idt> grapht;
   grapht graph;
 
+  void swap(call_grapht &other);
+
   void add(const irep_idt &caller, const irep_idt &callee);
 
+  /**
+   * The type provides a mapping from edges of the call-graph to particular
+   * instructions in the caller GOTO programs, where the calls are performed.
+   */
+  typedef std::map<
+            std::pair<irep_idt, irep_idt>,
+            std::vector<goto_programt::instructionst::const_iterator> >
+          map_from_edges_to_call_locationst;
+
+  const map_from_edges_to_call_locationst &
+  get_map_from_edges_to_call_locations() const
+  { return map_from_edges_to_call_locations; }
+
+  void add(const irep_idt &caller, const irep_idt &callee,
+           const map_from_edges_to_call_locationst::mapped_type &call_sites);
 protected:
   void add(const irep_idt &function,
            const goto_programt &body);
@@ -74,6 +82,9 @@ public:
    *    std::cout << it->second << ", ";
    */
   call_edges_ranget out_edges(const irep_idt &caller) const;
+
+private:
+  map_from_edges_to_call_locationst map_from_edges_to_call_locations;
 };
 
 /*******************************************************************\
@@ -159,5 +170,27 @@ void find_leaves_below_function(
   const call_grapht &call_graph,
   const irep_idt &function,
   std::unordered_set<irep_idt, dstring_hash> &output);
+
+void find_direct_or_indirect_callees_of_function(
+  const call_grapht &call_graph,
+  const irep_idt &function,
+  std::unordered_set<irep_idt,dstring_hash> &output);
+
+void find_nearest_common_callees(
+  const call_grapht &call_graph,
+  const std::set<irep_idt> &functions,
+  std::set<irep_idt> &output);
+
+/**
+ * The "callee" must be a DIRECT callee of the "caller" in the "call_graph".
+ */
+inline const std::vector<goto_programt::instructionst::const_iterator> &
+get_call_sites(
+  call_grapht const&  call_graph,
+  irep_idt const&  caller,
+  irep_idt const&  callee)
+{
+  return call_graph.get_map_from_edges_to_call_locations().at({caller,callee});
+}
 
 #endif // CPROVER_ANALYSES_CALL_GRAPH_H
