@@ -170,11 +170,14 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
+    java_class_loader_limitt class_loader_limit(
+      get_message_handler(),
+      java_cp_include_files);
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
       jar_filet::manifestt manifest=
-        java_class_loader.jar_pool(path).get_manifest();
+        java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
       if(manifest_main_class!="")
@@ -186,8 +189,8 @@ bool java_bytecode_languaget::parse(
     // Do we have one now?
     if(main_class.empty())
     {
-      status() << "JAR file without entry point: loading it all" << eom;
-      java_class_loader.load_entire_jar(path);
+      status() << "JAR file without entry point: loading class files" << eom;
+      java_class_loader.load_entire_jar(class_loader_limit, path);
       for(const auto &kv : java_class_loader.jar_map.at(path).entries)
         main_jar_classes.push_back(kv.first);
     }
