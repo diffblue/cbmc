@@ -135,3 +135,18 @@ void class_hierarchyt::output(std::ostream &out) const
           << ch << '\n';
   }
 }
+
+std::ostream &output_dot(std::ostream &ostr, const class_hierarchyt &hierarchy)
+{
+  ostr << "digraph call_graph {\n"
+       << "  rankdir=BT;\n"
+       << "  node [fontsize=12 shape=box];\n";
+  for(const auto &c : hierarchy.class_map)
+    for(const auto &ch : c.second.parents)
+      ostr << "  \"" << c.first << "\" -> "
+           << "\"" << ch << "\" "
+           << " [arrowhead=\"vee\"];"
+           << "\n";
+  ostr << "}\n";
+  return ostr;
+}
