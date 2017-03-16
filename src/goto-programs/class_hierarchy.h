@@ -56,17 +56,6 @@ protected:
 };
 
 
-/*******************************************************************\
-
-Function: output_dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 std::ostream &output_dot(std::ostream &ostr, const class_hierarchyt &hierarchy);
 
 

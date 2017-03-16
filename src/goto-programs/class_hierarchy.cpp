@@ -136,6 +136,18 @@ void class_hierarchyt::output(std::ostream &out) const
   }
 }
 
+/*******************************************************************\
+
+Function: output_dot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::ostream &output_dot(std::ostream &ostr, const class_hierarchyt &hierarchy)
 {
   ostr << "digraph call_graph {\n"
