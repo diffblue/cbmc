@@ -52,10 +52,11 @@ static void get_subtypes(
                 candidate)!=subtypes.end())
           continue;
         // get its base class
-        const irept::subt &bases=to_class_type((it->second).type).bases();
+        const class_typet::basest &bases=
+          to_class_type((it->second).type).bases();
         if(bases.size()>0)
         {
-          const irept &base = bases[0];
+          const class_typet::baset &base = bases[0];
           const irept &base_type=base.find(ID_type);
           assert(base_type.id()==ID_symbol);
 
