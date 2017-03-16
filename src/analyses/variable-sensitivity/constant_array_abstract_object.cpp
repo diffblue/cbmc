@@ -11,14 +11,56 @@
 
 #include "constant_array_abstract_object.h"
 
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+
+  Inputs:
+   type - the type the abstract_object is representing
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 constant_array_abstract_objectt::constant_array_abstract_objectt(typet type):
 array_abstract_objectt(type)
 {}
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+
+  Inputs:
+   type - the type the abstract_object is representing
+   top - is the abstract_object starting as top
+   bottom - is the abstract_object starting as bottom
+
+ Outputs:
+
+ Purpose: Start the abstract object at either top or bottom or neither
+          Asserts if both top and bottom are true
+
+\*******************************************************************/
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   typet type, bool top, bool bottom):
 array_abstract_objectt(type, top, bottom)
 {}
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+
+  Inputs:
+   old - the abstract object to copy from
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   const constant_array_abstract_objectt &old):
@@ -29,6 +71,21 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
     map[entry.first]=abstract_object_pointert(entry.second->clone());
   }
 }
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::constant_array_abstract_objectt
+
+  Inputs:
+   expr - the expression to use as the starting pointer for an abstract object
+   environment - the environment the abstract object is being created in
+   ns - the namespace
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_array_abstract_objectt::constant_array_abstract_objectt(
   const exprt &expr,
@@ -47,6 +104,21 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
     top=false;
   }
 }
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::merge_state
+
+  Inputs:
+   op1 - The first array to merge
+   op2 - The second to merge
+
+ Outputs: Returns true if the resulting abstract object is different to op1
+
+ Purpose: To modify this to be a merged version of op1 and op2, returning
+          true if the result is different to op1
+
+\*******************************************************************/
 
 bool constant_array_abstract_objectt::merge_state(
   const constant_array_abstract_object_pointert op1,
@@ -79,6 +151,24 @@ bool constant_array_abstract_objectt::merge_state(
   }
 }
 
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::output
+
+  Inputs:
+   out - the stream to write to
+   ai - the abstract interpreter that contains the abstract domain
+        (that contains the object ... )
+   ns - the current namespace
+
+ Outputs:
+
+ Purpose: To provide a human readable string to the out representing
+          the current known value about this object. For this array we
+          print: { [0] - <output of object at index 0... }
+
+\*******************************************************************/
+
 void constant_array_abstract_objectt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
@@ -98,6 +188,23 @@ void constant_array_abstract_objectt::output(
     out << "}";
   }
 }
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::read_index
+
+  Inputs:
+   env - the environment
+   index - the expression used to access the specific value in the array
+
+ Outputs: An abstract object representing the value in the array
+
+ Purpose: A helper function to read elements from an array. This will return
+          the abstract object stored for that index, or top if we don't know
+          about the specified index.
+          If we can't resolve the index to a constant, we return top
+
+\*******************************************************************/
 
 abstract_object_pointert constant_array_abstract_objectt::read_index(
   const abstract_environmentt &env,
@@ -125,6 +232,26 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
     return env.abstract_object_factory(type().subtype(), ns, true, false);
   }
 }
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::write_index
+
+  Inputs:
+   environment - the abstract environment
+   ns - the namespace
+   stack - the remaining stack of expressions on the LHS to evaluate
+   index_expr - the expression uses to access a specific index
+   value - the value we are trying to assign to that value in the array
+   merging_write - Should this and all future writes be merged with the current
+                   value
+
+ Outputs: The array_abstract_objectt representing the result of writing
+          to a specific index.
+
+ Purpose: A helper function to evaluate writing to a index of an array.
+
+\*******************************************************************/
 
 sharing_ptrt<array_abstract_objectt>
   constant_array_abstract_objectt::write_index(
@@ -216,12 +343,41 @@ sharing_ptrt<array_abstract_objectt>
   }
 }
 
-// Purpose: Short hand method for creating a top element of the array
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::get_top_entry
+
+  Inputs:
+   environment - the abstract environment
+   ns - the namespace
+
+ Outputs: An abstract object pointer of type type().subtype() (i.e. the
+          type of the array's values).
+
+ Purpose: Short hand method for creating a top element of the array
+
+\*******************************************************************/
+
 abstract_object_pointert constant_array_abstract_objectt::get_top_entry(
   const abstract_environmentt &env, const namespacet &ns) const
 {
   return env.abstract_object_factory(type().subtype(), ns, true, false);
 }
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::eval_index
+
+  Inputs:
+   environment - the abstract environment
+   ns - the namespace
+
+ Outputs: An abstract object pointer of type type().subtype() (i.e. the
+          type of the array's values).
+
+ Purpose: Short hand method for creating a top element of the array
+
+\*******************************************************************/
 
 bool constant_array_abstract_objectt::eval_index(
   const index_exprt &index,
