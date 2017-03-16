@@ -871,6 +871,111 @@ void string_refinementt::fill_model()
 
 /*******************************************************************\
 
+Function: string_refinementt::substitute_array_with_expr()
+
+  Inputs:
+    expr - A (possibly nested) 'with' expression on an `array_of`
+           expression
+    index - An index with which to build the equality condition
+
+ Outputs: An expression containing no 'with' expression
+
+ Purpose: Create a new expression where 'with' expressions on arrays
+          are replaced by 'if' expressions.
+          e.g. for an array access arr[x], where:
+               `arr := array_of(12) with {0:=24} with {2:=42}`
+               the constructed expression will be:
+               `index==0 ? 24 : index==2 ? 42 : 12`
+
+\*******************************************************************/
+
+exprt string_refinementt::substitute_array_with_expr
+  (exprt &expr, exprt &index) const
+{
+  if(expr.id()==ID_with)
+  {
+    with_exprt &with_expr=to_with_expr(expr);
+    return if_exprt(equal_exprt(index, with_expr.where()),
+                    with_expr.new_value(),
+                    substitute_array_with_expr(with_expr.old(), index));
+  }
+  else
+  {
+    // Only handle 'with' expressions on 'array_of' expressions.
+    assert(expr.id()==ID_array_of);
+    return to_array_of_expr(expr).what();
+  }
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::substitute_array_access()
+
+  Inputs:
+    expr - an expression containing array accesses
+
+ Outputs: an expression containing no array access
+
+ Purpose: create an equivalent expression where array accesses and
+          'with' expressions are replaced by 'if' expressions.
+          e.g. for an array access arr[x], where:
+               `arr := {12, 24, 48}`
+               the constructed expression will be:
+               `index==0 ? 12 : index==1 ? 24 : 48`
+
+\*******************************************************************/
+
+exprt string_refinementt::substitute_array_access(exprt &expr) const
+{
+  for(size_t i=0; i<expr.operands().size(); ++i)
+  {
+    // TODO: only copy when necessary
+    exprt op(expr.operands()[i]);
+    expr.operands()[i]=substitute_array_access(op);
+  }
+
+  if(expr.id()==ID_index)
+  {
+    index_exprt &index_expr=to_index_expr(expr);
+
+    if(index_expr.array().id()==ID_symbol)
+    {
+      return index_expr;
+    }
+
+    if(index_expr.array().id()==ID_with)
+    {
+      exprt subst=substitute_array_with_expr(index_expr.array(),
+                                             index_expr.index());
+      return subst;
+    }
+
+    if(index_expr.array().id()==ID_array_of)
+    {
+      return to_array_of_expr(index_expr.array()).op();
+    }
+
+    assert(index_expr.array().id()==ID_array);
+    array_exprt &array_expr=to_array_expr(index_expr.array());
+
+    size_t last_index=array_expr.operands().size()-1;
+    assert(last_index>=0);
+    exprt ite=array_expr.operands()[last_index];
+
+    for(long i=last_index-1; i>=0; --i)
+    {
+      equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
+      ite=if_exprt(equals,
+                   array_expr.operands()[i],
+                   ite);
+    }
+    return ite;
+  }
+  return expr;
+}
+
+/*******************************************************************\
+
 Function: string_refinementt::add_negation_of_constraint_to_solver
 
   Inputs: a string constraint and a solver for non string expressions
@@ -913,7 +1018,7 @@ void string_refinementt::add_negation_of_constraint_to_solver(
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
-  solver << negaxiom;
+  solver << substitute_array_access(negaxiom);
 }
 
 /*******************************************************************\
@@ -1007,6 +1112,7 @@ bool string_refinementt::check_axioms()
         exprt premise(axiom.premise());
         exprt body(axiom.body());
         implies_exprt instance(premise, body);
+        replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
         debug() << "adding counter example " << from_expr(instance) << eom;
         add_lemma(instance);
