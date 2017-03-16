@@ -77,6 +77,18 @@ void call_grapht::add(
   }
 }
 
+/*******************************************************************\
+
+Function: call_grapht::swap
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void call_grapht::swap(call_grapht &other)
 {
   std::swap(graph, other.graph);
@@ -104,17 +116,33 @@ void call_grapht::add(
   graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
 }
 
-void call_grapht::add(const irep_idt &caller, const irep_idt &callee,
+/*******************************************************************\
+
+Function: call_grapht::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void call_grapht::add(
+  const irep_idt &caller,
+  const irep_idt &callee,
   const map_from_edges_to_call_locationst::mapped_type &call_sites)
 {
   bool exists=false;
   const call_grapht::call_edges_ranget range=out_edges(caller);
   for(auto it=range.first; it!=range.second; ++it)
+  {
     if(it->second==callee)
     {
       exists=true;
       break;
     }
+  }
   if(!exists)
     add(caller, callee);
   std::copy(
@@ -464,6 +492,18 @@ void find_leaves_below_function(
   find_leaves_below_function(call_graph, function, to_avoid, output);
 }
 
+/*******************************************************************\
+
+Function: find_direct_or_indirect_callees_of_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void find_direct_or_indirect_callees_of_function(
   const call_grapht &call_graph,
   const irep_idt &function,
@@ -473,6 +513,18 @@ void find_direct_or_indirect_callees_of_function(
   find_leaves_below_function(call_graph, function, output, leaves);
   output.insert(leaves.cbegin(), leaves.cend());
 }
+
+/*******************************************************************\
+
+Function: find_nearest_common_callees
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void find_nearest_common_callees(
   const call_grapht &call_graph,

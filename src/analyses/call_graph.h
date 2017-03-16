@@ -186,9 +186,9 @@ void find_nearest_common_callees(
  */
 inline const std::vector<goto_programt::instructionst::const_iterator> &
 get_call_sites(
-  call_grapht const&  call_graph,
-  irep_idt const&  caller,
-  irep_idt const&  callee)
+  const call_grapht &call_graph,
+  const irep_idt &caller,
+  const irep_idt &callee)
 {
   return call_graph.get_map_from_edges_to_call_locations().at({caller, callee});
 }
