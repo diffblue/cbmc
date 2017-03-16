@@ -321,75 +321,9 @@ bool full_struct_abstract_objectt::merge_state(
     return true;
   }
 
+
   // at this point both are different from top and bottom
-
-  const struct_mapt &m1=op1->map;
-  const struct_mapt &m2=op2->map;
-
-  assert(!m1.empty());
-  assert(!m2.empty());
-
-  map.clear();
-
-  struct_mapt::const_iterator it1=m1.begin();
-  struct_mapt::const_iterator it2=m2.begin();
-
-  bool modified=false;
-
-  while(true)
-  {
-    if(it1->first<it2->first)
-    {
-      // element of m1 is not in m2
-
-      it1++;
-      modified=true;
-      if(it1==m1.end())
-        break;
-    }
-    else if(it2->first<it1->first)
-    {
-      // element of m2 is not in m1
-
-      it2++;
-      if(it2==m2.end())
-      {
-        modified=true; // as there is a remaining element in m1
-        break;
-      }
-    }
-    else
-    {
-      // merge entries
-
-      const abstract_object_pointert &v1=it1->second;
-      const abstract_object_pointert &v2=it2->second;
-
-      bool changes=false;
-      abstract_object_pointert v_new;
-
-      v_new=v1->merge(v2, changes);
-
-      modified|=changes;
-
-      map[it1->first]=v_new;
-
-      it1++;
-
-      if(it1==m1.end())
-        break;
-
-      it2++;
-
-      if(it2==m2.end())
-      {
-        modified=true; // as there is a remaining element in m1
-        break;
-      }
-    }
-  }
+  return abstract_objectt::merge_maps<irep_idt>(op1->map, op2->map, map);
 
   assert(verify());
-
-  return modified;
 }
