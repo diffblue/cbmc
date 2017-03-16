@@ -78,6 +78,8 @@ Function: array_abstract_objectt::array_abstract_objectt
 
   Inputs:
    expr - the expression to use as the starting pointer for an abstract object
+   environment - the environment the abstract object is being created in
+   ns - the namespace
 
  Outputs:
 
@@ -124,10 +126,11 @@ abstract_object_pointert array_abstract_objectt::read_index(
 
 /*******************************************************************\
 
-Function: abstract_object_pointert array_abstract_objectt
+Function: array_abstract_objectt::write_index
 
   Inputs:
    environment - the abstract environment
+   ns - the namespace
    stack - the remaining stack of expressions on the LHS to evaluate
    index_expr - the expression uses to access a specific index
    value - the value we are trying to assign to that value in the array
