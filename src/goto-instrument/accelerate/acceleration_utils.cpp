@@ -42,8 +42,6 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
 void acceleration_utilst::gather_rvalues(
   const exprt &expr,
   expr_sett &rvalues)

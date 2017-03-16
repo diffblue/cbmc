@@ -18,8 +18,6 @@ Author: Matt Lewis
 #include "overflow_instrumenter.h"
 #include "util.h"
 
-// #define DEBUG
-
 /*
  * This code is copied wholesale from analyses/goto_check.cpp.
  */

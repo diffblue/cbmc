@@ -81,8 +81,6 @@ Function: natural_loops_templatet::compute
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -91,10 +89,6 @@ template<class P, class T>
 void natural_loops_templatet<P, T>::compute(P &program)
 {
   cfg_dominators(program);
-
-#ifdef DEBUG
-  cfg_dominators.output(std::cout);
-#endif
 
   // find back-edges m->n
   for(T m_it=program.instructions.begin();

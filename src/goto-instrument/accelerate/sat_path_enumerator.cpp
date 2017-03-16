@@ -42,8 +42,6 @@ Author: Matt Lewis
 #include "util.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
 bool sat_path_enumeratort::next(patht &path)
 {
   scratch_programt program(symbol_table);

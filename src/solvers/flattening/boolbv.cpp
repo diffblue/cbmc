@@ -27,8 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: boolbvt::literal
@@ -144,9 +142,6 @@ const bvt &boolbvt::convert_bv(const exprt &expr)
     bv_cache.insert(std::make_pair(expr, bvt()));
   if(!cache_result.second)
   {
-    #ifdef DEBUG
-    std::cout << "Cache hit on " << expr << "\n";
-    #endif
     return cache_result.first->second;
   }
 
@@ -205,10 +200,6 @@ Function: boolbvt::convert_bitvector
 
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
-  #ifdef DEBUG
-  std::cout << "BV: " << expr.pretty() << std::endl;
-  #endif
-
   if(expr.type().id()==ID_bool)
   {
     bvt bv;

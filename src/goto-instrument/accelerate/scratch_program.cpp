@@ -15,8 +15,6 @@ Author: Matt Lewis
 
 #include "scratch_program.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -29,11 +27,6 @@ bool scratch_programt::check_sat(bool do_slice)
 
   remove_skip(*this);
   update();
-
-#ifdef DEBUG
-  std::cout << "Checking following program for satness:" << endl;
-  output(ns, "scratch", cout);
-#endif
 
   symex.constant_propagation=constant_propagation;
   goto_symex_statet::propagationt::valuest constants;
@@ -55,10 +48,6 @@ bool scratch_programt::check_sat(bool do_slice)
   }
 
   equation.convert(*checker);
-
-#ifdef DEBUG
-  cout << "Finished symex, invoking decision procedure." << endl;
-#endif
 
   return (checker->dec_solve()==decision_proceduret::D_SATISFIABLE);
 }

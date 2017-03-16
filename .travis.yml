@@ -68,6 +68,8 @@ matrix:
 
 script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
+    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="make -C src minisat2-download" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&

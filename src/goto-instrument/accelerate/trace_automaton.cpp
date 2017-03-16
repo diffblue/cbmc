@@ -12,8 +12,6 @@ Author: Matt Lewis
 #include "trace_automaton.h"
 #include "path.h"
 
-// #define DEBUG
-
 void trace_automatont::build()
 {
 #ifdef DEBUG
@@ -76,9 +74,6 @@ void trace_automatont::add_path(patht &path)
   for(const auto &step : path)
   {
     goto_programt::targett l=step.loc;
-#ifdef DEBUG
-      std::cout << ", " << l->location_number << ":" << l->location;
-#endif
 
     if(in_alphabet(l))
     {
@@ -108,13 +103,6 @@ void trace_automatont::add_path(patht &path)
  */
 void trace_automatont::determinise()
 {
-#ifdef DEBUG
-  std::cout << "Determinising automaton with " << nta.num_states
-            << " states and " << nta.accept_states.size()
-            << " accept states and " << nta.count_transitions()
-            << " transitions" << endl;
-#endif
-
   dstates.clear();
   unmarked_dstates.clear();
   dta.clear();
@@ -122,10 +110,6 @@ void trace_automatont::determinise()
   state_sett init_states;
   init_states.insert(nta.init_state);
   epsilon_closure(init_states);
-
-#ifdef DEBUG
-  std::cout << "There are " << init_states.size() << " init states" << endl;
-#endif
 
   dta.init_state=add_dstate(init_states);
 

@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #include <cassert>
 #include <iostream>
 
