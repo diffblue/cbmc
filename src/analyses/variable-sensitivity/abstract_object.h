@@ -31,6 +31,7 @@ class namespacet;
 
 #include <util/expr.h>
 #include <memory>
+#include <map>
 
 
 #define CLONE \
@@ -152,6 +153,84 @@ protected:
   // Sets the state of this object
   bool merge_state(
     const abstract_object_pointert op1, const abstract_object_pointert op2);
+
+  template<class keyt>
+  static bool merge_maps(
+    const std::map<keyt, abstract_object_pointert> &map1,
+    const std::map<keyt, abstract_object_pointert> &map2,
+    std::map<keyt, abstract_object_pointert> &out_map);
 };
+
+template<typename keyt>
+bool abstract_objectt::merge_maps(
+  const std::map<keyt, abstract_object_pointert> &m1,
+  const std::map<keyt, abstract_object_pointert> &m2,
+  std::map<keyt, abstract_object_pointert> &out_map)
+{
+  out_map.clear();
+
+  typedef std::map<keyt, abstract_object_pointert> abstract_object_mapt;
+
+  typename abstract_object_mapt::const_iterator it1=m1.begin();
+  typename abstract_object_mapt::const_iterator it2=m2.begin();
+
+  bool modified=false;
+
+  while(true)
+  {
+    if(it1->first<it2->first)
+    {
+      // element of m1 is not in m2
+
+      it1++;
+      modified=true;
+      if(it1==m1.end())
+        break;
+    }
+    else if(it2->first<it1->first)
+    {
+      // element of m2 is not in m1
+
+      it2++;
+      if(it2==m2.end())
+      {
+        modified=true; // as there is a remaining element in m1
+        break;
+      }
+    }
+    else
+    {
+      // merge entries
+
+      const abstract_object_pointert &v1=it1->second;
+      const abstract_object_pointert &v2=it2->second;
+
+      bool changes=false;
+      abstract_object_pointert v_new;
+
+      v_new=v1->merge(v2, changes);
+
+      modified|=changes;
+
+      out_map[it1->first]=v_new;
+
+      it1++;
+
+      if(it1==m1.end())
+        break;
+
+      it2++;
+
+      if(it2==m2.end())
+      {
+        modified=true; // as there is a remaining element in m1
+        break;
+      }
+    }
+  }
+
+  return modified;
+}
+
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H

@@ -50,6 +50,9 @@ public:
     bool merging_write) const override;
 
 protected:
+  bool merge_state(
+    const constant_array_abstract_object_pointert op1,
+    const constant_array_abstract_object_pointert op2);
 
 private:
   // Since we don't store for any index where the value is top
