@@ -48,6 +48,37 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   }
 }
 
+bool constant_array_abstract_objectt::merge_state(
+  const constant_array_abstract_object_pointert op1,
+  const constant_array_abstract_object_pointert op2)
+{
+  bool parent_merge_change=array_abstract_objectt::merge_state(op1, op2);
+  if(is_top() || is_bottom())
+  {
+    map.clear();
+    return parent_merge_change;
+  }
+  else
+  {
+    if(op1->is_bottom())
+    {
+      *this=*dynamic_cast<constant_array_abstract_objectt*>(op2->clone());
+      return true;
+    }
+    if(op2->is_bottom())
+    {
+      *this=*dynamic_cast<constant_array_abstract_objectt*>(op1->clone());
+      return false;
+    }
+
+    // Both not top or bottom
+    assert(!op1->is_top() && !op2->is_top());
+    assert(!op1->is_bottom() && !op2->is_bottom());
+
+    return abstract_objectt::merge_maps<mp_integer>(op1->map, op2->map, map);
+  }
+}
+
 void constant_array_abstract_objectt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
