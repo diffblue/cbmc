@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 
+class goto_modelt;
+
 void show_symbol_table(
   const goto_modelt &,
   ui_message_handlert::uit ui);
