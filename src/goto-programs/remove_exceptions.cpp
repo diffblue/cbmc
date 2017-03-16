@@ -336,7 +336,8 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX))
+  if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX) &&
+     symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
   {
     // we may have an escaping exception
     const symbolt &callee_exc_symbol=
