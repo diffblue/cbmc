@@ -42,7 +42,6 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
-  disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("string-refine");
   if(cmd.isset("java-max-input-array-length"))
@@ -518,7 +517,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second,
          symbol_table,
          get_message_handler(),
-         disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
          lazy_methods_mode,
@@ -639,7 +637,6 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           *parsed_method.second,
           symbol_table,
           get_message_handler(),
-          disable_runtime_checks,
           max_user_array_length,
           safe_pointer<std::vector<irep_idt> >::create_non_null(
             &method_worklist2),
@@ -754,7 +751,6 @@ void java_bytecode_languaget::convert_lazy_method(
     *lazy_method_entry.second,
     symtab,
     get_message_handler(),
-    disable_runtime_checks,
     max_user_array_length);
 }
 
