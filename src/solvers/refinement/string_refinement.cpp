@@ -288,16 +288,18 @@ void string_refinementt::concretize_string(const exprt &expr)
     if(!to_integer(length, found_length))
     {
       assert(found_length.is_long());
-      if(found_length < 0)
+      if(found_length<0)
       {
+        // Lengths should not be negative.
+        // TODO: Add constraints no the sign of string lengths.
         debug() << "concretize_results: WARNING found length is negative"
                 << eom;
       }
       else
       {
         size_t concretize_limit=found_length.to_long();
-        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
-              MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        concretize_limit=concretize_limit>generator.max_string_length?
+              generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
         for(size_t i=0; i<concretize_limit; ++i)
         {
@@ -317,9 +319,9 @@ void string_refinementt::concretize_string(const exprt &expr)
 /// map `found_length`
 void string_refinementt::concretize_results()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
     concretize_string(it.second);
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
     concretize_string(it);
   add_instantiations();
 }
@@ -328,7 +330,7 @@ void string_refinementt::concretize_results()
 /// `found_length`
 void string_refinementt::concretize_lengths()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
@@ -339,7 +341,7 @@ void string_refinementt::concretize_lengths()
       found_length[content]=length;
      }
   }
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
   {
     if(refined_string_typet::is_refined_string_type(it.type()))
     {
@@ -357,12 +359,6 @@ void string_refinementt::concretize_lengths()
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   assert(equality_propagation);
-
-  // TODO: remove the mode field of generator since we should be language
-  // independent.
-  // We only set the mode once.
-  if(generator.get_mode()==ID_unknown)
-    set_mode();
 
   if(expr.id()==ID_equal)
   {
@@ -621,7 +617,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
-  if(n>MAX_CONCRETE_STRING_SIZE)
+  if(n>generator.max_string_length)
   {
 #if 0
     debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
@@ -1007,6 +1003,7 @@ exprt string_refinementt::negation_of_constraint(
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
+  substitute_array_access(negaxiom);
   solver << negaxiom;
 }
 
@@ -1039,6 +1036,7 @@ bool string_refinementt::check_axioms()
 
     satcheck_no_simplifiert sat_check;
     supert solver(ns, sat_check);
+    solver.set_ui(ui);
     add_negation_of_constraint_to_solver(axiom_in_model, solver);
 
     switch(solver())
@@ -1093,6 +1091,7 @@ bool string_refinementt::check_axioms()
         exprt premise(axiom.premise());
         exprt body(axiom.body());
         implies_exprt instance(premise, body);
+        replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
         debug() << "adding counter example " << from_expr(instance) << eom;
         add_lemma(instance);

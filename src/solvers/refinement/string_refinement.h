@@ -25,11 +25,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-// Defines a limit on the string witnesses we will output.
-// Longer strings are still concidered possible by the solver but
-// it will not output them.
-#define MAX_CONCRETE_STRING_SIZE 500
-
 #define MAX_NB_REFINEMENT 100
 
 class string_refinementt: public bv_refinementt
@@ -48,7 +43,7 @@ public:
   // Should we concretize strings when the solver finished
   bool do_concretizing;
 
-  void set_max_string_length(int i);
+  void set_max_string_length(size_t i);
   void enforce_non_empty_string();
   void enforce_printable_characters();
 
@@ -113,8 +108,8 @@ private:
   exprt substitute_function_applications(exprt expr);
   typet substitute_java_string_types(typet type);
   exprt substitute_java_strings(exprt expr);
-  exprt substitute_array_with_expr(exprt &expr, exprt &index) const;
-  exprt substitute_array_access(exprt &expr) const;
+  exprt substitute_array_with_expr(const exprt &expr, const exprt &index) const;
+  void substitute_array_access(exprt &expr) const;
   void add_symbol_to_symbol_map(const exprt &lhs, const exprt &rhs);
   bool is_char_array(const typet &type) const;
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);

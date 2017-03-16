@@ -26,16 +26,30 @@ string_exprt string_constraint_generatort::add_axioms_for_insert(
   return add_axioms_for_concat(concat1, suf);
 }
 
-/// add axioms corresponding to the StringBuilder.insert(String) java function
+/// add axioms corresponding to the StringBuilder.insert(int, CharSequence) and
+/// StringBuilder.insert(int, CharSequence, int, int) java functions
 /// \par parameters: function application with three arguments: two strings and
 ///   an index
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_insert(
   const function_application_exprt &f)
 {
-  string_exprt s1=get_string_expr(args(f, 3)[0]);
-  string_exprt s2=get_string_expr(args(f, 3)[2]);
-  return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
+  assert(f.arguments().size()>=3);
+  string_exprt s1=get_string_expr(f.arguments()[0]);
+  string_exprt s2=get_string_expr(f.arguments()[2]);
+  const exprt &offset=f.arguments()[1];
+  if(f.arguments().size()==5)
+  {
+    const exprt &start=f.arguments()[3];
+    const exprt &end=f.arguments()[4];
+    string_exprt substring=add_axioms_for_substring(s2, start, end);
+    return add_axioms_for_insert(s1, substring, offset);
+  }
+  else
+  {
+    assert(f.arguments().size()==3);
+    return add_axioms_for_insert(s1, s2, offset);
+  }
 }
 
 /// add axioms corresponding to the StringBuilder.insert(I) java function

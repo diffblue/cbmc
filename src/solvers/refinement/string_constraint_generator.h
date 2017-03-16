@@ -20,6 +20,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
+#include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
@@ -29,29 +30,19 @@ class string_constraint_generatort
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
-  // string constraints for different string funcitons and add them
+  // string constraints for different string functions and add them
   // to the axiom list.
 
   string_constraint_generatort():
-    mode(ID_unknown),
-    max_string_length(-1),
+    max_string_length(std::numeric_limits<size_t>::max()),
     force_printable_characters(false)
   { }
 
   // Constraints on the maximal length of strings
-  int max_string_length;
+  size_t max_string_length;
 
   // Should we add constraints on the characters
   bool force_printable_characters;
-
-  void set_mode(irep_idt _mode)
-  {
-    // only C and java modes supported
-    assert((_mode==ID_java) || (_mode==ID_C));
-    mode=_mode;
-  }
-
-  irep_idt &get_mode() { return mode; }
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
