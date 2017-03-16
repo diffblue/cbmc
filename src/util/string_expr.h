@@ -77,7 +77,7 @@ public:
     return binary_relation_exprt(rhs.length(), ID_lt, length());
   }
 
-  binary_relation_exprt axiom_for_is_strictly_longer_than(int i) const
+  binary_relation_exprt axiom_for_is_strictly_longer_than(mp_integer i) const
   {
     return axiom_for_is_strictly_longer_than(from_integer(i, length().type()));
   }
@@ -94,7 +94,7 @@ public:
     return binary_relation_exprt(length(), ID_le, rhs);
   }
 
-  binary_relation_exprt axiom_for_is_shorter_than(int i) const
+  binary_relation_exprt axiom_for_is_shorter_than(mp_integer i) const
   {
     return axiom_for_is_shorter_than(from_integer(i, length().type()));
   }
@@ -122,7 +122,7 @@ public:
     return equal_exprt(length(), rhs);
   }
 
-  equal_exprt axiom_for_has_length(int i) const
+  equal_exprt axiom_for_has_length(mp_integer i) const
   {
     return axiom_for_has_length(from_integer(i, length().type()));
   }
