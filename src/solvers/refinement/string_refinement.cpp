@@ -49,35 +49,20 @@ string_refinementt::string_refinementt(
 
 /*******************************************************************\
 
-Function: string_refinementt::set_mode
-
- Purpose: determine which language should be used
-
-\*******************************************************************/
-
-void string_refinementt::set_mode()
-{
-  debug() << "initializing mode" << eom;
-  symbolt init=ns.lookup(irep_idt(CPROVER_PREFIX"initialize"));
-  irep_idt mode=init.mode;
-  debug() << "mode detected as " << mode << eom;
-  generator.set_mode(mode);
-}
-
-/*******************************************************************\
-
 Function: string_refinementt::set_max_string_length
 
   Inputs:
     i - maximum length which is allowed for strings.
-        negative number means no limit
+        by default the strings length has no other limit
+        than the maximal integer according to the type of their
+        length, for instance 2^31-1 for Java.
 
  Purpose: Add constraints on the size of strings used in the
           program.
 
 \*******************************************************************/
 
-void string_refinementt::set_max_string_length(int i)
+void string_refinementt::set_max_string_length(size_t i)
 {
   generator.max_string_length=i;
 }
@@ -355,16 +340,18 @@ void string_refinementt::concretize_string(const exprt &expr)
     if(!to_integer(length, found_length))
     {
       assert(found_length.is_long());
-      if(found_length < 0)
+      if(found_length<0)
       {
+        // Lengths should not be negative.
+        // TODO: Add constraints no the sign of string lengths.
         debug() << "concretize_results: WARNING found length is negative"
                 << eom;
       }
       else
       {
         size_t concretize_limit=found_length.to_long();
-        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
-              MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        concretize_limit=concretize_limit>generator.max_string_length?
+              generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
         for(size_t i=0; i<concretize_limit; ++i)
         {
@@ -391,9 +378,9 @@ Function: string_refinementt::concretize_results
 
 void string_refinementt::concretize_results()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
     concretize_string(it.second);
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
     concretize_string(it);
   add_instantiations();
 }
@@ -409,7 +396,7 @@ Function: string_refinementt::concretize_lengths
 
 void string_refinementt::concretize_lengths()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
@@ -420,7 +407,7 @@ void string_refinementt::concretize_lengths()
       found_length[content]=length;
      }
   }
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
   {
     if(refined_string_typet::is_refined_string_type(it.type()))
     {
@@ -447,12 +434,6 @@ Function: string_refinementt::set_to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   assert(equality_propagation);
-
-  // TODO: remove the mode field of generator since we should be language
-  // independent.
-  // We only set the mode once.
-  if(generator.get_mode()==ID_unknown)
-    set_mode();
 
   if(expr.id()==ID_equal)
   {
@@ -743,7 +724,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
-  if(n>MAX_CONCRETE_STRING_SIZE)
+  if(n>generator.max_string_length)
   {
 #if 0
     debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
@@ -949,6 +930,125 @@ void string_refinementt::fill_model()
 
 /*******************************************************************\
 
+Function: string_refinementt::substitute_array_with_expr()
+
+  Inputs:
+    expr - A (possibly nested) 'with' expression on an `array_of`
+           expression
+    index - An index with which to build the equality condition
+
+ Outputs: An expression containing no 'with' expression
+
+ Purpose: Create a new expression where 'with' expressions on arrays
+          are replaced by 'if' expressions.
+          e.g. for an array access arr[x], where:
+               `arr := array_of(12) with {0:=24} with {2:=42}`
+               the constructed expression will be:
+               `index==0 ? 24 : index==2 ? 42 : 12`
+
+\*******************************************************************/
+
+exprt string_refinementt::substitute_array_with_expr(
+  const exprt &expr, const exprt &index) const
+{
+  if(expr.id()==ID_with)
+  {
+    const with_exprt &with_expr=to_with_expr(expr);
+    const exprt &then_expr=with_expr.new_value();
+    exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
+    const typet &type=then_expr.type();
+    assert(else_expr.type()==type);
+    return if_exprt(
+      equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
+  }
+  else
+  {
+    // Only handle 'with' expressions on 'array_of' expressions.
+    assert(expr.id()==ID_array_of);
+    return to_array_of_expr(expr).what();
+  }
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::substitute_array_access()
+
+  Inputs:
+    expr - an expression containing array accesses
+
+ Outputs: an expression containing no array access
+
+ Purpose: create an equivalent expression where array accesses and
+          'with' expressions are replaced by 'if' expressions.
+          e.g. for an array access arr[x], where:
+               `arr := {12, 24, 48}`
+               the constructed expression will be:
+               `index==0 ? 12 : index==1 ? 24 : 48`
+
+\*******************************************************************/
+
+void string_refinementt::substitute_array_access(exprt &expr) const
+{
+  for(auto &op : expr.operands())
+    substitute_array_access(op);
+
+  if(expr.id()==ID_index)
+  {
+    index_exprt &index_expr=to_index_expr(expr);
+
+    if(index_expr.array().id()==ID_symbol)
+    {
+      expr=index_expr;
+      return;
+    }
+
+    if(index_expr.array().id()==ID_with)
+    {
+      expr=substitute_array_with_expr(
+        index_expr.array(), index_expr.index());
+      return;
+    }
+
+    if(index_expr.array().id()==ID_array_of)
+    {
+      expr=to_array_of_expr(index_expr.array()).op();
+      return;
+    }
+
+    assert(index_expr.array().id()==ID_array);
+    array_exprt &array_expr=to_array_expr(index_expr.array());
+
+    assert(!array_expr.operands().empty());
+    size_t last_index=array_expr.operands().size()-1;
+
+    const typet &char_type=index_expr.array().type().subtype();
+    exprt ite=array_expr.operands().back();
+
+    if(ite.type()!=char_type)
+    {
+      // We have to manualy set the type for unknown values
+      assert(ite.id()==ID_unknown);
+      ite.type()=char_type;
+    }
+
+    auto op_it=++array_expr.operands().rbegin();
+    for(size_t i=last_index-1;
+        op_it!=array_expr.operands().rend(); ++op_it, --i)
+    {
+      equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
+      ite=if_exprt(equals, *op_it, ite);
+      if(ite.type()!=char_type)
+      {
+        assert(ite.id()==ID_unknown);
+        ite.type()=char_type;
+      }
+    }
+    expr=ite;
+  }
+}
+
+/*******************************************************************\
+
 Function: string_refinementt::add_negation_of_constraint_to_solver
 
   Inputs: a string constraint and a solver for non string expressions
@@ -991,6 +1091,7 @@ void string_refinementt::add_negation_of_constraint_to_solver(
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
+  substitute_array_access(negaxiom);
   solver << negaxiom;
 }
 
@@ -1031,6 +1132,7 @@ bool string_refinementt::check_axioms()
 
     satcheck_no_simplifiert sat_check;
     supert solver(ns, sat_check);
+    solver.set_ui(ui);
     add_negation_of_constraint_to_solver(axiom_in_model, solver);
 
     switch(solver())
@@ -1085,6 +1187,7 @@ bool string_refinementt::check_axioms()
         exprt premise(axiom.premise());
         exprt body(axiom.body());
         implies_exprt instance(premise, body);
+        replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
         debug() << "adding counter example " << from_expr(instance) << eom;
         add_lemma(instance);

@@ -224,7 +224,6 @@ Function: string_constraint_generatort::convert_java_string_to_string_exprt
 string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
     const exprt &jls)
 {
-  assert(get_mode()==ID_java);
   assert(jls.id()==ID_struct);
 
   exprt length(to_struct_expr(jls).op1());
@@ -269,7 +268,7 @@ void string_constraint_generatort::add_default_axioms(
   const string_exprt &s)
 {
   s.axiom_for_is_longer_than(from_integer(0, s.length().type()));
-  if(max_string_length>=0)
+  if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_is_shorter_than(max_string_length));
 
   if(force_printable_characters)
@@ -433,7 +432,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     // TODO: This part needs some improvement.
     // Stripping the symbol name is not a very robust process.
     new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
-    assert(get_mode()==ID_java);
     new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
 
     auto res_it=function_application_cache.insert(std::make_pair(new_expr,
