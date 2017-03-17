@@ -545,15 +545,14 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       modified|=object_modified;
         map[entry.first]=new_object;
 
-      }
-
-      if(map[entry.first]->is_top())
-      {
-        map.erase(entry.first);
-        modified=true;
+        if(map[entry.first]->is_top())
+        {
+          map.erase(entry.first);
+          modified=true;
 #ifdef DEBUG
-      std::cout << "Removing " << entry.first.get_identifier() << std::endl;
+          std::cout << "Removing " << entry.first.get_identifier() << std::endl;
 #endif
+        }
       }
     }
 
@@ -569,7 +568,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
     {
       map.erase(key_to_remove);
 #ifdef DEBUG
-    std::cout << "Removing " << key_to_remove.get_identifier() << std::endl;
+      std::cout << "Removing " << key_to_remove.get_identifier() << std::endl;
 #endif
       modified=true;
     }
