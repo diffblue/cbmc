@@ -117,10 +117,11 @@ plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
 string_exprt string_constraint_generatort::fresh_string(
   const refined_string_typet &type)
 {
-  symbol_exprt length=
-    fresh_symbol("string_length", type.get_index_type());
+  symbol_exprt length=fresh_symbol("string_length", type.get_index_type());
   symbol_exprt content=fresh_symbol("string_content", type.get_content_type());
-  return string_exprt(length, content, type);
+  string_exprt str(length, content, type);
+  created_strings.insert(str);
+  return str;
 }
 
 /// casts an expression to a string expression, or fetches the actual
@@ -215,15 +216,13 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   {
     const symbol_exprt &sym=to_symbol_expr(string);
     string_exprt s=find_or_add_string_of_symbol(sym, type);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else if(string.id()==ID_nondet_symbol)
   {
     string_exprt s=fresh_string(type);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else if(string.id()==ID_if)
@@ -233,8 +232,7 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   else if(string.id()==ID_struct)
   {
     const string_exprt &s=to_string_expr(string);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else

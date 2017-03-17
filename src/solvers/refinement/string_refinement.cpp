@@ -51,18 +51,41 @@ string_refinementt::string_refinementt(
   supert(_ns, _prop),
   use_counter_example(false),
   do_concretizing(false),
-  initial_loop_bound(refinement_bound)
+  initial_loop_bound(refinement_bound),
+  non_empty_string(false)
 { }
 
-/// determine which language should be used
-void string_refinementt::set_mode()
+/// Add constraints on the size of strings used in the program.
+/// \param i: maximum length which is allowed for strings.
+/// by default the strings length has no other limit
+/// than the maximal integer according to the type of their
+/// length, for instance 2^31-1 for Java.
+void string_refinementt::set_max_string_length(size_t i)
 {
-  debug() << "initializing mode" << eom;
-  symbolt init=ns.lookup(irep_idt(CPROVER_PREFIX"initialize"));
-  irep_idt mode=init.mode;
-  debug() << "mode detected as " << mode << eom;
-  generator.set_mode(mode);
+  generator.max_string_length=i;
 }
+
+/// Add constraints on the size of nondet character arrays to ensure they have
+/// length at least 1
+void string_refinementt::enforce_non_empty_string()
+{
+  non_empty_string=true;
+}
+
+/// Add constraints on characters used in the program to ensure they are
+/// printable
+void string_refinementt::enforce_printable_characters()
+{
+  generator.force_printable_characters=true;
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::display_index_set
+
+ Purpose: display the current index set, for debugging
+
+\*******************************************************************/
 
 /// display the current index set, for debugging
 void string_refinementt::display_index_set()
@@ -118,19 +141,12 @@ void string_refinementt::add_instantiations()
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_symbol_to_symbol_map()
-
-  Inputs: a symbol and the expression to map it to
-
- Purpose: keeps a map of symbols to expressions, such as none of the
-          mapped values exist as a key
-
-\*******************************************************************/
-
-void string_refinementt::add_symbol_to_symbol_map
-(const exprt &lhs, const exprt &rhs)
+/// keeps a map of symbols to expressions, such as none of the mapped values
+/// exist as a key
+/// \param lhs: a symbol expression
+/// \param rhs: an expression to map it to
+void string_refinementt::add_symbol_to_symbol_map(
+  const exprt &lhs, const exprt &rhs)
 {
   assert(lhs.id()==ID_symbol);
 
@@ -149,16 +165,8 @@ void string_refinementt::add_symbol_to_symbol_map
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_char_array_equality()
-
-  Inputs: the rhs and lhs of an equality over character arrays
-
- Purpose: add axioms if the rhs is a character array
-
-\*******************************************************************/
-
+/// add axioms if the rhs is a character array
+/// \par parameters: the rhs and lhs of an equality over character arrays
 void string_refinementt::set_char_array_equality(
   const exprt &lhs, const exprt &rhs)
 {
@@ -183,19 +191,9 @@ void string_refinementt::set_char_array_equality(
   // equality. Note that this might not be the case for other languages.
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::substitute_function_applications()
-
-  Inputs: an expression containing function applications
-
- Outputs: an epression containing no function application
-
- Purpose: remove functions applications and create the necessary
-          axioms
-
-\*******************************************************************/
-
+/// remove functions applications and create the necessary axioms
+/// \par parameters: an expression containing function applications
+/// \return an epression containing no function application
 exprt string_refinementt::substitute_function_applications(exprt expr)
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
@@ -214,6 +212,11 @@ exprt string_refinementt::substitute_function_applications(exprt expr)
   return expr;
 }
 
+/// distinguish char array from other types
+///
+/// TODO: this is only for java char array and does not work for other languages
+/// \param type: a type
+/// \return true if the given type is an array of java characters
 bool string_refinementt::is_char_array(const typet &type) const
 {
   if(type.id()==ID_symbol)
@@ -222,20 +225,12 @@ bool string_refinementt::is_char_array(const typet &type) const
   return (type.id()==ID_array && type.subtype()==java_char_type());
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::boolbv_set_equality_to_true
-
-  Inputs: the lhs and rhs of an equality expression
-
- Outputs: false if the lemmas were added successfully, true otherwise
-
- Purpose: add lemmas to the solver corresponding to the given equation
-
-\*******************************************************************/
-
-bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
-                                                       const exprt &rhs)
+/// add lemmas to the solver corresponding to the given equation
+/// \param lhs: left hand side of an equality expression
+/// \param rhs: right and side of the equality
+/// \return false if the lemmas were added successfully, true otherwise
+bool string_refinementt::add_axioms_for_string_assigns(
+  const exprt &lhs, const exprt &rhs)
 {
   if(is_char_array(rhs.type()))
   {
@@ -268,66 +263,69 @@ bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
   return true;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::concretize_results
-
- Purpose: For each string whose length has been solved, add constants
-          to the index set to force the solver to pick concrete values
-          for each character, and fill the map `found_length`
-
-\*******************************************************************/
-
-void string_refinementt::concretize_results()
+/// If the expression is of type string, then adds constants to the index set to
+/// force the solver to pick concrete values for each character, and fill the
+/// maps `found_length` and `found_content`.
+///
+///          The way this is done is by looking for the length of the string,
+///          then for each `i` in the index set, look at the value found by
+///          the solver and put it in the `result` table.
+///          For indexes that are not present in the index set, we put the
+///          same value as the next index that is present in the index set.
+///          We do so by traversing the array backward, remembering the
+///          last value that has been initialized.
+void string_refinementt::concretize_string(const exprt &expr)
 {
-  for(const auto& it : symbol_resolve)
+  if(refined_string_typet::is_refined_string_type(expr.type()))
   {
-    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    string_exprt str=to_string_expr(expr);
+    exprt length=get(str.length());
+    add_lemma(equal_exprt(str.length(), length));
+    exprt content=str.content();
+    replace_expr(symbol_resolve, content);
+    found_length[content]=length;
+    mp_integer found_length;
+    if(!to_integer(length, found_length))
     {
-      string_exprt str=to_string_expr(it.second);
-      exprt length=current_model[str.length()];
-      exprt content=str.content();
-      replace_expr(symbol_resolve, content);
-      found_length[content]=length;
-      mp_integer found_length;
-      if(!to_integer(length, found_length))
+      assert(found_length.is_long());
+      if(found_length < 0)
       {
-        assert(found_length.is_long());
-        if(found_length < 0)
+        debug() << "concretize_results: WARNING found length is negative"
+                << eom;
+      }
+      else
+      {
+        size_t concretize_limit=found_length.to_long();
+        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
+              MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        exprt content_expr=str.content();
+        for(size_t i=0; i<concretize_limit; ++i)
         {
-          debug() << "concretize_results: WARNING found length is negative"
-                  << eom;
-        }
-        else
-        {
-          size_t concretize_limit=found_length.to_long();
-          concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
-                MAX_CONCRETE_STRING_SIZE:concretize_limit;
-          exprt content_expr=str.content();
-          replace_expr(current_model, content_expr);
-          for(size_t i=0; i<concretize_limit; ++i)
-          {
-            auto i_expr=from_integer(i, str.length().type());
-            debug() << "Concretizing " << from_expr(content_expr)
-                    << " / " << i << eom;
-            current_index_set[str.content()].insert(i_expr);
-          }
+          auto i_expr=from_integer(i, str.length().type());
+          debug() << "Concretizing " << from_expr(content_expr)
+                  << " / " << i << eom;
+          current_index_set[str.content()].insert(i_expr);
+          index_set[str.content()].insert(i_expr);
         }
       }
     }
   }
+}
+
+/// For each string whose length has been solved, add constants to the index set
+/// to force the solver to pick concrete values for each character, and fill the
+/// map `found_length`
+void string_refinementt::concretize_results()
+{
+  for(const auto& it : symbol_resolve)
+    concretize_string(it.second);
+  for(const auto& it : generator.created_strings)
+    concretize_string(it);
   add_instantiations();
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::concretize_lengths
-
- Purpose: For each string whose length has been solved, add constants
-          to the map `found_length`
-
-\*******************************************************************/
-
+/// For each string whose length has been solved, add constants to the map
+/// `found_length`
 void string_refinementt::concretize_lengths()
 {
   for(const auto& it : symbol_resolve)
@@ -335,7 +333,18 @@ void string_refinementt::concretize_lengths()
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
       string_exprt str=to_string_expr(it.second);
-      exprt length=current_model[str.length()];
+      exprt length=get(str.length());
+      exprt content=str.content();
+      replace_expr(symbol_resolve, content);
+      found_length[content]=length;
+     }
+  }
+  for(const auto& it : generator.created_strings)
+  {
+    if(refined_string_typet::is_refined_string_type(it.type()))
+    {
+      string_exprt str=to_string_expr(it);
+      exprt length=get(str.length());
       exprt content=str.content();
       replace_expr(symbol_resolve, content);
       found_length[content]=length;
@@ -343,17 +352,8 @@ void string_refinementt::concretize_lengths()
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_to
-
-  Inputs: an expression and the value to set it to
-
- Purpose: add lemmas representing the setting of an expression to a
-          given value
-
-\*******************************************************************/
-
+/// add lemmas representing the setting of an expression to a given value
+/// \par parameters: an expression and the value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   assert(equality_propagation);
@@ -797,6 +797,7 @@ void string_refinementt::fill_model()
      current_model[it]=supert::get(it);
   }
 }
+
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
 /// 'if' expressions. e.g. for an array access arr[x], where: `arr :=
