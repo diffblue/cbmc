@@ -12,6 +12,7 @@ Date: January 2012
 #include <cassert>
 
 #include <fstream>
+#include <cstring>
 #include <cstdlib>
 #include <algorithm>
 #include <sstream>
@@ -255,6 +256,11 @@ std::string fileutl_absolute_path(std::string const &path)
   return std::string(&(buffer[0]));
 #else
   char *absolute = realpath(path.c_str(), nullptr);
+  if(absolute==NULL)
+  {
+    std::string error=std::strerror(errno);
+    throw std::ios::failure("Could not resolve absolute path ("+error+")");
+  }
   std::string ret(absolute);
   free(absolute);
   return ret;
