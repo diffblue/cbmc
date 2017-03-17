@@ -173,6 +173,16 @@ cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
   string_refinementt *string_refinement=new string_refinementt(
     ns, *prop, MAX_NB_REFINEMENT);
   string_refinement->set_ui(ui);
+
+  string_refinement->do_concretizing=options.get_bool_option("trace");
+  if(options.get_bool_option("string-max-length"))
+    string_refinement->set_max_string_length(
+      options.get_signed_int_option("string-max-length"));
+  if(options.get_bool_option("string-non-empty"))
+    string_refinement->enforce_non_empty_string();
+  if(options.get_bool_option("string-printable"))
+    string_refinement->enforce_printable_characters();
+
   return new solvert(string_refinement, prop);
 }
 

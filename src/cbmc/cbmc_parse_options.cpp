@@ -271,7 +271,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("string-refine"))
   {
-    options.set_option("string-refine", true);
+    options.set_option("refine-strings", true);
+    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
+    options.set_option("string-printable", cmdline.isset("string-printable"));
+    if(cmdline.isset("string-max-length"))
+      options.set_option(
+        "string-max-length", cmdline.get_value("string-max-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
