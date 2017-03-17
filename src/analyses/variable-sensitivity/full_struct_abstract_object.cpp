@@ -204,9 +204,21 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
     internal_sharing_ptrt<full_struct_abstract_objectt> copy(
       new full_struct_abstract_objectt(*this));
 
+    abstract_object_pointert starting_value;
     irep_idt c=member_expr.get_component_name();
+    if(map.find(c)==map.cend())
+    {
+      starting_value=
+        environment.abstract_object_factory(
+          member_expr.type(), ns, true, false);
+    }
+    else
+    {
+      starting_value=map.at(c);
+    }
+
     copy->map[c]=
-      environment.write(copy->map[c], value, stack, ns, merging_write);
+      environment.write(starting_value, value, stack, ns, merging_write);
     assert(copy->verify());
     return copy;
   }
