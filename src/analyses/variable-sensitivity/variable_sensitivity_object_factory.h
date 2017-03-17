@@ -15,6 +15,7 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <util/options.h>
+#include <util/namespace.h>
 
 
 class variable_sensitivity_object_factoryt
@@ -91,7 +92,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   }
   else
   {
-    assert(type==e.type());
+    assert(type==ns.follow(e.type()));
     return abstract_object_pointert(new abstract_object_classt(e));
   }
 }
