@@ -107,7 +107,13 @@ void delete_directory(const std::string &path)
     struct dirent *ent;
 
     while((ent=readdir(dir))!=NULL)
-      remove((path+"/"+ent->d_name).c_str());
+    {
+      std::string sub_path=path+"/"+ent->d_name;
+      if(ent->d_type==DT_DIR)
+        delete_directory(sub_path);
+      else
+        remove(sub_path.c_str());
+    }
 
     closedir(dir);
   }
