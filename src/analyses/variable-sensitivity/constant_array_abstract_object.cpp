@@ -66,10 +66,7 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
   const constant_array_abstract_objectt &old):
     array_abstract_objectt(old)
 {
-  for(const auto &entry : old.map)
-  {
-    map[entry.first]=abstract_object_pointert(entry.second->clone());
-  }
+  map=old.map;
 }
 
 /*******************************************************************\
@@ -134,12 +131,11 @@ bool constant_array_abstract_objectt::merge_state(
   {
     if(op1->is_bottom())
     {
-      *this=*dynamic_cast<constant_array_abstract_objectt*>(op2->clone());
+      map=op2->map;
       return true;
     }
     if(op2->is_bottom())
     {
-      *this=*dynamic_cast<constant_array_abstract_objectt*>(op1->clone());
       return false;
     }
 
