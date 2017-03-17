@@ -160,6 +160,39 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
   return new solvert(bv_refinement, prop);
 }
 
+/*******************************************************************\
+
+Function: cbmc_solverst::get_string_refinement
+
+ Outputs: a solver for cbmc
+
+ Purpose: the string refinement adds to the bit vector refinement
+          specifications for functions from the Java string library
+
+\*******************************************************************/
+
+cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
+{
+  propt *prop;
+  prop=new satcheck_no_simplifiert();
+  prop->set_message_handler(get_message_handler());
+
+  string_refinementt *string_refinement=new string_refinementt(
+    ns, *prop, MAX_NB_REFINEMENT);
+  string_refinement->set_ui(ui);
+
+  string_refinement->do_concretizing=options.get_bool_option("trace");
+  if(options.get_bool_option("string-max-length"))
+    string_refinement->set_max_string_length(
+      options.get_signed_int_option("string-max-length"));
+  if(options.get_bool_option("string-non-empty"))
+    string_refinement->enforce_non_empty_string();
+  if(options.get_bool_option("string-printable"))
+    string_refinement->enforce_printable_characters();
+
+  return new solvert(string_refinement, prop);
+}
+
 cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
 {
   no_beautification();
