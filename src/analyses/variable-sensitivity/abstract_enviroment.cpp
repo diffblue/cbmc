@@ -729,6 +729,6 @@ abstract_object_pointert abstract_environmentt::eval_expression(
 {
   // Delegate responsibility of resolving to a boolean abstract object
   // to the abstract object being compared against
-  abstract_object_pointert lhs=eval(e.op0(), ns);
-  return lhs->expression_transform(e, *this, ns);
+  abstract_object_pointert eval_obj=abstract_object_factory(e.type(), e, ns);
+  return eval_obj->expression_transform(e, *this, ns);
 }
