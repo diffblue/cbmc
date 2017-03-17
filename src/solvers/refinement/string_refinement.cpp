@@ -43,7 +43,8 @@ string_refinementt::string_refinementt(
   supert(_ns, _prop),
   use_counter_example(false),
   do_concretizing(false),
-  initial_loop_bound(refinement_bound)
+  initial_loop_bound(refinement_bound),
+  non_empty_string(false)
 { }
 
 /*******************************************************************\
@@ -61,6 +62,52 @@ void string_refinementt::set_mode()
   irep_idt mode=init.mode;
   debug() << "mode detected as " << mode << eom;
   generator.set_mode(mode);
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::set_max_string_length
+
+  Inputs:
+    i - maximum length which is allowed for strings.
+        negative number means no limit
+
+ Purpose: Add constraints on the size of strings used in the
+          program.
+
+\*******************************************************************/
+
+void string_refinementt::set_max_string_length(int i)
+{
+  generator.max_string_length=i;
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::set_max_string_length
+
+ Purpose: Add constraints on the size of nondet character arrays
+          to ensure they have length at least 1
+
+\*******************************************************************/
+
+void string_refinementt::enforce_non_empty_string()
+{
+  non_empty_string=true;
+}
+
+/*******************************************************************\
+
+Function: string_refinementt::enforce_printable_characters
+
+ Purpose: Add constraints on characters used in the program
+          to ensure they are printable
+
+\*******************************************************************/
+
+void string_refinementt::enforce_printable_characters()
+{
+  generator.force_printable_characters=true;
 }
 
 /*******************************************************************\
@@ -283,6 +330,57 @@ bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
 
 /*******************************************************************\
 
+Function: string_refinementt::concretize_string
+
+  Input:
+    expr - an expression
+
+ Purpose: If the expression is of type string, then adds constants
+          to the index set to force the solver to pick concrete values
+          for each character, and fill the map `found_length`
+
+\*******************************************************************/
+
+void string_refinementt::concretize_string(const exprt &expr)
+{
+  if(refined_string_typet::is_refined_string_type(expr.type()))
+  {
+    string_exprt str=to_string_expr(expr);
+    exprt length=get(str.length());
+    add_lemma(equal_exprt(str.length(), length));
+    exprt content=str.content();
+    replace_expr(symbol_resolve, content);
+    found_length[content]=length;
+    mp_integer found_length;
+    if(!to_integer(length, found_length))
+    {
+      assert(found_length.is_long());
+      if(found_length < 0)
+      {
+        debug() << "concretize_results: WARNING found length is negative"
+                << eom;
+      }
+      else
+      {
+        size_t concretize_limit=found_length.to_long();
+        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
+              MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        exprt content_expr=str.content();
+        for(size_t i=0; i<concretize_limit; ++i)
+        {
+          auto i_expr=from_integer(i, str.length().type());
+          debug() << "Concretizing " << from_expr(content_expr)
+                  << " / " << i << eom;
+          current_index_set[str.content()].insert(i_expr);
+          index_set[str.content()].insert(i_expr);
+        }
+      }
+    }
+  }
+}
+
+/*******************************************************************\
+
 Function: string_refinementt::concretize_results
 
  Purpose: For each string whose length has been solved, add constants
@@ -294,41 +392,9 @@ Function: string_refinementt::concretize_results
 void string_refinementt::concretize_results()
 {
   for(const auto& it : symbol_resolve)
-  {
-    if(refined_string_typet::is_refined_string_type(it.second.type()))
-    {
-      string_exprt str=to_string_expr(it.second);
-      exprt length=current_model[str.length()];
-      exprt content=str.content();
-      replace_expr(symbol_resolve, content);
-      found_length[content]=length;
-      mp_integer found_length;
-      if(!to_integer(length, found_length))
-      {
-        assert(found_length.is_long());
-        if(found_length < 0)
-        {
-          debug() << "concretize_results: WARNING found length is negative"
-                  << eom;
-        }
-        else
-        {
-          size_t concretize_limit=found_length.to_long();
-          concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
-                MAX_CONCRETE_STRING_SIZE:concretize_limit;
-          exprt content_expr=str.content();
-          replace_expr(current_model, content_expr);
-          for(size_t i=0; i<concretize_limit; ++i)
-          {
-            auto i_expr=from_integer(i, str.length().type());
-            debug() << "Concretizing " << from_expr(content_expr)
-                    << " / " << i << eom;
-            current_index_set[str.content()].insert(i_expr);
-          }
-        }
-      }
-    }
-  }
+    concretize_string(it.second);
+  for(const auto& it : generator.created_strings)
+    concretize_string(it);
   add_instantiations();
 }
 
@@ -348,7 +414,18 @@ void string_refinementt::concretize_lengths()
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
       string_exprt str=to_string_expr(it.second);
-      exprt length=current_model[str.length()];
+      exprt length=get(str.length());
+      exprt content=str.content();
+      replace_expr(symbol_resolve, content);
+      found_length[content]=length;
+     }
+  }
+  for(const auto& it : generator.created_strings)
+  {
+    if(refined_string_typet::is_refined_string_type(it.type()))
+    {
+      string_exprt str=to_string_expr(it);
+      exprt length=get(str.length());
       exprt content=str.content();
       replace_expr(symbol_resolve, content);
       found_length[content]=length;
@@ -868,6 +945,7 @@ void string_refinementt::fill_model()
      current_model[it]=supert::get(it);
   }
 }
+
 
 /*******************************************************************\
 
