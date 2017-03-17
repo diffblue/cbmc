@@ -546,14 +546,6 @@ static void merge_variable_table_entries(
   merge_into.var.start_pc=found_dominator;
   merge_into.var.length=last_pc-found_dominator;
 
-#ifdef DEBUG
-  debug_out << "Merged " << merge_vars.size() << " variables named "
-            << merge_into.var.name << "; new live range "
-            << merge_into.var.start_pc << "-"
-            << merge_into.var.start_pc + merge_into.var.length
-            << messaget::eom;
-#endif
-
   // Nuke the now-subsumed var-table entries:
   for(auto &v : merge_vars)
     if(v!=&merge_into)
