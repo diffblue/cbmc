@@ -49,23 +49,6 @@ string_refinementt::string_refinementt(
 
 /*******************************************************************\
 
-Function: string_refinementt::set_mode
-
- Purpose: determine which language should be used
-
-\*******************************************************************/
-
-void string_refinementt::set_mode()
-{
-  debug() << "initializing mode" << eom;
-  symbolt init=ns.lookup(irep_idt(CPROVER_PREFIX"initialize"));
-  irep_idt mode=init.mode;
-  debug() << "mode detected as " << mode << eom;
-  generator.set_mode(mode);
-}
-
-/*******************************************************************\
-
 Function: string_refinementt::set_max_string_length
 
   Inputs:
@@ -447,12 +430,6 @@ Function: string_refinementt::set_to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   assert(equality_propagation);
-
-  // TODO: remove the mode field of generator since we should be language
-  // independent.
-  // We only set the mode once.
-  if(generator.get_mode()==ID_unknown)
-    set_mode();
 
   if(expr.id()==ID_equal)
   {

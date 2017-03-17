@@ -26,7 +26,6 @@ public:
   // to the axiom list.
 
   string_constraint_generatort():
-    mode(ID_unknown),
     max_string_length(-1),
     force_printable_characters(false)
   { }
@@ -36,15 +35,6 @@ public:
 
   // Should we add constraints on the characters
   bool force_printable_characters;
-
-  void set_mode(irep_idt _mode)
-  {
-    // only C and java modes supported
-    assert((_mode==ID_java) || (_mode==ID_C));
-    mode=_mode;
-  }
-
-  irep_idt &get_mode() { return mode; }
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
