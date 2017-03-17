@@ -2,7 +2,7 @@
 
 Module: String support via creating string constraints and progressively
         instantiating the universal constraints as needed.
-	The procedure is described in the PASS paper at HVC'13:
+        The procedure is described in the PASS paper at HVC'13:
         "PASS: String Solving with Parameterized Array and Interval Automaton"
         by Guodong Li and Indradeep Ghosh
 
@@ -38,7 +38,12 @@ public:
   // Should we use counter examples at each iteration?
   bool use_counter_example;
 
+  // Should we concretize strings when the solver finished
   bool do_concretizing;
+
+  void set_max_string_length(int i);
+  void enforce_non_empty_string();
+  void enforce_printable_characters();
 
   virtual std::string decision_procedure_text() const override
   {
@@ -64,6 +69,9 @@ private:
   unsigned initial_loop_bound;
 
   string_constraint_generatort generator;
+
+  bool non_empty_string;
+  expr_sett nondet_arrays;
 
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
@@ -98,6 +106,8 @@ private:
   exprt substitute_function_applications(exprt expr);
   typet substitute_java_string_types(typet type);
   exprt substitute_java_strings(exprt expr);
+  exprt substitute_array_with_expr(exprt &expr, exprt &index) const;
+  exprt substitute_array_access(exprt &expr) const;
   void add_symbol_to_symbol_map(const exprt &lhs, const exprt &rhs);
   bool is_char_array(const typet &type) const;
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
@@ -134,8 +144,10 @@ private:
 
   exprt simplify_sum(const exprt &f) const;
 
+  void concretize_string(const exprt &expr);
   void concretize_results();
   void concretize_lengths();
+
   // Length of char arrays found during concretization
   std::map<exprt, exprt> found_length;
 
