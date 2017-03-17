@@ -311,9 +311,15 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+
   if(cmdline.isset("string-refine"))
   {
     options.set_option("string-refine", true);
+    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
+    options.set_option("string-printable", cmdline.isset("string-printable"));
+    if(cmdline.isset("string-max-length"))
+      options.set_option(
+        "string-max-length", cmdline.get_value("string-max-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -1206,6 +1212,9 @@ void cbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --string-refine              use string refinement (experimental)\n"
+    " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
+    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings (experimental)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
