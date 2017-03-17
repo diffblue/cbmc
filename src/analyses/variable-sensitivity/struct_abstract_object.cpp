@@ -89,7 +89,7 @@ Function: struct_abstract_objectt::struct_abstract_objectt
 struct_abstract_objectt::struct_abstract_objectt(const exprt &e):
   abstract_objectt(e)
 {
-  assert(e.type().id()==ID_struct);
+//  assert(e.type().id()==ID_struct);
 }
 
 /*******************************************************************\
