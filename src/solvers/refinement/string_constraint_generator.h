@@ -33,8 +33,16 @@ public:
   // to the axiom list.
 
   string_constraint_generatort():
-    mode(ID_unknown)
+    mode(ID_unknown),
+    max_string_length(-1),
+    force_printable_characters(false)
   { }
+
+  // Constraints on the maximal length of strings
+  int max_string_length;
+
+  // Should we add constraints on the characters
+  bool force_printable_characters;
 
   void set_mode(irep_idt _mode)
   {
@@ -81,6 +89,8 @@ public:
   // Maps unresolved symbols to the string_exprt that was created for them
   std::map<irep_idt, string_exprt> unresolved_symbols;
 
+  // Set of strings that have been created by the generator
+  std::set<string_exprt> created_strings;
 
   string_exprt find_or_add_string_of_symbol(
     const symbol_exprt &sym,
@@ -107,6 +117,7 @@ private:
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
+  void add_default_axioms(const string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
 
   // The following functions add axioms for the returned value
