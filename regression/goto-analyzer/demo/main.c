@@ -82,17 +82,28 @@ void func(int unknown)
   int ** ypp = &yp;
   **ypp = *yp;
 
-  int i;
-  int array[4];
+  int array[4] = {0, 1 , 2, 3};
 
-  i = 0;
-  array[i] = i;
-  i = i+1;
-  array[i] = i;
-  i = i+1;
-  array[i] = i;
-  i = i+1;
-  array[i] = i;
+  assert(array[0] == 0); // Success
+  assert(array[3] == 3); // Success
+
+  if(unknown > 10)
+  {
+    array[0] = 4;
+    array[1] = 1;
+    array[2] = 5;
+  }
+  else
+  {
+    array[0] = 4;
+    array[2] = 10;
+  }
+
+  assert(array[0] == 4); // Success
+  assert(array[1] == 1); // Success
+  assert(array[2] == 5); // Unknown
+  assert(array[3] == 3); // Success
+
 
   typedef struct
   {
