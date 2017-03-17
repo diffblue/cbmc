@@ -1058,6 +1058,7 @@ bool string_refinementt::check_axioms()
 
     satcheck_no_simplifiert sat_check;
     supert solver(ns, sat_check);
+    solver.set_ui(ui);
     add_negation_of_constraint_to_solver(axiom_in_model, solver);
 
     switch(solver())
