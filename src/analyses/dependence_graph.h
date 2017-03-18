@@ -154,6 +154,8 @@ public:
   using ait<dep_graph_domaint>::operator[];
   using grapht<dep_nodet>::operator[];
 
+  typedef std::map<irep_idt, cfg_post_dominatorst> post_dominators_mapt;
+
   explicit dependence_grapht(const namespacet &_ns):
     ns(_ns),
     rd(ns)
@@ -169,7 +171,13 @@ public:
   void initialize(const goto_programt &goto_program)
   {
     ait<dep_graph_domaint>::initialize(goto_program);
-    post_dominators(goto_program);
+
+    if(!goto_program.empty())
+    {
+      const irep_idt id=goto_programt::get_function_id(goto_program);
+      cfg_post_dominatorst &pd=post_dominators[id];
+      pd(goto_program);
+    }
   }
 
   void add_dep(
@@ -177,7 +185,7 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to);
 
-  const cfg_post_dominatorst &cfg_post_dominators() const
+  const post_dominators_mapt &cfg_post_dominators() const
   {
     return post_dominators;
   }
@@ -205,7 +213,7 @@ public:
 protected:
   const namespacet &ns;
 
-  cfg_post_dominatorst post_dominators;
+  post_dominators_mapt post_dominators;
   reaching_definitions_analysist rd;
 };
 
