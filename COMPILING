@@ -32,7 +32,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher.
    On Debian-like distributions, do
 
-   apt-get install g++-6 gcc flex bison make git libz-dev libwww-perl patch libzip-dev
+   apt-get install g++-6 gcc flex bison make git libwww-perl patch
 
    On Red Hat/Fedora or derivates, do
 
