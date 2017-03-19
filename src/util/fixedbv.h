@@ -46,6 +46,10 @@ public:
   {
   }
 
+  explicit fixedbvt(const fixedbv_spect &_spec):spec(_spec), v(0)
+  {
+  }
+
   explicit fixedbvt(const constant_exprt &expr);
 
   void from_integer(const mp_integer &i);
@@ -66,6 +70,11 @@ public:
   bool is_zero() const
   {
     return v==0;
+  }
+
+  static fixedbvt zero(const fixedbv_typet &type)
+  {
+    return fixedbvt(fixedbv_spect(type));
   }
 
   void negate();
