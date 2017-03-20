@@ -9,16 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_IREP_H
 #define CPROVER_UTIL_IREP_H
 
+#define USE_DSTRING
+#define SHARING
+// #define HASH_CODE
+// #define SUB_IS_LIST
+
+#include "irep_ids.h"
+
+#ifdef USE_DSTRING
+#include "dstring.h"
+#endif
+
 #include <vector>
 #include <string>
 #include <cassert>
 #include <iosfwd>
-
-#define USE_DSTRING
-#define SHARING
-// #define HASH_CODE
-#define USE_MOVE
-// #define SUB_IS_LIST
+#include <memory>
 
 #ifdef SUB_IS_LIST
 #include <list>
@@ -26,11 +32,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #endif
 
-#ifdef USE_DSTRING
-#include "dstring.h"
+#ifdef IREP_DEBUG
+#include <iostream>
 #endif
-
-#include "irep_ids.h"
 
 #ifdef USE_DSTRING
 typedef dstringt irep_idt;
@@ -79,10 +83,6 @@ inline const std::string &name2string(const irep_namet &n)
   for(irept::named_subt::iterator it=(irep).begin(); \
       it!=(irep).end(); ++it)
 
-#ifdef IREP_DEBUG
-#include <iostream>
-#endif
-
 class irept;
 const irept &get_nil_irep();
 
@@ -97,104 +97,24 @@ public:
   // named_subt has to provide stable references; with C++11 we could
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
-
   #ifdef SUB_IS_LIST
-  typedef std::list<std::pair<irep_namet, irept> > named_subt;
+  typedef std::list<std::pair<irep_namet, irept>> named_subt;
   #else
   typedef std::map<irep_namet, irept> named_subt;
   #endif
 
+  irept()=default;
+
+  explicit irept(const irep_idt &_id) { id(_id); }
+
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
-  explicit irept(const irep_idt &_id):data(&empty_d)
-  {
-    id(_id);
-  }
+  const irep_idt &id() const { return read().data; }
 
-  #ifdef SHARING
-  // constructor for blank irep
-  irept():data(&empty_d)
-  {
-  }
+  const std::string &id_string() const { return id2string(read().data); }
 
-  // copy constructor
-  irept(const irept &irep):data(irep.data)
-  {
-    if(data!=&empty_d)
-    {
-      assert(data->ref_count!=0);
-      data->ref_count++;
-      #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << std::endl;
-      #endif
-    }
-  }
-
-  #ifdef USE_MOVE
-  // Copy from rvalue reference.
-  // Note that this does avoid a branch compared to the
-  // standard copy constructor above.
-  irept(irept &&irep):data(irep.data)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "COPY MOVE\n";
-    #endif
-    irep.data=&empty_d;
-  }
-  #endif
-
-  irept &operator=(const irept &irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN\n";
-    #endif
-
-    // Ordering is very important here!
-    // Consider self-assignment, which may destroy 'irep'
-    dt *irep_data=irep.data;
-    if(irep_data!=&empty_d)
-      irep_data->ref_count++;
-
-    remove_ref(data); // this may kill 'irep'
-    data=irep_data;
-
-    return *this;
-  }
-
-  #ifdef USE_MOVE
-  // Note that the move assignment operator does avoid
-  // three branches compared to standard operator above.
-  irept &operator=(irept &&irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN MOVE\n";
-    #endif
-    // we simply swap two pointers
-    std::swap(data, irep.data);
-    return *this;
-  }
-  #endif
-
-  ~irept()
-  {
-    remove_ref(data);
-  }
-
-  #else
-  irept()
-  {
-  }
-  #endif
-
-  const irep_idt &id() const
-  { return read().data; }
-
-  const std::string &id_string() const
-  { return id2string(read().data); }
-
-  void id(const irep_idt &_data)
-  { write().data=_data; }
+  void id(const irep_idt &_data) { write().data=_data; }
 
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
@@ -213,9 +133,10 @@ public:
   long long get_long_long(const irep_namet &name) const;
 
   void set(const irep_namet &name, const irep_idt &value)
-  { add(name).id(value); }
-  void set(const irep_namet &name, const irept &irep)
-  { add(name, irep); }
+  {
+    add(name).id(value);
+  }
+  void set(const irep_namet &name, const irept &irep) { add(name, irep); }
   void set(const irep_namet &name, const long long value);
 
   void remove(const irep_namet &name);
@@ -224,14 +145,12 @@ public:
 
   bool operator==(const irept &other) const;
 
-  bool operator!=(const irept &other) const
-  {
-    return !(*this==other);
-  }
+  bool operator!=(const irept &other) const { return !operator==(other); }
 
-  void swap(irept &irep)
+  void swap(irept &irep) noexcept
   {
-    std::swap(irep.data, data);
+    using std::swap;
+    swap(data, irep.data);
   }
 
   bool operator<(const irept &other) const;
@@ -257,28 +176,17 @@ public:
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
-protected:
-  static bool is_comment(const irep_namet &name)
-  { return !name.empty() && name[0]=='#'; }
-
-public:
+private:
   class dt
   {
-  private:
-    friend class irept;
-
-    #ifdef SHARING
-    unsigned ref_count;
-    #endif
-
+  public:
     irep_idt data;
-
     named_subt named_sub;
     named_subt comments;
     subt sub;
 
     #ifdef HASH_CODE
-    mutable std::size_t hash_code;
+    mutable std::size_t hash_code=0;
     #endif
 
     void clear()
@@ -295,75 +203,63 @@ public:
       hash_code=0;
       #endif
     }
-
-    void swap(dt &d)
-    {
-      d.data.swap(data);
-      d.sub.swap(sub);
-      d.named_sub.swap(named_sub);
-      d.comments.swap(comments);
-      #ifdef HASH_CODE
-      std::swap(d.hash_code, hash_code);
-      #endif
-    }
-
-    #ifdef SHARING
-    dt():ref_count(1)
-      #ifdef HASH_CODE
-         , hash_code(0)
-      #endif
-    {
-    }
-    #else
-    dt()
-      #ifdef HASH_CODE
-      :hash_code(0)
-      #endif
-    {
-    }
-    #endif
   };
 
-protected:
-  #ifdef SHARING
-  dt *data;
-  static dt empty_d;
-
-  static void remove_ref(dt *old_data);
-  static void nonrecursive_destructor(dt *old_data);
-  void detach();
-
 public:
-  const dt &read() const
-  {
-    return *data;
-  }
+  // TODO This is only public so that we can use the data pointer as a hash.
+  // This is poor encapsulation, which might be fixed by making this method
+  // private and providing a dedicated `ptr_hash` method which returns a
+  // `std::size_t`.
+  const dt &read() const { return *ptr(); }
 
+private:
   dt &write()
   {
-    detach();
-    #ifdef HASH_CODE
-    data->hash_code=0;
+    #ifdef SHARING
+    #ifdef IREP_DEBUG
+    std::cout << "DETACH1: " << data << '\n';
     #endif
-    return *data;
+
+    if(!data.unique())
+    {
+      data=std::make_shared<dt>(*data);
+    }
+
+    #ifdef IREP_DEBUG
+    std::cout << "ALLOCATED " << data << '\n';
+    #endif
+
+    #ifdef IREP_DEBUG
+    std::cout << "DETACH2: " << data << '\n';
+    #endif
+    #endif
+    #ifdef HASH_CODE
+    ptr()->hash_code=0;
+    #endif
+    return *ptr();
   }
 
+  #ifdef SHARING
+  static std::shared_ptr<dt> empty;
+  #endif
+
+  static bool is_comment(const irep_namet &name)
+  {
+    return !name.empty() && name[0]=='#';
+  }
+
+  #ifdef SHARING
+  std::shared_ptr<dt> data=empty;
   #else
   dt data;
+  #endif
 
-public:
-  const dt &read() const
-  {
-    return data;
-  }
-
-  dt &write()
-  {
-    #ifdef HASH_CODE
-    data.hash_code=0;
-    #endif
-    return data;
-  }
+  #ifdef SHARING
+  dt *ptr() { return data.get(); }
+  const dt *ptr() const { return data.get(); }
+  #else
+  dt *ptr() { return &data; }
+  const dt *ptr() const { return &data; }
   #endif
 };
 
