@@ -1,8 +1,8 @@
 /*******************************************************************\
 
-Module:
+Module: Generic expression / type pretty-printer
 
-Author: Daniel Kroening, kroening@cs.cmu.edu
+Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
@@ -18,6 +18,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
+/*
+ * Interface to an expression and/or type pretty-printer.
+ * The convert(...) routines should pretty-print the expressions
+ * they know how to deal with, and defer to next_pretty_printer
+ * for those they can't handle, and top_pretty_printer for
+ * subexpressions (whether it understands them or not).
+ * Per default they always defer.
+ * See `util/language_util.h` and particularly
+ * `register_global_pretty_printer` for detail on how these are used.
+ */
 class pretty_printert
 {
  public:
