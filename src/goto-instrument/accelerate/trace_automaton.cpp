@@ -75,6 +75,11 @@ void trace_automatont::add_path(patht &path)
   {
     goto_programt::targett l=step.loc;
 
+#ifdef DEBUG
+    std::cout << ", " << l->location_number << ':'
+              << l->source_location.as_string();
+#endif
+
     if(in_alphabet(l))
     {
 #ifdef DEBUG
@@ -103,6 +108,13 @@ void trace_automatont::add_path(patht &path)
  */
 void trace_automatont::determinise()
 {
+#ifdef DEBUG
+  std::cout << "Determinising automaton with " << nta.num_states
+            << " states and " << nta.accept_states.size()
+            << " accept states and " << nta.count_transitions()
+            << " transitions\n";
+#endif
+
   dstates.clear();
   unmarked_dstates.clear();
   dta.clear();
@@ -110,6 +122,10 @@ void trace_automatont::determinise()
   state_sett init_states;
   init_states.insert(nta.init_state);
   epsilon_closure(init_states);
+
+#ifdef DEBUG
+  std::cout << "There are " << init_states.size() << " init states\n";
+#endif
 
   dta.init_state=add_dstate(init_states);
 
@@ -371,7 +387,7 @@ void automatont::reverse(goto_programt::targett epsilon)
 
   std::cout << "Reversing automaton, old init=" << init_state
             << ", new init=" << new_init << ", old accept="
-            << *(accept_states.begin()) << "/" << accept_states.size()
+            << *(accept_states.begin()) << '/' << accept_states.size()
             << " new accept=" << init_state << std::endl;
 
   accept_states.clear();
@@ -455,7 +471,7 @@ void automatont::output(std::ostream &str)
   str << "Accept states: ";
 
   for(const auto &state : accept_states)
-    str << state << " ";
+    str << state << ' ';
 
   str << std::endl;
 

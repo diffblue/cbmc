@@ -90,6 +90,10 @@ void natural_loops_templatet<P, T>::compute(P &program)
 {
   cfg_dominators(program);
 
+#ifdef DEBUG
+  cfg_dominators.output(std::cout);
+#endif
+
   // find back-edges m->n
   for(T m_it=program.instructions.begin();
       m_it!=program.instructions.end();

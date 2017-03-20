@@ -637,6 +637,12 @@ bool Parser::rDefinition(cpp_itemt &item)
 {
   int t=lex.LookAhead(0);
 
+  #ifdef DEBUG
+  indenter _i;
+  std::cout << std::string(__indent, ' ') << "Parser::rDefinition 1 " << t
+            << '\n';
+  #endif
+
   if(t==';')
     return rNullDeclaration(item.make_declaration());
   else if(t==TOK_TYPEDEF)
@@ -1229,6 +1235,12 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   switch(kind)
   {
   case tdk_decl:
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "BODY: "
+              << body.pretty() << '\n';
+    std::cout << std::string(__indent, ' ') << "TEMPLATE_TYPE: "
+              << template_type.pretty() << '\n';
+    #endif
     body.add(ID_template_type).swap(template_type);
     body.set(ID_is_template, true);
     decl.swap(body);
@@ -1895,6 +1907,11 @@ bool Parser::rIntegralDeclaration(
 
     if(lex.LookAhead(0)==';')
     {
+      #ifdef DEBUG
+      std::cout << std::string(__indent, ' ')
+                << "Parser::rIntegralDeclaration 8 "
+                << declaration.pretty() << '\n';
+      #endif
       lex.get_token(tk);
       return true;
     }
@@ -5098,6 +5115,10 @@ bool Parser::rClassBody(exprt &body)
       // body=Ptree::List(ob, nil, new Leaf(tk));
       return true;        // error recovery
     }
+    #ifdef DEBUG
+    std::cout << std::string(__indent, ' ') << "Parser::rClassBody "
+              << member.pretty() << '\n';
+    #endif
 
     members.move_to_operands(
       static_cast<exprt &>(static_cast<irept &>(member)));
@@ -7558,7 +7579,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 0 "
-            << lex.LookAhead(0) << " " << lex.current_token().text <<"\n";
+            << lex.LookAhead(0) << ' ' << lex.current_token().text << '\n';
   #endif
 
   switch(lex.LookAhead(0))
@@ -9219,6 +9240,10 @@ bool Parser::rExprStatement(codet &statement)
 
     if(rDeclarationStatement(statement))
     {
+      #ifdef DEBUG
+      std::cout << std::string(__indent, ' ') << "rDe "
+                << statement.pretty() << '\n';
+      #endif
       return true;
     }
     else
