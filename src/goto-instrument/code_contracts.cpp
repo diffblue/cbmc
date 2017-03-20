@@ -9,6 +9,7 @@ Date: February 2016
 \*******************************************************************/
 
 #include <util/cprover_prefix.h>
+#include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
 
 #include <goto-programs/remove_skip.h>
@@ -291,20 +292,13 @@ const symbolt &code_contractst::new_tmp_symbol(
   const typet &type,
   const source_locationt &source_location)
 {
-  auxiliary_symbolt new_symbol;
-  new_symbol.type=type;
-  new_symbol.location=source_location;
-
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.base_name="tmp_cc$"+std::to_string(++temporary_counter);
-    new_symbol.name=new_symbol.base_name;
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
-
-  return *symbol_ptr;
+  return get_fresh_aux_symbol(
+    type,
+    "",
+    "tmp_cc",
+    source_location,
+    irep_idt(),
+    symbol_table);
 }
 
 /*******************************************************************\

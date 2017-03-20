@@ -84,33 +84,23 @@ void value_set_analysis_fivrt::add_vars(
   entry_cachet entry_cache;
 
   value_set_fivrt &v=state.value_set;
+  v.add_vars(globals);
 
-  for(goto_programt::instructionst::const_iterator
-      i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end();
-      i_it++)
+  for(auto l : locals)
   {
-    v.add_vars(globals);
+    // cache hit?
+    entry_cachet::const_iterator e_it=entry_cache.find(l);
 
-    for(goto_programt::decl_identifierst::const_iterator
-        l_it=locals.begin();
-        l_it!=locals.end();
-        l_it++)
+    if(e_it==entry_cache.end())
     {
-      // cache hit?
-      entry_cachet::const_iterator e_it=entry_cache.find(*l_it);
+      const symbolt &symbol=ns.lookup(l);
 
-      if(e_it==entry_cache.end())
-      {
-        const symbolt &symbol=ns.lookup(*l_it);
-
-        std::list<value_set_fivrt::entryt> &entries=entry_cache[*l_it];
-        get_entries(symbol, entries);
-        v.add_vars(entries);
-      }
-      else
-        v.add_vars(e_it->second);
+      std::list<value_set_fivrt::entryt> &entries=entry_cache[l];
+      get_entries(symbol, entries);
+      v.add_vars(entries);
     }
+    else
+      v.add_vars(e_it->second);
   }
 }
 
@@ -202,31 +192,21 @@ void value_set_analysis_fivrt::add_vars(
   get_globals(globals);
 
   value_set_fivrt &v=state.value_set;
+  v.add_vars(globals);
 
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     // get the locals
     std::set<irep_idt> locals;
     get_local_identifiers(f_it->second, locals);
 
-    forall_goto_program_instructions(i_it, f_it->second.body)
+    for(auto l : locals)
     {
-      v.add_vars(globals);
+      const symbolt &symbol=ns.lookup(l);
 
-      for(std::set<irep_idt>::const_iterator
-          l_it=locals.begin();
-          l_it!=locals.end();
-          l_it++)
-      {
-        const symbolt &symbol=ns.lookup(*l_it);
-
-        std::list<value_set_fivrt::entryt> entries;
-        get_entries(symbol, entries);
-        v.add_vars(entries);
-      }
+      std::list<value_set_fivrt::entryt> entries;
+      get_entries(symbol, entries);
+      v.add_vars(entries);
     }
   }
 }

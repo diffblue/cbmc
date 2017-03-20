@@ -35,7 +35,6 @@ public:
 
   void operator()(P &program);
 
-  target_sett top;
   T entry_node;
 
   void output(std::ostream &) const;
@@ -101,10 +100,6 @@ template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
 {
   cfg(program);
-
-  // initialise top element
-  for(const auto &node : cfg.entry_map)
-    top.insert(cfg[node.second].PC);
 }
 
 /*******************************************************************\

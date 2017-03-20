@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
@@ -810,6 +811,8 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
     cmdline.isset("pointer-check"));
   status() << "Virtual function removal" << eom;
   remove_virtual_functions(symbol_table, goto_functions);
+  status() << "Catch and throw removal" << eom;
+  remove_exceptions(symbol_table, goto_functions);
   status() << "Java instanceof removal" << eom;
   remove_instanceof(symbol_table, goto_functions);
 }
@@ -1049,6 +1052,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     std::string function=cmdline.get_value("function-inline");
     assert(!function.empty());
 
+    bool caching=!cmdline.isset("no-caching");
+
     do_indirect_call_and_rtti_removal();
 
     status() << "Inlining calls of function `" << function << "'" << eom;
@@ -1060,7 +1065,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         function,
         ns,
         ui_message_handler,
-        true);
+        true,
+        caching);
     }
     else
     {
@@ -1073,7 +1079,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           function,
           ns,
           ui_message_handler,
-          true);
+          true,
+          caching);
 
       if(have_file)
       {
@@ -1429,6 +1436,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
+    remove_returns(symbol_table, goto_functions);
     do_indirect_call_and_rtti_removal();
 
     status() << "Performing a full slice" << eom;
@@ -1544,6 +1552,7 @@ void goto_instrument_parse_optionst::help()
     " --inline                     perform full inlining\n"
     " --partial-inline             perform partial inlining\n"
     " --function-inline <function> transitively inline all calls <function> makes\n" // NOLINT(*)
+    " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
     " --add-library                add models of C library functions\n"

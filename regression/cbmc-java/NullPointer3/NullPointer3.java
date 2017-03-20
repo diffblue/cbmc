@@ -4,5 +4,4 @@ public class NullPointer3 {
   {
     throw null; // NULL pointer dereference
   }
-
 }

@@ -95,7 +95,7 @@ protected:
   void add_jumps(
     queuet &queue,
     jumpst &jumps,
-    const cfg_post_dominatorst &cfg_post_dominators);
+    const dependence_grapht::post_dominators_mapt &post_dominators);
 
   void add_to_queue(
     queuet &queue,

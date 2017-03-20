@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -46,6 +47,85 @@ static bool is_empty(const goto_programt &goto_program)
 }
 
 /*******************************************************************\
+
+Function: finish_catch_push_targets
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Populate the CATCH instructions with the targets 
+          corresponding to their associated labels
+
+\*******************************************************************/
+
+static void finish_catch_push_targets(goto_programt &dest)
+{
+  std::map<irep_idt, goto_programt::targett> label_targets;
+
+  // in the first pass collect the labels and the corresponding targets
+  Forall_goto_program_instructions(it, dest)
+  {
+    if(!it->labels.empty())
+    {
+      for(auto label : it->labels)
+        // record the label and the corresponding target
+        label_targets.insert(std::make_pair(label, it));
+    }
+  }
+
+  // in the second pass set the targets
+  Forall_goto_program_instructions(it, dest)
+  {
+    if(it->is_catch())
+    {
+      bool handler_added=true;
+      irept exceptions=it->code.find(ID_exception_list);
+
+      if(exceptions.is_nil() &&
+         it->code.has_operands())
+        exceptions=it->code.op0().find(ID_exception_list);
+
+      const irept::subt &exception_list=exceptions.get_sub();
+
+      if(!exception_list.empty())
+      {
+        // in this case we have a CATCH_PUSH
+        irept handlers=it->code.find(ID_label);
+        if(handlers.is_nil() &&
+           it->code.has_operands())
+          handlers=it->code.op0().find(ID_label);
+        const irept::subt &handler_list=handlers.get_sub();
+
+        // some handlers may not have been converted (if there was no
+        // exception to be caught); in such a situation we abort
+        for(const auto &handler : handler_list)
+        {
+          if(label_targets.find(handler.id())==label_targets.end())
+          {
+            handler_added=false;
+            break;
+          }
+        }
+
+        if(!handler_added)
+          continue;
+
+        for(const auto &handler : handler_list)
+        {
+          std::map<irep_idt,
+                   goto_programt::targett>::const_iterator handler_it=
+            label_targets.find(handler.id());
+          assert(handler_it!=label_targets.end());
+          // set the target
+          it->targets.push_back(handler_it->second);
+        }
+      }
+    }
+  }
+}
+
+/*******************************************************************	\
 
 Function: goto_convertt::finish_gotos
 
@@ -302,6 +382,7 @@ void goto_convertt::goto_convert_rec(
   finish_gotos(dest);
   finish_computed_gotos(dest);
   finish_guarded_gotos(dest);
+  finish_catch_push_targets(dest);
 }
 
 /*******************************************************************\
@@ -2674,24 +2755,21 @@ symbolt &goto_convertt::new_tmp_symbol(
   goto_programt &dest,
   const source_locationt &source_location)
 {
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.base_name="tmp_"+suffix+"$"+std::to_string(++temporary_counter);
-    new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.type=type;
-    new_symbol.location=source_location;
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
+  symbolt &new_symbol=
+    get_fresh_aux_symbol(
+      type,
+      tmp_symbol_prefix,
+      "tmp_"+suffix,
+      source_location,
+      irep_idt(),
+      symbol_table);
 
   code_declt decl;
-  decl.symbol()=symbol_ptr->symbol_expr();
+  decl.symbol()=new_symbol.symbol_expr();
   decl.add_source_location()=source_location;
   convert_decl(decl, dest);
 
-  return *symbol_ptr;
+  return new_symbol;
 }
 
 /*******************************************************************\

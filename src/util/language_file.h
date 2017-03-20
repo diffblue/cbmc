@@ -87,7 +87,7 @@ public:
 
   bool has_lazy_method(const irep_idt &id)
   {
-    return lazy_method_map.count(id);
+    return lazy_method_map.count(id)!=0;
   }
 
   // The method must have been added to the symbol table and registered

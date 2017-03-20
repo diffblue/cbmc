@@ -288,6 +288,23 @@ public:
     return t;
   }
 
+  static const irep_idt get_function_id(
+    const_targett l)
+  {
+    while(!l->is_end_function())
+      l++;
+
+    return l->function;
+  }
+
+  static const irep_idt get_function_id(
+    const goto_program_templatet<codeT, guardT> &p)
+  {
+    assert(!p.empty());
+
+    return get_function_id(--p.instructions.end());
+  }
+
   void get_successors(
     targett target,
     targetst &successors);
@@ -472,6 +489,14 @@ public:
   void clear()
   {
     instructions.clear();
+  }
+
+  targett get_end_function()
+  {
+    assert(!instructions.empty());
+    targett end_function=--instructions.end();
+    assert(end_function->is_end_function());
+    return end_function;
   }
 
   //! Copy a full goto program, preserving targets

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <cassert>
+#include <cstdlib>
 #include <fstream>
 
 #include <util/config.h>
