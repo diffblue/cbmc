@@ -950,9 +950,12 @@ exprt string_refinementt::substitute_array_with_expr
   if(expr.id()==ID_with)
   {
     with_exprt &with_expr=to_with_expr(expr);
-    return if_exprt(equal_exprt(index, with_expr.where()),
-                    with_expr.new_value(),
-                    substitute_array_with_expr(with_expr.old(), index));
+    exprt then_expr=with_expr.new_value();
+    exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
+    const typet &type=then_expr.type();
+    assert(else_expr.type()==type);
+    return if_exprt(
+      equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
   }
   else
   {
@@ -1015,14 +1018,27 @@ exprt string_refinementt::substitute_array_access(exprt &expr) const
 
     size_t last_index=array_expr.operands().size()-1;
     assert(last_index>=0);
+
+    const typet &char_type=index_expr.array().type().subtype();
     exprt ite=array_expr.operands()[last_index];
+
+    if(ite.type()!=char_type)
+    {
+      // We have to manualy set the type for unknown values
+      assert(ite.id()==ID_unknown);
+      ite.type()=char_type;
+    }
 
     for(long i=last_index-1; i>=0; --i)
     {
+      exprt op=array_expr.operands()[i];
+      if(op.type()!=char_type)
+      {
+        assert(op.id()==ID_unknown);
+        op.type()=char_type;
+      }
       equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
-      ite=if_exprt(equals,
-                   array_expr.operands()[i],
-                   ite);
+      ite=if_exprt(equals, op, ite, char_type);
     }
     return ite;
   }
