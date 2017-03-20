@@ -12,6 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <memory>
+
+#include <langapi/pretty_printer.h>
 
 #include "message.h"
 
@@ -87,7 +90,6 @@ public:
   virtual void show_parse(std::ostream &out)=0;
 
   // conversion of expressions
-
   virtual bool from_expr(
     const exprt &expr,
     std::string &code,
@@ -97,6 +99,9 @@ public:
     const typet &type,
     std::string &code,
     const namespacet &ns);
+
+  virtual std::unique_ptr<pretty_printert>
+    get_pretty_printer(const namespacet &)=0;
 
   virtual bool type_to_name(
     const typet &type,

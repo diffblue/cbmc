@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_internal_additions.h"
 #include "cpp_language.h"
 #include "expr2cpp.h"
+#include "expr2cpp_class.h"
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"
 #include "cpp_type2name.h"
@@ -358,6 +359,24 @@ bool cpp_languaget::from_type(
 {
   code=type2cpp(type, ns);
   return false;
+}
+
+/*******************************************************************\
+
+Function: cpp_languaget::get_pretty_printer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::unique_ptr<pretty_printert>
+cpp_languaget::get_pretty_printer(const namespacet &ns)
+{
+  return std::unique_ptr<pretty_printert>(new expr2cppt(ns));
 }
 
 /*******************************************************************\

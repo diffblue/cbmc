@@ -876,6 +876,24 @@ bool java_bytecode_languaget::from_type(
 
 /*******************************************************************\
 
+Function: java_bytecode_languaget::get_pretty_printer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+std::unique_ptr<pretty_printert>
+java_bytecode_languaget::get_pretty_printer(const namespacet &ns)
+{
+  return std::unique_ptr<pretty_printert>(new expr2javat(ns));
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_languaget::to_expr
 
   Inputs:
