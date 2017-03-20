@@ -40,6 +40,8 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   queue.push("java.lang.Object");
   // java.lang.String
   queue.push("java.lang.String");
+  // add java.lang.Class
+  queue.push("java.lang.Class");
   queue.push(class_name);
 
   while(!queue.empty())

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include <util/arith_tools.h>
+#include <util/fresh_symbol.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -108,8 +109,7 @@ exprt java_object_factoryt::allocate_object(
   bool cast_needed=allocate_type_resolved!=target_type;
   if(!create_dynamic_objects)
   {
-    symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-    aux_symbol.type=allocate_type;
+    symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, allocate_type);
     aux_symbol.is_static_lifetime=true;
 
     exprt object=aux_symbol.symbol_expr();
@@ -137,8 +137,11 @@ exprt java_object_factoryt::allocate_object(
       // Create a symbol for the malloc expression so we can initialize
       // without having to do it potentially through a double-deref, which
       // breaks the to-SSA phase.
-      symbolt &malloc_sym=new_tmp_symbol(symbol_table, "malloc_site");
-      malloc_sym.type=pointer_typet(allocate_type);
+      symbolt &malloc_sym=new_tmp_symbol(
+        symbol_table,
+        loc,
+        pointer_typet(allocate_type),
+        "malloc_site");
       code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
       code_assignt &malloc_assign=assign;
       malloc_assign.add_source_location()=loc;
@@ -506,8 +509,11 @@ void java_object_factoryt::gen_nondet_array_init(
 
   if(update_in_place==NO_UPDATE_IN_PLACE)
   {
-    symbolt &length_sym=new_tmp_symbol(symbol_table, "nondet_array_length");
-    length_sym.type=java_int_type();
+    const symbolt &length_sym=new_tmp_symbol(
+      symbol_table,
+      loc,
+      java_int_type(),
+      "nondet_array_length");
     length_sym_expr=length_sym.symbol_expr();
 
     // Initialise array with some undetermined length:
@@ -560,8 +566,11 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Interpose a new symbol, as the goto-symex stage can't handle array indexing
   // via a cast.
-  symbolt &array_init_symbol=new_tmp_symbol(symbol_table, "array_data_init");
-  array_init_symbol.type=init_array_expr.type();
+  symbolt &array_init_symbol=new_tmp_symbol(
+    symbol_table,
+    loc,
+    init_array_expr.type(),
+    "array_data_init");
   const auto &array_init_symexpr=array_init_symbol.symbol_expr();
   codet data_assign=code_assignt(array_init_symexpr, init_array_expr);
   data_assign.add_source_location()=loc;
@@ -569,8 +578,11 @@ void java_object_factoryt::gen_nondet_array_init(
 
   // Emit init loop for(array_init_iter=0; array_init_iter!=array.length;
   //                  ++array_init_iter) init(array[array_init_iter]);
-  symbolt &counter=new_tmp_symbol(symbol_table, "array_init_iter");
-  counter.type=length_sym_expr.type();
+  symbolt &counter=new_tmp_symbol(
+    symbol_table,
+    loc,
+    length_sym_expr.type(),
+    "array_init_iter");
   exprt counter_expr=counter.symbol_expr();
 
   exprt java_zero=from_integer(0, java_int_type());
@@ -707,22 +719,19 @@ Function: new_tmp_symbol
 
 \*******************************************************************/
 
-symbolt &new_tmp_symbol(symbol_tablet &symbol_table, const std::string &prefix)
+symbolt &new_tmp_symbol(
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  const typet &type,
+  const std::string &prefix)
 {
-  static size_t temporary_counter=0; // TODO encapsulate as class variable
-
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.name="tmp_object_factory$"+std::to_string(++temporary_counter);
-    new_symbol.base_name=new_symbol.name;
-    new_symbol.mode=ID_java;
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
-
-  return *symbol_ptr;
+  return get_fresh_aux_symbol(
+    type,
+    "",
+    prefix,
+    loc,
+    ID_java,
+    symbol_table);
 }
 
 /*******************************************************************\
@@ -758,8 +767,10 @@ exprt object_factory(
 {
   if(type.id()==ID_pointer)
   {
-    symbolt &aux_symbol=new_tmp_symbol(symbol_table);
-    aux_symbol.type=type;
+    symbolt &aux_symbol=new_tmp_symbol(
+      symbol_table,
+      loc,
+      type);
     aux_symbol.is_static_lifetime=true;
 
     exprt object=aux_symbol.symbol_expr();

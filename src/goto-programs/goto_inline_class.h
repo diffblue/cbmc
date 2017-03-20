@@ -24,11 +24,13 @@ public:
     goto_functionst &goto_functions,
     const namespacet &ns,
     message_handlert &message_handler,
-    bool adjust_function):
+    bool adjust_function,
+    bool caching=true):
     messaget(message_handler),
     goto_functions(goto_functions),
     ns(ns),
-    adjust_function(adjust_function)
+    adjust_function(adjust_function),
+    caching(caching)
   {
   }
 
@@ -63,6 +65,8 @@ public:
   void output_inline_map(
     std::ostream &out,
     const inline_mapt &inline_map);
+
+  void output_cache(std::ostream &out) const;
 
   // call after goto_functions.update()!
   jsont output_inline_log_json()
@@ -127,6 +131,8 @@ protected:
   const namespacet &ns;
 
   const bool adjust_function;
+  const bool caching;
+
   goto_inline_logt inline_log;
 
   void goto_inline_nontransitive(

@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
   x[8]=0x09;
   x[9]=0x0a;
 
-  unsigned long* alias=(unsigned long*)(((char*)x)+1);
+  unsigned long long* alias=(unsigned long long*)(((char*)x)+1);
   *alias=0xf1f2f3f4f5f6f7f8;
 
   unsigned char* alias2=(unsigned char*)x;

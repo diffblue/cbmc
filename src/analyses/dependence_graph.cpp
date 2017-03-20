@@ -94,6 +94,9 @@ void dep_graph_domaint::control_dependencies(
      from->is_assume())
     control_deps.insert(from);
 
+  const irep_idt id=goto_programt::get_function_id(from);
+  const cfg_post_dominatorst &pd=dep_graph.cfg_post_dominators().at(id);
+
   // check all candidates for M
   for(depst::iterator
       it=control_deps.begin();
@@ -111,15 +114,17 @@ void dep_graph_domaint::control_dependencies(
     // we could hard-code assume and goto handling here to improve
     // performance
     cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
-      dep_graph.cfg_post_dominators().cfg.entry_map.find(*it);
-    assert(e!=dep_graph.cfg_post_dominators().cfg.entry_map.end());
+      pd.cfg.entry_map.find(*it);
+
+    assert(e!=pd.cfg.entry_map.end());
+
     const cfg_post_dominatorst::cfgt::nodet &m=
-      dep_graph.cfg_post_dominators().cfg[e->second];
+      pd.cfg[e->second];
 
     for(const auto &edge : m.out)
     {
       const cfg_post_dominatorst::cfgt::nodet &m_s=
-        dep_graph.cfg_post_dominators().cfg[edge.first];
+        pd.cfg[edge.first];
 
       if(m_s.dominators.find(to)!=m_s.dominators.end())
         post_dom_one=true;
@@ -252,7 +257,7 @@ void dep_graph_domaint::transform(
   const namespacet &ns)
 {
   dependence_grapht *dep_graph=dynamic_cast<dependence_grapht*>(&ai);
-  assert(dep_graph!=0);
+  assert(dep_graph!=nullptr);
 
   // propagate control dependencies across function calls
   if(from->is_function_call())
@@ -260,22 +265,31 @@ void dep_graph_domaint::transform(
     goto_programt::const_targett next=from;
     ++next;
 
-    dep_graph_domaint *s=
-      dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
-    assert(s!=0);
-
-    depst::iterator it=s->control_deps.begin();
-    for(const auto &c_dep : control_deps)
+    if(next==to)
     {
-      while(it!=s->control_deps.end() && *it<c_dep)
-        ++it;
-      if(it==s->control_deps.end() || c_dep<*it)
-        s->control_deps.insert(it, c_dep);
-      else if(it!=s->control_deps.end())
-        ++it;
+      control_dependencies(from, to, *dep_graph);
     }
+    else
+    {
+      // edge to function entry point
 
-    control_dependencies(from, next, *dep_graph);
+      dep_graph_domaint *s=
+        dynamic_cast<dep_graph_domaint*>(&(dep_graph->get_state(next)));
+      assert(s!=nullptr);
+
+      depst::iterator it=s->control_deps.begin();
+      for(const auto &c_dep : control_deps)
+      {
+        while(it!=s->control_deps.end() && *it<c_dep)
+          ++it;
+        if(it==s->control_deps.end() || c_dep<*it)
+          s->control_deps.insert(it, c_dep);
+        else if(it!=s->control_deps.end())
+          ++it;
+      }
+
+      control_deps.clear();
+    }
   }
   else
     control_dependencies(from, to, *dep_graph);

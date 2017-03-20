@@ -46,6 +46,8 @@ exprt get_nondet_bool(const typet &);
 
 symbolt &new_tmp_symbol(
   symbol_tablet &symbol_table,
+  const source_locationt &,
+  const typet &,
   const std::string &prefix="tmp_object_factory");
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

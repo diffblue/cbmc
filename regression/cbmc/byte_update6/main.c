@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
   if(argc != 2)
     return 0;
 
-  unsigned long x[argc];
+  unsigned long long x[argc];
   x[0]=0x0102030405060708;
   x[1]=0x1112131415161718;
 
