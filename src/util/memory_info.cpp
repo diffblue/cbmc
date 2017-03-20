@@ -39,7 +39,7 @@ Function: memory_info
 
 void memory_info(std::ostream &out)
 {
-  #ifdef __linux__
+  #if defined(__linux__) && defined(__GLIBC__)
   // NOLINTNEXTLINE(readability/identifiers)
   struct mallinfo m = mallinfo();
   out << "  non-mmapped space allocated from system: " << m.arena << "\n";

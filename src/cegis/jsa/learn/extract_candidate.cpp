@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include <util/bv_arithmetic.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/goto_trace.h>

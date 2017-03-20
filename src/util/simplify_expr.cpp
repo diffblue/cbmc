@@ -32,8 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "endianness_map.h"
 #include "simplify_utils.h"
 
-#include <linking/zero_initializer.h>
-
 // #define DEBUGX
 
 #ifdef DEBUGX
@@ -278,8 +276,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
     inequality.add_source_location()=expr.source_location();
     inequality.lhs()=expr.op0();
-    inequality.rhs()=
-      zero_initializer(expr.op0().type(), expr.source_location(), ns);
+    inequality.rhs()=from_integer(0, op_type);
     assert(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.swap(inequality);
@@ -295,8 +292,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
     inequality.add_source_location()=expr.source_location();
     inequality.lhs()=expr.op0();
-    inequality.rhs()=
-      zero_initializer(expr.op0().type(), expr.source_location(), ns);
+    inequality.rhs()=from_integer(0, op_type);
     assert(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.op0()=inequality;

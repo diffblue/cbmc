@@ -196,3 +196,15 @@ diff -urN minisat-2.2.1/minisat/utils/ParseUtils.h minisat-2.2.1.patched/minisat
  
      int  operator *  () const { return (pos >= size) ? EOF : buf[pos]; }
      void operator ++ ()       { pos++; assureLookahead(); }
+diff -urN minisat-2.2.1/minisat/utils/System.h minisat-2.2.1.patched/minisat/utils/System.h
+--- minisat-2.2.1/minisat/utils/System.h	2017-02-21 18:23:22.727464369 +0000
++++ minisat-2.2.1.patched/minisat/utils/System.h	2017-02-21 18:23:14.451343361 +0000
+@@ -21,7 +21,7 @@
+ #ifndef Minisat_System_h
+ #define Minisat_System_h
+ 
+-#if defined(__linux__)
++#if defined(__linux__) && defined(__GLIBC__)
+ #include <fpu_control.h>
+ #endif
+ 

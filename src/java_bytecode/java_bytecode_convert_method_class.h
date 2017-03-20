@@ -141,6 +141,7 @@ public:
 
   exprt::operandst pop(std::size_t n);
 
+  void pop_residue(std::size_t n);
   void push(const exprt::operandst &o);
 
   bool is_constructor(const class_typet::methodt &method);

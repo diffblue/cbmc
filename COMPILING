@@ -10,10 +10,10 @@ environments:
 
 - Solaris 11
 
-- FreeBSD 10 or 11
+- FreeBSD 11
 
 - Cygwin
-  (We recommend the i686-pc-mingw32-g++ cross compiler, version 4.7 or above.)
+  (We recommend the i686-pc-mingw32-g++ cross compiler, version 5.4 or above.)
 
 - Microsoft's Visual Studio version 12 (2013), version 14 (2015),
   or version 15 (older versions won't work)
@@ -29,16 +29,16 @@ COMPILATION ON LINUX
 We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 0) You need a C/C++ compiler, Flex and Bison, and GNU make.
-   The GNU Make needs to be version 3.81 or higher. On Debian-like
-   distributions, do
+   The GNU Make needs to be version 3.81 or higher.
+   On Debian-like distributions, do
 
-   apt-get install g++ gcc flex bison make git libz-dev libwww-perl patch libzip-dev
+   apt-get install g++-6 gcc flex bison make git libwww-perl patch
 
    On Red Hat/Fedora or derivates, do
 
    yum install gcc gcc-c++ flex bison perl-libwww-perl patch
 
-   Note that you need g++ version 4.9 or newer.
+   Note that you need g++ version 5.2 or newer.
 
 1) As a user, get the CBMC source via
 
@@ -48,8 +48,6 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    cd cbmc-git/src
    make minisat2-download
-   make libzip-download zlib-download
-   make libzip-build
    make
 
 
@@ -59,7 +57,7 @@ COMPILATION ON SOLARIS 11
 1) As root, get the necessary development tools:
 
    pkg install system/header developer/lexer/flex developer/parser/bison developer/versioning/git
-   pkg install --accept developer/gcc-49
+   pkg install --accept developer/gcc-5
 
 2) As a user, get the CBMC source via
 
@@ -85,8 +83,8 @@ COMPILATION ON SOLARIS 11
    It will mis-optimize MiniSat2.
 
 
-COMPILATION ON FREEBSD 10/11
-----------------------------
+COMPILATION ON FREEBSD 11
+-------------------------
 
 1) As root, get the necessary tools:
 
@@ -126,8 +124,6 @@ Follow these instructions:
 
    cd cbmc-git/src
    make minisat2-download
-   make libzip-download zlib-download
-   make libzip-build
    make
 
 

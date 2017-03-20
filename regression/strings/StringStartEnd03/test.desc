@@ -1,7 +1,7 @@
 KNOWNBUG
 StringStartEnd03.class
 --string-refine --unwind 15
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --

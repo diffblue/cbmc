@@ -21,6 +21,12 @@ class java_class_loadert:public messaget
 public:
   java_bytecode_parse_treet &operator()(const irep_idt &);
 
+  void set_java_cp_include_files(std::string &java_cp_include_files)
+  {
+    jar_pool.set_java_cp_include_files(java_cp_include_files);
+    jar_pool.set_message_handler(get_message_handler());
+  }
+
   // maps class names to the parse trees
   typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
   class_mapt class_map;
@@ -42,7 +48,7 @@ public:
   public:
     struct entryt
     {
-      std::size_t index;
+      std::string class_file_name;
     };
 
     // class name to index map

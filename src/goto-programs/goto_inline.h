@@ -50,20 +50,23 @@ void goto_function_inline(
   goto_modelt &goto_model,
   const irep_idt function,
   message_handlert &message_handler,
-  bool adjust_function=false);
+  bool adjust_function=false,
+  bool caching=true);
 
 void goto_function_inline(
   goto_functionst &goto_functions,
   const irep_idt function,
   const namespacet &ns,
   message_handlert &message_handler,
-  bool adjust_function=false);
+  bool adjust_function=false,
+  bool caching=true);
 
 jsont goto_function_inline_and_log(
   goto_functionst &goto_functions,
   const irep_idt function,
   const namespacet &ns,
   message_handlert &message_handler,
-  bool adjust_function=false);
+  bool adjust_function=false,
+  bool caching=true);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H

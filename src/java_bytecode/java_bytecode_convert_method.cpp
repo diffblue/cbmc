@@ -108,6 +108,25 @@ exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
   return operands;
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::pop_residue
+
+Inputs:
+
+Outputs:
+
+Purpose: removes minimum(n, stack.size()) elements from the stack
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::pop_residue(std::size_t n)
+{
+  std::size_t residue_size=std::min(n, stack.size());
+
+  stack.resize(stack.size()-residue_size);
+}
+
 void java_bytecode_convert_methodt::push(const exprt::operandst &o)
 {
   stack.resize(stack.size()+o.size());
@@ -169,7 +188,6 @@ const exprt java_bytecode_convert_methodt::variable(
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, base_name);
     used_local_names.insert(result);
-
     return result;
   }
   else
@@ -798,8 +816,10 @@ static void gather_symbol_live_ranges(
     }
   }
   else
+  {
     forall_operands(it, e)
       gather_symbol_live_ranges(pc, *it, result);
+  }
 }
 
 /*******************************************************************\
@@ -864,6 +884,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
       instructionst::const_iterator next=i_it;
       if(++next!=instructions.end())
         a_entry.first->second.successors.push_back(next->address);
+    }
+
+    if(i_it->statement=="athrow" ||
+       i_it->statement=="invokestatic" ||
+       i_it->statement=="invokevirtual" ||
+       i_it->statement=="invokespecial" ||
+       i_it->statement=="invokeinterface")
+    {
+      // find the corresponding try-catch blocks and add the handlers
+      // to the targets
+      for(const auto &exception_row : method.exception_table)
+      {
+        if(i_it->address>=exception_row.start_pc &&
+           i_it->address<exception_row.end_pc)
+        {
+          a_entry.first->second.successors.push_back(
+            exception_row.handler_pc);
+          targets.insert(exception_row.handler_pc);
+        }
+      }
     }
 
     if(i_it->statement=="goto" ||
@@ -943,7 +983,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
   setup_local_variables(method, address_map);
 
   std::set<unsigned> working_set;
-  bool assertion_failure=false;
 
   if(!instructions.empty())
     working_set.insert(instructions.front().address);
@@ -953,6 +992,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     std::set<unsigned>::iterator cur=working_set.begin();
     address_mapt::iterator a_it=address_map.find(*cur);
     assert(a_it!=address_map.end());
+    unsigned cur_pc=*cur;
     working_set.erase(cur);
 
     if(a_it->second.done)
@@ -989,6 +1029,48 @@ codet java_bytecode_convert_methodt::convert_instructions(
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
 
+    // we throw away the first statement in an exception handler
+    // as we don't know if a function call had a normal or exceptional return
+    auto it=method.exception_table.begin();
+    for(; it!=method.exception_table.end(); ++it)
+    {
+      if(cur_pc==it->handler_pc)
+      {
+        exprt exc_var=variable(
+          arg0, statement[0],
+          i_it->address,
+          NO_CAST);
+
+        // throw away the operands
+        pop_residue(bytecode_info.pop);
+
+        // add a CATCH-PUSH signaling a handler
+        side_effect_expr_catcht catch_handler_expr;
+        // pack the exception variable so that it can be used
+        // later for instrumentation
+        catch_handler_expr.get_sub().resize(1);
+        catch_handler_expr.get_sub()[0]=exc_var;
+
+        code_expressiont catch_handler(catch_handler_expr);
+        code_labelt newlabel(label(std::to_string(cur_pc)),
+                             code_blockt());
+
+        code_blockt label_block=to_code_block(newlabel.code());
+        code_blockt handler_block;
+        handler_block.move_to_operands(c);
+        handler_block.move_to_operands(catch_handler);
+        handler_block.move_to_operands(label_block);
+        c=handler_block;
+        break;
+      }
+    }
+
+    if(it!=method.exception_table.end())
+    {
+      // go straight to the next statement
+      continue;
+    }
+
     exprt::operandst op=pop(bytecode_info.pop);
     exprt::operandst results;
     results.resize(bytecode_info.push, nil_exprt());
@@ -1001,21 +1083,30 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="athrow")
     {
       assert(op.size()==1 && results.size()==1);
-      if(!assertion_failure)
+      code_blockt block;
+      if(!disable_runtime_checks)
       {
-        side_effect_expr_throwt throw_expr;
-        throw_expr.add_source_location()=i_it->source_location;
-        throw_expr.copy_to_operands(op[0]);
-        c=code_expressiont(throw_expr);
-        results[0]=op[0];
+        // TODO throw NullPointerException instead
+        const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+        const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+        const exprt not_equal_null(
+          binary_relation_exprt(lhs, ID_notequal, rhs));
+        code_assertt check(not_equal_null);
+        check.add_source_location()
+          .set_comment("Throw null");
+        check.add_source_location()
+          .set_property_class("null-pointer-exception");
+        block.move_to_operands(check);
       }
-      else
-      {
-        // TODO: this can be removed once we properly handle throw
-        // if this athrow is generated by an assertion, then skip it
-        c=code_skipt();
-        assertion_failure=false;
-      }
+
+      side_effect_expr_throwt throw_expr;
+      throw_expr.add_source_location()=i_it->source_location;
+      throw_expr.copy_to_operands(op[0]);
+      c=code_expressiont(throw_expr);
+      results[0]=op[0];
+
+      block.move_to_operands(c);
+      c=block;
     }
     else if(statement=="checkcast")
     {
@@ -1062,13 +1153,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
             statement=="invokevirtual" ||
             statement=="invokestatic")
     {
-      // Remember that this is triggered by an assertion
-      if(statement=="invokespecial" &&
-         id2string(arg0.get(ID_identifier))
-         .find("AssertionError")!=std::string::npos)
-      {
-        assertion_failure=true;
-      }
       const bool use_this(statement!="invokestatic");
       const bool is_virtual(
         statement=="invokevirtual" || statement=="invokeinterface");
@@ -1993,6 +2077,115 @@ codet java_bytecode_convert_methodt::convert_instructions(
       c.operands()=op;
     }
 
+    // next we do the exception handling
+    std::vector<irep_idt> exception_ids;
+    std::vector<irep_idt> handler_labels;
+
+    // for each try-catch add a CATCH-PUSH instruction
+    // each CATCH-PUSH records a list of all the handler labels
+    // together with a list of all the exception ids
+
+    // be aware of different try-catch blocks with the same starting pc
+    std::size_t pos=0;
+    std::size_t end_pc=0;
+    while(pos<method.exception_table.size())
+    {
+      // check if this is the beginning of a try block
+      for(; pos<method.exception_table.size(); ++pos)
+      {
+        // unexplored try-catch?
+        if(cur_pc==method.exception_table[pos].start_pc && end_pc==0)
+        {
+          end_pc=method.exception_table[pos].end_pc;
+        }
+
+        // currently explored try-catch?
+        if(cur_pc==method.exception_table[pos].start_pc &&
+           method.exception_table[pos].end_pc==end_pc)
+        {
+          exception_ids.push_back(
+            method.exception_table[pos].catch_type.get_identifier());
+          // record the exception handler in the CATCH-PUSH
+          // instruction by generating a label corresponding to
+          // the handler's pc
+          handler_labels.push_back(
+            label(std::to_string(method.exception_table[pos].handler_pc)));
+        }
+        else
+          break;
+      }
+
+      // add the actual PUSH-CATCH instruction
+      if(!exception_ids.empty())
+      {
+        // add the exception ids
+        side_effect_expr_catcht catch_push_expr;
+        irept result(ID_exception_list);
+        result.get_sub().resize(exception_ids.size());
+        for(size_t i=0; i<exception_ids.size(); ++i)
+          result.get_sub()[i].id(exception_ids[i]);
+        catch_push_expr.set(ID_exception_list, result);
+
+        // add the labels corresponding to the handlers
+        irept labels(ID_label);
+        labels.get_sub().resize(handler_labels.size());
+        for(size_t i=0; i<handler_labels.size(); ++i)
+          labels.get_sub()[i].id(handler_labels[i]);
+        catch_push_expr.set(ID_label, labels);
+
+        code_blockt try_block;
+        code_expressiont catch_push(catch_push_expr);
+        try_block.move_to_operands(catch_push);
+        try_block.move_to_operands(c);
+        c=try_block;
+      }
+      else
+      {
+        // advance
+        ++pos;
+      }
+
+      // reset
+      end_pc=0;
+      exception_ids.clear();
+      handler_labels.clear();
+    }
+
+    // next add the CATCH-POP instructions
+    size_t start_pc=0;
+    // as the first try block may have start_pc 0, we
+    // must track it separately
+    bool first_handler=false;
+    // check if this is the end of a try block
+    for(const auto &exception_row : method.exception_table)
+    {
+      // add the CATCH-POP before the end of the try block
+      if(cur_pc<exception_row.end_pc &&
+         !working_set.empty() &&
+         *working_set.begin()==exception_row.end_pc)
+      {
+        // have we already added a CATCH-POP for the current try-catch?
+        // (each row corresponds to a handler)
+        if(exception_row.start_pc!=start_pc || !first_handler)
+        {
+          if(!first_handler)
+            first_handler=true;
+          // remember the beginning of the try-catch so that we don't add
+          // another CATCH-POP for the same try-catch
+          start_pc=exception_row.start_pc;
+          // add CATCH_POP instruction
+          side_effect_expr_catcht catch_pop_expr;
+          code_blockt end_try_block;
+          code_expressiont catch_pop(catch_pop_expr);
+          catch_pop.set(ID_exception_list, get_nil_irep());
+          catch_pop.set(ID_label, get_nil_irep());
+          end_try_block.move_to_operands(c);
+          end_try_block.move_to_operands(catch_pop);
+          c=end_try_block;
+        }
+      }
+    }
+
     if(!i_it->source_location.get_line().empty())
       c.add_source_location()=i_it->source_location;
 
@@ -2003,6 +2196,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       address_mapt::iterator a_it2=address_map.find(address);
       assert(a_it2!=address_map.end());
+
+      // we don't worry about exception handlers as we don't load the
+      // operands from the stack anyway -- we keep explicit global
+      // exception variables
+      for(const auto &exception_row : method.exception_table)
+      {
+        if(address==exception_row.handler_pc)
+        {
+          stack.clear();
+          break;
+        }
+      }
 
       if(!stack.empty() && a_it2->second.predecessors.size()>1)
       {
@@ -2068,8 +2273,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
   }
 
-  // TODO: add exception handlers from exception table
-  // review successor computation of athrow!
   code_blockt code;
 
   // Add anonymous locals to the symtab:
@@ -2098,6 +2301,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // First create a simple flat list of basic blocks. We'll add lexical nesting
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
+  int previous_address=-1;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
@@ -2111,6 +2315,16 @@ codet java_bytecode_convert_methodt::convert_instructions(
     // (e.g. due to exceptional control flow)
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
+    // Start a new lexical block if we've just entered a try block
+    if(!start_new_block && previous_address!=-1)
+    {
+      for(const auto &exception_row : method.exception_table)
+        if(exception_row.start_pc==previous_address)
+        {
+          start_new_block=true;
+          break;
+        }
+    }
 
     if(start_new_block)
     {
@@ -2130,6 +2344,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       add_to_block.add(c);
     }
     start_new_block=address_pair.second.successors.size()>1;
+
+    previous_address=address;
   }
 
   // Find out where temporaries are used:

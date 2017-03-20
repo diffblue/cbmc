@@ -7,6 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include <util/config.h>
 #include <util/substitute.h>
 
