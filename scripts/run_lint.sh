@@ -3,7 +3,7 @@
 set -e
 
 script_folder=`dirname $0`
-absolute_repository_root=`readlink -f $script_folder/..`
+absolute_repository_root=`git rev-parse --show-toplevel`
 
 if [[ "$#" -gt 2 ]]
 then
@@ -17,6 +17,13 @@ if ! [[ -e $script_folder/cpplint.py ]]
 then
   echo "Lint script could not be found in the $script_folder directory"
   echo "Ensure cpplint.py is inside the $script_folder directory then run again"
+  exit 1
+fi
+
+if ! [[ -e $script_folder/filter_lint_by_diff.py ]]
+then
+  echo "Lint filter script could not be found in the $script_folder directory"
+  echo "Ensure filter_lint_by_diff.py is inside the $script_folder directory then run again"
   exit 1
 fi
 
@@ -62,7 +69,7 @@ for file in $diff_files; do
 
   # Run the linting script and filter:
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=`$script_folder/cpplint.py $file 2>&1 | $script_folder/filter_lint_by_diff.py $diff_file $absolute_repository_root`
+  result=`$script_folder/cpplint.py $file 2>&1 >/dev/null | $script_folder/filter_lint_by_diff.py $diff_file $absolute_repository_root`
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
