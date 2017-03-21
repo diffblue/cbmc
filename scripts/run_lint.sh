@@ -3,7 +3,7 @@
 set -e
 
 script_folder=`dirname $0`
-absolute_repository_root=`readlink -f $script_folder/..`
+absolute_repository_root=`git rev-parse --show-toplevel`
 
 if [[ "$#" -gt 2 ]]
 then
