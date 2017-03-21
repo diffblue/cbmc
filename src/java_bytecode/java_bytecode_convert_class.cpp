@@ -30,13 +30,15 @@ public:
     size_t _max_array_length,
     lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode,
-    bool _string_refinement_enabled):
+    bool _string_refinement_enabled,
+    const character_refine_preprocesst &_character_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     lazy_methods_mode(_lazy_methods_mode),
-    string_refinement_enabled(_string_refinement_enabled)
+    string_refinement_enabled(_string_refinement_enabled),
+    character_preprocess(_character_preprocess)
   {
   }
 
@@ -62,6 +64,7 @@ protected:
   lazy_methodst &lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
+  character_refine_preprocesst character_preprocess;
 
   // conversion
   void convert(const classt &c);
@@ -166,7 +169,8 @@ void java_bytecode_convert_classt::convert(const classt &c)
         method,
         symbol_table,
         get_message_handler(),
-        max_array_length);
+        max_array_length,
+        character_preprocess);
     }
     else
     {
@@ -365,7 +369,8 @@ bool java_bytecode_convert_class(
   size_t max_array_length,
   lazy_methodst &lazy_methods,
   lazy_methods_modet lazy_methods_mode,
-  bool string_refinement_enabled)
+  bool string_refinement_enabled,
+  const character_refine_preprocesst &character_preprocess)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
@@ -373,7 +378,8 @@ bool java_bytecode_convert_class(
     max_array_length,
     lazy_methods,
     lazy_methods_mode,
-    string_refinement_enabled);
+    string_refinement_enabled,
+    character_preprocess);
 
   try
   {

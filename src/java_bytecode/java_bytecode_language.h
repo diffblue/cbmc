@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 
 #include "java_class_loader.h"
+#include "character_refine_preprocess.h"
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 
@@ -99,6 +100,7 @@ protected:
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
+  character_refine_preprocesst character_preprocess;
   std::string java_cp_include_files;
 };
 
