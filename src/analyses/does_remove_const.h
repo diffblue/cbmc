@@ -19,6 +19,8 @@ public:
   bool operator()() const;
 
 private:
+  bool does_expr_lose_const(const exprt &expr) const;
+
   bool is_type_at_least_as_const_as(
     typet type_more_const, typet type_compare) const;
 

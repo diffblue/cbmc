@@ -43,7 +43,7 @@ Function: does_remove_constt::operator()
 
   Inputs:
 
- Outputs: Returns true if the pgroam contains a const-removing cast
+ Outputs: Returns true if the program contains a const-removing cast
 
  Purpose: A naive analysis to look for casts that remove const-ness from
           pointers.
@@ -68,28 +68,56 @@ bool does_remove_constt::operator()() const
         return true;
       }
 
-      // see if the rhs loses const inside the expression tree
-      exprt rhs=assign.rhs();
-      while(!rhs.operands().empty())
+      bool sub_expr_lose_const=does_expr_lose_const(assign.rhs());
+      if(sub_expr_lose_const)
       {
-        typet &pre_op_type=rhs.type();
-        typet &post_op_type=rhs.op0().type();
-
-        // Types equality does not check, for example, const-ness
-        // If this is true, then this expression only modified the
-        // type by some qualifier (or not at all)
-        if(base_type_eq(pre_op_type, post_op_type, ns))
-        {
-          if(!is_type_at_least_as_const_as(pre_op_type, post_op_type))
-          {
-            return true;
-          }
-        }
-        rhs=rhs.op0();
+        return true;
       }
     }
   }
 
+  return false;
+}
+
+/*******************************************************************\
+
+Function: does_remove_constt::does_expr_lose_const()
+
+  Inputs:
+   expr - The expression to check
+
+ Outputs: Returns true if somewhere in the passed expression tree the const-ness
+          is lost.
+
+ Purpose: Search the expression tree to look for any children that have the
+          same base type, but a less strict const qualification.
+          If one is found, we return true.
+
+\*******************************************************************/
+
+bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
+{
+  const typet &root_type=expr.type();
+
+  // Look in each child that has the same base type as the root
+  for(const exprt &op : expr.operands())
+  {
+    const typet &op_type=op.type();
+    if(base_type_eq(op_type, root_type, ns))
+    {
+      // Is this child more const-qualified than the root
+      if(!is_type_at_least_as_const_as(root_type, op_type))
+      {
+        return true;
+      }
+    }
+
+    // Recursively check the children of this child
+    if(does_expr_lose_const(op))
+    {
+      return true;
+    }
+  }
   return false;
 }
 
