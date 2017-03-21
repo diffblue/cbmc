@@ -62,7 +62,7 @@ for file in $diff_files; do
 
   # Run the linting script and filter:
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=`$script_folder/cpplint.py $file 2>&1 | $script_folder/filter_lint_by_diff.py $diff_file $absolute_repository_root`
+  result=`$script_folder/cpplint.py $file 2>&1 >/dev/null | $script_folder/filter_lint_by_diff.py $diff_file $absolute_repository_root`
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
