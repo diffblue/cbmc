@@ -16,7 +16,6 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/cover$(OBJEXT) \
-       ../json/json$(LIBEXT) \
        ../path-symex/path-symex$(LIBEXT) \
        ../miniz/miniz$(OBJEXT) \
        ../json/json$(LIBEXT)

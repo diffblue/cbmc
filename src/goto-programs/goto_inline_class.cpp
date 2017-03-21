@@ -682,6 +682,20 @@ void goto_inlinet::expand_function_call(
         function,
         arguments,
         constrain);
+
+      progress() << "Inserting " << identifier << " into caller" << eom;
+      progress() << "Number of instructions: "
+                 << cached.body.instructions.size() << eom;
+
+      if(!caching)
+      {
+        progress() << "Removing " << identifier << " from cache" << eom;
+        progress() << "Number of instructions: "
+                   << cached.body.instructions.size() << eom;
+
+        inline_log.cleanup(cached.body);
+        cache.erase(identifier);
+      }
     }
     else
     {
@@ -944,6 +958,11 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   goto_functiont &cached=cache[identifier];
   assert(cached.body.empty());
+
+  progress() << "Creating copy of " << identifier << eom;
+  progress() << "Number of instructions: "
+             << goto_function.body.instructions.size() << eom;
+
   cached.copy_from(goto_function); // location numbers not changed
   inline_log.copy_from(goto_function.body, cached.body);
 
@@ -1146,6 +1165,29 @@ void goto_inlinet::output_inline_map(
 
 /*******************************************************************\
 
+Function: output_cache
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_inlinet::output_cache(std::ostream &out) const
+{
+  for(auto it=cache.begin(); it!=cache.end(); it++)
+  {
+    if(it!=cache.begin())
+      out << ", ";
+
+    out << it->first << "\n";
+  }
+}
+
+/*******************************************************************\
+
 Function: cleanup
 
   Inputs:
@@ -1257,8 +1299,9 @@ void goto_inlinet::goto_inline_logt::copy_from(
     assert(it1->location_number==it2->location_number);
 
     log_mapt::const_iterator l_it=log_map.find(it1);
-    if(l_it!=log_map.end())
+    if(l_it!=log_map.end()) // a segment starts here
     {
+      // as 'to' is a fresh copy
       assert(log_map.find(it2)==log_map.end());
 
       goto_inline_log_infot info=l_it->second;

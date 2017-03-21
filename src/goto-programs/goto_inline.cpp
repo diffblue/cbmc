@@ -278,13 +278,15 @@ void goto_function_inline(
   const irep_idt function,
   const namespacet &ns,
   message_handlert &message_handler,
-  bool adjust_function)
+  bool adjust_function,
+  bool caching)
 {
   goto_inlinet goto_inline(
     goto_functions,
     ns,
     message_handler,
-    adjust_function);
+    adjust_function,
+    caching);
 
   goto_functionst::function_mapt::iterator f_it=
     goto_functions.function_map.find(function);
@@ -332,13 +334,15 @@ jsont goto_function_inline_and_log(
   const irep_idt function,
   const namespacet &ns,
   message_handlert &message_handler,
-  bool adjust_function)
+  bool adjust_function,
+  bool caching)
 {
   goto_inlinet goto_inline(
     goto_functions,
     ns,
     message_handler,
-    adjust_function);
+    adjust_function,
+    caching);
 
   goto_functionst::function_mapt::iterator f_it=
     goto_functions.function_map.find(function);
@@ -354,6 +358,7 @@ jsont goto_function_inline_and_log(
   // gather all calls
   goto_inlinet::inline_mapt inline_map;
 
+  // create empty call list
   goto_inlinet::call_listt &call_list=inline_map[f_it->first];
 
   goto_programt &goto_program=goto_function.body;

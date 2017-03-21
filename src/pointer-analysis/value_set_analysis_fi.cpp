@@ -202,31 +202,21 @@ void value_set_analysis_fit::add_vars(
   get_globals(globals);
 
   value_set_fit &v=state.value_set;
+  v.add_vars(globals);
 
-  for(goto_functionst::function_mapt::const_iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  forall_goto_functions(f_it, goto_functions)
   {
     // get the locals
     std::set<irep_idt> locals;
     get_local_identifiers(f_it->second, locals);
 
-    forall_goto_program_instructions(i_it, f_it->second.body)
+    for(auto l : locals)
     {
-      v.add_vars(globals);
+      const symbolt &symbol=ns.lookup(l);
 
-      for(std::set<irep_idt>::const_iterator
-          l_it=locals.begin();
-          l_it!=locals.end();
-          l_it++)
-      {
-        const symbolt &symbol=ns.lookup(*l_it);
-
-        std::list<value_set_fit::entryt> entries;
-        get_entries(symbol, entries);
-        v.add_vars(entries);
-      }
+      std::list<value_set_fit::entryt> entries;
+      get_entries(symbol, entries);
+      v.add_vars(entries);
     }
   }
 }

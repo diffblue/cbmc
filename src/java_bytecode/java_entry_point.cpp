@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/remove_exceptions.h>
 
 #include "java_entry_point.h"
 #include "java_object_factory.h"
@@ -326,6 +327,24 @@ void java_record_outputs(
       init_code.move_to_operands(output);
     }
   }
+
+  // record exceptional return variable as output
+  codet output(ID_output);
+  output.operands().resize(2);
+
+  assert(symbol_table.has_symbol(id2string(function.name)+EXC_SUFFIX));
+
+  // retrieve the exception variable
+  const symbolt exc_symbol=symbol_table.lookup(
+    id2string(function.name)+EXC_SUFFIX);
+
+  output.op0()=address_of_exprt(
+    index_exprt(string_constantt(exc_symbol.base_name),
+                from_integer(0, index_type())));
+  output.op1()=exc_symbol.symbol_expr();
+  output.add_source_location()=function.location;
+
+  init_code.move_to_operands(output);
 }
 
 main_function_resultt get_main_symbol(
@@ -591,6 +610,15 @@ bool java_entry_point(
     symbol_table.add(return_symbol);
     call_main.lhs()=return_symbol.symbol_expr();
   }
+
+  // add the exceptional return value
+  auxiliary_symbolt exc_symbol;
+  exc_symbol.mode=ID_C;
+  exc_symbol.is_static_lifetime=false;
+  exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
+  exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
+  exc_symbol.type=typet(ID_pointer, empty_typet());
+  symbol_table.add(exc_symbol);
 
   exprt::operandst main_arguments=
     java_build_arguments(
