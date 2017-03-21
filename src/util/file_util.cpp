@@ -26,6 +26,7 @@ Date: January 2012
 #include <io.h>
 #include <windows.h>
 #include <direct.h>
+#include <util/unicode.h>
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
@@ -79,42 +80,55 @@ Function: delete_directory
 
 \*******************************************************************/
 
+#ifdef _WIN32
+
+void delete_directory_utf16(const std::wstring &path)
+{
+  std::wstring pattern=path + L"\\*";
+  // NOLINTNEXTLINE(readability/identifiers)
+  struct _wfinddata_t info;
+  intptr_t hFile=_wfindfirst(pattern.c_str(), &info);
+  if(hFile!=-1)
+  {
+    do
+    {
+      if(wcscmp(info.name, L".")==0 || wcscmp(info.name, L"..")==0)
+        continue;
+      std::wstring sub_path=path+L"\\"+info.name;
+      if(info.attrib & _A_SUBDIR)
+        delete_directory_utf16(sub_path);
+      else
+        DeleteFileW(sub_path.c_str());
+    }
+    while(_wfindnext(hFile, &info)==0);
+    _findclose(hFile);
+    RemoveDirectoryW(path.c_str());
+  }
+}
+
+#endif
+
 void delete_directory(const std::string &path)
 {
-  #ifdef _WIN32
-
-  std::string pattern=path+"\\*";
-
-  // NOLINTNEXTLINE(readability/identifiers)
-  struct _finddata_t info;
-
-  intptr_t handle=_findfirst(pattern.c_str(), &info);
-
-  if(handle!=-1)
-  {
-    unlink(info.name);
-
-    while(_findnext(handle, &info)!=-1)
-      unlink(info.name);
-  }
-
-  #else
-
+#ifdef _WIN32
+  delete_directory_utf16(utf8_to_utf16_little_endian(path));
+#else
   DIR *dir=opendir(path.c_str());
-
   if(dir!=NULL)
   {
     struct dirent *ent;
-
     while((ent=readdir(dir))!=NULL)
-      remove((path+"/"+ent->d_name).c_str());
-
+    {
+      std::string sub_path=path+"/"+ent->d_name;
+      if(ent->d_type==DT_DIR)
+        delete_directory(sub_path);
+      else
+        remove(sub_path.c_str());
+    }
     closedir(dir);
   }
-
-  #endif
-
   rmdir(path.c_str());
+#endif
 }
 
 /*******************************************************************\
