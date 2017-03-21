@@ -5,6 +5,7 @@ matrix:
 
     # Alpine Linux with musl-libc using g++
     - os: linux
+      dist: precise
       sudo: required
       compiler: gcc
       services:
@@ -29,7 +30,8 @@ matrix:
 
     # Ubuntu Linux with glibc using g++-5
     - os: linux
-      sudo: false
+      dist: precise
+      sudo: required
       compiler: gcc
       addons:
         apt:
@@ -46,7 +48,8 @@ matrix:
 
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
-      sudo: false
+      dist: precise
+      sudo: required
       compiler: clang
       addons:
         apt:
