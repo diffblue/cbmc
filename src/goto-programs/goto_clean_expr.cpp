@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/fresh_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/rename.h>
@@ -33,24 +34,21 @@ symbol_exprt goto_convertt::make_compound_literal(
 {
   const source_locationt source_location=expr.find_source_location();
 
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.base_name="literal$"+std::to_string(++temporary_counter);
-    new_symbol.name=tmp_symbol_prefix+id2string(new_symbol.base_name);
-    new_symbol.is_static_lifetime=source_location.get_function().empty();
-    new_symbol.value=expr;
-    new_symbol.type=expr.type();
-    new_symbol.location=source_location;
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
+  symbolt &new_symbol=
+    get_fresh_aux_symbol(
+      expr.type(),
+      tmp_symbol_prefix,
+      "literal",
+      source_location,
+      irep_idt(),
+      symbol_table);
+  new_symbol.is_static_lifetime=source_location.get_function().empty();
+  new_symbol.value=expr;
 
   // The value might depend on a variable, thus
   // generate code for this.
 
-  symbol_exprt result=symbol_ptr->symbol_expr();
+  symbol_exprt result=new_symbol.symbol_expr();
   result.add_source_location()=source_location;
 
   // The lifetime of compound literals is really that of
@@ -62,7 +60,7 @@ symbol_exprt goto_convertt::make_compound_literal(
   convert(code_assign, dest);
 
   // now create a 'dead' instruction
-  if(!symbol_ptr->is_static_lifetime)
+  if(!new_symbol.is_static_lifetime)
   {
     code_deadt code_dead(result);
     targets.destructor_stack.push_back(code_dead);

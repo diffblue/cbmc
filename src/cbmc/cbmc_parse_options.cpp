@@ -900,13 +900,6 @@ bool cbmc_parse_optionst::process_goto_program(
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
 
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
-    }
-
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -920,6 +913,14 @@ bool cbmc_parse_optionst::process_goto_program(
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      full_slicer(goto_functions, ns);
+    }
+
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_functions, ns);
 

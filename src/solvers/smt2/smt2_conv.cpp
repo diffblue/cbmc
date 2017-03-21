@@ -22,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include <linking/zero_initializer.h>
-
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
@@ -2089,8 +2087,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       out << "(not (= ";
       convert_expr(src);
       out << " ";
-      convert_expr(
-        zero_initializer(src_type, expr.source_location(), ns));
+      convert_expr(from_integer(0, src_type));
       out << "))";
     }
     else if(src_type.id()==ID_floatbv)
@@ -2116,8 +2113,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     out << "(not (= ";
     convert_expr(src);
     out << " ";
-    convert_expr(
-      zero_initializer(src_type, expr.source_location(), ns));
+    convert_expr(from_integer(0, src_type));
     out << ")) "; // not, =
     out << " (_ bv1 " << to_width << ")";
     out << " (_ bv0 " << to_width << ")";

@@ -169,6 +169,13 @@ public:
     infinity_flag=false;
   }
 
+  static ieee_floatt zero(const floatbv_typet &type)
+  {
+    ieee_floatt result(type);
+    result.make_zero();
+    return result;
+  }
+
   void make_NaN();
   void make_plus_infinity();
   void make_minus_infinity();

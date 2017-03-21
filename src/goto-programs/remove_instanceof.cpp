@@ -9,6 +9,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 #include "remove_instanceof.h"
+#include <util/fresh_symbol.h>
 
 #include <sstream>
 
@@ -20,8 +21,7 @@ public:
     goto_functionst &_goto_functions):
     symbol_table(_symbol_table),
     ns(_symbol_table),
-    goto_functions(_goto_functions),
-    lowered_count(0)
+    goto_functions(_goto_functions)
   {
     class_hierarchy(_symbol_table);
   }
@@ -34,7 +34,6 @@ protected:
   namespacet ns;
   class_hierarchyt class_hierarchy;
   goto_functionst &goto_functions;
-  int lowered_count;
 
   bool lower_instanceof(goto_programt &);
 
@@ -128,15 +127,14 @@ void remove_instanceoft::lower_instanceof(
     symbol_typet jlo("java::java.lang.Object");
     exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
 
-    std::ostringstream symname;
-    symname << "instanceof_tmp::instanceof_tmp" << (++lowered_count);
-    auxiliary_symbolt newsym;
-    newsym.name=symname.str();
-    newsym.type=object_clsid.type();
-    newsym.base_name=newsym.name;
-    newsym.mode=ID_java;
-    newsym.is_type=false;
-    assert(!symbol_table.add(newsym));
+    symbolt &newsym=
+      get_fresh_aux_symbol(
+        object_clsid.type(),
+        "instanceof_tmp",
+        "instanceof_tmp",
+        source_locationt(),
+        ID_java,
+        symbol_table);
 
     auto newinst=goto_program.insert_after(this_inst);
     newinst->make_assignment();

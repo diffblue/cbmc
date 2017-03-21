@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/fresh_symbol.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
@@ -68,8 +69,6 @@ protected:
     code_function_callt &function_call,
     goto_programt &dest);
 
-  symbolt &new_tmp_symbol();
-
   void compute_address_taken_in_symbols(
     std::set<irep_idt> &address_taken)
   {
@@ -106,37 +105,6 @@ remove_function_pointerst::remove_function_pointerst(
   // build type map
   forall_goto_functions(f_it, goto_functions)
     type_map[f_it->first]=f_it->second.type;
-}
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::new_tmp_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-symbolt &remove_function_pointerst::new_tmp_symbol()
-{
-  static int temporary_counter;
-
-  auxiliary_symbolt new_symbol;
-  symbolt *symbol_ptr;
-
-  do
-  {
-    new_symbol.base_name=
-      "tmp_return_val$"+std::to_string(++temporary_counter);
-    new_symbol.name=
-      "remove_function_pointers::"+id2string(new_symbol.base_name);
-  }
-  while(symbol_table.move(new_symbol, symbol_ptr));
-
-  return *symbol_ptr;
 }
 
 /*******************************************************************\
@@ -311,9 +279,14 @@ void remove_function_pointerst::fix_return_type(
        code_type.return_type(), ns))
     return;
 
-  symbolt &tmp_symbol=new_tmp_symbol();
-  tmp_symbol.type=code_type.return_type();
-  tmp_symbol.location=function_call.source_location();
+  symbolt &tmp_symbol=
+    get_fresh_aux_symbol(
+      code_type.return_type(),
+      "remove_function_pointers",
+      "tmp_return_val",
+      function_call.source_location(),
+      irep_idt(),
+      symbol_table);
 
   symbol_exprt tmp_symbol_expr;
   tmp_symbol_expr.type()=tmp_symbol.type;
