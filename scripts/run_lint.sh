@@ -20,6 +20,13 @@ then
   exit 1
 fi
 
+if ! [[ -e $script_folder/filter_lint_by_diff.py ]]
+then
+  echo "Lint filter script could not be found in the $script_folder directory"
+  echo "Ensure filter_lint_by_diff.py is inside the $script_folder directory then run again"
+  exit 1
+fi
+
 if [[ "$#" -gt 0 ]]
 then
     git_start=$1
