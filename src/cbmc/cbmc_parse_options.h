@@ -42,6 +42,7 @@ class optionst;
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)(show-reachable-properties)" \
+  "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \
