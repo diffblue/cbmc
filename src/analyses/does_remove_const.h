@@ -22,7 +22,7 @@ private:
   bool does_expr_lose_const(const exprt &expr) const;
 
   bool is_type_at_least_as_const_as(
-    typet type_more_const, typet type_compare) const;
+    const typet *type_more_const, const typet *type_compare) const;
 
   const goto_programt &goto_program;
   const namespacet &ns;

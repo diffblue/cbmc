@@ -66,7 +66,7 @@ bool does_remove_constt::operator()() const
 
     // Compare the types recursively for a point where the rhs is more
     // const that the lhs
-    if(!is_type_at_least_as_const_as(lhs_type, rhs_type))
+    if(!is_type_at_least_as_const_as(&lhs_type, &rhs_type))
     {
       return true;
     }
@@ -107,7 +107,7 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
     if(base_type_eq(op_type, root_type, ns))
     {
       // Is this child more const-qualified than the root
-      if(!is_type_at_least_as_const_as(root_type, op_type))
+      if(!is_type_at_least_as_const_as(&root_type, &op_type))
       {
         return true;
       }
@@ -146,22 +146,22 @@ Function: does_remove_constt::is_type_at_least_as_const_as
 \*******************************************************************/
 
 bool does_remove_constt::is_type_at_least_as_const_as(
-  typet type_more_const, typet type_compare) const
+  const typet *type_more_const, const typet *type_compare) const
 {
-  while(!type_compare.id().empty() && !type_more_const.id().empty())
+  while(type_compare->id()!=ID_nil && type_more_const->id()!=ID_nil)
   {
-    const c_qualifierst rhs_qualifiers(type_compare);
-    const c_qualifierst lhs_qualifiers(type_more_const);
+    const c_qualifierst rhs_qualifiers(*type_compare);
+    const c_qualifierst lhs_qualifiers(*type_more_const);
     if(rhs_qualifiers.is_constant && !lhs_qualifiers.is_constant)
     {
       return false;
     }
 
-    type_compare=type_compare.subtype();
-    type_more_const=type_more_const.subtype();
+    type_compare=&type_compare->subtype();
+    type_more_const=&type_more_const->subtype();
   }
 
   // Both the types should have the same number of subtypes
-  assert(type_compare.id().empty() && type_more_const.id().empty());
+  assert(type_compare->id()==ID_nil && type_more_const->id()==ID_nil);
   return true;
 }
