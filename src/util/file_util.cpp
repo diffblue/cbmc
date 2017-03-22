@@ -30,6 +30,8 @@ Date: January 2012
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
+#else
+#include <cstring>
 #endif
 
 #include "file_util.h"
@@ -119,6 +121,9 @@ void delete_directory(const std::string &path)
     struct dirent *ent;
     while((ent=readdir(dir))!=NULL)
     {
+      // Needed for Alpine Linux
+      if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
+        continue;
       std::string sub_path=path+"/"+ent->d_name;
       if(ent->d_type==DT_DIR)
         delete_directory(sub_path);
