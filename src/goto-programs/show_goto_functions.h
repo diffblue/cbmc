@@ -19,7 +19,7 @@ class goto_modelt;
   "(show-goto-functions)"
 
 #define HELP_SHOW_GOTO_FUNCTIONS \
-  " --show-goto-functions         show goto program\n"
+  " --show-goto-functions        show goto program\n"
 
 void show_goto_functions(
   const namespacet &ns,
