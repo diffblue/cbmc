@@ -1304,7 +1304,9 @@ void goto_convertt::do_function_call_symbol(
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments[0];
     t->source_location=function.source_location();
-    t->source_location.set("user-provided", true);
+    t->source_location.set(
+      "user-provided",
+      !function.source_location().is_built_in());
     t->source_location.set_property_class(ID_assertion);
     t->source_location.set_comment(description);
 
