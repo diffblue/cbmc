@@ -55,24 +55,25 @@ bool does_remove_constt::operator()() const
   for(const goto_programt::instructiont &instruction :
     goto_program.instructions)
   {
-    if(instruction.is_assign())
+    if(!instruction.is_assign())
     {
-      const code_assignt assign=to_code_assign(instruction.code);
-      const typet &rhs_type=assign.rhs().type();
-      const typet &lhs_type=assign.lhs().type();
+      continue;
+    }
 
-      // Compare the types recursively for a point where the rhs is more
-      // const that the lhs
-      if(!is_type_at_least_as_const_as(lhs_type, rhs_type))
-      {
-        return true;
-      }
+    const code_assignt &assign=to_code_assign(instruction.code);
+    const typet &rhs_type=assign.rhs().type();
+    const typet &lhs_type=assign.lhs().type();
 
-      bool sub_expr_lose_const=does_expr_lose_const(assign.rhs());
-      if(sub_expr_lose_const)
-      {
-        return true;
-      }
+    // Compare the types recursively for a point where the rhs is more
+    // const that the lhs
+    if(!is_type_at_least_as_const_as(lhs_type, rhs_type))
+    {
+      return true;
+    }
+
+    if(does_expr_lose_const(assign.rhs()))
+    {
+      return true;
     }
   }
 

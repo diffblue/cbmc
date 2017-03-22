@@ -501,7 +501,7 @@ Function: remove_const_function_pointerst::try_resolve_expression
 bool remove_const_function_pointerst::try_resolve_expression(
   const exprt &expr, expressionst &out_resolved_expression, bool &out_is_const)
 {
-  const exprt &simplified_expr=simplify_expr(expr, ns);
+  exprt simplified_expr=simplify_expr(expr, ns);
   bool resolved;
   expressionst resolved_expressions;
   bool is_resolved_expression_const;
@@ -693,24 +693,18 @@ bool remove_const_function_pointerst::try_resolve_index_of(
               try_resolve_expression(
                 array_entry, array_contents, is_entry_const);
 
-            if(resolved_value)
-            {
-              for(const exprt &resolved_array_entry : array_contents)
-              {
-                if(resolved_array_entry .is_zero())
-                {
-                  continue;
-                }
-                else
-                {
-                  out_expressions.push_back(resolved_array_entry);
-                }
-              }
-            }
-            else
+            if(!resolved_value)
             {
               LOG("Failed to resolve array value", array_entry);
               return false;
+            }
+
+            for(const exprt &resolved_array_entry : array_contents)
+            {
+              if(!resolved_array_entry.is_zero())
+              {
+                out_expressions.push_back(resolved_array_entry);
+              }
             }
           }
         }

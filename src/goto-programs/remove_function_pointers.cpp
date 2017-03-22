@@ -374,13 +374,10 @@ void remove_function_pointerst::remove_function_pointer(
 
     found_functions=fpr(functions);
 
-    // Consistency checks
-    // Reported optimized function pointer call, but didn't find any functions
-    assert(!found_functions || !functions.empty());
-
-    // Reported didn't optimize function pointer call, but did find some
-    // functions to replace with
-    assert(found_functions || functions.empty());
+    // Either found_functions is true therefore the functions should not
+    // be empty
+    // Or found_functions is false therefore the functions should be empty
+    assert(found_functions != functions.empty());
 
     if(functions.size()==1)
     {
