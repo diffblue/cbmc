@@ -361,7 +361,16 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
     std::list<code_assignt> assignments;
 
     // 1) cprover_string_length= *(rhs->length)
+    symbolt sym_length=get_fresh_aux_symbol(
+      length_type,
+      "cprover_string_length",
+      "cprover_string_length",
+      location,
+      ID_java,
+      symbol_table);
+    symbol_exprt cprover_length=sym_length.symbol_expr();
     member_exprt length(deref, "length", length_type);
+    assignments.emplace_back(cprover_length, length);
 
     // 2) cprover_string_array = *(rhs->data)
     symbol_exprt array_lhs=fresh_array(data_type.subtype(), location);
@@ -373,7 +382,7 @@ exprt string_refine_preprocesst::make_cprover_string_assign(
     // This assignment is useful for finding witnessing strings for counter
     // examples
     refined_string_typet ref_type(length_type, java_char_type());
-    string_exprt new_rhs(length, array_lhs, ref_type);
+    string_exprt new_rhs(cprover_length, array_lhs, ref_type);
 
     symbol_exprt lhs=fresh_string(new_rhs.type(), location);
     assignments.emplace_back(lhs, new_rhs);
