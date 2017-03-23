@@ -44,8 +44,6 @@ CLEANFILES = goto-diff$(EXEEXT)
 
 all: goto-diff$(EXEEXT)
 
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
-
 ###############################################################################
 
 goto-diff$(EXEEXT): $(OBJ)

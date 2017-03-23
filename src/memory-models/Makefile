@@ -22,8 +22,6 @@ CLEANFILES = memory_models$(LIBEXT) \
 
 all: mmcc$(EXEEXT)
 
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
-
 ###############################################################################
 
 mm_y.tab.cpp: parser.y

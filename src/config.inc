@@ -73,4 +73,3 @@ OSX_IDENTITY="Developer ID Application: Daniel Kroening"
 
 # Detailed version information
 CBMC_VERSION = 5.8
-GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")

@@ -45,8 +45,6 @@ CLEANFILES = jdiff$(EXEEXT)
 
 all: jdiff$(EXEEXT)
 
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
-
 ###############################################################################
 
 jdiff$(EXEEXT): $(OBJ)

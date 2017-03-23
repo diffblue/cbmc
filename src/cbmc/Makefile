@@ -56,14 +56,14 @@ INCLUDES= -I ..
 
 LIBS =
 
+CBMC_VERSION_FILES = cbmc_solvers$(OBJEXT)
+
 include ../config.inc
 include ../common
 
 CLEANFILES = cbmc$(EXEEXT)
 
 all: cbmc$(EXEEXT)
-
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
 
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)

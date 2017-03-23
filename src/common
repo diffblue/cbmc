@@ -227,6 +227,17 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 %.obj:%.c
 	$(CC) $(CP_CFLAGS) /nologo /c /EHsc $< /Fo$@
 
+# get version from git
+GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
+
+CBMC_VERSION_FILES += $(filter %_parse_options$(OBJEXT), $(OBJ))
+
+ifeq ($(BUILD_ENV_),MSVC)
+$(CBMC_VERSION_FILES): CP_CXXFLAGS += /DCBMC_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
+else
+$(CBMC_VERSION_FILES): CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+endif
+
 clean:
 	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cpp, %$(DEPEXT), $(filter %.cpp, $(SRC))) \
@@ -252,4 +263,3 @@ D_FILES1 = $(SRC:.c=$(DEPEXT))
 D_FILES = $(D_FILES1:.cpp=$(DEPEXT))
 
 -include $(D_FILES)
-
