@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/arith_tools.h>
+#include <util/sparse_vector.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"
@@ -71,6 +72,9 @@ public:
   // List of dynamically allocated symbols that are not in the symbol table
   typedef std::map<irep_idt, typet> dynamic_typest;
 
+  typedef std::map<irep_idt, function_assignmentst> output_valuest;
+  output_valuest output_values;
+
   // An assignment list annotated with the calling context.
   struct function_assignments_contextt
   {
@@ -106,26 +110,77 @@ protected:
 
   const goto_functionst &goto_functions;
 
-  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> memory_mapt;
+  typedef std::unordered_map<irep_idt, std::size_t, irep_id_hash> memory_mapt;
+  typedef std::map<std::size_t, irep_idt> inverse_memory_mapt;
   memory_mapt memory_map;
+  inverse_memory_mapt inverse_memory_map;
+
+  const inverse_memory_mapt::value_type &address_to_object_record(
+    std::size_t address) const
+  {
+    auto lower_bound=inverse_memory_map.lower_bound(address);
+    if(lower_bound->first!=address)
+    {
+      assert(lower_bound!=inverse_memory_map.begin());
+      --lower_bound;
+    }
+    return *lower_bound;
+  }
+
+  irep_idt address_to_identifier(std::size_t address) const
+  {
+    return address_to_object_record(address).second;
+  }
+
+  std::size_t address_to_offset(std::size_t address) const
+  {
+    return address-(address_to_object_record(address).first);
+  }
+
+  std::size_t base_address_to_alloc_size(std::size_t address) const
+  {
+    assert(address_to_offset(address)==0);
+    auto upper_bound=inverse_memory_map.upper_bound(address);
+    std::size_t next_alloc_address=
+      upper_bound==inverse_memory_map.end() ?
+      memory.size() :
+      upper_bound->first;
+    return next_alloc_address-address;
+  }
+
+  std::size_t base_address_to_actual_size(std::size_t address) const
+  {
+    auto memory_iter=memory.find(address);
+    if(memory_iter==memory.end())
+      return 0;
+    std::size_t ret=0;
+    std::size_t alloc_size=base_address_to_alloc_size(address);
+    while(memory_iter!=memory.end() && ret<alloc_size)
+    {
+      ++ret;
+      ++memory_iter;
+    }
+    return ret;
+  }
 
   class memory_cellt
   {
   public:
-    irep_idt identifier;
-    unsigned offset;
+    memory_cellt() :
+    value(0),
+    initialized(0)
+    {}
     mp_integer value;
     // Initialized is annotated even during reads
     // Set to 1 when written-before-read, -1 when read-before-written
     mutable char initialized;
   };
 
-  typedef std::vector<memory_cellt> memoryt;
+  typedef sparse_vectort<memory_cellt> memoryt;
   typedef std::map<std::string, const irep_idt &> parameter_sett;
   // mapping <structure, field> -> value
   typedef std::pair<const irep_idt, const irep_idt> struct_member_idt;
   typedef std::map<struct_member_idt, const exprt> struct_valuest;
-
 
   //  The memory is being annotated/reshaped even during reads
   //  (ie to find a read-before-write location) thus memory
@@ -138,6 +193,7 @@ protected:
   void build_memory_map(const symbolt &symbol);
   mp_integer build_memory_map(const irep_idt &id, const typet &type);
   typet concretize_type(const typet &type);
+  bool unbounded_size(const typet &);
   size_t get_size(const typet &type);
 
   irep_idt get_component_id(const irep_idt &object, unsigned offset);
@@ -169,6 +225,10 @@ protected:
     const mp_vectort &rhs);
 
   void read(
+    mp_integer address,
+    mp_vectort &dest) const;
+
+  void read_unbounded(
     mp_integer address,
     mp_vectort &dest) const;
 
