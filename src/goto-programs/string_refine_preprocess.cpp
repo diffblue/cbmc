@@ -809,11 +809,13 @@ void string_refine_preprocesst::make_string_function_side_effect(
   const irep_idt &function_name,
   const std::string &signature)
 {
+  // Cannot use const & here
   code_function_callt function_call=to_code_function_call(target->code);
   source_locationt loc=function_call.source_location();
   std::list<code_assignt> assignments;
-  exprt lhs=function_call.lhs();
-  exprt s=function_call.arguments()[0];
+  const exprt &lhs=function_call.lhs();
+  assert(!function_call.arguments().empty());
+  const exprt &s=function_call.arguments()[0];
   code_typet function_type=to_code_type(function_call.type());
 
   function_type.return_type()=s.type();
@@ -901,7 +903,7 @@ void string_refine_preprocesst::make_to_char_array_function(
   const code_function_callt &function_call=to_code_function_call(target->code);
   source_locationt location=function_call.source_location();
 
-  assert(function_call.arguments().size()>=1);
+  assert(!function_call.arguments().empty());
   const exprt &string_argument=function_call.arguments()[0];
   assert(is_java_string_pointer_type(string_argument.type()));
 
@@ -985,7 +987,7 @@ exprt::operandst string_refine_preprocesst::process_arguments(
         arg=typecast_exprt(arg, jls_ptr);
     }
     arg=make_cprover_string_assign(goto_program, target, arg, location);
-    typet type=ns.follow(arg.type());
+    const typet &type=ns.follow(arg.type());
     if(is_java_char_array_pointer_type(type))
     {
       arg=make_cprover_char_array_assign(goto_program, target, arg, location);
