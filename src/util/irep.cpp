@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string2int.h"
 #include "irep.h"
 #include "string_hash.h"
+#include "serializer.h"
 #include "irep_hash.h"
 
 #ifdef SUB_IS_LIST
@@ -1002,4 +1003,25 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
   }
 
   return result;
+}
+
+/*******************************************************************\
+
+  Function: irept::serialize
+
+  Inputs:
+    serializer: The serializer to read from/write to
+
+  Outputs:
+
+  Purpose:
+    Serializes this instance to/from the given serializer.
+
+\*******************************************************************/
+void irept::serialize(serializert &serializer)
+{
+  serializer.serialize("id", write().data);
+  serializer.serialize("subs", get_sub());
+  serializer.serialize("named_subs", get_named_sub());
+  serializer.serialize("comments", get_comments());
 }

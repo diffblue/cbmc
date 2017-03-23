@@ -13,6 +13,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "string_container.h"
 
+class serializert;
+
+
 class dstringt
 {
 public:
@@ -122,6 +125,8 @@ public:
   {
     return out << as_string();
   }
+
+  void serialize(serializert &serializer);
 
   // non-standard
 

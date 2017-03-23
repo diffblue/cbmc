@@ -45,6 +45,9 @@ typedef std::string irep_namet;
 typedef string_hash irep_id_hash;
 #endif
 
+class serializert;
+
+
 inline const std::string &id2string(const irep_idt &d)
 {
   #ifdef USE_DSTRING
@@ -256,6 +259,8 @@ public:
   bool full_eq(const irept &other) const;
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
+
+  void serialize(serializert &serializer);
 
 protected:
   static bool is_comment(const irep_namet &name)

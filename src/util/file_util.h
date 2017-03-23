@@ -62,4 +62,6 @@ std::string fileutl_get_relative_path(
   std::string const &pathname,
   std::string const &directory);
 
+std::string make_valid_filename(std::string filename);
+
 #endif // CPROVER_UTIL_FILE_UTIL_H
