@@ -71,6 +71,13 @@ abstract_object_pointert abstract_environmentt::eval(
       }
     },
     {
+      ID_array, [&](const exprt &expr)
+      {
+        return abstract_object_factory(
+          expr.type(), expr, ns);
+      }
+    },
+    {
       ID_member, [&](const exprt &expr)
       {
         member_exprt member_expr(to_member_expr(expr));

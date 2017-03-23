@@ -158,14 +158,15 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   // that we are not writing past the end of the array - Martin said
   // default should be not to, but perhaps for soundness the base class should
   // havoc and the default should derive from this.
-  if(is_top())
+  if(is_top() || is_bottom())
   {
     return sharing_ptrt<array_abstract_objectt>(
-      new array_abstract_objectt(*this));
+      dynamic_cast<array_abstract_objectt*>(clone()));
+
   }
   else
   {
     return sharing_ptrt<array_abstract_objectt>(
-      new array_abstract_objectt(type(), false, true));
+      new array_abstract_objectt(type(), true, false));
   }
 }
