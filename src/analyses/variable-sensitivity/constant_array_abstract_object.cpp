@@ -301,7 +301,7 @@ sharing_ptrt<array_abstract_objectt>
       {
         // Here we assume the write is in bounds
         abstract_object_pointert array_entry;
-        if(map.find(index_value)==map.cend())
+        if(map.find(index_value)!=map.cend())
         {
           array_entry=map.at(index_value);
         }
