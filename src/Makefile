@@ -112,7 +112,7 @@ ipasir-download:
 	# get the 2016 version of the ipasir package, which contains a few solvers
 	@echo "Download ipasir 2016 package"
 	@(lwp-download http://baldur.iti.kit.edu/sat-competition-2016/downloads/ipasir.zip ../ipasir.zip)
-	@(cd ..; unzip -u ipasir.zip)
+	@(cd ..; unzip ipasir.zip)
 
 ipasir-build: ipasir-download
 	# build libpicaso, and create a libipasir.a in ipasir directory
