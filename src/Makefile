@@ -84,4 +84,12 @@ glucose-download:
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 
-.PHONY: minisat2-download glucose-download
+cprover-jar-build:
+	@echo "Building org.cprover.jar"
+	@(cd java_bytecode/library/; \
+	mkdir -p target; \
+	javac -d target/ `find src/ -name "*.java"`; \
+	cd target; jar cf org.cprover.jar `find . -name "*.class"`; \
+	mv org.cprover.jar ../../../)
+
+.PHONY: minisat2-download glucose-download cprover-jar-build

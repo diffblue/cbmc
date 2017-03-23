@@ -2979,6 +2979,17 @@ public:
   {
     return op0();
   }
+
+  // Retrieves the object(symbol) this member corresponds to
+  inline const symbol_exprt &symbol() const
+  {
+    const exprt &op=op0();
+    if(op.id()==ID_member)
+    {
+      return static_cast<const member_exprt &>(op).symbol();
+    }
+    return to_symbol_expr(op);
+  }
 };
 
 /*! \brief Cast a generic exprt to a \ref member_exprt
@@ -3448,6 +3459,19 @@ public:
   function_application_exprt():exprt(ID_function_application)
   {
     operands().resize(2);
+  }
+
+  explicit function_application_exprt(const typet &_type):
+    exprt(ID_function_application, _type)
+  {
+    operands().resize(2);
+  }
+
+  function_application_exprt(
+    const symbol_exprt &_function, const typet &_type):
+      function_application_exprt(_type) // NOLINT(runtime/explicit)
+  {
+    function()=_function;
   }
 
   exprt &function()

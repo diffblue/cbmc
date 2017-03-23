@@ -15,7 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <langapi/language_ui.h>
 #include <solvers/refinement/bv_refinement.h>
-#include <solvers/refinement/refined_string_type.h>
+#include <util/refined_string_type.h>
 
 class string_constraintt: public exprt
 {
@@ -47,7 +47,6 @@ public:
   {
     return operands()[4];
   }
-
 
  private:
   string_constraintt();

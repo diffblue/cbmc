@@ -55,6 +55,56 @@ protected:
   const char *p;
 };
 
+/*******************************************************************\
+
+Function: assign_parameter_names
+
+  Inputs: `ftype`: Function type whose parameters should be named
+          `name_prefix`: Prefix for parameter names, typically the
+            parent function's name.
+          `symbol_table`: Global symbol table
+
+ Outputs: Assigns parameter names (side-effects on `ftype`) to
+          function stub parameters, which are initially nameless
+          as method conversion hasn't happened.
+          Also creates symbols in `symbol_table`.
+
+ Purpose: See above
+
+\*******************************************************************/
+
+void assign_parameter_names(
+  code_typet &ftype,
+  const irep_idt &name_prefix,
+  symbol_tablet &symbol_table)
+{
+  code_typet::parameterst &parameters=ftype.parameters();
+
+  // Mostly borrowed from java_bytecode_convert.cpp; maybe factor this out.
+  // assign names to parameters
+  for(std::size_t i=0; i<parameters.size(); ++i)
+  {
+    irep_idt base_name, identifier;
+
+    if(i==0 && parameters[i].get_this())
+      base_name="this";
+    else
+      base_name="stub_ignored_arg"+std::to_string(i);
+
+    identifier=id2string(name_prefix)+"::"+id2string(base_name);
+    parameters[i].set_base_name(base_name);
+    parameters[i].set_identifier(identifier);
+
+    // add to symbol table
+    parameter_symbolt parameter_symbol;
+    parameter_symbol.base_name=base_name;
+    parameter_symbol.mode=ID_java;
+    parameter_symbol.name=identifier;
+    parameter_symbol.type=parameters[i].type();
+    symbol_table.add(parameter_symbol);
+  }
+}
+
 static bool operator==(const irep_idt &what, const patternt &pattern)
 {
   return pattern==what;
@@ -824,6 +874,43 @@ static void gather_symbol_live_ranges(
 
 /*******************************************************************\
 
+Function: java_bytecode_convert_methodt::check_static_field_stub
+
+  Inputs: `se`: Symbol expression referring to a static field
+          `basename`: The static field's basename
+
+ Outputs: Creates a symbol table entry for the static field if one
+          doesn't exist already.
+
+ Purpose: See above
+
+\*******************************************************************/
+
+void java_bytecode_convert_methodt::check_static_field_stub(
+  const symbol_exprt &symbol_expr,
+  const irep_idt &basename)
+{
+  const auto &id=symbol_expr.get_identifier();
+  if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+  {
+    // Create a stub, to be overwritten if/when the real class is loaded.
+    symbolt new_symbol;
+    new_symbol.is_static_lifetime=true;
+    new_symbol.is_lvalue=true;
+    new_symbol.is_state_var=true;
+    new_symbol.name=id;
+    new_symbol.base_name=basename;
+    new_symbol.type=symbol_expr.type();
+    new_symbol.pretty_name=new_symbol.name;
+    new_symbol.mode=ID_java;
+    new_symbol.is_type=false;
+    new_symbol.value.make_nil();
+    symbol_table.add(new_symbol);
+  }
+}
+
+/*******************************************************************\
+
 Function: java_bytecode_convert_methodt::convert_instructions
 
   Inputs:
@@ -1148,6 +1235,25 @@ codet java_bytecode_convert_methodt::convert_instructions(
             get_message_handler());
       }
     }
+    // replace calls to CProver.assume
+    else if(statement=="invokestatic" &&
+            id2string(arg0.get(ID_identifier))==
+            "java::org.cprover.CProver.assume:(Z)V")
+    {
+      const code_typet &code_type=to_code_type(arg0.type());
+      // sanity check: function has the right number of args
+      assert(code_type.parameters().size()==1);
+
+      exprt operand = pop(1)[0];
+      // we may need to adjust the type of the argument
+      if(operand.type()!=bool_typet())
+        operand.make_typecast(bool_typet());
+
+      c=code_assumet(operand);
+      source_locationt loc=i_it->source_location;
+      loc.set_function(method_id);
+      c.add_source_location()=loc;
+    }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
             statement=="invokevirtual" ||
@@ -1246,9 +1352,18 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbolt symbol;
         symbol.name=id;
         symbol.base_name=arg0.get(ID_C_base_name);
+        symbol.pretty_name=
+          id2string(arg0.get(ID_C_class)).substr(6)+"."+
+          id2string(symbol.base_name)+"()";
         symbol.type=arg0.type();
         symbol.value.make_nil();
         symbol.mode=ID_java;
+
+        assign_parameter_names(
+          to_code_type(symbol.type),
+          symbol.name,
+          symbol_table);
+
         symbol_table.add(symbol);
       }
 

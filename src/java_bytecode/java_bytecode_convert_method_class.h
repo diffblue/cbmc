@@ -220,6 +220,10 @@ protected:
     const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+
+  void check_static_field_stub(
+    const symbol_exprt &se,
+    const irep_idt &basename);
 };
 
 #endif

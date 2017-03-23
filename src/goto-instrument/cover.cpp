@@ -10,8 +10,14 @@ Date: May 2016
 
 #include <algorithm>
 #include <iterator>
+#include <unordered_set>
 
+#include <util/format_number_range.h>
 #include <util/prefix.h>
+#include <util/string2int.h>
+#include <util/cprover_prefix.h>
+
+#include <json/json_parser.h>
 
 #include "cover.h"
 
@@ -28,6 +34,11 @@ public:
       if(next_is_target || it->is_target())
         block_count++;
 
+      const irep_idt &line=it->source_location.get_line();
+      if(!line.empty())
+        block_line_cover_map[block_count]
+          .insert(unsafe_string2unsigned(id2string(line)));
+
       block_map[it]=block_count;
 
       if(!it->source_location.is_nil() &&
@@ -35,7 +46,26 @@ public:
         source_location_map[block_count]=it->source_location;
 
       next_is_target=
+#if 0
+        // Disabled for being too messy
         it->is_goto() || it->is_function_call() || it->is_assume();
+#else
+        it->is_goto() || it->is_function_call();
+#endif
+    }
+
+    // create list of covered lines as CSV string and set as property of source
+    // location of basic block, compress to ranges if applicable
+    format_number_ranget format_lines;
+    for(const auto &cover_set : block_line_cover_map)
+    {
+      assert(!cover_set.second.empty());
+      std::vector<unsigned>
+        line_list{cover_set.second.begin(), cover_set.second.end()};
+
+      std::string covered_lines=format_lines(line_list);
+      source_location_map[cover_set.first]
+        .set_basic_block_covered_lines(covered_lines);
     }
   }
 
@@ -46,6 +76,11 @@ public:
   // map block numbers to source code locations
   typedef std::map<unsigned, source_locationt> source_location_mapt;
   source_location_mapt source_location_map;
+
+  // map block numbers to set of line numbers
+  typedef std::map<unsigned, std::unordered_set<unsigned> >
+    block_line_cover_mapt;
+  block_line_cover_mapt block_line_cover_map;
 
   inline unsigned operator[](goto_programt::const_targett t)
   {
@@ -63,6 +98,171 @@ public:
           << '\n';
   }
 };
+
+/*******************************************************************\
+
+Function: coverage_goalst::coverage_goalst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+coverage_goalst::coverage_goalst()
+{
+  no_trivial_tests=false;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::get_coverage
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
+                                   message_handlert &message_handler)
+{
+  jsont json;
+  coverage_goalst goals;
+  source_locationt source_location;
+  goals.set_no_trivial_tests(false);
+
+  // check coverage file
+  if(parse_json(coverage, message_handler, json))
+  {
+    messaget message(message_handler);
+    message.error() << coverage << " file is not a valid json file"
+                    << messaget::eom;
+    exit(6);
+  }
+
+  // make sure that we have an array of elements
+  if(!json.is_array())
+  {
+    messaget message(message_handler);
+    message.error() << "expecting an array in the " <<  coverage
+                    << " file, but got "
+                    << json << messaget::eom;
+    exit(6);
+  }
+
+  irep_idt file, function, line;
+  for(jsont::arrayt::const_iterator
+      it=json.array.begin();
+      it!=json.array.end();
+      it++)
+  {
+    // get the file of each existing goal
+    file=(*it)["file"].value;
+    source_location.set_file(file);
+
+    // get the function of each existing goal
+    function=(*it)["function"].value;
+    source_location.set_function(function);
+
+    // get the lines array
+    if((*it)["lines"].is_array())
+    {
+      for(const jsont & entry : (*it)["lines"].array)
+      {
+        // get the line of each existing goal
+        line=entry["number"].value;
+        source_location.set_line(line);
+        goals.set_goals(source_location);
+      }
+    }
+  }
+  return goals;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::set_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goalst::set_goals(source_locationt goal)
+{
+  existing_goals.push_back(goal);
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::is_existing_goal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool coverage_goalst::is_existing_goal(source_locationt source_location)
+{
+  std::vector<source_locationt>::iterator it = existing_goals.begin();
+  while(it!=existing_goals.end())
+  {
+    if(!source_location.get_file().compare(it->get_file()) &&
+       !source_location.get_function().compare(it->get_function()) &&
+       !source_location.get_line().compare(it->get_line()))
+         break;
+    ++it;
+  }
+  if(it == existing_goals.end())
+    return true;
+  else
+    return false;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::set_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goalst::set_no_trivial_tests(const bool trivial)
+{
+  no_trivial_tests=trivial;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::get_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const bool coverage_goalst::get_no_trivial_tests()
+{
+  return no_trivial_tests;
+}
 
 /*******************************************************************\
 
@@ -414,7 +614,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
   const std::set<exprt> &decisions)
 {
   // To obtain the 1st-level controlling conditions
-  std::set<exprt> controlling = collect_mcdc_controlling(decisions);
+  std::set<exprt> controlling=collect_mcdc_controlling(decisions);
 
   std::set<exprt> result;
   // For each controlling condition, to check if it contains
@@ -627,7 +827,7 @@ void remove_repetition(std::set<exprt> &exprs)
      **/
     for(auto &y : new_exprs)
     {
-      bool iden = true;
+      bool iden=true;
       for(auto &c : conditions)
       {
         std::set<signed> signs1=sign_of_expr(c, x);
@@ -669,7 +869,7 @@ void remove_repetition(std::set<exprt> &exprs)
   }
 
   // update the original ''exprs''
-  exprs = new_exprs;
+  exprs=new_exprs;
 }
 
 /*******************************************************************\
@@ -838,7 +1038,8 @@ bool is_mcdc_pair(
 
   if(diff_count==1)
     return true;
-  else return false;
+  else
+    return false;
 }
 
 /*******************************************************************\
@@ -963,7 +1164,8 @@ void minimize_mcdc_controlling(
     {
       controlling=new_controlling;
     }
-    else break;
+    else
+      break;
   }
 }
 
@@ -1074,7 +1276,8 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  coverage_goalst &goals)
 {
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
@@ -1142,7 +1345,9 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_map[block_nr];
 
-          if(!source_location.get_file().empty() &&
+          // check whether the current goal already exists
+          if(goals.is_existing_goal(source_location) &&
+             !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
             std::string comment="block "+b;
@@ -1297,9 +1502,12 @@ void instrument_cover_goals(
         const std::set<exprt> decisions=collect_decisions(i_it);
 
         std::set<exprt> both;
-        std::set_union(conditions.begin(), conditions.end(),
-                       decisions.begin(), decisions.end(),
-                       inserter(both, both.end()));
+        std::set_union(
+          conditions.begin(),
+          conditions.end(),
+          decisions.begin(),
+          decisions.end(),
+          inserter(both, both.end()));
 
         const source_locationt source_location=i_it->source_location;
 
@@ -1389,6 +1597,38 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
+  coverage_criteriont criterion,
+  coverage_goalst &goals)
+{
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    if(f_it->first==ID__start ||
+       f_it->first==CPROVER_PREFIX "initialize")
+      continue;
+
+    instrument_cover_goals(
+      symbol_table,
+      f_it->second.body,
+      criterion,
+      goals);
+  }
+}
+
+/*******************************************************************\
+
+Function: instrument_cover_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
   coverage_criteriont criterion)
 {
   Forall_goto_functions(f_it, goto_functions)
@@ -1397,6 +1637,53 @@ void instrument_cover_goals(
        f_it->first=="__CPROVER_initialize")
       continue;
 
-    instrument_cover_goals(symbol_table, f_it->second.body, criterion);
+    // empty set of existing goals
+    coverage_goalst goals;
+    instrument_cover_goals(symbol_table, f_it->second.body,
+                           criterion, goals);
   }
 }
+
+/*******************************************************************\
+
+Function: consider_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool consider_goals(
+  const goto_programt &goto_program,
+  coverage_goalst &goals)
+{
+  // check whether we should eliminate trivial goals
+  if(!goals.get_no_trivial_tests())
+    return true;
+
+  bool result;
+  unsigned long count_assignments=0, count_goto=0, count_decl=0;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_goto())
+      ++count_goto;
+    else if(i_it->is_assign())
+      ++count_assignments;
+    else if(i_it->is_decl())
+      ++count_decl;
+  }
+
+  // check whether this is a constructor/destructor or a get/set (pattern)
+  if(!count_goto && !count_assignments && !count_decl)
+    result=false;
+  else
+    result = !((count_decl==0) && (count_goto<=1) &&
+             (count_assignments>0 && count_assignments<5));
+
+  return result;
+}
+
