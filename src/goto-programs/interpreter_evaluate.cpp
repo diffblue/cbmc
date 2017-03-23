@@ -94,10 +94,10 @@ void interpretert::allocate(
 /// Clears memoy r/w flag initialization
 void interpretert::clear_input_flags()
 {
-  for(const memory_cellt &cell : memory)
+  for(auto &cell : memory)
   {
-    if(cell.initialized>0)
-      cell.initialized=0;
+    if(cell.second.initialized>0)
+      cell.second.initialized=0;
   }
 }
 
@@ -397,7 +397,8 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_struct)
   {
-    dest.reserve(get_size(expr.type()));
+    if(!unbounded_size(expr.type()))
+      dest.reserve(get_size(expr.type()));
     bool error=false;
 
     forall_operands(it, expr)
@@ -412,9 +413,9 @@ void interpretert::evaluate(
       mp_vectort tmp;
       evaluate(*it, tmp);
 
-      if(tmp.size()==sub_size)
+      if(unbounded_size(it->type()) || tmp.size()==sub_size)
       {
-        for(size_t i=0; i<sub_size; i++)
+        for(size_t i=0; i<tmp.size(); i++)
           dest.push_back(tmp[i]);
       }
       else
@@ -848,10 +849,10 @@ void interpretert::evaluate(
       mp_integer address=result[0];
       if(address>0 && address<memory.size())
       {
-        const auto &memory_record=memory[integer2unsigned(address)];
-        auto obj_type=get_type(memory_record.identifier);
+        std::size_t address_val=integer2size_t(address);
+        auto obj_type=get_type(address_to_identifier(address_val));
 
-        mp_integer offset=memory_record.offset;
+        mp_integer offset=address_to_offset(address_val);
         mp_integer byte_offset;
         if(!memory_offset_to_byte_offset(obj_type, offset, byte_offset))
           dest.push_back(byte_offset);
@@ -946,8 +947,15 @@ void interpretert::evaluate(
     }
     else if(!address.is_zero())
     {
-      dest.resize(get_size(expr.type()));
-      read(address, dest);
+      if(!unbounded_size(expr.type()))
+      {
+        dest.resize(get_size(expr.type()));
+        read(address, dest);
+      }
+      else
+      {
+        read_unbounded(address, dest);
+      }
       return;
     }
   }
@@ -989,13 +997,53 @@ void interpretert::evaluate(
       }
     }
   }
-  else if((expr.id()==ID_array) || (expr.id()==ID_array_of))
+  else if(expr.id()==ID_array)
   {
     forall_operands(it, expr)
     {
       evaluate(*it, dest);
     }
     return;
+  }
+  else if(expr.id()==ID_array_of)
+  {
+    const auto &ty=to_array_type(expr.type());
+    std::vector<mp_integer> size;
+    if(ty.size().id()==ID_infinity)
+      size.push_back(0);
+    else
+      evaluate(ty.size(), size);
+    if(size.size()==1)
+    {
+      std::size_t size_int=integer2size_t(size[0]);
+      for(std::size_t i=0; i<size_int; ++i)
+        evaluate(expr.op0(), dest);
+      return;
+    }
+  }
+  else if(expr.id()==ID_with)
+  {
+    const auto &wexpr=to_with_expr(expr);
+    evaluate(wexpr.old(), dest);
+    std::vector<mp_integer> where;
+    std::vector<mp_integer> new_value;
+    evaluate(wexpr.where(), where);
+    evaluate(wexpr.new_value(), new_value);
+    const auto &subtype=expr.type().subtype();
+    if(!new_value.empty() && where.size()==1 && !unbounded_size(subtype))
+    {
+      // Ignore indices < 0, which the string solver sometimes produces
+      if(where[0]<0)
+        return;
+      std::size_t where_idx=integer2size_t(where[0]);
+      std::size_t subtype_size=get_size(subtype);
+      std::size_t need_size=(where_idx+1)*subtype_size;
+      if(dest.size()<need_size)
+        dest.resize(need_size, 0);
+      for(std::size_t i=0; i<new_value.size(); ++i)
+        dest[(where_idx*subtype_size)+i]=new_value[i];
+      return;
+    }
   }
   else if(expr.id()==ID_nil)
   {
