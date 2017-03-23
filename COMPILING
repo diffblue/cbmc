@@ -44,11 +44,17 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    git clone https://github.com/diffblue/cbmc cbmc-git
 
-2) Do
+2) On Debian/Ubuntu, do
 
    cd cbmc-git/src
    make minisat2-download
    make
+
+   On Redhat/Fedora etc., do
+
+   cd cbmc-git/src
+   make minisat2-download
+   make CXX=g++-6
 
 
 COMPILATION ON SOLARIS 11
