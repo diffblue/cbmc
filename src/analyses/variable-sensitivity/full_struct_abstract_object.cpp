@@ -221,6 +221,7 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
 
     copy->map[c]=
       environment.write(starting_value, value, stack, ns, merging_write);
+    copy->top=false;
     assert(copy->verify());
     return copy;
   }
