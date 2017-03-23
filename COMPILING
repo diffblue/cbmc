@@ -36,7 +36,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    On Red Hat/Fedora or derivates, do
 
-   yum install gcc gcc-c++ flex bison perl-libwww-perl patch
+   yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6
 
    Note that you need g++ version 5.2 or newer.
 
@@ -48,13 +48,14 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    cd cbmc-git/src
    make minisat2-download
-   make
+   make CXX=g++-6
 
    On Redhat/Fedora etc., do
 
    cd cbmc-git/src
    make minisat2-download
-   make CXX=g++-6
+   scl enable devtoolset-6 bash
+   make
 
 
 COMPILATION ON SOLARIS 11
