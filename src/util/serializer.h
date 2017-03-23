@@ -17,6 +17,7 @@ Purpose: Generic serialization of object hierarchies.
 #include <vector>
 #include <set>
 #include <map>
+#include <cassert>
 #ifdef USE_BOOST
 #include <boost/bimap.hpp>
 #endif
@@ -162,9 +163,7 @@ public:
     traitst * result=dynamic_cast<traitst *>(traits);
     if(result!=nullptr)
       return *result;
-    if(parent==nullptr)
-      throw std::logic_error(
-        "Traits of required type not found on this serializer");
+    assert(parent!=nullptr);  // In release build allow undefined behaviour
     return parent->get_traits<traitst>();
   }
 
@@ -188,9 +187,7 @@ public:
   \*******************************************************************/
   void set_traits(serializer_traitst &serializer_traits)
   {
-    if(traits!=nullptr)
-      throw std::logic_error(
-        "Tried to set traits twice on the same serializert");
+    assert(traits==nullptr);
     traits=&serializer_traits;
   }
 
