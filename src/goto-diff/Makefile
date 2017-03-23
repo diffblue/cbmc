@@ -33,7 +33,7 @@ CLEANFILES = goto-diff$(EXEEXT)
 
 all: goto-diff$(EXEEXT)
 
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(RELEASE_INFO))\""
+CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
 
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)

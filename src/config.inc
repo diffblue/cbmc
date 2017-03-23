@@ -31,6 +31,4 @@ OSX_IDENTITY="Developer ID Application: Daniel Kroening"
 
 # Detailed version information
 CBMC_VERSION = 5.7
-GIT_HEAD = $(shell git rev-parse --short HEAD || echo "n/a")
-GIT_MOD = $(shell git diff HEAD --quiet || echo +dirty)
-RELEASE_INFO = $(GIT_HEAD)$(GIT_MOD)
+GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
