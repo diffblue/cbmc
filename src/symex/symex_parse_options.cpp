@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_unused_functions.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -383,6 +384,13 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
 
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      // Entry point will have been set before and function pointers removed
+      status() << "Removing Unused Functions" << eom;
+      remove_unused_functions(goto_model.goto_functions, ui_message_handler);
+    }
+
     if(cmdline.isset("cover"))
     {
       std::string criterion=cmdline.get_value("cover");
@@ -683,6 +691,7 @@ void symex_parse_optionst::help()
     " --stop-on-fail               stop analysis once a failed property is detected\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --trace                      give a counterexample trace for failed properties\n"
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
