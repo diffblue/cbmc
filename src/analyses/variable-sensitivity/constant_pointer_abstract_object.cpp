@@ -96,37 +96,23 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(e, environment, ns)
 {
   assert(e.type().id()==ID_pointer);
+  value=nil_exprt();
 
-  // TODO(tkiley): Should here really be handling the different ways we
-  // can create a pointer
   if(e.id()==ID_address_of)
   {
-    //address_of_exprt address_expr(to_address_of_expr(e));
     value=e;
     top=false;
   }
-  else
+  else if(e.id()==ID_constant)
   {
-    if(e.id()==ID_constant)
+    constant_exprt constant_expr(to_constant_expr(e));
+    if(constant_expr.get_value()==ID_NULL)
     {
-      constant_exprt constant_expr(to_constant_expr(e));
-      if(constant_expr.get_value()==ID_NULL)
-      {
-        value=e;
-        top=false;
-      }
-      else
-      {
-        // TODO(tkiley): These should probably be logged.
-        // unknown type
-        value=nil_exprt();
-      }
-    }
-    else
-    {
-      value=nil_exprt();
+      value=e;
+      top=false;
     }
   }
+  // Else unknown expression type - possibly we should handle more
 }
 
 /*******************************************************************\
