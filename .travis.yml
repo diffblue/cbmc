@@ -88,7 +88,7 @@ script:
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="touch src/solvers/sat/satcheck.h" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make ipasir-build" &&
+    COMMAND="make -C src ipasir-build" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="make -C src -j2 IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
