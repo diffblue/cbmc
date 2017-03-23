@@ -851,12 +851,18 @@ void goto_convertt::do_java_new_array(
     goto_programt tmp;
 
     symbol_exprt tmp_i=
-      new_tmp_symbol(index_type(), "index", tmp, location).symbol_expr();
+      new_tmp_symbol(length.type(), "index", tmp, location).symbol_expr();
 
     code_fort for_loop;
 
     side_effect_exprt sub_java_new=rhs;
     sub_java_new.operands().erase(sub_java_new.operands().begin());
+
+    assert(rhs.type().id()==ID_pointer);
+    typet sub_type=
+      static_cast<const typet &>(rhs.type().subtype().find("#element_type"));
+    assert(sub_type.id()==ID_pointer);
+    sub_java_new.type()=sub_type;
 
     side_effect_exprt inc(ID_assign);
     inc.operands().resize(2);
@@ -866,11 +872,21 @@ void goto_convertt::do_java_new_array(
     dereference_exprt deref_expr(
       plus_exprt(data, tmp_i), data.type().subtype());
 
+    code_blockt for_body;
+    symbol_exprt init_sym=
+      new_tmp_symbol(sub_type, "subarray_init", tmp, location).symbol_expr();
+
+    code_assignt init_subarray(init_sym, sub_java_new);
+    code_assignt assign_subarray(
+      deref_expr,
+      typecast_exprt(init_sym, deref_expr.type()));
+    for_body.move_to_operands(init_subarray);
+    for_body.move_to_operands(assign_subarray);
+
     for_loop.init()=code_assignt(tmp_i, from_integer(0, tmp_i.type()));
     for_loop.cond()=binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
     for_loop.iter()=inc;
-    for_loop.body()=code_skipt();
-    for_loop.body()=code_assignt(deref_expr, sub_java_new);
+    for_loop.body()=for_body;
 
     convert(for_loop, tmp);
     dest.destructive_append(tmp);
