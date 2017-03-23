@@ -1,0 +1,6 @@
+CORE
+NondetInt.class
+--function NondetInt.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

@@ -1,0 +1,6 @@
+CORE
+NondetBoolean.class
+--function NondetBoolean.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

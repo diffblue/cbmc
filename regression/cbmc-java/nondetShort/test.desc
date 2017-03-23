@@ -1,0 +1,6 @@
+CORE
+NondetShort.class
+--function NondetShort.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

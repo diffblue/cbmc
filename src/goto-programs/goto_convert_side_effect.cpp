@@ -6,6 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>

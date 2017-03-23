@@ -1,0 +1,6 @@
+CORE
+NondetChar.class
+--function NondetChar.foo
+^VERIFICATION FAILED$
+--
+^warning: ignoring

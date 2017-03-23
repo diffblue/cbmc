@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <iomanip>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <util/std_expr.h>
 #include <util/prefix.h>
@@ -47,11 +50,16 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_symbol(to_symbol_expr(expr));
   else if(expr.id()==ID_side_effect)
   {
-    const irep_idt &statement=to_side_effect_expr(expr).get_statement();
+    auto &side_effect_expr=to_side_effect_expr(expr);
+    const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_java_new)
-      typecheck_expr_java_new(to_side_effect_expr(expr));
+    {
+      typecheck_expr_java_new(side_effect_expr);
+    }
     else if(statement==ID_java_new_array)
-      typecheck_expr_java_new_array(to_side_effect_expr(expr));
+    {
+      typecheck_expr_java_new_array(side_effect_expr);
+    }
   }
   else if(expr.id()==ID_java_string_literal)
     typecheck_expr_java_string_literal(expr);
