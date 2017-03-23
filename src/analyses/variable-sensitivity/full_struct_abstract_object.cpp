@@ -272,6 +272,40 @@ sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_compon
   }
 }
 
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::output
+
+  Inputs:
+   out - the stream to write to
+   ai - the abstract interpreter that contains the abstract domain
+        (that contains the object ... )
+   ns - the current namespace
+
+ Outputs:
+
+ Purpose: To provide a human readable string to the out representing
+          the current known value about this object. For this array we
+          print: { .component_name=<output of object for component_name... }
+
+\*******************************************************************/
+
+void full_struct_abstract_objectt::output(
+  std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+{
+  out << "{";
+  for(const auto &entry : map)
+  {
+    if(entry.first!=map.cbegin()->first)
+    {
+      out << ", ";
+    }
+    out << "." << entry.first << "=";
+    entry.second->output(out, ai, ns);
+  }
+  out << "}";
+}
+
 bool full_struct_abstract_objectt::verify() const
 {
   return is_top() || is_bottom() || !map.empty();
