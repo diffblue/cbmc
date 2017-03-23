@@ -56,6 +56,9 @@ Purpose:
 \*******************************************************************/
 class serializert
 {
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Data used in this class
+
 private:
   // The serializer for a containing object, if any
   serializert *parent;
@@ -63,6 +66,9 @@ private:
   bool is_read;
   // Traits attached to this serializer
   serializer_traitst *traits;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Constructors/destructors
 
 protected:
   /*******************************************************************\
@@ -107,6 +113,9 @@ protected:
 
   // The virtual destructor ensures sub-classes are disposed correctly.
   virtual ~serializert()=default;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Accessors
 
 public:
   /*******************************************************************\
@@ -184,6 +193,9 @@ public:
         "Tried to set traits twice on the same serializert");
     traits=&serializer_traits;
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serialization of basic data types
 
 public:
   /*******************************************************************\
@@ -298,7 +310,9 @@ public:
   \*******************************************************************/
   virtual void serialize(const char *name, float &field)=0;
 
-  // Serializing objects that implement a serialize method
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing objects that implement a serialize method
+
 protected:
   // This is a non-templated function so that it can be virtual
   // It therefore can't take an object of the type to be serialized
@@ -335,33 +349,6 @@ public:
       {
         field.serialize(serializer);
       });
-  }
-
-  /*******************************************************************\
-
-  Function: serializert::serialize
-
-  Template parameters:
-    T:
-      The type of the field to serialize. Must be serializable.
-
-  Inputs:
-    name: The name of the field to serialize.
-    field: An rvalue reference to the field to serialize.
-
-  Outputs:
-
-  Purpose:
-    Serializes a field.
-    Since the field is an rvalue reference this override is useful for writing
-      temporary objects or reading into temporary objects that store their
-      values in a non-temporary.
-
-  \*******************************************************************/
-  template<typename T>
-  void serialize(const char *name, T &&field)
-  {
-    serialize(name, static_cast<T &>(field));
   }
 
   /*******************************************************************\
@@ -417,7 +404,40 @@ public:
     return result;
   }
 
-  // Serializing pairs of serializable values
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing rvalue references
+
+public:
+  /*******************************************************************\
+
+  Function: serializert::serialize
+
+  Template parameters:
+    T:
+      The type of the field to serialize. Must be serializable.
+
+  Inputs:
+    name: The name of the field to serialize.
+    field: An rvalue reference to the field to serialize.
+
+  Outputs:
+
+  Purpose:
+    Serializes a field.
+    Since the field is an rvalue reference this override is useful for writing
+      temporary objects or reading into temporary objects that store their
+      values in a non-temporary.
+
+  \*******************************************************************/
+  template<typename T>
+  void serialize(const char *name, T &&field)
+  {
+    serialize(name, static_cast<T &>(field));
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing pairs of serializable values
+
 private:
   /*******************************************************************\
 
@@ -490,8 +510,11 @@ public:
     serialize(name, serializable_pairt<std::pair<firstt, secondt>>(field));
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing vectors
+
 public:
-  // A helper class for writing vectors
+  // A helper base class for writing vectors
   class collection_writert
   {
   public:
@@ -499,11 +522,17 @@ public:
     virtual void write(serializert &serializer)=0;
   };
 
+  // Virtual function that must be implemented to support reading vectors
   virtual void read_array(
     const char *name,
     std::function<void(serializert &serializer)> read_elt)=0;
+
+  // Virtual function that must be implemented to support writing vectors
   virtual void write_array(
     const char *name, collection_writert &collection_writer)=0;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing vectors of objects that implement a serialize method
 
 public:
   // A helper class for writing vectors of objects that implement a serialize
@@ -581,6 +610,9 @@ public:
     }
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing vectors of serializable values
+
 protected:
   // A helper class for writing vectors of serializable objects (wrapped in a
   //  value field)
@@ -654,6 +686,9 @@ public:
       write_array(name, writer);
     }
   }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing sets of serializable values
 
 public:
   /*******************************************************************\
@@ -754,7 +789,9 @@ public:
     serialize_set(name, field);
   }
 
-  // Serializing maps of serializable values
+  /////////////////////////////////////////////////////////////////////////////
+  // Section: Serializing maps of serializable values
+
 private:
   // This helper function can serialize any type of map (mapt) that has member
   //  types key_type, mapped_type, value_type and reference, an insert method
