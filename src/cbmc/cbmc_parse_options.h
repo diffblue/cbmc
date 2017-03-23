@@ -41,7 +41,7 @@ class optionst;
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
-  "(show-claims)(claim):(show-properties)(show-reachable-properties)" \
+  "(show-claims)(claim):(show-properties)" \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \

@@ -540,19 +540,6 @@ int cbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  // may replace --show-properties
-  if(cmdline.isset("show-reachable-properties"))
-  {
-    const namespacet ns(symbol_table);
-
-    // Entry point will have been set before and function pointers removed
-    status() << "Removing Unused Functions" << eom;
-    remove_unused_functions(goto_functions, ui_message_handler);
-
-    show_properties(ns, get_ui(), goto_functions);
-    return 0; // should contemplate EX_OK from sysexits.h
-  }
-
   if(set_properties(goto_functions))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
