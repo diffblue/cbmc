@@ -147,7 +147,7 @@ public:
 
   bool operator!=(const irept &other) const { return !operator==(other); }
 
-  void swap(irept &irep) noexcept
+  void swap(irept &irep)
   {
     using std::swap;
     swap(data, irep.data);
