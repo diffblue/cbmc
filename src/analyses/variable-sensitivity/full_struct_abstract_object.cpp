@@ -79,8 +79,8 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
   const full_struct_abstract_objectt &old):
     struct_abstract_objectt(old)
 {
-    map=old.map;
-    assert(verify());
+  map=old.map;
+  assert(verify());
 }
 
 /*******************************************************************\
@@ -306,9 +306,26 @@ void full_struct_abstract_objectt::output(
   out << "}";
 }
 
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::verify
+
+  Inputs:
+
+ Outputs: Returns true if the struct is valid
+
+ Purpose: To validate that the struct object is in a valid state.
+          This means either it is top or bottom, or if neither of those
+          then there exists something in the map of components.
+          If there is something in the map, then it can't be top or bottom
+
+\*******************************************************************/
+
 bool full_struct_abstract_objectt::verify() const
 {
-  return is_top() || is_bottom() || !map.empty();
+  // Either the object is top or bottom (=> map empty)
+  // or the map is not empty => neither top nor bottom
+  return (is_top() || is_bottom()) == map.empty();
 }
 
 /*******************************************************************\
