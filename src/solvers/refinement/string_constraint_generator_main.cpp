@@ -208,6 +208,18 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: string_constraint_generatort::convert_java_string_to_string_exprt
+
+  Inputs: a java string
+
+ Outputs: a string expression
+
+ Purpose: create a new string_exprt as a conversion of a java string
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
     const exprt &jls)
 {
