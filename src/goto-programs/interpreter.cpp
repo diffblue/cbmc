@@ -581,22 +581,24 @@ exprt interpretert::get_value(
     if(rhs[offset]<memory.size())
     {
       // We want the symbol pointed to
-      memory_cellt &cell=memory[integer2unsigned(rhs[offset])];
-      const typet type=get_type(cell.identifier);
+      std::size_t address=integer2size_t(rhs[offset]);
+      irep_idt identifier=address_to_identifier(address);
+      size_t offset=address_to_offset(address);
+      const typet type=get_type(identifier);
       exprt symbol_expr(ID_symbol, type);
-      symbol_expr.set(ID_identifier, cell.identifier);
+      symbol_expr.set(ID_identifier, identifier);
 
-      if(cell.offset==0)
+      if(offset==0)
         return address_of_exprt(symbol_expr);
       if(ns.follow(type).id()==ID_struct)
       {
-        irep_idt member_id=get_component_id(cell.identifier, cell.offset);
+        irep_idt member_id=get_component_id(identifier, offset);
         member_exprt member_expr(symbol_expr, member_id);
         return address_of_exprt(member_expr);
       }
       index_exprt index_expr(
         symbol_expr,
-        from_integer(cell.offset, integer_typet()));
+        from_integer(offset, integer_typet()));
       return index_expr;
     }
 
@@ -674,12 +676,13 @@ void interpretert::assign(
   {
     if((address+i)<memory.size())
     {
-      memory_cellt &cell=memory[integer2unsigned(address+i)];
+      std::size_t address_val=integer2size_t(address+i);
+      memory_cellt &cell=memory[address_val];
       if(show)
       {
         status() << total_steps << " ** assigning "
-                 << cell.identifier << "["
-                 << cell.offset << "]:=" << rhs[i]
+                 << address_to_identifier(address_val) << "["
+                 << address_to_offset(address_val) << "]:=" << rhs[i]
                  << "\n" << eom;
       }
       cell.value=rhs[i];
@@ -723,8 +726,9 @@ void interpretert::execute_function_call()
   // Retrieve the empty last trace step struct we pushed for this step
   // of the interpreter run to fill it with the corresponding data
   goto_trace_stept &trace_step=steps.get_last_step();
-  const memory_cellt &cell=memory[integer2size_t(a)];
-  const irep_idt &identifier=cell.identifier;
+  std::size_t address=integer2size_t(a);
+  const memory_cellt &cell=memory[address];
+  const irep_idt &identifier=address_to_identifier(address);
   trace_step.identifier=identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=
@@ -819,9 +823,7 @@ void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
   memory.resize(1);
-  memory[0].offset=0;
-  memory[0].identifier="NULL-OBJECT";
-  memory[0].initialized=0;
+  inverse_memory_map[0]="NULL-OBJECT";
 
   num_dynamic_objects=0;
   dynamic_types.clear();
@@ -849,18 +851,10 @@ void interpretert::build_memory_map(const symbolt &symbol)
 
   if(size!=0)
   {
-    unsigned address=memory.size();
+    std::size_t address=memory.size();
     memory.resize(address+size);
     memory_map[symbol.name]=address;
-
-    for(size_t i=0; i<size; i++)
-    {
-      memory_cellt &cell=memory[address+i];
-      cell.identifier=symbol.name;
-      cell.offset=i;
-      cell.value=0;
-      cell.initialized=0;
-    }
+    inverse_memory_map[address]=symbol.name;
   }
 }
 
@@ -901,12 +895,10 @@ mp_integer interpretert::build_memory_map(
 
   if(it!=dynamic_types.end())
   {
-    unsigned offset=1;
-    unsigned address=memory_map[id];
-    while(memory[address+offset].offset>0) offset++;
-
+    std::size_t address=memory_map[id];
+    std::size_t current_size=base_address_to_alloc_size(address);
     // current size <= size already recorded
-    if(size<=offset)
+    if(size<=current_size)
       return memory_map[id];
   }
 
@@ -916,19 +908,12 @@ mp_integer interpretert::build_memory_map(
   if(size==0)
     size=1; // This is a hack to create existence
 
-  unsigned address=memory.size();
+  std::size_t address=memory.size();
   memory.resize(address+size);
   memory_map[id]=address;
+  inverse_memory_map[address]=id;
   dynamic_types.insert(std::pair<const irep_idt, typet>(id, alloc_type));
 
-  for(size_t i=0; i<size; i++)
-  {
-    memory_cellt &cell=memory[address+i];
-    cell.identifier=id;
-    cell.offset=i;
-    cell.value=0;
-    cell.initialized=0;
-  }
   return address;
 }
 
