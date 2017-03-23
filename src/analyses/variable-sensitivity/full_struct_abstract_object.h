@@ -46,6 +46,11 @@ public:
     const abstract_object_pointert value,
     bool merging_write) const override;
 
+  virtual void output(
+    std::ostream &out,
+    const class ai_baset &ai,
+    const class namespacet &ns) const override;
+
 private:
   // no entry means component is top
   typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
