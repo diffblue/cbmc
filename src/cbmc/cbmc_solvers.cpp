@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -209,6 +210,29 @@ cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
     options.get_bool_option("refine-arithmetic");
 
   return new solvert(bv_refinement, prop);
+}
+
+/*******************************************************************\
+
+Function: cbmc_solverst::get_string_refinement
+
+ Outputs: a solver for cbmc
+
+ Purpose: the string refinement adds to the bit vector refinement
+          specifications for functions from the Java string library
+
+\*******************************************************************/
+
+cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
+{
+  propt *prop;
+  prop=new satcheck_no_simplifiert();
+  prop->set_message_handler(get_message_handler());
+
+  string_refinementt *string_refinement=new string_refinementt(
+    ns, *prop, MAX_NB_REFINEMENT);
+  string_refinement->set_ui(ui);
+  return new solvert(string_refinement, prop);
 }
 
 /*******************************************************************\
