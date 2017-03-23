@@ -1,3 +1,6 @@
+# get version from git
+GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
+
 # Build platform
 # (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
 
@@ -207,4 +210,3 @@ D_FILES1 = $(SRC:.c=.d)
 D_FILES = $(D_FILES1:.cpp=.d)
 
 -include $(D_FILES)
-

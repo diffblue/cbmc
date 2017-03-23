@@ -34,7 +34,11 @@ CLEANFILES = symex$(EXEEXT)
 
 all: symex$(EXEEXT)
 
-CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+ifeq ($(BUILD_ENV_),MSVC)
+  CP_CXXFLAGS += /DCBMC_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
+else
+  CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+endif
 
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
