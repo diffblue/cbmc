@@ -273,14 +273,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
-  if(cmdline.isset("string-refine"))
+  if(cmdline.isset("refine-strings"))
   {
     options.set_option("refine-strings", true);
-    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
-    options.set_option("string-printable", cmdline.isset("string-printable"));
-    if(cmdline.isset("string-max-length"))
-      options.set_option(
-        "string-max-length", cmdline.get_value("string-max-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -828,7 +823,7 @@ bool cbmc_parse_optionst::process_goto_program(
     goto_partial_inline(goto_functions, ns, ui_message_handler);
 
 
-    if(cmdline.isset("string-refine"))
+    if(cmdline.isset("refine-strings"))
     {
       status() << "Preprocessing for string refinement" << eom;
       string_refine_preprocesst(
