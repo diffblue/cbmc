@@ -1,0 +1,9 @@
+CORE
+main.c
+--variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[bar\.assertion\.1\] .* assertion other==4: Success$
+^\[main\.assertion\.1\] .* assertion y==5: Success$
+--
+^warning: ignoring

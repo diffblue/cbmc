@@ -1,0 +1,12 @@
+CORE
+main.c
+--variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion \*arr_y==2: Success$
+^\[main\.assertion\.2\] .* assertion p2arr==arr_y: Success$
+^\[main\.assertion\.3\] .* assertion \*p2arr==2: Success$
+^\[bar\.assertion\.1\] .* assertion \*arr_unmodified==1: Success$
+^\[bar\.assertion\.2\] .* assertion \*arr_modified==2: Success$
+--
+^warning: ignoring
