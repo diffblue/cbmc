@@ -55,4 +55,6 @@ protected:
   void get_parents_trans_rec(const irep_idt &, idst &) const;
 };
 
+std::ostream &output_dot(std::ostream &ostr, const class_hierarchyt &hierarchy);
+
 #endif // CPROVER_GOTO_PROGRAMS_CLASS_HIERARCHY_H
