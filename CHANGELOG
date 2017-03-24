@@ -1,3 +1,27 @@
+5.7
+===
+
+* General: All tools now support the same set of --*-check options.
+* General: Added --conversion-check to catch type casts that cause loss of
+  information. Previously --(un)signed-overflow-check would report these.
+* CBMC: New option --symex-coverage-report to produce a Cobertura-compatible
+  statement- and branch coverage report.
+* CBMC/Java: New options --java-max-vla-length, --java-unwind-enum-static,
+  --java-cp-include-files, --lazy-methods.
+* GOTO-INSTRUMENT: Static loop unwinding via --unwind or via new options
+  --unwindset, --unwindset-file, --unwinding-assertions, --partial-loops,
+  --continue-as-loops, --log
+* GOTO-INSTRUMENT: New option --slice-global-inits
+* GOTO-INSTRUMENT: Inlining via --inline, --partial-inline, --function-inline,
+  --no-caching
+* GOTO-INSTRUMENT: New options --remove-function-pointers, --model-argc-argv,
+  --show-threaded
+* GOTO-CC: Additional drop-in replacement support for bcc, as, as86
+* GOTO-CC: GCC-style error/warning messages
+* GOTO-CC: New options --native-compiler and --native-linker to select the
+  compiler/linker to be used when building combined native/goto object files.
+
+
 5.6
 ===
 
