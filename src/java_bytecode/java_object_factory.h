@@ -27,7 +27,6 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &,
-  bool skip_classid,
   bool create_dynamic_objects,
   bool assume_non_null,
   message_handlert &message_handler,

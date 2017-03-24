@@ -63,7 +63,6 @@ public:
     bool is_sub,
     irep_idt class_identifier,
     const source_locationt &loc,
-    bool skip_classid,
     bool create_dynamic_objects,
     bool override=false,
     const typet &override_type=empty_typet());
@@ -158,7 +157,6 @@ Function: java_object_factoryt::gen_nondet_init
    is_sub -
    class_identifier -
    loc -
-   skip_classid -
    create_dynamic_objects -
    override - Ignore the LHS' real type. Used at the moment for
               reference arrays, which are implemented as void*
@@ -177,7 +175,6 @@ void java_object_factoryt::gen_nondet_init(
   bool is_sub,
   irep_idt class_identifier,
   const source_locationt &loc,
-  bool skip_classid,
   bool create_dynamic_objects,
   bool override,
   const typet &override_type)
@@ -263,7 +260,6 @@ void java_object_factoryt::gen_nondet_init(
         false,
         "",
         loc,
-        false,
         create_dynamic_objects);
     }
 
@@ -298,9 +294,6 @@ void java_object_factoryt::gen_nondet_init(
 
       if(name=="@class_identifier")
       {
-        if(skip_classid)
-          continue;
-
         irep_idt qualified_clsid="java::"+as_string(class_identifier);
         constant_exprt ci(qualified_clsid, string_typet());
         code_assignt code(me, ci);
@@ -328,7 +321,6 @@ void java_object_factoryt::gen_nondet_init(
           _is_sub,
           class_identifier,
           loc,
-          false,
           create_dynamic_objects);
       }
     }
@@ -380,7 +372,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const auto &length_sym_expr=length_sym.symbol_expr();
 
   // Initialize array with some undetermined length:
-  gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false, false);
+  gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -465,7 +457,6 @@ void java_object_factoryt::gen_nondet_array_init(
     false,
     irep_idt(),
     loc,
-    false,
     true,
     true,
     element_type);
@@ -495,7 +486,6 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
-  bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
   message_handlert &message_handler,
@@ -512,7 +502,6 @@ void gen_nondet_init(
     false,
     "",
     loc,
-    skip_classid,
     create_dyn_objs);
 }
 
@@ -598,7 +587,6 @@ exprt object_factory(
       init_code,
       symbol_table,
       loc,
-      false,
       false,
       !allow_null,
       message_handler,
