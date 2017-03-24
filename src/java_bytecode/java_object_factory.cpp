@@ -250,20 +250,18 @@ void java_object_factoryt::gen_nondet_init(
     {
       exprt allocated=
         allocate_object(expr, subtype, loc, create_dynamic_objects);
-      {
-        exprt init_expr;
-        if(allocated.id()==ID_address_of)
-          init_expr=allocated.op0();
-        else
-          init_expr=dereference_exprt(allocated, allocated.type().subtype());
-        gen_nondet_init(
-          init_expr,
-          false,
-          "",
-          loc,
-          false,
-          create_dynamic_objects);
-      }
+      exprt init_expr;
+      if(allocated.id()==ID_address_of)
+        init_expr=allocated.op0();
+      else
+        init_expr=dereference_exprt(allocated, allocated.type().subtype());
+      gen_nondet_init(
+        init_expr,
+        false,
+        "",
+        loc,
+        false,
+        create_dynamic_objects);
     }
 
     if(!assume_non_null)
@@ -592,7 +590,6 @@ exprt object_factory(
 
     exprt object=aux_symbol.symbol_expr();
 
-    const namespacet ns(symbol_table);
     gen_nondet_init(
       object,
       init_code,
