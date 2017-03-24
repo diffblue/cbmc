@@ -53,7 +53,9 @@ Function: string_refinementt::set_max_string_length
 
   Inputs:
     i - maximum length which is allowed for strings.
-        negative number means no limit
+        negative number means the strings length has no other limit
+        than the maximal integer according to the type of their
+        length, for instance 2^31-1 for Java.
 
  Purpose: Add constraints on the size of strings used in the
           program.
