@@ -18,11 +18,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-// Defines a limit on the string witnesses we will output.
-// Longer strings are still concidered possible by the solver but
-// it will not output them.
-#define MAX_CONCRETE_STRING_SIZE 500
-
 #define MAX_NB_REFINEMENT 100
 
 class string_refinementt: public bv_refinementt

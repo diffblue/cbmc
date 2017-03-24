@@ -348,8 +348,8 @@ void string_refinementt::concretize_string(const exprt &expr)
       else
       {
         size_t concretize_limit=found_length.to_long();
-        concretize_limit=concretize_limit>MAX_CONCRETE_STRING_SIZE?
-              MAX_CONCRETE_STRING_SIZE:concretize_limit;
+        concretize_limit=concretize_limit>generator.max_string_length?
+              generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
         for(size_t i=0; i<concretize_limit; ++i)
         {
@@ -722,7 +722,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
-  if(n>MAX_CONCRETE_STRING_SIZE)
+  if(n>generator.max_string_length)
   {
 #if 0
     debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
