@@ -946,13 +946,13 @@ Function: string_refinementt::substitute_array_with_expr()
 
 \*******************************************************************/
 
-exprt string_refinementt::substitute_array_with_expr
-  (exprt &expr, exprt &index) const
+exprt string_refinementt::substitute_array_with_expr(
+  const exprt &expr, const exprt &index) const
 {
   if(expr.id()==ID_with)
   {
-    with_exprt &with_expr=to_with_expr(expr);
-    exprt then_expr=with_expr.new_value();
+    const with_exprt &with_expr=to_with_expr(expr);
+    const exprt &then_expr=with_expr.new_value();
     exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
     const typet &type=then_expr.type();
     assert(else_expr.type()==type);
