@@ -413,6 +413,9 @@ void full_slicert::operator()(
   Forall_goto_functions(f_it, goto_functions)
     if(f_it->second.body_available())
     {
+      if(f_it->first=="pthread_create")
+        throw "--full-slice does not support C/Pthreads yet";
+
       Forall_goto_program_instructions(i_it, f_it->second.body)
       {
         const cfgt::entryt &e=cfg.entry_map[i_it];
