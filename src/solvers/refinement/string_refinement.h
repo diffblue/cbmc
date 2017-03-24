@@ -102,7 +102,7 @@ private:
   typet substitute_java_string_types(typet type);
   exprt substitute_java_strings(exprt expr);
   exprt substitute_array_with_expr(const exprt &expr, const exprt &index) const;
-  exprt substitute_array_access(exprt &expr) const;
+  void substitute_array_access(exprt &expr) const;
   void add_symbol_to_symbol_map(const exprt &lhs, const exprt &rhs);
   bool is_char_array(const typet &type) const;
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);

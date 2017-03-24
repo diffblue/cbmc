@@ -985,14 +985,10 @@ Function: string_refinementt::substitute_array_access()
 
 \*******************************************************************/
 
-exprt string_refinementt::substitute_array_access(exprt &expr) const
+void string_refinementt::substitute_array_access(exprt &expr) const
 {
-  for(size_t i=0; i<expr.operands().size(); ++i)
-  {
-    // TODO: only copy when necessary
-    exprt op(expr.operands()[i]);
-    expr.operands()[i]=substitute_array_access(op);
-  }
+  for(auto &op : expr.operands())
+    substitute_array_access(op);
 
   if(expr.id()==ID_index)
   {
@@ -1000,19 +996,21 @@ exprt string_refinementt::substitute_array_access(exprt &expr) const
 
     if(index_expr.array().id()==ID_symbol)
     {
-      return index_expr;
+      expr=index_expr;
+      return;
     }
 
     if(index_expr.array().id()==ID_with)
     {
-      exprt subst=substitute_array_with_expr(index_expr.array(),
-                                             index_expr.index());
-      return subst;
+      expr=substitute_array_with_expr(
+        index_expr.array(), index_expr.index());
+      return;
     }
 
     if(index_expr.array().id()==ID_array_of)
     {
-      return to_array_of_expr(index_expr.array()).op();
+      expr=to_array_of_expr(index_expr.array()).op();
+      return;
     }
 
     assert(index_expr.array().id()==ID_array);
@@ -1042,9 +1040,8 @@ exprt string_refinementt::substitute_array_access(exprt &expr) const
       equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
       ite=if_exprt(equals, op, ite, char_type);
     }
-    return ite;
+    expr=ite;
   }
-  return expr;
 }
 
 /*******************************************************************\
@@ -1091,7 +1088,8 @@ void string_refinementt::add_negation_of_constraint_to_solver(
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
-  solver << substitute_array_access(negaxiom);
+  substitute_array_access(negaxiom);
+  solver << negaxiom;
 }
 
 /*******************************************************************\
