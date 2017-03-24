@@ -471,42 +471,6 @@ void java_object_factoryt::gen_nondet_array_init(
 
 /*******************************************************************\
 
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  bool create_dyn_objs,
-  bool assume_non_null,
-  message_handlert &message_handler,
-  size_t max_nondet_array_length)
-{
-  java_object_factoryt state(
-    init_code,
-    assume_non_null,
-    max_nondet_array_length,
-    symbol_table,
-    message_handler);
-  state.gen_nondet_init(
-    expr,
-    false,
-    "",
-    loc,
-    create_dyn_objs);
-}
-
-/*******************************************************************\
-
 Function: new_tmp_symbol
 
   Inputs:
@@ -582,15 +546,18 @@ exprt object_factory(
 
     exprt object=aux_symbol.symbol_expr();
 
-    gen_nondet_init(
-      object,
+    java_object_factoryt state(
       init_code,
-      symbol_table,
-      loc,
-      false,
       !allow_null,
-      message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      symbol_table,
+      message_handler);
+    state.gen_nondet_init(
+      object,
+      false,
+      "",
+      loc,
+      false);
 
     return object;
   }
