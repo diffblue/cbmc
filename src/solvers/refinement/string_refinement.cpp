@@ -347,11 +347,11 @@ void string_refinementt::concretize_string(const exprt &expr)
       }
       else
       {
-        size_t concretize_limit=found_length.to_long();
+        unsigned long concretize_limit=found_length.to_long();
         concretize_limit=concretize_limit>generator.max_string_length?
               generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
-        for(size_t i=0; i<concretize_limit; ++i)
+        for(unsigned long i=0; i<concretize_limit; ++i)
         {
           auto i_expr=from_integer(i, str.length().type());
           debug() << "Concretizing " << from_expr(content_expr)

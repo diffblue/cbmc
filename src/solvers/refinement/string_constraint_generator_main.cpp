@@ -268,7 +268,7 @@ void string_constraint_generatort::add_default_axioms(
   const string_exprt &s)
 {
   s.axiom_for_is_longer_than(from_integer(0, s.length().type()));
-  if(max_string_length>=0)
+  if(max_string_length!=std::numeric_limits<unsigned long>::max())
     axioms.push_back(s.axiom_for_is_shorter_than(max_string_length));
 
   if(force_printable_characters)

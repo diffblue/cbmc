@@ -61,7 +61,7 @@ private:
   // Base class
   typedef bv_refinementt supert;
 
-  unsigned initial_loop_bound;
+  unsigned long initial_loop_bound;
 
   string_constraint_generatort generator;
 

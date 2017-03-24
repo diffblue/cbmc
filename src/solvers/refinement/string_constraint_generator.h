@@ -23,16 +23,16 @@ class string_constraint_generatort
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
-  // string constraints for different string funcitons and add them
+  // string constraints for different string functions and add them
   // to the axiom list.
 
   string_constraint_generatort():
-    max_string_length(std::numeric_limits<unsigned int>::max()),
+    max_string_length(std::numeric_limits<unsigned long>::max()),
     force_printable_characters(false)
   { }
 
   // Constraints on the maximal length of strings
-  unsigned int max_string_length;
+  unsigned long max_string_length;
 
   // Should we add constraints on the characters
   bool force_printable_characters;
