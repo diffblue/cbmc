@@ -1,3 +1,72 @@
+5.6
+===
+
+Bugfixes in the C, C++, Java front-ends.
+
+
+5.5
+===
+
+This is a major release, with significant changes. The option
+--all-properties is now the default; to restore the previous behaviour,
+use --stop-on-fail. The primary area of attention was again the Java
+front-end. We have furthermore added test-suite generation for branch
+coverage, location coverage, condition coverage, decision coverage and
+MC/DC.
+
+
+5.4
+===
+
+This is a minor release, focused primarily on maintenance. The primary
+area of attention was again the Java front-end. We have also updated to
+Minisat 2.2.1.
+
+
+5.3
+===
+
+This is a minor release, focused primarily on maintenance. The primary
+area of attention is the Java front-end.
+
+
+5.2
+===
+
+This is a minor release, focused primarily on maintenance. The primary
+areas of attention are the full slicer, the Java frontend, test suite
+generation and support for the Glucose solver.
+
+
+5.1
+===
+
+This is a minor release, focused primarily on maintenance. Support for solving
+floating-point problems using for SMT-LIB2 solvers without support for the
+floating-point theory has been added.
+
+
+5.0
+===
+
+This is a major release, focused primarily on performance improvements.
+Furthermore, the support for the floating-point theory for SMT-LIB2 has been
+improved substantially. This release breaks compatibility with the goto-binary
+format used by earlier releases; i.e., you will need to rebuild your
+goto-binaries.
+
+
+4.9
+===
+
+This release is primarily for maintenance purposes and does not add any major
+new features. The support for SMT-LIB2 solvers has been improved substantially.
+
+
+4.8
+===
+
+
 4.7
 ===
 
