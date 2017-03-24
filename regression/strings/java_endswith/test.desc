@@ -1,0 +1,7 @@
+FUTURE
+test_endswith.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 7.* FAILURE$
+--

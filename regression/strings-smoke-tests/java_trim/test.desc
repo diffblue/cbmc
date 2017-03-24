@@ -1,0 +1,8 @@
+FUTURE
+test_trim.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 6.* SUCCESS$
+^\[.*assertion.2\].* line 7.* FAILURE$
+--

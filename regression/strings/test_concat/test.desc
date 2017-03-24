@@ -1,6 +1,6 @@
 FUTURE
 test.c
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion c == .p.: SUCCESS$
