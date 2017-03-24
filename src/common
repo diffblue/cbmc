@@ -185,14 +185,14 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 %.obj:%.c
 	$(CC) $(CP_CFLAGS) /nologo /c /EHsc $< /Fo$@
 
-# make >= 4.0 has a `file` function that may be fast than `shell cat`
+# make >= 4.0 has a `file` function that may be faster than `shell cat`
 # for now, portability wins
 KNOWN_RELEASE_INFO = $(shell cat .release_info 2>/dev/null)
-ifneq ($(RELEASE_INFO), $(KNOWN_RELEASE_INFO))
+ifneq ($(GIT_INFO), $(KNOWN_RELEASE_INFO))
 $(filter %_parse_options$(OBJEXT), $(OBJ)): .release_info
 
 .release_info:
-	echo $(RELEASE_INFO) > $@
+	echo $(GIT_INFO) > $@
 
 .PHONY: .release_info
 endif
