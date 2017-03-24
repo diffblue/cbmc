@@ -53,7 +53,7 @@ Function: string_refinementt::set_max_string_length
 
   Inputs:
     i - maximum length which is allowed for strings.
-        negative number means the strings length has no other limit
+        by default the strings length has no other limit
         than the maximal integer according to the type of their
         length, for instance 2^31-1 for Java.
 
@@ -62,7 +62,7 @@ Function: string_refinementt::set_max_string_length
 
 \*******************************************************************/
 
-void string_refinementt::set_max_string_length(int i)
+void string_refinementt::set_max_string_length(unsigned int i)
 {
   generator.max_string_length=i;
 }

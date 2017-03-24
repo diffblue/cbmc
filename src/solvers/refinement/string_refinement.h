@@ -36,7 +36,7 @@ public:
   // Should we concretize strings when the solver finished
   bool do_concretizing;
 
-  void set_max_string_length(int i);
+  void set_max_string_length(unsigned int i);
   void enforce_non_empty_string();
   void enforce_printable_characters();
 

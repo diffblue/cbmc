@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
+#include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
@@ -26,12 +27,12 @@ public:
   // to the axiom list.
 
   string_constraint_generatort():
-    max_string_length(-1),
+    max_string_length(std::numeric_limits<unsigned int>::max()),
     force_printable_characters(false)
   { }
 
   // Constraints on the maximal length of strings
-  int max_string_length;
+  unsigned int max_string_length;
 
   // Should we add constraints on the characters
   bool force_printable_characters;
