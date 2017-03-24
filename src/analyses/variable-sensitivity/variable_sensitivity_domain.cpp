@@ -75,15 +75,27 @@ void variable_sensitivity_domaint::transform(
 
   case GOTO:
     {
-      // TODO(tkiley): add support for flow sensitivity
       if (1) // (flow_sensitivity == FLOW_SENSITIVE)
       {
+        // Get the next line
         locationt next=from;
         next++;
-        if(next==to)
-          abstract_state.assume(not_exprt(instruction.guard), ns);
-        else
-          abstract_state.assume(instruction.guard, ns);
+        // Is this a GOTO to the next line (i.e. pointless)
+        if(next!=from->get_target())
+        {
+          if(to==from->get_target())
+          {
+            // The AI is exploring the branch where the jump is taken
+            abstract_state.assume(instruction.guard, ns);
+          }
+          else
+          {
+            // Exploring the path where the jump is not taken - therefore assume
+            // the condition is false
+            abstract_state.assume(not_exprt(instruction.guard), ns);
+          }
+        }
+        // ignore jumps to the next line, we can assume nothing
       }
     }
     break;
