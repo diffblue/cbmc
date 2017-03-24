@@ -1350,7 +1350,8 @@ void instrument_cover_goals(
              !source_location.get_file().empty() &&
              source_location.get_file()[0]!='<')
           {
-            std::string comment="block "+b;
+            std::string comment=
+              "function "+id2string(source_location.get_function())+" block "+b;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
@@ -1686,4 +1687,3 @@ bool consider_goals(
 
   return result;
 }
-
