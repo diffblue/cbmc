@@ -1,0 +1,12 @@
+CORE
+main.c
+--variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion y==5: Success$
+^\[main\.assertion\.2\] .* assertion p2x==&y: Success$
+^\[main\.assertion\.3\] .* assertion \*p2x==5: Success$
+^\[bar\.assertion\.1\] .* assertion \*unmodified==3: Success$
+^\[bar\.assertion\.2\] .* assertion \*modifed==5: Success$
+--
+^warning: ignoring
