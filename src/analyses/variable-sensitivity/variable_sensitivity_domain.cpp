@@ -14,6 +14,7 @@ Date: April 2016
 #include <util/simplify_expr.h>
 
 #include "variable_sensitivity_domain.h"
+#include <util/cprover_prefix.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -106,12 +107,89 @@ void variable_sensitivity_domaint::transform(
     break;
 
   case FUNCTION_CALL:
-    // FIXME : Ignore as not yet interprocedural
+  {
+    const code_function_callt &function_call=to_code_function_call(from->code);
+    const exprt &function=function_call.function();
+
+    locationt next=from;
+    next++;
+
+    if(function.id()==ID_symbol)
+    {
+      // called function identifier
+      const symbol_exprt &symbol_expr=to_symbol_expr(function);
+      const irep_idt function_id=symbol_expr.get_identifier();
+
+
+      if(to==next)
+      {
+        if(function_id==CPROVER_PREFIX "set_must" ||
+           function_id==CPROVER_PREFIX "get_must" ||
+           function_id==CPROVER_PREFIX "set_may" ||
+           function_id==CPROVER_PREFIX "get_may" ||
+           function_id==CPROVER_PREFIX "cleanup" ||
+           function_id==CPROVER_PREFIX "clear_may" ||
+           function_id==CPROVER_PREFIX "clear_must")
+        {
+          // no effect on constants
+        }
+        else
+        {
+          assert(false);
+        }
+      }
+      else
+      {
+        // we have an actual call
+
+        // parameters of called function
+        const symbolt &symbol=ns.lookup(function_id);
+        const code_typet &code_type=to_code_type(symbol.type);
+        const code_typet::parameterst &parameters=code_type.parameters();
+
+        const code_function_callt::argumentst &arguments=
+          function_call.arguments();
+
+        code_typet::parameterst::const_iterator p_it=parameters.begin();
+        for(const auto &arg : arguments)
+        {
+          if(p_it==parameters.end())
+            break;
+
+          const symbol_exprt parameter_expr(p_it->get_identifier(), arg.type());
+          abstract_object_pointert param_val=abstract_state.eval(arg, ns);
+          abstract_state.assign(parameter_expr, param_val, ns);
+
+          ++p_it;
+        }
+      }
+    }
+    else
+    {
+      // unresolved call
+      assert(false);
+    }
     break;
+  }
 
   case END_FUNCTION:
-    // FIXME : Ignore as not yet interprocedural
+  {
+    // erase parameters
+
+    const irep_idt id=from->function;
+    const symbolt &symbol=ns.lookup(id);
+
+    const code_typet &type=to_code_type(symbol.type);
+
+    for(const auto &param : type.parameters())
+    {
+      abstract_state.assign(
+        symbol_exprt(param.get_identifier(), param.type()),
+        abstract_state.abstract_object_factory(param.type(), ns, true, false),
+        ns);
+    }
     break;
+  }
 
     /***************************************************************/
 
