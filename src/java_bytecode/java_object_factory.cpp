@@ -25,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 class java_object_factoryt:public messaget
 {
   code_blockt &init_code;
@@ -81,19 +69,15 @@ public:
     const typet &override_type=empty_typet());
 };
 
-
 /*******************************************************************\
 
-Function: gen_nondet_array_init
+Function: java_object_factoryt::allocate_object
 
-  Inputs: the target expression, desired object type, source location
-          and Boolean whether to create a dynamic object
+  Inputs:
 
- Outputs: the allocated object
+ Outputs:
 
- Purpose: Returns false if we can't figure out the size of allocate_type.
-          allocate_type may differ from target_expr, e.g. for target_expr
-          having type int* and allocate_type being an int[10].
+ Purpose:
 
 \*******************************************************************/
 
@@ -165,10 +149,29 @@ exprt java_object_factoryt::allocate_object(
   }
 }
 
-// Override type says to ignore the LHS' real type, and init it with the given
-// type regardless. Used at the moment for reference arrays, which are
-// implemented as void* arrays but should be init'd as their true type with
-// appropriate casts.
+/*******************************************************************\
+
+Function: java_object_factoryt::gen_nondet_init
+
+  Inputs:
+   expr -
+   is_sub -
+   class_identifier -
+   loc -
+   skip_classid -
+   create_dynamic_objects -
+   override - Ignore the LHS' real type. Used at the moment for
+              reference arrays, which are implemented as void*
+              arrays but should be init'd as their true type with
+              appropriate casts.
+   override_type - Type to use if ignoring the LHS' real type
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_object_factoryt::gen_nondet_init(
   const exprt &expr,
   bool is_sub,
@@ -343,7 +346,7 @@ void java_object_factoryt::gen_nondet_init(
 
 /*******************************************************************\
 
-Function: gen_nondet_array_init
+Function: java_object_factoryt::gen_nondet_array_init
 
   Inputs:
 
