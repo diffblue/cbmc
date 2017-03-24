@@ -229,6 +229,7 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 
 # get version from git
 GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
+GIT_INFO_FILE = .release_info
 
 CBMC_VERSION_FILES += $(filter %_parse_options$(OBJEXT), $(OBJ))
 
@@ -238,12 +239,28 @@ else
 $(CBMC_VERSION_FILES): CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
 endif
 
+# Use make >= 4.0's `file` function, if available - it should be faster than
+# `shell cat`
+ifeq ($(firstword $(subst ., , $(MAKE_VERSION))), 3)
+KNOWN_RELEASE_INFO = $(shell cat $(GIT_INFO_FILE) 2>/dev/null)
+else
+KNOWN_RELEASE_INFO = $(file < $(GIT_INFO_FILE))
+endif
+ifneq ($(GIT_INFO), $(KNOWN_RELEASE_INFO))
+$(CBMC_VERSION_FILES): $(GIT_INFO_FILE)
+
+$(GIT_INFO_FILE):
+	echo $(GIT_INFO) > $@
+
+.PHONY: $(GIT_INFO_FILE)
+endif
+
 clean:
 	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cpp, %$(DEPEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
 		$(patsubst %.cc, %$(DEPEXT), $(filter %.cc, $(SRC))) \
-		$(CLEANFILES)
+		$(CLEANFILES) $(GIT_INFO_FILE)
 
 .PHONY: first_target clean all
 .PHONY: sources generated_files
