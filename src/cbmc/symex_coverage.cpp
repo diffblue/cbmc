@@ -318,7 +318,7 @@ void symex_coveraget::compute_overall_coverage(
       it!=file_records.end();
       ++it)
   {
-    if(has_prefix(id2string(it->first), "<builtin-"))
+    if(source_locationt::is_built_in(id2string(it->first)))
       continue;
 
     const coverage_recordt &f_cov=it->second;

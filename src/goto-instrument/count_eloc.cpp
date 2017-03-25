@@ -44,7 +44,7 @@ static void collect_eloc(
       const irep_idt &file=it->source_location.get_file();
 
       if(!file.empty() &&
-         !has_prefix(id2string(file), "<built-in-"))
+         !it->source_location.is_built_in())
         files[file].insert(it->source_location.get_line());
     }
   }
