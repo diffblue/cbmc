@@ -103,7 +103,8 @@ bool java_static_lifetime_init(
   const source_locationt &source_location,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_recursive_depth)
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
@@ -142,6 +143,7 @@ bool java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
+          max_recursive_depth,
           source_location,
           message_handler);
         code_assignt assignment(sym.symbol_expr(), newsym);
@@ -195,7 +197,8 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length,
+  size_t max_nondet_array_length,
+  size_t max_recursive_depth,
   message_handlert &message_handler)
 {
   const code_typet::parameterst &parameters=
@@ -234,6 +237,7 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
+        max_recursive_depth,
         function.location,
         message_handler);
 
@@ -536,7 +540,8 @@ bool java_entry_point(
   const irep_idt &main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_recursive_depth)
 {
   // check if the entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -560,7 +565,8 @@ bool java_entry_point(
        symbol.location,
        message_handler,
        assume_init_pointers_not_null,
-       max_nondet_array_length))
+       max_nondet_array_length,
+       max_recursive_depth))
     return true;
 
   code_blockt init_code;
@@ -626,6 +632,7 @@ bool java_entry_point(
       symbol_table,
       assume_init_pointers_not_null,
       max_nondet_array_length,
+      max_recursive_depth,
       message_handler);
   call_main.arguments()=main_arguments;
 

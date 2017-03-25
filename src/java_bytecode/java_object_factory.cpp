@@ -43,6 +43,8 @@ class java_object_factoryt:public messaget
   std::set<irep_idt> recursion_set;
   bool assume_non_null;
   size_t max_nondet_array_length;
+  size_t recursion_depth;
+  size_t max_recursion_depth;
   symbol_tablet &symbol_table;
   message_handlert &message_handler;
   namespacet ns;
@@ -52,11 +54,14 @@ public:
     code_blockt &_init_code,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
+    size_t _max_recursion_depth,
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
     init_code(_init_code),
     assume_non_null(_assume_non_null),
     max_nondet_array_length(_max_nondet_array_length),
+    recursion_depth(0),
+    max_recursion_depth(_max_recursion_depth),
     symbol_table(_symbol_table),
     message_handler(_message_handler),
     ns(_symbol_table)
@@ -192,20 +197,23 @@ void java_object_factoryt::gen_nondet_init(
     {
       const struct_typet &struct_type=to_struct_type(subtype);
       const irep_idt struct_tag=struct_type.get_tag();
-      // set to null if found in recursion set and not a sub-type
-      if(recursion_set.find(struct_tag)!=recursion_set.end() &&
-         struct_tag==class_identifier)
+      // set to null if found in recursion set and recursion depth allows it
+      if(recursion_set.find(struct_tag)!=recursion_set.end())
       {
-        // make null
-        null_pointer_exprt null_pointer_expr(pointer_type);
-        code_assignt code(expr, null_pointer_expr);
-        code.add_source_location()=loc;
-        init_code.copy_to_operands(code);
-
-        return;
+        if(recursion_depth<max_recursion_depth)
+          recursion_depth++;
+        else
+        {
+          recursion_depth=0;
+          // make null
+          null_pointer_exprt null_pointer_expr(pointer_type);
+          code_assignt code(expr, null_pointer_expr);
+          code.add_source_location()=loc;
+          init_code.copy_to_operands(code);
+          return;
+        }
       }
     }
-
     code_labelt set_null_label;
     code_labelt init_done_label;
 
@@ -498,12 +506,14 @@ void gen_nondet_init(
   bool create_dyn_objs,
   bool assume_non_null,
   message_handlert &message_handler,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_recursion_depth)
 {
   java_object_factoryt state(
     init_code,
     assume_non_null,
     max_nondet_array_length,
+    max_recursion_depth,
     symbol_table,
     message_handler);
   state.gen_nondet_init(
@@ -579,6 +589,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_recursion_depth,
   const source_locationt &loc,
   message_handlert &message_handler)
 {
@@ -602,7 +613,8 @@ exprt object_factory(
       false,
       !allow_null,
       message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      max_recursion_depth);
 
     return object;
   }
