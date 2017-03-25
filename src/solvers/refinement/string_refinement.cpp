@@ -376,9 +376,9 @@ Function: string_refinementt::concretize_results
 
 void string_refinementt::concretize_results()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
     concretize_string(it.second);
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
     concretize_string(it);
   add_instantiations();
 }
@@ -394,7 +394,7 @@ Function: string_refinementt::concretize_lengths
 
 void string_refinementt::concretize_lengths()
 {
-  for(const auto& it : symbol_resolve)
+  for(const auto &it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
@@ -405,7 +405,7 @@ void string_refinementt::concretize_lengths()
       found_length[content]=length;
      }
   }
-  for(const auto& it : generator.created_strings)
+  for(const auto &it : generator.created_strings)
   {
     if(refined_string_typet::is_refined_string_type(it.type()))
     {
