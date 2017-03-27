@@ -9,6 +9,8 @@
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
 
 #include <vector>
+#include <iosfwd>
+
 #include <analyses/variable-sensitivity/array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 

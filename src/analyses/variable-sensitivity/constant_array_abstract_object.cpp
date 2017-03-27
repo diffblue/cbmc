@@ -5,6 +5,8 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
+#include <ostream>
+
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>

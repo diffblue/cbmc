@@ -64,6 +64,7 @@ into calls to eval, assume, assign and merge.
 
 #include <map>
 #include <memory>
+#include <iosfwd>
 
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>

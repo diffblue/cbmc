@@ -10,6 +10,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ONE_LEVEL_STRUCT_ABSTRACT_OBJECT_H
 
 #include <stack>
+#include <iosfwd>
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
 

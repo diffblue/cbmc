@@ -6,6 +6,7 @@
 
 \*******************************************************************/
 
+#include <ostream>
 
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <util/std_types.h>
