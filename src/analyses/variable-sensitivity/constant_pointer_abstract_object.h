@@ -8,6 +8,8 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_POINTER_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_POINTER_ABSTRACT_OBJECT_H
 
+#include <iosfwd>
+
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
 
 class constant_pointer_abstract_objectt:public pointer_abstract_objectt

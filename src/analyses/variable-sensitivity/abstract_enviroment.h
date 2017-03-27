@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <stack>
+#include <iosfwd>
 
 #include <util/std_expr.h>
 #include <util/message.h>
