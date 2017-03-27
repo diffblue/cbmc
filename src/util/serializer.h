@@ -12,6 +12,7 @@ Purpose: Generic serialization of object hierarchies.
 #define CPROVER_UTIL_SERIALIZER_H
 
 #include <utility>
+#include <memory>
 #include <string>
 #include <functional>
 #include <vector>
@@ -67,7 +68,7 @@ private:
   // Whether this serializer is used for reading rather than writing
   bool is_read;
   // Traits attached to this serializer
-  serializer_traitst *traits;
+  std::shared_ptr<serializer_traitst> traits;
 
   /////////////////////////////////////////////////////////////////////////////
   // Section: Constructors/destructors
@@ -89,7 +90,7 @@ protected:
 
   \*******************************************************************/
   serializert(serializert *parent, bool is_read)
-    : parent(parent), is_read(is_read), traits(nullptr)
+    : parent(parent), is_read(is_read)
   {
   }
 
@@ -109,7 +110,7 @@ protected:
 
   \*******************************************************************/
   explicit serializert(bool is_read)
-    : parent(nullptr), is_read(is_read), traits(nullptr)
+    : parent(nullptr), is_read(is_read)
   {
   }
 
@@ -161,7 +162,7 @@ public:
   template<typename traitst>
   traitst &get_traits() const
   {
-    traitst * result=dynamic_cast<traitst *>(traits);
+    traitst * result=dynamic_cast<traitst *>(traits.get());
     if(result!=nullptr)
       return *result;
     assert(parent!=nullptr);  // In release build allow undefined behaviour
@@ -186,10 +187,12 @@ public:
     Sets traits attached to this serializer.
 
   \*******************************************************************/
-  void set_traits(serializer_traitst &serializer_traits)
+  void set_traits(std::shared_ptr<serializer_traitst> serializer_traits)
   {
+    assert(serializer_traits!=nullptr);
+    // If you need to set_traits twice then make the traits member a set
     assert(traits==nullptr);
-    traits=&serializer_traits;
+    traits=serializer_traits;
   }
 
   /////////////////////////////////////////////////////////////////////////////
