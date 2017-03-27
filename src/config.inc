@@ -9,7 +9,7 @@ BUILD_ENV = AUTO
 
 # Select optimisation or debug info
 #CXXFLAGS += -O2 -DNDEBUG
-CXXFLAGS += -O0 -g
+#CXXFLAGS += -O0 -g
 
 ifeq ($(shell uname),Linux)
   CXXFLAGS += -DUSE_BOOST
