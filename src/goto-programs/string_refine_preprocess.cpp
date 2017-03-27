@@ -1237,7 +1237,7 @@ void string_refine_preprocesst::initialize_string_function_table()
     ID_cprover_string_of_float_func;
   string_functions["java::java.lang.String.valueOf:(I)Ljava/lang/String;"]=
     ID_cprover_string_of_int_func;
-  string_functions["java::java.lang.String.valueOf:(L)Ljava/lang/String;"]=
+  string_functions["java::java.lang.String.valueOf:(J)Ljava/lang/String;"]=
     ID_cprover_string_of_long_func;
   // Not supported "java.lang.String.valueOf:(LObject;)"
 
