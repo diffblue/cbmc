@@ -402,6 +402,8 @@ void full_slicert::operator()(
       const exprt &s=to_code_dead(e_it->first->code).symbol();
       decl_dead[to_symbol_expr(s).get_identifier()].push(e_it->second);
     }
+    else if(e_it->first->is_function_call())
+      add_to_queue(queue, e_it->second, e_it->first);
   }
 
   // compute program dependence graph (and post-dominators)
