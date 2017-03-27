@@ -17,6 +17,7 @@ Purpose: Generic serialization of object hierarchies.
 #include <vector>
 #include <set>
 #include <map>
+#include <cstdint>
 #include <cassert>
 #ifdef USE_BOOST
 #include <boost/bimap.hpp>
@@ -257,7 +258,7 @@ public:
     Serializes a field.
 
   \*******************************************************************/
-  virtual void serialize(const char *name, int &field)=0;
+  virtual void serialize(const char *name, int32_t &field)=0;
 
   /*******************************************************************\
 
@@ -273,7 +274,7 @@ public:
     Serializes a field.
 
   \*******************************************************************/
-  virtual void serialize(const char *name, unsigned int &field)=0;
+  virtual void serialize(const char *name, uint32_t &field)=0;
 
   /*******************************************************************\
 
@@ -289,7 +290,7 @@ public:
     Serializes a field.
 
   \*******************************************************************/
-  virtual void serialize(const char *name, unsigned long long &field)=0;
+  virtual void serialize(const char *name, uint64_t &field)=0;
 
   /*******************************************************************\
 
