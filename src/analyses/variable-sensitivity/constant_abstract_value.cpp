@@ -5,9 +5,12 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
-#include "constant_abstract_value.h"
+
+#include <ostream>
 
 #include <util/std_expr.h>
+
+#include "constant_abstract_value.h"
 
 constant_abstract_valuet::constant_abstract_valuet(typet t):
   abstract_valuet(t), value()

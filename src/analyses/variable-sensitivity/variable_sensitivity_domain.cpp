@@ -8,6 +8,7 @@ Date: April 2016
 
 \*******************************************************************/
 
+#include <ostream>
 
 #include <util/message.h>
 #include <util/simplify_expr.h>
