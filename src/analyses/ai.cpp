@@ -455,14 +455,6 @@ bool ai_baset::do_function_call_rec(
   {
     const irep_idt &identifier=function.get(ID_identifier);
 
-    if(recursion_set.find(identifier)!=recursion_set.end())
-    {
-      // recursion detected!
-      return new_data;
-    }
-    else
-      recursion_set.insert(identifier);
-
     goto_functionst::function_mapt::const_iterator it=
       goto_functions.function_map.find(identifier);
 
@@ -475,8 +467,6 @@ bool ai_baset::do_function_call_rec(
       it,
       arguments,
       ns);
-
-    recursion_set.erase(identifier);
   }
   else if(function.id()==ID_if)
   {
