@@ -8,6 +8,8 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ABSTRACT_VALUE_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ABSTRACT_VALUE_H
 
+#include <iosfwd>
+
 #include <analyses/variable-sensitivity/abstract_value.h>
 #include <util/std_expr.h>
 

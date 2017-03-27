@@ -24,14 +24,18 @@
 #ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 #define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_OBJECT_H
 
+
+
+#include <memory>
+#include <map>
+#include <iosfwd>
+
+#include <util/expr.h>
+
 class typet;
 class constant_exprt;
 class abstract_environmentt;
 class namespacet;
-
-#include <util/expr.h>
-#include <memory>
-#include <map>
 
 
 #define CLONE \

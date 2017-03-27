@@ -8,13 +8,13 @@
 
 #include <iostream>
 
-#include <util/type.h>
-#include <util/std_expr.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
-#include <util/simplify_expr.h>
 #include <util/namespace.h>
+#include <util/std_expr.h>
+#include <util/simplify_expr.h>
+#include <util/type.h>
 
 #include "abstract_object.h"
 

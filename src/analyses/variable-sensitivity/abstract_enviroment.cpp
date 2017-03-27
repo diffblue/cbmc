@@ -5,12 +5,11 @@
  Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
-#include "abstract_enviroment.h"
-
 #include <functional>
 #include <stack>
 #include <map>
 #include <ostream>
+
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 #include <analyses/variable-sensitivity/struct_abstract_object.h>
@@ -20,11 +19,12 @@
 #include <analyses/ai.h>
 #include <util/simplify_expr.h>
 
-
+#include "abstract_enviroment.h"
 
 #ifdef DEBUG
 #include <iostream>
 #endif
+
 /*******************************************************************\
 
 Function: abstract_environmentt::eval
