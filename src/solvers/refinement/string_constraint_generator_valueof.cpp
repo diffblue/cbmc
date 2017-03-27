@@ -171,14 +171,11 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   const exprt &b, const refined_string_typet &ref_type)
 {
   string_exprt res=fresh_string(ref_type);
-  const typet &index_type=ref_type.get_index_type();
+  const typet &char_type=ref_type.get_char_type();
 
   assert(b.type()==bool_typet() || b.type().id()==ID_c_bool);
 
   typecast_exprt eq(b, bool_typet());
-
-  string_exprt true_string=add_axioms_for_constant("true", ref_type);
-  string_exprt false_string=add_axioms_for_constant("false", ref_type);
 
   // We add axioms:
   // a1 : eq => res = |"true"|
@@ -186,27 +183,27 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   // a3 : !eq => res = |"false"|
   // a4 : forall i < |"false"|. !eq => res[i]="false"[i]
 
-  implies_exprt a1(eq, res.axiom_for_has_same_length_as(true_string));
+  std::string str_true="true";
+  implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
   axioms.push_back(a1);
-  symbol_exprt qvar=fresh_univ_index("QA_equal_true", index_type);
-  string_constraintt a2(
-    qvar,
-    true_string.length(),
-    eq,
-    equal_exprt(res[qvar], true_string[qvar]));
-  axioms.push_back(a2);
 
-  implies_exprt a3(
-    not_exprt(eq), res.axiom_for_has_same_length_as(false_string));
+  for(std::size_t i=0; i<str_true.length(); i++)
+  {
+    exprt chr=from_integer(str_true[i], char_type);
+    implies_exprt a2(eq, equal_exprt(res[i], chr));
+    axioms.push_back(a2);
+  }
+
+  std::string str_false="false";
+  implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
   axioms.push_back(a3);
 
-  symbol_exprt qvar1=fresh_univ_index("QA_equal_false", index_type);
-  string_constraintt a4(
-    qvar,
-    false_string.length(),
-    not_exprt(eq),
-    equal_exprt(res[qvar1], false_string[qvar1]));
-  axioms.push_back(a4);
+  for(std::size_t i=0; i<str_false.length(); i++)
+  {
+    exprt chr=from_integer(str_false[i], char_type);
+    implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
+    axioms.push_back(a4);
+  }
 
   return res;
 }
