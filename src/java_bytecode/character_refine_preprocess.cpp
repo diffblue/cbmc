@@ -220,11 +220,12 @@ codet character_refine_preprocesst::convert_for_digit(conversion_inputt &target)
   const exprt &digit=function_call.arguments()[0];
   const exprt &result=function_call.lhs();
   const typet &type=result.type();
+  typecast_exprt casted_digit(digit, type);
 
   exprt d10=from_integer(10, type);
-  binary_relation_exprt small(digit, ID_le, d10);
-  plus_exprt value1(digit, from_integer('0', type));
-  minus_exprt value2(plus_exprt(digit, from_integer('a', digit.type())), d10);
+  binary_relation_exprt small(casted_digit, ID_le, d10);
+  plus_exprt value1(casted_digit, from_integer('0', type));
+  plus_exprt value2(minus_exprt(casted_digit, d10), from_integer('a', type));
   return code_assignt(result, if_exprt(small, value1, value2));
 }
 
