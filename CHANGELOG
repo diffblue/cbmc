@@ -20,6 +20,8 @@
 * GOTO-CC: GCC-style error/warning messages
 * GOTO-CC: New options --native-compiler and --native-linker to select the
   compiler/linker to be used when building combined native/goto object files.
+* CBMC, SYMEX, GOTO-INSTRUMENT: New option --drop-unused-functions. Removed
+  ambiguous --show-reachable-properties.
 
 
 5.6

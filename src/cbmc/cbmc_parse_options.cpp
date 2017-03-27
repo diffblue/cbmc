@@ -946,7 +946,7 @@ bool cbmc_parse_optionst::process_goto_program(
     if(cmdline.isset("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
-      status() << "Removing Unused Functions" << eom;
+      status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_functions, ui_message_handler);
     }
 
@@ -1096,7 +1096,6 @@ void cbmc_parse_optionst::help()
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1142,6 +1141,7 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
