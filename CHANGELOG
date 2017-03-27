@@ -22,6 +22,7 @@
   compiler/linker to be used when building combined native/goto object files.
 * CBMC, SYMEX, GOTO-INSTRUMENT: New option --drop-unused-functions. Removed
   ambiguous --show-reachable-properties.
+* CBMC: New option --no-built-in-assertions
 
 
 5.6
