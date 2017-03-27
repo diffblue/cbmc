@@ -1,0 +1,11 @@
+CORE
+main.c
+--variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion y==4: Unknown$
+^\[main\.assertion\.2\] .* assertion y2==0: Unknown$
+^\[main\.assertion\.3\] .* assertion z==0: Success$
+^\[main\.assertion\.4\] .* assertion w==18: Success$
+--
+^warning: ignoring
