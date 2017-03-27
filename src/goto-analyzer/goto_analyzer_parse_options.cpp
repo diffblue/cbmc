@@ -378,8 +378,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    status() << "Adding CPROVER library ("
-             << config.ansi_c.arch << ")" << eom;
     link_to_library(goto_model, ui_message_handler);
     #endif
 
