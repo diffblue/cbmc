@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_SOURCE_LOCATION_H
 
 #include "irep.h"
+#include "prefix.h"
 
 class source_locationt:public irept
 {
@@ -146,6 +147,18 @@ public:
   bool get_hide() const
   {
     return get_bool(ID_hide);
+  }
+
+  static bool is_built_in(const std::string &s)
+  {
+    std::string built_in1="<built-in-"; // "<built-in-additions>";
+    std::string built_in2="<builtin-"; // "<builtin-architecture-strings>";
+    return has_prefix(s, built_in1) || has_prefix(s, built_in2);
+  }
+
+  bool is_built_in() const
+  {
+    return is_built_in(id2string(get_file()));
   }
 
   static const source_locationt &nil()

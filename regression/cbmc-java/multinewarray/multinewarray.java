@@ -12,8 +12,8 @@ class multinewarray
     assert some_a[0].length==3;
     assert some_a[0][0].length==2;
   
-    int x=10;
-    int y=20;
+    int x=3;
+    int y=5;
     int[][] int_array = new int[x][y];
     
     for(int i=0; i<x; ++i)

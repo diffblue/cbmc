@@ -645,69 +645,6 @@ void java_object_factoryt::gen_nondet_array_init(
 
 /*******************************************************************\
 
-Function: gen_nondet_init
-
-  Inputs: `expr`: lvalue expression to initialise
-          `loc`: source location for all generated code
-          `skip_classid`: if true, skip initialising @class_identifier
-          `create_dyn_objs`: if true, use malloc to allocate
-            objects; otherwise generate fresh static symbols.
-          `assume_non_null`: never initialise pointer members with
-            null, unless forced to by recursive datatypes
-          `message_handler`: logging
-          `max_nondet_array_length`: upper bound on size of initialised
-            arrays.
-          `update_in_place`:
-            NO_UPDATE_IN_PLACE: initialise `expr` from scratch
-            MUST_UPDATE_IN_PLACE: reinitialise an existing object
-            MAY_UPDATE_IN_PLACE: generate a runtime nondet branch
-              between the NO_ and MUST_ cases.
-
- Outputs: `init_code` gets an instruction sequence to initialise or
-          reinitialise `expr` and child objects it refers to.
-          `symbol_table` is modified with any new symbols created. This
-          includes any necessary temporaries, and if `create_dyn_objs`
-          is false, any allocated objects.
-
- Purpose: Initialises a primitive or object tree rooted at `expr`,
-          allocating child objects as necessary and nondet-initialising
-          their members, or if MAY_ or MUST_UPDATE_IN_PLACE is set,
-          re-initialising already-allocated objects.
-
-\*******************************************************************/
-
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  bool skip_classid,
-  bool create_dyn_objs,
-  bool assume_non_null,
-  message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  update_in_placet update_in_place)
-{
-  java_object_factoryt state(
-    init_code,
-    assume_non_null,
-    max_nondet_array_length,
-    symbol_table,
-    message_handler,
-    loc);
-  state.gen_nondet_init(
-    expr,
-    false,
-    "",
-    skip_classid,
-    create_dyn_objs,
-    false,
-    typet(),
-    update_in_place);
-}
-
-/*******************************************************************\
-
 Function: new_tmp_symbol
 
   Inputs: `prefix`: new symbol name prefix
@@ -775,16 +712,22 @@ exprt object_factory(
 
     exprt object=aux_symbol.symbol_expr();
 
-    gen_nondet_init(
-      object,
+    java_object_factoryt state(
       init_code,
-      symbol_table,
-      loc,
-      false,
-      false,
       !allow_null,
+      max_nondet_array_length,
+      symbol_table,
       message_handler,
-      max_nondet_array_length);
+      loc);
+    state.gen_nondet_init(
+      object,
+      false,
+      "",
+      false,
+      false,
+      false,
+      typet(),
+      NO_UPDATE_IN_PLACE);
 
     return object;
   }
@@ -797,3 +740,67 @@ exprt object_factory(
   else
     return side_effect_expr_nondett(type);
 }
+
+/*******************************************************************\
+
+Function: gen_nondet_init
+
+  Inputs: `expr`: lvalue expression to initialise
+          `loc`: source location for all generated code
+          `skip_classid`: if true, skip initialising @class_identifier
+          `create_dyn_objs`: if true, use malloc to allocate
+            objects; otherwise generate fresh static symbols.
+          `assume_non_null`: never initialise pointer members with
+            null, unless forced to by recursive datatypes
+          `message_handler`: logging
+          `max_nondet_array_length`: upper bound on size of initialised
+            arrays.
+          `update_in_place`:
+            NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+            MUST_UPDATE_IN_PLACE: reinitialise an existing object
+            MAY_UPDATE_IN_PLACE: generate a runtime nondet branch
+              between the NO_ and MUST_ cases.
+
+ Outputs: `init_code` gets an instruction sequence to initialise or
+          reinitialise `expr` and child objects it refers to.
+          `symbol_table` is modified with any new symbols created. This
+          includes any necessary temporaries, and if `create_dyn_objs`
+          is false, any allocated objects.
+
+ Purpose: Initialises a primitive or object tree rooted at `expr`,
+          allocating child objects as necessary and nondet-initialising
+          their members, or if MAY_ or MUST_UPDATE_IN_PLACE is set,
+          re-initialising already-allocated objects.
+
+\*******************************************************************/
+
+void gen_nondet_init(
+  const exprt &expr,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  bool skip_classid,
+  bool create_dyn_objs,
+  bool assume_non_null,
+  message_handlert &message_handler,
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place)
+{
+  java_object_factoryt state(
+    init_code,
+    assume_non_null,
+    max_nondet_array_length,
+    symbol_table,
+    message_handler,
+    loc);
+  state.gen_nondet_init(
+    expr,
+    false,
+    "",
+    skip_classid,
+    create_dyn_objs,
+    false,
+    typet(),
+    update_in_place);
+}
+

@@ -3349,7 +3349,7 @@ std::string expr2ct::convert_code_return(
   std::string dest=indent_str(indent);
   dest+="return";
 
-  if(src.operands().size()==1)
+  if(to_code_return(src).has_return_value())
     dest+=" "+convert(src.op0());
 
   dest+=';';
