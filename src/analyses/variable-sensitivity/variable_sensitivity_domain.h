@@ -106,6 +106,10 @@ public:
   bool is_top() const override;
 
 private:
+  bool ai_simplify_lhs(
+    exprt &condition,
+    const namespacet &ns) const;
+
   abstract_environmentt abstract_state;
 
 };
