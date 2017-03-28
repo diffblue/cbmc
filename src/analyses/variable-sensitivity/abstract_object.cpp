@@ -207,20 +207,7 @@ abstract_object_pointert abstract_objectt::expression_transform(
   }
 
   exprt simplified=simplify_expr(constant_replaced_expr, ns);
-  if(simplified.is_constant())
-  {
-    constant_exprt constant_expr=to_constant_expr(simplified);
-
-    // TODO(tkiley): This should be going through the abstract_object_factory
-    // but at the moment this produces a two value abstraction for type bool
-    // so for now we force it to be the constant abstraction
-    return abstract_object_pointert(
-      new constant_abstract_valuet(constant_expr, environment, ns));
-  }
-  else
-  {
-    return environment.abstract_object_factory(expr.type(), expr, ns);
-  }
+  return environment.abstract_object_factory(simplified.type(), simplified, ns);
 }
 
 /*******************************************************************\
