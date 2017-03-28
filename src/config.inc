@@ -13,7 +13,6 @@ BUILD_ENV = AUTO
 
 ifeq ($(shell uname),Linux)
   CXXFLAGS += -DUSE_BOOST
-  LIBS=-lboost_filesystem -lboost_system
 endif
 
 # On Windows this Makefile is subject to sed s/BUILD_ENV.*/BUILD_ENV = MSVC,
