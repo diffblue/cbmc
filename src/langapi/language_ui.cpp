@@ -31,10 +31,10 @@ Function: language_uit::language_uit
 \*******************************************************************/
 
 language_uit::language_uit(
-  const cmdlinet &__cmdline,
+  const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
   ui_message_handler(_ui_message_handler),
-  _cmdline(__cmdline)
+  _cmdline(cmdline)
 {
   set_message_handler(ui_message_handler);
 }
