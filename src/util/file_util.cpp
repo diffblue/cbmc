@@ -45,10 +45,6 @@ Date: January 2012
 #include <cstring>
 #endif
 
-#ifdef USE_BOOST
-#include <boost/filesystem.hpp>
-#endif
-
 #include "file_util.h"
 
 
@@ -238,18 +234,26 @@ std::string fileutl_remove_extension(std::string const &filename)
 void fileutl_create_directory(std::string const &pathname)
 {
 # if defined(WIN32)
-  std::system((std::string("mkdir \"") + pathname + "\"").c_str());
-# elif defined(__linux__) || defined(__APPLE__)
-#ifdef USE_BOOST
-  boost::filesystem::create_directories(pathname);
+  char path_sep='\\';
 #else
-  auto ignore = std::system(
-    (std::string("mkdir -p \"") + pathname + "\"").c_str());
-  (void)ignore;
+  char path_sep='/';
 #endif
-# else
-#   error "Unsuported platform."
-# endif
+  std::size_t search_from=0;
+  while(search_from!=std::string::npos)
+  {
+    // Search from after the previous path separator, incidentally
+    // skipping trying to create '/' if an absolute path is given
+    search_from=pathname.find(path_sep, search_from+1);
+    std::string truncated_pathname=pathname.substr(0, search_from);
+#if defined(WIN32)
+    _mkdir(truncated_pathname.c_str());
+#else
+    mkdir(truncated_pathname.c_str(), 0777);
+#endif
+    // Ignore return-- regardless of why we can't create a
+    // path prefix, we might as well keep trying down to more
+    // specific paths.
+  }
 }
 
 std::string fileutl_concatenate_file_paths(
