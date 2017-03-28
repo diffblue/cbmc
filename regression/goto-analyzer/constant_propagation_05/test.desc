@@ -1,8 +1,8 @@
-FUTURE
+CORE
 main.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 12 function main, assertion j!=3: Failure (if reachable)$
+^\[main\.assertion\.1\] .* assertion j != 3: Failure \(if reachable\)$
 --
 ^warning: ignoring
