@@ -18,7 +18,7 @@ private:
   typedef sharing_ptrt<constant_pointer_abstract_objectt>
     constant_pointer_abstract_pointert;
 public:
-  constant_pointer_abstract_objectt(const typet &type);
+  explicit constant_pointer_abstract_objectt(const typet &type);
 
   constant_pointer_abstract_objectt(
     const typet &type,
@@ -57,9 +57,6 @@ protected:
 
 private:
   exprt value;
-
-
-
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_POINTER_ABSTRACT_OBJECT_H // NOLINT(*)
