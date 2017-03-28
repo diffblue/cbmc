@@ -275,48 +275,7 @@ bool variable_sensitivity_domaint::ai_simplify(
 {
   if (lhs)
   {
-    // Care must be taken here to give something that is still writable
-    if (condition.id()==ID_index)
-    {
-      index_exprt ie = to_index_expr(condition);
-      exprt index = ie.index();
-      bool changed = ai_simplify(index, ns, false);
-      if (changed)
-      {
-        ie.index() = index;
-        condition = simplify_expr(ie, ns);
-      }
-
-      return changed;
-    }
-    else if (condition.id()==ID_dereference)
-    {
-      dereference_exprt de = to_dereference_expr(condition);
-      exprt pointer = de.pointer();
-      bool changed = ai_simplify(pointer, ns, false);
-      if (changed)
-      {
-        de.pointer() = pointer;
-        condition = simplify_expr(de, ns);  // So *(&x) -> x
-      }
-
-      return changed;
-    }
-    else if (condition.id()==ID_member)
-    {
-      member_exprt me = to_member_expr(condition);
-      exprt compound = me.compound();
-      bool changed = ai_simplify(compound, ns, true); // <-- true!
-      if (changed)
-      {
-        me.compound() = compound;
-        condition = simplify_expr(me, ns);
-      }
-
-      return changed;
-    }
-    else
-      return false;
+    return ai_simplify_lhs(condition, ns);
   }
   else
   {
@@ -368,4 +327,67 @@ bool variable_sensitivity_domaint::is_top() const
   return abstract_state.is_top();
 }
 
+/*******************************************************************\
 
+Function: variable_sensitivity_domaint::ai_simplify_lhs
+
+  Inputs:
+   condition - the expression to simplify
+   ns - the namespace
+
+ Outputs: True if simplified the condition. False otherwise. condition
+          will be updated with the simplified condition if it has worked
+
+ Purpose: Use the information in the domain to simplify the expression
+          on the LHS of an assignment. This for example won't simplify symbols
+          to their values, but does simplify indices in arrays, members of
+          structs and dereferencing of pointers
+
+\*******************************************************************/
+
+bool variable_sensitivity_domaint::ai_simplify_lhs(
+  exprt &condition, const namespacet &ns) const
+{
+  // Care must be taken here to give something that is still writable
+  if (condition.id()==ID_index)
+  {
+    index_exprt ie = to_index_expr(condition);
+    exprt index = ie.index();
+    bool changed = ai_simplify(index, ns, false);
+    if (changed)
+    {
+      ie.index() = index;
+      condition = simplify_expr(ie, ns);
+    }
+
+    return changed;
+  }
+  else if (condition.id()==ID_dereference)
+  {
+    dereference_exprt de = to_dereference_expr(condition);
+    exprt pointer = de.pointer();
+    bool changed = ai_simplify(pointer, ns, false);
+    if (changed)
+    {
+      de.pointer() = pointer;
+      condition = simplify_expr(de, ns);  // So *(&x) -> x
+    }
+
+    return changed;
+  }
+  else if (condition.id()==ID_member)
+  {
+    member_exprt me = to_member_expr(condition);
+    exprt compound = me.compound();
+    bool changed = ai_simplify(compound, ns, true); // <-- true!
+    if (changed)
+    {
+      me.compound() = compound;
+      condition = simplify_expr(me, ns);
+    }
+
+    return changed;
+  }
+  else
+    return false;
+}
