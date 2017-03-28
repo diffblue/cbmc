@@ -1,6 +1,6 @@
-FUTURE
+KNOWNBUG
 main.c
---variable --simplify out.gb
+--variable --arrays --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
 ^Simplified:  assert: 1, assume: 0, goto: 2, assigns: 5, function calls: 0$
