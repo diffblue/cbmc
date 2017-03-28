@@ -355,7 +355,6 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
   try
   {
     // we add the library
-    status() << "Adding CPROVER library" << eom;
     link_to_library(goto_model, ui_message_handler);
 
     // do partial inlining
