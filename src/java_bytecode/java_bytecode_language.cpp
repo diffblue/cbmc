@@ -387,9 +387,16 @@ static void gather_needed_globals(
 {
   if(e.id()==ID_symbol)
   {
-    const auto &sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
-    if(sym.is_static_lifetime)
-      needed.add(sym);
+    // If the symbol isn't in the symbol table at all, then it is defined
+    // on an opaque type (i.e. we don't have the class definition at this point)
+    // and will be created during the typecheck phase.
+    // We don't mark it as 'needed' as it doesn't exist yet to keep.
+    auto findit=symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    if(findit!=symbol_table.symbols.end() &&
+       findit->second.is_static_lifetime)
+    {
+      needed.add(findit->second);
+    }
   }
   else
     forall_operands(opit, e)
