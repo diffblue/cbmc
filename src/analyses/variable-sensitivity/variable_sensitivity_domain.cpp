@@ -261,8 +261,7 @@ Function: variable_sensitivity_domaint::ai_simplify
    ns - the namespace
    lhs - is the expression on the left hand side
 
- Outputs: True if simplified the condition. False otherwise. condition
-          will be updated with the simplified condition if it has worked
+ Outputs: True if no simplification was made
 
  Purpose: Use the information in the domain to simplify the expression
           with respect to the current location.  This may be able to
@@ -282,13 +281,13 @@ bool variable_sensitivity_domaint::ai_simplify(
     sharing_ptrt<abstract_objectt> res = abstract_state.eval(condition, ns);
     exprt c = res->to_constant();
 
-    if (c.id() == ID_nil)  // TODO : simplification within an expression
-      return false;
+    if(c.id() == ID_nil)  // TODO : simplification within an expression
+      return true;
     else
     {
-      bool b = (condition!=c);
+      bool condition_changed = (condition!=c);
       condition = c;
-      return b;
+      return !condition_changed;
     }
   }
   assert(0); // All conditions should be handled
@@ -335,7 +334,7 @@ Function: variable_sensitivity_domaint::ai_simplify_lhs
    condition - the expression to simplify
    ns - the namespace
 
- Outputs: True if simplified the condition. False otherwise. condition
+ Outputs: True if condition did not change. False otherwise. condition
           will be updated with the simplified condition if it has worked
 
  Purpose: Use the information in the domain to simplify the expression
@@ -360,7 +359,7 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
       condition = simplify_expr(ie, ns);
     }
 
-    return changed;
+    return !changed;
   }
   else if (condition.id()==ID_dereference)
   {
@@ -373,7 +372,7 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
       condition = simplify_expr(de, ns);  // So *(&x) -> x
     }
 
-    return changed;
+    return !changed;
   }
   else if (condition.id()==ID_member)
   {
@@ -386,8 +385,8 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
       condition = simplify_expr(me, ns);
     }
 
-    return changed;
+    return !changed;
   }
   else
-    return false;
+    return true;
 }
