@@ -238,6 +238,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("assertions", true);
 
+  // check built-in assertions
+  if(cmdline.isset("no-built-in-assertions"))
+    options.set_option("built-in-assertions", false);
+  else
+    options.set_option("built-in-assertions", true);
+
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
@@ -542,19 +548,6 @@ int cbmc_parse_optionst::doit()
      cmdline.isset("show-properties")) // use this one
   {
     const namespacet ns(symbol_table);
-    show_properties(ns, get_ui(), goto_functions);
-    return 0; // should contemplate EX_OK from sysexits.h
-  }
-
-  // may replace --show-properties
-  if(cmdline.isset("show-reachable-properties"))
-  {
-    const namespacet ns(symbol_table);
-
-    // Entry point will have been set before and function pointers removed
-    status() << "Removing Unused Functions" << eom;
-    remove_unused_functions(goto_functions, ui_message_handler);
-
     show_properties(ns, get_ui(), goto_functions);
     return 0; // should contemplate EX_OK from sysexits.h
   }
@@ -966,8 +959,14 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
 
-    // instrument cover goals
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      // Entry point will have been set before and function pointers removed
+      status() << "Removing Unused Functions" << eom;
+      remove_unused_functions(goto_functions, ui_message_handler);
+    }
 
+    // instrument cover goals
     if(cmdline.isset("cover"))
     {
       std::list<std::string> criteria_strings=
@@ -1113,6 +1112,7 @@ void cbmc_parse_optionst::help()
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1162,6 +1162,7 @@ void cbmc_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
+    " --no-built-in-assertions     ignore assertions in built-in library\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)

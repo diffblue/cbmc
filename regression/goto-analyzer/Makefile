@@ -1,10 +1,16 @@
 default: tests.log
 
 test:
-	@../test.pl -c ../../../src/goto-analyzer/goto-analyzer
+	@if ! ../test.pl -c ../../../src/goto-analyzer/goto-analyzer ; then \
+		../failed-tests-printer.pl ; \
+		exit 1 ; \
+	fi
 
 tests.log: ../test.pl
-	@../test.pl -c ../../../src/goto-analyzer/goto-analyzer
+	@if ! ../test.pl -c ../../../src/goto-analyzer/goto-analyzer ; then \
+		../failed-tests-printer.pl ; \
+		exit 1 ; \
+	fi
 
 show:
 	@for dir in *; do \
