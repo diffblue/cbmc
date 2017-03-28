@@ -132,18 +132,18 @@ exprt adjust_lhs_object(
 
 /*******************************************************************\
 
-Function: hide_dynamic_object
+Function: set_internal_dynamic_object
 
   Inputs:
 
  Outputs:
 
- Purpose: hide variable assignments related to dynamic_object[0-9]
-          and dynamic_[0-9]_array.
+ Purpose: set internal field for variable assignment related to
+          dynamic_object[0-9] and dynamic_[0-9]_array.
 
 \*******************************************************************/
 
-void hide_dynamic_object(
+void set_internal_dynamic_object(
   const exprt &expr,
   goto_trace_stept &goto_trace_step,
   const namespacet &ns)
@@ -156,50 +156,51 @@ void hide_dynamic_object(
     {
       bool result=symbol->type.get_bool("#dynamic");
       if(result)
-        goto_trace_step.hidden=true;
+        goto_trace_step.internal=true;
     }
   }
   else
   {
     forall_operands(it, expr)
-      hide_dynamic_object(*it, goto_trace_step, ns);
+      set_internal_dynamic_object(*it, goto_trace_step, ns);
   }
 }
 
 /*******************************************************************\
 
-Function: update_fields_to_hidden
+Function: update_internal_field
 
   Inputs:
 
  Outputs:
 
- Purpose: hide variables assignments related to dynamic_object
-          and CPROVER internal functions (e.g., __CPROVER_initialize)
+ Purpose: set internal for variables assignments related to
+          dynamic_object and CPROVER internal functions
+          (e.g., __CPROVER_initialize)
 
 \*******************************************************************/
 
-void update_fields_to_hidden(
+void update_internal_field(
   const symex_target_equationt::SSA_stept &SSA_step,
   goto_trace_stept &goto_trace_step,
   const namespacet &ns)
 {
-  // hide dynamic_object in both lhs and rhs expressions
-  hide_dynamic_object(SSA_step.ssa_lhs, goto_trace_step, ns);
-  hide_dynamic_object(SSA_step.ssa_rhs, goto_trace_step, ns);
+  // set internal for dynamic_object in both lhs and rhs expressions
+  set_internal_dynamic_object(SSA_step.ssa_lhs, goto_trace_step, ns);
+  set_internal_dynamic_object(SSA_step.ssa_rhs, goto_trace_step, ns);
 
-  // hide internal CPROVER functions (e.g., __CPROVER_initialize)
+  // set internal field to CPROVER functions (e.g., __CPROVER_initialize)
   if(SSA_step.is_function_call())
   {
     if(SSA_step.source.pc->source_location.as_string().empty())
-      goto_trace_step.hidden=true;
+      goto_trace_step.internal=true;
   }
 
-  // hide input and output steps
+  // set internal field to input and output steps
   if(goto_trace_step.type==goto_trace_stept::OUTPUT ||
       goto_trace_step.type==goto_trace_stept::INPUT)
   {
-    goto_trace_step.hidden=true;
+    goto_trace_step.internal=true;
   }
 
   // set internal field to _start function-return step
@@ -316,8 +317,8 @@ void build_goto_trace(
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
 
-    // hide specific variables in the counterexample trace
-    update_fields_to_hidden(SSA_step, goto_trace_step, ns);
+    // update internal field for specific variables in the counterexample
+    update_internal_field(SSA_step, goto_trace_step, ns);
 
     goto_trace_step.assignment_type=
       (it->is_assignment()&&
