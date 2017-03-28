@@ -182,13 +182,14 @@ Function: struct_abstract_objectt::write_component
 
 \*******************************************************************/
 
-sharing_ptrt<struct_abstract_objectt> full_struct_abstract_objectt::write_component(
-  abstract_environmentt &environment,
-  const namespacet &ns,
-  const std::stack<exprt> &stack,
-  const member_exprt &member_expr,
-  const abstract_object_pointert value,
-  bool merging_write) const
+sharing_ptrt<struct_abstract_objectt>
+  full_struct_abstract_objectt::write_component(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> &stack,
+    const member_exprt &member_expr,
+    const abstract_object_pointert value,
+    bool merging_write) const
 {
 #ifdef DEBUG
   std::cout << "Writing component " << member_expr.get_component_name()

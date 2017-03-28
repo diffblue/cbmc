@@ -6,8 +6,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ONE_LEVEL_STRUCT_ABSTRACT_OBJECT_H
-#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ONE_LEVEL_STRUCT_ABSTRACT_OBJECT_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
 
 #include <stack>
 #include <iosfwd>
@@ -24,8 +24,9 @@ public:
 
   full_struct_abstract_objectt(const typet &type, bool top, bool bottom);
 
-  explicit full_struct_abstract_objectt(const full_struct_abstract_objectt &old);
   explicit full_struct_abstract_objectt(
+    const full_struct_abstract_objectt &old);
+  full_struct_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
     const namespacet &ns);
@@ -64,7 +65,6 @@ protected:
   bool merge_state(
     const sharing_ptrt<full_struct_abstract_objectt> op1,
     const sharing_ptrt<full_struct_abstract_objectt> op2);
-
 };
 
-#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ONE_LEVEL_STRUCT_ABSTRACT_OBJECT_H
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H

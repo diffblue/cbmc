@@ -61,12 +61,14 @@ class namespacet;
     \
     typedef sharing_ptrt<current_typet> current_type_ptrt; \
     typedef internal_sharing_ptrt<current_typet> this_ptrt; \
-    /*Cast the supplied type to the current type to facilitate double dispatch*/ \
+    /* Cast the supplied type to the current type to */ \
+    /* facilitate double dispatch*/ \
     current_type_ptrt n=std::dynamic_pointer_cast<current_typet const>(op); \
     this_ptrt m=this_ptrt(new current_typet(*this)); \
-    if (n!= NULL) \
+    if(n!= NULL) \
     { \
-      out_any_modifications=m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
+      out_any_modifications= \
+        m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
       return m; \
     } \
     else \
@@ -95,14 +97,14 @@ class namespacet;
  */
 
 template<class T>
-using sharing_ptrt=std::shared_ptr<const T>;
+using sharing_ptrt=std::shared_ptr<const T>; // NOLINT(*)
 
 typedef sharing_ptrt<class abstract_objectt> abstract_object_pointert;
 
 class abstract_objectt
 {
 public:
-  abstract_objectt(const typet &type);
+  explicit abstract_objectt(const typet &type);
   abstract_objectt(const typet &type, bool top, bool bottom);
   abstract_objectt(const abstract_objectt &old);
   abstract_objectt(
@@ -131,7 +133,8 @@ public:
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
-  virtual abstract_objectt* clone() const  // Macro is not used as this does not override
+  // Macro is not used as this does not override
+  virtual abstract_objectt* clone() const
   {
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type
       >::type current_typet;
