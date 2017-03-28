@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "value_set_fi.h"
+#include "dynamic_object_name.h"
 
 const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank;
 object_numberingt value_set_fit::object_numbering;
@@ -771,11 +772,7 @@ void value_set_fit::get_value_set_rec(
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(expr);
-
-    const std::string name=
-      "value_set::dynamic_object"+
-      std::to_string(dynamic_object.get_instance())+
-      suffix;
+    std::string name=get_dynamic_object_name(dynamic_object)+suffix;
 
     // look it up
     valuest::const_iterator v_it=values.find(name);
@@ -1330,9 +1327,12 @@ void value_set_fit::do_free(
     {
       const dynamic_object_exprt &dynamic_object=
         to_dynamic_object_expr(object);
+      dynamic_object_idt key_dynamic_object=std::make_pair(
+        dynamic_object.get_instance(),
+        dynamic_object.get_recency());
 
       if(dynamic_object.valid().is_true())
-        to_mark.insert(dynamic_object.get_instance());
+        to_mark.insert(key_dynamic_object);
     }
   }
 
@@ -1357,8 +1357,11 @@ void value_set_fit::do_free(
       {
         const dynamic_object_exprt &dynamic_object=
           to_dynamic_object_expr(object);
+        dynamic_object_idt key_dynamic_object=std::make_pair(
+          dynamic_object.get_instance(),
+          dynamic_object.get_recency());
 
-        if(to_mark.count(dynamic_object.get_instance())==0)
+        if(to_mark.count(key_dynamic_object)==0)
           set(new_object_map, o_it);
         else
         {
@@ -1447,10 +1450,7 @@ void value_set_fit::assign_rec(
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(lhs);
-
-    const std::string name=
-      "value_set::dynamic_object"+
-      std::to_string(dynamic_object.get_instance());
+    std::string name=get_dynamic_object_name(dynamic_object);
 
     if(make_union(get_entry(name, suffix).object_map, values_rhs))
       changed = true;

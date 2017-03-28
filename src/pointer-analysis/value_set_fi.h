@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "object_numbering.h"
 
+#include <util/std_expr.h>
+
 class value_set_fit
 {
 public:
@@ -155,7 +157,9 @@ public:
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  typedef std::pair<unsigned int, dynamic_object_exprt::recencyt>
+    dynamic_object_idt;
+  typedef std::set<dynamic_object_idt> dynamic_object_id_sett;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;

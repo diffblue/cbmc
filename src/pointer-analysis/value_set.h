@@ -126,7 +126,9 @@ public:
 
   typedef std::set<exprt> expr_sett;
 
-  typedef std::set<unsigned int> dynamic_object_id_sett;
+  typedef std::pair<unsigned int, dynamic_object_exprt::recencyt>
+    dynamic_object_idt;
+  typedef std::set<dynamic_object_idt> dynamic_object_id_sett;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
