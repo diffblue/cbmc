@@ -151,15 +151,15 @@ sharing_ptrt<pointer_abstract_objectt>
     const abstract_object_pointert value,
     bool merging_write) const
 {
-  if(is_top())
+  if(is_top() || is_bottom())
   {
     environment.havoc("Writing to a 2value pointer");
     return sharing_ptrt<pointer_abstract_objectt>(
-      new pointer_abstract_objectt(*this));
+      dynamic_cast<pointer_abstract_objectt*>(clone()));
   }
   else
   {
     return sharing_ptrt<pointer_abstract_objectt>(
-      new pointer_abstract_objectt(type(), false, true));
+      new pointer_abstract_objectt(type(), true, false));
   }
 }

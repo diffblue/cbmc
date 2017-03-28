@@ -153,14 +153,14 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
   const abstract_object_pointert value,
   bool merging_write) const
 {
-  if(is_top())
+  if(is_top() || is_bottom())
   {
     return sharing_ptrt<struct_abstract_objectt>(
-      new struct_abstract_objectt(*this));
+      dynamic_cast<struct_abstract_objectt*>(clone()));
   }
   else
   {
     return sharing_ptrt<struct_abstract_objectt>(
-      new struct_abstract_objectt(type(), false, true));
+      new struct_abstract_objectt(type(), true, false));
   }
 }
