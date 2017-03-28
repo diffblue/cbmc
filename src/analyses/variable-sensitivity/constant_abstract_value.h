@@ -13,7 +13,7 @@
 #include <analyses/variable-sensitivity/abstract_value.h>
 #include <util/std_expr.h>
 
-class constant_abstract_valuet : public abstract_valuet
+class constant_abstract_valuet:public abstract_valuet
 {
 private:
   typedef sharing_ptrt<constant_abstract_valuet>
@@ -31,7 +31,7 @@ public:
   CLONE
   MERGE(abstract_valuet)
 
-  virtual exprt to_constant (void) const override;
+  virtual exprt to_constant() const override;
 
   virtual void output(
     std::ostream &out,

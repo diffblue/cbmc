@@ -132,7 +132,7 @@ Function: abstract_objectt::merge_state
 bool abstract_objectt::merge_state(
   const abstract_object_pointert op1, const abstract_object_pointert op2)
 {
-  top=op1->top||op2->top;
+  top=op1->top || op2->top;
   bottom=op1->bottom && op2->bottom;
 
   assert(!(top && bottom));

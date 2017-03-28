@@ -62,9 +62,9 @@ bool constant_abstract_valuet::merge_state(
   constant_abstract_value_pointert op2)
 {
   bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
-  if (!is_top() && !is_bottom())
+  if(!is_top() && !is_bottom())
   {
-    if (op1->value==op2->value)
+    if(op1->value==op2->value)
     {
       value=op1->value;
       return false;
