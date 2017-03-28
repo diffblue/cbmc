@@ -76,7 +76,7 @@ void variable_sensitivity_domaint::transform(
 
   case GOTO:
     {
-      if (1) // (flow_sensitivity == FLOW_SENSITIVE)
+      if(1) // (flow_sensitivity == FLOW_SENSITIVE)
       {
         // Get the next line
         locationt next=from;
@@ -272,7 +272,7 @@ Function: variable_sensitivity_domaint::ai_simplify
 bool variable_sensitivity_domaint::ai_simplify(
   exprt &condition, const namespacet &ns, const bool lhs) const
 {
-  if (lhs)
+  if(lhs)
   {
     return ai_simplify_lhs(condition, ns);
   }
@@ -348,12 +348,12 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   exprt &condition, const namespacet &ns) const
 {
   // Care must be taken here to give something that is still writable
-  if (condition.id()==ID_index)
+  if(condition.id()==ID_index)
   {
     index_exprt ie = to_index_expr(condition);
     exprt index = ie.index();
     bool changed = ai_simplify(index, ns, false);
-    if (changed)
+    if(changed)
     {
       ie.index() = index;
       condition = simplify_expr(ie, ns);
@@ -361,12 +361,12 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
 
     return !changed;
   }
-  else if (condition.id()==ID_dereference)
+  else if(condition.id()==ID_dereference)
   {
     dereference_exprt de = to_dereference_expr(condition);
     exprt pointer = de.pointer();
     bool changed = ai_simplify(pointer, ns, false);
-    if (changed)
+    if(changed)
     {
       de.pointer() = pointer;
       condition = simplify_expr(de, ns);  // So *(&x) -> x
@@ -374,12 +374,12 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
 
     return !changed;
   }
-  else if (condition.id()==ID_member)
+  else if(condition.id()==ID_member)
   {
     member_exprt me = to_member_expr(condition);
     exprt compound = me.compound();
     bool changed = ai_simplify(compound, ns, true); // <-- true!
-    if (changed)
+    if(changed)
     {
       me.compound() = compound;
       condition = simplify_expr(me, ns);

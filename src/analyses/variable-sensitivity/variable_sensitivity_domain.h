@@ -59,8 +59,8 @@ into calls to eval, assume, assign and merge.
 
 
 \*******************************************************************/
-#ifndef CPROVER_GOTO_ANALYZER_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
-#define CPROVER_GOTO_ANALYZER_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
+#ifndef CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
+#define CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
 
 #include <map>
 #include <memory>
@@ -69,7 +69,7 @@ into calls to eval, assume, assign and merge.
 #include <analyses/ai.h>
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
 
-class variable_sensitivity_domaint : public ai_domain_baset
+class variable_sensitivity_domaint:public ai_domain_baset
 {
 public:
   virtual void transform(
@@ -111,7 +111,6 @@ private:
     const namespacet &ns) const;
 
   abstract_environmentt abstract_state;
-
 };
 
-#endif // CPROVER_GOTO_ANALYZER_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H // NOLINT(*)
+#endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H

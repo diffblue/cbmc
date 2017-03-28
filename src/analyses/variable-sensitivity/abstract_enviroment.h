@@ -68,8 +68,8 @@ public:
 protected:
   bool bottom;
 
- // We may need to break out more of these cases into these
- virtual abstract_object_pointert eval_expression(
+  // We may need to break out more of these cases into these
+  virtual abstract_object_pointert eval_expression(
     const exprt &e, const namespacet &ns) const;
 
   typedef symbol_exprt map_keyt;

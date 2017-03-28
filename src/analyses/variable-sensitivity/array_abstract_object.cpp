@@ -162,7 +162,6 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   {
     return sharing_ptrt<array_abstract_objectt>(
       dynamic_cast<array_abstract_objectt*>(clone()));
-
   }
   else
   {
