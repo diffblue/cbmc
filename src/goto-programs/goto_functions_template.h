@@ -123,7 +123,7 @@ public:
   static inline irep_idt entry_point()
   {
     // do not confuse with C's "int main()"
-    return ID__start;
+    return ID_start;
   }
 
   void swap(goto_functions_templatet &other)
