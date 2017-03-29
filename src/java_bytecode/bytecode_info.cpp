@@ -218,5 +218,5 @@ struct bytecode_infot const bytecode_info[]=
 { "impdep1",        0xfe, ' ', 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file  NOLINT(*)
 { "impdep2",        0xff, ' ', 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file  NOLINT(*)
 { "wide",           0xc4, ' ', 0, 0, ' ' }, // modifier for others  NOLINT(*)
-{ 0, 0 }
+{ nullptr,          0x00, '\0',0, 0, '\0'}, // zero-initialized NOLINT (*)
 };
