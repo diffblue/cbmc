@@ -227,11 +227,24 @@ void goto_checkt::invalidate(const exprt &lhs)
   }
 }
 
+/// Check if the frontend has flagged a given expression for division
+/// by zero checking.
+/// \param e: The expression that is to be checked.
+/// \return: True or false based on whether the flag was set or not.
+static bool div_by_zero_check_flag_set(const div_exprt &expr)
+{
+  return expr.get_bool("div_by_zero_check");
+}
+
+/// Add a new division by zero check on an arithmetic expression 
+/// in the list of assertions.
+/// \param expr: The arithmetic expression
+/// \param guard: A guard expression.
 void goto_checkt::div_by_zero_check(
   const div_exprt &expr,
   const guardt &guard)
 {
-  if(!enable_div_by_zero_check)
+  if(!enable_div_by_zero_check && !div_by_zero_check_flag_set(expr))
     return;
 
   // add divison by zero subgoal
@@ -352,24 +365,18 @@ void goto_checkt::mod_by_zero_check(
     guard);
 }
 
-/*******************************************************************\
-
-Function: range_check_flag_set
-
-  Inputs: Expression `e`
-
- Outputs: Returns true if the frontend has flagged this expression
-          for range checking.
-
- Purpose: See output.
-
-\*******************************************************************/
-
+/// Check if the frontend has flagged a given expression for range checking.
+/// \param e: The expression that is to be checked.
+/// \return: True or false based on whether the flag was set or not.
 static bool range_check_flag_set(const exprt &e)
 {
   return e.get_bool("range_check");
 }
 
+/// Add a new range check on an arithmetic expression in the list
+/// of assertions.
+/// \param expr: The arithmetic expression
+/// \param guard: A guard expression.
 void goto_checkt::ranged_type_check(const exprt &expr, const guardt &guard)
 {
   if(!range_check_flag_set(expr))
@@ -400,18 +407,11 @@ void goto_checkt::ranged_type_check(const exprt &expr, const guardt &guard)
     guard);
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::conversion_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Add arithmetic overflow guards in the list of assertions 
+/// based on the type of the arithmetic expression that was
+/// input to be converted to a different type.
+/// \param expr: The arithmetic expression.
+/// \param guard: A guard expression.
 void goto_checkt::conversion_check(
   const exprt &expr,
   const guardt &guard)
@@ -584,36 +584,19 @@ void goto_checkt::conversion_check(
   }
 }
 
-/*******************************************************************\
-
-Function: overflow_check_flag_set
-
-  Inputs: Expression `e`
-
- Outputs: Returns true if the frontend has flagged this expression
-          for overflow checking.
-
- Purpose: See output.
-
-\*******************************************************************/
-
+/// Check if the frontend has flagged a given expression for overflow
+/// checking.
+/// \param e: The expression that is to be checked.
+/// \return: True or false based on whether the flag was set or not.
 static bool overflow_check_flag_set(const exprt &e)
 {
   return e.get_bool("overflow_check");
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::integer_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Add arithmetic overflow guards in the list of assertions 
+/// based on the type of the arithmetic expression that was input.
+/// \param expr: The arithmetic expression that will be checked.
+/// \param guard: The guard expression.
 void goto_checkt::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
@@ -1396,6 +1379,12 @@ void goto_checkt::add_guarded_claim(
   }
 }
 
+/// Recursively add assertions and guards to the list of assertions
+/// based on the type of the expression passed.
+/// \param expr: An expression
+/// \param guard: A guard expression
+/// \param address: Denotes if the expression passed is representing an
+//                  object with an address, like a pointer or reference.
 void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 {
   // we don't look into quantifiers
