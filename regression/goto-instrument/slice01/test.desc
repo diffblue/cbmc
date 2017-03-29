@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
---unwind 2 --full-slice
+--unwind 2 --full-slice --add-library
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
