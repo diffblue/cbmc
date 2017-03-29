@@ -744,6 +744,14 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      do_indirect_call_and_rtti_removal();
+
+      status() << "Removing unused functions" << eom;
+      remove_unused_functions(goto_functions, get_message_handler());
+    }
+
     // write new binary?
     if(cmdline.args.size()==2)
     {
@@ -1182,6 +1190,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("string-abstraction"))
   {
+    do_indirect_call_and_rtti_removal();
+    do_remove_returns();
+
     status() << "String Abstraction" << eom;
     string_abstraction(
       symbol_table,

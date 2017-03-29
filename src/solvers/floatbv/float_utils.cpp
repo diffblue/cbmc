@@ -206,7 +206,7 @@ bvt float_utilst::to_integer(
     return result;
   }
   else
-    assert(0);
+    throw "unsupported rounding mode";
 }
 
 /*******************************************************************\

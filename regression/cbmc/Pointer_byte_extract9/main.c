@@ -1,3 +1,5 @@
+#include <assert.h>
+
 int main()
 {
   int N;
