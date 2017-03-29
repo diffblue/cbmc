@@ -59,7 +59,8 @@ abstract_object_pointert abstract_environmentt::eval(
         }
         else
         {
-          return symbol_entry->second;
+          abstract_object_pointert found_symbol_value=symbol_entry->second;
+          return found_symbol_value;
         }
       }
     },
