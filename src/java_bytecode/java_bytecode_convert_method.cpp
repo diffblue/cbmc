@@ -2301,7 +2301,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // First create a simple flat list of basic blocks. We'll add lexical nesting
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
-  int previous_address=-1;
+  bool has_seen_previous_address=false;
+  unsigned previous_address=0;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
@@ -2316,7 +2317,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
     // Start a new lexical block if we've just entered a try block
-    if(!start_new_block && previous_address!=-1)
+    if(!start_new_block && has_seen_previous_address)
     {
       for(const auto &exception_row : method.exception_table)
         if(exception_row.start_pc==previous_address)
@@ -2346,6 +2347,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     start_new_block=address_pair.second.successors.size()>1;
 
     previous_address=address;
+    has_seen_previous_address=true;
   }
 
   // Find out where temporaries are used:
