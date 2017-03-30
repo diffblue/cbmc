@@ -39,8 +39,6 @@ matrix:
             - libwww-perl
             - g++-5
             - libubsan0
-            - libboost-system-dev
-            - libboost-filesystem-dev
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
@@ -60,8 +58,6 @@ matrix:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
-            - libboost-system-dev
-            - libboost-filesystem-dev
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
@@ -74,7 +70,9 @@ script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     COMMAND="make -C src minisat2-download" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
+    COMMAND="make -C src boost-download" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DUSE_BOOST\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
     eval ${PRE_COMMAND} ${COMMAND} &&

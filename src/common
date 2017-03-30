@@ -1,3 +1,6 @@
+MAKEFILES_WITHOUT_DEPS = $(filter-out %.d, $(MAKEFILE_LIST))
+THIS_DIR = $(abspath $(dir $(lastword $(MAKEFILES_WITHOUT_DEPS))))
+
 # Build platform
 # (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
 
@@ -155,6 +158,8 @@ first_target: all
 
 HOSTCXX ?= $(CXX)
 
+BOOST_DIR = $(abspath $(THIS_DIR)/../boost-include)
+INCLUDES += -I$(BOOST_DIR)
 CP_CFLAGS += $(CFLAGS) $(INCLUDES)
 CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
 
@@ -207,4 +212,3 @@ D_FILES1 = $(SRC:.c=.d)
 D_FILES = $(D_FILES1:.cpp=.d)
 
 -include $(D_FILES)
-
