@@ -63,6 +63,9 @@ public:
   // we may choose to hide a step
   bool hidden;
 
+  // this is related to an internal expression
+  bool internal;
+
   // we categorize
   typedef enum { STATE, ACTUAL_PARAMETER } assignment_typet;
   assignment_typet assignment_type;
@@ -107,6 +110,7 @@ public:
     step_nr(0),
     type(NONE),
     hidden(false),
+    internal(false),
     assignment_type(STATE),
     thread_nr(0),
     cond_value(false),
