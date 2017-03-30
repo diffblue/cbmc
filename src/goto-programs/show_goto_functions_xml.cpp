@@ -80,7 +80,7 @@ xmlt show_goto_functions_xmlt::convert(
     xml_function.set_attribute_bool(
       "is_body_available", function.body_available());
     bool is_internal=(has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-                      function_name==ID__start);
+                      function_name==ID_start);
     xml_function.set_attribute_bool("is_internal", is_internal);
 
     if(function.body_available())
