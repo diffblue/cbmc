@@ -86,6 +86,12 @@ matrix:
       script: scripts/travis_lint.sh
       before_cache:
 
+  allow_failures:
+    - env: NAME="CPP-LINT"
+      install:
+      script: scripts/travis_lint.sh
+      before_cache:
+
 install:
   - COMMAND="make -C src minisat2-download" &&
     eval ${PRE_COMMAND} ${COMMAND}
