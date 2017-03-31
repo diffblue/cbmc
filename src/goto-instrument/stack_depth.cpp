@@ -107,8 +107,8 @@ void stack_depth(
   goto_programt::targett it=init.insert_before(first);
   it->make_assignment();
   it->code=code_assignt(sym, from_integer(0, sym.type()));
-  it->source_location=first->source_location;
-  it->function=first->function;
+  // no suitable value for source location -- omitted
+  it->function = INITIALIZE_FUNCTION;
 
   // update counters etc.
   goto_model.goto_functions.update();
