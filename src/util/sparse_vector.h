@@ -12,7 +12,9 @@ Author: Romain Brenguier
 #ifndef CPROVER_UTIL_SPARSE_VECTOR_H
 #define CPROVER_UTIL_SPARSE_VECTOR_H
 
-#include<cstdint>
+#include <cstdint>
+#include <map>
+#include <assert.h>
 
 template<class T> class sparse_vectort
 {
