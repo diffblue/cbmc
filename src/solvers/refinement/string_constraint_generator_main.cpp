@@ -173,10 +173,11 @@ Function: string_constraint_generatort::fresh_string
 string_exprt string_constraint_generatort::fresh_string(
   const refined_string_typet &type)
 {
-  symbol_exprt length=
-    fresh_symbol("string_length", type.get_index_type());
+  symbol_exprt length=fresh_symbol("string_length", type.get_index_type());
   symbol_exprt content=fresh_symbol("string_content", type.get_content_type());
-  return string_exprt(length, content, type);
+  string_exprt str(length, content, type);
+  created_strings.insert(str);
+  return str;
 }
 
 /*******************************************************************\
@@ -223,7 +224,6 @@ Function: string_constraint_generatort::convert_java_string_to_string_exprt
 string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
     const exprt &jls)
 {
-  assert(get_mode()==ID_java);
   assert(jls.id()==ID_struct);
 
   exprt length(to_struct_expr(jls).op1());
@@ -246,6 +246,45 @@ string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
 
 /*******************************************************************\
 
+Function: string_constraint_generatort::add_default_constraints
+
+  Inputs:
+    s - a string expression
+
+ Outputs: a string expression that is linked to the argument through
+          axioms that are added to the list
+
+ Purpose: adds standard axioms about the length of the string and
+          its content:
+          * its length should be positive
+          * it should not exceed max_string_length
+          * if force_printable_characters is true then all characters
+            should belong to the range of ASCII characters between ' ' and '~'
+
+
+\*******************************************************************/
+
+void string_constraint_generatort::add_default_axioms(
+  const string_exprt &s)
+{
+  s.axiom_for_is_longer_than(from_integer(0, s.length().type()));
+  if(max_string_length!=std::numeric_limits<unsigned long>::max())
+    axioms.push_back(s.axiom_for_is_shorter_than(max_string_length));
+
+  if(force_printable_characters)
+  {
+    symbol_exprt qvar=fresh_univ_index("printable", s.length().type());
+    exprt chr=s[qvar];
+    and_exprt printable(
+      binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
+      binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
+    string_constraintt sc(qvar, s.length(), printable);
+    axioms.push_back(sc);
+  }
+}
+
+/*******************************************************************\
+
 Function: string_constraint_generatort::add_axioms_for_refined_string
 
   Inputs: an expression of refined string type
@@ -257,7 +296,6 @@ Function: string_constraint_generatort::add_axioms_for_refined_string
           of type string
 
 \*******************************************************************/
-
 
 string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   const exprt &string)
@@ -272,15 +310,13 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   {
     const symbol_exprt &sym=to_symbol_expr(string);
     string_exprt s=find_or_add_string_of_symbol(sym, type);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else if(string.id()==ID_nondet_symbol)
   {
     string_exprt s=fresh_string(type);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else if(string.id()==ID_if)
@@ -290,8 +326,7 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   else if(string.id()==ID_struct)
   {
     const string_exprt &s=to_string_expr(string);
-    axioms.push_back(
-      s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
+    add_default_axioms(s);
     return s;
   }
   else
@@ -397,7 +432,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     // TODO: This part needs some improvement.
     // Stripping the symbol name is not a very robust process.
     new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
-    assert(get_mode()==ID_java);
     new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
 
     auto res_it=function_application_cache.insert(std::make_pair(new_expr,
