@@ -101,7 +101,7 @@ install:
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src clean" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
 
 script:
