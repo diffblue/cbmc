@@ -216,6 +216,8 @@ public:
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
+  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
   typedef std::unordered_set<idt, irep_id_hash> flatten_seent;
