@@ -7,30 +7,44 @@ matrix:
     - os: linux
       sudo: required
       compiler: gcc
+      cache: ccache
       services:
         - docker
       before_install:
         - docker pull diffblue/cbmc-builder:alpine
       env:
-        - PRE_COMMAND="docker run -v ${TRAVIS_BUILD_DIR}:/cbmc diffblue/cbmc-builder:alpine"
-        - COMPILER=g++
+        - PRE_COMMAND="docker run -v ${TRAVIS_BUILD_DIR}:/cbmc -v ${HOME}/.ccache:/root/.ccache diffblue/cbmc-builder:alpine"
+        - COMPILER="ccache g++"
 
     # OS X using g++
     - os: osx
       sudo: false
       compiler: gcc
+      cache: ccache
+      before_install:
+          #we create symlink to non-ccache gcc, to be used in tests
+        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
+        - brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env: COMPILER=g++
 
     # OS X using clang++
     - os: osx
       sudo: false
       compiler: clang
-      env: COMPILER=clang++
+      cache: ccache
+      before_install:
+        - brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+      env:
+        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
 
     # Ubuntu Linux with glibc using g++-5
     - os: linux
       sudo: false
       compiler: gcc
+      cache: ccache
       addons:
         apt:
           sources:
@@ -42,12 +56,13 @@ matrix:
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env: COMPILER=g++-5
+      env: COMPILER="g++-5"
 
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
       sudo: false
       compiler: clang
+      cache: ccache
       addons:
         apt:
           sources:
@@ -60,23 +75,39 @@ matrix:
             - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
+        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
-      env: COMPILER=clang++-3.7
+      env:
+        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
 
     - env: NAME="CPP-LINT"
-      script: scripts/travis_lint.sh || true
+      install:
+      script: scripts/travis_lint.sh
+      before_cache:
+
+  allow_failures:
+    - env: NAME="CPP-LINT"
+      install:
+      script: scripts/travis_lint.sh
+      before_cache:
+
+install:
+  - COMMAND="make -C src minisat2-download" &&
+    eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
+    eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=$FLAGS -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
+    eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C src clean" &&
+    eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
+    eval ${PRE_COMMAND} ${COMMAND}
 
 script:
-  - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-    COMMAND="make -C src minisat2-download" &&
-    eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
-    eval ${PRE_COMMAND} ${COMMAND} &&
+  - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
-    eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=$FLAGS -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
-    eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src clean" &&
-    eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
+
+before_cache:
+  - ccache -s
