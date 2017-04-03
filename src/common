@@ -150,6 +150,64 @@ else
   $(error Invalid setting for BUILD_ENV: $(BUILD_ENV_))
 endif
 
+# select default solver to be minisat2 if no other is specified
+ifndef IPASIR
+ifndef PRECOSAT
+ifndef PICOSAT
+ifndef LINGELING
+ifndef CHAFF
+ifndef BOOLEFORCE
+ifndef MINISAT
+ifndef MINISAT2
+ifndef GLUCOSE
+MINISAT2 = ../../minisat-2.2.1
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+
+ifneq ($(IPASIR),)
+  CP_CXXFLAGS += -DHAVE_IPASIR
+endif
+
+ifneq ($(PRECOSAT),)
+  CP_CXXFLAGS += -DHAVE_PRECOSAT
+endif
+
+ifneq ($(PICOSAT),)
+  CP_CXXFLAGS += -DHAVE_PICOSAT
+endif
+
+ifneq ($(LINGELING),)
+  CP_CXXFLAGS += -DHAVE_LINGELING
+endif
+
+ifneq ($(CHAFF),)
+  CP_CXXFLAGS += -DHAVE_CHAFF
+endif
+
+ifneq ($(BOOLEFORCE),)
+  CP_CXXFLAGS += -DHAVE_BOOLEFORCE
+endif
+
+ifneq ($(MINISAT),)
+  CP_CXXFLAGS += -DHAVE_MINISAT
+endif
+
+ifneq ($(MINISAT2),)
+  CP_CXXFLAGS += -DHAVE_MINISAT2
+endif
+
+ifneq ($(GLUCOSE),)
+  CP_CXXFLAGS += -DHAVE_GLUCOSE
+endif
+
+
 
 first_target: all
 

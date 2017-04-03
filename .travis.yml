@@ -42,7 +42,7 @@ matrix:
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env: COMPILER=g++-5
+      env: COMPILER=g++-5 STATICLINK=-static
 
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
@@ -61,10 +61,12 @@ matrix:
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
-      env: COMPILER=clang++-3.7
+      env: COMPILER=clang++-3.7 STATICLINK=-static
 
     - env: NAME="CPP-LINT"
       script: scripts/travis_lint.sh || true
+    - env: NAME="LIB-ZIP"
+      script: cd src; make zlib-download && make libzip-download && make libzip-build
 
 script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
@@ -75,4 +77,19 @@ script:
     COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="make -C src CXX=$COMPILER CXXFLAGS=$FLAGS -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
-    eval ${PRE_COMMAND} ${COMMAND}
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src clean" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src glucose-download" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src -j2 GLUCOSE=../../glucose-syrup LINKFLAGS=$STATICLINK" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C regression test" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="touch src/solvers/sat/satcheck.h" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make ipasir-build" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src -j2 IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C regression test"
