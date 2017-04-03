@@ -39,10 +39,11 @@ matrix:
             - libwww-perl
             - g++-5
             - libubsan0
+            - unzip
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env: COMPILER=g++-5
+      env: COMPILER=g++-5 STATICLINK=-static
 
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
@@ -58,10 +59,11 @@ matrix:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
+            - unzip
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
-      env: COMPILER=clang++-3.7
+      env: COMPILER=clang++-3.7 STATICLINK=-static
 
     - env: NAME="CPP-LINT"
       script: scripts/travis_lint.sh || true
@@ -70,9 +72,24 @@ script:
   - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     COMMAND="make -C src minisat2-download" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
-    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
+    COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O2 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
     eval ${PRE_COMMAND} ${COMMAND} &&
     COMMAND="make -C src CXX=$COMPILER CXXFLAGS=$FLAGS -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
-    eval ${PRE_COMMAND} ${COMMAND}
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src clean" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src glucose-download" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src -j2 GLUCOSE=../../glucose-syrup LINKFLAGS=$STATICLINK" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C regression test" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="touch src/solvers/sat/satcheck.h" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src ipasir-build" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C src -j2 IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a" &&
+    eval ${PRE_COMMAND} ${COMMAND} &&
+    COMMAND="make -C regression test"

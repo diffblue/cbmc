@@ -26,7 +26,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
-      ../solvers/solvers$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT) $(LIBSOLVER) \
       ../util/util$(LIBEXT) \
       ../miniz/miniz$(OBJEXT) \
       ../json/json$(LIBEXT)

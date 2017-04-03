@@ -125,3 +125,14 @@ diff -rupN glucose-syrup/utils/System.h glucose-syrup-patched/utils/System.h
 +}
  
  #endif
+--- glucose-syrup/utils/System.h	2017-03-23 12:42:13.168183780 +0100
++++ glucose-syrup-patched/utils/System.h	2017-03-23 12:41:12.244000866 +0100
+@@ -21,7 +21,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR
+ #ifndef Glucose_System_h
+ #define Glucose_System_h
+ 
+-#if defined(__linux__)
++#if defined(__linux__) && defined(__GLIBC__)
+ #include <fpu_control.h>
+ #endif
+ 
