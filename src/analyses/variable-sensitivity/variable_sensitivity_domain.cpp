@@ -135,7 +135,7 @@ void variable_sensitivity_domaint::transform(
         }
         else
         {
-          assert(false);
+          abstract_state.havoc("opaque function call");
         }
       }
       else
@@ -166,8 +166,8 @@ void variable_sensitivity_domaint::transform(
     }
     else
     {
-      // unresolved call
-      assert(false);
+      assert(to==next);
+      abstract_state.havoc("unknown opaque function call");
     }
     break;
   }
