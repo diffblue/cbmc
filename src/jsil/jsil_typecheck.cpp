@@ -1214,7 +1214,7 @@ void jsil_typecheckt::typecheck_function_call(
 
       if(symbol_table.add(new_symbol))
       {
-        err_location(new_symbol.location);
+        error().source_location=new_symbol.location;
         error() << "failed to add expression symbol to symbol table"
                 << eom;
         throw 0;
@@ -1312,7 +1312,7 @@ void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
   }
   else
   {
-    err_location(symbol.location);
+    error().source_location=symbol.location;
     error() << "non-type symbol value expected code, but got "
             << symbol.value.pretty() << eom;
     throw 0;
