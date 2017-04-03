@@ -479,7 +479,18 @@ void variable_sensitivity_domaint::transform_function_call(
                 called_arg.type().subtype(), ns, true), false);
           }
         }
-        // TODO (tkiley): Should also top anything globally accessible
+
+        // Top any global values
+        for(const auto &symbol : ns.get_symbol_table().symbols)
+        {
+          if(!symbol.second.is_procedure_local())
+          {
+            abstract_state.assign(
+              symbol_exprt(symbol.first, symbol.second.type),
+              abstract_state.abstract_object_factory(symbol.second.type, ns, true),
+              ns);
+          }
+        }
       }
     }
     else
