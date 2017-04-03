@@ -109,93 +109,7 @@ void variable_sensitivity_domaint::transform(
 
   case FUNCTION_CALL:
   {
-    const code_function_callt &function_call=to_code_function_call(from->code);
-    const exprt &function=function_call.function();
-
-    locationt next=from;
-    next++;
-
-    if(function.id()==ID_symbol)
-    {
-      // called function identifier
-      const symbol_exprt &symbol_expr=to_symbol_expr(function);
-      const irep_idt function_id=symbol_expr.get_identifier();
-
-      // parameters of called function
-      const symbolt &symbol=ns.lookup(function_id);
-      const code_typet &code_type=to_code_type(symbol.type);
-      const code_typet::parameterst &parameters=code_type.parameters();
-
-      const code_function_callt::argumentst &arguments=
-        function_call.arguments();
-
-
-      if(to==next)
-      {
-        if(function_id==CPROVER_PREFIX "set_must" ||
-           function_id==CPROVER_PREFIX "get_must" ||
-           function_id==CPROVER_PREFIX "set_may" ||
-           function_id==CPROVER_PREFIX "get_may" ||
-           function_id==CPROVER_PREFIX "cleanup" ||
-           function_id==CPROVER_PREFIX "clear_may" ||
-           function_id==CPROVER_PREFIX "clear_must")
-        {
-          // no effect on constants
-        }
-        else
-        {
-          if(0) // Sound on opaque function calls
-          {
-            abstract_state.havoc("opaque function call");
-          }
-          else
-          {
-            for(const exprt &called_arg : arguments)
-            {
-              if(called_arg.type().id()==ID_pointer)
-              {
-                sharing_ptrt<pointer_abstract_objectt> pointer_value=
-                  std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-                    abstract_state.eval(called_arg, ns));
-
-                assert(pointer_value);
-
-                // Write top to the pointer
-                pointer_value->write_dereference(
-                  abstract_state,
-                  ns,
-                  std::stack<exprt>(),
-                  abstract_state.abstract_object_factory(
-                    called_arg.type().subtype(), ns, true), false);
-
-
-              }
-            }
-          }
-        }
-      }
-      else
-      {
-        // we have an actual call
-        code_typet::parameterst::const_iterator p_it=parameters.begin();
-        for(const auto &arg : arguments)
-        {
-          if(p_it==parameters.end())
-            break;
-
-          const symbol_exprt parameter_expr(p_it->get_identifier(), arg.type());
-          abstract_object_pointert param_val=abstract_state.eval(arg, ns);
-          abstract_state.assign(parameter_expr, param_val, ns);
-
-          ++p_it;
-        }
-      }
-    }
-    else
-    {
-      assert(to==next);
-      abstract_state.havoc("unknown opaque function call");
-    }
+    transform_function_call(from, to, ai, ns);
     break;
   }
 
@@ -489,4 +403,159 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   }
   else
     return true;
+}
+
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::transform_function_call
+
+  Inputs:
+   from - the location to transform from which is a function call
+   to - the destination of the transform (potentially inside the function call)
+   ai - the abstract interpreter
+   ns - the namespace of the current state
+
+ Outputs:
+
+ Purpose: Used by variable_sensitivity_domaint::transform to handle
+          FUNCTION_CALL transforms. This is copying the values of the arguments
+          into new symbols corresponding to the declared parameter names.
+
+          If the function call is opaque we currently top the return value
+          and the value of any things whose address is passed into the function.
+
+\*******************************************************************/
+
+void variable_sensitivity_domaint::transform_function_call(
+  locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+{
+  assert(from->type==FUNCTION_CALL);
+
+  const code_function_callt &function_call=to_code_function_call(from->code);
+  const exprt &function=function_call.function();
+
+  const locationt next=std::next(from);
+
+  if(function.id()==ID_symbol)
+  {
+    // called function identifier
+    const symbol_exprt &symbol_expr=to_symbol_expr(function);
+    const irep_idt function_id=symbol_expr.get_identifier();
+
+    const code_function_callt::argumentst &called_arguments=
+      function_call.arguments();
+
+    if(to==next)
+    {
+      if(ignore_function_call_transform(function_id))
+      {
+        return;
+      }
+
+      if(0) // Sound on opaque function calls
+      {
+        abstract_state.havoc("opaque function call");
+      }
+      else
+      {
+        // For any parameter that is a pointer, top the value it is pointing
+        // at.
+        for(const exprt &called_arg : called_arguments)
+        {
+          if(called_arg.type().id()==ID_pointer)
+          {
+            sharing_ptrt<pointer_abstract_objectt> pointer_value=
+              std::dynamic_pointer_cast<const pointer_abstract_objectt>(
+                abstract_state.eval(called_arg, ns));
+
+            assert(pointer_value);
+
+            // Write top to the pointer
+            pointer_value->write_dereference(
+              abstract_state,
+              ns,
+              std::stack<exprt>(),
+              abstract_state.abstract_object_factory(
+                called_arg.type().subtype(), ns, true), false);
+          }
+        }
+        // TODO (tkiley): Should also top anything globally accessible
+      }
+    }
+    else
+    {
+      // we have an actual call
+      const symbolt &symbol=ns.lookup(function_id);
+      const code_typet &code_type=to_code_type(symbol.type);
+      const code_typet::parameterst &declaration_parameters=
+        code_type.parameters();
+
+      code_typet::parameterst::const_iterator parameter_it=
+        declaration_parameters.begin();
+
+      for(const exprt &called_arg : called_arguments)
+      {
+        if(parameter_it==declaration_parameters.end())
+        {
+          // TODO(tkiley): Here we have fewer parameters in the function
+          // declaration than we had arguments in the function call
+          // I think this should be an error rather than silently failing?
+          break;
+        }
+
+        // Evaluate the expression that is being
+        // passed into the function call (called_arg)
+        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns);
+
+        // Assign the evaluated value to the symbol associated with the
+        // parameter of the function
+        const symbol_exprt parameter_expr(
+          parameter_it->get_identifier(), called_arg.type());
+        abstract_state.assign(parameter_expr, param_val, ns);
+
+        ++parameter_it;
+      }
+
+      // TODO(tkiley): Here there were more declared parameters than were passed
+      // could this be a varadics thing or is this an error?
+      if(parameter_it!=declaration_parameters.end())
+      {}
+    }
+  }
+  else
+  {
+    assert(to==next);
+    abstract_state.havoc("unknown opaque function call");
+  }
+}
+
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::ignore_function_call_transform
+
+  Inputs:
+   function_id - the name of the function being called
+
+ Outputs: Returns true if the function should be ignored
+
+ Purpose: Used to specify which CPROVER internal functions should be skipped
+          over when doing function call transforms
+
+\*******************************************************************/
+
+bool variable_sensitivity_domaint::ignore_function_call_transform(
+  const irep_idt &function_id) const
+{
+  static const std::set<irep_idt> ignored_internal_function={
+    CPROVER_PREFIX "set_must",
+    CPROVER_PREFIX "get_must",
+    CPROVER_PREFIX "set_may",
+    CPROVER_PREFIX "get_may",
+    CPROVER_PREFIX "cleanup",
+    CPROVER_PREFIX "clear_may",
+    CPROVER_PREFIX "clear_must"
+  };
+
+  return ignored_internal_function.find(function_id)!=
+    ignored_internal_function.cend();
 }
