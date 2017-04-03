@@ -196,7 +196,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
        (it->is_goto() && it->pc->guard.is_true()) ||
        source_location.is_nil() ||
        source_location.get_file().empty() ||
-       source_location.get_file()=="<built-in-additions>" ||
+       source_location.is_built_in() ||
        source_location.get_line().empty())
     {
       step_to_node[it->step_nr]=sink;
@@ -392,7 +392,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
        (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
        (it->is_goto() && it->source.pc->guard.is_true()) ||
        source_location.is_nil() ||
-       source_location.get_file()=="<built-in-additions>" ||
+       source_location.is_built_in() ||
        source_location.get_line().empty())
     {
       step_to_node[step_nr]=sink;

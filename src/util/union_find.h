@@ -157,7 +157,8 @@ public:
   // are 'a' and 'b' in the same set?
   bool same_set(const T &a, const T &b) const
   {
-    typename subt::number_type na, nb;
+    typedef typename subt::number_type subt_number_typet;
+    subt_number_typet na=subt_number_typet(), nb=subt_number_typet();
     bool have_na=!subt::get_number(a, na),
          have_nb=!subt::get_number(b, nb);
 

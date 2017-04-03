@@ -55,6 +55,7 @@ public:
     retain_trivial=_options.get_bool_option("retain-trivial");
     enable_assert_to_assume=_options.get_bool_option("assert-to-assume");
     enable_assertions=_options.get_bool_option("assertions");
+    enable_built_in_assertions=_options.get_bool_option("built-in-assertions");
     enable_assumptions=_options.get_bool_option("assumptions");
     error_labels=_options.get_list_option("error-label");
   }
@@ -125,6 +126,7 @@ protected:
   bool retain_trivial;
   bool enable_assert_to_assume;
   bool enable_assertions;
+  bool enable_built_in_assertions;
   bool enable_assumptions;
 
   typedef optionst::value_listt error_labelst;
@@ -1730,9 +1732,10 @@ void goto_checkt::goto_check(goto_functiont &goto_function)
     }
     else if(i.is_assert())
     {
-      if(i.source_location.get_bool("user-provided") &&
-         i.source_location.get_property_class()!="error label" &&
-         !enable_assertions)
+      bool is_user_provided=i.source_location.get_bool("user-provided");
+      if((is_user_provided && !enable_assertions &&
+          i.source_location.get_property_class()!="error label") ||
+         (!is_user_provided && !enable_built_in_assertions))
         i.type=SKIP;
     }
     else if(i.is_assume())

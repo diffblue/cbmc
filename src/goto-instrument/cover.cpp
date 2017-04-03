@@ -1082,9 +1082,7 @@ void instrument_cover_goals(
 
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
-     has_prefix(
-       id2string(goto_program.instructions.front().source_location.get_file()),
-       "<builtin-library-"))
+     goto_program.instructions.front().source_location.is_built_in())
     return;
 
   const irep_idt coverage_criterion=as_string(criterion);

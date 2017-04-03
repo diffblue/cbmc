@@ -3,7 +3,6 @@ main.c
 --verbosity 2
 ^main.c:3:1: warning: function has return void but a return statement returning signed int$
 ^SIGNAL=0$
-
 --
 ^warning: ignoring
 ^CONVERSION ERROR$

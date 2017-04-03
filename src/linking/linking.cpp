@@ -936,11 +936,6 @@ bool linkingt::adjust_object_type_rec(
   else if(t1.id()!=t2.id())
   {
     // type classes do not match and can't be fixed
-    #ifdef DEBUG
-    str << "LINKING: cannot join " << t1.id() << " vs. " << t2.id();
-    debug_msg();
-    #endif
-
     return true;
   }
 
@@ -1041,11 +1036,6 @@ bool linkingt::adjust_object_type(
   const symbolt &new_symbol,
   bool &set_to_new)
 {
-  #ifdef DEBUG
-  str << "LINKING: trying to adjust types of " << old_symbol.name;
-  debug_msg();
-  #endif
-
   const typet &old_type=follow_tags_symbols(ns, old_symbol.type);
   const typet &new_type=follow_tags_symbols(ns, new_symbol.type);
 
@@ -1133,17 +1123,20 @@ void linkingt::duplicate_object_symbol(
       }
       else
       {
-        err_location(new_symbol.value);
-        error() << "error: conflicting initializers for variable \""
-                << old_symbol.name
-                << "\"" << '\n';
-        error() << "old value in module " << old_symbol.module
-                << " " << old_symbol.value.find_source_location() << '\n'
-                << expr_to_string(ns, old_symbol.name, tmp_old) << '\n';
-        error() << "new value in module " << new_symbol.module
-                << " " << new_symbol.value.find_source_location() << '\n'
-                << expr_to_string(ns, new_symbol.name, tmp_new) << eom;
-        throw 0;
+        warning().source_location=new_symbol.location;
+
+        warning() << "warning: conflicting initializers for"
+                  << " variable \"" << old_symbol.name << "\"\n";
+        warning() << "using old value in module "
+                  << old_symbol.module << " "
+                  << old_symbol.value.find_source_location() << '\n'
+                  << expr_to_string(ns, old_symbol.name, tmp_old)
+                  << '\n';
+        warning() << "ignoring new value in module "
+                  << new_symbol.module << " "
+                  << new_symbol.value.find_source_location() << '\n'
+                  << expr_to_string(ns, new_symbol.name, tmp_new)
+                  << eom;
       }
     }
   }

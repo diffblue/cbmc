@@ -49,7 +49,7 @@ public:
     return false;
   }
 
-  const node_indext add_node_if_not_exists(std::string node_name)
+  node_indext add_node_if_not_exists(std::string node_name)
   {
     for(node_indext i=0; i<nodes.size(); ++i)
     {

@@ -1541,15 +1541,9 @@ public:
       (recent ? ID_most_recent_allocation : ID_any_allocation));
   }
 
-  exprt &instance()
-  {
-    return op0();
-  }
+  void set_instance(unsigned int instance);
 
-  const exprt &instance() const
-  {
-    return op0();
-  }
+  unsigned int get_instance() const;
 
   exprt &valid()
   {

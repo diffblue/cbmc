@@ -200,7 +200,6 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 
   // we add the library, as some analyses benefit
 
-  status() << "Adding CPROVER library" << eom;
   link_to_library(symbol_table, goto_functions, ui_message_handler);
 
   namespacet ns(symbol_table);

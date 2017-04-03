@@ -224,6 +224,13 @@ void dominators_pretty_print_node(const T &node, std::ostream &out)
   out << node;
 }
 
+inline void dominators_pretty_print_node(
+  const goto_programt::targett& target,
+  std::ostream& out)
+{
+  out << target->code.pretty();
+}
+
 /*******************************************************************\
 
 Function: cfg_dominators_templatet::output
@@ -241,7 +248,7 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {
   for(const auto &node : cfg.entry_map)
   {
-    T n=node.first;
+    auto n=node.first;
 
     dominators_pretty_print_node(n, out);
     if(post_dom)

@@ -81,8 +81,6 @@ Function: natural_loops_templatet::compute
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif

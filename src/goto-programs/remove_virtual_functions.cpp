@@ -57,8 +57,11 @@ protected:
   typedef std::vector<functiont> functionst;
   void get_functions(const exprt &, functionst &);
   void get_child_functions_rec(
-    const irep_idt &, const symbol_exprt &,
-    const irep_idt &, functionst &) const;
+    const irep_idt &,
+    const symbol_exprt &,
+    const irep_idt &,
+    functionst &,
+    std::set<irep_idt> &visited) const;
   exprt get_method(
     const irep_idt &class_id,
     const irep_idt &component_name) const;
@@ -254,7 +257,8 @@ void remove_virtual_functionst::get_child_functions_rec(
   const irep_idt &this_id,
   const symbol_exprt &last_method_defn,
   const irep_idt &component_name,
-  functionst &functions) const
+  functionst &functions,
+  std::set<irep_idt> &visited) const
 {
   auto findit=class_hierarchy.class_map.find(this_id);
   if(findit==class_hierarchy.class_map.end())
@@ -262,6 +266,8 @@ void remove_virtual_functionst::get_child_functions_rec(
 
   for(const auto &child : findit->second.children)
   {
+    if(!visited.insert(child).second)
+      continue;
     exprt method=get_method(child, component_name);
     functiont function(child);
     if(method.is_not_nil())
@@ -279,7 +285,8 @@ void remove_virtual_functionst::get_child_functions_rec(
       child,
       function.symbol_expr,
       component_name,
-      functions);
+      functions,
+      visited);
   }
 }
 
@@ -333,11 +340,13 @@ void remove_virtual_functionst::get_functions(
   }
 
   // iterate over all children, transitively
+  std::set<irep_idt> visited;
   get_child_functions_rec(
     class_id,
     root_function.symbol_expr,
     component_name,
-    functions);
+    functions,
+    visited);
 
   if(root_function.symbol_expr!=symbol_exprt())
     functions.push_back(root_function);

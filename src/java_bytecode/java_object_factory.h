@@ -22,18 +22,6 @@ exprt object_factory(
   const source_locationt &,
   message_handlert &message_handler);
 
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  symbol_tablet &symbol_table,
-  const source_locationt &,
-  bool skip_classid,
-  bool create_dynamic_objects,
-  bool assume_non_null,
-  message_handlert &message_handler,
-  size_t max_nondet_array_length=5);
-
-
 exprt get_nondet_bool(const typet &);
 
 symbolt &new_tmp_symbol(

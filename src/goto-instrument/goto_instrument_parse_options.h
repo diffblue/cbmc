@@ -45,6 +45,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(stack-depth):(nondet-static)" \
   "(function-enter):(function-exit):(branch):" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  "(drop-unused-functions)" \
   "(show-value-sets)" \
   "(show-global-may-alias)" \
   "(show-local-bitvector-analysis)(show-custom-bitvector-analysis)" \

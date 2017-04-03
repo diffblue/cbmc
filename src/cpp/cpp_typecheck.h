@@ -136,13 +136,6 @@ protected:
     const template_typet &old_type,
     template_typet &new_type);
 
-  #if 0
-  void check_template_restrictions(
-    const irept &cpp_name,
-    const irep_idt &final_identifier,
-    const typet &final_type);
-  #endif
-
   void convert_template_declaration(cpp_declarationt &declaration);
 
   void convert_non_template_declaration(cpp_declarationt &declaration);
