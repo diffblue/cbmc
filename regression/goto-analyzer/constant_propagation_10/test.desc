@@ -1,4 +1,4 @@
-CORE
+FUTURE
 constant_propagation_10.c
 --constants --simplify out.goto
 ^EXIT=0$
