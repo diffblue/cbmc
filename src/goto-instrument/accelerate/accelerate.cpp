@@ -27,8 +27,6 @@ Author: Matt Lewis
 #include "overflow_instrumenter.h"
 #include "util.h"
 
-#define DEBUG
-
 goto_programt::targett acceleratet::find_back_jump(
   goto_programt::targett loop_header)
 {
