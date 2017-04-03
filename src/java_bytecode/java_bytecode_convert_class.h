@@ -19,7 +19,6 @@ bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  bool disable_runtime_checks,
   size_t max_array_length,
   lazy_methodst &,
   lazy_methods_modet,

@@ -14,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "var_map.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: var_mapt::var_infot::operator()

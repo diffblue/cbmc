@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -109,11 +107,6 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
     else
       l=result->second;
   }
-
-  #ifdef DEBUG
-  std::cout << "EQUALITY " << l << "<=>"
-            << e1 << "=" << e2 << std::endl;
-  #endif
 
   return l;
 }

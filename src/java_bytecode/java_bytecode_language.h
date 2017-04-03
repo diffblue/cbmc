@@ -98,12 +98,6 @@ protected:
   std::vector<irep_idt> main_jar_classes;
   java_class_loadert java_class_loader;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
-
-  bool disable_runtime_checks;      // disable run-time checks for java, i.e.,
-                                    // ASSERTS for
-                                    //  - checkcast / instanceof
-                                    //  - array bounds check
-                                    //  - array size for newarray
   size_t max_nondet_array_length;   // maximal length for non-det array creation
   size_t max_user_array_length;     // max size for user code created arrays
   lazy_methodst lazy_methods;

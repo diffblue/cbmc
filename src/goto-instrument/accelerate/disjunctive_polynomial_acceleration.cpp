@@ -43,9 +43,6 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
-
 bool disjunctive_polynomial_accelerationt::accelerate(
   path_acceleratort &accelerator)
 {

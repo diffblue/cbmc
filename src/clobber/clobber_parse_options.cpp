@@ -368,7 +368,6 @@ bool clobber_parse_optionst::get_goto_program(
 
     // finally add the library
     #if 0
-    status() << "Adding CPROVER library" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
     #endif
 

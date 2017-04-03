@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prop_conv.h"
 #include "literal_expr.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: prop_convt::is_in_conflict

@@ -55,13 +55,19 @@ exprt make_binary(const exprt &expr)
   if(operands.size()<=2)
     return expr;
 
+  // types must be identical for make_binary to be safe to use
+  const typet &type=expr.type();
+
   exprt previous=operands.front();
+  assert(previous.type()==type);
 
   for(exprt::operandst::const_iterator
       it=++operands.begin();
       it!=operands.end();
       ++it)
   {
+    assert(it->type()==type);
+
     exprt tmp=expr;
     tmp.operands().clear();
     tmp.operands().resize(2);

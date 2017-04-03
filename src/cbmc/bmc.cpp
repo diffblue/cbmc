@@ -687,7 +687,7 @@ void bmct::setup_unwind()
 
   for(auto &val : unwindset_loops)
   {
-    unsigned thread_nr;
+    unsigned thread_nr=0;
     bool thread_nr_set=false;
 
     if(!val.empty() &&

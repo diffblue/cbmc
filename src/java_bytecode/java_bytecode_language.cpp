@@ -42,7 +42,6 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
-  disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("string-refine");
   if(cmd.isset("java-max-input-array-length"))
@@ -387,9 +386,16 @@ static void gather_needed_globals(
 {
   if(e.id()==ID_symbol)
   {
-    const auto &sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
-    if(sym.is_static_lifetime)
-      needed.add(sym);
+    // If the symbol isn't in the symbol table at all, then it is defined
+    // on an opaque type (i.e. we don't have the class definition at this point)
+    // and will be created during the typecheck phase.
+    // We don't mark it as 'needed' as it doesn't exist yet to keep.
+    auto findit=symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    if(findit!=symbol_table.symbols.end() &&
+       findit->second.is_static_lifetime)
+    {
+      needed.add(findit->second);
+    }
   }
   else
     forall_operands(opit, e)
@@ -518,7 +524,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second,
          symbol_table,
          get_message_handler(),
-         disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
          lazy_methods_mode,
@@ -639,7 +644,6 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           *parsed_method.second,
           symbol_table,
           get_message_handler(),
-          disable_runtime_checks,
           max_user_array_length,
           safe_pointer<std::vector<irep_idt> >::create_non_null(
             &method_worklist2),
@@ -754,7 +758,6 @@ void java_bytecode_languaget::convert_lazy_method(
     *lazy_method_entry.second,
     symtab,
     get_message_handler(),
-    disable_runtime_checks,
     max_user_array_length);
 }
 

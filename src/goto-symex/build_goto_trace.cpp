@@ -158,11 +158,17 @@ void build_goto_trace(
 
   mp_integer current_time=0;
 
+  const goto_trace_stept *end_ptr=nullptr;
+  bool end_step_seen=false;
+
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=target.SSA_steps.begin();
-      it!=end_step;
+      it!=target.SSA_steps.end();
       it++)
   {
+    if(it==end_step)
+      end_step_seen=true;
+
     const symex_target_equationt::SSA_stept &SSA_step=*it;
 
     if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
@@ -221,6 +227,8 @@ void build_goto_trace(
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());
     goto_trace_stept &goto_trace_step=steps.back();
+    if(!end_step_seen)
+      end_ptr=&goto_trace_step;
 
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
     goto_trace_step.pc=SSA_step.source.pc;
@@ -286,6 +294,17 @@ void build_goto_trace(
   for(auto &t_it : time_map)
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 
+  // cut off the trace at the desired end
+  for(goto_tracet::stepst::iterator
+      s_it1=goto_trace.steps.begin();
+      s_it1!=goto_trace.steps.end();
+      ++s_it1)
+    if(end_step_seen && end_ptr==&(*s_it1))
+    {
+      goto_trace.trim_after(s_it1);
+      break;
+    }
+
   // produce the step numbers
   unsigned step_nr=0;
 
@@ -321,7 +340,7 @@ void build_goto_trace(
       s_it1++)
     if(s_it1->is_assert() && !s_it1->cond_value)
     {
-      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
+      goto_trace.trim_after(s_it1);
       break;
     }
 }

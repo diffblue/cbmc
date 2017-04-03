@@ -136,8 +136,13 @@ void delete_directory(const std::string &path)
       // Needed for Alpine Linux
       if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
         continue;
+
       std::string sub_path=path+"/"+ent->d_name;
-      if(ent->d_type==DT_DIR)
+
+      struct stat stbuf;
+      stat(sub_path.c_str(), &stbuf);
+
+      if(S_ISDIR(stbuf.st_mode))
         delete_directory(sub_path);
       else
         remove(sub_path.c_str());

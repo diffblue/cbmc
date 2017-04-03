@@ -17,8 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "boolbv_type.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: boolbvt::get

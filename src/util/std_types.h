@@ -215,7 +215,7 @@ public:
       return set(ID_pretty_name, name);
     }
 
-    const bool get_anonymous() const
+    bool get_anonymous() const
     {
       return get_bool(ID_anonymous);
     }
@@ -225,7 +225,7 @@ public:
       return set(ID_anonymous, anonymous);
     }
 
-    const bool get_is_padding() const
+    bool get_is_padding() const
     {
       return get_bool(ID_C_is_padding);
     }

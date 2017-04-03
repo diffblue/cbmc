@@ -25,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 class java_object_factoryt:public messaget
 {
   code_blockt &init_code;
@@ -75,25 +63,20 @@ public:
     bool is_sub,
     irep_idt class_identifier,
     const source_locationt &loc,
-    bool skip_classid,
     bool create_dynamic_objects,
     bool override=false,
     const typet &override_type=empty_typet());
 };
 
-
 /*******************************************************************\
 
-Function: gen_nondet_array_init
+Function: java_object_factoryt::allocate_object
 
-  Inputs: the target expression, desired object type, source location
-          and Boolean whether to create a dynamic object
+  Inputs:
 
- Outputs: the allocated object
+ Outputs:
 
- Purpose: Returns false if we can't figure out the size of allocate_type.
-          allocate_type may differ from target_expr, e.g. for target_expr
-          having type int* and allocate_type being an int[10].
+ Purpose:
 
 \*******************************************************************/
 
@@ -165,16 +148,33 @@ exprt java_object_factoryt::allocate_object(
   }
 }
 
-// Override type says to ignore the LHS' real type, and init it with the given
-// type regardless. Used at the moment for reference arrays, which are
-// implemented as void* arrays but should be init'd as their true type with
-// appropriate casts.
+/*******************************************************************\
+
+Function: java_object_factoryt::gen_nondet_init
+
+  Inputs:
+   expr -
+   is_sub -
+   class_identifier -
+   loc -
+   create_dynamic_objects -
+   override - Ignore the LHS' real type. Used at the moment for
+              reference arrays, which are implemented as void*
+              arrays but should be init'd as their true type with
+              appropriate casts.
+   override_type - Type to use if ignoring the LHS' real type
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_object_factoryt::gen_nondet_init(
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
   const source_locationt &loc,
-  bool skip_classid,
   bool create_dynamic_objects,
   bool override,
   const typet &override_type)
@@ -250,20 +250,17 @@ void java_object_factoryt::gen_nondet_init(
     {
       exprt allocated=
         allocate_object(expr, subtype, loc, create_dynamic_objects);
-      {
-        exprt init_expr;
-        if(allocated.id()==ID_address_of)
-          init_expr=allocated.op0();
-        else
-          init_expr=dereference_exprt(allocated, allocated.type().subtype());
-        gen_nondet_init(
-          init_expr,
-          false,
-          "",
-          loc,
-          false,
-          create_dynamic_objects);
-      }
+      exprt init_expr;
+      if(allocated.id()==ID_address_of)
+        init_expr=allocated.op0();
+      else
+        init_expr=dereference_exprt(allocated, allocated.type().subtype());
+      gen_nondet_init(
+        init_expr,
+        false,
+        "",
+        loc,
+        create_dynamic_objects);
     }
 
     if(!assume_non_null)
@@ -297,9 +294,6 @@ void java_object_factoryt::gen_nondet_init(
 
       if(name=="@class_identifier")
       {
-        if(skip_classid)
-          continue;
-
         irep_idt qualified_clsid="java::"+as_string(class_identifier);
         constant_exprt ci(qualified_clsid, string_typet());
         code_assignt code(me, ci);
@@ -327,7 +321,6 @@ void java_object_factoryt::gen_nondet_init(
           _is_sub,
           class_identifier,
           loc,
-          false,
           create_dynamic_objects);
       }
     }
@@ -345,7 +338,7 @@ void java_object_factoryt::gen_nondet_init(
 
 /*******************************************************************\
 
-Function: gen_nondet_array_init
+Function: java_object_factoryt::gen_nondet_array_init
 
   Inputs:
 
@@ -379,7 +372,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const auto &length_sym_expr=length_sym.symbol_expr();
 
   // Initialize array with some undetermined length:
-  gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false, false);
+  gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -464,7 +457,6 @@ void java_object_factoryt::gen_nondet_array_init(
     false,
     irep_idt(),
     loc,
-    false,
     true,
     true,
     element_type);
@@ -475,44 +467,6 @@ void java_object_factoryt::gen_nondet_array_init(
   init_code.move_to_operands(incr);
   init_code.move_to_operands(goto_head);
   init_code.move_to_operands(init_done_label);
-}
-
-/*******************************************************************\
-
-Function: gen_nondet_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void gen_nondet_init(
-  const exprt &expr,
-  code_blockt &init_code,
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  bool skip_classid,
-  bool create_dyn_objs,
-  bool assume_non_null,
-  message_handlert &message_handler,
-  size_t max_nondet_array_length)
-{
-  java_object_factoryt state(
-    init_code,
-    assume_non_null,
-    max_nondet_array_length,
-    symbol_table,
-    message_handler);
-  state.gen_nondet_init(
-    expr,
-    false,
-    "",
-    loc,
-    skip_classid,
-    create_dyn_objs);
 }
 
 /*******************************************************************\
@@ -592,17 +546,18 @@ exprt object_factory(
 
     exprt object=aux_symbol.symbol_expr();
 
-    const namespacet ns(symbol_table);
-    gen_nondet_init(
-      object,
+    java_object_factoryt state(
       init_code,
-      symbol_table,
-      loc,
-      false,
-      false,
       !allow_null,
-      message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      symbol_table,
+      message_handler);
+    state.gen_nondet_init(
+      object,
+      false,
+      "",
+      loc,
+      false);
 
     return object;
   }
