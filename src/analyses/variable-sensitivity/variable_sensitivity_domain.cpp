@@ -12,6 +12,7 @@ Date: April 2016
 
 #include <util/message.h>
 #include <util/simplify_expr.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 
 #include "variable_sensitivity_domain.h"
 #include <util/cprover_prefix.h>
@@ -120,6 +121,14 @@ void variable_sensitivity_domaint::transform(
       const symbol_exprt &symbol_expr=to_symbol_expr(function);
       const irep_idt function_id=symbol_expr.get_identifier();
 
+      // parameters of called function
+      const symbolt &symbol=ns.lookup(function_id);
+      const code_typet &code_type=to_code_type(symbol.type);
+      const code_typet::parameterst &parameters=code_type.parameters();
+
+      const code_function_callt::argumentst &arguments=
+        function_call.arguments();
+
 
       if(to==next)
       {
@@ -135,21 +144,39 @@ void variable_sensitivity_domaint::transform(
         }
         else
         {
-          abstract_state.havoc("opaque function call");
+          if(0) // Sound on opaque function calls
+          {
+            abstract_state.havoc("opaque function call");
+          }
+          else
+          {
+            for(const exprt &called_arg : arguments)
+            {
+              if(called_arg.type().id()==ID_pointer)
+              {
+                sharing_ptrt<pointer_abstract_objectt> pointer_value=
+                  std::dynamic_pointer_cast<const pointer_abstract_objectt>(
+                    abstract_state.eval(called_arg, ns));
+
+                assert(pointer_value);
+
+                // Write top to the pointer
+                pointer_value->write_dereference(
+                  abstract_state,
+                  ns,
+                  std::stack<exprt>(),
+                  abstract_state.abstract_object_factory(
+                    called_arg.type().subtype(), ns, true), false);
+
+
+              }
+            }
+          }
         }
       }
       else
       {
         // we have an actual call
-
-        // parameters of called function
-        const symbolt &symbol=ns.lookup(function_id);
-        const code_typet &code_type=to_code_type(symbol.type);
-        const code_typet::parameterst &parameters=code_type.parameters();
-
-        const code_function_callt::argumentst &arguments=
-          function_call.arguments();
-
         code_typet::parameterst::const_iterator p_it=parameters.begin();
         for(const auto &arg : arguments)
         {
@@ -183,6 +210,7 @@ void variable_sensitivity_domaint::transform(
 
     for(const auto &param : type.parameters())
     {
+      // Bottom the arguments to the function
       abstract_state.assign(
         symbol_exprt(param.get_identifier(), param.type()),
         abstract_state.abstract_object_factory(param.type(), ns, true, false),
