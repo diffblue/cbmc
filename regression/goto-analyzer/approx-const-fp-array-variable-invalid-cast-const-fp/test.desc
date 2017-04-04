@@ -3,9 +3,9 @@ main.c
 --show-goto-functions --verbosity 10 --pointer-check
 
 ^Removing function pointers and virtual functions$
-^\s*IF fp == \(void \(\*\)\(void\)\)f2 THEN GOTO [0-9]$
-^\s*IF fp == \(void \(\*\)\(void\)\)f3 THEN GOTO [0-9]$
-^\s*IF fp == \(void \(\*\)\(void\)\)f4 THEN GOTO [0-9]$
+^\s*IF fp == \(const void_fp\)f2 THEN GOTO [0-9]$
+^\s*IF fp == \(const void_fp\)f3 THEN GOTO [0-9]$
+^\s*IF fp == \(const void_fp\)f4 THEN GOTO [0-9]$
 ^SIGNAL=0$
 --
 ^warning: ignoring
