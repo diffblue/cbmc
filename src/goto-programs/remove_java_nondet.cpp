@@ -210,17 +210,18 @@ static void replace_java_nondet(goto_programt &goto_program)
   // Check each instruction.
   // `process_target` may modify the list in place, and returns the next
   // iterator to look at.
+  // Can't use forall_goto_program_instructions because we don't want to
+  // increment the iterator by one after every iteration.
   for(auto instruction_iterator=std::begin(goto_program.instructions),
         end=std::end(goto_program.instructions);
-      instruction_iterator!=end;
-      instruction_iterator=process_target(
-        message_handler,
-        symbol_table,
-        max_nondet_array_length,
-        goto_program,
-        instruction_iterator))
+      instruction_iterator!=end;)
   {
-    // Loop body deliberately empty.
+    instruction_iterator=process_target(
+      message_handler,
+      symbol_table,
+      max_nondet_array_length,
+      goto_program,
+      instruction_iterator);
   }
 }
 
