@@ -743,6 +743,7 @@ string_constraint
 string_not_contains_constraint
 cprover_char_literal_func
 cprover_string_literal_func
+cprover_string_array_of_char_pointer_func
 cprover_string_char_at_func
 cprover_string_char_set_func
 cprover_string_code_point_at_func

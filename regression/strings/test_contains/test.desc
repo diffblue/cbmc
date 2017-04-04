@@ -1,6 +1,6 @@
 FUTURE
 test.c
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main.assertion.1\] assertion !__CPROVER_uninterpreted_string_contains_func\(t, __CPROVER_uninterpreted_string_literal_func\(\"3\"\)): SUCCESS$

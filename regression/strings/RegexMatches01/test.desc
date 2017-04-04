@@ -1,6 +1,6 @@
 FUTURE
 RegexMatches01.class
---string-refine --unwind 100
+--refine-strings --unwind 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

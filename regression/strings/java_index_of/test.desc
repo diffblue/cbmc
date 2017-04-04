@@ -1,16 +1,7 @@
 FUTURE
 test_index_of.class
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[assertion.1\] assertion at file test_index_of.java line 13: SUCCESS$
-^\[assertion.2\] assertion at file test_index_of.java line 14: FAILURE$
-^\[assertion.3\] assertion at file test_index_of.java line 17: SUCCESS$
-^\[assertion.4\] assertion at file test_index_of.java line 18: FAILURE$
-^\[assertion.5\] assertion at file test_index_of.java line 21: SUCCESS$
-^\[assertion.6\] assertion at file test_index_of.java line 22: FAILURE$
-^\[assertion.7\] assertion at file test_index_of.java line 25: SUCCESS$
-^\[assertion.8\] assertion at file test_index_of.java line 26: FAILURE$
-^\[assertion.9\] assertion at file test_index_of.java line 28: SUCCESS$
-^\[assertion.10\] assertion at file test_index_of.java line 29: SUCCESS$
+^\[.*assertion.1\].* line 8.* FAILURE$
 --

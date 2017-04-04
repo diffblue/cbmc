@@ -1,9 +1,7 @@
 FUTURE
 test_char_at.class
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[assertion.1\] assertion at file test_char_at.java line 11: SUCCESS$
-^\[assertion.2\] assertion at file test_char_at.java line 13: FAILURE$
-^\[assertion.3\] assertion at file test_char_at.java line 15: SUCCESS$
+^\[.*assertion.1\].* line 5.* FAILURE$
 --

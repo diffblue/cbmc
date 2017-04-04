@@ -1,10 +1,7 @@
 FUTURE
 test_float.class
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[assertion.1\] assertion at file test_float.java line 14: SUCCESS$
-^\[assertion.2\] assertion at file test_float.java line 15: SUCCESS$
-^\[assertion.3\] assertion at file test_float.java line 16: SUCCESS$
-^\[assertion.4\] assertion at file test_float.java line 17: FAILURE$
+^\[.*assertion.1\].* line 15.* FAILURE$
 --
