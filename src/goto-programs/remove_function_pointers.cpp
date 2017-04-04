@@ -503,6 +503,11 @@ void remove_function_pointerst::remove_function_pointer(
   code_expression.expression()=function;
   target->code.swap(code_expression);
   target->type=OTHER;
+
+  // report statistics
+  statistics().source_location=target->source_location;
+  statistics() << "replacing function pointer by "
+               << functions.size() << " possible targets" << eom;
 }
 
 /*******************************************************************\
