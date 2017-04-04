@@ -13,9 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
-#include <analyses/dependence_graph.h>
-
-#include "full_slicer.h"
 #include "full_slicer_class.h"
 
 /*******************************************************************\

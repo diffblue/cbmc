@@ -1502,7 +1502,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("reachability-slice"))
   {
     status() << "Performing a reachability slice" << eom;
-    reachability_slicer(goto_functions);
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_functions, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_functions);
   }
 
   // full slice?
