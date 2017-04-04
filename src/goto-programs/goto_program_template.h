@@ -275,6 +275,12 @@ public:
   //! The list of instructions in the goto program
   instructionst instructions;
 
+  //! A range-erase which should maintain goto program invariants
+  targett erase(const_targett first, const_targett last)
+  {
+    return instructions.erase(first, last);
+  }
+
   // Convert a const_targett to a targett - use with care and avoid
   // whenever possible
   targett const_cast_target(const_targett t)
