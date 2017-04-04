@@ -343,7 +343,7 @@ void symex_coveraget::compute_overall_coverage(
   forall_goto_functions(gf_it, goto_functions)
   {
     if(!gf_it->second.body_available() ||
-       gf_it->first==ID__start ||
+       gf_it->first==goto_functions.entry_point() ||
        gf_it->first==CPROVER_PREFIX "initialize")
       continue;
 

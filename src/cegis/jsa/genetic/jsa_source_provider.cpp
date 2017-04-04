@@ -26,7 +26,6 @@ jsa_source_providert::jsa_source_providert(jsa_symex_learnt &lcfg) :
 {
 }
 
-#define START_METHOD_PREFIX "void _start"
 #define RETURN_VALUE_ASSIGNMENT RETURN_VALUE_SUFFIX" ="
 #define JUMP_BUFFER "__CPROVER_jsa_jump_buffer"
 #define TEST_SIGNATURE "int " CEGIS_FITNESS_TEST_FUNC \
@@ -104,7 +103,9 @@ void add_main_body(std::string &result, const jsa_symex_learnt &lcfg)
   std::ostringstream oss;
   dump_c(entry_only, false, ns, oss);
   const std::string main_body(oss.str());
-  result+=main_body.substr(main_body.find(START_METHOD_PREFIX));
+  result+=
+    main_body.substr(
+      main_body.find(std::string("void ")+id2string(gf.entry_point())));
 }
 
 void fix_return_values(std::string &result)
@@ -138,9 +139,11 @@ void fix_return_values(std::string &result)
   substitute(result, "\n  return 0;", "");
 }
 
-void add_facade_function(std::string &result)
+void add_facade_function(const goto_functionst &gf, std::string &result)
 {
-  substitute(result, "void _start(void)", TEST_SIGNATURE);
+  std::ostringstream start_sig;
+  start_sig << "void " << gf.entry_point() << "(void)";
+  substitute(result, start_sig.str(), TEST_SIGNATURE);
   const std::string::size_type pos=result.find("  __CPROVER_initialize();");
   result.insert(pos, "  if (setjmp(" JUMP_BUFFER")) return EXIT_FAILURE;\n");
 }
@@ -249,7 +252,7 @@ const std::string &jsa_source_providert::operator ()()
   add_temp_clean(source, lcfg.get_symbol_table());
   add_main_body(source, lcfg);
   fix_return_values(source);
-  add_facade_function(source);
+  add_facade_function(lcfg.get_goto_functions(), source);
   insert_solution(source, lcfg);
   insert_counterexample(source);
   cleanup(source);
