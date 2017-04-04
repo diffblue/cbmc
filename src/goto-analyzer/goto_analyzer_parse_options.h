@@ -36,7 +36,8 @@ class optionst;
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
   "(json):(xml):" \
-  "(unreachable-instructions)" \
+  "(unreachable-instructions)(unreachable-functions)" \
+  "(reachable-functions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)"
 
