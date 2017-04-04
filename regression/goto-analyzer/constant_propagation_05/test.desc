@@ -1,4 +1,4 @@
-CORE
+FUTURE
 constant_propagation_05.c
 --constants --verify
 ^EXIT=0$

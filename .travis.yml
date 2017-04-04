@@ -58,6 +58,27 @@ matrix:
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env: COMPILER="g++-5"
 
+    # Ubuntu Linux with glibc using g++-5, debug mode
+    - os: linux
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+            - libubsan0
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
+      env:
+        - COMPILER="g++-5"
+        - EXTRA_CXXFLAGS="-DDEBUG"
+      script: echo "Not running any tests for a debug build."
+
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
       sudo: false
@@ -81,6 +102,31 @@ matrix:
         - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
 
+    # Ubuntu Linux with glibc using clang++-3.7, debug mode
+    - os: linux
+      sudo: false
+      compiler: clang
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - libwww-perl
+            - clang-3.7
+            - libstdc++-5-dev
+            - libubsan0
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
+        - export CCACHE_CPP2=yes
+      # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
+      env:
+        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
+        - EXTRA_CXXFLAGS="-DDEBUG"
+      script: echo "Not running any tests for a debug build."
+
     - env: NAME="CPP-LINT"
       install:
       script: scripts/travis_lint.sh
@@ -95,13 +141,9 @@ matrix:
 install:
   - COMMAND="make -C src minisat2-download" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare\" -j2" &&
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=$FLAGS -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
-    eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src clean" &&
-    eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"-Wall -O0 -ggdb3 -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare -DDEBUG\" -j2" &&
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
     eval ${PRE_COMMAND} ${COMMAND}
 
 script:
