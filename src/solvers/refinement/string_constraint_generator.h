@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
+#include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
@@ -22,21 +23,19 @@ class string_constraint_generatort
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
-  // string constraints for different string funcitons and add them
+  // string constraints for different string functions and add them
   // to the axiom list.
 
   string_constraint_generatort():
-    mode(ID_unknown)
+    max_string_length(std::numeric_limits<size_t>::max()),
+    force_printable_characters(false)
   { }
 
-  void set_mode(irep_idt _mode)
-  {
-    // only C and java modes supported
-    assert((_mode==ID_java) || (_mode==ID_C));
-    mode=_mode;
-  }
+  // Constraints on the maximal length of strings
+  size_t max_string_length;
 
-  irep_idt &get_mode() { return mode; }
+  // Should we add constraints on the characters
+  bool force_printable_characters;
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
@@ -74,6 +73,8 @@ public:
   // Maps unresolved symbols to the string_exprt that was created for them
   std::map<irep_idt, string_exprt> unresolved_symbols;
 
+  // Set of strings that have been created by the generator
+  std::set<string_exprt> created_strings;
 
   string_exprt find_or_add_string_of_symbol(
     const symbol_exprt &sym,
@@ -100,6 +101,7 @@ private:
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
+  void add_default_axioms(const string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
 
   // The following functions add axioms for the returned value
