@@ -1,29 +1,95 @@
-SRC = arith_tools.cpp base_type.cpp cmdline.cpp config.cpp symbol_table.cpp \
-      expr.cpp expr_util.cpp irep.cpp language.cpp \
-      lispexpr.cpp lispirep.cpp source_location.cpp message.cpp language_file.cpp \
-      mp_arith.cpp namespace.cpp parse_options.cpp rename.cpp \
-      replace_expr.cpp threeval.cpp typecheck.cpp graph.cpp \
-      type.cpp pointer_predicates.cpp merge_irep.cpp run.cpp \
-      parser.cpp replace_symbol.cpp json.cpp get_base_name.cpp \
-      simplify_expr.cpp simplify_expr_floatbv.cpp simplify_expr_int.cpp \
-      simplify_expr_array.cpp simplify_expr_struct.cpp \
-      simplify_expr_boolean.cpp simplify_expr_pointer.cpp \
-      get_module.cpp string_hash.cpp string_container.cpp identifier.cpp \
-      rational.cpp options.cpp dstring.cpp \
-      find_symbols.cpp rational_tools.cpp ui_message.cpp simplify_utils.cpp \
-      time_stopping.cpp symbol.cpp irep_hash_container.cpp cout_message.cpp \
-      type_eq.cpp guard.cpp array_name.cpp \
-      substitute.cpp decision_procedure.cpp union_find.cpp \
-      xml.cpp xml_irep.cpp xml_expr.cpp std_types.cpp std_code.cpp \
-      format_constant.cpp find_macros.cpp ref_expr_set.cpp std_expr.cpp \
-      irep_serialization.cpp fixedbv.cpp rename_symbol.cpp \
-      ieee_float.cpp signal_catcher.cpp pointer_offset_size.cpp \
-      bv_arithmetic.cpp tempdir.cpp tempfile.cpp timer.cpp unicode.cpp \
-      irep_ids.cpp byte_operators.cpp string2int.cpp file_util.cpp \
-      memory_info.cpp pipe_stream.cpp irep_hash.cpp endianness_map.cpp \
-      ssa_expr.cpp json_irep.cpp json_expr.cpp \
+SRC = arith_tools.cpp \
+      array_name.cpp \
+      base_type.cpp \
+      bv_arithmetic.cpp \
+      byte_operators.cpp \
+      cmdline.cpp \
+      config.cpp \
+      cout_message.cpp \
+      decision_procedure.cpp \
+      dstring.cpp \
+      endianness_map.cpp \
+      expr.cpp \
+      expr_util.cpp \
+      file_util.cpp \
+      find_macros.cpp \
+      find_symbols.cpp \
+      fixedbv.cpp \
+      format_constant.cpp \
       fresh_symbol.cpp \
-      string_utils.cpp
+      get_base_name.cpp \
+      get_module.cpp \
+      graph.cpp \
+      guard.cpp \
+      identifier.cpp \
+      ieee_float.cpp \
+      irep.cpp \
+      irep_hash.cpp \
+      irep_hash_container.cpp \
+      irep_ids.cpp \
+      irep_serialization.cpp \
+      json.cpp \
+      json_expr.cpp \
+      json_irep.cpp \
+      language.cpp \
+      language_file.cpp \
+      lispexpr.cpp \
+      lispirep.cpp \
+      memory_info.cpp \
+      merge_irep.cpp \
+      message.cpp \
+      mp_arith.cpp \
+      namespace.cpp \
+      options.cpp \
+      parse_options.cpp \
+      parser.cpp \
+      pipe_stream.cpp \
+      pointer_offset_size.cpp \
+      pointer_predicates.cpp \
+      rational.cpp \
+      rational_tools.cpp \
+      ref_expr_set.cpp \
+      rename.cpp \
+      rename_symbol.cpp \
+      replace_expr.cpp \
+      replace_symbol.cpp \
+      run.cpp \
+      signal_catcher.cpp \
+      simplify_expr.cpp \
+      simplify_expr_array.cpp \
+      simplify_expr_boolean.cpp \
+      simplify_expr_floatbv.cpp \
+      simplify_expr_int.cpp \
+      simplify_expr_pointer.cpp \
+      simplify_expr_struct.cpp \
+      simplify_utils.cpp \
+      source_location.cpp \
+      ssa_expr.cpp \
+      std_code.cpp \
+      std_expr.cpp \
+      std_types.cpp \
+      string2int.cpp \
+      string_container.cpp \
+      string_hash.cpp \
+      string_utils.cpp \
+      substitute.cpp \
+      symbol.cpp \
+      symbol_table.cpp \
+      tempdir.cpp \
+      tempfile.cpp \
+      threeval.cpp \
+      time_stopping.cpp \
+      timer.cpp \
+      type.cpp \
+      type_eq.cpp \
+      typecheck.cpp \
+      ui_message.cpp \
+      unicode.cpp \
+      union_find.cpp \
+      xml.cpp \
+      xml_expr.cpp \
+      xml_irep.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 

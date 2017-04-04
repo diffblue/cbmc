@@ -1,5 +1,9 @@
-SRC = xml_parser.cpp xml_y.tab.cpp xml_lex.yy.cpp xml_parse_tree.cpp graphml.cpp
-
+SRC = graphml.cpp \
+      xml_lex.yy.cpp \
+      xml_parse_tree.cpp \
+      xml_parser.cpp \
+      xml_y.tab.cpp \
+      # Empty last line
 INCLUDES= -I ..
 
 include ../config.inc

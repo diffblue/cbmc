@@ -1,7 +1,15 @@
-SRC =  jsil_y.tab.cpp jsil_lex.yy.cpp \
-       jsil_convert.cpp jsil_language.cpp jsil_parse_tree.cpp jsil_types.cpp \
-       jsil_parser.cpp jsil_typecheck.cpp expr2jsil.cpp \
-       jsil_entry_point.cpp jsil_internal_additions.cpp
+SRC = expr2jsil.cpp \
+      jsil_convert.cpp \
+      jsil_entry_point.cpp \
+      jsil_internal_additions.cpp \
+      jsil_language.cpp \
+      jsil_lex.yy.cpp \
+      jsil_parse_tree.cpp \
+      jsil_parser.cpp \
+      jsil_typecheck.cpp \
+      jsil_types.cpp \
+      jsil_y.tab.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 
