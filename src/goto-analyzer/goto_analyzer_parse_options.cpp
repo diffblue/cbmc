@@ -324,7 +324,7 @@ int goto_analyzer_parse_optionst::doit()
 
     goto_model.set_message_handler(get_message_handler());
 
-    if(goto_model(cmdline.args))
+    if(goto_model(cmdline))
       return 6;
 
     goto_functionst::function_mapt::const_iterator f_it=
