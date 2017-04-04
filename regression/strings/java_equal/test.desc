@@ -1,8 +1,0 @@
-FUTURE
-test_equal.class
---string-refine
-^EXIT=10$
-^SIGNAL=0$
-^\[assertion.1\] assertion at file test_equal.java line 7: FAILURE$
-^\[assertion.2\] assertion at file test_equal.java line 8: SUCCESS$
---

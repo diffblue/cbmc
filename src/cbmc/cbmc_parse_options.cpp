@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/string_refine_preprocess.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
@@ -314,6 +315,17 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine", true);
     options.set_option("refine-arrays", true);
     options.set_option("refine-arithmetic", true);
+  }
+
+
+  if(cmdline.isset("string-refine"))
+  {
+    options.set_option("string-refine", true);
+    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
+    options.set_option("string-printable", cmdline.isset("string-printable"));
+    if(cmdline.isset("string-max-length"))
+      options.set_option(
+        "string-max-length", cmdline.get_value("string-max-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -895,6 +907,14 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
 
+
+    if(cmdline.isset("string-refine"))
+    {
+      status() << "Preprocessing for string refinement" << eom;
+      string_refine_preprocesst(
+        symbol_table, goto_functions, ui_message_handler);
+    }
+
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
     remove_vector(symbol_table, goto_functions);
@@ -1190,6 +1210,10 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --string-refine              use string refinement (experimental)\n"
+    " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
+    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings (experimental)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

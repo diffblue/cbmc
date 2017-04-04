@@ -1,6 +1,5 @@
-typedef struct __CPROVER_string { char *s; } __CPROVER_string;
-//typedef struct __CPROVER_char { char c; } __CPROVER_char;
-typedef unsigned char __CPROVER_char;
+typedef struct __attribute__((__packed__)) __CPROVER_refined_string_type { int length; char content[]; } __CPROVER_refined_string_type;
+typedef __CPROVER_refined_string_type __CPROVER_string;
 
 /******************************************************************************
  * CPROVER string functions
@@ -54,19 +53,19 @@ typedef unsigned char __CPROVER_char;
 /******************************************************************************
  * don't use these directly
  ******************************************************************************/
-extern __CPROVER_char __CPROVER_uninterpreted_string_char_at_func(__CPROVER_string str, int pos);
+extern char __CPROVER_uninterpreted_string_char_at_func(__CPROVER_string str, int pos);
 extern __CPROVER_bool __CPROVER_uninterpreted_string_equal_func(__CPROVER_string str1, __CPROVER_string str2);
 extern __CPROVER_string __CPROVER_uninterpreted_string_literal_func(char * str);
-extern __CPROVER_char __CPROVER_uninterpreted_char_literal_func();
+extern char __CPROVER_uninterpreted_char_literal_func();
 extern __CPROVER_string __CPROVER_uninterpreted_string_concat_func(__CPROVER_string str1, __CPROVER_string str2);
 extern int __CPROVER_uninterpreted_string_length_func(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_string_substring_func(__CPROVER_string str, int i, int j);
 extern __CPROVER_bool __CPROVER_uninterpreted_string_is_prefix_func(__CPROVER_string pref, __CPROVER_string str);
 extern __CPROVER_bool __CPROVER_uninterpreted_string_is_suffix_func(__CPROVER_string suff, __CPROVER_string str);
 extern __CPROVER_bool __CPROVER_uninterpreted_string_contains_func(__CPROVER_string str1, __CPROVER_string str2);
-extern int __CPROVER_uninterpreted_string_index_of_func(__CPROVER_string str, __CPROVER_char c);
-extern int __CPROVER_uninterpreted_string_last_index_of_func(__CPROVER_string str, __CPROVER_char c);
-extern __CPROVER_string __CPROVER_uninterpreted_string_char_set_func(__CPROVER_string str, int pos, __CPROVER_char c);
+extern int __CPROVER_uninterpreted_string_index_of_func(__CPROVER_string str, char c);
+extern int __CPROVER_uninterpreted_string_last_index_of_func(__CPROVER_string str, char c);
+extern __CPROVER_string __CPROVER_uninterpreted_string_char_set_func(__CPROVER_string str, int pos, char c);
 extern __CPROVER_string __CPROVER_uninterpreted_string_copy_func(__CPROVER_string str);
 extern int __CPROVER_uninterpreted_string_parse_int_func(__CPROVER_string str);
 extern __CPROVER_string __CPROVER_uninterpreted_string_of_int_func(int i);

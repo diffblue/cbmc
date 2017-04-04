@@ -1,0 +1,7 @@
+THOROUGH
+easychair.class
+--string-refine
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 30.* FAILURE$
+--

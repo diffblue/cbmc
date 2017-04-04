@@ -3444,6 +3444,19 @@ public:
     operands().resize(2);
   }
 
+  explicit function_application_exprt(const typet &_type):
+    exprt(ID_function_application, _type)
+  {
+    operands().resize(2);
+  }
+
+  function_application_exprt(
+    const symbol_exprt &_function, const typet &_type):
+      function_application_exprt(_type)
+  {
+    function()=_function;
+  }
+
   exprt &function()
   {
     return op0();
