@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 
 #include <util/source_location.h>
+#include <util/simplify_expr.h>
 
 #include "symex_bmc.h"
 
@@ -64,6 +65,21 @@ void symex_bmct::symex_step(
   }
 
   const goto_programt::const_targett cur_pc=state.source.pc;
+
+  if(!state.guard.is_false() &&
+     state.source.pc->is_assume() &&
+     simplify_expr(state.source.pc->guard, ns).is_false())
+  {
+    statistics() << "aborting path on assume(false) at "
+                 << state.source.pc->source_location
+                 << " thread " << state.source.thread_nr;
+
+    const irep_idt &c=state.source.pc->source_location.get_comment();
+    if(!c.empty())
+      statistics() << ": " << c;
+
+    statistics() << eom;
+  }
 
   goto_symext::symex_step(goto_functions, state);
 
