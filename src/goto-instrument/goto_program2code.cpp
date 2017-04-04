@@ -565,7 +565,7 @@ goto_programt::const_targett goto_program2codet::convert_goto(
   else if(!target->guard.is_true())
     return convert_goto_switch(target, upper_bound, dest);
   else if(!loop_last_stack.empty())
-    return convert_goto_break_continue(target, dest);
+    return convert_goto_break_continue(target, upper_bound, dest);
   else
     return convert_goto_goto(target, dest);
 }
@@ -803,7 +803,14 @@ bool goto_program2codet::set_block_end_points(
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
+      {
+        // simplification may have figured out that a case is unreachable
+        // this is possibly getting too weird, abort to be safe
+        if(case_end==it->case_start)
+          return true;
+
         continue;
+      }
 
       // find the last instruction dominated by the case start
       if(n.dominators.find(it->case_start)==n.dominators.end())
@@ -1107,7 +1114,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
        upper_bound->location_number < end_if->location_number))
   {
     if(!loop_last_stack.empty())
-      return convert_goto_break_continue(target, dest);
+      return convert_goto_break_continue(target, upper_bound, dest);
     else
       return convert_goto_goto(target, dest);
   }
@@ -1140,6 +1147,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
 goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
     codet &dest)
 {
   assert(!loop_last_stack.empty());
@@ -1149,7 +1157,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   // 1: ...
   goto_programt::const_targett next=target;
   for(++next;
-      next!=goto_program.instructions.end();
+      next!=upper_bound && next!=goto_program.instructions.end();
       ++next)
   {
     cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
