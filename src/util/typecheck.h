@@ -9,23 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_TYPECHECK_H
 #define CPROVER_UTIL_TYPECHECK_H
 
-#include "message_stream.h"
-
-class legacy_typecheckt:public legacy_message_streamt
-{
-public:
-  explicit legacy_typecheckt(message_handlert &_message_handler):
-    legacy_message_streamt(_message_handler) { }
-  virtual ~legacy_typecheckt() { }
-
-protected:
-  // main function -- overload this one
-  virtual void typecheck()=0;
-
-public:
-  // call that one
-  virtual bool typecheck_main();
-};
+#include "expr.h"
+#include "message.h"
 
 class typecheckt:public messaget
 {

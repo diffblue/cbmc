@@ -5,6 +5,7 @@ DIRS = ansi-c \
        cbmc-java \
        goto-analyzer \
        goto-instrument \
+       goto-instrument-typedef \
        test-script \
        # Empty last line
 

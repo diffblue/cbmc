@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <regex>
 #include <util/message.h>
 
+#include "java_class_loader_limit.h"
+
 class jar_filet:public messaget
 {
 public:
@@ -25,7 +27,7 @@ public:
 
   ~jar_filet();
 
-  void open(std::string &java_cp_include_files, const std::string &);
+  void open(java_class_loader_limitt &, const std::string &);
 
   // Test for error; 'true' means we are good.
   explicit operator bool() const { return mz_ok; }
@@ -47,21 +49,16 @@ protected:
 class jar_poolt:public messaget
 {
 public:
-  void set_java_cp_include_files(std::string &_java_cp_include_files)
+  jar_filet &operator()(
+    java_class_loader_limitt &class_loader_limit,
+    const std::string &file_name)
   {
-    java_cp_include_files=_java_cp_include_files;
-  }
-
-  jar_filet &operator()(const std::string &file_name)
-  {
-    if(java_cp_include_files.empty())
-      throw "class regexp cannot be empty";
     file_mapt::iterator it=file_map.find(file_name);
     if(it==file_map.end())
     {
       jar_filet &jar_file=file_map[file_name];
       jar_file.set_message_handler(get_message_handler());
-      jar_file.open(java_cp_include_files, file_name);
+      jar_file.open(class_loader_limit, file_name);
       return jar_file;
     }
     else

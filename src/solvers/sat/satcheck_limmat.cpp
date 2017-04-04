@@ -16,8 +16,6 @@ extern "C"
 #include "limmat.h"
 }
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: satcheck_limmatt::satcheck_limmatt

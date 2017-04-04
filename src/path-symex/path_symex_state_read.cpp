@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>

@@ -1391,7 +1391,7 @@ void instrument_cover_goals(
 {
   Forall_goto_functions(f_it, goto_functions)
   {
-    if(f_it->first==ID__start ||
+    if(f_it->first==goto_functions.entry_point() ||
        f_it->first=="__CPROVER_initialize")
       continue;
 

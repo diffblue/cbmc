@@ -1,0 +1,8 @@
+FUTURE
+constant_propagation_07.c
+--constants --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file constant_propagation_07.c line 12 function main, assertion i<51: UNKNOWN$
+--
+^warning: ignoring

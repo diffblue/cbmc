@@ -69,6 +69,27 @@ void goto_symext::symex_goto(statet &state)
 
   if(!forward) // backwards?
   {
+    // is it label: goto label; or while(cond); - popular in SV-COMP
+    if(goto_target==state.source.pc ||
+       (instruction.incoming_edges.size()==1 &&
+        *instruction.incoming_edges.begin()==goto_target))
+    {
+      // generate assume(false) or a suitable negation if this
+      // instruction is a conditional goto
+      exprt negated_cond;
+
+      if(new_guard.is_true())
+        negated_cond=false_exprt();
+      else
+        negated_cond=not_exprt(new_guard);
+
+      symex_assume(state, negated_cond);
+
+      // next instruction
+      state.source.pc++;
+      return;
+    }
+
     unsigned &unwind=
       frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
     unwind++;
@@ -121,14 +142,14 @@ void goto_symext::symex_goto(statet &state)
     state_pc=goto_target;
   }
 
-  state.source.pc=state_pc;
-
   // put into state-queue
   statet::goto_state_listt &goto_state_list=
     state.top().goto_state_map[new_state_pc];
 
   goto_state_list.push_back(statet::goto_statet(state));
   statet::goto_statet &new_state=goto_state_list.back();
+
+  state.source.pc=state_pc;
 
   // adjust guards
   if(new_guard.is_true())
@@ -244,27 +265,42 @@ void goto_symext::merge_gotos(statet &state)
       list_it=state_list.rbegin();
       list_it!=state_list.rend();
       list_it++)
-  {
-    statet::goto_statet &goto_state=*list_it;
-
-    // check atomic section
-    if(state.atomic_section_id!=goto_state.atomic_section_id)
-      throw "atomic sections differ across branches";
-
-    // do SSA phi functions
-    phi_function(goto_state, state);
-
-    merge_value_sets(goto_state, state);
-
-    // adjust guard
-    state.guard|=goto_state.guard;
-
-    // adjust depth
-    state.depth=std::min(state.depth, goto_state.depth);
-  }
+    merge_goto(*list_it, state);
 
   // clean up to save some memory
   frame.goto_state_map.erase(state_map_it);
+}
+
+/*******************************************************************\
+
+Function: goto_symext::merge_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_symext::merge_goto(
+  const statet::goto_statet &goto_state,
+  statet &state)
+{
+  // check atomic section
+  if(state.atomic_section_id!=goto_state.atomic_section_id)
+    throw "atomic sections differ across branches";
+
+  // do SSA phi functions
+  phi_function(goto_state, state);
+
+  merge_value_sets(goto_state, state);
+
+  // adjust guard
+  state.guard|=goto_state.guard;
+
+  // adjust depth
+  state.depth=std::min(state.depth, goto_state.depth);
 }
 
 /*******************************************************************\

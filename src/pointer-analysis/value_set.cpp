@@ -799,8 +799,7 @@ void value_sett::get_value_set_rec(
         static_cast<const typet &>(expr.find("#type"));
 
       dynamic_object_exprt dynamic_object(dynamic_type);
-      dynamic_object.instance()=
-        from_integer(location_number, typet(ID_natural));
+      dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
       insert(dest, dynamic_object, 0);
@@ -812,8 +811,7 @@ void value_sett::get_value_set_rec(
       assert(expr_type.id()==ID_pointer);
 
       dynamic_object_exprt dynamic_object(expr_type.subtype());
-      dynamic_object.instance()=
-        from_integer(location_number, typet(ID_natural));
+      dynamic_object.set_instance(location_number);
       dynamic_object.valid()=true_exprt();
 
       insert(dest, dynamic_object, 0);
@@ -897,7 +895,7 @@ void value_sett::get_value_set_rec(
 
     const std::string prefix=
       "value_set::dynamic_object"+
-      dynamic_object.instance().get_string(ID_value);
+      std::to_string(dynamic_object.get_instance());
 
     // first try with suffix
     const std::string full_name=prefix+suffix;
@@ -1392,7 +1390,7 @@ void value_sett::do_free(
   const object_map_dt &object_map=value_set.read();
 
   // find out which *instances* interest us
-  expr_sett to_mark;
+  dynamic_object_id_sett to_mark;
 
   for(object_map_dt::const_iterator
       it=object_map.begin();
@@ -1407,7 +1405,7 @@ void value_sett::do_free(
         to_dynamic_object_expr(object);
 
       if(dynamic_object.valid().is_true())
-        to_mark.insert(dynamic_object.instance());
+        to_mark.insert(dynamic_object.get_instance());
     }
   }
 
@@ -1433,10 +1431,10 @@ void value_sett::do_free(
 
       if(object.id()==ID_dynamic_object)
       {
-        const exprt &instance=
-          to_dynamic_object_expr(object).instance();
+        const dynamic_object_exprt &dynamic_object=
+          to_dynamic_object_expr(object);
 
-        if(to_mark.count(instance)==0)
+        if(to_mark.count(dynamic_object.get_instance())==0)
           set(new_object_map, o_it);
         else
         {
@@ -1507,7 +1505,7 @@ void value_sett::assign_rec(
 
     const std::string name=
       "value_set::dynamic_object"+
-      dynamic_object.instance().get_string(ID_value);
+      std::to_string(dynamic_object.get_instance());
 
     entryt &e=get_entry(entryt(name, suffix), lhs.type(), ns);
 

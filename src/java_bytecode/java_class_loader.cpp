@@ -44,6 +44,9 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   queue.push("java.lang.Class");
   queue.push(class_name);
 
+  java_class_loader_limitt class_loader_limit(
+    get_message_handler(), java_cp_include_files);
+
   while(!queue.empty())
   {
     irep_idt c=queue.top();
@@ -56,7 +59,7 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
     debug() << "Reading class " << c << eom;
 
     java_bytecode_parse_treet &parse_tree=
-      get_parse_tree(c);
+      get_parse_tree(class_loader_limit, c);
 
     // add any dependencies to queue
     for(java_bytecode_parse_treet::class_refst::const_iterator
@@ -67,6 +70,25 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   }
 
   return class_map[class_name];
+}
+
+/*******************************************************************\
+
+Function: java_class_loadert::set_java_cp_include_files
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void java_class_loadert::set_java_cp_include_files(
+  std::string &_java_cp_include_files)
+{
+  java_cp_include_files=_java_cp_include_files;
+  jar_pool.set_message_handler(get_message_handler());
 }
 
 /*******************************************************************\
@@ -82,6 +104,7 @@ Function: java_class_loadert::get_parse_tree
 \*******************************************************************/
 
 java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
+  java_class_loader_limitt &class_loader_limit,
   const irep_idt &class_name)
 {
   java_bytecode_parse_treet &parse_tree=class_map[class_name];
@@ -89,7 +112,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   // First check given JAR files
   for(const auto &jf : jar_files)
   {
-    read_jar_file(jf);
+    read_jar_file(class_loader_limit, jf);
 
     const auto &jm=jar_map[jf];
 
@@ -100,7 +123,8 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
       debug() << "Getting class `" << class_name << "' from JAR "
               << jf << eom;
 
-      std::string data=jar_pool(jf).get_entry(jm_it->second.class_file_name);
+      std::string data=jar_pool(class_loader_limit, jf)
+        .get_entry(jm_it->second.class_file_name);
 
       std::istringstream istream(data);
 
@@ -114,13 +138,12 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   }
 
   // See if we can find it in the class path
-
   for(const auto &cp : config.java.classpath)
   {
     // in a JAR?
     if(has_suffix(cp, ".jar"))
     {
-      read_jar_file(cp);
+      read_jar_file(class_loader_limit, cp);
 
       const auto &jm=jar_map[cp];
 
@@ -131,7 +154,8 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
         debug() << "Getting class `" << class_name << "' from JAR "
                 << cp << eom;
 
-        std::string data=jar_pool(cp).get_entry(jm_it->second.class_file_name);
+        std::string data=jar_pool(class_loader_limit, cp)
+          .get_entry(jm_it->second.class_file_name);
 
         std::istringstream istream(data);
 
@@ -153,7 +177,9 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
         cp+'/'+class_name_to_file(class_name);
         #endif
 
-      if(std::ifstream(full_path))
+      // full class path starts with './'
+      if(class_loader_limit.load_class_file(full_path.substr(2)) &&
+         std::ifstream(full_path))
       {
         if(!java_bytecode_parse(
              full_path,
@@ -182,9 +208,11 @@ Function: java_class_loadert::load_entire_jar
 
 \*******************************************************************/
 
-void java_class_loadert::load_entire_jar(const std::string &file)
+void java_class_loadert::load_entire_jar(
+  java_class_loader_limitt &class_loader_limit,
+  const std::string &file)
 {
-  read_jar_file(file);
+  read_jar_file(class_loader_limit, file);
 
   const auto &jm=jar_map[file];
 
@@ -208,13 +236,15 @@ Function: java_class_loadert::read_jar_file
 
 \*******************************************************************/
 
-void java_class_loadert::read_jar_file(const irep_idt &file)
+void java_class_loadert::read_jar_file(
+  java_class_loader_limitt &class_loader_limit,
+  const irep_idt &file)
 {
   // done already?
   if(jar_map.find(file)!=jar_map.end())
     return;
 
-  jar_filet &jar_file=jar_pool(id2string(file));
+  jar_filet &jar_file=jar_pool(class_loader_limit, id2string(file));
 
   if(!jar_file)
   {
