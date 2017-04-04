@@ -118,6 +118,17 @@ SRC = $(CHAFF_SRC) $(BOOLEFORCE_SRC) $(MINISAT_SRC) $(MINISAT2_SRC) \
       floatbv/float_utils.cpp floatbv/float_bv.cpp \
       refinement/bv_refinement_loop.cpp refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp \
+      refinement/string_refinement.cpp \
+      refinement/string_constraint_generator_code_points.cpp \
+      refinement/string_constraint_generator_comparison.cpp \
+      refinement/string_constraint_generator_concat.cpp \
+      refinement/string_constraint_generator_constants.cpp \
+      refinement/string_constraint_generator_indexof.cpp \
+      refinement/string_constraint_generator_insert.cpp \
+      refinement/string_constraint_generator_main.cpp \
+      refinement/string_constraint_generator_testing.cpp \
+      refinement/string_constraint_generator_transformation.cpp \
+      refinement/string_constraint_generator_valueof.cpp \
       miniBDD/miniBDD.cpp
 
 INCLUDES += -I .. \

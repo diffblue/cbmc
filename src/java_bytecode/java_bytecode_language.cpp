@@ -43,7 +43,7 @@ Function: java_bytecode_languaget::get_language_options
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
-  string_refinement_enabled=cmd.isset("string-refine");
+  string_refinement_enabled=cmd.isset("refine-strings");
   if(cmd.isset("java-max-input-array-length"))
     max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));

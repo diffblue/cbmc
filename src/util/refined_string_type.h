@@ -10,8 +10,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
-#define CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
+#ifndef CPROVER_UTIL_REFINED_STRING_TYPE_H
+#define CPROVER_UTIL_REFINED_STRING_TYPE_H
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -33,41 +33,16 @@ public:
 
   const typet &get_char_type() const
   {
-    assert(components().size()==2);
-    return components()[0].type();
+    return get_content_type().subtype();
   }
 
   const typet &get_index_type() const
   {
-    return get_content_type().size().type();
+    assert(components().size()==2);
+    return components()[0].type();
   }
 
-  // For C the unrefined string type is __CPROVER_string, for java it is a
-  // pointer to a struct with tag java.lang.String
-
-  static bool is_c_string_type(const typet &type);
-
-  static bool is_java_string_pointer_type(const typet &type);
-
-  static bool is_java_string_type(const typet &type);
-
-  static bool is_java_string_builder_type(const typet &type);
-
-  static bool is_java_char_sequence_type(const typet &type);
-
-  static bool is_unrefined_string_type(const typet &type)
-  {
-    return (
-      is_c_string_type(type) ||
-      is_java_string_pointer_type(type) ||
-      is_java_string_builder_type(type) ||
-      is_java_char_sequence_type(type));
-  }
-
-  static bool is_unrefined_string(const exprt &expr)
-  {
-    return (is_unrefined_string_type(expr.type()));
-  }
+  static bool is_refined_string_type(const typet &type);
 
   constant_exprt index_of_int(int i) const
   {
@@ -75,9 +50,10 @@ public:
   }
 };
 
-const refined_string_typet &to_refined_string_type(const typet &type)
+extern inline const refined_string_typet &to_refined_string_type(
+  const typet &type)
 {
-  assert(type.id()==ID_struct);
+  assert(refined_string_typet::is_refined_string_type(type));
   return static_cast<const refined_string_typet &>(type);
 }
 
