@@ -88,7 +88,7 @@ void symex_bmct::symex_step(
      !state.guard.is_false() &&
      // avoid an invalid iterator in state.source.pc
      (!cur_pc->is_end_function() ||
-      cur_pc->function!=ID__start) &&
+      cur_pc->function!=goto_functions.entry_point()) &&
      // ignore transition to next instruction when goto points elsewhere
      (!cur_pc->is_goto() ||
       cur_pc->get_target()==state.source.pc ||
