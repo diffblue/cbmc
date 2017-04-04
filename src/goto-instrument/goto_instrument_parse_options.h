@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/remove_const_function_pointers.h>
 
 #include <analyses/goto_check.h>
 
@@ -55,6 +56,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
+  OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(remove-function-pointers)" \
   "(show-claims)(show-properties)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
@@ -100,6 +102,7 @@ protected:
   void eval_verbosity();
 
   void do_indirect_call_and_rtti_removal(bool force=false);
+  void do_remove_const_function_pointers_only();
   void do_partial_inlining();
   void do_remove_returns();
 

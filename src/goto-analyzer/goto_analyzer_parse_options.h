@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/get_goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 
+#include <analyses/goto_check.h>
+
 class bmct;
 class goto_functionst;
 class optionst;
@@ -28,6 +30,7 @@ class optionst;
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_GOTO_CHECK \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(show-properties)(show-reachable-properties)(property):" \
