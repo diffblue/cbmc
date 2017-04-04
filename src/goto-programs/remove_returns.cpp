@@ -269,6 +269,46 @@ void remove_returns(goto_modelt &goto_model)
 
 /*******************************************************************\
 
+Function: original_return_type
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
+code_typet original_return_type(
+  const symbol_tablet &symbol_table,
+  const irep_idt &function_id)
+{
+  code_typet type;
+  type.make_nil();
+
+  // do we have X#return_value?
+  std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
+
+  symbol_tablet::symbolst::const_iterator rv_it=
+    symbol_table.symbols.find(rv_name);
+
+  if(rv_it!=symbol_table.symbols.end())
+  {
+    // look up the function symbol
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find(function_id);
+
+    assert(s_it!=symbol_table.symbols.end());
+
+    type=to_code_type(s_it->second.type);
+    type.return_type()=rv_it->second.type;
+  }
+
+  return type;
+}
+
+/*******************************************************************\
+
 Function: remove_returnst::restore_returns
 
 Inputs:
@@ -301,7 +341,7 @@ bool remove_returnst::restore_returns(
   symbolt &function_symbol=s_it->second;
 
   // restore the return type
-  f_it->second.type.return_type()=rv_it->second.type;
+  f_it->second.type=original_return_type(symbol_table, function_id);
   function_symbol.type=f_it->second.type;
 
   // remove the return_value symbol from the symbol_table
