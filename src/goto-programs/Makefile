@@ -25,7 +25,8 @@ SRC = goto_convert.cpp goto_convert_function_call.cpp \
       remove_const_function_pointers.cpp \
       system_library_symbols.cpp \
       string_refine_preprocess.cpp \
-      remove_java_nondet.cpp \
+      replace_java_nondet.cpp \
+      convert_nondet.cpp \
       # Empty last line
 
 INCLUDES= -I ..

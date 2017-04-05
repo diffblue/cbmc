@@ -1,16 +1,14 @@
 /*******************************************************************\
 
-Module: Remove Java Nondet expressions
+Module: Replace Java Nondet expressions
 
 Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 \*******************************************************************/
 
-#include "goto-programs/remove_java_nondet.h"
+#include "goto-programs/replace_java_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
-
-#include "java_bytecode/java_object_factory.h"
 
 #include "util/irep_ids.h"
 
@@ -19,16 +17,37 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 /*******************************************************************\
 
-  Struct: nondet_instruction_infot
+   Class: nondet_instruction_infot
 
- Purpose: Hold information about a nondet instruction invocation.
+ Purpose: Holds information about any discovered nondet methods,
+          with extreme type-safety.
 
 \*******************************************************************/
 
-struct nondet_instruction_infot final
+class nondet_instruction_infot final
 {
-  bool is_nondet_instruction;
-  bool is_never_null;
+public:
+  enum class is_nondett:bool { FALSE, TRUE };
+  enum class is_nullablet:bool { FALSE, TRUE };
+
+  nondet_instruction_infot():
+    is_nondet(is_nondett::FALSE),
+    is_nullable(is_nullablet::FALSE)
+  {
+  }
+
+  explicit nondet_instruction_infot(is_nullablet is_nullable):
+    is_nondet(is_nondett::TRUE),
+    is_nullable(is_nullable)
+  {
+  }
+
+  is_nondett get_instruction_type() const { return is_nondet; }
+  is_nullablet get_nullable_type() const { return is_nullable; }
+
+private:
+  is_nondett is_nondet;
+  is_nullablet is_nullable;
 };
 
 /*******************************************************************\
@@ -36,15 +55,14 @@ struct nondet_instruction_infot final
 Function: is_nondet_returning_object
 
   Inputs:
-    function_call: A function call expression.
+    function_call: The function call declaration to check.
 
- Outputs: Whether the function has a nondet signature, and whether the nondet
-          item may be null.
+  Outputs: A structure detailing whether the function call appears to
+           be one of our nondet library methods, and if so, whether
+           or not it allows null results.
 
-
- Purpose: Find whether the supplied function call has a recognised 'nondet'
-          library signature.  If so, specify whether the function call is
-          expected to return non-null.
+ Purpose: Checks whether the function call is one of our nondet
+          library functions.
 
 \*******************************************************************/
 
@@ -53,16 +71,17 @@ static nondet_instruction_infot is_nondet_returning_object(
 {
   const auto &function_symbol=to_symbol_expr(function_call.function());
   const auto function_name=id2string(function_symbol.get_identifier());
+  const std::regex reg(
+    R"(.*org\.cprover\.CProver\.nondet)"
+    R"((?:Boolean|Byte|Char|Short|Int|Long|Float|Double|With(out)?Null.*))");
   std::smatch match_results;
-  if(!std::regex_match(
-       function_name,
-       match_results,
-       std::regex(".*org\\.cprover\\.CProver\\.nondetWith(out)?Null.*")))
+  if(!std::regex_match(function_name, match_results, reg))
   {
-    return {false, false};
+    return nondet_instruction_infot();
   }
 
-  return {true, match_results[1].matched};
+  return nondet_instruction_infot(
+    nondet_instruction_infot::is_nullablet(!match_results[1].matched));
 }
 
 /*******************************************************************\
@@ -70,27 +89,27 @@ static nondet_instruction_infot is_nondet_returning_object(
 Function: get_nondet_instruction_info
 
   Inputs:
-    instr: A goto program instruction.
+    instr: A goto-program instruction to check.
 
- Outputs: Whether the instruction is a function with a nondet signature, and
-          whether the nondet item may be null.
+  Outputs: A structure detailing the properties of the nondet method.
 
- Purpose: Return whether the instruction has a recognised 'nondet' library
-          signature.
+ Purpose: Check whether the instruction is a function call which
+          matches one of the recognised nondet library methods, and
+          return some information about it.
 
 \*******************************************************************/
 
 static nondet_instruction_infot get_nondet_instruction_info(
-  const goto_programt::targett &instr)
+  const goto_programt::const_targett &instr)
 {
   if(!(instr->is_function_call() && instr->code.id()==ID_code))
   {
-    return {false, false};
+    return nondet_instruction_infot();
   }
   const auto &code=to_code(instr->code);
   if(code.get_statement()!=ID_function_call)
   {
-    return {false, false};
+    return nondet_instruction_infot();
   }
   const auto &function_call=to_code_function_call(code);
   return is_nondet_returning_object(function_call);
@@ -111,7 +130,7 @@ Function: is_symbol_with_id
 
 \*******************************************************************/
 
-static bool is_symbol_with_id(const exprt& expr, const dstringt& identifier)
+static bool is_symbol_with_id(const exprt& expr, const irep_idt& identifier)
 {
   return expr.id()==ID_symbol &&
          to_symbol_expr(expr).get_identifier()==identifier;
@@ -133,7 +152,7 @@ Function: is_typecast_with_id
 
 \*******************************************************************/
 
-static bool is_typecast_with_id(const exprt& expr, const dstringt& identifier)
+static bool is_typecast_with_id(const exprt& expr, const irep_idt& identifier)
 {
   if(!(expr.id()==ID_typecast && expr.operands().size()==1))
   {
@@ -167,7 +186,7 @@ Function: is_assignment_from
 
 static bool is_assignment_from(
   const goto_programt::instructiont &instr,
-  const dstringt &identifier)
+  const irep_idt &identifier)
 {
   // If not an assignment, return false
   if(!instr.is_assign())
@@ -181,14 +200,12 @@ static bool is_assignment_from(
 
 /*******************************************************************\
 
-Function: process_target
+Function: check_and_replace_target
 
   Inputs:
-    message_handler: Handles logging.
-    symbol_table: The table of known symbols.
-    max_nondet_array_length: Max length of arrays in new nondet objects.
-    instructions: The list of all instructions.
-    instr: The instruction to check.
+    goto_program: The goto program to modify.
+    target: A single step of the goto program which may be erased and
+            replaced.
 
  Outputs: The next instruction to process, probably with this function.
 
@@ -198,17 +215,15 @@ Function: process_target
 
 \*******************************************************************/
 
-static goto_programt::targett process_target(
-  message_handlert &message_handler,
-  symbol_tablet &symbol_table,
-  const size_t max_nondet_array_length,
-  goto_programt &prog,
-  const goto_programt::targett &instr)
+static goto_programt::const_targett check_and_replace_target(
+  goto_programt &goto_program,
+  const goto_programt::const_targett &target)
 {
-  // Check whether this is our nondet library method, and return if not
-  const auto instr_info=get_nondet_instruction_info(instr);
-  const auto next_instr=std::next(instr);
-  if(!instr_info.is_nondet_instruction)
+  // Check whether this is a nondet library method, and return if not
+  const auto instr_info=get_nondet_instruction_info(target);
+  const auto next_instr=std::next(target);
+  if(instr_info.get_instruction_type()==
+     nondet_instruction_infot::is_nondett::FALSE)
   {
     return next_instr;
   }
@@ -225,8 +240,8 @@ static goto_programt::targett process_target(
   const auto return_identifier=
     to_symbol_expr(next_instr_assign_lhs).get_identifier();
 
-  auto &instructions=prog.instructions;
-  const auto end=std::end(instructions);
+  auto &instructions=goto_program.instructions;
+  const auto end=instructions.cend();
 
   // Look for an instruction where this name is on the RHS of an assignment
   const auto matching_assignment=std::find_if(
@@ -242,90 +257,63 @@ static goto_programt::targett process_target(
   // Assume that the LHS of *this* assignment is the actual nondet variable
   const auto &code_assign=to_code_assign(matching_assignment->code);
   const auto nondet_var=code_assign.lhs();
-  const auto source_loc=instr->source_location;
+  const auto source_loc=target->source_location;
 
   // Erase from the nondet function call to the assignment
   const auto after_matching_assignment=std::next(matching_assignment);
   assert(after_matching_assignment!=end);
-  const auto after_erased=
-    instructions.erase(instr, after_matching_assignment);
 
-  // Generate nondet init code
-  code_blockt init_code;
-  gen_nondet_init(
-    nondet_var,
-    init_code,
-    symbol_table,
-    source_loc,
-    false,
-    true,
-    instr_info.is_never_null,
-    message_handler,
-    max_nondet_array_length);
+  const auto after_erased=goto_program.instructions.erase(
+    target, after_matching_assignment);
 
-  // Convert this code into goto instructions
-  goto_programt new_instructions;
-  goto_convert(init_code, symbol_table, new_instructions, message_handler);
+  const auto inserted=goto_program.insert_before(after_erased);
+  inserted->make_assignment();
+  side_effect_expr_nondett inserted_expr(nondet_var.type());
+  inserted_expr.set_nullable(
+    instr_info.get_nullable_type()==
+    nondet_instruction_infot::is_nullablet::TRUE);
+  inserted->code=code_assignt(nondet_var, inserted_expr);
+  inserted->code.add_source_location()=source_loc;
+  inserted->source_location=source_loc;
 
-  // Insert the new instructions into the instruction list
-  prog.destructive_insert(after_erased, new_instructions);
-  prog.update();
+  goto_program.update();
 
   return after_erased;
 }
 
 /*******************************************************************\
 
-Function: remove_java_nondet
+Function: replace_java_nondet
 
   Inputs:
-    message_handler: Object which prints messages.
-    symbol_table: The list of known symbols.
-    max_nondet_array_length: The maximum length of new nondet arrays.
-    goto_program: The program to modify.
+    goto_program: The goto program to modify.
 
- Purpose: Modify a goto_programt to replace 'nondet' library functions with
-          CBMC-native nondet expressions.
+ Purpose: Checks each instruction in the goto program to see whether
+          it is a method returning nondet.  If it is, replaces the
+          function call with an irep representing a nondet side
+          effect with an appropriate type.
 
 \*******************************************************************/
 
-static void remove_java_nondet(
-  message_handlert &message_handler,
-  symbol_tablet &symbol_table,
-  const size_t max_nondet_array_length,
-  goto_programt &goto_program)
+static void replace_java_nondet(goto_programt &goto_program)
 {
-  // Check each instruction.
-  // `process_target` may modify the list in place, and returns the next
-  // iterator to look at.
-  // Can't use forall_goto_program_instructions because we don't want to
-  // increment the iterator by one after every iteration.
-  for(auto instruction_iterator=std::begin(goto_program.instructions),
-        end=std::end(goto_program.instructions);
+  for(auto instruction_iterator=goto_program.instructions.cbegin(),
+        end=goto_program.instructions.cend();
       instruction_iterator!=end;)
   {
-    instruction_iterator=process_target(
-      message_handler,
-      symbol_table,
-      max_nondet_array_length,
+    instruction_iterator=check_and_replace_target(
       goto_program,
       instruction_iterator);
   }
 }
 
-void remove_java_nondet(
-  message_handlert &message_handler,
-  symbol_tablet &symbol_table,
-  const size_t max_nondet_array_length,
-  goto_functionst &goto_functions)
+
+
+void replace_java_nondet(goto_functionst &goto_functions)
 {
-  for(auto &f : goto_functions.function_map)
+  for(auto &goto_program : goto_functions.function_map)
   {
-    remove_java_nondet(
-      message_handler,
-      symbol_table,
-      max_nondet_array_length,
-      f.second.body);
+    replace_java_nondet(goto_program.second.body);
   }
   goto_functions.compute_location_numbers();
 }

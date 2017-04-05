@@ -41,7 +41,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
-#include <goto-programs/remove_java_nondet.h>
+#include <goto-programs/replace_java_nondet.h>
+#include <goto-programs/convert_nondet.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -931,11 +932,12 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("java-max-input-array-length")
         ? std::stoi(cmdline.get_value("java-max-input-array-length"))
         : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    remove_java_nondet(
-      ui_message_handler,
+    replace_java_nondet(goto_functions);
+    convert_nondet(
+      goto_functions,
       symbol_table,
-      max_nondet_array_length,
-      goto_functions);
+      ui_message_handler,
+      max_nondet_array_length);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
