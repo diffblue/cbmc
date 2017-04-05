@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
   // Test writing into an array using a pointer
   *q=4;
   assert(a[1]==4);
+
+  q[1]=5;
+  assert(a[1]==5);
+
   a[1]=2;
 
   // We now explore pointers and indexes each with more than one possible value
