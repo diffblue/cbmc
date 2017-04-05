@@ -9,13 +9,14 @@ sensitivity_test_constants_pointer_to_constants_array.c
 ^\[main.assertion.4\] .* assertion \*q==2: UNKNOWN$
 ^\[main.assertion.5\] .* assertion q-p==x: UNKNOWN$
 ^\[main.assertion.6\] .* assertion a\[1\]==4: UNKNOWN$
-^\[main.assertion.7\] .* assertion \*r==2: UNKNOWN$
-^\[main.assertion.8\] .* assertion \*r==1: UNKNOWN$
-^\[main.assertion.9\] .* assertion \*s==0: UNKNOWN$
-^\[main.assertion.10\] .* assertion \*s==1: UNKNOWN$
-^\[main.assertion.11\] .* assertion t==p\+i: UNKNOWN$
-^\[main.assertion.12\] .* assertion t-p==y: UNKNOWN$
-^\[main.assertion.13\] .* assertion a\[i\]==5: UNKNOWN$
-^\[main.assertion.14\] .* assertion a\[1\]==5: UNKNOWN$
+^\[main.assertion.7\] .* assertion a\[1\]==5: UNKNOWN$
+^\[main.assertion.8\] .* assertion \*r==2: UNKNOWN$
+^\[main.assertion.9\] .* assertion \*r==1: UNKNOWN$
+^\[main.assertion.10\] .* assertion \*s==0: UNKNOWN$
+^\[main.assertion.11\] .* assertion \*s==1: UNKNOWN$
+^\[main.assertion.12\] .* assertion t==p\+i: UNKNOWN$
+^\[main.assertion.13\] .* assertion t-p==y: UNKNOWN$
+^\[main.assertion.14\] .* assertion a\[i\]==5: UNKNOWN$
+^\[main.assertion.15\] .* assertion a\[1\]==5: UNKNOWN$
 --
 ^warning: ignoring
