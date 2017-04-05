@@ -20,4 +20,14 @@ void unreachable_instructions(
   const bool json,
   std::ostream &os);
 
+void unreachable_functions(
+  const goto_modelt &,
+  const bool json,
+  std::ostream &os);
+
+void reachable_functions(
+  const goto_modelt &,
+  const bool json,
+  std::ostream &os);
+
 #endif // CPROVER_GOTO_ANALYZER_UNREACHABLE_INSTRUCTIONS_H

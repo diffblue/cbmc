@@ -1,0 +1,8 @@
+FUTURE
+constant_propagation_05.c
+--constants --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file constant_propagation_05.c line 12 function main, assertion j!=3: FAILURE (if reachable)$
+--
+^warning: ignoring

@@ -133,6 +133,9 @@ Function: rename_symbolt::have_to_rename
 
 bool rename_symbolt::have_to_rename(const exprt &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   // first look at type
 
   if(have_to_rename(dest.type()))
@@ -274,6 +277,9 @@ Function: rename_symbolt::have_to_rename
 
 bool rename_symbolt::have_to_rename(const typet &dest) const
 {
+  if(expr_map.empty() && type_map.empty())
+    return false;
+
   if(dest.has_subtype())
     if(have_to_rename(dest.subtype()))
       return true;

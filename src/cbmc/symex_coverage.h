@@ -29,11 +29,12 @@ public:
   {
   }
 
-  void covered(goto_programt::const_targett location)
+  void covered(
+    goto_programt::const_targett from,
+    goto_programt::const_targett to)
   {
-    std::pair<coveraget::iterator, bool> entry=
-      coverage.insert(std::make_pair(location,
-                                     coverage_infot(location, 1)));
+    std::pair<coverage_innert::iterator, bool> entry=
+      coverage[from].insert({to, coverage_infot(from, to, 1)});
 
     if(!entry.second)
       ++(entry.first->second.num_executions);
@@ -49,17 +50,22 @@ protected:
   struct coverage_infot
   {
     coverage_infot(
-      goto_programt::const_targett _location,
+      goto_programt::const_targett _from,
+      goto_programt::const_targett _to,
       unsigned _num_executions):
-      location(_location), num_executions(_num_executions)
+      location(_from), num_executions(_num_executions),
+      succ(_to)
     {
     }
 
     goto_programt::const_targett location;
     unsigned num_executions;
+    goto_programt::const_targett succ;
   };
 
   typedef std::map<goto_programt::const_targett, coverage_infot>
+    coverage_innert;
+  typedef std::map<goto_programt::const_targett, coverage_innert>
     coveraget;
   coveraget coverage;
 

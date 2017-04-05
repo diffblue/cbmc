@@ -1,3 +1,14 @@
+5.8
+===
+
+* GOTO-INSTRUMENT: --reachability-slice can be used with --property to slice
+  down to a single property only.
+* GOTO-INSTRUMENT: New option --list-calls-args
+* GOTO-INSTRUMENT: New option --print-path-lenghts
+* GOTO-ANALYZER: New option --unreachable-functions, --reachable-functions
+* GOTO-INSTRUMENT: New option --undefined-function-is-assume-false
+
+
 5.7
 ===
 
@@ -20,6 +31,9 @@
 * GOTO-CC: GCC-style error/warning messages
 * GOTO-CC: New options --native-compiler and --native-linker to select the
   compiler/linker to be used when building combined native/goto object files.
+* CBMC, SYMEX, GOTO-INSTRUMENT: New option --drop-unused-functions. Removed
+  ambiguous --show-reachable-properties.
+* CBMC: New option --no-built-in-assertions
 
 
 5.6

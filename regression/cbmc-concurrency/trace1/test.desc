@@ -1,0 +1,9 @@
+CORE
+main.c
+--mm tso --trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^[[:space:]]*r2=1u \(.*\)$
+--
+^warning: ignoring

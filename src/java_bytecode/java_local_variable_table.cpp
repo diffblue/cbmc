@@ -352,7 +352,7 @@ static void populate_predecessor_map(
             // handling is presently vague (any subroutine is assumed to
             // be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from "
-                          << "out of range for " << it->var.name << " "
+                          << "out of range for " << it->var.name << ' '
                           << pred << " -> " << amapit->first
                           << messaget::eom;
             continue;
@@ -375,7 +375,7 @@ static void populate_predecessor_map(
             // assumed to be able to return to any callsite)
             msg.warning() << "Local variable table: ignoring flow from "
                           << "clashing variable for "
-                          << it->var.name << " " << pred << " -> "
+                          << it->var.name << ' ' << pred << " -> "
                           << amapit->first << messaget::eom;
             continue;
           }
@@ -549,9 +549,8 @@ static void merge_variable_table_entries(
 #ifdef DEBUG
   debug_out << "Merged " << merge_vars.size() << " variables named "
             << merge_into.var.name << "; new live range "
-            << merge_into.var.start_pc << "-"
-            << merge_into.var.start_pc + merge_into.var.length
-            << messaget::eom;
+            << merge_into.var.start_pc << '-'
+            << merge_into.var.start_pc + merge_into.var.length << '\n';
 #endif
 
   // Nuke the now-subsumed var-table entries:

@@ -14,3 +14,8 @@ show:
 			vim -o "$$dir/*.c" "$$dir/*.out"; \
 		fi; \
 	done;
+
+clean:
+	find -name '*.out' -execdir $(RM) '{}' \;
+	find -name '*.gb' -execdir $(RM) '{}' \;
+	$(RM) tests.log

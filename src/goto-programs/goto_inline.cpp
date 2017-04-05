@@ -218,7 +218,7 @@ void goto_partial_inline(
       // We also don't allow for the _start function to have any of its
       // function calls to be inlined
       if(!goto_function.body_available() ||
-         f_it->first==ID__start)
+         f_it->first==goto_functions.entry_point())
         continue;
 
       const goto_programt &goto_program=goto_function.body;

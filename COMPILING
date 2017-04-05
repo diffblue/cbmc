@@ -44,11 +44,17 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    git clone https://github.com/diffblue/cbmc cbmc-git
 
-2) On Debian/Ubuntu, do
+2) On Debian, do
 
    cd cbmc-git/src
    make minisat2-download
    make CXX=g++-6
+
+   On Ubuntu, or other distributions with recent g++, do
+
+   cd cbmc-git/src
+   make minisat2-download
+   make
 
    On Redhat/Fedora etc., do
 
@@ -64,7 +70,7 @@ COMPILATION ON SOLARIS 11
 1) As root, get the necessary development tools:
 
    pkg install system/header developer/lexer/flex developer/parser/bison developer/versioning/git
-   pkg install --accept developer/gcc-5
+   pkg install --accept developer/gcc/gcc-c++-5
 
 2) As a user, get the CBMC source via
 
@@ -85,9 +91,6 @@ COMPILATION ON SOLARIS 11
    That should do it. To run, you will need
 
    export LD_LIBRARY_PATH=/usr/gcc/4.9/lib
-
-   Do not attempt to compile with gcc-45 that comes with Solaris 11.
-   It will mis-optimize MiniSat2.
 
 
 COMPILATION ON FREEBSD 11
@@ -163,23 +166,21 @@ Follow these instructions:
    The patch removes the dependency on zlib and prevents a problem
    with a header file that is often unavailable on Windows.
 
-2) Adjust src/config.inc for the paths to item 1).
-
-3A) To compile with Cygwin, install the mingw compilers, and adjust
+2A) To compile with Cygwin, install the mingw compilers, and adjust
    the second line of config.inc to say
 
    BUILD_ENV = MinGW
 
-3B) To compile with Visual Studio, make sure you have at least Visual
+2B) To compile with Visual Studio, make sure you have at least Visual
    Studio version 12 (2013), and adjust the second line of config.inc to say
 
    BUILD_ENV = MSVC
 
-   Open the Visual Studio Command prompt, and then run the make.exe
-   from Cygwin from in there.
+   Open the Visual Studio Command prompt, and then bash.exe -login from
+   Cygwin from in there. 
 
-4) Type cd src; make - that should do it.
-   Note that "nmake" is not expected to work. Use "make".
+3) Type cd src; make - that should do it.
+
 
 (Optional) A Visual Studio project file can be generated with the script
 "generate_vcxproj" that is in the subdirectory "scripts".  The project file

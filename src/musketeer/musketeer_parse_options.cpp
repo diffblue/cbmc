@@ -200,7 +200,6 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 
   // we add the library, as some analyses benefit
 
-  status() << "Adding CPROVER library" << eom;
   link_to_library(symbol_table, goto_functions, ui_message_handler);
 
   namespacet ns(symbol_table);
@@ -215,7 +214,10 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     if(cmdline.isset("remove-function-pointers"))
     {
       status() << "remove soundly function pointers" << eom;
-      remove_function_pointers(symbol_table, goto_functions,
+      remove_function_pointers(
+        get_message_handler(),
+        symbol_table,
+        goto_functions,
         cmdline.isset("pointer-check"));
     }
 

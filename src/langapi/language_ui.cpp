@@ -31,10 +31,10 @@ Function: language_uit::language_uit
 \*******************************************************************/
 
 language_uit::language_uit(
-  const cmdlinet &__cmdline,
+  const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
   ui_message_handler(_ui_message_handler),
-  _cmdline(__cmdline)
+  _cmdline(cmdline)
 {
   set_message_handler(ui_message_handler);
 }
@@ -158,9 +158,7 @@ bool language_uit::typecheck()
 
   if(language_files.typecheck(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 
@@ -189,9 +187,7 @@ bool language_uit::final()
 
   if(language_files.final(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 

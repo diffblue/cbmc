@@ -883,8 +883,6 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(symbol_table, goto_functions);
 
     // add the library
-    status() << "Adding CPROVER library ("
-             << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(cmdline.isset("string-abstraction"))
@@ -894,6 +892,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
+      get_message_handler(),
       symbol_table,
       goto_functions,
       cmdline.isset("pointer-check"));
@@ -967,7 +966,7 @@ bool cbmc_parse_optionst::process_goto_program(
     if(cmdline.isset("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
-      status() << "Removing Unused Functions" << eom;
+      status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_functions, ui_message_handler);
     }
 
@@ -1117,7 +1116,6 @@ void cbmc_parse_optionst::help()
     " --property id                only check one specific property\n"
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -1163,6 +1161,7 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
@@ -1224,5 +1223,6 @@ void cbmc_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
+    " --verbosity #                verbosity level\n"
     "\n";
 }

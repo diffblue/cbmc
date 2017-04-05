@@ -1171,20 +1171,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.size()==1);
       code_blockt block;
-      if(!disable_runtime_checks)
-      {
-        // TODO throw NullPointerException instead
-        const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
-        const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-        const exprt not_equal_null(
-          binary_relation_exprt(lhs, ID_notequal, rhs));
-        code_assertt check(not_equal_null);
-        check.add_source_location()
-          .set_comment("Throw null");
-        check.add_source_location()
-          .set_property_class("null-pointer-exception");
-        block.move_to_operands(check);
-      }
+      // TODO throw NullPointerException instead
+      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+      const exprt not_equal_null(
+        binary_relation_exprt(lhs, ID_notequal, rhs));
+      code_assertt check(not_equal_null);
+      check.add_source_location()
+        .set_comment("Throw null");
+      check.add_source_location()
+        .set_property_class("null-pointer-exception");
+      block.move_to_operands(check);
 
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
@@ -1197,20 +1194,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="checkcast")
     {
-      if(!disable_runtime_checks)
-      {
-        // checkcast throws an exception in case a cast of object
-        // on stack to given type fails.
-        // The stack isn't modified.
-        // TODO: convert assertions to exceptions.
-        assert(op.size()==1 && results.size()==1);
-        binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
-        c=code_assertt(check);
-        c.add_source_location().set_comment("Dynamic cast check");
-        c.add_source_location().set_property_class("bad-dynamic-cast");
-      }
-      else
-        c=code_skipt();
+      // checkcast throws an exception in case a cast of object
+      // on stack to given type fails.
+      // The stack isn't modified.
+      // TODO: convert assertions to exceptions.
+      assert(op.size()==1 && results.size()==1);
+      binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
+      c=code_assertt(check);
+      c.add_source_location().set_comment("Dynamic cast check");
+      c.add_source_location().set_property_class("bad-dynamic-cast");
 
       results[0]=op[0];
     }
@@ -1423,13 +1415,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_blockt();
-      if(!disable_runtime_checks)
-      {
-        codet bounds_check=
-          get_array_bounds_check(deref, op[1], i_it->source_location);
-        bounds_check.add_source_location()=i_it->source_location;
-        c.move_to_operands(bounds_check);
-      }
+      codet bounds_check=
+        get_array_bounds_check(deref, op[1], i_it->source_location);
+      bounds_check.add_source_location()=i_it->source_location;
+      c.move_to_operands(bounds_check);
       code_assignt array_put(element, op[2]);
       array_put.add_source_location()=i_it->source_location;
       c.move_to_operands(array_put);
@@ -1469,11 +1458,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
 
-      if(!disable_runtime_checks)
-      {
-        c=get_array_bounds_check(deref, op[1], i_it->source_location);
-        c.add_source_location()=i_it->source_location;
-      }
+      c=get_array_bounds_check(deref, op[1], i_it->source_location);
+      c.add_source_location()=i_it->source_location;
       results[0]=java_bytecode_promotion(element);
     }
     else if(statement==patternt("?load"))
@@ -2014,17 +2000,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       c=code_blockt();
-      if(!disable_runtime_checks)
-      {
-        // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=from_integer(0, java_int_type());
-        binary_relation_exprt gezero(op[0], ID_ge, intzero);
-        code_assertt check(gezero);
-        check.add_source_location().set_comment("Array size < 0");
-        check.add_source_location()
-          .set_property_class("array-create-negative-size");
-        c.move_to_operands(check);
-      }
+      // TODO make this throw NegativeArrayIndexException instead.
+      constant_exprt intzero=from_integer(0, java_int_type());
+      binary_relation_exprt gezero(op[0], ID_ge, intzero);
+      code_assertt check(gezero);
+      check.add_source_location().set_comment("Array size < 0");
+      check.add_source_location()
+        .set_property_class("array-create-negative-size");
+      c.move_to_operands(check);
+
       if(max_array_length!=0)
       {
         constant_exprt size_limit=
@@ -2056,26 +2040,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       code_blockt checkandcreate;
-      if(!disable_runtime_checks)
-      {
-        // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=from_integer(0, java_int_type());
-        binary_relation_exprt gezero(op[0], ID_ge, intzero);
-        code_assertt check(gezero);
-        check.add_source_location().set_comment("Array size < 0");
-        check.add_source_location()
-          .set_property_class("array-create-negative-size");
-        checkandcreate.move_to_operands(check);
+      // TODO make this throw NegativeArrayIndexException instead.
+      constant_exprt intzero=from_integer(0, java_int_type());
+      binary_relation_exprt gezero(op[0], ID_ge, intzero);
+      code_assertt check(gezero);
+      check.add_source_location().set_comment("Array size < 0");
+      check.add_source_location()
+        .set_property_class("array-create-negative-size");
+      checkandcreate.move_to_operands(check);
 
-        if(max_array_length!=0)
-        {
-          constant_exprt size_limit=
-            from_integer(max_array_length, java_int_type());
-          binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
-          code_assumet assume_le_max_size(le_max_size);
-          checkandcreate.move_to_operands(assume_le_max_size);
-        }
+      if(max_array_length!=0)
+      {
+        constant_exprt size_limit=
+          from_integer(max_array_length, java_int_type());
+        binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
+        code_assumet assume_le_max_size(le_max_size);
+        checkandcreate.move_to_operands(assume_le_max_size);
       }
+
       const exprt tmp=tmp_variable("newarray", ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
@@ -2416,7 +2398,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // First create a simple flat list of basic blocks. We'll add lexical nesting
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
-  int previous_address=-1;
+  bool has_seen_previous_address=false;
+  unsigned previous_address=0;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
@@ -2431,7 +2414,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
     // Start a new lexical block if we've just entered a try block
-    if(!start_new_block && previous_address!=-1)
+    if(!start_new_block && has_seen_previous_address)
     {
       for(const auto &exception_row : method.exception_table)
         if(exception_row.start_pc==previous_address)
@@ -2461,6 +2444,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     start_new_block=address_pair.second.successors.size()>1;
 
     previous_address=address;
+    has_seen_previous_address=true;
   }
 
   // Find out where temporaries are used:
@@ -2543,7 +2527,6 @@ void java_bytecode_convert_method(
   const java_bytecode_parse_treet::methodt &method,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  bool disable_runtime_checks,
   size_t max_array_length,
   safe_pointer<std::vector<irep_idt> > needed_methods,
   safe_pointer<std::set<irep_idt> > needed_classes)
@@ -2551,7 +2534,6 @@ void java_bytecode_convert_method(
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
     message_handler,
-    disable_runtime_checks,
     max_array_length,
     needed_methods,
     needed_classes);

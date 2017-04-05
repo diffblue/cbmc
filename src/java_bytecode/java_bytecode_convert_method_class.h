@@ -30,13 +30,11 @@ public:
   java_bytecode_convert_methodt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    bool _disable_runtime_checks,
     size_t _max_array_length,
     safe_pointer<std::vector<irep_idt> > _needed_methods,
     safe_pointer<std::set<irep_idt> > _needed_classes):
     messaget(_message_handler),
     symbol_table(_symbol_table),
-    disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
     needed_methods(_needed_methods),
     needed_classes(_needed_classes)
@@ -56,7 +54,6 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
-  const bool disable_runtime_checks;
   const size_t max_array_length;
   safe_pointer<std::vector<irep_idt> > needed_methods;
   safe_pointer<std::set<irep_idt> > needed_classes;
