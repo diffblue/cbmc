@@ -160,7 +160,7 @@ public:
   typedef std::map<locationt, rangest> ranges_at_loct;
 
   const ranges_at_loct &get(const irep_idt &identifier) const;
-  const void clear_cache(const irep_idt &identifier) const
+  void clear_cache(const irep_idt &identifier) const
   {
     export_cache[identifier].clear();
   }

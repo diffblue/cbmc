@@ -10,8 +10,6 @@ Author: Matt Lewis
 
 #include "enumerating_loop_acceleration.h"
 
-// #define DEBUG
-
 bool enumerating_loop_accelerationt::accelerate(
   path_acceleratort &accelerator)
 {

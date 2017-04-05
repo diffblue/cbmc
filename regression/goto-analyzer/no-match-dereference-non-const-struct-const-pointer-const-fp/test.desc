@@ -1,0 +1,17 @@
+CORE
+main.c
+--show-goto-functions --verbosity 10 --pointer-check
+
+^Removing function pointers and virtual functions$
+^\s*IF \*container_container\.container == f1 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f2 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f3 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f4 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f5 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f6 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f7 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f8 THEN GOTO [0-9]$
+^\s*IF \*container_container\.container == f9 THEN GOTO [0-9]$
+^SIGNAL=0$
+--
+^warning: ignoring

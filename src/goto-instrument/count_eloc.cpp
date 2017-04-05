@@ -14,6 +14,8 @@ Date: December 2012
 #include <util/prefix.h>
 #include <util/file_util.h>
 
+#include <goto-programs/cfg.h>
+
 #include "count_eloc.h"
 
 typedef std::unordered_set<irep_idt, irep_id_hash> linest;
@@ -103,4 +105,84 @@ void list_eloc(const goto_functionst &goto_functions)
       for(const irep_idt &line : lines.second)
         std::cout << file << ':' << line << '\n';
     }
+}
+
+/*******************************************************************\
+
+Function: print_path_lengths
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void print_path_lengths(const goto_functionst &goto_functions)
+{
+  const irep_idt &entry_point=goto_functions.entry_point();
+  goto_functionst::function_mapt::const_iterator start=
+    goto_functions.function_map.find(entry_point);
+
+  if(start==goto_functions.function_map.end() ||
+     !start->second.body_available())
+  {
+    std::cout << "No entry point found, path length undefined\n";
+    return;
+  }
+
+  struct visited_cfg_nodet
+  {
+    bool visited;
+
+    visited_cfg_nodet():visited(false)
+    {
+    }
+  };
+
+  typedef cfg_baset<visited_cfg_nodet> cfgt;
+  cfgt cfg;
+  cfg(goto_functions);
+
+  const goto_programt &start_program=start->second.body;
+
+  const cfgt::entryt &start_node=
+    cfg.entry_map[start_program.instructions.begin()];
+  const cfgt::entryt &last_node=
+    cfg.entry_map[--start_program.instructions.end()];
+
+  cfgt::patht shortest_path;
+  cfg.shortest_path(start_node, last_node, shortest_path);
+  std::cout << "Shortest control-flow path: " << shortest_path.size()
+            << " instructions\n";
+
+  std::size_t n_loops=0, loop_ins=0;
+  forall_goto_functions(gf_it, goto_functions)
+    forall_goto_program_instructions(i_it, gf_it->second.body)
+      // loops or recursion
+      if(i_it->is_backwards_goto() ||
+         i_it==gf_it->second.body.instructions.begin())
+      {
+        const cfgt::entryt &node=cfg.entry_map[i_it];
+        cfgt::patht loop;
+        cfg.shortest_loop(node, loop);
+
+        if(!loop.empty())
+        {
+          ++n_loops;
+          loop_ins+=loop.size()-1;
+        }
+      }
+
+  if(n_loops>0)
+    std::cout << "Loop information: " << n_loops << " loops, "
+              << loop_ins << " instructions in shortest paths of loop bodies\n";
+
+  std::size_t n_reachable=0;
+  cfg.visit_reachable(start_node);
+  for(std::size_t i=0; i<cfg.size(); ++i)
+    if(cfg[i].visited)
+      ++n_reachable;
+  std::cout << "Reachable instructions: " << n_reachable << "\n";
 }

@@ -138,7 +138,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
     else if(expr.id()==ID_floatbv_rem)
       return float_utils.rem(bv0, bv1);
     else
-      assert(false);
+      throw "unexpected operator "+expr.id_string();
   }
   else if(type.id()==ID_vector || type.id()==ID_complex)
   {

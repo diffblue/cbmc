@@ -1,0 +1,12 @@
+FUTURE
+intervals10.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file intervals10.c line 8 function main, assertion j<=100: SUCCESS$
+^\[main.assertion.2\] file intervals10.c line 11 function main, assertion j<101: SUCCESS$
+^\[main.assertion.3\] file intervals10.c line 14 function main, assertion j>100: FAILURE (if reachable)$
+^\[main.assertion.4\] file intervals10.c line 17 function main, assertion j<99: UNKNOWN$
+^\[main.assertion.5\] file intervals10.c line 20 function main, assertion j==100: FAILURE (if reachable)$
+--
+^warning: ignoring

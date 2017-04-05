@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/expr_util.h>
 
 #include <ansi-c/c_types.h>
 #include <langapi/language_util.h>
@@ -309,7 +308,8 @@ void local_may_aliast::get_rec(
   {
     if(rhs.operands().size()>=3)
     {
-      get_rec(dest, make_binary(rhs), loc_info_src);
+      assert(rhs.op0().type().id()==ID_pointer);
+      get_rec(dest, rhs.op0(), loc_info_src);
     }
     else if(rhs.operands().size()==2)
     {

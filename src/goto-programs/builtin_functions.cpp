@@ -1245,6 +1245,13 @@ void goto_convertt::do_function_call_symbol(
       error() << identifier << " expected not to have LHS" << eom;
       throw 0;
     }
+
+    // __VERIFIER_error has abort() semantics, even if no assertions
+    // are being checked
+    goto_programt::targett a=dest.add_instruction(ASSUME);
+    a->guard=false_exprt();
+    a->source_location=function.source_location();
+    a->source_location.set("user-provided", true);
   }
   else if(has_prefix(
       id2string(identifier), "java::java.lang.AssertionError.<init>:"))

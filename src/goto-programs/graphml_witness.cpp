@@ -146,11 +146,61 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_rhs=assign.rhs();
     remove_l0_l1(clean_rhs);
 
-    result=from_expr(ns, identifier, assign.lhs())+" = "+
-           from_expr(ns, identifier, clean_rhs)+";";
+    std::string lhs=from_expr(ns, identifier, assign.lhs());
+    if(lhs.find('$')!=std::string::npos)
+      lhs="\\result";
+
+    result=lhs+" = "+from_expr(ns, identifier, clean_rhs)+";";
   }
 
   return result;
+}
+
+/*******************************************************************\
+
+Function: filter_out
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static bool filter_out(
+  const goto_tracet &goto_trace,
+  const goto_tracet::stepst::const_iterator &prev_it,
+  goto_tracet::stepst::const_iterator &it)
+{
+  if(it->hidden &&
+     (!it->is_assignment() ||
+      to_code_assign(it->pc->code).rhs().id()!=ID_side_effect ||
+      to_code_assign(it->pc->code).rhs().get(ID_statement)!=ID_nondet))
+    return true;
+
+  if(!it->is_assignment() && !it->is_goto() && !it->is_assert())
+    return true;
+
+  // we filter out steps with the same source location
+  // TODO: if these are assignments we should accumulate them into
+  //       a single edge
+  if(prev_it!=goto_trace.steps.end() &&
+     prev_it->pc->source_location==it->pc->source_location)
+    return true;
+
+  if(it->is_goto() && it->pc->guard.is_true())
+    return true;
+
+  const source_locationt &source_location=it->pc->source_location;
+
+  if(source_location.is_nil() ||
+     source_location.get_file().empty() ||
+     source_location.is_built_in() ||
+     source_location.get_line().empty())
+    return true;
+
+  return false;
 }
 
 /*******************************************************************\
@@ -184,20 +234,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       it!=goto_trace.steps.end();
       it++) // we cannot replace this by a ranged for
   {
-    const source_locationt &source_location=it->pc->source_location;
-
-    if(it->hidden ||
-       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
-       // we filter out steps with the same source location
-       // TODO: if these are assignments we should accumulate them into
-       //       a single edge
-       (prev_it!=goto_trace.steps.end() &&
-        prev_it->pc->source_location==it->pc->source_location) ||
-       (it->is_goto() && it->pc->guard.is_true()) ||
-       source_location.is_nil() ||
-       source_location.get_file().empty() ||
-       source_location.is_built_in() ||
-       source_location.get_line().empty())
+    if(filter_out(goto_trace, prev_it, it))
     {
       step_to_node[it->step_nr]=sink;
 
@@ -218,6 +255,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     }
 
     prev_it=it;
+
+    const source_locationt &source_location=it->pc->source_location;
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
@@ -278,21 +317,25 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           data_l.data=id2string(graphml[from].line);
         }
 
-        if((it->type==goto_trace_stept::ASSIGNMENT ||
-            it->type==goto_trace_stept::DECL) &&
+        if(it->type==goto_trace_stept::ASSIGNMENT &&
            it->lhs_object_value.is_not_nil() &&
            it->full_lhs.is_not_nil())
         {
-          irep_idt identifier=it->lhs_object.get_identifier();
+          if(!it->lhs_object_value.is_constant() ||
+             !it->lhs_object_value.has_operands() ||
+             !has_prefix(id2string(it->lhs_object_value.op0().get(ID_value)),
+                         "INVALID-"))
+          {
+            xmlt &val=edge.new_element("data");
+            val.set_attribute("key", "assumption");
+            code_assignt assign(it->lhs_object, it->lhs_object_value);
+            irep_idt identifier=it->lhs_object.get_identifier();
+            val.data=convert_assign_rec(identifier, assign);
 
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "assumption");
-          code_assignt assign(it->lhs_object, it->lhs_object_value);
-          val.data=convert_assign_rec(identifier, assign);
-
-          xmlt &val_s=edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          val_s.data=id2string(it->pc->source_location.get_function());
+            xmlt &val_s=edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            val_s.data=id2string(it->pc->source_location.get_function());
+          }
         }
         else if(it->type==goto_trace_stept::GOTO &&
                 it->pc->is_goto())

@@ -39,9 +39,6 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
-
 bool polynomial_acceleratort::accelerate(
   patht &loop,
   path_acceleratort &accelerator)

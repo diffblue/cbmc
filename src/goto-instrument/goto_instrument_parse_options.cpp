@@ -89,6 +89,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "code_contracts.h"
 #include "unwind.h"
 #include "model_argc_argv.h"
+#include "undefined_functions.h"
 
 /*******************************************************************\
 
@@ -456,6 +457,17 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("list-calls-args"))
+    {
+      do_indirect_call_and_rtti_removal();
+      do_partial_inlining();
+
+      namespacet ns(symbol_table);
+      list_calls_and_arguments(ns, goto_functions);
+
+      return 0;
+    }
+
     if(cmdline.isset("show-rw-set"))
     {
       namespacet ns(symbol_table);
@@ -547,6 +559,12 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("print-path-lengths"))
+    {
+      print_path_lengths(goto_functions);
+      return 0;
+    }
+
     if(cmdline.isset("list-symbols"))
     {
       show_symbol_table(true);
@@ -611,11 +629,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("list-undefined-functions"))
     {
       const namespacet ns(symbol_table);
-
-      Forall_goto_functions(it, goto_functions)
-        if(!ns.lookup(it->first).is_macro &&
-           !it->second.body_available())
-          std::cout << it->first << std::endl;
+      list_undefined_functions(goto_functions, ns, std::cout);
       return 0;
     }
 
@@ -744,6 +758,21 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      do_indirect_call_and_rtti_removal();
+
+      status() << "Removing unused functions" << eom;
+      remove_unused_functions(goto_functions, get_message_handler());
+    }
+
+    if(cmdline.isset("undefined-function-is-assume-false"))
+    {
+      do_indirect_call_and_rtti_removal();
+
+      undefined_function_abort_path(goto_functions);
+    }
+
     // write new binary?
     if(cmdline.args.size()==2)
     {
@@ -806,6 +835,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
 
   status() << "Function Pointer Removal" << eom;
   remove_function_pointers(
+    get_message_handler(),
     symbol_table,
     goto_functions,
     cmdline.isset("pointer-check"));
@@ -815,6 +845,39 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   remove_exceptions(symbol_table, goto_functions);
   status() << "Java instanceof removal" << eom;
   remove_instanceof(symbol_table, goto_functions);
+}
+
+/*******************************************************************\
+
+Function: goto_instrument_parse_optionst::do_remove_const_function_pointers_only
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Remove function pointers that can be resolved by analysing
+          const variables (i.e. can be resolved using
+          remove_const_function_pointers). Function pointers that cannot
+          be resolved will be left as function pointers.
+
+\*******************************************************************/
+
+void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
+{
+  // Don't bother if we've already done a full function pointer
+  // removal.
+  if(function_pointer_removal_done)
+  {
+    return;
+  }
+
+  status() << "Removing const function pointers only" << eom;
+  remove_function_pointers(
+    get_message_handler(),
+    symbol_table,
+    goto_functions,
+    cmdline.isset("pointer-check"),
+    true); // abort if we can't resolve via const pointers
 }
 
 /*******************************************************************\
@@ -983,7 +1046,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
        cmdline.isset("custom-bitvector-analysis"))
       config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
 
-    status() << "Adding CPROVER library" << eom;
+    // add the library
     link_to_library(symbol_table, goto_functions, ui_message_handler);
   }
 
@@ -1045,7 +1108,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // replace function pointers, if explicitly requested
   if(cmdline.isset("remove-function-pointers"))
+  {
     do_indirect_call_and_rtti_removal();
+  }
+  else if(cmdline.isset("remove-const-function-pointers"))
+  {
+    do_remove_const_function_pointers_only();
+  }
 
   if(cmdline.isset("function-inline"))
   {
@@ -1182,6 +1251,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("string-abstraction"))
   {
+    do_indirect_call_and_rtti_removal();
+    do_remove_returns();
+
     status() << "String Abstraction" << eom;
     string_abstraction(
       symbol_table,
@@ -1430,7 +1502,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("reachability-slice"))
   {
     status() << "Performing a reachability slice" << eom;
-    reachability_slicer(goto_functions);
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_functions, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_functions);
   }
 
   // full slice?
@@ -1497,6 +1572,8 @@ void goto_instrument_parse_optionst::help()
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --list-calls-args            list all function calls with their arguments\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1519,6 +1596,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    " --undefined-function-is-assume-false\n"
+    "                              convert each call to an undefined function to assume(false)\n"
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"
@@ -1555,6 +1634,7 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     "\n"

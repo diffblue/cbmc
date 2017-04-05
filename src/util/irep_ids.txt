@@ -251,6 +251,7 @@ concatenation
 infinity
 return_type
 typedef
+C_typedef #typedef
 extern
 static
 auto
@@ -681,7 +682,6 @@ read
 write
 native
 final
-_start
 compound_literal
 custom_bv
 custom_unsignedbv

@@ -211,5 +211,6 @@ void gcc_message_handlert::print(
   const std::string &message)
 {
   // gcc appears to send everything to cerr
-  std::cerr << message << '\n' << std::flush;
+  if(verbosity>=level)
+    std::cerr << message << '\n' << std::flush;
 }

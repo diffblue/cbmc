@@ -37,10 +37,10 @@ show:
 
 clean:
 	@for dir in *; do \
-		rm -f tests.log; \
+		$(RM) tests.log; \
 		if [ -d "$$dir" ]; then \
 			cd "$$dir"; \
-			rm -f *.out *.gb; \
+			$(RM) *.out *.gb; \
 			cd ..; \
 		fi \
 	done

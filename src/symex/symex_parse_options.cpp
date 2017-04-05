@@ -179,7 +179,7 @@ int symex_parse_optionst::doit()
 
   goto_model.set_message_handler(get_message_handler());
 
-  if(goto_model(cmdline.args))
+  if(goto_model(cmdline))
     return 6;
 
   if(process_goto_program(options))
@@ -355,7 +355,6 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
   try
   {
     // we add the library
-    status() << "Adding CPROVER library" << eom;
     link_to_library(goto_model, ui_message_handler);
 
     // do partial inlining
@@ -387,7 +386,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     if(cmdline.isset("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
-      status() << "Removing Unused Functions" << eom;
+      status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_model.goto_functions, ui_message_handler);
     }
 
@@ -691,7 +690,6 @@ void symex_parse_optionst::help()
     " --stop-on-fail               stop analysis once a failed property is detected\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --trace                      give a counterexample trace for failed properties\n"
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Frontend options:\n"
     " -I path                      set include path (C/C++)\n"
@@ -706,6 +704,7 @@ void symex_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --ppc-macos                  set MACOS/PPC architecture\n"
     " --mm model                   set memory model (default: sc)\n"
     " --arch                       set architecture (default: "
@@ -739,5 +738,6 @@ void symex_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
+    " --verbosity #                verbosity level\n"
     "\n";
 }

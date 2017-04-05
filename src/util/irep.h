@@ -283,11 +283,7 @@ public:
 
     void clear()
     {
-      #ifdef USE_DSTRING
       data.clear();
-      #else
-      data="";
-      #endif
       sub.clear();
       named_sub.clear();
       comments.clear();

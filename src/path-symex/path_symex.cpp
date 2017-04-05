@@ -22,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_symex.h"
 #include "path_symex_class.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif

@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/config.h>
+
 #include <ansi-c/cprover_library.h>
 
 #include "link_to_library.h"
@@ -53,6 +55,11 @@ void link_to_library(
 {
   // this needs a fixedpoint, as library functions
   // may depend on other library functions
+
+  messaget message(message_handler);
+
+  message.status() << "Adding CPROVER library ("
+                   << config.ansi_c.arch << ")" << messaget::eom;
 
   std::set<irep_idt> added_functions;
 

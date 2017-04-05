@@ -42,7 +42,6 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
-  disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("refine-strings");
   if(cmd.isset("java-max-input-array-length"))
@@ -170,11 +169,14 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
+    java_class_loader_limitt class_loader_limit(
+      get_message_handler(),
+      java_cp_include_files);
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
       jar_filet::manifestt manifest=
-        java_class_loader.jar_pool(path).get_manifest();
+        java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
       if(manifest_main_class!="")
@@ -186,8 +188,8 @@ bool java_bytecode_languaget::parse(
     // Do we have one now?
     if(main_class.empty())
     {
-      status() << "JAR file without entry point: loading it all" << eom;
-      java_class_loader.load_entire_jar(path);
+      status() << "JAR file without entry point: loading class files" << eom;
+      java_class_loader.load_entire_jar(class_loader_limit, path);
       for(const auto &kv : java_class_loader.jar_map.at(path).entries)
         main_jar_classes.push_back(kv.first);
     }
@@ -387,9 +389,16 @@ static void gather_needed_globals(
 {
   if(e.id()==ID_symbol)
   {
-    const auto &sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
-    if(sym.is_static_lifetime)
-      needed.add(sym);
+    // If the symbol isn't in the symbol table at all, then it is defined
+    // on an opaque type (i.e. we don't have the class definition at this point)
+    // and will be created during the typecheck phase.
+    // We don't mark it as 'needed' as it doesn't exist yet to keep.
+    auto findit=symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    if(findit!=symbol_table.symbols.end() &&
+       findit->second.is_static_lifetime)
+    {
+      needed.add(findit->second);
+    }
   }
   else
     forall_operands(opit, e)
@@ -518,7 +527,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second,
          symbol_table,
          get_message_handler(),
-         disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
          lazy_methods_mode,
@@ -639,7 +647,6 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           *parsed_method.second,
           symbol_table,
           get_message_handler(),
-          disable_runtime_checks,
           max_user_array_length,
           safe_pointer<std::vector<irep_idt> >::create_non_null(
             &method_worklist2),
@@ -754,7 +761,6 @@ void java_bytecode_languaget::convert_lazy_method(
     *lazy_method_entry.second,
     symtab,
     get_message_handler(),
-    disable_runtime_checks,
     max_user_array_length);
 }
 

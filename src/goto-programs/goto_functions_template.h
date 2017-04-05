@@ -16,6 +16,7 @@ Date: June 2003
 
 #include <util/std_types.h>
 #include <util/symbol.h>
+#include <util/cprover_prefix.h>
 
 template <class bodyT>
 class goto_function_templatet
@@ -123,7 +124,7 @@ public:
   static inline irep_idt entry_point()
   {
     // do not confuse with C's "int main()"
-    return ID__start;
+    return CPROVER_PREFIX "_start";
   }
 
   void swap(goto_functions_templatet &other)

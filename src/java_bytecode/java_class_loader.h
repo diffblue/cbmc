@@ -10,10 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
 
 #include <map>
+#include <regex>
+#include <set>
 
 #include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
+#include "java_class_loader_limit.h"
 #include "jar_file.h"
 
 class java_class_loadert:public messaget
@@ -21,11 +24,7 @@ class java_class_loadert:public messaget
 public:
   java_bytecode_parse_treet &operator()(const irep_idt &);
 
-  void set_java_cp_include_files(std::string &java_cp_include_files)
-  {
-    jar_pool.set_java_cp_include_files(java_cp_include_files);
-    jar_pool.set_message_handler(get_message_handler());
-  }
+  void set_java_cp_include_files(std::string &);
 
   // maps class names to the parse trees
   typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
@@ -39,7 +38,7 @@ public:
     jar_files.push_back(f);
   }
 
-  void load_entire_jar(const std::string &f);
+  void load_entire_jar(java_class_loader_limitt &, const std::string &f);
 
   jar_poolt jar_pool;
 
@@ -60,12 +59,14 @@ public:
   typedef std::map<irep_idt, jar_map_entryt> jar_mapt;
   jar_mapt jar_map;
 
-  void read_jar_file(const irep_idt &);
+  void read_jar_file(java_class_loader_limitt &, const irep_idt &);
 
   // get a parse tree for given class
-  java_bytecode_parse_treet &get_parse_tree(const irep_idt &);
+  java_bytecode_parse_treet &get_parse_tree(
+    java_class_loader_limitt &, const irep_idt &);
 
   std::list<std::string> jar_files;
+  std::string java_cp_include_files;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

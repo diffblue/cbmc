@@ -21,8 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 
@@ -642,7 +640,7 @@ bool Parser::rDefinition(cpp_itemt &item)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rDefinition 1 " << t
-            << "\n";
+            << '\n';
   #endif
 
   if(t==';')
@@ -1238,11 +1236,11 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   {
   case tdk_decl:
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "BODY: " << body << std::endl;
+    std::cout << std::string(__indent, ' ') << "BODY: "
+              << body.pretty() << '\n';
     std::cout << std::string(__indent, ' ') << "TEMPLATE_TYPE: "
-              << template_type << std::endl;
+              << template_type.pretty() << '\n';
     #endif
-
     body.add(ID_template_type).swap(template_type);
     body.set(ID_is_template, true);
     decl.swap(body);
@@ -1912,9 +1910,8 @@ bool Parser::rIntegralDeclaration(
       #ifdef DEBUG
       std::cout << std::string(__indent, ' ')
                 << "Parser::rIntegralDeclaration 8 "
-                << declaration << "\n";
+                << declaration.pretty() << '\n';
       #endif
-
       lex.get_token(tk);
       return true;
     }
@@ -5118,10 +5115,9 @@ bool Parser::rClassBody(exprt &body)
       // body=Ptree::List(ob, nil, new Leaf(tk));
       return true;        // error recovery
     }
-
     #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::rClassBody " << member
-              << std::endl;
+    std::cout << std::string(__indent, ' ') << "Parser::rClassBody "
+              << member.pretty() << '\n';
     #endif
 
     members.move_to_operands(
@@ -7583,7 +7579,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 0 "
-            << lex.LookAhead(0) << " " << lex.current_token().text <<"\n";
+            << lex.LookAhead(0) << ' ' << lex.current_token().text << '\n';
   #endif
 
   switch(lex.LookAhead(0))
@@ -9245,8 +9241,8 @@ bool Parser::rExprStatement(codet &statement)
     if(rDeclarationStatement(statement))
     {
       #ifdef DEBUG
-      std::cout << std::string(__indent, ' ') << "rDe: " << statement
-                << std::endl;
+      std::cout << std::string(__indent, ' ') << "rDe "
+                << statement.pretty() << '\n';
       #endif
       return true;
     }

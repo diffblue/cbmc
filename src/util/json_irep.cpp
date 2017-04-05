@@ -164,8 +164,8 @@ void json_irept::convert_from_json(const jsont &in, irept &out) const
   }
 
   for(const auto &named_sub : in["namedSub"].object)
-    convert_from_json(named_sub.second, out.get_named_sub()[named_sub.first]);
+    convert_from_json(named_sub.second, out.add(named_sub.first));
 
   for(const auto &comment : in["comment"].object)
-    convert_from_json(comment.second, out.get_comments()[comment.first]);
+    convert_from_json(comment.second, out.add(comment.first));
 }
