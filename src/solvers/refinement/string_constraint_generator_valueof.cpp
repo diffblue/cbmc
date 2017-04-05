@@ -511,25 +511,35 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
     binary_relation_exprt(chr, ID_ge, zero_char),
     binary_relation_exprt(chr, ID_le, nine_char));
 
+  // TODO: we should have implications in the other direction for correct
+  // correct => |str| > 0
+  exprt non_empty=str.axiom_for_is_longer_than(from_integer(1, index_type));
+  axioms.push_back(implies_exprt(correct, non_empty));
+
+  // correct => (str[0] = '+' or '-' || '0' <= str[0] <= '9')
   or_exprt correct_first(
     or_exprt(starts_with_minus, starts_with_plus), starts_with_digit);
-  exprt has_first=str.axiom_for_is_longer_than(from_integer(1, index_type));
-  implies_exprt a1(correct, and_exprt(has_first, correct_first));
-  axioms.push_back(a1);
+  axioms.push_back(implies_exprt(correct, correct_first));
 
-  exprt not_too_long=str.axiom_for_is_shorter_than(max_size);
-  axioms.push_back(not_too_long);
+  // correct => str[0]='+' or '-' ==> |str| > 1
+  implies_exprt contains_digit(
+    or_exprt(starts_with_minus, starts_with_plus),
+    str.axiom_for_is_longer_than(from_integer(2, index_type)));
+  axioms.push_back(implies_exprt(correct, contains_digit));
 
+  // correct => |str| < max_size
+  axioms.push_back(
+    implies_exprt(correct, str.axiom_for_is_shorter_than(max_size)));
+
+  // forall 1 <= qvar < |str| . correct => '0'<= str[qvar] <= '9'
   symbol_exprt qvar=fresh_univ_index("number_format", index_type);
-
   and_exprt is_digit(
     binary_relation_exprt(str[qvar], ID_ge, zero_char),
     binary_relation_exprt(str[qvar], ID_le, nine_char));
-
-  string_constraintt a2(
+  string_constraintt all_digits(
     qvar, from_integer(1, index_type), str.length(), correct, is_digit);
+  axioms.push_back(all_digits);
 
-  axioms.push_back(a2);
   return correct;
 }
 
@@ -575,10 +585,29 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 
     for(unsigned j=1; j<size; j++)
     {
-      sum=plus_exprt(
-        mult_exprt(sum, ten),
+      mult_exprt ten_sum(sum, ten);
+      if(j>=9)
+      {
+        // We have to be careful about overflows
+        div_exprt div(sum, ten);
+        equal_exprt no_overflow(div, sum);
+        axioms.push_back(no_overflow);
+      }
+
+      sum=plus_exprt_with_overflow_check(
+        ten_sum,
         typecast_exprt(minus_exprt(str[j], zero_char), type));
-      first_value=mult_exprt(first_value, ten);
+
+      mult_exprt first(first_value, ten);
+      if(j>=9)
+      {
+        // We have to be careful about overflows
+        div_exprt div_first(first, ten);
+        implies_exprt no_overflow_first(
+          starts_with_digit, equal_exprt(div_first, first_value));
+        axioms.push_back(no_overflow_first);
+      }
+      first_value=first;
     }
 
     // If the length is `size`, we add axioms:
