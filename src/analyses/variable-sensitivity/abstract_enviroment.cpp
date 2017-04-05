@@ -194,6 +194,7 @@ bool abstract_environmentt::assign(
     return !bottom_at_start;
   }
 
+  abstract_object_pointert lhs_value=nullptr;
   // Build a stack of index, member and dereference accesses which
   // we will work through the relevant abstract objects
   exprt s = expr;
@@ -207,54 +208,67 @@ bool abstract_environmentt::assign(
     }
     else
     {
-      // Attempting to assign to something unreasonable
-      // Your goto-program is broken
-      std::ostringstream error_builder;
-      error_builder << "unsupported assign ";
-      error_builder << s.id();
-      throw error_builder.str();
+      lhs_value=eval(s, ns);
+      break;
     }
   }
 
-  const symbol_exprt &symbol_expr(to_symbol_expr(s));
-
-  // This is the root abstract object that is in the map of abstract objects
-  // It might not have the same type as value if the above stack isn't empty
-  abstract_object_pointert final_value;
-
-  if(!stactions.empty())
+  if(!lhs_value)
   {
-    // The symbol is not in the map - it is therefore top
-    abstract_object_pointert symbol_object;
+    assert(s.id()==ID_symbol);
+    const symbol_exprt &symbol_expr(to_symbol_expr(s));
     if(map.find(symbol_expr)==map.end())
     {
-      symbol_object=abstract_object_factory(
+      lhs_value=abstract_object_factory(
         symbol_expr.type(), ns, true, false);
     }
     else
     {
-      symbol_object=map[symbol_expr];
+      lhs_value=map[symbol_expr];
     }
-    final_value=write(symbol_object, value, stactions, ns, false);
+  }
+
+  abstract_object_pointert final_value;
+
+  // This is the root abstract object that is in the map of abstract objects
+  // It might not have the same type as value if the above stack isn't empty
+
+
+  if(!stactions.empty())
+  {
+    // The symbol is not in the map - it is therefore top
+    final_value=write(lhs_value, value, stactions, ns, false);
   }
   else
   {
+    // If we don't have a symbol on the LHS, then we must have some expression
+    // that we can write to (i.e. a pointer, an array, a struct) This appears
+    // to be none of that.
+    if(s.id()!=ID_symbol)
+    {
+      throw "invalid l-value";
+    }
     // We can assign the AO directly to the symbol
     final_value=value;
   }
 
-  const typet &lhs_type=ns.follow(symbol_expr.type());
+  const typet &lhs_type=ns.follow(lhs_value->type());
   const typet &rhs_type=ns.follow(final_value->type());
 
   // Write the value for the root symbol back into the map
   assert(lhs_type==rhs_type);
-  if(final_value->is_top())
+  // If LHS was directly the symbol
+  if(s.id()==ID_symbol)
   {
-    map.erase(symbol_expr);
-  }
-  else
-  {
-    map[symbol_expr]=final_value;
+    symbol_exprt symbol_expr=to_symbol_expr(s);
+    if(final_value->is_top())
+    {
+      map.erase(symbol_expr);
+    }
+    else
+    {
+      map[symbol_expr]=final_value;
+    }
   }
   return true;
 }
