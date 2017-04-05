@@ -561,11 +561,6 @@ bool interval_domaint::ai_simplify(
     a.make_top();
     a.assume(condition, ns);
 
-#ifdef DEBUG
-    a.output(std::cout, interval_analysis, ns);
-    d.output(std::cout, interval_analysis, ns);
-#endif
-
     if(!a.join(d))
     {
       unchanged=condition.is_true();
