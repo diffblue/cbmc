@@ -750,6 +750,7 @@ IREP_ID_ONE(string_constraint)
 IREP_ID_ONE(string_not_contains_constraint)
 IREP_ID_ONE(cprover_char_literal_func)
 IREP_ID_ONE(cprover_string_literal_func)
+IREP_ID_ONE(cprover_string_array_of_char_pointer_func)
 IREP_ID_ONE(cprover_string_char_at_func)
 IREP_ID_ONE(cprover_string_char_set_func)
 IREP_ID_ONE(cprover_string_code_point_at_func)
@@ -814,6 +815,7 @@ IREP_ID_ONE(array_replace)
 IREP_ID_ONE(switch_case_number)
 IREP_ID_ONE(cprover_string_array_of_char_pointer_func)
 IREP_ID_ONE(skip_initialize)
+IREP_ID_ONE(is_nondet_nullable)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
