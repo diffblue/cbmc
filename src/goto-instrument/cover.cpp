@@ -16,7 +16,6 @@ Date: May 2016
 #include <util/prefix.h>
 #include <util/string2int.h>
 #include <util/cprover_prefix.h>
-#include <util/config.h>
 
 #include <json/json_parser.h>
 
@@ -102,6 +101,23 @@ public:
 
 /*******************************************************************\
 
+Function: coverage_goalst::coverage_goalst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+coverage_goalst::coverage_goalst()
+{
+  no_trivial_tests=false;
+}
+
+/*******************************************************************\
+
 Function: coverage_goalst::get_coverage
 
   Inputs:
@@ -112,61 +128,65 @@ Function: coverage_goalst::get_coverage
 
 \*******************************************************************/
 
-bool coverage_goalst::get_coverage_goals(
-  const std::string &coverage_file,
-  message_handlert &message_handler,
-  coverage_goalst &goals)
+coverage_goalst coverage_goalst::get_coverage_goals(const std::string &coverage,
+                                   message_handlert &message_handler)
 {
   jsont json;
+  coverage_goalst goals;
   source_locationt source_location;
+  goals.set_no_trivial_tests(false);
 
   // check coverage file
-  if(parse_json(coverage_file, message_handler, json))
+  if(parse_json(coverage, message_handler, json))
   {
     messaget message(message_handler);
-    message.error() << coverage_file << " file is not a valid json file"
+    message.error() << coverage << " file is not a valid json file"
                     << messaget::eom;
-    return true;
+    exit(6);
   }
 
   // make sure that we have an array of elements
   if(!json.is_array())
   {
     messaget message(message_handler);
-    message.error() << "expecting an array in the " <<  coverage_file
+    message.error() << "expecting an array in the " <<  coverage
                     << " file, but got "
                     << json << messaget::eom;
-    return true;
+    exit(6);
   }
 
-  for(const auto &goal : json.array)
+  irep_idt file, function, line;
+  for(jsont::arrayt::const_iterator
+      it=json.array.begin();
+      it!=json.array.end();
+      it++)
   {
     // get the file of each existing goal
-    irep_idt file=goal["file"].value;
+    file=(*it)["file"].value;
     source_location.set_file(file);
 
     // get the function of each existing goal
-    irep_idt function=goal["function"].value;
+    function=(*it)["function"].value;
     source_location.set_function(function);
 
     // get the lines array
-    if(goal["lines"].is_array())
+    if((*it)["lines"].is_array())
     {
-      for(const auto &line_json : goal["lines"].array)
+      for(const jsont & entry : (*it)["lines"].array)
       {
         // get the line of each existing goal
-        irep_idt line=line_json["number"].value;
+        line=entry["number"].value;
         source_location.set_line(line);
-        goals.add_goal(source_location);
+        goals.set_goals(source_location);
       }
     }
   }
-  return false;
+  return goals;
 }
 
 /*******************************************************************\
 
-Function: coverage_goalst::add_goal
+Function: coverage_goalst::set_goals
 
   Inputs:
 
@@ -176,9 +196,35 @@ Function: coverage_goalst::add_goal
 
 \*******************************************************************/
 
-void coverage_goalst::add_goal(source_locationt goal)
+void coverage_goalst::set_goals(source_locationt goal)
 {
   existing_goals.push_back(goal);
+}
+
+/*******************************************************************\
+
+Function: has_common_location
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool has_common_location(
+source_locationt given_location,
+std::vector<source_locationt>::iterator &known_location)
+{
+  if(given_location.get_file().compare(known_location->get_file())==0 &&
+    given_location.get_function().compare(known_location->get_function())==0 &&
+    given_location.get_line().compare(known_location->get_line())==0)
+  {
+    return true;
+  }
+  else
+    return false;
 }
 
 /*******************************************************************\
@@ -193,16 +239,59 @@ Function: coverage_goalst::is_existing_goal
 
 \*******************************************************************/
 
-bool coverage_goalst::is_existing_goal(source_locationt source_location) const
+bool coverage_goalst::is_existing_goal(source_locationt source_location)
 {
-  for(const auto &existing_loc : existing_goals)
+  std::vector<source_locationt>::iterator it = existing_goals.begin();
+  while(it!=existing_goals.end())
   {
-    if(source_location.get_file()==existing_loc.get_file() &&
-       source_location.get_function()==existing_loc.get_function() &&
-       source_location.get_line()==existing_loc.get_line())
-      return true;
+    if(has_common_location(source_location, it))
+    {
+      if(source_location.get_java_bytecode_index().empty())
+        break;
+      else if(!source_location.get_java_bytecode_index().compare(
+        it->get_java_bytecode_index())==0)
+        break;
+    }
+    ++it;
   }
-  return false;
+  if(it == existing_goals.end())
+    return true;
+  else
+    return false;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::set_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void coverage_goalst::set_no_trivial_tests(const bool trivial)
+{
+  no_trivial_tests=trivial;
+}
+
+/*******************************************************************\
+
+Function: coverage_goalst::get_no_trivial_tests
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+const bool coverage_goalst::get_no_trivial_tests()
+{
+  return no_trivial_tests;
 }
 
 /*******************************************************************\
@@ -1218,79 +1307,8 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
-  bool function_only)
+  coverage_goalst &goals)
 {
-  coverage_goalst goals; // empty already covered goals
-  instrument_cover_goals(
-    symbol_table,
-    goto_program,
-    criterion,
-    goals,
-    function_only,
-    false);
-}
-
-/*******************************************************************\
-
-Function: program_is_trivial
-
-  Inputs: Program `goto_program`
-
- Outputs: Returns true if trivial
-
- Purpose: Call a goto_program trivial unless it has:
-          * Any declarations
-          * At least 2 branches
-          * At least 5 assignments
-
-\*******************************************************************/
-
-bool program_is_trivial(const goto_programt &goto_program)
-{
-  unsigned long count_assignments=0, count_goto=0;
-  forall_goto_program_instructions(i_it, goto_program)
-  {
-    if(i_it->is_goto())
-    {
-      if((++count_goto)>=2)
-        return false;
-    }
-    else if(i_it->is_assign())
-    {
-      if((++count_assignments)>=5)
-        return false;
-    }
-    else if(i_it->is_decl())
-      return false;
-  }
-
-  return true;
-}
-
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_programt &goto_program,
-  coverage_criteriont criterion,
-  const coverage_goalst &goals,
-  bool function_only,
-  bool ignore_trivial)
-{
-  // exclude trivial coverage goals of a goto program
-  if(ignore_trivial && program_is_trivial(goto_program))
-    return;
-
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
   std::set<unsigned> blocks_done;
@@ -1305,30 +1323,21 @@ void instrument_cover_goals(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    std::string curr_function = id2string(i_it->function);
-
-    // if the --cover-function-only flag is set, then we only add coverage
-    // instrumentation for the entry function
-    bool cover_curr_function=
-      !function_only ||
-      curr_function.find(config.main)!=std::string::npos;
-
     switch(criterion)
     {
     case coverage_criteriont::ASSERTION:
       // turn into 'assert(false)' to avoid simplification
-      if(i_it->is_assert() && cover_curr_function)
+      if(i_it->is_assert())
       {
         i_it->guard=false_exprt();
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
-        i_it->source_location.set_function(i_it->function);
       }
       break;
 
     case coverage_criteriont::COVER:
       // turn __CPROVER_cover(x) into 'assert(!x)'
-      if(i_it->is_function_call() && cover_curr_function)
+      if(i_it->is_function_call())
       {
         const code_function_callt &code_function_call=
           to_code_function_call(i_it->code);
@@ -1345,7 +1354,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(i_it->function);
         }
       }
       else if(i_it->is_assert())
@@ -1366,14 +1374,11 @@ void instrument_cover_goals(
             basic_blocks.source_location_map[block_nr];
 
           // check whether the current goal already exists
-          if(!goals.is_existing_goal(source_location) &&
+          if(goals.is_existing_goal(source_location) &&
              !source_location.get_file().empty() &&
-             source_location.get_file()[0]!='<' &&
-             cover_curr_function)
+             source_location.get_file()[0]!='<')
           {
-            std::string comment=
-              "function "+id2string(i_it->function)+" block "+b;
-            const irep_idt function=i_it->function;
+            std::string comment="block "+b;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
@@ -1381,7 +1386,7 @@ void instrument_cover_goals(
             i_it->source_location.set(
               ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
-            i_it->source_location.set_function(function);
+
             i_it++;
           }
         }
@@ -1392,8 +1397,7 @@ void instrument_cover_goals(
       if(i_it->is_assert())
         i_it->make_skip();
 
-      if(i_it==goto_program.instructions.begin() &&
-         cover_curr_function)
+      if(i_it==goto_program.instructions.begin())
       {
         // we want branch coverage to imply 'entry point of function'
         // coverage
@@ -1408,7 +1412,6 @@ void instrument_cover_goals(
         t->source_location.set_comment(comment);
         t->source_location.set(ID_coverage_criterion, coverage_criterion);
         t->source_location.set_property_class(property_class);
-        t->source_location.set_function(i_it->function);
       }
 
       if(i_it->is_goto() && !i_it->guard.is_true())
@@ -1421,7 +1424,6 @@ void instrument_cover_goals(
 
         exprt guard=i_it->guard;
         source_locationt source_location=i_it->source_location;
-        source_location.set_function(i_it->function);
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(not_exprt(guard));
@@ -1447,7 +1449,6 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
-      if(cover_curr_function)
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -1458,14 +1459,12 @@ void instrument_cover_goals(
           const std::string c_string=from_expr(ns, "", c);
 
           const std::string comment_t="condition `"+c_string+"' true";
-          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(c);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
 
           const std::string comment_f="condition `"+c_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1474,7 +1473,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
         }
 
         for(std::size_t i=0; i<conditions.size()*2; i++)
@@ -1487,7 +1485,6 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
-      if(cover_curr_function)
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1498,14 +1495,12 @@ void instrument_cover_goals(
           const std::string d_string=from_expr(ns, "", d);
 
           const std::string comment_t="decision `"+d_string+"' true";
-          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(d);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
 
           const std::string comment_f="decision `"+d_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1514,7 +1509,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
         }
 
         for(std::size_t i=0; i<decisions.size()*2; i++)
@@ -1531,7 +1525,6 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
-      if(cover_curr_function)
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -1558,7 +1551,6 @@ void instrument_cover_goals(
           std::string p_string=from_expr(ns, "", p);
 
           std::string comment_t=description+" `"+p_string+"' true";
-          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           // i_it->make_assertion(p);
           i_it->make_assertion(not_exprt(p));
@@ -1566,7 +1558,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1576,7 +1567,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
         }
 
         std::set<exprt> controlling;
@@ -1594,7 +1584,6 @@ void instrument_cover_goals(
           std::string description=
             "MC/DC independence condition `"+p_string+"'";
 
-          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(p));
           // i_it->make_assertion(p);
@@ -1602,7 +1591,6 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(description);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
-          i_it->source_location.set_function(function);
         }
 
         for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
@@ -1638,23 +1626,19 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
-  const coverage_goalst &goals,
-  bool function_only,
-  bool ignore_trivial)
+  coverage_goalst &goals)
 {
   Forall_goto_functions(f_it, goto_functions)
   {
-    if(f_it->first==goto_functions.entry_point() ||
-       f_it->first==(CPROVER_PREFIX "initialize"))
+    if(f_it->first==ID__start ||
+       f_it->first==CPROVER_PREFIX "initialize")
       continue;
 
     instrument_cover_goals(
       symbol_table,
       f_it->second.body,
       criterion,
-      goals,
-      function_only,
-      ignore_trivial);
+      goals);
   }
 }
 
@@ -1673,16 +1657,61 @@ Function: instrument_cover_goals
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont criterion,
-  bool function_only)
+  coverage_criteriont criterion)
 {
-  // empty set of existing goals
-  coverage_goalst goals;
-  instrument_cover_goals(
-    symbol_table,
-    goto_functions,
-    criterion,
-    goals,
-    function_only,
-    false);
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    if(f_it->first==ID__start ||
+       f_it->first=="__CPROVER_initialize")
+      continue;
+
+    // empty set of existing goals
+    coverage_goalst goals;
+    instrument_cover_goals(symbol_table, f_it->second.body,
+                           criterion, goals);
+  }
 }
+
+/*******************************************************************\
+
+Function: consider_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool consider_goals(
+  const goto_programt &goto_program,
+  coverage_goalst &goals)
+{
+  // check whether we should eliminate trivial goals
+  if(!goals.get_no_trivial_tests())
+    return true;
+
+  bool result;
+  unsigned long count_assignments=0, count_goto=0, count_decl=0;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_goto())
+      ++count_goto;
+    else if(i_it->is_assign())
+      ++count_assignments;
+    else if(i_it->is_decl())
+      ++count_decl;
+  }
+
+  // check whether this is a constructor/destructor or a get/set (pattern)
+  if(!count_goto && !count_assignments && !count_decl)
+    result=false;
+  else
+    result = !((count_decl==0) && (count_goto<=1) &&
+             (count_assignments>0 && count_assignments<5));
+
+  return result;
+}
+
