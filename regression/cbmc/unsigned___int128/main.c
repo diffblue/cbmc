@@ -29,6 +29,9 @@ void reduce(
     __CPROVER_assume(in[1]<((widelimb)1<<126));
     __CPROVER_assume(in[2]<((widelimb)1<<126));
     __CPROVER_assume(in[3]<((widelimb)1<<126));
+    __CPROVER_assume(in[4]<((widelimb)1<<126));
+    __CPROVER_assume(in[5]<((widelimb)1<<126));
+    __CPROVER_assume(in[6]<((widelimb)1<<126));
 
     static const widelimb two127p15 = (((widelimb) 1) << 127) +
         (((widelimb) 1) << 15);

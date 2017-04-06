@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --unsigned-overflow-check --signed-overflow-check --function reduce
 ^EXIT=0$
