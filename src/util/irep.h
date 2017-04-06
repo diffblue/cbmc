@@ -14,8 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iosfwd>
 
-#include "irep_ids.h"
-
+#define USE_DSTRING
 #define SHARING
 // #define HASH_CODE
 #define USE_MOVE
@@ -26,6 +25,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #else
 #include <map>
 #endif
+
+#ifdef USE_DSTRING
+#include "dstring.h"
+#endif
+
+#include "irep_ids.h"
 
 #ifdef USE_DSTRING
 typedef dstringt irep_idt;
