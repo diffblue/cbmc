@@ -177,6 +177,7 @@ string_exprt string_constraint_generatort::fresh_string(
   symbol_exprt content=fresh_symbol("string_content", type.get_content_type());
   string_exprt str(length, content, type);
   created_strings.insert(str);
+  add_default_axioms(str);
   return str;
 }
 
@@ -246,7 +247,7 @@ string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
 
 /*******************************************************************\
 
-Function: string_constraint_generatort::add_default_constraints
+Function: string_constraint_generatort::add_default_axioms
 
   Inputs:
     s - a string expression
@@ -267,7 +268,8 @@ Function: string_constraint_generatort::add_default_constraints
 void string_constraint_generatort::add_default_axioms(
   const string_exprt &s)
 {
-  s.axiom_for_is_longer_than(from_integer(0, s.length().type()));
+  axioms.push_back(
+    s.axiom_for_is_longer_than(from_integer(0, s.length().type())));
   if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_is_shorter_than(max_string_length));
 
