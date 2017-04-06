@@ -97,6 +97,11 @@ private:
   // by the solver
   replace_mapt current_model;
 
+  // Length of char arrays found during concretization
+  std::map<exprt, exprt> found_length;
+  // Content of char arrays found during concretization
+  std::map<exprt, array_exprt> found_content;
+
   void add_equivalence(const irep_idt & lhs, const exprt & rhs);
 
   void display_index_set();
@@ -145,13 +150,15 @@ private:
     std::map<exprt, int> &m, const typet &type, bool negated=false) const;
 
   exprt simplify_sum(const exprt &f) const;
+  template <typename T1, typename T2>
+  void pad_vector(
+    std::vector<T1> &result,
+    std::set<T2> &initialized,
+    T1 last_concretized) const;
 
   void concretize_string(const exprt &expr);
   void concretize_results();
   void concretize_lengths();
-
-  // Length of char arrays found during concretization
-  std::map<exprt, exprt> found_length;
 
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;
@@ -159,4 +166,36 @@ private:
   std::string string_of_array(const array_exprt &arr);
 };
 
+/// Utility function for concretization of strings. Copies concretized values to
+/// the left to initialize the unconcretized indices of concrete_array.
+/// \param concrete_array: the vector to populate
+/// \param initialized: the vector containing the indices of the concretized
+///   values
+/// \param last_concretized: initial value of the last concretized index
+template <typename T1, typename T2>
+void string_refinementt::pad_vector(
+  std::vector<T1> &concrete_array,
+  std::set<T2> &initialized,
+  T1 last_concretized) const
+{
+  // Pad the concretized values to the left to assign the uninitialized
+  // values of result. The indices greater than concretize_limit are
+  // already assigned to last_concretized.
+  for(auto j=initialized.rbegin(); j!=initialized.rend();)
+  {
+    size_t i=*j;
+    // The leftmost index to pad is the value + 1 of the next element in
+    // 'initialized'. Since we cannot use the binary '+' operator on set
+    // iterators, we must increment the iterator here instead of in the
+    // for loop.
+    j++;
+    size_t leftmost_index_to_pad=(j!=initialized.rend()?*(j)+1:0);
+    // pad until we reach the next initialized index (right to left)
+    while(i>leftmost_index_to_pad)
+      concrete_array[(i--)-1]=last_concretized;
+    assert(i==leftmost_index_to_pad);
+    if(i>0)
+      last_concretized=concrete_array[i-1];
+  }
+}
 #endif

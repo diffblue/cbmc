@@ -286,29 +286,55 @@ void string_refinementt::concretize_string(const exprt &expr)
     if(!to_integer(length, found_length))
     {
       assert(found_length.is_long());
-      if(found_length<0)
+      assert(found_length>=0);
+      assert(found_length.to_long()<=generator.max_string_length);
+      size_t concretize_limit=found_length.to_long();
+      exprt content_expr=str.content();
+      std::vector<exprt> result;
+
+      if(index_set[str.content()].empty())
+        return;
+
+      // Use the last index as the default character value
+      exprt last_concretized=simplify_expr(
+        get(str[minus_exprt(length, from_integer(1, length.type()))]), ns);
+      result.resize(concretize_limit, last_concretized);
+
+      // Keep track of the indexes for which we have actual values
+      std::set<size_t> initialized;
+
+      for(const auto &i : index_set[str.content()])
       {
-        // Lengths should not be negative.
-        // TODO: Add constraints no the sign of string lengths.
-        debug() << "concretize_results: WARNING found length is negative"
-                << eom;
-      }
-      else
-      {
-        size_t concretize_limit=found_length.to_long();
-        assert(concretize_limit<=generator.max_string_length);
-        concretize_limit=concretize_limit>generator.max_string_length?
-              generator.max_string_length:concretize_limit;
-        exprt content_expr=str.content();
-        for(size_t i=0; i<concretize_limit; ++i)
+        mp_integer mp_index;
+        exprt simple_i=simplify_expr(get(i), ns);
+        if(to_integer(simple_i, mp_index) ||
+           mp_index<0 ||
+           mp_index>=concretize_limit)
         {
-          auto i_expr=from_integer(i, str.length().type());
-          debug() << "Concretizing " << from_expr(content_expr)
-                  << " / " << i << eom;
-          current_index_set[str.content()].insert(i_expr);
-          index_set[str.content()].insert(i_expr);
+          debug() << "concretize_string: ignoring out of bound index: "
+                  << from_expr(simple_i) << eom;
+        }
+        else
+        {
+          // Add an entry in the result vector
+          size_t index=mp_index.to_long();
+          exprt str_i=simplify_expr(str[simple_i], ns);
+          exprt value=simplify_expr(get(str_i), ns);
+          result[index]=value;
+          initialized.insert(index);
         }
       }
+
+      // Pad the concretized values to the left to assign the uninitialized
+      // values of result. The indices greater than concretize_limit are
+      // already assigned to last_concretized.
+      pad_vector(result, initialized, last_concretized);
+
+      array_exprt arr(to_array_type(content.type()));
+      arr.operands()=result;
+      debug() << "Concretized " << from_expr(content_expr)
+              << " = " << from_expr(arr) << eom;
+      found_content[content]=arr;
     }
   }
 }
@@ -472,6 +498,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
   }
 
+  found_length.clear();
+  found_content.clear();
+
   initial_index_set(universal_axioms);
   update_index_set(cur);
   cur.clear();
@@ -511,7 +540,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         if(do_concretizing)
         {
           concretize_results();
-          do_concretizing=false;
+          return resultt::D_SATISFIABLE;
         }
         else
         {
@@ -639,6 +668,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 
   if(arr_val.id()=="array-list")
   {
+    std::set<unsigned> initialized;
     for(size_t i=0; i<arr_val.operands().size()/2; i++)
     {
       exprt index=arr_val.operands()[i*2];
@@ -649,9 +679,14 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
         {
           exprt value=arr_val.operands()[i*2+1];
           to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
+          initialized.insert(idx);
         }
       }
     }
+
+    // Pad the concretized values to the left to assign the uninitialized
+    // values of result.
+    pad_vector(concrete_array, initialized, concrete_array[n-1]);
   }
   else if(arr_val.id()==ID_array)
   {
@@ -1567,6 +1602,10 @@ exprt string_refinementt::get(const exprt &expr) const
   replace_expr(symbol_resolve, ecopy);
   if(is_char_array(ecopy.type()))
   {
+    auto it_content=found_content.find(ecopy);
+    if(it_content!=found_content.end())
+      return it_content->second;
+
     auto it=found_length.find(ecopy);
     if(it!=found_length.end())
       return get_array(ecopy, it->second);
