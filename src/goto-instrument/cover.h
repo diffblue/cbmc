@@ -27,7 +27,7 @@ public:
     message_handlert &message_handler,
     coverage_goalst &goals);
   void add_goal(source_locationt goal);
-  bool is_existing_goal(source_locationt source_location) const;
+  bool is_existing_goal(source_locationt source_loc) const;
 
 private:
   std::vector<source_locationt> existing_goals;
