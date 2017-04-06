@@ -121,6 +121,7 @@ string_exprt string_constraint_generatort::fresh_string(
   symbol_exprt content=fresh_symbol("string_content", type.get_content_type());
   string_exprt str(length, content, type);
   created_strings.insert(str);
+  add_default_axioms(str);
   return str;
 }
 

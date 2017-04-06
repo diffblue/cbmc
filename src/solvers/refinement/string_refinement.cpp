@@ -280,7 +280,6 @@ void string_refinementt::concretize_string(const exprt &expr)
   {
     string_exprt str=to_string_expr(expr);
     exprt length=get(str.length());
-    add_lemma(equal_exprt(str.length(), length));
     exprt content=str.content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
@@ -298,6 +297,7 @@ void string_refinementt::concretize_string(const exprt &expr)
       else
       {
         size_t concretize_limit=found_length.to_long();
+        assert(concretize_limit<=generator.max_string_length);
         concretize_limit=concretize_limit>generator.max_string_length?
               generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
@@ -532,6 +532,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       }
       break;
     default:
+      debug() << "check_SAT: default return " << static_cast<int>(res) << eom;
       return res;
     }
   }
