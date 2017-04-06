@@ -31,6 +31,8 @@ src/ansi-c/gcc_builtin_headers_ia32-2.inc
 src/ansi-c/gcc_builtin_headers_ia32.inc
 src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
+src/util/irep_ids.h
+src/util/irep_ids.inc
 
 # regression/test files
 *.out

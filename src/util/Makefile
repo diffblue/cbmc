@@ -30,9 +30,30 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = util$(LIBEXT)
+CLEANFILES = util$(LIBEXT) \
+             irep_ids.h irep_ids.inc \
+             irep_ids_convert$(EXEEXT) irep_ids_convert$(OBJEXT) irep_ids_convert.d
 
 all: util$(LIBEXT)
+
+###############################################################################
+
+irep_ids.h: irep_ids.txt irep_ids_convert$(EXEEXT)
+	./irep_ids_convert$(EXEEXT) header < $< > $@
+
+irep_ids.inc: irep_ids.txt irep_ids_convert$(EXEEXT)
+	./irep_ids_convert$(EXEEXT) table < $< > $@
+
+irep_ids.cpp: irep_ids.inc irep_ids.h
+
+irep_ids_convert$(EXEEXT): irep_ids_convert.cpp
+	$(LINKNATIVE)
+
+generated_files: irep_ids.h irep_ids.inc
+
+# Most of the others will need irep_ids.h,
+# which we first need to generate.
+$(OBJ): irep_ids.h
 
 util$(LIBEXT): $(OBJ)
 	$(LINKLIB)
