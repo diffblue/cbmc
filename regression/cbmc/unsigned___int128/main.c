@@ -1,6 +1,6 @@
 # include <stdint.h>
 
-typedef unsigned __int128 uint128_t; 
+typedef unsigned __int128 uint128_t;
 
 typedef uint64_t limb;
 typedef uint128_t widelimb;
@@ -8,9 +8,9 @@ typedef uint128_t widelimb;
 typedef limb felem[4];
 typedef widelimb widefelem[7];
 
-felem p = {0x1FFFFFFFFFFFFFF, 
-           0xFFFFFFFFFFFFFF, 
-           0xFFFFE000000000, 
+felem p = {0x1FFFFFFFFFFFFFF,
+           0xFFFFFFFFFFFFFF,
+           0xFFFFE000000000,
            0x00000000000002};
 
 
@@ -18,8 +18,12 @@ felem p = {0x1FFFFFFFFFFFFFF,
  * Reduce seven 128-bit coefficients to four 64-bit coefficients.
  * Requires in[i] < 2^126,
  * ensures out[0] < 2^56, out[1] < 2^56, out[2] < 2^56, out[3] <= 2^56 + 2^16 */
-void reduce(felem out, const widefelem in)
+void reduce(
+    limb out0, limb out1, limb out2, limb out3, widelimb in0, widelimb in1,
+    widelimb in2, widelimb in3, widelimb in4, widelimb in5, widelimb in6)
 {
+    felem out = {out0, out1, out2, out3};
+    const widefelem in = {in0, in1, in2, in3, in4, in5, in6};
 
     __CPROVER_assume(in[0]<(widelimb)((widelimb)1<<126));
     __CPROVER_assume(in[1]<((widelimb)1<<126));
@@ -75,9 +79,9 @@ void reduce(felem out, const widefelem in)
 
     output[2] += output[1] >> 56;
     /* output[2] < 2^57 + 2^72 */
-    
+
     assert(output[2] < (((widelimb)1)<<57)+(((widelimb)1)<<72));
-    
+
     out[1] = output[1] & 0x00ffffffffffffff;
     output[3] += output[2] >> 56;
     /* output[3] <= 2^56 + 2^16 */
