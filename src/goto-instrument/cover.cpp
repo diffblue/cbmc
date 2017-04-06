@@ -161,14 +161,20 @@ void coverage_goalst::add_goal(source_locationt goal)
   existing_goals.push_back(goal);
 }
 
-bool coverage_goalst::is_existing_goal(source_locationt source_location) const
+/// compare the value of the current goal to the existing ones
+/// \param source_loc: source location of the current goal
+/// \return true : if the current goal exists false : otherwise
+bool coverage_goalst::is_existing_goal(source_locationt source_loc) const
 {
   for(const auto &existing_loc : existing_goals)
   {
-    if(source_location.get_file()==existing_loc.get_file() &&
-       source_location.get_function()==existing_loc.get_function() &&
-       source_location.get_line()==existing_loc.get_line())
-      return true;
+    if((source_loc.get_file()==existing_loc.get_file()) &&
+       (source_loc.get_function()==existing_loc.get_function()) &&
+       (source_loc.get_line()==existing_loc.get_line()) &&
+       (source_loc.get_java_bytecode_index().empty() ||
+         (source_loc.get_java_bytecode_index()==
+           existing_loc.get_java_bytecode_index())))
+        return true;
   }
   return false;
 }
