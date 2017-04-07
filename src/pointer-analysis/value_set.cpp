@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set.h"
 #include "add_failed_symbols.h"
+#include "dynamic_object_name.h"
 
 const value_sett::object_map_dt value_sett::object_map_dt::blank;
 object_numberingt value_sett::object_numbering;
@@ -808,11 +809,12 @@ void value_sett::get_value_set_rec(
       const typet &dynamic_type=
         static_cast<const typet &>(expr.find("#type"));
 
-      dynamic_object_exprt dynamic_object(dynamic_type);
-      dynamic_object.set_instance(location_number);
-      dynamic_object.valid()=true_exprt();
+      // Create the most-recent-allocation dynamic-object
+      dynamic_object_exprt dynamic_object_recent(dynamic_type, true);
+      dynamic_object_recent.set_instance(location_number);
+      dynamic_object_recent.valid()=true_exprt();
 
-      insert(dest, dynamic_object, 0);
+      insert(dest, dynamic_object_recent, 0);
     }
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
@@ -902,10 +904,7 @@ void value_sett::get_value_set_rec(
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(expr);
-
-    const std::string prefix=
-      "value_set::dynamic_object"+
-      std::to_string(dynamic_object.get_instance());
+    std::string prefix=get_dynamic_object_name(dynamic_object);
 
     // first try with suffix
     const std::string full_name=prefix+suffix;
@@ -1466,9 +1465,12 @@ void value_sett::do_free(
     {
       const dynamic_object_exprt &dynamic_object=
         to_dynamic_object_expr(object);
+      dynamic_object_idt key_dynamic_object=std::make_pair(
+        dynamic_object.get_instance(),
+        dynamic_object.get_recency());
 
       if(dynamic_object.valid().is_true())
-        to_mark.insert(dynamic_object.get_instance());
+        to_mark.insert(key_dynamic_object);
     }
   }
 
@@ -1497,7 +1499,11 @@ void value_sett::do_free(
         const dynamic_object_exprt &dynamic_object=
           to_dynamic_object_expr(object);
 
-        if(to_mark.count(dynamic_object.get_instance())==0)
+        dynamic_object_idt key_dynamic_object=std::make_pair(
+          dynamic_object.get_instance(),
+          dynamic_object.get_recency());
+
+        if(to_mark.count(key_dynamic_object)==0)
           set(new_object_map, o_it);
         else
         {
@@ -1564,10 +1570,7 @@ void value_sett::assign_rec(
   {
     const dynamic_object_exprt &dynamic_object=
       to_dynamic_object_expr(lhs);
-
-    const std::string name=
-      "value_set::dynamic_object"+
-      std::to_string(dynamic_object.get_instance());
+    std::string name=get_dynamic_object_name(dynamic_object);
 
     entryt &e=get_entry(entryt(name, suffix), lhs.type(), ns);
 
