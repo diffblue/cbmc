@@ -7,7 +7,16 @@ int main(int argc, char *argv[])
   int a[3]={1, 2, 3};
   int *p=a;
   assert(p==&a[0]);
+
   assert(*p==1);
+
+  assert(p[1]==2);
+  assert(1[p]==2);
+
+  assert(*(p+1)==2);
+  assert(*(1+p)==2);
+
+  assert(*(p-1)==1);
 
   // Test pointer arithmetic
   int *q=&a[1];
@@ -22,8 +31,14 @@ int main(int argc, char *argv[])
   *q=4;
   assert(a[1]==4);
 
-  q[1]=5;
+  p[1]=5;
   assert(a[1]==5);
+
+  *(p+1)=6;
+  assert(a[1]==6);
+
+  *(1+p)=7;
+  assert(a[1]==7);
 
   a[1]=2;
 
