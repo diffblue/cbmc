@@ -24,8 +24,9 @@ matrix:
       before_install:
           #we create symlink to non-ccache gcc, to be used in tests
         - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
-        - brew install ccache
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - ccache -M 1G
       env: COMPILER=g++
 
     # OS X using clang++
@@ -34,11 +35,12 @@ matrix:
       compiler: clang
       cache: ccache
       before_install:
-        - brew install ccache
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
+        - ccache -M 1G
 
     # Ubuntu Linux with glibc using g++-5
     - os: linux
