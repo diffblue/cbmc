@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/ssa_expr.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>

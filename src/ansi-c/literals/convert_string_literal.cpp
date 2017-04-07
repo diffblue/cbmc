@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/unicode.h>
 
 #include "../string_constant.h"
-#include "../c_types.h"
 
 #include "unescape_string.h"
 #include "convert_string_literal.h"

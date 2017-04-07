@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <sstream>
 
+#include <util/c_types.h>
 #include <util/format_constant.h>
 #include <util/simplify_expr.h>
 
-#include "c_types.h"
 #include "printf_formatter.h"
 
 /*******************************************************************\

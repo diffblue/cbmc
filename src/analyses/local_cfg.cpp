@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <langapi/language_util.h>
 
 #endif

@@ -10,7 +10,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "jsil_types.h"
 

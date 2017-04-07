@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com,
 #include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "value_set_fivrns.h"
 

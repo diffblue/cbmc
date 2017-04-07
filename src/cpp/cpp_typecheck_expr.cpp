@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_sizeof.h>
 

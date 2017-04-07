@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_qualifiers.h>
 #include <analyses/does_remove_const.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "remove_skip.h"
 #include "remove_function_pointers.h"

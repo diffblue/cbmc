@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
@@ -13,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_sizeof.h"
 #include "c_typecast.h"
-#include "c_types.h"
 
 /*******************************************************************\
 

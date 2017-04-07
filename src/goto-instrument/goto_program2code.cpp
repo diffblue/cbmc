@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
@@ -479,9 +480,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       static_cast<typet const&>(r.find(ID_C_va_arg_type));
 
     dereference_exprt deref(
-      typecast_exprt(
-        from_integer(0, signedbv_typet(config.ansi_c.pointer_width)),
-        pointer_typet(va_arg_type)),
+      null_pointer_exprt(pointer_typet(va_arg_type)),
       va_arg_type);
 
     type_of.arguments().push_back(deref);
@@ -530,7 +529,7 @@ void goto_program2codet::convert_assign_rec(
     {
       index_exprt index(
           assign.lhs(),
-          from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+          from_integer(i++, index_type()),
           type.subtype());
       convert_assign_rec(code_assignt(index, *it), dest);
     }

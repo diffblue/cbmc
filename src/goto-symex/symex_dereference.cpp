@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_symex.h"
 #include "symex_dereference_state.h"

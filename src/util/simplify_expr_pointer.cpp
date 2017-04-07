@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "c_types.h"
 #include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
@@ -100,11 +101,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
         {
-          unsignedbv_typet int_type(config.ansi_c.pointer_width);
           pointer_typet pointer_type;
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
-            from_integer(step_size*index+address, int_type), pointer_type);
+            from_integer(step_size*index+address, index_type()), pointer_type);
           exprt new_expr=dereference_exprt(typecast_expr, expr.type());
           expr=new_expr;
           result=true;
@@ -137,11 +137,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
-            unsignedbv_typet int_type(config.ansi_c.pointer_width);
             pointer_typet pointer_type;
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
-              from_integer(address+offset, int_type), pointer_type);
+              from_integer(address+offset, index_type()), pointer_type);
             exprt new_expr=dereference_exprt(typecast_expr, expr.type());
             expr=new_expr;
             result=true;
