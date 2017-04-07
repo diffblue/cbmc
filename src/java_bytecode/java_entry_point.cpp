@@ -98,6 +98,19 @@ Function: java_static_lifetime_init
 
 \*******************************************************************/
 
+struct static_initializer_callt
+{
+  symbol_exprt initializer_symbol;
+  bool is_enum;
+};
+
+static bool static_initializer_call_enum_lt(
+  const static_initializer_callt &a,
+  const static_initializer_callt &b)
+{
+  return a.is_enum && !b.is_enum;
+}
+
 bool java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
@@ -158,6 +171,8 @@ bool java_static_lifetime_init(
 
   // we now need to run all the <clinit> methods
 
+  std::vector<static_initializer_callt> clinits;
+
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();
@@ -167,12 +182,36 @@ bool java_static_lifetime_init(
        it->second.type.id()==ID_code &&
        it->second.mode==ID_java)
     {
-      code_function_callt function_call;
-      function_call.lhs()=nil_exprt();
-      function_call.function()=it->second.symbol_expr();
-      function_call.add_source_location()=source_location;
-      code_block.add(function_call);
+      const irep_idt symbol_name=
+        it->second.symbol_expr().get_identifier();
+      const std::string &symbol_str=id2string(symbol_name);
+      const std::string suffix(".<clinit>:()V");
+      assert(has_suffix(symbol_str, suffix));
+      const std::string class_symbol_name=
+        symbol_str.substr(0, symbol_str.size()-suffix.size());
+      const symbolt &class_symbol=symbol_table.lookup(class_symbol_name);
+      clinits.push_back(
+        {
+          it->second.symbol_expr(),
+          class_symbol.type.get_bool(ID_enumeration)
+        }
+      );
     }
+  }
+
+  // Call enumeration initialisers before anything else.
+  // Really we should be calling them the first time they're referenced,
+  // as acccording to the JVM spec, but this ought to do the trick for
+  // most cases with much less effort.
+  std::sort(clinits.begin(), clinits.end(), static_initializer_call_enum_lt);
+
+  for(const auto &clinit : clinits)
+  {
+    code_function_callt function_call;
+    function_call.lhs()=nil_exprt();
+    function_call.function()=clinit.initializer_symbol;
+    function_call.add_source_location()=source_location;
+    code_block.add(function_call);
   }
 
   return false;
