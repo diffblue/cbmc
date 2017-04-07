@@ -34,13 +34,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 Constructor: string_refinementt
 
-     Inputs: a namespace, a decision procedure, a bound on the number
-             of refinements and a boolean flag `concretize_result`
+     Inputs:
+       _ns - a namespace
+       _prop - a decision procedure
+       refinement_bound - a bound on the number of refinements
 
     Purpose: refinement_bound is a bound on the number of refinement allowed.
-             if `concretize_result` is set to true, at the end of the decision
-             procedure, the solver try to find a concrete value for each
-             character
 
 \*******************************************************************/
 
@@ -368,6 +367,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     {
       debug() << "(sr::set_to) WARNING: ignoring "
               << from_expr(expr) << " [inconsistent types]" << eom;
+      debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
+      debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
       return;
     }
 
@@ -1545,7 +1546,7 @@ exprt string_refinementt::substitute_array_lists(exprt expr) const
                         expr.operands()[0],
                         expr.operands()[1]);
 
-    for(size_t i=2; i<expr.operands().size()/2; i++)
+    for(size_t i=1; i<expr.operands().size()/2; i++)
     {
       ret_expr=with_exprt(ret_expr,
                           expr.operands()[i*2],
