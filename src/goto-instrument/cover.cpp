@@ -1110,7 +1110,7 @@ void instrument_cover_goals(
         t->source_location.set_function(i_it->function);
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true() &&
+      if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
          !i_it->source_location.is_built_in())
       {
         std::string b=std::to_string(basic_blocks[i_it]);
