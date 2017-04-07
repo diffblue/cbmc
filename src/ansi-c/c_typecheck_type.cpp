@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/pointer_offset_size.h>
 
-#include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"
 #include "padding.h"
@@ -661,7 +660,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   }
 
   // the subtype must have constant size
-  exprt size_expr=c_sizeof(type.subtype(), *this);
+  exprt size_expr=size_of_expr(type.subtype(), *this);
 
   simplify(size_expr, *this);
 

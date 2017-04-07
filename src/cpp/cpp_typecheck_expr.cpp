@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cstdlib>
 
+#include <util/pointer_offset_size.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
@@ -22,7 +23,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/c_sizeof.h>
 
 #include <linking/zero_initializer.h>
 
@@ -856,8 +856,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // runtime library
 
   exprt &sizeof_expr=static_cast<exprt &>(expr.add(ID_sizeof));
-  sizeof_expr=c_sizeof(expr.type().subtype(), *this);
-  sizeof_expr.add("#c_sizeof_type")=expr.type().subtype();
+  sizeof_expr=size_of_expr(expr.type().subtype(), *this);
+  sizeof_expr.add(ID_C_c_sizeof_type)=expr.type().subtype();
 }
 
 static exprt collect_comma_expression(const exprt &src)
