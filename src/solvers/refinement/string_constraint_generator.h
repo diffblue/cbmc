@@ -312,11 +312,14 @@ private:
     return args;
   }
 
+private:
+  // Helper functions
   exprt int_of_hex_char(const exprt &chr) const;
   exprt is_high_surrogate(const exprt &chr) const;
   exprt is_low_surrogate(const exprt &chr) const;
   exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
+  bool is_constant_string(const string_exprt &expr) const;
 };
 
 #endif

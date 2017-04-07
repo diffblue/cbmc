@@ -158,6 +158,25 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   return tc_issuffix;
 }
 
+/// tells whether the given string is a constant
+/// \param expr: a string expression
+/// \return a Boolean
+bool string_constraint_generatort::is_constant_string(
+  const string_exprt &expr) const
+{
+  if(expr.id()!=ID_struct ||
+     expr.operands().size()!=2 ||
+     expr.length().id()!=ID_constant ||
+     expr.content().id()!=ID_array)
+    return false;
+  for(const auto &element : expr.content().operands())
+  {
+    if(element.id()!=ID_constant)
+      return false;
+  }
+  return true;
+}
+
 /// add axioms corresponding to the String.contains java function
 /// \par parameters: function application with two string arguments
 /// \return a Boolean expression
@@ -165,46 +184,90 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   const function_application_exprt &f)
 {
   assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
-  symbol_exprt contains=fresh_boolean("contains");
-  typecast_exprt tc_contains(contains, f.type());
   string_exprt s0=get_string_expr(args(f, 2)[0]);
   string_exprt s1=get_string_expr(args(f, 2)[1]);
+  bool constant=is_constant_string(s1);
+
+  symbol_exprt contains=fresh_boolean("contains");
   const refined_string_typet ref_type=to_refined_string_type(s0.type());
   const typet &index_type=ref_type.get_index_type();
 
   // We add axioms:
-  // a1 : contains => s0.length >= s1.length
-  // a2 : 0 <= startpos <= s0.length-s1.length
-  // a3 : forall qvar<s1.length. contains => s1[qvar]=s0[startpos + qvar]
-  // a4 : !contains => s1.length > s0.length
-  //       || (forall startpos <= s0.length-s1.length.
-  //             exists witness<s1.length &&s1[witness]!=s0[witness + startpos]
+  // a1 : contains ==> |s0| >= |s1|
+  // a2 : 0 <= startpos <= |s0|-|s1|
+  // a3 : forall qvar < |s1|. contains ==> s1[qvar] = s0[startpos + qvar]
+  // a4 : !contains ==> |s1| > |s0| ||
+  //      (forall startpos <= |s0| - |s1|.
+  //         exists witness < |s1|. s1[witness] != s0[witness + startpos])
 
   implies_exprt a1(contains, s0.axiom_for_is_longer_than(s1));
   axioms.push_back(a1);
 
   symbol_exprt startpos=fresh_exist_index("startpos_contains", index_type);
   minus_exprt length_diff(s0.length(), s1.length());
-  and_exprt a2(
+  and_exprt bounds(
     axiom_for_is_positive_index(startpos),
     binary_relation_exprt(startpos, ID_le, length_diff));
+  implies_exprt a2(contains, bounds);
   axioms.push_back(a2);
 
-  symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
-  exprt qvar_shifted=plus_exprt(qvar, startpos);
-  string_constraintt a3(
-    qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
-  axioms.push_back(a3);
+  if(constant)
+  {
+    // If the string is constant, we can use a more efficient axiom for a3:
+    // contains ==> AND_{i < |s1|} s1[i] = s0[startpos + i]
+    mp_integer s1_length;
+    assert(!to_integer(s1.length(), s1_length));
+    exprt::operandst conjuncts;
+    for(mp_integer i=0; i<s1_length; ++i)
+    {
+      exprt expr_i=from_integer(i, index_type);
+      plus_exprt shifted_i(expr_i, startpos);
+      conjuncts.push_back(equal_exprt(s1[expr_i], s0[shifted_i]));
+    }
+    implies_exprt a3(contains, conjunction(conjuncts));
+    axioms.push_back(a3);
 
-  // We rewrite the axiom for !contains as:
-  // forall startpos <= |s0|-|s1|.  (!contains &&|s0| >= |s1| )
-  //      ==> exists witness<|s1|. s1[witness]!=s0[startpos+witness]
-  string_not_contains_constraintt a4(
-    from_integer(0, index_type),
-    plus_exprt(from_integer(1, index_type), length_diff),
-    and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
-    from_integer(0, index_type), s1.length(), s0, s1);
-  axioms.push_back(a4);
+    // The a4 constraint for constant strings translates to:
+    // !contains ==> |s1| > |s0| ||
+    //               (forall qvar <= |s0| - |s1|.
+    //                 !(AND_{i < |s1|} s1[i] == s0[i + qvar])
+    //
+    // which we implement as:
+    // forall qvar <= |s0| - |s1|.  (!contains && |s0| >= |s1|)
+    //     ==> !(AND_{i < |s1|} (s1[i] == s0[qvar+i]))
+    symbol_exprt qvar=fresh_univ_index("QA_contains_constant", index_type);
+    exprt::operandst conjuncts1;
+    for(mp_integer i=0; i<s1_length; ++i)
+    {
+      exprt expr_i=from_integer(i, index_type);
+      plus_exprt shifted_i(expr_i, qvar);
+      conjuncts1.push_back(equal_exprt(s1[expr_i], s0[shifted_i]));
+    }
 
-  return tc_contains;
+    string_constraintt a4(
+      qvar,
+      plus_exprt(from_integer(1, index_type), length_diff),
+      and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
+      not_exprt(conjunction(conjuncts1)));
+    axioms.push_back(a4);
+  }
+  else
+  {
+    symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
+    exprt qvar_shifted=plus_exprt(qvar, startpos);
+    string_constraintt a3(
+      qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
+    axioms.push_back(a3);
+
+    // We rewrite axiom a4 as:
+    // forall startpos <= |s0|-|s1|.  (!contains && |s0| >= |s1|)
+    //     ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
+    string_not_contains_constraintt a4(
+      from_integer(0, index_type),
+      plus_exprt(from_integer(1, index_type), length_diff),
+      and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
+      from_integer(0, index_type), s1.length(), s0, s1);
+    axioms.push_back(a4);
+  }
+  return typecast_exprt(contains, f.type());
 }
