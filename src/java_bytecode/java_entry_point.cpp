@@ -133,6 +133,8 @@ void java_static_lifetime_init(
 
   // we now need to run all the <clinit> methods
 
+  std::vector<static_initializer_callt> clinits;
+
   for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();
@@ -142,11 +144,20 @@ void java_static_lifetime_init(
        it->second.type.id()==ID_code &&
        it->second.mode==ID_java)
     {
-      code_function_callt function_call;
-      function_call.lhs()=nil_exprt();
-      function_call.function()=it->second.symbol_expr();
-      function_call.add_source_location()=source_location;
-      code_block.add(function_call);
+      const irep_idt symbol_name=
+        it->second.symbol_expr().get_identifier();
+      const std::string &symbol_str=id2string(symbol_name);
+      const std::string suffix(".<clinit>:()V");
+      assert(has_suffix(symbol_str, suffix));
+      const std::string class_symbol_name=
+        symbol_str.substr(0, symbol_str.size()-suffix.size());
+      const symbolt &class_symbol=symbol_table.lookup(class_symbol_name);
+      clinits.push_back(
+        {
+          it->second.symbol_expr(),
+          class_symbol.type.get_bool(ID_enumeration)
+        }
+      );
     }
   }
 }
