@@ -664,14 +664,21 @@ void goto_convertt::do_java_new_array(
   t_n->code=code_assignt(lhs, malloc_expr);
   t_n->source_location=location;
 
-  // multi-dimensional?
-
   assert(ns.follow(object_type).id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
   assert(struct_type.components().size()==3);
 
-  // if it's an array, we need to set the length field
+  // Init base class:
   dereference_exprt deref(lhs, object_type);
+  exprt zero_object=
+    zero_initializer(object_type, location, ns, get_message_handler());
+  set_class_identifier(
+    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
+  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
+  t_i->code=code_assignt(deref, zero_object);
+  t_i->source_location=location;
+
+  // if it's an array, we need to set the length field
   member_exprt length(
     deref,
     struct_type.components()[1].get_name(),
@@ -713,6 +720,8 @@ void goto_convertt::do_java_new_array(
   goto_programt::targett t_d=dest.add_instruction(OTHER);
   t_d->code=array_set;
   t_d->source_location=location;
+
+  // multi-dimensional?
 
   if(rhs.operands().size()>=2)
   {

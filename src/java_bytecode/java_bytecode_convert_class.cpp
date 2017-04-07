@@ -289,13 +289,19 @@ void java_bytecode_convert_classt::add_array_types()
     struct_type.components().reserve(3);
     struct_typet::componentt
       comp0("@java.lang.Object", symbol_typet("java::java.lang.Object"));
+    comp0.set_pretty_name("@java.lang.Object");
+    comp0.set_base_name("@java.lang.Object");
     struct_type.components().push_back(comp0);
 
     struct_typet::componentt comp1("length", java_int_type());
+    comp1.set_pretty_name("length");
+    comp1.set_base_name("length");
     struct_type.components().push_back(comp1);
 
     struct_typet::componentt
       comp2("data", pointer_type(java_type_from_char(l)));
+    comp2.set_pretty_name("data");
+    comp2.set_base_name("data");
     struct_type.components().push_back(comp2);
 
     symbolt symbol;
