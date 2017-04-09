@@ -424,6 +424,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
               ns.follow(memory_symbol.type).subtype(),
               dereference_type))
     {
+
       exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=typecast_exprt(index_expr, dereference_type);
