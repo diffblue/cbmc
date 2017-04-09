@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_static_init_loops.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -885,6 +886,8 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_exceptions(symbol_table, goto_functions);
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
+
+    mm_io(symbol_table, goto_functions);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
