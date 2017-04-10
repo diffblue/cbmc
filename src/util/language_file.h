@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <map>
 #include <string>
+#include <memory> // unique_ptr
 
 #include "message.h"
 
@@ -21,7 +22,7 @@ class symbol_tablet;
 class language_filet;
 class languaget;
 
-class language_modulet
+class language_modulet final
 {
 public:
   std::string name;
@@ -32,13 +33,13 @@ public:
   { type_checked=in_progress=false; }
 };
 
-class language_filet
+class language_filet final
 {
 public:
   typedef std::set<std::string> modulest;
   modulest modules;
 
-  languaget *language;
+  std::unique_ptr<languaget> language;
   std::string filename;
 
   void get_modules();
@@ -47,11 +48,8 @@ public:
     const irep_idt &id,
     symbol_tablet &symbol_table);
 
+  language_filet();
   language_filet(const language_filet &rhs);
-
-  language_filet():language(NULL)
-  {
-  }
 
   ~language_filet();
 };

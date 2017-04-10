@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 #include <util/std_expr.h>
 #include <util/ssa_expr.h>
+#include <util/make_unique.h>
 
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_functions.h>
@@ -27,10 +28,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class dirtyt;
 
 // central data structure: state
-class goto_symex_statet
+class goto_symex_statet final
 {
 public:
   goto_symex_statet();
+  ~goto_symex_statet();
 
   // distance from entry
   unsigned depth;
@@ -341,7 +343,7 @@ public:
 
   void switch_to_thread(unsigned t);
   bool record_events;
-  const dirtyt * dirty;
+  std::unique_ptr<const dirtyt> dirty;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

@@ -699,9 +699,9 @@ void java_bytecode_languaget::show_parse(std::ostream &out)
   java_class_loader(main_class).output(out);
 }
 
-languaget *new_java_bytecode_language()
+std::unique_ptr<languaget> new_java_bytecode_language()
 {
-  return new java_bytecode_languaget;
+  return util_make_unique<java_bytecode_languaget>();
 }
 
 bool java_bytecode_languaget::from_expr(

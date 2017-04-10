@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/language.h>
 
+#include <memory> // unique_ptr
+
 class languagest
 {
 public:
@@ -37,12 +39,17 @@ public:
 
   // constructor / destructor
 
-  languagest(const namespacet &_ns, languaget *_language);
+  languagest(const namespacet &_ns, std::unique_ptr<languaget> _language):
+    ns(_ns),
+    language(std::move(_language))
+  {
+  }
+
   virtual ~languagest();
 
 protected:
   const namespacet &ns;
-  languaget *language;
+  std::unique_ptr<languaget> language;
 };
 
 #endif // CPROVER_LANGAPI_LANGUAGES_H

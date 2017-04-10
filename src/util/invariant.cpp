@@ -6,9 +6,11 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 \*******************************************************************/
 
-
 #include "invariant.h"
 
+#include "util/freer.h"
+
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -56,18 +58,16 @@ static bool output_demangled_name(
     std::string mangled(working.substr(start+1, length));
 
     int demangle_success=1;
-    char *demangled=
-      abi::__cxa_demangle(mangled.c_str(), NULL, 0, &demangle_success);
+    std::unique_ptr<char, freert> demangled(
+      abi::__cxa_demangle(mangled.c_str(), NULL, 0, &demangle_success));
 
     if(demangle_success==0)
     {
       out << working.substr(0, start+1)
-          << demangled
+          << demangled.get()
           << working.substr(end);
       return_value=true;
     }
-
-    free(demangled);
   }
 
   return return_value;
@@ -115,16 +115,15 @@ void check_invariant(
     void * stack[50] = {};
 
     std::size_t entries=backtrace(stack, sizeof(stack) / sizeof(void *));
-    char **description=backtrace_symbols(stack, entries);
+    std::unique_ptr<char*, freert> description(
+      backtrace_symbols(stack, entries));
 
     for(std::size_t i=0; i<entries; i++)
     {
-      if(!output_demangled_name(out, description[i]))
-        out << description[i];
+      if(!output_demangled_name(out, description.get()[i]))
+        out << description.get()[i];
       out << '\n' << std::flush;
     }
-
-    free(description);
 
 #else
     out << "Backtraces not supported\n" << std::flush;

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 #include <string>
+#include <memory> // unique_ptr
 
 #include <util/language.h>
 
@@ -37,10 +38,7 @@ public:
       system_symbols=system_library_symbolst();
   }
 
-  virtual ~dump_ct()
-  {
-    delete language;
-  }
+  virtual ~dump_ct()=default;
 
   void operator()(std::ostream &out);
 
@@ -48,7 +46,7 @@ protected:
   const goto_functionst &goto_functions;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
-  languaget *language;
+  std::unique_ptr<languaget> language;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;

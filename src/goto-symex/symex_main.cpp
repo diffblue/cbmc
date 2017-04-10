@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename.h>
 #include <util/symbol_table.h>
 #include <util/replace_symbol.h>
+#include <util/make_unique.h>
 
 #include <analyses/dirty.h>
 
@@ -112,7 +113,7 @@ void goto_symext::operator()(
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
-  state.dirty=new dirtyt(goto_functions);
+  state.dirty=util_make_unique<dirtyt>(goto_functions);
 
   assert(state.top().end_of_function->is_end_function());
 
@@ -130,8 +131,7 @@ void goto_symext::operator()(
     }
   }
 
-  delete state.dirty;
-  state.dirty=0;
+  state.dirty=nullptr;
 }
 
 /// symex starting from given program

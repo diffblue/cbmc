@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)
 {
-  const char **argv=narrow_argv(argc, argv_wide);
+  auto vec=narrow_argv(argc, argv_wide);
+  auto argv=vec.data();
 #else
 int main(int argc, const char **argv)
 {

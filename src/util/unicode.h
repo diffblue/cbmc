@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_UNICODE_H
 
 #include <string>
+#include <vector>
 
 // we follow the ideas suggested at
 // http://www.utf8everywhere.org/
@@ -26,6 +27,6 @@ std::wstring utf8_to_utf16_big_endian(const std::string &);
 std::wstring utf8_to_utf16_little_endian(const std::string &);
 std::string utf16_little_endian_to_ascii(const std::wstring &in);
 
-const char **narrow_argv(int argc, const wchar_t **argv_wide);
+std::vector<const char *> narrow_argv(int argc, const wchar_t **argv_wide);
 
 #endif // CPROVER_UTIL_UNICODE_H

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/language.h>
 #include <util/cmdline.h>
+#include <util/make_unique.h>
 
 #include "java_class_loader.h"
 #include "java_string_library_preprocess.h"
@@ -79,8 +80,8 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
-  languaget *new_language() override
-  { return new java_bytecode_languaget; }
+  std::unique_ptr<languaget> new_language() override
+  { return util_make_unique<java_bytecode_languaget>(); }
 
   std::string id() const override { return "java"; }
   std::string description() const override { return "Java Bytecode"; }
@@ -107,6 +108,6 @@ protected:
   std::string java_cp_include_files;
 };
 
-languaget *new_java_bytecode_language();
+std::unique_ptr<languaget> new_java_bytecode_language();
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H

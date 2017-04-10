@@ -19,6 +19,7 @@ Date: April 2010
 #include <util/endianness_map.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
+#include <util/make_unique.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -50,12 +51,12 @@ rw_range_sett::~rw_range_sett()
   for(rw_range_sett::objectst::iterator it=r_range_set.begin();
       it!=r_range_set.end();
       ++it)
-    delete it->second;
+    it->second=nullptr;
 
   for(rw_range_sett::objectst::iterator it=w_range_set.begin();
       it!=w_range_set.end();
       ++it)
-    delete it->second;
+    it->second=nullptr;
 }
 
 void rw_range_sett::output(std::ostream &out) const
@@ -462,14 +463,17 @@ void rw_range_sett::add(
   const range_spect &range_start,
   const range_spect &range_end)
 {
-  objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
-    insert(
-      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+  objectst::iterator entry=
+    (mode==get_modet::LHS_W?w_range_set:r_range_set)
+       .insert(
+         std::pair<const irep_idt &, std::unique_ptr<range_domain_baset>>(
+           identifier, nullptr))
+       .first;
 
-  if(entry->second==0)
-    entry->second=new range_domaint();
+  if(entry->second==nullptr)
+    entry->second=util_make_unique<range_domaint>();
 
-  static_cast<range_domaint*>(entry->second)->push_back(
+  static_cast<range_domaint&>(*entry->second).push_back(
     std::make_pair(range_start, range_end));
 }
 
@@ -662,16 +666,18 @@ void rw_guarded_range_set_value_sett::add(
   const range_spect &range_start,
   const range_spect &range_end)
 {
-  objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
-    insert(
-      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+  objectst::iterator entry=
+    (mode==get_modet::LHS_W?w_range_set:r_range_set)
+      .insert(
+        std::pair<const irep_idt &, std::unique_ptr<range_domain_baset>>(
+          identifier, nullptr))
+      .first;
 
-  if(entry->second==0)
-    entry->second=new guarded_range_domaint();
+  if(entry->second==nullptr)
+    entry->second=util_make_unique<guarded_range_domaint>();
 
-  static_cast<guarded_range_domaint*>(entry->second)->insert(
-    std::make_pair(range_start,
-                   std::make_pair(range_end, guard.as_expr())));
+  static_cast<guarded_range_domaint&>(*entry->second).insert(
+    std::make_pair(range_start, std::make_pair(range_end, guard.as_expr())));
 }
 
 void goto_rw(goto_programt::const_targett target,

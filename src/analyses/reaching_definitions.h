@@ -240,16 +240,9 @@ class reaching_definitions_analysist:
 {
 public:
   // constructor
-  explicit reaching_definitions_analysist(const namespacet &_ns):
-    concurrency_aware_ait<rd_range_domaint>(),
-    ns(_ns),
-    value_sets(0),
-    is_threaded(0),
-    is_dirty(0)
-  {
-  }
+  explicit reaching_definitions_analysist(const namespacet &_ns);
 
-  virtual ~reaching_definitions_analysist();
+  ~reaching_definitions_analysist();
 
   virtual void initialize(
     const goto_functionst &goto_functions);
@@ -286,9 +279,9 @@ public:
 
 protected:
   const namespacet &ns;
-  value_setst * value_sets;
-  is_threadedt * is_threaded;
-  dirtyt * is_dirty;
+  std::unique_ptr<value_setst> value_sets;
+  std::unique_ptr<is_threadedt> is_threaded;
+  std::unique_ptr<dirtyt> is_dirty;
 };
 
 #endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_H

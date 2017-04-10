@@ -235,12 +235,17 @@ json_objectt json(
 
       std::unique_ptr<languaget> lang;
       if(mode==ID_unknown)
-        lang=std::unique_ptr<languaget>(get_default_language());
+      {
+        lang=get_default_language();
+      }
       else
       {
-        lang=std::unique_ptr<languaget>(get_language_from_mode(mode));
-        if(!lang)
-          lang=std::unique_ptr<languaget>(get_default_language());
+        lang=get_language_from_mode(mode);
+      }
+
+      if(!lang)
+      {
+        lang=get_default_language();
       }
 
       std::string type_string;

@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <unordered_set>
 
+#include <util/make_unique.h>
+
 #include <goto-programs/goto_functions.h>
 
 // don't use me -- I am just a base class
@@ -252,7 +254,7 @@ protected:
   virtual void generate_state(locationt l)=0;
   virtual statet &get_state(locationt l)=0;
   virtual const statet &get_state(locationt l) const=0;
-  virtual statet* make_temporary_state(statet &s)=0;
+  virtual std::unique_ptr<statet> make_temporary_state(statet &s)=0;
 
   typedef domain_baset::expr_sett expr_sett;
 
@@ -331,9 +333,9 @@ protected:
     return static_cast<T &>(a).merge(static_cast<const T &>(b), to);
   }
 
-  virtual statet *make_temporary_state(statet &s)
+  virtual std::unique_ptr<statet> make_temporary_state(statet &s)
   {
-    return new T(static_cast<T &>(s));
+    return util_make_unique<T>(static_cast<T &>(s));
   }
 
   virtual void generate_state(locationt l)
