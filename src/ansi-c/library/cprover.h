@@ -1,3 +1,14 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_ANSI_C_LIBRARY_CPROVER_H
+#define CPROVER_ANSI_C_LIBRARY_CPROVER_H
+
 typedef __typeof__(sizeof(int)) __CPROVER_size_t;
 void *__CPROVER_malloc(__CPROVER_size_t size);
 extern const void *__CPROVER_deallocated;
@@ -130,3 +141,5 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 #define __CPROVER_danger_max_solution_size 1
 #define __CPROVER_danger_number_of_vars 1
 #define __CPROVER_danger_number_of_consts 1
+
+#endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H
