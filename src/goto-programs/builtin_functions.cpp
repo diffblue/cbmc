@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <cassert>
 
 #include <util/rational.h>
@@ -32,6 +29,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 #include "format_strings.h"
+
+/*******************************************************************\
+
+Function: goto_convertt::do_prob_uniform
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,
@@ -111,6 +120,18 @@ void goto_convertt::do_prob_uniform(
   copy(assignment, ASSIGN, dest);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_prob_coin
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_prob_coin(
   const exprt &lhs,
   const exprt &function,
@@ -188,6 +209,18 @@ void goto_convertt::do_prob_coin(
   copy(assignment, ASSIGN, dest);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_printf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_printf(
   const exprt &lhs,
   const exprt &function,
@@ -223,6 +256,18 @@ void goto_convertt::do_printf(
     assert(false);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_scanf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_scanf(
   const exprt &lhs,
   const exprt &function,
@@ -233,7 +278,7 @@ void goto_convertt::do_scanf(
 
   if(f_id==CPROVER_PREFIX "scanf")
   {
-    if(arguments.empty())
+    if(arguments.size()<1)
     {
       error().source_location=function.find_source_location();
       error() << "scanf takes at least one argument" << eom;
@@ -290,9 +335,7 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              exprt lhs=
-                index_exprt(
-                  dereference_exprt(ptr, type), from_integer(0, index_type()));
+              exprt lhs=dereference_exprt(ptr, type.subtype());
               exprt rhs=side_effect_expr_nondett(type.subtype());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
@@ -328,6 +371,18 @@ void goto_convertt::do_scanf(
     assert(false);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_input
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_input(
   const exprt &lhs,
   const exprt &function,
@@ -349,6 +404,18 @@ void goto_convertt::do_input(
   copy(input_code, OTHER, dest);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_output(
   const exprt &lhs,
   const exprt &function,
@@ -369,6 +436,18 @@ void goto_convertt::do_output(
 
   copy(output_code, OTHER, dest);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_atomic_begin
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_atomic_begin(
   const exprt &lhs,
@@ -394,6 +473,18 @@ void goto_convertt::do_atomic_begin(
   t->source_location=function.source_location();
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_atomic_end
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_atomic_end(
   const exprt &lhs,
   const exprt &function,
@@ -417,6 +508,18 @@ void goto_convertt::do_atomic_end(
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
   t->source_location=function.source_location();
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_cpp_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_cpp_new(
   const exprt &lhs,
@@ -538,6 +641,18 @@ void goto_convertt::do_cpp_new(
   dest.destructive_append(tmp_initializer);
 }
 
+/*******************************************************************\
+
+Function: set_class_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
@@ -562,6 +677,18 @@ void set_class_identifier(
     set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_java_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_java_new(
   const exprt &lhs,
@@ -617,6 +744,18 @@ void goto_convertt::do_java_new(
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_java_new_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_java_new_array(
   const exprt &lhs,
@@ -764,7 +903,19 @@ void goto_convertt::do_java_new_array(
   }
 }
 
-/// builds a goto program for object initialization after new
+/*******************************************************************\
+
+Function: goto_convertt::cpp_new_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: builds a goto program for object initialization
+          after new
+
+\*******************************************************************/
+
 void goto_convertt::cpp_new_initializer(
   const exprt &lhs,
   const side_effect_exprt &rhs,
@@ -792,6 +943,18 @@ void goto_convertt::cpp_new_initializer(
       assert(false);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::get_array_argument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt goto_convertt::get_array_argument(const exprt &src)
 {
@@ -829,6 +992,18 @@ exprt goto_convertt::get_array_argument(const exprt &src)
   return src.op0().op0();
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::do_array_op
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::do_array_op(
   const irep_idt &id,
   const exprt &lhs,
@@ -850,6 +1025,18 @@ void goto_convertt::do_array_op(
 
   copy(array_op_statement, OTHER, dest);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_array_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_array_equal(
   const exprt &lhs,
@@ -895,6 +1082,18 @@ void goto_convertt::do_array_equal(
   }
 }
 
+/*******************************************************************\
+
+Function: is_lvalue
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool is_lvalue(const exprt &expr)
 {
   if(expr.id()==ID_index)
@@ -908,6 +1107,18 @@ bool is_lvalue(const exprt &expr)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function: make_va_list
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt make_va_list(const exprt &expr)
 {
@@ -924,7 +1135,19 @@ exprt make_va_list(const exprt &expr)
   return expr;
 }
 
-/// add function calls to function queue for later processing
+/*******************************************************************\
+
+Function: goto_convertt::do_function_call_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: add function calls to function queue for later
+          processing
+
+\*******************************************************************/
+
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
   const symbol_exprt &function,
@@ -1305,18 +1528,8 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    irep_idt description;
-    try
-    {
-      description="assertion "+id2string(get_string_constant(arguments[3]));
-    }
-    catch(int)
-    {
-      // we might be building newlib, where __assert_func is passed
-      // a pointer-typed symbol; the warning will still have been
-      // printed
-      description="assertion";
-    }
+    const irep_idt description=
+      "assertion "+id2string(get_string_constant(arguments[3]));
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();
@@ -1328,7 +1541,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "fence")
   {
-    if(arguments.empty())
+    if(arguments.size()<1)
     {
       error().source_location=function.find_source_location();
       error() << "`" << identifier
@@ -1766,77 +1979,6 @@ void goto_convertt::do_function_call_symbol(
     // be satisfied.
 
     // void __sync_lock_release (type *ptr, ...)
-  }
-  else if(identifier=="__builtin_isgreater" ||
-          identifier=="__builtin_isgreater" ||
-          identifier=="__builtin_isgreaterequal" ||
-          identifier=="__builtin_isless" ||
-          identifier=="__builtin_islessequal" ||
-          identifier=="__builtin_islessgreater" ||
-          identifier=="__builtin_isunordered")
-  {
-    // these support two double or two float arguments; we call the
-    // appropriate internal version
-    if(arguments.size()!=2 ||
-       (arguments[0].type()!=double_type() &&
-        arguments[0].type()!=float_type()) ||
-       (arguments[1].type()!=double_type() &&
-        arguments[1].type()!=float_type()))
-    {
-      error().source_location=function.find_source_location();
-      error() << "`" << identifier
-              << "' expected to have two float/double arguments"
-              << eom;
-      throw 0;
-    }
-
-    exprt::operandst new_arguments=arguments;
-
-    bool use_double=arguments[0].type()==double_type();
-    if(arguments[0].type()!=arguments[1].type())
-    {
-      if(use_double)
-        new_arguments[1].make_typecast(arguments[0].type());
-      else
-      {
-        new_arguments[0].make_typecast(arguments[1].type());
-        use_double=true;
-      }
-    }
-
-    code_typet f_type=to_code_type(function.type());
-    f_type.remove_ellipsis();
-    const typet &a_t=new_arguments[0].type();
-    f_type.parameters()=
-      code_typet::parameterst(2, code_typet::parametert(a_t));
-
-    // replace __builtin_ by CPROVER_PREFIX
-    std::string name=CPROVER_PREFIX+id2string(identifier).substr(10);
-    // append d or f for double/float
-    name+=use_double?'d':'f';
-
-    symbol_exprt new_function=function;
-    new_function.set_identifier(name);
-    new_function.type()=f_type;
-
-    code_function_callt function_call;
-    function_call.lhs()=lhs;
-    function_call.function()=new_function;
-    function_call.arguments()=new_arguments;
-    function_call.add_source_location()=function.source_location();
-
-    if(!symbol_table.has_symbol(name))
-    {
-      code_typet();
-      symbolt new_symbol;
-      new_symbol.base_name=name;
-      new_symbol.name=name;
-      new_symbol.type=f_type;
-      new_symbol.location=function.source_location();
-      symbol_table.add(new_symbol);
-    }
-
-    copy(function_call, FUNCTION_CALL, dest);
   }
   else
   {
