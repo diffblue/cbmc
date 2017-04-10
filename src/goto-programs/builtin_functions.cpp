@@ -709,17 +709,20 @@ void goto_convertt::do_java_new_array(
   t_p->source_location=location;
 
   // zero-initialize the data
-  exprt zero_element=
-    zero_initializer(
-      data.type().subtype(),
-      location,
-      ns,
-      get_message_handler());
-  codet array_set(ID_array_set);
-  array_set.copy_to_operands(data, zero_element);
-  goto_programt::targett t_d=dest.add_instruction(OTHER);
-  t_d->code=array_set;
-  t_d->source_location=location;
+  if(!rhs.get_bool(ID_skip_initialize))
+  {
+    exprt zero_element=
+      zero_initializer(
+        data.type().subtype(),
+        location,
+        ns,
+        get_message_handler());
+    codet array_set(ID_array_set);
+    array_set.copy_to_operands(data, zero_element);
+    goto_programt::targett t_d=dest.add_instruction(OTHER);
+    t_d->code=array_set;
+    t_d->source_location=location;
+  }
 
   // multi-dimensional?
 
