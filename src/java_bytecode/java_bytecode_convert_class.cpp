@@ -158,22 +158,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
       method_identifier,
       method,
       symbol_table);
-    if(lazy_methods_mode==LAZY_METHODS_MODE_EAGER)
-    {
-      // Upgrade to a fully-realized symbol now:
-      java_bytecode_convert_method(
-        *class_symbol,
-        method,
-        symbol_table,
-        get_message_handler(),
-        max_array_length,
-        character_preprocess);
-    }
-    else
-    {
-      // Wait for our caller to decide what needs elaborating.
-      lazy_methods[method_identifier]=std::make_pair(class_symbol, &method);
-    }
+    lazy_methods[method_identifier]=std::make_pair(class_symbol, &method);
   }
 
   // is this a root class?
