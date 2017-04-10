@@ -15,6 +15,7 @@
 #include <analyses/variable-sensitivity/constant_array_abstract_object.h>
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
+#include <analyses/variable-sensitivity/union_abstract_object.h>
 #include <util/options.h>
 #include <util/namespace.h>
 
@@ -48,7 +49,9 @@ private:
     POINTER_SENSITIVE,
     POINTER_INSENSITIVE,
     STRUCT_SENSITIVE,
-    STRUCT_INSENSITIVE
+    STRUCT_INSENSITIVE,
+    // TODO: plug in UNION_SENSITIVE HERE
+    UNION_INSENSITIVE
   };
   ABSTRACT_OBJECT_TYPET get_abstract_object_type(const typet type);
   template <class abstract_object_class>

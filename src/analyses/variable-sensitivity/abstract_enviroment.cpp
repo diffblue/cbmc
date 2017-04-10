@@ -67,11 +67,24 @@ abstract_object_pointert abstract_environmentt::eval(
   {
     member_exprt member_expr(to_member_expr(simplified_expr));
 
-    sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-      std::dynamic_pointer_cast<const struct_abstract_objectt>(
-        eval(member_expr.compound(), ns));
+    const exprt &parent = member_expr.compound();
+    bool is_union = ns.follow(parent.type()).id() == ID_union;
 
-    return struct_abstract_object->read_component(*this, member_expr, ns);
+    if(is_union)
+    {
+      sharing_ptrt<union_abstract_objectt> union_abstract_object=
+        std::dynamic_pointer_cast<const union_abstract_objectt>(
+          eval(parent, ns));
+
+      return union_abstract_object->read_component(*this, member_expr, ns);
+    }
+    else
+    { // is struct
+      sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
+        std::dynamic_pointer_cast<const struct_abstract_objectt>(
+          eval(member_expr.compound(), ns));
+      return struct_abstract_object->read_component(*this, member_expr, ns);
+    }
   }
   else if(simplified_id==ID_address_of)
   {
@@ -308,15 +321,34 @@ abstract_object_pointert abstract_environmentt::write(
   }
   else if(stack_head_id==ID_member)
   {
-    sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-      std::dynamic_pointer_cast<const struct_abstract_objectt>(lhs);
 
-    const member_exprt next_member_expr(to_member_expr(next_expr));
-    sharing_ptrt<struct_abstract_objectt> modified_struct=
-      struct_abstract_object->write_component(
-        *this, ns, remaining_stack, next_member_expr, rhs, merge_write);
+    const member_exprt &member_expr = to_member_expr(next_expr);
+    const exprt &parent = member_expr.compound();
+    bool is_union = ns.follow(parent.type()).id() == ID_union;
 
-    return modified_struct;
+    if(is_union)
+    {
+      sharing_ptrt<union_abstract_objectt> union_abstract_object=
+        std::dynamic_pointer_cast<const union_abstract_objectt>(lhs);
+
+      sharing_ptrt<union_abstract_objectt> modified_union=
+        union_abstract_object->write_component(
+          *this, ns, remaining_stack, member_expr, rhs, merge_write);
+
+      return modified_union;
+    }
+    else
+    {
+      sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
+        std::dynamic_pointer_cast<const struct_abstract_objectt>(lhs);
+
+      const member_exprt next_member_expr(to_member_expr(next_expr));
+      sharing_ptrt<struct_abstract_objectt> modified_struct=
+        struct_abstract_object->write_component(
+          *this, ns, remaining_stack, next_member_expr, rhs, merge_write);
+
+      return modified_struct;
+    }
   }
   else if(stack_head_id==ID_dereference)
   {
