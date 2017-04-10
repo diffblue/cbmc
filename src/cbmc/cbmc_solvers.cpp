@@ -183,6 +183,15 @@ cbmc_solverst::solvert* cbmc_solverst::get_string_refinement()
   if(options.get_bool_option("string-printable"))
     string_refinement->enforce_printable_characters();
 
+  if(options.get_option("max-node-refinement")!="")
+    string_refinement->max_node_refinement=
+      options.get_unsigned_int_option("max-node-refinement");
+
+  string_refinement->do_array_refinement=
+    options.get_bool_option("refine-arrays");
+  string_refinement->do_arithmetic_refinement=
+    options.get_bool_option("refine-arithmetic");
+
   return new solvert(string_refinement, prop);
 }
 
