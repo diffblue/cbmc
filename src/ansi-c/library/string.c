@@ -516,7 +516,7 @@ inline char *strdup(const char *str)
 
 #undef memcpy
 
-void *memcpy(void *dst, const void *src, size_t n)
+inline void *memcpy(void *dst, const void *src, size_t n)
 {
   __CPROVER_HIDE:
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -535,10 +535,7 @@ void *memcpy(void *dst, const void *src, size_t n)
   #else
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
-  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dst, src_n);
+  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
   #endif
   return dst;
 }
@@ -566,10 +563,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
   (void)size;
-  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dst, src_n);
+  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
   #endif
   return dst;
 }
@@ -583,7 +577,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
 
 #undef memset
 
-void *memset(void *s, int c, size_t n)
+inline void *memset(void *s, int c, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -602,11 +596,8 @@ void *memset(void *s, int c, size_t n)
   else
     __CPROVER_is_zero_string(s)=0;
   #else
-  //char *sp=s;
-  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-  unsigned char s_n[n];
-  __CPROVER_array_set(s_n, (unsigned char)c);
-  __CPROVER_array_replace((unsigned char*)s, s_n);
+  char *sp=s;
+  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
   #endif
   return s;
 }
@@ -634,11 +625,8 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
     __CPROVER_is_zero_string(s)=0;
   #else
   (void)size;
-  //char *sp=s;
-  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-  unsigned char s_n[n];
-  __CPROVER_array_set(s_n, (unsigned char)c);
-  __CPROVER_array_replace((unsigned char*)s, s_n);
+  char *sp=s;
+  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
   #endif
   return s;
 }
@@ -652,7 +640,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
 
 #undef memmove
 
-void *memmove(void *dest, const void *src, size_t n)
+inline void *memmove(void *dest, const void *src, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -667,42 +655,14 @@ void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dest, src_n);
-  #endif
-  return dest;
-}
-
-/* FUNCTION: __builtin___memmove_chk */
-
-#ifndef __CPROVER_STRING_H_INCLUDED
-#include <string.h>
-#define __CPROVER_STRING_H_INCLUDED
-#endif
-
-#undef memmove
-
-void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
-{
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memmove buffer overflow");
-  __CPROVER_assert(__CPROVER_buffer_size(dest)==size, "builtin object size");
-  // dst = src (with overlap allowed)
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if((const char *)dest>=(const char *)src+n)
   {
-    __CPROVER_is_zero_string(src)=1;
-    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+    for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
   }
   else
-    __CPROVER_is_zero_string(dest)=0;
-  #else
-  (void)size;
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dest, src_n);
+  {
+    for(__CPROVER_size_t i=n; i>0; i--) ((char *)dest)[i-1]=((const char *)src)[i-1];
+  }
   #endif
   return dest;
 }
