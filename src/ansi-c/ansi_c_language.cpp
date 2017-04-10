@@ -231,9 +231,9 @@ Function: new_ansi_c_language
 
 \*******************************************************************/
 
-languaget *new_ansi_c_language()
+std::unique_ptr<languaget> new_ansi_c_language()
 {
-  return new ansi_c_languaget;
+  return util_make_unique<ansi_c_languaget>();
 }
 
 /*******************************************************************\

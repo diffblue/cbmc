@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <memory> // unique_ptr
 
 #include "message.h"
 
@@ -108,7 +109,7 @@ public:
     exprt &expr,
     const namespacet &ns)=0;
 
-  virtual languaget *new_language()=0;
+  virtual std::unique_ptr<languaget> new_language()=0;
 
   // constructor / destructor
 

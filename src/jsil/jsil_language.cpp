@@ -204,9 +204,9 @@ Function: new_jsil_language
 
 \*******************************************************************/
 
-languaget *new_jsil_language()
+std::unique_ptr<languaget> new_jsil_language()
 {
-  return new jsil_languaget;
+  return util_make_unique<jsil_languaget>();
 }
 
 /*******************************************************************\

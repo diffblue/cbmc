@@ -46,11 +46,12 @@ void jar_filet::open(
     for(std::size_t i=0; i<number_of_files; i++)
     {
       mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
-      char *filename_char=new char[filename_length+1];
+      std::vector<char> filename_char(filename_length+1);
       mz_uint filename_len=
-        mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
+        mz_zip_reader_get_filename(
+          &zip, i, filename_char.data(), filename_length);
       assert(filename_length==filename_len);
-      std::string file_name(filename_char);
+      std::string file_name(filename_char.data());
 
       // non-class files are loaded in any case
       bool add_file=!has_suffix(file_name, ".class");
@@ -63,7 +64,6 @@ void jar_filet::open(
                    << " from " << filename << eom;
         filtered_jar[file_name]=i;
       }
-      delete[] filename_char;
     }
   }
 }

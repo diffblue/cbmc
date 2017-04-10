@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 #define CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 
+#include "util/make_unique.h"
 #include <stack>
 #include <memory>
 
@@ -122,8 +123,7 @@ public:
     goto_functionst::function_mapt::const_iterator f_it2=
       goto_functions->function_map.find(fkt);
     assert(f_it2!=goto_functions->function_map.end());
-    return *(fkt_map[fkt]=std::unique_ptr<local_may_aliast>(
-              new local_may_aliast(f_it2->second)));
+    return *(fkt_map[fkt]=util_make_unique<local_may_aliast>(f_it2->second));
   }
 
   local_may_aliast &operator()(goto_programt::const_targett t)

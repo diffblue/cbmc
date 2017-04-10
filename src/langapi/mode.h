@@ -11,13 +11,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/irep.h>
 
+#include <memory> // unique_ptr
+
 class languaget;
 
-languaget *get_language_from_mode(const irep_idt &mode);
-languaget *get_language_from_filename(const std::string &filename);
-languaget *get_default_language();
+std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode);
+std::unique_ptr<languaget> get_language_from_filename(
+  const std::string &filename);
+std::unique_ptr<languaget> get_default_language();
 
-typedef languaget *(*language_factoryt)();
+typedef std::unique_ptr<languaget> (*language_factoryt)();
 void register_language(language_factoryt factory);
 
 #endif // CPROVER_LANGAPI_MODE_H

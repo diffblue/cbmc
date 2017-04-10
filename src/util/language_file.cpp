@@ -11,6 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 #include "language_file.h"
 
+// Defined here so that unique_ptr works properly
+language_filet::language_filet()=default;
+language_filet::~language_filet()=default;
+
 /*******************************************************************\
 
 Function: language_filet::language_filet
@@ -25,27 +29,9 @@ Function: language_filet::language_filet
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
-  language(rhs.language==NULL?NULL:rhs.language->new_language()),
+  language(rhs.language?rhs.language->new_language():nullptr),
   filename(rhs.filename)
 {
-}
-
-/*******************************************************************\
-
-Function: language_filet::~language_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-language_filet::~language_filet()
-{
-  if(language!=NULL)
-    delete language;
 }
 
 /*******************************************************************\
