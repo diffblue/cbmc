@@ -104,7 +104,8 @@ float __CPROVER_fabsf(float);
 // arrays
 //__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);
 void __CPROVER_array_copy(const void *dest, const void *src);
-//void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_replace(const void *dest, const void *src);
 
 #if 0
 // k-induction

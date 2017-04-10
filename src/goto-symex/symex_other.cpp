@@ -85,7 +85,8 @@ void goto_symext::symex_other(
   {
     // we ignore this for now
   }
-  else if(statement==ID_array_copy)
+  else if(statement==ID_array_copy ||
+          statement==ID_array_replace)
   {
     assert(code.operands().size()==2);
 
@@ -120,11 +121,21 @@ void goto_symext::symex_other(
                      clean_code.op1().type(), ns))
     {
       byte_extract_exprt be(byte_extract_id());
-      be.type()=clean_code.op0().type();
-      be.op()=clean_code.op1();
       be.offset()=from_integer(0, index_type());
 
-      clean_code.op1()=be;
+      if(statement==ID_array_copy)
+      {
+        be.op()=clean_code.op1();
+        be.type()=clean_code.op0().type();
+        clean_code.op1()=be;
+      }
+      else
+      {
+        // ID_array_replace
+        be.op()=clean_code.op0();
+        be.type()=clean_code.op1().type();
+        clean_code.op0()=be;
+      }
     }
 
     code_assignt assignment;

@@ -1822,6 +1822,9 @@ void value_sett::apply_code(
   else if(statement==ID_array_copy)
   {
   }
+  else if(statement==ID_array_replace)
+  {
+  }
   else if(statement==ID_assume)
   {
     guard(to_code_assume(code).op0(), ns);
