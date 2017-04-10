@@ -51,7 +51,7 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
   }
   else if(type.id()==ID_union)
   {
-    // TODO: deal with unions
+    abstract_object_type=UNION_INSENSITIVE;
   }
 
   return abstract_object_type;
@@ -118,6 +118,9 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
       followed_type, top, bottom, e, environment, ns);
   case STRUCT_INSENSITIVE:
     return initialize_abstract_object<struct_abstract_objectt>(
+      followed_type, top, bottom, e, environment, ns);
+  case UNION_INSENSITIVE:
+    return initialize_abstract_object<union_abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   case TWO_VALUE:
     return initialize_abstract_object<abstract_objectt>(
