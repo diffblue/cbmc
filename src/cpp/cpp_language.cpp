@@ -205,9 +205,9 @@ void cpp_languaget::show_parse(
     out << "UNKNOWN: " << item.pretty() << '\n';
 }
 
-languaget *new_cpp_language()
+std::unique_ptr<languaget> new_cpp_language()
 {
-  return new cpp_languaget;
+  return util_make_unique<cpp_languaget>();
 }
 
 bool cpp_languaget::from_expr(

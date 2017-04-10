@@ -139,9 +139,9 @@ void ansi_c_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-languaget *new_ansi_c_language()
+std::unique_ptr<languaget> new_ansi_c_language()
 {
-  return new ansi_c_languaget;
+  return util_make_unique<ansi_c_languaget>();
 }
 
 bool ansi_c_languaget::from_expr(

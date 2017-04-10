@@ -15,6 +15,7 @@ Date: April 2010
 #include <map>
 #include <ostream>
 #include <limits>
+#include <memory> // unique_ptr
 
 #include <util/guard.h>
 
@@ -83,10 +84,10 @@ class rw_range_sett
 {
 public:
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, range_domain_baset*> objectst;
+  typedef std::map<irep_idt, std::unique_ptr<range_domain_baset>> objectst;
   #else
-  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash>
-    objectst;
+  typedef std::unordered_map<
+    irep_idt, std::unique_ptr<range_domain_baset>, string_hash> objectst;
   #endif
 
   virtual ~rw_range_sett();
@@ -108,8 +109,8 @@ public:
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    PRECONDITION(dynamic_cast<range_domaint*>(it->second)!=nullptr);
-    return *static_cast<range_domaint*>(it->second);
+    PRECONDITION(dynamic_cast<range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const range_domaint &>(*it->second);
   }
 
   enum class get_modet { LHS_W, READ };
@@ -277,8 +278,9 @@ public:
 
   const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    PRECONDITION(dynamic_cast<guarded_range_domaint*>(it->second)!=nullptr);
-    return *static_cast<guarded_range_domaint*>(it->second);
+    PRECONDITION(
+      dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const guarded_range_domaint &>(*it->second);
   }
 
   virtual void get_objects_rec(

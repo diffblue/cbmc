@@ -32,6 +32,8 @@ goto_symex_statet::goto_symex_statet():
   new_frame();
 }
 
+goto_symex_statet::~goto_symex_statet()=default;
+
 void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 {
   goto_functionst::function_mapt::const_iterator it=

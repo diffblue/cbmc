@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <memory> // unique_ptr
 #include <util/symbol.h>
 #include <util/std_types.h>
 #include <goto-programs/system_library_symbols.h>
@@ -114,7 +115,7 @@ public:
     exprt &expr,
     const namespacet &ns)=0;
 
-  virtual languaget *new_language()=0;
+  virtual std::unique_ptr<languaget> new_language()=0;
 
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
 

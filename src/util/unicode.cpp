@@ -152,17 +152,15 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
   return result;
 }
 
-const char **narrow_argv(int argc, const wchar_t **argv_wide)
+std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
 {
   if(argv_wide==nullptr)
-    return nullptr;
+    return std::vector<std::string>();
 
-  // the following never gets deleted
-  const char **argv_narrow=new const char *[argc+1];
-  argv_narrow[argc]=nullptr;
+  std::vector<std::string> argv_narrow(argc);
 
-  for(int i=0; i<argc; i++)
-    argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
+  for(int i=0; i!=argc; ++i)
+    argv_narrow[i]=narrow(argv_wide[i]);
 
   return argv_narrow;
 }

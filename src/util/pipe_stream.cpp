@@ -106,18 +106,16 @@ int pipe_streamt::run()
   for(const auto &s : args)
         command += L" " + ::widen(s);
 
-  LPWSTR lpCommandLine = new wchar_t[command.length()+1];
+  std::vector<wchar_t> lpCommandLine(command.length()+1);
 
   #ifdef _MSC_VER
-  wcscpy_s(lpCommandLine, command.length()+1, command.c_str());
+  wcscpy_s(lpCommandLine.data(), command.length()+1, command.c_str());
   #else
-  wcsncpy(lpCommandLine, command.c_str(), command.length()+1);
+  wcsncpy(lpCommandLine.data(), command.c_str(), command.length()+1);
   #endif
 
-  BOOL ret=CreateProcessW(NULL, lpCommandLine, NULL, NULL, TRUE,
+  BOOL ret=CreateProcessW(NULL, lpCommandLine.data(), NULL, NULL, TRUE,
                           CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
-
-  delete lpCommandLine; // clean up
 
   if(!ret)
     return -1;
@@ -147,7 +145,7 @@ int pipe_streamt::run()
     dup2(in[0], STDIN_FILENO);
     dup2(out[1], STDOUT_FILENO);
 
-    char **_argv=new char * [args.size()+2];
+    std::vector<char *> _argv(args.size()+2);
 
     _argv[0]=strdup(executable.c_str());
 
@@ -161,7 +159,7 @@ int pipe_streamt::run()
 
     _argv[args.size()+1]=nullptr;
 
-    int result=execvp(executable.c_str(), _argv);
+    int result=execvp(executable.c_str(), _argv.data());
 
     if(result==-1)
       perror(nullptr);
@@ -218,14 +216,14 @@ int pipe_streamt::wait()
 filedescriptor_streambuft::filedescriptor_streambuft():
   #ifdef _WIN32
   proc_in(INVALID_HANDLE_VALUE),
-  proc_out(INVALID_HANDLE_VALUE)
+  proc_out(INVALID_HANDLE_VALUE),
   #else
   proc_in(STDOUT_FILENO),
-  proc_out(STDIN_FILENO)
+  proc_out(STDIN_FILENO),
   #endif
+  in_buffer(READ_BUFFER_SIZE)
 {
-  in_buffer=new char[READ_BUFFER_SIZE];
-  setg(in_buffer, in_buffer, in_buffer);
+  setg(in_buffer.data(), in_buffer.data(), in_buffer.data());
 }
 
 /// Destructor
@@ -248,8 +246,6 @@ filedescriptor_streambuft::~filedescriptor_streambuft()
     close(proc_out);
 
   #endif
-
-  delete in_buffer;
 }
 
 /// write one character to the piped process

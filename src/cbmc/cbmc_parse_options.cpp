@@ -601,7 +601,7 @@ int cbmc_parse_optionst::get_goto_program(
         return 6;
       }
 
-      languaget *language=get_language_from_filename(filename);
+      std::unique_ptr<languaget> language=get_language_from_filename(filename);
       language->get_language_options(cmdline);
 
       if(language==nullptr)
@@ -750,18 +750,16 @@ void cbmc_parse_optionst::preprocessing()
       return;
     }
 
-    languaget *ptr=get_language_from_filename(filename);
-    ptr->get_language_options(cmdline);
+    std::unique_ptr<languaget> language=get_language_from_filename(filename);
+    language->get_language_options(cmdline);
 
-    if(ptr==nullptr)
+    if(language==nullptr)
     {
       error() << "failed to figure out type of file" << eom;
       return;
     }
 
-    ptr->set_message_handler(get_message_handler());
-
-    std::unique_ptr<languaget> language(ptr);
+    language->set_message_handler(get_message_handler());
 
     if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
