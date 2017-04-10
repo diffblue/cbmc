@@ -535,7 +535,10 @@ inline void *memcpy(void *dst, const void *src, size_t n)
   #else
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
-  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dst, src_n);
   #endif
   return dst;
 }
@@ -563,7 +566,10 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
   (void)size;
-  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dst, src_n);
   #endif
   return dst;
 }
@@ -596,8 +602,11 @@ inline void *memset(void *s, int c, size_t n)
   else
     __CPROVER_is_zero_string(s)=0;
   #else
-  char *sp=s;
-  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  //char *sp=s;
+  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  unsigned char s_n[n];
+  __CPROVER_array_set(s_n, (unsigned char)c);
+  __CPROVER_array_replace((unsigned char*)s, s_n);
   #endif
   return s;
 }
@@ -625,8 +634,11 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
     __CPROVER_is_zero_string(s)=0;
   #else
   (void)size;
-  char *sp=s;
-  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  //char *sp=s;
+  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  unsigned char s_n[n];
+  __CPROVER_array_set(s_n, (unsigned char)c);
+  __CPROVER_array_replace((unsigned char*)s, s_n);
   #endif
   return s;
 }
@@ -655,14 +667,9 @@ inline void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  if((const char *)dest>=(const char *)src+n)
-  {
-    for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
-  }
-  else
-  {
-    for(__CPROVER_size_t i=n; i>0; i--) ((char *)dest)[i-1]=((const char *)src)[i-1];
-  }
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dest, src_n);
   #endif
   return dest;
 }

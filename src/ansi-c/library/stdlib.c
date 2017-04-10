@@ -67,17 +67,18 @@ inline void *malloc(__CPROVER_size_t malloc_size);
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
   __CPROVER_HIDE:;
-  __CPROVER_size_t total_size=nmemb*size;
   void *res;
-  res=malloc(total_size);
+  res=malloc(nmemb*size);
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_is_zero_string(res)=1;
   __CPROVER_zero_string_length(res)=0;
   //for(int i=0; i<nmemb*size; i++) res[i]=0;
   #else
-  // there should be memset here
-  //char *p=res;
-  //for(int i=0; i<total_size; i++) p[i]=0;
+  if(nmemb>1)
+    __CPROVER_array_set(res, 0);
+  else if(nmemb==1)
+    for(__CPROVER_size_t i=0; i<size; ++i)
+      ((char*)res)[i]=0;
   #endif
   return res;
 }
