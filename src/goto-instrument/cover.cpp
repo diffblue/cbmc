@@ -1418,17 +1418,20 @@ bool instrument_cover_goals(
   goto_functionst &goto_functions,
   message_handlert &msgh)
 {
-  messaget msg;
-  msg.set_message_handler(msgh);
+  messaget msg(msgh);
   std::list<std::string> criteria_strings=cmdline.get_values("cover");
   std::set<coverage_criteriont> criteria;
+  bool keep_assertions=false;
 
   for(const auto &criterion_string : criteria_strings)
   {
     coverage_criteriont c;
 
     if(criterion_string=="assertion" || criterion_string=="assertions")
+    {
+      keep_assertions=true;
       c=coverage_criteriont::ASSERTION;
+    }
     else if(criterion_string=="path" || criterion_string=="paths")
       c=coverage_criteriont::PATH;
     else if(criterion_string=="branch" || criterion_string=="branches")
@@ -1445,11 +1448,37 @@ bool instrument_cover_goals(
       c=coverage_criteriont::COVER;
     else
     {
-      msg.error() << "unknown coverage criterion" << messaget::eom;
+      msg.error() << "unknown coverage criterion "
+                  << '\'' << criterion_string << '\''
+                  << messaget::eom;
       return true;
     }
 
     criteria.insert(c);
+  }
+
+  if(keep_assertions && criteria_strings.size()>1)
+  {
+    msg.error() << "assertion coverage cannot currently be used together with "
+                << "other coverage criteria" << messaget::eom;
+    return true;
+  }
+
+  msg.status() << "Rewriting existing assertions as assumptions"
+               << messaget::eom;
+
+  if(!keep_assertions)
+  {
+    // turn assertions (from generic checks) into assumptions
+    Forall_goto_functions(f_it, goto_functions)
+    {
+      goto_programt &body=f_it->second.body;
+      Forall_goto_program_instructions(i_it, body)
+      {
+        if(i_it->is_assert())
+          i_it->type=goto_program_instruction_typet::ASSUME;
+      }
+    }
   }
 
   msg.status() << "Instrumenting coverage goals" << messaget::eom;
