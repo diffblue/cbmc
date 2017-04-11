@@ -347,7 +347,9 @@ sharing_ptrt<pointer_abstract_objectt>
         abstract_object_pointert pointed_value=
           environment.eval(address_expr.object(), ns);
         bool modifications;
-        pointed_value->merge(new_value, modifications);
+        abstract_object_pointert merged_value=
+          pointed_value->merge(new_value, modifications);
+        environment.assign(address_expr.object(), merged_value, ns);
       }
       else
       {

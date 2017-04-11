@@ -152,5 +152,25 @@ int main(int argc, char *argv[])
   assert(ek[0]==&ek0);
   assert(*ek[0]==60);
 
+  // Test writing to an unknown index (i.e. a merging write of the pointer)
+  int x = 4;
+  int y = 5;
+  int *ps[2] = {&x, &y};
+  int i;
+  if(argc > 2)
+  {
+    i=0;
+  }
+  else
+  {
+    i=1;
+  }
+  *(ps[i])=4;
+
+  assert(*ps[0]==4);
+  assert(*ps[1]==4);
+  assert(x==4);
+  assert(y==4);
+
   return 0;
 }

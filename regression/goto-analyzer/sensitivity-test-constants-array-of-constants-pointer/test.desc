@@ -67,5 +67,9 @@ sensitivity_test_constants_array_of_constants_pointer.c
 ^\[main.assertion.62\] .* assertion \*ej\[2\]==51: Unknown$
 ^\[main.assertion.63\] .* assertion ek\[0\]==&ek0: Unknown$
 ^\[main.assertion.64\] .* assertion \*ek\[0\]==60: Unknown$
+^\[main\.assertion\.65\] .* assertion \*ps\[0\]==4: Success$
+^\[main\.assertion\.66\] .* assertion \*ps\[1\]==4: Unknown$
+^\[main\.assertion\.67\] .* assertion x==4: Success$
+^\[main\.assertion\.68\] .* assertion y==4: Unknown$
 --
 ^warning: ignoring
