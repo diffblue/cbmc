@@ -51,7 +51,7 @@ bool value_sett::field_sensitive(
   const namespacet &ns)
 {
   // we always track fields on these
-  if(has_prefix(id2string(id), "value_set::dynamic_object") ||
+  if(has_prefix(id2string(id), prefix_dynamic_object) ||
      id=="value_set::return_value" ||
      id=="value_set::memory")
     return true;
@@ -152,7 +152,7 @@ void value_sett::output(
 
     const entryt &e=v_it->second;
 
-    if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
+    if(has_prefix(id2string(e.identifier), prefix_dynamic_object))
     {
       display_name=id2string(e.identifier)+e.suffix;
       identifier="";

@@ -17,6 +17,8 @@ Date: April 2017
 
 #include <util/std_expr.h>
 
+extern const std::string prefix_dynamic_object;
+
 /*******************************************************************\
 
 Function: get_dynamic_object_name
@@ -38,7 +40,7 @@ inline std::string get_dynamic_object_name(
   const dynamic_object_exprt &dynamic_object)
 {
   std::string name=
-    "value_set::dynamic_object"+
+    prefix_dynamic_object+
     std::to_string(dynamic_object.get_instance());
 
   if(dynamic_object.get_recency()==

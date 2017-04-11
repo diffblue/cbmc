@@ -64,7 +64,7 @@ void value_set_fit::output(
 
     const entryt &e=v_it->second;
 
-    if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
+    if(has_prefix(id2string(e.identifier), prefix_dynamic_object))
     {
       display_name=id2string(e.identifier)+e.suffix;
       identifier="";
@@ -316,7 +316,7 @@ bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
     {
       // we always track these
       if(has_prefix(id2string(it->second.identifier),
-                    "value_set::dynamic_object") ||
+                    prefix_dynamic_object) ||
          has_prefix(id2string(it->second.identifier),
                     "value_set::return_value"))
       {
@@ -1434,7 +1434,7 @@ void value_set_fit::assign_rec(
     const irep_idt &identifier=lhs.get(ID_identifier);
 
     if(has_prefix(id2string(identifier),
-                  "value_set::dynamic_object") ||
+                  prefix_dynamic_object) ||
        has_prefix(id2string(identifier),
                   "value_set::return_value") ||
        values.find(id2string(identifier)+suffix)!=values.end())
