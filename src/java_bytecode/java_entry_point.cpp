@@ -156,8 +156,7 @@ void java_static_lifetime_init(
         {
           it->second.symbol_expr(),
           class_symbol.type.get_bool(ID_enumeration)
-        }
-      );
+        });
     }
   }
 }
