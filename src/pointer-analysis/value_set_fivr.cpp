@@ -1562,7 +1562,7 @@ void value_set_fivrt::assign_rec(
     const irep_idt &identifier=lhs.get(ID_identifier);
 
     if(has_prefix(id2string(identifier),
-                  "value_set::dynamic_object") ||
+                  prefix_dynamic_object) ||
        has_prefix(id2string(identifier),
                   "value_set::return_value") ||
        values.find(id2string(identifier)+suffix)!=values.end())
