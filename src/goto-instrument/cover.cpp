@@ -12,6 +12,7 @@ Date: May 2016
 #include <iterator>
 
 #include <util/prefix.h>
+#include <util/message.h>
 
 #include "cover.h"
 
@@ -1397,4 +1398,65 @@ void instrument_cover_goals(
 
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
   }
+}
+
+/*******************************************************************\
+
+Function: instrument_cover_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &msgh)
+{
+  messaget msg;
+  msg.set_message_handler(msgh);
+  std::list<std::string> criteria_strings=cmdline.get_values("cover");
+  std::set<coverage_criteriont> criteria;
+
+  for(const auto &criterion_string : criteria_strings)
+  {
+    coverage_criteriont c;
+
+    if(criterion_string=="assertion" || criterion_string=="assertions")
+      c=coverage_criteriont::ASSERTION;
+    else if(criterion_string=="path" || criterion_string=="paths")
+      c=coverage_criteriont::PATH;
+    else if(criterion_string=="branch" || criterion_string=="branches")
+      c=coverage_criteriont::BRANCH;
+    else if(criterion_string=="location" || criterion_string=="locations")
+      c=coverage_criteriont::LOCATION;
+    else if(criterion_string=="decision" || criterion_string=="decisions")
+      c=coverage_criteriont::DECISION;
+    else if(criterion_string=="condition" || criterion_string=="conditions")
+      c=coverage_criteriont::CONDITION;
+    else if(criterion_string=="mcdc")
+      c=coverage_criteriont::MCDC;
+    else if(criterion_string=="cover")
+      c=coverage_criteriont::COVER;
+    else
+    {
+      msg.error() << "unknown coverage criterion" << messaget::eom;
+      return true;
+    }
+
+    criteria.insert(c);
+  }
+
+  msg.status() << "Instrumenting coverage goals" << messaget::eom;
+
+  for(const auto &criterion : criteria)
+    instrument_cover_goals(symbol_table, goto_functions, criterion);
+
+  goto_functions.update();
+  return false;
 }

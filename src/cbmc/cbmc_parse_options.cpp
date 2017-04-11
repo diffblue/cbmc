@@ -954,46 +954,12 @@ bool cbmc_parse_optionst::process_goto_program(
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
-      std::list<std::string> criteria_strings=
-        cmdline.get_values("cover");
-
-      std::set<coverage_criteriont> criteria;
-
-      for(const auto &criterion_string : criteria_strings)
-      {
-        coverage_criteriont c;
-
-        if(criterion_string=="assertion" || criterion_string=="assertions")
-          c=coverage_criteriont::ASSERTION;
-        else if(criterion_string=="path" || criterion_string=="paths")
-          c=coverage_criteriont::PATH;
-        else if(criterion_string=="branch" || criterion_string=="branches")
-          c=coverage_criteriont::BRANCH;
-        else if(criterion_string=="location" || criterion_string=="locations")
-          c=coverage_criteriont::LOCATION;
-        else if(criterion_string=="decision" || criterion_string=="decisions")
-          c=coverage_criteriont::DECISION;
-        else if(criterion_string=="condition" || criterion_string=="conditions")
-          c=coverage_criteriont::CONDITION;
-        else if(criterion_string=="mcdc")
-          c=coverage_criteriont::MCDC;
-        else if(criterion_string=="cover")
-          c=coverage_criteriont::COVER;
-        else
-        {
-          error() << "unknown coverage criterion" << eom;
-          return true;
-        }
-
-        criteria.insert(c);
-      }
-
-      status() << "Instrumenting coverage goals" << eom;
-
-      for(const auto &criterion : criteria)
-        instrument_cover_goals(symbol_table, goto_functions, criterion);
-
-      goto_functions.update();
+      if(instrument_cover_goals(
+           cmdline,
+           symbol_table,
+           goto_functions,
+           get_message_handler()))
+        return true;
     }
 
     // remove skips
