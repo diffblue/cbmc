@@ -17,6 +17,8 @@ Date: April 2017
 
 #include <util/std_expr.h>
 
+extern const std::string prefix_dynamic_object;
+
 /*******************************************************************\
 
 Function: get_dynamic_object_name
