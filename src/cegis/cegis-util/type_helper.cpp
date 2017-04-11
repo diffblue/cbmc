@@ -34,10 +34,10 @@ bool instanceof(const typet &lhs, const typet &rhs, const namespacet &ns)
   if (type_eq(lhs, rhs, ns)) return true;
   assert(ID_class == lhs.id());
   const class_typet &lhs_class=to_class_type(lhs);
-  const irept::subt &bases=lhs_class.bases();
-  for (const irept &base : bases)
+  const class_typet::basest &bases=lhs_class.bases();
+  for(const exprt &base : bases)
   {
-    const typet &type=static_cast<const typet &>(base.find(ID_type));
+    const typet &type=base.type();
     if (instanceof(ns.follow(type), rhs, ns)) return true;
   }
   return false;

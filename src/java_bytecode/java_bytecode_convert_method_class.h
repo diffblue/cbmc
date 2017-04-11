@@ -94,6 +94,8 @@ public:
   expanding_vectort<variablest> variables;
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
+  std::map<irep_idt, bool> class_has_clinit_method;
+  std::map<irep_idt, bool> any_superclass_has_clinit_method;
 
   typedef enum instruction_sizet
   {
@@ -221,6 +223,10 @@ protected:
   void check_static_field_stub(
     const symbol_exprt &se,
     const irep_idt &basename);
+
+  bool class_needs_clinit(const irep_idt &classname);
+  exprt get_or_create_clinit_wrapper(const irep_idt &classname);
+  codet get_clinit_call(const irep_idt &classname);
 };
 
 #endif
