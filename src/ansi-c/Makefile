@@ -14,7 +14,9 @@ SRC = c_typecast.cpp ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_parser.cpp \
       literals/convert_float_literal.cpp \
       literals/convert_character_literal.cpp \
       literals/convert_integer_literal.cpp \
-      literals/convert_string_literal.cpp c_misc.cpp
+      literals/convert_string_literal.cpp c_misc.cpp \
+      c_nondet_symbol_factory.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 
