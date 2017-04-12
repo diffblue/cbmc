@@ -90,16 +90,6 @@ public:
   const dynamic_typest &get_dynamic_types() { return dynamic_types; }
 
 protected:
-  struct trace_stack_entryt
-  {
-    irep_idt func_name;
-    mp_integer this_address;
-    irep_idt capture_symbol;
-    bool is_super_call;
-    std::vector<interpretert::function_assignmentt> param_values;
-  };
-  typedef std::vector<trace_stack_entryt> trace_stackt;
-
   const symbol_tablet &symbol_table;
 
   // This is a cache so that we don't have to create it when a call needs it
