@@ -147,7 +147,7 @@ int clobber_parse_optionst::doit()
     if(!out)
       throw std::string("failed to create file simulator.c");
 
-    dump_c(goto_functions, true, false, ns, out);
+    dump_c(goto_functions, true, false, false, ns, out);
 
     status() << "instrumentation complete; compile and execute simulator.c"
              << eom;
