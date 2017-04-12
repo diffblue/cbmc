@@ -674,6 +674,39 @@ inline void *memmove(void *dest, const void *src, size_t n)
   return dest;
 }
 
+/* FUNCTION: __builtin___memmove_chk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef memmove
+
+inline void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memmove buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dest)==size, "builtin object size");
+  // dst = src (with overlap allowed)
+  if(__CPROVER_is_zero_string(src) &&
+     n > __CPROVER_zero_string_length(src))
+  {
+    __CPROVER_is_zero_string(src)=1;
+    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
+  }
+  else
+    __CPROVER_is_zero_string(dest)=0;
+  #else
+  (void)size;
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dest, src_n);
+  #endif
+  return dest;
+}
+
 /* FUNCTION: memcmp */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
