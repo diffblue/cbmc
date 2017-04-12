@@ -499,8 +499,6 @@ std::string expr2javat::convert(
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
     return convert_function(src, "throw", precedence=16);
-  else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
-    return "nullptr";
   else if(src.id()==ID_unassigned)
     return "?";
   else if(src.id()=="pod_constructor")
