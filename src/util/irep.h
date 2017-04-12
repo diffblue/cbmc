@@ -215,8 +215,7 @@ private:
   };
 
 #ifdef SHARING
-  static small_shared_ptrt<dt> &get_empty_dt();
-  small_shared_ptrt<dt> data=get_empty_dt();
+  small_shared_ptrt<dt> data=make_small_shared_ptr<dt>();
 #else
   dt data;
 #endif

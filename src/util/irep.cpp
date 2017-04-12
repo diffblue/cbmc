@@ -22,16 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#ifdef SHARING
-small_shared_ptrt<irept::dt>& irept::get_empty_dt()
-{
-  // Putting this in a function makes sure that it exists the first time that
-  // the function is called, which solves undefined-order-of-static-init issues.
-  static small_shared_ptrt<dt> empty=make_small_shared_ptr<dt>();
-  return empty;
-}
-#endif
-
 /*******************************************************************\
 
 Function: named_subt_lower_bound
