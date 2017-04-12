@@ -156,7 +156,8 @@ void string_refinementt::add_symbol_to_symbol_map(
   symbol_resolve[lhs]=new_rhs;
   reverse_symbol_resolve[new_rhs].push_back(lhs);
 
-  std::list<exprt> symbols_to_update_with_new_rhs(reverse_symbol_resolve[rhs]);
+  const std::list<exprt> &symbols_to_update_with_new_rhs(
+    reverse_symbol_resolve[lhs]);
   for(exprt item : symbols_to_update_with_new_rhs)
   {
     symbol_resolve[item]=new_rhs;
