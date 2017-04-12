@@ -29,6 +29,12 @@ Date: April 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
 
+/// Set up argv with up to max_argc pointers into an array of 4096 bytes.
+/// \param symbol_table: Input program's symbol table
+/// \param goto_functions: Input program's intermediate representation
+/// \param max_argc: User-specified maximum number of arguments to be modelled
+/// \param message_handler: message logging
+/// \return True, if and only if modelling succeeded
 bool model_argc_argv(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -38,36 +44,22 @@ bool model_argc_argv(
   messaget message(message_handler);
   const namespacet ns(symbol_table);
 
-  const symbolt *init_symbol=nullptr;
-  if(ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
+  if(!symbol_table.has_symbol(goto_functions.entry_point()))
   {
     message.error() << "Linking not done, missing "
-                    << CPROVER_PREFIX "initialize" << messaget::eom;
+                    << goto_functions.entry_point() << messaget::eom;
     return true;
   }
 
-  if(init_symbol->mode!=ID_C)
+  const symbolt &main_symbol=
+    ns.lookup(config.main.empty()?ID_main:config.main);
+
+  if(main_symbol.mode!=ID_C)
   {
     message.error() << "argc/argv modelling is C specific"
                     << messaget::eom;
     return true;
   }
-
-  goto_functionst::function_mapt::iterator init_entry=
-    goto_functions.function_map.find(CPROVER_PREFIX "initialize");
-  assert(
-    init_entry!=goto_functions.function_map.end() &&
-    init_entry->second.body_available());
-
-  goto_programt &init=init_entry->second.body;
-  goto_programt::targett init_end=init.instructions.end();
-  --init_end;
-  assert(init_end->is_end_function());
-  assert(init_end!=init.instructions.begin());
-  --init_end;
-
-  const symbolt &main_symbol=
-    ns.lookup(config.main.empty()?ID_main:config.main);
 
   const code_typet::parameterst &parameters=
     to_code_type(main_symbol.type).parameters();
@@ -86,13 +78,14 @@ bool model_argc_argv(
   std::ostringstream oss;
   oss << "int ARGC;\n"
       << "char *ARGV[1];\n"
-      << "void " CPROVER_PREFIX "initialize()\n"
+      << "void " << goto_functions.entry_point() << "()\n"
       << "{\n"
       << "  unsigned next=0u;\n"
       << "  " CPROVER_PREFIX "assume(ARGC>=1);\n"
       << "  " CPROVER_PREFIX "assume(ARGC<=" << max_argc << ");\n"
-      << "  " CPROVER_PREFIX "thread_local static char arg_string[4096];\n"
-      << "  for(unsigned i=0u; i<ARGC && i<" << max_argc << "; ++i)\n"
+      << "  char arg_string[4096];\n"
+      << "  __CPROVER_input(\"arg_string\", &arg_string[0]);\n"
+      << "  for(int i=0; i<ARGC && i<" << max_argc << "; ++i)\n"
       << "  {\n"
       << "    unsigned len;\n"
       << "    " CPROVER_PREFIX "assume(len<4096);\n"
@@ -114,17 +107,18 @@ bool model_argc_argv(
   symbol_tablet tmp_symbol_table;
   ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
 
-  goto_programt tmp;
+  goto_programt init_instructions;
   exprt value=nil_exprt();
-  // locate the body of the newly built initialize function as well
-  // as any additional declarations we might need; the body will then
-  // be converted and appended to the existing initialize function
+  // locate the body of the newly built start function as well as any
+  // additional declarations we might need; the body will then be
+  // converted and inserted into the start function
   forall_symbols(it, tmp_symbol_table.symbols)
   {
     // add __CPROVER_assume if necessary (it might exist already)
-    if(it->first==CPROVER_PREFIX "assume")
+    if(it->first==CPROVER_PREFIX "assume" ||
+       it->first==CPROVER_PREFIX "input")
       symbol_table.add(it->second);
-    else if(it->first==CPROVER_PREFIX "initialize")
+    else if(it->first==goto_functions.entry_point())
     {
       value=it->second.value;
 
@@ -134,7 +128,7 @@ bool model_argc_argv(
       replace(value);
     }
     else if(has_prefix(id2string(it->first),
-                       CPROVER_PREFIX "initialize::") &&
+                       id2string(goto_functions.entry_point())+"::") &&
             symbol_table.add(it->second))
       UNREACHABLE;
   }
@@ -143,20 +137,41 @@ bool model_argc_argv(
   goto_convert(
     to_code(value),
     symbol_table,
-    tmp,
+    init_instructions,
     message_handler);
-  Forall_goto_program_instructions(it, tmp)
+  Forall_goto_program_instructions(it, init_instructions)
   {
     it->source_location.set_file("<built-in-library>");
-    it->function=CPROVER_PREFIX "initialize";
+    it->function=goto_functions.entry_point();
   }
-  init.insert_before_swap(init_end, tmp);
+
+  goto_functionst::function_mapt::iterator start_entry=
+    goto_functions.function_map.find(goto_functions.entry_point());
+  assert(
+    start_entry!=goto_functions.function_map.end() &&
+    start_entry->second.body_available());
+
+  goto_programt &start=start_entry->second.body;
+  goto_programt::targett main_call=start.instructions.begin();
+  for(goto_programt::targett end=start.instructions.end();
+      main_call!=end;
+      ++main_call)
+    if(main_call->is_function_call())
+    {
+      const exprt &func=
+        to_code_function_call(main_call->code).function();
+      if(func.id()==ID_symbol &&
+         to_symbol_expr(func).get_identifier()==main_symbol.name)
+        break;
+    }
+
+  assert(main_call!=start.instructions.end());
+  start.insert_before_swap(main_call, init_instructions);
 
   // update counters etc.
-  remove_skip(init);
-  init.compute_loop_numbers();
+  remove_skip(start);
+  start.compute_loop_numbers();
   goto_functions.update();
 
   return false;
 }
-
