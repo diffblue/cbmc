@@ -42,13 +42,13 @@ public:
     size_t _max_nondet_array_length,
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler):
-    init_code(_init_code),
-    assume_non_null(_assume_non_null),
-    max_nondet_array_length(_max_nondet_array_length),
-    symbol_table(_symbol_table),
-    message_handler(_message_handler),
-    ns(_symbol_table)
-    {}
+      init_code(_init_code),
+      assume_non_null(_assume_non_null),
+      max_nondet_array_length(_max_nondet_array_length),
+      symbol_table(_symbol_table),
+      message_handler(_message_handler),
+      ns(_symbol_table)
+  {}
 
   exprt allocate_object(
     const exprt &,
@@ -72,7 +72,7 @@ public:
 
 Function: java_object_factoryt::allocate_object
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -152,17 +152,17 @@ exprt java_object_factoryt::allocate_object(
 
 Function: java_object_factoryt::gen_nondet_init
 
-  Inputs:
-   expr -
-   is_sub -
-   class_identifier -
-   loc -
-   create_dynamic_objects -
-   override - Ignore the LHS' real type. Used at the moment for
-              reference arrays, which are implemented as void*
-              arrays but should be init'd as their true type with
-              appropriate casts.
-   override_type - Type to use if ignoring the LHS' real type
+ Inputs:
+  expr -
+  is_sub -
+  class_identifier -
+  loc -
+  create_dynamic_objects -
+  override - Ignore the LHS' real type. Used at the moment for
+             reference arrays, which are implemented as void*
+             arrays but should be init'd as their true type with
+             appropriate casts.
+  override_type - Type to use if ignoring the LHS' real type
 
  Outputs:
 
@@ -340,7 +340,7 @@ void java_object_factoryt::gen_nondet_init(
 
 Function: java_object_factoryt::gen_nondet_array_init
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -519,7 +519,7 @@ exprt get_nondet_bool(const typet &type)
 
 Function: object_factory
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
