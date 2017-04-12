@@ -37,10 +37,10 @@ matrix:
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - ccache -M 1G
       env:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
-        - ccache -M 1G
 
     # Ubuntu Linux with glibc using g++-5
     - os: linux
