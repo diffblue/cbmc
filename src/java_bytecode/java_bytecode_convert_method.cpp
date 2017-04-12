@@ -1260,10 +1260,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // TODO: convert assertions to exceptions.
       assert(op.size()==1 && results.size()==1);
       binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
-      c=code_assertt(check);
-      c.add_source_location().set_comment("Dynamic cast check");
-      c.add_source_location().set_property_class("bad-dynamic-cast");
-
+      code_assertt assert_class(check);
+      assert_class.add_source_location().set_comment("Dynamic cast check");
+      assert_class.add_source_location().set_property_class("bad-dynamic-cast");
+      // checkcast passes when the operand is null.
+      empty_typet voidt;
+      pointer_typet voidptr(voidt);
+      exprt null_check_op=op[0];
+      if(null_check_op.type()!=voidptr)
+        null_check_op.make_typecast(voidptr);
+      code_ifthenelset conditional_check;
+      notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
+      conditional_check.cond()=std::move(op_not_null);
+      conditional_check.then_case()=std::move(assert_class);
+      c=std::move(conditional_check);
       results[0]=op[0];
     }
     else if(statement=="invokedynamic")
