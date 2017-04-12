@@ -41,7 +41,6 @@ matrix:
       env:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
-        - ccache -M 1G
 
     # Ubuntu Linux with glibc using g++-5
     - os: linux
