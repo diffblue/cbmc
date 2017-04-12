@@ -75,7 +75,7 @@ exprt convert_integer_literal(const std::string &src)
     std::string without_prefix(src, 2, std::string::npos);
     value=string2integer(without_prefix, 2);
   }
-  else if(src.size()>=2 && src[0]=='0')
+  else if(src.size()>=2 && src[0]=='0' && isdigit(src[1]))
   {
     // octal
     base=8;
