@@ -26,13 +26,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 Constructor: string_refinementt
 
-     Inputs: a namespace, a decision procedure, a bound on the number
-             of refinements and a boolean flag `concretize_result`
+     Inputs:
+       _ns - a namespace
+       _prop - a decision procedure
+       refinement_bound - a bound on the number of refinements
 
     Purpose: refinement_bound is a bound on the number of refinement allowed.
-             if `concretize_result` is set to true, at the end of the decision
-             procedure, the solver try to find a concrete value for each
-             character
 
 \*******************************************************************/
 
@@ -167,15 +166,17 @@ void string_refinementt::add_instantiations()
 
 Function: string_refinementt::add_symbol_to_symbol_map()
 
-  Inputs: a symbol and the expression to map it to
+  Inputs:
+    lhs - a symbol expression
+    rhs - an expression to map it to
 
  Purpose: keeps a map of symbols to expressions, such as none of the
           mapped values exist as a key
 
 \*******************************************************************/
 
-void string_refinementt::add_symbol_to_symbol_map
-(const exprt &lhs, const exprt &rhs)
+void string_refinementt::add_symbol_to_symbol_map(
+  const exprt &lhs, const exprt &rhs)
 {
   assert(lhs.id()==ID_symbol);
 
@@ -259,6 +260,21 @@ exprt string_refinementt::substitute_function_applications(exprt expr)
   return expr;
 }
 
+/*******************************************************************\
+
+Function: string_refinementt::is_char_array
+
+  Inputs:
+    type - a type
+
+ Outputs: true if the given type is an array of java characters
+
+ Purpose: distinguish char array from other types
+
+ TODO: this is only for java char array and does not work for other languages
+
+\*******************************************************************/
+
 bool string_refinementt::is_char_array(const typet &type) const
 {
   if(type.id()==ID_symbol)
@@ -269,9 +285,11 @@ bool string_refinementt::is_char_array(const typet &type) const
 
 /*******************************************************************\
 
-Function: string_refinementt::boolbv_set_equality_to_true
+Function: string_refinementt::add_axioms_for_string_assigns
 
-  Inputs: the lhs and rhs of an equality expression
+  Inputs:
+    lhs - left hand side of an equality expression
+    rhs - right and side of the equality
 
  Outputs: false if the lemmas were added successfully, true otherwise
 
@@ -279,8 +297,8 @@ Function: string_refinementt::boolbv_set_equality_to_true
 
 \*******************************************************************/
 
-bool string_refinementt::add_axioms_for_string_assigns(const exprt &lhs,
-                                                       const exprt &rhs)
+bool string_refinementt::add_axioms_for_string_assigns(
+  const exprt &lhs, const exprt &rhs)
 {
   if(is_char_array(rhs.type()))
   {
@@ -332,7 +350,6 @@ void string_refinementt::concretize_string(const exprt &expr)
   {
     string_exprt str=to_string_expr(expr);
     exprt length=get(str.length());
-    add_lemma(equal_exprt(str.length(), length));
     exprt content=str.content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
@@ -350,6 +367,7 @@ void string_refinementt::concretize_string(const exprt &expr)
       else
       {
         size_t concretize_limit=found_length.to_long();
+        assert(concretize_limit<=generator.max_string_length);
         concretize_limit=concretize_limit>generator.max_string_length?
               generator.max_string_length:concretize_limit;
         exprt content_expr=str.content();
@@ -443,6 +461,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     {
       debug() << "(sr::set_to) WARNING: ignoring "
               << from_expr(expr) << " [inconsistent types]" << eom;
+      debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
+      debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
       return;
     }
 
@@ -596,7 +616,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
           do_concretizing=false;
         }
         else
+        {
+          debug() << "check_SAT: the model is correct and "
+                  << "does not need concretizing" << eom;
           return D_SATISFIABLE;
+        }
       }
 
       display_index_set();
@@ -611,6 +635,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       }
       break;
     default:
+      debug() << "check_SAT: default return " << res << eom;
       return res;
     }
   }
@@ -1032,16 +1057,17 @@ void string_refinementt::substitute_array_access(exprt &expr) const
     }
 
     auto op_it=++array_expr.operands().rbegin();
+
     for(size_t i=last_index-1;
         op_it!=array_expr.operands().rend(); ++op_it, --i)
     {
       equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
-      ite=if_exprt(equals, *op_it, ite);
-      if(ite.type()!=char_type)
+      if(op_it->type()!=char_type)
       {
-        assert(ite.id()==ID_unknown);
-        ite.type()=char_type;
+        assert(op_it->id()==ID_unknown);
+        op_it->type()=char_type;
       }
+      ite=if_exprt(equals, *op_it, ite);
     }
     expr=ite;
   }
@@ -1747,7 +1773,7 @@ exprt string_refinementt::substitute_array_lists(exprt expr) const
                         expr.operands()[0],
                         expr.operands()[1]);
 
-    for(size_t i=2; i<expr.operands().size()/2; i++)
+    for(size_t i=1; i<expr.operands().size()/2; i++)
     {
       ret_expr=with_exprt(ret_expr,
                           expr.operands()[i*2],
