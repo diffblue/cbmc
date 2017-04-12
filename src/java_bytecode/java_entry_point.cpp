@@ -142,8 +142,7 @@ bool java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
-          source_location,
-          message_handler);
+          source_location);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
       }
@@ -234,8 +233,7 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
-        function.location,
-        message_handler);
+        function.location);
 
     const symbolt &p_symbol=
       symbol_table.lookup(parameters[param_number].get_identifier());
