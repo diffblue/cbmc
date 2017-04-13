@@ -208,20 +208,21 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   return res;
 }
 
-/// gives the smallest integer with the specified number of digits
-/// \par parameters: number of digit
-/// \return an integer with the right number of digit
-static mp_integer smallest_by_digit(int nb)
-{
-  return power(10, nb-1);
-}
+/*******************************************************************\
 
-/// add axioms to say the string corresponds to the result of String.valueOf(I)
-/// or String.valueOf(J) java functions applied on the integer expression
-/// \par parameters: a signed integer expression, and a maximal size for the
-///   string
-/// representation
-/// \return a string expression
+Function: string_constraint_generatort::add_axioms_from_int
+
+  Inputs: a signed integer expression, and a maximal size for the string
+          representation
+
+ Outputs: a string expression
+
+ Purpose: add axioms to say the string corresponds to the result of
+          String.valueOf(I) or String.valueOf(J) java functions applied on the
+          integer expression
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_from_int(
   const exprt &i, size_t max_size, const refined_string_typet &ref_type)
 {
@@ -238,102 +239,90 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   exprt max=from_integer(max_size, index_type);
 
   // We add axioms:
-  // a1 : 0 <|res|<=max_size
-  // a2 : (res[0]='-')||('0'<=res[0]<='9')
+  // a1 : i < 0 => 1 <|res|<=max_size && res[0]='-'
+  // a2 : i >= 0 => 0 <|res|<=max_size-1 && '0'<=res[0]<='9'
+  // a3 : |res|>1 && '0'<=res[0]<='9' => res[0]!='0'
+  // a4 : |res|>1 && res[0]='-' => res[1]!='0'
 
-  and_exprt a1(res.axiom_for_is_strictly_longer_than(zero),
-               res.axiom_for_is_shorter_than(max));
+  binary_relation_exprt is_negative(i, ID_lt, zero);
+  and_exprt correct_length1(
+    res.axiom_for_is_strictly_longer_than(1),
+    res.axiom_for_is_shorter_than(max));
+  equal_exprt starts_with_minus(res[0], minus_char);
+  implies_exprt a1(is_negative, and_exprt(correct_length1, starts_with_minus));
   axioms.push_back(a1);
 
-  exprt chr=res[0];
-  equal_exprt starts_with_minus(chr, minus_char);
+  not_exprt is_positive(is_negative);
   and_exprt starts_with_digit(
-    binary_relation_exprt(chr, ID_ge, zero_char),
-    binary_relation_exprt(chr, ID_le, nine_char));
-  or_exprt a2(starts_with_digit, starts_with_minus);
+    binary_relation_exprt(res[0], ID_ge, zero_char),
+    binary_relation_exprt(res[0], ID_le, nine_char));
+  and_exprt correct_length2(
+    res.axiom_for_is_strictly_longer_than(0),
+    res.axiom_for_is_strictly_shorter_than(max));
+  implies_exprt a2(is_positive, and_exprt(correct_length2, starts_with_digit));
   axioms.push_back(a2);
 
-  // These are constraints to detect number that requiere the maximum number
-  // of digits
-  exprt smallest_with_max_digits=
-    from_integer(smallest_by_digit(max_size-1), type);
-  binary_relation_exprt big_negative(
-    i, ID_le, unary_minus_exprt(smallest_with_max_digits));
-  binary_relation_exprt big_positive(i, ID_ge, smallest_with_max_digits);
-  or_exprt requieres_max_digits(big_negative, big_positive);
+  implies_exprt a3(
+    and_exprt(res.axiom_for_is_strictly_longer_than(1), starts_with_digit),
+    not_exprt(equal_exprt(res[0], zero_char)));
+  axioms.push_back(a3);
+
+  implies_exprt a4(
+    and_exprt(res.axiom_for_is_strictly_longer_than(1), starts_with_minus),
+    not_exprt(equal_exprt(res[1], zero_char)));
+  axioms.push_back(a4);
+
+  assert(max_size<std::numeric_limits<size_t>::max());
 
   for(size_t size=1; size<=max_size; size++)
   {
     // For each possible size, we add axioms:
-    // all_numbers: forall 1<=i<=size. '0'<=res[i]<='9'
-    // a3 : |res|=size&&'0'<=res[0]<='9' =>
-    //      i=sum+str[0]-'0' &&all_numbers
-    // a4 : |res|=size&&res[0]='-' => i=-sum
-    // a5 : size>1 => |res|=size&&'0'<=res[0]<='9' => res[0]!='0'
-    // a6 : size>1 => |res|=size&&res[0]'-' => res[1]!='0'
-    // a7 : size==max_size => i>1000000000
-    exprt sum=from_integer(0, type);
-    exprt all_numbers=true_exprt();
-    chr=res[0];
-    exprt first_value=typecast_exprt(minus_exprt(chr, zero_char), type);
+    // a5 : forall 1 <= j < size. '0' <= res[j] <= '9' && sum == 10 * (sum/10)
+    // a6 : |res| == size && '0' <= res[0] <= '9' => i == sum
+    // a7 : |res| == size && res[0] == '-' => i == -sum
+
+    exprt::operandst digit_constraints;
+    exprt sum=if_exprt(
+      starts_with_digit,
+      typecast_exprt(minus_exprt(res[0], zero_char), type),
+      from_integer(0, type));
 
     for(size_t j=1; j<size; j++)
     {
-      chr=res[j];
-      sum=plus_exprt(
-        mult_exprt(sum, ten),
-        typecast_exprt(minus_exprt(chr, zero_char), type));
-      first_value=mult_exprt(first_value, ten);
+      mult_exprt ten_sum(sum, ten);
+      // sum = 10 * sum + (res[j] - '0')
+      exprt new_sum=plus_exprt(
+        ten_sum, typecast_exprt(minus_exprt(res[j], zero_char), type));
       and_exprt is_number(
-        binary_relation_exprt(chr, ID_ge, zero_char),
-        binary_relation_exprt(chr, ID_le, nine_char));
-      all_numbers=and_exprt(all_numbers, is_number);
+        binary_relation_exprt(res[j], ID_ge, zero_char),
+        binary_relation_exprt(res[j], ID_le, nine_char));
+      digit_constraints.push_back(is_number);
+
+      if(j>=max_size-1)
+      {
+        // check for overflows if the size is big
+        and_exprt no_overflow(
+          equal_exprt(sum, div_exprt(ten_sum, ten)),
+          binary_relation_exprt(new_sum, ID_ge, ten_sum));
+        digit_constraints.push_back(no_overflow);
+      }
+      sum=new_sum;
     }
 
-    axioms.push_back(all_numbers);
+    exprt a5=conjunction(digit_constraints);
+    axioms.push_back(a5);
 
     equal_exprt premise=res.axiom_for_has_length(size);
-    equal_exprt constr3(i, plus_exprt(sum, first_value));
-    implies_exprt a3(and_exprt(premise, starts_with_digit), constr3);
-    axioms.push_back(a3);
+    implies_exprt a6(
+      and_exprt(premise, starts_with_digit), equal_exprt(i, sum));
+    axioms.push_back(a6);
 
-    implies_exprt a4(
+    implies_exprt a7(
       and_exprt(premise, starts_with_minus),
       equal_exprt(i, unary_minus_exprt(sum)));
-    axioms.push_back(a4);
-
-    // disallow 0s at the beginning
-    if(size>1)
-    {
-      equal_exprt r0_zero(res[zero], zero_char);
-      implies_exprt a5(
-        and_exprt(premise, starts_with_digit),
-        not_exprt(r0_zero));
-      axioms.push_back(a5);
-
-      exprt one=from_integer(1, index_type);
-      equal_exprt r1_zero(res[one], zero_char);
-      implies_exprt a6(
-        and_exprt(premise, starts_with_minus),
-        not_exprt(r1_zero));
-      axioms.push_back(a6);
-    }
-
-    // when the size is close to the maximum, either the number is very big
-    // or it is negative
-    if(size==max_size-1)
-    {
-      implies_exprt a7(premise, or_exprt(requieres_max_digits,
-                                         starts_with_minus));
-      axioms.push_back(a7);
-    }
-    // when we reach the maximal size the number is very big in the negative
-    if(size==max_size)
-    {
-      implies_exprt a7(premise, and_exprt(starts_with_minus, big_negative));
-      axioms.push_back(a7);
-    }
+    axioms.push_back(a7);
   }
+
   return res;
 }
 
