@@ -53,6 +53,10 @@ class string_refine_preprocesst:public messaget
 
   static bool is_java_string_builder_pointer_type(const typet &type);
 
+  static bool is_java_string_buffer_type(const typet &type);
+
+  static bool is_java_string_buffer_pointer_type(const typet &type);
+
   static bool is_java_char_sequence_type(const typet &type);
 
   static bool is_java_char_sequence_pointer_type(const typet &type);
@@ -66,6 +70,7 @@ class string_refine_preprocesst:public messaget
       return
         is_java_char_sequence_pointer_type(type) ||
         is_java_string_builder_pointer_type(type) ||
+        is_java_string_buffer_pointer_type(type) ||
         is_java_string_pointer_type(type);
   }
 
