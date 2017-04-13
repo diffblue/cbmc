@@ -508,9 +508,7 @@ void variable_sensitivity_domaint::transform_function_call(
       {
         if(parameter_it==declaration_parameters.end())
         {
-          // TODO(tkiley): Here we have fewer parameters in the function
-          // declaration than we had arguments in the function call
-          // I think this should be an error rather than silently failing?
+          assert(code_type.has_ellipsis());
           break;
         }
 
@@ -527,10 +525,8 @@ void variable_sensitivity_domaint::transform_function_call(
         ++parameter_it;
       }
 
-      // TODO(tkiley): Here there were more declared parameters than were passed
-      // could this be a varadics thing or is this an error?
-      if(parameter_it!=declaration_parameters.end())
-      {}
+      // Too few arguments so invalid code
+      assert(parameter_it==declaration_parameters.end());
     }
   }
   else
