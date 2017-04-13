@@ -31,21 +31,28 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
 
   // We add axioms:
   // a1 : |res|=k
-  // a2 : forall i<k. (i<k ==> s[i]=s1[i]) &&(i >= k ==> s[i]=0)
+  // a2 : forall i<|s1|. i < |res|  ==> res[i] = s1[i]
+  // a3 : forall i<|s1|. i >= |res| ==> res[i] = 0
 
   axioms.push_back(res.axiom_for_has_length(k));
 
   symbol_exprt idx=fresh_univ_index(
     "QA_index_set_length", ref_type.get_index_type());
   string_constraintt a2(
-    idx, k, and_exprt(
-      implies_exprt(
-        s1.axiom_for_is_strictly_longer_than(idx),
-        equal_exprt(s1[idx], res[idx])),
-      implies_exprt(
-        s1.axiom_for_is_shorter_than(idx),
-        equal_exprt(s1[idx], constant_char(0, ref_type.get_char_type())))));
+    idx,
+    s1.length(),
+    res.axiom_for_is_strictly_longer_than(idx),
+    equal_exprt(s1[idx], res[idx]));
   axioms.push_back(a2);
+
+  symbol_exprt idx2=fresh_univ_index(
+    "QA_index_set_length2", ref_type.get_index_type());
+  string_constraintt a3(
+    idx2,
+    s1.length(),
+    res.axiom_for_is_shorter_than(idx2),
+    equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type())));
+  axioms.push_back(a3);
 
   return res;
 }
