@@ -464,18 +464,11 @@ void java_object_factoryt::gen_nondet_init(
   }
   else
   {
-    code_assignt assign;
-    assign.lhs()=expr;
+    exprt rhs=type.id()==ID_c_bool?
+      get_nondet_bool(type):
+      side_effect_expr_nondett(type);
+    code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
-
-    if(type.id()==ID_c_bool)
-    {
-      assign.rhs()=get_nondet_bool(type);
-    }
-    else
-    {
-      assign.rhs()=side_effect_expr_nondett(type);
-    }
 
     init_code.copy_to_operands(assign);
   }
