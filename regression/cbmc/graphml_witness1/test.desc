@@ -49,7 +49,7 @@ main.c
     <node id="[0-9\.]*">
       <data key="entry">true</data>
     </node>
-    <edge source="33.22" target="4.29">
+    <edge source="[0-9\.]*" target="[0-9\.]*">
       <data key="originfile">main.c</data>
       <data key="startline">21</data>
     </edge>

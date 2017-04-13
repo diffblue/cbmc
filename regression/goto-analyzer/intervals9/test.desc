@@ -1,0 +1,8 @@
+KNOWNBUG
+intervals9.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] file intervals9.c line 9 function main, assertion i>=1 && i<=2: SUCCESS$
+--
+^warning: ignoring

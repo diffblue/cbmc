@@ -1,0 +1,15 @@
+CORE
+main.c
+--verbosity 10 --pointer-check --remove-function-pointers
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f2 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f3 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f4 THEN GOTO [0-9]$
+^SIGNAL=0$
+--
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f1 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f5 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f6 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f7 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f8 THEN GOTO [0-9]$
+^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f9 THEN GOTO [0-9]$
+^warning: ignoring

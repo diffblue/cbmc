@@ -14,12 +14,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/config.h>
 #include <util/type_eq.h>
+#include <util/message.h>
+#include <util/base_type.h>
+#include <ansi-c/c_qualifiers.h>
+#include <analyses/does_remove_const.h>
 
 #include <ansi-c/c_types.h>
 
 #include "remove_skip.h"
 #include "remove_function_pointers.h"
 #include "compute_called_functions.h"
+#include "remove_const_function_pointers.h"
 
 /*******************************************************************\
 
@@ -29,12 +34,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-class remove_function_pointerst
+class remove_function_pointerst:public messaget
 {
 public:
   remove_function_pointerst(
+    message_handlert &_message_handler,
     symbol_tablet &_symbol_table,
     bool _add_safety_assertion,
+    bool only_resolve_const_fps,
     const goto_functionst &goto_functions);
 
   void operator()(goto_functionst &goto_functions);
@@ -45,6 +52,14 @@ protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
   bool add_safety_assertion;
+
+  // We can optionally halt the FP removal if we aren't able to use
+  // remove_const_function_pointerst to sucessfully narrow to a small
+  // subset of possible functions and just leave the function pointer
+  // as it is.
+  // This can be activated in goto-instrument using
+  // --remove-const-function-pointers instead of --remove-function-pointers
+  bool only_resolve_const_fps;
 
   void remove_function_pointer(
     goto_programt &goto_program,
@@ -92,12 +107,15 @@ Function: remove_function_pointerst::remove_function_pointerst
 \*******************************************************************/
 
 remove_function_pointerst::remove_function_pointerst(
+  message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
-  bool _add_safety_assertion,
+  bool _add_safety_assertion, bool only_resolve_const_fps,
   const goto_functionst &goto_functions):
+  messaget(_message_handler),
   ns(_symbol_table),
   symbol_table(_symbol_table),
-  add_safety_assertion(_add_safety_assertion)
+  add_safety_assertion(_add_safety_assertion),
+  only_resolve_const_fps(only_resolve_const_fps)
 {
   compute_address_taken_in_symbols(address_taken);
   compute_address_taken_functions(goto_functions, address_taken);
@@ -338,41 +356,71 @@ void remove_function_pointerst::remove_function_pointer(
   assert(function.id()==ID_dereference);
   assert(function.operands().size()==1);
 
-  const exprt &pointer=function.op0();
+  bool found_functions;
 
-  // Is this simple?
-  if(pointer.id()==ID_address_of &&
-     to_address_of_expr(pointer).object().id()==ID_symbol)
+  const exprt &pointer=function.op0();
+  remove_const_function_pointerst::functionst functions;
+  does_remove_constt const_removal_check(goto_program, ns);
+  if(const_removal_check())
   {
-    to_code_function_call(target->code).function()=
-      to_address_of_expr(pointer).object();
-    return;
+    warning() << "Cast from const to non-const pointer found, only worst case"
+              << " function pointer removal will be done." << eom;
+    found_functions=false;
+  }
+  else
+  {
+    remove_const_function_pointerst fpr(
+    get_message_handler(), pointer, ns, symbol_table);
+
+    found_functions=fpr(functions);
+
+    // Either found_functions is true therefore the functions should not
+    // be empty
+    // Or found_functions is false therefore the functions should be empty
+    assert(found_functions != functions.empty());
+
+    if(functions.size()==1)
+    {
+      to_code_function_call(target->code).function()=*functions.cbegin();
+      return;
+    }
   }
 
-  typedef std::list<exprt> functionst;
-  functionst functions;
-
-  bool return_value_used=code.lhs().is_not_nil();
-
-  // get all type-compatible functions
-  // whose address is ever taken
-  for(const auto &t : type_map)
+  if(!found_functions)
   {
-    // address taken?
-    if(address_taken.find(t.first)==address_taken.end())
-      continue;
+    if(only_resolve_const_fps)
+    {
+      // If this mode is enabled, we only remove function pointers
+      // that we can resolve either to an exact funciton, or an exact subset
+      // (e.g. a variable index in a constant array).
+      // Since we haven't found functions, we would now resort to
+      // replacing the function pointer with any function with a valid signature
+      // Since we don't want to do that, we abort.
+      return;
+    }
 
-    // type-compatible?
-    if(!is_type_compatible(return_value_used, call_type, t.second))
-      continue;
+    bool return_value_used=code.lhs().is_not_nil();
 
-    if(t.first=="pthread_mutex_cleanup")
-      continue;
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &t : type_map)
+    {
+      // address taken?
+      if(address_taken.find(t.first)==address_taken.end())
+        continue;
 
-    symbol_exprt expr;
-    expr.type()=t.second;
-    expr.set_identifier(t.first);
-    functions.push_back(expr);
+      // type-compatible?
+      if(!is_type_compatible(return_value_used, call_type, t.second))
+        continue;
+
+      if(t.first=="pthread_mutex_cleanup")
+        continue;
+
+      symbol_exprt expr;
+      expr.type()=t.second;
+      expr.set_identifier(t.first);
+        functions.insert(expr);
+    }
   }
 
   // the final target is a skip
@@ -455,6 +503,11 @@ void remove_function_pointerst::remove_function_pointer(
   code_expression.expression()=function;
   target->code.swap(code_expression);
   target->type=OTHER;
+
+  // report statistics
+  statistics().source_location=target->source_location;
+  statistics() << "replacing function pointer by "
+               << functions.size() << " possible targets" << eom;
 }
 
 /*******************************************************************\
@@ -539,14 +592,20 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
-bool remove_function_pointers(
+bool remove_function_pointers(message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   goto_programt &goto_program,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointerst
-    rfp(symbol_table, add_safety_assertion, goto_functions);
+    rfp(
+      _message_handler,
+      symbol_table,
+      add_safety_assertion,
+      only_remove_const_fps,
+      goto_functions);
 
   return rfp.remove_function_pointers(goto_program);
 }
@@ -564,12 +623,19 @@ Function: remove_function_pointers
 \*******************************************************************/
 
 void remove_function_pointers(
+  message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointerst
-    rfp(symbol_table, add_safety_assertion, goto_functions);
+    rfp(
+      _message_handler,
+      symbol_table,
+      add_safety_assertion,
+      only_remove_const_fps,
+      goto_functions);
 
   rfp(goto_functions);
 }
@@ -586,11 +652,15 @@ Function: remove_function_pointers
 
 \*******************************************************************/
 
-void remove_function_pointers(
+void remove_function_pointers(message_handlert &_message_handler,
   goto_modelt &goto_model,
-  bool add_safety_assertion)
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
 {
   remove_function_pointers(
-    goto_model.symbol_table, goto_model.goto_functions,
-    add_safety_assertion);
+    _message_handler,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    add_safety_assertion,
+    only_remove_const_fps);
 }

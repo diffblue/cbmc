@@ -37,7 +37,7 @@ void goto_check(
 
 #define HELP_GOTO_CHECK \
   " --bounds-check               enable array bounds checks\n" \
-  " --pointer-check              enable pointer checks\n" \
+  " --pointer-check              enable pointer checks (always enabled for Java)\n" /* NOLINT(whitespace/line_length) */ \
   " --memory-leak-check          enable memory leak checks\n" \
   " --div-by-zero-check          enable division by zero checks\n" \
   " --signed-overflow-check      enable signed arithmetic over- and underflow checks\n" /* NOLINT(whitespace/line_length) */ \

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/simplify_expr.h>
 #include <util/time_stopping.h>
 
 #include <solvers/flattening/bv_pointers.h>
@@ -315,8 +316,10 @@ Function: path_searcht::drop_state
 
 \*******************************************************************/
 
-bool path_searcht::drop_state(const statet &state) const
+bool path_searcht::drop_state(const statet &state)
 {
+  goto_programt::const_targett pc=state.get_instruction();
+
   // depth limit
   if(depth_limit_set && state.get_depth()>depth_limit)
     return true;
@@ -343,6 +346,22 @@ bool path_searcht::drop_state(const statet &state) const
     for(const auto &rec_info : state.recursion_map)
       if(rec_info.second>unwind_limit)
         return true;
+  }
+
+  if(pc->is_assume() &&
+     simplify_expr(pc->guard, ns).is_false())
+  {
+    debug() << "aborting path on assume(false) at "
+            << pc->source_location
+            << " thread " << state.get_current_thread();
+
+    const irep_idt &c=pc->source_location.get_comment();
+    if(!c.empty())
+      debug() << ": " << c;
+
+    debug() << eom;
+
+    return true;
   }
 
   return false;

@@ -146,6 +146,10 @@ typet ansi_c_declarationt::full_type(
 
   *p=type();
 
+  // retain typedef for dump-c
+  if(get_is_typedef())
+    result.set(ID_C_typedef, declarator.get_name());
+
   return result;
 }
 

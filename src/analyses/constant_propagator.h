@@ -62,6 +62,7 @@ public:
     }
 
     bool is_constant(const exprt &expr) const;
+    bool is_array_constant(const exprt &expr) const;
     bool is_constant_address_of(const exprt &expr) const;
     bool set_to_top(const irep_idt &id);
 
@@ -75,6 +76,7 @@ public:
       replace_const.clear();
       is_bottom = false;
     }
+
   };
 
   valuest values;
@@ -117,6 +119,11 @@ public:
   }
 
 protected:
+  friend class constant_propagator_domaint;
+
+  void replace_array_symbol(
+		  exprt &expr);
+
   void replace(
     goto_functionst::goto_functiont &,
     const namespacet &);
@@ -128,6 +135,7 @@ protected:
   void replace_types_rec(
     const replace_symbolt &replace_const,
     exprt &expr);
+
 };
 
 #endif // CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H

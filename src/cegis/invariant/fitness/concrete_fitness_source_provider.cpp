@@ -69,9 +69,15 @@ bool contains(const std::string &haystack, const std::string &needle)
   return std::string::npos != haystack.find(needle);
 }
 
-bool handle_start(std::string &source, const std::string &line)
+bool handle_start(
+  const goto_functionst &gf,
+  std::string &source,
+  const std::string &line)
 {
-  if ("void _start(void)" != line) return false;
+  std::ostringstream start_sig;
+  start_sig << "void " << gf.entry_point() << "(void)";
+  if(start_sig.str()!=line)
+    return false;
   source+="int main(const int argc, const char * const argv[])\n";
   return true;
 }
@@ -212,17 +218,24 @@ bool handle_internals(const std::string &line)
       || "static signed int assert#return_value;" == line;
 }
 
-void post_process(std::string &source, std::stringstream &ss)
+void post_process(
+  const goto_functionst &gf,
+  std::string &source,
+  std::stringstream &ss)
 {
   bool deserialise_initialised=false;
   bool ce_initialised=false;
   for (std::string line; std::getline(ss, line);)
   {
-    if (handle_start(source, line) || handle_return_value(line)
-        || handle_ce_loop(line, ss) || handle_internals(line)
-        || handle_programs(source, deserialise_initialised, line)
-        || handle_x0(source, line) || handle_ce(source, ce_initialised, line)
-        || handle_second_instr_struct(source, line)) continue;
+    if(handle_start(gf, source, line) ||
+       handle_return_value(line) ||
+       handle_ce_loop(line, ss) ||
+       handle_internals(line) ||
+       handle_programs(source, deserialise_initialised, line) ||
+       handle_x0(source, line) ||
+       handle_ce(source, ce_initialised, line) ||
+       handle_second_instr_struct(source, line))
+      continue;
     replace_ce_index(line);
     replace_assume(line);
     fix_cprover_names(line);
@@ -254,7 +267,7 @@ std::string &post_process_fitness_source(std::string &result,
   add_first_prog_offset(result, num_ce_vars);
   add_assume_implementation(result);
   add_danger_execute(result, num_vars, num_consts, max_prog_size, exec);
-  post_process(result, ss);
+  post_process(gf, result, ss);
   transform_program_individual_main_to_lib(result, danger);
   return result;
 }

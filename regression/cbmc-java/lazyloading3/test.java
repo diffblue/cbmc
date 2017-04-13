@@ -5,6 +5,8 @@ public class test
 {
   public static void main(C c)
   {
+    if(c==null)
+      return;
     c.a.f();
   }
 }
