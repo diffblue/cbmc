@@ -1,0 +1,16 @@
+#include <assert.h>
+
+int main()
+{
+  int i=0, j=2;
+
+  while (i<=50) 
+  {
+    i++;
+    j++;
+  }
+  assert(i<50);
+  assert(i<51);
+  assert(i<52);
+}
+

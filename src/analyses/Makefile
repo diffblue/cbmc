@@ -6,7 +6,9 @@ SRC = natural_loops.cpp is_threaded.cpp dirty.cpp interval_analysis.cpp \
       local_bitvector_analysis.cpp dependence_graph.cpp \
       constant_propagator.cpp replace_symbol_ext.cpp \
       flow_insensitive_analysis.cpp \
-      custom_bitvector_analysis.cpp escape_analysis.cpp global_may_alias.cpp
+      custom_bitvector_analysis.cpp escape_analysis.cpp global_may_alias.cpp \
+      does_remove_const.cpp \
+      # Empty last line
 
 INCLUDES= -I ..
 

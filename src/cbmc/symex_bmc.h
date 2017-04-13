@@ -83,6 +83,10 @@ protected:
     const goto_functionst &goto_functions,
     statet &state);
 
+  virtual void merge_goto(
+    const statet::goto_statet &goto_state,
+    statet &state);
+
   // for loop unwinding
   virtual bool get_unwind(
     const symex_targett::sourcet &source,

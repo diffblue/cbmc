@@ -175,6 +175,10 @@ protected:
   // gotos
   void merge_gotos(statet &state);
 
+  virtual void merge_goto(
+    const statet::goto_statet &goto_state,
+    statet &state);
+
   void merge_value_sets(
     const statet::goto_statet &goto_state,
     statet &dest);

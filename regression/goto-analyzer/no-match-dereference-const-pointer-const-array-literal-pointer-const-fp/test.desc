@@ -1,0 +1,16 @@
+CORE
+main.c
+--show-goto-functions --verbosity 10 --pointer-check
+^Removing function pointers and virtual functions$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f1 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f2 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f3 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f4 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f5 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f6 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f7 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f8 THEN GOTO [0-9]$
+^\s*IF \*container_ptr->fp_tbl\[\(signed (long )*long int\)1\] == f9 THEN GOTO [0-9]$
+^SIGNAL=0$
+--
+^warning: ignoring

@@ -1,0 +1,16 @@
+CORE
+main.c
+--show-goto-functions --verbosity 10 --pointer-check
+^Removing function pointers and virtual functions$
+^\s*IF pts->go == f1 THEN GOTO [0-9]$
+^\s*IF pts->go == f2 THEN GOTO [0-9]$
+^\s*IF pts->go == f3 THEN GOTO [0-9]$
+^\s*IF pts->go == f4 THEN GOTO [0-9]$
+^\s*IF pts->go == f5 THEN GOTO [0-9]$
+^\s*IF pts->go == f6 THEN GOTO [0-9]$
+^\s*IF pts->go == f7 THEN GOTO [0-9]$
+^\s*IF pts->go == f8 THEN GOTO [0-9]$
+^\s*IF pts->go == f9 THEN GOTO [0-9]$
+^SIGNAL=0$
+--
+^warning: ignoring

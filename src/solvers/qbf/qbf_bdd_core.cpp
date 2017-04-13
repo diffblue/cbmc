@@ -445,7 +445,7 @@ void qbf_bdd_coret::compress_certificate(void)
       if(model==bdd_manager->bddOne() ||
          model==bdd_manager->bddZero())
       {
-        for(const quantifiert &quantifier2 : quantifier)
+        for(const quantifiert &quantifier2 : quantifiers)
         {
           BDD &model2=*model_bdds[quantifier2.var_no];
 

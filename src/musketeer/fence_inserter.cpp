@@ -494,7 +494,7 @@ void inline fence_insertert::mip_fill_matrix(
       e_c_it!=e_i->end();
       ++e_c_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_c_it)!=map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_c_it)->second, pt_set);
       /* sum_e' f_e' */
@@ -538,7 +538,7 @@ void inline fence_insertert::mip_fill_matrix(
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it)!=map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
       /* sum_e' (f_e' + lwf_e') */
@@ -582,7 +582,7 @@ void inline fence_insertert::mip_fill_matrix(
       e_nc_it!=e_i->end();
       ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it)!=map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
       /* dp_e + sum_e' (f_e' + lwf_e' + br_e') */
@@ -649,12 +649,12 @@ void inline fence_insertert::mip_fill_matrix(
         e_nc_it!=e_i->end();
         ++e_nc_it)
     {
-      std::set<event_idt> pt_set;
+      std::set<unsigned> pt_set;
       assert(map_to_e.find(*e_nc_it)!=map_to_e.end());
       const_graph_visitor.PT(map_to_e.find(*e_nc_it)->second, pt_set);
 // uncomment for cf
 #if 0
-      std::set<event_idt> it_set;
+      std::set<unsigned> it_set;
       IT(map_to_e.find(*e_nc_it)->second, it_set);
 #endif
       /* dp_e + sum_e' (f_e' + lwf_e') + sum_e'' cf_e'') */
@@ -722,13 +722,13 @@ void inline fence_insertert::mip_fill_matrix(
       {
         unsigned possibilities_met=0;
 
-        std::set<event_idt> ct_set;
+        std::set<unsigned> ct_set;
         assert(invisible_var.map_to_e.find(*e_c_it)!=
                invisible_var.map_to_e.end());
         const_graph_visitor.CT(invisible_var.map_to_e.find(*e_c_it)->second,
           ct_set);
 
-        std::set<event_idt> ct_not_powr_set;
+        std::set<unsigned> ct_not_powr_set;
         const_graph_visitor.CT_not_powr(invisible_var.map_to_e.find(
           *e_c_it)->second, ct_not_powr_set);
 
@@ -801,7 +801,7 @@ void fence_insertert::solve()
   assert(i-1==constraints_number);
 
   const std::size_t const_constraints_number=constraints_number;
-  const event_idt const_unique=unique;
+  const unsigned const_unique=unique;
 
   const std::size_t mat_size=
     // NOLINTNEXTLINE(whitespace/operators)
@@ -1234,13 +1234,13 @@ void fence_insertert::print_vars() const
 {
   instrumenter.message.statistics()
     << "---- pos/pos+ (visible) variables ----" << messaget::eom;
-  for(std::map<edget, event_idt>::const_iterator it=map_from_e.begin();
+  for(std::map<edget, unsigned>::const_iterator it=map_from_e.begin();
     it!=map_from_e.end(); ++it)
     instrumenter.message.statistics() << it->first.first << ","
       << it->first.second << messaget::eom;
   instrumenter.message.statistics() << "---- cmp (invisible) variables ----"
     << messaget::eom;
-  for(std::map<edget, event_idt>::const_iterator it=
+  for(std::map<edget, unsigned>::const_iterator it=
     invisible_var.map_from_e.begin();
     it!=invisible_var.map_from_e.end(); ++it)
     instrumenter.message.statistics() << it->first.first << ","

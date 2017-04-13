@@ -16,7 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class serializert;
 
 
-class dstringt
+// Marked final to disable inheritance.
+// No virtual destructor, so runtime-polymorphic use would be unsafe.
+class dstringt final
 {
 public:
   // this is safe for static objects
@@ -28,12 +30,12 @@ public:
   }
 
   // this is safe for static objects
-  // the 2nd argument is to avoid accidental conversions
   #ifdef __GNUC__
   constexpr
   #endif
-  dstringt(unsigned _no, unsigned):no(_no)
+  static dstringt make_from_table_index(unsigned no)
   {
+    return dstringt(no);
   }
 
   #if 0
@@ -140,7 +142,14 @@ public:
     return no;
   }
 
-protected:
+private:
+  #ifdef __GNUC__
+  constexpr
+  #endif
+  explicit dstringt(unsigned _no):no(_no)
+  {
+  }
+
   unsigned no;
 
   // the reference returned is guaranteed to be stable
