@@ -1,6 +1,9 @@
-CORE
+KNOWNBUG
 main.c
 --full-slice --add-library
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
+--
+Issue to re-enable these tests: diffblue/cbmc-toyota#116

@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --pointer-check --full-slice
 ^EXIT=0$
@@ -6,3 +6,5 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Issue to re-enable these tests: diffblue/cbmc-toyota#116
