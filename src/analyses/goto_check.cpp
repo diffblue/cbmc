@@ -64,6 +64,8 @@ public:
 
   void goto_check(goto_functiont &goto_function, const irep_idt &mode);
 
+  void collect_allocations(const goto_functionst &goto_functions);
+
 protected:
   const namespacet &ns;
   local_bitvector_analysist *local_bitvector_analysis;
@@ -134,7 +136,55 @@ protected:
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
+
+  typedef std::pair<exprt, exprt> allocationt;
+  typedef std::list<allocationt> allocationst;
+  allocationst allocations;
 };
+
+/*******************************************************************\
+
+Function: goto_checkt::collect_allocations
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void goto_checkt::collect_allocations(
+  const goto_functionst &goto_functions)
+{
+  if(!enable_pointer_check)
+    return;
+
+  forall_goto_functions(itf, goto_functions)
+    forall_goto_program_instructions(it, itf->second.body)
+    {
+      const goto_programt::instructiont &instruction=*it;
+      if(!instruction.is_function_call())
+        continue;
+
+      const code_function_callt &call=
+        to_code_function_call(instruction.code);
+      if(call.function().id()!=ID_symbol ||
+         to_symbol_expr(call.function()).get_identifier()!=
+         CPROVER_PREFIX "allocated_memory")
+        continue;
+
+      const code_function_callt::argumentst &args= call.arguments();
+      if(args.size()!=2 ||
+         args[0].type().id()!=ID_unsignedbv ||
+         args[1].type().id()!=ID_unsignedbv)
+        throw "expected two unsigned arguments to "
+              CPROVER_PREFIX "allocated_memory";
+
+      assert(args[0].type()==args[1].type());
+      allocations.push_back({args[0], args[1]});
+    }
+}
 
 /*******************************************************************\
 
@@ -1031,10 +1081,49 @@ void goto_checkt::pointer_validity_check(
   }
   else
   {
+    exprt allocs=false_exprt();
+
+    if(!allocations.empty())
+    {
+      exprt::operandst disjuncts;
+
+      for(const auto &a : allocations)
+      {
+        typecast_exprt int_ptr(pointer, a.first.type());
+
+        exprt lb(int_ptr);
+        if(access_lb.is_not_nil())
+        {
+          if(!base_type_eq(lb.type(), access_lb.type(), ns))
+            lb=plus_exprt(lb, typecast_exprt(access_lb, lb.type()));
+          else
+            lb=plus_exprt(lb, access_lb);
+        }
+
+        binary_relation_exprt lb_check(a.first, ID_le, lb);
+
+        exprt ub(int_ptr);
+        if(access_ub.is_not_nil())
+        {
+          if(!base_type_eq(ub.type(), access_ub.type(), ns))
+            ub=plus_exprt(ub, typecast_exprt(access_ub, ub.type()));
+          else
+            ub=plus_exprt(ub, access_ub);
+        }
+
+        binary_relation_exprt ub_check(
+          ub, ID_le, plus_exprt(a.first, a.second));
+
+        disjuncts.push_back(and_exprt(lb_check, ub_check));
+      }
+
+      allocs=disjunction(disjuncts);
+    }
+
     if(flags.is_unknown() || flags.is_null())
     {
       add_guarded_claim(
-        not_exprt(null_pointer(pointer)),
+        or_exprt(allocs, not_exprt(null_pointer(pointer))),
         "dereference failure: pointer NULL",
         "pointer dereference",
         expr.find_source_location(),
@@ -1044,7 +1133,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown())
       add_guarded_claim(
-        not_exprt(invalid_pointer(pointer)),
+        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer invalid",
         "pointer dereference",
         expr.find_source_location(),
@@ -1053,7 +1142,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_uninitialized())
       add_guarded_claim(
-        not_exprt(invalid_pointer(pointer)),
+        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer uninitialized",
         "pointer dereference",
         expr.find_source_location(),
@@ -1062,7 +1151,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
       add_guarded_claim(
-        not_exprt(deallocated(pointer, ns)),
+        or_exprt(allocs, not_exprt(deallocated(pointer, ns))),
         "dereference failure: deallocated dynamic object",
         "pointer dereference",
         expr.find_source_location(),
@@ -1071,7 +1160,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() || flags.is_dynamic_local())
       add_guarded_claim(
-        not_exprt(dead_object(pointer, ns)),
+        or_exprt(allocs, not_exprt(dead_object(pointer, ns))),
         "dereference failure: dead object",
         "pointer dereference",
         expr.find_source_location(),
@@ -1089,7 +1178,11 @@ void goto_checkt::pointer_validity_check(
                    access_ub));
 
       add_guarded_claim(
-        implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
+        or_exprt(
+          allocs,
+          implies_exprt(
+            malloc_object(pointer, ns),
+            not_exprt(dynamic_bounds))),
         "dereference failure: pointer outside dynamic object bounds",
         "pointer dereference",
         expr.find_source_location(),
@@ -1110,7 +1203,7 @@ void goto_checkt::pointer_validity_check(
                    access_ub));
 
       add_guarded_claim(
-        or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+        or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),
         "dereference failure: pointer outside object bounds",
         "pointer dereference",
         expr.find_source_location(),
@@ -1876,6 +1969,8 @@ void goto_check(
   goto_functionst &goto_functions)
 {
   goto_checkt goto_check(ns, options);
+
+  goto_check.collect_allocations(goto_functions);
 
   Forall_goto_functions(it, goto_functions)
   {

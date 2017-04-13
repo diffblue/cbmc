@@ -57,6 +57,8 @@ signed __CPROVER_POINTER_OFFSET(const void *p);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 #if 0
 extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];
+void __CPROVER_allocated_memory(
+  __CPROVER_size_t address, __CPROVER_size_t extent);
 
 // this is ANSI-C
 extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];
