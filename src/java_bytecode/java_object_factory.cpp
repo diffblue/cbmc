@@ -316,9 +316,8 @@ void java_object_factoryt::gen_nondet_init(
     {
       const struct_typet &struct_type=to_struct_type(subtype);
       const irep_idt struct_tag=struct_type.get_tag();
-      // set to null if found in recursion set and not a sub-type
-      if(recursion_set.find(struct_tag)!=recursion_set.end() &&
-         struct_tag==class_identifier)
+      // If this is a recursive type of some kind, set null.
+      if(!recursion_set.insert(struct_tag).second)
       {
         if(update_in_place==NO_UPDATE_IN_PLACE)
           set_null(expr, pointer_type);
@@ -403,9 +402,6 @@ void java_object_factoryt::gen_nondet_init(
     if(!is_sub)
       class_identifier=struct_tag;
 
-    recursion_set.insert(struct_tag);
-    assert(!recursion_set.empty());
-
     for(const auto &component : components)
     {
       const typet &component_type=component.type();
@@ -460,7 +456,6 @@ void java_object_factoryt::gen_nondet_init(
           substruct_in_place);
       }
     }
-    recursion_set.erase(struct_tag);
   }
   else
   {
