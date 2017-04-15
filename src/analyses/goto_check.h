@@ -33,7 +33,7 @@ void goto_check(
   "(bounds-check)(pointer-check)(memory-leak-check)" \
   "(div-by-zero-check)(signed-overflow-check)(unsigned-overflow-check)" \
   "(pointer-overflow-check)(conversion-check)(undefined-shift-check)" \
-  "(float-overflow-check)(nan-check)"
+  "(float-overflow-check)(nan-check)(no-built-in-assertions)"
 
 #define HELP_GOTO_CHECK \
   " --bounds-check               enable array bounds checks\n" \
@@ -47,6 +47,7 @@ void goto_check(
   " --undefined-shift-check      check shift greater than bit-width\n" \
   " --float-overflow-check       check floating-point for +/-Inf\n" \
   " --nan-check                  check floating-point for NaN\n" \
+  " --no-built-in-assertions     ignore assertions in built-in library\n" \
 
 #define PARSE_OPTIONS_GOTO_CHECK(cmdline, options) \
   options.set_option("bounds-check", cmdline.isset("bounds-check")); \
@@ -59,6 +60,7 @@ void goto_check(
   options.set_option("conversion-check", cmdline.isset("conversion-check")); \
   options.set_option("undefined-shift-check", cmdline.isset("undefined-shift-check")); /* NOLINT(whitespace/line_length) */  \
   options.set_option("float-overflow-check", cmdline.isset("float-overflow-check")); /* NOLINT(whitespace/line_length) */  \
-  options.set_option("nan-check", cmdline.isset("nan-check"))
+  options.set_option("nan-check", cmdline.isset("nan-check")); \
+  options.set_option("built-in-assertions", !cmdline.isset("no-built-in-assertions")) /* NOLINT(whitespace/line_length) */
 
 #endif // CPROVER_ANALYSES_GOTO_CHECK_H
