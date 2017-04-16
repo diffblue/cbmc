@@ -215,17 +215,19 @@ void goto_convertt::finish_gotos(goto_programt &dest)
 
       if(!stack_is_prefix)
       {
-        warning() << "Encountered goto (" << goto_label <<
-          ") that enters one or more lexical blocks;" <<
-          "omitting constructors and destructors." << eom;
+          debug().source_location=i.code.find_source_location();
+          debug() << "encountered goto `" << goto_label
+                  << "' that enters one or more lexical blocks; "
+                  << "omitting constructors and destructors" << eom;
       }
       else
       {
         auto unwind_to_size=label_stack.size();
         if(unwind_to_size<goto_stack.size())
         {
-          status() << "Adding goto-destructor code on jump to " <<
-            goto_label << eom;
+          debug().source_location=i.code.find_source_location();
+          debug() << "adding goto-destructor code on jump to `"
+                  << goto_label << "'" << eom;
           goto_programt destructor_code;
           unwind_destructor_stack(
             i.code.add_source_location(),
