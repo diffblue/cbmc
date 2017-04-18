@@ -117,10 +117,9 @@ public final class CProver
 
   public static void assume(boolean condition)
   {
-    if(enableAssume)
+    if(enableAssume && !condition)
     {
-      throw new RuntimeException(
-          "Cannot execute program with CProver.assume()");
+      throw new RuntimeException("CProver.assume() predicate is false");
     }
   }
 }
