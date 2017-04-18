@@ -1100,6 +1100,8 @@ void linkingt::duplicate_object_symbol(
     }
     else if(set_to_new)
       old_symbol.type=new_symbol.type;
+
+    object_type_updates.insert(old_symbol.name, old_symbol.symbol_expr());
   }
 
   // care about initializers
@@ -1507,6 +1509,15 @@ void linkingt::copy_symbols()
       duplicate_type_symbol(old_symbol, new_symbol);
     else
       duplicate_non_type_symbol(old_symbol, new_symbol);
+  }
+
+  // Apply type updates to initializers
+  Forall_symbols(s_it, main_symbol_table.symbols)
+  {
+    if(!s_it->second.is_type &&
+       !s_it->second.is_macro &&
+       s_it->second.value.is_not_nil())
+      object_type_updates(s_it->second.value);
   }
 }
 
