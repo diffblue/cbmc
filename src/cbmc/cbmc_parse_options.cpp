@@ -41,6 +41,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/replace_java_nondet.h>
+#include <goto-programs/convert_nondet.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -52,6 +54,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
+
+#include "java_bytecode/java_bytecode_language.h"
 
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
@@ -920,6 +924,20 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
     rewrite_union(goto_functions, ns);
+
+    // Similar removal of java nondet statements:
+    // TODO Should really get this from java_bytecode_language somehow, but we
+    // don't have an instance of that here.
+    const auto max_nondet_array_length=
+      cmdline.isset("java-max-input-array-length")
+        ? std::stoi(cmdline.get_value("java-max-input-array-length"))
+        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    replace_java_nondet(goto_functions);
+    convert_nondet(
+      goto_functions,
+      symbol_table,
+      ui_message_handler,
+      max_nondet_array_length);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
