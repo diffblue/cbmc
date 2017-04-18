@@ -824,7 +824,17 @@ void goto_convertt::do_java_new_array(
     struct_type.components()[2].get_name(),
     struct_type.components()[2].type());
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
-  data_cpp_new_expr.set(ID_size, rhs.op0());
+
+  // The instruction may specify a (hopefully small) upper bound on the
+  // array size, in which case we allocate a fixed-length array that may
+  // be larger than the `length` member rather than use a true variable-
+  // length array, which produces a more complex formula in the current
+  // backend.
+  const irept size_bound=rhs.find(ID_length_upper_bound);
+  if(size_bound.is_nil())
+    data_cpp_new_expr.set(ID_size, rhs.op0());
+  else
+    data_cpp_new_expr.set(ID_size, size_bound);
   goto_programt::targett t_p=dest.add_instruction(ASSIGN);
   t_p->code=code_assignt(data, data_cpp_new_expr);
   t_p->source_location=location;
