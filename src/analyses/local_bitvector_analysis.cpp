@@ -400,6 +400,7 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
 
     for(const auto &succ : node.successors)
     {
+      assert(succ<loc_infos.size());
       if(loc_infos[succ].merge(loc_info_dest))
         work_queue.push(succ);
     }
