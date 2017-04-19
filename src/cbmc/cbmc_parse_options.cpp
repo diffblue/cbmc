@@ -1011,17 +1011,28 @@ int cbmc_parse_optionst::do_bmc(
 {
   bmc.set_ui(get_ui());
 
+  int result=6;
+
   // do actual BMC
-  bool result=(bmc.run(goto_functions)==safety_checkert::SAFE);
+  switch(bmc.run(goto_functions))
+  {
+    case safety_checkert::SAFE:
+      result=0;
+      break;
+    case safety_checkert::UNSAFE:
+      result=10;
+      break;
+    case safety_checkert::ERROR:
+      result=6;
+      break;
+  }
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
   memory_info(debug());
   debug() << eom;
 
-  // We return '0' if the property holds,
-  // and '10' if it is violated.
-  return result?0:10;
+  return result;
 }
 
 /*******************************************************************\
