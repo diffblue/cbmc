@@ -1,4 +1,4 @@
-SRC = mode.cpp language_ui.cpp languages.cpp language_util.cpp
+SRC = mode.cpp language_ui.cpp language_util.cpp
 
 INCLUDES= -I ..
 

@@ -308,9 +308,9 @@ Function: new_cpp_language
 
 \*******************************************************************/
 
-languaget *new_cpp_language()
+std::unique_ptr<languaget> new_cpp_language()
 {
-  return new cpp_languaget;
+  return util_make_unique<cpp_languaget>();
 }
 
 /*******************************************************************\

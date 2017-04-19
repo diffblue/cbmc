@@ -19,6 +19,8 @@ Date: April 2010
 
 #include <goto-programs/goto_program.h>
 
+#include <memory> // unique_ptr
+
 #define forall_rw_range_set_r_objects(it, rw_set) \
   for(rw_range_sett::objectst::const_iterator it=(rw_set).get_r_set().begin(); \
       it!=(rw_set).get_r_set().end(); ++it)
@@ -82,10 +84,10 @@ class rw_range_sett
 {
 public:
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, range_domain_baset*> objectst;
+  typedef std::map<irep_idt, std::unique_ptr<range_domain_baset>> objectst;
   #else
-  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash>
-    objectst;
+  typedef std::unordered_map<
+    irep_idt, std::unique_ptr<range_domain_baset>, string_hash> objectst;
   #endif
 
   virtual ~rw_range_sett();
@@ -107,8 +109,8 @@ public:
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<range_domaint*>(it->second)!=0);
-    return *static_cast<range_domaint*>(it->second);
+    assert(dynamic_cast<range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const range_domaint &>(*it->second);
   }
 
   typedef enum { LHS_W, READ } get_modet;
@@ -276,8 +278,8 @@ public:
 
   const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<guarded_range_domaint*>(it->second)!=0);
-    return *static_cast<guarded_range_domaint*>(it->second);
+    assert(dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const guarded_range_domaint &>(*it->second);
   }
 
   virtual void get_objects_rec(

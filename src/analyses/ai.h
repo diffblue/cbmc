@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_AI_H
 #define CPROVER_ANALYSES_AI_H
 
+#include "util/make_unique.h"
+
 #include <map>
 #include <iosfwd>
 #include <sstream>
@@ -327,7 +329,7 @@ protected:
     const namespacet &ns)=0;
   virtual statet &get_state(locationt l)=0;
   virtual const statet &find_state(locationt l) const=0;
-  virtual statet* make_temporary_state(const statet &s)=0;
+  virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
 };
 
 // domainT is expected to be derived from ai_domain_baseT
@@ -393,9 +395,9 @@ protected:
       static_cast<const domainT &>(src), from, to);
   }
 
-  statet *make_temporary_state(const statet &s) override
+  std::unique_ptr<statet> make_temporary_state(const statet &s) override
   {
-    return new domainT(static_cast<const domainT &>(s));
+    return util_make_unique<domainT>(static_cast<const domainT &>(s));
   }
 
   void fixedpoint(

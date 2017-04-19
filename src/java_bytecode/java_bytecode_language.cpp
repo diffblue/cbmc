@@ -829,9 +829,9 @@ Function: new_java_bytecode_language
 
 \*******************************************************************/
 
-languaget *new_java_bytecode_language()
+std::unique_ptr<languaget> new_java_bytecode_language()
 {
-  return new java_bytecode_languaget;
+  return util_make_unique<java_bytecode_languaget>();
 }
 
 /*******************************************************************\

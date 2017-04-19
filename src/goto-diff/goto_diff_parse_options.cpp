@@ -6,6 +6,8 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+#include "util/make_unique.h"
+
 #include <fstream>
 #include <cstdlib> // exit()
 #include <iostream>
@@ -371,9 +373,9 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_difft> goto_diff;
-  goto_diff = std::unique_ptr<goto_difft>(
-    new syntactic_difft(goto_model1, goto_model2, get_message_handler()));
+  std::unique_ptr<goto_difft> goto_diff=
+    util_make_unique<syntactic_difft>(
+      goto_model1, goto_model2, get_message_handler());
   goto_diff->set_ui(get_ui());
 
   (*goto_diff)();

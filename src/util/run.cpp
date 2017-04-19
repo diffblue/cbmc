@@ -85,7 +85,7 @@ int run(
   for(std::size_t i=0; i<argv.size(); i++)
     wargv[i]=widen(argv[i]);
 
-  const wchar_t **_argv=new const wchar_t * [argv.size()+1];
+  std::vector<const wchar_t *> _argv(argv.size()+1);
 
   for(std::size_t i=0; i<wargv.size(); i++)
     _argv[i]=wargv[i].c_str();
@@ -96,9 +96,7 @@ int run(
 
   std::wstring wide_what=widen(what);
 
-  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv);
-
-  delete[] _argv;
+  int status=_wspawnvp(_P_WAIT, wide_what.c_str(), _argv.data());
 
   return status;
 
@@ -143,7 +141,7 @@ int run(
       remove_signal_catcher();
       sigprocmask(SIG_SETMASK, &old_mask, NULL);
 
-      char **_argv=new char * [argv.size()+1];
+      std::vector<char *> _argv(argv.size()+1);
       for(std::size_t i=0; i<argv.size(); i++)
         _argv[i]=strdup(argv[i].c_str());
 
@@ -153,7 +151,7 @@ int run(
         dup2(stdin_fd, STDIN_FILENO);
       if(stdout_fd!=STDOUT_FILENO)
         dup2(stdout_fd, STDOUT_FILENO);
-      execvp(what.c_str(), _argv);
+      execvp(what.c_str(), _argv.data());
 
       /* usually no return */
       return 1;

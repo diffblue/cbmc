@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <memory> // unique_ptr
+
 class dump_ct
 {
 public:
@@ -33,10 +35,7 @@ public:
       init_system_library_map();
   }
 
-  virtual ~dump_ct()
-  {
-    delete language;
-  }
+  virtual ~dump_ct()=default;
 
   void operator()(std::ostream &out);
 
@@ -44,7 +43,7 @@ protected:
   const goto_functionst &goto_functions;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
-  languaget *language;
+  std::unique_ptr<languaget> language;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;

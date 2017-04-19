@@ -518,7 +518,7 @@ bool compilet::parse(const std::string &file_name)
     return true;
   }
 
-  languaget *languagep;
+  std::unique_ptr<languaget> languagep;
 
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
@@ -533,14 +533,13 @@ bool compilet::parse(const std::string &file_name)
   else
     languagep=get_language_from_filename(file_name);
 
-  if(languagep==NULL)
+  if(!languagep)
   {
     error() << "failed to figure out type of file `" << file_name << "'" << eom;
     return true;
   }
 
-  languaget &language=*languagep;
-  language.set_message_handler(get_message_handler());
+  languagep->set_message_handler(get_message_handler());
 
   language_filet language_file;
 
@@ -550,7 +549,7 @@ bool compilet::parse(const std::string &file_name)
 
   language_filet &lf=res.first->second;
   lf.filename=file_name;
-  lf.language=languagep;
+  lf.language=std::move(languagep);
 
   if(mode==PREPROCESS_ONLY)
   {
@@ -572,13 +571,13 @@ bool compilet::parse(const std::string &file_name)
       }
     }
 
-    language.preprocess(infile, file_name, *os);
+    lf.language->preprocess(infile, file_name, *os);
   }
   else
   {
     print(8, "Parsing: "+file_name);
 
-    if(language.parse(infile, file_name))
+    if(lf.language->parse(infile, file_name))
     {
       if(get_ui()==ui_message_handlert::PLAIN)
         error() << "PARSING ERROR" << eom;
