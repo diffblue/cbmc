@@ -6,9 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#ifndef __GNUC__
+#  define HAVE_CODECVT
+#elif(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) >= 50000
+#  define HAVE_CODECVT
+#endif
+
 #include <cstring>
 #include <locale>
-#include <codecvt>
+#ifdef HAVE_CODECVT
+#  include <codecvt>
+#endif
 #include <iomanip>
 #include <sstream>
 
@@ -277,8 +285,12 @@ Function: utf8_to_utf16_big_endian
 
 std::wstring utf8_to_utf16_big_endian(const std::string& in)
 {
+#ifdef HAVE_CODECVT
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
   return converter.from_bytes(in);
+#else
+  throw "compiled without UTF16 support";
+#endif
 }
 
 /*******************************************************************\
@@ -295,6 +307,7 @@ Function: utf8_to_utf16_little_endian
 
 std::wstring utf8_to_utf16_little_endian(const std::string& in)
 {
+#ifdef HAVE_CODECVT
   const std::codecvt_mode mode=std::codecvt_mode::little_endian;
 
   // default largest value codecvt_utf8_utf16 reads without error is 0x10ffff
@@ -304,6 +317,9 @@ std::wstring utf8_to_utf16_little_endian(const std::string& in)
   typedef std::codecvt_utf8_utf16<wchar_t, maxcode, mode> codecvt_utf8_utf16t;
   std::wstring_convert<codecvt_utf8_utf16t> converter;
   return converter.from_bytes(in);
+#else
+  throw "compiled without UTF16 support";
+#endif
 }
 
 /*******************************************************************\
