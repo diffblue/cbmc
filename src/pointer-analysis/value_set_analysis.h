@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/static_analysis.h>
 #include <util/xml_expr.h>
 #include <util/xml.h>
+#include <util/expr_util.h>
 
 #include "value_set_domain.h"
 #include "value_sets.h"
@@ -107,6 +108,26 @@ public:
       expr,
       dest,
       baset::ns);
+  }
+
+  /*******************************************************************\
+
+  Function: value_set_analysis_baset::is_singular
+
+    Inputs: The set of expressions to check.
+
+   Outputs: true, if it contains only one expression and 
+            that expression is a symbol, 
+            false, otherwise.
+
+   Purpose: Get whether a set of expressions can have a strong update
+            or not.
+
+  \*******************************************************************/
+
+  virtual bool is_singular(const std::set<exprt> &values)
+  {
+    return values.size()==1 && values.begin()->id()==ID_symbol;
   }
 };
 
