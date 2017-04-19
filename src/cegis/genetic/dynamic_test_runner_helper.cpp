@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void close_fitness_tester_library(fitness_lib_handlet &handle)
 {
-  if (handle)
+  if(handle)
   {
 #if !defined(_WIN32) || defined(_HAVE_DLFCN)
     dlclose(handle);
@@ -63,7 +63,7 @@ void *prepare_fitness_tester_library(fitness_lib_handlet &handle,
   const std::string source_file_name(source_file());
   write_file(source_file_name, source_code_provider());
   std::string compile_command;
-  if (configt::ansi_ct::preprocessort::CLANG == config.ansi_c.preprocessor)
+  if(configt::ansi_ct::preprocessort::CLANG == config.ansi_c.preprocessor)
     compile_command+=CLANG_COMPILE_COMMAND;
   else
     compile_command+=COMPILE_COMMAND;
@@ -72,18 +72,18 @@ void *prepare_fitness_tester_library(fitness_lib_handlet &handle,
   compile_command+=ARTIFACT_SEPARATOR;
   compile_command+=library_file_path;
   const int result=system(compile_command.c_str());
-  if (result) throw std::runtime_error(COMPLING_FAILED);
+  if(result) throw std::runtime_error(COMPLING_FAILED);
 
 #if !defined(_WIN32) || defined(_HAVE_DLFCN)
   handle=dlopen(library_file_path.c_str(), RTLD_NOW);
-  if (!handle)
+  if(!handle)
   {
     perror(OPEN_LIB_FAILED);
     throw std::runtime_error(OPEN_LIB_FAILED);
   }
   void * const func_result=dlsym(handle, CEGIS_FITNESS_TEST_FUNC);
   char *error=0;
-  if ((error=dlerror()))
+  if((error=dlerror()))
   {
     perror(error);
     throw std::runtime_error(LOAD_FUNC_FAILED);

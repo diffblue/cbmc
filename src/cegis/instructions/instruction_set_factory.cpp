@@ -43,19 +43,19 @@ public:
   {
     const goto_programt::instructiont &instr=*target;
     const goto_programt::instructiont::labelst &labels=instr.labels;
-    if (labels.empty()) return;
+    if(labels.empty()) return;
     const std::string &label=id2string(instr.labels.front());
-    if (std::string::npos != label.find(first_prefix))
+    if(std::string::npos != label.find(first_prefix))
     {
       current_instr_offset=target;
       has_current_instr=true;
       is_last_in_range=false;
       instr_idx=string2integer(label.substr(first_prefix.size())).to_ulong();
-    } else if (std::string::npos != label.find(last_prefix))
+    } else if(std::string::npos != label.find(last_prefix))
     {
       is_last_in_range=true;
       instr_idx=string2integer(label.substr(last_prefix.size())).to_ulong();
-    } else if (std::string::npos != label.find(single_prefix))
+    } else if(std::string::npos != label.find(single_prefix))
     {
       has_current_instr=true;
       is_last_in_range=true;
@@ -69,7 +69,7 @@ public:
     instr.push_back(goto_programt::instructiont());
     goto_programt::targett new_target=instr.end();
     copy_instruction(--new_target, target);
-    if (is_last_in_range)
+    if(is_last_in_range)
     {
       instr.push_back(goto_programt::instructiont(SKIP));
       goto_programt::targett new_target=instr.end();
@@ -81,7 +81,7 @@ public:
   void operator()(const goto_programt::const_targett &target)
   {
     handle_meta_info(target);
-    if (has_current_instr) copy_op(target);
+    if(has_current_instr) copy_op(target);
   }
 };
 }
@@ -102,7 +102,7 @@ instruction_sett extract_instruction_set(const goto_programt &body,
   const goto_programt::instructionst &instrs=body.instructions;
   instruction_sett instruction_set;
   execute_instruction_handlert handler(first_prefix, last_prefix, single_prefix, instruction_set);
-  for (goto_programt::const_targett it=instrs.begin(); it != instrs.end(); ++it)
+  for(goto_programt::const_targett it=instrs.begin(); it != instrs.end(); ++it)
     handler(it);
   return instruction_set;
 }

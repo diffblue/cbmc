@@ -44,7 +44,7 @@ int run(optionst &o, messaget::mstreamt &result, const symbol_tablet &st,
 int run_control(optionst &o, messaget::mstreamt &result,
     const symbol_tablet &st, const goto_functionst &gf)
 {
-  if (is_vector_solution_config(st))
+  if(is_vector_solution_config(st))
   {
     const zero_vector_solutiont def(st);
     return run<vector_solution_configurationt>(o, result, st, gf, def);

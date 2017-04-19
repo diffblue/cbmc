@@ -1,12 +1,12 @@
 struct A
 {
-	int f();
+  int f();
 };
 
 struct B
 {
-	int g()
-	{
-		A::f(); // ill-formed
-	}
+  int g()
+  {
+    A::f(); // ill-formed
+  }
 };

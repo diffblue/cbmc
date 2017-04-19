@@ -54,7 +54,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
     irept _typedef=type.find(ID_C_typedef);
 
-    type.swap(type.subtype());
+    type=type.subtype();
 
     c_qualifiers.write(type);
     if(packed)

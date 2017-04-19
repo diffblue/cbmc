@@ -32,16 +32,16 @@ bool is_const(const typet &type)
 
 bool is_local_or_constant(const symbolt &symbol)
 {
-  if (is_local(id2string(symbol.name))) return true;
+  if(is_local(id2string(symbol.name))) return true;
   return is_const(symbol.type);
 }
 
 bool is_meta(const irep_idt &id, const typet &type)
 {
-  if (ID_code == type.id()) return true;
+  if(ID_code == type.id()) return true;
   const std::string &name=id2string(id);
-  if (std::string::npos != name.find(CEGIS_CONSTANT_PREFIX)) return true;
-  if (std::string::npos != name.find("#return_value")) return true;
+  if(std::string::npos != name.find(CEGIS_CONSTANT_PREFIX)) return true;
+  if(std::string::npos != name.find("#return_value")) return true;
   return std::string::npos != name.find(CPROVER_PREFIX);
 }
 
@@ -56,19 +56,19 @@ public:
 
   void operator()(const goto_programt::instructiont &instr) const
   {
-    if (goto_program_instruction_typet::DECL != instr.type) return;
+    if(goto_program_instruction_typet::DECL != instr.type) return;
     const code_declt &code_decl=to_code_decl(instr.code);
     const symbol_exprt &symbol=to_symbol_expr(code_decl.symbol());
     const typet &type=symbol.type();
-    if (is_const(type)) return;
-    if (is_meta(symbol.get_identifier(), type)) return;
+    if(is_const(type)) return;
+    if(is_meta(symbol.get_identifier(), type)) return;
     vars.insert(symbol);
   }
 
   void operator()(const std::pair<const irep_idt, symbolt> &named_symbol) const
   {
     const symbolt &symbol=named_symbol.second;
-    if (is_local_or_constant(symbol) || is_meta(symbol.name, symbol.type))
+    if(is_local_or_constant(symbol) || is_meta(symbol.name, symbol.type))
       return;
     vars.insert(symbol.symbol_expr());
   }

@@ -30,9 +30,9 @@ random_individualt::~random_individualt()
 size_t random_individualt::prog_size(const size_t index) const
 {
   const size_t max=settings.max_prog_sz(index);
-  if (max == 0u) return 0u;
+  if(max == 0u) return 0u;
   const size_t min=settings.min_prog_sz(index);
-  if (min >= max) return min;
+  if(min >= max) return min;
   const size_t diff=max - min;
   return min + rand() % (diff + 1);
 }
@@ -57,7 +57,7 @@ void random_individualt::havoc(program_individualt::instructiont &instr,
   const instruction_set_infot::const_iterator num_ops=info.find(instr.opcode);
   assert(info.end() != num_ops);
   instr.ops.resize(num_ops->second);
-  for (program_individualt::instructiont::opt &o : instr.ops)
+  for(program_individualt::instructiont::opt &o : instr.ops)
     o=op(index);
 }
 
@@ -66,7 +66,7 @@ void random_individualt::havoc(program_individualt::programt &prog,
 {
   const size_t prog_sz=prog_size(index);
   prog.resize(prog_sz);
-  for (size_t i=0; i < prog_sz; ++i)
+  for(size_t i=0; i < prog_sz; ++i)
     havoc(prog[i], i);
 }
 
@@ -82,7 +82,7 @@ program_individualt::x0t::value_type random_individualt::constant() const
   const mp_integer::llong_t v=spec.max_value().to_long();
   const unsigned int wordmask=static_cast<unsigned int>(v);
   const unsigned int r=rand() % 6u;
-  switch (r)
+  switch(r)
   {
   case 0:
     return 0;
@@ -103,16 +103,16 @@ void random_individualt::havoc(program_individualt &ind)
 {
   program_individualt::programst &progs=ind.programs;
   progs.resize(settings.num_progs());
-  for (size_t i=0u; i < progs.size(); ++i)
+  for(size_t i=0u; i < progs.size(); ++i)
     havoc(progs[i], i);
   post_process(ind);
   const size_t number_of_x0=settings.num_x0();
   program_individualt::x0t &ind_x0=ind.x0;
   ind_x0.resize(number_of_x0);
   const size_t number_of_constants=settings.num_consts();
-  for (size_t i=0; i < number_of_constants; ++i)
+  for(size_t i=0; i < number_of_constants; ++i)
     ind_x0[i]=constant();
-  for (size_t i=number_of_constants; i < number_of_x0; ++i)
+  for(size_t i=number_of_constants; i < number_of_x0; ++i)
     ind_x0[i]=x0();
 }
 
@@ -145,10 +145,10 @@ void random_individualt::post_process(program_individualt &ind) const
 {
   // XXX: Specific optimisation for PLDI 2016 submissions.
   program_individualt::programst &progs=ind.programs;
-  if (progs.size() <= RANKING_INDEX) return;
+  if(progs.size() <= RANKING_INDEX) return;
   program_individualt::programt &ranking=progs[RANKING_INDEX];
-  for (program_individualt::instructiont &instr : ranking)
-    switch (instr.opcode)
+  for(program_individualt::instructiont &instr : ranking)
+    switch(instr.opcode)
     {
     case 1u:
     case 19u:

@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 double to_control_float(const constant_exprt &expr)
 {
   const typet &data_type=expr.type();
-  if (ID_fixedbv == data_type.id())
+  if(ID_fixedbv == data_type.id())
   {
     // TODO: Implement
     assert(false);
@@ -36,7 +36,7 @@ double to_control_float(const constant_exprt &expr)
 exprt to_control_float_expr(const symbol_tablet &st, double value)
 {
   const typet &data_type=control_float_value_type(st);
-  if (ID_fixedbv == data_type.id())
+  if(ID_fixedbv == data_type.id())
   {
     const fixedbv_spect spec(to_fixedbv_type(data_type));
     const bool is_neg=value < 0.0;
@@ -47,12 +47,12 @@ exprt to_control_float_expr(const symbol_tablet &st, double value)
     bv.spec=spec;
     bv.from_integer(converted);
     const constant_exprt constant_expr(bv.to_expr());
-    if (!is_neg) return constant_expr;
+    if(!is_neg) return constant_expr;
     return unary_minus_exprt(constant_expr);
   }
   ieee_floatt ieee(ieee_float_spect::double_precision());
   ieee.from_double(value);
   const exprt result(ieee.to_expr());
-  if (type_eq(result.type(), data_type, namespacet(st))) return result;
+  if(type_eq(result.type(), data_type, namespacet(st))) return result;
   return typecast_exprt(result, data_type);
 }

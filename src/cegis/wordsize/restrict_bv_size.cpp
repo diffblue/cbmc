@@ -14,19 +14,19 @@ Author: Daniel Kroening, kroening@kroening.com
 void restrict_bv_size(symbol_tablet &st, goto_functionst &gf,
     const size_t width_in_bits)
 {
-  for (symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
+  for(symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
   {
     symbolt &symbol=id_and_symbol.second;
     restrict_bv_size(symbol.type, width_in_bits);
     restrict_bv_size(symbol.value, width_in_bits);
   }
-  for (goto_functionst::function_mapt::value_type &entry : gf.function_map)
+  for(goto_functionst::function_mapt::value_type &entry : gf.function_map)
   {
     goto_functionst::function_mapt::value_type::second_type &func=entry.second;
     restrict_bv_size(func.type, width_in_bits);
-    if (!func.body_available()) continue;
+    if(!func.body_available()) continue;
     goto_programt::instructionst &body=func.body.instructions;
-    for (goto_programt::instructiont &instr : body)
+    for(goto_programt::instructiont &instr : body)
     {
       restrict_bv_size(instr.code, width_in_bits);
       restrict_bv_size(instr.guard, width_in_bits);
@@ -61,15 +61,15 @@ public:
   virtual void operator()(exprt &expr)
   {
     typet &type=expr.type();
-    if (!restrict_bv_size(type, width_in_bits)) return;
-    if (ID_constant != expr.id()) return;
+    if(!restrict_bv_size(type, width_in_bits)) return;
+    if(ID_constant != expr.id()) return;
     constant_exprt &constant=to_constant_expr(expr);
     const std::string &value=id2string(constant.get_value());
-    if (value.empty()) return;
+    if(value.empty()) return;
     assert(width_in_bits < value.size());
     std::string new_value(value.substr(value.size() - width_in_bits));
     // XXX: Restrict positive constant from being turned negative. Sensible?
-    if (ID_signedbv == type.id()) new_value[0]=value[0];
+    if(ID_signedbv == type.id()) new_value[0]=value[0];
     constant.set_value(new_value);
   }
 };
@@ -86,7 +86,7 @@ namespace
 bool restrict_bv_size(code_typet &type, const size_t width_in_bits)
 {
   restrict_bv_size(type.return_type(), width_in_bits);
-  for (code_typet::parametert &param : type.parameters())
+  for(code_typet::parametert &param : type.parameters())
   {
     restrict_bv_size(param, width_in_bits);
     restrict_bv_size(param.default_value(), width_in_bits);
@@ -96,7 +96,7 @@ bool restrict_bv_size(code_typet &type, const size_t width_in_bits)
 
 bool restrict_bv_size(struct_union_typet &type, const size_t width_in_bits)
 {
-  for (struct_union_typet::componentt &comp : type.components())
+  for(struct_union_typet::componentt &comp : type.components())
     restrict_bv_size(comp, width_in_bits);
   return false;
 }
@@ -105,15 +105,15 @@ bool restrict_bv_size(struct_union_typet &type, const size_t width_in_bits)
 bool restrict_bv_size(typet &type, const size_t width_in_bits)
 {
   const irep_idt &type_id=type.id();
-  if (ID_code == type_id)
+  if(ID_code == type_id)
     return restrict_bv_size(to_code_type(type), width_in_bits);
-  if (ID_struct == type_id || ID_union == type_id)
+  if(ID_struct == type_id || ID_union == type_id)
     return restrict_bv_size(to_struct_union_type(type), width_in_bits);
-  if (static_cast<const typet &>(type).subtype().is_not_nil())
+  if(static_cast<const typet &>(type).subtype().is_not_nil())
     restrict_bv_size(type.subtype(), width_in_bits);
-  if (!is_bv_type(type)) return false;
+  if(!is_bv_type(type)) return false;
   bitvector_typet &bvtype=to_bitvector_type(type);
-  if (width_in_bits >= bvtype.get_width()) return false;
+  if(width_in_bits >= bvtype.get_width()) return false;
   to_bitvector_type(type).set_width(width_in_bits);
   return true;
 }

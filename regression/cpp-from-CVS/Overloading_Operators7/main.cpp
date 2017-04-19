@@ -3,7 +3,7 @@ int g;
 struct A
 {
   int i;
-  A(int i):i(i){}
+  A(int i):i(i) {}
 
   friend bool operator==(const A& a1, const A& a2)
   {

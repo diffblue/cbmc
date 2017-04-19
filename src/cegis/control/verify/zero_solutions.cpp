@@ -38,7 +38,7 @@ struct_exprt make_zero(const namespacet &ns, const symbol_typet &type)
 
 void zero_rational_solutiont::operator ()(control_solutiont &solution) const
 {
-  if (!solution.a.operands().empty()) return;
+  if(!solution.a.operands().empty()) return;
   const symbol_typet &type=control_solution_type(st);
   const namespacet ns(st);
   const struct_exprt zero_struct=make_zero(ns, type);
@@ -54,7 +54,7 @@ zero_vector_solutiont::zero_vector_solutiont(const symbol_tablet &st) :
 void zero_vector_solutiont::operator ()(
     control_vector_solutiont &solution) const
 {
-  if (!solution.K.operands().empty()) return;
+  if(!solution.K.operands().empty()) return;
   const namespacet ns(st);
   const array_typet &type=control_vector_solution_type(st);
   const source_locationt loc(default_cegis_source_location());

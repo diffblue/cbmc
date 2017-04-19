@@ -49,10 +49,10 @@ size_t genetic_constant_strategy(invariant_programt &prog,
   size_t max_word_width=0u;
   size_t const_index=0u;
   // XXX: Literals strategy, benchmark performance
-  for (const constant_exprt &expr : literals)
+  for(const constant_exprt &expr : literals)
   {
     // XXX: Debug
-    if (!constants_printed)
+    if(!constants_printed)
     {
       std::cout << "<id>" << const_index << "</id>" << std::endl;
       std::cout << "<value>" << from_expr(ns, "", expr) << "</value>\n";

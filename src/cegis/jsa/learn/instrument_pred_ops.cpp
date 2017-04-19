@@ -30,11 +30,11 @@ bool contains(const std::string &haystack, const char * const needle)
 
 bool is_pred_op_decl(const symbol_tablet &st, const goto_programt::targett &pos)
 {
-  if (goto_program_instruction_typet::DECL != pos->type) return false;
+  if(goto_program_instruction_typet::DECL != pos->type) return false;
   const std::string &id=id2string(get_affected_variable(*pos));
-  if (contains(id, JSA_TMP_PREFIX) || contains(id, JSA_LAMBDA_OP)
+  if(contains(id, JSA_TMP_PREFIX) || contains(id, JSA_LAMBDA_OP)
       || contains(id, JSA_CONSTANT_PREFIX)) return true;
-  if (contains(id, CPROVER_PREFIX)) return false;
+  if(contains(id, CPROVER_PREFIX)) return false;
   const namespacet ns(st);
   const typet lhs(jsa_word_type());
   return type_eq(lhs, st.lookup(id).type, ns);
@@ -47,8 +47,8 @@ goto_programt::targetst collect_pred_ops(jsa_programt &prog)
   goto_programt::instructionst &body=get_entry_body(prog.gf).instructions;
   const goto_programt::targett end(prog.body.first);
   goto_programt::targetst pred_ops;
-  for (goto_programt::targett it=body.begin(); it != end; ++it)
-    if (is_pred_op_decl(st, it)) pred_ops.push_back(it);
+  for(goto_programt::targett it=body.begin(); it != end; ++it)
+    if(is_pred_op_decl(st, it)) pred_ops.push_back(it);
   return pred_ops;
 }
 
@@ -66,7 +66,7 @@ void mark_dead(goto_programt &body, goto_programt::targett pos,
   const goto_programt::targett end(instrs.end());
   pos=std::find_if(pos, end, [&id](const goto_programt::instructiont &instr)
   { return DEAD == instr.type && id == get_affected_variable(instr);});
-  if (end == pos) return;
+  if(end == pos) return;
   pos=body.insert_after(pos);
   pos->type=goto_program_instruction_typet::ASSIGN;
   pos->source_location=jsa_builtin_source_location();
@@ -85,7 +85,7 @@ void instrument_pred_ops(jsa_programt &prog, const goto_programt::targetst &ops,
   const typet sz_type(signed_int_type());
   size_t op_index=0;
   size_t res_op_idx=0;
-  for (const goto_programt::targett &op : ops)
+  for(const goto_programt::targett &op : ops)
   {
     const symbol_exprt var(st.lookup(get_affected_variable(*op)).symbol_expr());
     const address_of_exprt var_ptr(var);
@@ -94,7 +94,7 @@ void instrument_pred_ops(jsa_programt &prog, const goto_programt::targetst &ops,
     const index_exprt op_elem(pred_ops, op_index_expr);
     mark_dead(body, op, op_elem);
     goto_programt::targett pos=jsa_assign(st, gf, op, op_elem, var_ptr);
-    if (!is_jsa_const(var))
+    if(!is_jsa_const(var))
     {
       op_ids.insert(std::make_pair(res_op_idx, var));
       const constant_exprt res_op_idx_expr(from_integer(res_op_idx++, sz_type));
@@ -102,7 +102,7 @@ void instrument_pred_ops(jsa_programt &prog, const goto_programt::targetst &ops,
       mark_dead(body, op, res_op_elem);
       pos=jsa_assign(st, gf, pos, res_op_elem, address_of_exprt(var));
     }
-    if (op == prog.synthetic_variables) prog.synthetic_variables=pos;
+    if(op == prog.synthetic_variables) prog.synthetic_variables=pos;
   }
   const symbol_exprt op_count(st.lookup(JSA_PRED_OP_COUNT).symbol_expr());
   const constant_exprt op_value(from_integer(op_index, op_count.type()));

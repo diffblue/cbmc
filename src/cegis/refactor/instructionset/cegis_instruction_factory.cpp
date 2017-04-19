@@ -111,10 +111,10 @@ ordered_instructionst get_instructions_for_types(
     const cegis_operand_datat &signature)
 {
   ordered_instructionst result;
-  for (const cegis_operand_datat::value_type &typeWithSlots : signature)
+  for(const cegis_operand_datat::value_type &typeWithSlots : signature)
   {
     const typet &type=typeWithSlots.first;
-    if (!is_cegis_primitive(type)) continue; // TODO: Add support for class types
+    if(!is_cegis_primitive(type)) continue; // TODO: Add support for class types
     const arithmetic_instructionst arith(type);
     insert(result, arith.plus());
     insert(result, arith.minus());

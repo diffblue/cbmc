@@ -55,11 +55,11 @@ goto_programt::targett link_temp_vars(const symbol_tablet &st,
 {
   goto_programt::targett previous_successor(pos);
   ++previous_successor;
-  for (size_t i=0; i < num_temps; ++i)
+  for(size_t i=0; i < num_temps; ++i)
   {
     const std::string name=get_cegis_meta_name(get_tmp(i));
     pos=set_rops_reference(st, body, pos, name, i);
-    if (i == 0) move_labels(body, previous_successor, pos);
+    if(i == 0) move_labels(body, previous_successor, pos);
     pos=set_ops_reference(st, body, pos, name, i + num_user_vars);
   }
   return pos;
@@ -82,12 +82,12 @@ void link_user_symbols(const symbol_tablet &st, operand_variable_idst &var_ids,
 {
   typedef symbol_tablet::symbolst symbolst;
   const symbolst &symbols=st.symbols;
-  for (symbolst::const_iterator it=symbols.begin(); it != symbols.end(); ++it)
+  for(symbolst::const_iterator it=symbols.begin(); it != symbols.end(); ++it)
   {
     const symbolt &symbol=it->second;
-    if (!is_instrumentable_user_variable(symbol.name, symbol.type)) continue;
+    if(!is_instrumentable_user_variable(symbol.name, symbol.type)) continue;
     const bool is_const=is_global_const(symbol.name, symbol.type);
-    if (is_const == consts)
+    if(is_const == consts)
       var_ids.insert(std::make_pair(symbol.name, variable_id++));
   }
 }

@@ -75,7 +75,7 @@ public:
     const irep_idt &Dx=get_affected_variable(*im.Ix);
     const irep_idt &Dx_prime=get_affected_variable(*im.Ix_prime);
     insert_program(body, im.Ix_prime, solution.invariant, Dx, Dx_prime);
-    if (!dm.Rx.empty() && !dm.Rx_prime.empty())
+    if(!dm.Rx.empty() && !dm.Rx_prime.empty())
     {
       const goto_programt::targett Rx=*dm.Rx.rbegin();
       insert_program(body, *dm.Rx.rbegin(), solution.ranking);
@@ -84,14 +84,14 @@ public:
       const irep_idt &Rx_pn=get_affected_variable(*Rx_prime);
       insert_program(body, Rx_prime, solution.ranking, Rx_n, Rx_pn); // XXX: Lexicographical ranking?
     }
-    if (!dm.Sx.empty()) insert_program(body, *dm.Sx.rbegin(), solution.skolem);
+    if(!dm.Sx.empty()) insert_program(body, *dm.Sx.rbegin(), solution.skolem);
   }
 };
 
 void insert_programs(danger_programt &prog, const candidatet &candidate)
 {
   const candidatet::danger_programst &progs=candidate.danger_programs;
-  if (progs.empty()) return;
+  if(progs.empty()) return;
   goto_programt &body=get_entry_body(prog.gf);
   const goto_programt::instructionst &first_inv=progs.begin()->invariant;
   const std::string D0x(get_cegis_meta_name(get_Dx(0)));

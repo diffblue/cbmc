@@ -1,9 +1,21 @@
-SRC = goto_cc_main.cpp goto_cc_mode.cpp gcc_mode.cpp \
-      gcc_cmdline.cpp ms_cl_cmdline.cpp ld_cmdline.cpp \
-      compile.cpp armcc_cmdline.cpp \
-      goto_cc_languages.cpp goto_cc_cmdline.cpp \
-      ms_cl_mode.cpp armcc_mode.cpp cw_mode.cpp bcc_cmdline.cpp \
-      as_mode.cpp as_cmdline.cpp as86_cmdline.cpp
+SRC = armcc_cmdline.cpp \
+      armcc_mode.cpp \
+      as86_cmdline.cpp \
+      as_cmdline.cpp \
+      as_mode.cpp \
+      bcc_cmdline.cpp \
+      compile.cpp \
+      cw_mode.cpp \
+      gcc_cmdline.cpp \
+      gcc_mode.cpp \
+      goto_cc_cmdline.cpp \
+      goto_cc_languages.cpp \
+      goto_cc_main.cpp \
+      goto_cc_mode.cpp \
+      ld_cmdline.cpp \
+      ms_cl_cmdline.cpp \
+      ms_cl_mode.cpp \
+      # Empty last line
 
 OBJ += ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \

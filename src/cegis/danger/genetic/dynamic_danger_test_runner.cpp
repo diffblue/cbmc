@@ -40,7 +40,7 @@ void dynamic_danger_test_runnert::run_test(individualt &ind,
   const int argc=args.size();
   std::vector<unsigned int> argv;
   argv.resize(argc);
-  for (int i=0; i < argc; ++i)
+  for(int i=0; i < argc; ++i)
     argv[i]=args[i];
 
   on_complete(EXIT_SUCCESS == fitness_tester(argv.data()));

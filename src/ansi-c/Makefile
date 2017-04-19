@@ -1,21 +1,44 @@
-SRC = c_typecast.cpp ansi_c_y.tab.cpp ansi_c_lex.yy.cpp ansi_c_parser.cpp \
-      expr2c.cpp ansi_c_language.cpp c_sizeof.cpp ansi_c_scope.cpp \
-      c_types.cpp ansi_c_typecheck.cpp \
-      c_preprocess.cpp c_storage_spec.cpp \
-      c_typecheck_base.cpp c_typecheck_initializer.cpp \
-      c_typecheck_typecast.cpp c_typecheck_code.cpp \
-      c_typecheck_expr.cpp c_typecheck_type.cpp string_constant.cpp \
-      c_qualifiers.cpp c_typecheck_argc_argv.cpp ansi_c_parse_tree.cpp \
-      preprocessor_line.cpp ansi_c_convert_type.cpp \
-      type2name.cpp cprover_library.cpp anonymous_member.cpp \
-      printf_formatter.cpp ansi_c_internal_additions.cpp padding.cpp \
-      ansi_c_declaration.cpp designator.cpp ansi_c_entry_point.cpp \
-      literals/parse_float.cpp literals/unescape_string.cpp \
-      literals/convert_float_literal.cpp \
-      literals/convert_character_literal.cpp \
-      literals/convert_integer_literal.cpp \
-      literals/convert_string_literal.cpp c_misc.cpp \
+SRC = anonymous_member.cpp \
+      ansi_c_convert_type.cpp \
+      ansi_c_declaration.cpp \
+      ansi_c_entry_point.cpp \
+      ansi_c_internal_additions.cpp \
+      ansi_c_language.cpp \
+      ansi_c_lex.yy.cpp \
+      ansi_c_parse_tree.cpp \
+      ansi_c_parser.cpp \
+      ansi_c_scope.cpp \
+      ansi_c_typecheck.cpp \
+      ansi_c_y.tab.cpp \
+      c_misc.cpp \
       c_nondet_symbol_factory.cpp \
+      c_preprocess.cpp \
+      c_qualifiers.cpp \
+      c_sizeof.cpp \
+      c_storage_spec.cpp \
+      c_typecast.cpp \
+      c_typecheck_argc_argv.cpp \
+      c_typecheck_base.cpp \
+      c_typecheck_code.cpp \
+      c_typecheck_expr.cpp \
+      c_typecheck_initializer.cpp \
+      c_typecheck_type.cpp \
+      c_typecheck_typecast.cpp \
+      c_types.cpp \
+      cprover_library.cpp \
+      designator.cpp \
+      expr2c.cpp \
+      literals/convert_character_literal.cpp \
+      literals/convert_float_literal.cpp \
+      literals/convert_integer_literal.cpp \
+      literals/convert_string_literal.cpp \
+      literals/parse_float.cpp \
+      literals/unescape_string.cpp \
+      padding.cpp \
+      preprocessor_line.cpp \
+      printf_formatter.cpp \
+      string_constant.cpp \
+      type2name.cpp \
       # Empty last line
 
 INCLUDES= -I ..

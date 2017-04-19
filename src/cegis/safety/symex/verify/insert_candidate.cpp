@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void safety_insert_candidate(safety_programt &program,
     const safety_goto_solutiont &candidate)
 {
-  if (candidate.empty()) return;
+  if(candidate.empty()) return;
   const safety_programt::safety_loopst &loops=program.safety_loops;
   const size_t size=loops.size();
   assert(size == candidate.size());
@@ -26,7 +26,7 @@ void safety_insert_candidate(safety_programt &program,
   const std::string Ix_0(get_cegis_meta_name(get_Ix(0)));
   const std::string Ix0(get_cegis_meta_name(get_Ix0()));
   insert_program(body, program.Ix0, candidate.front(), Ix_0, Ix0);
-  for (size_t i=0; i < size; ++i)
+  for(size_t i=0; i < size; ++i)
   {
     const invariant_programt::invariant_loopt &loop=loops[i];
     const goto_programt::instructionst &prog=candidate[i];

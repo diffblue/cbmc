@@ -42,14 +42,14 @@ void havoc_size(containert &container, const size_t max, const size_t min=1u)
 void jsa_randomt::havoc(jsa_genetic_solutiont::predicatest &predicates) const
 {
   predicates.resize(get_num_jsa_preds(st));
-  for (jsa_genetic_solutiont::predicatet &predicate : predicates)
+  for(jsa_genetic_solutiont::predicatet &predicate : predicates)
     havoc(predicate);
 }
 
 void jsa_randomt::havoc(jsa_genetic_solutiont::predicatet &predicate) const
 {
   havoc_size(predicate, get_max_pred_size(st));
-  for (jsa_genetic_solutiont::predicatet::value_type &instr : predicate)
+  for(jsa_genetic_solutiont::predicatet::value_type &instr : predicate)
     havoc(instr);
 }
 
@@ -65,7 +65,7 @@ void jsa_randomt::havoc(
 void jsa_randomt::havoc(jsa_genetic_solutiont::invariantt &invariant) const
 {
   invariant.resize(get_max_inv_size());
-  for (jsa_genetic_solutiont::invariantt::value_type &instr : invariant)
+  for(jsa_genetic_solutiont::invariantt::value_type &instr : invariant)
     havoc(instr);
 }
 
@@ -80,7 +80,7 @@ void jsa_randomt::havoc(
 void jsa_randomt::havoc(jsa_genetic_solutiont::queryt &query) const
 {
   havoc_size(query, get_max_query_size(st), MIN_QUERY_SIZE);
-  for (size_t i=0; i < query.size(); ++i)
+  for(size_t i=0; i < query.size(); ++i)
     havoc(query[i], i);
 }
 
@@ -89,7 +89,7 @@ void jsa_randomt::havoc(jsa_genetic_solutiont::queryt &query) const
 void jsa_randomt::havoc(jsa_genetic_solutiont::queryt::value_type &instr,
     const size_t index) const
 {
-  if (index == 0)
+  if(index == 0)
   {
     havoc_list(instr.opcode);
     havoc_iterator(instr.op0);

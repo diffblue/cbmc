@@ -24,10 +24,10 @@ void collect_counterexamples(refactor_programt &prog)
   refactor_programt::counterexample_locationst &ls=prog.counterexample_locations;
   typedef goto_functionst::function_mapt fmapt;
   size_t idx=0;
-  for (fmapt::value_type &entry : prog.gf.function_map)
+  for(fmapt::value_type &entry : prog.gf.function_map)
   {
     fmapt::value_type::second_type &func=entry.second;
-    if (!func.body_available()) continue;
+    if(!func.body_available()) continue;
     goto_programt::targetst &ce_locs=ls[entry.first];
     idx=collect_counterexample_locations(ce_locs, func.body, is_meta, idx);
   }

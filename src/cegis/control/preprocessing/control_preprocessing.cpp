@@ -43,18 +43,18 @@ const char * const excluded_functions[]= {
 
 bool is_meta(const goto_programt::const_targett pos)
 {
-  if (default_cegis_meta_criterion(pos)) return true;
+  if(default_cegis_meta_criterion(pos)) return true;
   const source_locationt &loc=pos->code.source_location();
   const std::string &func=id2string(loc.get_function());
-  for (const char * const excluded : excluded_functions)
-    if (contains(func, excluded)) return true;
-  if ((goto_program_instruction_typet::ASSIGN != pos->type
+  for(const char * const excluded : excluded_functions)
+    if(contains(func, excluded)) return true;
+  if((goto_program_instruction_typet::ASSIGN != pos->type
       && goto_program_instruction_typet::DECL != pos->type)
       || !pos->code.has_operands()
       || (pos->code.has_operands() && ID_symbol != pos->code.op0().id()))
     return false;
   const std::string &var=id2string(get_affected_variable(*pos));
-  if (contains(var, TMP_MARKER) || contains(var, RETURN_VALUE_SUFFIX)
+  if(contains(var, TMP_MARKER) || contains(var, RETURN_VALUE_SUFFIX)
       || contains(var, CPROVER_PREFIX)) return true;
   return CEGIS_CONTROL_SOLUTION_VAR_NAME == var
       || CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == var;
@@ -67,17 +67,17 @@ void add_explicit_nondet_for_extern_vars(const symbol_tablet &st,
   goto_programt &init_body=get_body(gf, CPROVER_INIT);
   goto_programt::targett entry_pos=entry_body.instructions.begin();
   goto_programt::targett init_pos=std::prev(init_body.instructions.end(), 1);
-  for (const symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
+  for(const symbol_tablet::symbolst::value_type &id_and_symbol : st.symbols)
   {
     const symbolt &symbol=id_and_symbol.second;
     const std::string &name=id2string(id_and_symbol.first);
-    if (!symbol.is_extern || contains(name, CPROVER_PREFIX)) continue;
+    if(!symbol.is_extern || contains(name, CPROVER_PREFIX)) continue;
     const bool is_solution_var=CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == name
         || CEGIS_CONTROL_SOLUTION_VAR_NAME == name;
     goto_programt &body=is_solution_var ? init_body : entry_body;
     goto_programt::targett &pos=is_solution_var ? init_pos : entry_pos;
     const source_locationt &loc=pos->source_location;
-    if (is_solution_var) pos=body.insert_before(pos);
+    if(is_solution_var) pos=body.insert_before(pos);
     else pos=body.insert_after(pos);
     pos->source_location=loc;
     pos->type=goto_program_instruction_typet::ASSIGN;
@@ -99,7 +99,7 @@ void control_preprocessingt::operator ()()
   add_explicit_nondet_for_extern_vars(st, gf);
   collect_counterexample_locations(locs, body, is_meta);
   // XXX: Debug
-  for (const goto_programt::const_targett target : locs)
+  for(const goto_programt::const_targett target : locs)
   {
     std::cout << "<ce>" << target->code.pretty() << "</ce>" << std::endl;
   }

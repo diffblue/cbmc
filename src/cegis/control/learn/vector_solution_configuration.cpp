@@ -23,7 +23,7 @@ namespace
 {
 bool is_assignment_to_solution_var(const goto_programt::instructiont &instr)
 {
-  if (goto_program_instruction_typet::ASSIGN != instr.type) return false;
+  if(goto_program_instruction_typet::ASSIGN != instr.type) return false;
   const std::string &var_name=id2string(get_affected_variable(instr));
   return CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == var_name;
 }
@@ -53,7 +53,7 @@ namespace
 bool is_solution(const goto_trace_stept &step)
 {
   const exprt &lhs=step.full_lhs;
-  if (ID_symbol != lhs.id()) return false;
+  if(ID_symbol != lhs.id()) return false;
   const std::string &id=id2string(to_symbol_expr(lhs).get_identifier());
   return CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == id;
 }

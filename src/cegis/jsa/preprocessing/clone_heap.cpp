@@ -23,13 +23,13 @@ namespace
 {
 bool is_heap_type(const typet &type)
 {
-  if (ID_symbol != type.id()) return false;
+  if(ID_symbol != type.id()) return false;
   return to_symbol_type(type).get_identifier() == JSA_HEAP_TAG;
 }
 
 bool is_heap(const goto_programt::instructiont &instr)
 {
-  if (goto_program_instruction_typet::DECL != instr.type) return false;
+  if(goto_program_instruction_typet::DECL != instr.type) return false;
   return is_heap_type(to_code_decl(instr.code).symbol().type());
 }
 }
@@ -74,7 +74,7 @@ void clone_heap(jsa_programt &prog)
 }
 
 #define VALID_LIST JSA_PREFIX "assume_valid_list"
-//#define VALID_IT JSA_PREFIX "assume_valid_iterator"
+// #define VALID_IT JSA_PREFIX "assume_valid_iterator"
 #define VALID_IT JSA_PREFIX "assume_valid_invariant_iterator" // XXX: TODO: Find a cleaner way.
 
 namespace
@@ -84,11 +84,11 @@ std::vector<symbol_exprt> collect(goto_programt::targett first,
     const std::function<bool(const irep_idt &)> pred)
 {
   std::vector<symbol_exprt> symbols;
-  for (; first != last; ++first)
+  for(; first != last; ++first)
   {
-    if (goto_program_instruction_typet::DECL != first->type) continue;
+    if(goto_program_instruction_typet::DECL != first->type) continue;
     const symbol_exprt symb(to_symbol_expr(to_code_decl(first->code).symbol()));
-    if (pred(symb.get_identifier())) symbols.push_back(symb);
+    if(pred(symb.get_identifier())) symbols.push_back(symb);
   }
   return symbols;
 }
@@ -113,10 +113,10 @@ goto_programt::targett assume_lists_and_its_valid(const symbol_tablet &st,
 {
   const goto_programt::targett first=body.instructions.begin();
   const std::vector<symbol_exprt> its(collect(first, pos, is_jsa_iterator));
-  for (const symbol_exprt &it : its)
+  for(const symbol_exprt &it : its)
     pos=call_assume(st, VALID_IT, heap_ptr, it, body, pos);
   const std::vector<symbol_exprt> lists(collect(first, pos, is_jsa_list));
-  for (const symbol_exprt &list : lists)
+  for(const symbol_exprt &list : lists)
     pos=call_assume(st, VALID_LIST, heap_ptr, list, body, pos);
   return pos;
 }

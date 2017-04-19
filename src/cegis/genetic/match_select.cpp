@@ -24,7 +24,7 @@ match_selectt::~match_selectt()
 void match_selectt::init(populationt &pop)
 {
   pop.resize(pop_size);
-  for (program_individualt &ind : pop)
+  for(program_individualt &ind : pop)
     random.havoc(ind);
 }
 
@@ -64,8 +64,8 @@ public:
   bool operator()(const contestantt &lhs, const contestantt &rhs) const
   {
     const bool is_rhs_null=no_contestant == rhs;
-    if (no_contestant == lhs) return !is_rhs_null;
-    if (is_rhs_null) return false;
+    if(no_contestant == lhs) return !is_rhs_null;
+    if(is_rhs_null) return false;
     return lhs->fitness < rhs->fitness;
   }
 };
@@ -84,8 +84,8 @@ size_t get_match_fitness(const match_selectt::test_case_datat &data,
   assert(f_data_size == m_dt.size());
   size_t match_value=mother->fitness;
   typedef std::list<bool>::const_iterator itert;
-  for (itert fv=f_dt.begin(), mv=m_dt.begin(); fv != f_dt.end(); ++fv, ++mv)
-    if (*fv != *mv) match_value+=2; // Excessive?
+  for(itert fv=f_dt.begin(), mv=m_dt.begin(); fv != f_dt.end(); ++fv, ++mv)
+    if(*fv != *mv) match_value+=2; // Excessive?
   return match_value;
 }
 }
@@ -95,27 +95,27 @@ match_selectt::selectiont match_selectt::select(populationt &pop)
   const contestantt no_contestant=pop.end();
   const is_contestant_less_thant is_less_than(no_contestant);
   contestantt father=no_contestant;
-  for (size_t contestants=0; contestants < rounds / 2;)
+  for(size_t contestants=0; contestants < rounds / 2;)
   {
     contestantt contestant=pop.begin();
     std::advance(contestant, random.rand() % pop.size());
-    if (father == contestant) continue;
-    if (is_less_than(father, contestant)) father=contestant;
+    if(father == contestant) continue;
+    if(is_less_than(father, contestant)) father=contestant;
     ++contestants;
   }
   contestantt mother=no_contestant;
   size_t match_fitness=0u;
-  for (size_t contestants=0; contestants < rounds / 2;)
+  for(size_t contestants=0; contestants < rounds / 2;)
   {
     contestantt contestant=pop.begin();
     std::advance(contestant, random.rand() % pop.size());
-    if (mother == contestant || father == contestant) continue;
-    if (no_contestant == mother) mother=contestant;
+    if(mother == contestant || father == contestant) continue;
+    if(no_contestant == mother) mother=contestant;
     else
     {
       const size_t new_match=get_match_fitness(test_case_data, no_contestant,
           father, contestant);
-      if (match_fitness < new_match)
+      if(match_fitness < new_match)
       {
         match_fitness=new_match;
         mother=contestant;
@@ -125,19 +125,19 @@ match_selectt::selectiont match_selectt::select(populationt &pop)
   }
   contestantt son=no_contestant;
   contestantt daughter=no_contestant;
-  for (size_t contestants=0; contestants < rounds / 2;)
+  for(size_t contestants=0; contestants < rounds / 2;)
   {
     contestantt contestant=pop.begin();
     std::advance(contestant, random.rand() % pop.size());
-    if (father == contestant || mother == contestant || son == contestant
+    if(father == contestant || mother == contestant || son == contestant
         || daughter == contestant) continue;
-    if (no_contestant == son) son=contestant;
-    else if (no_contestant == daughter) daughter=contestant;
-    else if (son->fitness > contestant->fitness)
+    if(no_contestant == son) son=contestant;
+    else if(no_contestant == daughter) daughter=contestant;
+    else if(son->fitness > contestant->fitness)
     {
       daughter=son;
       son=contestant;
-    } else if (daughter->fitness > contestant->fitness) daughter=contestant;
+    } else if(daughter->fitness > contestant->fitness) daughter=contestant;
     ++contestants;
   }
   selectiont selection;
