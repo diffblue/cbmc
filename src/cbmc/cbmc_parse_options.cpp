@@ -237,12 +237,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("assertions", true);
 
-  // check built-in assertions
-  if(cmdline.isset("no-built-in-assertions"))
-    options.set_option("built-in-assertions", false);
-  else
-    options.set_option("built-in-assertions", true);
-
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
@@ -1124,7 +1118,6 @@ void cbmc_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
-    " --no-built-in-assertions     ignore assertions in built-in library\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
