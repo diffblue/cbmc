@@ -531,8 +531,6 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   // for each entry in the incoming environment we need to either add it
   // if it is new, or merge with the existing key if it is not present
 
-
-
   if(bottom)
   {
     *this=env;
@@ -544,6 +542,8 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   }
   else
   {
+    // For each element in the intersection of map and env.map merge
+    // If the result of the merge is top, remove from the map
     bool modified=false;
     for(const auto &entry : env.map)
     {
@@ -553,7 +553,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
         abstract_object_pointert new_object=map[entry.first]->merge(
           entry.second, object_modified);
 
-      modified|=object_modified;
+        modified|=object_modified;
         map[entry.first]=new_object;
 
         if(map[entry.first]->is_top())
@@ -565,23 +565,32 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
 #endif
         }
       }
-    }
-
-    std::vector<map_keyt> to_remove;
-    for(const auto &entry : map)
-    {
-      if(env.map.find(entry.first)==env.map.end())
+      else
       {
-        to_remove.push_back(entry.first);
+        // Map doesn't contain key so the resulting map shouldn't either
       }
     }
-    for(const map_keyt &key_to_remove : to_remove)
+
+    // Remove all elements from the map that are not present in the map we are
+    // merging in since they must be top
+    const auto &end_iter=map.end();
+    for(auto iter=map.begin(); iter!=end_iter;)
     {
-      map.erase(key_to_remove);
+      if(env.map.find(iter->first)==env.map.cend())
+      {
+        // After calling erase, the iterator is no longer valid, so we increment
+        // the iterator first and return a copy of the original iterator
+        map.erase(iter++);
+        modified=true;
+
 #ifdef DEBUG
-      std::cout << "Removing " << key_to_remove.get_identifier() << std::endl;
+        std::cout << "Removing " << iter->first.get_identifier() << std::endl;
 #endif
-      modified=true;
+      }
+      else
+      {
+        ++iter;
+      }
     }
 
     return modified;

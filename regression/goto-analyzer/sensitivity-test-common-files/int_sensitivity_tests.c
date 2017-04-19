@@ -51,5 +51,27 @@ int main(int argc, char *argv[])
     assert(y==0);
   }
 
+  // Try merging two states with multiple variables
+
+  int a1 = 0;
+  int a2 = 0;
+  int a3 = 0;
+  int a4 = 0;
+  int a5 = 0;
+  if(argc > 2)
+  {
+    a1 = argc;
+    a2 = argc;
+    a3 = argc;
+    // all three variables are now top in this branch
+  }
+
+  // all three asserts are unverifiable
+  assert(a1==0);
+  assert(a2==0);
+  assert(a3==0);
+  assert(a4==0);
+  assert(a5==0);
+
   return 0;
 }
