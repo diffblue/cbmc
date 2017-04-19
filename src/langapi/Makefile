@@ -1,5 +1,8 @@
-SRC = mode.cpp language_ui.cpp languages.cpp language_util.cpp
-
+SRC = language_ui.cpp \
+      language_util.cpp \
+      languages.cpp \
+      mode.cpp \
+      # Empty last line
 INCLUDES= -I ..
 
 include ../config.inc
