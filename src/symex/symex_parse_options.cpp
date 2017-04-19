@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
@@ -304,6 +305,12 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // remove stuff
     remove_complex(goto_model);
     remove_vector(goto_model);
+    // remove function pointers
+    status() << "Removal of function pointers and virtual functions" << eom;
+    remove_function_pointers(
+      get_message_handler(),
+      goto_model,
+      cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // Java throw and catch -> explicit exceptional return variables:
