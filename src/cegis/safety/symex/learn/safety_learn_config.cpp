@@ -69,17 +69,17 @@ void safety_learn_configt::process(const size_t max_solution_size)
   counterexamplet dummy_ce;
   dummy_ce.x.push_back(counterexamplet::assignmentst());
   counterexamplet::assignmentst &x=dummy_ce.x.front();
-  for (const symbol_exprt &var : ce_vars)
+  for(const symbol_exprt &var : ce_vars)
     x.insert(std::make_pair(var.get_identifier(), zero));
   // TODO: Implement for multiple loops (change constraint, instrumentation)
   const safety_programt &prog=original_program;
   const invariant_programt::const_invariant_loopst loops=prog.get_loops();
   assert(!loops.empty());
   // XXX: We might have to handle skolem choices explicitly at some point
-  for (const goto_programt::targett &skolem_choice : loops.front()->skolem_choices)
+  for(const goto_programt::targett &skolem_choice : loops.front()->skolem_choices)
     x.insert(std::make_pair(get_affected_variable(*skolem_choice), zero));
   counterexamplet::assignmentst &x0=dummy_ce.x0;
-  for (const goto_programt::targett &x0_choice : original_program.x0_choices)
+  for(const goto_programt::targett &x0_choice : original_program.x0_choices)
     x0.insert(std::make_pair(get_affected_variable(*x0_choice), zero));
   counterexamplest empty(1, dummy_ce);
   process(empty, max_solution_size);

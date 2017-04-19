@@ -25,7 +25,7 @@ std::string get_current_executable_file_path()
 #else
   char buffer[PATH_MAX];
   const ssize_t len=::readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
-  if (len == -1) throw std::runtime_error("module helper: readlink failed");
+  if(len == -1) throw std::runtime_error("module helper: readlink failed");
   buffer[len]='\0';
   return std::string(buffer);
 #endif

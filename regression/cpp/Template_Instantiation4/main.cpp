@@ -17,7 +17,7 @@ X<1> x;
 
 int main()
 {
-  //x.some_func();
+  // x.some_func();
 }
 
 // also works with function templates

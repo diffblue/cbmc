@@ -42,13 +42,13 @@ public:
       vals(vals), prototype(prototype), num_ces(num_ces)
   {
     const constant_exprt size(from_integer(num_ces, unsigned_int_type()));
-    for (ceitt it=prototype.begin(); it != prototype.end(); ++it)
+    for(ceitt it=prototype.begin(); it != prototype.end(); ++it)
       vals.insert(to_array(it, size));
   }
 
   void operator()(const counterexamplet &ce) const
   {
-    for (ceitt it=ce.begin(); it != ce.end(); ++it)
+    for(ceitt it=ce.begin(); it != ce.end(); ++it)
       vals[it->first].copy_to_operands(it->second);
   }
 };
@@ -57,7 +57,7 @@ void declare_x_arrays(symbol_tablet &st, goto_functionst &gf,
     goto_programt::targett pos, const array_valuest &vals,
     const std::string &meta_var_prefix)
 {
-  for (array_valuest::const_iterator it=vals.begin(); it != vals.end(); ++it)
+  for(array_valuest::const_iterator it=vals.begin(); it != vals.end(); ++it)
   {
     std::string base_name(meta_var_prefix);
     base_name+=id2string(it->first);
@@ -78,8 +78,8 @@ symbol_exprt get_index(const symbol_tablet &st)
 goto_programt::targett find_decl(goto_programt::targett begin,
     const goto_programt::targett &end, const irep_idt &id)
 {
-  for (; begin != end; ++begin)
-    if (begin->is_decl() && get_affected_variable(*begin) == id) return begin;
+  for(; begin != end; ++begin)
+    if(begin->is_decl() && get_affected_variable(*begin) == id) return begin;
   return end;
 }
 
@@ -113,7 +113,7 @@ public:
     assert(!loops.empty());
     pos=begin_pos;
     ++pos;
-    if (use_x0_ce)
+    if(use_x0_ce)
     {
       pos=get_entry_body(gf).insert_after(pos);
       pos->type=goto_program_instruction_typet::GOTO;
@@ -133,13 +133,13 @@ public:
     const symbol_exprt lhs(st.lookup(id).symbol_expr());
     const goto_programt::targett end(prog.invariant_range.end);
     const goto_programt::targett decl(find_decl(pos, end, id));
-    if (end == decl) pos=cegis_assign(st, gf, pos, lhs, rhs);
+    if(end == decl) pos=cegis_assign(st, gf, pos, lhs, rhs);
     else cegis_assign(st, gf, decl, lhs, rhs);
   }
 
   void finalize_x0_case()
   {
-    if (use_x0_ce) goto_pos->targets.push_back(++pos);
+    if(use_x0_ce) goto_pos->targets.push_back(++pos);
   }
 };
 
@@ -238,7 +238,7 @@ void invariant_add_learned_counterexamples(invariant_programt &prog,
     const bool x0_ce)
 {
   // TODO: Danger counterexamples need one map<irep_idt, exprt> per loop (per quantifier)!
-  if (ces.empty()) return;
+  if(ces.empty()) return;
   const std::string pre(X_CHOICE_PREFIX);
   invariant_declare_x_choice_arrays(prog, ces, pre);
   const size_t sz=ces.size();

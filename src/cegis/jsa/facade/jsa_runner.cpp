@@ -43,7 +43,7 @@ std::function<void(jsa_solutiont &)> get_default_solution(
     const jsa_programt &prog)
 {
   return [&prog](jsa_solutiont &solution)
-  { if (solution.invariant.empty()) solution=default_jsa_solution(prog);};
+  { if(solution.invariant.empty()) solution=default_jsa_solution(prog);};
 }
 
 template<class oraclet, class prept>
@@ -92,7 +92,7 @@ int run_jsa(optionst &o, mstreamt &result, const symbol_tablet &st,
   cegis_symex_learnt<jsa_preprocessingt, jsa_symex_learnt> learn(o, prep, lcfg, get_default_solution(prog));
   jsa_symex_verifyt vcfg(prog);
   cegis_symex_verifyt<jsa_symex_verifyt> oracle(o, vcfg);
-  if (o.get_bool_option(CEGIS_GENETIC))
+  if(o.get_bool_option(CEGIS_GENETIC))
     return run_with_ga(st, o, result, lcfg, oracle, prep);
   else
     return run_cegis_with_statistics_wrapper(result, o, learn, oracle, prep);

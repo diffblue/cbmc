@@ -32,7 +32,7 @@ void refactor_symex_learnt::process(const counterexamplest &counterexamples,
   current_program=original_program;
   symbol_tablet &st=current_program.st;
   goto_functionst &gf=current_program.gf;
-  for (const irep_idt &program : current_program.programs)
+  for(const irep_idt &program : current_program.programs)
   {
     symbolt &symbol=st.lookup(program);
     assign_in_cprover_init(gf, symbol, side_effect_expr_nondett(symbol.type));
@@ -71,11 +71,11 @@ public:
 
   void operator()(const goto_trace_stept &step) const
   {
-    if (!step.is_assignment()) return;
+    if(!step.is_assignment()) return;
     const std::string &v=id2string(step.lhs_object.get_identifier());
     const auto it=std::find_if(progs.begin(), progs.end(),
         std::bind(starts_with, v, std::bind(id2string, std::placeholders::_1)));
-    if (progs.end() == it || !ends_with(v, CEGIS_REFACTOR_PROG_SUFFIX)) return;
+    if(progs.end() == it || !ends_with(v, CEGIS_REFACTOR_PROG_SUFFIX)) return;
     const array_exprt &value=to_array_expr(step.full_lhs_value);
     assert(candidate.insert(std::make_pair(v, value)).second);
   }

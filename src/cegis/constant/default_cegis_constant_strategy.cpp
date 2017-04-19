@@ -31,11 +31,11 @@ size_t default_cegis_constant_strategy(symbol_tablet &st, goto_functionst &gf)
   size_t const_index=0u;
   goto_programt::targett pos=get_entry_body(gf).instructions.begin();
   // XXX: Literals strategy, benchmark performance
-  for (const constant_exprt &expr : literals)
+  for(const constant_exprt &expr : literals)
   {
     // XXX: Debug
-    //std::cout << "<id>" << const_index << "</id>" << std::endl;
-    //std::cout << "<value>" << expr.to_string() << "</value>" << std::endl;
+    // std::cout << "<id>" << const_index << "</id>" << std::endl;
+    // std::cout << "<value>" << expr.to_string() << "</value>" << std::endl;
     // XXX: Debug
     const std::string base_name(get_name(const_index++));
     pos=declare_cegis_meta_variable(st, gf, pos, base_name, expr.type());

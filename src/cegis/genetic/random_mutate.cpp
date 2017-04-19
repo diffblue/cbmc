@@ -31,7 +31,7 @@ void mutate_opcode(random_mutatet::individualt::instructiont &instr,
   rand.havoc(instr, index);
   random_mutatet::individualt::instructiont::opst &new_ops=instr.ops;
   const size_t size=std::min(old_ops.size(), new_ops.size());
-  for (size_t i=0; i < size; ++i)
+  for(size_t i=0; i < size; ++i)
     new_ops[i]=old_ops[i];
 }
 }
@@ -41,33 +41,33 @@ void random_mutatet::operator()(individualt &lhs, const individualt &rhs) const
   lhs=rhs;
   const size_t num_x0=lhs.x0.size();
   size_t num_mutation_candidates=num_x0;
-  for (const individualt::programt &prog : lhs.programs)
+  for(const individualt::programt &prog : lhs.programs)
   {
-    for (const individualt::instructiont &instr : prog)
+    for(const individualt::instructiont &instr : prog)
       num_mutation_candidates+=instr.ops.size() + 1;
   }
 
   size_t mutation_target=random.rand() % (num_mutation_candidates + 1);
-  if (mutation_target < num_consts())
+  if(mutation_target < num_consts())
   {
     lhs.x0[mutation_target]=random.constant();
     return;
   }
-  if (mutation_target < num_x0)
+  if(mutation_target < num_x0)
   {
     lhs.x0[mutation_target]=random.x0();
     return;
   }
   mutation_target-=num_x0;
-  for (individualt::programt &prog : lhs.programs)
+  for(individualt::programt &prog : lhs.programs)
   {
-    for (size_t i=0; i < prog.size(); ++i)
+    for(size_t i=0; i < prog.size(); ++i)
     {
       individualt::instructiont &instr=prog[i];
-      if (!mutation_target) return mutate_opcode(instr, random, i);
+      if(!mutation_target) return mutate_opcode(instr, random, i);
       --mutation_target;
       const size_t length=instr.ops.size();
-      if (mutation_target < length)
+      if(mutation_target < length)
       {
         instr.ops[mutation_target]=random.op(i);
         return;

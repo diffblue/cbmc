@@ -39,7 +39,7 @@ exprt create_danger_constraint(const size_t number_of_loops, const bool use_rank
   const constant_exprt min(get_min_value());
   and_exprt root;
   root.copy_to_operands(as_bool(get_Dx0()));
-  for (size_t i=0; i < number_of_loops; ++i)
+  for(size_t i=0; i < number_of_loops; ++i)
   {
     const notequal_exprt D0_x(as_bool(get_Dx(i)));
     const notequal_exprt D0_x_prime(as_bool(get_Dx_prime(i)));
@@ -49,7 +49,7 @@ exprt create_danger_constraint(const size_t number_of_loops, const bool use_rank
     const and_exprt D0_x_and_G0_x(D0_x, G0_x);
     const not_exprt not_D0_x_and_G0_x(D0_x_and_G0_x);
     exprt first_conseq;
-    if (use_ranking)
+    if(use_ranking)
     {
       const binary_predicate_exprt R0_x_gt_min(R0_x, ID_gt, min);
       const binary_predicate_exprt R0_x_prime_lt_R0_x(R0_x_prime, ID_lt, R0_x);
@@ -63,7 +63,7 @@ exprt create_danger_constraint(const size_t number_of_loops, const bool use_rank
     const notequal_exprt A_x(as_bool(get_Ax()));
     exprt second_conseq;
     const bool is_last_component=(i == (number_of_loops - 1));
-    if (is_last_component) second_conseq=not_exprt(A_x);
+    if(is_last_component) second_conseq=not_exprt(A_x);
     else second_conseq=D1_x;
     const or_exprt second_implication(not_D0_x_and_not_G0_x, second_conseq);
     root.copy_to_operands(second_implication);

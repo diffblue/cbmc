@@ -31,7 +31,7 @@ zero_valuest get_zero_values(const symbol_tablet &st,
   std::map<const irep_idt, exprt> zero_values;
   const source_locationt loc(default_cegis_source_location());
   const namespacet ns(st);
-  for (const goto_programt::const_targett pos : ce_locs)
+  for(const goto_programt::const_targett pos : ce_locs)
   {
     const irep_idt &marker=get_counterexample_marker(pos);
     const typet &type=get_affected_type(*pos);
@@ -46,23 +46,23 @@ void normalise(const std::set<irep_idt> &ce_keys, const zero_valuest &zv,
 {
   const exprt::operandst no_values;
   std::map<const irep_idt, size_t> sizes;
-  for (labelled_counterexamplest::value_type &ce : ces)
+  for(labelled_counterexamplest::value_type &ce : ces)
   {
-    for (const irep_idt &loc : ce_keys)
+    for(const irep_idt &loc : ce_keys)
     {
       std::map<const irep_idt, size_t>::iterator sz=sizes.find(loc);
-      if (sizes.end() == sz) sz=sizes.insert(std::make_pair(loc, 1)).first;
+      if(sizes.end() == sz) sz=sizes.insert(std::make_pair(loc, 1)).first;
       size_t &size=sz->second;
       labelled_assignmentst::const_iterator values=ce.find(loc);
-      if (ce.end() == values)
+      if(ce.end() == values)
         values=ce.insert(std::make_pair(loc, no_values)).first;
       size=std::max(size, values->second.size());
     }
     assert(ce.size() == zv.size());
   }
   assert(sizes.size() == zv.size());
-  for (labelled_counterexamplest::value_type &ce : ces)
-    for (labelled_counterexamplest::value_type::value_type &ass : ce)
+  for(labelled_counterexamplest::value_type &ce : ces)
+    for(labelled_counterexamplest::value_type::value_type &ass : ce)
     {
       labelled_assignmentst::value_type::second_type &values=ass.second;
       const size_t current_size=values.size();
@@ -72,7 +72,7 @@ void normalise(const std::set<irep_idt> &ce_keys, const zero_valuest &zv,
       const size_t target_size=it->second;
       assert(current_size <= target_size);
       const size_t missing=target_size - current_size;
-      if (missing)
+      if(missing)
       {
         const std::map<const irep_idt, exprt>::const_iterator it=zv.find(lbl);
         assert(zv.end() != it);
@@ -110,13 +110,13 @@ array_valuest get_array_values(const labelled_counterexamplest &ces)
   const typet sz_type(signed_int_type());
   const constant_exprt ces_sz_expr(from_integer(ces.size(), sz_type));
   array_valuest result;
-  for (const labelled_assignmentst &ce : ces)
-    for (const labelled_assignmentst::value_type &ass : ce)
+  for(const labelled_assignmentst &ce : ces)
+    for(const labelled_assignmentst::value_type &ass : ce)
     {
       const array_exprt ass_values(to_values(ass.second));
       const irep_idt &loc=ass.first;
       array_valuest::iterator it=result.find(loc);
-      if (result.end() == it)
+      if(result.end() == it)
       {
         const array_typet type(ass_values.type(), ces_sz_expr);
         it=result.insert(std::make_pair(loc, array_exprt(type))).first;
@@ -148,7 +148,7 @@ void add_array_declarations(symbol_tablet &st, goto_functionst &gf,
   const array_valuest array_values(get_array_values(ces));
   const labelled_counterexamplest::value_type &prototype=ces.front();
   goto_programt::targett pos=std::prev(begin);
-  for (const labelled_counterexamplest::value_type::value_type &value : prototype)
+  for(const labelled_counterexamplest::value_type::value_type &value : prototype)
   {
     const labelled_assignmentst::value_type::first_type loc_id=value.first;
     const array_valuest::const_iterator array_val=array_values.find(loc_id);
@@ -174,7 +174,7 @@ void add_array_indexes(const std::set<irep_idt> &ce_keys, symbol_tablet &st,
   const exprt zero(zero_initializer(type, loc, ns));
   assign_cegis_meta_variable(st, gf, pos, CE_ARRAY_INDEX, zero);
   pos=cprover_init;
-  for (const irep_idt &key : ce_keys)
+  for(const irep_idt &key : ce_keys)
   {
     const std::string label(get_ce_value_index_name(key));
     pos=declare_cegis_meta_variable(st, gf, pos, label, type);
@@ -231,11 +231,11 @@ void assign_ce_values(symbol_tablet &st, goto_functionst &gf,
 {
   const typet sz_type(signed_int_type());
   const constant_exprt one(from_integer(1, sz_type));
-  for (goto_programt::targett pos : ce_locs)
+  for(goto_programt::targett pos : ce_locs)
   {
     const irep_idt &label=get_counterexample_marker(pos);
     const index_exprt value(get_array_val_expr(st, pos->labels.front()));
-    switch (pos->type)
+    switch(pos->type)
     {
     case ASSIGN:
       to_code_assign(pos->code).rhs()=value;

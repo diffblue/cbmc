@@ -63,7 +63,7 @@ int main()
     f3=f1;
 
     int op=(binopt)i%3;
-    //op=PLUS;
+    // op=PLUS;
     #else
     f1=-0.25;
     f2=-2.5;

@@ -31,20 +31,20 @@ void link_user_symbols(const symbol_tablet &st, operand_variable_idst &var_ids,
 {
   typedef symbol_tablet::symbolst symbolst;
   const symbolst &symbols=st.symbols;
-  for (symbolst::const_iterator it=symbols.begin(); it != symbols.end(); ++it)
+  for(symbolst::const_iterator it=symbols.begin(); it != symbols.end(); ++it)
   {
     const symbolt &s=it->second;
-    if (!is_op_variable(s.name, s.type)
+    if(!is_op_variable(s.name, s.type)
         || (is_builtin(s.location) && !is_cegis_constant(s.name))) continue;
     const bool is_const=is_global_const(s.name, s.type);
-    if (is_const == consts)
+    if(is_const == consts)
       var_ids.insert(std::make_pair(s.name, variable_id++));
   }
 }
 
 size_t get_min_id(const operand_variable_idst &ids)
 {
-  if (ids.empty()) return 0;
+  if(ids.empty()) return 0;
   return std::max_element(ids.begin(), ids.end(),
       [](const operand_variable_idst::value_type &lhs, const operand_variable_idst::value_type &rhs)
       { return lhs.second < rhs.second;})->second + 1;
@@ -68,13 +68,13 @@ const char RETURN_VALUE_IDENTIFIER[]="#return_value";
 
 bool is_instrumentable_user_variable(const irep_idt &id, const typet &type)
 {
-  if (ID_code == type.id()) return false;
+  if(ID_code == type.id()) return false;
   const std::string &name=id2string(id);
-  if (std::string::npos != name.find("::")
+  if(std::string::npos != name.find("::")
       && std::string::npos == name.find(id2string(ID_main))
       && std::string::npos == name.find(id2string(goto_functionst::entry_point())))
     return false; // Inlined variables
-  if (std::string::npos != name.find(RETURN_VALUE_IDENTIFIER)) return false;
+  if(std::string::npos != name.find(RETURN_VALUE_IDENTIFIER)) return false;
   return std::string::npos == name.find(CPROVER_PREFIX);
 }
 
@@ -101,30 +101,30 @@ void link_user_program_variable_ops(const symbol_tablet &st,
   goto_programt &body=get_entry_body(gf);
   goto_programt::instructionst &instrs=body.instructions;
   goto_programt::targett pos=begin;
-  while (is_builtin(pos->source_location) && pos != end)
+  while(is_builtin(pos->source_location) && pos != end)
     ++pos;
-  for (goto_programt::targett it=pos; it != end; ++it)
+  for(goto_programt::targett it=pos; it != end; ++it)
   {
     goto_programt::instructiont &instr=*it;
     const goto_program_instruction_typet type=instr.type;
-    if (DECL != type && DEAD != type) continue;
+    if(DECL != type && DEAD != type) continue;
     const irep_idt &name=get_affected_variable(instr);
-    if (!is_op_variable(name, st.lookup(name).type)) continue;
+    if(!is_op_variable(name, st.lookup(name).type)) continue;
     const operand_variable_idst::const_iterator id=var_ids.find(name);
-    if (DEAD == type) set_ops_reference(st, body, it, get_null(), id->second);
+    if(DEAD == type) set_ops_reference(st, body, it, get_null(), id->second);
     else
     {
       set_ops_reference(st, body, it, name, id->second);
       to_instrument.erase(id->first);
     }
   }
-  if (pos != instrs.begin()) --pos;
+  if(pos != instrs.begin()) --pos;
   typedef operand_variable_idst::const_iterator itt;
   const itt first=to_instrument.begin();
-  for (itt it=first; it != to_instrument.end(); ++it)
+  for(itt it=first; it != to_instrument.end(); ++it)
   {
     pos=set_ops_reference(st, body, pos, it->first, it->second);
-    if (first == it) move_labels(body, begin, pos);
+    if(first == it) move_labels(body, begin, pos);
   }
 }
 

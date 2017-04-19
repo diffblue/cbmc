@@ -49,7 +49,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   std::vector<__CPROVER_jsa_query_instructiont> jsa_query;
   jsa_query.resize(jsa_query_size);
   size_t index=0;
-  for (const individualt::queryt::value_type &instr : query)
+  for(const individualt::queryt::value_type &instr : query)
     jsa_query[index++]=instr;
 
   const individualt::invariantt &invariant=individual.invariant;
@@ -70,7 +70,7 @@ void dynamic_jsa_test_runnert::run_test(individualt &individual,
   for(const individualt::predicatet &pred : preds)
   {
     jsa_predicates.push_back(decltype(jsa_predicates)::value_type());
-    for (const individualt::predicatet::value_type &instr : pred)
+    for(const individualt::predicatet::value_type &instr : pred)
       jsa_predicates.back().push_back(instr);
 
     jsa_predicates_arg.push_back(jsa_predicates.back().data());

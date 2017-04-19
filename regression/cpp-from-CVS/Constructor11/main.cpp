@@ -1,10 +1,10 @@
 struct A
 {
-	A(){};
+  A(){};
 };
 
 int main()
 {
-	A a;
-	a.A();
+  A a;
+  a.A();
 }

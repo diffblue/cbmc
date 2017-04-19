@@ -39,7 +39,7 @@ public:
 
   bool operator()(const exprt &expr) const
   {
-    if (ID_symbol != expr.id()) return false;
+    if(ID_symbol != expr.id()) return false;
     return name == to_symbol_expr(expr).get_identifier();
   }
 };
@@ -58,7 +58,7 @@ public:
 
   void operator()(const exprt &expr) const
   {
-    if (ID_symbol != expr.id()) return;
+    if(ID_symbol != expr.id()) return;
     keys.insert(to_symbol_expr(expr).get_identifier());
   }
 };
@@ -89,10 +89,10 @@ public:
 
   void operator()(const exprt &expr) const
   {
-    if (ID_constant != expr.id()) return;
+    if(ID_constant != expr.id()) return;
     const constant_exprt &new_literal=to_constant_expr(expr);
     const compare_literalt compare(new_literal);
-    if (values.end() != std::find_if(values.begin(), values.end(), compare))
+    if(values.end() != std::find_if(values.begin(), values.end(), compare))
       return;
     values.push_back(new_literal);
   }
@@ -115,9 +115,9 @@ public:
   virtual void operator()(const exprt &expr)
   {
     exprt::operandst ops(expr.operands());
-    if (ops.size() < 2u) return;
+    if(ops.size() < 2u) return;
     const is_same_symbolt pred(var);
-    if (ops.end() == std::find_if(ops.begin(), ops.end(), pred)) return;
+    if(ops.end() == std::find_if(ops.begin(), ops.end(), pred)) return;
     const add_symbolt add(keys);
     std::for_each(ops.begin(), ops.end(), add);
   }
@@ -135,10 +135,10 @@ typedef std::map<keyst, valuest> pool_storaget;
 pool_storaget::const_iterator find(const pool_storaget &pool,
     const irep_idt &id)
 {
-  for (pool_storaget::const_iterator it=pool.begin(); it != pool.end(); ++it)
+  for(pool_storaget::const_iterator it=pool.begin(); it != pool.end(); ++it)
   {
     const keyst &keys=it->first;
-    if (std::find(keys.begin(), keys.end(), id) == keys.end()) continue;
+    if(std::find(keys.begin(), keys.end(), id) == keys.end()) continue;
     return it;
   }
   return pool.end();
@@ -158,7 +158,7 @@ public:
   {
     const irep_idt &id=var.get_identifier();
     pool_storaget::const_iterator it=find(pool, id);
-    if (pool.end() != it) return;
+    if(pool.end() != it) return;
     keyst newKey;
     newKey.insert(id);
     const init_pool_keyst add(newKey, id);
@@ -185,11 +185,11 @@ public:
 
   bool operator()(const irep_idt &key) const
   {
-    for (exprt::operandst::const_iterator it=ops.begin(); ops.end() != it; ++it)
+    for(exprt::operandst::const_iterator it=ops.begin(); ops.end() != it; ++it)
     {
       const exprt &op=*it;
-      if (ID_symbol != op.id()) continue;
-      if (key == to_symbol_expr(op).get_identifier()) return true;
+      if(ID_symbol != op.id()) continue;
+      if(key == to_symbol_expr(op).get_identifier()) return true;
     }
     return false;
   }
@@ -225,9 +225,9 @@ public:
   virtual void operator()(const exprt &expr)
   {
     const exprt::operandst &ops=expr.operands();
-    if (ops.size() < 2u) return;
+    if(ops.size() < 2u) return;
     std::deque<keyst>::const_iterator it=find_key(keys, ops);
-    if (keys.end() == it) return;
+    if(keys.end() == it) return;
     const add_literalt add(pool[*it]);
     std::for_each(ops.begin(), ops.end(), add);
   }
@@ -266,7 +266,7 @@ public:
   size_t size() const
   {
     size_t size=0;
-    for (pool_storaget::const_iterator it=pool.begin(); it != pool.end(); ++it)
+    for(pool_storaget::const_iterator it=pool.begin(); it != pool.end(); ++it)
       size=std::max(size, it->second.size());
     return size;
   }
@@ -283,10 +283,10 @@ public:
   void seed(danger_verify_configt::counterexamplest &counterexamples) const
   {
     const size_t sz=size();
-    for (size_t i=0; i < sz; ++i)
+    for(size_t i=0; i < sz; ++i)
     {
       danger_verify_configt::counterexamplet ce;
-      for (constraint_varst::const_iterator v=vs.begin(); v != vs.end(); ++v)
+      for(constraint_varst::const_iterator v=vs.begin(); v != vs.end(); ++v)
       {
         const irep_idt &id=v->get_identifier();
         const typet &type=v->type();
@@ -301,7 +301,7 @@ public:
 void danger_literals_seedt::operator()(
     danger_verify_configt::counterexamplest &counterexamples)
 {
-  if (seeded) return;
+  if(seeded) return;
   constraint_varst vars;
   get_invariant_constraint_vars(vars, prog);
   const value_poolt pool(prog, vars);

@@ -25,7 +25,7 @@ bool ends_with(const std::string &haystack, const std::string &suffix)
 {
   const std::string::size_type haystack_sz=haystack.size();
   const std::string::size_type suffix_sz=suffix.size();
-  if (haystack_sz < suffix_sz) return false;
+  if(haystack_sz < suffix_sz) return false;
   return haystack.substr(haystack_sz - suffix_sz) == suffix;
 }
 

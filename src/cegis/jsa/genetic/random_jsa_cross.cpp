@@ -79,7 +79,7 @@ void check_consistency(const individualt &individual)
 {
   assert(individual.invariant.size() == 1);
   assert(individual.predicates.size() >= 1);
-  for (const individualt::predicatet &predicate : individual.predicates)
+  for(const individualt::predicatet &predicate : individual.predicates)
     assert(predicate.size() >= 1);
   assert(individual.query.size() >= 1);
 }
@@ -91,19 +91,19 @@ void cross(individualt &offspring, const individualt &father,
   offspring.query=mother.query;
   const individualt::invariantt &f_inv=father.invariant;
   const size_t f_inv_size=f_inv.size();
-  if (offset < f_inv_size)
+  if(offset < f_inv_size)
   {
     const individualt::invariantt &m_inv=mother.invariant;
     return splice(offspring.invariant, f_inv, m_inv, offset, OPERANDS_PER_JSA_INVARIANT_INSTRUCTION);
   }
   offset-=f_inv_size;
   offspring.invariant=father.invariant;
-  for (size_t pred_index=0; pred_index < father.predicates.size(); ++pred_index)
+  for(size_t pred_index=0; pred_index < father.predicates.size(); ++pred_index)
   {
     const individualt::predicatet &f_pred=father.predicates[pred_index];
     const size_t f_pred_size=f_pred.size() * OPERANDS_PER_JSA_PREDICATE_INSTRUCTION;
     individualt::predicatet &offspring_pred=offspring.predicates[pred_index];
-    if (offset >= f_pred_size)
+    if(offset >= f_pred_size)
     {
       offspring_pred=f_pred;
       offset-=f_pred_size;

@@ -133,7 +133,7 @@ const symbolt &declare_global_meta_variable(symbol_tablet &st,
   goto_programt &init_body=get_body(gf, CPROVER_INIT);
   goto_programt::instructionst &instrs=init_body.instructions;
   goto_programt::targett pos=instrs.begin();
-  if (instrs.size() >= 2) pos=std::prev(init_body.instructions.end(), 2);
+  if(instrs.size() >= 2) pos=std::prev(init_body.instructions.end(), 2);
   const symbol_exprt lhs(symbol.symbol_expr());
   cegis_assign(st, init_body, pos, lhs, value, default_cegis_source_location());
   return symbol;

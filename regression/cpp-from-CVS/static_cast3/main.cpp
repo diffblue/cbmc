@@ -1,26 +1,26 @@
 struct A {
-	int i;
+  int i;
 };
 
 struct B {
-	char j;
+  char j;
 };
 
 struct C: A, B
 {
-	bool k;
+  bool k;
 };
 
 
 int main()
 {
-	C c;
-	c.k = true;
+  C c;
+  c.k = true;
 
-	B& b = c;
-	assert((static_cast<C&>(b)).k == true);
+  B& b = c;
+  assert((static_cast<C&>(b)).k == true);
 
-	B* pb = &c;
-	static_cast<C*>(pb)->k = false;
-	assert(c.k==false);
+  B* pb = &c;
+  static_cast<C*>(pb)->k = false;
+  assert(c.k==false);
 }

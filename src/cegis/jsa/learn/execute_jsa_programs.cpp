@@ -61,7 +61,7 @@ void make_query_call(jsa_programt &prog, const symbol_tablet &st,
   goto_programt &body=get_entry_body(gf);
   pos=insert_before_preserve_labels(body, pos);
   const goto_programt::targett temps_end=zero_jsa_temps(prog, pos);
-  if (pos != temps_end)
+  if(pos != temps_end)
   {
     move_labels(body, pos, std::next(pos));
     body.instructions.erase(pos);

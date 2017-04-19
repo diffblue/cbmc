@@ -30,7 +30,7 @@ void link_skolem(danger_programt &prog, const size_t num_user_vars,
     const danger_programt::loopt &loop)
 {
   const goto_programt::targetst &sklm=loop.danger_meta_variables.Sx;
-  if (sklm.empty()) return;
+  if(sklm.empty()) return;
   const symbol_tablet &st=prog.st;
   goto_programt &body=get_entry_body(prog.gf);
   goto_programt::targett pos=sklm.front();
@@ -38,7 +38,7 @@ void link_skolem(danger_programt &prog, const size_t num_user_vars,
   const size_t num_tmp=max_solution_size - num_skolem;
   link_temp_vars(st, body, --pos, num_tmp, user_vars);
   goto_programt::targetst::const_iterator it=sklm.begin();
-  for (size_t i=0; i < num_skolem - 1; ++i, ++it)
+  for(size_t i=0; i < num_skolem - 1; ++i, ++it)
   {
     pos=*it;
     const goto_programt::instructiont &instr=*pos;

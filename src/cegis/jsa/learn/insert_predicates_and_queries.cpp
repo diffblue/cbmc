@@ -73,7 +73,7 @@ void declare_jsa_predicates(jsa_programt &prog, const size_t max_sz)
   const typet sz_type(signed_int_type());
   const exprt zero(from_integer(0, sz_type));
   const size_t max_pred_size=get_max_pred_size(st);
-  for (mp_integer::ullong_t i=0; i < num_preds; ++i)
+  for(mp_integer::ullong_t i=0; i < num_preds; ++i)
   {
     goto_programt::targett &pos=prog.synthetic_variables;
     std::string base_name(JSA_PRED_PREFIX);

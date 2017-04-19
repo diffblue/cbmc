@@ -34,17 +34,17 @@ void create_tmp_variables(invariant_programt &program,
 void create_tmp_variables(invariant_programt &program,
     const size_t max_program_length, const typet &type)
 {
-  if (!need_temp_variables(max_program_length)) return;
+  if(!need_temp_variables(max_program_length)) return;
   symbol_tablet &st=program.st;
   goto_functionst &gf=program.gf;
   goto_programt &body=get_entry_body(gf);
   goto_programt::targett insert_after=program.invariant_range.begin;
   --insert_after;
-  for (size_t i=0; i < max_program_length - 1; ++i)
+  for(size_t i=0; i < max_program_length - 1; ++i)
   {
     const std::string name(get_tmp(i));
     insert_after=declare_cegis_meta_variable(st, gf, insert_after, name, type);
-    if (i == 0) move_labels(body, program.invariant_range.begin, insert_after);
+    if(i == 0) move_labels(body, program.invariant_range.begin, insert_after);
   }
 }
 

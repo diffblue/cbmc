@@ -16,7 +16,7 @@ void print_assignments(messaget::mstreamt &os, const symbol_tablet &st,
     const std::map<const irep_idt, exprt> &assignments)
 {
   const namespacet ns(st);
-  for (const std::map<const irep_idt, exprt>::value_type &assignment : assignments)
+  for(const std::map<const irep_idt, exprt>::value_type &assignment : assignments)
   {
     os << "<assignment>" << messaget::endl;
     os << "  <id>" << assignment.first << "</id>" << messaget::endl;

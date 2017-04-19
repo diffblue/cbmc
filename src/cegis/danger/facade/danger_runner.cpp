@@ -65,9 +65,9 @@ int run_statistics(mstreamt &os, const optionst &opt,
     preproct &preproc)
 {
   null_seedt seed;
-  //danger_literals_seedt seed(prog);  // XXX: Benchmark performance
+  // danger_literals_seedt seed(prog);  // XXX: Benchmark performance
   const size_t max_prog_size=opt.get_unsigned_int_option(CEGIS_MAX_SIZE);
-  if (!opt.get_bool_option(CEGIS_STATISTICS))
+  if(!opt.get_bool_option(CEGIS_STATISTICS))
     return run_cegis(learn, verify, preproc, seed, max_prog_size, os);
   cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os, opt);
   return run_cegis(stat, stat, preproc, seed, max_prog_size, os);
@@ -78,7 +78,7 @@ int run_limited(mstreamt &os, optionst &options, const danger_programt &prog,
     danger_verify_configt &config, learnert &learn, verifiert &verify,
     preproct &preproc)
 {
-  if (!options.get_bool_option(CEGIS_LIMIT_WORDSIZE))
+  if(!options.get_bool_option(CEGIS_LIMIT_WORDSIZE))
     return run_statistics(os, options, prog, learn, verify, preproc);
   limited_wordsize_verifyt<verifiert> limited_verify(options, verify,
       [&config](const size_t width)
@@ -91,7 +91,7 @@ int run_parallel(mstreamt &os, optionst &options, const danger_programt &prog,
     learnert &learn, preproct &preproc)
 {
   danger_verify_configt config(prog);
-  if (options.get_bool_option(CEGIS_PARALLEL_VERIFY))
+  if(options.get_bool_option(CEGIS_PARALLEL_VERIFY))
   {
     parallel_danger_verifiert verify(options, config);
     return run_limited(os, options, prog, config, learn, verify, preproc);
@@ -109,14 +109,14 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
 {
   const size_t symex_head_start=opt.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
   const individual_to_danger_solution_deserialisert deser(prog, info_fac);
-  if (opt.get_bool_option(CEGIS_MATCH_SELECT))
+  if(opt.get_bool_option(CEGIS_MATCH_SELECT))
   {
     typedef match_selectt<program_populationt> selectt;
     selectt select(fitness.get_test_case_data(), rnd, rounds);
     typedef ga_learnt<selectt, mutatet, crosst, fitnesst, danger_fitness_configt> ga_learnt;
     ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
-    if (!opt.get_bool_option(CEGIS_GENETIC_ONLY))
+    if(!opt.get_bool_option(CEGIS_GENETIC_ONLY))
     {
       concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
           serialise, std::ref(deser), deserialise, symex_head_start);
@@ -130,7 +130,7 @@ int run_match(mstreamt &os, optionst &opt, const danger_programt &prog,
   typedef ga_learnt<selectt, mutatet, crosst, fitnesst, danger_fitness_configt> ga_learnt;
   ga_learnt ga_learn(opt, rnd, select, mutate, cross, fitness, converter);
 #ifndef _WIN32
-  if (!opt.get_bool_option(CEGIS_GENETIC_ONLY))
+  if(!opt.get_bool_option(CEGIS_GENETIC_ONLY))
   {
     concurrent_learnt<ga_learnt, symex_learnt> learn(ga_learn, symex_learn,
         serialise, std::ref(deser), deserialise, symex_head_start);
@@ -144,7 +144,7 @@ template<class preproct>
 int run_genetic_and_symex(mstreamt &os, optionst &opt,
     const danger_programt &prog, preproct &prep)
 {
-  if (!is_genetic(opt))
+  if(!is_genetic(opt))
   {
     danger_learn_configt cfg(prog);
     cegis_symex_learnt<preproct, danger_learn_configt> learn(opt, prep, cfg);
