@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <set>
+#include <unordered_set>
 #include <sstream>
 
 #include <util/arith_tools.h>
@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/message.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
@@ -25,14 +24,59 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-class java_object_factoryt:public messaget
+/*******************************************************************\
+
+Function: new_tmp_symbol
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static symbolt &new_tmp_symbol(
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  const typet &type,
+  const std::string &prefix="tmp_object_factory")
+{
+  return get_fresh_aux_symbol(
+    type,
+    "",
+    prefix,
+    loc,
+    ID_java,
+    symbol_table);
+}
+
+/*******************************************************************\
+
+Function: get_nondet_bool
+
+ Inputs: Desired type (C_bool or plain bool)
+
+ Outputs: nondet expr of that type
+
+ Purpose:
+
+\*******************************************************************/
+
+static exprt get_nondet_bool(const typet &type)
+{
+  // We force this to 0 and 1 and won't consider
+  // other values.
+  return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
+}
+
+class java_object_factoryt
 {
   code_blockt &init_code;
-  std::set<irep_idt> recursion_set;
+  std::unordered_set<irep_idt, irep_id_hash> recursion_set;
   bool assume_non_null;
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
-  message_handlert &message_handler;
   namespacet ns;
 
 public:
@@ -40,15 +84,13 @@ public:
     code_blockt &_init_code,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    init_code(_init_code),
-    assume_non_null(_assume_non_null),
-    max_nondet_array_length(_max_nondet_array_length),
-    symbol_table(_symbol_table),
-    message_handler(_message_handler),
-    ns(_symbol_table)
-    {}
+    symbol_tablet &_symbol_table):
+      init_code(_init_code),
+      assume_non_null(_assume_non_null),
+      max_nondet_array_length(_max_nondet_array_length),
+      symbol_table(_symbol_table),
+      ns(_symbol_table)
+  {}
 
   exprt allocate_object(
     const exprt &,
@@ -72,7 +114,7 @@ public:
 
 Function: java_object_factoryt::allocate_object
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -152,17 +194,17 @@ exprt java_object_factoryt::allocate_object(
 
 Function: java_object_factoryt::gen_nondet_init
 
-  Inputs:
-   expr -
-   is_sub -
-   class_identifier -
-   loc -
-   create_dynamic_objects -
-   override - Ignore the LHS' real type. Used at the moment for
-              reference arrays, which are implemented as void*
-              arrays but should be init'd as their true type with
-              appropriate casts.
-   override_type - Type to use if ignoring the LHS' real type
+ Inputs:
+  expr -
+  is_sub -
+  class_identifier -
+  loc -
+  create_dynamic_objects -
+  override - Ignore the LHS' real type. Used at the moment for
+             reference arrays, which are implemented as void*
+             arrays but should be init'd as their true type with
+             appropriate casts.
+  override_type - Type to use if ignoring the LHS' real type
 
  Outputs:
 
@@ -209,26 +251,13 @@ void java_object_factoryt::gen_nondet_init(
     code_labelt set_null_label;
     code_labelt init_done_label;
 
-    static size_t synthetic_constructor_count=0;
-
     if(!assume_non_null)
     {
-      auto returns_null_sym=
-        new_tmp_symbol(
-          symbol_table,
-          loc,
-          c_bool_typet(1),
-          "opaque_returns_null");
-      auto returns_null=returns_null_sym.symbol_expr();
-      auto assign_returns_null=
-          code_assignt(returns_null, get_nondet_bool(returns_null_sym.type));
-      assign_returns_null.add_source_location()=loc;
-      init_code.move_to_operands(assign_returns_null);
-
       auto set_null_inst=
         code_assignt(expr, null_pointer_exprt(pointer_type));
       set_null_inst.add_source_location()=loc;
 
+      static size_t synthetic_constructor_count=0;
       std::string fresh_label=
         "post_synthetic_malloc_"+std::to_string(++synthetic_constructor_count);
       set_null_label=code_labelt(fresh_label, set_null_inst);
@@ -236,10 +265,9 @@ void java_object_factoryt::gen_nondet_init(
       init_done_label=code_labelt(fresh_label+"_init_done", code_skipt());
 
       code_ifthenelset null_check;
-      exprt null_return=
-        zero_initializer(returns_null_sym.type, loc, ns, message_handler);
+      exprt null_return=from_integer(0, c_bool_typet(1));
       null_check.cond()=
-        notequal_exprt(returns_null, null_return);
+        notequal_exprt(get_nondet_bool(c_bool_typet(1)), null_return);
       null_check.then_case()=code_gotot(fresh_label);
       init_code.move_to_operands(null_check);
     }
@@ -340,7 +368,7 @@ void java_object_factoryt::gen_nondet_init(
 
 Function: java_object_factoryt::gen_nondet_array_init
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -471,55 +499,9 @@ void java_object_factoryt::gen_nondet_array_init(
 
 /*******************************************************************\
 
-Function: new_tmp_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-symbolt &new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  const typet &type,
-  const std::string &prefix)
-{
-  return get_fresh_aux_symbol(
-    type,
-    "",
-    prefix,
-    loc,
-    ID_java,
-    symbol_table);
-}
-
-/*******************************************************************\
-
-Function: get_nondet_bool
-
-  Inputs: Desired type (C_bool or plain bool)
-
- Outputs: nondet expr of that type
-
- Purpose:
-
-\*******************************************************************/
-
-exprt get_nondet_bool(const typet &type)
-{
-  // We force this to 0 and 1 and won't consider
-  // other values.
-  return typecast_exprt(side_effect_expr_nondett(bool_typet()), type);
-}
-
-/*******************************************************************\
-
 Function: object_factory
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -533,8 +515,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &loc,
-  message_handlert &message_handler)
+  const source_locationt &loc)
 {
   if(type.id()==ID_pointer)
   {
@@ -550,8 +531,7 @@ exprt object_factory(
       init_code,
       !allow_null,
       max_nondet_array_length,
-      symbol_table,
-      message_handler);
+      symbol_table);
     state.gen_nondet_init(
       object,
       false,

@@ -11,6 +11,7 @@ SRC = anonymous_member.cpp \
       ansi_c_typecheck.cpp \
       ansi_c_y.tab.cpp \
       c_misc.cpp \
+      c_nondet_symbol_factory.cpp \
       c_preprocess.cpp \
       c_qualifiers.cpp \
       c_sizeof.cpp \

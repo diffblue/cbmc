@@ -177,3 +177,27 @@ const codet &codet::last_statement() const
 
   return *this;
 }
+
+/*******************************************************************\
+
+Function: code_blockt::append
+
+ Inputs:
+  extra_block - The input code_blockt
+
+ Outputs:
+
+ Purpose: Add all the codets from extra_block to the current
+          code_blockt
+
+\*******************************************************************/
+
+void code_blockt::append(const code_blockt &extra_block)
+{
+  operands().reserve(operands().size()+extra_block.operands().size());
+
+  for(const auto &operand : extra_block.operands())
+  {
+    add(to_code(operand));
+  }
+}

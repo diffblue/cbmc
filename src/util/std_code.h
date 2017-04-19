@@ -82,6 +82,8 @@ public:
     copy_to_operands(code);
   }
 
+  void append(const code_blockt &extra_block);
+
   // This is the closing '}' or 'END' at the end of a block
   source_locationt end_location() const
   {
