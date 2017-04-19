@@ -294,6 +294,8 @@ void java_bytecode_convert_classt::convert(
       component.set_access(ID_protected);
     else if(f.is_public)
       component.set_access(ID_public);
+    else
+      component.set_access(ID_default);
   }
 }
 

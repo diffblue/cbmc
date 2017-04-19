@@ -232,6 +232,14 @@ void java_bytecode_convert_method_lazy(
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
+  if(m.is_public)
+    member_type.set(ID_access, ID_public);
+  else if(m.is_protected)
+    member_type.set(ID_access, ID_protected);
+  else if(m.is_private)
+    member_type.set(ID_access, ID_private);
+  else
+    member_type.set(ID_access, ID_default);
 
   if(method_symbol.base_name=="<init>")
   {
