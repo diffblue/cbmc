@@ -22,6 +22,7 @@ SRC = bytecode_info.cpp \
       java_object_factory.cpp \
       java_pointer_casts.cpp \
       java_root_class.cpp \
+      java_string_library_preprocess.cpp \
       java_types.cpp \
       java_utils.cpp \
       select_pointer_type.cpp \

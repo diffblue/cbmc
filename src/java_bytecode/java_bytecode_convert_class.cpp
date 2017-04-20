@@ -37,15 +37,13 @@ public:
     size_t _max_array_length,
     lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode,
-    bool _string_refinement_enabled,
-    const character_refine_preprocesst &_character_preprocess):
+    const java_string_library_preprocesst &_string_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     lazy_methods_mode(_lazy_methods_mode),
-    string_refinement_enabled(_string_refinement_enabled),
-    character_preprocess(_character_preprocess)
+    string_preprocess(_string_preprocess)
   {
   }
 
@@ -55,11 +53,11 @@ public:
 
     if(parse_tree.loading_successful)
       convert(parse_tree.parsed_class);
-
-    if(string_preprocess.is_known_string_type(parse_tree.parsed_class.name))
+    else if(string_preprocess.is_known_string_type(
+              parse_tree.parsed_class.name))
       string_preprocess.add_string_type(
         parse_tree.parsed_class.name, symbol_table);
-    else if(!loading_success)
+    else
       generate_class_stub(
         parse_tree.parsed_class.name,
         symbol_table,
@@ -74,15 +72,13 @@ protected:
   const size_t max_array_length;
   lazy_methodst &lazy_methods;
   lazy_methods_modet lazy_methods_mode;
-  bool string_refinement_enabled;
-  character_refine_preprocesst character_preprocess;
+  java_string_library_preprocesst string_preprocess;
 
   // conversion
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const fieldt &f);
 
   void add_array_types();
-  void add_string_type(const irep_idt &class_name);
 };
 
 void java_bytecode_convert_classt::convert(const classt &c)
@@ -405,8 +401,7 @@ bool java_bytecode_convert_class(
   size_t max_array_length,
   lazy_methodst &lazy_methods,
   lazy_methods_modet lazy_methods_mode,
-  bool string_refinement_enabled,
-  const character_refine_preprocesst &character_preprocess)
+  const java_string_library_preprocesst &string_preprocess)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
@@ -414,8 +409,7 @@ bool java_bytecode_convert_class(
     max_array_length,
     lazy_methods,
     lazy_methods_mode,
-    string_refinement_enabled,
-    character_preprocess);
+    string_preprocess);
 
   try
   {
@@ -438,67 +432,4 @@ bool java_bytecode_convert_class(
   }
 
   return true;
-}
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::add_string_type
-
-  Inputs: a name for the class such as "java.lang.String"
-
- Purpose: Implements the java.lang.String type in the case that
-          we provide an internal implementation.
-
-\*******************************************************************/
-
-void java_bytecode_convert_classt::add_string_type(const irep_idt &class_name)
-{
-  class_typet string_type;
-  string_type.set_tag(class_name);
-  string_type.components().resize(3);
-  string_type.components()[0].set_name("@java.lang.Object");
-  string_type.components()[0].set_pretty_name("@java.lang.Object");
-  string_type.components()[0].type()=symbol_typet("java::java.lang.Object");
-  string_type.components()[1].set_name("length");
-  string_type.components()[1].set_pretty_name("length");
-  string_type.components()[1].type()=java_int_type();
-  string_type.components()[2].set_name("data");
-  string_type.components()[2].set_pretty_name("data");
-  // Use a pointer-to-unbounded-array instead of a pointer-to-char.
-  // Saves some casting in the string refinement algorithm but may
-  // be unnecessary.
-  string_type.components()[2].type()=pointer_type(
-    array_typet(java_char_type(), infinity_exprt(java_int_type())));
-  string_type.add_base(symbol_typet("java::java.lang.Object"));
-
-  symbolt string_symbol;
-  string_symbol.name="java::"+id2string(class_name);
-  string_symbol.base_name=id2string(class_name);
-  string_symbol.type=string_type;
-  string_symbol.is_type=true;
-
-  symbol_table.add(string_symbol);
-
-  // Also add a stub of `String.equals` so that remove-virtual-functions
-  // generates a check for Object.equals vs. String.equals.
-  // No need to fill it in, as pass_preprocess will replace the calls again.
-  symbolt string_equals_symbol;
-  string_equals_symbol.name=
-    "java::java.lang.String.equals:(Ljava/lang/Object;)Z";
-  string_equals_symbol.base_name=id2string(class_name)+".equals";
-  string_equals_symbol.pretty_name=id2string(class_name)+".equals";
-  string_equals_symbol.mode=ID_java;
-
-  code_typet string_equals_type;
-  string_equals_type.return_type()=java_boolean_type();
-  code_typet::parametert thisparam;
-  thisparam.set_this();
-  thisparam.type()=java_reference_type(symbol_typet(string_symbol.name));
-  code_typet::parametert otherparam;
-  otherparam.type()=java_reference_type(symbol_typet("java::java.lang.Object"));
-  string_equals_type.parameters().push_back(thisparam);
-  string_equals_type.parameters().push_back(otherparam);
-  string_equals_symbol.type=std::move(string_equals_type);
-
-  symbol_table.add(string_equals_symbol);
 }

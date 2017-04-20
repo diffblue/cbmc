@@ -1415,8 +1415,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           symbol.name,
           symbol_table);
 
-        // functions of the String libraries can have code
-        // generated for them
+        // The string refinement module may provide a definition for this
+        // function.
         symbol.value=string_preprocess.code_for_function(
           id, to_code_type(symbol.type), loc, symbol_table);
 

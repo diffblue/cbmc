@@ -36,12 +36,12 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     safe_pointer<ci_lazy_methodst> _lazy_methods,
-    const character_refine_preprocesst &_character_preprocess):
+    const java_string_library_preprocesst &_string_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
-    character_preprocess(_character_preprocess),
+    string_preprocess(_string_preprocess),
     method_has_this(false),
     slots_for_parameters(0)
   {
@@ -75,7 +75,7 @@ protected:
   /// Initialized by `convert`.
   typet method_return_type;
 
-  character_refine_preprocesst character_preprocess;
+  java_string_library_preprocesst string_preprocess;
 
   /// Number of local variable slots used by the JVM to pass parameters upon
   /// invocation of the method under translation.
