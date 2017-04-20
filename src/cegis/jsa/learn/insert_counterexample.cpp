@@ -37,15 +37,15 @@ array_valuest get_array_values(const symbol_tablet &st,
   const constant_exprt size_expr(get_size_expr(ces.size()));
   const jsa_counterexamplet &prototype=ces.front();
   array_valuest array_values;
-  for (const jsa_counterexamplet::value_type &value : prototype)
+  for(const jsa_counterexamplet::value_type &value : prototype)
   {
     const typet &org_type=value.second.type();
     const typet &element_type=replace_struct_by_symbol_type(st, org_type);
     const array_typet array_type(element_type, size_expr);
     array_values.insert(std::make_pair(value.first, array_exprt(array_type)));
   }
-  for (const jsa_counterexamplet &ce : ces)
-    for (const jsa_counterexamplet::value_type &value : ce)
+  for(const jsa_counterexamplet &ce : ces)
+    for(const jsa_counterexamplet::value_type &value : ce)
       array_values[value.first].copy_to_operands(value.second);
   return array_values;
 }
@@ -66,7 +66,7 @@ void add_array_declarations(jsa_programt &program,
   const array_valuest array_values(get_array_values(st, ces));
   const constant_exprt size_expr(get_size_expr(ces.size()));
   goto_programt::targett &pos=program.synthetic_variables;
-  for (const jsa_counterexamplet::value_type &value : prototype)
+  for(const jsa_counterexamplet::value_type &value : prototype)
   {
     const jsa_counterexamplet::value_type::first_type loc_id=value.first;
     const typet &org_type=value.second.type();
@@ -139,11 +139,11 @@ void assign_ce_values(jsa_programt &prog)
 {
   const symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
-  for (const goto_programt::targett &pos : prog.counterexample_locations)
+  for(const goto_programt::targett &pos : prog.counterexample_locations)
   {
     assert(pos->labels.size() == 1u);
     const index_exprt value(get_array_val_expr(st, pos->labels.front()));
-    switch (pos->type)
+    switch(pos->type)
     {
     case ASSIGN:
       to_code_assign(pos->code).rhs()=value;

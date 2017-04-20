@@ -22,7 +22,7 @@ void extract(const jsa_programt &prog, jsa_counterexamplet &ce,
   const namespacet ns(st);
   const goto_programt::targetst &ce_locs=prog.counterexample_locations;
   const goto_tracet::stepst &steps=trace.steps;
-  for (const goto_programt::targett &ce_loc : ce_locs)
+  for(const goto_programt::targett &ce_loc : ce_locs)
   {
     assert(ce_loc->labels.size() == 1u);
     const irep_idt &id=ce_loc->labels.front();
@@ -32,7 +32,7 @@ void extract(const jsa_programt &prog, jsa_counterexamplet &ce,
           const goto_programt::instructiont::labelst &labels=step.pc->labels;
           return labels.end() != std::find(labels.begin(), labels.end(), id);
         });
-    if (steps.end() != it) ce.insert(std::make_pair(id, it->full_lhs_value));
+    if(steps.end() != it) ce.insert(std::make_pair(id, it->full_lhs_value));
     else
     assert(
         !"We need counterexample for each location."

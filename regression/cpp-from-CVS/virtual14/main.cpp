@@ -47,19 +47,19 @@ int main(int argc, char* argv[])
   t1.x = 10;
   t1.y = 20;
 
-  a.f(t1,t2);
+  a.f(t1, t2);
   assert(t2.x == t1.x && t2.y == t1.y);
   t2.x = t2.y = 0;
 
-  b.f(t1,t2);
+  b.f(t1, t2);
   assert(t2.x == t1.y && t2.y == t1.x);
   t2.x = t2.y = 0;
 
-  c.f(t1,t2);
+  c.f(t1, t2);
   assert(t2.x == t1.x+1 && t2.y == t1.y+1);
   t2.x = t2.y = 0;
 
-  ((A*)&c)->f(t1,t2);
+  ((A*)&c)->f(t1, t2);
   assert(t2.x == t1.x+1 && t2.y == t1.y+1);
   t2.x = t2.y = 0;
 
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   c.b = 1;
   assert(((B*)&c)->b == 1);
 
-  ((B*)&c)->f(t1,t2);
+  ((B*)&c)->f(t1, t2);
   assert(t2.x == t1.x+1 && t2.y == t1.y+1);
   t2.x = t2.y = 0;
 

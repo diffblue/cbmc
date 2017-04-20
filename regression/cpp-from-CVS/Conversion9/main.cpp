@@ -6,5 +6,5 @@ struct B: A {};
 
 int main()
 {
-	A a = B();
+  A a = B();
 }

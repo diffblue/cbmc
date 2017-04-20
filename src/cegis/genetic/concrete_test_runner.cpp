@@ -74,7 +74,7 @@ void prepare_executable(bool &executable_compiled,
     const std::function<std::string(void)> &source_code_provider,
     const std::string &executable)
 {
-  if (executable_compiled) return;
+  if(executable_compiled) return;
   const temporary_filet source_file(SOURCE_FILE_PREFIX, SOURCE_FILE_SUFFIX);
   const std::string source_file_name(source_file());
   std::string source;
@@ -86,7 +86,7 @@ void prepare_executable(bool &executable_compiled,
   compile_command+=ARTIFACT_SEPARATOR;
   compile_command+=executable;
   const int result=system(compile_command.c_str());
-  if (result) throw std::runtime_error(COMPLING_FAILED);
+  if(result) throw std::runtime_error(COMPLING_FAILED);
   executable_compiled=true;
 }
 
@@ -109,7 +109,7 @@ public:
   {
 #ifndef _WIN32
     const int result=system(command.c_str());
-    if (!WIFEXITED(result)) return EXIT_FAILURE;
+    if(!WIFEXITED(result)) return EXIT_FAILURE;
     return WEXITSTATUS(result);
 #else
     NOT_SUPPORTED();
@@ -120,8 +120,8 @@ public:
   void operator()(const int status) const
   {
 #ifndef _WIN32
-    if (!WIFEXITED(status)) return;
-    if (EXIT_SUCCESS == WEXITSTATUS(status)) ++ind.fitness;
+    if(!WIFEXITED(status)) return;
+    if(EXIT_SUCCESS == WEXITSTATUS(status)) ++ind.fitness;
 #else
     NOT_SUPPORTED();
 #endif
@@ -137,34 +137,34 @@ void concrete_test_runnert::run_test(individualt &ind,
   const std::string exe(executable());
   prepare_executable(executable_compiled, source_code_provider, exe);
   std::string command(exe);
-  for (const std::pair<const irep_idt, exprt> &assignment : ce)
+  for(const std::pair<const irep_idt, exprt> &assignment : ce)
   {
     command+=" ";
     const bv_arithmetict arith(assignment.second);
     const mp_integer::llong_t v=arith.to_integer().to_long();
     command+=integer2string(static_cast<unsigned int>(v));
   }
-  for (const individualt::programt &prog : ind.programs)
+  for(const individualt::programt &prog : ind.programs)
   {
-    if (prog.empty()) continue;
+    if(prog.empty()) continue;
     command+=" ";
     command+=integer2string(prog.size());
-    for (const individualt::instructiont &instr : prog)
+    for(const individualt::instructiont &instr : prog)
     {
       command+=" ";
       command+=integer2string(static_cast<unsigned int>(instr.opcode));
       size_t op_count=0;
-      for (const individualt::instructiont::opt &op : instr.ops)
+      for(const individualt::instructiont::opt &op : instr.ops)
       {
         command+=" ";
         command+=integer2string(static_cast<unsigned int>(op));
         ++op_count;
       }
-      for (; op_count < 3u; ++op_count)
+      for(; op_count < 3u; ++op_count)
         command+=" 0";
     }
   }
-  for (const individualt::x0t::value_type &x0 : ind.x0)
+  for(const individualt::x0t::value_type &x0 : ind.x0)
   {
     command+=" ";
     command+=integer2string(static_cast<unsigned int>(x0));

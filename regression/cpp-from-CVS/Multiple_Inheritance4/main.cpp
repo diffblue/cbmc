@@ -1,6 +1,6 @@
  struct ostream
   {
-    ostream(int id): id(id){}
+    ostream(int id): id(id) {}
     ostream(const ostream&); // disabled
     ostream& operator=(const ostream&); // disabled
     int id;
@@ -8,7 +8,7 @@
 
   struct istream
   {
-    istream(int id): id(id){}
+    istream(int id): id(id) {}
     istream(const istream&); // disabled
     istream& operator=(const istream&); // disabled
     int id;

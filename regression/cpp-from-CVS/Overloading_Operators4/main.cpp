@@ -15,9 +15,9 @@ struct X
 
   bool func()
   {
-	  X x1, x2;
-	  x1.i = 2;
-	  return x1 == x2;
+    X x1, x2;
+    x1.i = 2;
+    return x1 == x2;
   }
 };
 

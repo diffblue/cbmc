@@ -7,7 +7,7 @@ struct
 } s;
 
 struct B {
-	static int x;
+  static int x;
 };
 
 int B::x;

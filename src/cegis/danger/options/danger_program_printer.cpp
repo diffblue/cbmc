@@ -37,7 +37,7 @@ public:
     tmp.compute_target_numbers();
     tmp.output(ns, "", os);*/
     // XXX: Debug
-    for (goto_programt::const_targett it=prog.begin(); it != prog.end(); ++it)
+    for(goto_programt::const_targett it=prog.begin(); it != prog.end(); ++it)
       body_printer.output_instruction(ns, "", os, it);
     // XXX: Debug
   }
@@ -78,7 +78,7 @@ void print_danger_program(messaget::mstreamt &os,
 {
   const danger_goto_solutiont::nondet_choicest &x0=solution.x0_choices;
   const danger_goto_solutiont::danger_programst &progs=solution.danger_programs;
-  if (x0.empty() && progs.empty()) return;
+  if(x0.empty() && progs.empty()) return;
   os << "x0:" << messaget::endl;
   const expr_printert x0_printer(program, os);
   std::for_each(x0.begin(), x0.end(), x0_printer);

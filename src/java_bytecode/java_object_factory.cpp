@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <set>
+#include <unordered_set>
 #include <sstream>
 
 #include <util/arith_tools.h>
@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/message.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
 #include <util/nondet_ifthenelse.h>
@@ -27,10 +26,37 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-class java_object_factoryt:public messaget
+/*******************************************************************\
+
+Function: new_tmp_symbol
+
+ Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static symbolt &new_tmp_symbol(
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  const typet &type,
+  const std::string &prefix="tmp_object_factory")
+{
+  return get_fresh_aux_symbol(
+    type,
+    "",
+    prefix,
+    loc,
+    ID_java,
+    symbol_table);
+}
+
+class java_object_factoryt
 {
   code_blockt &init_code;
-  std::set<irep_idt> recursion_set;
+  std::unordered_set<irep_idt, irep_id_hash> recursion_set;
   bool assume_non_null;
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
@@ -53,9 +79,7 @@ public:
     bool _assume_non_null,
     size_t _max_nondet_array_length,
     symbol_tablet &_symbol_table,
-    message_handlert &_message_handler,
     const source_locationt &_loc):
-    messaget(_message_handler),
     init_code(_init_code),
     assume_non_null(_assume_non_null),
     max_nondet_array_length(_max_nondet_array_length),
@@ -276,7 +300,10 @@ Function: java_object_factoryt::gen_nondet_init
           `create_dynamic_objects`: if true, use malloc to allocate
             objects; otherwise generate fresh static symbols.
           `override`: If true, initialise with `override_type` instead
-            of `expr.type()`
+            of `expr.type()`. Used at the moment for
+            reference arrays, which are implemented as void*
+            arrays but should be init'd as their true type with
+            appropriate casts.
           `override_type`: Override type per above
           `update_in_place`:
             NO_UPDATE_IN_PLACE: initialise `expr` from scratch
@@ -348,6 +375,7 @@ void java_object_factoryt::gen_nondet_init(
       code_ifthenelset null_check;
       null_check.cond()=equal_exprt(expr, null_pointer_exprt(pointer_type));
       null_check.then_case()=code_gotot(post_null_check.get_label());
+
       init_code.move_to_operands(null_check);
 
       gen_pointer_target_init(
@@ -473,11 +501,12 @@ void java_object_factoryt::gen_nondet_init(
 
 Function: java_object_factoryt::gen_nondet_array_init
 
-  Inputs: `expr`: Array-typed expression to initialise
-          `update_in_place`:
-            NO_UPDATE_IN_PLACE: initialise `expr` from scratch
-            MUST_UPDATE_IN_PLACE: reinitialise an existing array
-            MAY_UPDATE_IN_PLACE: invalid input
+ Inputs: `expr`: Array-typed expression to initialise
+         `update_in_place`:
+           NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+           MUST_UPDATE_IN_PLACE: reinitialise an existing array
+           MAY_UPDATE_IN_PLACE: invalid input
+
  Outputs:
 
  Purpose: create code to initialize a Java array with size
@@ -645,37 +674,9 @@ void java_object_factoryt::gen_nondet_array_init(
 
 /*******************************************************************\
 
-Function: new_tmp_symbol
-
-  Inputs: `prefix`: new symbol name prefix
-
- Outputs: A fresh-named symbol is added to `symbol_table` and also
-          returned.
-
- Purpose:
-
-\*******************************************************************/
-
-symbolt &new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  const typet &type,
-  const std::string &prefix)
-{
-  return get_fresh_aux_symbol(
-    type,
-    "",
-    prefix,
-    loc,
-    ID_java,
-    symbol_table);
-}
-
-/*******************************************************************\
-
 Function: object_factory
 
-  Inputs: `type`: type of new object to create
+ Inputs:  `type`: type of new object to create
           `allow_null`: if true, may return null; otherwise always
             allocates an object
           `max_nondet_array_length`: upper bound on size of initialised
@@ -699,8 +700,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &loc,
-  message_handlert &message_handler)
+  const source_locationt &loc)
 {
   symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, type);
   aux_symbol.is_static_lifetime=true;
@@ -712,7 +712,6 @@ exprt object_factory(
     !allow_null,
     max_nondet_array_length,
     symbol_table,
-    message_handler,
     loc);
   state.gen_nondet_init(
     object,
@@ -768,7 +767,6 @@ void gen_nondet_init(
   bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
-  message_handlert &message_handler,
   size_t max_nondet_array_length,
   update_in_placet update_in_place)
 {
@@ -777,7 +775,6 @@ void gen_nondet_init(
     assume_non_null,
     max_nondet_array_length,
     symbol_table,
-    message_handler,
     loc);
   state.gen_nondet_init(
     expr,

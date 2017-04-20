@@ -46,7 +46,7 @@ int main(int argc, const char **argv)
 
     const goto_programt &p=f_it->second.body;
 
-    //p.output(namespacet(symbol_table), "f", std::cout);
+    // p.output(namespacet(symbol_table), "f", std::cout);
 
     forall_goto_program_instructions(it, p)
     {

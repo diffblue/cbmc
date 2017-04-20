@@ -25,7 +25,7 @@ namespace
 void open_pipe(int filedes[2])
 {
 #ifndef _WIN32
-  if (pipe(filedes))
+  if(pipe(filedes))
   {
     perror(IREP_PIPE " open");
     throw std::runtime_error("Error creating pipe.");
@@ -48,7 +48,7 @@ irep_pipet::irep_pipet(const bool auto_close) :
 
 irep_pipet::~irep_pipet()
 {
-  if (close_on_destuction) close();
+  if(close_on_destuction) close();
 }
 
 void irep_pipet::close_read()
@@ -81,8 +81,8 @@ bool irep_pipet::is_write_closed() const
 
 void irep_pipet::close()
 {
-  if (!read_closed) close_read();
-  if (!write_closed) close_write();
+  if(!read_closed) close_read();
+  if(!write_closed) close_write();
 }
 
 namespace
@@ -101,10 +101,10 @@ void irep_pipet::send(const irept &sdu) const
   const std::string data(os.str());
   const size_t size=data.size() + 1;
   const char * offset=data.c_str();
-  for (size_t written=0; written < size;)
+  for(size_t written=0; written < size;)
   {
     const ssize_t result=write(fd[1u], offset + written, size - written);
-    if (result == -1)
+    if(result == -1)
     {
       perror(IREP_PIPE " write");
       throw std::runtime_error("Error writing pipe.");
@@ -131,14 +131,14 @@ void irep_pipet::receive(irept &sdu) const
   do
   {
     const ssize_t result=read(fd[0u], buffer, sizeof(buffer));
-    if (result == -1)
+    if(result == -1)
     {
       perror(IREP_PIPE " read");
       throw std::runtime_error("Error reading pipe.");
     }
-    if (result > 0) data.append(buffer, result);
+    if(result > 0) data.append(buffer, result);
     else break;
-  } while (true);
+  } while(true);
   data.erase(data.end() - 1);
   std::istringstream is(data);
   xmlt xml;

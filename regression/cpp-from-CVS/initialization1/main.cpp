@@ -2,16 +2,16 @@ int g1;
 
 class One
 {
-	public:
-	int o;
-	One():o(1){}
+  public:
+  int o;
+  One():o(1){}
 };
 
 class A
 {
-	public:
-	static One one;
-	A() { assert(one.o == 1); }
+  public:
+  static One one;
+  A() { assert(one.o == 1); }
 };
 
 One A::one;

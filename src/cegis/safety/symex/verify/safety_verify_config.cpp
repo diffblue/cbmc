@@ -77,7 +77,7 @@ void safety_verify_configt::show_counterexample(messaget::mstreamt &os,
   print_assignments(os, st, counterexample.x0);
   os << "  </x0>" << messaget::endl;
   os << "  <loops>" << messaget::endl;
-  for (const counterexamplet::assignments_per_loopt::value_type &loop : counterexample.x)
+  for(const counterexamplet::assignments_per_loopt::value_type &loop : counterexample.x)
   {
     os << "    <loop>" << messaget::endl;
     print_assignments(os, st, loop);

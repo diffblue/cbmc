@@ -44,7 +44,7 @@ exprt create_safety_constraint(const size_t number_of_loops)
   const notequal_exprt A_x(as_bool(get_Ax()));
   and_exprt root;
   root.copy_to_operands(as_bool(get_Ix0()));
-  for (size_t i=0; i < number_of_loops; ++i)
+  for(size_t i=0; i < number_of_loops; ++i)
   {
     const notequal_exprt S0_x(as_bool(get_Ix(i)));
     const notequal_exprt G0_x(as_bool(get_Gx(i)));

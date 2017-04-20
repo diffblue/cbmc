@@ -38,7 +38,7 @@ void create_or_redirect_entry(symbol_tablet &st, goto_functionst &gf)
   fmapt &fmap=gf.function_map;
   const fmapt::const_iterator it=fmap.find(goto_functionst::entry_point());
   null_message_handlert msg;
-  if (fmap.end() == it)
+  if(fmap.end() == it)
   {
     config.main=CONSTRAINT_CALLER;
     assert(!java_entry_point(st, ID_empty, msg, false, 0));
@@ -54,7 +54,7 @@ void create_or_redirect_entry(symbol_tablet &st, goto_functionst &gf)
 void add_to_symbol_table(symbol_tablet &st, const std::string &name,
     const goto_functionst::function_mapt::mapped_type &func)
 {
-  if (st.has_symbol(name)) return;
+  if(st.has_symbol(name)) return;
   symbolt new_symbol;
   new_symbol.name=name;
   new_symbol.type=func.type;
@@ -77,7 +77,7 @@ void create_constraint_function_caller(refactor_programt &prog)
   goto_programt &body=func.body;
   const source_locationt loc(default_cegis_source_location());
   symbol_tablet &st=prog.st;
-  for (const refactor_programt::sketcht &sketch : prog.sketches)
+  for(const refactor_programt::sketcht &sketch : prog.sketches)
   {
     const symbolt &symbol=st.lookup(sketch.init->function);
     const code_typet &type=to_code_type(symbol.type);
@@ -87,7 +87,7 @@ void create_constraint_function_caller(refactor_programt &prog)
     code_function_callt call;
     call.function()=symbol.symbol_expr();
     code_function_callt::argumentst &args=call.arguments();
-    for (const code_typet::parametert &param : type.parameters())
+    for(const code_typet::parametert &param : type.parameters())
       args.push_back(from_integer(0, param.type()));
     pos->code=call;
   }
@@ -139,7 +139,7 @@ goto_programt::targett nondet_init(const symbol_tablet &st, goto_programt &body,
     goto_programt::targett pos, const irep_idt &state_var)
 {
   const symbolt &symbol=st.lookup(state_var);
-  if (!is_cegis_primitive(symbol.type)) return pos; // TODO: Handle class types
+  if(!is_cegis_primitive(symbol.type)) return pos; // TODO: Handle class types
   pos=insert_after_preserving_source_location(body, pos);
   pos->type=goto_program_instruction_typet::ASSIGN;
   const symbol_exprt lhs(symbol.symbol_expr());
@@ -152,7 +152,7 @@ goto_programt::targett havoc_inputs(const symbol_tablet &st,
     goto_programt &body, const refactor_programt::sketcht &sketch)
 {
   goto_programt::targett pos=sketch.init;
-  for (const irep_idt &state_var : sketch.state_vars)
+  for(const irep_idt &state_var : sketch.state_vars)
     pos=nondet_init(st, body, pos, state_var);
   return pos;
 }
@@ -173,11 +173,11 @@ goto_programt::targett create_snapshot(symbol_tablet &st, goto_programt &body,
     const std::string &func_name, const std::set<irep_idt> &state_vars,
     goto_programt::targett pos, const char * const suffix)
 {
-  for (const irep_idt &state_var : state_vars)
+  for(const irep_idt &state_var : state_vars)
   {
     const symbolt &symbol=st.lookup(state_var);
     const typet &type=symbol.type;
-    if (!is_cegis_primitive(type)) continue; // TODO: Handle class types (clone)
+    if(!is_cegis_primitive(type)) continue; // TODO: Handle class types (clone)
     const std::string clone_name(get_clone_name(symbol.base_name, suffix));
     pos=declare_local_meta_variable(st, func_name, body, pos, clone_name, type);
     const symbol_exprt rhs(symbol.symbol_expr());
@@ -189,7 +189,7 @@ goto_programt::targett create_snapshot(symbol_tablet &st, goto_programt &body,
 void create_init_snapshot(symbol_tablet &st, goto_programt &body,
     const refactor_programt::sketcht &sketch, const goto_programt::targett pos)
 {
-  if (sketch.state_vars.empty()) return;
+  if(sketch.state_vars.empty()) return;
   const std::string func(id2string(sketch.init->function));
   create_snapshot(st, body, func, sketch.state_vars, pos, INIT_SUFFIX);
 }
@@ -207,10 +207,10 @@ void assign_init_snapshot(symbol_tablet &st, goto_programt &body,
     const refactor_programt::sketcht &sketch, goto_programt::targett pos)
 {
   const std::string &func=id2string(sketch.init->function);
-  for (const irep_idt &var : sketch.state_vars)
+  for(const irep_idt &var : sketch.state_vars)
   {
     const symbolt &symbol=st.lookup(var);
-    if (!is_cegis_primitive(symbol.type)) continue; // TODO: Handle class types
+    if(!is_cegis_primitive(symbol.type)) continue; // TODO: Handle class types
     const symbol_exprt lhs(symbol.symbol_expr());
     const irep_idt &base_name=symbol.base_name;
     const std::string rhs_name(get_clone_id(base_name, func, INIT_SUFFIX));
@@ -236,10 +236,10 @@ void insert_assertion(/*const */symbol_tablet &st, goto_programt &body,
 {
   const irep_idt &func_name=sketch.init->function;
   exprt::operandst clauses;
-  for (const irep_idt &var : sketch.state_vars)
+  for(const irep_idt &var : sketch.state_vars)
   {
-    if (!is_cegis_primitive(st.lookup(var).type)) continue; // TODO: Handle class types
-    if (is_refactor_meta_var(var)) continue;
+    if(!is_cegis_primitive(st.lookup(var).type)) continue; // TODO: Handle class types
+    if(is_refactor_meta_var(var)) continue;
     clauses.push_back(equal_to_clone(st, func_name, var));
   }
   goto_programt::targett pos=get_second_range(sketch).second;
@@ -253,7 +253,7 @@ void create_refactoring_constraint(refactor_programt &prog)
 {
   symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
-  for (const refactor_programt::sketcht &sketch : prog.sketches)
+  for(const refactor_programt::sketcht &sketch : prog.sketches)
   {
     goto_programt &body=get_body(gf, sketch.init);
     link_refactoring_ranges(body, sketch);

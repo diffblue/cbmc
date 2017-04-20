@@ -43,7 +43,7 @@ namespace
 {
 void add_choice_labels(const goto_programt::targetst &choices, size_t offset=0)
 {
-  for (const goto_programt::targett &choice : choices)
+  for(const goto_programt::targett &choice : choices)
   {
     goto_programt::instructiont::labelst &labels=choice->labels;
     std::string label(DANGER_CE_QUANTIFIER_LABEL_PREFIX);
@@ -56,7 +56,7 @@ void add_skolem_labels(const invariant_programt &prog)
 {
   size_t offset=0;
   const invariant_programt::const_invariant_loopst loops(prog.get_loops());
-  for (const invariant_programt::invariant_loopt * const loop : loops)
+  for(const invariant_programt::invariant_loopt * const loop : loops)
   {
     add_choice_labels(loop->skolem_choices, offset);
     offset+=loop->skolem_choices.size();

@@ -22,7 +22,7 @@ void positional_assign(invariant_programt &prog,
     const std::string &pre)
 {
   const counterexamplet &ce_template=values.front();
-  for (const goto_programt::targett x0 : vars)
+  for(const goto_programt::targett x0 : vars)
   {
     const irep_idt &id=get_affected_variable(*x0);
     const counterexamplet::const_iterator it=ce_template.find(id);
@@ -37,7 +37,7 @@ void positional_assign(invariant_programt &prog,
 void safety_add_learned_counterexamples(safety_programt &prog,
     const safety_goto_cest &ces, constraint_factoryt constraint)
 {
-  if (ces.empty()) return;
+  if(ces.empty()) return;
   // TODO: Implement for multiple loops (change constraint, instrumentation)
   counterexamplest x0s;
   std::transform(ces.begin(), ces.end(), std::back_inserter(x0s),
@@ -54,7 +54,7 @@ void safety_add_learned_counterexamples(safety_programt &prog,
   const size_t sz=ces.size();
   const goto_programt::targett loop_end=invariant_add_ce_loop(prog, sz, false);
   positional_assign(prog, prog.x0_choices, first_loop_only, x0_pre);
-  for (const goto_programt::targett x0 : prog.x0_choices)
+  for(const goto_programt::targett x0 : prog.x0_choices)
   {
     const irep_idt &id=get_affected_variable(*x0);
     const counterexamplet &ce_template=x0s.front();

@@ -33,7 +33,7 @@ goto_programt::targett default_jsa_constant_strategy(symbol_tablet &st,
   size_t const_index=0u;
   goto_programt &body=get_entry_body(gf);
   goto_programt::targett pos=body.instructions.begin();
-  for (const constant_exprt &expr : literals)
+  for(const constant_exprt &expr : literals)
   {
     mp_integer value;
     to_integer(expr, value);

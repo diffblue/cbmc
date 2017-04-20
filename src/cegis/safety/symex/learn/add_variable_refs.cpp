@@ -20,7 +20,7 @@ void add_safety_learning_variable_refs(invariant_programt &prog,
   const size_t num_vars=var_ids.size();
   const invariant_programt::const_invariant_loopst loops(
       static_cast<const invariant_programt &>(prog).get_loops());
-  for (const invariant_programt::invariant_loopt * const loop : loops)
+  for(const invariant_programt::invariant_loopt * const loop : loops)
   {
     link_result_var(st, gf, num_vars, max_sz, loop->meta_variables.Ix);
     link_result_var(st, gf, num_vars, max_sz, loop->meta_variables.Ix_prime);

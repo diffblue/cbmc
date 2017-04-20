@@ -31,7 +31,7 @@ void jsa_serialisert::operator()(irept &sdu,
   sdu.set(FITNESS, entity.fitness);
   irept invariant;
   irept::subt &invariant_instructions=invariant.get_sub();
-  for (const jsa_genetic_solutiont::invariantt::value_type &instr : entity.invariant)
+  for(const jsa_genetic_solutiont::invariantt::value_type &instr : entity.invariant)
   {
     irept instruction;
     instruction.set(OPCODE, instr.opcode);
@@ -40,11 +40,11 @@ void jsa_serialisert::operator()(irept &sdu,
   sdu.set(INVARIANT, invariant);
   irept predicates;
   irept::subt &predicates_list=predicates.get_sub();
-  for (const jsa_genetic_solutiont::predicatet &predicate : entity.predicates)
+  for(const jsa_genetic_solutiont::predicatet &predicate : entity.predicates)
   {
     irept pred;
     irept::subt &predicate_instructions=pred.get_sub();
-    for (const jsa_genetic_solutiont::predicatet::value_type &instr : predicate)
+    for(const jsa_genetic_solutiont::predicatet::value_type &instr : predicate)
     {
       irept instruction;
       instruction.set(OPCODE, instr.opcode);
@@ -58,7 +58,7 @@ void jsa_serialisert::operator()(irept &sdu,
   sdu.set(PREDICATES, predicates);
   irept query;
   irept::subt &query_instructions=query.get_sub();
-  for (const jsa_genetic_solutiont::queryt::value_type &instr : entity.query)
+  for(const jsa_genetic_solutiont::queryt::value_type &instr : entity.query)
   {
     irept instruction;
     instruction.set(OPCODE, instr.opcode);
@@ -77,7 +77,7 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   typedef irept::named_subt::const_iterator const_iterator;
   const const_iterator invariant=named_sub.find(INVARIANT);
   assert(named_sub.end() != invariant);
-  for (const irept &instruction : invariant->second.get_sub())
+  for(const irept &instruction : invariant->second.get_sub())
   {
     jsa_genetic_solutiont::invariantt::value_type instr;
     instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));
@@ -85,10 +85,10 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   }
   const const_iterator predicates=named_sub.find(PREDICATES);
   assert(named_sub.end() != predicates);
-  for (const irept &predicate : predicates->second.get_sub())
+  for(const irept &predicate : predicates->second.get_sub())
   {
     jsa_genetic_solutiont::predicatet pred;
-    for (const irept &instruction : predicate.get_sub())
+    for(const irept &instruction : predicate.get_sub())
     {
       jsa_genetic_solutiont::predicatet::value_type instr;
       instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));
@@ -101,7 +101,7 @@ void jsa_serialisert::operator()(jsa_genetic_solutiont &entity,
   }
   const const_iterator query=named_sub.find(QUERY);
   assert(named_sub.end() != query);
-  for (const irept &instruction : query->second.get_sub())
+  for(const irept &instruction : query->second.get_sub())
   {
     jsa_genetic_solutiont::queryt::value_type instr;
     instr.opcode=__CPROVER_jsa_opcodet(instruction.get_long_long(OPCODE));

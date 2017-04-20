@@ -30,8 +30,8 @@ exprt &get_comp(struct_exprt::operandst &ops, const struct_typet &struct_type,
   const struct_typet::componentst &comps=struct_type.components();
   const size_t comps_size=comps.size();
   size_t offset=0;
-  for (offset=0; offset < comps_size; ++offset)
-    if (id2string(comps[offset].get_name()) == comp) break;
+  for(offset=0; offset < comps_size; ++offset)
+    if(id2string(comps[offset].get_name()) == comp) break;
   assert(offset < comps_size);
   return ops[offset];
 }
@@ -86,7 +86,7 @@ public:
 
   bool operator()(const goto_programt::instructiont &instr) const
   {
-    if (goto_program_instruction_typet::ASSIGN != instr.type) return false;
+    if(goto_program_instruction_typet::ASSIGN != instr.type) return false;
     const std::string &var=id2string(get_affected_variable(instr));
     return name == var;
   }

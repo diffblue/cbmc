@@ -33,7 +33,7 @@ public:
   goto_programt::targett operator()(const goto_programt::targett rhs) const
   {
     const goto_programt::targett empty;
-    if (empty == rhs) return empty;
+    if(empty == rhs) return empty;
     const std::string &function=id2string(rhs->function);
     goto_programt &lhs_body=get_body(lhs_func, function);
     const goto_programt &rhs_body=get_body(rhs_func, function);
@@ -69,10 +69,10 @@ refactor_programt &copy(refactor_programt &lhs, const refactor_programt &rhs)
   lhs.gf.copy_from(rhs.gf);
   const copy_targett copy(lhs.gf, rhs.gf);
   lhs.counterexample_locations.clear();
-  for (const refactor_programt::counterexample_locationst::value_type &entry : rhs.counterexample_locations)
+  for(const refactor_programt::counterexample_locationst::value_type &entry : rhs.counterexample_locations)
     copy(lhs.counterexample_locations[entry.first], entry.second);
   lhs.sketches.resize(rhs.sketches.size());
-  for (size_t i=0; i < lhs.sketches.size(); ++i)
+  for(size_t i=0; i < lhs.sketches.size(); ++i)
     ::copy(copy, lhs.sketches[i], rhs.sketches[i]);
   lhs.programs=rhs.programs;
   return lhs;

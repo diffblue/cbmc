@@ -21,7 +21,7 @@ void copy_instructionst::operator()(const goto_programt::targett &new_target,
 void copy_instructionst::operator()(goto_programt::instructionst &new_instrs,
     const goto_programt::instructionst &old_instrs)
 {
-  for (goto_programt::const_targett pos=old_instrs.begin();
+  for(goto_programt::const_targett pos=old_instrs.begin();
       pos != old_instrs.end(); ++pos)
   {
     new_instrs.push_back(goto_programt::instructiont());
@@ -36,7 +36,7 @@ goto_programt::targett copy_instructionst::operator()(
 {
   assert(!old_instrs.empty());
   ++insert_after;
-  for (goto_programt::const_targett pos=old_instrs.begin();
+  for(goto_programt::const_targett pos=old_instrs.begin();
       pos != old_instrs.end(); ++pos)
   {
     insert_after=new_instrs.insert(insert_after, goto_programt::instructiont());
@@ -112,8 +112,8 @@ public:
   void operator()(const goto_programt::targett &target)
   {
     const goto_programt::instructiont::labelst &labels=target->labels;
-    if (labels.empty()) return;
-    if (id2string(labels.front()) != DANGER_SKIP_LABEL) return;
+    if(labels.empty()) return;
+    if(id2string(labels.front()) != DANGER_SKIP_LABEL) return;
     goto_programt::targett next(target);
     skips.insert(std::make_pair(target, ++next));
   }
@@ -121,7 +121,7 @@ public:
   void operator()(goto_programt::targett first,
       const goto_programt::targett &last)
   {
-    for (; first != last; ++first)
+    for(; first != last; ++first)
       this->operator()(first);
   }
 
@@ -129,19 +129,19 @@ public:
   {
     goto_programt::targetst &targets=instr.targets;
     goto_programt::targetst::iterator it;
-    for (it=targets.begin(); it != targets.end(); ++it)
+    for(it=targets.begin(); it != targets.end(); ++it)
     {
       skipst::const_iterator e=skips.find(*it);
-      if (skips.end() == e) continue;
+      if(skips.end() == e) continue;
       *it=e->second;
     }
   }
 
   void remove()
   {
-    for (goto_programt::instructiont &instr : instrs)
+    for(goto_programt::instructiont &instr : instrs)
       replace_targets(instr);
-    for (const skipst::value_type &skip : skips)
+    for(const skipst::value_type &skip : skips)
       instrs.erase(skip.first);
   }
 };
@@ -151,7 +151,7 @@ void invariant_make_presentable(goto_programt::instructionst &instrs)
 {
   const goto_programt::targett &begin=instrs.begin();
   const goto_programt::targett &last=instrs.end();
-  if (begin == last) return;
+  if(begin == last) return;
   skip_removert op(instrs);
   op(begin, std::prev(last));
   op.remove();

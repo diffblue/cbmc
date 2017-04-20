@@ -58,7 +58,7 @@ int configure_ui_and_run(mstreamt &os, const optionst &opt, learnt &learn,
 {
   null_seedt seed;
   const size_t max_prog_size=opt.get_unsigned_int_option(CEGIS_MAX_SIZE);
-  if (!opt.get_bool_option(CEGIS_STATISTICS))
+  if(!opt.get_bool_option(CEGIS_STATISTICS))
     return run_cegis(learn, verify, preproc, seed, max_prog_size, os);
   cegis_statistics_wrappert<learnt, verifyt, mstreamt> stat(learn, verify, os, opt);
   return run_cegis(stat, stat, preproc, seed, max_prog_size, os);
@@ -68,7 +68,7 @@ template<class learnt, class verifyt, class prept>
 int configure_backend(mstreamt &os, const optionst &o,
     const safety_programt &prog, learnt &cfg, verifyt &verify, prept &prep)
 {
-  if (!o.get_bool_option(CEGIS_GENETIC))
+  if(!o.get_bool_option(CEGIS_GENETIC))
   {
     cegis_symex_learnt<safety_preprocessingt, learnt> learn(o, prep, cfg);
     return configure_ui_and_run(os, o, learn, verify, prep);
@@ -96,7 +96,7 @@ int configure_backend(mstreamt &os, const optionst &o,
   random_mutatet mutate(rnd, lazy.num_consts_provder());
   random_crosst cross(rnd);
   const size_t symex_head_start=o.get_unsigned_int_option(CEGIS_SYMEX_HEAD_START);
-  if (o.get_bool_option(CEGIS_MATCH_SELECT))
+  if(o.get_bool_option(CEGIS_MATCH_SELECT))
   {
     typedef match_selectt<program_populationt> selectt;
     selectt select(fit.get_test_case_data(), rnd, rounds);
@@ -105,7 +105,7 @@ int configure_backend(mstreamt &os, const optionst &o,
             safety_goto_cet>, safety_fitness_configt> ga_learnt;
     ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
-    if (!o.get_bool_option(CEGIS_GENETIC_ONLY))
+    if(!o.get_bool_option(CEGIS_GENETIC_ONLY))
     {
       const individual_to_safety_solution_deserialisert deser(prog, info_fac);
       concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
@@ -122,7 +122,7 @@ int configure_backend(mstreamt &os, const optionst &o,
           safety_goto_cet>, safety_fitness_configt> ga_learnt;
   ga_learnt ga_learn(o, rnd, select, mutate, cross, fit, safety_fitness_config);
 #ifndef _WIN32
-  if (!o.get_bool_option(CEGIS_GENETIC_ONLY))
+  if(!o.get_bool_option(CEGIS_GENETIC_ONLY))
   {
     const individual_to_safety_solution_deserialisert deser(prog, info_fac);
     concurrent_learnt<ga_learnt, symex_learnt> learner(ga_learn, learn,
@@ -135,7 +135,7 @@ int configure_backend(mstreamt &os, const optionst &o,
 
 constant_strategyt get_constant_strategy(const optionst &opt)
 {
-  if (opt.get_bool_option(CEGIS_GENETIC)) return genetic_constant_strategy;
+  if(opt.get_bool_option(CEGIS_GENETIC)) return genetic_constant_strategy;
   return default_constant_strategy;
 }
 }

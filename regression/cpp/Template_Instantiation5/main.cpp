@@ -1,4 +1,4 @@
-//#include <stdio.h>
+// #include <stdio.h>
 
 template <typename T>
 class template_test
@@ -11,14 +11,14 @@ public:
    }
    T get(void)
    {
-        //printf ("elem is '%c' \n", elem);
+        // printf ("elem is '%c' \n", elem);
         return elem;
    }
 
    void add(void)
    {
         int c = elem + elem;
-        //printf ("c = %d \n", c);
+        // printf ("c = %d \n", c);
         return;
    }
 

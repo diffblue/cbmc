@@ -242,12 +242,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("assertions", true);
 
-  // check built-in assertions
-  if(cmdline.isset("no-built-in-assertions"))
-    options.set_option("built-in-assertions", false);
-  else
-    options.set_option("built-in-assertions", true);
-
   // use assumptions
   if(cmdline.isset("no-assumptions"))
     options.set_option("assumptions", false);
@@ -991,46 +985,12 @@ bool cbmc_parse_optionst::process_goto_program(
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
-      std::list<std::string> criteria_strings=
-        cmdline.get_values("cover");
-
-      std::set<coverage_criteriont> criteria;
-
-      for(const auto &criterion_string : criteria_strings)
-      {
-        coverage_criteriont c;
-
-        if(criterion_string=="assertion" || criterion_string=="assertions")
-          c=coverage_criteriont::ASSERTION;
-        else if(criterion_string=="path" || criterion_string=="paths")
-          c=coverage_criteriont::PATH;
-        else if(criterion_string=="branch" || criterion_string=="branches")
-          c=coverage_criteriont::BRANCH;
-        else if(criterion_string=="location" || criterion_string=="locations")
-          c=coverage_criteriont::LOCATION;
-        else if(criterion_string=="decision" || criterion_string=="decisions")
-          c=coverage_criteriont::DECISION;
-        else if(criterion_string=="condition" || criterion_string=="conditions")
-          c=coverage_criteriont::CONDITION;
-        else if(criterion_string=="mcdc")
-          c=coverage_criteriont::MCDC;
-        else if(criterion_string=="cover")
-          c=coverage_criteriont::COVER;
-        else
-        {
-          error() << "unknown coverage criterion" << eom;
-          return true;
-        }
-
-        criteria.insert(c);
-      }
-
-      status() << "Instrumenting coverage goals" << eom;
-
-      for(const auto &criterion : criteria)
-        instrument_cover_goals(symbol_table, goto_functions, criterion);
-
-      goto_functions.update();
+      if(instrument_cover_goals(
+           cmdline,
+           symbol_table,
+           goto_functions,
+           get_message_handler()))
+        return true;
     }
 
     // remove skips
@@ -1082,17 +1042,28 @@ int cbmc_parse_optionst::do_bmc(
 {
   bmc.set_ui(get_ui());
 
+  int result=6;
+
   // do actual BMC
-  bool result=(bmc.run(goto_functions)==safety_checkert::SAFE);
+  switch(bmc.run(goto_functions))
+  {
+    case safety_checkert::SAFE:
+      result=0;
+      break;
+    case safety_checkert::UNSAFE:
+      result=10;
+      break;
+    case safety_checkert::ERROR:
+      result=6;
+      break;
+  }
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
   memory_info(debug());
   debug() << eom;
 
-  // We return '0' if the property holds,
-  // and '10' if it is violated.
-  return result?0:10;
+  return result;
 }
 
 /*******************************************************************\
@@ -1184,7 +1155,6 @@ void cbmc_parse_optionst::help()
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"
-    " --no-built-in-assertions     ignore assertions in built-in library\n"
     " --no-assumptions             ignore user assumptions\n"
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)

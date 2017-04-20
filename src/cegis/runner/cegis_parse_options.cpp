@@ -43,7 +43,7 @@ namespace
 void set_integer_option(optionst &opt, const cmdlinet &cmd,
     const char * const name, const unsigned int default_value)
 {
-  if (!cmd.isset(name)) return opt.set_option(name, default_value);
+  if(!cmd.isset(name)) return opt.set_option(name, default_value);
   const std::string text_value(cmd.get_value(name));
   const mp_integer::ullong_t value=string2integer(text_value).to_ulong();
   opt.set_option(name, static_cast<unsigned int>(value));
@@ -69,7 +69,7 @@ void cegis_parse_optionst::get_command_line_options(optionst &options)
   const bool configure_cegis=cmdline.isset("danger") || cmdline.isset("safety")
       || cmdline.isset("jsa") || cmdline.isset(CEGIS_CONTROL)
       || cmdline.isset(CEGIS_REFACTOR);
-  if (configure_cegis)
+  if(configure_cegis)
   {
     set_integer_option(options, cmdline, "cegis-min-size", 1u);
     set_integer_option(options, cmdline, "cegis-max-size", 5u);
@@ -112,15 +112,15 @@ int cegis_parse_optionst::do_bmc(
   optionst options;
   get_command_line_options(options);
 
-  if (cmdline.isset("danger"))
+  if(cmdline.isset("danger"))
     return run_danger(options, result(), symbol_table, goto_functions);
-  if (cmdline.isset("safety"))
+  if(cmdline.isset("safety"))
     return run_safety(options, result(), symbol_table, goto_functions);
-  if (cmdline.isset("jsa"))
+  if(cmdline.isset("jsa"))
     return run_jsa(options, result(), symbol_table, goto_functions);
-  if (cmdline.isset(CEGIS_CONTROL))
+  if(cmdline.isset(CEGIS_CONTROL))
     return run_control(options, result(), symbol_table, goto_functions);
-  if (cmdline.isset(CEGIS_REFACTOR))
+  if(cmdline.isset(CEGIS_REFACTOR))
     return run_refactor(options, result(), symbol_table, goto_functions);
 
   return cbmc_parse_optionst::do_bmc(bmc, goto_functions);

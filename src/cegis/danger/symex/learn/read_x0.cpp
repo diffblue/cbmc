@@ -27,7 +27,7 @@ bool is_placeholder_of(const goto_programt::targett &x0,
     const goto_programt::const_targett &placeholder)
 {
   const goto_programt::instructiont &placeholder_instr=*placeholder;
-  if (goto_program_instruction_typet::DECL != placeholder_instr.type)
+  if(goto_program_instruction_typet::DECL != placeholder_instr.type)
     return false;
   std::string placeholder_base(DANGER_X0_PLACEHOLDER_PREFIX);
   placeholder_base+=id2string(get_affected_variable(*x0));
@@ -51,7 +51,7 @@ public:
   void operator()(const goto_programt::targett &x0)
   {
     const goto_tracet::stepst::const_iterator end(trace.steps.end());
-    while (end != current_step && !is_placeholder_of(x0, current_step->pc))
+    while(end != current_step && !is_placeholder_of(x0, current_step->pc))
       ++current_step;
     assert(end != current_step);
     result.x0_choices.push_back(current_step->full_lhs_value);
@@ -73,7 +73,7 @@ void danger_read_x0(program_individualt &ind, const danger_programt &prog,
   danger_goto_solutiont tmp;
   danger_read_x0(tmp, prog, trace);
   program_individualt::x0t &x0=ind.x0;
-  for (const danger_goto_solutiont::nondet_choicest::value_type &choice : tmp.x0_choices)
+  for(const danger_goto_solutiont::nondet_choicest::value_type &choice : tmp.x0_choices)
   {
     const bv_arithmetict arith(choice);
     const mp_integer::llong_t value=arith.to_integer().to_long();

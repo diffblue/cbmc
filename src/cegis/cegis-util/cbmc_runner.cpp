@@ -41,7 +41,7 @@ std::string get_goto_file_name(const size_t index)
 std::string get_next_goto_file_name()
 {
   size_t index=0;
-  while (exists(get_goto_file_name(index)))
+  while(exists(get_goto_file_name(index)))
     ++index;
   return get_goto_file_name(index);
 }
@@ -89,8 +89,8 @@ public:
     symbol_table=st;
     goto_functions.clear();
     goto_functions.copy_from(gf);
-    if (process_goto_program(options, goto_functions)) return 6;
-    if (keep_goto_programs)
+    if(process_goto_program(options, goto_functions)) return 6;
+    if(keep_goto_programs)
     {
       const std::string path(get_next_goto_file_name());
       message_handlert &msg=get_message_handler();
@@ -127,7 +127,7 @@ safety_checkert::resultt run_cbmc(const symbol_tablet &st,
   cbmc_runnert runner(st, gf, cbmc_result, keep_goto_programs);
   const int result=runner.main();
   disable_output.release();
-  if (EXIT_SUCCESS != result)
+  if(EXIT_SUCCESS != result)
     throw std::runtime_error("cbmc_runner.cbmc-execution-failed");
   return runner.get_bmc_result();
 }

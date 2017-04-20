@@ -76,16 +76,16 @@ goto_programt::targett call_processor(const symbol_tablet &st,
 void set_cegis_processor_sizes(symbol_tablet &st, const size_t size)
 {
   const constant_exprt sz_expr(from_integer(size, signed_int_type()));
-  for (symbol_tablet::symbolst::value_type &entry : st.symbols)
+  for(symbol_tablet::symbolst::value_type &entry : st.symbols)
   {
     typet &type=entry.second.type;
-    if (ID_array != type.id()) continue;
+    if(ID_array != type.id()) continue;
     array_typet &array_type=to_array_type(type);
     const typet &elem_type=array_type.subtype();
-    if (ID_symbol != elem_type.id()) continue;
+    if(ID_symbol != elem_type.id()) continue;
     const symbol_typet &symbol_type=to_symbol_type(elem_type);
     const std::string &type_name=id2string(symbol_type.get_identifier());
-    if (ends_with(type_name, INSTR_TYPE_SUFFIX)) array_type.size()=sz_expr;
+    if(ends_with(type_name, INSTR_TYPE_SUFFIX)) array_type.size()=sz_expr;
   }
 }
 
@@ -96,24 +96,24 @@ void set_cegis_processor_sizes(const symbol_tablet &st,
     const size_t size)
 {
   const constant_exprt sz_expr(from_integer(size, cegis_size_type()));
-  for (; first != last; ++first)
+  for(; first != last; ++first)
   {
-    if (goto_program_instruction_typet::FUNCTION_CALL != first->type) continue;
+    if(goto_program_instruction_typet::FUNCTION_CALL != first->type) continue;
     code_function_callt &call=to_code_function_call(first->code);
     const exprt &func=call.function();
-    if (ID_symbol != func.id()) continue;
+    if(ID_symbol != func.id()) continue;
     const irep_idt &func_name=to_symbol_expr(func).get_identifier();
-    if (!st.has_symbol(func_name)) continue;
+    if(!st.has_symbol(func_name)) continue;
     const symbolt &symbol=st.lookup(func_name);
     const code_typet &code_type=to_code_type(symbol.type);
     const code_typet::parameterst &params=code_type.parameters();
-    if (params.size() != NUM_PROC_CALL_ARGS) continue;
+    if(params.size() != NUM_PROC_CALL_ARGS) continue;
     const typet &param_ptr_type=params.front().type();
-    if (ID_pointer != param_ptr_type.id()) continue;
+    if(ID_pointer != param_ptr_type.id()) continue;
     const typet &param_type=param_ptr_type.subtype();
-    if (ID_symbol != param_type.id()) continue;
+    if(ID_symbol != param_type.id()) continue;
     const irep_idt &param_id=to_symbol_type(param_type).get_identifier();
-    if (!ends_with(id2string(param_id), INSTR_TYPE_SUFFIX)) continue;
+    if(!ends_with(id2string(param_id), INSTR_TYPE_SUFFIX)) continue;
     assert(call.arguments().size() == NUM_PROC_CALL_ARGS);
     call.arguments().back()=sz_expr;
   }

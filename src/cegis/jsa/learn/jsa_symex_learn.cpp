@@ -31,7 +31,7 @@ void jsa_symex_learnt::process(const counterexamplest &counterexamples,
 {
   program=original_program;
   const goto_programt::targetst pred_ops(collect_pred_ops(program));
-  //add_jsa_library(program, max_solution_size, pred_ops);
+  // add_jsa_library(program, max_solution_size, pred_ops);
   instrument_pred_ops(program, pred_ops, op_ids, const_op_ids);
   insert_jsa_constraint(program, true);
   insert_counterexamples(program, counterexamples);
@@ -48,7 +48,7 @@ void jsa_symex_learnt::process(const size_t max_solution_size)
   const namespacet ns(original_program.st);
   counterexamplest counterexamples(1);
   counterexamplet &counterexample=counterexamples.front();
-  for (const goto_programt::targett &pos : original_program.counterexample_locations)
+  for(const goto_programt::targett &pos : original_program.counterexample_locations)
   {
     assert(pos->labels.size() == 1u);
     const irep_idt &key=pos->labels.front();

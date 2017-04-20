@@ -25,7 +25,7 @@ size_t default_constant_strategy(invariant_programt &program,
   add_danger_constant(program, from_integer(spec.max_value().to_ulong(), type));
   add_danger_constant(program, from_integer(0u, type));
   return std::max(size_t(1u), literals_constant_strategy(program, max_length));
-  //return 2u + literals_constant_strategy(program, max_length);
+  // return 2u + literals_constant_strategy(program, max_length);
   /*for (size_t i=0; i < max_length; ++i)
    {
    const side_effect_expr_nondett value(type);

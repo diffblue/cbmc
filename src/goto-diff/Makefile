@@ -1,6 +1,11 @@
-SRC = goto_diff_main.cpp goto_diff_parse_options.cpp \
-      goto_diff_languages.cpp goto_diff_base.cpp syntactic_diff.cpp \
-      unified_diff.cpp change_impact.cpp
+SRC = change_impact.cpp \
+      goto_diff_base.cpp \
+      goto_diff_languages.cpp \
+      goto_diff_main.cpp \
+      goto_diff_parse_options.cpp \
+      syntactic_diff.cpp \
+      unified_diff.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \

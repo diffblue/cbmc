@@ -580,7 +580,7 @@ void goto_convertt::do_cpp_new(
     if(new_array)
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
-    new_call.set("#type", lhs.type().subtype());
+    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
@@ -612,7 +612,7 @@ void goto_convertt::do_cpp_new(
       new_call.arguments().push_back(count);
     new_call.arguments().push_back(object_size);
     new_call.arguments().push_back(rhs.op0()); // memory location
-    new_call.set("#type", lhs.type().subtype());
+    new_call.set(ID_C_cxx_alloc_type, lhs.type().subtype());
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 

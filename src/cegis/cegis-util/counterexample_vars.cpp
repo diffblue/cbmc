@@ -26,8 +26,8 @@ size_t collect_counterexample_locations(goto_programt::targetst &locs,
 {
   goto_programt::instructionst &body=prog.instructions;
   const goto_programt::targett end(body.end());
-  for (goto_programt::targett instr=body.begin(); instr != end; ++instr)
-    if (is_nondet(instr, end) && !is_meta(instr))
+  for(goto_programt::targett instr=body.begin(); instr != end; ++instr)
+    if(is_nondet(instr, end) && !is_meta(instr))
     {
       assert(instr->labels.empty());
       instr->labels.push_back(marker_prefix + std::to_string(marker_index++));
@@ -50,7 +50,7 @@ bool default_cegis_meta_criterion(const goto_programt::const_targett pos)
 {
   const goto_programt::instructiont &instr=*pos;
   const goto_program_instruction_typet type=instr.type;
-  if (goto_program_instruction_typet::ASSIGN == type
+  if(goto_program_instruction_typet::ASSIGN == type
       && ID_symbol != to_code_assign(instr.code).rhs().id()) return false;
   const std::string &name=id2string(get_affected_variable(instr));
   return contains(name, TMP_IF_EXPR_PREFIX) || contains(name, CPROVER_PREFIX)
@@ -104,12 +104,12 @@ std::map<const irep_idt, exprt::operandst> extract_counterexample(
 {
   const goto_tracet::stepst &steps=trace.steps;
   std::map<const irep_idt, exprt::operandst> result;
-  for (const goto_trace_stept &step : steps)
+  for(const goto_trace_stept &step : steps)
   {
     typedef goto_programt::instructiont::labelst labelst;
     const labelst &labels=step.pc->labels;
     const labelst::const_iterator it=find_ce_label(labels);
-    if (labels.end() == it) continue;
+    if(labels.end() == it) continue;
     result[*it].push_back(step.full_lhs_value);
   }
   return result;
@@ -118,12 +118,12 @@ std::map<const irep_idt, exprt::operandst> extract_counterexample(
 void show_assignments(std::ostream &os,
     const std::map<const irep_idt, exprt::operandst> &assignments)
 {
-  for (const std::pair<const irep_idt, exprt::operandst> &ass : assignments)
+  for(const std::pair<const irep_idt, exprt::operandst> &ass : assignments)
   {
     os << "<assignment>" << std::endl;
     os << "  <id>" << ass.first << "</id>" << std::endl;
     os << "  <values>" << std::endl;
-    for (const exprt &value : ass.second)
+    for(const exprt &value : ass.second)
       os << "    <value>" << value.pretty() << "</value>" << std::endl;
     os << "  </values>" << std::endl;
     os << "</assignment>" << std::endl;

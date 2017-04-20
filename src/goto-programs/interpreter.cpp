@@ -758,7 +758,7 @@ exprt interpretert::get_value(
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      irep_idt(rhs[offset].to_long(), 0),
+      irep_idt::make_from_table_index(rhs[offset].to_long()),
       type);
   }
   // Retrieve value of basic data type

@@ -21,7 +21,7 @@ jsa_solutiont &copy_instrs(jsa_solutiont &lhs, const jsa_solutiont &rhs)
 {
   lhs.predicates.clear();
   lhs.predicates.resize(rhs.predicates.size());
-  for (size_t i=0; i < lhs.predicates.size(); ++i)
+  for(size_t i=0; i < lhs.predicates.size(); ++i)
     copy_instructions(lhs.predicates[i], rhs.predicates[i]);
   lhs.query.clear();
   copy_instructions(lhs.query, rhs.query);

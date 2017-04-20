@@ -102,7 +102,7 @@ void replace_assume(std::string &line)
 
 void replace_danger_execute_size(std::string &line)
 {
-  if (!contains(line, "__CPROVER_danger_execute(")) return;
+  if(!contains(line, "__CPROVER_danger_execute(")) return;
   const std::string::size_type name_start=line.find('(') + 1;
   const std::string::size_type name_end=line.find(',');
   const std::string::size_type name_len=name_end - name_start;
@@ -129,8 +129,8 @@ bool handle_programs(std::string &source, bool &initialised,
     const std::string &line)
 {
   const size_t len=PROG_PREFIX_LEN;
-  if (PROG_PREFIX != line.substr(0, len)) return false;
-  if (!initialised)
+  if(PROG_PREFIX != line.substr(0, len)) return false;
+  if(!initialised)
   {
     source+="  " CEGIS_PREFIX "deserialise_init();\n";
     initialised=true;
@@ -149,7 +149,7 @@ bool handle_programs(std::string &source, bool &initialised,
 
 bool handle_x0(std::string &source, std::string &line)
 {
-  if (!contains(line, "__CPROVER") || !contains(line, "_x0_")
+  if(!contains(line, "__CPROVER") || !contains(line, "_x0_")
       || contains(line, "=")) return false;
   fix_cprover_names(line);
   const std::string::size_type name_start=line.rfind(' ') + 1;
@@ -163,10 +163,10 @@ bool handle_x0(std::string &source, std::string &line)
 
 bool handle_ce(std::string &source, bool &initialised, const std::string &line)
 {
-  if (!(contains(line, CEGIS_PREFIX "x_choice_")
+  if(!(contains(line, CEGIS_PREFIX "x_choice_")
       || contains(line, CEGIS_PREFIX "x0_choice_"))
       || contains(line, CEGIS_PREFIX "x_index")) return false;
-  if (!initialised)
+  if(!initialised)
   {
     source+="  " CEGIS_PREFIX "ce_value_init();\n";
     initialised=true;
@@ -182,14 +182,14 @@ bool handle_ce(std::string &source, bool &initialised, const std::string &line)
 
 bool handle_second_instr_struct(std::string &source, const std::string &line)
 {
-  if ("struct " CEGIS_PREFIX "instructiont" != line) return false;
+  if("struct " CEGIS_PREFIX "instructiont" != line) return false;
   source+="struct " CEGIS_PREFIX "instructiont_escaped\n";
   return true;
 }
 
 bool handle_ce_loop(const std::string &line, std::stringstream &ss)
 {
-  if ("    " CEGIS_PREFIX "x_index = " CEGIS_PREFIX "x_index + 1u;" == line
+  if("    " CEGIS_PREFIX "x_index = " CEGIS_PREFIX "x_index + 1u;" == line
       || "  do" == line)
   {
     std::string skip;
@@ -201,7 +201,7 @@ bool handle_ce_loop(const std::string &line, std::stringstream &ss)
 
 bool handle_internals(const std::string &line)
 {
-  if (contains(line, "ARRAY_OF(")) return true;
+  if(contains(line, "ARRAY_OF(")) return true;
   return contains(line, "__CPROVER_malloc_size =")
       || contains(line, "__CPROVER_dead_object =")
       || contains(line, "__CPROVER_deallocated =")
@@ -225,7 +225,7 @@ void post_process(
 {
   bool deserialise_initialised=false;
   bool ce_initialised=false;
-  for (std::string line; std::getline(ss, line);)
+  for(std::string line; std::getline(ss, line);)
   {
     if(handle_start(gf, source, line) ||
        handle_return_value(line) ||

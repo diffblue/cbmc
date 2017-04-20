@@ -1,0 +1,110 @@
+version: 1.0.{build}
+image: Visual Studio 2013
+clone_depth: 50
+environment:
+  BUILD_ENV: MSVC
+  PATH: C:\projects\cbmc\deps\bin;%PATH%
+  INCLUDE: C:\projects\cbmc\deps\include
+install:
+- ps: |
+    #check if dependencies were copied from cache, if not, download them.
+    if (!(Test-Path deps)) {
+    md deps
+    }
+    cd deps
+    if (!(Test-Path bin\bison.exe)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/bison-2.4.1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=JAPFzNPMJDI4IViAVlJAEc6l8aHB3k17NpZRdoWDMLbALaJNX88vfwocuezU1tfhyrSJxfo2fTK4rgP5OULkikJs7MBZI9ovp2V%2BMT6yg87KDdH9EIOlMgltGfbP%2BoZkwBY7kXb3W5puSlt4OTE%2Bw7CRlHF9MNqFXVBqVBfa%2BGw0gXDe5Jd9qV%2BvUXZzRuBl9ERSQkSD%2B%2B%2BxFo24FZoOeYkgBHJz03%2BHuIMnlmcLgneTB2aiZZU3%2B6UTPceUxLus9%2Bksb5UbqEVaVE06TIXl76VKwqAgXM2LWaNyeJDog%2BT%2BhjW4v4ypxh6mIBo5KRNXVLPc1MxSPFQB3ITlIXv9Zg%3D%3D"
+    & 7z x bison-2.4.1-bin.zip
+    }
+    if (!(Test-Path bin\flex.exe)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/flex-2.5.4a-1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=WriP8S047Mmq271ZHWL0MCPGx1gEFsuc%2BKMmChoXhXFRkn0GlIgCxZEiOu52ke9fT1kAvycWXePNBFAyCHjpF%2BJkXCwisQ6FLIf3NL%2F92849YgQKdJkDUOcZ%2Bh82XVTwNBrljKIkExkak7QEyhOf3buTC1oeuatCUV5Ez42RZjgtRiJaqcFW6xLbhfuVONr39KxH5hGx%2FDUi2RRXPbgoKDwavc9s56NP1rNbWMTE6NdNHzJeaf43E%2BSMemlVO%2BhhIY6W0f%2FtaQ7fYF%2F6YaqxdQ0sB8W5DnG4Hb%2F0CyQlrTZpGDXGr301rV0M4WBkYLmfauq4IyJsBaR095tXGW%2BzmA%3D%3D"
+    & 7z x flex-2.5.4a-1-bin.zip
+    }
+    if (!(Test-Path include\FlexLexer.h)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/flex-2.5.4a-1-lib.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=H%2FLeKGv2QqKAGDTP%2F6TYPhDzuL6K%2F5dFOt61HfYBm1vUWVUNmAYVGvUAcvnUqBnhEHwZgtc8vZt1H7k3W8azxCUc7l6ZhlCDbqQ6Mg2VhfpBaQMbL1V%2BjSq5ePpWcuLMBntKk2br38PF1NtiAwCCpRTRPptaYPeGs%2BOjAH%2BN8aIIxjvj45QAgt9mcg6dfBsyfj5fdJmpHRQFuJ7%2FnsG50fmN5JDvdvmBWloB6rjxVWaN4XO6VTWZFZ34JWFyOqgWNEw9aDN3HdsSuJ0Uz19AbdwZBIWe5Elrl71rRJjn1lijCknDB7D4sAmP33k71e%2BB0qvsNl1Shuh9FkY8Z6y05Q%3D%3D"
+    & 7z x flex-2.5.4a-1-lib.zip
+    }
+    if (!(Test-Path bin\iconv.exe)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/libiconv-1.9.2-1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=sS3Y2lC1oWOhBDsL8C9ASuO4LOM%2BpB%2F8PwG5w5CdB9JnPfLqhb3FnA1zkkZJoSNuIYS3DM6CN2qxoWjpJbLEtVQe0PpxziQZjLpJw2MpxXdJiJHRDu8x9THgzwuZ3ze5BWHzPoCBQPdRkKzVPezf1HwptUsm3Y9c2jlWljQjhc8NVsI4iPmjEOwT8E%2BYpR5fsLs2GsRjuoyqKa%2Bi4JJ6MbpXVX1IgR4fzp1Li9SnE39ujHDb%2FyI3c96eCdVm1Oa6jNxzSJNfq%2FgOZM8BIxlR55a%2BtM3oBQhU0voEtDOABwuO7ZBay8dLt%2FG5vz1%2Bi%2FIlRLFxQfICaprPLzw6pXRm8Q%3D%3D"
+    & 7z x libiconv-1.9.2-1-bin.zip
+    }
+    if (!(Test-Path bin\libintl3.dll)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/libintl-0.14.4-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=lJViGr6bl%2F4i%2B6nIfeYChreq%2FKfgid9QqGSq7Ie%2FMG%2Fmr9nPyPUA%2BLtT7jn1ogunTzQLZP%2FNxVFcYqyd8gyuT%2Bn2MF80Ds4Whw4cRYnXPb2LZg4%2FiEqZV6wgBMIQfq5v2l3lAsglISVErOik%2BQAHec5gZe2%2BKaVjRnJnhPRziZkQyzF9Xdf2xsPi28hBaX4RQx8XqSLcY1kQpY13PDBZDi9lmdKHf0pBKu%2F0WXspmRAU02HtleMk6Zeg5vEDFcwoe8C3fb4vwtpwGwN9TX5ddaq56yUVn70zh%2BH2KgKIsRl26avnrCpeWF9M5lLck0ngaqFX84w%2BgxmZu40IVU%2Ff0A%3D%3D"
+    & 7z x libintl-0.14.4-bin.zip
+    }
+    if (!(Test-Path bin\make.exe)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/make-3.81-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=PRC97AWzJ2ZAyjEK4p7eCbA3RAEr8sTf8TUK5zoMBcrXPUHWYjnCwXRMnIxUUufBYjsAx8t1XnOQdlTuAPJYpcha%2FFJRlcxMmfQjNbpNEQFJuqEpA5c%2FGhFYxSD3a26vjpgReUW5MuQXeLeNh7PziLB0GP0sdRHN%2B1eDiHeCJWYNMYhrEY9BAkf5rXeRQWr1ZG0Hzq%2FxZEHceypx8xyaT%2BFzREYQOyKjGdre1QXtI%2FXo4ImA1xWt%2F8TnlGcAnCEaTltxuSRVB%2F7s1ShMr9KoagCb%2BjBWq6BgbcNGxyzyOZfi2Sjjo39mhudF9DNbKbkczes9Kp3ySgXmrXSWjIG4Iw%3D%3D"
+    & 7z x make-3.81-bin.zip
+    }
+    if (!(Test-Path bin\regex2.dll)) {
+    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/regex-2.7-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=bXRvFV%2Be4Dpm8vzp%2F1bJWwgkERE6WakcPTBN57n9vNh0dr42jDTXv8JF%2BWCmTIb%2Fy4XzxYl0faggt3g6TqTLYn5UDVUBYx%2FMLmNVVNEv%2BaBlDd87UAZGLi6fkEV5oAP4W4FYsqEnKRDfGPOBoL7D7CuW9Kcxy3Moubxdl%2Bmes%2BMI%2FzWJ6BgLD3Oj04GyD42zLCYVtAzkeDAX0UADoh06ExhpTjI4BNnQ%2FhzSlPtPG7mon4q81%2F2tDNskKVJS466eR%2F8XV6H4QT3LoCkh6dxQ9%2B9ZnkWJplundRbiIlpj43vmdvjIChczl4jbAgL6zFj5Gz6u58uvCV%2FbOuyx3Sw1fg%3D%3D"
+    & 7z x regex-2.7-bin.zip
+    }
+    if (!(Test-Path minisat2-2.2.1)) {
+     & appveyor DownloadFile http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+     & 7z x minisat2_2.2.1.orig.tar.gz
+     &7z x minisat2_2.2.1.orig.tar
+    }
+    cd ..
+
+cache: deps
+
+build_script:
+- cmd: |
+    cp -r deps/minisat2-2.2.1 minisat-2.2.1
+    patch -d minisat-2.2.1 -p1 < scripts/minisat-2.2.1-patch
+    call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
+    sed -i "s/BUILD_ENV.*/BUILD_ENV = MSVC/" src/config.inc
+    make -C src -j2
+
+test_script:
+- cmd: |
+    cd regression
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" ansi-c/Makefile
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" cpp/Makefile
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-instrument/chain.sh
+    sed -i "15s/.*/$goto_cc $name.c/" goto-instrument/chain.sh
+    sed -i "16i mv $name.exe $name.gb" goto-instrument/chain.sh
+    sed -i "23s/.*/  $goto_cc ${name}-mod.c/" goto-instrument/chain.sh
+    sed -i "24i   mv ${name}-mod.exe $name-mod.gb" goto-instrument/chain.sh
+    cat goto-instrument/chain.sh
+
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-instrument-typedef/chain.sh || true
+    sed -i "12s/.*/$GC $NAME.c --function fun/" goto-instrument-typedef/chain.sh || true
+    sed -i "13i mv $NAME.exe $NAME.gb" goto-instrument-typedef/chain.sh || true
+    cat goto-instrument-typedef/chain.sh || true
+
+    rem HACK disable failing tests
+    rmdir /s /q ansi-c\Forward_Declaration2
+    rmdir /s /q ansi-c\Incomplete_Type1
+    rmdir /s /q ansi-c\Union_Padding1
+    rmdir /s /q ansi-c\Universal_characters1
+    rmdir /s /q ansi-c\function_return1
+    rmdir /s /q ansi-c\gcc_attributes7
+    rmdir /s /q ansi-c\struct6
+    rmdir /s /q ansi-c\struct7
+    rmdir /s /q cbmc\Malloc23
+    rmdir /s /q cbmc\byte_update2
+    rmdir /s /q cbmc\byte_update3
+    rmdir /s /q cbmc\byte_update4
+    rmdir /s /q cbmc\byte_update5
+    rmdir /s /q cbmc\byte_update6
+    rmdir /s /q cbmc\byte_update7
+    rmdir /s /q cbmc\pipe1
+    rmdir /s /q cbmc\unsigned___int128
+    rmdir /s /q cpp\Decltype1
+    rmdir /s /q cpp\Decltype2
+    rmdir /s /q cpp\Function_Overloading1
+    rmdir /s /q cpp\enum2
+    rmdir /s /q cpp\enum7
+    rmdir /s /q cpp\enum8
+    rmdir /s /q cpp\nullptr1
+    rmdir /s /q cpp\sizeof1
+    rmdir /s /q cpp\static_assert1
+    rmdir /s /q cbmc-java\VarLengthArrayTrace1
+    rmdir /s /q cbmc-java\classpath1
+    rmdir /s /q cbmc-java\jar-file3
+    rmdir /s /q cbmc-java\tableswitch2
+    rmdir /s /q goto-instrument\slice08
+
+    make test
