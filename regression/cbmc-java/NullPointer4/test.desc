@@ -3,7 +3,7 @@ NullPointer4.class
 --pointer-check --stop-on-fail
 ^EXIT=10$
 ^SIGNAL=0$
-^  file NullPointer4.java line 6 function java::NullPointer4.main:\(\[Ljava/lang/String;\)V$
+^  file NullPointer4.java line 6 function java::NullPointer4.main:\(\[Ljava/lang/String;\)V bytecode_index 4$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
