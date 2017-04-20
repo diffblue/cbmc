@@ -1172,6 +1172,15 @@ mp_integer interpretert::evaluate_address(
     if(result.size()==1)
       return result[0];
   }
+  else if(expr.id()==ID_typecast)
+  {
+    if(expr.operands().size()!=1)
+      throw "typecast expects one operand";
+
+    assert(expr.type().id()==ID_pointer);
+
+    return evaluate_address(expr.op0(), fail_quietly);
+  }
   if(!fail_quietly)
   {
     error() << "!! failed to evaluate address: "
