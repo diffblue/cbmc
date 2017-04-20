@@ -7,6 +7,7 @@ DIRS = ansi-c \
        goto-instrument-typedef \
        goto-diff \
        invariants \
+       strings-smoke-tests \
        test-script \
        # Empty last line
 
