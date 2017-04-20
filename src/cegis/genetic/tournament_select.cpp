@@ -51,7 +51,7 @@ tournament_selectt::~tournament_selectt()
 void tournament_selectt::init(populationt &pop)
 {
   pop.resize(pop_size);
-  for (program_individualt &ind : pop)
+  for(program_individualt &ind : pop)
     random.havoc(ind);
 }
 
@@ -80,21 +80,21 @@ public:
 
   bool add_contestant(const contestantt &contestant)
   {
-    if (contains(contestant)) return false;
-    if (no_contestant == father) father=contestant;
-    else if (no_contestant == mother) mother=contestant;
-    else if (no_contestant == son) son=contestant;
-    else if (no_contestant == daughter) daughter=contestant;
-    else if (father->fitness < contestant->fitness)
+    if(contains(contestant)) return false;
+    if(no_contestant == father) father=contestant;
+    else if(no_contestant == mother) mother=contestant;
+    else if(no_contestant == son) son=contestant;
+    else if(no_contestant == daughter) daughter=contestant;
+    else if(father->fitness < contestant->fitness)
     {
       mother=father;
       father=contestant;
-    } else if (mother->fitness < contestant->fitness) mother=contestant;
-    else if (daughter->fitness > contestant->fitness)
+    } else if(mother->fitness < contestant->fitness) mother=contestant;
+    else if(daughter->fitness > contestant->fitness)
     {
       son=daughter;
       daughter=contestant;
-    } else if (son->fitness > contestant->fitness) son=contestant;
+    } else if(son->fitness > contestant->fitness) son=contestant;
     return true;
   }
 
@@ -111,11 +111,11 @@ public:
 tournament_selectt::selectiont tournament_selectt::select(populationt &pop)
 {
   arenat arena(pop);
-  for (size_t contestants=0; contestants < rounds;)
+  for(size_t contestants=0; contestants < rounds;)
   {
     populationt::iterator contestant=pop.begin();
     std::advance(contestant, rand() % pop.size());
-    if (arena.add_contestant(contestant)) ++contestants;
+    if(arena.add_contestant(contestant)) ++contestants;
   }
   tournament_selectt::selectiont selection;
   arena.select(selection);

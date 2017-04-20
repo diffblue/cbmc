@@ -1,5 +1,8 @@
-SRC = symex_main.cpp symex_parse_options.cpp path_search.cpp \
-      symex_cover.cpp
+SRC = path_search.cpp \
+      symex_cover.cpp \
+      symex_main.cpp \
+      symex_parse_options.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \

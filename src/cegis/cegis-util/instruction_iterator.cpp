@@ -14,7 +14,7 @@ namespace
 bool has_body(const goto_functionst::function_mapt::iterator &it,
     const goto_functionst::function_mapt::const_iterator &end)
 {
-  if (end == it) return false;
+  if(end == it) return false;
   return it->second.body_available();
 }
 }
@@ -26,24 +26,24 @@ instr_iteratort::instr_iteratort()
 instr_iteratort::instr_iteratort(goto_functionst &gf) :
     func_it(gf.function_map.begin()), func_end(gf.function_map.end())
 {
-  while (!has_body(func_it, func_end) && func_end != func_it)
+  while(!has_body(func_it, func_end) && func_end != func_it)
     ++func_it;
-  if (has_body(func_it, func_end))
+  if(has_body(func_it, func_end))
     prog_it=func_it->second.body.instructions.begin();
 }
 
 instr_iteratort &instr_iteratort::operator++()
 {
-  if (func_it->second.body.instructions.end() == prog_it) do
+  if(func_it->second.body.instructions.end() == prog_it) do
   {
     ++func_it;
-    if (func_end == func_it)
+    if(func_end == func_it)
     {
       func_it=goto_functionst::function_mapt::iterator();
       prog_it=goto_programt::targett();
       break;
     } else prog_it=func_it->second.body.instructions.begin();
-  } while (func_it->second.body.instructions.end() == prog_it);
+  } while(func_it->second.body.instructions.end() == prog_it);
   else ++prog_it;
   return *this;
 }

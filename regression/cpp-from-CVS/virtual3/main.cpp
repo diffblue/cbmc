@@ -6,12 +6,12 @@ class B{
 
 void toBr(B& b)
 {
-	assert(b.f()==0);
+  assert(b.f()==0);
 }
 
 int main()
 {
-	B b;
-//	assert(b.f()==0);
-	toBr(b);
+  B b;
+//   assert(b.f()==0);
+  toBr(b);
 }

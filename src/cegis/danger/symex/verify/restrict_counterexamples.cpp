@@ -38,7 +38,7 @@ goto_programt::targett add_assume(goto_functionst &gf)
 {
   goto_programt &body=get_entry_body(gf);
   goto_programt::targett pos=find_assertion(gf);
-  if (goto_program_instruction_typet::ASSUME == (--pos)->type) return pos;
+  if(goto_program_instruction_typet::ASSUME == (--pos)->type) return pos;
   pos=body.insert_after(pos);
   pos->type=goto_program_instruction_typet::ASSUME;
   pos->source_location=default_cegis_source_location();
@@ -47,7 +47,7 @@ goto_programt::targett add_assume(goto_functionst &gf)
 
 void force_all_guards_violated(exprt::operandst &op, const size_t num_loops)
 {
-  for (size_t i=0; i < num_loops; ++i)
+  for(size_t i=0; i < num_loops; ++i)
   {
     const notequal_exprt Gx=danger_component_as_bool(get_Gx(i));
     const equal_exprt not_Gx(Gx.lhs(), Gx.rhs());
@@ -70,7 +70,7 @@ void force_assertion_violation(goto_functionst &gf, const size_t num_loops)
 void force_ranking_error(goto_functionst &gf, const size_t num_loops)
 {
   exprt::operandst op;
-  for (size_t i=0; i < num_loops; ++i)
+  for(size_t i=0; i < num_loops; ++i)
   {
   const exprt::operandst conj={ danger_component_as_bool(get_Dx(i)),
       danger_component_as_bool(get_Dx(i)), danger_component_as_bool(get_Gx(i)),

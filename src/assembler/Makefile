@@ -1,5 +1,6 @@
-SRC = assembler_lex.yy.cpp assembler_parser.cpp
-
+SRC = assembler_lex.yy.cpp \
+      assembler_parser.cpp \
+      # Empty last line
 INCLUDES= -I ..
 
 include ../config.inc

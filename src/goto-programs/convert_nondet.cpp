@@ -94,7 +94,6 @@ static goto_programt::const_targett insert_nondet_init_code(
     false,
     true,
     !nullable,
-    message_handler,
     max_nondet_array_length);
 
   // Convert this code into goto instructions

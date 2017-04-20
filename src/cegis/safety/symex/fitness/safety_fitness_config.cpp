@@ -52,7 +52,7 @@ void fix_quantifiers(const safety_programt &org_prog, safety_programt &new_prog,
   goto_programt::targett new_off=new_prog.safety_loops.front().meta_variables.Ix;
   --new_off;
   goto_programt::targett::difference_type diff;
-  for (goto_programt::targett &q : quantifiers)
+  for(goto_programt::targett &q : quantifiers)
   {
     diff=std::distance(org_off, static_cast<goto_programt::const_targett>(q));
     q=new_off;
@@ -63,7 +63,7 @@ void fix_quantifiers(const safety_programt &org_prog, safety_programt &new_prog,
 
 void safety_fitness_configt::set_candidate(const candidatet &candidate)
 {
-  if (!constraint_inserted)
+  if(!constraint_inserted)
   {
     program_with_constraint=original_program;
     invariant_insert_constraint(original_quantifiers, program_with_constraint,
@@ -79,19 +79,19 @@ void safety_fitness_configt::set_candidate(const candidatet &candidate)
 
 void safety_fitness_configt::set_test_case(const counterexamplet &ce)
 {
-  if (quantifiers.empty()) return;
+  if(quantifiers.empty()) return;
   goto_functionst &gf=program.gf;
   // TODO: Implement for multiple loops (change constraint, instrumentation)
   const counterexamplet::assignmentst &ass=ce.x.back();
   typedef counterexamplet::assignmentst counterexamplet;
 
-  for (goto_programt::targett quantifier : quantifiers)
+  for(goto_programt::targett quantifier : quantifiers)
   {
     const irep_idt &var=get_affected_variable(*quantifier);
     const counterexamplet::const_iterator it=ass.find(var);
-    if (ass.end() == it) continue;
+    if(ass.end() == it) continue;
     symbol_tablet &st=program.st;
-    if (program_contains_ce)
+    if(program_contains_ce)
     {
       goto_programt::targett assignment=quantifier;
       erase_target(get_entry_body(gf).instructions, ++assignment);

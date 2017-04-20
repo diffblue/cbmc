@@ -41,20 +41,20 @@ public:
 
   virtual void operator()(exprt &expr)
   {
-    if (ID_typecast != expr.id()) return;
+    if(ID_typecast != expr.id()) return;
     const typecast_exprt &cast=to_typecast_expr(expr);
     const exprt &cast_op=cast.op();
-    if (ID_member != cast_op.id()) return;
+    if(ID_member != cast_op.id()) return;
     const member_exprt &member=to_member_expr(cast_op);
     const exprt &compound=member.compound();
-    if (ID_symbol != compound.id()) return;
+    if(ID_symbol != compound.id()) return;
     const irep_idt &compound_id=to_symbol_expr(compound).get_identifier();
-    if (!is_instr_name(id2string(compound_id))) return;
+    if(!is_instr_name(id2string(compound_id))) return;
     const std::string &component=id2string(member.get_component_name());
     const typet &type=cast.type();
-    if (ROP == component) expr=from_integer(instr.result_op, type);
-    else if (OP0 == component) expr=from_integer(instr.op0, type);
-    else if (OP1 == component) expr=from_integer(instr.op1, type);
+    if(ROP == component) expr=from_integer(instr.result_op, type);
+    else if(OP0 == component) expr=from_integer(instr.op0, type);
+    else if(OP1 == component) expr=from_integer(instr.op1, type);
     else assert(!"Illegal compound member");
   }
 };
@@ -65,7 +65,7 @@ void replace_pred_ops(goto_programt::targett first,
     const __CPROVER_jsa_pred_instructiont &instr)
 {
   replace_pred_ops_visitort visitor(instr);
-  for (; first != last; ++first)
+  for(; first != last; ++first)
   {
     first->guard.visit(visitor);
     first->code.visit(visitor);
@@ -90,35 +90,35 @@ public:
 
   ~replace_query_ops_visitort()
   {
-    for (exprt * const expr : heap_occurrences)
+    for(exprt * const expr : heap_occurrences)
       *expr=address_of_exprt(get_queried_heap(st));
   }
 
   void handle_member(member_exprt &member_expr)
   {
     const exprt &compound=member_expr.compound();
-    if (ID_symbol != compound.id()) return;
+    if(ID_symbol != compound.id()) return;
     const std::string &id=id2string(to_symbol_expr(compound).get_identifier());
-    if (std::string::npos == id.find(INSTR)) return;
+    if(std::string::npos == id.find(INSTR)) return;
     const std::string &member=id2string(member_expr.get_component_name());
     exprt &expr=static_cast<exprt &>(member_expr);
-    if (OP0 == member) expr=from_integer(instr.op0, expr.type());
-    else if (OP1 == member) expr=from_integer(instr.op1, expr.type());
-    else if (OPCODE == member) expr=from_integer(instr.opcode, expr.type());
+    if(OP0 == member) expr=from_integer(instr.op0, expr.type());
+    else if(OP1 == member) expr=from_integer(instr.op1, expr.type());
+    else if(OPCODE == member) expr=from_integer(instr.opcode, expr.type());
     else assert(!"Illegal compound member");
   }
 
   virtual void operator()(exprt &expr)
   {
     const irep_idt &expr_id=expr.id();
-    if (ID_member == expr_id) return handle_member(to_member_expr(expr));
-    if (ID_symbol != expr_id) return;
+    if(ID_member == expr_id) return handle_member(to_member_expr(expr));
+    if(ID_symbol != expr_id) return;
     const std::string &id=id2string(to_symbol_expr(expr).get_identifier());
-    if (std::string::npos != id.find(LOCAL_HEAP)) heap_occurrences.push_back(
+    if(std::string::npos != id.find(LOCAL_HEAP)) heap_occurrences.push_back(
         &expr);
-    else if (std::string::npos != id.find(LOCAL_LIST)) expr=from_integer(
+    else if(std::string::npos != id.find(LOCAL_LIST)) expr=from_integer(
         prefix.opcode, expr.type());
-    else if (std::string::npos != id.find(LOCAL_IT))
+    else if(std::string::npos != id.find(LOCAL_IT))
       expr=from_integer(prefix.op0, expr.type());
   }
 };
@@ -130,7 +130,7 @@ void replace_query_ops(const symbol_tablet &st, goto_programt::targett first,
     const __CPROVER_jsa_query_instructiont &prefix)
 {
   replace_query_ops_visitort visitor(st, instr, prefix);
-  for (; first != last; ++first)
+  for(; first != last; ++first)
   {
     first->guard.visit(visitor);
     first->code.visit(visitor);

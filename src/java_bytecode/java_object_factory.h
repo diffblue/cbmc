@@ -19,8 +19,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &,
-  message_handlert &message_handler);
+  const source_locationt &);
 
 enum update_in_placet
 {
@@ -33,21 +32,11 @@ void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
   symbol_tablet &symbol_table,
-  const source_locationt &,
+  const source_locationt &loc,
   bool skip_classid,
-  bool create_dynamic_objects,
+  bool create_dyn_objs,
   bool assume_non_null,
-  message_handlert &message_handler,
   size_t max_nondet_array_length,
   update_in_placet update_in_place=NO_UPDATE_IN_PLACE);
-
-
-exprt get_nondet_bool(const typet &);
-
-symbolt &new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &,
-  const typet &,
-  const std::string &prefix="tmp_object_factory");
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

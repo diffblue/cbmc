@@ -34,9 +34,9 @@ goto_programt::targett zero_jsa_temps(jsa_programt &prog,
 {
   symbol_tablet &st=prog.st;
   goto_functionst &gf=prog.gf;
-  for (const symbol_tablet::symbolst::value_type &symbol : st.symbols)
+  for(const symbol_tablet::symbolst::value_type &symbol : st.symbols)
   {
-    if (!is_tmp(symbol)) continue;
+    if(!is_tmp(symbol)) continue;
     const symbol_exprt lhs(symbol.second.symbol_expr());
     pos=jsa_assign(st, gf, pos, lhs, from_integer(0, lhs.type()));
   }
@@ -58,20 +58,20 @@ void add_zero_jsa_temps_to_pred_exec(jsa_programt &prog)
   source_locationt loc;
   loc.set_file(JSA_MODULE);
   loc.set_function(JSA_PRED_EXEC);
-  for (goto_programt::targett pos=instr.begin(); pos != instr.end(); ++pos)
+  for(goto_programt::targett pos=instr.begin(); pos != instr.end(); ++pos)
   {
     const codet &code=pos->code;
-    if (ID_assign != code.get_statement()) continue;
+    if(ID_assign != code.get_statement()) continue;
     const code_assignt &assign=to_code_assign(code);
     const exprt &lhs=assign.lhs();
-    if (ID_symbol != lhs.id()) continue;
+    if(ID_symbol != lhs.id()) continue;
     const symbol_exprt &symbol=to_symbol_expr(lhs);
     const irep_idt &id=symbol.get_identifier();
-    if (std::string::npos == id2string(id).find(RETURN_VALUE_SUFFIX)) continue;
+    if(std::string::npos == id2string(id).find(RETURN_VALUE_SUFFIX)) continue;
     const goto_programt::targett return_pos(pos);
     std::advance(pos, -1);
     const symbol_exprt ops(st.lookup(JSA_PRED_RES_OPS).symbol_expr());
-    for (size_t i=1; i <= num_tmps; ++i)
+    for(size_t i=1; i <= num_tmps; ++i)
     {
       const constant_exprt index(from_integer(i, signed_int_type()));
       const index_exprt elem(ops, index);

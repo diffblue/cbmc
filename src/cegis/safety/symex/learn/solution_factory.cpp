@@ -44,7 +44,7 @@ void copy_instructions(goto_programt::instructionst &prog,
     const size_t instr_idx)
 {
   copy_instructionst copy_instr;
-  for (goto_programt::const_targett it=entry.begin(); it != entry.end(); ++it)
+  for(goto_programt::const_targett it=entry.begin(); it != entry.end(); ++it)
   {
     prog.push_back(goto_programt::instructiont());
     goto_programt::targett new_instr=prog.end();
@@ -69,7 +69,7 @@ void extract_program(goto_programt::instructionst &prog,
     const program_individualt::programt &instructions)
 {
   size_t instr_idx=0;
-  for (const program_individualt::instructiont &instr : instructions)
+  for(const program_individualt::instructiont &instr : instructions)
   {
     const program_individualt::instructiont::opcodet opcode=instr.opcode;
     const instruction_sett::const_iterator instr_entry=instr_set.find(opcode);
@@ -94,7 +94,7 @@ void extract_program(goto_programt::instructionst &prog,
 
 size_t create_temps(invariant_variable_namest &rnames, const size_t num_tmp)
 {
-  for (size_t i=0; i < num_tmp; ++i)
+  for(size_t i=0; i < num_tmp; ++i)
     rnames.insert(std::make_pair(i, get_cegis_meta_name(get_tmp(i))));
   return num_tmp;
 }
@@ -121,9 +121,9 @@ void create_safety_solution(safety_goto_solutiont &solution,
   assert(max_sz > 0);
   const size_t idx=create_temps(result_var_names, max_sz - 1);
   size_t loop_idx=0;
-  for (const goto_trace_stept &step : trace.steps)
+  for(const goto_trace_stept &step : trace.steps)
   {
-    if (!is_program_individual_decl(step)) continue;
+    if(!is_program_individual_decl(step)) continue;
     const exprt::operandst &instrs=step.full_lhs_value.operands();
     set_result_var(result_var_names, idx, loop_idx++);
     solution.push_back(goto_programt::instructionst());
@@ -143,7 +143,7 @@ void create_safety_solution(safety_goto_solutiont &solution,
   invariant_variable_namest vars;
   reverse_invariant_var_ids(vars, var_ids);
   size_t loop_idx=0;
-  for (const program_individualt::programt &instrs : ind.programs)
+  for(const program_individualt::programt &instrs : ind.programs)
   {
     invariant_variable_namest rvars;
     const size_t prog_size=instrs.size();

@@ -43,7 +43,7 @@ public:
         loop.danger_meta_variables;
     const goto_programt::targetst &rx=dm.Rx;
     const goto_programt::targetst &rx_prime=dm.Rx_prime;
-    if (!rx.empty() && !rx_prime.empty())
+    if(!rx.empty() && !rx_prime.empty())
     {
       const goto_programt::targett rx_prog=*rx.rbegin();
       pos=add_inv_prog(prog, pos, max_sol_sz, rx_prog);
@@ -51,7 +51,7 @@ public:
       execute_inv_prog(st, gf, max_sol_sz, *rx_prime.rbegin(), rx_prog_name);
     }
     const goto_programt::targetst &sx=dm.Sx;
-    if (!sx.empty()) pos=add_inv_prog(prog, pos, max_sol_sz, *sx.rbegin());
+    if(!sx.empty()) pos=add_inv_prog(prog, pos, max_sol_sz, *sx.rbegin());
   }
 };
 }
@@ -59,7 +59,7 @@ public:
 void danger_add_programs_to_learn(danger_programt &prog, const size_t max_sz)
 {
   const danger_programt::loopst &loops=prog.loops;
-  if (loops.empty()) return;
+  if(loops.empty()) return;
   const goto_programt::targett pos=add_invariant_progs_to_learn(prog, max_sz);
   const declare_danger_programst declare_danger_progs(prog, max_sz, pos);
   std::for_each(loops.begin(), loops.end(), declare_danger_progs);

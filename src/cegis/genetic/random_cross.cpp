@@ -28,10 +28,10 @@ namespace
 void fix_result_ops(random_crosst::programt::value_type &instr,
     const size_t org_index, const size_t new_index, const size_t num_vars)
 {
-  for (random_crosst::programt::value_type::opt &op : instr.ops)
+  for(random_crosst::programt::value_type::opt &op : instr.ops)
   {
-    if (op < num_vars) continue;
-    if (org_index > new_index) op-=(org_index - new_index);
+    if(op < num_vars) continue;
+    if(org_index > new_index) op-=(org_index - new_index);
     else op+=(new_index - org_index);
     op%=(num_vars + new_index);
   }
@@ -69,7 +69,7 @@ void random_crosst::operator ()(const individualst &parents,
   const size_t max_prog_sz=random.get_max_prog_size(target_prog_index);
   const size_t f_sz=f_prog.size();
   const size_t m_sz=m_prog.size();
-  if (f_sz < min_prog_sz || m_sz < min_prog_sz) return;
+  if(f_sz < min_prog_sz || m_sz < min_prog_sz) return;
   const size_t all_instrs=f_sz + m_sz;
   const size_t child_max=std::min(max_prog_sz, all_instrs - min_prog_sz);
   const size_t father_offset=random.rand() % (f_sz + 1);
@@ -88,8 +88,8 @@ void random_crosst::operator ()(const individualst &parents,
   std::copy(f_prog.begin(), f_prog.begin() + father_offset, s_prog.begin());
   std::copy(m_prog.begin(), m_prog.begin() + mother_offset, d_prog.begin());
   const size_t num_vars=random.get_num_vars();
-  for (size_t f=father_offset, m=mother_offset; m < m_sz; ++f, ++m)
+  for(size_t f=father_offset, m=mother_offset; m < m_sz; ++f, ++m)
     fix_result_ops(s_prog[f]=m_prog[m], m, f, num_vars);
-  for (size_t m=mother_offset, f=father_offset; f < f_sz; ++m, ++f)
+  for(size_t m=mother_offset, f=father_offset; f < f_sz; ++m, ++f)
     fix_result_ops(d_prog[m]=f_prog[f], f, m, num_vars);
 }

@@ -12,6 +12,7 @@ Date: May 2016
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
+#include <util/cmdline.h>
 
 class coverage_goalst
 {
@@ -63,5 +64,11 @@ void instrument_cover_goals(
   const coverage_goalst &goals,
   bool function_only=false,
   bool ignore_trivial=false);
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &msgh);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H

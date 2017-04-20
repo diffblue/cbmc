@@ -20,7 +20,7 @@ namespace
 {
 void print(messaget::mstreamt &os, const pred_op_idst &op_ids)
 {
-  for (const pred_op_idst::value_type &op : op_ids)
+  for(const pred_op_idst::value_type &op : op_ids)
   {
     os << "      <op><id>" << op.first << "</id>";
     const irep_idt &id=op.second.get_identifier();
@@ -35,7 +35,7 @@ void print_consts(messaget::mstreamt &os, const jsa_programt &prog)
   const std::vector<constant_exprt> values(collect_integer_literals(st, gf));
   os << "  <consts>" << messaget::endl;
   size_t index=0;
-  for (const constant_exprt &expr : values)
+  for(const constant_exprt &expr : values)
   {
     mp_integer literal;
     to_integer(expr, literal);
@@ -51,7 +51,7 @@ void print_instructions(messaget::mstreamt &os, const jsa_programt &program,
 {
   const goto_programt &prog=get_entry_body(program.gf);
   const namespacet ns(program.st);
-  for (goto_programt::const_targett it=instrs.begin(); it != instrs.end(); ++it)
+  for(goto_programt::const_targett it=instrs.begin(); it != instrs.end(); ++it)
     prog.output_instruction(ns, "", os, it);
 }
 }
@@ -60,7 +60,7 @@ void print_jsa_solution(messaget::mstreamt &os, const jsa_programt &program,
     const jsa_solutiont &solution, const pred_op_idst &op_ids,
     const pred_op_idst &const_op_ids)
 {
-  if (solution.query.empty() || program.st.symbols.empty())
+  if(solution.query.empty() || program.st.symbols.empty())
   {
     os << "<jsa_solution />" << messaget::endl << messaget::eom;
     return;
@@ -77,7 +77,7 @@ void print_jsa_solution(messaget::mstreamt &os, const jsa_programt &program,
   os << "  </variables>" << messaget::endl;
   os << "  <predicates>" << messaget::endl;
   const jsa_solutiont::predicatest &predicates=solution.predicates;
-  for (const goto_programt::instructionst &predicate : predicates)
+  for(const goto_programt::instructionst &predicate : predicates)
   {
     os << "    <predicate>" << messaget::endl;
     print_instructions(os, program, predicate);

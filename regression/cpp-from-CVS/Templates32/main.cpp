@@ -6,7 +6,7 @@ template < argt V = TWO, class T = argt >
 class A
 {
   public:
-  A():v(V){}
+  A():v(V) {}
   T v;
 };
 

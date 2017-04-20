@@ -10,6 +10,6 @@ const int a = gen();
 
 int main()
 {
-	assert(a==1);
-	assert(b==0);
+  assert(a==1);
+  assert(b==0);
 }

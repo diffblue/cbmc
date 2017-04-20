@@ -19,8 +19,8 @@ void store_skolem_choices_for_loop(invariant_programt::invariant_loopt *loop)
 {
   const danger_programt::program_ranget &range=loop->body;
   const goto_programt::targett &end=range.end;
-  for (goto_programt::targett it=range.begin; it != end; ++it)
-    if (is_nondet(it, end)) loop->skolem_choices.push_back(it);
+  for(goto_programt::targett it=range.begin; it != end; ++it)
+    if(is_nondet(it, end)) loop->skolem_choices.push_back(it);
 }
 }
 
@@ -35,8 +35,8 @@ namespace
 void store_x0_choices_for_range(invariant_programt &program,
     const goto_programt::targett &begin, const goto_programt::targett &end)
 {
-  for (goto_programt::targett it=begin; it != end; ++it)
-    if (is_nondet(it, end)) program.x0_choices.push_back(it);
+  for(goto_programt::targett it=begin; it != end; ++it)
+    if(is_nondet(it, end)) program.x0_choices.push_back(it);
 }
 }
 
@@ -46,7 +46,7 @@ void store_x0_choices(invariant_programt &program)
   goto_programt::targett end;
   const invariant_programt &prog=program;
   const invariant_programt::const_invariant_loopst loops(prog.get_loops());
-  for (const invariant_programt::const_invariant_loopst::value_type &loop : loops)
+  for(const invariant_programt::const_invariant_loopst::value_type &loop : loops)
   {
     end=loop->body.begin;
     store_x0_choices_for_range(program, begin, end);

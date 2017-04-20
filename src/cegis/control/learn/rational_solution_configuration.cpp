@@ -27,12 +27,12 @@ namespace
 {
 const struct_exprt &find_solution(const goto_tracet &trace)
 {
-  for (const goto_trace_stept &step : trace.steps)
+  for(const goto_trace_stept &step : trace.steps)
   {
     const exprt &lhs=step.full_lhs;
-    if (ID_symbol != lhs.id()) continue;
+    if(ID_symbol != lhs.id()) continue;
     const std::string &id=id2string(to_symbol_expr(lhs).get_identifier());
-    if (CEGIS_CONTROL_SOLUTION_VAR_NAME != id) continue;
+    if(CEGIS_CONTROL_SOLUTION_VAR_NAME != id) continue;
     return to_struct_expr(step.full_lhs_value);
   }
   assert(!"Control solution not found in trace.");

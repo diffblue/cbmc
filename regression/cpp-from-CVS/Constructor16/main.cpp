@@ -15,6 +15,6 @@ class B: public A
 
 int main()
 {
-  B b1,b2;
+  B b1, b2;
   b1 = b2;  // not ok
 }

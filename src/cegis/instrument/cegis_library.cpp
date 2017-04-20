@@ -58,7 +58,7 @@ code_typet cegis_execute_type()
 void add_execute_placeholder(symbol_tablet &symbol_table,
     const std::string &func_name, const code_typet &type)
 {
-  if (symbol_table.has_symbol(func_name)) return;
+  if(symbol_table.has_symbol(func_name)) return;
   symbolt symbol;
   symbol.name=func_name;
   symbol.base_name=symbol.name;

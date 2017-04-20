@@ -1,11 +1,11 @@
 struct A
 {
-	typedef int INT;
+  typedef int INT;
 };
 
 struct B: A{};
 
 int main()
 {
-	B::INT i;
+  B::INT i;
 }

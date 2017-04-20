@@ -35,7 +35,7 @@ void danger_verify_configt::process(const candidatet &candidate)
   invariant_insert_constraint(quantifiers, program, std::cref(constraint));
   danger_insert_candidate(program, candidate);
   goto_functionst &gf=program.gf;
-  if (limit_ce) restrict_bv_size(program.st, gf, max_ce_width);
+  if(limit_ce) restrict_bv_size(program.st, gf, max_ce_width);
   gf.update();
 }
 

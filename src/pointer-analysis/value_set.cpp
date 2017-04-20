@@ -796,7 +796,7 @@ void value_sett::get_value_set_rec(
       assert(suffix=="");
 
       const typet &dynamic_type=
-        static_cast<const typet &>(expr.find("#type"));
+        static_cast<const typet &>(expr.find(ID_C_cxx_alloc_type));
 
       dynamic_object_exprt dynamic_object(dynamic_type);
       dynamic_object.set_instance(location_number);

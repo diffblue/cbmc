@@ -23,7 +23,7 @@ namespace
 bool matches_opcode(const goto_programt::instructiont &instr,
     const mp_integer &opcode)
 {
-  if (!instr.is_goto() || ID_notequal != instr.guard.id()) return false;
+  if(!instr.is_goto() || ID_notequal != instr.guard.id()) return false;
   const notequal_exprt &guard=to_notequal_expr(instr.guard);
   return opcode == bv_arithmetict(guard.rhs()).to_integer();
 }
@@ -44,10 +44,10 @@ void print_instr(messaget::mstreamt &os, const namespacet &ns,
           { return matches_opcode(instr, opcode);}));
   const goto_programt::const_targett last=std::find_if(first, end,
       std::mem_fun_ref(&goto_programt::instructiont::is_goto));
-  for (; first != last; ++first)
+  for(; first != last; ++first)
     body.output_instruction(ns, func_name, oss, first);
   std::string result(oss.str());
-  for (size_t i=1; i < ops.size(); ++i)
+  for(size_t i=1; i < ops.size(); ++i)
   {
     std::string nd("*__CPROVER_cegis_variable_array_double[(program + i)->op_");
     nd+=std::to_string(i - 1);
@@ -66,7 +66,7 @@ void print_program(messaget::mstreamt &os, const namespacet &ns,
   os << "  <prog>" << messaget::endl;
   os << "    <id>" << func_name << "</id>" << messaget::endl;
   os << "    <body>" << messaget::endl;
-  for (const exprt &instr : prog.second.operands())
+  for(const exprt &instr : prog.second.operands())
     print_instr(os, ns, body, func_name, to_struct_expr(instr));
   os << "    </body>" << messaget::endl;
   os << "  </prog>" << messaget::endl;
@@ -79,7 +79,7 @@ void print_refactor_candidate(messaget::mstreamt &os, const symbol_tablet &st,
   os << "<refactor_candidate>" << messaget::endl;
   const namespacet ns(st);
   const goto_functionst::function_mapt &fmap=gf.function_map;
-  for (const refactor_solutiont::value_type &entry : candidate)
+  for(const refactor_solutiont::value_type &entry : candidate)
   {
     std::string func(id2string(entry.first));
     remove_suffix(func, CEGIS_REFACTOR_PROG_SUFFIX);

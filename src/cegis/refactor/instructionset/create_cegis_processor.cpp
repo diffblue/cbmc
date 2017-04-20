@@ -27,7 +27,7 @@ namespace
 bool is_empty(const typet &type)
 {
   const irep_idt &id=type.id();
-  if (ID_pointer == id) return is_empty(type.subtype());
+  if(ID_pointer == id) return is_empty(type.subtype());
   return ID_empty == id || id.empty();
 }
 
@@ -41,7 +41,7 @@ public:
   virtual void operator()(const exprt &expr)
   {
     const typet &type=expr.type();
-    if (ID_code != type.id() && !is_empty(type)) types.insert(expr.type());
+    if(ID_code != type.id() && !is_empty(type)) types.insert(expr.type());
   }
 };
 }
@@ -49,7 +49,7 @@ public:
 std::set<typet> collect_context_types(const goto_ranget &range)
 {
   type_collectort collector;
-  for (goto_programt::const_targett it(range.first); it != range.second; ++it)
+  for(goto_programt::const_targett it(range.first); it != range.second; ++it)
     it->code.visit(collector);
   return collector.types;
 }
@@ -62,7 +62,7 @@ void create_variable_array(symbol_tablet &st, goto_functionst &gf,
     const typet &type, const size_t size)
 {
   const std::string name(cegis_operand_array_name(st, type));
-  if (st.has_symbol(name)) return;
+  if(st.has_symbol(name)) return;
   const typet size_type(signed_int_type());
   const constant_exprt sz_expr(from_integer(size, size_type));
   const array_typet array_type(pointer_typet(type), sz_expr);
@@ -94,10 +94,10 @@ void create_variable_array(symbol_tablet &st, goto_functionst &gf,
 std::string get_next_processor_name(const symbol_tablet &st)
 {
   std::string name(CEGIS_PROCESSOR_FUNCTION_PREFIX);
-  for (size_t index=0; index < MAX_PROCESSORS; ++index)
+  for(size_t index=0; index < MAX_PROCESSORS; ++index)
   {
     name+=std::to_string(index);
-    if (!st.has_symbol(name)) return name;
+    if(!st.has_symbol(name)) return name;
     else name= CEGIS_PROCESSOR_FUNCTION_PREFIX;
   }
   assert(!"Exceeded maximum number of CEGIS processors.");
@@ -110,7 +110,7 @@ symbol_typet create_instruction_type(symbol_tablet &st,
 {
   std::string instr_type_name(func_name);
   instr_type_name+= INSTR_TYPE_SUFFIX;
-  if (st.has_symbol(instr_type_name)) return symbol_typet(instr_type_name);
+  if(st.has_symbol(instr_type_name)) return symbol_typet(instr_type_name);
   struct_typet type;
   std::string tag(TAG_PREFIX);
   tag+=instr_type_name;
@@ -121,7 +121,7 @@ symbol_typet create_instruction_type(symbol_tablet &st,
   comps.push_back(struct_typet::componentt(member_name, opcode_type));
   const size_t max_operands=cegis_max_operands(variable_slots_per_context_type);
   const typet op_type(cegis_operand_type());
-  for (size_t i=0; i < max_operands; ++i)
+  for(size_t i=0; i < max_operands; ++i)
   {
     struct_union_typet::componentt comp(cegis_operand_base_name(i), op_type);
     comps.push_back(comp);
@@ -178,7 +178,7 @@ void add_param(symbol_tablet &st, const std::string &func,
 void add_to_symbol_table(symbol_tablet &st, const std::string &name,
     const goto_functionst::function_mapt::mapped_type &func)
 {
-  if (st.has_symbol(name)) return;
+  if(st.has_symbol(name)) return;
   symbolt new_symbol;
   new_symbol.name=name;
   new_symbol.type=func.type;
@@ -198,7 +198,7 @@ void add_to_symbol_table(symbol_tablet &st, const std::string &name,
 std::string create_cegis_processor(symbol_tablet &st, goto_functionst &gf,
     const cegis_operand_datat &slots)
 {
-  for (const std::pair<typet, size_t> &var_slot : slots)
+  for(const std::pair<typet, size_t> &var_slot : slots)
     create_variable_array(st, gf, var_slot.first, var_slot.second);
   const std::string func_name(get_next_processor_name(st));
   const symbol_typet instr_type(create_instruction_type(st, slots, func_name));

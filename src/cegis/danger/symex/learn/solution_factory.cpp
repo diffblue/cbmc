@@ -32,7 +32,7 @@ namespace
 {
 size_t create_temps(invariant_variable_namest &rnames, const size_t num_tmp)
 {
-  for (size_t i=0; i < num_tmp; ++i)
+  for(size_t i=0; i < num_tmp; ++i)
     rnames.insert(std::make_pair(i, get_cegis_meta_name(get_tmp(i))));
   return num_tmp;
 }
@@ -46,10 +46,10 @@ goto_programt::instructionst &get_prog(
     danger_goto_solutiont::danger_programst &progs, const prog_typet type,
     const size_t instr_idx)
 {
-  switch (type)
+  switch(type)
   {
   case INV:
-    if (!instr_idx) progs.push_back(danger_goto_solutiont::danger_programt());
+    if(!instr_idx) progs.push_back(danger_goto_solutiont::danger_programt());
     return progs.back().invariant;
   case SKO:
     return progs.back().skolem;
@@ -77,11 +77,11 @@ class read_instrt
   {
     insidx=0;
     rnames.clear();
-    switch (prog_type)
+    switch(prog_type)
     {
     case INV:
     {
-      if (prog_size)
+      if(prog_size)
       {
         const size_t idx=create_temps(rnames, prog_size - 1);
         const std::string result(get_cegis_meta_name(get_Rx(loop_index, 0))); // XXX: Lexicographical ranking?
@@ -95,7 +95,7 @@ class read_instrt
       const danger_programt::loopt &loop=danger_prog.loops[loop_index];
       const size_t num_skolem=loop.skolem_choices.size();
       const size_t num_temps=create_temps(rnames, prog_size - num_skolem);
-      for (size_t i=num_temps; i < prog_size; ++i)
+      for(size_t i=num_temps; i < prog_size; ++i)
       {
         const size_t sk=i - num_temps;
         const std::string name(get_cegis_meta_name(get_Sx(loop_index, sk)));
@@ -144,7 +144,7 @@ public:
     goto_programt::targett first=prog.end();
     const goto_programt::targett last=prog.end();
     copy_instructionst copy_instr;
-    for (goto_programt::const_targett it=instr.begin(); it != instr.end(); ++it)
+    for(goto_programt::const_targett it=instr.begin(); it != instr.end(); ++it)
     {
       prog.push_back(goto_programt::instructiont());
       goto_programt::targett new_instr=prog.end();
@@ -160,14 +160,14 @@ public:
     const symbol_tablet &st=danger_prog.st;
     replace_ops_in_instr(st, DANGER_EXECUTE, first, last, names, rnames, op0,
         op1, op2, insidx);
-    if (++insidx % prog_size == 0) invariant_make_presentable(prog);
+    if(++insidx % prog_size == 0) invariant_make_presentable(prog);
   }
 
   void operator()(const exprt &prog_arary_member)
   {
     const struct_exprt &instr_rep=to_struct_expr(prog_arary_member);
     operator()(to_program_individual_instruction(instr_rep));
-    if (insidx % prog_size == 0) switch_prog();
+    if(insidx % prog_size == 0) switch_prog();
   }
 
   void set_prog_size(const size_t prog_size)
@@ -190,8 +190,8 @@ public:
 
   void operator()(const goto_trace_stept &step)
   {
-    if (!is_program_individual_decl(step)) return;
-    for (const exprt &prog_array_member : step.full_lhs_value.operands())
+    if(!is_program_individual_decl(step)) return;
+    for(const exprt &prog_array_member : step.full_lhs_value.operands())
       read_instr(prog_array_member);
   }
 };
@@ -240,16 +240,16 @@ void create_danger_solution(danger_goto_solutiont &result,
   typedef program_individualt individualt;
   const individualt::programst &ind_progs=ind.programs;
   read_instrt extract(progs, prog, names, instr_set);
-  for (const individualt::programt &program : ind_progs)
+  for(const individualt::programt &program : ind_progs)
   {
     extract.set_prog_size(program.size());
-    for (const individualt::instructiont &instr : program)
+    for(const individualt::instructiont &instr : program)
       extract(instr);
   }
   danger_goto_solutiont::nondet_choicest &nondet=result.x0_choices;
   nondet.clear();
   const typet type=cegis_default_integer_type(); // XXX: Currently single data type.
-  for (const individualt::x0t::value_type &x0 : ind.x0)
+  for(const individualt::x0t::value_type &x0 : ind.x0)
     nondet.push_back(from_integer(x0, type));
 }
 
