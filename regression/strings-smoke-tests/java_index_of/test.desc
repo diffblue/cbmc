@@ -1,7 +1,8 @@
-FUTURE
+KNOWNBUG
 test_index_of.class
 --refine-strings
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+Issue: cbmc/test-gen#77

@@ -1,6 +1,6 @@
-FUTURE
+CORE
 test_equal.class
---refine-strings
+--refine-strings --string-max-length 100 --string-max-length 100
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* FAILURE$
