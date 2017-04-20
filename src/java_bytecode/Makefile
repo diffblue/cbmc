@@ -21,6 +21,7 @@ SRC = bytecode_info.cpp \
       java_root_class.cpp \
       java_types.cpp \
       java_utils.cpp \
+      java_string_library_preprocess.cpp \
       # Empty last line
 
 INCLUDES= -I ..
