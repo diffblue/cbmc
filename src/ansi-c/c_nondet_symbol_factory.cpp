@@ -61,7 +61,7 @@ static exprt c_get_nondet_bool(const typet &type)
 
 class symbol_factoryt
 {
-  std::vector<symbolt const *> &symbols_created;
+  std::vector<const symbolt *> &symbols_created;
   symbol_tablet &symbol_table;
   const source_locationt &loc;
   const bool assume_non_null;
@@ -69,7 +69,7 @@ class symbol_factoryt
 
 public:
   symbol_factoryt(
-    std::vector<symbolt const *> &_symbols_created,
+    std::vector<const symbolt *> &_symbols_created,
     symbol_tablet &_symbol_table,
     const source_locationt &loc,
     const bool _assume_non_null):
@@ -171,7 +171,7 @@ void symbol_factoryt::gen_nondet_init(
     else
     {
       // Add the following code to assignments:
-      //           IF !(NONDET(_Bool) == FALSE) THEN GOTO <label1>
+      //           IF !NONDET(_Bool) THEN GOTO <label1>
       //           <expr> = <null pointer>
       //           GOTO <label2>
       // <label1>: <expr> = &tmp$<temporary_counter>;
@@ -233,13 +233,15 @@ exprt c_nondet_symbol_factory(
   main_symbol.name=identifier;
   main_symbol.base_name=base_name;
   main_symbol.type=type;
+  main_symbol.location=loc;
+
+  symbol_exprt main_symbol_expr=main_symbol.symbol_expr();
 
   symbolt *main_symbol_ptr;
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
   assert(!moving_symbol_failed);
 
-  std::vector<symbolt const *> symbols_created;
-  symbol_exprt main_symbol_expr=(*main_symbol_ptr).symbol_expr();
+  std::vector<const symbolt *> symbols_created;
   symbols_created.push_back(main_symbol_ptr);
 
   symbol_factoryt state(
@@ -252,7 +254,7 @@ exprt c_nondet_symbol_factory(
 
   // Add the following code to init_code for each symbol that's been created:
   //   <type> <identifier>;
-  for(symbolt const *symbol_ptr : symbols_created)
+  for(const symbolt * const symbol_ptr : symbols_created)
   {
     code_declt decl(symbol_ptr->symbol_expr());
     decl.add_source_location()=loc;
