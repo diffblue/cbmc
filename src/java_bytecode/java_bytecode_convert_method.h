@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/safe_pointer.h>
 
 #include "java_bytecode_parse_tree.h"
+#include "ci_lazy_methods.h"
 
 class class_hierarchyt;
 
@@ -23,10 +24,8 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<std::vector<irep_idt> > needed_methods,
-  safe_pointer<std::set<irep_idt> > needed_classes);
+  safe_pointer<ci_lazy_methodst> lazy_methods);
 
-// Must provide both the optional parameters or neither.
 inline void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &method,
@@ -40,8 +39,7 @@ inline void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
-    safe_pointer<std::vector<irep_idt> >::create_null(),
-    safe_pointer<std::set<irep_idt> >::create_null());
+    safe_pointer<ci_lazy_methodst>::create_null());
 }
 
 void java_bytecode_convert_method_lazy(

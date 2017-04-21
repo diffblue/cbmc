@@ -412,11 +412,10 @@ Function: gather_field_types
   Inputs: `class_type`: root of class tree to search
           `ns`: global namespace
 
- Outputs: Populates `needed_classes` with all Java reference types
+ Outputs: Populates `lazy_methods` with all Java reference types
             reachable starting at `class_type`. For example if
             `class_type` is `symbol_typet("java::A")` and A has a B
-            field, then `B` (but not `A`) will be added to
-            `needed_classes`.
+            field, then `B` (but not `A`) will noted as a needed class.
 
  Purpose: See output
 
@@ -425,13 +424,13 @@ Function: gather_field_types
 static void gather_field_types(
   const typet &class_type,
   const namespacet &ns,
-  std::set<irep_idt> &needed_classes)
+  ci_lazy_methodst &lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
   for(const auto &field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, needed_classes);
+      gather_field_types(field.type(), ns, lazy_methods);
     else if(field.type().id()==ID_pointer)
     {
       // Skip array primitive pointers, for example:
@@ -439,8 +438,8 @@ static void gather_field_types(
         continue;
       const auto &field_classid=
         to_symbol_type(field.type().subtype()).get_identifier();
-      if(needed_classes.insert(field_classid).second)
-        gather_field_types(field.type().subtype(), ns, needed_classes);
+      if(lazy_methods.add_needed_class(field_classid))
+        gather_field_types(field.type().subtype(), ns, lazy_methods);
     }
   }
 }
@@ -454,7 +453,7 @@ Function: initialize_needed_classes
           `ns`: global namespace
           `ch`: global class hierarchy
 
- Outputs: Populates `needed_classes` with all Java reference types
+ Outputs: Populates `lazy_methods` with all Java reference types
             whose references may be passed, directly or indirectly,
             to any of the functions in `entry_points`.
 
@@ -466,7 +465,7 @@ static void initialize_needed_classes(
   const std::vector<irep_idt> &entry_points,
   const namespacet &ns,
   const class_hierarchyt &ch,
-  std::set<irep_idt> &needed_classes)
+  ci_lazy_methodst &lazy_methods)
 {
   for(const auto &mname : entry_points)
   {
@@ -482,8 +481,8 @@ static void initialize_needed_classes(
           ch.get_parents_trans(param_classid);
         class_and_parents.push_back(param_classid);
         for(const auto &classid : class_and_parents)
-          needed_classes.insert(classid);
-        gather_field_types(param.type().subtype(), ns, needed_classes);
+          lazy_methods.add_needed_class(classid);
+        gather_field_types(param.type().subtype(), ns, lazy_methods);
       }
     }
   }
@@ -491,9 +490,9 @@ static void initialize_needed_classes(
   // Also add classes whose instances are magically
   // created by the JVM and so won't be spotted by
   // looking for constructors and calls as usual:
-  needed_classes.insert("java::java.lang.String");
-  needed_classes.insert("java::java.lang.Class");
-  needed_classes.insert("java::java.lang.Object");
+  lazy_methods.add_needed_class("java::java.lang.String");
+  lazy_methods.add_needed_class("java::java.lang.Class");
+  lazy_methods.add_needed_class("java::java.lang.Object");
 }
 
 /*******************************************************************\
@@ -614,11 +613,23 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialize_needed_classes(
-    method_worklist2,
-    namespacet(symbol_table),
-    ch,
-    needed_classes);
+
+  {
+    std::vector<irep_idt> needed_clinits;
+    ci_lazy_methodst initial_lazy_methods(
+      needed_clinits,
+      needed_classes,
+      symbol_table);
+    initialize_needed_classes(
+      method_worklist2,
+      namespacet(symbol_table),
+      ch,
+      initial_lazy_methods);
+    method_worklist2.insert(
+      method_worklist2.end(),
+      needed_clinits.begin(),
+      needed_clinits.end());
+  }
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt *> virtual_callsites;
@@ -642,16 +653,18 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
         const auto &parsed_method=findit->second;
+        // Note this wraps *references* to method_worklist2, needed_classes:
+        ci_lazy_methodst lazy_methods(
+          method_worklist2,
+          needed_classes,
+          symbol_table);
         java_bytecode_convert_method(
           *parsed_method.first,
           *parsed_method.second,
           symbol_table,
           get_message_handler(),
           max_user_array_length,
-          safe_pointer<std::vector<irep_idt> >::create_non_null(
-            &method_worklist2),
-          safe_pointer<std::set<irep_idt> >::create_non_null(
-            &needed_classes));
+          safe_pointer<ci_lazy_methodst>::create_non_null(&lazy_methods));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
           virtual_callsites);
