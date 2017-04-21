@@ -118,34 +118,65 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
 
 /*******************************************************************\
 
-Function: constant_pointer_abstract_objectt::merge_state
+Function: constant_pointer_abstract_objectt::merge
 
   Inputs:
-   op1 - the first pointer abstract object
-   op2 - the second pointer abstract object
+   other - the pointer being merged
 
- Outputs: Returns true if this changed from op1
+ Outputs: Returns true if this changed from this
 
- Purpose: Set this abstract object to be the result of merging two
-          other abstract objects. This handles the case where if they are
-          both pointing to the same object we keep the value.
+ Purpose: Set this abstract object to be the result of merging this
+          abstract object. This calls the merge_constant_pointers if
+          we are trying to merge a constant pointer we use the constant pointer
+          constant pointer merge
 
 \*******************************************************************/
 
-bool constant_pointer_abstract_objectt::merge_state(
-  const constant_pointer_abstract_pointert op1,
-  const constant_pointer_abstract_pointert op2)
+bool constant_pointer_abstract_objectt::merge(abstract_object_pointert other)
 {
-  bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
+  auto cast_other=
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
+  if(cast_other)
+  {
+    return merge_constant_pointers(cast_other);
+  }
+  else
+  {
+    value=nil_exprt();
+    return pointer_abstract_objectt::merge(other);
+  }
+}
+
+/*******************************************************************\
+
+Function: constant_pointer_abstract_objectt::merge_constant_pointers
+
+  Inputs:
+   other - the pointer being merged
+
+ Outputs: Returns true if this changed from this
+
+ Purpose: Merges two constant pointers. If they are pointing at the same
+          value, we merge, otherwise we set to top.
+
+\*******************************************************************/
+
+bool constant_pointer_abstract_objectt::merge_constant_pointers(
+  const constant_pointer_abstract_pointert other)
+{
+  auto old=
+    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(clone());
+
+  bool parent_merge_change=abstract_objectt::merge(other);
   if(is_top() || is_bottom())
   {
+    value=nil_exprt();
     return parent_merge_change;
   }
   else
   {
-    if(op1->value==op2->value)
+    if(old->value==other->value)
     {
-      value=op1->value;
       return false;
     }
     else
@@ -153,7 +184,7 @@ bool constant_pointer_abstract_objectt::merge_state(
       make_top();
       value=nil_exprt();
       assert(!is_bottom());
-      return !op1->is_top();
+      return !old->is_top();
     }
   }
 }
@@ -348,7 +379,7 @@ sharing_ptrt<pointer_abstract_objectt>
           environment.eval(address_expr.object(), ns);
         bool modifications;
         abstract_object_pointert merged_value=
-          pointed_value->merge(new_value, modifications);
+          abstract_objectt::merge(pointed_value, new_value, modifications);
         environment.assign(address_expr.object(), merged_value, ns);
       }
       else

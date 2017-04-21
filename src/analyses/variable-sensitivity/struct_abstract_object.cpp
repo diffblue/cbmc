@@ -155,8 +155,7 @@ sharing_ptrt<struct_abstract_objectt> struct_abstract_objectt::write_component(
 {
   if(is_top() || is_bottom())
   {
-    return sharing_ptrt<struct_abstract_objectt>(
-      dynamic_cast<struct_abstract_objectt*>(clone()));
+    return std::dynamic_pointer_cast<const struct_abstract_objectt>(clone());
   }
   else
   {

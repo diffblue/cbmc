@@ -28,9 +28,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  CLONE
-  MERGE(abstract_objectt)
-
   // pointer interface
   virtual abstract_object_pointert read_dereference(
     const abstract_environmentt &env, const namespacet &ns) const;
@@ -41,6 +38,9 @@ public:
     const std::stack<exprt> stack,
     const abstract_object_pointert value,
     bool merging_write) const;
+
+protected:
+  CLONE
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_POINTER_ABSTRACT_OBJECT_H
