@@ -261,7 +261,7 @@ sharing_ptrt<struct_abstract_objectt>
 
       bool dummy;
 
-      it->second=it->second->merge(value, dummy);
+      it->second=abstract_objectt::merge(it->second, value, dummy);
     }
     else
     {
@@ -334,51 +334,84 @@ bool full_struct_abstract_objectt::verify() const
 
 /*******************************************************************\
 
-Function: full_struct_abstract_objectt::merge_state
+Function: full_struct_abstract_objectt::merge
 
   Inputs:
+   other - the other object being merged
 
- Outputs:
+ Outputs: Returns true if this merge changes the value of this
 
- Purpose:
+ Purpose: To merge an abstract object into this abstract object. If
+          the other is also a struct, we perform a constant_structs merge
+          Otherwise we call back to the parent merge.
 
 \*******************************************************************/
 
-bool full_struct_abstract_objectt::merge_state(
-  const sharing_ptrt<full_struct_abstract_objectt> op1,
-  const sharing_ptrt<full_struct_abstract_objectt> op2)
+bool full_struct_abstract_objectt::merge(abstract_object_pointert other)
 {
-  bool changed;
+  constant_struct_pointert cast_other=
+    std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);
+  if(cast_other)
+  {
+    return merge_constant_structs(cast_other);
+  }
+  else
+  {
+    map.clear();
+    return struct_abstract_objectt::merge(other);
+  }
+}
+
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::merge_constant_structs
+
+  Inputs:
+   other - the other object being merged
+
+ Outputs: Returns true if this merge changes the value of this
+
+ Purpose: Performs an element wise merge of the map for each struct
+
+\*******************************************************************/
+
+bool full_struct_abstract_objectt::merge_constant_structs(
+  constant_struct_pointert other)
+{
+  auto old=
+    std::dynamic_pointer_cast<const full_struct_abstract_objectt>(clone());
 
   // consider top and bottom in parent
-  changed=abstract_objectt::merge_state(op1, op2);
+  bool parent_merge_change=abstract_objectt::merge(other);
 
   if(is_top() || is_bottom())
   {
     map.clear();
     assert(verify());
-    return changed;
+    return parent_merge_change;
   }
 
-  assert(!op1->is_top() && !op2->is_top());
-  assert(!op1->is_bottom() && !op2->is_bottom());
+  assert(!old->is_top() && !other->is_top());
+  assert(!old->is_bottom() && !other->is_bottom());
 
-  if(op2->is_bottom())
+  if(other->is_bottom())
   {
     assert(verify());
     return false;
   }
 
-  if(op1->is_bottom())
+  if(old->is_bottom())
   {
-    map=op2->map;
+    map=other->map;
     assert(verify());
     return true;
   }
 
 
   // at this point both are different from top and bottom
-  return abstract_objectt::merge_maps<irep_idt>(op1->map, op2->map, map);
+  bool merge_result=
+    abstract_objectt::merge_maps<irep_idt>(old->map, other->map, map);
 
   assert(verify());
+  return merge_result;
 }

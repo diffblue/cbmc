@@ -26,9 +26,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  CLONE
-  MERGE(abstract_objectt)
-
   // struct interface
   virtual abstract_object_pointert read_component(
     const abstract_environmentt &environment,
@@ -42,6 +39,9 @@ public:
     const member_exprt &member_expr,
     const abstract_object_pointert value,
     bool merging_write) const;
+
+protected:
+  CLONE
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_STRUCT_ABSTRACT_OBJECT_H

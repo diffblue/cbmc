@@ -115,13 +115,12 @@ const typet &abstract_objectt::type() const
 
 /*******************************************************************\
 
-Function: abstract_objectt::merge_state
+Function: abstract_objectt::merge
 
   Inputs:
-   op1 - the first abstract object
-   op2 - the second abstract object
+   other - The object to merge with this
 
- Outputs:
+ Outputs: Returns true if the merge changed this value
 
  Purpose: Set this abstract object to be the result of merging two
           other abstract objects. This is the worst case - we can
@@ -129,39 +128,16 @@ Function: abstract_objectt::merge_state
 
 \*******************************************************************/
 
-bool abstract_objectt::merge_state(
-  const abstract_object_pointert op1, const abstract_object_pointert op2)
+bool abstract_objectt::merge(abstract_object_pointert other)
 {
-  top=op1->top || op2->top;
-  bottom=op1->bottom && op2->bottom;
+  abstract_object_pointert old=clone();
+  top= old->top || other->top;
+  bottom=old->bottom && other->bottom;
 
   assert(!(top && bottom));
-  return top!=op1->top || bottom!=op1->bottom;
+  return top!=old->top || bottom!=old->bottom;
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::merge
-
-  Inputs:
-   op - the abstract object to merge with
-
- Outputs:
-
- Purpose: Set this abstract object to be the result of merging this
-          abstract object and the provided one. See merge_state.
-
-\*******************************************************************/
-
-abstract_object_pointert abstract_objectt::merge(
-  const abstract_object_pointert op, bool &out_any_modifications) const
-{
-  assert(t==op->t);
-  internal_abstract_object_pointert m=
-    internal_abstract_object_pointert(new abstract_objectt(*this));
-  out_any_modifications=m->merge_state(abstract_object_pointert(this), op);
-  return m;
-}
 
 /*******************************************************************\
 
@@ -298,3 +274,34 @@ void abstract_objectt::output(
     out << "Unknown";
   }
 }
+
+/*******************************************************************\
+
+Function: abstract_objectt::merge
+
+  Inputs:
+   op1 - the first abstract object to merge, this object determines
+         the sensitivity of the output and is the object compared against
+         to choose whether this merge changed anything
+   op2 - the second abstract object to merge
+
+ Outputs: The merged abstract object with the same sensitivity as the
+          first parameter. out_modifications will be true if the resulting
+          abstract object is different from op1
+
+ Purpose: Clones the first parameter and merges it with the second.
+
+
+\*******************************************************************/
+
+abstract_object_pointert abstract_objectt::merge(
+  abstract_object_pointert op1,
+  abstract_object_pointert op2,
+  bool &out_modifications)
+{
+  internal_abstract_object_pointert result(op1->mutable_clone());
+  out_modifications=result->merge(op2);
+  return result;
+}
+
+

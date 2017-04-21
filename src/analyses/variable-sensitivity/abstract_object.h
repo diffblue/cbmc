@@ -39,44 +39,13 @@ class namespacet;
 
 
 #define CLONE \
-  virtual abstract_objectt* clone() const override \
+  virtual internal_abstract_object_pointert mutable_clone() const override \
   { \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
       >::type current_typet; \
-    return new current_typet(*this); \
+    return internal_abstract_object_pointert(new current_typet(*this)); \
   } \
 
-#define MERGE(parent_typet) \
-  virtual abstract_object_pointert merge( \
-    const abstract_object_pointert op, \
-    bool &out_any_modifications) const override \
-  {\
-    assert(type()==op->type()); \
-    typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
-      >::type current_typet; \
-    \
-    /*Check the supplied parent type is indeed a parent*/ \
-    static_assert(std::is_base_of<parent_typet, current_typet>::value, \
-      "parent_typet in MERGE must be parent class of the current type"); \
-    \
-    typedef sharing_ptrt<current_typet> current_type_ptrt; \
-    typedef internal_sharing_ptrt<current_typet> this_ptrt; \
-    /* Cast the supplied type to the current type to */ \
-    /* facilitate double dispatch*/ \
-    current_type_ptrt n=std::dynamic_pointer_cast<current_typet const>(op); \
-    this_ptrt m=this_ptrt(new current_typet(*this)); \
-    if(n!= NULL) \
-    { \
-      out_any_modifications= \
-        m->merge_state(current_type_ptrt(new current_typet(*this)), n); \
-      return m; \
-    } \
-    else \
-    { \
-      return parent_typet::merge( \
-        abstract_object_pointert(op), out_any_modifications); \
-    } \
-  } \
 
 /* Merge is designed to allow different abstractions to be merged
  * gracefully.  There are two real use-cases for this:
@@ -91,9 +60,9 @@ class namespacet;
  *         a[i] = v
  *     will cause this to happen.
  *
- * To handle this, merge finds the most specific class that is a
- * parent to both classes and generates a new object of that type.
- * The actual state is then merged by merge_state.
+ * To handle this, merge is dispatched to the first abstract object being
+ * merged, which switches based on the type of the other object. If it can
+ * merge then it merges, otherwise it calls the parent merge.
  */
 
 template<class T>
@@ -116,12 +85,6 @@ public:
   virtual bool is_top() const;
   virtual bool is_bottom() const;
 
-  // This is both the interface and the base case of the recursion
-  // It uses merge state to produce a new object of the most
-  // specific common parent type and is thus copy-on-write safe.
-  virtual abstract_object_pointert merge(
-    const abstract_object_pointert op, bool &out_any_modifications) const;
-
   // Interface for transforms
   abstract_object_pointert expression_transform(
     const exprt &expr,
@@ -133,13 +96,15 @@ public:
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
-  // Macro is not used as this does not override
-  virtual abstract_objectt* clone() const
+  abstract_object_pointert clone() const
   {
-    typedef std::remove_const<std::remove_reference<decltype(*this)>::type
-      >::type current_typet;
-    return new current_typet(*this);
+    return mutable_clone();
   }
+
+  static abstract_object_pointert merge(
+    abstract_object_pointert op1,
+    abstract_object_pointert op2,
+    bool &out_modifications);
 
 private:
   // To enforce copy-on-write these are private and have read-only accessors
@@ -152,14 +117,19 @@ protected:
   typedef internal_sharing_ptrt<class abstract_objectt>
     internal_abstract_object_pointert;
 
+  // Macro is not used as this does not override
+  virtual internal_abstract_object_pointert mutable_clone() const
+  {
+    return internal_abstract_object_pointert(new abstract_objectt(*this));
+  }
+
   bool top;
 
-  // The one exception is merge_state in descendent classes, which needs this
+  // The one exception is merge in descendent classes, which needs this
   void make_top() { top=true; }
 
   // Sets the state of this object
-  bool merge_state(
-    const abstract_object_pointert op1, const abstract_object_pointert op2);
+  virtual bool merge(abstract_object_pointert other);
 
   template<class keyt>
   static bool merge_maps(
@@ -215,7 +185,7 @@ bool abstract_objectt::merge_maps(
       bool changes=false;
       abstract_object_pointert v_new;
 
-      v_new=v1->merge(v2, changes);
+      v_new=abstract_objectt::merge(v1, v2, changes);
 
       modified|=changes;
 

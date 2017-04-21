@@ -33,9 +33,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  CLONE
-  MERGE(pointer_abstract_objectt)
-
   exprt to_constant() const override;
   void output(
     std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
@@ -51,11 +48,13 @@ public:
     bool merging_write) const override;
 
 protected:
-  bool merge_state(
-    const constant_pointer_abstract_pointert op1,
-    const constant_pointer_abstract_pointert op2);
+  virtual bool merge(abstract_object_pointert op1) override;
+
+  CLONE
 
 private:
+  bool merge_constant_pointers(const constant_pointer_abstract_pointert other);
+
   exprt value;
 };
 

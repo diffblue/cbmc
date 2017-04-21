@@ -31,8 +31,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  CLONE
-  MERGE(struct_abstract_objectt)
 
   // struct interface
   virtual abstract_object_pointert read_component(
@@ -58,13 +56,17 @@ private:
   typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
   struct_mapt map;
 
+  typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
+
+  bool merge_constant_structs(constant_struct_pointert other);
+
 protected:
+  CLONE
+
   bool verify() const;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
-  bool merge_state(
-    const sharing_ptrt<full_struct_abstract_objectt> op1,
-    const sharing_ptrt<full_struct_abstract_objectt> op2);
+  virtual bool merge(abstract_object_pointert other) override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
