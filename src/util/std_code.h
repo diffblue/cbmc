@@ -78,6 +78,11 @@ public:
       o.push_back(*it);
   }
 
+  void move(codet &code)
+  {
+    move_to_operands(code);
+  }
+
   void add(const codet &code)
   {
     copy_to_operands(code);
