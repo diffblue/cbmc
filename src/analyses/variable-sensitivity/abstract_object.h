@@ -75,7 +75,6 @@ class abstract_objectt
 public:
   explicit abstract_objectt(const typet &type);
   abstract_objectt(const typet &type, bool top, bool bottom);
-  abstract_objectt(const abstract_objectt &old);
   abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,
