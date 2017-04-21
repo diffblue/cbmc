@@ -22,8 +22,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+protected:
   CLONE
-  MERGE(abstract_objectt)
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ABSTRACT_VALUE_H

@@ -27,9 +27,6 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
-  CLONE
-  MERGE(abstract_objectt)
-
   virtual abstract_object_pointert read_index(
     const abstract_environmentt &env,
     const index_exprt &index,
@@ -42,6 +39,9 @@ public:
     const index_exprt &index_expr,
     const abstract_object_pointert value,
     bool merging_write) const;
+
+protected:
+  CLONE
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_ARRAY_ABSTRACT_OBJECT_H

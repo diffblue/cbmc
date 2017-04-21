@@ -106,24 +106,53 @@ constant_array_abstract_objectt::constant_array_abstract_objectt(
 
 /*******************************************************************\
 
-Function: constant_array_abstract_objectt::merge_state
+Function: constant_array_abstract_objectt::merge
 
   Inputs:
-   op1 - The first array to merge
-   op2 - The second to merge
+   other - The object to merge in
 
- Outputs: Returns true if the resulting abstract object is different to op1
+ Outputs: Returns true if this merge changes this
 
- Purpose: To modify this to be a merged version of op1 and op2, returning
-          true if the result is different to op1
+ Purpose: Tries to do an array/array merge if merging with a constant array
+          If it can't, falls back to parent merge
 
 \*******************************************************************/
 
-bool constant_array_abstract_objectt::merge_state(
-  const constant_array_abstract_object_pointert op1,
-  const constant_array_abstract_object_pointert op2)
+bool constant_array_abstract_objectt::merge(
+  abstract_object_pointert other)
 {
-  bool parent_merge_change=array_abstract_objectt::merge_state(op1, op2);
+  auto cast_other=
+    std::dynamic_pointer_cast<const constant_array_abstract_objectt>(other);
+  if(cast_other)
+  {
+    return constant_array_merge(cast_other);
+  }
+  else
+  {
+    map.clear();
+    return array_abstract_objectt::merge(other);
+  }
+}
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::constant_array_merge
+
+  Inputs:
+   other - The object to merge in
+
+ Outputs: Returns true if this merge changes this
+
+ Purpose: Merges an array into this array
+
+\*******************************************************************/
+
+bool constant_array_abstract_objectt::constant_array_merge(
+  const constant_array_abstract_object_pointert other)
+{
+  constant_array_abstract_object_pointert old=
+    std::dynamic_pointer_cast<const constant_array_abstract_objectt>(clone());
+  bool parent_merge_change=array_abstract_objectt::merge(other);
   if(is_top() || is_bottom())
   {
     map.clear();
@@ -131,21 +160,21 @@ bool constant_array_abstract_objectt::merge_state(
   }
   else
   {
-    if(op1->is_bottom())
+    if(old->is_bottom())
     {
-      map=op2->map;
+      map=other->map;
       return true;
     }
-    if(op2->is_bottom())
+    if(other->is_bottom())
     {
       return false;
     }
 
     // Both not top or bottom
-    assert(!op1->is_top() && !op2->is_top());
-    assert(!op1->is_bottom() && !op2->is_bottom());
+    assert(!old->is_top() && !other->is_top());
+    assert(!old->is_bottom() && !other->is_bottom());
 
-    return abstract_objectt::merge_maps<mp_integer>(op1->map, op2->map, map);
+    return abstract_objectt::merge_maps<mp_integer>(old->map, other->map, map);
   }
 }
 

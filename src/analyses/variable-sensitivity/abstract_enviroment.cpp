@@ -564,8 +564,11 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       if(map.find(entry.first)!=map.end())
       {
         bool object_modified=false;
-        abstract_object_pointert new_object=map[entry.first]->merge(
-          entry.second, object_modified);
+        abstract_object_pointert new_object=
+          abstract_objectt::merge(
+            map[entry.first],
+            entry.second,
+            object_modified);
 
         modified|=object_modified;
         map[entry.first]=new_object;

@@ -154,8 +154,7 @@ sharing_ptrt<pointer_abstract_objectt>
   if(is_top() || is_bottom())
   {
     environment.havoc("Writing to a 2value pointer");
-    return sharing_ptrt<pointer_abstract_objectt>(
-      dynamic_cast<pointer_abstract_objectt*>(clone()));
+    return std::dynamic_pointer_cast<const pointer_abstract_objectt>(clone());
   }
   else
   {

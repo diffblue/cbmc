@@ -57,28 +57,71 @@ void constant_abstract_valuet::output(
   }
 }
 
-bool constant_abstract_valuet::merge_state(
-  constant_abstract_value_pointert op1,
-  constant_abstract_value_pointert op2)
+/*******************************************************************\
+
+Function: constant_abstract_valuet::merge
+
+  Inputs:
+   other - the abstract object to merge with
+
+ Outputs: Returns true if this changes when performing this merge
+
+ Purpose: Attempts to do a constant/constant merge if both are constants,
+          otherwise falls back to the parent merge
+
+
+\*******************************************************************/
+
+bool constant_abstract_valuet::merge(abstract_object_pointert other)
 {
-  bool parent_merge_change=abstract_objectt::merge_state(op1, op2);
+  constant_abstract_value_pointert cast_other=
+    std::dynamic_pointer_cast<const constant_abstract_valuet>(other);
+  if(cast_other)
+  {
+    return merge_constant_constant(cast_other);
+  }
+  else
+  {
+    value=exprt();
+    return abstract_valuet::merge(other);
+  }
+}
+
+/*******************************************************************\
+
+Function: constant_abstract_valuet::merge_constant_constant
+
+  Inputs:
+   other - the abstract object to merge with
+
+ Outputs: Returns true if this changes when performing this merge
+
+
+ Purpose: Merges another constant abstract value into this one
+
+\*******************************************************************/
+
+bool constant_abstract_valuet::merge_constant_constant(
+  constant_abstract_value_pointert other)
+{
+  bool was_top=is_top();
+  bool parent_merge_change=abstract_valuet::merge(other);
+
   if(!is_top() && !is_bottom())
   {
-    if(op1->value==op2->value)
+    if(value==other->value)
     {
-      value=op1->value;
       return false;
     }
-    else // values different
+    else
     {
       make_top();
-      assert(is_bottom()==false);
-      // Clear out the expression
+      assert(!is_bottom());
       value=exprt();
-      return !op1->is_top();
+      return !was_top;
     }
   }
-  else // either top or bottom
+  else
   {
     return parent_merge_change;
   }
