@@ -1363,3 +1363,104 @@ void instrument_cover_goals(
     function_only,
     false);
 }
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &msgh)
+{
+  messaget msg(msgh);
+  std::list<std::string> criteria_strings=cmdline.get_values("cover");
+  std::set<coverage_criteriont> criteria;
+  bool keep_assertions=false;
+
+  for(const auto &criterion_string : criteria_strings)
+  {
+    coverage_criteriont c;
+
+    if(criterion_string=="assertion" || criterion_string=="assertions")
+    {
+      keep_assertions=true;
+      c=coverage_criteriont::ASSERTION;
+    }
+    else if(criterion_string=="path" || criterion_string=="paths")
+      c=coverage_criteriont::PATH;
+    else if(criterion_string=="branch" || criterion_string=="branches")
+      c=coverage_criteriont::BRANCH;
+    else if(criterion_string=="location" || criterion_string=="locations")
+      c=coverage_criteriont::LOCATION;
+    else if(criterion_string=="decision" || criterion_string=="decisions")
+      c=coverage_criteriont::DECISION;
+    else if(criterion_string=="condition" || criterion_string=="conditions")
+      c=coverage_criteriont::CONDITION;
+    else if(criterion_string=="mcdc")
+      c=coverage_criteriont::MCDC;
+    else if(criterion_string=="cover")
+      c=coverage_criteriont::COVER;
+    else
+    {
+      msg.error() << "unknown coverage criterion "
+                  << '\'' << criterion_string << '\''
+                  << messaget::eom;
+      return true;
+    }
+
+    criteria.insert(c);
+  }
+
+  if(keep_assertions && criteria_strings.size()>1)
+  {
+    msg.error() << "assertion coverage cannot currently be used together with "
+                << "other coverage criteria" << messaget::eom;
+    return true;
+  }
+
+  msg.status() << "Rewriting existing assertions as assumptions"
+               << messaget::eom;
+
+  if(!keep_assertions)
+  {
+    // turn assertions (from generic checks) into assumptions
+    Forall_goto_functions(f_it, goto_functions)
+    {
+      goto_programt &body=f_it->second.body;
+      Forall_goto_program_instructions(i_it, body)
+      {
+        if(i_it->is_assert())
+          i_it->type=goto_program_instruction_typet::ASSUME;
+      }
+    }
+  }
+
+  // check existing test goals
+  coverage_goalst existing_goals;
+  if(cmdline.isset("existing-coverage"))
+  {
+    msg.status() << "Check existing coverage goals" << messaget::eom;
+    // get file with covered test goals
+    const std::string coverage=cmdline.get_value("existing-coverage");
+    // get a coverage_goalst object
+    if(coverage_goalst::get_coverage_goals(coverage, msgh, existing_goals))
+    {
+      msg.error() << "get_coverage_goals failed" << messaget::eom;
+      return true;
+    }
+  }
+
+  msg.status() << "Instrumenting coverage goals" << messaget::eom;
+
+  for(const auto &criterion : criteria)
+  {
+    instrument_cover_goals(
+      symbol_table,
+      goto_functions,
+      criterion,
+      existing_goals,
+      cmdline.isset("cover-function-only"),
+      cmdline.isset("no-trivial-tests"));
+  }
+
+  goto_functions.update();
+  return false;
+}
