@@ -83,6 +83,26 @@ void remove_exceptionst::add_exceptional_returns(
   if(goto_program.empty())
     return;
 
+  // the entry function has already been added to the symbol table
+  // if you find it, initialise it
+  if(symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
+  {
+    const symbolt &symbol=
+      symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    symbol_exprt lhs_expr_null=symbol.symbol_expr();
+    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    goto_programt::targett t_null=
+      goto_program.insert_before(goto_program.instructions.begin());
+    t_null->make_assignment();
+    t_null->source_location=
+      goto_program.instructions.begin()->source_location;
+    t_null->code=code_assignt(
+      lhs_expr_null,
+      rhs_expr_null);
+    t_null->function=function_id;
+    return;
+  }
+
   // We generate an exceptional return value for any function that has
   // a throw or a function call. This can be improved by only considering
   // function calls that may escape exceptions. However, this will
