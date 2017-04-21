@@ -70,4 +70,10 @@ void instrument_cover_goals(
   bool function_only=false,
   bool ignore_trivial=false);
 
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &msgh);
+
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H
