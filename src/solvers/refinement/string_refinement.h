@@ -90,6 +90,11 @@ private:
   // by the solver
   replace_mapt current_model;
 
+  // Length of char arrays found during concretization
+  std::map<exprt, exprt> found_length;
+  // Content of char arrays found during concretization
+  std::map<exprt, array_exprt> found_content;
+
   void add_equivalence(const irep_idt & lhs, const exprt & rhs);
 
   void display_index_set();
@@ -142,9 +147,6 @@ private:
   void concretize_string(const exprt &expr);
   void concretize_results();
   void concretize_lengths();
-
-  // Length of char arrays found during concretization
-  std::map<exprt, exprt> found_length;
 
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;
