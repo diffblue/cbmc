@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/string_refine_preprocess.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
@@ -821,14 +820,6 @@ bool cbmc_parse_optionst::process_goto_program(
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
-
-
-    if(cmdline.isset("refine-strings"))
-    {
-      status() << "Preprocessing for string refinement" << eom;
-      string_refine_preprocesst(
-        symbol_table, goto_functions, ui_message_handler);
-    }
 
     // remove returns, gcc vectors, complex
     remove_returns(symbol_table, goto_functions);
