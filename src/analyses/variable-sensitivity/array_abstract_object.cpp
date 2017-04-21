@@ -160,8 +160,7 @@ sharing_ptrt<array_abstract_objectt> array_abstract_objectt::write_index(
   // havoc and the default should derive from this.
   if(is_top() || is_bottom())
   {
-    return sharing_ptrt<array_abstract_objectt>(
-      dynamic_cast<array_abstract_objectt*>(clone()));
+    return std::dynamic_pointer_cast<const array_abstract_objectt>(clone());
   }
   else
   {
