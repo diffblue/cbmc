@@ -1541,7 +1541,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
   map.insert(p);
 
   goto_functionst this_interleaving;
-  this_interleaving.function_map=map;
+  this_interleaving.function_map=std::move(map);
   optionst no_option;
   null_message_handlert no_message;
 

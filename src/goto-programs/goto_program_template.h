@@ -60,24 +60,13 @@ public:
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  goto_program_templatet(const goto_program_templatet &src)
-  {
-    // DO NOT COPY ME! I HAVE POINTERS IN ME!
-    assert(src.instructions.empty());
-  }
+  goto_program_templatet(const goto_program_templatet &src)=delete;
 
   /*! \brief assignment operator
       \param[in] src an empty goto program
       \remark Use copy_from to copy non-empty goto-programs
   */
-  goto_program_templatet &operator=(const goto_program_templatet &src)
-  {
-    // DO NOT COPY ME! I HAVE POINTERS IN ME!
-    assert(src.instructions.empty());
-    instructions.clear();
-    update();
-    return *this;
-  }
+  goto_program_templatet &operator=(const goto_program_templatet &src)=delete;
 
   /*! \brief Container for an instruction of the goto-program
   */
@@ -193,11 +182,7 @@ public:
     bool is_end_function () const { return type==END_FUNCTION;  }
 
     instructiont():
-      source_location(static_cast<const source_locationt &>(get_nil_irep())),
-      type(NO_INSTRUCTION_TYPE),
-      guard(true_exprt()),
-      location_number(0),
-      target_number(nil_target)
+      instructiont(NO_INSTRUCTION_TYPE) // NOLINT(runtime/explicit)
     {
     }
 
@@ -206,6 +191,7 @@ public:
       type(_type),
       guard(true_exprt()),
       location_number(0),
+      loop_number(0),
       target_number(nil_target)
     {
     }
@@ -213,12 +199,13 @@ public:
     //! swap two instructions
     void swap(instructiont &instruction)
     {
-      instruction.code.swap(code);
-      instruction.source_location.swap(source_location);
-      std::swap(instruction.type, type);
-      instruction.guard.swap(guard);
-      instruction.targets.swap(targets);
-      instruction.function.swap(function);
+      using std::swap;
+      swap(instruction.code, code);
+      swap(instruction.source_location, source_location);
+      swap(instruction.type, type);
+      swap(instruction.guard, guard);
+      swap(instruction.targets, targets);
+      swap(instruction.function, function);
     }
 
     //! Uniquely identify an invalid target or location
@@ -292,7 +279,7 @@ public:
     const_targett l)
   {
     while(!l->is_end_function())
-      l++;
+      ++l;
 
     return l->function;
   }
@@ -305,13 +292,8 @@ public:
     return get_function_id(--p.instructions.end());
   }
 
-  void get_successors(
-    targett target,
-    targetst &successors);
-
-  void get_successors(
-    const_targett target,
-    const_targetst &successors) const;
+  template <typename Target>
+  std::list<Target> get_successors(Target target) const;
 
   void compute_incoming_edges();
 
@@ -319,8 +301,7 @@ public:
   void insert_before_swap(targett target)
   {
     assert(target!=instructions.end());
-    targett next=target;
-    next++;
+    const auto next=std::next(target);
     instructions.insert(next, instructiont())->swap(*target);
   }
 
@@ -342,17 +323,9 @@ public:
     if(p.instructions.empty())
       return;
     insert_before_swap(target, p.instructions.front());
-    targett next=target;
-    next++;
+    auto next=std::next(target);
     p.instructions.erase(p.instructions.begin());
     instructions.splice(next, p.instructions);
-  }
-
-  //! Insertion before the given target
-  //! \return newly inserted location
-  targett insert_before(targett target)
-  {
-    return instructions.insert(target, instructiont());
   }
 
   //! Insertion before the given target
@@ -364,11 +337,9 @@ public:
 
   //! Insertion after the given target
   //! \return newly inserted location
-  targett insert_after(targett target)
+  targett insert_after(const_targett target)
   {
-    targett t=target;
-    t++;
-    return instructions.insert(t, instructiont());
+    return instructions.insert(std::next(target), instructiont());
   }
 
   //! Appends the given program, which is destroyed
@@ -376,16 +347,6 @@ public:
   {
     instructions.splice(instructions.end(),
                         p.instructions);
-    // BUG: The iterators to p-instructions are invalidated!
-  }
-
-  //! Inserts the given program at the given location.
-  //! The program is destroyed.
-  void destructive_insert(
-    targett target,
-    goto_program_templatet<codeT, guardT> &p)
-  {
-    instructions.splice(target, p.instructions);
     // BUG: The iterators to p-instructions are invalidated!
   }
 
@@ -494,7 +455,7 @@ public:
   targett get_end_function()
   {
     assert(!instructions.empty());
-    targett end_function=--instructions.end();
+    const auto end_function=std::prev(instructions.end());
     assert(end_function->is_end_function());
     return end_function;
   }
@@ -516,99 +477,63 @@ void goto_program_templatet<codeT, guardT>::compute_loop_numbers()
 }
 
 template <class codeT, class guardT>
-void goto_program_templatet<codeT, guardT>::get_successors(
-  targett target,
-  targetst &successors)
+template <typename Target>
+std::list<Target> goto_program_templatet<codeT, guardT>::get_successors(
+  Target target) const
 {
-  successors.clear();
   if(target==instructions.end())
-    return;
+    return std::list<Target>();
 
-  targett next=target;
-  next++;
+  const auto next=std::next(target);
 
   const instructiont &i=*target;
 
   if(i.is_goto())
   {
-    for(const auto &t : i.targets)
-      successors.push_back(t);
+    std::list<Target> successors(i.targets.begin(), i.targets.end());
 
     if(!i.guard.is_true() && next!=instructions.end())
       successors.push_back(next);
+
+    return successors;
   }
-  else if(i.is_start_thread())
+
+  if(i.is_start_thread())
   {
-    for(const auto &t : i.targets)
-      successors.push_back(t);
+    std::list<Target> successors(i.targets.begin(), i.targets.end());
 
     if(next!=instructions.end())
       successors.push_back(next);
+
+    return successors;
   }
-  else if(i.is_end_thread())
+
+  if(i.is_end_thread())
   {
     // no successors
+    return std::list<Target>();
   }
-  else if(i.is_throw())
+
+  if(i.is_throw())
   {
     // the successors are non-obvious
+    return std::list<Target>();
   }
-  else if(i.is_assume())
-  {
-    if(!i.guard.is_false() && next!=instructions.end())
-      successors.push_back(next);
-  }
-  else
-  {
-    if(next!=instructions.end())
-      successors.push_back(next);
-  }
-}
 
-template <class codeT, class guardT>
-void goto_program_templatet<codeT, guardT>::get_successors(
-  const_targett target,
-  const_targetst &successors) const
-{
-  successors.clear();
-  if(target==instructions.end())
-    return;
-
-  const_targett next=target;
-  next++;
-
-  const instructiont &i=*target;
-
-  if(i.is_goto())
+  if(i.is_assume())
   {
-    for(const auto &t : i.targets)
-      successors.push_back(t);
+    return
+      !i.guard.is_false() && next!=instructions.end() ?
+      std::list<Target>{next} :
+      std::list<Target>();
+  }
 
-    if(!i.guard.is_true() && next!=instructions.end())
-      successors.push_back(next);
-  }
-  else if(i.is_start_thread())
+  if(next!=instructions.end())
   {
-    for(const auto &t : i.targets)
-      successors.push_back(t);
+    return std::list<Target>{next};
+  }
 
-    if(next!=instructions.end())
-      successors.push_back(next);
-  }
-  else if(i.is_end_thread())
-  {
-    // no successors
-  }
-  else if(i.is_assume())
-  {
-    if(!i.guard.is_false() && next!=instructions.end())
-      successors.push_back(next);
-  }
-  else
-  {
-    if(next!=instructions.end())
-      successors.push_back(next);
-  }
+  return std::list<Target>();
 }
 
 #include <langapi/language_util.h>
@@ -633,7 +558,7 @@ std::ostream &goto_program_templatet<codeT, guardT>::output(
   for(typename instructionst::const_iterator
       it=instructions.begin();
       it!=instructions.end();
-      it++)
+      ++it)
     output_instruction(ns, identifier, out, it);
 
   return out;
@@ -701,9 +626,9 @@ void goto_program_templatet<codeT, guardT>::copy_from(
   for(typename instructionst::const_iterator
       it=src.instructions.begin();
       it!=src.instructions.end();
-      it++)
+      ++it)
   {
-    targett new_instruction=add_instruction();
+    auto new_instruction=add_instruction();
     targets_mapping[it]=new_instruction;
     *new_instruction=*it;
   }
@@ -750,13 +675,9 @@ void goto_program_templatet<codeT, guardT>::compute_incoming_edges()
   for(typename instructionst::iterator
       it=instructions.begin();
       it!=instructions.end();
-      it++)
+      ++it)
   {
-    targetst successors;
-
-    get_successors(it, successors);
-
-    for(const auto &s : successors)
+    for(const auto &s : get_successors(it))
     {
       if(s!=instructions.end())
         s->incoming_edges.insert(it);
