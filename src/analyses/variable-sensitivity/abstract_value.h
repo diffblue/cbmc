@@ -16,7 +16,6 @@ class abstract_valuet:public abstract_objectt
 public:
   explicit abstract_valuet(const typet &type);
   abstract_valuet(const typet &type, bool top, bool bottom);
-  abstract_valuet(const abstract_valuet &old);
   abstract_valuet(
     const exprt &expr,
     const abstract_environmentt &environment,

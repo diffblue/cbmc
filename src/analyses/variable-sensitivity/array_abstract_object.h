@@ -21,7 +21,6 @@ class array_abstract_objectt:public abstract_objectt
 public:
   explicit array_abstract_objectt(const typet &type);
   array_abstract_objectt(const typet &type, bool top, bool bottom);
-  explicit array_abstract_objectt(const array_abstract_objectt &old);
   explicit array_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,

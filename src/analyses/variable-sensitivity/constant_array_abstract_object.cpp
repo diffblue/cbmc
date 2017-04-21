@@ -56,26 +56,6 @@ array_abstract_objectt(type, top, bottom)
 Function: constant_array_abstract_objectt::constant_array_abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-constant_array_abstract_objectt::constant_array_abstract_objectt(
-  const constant_array_abstract_objectt &old):
-    array_abstract_objectt(old)
-{
-  map=old.map;
-}
-
-/*******************************************************************\
-
-Function: constant_array_abstract_objectt::constant_array_abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
    environment - the environment the abstract object is being created in
    ns - the namespace

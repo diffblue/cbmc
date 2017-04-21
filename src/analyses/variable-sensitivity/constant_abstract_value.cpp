@@ -21,11 +21,6 @@ constant_abstract_valuet::constant_abstract_valuet(typet t, bool tp, bool bttm):
 {}
 
 constant_abstract_valuet::constant_abstract_valuet(
-  const constant_abstract_valuet &old):
-    abstract_valuet(old), value(old.value)
-{}
-
-constant_abstract_valuet::constant_abstract_valuet(
   const exprt e,
   const abstract_environmentt &environment,
   const namespacet &ns):

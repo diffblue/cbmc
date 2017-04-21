@@ -62,23 +62,6 @@ abstract_objectt::abstract_objectt(const typet &type, bool top, bool bottom):
 Function: abstract_objectt::abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-abstract_objectt::abstract_objectt(const abstract_objectt &old):
-  t(old.t), bottom(old.bottom), top(old.top)
-{}
-
-/*******************************************************************\
-
-Function: abstract_objectt::abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
    environment - The environment this abstract object is being created in
    ns - the namespace
