@@ -1769,10 +1769,33 @@ bool instrument_cover_goals(
     }
   }
 
+  // check existing test goals
+  coverage_goalst existing_goals;
+  if(cmdline.isset("existing-coverage"))
+  {
+    msg.status() << "Check existing coverage goals" << messaget::eom;
+    // get file with covered test goals
+    const std::string coverage=cmdline.get_value("existing-coverage");
+    // get a coverage_goalst object
+    if(coverage_goalst::get_coverage_goals(coverage, msgh, existing_goals))
+    {
+      msg.error() << "get_coverage_goals failed" << messaget::eom;
+      return true;
+    }
+  }
+
   msg.status() << "Instrumenting coverage goals" << messaget::eom;
 
   for(const auto &criterion : criteria)
-    instrument_cover_goals(symbol_table, goto_functions, criterion);
+  {
+    instrument_cover_goals(
+      symbol_table,
+      goto_functions,
+      criterion,
+      existing_goals,
+      cmdline.isset("cover-function-only"),
+      cmdline.isset("no-trivial-tests"));
+  }
 
   goto_functions.update();
   return false;
