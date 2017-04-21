@@ -59,24 +59,6 @@ array_abstract_objectt::array_abstract_objectt(
 Function: array_abstract_objectt::array_abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-array_abstract_objectt::array_abstract_objectt(
-  const array_abstract_objectt &old):
-    abstract_objectt(old)
-{}
-
-/*******************************************************************\
-
-Function: array_abstract_objectt::array_abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
    environment - the environment the abstract object is being created in
    ns - the namespace

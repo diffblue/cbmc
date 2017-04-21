@@ -26,7 +26,6 @@ private:
 public:
   explicit constant_array_abstract_objectt(typet type);
   constant_array_abstract_objectt(typet type, bool top, bool bottom);
-  constant_array_abstract_objectt(const constant_array_abstract_objectt &old);
   constant_array_abstract_objectt(
     const exprt &expr,
     const abstract_environmentt &environment,

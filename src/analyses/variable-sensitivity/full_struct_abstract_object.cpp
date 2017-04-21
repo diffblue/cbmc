@@ -69,27 +69,6 @@ full_struct_abstract_objectt::full_struct_abstract_objectt(
 Function: full_struct_abstract_objectt::full_struct_abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-full_struct_abstract_objectt::full_struct_abstract_objectt(
-  const full_struct_abstract_objectt &old):
-    struct_abstract_objectt(old)
-{
-  map=old.map;
-  assert(verify());
-}
-
-/*******************************************************************\
-
-Function: full_struct_abstract_objectt::full_struct_abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an
           abstract object
 

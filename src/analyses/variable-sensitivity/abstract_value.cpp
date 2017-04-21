@@ -55,23 +55,6 @@ abstract_valuet::abstract_valuet(const typet &type, bool top, bool bottom):
 Function: abstract_valuet::abstract_valuet
 
   Inputs:
-   old - the abstract value to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-abstract_valuet::abstract_valuet(const abstract_valuet &old):
-  abstract_objectt(old)
-{}
-
-/*******************************************************************\
-
-Function: abstract_valuet::abstract_valuet
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
    environment - The environment this abstract object is being created in
    ns - the namespace
