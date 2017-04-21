@@ -61,24 +61,6 @@ struct_abstract_objectt::struct_abstract_objectt(
 Function: struct_abstract_objectt::struct_abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-struct_abstract_objectt::struct_abstract_objectt(
-  const struct_abstract_objectt &old):
-    abstract_objectt(old)
-{}
-
-/*******************************************************************\
-
-Function: struct_abstract_objectt::struct_abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
 
  Outputs:

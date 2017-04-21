@@ -60,24 +60,6 @@ pointer_abstract_objectt::pointer_abstract_objectt(
 Function: pointer_abstract_objectt::pointer_abstract_objectt
 
   Inputs:
-   old - the abstract object to copy from
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-pointer_abstract_objectt::pointer_abstract_objectt(
-  const pointer_abstract_objectt &old):
-    abstract_objectt(old)
-{}
-
-/*******************************************************************\
-
-Function: pointer_abstract_objectt::pointer_abstract_objectt
-
-  Inputs:
    expr - the expression to use as the starting pointer for an abstract object
 
  Outputs:
