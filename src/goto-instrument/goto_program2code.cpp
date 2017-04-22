@@ -1496,6 +1496,11 @@ void goto_program2codet::cleanup_code(
 
     add_local_types(code.op0().type());
 
+    const irep_idt &typedef_str=code.op0().type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      code.op0().type().remove(ID_C_typedef);
+
     return;
   }
   else if(code.get_statement()==ID_function_call)
@@ -1851,6 +1856,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     add_local_types(t);
     expr=typecast_exprt(expr, t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
@@ -1863,6 +1873,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     expr.make_typecast(t);
     add_local_types(t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_side_effect)
   {
@@ -1977,6 +1992,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     else
     {
       add_local_types(expr.type());
+
+      const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+      if(!typedef_str.empty() &&
+         typedef_names.find(typedef_str)==typedef_names.end())
+        expr.type().remove(ID_C_typedef);
 
       assert(expr.type().id()!=ID_union &&
              expr.type().id()!=ID_struct);

@@ -65,6 +65,25 @@ protected:
     declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
+  struct typedef_infot
+  {
+    irep_idt typedef_name;
+    std::string type_decl_str;
+    bool early;
+    std::unordered_set<irep_idt, irep_id_hash> dependencies;
+
+    explicit typedef_infot(const irep_idt &name):
+      typedef_name(name),
+      type_decl_str(""),
+      early(false)
+    {
+    }
+  };
+  typedef std::map<irep_idt, typedef_infot> typedef_mapt;
+  typedef_mapt typedef_map;
+  typedef std::unordered_map<typet, irep_idt, irep_hash> typedef_typest;
+  typedef_typest typedef_types;
+
   void init_system_library_map();
 
   std::string type_to_string(const typet &type);
@@ -90,6 +109,14 @@ protected:
 
     return d_str.substr(0, d_str.size()-1);
   }
+
+  void collect_typedefs(const typet &type, bool early);
+  void collect_typedefs_rec(
+    const typet &type,
+    bool early,
+    std::unordered_set<irep_idt, irep_id_hash> &dependencies);
+  void gather_global_typedefs();
+  void dump_typedefs(std::ostream &os) const;
 
   void convert_compound_declaration(
       const symbolt &symbol,

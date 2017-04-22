@@ -92,6 +92,9 @@ void dump_ct::operator()(std::ostream &os)
     symbolt &symbol=it->second;
     bool tag_added=false;
 
+    // TODO we could get rid of some of the ID_anonymous by looking up
+    // the origin symbol types in typedef_types and adjusting any other
+    // uses of ID_tag
     if((symbol.type.id()==ID_union || symbol.type.id()==ID_struct) &&
        symbol.type.get(ID_tag).empty())
     {
@@ -149,6 +152,8 @@ void dump_ct::operator()(std::ostream &os)
       assert(false);
   }
 
+  gather_global_typedefs();
+
   // collect all declarations we might need, include local static variables
   bool skip_function_main=false;
   for(std::set<std::string>::const_iterator
@@ -201,7 +206,8 @@ void dump_ct::operator()(std::ostream &os)
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    if(symbol.type.id()!=ID_code)
+    if(symbol.type.id()!=ID_code ||
+       symbol.is_type)
       continue;
 
     convert_function_declaration(
@@ -260,6 +266,8 @@ void dump_ct::operator()(std::ostream &os)
        << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))\n"
        << "#endif\n\n";
   }
+
+  dump_typedefs(os);
 
   if(!func_decl_stream.str().empty())
     os << func_decl_stream.str() << '\n';
@@ -349,6 +357,9 @@ void dump_ct::convert_compound(
   if(!converted_compound.insert(name).second)
     return;
 
+  // make sure typedef names used in the declaration are available
+  collect_typedefs(type, true);
+
   const irept &bases = type.find(ID_bases);
   std::stringstream base_decls;
   forall_irep(parent_it, bases.get_sub())
@@ -407,8 +418,13 @@ void dump_ct::convert_compound(
     while(non_array_type->id()==ID_array)
       non_array_type=&(ns.follow(non_array_type->subtype()));
 
-    if(recursive && non_array_type->id()!=ID_pointer)
-      convert_compound(comp.type(), comp.type(), recursive, os);
+    if(recursive)
+    {
+      if(non_array_type->id()!=ID_pointer)
+        convert_compound(comp.type(), comp.type(), recursive, os);
+      else
+        collect_typedefs(comp.type(), true);
+    }
 
     irep_idt comp_name=comp.get_name();
 
@@ -462,7 +478,23 @@ void dump_ct::convert_compound(
     struct_body << ";\n";
   }
 
-  os << type_to_string(unresolved);
+  typet unresolved_clean=unresolved;
+  typedef_typest::const_iterator td_entry=
+    typedef_types.find(unresolved);
+  irep_idt typedef_str;
+  if(td_entry!=typedef_types.end())
+  {
+    unresolved_clean.remove(ID_C_typedef);
+    typedef_str=td_entry->second;
+    std::pair<typedef_mapt::iterator, bool> td_map_entry=
+      typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
+    assert(!td_map_entry.second);
+    if(!td_map_entry.first->second.early)
+      td_map_entry.first->second.type_decl_str="";
+    os << "typedef ";
+  }
+
+  os << type_to_string(unresolved_clean);
   if(!base_decls.str().empty())
   {
     assert(language->id()=="cpp");
@@ -489,7 +521,9 @@ void dump_ct::convert_compound(
     os << " __attribute__ ((__transparent_union__))";
   if(type.get_bool(ID_C_packed))
     os << " __attribute__ ((__packed__))";
-  os << ";\n";
+  if(!typedef_str.empty())
+    os << " " << typedef_str;
+  os << ";\n\n";
 }
 
 void dump_ct::convert_compound_enum(
@@ -797,6 +831,10 @@ void dump_ct::cleanup_decl(
 
   tmp.add_instruction(END_FUNCTION);
 
+  std::unordered_set<irep_idt, irep_id_hash> typedef_names;
+  for(const auto &td : typedef_map)
+    typedef_names.insert(td.first);
+
   code_blockt b;
   goto_program2codet p2s(
     irep_idt(),
@@ -805,11 +843,266 @@ void dump_ct::cleanup_decl(
     b,
     local_static,
     local_type_decls,
+    typedef_names,
     system_headers);
   p2s();
 
   assert(b.operands().size()==1);
   decl.swap(b.op0());
+}
+
+/*******************************************************************\
+
+Function: dump_ct::collect_typedefs
+
+Inputs:
+    type  Type to inspect for ID_C_typedef entry
+    early Set to true to enforce that typedef is dumped before any
+          function declarations or struct definitions
+
+Outputs:
+
+Purpose: Find any typedef names contained in the input type and store
+         their declaration strings in typedef_map for eventual output.
+
+\*******************************************************************/
+
+void dump_ct::collect_typedefs(const typet &type, bool early)
+{
+  std::unordered_set<irep_idt, irep_id_hash> deps;
+  collect_typedefs_rec(type, early, deps);
+}
+
+/*******************************************************************\
+
+Function: dump_ct::collect_typedefs_rec
+
+Inputs:
+    type  Type to inspect for ID_C_typedef entry
+    early Set to true to enforce that typedef is dumped before any
+          function declarations or struct definitions
+    dependencies Typedefs used in the declaration of a given typedef
+
+Outputs:
+
+Purpose: Find any typedef names contained in the input type and store
+         their declaration strings in typedef_map for eventual output.
+
+\*******************************************************************/
+
+void dump_ct::collect_typedefs_rec(
+  const typet &type,
+  bool early,
+  std::unordered_set<irep_idt, irep_id_hash> &dependencies)
+{
+  if(ignore(type))
+    return;
+
+  std::unordered_set<irep_idt, irep_id_hash> local_deps;
+
+  if(type.id()==ID_code)
+  {
+    const code_typet &code_type=to_code_type(type);
+
+    collect_typedefs_rec(code_type.return_type(), early, local_deps);
+    for(const auto &param : code_type.parameters())
+      collect_typedefs_rec(param.type(), early, local_deps);
+  }
+  else if(type.id()==ID_pointer || type.id()==ID_array)
+  {
+    collect_typedefs_rec(type.subtype(), early, local_deps);
+  }
+  else if(type.id()==ID_symbol)
+  {
+    const symbolt &symbol=
+      ns.lookup(to_symbol_type(type).get_identifier());
+    collect_typedefs_rec(symbol.type, early, local_deps);
+  }
+
+  const irep_idt &typedef_str=type.get(ID_C_typedef);
+
+  if(!typedef_str.empty())
+  {
+    std::pair<typedef_mapt::iterator, bool> entry=
+      typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
+
+    if(entry.second ||
+       (early && entry.first->second.type_decl_str.empty()))
+    {
+      if(typedef_str=="__gnuc_va_list" || typedef_str == "va_list")
+      {
+        system_headers.insert("stdarg.h");
+        early=false;
+      }
+      else
+      {
+        typet t=type;
+        t.remove(ID_C_typedef);
+
+        std::ostringstream oss;
+        oss << "typedef " << make_decl(typedef_str, t) << ';';
+
+        entry.first->second.type_decl_str=oss.str();
+        entry.first->second.dependencies=local_deps;
+      }
+    }
+
+    if(early)
+    {
+      entry.first->second.early=true;
+
+      for(const auto &d : local_deps)
+      {
+        auto td_entry=typedef_map.find(d);
+        assert(td_entry!=typedef_map.end());
+        td_entry->second.early=true;
+      }
+    }
+
+    dependencies.insert(typedef_str);
+  }
+
+  dependencies.insert(local_deps.begin(), local_deps.end());
+}
+
+/*******************************************************************\
+
+Function: dump_ct::gather_global_typedefs
+
+Inputs:
+
+Outputs:
+
+Purpose: find all global typdefs in the symbol table and store them
+         in typedef_types
+
+\*******************************************************************/
+
+void dump_ct::gather_global_typedefs()
+{
+  // sort the symbols first to ensure deterministic replacement in
+  // typedef_types below as there could be redundant declarations
+  // typedef int x;
+  // typedef int y;
+  std::map<std::string, symbolt> symbols_sorted;
+  for(const auto &symbol_entry : copied_symbol_table.symbols)
+    symbols_sorted.insert(
+      {id2string(symbol_entry.first), symbol_entry.second});
+
+  for(const auto &symbol_entry : symbols_sorted)
+  {
+    const symbolt &symbol=symbol_entry.second;
+
+    if(symbol.is_macro && symbol.is_type && !ignore(symbol) &&
+       symbol.location.get_function().empty())
+    {
+      const irep_idt &typedef_str=symbol.type.get(ID_C_typedef);
+      assert(!typedef_str.empty());
+      typedef_types[symbol.type]=typedef_str;
+      if(ignore(symbol))
+        typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
+      else
+        collect_typedefs(symbol.type, false);
+    }
+  }
+}
+
+/*******************************************************************\
+
+Function: dump_ct::dump_typedefs
+
+Inputs:
+
+Outputs: os  output stream
+
+Purpose: print all typedefs that are not covered via
+         typedef struct xyz { ... } name;
+
+\*******************************************************************/
+
+void dump_ct::dump_typedefs(std::ostream &os) const
+{
+  // we need to compute a topological sort; we do so by picking all
+  // typedefs the dependencies of which have been emitted into to_insert
+  std::vector<typedef_infot> typedefs_sorted;
+  typedefs_sorted.reserve(typedef_map.size());
+
+  // elements in to_insert are lexicographically sorted and ready for
+  // output
+  std::map<std::string, typedef_infot> to_insert;
+
+  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
+  id_sett typedefs_done;
+  std::unordered_map<irep_idt, id_sett, irep_id_hash>
+    forward_deps, reverse_deps;
+
+  for(const auto &td : typedef_map)
+    if(!td.second.type_decl_str.empty())
+    {
+      if(td.second.dependencies.empty())
+        // those can be dumped immediately
+        to_insert.insert({id2string(td.first), td.second});
+      else
+      {
+        // delay them until dependencies are dumped
+        forward_deps.insert({td.first, td.second.dependencies});
+        for(const auto &d : td.second.dependencies)
+          reverse_deps[d].insert(td.first);
+      }
+    }
+
+  while(!to_insert.empty())
+  {
+    // the topologically next element (lexicographically ranked first
+    // among all the dependencies of which have been dumped)
+    typedef_infot t=to_insert.begin()->second;
+    to_insert.erase(to_insert.begin());
+    // move to the output queue
+    typedefs_sorted.push_back(t);
+
+    // find any depending typedefs that are now valid, or at least
+    // reduce the remaining dependencies
+    auto r_it=reverse_deps.find(t.typedef_name);
+    if(r_it==reverse_deps.end())
+      continue;
+
+    // reduce remaining dependencies
+    id_sett &r_deps=r_it->second;
+    for(id_sett::iterator it=r_deps.begin(); it!=r_deps.end(); ) // no ++it
+    {
+      auto f_it=forward_deps.find(*it);
+      if(f_it==forward_deps.end()) // might be done already
+      {
+        it=r_deps.erase(it);
+        continue;
+      }
+
+      // update dependencies
+      id_sett &f_deps=f_it->second;
+      assert(!f_deps.empty());
+      assert(f_deps.find(t.typedef_name)!=f_deps.end());
+      f_deps.erase(t.typedef_name);
+
+      if(f_deps.empty()) // all depenencies done now!
+      {
+        const auto td_entry=typedef_map.find(*it);
+        assert(td_entry!=typedef_map.end());
+        to_insert.insert({id2string(*it), td_entry->second});
+        forward_deps.erase(*it);
+        it=r_deps.erase(it);
+      }
+      else
+        ++it;
+    }
+  }
+
+  assert(forward_deps.empty());
+
+  for(const auto &td : typedefs_sorted)
+    os << td.type_decl_str << '\n';
+
+  if(!typedefs_sorted.empty())
+    os << '\n';
 }
 
 void dump_ct::convert_global_variable(
@@ -896,6 +1189,10 @@ void dump_ct::convert_function_declaration(
     code_blockt b;
     std::list<irep_idt> type_decls, local_static;
 
+    std::unordered_set<irep_idt, irep_id_hash> typedef_names;
+    for(const auto &td : typedef_map)
+      typedef_names.insert(td.first);
+
     goto_program2codet p2s(
       symbol.name,
       func_entry->second.body,
@@ -903,6 +1200,7 @@ void dump_ct::convert_function_declaration(
       b,
       local_static,
       type_decls,
+      typedef_names,
       system_headers);
     p2s();
 
@@ -941,6 +1239,10 @@ void dump_ct::convert_function_declaration(
     os_decl << "// " << symbol.location << '\n';
     os_decl << make_decl(symbol.name, symbol.type) << ";\n";
   }
+
+  // make sure typedef names used in the function declaration are
+  // available
+  collect_typedefs(symbol.type, true);
 }
 
 static bool find_block_position_rec(
