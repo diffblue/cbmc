@@ -45,91 +45,71 @@ abstract_object_pointert abstract_environmentt::eval(
   if(bottom)
     return abstract_object_factory(expr.type(), ns, false, true);
 
-  typedef std::function<abstract_object_pointert(const exprt &)> eval_handlert;
-  std::map<irep_idt, eval_handlert> handlers=
-  {
-    {
-      ID_symbol, [&](const exprt &expr)
-      {
-        const symbol_exprt &symbol(to_symbol_expr(expr));
-        const auto &symbol_entry=map.find(symbol);
-        if(symbol_entry==map.cend())
-        {
-          return abstract_object_factory(expr.type(), ns, true);
-        }
-        else
-        {
-          abstract_object_pointert found_symbol_value=symbol_entry->second;
-          return found_symbol_value;
-        }
-      }
-    },
-    {
-      ID_constant, [&](const exprt &expr)
-      {
-        return abstract_object_factory(
-          expr.type(), to_constant_expr(expr), ns);
-      }
-    },
-    {
-      ID_array, [&](const exprt &expr)
-      {
-        return abstract_object_factory(
-          expr.type(), expr, ns);
-      }
-    },
-    {
-      ID_member, [&](const exprt &expr)
-      {
-        member_exprt member_expr(to_member_expr(expr));
-
-        sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-          std::dynamic_pointer_cast<const struct_abstract_objectt>(
-            eval(member_expr.compound(), ns));
-
-        return struct_abstract_object->read_component(*this, member_expr, ns);
-      }
-    },
-    {
-      ID_address_of, [&](const exprt &expr)
-      {
-        sharing_ptrt<pointer_abstract_objectt> pointer_object=
-          std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-            abstract_object_factory(expr.type(), expr, ns));
-
-        // Store the abstract object in the pointer
-        return pointer_object;
-      }
-    },
-    {
-      ID_dereference, [&](const exprt &expr)
-      {
-        dereference_exprt dereference(to_dereference_expr(expr));
-        sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
-          std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-            eval(dereference.pointer(), ns));
-
-        return pointer_abstract_object->read_dereference(*this, ns);
-      }
-    },
-    {
-      ID_index, [&](const exprt &expr)
-      {
-        index_exprt index_expr(to_index_expr(expr));
-        sharing_ptrt<array_abstract_objectt> array_abstract_object=
-          std::dynamic_pointer_cast<const array_abstract_objectt>(
-            eval(index_expr.array(), ns));
-
-        return array_abstract_object->read_index(*this, index_expr, ns);
-      }
-    }
-  };
-
   // first try to canonicalise, including constant folding
   const exprt &simplified_expr=simplify_expr(expr, ns);
 
-  const auto &handler=handlers.find(simplified_expr.id());
-  if(handler==handlers.cend())
+  const irep_idt simplified_id=simplified_expr.id();
+  if(simplified_id==ID_symbol)
+  {
+    const symbol_exprt &symbol(to_symbol_expr(simplified_expr));
+    const auto &symbol_entry=map.find(symbol);
+    if(symbol_entry==map.cend())
+    {
+      return abstract_object_factory(simplified_expr.type(), ns, true);
+    }
+    else
+    {
+      abstract_object_pointert found_symbol_value=symbol_entry->second;
+      return found_symbol_value;
+    }
+  }
+  else if(simplified_id==ID_member)
+  {
+    member_exprt member_expr(to_member_expr(simplified_expr));
+
+    sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
+      std::dynamic_pointer_cast<const struct_abstract_objectt>(
+        eval(member_expr.compound(), ns));
+
+    return struct_abstract_object->read_component(*this, member_expr, ns);
+  }
+  else if(simplified_id==ID_address_of)
+  {
+    sharing_ptrt<pointer_abstract_objectt> pointer_object=
+      std::dynamic_pointer_cast<const pointer_abstract_objectt>(
+        abstract_object_factory(simplified_expr.type(), simplified_expr, ns));
+
+    // Store the abstract object in the pointer
+    return pointer_object;
+  }
+  else if(simplified_id==ID_dereference)
+  {
+    dereference_exprt dereference(to_dereference_expr(simplified_expr));
+    sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
+      std::dynamic_pointer_cast<const pointer_abstract_objectt>(
+        eval(dereference.pointer(), ns));
+
+    return pointer_abstract_object->read_dereference(*this, ns);
+  }
+  else if(simplified_id==ID_index)
+  {
+    index_exprt index_expr(to_index_expr(simplified_expr));
+    sharing_ptrt<array_abstract_objectt> array_abstract_object=
+      std::dynamic_pointer_cast<const array_abstract_objectt>(
+        eval(index_expr.array(), ns));
+
+    return array_abstract_object->read_index(*this, index_expr, ns);
+  }
+  else if(simplified_id==ID_array)
+  {
+    return abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
+  }
+  else if(simplified_id==ID_constant)
+  {
+    return abstract_object_factory(
+      simplified_expr.type(), to_constant_expr(simplified_expr), ns);
+  }
+  else
   {
     // No special handling required by the abstract environment
     // delegate to the abstract object
@@ -141,10 +121,6 @@ abstract_object_pointert abstract_environmentt::eval(
     {
       return abstract_object_factory(simplified_expr.type(), ns, true);
     }
-  }
-  else
-  {
-    return handler->second(simplified_expr);
   }
 }
 
@@ -309,12 +285,7 @@ abstract_object_pointert abstract_environmentt::write(
   const exprt & next_expr=remaining_stack.top();
   remaining_stack.pop();
 
-  typedef std::function<
-    abstract_object_pointert(
-      abstract_object_pointert,  // The symbol we are modifying
-      std::stack<exprt>, // The remaining stack
-      abstract_object_pointert)> // The value we are writing.
-      stacion_functiont;
+  const irep_idt &stack_head_id=next_expr.id();
 
   // Each handler takes the abstract object referenced, copies it,
   // writes according to the type of expression (e.g. for ID_member)
@@ -322,71 +293,45 @@ abstract_object_pointert abstract_environmentt::write(
   // write_member which will attempt to update the abstract object for the
   // relevant member. This modified abstract object is returned and this
   // is inserted back into the map
-  std::map<irep_idt, stacion_functiont> handlers=
+  if(stack_head_id==ID_index)
   {
-    {
-      ID_index, [&](
-        const abstract_object_pointert lhs_object,
-        std::stack<exprt> stack,
-        abstract_object_pointert rhs_object)
-      {
-        sharing_ptrt<array_abstract_objectt> array_abstract_object=
-          std::dynamic_pointer_cast<const array_abstract_objectt>(lhs_object);
+    sharing_ptrt<array_abstract_objectt> array_abstract_object=
+      std::dynamic_pointer_cast<const array_abstract_objectt>(lhs);
 
-        sharing_ptrt<array_abstract_objectt> modified_array=
-          array_abstract_object->write_index(
-            *this,
-            ns,
-            stack,
-            to_index_expr(next_expr),
-            rhs_object,
-            merge_write);
+    sharing_ptrt<array_abstract_objectt> modified_array=
+      array_abstract_object->write_index(
+        *this, ns, remaining_stack, to_index_expr(next_expr), rhs, merge_write);
 
-        return modified_array;
-      }
-    },
-    {
-      ID_member, [&](
-        const abstract_object_pointert lhs_object,
-        std::stack<exprt> stack,
-        abstract_object_pointert rhs_object)
-      {
-        sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
-          std::dynamic_pointer_cast<const struct_abstract_objectt>(lhs_object);
+    return modified_array;
+  }
+  else if(stack_head_id==ID_member)
+  {
+    sharing_ptrt<struct_abstract_objectt> struct_abstract_object=
+      std::dynamic_pointer_cast<const struct_abstract_objectt>(lhs);
 
-        sharing_ptrt<struct_abstract_objectt> modified_struct=
-          struct_abstract_object->write_component(
-            *this,
-            ns,
-            stack,
-            to_member_expr(next_expr),
-            rhs_object,
-            merge_write);
+    const member_exprt next_member_expr(to_member_expr(next_expr));
+    sharing_ptrt<struct_abstract_objectt> modified_struct=
+      struct_abstract_object->write_component(
+        *this, ns, remaining_stack, next_member_expr, rhs, merge_write);
 
-        return modified_struct;
-      }
-    },
-    {
-      ID_dereference, [&](
-        const abstract_object_pointert lhs_object,
-        std::stack<exprt> stack,
-        abstract_object_pointert rhs_object)
-      {
-        sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
-          std::dynamic_pointer_cast<const pointer_abstract_objectt>(lhs_object);
+    return modified_struct;
+  }
+  else if(stack_head_id==ID_dereference)
+  {
+    sharing_ptrt<pointer_abstract_objectt> pointer_abstract_object=
+      std::dynamic_pointer_cast<const pointer_abstract_objectt>(lhs);
 
-        sharing_ptrt<pointer_abstract_objectt> modified_pointer=
-          pointer_abstract_object->write_dereference(
-            *this, ns, stack, rhs_object, merge_write);
+    sharing_ptrt<pointer_abstract_objectt> modified_pointer=
+      pointer_abstract_object->write_dereference(
+        *this, ns, remaining_stack, rhs, merge_write);
 
-        return modified_pointer;
-      }
-    }
-  };
-
-  // We added something to the stack that we couldn't deal with
-  assert(handlers.find(next_expr.id())!=handlers.end());
-  return handlers[next_expr.id()](lhs, remaining_stack, rhs);
+    return modified_pointer;
+  }
+  else
+  {
+    assert(0);
+    return nullptr;
+  }
 }
 
 /*******************************************************************\
