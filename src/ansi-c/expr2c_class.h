@@ -61,6 +61,12 @@ protected:
     const std::string &declarator_str,
     bool inc_size_if_possible);
 
+  virtual std::string convert_pointer_type(
+    const typet &src,
+    const c_qualifierst &qualifiers,
+    const std::string &declarator,
+    bool toggle);
+
   static std::string indent_str(unsigned indent);
 
   std::unordered_map<irep_idt,

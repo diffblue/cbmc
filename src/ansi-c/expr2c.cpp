@@ -488,27 +488,7 @@ std::string expr2ct::convert_rec(
   }
   else if(src.id()==ID_pointer)
   {
-    c_qualifierst sub_qualifiers;
-    sub_qualifiers.read(src.subtype());
-    const typet &subtype_followed=ns.follow(src.subtype());
-
-    // The star gets attached to the declarator.
-    std::string new_declarator="*";
-
-    if(q!="" &&
-       (!declarator.empty() || subtype_followed.id()==ID_pointer))
-      new_declarator+=" "+q;
-
-    new_declarator+=declarator;
-
-    // Depending on precedences, we may add parentheses.
-    if(subtype_followed.id()==ID_code ||
-        (sizeof_nesting==0 &&
-         (subtype_followed.id()==ID_array ||
-          subtype_followed.id()==ID_incomplete_array)))
-      new_declarator="("+new_declarator+")";
-
-    return convert_rec(src.subtype(), sub_qualifiers, new_declarator);
+    return convert_pointer_type(src, new_qualifiers, declarator, false);
   }
   else if(src.id()==ID_array)
   {
@@ -858,6 +838,55 @@ std::string expr2ct::convert_array_type(
   // Note that qualifiers are passed down.
   return convert_rec(
     src.subtype(), qualifiers, declarator_str+array_suffix);
+}
+
+/*******************************************************************\
+
+Function: expr2ct::convert_pointer_type
+
+  Inputs:
+          src - The pointer type to convert
+          qualifiers - A list of the qualifiers of the pointer declaration
+          declarator_str - The declaration string we will build
+          toggle - Activate the pointer -> array treating behavior
+
+ Outputs: A C-like type declaration of a pointer
+
+ Purpose: To generate a C-like type declaration of an pointer
+\*******************************************************************/
+
+std::string expr2ct::convert_pointer_type(
+  const typet &src,
+  const c_qualifierst &qualifiers,
+  const std::string &declarator,
+  bool toggle)
+{
+  c_qualifierst sub_qualifiers;
+  sub_qualifiers.read(src.subtype());
+  const typet &subtype_followed=ns.follow(src.subtype());
+
+  // The star gets attached to the declarator.
+  std::string new_declarator="*";
+  std::string q=qualifiers.as_string();
+
+  if(q!="" &&
+      (!declarator.empty() || subtype_followed.id()==ID_pointer))
+        new_declarator+=" "+q;
+
+  new_declarator+=declarator;
+
+  // Depending on precedences, we may add parentheses.
+  if(subtype_followed.id()==ID_code ||
+      (sizeof_nesting==0 &&
+        (subtype_followed.id()==ID_array ||
+          subtype_followed.id()==ID_incomplete_array)))
+      new_declarator="("+new_declarator+")";
+
+  if(subtype_followed.id()==ID_array && toggle)
+    return convert_rec(src.subtype().subtype(), sub_qualifiers,
+      new_declarator.substr(1, new_declarator.size()-2));
+
+  return convert_rec(src.subtype(), sub_qualifiers, new_declarator);
 }
 
 /*******************************************************************\
