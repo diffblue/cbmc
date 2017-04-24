@@ -119,6 +119,8 @@ abstract_object_pointert abstract_environmentt::eval(
     }
     else
     {
+      // It is important that this is top as the abstract object may not know
+      // how to handle the expression
       return abstract_object_factory(simplified_expr.type(), ns, true);
     }
   }
