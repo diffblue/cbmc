@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
+  total_vccs(0),
+  remaining_vccs(0),
   atomic_section_id(0),
   record_events(true),
   dirty(0)

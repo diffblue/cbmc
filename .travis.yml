@@ -159,7 +159,7 @@ install:
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
+    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\"" &&
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C unit CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}

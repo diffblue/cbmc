@@ -121,6 +121,24 @@ public:
     return std::unique_ptr<solvert>(solver);
   }
 
+  virtual solvert* get_solver_local()
+  {
+    solvert *solver;
+
+    if(options.get_bool_option("dimacs"))
+      solver = get_dimacs();
+    else if(options.get_bool_option("refine"))
+      solver = get_bv_refinement();
+    else if(options.get_bool_option("smt1"))
+      solver = get_smt1(get_smt1_solver_type());
+    else if(options.get_bool_option("smt2"))
+      solver = get_smt2(get_smt2_solver_type());
+    else
+      solver = get_default();
+
+    return (solver);
+  }
+
   virtual ~cbmc_solverst()
   {
   }

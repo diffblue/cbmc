@@ -306,9 +306,11 @@ void goto_symext::symex_printf(
     get_string_argument(operands[0], ns);
 
   if(format_string!="")
-    target.output_fmt(
+  {
+    state.symex_target->output_fmt(
       state.guard.as_expr(),
       state.source, "printf", format_string, args);
+  }
 }
 
 void goto_symext::symex_input(
@@ -333,7 +335,7 @@ void goto_symext::symex_input(
 
   const irep_idt input_id=get_string_argument(id_arg, ns);
 
-  target.input(state.guard.as_expr(), state.source, input_id, args);
+  state.symex_target->input(state.guard.as_expr(), state.source, input_id, args);
 }
 
 void goto_symext::symex_output(
@@ -358,7 +360,7 @@ void goto_symext::symex_output(
 
   const irep_idt output_id=get_string_argument(id_arg, ns);
 
-  target.output(state.guard.as_expr(), state.source, output_id, args);
+  state.symex_target->output(state.guard.as_expr(), state.source, output_id, args);
 }
 
 void goto_symext::symex_cpp_new(
@@ -463,7 +465,7 @@ void goto_symext::symex_trace(
       vars.push_back(var);
     }
 
-    target.output(state.guard.as_expr(), state.source, event, vars);
+    state.symex_target->output(state.guard.as_expr(), state.source, event, vars);
   }
 }
 

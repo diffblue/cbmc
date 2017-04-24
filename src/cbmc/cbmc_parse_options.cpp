@@ -61,6 +61,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_solvers.h"
 #include "bmc.h"
+#include "bmc_clustering.h"
 #include "version.h"
 #include "xml_interface.h"
 
@@ -104,27 +105,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
-  }
-
-  // Test only; do not use for input validation
-  if(cmdline.isset("test-invariant-failure"))
-  {
-    // Have to catch this as the default handling of uncaught exceptions
-    // on windows appears to be silent termination.
-    try
-    {
-      INVARIANT(0, "Test invariant failure");
-    }
-    catch (const invariant_failedt &e)
-    {
-      std::cerr << e.what();
-      exit(0); // should contemplate EX_OK from sysexits.h
-    }
-    catch (...)
-    {
-      error() << "Unexpected exception type\n";
-    }
-    exit(1);
   }
 
   if(cmdline.isset("program-only"))
@@ -172,6 +152,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
     options.set_option("trace", true);
+
+  if(cmdline.isset("clustering"))
+  {
+    options.set_option("clustering", true);
+	options.set_option("trace", true);
+  }
 
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
@@ -514,10 +500,24 @@ int cbmc_parse_optionst::doit()
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
 
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
+  std::unique_ptr<bmct> bmc;
+  if(options.get_bool_option("clustering"))
+  {
+    bmc=std::unique_ptr<bmct>(
+      new bmc_clusteringt(
+        options,
+        symbol_table,
+        ui_message_handler,
+        prop_conv,
+        goto_functions,
+        cbmc_solvers));
+  }
+  else
+    bmc=std::unique_ptr<bmct>(
+      new bmct(options, symbol_table, ui_message_handler, prop_conv));
 
   // do actual BMC
-  return do_bmc(bmc, goto_functions);
+  return do_bmc(*bmc, goto_functions);
 }
 
 bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)

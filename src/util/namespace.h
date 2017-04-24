@@ -63,7 +63,8 @@ class namespacet:public namespace_baset
 {
 public:
   // constructors
-  explicit namespacet(const symbol_tablet &_symbol_table)
+  //explicit
+  namespacet(const symbol_tablet &_symbol_table)
   { symbol_table1=&_symbol_table; symbol_table2=NULL; }
 
   namespacet(

@@ -56,6 +56,7 @@ void goto_symext::vcc(
   statet &state)
 {
   total_vccs++;
+  state.total_vccs++;
 
   exprt expr=vcc_expr;
 
@@ -74,7 +75,8 @@ void goto_symext::vcc(
   state.guard.guard_expr(expr);
 
   remaining_vccs++;
-  target.assertion(state.guard.as_expr(), expr, msg, state.source);
+  state.remaining_vccs++;
+  state.symex_target->assertion(state.guard.as_expr(), expr, msg, state.source);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
@@ -90,7 +92,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   {
     exprt tmp=simplified_cond;
     state.guard.guard_expr(tmp);
-    target.assumption(state.guard.as_expr(), tmp, state.source);
+    state.symex_target->assumption(state.guard.as_expr(), tmp, state.source);
   }
   // symex_target_equationt::convert_assertions would fail to
   // consider assumptions of threads that have a thread-id above that
@@ -216,7 +218,9 @@ void goto_symext::symex_step(
   {
   case SKIP:
     if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+    {
+      state.symex_target->location(state.guard.as_expr(), state.source);
+    }
     symex_transition(state);
     break;
 
@@ -229,7 +233,9 @@ void goto_symext::symex_step(
 
   case LOCATION:
     if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+    {
+      state.symex_target->location(state.guard.as_expr(), state.source);
+    }
     symex_transition(state);
     break;
 
