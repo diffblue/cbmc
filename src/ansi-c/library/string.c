@@ -516,7 +516,7 @@ inline char *strdup(const char *str)
 
 #undef memcpy
 
-inline void *memcpy(void *dst, const void *src, size_t n)
+void *memcpy(void *dst, const void *src, size_t n)
 {
   __CPROVER_HIDE:
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -583,7 +583,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
 
 #undef memset
 
-inline void *memset(void *s, int c, size_t n)
+void *memset(void *s, int c, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -652,7 +652,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
 
 #undef memmove
 
-inline void *memmove(void *dest, const void *src, size_t n)
+void *memmove(void *dest, const void *src, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -683,7 +683,7 @@ inline void *memmove(void *dest, const void *src, size_t n)
 
 #undef memmove
 
-inline void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
