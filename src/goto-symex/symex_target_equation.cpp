@@ -250,8 +250,8 @@ void symex_target_equationt::assignment(
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
   SSA_step.type=goto_trace_stept::ASSIGNMENT;
-  SSA_step.hidden=(assignment_type!=STATE &&
-                   assignment_type!=VISIBLE_ACTUAL_PARAMETER);
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE &&
+                   assignment_type!=assignment_typet::VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -286,7 +286,7 @@ void symex_target_equationt::decl(
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
   SSA_step.type=goto_trace_stept::DECL;
   SSA_step.source=source;
-  SSA_step.hidden=(assignment_type!=STATE);
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
@@ -1001,12 +1001,24 @@ void symex_target_equationt::SSA_stept::output(
     out << "ASSIGNMENT (";
     switch(assignment_type)
     {
-    case HIDDEN: out << "HIDDEN"; break;
-    case STATE: out << "STATE"; break;
-    case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
-    case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
-    case PHI: out << "PHI"; break;
-    case GUARD: out << "GUARD"; break;
+    case assignment_typet::HIDDEN:
+      out << "HIDDEN";
+      break;
+    case assignment_typet::STATE:
+      out << "STATE";
+      break;
+    case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
+      out << "VISIBLE_ACTUAL_PARAMETER";
+      break;
+    case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
+      out << "HIDDEN_ACTUAL_PARAMETER";
+      break;
+    case assignment_typet::PHI:
+      out << "PHI";
+      break;
+    case assignment_typet::GUARD:
+      out << "GUARD";
+      break;
     default:
       {
       }

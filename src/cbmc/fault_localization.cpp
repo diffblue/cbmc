@@ -64,7 +64,7 @@ void fault_localizationt::collect_guards(lpointst &lpoints)
       it!=bmc.equation.SSA_steps.end(); it++)
   {
     if(it->is_assignment() &&
-       it->assignment_type==symex_targett::STATE &&
+       it->assignment_type==symex_targett::assignment_typet::STATE &&
        !it->ignore)
     {
       if(!it->guard_literal.is_constant())

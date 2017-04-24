@@ -300,9 +300,13 @@ void build_goto_trace(
 
     // drop PHI and GUARD assignments altogether
     if(it->is_assignment() &&
-       (SSA_step.assignment_type==symex_target_equationt::PHI ||
-        SSA_step.assignment_type==symex_target_equationt::GUARD))
+       (SSA_step.assignment_type==
+          symex_target_equationt::assignment_typet::PHI ||
+        SSA_step.assignment_type==
+          symex_target_equationt::assignment_typet::GUARD))
+    {
       continue;
+    }
 
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());
@@ -330,8 +334,10 @@ void build_goto_trace(
 
     goto_trace_step.assignment_type=
       (it->is_assignment()&&
-       (SSA_step.assignment_type==symex_targett::VISIBLE_ACTUAL_PARAMETER ||
-        SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER))?
+       (SSA_step.assignment_type==
+          symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
+        SSA_step.assignment_type==
+          symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER))?
       goto_trace_stept::ACTUAL_PARAMETER:
       goto_trace_stept::STATE;
 
