@@ -191,7 +191,9 @@ void build_goto_trace(
           symex_target_equationt::assignment_typet::PHI ||
         SSA_step.assignment_type==
           symex_target_equationt::assignment_typet::GUARD))
+    {
       continue;
+    }
 
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());
