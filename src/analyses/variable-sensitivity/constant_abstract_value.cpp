@@ -67,7 +67,7 @@ Function: constant_abstract_valuet::merge
 
 \*******************************************************************/
 
-const abstract_objectt *constant_abstract_valuet::merge(
+abstract_object_pointert constant_abstract_valuet::merge(
   abstract_object_pointert other) const
 {
   constant_abstract_value_pointert cast_other=
@@ -98,10 +98,10 @@ Function: constant_abstract_valuet::merge_constant_constant
 
 \*******************************************************************/
 
-const abstract_objectt *constant_abstract_valuet::merge_constant_constant(
+abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   constant_abstract_value_pointert other) const
 {
-  const abstract_objectt *parent_merge=abstract_valuet::merge(other);
+  abstract_object_pointert parent_merge=abstract_valuet::merge(other);
 
   // Did the parent merge result in a definitive result
   if(!parent_merge->is_top() && !parent_merge->is_bottom())
@@ -109,26 +109,13 @@ const abstract_objectt *constant_abstract_valuet::merge_constant_constant(
     // Can we actually merge these value
     if(value==other->value)
     {
-      // If the parent merge changed the merge, but we're neither top nor bottom
-      // then we can still return this
-      if(parent_merge!=this)
-      {
-        delete parent_merge;
-        parent_merge=nullptr;
-      }
-      return this;
+      return shared_from_this();
     }
     else
     {
-      // We need to make a new clone since the one created by the parent
-      // merge is immutable
-      if(parent_merge!=this)
-      {
-        delete parent_merge;
-      }
-
-      constant_abstract_valuet *result=
-        static_cast<constant_abstract_valuet *>(mutable_clone());
+      internal_sharing_ptrt<constant_abstract_valuet> result=
+        std::dynamic_pointer_cast<constant_abstract_valuet>(
+          mutable_clone());
 
       result->make_top();
       assert(!result->is_bottom());
