@@ -101,10 +101,15 @@ Function: constant_abstract_valuet::merge_constant_constant
 abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   constant_abstract_value_pointert other) const
 {
-  abstract_object_pointert parent_merge=abstract_valuet::merge(other);
-
-  // Did the parent merge result in a definitive result
-  if(!parent_merge->is_top() && !parent_merge->is_bottom())
+  if(is_top() || other->is_bottom())
+  {
+    return abstract_valuet::merge(other);
+  }
+  else if(is_bottom())
+  {
+    return std::make_shared<constant_abstract_valuet>(*other);
+  }
+  else
   {
     // Can we actually merge these value
     if(value==other->value)
@@ -113,18 +118,7 @@ abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
     }
     else
     {
-      internal_sharing_ptrt<constant_abstract_valuet> result=
-        std::dynamic_pointer_cast<constant_abstract_valuet>(
-          mutable_clone());
-
-      result->make_top();
-      assert(!result->is_bottom());
-      result->value=exprt();
-      return result;
+      return abstract_valuet::merge(other);
     }
-  }
-  else
-  {
-    return parent_merge;
   }
 }
