@@ -118,15 +118,10 @@ abstract_object_pointert abstract_objectt::merge(
   if(other->bottom)
     return shared_from_this();
 
+
   internal_abstract_object_pointert merged=mutable_clone();
-
-  // We are top if and only if the other is top (since this is not)
-  merged->top=other->top;
-
-  // Other is definitely not bottom, so the merge definitely can't be bottom
+  merged->top=true;
   merged->bottom=false;
-
-  assert(!(merged->top && merged->bottom));
   return merged;
 }
 
