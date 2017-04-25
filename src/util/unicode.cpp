@@ -154,17 +154,17 @@ std::wstring widen(const std::string &s)
 
 /*******************************************************************\
 
-Function: utf32_to_utf8
+Function: utf8_append_code
 
-  Inputs:
+  Inputs: character to append, string to append to
 
  Outputs:
 
- Purpose:
+ Purpose: Appends a unicode character to a utf8-encoded string
 
 \*******************************************************************/
 
-void utf32_to_utf8(unsigned int c, std::string &result)
+static void utf8_append_code(unsigned int c, std::string &result)
 {
   if(c<=0x7f)
     result+=static_cast<char>(c);
@@ -192,9 +192,10 @@ void utf32_to_utf8(unsigned int c, std::string &result)
 
 Function: utf32_to_utf8
 
-  Inputs:
+  Inputs: utf32-encoded wide string
 
- Outputs:
+ Outputs: utf8-encoded string with the same unicode characters
+          as the input.
 
  Purpose:
 
@@ -207,31 +208,7 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
   result.reserve(s.size()); // at least that long
 
   for(const auto c : s)
-    utf32_to_utf8(c, result);
-
-  return result;
-}
-
-/*******************************************************************\
-
-Function: utf16_to_utf8
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s)
-{
-  std::string result;
-
-  result.reserve(s.size()); // at least that long
-
-  for(const auto c : s)
-    utf32_to_utf8(c, result);
+    utf8_append_code(c, result);
 
   return result;
 }
