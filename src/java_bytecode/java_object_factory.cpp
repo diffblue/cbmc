@@ -78,33 +78,34 @@ class java_object_factoryt
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
   namespacet ns;
+  const source_locationt &loc;
 
 public:
   java_object_factoryt(
     code_blockt &_init_code,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
-    symbol_tablet &_symbol_table):
+    symbol_tablet &_symbol_table,
+    const source_locationt &_loc):
       init_code(_init_code),
       assume_non_null(_assume_non_null),
       max_nondet_array_length(_max_nondet_array_length),
       symbol_table(_symbol_table),
-      ns(_symbol_table)
+      ns(_symbol_table),
+      loc(_loc)
   {}
 
   exprt allocate_object(
     const exprt &,
     const typet &,
-    const source_locationt &,
     bool create_dynamic_objects);
 
-  void gen_nondet_array_init(const exprt &expr, const source_locationt &);
+  void gen_nondet_array_init(const exprt &expr);
 
   void gen_nondet_init(
     const exprt &expr,
     bool is_sub,
     irep_idt class_identifier,
-    const source_locationt &loc,
     bool create_dynamic_objects,
     bool override=false,
     const typet &override_type=empty_typet());
@@ -125,7 +126,6 @@ Function: java_object_factoryt::allocate_object
 exprt java_object_factoryt::allocate_object(
   const exprt &target_expr,
   const typet &allocate_type,
-  const source_locationt &loc,
   bool create_dynamic_objects)
 {
   const typet &allocate_type_resolved=ns.follow(allocate_type);
@@ -216,7 +216,6 @@ void java_object_factoryt::gen_nondet_init(
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
-  const source_locationt &loc,
   bool create_dynamic_objects,
   bool override,
   const typet &override_type)
@@ -273,11 +272,11 @@ void java_object_factoryt::gen_nondet_init(
     }
 
     if(java_is_array_type(subtype))
-      gen_nondet_array_init(expr, loc);
+      gen_nondet_array_init(expr);
     else
     {
       exprt allocated=
-        allocate_object(expr, subtype, loc, create_dynamic_objects);
+        allocate_object(expr, subtype, create_dynamic_objects);
       exprt init_expr;
       if(allocated.id()==ID_address_of)
         init_expr=allocated.op0();
@@ -287,7 +286,6 @@ void java_object_factoryt::gen_nondet_init(
         init_expr,
         false,
         "",
-        loc,
         create_dynamic_objects);
     }
 
@@ -348,7 +346,6 @@ void java_object_factoryt::gen_nondet_init(
           me,
           _is_sub,
           class_identifier,
-          loc,
           create_dynamic_objects);
       }
     }
@@ -379,8 +376,7 @@ Function: java_object_factoryt::gen_nondet_array_init
 \*******************************************************************/
 
 void java_object_factoryt::gen_nondet_array_init(
-  const exprt &expr,
-  const source_locationt &loc)
+  const exprt &expr)
 {
   assert(expr.type().id()==ID_pointer);
   const typet &type=ns.follow(expr.type().subtype());
@@ -400,7 +396,7 @@ void java_object_factoryt::gen_nondet_array_init(
   const auto &length_sym_expr=length_sym.symbol_expr();
 
   // Initialize array with some undetermined length:
-  gen_nondet_init(length_sym_expr, false, irep_idt(), loc, false);
+  gen_nondet_init(length_sym_expr, false, irep_idt(), false);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -484,7 +480,6 @@ void java_object_factoryt::gen_nondet_array_init(
     arraycellref,
     false,
     irep_idt(),
-    loc,
     true,
     true,
     element_type);
@@ -531,12 +526,12 @@ exprt object_factory(
       init_code,
       !allow_null,
       max_nondet_array_length,
-      symbol_table);
+      symbol_table,
+      loc);
     state.gen_nondet_init(
       object,
       false,
       "",
-      loc,
       false);
 
     return object;
