@@ -21,6 +21,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual ~abstract_valuet() {}
+
 protected:
   CLONE
 };

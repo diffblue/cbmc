@@ -27,6 +27,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual ~constant_abstract_valuet() {}
+
   virtual exprt to_constant() const override;
 
   virtual void output(
@@ -36,10 +38,11 @@ public:
 
 protected:
   CLONE
-  virtual bool merge(abstract_object_pointert other) override;
+  virtual const abstract_objectt *merge(abstract_object_pointert other) const override;
 
 private :
-  bool merge_constant_constant(constant_abstract_value_pointert other);
+  const abstract_objectt *merge_constant_constant(
+    constant_abstract_value_pointert other) const;
 
   exprt value;
 };

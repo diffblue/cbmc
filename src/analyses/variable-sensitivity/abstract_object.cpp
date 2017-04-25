@@ -103,22 +103,31 @@ Function: abstract_objectt::merge
   Inputs:
    other - The object to merge with this
 
- Outputs: Returns true if the merge changed this value
+ Outputs: Returns the result of the merge.
 
- Purpose: Set this abstract object to be the result of merging two
-          other abstract objects. This is the worst case - we can
-          only set to top or bottom.
+ Purpose: Create a new abstract object that is the result of the merge, unless
+          the object would be unchanged, then would return itself.
 
 \*******************************************************************/
 
-bool abstract_objectt::merge(abstract_object_pointert other)
+const abstract_objectt *abstract_objectt::merge(
+  abstract_object_pointert other) const
 {
-  abstract_object_pointert old=clone();
-  top= old->top || other->top;
-  bottom=old->bottom && other->bottom;
+  if(top)
+    return this;
+  if(other->bottom)
+    return this;
 
-  assert(!(top && bottom));
-  return top!=old->top || bottom!=old->bottom;
+  abstract_objectt *merged=mutable_clone();
+
+  // We are top if and only if the other is top (since this is not)
+  merged->top=other->top;
+
+  // Other is definitely not bottom, so the merge definitely can't be bottom
+  merged->bottom=false;
+
+  assert(!(merged->top && merged->bottom));
+  return merged;
 }
 
 
@@ -282,9 +291,17 @@ abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert op2,
   bool &out_modifications)
 {
-  internal_abstract_object_pointert result(op1->mutable_clone());
-  out_modifications=result->merge(op2);
-  return result;
+  const abstract_objectt* result=op1->merge(op2);
+  // If no modifications, we will return the original pointer
+  out_modifications=result!=op1.get();
+  if(!out_modifications)
+  {
+    return op1;
+  }
+  else
+  {
+    return abstract_object_pointert(result);
+  }
 }
 
 
