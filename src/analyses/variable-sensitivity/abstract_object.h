@@ -39,11 +39,11 @@ class namespacet;
 
 
 #define CLONE \
-  virtual abstract_objectt *mutable_clone() const override \
+  virtual internal_abstract_object_pointert mutable_clone() const override \
   { \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
       >::type current_typet; \
-    return new current_typet(*this); \
+    return internal_abstract_object_pointert(new current_typet(*this)); \
   } \
 
 
@@ -70,7 +70,7 @@ using sharing_ptrt=std::shared_ptr<const T>; // NOLINT(*)
 
 typedef sharing_ptrt<class abstract_objectt> abstract_object_pointert;
 
-class abstract_objectt
+class abstract_objectt:public std::enable_shared_from_this<abstract_objectt>
 {
 public:
   explicit abstract_objectt(const typet &type);
@@ -119,9 +119,9 @@ protected:
     internal_abstract_object_pointert;
 
   // Macro is not used as this does not override
-  virtual abstract_objectt *mutable_clone() const
+  virtual internal_abstract_object_pointert mutable_clone() const
   {
-    return new abstract_objectt(*this);
+    return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
 
   bool top;
@@ -130,7 +130,7 @@ protected:
   void make_top() { top=true; }
 
   // Sets the state of this object
-  virtual const abstract_objectt *merge(abstract_object_pointert other) const;
+  virtual abstract_object_pointert merge(abstract_object_pointert other) const;
 
   template<class keyt>
   static bool merge_maps(

@@ -56,7 +56,8 @@ private:
 
   typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
 
-  const abstract_objectt *merge_constant_structs(constant_struct_pointert other) const;
+  abstract_object_pointert merge_constant_structs(
+    constant_struct_pointert other) const;
 
 protected:
   CLONE
@@ -64,7 +65,8 @@ protected:
   bool verify() const;
   // Set the state of this to the merge result of op1 and op2 and
   // return if the result is different from op1
-  virtual const abstract_objectt *merge(abstract_object_pointert other) const override;
+  virtual abstract_object_pointert merge(
+    abstract_object_pointert other) const override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_FULL_STRUCT_ABSTRACT_OBJECT_H
