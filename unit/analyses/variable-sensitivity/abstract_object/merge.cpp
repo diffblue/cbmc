@@ -75,6 +75,8 @@ TEST_CASE("merge_abstract_object",
         REQUIRE(modifications);
         REQUIRE(result->is_top());
         REQUIRE_FALSE(result->is_bottom());
+
+        REQUIRE_FALSE(op1==result);
       }
       SECTION("bottom")
       {
