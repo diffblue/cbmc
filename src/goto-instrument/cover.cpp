@@ -229,10 +229,10 @@ const char *as_string(coverage_criteriont c)
   case coverage_criteriont::PATH: return "path";
   case coverage_criteriont::MCDC: return "MC/DC";
   case coverage_criteriont::ASSERTION: return "assertion";
-  case coverage_criteriont::RUNTIME_EXCEPTIONS:
-    return "runtime_exceptions";
-  case coverage_criteriont::USER_ASSERTIONS:
-    return "user_assertions";
+  case coverage_criteriont::RUNTIME_EXCEPTION:
+    return "runtime exception";
+  case coverage_criteriont::USER_ASSERTION:
+    return "user assertion";
   case coverage_criteriont::COVER: return "cover instructions";
   default: return "";
   }
@@ -1735,13 +1735,13 @@ bool instrument_cover_goals(
     else if(criterion_string=="runtime_exception" ||
             criterion_string=="runtime_exceptions")
     {
-      c=coverage_criteriont::RUNTIME_EXCEPTIONS;
+      c=coverage_criteriont::RUNTIME_EXCEPTION;
       keep_exception_assertions=true;
     }
     else if(criterion_string=="user_assertion" ||
             criterion_string=="user_assertions")
     {
-      c=coverage_criteriont::USER_ASSERTIONS;
+      c=coverage_criteriont::USER_ASSERTION;
       keep_user_assertions=true;
     }
     else if(criterion_string=="decision" || criterion_string=="decisions")
@@ -1781,11 +1781,11 @@ bool instrument_cover_goals(
       goto_programt &body=f_it->second.body;
       Forall_goto_program_instructions(i_it, body)
       {
-        const irep_idt &user_provided=
-          i_it->source_location.get("user-provided");
         if(i_it->is_assert() &&
-            (!keep_exception_assertions || id2string(user_provided)=="1") &&
-            (!keep_user_assertions || id2string(user_provided)!="1"))
+            (!keep_exception_assertions ||
+             i_it->source_location.get_bool("user-provided")) &&
+            (!keep_user_assertions ||
+             !i_it->source_location.get_bool("user-provided")))
           i_it->type=goto_program_instruction_typet::ASSUME;
       }
     }
