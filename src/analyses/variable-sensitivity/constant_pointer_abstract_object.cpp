@@ -123,7 +123,7 @@ Function: constant_pointer_abstract_objectt::merge
   Inputs:
    other - the pointer being merged
 
- Outputs: Returns true if this changed from this
+ Outputs: Returns the result of the merge.
 
  Purpose: Set this abstract object to be the result of merging this
           abstract object. This calls the merge_constant_pointers if
@@ -132,7 +132,8 @@ Function: constant_pointer_abstract_objectt::merge
 
 \*******************************************************************/
 
-bool constant_pointer_abstract_objectt::merge(abstract_object_pointert other)
+const abstract_objectt *constant_pointer_abstract_objectt::merge(
+  abstract_object_pointert other) const
 {
   auto cast_other=
     std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(other);
@@ -142,7 +143,7 @@ bool constant_pointer_abstract_objectt::merge(abstract_object_pointert other)
   }
   else
   {
-    value=nil_exprt();
+    // TODO(tkiley): How do we set the result to be toppish?
     return pointer_abstract_objectt::merge(other);
   }
 }
@@ -154,38 +155,55 @@ Function: constant_pointer_abstract_objectt::merge_constant_pointers
   Inputs:
    other - the pointer being merged
 
- Outputs: Returns true if this changed from this
+ Outputs: Returns a new abstract object that is the result of the merge
+          unless the merge is the same as this abstract object, in which
+          case it returns this.
 
  Purpose: Merges two constant pointers. If they are pointing at the same
           value, we merge, otherwise we set to top.
 
 \*******************************************************************/
 
-bool constant_pointer_abstract_objectt::merge_constant_pointers(
-  const constant_pointer_abstract_pointert other)
+const abstract_objectt *constant_pointer_abstract_objectt::merge_constant_pointers(
+  const constant_pointer_abstract_pointert other) const
 {
-  auto old=
-    std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(clone());
+  const abstract_objectt *parent_merge=pointer_abstract_objectt::merge(other);
 
-  bool parent_merge_change=abstract_objectt::merge(other);
-  if(is_top() || is_bottom())
+  // Did the parent merge result in a definitive result
+  if(!parent_merge->is_top() && !parent_merge->is_bottom())
   {
-    value=nil_exprt();
-    return parent_merge_change;
-  }
-  else
-  {
-    if(old->value==other->value)
+    if(value==other->value)
     {
-      return false;
+      // If the parent merge changed the merge, but we're neither top nor bottom
+      // then we can still return this
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+        parent_merge=nullptr;
+      }
+      return this;
     }
     else
     {
-      make_top();
-      value=nil_exprt();
-      assert(!is_bottom());
-      return !old->is_top();
+      // We need to make a new clone since the one created by the parent
+      // merge is immutable
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+      }
+
+      constant_pointer_abstract_objectt *result=
+        static_cast<constant_pointer_abstract_objectt *>(mutable_clone());
+
+      result->make_top();
+      assert(!result->is_bottom());
+      result->value=exprt();
+      return result;
     }
+  }
+  else
+  {
+    return parent_merge;
   }
 }
 
