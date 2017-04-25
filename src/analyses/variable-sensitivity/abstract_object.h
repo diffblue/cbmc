@@ -39,11 +39,11 @@ class namespacet;
 
 
 #define CLONE \
-  virtual internal_abstract_object_pointert mutable_clone() const override \
+  virtual abstract_objectt *mutable_clone() const override \
   { \
     typedef std::remove_const<std::remove_reference<decltype(*this)>::type \
       >::type current_typet; \
-    return internal_abstract_object_pointert(new current_typet(*this)); \
+    return new current_typet(*this); \
   } \
 
 
@@ -80,6 +80,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual ~abstract_objectt() {}
+
   const typet &type() const;
   virtual bool is_top() const;
   virtual bool is_bottom() const;
@@ -97,7 +99,7 @@ public:
 
   abstract_object_pointert clone() const
   {
-    return mutable_clone();
+    return abstract_object_pointert(mutable_clone());
   }
 
   static abstract_object_pointert merge(
@@ -117,18 +119,18 @@ protected:
     internal_abstract_object_pointert;
 
   // Macro is not used as this does not override
-  virtual internal_abstract_object_pointert mutable_clone() const
+  virtual abstract_objectt *mutable_clone() const
   {
-    return internal_abstract_object_pointert(new abstract_objectt(*this));
+    return new abstract_objectt(*this);
   }
 
   bool top;
 
-  // The one exception is merge in descendent classes, which needs this
+  // The one exception is merge in descendant classes, which needs this
   void make_top() { top=true; }
 
   // Sets the state of this object
-  virtual bool merge(abstract_object_pointert other);
+  virtual const abstract_objectt *merge(abstract_object_pointert other) const;
 
   template<class keyt>
   static bool merge_maps(
