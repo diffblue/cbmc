@@ -1023,7 +1023,7 @@ void goto_checkt::pointer_validity_check(
       add_guarded_claim(
         not_eq_null,
         "reference is null",
-        "pointer dereference",
+        "runtime-exception",
         expr.find_source_location(),
         expr,
         guard);
@@ -1680,7 +1680,7 @@ void goto_checkt::goto_check(
           add_guarded_claim(
             not_eq_null,
             "this is null on method invokation",
-            "pointer dereference",
+            "runtime-exception",
             i.source_location,
             pointer,
             guardt());
@@ -1722,7 +1722,7 @@ void goto_checkt::goto_check(
           add_guarded_claim(
             not_eq_null,
             "throwing null",
-            "pointer dereference",
+            "runtime-exception",
             i.source_location,
             pointer,
             guardt());
