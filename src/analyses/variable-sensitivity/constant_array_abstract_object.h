@@ -52,7 +52,7 @@ public:
 protected:
   CLONE
 
-  virtual const abstract_objectt *merge(
+  virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
 
 private:
@@ -71,7 +71,7 @@ private:
   abstract_object_pointert get_top_entry(
     const abstract_environmentt &env, const namespacet &ns) const;
 
-  const abstract_objectt *constant_array_merge(
+  abstract_object_pointert constant_array_merge(
     const constant_array_abstract_object_pointert other) const;
 };
 

@@ -38,10 +38,11 @@ public:
 
 protected:
   CLONE
-  virtual const abstract_objectt *merge(abstract_object_pointert other) const override;
+  virtual abstract_object_pointert merge(
+    abstract_object_pointert other) const override;
 
 private :
-  const abstract_objectt *merge_constant_constant(
+  abstract_object_pointert merge_constant_constant(
     constant_abstract_value_pointert other) const;
 
   exprt value;

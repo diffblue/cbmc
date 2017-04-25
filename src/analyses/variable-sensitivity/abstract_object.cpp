@@ -110,15 +110,15 @@ Function: abstract_objectt::merge
 
 \*******************************************************************/
 
-const abstract_objectt *abstract_objectt::merge(
+abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert other) const
 {
   if(top)
-    return this;
+    return shared_from_this();
   if(other->bottom)
-    return this;
+    return shared_from_this();
 
-  abstract_objectt *merged=mutable_clone();
+  internal_abstract_object_pointert merged=mutable_clone();
 
   // We are top if and only if the other is top (since this is not)
   merged->top=other->top;
@@ -291,17 +291,10 @@ abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert op2,
   bool &out_modifications)
 {
-  const abstract_objectt* result=op1->merge(op2);
+  abstract_object_pointert result=op1->merge(op2);
   // If no modifications, we will return the original pointer
-  out_modifications=result!=op1.get();
-  if(!out_modifications)
-  {
-    return op1;
-  }
-  else
-  {
-    return abstract_object_pointert(result);
-  }
+  out_modifications=result!=op1;
+  return result;
 }
 
 

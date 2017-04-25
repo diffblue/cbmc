@@ -48,12 +48,13 @@ public:
     bool merging_write) const override;
 
 protected:
-  virtual const abstract_objectt *merge(abstract_object_pointert op1) const override;
+  virtual abstract_object_pointert merge(
+    abstract_object_pointert op1) const override;
 
   CLONE
 
 private:
-  const abstract_objectt *merge_constant_pointers(
+  abstract_object_pointert merge_constant_pointers(
     const constant_pointer_abstract_pointert other) const;
 
   exprt value;
