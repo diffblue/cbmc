@@ -91,15 +91,15 @@ Function: constant_array_abstract_objectt::merge
   Inputs:
    other - The object to merge in
 
- Outputs: Returns true if this merge changes this
+ Outputs: Returns the result of the merge.
 
  Purpose: Tries to do an array/array merge if merging with a constant array
           If it can't, falls back to parent merge
 
 \*******************************************************************/
 
-bool constant_array_abstract_objectt::merge(
-  abstract_object_pointert other)
+const abstract_objectt *constant_array_abstract_objectt::merge(
+  abstract_object_pointert other) const
 {
   auto cast_other=
     std::dynamic_pointer_cast<const constant_array_abstract_objectt>(other);
@@ -109,7 +109,7 @@ bool constant_array_abstract_objectt::merge(
   }
   else
   {
-    map.clear();
+    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
     return array_abstract_objectt::merge(other);
   }
 }
@@ -121,40 +121,59 @@ Function: constant_array_abstract_objectt::constant_array_merge
   Inputs:
    other - The object to merge in
 
- Outputs: Returns true if this merge changes this
+ Outputs: Returns a new abstract object that is the result of the merge
+          unless the merge is the same as this abstract object, in which
+          case it returns this..
 
  Purpose: Merges an array into this array
 
 \*******************************************************************/
 
-bool constant_array_abstract_objectt::constant_array_merge(
-  const constant_array_abstract_object_pointert other)
+const abstract_objectt *constant_array_abstract_objectt::constant_array_merge(
+  const constant_array_abstract_object_pointert other) const
 {
-  constant_array_abstract_object_pointert old=
-    std::dynamic_pointer_cast<const constant_array_abstract_objectt>(clone());
-  bool parent_merge_change=array_abstract_objectt::merge(other);
-  if(is_top() || is_bottom())
+  const abstract_objectt *parent_merge=array_abstract_objectt::merge(other);
+
+  // Did the parent merge result in a definitive result
+  if(!parent_merge->is_top() && !parent_merge->is_bottom())
   {
-    map.clear();
-    return parent_merge_change;
+    array_mapt merged_map;
+    bool modified=
+      abstract_objectt::merge_maps<mp_integer>(map, other->map, merged_map);
+    // Can we actually merge these value
+    if(!modified)
+    {
+      // If the parent merge changed the merge, but we're neither top nor bottom
+      // then we can still return this
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+        parent_merge=nullptr;
+      }
+      return this;
+    }
+    else
+    {
+      // We need to make a new clone since the one created by the parent
+      // merge is immutable
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+      }
+
+      constant_array_abstract_objectt *result=
+        dynamic_cast<constant_array_abstract_objectt *>(mutable_clone());
+
+      result->map=merged_map;
+
+      assert(!result->is_top());
+      assert(!result->is_bottom());
+      return result;
+    }
   }
   else
   {
-    if(old->is_bottom())
-    {
-      map=other->map;
-      return true;
-    }
-    if(other->is_bottom())
-    {
-      return false;
-    }
-
-    // Both not top or bottom
-    assert(!old->is_top() && !other->is_top());
-    assert(!old->is_bottom() && !other->is_bottom());
-
-    return abstract_objectt::merge_maps<mp_integer>(old->map, other->map, map);
+    return parent_merge;
   }
 }
 

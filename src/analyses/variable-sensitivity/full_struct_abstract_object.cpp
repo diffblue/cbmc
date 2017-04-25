@@ -318,7 +318,7 @@ Function: full_struct_abstract_objectt::merge
   Inputs:
    other - the other object being merged
 
- Outputs: Returns true if this merge changes the value of this
+ Outputs: Returns the result of the merge.
 
  Purpose: To merge an abstract object into this abstract object. If
           the other is also a struct, we perform a constant_structs merge
@@ -326,7 +326,8 @@ Function: full_struct_abstract_objectt::merge
 
 \*******************************************************************/
 
-bool full_struct_abstract_objectt::merge(abstract_object_pointert other)
+const abstract_objectt *full_struct_abstract_objectt::merge(
+  abstract_object_pointert other) const
 {
   constant_struct_pointert cast_other=
     std::dynamic_pointer_cast<const full_struct_abstract_objectt>(other);
@@ -336,7 +337,7 @@ bool full_struct_abstract_objectt::merge(abstract_object_pointert other)
   }
   else
   {
-    map.clear();
+    // TODO(tkiley): How do we set the result to be toppish? Does it matter?
     return struct_abstract_objectt::merge(other);
   }
 }
@@ -348,49 +349,60 @@ Function: full_struct_abstract_objectt::merge_constant_structs
   Inputs:
    other - the other object being merged
 
- Outputs: Returns true if this merge changes the value of this
+ Outputs: Returns a new abstract object that is the result of the merge
+          unless the merge is the same as this abstract object, in which
+          case it returns this.
 
  Purpose: Performs an element wise merge of the map for each struct
 
 \*******************************************************************/
 
-bool full_struct_abstract_objectt::merge_constant_structs(
-  constant_struct_pointert other)
+const abstract_objectt *full_struct_abstract_objectt::merge_constant_structs(
+  constant_struct_pointert other) const
 {
-  auto old=
-    std::dynamic_pointer_cast<const full_struct_abstract_objectt>(clone());
+  const abstract_objectt *parent_merge=struct_abstract_objectt::merge(other);
 
-  // consider top and bottom in parent
-  bool parent_merge_change=abstract_objectt::merge(other);
-
-  if(is_top() || is_bottom())
+  // Did the parent merge result in a definitive result
+  if(!parent_merge->is_top() && !parent_merge->is_bottom())
   {
-    map.clear();
-    assert(verify());
-    return parent_merge_change;
+    struct_mapt merged_map;
+    bool modified=
+      abstract_objectt::merge_maps<irep_idt>(map, other->map, merged_map);
+    // Can we actually merge these value
+    if(!modified)
+    {
+      // If the parent merge changed the merge, but we're neither top nor bottom
+      // then we can still return this
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+        parent_merge=nullptr;
+      }
+      assert(verify());
+      return this;
+    }
+    else
+    {
+      // We need to make a new clone since the one created by the parent
+      // merge is immutable
+      if(parent_merge!=this)
+      {
+        delete parent_merge;
+      }
+
+      full_struct_abstract_objectt *result=
+        dynamic_cast<full_struct_abstract_objectt *>(mutable_clone());
+
+      result->map=merged_map;
+
+      assert(!result->is_top());
+      assert(!result->is_bottom());
+      assert(result->verify());
+      return result;
+    }
   }
-
-  assert(!old->is_top() && !other->is_top());
-  assert(!old->is_bottom() && !other->is_bottom());
-
-  if(other->is_bottom())
+  else
   {
-    assert(verify());
-    return false;
+    return parent_merge;
   }
-
-  if(old->is_bottom())
-  {
-    map=other->map;
-    assert(verify());
-    return true;
-  }
-
-
-  // at this point both are different from top and bottom
-  bool merge_result=
-    abstract_objectt::merge_maps<irep_idt>(old->map, other->map, map);
-
-  assert(verify());
-  return merge_result;
 }

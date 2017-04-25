@@ -31,6 +31,8 @@ public:
     const abstract_environmentt &environment,
     const namespacet &ns);
 
+  virtual ~constant_array_abstract_objectt() {}
+
   void output(
     std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
 
@@ -50,7 +52,8 @@ public:
 protected:
   CLONE
 
-  virtual bool merge(abstract_object_pointert other) override;
+  virtual const abstract_objectt *merge(
+    abstract_object_pointert other) const override;
 
 private:
   // Since we don't store for any index where the value is top
@@ -68,8 +71,8 @@ private:
   abstract_object_pointert get_top_entry(
     const abstract_environmentt &env, const namespacet &ns) const;
 
-  bool constant_array_merge(
-    const constant_array_abstract_object_pointert other);
+  const abstract_objectt *constant_array_merge(
+    const constant_array_abstract_object_pointert other) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
