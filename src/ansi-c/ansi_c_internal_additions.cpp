@@ -15,6 +15,31 @@ const char gcc_builtin_headers_generic[]=
 #include "gcc_builtin_headers_generic.inc"
 ; // NOLINT(whitespace/semicolon)
 
+const char gcc_builtin_headers_math[]=
+"# 1 \"gcc_builtin_headers_math.h\"\n"
+#include "gcc_builtin_headers_math.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_mem_string[]=
+"# 1 \"gcc_builtin_headers_mem_string.h\"\n"
+#include "gcc_builtin_headers_mem_string.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_omp[]=
+"# 1 \"gcc_builtin_headers_omp.h\"\n"
+#include "gcc_builtin_headers_omp.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_tm[]=
+"# 1 \"gcc_builtin_headers_tm.h\"\n"
+#include "gcc_builtin_headers_tm.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_ubsan[]=
+"# 1 \"gcc_builtin_headers_ubsan.h\"\n"
+#include "gcc_builtin_headers_ubsan.inc"
+; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
@@ -242,6 +267,11 @@ void ansi_c_internal_additions(std::string &code)
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_generic;
+    code+=gcc_builtin_headers_math;
+    code+=gcc_builtin_headers_mem_string;
+    code+=gcc_builtin_headers_omp;
+    code+=gcc_builtin_headers_tm;
+    code+=gcc_builtin_headers_ubsan;
     code+=clang_builtin_headers;
 
     // there are many more, e.g., look at

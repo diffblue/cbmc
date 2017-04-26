@@ -166,8 +166,10 @@ IFS='
 while read line ; do
   if [ $sed_is_gnu_sed -eq 1 ] ; then
     line=`echo "$line" | sed 's/\<size_t/__CPROVER_size_t/g'`
+    line=`echo "$line" | sed 's/\<complex\>\([^\.]\)/_Complex\1/g'`
   else
     line=`echo "$line" | sed 's/[[:<:]]size_t/__CPROVER_size_t/g'`
+    line=`echo "$line" | sed 's/[[:<:]]complex[[:>:]]\([^\.]\)/_Complex\1/g'`
   fi
 
   if grep -q -F "$line" gcc_builtin_headers_*.h ; then

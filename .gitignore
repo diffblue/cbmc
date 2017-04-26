@@ -29,8 +29,13 @@ src/ansi-c/gcc_builtin_headers_arm.inc
 src/ansi-c/gcc_builtin_headers_generic.inc
 src/ansi-c/gcc_builtin_headers_ia32-2.inc
 src/ansi-c/gcc_builtin_headers_ia32.inc
+src/ansi-c/gcc_builtin_headers_math.inc
+src/ansi-c/gcc_builtin_headers_mem_string.inc
+src/ansi-c/gcc_builtin_headers_omp.inc
+src/ansi-c/gcc_builtin_headers_tm.inc
 src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
+src/ansi-c/gcc_builtin_headers_ubsan.inc
 
 # regression/test files
 *.out
