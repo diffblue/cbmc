@@ -1,6 +1,7 @@
 .PHONY: all cprover.dir test
 
 SRC = unit_tests.cpp \
+      sharing_map.cpp \
       catch_example.cpp \
       # Empty last line
 
