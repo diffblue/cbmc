@@ -10,7 +10,7 @@ fi
 builtin_defs=" \
   builtin-types.def builtins.def sync-builtins.def \
   omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def \
-  sanitizer.def chkp-builtins.def hsa-builtins.def"
+  sanitizer.def chkp-builtins.def hsa-builtins.def brig-builtins.def"
 
 for f in $builtin_defs ; do
   [ ! -s $f ] || continue
@@ -135,11 +135,16 @@ gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | cat - builtins.def | \
 
 rm $builtin_defs builtins.h
 
+sed_is_gnu_sed=0
+if sed --version >/dev/null 2>&1 ; then
+  # GNU sed
+  sed_is_gnu_sed=1
+fi
+
 # for some we don't know how to handle them - removing symbols should be safe
 remove_line() {
   local pattern="$1"
-  if sed --version >/dev/null 2>&1 ; then
-    # GNU sed
+  if [ $sed_is_gnu_sed -eq 1 ] ; then
     sed -i "/$pattern/d" gcc-builtins.h
   else
     sed -i '' "/$pattern/d" gcc-builtins.h
@@ -152,9 +157,29 @@ remove_line BT_FN
 remove_line lang_hooks.types.type_for_mode
 remove_line __float
 remove_line pointer_bounds_type_node
+remove_line BT_LAST
+
+ifs=$IFS
+IFS='
+'
+
+while read line ; do
+  if [ $sed_is_gnu_sed -eq 1 ] ; then
+    line=`echo "$line" | sed 's/\<size_t/__CPROVER_size_t/g'`
+  else
+    line=`echo "$line" | sed 's/[[:<:]]size_t/__CPROVER_size_t/g'`
+  fi
+
+  if grep -q -F "$line" gcc_builtin_headers_*.h ; then
+    continue
+  fi
+
+  echo "$line" >> _gcc-builtins.h
+done < gcc-builtins.h
+mv _gcc-builtins.h gcc-builtins.h
 
 cat gcc-builtins.h | sed 's/__builtin/XX__builtin/' | \
-  gcc -c -fno-builtin -x c - -o gcc-builtins.o
+  gcc -D__CPROVER_size_t=size_t -c -fno-builtin -x c - -o gcc-builtins.o
 rm gcc-builtins.o
 
 echo "Successfully built gcc-builtins.h"
