@@ -66,7 +66,8 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
   if(expr.id()==ID_dereference ||
      expr.id()==ID_side_effect ||
      expr.id()==ID_compound_literal ||
-     expr.id()==ID_comma)
+     expr.id()==ID_comma ||
+     expr.id()==ID_let)
     return true;
 
   if(expr.id()==ID_index)
@@ -407,6 +408,11 @@ void goto_convertt::clean_expr(
     clean_expr_address_of(addr.object(), dest, mode);
     return;
   }
+  else if(expr.id()==ID_let)
+  {
+    rewrite_let(expr, dest, mode);
+    return;
+  }
 
   // TODO: evaluation order
 
@@ -519,4 +525,45 @@ void goto_convertt::remove_gcc_conditional_expression(
 
   // there might still be junk in expr.op2()
   clean_expr(expr, dest, mode);
+}
+
+/// Create a new code block, with a simplified version of let,
+/// and pass it to convert so that it can substituted for the
+/// original expression.
+/// \param expr: The let expression to be rewritten
+/// \param dest: A goto function that contains the expression
+/// \param mode: The language mode
+void goto_convertt::rewrite_let(
+  exprt &expr,
+  goto_programt &dest,
+  const irep_idt &mode)
+{
+  static int temporary_counter = 0;
+  std::string base_name = "let_result$" + std::to_string(++temporary_counter);
+
+  symbolt &let_result = get_fresh_aux_symbol(
+    expr.type(),
+    tmp_symbol_prefix,
+    base_name,
+    expr.find_source_location(),
+    mode,
+    symbol_table);
+
+  // required to essentially "cast" a symbolt -> auxiliary_symbolt
+  let_result.is_state_var = true;
+  let_result.is_lvalue = true;
+  let_result.is_thread_local = true;
+  let_result.is_file_local = true;
+  let_result.is_auxiliary = true;
+
+  auto &let_expr = to_let_expr(expr);
+  code_blockt equivalent_block;
+  code_declt bound_declaration(let_expr.symbol());
+  equivalent_block.move_to_operands(bound_declaration);
+  code_assignt bound_assignment(let_expr.symbol(), let_expr.value());
+  equivalent_block.move_to_operands(bound_assignment);
+  code_assignt result_assignment(let_result.symbol_expr(), let_expr.where());
+  equivalent_block.move_to_operands(result_assignment);
+  expr = let_result.symbol_expr();
+  convert(equivalent_block, dest, mode);
 }

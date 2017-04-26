@@ -91,6 +91,7 @@ protected:
     const irep_idt &mode);
 
   void rewrite_boolean(exprt &dest);
+  void rewrite_let(exprt &, goto_programt &, const irep_idt &mode);
 
   static bool has_sideeffect(const exprt &expr);
   static bool has_function_call(const exprt &expr);
