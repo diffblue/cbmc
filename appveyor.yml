@@ -108,3 +108,7 @@ test_script:
     rmdir /s /q goto-instrument\slice08
 
     make test
+
+    cd ..
+    make -C unit all
+    make -C unit test
