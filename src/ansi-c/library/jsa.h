@@ -188,7 +188,10 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_are_heaps_equal(
   const __CPROVER_jsa_abstract_heapt *const rhs)
 {
   __CPROVER_jsa__internal_index_t i;
+#include <util/pragma_push>
+#include <util/pragma_wtautological_compare>
   for(i=0; i < __CPROVER_JSA_MAX_ABSTRACT_NODES; ++i)
+#include <util/pragma_pop>
   {
     const __CPROVER_jsa_abstract_nodet lhs_node=lhs->abstract_nodes[i];
     const __CPROVER_jsa_abstract_nodet rhs_node=rhs->abstract_nodes[i];
@@ -198,7 +201,10 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_are_heaps_equal(
        lhs_node.value_ref!=rhs_node.value_ref)
       return false;
   }
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
   for(i=0; i < __CPROVER_JSA_MAX_ABSTRACT_RANGES; ++i)
+#include <util/pragma_pop> // NOLINT(build/include)
   {
     const __CPROVER_jsa_abstract_ranget lhs_range=lhs->abstract_ranges[i];
     const __CPROVER_jsa_abstract_ranget rhs_range=rhs->abstract_ranges[i];
@@ -592,9 +598,12 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
       __CPROVER_jsa__internal_assume_linking_correct(h, cnode, prev, nxt);
     }
   }
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
   for(__CPROVER_jsa__internal_index_t anode=0;
       anode<__CPROVER_JSA_MAX_ABSTRACT_NODES;
       ++anode)
+#include <util/pragma_pop> // NOLINT(build/include)
   {
     const __CPROVER_jsa_id_t nxt=h->abstract_nodes[anode].next;
     __CPROVER_jsa_assume(__CPROVER_jsa__internal_is_valid_node_id(nxt));
@@ -604,9 +613,12 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
       __CPROVER_jsa__internal_get_abstract_node_id(anode);
     __CPROVER_jsa__internal_assume_linking_correct(h, nid, prev, nxt);
   }
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
   for(__CPROVER_jsa__internal_index_t range=0;
       range<__CPROVER_JSA_MAX_ABSTRACT_RANGES;
       ++range)
+#include <util/pragma_pop> // NOLINT(build/include)
   {
     const __CPROVER_jsa_abstract_ranget r=h->abstract_ranges[range];
     __CPROVER_jsa_assume(r.size >= 1);
@@ -653,9 +665,12 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
         ++cnodec)
       if(h->concrete_nodes[cnodec].list == listc)
         ++count;
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
     for(__CPROVER_jsa__internal_index_t anodec=0;
         anodec<__CPROVER_JSA_MAX_ABSTRACT_NODES;
         ++anodec)
+#include <util/pragma_pop> // NOLINT(build/include)
       if(h->abstract_nodes[anodec].list==listc)
         ++count;
     __CPROVER_jsa_assume(count<=__CPROVER_JSA_MAX_NODES_PER_CE_LIST);

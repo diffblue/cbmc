@@ -56,13 +56,19 @@ public:
 
   loct &operator[] (loc_reft l)
   {
+#include <util/pragma_push>
+#include <util/pragma_wtautological_compare>
     assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
+#include <util/pragma_pop>
     return loc_vector[l.loc_number];
   }
 
   const loct &operator[] (loc_reft l) const
   {
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
     assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
+#include <util/pragma_pop> // NOLINT(build/include)
     return loc_vector[l.loc_number];
   }
 
