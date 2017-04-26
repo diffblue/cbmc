@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
-  "(dump-c)(dump-cpp)(use-system-headers)(dot)(xml)" \
+  "(dump-c)(dump-cpp)(use-system-headers)(use-all-headers)(dot)(xml)" \
   OPT_GOTO_CHECK \
   /* no-X-check are deprecated and ignored */ \
   "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \

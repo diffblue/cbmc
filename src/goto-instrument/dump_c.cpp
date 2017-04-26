@@ -732,12 +732,7 @@ bool dump_ct::ignore(const symbolt &symbol)
   const std::string &file_str=id2string(symbol.location.get_file());
 
   // don't dump internal GCC builtins
-  if((file_str=="gcc_builtin_headers_alpha.h" ||
-      file_str=="gcc_builtin_headers_arm.h" ||
-      file_str=="gcc_builtin_headers_ia32.h" ||
-      file_str=="gcc_builtin_headers_mips.h" ||
-      file_str=="gcc_builtin_headers_power.h" ||
-      file_str=="gcc_builtin_headers_generic.h") &&
+  if(has_prefix(file_str, "gcc_builtin_headers_") &&
      has_prefix(name_str, "__builtin_"))
     return true;
 
@@ -758,6 +753,19 @@ bool dump_ct::ignore(const symbolt &symbol)
   if(it!=system_library_map.end())
   {
     system_headers.insert(it->second);
+    return true;
+  }
+
+  if(use_all_headers &&
+     has_prefix(file_str, "/usr/include/"))
+  {
+    if(file_str.find("/bits/")==std::string::npos)
+    {
+      // Do not include transitive includes of system headers!
+      std::string::size_type prefix_len=std::string("/usr/include/").size();
+      system_headers.insert(file_str.substr(prefix_len));
+    }
+
     return true;
   }
 
@@ -1278,19 +1286,23 @@ std::string dump_ct::expr_to_string(const exprt &expr)
 void dump_c(
   const goto_functionst &src,
   const bool use_system_headers,
+  const bool use_all_headers,
   const namespacet &ns,
   std::ostream &out)
 {
-  dump_ct goto2c(src, use_system_headers, ns, new_ansi_c_language);
+  dump_ct goto2c(
+    src, use_system_headers, use_all_headers, ns, new_ansi_c_language);
   out << goto2c;
 }
 
 void dump_cpp(
   const goto_functionst &src,
   const bool use_system_headers,
+  const bool use_all_headers,
   const namespacet &ns,
   std::ostream &out)
 {
-  dump_ct goto2cpp(src, use_system_headers, ns, new_cpp_language);
+  dump_ct goto2cpp(
+    src, use_system_headers, use_all_headers, ns, new_cpp_language);
   out << goto2cpp;
 }

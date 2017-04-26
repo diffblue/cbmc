@@ -25,12 +25,14 @@ public:
   dump_ct(
     const goto_functionst &_goto_functions,
     const bool use_system_headers,
+    const bool use_all_headers,
     const namespacet &_ns,
     language_factoryt factory):
     goto_functions(_goto_functions),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
-    language(factory())
+    language(factory()),
+    use_all_headers(use_all_headers)
   {
     if(use_system_headers)
       init_system_library_map();
@@ -48,6 +50,7 @@ protected:
   symbol_tablet copied_symbol_table;
   const namespacet ns;
   languaget *language;
+  const bool use_all_headers;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;

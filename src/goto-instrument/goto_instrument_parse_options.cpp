@@ -621,7 +621,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
-      const bool h=cmdline.isset("use-system-headers");
+      const bool h_libc=cmdline.isset("use-system-headers");
+      const bool h_all=cmdline.isset("use-all-headers");
       namespacet ns(symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -640,10 +641,11 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
       }
       else
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, std::cout);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_functions, h_libc, h_all, ns, std::cout);
 
       return 0;
     }
@@ -1540,7 +1542,8 @@ void goto_instrument_parse_optionst::help()
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
-    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
+    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with libc includes\n" // NOLINT(*)
+    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
