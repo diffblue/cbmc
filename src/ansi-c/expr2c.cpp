@@ -3618,7 +3618,10 @@ std::string expr2ct::convert_code_block(
   const code_blockt &src,
   unsigned indent)
 {
+#include <util/pragma_push>
+#include <util/pragma_wtautological_compare>
   assert(indent>=0);
+#include <util/pragma_pop>
   std::string dest=indent_str(indent);
   dest+="{\n";
 
@@ -3654,7 +3657,10 @@ std::string expr2ct::convert_code_decl_block(
   const codet &src,
   unsigned indent)
 {
+#include <util/pragma_push> // NOLINT(build/include)
+#include <util/pragma_wtautological_compare> // NOLINT(build/include)
   assert(indent>=0);
+#include <util/pragma_pop> // NOLINT(build/include)
   std::string dest;
 
   forall_operands(it, src)

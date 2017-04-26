@@ -31,6 +31,10 @@ static char *word(char *s)
   return buf;
 }
 
+#include <util/pragma_wsign_compare>
+#include <util/pragma_wnull_conversion>
+#include <util/pragma_wdeprecated_register>
+
 %}
 
 
