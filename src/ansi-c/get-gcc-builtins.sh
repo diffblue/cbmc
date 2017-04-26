@@ -25,7 +25,6 @@ cat > gcc-builtins.h <<EOF
 #include <unistd.h>
 #include <stdio.h>
 #include <wctype.h>
-
 typedef   char   __gcc_v8qi  __attribute__ ((__vector_size__ (8)));
 typedef   char   __gcc_v16qi __attribute__ ((__vector_size__ (16)));
 typedef   char   __gcc_v32qi __attribute__ ((__vector_size__ (32)));
@@ -50,7 +49,6 @@ typedef   long long __gcc_v2di __attribute__ ((__vector_size__ (16)));
 typedef   long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
 typedef   long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
 typedef   unsigned long long __gcc_di;
-
 EOF
 
 cat > builtins.h <<EOF
@@ -98,17 +96,14 @@ cat > builtins.h <<EOF
 #define short_unsigned_type_node unsigned short
 #define short_integer_type_node short
 #define unsigned_char_type_node unsigned char
-
 // some newer versions of GCC apparently support __floatXYZ
 #define dfloat32_type_node __float32
 #define dfloat64_type_node __float64
 #define dfloat128_type_node __float128
-
 #define build_qualified_type(t, q) q t
 #define build_pointer_type(t) t*
 #define TYPE_QUAL_VOLATILE volatile
 #define TYPE_QUAL_CONST const
-
 #define DEF_PRIMITIVE_TYPE(ENUM, TYPE) \
 NEXTDEF ENUM TYPE
 #define DEF_FUNCTION_TYPE_0(ENUM, RETURN) \
@@ -135,7 +130,6 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, A
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10)
 #define DEF_FUNCTION_TYPE_11(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10, ARG11) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8, ARG9, ARG10, ARG11)
-
 #define DEF_FUNCTION_TYPE_VAR_0(ENUM, RETURN) \
 NEXTDEF ENUM(name) RETURN name()
 #define DEF_FUNCTION_TYPE_VAR_1(ENUM, RETURN, ARG1) \
@@ -152,21 +146,15 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ...)
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ...)
 #define DEF_FUNCTION_TYPE_VAR_7(ENUM, RETURN, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) \
 NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ...)
-
 #define DEF_POINTER_TYPE(ENUM, TYPE) \
 NEXTDEF ENUM TYPE*
-
 #define DEF_POINTER_TYPE_CONST(ENUM, TYPE, C) \
 NEXTDEF ENUM const TYPE*
-
 #include "builtin-types.def"
-
 NEXTDEF DEF_BUILTIN(ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, \
                   FALLBACK_P, NONANSI_P, ATTRS, IMPLICIT, COND) \
 TYPE(MANGLE(NAME));
-
 #include "i386-builtin-types-expanded.def"
-
 NEXTDEF BDESC(mask, icode, name, code, comparison, flag) \
 flag(MANGLEi386(name));
 NEXTDEF BDESC_FIRST(kind, KIND, mask, icode, name, code, comparison, flag) \
@@ -176,12 +164,10 @@ EOF
 grep '^DEF_VECTOR_TYPE' i386-builtin-types.def | \
   awk -F '[,() \t]' '{ print "#define " $3 " __gcc_" tolower($3) }' \
   > i386-builtin-types-expanded.def
-
 grep -v '^DEF_FUNCTION_TYPE[[:space:]]' i386-builtin-types.def | \
   grep '^DEF_P' | \
   sed '/^DEF_POINTER_TYPE[^,]*, [^,]*, [^,]*$/ s/_TYPE/_TYPE_CONST/' \
   >> i386-builtin-types-expanded.def
-
 cat i386-builtin-types.def | \
   sed '/^DEF_FUNCTION_TYPE[[:space:]]/! s/.*//' | \
   sed 's/^DEF_FUNCTION_TYPE[[:space:]]*(\([^,]*\))/\1_FTYPE_VOID/' | \
