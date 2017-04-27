@@ -132,7 +132,7 @@ static void convert_nondet(
 {
   for(auto instruction_iterator=goto_program.instructions.begin(),
         end=goto_program.instructions.end();
-        instruction_iterator!=end;)
+      instruction_iterator!=end;)
   {
     instruction_iterator=insert_nondet_init_code(
       goto_program,
