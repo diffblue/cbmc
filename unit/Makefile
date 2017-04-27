@@ -10,6 +10,7 @@ SRC = cpp_parser.cpp \
       sharing_node.cpp \
       smt2_parser.cpp \
       string_utils.cpp \
+      unicode.cpp \
       wp.cpp \
       # Empty last line
 
@@ -74,5 +75,8 @@ sharing_map$(EXEEXT): sharing_map$(OBJEXT)
 	$(LINKBIN)
 
 sharing_node$(EXEEXT): sharing_node$(OBJEXT)
+	$(LINKBIN)
+
+unicode$(EXEEXT): unicode$(OBJEXT)
 	$(LINKBIN)
 
