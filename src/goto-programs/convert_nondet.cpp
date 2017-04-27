@@ -9,6 +9,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "goto-programs/convert_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
+#include "goto-programs/remove_skip.h"
 
 #include "java_bytecode/java_object_factory.h" // gen_nondet_init
 
@@ -34,9 +35,9 @@ Function: insert_nondet_init_code
 
 \*******************************************************************/
 
-static goto_programt::const_targett insert_nondet_init_code(
+static goto_programt::targett insert_nondet_init_code(
   goto_programt &goto_program,
-  const goto_programt::const_targett &target,
+  const goto_programt::targett &target,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_nondet_array_length)
@@ -82,7 +83,7 @@ static goto_programt::const_targett insert_nondet_init_code(
   const auto source_loc=target->source_location;
 
   // Erase the nondet assignment
-  const auto after_erased=goto_program.instructions.erase(target);
+  target->make_skip();
 
   // Generate nondet init code
   code_blockt init_code;
@@ -101,10 +102,10 @@ static goto_programt::const_targett insert_nondet_init_code(
   goto_convert(init_code, symbol_table, new_instructions, message_handler);
 
   // Insert the new instructions into the instruction list
-  goto_program.destructive_insert(after_erased, new_instructions);
+  goto_program.destructive_insert(next_instr, new_instructions);
   goto_program.update();
 
-  return after_erased;
+  return next_instr;
 }
 
 /*******************************************************************\
@@ -129,8 +130,8 @@ static void convert_nondet(
   message_handlert &message_handler,
   size_t max_nondet_array_length)
 {
-  for(auto instruction_iterator=goto_program.instructions.cbegin(),
-        end=goto_program.instructions.cend();
+  for(auto instruction_iterator=goto_program.instructions.begin(),
+        end=goto_program.instructions.end();
         instruction_iterator!=end;)
   {
     instruction_iterator=insert_nondet_init_code(
@@ -160,4 +161,6 @@ void convert_nondet(
   }
 
   goto_functions.compute_location_numbers();
+
+  remove_skip(goto_functions);
 }
