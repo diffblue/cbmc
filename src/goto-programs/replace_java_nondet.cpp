@@ -12,6 +12,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "goto-programs/replace_java_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
+#include "goto-programs/remove_skip.h"
 
 #include "util/irep_ids.h"
 
@@ -242,5 +243,8 @@ void replace_java_nondet(goto_functionst &goto_functions)
   {
     replace_java_nondet(goto_program.second.body);
   }
+
   goto_functions.compute_location_numbers();
+
+  remove_skip(goto_functions);
 }
