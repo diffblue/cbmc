@@ -256,9 +256,9 @@ while read line ; do
   if [[ $bi =~ __builtin_ia32 ]] ; then
     if grep -wq $bi gcc_builtin_headers_ia32*.h ; then
       if [ $sed_is_gnu_sed -eq 1 ] ; then
-        sed -i "/[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
+        sed -i "/^[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
       else
-        sed -i '' "/[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
+        sed -i '' "/^[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
       fi
       continue
     fi

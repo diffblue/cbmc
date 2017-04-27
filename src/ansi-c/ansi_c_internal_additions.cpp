@@ -47,6 +47,12 @@ const char gcc_builtin_headers_ia32[]=
 const char gcc_builtin_headers_ia32_2[]=
 #include "gcc_builtin_headers_ia32-2.inc"
 ; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_3[]=
+#include "gcc_builtin_headers_ia32-3.inc"
+; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_4[]=
+#include "gcc_builtin_headers_ia32-4.inc"
+; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[]=
 "# 1 \"gcc_builtin_headers_alpha.h\"\n"
@@ -286,6 +292,8 @@ void ansi_c_internal_additions(std::string &code)
 
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
+      code+=gcc_builtin_headers_ia32_3;
+      code+=gcc_builtin_headers_ia32_4;
     }
     else if(config.ansi_c.arch=="arm64" ||
             config.ansi_c.arch=="armel" ||

@@ -147,6 +147,9 @@ void cpp_internal_additions(std::ostream &out)
        out << "typedef double __float128;\n"; // clang doesn't do __float128
 
     out << c2cpp(gcc_builtin_headers_ia32);
+    out << c2cpp(gcc_builtin_headers_ia32_2);
+    out << c2cpp(gcc_builtin_headers_ia32_3);
+    out << c2cpp(gcc_builtin_headers_ia32_4);
     out << "}" << '\n';
   }
 
