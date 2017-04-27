@@ -4,6 +4,7 @@ SRC = unit_tests.cpp \
       catch_example.cpp \
       analyses/variable-sensitivity/abstract_object/merge.cpp \
       analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
+      analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
       # Empty last line
 
 INCLUDES= -I ../src/ -I.
