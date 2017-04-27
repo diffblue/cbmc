@@ -29,6 +29,7 @@
 #include <memory>
 #include <map>
 #include <iosfwd>
+#include <algorithm>
 
 #include <util/expr.h>
 
@@ -149,62 +150,36 @@ bool abstract_objectt::merge_maps(
 
   typedef std::map<keyt, abstract_object_pointert> abstract_object_mapt;
 
-  typename abstract_object_mapt::const_iterator it1=m1.begin();
-  typename abstract_object_mapt::const_iterator it2=m2.begin();
-
   bool modified=false;
 
-  while(true)
+  std::vector<std::pair<keyt, abstract_object_pointert>> intersection_set;
+  std::set_intersection(
+    m1.cbegin(),
+    m1.cend(),
+    m2.cbegin(),
+    m2.cend(),
+    std::back_inserter(intersection_set),
+    [](
+      const std::pair<keyt, abstract_object_pointert> &op1,
+      const std::pair<keyt, abstract_object_pointert> &op2)
+    {
+      return op1.first < op2.first;
+    });
+
+  for(const typename abstract_object_mapt::value_type &entry : intersection_set)
   {
-    if(it1->first<it2->first)
-    {
-      // element of m1 is not in m2
+    // merge entries
 
-      it1++;
-      modified=true;
-      if(it1==m1.end())
-        break;
-    }
-    else if(it2->first<it1->first)
-    {
-      // element of m2 is not in m1
+    const abstract_object_pointert &v1=m1.at(entry.first);
+    const abstract_object_pointert &v2=m2.at(entry.first);
 
-      it2++;
-      if(it2==m2.end())
-      {
-        modified=true; // as there is a remaining element in m1
-        break;
-      }
-    }
-    else
-    {
-      // merge entries
+    bool changes=false;
+    abstract_object_pointert v_new=abstract_objectt::merge(v1, v2, changes);
 
-      const abstract_object_pointert &v1=it1->second;
-      const abstract_object_pointert &v2=it2->second;
 
-      bool changes=false;
-      abstract_object_pointert v_new;
+    modified|=changes;
 
-      v_new=abstract_objectt::merge(v1, v2, changes);
-
-      modified|=changes;
-
-      out_map[it1->first]=v_new;
-
-      it1++;
-
-      if(it1==m1.end())
-        break;
-
-      it2++;
-
-      if(it2==m2.end())
-      {
-        modified=true; // as there is a remaining element in m1
-        break;
-      }
-    }
+    out_map[entry.first]=v_new;
   }
 
   return modified;

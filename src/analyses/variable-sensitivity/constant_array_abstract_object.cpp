@@ -8,6 +8,7 @@
 #include <ostream>
 
 #include <analyses/variable-sensitivity/abstract_enviroment.h>
+#include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
@@ -132,22 +133,26 @@ Function: constant_array_abstract_objectt::constant_array_merge
 abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   const constant_array_abstract_object_pointert other) const
 {
-  abstract_object_pointert parent_merge=array_abstract_objectt::merge(other);
-
-  // Did the parent merge result in a definitive result
-  if(!parent_merge->is_top() && !parent_merge->is_bottom())
+  if(is_top() || other->is_bottom())
   {
-    array_mapt merged_map;
+    return array_abstract_objectt::merge(other);
+  }
+  else if(is_bottom())
+  {
+    return std::make_shared<constant_array_abstract_objectt>(*other);
+  }
+  else
+  {
+    array_mapt merged_map=array_mapt();
     bool modified=
       abstract_objectt::merge_maps<mp_integer>(map, other->map, merged_map);
-    // Can we actually merge these value
     if(!modified)
     {
       return shared_from_this();
     }
     else
     {
-      internal_sharing_ptrt<constant_array_abstract_objectt> result=
+      const auto &result=
         std::dynamic_pointer_cast<constant_array_abstract_objectt>(
           mutable_clone());
 
@@ -157,10 +162,6 @@ abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
       assert(!result->is_bottom());
       return result;
     }
-  }
-  else
-  {
-    return parent_merge;
   }
 }
 
@@ -403,8 +404,8 @@ bool constant_array_abstract_objectt::eval_index(
   if(value.is_constant())
   {
     constant_exprt constant_index=to_constant_expr(value);
-    out_index=binary2integer(id2string(constant_index.get_value()), false);
-    return true;
+    bool result=to_integer(constant_index, out_index);
+    return !result;
   }
   else
   {
