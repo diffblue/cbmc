@@ -1,4 +1,5 @@
 SRC = bytecode_info.cpp \
+      ci_lazy_methods.cpp \
       expr2java.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
