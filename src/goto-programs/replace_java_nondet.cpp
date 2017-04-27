@@ -9,6 +9,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "goto-programs/replace_java_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
+#include "goto-programs/remove_skip.h"
 
 #include "util/irep_ids.h"
 
@@ -215,9 +216,9 @@ Function: check_and_replace_target
 
 \*******************************************************************/
 
-static goto_programt::const_targett check_and_replace_target(
+static goto_programt::targett check_and_replace_target(
   goto_programt &goto_program,
-  const goto_programt::const_targett &target)
+  const goto_programt::targett &target)
 {
   // Check whether this is a nondet library method, and return if not
   const auto instr_info=get_nondet_instruction_info(target);
@@ -241,7 +242,7 @@ static goto_programt::const_targett check_and_replace_target(
     to_symbol_expr(next_instr_assign_lhs).get_identifier();
 
   auto &instructions=goto_program.instructions;
-  const auto end=instructions.cend();
+  const auto end=instructions.end();
 
   // Look for an instruction where this name is on the RHS of an assignment
   const auto matching_assignment=std::find_if(
@@ -263,10 +264,15 @@ static goto_programt::const_targett check_and_replace_target(
   const auto after_matching_assignment=std::next(matching_assignment);
   assert(after_matching_assignment!=end);
 
-  const auto after_erased=goto_program.instructions.erase(
-    target, after_matching_assignment);
+  std::for_each(
+    target,
+    after_matching_assignment,
+    [](goto_programt::instructiont &instr)
+    {
+      instr.make_skip();
+    });
 
-  const auto inserted=goto_program.insert_before(after_erased);
+  const auto inserted=goto_program.insert_before(after_matching_assignment);
   inserted->make_assignment();
   side_effect_expr_nondett inserted_expr(nondet_var.type());
   inserted_expr.set_nullable(
@@ -278,7 +284,7 @@ static goto_programt::const_targett check_and_replace_target(
 
   goto_program.update();
 
-  return after_erased;
+  return after_matching_assignment;
 }
 
 /*******************************************************************\
@@ -297,8 +303,8 @@ Function: replace_java_nondet
 
 static void replace_java_nondet(goto_programt &goto_program)
 {
-  for(auto instruction_iterator=goto_program.instructions.cbegin(),
-        end=goto_program.instructions.cend();
+  for(auto instruction_iterator=goto_program.instructions.begin(),
+        end=goto_program.instructions.end();
       instruction_iterator!=end;)
   {
     instruction_iterator=check_and_replace_target(
@@ -315,5 +321,8 @@ void replace_java_nondet(goto_functionst &goto_functions)
   {
     replace_java_nondet(goto_program.second.body);
   }
+
   goto_functions.compute_location_numbers();
+
+  remove_skip(goto_functions);
 }
