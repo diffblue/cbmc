@@ -19,11 +19,10 @@ class abstract_environmentt;
 
 class constant_array_abstract_objectt:public array_abstract_objectt
 {
-private:
+public:
   typedef sharing_ptrt<constant_array_abstract_objectt> const
     constant_array_abstract_object_pointert;
 
-public:
   explicit constant_array_abstract_objectt(typet type);
   constant_array_abstract_objectt(typet type, bool top, bool bottom);
   constant_array_abstract_objectt(
