@@ -142,12 +142,8 @@ generated_files: cprover_library.inc gcc_builtin_headers_generic.inc \
 	ansi_c_y.tab.h clang_builtin_headers.inc gcc_builtin_headers_ia32-2.inc \
   gcc_builtin_headers_math.inc gcc_builtin_headers_omp.inc \
   gcc_builtin_headers_tm.inc gcc_builtin_headers_ubsan.inc \
-<<<<<<< 0bc503ae07a912ec82d5c337f453520219aac395
   gcc_builtin_headers_mem_string.inc \
   gcc_builtin_headers_ia32-3.inc gcc_builtin_headers_ia32-4.inc
-=======
-  gcc_builtin_headers_mem_string.inc
->>>>>>> HEAD~80
 
 ###############################################################################
 
