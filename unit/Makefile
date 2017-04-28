@@ -1,6 +1,6 @@
 .PHONY: all cprover.dir test
 
-SRC = catch_entry_point.cpp \
+SRC = unit_tests.cpp \
       catch_example.cpp \
       # Empty last line
 
@@ -26,7 +26,7 @@ LIBS = ../src/ansi-c/ansi-c$(LIBEXT) \
        ../src/solvers/solvers$(LIBEXT) \
        # Empty last line
 
-TESTS = catch_entry_point$(EXEEXT) \
+TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
         string_utils$(EXEEXT) \
         sharing_node$(EXEEXT) \
@@ -43,7 +43,7 @@ test: all
 
 ###############################################################################
 
-catch_entry_point$(EXEEXT): $(OBJ)
+unit_tests$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
 miniBDD$(EXEEXT): miniBDD$(OBJEXT)
