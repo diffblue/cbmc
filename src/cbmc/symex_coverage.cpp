@@ -314,7 +314,8 @@ void goto_program_coverage_recordt::compute_coverage_lines(
         if(entry.first->second.hits==0)
           ++lines_covered;
 
-        entry.first->second.hits+=cov.second.num_executions;
+        if(cov.second.num_executions>entry.first->second.hits)
+          entry.first->second.hits=cov.second.num_executions;
 
         if(is_branch)
         {
