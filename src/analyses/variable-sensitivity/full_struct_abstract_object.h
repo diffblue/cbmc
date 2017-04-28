@@ -20,6 +20,8 @@ class member_exprt;
 class full_struct_abstract_objectt:public struct_abstract_objectt
 {
 public:
+  typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
+
   explicit full_struct_abstract_objectt(const typet &type);
 
   full_struct_abstract_objectt(const typet &type, bool top, bool bottom);
@@ -54,7 +56,7 @@ private:
   typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
   struct_mapt map;
 
-  typedef sharing_ptrt<full_struct_abstract_objectt> constant_struct_pointert;
+
 
   abstract_object_pointert merge_constant_structs(
     constant_struct_pointert other) const;
