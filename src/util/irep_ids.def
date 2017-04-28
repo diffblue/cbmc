@@ -1,3 +1,6 @@
+/// \file List of irep id names and values.
+/// For an explanation of how this works, see irep_ids.h.
+
 IREP_ID_TWO(empty_string, )
 IREP_ID_ONE(let)
 IREP_ID_ONE(nil)
