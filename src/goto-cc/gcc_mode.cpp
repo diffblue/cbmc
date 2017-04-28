@@ -432,7 +432,6 @@ int gcc_modet::doit()
                     cmdline.isset("Werror") &&
                     cmdline.isset("Wextra") &&
                     !cmdline.isset("Wno-error"));
-  compiler.set_message_handler(get_message_handler());
 
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
