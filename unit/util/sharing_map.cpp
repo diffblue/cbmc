@@ -1,3 +1,11 @@
+/*******************************************************************\
+
+ Module: Unit tests for the util/sharing_map
+
+ Author: DiffBlue Limited. All rights reserved.
+
+\*******************************************************************/
+
 #include <iostream>
 
 #include <catch.hpp>
@@ -20,27 +28,14 @@ void fill2(smt &sm)
   sm.insert("n", "5");
 }
 
-class some_keyt
-{
-public:
-  some_keyt(size_t s) : s(s)
-  {
-  }
+typedef size_t some_keyt;
 
-  size_t s;
-
-  bool operator==(const some_keyt &other) const
-  {
-    return s==other.s;
-  }
-};
-
-class some_key_hash
+class some_key_hasht
 {
 public:
   size_t operator()(const some_keyt &k) const
   {
-    return k.s & 0x3;
+    return k & 0x3;
   }
 };
 
@@ -101,7 +96,8 @@ TEST_CASE("sharing map", "[core][util][sharing_map]")
       s=sm2.at("i");
       REQUIRE(s=="0");
 
-      try {
+      try
+      {
         sm2.at("k");
         REQUIRE(false);
       } catch (...) {}
@@ -205,9 +201,9 @@ TEST_CASE("sharing map", "[core][util][sharing_map]")
 
   SECTION("collision_test")
   {
-    typedef sharing_mapt<some_keyt, std::string, some_key_hash> smt;
+    typedef sharing_mapt<some_keyt, std::string, some_key_hasht> sm2t;
 
-    smt sm;
+    sm2t sm;
 
     sm.insert(0, "a");
     sm.insert(8, "b");
