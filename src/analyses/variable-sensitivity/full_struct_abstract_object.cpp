@@ -360,15 +360,19 @@ Function: full_struct_abstract_objectt::merge_constant_structs
 abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   constant_struct_pointert other) const
 {
-  abstract_object_pointert parent_merge=struct_abstract_objectt::merge(other);
-
-  // Did the parent merge result in a definitive result
-  if(!parent_merge->is_top() && !parent_merge->is_bottom())
+  if(is_top() || other->is_bottom())
+  {
+    return struct_abstract_objectt::merge(other);
+  }
+  else if(is_bottom())
+  {
+    return std::make_shared<full_struct_abstract_objectt>(*other);
+  }
+  else
   {
     struct_mapt merged_map;
     bool modified=
       abstract_objectt::merge_maps<irep_idt>(map, other->map, merged_map);
-    // Can we actually merge these value
     if(!modified)
     {
       assert(verify());
@@ -376,7 +380,7 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
     }
     else
     {
-      internal_sharing_ptrt<full_struct_abstract_objectt> result=
+      const auto &result=
         std::dynamic_pointer_cast<full_struct_abstract_objectt>(
           mutable_clone());
 
@@ -387,9 +391,5 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
       assert(result->verify());
       return result;
     }
-  }
-  else
-  {
-    return parent_merge;
   }
 }

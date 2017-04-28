@@ -168,30 +168,25 @@ abstract_object_pointert
   constant_pointer_abstract_objectt::merge_constant_pointers(
     const constant_pointer_abstract_pointert other) const
 {
-  abstract_object_pointert parent_merge=pointer_abstract_objectt::merge(other);
-
-  // Did the parent merge result in a definitive result
-  if(!parent_merge->is_top() && !parent_merge->is_bottom())
+  if(is_top() || other->is_bottom())
   {
+    return pointer_abstract_objectt::merge(other);
+  }
+  else if(is_bottom())
+  {
+    return std::make_shared<constant_pointer_abstract_objectt>(*other);
+  }
+  else
+  {
+    // Can we actually merge these value
     if(value==other->value)
     {
       return shared_from_this();
     }
     else
     {
-      internal_sharing_ptrt<constant_pointer_abstract_objectt> result=
-        std::dynamic_pointer_cast<constant_pointer_abstract_objectt>(
-          mutable_clone());
-
-      result->make_top();
-      assert(!result->is_bottom());
-      result->value=exprt();
-      return result;
+      return pointer_abstract_objectt::merge(other);
     }
-  }
-  else
-  {
-    return parent_merge;
   }
 }
 
