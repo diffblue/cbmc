@@ -59,7 +59,7 @@ int ms_cl_modet::doit()
 
   unsigned int verbosity=1;
 
-  compilet compiler(cmdline, cmdline.isset("WX"));
+  compilet compiler(cmdline, message_handler, cmdline.isset("WX"));
 
   #if 0
   bool act_as_ld=

@@ -415,7 +415,7 @@ bool compilet::link()
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
       return true;
 
     // entry_point may (should) add some more functions.
@@ -758,9 +758,8 @@ Function: compilet::compilet
 
 \*******************************************************************/
 
-compilet::compilet(cmdlinet &_cmdline, bool Werror):
-  language_uit(_cmdline, ui_message_handler),
-  ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
+compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
+  language_uit(_cmdline, mh),
   ns(symbol_table),
   cmdline(_cmdline),
   warning_is_fatal(Werror)
@@ -849,7 +848,7 @@ Function: compilet::convert_symbols
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, dest, ui_message_handler);
+  goto_convert_functionst converter(symbol_table, dest, get_message_handler());
 
   // the compilation may add symbols!
 

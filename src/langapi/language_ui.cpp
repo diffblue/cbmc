@@ -33,8 +33,8 @@ Function: language_uit::language_uit
 language_uit::language_uit(
   const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
-  ui_message_handler(_ui_message_handler),
-  _cmdline(cmdline)
+  _cmdline(cmdline),
+  ui_message_handler(_ui_message_handler)
 {
   set_message_handler(ui_message_handler);
 }

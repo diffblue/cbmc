@@ -18,6 +18,10 @@ public:
 
   ui_message_handlert(uit, const std::string &program);
   ui_message_handlert(const class cmdlinet &, const std::string &program);
+  ui_message_handlert():
+    _ui(uit::PLAIN)
+  {
+  }
 
   virtual ~ui_message_handlert();
 

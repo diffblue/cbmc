@@ -20,7 +20,6 @@ Date: June 2006
 class compilet:public language_uit
 {
 public:
-  ui_message_handlert ui_message_handler;
   namespacet ns;
   goto_functionst compiled_functions;
   bool echo_file_name;
@@ -45,7 +44,7 @@ public:
   std::string object_file_extension;
   std::string output_file_object, output_file_executable;
 
-  compilet(cmdlinet &_cmdline, bool Werror);
+  compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror);
 
   ~compilet();
 

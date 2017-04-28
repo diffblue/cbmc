@@ -46,7 +46,7 @@ int cw_modet::doit()
 
   unsigned int verbosity=1;
 
-  compilet compiler(cmdline, cmdline.isset("Werror"));
+  compilet compiler(cmdline, message_handler, cmdline.isset("Werror"));
 
   #if 0
   bool act_as_ld=
