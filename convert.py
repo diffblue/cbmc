@@ -1,12 +1,11 @@
 import re, collections, textwrap, sys, argparse, platform
 
-
 Field = collections.namedtuple('Field', ['name', 'contents'])
 
 Header = collections.namedtuple('Header', ['module'])
 
 Function = collections.namedtuple('Function',
-        ['pos', 'name', 'purpose', 'inputs', 'returns'])
+        ['name', 'purpose', 'inputs', 'returns'])
 
 Class = collections.namedtuple('Class', ['name', 'purpose'])
 
@@ -23,9 +22,13 @@ def header_from_block(block):
 
 def function_from_block(block):
     """ Create a Function structure from a parsed Block.  """
-    return Function(block.pos, block.fields.get('Function', None),
+    return Function(block.fields.get('Function', None),
             block.fields.get('Purpose', None), block.fields.get('Inputs', None),
             block.fields.get('Outputs', None))
+
+
+def make_field(name, contents):
+    return Field(name, contents if contents.strip() else None)
 
 
 def class_from_block(block):
@@ -34,7 +37,7 @@ def class_from_block(block):
             block.fields.get('Purpose', None))
 
 
-def parse_fields(block_contents, width):
+def parse_fields(block_contents):
     """ Extract the named fields of an old-style comment block.  """
 
     field_re = re.compile(
@@ -43,13 +46,13 @@ def parse_fields(block_contents, width):
     for m in field_re.finditer(block_contents):
         # If the field is a Purpose field
         if m.lastindex == 2:
-            yield Field(m.group(1), textwrap.dedent(m.group(2)))
+            yield make_field(m.group(1), textwrap.dedent(m.group(2)))
         # If the field is any other field
         elif m.lastindex == 3 or m.lastindex == 4:
-            yield Field(m.group(3), textwrap.dedent(m.group(4)))
+            yield make_field(m.group(3), textwrap.dedent(m.group(4)))
 
 
-Block = collections.namedtuple('Block', ['pos', 'fields'])
+Block = collections.namedtuple('Block', ['fields'])
 
 
 def has_field(block, field_name):
@@ -58,42 +61,52 @@ def has_field(block, field_name):
 
 
 def make_doxy_comment(text):
-    text, _ = re.subn(r'^(?!$)', r'/// ', text, flags=re.MULTILINE)
-    text, _ = re.subn(r'^(?=$)', r'///' , text, flags=re.MULTILINE)
-    return text
+    text = re.sub(r'^(?!$)', r'/// ', text, flags=re.MULTILINE)
+    return re.sub(r'^(?=$)', r'///' , text, flags=re.MULTILINE)
 
 
-def is_header_doc(block):
-    """ Return whether the block appears to be a file header.  """
-    return has_field(block, 'Module')
-
-
-def convert_header_doc(header, doc_width):
-    """ Return a doxygen-style header string.  """
-    text_wrapper = textwrap.TextWrapper(width=doc_width)
-    return (make_doxy_comment(
-            text_wrapper.fill(r'\file %s' % header.module)) + '\n\n'
-            if header.module.strip() else '')
-
-
-def is_function_doc(block):
-    """ Return whether the block appears to be a function descriptor.  """
-    return has_field(block, 'Function')
-
-
-class FunctionFormatter:
+class GenericFormatter(object):
     def __init__(self, doc_width):
         self.text_wrapper = textwrap.TextWrapper(width=doc_width)
-        self.input_wrapper = textwrap.TextWrapper(width=doc_width,
+        self.indented_wrapper = textwrap.TextWrapper(width=doc_width,
                 subsequent_indent=r'  ')
         self.whitespace_re = re.compile(r'\n\s*', re.MULTILINE | re.DOTALL)
+
+    def convert(self, block):
+        sections = filter(None, self.convert_sections(block))
+        if sections:
+            return make_doxy_comment('\n'.join(sections)) + '\n'
+        return ''
+
+
+class HeaderFormatter(GenericFormatter):
+    def format_module(self, header):
+        if not header.module:
+            return None
+
+        subbed = self.whitespace_re.sub(' ', header.module)
+        return self.indented_wrapper.fill(r'\file %s' % subbed)
+
+    def is_block_valid(self, block):
+        return has_field(block, 'Module')
+
+    def convert_sections(self, block):
+        return [self.format_module(block)]
+
+
+class FunctionFormatter(GenericFormatter):
+    def __init__(self, doc_width):
+        super(FunctionFormatter, self).__init__(doc_width)
         self.paragraph_re = re.compile(r'(.*?)^$(.*)', re.MULTILINE | re.DOTALL)
 
     def format_purpose(self, function):
+        if not function.purpose:
+            return None
+
         match = self.paragraph_re.match(function.purpose)
         first_paragraph = match.group(1)
-        first_paragraph, _ = self.whitespace_re.subn(' ',
-                first_paragraph) if first_paragraph else ('', None)
+        first_paragraph = self.whitespace_re.sub(' ',
+                first_paragraph) if first_paragraph else ''
 
         tail_paragraphs = (('\n' + match.group(2)) if match.group(2) else '')
         formatted_purpose = (self.text_wrapper.fill(first_paragraph) +
@@ -102,79 +115,90 @@ class FunctionFormatter:
         return formatted_purpose.strip()
 
     def format_inputs(self, function):
+        if not function.inputs:
+            return None
+
+        if re.match(r'^\s*\S+\s*$', function.inputs):
+            return None
+
         def param_replacement(match):
             return r'\param %s:' % match.group(1)
 
         dedented = textwrap.dedent(function.inputs)
-        text, _ = re.subn(r'\n\s+', ' ', dedented, flags=re.MULTILINE)
+        text = re.sub(r'\n\s+', ' ', dedented, flags=re.MULTILINE)
         text, num_replacements = re.subn(r'^([a-zA-Z0-9_]+)\s+[:-]',
                 param_replacement, text, flags=re.MULTILINE)
 
         if num_replacements == 0:
             text = r'parameters: %s' % text
 
-        text = '\n'.join(self.input_wrapper.fill(t) for t in text.split('\n'))
+        text = '\n'.join(
+                self.indented_wrapper.fill(t) for t in text.split('\n'))
         return text.strip()
 
     def format_returns(self, function):
-        subbed, _ = self.whitespace_re.subn(' ', function.returns)
-        return self.input_wrapper.fill(r'\returns %s' % subbed)
+        if not function.returns:
+            return None
+
+        subbed = self.whitespace_re.sub(' ', function.returns)
+        return self.indented_wrapper.fill(r'\return %s' % subbed)
+
+    def is_block_valid(self, block):
+        return has_field(block, 'Function')
+
+    def convert_sections(self, block):
+        return [
+            self.format_purpose(block),
+            self.format_inputs(block),
+            self.format_returns(block)]
 
 
-def convert_function_doc(function, file, doc_width):
-    """ Return a doxygen-style doc string for the supplied Function.  """
-    formatter = FunctionFormatter(doc_width)
+class ClassFormatter(GenericFormatter):
+    def __init__(self, doc_width):
+        super(ClassFormatter, self).__init__(doc_width)
+        self.paragraph_re = re.compile(r'(.*?)^$(.*)', re.MULTILINE | re.DOTALL)
 
-    sections = []
+    def format_purpose(self, klass):
+        if not klass.purpose:
+            return None
 
-    if function.purpose and function.purpose.strip():
-        sections.append(formatter.format_purpose(function))
+        match = self.paragraph_re.match(klass.purpose)
+        first_paragraph = match.group(1)
+        first_paragraph = self.whitespace_re.sub(' ',
+                first_paragraph) if first_paragraph else ''
 
-    if function.inputs and function.inputs.strip():
-        sections.append(formatter.format_inputs(function))
+        tail_paragraphs = (('\n' + match.group(2)) if match.group(2) else '')
+        formatted_purpose = (self.text_wrapper.fill(first_paragraph) +
+                tail_paragraphs)
 
-    if function.returns and function.returns.strip():
-        sections.append(formatter.format_returns(function))
+        return formatted_purpose.strip()
 
-    if sections:
-        text = '\n\n'.join(sections)
-        if text:
-            text = make_doxy_comment(text)
-        return text + '\n'
+    def is_block_valid(self, block):
+        return has_field(block, 'Class')
 
-    return ''
-
-
-def is_class_doc(block):
-    """ Return whether the block appears to be a class doc block.  """
-    return has_field(block, 'Class')
+    def convert_sections(self, block):
+        return [self.format_purpose(block)]
 
 
-def convert_class_doc(c, doc_width):
-    """ Return a doxygen-style class string.  """
-    text_wrapper = textwrap.TextWrapper(width=doc_width)
-    stripped = c.purpose.strip()
-    return (make_doxy_comment(text_wrapper.fill(stripped)) + '\n'
-            if stripped else '')
-
-
-def replace_block(start, block_contents, file, doc_width):
+def replace_block(
+        block_contents,
+        file,
+        header_formatter,
+        class_formatter,
+        function_formatter):
     """
     Replace an old-style documentation block with the doxygen equivalent
     """
-    block = Block(start,
-            {f.name: f.contents
-                for f in parse_fields(block_contents, doc_width)})
+    block = Block({f.name: f.contents for f in parse_fields(block_contents)})
 
-    if is_header_doc(block):
-        return convert_header_doc(header_from_block(block), doc_width)
+    if header_formatter.is_block_valid(block):
+        return header_formatter.convert(header_from_block(block))
 
-    if is_function_doc(block):
-        return convert_function_doc(
-                function_from_block(block), file, doc_width)
+    if class_formatter.is_block_valid(block):
+        return class_formatter.convert(class_from_block(block))
 
-    if is_class_doc(block):
-        return convert_class_doc(class_from_block(block), doc_width)
+    if function_formatter.is_block_valid(block):
+        return function_formatter.convert(function_from_block(block))
 
     warn('block in "%s" has unrecognised format:\n%s' %
             (file, block_contents))
@@ -187,15 +211,21 @@ def convert_file(file):
     with open(file) as f:
         contents = f.read()
 
-    doc_width = 75
+    doc_width = 76
+
+    header_formatter = HeaderFormatter(doc_width)
+    class_formatter = ClassFormatter(doc_width)
+    function_formatter = FunctionFormatter(doc_width)
 
     block_re = re.compile(
             r'^/\*+\\$(.*?)^\\\*+/$\s*', re.MULTILINE | re.DOTALL)
-    contents, _ = block_re.subn(
-            lambda match: replace_block(match.start(), match.group(1), file,
-                doc_width), contents)
-
-    sys.stdout.write(contents)
+    sys.stdout.write(block_re.sub(
+            lambda match: replace_block(
+                match.group(1),
+                file,
+                header_formatter,
+                class_formatter,
+                function_formatter), contents))
 
 
 def main():
