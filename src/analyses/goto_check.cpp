@@ -1679,7 +1679,7 @@ void goto_checkt::goto_check(
 
           add_guarded_claim(
             not_eq_null,
-            "this is null on method invokation",
+            "this is null on method invocation",
             "runtime-exception",
             i.source_location,
             pointer,
