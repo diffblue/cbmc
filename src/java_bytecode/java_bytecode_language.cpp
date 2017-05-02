@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cmdline.h>
 #include <util/string2int.h>
-#include <json/json_parser.h>
 
 #include <goto-programs/class_hierarchy.h>
 
@@ -25,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
+#include "java_parse_options.h"
 
 #include "expr2java.h"
 
@@ -56,35 +56,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 
-  if(cmd.isset("java-cp-include-files"))
-  {
-    java_cp_include_files=cmd.get_value("java-cp-include-files");
-    // load file list from JSON file
-    if(java_cp_include_files[0]=='@')
-    {
-      jsont json_cp_config;
-      if(parse_json(
-           java_cp_include_files.substr(1),
-           get_message_handler(),
-           json_cp_config))
-        throw "cannot read JSON input configuration for JAR loading";
-
-      if(!json_cp_config.is_object())
-        throw "the JSON file has a wrong format";
-      jsont include_files=json_cp_config["jar"];
-      if(!include_files.is_array())
-         throw "the JSON file has a wrong format";
-
-      // add jars from JSON config file to classpath
-      for(const jsont &file_entry : include_files.array)
-      {
-        assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
-        config.java.classpath.push_back(file_entry.value);
-      }
-    }
-  }
-  else
-    java_cp_include_files=".*";
+  java_cp_include_files=java_get_cp_include_files(cmd, get_message_handler());
 }
 
 /*******************************************************************\

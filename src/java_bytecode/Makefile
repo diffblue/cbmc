@@ -17,6 +17,7 @@ SRC = bytecode_info.cpp \
       java_entry_point.cpp \
       java_local_variable_table.cpp \
       java_object_factory.cpp \
+      java_parse_options.cpp \
       java_pointer_casts.cpp \
       java_root_class.cpp \
       java_types.cpp \
