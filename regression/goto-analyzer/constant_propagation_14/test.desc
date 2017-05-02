@@ -3,7 +3,7 @@ main.c
 --variable --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
-\[main\.assertion\.1\] .* assertion tmp_if_expr\$1: Success$
-\[main\.assertion\.2\] .* assertion tmp_if_expr\$2: Failure \(if reachable\)$
+\[main\.assertion\.1\] .* a\[0\]==1 || a\[0\]==2: Success$
+\[main\.assertion\.2\] .* a\[0\]==1 && a\[0\]==2: Failure \(if reachable\)$
 --
 ^warning: ignoring

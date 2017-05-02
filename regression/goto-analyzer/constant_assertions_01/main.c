@@ -7,11 +7,11 @@ int main (int argc, char **argv)
   int x = nondet_int();
   int y = nondet_int();
 
-  assert(0);
-  assert(0 && 1);
-  assert(0 || 0);
-  assert(0 && x);
-  assert(y && 0);
+  __CPROVER_assert(0, "0");
+  __CPROVER_assert(0 && 1, "0 && 1");
+  __CPROVER_assert(0 || 0, "0 || 0");
+  __CPROVER_assert(0 && x, "0 && x");
+  __CPROVER_assert(y && 0, "y && 0");
 
   return 0;
 }

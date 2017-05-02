@@ -6,7 +6,7 @@ int main()
   if (i==0)
     y=1;
 
-  assert(y==0);
+  __CPROVER_assert(y==0, "y==0");
 
   return 0;
 }
