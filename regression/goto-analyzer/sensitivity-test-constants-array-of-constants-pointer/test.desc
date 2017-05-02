@@ -3,73 +3,73 @@ sensitivity_test_constants_array_of_constants_pointer.c
 --variable --arrays --pointers --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion a\[1\]==&a0: Success$
-^\[main.assertion.2\] .* assertion a\[1\]==&a3: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion \*a\[1\]==0: Success$
-^\[main.assertion.4\] .* assertion \*a\[1\]==3: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion b\[1\]==&b1: Success$
-^\[main.assertion.6\] .* assertion b\[1\]==&b3: Failure \(if reachable\)$
-^\[main.assertion.7\] .* assertion \*b\[1\]==11: Success$
-^\[main.assertion.8\] .* assertion \*b\[1\]==13: Failure \(if reachable\)$
-^\[main.assertion.9\] .* assertion \*\(b\+1\)==&b1: Success$
-^\[main.assertion.10\] .* assertion \*\(b\+1\)==&b3: Failure \(if reachable\)$
-^\[main.assertion.11\] .* assertion \*\(1\+b\)==&b1: Unknown$
-^\[main.assertion.12\] .* assertion \*\(1\+b\)==&b3: Unknown$
-^\[main.assertion.13\] .* assertion 1\[b\]==&b1: Success$
-^\[main.assertion.14\] .* assertion 1\[b\]==&b3: Failure \(if reachable\)$
-^\[main.assertion.15\] .* assertion \*\*\(b\+1\)==11: Success$
-^\[main.assertion.16\] .* assertion \*\*\(b\+1\)==13: Failure \(if reachable\)$
-^\[main.assertion.17\] .* assertion \*\*\(1\+b\)==11: Unknown$
-^\[main.assertion.18\] .* assertion \*\*\(1\+b\)==13: Unknown$
-^\[main.assertion.19\] .* assertion \*1\[b\]==11: Success$
-^\[main.assertion.20\] .* assertion \*1\[b\]==13: Failure \(if reachable\)$
-^\[main.assertion.21\] .* assertion c\[0\]==&c0: Unknown$
-^\[main.assertion.22\] .* assertion c\[0\]==&c3: Unknown$
-^\[main.assertion.23\] .* assertion d\[0\]==&d0: Unknown$
-^\[main.assertion.24\] .* assertion d\[0\]==&d3: Unknown$
-^\[main.assertion.25\] .* assertion \*c\[0\]==20: Unknown$
-^\[main.assertion.26\] .* assertion \*c\[0\]==23: Unknown$
-^\[main.assertion.27\] .* assertion \*d\[0\]==30: Unknown$
-^\[main.assertion.28\] .* assertion \*d\[0\]==33: Unknown$
-^\[main.assertion.29\] .* assertion a\[i\]==&a0: Success$
-^\[main.assertion.30\] .* assertion a\[i\]==&a3: Failure \(if reachable\)$
-^\[main.assertion.31\] .* assertion a\[j\]==&a0: Unknown$
-^\[main.assertion.32\] .* assertion a\[j\]==&a3: Unknown$
-^\[main.assertion.33\] .* assertion \*a\[i\]==0: Success$
-^\[main.assertion.34\] .* assertion \*a\[i\]==3: Failure \(if reachable\)$
-^\[main.assertion.35\] .* assertion \*a\[j\]==0: Unknown$
-^\[main.assertion.36\] .* assertion \*a\[j\]==3: Unknown$
-^\[main.assertion.37\] .* assertion b\[i\]==&b0: Success$
-^\[main.assertion.38\] .* assertion b\[i\]==&b1: Failure \(if reachable\)$
-^\[main.assertion.39\] .* assertion b\[j\]==&b0: Unknown$
-^\[main.assertion.40\] .* assertion b\[j\]==&b3: Unknown$
-^\[main.assertion.41\] .* assertion \*b\[i\]==10: Success$
-^\[main.assertion.42\] .* assertion \*b\[i\]==11: Failure \(if reachable\)$
-^\[main.assertion.43\] .* assertion \*b\[j\]==10: Unknown$
-^\[main.assertion.44\] .* assertion \*b\[j\]==13: Unknown$
-^\[main.assertion.45\] .* assertion a\[100\]==&a2: Unknown$
-^\[main.assertion.46\] .* assertion \*a\[100\]==2: Unknown$
-^\[main.assertion.47\] .* assertion b\[1\]==&b1: Success$
-^\[main.assertion.48\] .* assertion \*b\[1\]==11: Success$
-^\[main.assertion.49\] .* assertion ei\[0\]==&ei1: Success$
-^\[main.assertion.50\] .* assertion ei\[0\]==&ei0: Failure \(if reachable\)$
-^\[main.assertion.51\] .* assertion ei\[2\]==&ei0: Success$
-^\[main.assertion.52\] .* assertion ei\[2\]==&ei1: Failure \(if reachable\)$
-^\[main.assertion.53\] .* assertion \*ei\[0\]==41: Success$
-^\[main.assertion.54\] .* assertion \*ei\[0\]==40: Failure \(if reachable\)$
-^\[main.assertion.55\] .* assertion \*ei\[2\]==40: Success$
-^\[main.assertion.56\] .* assertion \*ei\[2\]==41: Failure \(if reachable\)$
-^\[main.assertion.57\] .* assertion ej\[0\]==&ej0: Unknown$
-^\[main.assertion.58\] .* assertion ej\[2\]==&ej0: Unknown$
-^\[main.assertion.59\] .* assertion ej\[2\]==&ej1: Unknown$
-^\[main.assertion.60\] .* assertion \*ej\[0\]==50: Unknown$
-^\[main.assertion.61\] .* assertion \*ej\[2\]==50: Unknown$
-^\[main.assertion.62\] .* assertion \*ej\[2\]==51: Unknown$
-^\[main.assertion.63\] .* assertion ek\[0\]==&ek0: Unknown$
-^\[main.assertion.64\] .* assertion \*ek\[0\]==60: Unknown$
-^\[main\.assertion\.65\] .* assertion \*ps\[0\]==4: Success$
-^\[main\.assertion\.66\] .* assertion \*ps\[1\]==4: Unknown$
-^\[main\.assertion\.67\] .* assertion x==4: Success$
-^\[main\.assertion\.68\] .* assertion y==4: Unknown$
+^\[main.assertion.1\] .* a\[1\]==&a0: Success$
+^\[main.assertion.2\] .* a\[1\]==&a3: Failure \(if reachable\)$
+^\[main.assertion.3\] .* \*a\[1\]==0: Success$
+^\[main.assertion.4\] .* \*a\[1\]==3: Failure \(if reachable\)$
+^\[main.assertion.5\] .* b\[1\]==&b1: Success$
+^\[main.assertion.6\] .* b\[1\]==&b3: Failure \(if reachable\)$
+^\[main.assertion.7\] .* \*b\[1\]==11: Success$
+^\[main.assertion.8\] .* \*b\[1\]==13: Failure \(if reachable\)$
+^\[main.assertion.9\] .* \*\(b\+1\)==&b1: Success$
+^\[main.assertion.10\] .* \*\(b\+1\)==&b3: Failure \(if reachable\)$
+^\[main.assertion.11\] .* \*\(1\+b\)==&b1: Unknown$
+^\[main.assertion.12\] .* \*\(1\+b\)==&b3: Unknown$
+^\[main.assertion.13\] .* 1\[b\]==&b1: Success$
+^\[main.assertion.14\] .* 1\[b\]==&b3: Failure \(if reachable\)$
+^\[main.assertion.15\] .* \*\*\(b\+1\)==11: Success$
+^\[main.assertion.16\] .* \*\*\(b\+1\)==13: Failure \(if reachable\)$
+^\[main.assertion.17\] .* \*\*\(1\+b\)==11: Unknown$
+^\[main.assertion.18\] .* \*\*\(1\+b\)==13: Unknown$
+^\[main.assertion.19\] .* \*1\[b\]==11: Success$
+^\[main.assertion.20\] .* \*1\[b\]==13: Failure \(if reachable\)$
+^\[main.assertion.21\] .* c\[0\]==&c0: Unknown$
+^\[main.assertion.22\] .* c\[0\]==&c3: Unknown$
+^\[main.assertion.23\] .* d\[0\]==&d0: Unknown$
+^\[main.assertion.24\] .* d\[0\]==&d3: Unknown$
+^\[main.assertion.25\] .* \*c\[0\]==20: Unknown$
+^\[main.assertion.26\] .* \*c\[0\]==23: Unknown$
+^\[main.assertion.27\] .* \*d\[0\]==30: Unknown$
+^\[main.assertion.28\] .* \*d\[0\]==33: Unknown$
+^\[main.assertion.29\] .* a\[i\]==&a0: Success$
+^\[main.assertion.30\] .* a\[i\]==&a3: Failure \(if reachable\)$
+^\[main.assertion.31\] .* a\[j\]==&a0: Unknown$
+^\[main.assertion.32\] .* a\[j\]==&a3: Unknown$
+^\[main.assertion.33\] .* \*a\[i\]==0: Success$
+^\[main.assertion.34\] .* \*a\[i\]==3: Failure \(if reachable\)$
+^\[main.assertion.35\] .* \*a\[j\]==0: Unknown$
+^\[main.assertion.36\] .* \*a\[j\]==3: Unknown$
+^\[main.assertion.37\] .* b\[i\]==&b0: Success$
+^\[main.assertion.38\] .* b\[i\]==&b1: Failure \(if reachable\)$
+^\[main.assertion.39\] .* b\[j\]==&b0: Unknown$
+^\[main.assertion.40\] .* b\[j\]==&b3: Unknown$
+^\[main.assertion.41\] .* \*b\[i\]==10: Success$
+^\[main.assertion.42\] .* \*b\[i\]==11: Failure \(if reachable\)$
+^\[main.assertion.43\] .* \*b\[j\]==10: Unknown$
+^\[main.assertion.44\] .* \*b\[j\]==13: Unknown$
+^\[main.assertion.45\] .* a\[100\]==&a2: Unknown$
+^\[main.assertion.46\] .* \*a\[100\]==2: Unknown$
+^\[main.assertion.47\] .* b\[1\]==&b1: Success$
+^\[main.assertion.48\] .* \*b\[1\]==11: Success$
+^\[main.assertion.49\] .* ei\[0\]==&ei1: Success$
+^\[main.assertion.50\] .* ei\[0\]==&ei0: Failure \(if reachable\)$
+^\[main.assertion.51\] .* ei\[2\]==&ei0: Success$
+^\[main.assertion.52\] .* ei\[2\]==&ei1: Failure \(if reachable\)$
+^\[main.assertion.53\] .* \*ei\[0\]==41: Success$
+^\[main.assertion.54\] .* \*ei\[0\]==40: Failure \(if reachable\)$
+^\[main.assertion.55\] .* \*ei\[2\]==40: Success$
+^\[main.assertion.56\] .* \*ei\[2\]==41: Failure \(if reachable\)$
+^\[main.assertion.57\] .* ej\[0\]==&ej0: Unknown$
+^\[main.assertion.58\] .* ej\[2\]==&ej0: Unknown$
+^\[main.assertion.59\] .* ej\[2\]==&ej1: Unknown$
+^\[main.assertion.60\] .* \*ej\[0\]==50: Unknown$
+^\[main.assertion.61\] .* \*ej\[2\]==50: Unknown$
+^\[main.assertion.62\] .* \*ej\[2\]==51: Unknown$
+^\[main.assertion.63\] .* ek\[0\]==&ek0: Unknown$
+^\[main.assertion.64\] .* \*ek\[0\]==60: Unknown$
+^\[main\.assertion\.65\] .* \*ps\[0\]==4: Success$
+^\[main\.assertion\.66\] .* \*ps\[1\]==4: Unknown$
+^\[main\.assertion\.67\] .* x==4: Success$
+^\[main\.assertion\.68\] .* y==4: Unknown$
 --
 ^warning: ignoring

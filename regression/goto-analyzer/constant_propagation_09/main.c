@@ -6,7 +6,7 @@ int main()
   if (a[0]==0)
     a[0]=1;
 
-  assert(a[0]==0);
+  __CPROVER_assert(a[0]==0, "a[0]==0");
 
   return 0;
 }

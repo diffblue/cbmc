@@ -3,13 +3,13 @@ minimal_reproducer_for_struct_problem.c
 --variable --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x.a==0: Success$
-^\[main.assertion.2\] .* assertion x.a==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* assertion x.a==0: Success$
-^\[main.assertion.4\] .* assertion x.a==1: Failure \(if reachable\)$
-^\[main.assertion.5\] .* assertion x.a==0: Failure \(if reachable\)$
-^\[main.assertion.6\] .* assertion x.a==1: Success$
-^\[main.assertion.7\] .* assertion x.a==0: Unknown$
-^\[main.assertion.8\] .* assertion x.a==1: Unknown$
+^\[main.assertion.1\] .* x.a==0: Success$
+^\[main.assertion.2\] .* x.a==1: Failure \(if reachable\)$
+^\[main.assertion.3\] .* x.a==0: Success$
+^\[main.assertion.4\] .* x.a==1: Failure \(if reachable\)$
+^\[main.assertion.5\] .* x.a==0: Failure \(if reachable\)$
+^\[main.assertion.6\] .* x.a==1: Success$
+^\[main.assertion.7\] .* x.a==0: Unknown$
+^\[main.assertion.8\] .* x.a==1: Unknown$
 --
 ^warning: ignoring

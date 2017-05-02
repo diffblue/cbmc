@@ -10,19 +10,19 @@ int main (int argc, char **argv)
   int y = nondet_int();
 
   if (a == b)
-    assert(0);  // Trivial false
+    __CPROVER_assert(0, "0");  // Trivial false
 
   if (a == b)
-    assert(1);  // Trivial true
+    __CPROVER_assert(1, "1");  // Trivial true
 
   if (a == b)
-    assert(x == y); // Undetermined
+    __CPROVER_assert(x == y, "x == y"); // Undetermined
 
   if (a == b)
-    assert(!(x == y) || (x + 1 + a == b + y));  // Non-trivial true
+    __CPROVER_assert(!(x == y) || (x + 1 + a == b + y), "!(x == y) || (x + 1 + a == b + y)");  // Non-trivial true
 
   if (a == b)
-    assert(!(!(x == y) || (x + 1 + a == b + y)));  // Non-trivial false
+    __CPROVER_assert(!(!(x == y) || (x + 1 + a == b + y)), "!(!(x == y) || (x + 1 + a == b + y)");  // Non-trivial false
 
   return 0;
 }

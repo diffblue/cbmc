@@ -13,7 +13,7 @@ int main() {
   float y_aux[xLen];
   float total=0;
   for (i=0;i<xLen;i++) {
-    x[i]=nondet_float();    
+    x[i]=nondet_float();
     __CPROVER_assume(x[i]>=-1 && x[i]<=1);
     x_aux[i]=0;
     y_aux[i]=0;
@@ -27,12 +27,12 @@ int main() {
     /* Num, x values */
     for (j = 0; j < Blen; j++) {
       y[i] = y[i] + B[j]*x_aux[j];
-      assert(y[i]>=-1.0f && y[i]<=1.0f); //success
+      __CPROVER_assert(y[i]>=-1.0f && y[i]<=1.0f, "y[i]>=-1.0f && y[i]<=1.0f"); //success
     }
     /* Den, y values */
     for(j=0;j<Alen-1;j++) {
       y[i] = y[i]-A[j+1]*y_aux[j];
-      assert(y[i]>=-1.0f && y[i]<=1.0f); //fails
+      __CPROVER_assert(y[i]>=-1.0f && y[i]<=1.0f, "y[i]>=-1.0f && y[i]<=1.0f"); //fails
     }
     /* Update past y values */
     for(j=Alen-2;j>=1;j--)

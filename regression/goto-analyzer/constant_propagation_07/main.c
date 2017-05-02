@@ -17,7 +17,7 @@ int main()
         j = j + 1;
         i = i + 1;
       }
-      assert(!(i < 2));
+      __CPROVER_assert(!(i < 2), "!(i < 2)");
     }
   }
   return 0;

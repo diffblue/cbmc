@@ -5,11 +5,11 @@ int main()
 
   if (a[0]==0)
     a[0]=1;
-  else 
+  else
     a[0]=2;
 
-  assert(a[0]==1 || a[0]==2);
-  assert(a[0]==1 && a[0]==2);
+  __CPROVER_assert(a[0]==1 || a[0]==2, "a[0]==1 || a[0]==2");
+  __CPROVER_assert(a[0]==1 && a[0]==2, "a[0]==1 && a[0]==2");
 
   return 0;
 }
