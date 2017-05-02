@@ -3,11 +3,11 @@ int main()
 {
   int i=0, j=2;
 
-  while (i<=50) 
+  while (i<=50)
   {
     i++;
     j++;
   }
-  assert(j<52);
+  __CPROVER_assert(j<52, "j<52");
 }
 

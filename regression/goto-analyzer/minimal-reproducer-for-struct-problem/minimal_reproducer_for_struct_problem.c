@@ -10,19 +10,19 @@ int main(int argc, char *argv[])
 
   struct int_struct x = {0};
   x.a = 0;
-  assert(x.a==0);
-  assert(x.a==1);
+  __CPROVER_assert(x.a==0, "x.a==0");
+  __CPROVER_assert(x.a==1, "x.a==1");
 
   if(argc>2)
   {
-    assert(x.a==0);
-    assert(x.a==1);
+    __CPROVER_assert(x.a==0, "x.a==0");
+    __CPROVER_assert(x.a==1, "x.a==1");
     x.a=1;
-    assert(x.a==0);
-    assert(x.a==1);
+    __CPROVER_assert(x.a==0, "x.a==0");
+    __CPROVER_assert(x.a==1, "x.a==1");
   }
-  assert(x.a==0);
-  assert(x.a==1);
+  __CPROVER_assert(x.a==0, "x.a==0");
+  __CPROVER_assert(x.a==1, "x.a==1");
 
   return 0;
 }
