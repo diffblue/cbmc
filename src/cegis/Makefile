@@ -211,7 +211,7 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-ifeq ($(filter-out Unix MinGW Cygwin OSX OSX_Universal,$(BUILD_ENV_)),)
+ifndef DLFCN_LINKFLAGS
   DLFCN_LINKFLAGS = -ldl
 endif
 
