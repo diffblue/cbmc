@@ -1391,7 +1391,10 @@ void bv_utilst::unsigned_divider(
   }
   #endif
 
-  // division by zero test
+  // Division by zero test.
+  // Note that we produce a non-deterministic result in
+  // case of division by zero. SMT-LIB now says that the
+  // result shall be zero.
 
   literalt is_not_zero=prop.lor(op1);
 
