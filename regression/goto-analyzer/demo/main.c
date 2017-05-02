@@ -28,37 +28,37 @@ void func(int unknown)
   }
 
   // Knows we took if statement so can conclude assertion is true
-  assert(j==3); // Verified
+  __CPROVER_assert(j==3, "j==3"); // Verified
 
   int value=4;
 
   int * p2v = &value;
   int ** pp2v = &p2v;
 
-  assert(*p2v==4);
-  assert(**pp2v==4);
+  __CPROVER_assert(*p2v==4, "*p2v==4");
+  __CPROVER_assert(**pp2v==4, "**pp2v==4");
 
   value=10;
 
   // Tracks the value pointed to has changed
-  assert(*p2v==10);
-  assert(**pp2v==10);
+  __CPROVER_assert(*p2v==10, "*p2v==10");
+  __CPROVER_assert(**pp2v==10, "**pp2v==10");
 
   *p2v = 15;
-  assert(value==15);
-  assert(*p2v==15);
-  assert(**pp2v==15);
+  __CPROVER_assert(value==15, "value==15");
+  __CPROVER_assert(*p2v==15, "*p2v==15");
+  __CPROVER_assert(**pp2v==15, "**pp2v==15");
 
   **pp2v = 20;
-  assert(value==20);
-  assert(*p2v==20);
-  assert(**pp2v==20);
+  __CPROVER_assert(value==20, "value==20");
+  __CPROVER_assert(*p2v==20, "*p2v==20");
+  __CPROVER_assert(**pp2v==20, "**pp2v==20");
 
   int other = 5;
   p2v = &other;
 
-  assert(*p2v==5);
-  assert(**pp2v==5);
+  __CPROVER_assert(*p2v==5, "*p2v==5");
+  __CPROVER_assert(**pp2v==5, "**pp2v==5");
 
   if(unknown > 10)
   {
@@ -69,9 +69,9 @@ void func(int unknown)
     p2v = &other;
   }
 
-  assert(pp2v==&p2v); // success (even though p2v has changed)
-  assert(*p2v==10); // unknown since we don't know anymore what p2v points to
-  assert(**pp2v==10); // unknown
+  __CPROVER_assert(pp2v==&p2v, "pp2v==&p2v"); // success (even though p2v has changed)
+  __CPROVER_assert(*p2v==10, "*p2v==10"); // unknown since we don't know anymore what p2v points to
+  __CPROVER_assert(**pp2v==10, "**pp2v==10"); // unknown
 
   // Running this through --simplify will yield:
   // yp = &x
@@ -84,8 +84,8 @@ void func(int unknown)
 
   int array[4] = {0, 1 , 2, 3};
 
-  assert(array[0] == 0); // Success
-  assert(array[3] == 3); // Success
+  __CPROVER_assert(array[0] == 0, "array[0] == 0"); // Success
+  __CPROVER_assert(array[3] == 3, "array[3] == 3"); // Success
 
   if(unknown > 10)
   {
@@ -99,10 +99,10 @@ void func(int unknown)
     array[2] = 10;
   }
 
-  assert(array[0] == 4); // Success
-  assert(array[1] == 1); // Success
-  assert(array[2] == 5); // Unknown
-  assert(array[3] == 3); // Success
+  __CPROVER_assert(array[0] == 4, "array[0] == 4"); // Success
+  __CPROVER_assert(array[1] == 1, "array[1] == 1"); // Success
+  __CPROVER_assert(array[2] == 5, "array[2] == 5"); // Unknown
+  __CPROVER_assert(array[3] == 3, "array[3] == 3"); // Success
 
 
   typedef struct
@@ -114,6 +114,6 @@ void func(int unknown)
   struct_t s;
   s.a = 1;
 
-  assert(s.a == 1);
-  assert(s.a == 2);
+  __CPROVER_assert(s.a == 1, "s.a == 1");
+  __CPROVER_assert(s.a == 2, "s.a == 2");
 }

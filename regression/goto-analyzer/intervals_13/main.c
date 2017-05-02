@@ -4,26 +4,26 @@ int main()
   int i, j=20;
 
   if(i>=20)
-    assert(i>=10); // success
+    __CPROVER_assert(i>=10, "i>=10"); // success
 
   if(i>=10 && i<=20)
-    assert(i!=30); // success
+    __CPROVER_assert(i!=30, "i!=30"); // success
 
   if(i>=10 && i<=20)
-    assert(i!=15); // fails
+    __CPROVER_assert(i!=15, "i!=15"); // fails
 
   if(i<1 && i>10)
-    assert(0); // success
+    __CPROVER_assert(0, "0"); // success
 
   if(i>=10 && j>=i)
-    assert(j>=10); // success
+    __CPROVER_assert(j>=10, "j>=10"); // success
 
   if(i>=j)
-    assert(i>=j); // unknown
+    __CPROVER_assert(i>=j, "i>=j"); // unknown
 
   if(i>10)
-    assert(i>=11); // success
+    __CPROVER_assert(i>=11, "i>=11"); // success
 
   if(i<=100 && j<i)
-    assert(j<100); // success
+    __CPROVER_assert(j<100, "j<100"); // success
 }

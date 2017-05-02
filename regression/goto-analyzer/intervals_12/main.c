@@ -4,10 +4,10 @@ int main (void) {
   int j;
 
   if (i <= 0 && j < i)
-    assert(j < 0);
+    __CPROVER_assert(j < 0, "j < 0");
 
   if (j < i && i <= 0)
-    assert(j < 0);
+    __CPROVER_assert(j < 0, "j < 0");
 
   return 0;
 }
