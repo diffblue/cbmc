@@ -547,14 +547,14 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
   bounds_checks.operands().back().add_source_location()
     .set_comment("Array index < 0");
   bounds_checks.operands().back().add_source_location()
-    .set_property_class("runtime-exception");
+    .set_property_class("array-index-out-of-bounds-low");
   bounds_checks.add(code_assertt(ltlength));
 
   bounds_checks.operands().back().add_source_location()=original_sloc;
   bounds_checks.operands().back().add_source_location()
     .set_comment("Array index >= length");
   bounds_checks.operands().back().add_source_location()
-    .set_property_class("runtime-exception");
+    .set_property_class("array-index-out-of-bounds-high");
 
   // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
   return bounds_checks;
@@ -1349,7 +1349,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       check.add_source_location()
         .set_comment("Throw null");
       check.add_source_location()
-        .set_property_class("runtime-exception");
+        .set_property_class("null-pointer-exception");
       block.move_to_operands(check);
 
       side_effect_expr_throwt throw_expr;
@@ -1371,8 +1371,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
       code_assertt assert_class(check);
       assert_class.add_source_location().set_comment("Dynamic cast check");
-      assert_class.add_source_location().
-        set_property_class("runtime-exception");
+      assert_class.add_source_location().set_property_class("bad-dynamic-cast");
       // checkcast passes when the operand is null.
       empty_typet voidt;
       pointer_typet voidptr(voidt);
@@ -2220,7 +2219,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_assertt check(gezero);
       check.add_source_location().set_comment("Array size < 0");
       check.add_source_location()
-        .set_property_class("runtime-exception");
+        .set_property_class("array-create-negative-size");
       c.move_to_operands(check);
 
       if(max_array_length!=0)
@@ -2260,7 +2259,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_assertt check(gezero);
       check.add_source_location().set_comment("Array size < 0");
       check.add_source_location()
-        .set_property_class("runtime-exception");
+        .set_property_class("array-create-negative-size");
       checkandcreate.move_to_operands(check);
 
       if(max_array_length!=0)
