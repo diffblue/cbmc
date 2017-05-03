@@ -220,7 +220,7 @@ public:
   {
     containert &c=get_container();
 
-    for(typename containert::const_iterator it=c.begin();
+    for(typename containert::iterator it=c.begin();
         it!=c.end(); it++)
     {
       const self_type &n=*it;
