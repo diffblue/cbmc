@@ -256,16 +256,13 @@ bool flow_insensitive_analysis_baset::visit(
     l->location_number << std::endl;
   #endif
 
-  goto_programt::const_targetst successors;
-  goto_program.get_successors(l, successors);
-
   seen_locations.insert(l);
   if(statistics.find(l)==statistics.end())
     statistics[l]=1;
   else
     statistics[l]++;
 
-  for(const auto &to_l : successors)
+  for(const auto &to_l : goto_program.get_successors(l))
   {
     if(to_l==goto_program.instructions.end())
       continue;

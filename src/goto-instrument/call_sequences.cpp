@@ -62,14 +62,11 @@ void show_call_sequences(
       continue; // abort search
     }
 
-    // get successors
-    goto_programt::const_targetst s;
-    goto_program.get_successors(t, s);
-
-    // add to stack
-    for(goto_programt::const_targetst::const_iterator
-        it=s.begin(); it!=s.end(); it++)
-      stack.push(*it);
+    // get successors and add to stack
+    for(const auto &it : goto_program.get_successors(t))
+    {
+      stack.push(it);
+    }
   }
 }
 
