@@ -929,7 +929,7 @@ Function: irept::stable_hash
 
  Outputs:
 
- Purpose: Stable hash, hashes the actual content of the string. 
+ Purpose: Stable hash, hashes the actual content of all contained strings.
           Can be used to identify hashes across commits 
           (of the target software)
 
