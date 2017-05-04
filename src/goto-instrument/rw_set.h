@@ -2,9 +2,9 @@
 
 Module: Race Detection for Threaded Goto Programs
 
-Author: Daniel Kroening
+Author: Daniel Kroening, Lihao Liang
 
-Date: February 2006
+Date: June 2016
 
 \*******************************************************************/
 
@@ -14,6 +14,7 @@ Date: February 2006
 #include <iosfwd>
 #include <vector>
 #include <set>
+#include <unordered_set>
 
 #include <util/guard.h>
 #include <util/std_code.h>
@@ -27,12 +28,13 @@ Date: February 2006
 #include <analyses/local_may_alias.h>
 #endif
 
+
 // a container for read/write sets
 
 class rw_set_baset
 {
 public:
-  rw_set_baset(const namespacet &_ns)
+  explicit rw_set_baset(const namespacet &_ns)
     :ns(_ns)
   {
   }
@@ -134,7 +136,7 @@ protected:
   const goto_programt::const_targett target;
 
 #ifdef LOCAL_MAY
-  local_may_aliast& local_may;
+  local_may_aliast &local_may;
 #endif
 
   inline void read(const exprt &expr)
@@ -177,7 +179,7 @@ public:
 #ifdef LOCAL_MAY
       , may
 #endif
-   )
+    )
   {
     compute();
   }
@@ -249,7 +251,8 @@ protected:
   bool dereferencing;
   std::vector<entryt> dereferenced;
 
-  void track_deref(const entryt& entry, bool read) {
+  void track_deref(const entryt& entry, bool read)
+  {
     if(dereferencing && dereferenced.size()==0)
     {
       dereferenced.insert(dereferenced.begin(), entry);
@@ -261,14 +264,95 @@ protected:
         dereferenced.front().object));
   }
 
-  void set_track_deref() {
+  void set_track_deref()
+  {
     dereferencing=true;
   }
 
-  void reset_track_deref() {
+  void reset_track_deref()
+  {
     dereferencing=false;
     dereferenced.clear();
   }
+};
+
+typedef std::unordered_set<irep_idt, irep_id_hash> recursion_sett;
+
+// another producer of read/write sets
+// this time look inside the body of function calls
+
+class rw_set_loc_rect:public rw_set_loct
+{
+public:
+  rw_set_loc_rect(
+    const namespacet &_ns,
+    value_setst &_value_sets,
+    goto_programt::const_targett _target,
+#ifdef LOCAL_MAY
+    local_may_aliast &may,
+#endif
+    const goto_functionst &_goto_functions,
+    recursion_sett &_recursion_set):
+    rw_set_loct(_ns, _value_sets, _target
+#ifdef LOCAL_MAY
+     , may
+#endif
+    ),
+    goto_functions(_goto_functions),
+    recursion_set(_recursion_set)
+  {
+    compute_rec(recursion_set);
+  }
+
+protected:
+  const goto_functionst &goto_functions;
+  recursion_sett &recursion_set;
+
+  void compute_rec(recursion_sett &recursion_set);
+};
+
+// another producer of entire functions
+// this time look inside the body of function calls
+
+class rw_set_function_rect:public rw_set_baset
+{
+public:
+  rw_set_function_rect(
+    value_setst &_value_sets,
+    const namespacet &_ns,
+    const goto_functionst &_goto_functions,
+    const irep_idt &function,
+    recursion_sett &_recursion_set):
+    rw_set_baset(_ns),
+    value_sets(_value_sets),
+    goto_functions(_goto_functions),
+    recursion_set(_recursion_set)
+  {
+    compute_func_rec(function, recursion_set);
+  }
+
+  rw_set_function_rect(
+    value_setst &_value_sets,
+    const namespacet &_ns,
+    const goto_functionst &_goto_functions,
+    const exprt &function,
+    recursion_sett &_recursion_set):
+    rw_set_baset(_ns),
+    value_sets(_value_sets),
+    goto_functions(_goto_functions),
+    recursion_set(_recursion_set)
+  {
+    compute_func_rec(function, recursion_set);
+  }
+
+protected:
+  value_setst &value_sets;
+  const goto_functionst &goto_functions;
+  recursion_sett &recursion_set;
+
+  void compute_func_rec(const exprt &function, recursion_sett &recursion_set);
+  void compute_func_rec(const irep_idt &function,
+    recursion_sett &recursion_set);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_RW_SET_H

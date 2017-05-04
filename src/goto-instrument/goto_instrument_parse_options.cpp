@@ -1162,6 +1162,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("race-check") ||
      cmdline.isset("mm") ||
      cmdline.isset("isr") ||
+     cmdline.isset("scheduling-function") ||
      cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
@@ -1292,6 +1293,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         symbol_table,
         goto_functions,
         cmdline.get_value("isr"));
+    }
+
+    // Scheduling function
+    if(cmdline.isset("scheduling-function"))
+    {
+      status() << "Instrumenting scheduling function for nested interrupts"
+               << eom;
+      nested_interrupts(
+        value_set_analysis,
+        symbol_table,
+        goto_functions,
+        cmdline.get_value("scheduling-function"));
     }
 
     // Memory-mapped I/O

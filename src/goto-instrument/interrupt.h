@@ -2,9 +2,9 @@
 
 Module: Interrupt Instrumentation for Goto Programs
 
-Author: Daniel Kroening
+Author: Daniel Kroening, Lihao Liang
 
-Date: September 2011
+Date: June 2016
 
 \*******************************************************************/
 
@@ -21,5 +21,11 @@ void interrupt(
   const class symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   const irep_idt &interrupt_handler);
+
+void nested_interrupts(
+  value_setst &value_sets,
+  const class symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  const irep_idt &scheduling_function);
 
 #endif // CPROVER_GOTO_INSTRUMENT_INTERRUPT_H
