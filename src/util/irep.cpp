@@ -923,6 +923,49 @@ std::size_t irept::full_hash() const
 
 /*******************************************************************\
 
+Function: irept::stable_hash
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Stable hash, hashes the actual content of all contained strings.
+          Can be used to identify hashes across commits 
+          (of the target software)
+
+\*******************************************************************/
+
+std::size_t irept::stable_hash() const
+{
+  const irept::subt &sub=get_sub();
+  const irept::named_subt &named_sub=get_named_sub();
+  const irept::named_subt &comments=get_comments();
+
+  std::size_t result=stable_hash_string(id());
+
+  forall_irep(it, sub) result=hash_combine(result, it->full_hash());
+
+  forall_named_irep(it, named_sub)
+  {
+    result=hash_combine(result, stable_hash_string(it->first));
+    result=hash_combine(result, it->second.full_hash());
+  }
+
+  forall_named_irep(it, comments)
+  {
+    result=hash_combine(result, stable_hash_string(it->first));
+    result=hash_combine(result, it->second.full_hash());
+  }
+
+  result=hash_finalize(
+    result,
+    named_sub.size()+sub.size()+comments.size());
+
+  return result;
+}
+
+/*******************************************************************\
+
 Function: indent
 
   Inputs:

@@ -158,6 +158,11 @@ inline size_t hash_string(const dstringt &s)
   return s.hash();
 }
 
+inline size_t stable_hash_string(const dstringt &s)
+{
+  return hash_string(string_container.get_string(s.get_no()));
+}
+
 inline std::ostream &operator<<(std::ostream &out, const dstringt &a)
 {
   return a.operator<<(out);
