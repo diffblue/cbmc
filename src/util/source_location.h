@@ -138,8 +138,6 @@ public:
     return get_bool(ID_hide);
   }
 
-  bool is_built_in() const;
-
   static const source_locationt &nil()
   {
     return static_cast<const source_locationt &>(get_nil_irep());
