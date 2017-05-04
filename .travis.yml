@@ -145,7 +145,7 @@ install:
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -O2 -g -Werror -Wno-deprecated-register -pedantic -Wno-sign-compare $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 clobber.dir memory-models.dir musketeer.dir" &&
     eval ${PRE_COMMAND} ${COMMAND}
 
 script:
