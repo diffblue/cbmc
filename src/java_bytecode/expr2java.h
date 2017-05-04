@@ -17,15 +17,7 @@ class expr2javat:public expr2ct
 public:
   explicit expr2javat(const namespacet &_ns):expr2ct(_ns) { }
 
-  virtual std::string convert(const exprt &src)
-  {
-    return expr2ct::convert(src);
-  }
-
-  virtual std::string convert(const typet &src)
-  {
-    return expr2ct::convert(src);
-  }
+  using expr2ct::convert;
 
 protected:
   virtual std::string convert(const exprt &src, unsigned &precedence);
