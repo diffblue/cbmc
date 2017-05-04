@@ -41,6 +41,7 @@ symbolt &get_fresh_aux_symbol(
 
   do
   {
+    // Distinguish local variables with the same name
     new_symbol.base_name=
       basename_prefix+
       "$"+

@@ -61,18 +61,23 @@ static void build_ssa_identifier_rec(
 
     if(!l0.empty())
     {
+      // Distinguish different threads of execution
       os << '!' << l0;
       l1_object_os << '!' << l0;
     }
 
     if(!l1.empty())
     {
+      // Distinguish different calls to the same function (~stack frame)
       os << '@' << l1;
       l1_object_os << '@' << l1;
     }
 
     if(!l2.empty())
+    {
+      // Distinguish SSA steps for the same variable
       os << '#' << l2;
+    }
   }
   else
     assert(false);
