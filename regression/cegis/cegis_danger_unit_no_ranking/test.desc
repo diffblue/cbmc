@@ -1,9 +1,0 @@
-CORE
-main.c
---gcc --danger --cegis-statistics --cegis-genetic --danger-no-ranking
-^EXIT=0$
-^SIGNAL=0$
-^.*__CPROVER_danger_D0_x *= *[\(]signed *int[\)][\(]MINUS_ONE *< *x[\)];$
-^.*__CPROVER_danger_R0_x_0 *= *ONE *- *x;$
---
-^warning: ignoring
