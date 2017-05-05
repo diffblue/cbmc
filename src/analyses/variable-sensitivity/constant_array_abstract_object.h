@@ -21,7 +21,7 @@ class constant_array_abstract_objectt:public array_abstract_objectt
 {
 public:
   typedef sharing_ptrt<constant_array_abstract_objectt> const
-    constant_array_abstract_object_pointert;
+    constant_array_pointert;
 
   explicit constant_array_abstract_objectt(typet type);
   constant_array_abstract_objectt(typet type, bool top, bool bottom);
@@ -71,7 +71,7 @@ private:
     const abstract_environmentt &env, const namespacet &ns) const;
 
   abstract_object_pointert constant_array_merge(
-    const constant_array_abstract_object_pointert other) const;
+    const constant_array_pointert other) const;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H
