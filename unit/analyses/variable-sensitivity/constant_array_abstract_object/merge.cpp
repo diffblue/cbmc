@@ -46,10 +46,12 @@ private:
   const namespacet ns;
 };
 
-TEST_CASE("merge_constant_array_abstract_object",
+SCENARIO("merge_constant_array_abstract_object",
   "[core]"
   "[analyses][variable-sensitivity][constant_array_abstract_object][merge]")
 {
+  GIVEN("Two arrays of size 3, whose first elements are the same")
+  {
   // int val1[3] = {1, 2, 3}
   exprt val1=
     array_exprt(
@@ -88,80 +90,63 @@ TEST_CASE("merge_constant_array_abstract_object",
 
   abstract_object_pointert result;
   bool modified=false;
-
-  SECTION("constant array AO merge with constant array AO")
+  WHEN("Merging two constant array AOs with the same array")
   {
-    SECTION("merge array with...")
+    auto op1=
+      std::make_shared<constant_array_abstract_objectt>(val1, enviroment, ns);
+    auto op2=
+      std::make_shared<constant_array_abstract_objectt>(val1, enviroment, ns);
+
+    result=abstract_objectt::merge(op1, op2, modified);
+
+    const auto &cast_result=
+      std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
+        result);
+    THEN("The original constant array AO should be returned")
     {
-      auto op1=
-        std::make_shared<constant_array_abstract_objectt>(val1, enviroment, ns);
+      // Though we may become top or bottom, the type should be unchanged
+      REQUIRE(cast_result);
 
-      SECTION("same value")
-      {
-        INFO(val1.op0().type().id_string());
+      // Correctness of merge
+      REQUIRE_FALSE(modified);
+      REQUIRE_FALSE(cast_result->is_top());
+      REQUIRE_FALSE(cast_result->is_bottom());
+      REQUIRE(util.read_index(cast_result, i0)==val1.op0());
+      REQUIRE(util.read_index(cast_result, i1)==val1.op1());
+      REQUIRE(util.read_index(cast_result, i2)==val1.op2());
 
-        auto op2=
-          std::make_shared<constant_array_abstract_objectt>(
-            val1, enviroment, ns);
+      // Is optimal
+      REQUIRE(result==op1);
+    }
+  }
+  WHEN("Merging two constant array AOs with different value arrays")
+  {
+    auto op1=
+      std::make_shared<constant_array_abstract_objectt>(val1, enviroment, ns);
+    auto op2=
+      std::make_shared<constant_array_abstract_objectt>(val2, enviroment, ns);
 
-        REQUIRE(util.read_index(op1, i1)==val1.op1());
-        REQUIRE(util.read_index(op1, i0)==val1.op0());
+    result=abstract_objectt::merge(op1, op2, modified);
 
-        INFO(i2.pretty());
+    const auto &cast_result=
+      std::dynamic_pointer_cast<const constant_array_abstract_objectt>(result);
 
-        const exprt &arr_val2=util.read_index(op1, i2);
-        INFO(arr_val2.pretty());
+    THEN("A new constant array AO whose first value is the same and "
+      "the other two are top")
+    {
+      // Though we may become top or bottom, the type should be unchanged
+      REQUIRE(cast_result);
 
-        REQUIRE(arr_val2==val1.op2());
+      // Correctness of merge
+      REQUIRE(modified);
+      REQUIRE_FALSE(cast_result->is_top());
+      REQUIRE_FALSE(cast_result->is_bottom());
+      REQUIRE(util.read_index(cast_result, i0)==val1.op0());
+      REQUIRE(util.read_index(cast_result, i1)==nil_exprt());
+      REQUIRE(util.read_index(cast_result, i2)==nil_exprt());
 
-        REQUIRE(util.read_index(op2, i0)==val1.op0());
-        REQUIRE(util.read_index(op2, i1)==val1.op1());
-        REQUIRE(util.read_index(op2, i2)==val1.op2());
-
-        result=abstract_objectt::merge(op1, op2, modified);
-
-        const auto &cast_result=
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
-            result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE_FALSE(modified);
-        REQUIRE_FALSE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0)==val1.op0());
-        REQUIRE(util.read_index(cast_result, i1)==val1.op1());
-        REQUIRE(util.read_index(cast_result, i2)==val1.op2());
-
-        // Is optimal
-        REQUIRE(result==op1);
-      }
-      SECTION("different array")
-      {
-        abstract_object_pointert op2=
-          std::make_shared<constant_array_abstract_objectt>(
-            val2, enviroment, ns);
-
-        result=abstract_objectt::merge(op1, op2, modified);
-
-        const auto &cast_result=
-          std::dynamic_pointer_cast<const constant_array_abstract_objectt>(
-            result);
-        // Though we may become top or bottom, the type should be unchanged
-        REQUIRE(cast_result);
-
-        // Correctness of merge
-        REQUIRE(modified);
-        REQUIRE_FALSE(cast_result->is_top());
-        REQUIRE_FALSE(cast_result->is_bottom());
-        REQUIRE(util.read_index(cast_result, i0)==val1.op0());
-        REQUIRE(util.read_index(cast_result, i1)==nil_exprt());
-        REQUIRE(util.read_index(cast_result, i2)==nil_exprt());
-
-
-        // Since it has modified, we definitely shouldn't be reusing the pointer
-        REQUIRE_FALSE(result==op1);
+      // Since it has modified, we definitely shouldn't be reusing the pointer
+      REQUIRE_FALSE(result==op1);
       }
     }
   }
