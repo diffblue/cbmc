@@ -52,8 +52,18 @@ static exprt simplify_json_expr(
           id2string(to_member_expr(
             src.op0()).get_component_name()).find("@")!=std::string::npos)
   {
-    // simplify things of the form  &member_expr(object, @class_identifier)
+    // simplify expressions of the form &member_expr(object, @class_identifier)
     return simplify_json_expr(src.op0(), ns);
+  }
+  else if(src.id()==ID_address_of &&
+          src.operands().size()==1 &&
+          src.op0().id()==ID_index &&
+          to_index_expr(src.op0()).index().id()==ID_constant &&
+          to_constant_expr(
+            to_index_expr(src.op0()).index()).value_is_zero_string())
+  {
+    // simplify expressions of the form  &array[0]
+    return simplify_json_expr(to_index_expr(src.op0()).array(), ns);
   }
   else if(src.id()==ID_member &&
           src.operands().size()==1 &&
@@ -61,7 +71,7 @@ static exprt simplify_json_expr(
             to_member_expr(src).get_component_name())
               .find("@")!=std::string::npos)
   {
-    // simplify things of the form  member_expr(object, @class_identifier)
+    // simplify expressions of the form  member_expr(object, @class_identifier)
     return simplify_json_expr(src.op0(), ns);
   }
 
