@@ -100,9 +100,6 @@ void convert(
           full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
 #endif
 
-        if(step.full_lhs_value.is_not_nil())
-          full_lhs_value = json(step.full_lhs_value, ns);
-
         const symbolt *symbol;
         irep_idt base_name, display_name;
 
@@ -114,6 +111,13 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
+          if(step.full_lhs_value.is_not_nil())
+            full_lhs_value=json(step.full_lhs_value, ns, symbol->mode);
+        }
+        else
+        {
+          if(step.full_lhs_value.is_not_nil())
+            full_lhs_value=json(step.full_lhs_value, ns);
         }
 
         json_assignment["value"]=full_lhs_value;
@@ -141,6 +145,9 @@ void convert(
         json_output["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        symbolt function_name=ns.lookup(source_location.get_function());
+        irep_idt mode=function_name.mode;
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -148,7 +155,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
