@@ -82,81 +82,64 @@ private:
   const namespacet ns;
 };
 
-TEST_CASE("merge_full_struct_abstract_object",
+SCENARIO("merge_full_struct_abstract_object",
   "[core]"
   "[analyses][variable-sensitivity][full_struct_abstract_object][merge]")
 {
-  // int val1[3] = {1, 2, 3}
-  struct_typet struct_type;
-  struct_union_typet::componentt comp_a("a", integer_typet());
-  struct_union_typet::componentt comp_b("b", integer_typet());
-  struct_union_typet::componentt comp_c("c", integer_typet());
-  struct_type.components().push_back(comp_a);
-  struct_type.components().push_back(comp_b);
-  struct_type.components().push_back(comp_c);
-
-  struct_exprt val1(struct_type);
-  val1.operands().push_back(constant_exprt::integer_constant(1));
-  val1.operands().push_back(constant_exprt::integer_constant(2));
-  val1.operands().push_back(constant_exprt::integer_constant(3));
-
-  // int val2[3] = {1, 4, 5}
-  struct_exprt val2(struct_type);
-  val2.operands().push_back(constant_exprt::integer_constant(1));
-  val2.operands().push_back(constant_exprt::integer_constant(4));
-  val2.operands().push_back(constant_exprt::integer_constant(5));
-
-  // index_exprt for reading from an array
-  const member_exprt a(nil_exprt(), "a");
-  const member_exprt b(nil_exprt(), "b");
-  const member_exprt c(nil_exprt(), "c");
-
-  abstract_environmentt enviroment;
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
-  optionst options;
-  options.set_option("pointers", true);
-  options.set_option("arrays", true);
-  options.set_option("structs", true);
-  variable_sensitivity_object_factoryt::instance().set_options(options);
-
-  struct_utilt util(enviroment, ns);
-
-  abstract_object_pointert result;
-  bool modified=false;
-
-  SECTION("constant struct AO merge with constant struct AO")
+  GIVEN("Two structs with 3 components, whose 1st component are the same")
   {
-    SECTION("merge struct with...")
+    // struct val1 = {.a = 1, .b = 2, .c = 3}
+    struct_typet struct_type;
+    struct_union_typet::componentt comp_a("a", integer_typet());
+    struct_union_typet::componentt comp_b("b", integer_typet());
+    struct_union_typet::componentt comp_c("c", integer_typet());
+    struct_type.components().push_back(comp_a);
+    struct_type.components().push_back(comp_b);
+    struct_type.components().push_back(comp_c);
+
+    struct_exprt val1(struct_type);
+    val1.operands().push_back(constant_exprt::integer_constant(1));
+    val1.operands().push_back(constant_exprt::integer_constant(2));
+    val1.operands().push_back(constant_exprt::integer_constant(3));
+
+    // struct val1 = {.a = 1, .b = 4, .c = 5}
+    struct_exprt val2(struct_type);
+    val2.operands().push_back(constant_exprt::integer_constant(1));
+    val2.operands().push_back(constant_exprt::integer_constant(4));
+    val2.operands().push_back(constant_exprt::integer_constant(5));
+
+    // index_exprt for reading from an array
+    const member_exprt a(nil_exprt(), "a");
+    const member_exprt b(nil_exprt(), "b");
+    const member_exprt c(nil_exprt(), "c");
+
+    abstract_environmentt enviroment;
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+
+    optionst options;
+    options.set_option("pointers", true);
+    options.set_option("arrays", true);
+    options.set_option("structs", true);
+    variable_sensitivity_object_factoryt::instance().set_options(options);
+
+    struct_utilt util(enviroment, ns);
+
+    abstract_object_pointert result;
+    bool modified=false;
+
+    WHEN("Merging two constant struct AOs with the same contents")
     {
       auto op1=util.build_struct(val1);
+      auto op2=util.build_struct(val1);
 
-      SECTION("same value")
+      result=abstract_objectt::merge(op1, op2, modified);
+
+      const auto &cast_result=
+        std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
+          result);
+      THEN("The original struct AO should be returned")
       {
-        INFO(val1.op0().type().id_string());
-
-        auto op2=util.build_struct(val1);
-
-        REQUIRE(util.read_component(op1, b)==val1.op1());
-        REQUIRE(util.read_component(op1, a)==val1.op0());
-
-        INFO(c.pretty());
-
-        const exprt &arr_val2=util.read_component(op1, c);
-        INFO(arr_val2.pretty());
-
-        REQUIRE(arr_val2==val1.op2());
-
-        REQUIRE(util.read_component(op2, a)==val1.op0());
-        REQUIRE(util.read_component(op2, b)==val1.op1());
-        REQUIRE(util.read_component(op2, c)==val1.op2());
-
-        result=abstract_objectt::merge(op1, op2, modified);
-
-        const auto &cast_result=
-          std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
-            result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
@@ -171,15 +154,20 @@ TEST_CASE("merge_full_struct_abstract_object",
         // Is optimal
         REQUIRE(result==op1);
       }
-      SECTION("different array")
+    }
+    WHEN("Merging two constant struct AOs with the different contents")
+    {
+      auto op1=util.build_struct(val1);
+      auto op2=util.build_struct(val2);
+
+      result=abstract_objectt::merge(op1, op2, modified);
+
+      const auto &cast_result=
+        std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
+          result);
+      THEN("A new constant struct AO whose a component is the same and the "
+        "b and c are set to top")
       {
-        abstract_object_pointert op2=util.build_struct(val2);
-
-        result=abstract_objectt::merge(op1, op2, modified);
-
-        const auto &cast_result=
-          std::dynamic_pointer_cast<const full_struct_abstract_objectt>(
-            result);
         // Though we may become top or bottom, the type should be unchanged
         REQUIRE(cast_result);
 
