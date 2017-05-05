@@ -1393,8 +1393,9 @@ void bv_utilst::unsigned_divider(
 
   // Division by zero test.
   // Note that we produce a non-deterministic result in
-  // case of division by zero. SMT-LIB now says that the
-  // result shall be zero.
+  // case of division by zero. SMT-LIB now says the following:
+  // bvudiv returns a vector of all 1s if the second operand is 0
+  // bvurem returns its first operand if the second operand is 0
 
   literalt is_not_zero=prop.lor(op1);
 
