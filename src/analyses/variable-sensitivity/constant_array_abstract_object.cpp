@@ -225,25 +225,34 @@ abstract_object_pointert constant_array_abstract_objectt::read_index(
   const index_exprt &index,
   const namespacet &ns) const
 {
-  mp_integer index_value;
-  if(eval_index(index, env, ns, index_value))
+  if(is_top())
   {
-    // Here we are assuming it is always in bounds
-    if(map.find(index_value)==map.cend())
-    {
-      return env.abstract_object_factory(type().subtype(), ns, true, false);
-    }
-    else
-    {
-      return map.find(index_value)->second;
-    }
+    return env.abstract_object_factory(
+      index.type(), ns, true);
   }
   else
   {
-    // Reading from somewhere in the array
-    // TODO(tkiley): merge all the values of the array, we may be able to
-    // do better than returning top
-    return env.abstract_object_factory(type().subtype(), ns, true, false);
+    assert(!is_bottom());
+    mp_integer index_value;
+    if(eval_index(index, env, ns, index_value))
+    {
+      // Here we are assuming it is always in bounds
+      if(map.find(index_value)==map.cend())
+      {
+        return env.abstract_object_factory(type().subtype(), ns, true, false);
+      }
+      else
+      {
+        return map.find(index_value)->second;
+      }
+    }
+    else
+    {
+      // Reading from somewhere in the array
+      // TODO(tkiley): merge all the values of the array, we may be able to
+      // do better than returning top
+      return env.abstract_object_factory(type().subtype(), ns, true, false);
+    }
   }
 }
 
