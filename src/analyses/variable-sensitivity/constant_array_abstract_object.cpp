@@ -133,7 +133,7 @@ Function: constant_array_abstract_objectt::constant_array_merge
 abstract_object_pointert constant_array_abstract_objectt::constant_array_merge(
   const constant_array_abstract_object_pointert other) const
 {
-  if(is_top() || other->is_bottom())
+  if(is_top() || other->is_bottom() || other->is_top())
   {
     return array_abstract_objectt::merge(other);
   }

@@ -360,7 +360,7 @@ Function: full_struct_abstract_objectt::merge_constant_structs
 abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
   constant_struct_pointert other) const
 {
-  if(is_top() || other->is_bottom())
+  if(is_top() || other->is_bottom() || other->is_top())
   {
     return struct_abstract_objectt::merge(other);
   }
