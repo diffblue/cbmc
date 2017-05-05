@@ -11,43 +11,26 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <util/std_types.h>
 
-TEST_CASE("merge_abstract_object",
+SCENARIO("merge_abstract_object",
   "[core][analyses][variable-sensitivity][abstract_object][merge]")
 {
-  SECTION("abstract object merge with abstract object")
+  GIVEN("Two abstract objects of type pointer")
   {
     const typet object_type=signedbv_typet(32);
-    SECTION("merging top with...")
+    WHEN("Both are top")
     {
       abstract_object_pointert op1=
         std::make_shared<const abstract_objectt>(object_type, true, false);
 
-      SECTION("top")
+      abstract_object_pointert op2=
+        std::make_shared<const abstract_objectt>(object_type, true, false);
+
+      bool modifications;
+      abstract_object_pointert result=
+        abstract_objectt::merge(op1, op2, modifications);
+
+      THEN("The result is the original abstract object")
       {
-        abstract_object_pointert op2=
-          std::make_shared<const abstract_objectt>(object_type, true, false);
-
-        bool modifications;
-        abstract_object_pointert result=
-          abstract_objectt::merge(op1, op2, modifications);
-
-        // Simple correctness of merge
-        REQUIRE_FALSE(modifications);
-        REQUIRE(result->is_top());
-        REQUIRE_FALSE(result->is_bottom());
-
-        // Is optimal
-        REQUIRE(op1==result);
-      }
-      SECTION("bottom")
-      {
-        abstract_object_pointert op2=
-          std::make_shared<const abstract_objectt>(object_type, false, true);
-
-        bool modifications;
-        abstract_object_pointert result=
-          abstract_objectt::merge(op1, op2, modifications);
-
         // Simple correctness of merge
         REQUIRE_FALSE(modifications);
         REQUIRE(result->is_top());
@@ -57,20 +40,42 @@ TEST_CASE("merge_abstract_object",
         REQUIRE(op1==result);
       }
     }
-    SECTION("merging bottom with...")
+    WHEN("The first is top, the second is bottom")
     {
       abstract_object_pointert op1=
-        std::make_shared<const abstract_objectt>(object_type, false, true);
+      std::make_shared<const abstract_objectt>(object_type, true, false);
 
-      SECTION("top")
-      {
-        abstract_object_pointert op2=
-          std::make_shared<const abstract_objectt>(object_type, true, false);
+      abstract_object_pointert op2=
+      std::make_shared<const abstract_objectt>(object_type, false, true);
 
-        bool modifications;
-        abstract_object_pointert result=
+      bool modifications;
+      abstract_object_pointert result=
           abstract_objectt::merge(op1, op2, modifications);
 
+      THEN("The result is the original abstract object")
+      {
+        // Simple correctness of merge
+        REQUIRE_FALSE(modifications);
+        REQUIRE(result->is_top());
+        REQUIRE_FALSE(result->is_bottom());
+
+        // Is optimal
+        REQUIRE(op1==result);
+      }
+    }
+    WHEN("The first is bottom and the second is top")
+    {
+      abstract_object_pointert op1=
+      std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op2=
+      std::make_shared<const abstract_objectt>(object_type, true, false);
+
+      bool modifications;
+      abstract_object_pointert result=
+      abstract_objectt::merge(op1, op2, modifications);
+
+      THEN("The result is top and a new abstract object")
+      {
         // Simple correctness of merge
         REQUIRE(modifications);
         REQUIRE(result->is_top());
@@ -78,15 +83,20 @@ TEST_CASE("merge_abstract_object",
 
         REQUIRE_FALSE(op1==result);
       }
-      SECTION("bottom")
+    }
+    WHEN("Both are bottom")
+    {
+      abstract_object_pointert op1=
+      std::make_shared<const abstract_objectt>(object_type, false, true);
+      abstract_object_pointert op2=
+      std::make_shared<const abstract_objectt>(object_type, false, true);
+
+      bool modifications;
+      abstract_object_pointert result=
+      abstract_objectt::merge(op1, op2, modifications);
+
+      THEN("The result is the original abstract object")
       {
-        abstract_object_pointert op2=
-          std::make_shared<const abstract_objectt>(object_type, false, true);
-
-        bool modifications;
-        abstract_object_pointert result=
-          abstract_objectt::merge(op1, op2, modifications);
-
         // Simple correctness of merge
         REQUIRE_FALSE(modifications);
         REQUIRE_FALSE(result->is_top());
