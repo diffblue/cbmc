@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symex Command Line Options Processing
 
+#include "symex_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -52,7 +54,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "path_search.h"
-#include "symex_parse_options.h"
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
