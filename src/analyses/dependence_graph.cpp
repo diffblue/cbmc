@@ -326,7 +326,7 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 
   if(!data_deps.empty())
@@ -341,7 +341,7 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 }
 

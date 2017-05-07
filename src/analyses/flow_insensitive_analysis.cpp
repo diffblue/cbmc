@@ -133,10 +133,7 @@ void flow_insensitive_analysis_baset::output(
 {
   forall_goto_functions(f_it, goto_functions)
   {
-    out << "////" << std::endl;
-    out << "//// Function: " << f_it->first << std::endl;
-    out << "////" << std::endl;
-    out << std::endl;
+    out << "////\n" << "//// Function: " << f_it->first << "\n////\n\n";
 
     output(f_it->second.body, f_it->first, out);
   }
@@ -253,7 +250,7 @@ bool flow_insensitive_analysis_baset::visit(
 
   #if 0
   std::cout << "Visiting: " << l->function << " " <<
-    l->location_number << std::endl;
+    l->location_number << '\n';
   #endif
 
   seen_locations.insert(l);
@@ -294,14 +291,14 @@ bool flow_insensitive_analysis_baset::visit(
   }
 
 //  if (id2string(l->function).find("debug")!=std::string::npos)
-//    std::cout << l->function << std::endl; //=="messages::debug")
+//    std::cout << l->function << '\n'; //=="messages::debug")
 
 //  {
 //    static unsigned state_cntr=0;
 //    std::string s("pastate"); s += std::to_string(state_cntr);
 //    std::ofstream f(s.c_str());
 //    goto_program.output_instruction(ns, "", f, l);
-//    f << std::endl;
+//    f << '\n';
 //    get_state().output(ns, f);
 //    f.close();
 //    state_cntr++;
