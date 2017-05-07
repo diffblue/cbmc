@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Language Registration
 
+#include "cbmc_parse_options.h"
+
 #include <langapi/mode.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef HAVE_JSIL
 #include <jsil/jsil_language.h>
 #endif
-
-#include "cbmc_parse_options.h"
 
 void cbmc_parse_optionst::register_languages()
 {

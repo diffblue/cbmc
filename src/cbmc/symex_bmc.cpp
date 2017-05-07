@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Bounded Model Checking for ANSI-C
 
+#include "symex_bmc.h"
+
 #include <limits>
 
 #include <util/source_location.h>
 #include <util/simplify_expr.h>
-
-#include "symex_bmc.h"
 
 symex_bmct::symex_bmct(
   const namespacet &_ns,
