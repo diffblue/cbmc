@@ -224,7 +224,7 @@ void value_sett::output(
       }
     }
 
-    out << " } " << std::endl;
+    out << " } \n";
   }
 }
 
@@ -432,7 +432,7 @@ void value_sett::get_value_set(
   #if 0
   for(value_setst::valuest::const_iterator it=dest.begin();
       it!=dest.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
   #endif
 }
 
@@ -482,7 +482,7 @@ void value_sett::get_value_set_rec(
 {
   #if 0
   std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << "\n";
-  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
   #endif
 
   const typet &expr_type=ns.follow(expr.type());
@@ -985,7 +985,7 @@ void value_sett::get_value_set_rec(
   else
   {
     #if 0
-    std::cout << "WARNING: not doing " << expr.id() << std::endl;
+    std::cout << "WARNING: not doing " << expr.id() << '\n';
     #endif
   }
 
@@ -1079,7 +1079,7 @@ void value_sett::get_reference_set_rec(
 {
   #if 0
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
+            << '\n';
   #endif
 
   if(expr.id()==ID_symbol ||
@@ -1105,7 +1105,7 @@ void value_sett::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
     #endif
 
     return;
@@ -1250,8 +1250,8 @@ void value_sett::assign(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;
+  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
   output(ns, std::cout);
   #endif
 
@@ -1475,16 +1475,16 @@ void value_sett::assign_rec(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << std::endl;
-  std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << '\n';
+  std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();
       it!=values_rhs.read().end();
       it++)
     std::cout << "ASSIGN_REC RHS: " <<
-      from_expr(ns, "", object_numbering[it->first]) << std::endl;
-  std::cout << std::endl;
+      from_expr(ns, "", object_numbering[it->first]) << '\n';
+  std::cout << '\n';
   #endif
 
   if(lhs.id()==ID_symbol)
@@ -1821,7 +1821,7 @@ void value_sett::apply_code(
   }
   else
   {
-    // std::cerr << code.pretty() << std::endl;
+    // std::cerr << code.pretty() << '\n';
     throw "value_sett: unexpected statement: "+id2string(statement);
   }
 }
