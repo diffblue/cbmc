@@ -9,6 +9,8 @@ Author: CM Wintersteiger, 2006
 /// \file
 /// GCC Mode
 
+#include "gcc_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -33,7 +35,6 @@ Author: CM Wintersteiger, 2006
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "gcc_mode.h"
 
 static std::string compiler_name(
   const cmdlinet &cmdline,

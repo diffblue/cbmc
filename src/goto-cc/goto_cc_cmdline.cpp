@@ -11,6 +11,8 @@ Date:   April 2010
 /// \file
 /// Command line interpretation for goto-cc
 
+#include "goto_cc_cmdline.h"
+
 #include <cstring>
 #include <cassert>
 #include <iostream>
@@ -18,8 +20,6 @@ Date:   April 2010
 
 #include <util/prefix.h>
 #include <util/tempfile.h>
-
-#include "goto_cc_cmdline.h"
 
 goto_cc_cmdlinet::~goto_cc_cmdlinet()
 {

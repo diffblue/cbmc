@@ -9,6 +9,8 @@ Author: Daniel Kroening
 /// \file
 /// A special command line object for the CL options
 
+#include "ms_cl_cmdline.h"
+
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
@@ -16,8 +18,6 @@ Author: Daniel Kroening
 #include <fstream>
 
 #include <util/unicode.h>
-
-#include "ms_cl_cmdline.h"
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

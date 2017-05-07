@@ -9,12 +9,12 @@ Author: Michael Tautschnig
 /// \file
 /// A special command line object for as86 (of Bruce's C Compiler)
 
+#include "as86_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "as86_cmdline.h"
 
 // non-as86 options
 const char *goto_as86_options_with_argument[]=

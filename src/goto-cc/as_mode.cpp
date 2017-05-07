@@ -9,6 +9,8 @@ Author: Michael Tautschnig
 /// \file
 /// Assembler Mode
 
+#include "as_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -30,8 +32,6 @@ Author: Michael Tautschnig
 #include <cbmc/version.h>
 
 #include "compile.h"
-
-#include "as_mode.h"
 
 static std::string assembler_name(
   const cmdlinet &cmdline,

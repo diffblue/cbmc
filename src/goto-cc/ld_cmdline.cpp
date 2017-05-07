@@ -9,12 +9,12 @@ Author: Daniel Kroening, 2013
 /// \file
 /// A special command line object for the ld-like options
 
+#include "ld_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "ld_cmdline.h"
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

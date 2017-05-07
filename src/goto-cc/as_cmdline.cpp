@@ -9,12 +9,12 @@ Author: Michael Tautschnig
 /// \file
 /// A special command line object for GNU Assembler
 
+#include "as_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "as_cmdline.h"
 
 // non-as options
 const char *goto_as_options_with_argument[]=
