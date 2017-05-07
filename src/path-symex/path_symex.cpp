@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Concrete Symbolic Transformer
 
+#include "path_symex.h"
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
-#include "path_symex.h"
 #include "path_symex_class.h"
 
 #ifdef DEBUG

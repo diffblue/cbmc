@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// History of path-based symbolic simulator
 
+#include "path_symex_history.h"
+
 #include <algorithm>
 
 #include <util/decision_procedure.h>
 
 #include <langapi/language_util.h>
-
-#include "path_symex_history.h"
 
 void path_symex_stept::output(std::ostream &out) const
 {

@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// State of path-based symbolic simulator
 
+#include "path_symex_state.h"
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
 #include <pointer-analysis/dereference.h>
-
-#include "path_symex_state.h"
 
 #ifdef DEBUG
 #include <iostream>
