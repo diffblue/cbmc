@@ -9,6 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
+#include "expr.h"
+
+#include <cassert>
+
 #include <stack>
 
 #include "string2int.h"
@@ -16,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
-#include "expr.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "arith_tools.h"

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "mp_arith.h"
 
 #include <cstdlib>
 #include <cctype>
@@ -15,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <limits>
 
-#include "mp_arith.h"
 #include "arith_tools.h"
 
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)

@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Internal Representation
 
+#include "irep.h"
+
 #include <ostream>
 
 #include "invariant.h"
-
 #include "string2int.h"
-#include "irep.h"
 #include "string_hash.h"
 #include "irep_hash.h"
 

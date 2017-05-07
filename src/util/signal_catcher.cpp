@@ -8,6 +8,7 @@ Date:
 
 \*******************************************************************/
 
+#include "signal_catcher.h"
 
 #if defined(_WIN32)
 #include <process.h>
@@ -17,8 +18,6 @@ Date:
 #endif
 
 #include <vector>
-
-#include "signal_catcher.h"
 
 // Here we have an instance of an ugly global object.
 // It keeps track of any child processes that we'll kill

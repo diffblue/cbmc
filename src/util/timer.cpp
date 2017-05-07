@@ -11,10 +11,10 @@ Date:
 /// \file
 /// Time Stopping
 
+#include "timer.h"
+
 #include <sstream>
 #include <cassert>
-
-#include "timer.h"
 
 timert::~timert()
 {

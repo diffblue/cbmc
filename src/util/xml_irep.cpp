@@ -8,11 +8,11 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+#include "xml_irep.h"
 
 #include <iostream>
 #include <string>
 
-#include "xml_irep.h"
 #include "irep.h"
 #include "xml.h"
 

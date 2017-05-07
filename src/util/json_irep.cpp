@@ -9,9 +9,10 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 /// \file
 /// Util
 
+#include "json_irep.h"
+
 #include "irep.h"
 #include "json.h"
-#include "json_irep.h"
 
 #include <algorithm>
 

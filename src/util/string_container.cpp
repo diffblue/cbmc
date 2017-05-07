@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Container for C-Strings
 
-#include <cstring>
-
 #include "string_container.h"
+
+#include <cstring>
 
 string_containert string_container;
 

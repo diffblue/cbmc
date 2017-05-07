@@ -6,6 +6,7 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+#include "tempfile.h"
 
 #ifdef _WIN32
 #include <process.h>
@@ -32,8 +33,6 @@ Author: Daniel Kroening
 #include <unistd.h>
 #include <sys/time.h>
 #endif
-
-#include "tempfile.h"
 
 /// Substitute for mkstemps (OpenBSD standard) for Windows, where it is
 /// unavailable.

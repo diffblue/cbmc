@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "language_file.h"
 
 #include <fstream>
 
 #include "language.h"
-#include "language_file.h"
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),

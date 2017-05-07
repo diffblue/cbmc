@@ -9,12 +9,13 @@ Author:
 /// \file
 /// A stdin/stdout pipe as STL stream
 
+#include "pipe_stream.h"
+
 #include <cstdio>
 #include <istream>
 #include <vector>
 
 #include "unicode.h"
-#include "pipe_stream.h"
 
 #ifdef _WIN32
 #include <io.h>

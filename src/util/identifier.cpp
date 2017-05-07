@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "identifier.h"
 
 #include <cstring>
-
-#include "identifier.h"
 
 std::string identifiert::as_string() const
 {

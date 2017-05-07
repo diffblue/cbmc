@@ -8,6 +8,7 @@ Date: August 2012
 
 \*******************************************************************/
 
+#include "run.h"
 
 #include <cassert>
 
@@ -31,8 +32,6 @@ Date: August 2012
 
 #include <util/unicode.h>
 #include <util/signal_catcher.h>
-
-#include "run.h"
 
 int run_shell(const std::string &command)
 {

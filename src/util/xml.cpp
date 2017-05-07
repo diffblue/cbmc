@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "xml.h"
 
 #include <ostream>
 
 #include "string2int.h"
-#include "xml.h"
 
 void xmlt::clear()
 {

@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "config.h"
 
 #include <cstdlib>
 
 #include "namespace.h"
-#include "config.h"
 #include "symbol_table.h"
 #include "arith_tools.h"
 #include "cmdline.h"

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "symbol.h"
 
 #include <ostream>
 
-#include "symbol.h"
 #include "source_location.h"
 #include "std_expr.h"
 

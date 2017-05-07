@@ -9,6 +9,8 @@ Author: Peter Schrammel
 /// \file
 /// Expressions in JSON
 
+#include "json_expr.h"
+
 #include "namespace.h"
 #include "expr.h"
 #include "json.h"
@@ -17,8 +19,6 @@ Author: Peter Schrammel
 #include "fixedbv.h"
 #include "std_expr.h"
 #include "config.h"
-
-#include "json_expr.h"
 
 json_objectt json(const source_locationt &location)
 {
