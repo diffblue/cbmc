@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <iostream>
 
 #include <util/std_types.h>
-
-#include "boolbv.h"
 
 #include "../floatbv/float_utils.h"
 

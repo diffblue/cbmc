@@ -6,11 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt2_prop.h"
 
 #include <cassert>
-
-
-#include "smt2_prop.h"
 
 smt2_propt::smt2_propt(
   const std::string &benchmark,

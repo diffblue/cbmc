@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <iostream>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_cond(const exprt &expr)
 {

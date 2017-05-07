@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// A minimalistic BDD library, following Bryant's original paper and Andersen's
 ///   lecture notes
 
+#include "miniBDD.h"
+
 #include <cassert>
 
 #include <iostream>
-
-#include "miniBDD.h"
 
 #define forall_nodes(it) for(nodest::const_iterator it=nodes.begin(); \
   it!=nodes.end(); it++)

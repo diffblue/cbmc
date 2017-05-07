@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "functions.h"
 
 #include <cassert>
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
-
-#include "functions.h"
 
 void functionst::record(
   const function_application_exprt &function_application)

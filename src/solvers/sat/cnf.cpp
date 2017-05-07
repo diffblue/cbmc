@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// CNF Generation, via Tseitin
 
+#include "cnf.h"
+
 #include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <set>
 
-#include "cnf.h"
 // #define VERBOSE
 
 /// Tseitin encoding of conjunction of two literals

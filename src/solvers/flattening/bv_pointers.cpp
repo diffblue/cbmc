@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "bv_pointers.h"
 
 #include <util/c_types.h>
 #include <util/config.h>
@@ -14,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/threeval.h>
-
-#include "bv_pointers.h"
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {

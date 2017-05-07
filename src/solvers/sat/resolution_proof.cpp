@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "resolution_proof.h"
 
 #include <cassert>
 #include <stack>
-
-#include "resolution_proof.h"
 
 template<class T>
 void resolution_prooft<T>::build_core(std::vector<bool> &in_core)

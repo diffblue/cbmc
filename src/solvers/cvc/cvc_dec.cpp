@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cvc_dec.h"
 
 #include <cstring>
 #include <cassert>
@@ -27,8 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/prefix.h>
 #include <util/string2int.h>
-
-#include "cvc_dec.h"
 
 cvc_temp_filet::cvc_temp_filet()
 {

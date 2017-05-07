@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_types.h>

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "prop_conv.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -16,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 
 #include "prop.h"
-#include "prop_conv.h"
 #include "literal_expr.h"
 
 /// determine whether a variable is in the final conflict

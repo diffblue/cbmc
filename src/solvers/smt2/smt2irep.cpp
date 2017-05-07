@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt2irep.h"
 
 #include <cassert>
 #include <stack>
 
-#include "smt2irep.h"
 #include "smt2_parser.h"
 
 class smt2irept:public smt2_parsert

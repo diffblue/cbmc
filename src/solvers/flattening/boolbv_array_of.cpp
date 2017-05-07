@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <util/arith_tools.h>
 #include <util/std_types.h>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 {

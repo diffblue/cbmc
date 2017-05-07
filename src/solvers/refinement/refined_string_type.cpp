@@ -16,9 +16,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   `content` of type `content_type`. This module also defines functions to
 ///   recognise the C and java string types.
 
-#include <util/cprover_prefix.h>
-
 #include "refined_string_type.h"
+
+#include <util/cprover_prefix.h>
 
 refined_string_typet::refined_string_typet(
   const typet &index_type, const typet &char_type)

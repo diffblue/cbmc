@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "arrays.h"
 
 #include <cassert>
 #include <iostream>
@@ -19,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
-
-#include "arrays.h"
 
 arrayst::arrayst(
   const namespacet &_ns,

@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "float_bv.h"
 
 #include <cassert>
 #include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
-
-#include "float_bv.h"
 
 exprt float_bvt::convert(const exprt &expr)
 {

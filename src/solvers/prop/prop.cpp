@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "prop.h"
 
 #include <cassert>
-
-#include "prop.h"
 
 /// asserts a==b in the propositional formula
 void propt::set_equal(literalt a, literalt b)

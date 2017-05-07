@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Pointer Logic
 
+#include "pointer_logic.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 #include <util/pointer_offset_size.h>
-
-#include "pointer_logic.h"
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {

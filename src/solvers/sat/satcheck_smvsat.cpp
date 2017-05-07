@@ -6,12 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_smvsat.h"
 
 #include <cassert>
 #include <stack>
-
-
-#include "satcheck_smvsat.h"
 
 #include <satsolvercore.h>
 #include <interpolator.h>

@@ -6,12 +6,11 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include "satcheck_lingeling.h"
 
 #include <cassert>
 
 #include <util/threeval.h>
-
-#include "satcheck_lingeling.h"
 
 extern "C"
 {

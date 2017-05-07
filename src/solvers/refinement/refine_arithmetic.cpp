@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "bv_refinement.h"
 
 #include <util/bv_arithmetic.h>
 #include <util/ieee_float.h>
@@ -15,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include <solvers/floatbv/float_utils.h>
-
-#include "bv_refinement.h"
 
 // Parameters
 #define MAX_INTEGER_UNDERAPPROX 3

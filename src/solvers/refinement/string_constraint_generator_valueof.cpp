@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   types, in particular int, long, float, double, char, bool
 
 #include <solvers/refinement/string_constraint_generator.h>
+
 #include <solvers/floatbv/float_bv.h>
 
 /// add axioms corresponding to the String.valueOf(I) java function

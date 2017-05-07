@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -15,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 
 #include <util/c_types.h>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_update(const exprt &expr)
 {
