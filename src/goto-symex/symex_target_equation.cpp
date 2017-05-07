@@ -974,27 +974,27 @@ void symex_target_equationt::SSA_stept::output(
     out << "Thread " << source.thread_nr;
 
     if(source.pc->source_location.is_not_nil())
-      out << " " << source.pc->source_location << std::endl;
+      out << " " << source.pc->source_location << '\n';
     else
-      out << std::endl;
+      out << '\n';
   }
 
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
+    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
+    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
   case goto_trace_stept::typet::LOCATION:
-    out << "LOCATION" << std::endl; break;
+    out << "LOCATION" << '\n'; break;
   case goto_trace_stept::typet::INPUT:
-    out << "INPUT" << std::endl; break;
+    out << "INPUT" << '\n'; break;
   case goto_trace_stept::typet::OUTPUT:
-    out << "OUTPUT" << std::endl; break;
+    out << "OUTPUT" << '\n'; break;
 
   case goto_trace_stept::typet::DECL:
-    out << "DECL" << std::endl;
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+    out << "DECL" << '\n';
+    out << from_expr(ns, "", ssa_lhs) << '\n';
     break;
 
   case goto_trace_stept::typet::ASSIGNMENT:
@@ -1018,45 +1018,45 @@ void symex_target_equationt::SSA_stept::output(
       }
     }
 
-    out << ")" << std::endl;
+    out << ")\n";
     break;
 
   case goto_trace_stept::typet::DEAD:
-    out << "DEAD" << std::endl; break;
+    out << "DEAD\n"; break;
   case goto_trace_stept::typet::FUNCTION_CALL:
-    out << "FUNCTION_CALL" << std::endl; break;
+    out << "FUNCTION_CALL\n"; break;
   case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN" << std::endl; break;
+    out << "FUNCTION_RETURN\n"; break;
   case goto_trace_stept::typet::CONSTRAINT:
-    out << "CONSTRAINT" << std::endl; break;
+    out << "CONSTRAINT\n"; break;
   case goto_trace_stept::typet::SHARED_READ:
-    out << "SHARED READ" << std::endl; break;
+    out << "SHARED READ\n"; break;
   case goto_trace_stept::typet::SHARED_WRITE:
-    out << "SHARED WRITE" << std::endl; break;
+    out << "SHARED WRITE\n"; break;
   case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << std::endl; break;
+    out << "ATOMIC_BEGIN\n"; break;
   case goto_trace_stept::typet::ATOMIC_END:
-    out << "AUTOMIC_END" << std::endl; break;
+    out << "AUTOMIC_END\n"; break;
   case goto_trace_stept::typet::SPAWN:
-    out << "SPAWN" << std::endl; break;
+    out << "SPAWN\n"; break;
   case goto_trace_stept::typet::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER" << std::endl; break;
+    out << "MEMORY_BARRIER\n"; break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
+    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
 
   default: assert(false);
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << std::endl;
+    out << from_expr(ns, "", cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
-    out << comment << std::endl;
+    out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+    out << from_expr(ns, "", ssa_lhs) << '\n';
 
-  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
+  out << "Guard: " << from_expr(ns, "", guard) << '\n';
 }
 
 /*******************************************************************\

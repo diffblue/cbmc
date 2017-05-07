@@ -181,7 +181,7 @@ void goto_symext::operator()(
        state.source.thread_nr+1<state.threads.size())
     {
       unsigned t=state.source.thread_nr+1;
-      // std::cout << "********* Now executing thread " << t << std::endl;
+      // std::cout << "********* Now executing thread " << t << '\n';
       state.switch_to_thread(t);
     }
   }

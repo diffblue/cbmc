@@ -98,7 +98,7 @@ void goto_symex_statet::level0t::operator()(
 
   if(ns.lookup(obj_identifier, s))
   {
-    std::cerr << "level0: failed to find " << obj_identifier << std::endl;
+    std::cerr << "level0: failed to find " << obj_identifier << '\n';
     abort();
   }
 
@@ -375,7 +375,7 @@ static void assert_l1_renaming(const exprt &expr)
   #if 1
   if(check_renaming_l1(expr))
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     assert(false);
   }
   #else
@@ -388,7 +388,7 @@ static void assert_l2_renaming(const exprt &expr)
   #if 1
   if(check_renaming(expr))
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     assert(false);
   }
   #else
@@ -455,9 +455,9 @@ void goto_symex_statet::assignment(
   }
 
   #if 0
-  std::cout << "Assigning " << l1_identifier << std::endl;
+  std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(ns, std::cout);
-  std::cout << "**********************" << std::endl;
+  std::cout << "**********************\n";
   #endif
 }
 
