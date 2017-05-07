@@ -18,7 +18,7 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/namespace.h>
 #include <util/std_code.h>
 
-
+class symbol_exprt;
 class codet;
 
 bool jsil_typecheck(
