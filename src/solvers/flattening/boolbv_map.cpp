@@ -160,7 +160,7 @@ void boolbv_mapt::get_literals(
 
     #ifdef DEBUG
     std::cout << "NEW: " << identifier << ":" << bit
-              << "=" << l << std::endl;
+              << "=" << l << '\n';
     #endif
   }
 }

@@ -220,7 +220,7 @@ propt::resultt qbf_bdd_coret::prop_solve()
     {
       #if 0
       std::cout << "BDD E: " << var << ", " <<
-        matrix->nodeCount() << " nodes" << std::endl;
+        matrix->nodeCount() << " nodes\n";
       #endif
 
       BDD *model=new BDD();
@@ -236,7 +236,7 @@ propt::resultt qbf_bdd_coret::prop_solve()
     {
       #if 0
       std::cout << "BDD A: " << var << ", " <<
-        matrix->nodeCount() << " nodes" << std::endl;
+        matrix->nodeCount() << " nodes\n";
       #endif
 
       *matrix=matrix->UnivAbstract(*bdd_variable_map[var]);
@@ -510,7 +510,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     if(it!=function_cache.end())
     {
       #if 0
-      std::cout << "CACHE HIT for " << l.dimacs() << std::endl;
+      std::cout << "CACHE HIT for " << l.dimacs() << '\n';
       #endif
 
       if(l.sign())
@@ -525,7 +525,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
     BDD &model=*model_bdds[l.var_no()];
 
     #if 0
-    std::cout << "Model " << l.var_no() << std::endl;
+    std::cout << "Model " << l.var_no() << '\n';
     model.PrintMinterm();
     #endif
 
@@ -547,7 +547,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       std::cout << "CUBE: ";
       for(signed i=0; i<bdd_manager->ReadSize(); i++)
         std::cout << cube[i];
-      std::cout << std::endl;
+      std::cout << '\n';
       #endif
 
       for(signed i=0; i<bdd_manager->ReadSize(); i++)

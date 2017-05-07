@@ -64,10 +64,9 @@ bvt boolbvt::convert_case(const exprt &expr)
       if(compare_bv.size()!=op.size())
       {
         std::cerr << "compare operand: " << compare_bv.size()
-                  << std::endl
-                  << "operand: " << op.size() << std::endl
+                  << "\noperand: " << op.size() << '\n'
                   << it->pretty()
-                  << std::endl;
+                  << '\n';
 
         throw "size of compare operand does not match";
       }
@@ -84,10 +83,9 @@ bvt boolbvt::convert_case(const exprt &expr)
       if(bv.size()!=op.size())
       {
         std::cerr << "result size: " << bv.size()
-                  << std::endl
-                  << "operand: " << op.size() << std::endl
+                  << "\noperand: " << op.size() << '\n'
                   << it->pretty()
-                  << std::endl;
+                  << '\n';
 
         throw "size of value operand does not match";
       }

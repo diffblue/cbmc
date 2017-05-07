@@ -293,7 +293,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
     prop.set_frozen(literal);
 
   #if 0
-  std::cout << literal << "=" << expr << std::endl;
+  std::cout << literal << "=" << expr << '\n';
   #endif
 
   return literal;

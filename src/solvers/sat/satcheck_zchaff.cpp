@@ -206,7 +206,7 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
   if(result==SATISFIABLE)
   {
     for(unsigned i=2; i<(_no_variables*2); i+=2)
-      cout << "DEBUG L" << i << ":" << get(i) << endl;
+      cout << "DEBUG L" << i << ":" << get(i) << '\n';
   }
   #endif
 
