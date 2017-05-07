@@ -121,7 +121,7 @@ public:
       assert(data->ref_count!=0);
       data->ref_count++;
       #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << std::endl;
+      std::cout << "COPY " << data << " " << data->ref_count << '\n';
       #endif
     }
   }
