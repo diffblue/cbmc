@@ -11,6 +11,8 @@ Author: Daniel Kroening
 /// \file
 /// Traces of GOTO Programs
 
+#include "build_goto_trace.h"
+
 #include <cassert>
 
 #include <util/threeval.h>
@@ -21,8 +23,6 @@ Author: Daniel Kroening
 #include <solvers/prop/prop.h>
 
 #include "partial_order_concurrency.h"
-
-#include "build_goto_trace.h"
 
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,

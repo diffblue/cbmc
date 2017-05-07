@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
-
-#include "goto_symex.h"
 
 exprt goto_symext::make_auto_object(const typet &type)
 {

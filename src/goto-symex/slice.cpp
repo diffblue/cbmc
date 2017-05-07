@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Slicer for symex traces
 
+#include "slice.h"
+
 #include <util/std_expr.h>
 
-#include "slice.h"
 #include "symex_slice_class.h"
 
 void symex_slicet::get_symbols(const exprt &expr)

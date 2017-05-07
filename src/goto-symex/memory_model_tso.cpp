@@ -9,10 +9,10 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 /// \file
 /// Memory model for partial order concurrency
 
+#include "memory_model_tso.h"
+
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
-
-#include "memory_model_tso.h"
 
 void memory_model_tsot::operator()(symex_target_equationt &equation)
 {

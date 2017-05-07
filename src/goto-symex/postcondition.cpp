@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "postcondition.h"
+
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
 
 #include "goto_symex_state.h"
-#include "postcondition.h"
 
 class postconditiont
 {

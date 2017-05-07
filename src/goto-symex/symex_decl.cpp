@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex.h"
+
 #include <cassert>
 
 #include <util/rename.h>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex.h"
 
 void goto_symext::symex_decl(statet &state)
 {

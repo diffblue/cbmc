@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
-#include <util/symbol_table.h>
-
 #include "symex_dereference_state.h"
+
+#include <util/symbol_table.h>
 
 void symex_dereference_statet::dereference_failure(
   const std::string &property,

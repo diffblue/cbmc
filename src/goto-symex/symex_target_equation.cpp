@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "symex_target_equation.h"
+
 #include <cassert>
 
 #include <util/std_expr.h>
@@ -19,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/literal_expr.h>
 
 #include "goto_symex_state.h"
-#include "symex_target_equation.h"
 
 symex_target_equationt::symex_target_equationt(
   const namespacet &_ns):ns(_ns)

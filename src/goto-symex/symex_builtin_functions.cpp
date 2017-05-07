@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -26,7 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include "goto_symex.h"
 #include "goto_symex_state.h"
 
 inline static typet c_sizeof_type_rec(const exprt &expr)

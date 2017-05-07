@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Slicer for symex traces
 
+#include "slice_by_trace.h"
+
 #include <cstring>
 #include <set>
 #include <fstream>
@@ -21,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 
 #include <langapi/language_util.h>
-
-#include "slice_by_trace.h"
 
 void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,

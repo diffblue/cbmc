@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 
 #include <util/c_types.h>
-
-#include "goto_symex.h"
 
 void goto_symext::symex_other(
   const goto_functionst &goto_functions,

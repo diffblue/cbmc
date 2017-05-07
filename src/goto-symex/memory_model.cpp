@@ -9,9 +9,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 /// \file
 /// Memory model for partial order concurrency
 
-#include <util/std_expr.h>
-
 #include "memory_model.h"
+
+#include <util/std_expr.h>
 
 memory_model_baset::memory_model_baset(const namespacet &_ns):
   partial_order_concurrencyt(_ns),
