@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symex Command Line Options Processing
 
+#include "clobber_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -37,7 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "clobber_parse_options.h"
 // #include "clobber_instrumenter.h"
 
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
