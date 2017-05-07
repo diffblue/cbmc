@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "mode.h"
 
 #include <list>
 #include <memory>
@@ -16,8 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include <util/language.h>
-
-#include "mode.h"
 
 struct language_entryt
 {
