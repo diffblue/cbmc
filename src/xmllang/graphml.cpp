@@ -9,13 +9,13 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 /// \file
 /// Read/write graphs as GraphML
 
+#include "graphml.h"
+
 #include <cassert>
 #include <set>
 
 #include <util/message.h>
 #include <util/string2int.h>
-
-#include "graphml.h"
 
 // include last to make sure #define stack(x) of parser.h does not
 // collide with std::stack included by graph.h
