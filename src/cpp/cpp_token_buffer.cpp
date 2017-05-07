@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Parser: Token Buffer
 
+#include "cpp_token_buffer.h"
+
 #include <cassert>
 
 #include <ansi-c/ansi_c_y.tab.h>
 #include <ansi-c/ansi_c_parser.h>
-
-#include "cpp_token_buffer.h"
 
 int cpp_token_buffert::LookAhead(unsigned offset)
 {

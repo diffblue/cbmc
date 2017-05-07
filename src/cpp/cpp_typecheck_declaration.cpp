@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
+
 #include "cpp_declarator_converter.h"
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)

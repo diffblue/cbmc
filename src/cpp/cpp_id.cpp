@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_id.h"
+
 #include <ostream>
 
-#include "cpp_id.h"
 #include "cpp_scope.h"
 
 cpp_idt::cpp_idt():

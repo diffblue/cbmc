@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <cstdlib>
 
 #include <util/std_types.h>
@@ -25,7 +27,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <linking/zero_initializer.h>
 
 #include "cpp_type2name.h"
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_exception_id.h"
 #include "expr2cpp.h"

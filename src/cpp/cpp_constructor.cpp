@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
 #include <util/c_types.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
 /// \param object: non-typechecked object
