@@ -128,7 +128,7 @@ bool language_uit::parse(const std::string &filename)
   if(language.parse(infile, filename))
   {
     if(get_ui()==ui_message_handlert::uit::PLAIN)
-      std::cerr << "PARSING ERROR" << std::endl;
+      std::cerr << "PARSING ERROR\n";
 
     return true;
   }
@@ -253,7 +253,7 @@ void language_uit::show_symbol_table_plain(
   bool brief)
 {
   if(!brief)
-    out << '\n' << "Symbols:" << '\n' << std::endl;
+    out << "\nSymbols:\n\n";
 
   // we want to sort alphabetically
   std::set<std::string> symbols;
@@ -289,7 +289,7 @@ void language_uit::show_symbol_table_plain(
 
     if(brief)
     {
-      out << symbol.name << " " << type_str << std::endl;
+      out << symbol.name << " " << type_str << '\n';
       continue;
     }
 
