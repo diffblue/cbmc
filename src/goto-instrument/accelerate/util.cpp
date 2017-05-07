@@ -9,13 +9,13 @@ Author: Matt Lewis
 /// \file
 /// Loop Acceleration
 
+#include "util.h"
+
 #include <iostream>
 #include <algorithm>
 
 #include <util/std_types.h>
 #include <util/config.h>
-
-#include "util.h"
 
 signedbv_typet signed_poly_type()
 {

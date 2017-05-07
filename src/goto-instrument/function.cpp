@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Function Entering and Exiting
 
+#include "function.h"
+
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -16,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <ansi-c/string_constant.h>
-
-#include "function.h"
 
 code_function_callt function_to_call(
   symbol_tablet &symbol_table,

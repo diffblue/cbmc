@@ -16,6 +16,8 @@ Date: July 2016
 
 #include <iosfwd>
 
+class namespacet;
+
 class goto_functionst;
 
 void list_undefined_functions(

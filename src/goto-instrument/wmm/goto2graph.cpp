@@ -11,6 +11,8 @@ Date: 2012
 /// \file
 /// Turns a goto-program into an abstract event graph
 
+#include "goto2graph.h"
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -28,7 +30,6 @@ Date: 2012
 
 #include "../rw_set.h"
 #include "fence.h"
-#include "goto2graph.h"
 
 // #define PRINT_UNSAFES
 

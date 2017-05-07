@@ -11,6 +11,8 @@ Date: September 2011
 /// \file
 /// Memory-mapped I/O Instrumentation for Goto Programs
 
+#include "mmio.h"
+
 #include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_program.h>
@@ -30,8 +32,6 @@ Date: September 2011
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>
 #endif
-
-#include "mmio.h"
 
 void mmio(
   value_setst &value_sets,

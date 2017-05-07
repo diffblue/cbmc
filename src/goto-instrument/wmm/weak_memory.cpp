@@ -19,6 +19,8 @@ Date: September 2011
  * in the program.
  */
 
+#include "weak_memory.h"
+
 #include <set>
 
 #include <util/cprover_prefix.h>
@@ -29,7 +31,6 @@ Date: September 2011
 
 #include "../rw_set.h"
 
-#include "weak_memory.h"
 #include "shared_buffers.h"
 #include "goto2graph.h"
 
