@@ -143,7 +143,7 @@ void remove_asmt::process_instruction(
     const irep_idt &i_str=
       to_string_constant(code.op0()).get_value();
 
-    // std::cout << "DOING " << i_str << std::endl;
+    // std::cout << "DOING " << i_str << '\n';
 
     std::istringstream str(id2string(i_str));
     assembler_parser.clear();
@@ -163,7 +163,7 @@ void remove_asmt::process_instruction(
       std::cout << "A ********************\n";
       for(const auto &ins : instruction)
       {
-        std::cout << "XX: " << ins.pretty() << std::endl;
+        std::cout << "XX: " << ins.pretty() << '\n';
       }
 
       std::cout << "B ********************\n";

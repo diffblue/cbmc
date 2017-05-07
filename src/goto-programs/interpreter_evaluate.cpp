@@ -423,7 +423,7 @@ void interpretert::evaluate(
 
   std::cout << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
-            << std::endl;
+            << '\n';
 }
 
 /*******************************************************************\
@@ -507,7 +507,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
 
   std::cout << "!! failed to evaluate address: "
             << from_expr(ns, function->first, expr)
-            << std::endl;
+            << '\n';
 
   return 0;
 }

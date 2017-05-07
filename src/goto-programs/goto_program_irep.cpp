@@ -179,7 +179,7 @@ void convert(const irept &irep, goto_programt &program)
       if(fit==program.instructions.end())
       {
         std::cout << "Warning: could not resolve target link "
-                  << "during irep->goto_program translation." << std::endl;
+                  << "during irep->goto_program translation.\n";
         throw 0;
       }
     }

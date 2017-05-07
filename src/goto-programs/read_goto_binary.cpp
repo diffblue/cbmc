@@ -368,8 +368,8 @@ static bool link_functions(
       #if 0
       if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
       {
-        std::cerr << symbol << std::endl;
-        std::cerr << ns.lookup(id) << std::endl;
+        std::cerr << symbol << '\n';
+        std::cerr << ns.lookup(id) << '\n';
       }
       assert(base_type_eq(symbol.type, ns.lookup(id).type, ns));
       #endif
