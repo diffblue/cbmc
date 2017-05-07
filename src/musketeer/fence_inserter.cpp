@@ -9,6 +9,8 @@ Author: Vincent Nimal
 /// \file
 /// ILP construction for all cycles and resolution
 
+#include "fence_inserter.h"
+
 #include <util/graph.h>
 
 #include <sstream>
@@ -19,7 +21,6 @@ Author: Vincent Nimal
 #include <cstdlib>
 #endif
 
-#include "fence_inserter.h"
 #include "ilp.h"
 
 class abstract_eventt;

@@ -9,6 +9,8 @@ Author: Vincent Nimal
 /// \file
 /// Constant Function Pointer Propagation
 
+#include "propagate_const_function_pointers.h"
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -22,8 +24,6 @@ Author: Vincent Nimal
 #include <map>
 #include <list>
 #include <cassert>
-
-#include "propagate_const_function_pointers.h"
 
 class const_function_pointer_propagationt
 {
