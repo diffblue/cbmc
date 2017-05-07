@@ -77,7 +77,7 @@ void cpp_namet::convert(
     else if(id==ID_template_args)
     {
       std::stringstream ss;
-      ss << location() << std::endl;
+      ss << location() << '\n';
       ss << "no template arguments allowed here";
       throw ss.str();
     }

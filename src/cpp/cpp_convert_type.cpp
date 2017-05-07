@@ -66,7 +66,7 @@ void cpp_convert_typet::read(const typet &type)
   other.clear();
 
   #if 0
-  std::cout << "cpp_convert_typet::read: " << type.pretty() << std::endl;
+  std::cout << "cpp_convert_typet::read: " << type.pretty() << '\n';
   #endif
 
   read_rec(type);
@@ -88,7 +88,7 @@ void cpp_convert_typet::read_rec(const typet &type)
 {
   #if 0
   std::cout << "cpp_convert_typet::read_rec: "
-            << type.pretty() << std::endl;
+            << type.pretty() << '\n';
   #endif
 
   if(type.id()==ID_merged_type)

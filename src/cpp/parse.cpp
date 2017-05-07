@@ -37,7 +37,7 @@ struct indenter // NOLINT(readability/identifiers)
   cpp_tokent _tk; \
   lex.LookAhead(0, _tk); \
   std::cout << std::string(__indent, ' ') << "Text [" << _tk.line_no << "]: " \
-    << _tk.text << std::endl; \
+    << _tk.text << '\n'; \
 }
 #endif
 
@@ -1687,7 +1687,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 0.1  token: "
-            << lex.LookAhead(0) << std::endl;
+            << lex.LookAhead(0) << '\n';
   #endif
 
   if(!optAttribute(declaration))
@@ -5193,7 +5193,7 @@ bool Parser::rClassMember(cpp_itemt &member)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rClassMember 0 " << t
-            << std::endl;
+            << '\n';
   #endif // DEBUG
 
   if(t==TOK_PUBLIC || t==TOK_PROTECTED || t==TOK_PRIVATE)
@@ -7903,7 +7903,7 @@ bool Parser::rVarNameCore(exprt &name)
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 1.1 "
               << lex.LookAhead(0)
-              << std::endl;
+              << '\n';
     #endif
 
     switch(lex.LookAhead(0))

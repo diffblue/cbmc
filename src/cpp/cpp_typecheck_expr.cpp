@@ -89,22 +89,22 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.is_nil())
   {
     #if 0
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got nil" << std::endl;
+    std::cerr << "cpp_typecheckt::typecheck_expr_main got nil\n";
     #endif
     abort();
   }
   else if(expr.id()==ID_code)
   {
     #if 0
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got code" << std::endl;
+    std::cerr << "cpp_typecheckt::typecheck_expr_main got code\n";
     #endif
     abort();
   }
   else if(expr.id()==ID_symbol)
   {
     #if 0
-    std::cout << "E: " << expr.pretty() << std::endl;
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol" << std::endl;
+    std::cout << "E: " << expr.pretty() << '\n';
+    std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol\n";
     abort();
     #endif
   }
@@ -1266,7 +1266,7 @@ void cpp_typecheckt::typecheck_expr_typecast(exprt &expr)
 {
   // should not be called
   #if 0
-  std::cout << "E: " << expr.pretty() << std::endl;
+  std::cout << "E: " << expr.pretty() << '\n';
   assert(0);
   #endif
 }

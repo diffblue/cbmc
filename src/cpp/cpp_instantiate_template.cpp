@@ -121,7 +121,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
         out << to_string(*a_it);
     }
 
-    out << "> at " << s_it->source_location << std::endl;
+    out << "> at " << s_it->source_location << '\n';
   }
 }
 
@@ -286,8 +286,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   instantiation_stack.back().full_template_args=full_template_args;
 
   #if 0
-  std::cout << "L: " << source_location << std::endl;
-  std::cout << "I: " << template_symbol.name << std::endl;
+  std::cout << "L: " << source_location << '\n';
+  std::cout << "I: " << template_symbol.name << '\n';
   #endif
 
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -310,7 +310,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     else
       std::cout << to_string(*it);
   }
-  std::cout << ">" << std::endl;
+  std::cout << ">\n";
   #endif
 
   // do we have arguments?
@@ -429,7 +429,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 
   #if 0
-  std::cout << "MAP:" << std::endl;
+  std::cout << "MAP:\n";
   template_map.print(std::cout);
   #endif
 
