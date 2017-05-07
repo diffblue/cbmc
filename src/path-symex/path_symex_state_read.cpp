@@ -33,7 +33,7 @@ Function: path_symex_statet::read
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  // std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
+  // std::cout << "path_symex_statet::read " << src.pretty() << '\n';
   #endif
 
   // This has three phases!
@@ -49,7 +49,7 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
-  // std::cout << " ==> " << tmp.pretty() << std::endl;
+  // std::cout << " ==> " << tmp.pretty() << '\n';
   #endif
 
   return tmp5;
@@ -71,7 +71,7 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 {
   #ifdef DEBUG
   std::cout << "expand_structs_and_arrays: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   const typet &src_type=var_map.ns.follow(src.type());
@@ -262,7 +262,7 @@ exprt path_symex_statet::instantiate_rec(
 {
   #ifdef DEBUG
   std::cout << "instantiate_rec: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   // check whether this is a symbol(.member|[index])*
@@ -451,7 +451,7 @@ exprt path_symex_statet::read_symbol_member_index(
 
   #ifdef DEBUG
   std::cout << "read_symbol_member_index_rec " << identifier
-            << " var_info " << var_info.full_identifier << std::endl;
+            << " var_info " << var_info.full_identifier << '\n';
   #endif
 
   // warning: reference is not stable
@@ -627,7 +627,7 @@ exprt path_symex_statet::instantiate_rec_address(
   bool propagate)
 {
   #ifdef DEBUG
-  std::cout << "instantiate_rec_address: " << src.id() << std::endl;
+  std::cout << "instantiate_rec_address: " << src.id() << '\n';
   #endif
 
   if(src.id()==ID_symbol)
@@ -687,7 +687,7 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     // this shouldn't really happen
     #ifdef DEBUG
-    std::cout << "SRC: " << src.pretty() << std::endl;
+    std::cout << "SRC: " << src.pretty() << '\n';
     #endif
     throw "address of unexpected `"+src.id_string()+"'";
   }
