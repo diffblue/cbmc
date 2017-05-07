@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Linking: Zero Initialization
 
+#include "zero_initializer.h"
+
 #include <sstream>
 
 #include <util/namespace.h>
@@ -20,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <ansi-c/expr2c.h>
-
-#include "zero_initializer.h"
 
 class zero_initializert:public messaget
 {
