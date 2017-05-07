@@ -134,7 +134,7 @@ int ms_cl_modet::doit()
         it!=config.ansi_c.defines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Undefines:\n";
@@ -142,7 +142,7 @@ int ms_cl_modet::doit()
         it!=config.ansi_c.undefines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Preprocessor Options:\n";
@@ -150,7 +150,7 @@ int ms_cl_modet::doit()
         it!=config.ansi_c.preprocessor_options.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Include Paths:\n";
@@ -158,7 +158,7 @@ int ms_cl_modet::doit()
         it!=config.ansi_c.include_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Library Paths:\n";
@@ -166,13 +166,13 @@ int ms_cl_modet::doit()
         it!=compiler.library_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Output file (object): "
-              << compiler.output_file_object << std::endl;
+              << compiler.output_file_object << '\n';
     std::cout << "Output file (executable): "
-              << compiler.output_file_executable << std::endl;
+              << compiler.output_file_executable << '\n';
   }
 
   // Parse input program, convert to goto program, write output

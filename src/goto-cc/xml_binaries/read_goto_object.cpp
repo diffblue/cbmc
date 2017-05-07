@@ -96,7 +96,7 @@ bool read_goto_object(
         {
           symbolt symbol;
           symbolconverter.convert(*sym_it, symbol);
-          // std::cout << "Adding Symbol: " << symbol.name << std::endl;
+          // std::cout << "Adding Symbol: " << symbol.name << '\n';
           if(!symbol.is_type &&
              symbol.type.id()=="code")
           {
@@ -117,7 +117,7 @@ bool read_goto_object(
             fun_it++)
         {
           std::string fname = fun_it->get_attribute("name");
-          // std::cout << "Adding function body: " << fname << std::endl;
+          // std::cout << "Adding function body: " << fname << '\n';
           goto_functionst::goto_functiont &f = functions.function_map[fname];
           gfconverter.convert(*fun_it, f);
         }

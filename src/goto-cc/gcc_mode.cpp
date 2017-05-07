@@ -214,7 +214,7 @@ int gcc_modet::doit()
 
   if(cmdline.isset("dumpversion"))
   {
-    std::cout << "3.4.4" << std::endl;
+    std::cout << "3.4.4\n";
     return EX_OK;
   }
 
@@ -609,7 +609,7 @@ int gcc_modet::preprocess(
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
-  std::cout << std::endl;
+  std::cout << '\n';
   #endif
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
@@ -644,7 +644,7 @@ int gcc_modet::run_gcc()
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
-  std::cout << std::endl;
+  std::cout << '\n';
   #endif
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");

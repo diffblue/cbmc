@@ -33,7 +33,7 @@ void xml_goto_program_convertt::convert(
   xmlt &xml)
 {
   std::stringstream tmp;
-  // std::cout << "TNO: " << goto_program.target_numbers.size() << std::endl;
+  // std::cout << "TNO: " << goto_program.target_numbers.size() << '\n';
 
   for(const auto &inst : goto_program.instructions)
   {
@@ -59,7 +59,7 @@ void xml_goto_program_convertt::convert(
 
     if(inst.target_number!=0)
     {
-      // std::cout << "Targetlabel found!" << std::endl;
+      // std::cout << "Targetlabel found!\n";
       tmp.str("");
       tmp << inst.target_number;
       ins.set_attribute("targetlabel", tmp.str());
@@ -285,8 +285,7 @@ void xml_goto_program_convertt::convert(
     else
     {
       std::cout << "Unknown instruction type encountered ("
-                << element.name << ")";
-      std::cout << std::endl;
+                << element.name << ")\n";
       return;
     }
 
@@ -313,7 +312,7 @@ void xml_goto_program_convertt::convert(
           }
           else
           {
-            std::cout << "Unknown node in labels section." << std::endl;
+            std::cout << "Unknown node in labels section.\n";
             return;
           }
         }
@@ -373,12 +372,12 @@ void xml_goto_program_convertt::convert(
             else
             {
               std::cout << "Warning: instruction not found when "
-              "resolving target links." << std::endl;
+              "resolving target links.\n";
             }
           }
           else
           {
-            std::cout << "Unknown node in targets section." << std::endl;
+            std::cout << "Unknown node in targets section.\n";
             return;
           }
         }
@@ -390,7 +389,7 @@ void xml_goto_program_convertt::convert(
   // resolve links
   goto_program.update();
 
-  // std::cout << "TNI: " << goto_program.target_numbers.size() << std::endl;
+  // std::cout << "TNI: " << goto_program.target_numbers.size() << '\n';
 }
 
 /*******************************************************************\

@@ -431,7 +431,7 @@ bool gcc_cmdlinet::parse_arguments(
       {
         // unrecognized option
         std::cerr << "Warning: uninterpreted gcc option '" << argv_i
-                  << "'" << std::endl;
+                  << "'\n";
       }
     }
   }

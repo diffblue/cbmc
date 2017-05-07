@@ -206,7 +206,7 @@ bool as_cmdlinet::parse(int argc, const char **argv)
     {
       // unrecognized option
       std::cerr << "Warning: uninterpreted as option '" << argv_i
-                << "'" << std::endl;
+                << "'\n";
     }
   }
 

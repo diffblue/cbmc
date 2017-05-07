@@ -162,7 +162,7 @@ bool bcc_cmdlinet::parse(int argc, const char **argv)
     {
       // unrecognized option
       std::cerr << "Warning: uninterpreted bcc option '" << argv_i
-                << "'" << std::endl;
+                << "'\n";
     }
   }
 
