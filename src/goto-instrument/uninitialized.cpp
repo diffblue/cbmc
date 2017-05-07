@@ -270,10 +270,9 @@ void show_uninitialized(
   {
     if(f_it->second.body_available())
     {
-      out << "////" << std::endl;
-      out << "//// Function: " << f_it->first << std::endl;
-      out << "////" << std::endl;
-      out << std::endl;
+      out << "////\n";
+      out << "//// Function: " << f_it->first << '\n';
+      out << "////\n\n";
       uninitialized_analysist uninitialized_analysis;
       uninitialized_analysis(f_it->second.body, ns);
       uninitialized_analysis.output(ns, f_it->second.body, out);

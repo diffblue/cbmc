@@ -55,14 +55,14 @@ void show_locations(
         l.new_element("function").data=
           id2string(source_location.get_function());
 
-        std::cout << xml << std::endl;
+        std::cout << xml << '\n';
       }
       break;
 
     case ui_message_handlert::uit::PLAIN:
       std::cout << function_id << " "
                 << it->location_number << " "
-                << it->source_location << std::endl;
+                << it->source_location << '\n';
       break;
 
     default:

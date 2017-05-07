@@ -78,16 +78,14 @@ void print_struct_alignment_problems(
               first_time_seen_in_struct=false;
               first_time_seen_from=false;
 
-              out << std::endl
-                  << "WARNING: "
+              out << "\nWARNING: "
                   << "declaration of structure "
                   << str.find_type(ID_tag).pretty()
-                  << " at " << it->second.location << std::endl;
+                  << " at " << it->second.location << '\n';
             }
 
             out << "members " << it_mem->get_pretty_name() << " and "
-                << it_next->get_pretty_name() << " might interfere"
-                << std::endl;
+                << it_next->get_pretty_name() << " might interfere\n";
           }
         }
       }
@@ -103,10 +101,10 @@ void print_struct_alignment_problems(
 
       if(2*integer2long(size)<=config.ansi_c.memory_operand_size)
       {
-        out << std::endl << "WARNING: "
+        out << "\nWARNING: "
             << "declaration of an array at "
-            << it->second.location << std::endl
-            << "might be concurrently accessed" << std::endl;
+            << it->second.location <<
+            << "\nmight be concurrently accessed\n";
       }
       #endif
     }
