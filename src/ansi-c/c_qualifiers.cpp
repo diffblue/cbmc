@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_qualifiers.h"
 
 #include <ostream>
-
-#include "c_qualifiers.h"
 
 std::string c_qualifierst::as_string() const
 {

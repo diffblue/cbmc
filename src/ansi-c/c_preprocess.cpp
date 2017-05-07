@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_preprocess.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,8 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 #include <util/prefix.h>
-
-#include "c_preprocess.h"
 
 #define GCC_DEFINES_16 \
   " -D__INT_MAX__=32767"\

@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Conversion of sizeof Expressions
 
-#include <util/c_types.h>
+#include "c_sizeof.h"
+
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+#include <util/c_types.h>
 
-#include "c_sizeof.h"
 #include "c_typecast.h"
 
 exprt c_sizeoft::sizeof_rec(const typet &type)

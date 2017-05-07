@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "string_constant.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
-
-#include "string_constant.h"
 
 string_constantt::string_constantt():
   exprt(ID_string_constant)

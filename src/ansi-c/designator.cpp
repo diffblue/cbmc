@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
-#include <ostream>
-
 #include "designator.h"
+
+#include <ostream>
 
 void designatort::print(std::ostream &out) const
 {

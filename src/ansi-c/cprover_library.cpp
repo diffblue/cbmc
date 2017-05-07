@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cprover_library.h"
 
 #include <sstream>
 
 #include <util/config.h>
 
-#include "cprover_library.h"
 #include "ansi_c_language.h"
 
 struct cprover_library_entryt

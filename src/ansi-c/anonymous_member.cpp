@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
+#include "anonymous_member.h"
+
 #include <util/std_types.h>
 #include <util/std_expr.h>
-
-#include "anonymous_member.h"
 
 static exprt make_member_expr(
   const exprt &struct_union,
