@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Bytecode Language Conversion
 
+#include "java_bytecode_convert_method.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -26,7 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <analyses/cfg_dominators.h>
 
-#include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
@@ -2402,19 +2403,8 @@ void java_bytecode_convert_method(
   java_bytecode_convert_method(class_symbol, method);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::save_stack_entries
-
-  Inputs:
-
- Outputs:
-
- Purpose: create temporary variables if a write instruction can have undesired
-          side-effects
-
-\*******************************************************************/
-
+/// create temporary variables if a write instruction can have undesired side-
+/// effects
 void java_bytecode_convert_methodt::save_stack_entries(
   const std::string &tmp_var_prefix,
   const typet &tmp_var_type,
@@ -2455,19 +2445,7 @@ void java_bytecode_convert_methodt::save_stack_entries(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::create_stack_tmp_var
-
-  Inputs:
-
- Outputs:
-
- Purpose: actually create a temporary variable to hold the value of a stack
-          entry
-
-\*******************************************************************/
-
+/// actually create a temporary variable to hold the value of a stack entry
 void java_bytecode_convert_methodt::create_stack_tmp_var(
   const std::string &tmp_var_prefix,
   const typet &tmp_var_type,

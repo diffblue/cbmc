@@ -12,6 +12,10 @@ Author: DiffBlue
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_POINTER_CASTS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_POINTER_CASTS_H
 
+class exprt;
+class typet;
+class namespacet;
+
 bool find_superclass_with_type(
   exprt &ptr,
   const typet &target_type,

@@ -9,9 +9,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \file
 /// Context-insensitive lazy methods container
 
-#include <string>
-
 #include "ci_lazy_methods.h"
+
+#include <string>
 
 /// Notes `method_symbol_name` is referenced from some reachable function, and
 /// should therefore be elaborated.

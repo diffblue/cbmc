@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_internal_additions.h"
 
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 
 #include <util/c_types.h>
-
-#include "java_bytecode_internal_additions.h"
 
 void java_internal_additions(symbol_tablet &dest)
 {

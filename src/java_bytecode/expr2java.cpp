@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "expr2java.h"
 
 #include <cassert>
 
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/expr2c_class.h>
 
 #include "java_types.h"
-#include "expr2java.h"
 
 std::string expr2javat::convert_code_function_call(
   const code_function_callt &src,

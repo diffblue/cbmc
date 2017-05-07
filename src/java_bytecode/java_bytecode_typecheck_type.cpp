@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Bytecode Conversion / Type Checking
 
-#include <util/std_types.h>
-
 #include "java_bytecode_typecheck.h"
+
+#include <util/std_types.h>
 
 void java_bytecode_typecheckt::typecheck_type(typet &type)
 {

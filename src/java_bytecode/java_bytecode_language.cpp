@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_language.h"
 
 #include <string>
 
@@ -18,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 
-#include "java_bytecode_language.h"
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_internal_additions.h"

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_object_factory.h"
 
 #include <unordered_set>
 #include <sstream>
@@ -23,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-#include "java_object_factory.h"
 #include "java_types.h"
 #include "java_utils.h"
 

@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_root_class.h"
 
 #include <util/symbol.h>
 #include <util/std_types.h>
 
 #include "java_types.h"
-#include "java_root_class.h"
 
 /*******************************************************************
 

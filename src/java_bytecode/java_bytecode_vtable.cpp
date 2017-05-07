@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_vtable.h"
 
 #include <algorithm>
 #include <iterator>
@@ -16,8 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/vtable.h>
-
-#include "java_bytecode_vtable.h"
 
 const char ID_virtual_name[]="virtual_name";
 

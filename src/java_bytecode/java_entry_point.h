@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 
 #include <util/irep.h>
+#include <util/symbol.h>
 
 bool java_entry_point(
   class symbol_tablet &symbol_table,
