@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// String Abstraction
 
+#include "string_abstraction.h"
+
 #include <cstring>
 
 #include <util/pointer_predicates.h>
@@ -21,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "pointer_arithmetic.h"
-#include "string_abstraction.h"
 
 bool string_abstractiont::build_wrap(
   const exprt &object,

@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Query Called Functions
 
-#include <util/std_expr.h>
-
 #include "compute_called_functions.h"
+
+#include <util/std_expr.h>
 
 /// get all functions whose address is taken
 void compute_address_taken_functions(

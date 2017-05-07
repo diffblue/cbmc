@@ -11,12 +11,13 @@ Date:   April 2017
 /// \file
 /// Perform Memory-mapped I/O instrumentation
 
+#include "mm_io.h"
+
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_expr.h>
 
 #include "remove_returns.h"
-#include "mm_io.h"
 
 void collect_deref_expr(
   const exprt &src,

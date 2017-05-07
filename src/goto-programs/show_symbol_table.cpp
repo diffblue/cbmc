@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Show the symbol table
 
+#include "show_symbol_table.h"
+
 #include <iostream>
 #include <memory>
 
@@ -16,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include "goto_model.h"
-#include "show_symbol_table.h"
 
 void show_symbol_table_xml_ui()
 {

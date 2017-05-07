@@ -11,6 +11,8 @@ Date:   December 2016
 /// \file
 /// Remove exception handling
 
+#include "remove_exceptions.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -20,8 +22,6 @@ Date:   December 2016
 
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include "remove_exceptions.h"
 
 class remove_exceptionst
 {

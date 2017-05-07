@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "remove_function_pointers.h"
+
 #include <cassert>
 
 #include <util/fresh_symbol.h>
@@ -25,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "remove_skip.h"
-#include "remove_function_pointers.h"
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
 

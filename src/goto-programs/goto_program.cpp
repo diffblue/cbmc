@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_program.h"
+
 #include <ostream>
 
 #include <util/std_expr.h>
 
 #include <langapi/language_util.h>
-
-#include "goto_program.h"
 
 /// See below.
 /// \param ns: the namespace to resolve the expressions in

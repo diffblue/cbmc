@@ -11,13 +11,14 @@ Date: June 2006
 /// \file
 /// Read goto object files.
 
+#include "read_bin_goto_object.h"
+
 #include <util/namespace.h>
 #include <util/message.h>
 #include <util/symbol_table.h>
 #include <util/irep_serialization.h>
 
 #include "goto_functions.h"
-#include "read_bin_goto_object.h"
 
 /// read goto binary format v3
 /// \par parameters: input stream, symbol_table, functions

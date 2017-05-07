@@ -9,6 +9,8 @@ Author: Peter Schrammel
 /// \file
 /// Show goto functions
 
+#include "show_goto_functions.h"
+
 #include <iostream>
 
 #include <util/xml.h>
@@ -22,7 +24,6 @@ Author: Peter Schrammel
 #include <goto-programs/show_goto_functions_json.h>
 #include <goto-programs/show_goto_functions_xml.h>
 
-#include "show_goto_functions.h"
 #include "goto_functions.h"
 #include "goto_model.h"
 

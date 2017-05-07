@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Destructor Calls
 
+#include "destructor.h"
+
 #include <util/std_types.h>
 #include <util/std_code.h>
-
-#include "destructor.h"
 
 code_function_callt get_destructor(
   const namespacet &ns,

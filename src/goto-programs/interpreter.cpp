@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Interpreter for GOTO Programs
 
+#include "interpreter.h"
+
 #include <cctype>
 #include <cstdio>
 #include <iostream>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-#include "interpreter.h"
 #include "interpreter_class.h"
 
 void interpretert::operator()()

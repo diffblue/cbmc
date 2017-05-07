@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Get a Goto Program
 
+#include "initialize_goto_model.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -21,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
-#include "initialize_goto_model.h"
 
 bool initialize_goto_model(
   goto_modelt &goto_model,
