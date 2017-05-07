@@ -13,6 +13,8 @@ Date: February 2013
 /// Range-based reaching definitions analysis (following Field- Sensitive
 ///   Program Dependence Analysis, Litvak et al., FSE 2010)
 
+#include "reaching_definitions.h"
+
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 
@@ -20,8 +22,6 @@ Date: February 2013
 
 #include "is_threaded.h"
 #include "dirty.h"
-
-#include "reaching_definitions.h"
 
 void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 {

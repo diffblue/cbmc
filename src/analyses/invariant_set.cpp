@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Invariant Set
 
+#include "invariant_set.h"
+
 #include <iostream>
 
 #include <util/symbol_table.h>
@@ -21,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <langapi/language_util.h>
-
-#include "invariant_set.h"
 
 void inv_object_storet::output(std::ostream &out) const
 {

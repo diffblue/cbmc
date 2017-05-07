@@ -9,6 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set Propagation
 
+#define USE_DEPRECATED_STATIC_ANALYSIS_H
+#include "static_analysis.h"
+
 #include <cassert>
 #include <memory>
 
@@ -16,9 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 
 #include "is_threaded.h"
-
-#define USE_DEPRECATED_STATIC_ANALYSIS_H
-#include "static_analysis.h"
 
 exprt static_analysis_baset::get_guard(
   locationt from,

@@ -9,9 +9,9 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 /// \file
 /// Dominators
 
-#include <iostream>
-
 #include "natural_loops.h"
+
+#include <iostream>
 
 void show_natural_loops(const goto_functionst &goto_functions)
 {

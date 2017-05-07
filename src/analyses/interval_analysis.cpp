@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Interval Analysis
 
+#include "interval_analysis.h"
+
 #include <util/find_symbols.h>
 
 #include "interval_domain.h"
-#include "interval_analysis.h"
 
 void instrument_intervals(
   const ait<interval_domaint> &interval_analysis,

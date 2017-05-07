@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Invariant Set Domain
 
-#include <util/simplify_expr.h>
-
 #include "invariant_set_domain.h"
+
+#include <util/simplify_expr.h>
 
 void invariant_set_domaint::transform(
   locationt from_l,

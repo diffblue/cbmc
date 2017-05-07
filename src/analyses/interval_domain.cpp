@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Interval Domain
 
+#include "interval_domain.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -16,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
-
-#include "interval_domain.h"
 
 void interval_domaint::output(
   std::ostream &out,
