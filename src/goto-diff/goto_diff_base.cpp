@@ -9,9 +9,9 @@ Author: Peter Schrammel
 /// \file
 /// GOTO-DIFF Base Class
 
-#include <util/json_expr.h>
-
 #include "goto_diff.h"
+
+#include <util/json_expr.h>
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
 {

@@ -11,6 +11,8 @@ Date: April 2016
 /// \file
 /// Data and control-dependencies of syntactic diff
 
+#include "change_impact.h"
+
 #include <iostream>
 
 #include <goto-programs/goto_model.h>
@@ -19,7 +21,6 @@ Date: April 2016
 
 #include "unified_diff.h"
 
-#include "change_impact.h"
 #if 0
   struct cfg_nodet
   {
