@@ -100,8 +100,8 @@ Function: merge_types
 static void merge_types(irept &dest, irept &src)
 {
   #if 0
-  std::cout << "D: " << dest.pretty() << std::endl;
-  std::cout << "S: " << src.pretty() << std::endl;
+  std::cout << "D: " << dest.pretty() << '\n';
+  std::cout << "S: " << src.pretty() << '\n';
   #endif
 
   if(src.is_nil())
@@ -183,8 +183,8 @@ static void make_subtype(typet &dest, typet &src)
   // find spot in 'dest' where to insert 'src'
 
   #if 0
-  std::cout << "D: " << dest.pretty() << std::endl;
-  std::cout << "S: " << src.pretty() << std::endl;
+  std::cout << "D: " << dest.pretty() << '\n';
+  std::cout << "S: " << src.pretty() << '\n';
   #endif
 
   assert(src.id()==ID_array ||
