@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "json_parser.h"
 
 #include <fstream>
-
-#include "json_parser.h"
 
 json_parsert json_parser;
 
