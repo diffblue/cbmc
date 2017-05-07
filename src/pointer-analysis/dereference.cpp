@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "dereference.h"
+
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -22,8 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include <util/c_types.h>
-
-#include "dereference.h"
 
 /// \par parameters: expression, to be dereferenced
 /// \return returns object after dereferencing

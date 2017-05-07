@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set (Flow Insensitive, Sharing)
 
+#include "value_set_fi.h"
+
 #include <cassert>
 #include <ostream>
 
@@ -22,8 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 #include <util/c_types.h>
-
-#include "value_set_fi.h"
 
 const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank;
 object_numberingt value_set_fit::object_numbering;

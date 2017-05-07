@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set
 
-#include <util/std_code.h>
-
 #include "value_set_domain.h"
+
+#include <util/std_code.h>
 
 void value_set_domaint::transform(
   const namespacet &ns,

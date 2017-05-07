@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Show Value Sets
 
+#include "show_value_sets.h"
+
 #include <iostream>
 
 #include <util/xml.h>
 
 #include "value_set_analysis.h"
-#include "show_value_sets.h"
 
 void show_value_sets(
   ui_message_handlert::uit ui,

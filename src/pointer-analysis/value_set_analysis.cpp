@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set Propagation
 
+#include "value_set_analysis.h"
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/xml_expr.h>
 #include <util/xml.h>
 
 #include <langapi/language_util.h>
-
-#include "value_set_analysis.h"
 
 void value_set_analysist::initialize(
   const goto_programt &goto_program)
