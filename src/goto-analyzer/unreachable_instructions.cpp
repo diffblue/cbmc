@@ -218,7 +218,7 @@ void unreachable_instructions(
   }
 
   if(json && !json_result.array.empty())
-    os << json_result << std::endl;
+    os << json_result << '\n';
 }
 
 /*******************************************************************\
@@ -325,7 +325,7 @@ static void list_functions(
   }
 
   if(json && !json_result.array.empty())
-    os << json_result << std::endl;
+    os << json_result << '\n';
 }
 
 /*******************************************************************\
