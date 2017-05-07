@@ -279,9 +279,9 @@ void goto_program_coverage_recordt::compute_coverage_lines(
     {
       if(!(c_entry->second.size()==1 || is_branch))
       {
-        std::cerr << it->location_number << std::endl;
+        std::cerr << it->location_number << '\n';
         for(const auto &cov : c_entry->second)
-          std::cerr << cov.second.succ->location_number << std::endl;
+          std::cerr << cov.second.succ->location_number << '\n';
       }
       assert(c_entry->second.size()==1 || is_branch);
 
