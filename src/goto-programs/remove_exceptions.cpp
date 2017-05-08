@@ -127,6 +127,7 @@ void remove_exceptionst::add_exceptional_returns(
     t_null->make_assignment();
     t_null->source_location=
       goto_program.instructions.begin()->source_location;
+    t_null->source_location.set(ID_instrumentation, true);
     t_null->code=code_assignt(
       lhs_expr_null,
       rhs_expr_null);
@@ -171,6 +172,7 @@ void remove_exceptionst::instrument_exception_handler(
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_assignment();
     t_null->source_location=instr_it->source_location;
+    t_null->source_location.set(ID_instrumentation, true);
     t_null->code=code_assignt(
       lhs_expr_null,
       rhs_expr_null);
@@ -259,6 +261,7 @@ void remove_exceptionst::instrument_throw(
     goto_programt::targett t_end=goto_program.insert_after(instr_it);
     t_end->make_goto(exceptional_output);
     t_end->source_location=instr_it->source_location;
+    t_end->source_location.set(ID_instrumentation, true);
     t_end->function=instr_it->function;
   }
 
@@ -299,6 +302,7 @@ void remove_exceptionst::instrument_throw(
     t_dead->make_dead();
     t_dead->code=code_deadt(local);
     t_dead->source_location=instr_it->source_location;
+    t_dead->source_location.set(ID_instrumentation, true);
     t_dead->function=instr_it->function;
   }
 
@@ -365,6 +369,7 @@ void remove_exceptionst::instrument_function_call(
       goto_programt::targett t_end=goto_program.insert_after(instr_it);
       t_end->make_goto(exceptional_output);
       t_end->source_location=instr_it->source_location;
+      t_end->source_location.set(ID_instrumentation, true);
       t_end->function=instr_it->function;
     }
 
@@ -396,6 +401,7 @@ void remove_exceptionst::instrument_function_call(
       t_dead->make_dead();
       t_dead->code=code_deadt(local);
       t_dead->source_location=instr_it->source_location;
+      t_dead->source_location.set(ID_instrumentation, true);
       t_dead->function=instr_it->function;
     }
 
