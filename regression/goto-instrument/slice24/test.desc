@@ -1,0 +1,6 @@
+CORE
+testSlice.class
+--full-slice
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$

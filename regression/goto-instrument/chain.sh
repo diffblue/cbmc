@@ -12,8 +12,7 @@ name=${name%.c}
 
 args=${@:1:$#-1}
 
-if [ -f $name.c ]
-then
+if [ -f $name.c ] ; then
   $goto_cc -o $name.gb $name.c
 # $goto_instrument --show-goto-functions $name.gb
   $goto_instrument $args $name.gb ${name}-mod.gb
@@ -24,9 +23,9 @@ then
     $goto_cc ${name}-mod.c -o ${name}-mod.gb
     rm ${name}-mod.c
   fi
-else
-  $goto_instrument $args $name ${name}-mod.gb
-fi
 $goto_instrument --show-goto-functions ${name}-mod.gb
 $cbmc ${name}-mod.gb
+else
+  $cbmc $name
+fi
 
