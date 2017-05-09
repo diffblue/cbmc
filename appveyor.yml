@@ -54,7 +54,7 @@ build_script:
     cp -r deps/minisat2-2.2.1 minisat-2.2.1
     patch -d minisat-2.2.1 -p1 < scripts/minisat-2.2.1-patch
     call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-    sed -i "s/BUILD_ENV.*/BUILD_ENV = MSVC/" src/config.inc
+    sed -i "s/BUILD_ENV[ ]*=.*/BUILD_ENV = MSVC/" src/config.inc
     make -C src -j2
 
 test_script:
