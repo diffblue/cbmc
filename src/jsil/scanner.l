@@ -36,6 +36,10 @@ static int make_identifier()
   return TOK_IDENTIFIER;
 }
 
+#include <util/pragma_wsign_compare.def>
+#include <util/pragma_wnull_conversion.def>
+#include <util/pragma_wdeprecated_register.def>
+
 %}
 
 delimiter       [ \t\b\r]

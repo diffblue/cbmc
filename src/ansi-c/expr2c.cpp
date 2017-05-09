@@ -3618,7 +3618,6 @@ std::string expr2ct::convert_code_block(
   const code_blockt &src,
   unsigned indent)
 {
-  assert(indent>=0);
   std::string dest=indent_str(indent);
   dest+="{\n";
 
@@ -3654,7 +3653,6 @@ std::string expr2ct::convert_code_decl_block(
   const codet &src,
   unsigned indent)
 {
-  assert(indent>=0);
   std::string dest;
 
   forall_operands(it, src)

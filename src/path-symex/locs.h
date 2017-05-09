@@ -56,13 +56,13 @@ public:
 
   loct &operator[] (loc_reft l)
   {
-    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
+    assert(l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
   const loct &operator[] (loc_reft l) const
   {
-    assert(l.loc_number>=0 && l.loc_number<loc_vector.size());
+    assert(l.loc_number<loc_vector.size());
     return loc_vector[l.loc_number];
   }
 
