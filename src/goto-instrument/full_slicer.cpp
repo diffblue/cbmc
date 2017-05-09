@@ -39,6 +39,10 @@ void full_slicert::add_function_calls(
   queuet &queue,
   const goto_functionst &goto_functions)
 {
+  // do not retain calls of empty functions
+  if (node.PC->function.empty())
+   return;
+
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(node.PC->function);
   assert(f_it!=goto_functions.function_map.end());
