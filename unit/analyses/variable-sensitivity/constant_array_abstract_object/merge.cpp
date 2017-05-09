@@ -97,6 +97,7 @@ SCENARIO("merge_constant_array_abstract_object",
       index_exprt(nil_exprt(), constant_exprt::integer_constant(2));
 
     abstract_environmentt enviroment;
+    enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 

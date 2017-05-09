@@ -128,6 +128,7 @@ SCENARIO("merge_full_struct_abstract_object",
     const member_exprt c(nil_exprt(), "c");
 
     abstract_environmentt enviroment;
+    enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
