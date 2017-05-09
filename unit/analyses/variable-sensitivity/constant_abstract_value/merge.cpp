@@ -32,6 +32,7 @@ SCENARIO("merge_constant_abstract_value",
     const exprt val2=constant_exprt::integer_constant(2);
 
     abstract_environmentt enviroment;
+    enviroment.make_top();
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
