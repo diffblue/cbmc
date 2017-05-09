@@ -86,6 +86,9 @@ public:
   // this computes the join between "this" and "b"
   // return true if "this" has changed
 
+  bool has_been_seen() const { return seen; }
+  void set_seen() { seen=true; }
+
 protected:
   bool seen;
 
