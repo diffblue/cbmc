@@ -164,5 +164,6 @@ Function: temporary_filet::~temporary_filet
 
 temporary_filet::~temporary_filet()
 {
-  if(!name.empty()) unlink(name.c_str());
+  if(!name.empty())
+    unlink(name.c_str());
 }
