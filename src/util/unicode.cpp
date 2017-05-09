@@ -324,7 +324,7 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
 {
     std::wstring result;
     result.reserve(in.size());
-    int i=0;
+    std::string::size_type i=0;
     while(i<in.size())
     {
       unsigned char c=in[i++];
