@@ -1,7 +1,8 @@
-FUTURE
+KNOWNBUG
 test_last_index_of.class
 --refine-strings
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+Issue: diffblue/test-gen#77

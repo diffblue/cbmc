@@ -648,19 +648,15 @@ void string_refine_preprocesst::make_string_function(
   {
     if(signature.back()=='S')
     {
-      code_typet ft=function_type;
-      ft.return_type()=jls_ptr;
-      typecast_exprt lhs2(lhs, jls_ptr);
-
       make_string_assign(
         goto_program,
         target,
-        lhs2,
-        ft,
+        lhs,
+        function_type,
         function_name,
         arguments,
         location,
-         signature);
+        signature);
     }
     else
       make_normal_assign(
@@ -746,6 +742,7 @@ void string_refine_preprocesst::make_string_function(
 
   std::string new_sig=signature;
   exprt lhs;
+
   if(assign_first_arg)
   {
     assert(!function_call.arguments().empty());
@@ -758,9 +755,6 @@ void string_refine_preprocesst::make_string_function(
   }
   else
     lhs=function_call.lhs();
-
-  if(lhs.id()==ID_typecast)
-    lhs=to_typecast_expr(lhs).op();
 
   new_type.return_type()=lhs.type();
 
@@ -1400,19 +1394,19 @@ void string_refine_preprocesst::initialize_string_function_table()
   signatures["java::java.lang.String.contains:(Ljava/lang/CharSequence;)Z"]=
     "SSZ";
   signatures["java::java.lang.StringBuilder.insert:(IZ)"
-             "Ljava/lang/StringBuilder;"]="SIZS";
+             "Ljava/lang/StringBuilder;"]="SIZ_";
   signatures["java::java.lang.StringBuilder.insert:(IJ)"
-             "Ljava/lang/StringBuilder;"]="SIJS";
+             "Ljava/lang/StringBuilder;"]="SIJ_";
   signatures["java::java.lang.StringBuilder.insert:(II)"
-             "Ljava/lang/StringBuilder;"]="SIIS";
+             "Ljava/lang/StringBuilder;"]="SII_";
   signatures["java::java.lang.StringBuilder.insert:(IC)"
-             "Ljava/lang/StringBuilder;"]="SICS";
+             "Ljava/lang/StringBuilder;"]="SIC_";
   signatures["java::java.lang.StringBuilder.insert:(ILjava/lang/String;)"
-             "Ljava/lang/StringBuilder;"]="SISS";
+             "Ljava/lang/StringBuilder;"]="SIS_";
   signatures["java::java.lang.StringBuilder.insert:(ILjava/lang/String;)"
-             "Ljava/lang/StringBuilder;"]="SISS";
+             "Ljava/lang/StringBuilder;"]="SIS_";
   signatures["java::java.lang.StringBuilder.insert:(I[C)"
-             "Ljava/lang/StringBuilder;"]="SI[S";
+             "Ljava/lang/StringBuilder;"]="SI[_";
   signatures["java::java.lang.String.intern:()Ljava/lang/String;"]="SV";
 }
 

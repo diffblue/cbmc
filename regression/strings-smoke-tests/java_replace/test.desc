@@ -1,7 +1,8 @@
 FUTURE
 test_replace.class
---refine-strings
+--refine-strings --string-max-length 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+diffblue/test-gen#256
