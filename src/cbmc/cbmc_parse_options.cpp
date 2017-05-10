@@ -1044,13 +1044,14 @@ void cbmc_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2016 ";
+    "* *   CBMC " CBMC_TAG_VERSION " - Copyright (C) 2001-2016 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
   std::cout << "   * *\n";
 
   std::cout <<
+    "* *                  " CBMC_VERSION "                * * \n"
     "* *              Daniel Kroening, Edmund Clarke             * *\n"
     "* * Carnegie Mellon University, Computer Science Department * *\n"
     "* *                 kroening@kroening.com                   * *\n"
