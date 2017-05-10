@@ -35,4 +35,7 @@ private:
   bool parse_result;
 };
 
+std::string
+banner_string(const std::string &front_end, const std::string &version);
+
 #endif // CPROVER_UTIL_PARSE_OPTIONS_H

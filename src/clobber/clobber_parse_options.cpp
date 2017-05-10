@@ -348,15 +348,10 @@ void clobber_parse_optionst::report_failure()
 /// display command line help
 void clobber_parse_optionst::help()
 {
-  std::cout <<
-    "\n"
-    "* *     CLOBBER " CBMC_VERSION " - Copyright (C) 2014 ";
-
-  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-
-  std::cout << "     * *\n";
-
-  std::cout <<
+  // clang-format off
+  std::cout << '\n' << banner_string("CLOBBER", CBMC_VERSION) << '\n'
+            <<
+    "* *                   Copyright (C) 2014                    * *\n"
     "* *                    Daniel Kroening                      * *\n"
     "* *                 University of Oxford                    * *\n"
     "* *                 kroening@kroening.com                   * *\n"
@@ -414,4 +409,5 @@ void clobber_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     "\n";
+  // clang-format on
 }

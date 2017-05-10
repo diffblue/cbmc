@@ -721,17 +721,11 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
 /// display command line help
 void janalyzer_parse_optionst::help()
 {
-  std::cout << "\n"
-               "* * JANALYZER " CBMC_VERSION " - Copyright (C) 2017-2018 ";
-
-  std::cout << "(" << (sizeof(void *) * 8) << "-bit version)";
-
-  std::cout << " * *\n";
-
   // clang-format off
-  std::cout <<
+  std::cout << '\n' << banner_string("JANALYZER", CBMC_VERSION) << '\n'
+            <<
      /* NOLINTNEXTLINE(whitespace/line_length) */
-    "* *         JANALYZER " CBMC_VERSION " - Copyright (C) 2016-2018          * *\n"
+    "* *                   Copyright (C) 2016-2018                    * *\n"
     "* *                  Daniel Kroening, Diffblue                   * *\n"
     "* *                   kroening@kroening.com                      * *\n"
     "\n"

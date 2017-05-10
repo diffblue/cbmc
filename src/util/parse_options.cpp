@@ -65,3 +65,20 @@ int parse_options_baset::main()
 
   return doit();
 }
+
+std::string
+banner_string(const std::string &front_end, const std::string &version)
+{
+  const std::string version_str = front_end + " " + version + " " +
+                                  std::to_string(sizeof(void *) * 8) + "-bit";
+
+  std::string::size_type left_padding = 0, right_padding = 0;
+  if(version_str.size() < 57)
+  {
+    left_padding = (57 - version_str.size() + 1) / 2;
+    right_padding = (57 - version_str.size()) / 2;
+  }
+
+  return "* *" + std::string(left_padding, ' ') + version_str +
+         std::string(right_padding, ' ') + "* *";
+}

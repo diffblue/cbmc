@@ -866,15 +866,9 @@ bool cbmc_parse_optionst::process_goto_program(
 void cbmc_parse_optionst::help()
 {
   // clang-format off
-  std::cout <<
-    "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2018 ";
-
-  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-
-  std::cout << "   * *\n";
-
-  std::cout <<
+  std::cout << '\n' << banner_string("CBMC", CBMC_VERSION) << '\n'
+            <<
+    "* *                 Copyright (C) 2001-2018                 * *\n"
     "* *              Daniel Kroening, Edmund Clarke             * *\n"
     "* * Carnegie Mellon University, Computer Science Department * *\n"
     "* *                 kroening@kroening.com                   * *\n"

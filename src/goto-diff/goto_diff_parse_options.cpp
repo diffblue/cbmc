@@ -484,10 +484,9 @@ bool goto_diff_parse_optionst::process_goto_program(
 void goto_diff_parse_optionst::help()
 {
   // clang-format off
-  std::cout <<
-    "\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "* *           GOTO_DIFF " CBMC_VERSION " - Copyright (C) 2016            * *\n"
+  std::cout << '\n' << banner_string("GOTO_DIFF", CBMC_VERSION) << '\n'
+            <<
+    "* *                  Copyright (C) 2016                     * *\n"
     "* *            Daniel Kroening, Peter Schrammel             * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"

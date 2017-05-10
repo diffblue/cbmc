@@ -1439,9 +1439,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 void goto_instrument_parse_optionst::help()
 {
   // clang-format off
-  std::cout <<
-    "\n"
-    "* *     Goto-Instrument " CBMC_VERSION " - Copyright (C) 2008-2013       * *\n" // NOLINT(*)
+  std::cout << '\n' << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
+            <<
+    "* *                Copyright (C) 2008-2013                  * *\n"
     "* *                    Daniel Kroening                      * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"

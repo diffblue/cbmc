@@ -789,15 +789,10 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 /// display command line help
 void goto_analyzer_parse_optionst::help()
 {
-  std::cout << "\n"
-               "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017-2018 ";
-
-  std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
-
-  std::cout << " * *\n";
-
   // clang-format off
-  std::cout <<
+  std::cout << '\n' << banner_string("GOTO-ANALYZER", CBMC_VERSION) << '\n'
+            <<
+    "* *                   Copyright (C) 2017-2018                    * *\n"
     "* *                  Daniel Kroening, DiffBlue                   * *\n"
     "* *                   kroening@kroening.com                      * *\n"
     "\n"
