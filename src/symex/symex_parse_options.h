@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <goto-programs/get_goto_model.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 
 #include <langapi/language_ui.h>

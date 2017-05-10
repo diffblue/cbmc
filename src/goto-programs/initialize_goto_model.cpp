@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
-#include "get_goto_model.h"
+#include "initialize_goto_model.h"
 
 /*******************************************************************\
 

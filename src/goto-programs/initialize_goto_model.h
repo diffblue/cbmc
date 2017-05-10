@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_GOTO_PROGRAMS_GET_GOTO_MODEL_H
-#define CPROVER_GOTO_PROGRAMS_GET_GOTO_MODEL_H
+#ifndef CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H
+#define CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H
 
 #include <util/message.h>
 #include <util/cmdline.h>
@@ -19,4 +19,4 @@ bool initialize_goto_model(
   const cmdlinet &cmdline,
   message_handlert &message_handler);
 
-#endif // CPROVER_GOTO_PROGRAMS_GET_GOTO_MODEL_H
+#endif // CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H

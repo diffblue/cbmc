@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
-#include <goto-programs/get_goto_model.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 
 #include <analyses/goto_check.h>

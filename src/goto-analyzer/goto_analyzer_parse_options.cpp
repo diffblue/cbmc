@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #include <jsil/jsil_language.h>
 
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
