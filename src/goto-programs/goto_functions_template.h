@@ -73,12 +73,8 @@ public:
     parameter_identifiers=other.parameter_identifiers;
   }
 
-  goto_function_templatet(const goto_function_templatet &other)
-    : type(other.type),
-      parameter_identifiers(other.parameter_identifiers)
-  {
-    body.copy_from(other.body);
-  }
+  goto_function_templatet(const goto_function_templatet &)=delete;
+  goto_function_templatet &operator=(const goto_function_templatet &)=delete;
 
   goto_function_templatet(goto_function_templatet &&other):
     body(std::move(other.body)),
@@ -108,10 +104,18 @@ public:
   {
   }
 
-  // copy constructor, don't use me!
-  goto_functions_templatet(const goto_functions_templatet<bodyT> &src)
+  goto_functions_templatet(const goto_functions_templatet &)=delete;
+  goto_functions_templatet &operator=(const goto_functions_templatet &)=delete;
+
+  goto_functions_templatet(goto_functions_templatet &&other):
+    function_map(std::move(other.function_map))
   {
-    assert(src.function_map.empty());
+  }
+
+  goto_functions_templatet &operator=(goto_functions_templatet &&other)
+  {
+    function_map=std::move(other.function_map);
+    return *this;
   }
 
   void clear()
