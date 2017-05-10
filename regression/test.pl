@@ -35,7 +35,6 @@ sub run($$$$$) {
   print LOG "  Core: $dumped_core\n";
 
   if($signal_num != 0) {
-    $failed = 1;
     print "Killed by signal $signal_num";
     if($dumped_core) {
       print " (code dumped)";
