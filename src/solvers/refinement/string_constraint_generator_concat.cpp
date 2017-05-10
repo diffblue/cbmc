@@ -148,9 +148,22 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   const function_application_exprt &f)
 {
   string_exprt s1=get_string_expr(args(f, 2)[0]);
-  const refined_string_typet &ref_type=to_refined_string_type(s1.type());
-  string_exprt s2=add_axioms_from_char(args(f, 2)[1], ref_type);
-  return add_axioms_for_concat(s1, s2);
+  return add_axioms_for_concat_char(s1, args(f, 2)[1]);
+}
+
+/// Add axioms corresponding adding the character char at the end of
+/// string_expr.
+/// \param string_expr: a string expression
+/// \param char' a character expression
+/// \return a new string expression
+
+string_exprt string_constraint_generatort::add_axioms_for_concat_char(
+  const string_exprt &string_expr, const exprt &char_expr)
+{
+  const refined_string_typet &ref_type=
+    to_refined_string_type(string_expr.type());
+  string_exprt s2=add_axioms_from_char(char_expr, ref_type);
+  return add_axioms_for_concat(string_expr, s2);
 }
 
 /// Add axioms corresponding to the StringBuilder.append(D) java function
