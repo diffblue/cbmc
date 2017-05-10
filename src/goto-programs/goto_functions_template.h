@@ -66,18 +66,33 @@ public:
     parameter_identifiers.swap(other.parameter_identifiers);
   }
 
-  void copy_from(const goto_function_templatet<bodyT> &other)
+  void copy_from(const goto_function_templatet &other)
   {
     body.copy_from(other.body);
     type=other.type;
     parameter_identifiers=other.parameter_identifiers;
   }
 
-  goto_function_templatet(const goto_function_templatet<bodyT> &src):
-    type(src.type),
-    parameter_identifiers(src.parameter_identifiers)
+  goto_function_templatet(const goto_function_templatet &other)
+    : type(other.type),
+      parameter_identifiers(other.parameter_identifiers)
   {
-    body.copy_from(src.body);
+    body.copy_from(other.body);
+  }
+
+  goto_function_templatet(goto_function_templatet &&other):
+    body(std::move(other.body)),
+    type(std::move(other.type)),
+    parameter_identifiers(std::move(other.parameter_identifiers))
+  {
+  }
+
+  goto_function_templatet &operator=(goto_function_templatet &&other)
+  {
+    body=std::move(other.body);
+    type=std::move(other.type);
+    parameter_identifiers=std::move(other.parameter_identifiers);
+    return *this;
   }
 };
 

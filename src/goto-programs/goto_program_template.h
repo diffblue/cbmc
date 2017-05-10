@@ -56,17 +56,26 @@ template <class codeT, class guardT>
 class goto_program_templatet
 {
 public:
-  /*! \brief copy constructor
-      \param[in] src an empty goto program
-      \remark Use copy_from to copy non-empty goto-programs
-  */
-  goto_program_templatet(const goto_program_templatet &src)=delete;
+  // Copying is deleted as this class contains pointers that cannot be copied
+  goto_program_templatet(const goto_program_templatet &)=delete;
+  goto_program_templatet &operator=(const goto_program_templatet &)=delete;
 
-  /*! \brief assignment operator
-      \param[in] src an empty goto program
-      \remark Use copy_from to copy non-empty goto-programs
-  */
-  goto_program_templatet &operator=(const goto_program_templatet &src)=delete;
+  // Move operations need to be explicitly enabled as they are deleted with the
+  // copy operations
+  // default for move operations isn't available on Windows yet, so define
+  //  explicitly (see https://msdn.microsoft.com/en-us/library/hh567368.aspx
+  //  under "Defaulted and Deleted Functions")
+
+  goto_program_templatet(goto_program_templatet &&other):
+    instructions(std::move(other.instructions))
+  {
+  }
+
+  goto_program_templatet &operator=(goto_program_templatet &&other)
+  {
+    instructions=std::move(other.instructions);
+    return *this;
+  }
 
   /*! \brief Container for an instruction of the goto-program
   */
