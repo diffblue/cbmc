@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/unicode.h>
 #include <util/memory_info.h>
+#include <util/invariant.h>
 
 #include <ansi-c/c_preprocess.h>
 
@@ -102,6 +103,27 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
+  }
+
+  // Test only; do not use for input validation
+  if(cmdline.isset("test-invariant-failure"))
+  {
+    // Have to catch this as the default handling of uncaught exceptions
+    // on windows appears to be silent termination.
+    try
+    {
+      INVARIANT(0, "Test invariant failure");
+    }
+    catch (const invariant_failedt &e)
+    {
+      std::cerr << e.what();
+      exit(0); // should contemplate EX_OK from sysexits.h
+    }
+    catch (...)
+    {
+      error() << "Unexpected exception type\n";
+    }
+    exit(1);
   }
 
   if(cmdline.isset("program-only"))
