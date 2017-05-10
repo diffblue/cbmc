@@ -123,6 +123,44 @@ bool string_refine_preprocesst::is_java_string_builder_pointer_type(
 
 /*******************************************************************\
 
+Function: string_refine_preprocesst::is_java_string_buffer_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java string buffer
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_buffer_type(const typet &type)
+{
+  return check_java_type(type, "java.lang.StringBuffer");
+}
+
+/*******************************************************************\
+
+Function: string_refine_preprocesst::is_java_string_buffer_pointer_type
+
+  Inputs: a type
+
+ Outputs: Boolean telling whether the type is that of java StringBuffer
+          pointers
+
+\*******************************************************************/
+
+bool string_refine_preprocesst::is_java_string_buffer_pointer_type(
+  const typet &type)
+{
+  if(type.id()==ID_pointer)
+  {
+    const pointer_typet &pt=to_pointer_type(type);
+    const typet &subtype=pt.subtype();
+    return is_java_string_buffer_type(subtype);
+  }
+  return false;
+}
+
+/*******************************************************************\
+
 Function: string_refine_preprocesst::is_java_char_sequence_type
 
   Inputs: a type
@@ -315,9 +353,7 @@ Function: string_refine_preprocesst::get_data_and_length_type_of_string
 void string_refine_preprocesst::get_data_and_length_type_of_string(
   const exprt &expr, typet &data_type, typet &length_type)
 {
-  assert(is_java_string_type(expr.type()) ||
-         is_java_string_builder_type(expr.type()) ||
-         is_java_char_sequence_type(expr.type()));
+  assert(implements_java_char_sequence(pointer_typet(expr.type())));
   typet object_type=ns.follow(expr.type());
   const struct_typet &struct_type=to_struct_type(object_type);
   for(const auto &component : struct_type.components())
@@ -1344,6 +1380,115 @@ void string_refine_preprocesst::initialize_string_function_table()
     ID_cprover_string_copy_func;
   // Not supported "java.lang.StringBuilder.trimToSize"
   // TODO clean irep ids from insert_char_array etc...
+
+  // StringBuffer library
+  string_function_calls
+    ["java::java.lang.StringBuffer.<init>:(Ljava/lang/String;)V"]=
+    ID_cprover_string_copy_func;
+  string_function_calls["java::java.lang.StringBuffer.<init>:()V"]=
+    ID_cprover_string_empty_string_func;
+
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(Z)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_bool_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(C)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_char_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:([C)"
+      "Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_func;
+  // Not supported: "java.lang.StringBuffer.append:([CII)"
+  // Not supported: "java.lang.StringBuffer.append:(LCharSequence;)"
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(D)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_double_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(F)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_float_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(I)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_int_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(J)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_long_func;
+  // Not supported: "java.lang.StringBuffer.append:(LObject;)"
+  side_effect_functions
+    ["java::java.lang.StringBuffer.append:(Ljava/lang/String;)"
+      "Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.appendCodePoint:(I)"
+     "Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_concat_code_point_func;
+  // Not supported: "java.lang.StringBuffer.append:(Ljava/lang/StringBuffer;)"
+  // Not supported: "java.lang.StringBuffer.capacity:()"
+  string_functions["java::java.lang.StringBuffer.charAt:(I)C"]=
+    ID_cprover_string_char_at_func;
+  string_functions["java::java.lang.StringBuffer.codePointAt:(I)I"]=
+    ID_cprover_string_code_point_at_func;
+  string_functions["java::java.lang.StringBuffer.codePointBefore:(I)I"]=
+    ID_cprover_string_code_point_before_func;
+  string_functions["java::java.lang.StringBuffer.codePointCount:(II)I"]=
+    ID_cprover_string_code_point_count_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.delete:(II)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_delete_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.deleteCharAt:(I)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_delete_char_at_func;
+  // Not supported: "java.lang.StringBuffer.ensureCapacity:()"
+  // Not supported: "java.lang.StringBuffer.getChars:()"
+  // Not supported: "java.lang.StringBuffer.indexOf:()"
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(IZ)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_bool_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(IC)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_char_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(I[C)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(I[CII)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_func;
+  // Not supported "java.lang.StringBuffer.insert:(ILCharSequence;)"
+  // Not supported "java.lang.StringBuffer.insert:(ILCharSequence;II)"
+  // Not supported "java.lang.StringBuffer.insert:(ID)"
+  // Not supported "java.lang.StringBuffer.insert:(IF)"
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(II)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_int_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(IJ)Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_long_func;
+  // Not supported "java.lang.StringBuffer.insert:(ILObject;)"
+  side_effect_functions
+    ["java::java.lang.StringBuffer.insert:(ILjava/lang/String;)"
+     "Ljava/lang/StringBuffer;"]=
+    ID_cprover_string_insert_func;
+  // Not supported "java.lang.StringBuffer.lastIndexOf"
+  string_functions["java::java.lang.StringBuffer.length:()I"]=
+    ID_cprover_string_length_func;
+  // Not supported "java.lang.StringBuffer.offsetByCodePoints"
+  // Not supported "java.lang.StringBuffer.replace"
+  // Not supported "java.lang.StringBuffer.reverse"
+  side_effect_functions["java::java.lang.StringBuffer.setCharAt:(IC)V"]=
+    ID_cprover_string_char_set_func;
+  side_effect_functions
+    ["java::java.lang.StringBuffer.setLength:(I)V"]=
+    ID_cprover_string_set_length_func;
+  // Not supported "java.lang.StringBuffer.subSequence"
+  string_functions
+    ["java::java.lang.StringBuffer.substring:(II)Ljava/lang/String;"]=
+    ID_cprover_string_substring_func;
+  string_functions
+    ["java::java.lang.StringBuffer.substring:(I)Ljava/lang/String;"]=
+    ID_cprover_string_substring_func;
+  string_functions
+    ["java::java.lang.StringBuffer.toString:()Ljava/lang/String;"]=
+    ID_cprover_string_copy_func;
+  // Not supported "java.lang.StringBuffer.trimToSize"
 
   // Other libraries
   string_functions["java::java.lang.CharSequence.charAt:(I)C"]=
