@@ -119,7 +119,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_double(
 {
   string_exprt s1=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(s1.type());
-  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type, true);
+  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 
@@ -133,7 +133,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_float(
 {
   string_exprt s1=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(s1.type());
-  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type, false);
+  string_exprt s2=add_axioms_from_float(args(f, 3)[2], ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 

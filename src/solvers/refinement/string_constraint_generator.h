@@ -155,6 +155,8 @@ private:
   string_exprt add_axioms_for_concat_long(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_bool(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_char(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_char(
+    const string_exprt &string_expr, const exprt &char_expr);
   string_exprt add_axioms_for_concat_double(
     const function_application_exprt &f);
   string_exprt add_axioms_for_concat_float(const function_application_exprt &f);
@@ -236,9 +238,14 @@ private:
   // the start for negative number
   string_exprt add_axioms_from_float(const function_application_exprt &f);
   string_exprt add_axioms_from_float(
-    const exprt &f,
-    const refined_string_typet &ref_type,
-    bool double_precision);
+    const exprt &f, const refined_string_typet &ref_type);
+
+  string_exprt add_axioms_for_fractional_part(
+    const exprt &i, size_t max_size, const refined_string_typet &ref_type);
+  string_exprt add_axioms_from_float_scientific_notation(
+    const exprt &f, const refined_string_typet &ref_type);
+  string_exprt add_axioms_from_float_scientific_notation(
+    const function_application_exprt &f);
 
   // Add axioms corresponding to the String.valueOf(D) java function
   // TODO: the specifications is only partial
