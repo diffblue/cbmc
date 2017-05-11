@@ -2052,6 +2052,36 @@ public:
   }
 };
 
+/*! \brief Cast a generic exprt to a \ref bitnot_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * bitnot_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref bitnot_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_bitnot);
+  // DATA_INVARIANT(expr.operands().size()==1,
+  //                "Bit-wise not must have one operand");
+  return static_cast<const bitnot_exprt &>(expr);
+}
+
+/*! \copydoc to_bitnot_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline bitnot_exprt &to_bitnot_expr(exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_bitnot);
+  // DATA_INVARIANT(expr.operands().size()==1,
+  //                "Bit-wise not must have one operand");
+  return static_cast<bitnot_exprt &>(expr);
+}
+
+
 /*! \brief Bit-wise OR
 */
 class bitor_exprt:public multi_ary_exprt
