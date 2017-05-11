@@ -31,6 +31,7 @@ public:
   virtual ~parse_options_baset() { }
 
 private:
+  void unknown_option_msg();
   bool parse_result;
 };
 
