@@ -33,6 +33,7 @@ public:
 
   typedef std::vector<std::string> argst;
   argst args;
+  std::string unknown_arg;
 
   cmdlinet();
   virtual ~cmdlinet();
