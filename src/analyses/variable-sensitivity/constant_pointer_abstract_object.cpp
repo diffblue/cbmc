@@ -168,11 +168,7 @@ abstract_object_pointert
   constant_pointer_abstract_objectt::merge_constant_pointers(
     const constant_pointer_abstract_pointert other) const
 {
-  if(is_top() || other->is_bottom())
-  {
-    return pointer_abstract_objectt::merge(other);
-  }
-  else if(is_bottom())
+  if(is_bottom())
   {
     return std::make_shared<constant_pointer_abstract_objectt>(*other);
   }

@@ -113,6 +113,26 @@ Function: abstract_objectt::merge
 abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert other) const
 {
+  return abstract_object_merge(other);
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::abstract_object_merge
+
+  Inputs:
+   other - The object to merge with this
+
+ Outputs: Returns the result of the abstract object.
+
+ Purpose: Create a new abstract object that is the result of the merge, unless
+          the object would be unchanged, then would return itself.
+
+\*******************************************************************/
+
+abstract_object_pointert abstract_objectt::abstract_object_merge(
+  const abstract_object_pointert other) const
+{
   if(top)
     return shared_from_this();
   if(other->bottom)
@@ -124,7 +144,6 @@ abstract_object_pointert abstract_objectt::merge(
   merged->bottom=false;
   return merged;
 }
-
 
 /*******************************************************************\
 
@@ -286,10 +305,31 @@ abstract_object_pointert abstract_objectt::merge(
   abstract_object_pointert op2,
   bool &out_modifications)
 {
-  abstract_object_pointert result=op1->merge(op2);
+  abstract_object_pointert result=op1->should_use_base_merge(op2)?
+    op1->abstract_object_merge(op2):op1->merge(op2);
   // If no modifications, we will return the original pointer
   out_modifications=result!=op1;
   return result;
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::should_use_base_merge
+
+  Inputs:
+   other - the object being merged with
+
+ Outputs: Returns true if the base class is capable of doing a complete merge
+
+ Purpose: To detect the cases where the base merge is sufficient to do a merge
+          We can't do if this->is_bottom() since we want the specific
+
+\*******************************************************************/
+
+bool abstract_objectt::should_use_base_merge(
+  const abstract_object_pointert other) const
+{
+  return is_top() || other->is_bottom() || other->is_top();
 }
 
 
