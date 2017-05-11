@@ -589,6 +589,14 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
+"__builtin_convertvector" {
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::APPLE)
+                    { loc(); return TOK_CLANG_BUILTIN_CONVERTVECTOR; }
+                  else
+                    return make_identifier();
+                }
+
 "__alignof__"   { if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::APPLE ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
