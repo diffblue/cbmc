@@ -101,11 +101,7 @@ Function: constant_abstract_valuet::merge_constant_constant
 abstract_object_pointert constant_abstract_valuet::merge_constant_constant(
   constant_abstract_value_pointert other) const
 {
-  if(is_top() || other->is_bottom())
-  {
-    return abstract_valuet::merge(other);
-  }
-  else if(is_bottom())
+  if(is_bottom())
   {
     return std::make_shared<constant_abstract_valuet>(*other);
   }
