@@ -755,7 +755,7 @@ void string_refine_preprocesst::make_string_function(
   code_function_callt &function_call=to_code_function_call(target->code);
   code_typet function_type=to_code_type(function_call.function().type());
   code_typet new_type;
-  const source_locationt &loc=function_call.source_location();
+  const source_locationt loc=function_call.source_location();
   declare_function(function_name, function_type);
   function_application_exprt rhs;
   std::vector<exprt> args;
@@ -1074,7 +1074,8 @@ void string_refine_preprocesst::replace_string_calls(
   {
     if(target->is_function_call())
     {
-      code_function_callt &function_call=to_code_function_call(target->code);
+      const code_function_callt function_call=
+        to_code_function_call(target->code);
 
       if(function_call.function().id()==ID_symbol)
       {
