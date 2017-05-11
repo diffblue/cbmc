@@ -587,12 +587,12 @@ codet java_bytecode_convert_methodt::get_array_access_check(
   const exprt &idx,
   const source_locationt &original_sloc)
 {
-  symbolt exc_symbol;  
+  symbolt exc_symbol;
   if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
   {
     exc_symbol.is_static_lifetime=true;
     exc_symbol.base_name="ArrayIndexOutOfBoundsException";
-    exc_symbol.name="ArrayIndexOutOfBoundsException"; 
+    exc_symbol.name="ArrayIndexOutOfBoundsException";
     exc_symbol.mode=ID_java;
     exc_symbol.type=typet(ID_pointer, empty_typet());
     symbol_table.add(exc_symbol);
@@ -600,7 +600,7 @@ codet java_bytecode_convert_methodt::get_array_access_check(
   else
     exc_symbol=symbol_table.lookup("ArrayIndexOutOfBoundsException");
 
-  const symbol_exprt &exc=exc_symbol.symbol_expr();   
+  const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
   throw_expr.add_source_location()=original_sloc;
   throw_expr.copy_to_operands(exc);
@@ -615,7 +615,7 @@ codet java_bytecode_convert_methodt::get_array_access_check(
   if_code.add_source_location()=original_sloc;
   if_code.cond()=and_expr;
   if_code.then_case()=code_expressiont(throw_expr);
-  
+
   return if_code;
 }
 
@@ -635,12 +635,12 @@ codet java_bytecode_convert_methodt::get_array_length_check(
   const exprt &length,
   const source_locationt &original_sloc)
 {
-  symbolt exc_symbol;  
+  symbolt exc_symbol;
   if(!symbol_table.has_symbol("NegativeArraySizeException"))
   {
     exc_symbol.is_static_lifetime=true;
     exc_symbol.base_name="NegativeArraySizeException";
-    exc_symbol.name="NegativeArraySizeException"; 
+    exc_symbol.name="NegativeArraySizeException";
     exc_symbol.mode=ID_java;
     exc_symbol.type=typet(ID_pointer, empty_typet());
     symbol_table.add(exc_symbol);
@@ -648,7 +648,7 @@ codet java_bytecode_convert_methodt::get_array_length_check(
   else
     exc_symbol=symbol_table.lookup("NegativeArraySizeException");
 
-  const symbol_exprt &exc=exc_symbol.symbol_expr();   
+  const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
   throw_expr.add_source_location()=original_sloc;
   throw_expr.copy_to_operands(exc);
@@ -2501,15 +2501,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      code_blockt checkandcreate;
-      // TODO make this throw NegativeArrayIndexException instead.
-      constant_exprt intzero=from_integer(0, java_int_type());
-      binary_relation_exprt gezero(op[0], ID_ge, intzero);
-      code_assertt check(gezero);
-      check.add_source_location().set_comment("Array size < 0");
-      check.add_source_location()
-        .set_property_class("array-create-negative-size");
-      checkandcreate.move_to_operands(check);
+      c=code_blockt();
+      if(throw_runtime_exceptions)
+      {
+        codet array_length_check=get_array_length_check(
+          op[0],
+          i_it->source_location);
+        c.move_to_operands(array_length_check);
+      }
+      else
+      {
+        constant_exprt intzero=from_integer(0, java_int_type());
+        binary_relation_exprt gezero(op[0], ID_ge, intzero);
+        code_assertt check(gezero);
+        check.add_source_location().set_comment("Array size < 0");
+        check.add_source_location()
+          .set_property_class("array-create-negative-size");
+        c.move_to_operands(check);
+      }
 
       if(max_array_length!=0)
       {
@@ -2517,11 +2526,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
           from_integer(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
-        checkandcreate.move_to_operands(assume_le_max_size);
+        c.move_to_operands(assume_le_max_size);
       }
 
       const exprt tmp=tmp_variable("newarray", ref_type);
-      c=code_assignt(tmp, java_new_array);
+      c.copy_to_operands(code_assignt(tmp, java_new_array));
       results[0]=tmp;
     }
     else if(statement=="arraylength")
