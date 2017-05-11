@@ -603,6 +603,68 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   return static_cast<binary_relation_exprt &>(expr);
 }
 
+/*! \brief A generic base class for multi-ary expressions
+*/
+class multi_ary_exprt:public exprt
+{
+public:
+  multi_ary_exprt()
+  {
+  }
+
+  explicit multi_ary_exprt(const irep_idt &_id):exprt(_id)
+  {
+  }
+
+  multi_ary_exprt(
+    const irep_idt &_id,
+    const typet &_type):exprt(_id, _type)
+  {
+  }
+
+  multi_ary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs):
+    exprt(_id, _lhs.type())
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+
+  multi_ary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs,
+    const typet &_type):
+    exprt(_id, _type)
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref multi_ary_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * multi_ary_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref multi_ary_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const multi_ary_exprt &to_multi_ary_expr(const exprt &expr)
+{
+  return static_cast<const multi_ary_exprt &>(expr);
+}
+
+/*! \copydoc to_multi_ary_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
+{
+  return static_cast<multi_ary_exprt &>(expr);
+}
+
 /*! \brief The plus expression
 */
 class plus_exprt:public binary_exprt
