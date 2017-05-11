@@ -184,7 +184,10 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
       }
 
       if(optnr<0)
+      {
+        unknown_arg=argv[i];
         return true;
+      }
       options[optnr].isset=true;
       if(options[optnr].hasval)
       {
