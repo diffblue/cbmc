@@ -106,6 +106,24 @@ public:
     const exprt &idx,
     const source_locationt &original_sloc);
 
+  codet get_array_access_check(
+    const exprt &arraystruct,
+    const exprt &idx,
+    const source_locationt &original_sloc);
+
+  codet get_array_length_check(
+    const exprt &length,
+    const source_locationt &original_sloc);
+  
+  codet get_null_dereference_check(
+    const exprt &expr,
+    const source_locationt &original_sloc);
+
+  codet get_class_cast_check(
+    const exprt &class1,
+    const exprt &class2,    
+    const source_locationt &original_sloc);
+  
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
     size_t address,

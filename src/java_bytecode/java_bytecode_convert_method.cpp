@@ -570,6 +570,209 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
 
 /*******************************************************************\
 
+Function: get_array_access_check
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: Checks whether the array access array_struct[idx] 
+          is out-of-bounds, and throws ArrayIndexOutofBoundsException 
+          if necessary
+
+\*******************************************************************/
+
+codet java_bytecode_convert_methodt::get_array_access_check(
+  const exprt &array_struct,
+  const exprt &idx,
+  const source_locationt &original_sloc)
+{
+  symbolt exc_symbol;  
+  if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
+  {
+    exc_symbol.is_static_lifetime=true;
+    exc_symbol.base_name="ArrayIndexOutOfBoundsException";
+    exc_symbol.name="ArrayIndexOutOfBoundsException"; 
+    exc_symbol.mode=ID_java;
+    exc_symbol.type=typet(ID_pointer, empty_typet());
+    symbol_table.add(exc_symbol);
+  }
+  else
+    exc_symbol=symbol_table.lookup("ArrayIndexOutOfBoundsException");
+
+  const symbol_exprt &exc=exc_symbol.symbol_expr();   
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location()=original_sloc;
+  throw_expr.copy_to_operands(exc);
+
+  const constant_exprt &zero=from_integer(0, java_int_type());
+  const binary_relation_exprt lt_zero(idx, ID_lt, zero);
+  const member_exprt length_field(array_struct, "length", java_int_type());
+  const binary_relation_exprt ge_length(idx, ID_ge, length_field);
+  const and_exprt and_expr(lt_zero, ge_length);
+
+  code_ifthenelset if_code;
+  if_code.add_source_location()=original_sloc;
+  if_code.cond()=and_expr;
+  if_code.then_case()=code_expressiont(throw_expr);
+  
+  return if_code;
+}
+
+/*******************************************************************\
+
+Function: get_array_length_check
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: Throws NegativeArraySizeException when necessary
+
+\*******************************************************************/
+
+codet java_bytecode_convert_methodt::get_array_length_check(
+  const exprt &length,
+  const source_locationt &original_sloc)
+{
+  symbolt exc_symbol;  
+  if(!symbol_table.has_symbol("NegativeArraySizeException"))
+  {
+    exc_symbol.is_static_lifetime=true;
+    exc_symbol.base_name="NegativeArraySizeException";
+    exc_symbol.name="NegativeArraySizeException"; 
+    exc_symbol.mode=ID_java;
+    exc_symbol.type=typet(ID_pointer, empty_typet());
+    symbol_table.add(exc_symbol);
+  }
+  else
+    exc_symbol=symbol_table.lookup("NegativeArraySizeException");
+
+  const symbol_exprt &exc=exc_symbol.symbol_expr();   
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location()=original_sloc;
+  throw_expr.copy_to_operands(exc);
+
+  const constant_exprt &zero=from_integer(0, java_int_type());
+  const binary_relation_exprt ge_zero(length, ID_ge, zero);
+
+  code_ifthenelset if_code;
+  if_code.add_source_location()=original_sloc;
+  if_code.cond()=ge_zero;
+  if_code.then_case()=code_expressiont(throw_expr);
+  
+  return if_code;
+}
+
+/*******************************************************************\
+
+Function: get_null_dereference_check
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: Checks whether expr is null, and throws
+          NullPointerException if necessary
+
+\*******************************************************************/
+
+codet java_bytecode_convert_methodt::get_null_dereference_check(
+  const exprt &expr,
+  const source_locationt &original_sloc)
+{
+  symbolt exc_symbol;  
+  if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
+  {
+    exc_symbol.is_static_lifetime=true;
+    exc_symbol.base_name="NullPointerException";
+    exc_symbol.name="NullPointerException"; 
+    exc_symbol.mode=ID_java;
+    exc_symbol.type=typet(ID_pointer, empty_typet());
+    symbol_table.add(exc_symbol);
+  }
+  else
+    exc_symbol=symbol_table.lookup("NullPointerException");
+  
+  const symbol_exprt &exc=exc_symbol.symbol_expr(); 
+      
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location()=original_sloc;
+  throw_expr.copy_to_operands(exc);
+
+  const equal_exprt equal_expr(
+    expr,
+    null_pointer_exprt(pointer_typet(empty_typet())));
+  code_ifthenelset if_code;
+  if_code.add_source_location()=original_sloc;
+  if_code.cond()=equal_expr;
+  if_code.then_case()=code_expressiont(throw_expr);
+  
+  return if_code;
+}
+
+
+/*******************************************************************\
+
+Function: get_class_cast_check
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: Throws ClassCastException when  necessary
+
+\*******************************************************************/
+
+codet java_bytecode_convert_methodt::get_class_cast_check(
+  const exprt &class1,
+  const exprt &class2,  
+  const source_locationt &original_sloc)
+{
+  // TODO: use std::move
+  
+  symbolt exc_symbol;  
+  if(!symbol_table.has_symbol("ClassCastException"))
+  {
+    exc_symbol.is_static_lifetime=true;
+    exc_symbol.base_name="ClassCastException";
+    exc_symbol.name="ClassCastException"; 
+    exc_symbol.mode=ID_java;
+    exc_symbol.type=typet(ID_pointer, empty_typet());
+    symbol_table.add(exc_symbol);
+  }
+  else
+    exc_symbol=symbol_table.lookup("ClassCastException");
+  
+  const symbol_exprt &exc=exc_symbol.symbol_expr(); 
+      
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location()=original_sloc;
+  throw_expr.copy_to_operands(exc);
+
+  binary_predicate_exprt class_cast_check(
+    class1, ID_java_instanceof, class2);
+
+  empty_typet voidt;
+  pointer_typet voidptr(voidt);
+  exprt null_check_op=class1;
+  if(null_check_op.type()!=voidptr)
+    null_check_op.make_typecast(voidptr);
+  notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
+
+  // checkcast passes when the operand is null  
+  and_exprt and_expr(op_not_null, class_cast_check);
+  
+  code_ifthenelset if_code;
+  if_code.add_source_location()=original_sloc;
+  if_code.cond()=and_expr;
+  if_code.then_case()=code_expressiont(throw_expr);
+  
+  return if_code;
+}
+
+/*******************************************************************\
+
 Function: replace_goto_target
 
   Inputs: 'repl', a block of code in which to perform replacement, and
