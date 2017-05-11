@@ -724,26 +724,25 @@ Function: get_class_cast_check
 
 codet java_bytecode_convert_methodt::get_class_cast_check(
   const exprt &class1,
-  const exprt &class2,  
+  const exprt &class2,
   const source_locationt &original_sloc)
 {
   // TODO: use std::move
-  
-  symbolt exc_symbol;  
+  symbolt exc_symbol;
   if(!symbol_table.has_symbol("ClassCastException"))
   {
     exc_symbol.is_static_lifetime=true;
     exc_symbol.base_name="ClassCastException";
-    exc_symbol.name="ClassCastException"; 
+    exc_symbol.name="ClassCastException";
     exc_symbol.mode=ID_java;
     exc_symbol.type=typet(ID_pointer, empty_typet());
     symbol_table.add(exc_symbol);
   }
   else
     exc_symbol=symbol_table.lookup("ClassCastException");
-  
-  const symbol_exprt &exc=exc_symbol.symbol_expr(); 
-      
+
+  const symbol_exprt &exc=exc_symbol.symbol_expr();
+
   side_effect_expr_throwt throw_expr;
   throw_expr.add_source_location()=original_sloc;
   throw_expr.copy_to_operands(exc);
@@ -758,14 +757,14 @@ codet java_bytecode_convert_methodt::get_class_cast_check(
     null_check_op.make_typecast(voidptr);
   notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
 
-  // checkcast passes when the operand is null  
+  // checkcast passes when the operand is null
   and_exprt and_expr(op_not_null, class_cast_check);
-  
+
   code_ifthenelset if_code;
   if_code.add_source_location()=original_sloc;
   if_code.cond()=and_expr;
   if_code.then_case()=code_expressiont(throw_expr);
-  
+
   return if_code;
 }
 
@@ -2453,14 +2452,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       c=code_blockt();
-      // TODO make this throw NegativeArrayIndexException instead.
-      constant_exprt intzero=from_integer(0, java_int_type());
-      binary_relation_exprt gezero(op[0], ID_ge, intzero);
-      code_assertt check(gezero);
-      check.add_source_location().set_comment("Array size < 0");
-      check.add_source_location()
-        .set_property_class("array-create-negative-size");
-      c.move_to_operands(check);
+
+      if(throw_runtime_exceptions)
+      {
+        codet array_length_check=get_array_length_check(
+          op[0],
+          i_it->source_location);
+        c.move_to_operands(array_length_check);
+      }
+      else
+      {
+        constant_exprt intzero=from_integer(0, java_int_type());
+        binary_relation_exprt gezero(op[0], ID_ge, intzero);
+        code_assertt check(gezero);
+        check.add_source_location().set_comment("Array size < 0");
+        check.add_source_location()
+          .set_property_class("array-create-negative-size");
+        c.move_to_operands(check);
+      }
 
       if(max_array_length!=0)
       {
