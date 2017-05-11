@@ -1,0 +1,9 @@
+CORE
+ClassCastExceptionTest.class
+--java-throw-runtime-exceptions
+^EXIT=10$
+^SIGNAL=0$
+^.*assertion at file ClassCastExceptionTest.java line 9 function.*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
