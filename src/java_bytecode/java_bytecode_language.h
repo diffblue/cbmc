@@ -56,7 +56,8 @@ public:
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget():
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
-    max_user_array_length(0)
+    max_user_array_length(0),
+    throw_runtime_exceptions(false)  
     {}
 
   bool from_expr(
@@ -96,6 +97,7 @@ protected:
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
   size_t max_nondet_array_length;   // maximal length for non-det array creation
   size_t max_user_array_length;     // max size for user code created arrays
+  bool throw_runtime_exceptions;
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;

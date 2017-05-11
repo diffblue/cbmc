@@ -32,10 +32,12 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
+    bool _throw_runtime_exceptions,
     safe_pointer<ci_lazy_methodst> _lazy_methods):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
+    throw_runtime_exceptions(_throw_runtime_exceptions),  
     lazy_methods(_lazy_methods)
   {
   }
@@ -54,6 +56,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
+  const bool throw_runtime_exceptions;
   safe_pointer<ci_lazy_methodst> lazy_methods;
 
   irep_idt method_id;

@@ -42,6 +42,7 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
+  throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");  
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("refine-strings");
   if(cmd.isset("java-max-input-array-length"))
@@ -551,7 +552,8 @@ bool java_bytecode_languaget::typecheck(
         *method_sig.second.second,
         symbol_table,
         get_message_handler(),
-        max_user_array_length);
+        max_user_array_length,
+        throw_runtime_exceptions);
     }
   }
   // Otherwise our caller is in charge of elaborating methods on demand.
@@ -678,6 +680,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
           symbol_table,
           get_message_handler(),
           max_user_array_length,
+          throw_runtime_exceptions,
           safe_pointer<ci_lazy_methodst>::create_non_null(&lazy_methods));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
@@ -788,7 +791,8 @@ void java_bytecode_languaget::convert_lazy_method(
     *lazy_method_entry.second,
     symtab,
     get_message_handler(),
-    max_user_array_length);
+    max_user_array_length,
+    throw_runtime_exceptions);
 }
 
 /*******************************************************************\
