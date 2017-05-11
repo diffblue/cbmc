@@ -681,21 +681,20 @@ codet java_bytecode_convert_methodt::get_null_dereference_check(
   const exprt &expr,
   const source_locationt &original_sloc)
 {
-  symbolt exc_symbol;  
-  if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
+  symbolt exc_symbol;
+  if(!symbol_table.has_symbol("NullPointerException"))
   {
     exc_symbol.is_static_lifetime=true;
     exc_symbol.base_name="NullPointerException";
-    exc_symbol.name="NullPointerException"; 
+    exc_symbol.name="NullPointerException";
     exc_symbol.mode=ID_java;
     exc_symbol.type=typet(ID_pointer, empty_typet());
     symbol_table.add(exc_symbol);
   }
   else
     exc_symbol=symbol_table.lookup("NullPointerException");
-  
-  const symbol_exprt &exc=exc_symbol.symbol_expr(); 
-      
+
+  const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
   throw_expr.add_source_location()=original_sloc;
   throw_expr.copy_to_operands(exc);
@@ -707,10 +706,9 @@ codet java_bytecode_convert_methodt::get_null_dereference_check(
   if_code.add_source_location()=original_sloc;
   if_code.cond()=equal_expr;
   if_code.then_case()=code_expressiont(throw_expr);
-  
+
   return if_code;
 }
-
 
 /*******************************************************************\
 
@@ -1563,49 +1561,68 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.size()==1);
       code_blockt block;
-      // TODO throw NullPointerException instead
-      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
-      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-      const exprt not_equal_null(
-        binary_relation_exprt(lhs, ID_notequal, rhs));
-      code_assertt check(not_equal_null);
-      check.add_source_location()
-        .set_comment("Throw null");
-      check.add_source_location()
-        .set_property_class("null-pointer-exception");
-      block.move_to_operands(check);
+      if(throw_runtime_exceptions)
+      {
+        codet null_dereference_check=get_null_dereference_check(
+          op[0],
+          i_it->source_location);
+        block.move_to_operands(null_dereference_check);
+      }
+      else
+      {
+        const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+        const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+        const exprt not_equal_null(
+          binary_relation_exprt(lhs, ID_notequal, rhs));
+        code_assertt check(not_equal_null);
+        check.add_source_location()
+          .set_comment("Throw null");
+        check.add_source_location()
+          .set_property_class("null-pointer-exception");
+        block.move_to_operands(check);
+      }
 
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
       throw_expr.copy_to_operands(op[0]);
       c=code_expressiont(throw_expr);
-      results[0]=op[0];
-
       block.move_to_operands(c);
-      c=block;
+
+      results[0]=op[0];
+      c=std::move(block);
     }
     else if(statement=="checkcast")
     {
       // checkcast throws an exception in case a cast of object
       // on stack to given type fails.
       // The stack isn't modified.
-      // TODO: convert assertions to exceptions.
       assert(op.size()==1 && results.size()==1);
-      binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
-      code_assertt assert_class(check);
-      assert_class.add_source_location().set_comment("Dynamic cast check");
-      assert_class.add_source_location().set_property_class("bad-dynamic-cast");
-      // checkcast passes when the operand is null.
-      empty_typet voidt;
-      pointer_typet voidptr(voidt);
-      exprt null_check_op=op[0];
-      if(null_check_op.type()!=voidptr)
-        null_check_op.make_typecast(voidptr);
-      code_ifthenelset conditional_check;
-      notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
-      conditional_check.cond()=std::move(op_not_null);
-      conditional_check.then_case()=std::move(assert_class);
-      c=std::move(conditional_check);
+      if(throw_runtime_exceptions)
+      {
+        codet conditional_check=
+        get_class_cast_check(op[0], arg0, i_it->source_location);
+        c=std::move(conditional_check);
+      }
+      else
+      {
+        binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
+        code_assertt assert_class(check);
+        assert_class.add_source_location().
+          set_comment("Dynamic cast check");
+        assert_class.add_source_location().
+          set_property_class("bad-dynamic-cast");
+        // checkcast passes when the operand is null.
+        empty_typet voidt;
+        pointer_typet voidptr(voidt);
+        exprt null_check_op=op[0];
+        if(null_check_op.type()!=voidptr)
+          null_check_op.make_typecast(voidptr);
+        code_ifthenelset conditional_check;
+        notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
+        conditional_check.cond()=std::move(op_not_null);
+        conditional_check.then_case()=std::move(assert_class);
+        c=std::move(conditional_check);
+      }
       results[0]=op[0];
     }
     else if(statement=="invokedynamic")
@@ -2970,6 +2987,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
+  bool throw_runtime_exceptions,
   safe_pointer<ci_lazy_methodst> lazy_methods)
 {
   static const std::unordered_set<std::string> methods_to_ignore
@@ -2999,6 +3017,7 @@ void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
+    throw_runtime_exceptions,
     lazy_methods);
 
   java_bytecode_convert_method(class_symbol, method);
