@@ -112,6 +112,9 @@ private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
+
+  abstract_object_pointert abstract_object_merge(
+    const abstract_object_pointert other) const;
 protected:
   template<class T>
   using internal_sharing_ptrt=std::shared_ptr<T>;
@@ -129,6 +132,8 @@ protected:
 
   // The one exception is merge in descendant classes, which needs this
   void make_top() { top=true; }
+
+  bool should_use_base_merge(const abstract_object_pointert other) const;
 
   // Sets the state of this object
   virtual abstract_object_pointert merge(abstract_object_pointert other) const;
