@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Obtain a Goto Program
+Module: Initialize a Goto Program
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -14,10 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
-class get_goto_modelt:public goto_modelt, public messaget
-{
-public:
-  bool operator()(const cmdlinet &);
-};
+bool initialize_goto_model(
+  goto_modelt &goto_model,
+  const cmdlinet &cmdline,
+  message_handlert &message_handler);
 
 #endif // CPROVER_GOTO_PROGRAMS_GET_GOTO_MODEL_H

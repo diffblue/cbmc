@@ -177,9 +177,7 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline))
+  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
     return 6;
 
   if(process_goto_program(options))

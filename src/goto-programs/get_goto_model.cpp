@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*******************************************************************\
 
-Function: get_goto_modelt::operator()
+Function: initialize_goto_model
 
   Inputs:
 
@@ -32,12 +32,16 @@ Function: get_goto_modelt::operator()
 
 \*******************************************************************/
 
-bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
+bool initialize_goto_model(
+  goto_modelt &goto_model,
+  const cmdlinet &cmdline,
+  message_handlert &message_handler)
 {
-  const std::vector<std::string> &files=_cmdline.args;
+  messaget msg(message_handler);
+  const std::vector<std::string> &files=cmdline.args;
   if(files.empty())
   {
-    error() << "Please provide a program" << eom;
+    msg.error() << "Please provide a program" << messaget::eom;
     return true;
   }
 
@@ -59,7 +63,7 @@ bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
     {
       language_filest language_files;
 
-      language_files.set_message_handler(get_message_handler());
+      language_files.set_message_handler(message_handler);
 
       for(const auto &filename : sources)
       {
@@ -71,8 +75,8 @@ bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
 
         if(!infile)
         {
-          error() << "failed to open input file `" << filename
-                  << '\'' << eom;
+          msg.error() << "failed to open input file `" << filename
+            << '\'' << messaget::eom;
           return true;
         }
 
@@ -87,38 +91,38 @@ bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
 
         if(lf.language==NULL)
         {
-          error("failed to figure out type of file", filename);
+          msg.error("failed to figure out type of file", filename);
           return true;
         }
 
         languaget &language=*lf.language;
-        language.set_message_handler(get_message_handler());
-        language.get_language_options(_cmdline);
+        language.set_message_handler(message_handler);
+        language.get_language_options(cmdline);
 
-        status() << "Parsing " << filename << eom;
+        msg.status() << "Parsing " << filename << messaget::eom;
 
         if(language.parse(infile, filename))
         {
-          error() << "PARSING ERROR" << eom;
+          msg.error() << "PARSING ERROR" << messaget::eom;
           return true;
         }
 
         lf.get_modules();
       }
 
-      status() << "Converting" << eom;
+      msg.status() << "Converting" << messaget::eom;
 
-      if(language_files.typecheck(symbol_table))
+      if(language_files.typecheck(goto_model.symbol_table))
       {
-        error() << "CONVERSION ERROR" << eom;
+        msg.error() << "CONVERSION ERROR" << messaget::eom;
         return true;
       }
 
       if(binaries.empty())
       {
-        if(language_files.final(symbol_table))
+        if(language_files.final(goto_model.symbol_table))
         {
-          error() << "CONVERSION ERROR" << eom;
+          msg.error() << "CONVERSION ERROR" << messaget::eom;
           return true;
         }
       }
@@ -126,42 +130,39 @@ bool get_goto_modelt::operator()(const cmdlinet &_cmdline)
 
     for(const auto &file : binaries)
     {
-      status() << "Reading GOTO program from file" << eom;
+      msg.status() << "Reading GOTO program from file" << messaget::eom;
 
-      if(read_object_and_link(file, *this, get_message_handler()))
+      if(read_object_and_link(file, goto_model, message_handler))
         return true;
     }
 
     if(!binaries.empty())
-      config.set_from_symbol_table(symbol_table);
+      config.set_from_symbol_table(goto_model.symbol_table);
 
-    status() << "Generating GOTO Program" << eom;
+    msg.status() << "Generating GOTO Program" << messaget::eom;
 
-    goto_convert(symbol_table,
-                 goto_functions,
-                 get_message_handler());
+    goto_convert(
+      goto_model.symbol_table,
+      goto_model.goto_functions,
+      message_handler);
   }
-
   catch(const char *e)
   {
-    error() << e << eom;
+    msg.error() << e << messaget::eom;
     return true;
   }
-
   catch(const std::string e)
   {
-    error() << e << eom;
+    msg.error() << e << messaget::eom;
     return true;
   }
-
   catch(int)
   {
     return true;
   }
-
   catch(std::bad_alloc)
   {
-    error() << "Out of memory" << eom;
+    msg.error() << "Out of memory" << messaget::eom;
     return true;
   }
 
