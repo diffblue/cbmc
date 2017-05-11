@@ -564,7 +564,6 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
   bounds_checks.operands().back().add_source_location()
     .set_property_class("array-index-out-of-bounds-high");
 
-  // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
   return bounds_checks;
 }
 
@@ -1845,8 +1844,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_blockt();
-      codet bounds_check=
-        get_array_bounds_check(deref, op[1], i_it->source_location);
+      codet bounds_check;
+      if(throw_runtime_exceptions)
+        bounds_check=
+          get_array_access_check(deref, op[1], i_it->source_location);
+      else
+        bounds_check=
+          get_array_bounds_check(deref, op[1], i_it->source_location);
+
       bounds_check.add_source_location()=i_it->source_location;
       c.move_to_operands(bounds_check);
       code_assignt array_put(element, op[2]);
