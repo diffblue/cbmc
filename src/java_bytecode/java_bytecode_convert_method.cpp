@@ -569,7 +569,7 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
 
 /*******************************************************************\
 
-Function: get_array_access_check
+Function: throw_array_access_exception
 
   Inputs: 
 
@@ -581,10 +581,10 @@ Function: get_array_access_check
 
 \*******************************************************************/
 
-codet java_bytecode_convert_methodt::get_array_access_check(
+codet java_bytecode_convert_methodt::throw_array_access_exception(
   const exprt &array_struct,
   const exprt &idx,
-  const source_locationt &original_sloc)
+  const source_locationt &original_loc)
 {
   symbolt exc_symbol;
   if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
@@ -601,7 +601,7 @@ codet java_bytecode_convert_methodt::get_array_access_check(
 
   const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_sloc;
+  throw_expr.add_source_location()=original_loc;
   throw_expr.copy_to_operands(exc);
 
   const constant_exprt &zero=from_integer(0, java_int_type());
@@ -611,7 +611,7 @@ codet java_bytecode_convert_methodt::get_array_access_check(
   const and_exprt and_expr(lt_zero, ge_length);
 
   code_ifthenelset if_code;
-  if_code.add_source_location()=original_sloc;
+  if_code.add_source_location()=original_loc;
   if_code.cond()=and_expr;
   if_code.then_case()=code_expressiont(throw_expr);
 
@@ -620,7 +620,7 @@ codet java_bytecode_convert_methodt::get_array_access_check(
 
 /*******************************************************************\
 
-Function: get_array_length_check
+Function: throw_array_length_exception
 
   Inputs: 
 
@@ -630,9 +630,9 @@ Function: get_array_length_check
 
 \*******************************************************************/
 
-codet java_bytecode_convert_methodt::get_array_length_check(
+codet java_bytecode_convert_methodt::throw_array_length_exception(
   const exprt &length,
-  const source_locationt &original_sloc)
+  const source_locationt &original_loc)
 {
   symbolt exc_symbol;
   if(!symbol_table.has_symbol("NegativeArraySizeException"))
@@ -649,23 +649,23 @@ codet java_bytecode_convert_methodt::get_array_length_check(
 
   const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_sloc;
+  throw_expr.add_source_location()=original_loc;
   throw_expr.copy_to_operands(exc);
 
   const constant_exprt &zero=from_integer(0, java_int_type());
   const binary_relation_exprt ge_zero(length, ID_ge, zero);
 
   code_ifthenelset if_code;
-  if_code.add_source_location()=original_sloc;
+  if_code.add_source_location()=original_loc;
   if_code.cond()=ge_zero;
   if_code.then_case()=code_expressiont(throw_expr);
-  
+
   return if_code;
 }
 
 /*******************************************************************\
 
-Function: get_null_dereference_check
+Function: throw_null_dereference_exception
 
   Inputs: 
 
@@ -676,9 +676,9 @@ Function: get_null_dereference_check
 
 \*******************************************************************/
 
-codet java_bytecode_convert_methodt::get_null_dereference_check(
+codet java_bytecode_convert_methodt::throw_null_dereference_exception(
   const exprt &expr,
-  const source_locationt &original_sloc)
+  const source_locationt &original_loc)
 {
   symbolt exc_symbol;
   if(!symbol_table.has_symbol("NullPointerException"))
@@ -695,14 +695,14 @@ codet java_bytecode_convert_methodt::get_null_dereference_check(
 
   const symbol_exprt &exc=exc_symbol.symbol_expr();
   side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_sloc;
+  throw_expr.add_source_location()=original_loc;
   throw_expr.copy_to_operands(exc);
 
   const equal_exprt equal_expr(
     expr,
     null_pointer_exprt(pointer_typet(empty_typet())));
   code_ifthenelset if_code;
-  if_code.add_source_location()=original_sloc;
+  if_code.add_source_location()=original_loc;
   if_code.cond()=equal_expr;
   if_code.then_case()=code_expressiont(throw_expr);
 
@@ -711,7 +711,7 @@ codet java_bytecode_convert_methodt::get_null_dereference_check(
 
 /*******************************************************************\
 
-Function: get_class_cast_check
+Function: throw_class_cast_exception
 
   Inputs: 
 
@@ -721,10 +721,10 @@ Function: get_class_cast_check
 
 \*******************************************************************/
 
-codet java_bytecode_convert_methodt::get_class_cast_check(
+codet java_bytecode_convert_methodt::throw_class_cast_exception(
   const exprt &class1,
   const exprt &class2,
-  const source_locationt &original_sloc)
+  const source_locationt &original_loc)
 {
   // TODO: use std::move
   symbolt exc_symbol;
@@ -743,7 +743,7 @@ codet java_bytecode_convert_methodt::get_class_cast_check(
   const symbol_exprt &exc=exc_symbol.symbol_expr();
 
   side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_sloc;
+  throw_expr.add_source_location()=original_loc;
   throw_expr.copy_to_operands(exc);
 
   binary_predicate_exprt class_cast_check(
@@ -760,7 +760,7 @@ codet java_bytecode_convert_methodt::get_class_cast_check(
   and_exprt and_expr(op_not_null, class_cast_check);
 
   code_ifthenelset if_code;
-  if_code.add_source_location()=original_sloc;
+  if_code.add_source_location()=original_loc;
   if_code.cond()=and_expr;
   if_code.then_case()=code_expressiont(throw_expr);
 
@@ -1561,9 +1561,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt block;
       if(throw_runtime_exceptions)
       {
-        codet null_dereference_check=get_null_dereference_check(
-          op[0],
-          i_it->source_location);
+        codet null_dereference_check=
+          throw_null_dereference_exception(
+            op[0],
+            i_it->source_location);
         block.move_to_operands(null_dereference_check);
       }
       else
@@ -1598,7 +1599,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(throw_runtime_exceptions)
       {
         codet conditional_check=
-        get_class_cast_check(op[0], arg0, i_it->source_location);
+        throw_class_cast_exception(op[0], arg0, i_it->source_location);
         c=std::move(conditional_check);
       }
       else
@@ -1844,13 +1845,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_blockt();
-      codet bounds_check;
-      if(throw_runtime_exceptions)
-        bounds_check=
-          get_array_access_check(deref, op[1], i_it->source_location);
-      else
-        bounds_check=
-          get_array_bounds_check(deref, op[1], i_it->source_location);
+      codet bounds_check=throw_runtime_exceptions?
+        throw_array_access_exception(deref, op[1], i_it->source_location):
+        get_array_bounds_check(deref, op[1], i_it->source_location);
 
       bounds_check.add_source_location()=i_it->source_location;
       c.move_to_operands(bounds_check);
@@ -2460,7 +2457,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       if(throw_runtime_exceptions)
       {
-        codet array_length_check=get_array_length_check(
+        codet array_length_check=throw_array_length_exception(
           op[0],
           i_it->source_location);
         c.move_to_operands(array_length_check);
@@ -2509,7 +2506,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       c=code_blockt();
       if(throw_runtime_exceptions)
       {
-        codet array_length_check=get_array_length_check(
+        codet array_length_check=throw_array_length_exception(
           op[0],
           i_it->source_location);
         c.move_to_operands(array_length_check);

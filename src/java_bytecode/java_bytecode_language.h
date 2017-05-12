@@ -57,8 +57,8 @@ public:
   java_bytecode_languaget():
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
     max_user_array_length(0),
-    throw_runtime_exceptions(false)  
-    {}
+    throw_runtime_exceptions(false)
+  {}
 
   bool from_expr(
     const exprt &expr,

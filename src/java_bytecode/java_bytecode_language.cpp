@@ -42,7 +42,7 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
-  throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");  
+  throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("refine-strings");
   if(cmd.isset("java-max-input-array-length"))
