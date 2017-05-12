@@ -10,6 +10,15 @@ Function = collections.namedtuple('Function',
 Class = collections.namedtuple('Class', ['name', 'purpose'])
 
 
+FILE_HEADER = """
+// Copyright 2001-2017,
+// Daniel Kroening (Computer Science Department, University of Oxford
+//   and Diffblue Ltd),
+// Edmund Clarke (Computer Science Department, Carnegie Mellon University),
+// DiffBlue Ltd.
+""".strip()
+
+
 def warn(message):
     """ Print a labelled message to stderr.  """
     sys.stderr.write('Warning: %s\n' % message)
@@ -87,17 +96,13 @@ class HeaderFormatter(GenericFormatter):
         subbed = self.whitespace_re.sub(' ', header.module)
         # The file directive must be followed by a newline in order to refer to
         # the current file
-        return '\\file\n' + self.indented_wrapper.fill(subbed)
+        return self.indented_wrapper.fill('\\file\n%s' % subbed)
 
     def is_block_valid(self, block):
         return has_field(block, 'Module')
 
     def convert_sections(self, block):
         return [self.format_module(block)]
-
-    def needs_new_header(self, file_contents):
-        return (re.search(r'^\/\/\/ \\file$', file_contents, flags=re.MULTILINE)
-                is None)
 
 
 class FunctionFormatter(GenericFormatter):
@@ -130,17 +135,13 @@ class FunctionFormatter(GenericFormatter):
         def param_replacement(match):
             return r'\param %s:' % match.group(1)
 
-        lines = function.inputs.split('\n')
-        tail = '\n'.join(lines[1:])
-
-        dedented = lines[0] + '\n' + textwrap.dedent(tail)
-
+        dedented = textwrap.dedent(function.inputs)
         text = re.sub(r'\n\s+', ' ', dedented, flags=re.MULTILINE)
-        text, num_replacements = re.subn(r'^([a-zA-Z0-9_]+)\s*[:-]',
+        text, num_replacements = re.subn(r'^([a-zA-Z0-9_]+)\s+[:-]',
                 param_replacement, text, flags=re.MULTILINE)
 
         if num_replacements == 0:
-            text = r'\par parameters: %s' % text
+            text = r'parameters: %s' % text
 
         text = '\n'.join(
                 self.indented_wrapper.fill(t) for t in text.split('\n'))
@@ -192,7 +193,6 @@ class ClassFormatter(GenericFormatter):
 
 def replace_block(
         block_contents,
-        file_contents,
         file,
         header_formatter,
         class_formatter,
@@ -200,14 +200,10 @@ def replace_block(
     """
     Replace an old-style documentation block with the doxygen equivalent
     """
-    block = Block(
-            {f.name: f.contents for f in parse_fields(block_contents.group(1))})
+    block = Block({f.name: f.contents for f in parse_fields(block_contents)})
 
     if header_formatter.is_block_valid(block):
-        converted = header_formatter.convert(header_from_block(block))
-        if header_formatter.needs_new_header(file_contents) and converted:
-            return block_contents.group(0) + converted + '\n'
-        return block_contents.group(0)
+        return header_formatter.convert(header_from_block(block))
 
     if class_formatter.is_block_valid(block):
         return class_formatter.convert(class_from_block(block))
@@ -216,12 +212,12 @@ def replace_block(
         return function_formatter.convert(function_from_block(block))
 
     warn('block in "%s" has unrecognised format:\n%s' %
-            (file, block_contents.group(1)))
+            (file, block_contents))
 
     return ''
 
 
-def convert_file(file, inplace):
+def convert_file(file):
     """ Replace documentation in file with doxygen-styled comments.  """
     with open(file) as f:
         contents = f.read()
@@ -236,29 +232,25 @@ def convert_file(file, inplace):
             r'^/\*+\\$(.*?)^\\\*+/$\s*', re.MULTILINE | re.DOTALL)
     new_contents = block_re.sub(
             lambda match: replace_block(
-                match,
-                contents,
+                match.group(1),
                 file,
                 header_formatter,
                 class_formatter,
                 function_formatter), contents)
 
-    if inplace:
-        with open(file, 'w') as f:
-            f.write(new_contents)
-    else:
-        sys.stdout.write(new_contents)
+    if not re.search(FILE_HEADER, new_contents):
+        new_contents = FILE_HEADER + '\n\n' + new_contents
+
+    sys.stdout.write(new_contents)
 
 
 def main():
     """ Run convert_file from the command-line.  """
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str, help='The file to process')
-    parser.add_argument('-i', '--inplace', action='store_true',
-            help='Process in place')
     args = parser.parse_args()
 
-    convert_file(args.file, args.inplace)
+    convert_file(args.file)
 
     return 0
 
