@@ -1920,14 +1920,11 @@ def ReverseCloseExpression(clean_lines, linenum, pos):
 def CheckForCopyright(filename, lines, error):
   """Logs an error if no Copyright message appears at the top of the file."""
 
-  # We'll say it should occur by line 10. Don't forget there's a
-  # dummy line at the front.
-  for line in xrange(1, min(len(lines), 11)):
-    if re.search(r'Author', lines[line], re.I): break
-  else:                       # means no copyright line was found
+  # Line one should contain the word 'Copyright' somewhere
+  if not re.search(r'Copyright', lines[1], re.I):
     error(filename, 0, 'legal/copyright', 5,
           'No copyright message found.  '
-          'You should have a line: "Author: <name>"')
+          'You should use the standard copyright block.')
 
 
 def GetIndentLevel(line):
