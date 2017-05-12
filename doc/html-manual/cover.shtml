@@ -244,30 +244,32 @@ The table below summarizes the coverage criteria that CBMC supports.
 
 <table class="fancy">
 
-<tr><td>assertion</td>
-<td>For every assertion, generate a test that reaches it</td></tr>
+<tr><th>Criterion</th><th>Definition</th></tr>
 
-<tr><td>location</td>
-<td>For every location, generate a test that reaches it</td></tr>
+<tr><td>assertion</td>
+<td class="alt">For every assertion, generate a test that reaches it</td></tr>
+
+<tr><td class="alt">location</td>
+<td class="alt">For every location, generate a test that reaches it</td></tr>
 
 <tr><td>branch</td>
-<td>Generate a test for every branch outcome</td></tr>
+<td class="alt">Generate a test for every branch outcome</td></tr>
 
-<tr><td>decision</td>
-<td>Generate a test for both outcomes of every Boolean expression
+<tr><td class="alt">decision</td>
+<td class="alt">Generate a test for both outcomes of every Boolean expression
 that is not an operand of a propositional connective</td></tr>
 
 <tr><td>condition</td>
 <td>Generate a test for both outcomes of every Boolean expression</td></tr>
 
-<tr><td>mcdc</td>
-<td>Modified Condition/Decision Coverage (MC/DC)</td></tr>
+<tr><td class="alt">mcdc</td>
+<td class="alt">Modified Condition/Decision Coverage (MC/DC)</td></tr>
 
 <tr><td>path</td>
 <td>Bounded path coverage</td></tr>
 
-<tr><td>cover</td>
-<td>Generate a test for every <code>__CPROVER_cover</code> statement.
+<tr><td class="alt">cover</td>
+<td class="alt">Generate a test for every <code>__CPROVER_cover</code> statement
 </td></tr>
 
 </table>
