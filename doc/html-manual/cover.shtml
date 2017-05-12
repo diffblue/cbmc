@@ -10,8 +10,6 @@
 
 <h3>A Small Tutorial with A Case Study</h3>
 
-<!--<h4>Verilog vs. ANSI-C</h4>-->
-
 <p class="justified">
 We assume that CBMC is installed on your system. If not so, follow
 <a href="installation-cbmc.shtml">these instructions</a>.</p>
@@ -237,5 +235,41 @@ PID controller case study.  In addition to <code>--cover mcdc</code>, other
 coverage criteria like <code>branch</code>, <code>decision</code>,
 <code>path</code> etc.  are also available when calling CBMC.
 </p>
+
+<h3>Coverage Criteria</h3>
+
+<p class="justified">
+The table below summarizes the coverage criteria that CBMC supports.
+</p>
+
+<table class="fancy">
+
+<tr><td>assertion</td>
+<td>For every assertion, generate a test that reaches it</td></tr>
+
+<tr><td>location</td>
+<td>For every location, generate a test that reaches it</td></tr>
+
+<tr><td>branch</td>
+<td>Generate a test for every branch outcome</td></tr>
+
+<tr><td>decision</td>
+<td>Generate a test for both outcomes of every Boolean expression
+that is not an operand of a propositional connective</td></tr>
+
+<tr><td>condition</td>
+<td>Generate a test for both outcomes of every Boolean expression</td></tr>
+
+<tr><td>mcdc</td>
+<td>Modified Condition/Decision Coverage (MC/DC)</td></tr>
+
+<tr><td>path</td>
+<td>Bounded path coverage</td></tr>
+
+<tr><td>cover</td>
+<td>Generate a test for every <code>__CPROVER_cover</code> statement.
+</td></tr>
+
+</table>
 
 <!--#include virtual="footer.inc" -->
