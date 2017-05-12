@@ -247,13 +247,13 @@ The table below summarizes the coverage criteria that CBMC supports.
 <tr><th>Criterion</th><th>Definition</th></tr>
 
 <tr><td>assertion</td>
-<td class="alt">For every assertion, generate a test that reaches it</td></tr>
+<td>For every assertion, generate a test that reaches it</td></tr>
 
 <tr><td class="alt">location</td>
 <td class="alt">For every location, generate a test that reaches it</td></tr>
 
 <tr><td>branch</td>
-<td class="alt">Generate a test for every branch outcome</td></tr>
+<td>Generate a test for every branch outcome</td></tr>
 
 <tr><td class="alt">decision</td>
 <td class="alt">Generate a test for both outcomes of every Boolean expression
