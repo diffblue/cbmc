@@ -1,3 +1,5 @@
+CONFIGDIR := $(dir $(lastword $(MAKEFILE_LIST)))
+
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
@@ -29,3 +31,5 @@ MINISAT2 = ../../minisat-2.2.1
 # Signing identity for MacOS Gatekeeper
 
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"
+
+-include $(CONFIGDIR)/config.local
