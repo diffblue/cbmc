@@ -114,8 +114,8 @@ void __CPROVER_cover(_Bool condition);
 <p class="justified">
 </p>
 
-<h4>__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isfinite,
-__CPROVER_isfinite, __CPROVER_sign</h4>
+<h4>__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isinf,
+__CPROVER_isnormal, __CPROVER_sign</h4>
 
 <hr>
 <code>
