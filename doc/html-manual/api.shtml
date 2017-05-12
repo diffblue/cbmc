@@ -111,6 +111,9 @@ void __CPROVER_cover(_Bool condition);
 </code>
 <hr>
 
+<p>This statement defines a custom coverage criterion, for usage
+with the <a href="cover.shtml">test suite generation feature</a>.</p>
+
 <p class="justified">
 </p>
 
