@@ -217,7 +217,7 @@ def replace_block(
     return ''
 
 
-def convert_file(file):
+def convert_file(file, inplace):
     """ Replace documentation in file with doxygen-styled comments.  """
     with open(file) as f:
         contents = f.read()
@@ -241,16 +241,22 @@ def convert_file(file):
     if not re.search(FILE_HEADER, new_contents):
         new_contents = FILE_HEADER + '\n\n' + new_contents
 
-    sys.stdout.write(new_contents)
+    if inplace:
+        with open(file, 'w') as f:
+            f.write(new_contents)
+    else:
+        sys.stdout.write(new_contents)
 
 
 def main():
     """ Run convert_file from the command-line.  """
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str, help='The file to process')
+    parser.add_argument('-i', '--inplace', action='store_true',
+            help='Process in place')
     args = parser.parse_args()
 
-    convert_file(args.file)
+    convert_file(args.file, args.inplace)
 
     return 0
 
