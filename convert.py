@@ -10,6 +10,15 @@ Function = collections.namedtuple('Function',
 Class = collections.namedtuple('Class', ['name', 'purpose'])
 
 
+FILE_HEADER = """
+// Copyright 2001-2017,
+// Daniel Kroening (Computer Science Department, University of Oxford
+//   and Diffblue Ltd),
+// Edmund Clarke (Computer Science Department, Carnegie Mellon University),
+// DiffBlue Ltd.
+""".strip()
+
+
 def warn(message):
     """ Print a labelled message to stderr.  """
     sys.stderr.write('Warning: %s\n' % message)
@@ -85,7 +94,9 @@ class HeaderFormatter(GenericFormatter):
             return None
 
         subbed = self.whitespace_re.sub(' ', header.module)
-        return self.indented_wrapper.fill(r'\file %s' % subbed)
+        # The file directive must be followed by a newline in order to refer to
+        # the current file
+        return self.indented_wrapper.fill('\\file\n%s' % subbed)
 
     def is_block_valid(self, block):
         return has_field(block, 'Module')
@@ -219,13 +230,18 @@ def convert_file(file):
 
     block_re = re.compile(
             r'^/\*+\\$(.*?)^\\\*+/$\s*', re.MULTILINE | re.DOTALL)
-    sys.stdout.write(block_re.sub(
+    new_contents = block_re.sub(
             lambda match: replace_block(
                 match.group(1),
                 file,
                 header_formatter,
                 class_formatter,
-                function_formatter), contents))
+                function_formatter), contents)
+
+    if not re.search(FILE_HEADER, new_contents):
+        new_contents = FILE_HEADER + '\n\n' + new_contents
+
+    sys.stdout.write(new_contents)
 
 
 def main():
