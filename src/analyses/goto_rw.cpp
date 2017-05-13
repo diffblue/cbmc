@@ -221,12 +221,12 @@ void rw_range_sett::get_objects_member(
 
   const struct_typet &struct_type=to_struct_type(type);
 
-  // TODO - assumes members are byte-aligned
   range_spect offset=
-    to_range_spect(member_offset(
+    to_range_spect(
+      member_offset_bits(
         struct_type,
         expr.get_component_name(),
-        ns) * 8);
+        ns));
 
   if(offset!=-1)
     offset+=range_start;
