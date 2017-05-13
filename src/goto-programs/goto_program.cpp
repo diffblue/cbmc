@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include <util/message.h>
 #include <util/std_expr.h>
 
 #include <langapi/language_util.h>
@@ -482,4 +483,130 @@ std::string as_string(
   }
 
   return "";
+}
+
+/// Ensure the current goto_programt satisfies all assumptions
+/// about consistent goto programs.
+/// \param msg Message output
+/// \return True, iff at least one invariant is violated
+bool goto_programt::check_internal_invariants(messaget &msg) const
+{
+  if(empty())
+    return false;
+
+  unsigned prev_loc_number=0;
+  bool prev_loc_number_set=false;
+
+  forall_goto_program_instructions(it, *this)
+  {
+    const goto_programt::instructiont &ins=*it;
+
+    if(ins.check_internal_invariants(msg))
+      return true;
+
+    if(prev_loc_number_set &&
+       ins.location_number<=prev_loc_number)
+    {
+      msg.error().source_location=ins.source_location;
+      msg.error() << "location number not strictly increasing"
+                  << messaget::eom;
+      return true;
+    }
+    else if(!prev_loc_number_set)
+    {
+      prev_loc_number=ins.location_number;
+      prev_loc_number_set=true;
+    }
+
+    switch(ins.type)
+    {
+      case GOTO:
+      case ASSUME:
+      case ASSERT:
+        if(ins.guard.type()!=bool_typet())
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << ins.type << " has non-Boolean guard"
+                      << messaget::eom;
+          return true;
+        }
+        break;
+      case OTHER:
+      case SKIP:
+      case LOCATION:
+      case END_FUNCTION:
+      case START_THREAD:
+      case END_THREAD:
+      case ATOMIC_BEGIN:
+      case ATOMIC_END:
+      case RETURN:
+        break;
+      case ASSIGN:
+        if(ins.code.get_statement()!=ID_assign)
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << ins.type << " instruction has code "
+                      << ins.code.get_statement()
+                      << messaget::eom;
+          return true;
+        }
+        return false;
+      case DECL:
+        if(ins.code.get_statement()!=ID_decl)
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << ins.type << " instruction has code "
+                      << ins.code.get_statement()
+                      << messaget::eom;
+          return true;
+        }
+        else if(to_code_decl(ins.code).symbol().id()!=ID_symbol)
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << "declaration operand is not a symbol"
+                      << messaget::eom;
+          return true;
+        }
+        break;
+      case DEAD:
+        if(ins.code.get_statement()!=ID_dead)
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << ins.type << " instruction has code "
+                      << ins.code.get_statement()
+                      << messaget::eom;
+          return true;
+        }
+        break;
+      case FUNCTION_CALL:
+        if(ins.code.get_statement()!=ID_function_call)
+        {
+          msg.error().source_location=ins.source_location;
+          msg.error() << ins.type << " instruction has code "
+                      << ins.code.get_statement()
+                      << messaget::eom;
+          return true;
+        }
+        break;
+      case THROW:
+      case CATCH:
+        break;
+      case NO_INSTRUCTION_TYPE:
+        msg.error().source_location=ins.source_location;
+        msg.error() << ins.type << " not permitted"
+                    << messaget::eom;
+        return true;
+    }
+  }
+
+  // the last instruction must be END_FUNCTION
+  if(!get_end_function()->is_end_function())
+  {
+    msg.error().source_location=get_end_function()->source_location;
+    msg.error() << "end of function is of type "
+                << get_end_function()->type << messaget::eom;
+    return true;
+  }
+
+  return false;
 }

@@ -141,6 +141,12 @@ void goto_fence_inserter_parse_optionst::get_goto_program(
     throw 0;
 
   config.set_from_symbol_table(symbol_table);
+
+  if(goto_functions.check_internal_invariants(*this))
+  {
+    error() << "GOTO program violates internal invariants" << eom;
+    throw 0;
+  }
 }
 
 void goto_fence_inserter_parse_optionst::instrument_goto_program(

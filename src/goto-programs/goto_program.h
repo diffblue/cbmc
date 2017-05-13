@@ -64,6 +64,8 @@ public:
   // get the variables in decl statements
   typedef std::set<irep_idt> decl_identifierst;
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
+
+  bool check_internal_invariants(messaget &msg) const;
 };
 
 #define forall_goto_program_instructions(it, program) \

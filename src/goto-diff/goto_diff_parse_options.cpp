@@ -278,6 +278,18 @@ int goto_diff_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
+  if(goto_model1.goto_functions.check_internal_invariants(*this))
+  {
+    error() << "GOTO program violates internal invariants" << eom;
+    return 6;
+  }
+
+  if(goto_model2.goto_functions.check_internal_invariants(*this))
+  {
+    error() << "GOTO program violates internal invariants" << eom;
+    return 6;
+  }
+
   if(cmdline.isset("show-goto-functions"))
   {
     show_goto_functions(goto_model1, get_ui());

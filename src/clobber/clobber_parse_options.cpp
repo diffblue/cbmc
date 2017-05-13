@@ -127,6 +127,12 @@ int clobber_parse_optionst::doit()
     if(get_goto_program(options, goto_functions))
       return 6;
 
+    if(goto_functions.check_internal_invariants(*this))
+    {
+      error() << "GOTO program violates internal invariants" << eom;
+      return 6;
+    }
+
     label_properties(goto_functions);
 
     if(cmdline.isset("show-properties"))

@@ -43,6 +43,8 @@ public:
     goto_functions_templatet::operator=(std::move(other));
     return *this;
   }
+
+  bool check_internal_invariants(messaget &msg) const;
 };
 
 #define Forall_goto_functions(it, functions) \

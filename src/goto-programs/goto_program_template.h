@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include <util/invariant.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 #include <util/source_location.h>
@@ -262,6 +264,84 @@ public:
       instruction_id_builder << type;
       return instruction_id_builder.str();
     }
+
+    /// Ensure the current instruction satisfies all assumptions
+    /// within consistent goto programs.
+    /// \param msg Message output
+    /// \return True, iff at least one invariant is violated
+    bool check_internal_invariants(messaget &msg) const
+    {
+      if(function.empty())
+      {
+        msg.error().source_location=source_location;
+        msg.error() << "instruction has no function name"
+                    << messaget::eom;
+        return true;
+      }
+
+      switch(type)
+      {
+        case GOTO:
+        case ASSUME:
+        case ASSERT:
+          if(code!=irept() && code.is_not_nil())
+          {
+            msg.error().source_location=source_location;
+            msg.error() << type << " has non-nil code\n"
+                        << code.pretty() << messaget::eom;
+            return true;
+          }
+          else if(guard.is_nil() || guard==irept())
+          {
+            msg.error().source_location=source_location;
+            msg.error() << type << " has nil guard"
+                        << messaget::eom;
+            return true;
+          }
+          return false;
+        case OTHER:
+          return false;
+        case SKIP:
+        case LOCATION:
+        case END_FUNCTION:
+          if(code!=irept() && code.is_not_nil())
+          {
+            msg.error().source_location=source_location;
+            msg.error() << type << " has non-nil code\n"
+                        << code.pretty() << messaget::eom;
+            return true;
+          }
+          return false;
+        case START_THREAD:
+          return false;
+        case END_THREAD:
+          return false;
+        case ATOMIC_BEGIN:
+          return false;
+        case ATOMIC_END:
+          return false;
+        case RETURN:
+          return false;
+        case ASSIGN:
+        case DECL:
+        case DEAD:
+        case FUNCTION_CALL:
+          if(code==irept() || code.is_nil())
+          {
+            msg.error().source_location=source_location;
+            msg.error() << type << " has nil code"
+                        << messaget::eom;
+            return true;
+          }
+          return false;
+        case THROW:
+          return false;
+        case CATCH:
+          return false;
+        default:
+          return true;
+      }
+    }
   };
 
   typedef std::list<instructiont> instructionst;
@@ -466,9 +546,17 @@ public:
 
   targett get_end_function()
   {
-    assert(!instructions.empty());
+    PRECONDITION(!instructions.empty());
     const auto end_function=std::prev(instructions.end());
-    assert(end_function->is_end_function());
+    DATA_INVARIANT(end_function->is_end_function(), "invalid end_function");
+    return end_function;
+  }
+
+  const_targett get_end_function() const
+  {
+    PRECONDITION(!instructions.empty());
+    const auto end_function=std::prev(instructions.end());
+    DATA_INVARIANT(end_function->is_end_function(), "invalid end_function");
     return end_function;
   }
 

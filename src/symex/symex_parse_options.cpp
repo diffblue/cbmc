@@ -138,6 +138,12 @@ int symex_parse_optionst::doit()
   if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
     return 6;
 
+  if(goto_model.goto_functions.check_internal_invariants(*this))
+  {
+    error() << "GOTO program violates internal invariants" << eom;
+    return 6;
+  }
+
   if(process_goto_program(options))
     return 6;
 

@@ -30,3 +30,16 @@ void get_local_identifiers(
       dest.insert(identifier);
   }
 }
+
+/// Ensure that all functions satisfy all assumptions about
+/// consistent goto programs.
+/// \param msg Message output
+/// \return True, iff at least one invariant is violated
+bool goto_functionst::check_internal_invariants(messaget &msg) const
+{
+  forall_goto_functions(it, *this)
+    if(it->second.body.check_internal_invariants(msg))
+      return true;
+
+  return false;
+}

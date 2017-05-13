@@ -129,6 +129,12 @@ bool compilet::doit()
       return true;
   }
 
+  if(compiled_functions.check_internal_invariants(*this))
+  {
+    error() << "GOTO program violates internal invariants" << eom;
+    return true;
+  }
+
   return
     warning_is_fatal &&
     get_message_handler().get_message_count(messaget::M_WARNING)!=
