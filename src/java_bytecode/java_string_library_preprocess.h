@@ -154,6 +154,11 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
+  codet make_object_get_class_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
   // Auxiliary functions
   codet code_for_scientific_notation(
     const exprt &arg,

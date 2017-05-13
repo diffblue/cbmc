@@ -1651,6 +1651,93 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
 
 /*******************************************************************\
 
+Function: java_string_library_preprocesst::make_object_get_class_code
+
+  Inputs:
+    type - type of the function called
+    loc - location in the source
+    symbol_table - the symbol table
+
+  Outputs: Code corresponding to
+          > Class class1;
+          > string_expr1 = substr(this->@class_identifier, 6)
+          > class1=Class.forName(string_expr1)
+          > return class1
+
+  Purpose: Used to provide our own implementation of the
+           java.lang.Object.getClass() function.
+
+\*******************************************************************/
+
+codet java_string_library_preprocesst::make_object_get_class_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table)
+{
+  code_typet::parameterst params=type.parameters();
+  exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
+
+  // Code to be returned
+  code_blockt code;
+
+  // > Class class1;
+  pointer_typet class_type(symbol_table.lookup("java::java.lang.Class").type);
+  symbolt class1_sym=get_fresh_aux_symbol(
+    class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
+  symbol_exprt class1=class1_sym.symbol_expr();
+  code.add(code_declt(class1));
+
+  // class_identifier is this->@class_identifier
+  member_exprt class_identifier(
+    dereference_exprt(this_obj, this_obj.type().subtype()),
+    "@class_identifier",
+    string_typet());
+
+  // string_expr = cprover_string_literal(this->@class_identifier)
+  string_exprt string_expr=fresh_string_expr(loc, symbol_table, code);
+  code.add(
+    code_assign_function_to_string_expr(
+      string_expr,
+      ID_cprover_string_literal_func,
+      {class_identifier},
+      symbol_table));
+
+  // string_expr1 = substr(string_expr, 6)
+  // We do this to remove the "java::" prefix
+  string_exprt string_expr1=fresh_string_expr(loc, symbol_table, code);
+  code.add(
+    code_assign_function_to_string_expr(
+      string_expr1,
+      ID_cprover_string_substring_func,
+      {string_expr, from_integer(6, java_int_type())},
+      symbol_table));
+
+  // string1 = (String*) string_expr
+  pointer_typet string_ptr_type(
+    symbol_table.lookup("java::java.lang.String").type);
+  exprt string1=allocate_fresh_string(string_ptr_type, loc, symbol_table, code);
+  code.add(
+    code_assign_string_expr_to_new_java_string(
+      string1, string_expr1, loc, symbol_table));
+
+  // > class1 = Class.forName(string1)
+  code_function_callt fun_call;
+  fun_call.function()=symbol_exprt(
+    "java::java.lang.Class.forName:(Ljava/lang/String;)Ljava/lang/Class;");
+  fun_call.lhs()=class1;
+  fun_call.arguments().push_back(string1);
+  code_typet fun_type;
+  fun_type.return_type()=string1.type();
+  fun_call.function().type()=fun_type;
+  code.add(fun_call);
+
+  // > return class1;
+  code.add(code_returnt(class1));
+  return code;
+}
+
+/*******************************************************************\
+
 Function: java_string_library_preprocesst::make_function_from_call
 
   Inputs:
@@ -2375,4 +2462,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toString:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_func;
+  conversion_table
+    ["java::java.lang.Object.getClass:()Ljava/lang/Class;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_object_get_class_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
 }
