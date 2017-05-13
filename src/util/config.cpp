@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "config.h"
 
+#include <climits>
 #include <cstdlib>
 
 #include "arith_tools.h"
@@ -1010,42 +1011,43 @@ bool configt::set(const cmdlinet &cmdline)
   if(arch==this_arch && os==this_os)
   {
     INVARIANT(
-      ansi_c.int_width == sizeof(int) * 8,
+      ansi_c.int_width == sizeof(int) * CHAR_BIT,
       "int width shall be equal to the system int width");
     INVARIANT(
-      ansi_c.long_int_width == sizeof(long) * 8,
+      ansi_c.long_int_width == sizeof(long) * CHAR_BIT,
       "long int width shall be equal to the system long int width");
     INVARIANT(
-      ansi_c.bool_width == sizeof(bool) * 8,
+      ansi_c.bool_width == sizeof(bool) * CHAR_BIT,
       "bool width shall be equal to the system bool width");
     INVARIANT(
-      ansi_c.char_width == sizeof(char) * 8,
+      ansi_c.char_width == sizeof(char) * CHAR_BIT,
       "char width shall be equal to the system char width");
     INVARIANT(
-      ansi_c.short_int_width == sizeof(short) * 8,
+      ansi_c.short_int_width == sizeof(short) * CHAR_BIT,
       "short int width shall be equal to the system short int width");
     INVARIANT(
-      ansi_c.long_long_int_width == sizeof(long long) * 8,
+      ansi_c.long_long_int_width == sizeof(long long) * CHAR_BIT,
       "long long int width shall be equal to the system long long int width");
     INVARIANT(
-      ansi_c.pointer_width == sizeof(void *) * 8,
+      ansi_c.pointer_width == sizeof(void *) * CHAR_BIT,
       "pointer width shall be equal to the system pointer width");
     INVARIANT(
-      ansi_c.single_width == sizeof(float) * 8,
+      ansi_c.single_width == sizeof(float) * CHAR_BIT,
       "float width shall be equal to the system float width");
     INVARIANT(
-      ansi_c.double_width == sizeof(double) * 8,
+      ansi_c.double_width == sizeof(double) * CHAR_BIT,
       "double width shall be equal to the system double width");
     INVARIANT(
-      ansi_c.char_is_unsigned == (static_cast<char>(255) == 255),
+      ansi_c.char_is_unsigned ==
+        (static_cast<char>((1 << CHAR_BIT) - 1) == (1 << CHAR_BIT) - 1),
       "char_is_unsigned flag shall indicate system char unsignedness");
 
-    #ifndef _WIN32
+#ifndef _WIN32
     // On Windows, long double width varies by compiler
     INVARIANT(
-      ansi_c.long_double_width == sizeof(long double) * 8,
+      ansi_c.long_double_width == sizeof(long double) * CHAR_BIT,
       "long double width shall be equal to the system long double width");
-    #endif
+#endif
   }
 
   // the following allows overriding the defaults

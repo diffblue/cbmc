@@ -35,6 +35,7 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 // MURMURHASH2A compares most favourably on String6 with 3076 fewer
 // calls (2.9%)
 
+#include <climits>
 #include <cstddef> // std::size_t
 
 #ifdef _MSC_VER
@@ -117,10 +118,9 @@ inline std::size_t basic_hash_finalize(
 
 // Boost uses the symbol hash_combine, if you're getting problems here then
 //  you've probably included a Boost header after this one
-#define hash_combine(h1, h2) \
-  basic_hash_combine<sizeof(std::size_t)*8>(h1, h2)
-#define hash_finalize(h1, len) \
-  basic_hash_finalize(h1, len)
+#  define hash_combine(h1, h2)                                                 \
+    basic_hash_combine<sizeof(std::size_t) * CHAR_BIT>(h1, h2)
+#  define hash_finalize(h1, len) basic_hash_finalize(h1, len)
 
 #endif
 
@@ -224,10 +224,10 @@ inline std::size_t murmurhash2a_hash_finalize<64>(
   return h1;
 }
 
-#define hash_combine(h1, h2) \
-  murmurhash2a_hash_combine<sizeof(std::size_t)*8>(h1, h2)
-#define hash_finalize(h1, len) \
-  murmurhash2a_hash_finalize<sizeof(std::size_t)*8>(h1, len)
+#  define hash_combine(h1, h2)                                                 \
+    murmurhash2a_hash_combine<sizeof(std::size_t) * CHAR_BIT>(h1, h2)
+#  define hash_finalize(h1, len)                                               \
+    murmurhash2a_hash_finalize<sizeof(std::size_t) * CHAR_BIT>(h1, len)
 
 #endif
 
@@ -340,10 +340,10 @@ inline std::size_t murmurhash3_hash_finalize<64>(
   return fmix64(h1);
 }
 
-#define hash_combine(h1, h2) \
-  murmurhash3_hash_combine<sizeof(std::size_t)*8>(h1, h2)
-#define hash_finalize(h1, len) \
-  murmurhash3_hash_finalize<sizeof(std::size_t)*8>(h1, len)
+#  define hash_combine(h1, h2)                                                 \
+    murmurhash3_hash_combine<sizeof(std::size_t) * CHAR_BIT>(h1, h2)
+#  define hash_finalize(h1, len)                                               \
+    murmurhash3_hash_finalize<sizeof(std::size_t) * CHAR_BIT>(h1, len)
 
 #endif
 

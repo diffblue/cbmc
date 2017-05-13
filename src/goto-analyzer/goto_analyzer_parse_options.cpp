@@ -11,9 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_analyzer_parse_options.h"
 
+#include <climits>
 #include <cstdlib> // exit()
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <memory>
 
 #include <ansi-c/ansi_c_language.h>
@@ -402,8 +403,9 @@ int goto_analyzer_parse_optionst::doit()
   // Print a banner
   //
   log.status() << "GOTO-ANALYSER version " << CBMC_VERSION << " "
-               << sizeof(void *) * 8 << "-bit " << config.this_architecture()
-               << " " << config.this_operating_system() << messaget::eom;
+               << sizeof(void *) * CHAR_BIT << "-bit "
+               << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
 
   register_languages();
 

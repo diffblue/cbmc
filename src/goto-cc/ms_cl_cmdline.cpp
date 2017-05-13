@@ -11,10 +11,11 @@ Author: Daniel Kroening
 
 #include "ms_cl_cmdline.h"
 
-#include <cstring>
+#include <climits>
 #include <cstdlib>
-#include <iostream>
+#include <cstring>
 #include <fstream>
+#include <iostream>
 
 #include <util/unicode.h>
 
@@ -165,7 +166,7 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
       break; // line end
     }
     else
-      dest+=wchar_t(ch1+(ch2<<8));
+      dest += wchar_t(ch1 + (ch2 << CHAR_BIT));
   }
 
   return in;
