@@ -24,13 +24,13 @@ void data_dpt::dp_analysis(
   const datat &write,
   bool local_write)
 {
-  const_iterator it;
+  data_typet::const_iterator it;
 
-  for(it=begin(); it!=end(); ++it)
+  for(it=data.cbegin(); it!=data.cend(); ++it)
   {
     if(local_read && it->id==read.id)
     {
-      insert(
+      data.insert(
         datat(
           write.id,
           (local_write?source_locationt():write.loc),
@@ -40,7 +40,7 @@ void data_dpt::dp_analysis(
 
     if(local_write && it->id==write.id)
     {
-      insert(
+      data.insert(
         datat(
           read.id,
           (local_read?source_locationt():read.loc),
@@ -49,12 +49,12 @@ void data_dpt::dp_analysis(
     }
   }
 
-  if(it==end())
+  if(it==data.cend())
   {
     ++class_nb;
-    insert(
+    data.insert(
       datat(read.id, (local_read?source_locationt():read.loc), class_nb));
-    insert(
+    data.insert(
       datat(write.id, (local_write?source_locationt():write.loc), class_nb));
   }
 }
@@ -71,11 +71,11 @@ void data_dpt::dp_analysis(
 /// search in N^2
 bool data_dpt::dp(const abstract_eventt &e1, const abstract_eventt &e2) const
 {
-  for(const_iterator it1=begin(); it1!=end(); ++it1)
+  for(auto it1=data.cbegin(); it1!=data.cend(); ++it1)
   {
-    const_iterator it2=it1;
+    auto it2=it1;
     ++it2;
-    if(it2==end())
+    if(it2==data.cend())
       break;
 
     if(e1.local)
@@ -89,7 +89,7 @@ bool data_dpt::dp(const abstract_eventt &e1, const abstract_eventt &e2) const
         continue;
     }
 
-    for(; it2!=end(); ++it2)
+    for(; it2!=data.cend(); ++it2)
     {
       if(e2.local)
       {
@@ -116,42 +116,42 @@ bool data_dpt::dp(const abstract_eventt &e1, const abstract_eventt &e2) const
 /// merge in N^3
 void data_dpt::dp_merge()
 {
-  if(size()<2)
+  if(data.size()<2)
     return;
 
-  unsigned initial_size=size();
+  unsigned initial_size=data.size();
 
   unsigned from=0;
   unsigned to=0;
 
   /* look for similar elements */
-  for(const_iterator it1=begin(); it1!=end(); ++it1)
+  for(auto it1=data.cbegin(); it1!=data.cend(); ++it1)
   {
-    const_iterator it2=it1;
+    auto it2=it1;
     ++it2;
     /* all ok -- ends */
-    if(it2==end())
+    if(it2==data.cend())
       return;
 
-    for(; it2!=end(); ++it2)
+    for(; it2!=data.cend(); ++it2)
     {
       if(it1 == it2)
       {
         from=it2->eq_class;
         to=it1->eq_class;
-        erase(it2);
+        data.erase(it2);
         break;
       }
     }
   }
 
   /* merge */
-  for(iterator it3=begin(); it3!=end(); ++it3)
+  for(auto it3=data.begin(); it3!=data.end(); ++it3)
     if(it3->eq_class==from)
       it3->eq_class=to;
 
   /* strictly monotonous => converges */
-  assert(initial_size>size());
+  assert(initial_size>data.size());
 
   /* repeat until classes are disjunct */
   dp_merge();
@@ -160,10 +160,10 @@ void data_dpt::dp_merge()
 void data_dpt::print(messaget &message)
 {
 #ifdef DEBUG
-  const_iterator it;
+  data_typet::const_iterator it;
   std::map<unsigned, std::set<source_locationt> > classed;
 
-  for(it=begin(); it!=end(); ++it)
+  for(it=data.cbegin(); it!=data.cend(); ++it)
   {
     if(classed.find(it->eq_class)==classed.end())
     {
