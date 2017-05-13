@@ -15,20 +15,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/prefix.h>
 #include <util/unicode.h>
 
-/// extract java string from symbol expression when they are encoded inside the
-/// symbol name
-/// \par parameters: a symbol expression representing a java literal
-/// \return a string constant
-irep_idt string_constraint_generatort::extract_java_string(
-  const symbol_exprt &s)
-{
-  std::string tmp=id2string(s.get_identifier());
-  std::string prefix("java::java.lang.String.Literal.");
-  assert(has_prefix(tmp, prefix));
-  std::string value=tmp.substr(prefix.length());
-  return irep_idt(value);
-}
-
 /// add axioms saying the returned string expression should be equal to the
 /// string constant
 /// \par parameters: a string constant
@@ -82,8 +68,8 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
 
 /// add axioms to say that the returned string expression is equal to the string
 /// literal
-/// \par parameters: function application with an argument which is a string
-///   literal
+/// \param f: function application with an argument which is a string literal
+/// that is a constant with a string value.
 /// \return string expression
 string_exprt string_constraint_generatort::add_axioms_from_literal(
   const function_application_exprt &f)
@@ -92,28 +78,7 @@ string_exprt string_constraint_generatort::add_axioms_from_literal(
   assert(args.size()==1); // Bad args to string literal?
 
   const exprt &arg=args[0];
-  irep_idt sval;
-
-  assert(arg.operands().size()==1);
-  if(arg.op0().operands().size()==2 &&
-     arg.op0().op0().id()==ID_string_constant)
-  {
-    // C string constant
-    const exprt &s=arg.op0().op0();
-    sval=to_string_constant(s).get_value();
-  }
-  else
-  {
-    // Java string constant
-    assert(false); // TODO: Check if used. On the contrary, discard else.
-    assert(arg.id()==ID_symbol);
-    const exprt &s=arg.op0();
-
-    // It seems the value of the string is lost,
-    // we need to recover it from the identifier
-    sval=extract_java_string(to_symbol_expr(s));
-  }
-
+  irep_idt sval=to_constant_expr(arg).get_value();
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
   return add_axioms_for_constant(sval, ref_type);
 }
