@@ -80,6 +80,29 @@ mp_integer member_offset(
   return offsets->second;
 }
 
+mp_integer member_offset_bits(
+  const struct_typet &type,
+  const irep_idt &member,
+  const namespacet &ns)
+{
+  mp_integer offset=0;
+  const struct_typet::componentst &components=type.components();
+
+  for(const auto &comp : components)
+  {
+    if(comp.get_name()==member)
+      break;
+
+    mp_integer member_bits=pointer_offset_bits(comp.type(), ns);
+    if(member_bits==-1)
+      return member_bits;
+
+    offset+=member_bits;
+  }
+
+  return offset;
+}
+
 mp_integer pointer_offset_size(
   const typet &type,
   const namespacet &ns)
