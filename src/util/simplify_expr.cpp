@@ -821,6 +821,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // circular casts through types shorter than `int`
+  // we use fixed bit widths as this is specifically for the Java bytecode
+  // front-end
   if(op_type == signedbv_typet(32) && expr.op().id() == ID_typecast)
   {
     if(expr_type==c_bool_typet(8) ||
@@ -1817,7 +1819,7 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
         // the next member would be misaligned, abort
         if(
           !component_bits.has_value() || *component_bits == 0 ||
-          *component_bits % 8 != 0)
+          *component_bits % expr.get_bits_per_byte() != 0)
         {
           failed = true;
           break;
@@ -1868,10 +1870,12 @@ simplify_exprt::simplify_byte_extract(const byte_extract_exprt &expr)
       pointer_offset_bits(array_type.element_type(), ns);
     if(element_bit_width.has_value() && *element_bit_width > 0)
     {
-      if(*offset > 0 && *offset * 8 % *element_bit_width == 0)
+      if(
+        *offset > 0 &&
+        *offset * expr.get_bits_per_byte() % *element_bit_width == 0)
       {
-        const auto elements_to_erase =
-          numeric_cast_v<std::size_t>((*offset * 8) / *element_bit_width);
+        const auto elements_to_erase = numeric_cast_v<std::size_t>(
+          (*offset * expr.get_bits_per_byte()) / *element_bit_width);
         array_exprt slice = to_array_expr(expr.op());
         slice.operands().erase(
           slice.operands().begin(),
@@ -1953,7 +1957,7 @@ simplify_exprt::simplify_byte_update(const byte_update_exprt &expr)
   if(
     root_size.has_value() && *root_size >= 0 && val_size.has_value() &&
     *val_size >= 0 && offset_int.has_value() && *offset_int >= 0 &&
-    *offset_int * 8 + *val_size <= *root_size)
+    *offset_int * expr.get_bits_per_byte() + *val_size <= *root_size)
   {
     auto root_bits =
       expr2bits(root, expr.id() == ID_byte_update_little_endian, ns);

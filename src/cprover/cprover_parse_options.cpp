@@ -308,11 +308,9 @@ void cprover_parse_optionst::help()
 {
   std::cout << '\n';
 
-  std::cout
-    << u8"* * CPROVER " << CBMC_VERSION << " (" << (sizeof(void *) * 8)
-    << "-bit)"
-    << " * *\n"
-    << "* *                       Copyright 2022                       * *\n";
+  std::cout << '\n'
+            << banner_string("CPROVER", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright 2022") << '\n';
 
   // clang-format off
   std::cout << help_formatter(

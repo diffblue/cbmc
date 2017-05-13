@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
+#include "config.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -185,7 +186,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
 
     if(target_size.has_value())
     {
-      mp_integer target_bits = target_size.value() * 8;
+      mp_integer target_bits = target_size.value() * config.ansi_c.char_width;
       const auto bits = expr2bits(op, true, ns);
 
       if(bits.has_value() &&

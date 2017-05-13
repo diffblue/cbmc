@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
+#include "config.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_expr.h"
@@ -38,14 +39,14 @@ optionalt<mp_integer> member_offset(
     {
       const std::size_t w = to_c_bit_field_type(comp.type()).get_width();
       bit_field_bits += w;
-      result += bit_field_bits / 8;
-      bit_field_bits %= 8;
+      result += bit_field_bits / config.ansi_c.char_width;
+      bit_field_bits %= config.ansi_c.char_width;
     }
     else if(comp.type().id() == ID_bool)
     {
       ++bit_field_bits;
-      result += bit_field_bits / 8;
-      bit_field_bits %= 8;
+      result += bit_field_bits / config.ansi_c.char_width;
+      bit_field_bits %= config.ansi_c.char_width;
     }
     else
     {
@@ -92,7 +93,7 @@ pointer_offset_size(const typet &type, const namespacet &ns)
   auto bits = pointer_offset_bits(type, ns);
 
   if(bits.has_value())
-    return (*bits + 7) / 8;
+    return (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
   else
     return {};
 }
@@ -249,16 +250,16 @@ optionalt<exprt> member_offset_expr(
     {
       std::size_t w = to_c_bit_field_type(c.type()).get_width();
       bit_field_bits += w;
-      const std::size_t bytes = bit_field_bits / 8;
-      bit_field_bits %= 8;
+      const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+      bit_field_bits %= config.ansi_c.char_width;
       if(bytes > 0)
         result = plus_exprt(result, from_integer(bytes, result.type()));
     }
     else if(c.type().id() == ID_bool)
     {
       ++bit_field_bits;
-      const std::size_t bytes = bit_field_bits / 8;
-      bit_field_bits %= 8;
+      const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+      bit_field_bits %= config.ansi_c.char_width;
       if(bytes > 0)
         result = plus_exprt(result, from_integer(bytes, result.type()));
     }
@@ -289,7 +290,9 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       auto bits = pointer_offset_bits(array_type, ns);
 
       if(bits.has_value())
-        return from_integer((*bits + 7) / 8, size_type());
+        return from_integer(
+          (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width,
+          size_type());
     }
 
     auto sub = size_of_expr(array_type.element_type(), ns);
@@ -316,7 +319,9 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       auto bits = pointer_offset_bits(vector_type, ns);
 
       if(bits.has_value())
-        return from_integer((*bits + 7) / 8, size_type());
+        return from_integer(
+          (*bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width,
+          size_type());
     }
 
     auto sub = size_of_expr(vector_type.element_type(), ns);
@@ -355,16 +360,16 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       {
         std::size_t w = to_c_bit_field_type(c.type()).get_width();
         bit_field_bits += w;
-        const std::size_t bytes = bit_field_bits / 8;
-        bit_field_bits %= 8;
+        const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+        bit_field_bits %= config.ansi_c.char_width;
         if(bytes > 0)
           result = plus_exprt(result, from_integer(bytes, result.type()));
       }
       else if(c.type().id() == ID_bool)
       {
         ++bit_field_bits;
-        const std::size_t bytes = bit_field_bits / 8;
-        bit_field_bits %= 8;
+        const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
+        bit_field_bits %= config.ansi_c.char_width;
         if(bytes > 0)
           result = plus_exprt(result, from_integer(bytes, result.type()));
       }
@@ -415,7 +420,8 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
       }
       else
       {
-        mp_integer sub_bytes = (*sub_bits + 7) / 8;
+        mp_integer sub_bytes =
+          (*sub_bits + config.ansi_c.char_width - 1) / config.ansi_c.char_width;
 
         if(max_bytes>=0)
         {
@@ -449,19 +455,14 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
           type.id()==ID_c_bit_field)
   {
     std::size_t width=to_bitvector_type(type).get_width();
-    std::size_t bytes=width/8;
-    if(bytes*8!=width)
+    std::size_t bytes = width / config.ansi_c.char_width;
+    if(bytes * config.ansi_c.char_width != width)
       bytes++;
     return from_integer(bytes, size_type());
   }
   else if(type.id()==ID_c_enum)
   {
-    std::size_t width =
-      to_bitvector_type(to_c_enum_type(type).underlying_type()).get_width();
-    std::size_t bytes=width/8;
-    if(bytes*8!=width)
-      bytes++;
-    return from_integer(bytes, size_type());
+    return size_of_expr(to_c_enum_type(type).underlying_type(), ns);
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -475,11 +476,11 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
   {
     // the following is an MS extension
     if(type.get_bool(ID_C_ptr32))
-      return from_integer(4, size_type());
+      return from_integer(32 / config.ansi_c.char_width, size_type());
 
     std::size_t width=to_bitvector_type(type).get_width();
-    std::size_t bytes=width/8;
-    if(bytes*8!=width)
+    std::size_t bytes = width / config.ansi_c.char_width;
+    if(bytes * config.ansi_c.char_width != width)
       bytes++;
     return from_integer(bytes, size_type());
   }
@@ -497,7 +498,7 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_string)
   {
-    return from_integer(32/8, size_type());
+    return from_integer(32 / config.ansi_c.char_width, size_type());
   }
   else
     return {};
@@ -607,12 +608,17 @@ optionalt<exprt> get_subexpression_at_offset(
       // if this member completely contains the target, and this member is
       // byte-aligned, recurse into it
       if(
-        offset_bytes * 8 >= m_offset_bits && m_offset_bits % 8 == 0 &&
-        offset_bytes * 8 + *target_size_bits <= m_offset_bits + *m_size_bits)
+        offset_bytes * config.ansi_c.char_width >= m_offset_bits &&
+        m_offset_bits % config.ansi_c.char_width == 0 &&
+        offset_bytes * config.ansi_c.char_width + *target_size_bits <=
+          m_offset_bits + *m_size_bits)
       {
         const member_exprt member(expr, component.get_name(), component.type());
         return get_subexpression_at_offset(
-          member, offset_bytes - m_offset_bits / 8, target_type_raw, ns);
+          member,
+          offset_bytes - m_offset_bits / config.ansi_c.char_width,
+          target_type_raw,
+          ns);
       }
 
       m_offset_bits += *m_size_bits;
@@ -628,11 +634,14 @@ optionalt<exprt> get_subexpression_at_offset(
     // no arrays of non-byte-aligned, zero-, or unknown-sized objects
     if(
       elem_size_bits.has_value() && *elem_size_bits > 0 &&
-      *elem_size_bits % 8 == 0 && *target_size_bits <= *elem_size_bits)
+      *elem_size_bits % config.ansi_c.char_width == 0 &&
+      *target_size_bits <= *elem_size_bits)
     {
-      const mp_integer elem_size_bytes = *elem_size_bits / 8;
+      const mp_integer elem_size_bytes =
+        *elem_size_bits / config.ansi_c.char_width;
       const auto offset_inside_elem = offset_bytes % elem_size_bytes;
-      const auto target_size_bytes = *target_size_bits / 8;
+      const auto target_size_bytes =
+        *target_size_bits / config.ansi_c.char_width;
       // only recurse if the cell completely contains the target
       if(offset_inside_elem + target_size_bytes <= elem_size_bytes)
       {
@@ -660,7 +669,9 @@ optionalt<exprt> get_subexpression_at_offset(
         continue;
 
       // if this member completely contains the target, recurse into it
-      if(offset_bytes * 8 + *target_size_bits <= *m_size_bits)
+      if(
+        offset_bytes * config.ansi_c.char_width + *target_size_bits <=
+        *m_size_bits)
       {
         const member_exprt member(expr, component.get_name(), component.type());
         return get_subexpression_at_offset(

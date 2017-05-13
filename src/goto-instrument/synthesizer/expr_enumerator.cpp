@@ -8,6 +8,8 @@ Author: Qinheping Hu
 #include <util/format_expr.h>
 #include <util/simplify_expr.h>
 
+#include <climits>
+
 expr_sett leaf_enumeratort::enumerate(const std::size_t size) const
 {
   // Size of leaf expressions must be 1.
@@ -185,7 +187,7 @@ get_partitions_long(const std::size_t n, const std::size_t k)
 /// Compute all positions of ones in the bit vector `v` (1-indexed).
 std::vector<std::size_t> get_ones_pos(std::size_t v)
 {
-  const std::size_t length = sizeof(std::size_t) * 8;
+  const std::size_t length = sizeof(std::size_t) * CHAR_BIT;
   std::vector<std::size_t> result;
 
   // Start from the lowest bit at position `length`
@@ -236,7 +238,7 @@ std::list<partitiont> non_leaf_enumeratort::get_partitions(
     return {};
 
   // Number of bits at all.
-  const std::size_t length = sizeof(std::size_t) * 8;
+  const std::size_t length = sizeof(std::size_t) * CHAR_BIT;
 
   // This bithack-based implementation works only for `n` no larger than
   // `length`. Use the vector-based implementation `n` is too large.
