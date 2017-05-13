@@ -774,6 +774,8 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
 
   // circular casts through types shorter than `int`
+  // we use fixed bit widths as this is specifically for the Java bytecode
+  // front-end
   if(op_type == signedbv_typet(32) && expr.op().id() == ID_typecast)
   {
     if(expr_type==c_bool_typet(8) ||

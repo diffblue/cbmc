@@ -15,6 +15,7 @@ Date: November 2011
 
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
+#include <util/c_types.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -23,7 +24,7 @@ Date: November 2011
 symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 {
   const irep_idt identifier="$stack_depth";
-  unsignedbv_typet type(sizeof(std::size_t)*8);
+  typet type = size_type();
 
   symbolt new_symbol;
   new_symbol.name=identifier;

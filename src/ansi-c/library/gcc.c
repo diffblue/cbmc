@@ -35,6 +35,11 @@ inline void __sync_synchronize(void)
 
 /* FUNCTION: __builtin_ffs */
 
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
 int __builtin_clz(unsigned int x);
 
 inline int __builtin_ffs(int x)
@@ -47,10 +52,15 @@ inline int __builtin_ffs(int x)
   unsigned int u = (unsigned int)x;
 #pragma CPROVER check pop
 
-  return sizeof(int) * 8 - __builtin_clz(u & ~(u - 1));
+  return sizeof(int) * CHAR_BIT - __builtin_clz(u & ~(u - 1));
 }
 
 /* FUNCTION: __builtin_ffsl */
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
 
 int __builtin_clzl(unsigned long x);
 
@@ -64,10 +74,15 @@ inline int __builtin_ffsl(long x)
   unsigned long u = (unsigned long)x;
 #pragma CPROVER check pop
 
-  return sizeof(long) * 8 - __builtin_clzl(u & ~(u - 1));
+  return sizeof(long) * CHAR_BIT - __builtin_clzl(u & ~(u - 1));
 }
 
 /* FUNCTION: __builtin_ffsll */
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
 
 int __builtin_clzll(unsigned long long x);
 
@@ -81,7 +96,7 @@ inline int __builtin_ffsll(long long x)
   unsigned long long u = (unsigned long long)x;
 #pragma CPROVER check pop
 
-  return sizeof(long long) * 8 - __builtin_clzll(u & ~(u - 1));
+  return sizeof(long long) * CHAR_BIT - __builtin_clzll(u & ~(u - 1));
 }
 
 /* FUNCTION: __atomic_test_and_set */
