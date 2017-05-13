@@ -18,11 +18,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 template <typename T>
 // NOLINTNEXTLINE(readability/identifiers)
-class numbering:public std::vector<T>
+class numbering final
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef std::size_t number_type;
+
+private:
+  typedef std::vector<T> data_typet;
+  data_typet data;
+  typedef std::map<T, number_type> numberst;
+  numberst numbers;
+
+public:
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::size_type size_type;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::const_iterator const_iterator;
 
   number_type number(const T &a)
   {
@@ -33,8 +47,8 @@ public:
 
     if(result.second) // inserted?
     {
-      this->push_back(a);
-      assert(this->size()==numbers.size());
+      data.push_back(a);
+      assert(data.size()==numbers.size());
     }
 
     return (result.first)->second;
@@ -58,24 +72,45 @@ public:
 
   void clear()
   {
-    subt::clear();
+    data.clear();
     numbers.clear();
   }
 
-protected:
-  typedef std::vector<T> subt;
+  size_t size() const { return data.size(); }
 
-  typedef std::map<T, number_type> numberst;
-  numberst numbers;
+  T &operator[](size_type t) { return data[t]; }
+  const T &operator[](size_type t) const { return data[t]; }
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.cbegin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.cend(); }
 };
 
 template <typename T, class hash_fkt>
 // NOLINTNEXTLINE(readability/identifiers)
-class hash_numbering:public std::vector<T>
+class hash_numbering final
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef unsigned int number_type;
+
+private:
+  typedef std::vector<T> data_typet;
+  data_typet data;
+  typedef std::unordered_map<T, number_type, hash_fkt> numberst;
+  numberst numbers;
+
+public:
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::size_type size_type;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename data_typet::const_iterator const_iterator;
 
   number_type number(const T &a)
   {
@@ -106,15 +141,25 @@ public:
 
   void clear()
   {
-    subt::clear();
+    data.clear();
     numbers.clear();
   }
 
-protected:
-  typedef std::vector<T> subt;
+  template <typename U>
+  void push_back(U &&u) { data.push_back(std::forward<U>(u)); }
 
-  typedef std::unordered_map<T, number_type, hash_fkt> numberst;
-  numberst numbers;
+  T &operator[](size_type t) { return data[t]; }
+  const T &operator[](size_type t) const { return data[t]; }
+
+  size_type size() const { return data.size(); }
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.cbegin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.cend(); }
 };
 
 #endif // CPROVER_UTIL_NUMBERING_H
