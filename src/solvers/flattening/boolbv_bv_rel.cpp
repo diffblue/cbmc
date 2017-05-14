@@ -69,8 +69,8 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
 
         bv_utilst::representationt rep=
           ((bvtype0==bvtypet::IS_SIGNED) || (bvtype0==bvtypet::IS_FIXED))?
-             bv_utilst::SIGNED:
-             bv_utilst::UNSIGNED;
+             bv_utilst::representationt::SIGNED:
+             bv_utilst::representationt::UNSIGNED;
 
         #if 1
 
@@ -112,7 +112,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         for(std::size_t i=0; i<extract1.size(); i++)
           extract1[i]=bv1[i*2];
 
-        bv_utilst::representationt rep=bv_utilst::UNSIGNED;
+        bv_utilst::representationt rep=bv_utilst::representationt::UNSIGNED;
 
         // now compare
         return bv_utils.rel(extract0, expr.id(), extract1, rep);

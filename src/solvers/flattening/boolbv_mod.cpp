@@ -43,8 +43,8 @@ bvt boolbvt::convert_mod(const mod_exprt &expr)
     throw "mod got mixed-type operands";
 
   bv_utilst::representationt rep=
-    expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                  bv_utilst::UNSIGNED;
+    expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                  bv_utilst::representationt::UNSIGNED;
 
   const bvt &op0=convert_bv(expr.op0());
   const bvt &op1=convert_bv(expr.op1());

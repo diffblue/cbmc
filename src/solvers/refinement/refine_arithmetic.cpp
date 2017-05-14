@@ -413,21 +413,24 @@ void bv_refinementt::check_SAT(approximationt &a)
         r=bv_utils.multiplier(
           a.op0_bv, a.op1_bv,
           a.expr.type().id()==ID_signedbv?
-            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+            bv_utilst::representationt::SIGNED:
+            bv_utilst::representationt::UNSIGNED);
       }
       else if(a.expr.id()==ID_div)
       {
         r=bv_utils.divider(
           a.op0_bv, a.op1_bv,
           a.expr.type().id()==ID_signedbv?
-            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+            bv_utilst::representationt::SIGNED:
+            bv_utilst::representationt::UNSIGNED);
       }
       else if(a.expr.id()==ID_mod)
       {
         r=bv_utils.remainder(
           a.op0_bv, a.op1_bv,
           a.expr.type().id()==ID_signedbv?
-            bv_utilst::SIGNED:bv_utilst::UNSIGNED);
+            bv_utilst::representationt::SIGNED:
+            bv_utilst::representationt::UNSIGNED);
       }
       else
         assert(0);
