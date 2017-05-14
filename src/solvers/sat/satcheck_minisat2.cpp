@@ -252,7 +252,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
             "SAT checker: instance is SATISFIABLE" << eom;
           assert(solver->model.size()!=0);
           status=statust::SAT;
-          return P_SATISFIABLE;
+          return resultt::P_SATISFIABLE;
         }
         else
         {
@@ -263,14 +263,14 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
     }
 
     status=statust::UNSAT;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
   catch(Minisat::OutOfMemoryException)
   {
     messaget::error() <<
       "SAT checker ran out of memory" << eom;
     status=statust::ERROR;
-    return P_ERROR;
+    return resultt::P_ERROR;
   }
 }
 

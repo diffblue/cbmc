@@ -148,20 +148,20 @@ propt::resultt qbf_quantort::prop_solve()
     if(!result_found)
     {
       messaget::error() << "Quantor failed: unknown result" << eom;
-      return P_ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
     messaget::status() << "Quantor: TRUE" << eom;
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   }
   else
   {
     messaget::status() << "Quantor: FALSE" << eom;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
 
-  return P_ERROR;
+  return resultt::P_ERROR;
 }

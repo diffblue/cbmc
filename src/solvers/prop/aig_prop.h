@@ -57,7 +57,7 @@ public:
   { assert(0); return tvt::unknown(); }
 
   resultt prop_solve() override
-  { assert(0); return P_ERROR; }
+  { assert(0); return resultt::P_ERROR; }
 
 protected:
   aigt &dest;
