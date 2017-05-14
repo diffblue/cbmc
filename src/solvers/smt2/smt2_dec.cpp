@@ -43,14 +43,14 @@ std::string smt2_dect::decision_procedure_text() const
   return "SMT2 "+logic+
     (use_FPA_theory?" (with FPA)":"")+
     " using "+
-    (solver==GENERIC?"Generic":
-     solver==BOOLECTOR?"Boolector":
-     solver==CVC3?"CVC3":
-     solver==CVC4?"CVC4":
-     solver==MATHSAT?"MathSAT":
-     solver==OPENSMT?"OpenSMT":
-     solver==YICES?"Yices":
-     solver==Z3?"Z3":
+    (solver==solvert::GENERIC?"Generic":
+     solver==solvert::BOOLECTOR?"Boolector":
+     solver==solvert::CVC3?"CVC3":
+     solver==solvert::CVC4?"CVC4":
+     solver==solvert::MATHSAT?"MathSAT":
+     solver==solvert::OPENSMT?"OpenSMT":
+     solver==solvert::YICES?"Yices":
+     solver==solvert::Z3?"Z3":
      "(unknown)");
 }
 
@@ -129,21 +129,21 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   switch(solver)
   {
-  case BOOLECTOR:
+  case solvert::BOOLECTOR:
     command = "boolector --smt2 "
             + smt2_temp_file.temp_out_filename
             + " -m > "
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case CVC3:
+  case solvert::CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
             + smt2_temp_file.temp_out_filename
             + " > "
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case CVC4:
+  case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
     command = "cvc4 -L smt2 "
@@ -152,7 +152,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case MATHSAT:
+  case solvert::MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
     command = "mathsat -input=smt2"
@@ -173,7 +173,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + " > "+smt2_temp_file.temp_result_filename;
     break;
 
-  case OPENSMT:
+  case solvert::OPENSMT:
     command = "opensmt "
             + smt2_temp_file.temp_out_filename
             + " > "
@@ -181,7 +181,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
 
-  case YICES:
+  case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     command = "yices-smt2 "  //  Calling for 2.2.1
             + smt2_temp_file.temp_out_filename
@@ -189,7 +189,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case Z3:
+  case solvert::Z3:
     command = "z3 -smt2 "
             + smt2_temp_file.temp_out_filename
             + " > "

@@ -80,24 +80,24 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
 {
   assert(options.get_bool_option("smt2"));
 
-  smt2_dect::solvert s=smt2_dect::GENERIC;
+  smt2_dect::solvert s=smt2_dect::solvert::GENERIC;
 
   if(options.get_bool_option("boolector"))
-    s=smt2_dect::BOOLECTOR;
+    s=smt2_dect::solvert::BOOLECTOR;
   else if(options.get_bool_option("mathsat"))
-    s=smt2_dect::MATHSAT;
+    s=smt2_dect::solvert::MATHSAT;
   else if(options.get_bool_option("cvc3"))
-    s=smt2_dect::CVC3;
+    s=smt2_dect::solvert::CVC3;
   else if(options.get_bool_option("cvc4"))
-    s=smt2_dect::CVC4;
+    s=smt2_dect::solvert::CVC4;
   else if(options.get_bool_option("opensmt"))
-    s=smt2_dect::OPENSMT;
+    s=smt2_dect::solvert::OPENSMT;
   else if(options.get_bool_option("yices"))
-    s=smt2_dect::YICES;
+    s=smt2_dect::solvert::YICES;
   else if(options.get_bool_option("z3"))
-    s=smt2_dect::Z3;
+    s=smt2_dect::solvert::Z3;
   else if(options.get_bool_option("generic"))
-    s=smt2_dect::GENERIC;
+    s=smt2_dect::solvert::GENERIC;
 
   return s;
 }
@@ -312,7 +312,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 
   if(filename=="")
   {
-    if(solver==smt2_dect::GENERIC)
+    if(solver==smt2_dect::solvert::GENERIC)
     {
       error() << "please use --outfile" << eom;
       throw 0;
