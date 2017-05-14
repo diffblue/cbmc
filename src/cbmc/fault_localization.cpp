@@ -364,7 +364,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
   {
   case decision_proceduret::D_UNSATISFIABLE:
     bmc.report_success();
-    return safety_checkert::SAFE;
+    return safety_checkert::resultt::SAFE;
 
   case decision_proceduret::D_SATISFIABLE:
     if(options.get_bool_option("trace"))
@@ -382,12 +382,12 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
     report(ID_nil);
 
     bmc.report_failure();
-    return safety_checkert::UNSAFE;
+    return safety_checkert::resultt::UNSAFE;
 
   default:
     error() << "decision procedure failed" << eom;
 
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 }
 

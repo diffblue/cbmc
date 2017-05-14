@@ -166,7 +166,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   report(cover_goals);
 
   if(error)
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
 
   bool safe=(cover_goals.number_covered()==0);
 
@@ -175,7 +175,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   else
     bmc.report_failure(); // legacy, might go away
 
-  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
+  return safe?safety_checkert::resultt::SAFE:safety_checkert::resultt::UNSAFE;
 }
 
 /*******************************************************************\

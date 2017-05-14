@@ -261,12 +261,12 @@ int symex_parse_optionst::doit()
       // do actual symex, for assertion checking
       switch(path_search(goto_model.goto_functions))
       {
-      case safety_checkert::SAFE:
+      case safety_checkert::resultt::SAFE:
         report_properties(path_search.property_map);
         report_success();
         return 0;
 
-      case safety_checkert::UNSAFE:
+      case safety_checkert::resultt::UNSAFE:
         report_properties(path_search.property_map);
         report_failure();
         return 10;
