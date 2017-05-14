@@ -59,7 +59,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     exprt symbol_expr=resolve(
       cpp_name,
-      cpp_typecheck_resolvet::TYPE,
+      cpp_typecheck_resolvet::wantt::TYPE,
       cpp_typecheck_fargst());
 
     if(symbol_expr.id()!=ID_type)
@@ -209,7 +209,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
         exprt symbol_expr=resolve(
           to_cpp_name(static_cast<const irept &>(tmp_type)),
-          cpp_typecheck_resolvet::BOTH,
+          cpp_typecheck_resolvet::wantt::BOTH,
           fargs);
 
         type=symbol_expr.type();

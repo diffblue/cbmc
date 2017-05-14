@@ -19,7 +19,7 @@ public:
   cpp_typecheck_resolvet(
     class cpp_typecheckt &_cpp_typecheck);
 
-  typedef enum { VAR, TYPE, BOTH } wantt;
+  enum class wantt { VAR, TYPE, BOTH };
 
   exprt resolve(
     const cpp_namet &cpp_name,

@@ -160,7 +160,7 @@ symbolt &cpp_declarator_convertert::convert(
       exprt symbol_expr=
         cpp_typecheck.resolve(
           name,
-          cpp_typecheck_resolvet::TYPE,
+          cpp_typecheck_resolvet::wantt::TYPE,
           cpp_typecheck_fargst());
 
       if(symbol_expr.id()!=ID_type ||

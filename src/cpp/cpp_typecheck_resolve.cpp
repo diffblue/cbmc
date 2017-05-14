@@ -494,15 +494,15 @@ void cpp_typecheck_resolvet::filter(
 
     switch(want)
     {
-    case TYPE:
+    case wantt::TYPE:
       match=(it->id()==ID_type);
       break;
 
-    case VAR:
+    case wantt::VAR:
       match=(it->id()!=ID_type);
       break;
 
-    case BOTH:
+    case wantt::BOTH:
       match=true;
       break;
 
@@ -1695,7 +1695,7 @@ exprt cpp_typecheck_resolvet::resolve(
         have_methods=true;
     }
 
-    if(want==BOTH && have_classes && have_methods)
+    if(want==wantt::BOTH && have_classes && have_methods)
     {
       if(!fail_with_exception)
         return nil_exprt();
@@ -1708,7 +1708,7 @@ exprt cpp_typecheck_resolvet::resolve(
       throw 0;
     }
 
-    if(want==TYPE || have_classes)
+    if(want==wantt::TYPE || have_classes)
     {
       typet instance=
         disambiguate_template_classes(base_name, id_set, template_args);
@@ -1731,7 +1731,7 @@ exprt cpp_typecheck_resolvet::resolve(
   }
 
   // change types into constructors if we want a constructor
-  if(want==VAR)
+  if(want==wantt::VAR)
     make_constructors(identifiers);
 
   filter(identifiers, want);
@@ -1877,7 +1877,7 @@ exprt cpp_typecheck_resolvet::resolve(
 
   switch(want)
   {
-  case VAR:
+  case wantt::VAR:
     if(result.id()==ID_type && !cpp_typecheck.cpp_is_pod(result.type()))
     {
       if(!fail_with_exception)
@@ -1894,7 +1894,7 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     break;
 
-  case TYPE:
+  case wantt::TYPE:
     if(result.id()!=ID_type)
     {
       if(!fail_with_exception)
