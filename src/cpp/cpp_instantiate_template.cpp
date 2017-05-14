@@ -201,13 +201,13 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   // put into template scope
   cpp_idt &id=cpp_scopes.put_into_scope(*s_ptr, *template_scope);
 
-  id.id_class=cpp_idt::CLASS;
+  id.id_class=cpp_idt::id_classt::CLASS;
   id.is_scope=true;
   id.prefix=template_scope->prefix+
             id2string(s_ptr->base_name)+
             id2string(suffix)+"::";
   id.class_identifier=s_ptr->name;
-  id.id_class=cpp_idt::CLASS;
+  id.id_class=cpp_idt::id_classt::CLASS;
 
   return *s_ptr;
 }
@@ -390,13 +390,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // It has already been instantianted!
       const cpp_idt &cpp_id = **id_set.begin();
 
-      assert(cpp_id.id_class == cpp_idt::CLASS ||
-             cpp_id.id_class == cpp_idt::SYMBOL);
+      assert(cpp_id.id_class == cpp_idt::id_classt::CLASS ||
+             cpp_id.id_class == cpp_idt::id_classt::SYMBOL);
 
       const symbolt &symb=lookup(cpp_id.identifier);
 
       // continue if the type is incomplete only
-      if(cpp_id.id_class==cpp_idt::CLASS &&
+      if(cpp_id.id_class==cpp_idt::id_classt::CLASS &&
          symb.type.id()==ID_struct)
         return symb;
       else if(symb.value.is_not_nil())
@@ -410,7 +410,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     // set up a scope as subscope of the template scope
     cpp_scopet &sub_scope=
       cpp_scopes.current_scope().new_scope(subscope_name);
-    sub_scope.id_class=cpp_idt::TEMPLATE_SCOPE;
+    sub_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
     sub_scope.prefix=template_scope->get_parent().prefix;
     sub_scope.suffix=suffix;
     sub_scope.add_using_scope(template_scope->get_parent());
