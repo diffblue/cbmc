@@ -612,6 +612,22 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   found_length.clear();
   found_content.clear();
 
+  // Initial try without index set
+  decision_proceduret::resultt res=supert::dec_solve();
+  if(res==D_SATISFIABLE)
+  {
+    if(!check_axioms())
+    {
+      debug() << "check_SAT: got SAT but the model is not correct" << eom;
+    }
+    else
+    {
+      debug() << "check_SAT: the model is correct" << eom;
+      concretize_lengths();
+      return D_SATISFIABLE;
+    }
+  }
+
   initial_index_set(universal_axioms);
   update_index_set(cur);
   cur.clear();
