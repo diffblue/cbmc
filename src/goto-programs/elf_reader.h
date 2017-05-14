@@ -99,7 +99,7 @@ class elf_readert
 public:
   explicit elf_readert(std::istream &_in);
 
-  typedef enum { ELF32=1, ELF64=2 } elf_classt;
+  enum elf_classt { ELF32=1, ELF64=2 };
   elf_classt elf_class;
 
   // the ELF header
