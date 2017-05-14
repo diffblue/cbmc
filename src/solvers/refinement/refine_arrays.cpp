@@ -67,7 +67,7 @@ void bv_refinementt::arrays_overapproximated()
   {
     satcheck_no_simplifiert sat_check;
     bv_pointerst solver(ns, sat_check);
-    solver.unbounded_array=bv_pointerst::U_ALL;
+    solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
 
     exprt current=(*it).lazy;
 

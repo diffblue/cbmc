@@ -134,9 +134,9 @@ cbmc_solverst::solvert* cbmc_solverst::get_default()
   bv_cbmct *bv_cbmc=new bv_cbmct(ns, solver->prop());
 
   if(options.get_option("arrays-uf")=="never")
-    bv_cbmc->unbounded_array=bv_cbmct::U_NONE;
+    bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf")=="always")
-    bv_cbmc->unbounded_array=bv_cbmct::U_ALL;
+    bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_ALL;
 
   solver->set_prop_conv(bv_cbmc);
 
