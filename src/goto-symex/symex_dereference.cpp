@@ -302,7 +302,9 @@ void goto_symext::dereference_rec(
       dereference.dereference(
         tmp1,
         guard,
-        write?value_set_dereferencet::WRITE:value_set_dereferencet::READ);
+        write?
+          value_set_dereferencet::modet::WRITE:
+          value_set_dereferencet::modet::READ);
     // std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
 
     expr.swap(tmp2);
