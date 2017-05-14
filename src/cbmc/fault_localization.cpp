@@ -139,7 +139,7 @@ bool fault_localizationt::check(const lpointst &lpoints,
 
   bmc.prop_conv.set_assumptions(assumptions);
 
-  if(bmc.prop_conv()==decision_proceduret::D_SATISFIABLE)
+  if(bmc.prop_conv()==decision_proceduret::resultt::D_SATISFIABLE)
     return false;
 
   return true;
@@ -362,11 +362,11 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
 {
   switch(run_decision_procedure(bmc.prop_conv))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     bmc.report_success();
     return safety_checkert::resultt::SAFE;
 
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     if(options.get_bool_option("trace"))
     {
       if(options.get_bool_option("beautify"))

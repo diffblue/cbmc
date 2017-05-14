@@ -637,12 +637,12 @@ safety_checkert::resultt bmct::stop_on_fail(
 {
   switch(run_decision_procedure(prop_conv))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success();
     output_graphml(resultt::SAFE, goto_functions);
     return resultt::SAFE;
 
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     if(options.get_bool_option("trace"))
     {
       if(options.get_bool_option("beautify"))

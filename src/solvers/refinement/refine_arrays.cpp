@@ -101,12 +101,12 @@ void bv_refinementt::arrays_overapproximated()
     exprt simplified=get(current);
     solver << simplified;
 
-    switch(sat_check.prop_solve())
+    switch(static_cast<decision_proceduret::resultt>(sat_check.prop_solve()))
     {
-    case decision_proceduret::D_SATISFIABLE:
+    case decision_proceduret::resultt::D_SATISFIABLE:
       ++it;
       break;
-    case decision_proceduret::D_UNSATISFIABLE:
+    case decision_proceduret::resultt::D_UNSATISFIABLE:
       prop.l_set_to_true(convert(current));
       nb_active++;
       lazy_array_constraints.erase(it++);

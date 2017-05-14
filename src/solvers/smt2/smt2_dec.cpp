@@ -208,7 +208,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   if(res<0)
   {
     error() << "error running SMT2 solver" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 
   std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
@@ -231,7 +231,7 @@ Function: smt2_dect::read_result
 decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res=D_ERROR;
+  decision_proceduret::resultt res=resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -244,9 +244,9 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     irept parsed=smt2irep(in);
 
     if(parsed.id()=="sat")
-      res=D_SATISFIABLE;
+      res=resultt::D_SATISFIABLE;
     else if(parsed.id()=="unsat")
-      res=D_UNSATISFIABLE;
+      res=resultt::D_UNSATISFIABLE;
     else if(parsed.id()=="" &&
             parsed.get_sub().size()==1 &&
             parsed.get_sub().front().get_sub().size()==2)
@@ -266,11 +266,11 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     {
       // We ignore errors after UNSAT because get-value after check-sat
       // returns unsat will give an error.
-      if(res!=D_UNSATISFIABLE)
+      if(res!=resultt::D_UNSATISFIABLE)
       {
         error() << "SMT2 solver returned error message:\n"
                 << "\t\"" << parsed.get_sub()[1].id() <<"\"" << eom;
-        return decision_proceduret::D_ERROR;
+        return decision_proceduret::resultt::D_ERROR;
       }
     }
   }

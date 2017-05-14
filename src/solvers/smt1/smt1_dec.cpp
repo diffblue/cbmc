@@ -190,7 +190,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   if(res<0)
   {
     error() << "error running SMT1 solver" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 
   std::ifstream in(temp_result_filename.c_str());
@@ -205,7 +205,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
 
   case CVC4:
     error() << "no support for CVC4 with SMT1, use SMT2 instead" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
 
   case MATHSAT:
     return read_result_mathsat(in);
@@ -222,7 +222,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   case GENERIC:
   default:
     error() << "Generic solver can't solve" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 }
 
@@ -311,14 +311,14 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
       boolean_assignment[v]=(value=="1");
     }
 
-    return D_SATISFIABLE;
+    return resultt::D_SATISFIABLE;
   }
   else if(line=="unsat")
-    return D_UNSATISFIABLE;
+    return resultt::D_UNSATISFIABLE;
   else
     error() << "Unexpected result from SMT-Solver: " << line << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -335,7 +335,7 @@ Function: smt1_dect::read_result_opensmt
 
 decision_proceduret::resultt smt1_dect::read_result_opensmt(std::istream &in)
 {
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -359,15 +359,15 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
     if(line=="sat")
     {
       // fixme: read values
-      return D_SATISFIABLE;
+      return resultt::D_SATISFIABLE;
     }
     else if(line=="unsat")
-      return D_UNSATISFIABLE;
+      return resultt::D_UNSATISFIABLE;
   }
 
   error() << "Unexpected result from SMT-Solver" << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -414,7 +414,7 @@ Function: smt1_dect::read_result_mathsat
 decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -425,9 +425,9 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res=D_SATISFIABLE;
+      res=resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res=D_UNSATISFIABLE;
+      res=resultt::D_UNSATISFIABLE;
     else if(line.size()>=1 && line[0]=='(')
     {
       // (iff B0 true)
@@ -496,7 +496,7 @@ Function: smt1_dect::read_result_z3
 decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -507,9 +507,9 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res = D_SATISFIABLE;
+      res = resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res = D_UNSATISFIABLE;
+      res = resultt::D_UNSATISFIABLE;
     else
     {
       std::size_t pos=line.find(" -> ");
@@ -692,7 +692,7 @@ Function: smt1_dect::read_result_cvc3
 decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -703,9 +703,9 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res = D_SATISFIABLE;
+      res = resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res = D_UNSATISFIABLE;
+      res = resultt::D_UNSATISFIABLE;
     else if(line.find("Current scope level")!=std::string::npos ||
             line.find("Variable Assignment")!=std::string::npos)
     {

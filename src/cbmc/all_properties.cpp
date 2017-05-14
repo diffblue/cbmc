@@ -140,7 +140,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   decision_proceduret::resultt result=cover_goals();
 
-  if(result==decision_proceduret::D_ERROR)
+  if(result==decision_proceduret::resultt::D_ERROR)
   {
     error=true;
     for(auto &g : goal_map)

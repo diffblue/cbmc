@@ -209,13 +209,13 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
           read_assert(in, line);
       }
 
-      return D_SATISFIABLE;
+      return resultt::D_SATISFIABLE;
     }
     else if(has_prefix(line, "Valid."))
-      return D_UNSATISFIABLE;
+      return resultt::D_UNSATISFIABLE;
   }
 
   error() << "Unexpected result from CVC-Lite" << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }

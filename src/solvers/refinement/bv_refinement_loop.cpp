@@ -92,27 +92,27 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
 
     switch(prop_solve())
     {
-    case D_SATISFIABLE:
+    case resultt::D_SATISFIABLE:
       check_SAT();
       if(!progress)
       {
         status() << "BV-Refinement: got SAT, and it simulates => SAT" << eom;
         status() << "Total iterations: " << iteration << eom;
-        return D_SATISFIABLE;
+        return resultt::D_SATISFIABLE;
       }
       else
         status() << "BV-Refinement: got SAT, and it is spurious, refining"
                  << eom;
       break;
 
-    case D_UNSATISFIABLE:
+    case resultt::D_UNSATISFIABLE:
       check_UNSAT();
       if(!progress)
       {
         status() << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
                  << eom;
         status() << "Total iterations: " << iteration << eom;
-        return D_UNSATISFIABLE;
+        return resultt::D_UNSATISFIABLE;
       }
       else
         status() << "BV-Refinement: got UNSAT, and the proof fails, refining"
@@ -120,7 +120,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
       break;
 
     default:
-      return D_ERROR;
+      return resultt::D_ERROR;
     }
   }
 }
@@ -161,9 +161,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
 
   switch(result)
   {
-    case propt::P_SATISFIABLE: return D_SATISFIABLE;
-    case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
-    default: return D_ERROR;
+    case propt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
+    case propt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
+    default: return resultt::D_ERROR;
   }
 }
 
