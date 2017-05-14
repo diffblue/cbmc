@@ -28,8 +28,17 @@ class member_exprt;
 class smt1_convt:public prop_convt
 {
 public:
-  typedef enum
-  { GENERIC, BOOLECTOR, CVC3, CVC4, MATHSAT, OPENSMT, YICES, Z3 } solvert;
+  enum class solvert
+  {
+    GENERIC,
+    BOOLECTOR,
+    CVC3,
+    CVC4,
+    MATHSAT,
+    OPENSMT,
+    YICES,
+    Z3
+  };
 
   smt1_convt(
     const namespacet &_ns,
