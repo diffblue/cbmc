@@ -350,8 +350,10 @@ int goto_diff_parse_optionst::doit()
 
     impact_modet impact_mode=
       cmdline.isset("forward-impact") ?
-      FORWARD :
-      (cmdline.isset("backward-impact") ? BACKWARD : BOTH);
+      impact_modet::FORWARD :
+      (cmdline.isset("backward-impact") ?
+         impact_modet::BACKWARD :
+         impact_modet::BOTH);
     change_impact(
       goto_model1,
       goto_model2,
