@@ -263,7 +263,7 @@ bool event_grapht::graph_explorert::backtrack(
   if(!this_vertex.local)
   {
     /* only the lwsyncWR can be interpreted as poWR (i.e., skip of the fence) */
-    if(lwfence_met && this_vertex.operation!=abstract_eventt::Read)
+    if(lwfence_met && this_vertex.operation!=abstract_eventt::operationt::Read)
       return false; // {no_comm=true;get_com_only=false;}//return false;
 
     bool has_to_be_unsafe_updated=false;
@@ -274,9 +274,9 @@ bool event_grapht::graph_explorert::backtrack(
        id2string(this_vertex.variable).find("[]")==std::string::npos)
     {
       /* no more than 4 events per thread */
-      if(this_vertex.operation!=abstract_eventt::Fence &&
-         this_vertex.operation!=abstract_eventt::Lwfence &&
-         this_vertex.operation!=abstract_eventt::ASMfence)
+      if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+         this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+         this_vertex.operation!=abstract_eventt::operationt::ASMfence)
       {
         if(events_per_thread[this_vertex.thread]==4)
           return false;
@@ -295,13 +295,16 @@ bool event_grapht::graph_explorert::backtrack(
         point_stack.pop();
         const event_idt preprevious=point_stack.top();
         point_stack.push(previous);
-        if(!egraph[preprevious].unsafe_pair(this_vertex, model)
-          && !(this_vertex.operation==abstract_eventt::Fence
-            || egraph[preprevious].operation==abstract_eventt::Fence
-            || this_vertex.operation==abstract_eventt::Lwfence
-            || egraph[preprevious].operation==abstract_eventt::Lwfence
-            || this_vertex.operation==abstract_eventt::ASMfence
-            || egraph[preprevious].operation==abstract_eventt::ASMfence))
+        if(!egraph[preprevious].unsafe_pair(this_vertex, model) &&
+           !(this_vertex.operation==abstract_eventt::operationt::Fence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::Fence ||
+             this_vertex.operation==abstract_eventt::operationt::Lwfence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::Lwfence ||
+             this_vertex.operation==abstract_eventt::operationt::ASMfence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::ASMfence))
           return false;
       }
     }
@@ -316,14 +319,15 @@ bool event_grapht::graph_explorert::backtrack(
        not taken into account) */
     if(!point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence &&
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence &&
        this_vertex.variable==egraph[point_stack.top()].variable)
     {
       if(same_var_pair ||
-         (this_vertex.operation==abstract_eventt::Read &&
-          egraph[point_stack.top()].operation==abstract_eventt::Read))
+         (this_vertex.operation==abstract_eventt::operationt::Read &&
+          egraph[point_stack.top()].operation==
+            abstract_eventt::operationt::Read))
       {
         events_per_thread[this_vertex.thread]--;
         return false; // {no_comm=true;get_com_only=false;} //return false;
@@ -339,18 +343,18 @@ bool event_grapht::graph_explorert::backtrack(
     /* constraint 1.b */
     if(!point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence &&
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence &&
        this_vertex.variable!=egraph[point_stack.top()].variable)
     {
       same_var_pair_updated=false;
     }
 
     /* constraint 2: per variable, either W W, R W, W R, or R W R */
-    if(this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence)
+    if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence)
     {
       const unsigned char nb_writes=writes_per_variable[this_vertex.variable];
       const unsigned char nb_reads=reads_per_variable[this_vertex.variable];
@@ -360,7 +364,7 @@ bool event_grapht::graph_explorert::backtrack(
         events_per_thread[this_vertex.thread]--;
         return false; // {no_comm=true;get_com_only=false;} //return false;
       }
-      else if(this_vertex.operation==abstract_eventt::Write)
+      else if(this_vertex.operation==abstract_eventt::operationt::Write)
       {
         if(nb_writes==2)
         {
@@ -370,7 +374,7 @@ bool event_grapht::graph_explorert::backtrack(
         else
           writes_per_variable[this_vertex.variable]++;
       }
-      else if(this_vertex.operation==abstract_eventt::Read)
+      else if(this_vertex.operation==abstract_eventt::operationt::Read)
       {
         if(nb_reads==2)
         {
@@ -522,11 +526,11 @@ bool event_grapht::graph_explorert::backtrack(
     point_stack.pop();
 
     /* removes variable access */
-    if(this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence)
+    if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence)
     {
-      if(this_vertex.operation==abstract_eventt::Write)
+      if(this_vertex.operation==abstract_eventt::operationt::Write)
         writes_per_variable[this_vertex.variable]--;
       else
         reads_per_variable[this_vertex.variable]--;
@@ -544,12 +548,14 @@ bool event_grapht::graph_explorert::backtrack(
        (po_trans > 1 || po_trans==0) &&
        !point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       (this_vertex.operation!=abstract_eventt::Lwfence ||
-        egraph[point_stack.top()].operation==abstract_eventt::Write) &&
-       (this_vertex.operation!=abstract_eventt::ASMfence ||
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       (this_vertex.operation!=abstract_eventt::operationt::Lwfence ||
+        egraph[point_stack.top()].operation==
+          abstract_eventt::operationt::Write) &&
+       (this_vertex.operation!=abstract_eventt::operationt::ASMfence ||
         !this_vertex.WRfence ||
-        egraph[point_stack.top()].operation==abstract_eventt::Write))
+        egraph[point_stack.top()].operation==
+          abstract_eventt::operationt::Write))
     {
       skip_tracked.insert(vertex);
 
@@ -590,11 +596,13 @@ bool event_grapht::graph_explorert::backtrack(
       /* skip lwfence by po-transition only if we consider a WR */
       // TO CHECK
       const bool is_lwfence=
-        (this_vertex.operation==abstract_eventt::Lwfence &&
-         egraph[point_stack.top()].operation==abstract_eventt::Write) ||
-        (this_vertex.operation==abstract_eventt::ASMfence &&
+        (this_vertex.operation==abstract_eventt::operationt::Lwfence &&
+         egraph[point_stack.top()].operation==
+           abstract_eventt::operationt::Write) ||
+        (this_vertex.operation==abstract_eventt::operationt::ASMfence &&
          (!this_vertex.WRfence &&
-          egraph[point_stack.top()].operation==abstract_eventt::Write));
+          egraph[point_stack.top()].operation==
+            abstract_eventt::operationt::Write));
 
       for(wmm_grapht::edgest::const_iterator w_it=
           egraph.po_out(vertex).begin();
