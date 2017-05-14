@@ -630,7 +630,7 @@ void symex_slice_by_tracet::assign_merges(
     SSA_step.guard=t_guard.as_expr();
     SSA_step.ssa_lhs=merge_sym;
     SSA_step.ssa_rhs.swap(merge_copy);
-    SSA_step.assignment_type=symex_targett::HIDDEN;
+    SSA_step.assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
     SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
