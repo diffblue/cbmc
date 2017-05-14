@@ -49,13 +49,13 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         float_utilst float_utils(prop, to_floatbv_type(op0.type()));
 
         if(rel==ID_le)
-          return float_utils.relation(bv0, float_utilst::LE, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::LE, bv1);
         else if(rel==ID_lt)
-          return float_utils.relation(bv0, float_utilst::LT, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::LT, bv1);
         else if(rel==ID_ge)
-          return float_utils.relation(bv0, float_utilst::GE, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::GE, bv1);
         else if(rel==ID_gt)
-          return float_utils.relation(bv0, float_utilst::GT, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::GT, bv1);
         else
           return SUB::convert_rest(expr);
       }
