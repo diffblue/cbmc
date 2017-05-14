@@ -100,7 +100,7 @@ protected:
   void preprocess();
   void solve();
 
-  typedef enum {Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4} fence_typet;
+  enum fence_typet { Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4 };
   virtual unsigned fence_cost(fence_typet e) const;
 
   std::string to_string(fence_typet f) const;
