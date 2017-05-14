@@ -42,7 +42,7 @@ public:
   class map_entryt
   {
   public:
-    map_entryt():width(0), bvtype(IS_UNKNOWN)
+    map_entryt():width(0), bvtype(bvtypet::IS_UNKNOWN)
     {
     }
 

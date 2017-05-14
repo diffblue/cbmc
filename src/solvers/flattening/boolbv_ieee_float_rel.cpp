@@ -42,7 +42,7 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
     const bvt &bv1=convert_bv(op1);
 
     if(bv0.size()==bv1.size() && !bv0.empty() &&
-       bvtype0==IS_FLOAT && bvtype1==IS_FLOAT)
+       bvtype0==bvtypet::IS_FLOAT && bvtype1==bvtypet::IS_FLOAT)
     {
       float_utilst float_utils(prop, to_floatbv_type(op0.type()));
 
