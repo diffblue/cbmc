@@ -24,27 +24,21 @@ class dependence_grapht;
 class dep_edget
 {
 public:
-  typedef enum
-  {
-    NONE,
-    CTRL,
-    DATA,
-    BOTH
-  } kindt;
+  enum class kindt { NONE, CTRL, DATA, BOTH };
 
   void add(kindt _kind)
   {
     switch(kind)
     {
-      case NONE:
+      case kindt::NONE:
         kind=_kind;
         break;
-      case DATA:
-      case CTRL:
+      case kindt::DATA:
+      case kindt::CTRL:
         if(kind!=_kind)
-          kind=BOTH;
+          kind=kindt::BOTH;
         break;
-      case BOTH:
+      case kindt::BOTH:
         break;
     }
   }

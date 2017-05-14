@@ -518,8 +518,8 @@ void change_impactt::propogate_dep_forward(
     if((change_impact[src->function][src] &data_flag)
         || (change_impact[src->function][src] &ctrl_flag))
       continue;
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;
@@ -559,8 +559,8 @@ void change_impactt::propogate_dep_back(
     {
       continue;
     }
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;
