@@ -149,7 +149,7 @@ void output_vcd(
   {
     switch(step.type)
     {
-    case goto_trace_stept::ASSIGNMENT:
+    case goto_trace_stept::typet::ASSIGNMENT:
       {
         irep_idt identifier=step.lhs_object.get_identifier();
         const typet &type=step.lhs_object.type();

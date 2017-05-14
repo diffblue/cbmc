@@ -74,7 +74,7 @@ void symex_target_equationt::shared_read(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_READ;
+  SSA_step.type=goto_trace_stept::typet::SHARED_READ;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -104,7 +104,7 @@ void symex_target_equationt::shared_write(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_WRITE;
+  SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -130,7 +130,7 @@ void symex_target_equationt::spawn(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::SPAWN;
+  SSA_step.type=goto_trace_stept::typet::SPAWN;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -155,7 +155,7 @@ void symex_target_equationt::memory_barrier(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::MEMORY_BARRIER;
+  SSA_step.type=goto_trace_stept::typet::MEMORY_BARRIER;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -181,7 +181,7 @@ void symex_target_equationt::atomic_begin(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_BEGIN;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -208,7 +208,7 @@ void symex_target_equationt::atomic_end(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_END;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_END;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -249,7 +249,7 @@ void symex_target_equationt::assignment(
   SSA_step.assignment_type=assignment_type;
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-  SSA_step.type=goto_trace_stept::ASSIGNMENT;
+  SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
   SSA_step.hidden=(assignment_type!=STATE &&
                    assignment_type!=VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
@@ -284,7 +284,7 @@ void symex_target_equationt::decl(
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
-  SSA_step.type=goto_trace_stept::DECL;
+  SSA_step.type=goto_trace_stept::typet::DECL;
   SSA_step.source=source;
   SSA_step.hidden=(assignment_type!=STATE);
 
@@ -335,7 +335,7 @@ void symex_target_equationt::location(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::LOCATION;
+  SSA_step.type=goto_trace_stept::typet::LOCATION;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -362,7 +362,7 @@ void symex_target_equationt::function_call(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_CALL;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
@@ -390,7 +390,7 @@ void symex_target_equationt::function_return(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
@@ -419,7 +419,7 @@ void symex_target_equationt::output(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -450,7 +450,7 @@ void symex_target_equationt::output_fmt(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -482,7 +482,7 @@ void symex_target_equationt::input(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::INPUT;
+  SSA_step.type=goto_trace_stept::typet::INPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=input_id;
@@ -512,7 +512,7 @@ void symex_target_equationt::assumption(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.type=goto_trace_stept::typet::ASSUME;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -541,7 +541,7 @@ void symex_target_equationt::assertion(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSERT;
+  SSA_step.type=goto_trace_stept::typet::ASSERT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
@@ -570,7 +570,7 @@ void symex_target_equationt::goto_instruction(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::GOTO;
+  SSA_step.type=goto_trace_stept::typet::GOTO;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -599,7 +599,7 @@ void symex_target_equationt::constraint(
 
   SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::CONSTRAINT;
+  SSA_step.type=goto_trace_stept::typet::CONSTRAINT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
@@ -981,23 +981,23 @@ void symex_target_equationt::SSA_stept::output(
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT:
+  case goto_trace_stept::typet::ASSERT:
     out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::ASSUME:
+  case goto_trace_stept::typet::ASSUME:
     out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::LOCATION:
+  case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << std::endl; break;
-  case goto_trace_stept::INPUT:
+  case goto_trace_stept::typet::INPUT:
     out << "INPUT" << std::endl; break;
-  case goto_trace_stept::OUTPUT:
+  case goto_trace_stept::typet::OUTPUT:
     out << "OUTPUT" << std::endl; break;
 
-  case goto_trace_stept::DECL:
+  case goto_trace_stept::typet::DECL:
     out << "DECL" << std::endl;
     out << from_expr(ns, "", ssa_lhs) << std::endl;
     break;
 
-  case goto_trace_stept::ASSIGNMENT:
+  case goto_trace_stept::typet::ASSIGNMENT:
     out << "ASSIGNMENT (";
     switch(assignment_type)
     {
@@ -1015,27 +1015,27 @@ void symex_target_equationt::SSA_stept::output(
     out << ")" << std::endl;
     break;
 
-  case goto_trace_stept::DEAD:
+  case goto_trace_stept::typet::DEAD:
     out << "DEAD" << std::endl; break;
-  case goto_trace_stept::FUNCTION_CALL:
+  case goto_trace_stept::typet::FUNCTION_CALL:
     out << "FUNCTION_CALL" << std::endl; break;
-  case goto_trace_stept::FUNCTION_RETURN:
+  case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION_RETURN" << std::endl; break;
-  case goto_trace_stept::CONSTRAINT:
+  case goto_trace_stept::typet::CONSTRAINT:
     out << "CONSTRAINT" << std::endl; break;
-  case goto_trace_stept::SHARED_READ:
+  case goto_trace_stept::typet::SHARED_READ:
     out << "SHARED READ" << std::endl; break;
-  case goto_trace_stept::SHARED_WRITE:
+  case goto_trace_stept::typet::SHARED_WRITE:
     out << "SHARED WRITE" << std::endl; break;
-  case goto_trace_stept::ATOMIC_BEGIN:
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
     out << "ATOMIC_BEGIN" << std::endl; break;
-  case goto_trace_stept::ATOMIC_END:
+  case goto_trace_stept::typet::ATOMIC_END:
     out << "AUTOMIC_END" << std::endl; break;
-  case goto_trace_stept::SPAWN:
+  case goto_trace_stept::typet::SPAWN:
     out << "SPAWN" << std::endl; break;
-  case goto_trace_stept::MEMORY_BARRIER:
+  case goto_trace_stept::typet::MEMORY_BARRIER:
     out << "MEMORY_BARRIER" << std::endl; break;
-  case goto_trace_stept::GOTO:
+  case goto_trace_stept::typet::GOTO:
     out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
 
   default: assert(false);

@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/source_location.h>
 #include <util/std_expr.h>
 
-typedef enum
+enum goto_program_instruction_typet
 {
   NO_INSTRUCTION_TYPE=0,
   GOTO=1,           // branch, possibly guarded
@@ -44,7 +44,7 @@ typedef enum
   FUNCTION_CALL=16, // call a function
   THROW=17,         // throw an exception
   CATCH=18          // catch an exception
-} goto_program_instruction_typet;
+};
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
