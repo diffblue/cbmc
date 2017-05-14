@@ -1,9 +1,9 @@
 FUTURE
-constant_propagation_11.c
---constants --simplify out.goto
+main.c
+--constants --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
-^SIMPLIFIED:  assert: 1, assume: 0, goto: 2, assigns: 5, function calls: 0$
-^UNMODIFIED:  assert: 0, assume: 0, goto: 4, assigns: 13, function calls: 2$
+^Simplified:  assert: 1, assume: 0, goto: 0$
+^Unmodified:     assert: 0, assume: 0, goto: 0$
 --
 ^warning: ignoring

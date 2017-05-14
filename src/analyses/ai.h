@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 #include <iosfwd>
-#include <sstream>
 
 #include <util/json.h>
 #include <util/xml.h>
+#include <util/expr.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -40,9 +40,9 @@ public:
 
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
-  // b) there is an edge from the last instruction (END_FUNCTION)
-  //    of the function to the instruction _following_ the call site
-  //    (this also needs to set the LHS, if applicable)
+  // b) there is an edge from the last instruction (END_FUNCTION) of
+  //    the function to the instruction _following_ the call site (this
+  //    also needs to set the LHS, if applicable)
 
   virtual void transform(
     locationt from,
@@ -59,24 +59,11 @@ public:
 
   virtual jsont output_json(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    json_stringt json(out.str());
-    return json;
-  }
+    const namespacet &ns) const;
 
   virtual xmlt output_xml(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    xmlt xml("domain");
-    xml.data=out.str();
-    return xml;
-  }
+    const namespacet &ns) const;
 
   // no states
   virtual void make_bottom()=0;
@@ -88,12 +75,31 @@ public:
   // a reasonable entry-point state
   virtual void make_entry()=0;
 
+  virtual bool is_bottom() const=0;
+
+  // the analysis doesn't use this,
+  // and domains may refuse to implement it.
+  virtual bool is_top() const=0;
+
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
   //
   // This computes the join between "this" and "b".
   // Return true if "this" has changed.
+
+  // This method allows an expression to be simplified / evaluated using the
+  // current state.  It is used to evaluate assertions and in program
+  // simplification
+
+  // return true if unchanged
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns,
+    const bool lhs=false) const
+  {
+    return true;
+  }
 };
 
 // don't use me -- I am just a base class
@@ -207,7 +213,6 @@ public:
   {
     return output_json(ns, goto_function.body, "");
   }
-
 
   virtual xmlt output_xml(
     const namespacet &ns,

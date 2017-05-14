@@ -129,7 +129,7 @@ void interval_domaint::transform(
 
 /*******************************************************************\
 
-Function: interval_domaint::merge
+Function: interval_domaint::join
 
   Inputs:
 
@@ -139,10 +139,8 @@ Function: interval_domaint::merge
 
 \*******************************************************************/
 
-bool interval_domaint::merge(
-  const interval_domaint &b,
-  locationt from,
-  locationt to)
+bool interval_domaint::join(
+  const interval_domaint &b)
 {
   if(b.bottom)
     return false;
@@ -157,8 +155,8 @@ bool interval_domaint::merge(
   for(int_mapt::iterator it=int_map.begin();
       it!=int_map.end(); ) // no it++
   {
-    //search for the variable that needs to be merged
-    //containers have different size and variable order
+    // search for the variable that needs to be merged
+    // containers have different size and variable order
     const int_mapt::const_iterator b_it=b.int_map.find(it->first);
     if(b_it==b.int_map.end())
     {
@@ -526,4 +524,62 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
   }
   else
     return true_exprt();
+}
+
+/*******************************************************************\
+
+Function: interval_domaint::simplify
+
+  Inputs: The expression to simplify.
+
+ Outputs: A simplified version of the expression.
+
+ Purpose: Uses the abstract state to simplify a given expression
+          using context-specific information.
+
+\*******************************************************************/
+
+bool interval_domaint::ai_simplify(
+  exprt &condition,
+  const namespacet &ns,
+  const bool lhs) const
+{
+  bool unchanged=true;
+
+  if(lhs)
+  {
+    // For now do not simplify the left hand side of assignments
+    return true;
+  }
+
+  interval_domaint d(*this);
+
+  // merge intervals to properly handle conjunction
+  if(condition.id()==ID_and)
+  {
+    interval_domaint a;
+    a.make_top();
+    a.assume(condition, ns);
+
+    if(!a.join(d))
+    {
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+  else if(condition.id()==ID_symbol)
+  {
+    // TODO: we have to handle symbol expression
+  }
+  else
+  {
+    d.assume(not_exprt(condition), ns);
+    if(d.is_bottom())
+    {
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+
+  return unchanged;
 }

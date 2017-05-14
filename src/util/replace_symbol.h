@@ -37,7 +37,10 @@ public:
     type_map.insert(std::pair<irep_idt, typet>(identifier, type));
   }
 
-  virtual bool replace(exprt &dest) const;
+  virtual bool replace(
+    exprt &dest,
+    const bool replace_with_const=true) const;
+
   virtual bool replace(typet &dest) const;
 
   void operator()(exprt &dest) const
@@ -54,6 +57,11 @@ public:
   {
     expr_map.clear();
     type_map.clear();
+  }
+
+  bool empty() const
+  {
+    return expr_map.empty() && type_map.empty();
   }
 
   replace_symbolt();

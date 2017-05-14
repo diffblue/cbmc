@@ -1,9 +1,9 @@
 FUTURE
-constant_propagation_14.c
---constants --simplify out.goto
+main.c
+--constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^SIMPLIFIED:  assert: 1, assume: 0, goto: 0$
-^UNKNOWN:     assert: 0, assume: 0, goto: 0$
+^\[main.assertion.1\] file main.c line 11 function main, assertion a\[0\]==1 || a\[0\]==2: Success$
+^\[main.assertion.2\] file main.c line 12 function main, assertion a\[0\]==1 && a\[0\]==2: Failure$
 --
 ^warning: ignoring

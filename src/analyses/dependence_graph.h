@@ -86,14 +86,18 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     ai_baset &ai,
-    const namespacet &ns) final;
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final;
+    const namespacet &ns) const final override;
 
-  void make_top() final
+  jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const override;
+
+  void make_top() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -102,7 +106,7 @@ public:
     data_deps.clear();
   }
 
-  void make_bottom() final
+  void make_bottom() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
@@ -111,9 +115,29 @@ public:
     data_deps.clear();
   }
 
-  void make_entry() final
+  void make_entry() final override
   {
     make_top();
+  }
+
+  bool is_top() const final override
+  {
+    assert(node_id!=std::numeric_limits<node_indext>::max());
+
+    assert(!has_values.is_true() ||
+           (control_deps.empty() && data_deps.empty()));
+
+    return has_values.is_true();
+  }
+
+  bool is_bottom() const final override
+  {
+    assert(node_id!=std::numeric_limits<node_indext>::max());
+
+    assert(!has_values.is_false() ||
+           (control_deps.empty() && data_deps.empty()));
+
+    return has_values.is_false();
   }
 
   void set_node_id(node_indext id)
