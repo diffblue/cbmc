@@ -83,7 +83,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
-    if(ui==ui_message_handlert::XML_UI)
+    if(ui==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);

@@ -76,7 +76,7 @@ void symex_parse_optionst::report_cover(
 
   switch(get_ui())
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       status() << "\n** coverage results:" << eom;
 
@@ -101,7 +101,7 @@ void symex_parse_optionst::report_cover(
       break;
     }
 
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       for(const auto &prop_pair : property_map)
       {
@@ -148,7 +148,7 @@ void symex_parse_optionst::report_cover(
 
       break;
     }
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["results"].make_array();
@@ -208,7 +208,7 @@ void symex_parse_optionst::report_cover(
            << "%)"
            << eom;
 
-  if(get_ui()==ui_message_handlert::PLAIN)
+  if(get_ui()==ui_message_handlert::uit::PLAIN)
   {
     std::set<std::string> tests;
 

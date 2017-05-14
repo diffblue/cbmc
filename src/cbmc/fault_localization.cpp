@@ -453,7 +453,7 @@ void fault_localizationt::report(
 
   switch(bmc.ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     if(cover_goals.number_covered()>0)
     {
       status() << "\n** Most likely fault location:" << eom;
@@ -465,9 +465,9 @@ void fault_localizationt::report(
       }
     }
     break;
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     break;
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     break;
   }
 }

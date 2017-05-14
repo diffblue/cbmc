@@ -77,12 +77,12 @@ void bmct::error_trace()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
@@ -90,7 +90,7 @@ void bmct::error_trace()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["results"].make_array();
@@ -235,10 +235,10 @@ void bmct::report_success()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
@@ -247,7 +247,7 @@ void bmct::report_success()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
@@ -275,10 +275,10 @@ void bmct::report_failure()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
@@ -287,7 +287,7 @@ void bmct::report_failure()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");

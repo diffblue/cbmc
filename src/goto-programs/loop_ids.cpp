@@ -52,7 +52,7 @@ void show_loop_ids(
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       forall_goto_program_instructions(it, goto_program)
       {
@@ -69,7 +69,7 @@ void show_loop_ids(
       }
       break;
     }
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       forall_goto_program_instructions(it, goto_program)
       {
@@ -87,7 +87,7 @@ void show_loop_ids(
       }
       break;
     }
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       assert(false); // use function below
   }
 }
@@ -97,7 +97,7 @@ void show_loop_ids_json(
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
-  assert(ui==ui_message_handlert::JSON_UI); // use function above
+  assert(ui==ui_message_handlert::uit::JSON_UI); // use function above
 
   forall_goto_program_instructions(it, goto_program)
   {
@@ -131,12 +131,12 @@ void show_loop_ids(
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::PLAIN:
+    case ui_message_handlert::uit::XML_UI:
       forall_goto_functions(it, goto_functions)
         show_loop_ids(ui, it->second.body);
       break;
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       json_objectt json_result;
       json_arrayt &loops=json_result["loops"].make_array();
 

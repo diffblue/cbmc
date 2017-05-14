@@ -194,7 +194,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 {
   switch(bmc.ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     {
       status() << "\n** Results:" << eom;
 
@@ -222,7 +222,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     }
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       for(const auto &g : goal_map)
       {
@@ -238,7 +238,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       break;
     }
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["result"].make_array();
