@@ -25,7 +25,7 @@ Function: prop_conv_storet::set_to
 void prop_conv_storet::set_to(const exprt &expr, bool value)
 {
   constraintt &constraint=constraints.add_constraint();
-  constraint.type=constraintt::SET_TO;
+  constraint.type=constraintt::typet::SET_TO;
   constraint.expr=expr;
   constraint.value=value;
 }
@@ -45,7 +45,7 @@ Function: prop_conv_storet::convert_rest
 literalt prop_conv_storet::convert(const exprt &expr)
 {
   constraintt &constraint=constraints.add_constraint();
-  constraint.type=constraintt::CONVERT;
+  constraint.type=constraintt::typet::CONVERT;
   constraint.expr=expr;
   #if 0
   constraint.literal=prop.new_variable();
@@ -111,11 +111,11 @@ void prop_conv_storet::constraintt::replay(prop_convt &dest) const
 {
   switch(type)
   {
-  case SET_TO:
+  case typet::SET_TO:
     dest.set_to(expr, value);
     break;
 
-  case CONVERT:
+  case typet::CONVERT:
     // dest.prop.set_equal(dest.convert_rest(expr), literal);
     break;
 
@@ -140,12 +140,12 @@ void prop_conv_storet::constraintt::print(std::ostream &out) const
 {
   switch(type)
   {
-  case SET_TO:
+  case typet::SET_TO:
     out << "SET_TO " << (value?"TRUE":"FALSE") << ": ";
     out << expr.pretty() << "\n";
     break;
 
-  case CONVERT:
+  case typet::CONVERT:
     out << "CONVERT(" << literal.dimacs() << "): ";
     out << expr.pretty() << "\n";
     break;
