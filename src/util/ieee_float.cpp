@@ -151,15 +151,15 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
 
   switch(format_spec.style)
   {
-  case format_spect::DECIMAL:
+  case format_spect::stylet::DECIMAL:
     result+=to_string_decimal(format_spec.precision);
     break;
 
-  case format_spect::SCIENTIFIC:
+  case format_spect::stylet::SCIENTIFIC:
     result+=to_string_scientific(format_spec.precision);
     break;
 
-  case format_spect::AUTOMATIC:
+  case format_spect::stylet::AUTOMATIC:
     {
       // "Style e is used if the exponent from its conversion
       //  is less than -4 or greater than or equal to the precision."
