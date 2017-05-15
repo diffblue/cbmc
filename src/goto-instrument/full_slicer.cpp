@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include "full_slicer_class.h"
+#include <iostream>
 
 void full_slicert::add_dependencies(
   const cfgt::nodet &node,
@@ -39,9 +40,6 @@ void full_slicert::add_function_calls(
   queuet &queue,
   const goto_functionst &goto_functions)
 {
-  if(node.PC->code.is_nil())
-    return;
-
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(node.PC->function);
   assert(f_it!=goto_functions.function_map.end());
