@@ -167,7 +167,17 @@ int goto_instrument_parse_optionst::doit()
         int k=-1;
 
         if(unwind)
-          k=std::stoi(cmdline.get_value("unwind"));
+        {
+          try
+          {
+            k=std::stoi(cmdline.get_value("unwind"));
+          }
+          catch (std::invalid_argument)
+          {
+            throw "unwind parameter requires an integer unwind bound";
+          }
+        }
+
 
         unwind_sett unwind_set;
 
