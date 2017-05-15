@@ -1410,16 +1410,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     nondet_volatile(symbol_table, goto_functions);
   }
 
-  // reachability slice?
-  if(cmdline.isset("reachability-slice"))
-  {
-    status() << "Performing a reachability slice" << eom;
-    if(cmdline.isset("property"))
-      reachability_slicer(goto_functions, cmdline.get_values("property"));
-    else
-      reachability_slicer(goto_functions);
-  }
-
   // full slice?
   if(cmdline.isset("full-slice"))
   {
@@ -1432,6 +1422,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     else
       full_slicer(goto_functions, ns);
   }
+
+  // reachability slice?
+  if(cmdline.isset("reachability-slice") || cmdline.isset("full-slice"))
+  {
+    status() << "Performing a reachability slice" << eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_functions, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_functions);
+  }
+
+  // label the assertions
+  label_properties(goto_functions);
 
   // recalculate numbers, etc.
   goto_functions.update();

@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include "full_slicer_class.h"
-#include <iostream>
 
 void full_slicert::add_dependencies(
   const cfgt::nodet &node,
