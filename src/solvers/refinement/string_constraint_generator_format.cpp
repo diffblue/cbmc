@@ -17,7 +17,6 @@ Date:   May 2017
 #include <vector>
 
 #include <util/std_expr.h>
-#include <util/unicode.h>
 
 #include "string_constraint_generator.h"
 
@@ -57,6 +56,8 @@ public:
   bool dt=false;
   char conversion;
 
+  format_specifiert() { }
+
   format_specifiert(
     int _index,
     std::string _flag,
@@ -79,7 +80,7 @@ class format_textt
 public:
   explicit format_textt(std::string _content): content(_content) { }
 
-  format_textt(const format_textt &fs): content(fs.content) { }
+  explicit format_textt(const format_textt &fs): content(fs.content) { }
 
   std::string get_content() const
   {
@@ -105,10 +106,9 @@ public:
   }
 
   explicit format_elementt(string_constraint_generatort::format_specifiert fs):
-    type(SPECIFIER),
-    fstring("")
+    type(SPECIFIER), fstring("")
   {
-    fspec.push_back(fs);
+    fspec[0]=fs;
   }
 
   bool is_format_specifier() const
@@ -124,7 +124,7 @@ public:
   string_constraint_generatort::format_specifiert get_format_specifier() const
   {
     PRECONDITION(is_format_specifier());
-    return fspec.back();
+    return fspec[0];
   }
 
   format_textt &get_format_text()
@@ -139,16 +139,19 @@ public:
     return fstring;
   }
 
+  ~format_elementt() {}
+
 private:
   format_typet type;
   format_textt fstring;
-  std::vector<string_constraint_generatort::format_specifiert> fspec;
+  string_constraint_generatort::format_specifiert fspec[1];
 };
 
 #if 0
-// This code is deactivated as it is not used for now, but ultimalety this
-// should be used to throw an exception when the format string is not correct
 /// Used to check first argument of `String.format` is correct.
+///
+/// TODO: This is not used for now but an exception should be thrown when the
+///   format string is not correct
 /// \param s: a string
 /// \return True if the argument is a correct format string. Any '%' found
 ///   between format specifier means the string is invalid.
@@ -186,23 +189,31 @@ static bool check_format_string(std::string s)
 static string_constraint_generatort::format_specifiert
   format_specifier_of_match(std::smatch &m)
 {
-  int index=m[1].str().empty()?-1:std::stoi(m[1].str());
-  std::string flag=m[2].str().empty()?"":m[2].str();
-  int width=m[3].str().empty()?-1:std::stoi(m[3].str());
-  int precision=m[4].str().empty()?-1:std::stoi(m[4].str());
-  std::string tT=m[5].str();
+  string_constraint_generatort::format_specifiert f;
 
-  bool dt=(tT!="");
+  if(!m[1].str().empty())
+    f.index=std::stoi(m[1].str());
+
+  if(!m[2].str().empty())
+    f.flag=m[2].str();
+
+  if(!m[3].str().empty())
+    f.width=std::stoi(m[3].str());
+
+  if(!m[4].str().empty())
+    f.precision=std::stoi(m[4].str());
+
+  std::string tT=m[5].str();
+  f.dt=(tT!="");
   if(tT=="T")
-    flag.push_back(
+    f.flag.push_back(
       string_constraint_generatort::format_specifiert::DATE_TIME_UPPER);
 
-  INVARIANT(
-    m[6].str().length()==1, "format conversion should be one character");
-  char conversion=m[6].str()[0];
+  if(m[6].str().length()!=1)
+    throw "invalid format specifier:"+m.str();
 
-  return string_constraint_generatort::format_specifiert(
-    index, flag, width, precision, dt, conversion);
+  f.conversion=m[6].str()[0];
+  return f;
 }
 
 /// Parse the given string into format specifiers and text.
@@ -220,7 +231,7 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 
   while(std::regex_search(s, match, regex))
   {
-    if(match.position()!=0)
+    if(match.position()!= 0)
     {
       std::string pre_match=s.substr(0, match.position());
       al.emplace_back(pre_match);
@@ -263,7 +274,8 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return add_axioms_from_int(get_component_in_struct(arg, ID_int), ref_type);
+    return add_axioms_from_int(
+      get_component_in_struct(arg, ID_int), MAX_INTEGER_LENGTH, ref_type);
   case format_specifiert::HEXADECIMAL_INTEGER:
     return add_axioms_from_int_hex(
       get_component_in_struct(arg, ID_int), ref_type);
@@ -283,7 +295,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
     return get_string_expr(get_component_in_struct(arg, "string_expr"));
   case format_specifiert::HASHCODE:
     return add_axioms_from_int(
-      get_component_in_struct(arg, "hashcode"), ref_type);
+      get_component_in_struct(arg, "hashcode"), MAX_INTEGER_LENGTH, ref_type);
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
     return add_axioms_for_constant("\n", ref_type);
@@ -331,7 +343,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
 /// \return String expression representing the output of String.format.
 string_exprt string_constraint_generatort::add_axioms_for_format(
   const std::string &s,
-  const exprt::operandst &args,
+  const std::vector<exprt> &args,
   const refined_string_typet &ref_type)
 {
   const std::vector<format_elementt> format_strings=parse_format_string(s);
@@ -354,11 +366,8 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
         }
         else
         {
-          INVARIANT(fs.index>=0, "index in format should be positive");
           INVARIANT(
-            static_cast<std::size_t>(fs.index)<=args.size(),
-            "number of format must match specifiers");
-
+            fs.index<=args.size(), "number of format must match specifiers");
           // first argument `args[0]` corresponds to index 1
           arg=to_struct_expr(args[fs.index-1]);
         }
@@ -386,20 +395,26 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
 /// \param length: an unsigned value representing the length of the array
 /// \return String of length `length` represented by the array assuming each
 ///   field in `arr` represents a character.
-std::string utf16_constant_array_to_java(
+std::string string_constraint_generatort::string_of_constant_array(
   const array_exprt &arr, unsigned int length)
 {
-  std::wstring out(length, '?');
-  unsigned int c;
-  for(std::size_t i=0; i<arr.operands().size() && i<length; i++)
+  std::ostringstream result;
+
+  for(size_t i=0; i<arr.operands().size() && i<length; i++)
   {
-    PRECONDITION(arr.operands()[i].id()==ID_constant);
-    bool conversion_failed=to_unsigned_integer(
-      to_constant_expr(arr.operands()[i]), c);
-    INVARIANT(!conversion_failed, "constant should be convertible to unsigned");
-    out[i]=c;
+    // TODO: factorize with utf16_little_endian_to_ascii
+    unsigned int c;
+    exprt arr_i=arr.operands()[i];
+    PRECONDITION(arr_i.id()==ID_constant);
+    to_unsigned_integer(to_constant_expr(arr_i), c);
+    if(c<=255 && c>=32)
+      result << (unsigned char) c;
+    else
+    {
+      result << "\\u" << std::hex << std::setw(4) << std::setfill('0') << c;
+    }
   }
-  return utf16_little_endian_to_java(out);
+  return result.str();
 }
 
 /// Add axioms to specify the Java String.format function.
@@ -417,14 +432,13 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
   PRECONDITION(!f.arguments().empty());
   string_exprt s1=get_string_expr(f.arguments()[0]);
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  unsigned int length;
 
-  if(s1.length().id()==ID_constant &&
-     s1.content().id()==ID_array &&
-     !to_unsigned_integer(to_constant_expr(s1.length()), length))
+  if(s1.length().id()==ID_constant && s1.content().id()==ID_array)
   {
-    std::string s=utf16_constant_array_to_java(
-      to_array_expr(s1.content()), length);
+    unsigned int length;
+    to_unsigned_integer(to_constant_expr(s1.length()), length);
+    std::string s=string_of_constant_array(to_array_expr(s1.content()), length);
+
     // List of arguments after s
     std::vector<exprt> args(
       std::next(f.arguments().begin()), f.arguments().end());
