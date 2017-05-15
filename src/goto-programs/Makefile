@@ -6,7 +6,7 @@ SRC = basic_blocks.cpp \
       destructor.cpp \
       elf_reader.cpp \
       format_strings.cpp \
-      get_goto_model.cpp \
+      initialize_goto_model.cpp \
       goto_asm.cpp \
       goto_clean_expr.cpp \
       goto_convert.cpp \

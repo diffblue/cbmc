@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
 
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -177,9 +178,7 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline))
+  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
     return 6;
 
   if(process_goto_program(options))
