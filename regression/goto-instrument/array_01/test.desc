@@ -1,0 +1,18 @@
+CORE
+main.c
+--dump-c 
+^        signed int \*\*Array;$
+^        void \*return_value_malloc\$1;$
+^        return_value_malloc\$1=malloc\(\(signed int\)\(2ul \* sizeof\(signed int \*\)
+^        Array = \(signed int \*\*\)return_value_malloc\$1;$
+^        void \*return_value_malloc\$2;$
+^        return_value_malloc\$2=malloc\(\(signed int\)sizeof\(signed int\)
+^        Array\[0l\] = \(signed int \*\)return_value_malloc\$2;$
+^        \*Array\[0l\] \= 32;$
+^        void \*return_value_malloc\$3;$
+^        return_value_malloc\$3=malloc\(\(signed int\)sizeof\(signed int\)
+^        Array\[1l\] = \(signed int \*\)return_value_malloc\$3;$
+^        \*Array\[1l\] = 64;$
+^        return Array;$
+^SIGNAL=0$
+--
