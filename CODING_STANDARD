@@ -122,7 +122,7 @@ Program Command Line Options
   from the command line into the options
 
 C++ features:
-- Do not use namespaces.
+- Do not use namespaces, except for anonymous namespaces.
 - Prefer use of 'typedef' insted of 'using'.
 - Prefer use of 'class' instead of 'struct'.
 - Write type modifiers before the type specifier.
