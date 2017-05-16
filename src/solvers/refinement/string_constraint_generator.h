@@ -335,6 +335,7 @@ private:
   exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
   bool is_constant_string(const string_exprt &expr) const;
+  string_exprt empty_string(const refined_string_typet &ref_type);
 };
 
 exprt is_digit_with_radix(exprt chr, exprt radix);

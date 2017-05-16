@@ -58,6 +58,15 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   PRECONDITION(f.arguments().empty());
   PRECONDITION(refined_string_typet::is_refined_string_type(f.type()));
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
+  return empty_string(ref_type);
+}
+
+/// Generate a string expression representing the empty string
+/// \param ref_type: a refined string type
+/// \return a string expression
+string_exprt string_constraint_generatort::empty_string(
+  const refined_string_typet &ref_type)
+{
   exprt size=from_integer(0, ref_type.get_index_type());
   const array_typet &content_type=ref_type.get_content_type();
   array_of_exprt empty_array(
