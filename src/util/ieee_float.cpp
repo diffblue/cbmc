@@ -161,25 +161,39 @@ std::string ieee_floatt::format(const format_spect &format_spec) const
 
   case format_spect::stylet::AUTOMATIC:
     {
+      // On Linux, the man page says:
       // "Style e is used if the exponent from its conversion
       //  is less than -4 or greater than or equal to the precision."
+      //
+      // On BSD, it's
+      // "The argument is printed in style f (F) or in style e (E)
+      // whichever gives full precision in minimum space."
 
       mp_integer _exponent, _fraction;
       extract_base10(_fraction, _exponent);
 
-      if(_exponent>=0)
+      mp_integer adjusted_exponent=base10_digits(_fraction)+_exponent;
+
+      if(adjusted_exponent>=format_spec.precision ||
+         adjusted_exponent<-4)
       {
-        if(base10_digits(_fraction)+_exponent>=format_spec.precision)
-          result+=to_string_scientific(format_spec.precision);
-        else
-          result+=to_string_decimal(format_spec.precision);
+        result+=to_string_scientific(format_spec.precision);
       }
-      else // _exponent<0
+      else
       {
-        if(true) // base10_digits(fraction)+_exponent<-4)
-          result+=to_string_scientific(format_spec.precision);
-        else
-          result+=to_string_decimal(format_spec.precision);
+        result+=to_string_decimal(format_spec.precision);
+
+        // Implementations tested also appear to suppress trailing zeros
+        // and trailing dots.
+
+        {
+          std::size_t trunc_pos=result.find_last_not_of('0');
+          if(trunc_pos!=std::string::npos)
+            result.resize(trunc_pos+1);
+        }
+
+        if(!result.empty() && result.back()=='.')
+          result.resize(result.size()-1);
       }
     }
     break;
