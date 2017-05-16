@@ -778,9 +778,6 @@ bool dump_ct::ignore(const symbolt &symbol)
     return true;
   }
 
-  if(name_str.find("$link")!=std::string::npos)
-    return false;
-
   system_library_mapt::const_iterator it=
     system_library_map.find(symbol.name);
 
