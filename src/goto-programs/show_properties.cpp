@@ -53,7 +53,7 @@ void show_properties(
 
     switch(ui)
     {
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
       {
         // use me instead
         xmlt xml_property("property");
@@ -71,11 +71,11 @@ void show_properties(
       }
       break;
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       assert(false);
       break;
 
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
       std::cout << "Property " << property_id << ":" << std::endl;
 
       std::cout << "  " << ins.source_location << std::endl
@@ -185,7 +185,7 @@ void show_properties(
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
 {
-  if(ui == ui_message_handlert::JSON_UI)
+  if(ui == ui_message_handlert::uit::JSON_UI)
     show_properties_json(ns, goto_functions);
   else
     for(const auto &fct : goto_functions.function_map)
@@ -210,7 +210,7 @@ void show_properties(
   ui_message_handlert::uit ui)
 {
   const namespacet ns(goto_model.symbol_table);
-  if(ui == ui_message_handlert::JSON_UI)
+  if(ui == ui_message_handlert::uit::JSON_UI)
     show_properties_json(ns, goto_model.goto_functions);
   else
     show_properties(ns, ui, goto_model.goto_functions);

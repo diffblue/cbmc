@@ -265,7 +265,8 @@ identifier:
           irep_idt value=stack($2).get(ID_value);
           stack($$).set(ID_C_base_name, value);
           stack($$).set(ID_identifier, value);
-          stack($$).set(ID_C_id_class, ANSI_C_SYMBOL);
+          stack($$).set(
+            ID_C_id_class, static_cast<int>(ansi_c_id_classt::ANSI_C_SYMBOL));
         }
         ;
 
@@ -2387,7 +2388,7 @@ gcc_local_label_statement:
             irep_idt base_name=it->get(ID_identifier);
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
-            i.id_class=ANSI_C_LOCAL_LABEL;
+            i.id_class=ansi_c_id_classt::ANSI_C_LOCAL_LABEL;
             i.prefixed_name=PARSER.current_scope().prefix+id2string(id);
             i.base_name=base_name;
           }

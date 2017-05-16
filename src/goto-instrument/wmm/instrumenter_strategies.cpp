@@ -249,9 +249,9 @@ unsigned inline instrumentert::cost(
   /* cost(poW*)=1
      cost(poRW)=cost(rfe)=2
      cost(poRR)=3 */
-  if(egraph[e.first].operation==abstract_eventt::Write)
+  if(egraph[e.first].operation==abstract_eventt::operationt::Write)
     return 1;
-  else if(egraph[e.second].operation==abstract_eventt::Write
+  else if(egraph[e.second].operation==abstract_eventt::operationt::Write
     || !e.is_po)
     return 2;
   else

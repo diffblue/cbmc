@@ -562,7 +562,7 @@ void string_instrumentationt::do_format_string_read(
 
     for(const auto &token : token_list)
     {
-      if(token.type==format_tokent::STRING)
+      if(token.type==format_tokent::token_typet::STRING)
       {
         const exprt &arg=arguments[argument_start_inx+args];
         const typet &arg_type=ns.follow(arg.type());
@@ -591,10 +591,13 @@ void string_instrumentationt::do_format_string_read(
         }
       }
 
-      if(token.type!=format_tokent::TEXT &&
-         token.type!=format_tokent::UNKNOWN) args++;
+      if(token.type!=format_tokent::token_typet::TEXT &&
+         token.type!=format_tokent::token_typet::UNKNOWN) args++;
 
-      if(find(token.flags.begin(), token.flags.end(), format_tokent::ASTERISK)!=
+      if(find(
+           token.flags.begin(),
+           token.flags.end(),
+           format_tokent::flag_typet::ASTERISK)!=
          token.flags.end())
         args++; // just eat the additional argument
     }
@@ -674,13 +677,16 @@ void string_instrumentationt::do_format_string_write(
 
     for(const auto &token : token_list)
     {
-      if(find(token.flags.begin(), token.flags.end(), format_tokent::ASTERISK)!=
+      if(find(
+           token.flags.begin(),
+           token.flags.end(),
+           format_tokent::flag_typet::ASTERISK)!=
          token.flags.end())
         continue; // asterisk means `ignore this'
 
       switch(token.type)
       {
-        case format_tokent::STRING:
+        case format_tokent::token_typet::STRING:
         {
           const exprt &argument=arguments[argument_start_inx+args];
           const typet &arg_type=ns.follow(argument.type());
@@ -729,8 +735,8 @@ void string_instrumentationt::do_format_string_write(
           args++;
           break;
         }
-        case format_tokent::TEXT:
-        case format_tokent::UNKNOWN:
+        case format_tokent::token_typet::TEXT:
+        case format_tokent::token_typet::UNKNOWN:
         {
           // nothing
           break;

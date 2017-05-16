@@ -37,7 +37,7 @@ public:
 protected:
   CSolver *solver;
 
-  typedef enum { INIT, SAT, UNSAT, ERROR } statust;
+  enum statust { INIT, SAT, UNSAT, ERROR };
   statust status;
 };
 

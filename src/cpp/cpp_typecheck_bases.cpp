@@ -40,7 +40,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     exprt base_symbol_expr=
       resolve(
         name,
-        cpp_typecheck_resolvet::TYPE,
+        cpp_typecheck_resolvet::wantt::TYPE,
         cpp_typecheck_fargst());
 
     if(base_symbol_expr.id()!=ID_type)

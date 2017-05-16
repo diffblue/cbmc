@@ -303,7 +303,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
   const wantt want,
   const cpp_typecheck_fargst &fargs)
 {
-  if(identifier.id_class==cpp_scopet::TEMPLATE_PARAMETER)
+  if(identifier.id_class==cpp_scopet::id_classt::TEMPLATE_PARAMETER)
     return convert_template_parameter(identifier);
 
   exprt e;
@@ -329,11 +329,11 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     const typet &type=component.type();
     assert(type.is_not_nil());
 
-    if(identifier.id_class==cpp_scopet::TYPEDEF)
+    if(identifier.id_class==cpp_scopet::id_classt::TYPEDEF)
     {
       e=type_exprt(type);
     }
-    else if(identifier.id_class==cpp_scopet::SYMBOL)
+    else if(identifier.id_class==cpp_scopet::id_classt::SYMBOL)
     {
       // A non-static, non-type member.
       // There has to be an object.
@@ -494,15 +494,15 @@ void cpp_typecheck_resolvet::filter(
 
     switch(want)
     {
-    case TYPE:
+    case wantt::TYPE:
       match=(it->id()==ID_type);
       break;
 
-    case VAR:
+    case wantt::VAR:
       match=(it->id()!=ID_type);
       break;
 
-    case BOTH:
+    case wantt::BOTH:
       match=true;
       break;
 
@@ -1065,7 +1065,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         cpp_typecheck.cpp_scopes.current_scope().lookup(
           final_base_name,
           recursive?cpp_scopet::RECURSIVE:cpp_scopet::QUALIFIED,
-          cpp_idt::TEMPLATE,
+          cpp_idt::id_classt::TEMPLATE,
           id_set);
 
         // std::cout << "S: "
@@ -1630,7 +1630,7 @@ exprt cpp_typecheck_resolvet::resolve(
       base_name, lookup_kind, id_set);
   else
     cpp_typecheck.cpp_scopes.current_scope().lookup(
-      base_name, lookup_kind, cpp_idt::TEMPLATE, id_set);
+      base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE, id_set);
 
   // Argument-dependent name lookup
   #if 0
@@ -1695,7 +1695,7 @@ exprt cpp_typecheck_resolvet::resolve(
         have_methods=true;
     }
 
-    if(want==BOTH && have_classes && have_methods)
+    if(want==wantt::BOTH && have_classes && have_methods)
     {
       if(!fail_with_exception)
         return nil_exprt();
@@ -1708,7 +1708,7 @@ exprt cpp_typecheck_resolvet::resolve(
       throw 0;
     }
 
-    if(want==TYPE || have_classes)
+    if(want==wantt::TYPE || have_classes)
     {
       typet instance=
         disambiguate_template_classes(base_name, id_set, template_args);
@@ -1731,7 +1731,7 @@ exprt cpp_typecheck_resolvet::resolve(
   }
 
   // change types into constructors if we want a constructor
-  if(want==VAR)
+  if(want==wantt::VAR)
     make_constructors(identifiers);
 
   filter(identifiers, want);
@@ -1877,7 +1877,7 @@ exprt cpp_typecheck_resolvet::resolve(
 
   switch(want)
   {
-  case VAR:
+  case wantt::VAR:
     if(result.id()==ID_type && !cpp_typecheck.cpp_is_pod(result.type()))
     {
       if(!fail_with_exception)
@@ -1894,7 +1894,7 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     break;
 
-  case TYPE:
+  case wantt::TYPE:
     if(result.id()!=ID_type)
     {
       if(!fail_with_exception)
@@ -1958,7 +1958,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       {
         const cpp_idt &id=**it;
         // template parameter?
-        if(id.id_class==cpp_idt::TEMPLATE_PARAMETER)
+        if(id.id_class==cpp_idt::id_classt::TEMPLATE_PARAMETER)
         {
           // see if unassigned
           exprt &e=cpp_typecheck.template_map.expr_map[id.identifier];
@@ -2062,7 +2062,7 @@ void cpp_typecheck_resolvet::guess_template_args(
           const cpp_idt &id=**it;
 
           // template argument?
-          if(id.id_class==cpp_idt::TEMPLATE_PARAMETER)
+          if(id.id_class==cpp_idt::id_classt::TEMPLATE_PARAMETER)
           {
             // see if unassigned
             typet &t=cpp_typecheck.template_map.type_map[id.identifier];
@@ -2545,7 +2545,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           break;
       }
     }
-    else if(id.id_class==cpp_scopet::TEMPLATE)
+    else if(id.id_class==cpp_scopet::id_classt::TEMPLATE)
     {
       // std::cout << "X3\n";
       #if 0
@@ -2561,7 +2561,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
       }
       #endif
     }
-    else if(id.id_class==cpp_scopet::TEMPLATE_PARAMETER)
+    else if(id.id_class==cpp_scopet::id_classt::TEMPLATE_PARAMETER)
     {
       // std::cout << "X4\n";
       // a template parameter may evaluate to be a scope: it could

@@ -18,39 +18,57 @@ Author: CM Wintersteiger
 class format_tokent
 {
 public:
-  typedef enum { UNKNOWN,
-                 TEXT,
-                 INT, // d, i, o, u, x
-                 FLOAT, // a, e, f, g
-                 CHAR, // c
-                 STRING, // s
-                 POINTER // p
-               } token_typet;
-
-  typedef enum { ALTERNATE, ZERO_PAD, LEFT_ADJUST,
-                 SIGNED_SPACE, SIGN, ASTERISK } flag_typet;
-
-  typedef enum
+  enum class token_typet
   {
-    LEN_undef, LEN_h, LEN_hh, LEN_l, LEN_ll,
-    LEN_L, LEN_j, LEN_t
-  } length_modifierst;
+    UNKNOWN,
+    TEXT,
+    INT, // d, i, o, u, x
+    FLOAT, // a, e, f, g
+    CHAR, // c
+    STRING, // s
+    POINTER // p
+  };
 
-  typedef enum
+  enum class flag_typet
   {
-    SIGNED_undef, SIGNED_DEC, UNSIGNED_DEC,
-    UNSIGNED_OCT, UNSIGNED_HEX
-  } representationt;
+    ALTERNATE,
+    ZERO_PAD,
+    LEFT_ADJUST,
+    SIGNED_SPACE,
+    SIGN,
+    ASTERISK
+  };
+
+  enum class length_modifierst
+  {
+    LEN_undef,
+    LEN_h,
+    LEN_hh,
+    LEN_l,
+    LEN_ll,
+    LEN_L,
+    LEN_j,
+    LEN_t
+  };
+
+  enum class representationt
+  {
+    SIGNED_undef,
+    SIGNED_DEC,
+    UNSIGNED_DEC,
+    UNSIGNED_OCT,
+    UNSIGNED_HEX
+  };
 
   explicit format_tokent(token_typet _type)
     : type(_type),
-      length_modifier(LEN_undef),
-      representation(SIGNED_undef)
+      length_modifier(length_modifierst::LEN_undef),
+      representation(representationt::SIGNED_undef)
     { }
   format_tokent():
-    type(UNKNOWN),
-    length_modifier(LEN_undef),
-    representation(SIGNED_undef)
+    type(token_typet::UNKNOWN),
+    length_modifier(length_modifierst::LEN_undef),
+    representation(representationt::SIGNED_undef)
     { }
 
 

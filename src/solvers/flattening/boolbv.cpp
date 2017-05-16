@@ -845,7 +845,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(type.id()!=ID_array)
     return false;
 
-  if(unbounded_array==U_ALL)
+  if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
   const exprt &size=to_array_type(type).size();
@@ -854,7 +854,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(to_integer(size, s))
     return true;
 
-  if(unbounded_array==U_AUTO)
+  if(unbounded_array==unbounded_arrayt::U_AUTO)
     if(s>1000) // magic number!
       return true;
 

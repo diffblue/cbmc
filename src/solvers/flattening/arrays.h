@@ -68,14 +68,15 @@ protected:
   index_mapt index_map;
 
   // adds array constraints lazily
-  typedef enum lazy_type
+  enum class lazy_typet
   {
     ARRAY_ACKERMANN,
     ARRAY_WITH,
     ARRAY_IF,
     ARRAY_OF,
     ARRAY_TYPECAST
-  } lazy_typet;
+  };
+
   struct lazy_constraintt
   {
     lazy_typet type;

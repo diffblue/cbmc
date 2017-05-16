@@ -886,7 +886,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
   goto_programt::instructionst::iterator i_it)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::Lwfence,
     thread, "f", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
@@ -937,7 +937,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   bool WWcumul=instruction.code.get_bool(ID_WWcumul);
   bool RRcumul=instruction.code.get_bool(ID_RRcumul);
   bool RWcumul=instruction.code.get_bool(ID_RWcumul);
-  const abstract_eventt new_fence_event(abstract_eventt::ASMfence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::ASMfence,
     thread, "asm", instrumenter.unique_id++, instruction.source_location,
     false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul, RRcumul);
   const event_idt new_fence_node=egraph.add_node();
@@ -1026,7 +1026,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     assert(read_expr);
 #endif
 
-    const abstract_eventt new_read_event(abstract_eventt::Read,
+    const abstract_eventt new_read_event(abstract_eventt::operationt::Read,
       thread, id2string(read), instrumenter.unique_id++,
       instruction.source_location, local(read));
 
@@ -1124,7 +1124,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     // assert(write_expr);
 
     /* creates Write */
-    const abstract_eventt new_write_event(abstract_eventt::Write,
+    const abstract_eventt new_write_event(abstract_eventt::operationt::Write,
       thread, id2string(write), instrumenter.unique_id++,
       instruction.source_location, local(write));
 
@@ -1311,7 +1311,7 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
   goto_programt::instructionst::iterator i_it)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::Fence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::Fence,
     thread, "F", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);

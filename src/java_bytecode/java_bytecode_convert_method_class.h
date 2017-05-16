@@ -93,11 +93,11 @@ public:
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
 
-  typedef enum instruction_sizet
+  enum instruction_sizet
   {
     INST_INDEX=2,
     INST_INDEX_CONST=3
-  } instruction_sizet;
+  };
 
   codet get_array_bounds_check(
     const exprt &arraystruct,

@@ -58,7 +58,7 @@ bool scratch_programt::check_sat(bool do_slice)
   std::cout << "Finished symex, invoking decision procedure.\n";
 #endif
 
-  return (checker->dec_solve()==decision_proceduret::D_SATISFIABLE);
+  return (checker->dec_solve()==decision_proceduret::resultt::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(const exprt &e)

@@ -260,12 +260,12 @@ int symex_parse_optionst::doit()
       // do actual symex, for assertion checking
       switch(path_search(goto_model.goto_functions))
       {
-      case safety_checkert::SAFE:
+      case safety_checkert::resultt::SAFE:
         report_properties(path_search.property_map);
         report_success();
         return 0;
 
-      case safety_checkert::UNSAFE:
+      case safety_checkert::resultt::UNSAFE:
         report_properties(path_search.property_map);
         report_failure();
         return 10;
@@ -478,7 +478,7 @@ Function: symex_parse_optionst::report_properties
 void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
-  if(get_ui()==ui_message_handlert::PLAIN)
+  if(get_ui()==ui_message_handlert::uit::PLAIN)
     status() << "\n** Results:" << eom;
 
   for(path_searcht::property_mapt::const_iterator
@@ -486,7 +486,7 @@ void symex_parse_optionst::report_properties(
       it!=property_map.end();
       it++)
   {
-    if(get_ui()==ui_message_handlert::XML_UI)
+    if(get_ui()==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("claim", id2string(it->first));
@@ -560,10 +560,10 @@ void symex_parse_optionst::report_success()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
@@ -596,12 +596,12 @@ void symex_parse_optionst::show_counterexample(
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << '\n' << "Counterexample:" << '\n';
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, error_trace, xml);
@@ -632,10 +632,10 @@ void symex_parse_optionst::report_failure()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";

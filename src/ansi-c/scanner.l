@@ -96,9 +96,9 @@ int make_identifier()
     stack(yyansi_clval).id(ID_symbol);
     stack(yyansi_clval).set(ID_C_base_name, base_name);
     stack(yyansi_clval).set(ID_identifier, identifier);
-    stack(yyansi_clval).set(ID_C_id_class, result);
+    stack(yyansi_clval).set(ID_C_id_class, static_cast<int>(result));
 
-    if(result==ANSI_C_TYPEDEF)
+    if(result==ansi_c_id_classt::ANSI_C_TYPEDEF)
       return TOK_TYPEDEFNAME;
     else
       return TOK_IDENTIFIER;

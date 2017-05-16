@@ -148,11 +148,11 @@ void show_symbol_table(
 {
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     show_symbol_table_plain(goto_model, std::cout);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     show_symbol_table_xml_ui();
     break;
 

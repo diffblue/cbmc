@@ -98,7 +98,7 @@ public:
     return scopes.back();
   }
 
-  typedef enum { TAG, MEMBER, PARAMETER, OTHER } decl_typet;
+  enum class decl_typet { TAG, MEMBER, PARAMETER, OTHER };
 
   // convert a declarator and then add it to existing an declaration
   void add_declarator(exprt &declaration, irept &declarator);
