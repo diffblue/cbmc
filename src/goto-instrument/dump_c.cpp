@@ -144,8 +144,9 @@ void dump_ct::operator()(std::ostream &os)
         symbol.type.set(ID_tag, new_tag);
     }
 
-    // we don't want to dump in full all definitions
-    if(!tag_added && ignore(symbol))
+    // we don't want to dump in full all definitions; in particular
+    // do not dump anonymous types that are defined in system headers
+    if((!tag_added || symbol.is_type) && ignore(symbol))
       continue;
 
     if(!symbols_sorted.insert(name_str).second)
@@ -1025,7 +1026,7 @@ void dump_ct::gather_global_typedefs()
   {
     const symbolt &symbol=symbol_entry.second;
 
-    if(symbol.is_macro && symbol.is_type && !ignore(symbol) &&
+    if(symbol.is_macro && symbol.is_type &&
        symbol.location.get_function().empty())
     {
       const irep_idt &typedef_str=symbol.type.get(ID_C_typedef);
