@@ -1,3 +1,6 @@
+/// \file List of irep id names and values.
+/// For an explanation of how this works, see irep_ids.h.
+
 IREP_ID_TWO(empty_string, )
 IREP_ID_ONE(let)
 IREP_ID_ONE(nil)
@@ -332,6 +335,7 @@ IREP_ID_ONE(continuous_assign)
 IREP_ID_ONE(blocking_assign)
 IREP_ID_ONE(non_blocking_assign)
 IREP_ID_ONE(alignof)
+IREP_ID_ONE(clang_builtin_convertvector)
 IREP_ID_ONE(gcc_builtin_va_arg)
 IREP_ID_ONE(gcc_builtin_types_compatible_p)
 IREP_ID_ONE(gcc_builtin_va_arg_next)

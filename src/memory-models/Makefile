@@ -1,5 +1,10 @@
-SRC = mm_y.tab.cpp mm_lex.yy.cpp mmcc_main.cpp mm_parser.cpp \
-      mmcc_parse_options.cpp mm2cpp.cpp
+SRC = mm2cpp.cpp \
+      mm_lex.yy.cpp \
+      mm_parser.cpp \
+      mm_y.tab.cpp \
+      mmcc_main.cpp \
+      mmcc_parse_options.cpp \
+      # Empty last line
 
 OBJ += ../big-int/big-int$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \

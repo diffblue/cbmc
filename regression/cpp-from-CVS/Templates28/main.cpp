@@ -13,6 +13,6 @@ struct B
 
 int main()
 {
-  B<5,4> b;
+  B<5, 4> b;
   assert(b.a.func() == 14);
 }

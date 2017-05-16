@@ -1,10 +1,10 @@
 class A
 {
-	int i;
+  int i;
 
-	public:
-	class B
-	{
-		int get(const A& a){return a.i;}
-	};
+  public:
+  class B
+  {
+    int get(const A& a){return a.i;}
+  };
 };

@@ -111,11 +111,14 @@ void __CPROVER_cover(_Bool condition);
 </code>
 <hr>
 
+<p>This statement defines a custom coverage criterion, for usage
+with the <a href="cover.shtml">test suite generation feature</a>.</p>
+
 <p class="justified">
 </p>
 
-<h4>__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isfinite,
-__CPROVER_isfinite, __CPROVER_sign</h4>
+<h4>__CPROVER_isnan, __CPROVER_isfinite, __CPROVER_isinf,
+__CPROVER_isnormal, __CPROVER_sign</h4>
 
 <hr>
 <code>

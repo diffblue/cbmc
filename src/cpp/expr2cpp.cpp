@@ -494,7 +494,7 @@ Function: expr2cppt::convert
 
 \*******************************************************************/
 
-std::string expr2cppt::convert(
+std::string expr2cppt::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
 {
@@ -522,7 +522,7 @@ std::string expr2cppt::convert(
   else if(src.id()=="pod_constructor")
     return "pod_constructor";
   else
-    return expr2ct::convert(src, precedence);
+    return expr2ct::convert_with_precedence(src, precedence);
 }
 
 /*******************************************************************\

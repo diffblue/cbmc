@@ -146,6 +146,7 @@ extern char *yyansi_ctext;
 %token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
 %token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
+%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
 %token TOK_MSC_TRY     "__try"
@@ -305,6 +306,7 @@ primary_expression:
         { $$ = $2; }
         | statement_expression
         | gcc_builtin_expressions
+        | clang_builtin_expressions
         | cw_builtin_expressions
         | offsetof
         | quantifier_expression
@@ -367,6 +369,16 @@ gcc_builtin_expressions:
           subtypes.resize(2);
           subtypes[0].swap(stack($3));
           subtypes[1].swap(stack($5));
+        }
+        ;
+
+clang_builtin_expressions:
+          TOK_CLANG_BUILTIN_CONVERTVECTOR '(' assignment_expression ',' type_name ')'
+        {
+          $$=$1;
+          stack($$).id(ID_clang_builtin_convertvector);
+          mto($$, $3);
+          stack($$).type().swap(stack($5));
         }
         ;
 

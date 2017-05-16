@@ -164,6 +164,10 @@ int cpp_operator(int token)
   }
 }
 
+#include <util/pragma_wsign_compare.def>
+#include <util/pragma_wnull_conversion.def>
+#include <util/pragma_wdeprecated_register.def>
+
 /*** macros for easier rule definition **********************************/
 %}
 
@@ -581,6 +585,14 @@ void ansi_c_scanner_init()
                      PARSER.mode==configt::ansi_ct::flavourt::APPLE ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM)
                     { loc(); return TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P; }
+                  else
+                    return make_identifier();
+                }
+
+"__builtin_convertvector" {
+                  if(PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                     PARSER.mode==configt::ansi_ct::flavourt::APPLE)
+                    { loc(); return TOK_CLANG_BUILTIN_CONVERTVECTOR; }
                   else
                     return make_identifier();
                 }

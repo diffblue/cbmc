@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>  // for size_t
 #include <vector>
 
-#include "irep_hash.h"
 #include "numbering.h"
 
 class irept;
@@ -55,13 +54,7 @@ protected:
 
   struct vector_hasht
   {
-    size_t operator()(const packedt &p) const
-    {
-      size_t result=p.size(); // seed
-      for(auto elem : p)
-        result=hash_combine(result, elem);
-      return result;
-    }
+    size_t operator()(const packedt &p) const;
   };
 
   typedef hash_numbering<packedt, vector_hasht> numberingt;

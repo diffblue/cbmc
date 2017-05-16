@@ -1,8 +1,8 @@
 class A {
-	static void func(){}
+  static void func(){}
 };
 
 int main()
 {
-	A::func();
+  A::func();
 }

@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep_hash_container.h"
 #include "irep.h"
+#include "irep_hash.h"
 
 /*******************************************************************\
 
@@ -37,6 +38,27 @@ size_t irep_hash_container_baset::number(const irept &irep)
   ptr_hash[&irep.read()]=id;
 
   return id;
+}
+
+/*******************************************************************\
+
+Function: irep_hash_container_baset::vector_hasht::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+size_t irep_hash_container_baset::vector_hasht::operator()(
+  const packedt &p) const
+{
+  size_t result=p.size(); // seed
+  for(auto elem : p)
+    result=hash_combine(result, elem);
+  return result;
 }
 
 /*******************************************************************\

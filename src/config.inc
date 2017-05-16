@@ -1,11 +1,12 @@
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
-# Enable all warnings
-#CXXFLAGS += -Wall -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
-
-# Treat warnings as errors
-#CXXFLAGS += -Werror
+# Enable all warnings and treat them as errors
+ifeq ($(BUILD_ENV),MSVC)
+  #CXXFLAGS += /Wall /WX
+else
+  CXXFLAGS += -Wall -pedantic -Werror
+endif
 
 # Select optimisation or debug info
 #CXXFLAGS += -O2 -DNDEBUG
@@ -15,10 +16,9 @@ ifeq ($(shell uname),Linux)
   CXXFLAGS += -DUSE_BOOST
 endif
 
-# On Windows this Makefile is subject to sed s/BUILD_ENV.*/BUILD_ENV = MSVC,
-# so we can't directly test BUILD_ENV here.
-SELF_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
-include $(SELF_DIR)add_shlwapi.inc
+ifeq ($(BUILD_ENV),MSVC)
+  LIBS=shlwapi.lib
+endif
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk

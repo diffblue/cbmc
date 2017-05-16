@@ -1,0 +1,9 @@
+CORE
+main.c
+--cover decision --unwind 5
+^EXIT=0$
+^SIGNAL=0$
+^\*\* 4 of 4 covered
+--
+^warning: ignoring
+^\[.*<builtin-library-

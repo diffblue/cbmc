@@ -27,7 +27,9 @@ public:
   }
 
 protected:
-  std::string convert(const exprt &src, unsigned &precedence) override;
+  std::string convert_with_precedence(
+    const exprt &src,
+    unsigned &precedence) override;
   std::string convert_cpp_this(const exprt &src, unsigned precedence);
   std::string convert_cpp_new(const exprt &src, unsigned precedence);
   std::string convert_extractbit(const exprt &src, unsigned precedence);

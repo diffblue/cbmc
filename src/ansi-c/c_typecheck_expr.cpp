@@ -294,6 +294,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     expr.make_bool(gcc_types_compatible_p(subtypes[0], subtypes[1]));
     expr.add_source_location()=source_location;
   }
+  else if(expr.id()==ID_clang_builtin_convertvector)
+  {
+    typecheck_type(expr.type());
+  }
   else if(expr.id()==ID_builtin_offsetof)
     typecheck_expr_builtin_offsetof(expr);
   else if(expr.id()==ID_string_constant)

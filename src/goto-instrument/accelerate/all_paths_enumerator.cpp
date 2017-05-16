@@ -69,8 +69,7 @@ int all_paths_enumeratort::backtrack(patht &path)
   path.pop_back();
 
   path_nodet &parent=path.back();
-  goto_programt::targetst succs;
-  goto_program.get_successors(parent.loc, succs);
+  const auto succs=goto_program.get_successors(parent.loc);
 
   unsigned int ret=0;
 
@@ -119,12 +118,9 @@ void all_paths_enumeratort::extend_path(
   int succ)
 {
   goto_programt::targett next;
-  goto_programt::targetst succs;
   exprt guard=true_exprt();
 
-  goto_program.get_successors(t, succs);
-
-  for(const auto &s : succs)
+  for(const auto &s : goto_program.get_successors(t))
   {
     if(succ==0)
     {

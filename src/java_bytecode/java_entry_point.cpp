@@ -38,7 +38,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 Function: create_initialize
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -90,7 +90,7 @@ static bool should_init_symbol(const symbolt &sym)
 
 Function: java_static_lifetime_init
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -142,8 +142,7 @@ bool java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
-          source_location,
-          message_handler);
+          source_location);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
       }
@@ -182,7 +181,7 @@ bool java_static_lifetime_init(
 
 Function: java_build_arguments
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -234,8 +233,7 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
-        function.location,
-        message_handler);
+        function.location);
 
     const symbolt &p_symbol=
       symbol_table.lookup(parameters[param_number].get_identifier());
@@ -261,7 +259,7 @@ exprt::operandst java_build_arguments(
 
 Function: java_record_outputs
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -520,10 +518,13 @@ main_function_resultt get_main_symbol(
 
 Function: java_entry_point
 
-  Inputs: symbol_table
-          main class
-          message_handler
-          allow pointers in initialization code to be null
+ Inputs:
+  symbol_table
+  main class
+  message_handler
+  assume_init_pointers_not_null - allow pointers in initialization code to be
+                                  null
+  max_nondet_array_length
 
  Outputs: true if error occurred on entry point search
 
