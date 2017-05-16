@@ -12,19 +12,19 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-LIBS = ../src/ansi-c/ansi-c$(LIBEXT) \
-       ../src/cpp/cpp$(LIBEXT) \
-       ../src/json/json$(LIBEXT) \
-       ../src/linking/linking$(LIBEXT) \
-       ../src/util/util$(LIBEXT) \
-       ../src/big-int/big-int$(LIBEXT) \
-       ../src/goto-programs/goto-programs$(LIBEXT) \
-       ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
-       ../src/langapi/langapi$(LIBEXT) \
-       ../src/assembler/assembler$(LIBEXT) \
-       ../src/analyses/analyses$(LIBEXT) \
-       ../src/solvers/solvers$(LIBEXT) \
-       # Empty last line
+LIBS += ../src/ansi-c/ansi-c$(LIBEXT) \
+        ../src/cpp/cpp$(LIBEXT) \
+        ../src/json/json$(LIBEXT) \
+        ../src/linking/linking$(LIBEXT) \
+        ../src/util/util$(LIBEXT) \
+        ../src/big-int/big-int$(LIBEXT) \
+        ../src/goto-programs/goto-programs$(LIBEXT) \
+        ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
+        ../src/langapi/langapi$(LIBEXT) \
+        ../src/assembler/assembler$(LIBEXT) \
+        ../src/analyses/analyses$(LIBEXT) \
+        ../src/solvers/solvers$(LIBEXT) \
+        # Empty last line
 
 TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
