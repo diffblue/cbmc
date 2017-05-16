@@ -1,0 +1,5 @@
+#if defined __clang__
+  #pragma clang diagnostic ignored "-Wtautological-compare"
+#elif defined __GNUC__
+#elif defined _MSC_VER
+#endif

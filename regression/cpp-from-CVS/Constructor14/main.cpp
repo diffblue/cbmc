@@ -1,6 +1,6 @@
 struct A
 {
-  A(int i):i(i){}
+  A(int i):i(i) {}
   int i;
 };
 

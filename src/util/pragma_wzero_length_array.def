@@ -1,0 +1,6 @@
+#if defined __clang__
+  #pragma clang diagnostic ignored "-Wzero-length-array"
+#elif defined __GNUC__
+  #pragma GCC diagnostic ignored "-Wpedantic" // no specific ZLA warning in GCC
+#elif defined _MSC_VER
+#endif

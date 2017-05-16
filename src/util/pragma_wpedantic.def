@@ -1,0 +1,6 @@
+#if defined __clang__
+  #pragma clang diagnostic ignored "-Wpedantic"
+#elif defined __GNUC__
+  #pragma GCC diagnostic ignored "-Wpedantic"
+#elif defined _MSC_VER
+#endif

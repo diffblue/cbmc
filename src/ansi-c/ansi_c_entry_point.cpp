@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include "ansi_c_entry_point.h"
+#include "c_nondet_symbol_factory.h"
 
 /*******************************************************************\
 
@@ -40,66 +41,31 @@ Function: build_function_environment
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
-  exprt::operandst result;
-  result.resize(parameters.size());
+  exprt::operandst main_arguments;
+  main_arguments.resize(parameters.size());
 
-  std::size_t i=0;
-
-  for(const auto &p : parameters)
+  for(std::size_t param_number=0;
+      param_number<parameters.size();
+      param_number++)
   {
-    irep_idt base_name=p.get_base_name().empty()?
-      ("argument#"+std::to_string(i)):p.get_base_name();
-    irep_idt identifier=id2string(goto_functionst::entry_point())+
-      "::"+id2string(base_name);
+    const code_typet::parametert &p=parameters[param_number];
+    const irep_idt base_name=p.get_base_name().empty()?
+      ("argument#"+std::to_string(param_number)):p.get_base_name();
 
-    {
-      auxiliary_symbolt new_symbol;
-      new_symbol.mode=ID_C;
-      new_symbol.is_static_lifetime=false;
-      new_symbol.name=identifier;
-      new_symbol.base_name=base_name;
-      new_symbol.type=p.type();
-
-      symbol_table.move(new_symbol);
-    }
-
-    symbol_exprt symbol_expr(identifier, p.type());
-
-    code_declt decl;
-    decl.symbol()=symbol_expr;
-
-    init_code.add(decl);
-
-    // nondet init for _Bool
-    if(decl.symbol().type().id()==ID_c_bool)
-    {
-      code_assignt assign(
-        decl.symbol(),
-        typecast_exprt(
-          side_effect_expr_nondett(bool_typet()),
-          decl.symbol().type()));
-
-      init_code.move_to_operands(assign);
-    }
-
-    codet input(ID_input);
-    input.operands().resize(2);
-
-    // record as an input
-    input.op0()=address_of_exprt(
-      index_exprt(string_constantt(base_name), from_integer(0, index_type())));
-    input.op1()=symbol_expr;
-    input.add_source_location()=p.source_location();
-
-    init_code.move_to_operands(input);
-
-    result[i]=symbol_expr;
-    i++;
+    main_arguments[param_number]=
+      c_nondet_symbol_factory(
+        init_code,
+        symbol_table,
+        base_name,
+        p.type(),
+        p.source_location(),
+        true);
   }
 
-  return result;
+  return main_arguments;
 }
 
 /*******************************************************************\
@@ -506,7 +472,11 @@ bool ansi_c_entry_point(
   {
     // produce nondet arguments
     call_main.arguments()=
-      build_function_environment(parameters, init_code, symbol_table);
+      build_function_environment(
+        parameters,
+        init_code,
+        symbol_table,
+        message_handler);
   }
 
   init_code.move_to_operands(call_main);

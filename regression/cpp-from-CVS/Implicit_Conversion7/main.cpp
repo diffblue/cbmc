@@ -1,5 +1,5 @@
 int main()
 {
-	int a;
-	assert(&a);
+  int a;
+  assert(&a);
 }

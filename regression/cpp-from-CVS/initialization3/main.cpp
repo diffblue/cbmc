@@ -1,12 +1,12 @@
 class A
 {
-	public:
-	int i;
-	A(){}
+  public:
+  int i;
+  A(){}
 };
 
 int main()
 {
-	A a;
-	assert(a.i==0);
+  A a;
+  assert(a.i==0);
 }

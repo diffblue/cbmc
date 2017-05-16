@@ -48,7 +48,7 @@ std::string expr2javat::convert_code_function_call(
   if(src.lhs().is_not_nil())
   {
     unsigned p;
-    std::string lhs_str=convert(src.lhs(), p);
+    std::string lhs_str=convert_with_precedence(src.lhs(), p);
 
     dest+=lhs_str;
     dest+='=';
@@ -63,14 +63,14 @@ std::string expr2javat::convert_code_function_call(
   if(has_this)
   {
     unsigned p;
-    std::string this_str=convert(src.arguments()[0], p);
+    std::string this_str=convert_with_precedence(src.arguments()[0], p);
     dest+=this_str;
     dest+=" . "; // extra spaces for readability
   }
 
   {
     unsigned p;
-    std::string function_str=convert(src.function(), p);
+    std::string function_str=convert_with_precedence(src.function(), p);
     dest+=function_str;
   }
 
@@ -88,7 +88,7 @@ std::string expr2javat::convert_code_function_call(
     else
     {
       unsigned p;
-      std::string arg_str=convert(*it, p);
+      std::string arg_str=convert_with_precedence(*it, p);
 
       if(first)
         first=false;
@@ -195,9 +195,15 @@ std::string expr2javat::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
 {
-  if(src.type().id()==ID_bool)
+  if(src.type().id()==ID_c_bool)
   {
-    // Java has built-in Boolean constants, in contrast to C
+    if(!src.is_zero())
+      return "true";
+    else
+      return "false";
+  }
+  else if(src.type().id()==ID_bool)
+  {
     if(src.is_true())
       return "true";
     else if(src.is_false())
@@ -478,11 +484,10 @@ Function: expr2javat::convert
 
 \*******************************************************************/
 
-std::string expr2javat::convert(
+std::string expr2javat::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet &type=ns.follow(src.type());
   if(src.id()=="java-this")
     return convert_java_this(src, precedence=15);
   if(src.id()==ID_java_instanceof)
@@ -494,8 +499,6 @@ std::string expr2javat::convert(
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
     return convert_function(src, "throw", precedence=16);
-  else if(src.is_constant() && to_constant_expr(src).get_value()==ID_nullptr)
-    return "nullptr";
   else if(src.id()==ID_unassigned)
     return "?";
   else if(src.id()=="pod_constructor")
@@ -510,15 +513,10 @@ std::string expr2javat::convert(
   }
   else if(src.id()==ID_java_string_literal)
     return '"'+MetaString(src.get_string(ID_value))+'"';
-  else if(src.id()==ID_constant && (type.id()==ID_bool || type.id()==ID_c_bool))
-  {
-    if(src.is_true())
-      return "true";
-    else
-      return "false";
-  }
+  else if(src.id()==ID_constant)
+    return convert_constant(to_constant_expr(src), precedence=16);
   else
-    return expr2ct::convert(src, precedence);
+    return expr2ct::convert_with_precedence(src, precedence);
 }
 
 /*******************************************************************\

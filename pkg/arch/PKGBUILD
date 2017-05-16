@@ -1,0 +1,40 @@
+# Maintainer: Vlastimil Zeman <vlastimil.zeman@diffblue.com>
+
+pkgname=cbmc
+pkgver=5.7
+pkgrel=1
+pkgdesc="Bounded Model Checker for C and C++ programs"
+arch=("x86_64")
+url="https://github.com/diffblue/cbmc"
+license=("BSD-4-Clause")
+depends=("gcc-libs>=6.3")
+makedepends=("gcc>=6.3"
+             "make>=4.2"
+             "patch>=2.7"
+             "perl-libwww>=6.24"
+             "bison>=3.0"
+             "flex>=2.6")
+source=("https://github.com/diffblue/cbmc/archive/$pkgname-$pkgver.tar.gz")
+sha256sums=("4f98cdce609532d3fc2587299ee4a6544f63aff5cf42e89d2baaa3d3562edf3e")
+
+
+build() {
+        make -C "$pkgname-$pkgname-$pkgver/src" minisat2-download
+        make -C "$pkgname-$pkgname-$pkgver/src" -j$(getconf _NPROCESSORS_ONLN)
+}
+
+
+check() {
+        make -C "$pkgname-$pkgname-$pkgver/regression" test
+}
+
+
+package() {
+        mkdir -p "$pkgdir/usr/bin/"
+        for binary in $pkgname goto-analyzer goto-cc goto-diff goto-instrument
+        do
+                cp "$pkgname-$pkgname-$pkgver/src/$binary/$binary" "$pkgdir/usr/bin/"
+                chmod 755 "$pkgdir/usr/bin/$binary"
+                chown root:root "$pkgdir/usr/bin/$binary"
+        done
+}

@@ -11,6 +11,7 @@ Author: Daniel Kroening
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
+#include <util/config.h>
 
 #include "remove_internal_symbols.h"
 
@@ -149,7 +150,8 @@ void remove_internal_symbols(
     else if(is_function)
     {
       // body? not local (i.e., "static")?
-      if(has_body && !is_file_local)
+      if(has_body &&
+         (!is_file_local || (config.main==symbol.name.c_str())))
         get_symbols_rec(ns, symbol, exported);
     }
     else

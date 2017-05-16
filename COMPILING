@@ -38,7 +38,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    yum install gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6
 
-   Note that you need g++ version 5.2 or newer.
+   Note that you need g++ version 4.9 or newer.
 
 1) As a user, get the CBMC source via
 

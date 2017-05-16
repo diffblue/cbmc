@@ -1,17 +1,17 @@
 class A
 {
-	public:
-	int i;
-	A():i(1){}
-	~A();
+  public:
+  int i;
+  A():i(1) {}
+  ~A();
 };
 
 A::~A()
 {
-	i = -1;
+  i = -1;
 }
 
 int main()
 {
-	A a;
+  A a;
 }
