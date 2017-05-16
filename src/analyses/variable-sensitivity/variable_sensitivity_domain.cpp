@@ -377,7 +377,9 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   {
     member_exprt me = to_member_expr(condition);
     exprt compound = me.compound();
-    bool changed = ai_simplify(compound, ns, true); // <-- true!
+    // Carry on the RHS since we still require an addressable object for the
+    // struct
+    bool changed = ai_simplify(compound, ns, true);
     if(changed)
     {
       me.compound() = compound;
