@@ -135,13 +135,17 @@ class FunctionFormatter(GenericFormatter):
         def param_replacement(match):
             return r'\param %s:' % match.group(1)
 
-        dedented = textwrap.dedent(function.inputs)
+        lines = function.inputs.split('\n')
+        tail = '\n'.join(lines[1:])
+
+        dedented = lines[0] + '\n' + textwrap.dedent(tail)
+
         text = re.sub(r'\n\s+', ' ', dedented, flags=re.MULTILINE)
-        text, num_replacements = re.subn(r'^([a-zA-Z0-9_]+)\s+[:-]',
+        text, num_replacements = re.subn(r'^([a-zA-Z0-9_]+)\s*[:-]',
                 param_replacement, text, flags=re.MULTILINE)
 
         if num_replacements == 0:
-            text = r'parameters: %s' % text
+            text = r'\par parameters: %s' % text
 
         text = '\n'.join(
                 self.indented_wrapper.fill(t) for t in text.split('\n'))
