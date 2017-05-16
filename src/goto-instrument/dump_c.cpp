@@ -172,13 +172,16 @@ void dump_ct::operator()(std::ostream &os)
         type_id==ID_incomplete_union ||
         type_id==ID_c_enum))
     {
-      os << "// " << symbol.name << '\n';
-      os << "// " << symbol.location << '\n';
+      if(!ignore(symbol))
+      {
+        os << "// " << symbol.name << '\n';
+        os << "// " << symbol.location << '\n';
 
-      if(type_id==ID_c_enum)
-        convert_compound_enum(symbol.type, os);
-      else
-        os << type_to_string(symbol_typet(symbol.name)) << ";\n\n";
+        if(type_id==ID_c_enum)
+          convert_compound_enum(symbol.type, os);
+        else
+          os << type_to_string(symbol_typet(symbol.name)) << ";\n\n";
+      }
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
       convert_global_variable(
@@ -748,6 +751,38 @@ void dump_ct::init_system_library_map()
   };
   ADD_TO_SYSTEM_LIBRARY(sys_wait_syms, "sys/wait.h");
 }
+
+/*******************************************************************\
+
+Function: dump_ct::ignore
+
+Inputs: type  input to check whether it should not be dumped
+
+Outputs: true, iff the type should not be printed
+
+Purpose: Ignore selected types as they are covered via system headers
+
+\*******************************************************************/
+
+bool dump_ct::ignore(const typet &type)
+{
+  symbolt symbol;
+  symbol.type=type;
+
+  return ignore(symbol);
+}
+
+/*******************************************************************\
+
+Function: dump_ct::ignore
+
+Inputs: type  input to check whether it should not be dumped
+
+Outputs: true, iff the symbol should not be printed
+
+Purpose: Ignore selected symbols as they are covered via system headers
+
+\*******************************************************************/
 
 bool dump_ct::ignore(const symbolt &symbol)
 {

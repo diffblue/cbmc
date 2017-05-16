@@ -90,6 +90,7 @@ protected:
   std::string expr_to_string(const exprt &expr);
 
   bool ignore(const symbolt &symbol);
+  bool ignore(const typet &type);
 
   static std::string indent(const unsigned n)
   {
