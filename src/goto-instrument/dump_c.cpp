@@ -38,6 +38,7 @@ void dump_ct::operator()(std::ostream &os)
   std::stringstream func_decl_stream;
   std::stringstream compound_body_stream;
   std::stringstream global_var_stream;
+  std::stringstream global_decl_stream;
   std::stringstream func_body_stream;
   local_static_declst local_static_decls;
 
@@ -175,13 +176,14 @@ void dump_ct::operator()(std::ostream &os)
     {
       if(!ignore(symbol))
       {
-        os << "// " << symbol.name << '\n';
-        os << "// " << symbol.location << '\n';
+        global_decl_stream << "// " << symbol.name << '\n';
+        global_decl_stream << "// " << symbol.location << '\n';
 
         if(type_id==ID_c_enum)
-          convert_compound_enum(symbol.type, os);
+          convert_compound_enum(symbol.type, global_decl_stream);
         else
-          os << type_to_string(symbol_typet(symbol.name)) << ";\n\n";
+          global_decl_stream << type_to_string(symbol_typet(symbol.name))
+                             << ";\n\n";
       }
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
@@ -240,6 +242,8 @@ void dump_ct::operator()(std::ostream &os)
           compound_body_stream);
   }
 
+  // Dump the code to the target stream;
+  // the statements before to this point collect the code to dump!
   for(std::set<std::string>::const_iterator
       it=system_headers.begin();
       it!=system_headers.end();
@@ -270,6 +274,9 @@ void dump_ct::operator()(std::ostream &os)
        << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))\n"
        << "#endif\n\n";
   }
+
+  if(!global_decl_stream.str().empty())
+    os << global_decl_stream.str() << '\n';
 
   dump_typedefs(os);
 
