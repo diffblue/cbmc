@@ -32,9 +32,9 @@ public:
   // Using the copy constructor would delete the file twice.
   temporary_filet(const temporary_filet &)=delete;
 
-  temporary_filet(temporary_filet &&other) :
-      name(std::move(other.name))
+  temporary_filet(temporary_filet &&other)
   {
+    name.swap(other.name);
   }
 
   // get the name
