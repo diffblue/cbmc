@@ -26,18 +26,9 @@ class expr2cppt:public expr2ct
 public:
   explicit expr2cppt(const namespacet &_ns):expr2ct(_ns) { }
 
-  std::string convert(const exprt &src) override
-  {
-    return expr2ct::convert(src);
-  }
-
-  std::string convert(const typet &src) override
-  {
-    return expr2ct::convert(src);
-  }
-
 protected:
-  std::string convert(const exprt &src, unsigned &precedence) override;
+  std::string convert_with_precedence(
+    const exprt &src, unsigned &precedence) override;
   std::string convert_cpp_this(const exprt &src, unsigned precedence);
   std::string convert_cpp_new(const exprt &src, unsigned precedence);
   std::string convert_extractbit(const exprt &src, unsigned precedence);
@@ -529,7 +520,7 @@ Function: expr2cppt::convert
 
 \*******************************************************************/
 
-std::string expr2cppt::convert(
+std::string expr2cppt::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
 {
@@ -557,7 +548,7 @@ std::string expr2cppt::convert(
   else if(src.id()=="pod_constructor")
     return "pod_constructor";
   else
-    return expr2ct::convert(src, precedence);
+    return expr2ct::convert_with_precedence(src, precedence);
 }
 
 /*******************************************************************\

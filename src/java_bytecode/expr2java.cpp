@@ -48,7 +48,7 @@ std::string expr2javat::convert_code_function_call(
   if(src.lhs().is_not_nil())
   {
     unsigned p;
-    std::string lhs_str=convert(src.lhs(), p);
+    std::string lhs_str=convert_with_precedence(src.lhs(), p);
 
     dest+=lhs_str;
     dest+='=';
@@ -63,14 +63,14 @@ std::string expr2javat::convert_code_function_call(
   if(has_this)
   {
     unsigned p;
-    std::string this_str=convert(src.arguments()[0], p);
+    std::string this_str=convert_with_precedence(src.arguments()[0], p);
     dest+=this_str;
     dest+=" . "; // extra spaces for readability
   }
 
   {
     unsigned p;
-    std::string function_str=convert(src.function(), p);
+    std::string function_str=convert_with_precedence(src.function(), p);
     dest+=function_str;
   }
 
@@ -88,7 +88,7 @@ std::string expr2javat::convert_code_function_call(
     else
     {
       unsigned p;
-      std::string arg_str=convert(*it, p);
+      std::string arg_str=convert_with_precedence(*it, p);
 
       if(first)
         first=false;
@@ -484,7 +484,7 @@ Function: expr2javat::convert
 
 \*******************************************************************/
 
-std::string expr2javat::convert(
+std::string expr2javat::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
 {
@@ -516,7 +516,7 @@ std::string expr2javat::convert(
   else if(src.id()==ID_constant)
     return convert_constant(to_constant_expr(src), precedence=16);
   else
-    return expr2ct::convert(src, precedence);
+    return expr2ct::convert_with_precedence(src, precedence);
 }
 
 /*******************************************************************\
