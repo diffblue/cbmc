@@ -1,0 +1,18 @@
+KNOWNBUG
+main.c
+--show-goto-functions --verbosity 10 --pointer-check
+^Removing function pointers and virtual functions$
+^\s*IF fp == f2 THEN GOTO [0-9]$
+^\s*IF fp == f3 THEN GOTO [0-9]$
+^\s*IF fp == f4 THEN GOTO [0-9]$
+^\s*ASSERT FALSE // invalid function pointer$
+^SIGNAL=0$
+--
+^warning: ignoring
+
+^\s*IF fp == f1 THEN GOTO [0-9]$
+^\s*IF fp == f1 THEN GOTO [0-9]$
+^\s*IF fp == f1 THEN GOTO [0-9]$
+^\s*IF fp == f1 THEN GOTO [0-9]$
+^\s*IF fp == f1 THEN GOTO [0-9]$
+^\s*IF fp == f1 THEN GOTO [0-9]$
