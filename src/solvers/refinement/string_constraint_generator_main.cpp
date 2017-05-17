@@ -500,6 +500,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_intern(expr);
   else if(id==ID_cprover_string_array_of_char_pointer_func)
     res=add_axioms_for_char_pointer(expr);
+  else if(id==ID_cprover_string_format_func)
+    res=add_axioms_for_format(expr);
   else
   {
     std::string msg(
