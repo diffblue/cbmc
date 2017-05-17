@@ -808,28 +808,7 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
   exprt size_expr=to_array_type(arr.type()).size();
   PRECONDITION(size_expr.id()==ID_constant);
   to_unsigned_integer(to_constant_expr(size_expr), n);
-  std::string str(n, '?');
-
-  std::ostringstream result;
-  std::locale loc;
-
-  for(size_t i=0; i<arr.operands().size() && i<n; i++)
-  {
-    // TODO: factorize with utf16_little_endian_to_ascii
-    unsigned c;
-    exprt arr_i=arr.operands()[i];
-    PRECONDITION(arr_i.id()==ID_constant);
-    to_unsigned_integer(to_constant_expr(arr_i), c);
-    if(c<=255 && c>=32)
-      result << (unsigned char) c;
-    else
-    {
-      result << "\\u" << std::hex << std::setw(4) << std::setfill('0')
-             << (unsigned int) c;
-    }
-  }
-
-  return result.str();
+  return generator.string_of_constant_array(arr, n);
 }
 
 /// Display part of the current model by mapping the variables created by the
