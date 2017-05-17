@@ -1,0 +1,18 @@
+KNOWNBUG
+main.c
+--show-goto-functions --verbosity 10 --pointer-check
+^Removing function pointers and virtual functions$
+^\s*f2\(\);
+--
+^warning: ignoring
+^\s*\d+:\s*f1\(\);
+^\s*\d+:\s*f3\(\);
+^\s*\d+:\s*f4\(\);
+^\s*\d+:\s*f5\(\);
+^\s*\d+:\s*f6\(\);
+^\s*\d+:\s*f7\(\);
+^\s*\d+:\s*f8\(\);
+^\s*\d+:\s*f9\(\);
+--
+Though this example program appears to lose const-ness, since it is a primitive
+it is a copy so it is irrelevant.
