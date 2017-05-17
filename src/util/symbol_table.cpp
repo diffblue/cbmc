@@ -45,23 +45,23 @@ bool symbol_tablet::add(const symbolt &symbol)
 ///   location in the symbol table
 bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
 {
-  symbolt tmp;
-
+  // Add an empty symbol to the table or retrieve existing symbol with same name
   std::pair<symbolst::iterator, bool> result=
-    symbols.insert(std::pair<irep_idt, symbolt>(symbol.name, tmp));
+    symbols.emplace(symbol.name, symbolt());
 
   if(!result.second)
   {
+    // Return the address of the symbol that already existed in the table
     new_symbol=&result.first->second;
     return true;
   }
 
-  symbol_base_map.insert(
-    std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
-  symbol_module_map.insert(
-    std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
+  symbol_base_map.emplace(symbol.base_name, symbol.name);
+  symbol_module_map.emplace(symbol.module, symbol.name);
 
+  // Move the provided symbol into the symbol table
   result.first->second.swap(symbol);
+  // Return the address of the new symbol in the table
   new_symbol=&result.first->second;
 
   return false;
