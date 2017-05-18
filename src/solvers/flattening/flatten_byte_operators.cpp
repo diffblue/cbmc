@@ -33,6 +33,51 @@ exprt flatten_byte_extract(
   const byte_extract_exprt &src,
   const namespacet &ns)
 {
+  // General notes about endianness and the bit-vector conversion:
+  // A single byte with value 0b10001000 is stored (in irept) as
+  // exactly this string literal, and its bit-vector encoding will be
+  // bvt bv={0,0,0,1,0,0,0,1}, i.e., bv[0]==0 and bv[7]==1
+  //
+  // A multi-byte value like x=256 would be:
+  // - little-endian storage: ((char*)&x)[0]==0, ((char*)&x)[1]==1
+  // - big-endian storage:    ((char*)&x)[0]==1, ((char*)&x)[1]==0
+  // - irept representation: 0000000100000000
+  // - bvt: {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
+  //         <... 8bits ...> <... 8bits ...>
+  //
+  // An array {0, 1} will be encoded as bvt bv={0,1}, i.e., bv[1]==1
+  // concatenation(0, 1) will yield a bvt bv={1,0}, i.e., bv[1]==0
+  //
+  // The semantics of byte_extract(endianness, op, offset, T) is:
+  // interpret ((char*)&op)+offset as the endianness-ordered storage
+  // of an object of type T at address ((char*)&op)+offset
+  // For some T x, byte_extract(endianness, x, 0, T) must yield x.
+  //
+  // byte_extract for a composite type T or an array will interpret
+  // the individual subtypes with suitable endianness; the overall
+  // order of components is not affected by endianness.
+  //
+  // Examples:
+  // unsigned char A[4];
+  // byte_extract_little_endian(A, 0, unsigned short) requests that
+  // A[0],A[1] be interpreted as the storage of an unsigned short with
+  // A[1] being the most-significant byte; byte_extract_big_endian for
+  // the same operands will select A[0] as the most-significant byte.
+  //
+  // int A[2] = {0x01020304,0xDEADBEEF}
+  // byte_extract_big_endian(A, 0, short) should yield 0x0102
+  // byte_extract_little_endian(A, 0, short) should yield 0x0304
+  // To obtain this we first compute byte arrays while taking into
+  // account endianness:
+  // big-endian byte representation: {01,02,03,04,DE,AB,BE,EF}
+  // little-endian byte representation: {04,03,02,01,EF,BE,AB,DE}
+  // We extract the relevant bytes starting from ((char*)A)+0:
+  // big-endian: {01,02}; little-endian: {04,03}
+  // Finally we place them in the appropriate byte order as indicated
+  // by endianness:
+  // big-endian: (short)concatenation(01,02)=0x0102
+  // little-endian: (short)concatenation(03,04)=0x0304
+
   assert(src.operands().size()==2);
 
   bool little_endian;
