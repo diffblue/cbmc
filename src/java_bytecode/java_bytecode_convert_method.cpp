@@ -1849,11 +1849,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
         lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
-      results[0]=java_bytecode_promotion(symbol_expr);
-
       // set $assertionDisabled to false
       if(field_name.find("$assertionsDisabled")!=std::string::npos)
+      {
         c=code_assignt(symbol_expr, false_exprt());
+        results[0]=java_bytecode_promotion(symbol_expr);
+      }
+      else
+      {
+        // create a new stack variable to hold the value of the field
+        const exprt tmp_var=tmp_variable(
+          "stack_static_field",
+          java_bytecode_promotion(arg0.type()));
+        c=code_assignt(tmp_var, symbol_expr);
+        results[0]=java_bytecode_promotion(tmp_var);
+      }
     }
     else if(statement=="putfield")
     {
