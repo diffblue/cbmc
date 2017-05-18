@@ -12,6 +12,7 @@
 #define CPROVER_ANALYSES_DOES_REMOVE_CONST_H
 
 #include <util/type.h>
+#include <util/namespace.h>
 
 class goto_programt;
 
@@ -29,6 +30,8 @@ private:
 
   const goto_programt &goto_program;
   const namespacet &ns;
+
+  friend class does_remove_const_testt;
 };
 
 #endif // CPROVER_ANALYSES_DOES_REMOVE_CONST_H

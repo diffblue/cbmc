@@ -1,6 +1,7 @@
 .PHONY: all cprover.dir test
 
 SRC = unit_tests.cpp \
+      analyses/does_remove_const/does_expr_lose_const.cpp \
       catch_example.cpp \
       # Empty last line
 
