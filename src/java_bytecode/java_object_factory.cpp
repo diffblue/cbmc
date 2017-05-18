@@ -356,11 +356,13 @@ void java_object_factoryt::gen_nondet_init(
   }
   else
   {
-    side_effect_expr_nondett se=side_effect_expr_nondett(type);
+    exprt rhs=type.id()==ID_c_bool?
+      get_nondet_bool(type):
+      side_effect_expr_nondett(type);
+    code_assignt assign(expr, rhs);
+    assign.add_source_location()=loc;
 
-    code_assignt code(expr, se);
-    code.add_source_location()=loc;
-    init_code.copy_to_operands(code);
+    init_code.copy_to_operands(assign);
   }
 }
 
@@ -517,36 +519,25 @@ exprt object_factory(
   size_t max_nondet_array_length,
   const source_locationt &loc)
 {
-  if(type.id()==ID_pointer)
-  {
-    symbolt &aux_symbol=new_tmp_symbol(
-      symbol_table,
-      loc,
-      type);
-    aux_symbol.is_static_lifetime=true;
+  symbolt &aux_symbol=new_tmp_symbol(
+    symbol_table,
+    loc,
+    type);
+  aux_symbol.is_static_lifetime=true;
 
-    exprt object=aux_symbol.symbol_expr();
+  exprt object=aux_symbol.symbol_expr();
 
-    java_object_factoryt state(
-      init_code,
-      !allow_null,
-      max_nondet_array_length,
-      symbol_table);
-    state.gen_nondet_init(
-      object,
-      false,
-      "",
-      loc,
-      false);
+  java_object_factoryt state(
+    init_code,
+    !allow_null,
+    max_nondet_array_length,
+    symbol_table);
+  state.gen_nondet_init(
+    object,
+    false,
+    "",
+    loc,
+    false);
 
-    return object;
-  }
-  else if(type.id()==ID_c_bool)
-  {
-    // We force this to 0 and 1 and won't consider
-    // other values.
-    return get_nondet_bool(type);
-  }
-  else
-    return side_effect_expr_nondett(type);
+  return object;
 }
