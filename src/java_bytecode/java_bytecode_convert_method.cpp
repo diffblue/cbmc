@@ -1363,15 +1363,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
 
-      c=get_array_bounds_check(deref, op[1], i_it->source_location);
+      const exprt tmp_var=tmp_variable("stack_array_elem", element_type);
+      c=code_blockt();
+      c.copy_to_operands(
+        get_array_bounds_check(deref, op[1], i_it->source_location));
+      c.copy_to_operands(
+        code_assignt(tmp_var, java_bytecode_promotion(element)));
       c.add_source_location()=i_it->source_location;
-      results[0]=java_bytecode_promotion(element);
+      results[0]=tmp_var;
     }
     else if(statement==patternt("?load"))
     {
-      // load a value from a local variable
-      results[0]=
-        variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
+      const char char_type=statement[0];
+      const typet t=java_bytecode_promotion(java_type_from_char(char_type));
+
+      // create new stack variable to hold the value of the local variable
+      const exprt tmp_var=tmp_variable("stack_var", t);
+      c=code_assignt(
+        tmp_var,
+        variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED));
+      results[0]=tmp_var;
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
