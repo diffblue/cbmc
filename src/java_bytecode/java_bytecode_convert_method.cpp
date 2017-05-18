@@ -1832,7 +1832,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=java_bytecode_promotion(to_member(op[0], arg0));
+      // create a new stack variable to hold the value of the field
+      const exprt tmp_var=
+        tmp_variable("stack_field", java_bytecode_promotion(arg0.type()));
+      c=code_assignt(tmp_var, java_bytecode_promotion(to_member(op[0], arg0)));
+      results[0]=tmp_var;
     }
     else if(statement=="getstatic")
     {
