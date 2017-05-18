@@ -39,6 +39,8 @@ public:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
+  bool shall_function_be_overriden(const irep_idt &function_id);
+
   codet replace_character_call(code_function_callt call)
   {
     return character_preprocess.replace_character_call(call);
@@ -77,6 +79,10 @@ private:
     conversion_functiont;
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
+
+  // Keeps functions on strings of which we have replaced the body, so that we
+  // only do it once.
+  std::unordered_set<irep_idt, irep_id_hash> overriden;
 
   // Table mapping each java method signature to the code generating function
   std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>
