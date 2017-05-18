@@ -1781,11 +1781,29 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
-        op=pop(2);
+      {
+        op=pop(2); // op0 is value1 op1 is value2
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_1", op[0].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_2", op[1].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[0])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+        results.push_back(tmp_var1);
+        results.push_back(tmp_var2);
+      }
       else
+      {
         op=pop(1);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results.push_back(tmp_var);
+      }
 
-      results.insert(results.end(), op.begin(), op.end());
       results.insert(results.end(), op.begin(), op.end());
     }
     else if(statement=="dup2_x1")
@@ -1793,11 +1811,34 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
+      {
         op=pop(3);
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_x1_1", op[2].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_x1_2", op[1].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[2])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+        results.push_back(tmp_var2);
+        results.push_back(tmp_var1);
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[2])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+      }
       else
+      {
         op=pop(2);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2_x1", op[1].type());
+        results.push_back(tmp_var);
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[1]));
+      }
 
-      results.insert(results.end(), op.begin()+1, op.end());
       results.insert(results.end(), op.begin(), op.end());
     }
     else if(statement=="dup2_x2")
@@ -1805,9 +1846,33 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
+      {
         op=pop(2);
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_x2_1", op[1].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_x2_2", op[0].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[1])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[0])));
+        results.push_back(tmp_var2);
+        results.push_back(tmp_var1);
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[1])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[0])));
+      }
       else
+      {
         op=pop(1);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2_x2", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results.push_back(tmp_var);
+      }
 
       assert(!stack.empty());
       exprt::operandst op2;
