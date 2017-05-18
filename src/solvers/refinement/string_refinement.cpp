@@ -287,8 +287,8 @@ void string_refinementt::concretize_string(const exprt &expr)
     {
       assert(found_length.is_long());
       assert(found_length>=0);
-      assert(found_length.to_long()<=generator.max_string_length);
       size_t concretize_limit=found_length.to_long();
+      assert(concretize_limit<=generator.max_string_length);
       exprt content_expr=str.content();
       std::vector<exprt> result;
 
