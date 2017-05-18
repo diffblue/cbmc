@@ -206,7 +206,9 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
   }
   else
   {
-    return to_string_expr(expr);
+    string_exprt string_expr=to_string_expr(expr);
+    created_strings.insert(string_expr);
+    return string_expr;
   }
 }
 
