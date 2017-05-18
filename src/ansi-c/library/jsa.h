@@ -188,6 +188,7 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_are_heaps_equal(
   const __CPROVER_jsa_abstract_heapt *const rhs)
 {
   __CPROVER_jsa__internal_index_t i;
+#if 0 < __CPROVER_JSA_MAX_ABSTRACT_NODES
   for(i=0; i < __CPROVER_JSA_MAX_ABSTRACT_NODES; ++i)
   {
     const __CPROVER_jsa_abstract_nodet lhs_node=lhs->abstract_nodes[i];
@@ -198,6 +199,8 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_are_heaps_equal(
        lhs_node.value_ref!=rhs_node.value_ref)
       return false;
   }
+#endif
+#if 0 < __CPROVER_JSA_MAX_ABSTRACT_RANGES
   for(i=0; i < __CPROVER_JSA_MAX_ABSTRACT_RANGES; ++i)
   {
     const __CPROVER_jsa_abstract_ranget lhs_range=lhs->abstract_ranges[i];
@@ -207,6 +210,7 @@ __CPROVER_jsa_inline _Bool __CPROVER_jsa__internal_are_heaps_equal(
        lhs_range.size!=rhs_range.size)
       return false;
   }
+#endif
   for(i=0; i < __CPROVER_JSA_MAX_CONCRETE_NODES; ++i)
   {
     const __CPROVER_jsa_concrete_nodet lhs_node=lhs->concrete_nodes[i];
@@ -592,6 +596,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
       __CPROVER_jsa__internal_assume_linking_correct(h, cnode, prev, nxt);
     }
   }
+#if 0 < __CPROVER_JSA_MAX_ABSTRACT_NODES
   for(__CPROVER_jsa__internal_index_t anode=0;
       anode<__CPROVER_JSA_MAX_ABSTRACT_NODES;
       ++anode)
@@ -604,6 +609,8 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
       __CPROVER_jsa__internal_get_abstract_node_id(anode);
     __CPROVER_jsa__internal_assume_linking_correct(h, nid, prev, nxt);
   }
+#endif
+#if 0 < __CPROVER_JSA_MAX_ABSTRACT_RANGES
   for(__CPROVER_jsa__internal_index_t range=0;
       range<__CPROVER_JSA_MAX_ABSTRACT_RANGES;
       ++range)
@@ -612,6 +619,7 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
     __CPROVER_jsa_assume(r.size >= 1);
     __CPROVER_jsa_assume(r.min <= r.max);
   }
+#endif
   // Iterators point to valid nodes
   __CPROVER_jsa_assume(h->iterator_count <= __CPROVER_JSA_MAX_ITERATORS);
   for(__CPROVER_jsa_iterator_id_t it=0; it < __CPROVER_JSA_MAX_ITERATORS; ++it)
@@ -653,11 +661,13 @@ __CPROVER_jsa_inline void __CPROVER_jsa_assume_valid_heap(
         ++cnodec)
       if(h->concrete_nodes[cnodec].list == listc)
         ++count;
+#if 0 < __CPROVER_JSA_MAX_ABSTRACT_NODES
     for(__CPROVER_jsa__internal_index_t anodec=0;
         anodec<__CPROVER_JSA_MAX_ABSTRACT_NODES;
         ++anodec)
       if(h->abstract_nodes[anodec].list==listc)
         ++count;
+#endif
     __CPROVER_jsa_assume(count<=__CPROVER_JSA_MAX_NODES_PER_CE_LIST);
   }
 }
