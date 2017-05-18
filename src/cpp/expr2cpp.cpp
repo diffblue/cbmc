@@ -26,16 +26,6 @@ class expr2cppt:public expr2ct
 public:
   explicit expr2cppt(const namespacet &_ns):expr2ct(_ns) { }
 
-  std::string convert(const exprt &src) override
-  {
-    return expr2ct::convert(src);
-  }
-
-  std::string convert(const typet &src) override
-  {
-    return expr2ct::convert(src);
-  }
-
 protected:
   std::string convert_with_precedence(
     const exprt &src, unsigned &precedence) override;
