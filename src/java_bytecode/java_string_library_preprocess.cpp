@@ -1781,33 +1781,100 @@ exprt java_string_library_preprocesst::code_for_function(
 {
   auto it_id=cprover_equivalent_to_java_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_function.end())
+  {
+    overriden.insert(function_id);
     return make_function_from_call(it_id->second, type, loc, symbol_table);
+  }
 
   it_id=cprover_equivalent_to_java_string_returning_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_string_returning_function.end())
+  {
+    overriden.insert(function_id);
     return make_string_returning_function_from_call(
       it_id->second, type, loc, symbol_table);
+  }
 
   it_id=cprover_equivalent_to_java_constructor.find(function_id);
   if(it_id!=cprover_equivalent_to_java_constructor.end())
+  {
+    overriden.insert(function_id);
     return make_init_function_from_call(
       it_id->second, type, loc, symbol_table);
+  }
 
   it_id=cprover_equivalent_to_java_assign_and_return_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_assign_and_return_function.end())
+  {
+    overriden.insert(function_id);
     return make_assign_and_return_function_from_call(
       it_id->second, type, loc, symbol_table);
+  }
 
   it_id=cprover_equivalent_to_java_assign_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_assign_function.end())
+  {
+    overriden.insert(function_id);
     return make_assign_function_from_call(
       it_id->second, type, loc, symbol_table);
+  }
 
   auto it=conversion_table.find(function_id);
   if(it!=conversion_table.end())
+  {
+    overriden.insert(function_id);
     return it->second(type, loc, symbol_table);
+  }
 
   return nil_exprt();
+}
+
+/*******************************************************************\
+
+Function: java_string_library_preprocesst::shall_function_be_overriden
+
+  Inputs:
+    function_id - name of the function
+
+ Outputs: True if the function has a known replacement for its body
+          or if it has already been replaced (by a call to
+          code_for_function), false otherwise.
+
+ Purpose: Check whether the current function's body is to be replaced
+          with the code created in the preprocessing.
+
+\*******************************************************************/
+
+bool java_string_library_preprocesst::shall_function_be_overriden(
+  const irep_idt &function_id)
+{
+  if(overriden.find(function_id)!=overriden.end())
+    return false;
+
+  auto it_id=cprover_equivalent_to_java_function.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_function.end())
+    return true;
+
+  it_id=cprover_equivalent_to_java_string_returning_function.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_string_returning_function.end())
+    return true;
+
+  it_id=cprover_equivalent_to_java_constructor.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_constructor.end())
+    return true;
+
+  it_id=cprover_equivalent_to_java_assign_and_return_function.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_assign_and_return_function.end())
+    return true;
+
+  it_id=cprover_equivalent_to_java_assign_function.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_assign_function.end())
+    return true;
+
+  auto it=conversion_table.find(function_id);
+  if(it!=conversion_table.end())
+    return true;
+
+  return false;
 }
 
 /*******************************************************************\

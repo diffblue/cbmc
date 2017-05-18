@@ -1530,18 +1530,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol.type=arg0.type();
         symbol.value.make_nil();
         symbol.mode=ID_java;
-
         assign_parameter_names(
           to_code_type(symbol.type),
           symbol.name,
           symbol_table);
 
-        // The string refinement module may provide a definition for this
-        // function.
+        symbol_table.add(symbol);
+      }
+
+      // Create code for functions on Strings and replace the body.
+      if(string_preprocess.shall_function_be_overriden(id))
+      {
+        symbolt &symbol=(*symbol_table.symbols.find(id)).second;
         symbol.value=string_preprocess.code_for_function(
           id, to_code_type(symbol.type), loc, symbol_table);
-
-        symbol_table.add(symbol);
       }
 
       if(is_virtual)
