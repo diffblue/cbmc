@@ -18,8 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define SHARING
 // #define HASH_CODE
-#define USE_MOVE
 // #define SUB_IS_LIST
+
+#ifdef SHARING
+#include "small_shared_ptr.h"
+#endif
 
 #ifdef SUB_IS_LIST
 #include <list>
@@ -102,85 +105,12 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
-  explicit irept(const irep_idt &_id):data(&empty_d)
+  irept()=default;
+
+  explicit irept(const irep_idt &_id)
   {
     id(_id);
   }
-
-  #ifdef SHARING
-  // constructor for blank irep
-  irept():data(&empty_d)
-  {
-  }
-
-  // copy constructor
-  irept(const irept &irep):data(irep.data)
-  {
-    if(data!=&empty_d)
-    {
-      assert(data->ref_count!=0);
-      data->ref_count++;
-      #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << std::endl;
-      #endif
-    }
-  }
-
-  #ifdef USE_MOVE
-  // Copy from rvalue reference.
-  // Note that this does avoid a branch compared to the
-  // standard copy constructor above.
-  irept(irept &&irep):data(irep.data)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "COPY MOVE\n";
-    #endif
-    irep.data=&empty_d;
-  }
-  #endif
-
-  irept &operator=(const irept &irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN\n";
-    #endif
-
-    // Ordering is very important here!
-    // Consider self-assignment, which may destroy 'irep'
-    dt *irep_data=irep.data;
-    if(irep_data!=&empty_d)
-      irep_data->ref_count++;
-
-    remove_ref(data); // this may kill 'irep'
-    data=irep_data;
-
-    return *this;
-  }
-
-  #ifdef USE_MOVE
-  // Note that the move assignment operator does avoid
-  // three branches compared to standard operator above.
-  irept &operator=(irept &&irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN MOVE\n";
-    #endif
-    // we simply swap two pointers
-    std::swap(data, irep.data);
-    return *this;
-  }
-  #endif
-
-  ~irept()
-  {
-    remove_ref(data);
-  }
-
-  #else
-  irept()
-  {
-  }
-  #endif
 
   const irep_idt &id() const
   { return read().data; }
@@ -256,106 +186,68 @@ protected:
   static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
-public:
+private:
   class dt
+  #ifdef SHARING
+    :public small_pointeet
+  #endif
   {
-  private:
-    friend class irept;
-
-    #ifdef SHARING
-    unsigned ref_count;
-    #endif
-
+  public:
     irep_idt data;
-
     named_subt named_sub;
     named_subt comments;
     subt sub;
 
     #ifdef HASH_CODE
-    mutable std::size_t hash_code;
+    mutable std::size_t hash_code=0;
     #endif
 
     void clear()
     {
       data.clear();
-      sub.clear();
       named_sub.clear();
       comments.clear();
+      sub.clear();
       #ifdef HASH_CODE
       hash_code=0;
       #endif
     }
-
-    void swap(dt &d)
-    {
-      d.data.swap(data);
-      d.sub.swap(sub);
-      d.named_sub.swap(named_sub);
-      d.comments.swap(comments);
-      #ifdef HASH_CODE
-      std::swap(d.hash_code, hash_code);
-      #endif
-    }
-
-    #ifdef SHARING
-    dt():ref_count(1)
-      #ifdef HASH_CODE
-         , hash_code(0)
-      #endif
-    {
-    }
-    #else
-    dt()
-      #ifdef HASH_CODE
-      :hash_code(0)
-      #endif
-    {
-    }
-    #endif
   };
 
-protected:
-  #ifdef SHARING
-  dt *data;
-  static dt empty_d;
-
-  static void remove_ref(dt *old_data);
-  static void nonrecursive_destructor(dt *old_data);
-  void detach();
+#ifdef SHARING
+  small_shared_ptrt<dt> data=make_small_shared_ptr<dt>();
+#else
+  dt data;
+#endif
 
 public:
   const dt &read() const
   {
+    #ifdef SHARING
+    assert(data);
     return *data;
+    #else
+    return data;
+    #endif
   }
 
+private:
   dt &write()
   {
-    detach();
+    #ifdef SHARING
+    assert(data);
+    if(data.use_count()!=1)
+    {
+      data=make_small_shared_ptr<dt>(*data);
+    }
     #ifdef HASH_CODE
     data->hash_code=0;
     #endif
     return *data;
-  }
-
-  #else
-  dt data;
-
-public:
-  const dt &read() const
-  {
+    #else
     return data;
-  }
-
-  dt &write()
-  {
-    #ifdef HASH_CODE
-    data.hash_code=0;
     #endif
-    return data;
   }
-  #endif
 };
 
 // NOLINTNEXTLINE(readability/identifiers)
