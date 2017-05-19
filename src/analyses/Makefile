@@ -24,6 +24,7 @@ SRC = ai.cpp \
       reaching_definitions.cpp \
       replace_symbol_ext.cpp \
       static_analysis.cpp \
+      uncaught_exceptions_analysis.cpp \
       uninitialized_domain.cpp \
       # Empty last line
 
