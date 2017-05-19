@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_types.h>
@@ -20,12 +19,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "flatten_byte_operators.h"
 
-/// rewrite an object into its individual bytes
-/// \par parameters: src  object to unpack
-/// little_endian  true, iff assumed endianness is little-endian
-/// max_bytes  if not nil, use as upper bound of the number of bytes to unpack
-/// ns  namespace for type lookups
-/// \return array of bytes in the sequence found in memory
+/*******************************************************************\
+
+Function: unpack_rec
+
+  Inputs:
+    src  object to unpack
+    little_endian  true, iff assumed endianness is little-endian
+    max_bytes  if not nil, use as upper bound of the number of bytes
+               to unpack
+    ns  namespace for type lookups
+
+ Outputs: array of bytes in the sequence found in memory
+
+ Purpose: rewrite an object into its individual bytes
+
+\*******************************************************************/
+
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
@@ -148,8 +158,19 @@ static exprt unpack_rec(
   return array;
 }
 
-/// rewrite byte extraction from an array to byte extraction from a
-/// concatenation of array index expressions
+/*******************************************************************\
+
+Function: flatten_byte_extract
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: rewrite byte extraction from an array to byte extraction
+          from a concatenation of array index expressions
+
+\*******************************************************************/
+
 exprt flatten_byte_extract(
   const byte_extract_exprt &src,
   const namespacet &ns)
@@ -339,6 +360,18 @@ exprt flatten_byte_extract(
     return concatenation;
   }
 }
+
+/*******************************************************************\
+
+Function: flatten_byte_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt flatten_byte_update(
   const byte_update_exprt &src,
@@ -595,12 +628,36 @@ exprt flatten_byte_update(
   }
 }
 
+/*******************************************************************\
+
+Function: flatten_byte_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt flatten_byte_update(
   const byte_update_exprt &src,
   const namespacet &ns)
 {
   return flatten_byte_update(src, ns, false);
 }
+
+/*******************************************************************\
+
+Function: has_byte_operators
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool has_byte_operator(const exprt &src)
 {
@@ -616,6 +673,18 @@ bool has_byte_operator(const exprt &src)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: flatten_byte_operators
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt flatten_byte_operators(
   const exprt &src,
