@@ -43,12 +43,11 @@ public:
   {
     return character_preprocess.replace_character_call(call);
   }
-
-  bool add_string_type_success(
-    irep_idt class_name, symbol_tablet &symbol_table);
+  void add_string_type(const irep_idt &class_name, symbol_tablet &symbol_table);
+  bool is_known_string_type(irep_idt class_name);
 
 private:
-  static bool check_java_type(const typet &type, const std::string &tag);
+  static bool java_type_matches_tag(const typet &type, const std::string &tag);
   static bool is_java_string_pointer_type(const typet &type);
   static bool is_java_string_type(const typet &type);
   static bool is_java_string_builder_type(const typet &type);
@@ -93,7 +92,7 @@ private:
 
   // Some Java initialization function initialize strings with the
   // same result as some function of the solver
-  id_mapt cprover_equivalent_to_java_initialization_function;
+  id_mapt cprover_equivalent_to_java_constructor;
 
   // Some Java functions have an equivalent in the solver except that
   // in addition they assign the result to the object on which it is called
@@ -113,7 +112,7 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
-  codet make_equals_code(
+  codet make_equals_function_code(
     const code_typet &type,
     const source_locationt &loc,
     symbol_tablet &symbol_table);
@@ -163,13 +162,13 @@ private:
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
-  exprt::operandst process_operands_for_equals(
+  exprt::operandst process_equals_function_operands(
     const exprt::operandst &operands,
     const source_locationt &loc,
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
-  string_exprt process_char_array(
+  string_exprt replace_char_array(
     const exprt &array_pointer,
     const source_locationt &loc,
     symbol_tablet &symbol_table,
@@ -265,8 +264,6 @@ private:
     const exprt &tmp_string,
     const std::string &s,
     symbol_tablet &symbol_table);
-
-  void add_string_type(const irep_idt &class_name, symbol_tablet &symbol_table);
 
   exprt string_literal(const std::string &s);
 

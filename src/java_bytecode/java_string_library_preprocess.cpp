@@ -24,7 +24,7 @@ Date:   April 2017
 
 /*******************************************************************\
 
-Function: java_string_library_preprocesst::check_java_type
+Function: java_string_library_preprocesst::java_type_matches_tag
 
   Inputs:
     type - a type
@@ -35,7 +35,7 @@ Function: java_string_library_preprocesst::check_java_type
 
 \*******************************************************************/
 
-bool java_string_library_preprocesst::check_java_type(
+bool java_string_library_preprocesst::java_type_matches_tag(
   const typet &type, const std::string &tag)
 {
   if(type.id()==ID_symbol)
@@ -86,7 +86,7 @@ Function: java_string_library_preprocesst::is_java_string_type
 bool java_string_library_preprocesst::is_java_string_type(
   const typet &type)
 {
-  return check_java_type(type, "java.lang.String");
+  return java_type_matches_tag(type, "java.lang.String");
 }
 
 /*******************************************************************\
@@ -102,7 +102,7 @@ Function: java_string_library_preprocesst::is_java_string_builder_type
 bool java_string_library_preprocesst::is_java_string_builder_type(
   const typet &type)
 {
-  return check_java_type(type, "java.lang.StringBuilder");
+  return java_type_matches_tag(type, "java.lang.StringBuilder");
 }
 
 /*******************************************************************\
@@ -141,7 +141,7 @@ Function: java_string_library_preprocesst::is_java_string_buffer_type
 bool java_string_library_preprocesst::is_java_string_buffer_type(
   const typet &type)
 {
-  return check_java_type(type, "java.lang.StringBuffer");
+  return java_type_matches_tag(type, "java.lang.StringBuffer");
 }
 
 /*******************************************************************\
@@ -180,7 +180,7 @@ Function: java_string_library_preprocesst::is_java_char_sequence_type
 bool java_string_library_preprocesst::is_java_char_sequence_type(
   const typet &type)
 {
-  return check_java_type(type, "java.lang.CharSequence");
+  return java_type_matches_tag(type, "java.lang.CharSequence");
 }
 
 /*******************************************************************\
@@ -219,7 +219,7 @@ Function: java_string_library_preprocesst::is_java_char_array_type
 bool java_string_library_preprocesst::is_java_char_array_type(
   const typet &type)
 {
-  return check_java_type(type, "array[char]");
+  return java_type_matches_tag(type, "array[char]");
 }
 
 /*******************************************************************\
@@ -318,6 +318,7 @@ void java_string_library_preprocesst::add_string_type(
   symbolt string_symbol;
   string_symbol.name="java::"+id2string(class_name);
   string_symbol.base_name=id2string(class_name);
+  string_symbol.pretty_name=id2string(class_name);
   string_symbol.type=string_type;
   string_symbol.is_type=true;
 
@@ -374,6 +375,7 @@ void java_string_library_preprocesst::declare_function(
 {
   auxiliary_symbolt func_symbol;
   func_symbol.base_name=function_name;
+  func_symbol.pretty_name=function_name;
   func_symbol.is_static_lifetime=false;
   func_symbol.mode=ID_java;
   func_symbol.name=function_name;
@@ -492,7 +494,7 @@ exprt::operandst java_string_library_preprocesst::process_operands(
     }
     else if(is_java_char_array_pointer_type(p.type()))
     {
-      ops.push_back(process_char_array(p, loc, symbol_table, init_code));
+      ops.push_back(replace_char_array(p, loc, symbol_table, init_code));
     }
     else
     {
@@ -504,7 +506,7 @@ exprt::operandst java_string_library_preprocesst::process_operands(
 
 /*******************************************************************\
 
-Function: java_string_library_preprocesst::process_operands_for_equals
+Function: java_string_library_preprocesst::process_equals_function_operands
 
   Inputs:
     operands - a list of expressions
@@ -521,7 +523,8 @@ Function: java_string_library_preprocesst::process_operands_for_equals
 
 \*******************************************************************/
 
-exprt::operandst java_string_library_preprocesst::process_operands_for_equals(
+exprt::operandst
+  java_string_library_preprocesst::process_equals_function_operands(
   const exprt::operandst &operands,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
@@ -656,13 +659,13 @@ exprt java_string_library_preprocesst::get_data(
 
 /*******************************************************************\
 
-Function: string_refine_preprocesst::process_char_array
+Function: string_refine_preprocesst::replace_char_array
 
   Inputs:
     array_pointer - an expression of type char array pointer
     loc - location in the source
     symbol_table - symbol table
-    code - code block, in which some assignements will be added
+    code - code block, in which some assignments will be added
 
   Output: a string expression
 
@@ -671,7 +674,7 @@ Function: string_refine_preprocesst::process_char_array
 
 \*******************************************************************/
 
-string_exprt java_string_library_preprocesst::process_char_array(
+string_exprt java_string_library_preprocesst::replace_char_array(
   const exprt &array_pointer,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
@@ -1234,7 +1237,7 @@ Function: java_string_library_preprocesst::make_equals_code
 
 \*******************************************************************/
 
-codet java_string_library_preprocesst::make_equals_code(
+codet java_string_library_preprocesst::make_equals_function_code(
   const code_typet &type,
   const source_locationt &loc,
   symbol_tablet &symbol_table)
@@ -1247,7 +1250,7 @@ codet java_string_library_preprocesst::make_equals_code(
     symbol_exprt sym(p.get_identifier(), p.type());
     ops.push_back(sym);
   }
-  exprt::operandst args=process_operands_for_equals(
+  exprt::operandst args=process_equals_function_operands(
     ops, loc, symbol_table, code);
   code.copy_to_operands(code_return_function_application(
     ID_cprover_string_equal_func, args, type.return_type(), symbol_table));
@@ -1714,7 +1717,7 @@ Function:
           > string = string_expr_to_string(string)
           > return string
 
-  Purpose: Povide code for a function that calls a function from the
+  Purpose: Provide code for a function that calls a function from the
            solver and return the string_expr result as a Java string.
 
 \*******************************************************************/
@@ -1785,8 +1788,8 @@ exprt java_string_library_preprocesst::code_for_function(
     return make_string_returning_function_from_call(
       it_id->second, type, loc, symbol_table);
 
-  it_id=cprover_equivalent_to_java_initialization_function.find(function_id);
-  if(it_id!=cprover_equivalent_to_java_initialization_function.end())
+  it_id=cprover_equivalent_to_java_constructor.find(function_id);
+  if(it_id!=cprover_equivalent_to_java_constructor.end())
     return make_init_function_from_call(
       it_id->second, type, loc, symbol_table);
 
@@ -1809,36 +1812,29 @@ exprt java_string_library_preprocesst::code_for_function(
 
 /*******************************************************************\
 
-Function: java_string_library_preprocesst::add_string_type_success
+Function: java_string_library_preprocesst::is_known_string_type
 
   Inputs:
     class_name - name of the class
-    symbol_table - a symbol table
 
  Outputs: True if the type is one that is known to our preprocessing,
           false otherwise
 
- Purpose: Declare a class for String types that are used in the program
+ Purpose: Check whether a class name is known as a string type.
 
 \*******************************************************************/
 
-bool java_string_library_preprocesst::add_string_type_success(
-  irep_idt class_name, symbol_tablet &symbol_table)
+bool java_string_library_preprocesst::is_known_string_type(
+  irep_idt class_name)
 {
-  if(string_types.find(class_name)!=string_types.end())
-  {
-    add_string_type(class_name, symbol_table);
-    return true;
-  }
-  else
-    return false;
+  return string_types.find(class_name)!=string_types.end();
 }
 
 /*******************************************************************\
 
 Function: java_string_library_preprocesst::initialize_conversion_table
 
- Purpose: fill maps with correspondance from java method names to
+ Purpose: fill maps with correspondence from java method names to
           conversion functions
 
 \*******************************************************************/
@@ -1854,19 +1850,19 @@ void java_string_library_preprocesst::initialize_conversion_table()
                                                "java.lang.StringBuffer"};
 
   // String library
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:(Ljava/lang/String;)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:([C)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:([CII)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:()V"]=
       ID_cprover_string_empty_string_func;
   // Not supported java.lang.String.<init>:(Ljava/lang/StringBuffer;)
@@ -1905,7 +1901,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
 
   conversion_table["java::java.lang.String.equals:(Ljava/lang/Object;)Z"]=
     std::bind(
-      &java_string_library_preprocesst::make_equals_code,
+      &java_string_library_preprocesst::make_equals_function_code,
       this,
       std::placeholders::_1,
       std::placeholders::_2,
@@ -2026,10 +2022,10 @@ void java_string_library_preprocesst::initialize_conversion_table()
   // Not supported "java.lang.String.valueOf:(LObject;)"
 
   // StringBuilder library
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuilder.<init>:()V"]=
       ID_cprover_string_empty_string_func;
 
@@ -2156,10 +2152,10 @@ void java_string_library_preprocesst::initialize_conversion_table()
   // TODO clean irep ids from insert_char_array etc...
 
   // StringBuffer library
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuffer.<init>:(Ljava/lang/String;)V"]=
       ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_initialization_function
+  cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuffer.<init>:()V"]=
       ID_cprover_string_empty_string_func;
 

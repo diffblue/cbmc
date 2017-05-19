@@ -156,9 +156,8 @@ exprt allocate_dynamic_object(
       pointer_typet(allocate_type),
       "malloc_site");
     code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
-    code_assignt &malloc_assign=assign;
-    malloc_assign.add_source_location()=loc;
-    output_code.copy_to_operands(malloc_assign);
+    assign.add_source_location()=loc;
+    output_code.copy_to_operands(assign);
     malloc_expr=malloc_sym.symbol_expr();
     if(cast_needed)
       malloc_expr=typecast_exprt(malloc_expr, target_expr.type());
