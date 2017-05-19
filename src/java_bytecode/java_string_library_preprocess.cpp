@@ -1170,6 +1170,7 @@ codet java_string_library_preprocesst::make_string_builder_append_object_code(
   symbol_tablet &symbol_table)
 {
   code_typet::parameterst params=type.parameters();
+  assert(params.size()==1);
   exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
 
   // Code to be returned
@@ -1281,6 +1282,7 @@ codet java_string_library_preprocesst::make_string_builder_append_float_code(
   symbol_tablet &symbol_table)
 {
   code_typet::parameterst params=type.parameters();
+  assert(params.size()==1);
   exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
 
   // Getting types
