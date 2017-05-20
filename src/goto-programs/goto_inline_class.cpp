@@ -608,7 +608,7 @@ void goto_inlinet::expand_function_call(
   assert(!transitive || inline_map.empty());
 
 #ifdef DEBUG
-  std::cout << "Expanding call:" << std::endl;
+  std::cout << "Expanding call:\n";
   dest.output_instruction(ns, "", std::cout, target);
 #endif
 

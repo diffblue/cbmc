@@ -34,7 +34,7 @@ void show_call_sequences(
   const goto_programt &goto_program,
   const goto_programt::const_targett start)
 {
-  std::cout << "# From " << function << std::endl;
+  std::cout << "# From " << function << '\n';
 
   std::stack<goto_programt::const_targett> stack;
   std::set<goto_programt::const_targett> seen;
@@ -57,7 +57,7 @@ void show_call_sequences(
       {
         // print pair function, function2
         std::cout << function << " -> "
-                  << to_symbol_expr(function2).get_identifier() << std::endl;
+                  << to_symbol_expr(function2).get_identifier() << '\n';
       }
       continue; // abort search
     }
@@ -88,7 +88,7 @@ void show_call_sequences(
 {
   // this is quadratic
 
-  std::cout << "# " << function << std::endl;
+  std::cout << "# " << function << '\n';
 
   show_call_sequences(
     function,
@@ -115,7 +115,7 @@ void show_call_sequences(
       next);
   }
 
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\

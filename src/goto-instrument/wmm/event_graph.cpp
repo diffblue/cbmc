@@ -39,15 +39,15 @@ void event_grapht::print_rec_graph(std::ofstream &file, event_idt node_id,
 {
   const abstract_eventt &node=operator[](node_id);
   file << node_id << "[label=\"" << node << ", " << node.source_location <<
-    "\"];" << std::endl;
+    "\"];\n";
   visited.insert(node_id);
 
   for(wmm_grapht::edgest::const_iterator
     it=po_out(node_id).begin();
     it!=po_out(node_id).end(); ++it)
   {
-    file << node_id << "->" << it->first << "[]" << std::endl;
-    file << "{rank=same; " << node_id << "; " << it->first << "}" << std::endl;
+    file << node_id << "->" << it->first << "[]\n";
+    file << "{rank=same; " << node_id << "; " << it->first << "}\n";
     if(visited.find(it->first)==visited.end())
       print_rec_graph(file, it->first, visited);
   }
@@ -56,7 +56,7 @@ void event_grapht::print_rec_graph(std::ofstream &file, event_idt node_id,
     it=com_out(node_id).begin();
     it!=com_out(node_id).end(); ++it)
   {
-    file << node_id << "->" << it->first << "[style=\"dotted\"]" << std::endl;
+    file << node_id << "->" << it->first << "[style=\"dotted\"]\n";
     if(visited.find(it->first)==visited.end())
       print_rec_graph(file, it->first, visited);
   }
@@ -81,10 +81,10 @@ void event_grapht::print_graph()
   event_idt root=po_order.front();
   std::ofstream file;
   file.open("graph.dot");
-  file << "digraph G {" << std::endl;
-  file << "rankdir=LR;" << std::endl;
+  file << "digraph G {\n";
+  file << "rankdir=LR;\n";
   print_rec_graph(file, root, visited);
-  file << "}" << std::endl;
+  file << "}\n";
 }
 
 /*******************************************************************\
@@ -103,7 +103,7 @@ Function: event_grapht::copy_segment
 void event_grapht::explore_copy_segment(std::set<event_idt> &explored,
   event_idt begin, event_idt end) const
 {
-  // std::cout << "explores " << begin << " against " << end << std::endl;
+  // std::cout << "explores " << begin << " against " << end << '\n';
   if(explored.find(begin)!=explored.end())
     return;
 
@@ -149,7 +149,7 @@ event_idt event_grapht::copy_segment(event_idt begin, event_idt end)
 
 //  for(std::set<event_idt>::const_iterator it=covered.begin();
 //      it!=covered.end(); ++it)
-//    std::cout << "covered: " << *it << std::endl;
+//    std::cout << "covered: " << *it << '\n';
 
   std::map<event_idt, event_idt> orig2copy;
 
@@ -1768,12 +1768,11 @@ void event_grapht::critical_cyclet::print_dot(
     const abstract_eventt &ev=egraph[*it];
 
     /* id of the cycle in comments */
-    str << "/* " << id << " */" << std::endl;
+    str << "/* " << id << " */\n";
 
     /* vertex */
     str << ev.id << "[label=\"\\\\lb {" << ev.id << "}" << ev.get_operation();
-    str << "{" << ev.variable << "} {} @thread" << ev.thread << "\"];";
-    str << std::endl;
+    str << "{" << ev.variable << "} {} @thread" << ev.thread << "\"];\n";
   }
 
   /* print edges */
@@ -1783,7 +1782,7 @@ void event_grapht::critical_cyclet::print_dot(
     const abstract_eventt &cur=egraph[*cur_it];
 
     /* id of the cycle in comments */
-    str << "/* " << id << " */" << std::endl;
+    str << "/* " << id << " */\n";
 
     /* edge */
     if(prev_it!=end())
@@ -1845,7 +1844,7 @@ void event_grapht::critical_cyclet::print_dot(
       else
         str << cur.id << "[label=\"?";
 
-      str << "\",color=" << print_colour(colour) << "];" <<std::endl;
+      str << "\",color=" << print_colour(colour) << "];\n";
     }
 
     prev_it=cur_it;
@@ -1855,7 +1854,7 @@ void event_grapht::critical_cyclet::print_dot(
   const abstract_eventt &last=egraph[back()];
 
   /* id of the cycle in comments */
-  str << "/* " << id << " */" << std::endl;
+  str << "/* " << id << " */\n";
 
   /* edge */
   str << last.id << "->";
@@ -1911,5 +1910,5 @@ void event_grapht::critical_cyclet::print_dot(
   else
     str << first.id << "[label=\"?";
 
-  str << "\", color=" << print_colour(colour) << "];" <<std::endl;
+  str << "\", color=" << print_colour(colour) << "];\n";
 }

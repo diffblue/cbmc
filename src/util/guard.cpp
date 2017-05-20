@@ -275,7 +275,7 @@ Function: operator <<
 std::ostream &operator << (std::ostream &out, const guardt &g)
 {
   forall_expr_list(it, g.guard_list)
-    out << "*** " << it->pretty() << std::endl;
+    out << "*** " << it->pretty() << '\n';
   return out;
 }
 

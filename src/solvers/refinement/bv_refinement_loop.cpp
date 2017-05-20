@@ -239,7 +239,7 @@ void bv_refinementt::set_to(const exprt &expr, bool value)
   if(expr.id()=="=" && expr.operands().size()==2)
     forall_operands(it, expr.op1())
       std::cout << " " << it->id() << "@" << it->type().id();
-  std::cout << std::endl;
+  std::cout << '\n';
   #else
   SUB::set_to(expr, value);
   #endif

@@ -67,7 +67,7 @@ void show_properties(
         xml_property.new_element("expression").data=
           from_expr(ns, identifier, ins.guard);
 
-        std::cout << xml_property << std::endl;
+        std::cout << xml_property << '\n';
       }
       break;
 
@@ -76,14 +76,14 @@ void show_properties(
       break;
 
     case ui_message_handlert::uit::PLAIN:
-      std::cout << "Property " << property_id << ":" << std::endl;
+      std::cout << "Property " << property_id << ":\n";
 
-      std::cout << "  " << ins.source_location << std::endl
-                << "  " << description << std::endl
+      std::cout << "  " << ins.source_location << '\n'
+                << "  " << description << '\n'
                 << "  " << from_expr(ns, identifier, ins.guard)
-                        << std::endl;
+                        << '\n';
 
-      std::cout << std::endl;
+      std::cout << '\n';
       break;
 
     default:

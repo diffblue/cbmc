@@ -16,7 +16,7 @@ Date: 2013
 #include "event_graph.h"
 
 #define OUTPUT(s, fence, file, line, id, type)  \
-  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<std::endl
+  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<'\n'
 
 /*******************************************************************\
 

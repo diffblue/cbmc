@@ -30,7 +30,7 @@ Author: Vincent Nimal
 #endif
 
 #define OUTPUT(s, fence, file, line, id, type)  \
-  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<std::endl
+  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<'\n'
 
 class simple_insertiont
 {
@@ -198,7 +198,7 @@ bool fence_volatilet::is_volatile(const typet &src) const
     return true;
 
 //  std::cout << "type: " << src << " has sub: "
-//  << src.subtypes().empty() /*src.has_subtypes()*/ <<  std::endl;
+//  << src.subtypes().empty() /*src.has_subtypes()*/ <<  '\n';
   if(src.id()==ID_symbol)
   {
     symbol_tablet::symbolst::const_iterator s_it=
@@ -222,7 +222,7 @@ bool fence_volatilet::is_volatile(const typet &src) const
       it!=src.subtypes().end();
       ++it)
     {
-      // std::cout << *it << std::endl;
+      // std::cout << *it << '\n';
       vol|=is_volatile(*it);
       if(vol)
         break;
@@ -247,7 +247,7 @@ Function:
 
 void fence_volatilet::compute()
 {
-  std::cout << "--------" << std::endl;
+  std::cout << "--------\n";
 
   forall_goto_functions(f_it, goto_functions)
   {
@@ -332,7 +332,7 @@ Function:
 
 void fence_all_sharedt::compute()
 {
-  std::cout << "--------" << std::endl;
+  std::cout << "--------\n";
 
   forall_goto_functions(f_it, goto_functions)
   {

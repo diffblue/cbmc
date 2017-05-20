@@ -59,7 +59,7 @@ void cpp_idt::print(std::ostream &out, unsigned indent) const
         it++)
       it->second.print(out, indent+2);
 
-    out << std::endl;
+    out << '\n';
   }
 }
 
@@ -78,22 +78,22 @@ Function: cpp_idt::print_fields
 void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
 {
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "**identifier=" << identifier << std::endl;
+  out << "**identifier=" << identifier << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  prefix=" << prefix << std::endl;
+  out << "  prefix=" << prefix << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  suffix=" << suffix << std::endl;
+  out << "  suffix=" << suffix << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  base_name=" << base_name << std::endl;
+  out << "  base_name=" << base_name << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  method=" << is_method << std::endl;
+  out << "  method=" << is_method << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  class_identifier=" << class_identifier << std::endl;
+  out << "  class_identifier=" << class_identifier << '\n';
 
   for(scope_listt::const_iterator
       it=secondary_scopes.begin();
@@ -101,7 +101,7 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
       it++)
   {
     for(unsigned i=0; i<indent; i++) out << ' ';
-    out << "  secondary_scope=" << (*it)->identifier << std::endl;
+    out << "  secondary_scope=" << (*it)->identifier << '\n';
   }
 
   for(scope_listt::const_iterator
@@ -110,7 +110,7 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
       it++)
   {
     for(unsigned i=0; i<indent; i++) out << ' ';
-    out << "  using_scope=" << (*it)->identifier << std::endl;
+    out << "  using_scope=" << (*it)->identifier << '\n';
   }
 
   for(unsigned i=0; i<indent; i++) out << ' ';
@@ -123,10 +123,10 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
     out << " member";
   if(is_static_member)
     out << " static_member";
-  out << std::endl;
+  out << '\n';
 
   for(unsigned i=0; i<indent; i++) out << ' ';
-  out << "  id_class=" << id_class << std::endl;
+  out << "  id_class=" << id_class << '\n';
 }
 
 /*******************************************************************\

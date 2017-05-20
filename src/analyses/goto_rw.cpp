@@ -107,22 +107,22 @@ Function: rw_range_sett::output
 
 void rw_range_sett::output(std::ostream &out) const
 {
-  out << "READ:" << std::endl;
+  out << "READ:\n";
   forall_rw_range_set_r_objects(it, *this)
   {
     out << "  " << it->first;
     it->second->output(ns, out);
-    out << std::endl;
+    out << '\n';
   }
 
-  out << std::endl;
+  out << '\n';
 
-  out << "WRITE:" << std::endl;
+  out << "WRITE:\n";
   forall_rw_range_set_w_objects(it, *this)
   {
     out << "  " << it->first;
     it->second->output(ns, out);
-    out << std::endl;
+    out << '\n';
   }
 }
 

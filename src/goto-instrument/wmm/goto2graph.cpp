@@ -1657,10 +1657,10 @@ void inline instrumentert::print_outputs_local(
     message.debug() << it->print_unsafes() << messaget::eom;
 #endif
     it->print_dot(dot, colour++, model);
-    ref << it->print_name(model, hide_internals) << std::endl;
-    output << it->print_output() << std::endl;
+    ref << it->print_name(model, hide_internals) << '\n';
+    output << it->print_output() << '\n';
     all << it->print_all(model, map_id2var, map_var2id, hide_internals)
-      << std::endl;
+      << '\n';
 
     /* emphasises instrumented events */
     for(std::list<event_idt>::const_iterator it_e=it->begin();
@@ -1682,7 +1682,7 @@ void inline instrumentert::print_outputs_local(
       {
         dot << ev.id << "[label=\"\\\\lb {" << ev.id << "}";
         dot << ev.get_operation() << "{" << ev.variable << "} {} @thread";
-        dot << ev.thread << "\",color=red,shape=box];" << std::endl;
+        dot << ev.thread << "\",color=red,shape=box];\n";
       }
     }
   }
@@ -1698,7 +1698,7 @@ void inline instrumentert::print_outputs_local(
         for(std::set<event_idt>::iterator it=same_po[i].begin();
           it!=same_po[i].end(); it++)
           dot << egraph[*it].id << ";";
-        dot << "};" << std::endl;
+        dot << "};\n";
       }
   }
 
@@ -1709,15 +1709,14 @@ void inline instrumentert::print_outputs_local(
       same_file.begin();
       it!=same_file.end(); it++)
     {
-      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{"
-          << std::endl;
-      dot << "  label=\"" << it->first << "\";" << std::endl;
+      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{\n";
+      dot << "  label=\"" << it->first << "\";\n";
       for(std::set<event_idt>::const_iterator ev_it=it->second.begin();
         ev_it!=it->second.end(); ev_it++)
       {
-        dot << "  " << egraph[*ev_it].id << ";" << std::endl;
+        dot << "  " << egraph[*ev_it].id << ";\n";
       }
-      dot << "};" << std::endl;
+      dot << "};\n";
     }
   }
 
@@ -1728,11 +1727,11 @@ void inline instrumentert::print_outputs_local(
       m_it!=map_id2var.end();
       ++m_it)
   {
-    table << std::endl << "| " << m_it->first << " : " << m_it->second;
+    table << "\n| " << m_it->first << " : " << m_it->second;
   }
-  table << std::endl;
+  table << '\n';
   table << std::string(80, '-');
-  table << std::endl;
+  table << '\n';
 }
 
 void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
@@ -1749,8 +1748,8 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
   all.open("all.txt");
   table.open("table.txt");
 
-  dot << "digraph G {" << std::endl;
-  dot << "nodesep=1; ranksep=1;" << std::endl;
+  dot << "digraph G {\n";
+  dot << "nodesep=1; ranksep=1;\n";
 
   /* prints cycles in the different outputs */
   if(!set_of_cycles.empty())
@@ -1764,21 +1763,21 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
       std::string name="scc_" + std::to_string(i) + ".dot";
       local_dot.open(name.c_str());
 
-      local_dot << "digraph G {" << std::endl;
-      local_dot << "nodesep=1; ranksep=1;" << std::endl;
+      local_dot << "digraph G {\n";
+      local_dot << "nodesep=1; ranksep=1;\n";
       print_outputs_local(set_of_cycles_per_SCC[i], local_dot, ref, output, all,
         table, model, hide_internals);
-      local_dot << "}" << std::endl;
+      local_dot << "}\n";
       local_dot.close();
 
       dot << i << "[label=\"SCC " << i << "\",link=\"" << "scc_" << i;
-      dot << ".svg\"]" << std::endl;
+      dot << ".svg\"]\n";
     }
   }
   else
     message.debug() << "no cycles to output" << messaget::eom;
 
-  dot << "}" << std::endl;
+  dot << "}\n";
 
   dot.close();
   ref.close();

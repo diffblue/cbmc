@@ -36,7 +36,7 @@ void show_value_sets(
     {
       xmlt xml;
       convert(goto_functions, value_set_analysis, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 
@@ -73,7 +73,7 @@ void show_value_sets(
     {
       xmlt xml;
       convert(goto_program, value_set_analysis, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 

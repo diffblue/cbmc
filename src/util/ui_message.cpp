@@ -282,7 +282,7 @@ void ui_message_handlert::xml_ui_msg(
   result.set_attribute("type", type);
 
   std::cout << result;
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\

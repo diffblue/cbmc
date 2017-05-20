@@ -158,7 +158,7 @@ bool acceleration_utilst::check_inductive(
   }
 
 #ifdef DEBUG
-  std::cout << "Checking following program for inductiveness:" << std::endl;
+  std::cout << "Checking following program for inductiveness:\n";
   program.output(ns, "", std::cout);
 #endif
 
@@ -168,7 +168,7 @@ bool acceleration_utilst::check_inductive(
     {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
-      std::cout << "Not inductive!" << std::endl;
+      std::cout << "Not inductive!\n";
   #endif
     return false;
     }
@@ -179,12 +179,12 @@ bool acceleration_utilst::check_inductive(
   }
   catch(std::string s)
   {
-    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
+    std::cout << "Error in inductiveness SAT check: " << s << '\n';
     return false;
   }
   catch (const  char *s)
   {
-    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
+    std::cout << "Error in inductiveness SAT check: " << s << '\n';
     return false;
   }
 }
@@ -439,7 +439,7 @@ bool acceleration_utilst::do_assumptions(
   simplify(guard, ns);
 
 #ifdef DEBUG
-  std::cout << "Checking following program for monotonicity:" << std::endl;
+  std::cout << "Checking following program for monotonicity:\n";
   program.output(ns, "", std::cout);
 #endif
 
@@ -448,7 +448,7 @@ bool acceleration_utilst::do_assumptions(
     if(program.check_sat())
     {
   #ifdef DEBUG
-      std::cout << "Path is not monotone" << std::endl;
+      std::cout << "Path is not monotone\n";
   #endif
 
       return false;
@@ -456,17 +456,17 @@ bool acceleration_utilst::do_assumptions(
   }
   catch(std::string s)
   {
-    std::cout << "Error in monotonicity SAT check: " << s << std::endl;
+    std::cout << "Error in monotonicity SAT check: " << s << '\n';
      return false;
   }
   catch(const char *s)
   {
-    std::cout << "Error in monotonicity SAT check: " << s << std::endl;
+    std::cout << "Error in monotonicity SAT check: " << s << '\n';
      return false;
   }
 
 #ifdef DEBUG
-  std::cout << "Path is monotone" << std::endl;
+  std::cout << "Path is monotone\n";
 #endif
 
   return true;
@@ -489,7 +489,7 @@ void acceleration_utilst::ensure_no_overflows(scratch_programt &program)
 
 #ifdef DEBUG
   time_t now=time(0);
-  std::cout << "Adding overflow checks at " << now << "..." << std::endl;
+  std::cout << "Adding overflow checks at " << now << "...\n";
 #endif
 
   instrumenter.add_overflow_checks();
@@ -502,7 +502,7 @@ void acceleration_utilst::ensure_no_overflows(scratch_programt &program)
 
 #ifdef DEBUG
   now=time(0);
-  std::cout << "Done at " << now << "." << std::endl;
+  std::cout << "Done at " << now << ".\n";
 #endif
 }
 
@@ -557,7 +557,7 @@ bool acceleration_utilst::do_arrays(
   scratch_programt &program)
 {
 #ifdef DEBUG
-  std::cout << "Doing arrays..." << std::endl;
+  std::cout << "Doing arrays...\n";
 #endif
 
   expr_sett arrays_written;
@@ -567,7 +567,7 @@ bool acceleration_utilst::do_arrays(
 
 #ifdef DEBUG
   std::cout << "Found " << array_assignments.size()
-            << " array assignments" << std::endl;
+            << " array assignments\n";
 #endif
 
   if(array_assignments.size()==0)
@@ -585,7 +585,7 @@ bool acceleration_utilst::do_arrays(
     // We weren't able to model some array assignment.  That means we need to
     // bail out altogether :-(
 #ifdef DEBUG
-    std::cout << "Couldn't model an array assignment :-(" << std::endl;
+    std::cout << "Couldn't model an array assignment :-(\n";
 #endif
     return false;
   }
@@ -661,8 +661,7 @@ bool acceleration_utilst::do_arrays(
            (index.coeff(loop_counter)!=1 && index.coeff(loop_counter)!=-1))
         {
 #ifdef DEBUG
-          std::cout << expr2c(index.to_expr(), ns) << " is nonlinear"
-                    << std::endl;
+          std::cout << expr2c(index.to_expr(), ns) << " is nonlinear\n";
 #endif
           nonlinear_index=true;
         }
@@ -814,7 +813,7 @@ bool acceleration_utilst::array_assignments2polys(
       // Couldn't convert the index -- bail out.
 #ifdef DEBUG
       std::cout << "Couldn't convert index: "
-                << expr2c(index_expr.index(), ns) << std::endl;
+                << expr2c(index_expr.index(), ns) << '\n';
 #endif
       return false;
     }
@@ -822,7 +821,7 @@ bool acceleration_utilst::array_assignments2polys(
 #ifdef DEBUG
     std::cout << "Converted index to: "
               << expr2c(poly_assignment.index.to_expr(), ns)
-              << std::endl;
+              << '\n';
 #endif
 
     if(it->second.id()==ID_nondet)
@@ -834,7 +833,7 @@ bool acceleration_utilst::array_assignments2polys(
       // Couldn't conver the RHS -- bail out.
 #ifdef DEBUG
       std::cout << "Couldn't convert RHS: " << expr2c(it->second, ns)
-                << std::endl;
+                << '\n';
 #endif
       return false;
     }
@@ -843,7 +842,7 @@ bool acceleration_utilst::array_assignments2polys(
 #ifdef DEBUG
       std::cout << "Converted RHS to: "
                 << expr2c(poly_assignment.value.to_expr(), ns)
-                << std::endl;
+                << '\n';
 #endif
 
       array_polynomials.push_back(poly_assignment);
@@ -868,7 +867,7 @@ bool acceleration_utilst::expr2poly(
   }
 
 #ifdef DEBUG
-  std::cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")" << std::endl;
+  std::cout << "expr2poly(" << expr2c(subbed_expr, ns) << ")\n";
 #endif
 
   try
@@ -941,7 +940,7 @@ bool acceleration_utilst::do_nonrecursive(
       {
         // Not handling pointer dereferences yet...
 #ifdef DEBUG
-        std::cout << "Bailing out on write-through-pointer" << std::endl;
+        std::cout << "Bailing out on write-through-pointer\n";
 #endif
         return false;
       }
@@ -957,7 +956,7 @@ bool acceleration_utilst::do_nonrecursive(
           // out now.
 #ifdef DEBUG
           std::cout << "Bailing out on array written to twice in loop: " <<
-            expr2c(lhs.op0(), ns) << std::endl;
+            expr2c(lhs.op0(), ns) << '\n';
 #endif
           return false;
         }
@@ -980,8 +979,7 @@ bool acceleration_utilst::do_nonrecursive(
     if(arrays_read.find(*it)!=arrays_read.end())
     {
 #ifdef DEBUG
-      std::cout << "Bailing out on array read and written on same path"
-                << std::endl;
+      std::cout << "Bailing out on array read and written on same path\n";
 #endif
       return false;
     }
@@ -998,7 +996,7 @@ bool acceleration_utilst::do_nonrecursive(
 
 #ifdef DEBUG
       std::cout << "Fitted nonrecursive: " << expr2c(*it, ns) << "=" <<
-        expr2c(val, ns) << std::endl;
+        expr2c(val, ns) << '\n';
 #endif
     }
   }
@@ -1014,7 +1012,7 @@ bool acceleration_utilst::do_nonrecursive(
     {
 #ifdef DEBUG
       std::cout << "Failed to assign a nonrecursive array: " <<
-        expr2c(lhs, ns) << "=" << expr2c(rhs, ns) << std::endl;
+        expr2c(lhs, ns) << "=" << expr2c(rhs, ns) << '\n';
 #endif
       return false;
     }
@@ -1031,14 +1029,14 @@ bool acceleration_utilst::assign_array(
 {
 #ifdef DEBUG
   std::cout << "Modelling array assignment " << expr2c(lhs, ns) << "=" <<
-    expr2c(rhs, ns) << std::endl;
+    expr2c(rhs, ns) << '\n';
 #endif
 
   if(lhs.id()==ID_dereference)
   {
     // Don't handle writes through pointers for now...
 #ifdef DEBUG
-    std::cout << "Bailing out on write-through-pointer" << std::endl;
+    std::cout << "Bailing out on write-through-pointer\n";
 #endif
     return false;
   }
@@ -1088,7 +1086,7 @@ bool acceleration_utilst::assign_array(
   // Now let's ensure that the array did not change at the indices we
   // didn't touch.
 #ifdef DEBUG
-  std::cout << "Trying to polynomialize " << expr2c(idx, ns) << std::endl;
+  std::cout << "Trying to polynomialize " << expr2c(idx, ns) << '\n';
 #endif
 
   polynomialt poly;
@@ -1108,7 +1106,7 @@ bool acceleration_utilst::assign_array(
   {
     // idx is probably nonlinear... bail out.
 #ifdef DEBUG
-    std::cout << "Failed to polynomialize" << std::endl;
+    std::cout << "Failed to polynomialize\n";
 #endif
     return false;
   }
@@ -1123,7 +1121,7 @@ bool acceleration_utilst::assign_array(
     // alternation, and that's too expensive.  Bail out.
 #ifdef DEBUG
     std::cout << "Bailing out on nonlinear index: "
-              << expr2c(idx, ns) << std::endl;
+              << expr2c(idx, ns) << '\n';
 #endif
     return false;
   }
@@ -1153,7 +1151,7 @@ bool acceleration_utilst::assign_array(
     // happen to much so just bail out.
 #ifdef DEBUG
     std::cout << "Bailing out on write to constant array index: " <<
-      expr2c(idx, ns) << std::endl;
+      expr2c(idx, ns) << '\n';
 #endif
     return false;
   }

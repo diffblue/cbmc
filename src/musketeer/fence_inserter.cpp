@@ -931,7 +931,7 @@ void fence_insertert::print_to_file()
 
     s << to_string(it->second) << "|" << first.source_location.get_file()
       << "|" << first.source_location.get_line() << "|"
-      << first.source_location.get_column() << std::endl;
+      << first.source_location.get_column() << '\n';
     non_redundant_display.insert(s.str());
   }
 
@@ -972,7 +972,7 @@ void fence_insertert::print_to_file_2()
     s << to_string(it->second) << "|" << first.source_location.get_file()
     << "|" << first.source_location.get_line() << "|"
     << second.source_location.get_file()
-    << "|" << second.source_location.get_line() << std::endl;
+    << "|" << second.source_location.get_line() << '\n';
     non_redundant_display.insert(s.str());
   }
 
@@ -1018,7 +1018,7 @@ void fence_insertert::print_to_file_3()
       << second.source_location.get_file() << "|"
       << second.source_location.get_function() << "|"
       << second.source_location.get_line()
-      << "|" << second.variable << std::endl;
+      << "|" << second.variable << '\n';
     non_redundant_display.insert(s.str());
     }
     catch(std::string s)
@@ -1074,7 +1074,7 @@ void fence_insertert::print_to_file_4()
         << second.source_location.get_function() << "|"
         << second.source_location.get_line()
         << "|" << second.variable << "|"
-        << get_type(second.variable).get("#c_type") << std::endl;
+        << get_type(second.variable).get("#c_type") << '\n';
       non_redundant_display.insert(s.str());
     }
     catch (std::string s)

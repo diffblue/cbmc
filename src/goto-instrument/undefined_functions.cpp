@@ -34,7 +34,7 @@ void list_undefined_functions(
   forall_goto_functions(it, goto_functions)
     if(!ns.lookup(it->first).is_macro &&
        !it->second.body_available())
-      os << it->first << std::endl;
+      os << it->first << '\n';
 }
 
 /*******************************************************************\

@@ -188,8 +188,8 @@ void dump_ct::operator()(std::ostream &os)
         type_id==ID_incomplete_union ||
         type_id==ID_c_enum))
     {
-      os << "// " << symbol.name << std::endl;
-      os << "// " << symbol.location << std::endl;
+      os << "// " << symbol.name << '\n';
+      os << "// " << symbol.location << '\n';
 
       if(type_id==ID_c_enum)
         convert_compound_enum(symbol.type, os);
@@ -255,42 +255,39 @@ void dump_ct::operator()(std::ostream &os)
       it=system_headers.begin();
       it!=system_headers.end();
       ++it)
-    os << "#include <" << *it << ">" << std::endl;
+    os << "#include <" << *it << ">\n";
   if(!system_headers.empty())
-    os << std::endl;
+    os << '\n';
 
   if(global_var_stream.str().find("NULL")!=std::string::npos ||
      func_body_stream.str().find("NULL")!=std::string::npos)
   {
-    os << "#ifndef NULL" << std::endl
-       << "#define NULL ((void*)0)" << std::endl
-       << "#endif" << std::endl;
-    os << std::endl;
+    os << "#ifndef NULL\n"
+       << "#define NULL ((void*)0)\n"
+       << "#endif\n\n";
   }
   if(func_body_stream.str().find("FENCE")!=std::string::npos)
   {
-    os << "#ifndef FENCE" << std::endl
-       << "#define FENCE(x) ((void)0)" << std::endl
-       << "#endif" << std::endl;
-    os << std::endl;
+    os << "#ifndef FENCE\n"
+       << "#define FENCE(x) ((void)0)\n"
+       << "#endif\n\n";
   }
   if(func_body_stream.str().find("IEEE_FLOAT_")!=std::string::npos)
   {
-    os << "#ifndef IEEE_FLOAT_EQUAL" << std::endl
-       << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))" << std::endl
-       << "#endif" << std::endl;
-    os << "#ifndef IEEE_FLOAT_NOTEQUAL" << std::endl
-       << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))" << std::endl
-       << "#endif" << std::endl;
-    os << std::endl;
+    os << "#ifndef IEEE_FLOAT_EQUAL\n"
+       << "#define IEEE_FLOAT_EQUAL(x,y) ((x)==(y))\n"
+       << "#endif\n"
+       << "#ifndef IEEE_FLOAT_NOTEQUAL\n"
+       << "#define IEEE_FLOAT_NOTEQUAL(x,y) ((x)!=(y))\n"
+       << "#endif\n\n";
   }
 
   if(!func_decl_stream.str().empty())
-    os << func_decl_stream.str() << std::endl;
+    os << func_decl_stream.str() << '\n';
   if(!compound_body_stream.str().empty())
-    os << compound_body_stream.str() << std::endl;
+    os << compound_body_stream.str() << '\n';
   if(!global_var_stream.str().empty())
-    os << global_var_stream.str() << std::endl;
+    os << global_var_stream.str() << '\n';
   os << func_body_stream.str();
 }
 
@@ -471,7 +468,7 @@ void dump_ct::convert_compound(
 
     irep_idt comp_name=comp.get_name();
 
-    struct_body << indent(1) << "// " << comp_name << std::endl;
+    struct_body << indent(1) << "// " << comp_name << '\n';
     struct_body << indent(1);
 
     // component names such as "main" would collide with other objects in the
@@ -518,7 +515,7 @@ void dump_ct::convert_compound(
     else
       assert(false);
 
-    struct_body << ";" << std::endl;
+    struct_body << ";\n";
   }
 
   os << type_to_string(unresolved);
@@ -527,8 +524,8 @@ void dump_ct::convert_compound(
     assert(language->id()=="cpp");
     os << ": " << base_decls.str();
   }
-  os << std::endl;
-  os << "{" << std::endl;
+  os << '\n';
+  os << "{\n";
   os << struct_body.str();
 
   /*
@@ -548,9 +545,7 @@ void dump_ct::convert_compound(
     os << " __attribute__ ((__transparent_union__))";
   if(type.get_bool(ID_C_packed))
     os << " __attribute__ ((__packed__))";
-  os << ";";
-  os << std::endl;
-  os << std::endl;
+  os << ";\n";
 }
 
 /*******************************************************************\
@@ -946,9 +941,9 @@ void dump_ct::convert_global_variable(
   if((func.empty() || symbol.is_extern) &&
      (symbol.value.is_nil() || !syms.empty()))
   {
-    os << "// " << symbol.name << std::endl;
-    os << "// " << symbol.location << std::endl;
-    os << expr_to_string(d) << std::endl;
+    os << "// " << symbol.name << '\n';
+    os << "// " << symbol.location << '\n';
+    os << expr_to_string(d) << '\n';
   }
 
   if(!symbol.value.is_nil())
@@ -978,13 +973,13 @@ void dump_ct::convert_global_variable(
     local_static_decls[symbol.name]=d;
   else if(!symbol.value.is_nil())
   {
-    os << "// " << symbol.name << std::endl;
-    os << "// " << symbol.location << std::endl;
+    os << "// " << symbol.name << '\n';
+    os << "// " << symbol.location << '\n';
 
     std::list<irep_idt> empty_static, empty_types;
     cleanup_decl(d, empty_static, empty_types);
     assert(empty_static.empty());
-    os << expr_to_string(d) << std::endl;
+    os << expr_to_string(d) << '\n';
   }
 }
 
@@ -1050,11 +1045,11 @@ void dump_ct::convert_function_declaration(
     converted_enum.swap(converted_e_bak);
     converted_compound.swap(converted_c_bak);
 
-    os_body << "// " << symbol.name << std::endl;
-    os_body << "// " << symbol.location << std::endl;
-    os_body << make_decl(symbol.name, symbol.type) << std::endl;
+    os_body << "// " << symbol.name << '\n';
+    os_body << "// " << symbol.location << '\n';
+    os_body << make_decl(symbol.name, symbol.type) << '\n';
     os_body << expr_to_string(b);
-    os_body << std::endl << std::endl;
+    os_body << "\n\n";
 
     declared_enum_constants.swap(enum_constants_bak);
   }
@@ -1062,9 +1057,9 @@ void dump_ct::convert_function_declaration(
   if(symbol.name!=goto_functionst::entry_point() &&
      symbol.name!=ID_main)
   {
-    os_decl << "// " << symbol.name << std::endl;
-    os_decl << "// " << symbol.location << std::endl;
-    os_decl << make_decl(symbol.name, symbol.type) << ";" << std::endl;
+    os_decl << "// " << symbol.name << '\n';
+    os_decl << "// " << symbol.location << '\n';
+    os_decl << make_decl(symbol.name, symbol.type) << ";\n";
   }
 }
 

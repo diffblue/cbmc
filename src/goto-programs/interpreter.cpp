@@ -72,20 +72,18 @@ Function: interpretert::show_state
 
 void interpretert::show_state()
 {
-  std::cout << std::endl;
-  std::cout << "----------------------------------------------------"
-            << std::endl;
+  std::cout << "\n----------------------------------------------------\n";
 
   if(PC==function->second.body.instructions.end())
   {
     std::cout << "End of function `"
-              << function->first << "'" << std::endl;
+              << function->first << "'\n";
   }
   else
     function->second.body.output_instruction(
       ns, function->first, std::cout, PC);
 
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\
@@ -318,7 +316,7 @@ void interpretert::execute_assign()
     if(size!=rhs.size())
       std::cout << "!! failed to obtain rhs ("
                 << rhs.size() << " vs. "
-                << size << ")" << std::endl;
+                << size << ")\n";
     else
       assign(address, rhs);
   }
@@ -346,7 +344,7 @@ void interpretert::assign(
     {
       memory_cellt &cell=memory[integer2unsigned(address)];
       std::cout << "** assigning " << cell.identifier
-                << "[" << cell.offset << "]:=" << rhs[i] << std::endl;
+                << "[" << cell.offset << "]:=" << rhs[i] << '\n';
       cell.value=rhs[i];
     }
   }

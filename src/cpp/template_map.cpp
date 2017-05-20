@@ -202,12 +202,12 @@ void template_mapt::print(std::ostream &out) const
   for(type_mapt::const_iterator it=type_map.begin();
       it!=type_map.end();
       it++)
-    out << it->first << " = " << it->second.pretty() << std::endl;
+    out << it->first << " = " << it->second.pretty() << '\n';
 
   for(expr_mapt::const_iterator it=expr_map.begin();
       it!=expr_map.end();
       it++)
-    out << it->first << " = " << it->second.pretty() << std::endl;
+    out << it->first << " = " << it->second.pretty() << '\n';
 }
 
 /*******************************************************************\

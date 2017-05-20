@@ -86,8 +86,8 @@ Function: dplib_dect::dec_solve
 
 decision_proceduret::resultt dplib_dect::dec_solve()
 {
-  dplib_prop.out << "QUERY FALSE;" << std::endl;
-  dplib_prop.out << "COUNTERMODEL;" << std::endl;
+  dplib_prop.out << "QUERY FALSE;\n";
+  dplib_prop.out << "COUNTERMODEL;\n";
 
   post_process();
 
@@ -151,8 +151,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     std::string value=std::string(line, pos, pos2-pos);
 
     #if 0
-    std::cout << ">" << identifier << "< = >" << value << "<";
-    std::cout << std::endl;
+    std::cout << ">" << identifier << "< = >" << value << "<\n";
     #endif
   }
   else

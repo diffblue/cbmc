@@ -37,6 +37,6 @@ int main()
         std::cout << ch;
     }
 
-    std::cout << "\\n\"" << std::endl;
+    std::cout << "\\n\"\n";
   }
 }

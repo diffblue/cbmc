@@ -129,7 +129,7 @@ bool cpp_typecheck_fargst::match(
     #if 0
     // unclear, todo
     if(is_reference(operand.type()))
-      std::cout << "O: " << operand.pretty() << std::endl;
+      std::cout << "O: " << operand.pretty() << '\n';
 
     assert(!is_reference(operand.type()));
     #endif
@@ -148,7 +148,7 @@ bool cpp_typecheck_fargst::match(
     #if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
               << " -> " << cpp_typecheck.to_string(parameter.type())
-              << std::endl;
+              << '\n';
     #endif
 
     // can we do the standard conversion sequence?
@@ -158,13 +158,13 @@ bool cpp_typecheck_fargst::match(
       // ok
       distance+=rank;
       #if 0
-      std::cout << "OK " << rank << std::endl;
+      std::cout << "OK " << rank << '\n';
       #endif
     }
     else
     {
       #if 0
-      std::cout << "NOT OK" << std::endl;
+      std::cout << "NOT OK\n";
       #endif
       return false; // no conversion possible
     }

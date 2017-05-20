@@ -93,7 +93,7 @@ void constant_propagator_domaint::assign_rec(
 
 #ifdef DEBUG
   std::cout << "assign: " << from_expr(ns, "", lhs)
-            << " := " << from_type(ns, "", rhs_type) << std::endl;
+            << " := " << from_type(ns, "", rhs_type) << '\n';
 #endif
 
   if(lhs.id()==ID_symbol && rhs.id()==ID_if)

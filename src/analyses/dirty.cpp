@@ -115,5 +115,5 @@ Function: dirtyt::output
 void dirtyt::output(std::ostream &out) const
 {
   for(const auto &d : dirty)
-    out << d << std::endl;
+    out << d << '\n';
 }

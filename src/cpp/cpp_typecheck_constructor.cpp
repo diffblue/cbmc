@@ -553,7 +553,7 @@ void cpp_typecheckt::default_assignop_value(
       if(size_expr.id()==ID_infinity)
       {
         // error().source_location=object);
-        // err << "cannot copy array of infinite size" << std::endl;
+        // err << "cannot copy array of infinite size\n";
         // throw 0;
         continue;
       }

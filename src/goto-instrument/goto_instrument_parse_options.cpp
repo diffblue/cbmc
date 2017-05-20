@@ -133,7 +133,7 @@ int goto_instrument_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -244,7 +244,7 @@ int goto_instrument_parse_optionst::doit()
           }
           else
           {
-            std::cout << result << std::endl;
+            std::cout << result << '\n';
           }
         }
       }
@@ -258,10 +258,9 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        std::cout << "////" << std::endl;
-        std::cout << "//// Function: " << f_it->first << std::endl;
-        std::cout << "////" << std::endl;
-        std::cout << std::endl;
+        std::cout << "////\n";
+        std::cout << "//// Function: " << f_it->first << '\n';
+        std::cout << "////\n\n";
 
         const goto_programt &goto_program=f_it->second.body;
 
@@ -269,8 +268,7 @@ int goto_instrument_parse_optionst::doit()
         {
           goto_program.output_instruction(ns, "", std::cout, i_it);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
-                    << std::endl;
-          std::cout << std::endl;
+                    << "\n\n";
         }
       }
     }
@@ -324,11 +322,11 @@ int goto_instrument_parse_optionst::doit()
       forall_goto_functions(it, goto_functions)
       {
         local_bitvector_analysist local_bitvector_analysis(it->second);
-        std::cout << ">>>>" << std::endl;
-        std::cout << ">>>> " << it->first << std::endl;
-        std::cout << ">>>>" << std::endl;
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
         local_bitvector_analysis.output(std::cout, it->second, ns);
-        std::cout << std::endl;
+        std::cout << '\n';
       }
 
       return 0;
@@ -512,10 +510,9 @@ int goto_instrument_parse_optionst::doit()
       {
         if(f_it->second.body_available())
         {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
+          std::cout << "////\n";
+          std::cout << "//// Function: " << f_it->first << '\n';
+          std::cout << "////\n\n";
           rd_analysis.output(ns, f_it->second.body, std::cout);
         }
       }
@@ -535,10 +532,9 @@ int goto_instrument_parse_optionst::doit()
       {
         if(f_it->second.body_available())
         {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
+          std::cout << "////\n";
+          std::cout << "//// Function: " << f_it->first << '\n';
+          std::cout << "////\n\n";
           dependence_graph.output(ns, f_it->second.body, std::cout);
         }
       }
@@ -1167,7 +1163,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       }
       else
       {
-        std::cout << result << std::endl;
+        std::cout << result << '\n';
       }
     }
 

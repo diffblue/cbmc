@@ -131,11 +131,11 @@ void cpp_scopet::lookup(
   // are looking for templates!
 
   #if 0
-  std::cout << "B: " << base_name <<  std::endl;
-  std::cout << "K: " << kind << std::endl;
-  std::cout << "I: " << id_class << std::endl;
+  std::cout << "B: " << base_name << '\n';
+  std::cout << "K: " << kind << '\n';
+  std::cout << "I: " << id_class << '\n';
   std::cout << "THIS: " << this->base_name << " " << this->id_class
-            << " " << this->identifier << std::endl;
+            << " " << this->identifier << '\n';
   #endif
 
   cpp_id_mapt::iterator
