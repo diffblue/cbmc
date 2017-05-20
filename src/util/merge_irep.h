@@ -20,16 +20,19 @@ public:
   {
     // We assume that both are in the same container,
     // which isn't checked.
-    return data==other.data;
+    return &read()==&other.read();
   }
 
   bool operator<(const merged_irept &other) const
   {
     // again, assumes that both are in the same container
-    return ((std::size_t)data)<((std::size_t)other.data);
+    return &read()<&other.read();
   }
 
-  std::size_t hash() const { return (std::size_t)data; }
+  std::size_t hash() const
+  {
+    return reinterpret_cast<std::size_t>(&read());
+  }
 
   // copy constructor: will only copy from other merged_irepts
   merged_irept(const merged_irept &_src):irept(_src)
