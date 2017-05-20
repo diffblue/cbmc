@@ -540,19 +540,6 @@ int cbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  // may replace --show-properties
-  if(cmdline.isset("show-reachable-properties"))
-  {
-    const namespacet ns(symbol_table);
-
-    // Entry point will have been set before and function pointers removed
-    status() << "Removing Unused Functions" << eom;
-    remove_unused_functions(goto_functions, ui_message_handler);
-
-    show_properties(ns, get_ui(), goto_functions);
-    return 0; // should contemplate EX_OK from sysexits.h
-  }
-
   if(set_properties(goto_functions))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
@@ -879,8 +866,6 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_asm(symbol_table, goto_functions);
 
     // add the library
-    status() << "Adding CPROVER library ("
-             << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     if(cmdline.isset("string-abstraction"))
@@ -890,6 +875,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
+      get_message_handler(),
       symbol_table,
       goto_functions,
       cmdline.isset("pointer-check"));
@@ -899,13 +885,6 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_exceptions(symbol_table, goto_functions);
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
-
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
-    }
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
@@ -920,6 +899,14 @@ bool cbmc_parse_optionst::process_goto_program(
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      full_slicer(goto_functions, ns);
+    }
+
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_functions, ns);
 
@@ -951,50 +938,22 @@ bool cbmc_parse_optionst::process_goto_program(
     // add loop ids
     goto_functions.compute_loop_numbers();
 
-    // instrument cover goals
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      // Entry point will have been set before and function pointers removed
+      status() << "Removing unused functions" << eom;
+      remove_unused_functions(goto_functions, ui_message_handler);
+    }
 
+    // instrument cover goals
     if(cmdline.isset("cover"))
     {
-      std::list<std::string> criteria_strings=
-        cmdline.get_values("cover");
-
-      std::set<coverage_criteriont> criteria;
-
-      for(const auto &criterion_string : criteria_strings)
-      {
-        coverage_criteriont c;
-
-        if(criterion_string=="assertion" || criterion_string=="assertions")
-          c=coverage_criteriont::ASSERTION;
-        else if(criterion_string=="path" || criterion_string=="paths")
-          c=coverage_criteriont::PATH;
-        else if(criterion_string=="branch" || criterion_string=="branches")
-          c=coverage_criteriont::BRANCH;
-        else if(criterion_string=="location" || criterion_string=="locations")
-          c=coverage_criteriont::LOCATION;
-        else if(criterion_string=="decision" || criterion_string=="decisions")
-          c=coverage_criteriont::DECISION;
-        else if(criterion_string=="condition" || criterion_string=="conditions")
-          c=coverage_criteriont::CONDITION;
-        else if(criterion_string=="mcdc")
-          c=coverage_criteriont::MCDC;
-        else if(criterion_string=="cover")
-          c=coverage_criteriont::COVER;
-        else
-        {
-          error() << "unknown coverage criterion" << eom;
-          return true;
-        }
-
-        criteria.insert(c);
-      }
-
-      status() << "Instrumenting coverage goals" << eom;
-
-      for(const auto &criterion : criteria)
-        instrument_cover_goals(symbol_table, goto_functions, criterion);
-
-      goto_functions.update();
+      if(instrument_cover_goals(
+           cmdline,
+           symbol_table,
+           goto_functions,
+           get_message_handler()))
+        return true;
     }
 
     // remove skips
@@ -1046,17 +1005,28 @@ int cbmc_parse_optionst::do_bmc(
 {
   bmc.set_ui(get_ui());
 
+  int result=6;
+
   // do actual BMC
-  bool result=(bmc.run(goto_functions)==safety_checkert::SAFE);
+  switch(bmc.run(goto_functions))
+  {
+    case safety_checkert::resultt::SAFE:
+      result=0;
+      break;
+    case safety_checkert::resultt::UNSAFE:
+      result=10;
+      break;
+    case safety_checkert::resultt::ERROR:
+      result=6;
+      break;
+  }
 
   // let's log some more statistics
   debug() << "Memory consumption:" << messaget::endl;
   memory_info(debug());
   debug() << eom;
 
-  // We return '0' if the property holds,
-  // and '10' if it is violated.
-  return result?0:10;
+  return result;
 }
 
 /*******************************************************************\
@@ -1143,6 +1113,7 @@ void cbmc_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
@@ -1158,6 +1129,7 @@ void cbmc_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"
@@ -1198,5 +1170,6 @@ void cbmc_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
+    " --verbosity #                verbosity level\n"
     "\n";
 }

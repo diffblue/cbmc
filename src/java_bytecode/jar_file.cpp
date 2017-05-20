@@ -6,14 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <cstring>
 #include <cassert>
-#include <sstream>
+#include <unordered_set>
+
+#include <json/json_parser.h>
+#include <util/suffix.h>
 
 #include "jar_file.h"
-
-#ifdef HAVE_LIBZIP
-#include <zip.h>
-#endif
 
 /*******************************************************************\
 
@@ -27,35 +27,45 @@ Function: jar_filet::open
 
 \*******************************************************************/
 
-void jar_filet::open(const std::string &filename)
+void jar_filet::open(
+  java_class_loader_limitt &class_loader_limit,
+  const std::string &filename)
 {
-  #ifdef HAVE_LIBZIP
-  if(zip!=nullptr)
-    // NOLINTNEXTLINE(readability/identifiers)
-    zip_close(static_cast<struct zip *>(zip));
+  if(!mz_ok)
+  {
+    memset(&zip, 0, sizeof(zip));
+    mz_bool mz_open=mz_zip_reader_init_file(&zip, filename.c_str(), 0);
+    mz_ok=mz_open==MZ_TRUE;
+  }
 
-  int zip_error;
-  zip=zip_open(filename.c_str(), 0, &zip_error);
-
-  if(zip!=nullptr)
+  if(mz_ok)
   {
     std::size_t number_of_files=
-      // NOLINTNEXTLINE(readability/identifiers)
-      zip_get_num_entries(static_cast<struct zip *>(zip), 0);
-
-    index.reserve(number_of_files);
+      mz_zip_reader_get_num_files(&zip);
 
     for(std::size_t i=0; i<number_of_files; i++)
     {
-      std::string file_name=
-        // NOLINTNEXTLINE(readability/identifiers)
-        zip_get_name(static_cast<struct zip *>(zip), i, 0);
-      index.push_back(file_name);
+      mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
+      char *filename_char=new char[filename_length+1];
+      mz_uint filename_len=
+        mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
+      assert(filename_length==filename_len);
+      std::string file_name(filename_char);
+
+      // non-class files are loaded in any case
+      bool add_file=!has_suffix(file_name, ".class");
+      // load .class file only if they match regex / are in match set
+      add_file|=class_loader_limit.load_class_file(file_name);
+      if(add_file)
+      {
+        if(has_suffix(file_name, ".class"))
+          status() << "read class file " << file_name
+                   << " from " << filename << eom;
+        filtered_jar[file_name]=i;
+      }
+      delete[] filename_char;
     }
   }
-  #else
-  zip=nullptr;
-  #endif
 }
 
 /*******************************************************************\
@@ -72,11 +82,11 @@ Function: jar_filet::~jar_filet
 
 jar_filet::~jar_filet()
 {
-  #ifdef HAVE_LIBZIP
-  if(zip!=nullptr)
-    // NOLINTNEXTLINE(readability/identifiers)
-    zip_close(static_cast<struct zip *>(zip));
-  #endif
+  if(mz_ok)
+  {
+    mz_zip_reader_end(&zip);
+    mz_ok=false;
+  }
 }
 
 /*******************************************************************\
@@ -91,47 +101,31 @@ Function: jar_filet::get_entry
 
 \*******************************************************************/
 
-#define ZIP_READ_SIZE 10000
-
-std::string jar_filet::get_entry(std::size_t i)
+std::string jar_filet::get_entry(const irep_idt &name)
 {
-  if(zip==nullptr)
+  if(!mz_ok)
     return std::string("");
-
-  assert(i<index.size());
 
   std::string dest;
 
-  #ifdef HAVE_LIBZIP
-  void *zip_e=zip; // zip is both a type and a non-type
-  // NOLINTNEXTLINE(readability/identifiers)
-  struct zip *zip_p=static_cast<struct zip*>(zip_e);
+  auto entry=filtered_jar.find(name);
+  assert(entry!=filtered_jar.end());
 
-  // NOLINTNEXTLINE(readability/identifiers)
-  struct zip_file *zip_file=zip_fopen_index(zip_p, i, 0);
-
-  if(zip_file==NULL)
-  {
-    zip_close(zip_p);
-    zip=nullptr;
-    return std::string(""); // error
-  }
-
+  size_t real_index=entry->second;
+  mz_zip_archive_file_stat file_stat;
+  memset(&file_stat, 0, sizeof(file_stat));
+  mz_bool stat_ok=mz_zip_reader_file_stat(&zip, real_index, &file_stat);
+  if(stat_ok!=MZ_TRUE)
+    return std::string();
   std::vector<char> buffer;
-  buffer.resize(ZIP_READ_SIZE);
+  size_t bufsize=file_stat.m_uncomp_size;
+  buffer.resize(bufsize);
+  mz_bool read_ok=
+    mz_zip_reader_extract_to_mem(&zip, real_index, buffer.data(), bufsize, 0);
+  if(read_ok!=MZ_TRUE)
+    return std::string();
 
-  while(true)
-  {
-    int bytes_read=
-      zip_fread(zip_file, buffer.data(), ZIP_READ_SIZE);
-    assert(bytes_read<=ZIP_READ_SIZE);
-    if(bytes_read<=0)
-      break;
-    dest.insert(dest.end(), buffer.begin(), buffer.begin()+bytes_read);
-  }
-
-  zip_fclose(zip_file);
-  #endif
+  dest.insert(dest.end(), buffer.begin(), buffer.end());
 
   return dest;
 }
@@ -150,24 +144,11 @@ Function: jar_filet::get_manifest
 
 jar_filet::manifestt jar_filet::get_manifest()
 {
-  std::size_t i=0;
-  bool found=false;
-
-  for(const auto &e : index)
-  {
-    if(e=="META-INF/MANIFEST.MF")
-    {
-      found=true;
-      break;
-    }
-
-    i++;
-  }
-
-  if(!found)
+  auto entry=filtered_jar.find("META-INF/MANIFEST.MF");
+  if(entry==filtered_jar.end())
     return manifestt();
 
-  std::string dest=get_entry(i);
+  std::string dest=get_entry(entry->first);
   std::istringstream in(dest);
 
   manifestt manifest;

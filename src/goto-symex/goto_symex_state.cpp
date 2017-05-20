@@ -759,7 +759,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       ssa_l1.get_original_expr(),
       tmp,
       source,
-      symex_targett::PHI);
+      symex_targett::assignment_typet::PHI);
 
     set_ssa_indices(ssa_l1, ns, L2);
     expr=ssa_l1;

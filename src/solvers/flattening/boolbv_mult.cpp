@@ -84,8 +84,8 @@ bvt boolbvt::convert_mult(const exprt &expr)
       throw "multiplication with mixed types";
 
     bv_utilst::representationt rep=
-      expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                    bv_utilst::UNSIGNED;
+      expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                    bv_utilst::representationt::UNSIGNED;
 
     bv=convert_bv(op0);
 

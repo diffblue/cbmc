@@ -61,7 +61,7 @@ public:
     }
 
     // the bits for the "bitvector analysis"
-    typedef enum
+    enum bitst
     {
       B_unknown=1<<0,
       B_uninitialized=1<<1,
@@ -71,7 +71,7 @@ public:
       B_null=1<<5,
       B_static_lifetime=1<<6,
       B_integer_address=1<<7
-    } bitst;
+    };
 
     explicit flagst(const bitst _bits):bits(_bits)
     {

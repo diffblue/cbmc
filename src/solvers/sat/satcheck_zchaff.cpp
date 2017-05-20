@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <zchaff_solver.h>
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: satcheck_zchaff_baset::satcheck_zchaff_baset

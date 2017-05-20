@@ -28,7 +28,7 @@ protected:
 
 public:
   /* for now, both fence functions and asm fences accepted */
-  typedef enum {Write, Read, Fence, Lwfence, ASMfence} operationt;
+  enum class operationt { Write, Read, Fence, Lwfence, ASMfence };
 
   operationt operation;
   unsigned thread;
@@ -111,7 +111,9 @@ public:
 
   bool is_fence() const
   {
-    return operation==Fence || operation==Lwfence || operation==ASMfence;
+    return operation==operationt::Fence ||
+           operation==operationt::Lwfence ||
+           operation==operationt::ASMfence;
   }
 
   /* checks the safety of the pair locally (i.e., w/o taking fences
@@ -138,11 +140,11 @@ public:
   {
     switch(operation)
     {
-      case Write: return "W";
-      case Read: return "R";
-      case Fence: return "F";
-      case Lwfence: return "f";
-      case ASMfence: return "asm:";
+      case operationt::Write: return "W";
+      case operationt::Read: return "R";
+      case operationt::Fence: return "F";
+      case operationt::Lwfence: return "f";
+      case operationt::ASMfence: return "asm:";
     }
     assert(false);
     return "?";
@@ -152,16 +154,18 @@ public:
     const abstract_eventt &second) const
   {
     return
-      (WRfence && first.operation==Write && second.operation==Read) ||
+      (WRfence &&
+       first.operation==operationt::Write &&
+       second.operation==operationt::Read) ||
       ((WWfence || WWcumul) &&
-       first.operation==Write &&
-       second.operation==Write) ||
+       first.operation==operationt::Write &&
+       second.operation==operationt::Write) ||
       ((RWfence || RWcumul) &&
-       first.operation==Read &&
-       second.operation==Write) ||
+       first.operation==operationt::Read &&
+       second.operation==operationt::Write) ||
       ((RRfence || RRcumul) &&
-       first.operation==Read &&
-       second.operation==Read);
+       first.operation==operationt::Read &&
+       second.operation==operationt::Read);
   }
 
   bool is_direct() const { return WWfence || WRfence || RRfence || RWfence; }

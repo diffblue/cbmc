@@ -1,7 +1,0 @@
-CORE
-simplified_noise.c
---gcc -D __CPROVER -D _FIXEDBV -D _CONTROL_FLOAT_WIDTH=24 -D _CONTORL_RADIX_WIDTH=12 -D _CONTROLER_INT_BITS=3 -D _CONTROLER_FRAC_BITS=7 --fixedbv --round-to-minus-inf --cegis-control --cegis-statistics --cegis-genetic --cegis-max-size 1 --cegis-show-iterations
-EXIT=0
-SIGNAL=0
---
-warning: ignoring

@@ -13,9 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
-#include <analyses/dependence_graph.h>
-
-#include "full_slicer.h"
 #include "full_slicer_class.h"
 
 /*******************************************************************\
@@ -140,7 +137,7 @@ Function: full_slicert::add_jumps
 void full_slicert::add_jumps(
   queuet &queue,
   jumpst &jumps,
-  const cfg_post_dominatorst &cfg_post_dominators)
+  const dependence_grapht::post_dominators_mapt &post_dominators)
 {
   // Based on:
   // On slicing programs with jump statements
@@ -197,11 +194,16 @@ void full_slicert::add_jumps(
       continue;
     }
 
+    const irep_idt id=goto_programt::get_function_id(j.PC);
+    const cfg_post_dominatorst &pd=post_dominators.at(id);
+
     cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
-      cfg_post_dominators.cfg.entry_map.find(j.PC);
-    assert(e!=cfg_post_dominators.cfg.entry_map.end());
+      pd.cfg.entry_map.find(j.PC);
+
+    assert(e!=pd.cfg.entry_map.end());
+
     const cfg_post_dominatorst::cfgt::nodet &n=
-      cfg_post_dominators.cfg[e->second];
+      pd.cfg[e->second];
 
     // find the nearest post-dominator in slice
     if(n.dominators.find(lex_succ)==n.dominators.end())
@@ -226,11 +228,16 @@ void full_slicert::add_jumps(
 
         if(cfg[entry->second].node_required)
         {
+          const irep_idt id2=goto_programt::get_function_id(*d_it);
+          assert(id==id2);
+
           cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e2=
-            cfg_post_dominators.cfg.entry_map.find(*d_it);
-          assert(e2!=cfg_post_dominators.cfg.entry_map.end());
+            pd.cfg.entry_map.find(*d_it);
+
+          assert(e2!=pd.cfg.entry_map.end());
+
           const cfg_post_dominatorst::cfgt::nodet &n2=
-            cfg_post_dominators.cfg[e2->second];
+            pd.cfg[e2->second];
 
           if(n2.dominators.size()>post_dom_size)
           {
@@ -326,6 +333,10 @@ Function: implicit
 static bool implicit(goto_programt::const_targett target)
 {
   // some variables are used during symbolic execution only
+
+  const irep_idt &statement=target->code.get_statement();
+  if(statement==ID_array_copy)
+    return true;
 
   if(!target->is_assign())
     return false;

@@ -10,8 +10,6 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include "natural_loops.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: show_natural_loops

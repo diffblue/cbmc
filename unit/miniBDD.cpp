@@ -18,7 +18,7 @@ void test1()
   mini_bddt x=mgr.Var("x");
   mini_bddt y=mgr.Var("y");
   mini_bddt z=mgr.Var("z");
-  mini_bddt f=(x&y&z)|(!x&!y&z);
+  mini_bddt f=(x&y&z)|((!x)&(!y)&z);
   y.clear();
   x.clear();
   z.clear();

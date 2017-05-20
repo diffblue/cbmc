@@ -14,8 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_ui.h>
 
-#include <goto-programs/get_goto_model.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+
+#include <analyses/goto_check.h>
 
 class bmct;
 class goto_functionst;
@@ -28,6 +30,7 @@ class optionst;
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \
+  OPT_GOTO_CHECK \
   "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)" \
   "(show-properties)(show-reachable-properties)(property):" \
@@ -36,7 +39,8 @@ class optionst;
   "(taint):(show-taint)" \
   "(show-local-may-alias)" \
   "(json):(xml):" \
-  "(unreachable-instructions)" \
+  "(unreachable-instructions)(unreachable-functions)" \
+  "(reachable-functions)" \
   "(intervals)(show-intervals)" \
   "(non-null)(show-non-null)"
 
@@ -52,7 +56,7 @@ public:
 
 protected:
   ui_message_handlert ui_message_handler;
-  get_goto_modelt goto_model;
+  goto_modelt goto_model;
 
   virtual void register_languages();
 

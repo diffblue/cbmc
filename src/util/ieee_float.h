@@ -110,12 +110,12 @@ public:
   // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
   // is the IEEE default.
   // The numbering below is what x86 uses in the control word.
-  typedef enum
+  enum rounding_modet
   {
     ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,
     ROUND_TO_PLUS_INF=2,  ROUND_TO_ZERO=3,
     UNKNOWN, NONDETERMINISTIC
-  } rounding_modet;
+  };
 
   rounding_modet rounding_mode;
 
@@ -167,6 +167,13 @@ public:
     fraction=0;
     NaN_flag=false;
     infinity_flag=false;
+  }
+
+  static ieee_floatt zero(const floatbv_typet &type)
+  {
+    ieee_floatt result(type);
+    result.make_zero();
+    return result;
   }
 
   void make_NaN();

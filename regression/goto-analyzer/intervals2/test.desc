@@ -1,6 +1,6 @@
 KNOWNBUG
 intervals2.c
---intervals
+--intervals --verify
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] file intervals2.c line 7 function main, assertion x > -10 && x < 100: SUCCESS$

@@ -20,46 +20,55 @@ class json_arrayt;
 class jsont
 {
 public:
-  typedef enum { J_STRING, J_NUMBER, J_OBJECT, J_ARRAY,
-                 J_TRUE, J_FALSE, J_NULL } kindt;
+  enum class kindt
+  {
+    J_STRING,
+    J_NUMBER,
+    J_OBJECT,
+    J_ARRAY,
+    J_TRUE,
+    J_FALSE,
+    J_NULL
+  };
+
   kindt kind;
 
   bool is_string() const
   {
-    return kind==J_STRING;
+    return kind==kindt::J_STRING;
   }
 
   bool is_number() const
   {
-    return kind==J_NUMBER;
+    return kind==kindt::J_NUMBER;
   }
 
   bool is_object() const
   {
-    return kind==J_OBJECT;
+    return kind==kindt::J_OBJECT;
   }
 
   bool is_array() const
   {
-    return kind==J_ARRAY;
+    return kind==kindt::J_ARRAY;
   }
 
   bool is_true() const
   {
-    return kind==J_TRUE;
+    return kind==kindt::J_TRUE;
   }
 
   bool is_false() const
   {
-    return kind==J_FALSE;
+    return kind==kindt::J_FALSE;
   }
 
   bool is_null() const
   {
-    return kind==J_NULL;
+    return kind==kindt::J_NULL;
   }
 
-  jsont():kind(J_NULL)
+  jsont():kind(kindt::J_NULL)
   {
   }
 
@@ -72,13 +81,13 @@ public:
 
   static jsont json_boolean(bool value)
   {
-    return jsont(value?J_TRUE:J_FALSE);
+    return jsont(value?kindt::J_TRUE:kindt::J_FALSE);
   }
 
   void clear()
   {
     value.clear();
-    kind=J_NULL;
+    kind=kindt::J_NULL;
     object.clear();
     array.clear();
   }
@@ -130,7 +139,7 @@ inline std::ostream &operator<<(std::ostream &out, const jsont &src)
 class json_arrayt:public jsont
 {
 public:
-  json_arrayt():jsont(J_ARRAY)
+  json_arrayt():jsont(kindt::J_ARRAY)
   {
   }
 
@@ -147,13 +156,13 @@ public:
   jsont &push_back(const jsont &json)
   {
     array.push_back(json);
-    return static_cast<jsont &>(array.back());
+    return array.back();
   }
 
   jsont &push_back()
   {
     array.push_back(jsont());
-    return static_cast<jsont &>(array.back());
+    return array.back();
   }
 };
 
@@ -161,7 +170,7 @@ class json_stringt:public jsont
 {
 public:
   explicit json_stringt(const std::string &_value):
-    jsont(J_STRING, _value)
+    jsont(kindt::J_STRING, _value)
   {
   }
 };
@@ -170,7 +179,7 @@ class json_numbert:public jsont
 {
 public:
   explicit json_numbert(const std::string &_value):
-    jsont(J_NUMBER, _value)
+    jsont(kindt::J_NUMBER, _value)
   {
   }
 };
@@ -178,7 +187,7 @@ public:
 class json_objectt:public jsont
 {
 public:
-  json_objectt():jsont(J_OBJECT)
+  json_objectt():jsont(kindt::J_OBJECT)
   {
   }
 
@@ -200,30 +209,30 @@ public:
 class json_truet:public jsont
 {
 public:
-  json_truet():jsont(J_TRUE) { }
+  json_truet():jsont(kindt::J_TRUE) { }
 };
 
 class json_falset:public jsont
 {
 public:
-  json_falset():jsont(J_FALSE) { }
+  json_falset():jsont(kindt::J_FALSE) { }
 };
 
 class json_nullt:public jsont
 {
 public:
-  json_nullt():jsont(J_NULL) { }
+  json_nullt():jsont(kindt::J_NULL) { }
 };
 
 inline json_arrayt &jsont::make_array()
 {
-  kind=J_ARRAY;
+  kind=kindt::J_ARRAY;
   return static_cast<json_arrayt &>(*this);
 }
 
 inline json_objectt &jsont::make_object()
 {
-  kind=J_OBJECT;
+  kind=kindt::J_OBJECT;
   return static_cast<json_objectt &>(*this);
 }
 

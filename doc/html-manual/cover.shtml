@@ -10,8 +10,6 @@
 
 <h3>A Small Tutorial with A Case Study</h3>
 
-<!--<h4>Verilog vs. ANSI-C</h4>-->
-
 <p class="justified">
 We assume that CBMC is installed on your system. If not so, follow
 <a href="installation-cbmc.shtml">these instructions</a>.</p>
@@ -149,7 +147,7 @@ To demonstrate the automatic test suite generation in CBMC,
 we call the following command and we are going to explain the command line options one by one.
 </p>
 
-<pre><code>cbmc pid.c --cover mcdc --unwind 6 --trace --xml-ui
+<pre><code>cbmc pid.c --cover mcdc --unwind 6 --xml-ui
 </code></pre>
 
 <p class="justified">
@@ -173,11 +171,11 @@ pprz >= (float)0 && pprz <= (float)(16 * 600)     id="climb_pid_run.coverage.3"
 
 <p class="justified">
 The "id" of each coverage goal is automatically assigned by CBMC.  For every
-coverage goal, a trace (if there exists) of the program execution that
-satisfies such a goal is printed out in XML format, as the parameters
-<code>--trace --xml-ui</code> are given.  Multiple coverage goals can share a
-trace, when the corresponding execution of the program satisfies all these
-goals at the same time.  Each trace corresponds to a test case. 
+coverage goal, a test suite (if there exists) that <!-- the program execution that-->
+satisfies such a goal is printed out in XML format, as the parameter
+<code>--xml-ui</code> is given.  Multiple coverage goals can share a
+test suite, when the corresponding execution of the program satisfies all these
+goals at the same time.  <!--Each trace corresponds to a test case.-->
 </p>
 
 <p class="justified">
@@ -185,6 +183,10 @@ In the end, the following test suites are automatically generated for testing th
 A test suite consists of a sequence of input parameters that are
 passed to the PID function <code>climb_pid_run</code> at each loop iteration. 
 For example, Test 1 covers the MC/DC goal with id="climb_pid_run.coverage.1".
+The complete output from CBMC is in
+<a href="pid_test_suites.xml">pid_test_suites.xml</a>, where every test suite and the coverage goals it is for
+are clearly described.
+
 <pre><code>Test suite:
 Test 1. 
   (iteration 1) desired_climb=-1.000000f, estimator_z_dot=1.000000f
@@ -233,5 +235,43 @@ PID controller case study.  In addition to <code>--cover mcdc</code>, other
 coverage criteria like <code>branch</code>, <code>decision</code>,
 <code>path</code> etc.  are also available when calling CBMC.
 </p>
+
+<h3>Coverage Criteria</h3>
+
+<p class="justified">
+The table below summarizes the coverage criteria that CBMC supports.
+</p>
+
+<table class="fancy">
+
+<tr><th>Criterion</th><th>Definition</th></tr>
+
+<tr><td>assertion</td>
+<td>For every assertion, generate a test that reaches it</td></tr>
+
+<tr><td class="alt">location</td>
+<td class="alt">For every location, generate a test that reaches it</td></tr>
+
+<tr><td>branch</td>
+<td>Generate a test for every branch outcome</td></tr>
+
+<tr><td class="alt">decision</td>
+<td class="alt">Generate a test for both outcomes of every Boolean expression
+that is not an operand of a propositional connective</td></tr>
+
+<tr><td>condition</td>
+<td>Generate a test for both outcomes of every Boolean expression</td></tr>
+
+<tr><td class="alt">mcdc</td>
+<td class="alt">Modified Condition/Decision Coverage (MC/DC)</td></tr>
+
+<tr><td>path</td>
+<td>Bounded path coverage</td></tr>
+
+<tr><td class="alt">cover</td>
+<td class="alt">Generate a test for every <code>__CPROVER_cover</code> statement
+</td></tr>
+
+</table>
 
 <!--#include virtual="footer.inc" -->

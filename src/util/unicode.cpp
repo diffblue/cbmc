@@ -8,15 +8,33 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 #include <locale>
-#include <codecvt>
 #include <iomanip>
 #include <sstream>
+#include <cstdint>
 
 #include "unicode.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+/*******************************************************************\
+
+Function: is_little_endian_arch
+
+  Inputs:
+
+ Outputs: True if the architecture is little_endian
+
+ Purpose: Determine endianness of the architecture
+
+\*******************************************************************/
+
+bool is_little_endian_arch()
+{
+  uint32_t i=1;
+  return reinterpret_cast<uint8_t &>(i);
+}
 
 /*******************************************************************\
 
@@ -154,17 +172,17 @@ std::wstring widen(const std::string &s)
 
 /*******************************************************************\
 
-Function: utf32_to_utf8
+Function: utf8_append_code
 
-  Inputs:
+  Inputs: character to append, string to append to
 
  Outputs:
 
- Purpose:
+ Purpose: Appends a unicode character to a utf8-encoded string
 
 \*******************************************************************/
 
-void utf32_to_utf8(unsigned int c, std::string &result)
+static void utf8_append_code(unsigned int c, std::string &result)
 {
   if(c<=0x7f)
     result+=static_cast<char>(c);
@@ -192,9 +210,10 @@ void utf32_to_utf8(unsigned int c, std::string &result)
 
 Function: utf32_to_utf8
 
-  Inputs:
+  Inputs: utf32-encoded wide string
 
- Outputs:
+ Outputs: utf8-encoded string with the same unicode characters
+          as the input.
 
  Purpose:
 
@@ -207,31 +226,7 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
   result.reserve(s.size()); // at least that long
 
   for(const auto c : s)
-    utf32_to_utf8(c, result);
-
-  return result;
-}
-
-/*******************************************************************\
-
-Function: utf16_to_utf8
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-std::string utf16_to_utf8(const std::basic_string<unsigned short int> &s)
-{
-  std::string result;
-
-  result.reserve(s.size()); // at least that long
-
-  for(const auto c : s)
-    utf32_to_utf8(c, result);
+    utf8_append_code(c, result);
 
   return result;
 }
@@ -265,20 +260,141 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
 
 /*******************************************************************\
 
+Function: do_swap_bytes
+
+  Inputs: A 16-bit integer
+
+ Outputs: A 16-bit integer with bytes swapped
+
+ Purpose: A helper function for dealing with different UTF16 endians
+
+\*******************************************************************/
+
+uint16_t do_swap_bytes(uint16_t x)
+{
+  uint16_t b1=x & 0xFF;
+  uint16_t b2=x & 0xFF00;
+  return (b1 << 8) | (b2 >> 8);
+}
+
+
+void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
+{
+  // we do not treat 0xD800 to 0xDFFF, although
+  // they are not valid unicode symbols
+
+  if(code<0xFFFF)
+  { // code is encoded as one UTF16 character
+    // we just take the code and possibly swap the bytes
+    unsigned int a=(swap_bytes)?do_swap_bytes(code):code;
+    result+=static_cast<wchar_t>(a);
+  }
+  else // code is encoded as two UTF16 characters
+  {
+    // if this is valid unicode, we have
+    // code<0x10FFFF
+    // but let's not check it programmatically
+
+    // encode the code in UTF16, possibly swapping bytes.
+    code=code-0x10000;
+    unsigned int i1=((code>>10) & 0x3ff) | 0xD800;
+    unsigned int a1=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i1)):i1;
+    result+=static_cast<wchar_t>(a1);
+    unsigned int i2=(code & 0x3ff) | 0xDC00;
+    unsigned int a2=(swap_bytes)?do_swap_bytes(static_cast<uint16_t>(i2)):i2;
+    result+=static_cast<wchar_t>(a2);
+  }
+}
+
+
+/*******************************************************************\
+
+Function: utf8_to_utf16
+
+  Inputs: String in UTF-8 format, bool value indicating whether the
+          endianness should be different from the architecture one.
+
+ Outputs: String in UTF-16 format. The encoding follows the
+          endianness of the architecture iff swap_bytes is true.
+
+ Purpose:
+
+\*******************************************************************/
+std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
+{
+    std::wstring result;
+    result.reserve(in.size());
+    std::string::size_type i=0;
+    while(i<in.size())
+    {
+      unsigned char c=in[i++];
+      unsigned int code=0;
+      // the ifs that follow find out how many UTF8 characters (1-4) store the
+      // next unicode character. This is determined by the few most
+      // significant bits.
+      if(c<=0x7F)
+      {
+        // if it's one character, then code is exactly the value
+        code=c;
+      }
+      else if(c<=0xDF && i<in.size())
+      { // in other cases, we need to read the right number of chars and decode
+        // note: if we wanted to make sure that we capture incorrect strings,
+        // we should check that whatever follows first character starts with
+        // bits 10.
+        code=(c & 0x1F) << 6;
+        c=in[i++];
+        code+=c  & 0x3F;
+      }
+      else if(c<=0xEF && i+1<in.size())
+      {
+        code=(c & 0xF) << 12;
+        c=in[i++];
+        code+=(c & 0x3F) << 6;
+        c=in[i++];
+        code+=c & 0x3F;
+      }
+      else if(c<=0xF7 && i+2<in.size())
+      {
+        code=(c & 0x7) << 18;
+        c=in[i++];
+        code+=(c & 0x3F) << 12;
+        c=in[i++];
+        code+=(c & 0x3F) << 6;
+        c=in[i++];
+        code+=c & 0x3F;
+      }
+      else
+      {
+        // The string is not a valid UTF8 string! Either it has some characters
+        // missing from a multi-character unicode symbol, or it has a char with
+        // too high value.
+        // For now, let's replace the character with a space
+        code=32;
+      }
+
+      utf16_append_code(code, swap_bytes, result);
+    }
+
+    return result;
+}
+
+/*******************************************************************\
+
 Function: utf8_to_utf16_big_endian
 
   Inputs: String in UTF-8 format
 
  Outputs: String in UTF-16BE format
 
- Purpose: Note this requires g++-5 libstdc++ / libc++ / MSVC2010+
+ Purpose:
 
 \*******************************************************************/
 
 std::wstring utf8_to_utf16_big_endian(const std::string& in)
 {
-  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
-  return converter.from_bytes(in);
+  bool swap_bytes=is_little_endian_arch();
+  return utf8_to_utf16(in, swap_bytes);
 }
 
 /*******************************************************************\
@@ -289,21 +405,14 @@ Function: utf8_to_utf16_little_endian
 
  Outputs: String in UTF-16LE format
 
- Purpose: Note this requires g++-5 libstdc++ / libc++ / MSVC2010+
+ Purpose:
 
 \*******************************************************************/
 
 std::wstring utf8_to_utf16_little_endian(const std::string& in)
 {
-  const std::codecvt_mode mode=std::codecvt_mode::little_endian;
-
-  // default largest value codecvt_utf8_utf16 reads without error is 0x10ffff
-  // see: http://en.cppreference.com/w/cpp/locale/codecvt_utf8_utf16
-  const unsigned long maxcode=0x10ffff;
-
-  typedef std::codecvt_utf8_utf16<wchar_t, maxcode, mode> codecvt_utf8_utf16t;
-  std::wstring_convert<codecvt_utf8_utf16t> converter;
-  return converter.from_bytes(in);
+  bool swap_bytes=!is_little_endian_arch();
+  return utf8_to_utf16(in, swap_bytes);
 }
 
 /*******************************************************************\

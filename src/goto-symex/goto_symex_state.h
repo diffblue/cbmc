@@ -142,7 +142,7 @@ public:
     }
   } propagation;
 
-  typedef enum { L0=0, L1=1, L2=2 } levelt;
+  enum levelt { L0=0, L1=1, L2=2 };
 
   // performs renaming _up to_ the given level
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
@@ -189,6 +189,7 @@ public:
     level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
+    symex_targett::sourcet source;
     propagationt propagation;
     unsigned atomic_section_id;
 
@@ -197,6 +198,7 @@ public:
       level2_current_names(s.level2.current_names),
       value_set(s.value_set),
       guard(s.guard),
+      source(s.source),
       propagation(s.propagation),
       atomic_section_id(s.atomic_section_id)
     {

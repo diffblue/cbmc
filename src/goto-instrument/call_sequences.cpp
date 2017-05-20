@@ -13,6 +13,7 @@ Date: April 2013
 #include <unordered_set>
 
 #include <util/std_expr.h>
+#include <util/simplify_expr.h>
 
 #include "call_sequences.h"
 
@@ -61,14 +62,11 @@ void show_call_sequences(
       continue; // abort search
     }
 
-    // get successors
-    goto_programt::const_targetst s;
-    goto_program.get_successors(t, s);
-
-    // add to stack
-    for(goto_programt::const_targetst::const_iterator
-        it=s.begin(); it!=s.end(); it++)
-      stack.push(*it);
+    // get successors and add to stack
+    for(const auto &it : goto_program.get_successors(t))
+    {
+      stack.push(it);
+    }
   }
 }
 
@@ -357,4 +355,84 @@ void check_call_sequence(const goto_functionst &goto_functions)
   }
 
   check_call_sequencet(goto_functions, sequence)();
+}
+
+/*******************************************************************\
+
+Function: list_calls_and_arguments
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static void list_calls_and_arguments(
+  const namespacet &ns,
+  const irep_idt &function,
+  const goto_programt &goto_program)
+{
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(!i_it->is_function_call())
+      continue;
+
+    const code_function_callt call=to_code_function_call(i_it->code);
+
+    const exprt &f=call.function();
+
+    if(f.id()!=ID_symbol)
+      continue;
+
+    const irep_idt &identifier=to_symbol_expr(f).get_identifier();
+    if(identifier=="__CPROVER_initialize")
+      continue;
+
+    std::string name=from_expr(ns, identifier, f);
+    std::string::size_type java_type_suffix=name.find(":(");
+    if(java_type_suffix!=std::string::npos)
+      name.erase(java_type_suffix);
+
+    std::cout << "found call to " << name;
+
+    if(!call.arguments().empty())
+    {
+      std::cout << " with arguments ";
+      for(exprt::operandst::const_iterator
+          it=call.arguments().begin();
+          it!=call.arguments().end();
+          ++it)
+      {
+        if(it!=call.arguments().begin())
+          std::cout << ", ";
+        std::cout << from_expr(ns, identifier, simplify_expr(*it, ns));
+      }
+    }
+
+    std::cout << '\n';
+  }
+}
+
+/*******************************************************************\
+
+Function: show_call_sequences
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void list_calls_and_arguments(
+  const namespacet &ns,
+  const goto_functionst &goto_functions)
+{
+  // do per function
+
+  forall_goto_functions(f_it, goto_functions)
+    list_calls_and_arguments(ns, f_it->first, f_it->second.body);
 }

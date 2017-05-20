@@ -1,5 +1,6 @@
-SRC = clobber_main.cpp clobber_parse_options.cpp
-
+SRC = clobber_main.cpp \
+      clobber_parse_options.cpp \
+      # Empty last line
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
@@ -15,7 +16,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/dump_c$(OBJEXT) \
-       ../goto-instrument/goto_program2code$(OBJEXT)
+       ../goto-instrument/goto_program2code$(OBJEXT) \
+       ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 

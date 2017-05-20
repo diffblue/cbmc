@@ -550,9 +550,13 @@ _SED_FIXUPS = {
   "Remove space before ( in switch (": "s/switch (/switch(/",
   "Should have a space between // and comment": 's/\/\//\/\/ /',
   "Missing space before {": r's/\([^ ]\){/\1 {/',
-  "Tab found, replace by spaces": r's/\t/  /',
+  "Tab found, replace by spaces": r's/\t/  /g',
   "Line ends in whitespace.  Consider deleting these extra spaces.": r's/\s*$//',
-  #"Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
+  "You don't need a ; after a }": r's/};/}/',
+  "Missing space after ,": r's/,\([^ ]\)/, \1/g',
+  # "Statement after an if should be on a new line": r's/^\(\s*\)if *\(([^()]*)\) *\(.*\)$/\1if\2\n\1  \3/', # Single layer of nested bracets
+  # "Statement after an if should be on a new line": r's/^\(\s*\)if *\((\([^()]\|([^()]*)\)*)\) *\(.*\)$/\1if\2\n\1  \4/', # Max 2 layers of nested bracets; messes up line numbers for other errors.
+  # "Redundant blank line at the end of a code block should be deleted.": "d", # messes up line numbers for other errors.
 }
 
 _regexp_compile_cache = {}
@@ -1141,6 +1145,7 @@ class FileInfo(object):
             os.path.exists(os.path.join(current_dir, ".hg")) or
             os.path.exists(os.path.join(current_dir, ".svn"))):
           root_dir = current_dir
+          break;
         current_dir = os.path.dirname(current_dir)
 
       if (os.path.exists(os.path.join(root_dir, ".git")) or
@@ -6264,7 +6269,6 @@ def FlagCxx11Features(filename, clean_lines, linenum, error):
                                       'thread',
                                       'chrono',
                                       'ratio',
-                                      'regex',
                                       'system_error',
                                      ):
     error(filename, linenum, 'build/c++11', 5,

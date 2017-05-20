@@ -19,6 +19,10 @@ static int isatty(int) { return 0; }
 
 unsigned comment_nesting;
 
+#include <util/pragma_wsign_compare.def>
+#include <util/pragma_wnull_conversion.def>
+#include <util/pragma_wdeprecated_register.def>
+
 %}
 
 %x GRAMMAR

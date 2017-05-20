@@ -142,10 +142,10 @@ decision_proceduret::resultt cover_goalst::operator()()
 
     switch(dec_result)
     {
-    case decision_proceduret::D_UNSATISFIABLE: // DONE
+    case decision_proceduret::resultt::D_UNSATISFIABLE: // DONE
       return dec_result;
 
-    case decision_proceduret::D_SATISFIABLE:
+    case decision_proceduret::resultt::D_SATISFIABLE:
       // mark the goals we got, and notify observers
       mark();
       break;
@@ -155,8 +155,8 @@ decision_proceduret::resultt cover_goalst::operator()()
       return dec_result;
     }
   }
-  while(dec_result==decision_proceduret::D_SATISFIABLE &&
+  while(dec_result==decision_proceduret::resultt::D_SATISFIABLE &&
         number_covered()<size());
 
-  return decision_proceduret::D_SATISFIABLE;
+  return decision_proceduret::resultt::D_SATISFIABLE;
 }

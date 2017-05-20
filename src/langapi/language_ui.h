@@ -23,7 +23,7 @@ public:
   symbol_tablet symbol_table;
 
   language_uit(
-    const cmdlinet &__cmdline,
+    const cmdlinet &cmdline,
     ui_message_handlert &ui_message_handler);
   virtual ~language_uit();
 

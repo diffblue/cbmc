@@ -77,12 +77,12 @@ void bmct::error_trace()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
@@ -90,7 +90,7 @@ void bmct::error_trace()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["results"].make_array();
@@ -130,9 +130,9 @@ void bmct::output_graphml(
     return;
 
   graphml_witnesst graphml_witness(ns);
-  if(result==UNSAFE)
+  if(result==resultt::UNSAFE)
     graphml_witness(safety_checkert::error_trace);
-  else if(result==SAFE)
+  else if(result==resultt::SAFE)
     graphml_witness(equation);
   else
     return;
@@ -235,10 +235,10 @@ void bmct::report_success()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
@@ -247,7 +247,7 @@ void bmct::report_success()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
@@ -275,10 +275,10 @@ void bmct::report_failure()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
@@ -287,7 +287,7 @@ void bmct::report_failure()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");
@@ -426,7 +426,7 @@ safety_checkert::resultt bmct::run(
   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   symex.set_message_handler(get_message_handler());
@@ -464,7 +464,7 @@ safety_checkert::resultt bmct::run(
     message.error().source_location=symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
@@ -473,13 +473,13 @@ safety_checkert::resultt bmct::run(
     message.error().source_location=symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   statistics() << "size of program expression: "
@@ -534,13 +534,13 @@ safety_checkert::resultt bmct::run(
        symex.output_coverage_report(goto_functions, cov_out))
     {
       error() << "Failed to write symex coverage report" << eom;
-      return safety_checkert::ERROR;
+      return safety_checkert::resultt::ERROR;
     }
 
     if(options.get_bool_option("show-vcc"))
     {
       show_vcc();
-      return safety_checkert::SAFE; // to indicate non-error
+      return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
     if(!options.get_list_option("cover").empty())
@@ -548,7 +548,7 @@ safety_checkert::resultt bmct::run(
       const optionst::value_listt criteria=
         options.get_list_option("cover");
       return cover(goto_functions, criteria)?
-        safety_checkert::ERROR:safety_checkert::SAFE;
+        safety_checkert::resultt::ERROR:safety_checkert::resultt::SAFE;
     }
 
     if(options.get_option("localize-faults")!="")
@@ -563,14 +563,14 @@ safety_checkert::resultt bmct::run(
        symex.remaining_vccs==0)
     {
       report_success();
-      output_graphml(SAFE, goto_functions);
-      return safety_checkert::SAFE;
+      output_graphml(resultt::SAFE, goto_functions);
+      return safety_checkert::resultt::SAFE;
     }
 
     if(options.get_bool_option("program-only"))
     {
       show_program();
-      return safety_checkert::SAFE;
+      return safety_checkert::resultt::SAFE;
     }
 
     return decide(goto_functions, prop_conv);
@@ -579,19 +579,19 @@ safety_checkert::resultt bmct::run(
   catch(std::string &error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 }
 
@@ -637,12 +637,12 @@ safety_checkert::resultt bmct::stop_on_fail(
 {
   switch(run_decision_procedure(prop_conv))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success();
-    output_graphml(SAFE, goto_functions);
-    return SAFE;
+    output_graphml(resultt::SAFE, goto_functions);
+    return resultt::SAFE;
 
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     if(options.get_bool_option("trace"))
     {
       if(options.get_bool_option("beautify"))
@@ -650,20 +650,20 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
-      output_graphml(UNSAFE, goto_functions);
+      output_graphml(resultt::UNSAFE, goto_functions);
     }
 
     report_failure();
-    return UNSAFE;
+    return resultt::UNSAFE;
 
   default:
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
-      return SAFE;
+      return resultt::SAFE;
 
     error() << "decision procedure failed" << eom;
 
-    return ERROR;
+    return resultt::ERROR;
   }
 }
 
@@ -687,7 +687,7 @@ void bmct::setup_unwind()
 
   for(auto &val : unwindset_loops)
   {
-    unsigned thread_nr;
+    unsigned thread_nr=0;
     bool thread_nr_set=false;
 
     if(!val.empty() &&

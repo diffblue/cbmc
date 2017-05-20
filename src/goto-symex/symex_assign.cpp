@@ -93,21 +93,21 @@ void goto_symext::symex_assign(
   }
   else
   {
-    assignment_typet assignment_type=symex_targett::STATE;
+    assignment_typet assignment_type=symex_targett::assignment_typet::STATE;
 
     // Let's hide return value assignments.
     if(lhs.id()==ID_symbol &&
        id2string(to_symbol_expr(lhs).get_identifier()).find(
                   "#return_value!")!=std::string::npos)
-      assignment_type=symex_targett::HIDDEN;
+      assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are in a hidden function.
     if(state.top().hidden_function)
-      assignment_type=symex_targett::HIDDEN;
+      assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are executing a hidden instruction.
     if(state.source.pc->source_location.get_hide())
-      assignment_type=symex_targett::HIDDEN;
+      assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     guardt guard; // NOT the state guard!
     symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
@@ -303,7 +303,7 @@ void goto_symext::symex_assign_symbol(
   // do the assignment
   const symbolt &symbol=ns.lookup(ssa_lhs.get_original_expr());
   if(symbol.is_auxiliary)
-    assignment_type=symex_targett::HIDDEN;
+    assignment_type=symex_targett::assignment_typet::HIDDEN;
 
   target.assignment(
     tmp_guard.as_expr(),

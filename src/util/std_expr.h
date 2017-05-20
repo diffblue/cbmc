@@ -603,19 +603,81 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   return static_cast<binary_relation_exprt &>(expr);
 }
 
-/*! \brief The plus expression
+/*! \brief A generic base class for multi-ary expressions
 */
-class plus_exprt:public binary_exprt
+class multi_ary_exprt:public exprt
 {
 public:
-  plus_exprt():binary_exprt(ID_plus)
+  multi_ary_exprt()
+  {
+  }
+
+  explicit multi_ary_exprt(const irep_idt &_id):exprt(_id)
+  {
+  }
+
+  multi_ary_exprt(
+    const irep_idt &_id,
+    const typet &_type):exprt(_id, _type)
+  {
+  }
+
+  multi_ary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs):
+    exprt(_id, _lhs.type())
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+
+  multi_ary_exprt(
+    const exprt &_lhs,
+    const irep_idt &_id,
+    const exprt &_rhs,
+    const typet &_type):
+    exprt(_id, _type)
+  {
+    copy_to_operands(_lhs, _rhs);
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref multi_ary_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * multi_ary_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref multi_ary_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const multi_ary_exprt &to_multi_ary_expr(const exprt &expr)
+{
+  return static_cast<const multi_ary_exprt &>(expr);
+}
+
+/*! \copydoc to_multi_ary_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
+{
+  return static_cast<multi_ary_exprt &>(expr);
+}
+
+/*! \brief The plus expression
+*/
+class plus_exprt:public multi_ary_exprt
+{
+public:
+  plus_exprt():multi_ary_exprt(ID_plus)
   {
   }
 
   plus_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
-    binary_exprt(_lhs, ID_plus, _rhs)
+    multi_ary_exprt(_lhs, ID_plus, _rhs)
   {
   }
 
@@ -623,7 +685,7 @@ public:
     const exprt &_lhs,
     const exprt &_rhs,
     const typet &_type):
-    binary_exprt(_lhs, ID_plus, _rhs, _type)
+    multi_ary_exprt(_lhs, ID_plus, _rhs, _type)
   {
   }
 };
@@ -697,17 +759,17 @@ inline minus_exprt &to_minus_expr(exprt &expr)
 
 /*! \brief binary multiplication
 */
-class mult_exprt:public binary_exprt
+class mult_exprt:public multi_ary_exprt
 {
 public:
-  mult_exprt():binary_exprt(ID_mult)
+  mult_exprt():multi_ary_exprt(ID_mult)
   {
   }
 
   mult_exprt(
     const exprt &_lhs,
     const exprt &_rhs):
-    binary_exprt(_lhs, ID_mult, _rhs)
+    multi_ary_exprt(_lhs, ID_mult, _rhs)
   {
   }
 };
@@ -1505,15 +1567,9 @@ public:
     op1().id(ID_unknown);
   }
 
-  exprt &instance()
-  {
-    return op0();
-  }
+  void set_instance(unsigned int instance);
 
-  const exprt &instance() const
-  {
-    return op0();
-  }
+  unsigned int get_instance() const;
 
   exprt &valid()
   {
@@ -1669,21 +1725,20 @@ inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 
 /*! \brief boolean AND
 */
-class and_exprt:public exprt
+class and_exprt:public multi_ary_exprt
 {
 public:
-  and_exprt():exprt(ID_and, bool_typet())
+  and_exprt():multi_ary_exprt(ID_and, bool_typet())
   {
   }
 
   and_exprt(const exprt &op0, const exprt &op1):
-    exprt(ID_and, bool_typet())
+    multi_ary_exprt(op0, ID_and, op1, bool_typet())
   {
-    copy_to_operands(op0, op1);
   }
 
   and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
-    exprt(ID_and, bool_typet())
+    multi_ary_exprt(ID_and, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
@@ -1693,7 +1748,7 @@ public:
     const exprt &op1,
     const exprt &op2,
     const exprt &op3):
-    exprt(ID_and, bool_typet())
+    multi_ary_exprt(ID_and, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
@@ -1778,20 +1833,20 @@ inline implies_exprt &to_implies_expr(exprt &expr)
 
 /*! \brief boolean OR
 */
-class or_exprt:public exprt
+class or_exprt:public multi_ary_exprt
 {
 public:
-  or_exprt():exprt(ID_or, bool_typet())
+  or_exprt():multi_ary_exprt(ID_or, bool_typet())
   {
   }
 
-  or_exprt(const exprt &op0, const exprt &op1):exprt(ID_or, bool_typet())
+  or_exprt(const exprt &op0, const exprt &op1):
+    multi_ary_exprt(op0, ID_or, op1, bool_typet())
   {
-    copy_to_operands(op0, op1);
   }
 
   or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
-    exprt(ID_or, bool_typet())
+    multi_ary_exprt(ID_or, bool_typet())
   {
     copy_to_operands(op0, op1, op2);
   }
@@ -1801,7 +1856,7 @@ public:
     const exprt &op1,
     const exprt &op2,
     const exprt &op3):
-    exprt(ID_or, bool_typet())
+    multi_ary_exprt(ID_or, bool_typet())
   {
     exprt::operandst &op=operands();
     op.resize(4);
@@ -1861,15 +1916,15 @@ public:
 
 /*! \brief Bit-wise OR
 */
-class bitor_exprt:public exprt
+class bitor_exprt:public multi_ary_exprt
 {
 public:
-  bitor_exprt():exprt(ID_bitor)
+  bitor_exprt():multi_ary_exprt(ID_bitor)
   {
   }
 
   bitor_exprt(const exprt &_op0, const exprt &_op1):
-    exprt(ID_bitor, _op0.type())
+    multi_ary_exprt(ID_bitor, _op0.type())
   {
     copy_to_operands(_op0, _op1);
   }
@@ -1902,17 +1957,16 @@ inline bitor_exprt &to_bitor_expr(exprt &expr)
 
 /*! \brief Bit-wise XOR
 */
-class bitxor_exprt:public exprt
+class bitxor_exprt:public multi_ary_exprt
 {
 public:
-  bitxor_exprt():exprt(ID_bitxor)
+  bitxor_exprt():multi_ary_exprt(ID_bitxor)
   {
   }
 
   bitxor_exprt(const exprt &_op0, const exprt &_op1):
-    exprt(ID_bitxor, _op0.type())
+    multi_ary_exprt(_op0, ID_bitxor, _op1, _op0.type())
   {
-    copy_to_operands(_op0, _op1);
   }
 };
 
@@ -1943,15 +1997,15 @@ inline bitxor_exprt &to_bitxor_expr(exprt &expr)
 
 /*! \brief Bit-wise AND
 */
-class bitand_exprt:public exprt
+class bitand_exprt:public multi_ary_exprt
 {
 public:
-  bitand_exprt():exprt(ID_bitand)
+  bitand_exprt():multi_ary_exprt(ID_bitand)
   {
   }
 
   bitand_exprt(const exprt &_op0, const exprt &_op1):
-    exprt(ID_bitand, _op0.type())
+    multi_ary_exprt(ID_bitand, _op0.type())
   {
     copy_to_operands(_op0, _op1);
   }

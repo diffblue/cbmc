@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv_map.h"
 #include "boolbv_width.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif

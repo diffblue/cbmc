@@ -260,7 +260,7 @@ protected:
   dependence_grapht old_dep_graph;
   dependence_grapht new_dep_graph;
 
-  typedef enum
+  enum mod_flagt
   {
     SAME=0,
     NEW=1<<0,
@@ -269,7 +269,7 @@ protected:
     DEL_DATA_DEP=1<<3,
     NEW_CTRL_DEP=1<<4,
     DEL_CTRL_DEP=1<<5
-  } mod_flagt;
+  };
 
   typedef std::map<goto_programt::const_targett, unsigned>
     goto_program_change_impactt;
@@ -445,13 +445,15 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
 
-          if(impact_mode==BACKWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::BACKWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_back(
               d_node,
               old_dep_graph,
               old_change_impact,
               true);
-          if(impact_mode==FORWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::FORWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_forward(
               d_node,
               old_dep_graph,
@@ -468,13 +470,15 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
 
-          if(impact_mode==BACKWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::BACKWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_back(
               d_node,
               new_dep_graph,
               new_change_impact,
               false);
-          if(impact_mode==FORWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::FORWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_forward(
               d_node,
               new_dep_graph,
@@ -518,8 +522,8 @@ void change_impactt::propogate_dep_forward(
     if((change_impact[src->function][src] &data_flag)
         || (change_impact[src->function][src] &ctrl_flag))
       continue;
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;
@@ -559,8 +563,8 @@ void change_impactt::propogate_dep_back(
     {
       continue;
     }
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;

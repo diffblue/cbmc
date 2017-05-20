@@ -69,18 +69,18 @@ public:
 
   bool is_root_scope() const
   {
-    return id_class==ROOT_SCOPE;
+    return id_class==id_classt::ROOT_SCOPE;
   }
 
   bool is_global_scope() const
   {
-    return id_class==ROOT_SCOPE ||
-           id_class==NAMESPACE;
+    return id_class==id_classt::ROOT_SCOPE ||
+           id_class==id_classt::NAMESPACE;
   }
 
   bool is_template_scope() const
   {
-    return id_class==TEMPLATE_SCOPE;
+    return id_class==id_classt::TEMPLATE_SCOPE;
   }
 
   cpp_scopet &get_parent() const
@@ -118,7 +118,7 @@ class cpp_root_scopet:public cpp_scopet
 public:
   cpp_root_scopet()
   {
-    id_class=ROOT_SCOPE;
+    id_class=id_classt::ROOT_SCOPE;
     identifier="::";
   }
 };

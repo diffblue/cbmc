@@ -155,7 +155,7 @@ void prop_minimizet::operator()()
       literalt c=constraint();
 
       if(c.is_false())
-        dec_result=decision_proceduret::D_UNSATISFIABLE;
+        dec_result=decision_proceduret::resultt::D_UNSATISFIABLE;
       else
       {
         _iterations++;
@@ -167,11 +167,11 @@ void prop_minimizet::operator()()
 
         switch(dec_result)
         {
-        case decision_proceduret::D_UNSATISFIABLE:
+        case decision_proceduret::resultt::D_UNSATISFIABLE:
           last_was_SAT=false;
           break;
 
-        case decision_proceduret::D_SATISFIABLE:
+        case decision_proceduret::resultt::D_SATISFIABLE:
           last_was_SAT=true;
           fix_objectives(); // fix the ones we got
           break;
@@ -183,7 +183,7 @@ void prop_minimizet::operator()()
         }
       }
     }
-    while(dec_result!=decision_proceduret::D_UNSATISFIABLE);
+    while(dec_result!=decision_proceduret::resultt::D_UNSATISFIABLE);
   }
 
   if(!last_was_SAT)

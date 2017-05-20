@@ -1,0 +1,10 @@
+CORE
+jarfile3.class
+--function jarfile3.f --java-cp-include-files "jarfile3\.class"
+^EXIT=10$
+^SIGNAL=0$
+.*SUCCESS$
+.*FAILURE$
+^VERIFICATION FAILED
+--
+^warning: ignoring

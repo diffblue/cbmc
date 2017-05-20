@@ -94,13 +94,13 @@ exprt float_bvt::convert(const exprt &expr)
   else if(expr.id()==ID_isnormal)
     return isnormal(expr.op0(), get_spec(expr.op0()));
   else if(expr.id()==ID_lt)
-    return relation(expr.op0(), LT, expr.op1(), get_spec(expr.op0()));
+    return relation(expr.op0(), relt::LT, expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_gt)
-    return relation(expr.op0(), GT, expr.op1(), get_spec(expr.op0()));
+    return relation(expr.op0(), relt::GT, expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_le)
-    return relation(expr.op0(), LE, expr.op1(), get_spec(expr.op0()));
+    return relation(expr.op0(), relt::LE, expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_ge)
-    return relation(expr.op0(), GE, expr.op1(), get_spec(expr.op0()));
+    return relation(expr.op0(), relt::GE, expr.op1(), get_spec(expr.op0()));
   else if(expr.id()==ID_sign)
     return sign_bit(expr.op0());
 
@@ -1034,12 +1034,12 @@ exprt float_bvt::relation(
   const exprt &src2,
   const ieee_float_spect &spec)
 {
-  if(rel==GT)
-    return relation(src2, LT, src1, spec); // swapped
-  else if(rel==GE)
-    return relation(src2, LE, src1, spec); // swapped
+  if(rel==relt::GT)
+    return relation(src2, relt::LT, src1, spec); // swapped
+  else if(rel==relt::GE)
+    return relation(src2, relt::LE, src1, spec); // swapped
 
-  assert(rel==EQ || rel==LT || rel==LE);
+  assert(rel==relt::EQ || rel==relt::LT || rel==relt::LE);
 
   // special cases: -0 and 0 are equal
   exprt is_zero1=is_zero(src1, spec);
@@ -1051,7 +1051,7 @@ exprt float_bvt::relation(
   exprt isnan2=isnan(src2, spec);
   exprt nan=or_exprt(isnan1, isnan2);
 
-  if(rel==LT || rel==LE)
+  if(rel==relt::LT || rel==relt::LE)
   {
     exprt bitwise_equal=equal_exprt(src1, src2);
 
@@ -1081,7 +1081,7 @@ exprt float_bvt::relation(
         sign_bit(src1),
         less_than2);
 
-    if(rel==LT)
+    if(rel==relt::LT)
     {
       exprt and_bv(ID_and, bool_typet());
       and_bv.copy_to_operands(less_than3);
@@ -1092,7 +1092,7 @@ exprt float_bvt::relation(
 
       return and_bv;
     }
-    else if(rel==LE)
+    else if(rel==relt::LE)
     {
       exprt or_bv(ID_or, bool_typet());
       or_bv.copy_to_operands(less_than3);
@@ -1104,7 +1104,7 @@ exprt float_bvt::relation(
     else
       assert(false);
   }
-  else if(rel==EQ)
+  else if(rel==relt::EQ)
   {
     exprt bitwise_equal=equal_exprt(src1, src2);
 

@@ -48,41 +48,6 @@ void cpp_typecheckt::salvage_default_arguments(
   }
 }
 
-#if 0
-/*******************************************************************\
-
-Function: cpp_typecheckt::check_template_restrictions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void cpp_typecheckt::check_template_restrictions(
-  const irept &cpp_name,
-  const irep_idt &final_identifier,
-  const typet &final_type)
-{
-  if(final_type.id()==ID_template)
-  {
-    // subtype must be class or function
-
-    if(final_type.subtype().id()!=ID_struct &&
-       final_type.subtype().id()!=ID_code)
-    {
-      error().source_location=cpp_name.location();
-      error() << "template only allowed with classes or functions,"
-              << " but got `" << to_string(final_type.subtype())
-              << "'" << eom;
-      throw 0;
-    }
-  }
-}
-#endif
-
 /*******************************************************************\
 
 Function: cpp_typecheckt::typecheck_class_template
@@ -215,7 +180,8 @@ void cpp_typecheckt::typecheck_class_template(
         previous_declaration.template_type());
     }
 
-    assert(cpp_scopes.id_map[symbol_name]->id_class == cpp_idt::TEMPLATE_SCOPE);
+    assert(cpp_scopes.id_map[symbol_name]->id_class ==
+           cpp_idt::id_classt::TEMPLATE_SCOPE);
     return;
   }
 
@@ -247,13 +213,14 @@ void cpp_typecheckt::typecheck_class_template(
 
   // put into current scope
   cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
-  id.id_class=cpp_idt::TEMPLATE;
+  id.id_class=cpp_idt::id_classt::TEMPLATE;
   id.prefix=cpp_scopes.current_scope().prefix+
             id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
   cpp_scopes.id_map[symbol_name]=&template_scope;
-  assert(cpp_scopes.id_map[symbol_name]->id_class==cpp_idt::TEMPLATE_SCOPE);
+  assert(cpp_scopes.id_map[symbol_name]->id_class ==
+         cpp_idt::id_classt::TEMPLATE_SCOPE);
 }
 
 /*******************************************************************\
@@ -361,12 +328,12 @@ void cpp_typecheckt::typecheck_function_template(
 
   // put into scope
   cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol);
-  id.id_class=cpp_idt::TEMPLATE;
+  id.id_class=cpp_idt::id_classt::TEMPLATE;
   id.prefix=cpp_scopes.current_scope().prefix+
             id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
-  assert(template_scope.id_class==cpp_idt::TEMPLATE_SCOPE);
+  assert(template_scope.id_class==cpp_idt::id_classt::TEMPLATE_SCOPE);
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
@@ -424,7 +391,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   cpp_scopes.current_scope().lookup(
     cpp_name.get_sub().front().get(ID_identifier),
     cpp_scopet::SCOPE_ONLY, // look only in current scope
-    cpp_scopet::TEMPLATE,   // must be template
+    cpp_scopet::id_classt::TEMPLATE,   // must be template
     id_set);
 
   if(id_set.empty())
@@ -444,7 +411,7 @@ void cpp_typecheckt::typecheck_class_template_member(
             << "' is ambiguous" << eom;
     throw 0;
   }
-  else if((*(id_set.begin()))->id_class!=cpp_idt::TEMPLATE)
+  else if((*(id_set.begin()))->id_class!=cpp_idt::id_classt::TEMPLATE)
   {
     // std::cerr << *(*id_set.begin()) << std::endl;
     error().source_location=cpp_name.source_location();
@@ -651,7 +618,7 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   cpp_scopest::id_sett id_set;
   cpp_scopes.current_scope().lookup(
-    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::TEMPLATE, id_set);
+    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE, id_set);
 
   // remove any specializations
   for(cpp_scopest::id_sett::iterator
@@ -868,7 +835,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       cpp_scopes.current_scope().prefix+id_suffix);
 
   template_scope.prefix=template_scope.get_parent().prefix+id_suffix;
-  template_scope.id_class=cpp_idt::TEMPLATE_SCOPE;
+  template_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
 
   cpp_scopes.go_to(template_scope);
 
@@ -922,7 +889,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     // add to scope
     cpp_idt &id=scope.insert(base_name);
     id.identifier=identifier;
-    id.id_class=cpp_idt::TEMPLATE_PARAMETER;
+    id.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
 
     // is it a type or not?
     if(declaration.get_bool(ID_is_type))

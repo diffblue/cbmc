@@ -1,5 +1,8 @@
-SRC = symex_main.cpp symex_parse_options.cpp path_search.cpp \
-      symex_cover.cpp
+SRC = path_search.cpp \
+      symex_cover.cpp \
+      symex_main.cpp \
+      symex_parse_options.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
@@ -16,7 +19,9 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../goto-symex/rewrite_union$(OBJEXT) \
        ../pointer-analysis/dereference$(OBJEXT) \
        ../goto-instrument/cover$(OBJEXT) \
-       ../path-symex/path-symex$(LIBEXT)
+       ../path-symex/path-symex$(LIBEXT) \
+       ../miniz/miniz$(OBJEXT) \
+       ../json/json$(LIBEXT)
 
 INCLUDES= -I ..
 
@@ -37,9 +42,6 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(wildcard ../specc/Makefile),)

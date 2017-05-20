@@ -27,8 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-// #define DEBUG
-
 /*******************************************************************\
 
 Function: boolbvt::literal
@@ -144,9 +142,6 @@ const bvt &boolbvt::convert_bv(const exprt &expr)
     bv_cache.insert(std::make_pair(expr, bvt()));
   if(!cache_result.second)
   {
-    #ifdef DEBUG
-    std::cout << "Cache hit on " << expr << "\n";
-    #endif
     return cache_result.first->second;
   }
 
@@ -205,10 +200,6 @@ Function: boolbvt::convert_bitvector
 
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
-  #ifdef DEBUG
-  std::cout << "BV: " << expr.pretty() << std::endl;
-  #endif
-
   if(expr.type().id()==ID_bool)
   {
     bvt bv;
@@ -854,7 +845,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(type.id()!=ID_array)
     return false;
 
-  if(unbounded_array==U_ALL)
+  if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
   const exprt &size=to_array_type(type).size();
@@ -863,7 +854,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(to_integer(size, s))
     return true;
 
-  if(unbounded_array==U_AUTO)
+  if(unbounded_array==unbounded_arrayt::U_AUTO)
     if(s>1000) // magic number!
       return true;
 

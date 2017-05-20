@@ -31,10 +31,10 @@ Function: language_uit::language_uit
 \*******************************************************************/
 
 language_uit::language_uit(
-  const cmdlinet &__cmdline,
+  const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
   ui_message_handler(_ui_message_handler),
-  _cmdline(__cmdline)
+  _cmdline(cmdline)
 {
   set_message_handler(ui_message_handler);
 }
@@ -127,7 +127,7 @@ bool language_uit::parse(const std::string &filename)
 
   if(language.parse(infile, filename))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
+    if(get_ui()==ui_message_handlert::uit::PLAIN)
       std::cerr << "PARSING ERROR" << std::endl;
 
     return true;
@@ -158,9 +158,7 @@ bool language_uit::typecheck()
 
   if(language_files.typecheck(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 
@@ -185,9 +183,7 @@ bool language_uit::final()
 
   if(language_files.final(symbol_table))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
-      std::cerr << "CONVERSION ERROR" << std::endl;
-
+    error() << "CONVERSION ERROR" << eom;
     return true;
   }
 
@@ -210,11 +206,11 @@ void language_uit::show_symbol_table(bool brief)
 {
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     show_symbol_table_plain(std::cout, brief);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     show_symbol_table_xml_ui(brief);
     break;
 

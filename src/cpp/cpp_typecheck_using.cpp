@@ -63,7 +63,7 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
   {
     if(using_directive)
     {
-      if((*it)->id_class==cpp_idt::NAMESPACE)
+      if((*it)->id_class==cpp_idt::id_classt::NAMESPACE)
         cpp_scopes.current_scope().add_using_scope(
           static_cast<cpp_scopet &>(**it));
       else
@@ -74,8 +74,8 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
     else // declaration
     {
       // we copy all 'normal' identifiers into the current scope
-      if((*it)->id_class!=cpp_idt::TEMPLATE_PARAMETER &&
-         (*it)->id_class!=cpp_idt::NAMESPACE)
+      if((*it)->id_class!=cpp_idt::id_classt::TEMPLATE_PARAMETER &&
+         (*it)->id_class!=cpp_idt::id_classt::NAMESPACE)
         cpp_scopes.current_scope().insert(**it);
     }
   }

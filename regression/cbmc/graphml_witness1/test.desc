@@ -46,29 +46,29 @@ main.c
   <graph edgedefault="directed">
     <data key="sourcecodelang">C</data>
     <node id="sink"/>
-    <node id="33.22">
+    <node id="[0-9\.]*">
       <data key="entry">true</data>
     </node>
-    <edge source="33.22" target="4.29">
+    <edge source="[0-9\.]*" target="[0-9\.]*">
       <data key="originfile">main.c</data>
       <data key="startline">21</data>
     </edge>
-    <node id="4.29"/>
-    <edge source="4.29" target="29.31">
+    <node id="[0-9\.]*"/>
+    <edge source="[0-9\.]*" target="[0-9\.]*">
       <data key="originfile">main.c</data>
       <data key="startline">29</data>
       <data key="assumption.scope">main</data>
     </edge>
-    <node id="29.31"/>
-    <edge source="29.31" target="5.33">
+    <node id="[0-9\.]*"/>
+    <edge source="[0-9\.]*" target="[0-9\.]*">
       <data key="originfile">main.c</data>
       <data key="startline">15</data>
       <data key="assumption.scope">remove_one</data>
     </edge>
-    <node id="5.33">
+    <node id="[0-9\.]*">
       <data key="violation">true</data>
     </node>
-    <edge source="5.33" target="sink">
+    <edge source="[0-9\.]*" target="sink">
       <data key="originfile">main.c</data>
       <data key="startline">31</data>
     </edge>

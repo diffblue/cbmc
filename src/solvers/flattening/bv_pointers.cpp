@@ -92,7 +92,8 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
-      return bv_utils.rel(bv0, expr.id(), bv1, bv_utilst::UNSIGNED);
+      return bv_utils.rel(
+        bv0, expr.id(), bv1, bv_utilst::representationt::UNSIGNED);
     }
   }
 
@@ -399,8 +400,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       }
 
       bv_utilst::representationt rep=
-        it->type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                     bv_utilst::UNSIGNED;
+        it->type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                     bv_utilst::representationt::UNSIGNED;
 
       bvt op=convert_bv(*it);
 
@@ -521,7 +522,8 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     {
       bvt element_size_bv=
         bv_utils.build_constant(element_size, bv.size());
-      bv=bv_utils.divider(bv, element_size_bv, bv_utilst::SIGNED);
+      bv=bv_utils.divider(
+        bv, element_size_bv, bv_utilst::representationt::SIGNED);
     }
 
     return bv;
@@ -738,8 +740,8 @@ void bv_pointerst::offset_arithmetic(
   bvt bv_index=convert_bv(index);
 
   bv_utilst::representationt rep=
-    index.type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                   bv_utilst::UNSIGNED;
+    index.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                   bv_utilst::representationt::UNSIGNED;
 
   bv_index=bv_utils.extension(bv_index, offset_bits, rep);
 

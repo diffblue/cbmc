@@ -73,7 +73,7 @@ sub test($$$$$) {
   $options =~ s/$ign//g if(defined($ign));
 
   my $output = $input;
-  $output =~ s/\.(c|i|gb|cpp|ii|xml|class|jar)$/.out/;
+  $output =~ s/\.[^.]*$/.out/;
 
   if($output eq $input) {
     print("Error in test file -- $test\n");
@@ -125,6 +125,7 @@ sub test($$$$$) {
             local $/ = undef;
             binmode $fh;
             my $whole_file = <$fh>;
+            $whole_file =~ s/\r\n/\n/g;
             my $is_match = $whole_file =~ /$result/;
             $r = ($included ? !$is_match : $is_match);
           }
@@ -132,6 +133,7 @@ sub test($$$$$) {
           {
             my $found_line = 0;
             while(my $line = <$fh>) {
+              $line =~ s/\r$//;
               if($line =~ /$result/) {
                 # We've found the line, therefore if it is included we set
                 # the result to 0 (OK) If it is excluded, we set the result

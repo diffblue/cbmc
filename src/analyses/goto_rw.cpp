@@ -179,7 +179,7 @@ void rw_range_sett::get_objects_if(
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
   else
   {
-    get_objects_rec(READ, if_expr.cond());
+    get_objects_rec(get_modet::READ, if_expr.cond());
 
     get_objects_rec(mode, if_expr.false_case(), range_start, size);
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
@@ -205,8 +205,8 @@ void rw_range_sett::get_objects_dereference(
   const range_spect &size)
 {
   const exprt &pointer=deref.pointer();
-  get_objects_rec(READ, pointer);
-  if(mode!=READ)
+  get_objects_rec(get_modet::READ, pointer);
+  if(mode!=get_modet::READ)
     get_objects_rec(mode, pointer);
 }
 
@@ -395,7 +395,7 @@ void rw_range_sett::get_objects_index(
   mp_integer index;
   if(to_integer(simp_index, index))
   {
-    get_objects_rec(READ, expr.index());
+    get_objects_rec(get_modet::READ, expr.index());
     index=-1;
   }
 
@@ -593,42 +593,42 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
     // constant, nothing to do
     return;
   else if(object.id()==ID_symbol)
-    get_objects_rec(READ, object);
+    get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_dereference)
-    get_objects_rec(READ, object);
+    get_objects_rec(get_modet::READ, object);
   else if(object.id()==ID_index)
   {
     const index_exprt &index=to_index_expr(object);
 
-    get_objects_rec(READ, address_of_exprt(index.array()));
-    get_objects_rec(READ, index.index());
+    get_objects_rec(get_modet::READ, address_of_exprt(index.array()));
+    get_objects_rec(get_modet::READ, index.index());
   }
   else if(object.id()==ID_member)
   {
     const member_exprt &member=to_member_expr(object);
 
-    get_objects_rec(READ, address_of_exprt(member.struct_op()));
+    get_objects_rec(get_modet::READ, address_of_exprt(member.struct_op()));
   }
   else if(object.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(object);
 
-    get_objects_rec(READ, if_expr.cond());
-    get_objects_rec(READ, address_of_exprt(if_expr.true_case()));
-    get_objects_rec(READ, address_of_exprt(if_expr.false_case()));
+    get_objects_rec(get_modet::READ, if_expr.cond());
+    get_objects_rec(get_modet::READ, address_of_exprt(if_expr.true_case()));
+    get_objects_rec(get_modet::READ, address_of_exprt(if_expr.false_case()));
   }
   else if(object.id()==ID_byte_extract_little_endian ||
           object.id()==ID_byte_extract_big_endian)
   {
     const byte_extract_exprt &be=to_byte_extract_expr(object);
 
-    get_objects_rec(READ, address_of_exprt(be.op()));
+    get_objects_rec(get_modet::READ, address_of_exprt(be.op()));
   }
   else if(object.id()==ID_typecast)
   {
     const typecast_exprt &tc=to_typecast_expr(object);
 
-    get_objects_rec(READ, address_of_exprt(tc.op()));
+    get_objects_rec(get_modet::READ, address_of_exprt(tc.op()));
   }
   else
     throw "rw_range_sett: address_of `"+object.id_string()+"' not handled";
@@ -652,7 +652,7 @@ void rw_range_sett::add(
   const range_spect &range_start,
   const range_spect &range_end)
 {
-  objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
+  objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
     insert(
       std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
@@ -742,9 +742,9 @@ void rw_range_sett::get_objects_rec(
     else
       add(mode, identifier, 0, -1);
   }
-  else if(mode==READ && expr.id()==ID_address_of)
+  else if(mode==get_modet::READ && expr.id()==ID_address_of)
     get_objects_address_of(to_address_of_expr(expr).object());
-  else if(mode==READ)
+  else if(mode==get_modet::READ)
   {
     // possibly affects the full object size, even if range_start/size
     // are only a subset of the bytes (e.g., when using the result of
@@ -757,7 +757,7 @@ void rw_range_sett::get_objects_rec(
   {
     // dereferencing may yield some weird ones, ignore these
   }
-  else if(mode==LHS_W)
+  else if(mode==get_modet::LHS_W)
   {
     forall_operands(it, expr)
       get_objects_rec(mode, *it);
@@ -803,7 +803,7 @@ void rw_range_sett::get_objects_rec(const typet &type)
   if(type.id()==ID_array)
   {
     get_objects_rec(type.subtype());
-    get_objects_rec(READ, to_array_type(type).size());
+    get_objects_rec(get_modet::READ, to_array_type(type).size());
   }
 }
 
@@ -904,7 +904,7 @@ void rw_guarded_range_set_value_sett::get_objects_if(
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
   else
   {
-    get_objects_rec(READ, if_expr.cond());
+    get_objects_rec(get_modet::READ, if_expr.cond());
 
     guardt guard_bak1(guard), guard_bak2(guard);
 
@@ -936,7 +936,7 @@ void rw_guarded_range_set_value_sett::add(
   const range_spect &range_start,
   const range_spect &range_end)
 {
-  objectst::iterator entry=(mode==LHS_W ? w_range_set : r_range_set).
+  objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
     insert(
       std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
 
@@ -964,8 +964,8 @@ void goto_rw(goto_programt::const_targett target,
              const code_assignt &assign,
              rw_range_sett &rw_set)
 {
-  rw_set.get_objects_rec(target, rw_range_sett::LHS_W, assign.lhs());
-  rw_set.get_objects_rec(target, rw_range_sett::READ, assign.rhs());
+  rw_set.get_objects_rec(target, rw_range_sett::get_modet::LHS_W, assign.lhs());
+  rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, assign.rhs());
 }
 
 /*******************************************************************\
@@ -987,16 +987,16 @@ void goto_rw(goto_programt::const_targett target,
   if(function_call.lhs().is_not_nil())
     rw_set.get_objects_rec(
       target,
-      rw_range_sett::LHS_W,
+      rw_range_sett::get_modet::LHS_W,
       function_call.lhs());
 
   rw_set.get_objects_rec(
     target,
-    rw_range_sett::READ,
+    rw_range_sett::get_modet::READ,
     function_call.function());
 
   forall_expr(it, function_call.arguments())
-    rw_set.get_objects_rec(target, rw_range_sett::READ, *it);
+    rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, *it);
 }
 
 /*******************************************************************\
@@ -1025,7 +1025,7 @@ void goto_rw(goto_programt::const_targett target,
   case ASSERT:
     rw_set.get_objects_rec(
       target,
-      rw_range_sett::READ,
+      rw_range_sett::get_modet::READ,
       target->guard);
     break;
 
@@ -1036,7 +1036,7 @@ void goto_rw(goto_programt::const_targett target,
       if(code_return.has_return_value())
         rw_set.get_objects_rec(
           target,
-          rw_range_sett::READ,
+          rw_range_sett::get_modet::READ,
           code_return.return_value());
     }
     break;
@@ -1046,7 +1046,7 @@ void goto_rw(goto_programt::const_targett target,
     if(target->code.get(ID_statement)==ID_printf)
     {
       forall_expr(it, target->code.operands())
-        rw_set.get_objects_rec(target, rw_range_sett::READ, *it);
+        rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, *it);
     }
     break;
 
@@ -1069,7 +1069,7 @@ void goto_rw(goto_programt::const_targett target,
   case DEAD:
     rw_set.get_objects_rec(
       target,
-      rw_range_sett::LHS_W,
+      rw_range_sett::get_modet::LHS_W,
       to_code_dead(target->code).symbol());
     break;
 
@@ -1078,7 +1078,7 @@ void goto_rw(goto_programt::const_targett target,
       to_code_decl(target->code).symbol().type());
     rw_set.get_objects_rec(
       target,
-      rw_range_sett::LHS_W,
+      rw_range_sett::get_modet::LHS_W,
       to_code_decl(target->code).symbol());
     break;
 

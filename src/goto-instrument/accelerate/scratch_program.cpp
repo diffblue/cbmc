@@ -15,8 +15,6 @@ Author: Matt Lewis
 
 #include "scratch_program.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -31,8 +29,8 @@ bool scratch_programt::check_sat(bool do_slice)
   update();
 
 #ifdef DEBUG
-  std::cout << "Checking following program for satness:" << endl;
-  output(ns, "scratch", cout);
+  std::cout << "Checking following program for satness:\n";
+  output(ns, "scratch", std::cout);
 #endif
 
   symex.constant_propagation=constant_propagation;
@@ -49,7 +47,7 @@ bool scratch_programt::check_sat(bool do_slice)
   {
     // Symex sliced away all our assertions.
 #ifdef DEBUG
-    std::cout << "Trivially unsat" << std::endl;
+    std::cout << "Trivially unsat\n";
 #endif
     return false;
   }
@@ -57,10 +55,10 @@ bool scratch_programt::check_sat(bool do_slice)
   equation.convert(*checker);
 
 #ifdef DEBUG
-  cout << "Finished symex, invoking decision procedure." << endl;
+  std::cout << "Finished symex, invoking decision procedure.\n";
 #endif
 
-  return (checker->dec_solve()==decision_proceduret::D_SATISFIABLE);
+  return (checker->dec_solve()==decision_proceduret::resultt::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(const exprt &e)

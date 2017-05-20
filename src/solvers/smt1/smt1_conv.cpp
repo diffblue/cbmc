@@ -21,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include <linking/zero_initializer.h>
-
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/flatten_byte_operators.h>
@@ -90,7 +88,7 @@ decision_proceduret::resultt smt1_convt::dec_solve()
 {
   write_footer();
   out.flush();
-  return decision_proceduret::D_ERROR;
+  return decision_proceduret::resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -1555,7 +1553,7 @@ void smt1_convt::convert_typecast(
       convert_expr(src, true);
       out << " ";
       convert_expr(
-        zero_initializer(src_type, expr.source_location(), ns),
+        from_integer(0, src_type),
         true);
       out << "))";
     }
@@ -1584,7 +1582,7 @@ void smt1_convt::convert_typecast(
       convert_expr(src, true);
       out << " ";
       convert_expr(
-        zero_initializer(src_type, expr.source_location(), ns),
+        from_integer(0, src_type),
         true);
       out << ")) "; // not, =
       out << " bv1[" << to_width << "]";

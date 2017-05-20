@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cmdline.h>
 #include <util/string2int.h>
+#include <json/json_parser.h>
 
 #include <goto-programs/class_hierarchy.h>
 
@@ -41,7 +42,6 @@ Function: java_bytecode_languaget::get_language_options
 
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
-  disable_runtime_checks=cmd.isset("disable-runtime-check");
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
   string_refinement_enabled=cmd.isset("string-refine");
   if(cmd.isset("java-max-input-array-length"))
@@ -55,6 +55,36 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
+
+  if(cmd.isset("java-cp-include-files"))
+  {
+    java_cp_include_files=cmd.get_value("java-cp-include-files");
+    // load file list from JSON file
+    if(java_cp_include_files[0]=='@')
+    {
+      jsont json_cp_config;
+      if(parse_json(
+           java_cp_include_files.substr(1),
+           get_message_handler(),
+           json_cp_config))
+        throw "cannot read JSON input configuration for JAR loading";
+
+      if(!json_cp_config.is_object())
+        throw "the JSON file has a wrong format";
+      jsont include_files=json_cp_config["jar"];
+      if(!include_files.is_array())
+         throw "the JSON file has a wrong format";
+
+      // add jars from JSON config file to classpath
+      for(const jsont &file_entry : include_files.array)
+      {
+        assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
+        config.java.classpath.push_back(file_entry.value);
+      }
+    }
+  }
+  else
+    java_cp_include_files=".*";
 }
 
 /*******************************************************************\
@@ -129,6 +159,7 @@ bool java_bytecode_languaget::parse(
   const std::string &path)
 {
   java_class_loader.set_message_handler(get_message_handler());
+  java_class_loader.set_java_cp_include_files(java_cp_include_files);
 
   // look at extension
   if(has_suffix(path, ".class"))
@@ -138,12 +169,14 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
-    #ifdef HAVE_LIBZIP
+    java_class_loader_limitt class_loader_limit(
+      get_message_handler(),
+      java_cp_include_files);
     if(config.java.main_class.empty())
     {
       // Does it have a main class set in the manifest?
       jar_filet::manifestt manifest=
-        java_class_loader.jar_pool(path).get_manifest();
+        java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
       if(manifest_main_class!="")
@@ -155,18 +188,13 @@ bool java_bytecode_languaget::parse(
     // Do we have one now?
     if(main_class.empty())
     {
-      status() << "JAR file without entry point: loading it all" << eom;
-      java_class_loader.load_entire_jar(path);
+      status() << "JAR file without entry point: loading class files" << eom;
+      java_class_loader.load_entire_jar(class_loader_limit, path);
       for(const auto &kv : java_class_loader.jar_map.at(path).entries)
         main_jar_classes.push_back(kv.first);
     }
     else
       java_class_loader.add_jar_file(path);
-
-    #else
-    error() << "No support for reading JAR files" << eom;
-    return true;
-    #endif
   }
   else
     assert(false);
@@ -361,9 +389,16 @@ static void gather_needed_globals(
 {
   if(e.id()==ID_symbol)
   {
-    const auto &sym=symbol_table.lookup(to_symbol_expr(e).get_identifier());
-    if(sym.is_static_lifetime)
-      needed.add(sym);
+    // If the symbol isn't in the symbol table at all, then it is defined
+    // on an opaque type (i.e. we don't have the class definition at this point)
+    // and will be created during the typecheck phase.
+    // We don't mark it as 'needed' as it doesn't exist yet to keep.
+    auto findit=symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    if(findit!=symbol_table.symbols.end() &&
+       findit->second.is_static_lifetime)
+    {
+      needed.add(findit->second);
+    }
   }
   else
     forall_operands(opit, e)
@@ -377,11 +412,10 @@ Function: gather_field_types
   Inputs: `class_type`: root of class tree to search
           `ns`: global namespace
 
- Outputs: Populates `needed_classes` with all Java reference types
+ Outputs: Populates `lazy_methods` with all Java reference types
             reachable starting at `class_type`. For example if
             `class_type` is `symbol_typet("java::A")` and A has a B
-            field, then `B` (but not `A`) will be added to
-            `needed_classes`.
+            field, then `B` (but not `A`) will noted as a needed class.
 
  Purpose: See output
 
@@ -390,13 +424,13 @@ Function: gather_field_types
 static void gather_field_types(
   const typet &class_type,
   const namespacet &ns,
-  std::set<irep_idt> &needed_classes)
+  ci_lazy_methodst &lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
   for(const auto &field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, needed_classes);
+      gather_field_types(field.type(), ns, lazy_methods);
     else if(field.type().id()==ID_pointer)
     {
       // Skip array primitive pointers, for example:
@@ -404,8 +438,8 @@ static void gather_field_types(
         continue;
       const auto &field_classid=
         to_symbol_type(field.type().subtype()).get_identifier();
-      if(needed_classes.insert(field_classid).second)
-        gather_field_types(field.type().subtype(), ns, needed_classes);
+      if(lazy_methods.add_needed_class(field_classid))
+        gather_field_types(field.type().subtype(), ns, lazy_methods);
     }
   }
 }
@@ -419,7 +453,7 @@ Function: initialize_needed_classes
           `ns`: global namespace
           `ch`: global class hierarchy
 
- Outputs: Populates `needed_classes` with all Java reference types
+ Outputs: Populates `lazy_methods` with all Java reference types
             whose references may be passed, directly or indirectly,
             to any of the functions in `entry_points`.
 
@@ -431,7 +465,7 @@ static void initialize_needed_classes(
   const std::vector<irep_idt> &entry_points,
   const namespacet &ns,
   const class_hierarchyt &ch,
-  std::set<irep_idt> &needed_classes)
+  ci_lazy_methodst &lazy_methods)
 {
   for(const auto &mname : entry_points)
   {
@@ -447,8 +481,8 @@ static void initialize_needed_classes(
           ch.get_parents_trans(param_classid);
         class_and_parents.push_back(param_classid);
         for(const auto &classid : class_and_parents)
-          needed_classes.insert(classid);
-        gather_field_types(param.type().subtype(), ns, needed_classes);
+          lazy_methods.add_needed_class(classid);
+        gather_field_types(param.type().subtype(), ns, lazy_methods);
       }
     }
   }
@@ -456,9 +490,9 @@ static void initialize_needed_classes(
   // Also add classes whose instances are magically
   // created by the JVM and so won't be spotted by
   // looking for constructors and calls as usual:
-  needed_classes.insert("java::java.lang.String");
-  needed_classes.insert("java::java.lang.Class");
-  needed_classes.insert("java::java.lang.Object");
+  lazy_methods.add_needed_class("java::java.lang.String");
+  lazy_methods.add_needed_class("java::java.lang.Class");
+  lazy_methods.add_needed_class("java::java.lang.Object");
 }
 
 /*******************************************************************\
@@ -492,7 +526,6 @@ bool java_bytecode_languaget::typecheck(
          c_it->second,
          symbol_table,
          get_message_handler(),
-         disable_runtime_checks,
          max_user_array_length,
          lazy_methods,
          lazy_methods_mode,
@@ -580,11 +613,23 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     method_worklist2.push_back(main_function.main_function.name);
 
   std::set<irep_idt> needed_classes;
-  initialize_needed_classes(
-    method_worklist2,
-    namespacet(symbol_table),
-    ch,
-    needed_classes);
+
+  {
+    std::vector<irep_idt> needed_clinits;
+    ci_lazy_methodst initial_lazy_methods(
+      needed_clinits,
+      needed_classes,
+      symbol_table);
+    initialize_needed_classes(
+      method_worklist2,
+      namespacet(symbol_table),
+      ch,
+      initial_lazy_methods);
+    method_worklist2.insert(
+      method_worklist2.end(),
+      needed_clinits.begin(),
+      needed_clinits.end());
+  }
 
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt *> virtual_callsites;
@@ -608,17 +653,18 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
         const auto &parsed_method=findit->second;
+        // Note this wraps *references* to method_worklist2, needed_classes:
+        ci_lazy_methodst lazy_methods(
+          method_worklist2,
+          needed_classes,
+          symbol_table);
         java_bytecode_convert_method(
           *parsed_method.first,
           *parsed_method.second,
           symbol_table,
           get_message_handler(),
-          disable_runtime_checks,
           max_user_array_length,
-          safe_pointer<std::vector<irep_idt> >::create_non_null(
-            &method_worklist2),
-          safe_pointer<std::set<irep_idt> >::create_non_null(
-            &needed_classes));
+          safe_pointer<ci_lazy_methodst>::create_non_null(&lazy_methods));
         gather_virtual_callsites(
           symbol_table.lookup(mname).value,
           virtual_callsites);
@@ -728,7 +774,6 @@ void java_bytecode_languaget::convert_lazy_method(
     *lazy_method_entry.second,
     symtab,
     get_message_handler(),
-    disable_runtime_checks,
     max_user_array_length);
 }
 

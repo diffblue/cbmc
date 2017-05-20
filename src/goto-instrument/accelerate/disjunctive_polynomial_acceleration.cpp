@@ -43,9 +43,6 @@ Author: Matt Lewis
 #include "cone_of_influence.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
-
 bool disjunctive_polynomial_accelerationt::accelerate(
   path_acceleratort &accelerator)
 {
@@ -760,23 +757,19 @@ void disjunctive_polynomial_accelerationt::find_distinguishing_points()
       it!=loop.end();
       ++it)
   {
-    goto_programt::targetst succs;
-
-    goto_program.get_successors(*it, succs);
+    const auto succs=goto_program.get_successors(*it);
 
     if(succs.size() > 1)
     {
       // This location has multiple successors -- each successor is a
       // distinguishing point.
-      for(goto_programt::targetst::iterator jt=succs.begin();
-          jt!=succs.end();
-          ++jt)
+      for(const auto &jt : succs)
       {
         symbolt distinguisher_sym =
           utils.fresh_symbol("polynomial::distinguisher", bool_typet());
         symbol_exprt distinguisher=distinguisher_sym.symbol_expr();
 
-        distinguishing_points[*jt]=distinguisher;
+        distinguishing_points[jt]=distinguisher;
         distinguishers.push_back(distinguisher);
       }
     }
@@ -791,9 +784,8 @@ void disjunctive_polynomial_accelerationt::build_path(
   do
   {
     goto_programt::targett next;
-    goto_programt::targetst succs;
 
-    goto_program.get_successors(t, succs);
+    const auto succs=goto_program.get_successors(t);
 
     // We should have a looping path, so we should never hit a location
     // with no successors.

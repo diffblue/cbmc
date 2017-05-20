@@ -29,7 +29,7 @@ cpp_idt::cpp_idt():
   is_static_member(false),
   is_scope(false),
   is_constructor(false),
-  id_class(UNKNOWN),
+  id_class(id_classt::UNKNOWN),
   this_expr(static_cast<const exprt &>(get_nil_irep())),
   compound_counter(0),
   parent(NULL)
@@ -163,20 +163,16 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
 {
   switch(id_class)
   {
-    case cpp_idt::UNKNOWN:            out << "UNKNOWN"; break;
-    case cpp_idt::SYMBOL:             out << "SYMBOL"; break;
-    case cpp_idt::TYPEDEF:            out << "TYPEDEF"; break;
-    case cpp_idt::CLASS:              out << "CLASS"; break;
-    case cpp_idt::TEMPLATE:           out << "TEMPLATE"; break;
-    case cpp_idt::TEMPLATE_PARAMETER: out << "TEMPLATE_PARAMETER"; break;
-    case cpp_idt::ROOT_SCOPE:         out << "ROOT_SCOPE"; break;
-    case cpp_idt::BLOCK_SCOPE:        out << "BLOCK_SCOPE"; break;
-    case cpp_idt::TEMPLATE_SCOPE:     out << "TEMPLATE_SCOPE"; break;
-    case cpp_idt::NAMESPACE:          out << "NAMESPACE"; break;
-
-    default:
-      out << "(OTHER)";
+  case cpp_idt::id_classt::UNKNOWN:           return out<<"UNKNOWN";
+  case cpp_idt::id_classt::SYMBOL:            return out<<"SYMBOL";
+  case cpp_idt::id_classt::TYPEDEF:           return out<<"TYPEDEF";
+  case cpp_idt::id_classt::CLASS:             return out<<"CLASS";
+  case cpp_idt::id_classt::TEMPLATE:          return out<<"TEMPLATE";
+  case cpp_idt::id_classt::TEMPLATE_PARAMETER:return out<<"TEMPLATE_PARAMETER";
+  case cpp_idt::id_classt::ROOT_SCOPE:        return out<<"ROOT_SCOPE";
+  case cpp_idt::id_classt::BLOCK_SCOPE:       return out<<"BLOCK_SCOPE";
+  case cpp_idt::id_classt::TEMPLATE_SCOPE:    return out<<"TEMPLATE_SCOPE";
+  case cpp_idt::id_classt::NAMESPACE:         return out<<"NAMESPACE";
+  default: return out << "(OTHER)";
   }
-
-  return out;
 }

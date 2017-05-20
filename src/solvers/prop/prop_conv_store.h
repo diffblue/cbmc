@@ -20,7 +20,7 @@ public:
 
   struct constraintt
   {
-    typedef enum { NONE, CONVERT, SET_TO } typet;
+    enum class typet { NONE, CONVERT, SET_TO };
     typet type;
 
     exprt expr;

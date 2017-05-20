@@ -42,21 +42,21 @@ void show_goto_functions(
 {
   switch(ui)
   {
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
   {
     show_goto_functions_xmlt xml_show_functions(ns);
     xml_show_functions(goto_functions, std::cout);
   }
   break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
   {
     show_goto_functions_jsont json_show_functions(ns);
     json_show_functions(goto_functions, std::cout);
   }
   break;
 
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     goto_functions.output(ns, std::cout);
     break;
   }

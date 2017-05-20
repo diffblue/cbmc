@@ -350,8 +350,10 @@ int goto_diff_parse_optionst::doit()
 
     impact_modet impact_mode=
       cmdline.isset("forward-impact") ?
-      FORWARD :
-      (cmdline.isset("backward-impact") ? BACKWARD : BOTH);
+      impact_modet::FORWARD :
+      (cmdline.isset("backward-impact") ?
+         impact_modet::BACKWARD :
+         impact_modet::BOTH);
     change_impact(
       goto_model1,
       goto_model2,
@@ -480,13 +482,12 @@ bool goto_diff_parse_optionst::process_goto_program(
     remove_asm(symbol_table, goto_functions);
 
     // add the library
-    status() << "Adding CPROVER library ("
-             << config.ansi_c.arch << ")" << eom;
     link_to_library(symbol_table, goto_functions, ui_message_handler);
 
     // remove function pointers
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(
+      get_message_handler(),
       symbol_table,
       goto_functions,
       cmdline.isset("pointer-check"));

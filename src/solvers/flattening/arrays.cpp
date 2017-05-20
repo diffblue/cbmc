@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #include <cassert>
 #include <iostream>
 
@@ -443,7 +441,7 @@ void arrayst::add_array_Ackermann_constraints()
             equal_exprt values_equal(index_expr1, index_expr2);
 
             // add constraint
-            lazy_constraintt lazy(ARRAY_ACKERMANN,
+            lazy_constraintt lazy(lazy_typet::ARRAY_ACKERMANN,
               or_exprt(literal_exprt(!indices_equal_lit), values_equal));
             add_array_constraint(lazy, true); // added lazily
 
@@ -636,7 +634,7 @@ void arrayst::add_array_constraints(
       assert(index_expr1.type()==index_expr2.type());
 
       // add constraint
-      lazy_constraintt lazy(ARRAY_TYPECAST,
+      lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
         equal_exprt(index_expr1, index_expr2));
       add_array_constraint(lazy, false); // added immediately
     }
@@ -684,7 +682,8 @@ void arrayst::add_array_constraints_with(
       assert(false);
     }
 
-     lazy_constraintt lazy(ARRAY_WITH, equal_exprt(index_expr, value));
+    lazy_constraintt lazy(
+       lazy_typet::ARRAY_WITH, equal_exprt(index_expr, value));
      add_array_constraint(lazy, false); // added immediately
   }
 
@@ -724,7 +723,7 @@ void arrayst::add_array_constraints_with(
         equal_exprt equality_expr(index_expr1, index_expr2);
 
         // add constraint
-        lazy_constraintt lazy(ARRAY_WITH, or_exprt(equality_expr,
+        lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
         add_array_constraint(lazy, false); // added immediately
 
@@ -864,7 +863,8 @@ void arrayst::add_array_constraints_array_of(
     assert(base_type_eq(index_expr.type(), expr.op0().type(), ns));
 
     // add constraint
-    lazy_constraintt lazy(ARRAY_OF, equal_exprt(index_expr, expr.op0()));
+    lazy_constraintt lazy(
+      lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.op0()));
     add_array_constraint(lazy, false); // added immediately
   }
 }
@@ -912,7 +912,7 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF,
+    lazy_constraintt lazy(lazy_typet::ARRAY_IF,
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
@@ -941,8 +941,10 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF, or_exprt(literal_exprt(cond_lit),
-                          equal_exprt(index_expr1, index_expr2)));
+    lazy_constraintt lazy(
+      lazy_typet::ARRAY_IF,
+      or_exprt(literal_exprt(cond_lit),
+      equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster

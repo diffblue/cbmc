@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "path_symex_state.h"
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -196,11 +194,12 @@ bool path_symex_statet::is_feasible(
   // check whether SAT
   switch(decision_procedure())
   {
-  case decision_proceduret::D_SATISFIABLE: return true;
+  case decision_proceduret::resultt::D_SATISFIABLE: return true;
 
-  case decision_proceduret::D_UNSATISFIABLE: return false;
+  case decision_proceduret::resultt::D_UNSATISFIABLE: return false;
 
-  case decision_proceduret::D_ERROR: throw "error from decision procedure";
+  case decision_proceduret::resultt::D_ERROR:
+    throw "error from decision procedure";
   }
 
   return true; // not really reachable
@@ -242,10 +241,10 @@ bool path_symex_statet::check_assertion(
   // check whether SAT
   switch(decision_procedure.dec_solve())
   {
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     return false; // error
 
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     return true; // no error
 
   default:

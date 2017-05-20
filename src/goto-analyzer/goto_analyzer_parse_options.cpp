@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #include <jsil/jsil_language.h>
 
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
@@ -214,9 +215,7 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline.args))
+  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
     return 6;
 
   if(process_goto_program(options))
@@ -260,6 +259,54 @@ int goto_analyzer_parse_optionst::doit()
       }
 
       unreachable_instructions(goto_model, true, ofs);
+    }
+
+    return 0;
+  }
+
+  if(cmdline.isset("unreachable-functions"))
+  {
+    const std::string json_file=cmdline.get_value("json");
+
+    if(json_file.empty())
+      unreachable_functions(goto_model, false, std::cout);
+    else if(json_file=="-")
+      unreachable_functions(goto_model, true, std::cout);
+    else
+    {
+      std::ofstream ofs(json_file);
+      if(!ofs)
+      {
+        error() << "Failed to open json output `"
+                << json_file << "'" << eom;
+        return 6;
+      }
+
+      unreachable_functions(goto_model, true, ofs);
+    }
+
+    return 0;
+  }
+
+  if(cmdline.isset("reachable-functions"))
+  {
+    const std::string json_file=cmdline.get_value("json");
+
+    if(json_file.empty())
+      reachable_functions(goto_model, false, std::cout);
+    else if(json_file=="-")
+      reachable_functions(goto_model, true, std::cout);
+    else
+    {
+      std::ofstream ofs(json_file);
+      if(!ofs)
+      {
+        error() << "Failed to open json output `"
+                << json_file << "'" << eom;
+        return 6;
+      }
+
+      reachable_functions(goto_model, true, ofs);
     }
 
     return 0;
@@ -378,14 +425,13 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     remove_asm(goto_model);
 
     // add the library
-    status() << "Adding CPROVER library ("
-             << config.ansi_c.arch << ")" << eom;
     link_to_library(goto_model, ui_message_handler);
     #endif
 
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;
-    remove_function_pointers(goto_model, cmdline.isset("pointer-check"));
+    remove_function_pointers(
+      get_message_handler(), goto_model, cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove Java throw and catch
@@ -491,6 +537,10 @@ void goto_analyzer_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --unreachable-functions      list functions unreachable from the entry point\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --reachable-functions        list functions reachable from the entry point\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
     "\n"
@@ -539,6 +589,9 @@ void goto_analyzer_parse_optionst::help()
     HELP_SHOW_GOTO_FUNCTIONS
     // NOLINTNEXTLINE(whitespace/line_length)
     " --show-properties            show the properties, but don't run analysis\n"
+    "\n"
+    "Program instrumentation options:\n"
+    HELP_GOTO_CHECK
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

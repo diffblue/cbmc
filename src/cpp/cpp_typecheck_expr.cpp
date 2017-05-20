@@ -379,7 +379,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
       exprt symbol_expr=resolve(
         to_cpp_name(static_cast<const irept &>(type)),
-        cpp_typecheck_resolvet::BOTH,
+        cpp_typecheck_resolvet::wantt::BOTH,
         fargs);
 
       if(symbol_expr.id()!=ID_type)
@@ -398,7 +398,7 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
         exprt symbol_expr=resolve(
           to_cpp_name(static_cast<const irept &>(type.subtype())),
-          cpp_typecheck_resolvet::BOTH,
+          cpp_typecheck_resolvet::wantt::BOTH,
           fargs);
 
         if(symbol_expr.id()!=ID_type)
@@ -725,7 +725,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
         // should really be a qualified search
         exprt resolve_result=resolve(
-          cpp_name, cpp_typecheck_resolvet::VAR, fargs, false);
+          cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
 
         if(resolve_result.is_not_nil())
         {
@@ -767,7 +767,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         fargs.in_use=true;
 
         exprt resolve_result=resolve(
-             cpp_name, cpp_typecheck_resolvet::VAR, fargs, false);
+             cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
 
         if(resolve_result.is_not_nil())
         {
@@ -1063,7 +1063,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
 
       exprt symbol_expr=resolve(
         to_cpp_name(static_cast<const irept &>(expr.type())),
-        cpp_typecheck_resolvet::TYPE,
+        cpp_typecheck_resolvet::wantt::TYPE,
         fargs,
         false); // fail silently
 
@@ -1356,7 +1356,7 @@ void cpp_typecheckt::typecheck_expr_member(
 
     exprt symbol_expr=resolve(
                         component_cpp_name,
-                        cpp_typecheck_resolvet::VAR,
+                        cpp_typecheck_resolvet::wantt::VAR,
                         new_fargs);
 
     if(symbol_expr.id()==ID_dereference)
@@ -2097,7 +2097,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   exprt symbol_expr=
     resolve(
       to_cpp_name(expr),
-      cpp_typecheck_resolvet::VAR,
+      cpp_typecheck_resolvet::wantt::VAR,
       fargs);
 
   // we want VAR
@@ -3141,7 +3141,7 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
     exprt resolve_result=
       resolve(
         to_cpp_name(expr.type()),
-        cpp_typecheck_resolvet::BOTH,
+        cpp_typecheck_resolvet::wantt::BOTH,
         cpp_typecheck_fargst());
 
     if(resolve_result.id()!=ID_type)

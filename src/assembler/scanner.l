@@ -15,6 +15,10 @@ static int isatty(int) { return 0; }
 
 #include "assembler_parser.h"
 
+#include <util/pragma_wsign_compare.def>
+#include <util/pragma_wnull_conversion.def>
+#include <util/pragma_wdeprecated_register.def>
+
 /*** macros for easier rule definition **********************************/
 %}
 

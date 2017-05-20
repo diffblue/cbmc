@@ -6,15 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
 #endif
 
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 #include <util/byte_operators.h>
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
@@ -279,11 +276,18 @@ exprt dereferencet::dereference_plus(
   const exprt &offset,
   const typet &type)
 {
-  if(expr.operands().size()>2)
-    return dereference_rec(make_binary(expr), offset, type);
+  exprt pointer=expr.op0();
+  exprt integer=expr.op1();
 
-  // binary
-  exprt pointer=expr.op0(), integer=expr.op1();
+  // need not be binary
+  if(expr.operands().size()>2)
+  {
+    assert(expr.op0().type().id()==ID_pointer);
+
+    exprt::operandst plus_ops(
+      ++expr.operands().begin(), expr.operands().end());
+    integer.operands().swap(plus_ops);
+  }
 
   if(ns.follow(integer.type()).id()==ID_pointer)
     std::swap(pointer, integer);

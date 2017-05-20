@@ -1,16 +1,16 @@
 template
 <class T>
-bool func(){
-	return func<bool>();
+bool func() {
+  return func<bool>();
 }
 
 template <>
 bool func<bool>()
 {
-	return true;
+  return true;
 }
 
 int main()
 {
-	assert(func<int>());
+  assert(func<int>());
 }

@@ -34,7 +34,7 @@ public:
     const namespacet &_ns,
     propt &_prop):
     arrayst(_ns, _prop),
-    unbounded_array(U_NONE),
+    unbounded_array(unbounded_arrayt::U_NONE),
     boolbv_width(_ns),
     bv_utils(_prop),
     functions(*this),
@@ -71,7 +71,7 @@ public:
 
   using arrayst::literal;
 
-  typedef enum { U_NONE, U_ALL, U_AUTO } unbounded_arrayt;
+  enum class unbounded_arrayt { U_NONE, U_ALL, U_AUTO };
   unbounded_arrayt unbounded_array;
 
   mp_integer get_value(const bvt &bv)

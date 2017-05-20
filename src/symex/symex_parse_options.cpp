@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
 
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -34,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_unused_functions.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -176,9 +178,7 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
-  goto_model.set_message_handler(get_message_handler());
-
-  if(goto_model(cmdline.args))
+  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
     return 6;
 
   if(process_goto_program(options))
@@ -260,12 +260,12 @@ int symex_parse_optionst::doit()
       // do actual symex, for assertion checking
       switch(path_search(goto_model.goto_functions))
       {
-      case safety_checkert::SAFE:
+      case safety_checkert::resultt::SAFE:
         report_properties(path_search.property_map);
         report_success();
         return 0;
 
-      case safety_checkert::UNSAFE:
+      case safety_checkert::resultt::UNSAFE:
         report_properties(path_search.property_map);
         report_failure();
         return 10;
@@ -354,7 +354,6 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
   try
   {
     // we add the library
-    status() << "Adding CPROVER library" << eom;
     link_to_library(goto_model, ui_message_handler);
 
     // do partial inlining
@@ -382,6 +381,13 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
 
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
+
+    if(cmdline.isset("drop-unused-functions"))
+    {
+      // Entry point will have been set before and function pointers removed
+      status() << "Removing unused functions" << eom;
+      remove_unused_functions(goto_model.goto_functions, ui_message_handler);
+    }
 
     if(cmdline.isset("cover"))
     {
@@ -472,7 +478,7 @@ Function: symex_parse_optionst::report_properties
 void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
-  if(get_ui()==ui_message_handlert::PLAIN)
+  if(get_ui()==ui_message_handlert::uit::PLAIN)
     status() << "\n** Results:" << eom;
 
   for(path_searcht::property_mapt::const_iterator
@@ -480,7 +486,7 @@ void symex_parse_optionst::report_properties(
       it!=property_map.end();
       it++)
   {
-    if(get_ui()==ui_message_handlert::XML_UI)
+    if(get_ui()==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("claim", id2string(it->first));
@@ -554,10 +560,10 @@ void symex_parse_optionst::report_success()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
@@ -590,12 +596,12 @@ void symex_parse_optionst::show_counterexample(
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << '\n' << "Counterexample:" << '\n';
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, error_trace, xml);
@@ -626,10 +632,10 @@ void symex_parse_optionst::report_failure()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
@@ -697,6 +703,7 @@ void symex_parse_optionst::help()
     " --show-parse-tree            show parse tree\n"
     " --show-symbol-table          show symbol table\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --ppc-macos                  set MACOS/PPC architecture\n"
     " --mm model                   set memory model (default: sc)\n"
     " --arch                       set architecture (default: "
@@ -730,5 +737,6 @@ void symex_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
+    " --verbosity #                verbosity level\n"
     "\n";
 }

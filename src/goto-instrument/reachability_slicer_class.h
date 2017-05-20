@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/is_threaded.h>
 
+class slicing_criteriont;
+
 /*******************************************************************\
 
    Class: reachability_slicert
@@ -25,11 +27,13 @@ Author: Daniel Kroening, kroening@kroening.com
 class reachability_slicert
 {
 public:
-  void operator()(goto_functionst &goto_functions)
+  void operator()(
+    goto_functionst &goto_functions,
+    slicing_criteriont &criterion)
   {
     cfg(goto_functions);
     is_threadedt is_threaded(goto_functions);
-    fixedpoint_assertions(is_threaded);
+    fixedpoint_assertions(is_threaded, criterion);
     slice(goto_functions);
   }
 
@@ -48,7 +52,9 @@ protected:
 
   typedef std::stack<cfgt::entryt> queuet;
 
-  void fixedpoint_assertions(const is_threadedt &is_threaded);
+  void fixedpoint_assertions(
+    const is_threadedt &is_threaded,
+    slicing_criteriont &criterion);
 
   void slice(goto_functionst &goto_functions);
 };

@@ -120,7 +120,7 @@ protected:
   bool is_feasible(statet &state);
   void do_show_vcc(statet &state);
 
-  bool drop_state(const statet &state) const;
+  bool drop_state(const statet &state);
 
   void report_statistics();
 

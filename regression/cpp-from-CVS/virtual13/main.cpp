@@ -1,6 +1,6 @@
 struct A { virtual int f(){ return 1; } };
 struct B { virtual int f(){ return 2;} };
-struct C: A,B { virtual int f(){ return 3;} };
+struct C: A, B { virtual int f(){ return 3;} };
 
 
 int main(int argc, char* argv[])

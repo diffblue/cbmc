@@ -1,6 +1,10 @@
-SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
-      taint_parser.cpp taint_analysis.cpp static_analyzer.cpp \
-      unreachable_instructions.cpp
+SRC = goto_analyzer_main.cpp \
+      goto_analyzer_parse_options.cpp \
+      static_analyzer.cpp \
+      taint_analysis.cpp \
+      taint_parser.cpp \
+      unreachable_instructions.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
@@ -12,7 +16,8 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
-      ../util/util$(LIBEXT)
+      ../util/util$(LIBEXT) \
+      ../miniz/miniz$(OBJEXT)
 
 INCLUDES= -I ..
 
@@ -28,9 +33,6 @@ all: goto-analyzer$(EXEEXT)
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(wildcard ../jsil/Makefile),)

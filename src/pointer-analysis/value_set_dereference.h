@@ -48,7 +48,7 @@ public:
 
   virtual ~value_set_dereferencet() { }
 
-  typedef enum { READ, WRITE } modet;
+  enum class modet { READ, WRITE };
 
   /*!
    * The method 'dereference' dereferences the

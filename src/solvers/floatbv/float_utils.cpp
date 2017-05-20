@@ -177,7 +177,8 @@ bvt float_utilst::to_integer(
     bvt offset=bv_utils.build_constant(fraction.size()-1,
                                        unpacked.exponent.size());
     bvt distance=bv_utils.sub(offset, unpacked.exponent);
-    bvt shift_result=bv_utils.shift(fraction, bv_utilst::LRIGHT, distance);
+    bvt shift_result=bv_utils.shift(
+      fraction, bv_utilst::shiftt::LRIGHT, distance);
 
     // if the exponent is negative, we have zero anyways
     bvt result=shift_result;
@@ -206,7 +207,7 @@ bvt float_utilst::to_integer(
     return result;
   }
   else
-    assert(0);
+    throw "unsupported rounding mode";
 }
 
 /*******************************************************************\
@@ -788,12 +789,12 @@ literalt float_utilst::relation(
   relt rel,
   const bvt &src2)
 {
-  if(rel==GT)
-    return relation(src2, LT, src1); // swapped
-  else if(rel==GE)
-    return relation(src2, LE, src1); // swapped
+  if(rel==relt::GT)
+    return relation(src2, relt::LT, src1); // swapped
+  else if(rel==relt::GE)
+    return relation(src2, relt::LE, src1); // swapped
 
-  assert(rel==EQ || rel==LT || rel==LE);
+  assert(rel==relt::EQ || rel==relt::LT || rel==relt::LE);
 
   // special cases: -0 and 0 are equal
   literalt is_zero1=is_zero(src1);
@@ -805,7 +806,7 @@ literalt float_utilst::relation(
   literalt is_NaN2=is_NaN(src2);
   literalt NaN=prop.lor(is_NaN1, is_NaN2);
 
-  if(rel==LT || rel==LE)
+  if(rel==relt::LT || rel==relt::LE)
   {
     literalt bitwise_equal=bv_utils.equal(src1, src2);
 
@@ -828,7 +829,7 @@ literalt float_utilst::relation(
         sign_bit(src1),
         less_than2);
 
-    if(rel==LT)
+    if(rel==relt::LT)
     {
       bvt and_bv;
       and_bv.push_back(less_than3);
@@ -838,7 +839,7 @@ literalt float_utilst::relation(
 
       return prop.land(and_bv);
     }
-    else if(rel==LE)
+    else if(rel==relt::LE)
     {
       bvt or_bv;
       or_bv.push_back(less_than3);
@@ -850,7 +851,7 @@ literalt float_utilst::relation(
     else
       assert(false);
   }
-  else if(rel==EQ)
+  else if(rel==relt::EQ)
   {
     literalt bitwise_equal=bv_utils.equal(src1, src2);
 
@@ -1153,7 +1154,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
     // If so, shift the zeros out left by 'distance'.
     // Otherwise, leave as is.
     const bvt shifted=
-      bv_utils.shift(fraction, bv_utilst::LEFT, distance);
+      bv_utils.shift(fraction, bv_utilst::shiftt::LEFT, distance);
 
     fraction=
       bv_utils.select(prefix_is_zero, shifted, fraction);
@@ -1769,7 +1770,7 @@ bvt float_utilst::sticky_right_shift(
   {
     if(dist[stage]!=const_literal(false))
     {
-      bvt tmp=bv_utils.shift(result, bv_utilst::LRIGHT, d);
+      bvt tmp=bv_utils.shift(result, bv_utilst::shiftt::LRIGHT, d);
 
       bvt lost_bits;
 

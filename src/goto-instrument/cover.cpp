@@ -12,6 +12,7 @@ Date: May 2016
 #include <iterator>
 
 #include <util/prefix.h>
+#include <util/message.h>
 
 #include "cover.h"
 
@@ -684,6 +685,7 @@ Function: eval_expr
           the atomic expr values
 
 \*******************************************************************/
+
 bool eval_expr(
   const std::map<exprt, signed> &atomic_exprs,
   const exprt &src)
@@ -1082,9 +1084,7 @@ void instrument_cover_goals(
 
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
-     has_prefix(
-       id2string(goto_program.instructions.front().source_location.get_file()),
-       "<builtin-library-"))
+     goto_program.instructions.front().source_location.is_built_in())
     return;
 
   const irep_idt coverage_criterion=as_string(criterion);
@@ -1143,7 +1143,7 @@ void instrument_cover_goals(
             basic_blocks.source_location_map[block_nr];
 
           if(!source_location.get_file().empty() &&
-             source_location.get_file()[0]!='<')
+             !source_location.is_built_in())
           {
             std::string comment="block "+b;
             goto_program.insert_before_swap(i_it);
@@ -1181,7 +1181,8 @@ void instrument_cover_goals(
         t->source_location.set_property_class(property_class);
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true())
+      if(i_it->is_goto() && !i_it->guard.is_true() &&
+         !i_it->source_location.is_built_in())
       {
         std::string b=std::to_string(basic_blocks[i_it]);
         std::string true_comment=
@@ -1216,6 +1217,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -1252,6 +1254,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1292,6 +1295,7 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -1393,10 +1397,101 @@ void instrument_cover_goals(
 {
   Forall_goto_functions(f_it, goto_functions)
   {
-    if(f_it->first==ID__start ||
-       f_it->first=="__CPROVER_initialize")
+    if(f_it->first==goto_functions.entry_point() ||
+       f_it->first=="__CPROVER_initialize" ||
+       f_it->second.is_hidden())
       continue;
 
     instrument_cover_goals(symbol_table, f_it->second.body, criterion);
   }
+}
+
+/*******************************************************************\
+
+Function: instrument_cover_goals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &msgh)
+{
+  messaget msg(msgh);
+  std::list<std::string> criteria_strings=cmdline.get_values("cover");
+  std::set<coverage_criteriont> criteria;
+  bool keep_assertions=false;
+
+  for(const auto &criterion_string : criteria_strings)
+  {
+    coverage_criteriont c;
+
+    if(criterion_string=="assertion" || criterion_string=="assertions")
+    {
+      keep_assertions=true;
+      c=coverage_criteriont::ASSERTION;
+    }
+    else if(criterion_string=="path" || criterion_string=="paths")
+      c=coverage_criteriont::PATH;
+    else if(criterion_string=="branch" || criterion_string=="branches")
+      c=coverage_criteriont::BRANCH;
+    else if(criterion_string=="location" || criterion_string=="locations")
+      c=coverage_criteriont::LOCATION;
+    else if(criterion_string=="decision" || criterion_string=="decisions")
+      c=coverage_criteriont::DECISION;
+    else if(criterion_string=="condition" || criterion_string=="conditions")
+      c=coverage_criteriont::CONDITION;
+    else if(criterion_string=="mcdc")
+      c=coverage_criteriont::MCDC;
+    else if(criterion_string=="cover")
+      c=coverage_criteriont::COVER;
+    else
+    {
+      msg.error() << "unknown coverage criterion "
+                  << '\'' << criterion_string << '\''
+                  << messaget::eom;
+      return true;
+    }
+
+    criteria.insert(c);
+  }
+
+  if(keep_assertions && criteria_strings.size()>1)
+  {
+    msg.error() << "assertion coverage cannot currently be used together with "
+                << "other coverage criteria" << messaget::eom;
+    return true;
+  }
+
+  msg.status() << "Rewriting existing assertions as assumptions"
+               << messaget::eom;
+
+  if(!keep_assertions)
+  {
+    // turn assertions (from generic checks) into assumptions
+    Forall_goto_functions(f_it, goto_functions)
+    {
+      goto_programt &body=f_it->second.body;
+      Forall_goto_program_instructions(i_it, body)
+      {
+        if(i_it->is_assert())
+          i_it->type=goto_program_instruction_typet::ASSUME;
+      }
+    }
+  }
+
+  msg.status() << "Instrumenting coverage goals" << messaget::eom;
+
+  for(const auto &criterion : criteria)
+    instrument_cover_goals(symbol_table, goto_functions, criterion);
+
+  goto_functions.update();
+  return false;
 }

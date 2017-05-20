@@ -43,14 +43,14 @@ std::string smt2_dect::decision_procedure_text() const
   return "SMT2 "+logic+
     (use_FPA_theory?" (with FPA)":"")+
     " using "+
-    (solver==GENERIC?"Generic":
-     solver==BOOLECTOR?"Boolector":
-     solver==CVC3?"CVC3":
-     solver==CVC4?"CVC4":
-     solver==MATHSAT?"MathSAT":
-     solver==OPENSMT?"OpenSMT":
-     solver==YICES?"Yices":
-     solver==Z3?"Z3":
+    (solver==solvert::GENERIC?"Generic":
+     solver==solvert::BOOLECTOR?"Boolector":
+     solver==solvert::CVC3?"CVC3":
+     solver==solvert::CVC4?"CVC4":
+     solver==solvert::MATHSAT?"MathSAT":
+     solver==solvert::OPENSMT?"OpenSMT":
+     solver==solvert::YICES?"Yices":
+     solver==solvert::Z3?"Z3":
      "(unknown)");
 }
 
@@ -129,21 +129,21 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   switch(solver)
   {
-  case BOOLECTOR:
+  case solvert::BOOLECTOR:
     command = "boolector --smt2 "
             + smt2_temp_file.temp_out_filename
             + " -m > "
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case CVC3:
+  case solvert::CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
             + smt2_temp_file.temp_out_filename
             + " > "
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case CVC4:
+  case solvert::CVC4:
     // The flags --bitblast=eager --bv-div-zero-const help but only
     // work for pure bit-vector formulas.
     command = "cvc4 -L smt2 "
@@ -152,7 +152,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case MATHSAT:
+  case solvert::MATHSAT:
     // The options below were recommended by Alberto Griggio
     // on 10 July 2013
     command = "mathsat -input=smt2"
@@ -173,7 +173,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + " > "+smt2_temp_file.temp_result_filename;
     break;
 
-  case OPENSMT:
+  case solvert::OPENSMT:
     command = "opensmt "
             + smt2_temp_file.temp_out_filename
             + " > "
@@ -181,7 +181,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     break;
 
 
-  case YICES:
+  case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     command = "yices-smt2 "  //  Calling for 2.2.1
             + smt2_temp_file.temp_out_filename
@@ -189,7 +189,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
             + smt2_temp_file.temp_result_filename;
     break;
 
-  case Z3:
+  case solvert::Z3:
     command = "z3 -smt2 "
             + smt2_temp_file.temp_out_filename
             + " > "
@@ -208,7 +208,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
   if(res<0)
   {
     error() << "error running SMT2 solver" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 
   std::ifstream in(smt2_temp_file.temp_result_filename.c_str());
@@ -231,7 +231,7 @@ Function: smt2_dect::read_result
 decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res=D_ERROR;
+  decision_proceduret::resultt res=resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -244,9 +244,9 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     irept parsed=smt2irep(in);
 
     if(parsed.id()=="sat")
-      res=D_SATISFIABLE;
+      res=resultt::D_SATISFIABLE;
     else if(parsed.id()=="unsat")
-      res=D_UNSATISFIABLE;
+      res=resultt::D_UNSATISFIABLE;
     else if(parsed.id()=="" &&
             parsed.get_sub().size()==1 &&
             parsed.get_sub().front().get_sub().size()==2)
@@ -266,11 +266,11 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     {
       // We ignore errors after UNSAT because get-value after check-sat
       // returns unsat will give an error.
-      if(res!=D_UNSATISFIABLE)
+      if(res!=resultt::D_UNSATISFIABLE)
       {
         error() << "SMT2 solver returned error message:\n"
                 << "\t\"" << parsed.get_sub()[1].id() <<"\"" << eom;
-        return decision_proceduret::D_ERROR;
+        return decision_proceduret::resultt::D_ERROR;
       }
     }
   }

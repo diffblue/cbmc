@@ -6,8 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-// #define DEBUG
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -662,7 +660,7 @@ void value_set_dereferencet::valid_check(
   {
     // always valid, but can't write
 
-    if(mode==WRITE)
+    if(mode==modet::WRITE)
     {
       dereference_callback.dereference_failure(
         "pointer dereference",

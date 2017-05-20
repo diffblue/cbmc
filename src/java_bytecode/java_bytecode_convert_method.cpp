@@ -232,6 +232,14 @@ void java_bytecode_convert_method_lazy(
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
+  if(m.is_public)
+    member_type.set(ID_access, ID_public);
+  else if(m.is_protected)
+    member_type.set(ID_access, ID_protected);
+  else if(m.is_private)
+    member_type.set(ID_access, ID_private);
+  else
+    member_type.set(ID_access, ID_default);
 
   if(method_symbol.base_name=="<init>")
   {
@@ -824,7 +832,7 @@ static void gather_symbol_live_ranges(
 
 /*******************************************************************\
 
-Function: java_bytecode_convert_methodt::convert_instructions
+Function: get_bytecode_type_width
 
   Inputs:
 
@@ -840,6 +848,18 @@ static unsigned get_bytecode_type_width(const typet &ty)
     return 32;
   return ty.get_unsigned_int(ID_width);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::convert_instructions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
@@ -1084,20 +1104,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.size()==1 && results.size()==1);
       code_blockt block;
-      if(!disable_runtime_checks)
-      {
-        // TODO throw NullPointerException instead
-        const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
-        const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-        const exprt not_equal_null(
-          binary_relation_exprt(lhs, ID_notequal, rhs));
-        code_assertt check(not_equal_null);
-        check.add_source_location()
-          .set_comment("Throw null");
-        check.add_source_location()
-          .set_property_class("null-pointer-exception");
-        block.move_to_operands(check);
-      }
+      // TODO throw NullPointerException instead
+      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
+      const exprt not_equal_null(
+        binary_relation_exprt(lhs, ID_notequal, rhs));
+      code_assertt check(not_equal_null);
+      check.add_source_location()
+        .set_comment("Throw null");
+      check.add_source_location()
+        .set_property_class("null-pointer-exception");
+      block.move_to_operands(check);
 
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
@@ -1110,21 +1127,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="checkcast")
     {
-      if(!disable_runtime_checks)
-      {
-        // checkcast throws an exception in case a cast of object
-        // on stack to given type fails.
-        // The stack isn't modified.
-        // TODO: convert assertions to exceptions.
-        assert(op.size()==1 && results.size()==1);
-        binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
-        c=code_assertt(check);
-        c.add_source_location().set_comment("Dynamic cast check");
-        c.add_source_location().set_property_class("bad-dynamic-cast");
-        results[0]=op[0];
-      }
-      else
-        c=code_skipt();
+      // checkcast throws an exception in case a cast of object
+      // on stack to given type fails.
+      // The stack isn't modified.
+      // TODO: convert assertions to exceptions.
+      assert(op.size()==1 && results.size()==1);
+      binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
+      c=code_assertt(check);
+      c.add_source_location().set_comment("Dynamic cast check");
+      c.add_source_location().set_property_class("bad-dynamic-cast");
+
+      results[0]=op[0];
     }
     else if(statement=="invokedynamic")
     {
@@ -1172,8 +1185,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             if(as_string(arg0.get(ID_identifier))
                .find("<init>")!=std::string::npos)
             {
-              if(needed_classes)
-                needed_classes->insert(classname);
+              if(lazy_methods)
+                lazy_methods->add_needed_class(classname);
               code_type.set(ID_constructor, true);
             }
             else
@@ -1264,8 +1277,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-        if(needed_methods)
-          needed_methods->push_back(arg0.get(ID_identifier));
+        if(lazy_methods)
+          lazy_methods->add_needed_method(arg0.get(ID_identifier));
       }
 
       call.function().add_source_location()=loc;
@@ -1307,13 +1320,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_blockt();
-      if(!disable_runtime_checks)
-      {
-        codet bounds_check=
-          get_array_bounds_check(deref, op[1], i_it->source_location);
-        bounds_check.add_source_location()=i_it->source_location;
-        c.move_to_operands(bounds_check);
-      }
+      codet bounds_check=
+        get_array_bounds_check(deref, op[1], i_it->source_location);
+      bounds_check.add_source_location()=i_it->source_location;
+      c.move_to_operands(bounds_check);
       code_assignt array_put(element, op[2]);
       array_put.add_source_location()=i_it->source_location;
       c.move_to_operands(array_put);
@@ -1353,11 +1363,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
 
-      if(!disable_runtime_checks)
-      {
-        c=get_array_bounds_check(deref, op[1], i_it->source_location);
-        c.add_source_location()=i_it->source_location;
-      }
+      c=get_array_bounds_check(deref, op[1], i_it->source_location);
+      c.add_source_location()=i_it->source_location;
       results[0]=java_bytecode_promotion(element);
     }
     else if(statement==patternt("?load"))
@@ -1807,9 +1814,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(needed_classes && arg0.type().id()==ID_symbol)
+      if(lazy_methods && arg0.type().id()==ID_symbol)
       {
-        needed_classes->insert(
+        lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
       results[0]=java_bytecode_promotion(symbol_expr);
@@ -1829,9 +1836,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(needed_classes && arg0.type().id()==ID_symbol)
+      if(lazy_methods && arg0.type().id()==ID_symbol)
       {
-        needed_classes->insert(
+        lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
       c=code_assignt(symbol_expr, op[0]);
@@ -1898,17 +1905,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       c=code_blockt();
-      if(!disable_runtime_checks)
-      {
-        // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=from_integer(0, java_int_type());
-        binary_relation_exprt gezero(op[0], ID_ge, intzero);
-        code_assertt check(gezero);
-        check.add_source_location().set_comment("Array size < 0");
-        check.add_source_location()
-          .set_property_class("array-create-negative-size");
-        c.move_to_operands(check);
-      }
+      // TODO make this throw NegativeArrayIndexException instead.
+      constant_exprt intzero=from_integer(0, java_int_type());
+      binary_relation_exprt gezero(op[0], ID_ge, intzero);
+      code_assertt check(gezero);
+      check.add_source_location().set_comment("Array size < 0");
+      check.add_source_location()
+        .set_property_class("array-create-negative-size");
+      c.move_to_operands(check);
+
       if(max_array_length!=0)
       {
         constant_exprt size_limit=
@@ -1940,26 +1945,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       code_blockt checkandcreate;
-      if(!disable_runtime_checks)
-      {
-        // TODO make this throw NegativeArrayIndexException instead.
-        constant_exprt intzero=from_integer(0, java_int_type());
-        binary_relation_exprt gezero(op[0], ID_ge, intzero);
-        code_assertt check(gezero);
-        check.add_source_location().set_comment("Array size < 0");
-        check.add_source_location()
-          .set_property_class("array-create-negative-size");
-        checkandcreate.move_to_operands(check);
+      // TODO make this throw NegativeArrayIndexException instead.
+      constant_exprt intzero=from_integer(0, java_int_type());
+      binary_relation_exprt gezero(op[0], ID_ge, intzero);
+      code_assertt check(gezero);
+      check.add_source_location().set_comment("Array size < 0");
+      check.add_source_location()
+        .set_property_class("array-create-negative-size");
+      checkandcreate.move_to_operands(check);
 
-        if(max_array_length!=0)
-        {
-          constant_exprt size_limit=
-            from_integer(max_array_length, java_int_type());
-          binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
-          code_assumet assume_le_max_size(le_max_size);
-          checkandcreate.move_to_operands(assume_le_max_size);
-        }
+      if(max_array_length!=0)
+      {
+        constant_exprt size_limit=
+          from_integer(max_array_length, java_int_type());
+        binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
+        code_assumet assume_le_max_size(le_max_size);
+        checkandcreate.move_to_operands(assume_le_max_size);
       }
+
       const exprt tmp=tmp_variable("newarray", ref_type);
       c=code_assignt(tmp, java_new_array);
       results[0]=tmp;
@@ -2300,7 +2303,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
   // First create a simple flat list of basic blocks. We'll add lexical nesting
   // constructs as variable live-ranges require next.
   bool start_new_block=true;
-  int previous_address=-1;
+  bool has_seen_previous_address=false;
+  unsigned previous_address=0;
   for(const auto &address_pair : address_map)
   {
     const unsigned address=address_pair.first;
@@ -2315,7 +2319,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
     // Start a new lexical block if we've just entered a try block
-    if(!start_new_block && previous_address!=-1)
+    if(!start_new_block && has_seen_previous_address)
     {
       for(const auto &exception_row : method.exception_table)
         if(exception_row.start_pc==previous_address)
@@ -2345,6 +2349,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     start_new_block=address_pair.second.successors.size()>1;
 
     previous_address=address;
+    has_seen_previous_address=true;
   }
 
   // Find out where temporaries are used:
@@ -2427,18 +2432,14 @@ void java_bytecode_convert_method(
   const java_bytecode_parse_treet::methodt &method,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  bool disable_runtime_checks,
   size_t max_array_length,
-  safe_pointer<std::vector<irep_idt> > needed_methods,
-  safe_pointer<std::set<irep_idt> > needed_classes)
+  safe_pointer<ci_lazy_methodst> lazy_methods)
 {
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
     message_handler,
-    disable_runtime_checks,
     max_array_length,
-    needed_methods,
-    needed_classes);
+    lazy_methods);
 
   java_bytecode_convert_method(class_symbol, method);
 }

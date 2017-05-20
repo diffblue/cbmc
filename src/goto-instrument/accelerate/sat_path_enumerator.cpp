@@ -42,8 +42,6 @@ Author: Matt Lewis
 #include "util.h"
 #include "overflow_instrumenter.h"
 
-#define DEBUG
-
 bool sat_path_enumeratort::next(patht &path)
 {
   scratch_programt program(symbol_table);
@@ -111,9 +109,7 @@ void sat_path_enumeratort::find_distinguishing_points()
       it!=loop.end();
       ++it)
   {
-    goto_programt::targetst succs;
-
-    goto_program.get_successors(*it, succs);
+    const auto succs=goto_program.get_successors(*it);
 
     if(succs.size()>1)
     {
@@ -141,9 +137,7 @@ void sat_path_enumeratort::build_path(
   do
   {
     goto_programt::targett next;
-    goto_programt::targetst succs;
-
-    goto_program.get_successors(t, succs);
+    const auto succs=goto_program.get_successors(t);
 
     // We should have a looping path, so we should never hit a location
     // with no successors.

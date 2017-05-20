@@ -580,7 +580,7 @@ bool compilet::parse(const std::string &file_name)
 
     if(language.parse(infile, file_name))
     {
-      if(get_ui()==ui_message_handlert::PLAIN)
+      if(get_ui()==ui_message_handlert::uit::PLAIN)
         error() << "PARSING ERROR" << eom;
       return true;
     }
@@ -634,7 +634,7 @@ bool compilet::parse_stdin()
   {
     if(language.parse(std::cin, ""))
     {
-      if(get_ui()==ui_message_handlert::PLAIN)
+      if(get_ui()==ui_message_handlert::uit::PLAIN)
         error() << "PARSING ERROR" << eom;
       return true;
     }

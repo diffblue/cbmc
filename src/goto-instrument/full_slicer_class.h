@@ -16,7 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/cfg.h>
 
-#include <analyses/cfg_dominators.h>
+#include <analyses/dependence_graph.h>
+
+#include "full_slicer.h"
 
 // #define DEBUG_FULL_SLICERT
 #if 0
@@ -29,8 +31,6 @@ echo 'digraph g {' > c.dot ; cat c.goto | \
   echo '}' >> c.dot ; tred c.dot > c-red.dot ; \
   dot -Tpdf -oc-red.pdf c-red.dot
 #endif
-
-class dependence_grapht;
 
 /*******************************************************************\
 
@@ -95,7 +95,7 @@ protected:
   void add_jumps(
     queuet &queue,
     jumpst &jumps,
-    const cfg_post_dominatorst &cfg_post_dominators);
+    const dependence_grapht::post_dominators_mapt &post_dominators);
 
   void add_to_queue(
     queuet &queue,

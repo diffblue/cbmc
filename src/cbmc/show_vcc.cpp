@@ -190,15 +190,15 @@ void bmct::show_vcc()
 
   switch(ui)
   {
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     error() << "XML UI not supported" << eom;
     return;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     show_vcc_json(out);
     break;
 
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     show_vcc_plain(out);
     break;
   }

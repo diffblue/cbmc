@@ -1,8 +1,19 @@
-SRC = cbmc_main.cpp cbmc_parse_options.cpp bmc.cpp cbmc_dimacs.cpp \
-      cbmc_languages.cpp counterexample_beautification.cpp \
-      bv_cbmc.cpp symex_bmc.cpp show_vcc.cpp cbmc_solvers.cpp \
-      xml_interface.cpp bmc_cover.cpp all_properties.cpp \
-      fault_localization.cpp symex_coverage.cpp
+SRC = all_properties.cpp \
+      bmc.cpp \
+      bmc_cover.cpp \
+      bv_cbmc.cpp \
+      cbmc_dimacs.cpp \
+      cbmc_languages.cpp \
+      cbmc_main.cpp \
+      cbmc_parse_options.cpp \
+      cbmc_solvers.cpp \
+      counterexample_beautification.cpp \
+      fault_localization.cpp \
+      show_vcc.cpp \
+      symex_bmc.cpp \
+      symex_coverage.cpp \
+      xml_interface.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
@@ -27,7 +38,9 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../xmllang/xmllang$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
-      ../util/util$(LIBEXT)
+      ../util/util$(LIBEXT) \
+      ../miniz/miniz$(OBJEXT) \
+      ../json/json$(LIBEXT)
 
 INCLUDES= -I ..
 
@@ -48,9 +61,6 @@ endif
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-  ifneq ($(wildcard $(LIBZIPINC)),)
-    LIBS += $(LIBZIPLIB)
-  endif
 endif
 
 ifneq ($(wildcard ../jsil/Makefile),)

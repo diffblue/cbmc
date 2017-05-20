@@ -27,14 +27,12 @@ public:
   java_bytecode_convert_classt(
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    bool _disable_runtime_checks,
     size_t _max_array_length,
     lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode,
     bool _string_refinement_enabled):
     messaget(_message_handler),
     symbol_table(_symbol_table),
-    disable_runtime_checks(_disable_runtime_checks),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     lazy_methods_mode(_lazy_methods_mode),
@@ -60,7 +58,6 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
-  const bool disable_runtime_checks;
   const size_t max_array_length;
   lazy_methodst &lazy_methods;
   lazy_methods_modet lazy_methods_mode;
@@ -169,7 +166,6 @@ void java_bytecode_convert_classt::convert(const classt &c)
         method,
         symbol_table,
         get_message_handler(),
-        disable_runtime_checks,
         max_array_length);
     }
     else
@@ -298,6 +294,8 @@ void java_bytecode_convert_classt::convert(
       component.set_access(ID_protected);
     else if(f.is_public)
       component.set_access(ID_public);
+    else
+      component.set_access(ID_default);
   }
 }
 
@@ -364,7 +362,6 @@ bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  bool disable_runtime_checks,
   size_t max_array_length,
   lazy_methodst &lazy_methods,
   lazy_methods_modet lazy_methods_mode,
@@ -373,7 +370,6 @@ bool java_bytecode_convert_class(
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
     message_handler,
-    disable_runtime_checks,
     max_array_length,
     lazy_methods,
     lazy_methods_mode,

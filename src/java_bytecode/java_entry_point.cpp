@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/remove_exceptions.h>
 
 #include "java_entry_point.h"
 #include "java_object_factory.h"
@@ -37,7 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 Function: create_initialize
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -89,7 +89,7 @@ static bool should_init_symbol(const symbolt &sym)
 
 Function: java_static_lifetime_init
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -97,10 +97,9 @@ Function: java_static_lifetime_init
 
 \*******************************************************************/
 
-bool java_static_lifetime_init(
+void java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
-  message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   unsigned max_nondet_array_length)
 {
@@ -137,12 +136,12 @@ bool java_static_lifetime_init(
         }
         auto newsym=object_factory(
           sym.type,
+          symname,
           code_block,
           allow_null,
           symbol_table,
           max_nondet_array_length,
-          source_location,
-          message_handler);
+          source_location);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
       }
@@ -173,15 +172,13 @@ bool java_static_lifetime_init(
       code_block.add(function_call);
     }
   }
-
-  return false;
 }
 
 /*******************************************************************\
 
 Function: java_build_arguments
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -194,8 +191,7 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length,
-  message_handlert &message_handler)
+  unsigned max_nondet_array_length)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -224,20 +220,21 @@ exprt::operandst java_build_arguments(
       is_main=(named_main && has_correct_type);
     }
 
+    const code_typet::parametert &p=parameters[param_number];
+    const irep_idt base_name=p.get_base_name().empty()?
+      ("argument#"+std::to_string(param_number)):p.get_base_name();
+
     bool allow_null=(!is_main) && (!is_this) && !assume_init_pointers_not_null;
 
     main_arguments[param_number]=
       object_factory(
-        parameters[param_number].type(),
+        p.type(),
+        base_name,
         init_code,
         allow_null,
         symbol_table,
         max_nondet_array_length,
-        function.location,
-        message_handler);
-
-    const symbolt &p_symbol=
-      symbol_table.lookup(parameters[param_number].get_identifier());
+        function.location);
 
     // record as an input
     codet input(ID_input);
@@ -245,7 +242,7 @@ exprt::operandst java_build_arguments(
     input.op0()=
       address_of_exprt(
         index_exprt(
-          string_constantt(p_symbol.base_name),
+          string_constantt(base_name),
           from_integer(0, index_type())));
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
@@ -260,7 +257,7 @@ exprt::operandst java_build_arguments(
 
 Function: java_record_outputs
 
-  Inputs:
+ Inputs:
 
  Outputs:
 
@@ -325,6 +322,24 @@ void java_record_outputs(
       init_code.move_to_operands(output);
     }
   }
+
+  // record exceptional return variable as output
+  codet output(ID_output);
+  output.operands().resize(2);
+
+  assert(symbol_table.has_symbol(id2string(function.name)+EXC_SUFFIX));
+
+  // retrieve the exception variable
+  const symbolt exc_symbol=symbol_table.lookup(
+    id2string(function.name)+EXC_SUFFIX);
+
+  output.op0()=address_of_exprt(
+    index_exprt(string_constantt(exc_symbol.base_name),
+                from_integer(0, index_type())));
+  output.op1()=exc_symbol.symbol_expr();
+  output.add_source_location()=function.location;
+
+  init_code.move_to_operands(output);
 }
 
 main_function_resultt get_main_symbol(
@@ -501,10 +516,13 @@ main_function_resultt get_main_symbol(
 
 Function: java_entry_point
 
-  Inputs: symbol_table
-          main class
-          message_handler
-          allow pointers in initialization code to be null
+ Inputs:
+  symbol_table
+  main class
+  message_handler
+  assume_init_pointers_not_null - allow pointers in initialization code to be
+                                  null
+  max_nondet_array_length
 
  Outputs: true if error occurred on entry point search
 
@@ -536,13 +554,11 @@ bool java_entry_point(
 
   create_initialize(symbol_table);
 
-  if(java_static_lifetime_init(
-       symbol_table,
-       symbol.location,
-       message_handler,
-       assume_init_pointers_not_null,
-       max_nondet_array_length))
-    return true;
+  java_static_lifetime_init(
+    symbol_table,
+    symbol.location,
+    assume_init_pointers_not_null,
+    max_nondet_array_length);
 
   code_blockt init_code;
 
@@ -591,14 +607,22 @@ bool java_entry_point(
     call_main.lhs()=return_symbol.symbol_expr();
   }
 
+  // add the exceptional return value
+  auxiliary_symbolt exc_symbol;
+  exc_symbol.mode=ID_C;
+  exc_symbol.is_static_lifetime=false;
+  exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
+  exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
+  exc_symbol.type=typet(ID_pointer, empty_typet());
+  symbol_table.add(exc_symbol);
+
   exprt::operandst main_arguments=
     java_build_arguments(
       symbol,
       init_code,
       symbol_table,
       assume_init_pointers_not_null,
-      max_nondet_array_length,
-      message_handler);
+      max_nondet_array_length);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);

@@ -14,7 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <iosfwd>
 
-#define USE_DSTRING
+#include "irep_ids.h"
+
 #define SHARING
 // #define HASH_CODE
 #define USE_MOVE
@@ -25,12 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #else
 #include <map>
 #endif
-
-#ifdef USE_DSTRING
-#include "dstring.h"
-#endif
-
-#include "irep_ids.h"
 
 #ifdef USE_DSTRING
 typedef dstringt irep_idt;
@@ -107,7 +102,10 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
-  explicit irept(const irep_idt &_id):data(&empty_d)
+  explicit irept(const irep_idt &_id)
+#ifdef SHARING
+    :data(&empty_d)
+#endif
   {
     id(_id);
   }
@@ -283,11 +281,7 @@ public:
 
     void clear()
     {
-      #ifdef USE_DSTRING
       data.clear();
-      #else
-      data="";
-      #endif
       sub.clear();
       named_sub.clear();
       comments.clear();
