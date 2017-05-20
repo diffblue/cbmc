@@ -46,6 +46,12 @@ include ../common
 
 all: musketeer$(EXEEXT)
 
+ifeq ($(BUILD_ENV_),MSVC)
+  CP_CXXFLAGS += /DMUSKETEER_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
+else
+  CP_CXXFLAGS += -DMUSKETEER_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+endif
+
 ifneq ($(LIB_GLPK),)
   LIBS += $(LIB_GLPK)
   CP_CXXFLAGS += -DHAVE_GLPK

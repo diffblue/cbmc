@@ -22,8 +22,6 @@ Author: CM Wintersteiger, 2006
 #include <util/config.h>
 #include <util/get_base_name.h>
 
-#include <cbmc/version.h>
-
 #include "ms_cl_mode.h"
 #include "compile.h"
 

@@ -24,8 +24,6 @@ Author: Michael Tautschnig
 #include <util/get_base_name.h>
 #include <util/cout_message.h>
 
-#include <cbmc/version.h>
-
 #include "compile.h"
 
 #include "as_mode.h"

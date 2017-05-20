@@ -55,8 +55,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
 
-#include <cbmc/version.h>
-
 #include "goto_instrument_parse_options.h"
 #include "document_properties.h"
 #include "uninitialized.h"

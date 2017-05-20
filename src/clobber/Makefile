@@ -30,6 +30,12 @@ CLEANFILES = clobber$(EXEEXT)
 
 all: clobber$(EXEEXT)
 
+ifeq ($(BUILD_ENV_),MSVC)
+  CP_CXXFLAGS += /DCBMC_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
+else
+  CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+endif
+
 ifneq ($(wildcard ../bv_refinement/Makefile),)
   OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT

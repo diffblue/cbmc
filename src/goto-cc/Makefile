@@ -43,6 +43,12 @@ all: goto-cl$(EXEEXT)
 endif
 all: goto-cc$(EXEEXT)
 
+ifeq ($(BUILD_ENV_),MSVC)
+  CP_CXXFLAGS += /DCBMC_VERSION='"""$(CBMC_VERSION) ($(GIT_INFO))"""'
+else
+  CP_CXXFLAGS += -DCBMC_VERSION="\"$(CBMC_VERSION) ($(GIT_INFO))\""
+endif
+
 ifneq ($(wildcard ../java_bytecode/Makefile),)
   OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
 endif

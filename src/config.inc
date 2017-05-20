@@ -29,3 +29,6 @@ MINISAT2 = ../../minisat-2.2.1
 # Signing identity for MacOS Gatekeeper
 
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"
+
+# Detailed version information
+CBMC_VERSION = 5.7

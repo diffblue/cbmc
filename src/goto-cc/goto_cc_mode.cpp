@@ -17,7 +17,6 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
-#include <cbmc/version.h>
 
 #include "goto_cc_mode.h"
 

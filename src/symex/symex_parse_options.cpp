@@ -44,8 +44,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include <cbmc/version.h>
-
 #include <path-symex/locs.h>
 
 #include "path_search.h"

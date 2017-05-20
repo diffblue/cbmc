@@ -20,6 +20,7 @@ src/goto-analyzer/taint_driver_scripts/.idea/*
 *.obj
 *.a
 *.lib
+.release_info
 src/ansi-c/arm_builtin_headers.inc
 src/ansi-c/clang_builtin_headers.inc
 src/ansi-c/cprover_library.inc

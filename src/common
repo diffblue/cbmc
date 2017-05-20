@@ -1,3 +1,6 @@
+# get version from git
+GIT_INFO = $(shell git describe --tags --always --dirty || echo "n/a")
+
 # Build platform
 # (use one of AUTO, Unix, OSX, OSX_Universal, MSVC, Cygwin, MinGW)
 
@@ -182,12 +185,24 @@ OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))
 %.obj:%.c
 	$(CC) $(CP_CFLAGS) /nologo /c /EHsc $< /Fo$@
 
+# make >= 4.0 has a `file` function that may be faster than `shell cat`
+# for now, portability wins
+KNOWN_RELEASE_INFO = $(shell cat .release_info 2>/dev/null)
+ifneq ($(GIT_INFO), $(KNOWN_RELEASE_INFO))
+$(filter %_parse_options$(OBJEXT), $(OBJ)): .release_info
+
+.release_info:
+	echo $(GIT_INFO) > $@
+
+.PHONY: .release_info
+endif
+
 clean:
 	$(RM) $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cpp, %.d, $(filter %.cpp, $(SRC))) \
 		$(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC))) \
 		$(patsubst %.cc, %.d, $(filter %.cc, $(SRC))) \
-		$(CLEANFILES)
+		$(CLEANFILES) .release_info
 
 .PHONY: first_target clean all
 .PHONY: sources generated_files
@@ -207,4 +222,3 @@ D_FILES1 = $(SRC:.c=.d)
 D_FILES = $(D_FILES1:.cpp=.d)
 
 -include $(D_FILES)
-

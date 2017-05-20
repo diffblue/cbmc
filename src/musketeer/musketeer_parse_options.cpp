@@ -38,7 +38,6 @@ Author:
 #include <goto-instrument/wmm/weak_memory.h>
 
 #include "propagate_const_function_pointers.h"
-#include "version.h"
 #include "musketeer_parse_options.h"
 #include "fencer.h"
 #include "fence_shared.h"
