@@ -2368,6 +2368,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       call.add_source_location()=i_it->source_location;
       c=call;
     }
+    else if(statement=="swap")
+    {
+      assert(op.size()==2 && results.size()==2);
+      results[1]=op[0];
+      results[0]=op[1];
+    }
     else
     {
       c=codet(statement);
