@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
+#include "java_string_library_preprocess.h"
 
 #include <limits>
 #include <algorithm>
@@ -1529,13 +1530,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol.type=arg0.type();
         symbol.value.make_nil();
         symbol.mode=ID_java;
-
         assign_parameter_names(
           to_code_type(symbol.type),
           symbol.name,
           symbol_table);
 
         symbol_table.add(symbol);
+      }
+
+      // Create code for functions on Strings and replace the body.
+      if(string_preprocess.shall_function_be_overriden(id))
+      {
+        symbolt &symbol=(*symbol_table.symbols.find(id)).second;
+        symbol.value=string_preprocess.code_for_function(
+          id, to_code_type(symbol.type), loc, symbol_table);
       }
 
       if(is_virtual)
@@ -1556,7 +1564,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
 
       call.function().add_source_location()=loc;
-      c=call;
+
+      // Replacing call if it is a function of the Character library,
+      // returning the same call otherwise
+      c=string_preprocess.replace_character_call(call);
 
       if(!use_this)
       {
@@ -2748,7 +2759,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   safe_pointer<std::vector<irep_idt> > needed_methods,
-  safe_pointer<std::set<irep_idt> > needed_classes)
+  safe_pointer<std::set<irep_idt> > needed_classes,
+  const java_string_library_preprocesst &string_preprocess)
 {
   static const std::unordered_set<std::string> methods_to_ignore
   {
@@ -2778,7 +2790,8 @@ void java_bytecode_convert_method(
     message_handler,
     max_array_length,
     needed_methods,
-    needed_classes);
+    needed_classes,
+    string_preprocess);
 
   java_bytecode_convert_method(class_symbol, method);
 }
