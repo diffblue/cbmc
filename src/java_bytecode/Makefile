@@ -1,4 +1,5 @@
 SRC = bytecode_info.cpp \
+      character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       expr2java.cpp \
       jar_file.cpp \
