@@ -1045,7 +1045,7 @@ void cbmc_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2016 ";
+    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
