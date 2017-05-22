@@ -157,8 +157,8 @@ bool interval_domaint::merge(
   for(int_mapt::iterator it=int_map.begin();
       it!=int_map.end(); ) // no it++
   {
-    //search for the variable that needs to be merged
-    //containers have different size and variable order
+    // search for the variable that needs to be merged
+    // containers have different size and variable order
     const int_mapt::const_iterator b_it=b.int_map.find(it->first);
     if(b_it==b.int_map.end())
     {
