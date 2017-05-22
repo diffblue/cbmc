@@ -184,7 +184,7 @@ void goto_symext::symex_goto(statet &state)
         new_lhs, new_lhs, guard_symbol_expr,
         new_rhs,
         original_source,
-        symex_targett::GUARD);
+        symex_targett::assignment_typet::GUARD);
 
       guard_expr=guard_symbol_expr;
       guard_expr.make_not();
@@ -437,7 +437,7 @@ void goto_symext::phi_function(
       new_lhs, new_lhs, new_lhs.get_original_expr(),
       rhs,
       dest_state.source,
-      symex_targett::PHI);
+      symex_targett::assignment_typet::PHI);
   }
 }
 
