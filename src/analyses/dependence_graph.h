@@ -91,7 +91,7 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const override;
 
-  void make_top() final
+  void make_top() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
