@@ -269,14 +269,11 @@ typet string_data_type(symbol_tablet symbol_table)
 
 Function: java_string_library_preprocesst::string_length_type
 
-  Inputs:
-    symbol_table - a symbol_table containing an entry for java Strings
-
- Outputs: the type of length fields in java Strings.
+ Outputs: the type of the length field in java Strings.
 
 \*******************************************************************/
 
-typet string_length_type(symbol_tablet symbol_table)
+typet string_length_type()
 {
   return java_int_type();
 }
@@ -305,14 +302,14 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[0].type()=symbol_typet("java::java.lang.Object");
   string_type.components()[1].set_name("length");
   string_type.components()[1].set_pretty_name("length");
-  string_type.components()[1].type()=java_int_type();
+  string_type.components()[1].type()=string_length_type();
   string_type.components()[2].set_name("data");
   string_type.components()[2].set_pretty_name("data");
   // Use a pointer-to-unbounded-array instead of a pointer-to-char.
   // Saves some casting in the string refinement algorithm but may
   // be unnecessary.
   string_type.components()[2].type()=pointer_typet(
-    array_typet(java_char_type(), infinity_exprt(java_int_type())));
+    array_typet(java_char_type(), infinity_exprt(string_length_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
   symbolt string_symbol;
@@ -441,7 +438,7 @@ void java_string_library_preprocesst::process_single_operand(
   code_blockt &init_code)
 {
   member_exprt length(
-    op_to_process, "length", string_length_type(symbol_table));
+    op_to_process, "length", string_length_type());
   member_exprt data(op_to_process, "data", string_data_type(symbol_table));
   dereference_exprt deref_data(data, data.type().subtype());
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, init_code);
@@ -1303,7 +1300,7 @@ codet java_string_library_preprocesst::make_string_builder_append_float_code(
   exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
 
   // Getting types
-  typet length_type=string_length_type(symbol_table);
+  typet length_type=string_length_type();
 
   // Code to be returned
   code_blockt code;
@@ -1665,7 +1662,7 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
   // first_element_address is `&((string_argument->data)[0])`
   exprt data=get_data(deref, symbol_table);
   dereference_exprt deref_data(data, data.type().subtype());
-  exprt first_index=from_integer(0, java_int_type());
+  exprt first_index=from_integer(0, string_length_type());
   index_exprt first_element(deref_data, first_index, java_char_type());
   address_of_exprt first_element_address(first_element);
 
