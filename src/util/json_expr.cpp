@@ -302,6 +302,11 @@ json_objectt json(
       to_integer(to_constant_expr(expr), b);
       result["data"]=json_stringt(integer2string(b));
     }
+    else if(type.id()==ID_string)
+    {
+      result["name"]=json_stringt("string");
+      result["data"]=json_stringt(expr.get_string(ID_value));
+    }
     else
     {
       result["name"]=json_stringt("unknown");
