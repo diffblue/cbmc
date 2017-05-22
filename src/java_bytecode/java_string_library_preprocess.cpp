@@ -260,7 +260,7 @@ typet string_data_type(symbol_tablet symbol_table)
 {
   symbolt sym=symbol_table.lookup("java::java.lang.String");
   typet concrete_type=sym.type;
-  // TODO: we should look at the name of the field
+  // TODO: Check that this is indeed the 'length' field.
   typet data_type=to_struct_type(concrete_type).components()[2].type();
   return data_type;
 }
@@ -446,9 +446,7 @@ void java_string_library_preprocesst::process_single_operand(
   dereference_exprt deref_data(data, data.type().subtype());
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, init_code);
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, init_code);
-#if 0
   init_code.copy_to_operands(code_declt(string_expr_sym));
-#endif
   init_code.copy_to_operands(code_assignt(string_expr.length(), length));
   init_code.copy_to_operands(
     code_assignt(string_expr.content(), deref_data));
@@ -828,17 +826,33 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   return str;
 }
 
+/*******************************************************************\
+
+Function: java_string_library_preprocesst::allocate_fresh_array
+
+  Inputs:
+    type - a type for string
+    loc - a location in the program
+    symbol_table - symbol table
+    code - code block to which allocation instruction will be added
+
+  Output: a new array
+
+ Purpose: declare a new character array and allocate it
+
+\*******************************************************************/
+
 exprt java_string_library_preprocesst::allocate_fresh_array(
   const typet &type,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
   code_blockt &code)
 {
-  exprt str=fresh_array(type, loc, symbol_table);
-  code.copy_to_operands(code_declt(str));
+  exprt array=fresh_array(type, loc, symbol_table);
+  code.copy_to_operands(code_declt(array));
   (void) allocate_dynamic_object(
-    str, str.type().subtype(), symbol_table, loc, code, false);
-  return str;
+    array, array.type().subtype(), symbol_table, loc, code, false);
+  return array;
 }
 
 /*******************************************************************\
