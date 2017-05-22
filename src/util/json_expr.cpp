@@ -243,6 +243,7 @@ json_objectt json(
 
   if(expr.id()==ID_constant)
   {
+    const constant_exprt &constant_expr=to_constant_expr(expr);
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
        type.id()==ID_c_bit_field)
@@ -250,7 +251,7 @@ json_objectt json(
       std::size_t width=to_bitvector_type(type).get_width();
 
       result["name"]=json_stringt("integer");
-      result["binary"]=json_stringt(expr.get_string(ID_value));
+      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["width"]=json_numbert(std::to_string(width));
 
       const typet &underlying_type=
@@ -279,7 +280,7 @@ json_objectt json(
     else if(type.id()==ID_c_enum)
     {
       result["name"]=json_stringt("integer");
-      result["binary"]=json_stringt(expr.get_string(ID_value));
+      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["width"]=json_numbert(type.subtype().get_string(ID_width));
       result["c_type"]=json_stringt("enum");
 
@@ -291,19 +292,19 @@ json_objectt json(
     {
       constant_exprt tmp;
       tmp.type()=ns.follow_tag(to_c_enum_tag_type(type));
-      tmp.set_value(to_constant_expr(expr).get_value());
+      tmp.set_value(constant_expr.get_value());
       return json(tmp, ns);
     }
     else if(type.id()==ID_bv)
     {
       result["name"]=json_stringt("bitvector");
-      result["binary"]=json_stringt(expr.get_string(ID_value));
+      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
     }
     else if(type.id()==ID_fixedbv)
     {
       result["name"]=json_stringt("fixed");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"]=json_stringt(expr.get_string(ID_value));
+      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["data"]=
         json_stringt(fixedbvt(to_constant_expr(expr)).to_ansi_c_string());
     }
@@ -311,7 +312,7 @@ json_objectt json(
     {
       result["name"]=json_stringt("float");
       result["width"]=json_numbert(type.get_string(ID_width));
-      result["binary"]=json_stringt(expr.get_string(ID_value));
+      result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["data"]=
         json_stringt(ieee_floatt(to_constant_expr(expr)).to_ansi_c_string());
     }
@@ -350,7 +351,7 @@ json_objectt json(
     else if(type.id()==ID_string)
     {
       result["name"]=json_stringt("string");
-      result["data"]=json_stringt(expr.get_string(ID_value));
+      result["data"]=json_stringt(id2string(constant_expr.get_value()));
     }
     else
     {
