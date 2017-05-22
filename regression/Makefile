@@ -6,6 +6,7 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
+       goto-trace \
        test-script \
        # Empty last line
 
