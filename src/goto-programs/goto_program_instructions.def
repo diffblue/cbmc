@@ -1,0 +1,21 @@
+GOTO_PROG_INSTR(NO_INSTRUCTION_TYPE)
+GOTO_PROG_INSTR(GOTO)          // branch, possibly guarded
+GOTO_PROG_INSTR(ASSUME)        // non-failing guarded self loop
+GOTO_PROG_INSTR(ASSERT)        // assertions
+GOTO_PROG_INSTR(OTHER)         // anything else
+GOTO_PROG_INSTR(SKIP)          // just advance the PC
+GOTO_PROG_INSTR(START_THREAD)  // spawns an asynchronous thread
+GOTO_PROG_INSTR(END_THREAD)    // end the current thread
+GOTO_PROG_INSTR(LOCATION)      // semantically like SKIP
+GOTO_PROG_INSTR(END_FUNCTION)  // exit point of a function
+GOTO_PROG_INSTR(ATOMIC_BEGIN)  // marks a block without interleavings
+GOTO_PROG_INSTR(ATOMIC_END)    // end of a block without interleavings
+GOTO_PROG_INSTR(RETURN)        // set function return value (no control-flow change)
+GOTO_PROG_INSTR(ASSIGN)        // assignment lhs:=rhs
+GOTO_PROG_INSTR(DECL)          // declare a local variable
+GOTO_PROG_INSTR(DEAD)          // marks the end-of-live of a local variable
+GOTO_PROG_INSTR(FUNCTION_CALL) // call a function
+GOTO_PROG_INSTR(THROW)         // throw an exception
+GOTO_PROG_INSTR(CATCH)         // catch an exception
+
+#undef GOTO_PROG_INSTR
