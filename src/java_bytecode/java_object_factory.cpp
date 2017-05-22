@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
+#include <goto-programs/goto_functions.h>
+
 #include "java_object_factory.h"
 #include "java_types.h"
 #include "java_utils.h"
@@ -55,13 +57,13 @@ static symbolt &new_tmp_symbol(
 
 class java_object_factoryt
 {
-  code_blockt &init_code;
+  std::vector<const symbolt *> &symbols_created;
+  const source_locationt &loc;
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
   bool assume_non_null;
   size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
   namespacet ns;
-  const source_locationt &loc;
 
   void set_null(
     const exprt &expr,
@@ -73,35 +75,54 @@ class java_object_factoryt
     bool create_dynamic_objects,
     update_in_placet update_in_place);
 
+  code_assignt get_null_assignment(
+    const exprt &expr,
+    const pointer_typet &ptr_type);
+
+  void gen_pointer_target_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    const typet &target_type,
+    bool create_dynamic_objects,
+    update_in_placet);
+
+  void allocate_nondet_length_array(
+    code_blockt &assignments,
+    const exprt &lhs,
+    const exprt &max_length_expr,
+    const typet &element_type);
+
 public:
   java_object_factoryt(
-    code_blockt &_init_code,
+    std::vector<const symbolt *> &_symbols_created,
+    const source_locationt &loc,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
-    symbol_tablet &_symbol_table,
-    const source_locationt &_loc):
-    init_code(_init_code),
-    assume_non_null(_assume_non_null),
-    max_nondet_array_length(_max_nondet_array_length),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    loc(_loc)
-    {}
+    symbol_tablet &_symbol_table):
+      symbols_created(_symbols_created),
+      loc(loc),
+      assume_non_null(_assume_non_null),
+      max_nondet_array_length(_max_nondet_array_length),
+      symbol_table(_symbol_table),
+      ns(_symbol_table)
+  {}
 
   exprt allocate_object(
+    code_blockt &assignments,
     const exprt &,
     const typet &,
     bool create_dynamic_objects);
 
   void gen_nondet_array_init(
+    code_blockt &assignments,
     const exprt &expr,
     update_in_placet);
 
   void gen_nondet_init(
+    code_blockt &assignments,
     const exprt &expr,
     bool is_sub,
     irep_idt class_identifier,
-    bool skip_classid,
     bool create_dynamic_objects,
     bool override,
     const typet &override_type,
@@ -112,8 +133,12 @@ public:
 
 Function: java_object_factoryt::allocate_object
 
-  Inputs: the target expression, desired object type, source location
-          and Boolean whether to create a dynamic object
+ Inputs:
+  assignments - The code block to add code to
+  target_expr - The expression which we are allocating a symbol for
+  allocate_type -
+  create_dynamic_objects - Whether to create a symbol with static
+                           lifetime or
 
  Outputs: the allocated object
 
@@ -124,6 +149,7 @@ Function: java_object_factoryt::allocate_object
 \*******************************************************************/
 
 exprt java_object_factoryt::allocate_object(
+  code_blockt &assignments,
   const exprt &target_expr,
   const typet &allocate_type,
   bool create_dynamic_objects)
@@ -134,7 +160,7 @@ exprt java_object_factoryt::allocate_object(
   if(!create_dynamic_objects)
   {
     symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, allocate_type);
-    aux_symbol.is_static_lifetime=true;
+    symbols_created.push_back(&aux_symbol);
 
     exprt object=aux_symbol.symbol_expr();
     exprt aoe=address_of_exprt(object);
@@ -142,7 +168,7 @@ exprt java_object_factoryt::allocate_object(
       aoe=typecast_exprt(aoe, target_expr.type());
     code_assignt code(target_expr, aoe);
     code.add_source_location()=loc;
-    init_code.copy_to_operands(code);
+    assignments.copy_to_operands(code);
     return aoe;
   }
   else
@@ -166,16 +192,17 @@ exprt java_object_factoryt::allocate_object(
         loc,
         pointer_typet(allocate_type),
         "malloc_site");
+      symbols_created.push_back(&malloc_sym);
       code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
       code_assignt &malloc_assign=assign;
       malloc_assign.add_source_location()=loc;
-      init_code.copy_to_operands(malloc_assign);
+      assignments.copy_to_operands(malloc_assign);
       malloc_expr=malloc_sym.symbol_expr();
       if(cast_needed)
         malloc_expr=typecast_exprt(malloc_expr, target_expr.type());
       code_assignt code(target_expr, malloc_expr);
       code.add_source_location()=loc;
-      init_code.copy_to_operands(code);
+      assignments.copy_to_operands(code);
       return malloc_sym.symbol_expr();
     }
     else
@@ -184,7 +211,7 @@ exprt java_object_factoryt::allocate_object(
       null_pointer_exprt null_pointer_expr(to_pointer_type(target_expr.type()));
       code_assignt code(target_expr, null_pointer_expr);
       code.add_source_location()=loc;
-      init_code.copy_to_operands(code);
+      assignments.copy_to_operands(code);
       return exprt();
     }
   }
@@ -192,7 +219,7 @@ exprt java_object_factoryt::allocate_object(
 
 /*******************************************************************\
 
-Function: java_object_factoryt::set_null
+Function: java_object_factoryt::get_null_assignment
 
   Inputs: `expr`: pointer-typed lvalue expression to initialise
           `ptr_type`: pointer type to write
@@ -204,14 +231,14 @@ Function: java_object_factoryt::set_null
 
 \*******************************************************************/
 
-void java_object_factoryt::set_null(
+code_assignt java_object_factoryt::get_null_assignment(
   const exprt &expr,
   const pointer_typet &ptr_type)
 {
   null_pointer_exprt null_pointer_expr(ptr_type);
   code_assignt code(expr, null_pointer_expr);
   code.add_source_location()=loc;
-  init_code.move_to_operands(code);
+  return code;
 }
 
 /*******************************************************************\
@@ -238,6 +265,7 @@ Function: java_object_factoryt::gen_pointer_target_init
 \*******************************************************************/
 
 void java_object_factoryt::gen_pointer_target_init(
+  code_blockt &assignments,
   const exprt &expr,
   const typet &target_type,
   bool create_dynamic_objects,
@@ -251,6 +279,7 @@ void java_object_factoryt::gen_pointer_target_init(
        "java::array["))
   {
     gen_nondet_array_init(
+      assignments,
       expr,
       update_in_place);
   }
@@ -260,6 +289,7 @@ void java_object_factoryt::gen_pointer_target_init(
     if(update_in_place==NO_UPDATE_IN_PLACE)
     {
       target=allocate_object(
+        assignments,
         expr,
         target_type,
         create_dynamic_objects);
@@ -275,10 +305,10 @@ void java_object_factoryt::gen_pointer_target_init(
       init_expr=
         dereference_exprt(target, target.type().subtype());
     gen_nondet_init(
+      assignments,
       init_expr,
       false,
       "",
-      false,
       create_dynamic_objects,
       false,
       typet(),
@@ -321,10 +351,10 @@ Function: java_object_factoryt::gen_nondet_init
 \*******************************************************************/
 
 void java_object_factoryt::gen_nondet_init(
+  code_blockt &assignments,
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
-  bool skip_classid,
   bool create_dynamic_objects,
   bool override,
   const typet &override_type,
@@ -347,76 +377,87 @@ void java_object_factoryt::gen_nondet_init(
       if(!recursion_set.insert(struct_tag).second)
       {
         if(update_in_place==NO_UPDATE_IN_PLACE)
-          set_null(expr, pointer_type);
+        {
+          assignments.copy_to_operands(
+            get_null_assignment(expr, pointer_type));
+        }
         // Otherwise leave it as it is.
         return;
       }
     }
 
-    nondet_ifthenelset update_in_place_diamond(
-      init_code,
-      symbol_table,
-      loc,
-      ID_java,
-      "nondet_update_in_place");
+    code_blockt new_object_assignments;
+    code_blockt update_in_place_assignments;
 
-    if(update_in_place==MAY_UPDATE_IN_PLACE ||
-       update_in_place==MUST_UPDATE_IN_PLACE)
+    if(update_in_place!=NO_UPDATE_IN_PLACE)
     {
-      if(update_in_place==MAY_UPDATE_IN_PLACE)
-        update_in_place_diamond.begin_if();
-
-      // If we're trying to update an object in place
-      // but it is null, just leave it alone.
-      static unsigned long null_check_count=0;
-      std::ostringstream oss;
-      oss << "null_check_failed_" << (++null_check_count);
-      code_labelt post_null_check(oss.str(), code_skipt());
-      code_ifthenelset null_check;
-      null_check.cond()=equal_exprt(expr, null_pointer_exprt(pointer_type));
-      null_check.then_case()=code_gotot(post_null_check.get_label());
-
-      init_code.move_to_operands(null_check);
-
       gen_pointer_target_init(
+        update_in_place_assignments,
         expr,
         subtype,
         create_dynamic_objects,
         MUST_UPDATE_IN_PLACE);
-
-      init_code.move_to_operands(post_null_check);
-
-      if(update_in_place==MUST_UPDATE_IN_PLACE)
-        return;
-
-      update_in_place_diamond.begin_else();
     }
 
-    nondet_ifthenelset init_null_diamond(
-      init_code,
-      symbol_table,
-      loc,
-      ID_java,
-      "nondet_ptr_is_null");
-
-    if(!assume_non_null)
+    if(update_in_place==MUST_UPDATE_IN_PLACE)
     {
-      init_null_diamond.begin_if();
-      set_null(expr, pointer_type);
-      init_null_diamond.begin_else();
+      assignments.append(update_in_place_assignments);
+      return;
     }
 
+    // Otherwise we need code for the allocate-new-object case:
+
+    code_blockt non_null_inst;
     gen_pointer_target_init(
+      non_null_inst,
       expr,
       subtype,
       create_dynamic_objects,
       NO_UPDATE_IN_PLACE);
 
-    if(!assume_non_null)
-      init_null_diamond.finish();
+    if(assume_non_null)
+    {
+      // Add the following code to assignments:
+      // <expr> = <aoe>;
+      new_object_assignments.append(non_null_inst);
+    }
+    else
+    {
+      // Add the following code to assignments:
+      //           IF !NONDET(_Bool) THEN GOTO <label1>
+      //           <expr> = <null pointer>
+      //           GOTO <label2>
+      // <label1>: <expr> = &tmp$<temporary_counter>;
+      //           <code from recursive call to gen_nondet_init() with
+      //             tmp$<temporary_counter>>
+      // And the next line is labelled label2
+      auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-    if(update_in_place==MAY_UPDATE_IN_PLACE)
-      update_in_place_diamond.finish();
+      code_ifthenelset null_check;
+      null_check.cond()=side_effect_expr_nondett(bool_typet());
+      null_check.then_case()=set_null_inst;
+      null_check.else_case()=non_null_inst;
+
+      new_object_assignments.add(null_check);
+    }
+
+    // Similarly to above, maybe use a conditional if both the
+    // allocate-fresh and update-in-place cases are allowed:
+    if(update_in_place==NO_UPDATE_IN_PLACE)
+    {
+      assignments.append(new_object_assignments);
+    }
+    else
+    {
+      assert(update_in_place==MAY_UPDATE_IN_PLACE);
+
+      code_ifthenelset update_check;
+      update_check.cond()=side_effect_expr_nondett(bool_typet());
+      update_check.then_case()=update_in_place_assignments;
+      update_check.else_case()=new_object_assignments;
+
+      assignments.add(update_check);
+    }
   }
   else if(type.id()==ID_struct)
   {
@@ -439,14 +480,14 @@ void java_object_factoryt::gen_nondet_init(
 
       if(name=="@class_identifier")
       {
-        if(skip_classid || update_in_place==MUST_UPDATE_IN_PLACE)
+        if(update_in_place==MUST_UPDATE_IN_PLACE)
           continue;
 
         irep_idt qualified_clsid="java::"+as_string(class_identifier);
         constant_exprt ci(qualified_clsid, string_typet());
         code_assignt code(me, ci);
         code.add_source_location()=loc;
-        init_code.copy_to_operands(code);
+        assignments.copy_to_operands(code);
       }
       else if(name=="@lock")
       {
@@ -454,7 +495,7 @@ void java_object_factoryt::gen_nondet_init(
           continue;
         code_assignt code(me, from_integer(0, me.type()));
         code.add_source_location()=loc;
-        init_code.copy_to_operands(code);
+        assignments.copy_to_operands(code);
       }
       else
       {
@@ -474,10 +515,10 @@ void java_object_factoryt::gen_nondet_init(
           MAY_UPDATE_IN_PLACE :
           update_in_place;
         gen_nondet_init(
+          assignments,
           me,
           _is_sub,
           class_identifier,
-          false,
           create_dynamic_objects,
           false,
           typet(),
@@ -493,35 +534,92 @@ void java_object_factoryt::gen_nondet_init(
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
 
-    init_code.copy_to_operands(assign);
+    assignments.copy_to_operands(assign);
   }
+}
+
+/*******************************************************************\
+
+Function: java_object_factoryt::allocate_nondet_length_array
+
+ Inputs:  `lhs`, symbol to assign the new array structure
+          `max_length_expr`, maximum length of the new array
+            (minimum is fixed at zero for now)
+          `element_type`, actual element type of the array (the array
+            for all reference types will have void* type, but this
+            will be annotated as the true member type)
+
+ Outputs: Appends instructions to `assignments`
+
+ Purpose: Allocates a fresh array. Single-use herem at the moment, but
+          useful to keep as a separate function for downstream branches.
+
+\*******************************************************************/
+
+void java_object_factoryt::allocate_nondet_length_array(
+  code_blockt &assignments,
+  const exprt &lhs,
+  const exprt &max_length_expr,
+  const typet &element_type)
+{
+  symbolt &length_sym=new_tmp_symbol(
+    symbol_table,
+    loc,
+    java_int_type(),
+    "nondet_array_length");
+  symbols_created.push_back(&length_sym);
+  const auto &length_sym_expr=length_sym.symbol_expr();
+
+  // Initialize array with some undetermined length:
+  gen_nondet_init(
+    assignments,
+    length_sym_expr,
+    false,
+    irep_idt(),
+    false,
+    false,
+    typet(),
+    NO_UPDATE_IN_PLACE);
+
+  // Insert assumptions to bound its length:
+  binary_relation_exprt
+    assume1(length_sym_expr, ID_ge, from_integer(0, java_int_type()));
+  binary_relation_exprt
+    assume2(length_sym_expr, ID_le, max_length_expr);
+  code_assumet assume_inst1(assume1);
+  code_assumet assume_inst2(assume2);
+  assignments.move_to_operands(assume_inst1);
+  assignments.move_to_operands(assume_inst2);
+
+  side_effect_exprt java_new_array(ID_java_new_array, lhs.type());
+  java_new_array.copy_to_operands(length_sym_expr);
+  java_new_array.type().subtype().set(ID_C_element_type, element_type);
+  codet assign=code_assignt(lhs, java_new_array);
+  assign.add_source_location()=loc;
+  assignments.copy_to_operands(assign);
 }
 
 /*******************************************************************\
 
 Function: java_object_factoryt::gen_nondet_array_init
 
- Inputs: `expr`: Array-typed expression to initialise
-         `update_in_place`:
-           NO_UPDATE_IN_PLACE: initialise `expr` from scratch
-           MUST_UPDATE_IN_PLACE: reinitialise an existing array
-           MAY_UPDATE_IN_PLACE: invalid input
+ Inputs:
 
  Outputs:
 
  Purpose: create code to initialize a Java array with size
           `max_nondet_array_length`, loop over elements and initialize
-          or reinitialize them
+          them
 
 \*******************************************************************/
 
 void java_object_factoryt::gen_nondet_array_init(
+  code_blockt &assignments,
   const exprt &expr,
   update_in_placet update_in_place)
 {
-  assert(update_in_place!=MAY_UPDATE_IN_PLACE);
   assert(expr.type().id()==ID_pointer);
-
+  assert(update_in_place!=MAY_UPDATE_IN_PLACE);
   const typet &type=ns.follow(expr.type().subtype());
   const struct_typet &struct_type=to_struct_type(type);
   assert(expr.type().subtype().id()==ID_symbol);
@@ -530,65 +628,23 @@ void java_object_factoryt::gen_nondet_array_init(
 
   auto max_length_expr=from_integer(max_nondet_array_length, java_int_type());
 
-  typet allocate_type;
-  exprt length_sym_expr;
-
   if(update_in_place==NO_UPDATE_IN_PLACE)
   {
-    const symbolt &length_sym=new_tmp_symbol(
-      symbol_table,
-      loc,
-      java_int_type(),
-      "nondet_array_length");
-    length_sym_expr=length_sym.symbol_expr();
-
-    // Initialise array with some undetermined length:
-    gen_nondet_init(
-      length_sym_expr,
-      false,
-      irep_idt(),
-      false,
-      false,
-      false,
-      typet(),
-      NO_UPDATE_IN_PLACE);
-
-    // Insert assumptions to bound its length:
-    binary_relation_exprt assume1(length_sym_expr, ID_ge,
-                                  from_integer(0, java_int_type()));
-    binary_relation_exprt assume2(length_sym_expr, ID_le,
-                                  max_length_expr);
-
-    code_assumet assume_inst1(assume1);
-    code_assumet assume_inst2(assume2);
-    init_code.move_to_operands(assume_inst1);
-    init_code.move_to_operands(assume_inst2);
-
-    side_effect_exprt java_new_array(ID_java_new_array, expr.type());
-    java_new_array.copy_to_operands(length_sym_expr);
-    // Retain the array_set instruction for the special case of a
-    // zero-length array, where this will be the only assignment against
-    // the array's identifier.
-    java_new_array.set(ID_skip_initialize, false);
-    java_new_array.type().subtype().set(ID_C_element_type, element_type);
-    codet assign=code_assignt(expr, java_new_array);
-    assign.add_source_location()=loc;
-    init_code.copy_to_operands(assign);
-  }
-  else
-  {
-    // Update in place. Get existing array length:
-    length_sym_expr=
-      member_exprt(
-        dereference_exprt(expr, expr.type().subtype()),
-        "length",
-        struct_type.component_type("length"));
+    allocate_nondet_length_array(
+      assignments,
+      expr,
+      max_length_expr,
+      element_type);
   }
 
-  exprt init_array_expr=member_exprt(
-    dereference_exprt(expr, expr.type().subtype()),
-    "data",
-    struct_type.component_type("data"));
+  // Otherwise we're updating the array in place, and use the
+  // existing array allocation and length.
+
+  dereference_exprt deref_expr(expr, expr.type().subtype());
+  const auto &comps=struct_type.components();
+  exprt length_expr=member_exprt(deref_expr, "length", comps[1].type());
+  exprt init_array_expr=member_exprt(deref_expr, "data", comps[2].type());
+
   if(init_array_expr.type()!=pointer_typet(element_type))
     init_array_expr=
       typecast_exprt(init_array_expr, pointer_typet(element_type));
@@ -600,38 +656,40 @@ void java_object_factoryt::gen_nondet_array_init(
     loc,
     init_array_expr.type(),
     "array_data_init");
+  symbols_created.push_back(&array_init_symbol);
   const auto &array_init_symexpr=array_init_symbol.symbol_expr();
   codet data_assign=code_assignt(array_init_symexpr, init_array_expr);
   data_assign.add_source_location()=loc;
-  init_code.copy_to_operands(data_assign);
+  assignments.copy_to_operands(data_assign);
 
   // Emit init loop for(array_init_iter=0; array_init_iter!=array.length;
   //                  ++array_init_iter) init(array[array_init_iter]);
   symbolt &counter=new_tmp_symbol(
     symbol_table,
     loc,
-    length_sym_expr.type(),
+    length_expr.type(),
     "array_init_iter");
+  symbols_created.push_back(&counter);
   exprt counter_expr=counter.symbol_expr();
 
   exprt java_zero=from_integer(0, java_int_type());
-  init_code.copy_to_operands(code_assignt(counter_expr, java_zero));
+  assignments.copy_to_operands(code_assignt(counter_expr, java_zero));
 
   std::string head_name=as_string(counter.base_name)+"_header";
   code_labelt init_head_label(head_name, code_skipt());
   code_gotot goto_head(head_name);
 
-  init_code.move_to_operands(init_head_label);
+  assignments.move_to_operands(init_head_label);
 
   std::string done_name=as_string(counter.base_name)+"_done";
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 
   code_ifthenelset done_test;
-  done_test.cond()=equal_exprt(counter_expr, length_sym_expr);
+  done_test.cond()=equal_exprt(counter_expr, length_expr);
   done_test.then_case()=goto_done;
 
-  init_code.move_to_operands(done_test);
+  assignments.move_to_operands(done_test);
 
   if(update_in_place!=MUST_UPDATE_IN_PLACE)
   {
@@ -640,7 +698,8 @@ void java_object_factoryt::gen_nondet_array_init(
     code_ifthenelset max_test;
     max_test.cond()=equal_exprt(counter_expr, max_length_expr);
     max_test.then_case()=goto_done;
-    init_code.move_to_operands(max_test);
+
+    assignments.move_to_operands(max_test);
   }
 
   exprt arraycellref=dereference_exprt(
@@ -655,10 +714,10 @@ void java_object_factoryt::gen_nondet_array_init(
     MAY_UPDATE_IN_PLACE :
     update_in_place;
   gen_nondet_init(
+    assignments,
     arraycellref,
     false,
     irep_idt(),
-    false,
     true,
     true,
     element_type,
@@ -667,9 +726,9 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt java_one=from_integer(1, java_int_type());
   code_assignt incr(counter_expr, plus_exprt(counter_expr, java_one));
 
-  init_code.move_to_operands(incr);
-  init_code.move_to_operands(goto_head);
-  init_code.move_to_operands(init_done_label);
+  assignments.move_to_operands(incr);
+  assignments.move_to_operands(goto_head);
+  assignments.move_to_operands(init_done_label);
 }
 
 /*******************************************************************\
@@ -696,33 +755,63 @@ Function: object_factory
 
 exprt object_factory(
   const typet &type,
+  const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
   const source_locationt &loc)
 {
+  irep_idt identifier=id2string(goto_functionst::entry_point())+
+    "::"+id2string(base_name);
+
+  auxiliary_symbolt main_symbol;
+  main_symbol.mode=ID_java;
+  main_symbol.is_static_lifetime=false;
+  main_symbol.name=identifier;
+  main_symbol.base_name=base_name;
+  main_symbol.type=type;
+  main_symbol.location=loc;
+
+  exprt object=main_symbol.symbol_expr();
+
+  symbolt *main_symbol_ptr;
+  bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
+  assert(!moving_symbol_failed);
+
+  std::vector<const symbolt *> symbols_created;
+  symbols_created.push_back(main_symbol_ptr);
+
   symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, type);
   aux_symbol.is_static_lifetime=true;
 
-  exprt object=aux_symbol.symbol_expr();
-
   java_object_factoryt state(
-    init_code,
+    symbols_created,
+    loc,
     !allow_null,
     max_nondet_array_length,
-    symbol_table,
-    loc);
+    symbol_table);
+  code_blockt assignments;
   state.gen_nondet_init(
+    assignments,
     object,
     false,
     "",
     false,
     false,
-    false,
     typet(),
     NO_UPDATE_IN_PLACE);
 
+  // Add the following code to init_code for each symbol that's been created:
+  //   <type> <identifier>;
+  for(const symbolt * const symbol_ptr : symbols_created)
+  {
+    code_declt decl(symbol_ptr->symbol_expr());
+    decl.add_source_location()=loc;
+    init_code.add(decl);
+  }
+
+  init_code.append(assignments);
   return object;
 }
 
@@ -764,25 +853,38 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
-  bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
   size_t max_nondet_array_length,
   update_in_placet update_in_place)
 {
+  std::vector<const symbolt *> symbols_created;
+
   java_object_factoryt state(
-    init_code,
+    symbols_created,
+    loc,
     assume_non_null,
     max_nondet_array_length,
-    symbol_table,
-    loc);
+    symbol_table);
+  code_blockt assignments;
   state.gen_nondet_init(
+    assignments,
     expr,
     false,
     "",
-    skip_classid,
     create_dyn_objs,
     false,
     typet(),
     update_in_place);
+
+  // Add the following code to init_code for each symbol that's been created:
+  //   <type> <identifier>;
+  for(const symbolt * const symbol_ptr : symbols_created)
+  {
+    code_declt decl(symbol_ptr->symbol_expr());
+    decl.add_source_location()=loc;
+    init_code.add(decl);
+  }
+
+  init_code.append(assignments);
 }

@@ -113,50 +113,50 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 
   switch(SSA_step.type)
   {
-  case goto_trace_stept::ASSERT:
+  case goto_trace_stept::typet::ASSERT:
     get_symbols(SSA_step.cond_expr);
     break;
 
-  case goto_trace_stept::ASSUME:
+  case goto_trace_stept::typet::ASSUME:
     get_symbols(SSA_step.cond_expr);
     break;
 
-  case goto_trace_stept::GOTO:
+  case goto_trace_stept::typet::GOTO:
     get_symbols(SSA_step.cond_expr);
     break;
 
-  case goto_trace_stept::LOCATION:
+  case goto_trace_stept::typet::LOCATION:
     // ignore
     break;
 
-  case goto_trace_stept::ASSIGNMENT:
+  case goto_trace_stept::typet::ASSIGNMENT:
     slice_assignment(SSA_step);
     break;
 
-  case goto_trace_stept::DECL:
+  case goto_trace_stept::typet::DECL:
     slice_decl(SSA_step);
     break;
 
-  case goto_trace_stept::OUTPUT:
-  case goto_trace_stept::INPUT:
+  case goto_trace_stept::typet::OUTPUT:
+  case goto_trace_stept::typet::INPUT:
     break;
 
-  case goto_trace_stept::DEAD:
+  case goto_trace_stept::typet::DEAD:
     // ignore for now
     break;
 
-  case goto_trace_stept::CONSTRAINT:
-  case goto_trace_stept::SHARED_READ:
-  case goto_trace_stept::SHARED_WRITE:
-  case goto_trace_stept::ATOMIC_BEGIN:
-  case goto_trace_stept::ATOMIC_END:
-  case goto_trace_stept::SPAWN:
-  case goto_trace_stept::MEMORY_BARRIER:
+  case goto_trace_stept::typet::CONSTRAINT:
+  case goto_trace_stept::typet::SHARED_READ:
+  case goto_trace_stept::typet::SHARED_WRITE:
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+  case goto_trace_stept::typet::ATOMIC_END:
+  case goto_trace_stept::typet::SPAWN:
+  case goto_trace_stept::typet::MEMORY_BARRIER:
     // ignore for now
     break;
 
-  case goto_trace_stept::FUNCTION_CALL:
-  case goto_trace_stept::FUNCTION_RETURN:
+  case goto_trace_stept::typet::FUNCTION_CALL:
+  case goto_trace_stept::typet::FUNCTION_RETURN:
     // ignore for now
     break;
 
@@ -248,39 +248,39 @@ void symex_slicet::collect_open_variables(
 
     switch(SSA_step.type)
     {
-    case goto_trace_stept::ASSERT:
+    case goto_trace_stept::typet::ASSERT:
       get_symbols(SSA_step.cond_expr);
       break;
 
-    case goto_trace_stept::ASSUME:
+    case goto_trace_stept::typet::ASSUME:
       get_symbols(SSA_step.cond_expr);
       break;
 
-    case goto_trace_stept::LOCATION:
+    case goto_trace_stept::typet::LOCATION:
       // ignore
       break;
 
-    case goto_trace_stept::ASSIGNMENT:
+    case goto_trace_stept::typet::ASSIGNMENT:
       get_symbols(SSA_step.ssa_rhs);
       lhs.insert(SSA_step.ssa_lhs.get_identifier());
       break;
 
-    case goto_trace_stept::OUTPUT:
-    case goto_trace_stept::INPUT:
-    case goto_trace_stept::DEAD:
-    case goto_trace_stept::NONE:
+    case goto_trace_stept::typet::OUTPUT:
+    case goto_trace_stept::typet::INPUT:
+    case goto_trace_stept::typet::DEAD:
+    case goto_trace_stept::typet::NONE:
       break;
 
-    case goto_trace_stept::DECL:
-    case goto_trace_stept::FUNCTION_CALL:
-    case goto_trace_stept::FUNCTION_RETURN:
-    case goto_trace_stept::CONSTRAINT:
-    case goto_trace_stept::SHARED_READ:
-    case goto_trace_stept::SHARED_WRITE:
-    case goto_trace_stept::ATOMIC_BEGIN:
-    case goto_trace_stept::ATOMIC_END:
-    case goto_trace_stept::SPAWN:
-    case goto_trace_stept::MEMORY_BARRIER:
+    case goto_trace_stept::typet::DECL:
+    case goto_trace_stept::typet::FUNCTION_CALL:
+    case goto_trace_stept::typet::FUNCTION_RETURN:
+    case goto_trace_stept::typet::CONSTRAINT:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::SHARED_WRITE:
+    case goto_trace_stept::typet::ATOMIC_BEGIN:
+    case goto_trace_stept::typet::ATOMIC_END:
+    case goto_trace_stept::typet::SPAWN:
+    case goto_trace_stept::typet::MEMORY_BARRIER:
       // ignore for now
       break;
 

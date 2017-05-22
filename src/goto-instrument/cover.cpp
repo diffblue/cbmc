@@ -826,6 +826,7 @@ Function: eval_expr
           the atomic expr values
 
 \*******************************************************************/
+
 bool eval_expr(
   const std::map<exprt, signed> &atomic_exprs,
   const exprt &src)
@@ -1369,7 +1370,7 @@ void instrument_cover_goals(
           // check whether the current goal already exists
           if(!goals.is_existing_goal(source_location) &&
              !source_location.get_file().empty() &&
-             source_location.get_file()[0]!='<' &&
+             !source_location.is_built_in() &&
              cover_curr_function)
           {
             std::string comment=
@@ -1412,7 +1413,8 @@ void instrument_cover_goals(
         t->source_location.set_function(i_it->function);
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function)
+      if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
+         !i_it->source_location.is_built_in())
       {
         std::string b=std::to_string(basic_blocks[i_it]);
         std::string true_comment=
@@ -1448,7 +1450,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
-      if(cover_curr_function)
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -1488,7 +1490,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
-      if(cover_curr_function)
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1532,7 +1534,7 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
-      if(cover_curr_function)
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -1646,7 +1648,8 @@ void instrument_cover_goals(
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==goto_functions.entry_point() ||
-       f_it->first==(CPROVER_PREFIX "initialize"))
+       f_it->first==(CPROVER_PREFIX "initialize") ||
+       f_it->second.is_hidden())
       continue;
 
     instrument_cover_goals(

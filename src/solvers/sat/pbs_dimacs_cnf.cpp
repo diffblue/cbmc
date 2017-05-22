@@ -247,9 +247,9 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   }
 
   if(result)
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   else
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
 }
 
 /*******************************************************************\

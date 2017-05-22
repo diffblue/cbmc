@@ -32,7 +32,7 @@ void show_value_sets(
 {
   switch(ui)
   {
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(goto_functions, value_set_analysis, xml);
@@ -40,7 +40,7 @@ void show_value_sets(
     }
     break;
 
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     value_set_analysis.output(goto_functions, std::cout);
     break;
 
@@ -69,7 +69,7 @@ void show_value_sets(
 {
   switch(ui)
   {
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(goto_program, value_set_analysis, xml);
@@ -77,7 +77,7 @@ void show_value_sets(
     }
     break;
 
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     value_set_analysis.output(goto_program, std::cout);
     break;
 

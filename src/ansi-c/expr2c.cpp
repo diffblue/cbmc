@@ -886,16 +886,16 @@ std::string expr2ct::convert_typecast(
 
   if(to_type.id()==ID_c_bool &&
      from_type.id()==ID_bool)
-    return convert(src.op(), precedence);
+    return convert_with_precedence(src.op(), precedence);
 
   if(to_type.id()==ID_bool &&
      from_type.id()==ID_c_bool)
-    return convert(src.op(), precedence);
+    return convert_with_precedence(src.op(), precedence);
 
   std::string dest="("+convert(src.type())+")";
 
   unsigned p;
-  std::string tmp=convert(src.op(), p);
+  std::string tmp=convert_with_precedence(src.op(), p);
 
   if(precedence>p)
     dest+='(';
@@ -934,9 +934,9 @@ std::string expr2ct::convert_trinary(
 
   unsigned p0, p1, p2;
 
-  std::string s_op0=convert(op0, p0);
-  std::string s_op1=convert(op1, p1);
-  std::string s_op2=convert(op2, p2);
+  std::string s_op0=convert_with_precedence(op0, p0);
+  std::string s_op1=convert_with_precedence(op1, p1);
+  std::string s_op2=convert_with_precedence(op2, p2);
 
   std::string dest;
 
@@ -991,8 +991,8 @@ std::string expr2ct::convert_quantifier(
 
   unsigned p0, p1;
 
-  std::string op0=convert(src.op0(), p0);
-  std::string op1=convert(src.op1(), p1);
+  std::string op0=convert_with_precedence(src.op0(), p0);
+  std::string op1=convert_with_precedence(src.op1(), p1);
 
   std::string dest=symbol+" { ";
   dest+=convert(src.op0().type());
@@ -1023,7 +1023,7 @@ std::string expr2ct::convert_with(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
 
   std::string dest;
 
@@ -1069,9 +1069,9 @@ std::string expr2ct::convert_with(
       p1=10;
     }
     else
-      op1=convert(src.operands()[i], p1);
+      op1=convert_with_precedence(src.operands()[i], p1);
 
-    op2=convert(src.operands()[i+1], p2);
+    op2=convert_with_precedence(src.operands()[i+1], p2);
 
     dest+=op1;
     dest+=":=";
@@ -1110,8 +1110,8 @@ std::string expr2ct::convert_update(
   std::string op0, op1, op2;
   unsigned p0, p2;
 
-  op0=convert(src.op0(), p0);
-  op2=convert(src.op2(), p2);
+  op0=convert_with_precedence(src.op0(), p0);
+  op2=convert_with_precedence(src.op2(), p2);
 
   if(precedence>p0)
     dest+='(';
@@ -1165,7 +1165,7 @@ std::string expr2ct::convert_cond(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string op=convert(*it, p);
+    std::string op=convert_with_precedence(*it, p);
 
     if(condition)
       dest+="  ";
@@ -1222,7 +1222,7 @@ std::string expr2ct::convert_binary(
     }
 
     unsigned p;
-    std::string op=convert(*it, p);
+    std::string op=convert_with_precedence(*it, p);
 
     // In pointer arithmetic, x+(y-z) is unfortunately
     // not the same as (x+y)-z, even though + and -
@@ -1267,7 +1267,7 @@ std::string expr2ct::convert_unary(
     return convert_norep(src, precedence);
 
   unsigned p;
-  std::string op=convert(src.op0(), p);
+  std::string op=convert_with_precedence(src.op0(), p);
 
   std::string dest=symbol;
   if(precedence>=p ||
@@ -1301,7 +1301,7 @@ std::string expr2ct::convert_pointer_object_has_type(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
 
   std::string dest="POINTER_OBJECT_HAS_TYPE";
   dest+='(';
@@ -1333,7 +1333,7 @@ std::string expr2ct::convert_malloc(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
 
   std::string dest="MALLOC";
   dest+='(';
@@ -1482,7 +1482,7 @@ std::string expr2ct::convert_function(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string op=convert(*it, p);
+    std::string op=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -1515,12 +1515,12 @@ std::string expr2ct::convert_comma(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
   if(*op0.rbegin()==';')
     op0.resize(op0.size()-1);
 
   unsigned p1;
-  std::string op1=convert(src.op1(), p1);
+  std::string op1=convert_with_precedence(src.op1(), p1);
   if(*op1.rbegin()==';')
     op1.resize(op1.size()-1);
 
@@ -1553,7 +1553,7 @@ std::string expr2ct::convert_complex(
   {
     // This is believed to be gcc only; check if this is sensible
     // in MSC mode.
-    return convert(src.op1(), precedence)+"i";
+    return convert_with_precedence(src.op1(), precedence)+"i";
   }
 
   // ISO C11 offers:
@@ -1581,7 +1581,7 @@ std::string expr2ct::convert_complex(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string op=convert(*it, p);
+    std::string op=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -1636,10 +1636,10 @@ std::string expr2ct::convert_byte_extract(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
 
   unsigned p1;
-  std::string op1=convert(src.op1(), p1);
+  std::string op1=convert_with_precedence(src.op1(), p1);
 
   std::string dest=src.id_string();
   dest+='(';
@@ -1673,13 +1673,13 @@ std::string expr2ct::convert_byte_update(
     return convert_norep(src, precedence);
 
   unsigned p0;
-  std::string op0=convert(src.op0(), p0);
+  std::string op0=convert_with_precedence(src.op0(), p0);
 
   unsigned p1;
-  std::string op1=convert(src.op1(), p1);
+  std::string op1=convert_with_precedence(src.op1(), p1);
 
   unsigned p2;
-  std::string op2=convert(src.op2(), p2);
+  std::string op2=convert_with_precedence(src.op2(), p2);
 
   std::string dest=src.id_string();
   dest+='(';
@@ -1716,7 +1716,7 @@ std::string expr2ct::convert_unary_post(
     return convert_norep(src, precedence);
 
   unsigned p;
-  std::string op=convert(src.op0(), p);
+  std::string op=convert_with_precedence(src.op0(), p);
 
   std::string dest;
   if(precedence>p)
@@ -1749,7 +1749,7 @@ std::string expr2ct::convert_index(
     return convert_norep(src, precedence);
 
   unsigned p;
-  std::string op=convert(src.op0(), p);
+  std::string op=convert_with_precedence(src.op0(), p);
 
   std::string dest;
   if(precedence>p)
@@ -1793,7 +1793,7 @@ std::string expr2ct::convert_pointer_arithmetic(
 
   dest+=", ";
 
-  op=convert(src.op0(), p);
+  op=convert_with_precedence(src.op0(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1802,7 +1802,7 @@ std::string expr2ct::convert_pointer_arithmetic(
 
   dest+=", ";
 
-  op=convert(src.op1(), p);
+  op=convert_with_precedence(src.op1(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1842,7 +1842,7 @@ std::string expr2ct::convert_pointer_difference(
 
   dest+=", ";
 
-  op=convert(src.op0(), p);
+  op=convert_with_precedence(src.op0(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1851,7 +1851,7 @@ std::string expr2ct::convert_pointer_difference(
 
   dest+=", ";
 
-  op=convert(src.op1(), p);
+  op=convert_with_precedence(src.op1(), p);
   if(precedence>p)
     dest+='(';
   dest+=op;
@@ -1932,7 +1932,7 @@ std::string expr2ct::convert_member(
   if(src.op0().id()==ID_dereference &&
      src.operands().size()==1)
   {
-    std::string op=convert(src.op0().op0(), p);
+    std::string op=convert_with_precedence(src.op0().op0(), p);
 
     if(precedence>p || src.op0().op0().id()==ID_typecast)
       dest+='(';
@@ -1944,7 +1944,7 @@ std::string expr2ct::convert_member(
   }
   else
   {
-    std::string op=convert(src.op0(), p);
+    std::string op=convert_with_precedence(src.op0(), p);
 
     if(precedence>p || src.op0().id()==ID_typecast)
       dest+='(';
@@ -2495,7 +2495,7 @@ std::string expr2ct::convert_constant(
           return convert_norep(src, precedence);
       }
       else
-        return convert(src.op0(), precedence);
+        return convert_with_precedence(src.op0(), precedence);
     }
   }
   else if(type.id()==ID_string)
@@ -2986,7 +2986,7 @@ std::string expr2ct::convert_function_application(
 
   {
     unsigned p;
-    std::string function_str=convert(src.function(), p);
+    std::string function_str=convert_with_precedence(src.function(), p);
     dest+=function_str;
   }
 
@@ -2995,7 +2995,7 @@ std::string expr2ct::convert_function_application(
   forall_expr(it, src.arguments())
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.arguments().begin())
       dest+=", ";
@@ -3028,7 +3028,7 @@ std::string expr2ct::convert_side_effect_expr_function_call(
 
   {
     unsigned p;
-    std::string function_str=convert(src.function(), p);
+    std::string function_str=convert_with_precedence(src.function(), p);
     dest+=function_str;
   }
 
@@ -3037,7 +3037,7 @@ std::string expr2ct::convert_side_effect_expr_function_call(
   forall_expr(it, src.arguments())
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.arguments().begin())
       dest+=", ";
@@ -3081,7 +3081,7 @@ std::string expr2ct::convert_overflow(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     dest+=", ";
     // TODO: ggf. Klammern je nach p
@@ -3991,7 +3991,7 @@ std::string expr2ct::convert_code_function_call(
   if(src.lhs().is_not_nil())
   {
     unsigned p;
-    std::string lhs_str=convert(src.lhs(), p);
+    std::string lhs_str=convert_with_precedence(src.lhs(), p);
 
     // TODO: ggf. Klammern je nach p
     dest+=lhs_str;
@@ -4000,7 +4000,7 @@ std::string expr2ct::convert_code_function_call(
 
   {
     unsigned p;
-    std::string function_str=convert(src.function(), p);
+    std::string function_str=convert_with_precedence(src.function(), p);
     dest+=function_str;
   }
 
@@ -4011,7 +4011,7 @@ std::string expr2ct::convert_code_function_call(
   forall_expr(it, arguments)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=arguments.begin())
       dest+=", ";
@@ -4045,7 +4045,7 @@ std::string expr2ct::convert_code_printf(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -4121,7 +4121,7 @@ std::string expr2ct::convert_code_input(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -4155,7 +4155,7 @@ std::string expr2ct::convert_code_output(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -4188,7 +4188,7 @@ std::string expr2ct::convert_code_array_set(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -4222,7 +4222,7 @@ std::string expr2ct::convert_code_array_copy(
   forall_operands(it, src)
   {
     unsigned p;
-    std::string arg_str=convert(*it, p);
+    std::string arg_str=convert_with_precedence(*it, p);
 
     if(it!=src.operands().begin())
       dest+=", ";
@@ -4448,9 +4448,9 @@ std::string expr2ct::convert_extractbit(
   if(src.operands().size()!=2)
     return convert_norep(src, precedence);
 
-  std::string dest=convert(src.op0(), precedence);
+  std::string dest=convert_with_precedence(src.op0(), precedence);
   dest+='[';
-  dest+=convert(src.op1(), precedence);
+  dest+=convert_with_precedence(src.op1(), precedence);
   dest+=']';
 
   return dest;
@@ -4475,11 +4475,11 @@ std::string expr2ct::convert_extractbits(
   if(src.operands().size()!=3)
     return convert_norep(src, precedence);
 
-  std::string dest=convert(src.op0(), precedence);
+  std::string dest=convert_with_precedence(src.op0(), precedence);
   dest+='[';
-  dest+=convert(src.op1(), precedence);
+  dest+=convert_with_precedence(src.op1(), precedence);
   dest+=", ";
-  dest+=convert(src.op2(), precedence);
+  dest+=convert_with_precedence(src.op2(), precedence);
   dest+=']';
 
   return dest;
@@ -4523,7 +4523,7 @@ Function: expr2ct::convert
 
 \*******************************************************************/
 
-std::string expr2ct::convert(
+std::string expr2ct::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
 {
@@ -4562,7 +4562,7 @@ std::string expr2ct::convert(
     std::string dest="FLOAT_TYPECAST(";
 
     unsigned p0;
-    std::string tmp0=convert(src.op0(), p0);
+    std::string tmp0=convert_with_precedence(src.op0(), p0);
 
     if(p0<=1)
       dest+='(';
@@ -4576,7 +4576,7 @@ std::string expr2ct::convert(
     dest+=", ";
 
     unsigned p1;
-    std::string tmp1=convert(src.op1(), p1);
+    std::string tmp1=convert_with_precedence(src.op1(), p1);
 
     if(p1<=1)
       dest+='(';
@@ -5042,7 +5042,7 @@ Function: expr2ct::convert
 std::string expr2ct::convert(const exprt &src)
 {
   unsigned precedence;
-  return convert(src, precedence);
+  return convert_with_precedence(src, precedence);
 }
 
 /*******************************************************************\

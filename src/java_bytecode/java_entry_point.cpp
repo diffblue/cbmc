@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
-#include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_exceptions.h>
 
 #include "java_entry_point.h"
@@ -98,10 +97,9 @@ Function: java_static_lifetime_init
 
 \*******************************************************************/
 
-bool java_static_lifetime_init(
+void java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
-  message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   unsigned max_nondet_array_length)
 {
@@ -138,6 +136,7 @@ bool java_static_lifetime_init(
         }
         auto newsym=object_factory(
           sym.type,
+          symname,
           code_block,
           allow_null,
           symbol_table,
@@ -154,8 +153,6 @@ bool java_static_lifetime_init(
       }
     }
   }
-
-  return false;
 }
 
 /*******************************************************************\
@@ -175,8 +172,7 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length,
-  message_handlert &message_handler)
+  unsigned max_nondet_array_length)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -205,19 +201,21 @@ exprt::operandst java_build_arguments(
       is_main=(named_main && has_correct_type);
     }
 
+    const code_typet::parametert &p=parameters[param_number];
+    const irep_idt base_name=p.get_base_name().empty()?
+      ("argument#"+std::to_string(param_number)):p.get_base_name();
+
     bool allow_null=(!is_main) && (!is_this) && !assume_init_pointers_not_null;
 
     main_arguments[param_number]=
       object_factory(
-        parameters[param_number].type(),
+        p.type(),
+        base_name,
         init_code,
         allow_null,
         symbol_table,
         max_nondet_array_length,
         function.location);
-
-    const symbolt &p_symbol=
-      symbol_table.lookup(parameters[param_number].get_identifier());
 
     // record as an input
     codet input(ID_input);
@@ -225,7 +223,7 @@ exprt::operandst java_build_arguments(
     input.op0()=
       address_of_exprt(
         index_exprt(
-          string_constantt(p_symbol.base_name),
+          string_constantt(base_name),
           from_integer(0, index_type())));
     input.op1()=main_arguments[param_number];
     input.add_source_location()=function.location;
@@ -538,13 +536,11 @@ bool java_entry_point(
 
   create_initialize(symbol_table);
 
-  if(java_static_lifetime_init(
-       symbol_table,
-       symbol.location,
-       message_handler,
-       assume_init_pointers_not_null,
-       max_nondet_array_length))
-    return true;
+  java_static_lifetime_init(
+    symbol_table,
+    symbol.location,
+    assume_init_pointers_not_null,
+    max_nondet_array_length);
 
   code_blockt init_code;
 
@@ -608,8 +604,7 @@ bool java_entry_point(
       init_code,
       symbol_table,
       assume_init_pointers_not_null,
-      max_nondet_array_length,
-      message_handler);
+      max_nondet_array_length);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);

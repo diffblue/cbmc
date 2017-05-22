@@ -275,8 +275,9 @@ void cycles_visitort::powr_constraint(
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
   {
-    if(e_i->is_po && (graph[e_i->first].operation==abstract_eventt::Write
-        && graph[e_i->second].operation==abstract_eventt::Read))
+    if(e_i->is_po &&
+       (graph[e_i->first].operation==abstract_eventt::operationt::Write &&
+        graph[e_i->second].operation==abstract_eventt::operationt::Read))
     {
       if( edges.insert(fence_inserter.add_edge(*e_i)).second )
         ++fence_inserter.constraints_number;
@@ -306,8 +307,9 @@ void cycles_visitort::poww_constraint(
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
   {
-    if(e_i->is_po && (graph[e_i->first].operation==abstract_eventt::Write
-        && graph[e_i->second].operation==abstract_eventt::Write))
+    if(e_i->is_po &&
+       (graph[e_i->first].operation==abstract_eventt::operationt::Write &&
+        graph[e_i->second].operation==abstract_eventt::operationt::Write))
     {
       if( edges.insert(fence_inserter.add_edge(*e_i)).second )
         ++fence_inserter.constraints_number;
@@ -337,8 +339,9 @@ void cycles_visitort::porw_constraint(
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
   {
-    if(e_i->is_po && (graph[e_i->first].operation==abstract_eventt::Read
-        && graph[e_i->second].operation==abstract_eventt::Write))
+    if(e_i->is_po &&
+       (graph[e_i->first].operation==abstract_eventt::operationt::Read &&
+        graph[e_i->second].operation==abstract_eventt::operationt::Write))
     {
       if( edges.insert(fence_inserter.add_edge(*e_i)).second )
         ++fence_inserter.constraints_number;
@@ -368,8 +371,9 @@ void cycles_visitort::porr_constraint(
   for(std::set<edget>::iterator e_i=C_j.unsafe_pairs.begin();
     e_i!=C_j.unsafe_pairs.end(); ++e_i)
   {
-    if(e_i->is_po && (graph[e_i->first].operation==abstract_eventt::Read
-        && graph[e_i->second].operation==abstract_eventt::Read))
+    if(e_i->is_po &&
+       (graph[e_i->first].operation==abstract_eventt::operationt::Read &&
+        graph[e_i->second].operation==abstract_eventt::operationt::Read))
     {
       if( edges.insert(fence_inserter.add_edge(*e_i)).second )
         ++fence_inserter.constraints_number;
@@ -400,8 +404,8 @@ void cycles_visitort::com_constraint(
     it!=C_j.unsafe_pairs.end();
     ++it)
   {
-    if(egraph[it->first].operation==abstract_eventt::Write
-      && egraph[it->second].operation==abstract_eventt::Read
+    if(egraph[it->first].operation==abstract_eventt::operationt::Write
+      && egraph[it->second].operation==abstract_eventt::operationt::Read
       && egraph[it->first].thread!=egraph[it->second].thread)
       if( edges.insert(fence_inserter.add_invisible_edge(*it)).second )
         ++fence_inserter.constraints_number;

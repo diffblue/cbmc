@@ -93,7 +93,7 @@ public:
     const ieee_float_spect &dest_spec);
 
   // relations
-  typedef enum { LT, LE, EQ, GT, GE } relt;
+  enum class relt { LT, LE, EQ, GT, GE };
   exprt relation(
     const exprt &,
     relt rel,

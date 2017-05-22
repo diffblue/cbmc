@@ -38,10 +38,7 @@ void trace_automatont::build_alphabet(goto_programt &program)
 {
   Forall_goto_program_instructions(it, program)
   {
-    goto_programt::targetst succs;
-
-    program.get_successors(it, succs);
-
+    const auto succs=program.get_successors(it);
     if(succs.size()>1)
     {
       alphabet.insert(succs.begin(), succs.end());

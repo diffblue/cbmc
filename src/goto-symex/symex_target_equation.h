@@ -170,31 +170,38 @@ public:
     sourcet source;
     goto_trace_stept::typet type;
 
-    bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
-    bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
-    bool is_goto() const            { return type==goto_trace_stept::GOTO; }
+    bool is_assert() const          { return type==goto_trace_stept::typet::ASSERT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
-    bool is_location() const        { return type==goto_trace_stept::LOCATION; }
-    bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
-    bool is_decl() const            { return type==goto_trace_stept::DECL; }
+    bool is_assume() const          { return type==goto_trace_stept::typet::ASSUME; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
+    bool is_assignment() const      { return type==goto_trace_stept::typet::ASSIGNMENT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
+    bool is_goto() const            { return type==goto_trace_stept::typet::GOTO; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_shared_read() const     { return type==goto_trace_stept::SHARED_READ; }
+    bool is_constraint() const      { return type==goto_trace_stept::typet::CONSTRAINT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_shared_write() const    { return type==goto_trace_stept::SHARED_WRITE; }
-    bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
+    bool is_location() const        { return type==goto_trace_stept::typet::LOCATION; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_memory_barrier() const  { return type==goto_trace_stept::MEMORY_BARRIER; }
+    bool is_output() const          { return type==goto_trace_stept::typet::OUTPUT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
+    bool is_decl() const            { return type==goto_trace_stept::typet::DECL; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
+    bool is_function_call() const   { return type==goto_trace_stept::typet::FUNCTION_CALL; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_function_return() const { return type==goto_trace_stept::typet::FUNCTION_RETURN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_shared_read() const     { return type==goto_trace_stept::typet::SHARED_READ; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_shared_write() const    { return type==goto_trace_stept::typet::SHARED_WRITE; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_spawn() const           { return type==goto_trace_stept::typet::SPAWN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_memory_barrier() const  { return type==goto_trace_stept::typet::MEMORY_BARRIER; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_atomic_begin() const    { return type==goto_trace_stept::typet::ATOMIC_BEGIN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_atomic_end() const      { return type==goto_trace_stept::typet::ATOMIC_END; }
 
     // we may choose to hide
     bool hidden;
@@ -229,7 +236,7 @@ public:
     bool ignore;
 
     SSA_stept():
-      type(goto_trace_stept::NONE),
+      type(goto_trace_stept::typet::NONE),
       hidden(false),
       guard(static_cast<const exprt &>(get_nil_irep())),
       guard_literal(const_literal(false)),

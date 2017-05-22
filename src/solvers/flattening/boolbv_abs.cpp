@@ -46,13 +46,13 @@ bvt boolbvt::convert_abs(const exprt &expr)
 
   bvtypet bvtype=get_bvtype(expr.type());
 
-  if(bvtype==IS_FIXED ||
-     bvtype==IS_SIGNED ||
-     bvtype==IS_UNSIGNED)
+  if(bvtype==bvtypet::IS_FIXED ||
+     bvtype==bvtypet::IS_SIGNED ||
+     bvtype==bvtypet::IS_UNSIGNED)
   {
     return bv_utils.absolute_value(op_bv);
   }
-  else if(bvtype==IS_FLOAT)
+  else if(bvtype==bvtypet::IS_FLOAT)
   {
     float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.abs(op_bv);

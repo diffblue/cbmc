@@ -1047,13 +1047,13 @@ int cbmc_parse_optionst::do_bmc(
   // do actual BMC
   switch(bmc.run(goto_functions))
   {
-    case safety_checkert::SAFE:
+    case safety_checkert::resultt::SAFE:
       result=0;
       break;
-    case safety_checkert::UNSAFE:
+    case safety_checkert::resultt::UNSAFE:
       result=10;
       break;
-    case safety_checkert::ERROR:
+    case safety_checkert::resultt::ERROR:
       result=6;
       break;
   }

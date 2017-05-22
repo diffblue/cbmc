@@ -62,11 +62,11 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
 
     switch(quantifier.type)
     {
-    case quantifiert::UNIVERSAL:
+    case quantifiert::typet::UNIVERSAL:
       out << "a";
       break;
 
-    case quantifiert::EXISTENTIAL:
+    case quantifiert::typet::EXISTENTIAL:
       out << "e";
       break;
 

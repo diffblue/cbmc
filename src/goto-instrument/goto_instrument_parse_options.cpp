@@ -200,19 +200,20 @@ int goto_instrument_parse_optionst::doit()
           throw "more than one of --unwinding-assertions,--partial-loops,"
                 "--continue-as-loops selected";
 
-        goto_unwindt::unwind_strategyt unwind_strategy=goto_unwindt::ASSUME;
+        goto_unwindt::unwind_strategyt unwind_strategy=
+          goto_unwindt::unwind_strategyt::ASSUME;
 
         if(unwinding_assertions)
         {
-          unwind_strategy=goto_unwindt::ASSERT;
+          unwind_strategy=goto_unwindt::unwind_strategyt::ASSERT;
         }
         else if(partial_loops)
         {
-          unwind_strategy=goto_unwindt::PARTIAL;
+          unwind_strategy=goto_unwindt::unwind_strategyt::PARTIAL;
         }
         else if(continue_as_loops)
         {
-          unwind_strategy=goto_unwindt::CONTINUE;
+          unwind_strategy=goto_unwindt::unwind_strategyt::CONTINUE;
         }
 
         goto_unwindt goto_unwind;

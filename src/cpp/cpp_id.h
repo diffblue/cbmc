@@ -26,12 +26,20 @@ class cpp_idt
 public:
   cpp_idt();
 
-  typedef enum
+  enum class id_classt
   {
-    UNKNOWN, SYMBOL, TYPEDEF, CLASS, ENUM, TEMPLATE,
-    TEMPLATE_PARAMETER, NAMESPACE, BLOCK_SCOPE,
-    TEMPLATE_SCOPE, ROOT_SCOPE
-  } id_classt;
+    UNKNOWN,
+    SYMBOL,
+    TYPEDEF,
+    CLASS,
+    ENUM,
+    TEMPLATE,
+    TEMPLATE_PARAMETER,
+    NAMESPACE,
+    BLOCK_SCOPE,
+    TEMPLATE_SCOPE,
+    ROOT_SCOPE,
+  };
 
   bool is_member, is_method, is_static_member,
        is_scope, is_constructor;
@@ -40,22 +48,22 @@ public:
 
   bool is_class() const
   {
-    return id_class==CLASS;
+    return id_class==id_classt::CLASS;
   }
 
   bool is_enum() const
   {
-    return id_class==ENUM;
+    return id_class==id_classt::ENUM;
   }
 
   bool is_namespace() const
   {
-    return id_class==NAMESPACE;
+    return id_class==id_classt::NAMESPACE;
   }
 
   bool is_typedef() const
   {
-    return id_class==TYPEDEF;
+    return id_class==id_classt::TYPEDEF;
   }
 
   irep_idt identifier, base_name;

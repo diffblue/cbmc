@@ -687,6 +687,7 @@ exprt string_constraint_generatort::add_axioms_for_char_pointer(
     return char_pointer.op0();
   // TODO: we do not know what to do in the other cases
   assert(false);
+  return exprt();
 }
 
 /*******************************************************************\

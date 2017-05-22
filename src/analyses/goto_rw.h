@@ -111,7 +111,7 @@ public:
     return *static_cast<range_domaint*>(it->second);
   }
 
-  typedef enum { LHS_W, READ } get_modet;
+  enum class get_modet { LHS_W, READ };
 
   virtual void get_objects_rec(
     goto_programt::const_targett _target,

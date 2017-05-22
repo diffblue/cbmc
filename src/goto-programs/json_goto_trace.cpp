@@ -50,7 +50,7 @@ void convert(
 
     switch(step.type)
     {
-    case goto_trace_stept::ASSERT:
+    case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
         irep_idt property_id;
@@ -78,8 +78,8 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::ASSIGNMENT:
-    case goto_trace_stept::DECL:
+    case goto_trace_stept::typet::ASSIGNMENT:
+    case goto_trace_stept::typet::DECL:
       {
         irep_idt identifier=step.lhs_object.get_identifier();
         json_objectt &json_assignment=dest_array.push_back().make_object();
@@ -123,12 +123,15 @@ void convert(
         json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));
 
         json_assignment["assignmentType"]=
-          json_stringt(step.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?
-                       "actual-parameter":"variable");
+          json_stringt(
+            step.assignment_type==
+              goto_trace_stept::assignment_typet::ACTUAL_PARAMETER?
+            "actual-parameter":
+            "variable");
       }
       break;
 
-    case goto_trace_stept::OUTPUT:
+    case goto_trace_stept::typet::OUTPUT:
       {
         json_objectt &json_output=dest_array.push_back().make_object();
 
@@ -153,7 +156,7 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::INPUT:
+    case goto_trace_stept::typet::INPUT:
       {
         json_objectt &json_input=dest_array.push_back().make_object();
 
@@ -178,11 +181,11 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::FUNCTION_CALL:
-    case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::typet::FUNCTION_CALL:
+    case goto_trace_stept::typet::FUNCTION_RETURN:
       {
         std::string tag=
-          (step.type==goto_trace_stept::FUNCTION_CALL)?
+          (step.type==goto_trace_stept::typet::FUNCTION_CALL)?
             "function-call":"function-return";
         json_objectt &json_call_return=dest_array.push_back().make_object();
 

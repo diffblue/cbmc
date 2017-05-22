@@ -50,7 +50,7 @@ public:
 
   virtual resultt prop_solve()
   {
-    return P_ERROR;
+    return resultt::P_ERROR;
   }
 
   virtual tvt l_get(literalt) const

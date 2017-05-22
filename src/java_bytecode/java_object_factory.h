@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt object_factory(
   const typet &type,
+  const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
@@ -33,7 +34,6 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
-  bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
   size_t max_nondet_array_length,

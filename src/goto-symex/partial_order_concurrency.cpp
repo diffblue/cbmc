@@ -96,7 +96,7 @@ void partial_order_concurrencyt::add_init_writes(
       // no SSA L2 index, thus nondet value
       SSA_step.ssa_lhs=e_it->ssa_lhs;
       SSA_step.ssa_lhs.remove_level_2();
-      SSA_step.type=goto_trace_stept::SHARED_WRITE;
+      SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
       SSA_step.atomic_section_id=0;
       SSA_step.source=e_it->source;
     }

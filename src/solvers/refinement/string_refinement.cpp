@@ -614,7 +614,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   // Initial try without index set
   decision_proceduret::resultt res=supert::dec_solve();
-  if(res==D_SATISFIABLE)
+  if(res==resultt::D_SATISFIABLE)
   {
     if(!check_axioms())
     {
@@ -624,7 +624,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       debug() << "check_SAT: the model is correct" << eom;
       concretize_lengths();
-      return D_SATISFIABLE;
+      return resultt::D_SATISFIABLE;
     }
   }
 
@@ -639,7 +639,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
     switch(res)
     {
-    case D_SATISFIABLE:
+    case resultt::D_SATISFIABLE:
       if(!check_axioms())
       {
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
@@ -648,7 +648,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       {
         debug() << "check_SAT: the model is correct" << eom;
         concretize_lengths();
-        return D_SATISFIABLE;
+        return resultt::D_SATISFIABLE;
       }
 
       debug() <<  "refining..." << eom;
@@ -667,13 +667,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         if(do_concretizing)
         {
           concretize_results();
-          return D_SATISFIABLE;
+          return resultt::D_SATISFIABLE;
         }
         else
         {
           debug() << "check_SAT: the model is correct and "
                   << "does not need concretizing" << eom;
-          return D_SATISFIABLE;
+          return resultt::D_SATISFIABLE;
         }
       }
 
@@ -689,13 +689,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       }
       break;
     default:
-      debug() << "check_SAT: default return " << res << eom;
+      debug() << "check_SAT: default return " << static_cast<int>(res) << eom;
       return res;
     }
   }
   debug() << "string_refinementt::dec_solve reached the maximum number"
            << "of steps allowed" << eom;
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -1223,7 +1223,7 @@ bool string_refinementt::check_axioms()
 
     switch(solver())
     {
-    case decision_proceduret::D_SATISFIABLE:
+    case decision_proceduret::resultt::D_SATISFIABLE:
       {
         exprt val=solver.get(axiom_in_model.univ_var());
         debug() << "string constraint can be violated for "
@@ -1232,7 +1232,7 @@ bool string_refinementt::check_axioms()
         violated[i]=val;
       }
       break;
-    case decision_proceduret::D_UNSATISFIABLE:
+    case decision_proceduret::resultt::D_UNSATISFIABLE:
       break;
     default:
       throw "failure in checking axiom";

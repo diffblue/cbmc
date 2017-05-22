@@ -40,7 +40,7 @@ void counterexample_beautificationt::get_minimization_list(
       it!=equation.SSA_steps.end(); it++)
   {
     if(it->is_assignment() &&
-       it->assignment_type==symex_targett::STATE)
+       it->assignment_type==symex_targett::assignment_typet::STATE)
     {
       if(!prop_conv.l_get(it->guard_literal).is_false())
       {
@@ -136,7 +136,7 @@ void counterexample_beautificationt::operator()(
         it!=equation.SSA_steps.end(); it++)
     {
       if(it->is_assignment() &&
-         it->assignment_type!=symex_targett::HIDDEN)
+         it->assignment_type!=symex_targett::assignment_typet::HIDDEN)
       {
         if(!it->guard_literal.is_constant())
           guard_count[it->guard_literal]++;

@@ -145,13 +145,16 @@ install:
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 cegis.dir clobber.dir memory-models.dir musketeer.dir" &&
+  - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 clobber.dir memory-models.dir musketeer.dir" &&
     eval ${PRE_COMMAND} ${COMMAND}
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
     COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
     eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C unit CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\" -j2" &&
+    eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C unit test" && eval ${PRE_COMMAND} ${COMMAND}
 
 before_cache:
   - ccache -s

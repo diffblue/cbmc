@@ -49,48 +49,48 @@ void build_goto_trace(
     switch(instruction.type)
     {
     case ASSIGN:
-      trace_step.type=goto_trace_stept::ASSIGNMENT;
+      trace_step.type=goto_trace_stept::typet::ASSIGNMENT;
       trace_step.full_lhs=step.full_lhs;
       trace_step.full_lhs_value=decision_procedure.get(step.ssa_lhs);
       break;
 
     case DECL:
-      trace_step.type=goto_trace_stept::DECL;
+      trace_step.type=goto_trace_stept::typet::DECL;
       trace_step.full_lhs=step.full_lhs;
       trace_step.lhs_object=ssa_exprt(step.full_lhs);
       trace_step.full_lhs_value=decision_procedure.get(step.ssa_lhs);
       break;
 
     case DEAD:
-      trace_step.type=goto_trace_stept::DEAD;
+      trace_step.type=goto_trace_stept::typet::DEAD;
       break;
 
     case ASSUME:
-      trace_step.type=goto_trace_stept::ASSUME;
+      trace_step.type=goto_trace_stept::typet::ASSUME;
       break;
 
     case FUNCTION_CALL:
-      trace_step.type=goto_trace_stept::FUNCTION_CALL;
+      trace_step.type=goto_trace_stept::typet::FUNCTION_CALL;
       break;
 
     case END_FUNCTION:
-      trace_step.type=goto_trace_stept::FUNCTION_RETURN;
+      trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
       break;
 
     case START_THREAD:
-      trace_step.type=goto_trace_stept::SPAWN;
+      trace_step.type=goto_trace_stept::typet::SPAWN;
       break;
 
     case ATOMIC_BEGIN:
-      trace_step.type=goto_trace_stept::ATOMIC_BEGIN;
+      trace_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
       break;
 
     case ATOMIC_END:
-      trace_step.type=goto_trace_stept::ATOMIC_END;
+      trace_step.type=goto_trace_stept::typet::ATOMIC_END;
       break;
 
     default:
-      trace_step.type=goto_trace_stept::LOCATION;
+      trace_step.type=goto_trace_stept::typet::LOCATION;
     }
 
     goto_trace.add_step(trace_step);
@@ -108,7 +108,7 @@ void build_goto_trace(
     trace_step.pc=state.get_instruction();
     trace_step.thread_nr=state.get_current_thread();
     trace_step.step_nr=step_nr;
-    trace_step.type=goto_trace_stept::ASSERT;
+    trace_step.type=goto_trace_stept::typet::ASSERT;
 
     const irep_idt &comment=
       instruction.source_location.get_comment();

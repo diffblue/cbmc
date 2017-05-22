@@ -41,14 +41,14 @@ Function: smt1_dect::decision_procedure_text
 std::string smt1_dect::decision_procedure_text() const
 {
   return "SMT1 "+logic+" using "+
-    (solver==GENERIC?"Generic":
-     solver==BOOLECTOR?"Boolector":
-     solver==CVC3?"CVC3":
-     solver==CVC4?"CVC3":
-     solver==MATHSAT?"MathSAT":
-     solver==OPENSMT?"OpenSMT":
-     solver==YICES?"Yices":
-     solver==Z3?"Z3":
+    (solver==solvert::GENERIC?"Generic":
+     solver==solvert::BOOLECTOR?"Boolector":
+     solver==solvert::CVC3?"CVC3":
+     solver==solvert::CVC4?"CVC3":
+     solver==solvert::MATHSAT?"MathSAT":
+     solver==solvert::OPENSMT?"OpenSMT":
+     solver==solvert::YICES?"Yices":
+     solver==solvert::Z3?"Z3":
      "(unknown)");
 }
 
@@ -125,7 +125,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
 
   switch(solver)
   {
-  case BOOLECTOR:
+  case solvert::BOOLECTOR:
     // -rwl0 disables rewriting, which makes things slower,
     // but in return values for arrays appear
     // command = "boolector -rwl0 --smt "
@@ -136,34 +136,34 @@ decision_proceduret::resultt smt1_dect::dec_solve()
             + temp_result_filename;
     break;
 
-  case CVC3:
+  case solvert::CVC3:
     command = "cvc3 +model -lang smtlib -output-lang smtlib "
             + temp_out_filename
             + " > "
             + temp_result_filename;
     break;
 
-  case CVC4:
+  case solvert::CVC4:
     command = "cvc4 -L smt1 "
             + temp_out_filename
             + " > "
             + temp_result_filename;
     break;
 
-  case MATHSAT:
+  case solvert::MATHSAT:
     command = "mathsat -model -input=smt"
               " < "+temp_out_filename
             + " > "+temp_result_filename;
     break;
 
-  case OPENSMT:
+  case solvert::OPENSMT:
     command = "opensmt "
             + temp_out_filename
             + " > "
             + temp_result_filename;
     break;
 
-  case YICES:
+  case solvert::YICES:
     //    command = "yices -smt -e "   // Calling convention for older versions
     command = "yices-smt --full-model "  //  Calling for 2.2.1
             + temp_out_filename
@@ -171,7 +171,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
             + temp_result_filename;
     break;
 
-  case Z3:
+  case solvert::Z3:
     command = "z3 -smt "
             + temp_out_filename
             + " > "
@@ -190,39 +190,39 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   if(res<0)
   {
     error() << "error running SMT1 solver" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 
   std::ifstream in(temp_result_filename.c_str());
 
   switch(solver)
   {
-  case BOOLECTOR:
+  case solvert::BOOLECTOR:
     return read_result_boolector(in);
 
-  case CVC3:
+  case solvert::CVC3:
     return read_result_cvc3(in);
 
-  case CVC4:
+  case solvert::CVC4:
     error() << "no support for CVC4 with SMT1, use SMT2 instead" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
 
-  case MATHSAT:
+  case solvert::MATHSAT:
     return read_result_mathsat(in);
 
-  case OPENSMT:
+  case solvert::OPENSMT:
     return read_result_opensmt(in);
 
-  case YICES:
+  case solvert::YICES:
     return read_result_yices(in);
 
-  case Z3:
+  case solvert::Z3:
     return read_result_z3(in);
 
-  case GENERIC:
+  case solvert::GENERIC:
   default:
     error() << "Generic solver can't solve" << eom;
-    return decision_proceduret::D_ERROR;
+    return decision_proceduret::resultt::D_ERROR;
   }
 }
 
@@ -311,14 +311,14 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
       boolean_assignment[v]=(value=="1");
     }
 
-    return D_SATISFIABLE;
+    return resultt::D_SATISFIABLE;
   }
   else if(line=="unsat")
-    return D_UNSATISFIABLE;
+    return resultt::D_UNSATISFIABLE;
   else
     error() << "Unexpected result from SMT-Solver: " << line << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -335,7 +335,7 @@ Function: smt1_dect::read_result_opensmt
 
 decision_proceduret::resultt smt1_dect::read_result_opensmt(std::istream &in)
 {
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -359,15 +359,15 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
     if(line=="sat")
     {
       // fixme: read values
-      return D_SATISFIABLE;
+      return resultt::D_SATISFIABLE;
     }
     else if(line=="unsat")
-      return D_UNSATISFIABLE;
+      return resultt::D_UNSATISFIABLE;
   }
 
   error() << "Unexpected result from SMT-Solver" << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\
@@ -414,7 +414,7 @@ Function: smt1_dect::read_result_mathsat
 decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -425,9 +425,9 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res=D_SATISFIABLE;
+      res=resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res=D_UNSATISFIABLE;
+      res=resultt::D_UNSATISFIABLE;
     else if(line.size()>=1 && line[0]=='(')
     {
       // (iff B0 true)
@@ -496,7 +496,7 @@ Function: smt1_dect::read_result_z3
 decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -507,9 +507,9 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res = D_SATISFIABLE;
+      res = resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res = D_UNSATISFIABLE;
+      res = resultt::D_UNSATISFIABLE;
     else
     {
       std::size_t pos=line.find(" -> ");
@@ -692,7 +692,7 @@ Function: smt1_dect::read_result_cvc3
 decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
 {
   std::string line;
-  decision_proceduret::resultt res = D_ERROR;
+  decision_proceduret::resultt res = resultt::D_ERROR;
 
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
@@ -703,9 +703,9 @@ decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
   while(std::getline(in, line))
   {
     if(line=="sat")
-      res = D_SATISFIABLE;
+      res = resultt::D_SATISFIABLE;
     else if(line=="unsat")
-      res = D_UNSATISFIABLE;
+      res = resultt::D_UNSATISFIABLE;
     else if(line.find("Current scope level")!=std::string::npos ||
             line.find("Variable Assignment")!=std::string::npos)
     {

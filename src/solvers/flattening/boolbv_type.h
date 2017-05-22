@@ -12,12 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 
 // new stuff
-typedef enum
+enum class bvtypet
 {
   IS_BV, IS_SIGNED, IS_UNSIGNED, IS_FLOAT, IS_FIXED, IS_C_BOOL,
   IS_VERILOG_SIGNED, IS_VERILOG_UNSIGNED, IS_RANGE, IS_UNKNOWN,
   IS_C_ENUM, IS_C_BIT_FIELD
-} bvtypet;
+};
 
 bvtypet get_bvtype(const typet &type);
 

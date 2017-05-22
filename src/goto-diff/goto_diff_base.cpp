@@ -26,7 +26,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       out << "total number of functions: " << total_functions_count << "\n";
       out << "new functions: \n";
@@ -63,7 +63,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
       }
       break;
     }
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["totalNumberOfFunctions"]=
@@ -77,7 +77,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
       out << ",\n" << json_result;
       break;
     }
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       out << "not supported yet";
     }

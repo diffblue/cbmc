@@ -22,7 +22,7 @@ void parse_unwindset(const std::string &us, unwind_sett &unwind_set);
 class goto_unwindt
 {
 public:
-  typedef enum { CONTINUE, PARTIAL, ASSERT, ASSUME } unwind_strategyt;
+  enum class unwind_strategyt { CONTINUE, PARTIAL, ASSERT, ASSUME };
 
   // unwind loop
 
@@ -47,14 +47,14 @@ public:
     goto_programt &goto_program,
     const unwind_sett &unwind_set,
     const int k=-1, // -1: no global bound
-    const unwind_strategyt unwind_strategy=PARTIAL);
+    const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL);
 
   // unwind all functions
 
   void operator()(
     goto_functionst &goto_functions,
     const unsigned k, // global bound
-    const unwind_strategyt unwind_strategy=PARTIAL)
+    const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL)
   {
     const unwind_sett unwind_set;
     operator()(goto_functions, unwind_set, k, unwind_strategy);
@@ -64,7 +64,7 @@ public:
     goto_functionst &goto_functions,
     const unwind_sett &unwind_set,
     const int k=-1, // -1: no global bound
-    const unwind_strategyt unwind_strategy=PARTIAL);
+    const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL);
 
   // unwind log
 

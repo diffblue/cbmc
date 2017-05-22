@@ -39,9 +39,8 @@ prefix <code>nondet_</code>. As an example, the following function
 returns a nondeterministically chosen unsigned short int:
 </p>
 
-<code>
-unsigned short int nondet_ushortint();
-</code>
+<pre><code class="c">unsigned short int nondet_ushortint();
+</code></pre>
 
 <p class="justified">Note that the body of the function is not defined.  The
 name of the function itself is irrelevant (save for the prefix), but must be

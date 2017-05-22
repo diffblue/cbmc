@@ -210,7 +210,7 @@ Function: satcheck_minisat2_baset::prop_solve
 template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
-  assert(status!=ERROR);
+  assert(status!=statust::ERROR);
 
   {
     messaget::status() <<
@@ -251,8 +251,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
           assert(solver->model.size()!=0);
-          status=SAT;
-          return P_SATISFIABLE;
+          status=statust::SAT;
+          return resultt::P_SATISFIABLE;
         }
         else
         {
@@ -262,15 +262,15 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
       }
     }
 
-    status=UNSAT;
-    return P_UNSATISFIABLE;
+    status=statust::UNSAT;
+    return resultt::P_UNSATISFIABLE;
   }
   catch(Minisat::OutOfMemoryException)
   {
     messaget::error() <<
       "SAT checker ran out of memory" << eom;
-    status=ERROR;
-    return P_ERROR;
+    status=statust::ERROR;
+    return resultt::P_ERROR;
   }
 }
 
