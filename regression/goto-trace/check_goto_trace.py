@@ -26,6 +26,27 @@ def check_trace_step(trace_step):
   return step_valid
 
 
+def validate_json(json, specifier):
+  for key in specifier:
+    if key in json:
+      if(type(specifier[key]) is str):
+        if not specifier[key]==json[key]:
+          return False
+      else:
+        child_valid=validate_json(json[key], specifier[key])
+        if not child_valid:
+          return False
+    else:
+      return False
+  return True
+
+def check_step_existence(trace, step_specifier):
+  found=False
+  for step in trace:
+    if validate_json(step, step_specifier):
+      found=True
+  return found
+
 def check_trace(trace):
   trace_valid=True
   step_index=0

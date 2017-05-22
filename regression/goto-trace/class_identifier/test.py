@@ -17,7 +17,16 @@ trace_found=False
 for trace in traces:
   trace_found=True
   if check_goto_trace.check_trace(trace):
-    print("Trace valid")
+    requirements = {
+      'lhs': 'tmp_object_factory$2.@java.lang.Object.@class_identifier',
+      'value': { 'data' : 'java::TestGenTest', 'name': 'string'},
+      'stepType': 'assignment'
+    }
+
+    if check_goto_trace.check_step_existence(trace, requirements):
+      print("Trace valid")
+    else:
+      print("Trace invalid")
   else:
     print("Trace invalid")
 
