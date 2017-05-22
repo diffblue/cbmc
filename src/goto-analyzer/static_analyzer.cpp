@@ -240,8 +240,9 @@ bool static_analyzer(
     // Constant and interval don't have merge_shared yet
 #if 0
     if(options.get_bool_option("constants"))
-      return static_analyzert<concurrency_aware_ait<constant_propagator_domaint> >
-        (goto_model, options, message_handler, out)();
+      return static_analyzert<concurrency_aware_ait<
+        constant_propagator_domaint>>
+          (goto_model, options, message_handler, out)();
 
     else if(options.get_bool_option("intervals"))
       return static_analyzert<concurrency_aware_ait<interval_domaint> >
@@ -254,6 +255,8 @@ bool static_analyzer(
   }
 
   messaget m(message_handler);
-  m.status() << "Task / Interpreter / Domain combination not supported" << messaget::eom;
+  m.status() << "Task / Interpreter / Domain combination not supported"
+             << messaget::eom;
+
   return true;
 }
