@@ -57,6 +57,10 @@ protected:
     const exprt &idx,
     const source_locationt &original_loc);
 
+  codet check_arithmetic_exception(
+    const exprt &denominator,
+    const source_locationt &original_loc);
+
   codet check_null_dereference(
     const exprt &expr,
     const source_locationt &original_loc,
@@ -130,6 +134,30 @@ codet java_bytecode_instrumentt::throw_exception(
   if_code.then_case()=throw_code;
 
   return if_code;
+}
+
+
+/// Checks whether there is a division by zero
+/// and throws ArithmeticException if necessary.
+/// Exceptions are thrown when the `throw_runtime_exceptions`
+/// flag is set.
+/// \return Based on the value of the flag `throw_runtime_exceptions`,
+/// it returns code that either throws an ArithmeticException
+/// or is a skip
+codet java_bytecode_instrumentt::check_arithmetic_exception(
+  const exprt &denominator,
+  const source_locationt &original_loc)
+{
+  const constant_exprt &zero=from_integer(0, denominator.type());
+  const binary_relation_exprt equal_zero(denominator, ID_equal, zero);
+
+  if(throw_runtime_exceptions)
+    return throw_exception(
+      equal_zero,
+      original_loc,
+      "java.lang.ArithmeticException");
+
+  return code_skipt();
 }
 
 /// Checks whether the array access array_struct[idx] is out-of-bounds,
@@ -462,6 +490,14 @@ codet java_bytecode_instrumentt::instrument_expr(
       return check_array_length(
         expr.op0(),
         expr.source_location());
+  }
+  else if((expr.id()==ID_div || expr.id()==ID_mod) &&
+          expr.type().id()==ID_signedbv)
+  {
+    // check division by zero (for integer types only)
+    return check_arithmetic_exception(
+      expr.op1(),
+      expr.source_location());
   }
   else if(expr.id()==ID_member &&
           expr.get_bool(ID_java_member_access))
