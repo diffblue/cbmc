@@ -110,14 +110,23 @@ void goto_program2codet::scan_for_varargs()
   forall_goto_program_instructions(target, goto_program)
     if(target->is_assign())
     {
+      const exprt &l=to_code_assign(target->code).lhs();
       const exprt &r=to_code_assign(target->code).rhs();
 
+      // find va_arg_next
       if(r.id()==ID_side_effect &&
          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
       {
         assert(r.has_operands());
         va_list_expr.insert(r.op0());
       }
+      // try our modelling of va_start
+      else if(l.type().id()==ID_pointer &&
+              l.type().get(ID_C_typedef)=="va_list" &&
+              l.id()==ID_symbol &&
+              r.id()==ID_typecast &&
+              to_typecast_expr(r).op().id()==ID_address_of)
+        va_list_expr.insert(l);
     }
 
   if(!va_list_expr.empty())
