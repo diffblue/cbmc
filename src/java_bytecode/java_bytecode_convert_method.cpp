@@ -1742,34 +1742,49 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="dup")
     {
       assert(op.size()==1 && results.size()==2);
-      // create new stack variable
-      const exprt tmp_var=
-        tmp_variable("stack_dup", op[0].type());
-      c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
-      results[0]=tmp_var;
+      if(op[0].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[0];
       results[1]=op[0];
     }
     else if(statement=="dup_x1")
     {
       assert(op.size()==2 && results.size()==3);
-      // create new stack variable
-      const exprt tmp_var=
-        tmp_variable("stack_dup_x1", op[1].type());
-      c=code_assignt(tmp_var, java_bytecode_promotion(op[1]));
-      // op1 is value1, op0 is value2
-      results[0]=tmp_var;
+      if(op[1].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup_x1", op[1].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[1]));
+        // op1 is value1, op0 is value2
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[1];
       results[1]=op[0];
       results[2]=op[1];
     }
     else if(statement=="dup_x2")
     {
       assert(op.size()==3 && results.size()==4);
-      // create new stack variable
-      const exprt tmp_var=
-        tmp_variable("stack_dup_x2", op[2].type());
-      c=code_assignt(tmp_var, java_bytecode_promotion(op[2]));
-      // op2 is value1, op1 is value2, op0 is value3
-      results[0]=tmp_var;
+      if(op[2].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup_x2", op[2].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[2]));
+        // op2 is value1, op1 is value2, op0 is value3
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[2];
       results[1]=op[0];
       results[2]=op[1];
       results[3]=op[2];
