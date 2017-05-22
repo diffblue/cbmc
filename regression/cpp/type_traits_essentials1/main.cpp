@@ -8,7 +8,7 @@ struct F
 };
 
 template<typename T, typename... A>
-struct F<T(A...,...)>
+struct F<T(A..., ...)>
 {
 };
 

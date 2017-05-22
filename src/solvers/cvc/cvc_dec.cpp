@@ -87,8 +87,8 @@ Function: cvc_dect::dec_solve
 
 decision_proceduret::resultt cvc_dect::dec_solve()
 {
-  out << "QUERY FALSE;" << std::endl;
-  out << "COUNTERMODEL;" << std::endl;
+  out << "QUERY FALSE;\n";
+  out << "COUNTERMODEL;\n";
 
   temp_out.close();
 
@@ -150,8 +150,7 @@ void cvc_dect::read_assert(std::istream &in, std::string &line)
     std::string value=std::string(line, pos, pos2-pos);
 
     #if 0
-    std::cout << ">" << identifier << "< = >" << value << "<";
-    std::cout << std::endl;
+    std::cout << ">" << identifier << "< = >" << value << "<\n";
     #endif
   }
   else
@@ -209,13 +208,13 @@ decision_proceduret::resultt cvc_dect::read_cvcl_result()
           read_assert(in, line);
       }
 
-      return D_SATISFIABLE;
+      return resultt::D_SATISFIABLE;
     }
     else if(has_prefix(line, "Valid."))
-      return D_UNSATISFIABLE;
+      return resultt::D_UNSATISFIABLE;
   }
 
   error() << "Unexpected result from CVC-Lite" << eom;
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }

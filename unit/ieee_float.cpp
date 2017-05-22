@@ -34,7 +34,7 @@ std::string float2binary(float f)
   } c;
 
   c.f = f;
-  return integer2binary(c.i,32);
+  return integer2binary(c.i, 32);
 }
 
 float random_float()
@@ -160,11 +160,11 @@ void check_comparison(int i)
   switch(op)
   {
     case EQ:
-      ires = ieee_equal(i1,i2);
+      ires = ieee_equal(i1, i2);
       fres = (f1 == f2);
       break;
     case NEQ:
-      ires = ieee_not_equal(i1,i2);
+      ires = ieee_not_equal(i1, i2);
       fres = (f1 != f2);
       break;
     case LT:

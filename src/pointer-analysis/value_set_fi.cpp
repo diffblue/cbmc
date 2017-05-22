@@ -161,14 +161,14 @@ void value_set_fit::flatten(
   object_mapt &dest) const
 {
   #if 0
-  std::cout << "FLATTEN: " << e.identifier << e.suffix << std::endl;
+  std::cout << "FLATTEN: " << e.identifier << e.suffix << '\n';
   #endif
 
   flatten_seent seen;
   flatten_rec(e, dest, seen);
 
   #if 0
-  std::cout << "FLATTEN: Done." << std::endl;
+  std::cout << "FLATTEN: Done.\n";
   #endif
 }
 
@@ -190,7 +190,7 @@ void value_set_fit::flatten_rec(
   flatten_seent &seen) const
 {
   #if 0
-  std::cout << "FLATTEN_REC: " << e.identifier << e.suffix << std::endl;
+  std::cout << "FLATTEN_REC: " << e.identifier << e.suffix << '\n';
   #endif
 
   std::string identifier = id2string(e.identifier);
@@ -433,7 +433,7 @@ void value_set_fit::get_value_set(
 
   #if 0
   for(expr_sett::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
   #endif
 }
 
@@ -483,9 +483,9 @@ void value_set_fit::get_value_set_rec(
 {
   #if 0
   std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
-  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
-  std::cout << std::endl;
+            << '\n';
+  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
+  std::cout << '\n';
   #endif
 
   if(expr.type().id()=="#REF#")
@@ -723,7 +723,7 @@ void value_set_fit::get_value_set_rec(
       assert(suffix=="");
 
       const typet &dynamic_type=
-        static_cast<const typet &>(expr.find("#type"));
+        static_cast<const typet &>(expr.find(ID_C_cxx_alloc_type));
 
       dynamic_object_exprt dynamic_object(dynamic_type);
       // let's make up a `unique' number for this object...
@@ -924,7 +924,7 @@ void value_set_fit::get_reference_set_sharing_rec(
 {
   #if 0
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
+            << '\n';
   #endif
 
   if(expr.type().id()=="#REF#")
@@ -999,7 +999,7 @@ void value_set_fit::get_reference_set_sharing_rec(
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end();
         it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
     #endif
 
     return;
@@ -1133,8 +1133,8 @@ void value_set_fit::assign(
   const namespacet &ns)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;
+  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
   #endif
 
   if(rhs.id()==ID_if)
@@ -1399,12 +1399,12 @@ void value_set_fit::assign_rec(
   assign_recursion_sett &recursion_set)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();
       it!=values_rhs.read().end(); it++)
-    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << std::endl;
+    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << '\n';
   #endif
 
   if(lhs.type().id()=="#REF#")

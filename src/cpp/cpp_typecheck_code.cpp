@@ -256,7 +256,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   // Plus, this should happen in class scope, not the scope of
   // the constructor because of the constructor arguments.
   exprt symbol_expr=
-    resolve(member, cpp_typecheck_resolvet::VAR, fargs);
+    resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
 
   if(symbol_expr.type().id()==ID_code)
   {
@@ -340,7 +340,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_scopes.go_to(
           *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
-        symbol_expr=resolve(member, cpp_typecheck_resolvet::VAR, fargs);
+        symbol_expr=resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
       }
 
       if(symbol_expr.id() == ID_dereference &&

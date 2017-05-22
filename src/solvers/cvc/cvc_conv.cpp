@@ -895,7 +895,7 @@ literalt cvc_convt::convert(const exprt &expr)
   convert_literal(l);
   out << " <=> (";
   convert_expr(expr);
-  out << ");" << std::endl << std::endl;
+  out << ");\n\n";
 
   return l;
 }
@@ -1467,7 +1467,7 @@ void cvc_convt::set_to(const exprt &expr, bool value)
     return;
   }
 
-  out << "%% set_to " << (value?"true":"false") << std::endl;
+  out << "%% set_to " << (value?"true":"false") << '\n';
 
   if(expr.id()==ID_equal && value)
   {
@@ -1497,7 +1497,7 @@ void cvc_convt::set_to(const exprt &expr, bool value)
           out << " = ";
           convert_expr(expr.op1());
 
-          out << ";" << std::endl << std::endl;
+          out << ";\n\n";
           return;
         }
       }
@@ -1516,7 +1516,7 @@ void cvc_convt::set_to(const exprt &expr, bool value)
   if(!value)
     out << ")";
 
-  out << ";" << std::endl << std::endl;
+  out << ";\n\n";
 }
 
 /*******************************************************************\
@@ -1554,7 +1554,7 @@ void cvc_convt::find_symbols(const exprt &expr)
       convert_identifier(id2string(identifier));
       out << ": ";
       convert_type(expr.type());
-      out << ";" << std::endl;
+      out << ";\n";
     }
   }
   else if(expr.id()==ID_nondet_symbol)
@@ -1573,7 +1573,7 @@ void cvc_convt::find_symbols(const exprt &expr)
       convert_identifier(id2string(identifier));
       out << ": ";
       convert_type(expr.type());
-      out << ";" << std::endl;
+      out << ";\n";
     }
   }
 }

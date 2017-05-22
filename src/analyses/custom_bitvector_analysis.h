@@ -102,7 +102,7 @@ public:
     custom_bitvector_analysist &) const;
 
 private:
-  typedef enum { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY } modet;
+  enum class modet { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY };
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
   void set_bit(const irep_idt &, unsigned bit_nr, modet);

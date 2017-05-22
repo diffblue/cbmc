@@ -71,7 +71,7 @@ void points_tot::output(std::ostream &out) const
       out << " " << *o_it;
     }
 
-    out << std::endl;
+    out << '\n';
   }
 }
 

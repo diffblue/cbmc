@@ -38,14 +38,28 @@ public:
   {
   }
 
-  goto_modelt(goto_modelt &&other)
+  // Copying is normally too expensive
+  goto_modelt(const goto_modelt &)=delete;
+  goto_modelt &operator=(const goto_modelt &)=delete;
+
+  // Move operations need to be explicitly enabled as they are deleted with the
+  // copy operations
+  // default for move operations isn't available on Windows yet, so define
+  //  explicitly (see https://msdn.microsoft.com/en-us/library/hh567368.aspx
+  //  under "Defaulted and Deleted Functions")
+
+  goto_modelt(goto_modelt &&other):
+    symbol_table(std::move(other.symbol_table)),
+    goto_functions(std::move(other.goto_functions))
   {
-    symbol_table.swap(other.symbol_table);
-    goto_functions.swap(other.goto_functions);
   }
 
-  // copying is likely too expensive
-  goto_modelt(const goto_modelt &) = delete;
+  goto_modelt &operator=(goto_modelt &&other)
+  {
+    symbol_table=std::move(other.symbol_table);
+    goto_functions=std::move(other.goto_functions);
+    return *this;
+  }
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H

@@ -1,20 +1,20 @@
 struct A
 {
-	int i;
+  int i;
 };
 
 struct B: public A {
-	int j;
+  int j;
 };
 
 int func(A a)
 {
-	return a.i;
+  return a.i;
 }
 
 int main()
 {
-	B b;
-	b.i = 1;
-	assert(func(b)==1);
+  B b;
+  b.i = 1;
+  assert(func(b)==1);
 }

@@ -1,5 +1,5 @@
-SRC = miniz.cpp
-
+SRC = miniz.cpp \
+      # Empty last line
 INCLUDES= -I ..
 
 include ../config.inc

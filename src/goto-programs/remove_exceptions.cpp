@@ -438,7 +438,7 @@ void remove_exceptionst::instrument_exceptions(
         else
         {
 #ifdef DEBUG
-          std::cout << "Remove exceptions: empty stack" << std::endl;
+          std::cout << "Remove exceptions: empty stack\n";
 #endif
         }
       }

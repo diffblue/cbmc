@@ -147,12 +147,12 @@ void cpp_token_buffert::read_token()
     tokens.back().filename=ansi_c_parser.get_file();
   }
 
-  // std::cout << "TOKEN: " << kind << " " << tokens.back().text << std::endl;
+  // std::cout << "TOKEN: " << kind << " " << tokens.back().text << '\n';
 
   tokens.back().kind=kind;
 
-  // std::cout << "II: " << token_vector.back()->kind << std::endl;
-  // std::cout << "I2: " << token_vector.size() << std::endl;
+  // std::cout << "II: " << token_vector.back()->kind << '\n';
+  // std::cout << "I2: " << token_vector.size() << '\n';
 }
 
 /*******************************************************************\

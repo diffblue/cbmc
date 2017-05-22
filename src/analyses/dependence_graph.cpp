@@ -141,7 +141,7 @@ void dep_graph_domaint::control_dependencies(
 
   // add edges to the graph
   for(const auto &c_dep : control_deps)
-    dep_graph.add_dep(dep_edget::CTRL, c_dep, to);
+    dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, to);
 }
 
 /*******************************************************************\
@@ -234,7 +234,7 @@ void dep_graph_domaint::data_dependencies(
     // *it might be handled in a future call call to visit only,
     // depending on the sequence of successors; make sure it exists
     dep_graph.get_state(d_dep);
-    dep_graph.add_dep(dep_edget::DATA, d_dep, to);
+    dep_graph.add_dep(dep_edget::kindt::DATA, d_dep, to);
   }
 }
 
@@ -326,7 +326,7 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 
   if(!data_deps.empty())
@@ -341,7 +341,7 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 }
 

@@ -49,7 +49,7 @@ void convert(
 
     switch(step.type)
     {
-    case goto_trace_stept::ASSERT:
+    case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
         irep_idt property_id;
@@ -76,8 +76,8 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::ASSIGNMENT:
-    case goto_trace_stept::DECL:
+    case goto_trace_stept::typet::ASSIGNMENT:
+    case goto_trace_stept::typet::DECL:
       {
         irep_idt identifier=step.lhs_object.get_identifier();
         xmlt &xml_assignment=dest.new_element("assignment");
@@ -128,7 +128,8 @@ void convert(
         xml_assignment.set_attribute("step_nr", std::to_string(step.step_nr));
 
         xml_assignment.set_attribute("assignment_type",
-          step.assignment_type==goto_trace_stept::ACTUAL_PARAMETER?
+          step.assignment_type==
+            goto_trace_stept::assignment_typet::ACTUAL_PARAMETER?
           "actual_parameter":"state");
 
         if(step.lhs_object_value.is_not_nil())
@@ -137,7 +138,7 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::OUTPUT:
+    case goto_trace_stept::typet::OUTPUT:
       {
         printf_formattert printf_formatter(ns);
         printf_formatter(id2string(step.format_string), step.io_args);
@@ -162,7 +163,7 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::INPUT:
+    case goto_trace_stept::typet::INPUT:
       {
         xmlt &xml_input=dest.new_element("input");
         xml_input.new_element("input_id").data=id2string(step.io_id);
@@ -183,11 +184,11 @@ void convert(
       }
       break;
 
-    case goto_trace_stept::FUNCTION_CALL:
-    case goto_trace_stept::FUNCTION_RETURN:
+    case goto_trace_stept::typet::FUNCTION_CALL:
+    case goto_trace_stept::typet::FUNCTION_RETURN:
       {
         std::string tag=
-          (step.type==goto_trace_stept::FUNCTION_CALL)?
+          (step.type==goto_trace_stept::typet::FUNCTION_CALL)?
           "function_call":"function_return";
         xmlt &xml_call_return=dest.new_element(tag);
 

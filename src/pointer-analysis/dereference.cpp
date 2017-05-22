@@ -44,7 +44,7 @@ exprt dereferencet::operator()(const exprt &pointer)
   const typet &type=pointer.type().subtype();
 
   #ifdef DEBUG
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
   #endif
 
   return dereference_rec(

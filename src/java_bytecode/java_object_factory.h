@@ -15,19 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt object_factory(
   const typet &type,
+  const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
-  const source_locationt &,
-  message_handlert &message_handler);
-
-exprt get_nondet_bool(const typet &);
-
-symbolt &new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &,
-  const typet &,
-  const std::string &prefix="tmp_object_factory");
+  const source_locationt &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

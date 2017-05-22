@@ -36,7 +36,7 @@ bool all_paths_enumeratort::next(patht &path)
   do
   {
 #ifdef DEBUG
-    std::cout << "Enumerating next path..." << std::endl;
+    std::cout << "Enumerating next path...\n";
 #endif
 
     int decision=backtrack(last_path);
@@ -69,8 +69,7 @@ int all_paths_enumeratort::backtrack(patht &path)
   path.pop_back();
 
   path_nodet &parent=path.back();
-  goto_programt::targetst succs;
-  goto_program.get_successors(parent.loc, succs);
+  const auto succs=goto_program.get_successors(parent.loc);
 
   unsigned int ret=0;
 
@@ -87,7 +86,7 @@ int all_paths_enumeratort::backtrack(patht &path)
     // We can take the next branch here...
 
 #ifdef DEBUG
-    std::cout << "Backtracked to a path of size " << path.size() << std::endl;
+    std::cout << "Backtracked to a path of size " << path.size() << '\n';
 #endif
 
     return ret+1;
@@ -119,12 +118,9 @@ void all_paths_enumeratort::extend_path(
   int succ)
 {
   goto_programt::targett next;
-  goto_programt::targetst succs;
   exprt guard=true_exprt();
 
-  goto_program.get_successors(t, succs);
-
-  for(const auto &s : succs)
+  for(const auto &s : goto_program.get_successors(t))
   {
     if(succ==0)
     {

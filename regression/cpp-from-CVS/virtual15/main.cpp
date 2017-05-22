@@ -1,8 +1,8 @@
-//#include <assert.h>
-//#include <iostream>
+// #include <assert.h>
+// #include <iostream>
 struct A
 {
-  virtual int f(){return 1;}
+  virtual int f() {return 1;}
   virtual int g(){return 1;}
 };
 

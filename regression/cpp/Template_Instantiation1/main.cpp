@@ -5,7 +5,7 @@ class bitVector {
   }
 };
 
-//#define WORKS
+// #define WORKS
 #ifdef WORKS
 
 typedef bitVector<int> sbv;

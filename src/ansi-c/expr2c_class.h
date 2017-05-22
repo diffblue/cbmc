@@ -205,7 +205,8 @@ protected:
   std::string convert_code_array_set(const codet &src, unsigned indent);
   std::string convert_code_array_copy(const codet &src, unsigned indent);
 
-  virtual std::string convert(const exprt &src, unsigned &precedence);
+  virtual std::string convert_with_precedence(
+    const exprt &src, unsigned &precedence);
 
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_function_application(const function_application_exprt &src, unsigned &precedence);

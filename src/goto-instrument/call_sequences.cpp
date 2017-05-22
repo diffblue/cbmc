@@ -34,7 +34,7 @@ void show_call_sequences(
   const goto_programt &goto_program,
   const goto_programt::const_targett start)
 {
-  std::cout << "# From " << function << std::endl;
+  std::cout << "# From " << function << '\n';
 
   std::stack<goto_programt::const_targett> stack;
   std::set<goto_programt::const_targett> seen;
@@ -57,19 +57,16 @@ void show_call_sequences(
       {
         // print pair function, function2
         std::cout << function << " -> "
-                  << to_symbol_expr(function2).get_identifier() << std::endl;
+                  << to_symbol_expr(function2).get_identifier() << '\n';
       }
       continue; // abort search
     }
 
-    // get successors
-    goto_programt::const_targetst s;
-    goto_program.get_successors(t, s);
-
-    // add to stack
-    for(goto_programt::const_targetst::const_iterator
-        it=s.begin(); it!=s.end(); it++)
-      stack.push(*it);
+    // get successors and add to stack
+    for(const auto &it : goto_program.get_successors(t))
+    {
+      stack.push(it);
+    }
   }
 }
 
@@ -91,7 +88,7 @@ void show_call_sequences(
 {
   // this is quadratic
 
-  std::cout << "# " << function << std::endl;
+  std::cout << "# " << function << '\n';
 
   show_call_sequences(
     function,
@@ -118,7 +115,7 @@ void show_call_sequences(
       next);
   }
 
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\

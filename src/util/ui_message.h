@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class ui_message_handlert:public message_handlert
 {
 public:
-  typedef enum { PLAIN, XML_UI, JSON_UI } uit;
+  enum class uit { PLAIN, XML_UI, JSON_UI };
 
   ui_message_handlert(uit, const std::string &program);
   ui_message_handlert(const class cmdlinet &, const std::string &program);

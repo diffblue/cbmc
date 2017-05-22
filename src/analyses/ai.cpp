@@ -412,11 +412,7 @@ bool ai_baset::visit(
 
   statet &current=get_state(l);
 
-  goto_programt::const_targetst successors;
-
-  goto_program.get_successors(l, successors);
-
-  for(const auto &to_l : successors)
+  for(const auto &to_l : goto_program.get_successors(l))
   {
     if(to_l==goto_program.instructions.end())
       continue;

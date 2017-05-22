@@ -309,7 +309,7 @@ bool bmc_covert::operator()()
 
   switch(bmc.ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       status() << "\n** coverage results:" << eom;
 
@@ -334,7 +334,7 @@ bool bmc_covert::operator()()
       break;
     }
 
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       for(const auto &goal_pair : goal_map)
       {
@@ -386,7 +386,7 @@ bool bmc_covert::operator()()
       break;
     }
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &goals_array=json_result["goals"].make_array();
@@ -452,7 +452,7 @@ bool bmc_covert::operator()()
                << (cover_goals.iterations()==1?"":"s")
                << eom;
 
-  if(bmc.ui==ui_message_handlert::PLAIN)
+  if(bmc.ui==ui_message_handlert::uit::PLAIN)
   {
     std::cout << "Test suite:" << '\n';
 

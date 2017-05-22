@@ -886,7 +886,7 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
   goto_programt::instructionst::iterator i_it)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::Lwfence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::Lwfence,
     thread, "f", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
@@ -937,7 +937,7 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   bool WWcumul=instruction.code.get_bool(ID_WWcumul);
   bool RRcumul=instruction.code.get_bool(ID_RRcumul);
   bool RWcumul=instruction.code.get_bool(ID_RWcumul);
-  const abstract_eventt new_fence_event(abstract_eventt::ASMfence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::ASMfence,
     thread, "asm", instrumenter.unique_id++, instruction.source_location,
     false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul, RRcumul);
   const event_idt new_fence_node=egraph.add_node();
@@ -1026,7 +1026,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     assert(read_expr);
 #endif
 
-    const abstract_eventt new_read_event(abstract_eventt::Read,
+    const abstract_eventt new_read_event(abstract_eventt::operationt::Read,
       thread, id2string(read), instrumenter.unique_id++,
       instruction.source_location, local(read));
 
@@ -1124,7 +1124,7 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     // assert(write_expr);
 
     /* creates Write */
-    const abstract_eventt new_write_event(abstract_eventt::Write,
+    const abstract_eventt new_write_event(abstract_eventt::operationt::Write,
       thread, id2string(write), instrumenter.unique_id++,
       instruction.source_location, local(write));
 
@@ -1311,7 +1311,7 @@ void instrumentert::cfg_visitort::visit_cfg_fence(
   goto_programt::instructionst::iterator i_it)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::Fence,
+  const abstract_eventt new_fence_event(abstract_eventt::operationt::Fence,
     thread, "F", instrumenter.unique_id++, instruction.source_location, false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
@@ -1532,16 +1532,15 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
     }
 
   /* now test whether this part of the code can exist */
+  goto_functionst::function_mapt map;
   goto_function_templatet<goto_programt> one_interleaving;
   one_interleaving.body.copy_from(interleaving);
-
-  std::pair<irep_idt, goto_function_templatet<goto_programt> > p(
-    goto_functionst::entry_point(), one_interleaving);
-  goto_functionst::function_mapt map;
-  map.insert(p);
+  map.insert(std::make_pair(
+    goto_functionst::entry_point(),
+    std::move(one_interleaving)));
 
   goto_functionst this_interleaving;
-  this_interleaving.function_map=map;
+  this_interleaving.function_map=std::move(map);
   optionst no_option;
   null_message_handlert no_message;
 
@@ -1658,10 +1657,10 @@ void inline instrumentert::print_outputs_local(
     message.debug() << it->print_unsafes() << messaget::eom;
 #endif
     it->print_dot(dot, colour++, model);
-    ref << it->print_name(model, hide_internals) << std::endl;
-    output << it->print_output() << std::endl;
+    ref << it->print_name(model, hide_internals) << '\n';
+    output << it->print_output() << '\n';
     all << it->print_all(model, map_id2var, map_var2id, hide_internals)
-      << std::endl;
+      << '\n';
 
     /* emphasises instrumented events */
     for(std::list<event_idt>::const_iterator it_e=it->begin();
@@ -1683,7 +1682,7 @@ void inline instrumentert::print_outputs_local(
       {
         dot << ev.id << "[label=\"\\\\lb {" << ev.id << "}";
         dot << ev.get_operation() << "{" << ev.variable << "} {} @thread";
-        dot << ev.thread << "\",color=red,shape=box];" << std::endl;
+        dot << ev.thread << "\",color=red,shape=box];\n";
       }
     }
   }
@@ -1699,7 +1698,7 @@ void inline instrumentert::print_outputs_local(
         for(std::set<event_idt>::iterator it=same_po[i].begin();
           it!=same_po[i].end(); it++)
           dot << egraph[*it].id << ";";
-        dot << "};" << std::endl;
+        dot << "};\n";
       }
   }
 
@@ -1710,15 +1709,14 @@ void inline instrumentert::print_outputs_local(
       same_file.begin();
       it!=same_file.end(); it++)
     {
-      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{"
-          << std::endl;
-      dot << "  label=\"" << it->first << "\";" << std::endl;
+      dot << "subgraph cluster_" << irep_id_hash()(it->first) << "{\n";
+      dot << "  label=\"" << it->first << "\";\n";
       for(std::set<event_idt>::const_iterator ev_it=it->second.begin();
         ev_it!=it->second.end(); ev_it++)
       {
-        dot << "  " << egraph[*ev_it].id << ";" << std::endl;
+        dot << "  " << egraph[*ev_it].id << ";\n";
       }
-      dot << "};" << std::endl;
+      dot << "};\n";
     }
   }
 
@@ -1729,11 +1727,11 @@ void inline instrumentert::print_outputs_local(
       m_it!=map_id2var.end();
       ++m_it)
   {
-    table << std::endl << "| " << m_it->first << " : " << m_it->second;
+    table << "\n| " << m_it->first << " : " << m_it->second;
   }
-  table << std::endl;
+  table << '\n';
   table << std::string(80, '-');
-  table << std::endl;
+  table << '\n';
 }
 
 void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
@@ -1750,8 +1748,8 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
   all.open("all.txt");
   table.open("table.txt");
 
-  dot << "digraph G {" << std::endl;
-  dot << "nodesep=1; ranksep=1;" << std::endl;
+  dot << "digraph G {\n";
+  dot << "nodesep=1; ranksep=1;\n";
 
   /* prints cycles in the different outputs */
   if(!set_of_cycles.empty())
@@ -1765,21 +1763,21 @@ void instrumentert::print_outputs(memory_modelt model, bool hide_internals)
       std::string name="scc_" + std::to_string(i) + ".dot";
       local_dot.open(name.c_str());
 
-      local_dot << "digraph G {" << std::endl;
-      local_dot << "nodesep=1; ranksep=1;" << std::endl;
+      local_dot << "digraph G {\n";
+      local_dot << "nodesep=1; ranksep=1;\n";
       print_outputs_local(set_of_cycles_per_SCC[i], local_dot, ref, output, all,
         table, model, hide_internals);
-      local_dot << "}" << std::endl;
+      local_dot << "}\n";
       local_dot.close();
 
       dot << i << "[label=\"SCC " << i << "\",link=\"" << "scc_" << i;
-      dot << ".svg\"]" << std::endl;
+      dot << ".svg\"]\n";
     }
   }
   else
     message.debug() << "no cycles to output" << messaget::eom;
 
-  dot << "}" << std::endl;
+  dot << "}\n";
 
   dot.close();
   ref.close();

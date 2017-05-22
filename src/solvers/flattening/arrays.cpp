@@ -84,7 +84,7 @@ literalt arrayst::record_array_equality(
   // check types
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
-    std::cout << equality.pretty() << std::endl;
+    std::cout << equality.pretty() << '\n';
     throw "record_array_equality got equality without matching types";
   }
 
@@ -174,7 +174,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'with' without matching types";
     }
 
@@ -196,7 +196,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'update' without matching types";
     }
 
@@ -220,14 +220,14 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op1().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
     // check types
     if(!base_type_eq(array_type, a.op2().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
@@ -390,7 +390,7 @@ void arrayst::add_array_Ackermann_constraints()
   // this is quadratic!
 
 #if 0
-  std::cout << "arrays.size(): " << arrays.size() << std::endl;
+  std::cout << "arrays.size(): " << arrays.size() << '\n';
 #endif
 
   // iterate over arrays
@@ -399,7 +399,7 @@ void arrayst::add_array_Ackermann_constraints()
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
 #if 0
-    std::cout << "index_set.size(): " << index_set.size() << std::endl;
+    std::cout << "index_set.size(): " << index_set.size() << '\n';
 #endif
 
     // iterate over indices, 2x!
@@ -441,7 +441,7 @@ void arrayst::add_array_Ackermann_constraints()
             equal_exprt values_equal(index_expr1, index_expr2);
 
             // add constraint
-            lazy_constraintt lazy(ARRAY_ACKERMANN,
+            lazy_constraintt lazy(lazy_typet::ARRAY_ACKERMANN,
               or_exprt(literal_exprt(!indices_equal_lit), values_equal));
             add_array_constraint(lazy, true); // added lazily
 
@@ -516,8 +516,8 @@ void arrayst::update_index_map(bool update_all)
                 << arrays.find_number(i1->first) << " = "
                 << from_expr(ns, "", arrays[arrays.find_number(i1->first)])
                 << "): "
-                << from_expr(ns, "", *i2) << std::endl;
-  std::cout << "-----" << std::endl;
+                << from_expr(ns, "", *i2) << '\n';
+  std::cout << "-----\n";
 #endif
 }
 
@@ -634,7 +634,7 @@ void arrayst::add_array_constraints(
       assert(index_expr1.type()==index_expr2.type());
 
       // add constraint
-      lazy_constraintt lazy(ARRAY_TYPECAST,
+      lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
         equal_exprt(index_expr1, index_expr2));
       add_array_constraint(lazy, false); // added immediately
     }
@@ -678,11 +678,12 @@ void arrayst::add_array_constraints_with(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << std::endl;
+      std::cout << expr.pretty() << '\n';
       assert(false);
     }
 
-     lazy_constraintt lazy(ARRAY_WITH, equal_exprt(index_expr, value));
+    lazy_constraintt lazy(
+       lazy_typet::ARRAY_WITH, equal_exprt(index_expr, value));
      add_array_constraint(lazy, false); // added immediately
   }
 
@@ -722,7 +723,7 @@ void arrayst::add_array_constraints_with(
         equal_exprt equality_expr(index_expr1, index_expr2);
 
         // add constraint
-        lazy_constraintt lazy(ARRAY_WITH, or_exprt(equality_expr,
+        lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
                                 literal_exprt(guard_lit)));
         add_array_constraint(lazy, false); // added immediately
 
@@ -773,7 +774,7 @@ void arrayst::add_array_constraints_update(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << std::endl;
+      std::cout << expr.pretty() << '\n';
       assert(false);
     }
 
@@ -862,7 +863,8 @@ void arrayst::add_array_constraints_array_of(
     assert(base_type_eq(index_expr.type(), expr.op0().type(), ns));
 
     // add constraint
-    lazy_constraintt lazy(ARRAY_OF, equal_exprt(index_expr, expr.op0()));
+    lazy_constraintt lazy(
+      lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.op0()));
     add_array_constraint(lazy, false); // added immediately
   }
 }
@@ -910,7 +912,7 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF,
+    lazy_constraintt lazy(lazy_typet::ARRAY_IF,
                             or_exprt(literal_exprt(!cond_lit),
                               equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
@@ -939,8 +941,10 @@ void arrayst::add_array_constraints_if(
     assert(index_expr1.type()==index_expr2.type());
 
     // add implication
-    lazy_constraintt lazy(ARRAY_IF, or_exprt(literal_exprt(cond_lit),
-                          equal_exprt(index_expr1, index_expr2)));
+    lazy_constraintt lazy(
+      lazy_typet::ARRAY_IF,
+      or_exprt(literal_exprt(cond_lit),
+      equal_exprt(index_expr1, index_expr2)));
     add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster

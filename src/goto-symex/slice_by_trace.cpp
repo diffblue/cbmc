@@ -37,7 +37,7 @@ void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,
   symex_target_equationt &equation)
 {
-  std::cout << "Slicing by trace..." << std::endl;
+  std::cout << "Slicing by trace...\n";
 
   merge_identifier="goto_symex::\\merge";
   merge_symbol=symbol_exprt(typet(ID_bool));
@@ -119,12 +119,12 @@ void symex_slice_by_tracet::slice_by_trace(
   SSA_step.guard=t_guard.as_expr();
   SSA_step.ssa_lhs.make_nil();
   SSA_step.cond_expr.swap(trace_condition);
-  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.type=goto_trace_stept::typet::ASSUME;
   SSA_step.source=empty_source;
 
   assign_merges(equation); // Now add the merge variable assignments to eqn
 
-  std::cout << "Finished slicing by trace..." << std::endl;
+  std::cout << "Finished slicing by trace...\n";
 }
 
 /*******************************************************************\
@@ -141,7 +141,7 @@ Function: read_trace
 
 void symex_slice_by_tracet::read_trace(std::string filename)
 {
-  std::cout << "Reading trace from file " << filename << std::endl;
+  std::cout << "Reading trace from file " << filename << '\n';
   std::ifstream file(filename);
   if(file.fail())
     throw "failed to read from trace file";
@@ -210,7 +210,7 @@ bool symex_slice_by_tracet::parse_alphabet(std::string read_line)
     std::cout << "Alphabet: ";
     if(!alphabet_parity)
       std::cout << "!";
-    std::cout << read_line << std::endl;
+    std::cout << read_line << '\n';
     alphabet.insert(read_line);
   }
   return false;
@@ -235,7 +235,7 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
   bool parity=strstr(read_line.c_str(), "!")==NULL;
   bool universe=strstr(read_line.c_str(), "?")!=NULL;
   bool has_values=strstr(read_line.c_str(), " ")!=NULL;
-  std::cout << "Trace: " << read_line << std::endl;
+  std::cout << "Trace: " << read_line << '\n';
   std::vector<irep_idt> value_v;
   if(has_values)
   {
@@ -314,12 +314,12 @@ void symex_slice_by_tracet::compute_ts_back(
       exprt guard=i->guard;
 
 #if 0
-      std::cout << "EVENT:  " << event << std::endl;
-      std::cout << "GUARD:  " << from_expr(ns, "", guard) << std::endl;
+      std::cout << "EVENT:  " << event << '\n';
+      std::cout << "GUARD:  " << from_expr(ns, "", guard) << '\n';
       for(size_t j=0; j < t.size(); j++)
       {
         std::cout << "t[" << j << "]=" << from_expr(ns, "", t[j]) <<
-          std::endl;
+          '\n';
       }
 #endif
 
@@ -489,7 +489,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     if(!guard.is_true())
       potential_SSA_steps++;
     // it->output(ns,std::cout);
-    // std::cout << "-----------------" << std::endl;
+    // std::cout << "-----------------\n";
 
     if((guard.id()==ID_symbol) || (guard.id() == ID_not))
     {
@@ -529,7 +529,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
       }
       else if(guard.id()==ID_or)
       {
-        std::cout << "Guarded by an OR." << std::endl;
+        std::cout << "Guarded by an OR.\n";
       }
     }
 
@@ -568,12 +568,12 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
   std::cout << "Trace slicing effectively removed "
             << (sliced_SSA_steps + sliced_conds) << " out of "
-            << equation.SSA_steps.size() << " SSA_steps." << std::endl;
+            << equation.SSA_steps.size() << " SSA_steps.\n";
   std::cout << "  ("
                 << ((sliced_SSA_steps + sliced_conds) - trace_loc_sliced)
             << " out of "
             << (equation.SSA_steps.size()-trace_SSA_steps-location_SSA_steps)
-            << " non-trace, non-location SSA_steps)" << std::endl;
+            << " non-trace, non-location SSA_steps)\n";
 }
 
 /*******************************************************************\
@@ -630,10 +630,10 @@ void symex_slice_by_tracet::assign_merges(
     SSA_step.guard=t_guard.as_expr();
     SSA_step.ssa_lhs=merge_sym;
     SSA_step.ssa_rhs.swap(merge_copy);
-    SSA_step.assignment_type=symex_targett::HIDDEN;
+    SSA_step.assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-    SSA_step.type=goto_trace_stept::ASSIGNMENT;
+    SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
     SSA_step.source=empty_source;
   }
 }

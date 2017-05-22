@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/cfg_dominators.h>
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_convert_class.h"
+#include "ci_lazy_methods.h"
 
 #include <vector>
 #include <list>
@@ -31,13 +32,13 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    safe_pointer<std::vector<irep_idt> > _needed_methods,
-    safe_pointer<std::set<irep_idt> > _needed_classes):
+    safe_pointer<ci_lazy_methodst> _lazy_methods,
+    const character_refine_preprocesst &_character_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
-    needed_methods(_needed_methods),
-    needed_classes(_needed_classes)
+    lazy_methods(_lazy_methods),
+    character_preprocess(_character_preprocess)
   {
   }
 
@@ -55,12 +56,12 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
-  safe_pointer<std::vector<irep_idt> > needed_methods;
-  safe_pointer<std::set<irep_idt> > needed_classes;
+  safe_pointer<ci_lazy_methodst> lazy_methods;
 
   irep_idt method_id;
   irep_idt current_method;
   typet method_return_type;
+  character_refine_preprocesst character_preprocess;
 
 public:
   struct holet
@@ -95,11 +96,11 @@ public:
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
 
-  typedef enum instruction_sizet
+  enum instruction_sizet
   {
     INST_INDEX=2,
     INST_INDEX_CONST=3
-  } instruction_sizet;
+  };
 
   codet get_array_bounds_check(
     const exprt &arraystruct,

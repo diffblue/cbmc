@@ -1,11 +1,11 @@
 template <class T>
 class A
 {
-	T t;
+  T t;
 };
 
 int main()
 {
-	A<A<double> > a1;
-	A<A<int> > a2;
+  A<A<double> > a1;
+  A<A<int> > a2;
 }

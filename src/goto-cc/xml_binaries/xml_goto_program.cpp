@@ -32,7 +32,7 @@ void convert(const goto_programt &goto_program,
              xmlt &xml)
 {
   std::stringstream tmp;
-  // std::cout << "TNO: " << goto_program.target_numbers.size() << std::endl;
+  // std::cout << "TNO: " << goto_program.target_numbers.size() << '\n';
 
   for(const auto &inst : goto_program.instructions)
   {
@@ -58,7 +58,7 @@ void convert(const goto_programt &goto_program,
 
     if(inst.target_number!=0)
     {
-      // std::cout << "Targetlabel found!" << std::endl;
+      // std::cout << "Targetlabel found!\n";
       tmp.str("");
       tmp << inst.target_number;
       ins.set_attribute("targetlabel", tmp.str());
@@ -289,8 +289,8 @@ void convert(const xmlt &xml, goto_programt &goto_program)
     }
     else
     {
-      std::cout << "Unknown instruction type encountered (" << it->name << ")";
-      std::cout << std::endl;
+      std::cout << "Unknown instruction type encountered (" << it->name
+                << ")\n";
       return;
     }
 
@@ -316,7 +316,7 @@ void convert(const xmlt &xml, goto_programt &goto_program)
           }
           else
           {
-            std::cout << "Unknown node in labels section." << std::endl;
+            std::cout << "Unknown node in labels section.\n";
             return;
           }
         }
@@ -374,12 +374,12 @@ void convert(const xmlt &xml, goto_programt &goto_program)
             else
             {
               std::cout << "Warning: instruction not found when "
-              "resolving target links." << std::endl;
+              "resolving target links.\n";
             }
           }
           else
           {
-            std::cout << "Unknown node in targets section." << std::endl;
+            std::cout << "Unknown node in targets section.\n";
             return;
           }
         }
@@ -391,7 +391,7 @@ void convert(const xmlt &xml, goto_programt &goto_program)
   // resolve links
   goto_program.update();
 
-  // std::cout << "TNI: " << goto_program.target_numbers.size() << std::endl;
+  // std::cout << "TNI: " << goto_program.target_numbers.size() << '\n';
 }
 
 /*******************************************************************\

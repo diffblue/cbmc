@@ -1,9 +1,0 @@
-CORE
-main.c
---gcc --stop-on-fail -D __CPROVER
-^  0 == 1$
-^VERIFICATION FAILED$
-^EXIT=10$
-^SIGNAL=0$
---
-^warning: ignoring

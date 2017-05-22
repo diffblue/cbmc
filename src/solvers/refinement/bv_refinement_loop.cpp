@@ -83,7 +83,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
-    if(ui==ui_message_handlert::XML_UI)
+    if(ui==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
@@ -92,27 +92,27 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
 
     switch(prop_solve())
     {
-    case D_SATISFIABLE:
+    case resultt::D_SATISFIABLE:
       check_SAT();
       if(!progress)
       {
         status() << "BV-Refinement: got SAT, and it simulates => SAT" << eom;
         status() << "Total iterations: " << iteration << eom;
-        return D_SATISFIABLE;
+        return resultt::D_SATISFIABLE;
       }
       else
         status() << "BV-Refinement: got SAT, and it is spurious, refining"
                  << eom;
       break;
 
-    case D_UNSATISFIABLE:
+    case resultt::D_UNSATISFIABLE:
       check_UNSAT();
       if(!progress)
       {
         status() << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
                  << eom;
         status() << "Total iterations: " << iteration << eom;
-        return D_UNSATISFIABLE;
+        return resultt::D_UNSATISFIABLE;
       }
       else
         status() << "BV-Refinement: got UNSAT, and the proof fails, refining"
@@ -120,7 +120,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
       break;
 
     default:
-      return D_ERROR;
+      return resultt::D_ERROR;
     }
   }
 }
@@ -161,9 +161,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
 
   switch(result)
   {
-    case propt::P_SATISFIABLE: return D_SATISFIABLE;
-    case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
-    default: return D_ERROR;
+    case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
+    case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
+    default: return resultt::D_ERROR;
   }
 }
 
@@ -239,7 +239,7 @@ void bv_refinementt::set_to(const exprt &expr, bool value)
   if(expr.id()=="=" && expr.operands().size()==2)
     forall_operands(it, expr.op1())
       std::cout << " " << it->id() << "@" << it->type().id();
-  std::cout << std::endl;
+  std::cout << '\n';
   #else
   SUB::set_to(expr, value);
   #endif

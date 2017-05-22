@@ -36,7 +36,7 @@ Function: inv_object_storet::output
 void inv_object_storet::output(std::ostream &out) const
 {
   for(unsigned i=0; i<entries.size(); i++)
-    out << "STORE " << i << ": " << to_string(i, "") << std::endl;
+    out << "STORE " << i << ": " << to_string(i, "") << '\n';
 }
 
 /*******************************************************************\
@@ -488,7 +488,7 @@ void invariant_sett::output(
 {
   if(is_false)
   {
-    out << "FALSE" << std::endl;
+    out << "FALSE\n";
     return;
   }
 
@@ -510,28 +510,28 @@ void invariant_sett::output(
           out << to_string(j, identifier);
         }
 
-      out << std::endl;
+      out << '\n';
     }
 
   for(const auto &bounds : bounds_map)
   {
     out << to_string(bounds.first, identifier)
         << " in " << bounds.second
-        << std::endl;
+        << '\n';
   }
 
   for(const auto &le : le_set)
   {
     out << to_string(le.first, identifier)
         << " <= " << to_string(le.second, identifier)
-        << std::endl;
+        << '\n';
   }
 
   for(const auto &ne : ne_set)
   {
     out << to_string(ne.first, identifier)
         << " != " << to_string(ne.second, identifier)
-        << std::endl;
+        << '\n';
   }
 }
 
@@ -604,7 +604,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     throw "non-Boolean argument to strengthen()";
 
   #if 0
-  std::cout << "S: " << from_expr(*ns, "", expr) << std::endl;
+  std::cout << "S: " << from_expr(*ns, "", expr) << '\n';
   #endif
 
   if(is_false)
@@ -836,7 +836,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     throw "implies: non-Boolean expression";
 
   #if 0
-  std::cout << "I: " << from_expr(*ns, "", expr) << std::endl;
+  std::cout << "I: " << from_expr(*ns, "", expr) << '\n';
   #endif
 
   if(is_false) // can't get any stronger
@@ -1508,7 +1508,7 @@ void invariant_sett::apply_code(const codet &code)
   }
   else
   {
-    std::cerr << code.pretty() << std::endl;
+    std::cerr << code.pretty() << '\n';
     throw "invariant_sett: unexpected statement: "+id2string(statement);
   }
 }

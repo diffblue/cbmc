@@ -159,8 +159,18 @@ void printf_formattert::process_format(std::ostream &out)
     out << ch;
     break;
 
+  case 'e':
+  case 'E':
+    format_constant.style=format_spect::stylet::SCIENTIFIC;
+    if(next_operand==operands.end())
+      break;
+    out << format_constant(
+      make_type(*(next_operand++), double_type()));
+    break;
+
   case 'f':
   case 'F':
+    format_constant.style=format_spect::stylet::DECIMAL;
     if(next_operand==operands.end())
       break;
     out << format_constant(
@@ -169,6 +179,7 @@ void printf_formattert::process_format(std::ostream &out)
 
   case 'g':
   case 'G':
+    format_constant.style=format_spect::stylet::AUTOMATIC;
     if(format_constant.precision==0)
       format_constant.precision=1;
     if(next_operand==operands.end())

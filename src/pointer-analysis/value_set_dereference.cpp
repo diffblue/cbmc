@@ -122,7 +122,7 @@ exprt value_set_dereferencet::dereference(
   const typet &type=pointer.type().subtype();
 
   #if 0
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
   #endif
 
   // collect objects the pointer may point to
@@ -135,7 +135,7 @@ exprt value_set_dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "P: " << from_expr(ns, "", *it) << '\n';
   #endif
 
   // get the values of these
@@ -151,7 +151,7 @@ exprt value_set_dereferencet::dereference(
 
     #if 0
     std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
-    std::cout << from_expr(ns, "", value.value) << std::endl;
+    std::cout << from_expr(ns, "", value.value) << '\n';
     #endif
 
     values.push_back(value);
@@ -235,8 +235,7 @@ exprt value_set_dereferencet::dereference(
   }
 
   #if 0
-  std::cout << "R: " << from_expr(ns, "", value) << std::endl
-            << std::endl;
+  std::cout << "R: " << from_expr(ns, "", value) << "\n\n";
   #endif
 
   return value;
@@ -353,7 +352,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &object=o.object();
 
   #if 0
-  std::cout << "O: " << from_expr(ns, "", root_object) << std::endl;
+  std::cout << "O: " << from_expr(ns, "", root_object) << '\n';
   #endif
 
   valuet result;
@@ -660,7 +659,7 @@ void value_set_dereferencet::valid_check(
   {
     // always valid, but can't write
 
-    if(mode==WRITE)
+    if(mode==modet::WRITE)
     {
       dereference_callback.dereference_failure(
         "pointer dereference",

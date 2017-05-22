@@ -131,11 +131,11 @@ void cpp_scopet::lookup(
   // are looking for templates!
 
   #if 0
-  std::cout << "B: " << base_name <<  std::endl;
-  std::cout << "K: " << kind << std::endl;
-  std::cout << "I: " << id_class << std::endl;
+  std::cout << "B: " << base_name << '\n';
+  std::cout << "K: " << kind << '\n';
+  std::cout << "I: " << id_class << '\n';
   std::cout << "THIS: " << this->base_name << " " << this->id_class
-            << " " << this->identifier << std::endl;
+            << " " << this->identifier << '\n';
   #endif
 
   cpp_id_mapt::iterator
@@ -175,7 +175,7 @@ void cpp_scopet::lookup(
   }
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // secondary scopes
   for(scope_listt::iterator
@@ -194,7 +194,7 @@ void cpp_scopet::lookup(
     return; // done
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // ask parent, recursive call
   if(!is_root_scope())

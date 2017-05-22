@@ -53,7 +53,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   if(op0.type()!=type)
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     throw "add/sub with mixed types";
   }
 
@@ -74,8 +74,8 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   bv_utilst::representationt rep=
     (arithmetic_type.id()==ID_signedbv ||
-     arithmetic_type.id()==ID_fixedbv)?bv_utilst::SIGNED:
-                                       bv_utilst::UNSIGNED;
+     arithmetic_type.id()==ID_fixedbv)?bv_utilst::representationt::SIGNED:
+                                       bv_utilst::representationt::UNSIGNED;
 
   for(exprt::operandst::const_iterator
       it=operands.begin()+1;
@@ -83,7 +83,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
   {
     if(it->type()!=type)
     {
-      std::cerr << expr.pretty() << std::endl;
+      std::cerr << expr.pretty() << '\n';
       throw "add/sub with mixed types";
     }
 

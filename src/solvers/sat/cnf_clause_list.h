@@ -33,7 +33,7 @@ public:
     return tvt::unknown();
   }
 
-  virtual resultt prop_solve() { return P_ERROR; }
+  virtual resultt prop_solve() { return resultt::P_ERROR; }
 
   virtual size_t no_clauses() const { return clauses.size(); }
 

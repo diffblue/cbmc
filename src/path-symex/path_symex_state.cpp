@@ -82,14 +82,14 @@ Function: path_symex_statet::output
 
 void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
-  out << "  PC: " << thread.pc << std::endl;
+  out << "  PC: " << thread.pc << '\n';
   out << "  Call stack:";
   for(call_stackt::const_iterator
       it=thread.call_stack.begin();
       it!=thread.call_stack.end();
       it++)
-    out << " " << it->return_location << std::endl;
-  out << std::endl;
+    out << " " << it->return_location << '\n';
+  out << '\n';
 }
 
 /*******************************************************************\
@@ -108,9 +108,9 @@ void path_symex_statet::output(std::ostream &out) const
 {
   for(unsigned t=0; t<threads.size(); t++)
   {
-    out << "*** Thread " << t << std::endl;
+    out << "*** Thread " << t << '\n';
     output(threads[t], out);
-    out << std::endl;
+    out << '\n';
   }
 }
 
@@ -194,11 +194,12 @@ bool path_symex_statet::is_feasible(
   // check whether SAT
   switch(decision_procedure())
   {
-  case decision_proceduret::D_SATISFIABLE: return true;
+  case decision_proceduret::resultt::D_SATISFIABLE: return true;
 
-  case decision_proceduret::D_UNSATISFIABLE: return false;
+  case decision_proceduret::resultt::D_UNSATISFIABLE: return false;
 
-  case decision_proceduret::D_ERROR: throw "error from decision procedure";
+  case decision_proceduret::resultt::D_ERROR:
+    throw "error from decision procedure";
   }
 
   return true; // not really reachable
@@ -240,10 +241,10 @@ bool path_symex_statet::check_assertion(
   // check whether SAT
   switch(decision_procedure.dec_solve())
   {
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     return false; // error
 
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     return true; // no error
 
   default:

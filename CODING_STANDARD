@@ -26,23 +26,23 @@ Whitespaces:
 - No whitespaces in blank lines
 - Put argument lists on next line (and ident 2 spaces) if too long
 - Put parameters on separate lines (and ident 2 spaces) if too long
-- No whitespaces around colon for inheritance, 
+- No whitespaces around colon for inheritance,
   put inherited into separate lines in case of multiple inheritance
 - The initializer list follows the constructor without a whitespace
   around the colon. Break line after the colon if required and indent members.
 - if(...), else, for(...), do, and while(...) are always in a separate line
-- Break expressions in if, for, while if necessary and align them 
+- Break expressions in if, for, while if necessary and align them
   with the first character following the opening parenthesis
 - Use {} instead of ; for the empty statement
-- Single line blocks without { } are allowed, 
+- Single line blocks without { } are allowed,
   but put braces around multi-line blocks
-- Use blank lines to visually separate logically cohesive code blocks 
+- Use blank lines to visually separate logically cohesive code blocks
   within a function
 - Have a newline at the end of a file
 
 Comments:
 - Do not use /* */ except for file and function comment blocks
-- Each source and header file must start with a comment block 
+- Each source and header file must start with a comment block
   stating the Module name and Author [will be changed when we roll out doxygen]
 - Each function in the source file (not the header) is preceded
   by a function comment header consisting of a comment block stating
@@ -75,9 +75,9 @@ Comments:
 - Use #ifdef DEBUG to guard debug code
 
 Naming:
-- Identifiers may use the characters [a-z0-9_] and should start with a 
+- Identifiers may use the characters [a-z0-9_] and should start with a
   lower-case letter (parameters in constructors may start with _).
-- Use american spelling for identifiers. 
+- Use american spelling for identifiers.
 - Separate basic words by _
 - Avoid abbreviations (e.g. prefer symbol_table to of st).
 - User defined type identifiers have to be terminated by 't'. Moreover,
@@ -92,8 +92,37 @@ Header files:
   of the header file rather than in line
 - Guard headers with #ifndef CPROVER_DIRECTORIES_FILE_H, etc
 
+Make files
+- Each source file should appear on a separate line
+- The final source file should still be followed by a trailing slash
+- The last line should be a comment to not be deleted, i.e. should look like:
+```
+SRC = source_file.cpp \
+      source_file2.cpp \
+      # Empty last line
+```
+- This ensures the Makefiles can be easily merged.
+
+Program Command Line Options
+- Each program contains a program_name_parse_optionst class which should
+  contain a define PROGRAM_NAME_PARSE_OPTIONS which is a string of all the
+  parse options in brackets (with a colon after the bracket if it takes a
+  parameter)
+- Each parameter should be one per line to yield easy merging
+- If parameters are shared between programs, they should be pulled out into
+  a common file and then included using a define
+- The defines should be OPT_FLAG_NAMES which should go into the OPTIONS define
+- The defines should include HELP_FLAG_NAMES which should contain the help
+  output of the format:
+  ```
+  " --flag                explanations\n" \
+  " --another flag        more explanation\n" \
+   <-------30 chars------>
+- The defines may include PARSE_OPTIONS_FLAG_NAMES which move the options
+  from the command line into the options
+
 C++ features:
-- Do not use namespaces.
+- Do not use namespaces, except for anonymous namespaces.
 - Prefer use of 'typedef' insted of 'using'.
 - Prefer use of 'class' instead of 'struct'.
 - Write type modifiers before the type specifier.
@@ -107,7 +136,7 @@ C++ features:
 - Avoid iterators, use ranged for instead
 - Avoid allocation with new/delete, use unique_ptr
 - Avoid pointers, use references
-- Avoid char *, use std::string 
+- Avoid char *, use std::string
 - For numbers, use int, unsigned, long, unsigned long, double
 - Use mp_integer, not BigInt
 - Use the functions in util for conversions between numbers and strings
@@ -117,13 +146,13 @@ C++ features:
 - Use instances of std::size_t for comparison with return values of .size() of
   STL containers and algorithms, and use them as indices to arrays or vectors.
 - Do not use default values in public functions
-- Use assertions to detect programming errors, e.g. whenever you make 
+- Use assertions to detect programming errors, e.g. whenever you make
   assumptions on how your code is used
-- Use exceptions only when the execution of the program has to abort 
+- Use exceptions only when the execution of the program has to abort
   because of erroneous user input
-- We allow to use 3rd-party libraries directly. 
-  No wrapper matching the coding rules is required. 
-  Allowed libraries are: STL. 
+- We allow to use 3rd-party libraries directly.
+  No wrapper matching the coding rules is required.
+  Allowed libraries are: STL.
 - When throwing, omit the brackets, i.e. `throw "error"`.
 - Error messages should start with a lower case letter.
 - Use the auto keyword if and only if one of the following
@@ -136,10 +165,38 @@ Architecture-specific code:
 - Don't include architecture-specific header files without #ifdef ...
 
 Output:
-- Do not output to cout or cerr directly (except in temporary debug code, 
+- Do not output to cout or cerr directly (except in temporary debug code,
   and then guard #include <iostream> by #ifdef DEBUG)
 - Derive from messaget if the class produces output and use the streams provided
   (status(), error(), debug(), etc)
 - Use '\n' instead of std::endl
 
+Unit tests:
+ - Unit tests are written using Catch: https://github.com/philsquared/Catch/
+ - For large classes:
+    - Create a separate file that contains the tests for each method of each
+      class
+    - The file should be named according to
+      `unit/class/path/class_name/function_name.cpp`
+ - For small classes:
+    - Create a separate file that contains the tests for all methods of each
+      class
+    - The file should be named according to unit/class/path/class_name.cpp
+ - Catch supports tagging, tests should be tagged with all the following tags:
+    - [core] should be used for all tests unless the test takes more than 1
+      second to run, then it should be tagged with [long]
+    - [folder_name] of the file being tested
+    - [class_name] of the class being tested
+    - [function_name] of the function being tested
+
 You are allowed to break rules if you have a good reason to do so.
+
+Pre-commit hook to run cpplint locally
+--------------------------------------
+To install the hook
+cp .githooks/pre-commit .git/hooks/pre-commit
+or use a symbolic link.
+Then, when running git commit, you should get the linter output
+(if any) before being prompted to enter a commit message.
+To bypass the check (e.g. if there was a false positive),
+add the option --no-verify.

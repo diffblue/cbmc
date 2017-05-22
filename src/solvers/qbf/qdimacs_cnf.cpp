@@ -62,11 +62,11 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
 
     switch(quantifier.type)
     {
-    case quantifiert::UNIVERSAL:
+    case quantifiert::typet::UNIVERSAL:
       out << "a";
       break;
 
-    case quantifiert::EXISTENTIAL:
+    case quantifiert::typet::EXISTENTIAL:
       out << "e";
       break;
 
@@ -74,7 +74,7 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
       assert(false);
     }
 
-    out << " " << quantifier.var_no << " 0" << std::endl;
+    out << " " << quantifier.var_no << " 0\n";
   }
 
   // variables that are not quantified
@@ -82,7 +82,7 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
 
   for(std::size_t i=1; i<no_variables(); i++)
     if(!quantified[i])
-      out << "e " << i << " 0" << std::endl;
+      out << "e " << i << " 0\n";
 }
 
 /*******************************************************************\

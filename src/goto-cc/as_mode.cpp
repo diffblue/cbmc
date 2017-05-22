@@ -313,7 +313,7 @@ int as_modet::run_as()
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
-  std::cout << std::endl;
+  std::cout << '\n';
   #endif
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");

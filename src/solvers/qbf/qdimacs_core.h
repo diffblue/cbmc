@@ -21,7 +21,7 @@ public:
   virtual tvt l_get(literalt a) const=0;
   virtual bool is_in_core(literalt l) const=0;
 
-  typedef enum { M_TRUE, M_FALSE, M_DONTCARE, M_COMPLEX } modeltypet;
+  enum modeltypet { M_TRUE, M_FALSE, M_DONTCARE, M_COMPLEX };
   virtual modeltypet m_get(literalt a) const=0;
 
   typedef std::pair<exprt, unsigned> symbol_mapt;

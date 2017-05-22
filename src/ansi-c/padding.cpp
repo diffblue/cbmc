@@ -203,7 +203,7 @@ void add_padding(struct_typet &type, const namespacet &ns)
       it!=components.end();
       it++)
   {
-    const typet &it_type=it->type();
+    const typet it_type=it->type();
     mp_integer a=1;
 
     const bool packed=it_type.get_bool(ID_C_packed) ||

@@ -74,7 +74,7 @@ void symex_target_equationt::shared_read(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_READ;
+  SSA_step.type=goto_trace_stept::typet::SHARED_READ;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -104,7 +104,7 @@ void symex_target_equationt::shared_write(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_WRITE;
+  SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -130,7 +130,7 @@ void symex_target_equationt::spawn(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::SPAWN;
+  SSA_step.type=goto_trace_stept::typet::SPAWN;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -155,7 +155,7 @@ void symex_target_equationt::memory_barrier(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::MEMORY_BARRIER;
+  SSA_step.type=goto_trace_stept::typet::MEMORY_BARRIER;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -181,7 +181,7 @@ void symex_target_equationt::atomic_begin(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_BEGIN;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -208,7 +208,7 @@ void symex_target_equationt::atomic_end(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_END;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_END;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
@@ -249,9 +249,9 @@ void symex_target_equationt::assignment(
   SSA_step.assignment_type=assignment_type;
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-  SSA_step.type=goto_trace_stept::ASSIGNMENT;
-  SSA_step.hidden=(assignment_type!=STATE &&
-                   assignment_type!=VISIBLE_ACTUAL_PARAMETER);
+  SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE &&
+                   assignment_type!=assignment_typet::VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -284,9 +284,9 @@ void symex_target_equationt::decl(
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
-  SSA_step.type=goto_trace_stept::DECL;
+  SSA_step.type=goto_trace_stept::typet::DECL;
   SSA_step.source=source;
-  SSA_step.hidden=(assignment_type!=STATE);
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
@@ -335,7 +335,7 @@ void symex_target_equationt::location(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::LOCATION;
+  SSA_step.type=goto_trace_stept::typet::LOCATION;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -362,7 +362,7 @@ void symex_target_equationt::function_call(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_CALL;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
@@ -390,7 +390,7 @@ void symex_target_equationt::function_return(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
@@ -419,7 +419,7 @@ void symex_target_equationt::output(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -450,7 +450,7 @@ void symex_target_equationt::output_fmt(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -482,7 +482,7 @@ void symex_target_equationt::input(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::INPUT;
+  SSA_step.type=goto_trace_stept::typet::INPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=input_id;
@@ -512,7 +512,7 @@ void symex_target_equationt::assumption(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.type=goto_trace_stept::typet::ASSUME;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -541,7 +541,7 @@ void symex_target_equationt::assertion(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSERT;
+  SSA_step.type=goto_trace_stept::typet::ASSERT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
@@ -570,7 +570,7 @@ void symex_target_equationt::goto_instruction(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::GOTO;
+  SSA_step.type=goto_trace_stept::typet::GOTO;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
@@ -599,7 +599,7 @@ void symex_target_equationt::constraint(
 
   SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::CONSTRAINT;
+  SSA_step.type=goto_trace_stept::typet::CONSTRAINT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
@@ -974,83 +974,89 @@ void symex_target_equationt::SSA_stept::output(
     out << "Thread " << source.thread_nr;
 
     if(source.pc->source_location.is_not_nil())
-      out << " " << source.pc->source_location << std::endl;
+      out << " " << source.pc->source_location << '\n';
     else
-      out << std::endl;
+      out << '\n';
   }
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::LOCATION:
-    out << "LOCATION" << std::endl; break;
-  case goto_trace_stept::INPUT:
-    out << "INPUT" << std::endl; break;
-  case goto_trace_stept::OUTPUT:
-    out << "OUTPUT" << std::endl; break;
+  case goto_trace_stept::typet::ASSERT:
+    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
+  case goto_trace_stept::typet::ASSUME:
+    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
+  case goto_trace_stept::typet::LOCATION:
+    out << "LOCATION" << '\n'; break;
+  case goto_trace_stept::typet::INPUT:
+    out << "INPUT" << '\n'; break;
+  case goto_trace_stept::typet::OUTPUT:
+    out << "OUTPUT" << '\n'; break;
 
-  case goto_trace_stept::DECL:
-    out << "DECL" << std::endl;
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+  case goto_trace_stept::typet::DECL:
+    out << "DECL" << '\n';
+    out << from_expr(ns, "", ssa_lhs) << '\n';
     break;
 
-  case goto_trace_stept::ASSIGNMENT:
+  case goto_trace_stept::typet::ASSIGNMENT:
     out << "ASSIGNMENT (";
     switch(assignment_type)
     {
-    case HIDDEN: out << "HIDDEN"; break;
-    case STATE: out << "STATE"; break;
-    case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
-    case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
-    case PHI: out << "PHI"; break;
-    case GUARD: out << "GUARD"; break;
+    case assignment_typet::HIDDEN:
+      out << "HIDDEN"; break;
+    case assignment_typet::STATE:
+      out << "STATE"; break;
+    case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
+      out << "VISIBLE_ACTUAL_PARAMETER"; break;
+    case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
+      out << "HIDDEN_ACTUAL_PARAMETER"; break;
+    case assignment_typet::PHI:
+      out << "PHI"; break;
+    case assignment_typet::GUARD:
+      out << "GUARD"; break;
     default:
       {
       }
     }
 
-    out << ")" << std::endl;
+    out << ")\n";
     break;
 
-  case goto_trace_stept::DEAD:
-    out << "DEAD" << std::endl; break;
-  case goto_trace_stept::FUNCTION_CALL:
-    out << "FUNCTION_CALL" << std::endl; break;
-  case goto_trace_stept::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN" << std::endl; break;
-  case goto_trace_stept::CONSTRAINT:
-    out << "CONSTRAINT" << std::endl; break;
-  case goto_trace_stept::SHARED_READ:
-    out << "SHARED READ" << std::endl; break;
-  case goto_trace_stept::SHARED_WRITE:
-    out << "SHARED WRITE" << std::endl; break;
-  case goto_trace_stept::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << std::endl; break;
-  case goto_trace_stept::ATOMIC_END:
-    out << "AUTOMIC_END" << std::endl; break;
-  case goto_trace_stept::SPAWN:
-    out << "SPAWN" << std::endl; break;
-  case goto_trace_stept::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER" << std::endl; break;
-  case goto_trace_stept::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
+  case goto_trace_stept::typet::DEAD:
+    out << "DEAD\n"; break;
+  case goto_trace_stept::typet::FUNCTION_CALL:
+    out << "FUNCTION_CALL\n"; break;
+  case goto_trace_stept::typet::FUNCTION_RETURN:
+    out << "FUNCTION_RETURN\n"; break;
+  case goto_trace_stept::typet::CONSTRAINT:
+    out << "CONSTRAINT\n"; break;
+  case goto_trace_stept::typet::SHARED_READ:
+    out << "SHARED READ\n"; break;
+  case goto_trace_stept::typet::SHARED_WRITE:
+    out << "SHARED WRITE\n"; break;
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+    out << "ATOMIC_BEGIN\n"; break;
+  case goto_trace_stept::typet::ATOMIC_END:
+    out << "AUTOMIC_END\n"; break;
+  case goto_trace_stept::typet::SPAWN:
+    out << "SPAWN\n"; break;
+  case goto_trace_stept::typet::MEMORY_BARRIER:
+    out << "MEMORY_BARRIER\n"; break;
+  case goto_trace_stept::typet::GOTO:
+    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
 
   default: assert(false);
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << std::endl;
+    out << from_expr(ns, "", cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
-    out << comment << std::endl;
+    out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+    out << from_expr(ns, "", ssa_lhs) << '\n';
 
-  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
+  out << "Guard: " << from_expr(ns, "", guard) << '\n';
 }
 
 /*******************************************************************\

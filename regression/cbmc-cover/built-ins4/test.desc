@@ -1,0 +1,9 @@
+CORE
+main.c
+--cover branch --unwind 5
+^EXIT=0$
+^SIGNAL=0$
+^\*\* 5 of 5 covered
+--
+^warning: ignoring
+^\[.*<builtin-library-

@@ -1,11 +1,12 @@
 # Build platform (use one of AUTO, Unix, OSX_Universal, MSVC, Cygwin, MinGW)
 BUILD_ENV = AUTO
 
-# Enable all warnings
-#CXXFLAGS += -Wall -Wno-long-long -Wno-sign-compare -Wno-parentheses -Wno-strict-aliasing -pedantic
-
-# Treat warnings as errors
-#CXXFLAGS += -Werror
+# Enable all warnings and treat them as errors
+ifeq ($(BUILD_ENV),MSVC)
+  #CXXFLAGS += /Wall /WX
+else
+  CXXFLAGS += -Wall -pedantic -Werror
+endif
 
 # Select optimisation or debug info
 #CXXFLAGS += -O2 -DNDEBUG

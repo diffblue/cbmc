@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "json.h"
 
-const jsont jsont::null_json_object(jsont::J_NULL);
+const jsont jsont::null_json_object(jsont::kindt::J_NULL);
 
 /*******************************************************************\
 
@@ -78,17 +78,17 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
 {
   switch(kind)
   {
-  case J_STRING:
+  case kindt::J_STRING:
     out << '"';
     escape_string(value, out);
     out << '"';
     break;
 
-  case J_NUMBER:
+  case kindt::J_NUMBER:
     out << value;
     break;
 
-  case J_OBJECT:
+  case kindt::J_OBJECT:
     out << '{';
     for(objectt::const_iterator o_it=object.begin();
         o_it!=object.end();
@@ -115,7 +115,7 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
     out << '}';
     break;
 
-  case J_ARRAY:
+  case kindt::J_ARRAY:
     out << '[';
 
     if(array.empty())
@@ -149,11 +149,11 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
     out << ']';
     break;
 
-  case J_TRUE: out << "true"; break;
+  case kindt::J_TRUE: out << "true"; break;
 
-  case J_FALSE: out << "false"; break;
+  case kindt::J_FALSE: out << "false"; break;
 
-  case J_NULL: out << "null"; break;
+  case kindt::J_NULL: out << "null"; break;
   }
 }
 

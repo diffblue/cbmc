@@ -10,7 +10,7 @@ struct A
 struct B : N::A<int>
 {
   B(int i): N::A<int>(i) {}
-  void  func(){};
+  void  func() {}
   int b;
 };
 

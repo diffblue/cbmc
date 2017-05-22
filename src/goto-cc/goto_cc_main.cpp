@@ -71,7 +71,7 @@ int main(int argc, const char **argv)
 
   if(argv==NULL || argc<1)
   {
-    std::cerr << "failed to determine base name" << std::endl;
+    std::cerr << "failed to determine base name\n";
     return 1;
   }
 

@@ -88,7 +88,7 @@ int goto_fence_inserter_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << MUSKETEER_VERSION << std::endl;
+    std::cout << MUSKETEER_VERSION << '\n';
     return 0;
   }
 
@@ -244,14 +244,11 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     // return;
 #if 0
     status() << "Function Pointer Removal" << eom;
-    remove_function_pointers(symbol_table, goto_functions,
-      cmdline.isset("pointer-check"));
-#endif
-
-#if 0
-    // do partial inlining
-    status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    remove_function_pointers(
+      get_message_handler(),
+      symbol_table,
+      goto_functions,
+      cmdline.isset("pointer-check");
 #endif
 
     status() << "Pointer Analysis" << eom;

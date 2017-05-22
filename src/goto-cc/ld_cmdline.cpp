@@ -285,7 +285,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
         }
         else
         {
-          std::cerr << "Warning: missing argument for " << argv_i << std::endl;
+          std::cerr << "Warning: missing argument for " << argv_i << '\n';
           set(os, ""); // end of command line
         }
       }
@@ -339,7 +339,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
         }
         else
         {
-          std::cerr << "Warning: missing argument for " << argv_i << std::endl;
+          std::cerr << "Warning: missing argument for " << argv_i << '\n';
           set(os, ""); // end of command line
         }
       }
@@ -365,7 +365,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     {
       // unrecognized option
       std::cerr << "Warning: uninterpreted ld option '" << argv_i
-                << "'" << std::endl;
+                << "'\n";
     }
   }
 

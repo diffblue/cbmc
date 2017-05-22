@@ -403,7 +403,7 @@ const exprt qbf_squolem_coret::f_get(literalt l)
   if(it!=function_cache.end())
   {
     #if 0
-    std::cout << "CACHE HIT for " << l.dimacs() << std::endl;
+    std::cout << "CACHE HIT for " << l.dimacs() << '\n';
     #endif
 
     if(l.sign())
@@ -478,7 +478,7 @@ const exprt qbf_squolem_coret::f_get_cnf(WitnessStack *wsp)
     }
 
     #if 0
-    std::cout << "CLAUSE: " << clause << std::endl;
+    std::cout << "CLAUSE: " << clause << '\n';
     #endif
 
     operands.push_back(clause);
@@ -534,7 +534,7 @@ const exprt qbf_squolem_coret::f_get_dnf(WitnessStack *wsp)
     }
 
     #if 0
-    std::cout << "CUBE: " << cube << std::endl;
+    std::cout << "CUBE: " << cube << '\n';
     #endif
 
     operands.push_back(cube);

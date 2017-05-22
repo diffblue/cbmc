@@ -100,8 +100,8 @@ Function: merge_types
 static void merge_types(irept &dest, irept &src)
 {
   #if 0
-  std::cout << "D: " << dest.pretty() << std::endl;
-  std::cout << "S: " << src.pretty() << std::endl;
+  std::cout << "D: " << dest.pretty() << '\n';
+  std::cout << "S: " << src.pretty() << '\n';
   #endif
 
   if(src.is_nil())
@@ -183,8 +183,8 @@ static void make_subtype(typet &dest, typet &src)
   // find spot in 'dest' where to insert 'src'
 
   #if 0
-  std::cout << "D: " << dest.pretty() << std::endl;
-  std::cout << "S: " << src.pretty() << std::endl;
+  std::cout << "D: " << dest.pretty() << '\n';
+  std::cout << "S: " << src.pretty() << '\n';
   #endif
 
   assert(src.id()==ID_array ||
@@ -364,7 +364,7 @@ static void create_function_scope(const YYSTYPE d)
           irep_idt base_name=param_decl.declarator().get_base_name();
           ansi_c_identifiert &identifier=
             PARSER.current_scope().name_map[base_name];
-          identifier.id_class=ANSI_C_SYMBOL;
+          identifier.id_class=ansi_c_id_classt::ANSI_C_SYMBOL;
           identifier.base_name=base_name;
           identifier.prefixed_name=param_decl.declarator().get_name();
         }

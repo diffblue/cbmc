@@ -44,17 +44,17 @@ void cone_of_influencet::cone_of_influence(
     cone_map[rit->location_number]=next;
 
 #ifdef DEBUG
-    std::cout << "Previous cone: " << std::endl;
+    std::cout << "Previous cone: \n";
 
     for(const auto &expr : curr)
       std::cout << expr2c(expr, ns) << " ";
 
-    std::cout << std::endl << "Current cone: " << std::endl;
+    std::cout << "\nCurrent cone: \n";
 
     for(const auto &expr : next)
       std::cout << expr2c(expr, ns) << " ";
 
-    std::cout << std::endl;
+    std::cout << '\n';
 #endif
   }
 

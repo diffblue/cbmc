@@ -32,24 +32,24 @@ Function: rw_set_baset::output
 
 void rw_set_baset::output(std::ostream &out) const
 {
-  out << "READ:" << std::endl;
+  out << "READ:\n";
   for(entriest::const_iterator it=r_entries.begin();
       it!=r_entries.end();
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << std::endl;
+        << from_expr(ns, "", it->second.guard) << '\n';
   }
 
-  out << std::endl;
+  out << '\n';
 
-  out << "WRITE:" << std::endl;
+  out << "WRITE:\n";
   for(entriest::const_iterator it=w_entries.begin();
       it!=w_entries.end();
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << std::endl;
+        << from_expr(ns, "", it->second.guard) << '\n';
   }
 }
 
@@ -190,7 +190,7 @@ void _rw_set_loct::read_write_rec(
       {
         /* as an under-approximation */
         // std::cout << "Sorry, LOCAL_MAY too imprecise. "
-        //           << Omitting some variables." << std::endl;
+        //           << Omitting some variables.\n";
         irep_idt object=ID_unknown;
 
         entryt &entry=r_entries[object];

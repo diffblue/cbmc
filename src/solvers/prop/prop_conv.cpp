@@ -293,7 +293,7 @@ literalt prop_conv_solvert::convert(const exprt &expr)
     prop.set_frozen(literal);
 
   #if 0
-  std::cout << literal << "=" << expr << std::endl;
+  std::cout << literal << "=" << expr << '\n';
   #endif
 
   return literal;
@@ -673,12 +673,12 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   switch(result)
   {
-    case propt::P_SATISFIABLE: return D_SATISFIABLE;
-    case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
-    default: return D_ERROR;
+    case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
+    case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
+    default: return resultt::D_ERROR;
   }
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /*******************************************************************\

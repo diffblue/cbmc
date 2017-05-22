@@ -1,11 +1,23 @@
-SRC = cbmc_main.cpp cbmc_parse_options.cpp bmc.cpp cbmc_dimacs.cpp \
-      cbmc_languages.cpp counterexample_beautification.cpp \
-      bv_cbmc.cpp symex_bmc.cpp show_vcc.cpp cbmc_solvers.cpp \
-      xml_interface.cpp bmc_cover.cpp all_properties.cpp \
-      fault_localization.cpp symex_coverage.cpp
+SRC = all_properties.cpp \
+      bmc.cpp \
+      bmc_cover.cpp \
+      bv_cbmc.cpp \
+      cbmc_dimacs.cpp \
+      cbmc_languages.cpp \
+      cbmc_main.cpp \
+      cbmc_parse_options.cpp \
+      cbmc_solvers.cpp \
+      counterexample_beautification.cpp \
+      fault_localization.cpp \
+      show_vcc.cpp \
+      symex_bmc.cpp \
+      symex_coverage.cpp \
+      xml_interface.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -47,24 +59,9 @@ ifneq ($(wildcard ../bv_refinement/Makefile),)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
 endif
 
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
-
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
-ifneq ($(wildcard ../specc/Makefile),)
-  OBJ += ../specc/specc$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_SPECC
-endif
-
-ifneq ($(wildcard ../php/Makefile),)
-  OBJ += ../php/php$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_PHP
 endif
 
 ###############################################################################

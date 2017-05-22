@@ -41,7 +41,7 @@ void show_locations(
 
     switch(ui)
     {
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
       {
         xmlt xml("program_location");
         xml.new_element("function").data=id2string(function_id);
@@ -55,14 +55,14 @@ void show_locations(
         l.new_element("function").data=
           id2string(source_location.get_function());
 
-        std::cout << xml << std::endl;
+        std::cout << xml << '\n';
       }
       break;
 
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
       std::cout << function_id << " "
                 << it->location_number << " "
-                << it->source_location << std::endl;
+                << it->source_location << '\n';
       break;
 
     default:

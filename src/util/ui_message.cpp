@@ -33,10 +33,10 @@ ui_message_handlert::ui_message_handlert(
 {
   switch(__ui)
   {
-  case PLAIN:
+  case uit::PLAIN:
     break;
 
-  case XML_UI:
+  case uit::XML_UI:
     std::cout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
     std::cout << "<cprover>" << "\n";
 
@@ -49,7 +49,7 @@ ui_message_handlert::ui_message_handlert(
     }
     break;
 
-  case JSON_UI:
+  case uit::JSON_UI:
     {
       std::cout << "[\n";
       json_objectt json_program;
@@ -76,9 +76,9 @@ ui_message_handlert::ui_message_handlert(
   const class cmdlinet &cmdline,
   const std::string &program):
   ui_message_handlert(
-    cmdline.isset("xml-ui")?XML_UI:
-    cmdline.isset("json-ui")?JSON_UI:
-    PLAIN,
+    cmdline.isset("xml-ui")?uit::XML_UI:
+    cmdline.isset("json-ui")?uit::JSON_UI:
+    uit::PLAIN,
     program)
 {
 }
@@ -99,15 +99,15 @@ ui_message_handlert::~ui_message_handlert()
 {
   switch(get_ui())
   {
-  case XML_UI:
+  case uit::XML_UI:
     std::cout << "</cprover>" << "\n";
     break;
 
-  case JSON_UI:
+  case uit::JSON_UI:
     std::cout << "\n]\n";
     break;
 
-  case PLAIN:
+  case uit::PLAIN:
     break;
   }
 }
@@ -154,15 +154,15 @@ void ui_message_handlert::print(
   {
     switch(get_ui())
     {
-    case PLAIN:
+    case uit::PLAIN:
     {
       console_message_handlert console_message_handler;
       console_message_handler.print(level, message);
     }
     break;
 
-    case XML_UI:
-    case JSON_UI:
+    case uit::XML_UI:
+    case uit::JSON_UI:
     {
       source_locationt location;
       location.make_nil();
@@ -195,13 +195,13 @@ void ui_message_handlert::print(
   {
     switch(get_ui())
     {
-    case PLAIN:
+    case uit::PLAIN:
       message_handlert::print(
         level, message, sequence_number, location);
       break;
 
-    case XML_UI:
-    case JSON_UI:
+    case uit::XML_UI:
+    case uit::JSON_UI:
     {
       std::string tmp_message(message);
 
@@ -240,14 +240,14 @@ void ui_message_handlert::ui_msg(
 {
   switch(get_ui())
   {
-  case PLAIN:
+  case uit::PLAIN:
     break;
 
-  case XML_UI:
+  case uit::XML_UI:
     xml_ui_msg(type, msg1, msg2, location);
     break;
 
-  case JSON_UI:
+  case uit::JSON_UI:
     json_ui_msg(type, msg1, msg2, location);
     break;
   }
@@ -282,7 +282,7 @@ void ui_message_handlert::xml_ui_msg(
   result.set_attribute("type", type);
 
   std::cout << result;
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\

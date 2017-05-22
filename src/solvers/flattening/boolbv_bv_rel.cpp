@@ -44,32 +44,33 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     if(bv0.size()==bv1.size() && !bv0.empty() &&
        bvtype0==bvtype1)
     {
-      if(bvtype0==IS_FLOAT)
+      if(bvtype0==bvtypet::IS_FLOAT)
       {
         float_utilst float_utils(prop, to_floatbv_type(op0.type()));
 
         if(rel==ID_le)
-          return float_utils.relation(bv0, float_utilst::LE, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::LE, bv1);
         else if(rel==ID_lt)
-          return float_utils.relation(bv0, float_utilst::LT, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::LT, bv1);
         else if(rel==ID_ge)
-          return float_utils.relation(bv0, float_utilst::GE, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::GE, bv1);
         else if(rel==ID_gt)
-          return float_utils.relation(bv0, float_utilst::GT, bv1);
+          return float_utils.relation(bv0, float_utilst::relt::GT, bv1);
         else
           return SUB::convert_rest(expr);
       }
       else if((op0.type().id()==ID_range &&
                op1.type()==op0.type()) ||
-               bvtype0==IS_SIGNED ||
-               bvtype0==IS_UNSIGNED ||
-               bvtype0==IS_FIXED)
+               bvtype0==bvtypet::IS_SIGNED ||
+               bvtype0==bvtypet::IS_UNSIGNED ||
+               bvtype0==bvtypet::IS_FIXED)
       {
         literalt literal;
 
         bv_utilst::representationt rep=
-          ((bvtype0==IS_SIGNED) || (bvtype0==IS_FIXED))?bv_utilst::SIGNED:
-                                                        bv_utilst::UNSIGNED;
+          ((bvtype0==bvtypet::IS_SIGNED) || (bvtype0==bvtypet::IS_FIXED))?
+             bv_utilst::representationt::SIGNED:
+             bv_utilst::representationt::UNSIGNED;
 
         #if 1
 
@@ -95,8 +96,8 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         return literal;
         #endif
       }
-      else if((bvtype0==IS_VERILOG_SIGNED ||
-               bvtype0==IS_VERILOG_UNSIGNED) &&
+      else if((bvtype0==bvtypet::IS_VERILOG_SIGNED ||
+               bvtype0==bvtypet::IS_VERILOG_UNSIGNED) &&
               op0.type()==op1.type())
       {
         // extract number bits
@@ -111,7 +112,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         for(std::size_t i=0; i<extract1.size(); i++)
           extract1[i]=bv1[i*2];
 
-        bv_utilst::representationt rep=bv_utilst::UNSIGNED;
+        bv_utilst::representationt rep=bv_utilst::representationt::UNSIGNED;
 
         // now compare
         return bv_utils.rel(extract0, expr.id(), extract1, rep);

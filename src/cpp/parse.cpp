@@ -37,70 +37,97 @@ struct indenter // NOLINT(readability/identifiers)
   cpp_tokent _tk; \
   lex.LookAhead(0, _tk); \
   std::cout << std::string(__indent, ' ') << "Text [" << _tk.line_no << "]: " \
-    << _tk.text << std::endl; \
+    << _tk.text << '\n'; \
 }
 #endif
 
 class new_scopet
 {
 public:
-  new_scopet():kind(NONE), anon_count(0), parent(NULL)
+  new_scopet():kind(kindt::NONE), anon_count(0), parent(NULL)
   {
   }
 
-  typedef enum { NONE,
-                 TEMPLATE, MEMBER, FUNCTION, VARIABLE,
-                 TYPEDEF, TAG,
-                 NAMESPACE, CLASS_TEMPLATE, MEMBER_TEMPLATE,
-                 FUNCTION_TEMPLATE, BLOCK,
-                 NON_TYPE_TEMPLATE_PARAMETER,
-                 TYPE_TEMPLATE_PARAMETER,
-                 TEMPLATE_TEMPLATE_PARAMETER } kindt;
+  enum class kindt
+  {
+    NONE,
+    TEMPLATE,
+    MEMBER,
+    FUNCTION,
+    VARIABLE,
+    TYPEDEF,
+    TAG,
+    NAMESPACE,
+    CLASS_TEMPLATE,
+    MEMBER_TEMPLATE,
+    FUNCTION_TEMPLATE,
+    BLOCK,
+    NON_TYPE_TEMPLATE_PARAMETER,
+    TYPE_TEMPLATE_PARAMETER,
+    TEMPLATE_TEMPLATE_PARAMETER
+  };
+
   kindt kind;
   irep_idt id;
 
   bool is_type() const
   {
-    return kind==TYPEDEF ||
-           kind==TYPE_TEMPLATE_PARAMETER ||
-           kind==TAG ||
-           kind==CLASS_TEMPLATE;
+    return kind==kindt::TYPEDEF ||
+           kind==kindt::TYPE_TEMPLATE_PARAMETER ||
+           kind==kindt::TAG ||
+           kind==kindt::CLASS_TEMPLATE;
   }
 
   bool is_template() const
   {
-    return kind==FUNCTION_TEMPLATE ||
-           kind==CLASS_TEMPLATE ||
-           kind==MEMBER_TEMPLATE;
+    return kind==kindt::FUNCTION_TEMPLATE ||
+           kind==kindt::CLASS_TEMPLATE ||
+           kind==kindt::MEMBER_TEMPLATE;
   }
 
   bool is_named_scope() const
   {
-    return kind==NAMESPACE ||
-           kind==TAG ||
-           kind==TYPE_TEMPLATE_PARAMETER;
+    return kind==kindt::NAMESPACE ||
+           kind==kindt::TAG ||
+           kind==kindt::TYPE_TEMPLATE_PARAMETER;
   }
 
   static const char *kind2string(kindt kind)
   {
     switch(kind)
     {
-    case NONE: return "?";
-    case TEMPLATE: return "TEMPLATE";
-    case MEMBER: return "MEMBER";
-    case FUNCTION: return "FUNCTION";
-    case VARIABLE: return "VARIABLE";
-    case TYPEDEF: return "TYPEDEF";
-    case TAG: return "TAG";
-    case NAMESPACE: return "NAMESPACE";
-    case CLASS_TEMPLATE: return "CLASS_TEMPLATE";
-    case MEMBER_TEMPLATE: return "MEMBER_TEMPLATE";
-    case FUNCTION_TEMPLATE: return "FUNCTION_TEMPLATE";
-    case BLOCK: return "BLOCK";
-    case NON_TYPE_TEMPLATE_PARAMETER: return "NON_TYPE_TEMPLATE_PARAMETER";
-    case TYPE_TEMPLATE_PARAMETER: return "TYPE_TEMPLATE_PARAMETER";
-    case TEMPLATE_TEMPLATE_PARAMETER: return "TEMPLATE_TEMPLATE_PARAMETER";
-    default: return "";
+    case kindt::NONE:
+      return "?";
+    case kindt::TEMPLATE:
+      return "TEMPLATE";
+    case kindt::MEMBER:
+      return "MEMBER";
+    case kindt::FUNCTION:
+      return "FUNCTION";
+    case kindt::VARIABLE:
+      return "VARIABLE";
+    case kindt::TYPEDEF:
+      return "TYPEDEF";
+    case kindt::TAG:
+      return "TAG";
+    case kindt::NAMESPACE:
+      return "NAMESPACE";
+    case kindt::CLASS_TEMPLATE:
+      return "CLASS_TEMPLATE";
+    case kindt::MEMBER_TEMPLATE:
+      return "MEMBER_TEMPLATE";
+    case kindt::FUNCTION_TEMPLATE:
+      return "FUNCTION_TEMPLATE";
+    case kindt::BLOCK:
+      return "BLOCK";
+    case kindt::NON_TYPE_TEMPLATE_PARAMETER:
+      return "NON_TYPE_TEMPLATE_PARAMETER";
+    case kindt::TYPE_TEMPLATE_PARAMETER:
+      return "TYPE_TEMPLATE_PARAMETER";
+    case kindt::TEMPLATE_TEMPLATE_PARAMETER:
+      return "TEMPLATE_TEMPLATE_PARAMETER";
+    default:
+      return "";
     }
   }
 
@@ -184,7 +211,7 @@ public:
     lex(_cpp_parser.token_buffer),
     parser(_cpp_parser)
   {
-    root_scope.kind=new_scopet::NAMESPACE;
+    root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;
   }
 
@@ -1214,7 +1241,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
 {
   TemplateDeclKind kind=tdk_unknown;
 
-  make_sub_scope("#template", new_scopet::TEMPLATE);
+  make_sub_scope("#template", new_scopet::kindt::TEMPLATE);
   current_scope->id_map.clear();
 
   typet template_type;
@@ -1446,7 +1473,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       cpp_name.get_sub().push_back(name);
       declarator.name().swap(cpp_name);
 
-      add_id(declarator.name(), new_scopet::TYPE_TEMPLATE_PARAMETER);
+      add_id(declarator.name(), new_scopet::kindt::TYPE_TEMPLATE_PARAMETER);
 
       if(has_ellipsis)
       {
@@ -1551,7 +1578,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
               << "Parser::rTempArgDeclaration 4\n";
     #endif
 
-    add_id(declarator.name(), new_scopet::NON_TYPE_TEMPLATE_PARAMETER);
+    add_id(declarator.name(), new_scopet::kindt::NON_TYPE_TEMPLATE_PARAMETER);
 
     if(has_ellipsis)
     {
@@ -1660,7 +1687,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 0.1  token: "
-            << lex.LookAhead(0) << std::endl;
+            << lex.LookAhead(0) << '\n';
   #endif
 
   if(!optAttribute(declaration))
@@ -4968,7 +4995,7 @@ bool Parser::rClassSpec(typet &spec)
   #endif
 
   save_scopet saved_scope(current_scope);
-  make_sub_scope(spec.find(ID_tag), new_scopet::TAG);
+  make_sub_scope(spec.find(ID_tag), new_scopet::kindt::TAG);
 
   exprt body;
 
@@ -5166,7 +5193,7 @@ bool Parser::rClassMember(cpp_itemt &member)
   #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rClassMember 0 " << t
-            << std::endl;
+            << '\n';
   #endif // DEBUG
 
   if(t==TOK_PUBLIC || t==TOK_PROTECTED || t==TOK_PRIVATE)
@@ -7876,7 +7903,7 @@ bool Parser::rVarNameCore(exprt &name)
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rVarNameCore 1.1 "
               << lex.LookAhead(0)
-              << std::endl;
+              << '\n';
     #endif
 
     switch(lex.LookAhead(0))

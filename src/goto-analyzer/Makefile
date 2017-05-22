@@ -1,9 +1,14 @@
-SRC = goto_analyzer_main.cpp goto_analyzer_parse_options.cpp \
-      taint_parser.cpp taint_analysis.cpp static_analyzer.cpp \
-      unreachable_instructions.cpp
+SRC = goto_analyzer_main.cpp \
+      goto_analyzer_parse_options.cpp \
+      static_analyzer.cpp \
+      taint_analysis.cpp \
+      taint_parser.cpp \
+      unreachable_instructions.cpp \
+      # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -26,24 +31,9 @@ CLEANFILES = goto-analyzer$(EXEEXT)
 
 all: goto-analyzer$(EXEEXT)
 
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
-
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
-ifneq ($(wildcard ../specc/Makefile),)
-  OBJ += ../specc/specc$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_SPECC
-endif
-
-ifneq ($(wildcard ../php/Makefile),)
-  OBJ += ../php/php$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_PHP
 endif
 
 ###############################################################################

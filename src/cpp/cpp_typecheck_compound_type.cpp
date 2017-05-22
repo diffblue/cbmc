@@ -269,13 +269,13 @@ void cpp_typecheckt::typecheck_compound_type(
     // put into dest_scope
     cpp_idt &id=cpp_scopes.put_into_scope(*new_symbol, *dest_scope);
 
-    id.id_class=cpp_idt::CLASS;
+    id.id_class=cpp_idt::id_classt::CLASS;
     id.is_scope=true;
     id.prefix=cpp_scopes.current_scope().prefix+
               id2string(new_symbol->base_name)+
               cpp_scopes.current_scope().suffix+"::";
     id.class_identifier=new_symbol->name;
-    id.id_class=cpp_idt::CLASS;
+    id.id_class=cpp_idt::id_classt::CLASS;
 
     if(has_body)
       typecheck_compound_body(*new_symbol);
@@ -856,7 +856,9 @@ void cpp_typecheckt::put_compound_into_scope(
   {
     // put the symbol into scope
     cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
-    id.id_class=compound.get_bool("is_type")?cpp_idt::TYPEDEF:cpp_idt::SYMBOL;
+    id.id_class=compound.get_bool("is_type")?
+      cpp_idt::id_classt::TYPEDEF:
+      cpp_idt::id_classt::SYMBOL;
     id.identifier=name;
     id.class_identifier=cpp_scopes.current_scope().identifier;
     id.is_member=true;
@@ -870,7 +872,7 @@ void cpp_typecheckt::put_compound_into_scope(
       cpp_scopes.current_scope().insert(
         irep_idt(std::string("$block:") + base_name.c_str()));
 
-    id_block.id_class=cpp_idt::BLOCK_SCOPE;
+    id_block.id_class=cpp_idt::id_classt::BLOCK_SCOPE;
     id_block.identifier=name;
     id_block.class_identifier=cpp_scopes.current_scope().identifier;
     id_block.is_method=true;
@@ -905,7 +907,9 @@ void cpp_typecheckt::put_compound_into_scope(
 
     // put into the scope
     cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
-    id.id_class=compound.get_bool(ID_is_type)?cpp_idt::TYPEDEF:cpp_idt::SYMBOL;
+    id.id_class=compound.get_bool(ID_is_type)?
+      cpp_idt::id_classt::TYPEDEF:
+      cpp_idt::id_classt::SYMBOL;
     id.identifier=name;
     id.class_identifier=cpp_scopes.current_scope().identifier;
     id.is_member=true;
@@ -1545,7 +1549,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
       }
 
       cpp_idt &id=cpp_scopes.current_scope().insert(base_name);
-      id.id_class=cpp_idt::SYMBOL;
+      id.id_class=cpp_idt::id_classt::SYMBOL;
       id.identifier=comp.get_name();
       id.class_identifier=struct_union_symbol.name;
       id.is_member=true;
@@ -1670,8 +1674,7 @@ bool cpp_typecheckt::get_component(
           error().source_location=source_location;
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
-          str << std::endl
-              << "struct name: " << final_type.get(ID_name);
+          str << "\nstruct name: " << final_type.get(ID_name);
           throw 0;
           #endif
         }

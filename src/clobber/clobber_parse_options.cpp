@@ -147,7 +147,7 @@ int clobber_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -524,15 +524,15 @@ void clobber_parse_optionst::report_success()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -560,16 +560,16 @@ void clobber_parse_optionst::show_counterexample(
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+  case ui_message_handlert::uit::PLAIN:
+    std::cout << "\nCounterexample:\n";
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, error_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 
@@ -596,15 +596,15 @@ void clobber_parse_optionst::report_failure()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 

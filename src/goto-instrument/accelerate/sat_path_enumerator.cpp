@@ -83,7 +83,7 @@ bool sat_path_enumeratort::next(patht &path)
     if(program.check_sat())
     {
 #ifdef DEBUG
-      std::cout << "Found a path" << std::endl;
+      std::cout << "Found a path\n";
 #endif
       build_path(program, path);
       record_path(program);
@@ -93,11 +93,11 @@ bool sat_path_enumeratort::next(patht &path)
   }
   catch(std::string s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
   catch(const char *s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
 
   return false;
@@ -109,9 +109,7 @@ void sat_path_enumeratort::find_distinguishing_points()
       it!=loop.end();
       ++it)
   {
-    goto_programt::targetst succs;
-
-    goto_program.get_successors(*it, succs);
+    const auto succs=goto_program.get_successors(*it);
 
     if(succs.size()>1)
     {
@@ -139,9 +137,7 @@ void sat_path_enumeratort::build_path(
   do
   {
     goto_programt::targett next;
-    goto_programt::targetst succs;
-
-    goto_program.get_successors(t, succs);
+    const auto succs=goto_program.get_successors(t);
 
     // We should have a looping path, so we should never hit a location
     // with no successors.

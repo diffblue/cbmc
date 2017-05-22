@@ -79,7 +79,7 @@ void k_inductiont::process_loop(
     // now unwind k times
     goto_unwindt goto_unwind;
     goto_unwind.unwind(goto_function.body, loop_head, loop_exit, k,
-                       goto_unwindt::PARTIAL);
+                       goto_unwindt::unwind_strategyt::PARTIAL);
 
     // assume the loop condition has become false
     goto_programt::instructiont assume(ASSUME);
@@ -103,8 +103,13 @@ void k_inductiont::process_loop(
     std::vector<goto_programt::targett> iteration_points;
 
     goto_unwindt goto_unwind;
-    goto_unwind.unwind(goto_function.body, loop_head, loop_exit, k+1,
-                       goto_unwindt::PARTIAL, iteration_points);
+    goto_unwind.unwind(
+      goto_function.body,
+      loop_head,
+      loop_exit,
+      k+1,
+      goto_unwindt::unwind_strategyt::PARTIAL,
+      iteration_points);
 
     // we can remove everything up to the first assertion
     for(goto_programt::targett t=loop_head; t!=loop_exit; t++)

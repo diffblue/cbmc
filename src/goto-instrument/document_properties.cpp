@@ -376,53 +376,53 @@ void document_propertiest::doit()
           << escape_latex(source_location.get_string("file"), false)
           << " function "
           << escape_latex(source_location.get_string("function"), false)
-          << "}" << std::endl;
+          << "}\n";
 
-      out << std::endl;
+      out << '\n';
 
       for(std::set<irep_idt>::const_iterator
           s_it=it->second.comment_set.begin();
           s_it!=it->second.comment_set.end();
           s_it++)
         out << "\\claim{" << escape_latex(id2string(*s_it), false)
-            << "}" << std::endl;
+            << "}\n";
 
-      out << std::endl;
+      out << '\n';
 
       out << "\\begin{alltt}\\claimcode\n"
           << code
           << "\\end{alltt}\n";
 
-      out << std::endl;
-      out << std::endl;
+      out << '\n';
+      out << '\n';
       break;
 
     case HTML:
-      out << "<div class=\"claim\">" << std::endl
+      out << "<div class=\"claim\">\n"
           << "<div class=\"location\">File "
           << escape_html(source_location.get_string("file"))
           << " function "
           << escape_html(source_location.get_string("function"))
-          << "</div>" << std::endl;
+          << "</div>\n";
 
-      out << std::endl;
+      out << '\n';
 
       for(std::set<irep_idt>::const_iterator
           s_it=it->second.comment_set.begin();
           s_it!=it->second.comment_set.end();
           s_it++)
-        out << "<div class=\"description\">" << std::endl
-            << escape_html(id2string(*s_it)) << std::endl
-            << "</div>" << std::endl;
+        out << "<div class=\"description\">\n"
+            << escape_html(id2string(*s_it)) << '\n'
+            << "</div>\n";
 
-      out << std::endl;
+      out << '\n';
 
       out << "<div class=\"code\">\n"
           << code
-          << "</div> <!-- code -->" << std::endl;
+          << "</div> <!-- code -->\n";
 
-      out << "</div> <!-- claim -->" << std::endl;
-      out << std::endl;
+      out << "</div> <!-- claim -->\n";
+      out << '\n';
       break;
     }
   }

@@ -30,19 +30,19 @@ struct mip_vart
 {
   typedef event_grapht::critical_cyclet::delayt edget;
 
-  event_idt unique;
+  unsigned unique;
 
-  std::map<event_idt, edget> map_to_e;
-  std::map<edget, event_idt> map_from_e;
+  std::map<unsigned, edget> map_to_e;
+  std::map<edget, unsigned> map_from_e;
 
-  event_idt add_edge(const edget &e)
+  unsigned add_edge(const edget &e)
   {
     if(map_from_e.find(e) != map_from_e.end())
       return map_from_e[e];
     else
     {
       ++unique;
-      map_to_e.insert(std::pair<event_idt, edget>(unique, e));
+      map_to_e.insert(std::pair<unsigned, edget>(unique, e));
       map_from_e[e] = unique;
       return unique;
     }
@@ -62,10 +62,10 @@ public:
   instrumentert &instrumenter;
 
   /* normal variables used almost everytime */
-  std::map<event_idt, edget> &map_to_e;
-  std::map<edget, event_idt> &map_from_e;
-  event_idt add_edge(const edget &e) { return var.add_edge(e); }
-  event_idt add_invisible_edge(const edget &e)
+  std::map<unsigned, edget> &map_to_e;
+  std::map<edget, unsigned> &map_from_e;
+  unsigned add_edge(const edget &e) { return var.add_edge(e); }
+  unsigned add_invisible_edge(const edget &e)
   {
     return invisible_var.add_edge(e);
   }
@@ -78,7 +78,7 @@ public:
   const_graph_visitort const_graph_visitor;
 
 protected:
-  event_idt &unique;
+  unsigned &unique;
   unsigned fence_options;
 
   /* MIP variables to edges in po^+/\C */
@@ -100,7 +100,7 @@ protected:
   void preprocess();
   void solve();
 
-  typedef enum {Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4} fence_typet;
+  enum fence_typet { Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4 };
   virtual unsigned fence_cost(fence_typet e) const;
 
   std::string to_string(fence_typet f) const;
