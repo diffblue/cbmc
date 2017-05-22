@@ -12,93 +12,117 @@ Author: Peter Schrammel
 #ifndef CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 #define CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 
+#include <iostream>
+
 #include "ai.h"
+#include "dirty.h"
 
 #include "replace_symbol_ext.h"
 
 class constant_propagator_domaint:public ai_domain_baset
 {
 public:
-  void transform(
-    locationt,
-    locationt,
-    ai_baset &,
-    const namespacet &) final;
-  void output(
-    std::ostream &,
-    const ai_baset &,
-    const namespacet &) const final;
-  void make_top() final { values.set_to_top(); }
-  void make_bottom() final { values.set_to_bottom(); }
-  void make_entry() final { values.set_to_top(); }
-  bool merge(const constant_propagator_domaint &, locationt, locationt);
+  virtual void transform(
+    locationt from,
+    locationt to,
+    ai_baset &ai_base,
+    const namespacet &ns);
+
+  virtual void output(
+    std::ostream &out,
+    const ai_baset &ai_base,
+    const namespacet &ns) const;
+
+  bool merge(
+    const constant_propagator_domaint &other,
+    locationt from,
+    locationt to);
 
   virtual bool ai_simplify(
     exprt &condition,
     const namespacet &ns) const override;
 
+  virtual void make_bottom()
+  {
+    values.set_to_bottom();
+  }
+
+  virtual void make_top()
+  {
+    values.set_to_top();
+  }
+
+  virtual void make_entry()
+  {
+    make_top();
+  }
+
   struct valuest
   {
   public:
-    valuest():is_bottom(true) { }
+    valuest():is_bottom(true) {}
 
     // maps variables to constants
     replace_symbol_extt replace_const;
     bool is_bottom;
 
-    void output(std::ostream &, const namespacet &) const;
-
     bool merge(const valuest &src);
     bool meet(const valuest &src);
 
-    void set_to_bottom()
+    // set whole state
+
+    inline void set_to_bottom()
     {
       replace_const.clear();
-      is_bottom = true;
+      is_bottom=true;
     }
 
-    void set_to(const irep_idt &lhs_id, const exprt &rhs_val)
+    inline void set_to_top()
     {
-      replace_const.expr_map[lhs_id] = rhs_val;
-      is_bottom = false;
+      replace_const.clear();
+      is_bottom=false;
     }
 
-    void set_to(const symbol_exprt &lhs, const exprt &rhs_val)
+    // set single identifier
+
+    inline void set_to(const irep_idt &lhs, const exprt &rhs)
     {
-      set_to(lhs.get_identifier(), rhs_val);
+      replace_const.expr_map[lhs]=rhs;
+      is_bottom=false;
     }
 
-    bool is_constant(const exprt &expr) const;
-    bool is_array_constant(const exprt &expr) const;
-    bool is_constant_address_of(const exprt &expr) const;
-    bool set_to_top(const irep_idt &id);
+    inline void set_to(const symbol_exprt &lhs, const exprt &rhs)
+    {
+      set_to(lhs.get_identifier(), rhs);
+    }
 
     bool set_to_top(const symbol_exprt &expr)
     {
       return set_to_top(expr.get_identifier());
     }
 
-    void set_to_top()
+    bool set_to_top(const irep_idt &id);
+
+    void set_dirty_to_top(const dirtyt &dirty, const namespacet &ns);
+
+    bool is_constant(const exprt &expr) const;
+    bool is_array_constant(const exprt &expr) const;
+    bool is_constant_address_of(const exprt &expr) const;
+
+    bool is_empty() const
     {
-      replace_const.clear();
-      is_bottom = false;
+      return replace_const.expr_map.empty();
     }
 
+    void output(std::ostream &out, const namespacet &ns) const;
   };
 
   valuest values;
 
-private:
-  void assign(
-    valuest &dest,
-    const symbol_exprt &lhs,
-    exprt rhs,
-    const namespacet &ns) const;
-
+protected:
   void assign_rec(
     valuest &values,
-    const exprt &lhs,
-    const exprt &rhs,
+    const exprt &lhs, const exprt &rhs,
     const namespacet &ns);
 
   bool two_way_propagate_rec(
@@ -109,8 +133,13 @@ private:
 class constant_propagator_ait:public ait<constant_propagator_domaint>
 {
 public:
+  explicit constant_propagator_ait(const goto_functionst &goto_functions):
+    dirty(goto_functions)
+  {
+  }
+
   constant_propagator_ait(
-    goto_modelt &goto_model)
+    goto_modelt &goto_model):dirty(goto_model.goto_functions)
   {
     const namespacet ns(goto_model.symbol_table);
     operator()(goto_model.goto_functions, ns);
@@ -119,17 +148,16 @@ public:
 
   constant_propagator_ait(
     goto_functionst::goto_functiont &goto_function,
-    const namespacet &ns)
+    const namespacet &ns):dirty(goto_function)
   {
     operator()(goto_function, ns);
     replace(goto_function, ns);
   }
 
+  dirtyt dirty;
+
 protected:
   friend class constant_propagator_domaint;
-
-  void replace_array_symbol(
-		  exprt &expr);
 
   void replace(
     goto_functionst::goto_functiont &,
@@ -142,7 +170,6 @@ protected:
   void replace_types_rec(
     const replace_symbolt &replace_const,
     exprt &expr);
-
 };
 
 #endif // CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
