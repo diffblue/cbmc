@@ -124,7 +124,142 @@ gcc_modet::gcc_modet(
   goto_cc_modet(_cmdline, _base_name, gcc_message_handler),
   produce_hybrid_binary(_produce_hybrid_binary),
   act_as_ld(base_name=="ld" ||
-            base_name.find("goto-ld")!=std::string::npos)
+            base_name.find("goto-ld")!=std::string::npos),
+
+  // Keys are architectures specified in configt::set_arch().
+  // Values are lists of GCC architectures that can be supplied as
+  // arguments to the -march, -mcpu, and -mtune flags (see the GCC
+  // manual https://gcc.gnu.org/onlinedocs/).
+  arch_map(
+  {
+    // ARM information taken from the following:
+    //
+    // the "ARM core timeline" table on this page:
+    // https://en.wikipedia.org/wiki/List_of_ARM_microarchitectures
+    //
+    // articles on particular core groups, e.g.
+    // https://en.wikipedia.org/wiki/ARM9
+    //
+    // The "Cores" table on this page:
+    // https://en.wikipedia.org/wiki/ARM_architecture
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"arm", {
+      "strongarm", "strongarm110", "strongarm1100", "strongarm1110",
+      "arm2", "arm250", "arm3", "arm6", "arm60", "arm600", "arm610",
+      "arm620", "fa526", "fa626", "fa606te", "fa626te", "fmp626",
+      "xscale", "iwmmxt", "iwmmxt2", "xgene1"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"armhf", {
+      "armv7", "arm7m", "arm7d", "arm7dm", "arm7di", "arm7dmi",
+      "arm70", "arm700", "arm700i", "arm710", "arm710c", "arm7100",
+      "arm720", "arm7500", "arm7500fe", "arm7tdmi", "arm7tdmi-s",
+      "arm710t", "arm720t", "arm740t", "mpcore", "mpcorenovfp",
+      "arm8", "arm810", "arm9", "arm9e", "arm920", "arm920t",
+      "arm922t", "arm946e-s", "arm966e-s", "arm968e-s", "arm926ej-s",
+      "arm940t", "arm9tdmi", "arm10tdmi", "arm1020t", "arm1026ej-s",
+      "arm10e", "arm1020e", "arm1022e", "arm1136j-s", "arm1136jf-s",
+      "arm1156t2-s", "arm1156t2f-s", "arm1176jz-s", "arm1176jzf-s",
+      "cortex-a5", "cortex-a7", "cortex-a8", "cortex-a9",
+      "cortex-a12", "cortex-a15", "cortex-a53", "cortex-r4",
+      "cortex-r4f", "cortex-r5", "cortex-r7", "cortex-m7",
+      "cortex-m4", "cortex-m3", "cortex-m1", "cortex-m0",
+      "cortex-m0plus", "cortex-m1.small-multiply",
+      "cortex-m0.small-multiply", "cortex-m0plus.small-multiply",
+      "marvell-pj4", "ep9312", "fa726te",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"arm64", {
+      "cortex-a57", "cortex-a72", "exynos-m1"
+    }},
+    // There are two MIPS architecture series. The 'old' one comprises
+    // MIPS I - MIPS V (where MIPS I and MIPS II are 32-bit
+    // architectures, and the III, IV and V are 64-bit). The 'new'
+    // architecture series comprises MIPS32 and MIPS64. Source: [0].
+    //
+    // CPROVER's names for these are in configt::this_architecture(),
+    // in particular note the preprocessor variable names. MIPS
+    // processors can run in little-endian or big-endian mode; [1]
+    // gives more information on particular processors. Particular
+    // processors and their architectures are at [2]. This means that
+    // we cannot use the processor flags alone to decide which CPROVER
+    // name to use; we also need to check for the -EB or -EL flags to
+    // decide whether little- or big-endian code should be generated.
+    // Therefore, the keys in this part of the map don't directly map
+    // to CPROVER architectures.
+    //
+    // [0] https://en.wikipedia.org/wiki/MIPS_architecture
+    // [1] https://www.debian.org/ports/mips/
+    // [2] https://en.wikipedia.org/wiki/List_of_MIPS_architecture_processors
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"mips64n", {
+      "loongson2e", "loongson2f", "loongson3a", "mips64", "mips64r2",
+      "mips64r3", "mips64r5", "mips64r6 4kc", "5kc", "5kf", "20kc",
+      "octeon", "octeon+", "octeon2", "octeon3", "sb1", "vr4100",
+      "vr4111", "vr4120", "vr4130", "vr4300", "vr5000", "vr5400",
+      "vr5500", "sr71000", "xlp",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips32n", {
+      "mips32", "mips32r2", "mips32r3", "mips32r5", "mips32r6",
+      // https://www.imgtec.com/mips/classic/
+      "4km", "4kp", "4ksc", "4kec", "4kem", "4kep", "4ksd", "24kc",
+      "24kf2_1", "24kf1_1", "24kec", "24kef2_1", "24kef1_1", "34kc",
+      "34kf2_1", "34kf1_1", "34kn", "74kc", "74kf2_1", "74kf1_1",
+      "74kf3_2", "1004kc", "1004kf2_1", "1004kf1_1", "m4k", "m14k",
+      "m14kc", "m14ke", "m14kec",
+      // https://en.wikipedia.org/wiki/List_of_MIPS_architecture_processors
+      "p5600", "xlr",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips32o", {
+      "mips1", "mips2", "r2000", "r3000",
+      "r6000", // Not a mistake, r4000 came out _after_ this
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips64o", {
+      "mips3", "mips4", "r4000", "r4400", "r4600", "r4650", "r4700",
+      "r8000", "rm7000", "rm9000", "r10000", "r12000", "r14000",
+      "r16000",
+    }},
+    // These are IBM mainframes. s390 is 32-bit; s390x is 64-bit [0].
+    // Search that page for s390x and note that 32-bit refers to
+    // everything "prior to 2000's z900 model".  The list of model
+    // numbers is at [1].
+    // [0] https://en.wikipedia.org/wiki/Linux_on_z_Systems
+    // [1] https://en.wikipedia.org/wiki/IBM_System_z
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"s390", {
+      "z900", "z990", "g5", "g6",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"s390x", {
+      "z9-109", "z9-ec", "z10", "z196", "zEC12", "z13"
+    }},
+    // SPARC
+    // In the "Implementations" table of [0], everything with an arch
+    // version up to V8 is 32-bit. V9 and onward are 64-bit.
+    // [0] https://en.wikipedia.org/wiki/SPARC
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"sparc", {
+      "v7", "v8", "leon", "leon3", "leon3v7", "cypress", "supersparc",
+      "hypersparc", "sparclite", "f930", "f934", "sparclite86x",
+      "tsc701",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"sparc64", {
+      "v9", "ultrasparc", "ultrasparc3", "niagara", "niagara2",
+      "niagara3", "niagara4",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"ia64", {
+      "itanium", "itanium1", "merced", "itanium2", "mckinley"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"i386", {
+      "i386", "i486", "i586", "pentium", "pentium-mmx", "pentiumpro",
+      "i686", "pentium2", "pentium3", "pentium3m", "pentium-m",
+      "pentium4", "pentium4m", "prescott", "nocona", "core2", "nehalem",
+      "westmere", "sandybridge", "ivybridge", "haswell", "broadwell",
+      "bonnell", "silvermont", "k6", "k6-2", "k6-3", "athlon",
+      "athlon-tbird", "athlon-4", "athlon-xp", "athlon-mp", "k8",
+      "opteron", "athlon64", "athlon-fx", "k8-sse3", "opteron-sse3",
+      "athlon64-sse3", "amdfam10", "barcelona", "bdver1", "bdver2",
+      "bdver3", "bdver4", "btver1", "btver2", "winchip-c6", "winchip2",
+      "c3", "c3-2", "geode",
+    }},
+  })
 {
 }
 
@@ -285,6 +420,51 @@ int gcc_modet::doit()
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
   else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
+
+  if(cmdline.isset("mthumb") || cmdline.isset("mthumb-interwork"))
+    config.ansi_c.set_arch_spec_arm("armhf");
+
+  // -mcpu sets both the arch and tune, but should only be used if
+  // neither -march nor -mtune are passed on the command line.
+  std::string target_cpu=
+    cmdline.isset("march") ? cmdline.get_value("march") :
+    cmdline.isset("mtune") ? cmdline.get_value("mtune") :
+    cmdline.isset("mcpu")  ? cmdline.get_value("mcpu")  : "";
+
+  if(target_cpu!="")
+  {
+    // Work out what CPROVER architecture we should target.
+    for(auto &pair : arch_map)
+      for(auto &processor : pair.second)
+        if(processor==target_cpu)
+        {
+          if(pair.first.find("mips")==std::string::npos)
+            config.set_arch(pair.first);
+          else
+          {
+            // Targeting a MIPS processor. MIPS is special; we also need
+            // to know the endianness. -EB (big-endian) is the default.
+            if(cmdline.isset("EL"))
+            {
+              if(pair.first=="mips32o")
+                config.set_arch("mipsel");
+              else if(pair.first=="mips32n")
+                config.set_arch("mipsn32el");
+              else
+                config.set_arch("mips64el");
+            }
+            else
+            {
+              if(pair.first=="mips32o")
+                config.set_arch("mips");
+              else if(pair.first=="mips32n")
+                config.set_arch("mipsn32");
+              else
+                config.set_arch("mips64");
+            }
+          }
+        }
+  }
 
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
