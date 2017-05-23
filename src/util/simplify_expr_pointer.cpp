@@ -383,12 +383,14 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr_expr.size()!=1 || int_expr.empty())
       return true;
 
-    typet pointer_type=ptr_expr.front().type();
+    typet pointer_sub_type=ptr_expr.front().type().subtype();
+    if(pointer_sub_type.id()==ID_empty)
+      pointer_sub_type=char_type();
 
     mp_integer element_size=
-      pointer_offset_size(pointer_type.subtype(), ns);
+      pointer_offset_size(pointer_sub_type, ns);
 
-    if(element_size==0)
+    if(element_size<0)
       return true;
 
     // this might change the type of the pointer!

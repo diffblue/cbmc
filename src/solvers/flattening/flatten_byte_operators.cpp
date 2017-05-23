@@ -197,6 +197,8 @@ exprt flatten_byte_update(
 
   mp_integer element_size=
     pointer_offset_size(src.op2().type(), ns);
+  if(element_size<0)
+    throw "byte_update of unknown width:\n"+src.pretty();
 
   const typet &t=ns.follow(src.op0().type());
 
@@ -378,9 +380,9 @@ exprt flatten_byte_update(
           t.id()==ID_pointer)
   {
     // do a shift, mask and OR
-    std::size_t width=integer2size_t(pointer_offset_size(t, ns)*8);
-
-    assert(width!=0);
+    mp_integer type_width=pointer_offset_bits(t, ns);
+    assert(type_width>0);
+    std::size_t width=integer2size_t(type_width);
 
     if(element_size*8>width)
       throw "flatten_byte_update to update element that is too large";

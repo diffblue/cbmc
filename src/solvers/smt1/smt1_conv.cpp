@@ -432,6 +432,7 @@ void smt1_convt::convert_address_of_rec(
         member_expr.get_component_name();
 
       mp_integer offset=member_offset(struct_type, component_name, ns);
+      assert(offset>=0);
 
       typet index_type(ID_unsignedbv);
       index_type.set(ID_width, boolbv_width(result_type));
@@ -2333,6 +2334,7 @@ void smt1_convt::convert_plus(const plus_exprt &expr)
 
       mp_integer element_size=
         pointer_offset_size(expr.type().subtype(), ns);
+      assert(element_size>0);
 
       // adjust width if needed
       if(boolbv_width(i.type())!=boolbv_width(expr.type()))

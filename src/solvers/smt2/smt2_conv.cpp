@@ -694,6 +694,7 @@ void smt2_convt::convert_address_of_rec(
         member_expr.get_component_name();
 
       mp_integer offset=member_offset(struct_type, component_name, ns);
+      assert(offset>=0);
 
       unsignedbv_typet index_type;
       index_type.set_width(boolbv_width(result_type));
@@ -3253,6 +3254,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
       mp_integer element_size=
         pointer_offset_size(expr.type().subtype(), ns);
+      assert(element_size>0);
 
       out << "(bvadd ";
       convert_expr(p);
@@ -3469,6 +3471,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       // Pointer difference.
       mp_integer element_size=
         pointer_offset_size(expr.op0().type().subtype(), ns);
+      assert(element_size>0);
 
       if(element_size>=2)
         out << "(bvsdiv ";

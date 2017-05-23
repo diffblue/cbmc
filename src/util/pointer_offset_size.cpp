@@ -130,6 +130,8 @@ mp_integer pointer_offset_bits(
   if(type.id()==ID_array)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
 
     // get size
     const exprt &size=to_array_type(type).size();
@@ -145,6 +147,8 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_vector)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
 
     // get size
     const exprt &size=to_vector_type(type).size();
@@ -160,6 +164,9 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_complex)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
+
     return sub*2;
   }
   else if(type.id()==ID_struct)
@@ -201,6 +208,8 @@ mp_integer pointer_offset_bits(
     {
       const typet &subtype=it->type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
+      if(sub_size==-1)
+        return -1;
       if(sub_size>result)
         result=sub_size;
     }
@@ -467,6 +476,11 @@ exprt size_of_expr(
       else
         sub_size=pointer_offset_size(subtype, ns);
 
+      if(sub_size==-1)
+      {
+        result=-1;
+        break;
+      }
       if(sub_size>result)
         result=sub_size;
     }
@@ -566,7 +580,7 @@ mp_integer compute_pointer_offset(
 
       mp_integer i;
 
-      if(sub_size!=0 && !to_integer(expr.op1(), i))
+      if(sub_size>0 && !to_integer(expr.op1(), i))
         return o+i*sub_size;
     }
 

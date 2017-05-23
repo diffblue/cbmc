@@ -566,6 +566,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         // no need to adjust offset
         adjusted_offset=offset;
       }
+      else if(element_size<=0)
+      {
+        throw "unknown or invalid type size of:\n"+dereference_type.pretty();
+      }
       else
       {
         exprt element_size_expr=
@@ -965,7 +969,12 @@ bool value_set_dereferencet::memory_model_bytes(
     // upper bound
     {
       mp_integer from_width=pointer_offset_size(from_type, ns);
+      if(from_width<=0)
+        throw "unknown or invalid type size:\n"+from_type.pretty();
+
       mp_integer to_width=pointer_offset_size(to_type, ns);
+      if(to_width<=0)
+        throw "unknown or invalid type size:\n"+to_type.pretty();
 
       exprt bound=from_integer(from_width-to_width, offset.type());
 
