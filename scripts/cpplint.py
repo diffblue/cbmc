@@ -6471,7 +6471,10 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   _BackupFilters()
 
 #exclude these files:
-  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp|builtin_headers)$', filename):
+  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp)$', filename):
+    return
+
+  if Search(r'_builtin_headers_[a-z0-9_-]+\.h$', filename):
     return
 
   if not ProcessConfigOverrides(filename):
