@@ -87,7 +87,11 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final;
 
-  void make_top() final
+  jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const override;
+
+  void make_top() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 
