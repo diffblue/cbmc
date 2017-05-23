@@ -806,6 +806,9 @@ bool dump_ct::ignore(const symbolt &symbol)
      name_str=="envp_size'")
     return true;
 
+  if(has_suffix(name_str, "$object"))
+    return true;
+
   const std::string &file_str=id2string(symbol.location.get_file());
 
   // don't dump internal GCC builtins
