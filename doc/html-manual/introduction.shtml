@@ -151,13 +151,11 @@ SATABS are described <a href="hwsw.shtml">here</a>.
 
 <div class="box1">
 <div class="caption">Further Reading</div>
-<p>
 <ul>
 <li><a href="cbmc.shtml">Bounded Model Checking with CBMC</a></li>
 <li><a href="satabs.shtml">Predicate Abstraction with SATABS</a></li>
 <li><a href="hwsw.shtml">Hardware/Software Co-Verification</a></li>
 </ul>
-</p>
 </div>
 
 <!--#include virtual="footer.inc" -->

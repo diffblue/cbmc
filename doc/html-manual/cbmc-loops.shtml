@@ -161,7 +161,7 @@ following loop-free program:
           <font color="#3030f0">BODY CODE COPY 4</font>
           if(cond) {
             <font color="#3030f0">BODY CODE COPY 5</font>
-            <font color=#ff3030">assert(!cond);</font>
+            <font color="#ff3030">assert(!cond);</font>
           }
         }
       }

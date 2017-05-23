@@ -215,7 +215,6 @@ Test 5.
   (iteration 5) desired_climb=-1.000000f, estimator_z_dot=1.000000f
   (iteration 6) desired_climb=-1.000000f, estimator_z_dot=1.000000f
 </code></pre>
-</p>
 
 <p class="justified">
 The option <code>--unwind 6</code> unwinds the loop inside the main
