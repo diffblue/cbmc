@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 #include <iosfwd>
-#include <sstream>
 
 #include <util/json.h>
 #include <util/xml.h>
@@ -59,24 +58,11 @@ public:
 
   virtual jsont output_json(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    json_stringt json(out.str());
-    return json;
-  }
+    const namespacet &ns) const;
 
   virtual xmlt output_xml(
     const ai_baset &ai,
-    const namespacet &ns) const
-  {
-    std::ostringstream out;
-    output(out, ai, ns);
-    xmlt xml("domain");
-    xml.data=out.str();
-    return xml;
-  }
+    const namespacet &ns) const;
 
   // no states
   virtual void make_bottom()=0;

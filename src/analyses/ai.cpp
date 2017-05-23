@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 #include <memory>
+#include <sstream>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -15,6 +16,51 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "is_threaded.h"
 
 #include "ai.h"
+
+/*******************************************************************\
+
+Function: ai_domain_baset::output_json
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+jsont ai_domain_baset::output_json(
+  const ai_baset &ai,
+  const namespacet &ns) const
+{
+  std::ostringstream out;
+  output(out, ai, ns);
+  json_stringt json(out.str());
+  return json;
+}
+
+/*******************************************************************\
+
+Function: ai_domain_baset::output_xml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+xmlt ai_domain_baset::output_xml(
+  const ai_baset &ai,
+  const namespacet &ns) const
+{
+  std::ostringstream out;
+  output(out, ai, ns);
+  xmlt xml("domain");
+  xml.data=out.str();
+  return xml;
+}
 
 /*******************************************************************\
 
