@@ -32,33 +32,49 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final;
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final;
+    const namespacet &ns) const final override;
 
   bool merge(
     const escape_domaint &b,
     locationt from,
     locationt to);
 
-  void make_bottom() final
+  void make_bottom() final override
   {
     cleanup_map.clear();
     aliases.clear();
     has_values=tvt(false);
   }
 
-  void make_top() final
+  void make_top() final override
   {
     cleanup_map.clear();
     aliases.clear();
     has_values=tvt(true);
   }
 
-  void make_entry() final
+  bool is_bottom() const override final
+  {
+    DATA_INVARIANT(!has_values.is_false() ||
+                   (cleanup_map.empty() && (aliases.size()==0)),
+                   "If the domain is bottom, all maps must be empty");
+    return has_values.is_false();
+  }
+
+  bool is_top() const override final
+  {
+    DATA_INVARIANT(!has_values.is_true() ||
+                   (cleanup_map.empty() && (aliases.size()==0)),
+                   "If the domain is top, all maps must be empty");
+    return has_values.is_true();
+  }
+
+  void make_entry() override final
   {
     make_top();
   }

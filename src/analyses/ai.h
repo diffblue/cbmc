@@ -80,6 +80,10 @@ public:
   // a reasonable entry-point state
   virtual void make_entry()=0;
 
+  virtual bool is_bottom() const=0;
+
+  virtual bool is_top() const=0;
+
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
