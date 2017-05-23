@@ -25,12 +25,12 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai_base,
-    const namespacet &ns);
+    const namespacet &ns) final override;
 
   virtual void output(
     std::ostream &out,
     const ai_baset &ai_base,
-    const namespacet &ns) const;
+    const namespacet &ns) const override;
 
   bool merge(
     const constant_propagator_domaint &other,
@@ -39,21 +39,31 @@ public:
 
   virtual bool ai_simplify(
     exprt &condition,
-    const namespacet &ns) const override;
+    const namespacet &ns) const final override;
 
-  virtual void make_bottom()
+  virtual void make_bottom() final override
   {
     values.set_to_bottom();
   }
 
-  virtual void make_top()
+  virtual void make_top() final override
   {
     values.set_to_top();
   }
 
-  virtual void make_entry()
+  virtual void make_entry() final override
   {
     make_top();
+  }
+
+  virtual bool is_bottom() const final override
+  {
+    return values.is_bot();
+  }
+
+  virtual bool is_top() const final override
+  {
+    return values.is_top();
   }
 
   struct valuest
@@ -70,27 +80,37 @@ public:
 
     // set whole state
 
-    inline void set_to_bottom()
+    void set_to_bottom()
     {
       replace_const.clear();
       is_bottom=true;
     }
 
-    inline void set_to_top()
+    void set_to_top()
     {
       replace_const.clear();
       is_bottom=false;
     }
 
+    bool is_bot() const
+    {
+      return is_bottom && replace_const.empty();
+    }
+
+    bool is_top() const
+    {
+      return !is_bottom && replace_const.empty();
+    }
+
     // set single identifier
 
-    inline void set_to(const irep_idt &lhs, const exprt &rhs)
+    void set_to(const irep_idt &lhs, const exprt &rhs)
     {
       replace_const.expr_map[lhs]=rhs;
       is_bottom=false;
     }
 
-    inline void set_to(const symbol_exprt &lhs, const exprt &rhs)
+    void set_to(const symbol_exprt &lhs, const exprt &rhs)
     {
       set_to(lhs.get_identifier(), rhs);
     }
@@ -142,8 +162,6 @@ public:
     goto_functionst &goto_functions,
     const namespacet &ns):dirty(goto_functions)
   {
-    assert(false);
-
     operator()(goto_functions, ns);
     replace(goto_functions, ns);
   }
@@ -152,8 +170,6 @@ public:
     goto_functionst::goto_functiont &goto_function,
     const namespacet &ns):dirty(goto_function)
   {
-    assert(false);
-
     operator()(goto_function, ns);
     replace(goto_function, ns);
   }

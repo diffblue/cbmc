@@ -116,17 +116,17 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final;
+    const namespacet &ns) final override;
 
   void output(
     std::ostream &out,
     const ai_baset &ai,
-    const namespacet &ns) const final
+    const namespacet &ns) const final override
   {
     output(out);
   }
 
-  void make_top() final
+  void make_top() final override
   {
     values.clear();
     if(bv_container)
@@ -134,7 +134,7 @@ public:
     has_values=tvt(true);
   }
 
-  void make_bottom() final
+  void make_bottom() final override
   {
     values.clear();
     if(bv_container)
@@ -142,9 +142,21 @@ public:
     has_values=tvt(false);
   }
 
-  void make_entry() final
+  void make_entry() final override
   {
     make_top();
+  }
+
+  bool is_top() const override final
+  {
+    assert(!has_values.is_true() || values.empty());
+    return has_values.is_true();
+  }
+
+  bool is_bottom() const override final
+  {
+    assert(!has_values.is_false() || values.empty());
+    return has_values.is_false();
   }
 
   // returns true iff there is s.th. new
@@ -252,9 +264,9 @@ public:
   virtual ~reaching_definitions_analysist();
 
   virtual void initialize(
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions) override;
 
-  virtual statet &get_state(goto_programt::const_targett l)
+  virtual statet &get_state(goto_programt::const_targett l) override
   {
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
