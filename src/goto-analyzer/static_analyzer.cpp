@@ -57,8 +57,10 @@ protected:
 template<class analyzerT>
 bool static_analyzert<analyzerT>::operator()()
 {
-  status() << "Performing analysis" << eom;
+  status() << "Computing abstract states" << eom;
   domain(goto_functions, ns);
+
+  status() << "Checking assertions" << eom;
 
   if(options.get_bool_option("json"))
     json_report();
@@ -225,6 +227,9 @@ bool static_analyzer(
   message_handlert &message_handler,
   std::ostream &out)
 {
+  messaget m(message_handler);
+  m.status() << "Selecting abstract domain" << messaget::eom;
+
   if(options.get_bool_option("flow-sensitive"))
   {
     if(options.get_bool_option("constants"))
@@ -258,7 +263,6 @@ bool static_analyzer(
 #endif
   }
 
-  messaget m(message_handler);
   m.status() << "Task / Interpreter / Domain combination not supported"
              << messaget::eom;
 

@@ -6,7 +6,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 \*******************************************************************/
 
-//#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #include <iostream>
@@ -47,6 +47,9 @@ bool static_show_domain(
   ai_baset *domain=nullptr;
 
   namespacet ns(goto_model.symbol_table);
+  messaget m(message_handler);
+
+  m.status() << "Selecting abstract domain" << messaget::eom;
 
   if(options.get_bool_option("flow-sensitive"))
   {
@@ -79,15 +82,15 @@ bool static_show_domain(
 
   if(domain==nullptr)
   {
-    messaget m(message_handler);
     m.status() << "Task / Interpreter / Domain combination not supported"
                << messaget::eom;
     return true;
   }
 
-  // status() << "Performing analysis" << eom;
+  m.status() << "Computing abstract states" << messaget::eom;
   (*domain)(goto_model);
 
+  m.status() << "Outputting abstract states" << messaget::eom;
 
   if(options.get_bool_option("json"))
     out << domain->output_json(goto_model);
