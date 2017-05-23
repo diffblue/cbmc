@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/decision_procedure.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <pointer-analysis/dereference.h>
 

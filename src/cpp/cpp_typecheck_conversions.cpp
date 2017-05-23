@@ -15,7 +15,7 @@ Author:
 #include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_typecheck.h"
 

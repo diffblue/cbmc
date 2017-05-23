@@ -22,6 +22,7 @@ Author: Matt Lewis
 
 #include <ansi-c/expr2c.h>
 
+#include <util/c_types.h>
 #include <util/symbol_table.h>
 #include <util/options.h>
 #include <util/std_expr.h>
@@ -516,7 +517,7 @@ void polynomial_acceleratort::assert_for_values(
 #ifdef DEBUG
       std::cout << "Overriding pointer type\n";
 #endif
-      this_type=unsignedbv_typet(config.ansi_c.pointer_width);
+      this_type=size_type();
     }
 
     if(expr_type==nil_typet())

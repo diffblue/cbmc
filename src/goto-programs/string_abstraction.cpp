@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "pointer_arithmetic.h"
 #include "string_abstraction.h"

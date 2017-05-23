@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_expr.h>
 
 #include <linking/zero_initializer.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/c_sizeof.h>
 
 #include "cpp_typecheck.h"

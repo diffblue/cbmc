@@ -11,7 +11,7 @@ Author: CM Wintersteiger
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
-#include <ansi-c/c_types.h> // uint type for indices
+#include <util/c_types.h> // uint type for indices
 
 #include "qbf_squolem_core.h"
 

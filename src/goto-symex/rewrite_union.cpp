@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "rewrite_union.h"
 

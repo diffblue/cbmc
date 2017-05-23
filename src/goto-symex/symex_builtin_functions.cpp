@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/string2int.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 

@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
@@ -37,7 +38,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_misc.h"
 #include "c_qualifiers.h"
 #include "expr2c.h"
-#include "c_types.h"
 #include "expr2c_class.h"
 
 /*
