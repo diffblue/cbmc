@@ -123,6 +123,7 @@ public:
     const exprt &expr,
     bool is_sub,
     irep_idt class_identifier,
+    bool skip_classid,
     bool create_dynamic_objects,
     bool override,
     const typet &override_type,
@@ -309,6 +310,7 @@ void java_object_factoryt::gen_pointer_target_init(
       init_expr,
       false,
       "",
+      false,
       create_dynamic_objects,
       false,
       typet(),
@@ -355,6 +357,7 @@ void java_object_factoryt::gen_nondet_init(
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
+  bool skip_classid,
   bool create_dynamic_objects,
   bool override,
   const typet &override_type,
@@ -483,6 +486,9 @@ void java_object_factoryt::gen_nondet_init(
         if(update_in_place==MUST_UPDATE_IN_PLACE)
           continue;
 
+        if(skip_classid)
+          continue;
+
         irep_idt qualified_clsid="java::"+as_string(class_identifier);
         constant_exprt ci(qualified_clsid, string_typet());
         code_assignt code(me, ci);
@@ -519,6 +525,7 @@ void java_object_factoryt::gen_nondet_init(
           me,
           _is_sub,
           class_identifier,
+          false,
           create_dynamic_objects,
           false,
           typet(),
@@ -576,6 +583,7 @@ void java_object_factoryt::allocate_nondet_length_array(
     length_sym_expr,
     false,
     irep_idt(),
+    false,
     false,
     false,
     typet(),
@@ -718,6 +726,7 @@ void java_object_factoryt::gen_nondet_array_init(
     arraycellref,
     false,
     irep_idt(),
+    false,
     true,
     true,
     element_type,
@@ -799,6 +808,7 @@ exprt object_factory(
     "",
     false,
     false,
+    false,
     typet(),
     NO_UPDATE_IN_PLACE);
 
@@ -853,6 +863,7 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
+  bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
   size_t max_nondet_array_length,
@@ -872,6 +883,7 @@ void gen_nondet_init(
     expr,
     false,
     "",
+    skip_classid,
     create_dyn_objs,
     false,
     typet(),

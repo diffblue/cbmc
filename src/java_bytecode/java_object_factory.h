@@ -34,6 +34,7 @@ void gen_nondet_init(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
+  bool skip_classid,
   bool create_dyn_objs,
   bool assume_non_null,
   size_t max_nondet_array_length,
