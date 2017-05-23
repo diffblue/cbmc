@@ -111,6 +111,7 @@ public:
     const exprt &expr,
     bool is_sub,
     irep_idt class_identifier,
+    bool skip_classid,
     bool create_dynamic_objects,
     bool override=false,
     const typet &override_type=empty_typet());
@@ -275,6 +276,7 @@ void java_object_factoryt::gen_pointer_target_init(
       init_expr,
       false,
       "",
+      false,
       create_dynamic_objects,
       false,
       typet(),
@@ -368,6 +370,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   const exprt &expr,
   bool is_sub,
   irep_idt class_identifier,
+  bool skip_classid,
   bool create_dynamic_objects,
   const struct_typet &struct_type)
 {
@@ -510,7 +513,16 @@ void java_object_factoryt::allocate_nondet_length_array(
   const auto &length_sym_expr=length_sym.symbol_expr();
 
   // Initialize array with some undetermined length:
-  gen_nondet_init(assignments, length_sym_expr, false, irep_idt(), false);
+  gen_nondet_init(
+    assignments,
+    length_sym_expr,
+    false,
+    irep_idt(),
+    false,
+    false,
+    false,
+    typet(),
+    NO_UPDATE_IN_PLACE);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -638,6 +650,7 @@ void java_object_factoryt::gen_nondet_array_init(
     arraycellref,
     false,
     irep_idt(),
+    false,
     true,
     true,
     element_type,
@@ -702,7 +715,11 @@ exprt object_factory(
     object,
     false,
     "",
-    false);
+    false,
+    false,
+    false,
+    typet(),
+    NO_UPDATE_IN_PLACE);
 
   // Add the following code to init_code for each symbol that's been created:
   //   <type> <identifier>;
@@ -715,4 +732,66 @@ exprt object_factory(
 
   init_code.append(assignments);
   return object;
+}
+
+/// Initialises a primitive or object tree rooted at `expr`, allocating child
+/// objects as necessary and nondet-initialising their members, or if MAY_ or
+/// MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated objects.
+/// \par parameters: `expr`: lvalue expression to initialise
+/// `loc`: source location for all generated code
+/// `skip_classid`: if true, skip initialising @class_identifier
+/// `create_dyn_objs`: if true, use malloc to allocate objects; otherwise
+///   generate fresh static symbols.
+/// `assume_non_null`: never initialise pointer members with null, unless forced
+///   to by recursive datatypes
+/// `message_handler`: logging
+/// `max_nondet_array_length`: upper bound on size of initialised arrays.
+/// `update_in_place`: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
+///   generate a runtime nondet branch between the NO_ and MUST_ cases.
+/// \return `init_code` gets an instruction sequence to initialise or
+///   reinitialise `expr` and child objects it refers to. `symbol_table` is
+///   modified with any new symbols created. This includes any necessary
+///   temporaries, and if `create_dyn_objs` is false, any allocated objects.
+void gen_nondet_init(
+  const exprt &expr,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  bool skip_classid,
+  bool create_dyn_objs,
+  bool assume_non_null,
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place)
+{
+  std::vector<const symbolt *> symbols_created;
+
+  java_object_factoryt state(
+    symbols_created,
+    loc,
+    assume_non_null,
+    max_nondet_array_length,
+    symbol_table);
+  code_blockt assignments;
+  state.gen_nondet_init(
+    assignments,
+    expr,
+    false,
+    "",
+    skip_classid,
+    create_dyn_objs,
+    false,
+    typet(),
+    update_in_place);
+
+  // Add the following code to init_code for each symbol that's been created:
+  //   <type> <identifier>;
+  for(const symbolt * const symbol_ptr : symbols_created)
+  {
+    code_declt decl(symbol_ptr->symbol_expr());
+    decl.add_source_location()=loc;
+    init_code.add(decl);
+  }
+
+  init_code.append(assignments);
 }
