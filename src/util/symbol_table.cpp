@@ -175,12 +175,7 @@ Function: symbol_tablet::lookup
 
 const symbolt &symbol_tablet::lookup(const irep_idt &identifier) const
 {
-  symbolst::const_iterator it=symbols.find(identifier);
-
-  if(it==symbols.end())
-    throw "symbol "+id2string(identifier)+" not found";
-
-  return it->second;
+  return lookup(*this, identifier);
 }
 
 /*******************************************************************\
@@ -199,12 +194,7 @@ Function: symbol_tablet::lookup
 
 symbolt &symbol_tablet::lookup(const irep_idt &identifier)
 {
-  symbolst::iterator it=symbols.find(identifier);
-
-  if(it==symbols.end())
-    throw "symbol "+id2string(identifier)+" not found";
-
-  return it->second;
+  return lookup(*this, identifier);
 }
 
 /*******************************************************************\

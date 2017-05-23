@@ -90,6 +90,20 @@ public:
 
   symbolt &lookup(const irep_idt &identifier);
   const symbolt &lookup(const irep_idt &identifier) const;
+
+private:
+  template <typename T>
+  static auto lookup(T &t, const irep_idt &id) -> decltype(t.lookup(id))
+  {
+    auto it=t.symbols.find(id);
+
+    if(it==t.symbols.end())
+    {
+      throw "symbol "+id2string(id)+" not found";
+    }
+
+    return it->second;
+  }
 };
 
 std::ostream &operator << (
