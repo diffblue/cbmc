@@ -558,6 +558,14 @@ std::string expr2ct::convert_rec(
 
     c_qualifierst ret_qualifiers;
     ret_qualifiers.read(code_type.return_type());
+    // _Noreturn should go with the return type
+    if(new_qualifiers.is_noreturn)
+    {
+      ret_qualifiers.is_noreturn=true;
+      new_qualifiers.is_noreturn=false;
+      q=new_qualifiers.as_string();
+    }
+
     const typet &return_type=code_type.return_type();
 
     // return type may be a function pointer or array
