@@ -6,8 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/std_types.h>
-#include <util/config.h>
+#include "std_types.h"
+#include "config.h"
 
 #include "c_types.h"
 

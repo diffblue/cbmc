@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "dereference.h"
 

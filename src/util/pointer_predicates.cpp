@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_types.h"
 #include "cprover_prefix.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -31,9 +32,7 @@ Function: pointer_object
 
 exprt pointer_object(const exprt &p)
 {
-  return unary_exprt(
-    ID_pointer_object, p,
-    unsignedbv_typet(config.ansi_c.pointer_width));
+  return unary_exprt(ID_pointer_object, p, size_type());
 }
 
 /*******************************************************************\
@@ -67,8 +66,7 @@ Function: object_size
 
 exprt object_size(const exprt &pointer)
 {
-  typet type=signedbv_typet(config.ansi_c.pointer_width);
-  return unary_exprt(ID_object_size, pointer, type);
+  return unary_exprt(ID_object_size, pointer, size_type());
 }
 
 /*******************************************************************\
@@ -85,8 +83,7 @@ Function: pointer_offset
 
 exprt pointer_offset(const exprt &pointer)
 {
-  typet type=signedbv_typet(config.ansi_c.pointer_width);
-  return unary_exprt(ID_pointer_offset, pointer, type);
+  return unary_exprt(ID_pointer_offset, pointer, signed_size_type());
 }
 
 /*******************************************************************\
@@ -411,6 +408,10 @@ exprt dynamic_object_upper_bound(
   if(access_size.is_not_nil())
   {
     op=ID_gt;
+
+    if(ns.follow(object_offset.type())!=
+       ns.follow(access_size.type()))
+      object_offset.make_typecast(access_size.type());
     sum=plus_exprt(object_offset, access_size);
   }
 
@@ -453,6 +454,10 @@ exprt object_upper_bound(
   if(access_size.is_not_nil())
   {
     op=ID_gt;
+
+    if(ns.follow(object_offset.type())!=
+       ns.follow(access_size.type()))
+      object_offset.make_typecast(access_size.type());
     sum=plus_exprt(object_offset, access_size);
   }
 

@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_enum_type.h"
 

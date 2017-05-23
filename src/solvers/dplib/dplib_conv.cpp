@@ -218,6 +218,7 @@ void dplib_convt::convert_address_of_rec(const exprt &expr)
 
     mp_integer offset=member_offset(ns,
       to_struct_type(struct_op.type()), component_name);
+    assert(offset>=0);
 
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);

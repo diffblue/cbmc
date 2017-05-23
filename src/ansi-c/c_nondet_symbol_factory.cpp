@@ -10,6 +10,7 @@ Author: DiffBlue Limited. All rights reserved.
 #include <sstream>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/std_types.h>
 #include <util/std_code.h>
@@ -20,7 +21,6 @@ Author: DiffBlue Limited. All rights reserved.
 
 #include <linking/zero_initializer.h>
 
-#include <ansi-c/c_types.h>
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>

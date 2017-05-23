@@ -24,7 +24,6 @@ SRC = anonymous_member.cpp \
       c_typecheck_initializer.cpp \
       c_typecheck_type.cpp \
       c_typecheck_typecast.cpp \
-      c_types.cpp \
       cprover_library.cpp \
       designator.cpp \
       expr2c.cpp \

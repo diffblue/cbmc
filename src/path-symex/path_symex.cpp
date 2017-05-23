@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
 #include <util/prefix.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 

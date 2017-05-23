@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "c_types.h"
 #include "expr.h"
 #include "arith_tools.h"
 #include "std_types.h"
@@ -129,6 +130,8 @@ mp_integer pointer_offset_bits(
   if(type.id()==ID_array)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
 
     // get size
     const exprt &size=to_array_type(type).size();
@@ -144,6 +147,8 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_vector)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
 
     // get size
     const exprt &size=to_vector_type(type).size();
@@ -159,6 +164,9 @@ mp_integer pointer_offset_bits(
   else if(type.id()==ID_complex)
   {
     mp_integer sub=pointer_offset_bits(type.subtype(), ns);
+    if(sub<0)
+      return -1;
+
     return sub*2;
   }
   else if(type.id()==ID_struct)
@@ -200,6 +208,8 @@ mp_integer pointer_offset_bits(
     {
       const typet &subtype=it->type();
       mp_integer sub_size=pointer_offset_bits(subtype, ns);
+      if(sub_size==-1)
+        return -1;
       if(sub_size>result)
         result=sub_size;
     }
@@ -273,7 +283,7 @@ exprt member_offset_expr(
     return member_offset_expr(
       to_struct_type(type), member_expr.get_component_name(), ns);
   else if(type.id()==ID_union)
-    return from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(0, signed_size_type());
   else
     return nil_exprt();
 }
@@ -297,7 +307,7 @@ exprt member_offset_expr(
 {
   const struct_typet::componentst &components=type.components();
 
-  exprt result=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+  exprt result=from_integer(0, signed_size_type());
   std::size_t bit_field_bits=0;
 
   for(struct_typet::componentst::const_iterator
@@ -407,7 +417,7 @@ exprt size_of_expr(
     const struct_typet::componentst &components=
       struct_type.components();
 
-    exprt result=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+    exprt result=from_integer(0, size_type());
     std::size_t bit_field_bits=0;
 
     for(struct_typet::componentst::const_iterator
@@ -466,11 +476,16 @@ exprt size_of_expr(
       else
         sub_size=pointer_offset_size(subtype, ns);
 
+      if(sub_size==-1)
+      {
+        result=-1;
+        break;
+      }
       if(sub_size>result)
         result=sub_size;
     }
 
-    return from_integer(result, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(result, size_type());
   }
   else if(type.id()==ID_signedbv ||
           type.id()==ID_unsignedbv ||
@@ -483,7 +498,7 @@ exprt size_of_expr(
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;
-    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(bytes, size_type());
   }
   else if(type.id()==ID_c_enum)
   {
@@ -491,7 +506,7 @@ exprt size_of_expr(
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;
-    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(bytes, size_type());
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -499,7 +514,7 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_bool)
   {
-    return from_integer(1, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(1, size_type());
   }
   else if(type.id()==ID_pointer)
   {
@@ -507,7 +522,7 @@ exprt size_of_expr(
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;
-    return from_integer(bytes, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(bytes, size_type());
   }
   else if(type.id()==ID_symbol)
   {
@@ -515,12 +530,11 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_code)
   {
-    return from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(0, size_type());
   }
   else if(type.id()==ID_string)
   {
-    return from_integer(
-      32/8, signedbv_typet(config.ansi_c.pointer_width));
+    return from_integer(32/8, size_type());
   }
   else
     return nil_exprt();
@@ -566,7 +580,7 @@ mp_integer compute_pointer_offset(
 
       mp_integer i;
 
-      if(sub_size!=0 && !to_integer(expr.op1(), i))
+      if(sub_size>0 && !to_integer(expr.op1(), i))
         return o+i*sub_size;
     }
 
@@ -628,7 +642,7 @@ exprt build_sizeof_expr(
     return nil_exprt();
 
   assert(address_bits(val+1)<=config.ansi_c.pointer_width);
-  const unsignedbv_typet t(config.ansi_c.pointer_width);
+  const typet t(size_type());
 
   mp_integer remainder=0;
   if(type_size!=0)

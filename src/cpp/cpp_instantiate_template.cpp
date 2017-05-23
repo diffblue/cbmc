@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"

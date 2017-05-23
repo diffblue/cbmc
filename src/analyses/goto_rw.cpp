@@ -149,6 +149,7 @@ void rw_range_sett::get_objects_complex(
 
   range_spect sub_size=
     to_range_spect(pointer_offset_bits(op.type().subtype(), ns));
+  assert(sub_size>0);
   range_spect offset=
     (range_start==-1 || expr.id()==ID_complex_real) ? 0 : sub_size;
 

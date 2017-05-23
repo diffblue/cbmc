@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include "c_types.h"
 #include "c_qualifiers.h"
 #include "c_storage_spec.h"
 

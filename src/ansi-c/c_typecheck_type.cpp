@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
@@ -15,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 
 #include "c_typecheck_base.h"
-#include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"

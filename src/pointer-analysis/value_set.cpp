@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/cprover_prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #ifdef DEBUG
 #include <langapi/language_util.h>
@@ -717,10 +717,23 @@ void value_sett::get_value_set_rec(
 
       if(i_is_set)
       {
-        i*=pointer_offset_size(ptr_operand.type().subtype(), ns);
+        typet pointer_sub_type=ptr_operand.type().subtype();
+        if(pointer_sub_type.id()==ID_empty)
+          pointer_sub_type=char_type();
 
-        if(expr.id()==ID_minus)
-          i.negate();
+        mp_integer size=pointer_offset_size(pointer_sub_type, ns);
+
+        if(size<=0)
+        {
+          i_is_set=false;
+        }
+        else
+        {
+          i*=size;
+
+          if(expr.id()==ID_minus)
+            i.negate();
+        }
       }
 
       get_value_set_rec(
@@ -1155,7 +1168,14 @@ void value_sett::get_reference_set_rec(
         }
         else if(!to_integer(offset, i) &&
                 o.offset_is_zero())
-          o.offset=i*pointer_offset_size(array_type.subtype(), ns);
+        {
+          mp_integer size=pointer_offset_size(array_type.subtype(), ns);
+
+          if(size<=0)
+            o.offset_is_set=false;
+          else
+            o.offset=i*size;
+        }
         else
           o.offset_is_set=false;
 

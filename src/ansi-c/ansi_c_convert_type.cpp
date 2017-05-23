@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/config.h>

@@ -7,10 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 
 #include "string_constant.h"
-#include "c_types.h"
 
 /*******************************************************************\
 

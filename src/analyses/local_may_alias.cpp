@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_code.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <langapi/language_util.h>
 
 #include "local_may_alias.h"
