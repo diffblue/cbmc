@@ -46,7 +46,7 @@ public:
 
   cpp_scopet &new_namespace(const irep_idt &new_scope_name)
   {
-    return new_scope(new_scope_name, cpp_idt::NAMESPACE);
+    return new_scope(new_scope_name, cpp_idt::id_classt::NAMESPACE);
   }
 
   cpp_scopet &new_block_scope();

@@ -39,10 +39,8 @@ void remove_unreachable(goto_programt &goto_program)
        t!=goto_program.instructions.end())
     {
       reachable.insert(t);
-      goto_programt::targetst successors;
-      goto_program.get_successors(t, successors);
 
-      for(const auto &succ : successors)
+      for(const auto &succ : goto_program.get_successors(t))
         working.push(succ);
     }
   }

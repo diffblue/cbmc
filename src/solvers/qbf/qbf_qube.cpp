@@ -97,7 +97,7 @@ propt::resultt qbf_qubet::prop_solve()
 {
   // sKizzo crashes on empty instances
   if(no_clauses()==0)
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
 
   {
     messaget::status() <<
@@ -156,20 +156,20 @@ propt::resultt qbf_qubet::prop_solve()
     if(!result_found)
     {
       messaget::error() << "QuBE failed: unknown result" << eom;
-      return P_ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
     messaget::status() << "QuBE: TRUE" << eom;
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   }
   else
   {
     messaget::status() << "QuBE: FALSE" << eom;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
 
-  return P_ERROR;
+  return resultt::P_ERROR;
 }

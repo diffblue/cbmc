@@ -40,7 +40,7 @@ public:
     equation(ns),
     symex(ns, new_symbol_table, equation),
     prop_conv(_prop_conv),
-    ui(ui_message_handlert::PLAIN)
+    ui(ui_message_handlert::uit::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
     symex.record_coverage=

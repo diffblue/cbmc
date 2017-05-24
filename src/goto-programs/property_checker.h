@@ -26,7 +26,7 @@ public:
   explicit property_checkert(
     message_handlert &_message_handler);
 
-  typedef enum { PASS, FAIL, ERROR, UNKNOWN } resultt;
+  enum class resultt { PASS, FAIL, ERROR, UNKNOWN };
 
   static std::string as_string(resultt);
 

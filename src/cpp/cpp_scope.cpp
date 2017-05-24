@@ -175,7 +175,7 @@ void cpp_scopet::lookup(
   }
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // secondary scopes
   for(scope_listt::iterator
@@ -194,7 +194,7 @@ void cpp_scopet::lookup(
     return; // done
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // ask parent, recursive call
   if(!is_root_scope())

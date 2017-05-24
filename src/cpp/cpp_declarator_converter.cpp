@@ -100,7 +100,7 @@ symbolt &cpp_declarator_convertert::convert(
   get_final_identifier();
 
   // first see if it is a member
-  if(scope->id_class==cpp_idt::CLASS && !is_friend)
+  if(scope->id_class==cpp_idt::id_classt::CLASS && !is_friend)
   {
     // it's a member! it must be declared already
 
@@ -160,7 +160,7 @@ symbolt &cpp_declarator_convertert::convert(
       exprt symbol_expr=
         cpp_typecheck.resolve(
           name,
-          cpp_typecheck_resolvet::TYPE,
+          cpp_typecheck_resolvet::wantt::TYPE,
           cpp_typecheck_fargst());
 
       if(symbol_expr.id()!=ID_type ||
@@ -238,13 +238,13 @@ symbolt &cpp_declarator_convertert::convert(
       cpp_scopet::id_sett id_set;
 
       scope->lookup_identifier(
-        symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
+        symbol.name, cpp_idt::id_classt::TEMPLATE_PARAMETER, id_set);
 
       if(id_set.empty())
       {
         cpp_idt &identifier=
           cpp_typecheck.cpp_scopes.put_into_scope(symbol, *scope);
-        identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
+        identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
       }
     }
 
@@ -618,13 +618,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     cpp_typecheck.cpp_scopes.put_into_scope(*new_symbol, *scope, is_friend);
 
   if(is_template)
-    identifier.id_class=cpp_idt::TEMPLATE;
+    identifier.id_class=cpp_idt::id_classt::TEMPLATE;
   else if(is_template_parameter)
-    identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
+    identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
   else if(is_typedef)
-    identifier.id_class=cpp_idt::TYPEDEF;
+    identifier.id_class=cpp_idt::id_classt::TYPEDEF;
   else
-    identifier.id_class=cpp_idt::SYMBOL;
+    identifier.id_class=cpp_idt::id_classt::SYMBOL;
 
   // do the value
   if(!new_symbol->is_type)

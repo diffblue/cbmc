@@ -146,6 +146,7 @@ extern char *yyansi_ctext;
 %token TOK_CW_VAR_ARG_TYPEOF "_var_arg_typeof"
 %token TOK_BUILTIN_VA_ARG "__builtin_va_arg"
 %token TOK_GCC_BUILTIN_TYPES_COMPATIBLE_P "__builtin_types_compatible_p"
+%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
 %token TOK_MSC_TRY     "__try"
@@ -264,7 +265,8 @@ identifier:
           irep_idt value=stack($2).get(ID_value);
           stack($$).set(ID_C_base_name, value);
           stack($$).set(ID_identifier, value);
-          stack($$).set(ID_C_id_class, ANSI_C_SYMBOL);
+          stack($$).set(
+            ID_C_id_class, static_cast<int>(ansi_c_id_classt::ANSI_C_SYMBOL));
         }
         ;
 
@@ -305,6 +307,7 @@ primary_expression:
         { $$ = $2; }
         | statement_expression
         | gcc_builtin_expressions
+        | clang_builtin_expressions
         | cw_builtin_expressions
         | offsetof
         | quantifier_expression
@@ -367,6 +370,16 @@ gcc_builtin_expressions:
           subtypes.resize(2);
           subtypes[0].swap(stack($3));
           subtypes[1].swap(stack($5));
+        }
+        ;
+
+clang_builtin_expressions:
+          TOK_CLANG_BUILTIN_CONVERTVECTOR '(' assignment_expression ',' type_name ')'
+        {
+          $$=$1;
+          stack($$).id(ID_clang_builtin_convertvector);
+          mto($$, $3);
+          stack($$).type().swap(stack($5));
         }
         ;
 
@@ -2375,7 +2388,7 @@ gcc_local_label_statement:
             irep_idt base_name=it->get(ID_identifier);
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
-            i.id_class=ANSI_C_LOCAL_LABEL;
+            i.id_class=ansi_c_id_classt::ANSI_C_LOCAL_LABEL;
             i.prefixed_name=PARSER.current_scope().prefix+id2string(id);
             i.base_name=base_name;
           }

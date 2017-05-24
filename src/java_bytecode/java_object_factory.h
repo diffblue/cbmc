@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt object_factory(
   const typet &type,
+  const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,

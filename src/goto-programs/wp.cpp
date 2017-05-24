@@ -101,7 +101,7 @@ Function: aliasing
 
 \*******************************************************************/
 
-typedef enum { A_MAY, A_MUST, A_MUSTNOT } aliasingt;
+enum class aliasingt { A_MAY, A_MUST, A_MUSTNOT };
 
 aliasingt aliasing(
   const exprt &e1, const exprt &e2,
@@ -122,20 +122,20 @@ aliasingt aliasing(
 
   // fairly radical. Ignores struct prefixes and the like.
   if(!base_type_eq(e1.type(), e2.type(), ns))
-    return A_MUSTNOT;
+    return aliasingt::A_MUSTNOT;
 
   // syntactically the same?
   if(e1==e2)
-    return A_MUST;
+    return aliasingt::A_MUST;
 
   // the trivial case first
   if(e1.id()==ID_symbol && e2.id()==ID_symbol)
   {
     if(to_symbol_expr(e1).get_identifier()==
        to_symbol_expr(e2).get_identifier())
-      return A_MUST;
+      return aliasingt::A_MUST;
     else
-      return A_MUSTNOT;
+      return aliasingt::A_MUSTNOT;
   }
 
   // an array or struct will never alias with a variable,
@@ -143,16 +143,16 @@ aliasingt aliasing(
 
   if(e1.id()==ID_index || e1.id()==ID_struct)
     if(e2.id()!=ID_dereference && e1.id()!=e2.id())
-      return A_MUSTNOT;
+      return aliasingt::A_MUSTNOT;
 
   if(e2.id()==ID_index || e2.id()==ID_struct)
     if(e2.id()!=ID_dereference && e1.id()!=e2.id())
-      return A_MUSTNOT;
+      return aliasingt::A_MUSTNOT;
 
   // we give up, and say it may
   // (could do much more here)
 
-  return A_MAY;
+  return aliasingt::A_MAY;
 }
 
 /*******************************************************************\
@@ -187,11 +187,11 @@ void substitute_rec(
     // could these be possible the same?
     switch(aliasing(dest, what, ns))
     {
-    case A_MUST:
+    case aliasingt::A_MUST:
       dest=by; // they are always the same
       break;
 
-    case A_MAY:
+    case aliasingt::A_MAY:
       {
         // consider possible aliasing between 'what' and 'dest'
         exprt what_address=address_of_exprt(what);
@@ -210,7 +210,7 @@ void substitute_rec(
         return;
       }
 
-    case A_MUSTNOT:
+    case aliasingt::A_MUSTNOT:
       // nothing to do
       break;
     }

@@ -1,8 +1,0 @@
-CORE
-Runner.class
---gcc --cegis-refactor --cegis-refactor-null-object --cegis-statistics --cegis-genetic
-^ *op0 *= *op1;
-^EXIT=0
-^SIGNAL=0
---
-^warning: ignoring

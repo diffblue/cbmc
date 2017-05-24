@@ -364,7 +364,7 @@ static void create_function_scope(const YYSTYPE d)
           irep_idt base_name=param_decl.declarator().get_base_name();
           ansi_c_identifiert &identifier=
             PARSER.current_scope().name_map[base_name];
-          identifier.id_class=ANSI_C_SYMBOL;
+          identifier.id_class=ansi_c_id_classt::ANSI_C_SYMBOL;
           identifier.base_name=base_name;
           identifier.prefixed_name=param_decl.declarator().get_name();
         }

@@ -108,7 +108,7 @@ protected:
     goto_programt::targett target,
     const exprt &lhs, const exprt &rhs);
 
-  typedef enum { IS_ZERO, LENGTH, SIZE } whatt;
+  enum class whatt { IS_ZERO, LENGTH, SIZE };
 
   static typet build_type(whatt what);
   exprt build(

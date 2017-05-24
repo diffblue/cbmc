@@ -180,7 +180,7 @@ void goto_unwindt::unwind(
   // rest program after unwound part
   goto_programt rest_program;
 
-  if(unwind_strategy==PARTIAL)
+  if(unwind_strategy==unwind_strategyt::PARTIAL)
   {
     goto_programt::targett t=rest_program.add_instruction();
     unwind_log.insert(t, loop_head->location_number);
@@ -190,7 +190,7 @@ void goto_unwindt::unwind(
     t->function=loop_head->function;
     t->location_number=loop_head->location_number;
   }
-  else if(unwind_strategy==CONTINUE)
+  else if(unwind_strategy==unwind_strategyt::CONTINUE)
   {
     copy_segment(loop_head, loop_exit, rest_program);
   }
@@ -216,9 +216,9 @@ void goto_unwindt::unwind(
 
     goto_programt::targett new_t=rest_program.add_instruction();
 
-    if(unwind_strategy==ASSERT)
+    if(unwind_strategy==unwind_strategyt::ASSERT)
       new_t->make_assertion(exit_cond);
-    else if(unwind_strategy==ASSUME)
+    else if(unwind_strategy==unwind_strategyt::ASSUME)
       new_t->make_assumption(exit_cond);
     else
       assert(false);

@@ -32,19 +32,19 @@ void custom_bitvector_domaint::set_bit(
 {
   switch(mode)
   {
-  case SET_MUST:
+  case modet::SET_MUST:
     set_bit(must_bits[identifier], bit_nr);
     break;
 
-  case CLEAR_MUST:
+  case modet::CLEAR_MUST:
     clear_bit(must_bits[identifier], bit_nr);
     break;
 
-  case SET_MAY:
+  case modet::SET_MAY:
     set_bit(may_bits[identifier], bit_nr);
     break;
 
-  case CLEAR_MAY:
+  case modet::CLEAR_MAY:
     clear_bit(may_bits[identifier], bit_nr);
     break;
   }
@@ -408,13 +408,13 @@ void custom_bitvector_domaint::transform(
             modet mode;
 
             if(identifier=="__CPROVER_set_must")
-              mode=SET_MUST;
+              mode=modet::SET_MUST;
             else if(identifier=="__CPROVER_clear_must")
-              mode=CLEAR_MUST;
+              mode=modet::CLEAR_MUST;
             else if(identifier=="__CPROVER_set_may")
-              mode=SET_MAY;
+              mode=modet::SET_MAY;
             else if(identifier=="__CPROVER_clear_may")
-              mode=CLEAR_MAY;
+              mode=modet::CLEAR_MAY;
             else
               assert(false);
 
@@ -423,7 +423,7 @@ void custom_bitvector_domaint::transform(
             if(lhs.is_constant() &&
                to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
             {
-              if(mode==CLEAR_MAY)
+              if(mode==modet::CLEAR_MAY)
               {
                 for(auto &bit : may_bits)
                   clear_bit(bit.second, bit_nr);
@@ -431,7 +431,7 @@ void custom_bitvector_domaint::transform(
                 // erase blank ones
                 erase_blank_vectors(may_bits);
               }
-              else if(mode==CLEAR_MUST)
+              else if(mode==modet::CLEAR_MUST)
               {
                 for(auto &bit : must_bits)
                   clear_bit(bit.second, bit_nr);
@@ -475,13 +475,13 @@ void custom_bitvector_domaint::transform(
         modet mode;
 
         if(statement=="set_must")
-          mode=SET_MUST;
+          mode=modet::SET_MUST;
         else if(statement=="clear_must")
-          mode=CLEAR_MUST;
+          mode=modet::CLEAR_MUST;
         else if(statement=="set_may")
-          mode=SET_MAY;
+          mode=modet::SET_MAY;
         else if(statement=="clear_may")
-          mode=CLEAR_MAY;
+          mode=modet::CLEAR_MAY;
         else
           assert(false);
 
@@ -490,7 +490,7 @@ void custom_bitvector_domaint::transform(
         if(lhs.is_constant() &&
            to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
         {
-          if(mode==CLEAR_MAY)
+          if(mode==modet::CLEAR_MAY)
           {
             for(bitst::iterator b_it=may_bits.begin();
                 b_it!=may_bits.end();
@@ -500,7 +500,7 @@ void custom_bitvector_domaint::transform(
             // erase blank ones
             erase_blank_vectors(may_bits);
           }
-          else if(mode==CLEAR_MUST)
+          else if(mode==modet::CLEAR_MUST)
           {
             for(bitst::iterator b_it=must_bits.begin();
                 b_it!=must_bits.end();

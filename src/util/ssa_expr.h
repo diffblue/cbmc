@@ -42,7 +42,7 @@ public:
     return static_cast<const exprt &>(find(ID_expression));
   }
 
-  const irep_idt &get_object_name() const
+  irep_idt get_object_name() const
   {
     object_descriptor_exprt ode;
     ode.object()=get_original_expr();

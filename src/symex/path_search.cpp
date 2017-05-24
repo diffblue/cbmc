@@ -156,7 +156,7 @@ path_searcht::resultt path_searcht::operator()(
 
   report_statistics();
 
-  return number_of_failed_properties==0?SAFE:UNSAFE;
+  return number_of_failed_properties==0?resultt::SAFE:resultt::UNSAFE;
 }
 
 /*******************************************************************\

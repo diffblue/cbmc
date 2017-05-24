@@ -225,7 +225,7 @@ bvt bv_utilst::extension(
   assert(old_size!=0);
 
   literalt extend_with=
-    (rep==SIGNED && !bv.empty())?bv[old_size-1]:
+    (rep==representationt::SIGNED && !bv.empty())?bv[old_size-1]:
     const_literal(false);
 
   for(std::size_t i=old_size; i<new_size; i++)
@@ -565,7 +565,7 @@ Function: bv_utilst::overflow_add
 literalt bv_utilst::overflow_add(
   const bvt &op0, const bvt &op1, representationt rep)
 {
-  if(rep==SIGNED)
+  if(rep==representationt::SIGNED)
   {
     // An overflow occurs if the signs of the two operands are the same
     // and the sign of the sum is the opposite.
@@ -577,7 +577,7 @@ literalt bv_utilst::overflow_add(
     return
       prop.land(sign_the_same, prop.lxor(result[result.size()-1], old_sign));
   }
-  else if(rep==UNSIGNED)
+  else if(rep==representationt::UNSIGNED)
   {
     // overflow is simply carry-out
     return carry_out(op0, op1, const_literal(false));
@@ -601,7 +601,7 @@ Function: bv_utilst::overflow_sub
 literalt bv_utilst::overflow_sub(
   const bvt &op0, const bvt &op1, representationt rep)
 {
-  if(rep==SIGNED)
+  if(rep==representationt::SIGNED)
   {
     // We special-case x-INT_MIN, which is >=0 if
     // x is negative, always representable, and
@@ -612,9 +612,9 @@ literalt bv_utilst::overflow_sub(
     return
       prop.lselect(op1_is_int_min,
         !op0_is_negative,
-        overflow_add(op0, negate(op1), SIGNED));
+        overflow_add(op0, negate(op1), representationt::SIGNED));
   }
-  else if(rep==UNSIGNED)
+  else if(rep==representationt::UNSIGNED)
   {
     // overflow is simply _negated_ carry-out
     return !carry_out(op0, inverted(op1), const_literal(true));
@@ -643,7 +643,7 @@ void bv_utilst::adder_no_overflow(
 {
   const bvt tmp_op=subtract?inverted(op):op;
 
-  if(rep==SIGNED)
+  if(rep==representationt::SIGNED)
   {
     // an overflow occurs if the signs of the two operands are the same
     // and the sign of the sum is the opposite
@@ -659,7 +659,7 @@ void bv_utilst::adder_no_overflow(
     prop.l_set_to_false(
       prop.land(sign_the_same, prop.lxor(sum[sum.size()-1], old_sign)));
   }
-  else if(rep==UNSIGNED)
+  else if(rep==representationt::UNSIGNED)
   {
     literalt carry_out;
     adder(sum, tmp_op, const_literal(subtract), carry_out);
@@ -746,15 +746,15 @@ bvt bv_utilst::shift(const bvt &src, const shiftt s, std::size_t dist)
 
     switch(s)
     {
-    case LEFT:
+    case shiftt::LEFT:
       l=(dist<=i?src[i-dist]:const_literal(false));
       break;
 
-    case ARIGHT:
+    case shiftt::ARIGHT:
       l=(i+dist<src.size()?src[i+dist]:src[src.size()-1]); // sign bit
       break;
 
-    case LRIGHT:
+    case shiftt::LRIGHT:
       l=(i+dist<src.size()?src[i+dist]:const_literal(false));
       break;
 
@@ -1233,8 +1233,8 @@ bvt bv_utilst::multiplier(
 {
   switch(rep)
   {
-  case SIGNED: return signed_multiplier(op0, op1);
-  case UNSIGNED: return unsigned_multiplier(op0, op1);
+  case representationt::SIGNED: return signed_multiplier(op0, op1);
+  case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
   default: assert(false);
   }
 }
@@ -1258,8 +1258,10 @@ bvt bv_utilst::multiplier_no_overflow(
 {
   switch(rep)
   {
-  case SIGNED: return signed_multiplier_no_overflow(op0, op1);
-  case UNSIGNED: return unsigned_multiplier_no_overflow(op0, op1);
+  case representationt::SIGNED:
+    return signed_multiplier_no_overflow(op0, op1);
+  case representationt::UNSIGNED:
+    return unsigned_multiplier_no_overflow(op0, op1);
   default: assert(false);
   }
 }
@@ -1334,8 +1336,10 @@ void bv_utilst::divider(
 
   switch(rep)
   {
-  case SIGNED: signed_divider(op0, op1, result, remainer); break;
-  case UNSIGNED: unsigned_divider(op0, op1, result, remainer); break;
+  case representationt::SIGNED:
+    signed_divider(op0, op1, result, remainer); break;
+  case representationt::UNSIGNED:
+    unsigned_divider(op0, op1, result, remainer); break;
   default: assert(false);
   }
 }
@@ -1391,7 +1395,11 @@ void bv_utilst::unsigned_divider(
   }
   #endif
 
-  // division by zero test
+  // Division by zero test.
+  // Note that we produce a non-deterministic result in
+  // case of division by zero. SMT-LIB now says the following:
+  // bvudiv returns a vector of all 1s if the second operand is 0
+  // bvurem returns its first operand if the second operand is 0
 
   literalt is_not_zero=prop.lor(op1);
 
@@ -1423,12 +1431,14 @@ void bv_utilst::unsigned_divider(
   // op1!=0 => rem < op1
 
   prop.l_set_to_true(
-    prop.limplies(is_not_zero, lt_or_le(false, rem, op1, UNSIGNED)));
+    prop.limplies(
+      is_not_zero, lt_or_le(false, rem, op1, representationt::UNSIGNED)));
 
   // op1!=0 => res <= op0
 
   prop.l_set_to_true(
-    prop.limplies(is_not_zero, lt_or_le(true, res, op0, UNSIGNED)));
+    prop.limplies(
+      is_not_zero, lt_or_le(true, res, op0, representationt::UNSIGNED)));
 }
 
 
@@ -1749,9 +1759,9 @@ literalt bv_utilst::lt_or_le(
 
     literalt result;
 
-    if(rep==SIGNED)
+    if(rep==representationt::SIGNED)
       result=prop.lxor(prop.lequal(top0, top1), carry);
-    else if(rep==UNSIGNED)
+    else if(rep==representationt::UNSIGNED)
       result=!carry;
     else
       assert(false);
@@ -1803,7 +1813,7 @@ literalt bv_utilst::signed_less_than(
   const bvt &bv0,
   const bvt &bv1)
 {
-  return lt_or_le(false, bv0, bv1, SIGNED);
+  return lt_or_le(false, bv0, bv1, representationt::SIGNED);
 }
 
 /*******************************************************************\

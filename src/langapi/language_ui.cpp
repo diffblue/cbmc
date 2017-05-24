@@ -127,7 +127,7 @@ bool language_uit::parse(const std::string &filename)
 
   if(language.parse(infile, filename))
   {
-    if(get_ui()==ui_message_handlert::PLAIN)
+    if(get_ui()==ui_message_handlert::uit::PLAIN)
       std::cerr << "PARSING ERROR" << std::endl;
 
     return true;
@@ -210,11 +210,11 @@ void language_uit::show_symbol_table(bool brief)
 {
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     show_symbol_table_plain(std::cout, brief);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     show_symbol_table_xml_ui(brief);
     break;
 

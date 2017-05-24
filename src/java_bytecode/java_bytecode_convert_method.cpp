@@ -283,6 +283,14 @@ void java_bytecode_convert_method_lazy(
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
+  if(m.is_public)
+    member_type.set(ID_access, ID_public);
+  else if(m.is_protected)
+    member_type.set(ID_access, ID_protected);
+  else if(m.is_private)
+    member_type.set(ID_access, ID_private);
+  else
+    member_type.set(ID_access, ID_default);
 
   if(method_symbol.base_name=="<init>")
   {
@@ -1080,7 +1088,7 @@ codet java_bytecode_convert_methodt::get_clinit_call(
 
 /*******************************************************************\
 
-Function: java_bytecode_convert_methodt::convert_instructions
+Function: get_bytecode_type_width
 
   Inputs:
 
@@ -1096,6 +1104,18 @@ static unsigned get_bytecode_type_width(const typet &ty)
     return 32;
   return ty.get_unsigned_int(ID_width);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_methodt::convert_instructions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
@@ -1450,8 +1470,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             if(as_string(arg0.get(ID_identifier))
                .find("<init>")!=std::string::npos)
             {
-              if(needed_classes)
-                needed_classes->insert(classname);
+              if(lazy_methods)
+                lazy_methods->add_needed_class(classname);
               code_type.set(ID_constructor, true);
             }
             else
@@ -1551,8 +1571,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-        if(needed_methods)
-          needed_methods->push_back(arg0.get(ID_identifier));
+        if(lazy_methods)
+          lazy_methods->add_needed_method(arg0.get(ID_identifier));
       }
 
       call.function().add_source_location()=loc;
@@ -2100,9 +2120,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(needed_classes && arg0.type().id()==ID_symbol)
+      if(lazy_methods && arg0.type().id()==ID_symbol)
       {
-        needed_classes->insert(
+        lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
       results[0]=java_bytecode_promotion(symbol_expr);
@@ -2127,9 +2147,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(needed_classes && arg0.type().id()==ID_symbol)
+      if(lazy_methods && arg0.type().id()==ID_symbol)
       {
-        needed_classes->insert(
+        lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
       c=code_assignt(symbol_expr, op[0]);
@@ -2747,8 +2767,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<std::vector<irep_idt> > needed_methods,
-  safe_pointer<std::set<irep_idt> > needed_classes)
+  safe_pointer<ci_lazy_methodst> lazy_methods)
 {
   static const std::unordered_set<std::string> methods_to_ignore
   {
@@ -2777,8 +2796,7 @@ void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
-    needed_methods,
-    needed_classes);
+    lazy_methods);
 
   java_bytecode_convert_method(class_symbol, method);
 }

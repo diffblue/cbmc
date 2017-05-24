@@ -217,8 +217,7 @@ void dott::write_dot_subgraph(
         write_edge(out, *it, **frit, flabel);
 
       seen.insert(it);
-      goto_programt::const_targetst temp;
-      goto_program.get_successors(it, temp);
+      const auto temp=goto_program.get_successors(it);
       worklist.insert(worklist.end(), temp.begin(), temp.end());
     }
   }

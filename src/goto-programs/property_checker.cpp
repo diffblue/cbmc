@@ -24,10 +24,10 @@ std::string property_checkert::as_string(resultt result)
 {
   switch(result)
   {
-  case property_checkert::PASS: return "OK";
-  case property_checkert::FAIL: return "FAILURE";
-  case property_checkert::ERROR: return "ERROR";
-  case property_checkert::UNKNOWN: return "UNKNOWN";
+  case property_checkert::resultt::PASS: return "OK";
+  case property_checkert::resultt::FAIL: return "FAILURE";
+  case property_checkert::resultt::ERROR: return "ERROR";
+  case property_checkert::resultt::UNKNOWN: return "UNKNOWN";
   }
 
   return "";
@@ -82,7 +82,7 @@ void property_checkert::initialize_property_map(
         irep_idt property_id=source_location.get_property_id();
 
         property_statust &property_status=property_map[property_id];
-        property_status.result=UNKNOWN;
+        property_status.result=resultt::UNKNOWN;
         property_status.location=i_it;
       }
     }
