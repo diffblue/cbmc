@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/json.h>
+#include <util/json_expr.h>
 #include <util/xml.h>
 
 #include <analyses/interval_domain.h>
@@ -17,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "static_analyzer.h"
 
-template<class analyzerT>
+template<typename analyzerT>
 class static_analyzert:public messaget
 {
 public:
@@ -91,7 +92,8 @@ void static_analyzert<analyzerT>::plain_text_report()
       if(!i_it->is_assert())
         continue;
 
-      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
+      exprt e(i_it->guard);
+      domain[i_it].ai_simplify(e, ns);
 
       result() << '[' << i_it->source_location.get_property_id()
                << ']' << ' ';
@@ -103,17 +105,20 @@ void static_analyzert<analyzerT>::plain_text_report()
 
       result() << ": ";
 
-      if(simplified.is_true())
+      if(e.is_true())
       {
-        result() << "SUCCESS"; pass++;
+        result() << "Success";
+        pass++;
       }
-      else if(simplified.is_false())
+      else if(e.is_false())
       {
-        result() << "FAILURE (if reachable)"; fail++;
+        result() << "Failure (if reachable)";
+        fail++;
       }
       else
       {
-        result() << "UNKNOWN"; unknown++;
+        result() << "Unknown";
+        unknown++;
       }
 
       result() << eom;
@@ -122,7 +127,7 @@ void static_analyzert<analyzerT>::plain_text_report()
     status() << '\n';
   }
 
-  status() << "SUMMARY: " << pass << " pass, " << fail << " fail if reachable, "
+  status() << "Summary: " << pass << " pass, " << fail << " fail if reachable, "
            << unknown << " unknown\n";
 }
 
@@ -146,21 +151,19 @@ void static_analyzert<analyzerT>::json_report()
       if(!i_it->is_assert())
         continue;
 
-      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
+      exprt e(i_it->guard);
+      domain[i_it].ai_simplify(e, ns);
 
       json_objectt &j=json_result.push_back().make_object();
 
-      if(simplified.is_true())
+      if(e.is_true())
         j["status"]=json_stringt("SUCCESS");
-      else if(simplified.is_false())
+      else if(e.is_false())
         j["status"]=json_stringt("FAILURE (if reachable)");
       else
         j["status"]=json_stringt("UNKNOWN");
 
-      j["file"]=json_stringt(id2string(i_it->source_location.get_file()));
-      j["line"]=json_numbert(id2string(i_it->source_location.get_line()));
-      j["description"]=json_stringt(id2string(
-        i_it->source_location.get_comment()));
+      j["sourceLocation"]=json(i_it->source_location);
     }
   }
   status() << "Writing JSON report" << eom;
@@ -187,13 +190,14 @@ void static_analyzert<analyzerT>::xml_report()
       if(!i_it->is_assert())
         continue;
 
-      exprt simplified=domain[i_it].domain_simplify(i_it->guard, ns);
+      exprt e(i_it->guard);
+      domain[i_it].ai_simplify(e, ns);
 
       xmlt &x=xml_result.new_element("result");
 
-      if(simplified.is_true())
+      if(e.is_true())
         x.set_attribute("status", "SUCCESS");
-      else if(simplified.is_false())
+      else if(e.is_false())
         x.set_attribute("status", "FAILURE (if reachable)");
       else
         x.set_attribute("status", "UNKNOWN");
