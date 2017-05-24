@@ -1,9 +1,6 @@
 /*******************************************************************\
-
 Module: CBMC Command Line Option Processing
-
 Author: Daniel Kroening, kroening@kroening.com
-
 \*******************************************************************/
 
 /// \file
@@ -55,11 +52,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
+#include <analyses/goto_check.h>
+
 #include <langapi/mode.h>
 
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
+#include "bmc_incremental_one_loop.h"
+#include "bmc_incremental.h"
 #include "version.h"
 #include "xml_interface.h"
 
@@ -181,8 +182,17 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       cmdline.get_value("localize-faults-method"));
   }
 
+  if(cmdline.isset("unwind-max"))
+    options.set_option("unwind-max", cmdline.get_value("unwind-max"));
+  if(cmdline.isset("unwind-min"))
+    options.set_option("unwind-min", cmdline.get_value("unwind-min"));
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
+
+  if(cmdline.isset("ignore-assertions-before-unwind-min"))
+    options.set_option("ignore-assertions-before-unwind-min", true);
+  if(cmdline.isset("stop-when-unsat"))
+    options.set_option("stop-when-unsat", true);
 
   if(cmdline.isset("depth"))
     options.set_option("depth", cmdline.get_value("depth"));
@@ -195,6 +205,25 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.get_value("unwindset"));
+
+  if(cmdline.isset("incremental"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+    options.set_option("incremental", true);
+  }
+  if(cmdline.isset("incremental-check"))
+  {
+    options.set_option("refine", true);
+    options.set_option("refine-arrays", true);
+    options.set_option(
+      "incremental-check", cmdline.get_value("incremental-check"));
+  }
+  if(cmdline.isset("earliest-loop-exit"))
+    options.set_option("earliest-loop-exit", true);
+  // heuristic unwinding numbers used for SV-COMP
+  if(cmdline.isset("magic-numbers"))
+    options.set_option("magic-numbers", true);
 
   // constant propagation
   if(cmdline.isset("no-propagation"))
@@ -420,6 +449,28 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       cmdline.get_value("symex-coverage-report"));
 }
 
+
+bool cbmc_parse_optionst::options_exclusive(const char *opt1, const char *opt2)
+{
+  if(cmdline.isset(opt1) && cmdline.isset(opt2))
+  {
+    error() << "--" << opt1 << " cannot be used with --" << opt2 << eom;
+    return true;
+  }
+  return false;
+}
+
+
+bool cbmc_parse_optionst::options_inclusive(const char *opt1, const char *opt2)
+{
+  if(cmdline.isset(opt1) && !cmdline.isset(opt2))
+  {
+    error() << "--" << opt1 << " can only be used with --" << opt2 << eom;
+    return true;
+  }
+  return false;
+}
+
 /// invoke main modules
 int cbmc_parse_optionst::doit()
 {
@@ -457,6 +508,13 @@ int cbmc_parse_optionst::doit()
     return 1; // should contemplate EX_USAGE from sysexits.h
   }
 
+  if(options_exclusive("incremental", "unwind") ||
+     options_exclusive("incremental", "incremental-check") ||
+     options_inclusive("earliest-loop-exit", "incremental"))
+  {
+    return 1;
+  }
+
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
@@ -469,6 +527,38 @@ int cbmc_parse_optionst::doit()
   }
 
   goto_functionst goto_functions;
+
+  // get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 1; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
+
+  std::unique_ptr<bmct> bmc;
+  if(options.get_option("incremental-check")!="")
+    bmc=std::unique_ptr<bmct>(
+      new bmc_incremental_one_loopt(
+        options, symbol_table, ui_message_handler, prop_conv, goto_functions));
+  else if(options.get_bool_option("incremental"))
+    bmc=std::unique_ptr<bmct>(
+      new bmc_incrementalt(
+        options, symbol_table, ui_message_handler, prop_conv, goto_functions));
+  else
+    bmc=std::unique_ptr<bmct>(
+      new bmct(options, symbol_table, ui_message_handler, prop_conv));
 
   expr_listt bmc_constraints;
 
@@ -494,29 +584,8 @@ int cbmc_parse_optionst::doit()
   if(options.get_bool_option("java-unwind-enum-static"))
     remove_static_init_loops(symbol_table, goto_functions, options);
 
-  // get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
-
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-
-  try
-  {
-    cbmc_solver=cbmc_solvers.get_solver();
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return 1; // should contemplate EX_SOFTWARE from sysexits.h
-  }
-
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
-
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
-
   // do actual BMC
-  return do_bmc(bmc, goto_functions);
+  return do_bmc(*bmc, goto_functions);
 }
 
 bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)
@@ -928,7 +997,7 @@ int cbmc_parse_optionst::do_bmc(
   int result=6;
 
   // do actual BMC
-  switch(bmc.run(goto_functions))
+  switch(bmc(goto_functions))
   {
     case safety_checkert::resultt::SAFE:
       result=0;
@@ -939,6 +1008,9 @@ int cbmc_parse_optionst::do_bmc(
     case safety_checkert::resultt::ERROR:
       result=6;
       break;
+    case safety_checkert::resultt::UNKNOWN:
+     result=6;
+     break;
   }
 
   // let's log some more statistics
@@ -1051,6 +1123,17 @@ void cbmc_parse_optionst::help()
     " --unwind nr                  unwind nr times\n"
     " --unwindset L:B,...          unwind loop L with a bound of B\n"
     "                              (use --show-loops to get the loop IDs)\n"
+    " --incremental                check after each unwinding\n"
+    " --incremental-check L        check after each unwinding of loop L\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --unwind-min nr              start incremental check after nr unwindings\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --unwind-max nr              stop incremental check after nr unwindings\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --earliest-loop-exit         stop unwinding as soon as possible\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --ignore-assertions-before-unwind-min     only check loop assertions after loop unwound to unwind-min\n"
+    " --stop-when-unsat            for step case in k-induction checks\n"
     " --show-vcc                   show the verification conditions\n"
     " --slice-formula              remove assignments unrelated to property\n"
     " --unwinding-assertions       generate unwinding assertions\n"
