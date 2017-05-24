@@ -83,11 +83,11 @@ Function: get_static_type
 
  Outputs:
 
- Purpose: 
+ Purpose: Returns the compile type of an exception
 
 \*******************************************************************/
 
-static irep_idt get_static_type(const typet &type)
+irep_idt uncaught_exceptions_domaint::get_static_type(const typet &type)
 {
   if(type.id()==ID_pointer)
   {
@@ -98,6 +98,26 @@ static irep_idt get_static_type(const typet &type)
      return to_symbol_type(type).get_identifier();
   }
   return ID_empty;
+}
+
+/*******************************************************************\
+
+Function: get_exception_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Returns the symbol corresponding to an exception
+
+\*******************************************************************/
+
+exprt uncaught_exceptions_domaint::get_exception_symbol(const exprt &expr)
+{
+  if(expr.id()!=ID_symbol && expr.has_operands())
+    return get_exception_symbol(expr.op0());
+
+  return expr;
 }
 
 /*******************************************************************\
@@ -148,16 +168,20 @@ void uncaught_exceptions_domaint::transform(
   {
   case THROW:
   {
-    const exprt &exc_symbol=instruction.code;
-
+    const exprt &exc_symbol=get_exception_symbol(instruction.code);
     // retrieve the static type of the thrown exception
     const irep_idt &type_id=get_static_type(exc_symbol.type());
-    join(type_id);
-    // we must consider all the subtypes given that
-    // the runtime type is a subtype of the static type
-    std::set<irep_idt> subtypes;
-    get_subtypes(type_id, subtypes, ns);
-    join(subtypes);
+    bool assertion_error=
+      id2string(type_id).find("java.lang.AssertionError")!=std::string::npos;
+    if(!assertion_error)
+    {
+      join(type_id);
+      // we must consider all the subtypes given that
+      // the runtime type is a subtype of the static type
+      std::set<irep_idt> subtypes;
+      get_subtypes(type_id, subtypes, ns);
+      join(subtypes);
+    }
     break;
   }
   case CATCH:
