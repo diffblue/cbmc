@@ -38,7 +38,21 @@ public:
     type_map.insert(std::pair<irep_idt, typet>(identifier, type));
   }
 
-  virtual bool replace(exprt &dest) const;
+  /* If you are replacing symbols with constants in an l-value, you can
+   * create something that is not an l-value.   For example if your
+   * l-value is "a[i]" then substituting i for a constant results in an
+   * l-value but substituting a for a constant (array) wouldn't.  This
+   * only applies to the "top level" of the expression, for example, it
+   * is OK to replace b with a constant array in a[b[0]].
+   *
+   * If replace_with_const == false then it disables the rewrites that
+   * could result in something that is not an l-value.
+   */
+
+  virtual bool replace(
+    exprt &dest,
+    const bool replace_with_const=true) const;
+
   virtual bool replace(typet &dest) const;
 
   void operator()(exprt &dest) const

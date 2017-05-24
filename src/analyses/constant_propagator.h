@@ -12,12 +12,11 @@ Author: Peter Schrammel
 #ifndef CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 #define CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 
-#include <iostream>
+#include <iosfwd>
+#include <util/replace_symbol.h>
 
 #include "ai.h"
 #include "dirty.h"
-
-#include "replace_symbol_ext.h"
 
 class constant_propagator_domaint:public ai_domain_baset
 {
@@ -63,7 +62,7 @@ public:
     valuest():is_bottom(true) {}
 
     // maps variables to constants
-    replace_symbol_extt replace_const;
+    replace_symbolt replace_const;
     bool is_bottom;
 
     bool merge(const valuest &src);
@@ -143,6 +142,8 @@ public:
     goto_functionst &goto_functions,
     const namespacet &ns):dirty(goto_functions)
   {
+    assert(false);
+
     operator()(goto_functions, ns);
     replace(goto_functions, ns);
   }
@@ -151,6 +152,8 @@ public:
     goto_functionst::goto_functiont &goto_function,
     const namespacet &ns):dirty(goto_function)
   {
+    assert(false);
+
     operator()(goto_function, ns);
     replace(goto_function, ns);
   }
