@@ -109,10 +109,8 @@ void remove_exceptionst::add_exceptional_returns(
     return;
   }
 
-  // We generate an exceptional return value for any function that has
-  // a throw or a function call. This can be improved by only considering
-  // function calls that may escape exceptions. However, this will
-  // require multiple passes.
+  // We generate an exceptional return value for any function that
+  // contains a throw or a function call that may escape exceptions.
   bool add_exceptional_var=false;
   bool has_uncaught_exceptions=false;
   forall_goto_program_instructions(instr_it, goto_program)
@@ -127,7 +125,17 @@ void remove_exceptionst::add_exceptional_returns(
       has_uncaught_exceptions=!exceptions_map[function_name].empty();
     }
 
-    if(instr_it->is_throw() || has_uncaught_exceptions)
+    const exprt &exc =
+      uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
+    bool assertion_error =
+      id2string(uncaught_exceptions_domaint::get_static_type(exc.type())).
+      find("java.lang.AssertionError")!=std::string::npos;
+
+    // if we find a throw that is not AssertionError of a function call
+    // that may escape exceptions, then we add an exceptional return
+    // variable
+    if((instr_it->is_throw() && !assertion_error)
+       || has_uncaught_exceptions)
     {
       add_exceptional_var=true;
       break;
@@ -243,6 +251,18 @@ void remove_exceptionst::instrument_throw(
 {
   assert(instr_it->type==THROW);
 
+  const exprt &exc_expr=
+    uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
+  bool assertion_error=id2string(
+    uncaught_exceptions_domaint::get_static_type(exc_expr.type())).
+    find("java.lang.AssertionError")!=std::string::npos;
+
+  // we don't count AssertionError (we couldn't catch it anyway
+  // and this may reduce the instrumentation considerably if the programmer
+  // used assertions)
+  if(assertion_error)
+    return;
+
   goto_programt &goto_program=func_it->second.body;
   const irep_idt &function_id=func_it->first;
 
@@ -302,9 +322,9 @@ void remove_exceptionst::instrument_throw(
   }
 
   // replace "throw x;" by "f#exception_value=x;"
-  exprt exc_expr=instr_it->code;
-  while(exc_expr.id()!=ID_symbol && exc_expr.has_operands())
-    exc_expr=exc_expr.op0();
+  // exprt exc_expr=instr_it->code;
+  // while(exc_expr.id()!=ID_symbol && exc_expr.has_operands())
+  //   exc_expr=exc_expr.op0();
 
   // add the assignment with the appropriate cast
   code_assignt assignment(typecast_exprt(exc_thrown, exc_expr.type()),

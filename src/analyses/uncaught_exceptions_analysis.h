@@ -36,6 +36,10 @@ class uncaught_exceptions_domaint
     stack_caught.clear();
   }
 
+  static irep_idt get_static_type(const typet &type);
+
+  static exprt get_exception_symbol(const exprt &exor);
+
   void get_elements(std::set<irep_idt> &elements);
 
  private:
