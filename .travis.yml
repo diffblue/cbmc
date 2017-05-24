@@ -98,12 +98,13 @@ matrix:
         - ln -s /usr/bin/gcov-5 bin/gcov
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env: COMPILER=g++-5
+      install:
+        - COMMAND="make -C src minisat2-download" &&
+          eval ${PRE_COMMAND} ${COMMAND}
+        - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"--coverage\" LINKFLAGS=\"--coverage\" -j2" &&
+          eval ${PRE_COMMAND} ${COMMAND}
       script:
-        - if [ -L bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-          COMMAND="make -C src minisat2-download" &&
-          eval ${PRE_COMMAND} ${COMMAND} &&
-          COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"--coverage\" LINKFLAGS=\"--coverage\" -j2" &&
-          eval ${PRE_COMMAND} ${COMMAND} &&
+        - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
           COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
           eval ${PRE_COMMAND} ${COMMAND}
       after_success:
