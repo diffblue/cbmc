@@ -267,6 +267,8 @@ private:
     const function_application_exprt &expr);
   string_exprt add_axioms_for_to_upper_case(
     const function_application_exprt &expr);
+  string_exprt add_axioms_for_to_upper_case(
+    const string_exprt &expr);
   string_exprt add_axioms_for_trim(const function_application_exprt &expr);
 
   // Add axioms corresponding to the String.valueOf([CII) function

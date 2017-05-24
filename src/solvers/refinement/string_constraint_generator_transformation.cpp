@@ -277,9 +277,8 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
 /// \par parameters: function application with one string argument
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
-  const function_application_exprt &expr)
+  const string_exprt &str)
 {
-  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -323,6 +322,15 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   return res;
 }
 
+/// add axioms corresponding to the String.toUpperCase java function
+/// \param expr: function application with one string argument
+/// \return a new string expression
+string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
+  const function_application_exprt &expr)
+{
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
+  return add_axioms_for_to_upper_case(str);
+}
 
 /// add axioms corresponding stating that the result is similar to that of the
 /// StringBuilder.setCharAt java function Warning: this may be underspecified in
