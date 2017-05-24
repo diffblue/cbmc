@@ -65,6 +65,7 @@ void symex_bmct::symex_step(
   }
 
   const goto_programt::const_targett cur_pc=state.source.pc;
+  const guardt cur_guard=state.guard;
 
   if(!state.guard.is_false() &&
      state.source.pc->is_assume() &&
@@ -84,16 +85,23 @@ void symex_bmct::symex_step(
   goto_symext::symex_step(goto_functions, state);
 
   if(record_coverage &&
-     // is the instruction being executed
-     !state.guard.is_false() &&
      // avoid an invalid iterator in state.source.pc
      (!cur_pc->is_end_function() ||
-      cur_pc->function!=goto_functions.entry_point()) &&
-     // ignore transition to next instruction when goto points elsewhere
-     (!cur_pc->is_goto() ||
-      cur_pc->get_target()==state.source.pc ||
-      !cur_pc->guard.is_true()))
-    symex_coverage.covered(cur_pc, state.source.pc);
+      cur_pc->function!=goto_functions.entry_point()))
+  {
+    // forward goto will effectively be covered via phi function,
+    // which does not invoke symex_step; as symex_step is called
+    // before merge_gotos, also state.guard will be false (we have
+    // taken an impossible transition); thus we synthesize a
+    // transition from the goto instruction to its target to make
+    // sure the goto is considered covered
+    if(cur_pc->is_goto() &&
+       cur_pc->get_target()!=state.source.pc &&
+       cur_pc->guard.is_true())
+      symex_coverage.covered(cur_pc, cur_pc->get_target());
+    else if(!state.guard.is_false())
+      symex_coverage.covered(cur_pc, state.source.pc);
+  }
 }
 
 /*******************************************************************\

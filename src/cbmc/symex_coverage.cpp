@@ -131,6 +131,29 @@ static std::string rate(
 
 /*******************************************************************\
 
+Function: rate_detailed
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+static std::string rate_detailed(
+  std::size_t covered,
+  std::size_t total,
+  bool per_cent=false)
+{
+  std::ostringstream oss;
+  oss << rate(covered, total, per_cent)
+      << " (" << covered << '/' << total << ')';
+  return oss.str();
+}
+
+/*******************************************************************\
+
 Function: goto_program_coverage_recordt::goto_program_coverage_recordt
 
   Inputs:
@@ -187,7 +210,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
                     from_type(ns, gf_it->first, sig_type));
 
   xml.set_attribute("line-rate",
-                    rate(lines_covered, lines_total));
+                    rate_detailed(lines_covered, lines_total));
   xml.set_attribute("branch-rate",
                     rate(branches_covered, branches_total));
 
@@ -219,10 +242,9 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
         condition.set_attribute("coverage", rate(taken, 2, true));
       }
 
-      std::ostringstream oss;
-      oss << rate(total_taken, number*2, true)
-          << " (" << total_taken << '/' << number*2 << ')';
-      line.set_attribute("condition-coverage", oss.str());
+      line.set_attribute(
+        "condition-coverage",
+        rate_detailed(total_taken, number*2, true));
     }
   }
 }
@@ -292,7 +314,8 @@ void goto_program_coverage_recordt::compute_coverage_lines(
         if(entry.first->second.hits==0)
           ++lines_covered;
 
-        entry.first->second.hits+=cov.second.num_executions;
+        if(cov.second.num_executions>entry.first->second.hits)
+          entry.first->second.hits=cov.second.num_executions;
 
         if(is_branch)
         {
