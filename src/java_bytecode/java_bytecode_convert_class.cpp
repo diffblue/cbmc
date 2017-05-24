@@ -51,13 +51,14 @@ public:
   {
     add_array_types();
 
-    if(parse_tree.loading_successful)
+    bool loading_success=parse_tree.loading_successful;
+    if(loading_success)
       convert(parse_tree.parsed_class);
-    else if(string_preprocess.is_known_string_type(
-              parse_tree.parsed_class.name))
+
+    if(string_preprocess.is_known_string_type(parse_tree.parsed_class.name))
       string_preprocess.add_string_type(
         parse_tree.parsed_class.name, symbol_table);
-    else
+    else if(!loading_success)
       generate_class_stub(
         parse_tree.parsed_class.name,
         symbol_table,

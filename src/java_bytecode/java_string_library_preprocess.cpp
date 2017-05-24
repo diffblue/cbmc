@@ -299,7 +299,10 @@ void java_string_library_preprocesst::add_string_type(
   string_symbol.type=string_type;
   string_symbol.is_type=true;
 
-  symbol_table.add(string_symbol);
+  // Overwrite any pre-existing symbol in the table, e.g. created by
+  // a loaded model.
+  symbol_table.remove(string_symbol.name);
+  assert(!symbol_table.add(string_symbol));
 }
 
 /// add a symbol in the table with static lifetime and name containing
