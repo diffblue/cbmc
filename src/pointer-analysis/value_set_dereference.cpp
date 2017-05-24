@@ -28,8 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/byte_operators.h>
 #include <util/ssa_expr.h>
-
 #include <util/c_types.h>
+
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>
@@ -576,6 +576,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
       // are we doing a byte?
       mp_integer element_size=
+        dereference_type.id()==ID_empty?
+        pointer_offset_size(char_type(), ns):
         pointer_offset_size(dereference_type, ns);
 
       if(element_size==1)
