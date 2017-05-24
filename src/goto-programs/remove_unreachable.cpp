@@ -56,6 +56,19 @@ void remove_unreachable(goto_programt &goto_program)
   }
 }
 
+/*******************************************************************\
+
+Function: remove_unreachable
+
+  Inputs: The goto functions from which the unreachable functions are
+          to be removed.
+
+ Outputs: None.
+
+ Purpose: Removes unreachable instructions from all functions.
+
+\*******************************************************************/
+
 void remove_unreachable(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)

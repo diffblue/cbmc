@@ -40,10 +40,17 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final;
 
+protected:
+  bool join(const interval_domaint &b);
+
+public:
   bool merge(
     const interval_domaint &b,
     locationt from,
-    locationt to);
+    locationt to)
+  {
+    return join(b);
+  }
 
   // no states
   void make_bottom() final
@@ -85,7 +92,11 @@ public:
     return bottom;
   }
 
-private:
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns) const override;
+
+protected:
   bool bottom;
 
   typedef std::map<irep_idt, integer_intervalt> int_mapt;
