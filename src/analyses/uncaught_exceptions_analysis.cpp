@@ -67,13 +67,11 @@ irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 /// Returns the symbol corresponding to an exception
 irep_idt uncaught_exceptions_domaint::get_static_type(const typet &type)
 {
-  if(type.id()==ID_pointer)
+  assert(type.id()==ID_pointer);
+
+  if(type.subtype().id()==ID_symbol)
   {
-    return get_static_type(type.subtype());
-  }
-  else if(type.id()==ID_symbol)
-  {
-     return to_symbol_type(type).get_identifier();
+    return to_symbol_type(type.subtype()).get_identifier();
   }
   return ID_empty;
 }
@@ -121,7 +119,7 @@ void uncaught_exceptions_domaint::transform(
   {
     const exprt &exc_symbol=get_exception_symbol(instruction.code);
     // retrieve the static type of the thrown exception
-    const irep_idt &type_id=get_static_type(exc_symbol.type());
+    const irep_idt &type_id=get_exception_type(exc_symbol.type());
     bool assertion_error=
       id2string(type_id).find("java.lang.AssertionError")!=std::string::npos;
     if(!assertion_error)
@@ -163,12 +161,7 @@ void uncaught_exceptions_domaint::transform(
           join(caught);
           // remove the caught exceptions
           for(const auto &exc_id : caught)
-          {
-            const std::set<irep_idt>::iterator it=
-              std::find(thrown.begin(), thrown.end(), exc_id);
-            if(it!=thrown.end())
-              thrown.erase(it);
-          }
+            thrown.erase(exc_id);
           stack_caught.pop_back();
         }
       }
@@ -228,11 +221,12 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
         domain.transform(instr_it, *this, ns);
       }
       // did our estimation for the current function improve?
-      std::set<irep_idt> elements;
-      domain.get_elements(elements);
-      change=change||
-        exceptions_map[current_function->first].size()!=elements.size();
-      exceptions_map[current_function->first]=elements;
+      const std::set<irep_idt> &elements=domain.get_elements();
+      if(exceptions_map[current_function->first].size()<elements.size())
+      {
+        change=true;
+        exceptions_map[current_function->first]=elements;
+      }
     }
   }
 }

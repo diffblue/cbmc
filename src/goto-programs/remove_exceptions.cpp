@@ -96,7 +96,7 @@ void remove_exceptionst::add_exceptional_returns(
     const symbolt &symbol=
       symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
     symbol_exprt lhs_expr_null=symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
     goto_programt::targett t_null=
       goto_program.insert_before(goto_program.instructions.begin());
     t_null->make_assignment();
@@ -111,10 +111,9 @@ void remove_exceptionst::add_exceptional_returns(
 
   // We generate an exceptional return value for any function that
   // contains a throw or a function call that may escape exceptions.
-  bool add_exceptional_var=false;
-  bool has_uncaught_exceptions=false;
   forall_goto_program_instructions(instr_it, goto_program)
   {
+    bool has_uncaught_exceptions=false;
     if(instr_it->is_function_call())
     {
       const exprt &function_expr=
@@ -125,52 +124,52 @@ void remove_exceptionst::add_exceptional_returns(
       has_uncaught_exceptions=!exceptions_map[function_name].empty();
     }
 
-    const exprt &exc =
-      uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
-    bool assertion_error =
-      id2string(uncaught_exceptions_domaint::get_static_type(exc.type())).
-      find("java.lang.AssertionError")!=std::string::npos;
+    bool assertion_error=false;
+    if(instr_it->is_throw())
+    {
+      const exprt &exc =
+        uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
+      assertion_error =
+        id2string(uncaught_exceptions_domaint::get_exception_type(exc.type())).
+        find("java.lang.AssertionError")!=std::string::npos;
+    }
 
-    // if we find a throw that is not AssertionError of a function call
+    // if we find a throw different from AssertionError or a function call
     // that may escape exceptions, then we add an exceptional return
     // variable
     if((instr_it->is_throw() && !assertion_error)
        || has_uncaught_exceptions)
     {
-      add_exceptional_var=true;
+      // look up the function symbol
+      symbol_tablet::symbolst::iterator s_it=
+        symbol_table.symbols.find(function_id);
+
+      assert(s_it!=symbol_table.symbols.end());
+
+      auxiliary_symbolt new_symbol;
+      new_symbol.is_static_lifetime=true;
+      new_symbol.module=function_symbol.module;
+      new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
+      new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
+      new_symbol.mode=function_symbol.mode;
+      new_symbol.type=typet(ID_pointer, empty_typet());
+      symbol_table.add(new_symbol);
+
+      // initialize the exceptional return with NULL
+      symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
+      null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
+      goto_programt::targett t_null=
+        goto_program.insert_before(goto_program.instructions.begin());
+      t_null->make_assignment();
+      t_null->source_location=
+        goto_program.instructions.begin()->source_location;
+      t_null->code=code_assignt(
+        lhs_expr_null,
+        rhs_expr_null);
+      t_null->function=function_id;
+
       break;
     }
-  }
-
-  if(add_exceptional_var)
-  {
-    // look up the function symbol
-    symbol_tablet::symbolst::iterator s_it=
-      symbol_table.symbols.find(function_id);
-
-    assert(s_it!=symbol_table.symbols.end());
-
-    auxiliary_symbolt new_symbol;
-    new_symbol.is_static_lifetime=true;
-    new_symbol.module=function_symbol.module;
-    new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
-    new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
-    new_symbol.mode=function_symbol.mode;
-    new_symbol.type=pointer_type(empty_typet());
-    symbol_table.add(new_symbol);
-
-    // initialize the exceptional return with NULL
-    symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
-    goto_programt::targett t_null=
-      goto_program.insert_before(goto_program.instructions.begin());
-    t_null->make_assignment();
-    t_null->source_location=
-      goto_program.instructions.begin()->source_location;
-    t_null->code=code_assignt(
-      lhs_expr_null,
-      rhs_expr_null);
-    t_null->function=function_id;
   }
 }
 
@@ -254,7 +253,7 @@ void remove_exceptionst::instrument_throw(
   const exprt &exc_expr=
     uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
   bool assertion_error=id2string(
-    uncaught_exceptions_domaint::get_static_type(exc_expr.type())).
+    uncaught_exceptions_domaint::get_exception_type(exc_expr.type())).
     find("java.lang.AssertionError")!=std::string::npos;
 
   // we don't count AssertionError (we couldn't catch it anyway
@@ -320,11 +319,6 @@ void remove_exceptionst::instrument_throw(
     t_dead->source_location=instr_it->source_location;
     t_dead->function=instr_it->function;
   }
-
-  // replace "throw x;" by "f#exception_value=x;"
-  // exprt exc_expr=instr_it->code;
-  // while(exc_expr.id()!=ID_symbol && exc_expr.has_operands())
-  //   exc_expr=exc_expr.op0();
 
   // add the assignment with the appropriate cast
   code_assignt assignment(typecast_exprt(exc_thrown, exc_expr.type()),
