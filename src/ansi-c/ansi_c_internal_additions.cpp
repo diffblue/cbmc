@@ -158,6 +158,8 @@ void ansi_c_internal_additions(std::string &code)
     "signed __CPROVER_POINTER_OFFSET(const void *p);\n"
     "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);\n"
 
     // malloc
     "void *__CPROVER_malloc(__CPROVER_size_t size);\n"

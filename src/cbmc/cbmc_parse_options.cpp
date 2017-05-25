@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_static_init_loops.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -503,27 +504,6 @@ int cbmc_parse_optionst::doit()
 
   goto_functionst goto_functions;
 
-  // get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
-
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-
-  try
-  {
-    cbmc_solver=cbmc_solvers.get_solver();
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return 1; // should contemplate EX_SOFTWARE from sysexits.h
-  }
-
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
-
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
-
   expr_listt bmc_constraints;
 
   int get_goto_program_ret=
@@ -551,7 +531,7 @@ int cbmc_parse_optionst::doit()
     remove_static_init_loops(symbol_table, goto_functions, options);
 
   // do actual BMC
-  return do_bmc(bmc, goto_functions);
+  return do_bmc(options, goto_functions);
 }
 
 /*******************************************************************\
@@ -888,6 +868,8 @@ bool cbmc_parse_optionst::process_goto_program(
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
 
+    mm_io(symbol_table, goto_functions);
+
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -1002,9 +984,29 @@ Function: cbmc_parse_optionst::do_bmc
 \*******************************************************************/
 
 int cbmc_parse_optionst::do_bmc(
-  bmct &bmc,
+  const optionst &options,
   const goto_functionst &goto_functions)
 {
+  // get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    throw 0;
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
+
+  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
   bmc.set_ui(get_ui());
 
   int result=6;
