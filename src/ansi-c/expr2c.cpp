@@ -4709,9 +4709,6 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()=="buffer_size")
     return convert_function(src, "BUFFER_SIZE", precedence=16);
 
-  else if(src.id()==ID_pointer_offset)
-    return convert_function(src, "POINTER_OFFSET", precedence=16);
-
   else if(src.id()==ID_isnan)
     return convert_function(src, "isnan", precedence=16);
 

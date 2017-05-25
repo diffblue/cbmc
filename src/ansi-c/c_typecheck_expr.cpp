@@ -2473,9 +2473,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
-    pointer_offset_expr.operands()=expr.arguments();
+    exprt pointer_offset_expr=pointer_offset(expr.arguments().front());
     pointer_offset_expr.add_source_location()=source_location;
+
+    if(expr.type()!=pointer_offset_expr.type())
+      pointer_offset_expr.make_typecast(expr.type());
 
     return pointer_offset_expr;
   }

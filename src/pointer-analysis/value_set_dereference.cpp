@@ -476,9 +476,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
-    exprt pointer_offset=unary_exprt(
-      ID_pointer_offset, pointer_expr, index_type());
-
     if(base_type_eq(
          ns.follow(memory_symbol.type).subtype(),
          dereference_type, ns))
@@ -486,7 +483,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Types match already, what a coincidence!
       // We can use an index expression.
 
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=index_expr;
     }
@@ -494,7 +491,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
               ns.follow(memory_symbol.type).subtype(),
               dereference_type))
     {
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=typecast_exprt(index_expr, dereference_type);
     }
@@ -509,7 +506,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
       {
         exprt byte_extract(byte_extract_id(), dereference_type);
-        byte_extract.copy_to_operands(symbol_expr, pointer_offset);
+        byte_extract.copy_to_operands(
+          symbol_expr, pointer_offset(pointer_expr));
         result.value=byte_extract;
       }
     }
@@ -570,7 +568,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(o.offset().is_constant())
         offset=o.offset();
       else
-        offset=unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+        offset=pointer_offset(pointer_expr);
 
       exprt adjusted_offset;
 
@@ -626,8 +624,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=o.root_object();
 
       // this is relative to the root object
-      const exprt offset=
-        unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+      const exprt offset=pointer_offset(pointer_expr);
 
       if(memory_model(result.value, dereference_type, tmp_guard, offset))
       {

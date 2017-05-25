@@ -394,9 +394,8 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
       return true;
 
     // this might change the type of the pointer!
-    exprt pointer_offset(ID_pointer_offset, expr.type());
-    pointer_offset.copy_to_operands(ptr_expr.front());
-    simplify_node(pointer_offset);
+    exprt pointer_offset_expr=pointer_offset(ptr_expr.front());
+    simplify_node(pointer_offset_expr);
 
     exprt sum;
 
@@ -417,7 +416,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     simplify_node(product);
 
-    expr=binary_exprt(pointer_offset, ID_plus, product, expr.type());
+    expr=binary_exprt(pointer_offset_expr, ID_plus, product, expr.type());
 
     simplify_node(expr);
 
