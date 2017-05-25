@@ -13,14 +13,14 @@ Author: Peter Schrammel, Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/options.h>
-
 #include <solvers/prop/prop_conv.h>
 #include <goto-symex/symex_target_equation.h>
+#include <goto-symex/memory_model.h>
 
 #include "symex_bmc_incremental_one_loop.h"
 #include "bv_cbmc.h"
 #include "bmc.h"
-#include <goto-symex/memory_model.h>
+
 
 class bmc_incremental_one_loopt:public bmct
 {
