@@ -47,8 +47,8 @@ public:
     prop_conv(_prop_conv),
     ui(ui_message_handlert::uit::PLAIN)
   {
-    symex.constant_propagation=options.get_bool_option("propagation");
-    symex.record_coverage=
+    symex().constant_propagation=options.get_bool_option("propagation");
+    symex().record_coverage=
       !options.get_option("symex-coverage-report").empty();
   }
 

@@ -90,7 +90,7 @@ bool goto_symext::symex_goto(statet &state)
 
       // next instruction
       state.source.pc++;
-      return;
+      return false; //I'm not sure if this is right..
     }
 
     goto_symex_statet::framet::loop_infot &loop_info=
@@ -140,7 +140,7 @@ bool goto_symext::symex_goto(statet &state)
     if(state_pc==goto_target)
     {
       state.source.pc=goto_target;
-      return; // nothing else to do
+      return false; // nothing else to do
     }
   }
   else

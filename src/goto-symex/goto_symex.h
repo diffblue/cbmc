@@ -52,7 +52,6 @@ public:
     remaining_vccs(0),
     constant_propagation(true),
     new_symbol_table(_new_symbol_table),
-    language_mode(),
     ignore_assertions(false),
     ns(_ns),
     target(_target),

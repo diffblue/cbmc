@@ -221,10 +221,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
   if(cmdline.isset("earliest-loop-exit"))
     options.set_option("earliest-loop-exit", true);
-<<<<<<< 0bc503ae07a912ec82d5c337f453520219aac395
+
   // heuristic unwinding numbers used for SV-COMP
-=======
->>>>>>> HEAD~15
   if(cmdline.isset("magic-numbers"))
     options.set_option("magic-numbers", true);
 

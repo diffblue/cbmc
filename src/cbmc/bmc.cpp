@@ -393,7 +393,7 @@ safety_checkert::resultt bmct::initialize()
   {
     const symbolt *init_symbol;
     if(!ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
-      symex.language_mode=init_symbol->mode;
+      symex().language_mode=init_symbol->mode;
   }
 
   status() << "Starting Bounded Model Checking" << eom;
@@ -435,7 +435,7 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
   catch(std::string &error_str)
   {
     messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
+    message.error().source_location=symex().last_source_location;
     message.error() << error_str << messaget::eom;
 
     return safety_checkert::resultt::ERROR;
@@ -444,7 +444,7 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
   catch(const char *error_str)
   {
     messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
+    message.error().source_location=symex().last_source_location;
     message.error() << error_str << messaget::eom;
 
     return safety_checkert::resultt::ERROR;
@@ -466,7 +466,7 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
     // coverage report
     std::string cov_out=options.get_option("symex-coverage-report");
     if(!cov_out.empty() &&
-       symex.output_coverage_report(goto_functions, cov_out))
+       symex().output_coverage_report(goto_functions, cov_out))
     {
       error() << "Failed to write symex coverage report" << eom;
       return safety_checkert::resultt::ERROR;
@@ -500,6 +500,12 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
       report_success();
       output_graphml(resultt::SAFE, goto_functions);
       return safety_checkert::resultt::SAFE;
+    }
+
+    if(options.get_bool_option("program-only"))
+    {
+    	show_program();
+    	return safety_checkert::resultt::SAFE;
     }
 
   // do all properties
