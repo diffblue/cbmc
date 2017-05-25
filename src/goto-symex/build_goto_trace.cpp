@@ -162,7 +162,11 @@ void update_internal_field(
   // set internal field to _start function-return step
   if(SSA_step.source.pc->function==goto_functionst::entry_point())
   {
-    goto_trace_step.internal=true;
+    // "__CPROVER_*" function calls in __CPROVER_start are already marked as
+    // internal. Don't mark any other function calls (i.e. "main"), function
+    // arguments or any other parts of a code_function_callt as internal.
+    if(SSA_step.source.pc->code.get_statement()!=ID_function_call)
+      goto_trace_step.internal=true;
   }
 }
 
