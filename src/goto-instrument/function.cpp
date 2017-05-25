@@ -32,7 +32,7 @@ code_function_callt function_to_call(
   if(s_it==symbol_table.symbols.end())
   {
     // not there
-    pointer_typet p(char_type());
+    typet p=pointer_type(char_type());
     p.subtype().set(ID_C_constant, true);
 
     code_typet function_type;

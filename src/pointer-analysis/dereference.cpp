@@ -275,7 +275,7 @@ exprt dereferencet::dereference_typecast(
         plus_exprt(offset, typecast_exprt(op, offset.type()));
 
     exprt new_typecast=
-      typecast_exprt(integer, pointer_typet(type));
+      typecast_exprt(integer, pointer_type(type));
 
     return dereference_exprt(new_typecast, type);
   }

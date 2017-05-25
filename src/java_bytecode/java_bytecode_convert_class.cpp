@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 
@@ -294,7 +295,7 @@ void java_bytecode_convert_classt::add_array_types()
     struct_type.components().push_back(comp1);
 
     struct_typet::componentt
-      comp2("data", pointer_typet(java_type_from_char(l)));
+      comp2("data", pointer_type(java_type_from_char(l)));
     struct_type.components().push_back(comp2);
 
     symbolt symbol;
@@ -366,7 +367,7 @@ void java_bytecode_convert_classt::add_string_type()
   // Use a pointer-to-unbounded-array instead of a pointer-to-char.
   // Saves some casting in the string refinement algorithm but may
   // be unnecessary.
-  string_type.components()[2].type()=pointer_typet(
+  string_type.components()[2].type()=pointer_type(
     array_typet(java_char_type(), infinity_exprt(java_int_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
@@ -392,9 +393,9 @@ void java_bytecode_convert_classt::add_string_type()
   string_equals_type.return_type()=java_boolean_type();
   code_typet::parametert thisparam;
   thisparam.set_this();
-  thisparam.type()=pointer_typet(symbol_typet(string_symbol.name));
+  thisparam.type()=java_reference_type(symbol_typet(string_symbol.name));
   code_typet::parametert otherparam;
-  otherparam.type()=pointer_typet(symbol_typet("java::java.lang.Object"));
+  otherparam.type()=java_reference_type(symbol_typet("java::java.lang.Object"));
   string_equals_type.parameters().push_back(thisparam);
   string_equals_type.parameters().push_back(otherparam);
   string_equals_symbol.type=std::move(string_equals_type);

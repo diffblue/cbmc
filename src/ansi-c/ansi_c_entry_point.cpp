@@ -327,8 +327,7 @@ bool ansi_c_entry_point(
         zero_string.type().set(ID_size, "infinity");
         exprt index(ID_index, char_type());
         index.copy_to_operands(zero_string, from_integer(0, uint_type()));
-        exprt address_of("address_of", pointer_typet());
-        address_of.type().subtype()=char_type();
+        exprt address_of("address_of", pointer_type(char_type()));
         address_of.copy_to_operands(index);
 
         if(argv_symbol.type.subtype()!=address_of.type())

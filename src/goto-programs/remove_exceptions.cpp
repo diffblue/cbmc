@@ -21,6 +21,7 @@ Date:   December 2016
 #include <algorithm>
 
 #include <util/std_expr.h>
+#include <util/c_types.h>
 #include <util/symbol_table.h>
 
 class remove_exceptionst
@@ -108,12 +109,12 @@ void remove_exceptionst::add_exceptional_returns(
     new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
     new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
     new_symbol.mode=function_symbol.mode;
-    new_symbol.type=pointer_typet(empty_typet());
+    new_symbol.type=pointer_type(empty_typet());
     symbol_table.add(new_symbol);
 
     // initialize the exceptional return with NULL
     symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
     goto_programt::targett t_null=
       goto_program.insert_before(goto_program.instructions.begin());
     t_null->make_assignment();
@@ -146,7 +147,7 @@ void remove_exceptionst::instrument_exception_handler(
       symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
     // next we reset the exceptional return to NULL
     symbol_exprt lhs_expr_null=function_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
 
     // add the assignment
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
@@ -326,7 +327,7 @@ void remove_exceptionst::instrument_function_call(
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(
       callee_exc,
-      null_pointer_exprt(pointer_typet(empty_typet())));
+      null_pointer_exprt(pointer_type(empty_typet())));
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_goto(next_it);
     t_null->source_location=instr_it->source_location;

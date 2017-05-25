@@ -6476,7 +6476,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_NULLPTR:
     lex.get_token(tk);
-    exp=constant_exprt(ID_NULL, pointer_typet(typet(ID_nullptr)));
+    exp=constant_exprt(ID_NULL, typet(ID_pointer, typet(ID_nullptr)));
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";
