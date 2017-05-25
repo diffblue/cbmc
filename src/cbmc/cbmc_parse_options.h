@@ -82,8 +82,9 @@ protected:
   virtual void register_languages();
 
   virtual void get_command_line_options(optionst &options);
+
   virtual int do_bmc(
-    const optionst &options,
+    bmct &bmc,
     const goto_functionst &goto_functions);
 
   virtual int get_goto_program(

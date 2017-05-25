@@ -530,8 +530,29 @@ int cbmc_parse_optionst::doit()
   if(options.get_bool_option("java-unwind-enum-static"))
     remove_static_init_loops(symbol_table, goto_functions, options);
 
+  // get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 1; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
+
+  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
+
   // do actual BMC
-  return do_bmc(options, goto_functions);
+  return do_bmc(bmc, goto_functions);
 }
 
 /*******************************************************************\
@@ -984,29 +1005,9 @@ Function: cbmc_parse_optionst::do_bmc
 \*******************************************************************/
 
 int cbmc_parse_optionst::do_bmc(
-  const optionst &options,
+  bmct &bmc,
   const goto_functionst &goto_functions)
 {
-  // get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
-
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-
-  try
-  {
-    cbmc_solver=cbmc_solvers.get_solver();
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    throw 0;
-  }
-
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
-
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
   bmc.set_ui(get_ui());
 
   int result=6;
