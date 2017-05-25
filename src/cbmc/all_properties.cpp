@@ -95,7 +95,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       else
         continue;
 
-      //need to convert again as the context of the expression
+      // need to convert again as the context of the expression
       //  may have changed
       it->cond_literal=solver.convert(it->cond_expr);
       goal_map[property_id].instances.push_back(it);

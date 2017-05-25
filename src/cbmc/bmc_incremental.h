@@ -44,9 +44,18 @@ public:
   virtual ~bmc_incrementalt() { }
 
   // make public
-  virtual resultt run() { return run(goto_functions); }
-  virtual resultt initialize() { return bmct::initialize(); }
-  virtual resultt step() { return step(goto_functions); }
+  virtual resultt run()
+  {
+	  return run(goto_functions);
+  }
+  virtual resultt initialize()
+  {
+	  return bmct::initialize();
+  }
+  virtual resultt step()
+  {
+	  return step(goto_functions);
+  }
 
 protected:
   const goto_functionst &goto_functions;

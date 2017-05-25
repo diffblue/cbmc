@@ -261,7 +261,6 @@ safety_checkert::resultt fault_localizationt::stop_on_fail(bool show_report)
 
     return safety_checkert::resultt::ERROR;
   }
-  assert(false);
 }
 
 void fault_localizationt::goal_covered(
