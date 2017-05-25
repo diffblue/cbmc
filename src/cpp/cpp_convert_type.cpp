@@ -251,8 +251,8 @@ void cpp_convert_typet::read_function_type(const typet &type)
         // see if it's an array type
         if(final_type.id()==ID_array)
         {
-          final_type.id(ID_pointer);
-          final_type.remove(ID_size);
+          // turn into pointer type
+          final_type=pointer_type(final_type.subtype());
         }
 
         code_typet::parametert new_parameter(final_type);

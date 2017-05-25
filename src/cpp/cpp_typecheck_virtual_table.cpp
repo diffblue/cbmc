@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
-#include <util/std_types.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
@@ -32,21 +32,20 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     const code_typet &code_type=to_code_type(compo.type());
     assert(code_type.parameters().size() > 0);
 
-    const pointer_typet &pointer_type =
-      static_cast<const pointer_typet&>(code_type.parameters()[0].type());
+    const pointer_typet &parameter_pointer_type=
+      to_pointer_type(code_type.parameters()[0].type());
 
-    irep_idt class_id=pointer_type.subtype().get("identifier");
+    irep_idt class_id=parameter_pointer_type.subtype().get("identifier");
 
     std::map<irep_idt, exprt> &value_map =
       vt_value_maps[class_id];
-
 
     exprt e=symbol_exprt(compo.get_name(), code_type);
 
     if(compo.get_bool("is_pure_virtual"))
     {
-      pointer_typet pointer_type(code_type);
-      e=null_pointer_exprt(pointer_type);
+      pointer_typet code_pointer_type=pointer_type(code_type);
+      e=null_pointer_exprt(code_pointer_type);
       value_map[compo.get("virtual_name")]=e;
     }
     else

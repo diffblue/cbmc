@@ -384,7 +384,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       static_cast<typet const&>(r.find(ID_C_va_arg_type));
 
     dereference_exprt deref(
-      null_pointer_exprt(pointer_typet(va_arg_type)),
+      null_pointer_exprt(pointer_type(va_arg_type)),
       va_arg_type);
 
     type_of.arguments().push_back(deref);
@@ -1378,7 +1378,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     // we don't bother setting the type
     f.lhs()=cf.lhs();
     f.function()=symbol_exprt("pthread_create", code_typet());
-    exprt n=null_pointer_exprt(pointer_typet(empty_typet()));
+    exprt n=null_pointer_exprt(pointer_type(empty_typet()));
     f.arguments().push_back(n);
     f.arguments().push_back(n);
     f.arguments().push_back(cf.function());

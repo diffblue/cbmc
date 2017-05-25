@@ -830,9 +830,7 @@ void string_instrumentationt::do_strerror(
     symbol_buf.symbol_expr(),
     from_integer(0, index_type()));
 
-  exprt ptr=exprt(ID_address_of, pointer_typet());
-  ptr.type().subtype()=char_type();
-  ptr.copy_to_operands(index);
+  exprt ptr=address_of_exprt(index, pointer_type(char_type()));
 
   // make that zero-terminated
   {

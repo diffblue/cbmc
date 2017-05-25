@@ -169,7 +169,7 @@ void goto_symext::symex_malloc(
 
   if(object_type.id()==ID_array)
   {
-    rhs.type()=pointer_typet(value_symbol.type.subtype());
+    rhs.type()=pointer_type(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
@@ -178,7 +178,7 @@ void goto_symext::symex_malloc(
   else
   {
     rhs.op0()=value_symbol.symbol_expr();
-    rhs.type()=pointer_typet(value_symbol.type);
+    rhs.type()=pointer_type(value_symbol.type);
   }
 
   if(rhs.type()!=lhs.type())
@@ -404,7 +404,7 @@ void goto_symext::symex_cpp_new(
 
   // make symbol expression
 
-  exprt rhs(ID_address_of, pointer_typet());
+  exprt rhs(ID_address_of, code.type());
   rhs.type().subtype()=code.type().subtype();
 
   if(do_array)

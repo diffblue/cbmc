@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/source_location.h>
 #include <util/simplify_expr.h>
+#include <util/c_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -107,8 +108,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
           // Add 'this' to the parameters
           exprt a0(ID_parameter);
           a0.set(ID_C_base_name, ID_this);
-          a0.type().id(ID_pointer);
-          a0.type().subtype() = class_object;
+          a0.type()=pointer_type(class_object);
           parameters.insert(parameters.begin(), a0);
         }
       }

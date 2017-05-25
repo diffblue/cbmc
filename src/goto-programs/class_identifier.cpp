@@ -12,6 +12,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "class_identifier.h"
 
 #include <util/std_expr.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
 
 /// \par parameters: Struct expression
@@ -66,7 +67,7 @@ exprt get_class_identifier_field(
          "Non-pointer this-arg in remove-virtuals?");
   const auto &points_to=this_expr.type().subtype();
   if(points_to==empty_typet())
-    this_expr=typecast_exprt(this_expr, pointer_typet(suggested_type));
+    this_expr=typecast_exprt(this_expr, pointer_type(suggested_type));
   exprt deref=dereference_exprt(this_expr, this_expr.type().subtype());
   return build_class_identifier(deref, ns);
 }

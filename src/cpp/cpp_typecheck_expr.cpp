@@ -755,7 +755,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   const bool is_ref=is_reference(expr.type());
   c_typecheck_baset::typecheck_expr_address_of(expr);
   if(is_ref)
-    expr.type()=reference_typet(expr.type().subtype());
+    expr.type()=reference_type(expr.type().subtype());
 }
 
 void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
@@ -808,8 +808,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     expr.set(ID_size, to_array_type(expr.type()).size());
 
     // new actually returns a pointer, not an array
-    pointer_typet ptr_type;
-    ptr_type.subtype()=expr.type().subtype();
+    pointer_typet ptr_type=
+      pointer_type(expr.type().subtype());
     expr.type().swap(ptr_type);
   }
   else
@@ -819,8 +819,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
     expr.set(ID_statement, ID_cpp_new);
 
-    pointer_typet ptr_type;
-    ptr_type.subtype().swap(expr.type());
+    pointer_typet ptr_type=pointer_type(expr.type());
     expr.type().swap(ptr_type);
   }
 
