@@ -86,7 +86,7 @@ protected:
     equation(ns),
     symex_ptr(NULL),
     prop_conv(_prop_conv),
-    ui(ui_message_handlert::PLAIN)
+    ui(ui_message_handlert::uit::PLAIN)
   {
   }
 

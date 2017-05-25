@@ -56,14 +56,14 @@ safety_checkert::resultt bmc_incrementalt::step(
     slice();
 
     resultt result=show(goto_functions);
-    if(result!=UNKNOWN)
+    if(result!=safety_checkert::resultt::UNKNOWN)
       return result;
 
     // any properties to check at all?
     if(symex().remaining_vccs==0)
     {
       report_success();
-      result=safety_checkert::SAFE;
+      result=safety_checkert::resultt::SAFE;
     }
     else
     {
@@ -75,26 +75,26 @@ safety_checkert::resultt bmc_incrementalt::step(
 
     resultt term_cond=
       options.get_bool_option("stop-when-unsat") ?
-        safety_checkert::UNSAFE : safety_checkert::SAFE;
-    return result==term_cond && !symex_done ? safety_checkert::UNKNOWN : result;
+        safety_checkert::resultt::UNSAFE : safety_checkert::resultt::SAFE;
+    return result==term_cond && !symex_done ? safety_checkert::resultt::UNKNOWN : result;
   }
 
   catch(std::string &error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   assert(false);
@@ -116,21 +116,21 @@ safety_checkert::resultt bmc_incrementalt::run(
   const goto_functionst &goto_functions)
 {
   safety_checkert::resultt result=initialize();
-  while(result==safety_checkert::UNKNOWN)
+  while(result==safety_checkert::resultt::UNKNOWN)
   {
     result=step();
 
     // check unwinding assertions
-    if(result==safety_checkert::UNKNOWN &&
+    if(result==safety_checkert::resultt::UNKNOWN &&
        symex().add_loop_check())
     {
       resultt loop_check_result=
         stop_on_fail(goto_functions, prop_conv);
       bool earliest_loop_exit=
         options.get_bool_option("earliest-loop-exit");
-      if(loop_check_result==SAFE)
+      if(loop_check_result==safety_checkert::resultt::SAFE)
         symex().update_loop_info(earliest_loop_exit ? false : true);
-      else if(loop_check_result==UNSAFE)
+      else if(loop_check_result==safety_checkert::resultt::UNSAFE)
         symex().update_loop_info(earliest_loop_exit ? true : false);
     }
   }

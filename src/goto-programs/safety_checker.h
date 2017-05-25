@@ -30,7 +30,7 @@ public:
     message_handlert &_message_handler);
 
 
-  enum class resultt { SAFE, UNSAFE, ERROR };
+  enum class resultt { SAFE, UNSAFE, ERROR , UNKNOWN };
 
   // check whether all assertions in goto_functions are safe
   // if UNSAFE, then a trace is returned

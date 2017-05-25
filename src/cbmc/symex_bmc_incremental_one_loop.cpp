@@ -65,7 +65,7 @@ bool symex_bmc_incremental_one_loopt::get_unwind(
   bool abort=unwind>=this_loop_limit;
 
   // report where we are
-  if(ui==ui_message_handlert::XML_UI)
+  if(ui==ui_message_handlert::uit::XML_UI)
   {
     xmlt xml("current-unwinding");
     xml.data=std::to_string(unwind);
