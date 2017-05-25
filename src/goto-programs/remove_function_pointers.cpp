@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
-#include <util/config.h>
 #include <util/type_eq.h>
 #include <util/message.h>
 #include <util/base_type.h>

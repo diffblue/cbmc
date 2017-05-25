@@ -9,7 +9,6 @@ Author: Daniel Kroening
 #include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
