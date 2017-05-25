@@ -30,14 +30,17 @@ else
   EXEEXT =
 endif
   CFLAGS ?= -Wall -O2
-  CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
+  CXXFLAGS ?= -Wall -O2
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   CP_CXXFLAGS = -MMD -MP -mmacosx-version-min=10.9 -std=c++11 -stdlib=libc++
   LINKFLAGS += -mmacosx-version-min=10.9 -stdlib=libc++
   LINKNATIVE += -mmacosx-version-min=10.9 -stdlib=libc++
 else
   CP_CXXFLAGS = -MMD -MP -std=c++11
+endif
+ifeq ($(filter -O%,$(CXXFLAGS)),)
+  CP_CXXFLAGS += -O2
 endif
   #LINKFLAGS = -static
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
