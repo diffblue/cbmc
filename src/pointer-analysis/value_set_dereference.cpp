@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution of ANSI-C
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -45,10 +42,34 @@ Author: Daniel Kroening, kroening@kroening.com
 // global data, horrible
 unsigned int value_set_dereferencet::invalid_counter=0;
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::has_dereference
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_dereferencet::has_dereference(const exprt &expr)
 {
   return has_subexpr(expr, ID_dereference);
 }
+
+/*******************************************************************\
+
+Function: value_set_dereferencet::get_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
@@ -58,9 +79,19 @@ const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
   return expr;
 }
 
-/// \par parameters: expression dest, to be dereferenced under given guard,
-/// and given mode
-/// \return returns pointer after dereferencing
+/*******************************************************************\
+
+Function: value_set_dereferencet::dereference
+
+  Inputs: expression dest, to be dereferenced under given guard,
+          and given mode
+
+ Outputs: returns pointer after dereferencing
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
@@ -210,6 +241,18 @@ exprt value_set_dereferencet::dereference(
   return value;
 }
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::dereference_type_compare
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
   const typet &dereference_type) const
@@ -252,6 +295,18 @@ bool value_set_dereferencet::dereference_type_compare(
   return false;
 }
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::invalid_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_dereferencet::invalid_pointer(
   const exprt &pointer,
   const guardt &guard)
@@ -268,6 +323,18 @@ void value_set_dereferencet::invalid_pointer(
     "invalid pointer",
     tmp_guard);
 }
+
+/*******************************************************************\
+
+Function: value_set_dereferencet::build_reference_to
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
@@ -424,7 +491,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
               ns.follow(memory_symbol.type).subtype(),
               dereference_type))
     {
-
       exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=typecast_exprt(index_expr, dereference_type);
@@ -587,6 +653,18 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   return result;
 }
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::valid_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_dereferencet::valid_check(
   const exprt &object,
   const guardt &guard,
@@ -638,6 +716,18 @@ void value_set_dereferencet::valid_check(
     #endif
   }
 }
+
+/*******************************************************************\
+
+Function: value_set_dereferencet::bounds_check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_dereferencet::bounds_check(
   const index_exprt &expr,
@@ -712,6 +802,18 @@ void value_set_dereferencet::bounds_check(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::memory_model
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 inline static unsigned bv_width(
   const typet &type,
   const namespacet &ns)
@@ -781,6 +883,18 @@ bool value_set_dereferencet::memory_model(
   return memory_model_bytes(value, to_type, guard, offset);
 }
 
+/*******************************************************************\
+
+Function: value_set_dereferencet::memory_model_conversion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_dereferencet::memory_model_conversion(
   exprt &value,
   const typet &to_type,
@@ -807,6 +921,18 @@ bool value_set_dereferencet::memory_model_conversion(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: value_set_dereferencet::memory_model_bytes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
@@ -862,9 +988,8 @@ bool value_set_dereferencet::memory_model_bytes(
       if(from_width<=0)
         throw "unknown or invalid type size:\n"+from_type.pretty();
 
-      mp_integer to_width=
-        to_type.id()==ID_empty?0: pointer_offset_size(to_type, ns);
-      if(to_width<0)
+      mp_integer to_width=pointer_offset_size(to_type, ns);
+      if(to_width<=0)
         throw "unknown or invalid type size:\n"+to_type.pretty();
 
       exprt bound=from_integer(from_width-to_width, offset.type());
