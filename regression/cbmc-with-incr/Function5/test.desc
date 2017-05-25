@@ -4,7 +4,7 @@ main.c
 ^SIGNAL=0$
 ^EXIT=10$
 ^Counterexample:$
-^  dereference failure: object bounds in .*$
+^  dereference failure: pointer outside object bounds in .*$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
