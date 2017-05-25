@@ -90,6 +90,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwind.h"
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
+#include "remove_function.h"
 
 /*******************************************************************\
 
@@ -1015,6 +1016,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
+  if(cmdline.isset("remove-function-body"))
+  {
+    remove_functions(
+      symbol_table,
+      goto_functions,
+      cmdline.get_values("remove-function-body"),
+      get_message_handler());
+  }
+
   // we add the library in some cases, as some analyses benefit
 
   if(cmdline.isset("add-library") ||
@@ -1615,6 +1625,8 @@ void goto_instrument_parse_optionst::help()
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
