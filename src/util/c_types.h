@@ -40,6 +40,9 @@ typet pointer_diff_type();
 typet pointer_type(const typet &);
 typet void_type();
 
+// This is for Java and C++
+typet reference_type(const typet &);
+
 // Turns an ID_C_c_type into a string, e.g.,
 // ID_signed_int gets "signed int".
 std::string c_type_as_string(const irep_idt &);

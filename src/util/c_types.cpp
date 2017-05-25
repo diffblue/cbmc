@@ -607,6 +607,23 @@ typet pointer_type(const typet &subtype)
 
 /*******************************************************************\
 
+Function: reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+typet reference_type(const typet &subtype)
+{
+  return reference_typet(subtype);
+}
+
+/*******************************************************************\
+
 Function: void_type
 
   Inputs:
