@@ -100,6 +100,12 @@ void uncaught_exceptions_domaint::join(
   thrown.insert(elements.begin(), elements.end());
 }
 
+void uncaught_exceptions_domaint::join(
+  const std::vector<irep_idt> &elements)
+{
+  thrown.insert(elements.begin(), elements.end());
+}
+
 
 /// The transformer for the uncaught exceptions domain
 void uncaught_exceptions_domaint::transform(
@@ -123,8 +129,8 @@ void uncaught_exceptions_domaint::transform(
       join(type_id);
       // we must consider all the subtypes given that
       // the runtime type is a subtype of the static type
-      std::set<irep_idt> subtypes;
-      get_subtypes(type_id, subtypes, ns);
+      std::vector<irep_idt> subtypes=
+        class_hierarchy.get_children_trans(type_id);
       join(subtypes);
     }
     break;
@@ -144,8 +150,8 @@ void uncaught_exceptions_domaint::transform(
         for(const auto &exc : exception_list)
         {
           last_caught.insert(exc.id());
-          std::set<irep_idt> subtypes;
-          get_subtypes(exc.id(), subtypes, ns);
+          std::vector<irep_idt> subtypes=
+            class_hierarchy.get_children_trans(exc.id());
           last_caught.insert(subtypes.begin(), subtypes.end());
         }
       }
@@ -195,7 +201,7 @@ const std::set<irep_idt> &uncaught_exceptions_domaint::get_elements() const
 void uncaught_exceptions_domaint::operator()(
   const namespacet &ns)
 {
-  elements=thrown;
+  class_hierarchy(ns.get_symbol_table());
 }
 
 /// Runs the uncaught exceptions analysis, which  populates the exceptions map
@@ -258,6 +264,7 @@ void uncaught_exceptions_analysist::operator()(
   const namespacet &ns,
   exceptions_mapt &exceptions)
 {
+  domain(ns);
   collect_uncaught_exceptions(goto_functions, ns);
   exceptions=exceptions_map;
   output(goto_functions);

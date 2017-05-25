@@ -16,6 +16,7 @@ Author: Cristina David
 #include <map>
 #include <set>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/class_hierarchy.h>
 
 /// defines the domain used by the uncaught  exceptions analysis
 class uncaught_exceptions_analysist;
@@ -29,6 +30,7 @@ class uncaught_exceptions_domaint
 
   void join(const irep_idt &);
   void join(const std::set<irep_idt> &);
+  void join(const std::vector<irep_idt> &);
 
   void make_top()
   {
@@ -42,10 +44,13 @@ class uncaught_exceptions_domaint
 
   void get_elements(std::set<irep_idt> &elements);
 
+  void operator()(const namespacet &ns);
+
  private:
   typedef std::vector<std::set<irep_idt>> stack_caughtt;
   stack_caughtt stack_caught;
   std::set<irep_idt> thrown;
+  class_hierarchyt class_hierarchy;
 };
 
 /// computes in exceptions_map an overapproximation of the  exceptions thrown by
