@@ -524,8 +524,10 @@ int cbmc_parse_optionst::doit()
 
   bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
 
+  expr_listt bmc_constraints;
+
   int get_goto_program_ret=
-    get_goto_program(options, bmc, goto_functions);
+    get_goto_program(options, bmc_constraints, goto_functions);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -609,7 +611,7 @@ Function: cbmc_parse_optionst::get_goto_program
 
 int cbmc_parse_optionst::get_goto_program(
   const optionst &options,
-  bmct &bmc, // for get_modules
+  expr_listt &bmc_constraints, // for get_modules
   goto_functionst &goto_functions)
 {
   if(cmdline.args.empty())
@@ -691,7 +693,7 @@ int cbmc_parse_optionst::get_goto_program(
         return 6;
       if(typecheck())
         return 6;
-      int get_modules_ret=get_modules(bmc);
+      int get_modules_ret=get_modules(bmc_constraints);
       if(get_modules_ret!=-1)
         return get_modules_ret;
       if(binaries.empty() && final())

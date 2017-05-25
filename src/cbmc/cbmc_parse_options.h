@@ -86,7 +86,7 @@ protected:
 
   virtual int get_goto_program(
     const optionst &options,
-    bmct &bmc,
+    expr_listt &bmc_constraints,
     goto_functionst &goto_functions);
 
   virtual bool process_goto_program(
@@ -97,8 +97,8 @@ protected:
 
   void eval_verbosity();
 
-  // get any additional stuff before finalizing
-  virtual int get_modules(bmct &bmc)
+  // get any additional stuff before finalizing the goto program
+  virtual int get_modules(expr_listt &bmc_constraints)
   {
     return -1; // continue
   }
