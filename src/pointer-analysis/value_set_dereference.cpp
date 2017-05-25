@@ -281,6 +281,15 @@ bool value_set_dereferencet::dereference_type_compare(
      object_type.id()==ID_code)
     return true;
 
+  // bitvectors of same width are ok
+  if((dereference_type.id()==ID_signedbv ||
+      dereference_type.id()==ID_unsignedbv) &&
+     (object_type.id()==ID_signedbv ||
+      object_type.id()==ID_unsignedbv) &&
+     to_bitvector_type(dereference_type).get_width()==
+     to_bitvector_type(object_type).get_width())
+    return true;
+
   // really different
 
   return false;
@@ -480,6 +489,14 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       exprt index_expr=index_exprt(symbol_expr, pointer_offset);
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=index_expr;
+    }
+    else if(dereference_type_compare(
+              ns.follow(memory_symbol.type).subtype(),
+              dereference_type))
+    {
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      result.value=typecast_exprt(index_expr, dereference_type);
     }
     else
     {
