@@ -267,6 +267,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   if(!is_ptr(expr.type()))
     throw "convert_pointer_type got non-pointer type";
 
+  // make sure the config hasn't been changed
+  assert(bits==config.ansi_c.pointer_width);
+
   if(expr.id()==ID_symbol)
   {
     const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
