@@ -44,7 +44,7 @@ symex_bmc_incrementalt::symex_bmc_incrementalt(
   magic_numbers.insert(200);
   magic_numbers.insert(1025);
 }
-
+// magic numbers are heuristic unwinding numbers used for SV_COMP
 /*******************************************************************\
 
 Function: symex_bmc_incrementalt::get_unwind
