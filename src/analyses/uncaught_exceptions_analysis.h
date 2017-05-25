@@ -13,6 +13,7 @@ Author: Cristina David
 #include <map>
 #include <set>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/class_hierarchy.h>
 
 /*******************************************************************\
 
@@ -34,6 +35,7 @@ class uncaught_exceptions_domaint
 
   void join(const irep_idt &);
   void join(const std::set<irep_idt> &);
+  void join(const std::vector<irep_idt> &);
 
   void make_top()
   {
@@ -47,10 +49,13 @@ class uncaught_exceptions_domaint
 
   void get_elements(std::set<irep_idt> &elements);
 
+  void operator()(const namespacet &ns);
+
  private:
   typedef std::vector<std::set<irep_idt>> stack_caughtt;
   stack_caughtt stack_caught;
   std::set<irep_idt> thrown;
+  class_hierarchyt class_hierarchy;
 };
 
 /*******************************************************************\

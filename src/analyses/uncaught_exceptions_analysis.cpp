@@ -5,75 +5,10 @@ Module: Over-approximating uncaught exceptions analysis
 Author: Cristina David
 
 \*******************************************************************/
-
 #ifdef DEBUG
 #include <iostream>
 #endif
 #include "uncaught_exceptions_analysis.h"
-
-/*******************************************************************\
-
-Function: get_subtypes
-
-  Inputs:
-
- Outputs:
-
- Purpose: computes the set of subtypes of "type" by iterating over
-          the symbol table
-\*******************************************************************/
-
-static void get_subtypes(
-  const irep_idt &type,
-  std::set<irep_idt> &subtypes,
-  const namespacet &ns)
-{
-  irep_idt candidate;
-  bool new_subtype=true;
-  const symbol_tablet &symbol_table=ns.get_symbol_table();
-
-  // as we don't know the order types have been recorded,
-  // we need to iterate over the symbol table until there are no more
-  // new subtypes found
-  while(new_subtype)
-  {
-    new_subtype=false;
-    // iterate over the symbol_table in order to find subtypes of type
-    forall_symbols(it, symbol_table.symbols)
-    {
-      // we only look at type entries
-      if(it->second.is_type)
-      {
-        // every type is a potential candidate
-        candidate=it->second.name;
-        // current candidate is already in subtypes
-        if(find(subtypes.begin(),
-                subtypes.end(),
-                candidate)!=subtypes.end())
-          continue;
-        // get its base class
-        const class_typet::basest &bases=
-          to_class_type((it->second).type).bases();
-        if(bases.size()>0)
-        {
-          const class_typet::baset &base = bases[0];
-          const irept &base_type=base.find(ID_type);
-          assert(base_type.id()==ID_symbol);
-
-          // is it derived from type?
-          // i.e. does it have type or one of its subtypes as a base?
-          if(base_type.get(ID_identifier)==type ||
-             find(subtypes.begin(), subtypes.end(),
-                  base_type.get(ID_identifier))!=subtypes.end())
-          {
-            subtypes.insert(candidate);
-            new_subtype=true;
-          }
-        }
-      }
-    }
-  }
-}
 
 /*******************************************************************\
 
@@ -144,6 +79,12 @@ void uncaught_exceptions_domaint::join(
   thrown.insert(elements.begin(), elements.end());
 }
 
+void uncaught_exceptions_domaint::join(
+  const std::vector<irep_idt> &elements)
+{
+  thrown.insert(elements.begin(), elements.end());
+}
+
 
 /*******************************************************************\
 
@@ -178,8 +119,8 @@ void uncaught_exceptions_domaint::transform(
       join(type_id);
       // we must consider all the subtypes given that
       // the runtime type is a subtype of the static type
-      std::set<irep_idt> subtypes;
-      get_subtypes(type_id, subtypes, ns);
+      std::vector<irep_idt> subtypes=
+        class_hierarchy.get_children_trans(type_id);
       join(subtypes);
     }
     break;
@@ -199,8 +140,8 @@ void uncaught_exceptions_domaint::transform(
         for(const auto &exc : exception_list)
         {
           last_caught.insert(exc.id());
-          std::set<irep_idt> subtypes;
-          get_subtypes(exc.id(), subtypes, ns);
+          std::vector<irep_idt> subtypes=
+            class_hierarchy.get_children_trans(exc.id());
           last_caught.insert(subtypes.begin(), subtypes.end());
         }
       }
@@ -256,6 +197,24 @@ void uncaught_exceptions_domaint::get_elements(
   std::set<irep_idt> &elements)
 {
   elements=thrown;
+}
+
+/*******************************************************************\
+
+Function: uncaught_exceptions_domaint::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: 
+
+\*******************************************************************/
+
+void uncaught_exceptions_domaint::operator()(
+  const namespacet &ns)
+{
+  class_hierarchy(ns.get_symbol_table());
 }
 
 /*******************************************************************\
@@ -350,6 +309,7 @@ void uncaught_exceptions_analysist::operator()(
   const namespacet &ns,
   exceptions_mapt &exceptions)
 {
+  domain(ns);
   collect_uncaught_exceptions(goto_functions, ns);
   exceptions=exceptions_map;
   output(goto_functions);
