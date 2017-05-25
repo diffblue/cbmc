@@ -108,7 +108,7 @@ void remove_exceptionst::add_exceptional_returns(
     new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
     new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
     new_symbol.mode=function_symbol.mode;
-    new_symbol.type=typet(ID_pointer, empty_typet());
+    new_symbol.type=pointer_typet(empty_typet());
     symbol_table.add(new_symbol);
 
     // initialize the exceptional return with NULL
