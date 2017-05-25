@@ -988,8 +988,9 @@ bool value_set_dereferencet::memory_model_bytes(
       if(from_width<=0)
         throw "unknown or invalid type size:\n"+from_type.pretty();
 
-      mp_integer to_width=pointer_offset_size(to_type, ns);
-      if(to_width<=0)
+      mp_integer to_width=
+        to_type.id()==ID_empty?0: pointer_offset_size(to_type, ns);
+      if(to_width<0)
         throw "unknown or invalid type size:\n"+to_type.pretty();
 
       exprt bound=from_integer(from_width-to_width, offset.type());
