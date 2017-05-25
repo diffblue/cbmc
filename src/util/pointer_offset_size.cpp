@@ -283,7 +283,7 @@ exprt member_offset_expr(
     return member_offset_expr(
       to_struct_type(type), member_expr.get_component_name(), ns);
   else if(type.id()==ID_union)
-    return from_integer(0, signed_size_type());
+    return from_integer(0, size_type());
   else
     return nil_exprt();
 }
@@ -307,7 +307,7 @@ exprt member_offset_expr(
 {
   const struct_typet::componentst &components=type.components();
 
-  exprt result=from_integer(0, signed_size_type());
+  exprt result=from_integer(0, size_type());
   std::size_t bit_field_bits=0;
 
   for(struct_typet::componentst::const_iterator
