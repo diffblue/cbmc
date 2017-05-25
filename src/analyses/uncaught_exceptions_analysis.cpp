@@ -5,6 +5,7 @@ Module: Over-approximating uncaught exceptions analysis
 Author: Cristina David
 
 \*******************************************************************/
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -12,7 +13,7 @@ Author: Cristina David
 
 /*******************************************************************\
 
-Function: get_static_type
+Function: get_exception_type
 
   Inputs:
 
@@ -22,15 +23,13 @@ Function: get_static_type
 
 \*******************************************************************/
 
-irep_idt uncaught_exceptions_domaint::get_static_type(const typet &type)
+irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 {
-  if(type.id()==ID_pointer)
+  assert(type.id()==ID_pointer);
+
+  if(type.subtype().id()==ID_symbol)
   {
-    return get_static_type(type.subtype());
-  }
-  else if(type.id()==ID_symbol)
-  {
-     return to_symbol_type(type).get_identifier();
+    return to_symbol_type(type.subtype()).get_identifier();
   }
   return ID_empty;
 }
@@ -63,7 +62,7 @@ Function: uncaught_exceptions_domaint::join
 
  Outputs:
 
- Purpose: 
+ Purpose: The join operator for the uncaught exceptions domain
 
 \*******************************************************************/
 
@@ -94,7 +93,7 @@ Function: uncaught_exceptions_domaint::transform
 
  Outputs:
 
- Purpose: 
+ Purpose: The transformer for the uncaught exceptions domain
 
 \*******************************************************************/
 
@@ -111,7 +110,7 @@ void uncaught_exceptions_domaint::transform(
   {
     const exprt &exc_symbol=get_exception_symbol(instruction.code);
     // retrieve the static type of the thrown exception
-    const irep_idt &type_id=get_static_type(exc_symbol.type());
+    const irep_idt &type_id=get_exception_type(exc_symbol.type());
     bool assertion_error=
       id2string(type_id).find("java.lang.AssertionError")!=std::string::npos;
     if(!assertion_error)
@@ -153,12 +152,7 @@ void uncaught_exceptions_domaint::transform(
           join(caught);
           // remove the caught exceptions
           for(const auto &exc_id : caught)
-          {
-            const std::set<irep_idt>::iterator it=
-              std::find(thrown.begin(), thrown.end(), exc_id);
-            if(it!=thrown.end())
-              thrown.erase(it);
-          }
+            thrown.erase(exc_id);
           stack_caught.pop_back();
         }
       }
@@ -189,14 +183,13 @@ Function: uncaught_exceptions_domaint::get_elements
 
  Outputs:
 
- Purpose: 
+ Purpose: Returns the value of the private member thrown
 
 \*******************************************************************/
 
-void uncaught_exceptions_domaint::get_elements(
-  std::set<irep_idt> &elements)
+const std::set<irep_idt> &uncaught_exceptions_domaint::get_elements() const
 {
-  elements=thrown;
+  return thrown;
 }
 
 /*******************************************************************\
@@ -207,7 +200,7 @@ Function: uncaught_exceptions_domaint::operator()
 
  Outputs:
 
- Purpose: 
+ Purpose: Constructs the class hierarchy
 
 \*******************************************************************/
 
@@ -225,7 +218,8 @@ Function: uncaught_exceptions_analysist::collect_uncaught_exceptions
 
  Outputs:
 
- Purpose: 
+ Purpose: Runs the uncaught exceptions analysis, which 
+          populates the exceptions map
 
 \*******************************************************************/
 
@@ -252,11 +246,12 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
         domain.transform(instr_it, *this, ns);
       }
       // did our estimation for the current function improve?
-      std::set<irep_idt> elements;
-      domain.get_elements(elements);
-      change=change||
-        exceptions_map[current_function->first].size()!=elements.size();
-      exceptions_map[current_function->first]=elements;
+      const std::set<irep_idt> &elements=domain.get_elements();
+      if(exceptions_map[current_function->first].size()<elements.size())
+      {
+        change=true;
+        exceptions_map[current_function->first]=elements;
+      }
     }
   }
 }
@@ -269,7 +264,8 @@ Function: uncaught_exceptions_analysist::output
 
  Outputs:
 
- Purpose: 
+ Purpose: Prints the exceptions map that maps each method to the 
+          set of exceptions that may escape it
 
 \*******************************************************************/
 
@@ -300,7 +296,8 @@ Function: uncaught_exceptions_analysist::operator()
 
  Outputs:
 
- Purpose: 
+ Purpose: Applies the uncaught exceptions analysis and 
+          outputs the result
 
 \*******************************************************************/
 
@@ -323,7 +320,8 @@ Function: uncaught_exceptions
 
  Outputs:
 
- Purpose: 
+ Purpose: Applies the uncaught exceptions analysis and 
+          outputs the result
 
 \*******************************************************************/
 
