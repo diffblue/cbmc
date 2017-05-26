@@ -93,6 +93,7 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   const function_application_exprt &f)
 {
   assert(f.arguments().empty());
+  assert(refined_string_typet::is_refined_string_type(f.type()));
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
   string_exprt res=fresh_string(ref_type);
   axioms.push_back(res.axiom_for_has_length(0));
@@ -132,7 +133,8 @@ string_exprt string_constraint_generatort::add_axioms_from_literal(
   else
   {
     // Java string constant
-    assert(refined_string_typet::is_unrefined_string_type(arg.type()));
+    assert(false); // TODO: Check if used. On the contrary, discard else.
+    assert(arg.id()==ID_symbol);
     const exprt &s=arg.op0();
 
     // It seems the value of the string is lost,
