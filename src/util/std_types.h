@@ -867,6 +867,16 @@ public:
     set(ID_C_inlined, value);
   }
 
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
+  }
+
   // this produces the list of parameter identifiers
   std::vector<irep_idt> parameter_identifiers() const
   {
