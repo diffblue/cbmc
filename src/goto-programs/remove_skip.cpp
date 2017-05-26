@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_model.h"
 
-static bool is_skip(goto_programt::instructionst::iterator it)
+bool is_skip(const goto_programt &body, goto_programt::const_targett it)
 {
   // we won't remove labelled statements
   // (think about error labels or the like)
@@ -28,8 +28,11 @@ static bool is_skip(goto_programt::instructionst::iterator it)
     if(it->guard.is_false())
       return true;
 
-    goto_programt::instructionst::iterator next_it=it;
+    goto_programt::const_targett next_it = it;
     next_it++;
+
+    if(next_it == body.instructions.end())
+      return false;
 
     // A branch to the next instruction is a skip
     // We also require the guard to be 'true'
@@ -92,7 +95,7 @@ void remove_skip(goto_programt &goto_program)
       // for collecting labels
       std::list<irep_idt> labels;
 
-      while(is_skip(it))
+      while(is_skip(goto_program, it))
       {
         // don't remove the last skip statement,
         // it could be a target
@@ -144,9 +147,10 @@ void remove_skip(goto_programt &goto_program)
     // remove the last skip statement unless it's a target
     goto_program.compute_incoming_edges();
 
-    if(!goto_program.instructions.empty() &&
-       is_skip(--goto_program.instructions.end()) &&
-       !goto_program.instructions.back().is_target())
+    if(
+      !goto_program.instructions.empty() &&
+      is_skip(goto_program, --goto_program.instructions.end()) &&
+      !goto_program.instructions.back().is_target())
       goto_program.instructions.pop_back();
   }
   while(goto_program.instructions.size()<old_size);
