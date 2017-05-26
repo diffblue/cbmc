@@ -963,6 +963,54 @@ string_exprt java_string_library_preprocesst::
 /*******************************************************************\
 
 Function: java_string_library_preprocesst::
+            code_assign_components_to_java_string
+
+  Inputs:
+    lhs - expression representing the java string to assign to
+    rhs_array - pointer to the array to assign
+    rhs_length - length of the array to assign
+    symbol_table - symbol table
+
+  Output: return the following code:
+          > lhs = { {Object}, length=rhs_length, data=rhs_array }
+
+ Purpose: Produce code for an assignemnrt of a string expr to a
+          Java string, component-wise.
+
+\*******************************************************************/
+
+codet java_string_library_preprocesst::code_assign_components_to_java_string(
+  const exprt &lhs,
+  const exprt &rhs_array,
+  const exprt &rhs_length,
+  symbol_tablet &symbol_table)
+{
+  assert(implements_java_char_sequence(lhs.type()));
+  dereference_exprt deref(lhs, lhs.type().subtype());
+
+  code_blockt code;
+
+  // A String has a field Object with @clsid = String and @lock = false:
+  const symbolt &jlo_symbol=symbol_table.lookup("java::java.lang.Object");
+  const struct_typet &jlo_struct=to_struct_type(jlo_symbol.type);
+  struct_exprt jlo_init(jlo_struct);
+  jlo_init.copy_to_operands(constant_exprt(
+    "java::java.lang.String", jlo_struct.components()[0].type()));
+  jlo_init.copy_to_operands(from_integer(0, jlo_struct.components()[1].type()));
+
+  struct_exprt struct_rhs(deref.type());
+  struct_rhs.copy_to_operands(jlo_init);
+  struct_rhs.copy_to_operands(rhs_length);
+  struct_rhs.copy_to_operands(rhs_array);
+  code.add(code_assignt(
+    dereference_exprt(lhs, lhs.type().subtype()), struct_rhs));
+
+  return code;
+}
+
+/*******************************************************************\
+
+Function: java_string_library_preprocesst::
             code_assign_string_expr_to_java_string
 
   Inputs:
@@ -971,8 +1019,10 @@ Function: java_string_library_preprocesst::
     symbol_table - symbol table
 
   Output: return the following code:
-          > lhs->length=rhs.length
-          > lhs->data=&rhs.data
+          > lhs = { {Object}, length=rhs.length, data=rhs.data }
+
+ Purpose: Produce code for an assignemnt of a string expr to a Java
+          string.
 
 \*******************************************************************/
 
@@ -981,19 +1031,8 @@ codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
   const string_exprt &rhs,
   symbol_tablet &symbol_table)
 {
-  assert(implements_java_char_sequence(lhs.type()));
-  dereference_exprt deref(lhs, lhs.type().subtype());
-
-  // Fields of the string object
-  exprt lhs_length=get_length(deref, symbol_table);
-  exprt lhs_data=get_data(deref, symbol_table);
-
-  // Assignments
-  code_blockt code;
-  code.add(code_assignt(lhs_length, rhs.length()));
-  code.add(
-    code_assignt(lhs_data, address_of_exprt(rhs.content())));
-  return code;
+  return code_assign_components_to_java_string(
+    lhs, address_of_exprt(rhs.content()), rhs.length(), symbol_table);
 }
 
 /*******************************************************************\
@@ -1008,8 +1047,11 @@ Function: java_string_library_preprocesst::
     symbol_table - symbol table
 
   Output: return the following code:
-          > lhs->length=rhs.length
-          > lhs->data=&rhs.data
+          > data = new array[];
+          > *data = rhs.data;
+          > lhs = { {Object} , length=rhs.length, data=data}
+
+ Purpose: Produce code for an assignment of a string from a string expr.
 
 \*******************************************************************/
 
@@ -1023,19 +1065,15 @@ codet java_string_library_preprocesst::
   assert(implements_java_char_sequence(lhs.type()));
   dereference_exprt deref(lhs, lhs.type().subtype());
 
-  // Fields of the string object
-  exprt lhs_length=get_length(deref, symbol_table);
-  exprt lhs_data=get_data(deref, symbol_table);
-
-  // Assignments
   code_blockt code;
-  // new array <- malloc(char[])
   exprt new_array=allocate_fresh_array(
     get_data_type(deref.type(), symbol_table), loc, symbol_table, code);
   code.add(code_assignt(
     dereference_exprt(new_array, new_array.type().subtype()), rhs.content()));
-  code.add(code_assignt(lhs_length, rhs.length()));
-  code.add(code_assignt(lhs_data, new_array));
+
+  code.add(code_assign_components_to_java_string(
+    lhs, new_array, rhs.length(), symbol_table));
+
   return code;
 }
 
@@ -1658,6 +1696,7 @@ Function:
 
   Outputs: Code corresponding to:
           > string_expr = function_name(args)
+          > string = new String
           > string = string_expr_to_string(string)
           > return string
 
@@ -1684,11 +1723,11 @@ codet java_string_library_preprocesst::
   string_exprt string_expr=string_expr_of_function_application(
     function_name, arguments, loc, symbol_table, code);
 
-  // Assigning string_expr to symbol for keeping track of it
+  // Assign string_expr to symbol to keep track of it
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, code);
   code.add(code_assignt(string_expr_sym, string_expr));
 
-  // Assigning to string
+  // Assign to string
   exprt str=allocate_fresh_string(type.return_type(), loc, symbol_table, code);
   code.add(code_assign_string_expr_to_new_java_string(
     str, string_expr, loc, symbol_table));
@@ -1843,12 +1882,22 @@ void java_string_library_preprocesst::initialize_conversion_table()
                                                "java.lang.StringBuffer"};
 
   // String library
-  cprover_equivalent_to_java_constructor
+  conversion_table
     ["java::java.lang.String.<init>:(Ljava/lang/String;)V"]=
-      ID_cprover_string_copy_func;
-  cprover_equivalent_to_java_constructor
+      std::bind(
+        &java_string_library_preprocesst::make_copy_constructor_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
+  conversion_table
     ["java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V"]=
-      ID_cprover_string_copy_func;
+      std::bind(
+        &java_string_library_preprocesst::make_copy_constructor_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:([C)V"]=
       ID_cprover_string_copy_func;
@@ -2015,9 +2064,14 @@ void java_string_library_preprocesst::initialize_conversion_table()
   // Not supported "java.lang.String.valueOf:(LObject;)"
 
   // StringBuilder library
-  cprover_equivalent_to_java_constructor
+  conversion_table
     ["java::java.lang.StringBuilder.<init>:(Ljava/lang/String;)V"]=
-      ID_cprover_string_copy_func;
+      std::bind(
+        &java_string_library_preprocesst::make_copy_constructor_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuilder.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -2033,18 +2087,27 @@ void java_string_library_preprocesst::initialize_conversion_table()
       "Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_func;
   // Not supported: "java.lang.StringBuilder.append:([CII)"
-  // Not supported: "java.lang.StringBuilder.append:(LCharSequence;)"
+
+  cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;II)"
+      "Ljava/lang/StringBuilder;"]=
+      ID_cprover_string_concat_func;
+  cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;)"
+      "Ljava/lang/StringBuilder;"]=
+      ID_cprover_string_concat_func;
+
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_double_func;
-  conversion_table["java::java.lang.StringBuilder.append:"
-                   "(F)Ljava/lang/StringBuilder;"]=
-    std::bind(
-      &java_string_library_preprocesst::make_string_builder_append_float_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3);
+  conversion_table
+    ["java::java.lang.StringBuilder.append:(F)Ljava/lang/StringBuilder;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_string_builder_append_float_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_int_func;
@@ -2138,16 +2201,26 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.StringBuilder.substring:(I)Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
-  cprover_equivalent_to_java_string_returning_function
+  conversion_table
     ["java::java.lang.StringBuilder.toString:()Ljava/lang/String;"]=
-      ID_cprover_string_copy_func;
+      std::bind(
+        &java_string_library_preprocesst::make_copy_string_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   // Not supported "java.lang.StringBuilder.trimToSize"
   // TODO clean irep ids from insert_char_array etc...
 
   // StringBuffer library
-  cprover_equivalent_to_java_constructor
+  conversion_table
     ["java::java.lang.StringBuffer.<init>:(Ljava/lang/String;)V"]=
-      ID_cprover_string_copy_func;
+      std::bind(
+        &java_string_library_preprocesst::make_copy_constructor_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuffer.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -2255,15 +2328,28 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.StringBuffer.substring:(I)Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
-  cprover_equivalent_to_java_string_returning_function
+  conversion_table
     ["java::java.lang.StringBuffer.toString:()Ljava/lang/String;"]=
-      ID_cprover_string_copy_func;
+      std::bind(
+        &java_string_library_preprocesst::make_copy_string_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   // Not supported "java.lang.StringBuffer.trimToSize"
 
   // Other libraries
   cprover_equivalent_to_java_function
     ["java::java.lang.CharSequence.charAt:(I)C"]=
       ID_cprover_string_char_at_func;
+  conversion_table
+    ["java::java.lang.CharSequence.toString:()Ljava/lang/String;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_copy_string_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   conversion_table
     ["java::java.lang.Float.toString:(F)Ljava/lang/String;"]=
       std::bind(

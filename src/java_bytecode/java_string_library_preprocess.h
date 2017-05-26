@@ -139,6 +139,16 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
+  codet make_copy_string_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
+  codet make_copy_constructor_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
   // Auxiliary functions
   codet code_for_scientific_notation(
     const exprt &arg,
@@ -253,6 +263,12 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table,
     code_blockt &code);
+
+  codet code_assign_components_to_java_string(
+    const exprt &lhs,
+    const exprt &rhs_array,
+    const exprt &rhs_length,
+    symbol_tablet &symbol_table);
 
   codet code_assign_string_expr_to_java_string(
     const exprt &lhs, const string_exprt &rhs, symbol_tablet &symbol_table);
