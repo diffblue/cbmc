@@ -65,10 +65,14 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   return index;
 }
 
-/// add axioms stating that the returned value is either -1 or greater than
-/// from_index and the string beggining there has prefix substring
-/// \par parameters: two string expressions and an integer expression
-/// \return a integer expression
+/// Add axioms stating that the returned value is the index within haystack of
+/// the first occurence of needle starting the search at from_index, or -1 if
+/// needle does not occur at or after position from_index.
+/// \param haystack: a string expression
+/// \param needle: a string expression
+/// \param from_index: an expression representing an index in strings
+/// \return an integer expression representing the first index of needle in
+///   haystack after from_index, or -1 if there is none
 exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const string_exprt &str,
   const string_exprt &substring,
@@ -79,20 +83,24 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => |str|-|substring|>=offset>=from_index
-  // a2 : !contains => offset=-1
-  // a3 : forall 0<=witness<|substring|.
-  //        contains => str[witness+offset]=substring[witness]
+  // a1 : contains => from_index <= offset <= |str|-|substring|
+  // a2 : !contains <=> offset=-1
+  // a3 : forall n:[0,|substring|[.
+  //        contains => str[n+offset]=substring[n]
+  // a4 : forall n:[from_index,offset[.
+  //        contains => (exists m:[0,|substring|[. str[m+n]!=substring[m]])
+  // a5:  forall n:[from_index,|str|-|substring|[.
+  //        !contains => (exists m:[0,|substring|[. str[m+n]!=substring[m])
 
   implies_exprt a1(
     contains,
     and_exprt(
-      str.axiom_for_is_longer_than(plus_exprt_with_overflow_check(
-        substring.length(), offset)),
-      binary_relation_exprt(offset, ID_ge, from_index)));
+      binary_relation_exprt(from_index, ID_le, offset),
+      binary_relation_exprt(
+        offset, ID_le, minus_exprt(str.length(), substring.length()))));
   axioms.push_back(a1);
 
-  implies_exprt a2(
+  equal_exprt a2(
     not_exprt(contains),
     equal_exprt(offset, from_integer(-1, index_type)));
   axioms.push_back(a2);
@@ -105,9 +113,74 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     equal_exprt(str[plus_exprt(qvar, offset)], substring[qvar]));
   axioms.push_back(a3);
 
+  if(!is_constant_string(substring))
+  {
+    // string_not contains_constraintt are formula of the form:
+    // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
+    string_not_contains_constraintt a4(
+      from_index,
+      offset,
+      contains,
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a4);
+
+    string_not_contains_constraintt a5(
+      from_index,
+      minus_exprt(str.length(), substring.length()),
+      not_exprt(contains),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a5);
+  }
+  else
+  {
+    // Unfold the existential quantifier as a disjunction in case of a constant
+    // a4 && a5 <=> a6:
+    //  forall n:[from_index,|str|-|substring|].
+    //    !contains || n < offset =>
+    //       str[n]!=substring[0] || ... ||
+    //       str[n+|substring|-1]!=substring[|substring|-1]
+    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
+    mp_integer sub_length;
+    assert(!to_integer(substring.length(), sub_length));
+    exprt::operandst disjuncts;
+    for(mp_integer offset=0; offset<sub_length; ++offset)
+    {
+      exprt expr_offset=from_integer(offset, index_type);
+      plus_exprt shifted(expr_offset, qvar2);
+      disjuncts.push_back(
+        not_exprt(equal_exprt(str[shifted], substring[expr_offset])));
+    }
+
+    or_exprt premise(
+      not_exprt(contains), binary_relation_exprt(qvar, ID_lt, offset));
+    minus_exprt length_diff(str.length(), substring.length());
+    string_constraintt a6(
+      qvar2,
+      from_index,
+      plus_exprt(from_integer(1, index_type), length_diff),
+      premise,
+      disjunction(disjuncts));
+    axioms.push_back(a6);
+  }
+
   return offset;
 }
 
+/// Add axioms stating that the returned value is the index within haystack of
+/// the last occurence of needle starting the search backward at from_index (ie
+/// the index is smaller or equal to from_index), or -1 if needle does not occur
+/// before from_index.
+/// \param haystack: a string expression
+/// \param needle: a string expression
+/// \param from_index: an expression representing an index in strings
+/// \return an integer expression representing the last index of needle in
+///   haystack before or at from_index, or -1 if there is none
 exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const string_exprt &str,
   const string_exprt &substring,
