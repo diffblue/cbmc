@@ -106,7 +106,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   cover_goalst cover_goals(solver);
 
-  //set activation literal for incremental checking
+  // set activation literal for incremental checking
   cover_goals.activation_literal=bmc.equation.current_activation_literal();
 
 #if 0

@@ -34,7 +34,7 @@ safety_checkert::resultt bmc_incremental_one_loopt::step(
     // perform symbolic execution
     bool symex_done=
       symex()(
-        symex_state,goto_functions,
+        symex_state, goto_functions,
         goto_functions.function_map.at(goto_functions.entry_point()).body);
 
     // add a partial ordering, if required
@@ -79,7 +79,8 @@ safety_checkert::resultt bmc_incremental_one_loopt::step(
     resultt term_cond=
       options.get_bool_option("stop-when-unsat") ?
         safety_checkert::resultt::UNSAFE : safety_checkert::resultt::SAFE;
-    return result==term_cond && !symex_done ? safety_checkert::resultt::UNKNOWN : result;
+    return result==term_cond && !symex_done ?
+      safety_checkert::resultt::UNKNOWN : result;
   }
 
   catch(std::string &error_str)

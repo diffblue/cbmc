@@ -202,7 +202,7 @@ bool symex_bmc_incrementalt::check_break(
 #if 0
   std::cout << "loop limit for " << id
             << (loop_limits.find(id)!=loop_limits.end() ?
-               " exists" : " does not exist") << std::endl;
+               " exists" : " does not exist") << "\n";
 #endif
 
   loop_limitst &this_thread_limits=
@@ -211,7 +211,7 @@ bool symex_bmc_incrementalt::check_break(
      loop_limits.find(id)==loop_limits.end())
   {
 #if 0
-    std::cout << "not statically unwound" << std::endl;
+    std::cout << "not statically unwound \n";
     // not a statically unwound loop when --incremental
 #endif
 

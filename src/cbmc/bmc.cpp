@@ -384,7 +384,6 @@ safety_checkert::resultt bmct::initialize()
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
     return safety_checkert::resultt::ERROR;
-
   }
 
   symex().set_message_handler(get_message_handler());

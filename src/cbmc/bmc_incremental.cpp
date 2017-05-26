@@ -76,7 +76,8 @@ safety_checkert::resultt bmc_incrementalt::step(
     resultt term_cond=
       options.get_bool_option("stop-when-unsat") ?
         safety_checkert::resultt::UNSAFE : safety_checkert::resultt::SAFE;
-    return result==term_cond && !symex_done ? safety_checkert::resultt::UNKNOWN : result;
+    return result==term_cond && !symex_done ?
+      safety_checkert::resultt::UNKNOWN : result;
   }
 
   catch(std::string &error_str)

@@ -102,7 +102,6 @@ void symex_bmct::merge_goto(
      // branches only, no single-successor goto
      !prev_pc->guard.is_true())
     symex_coverage.covered(prev_pc, state.source.pc);
-
 }
 
 bool symex_bmct::get_unwind(

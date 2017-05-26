@@ -46,15 +46,15 @@ public:
   // make public
   virtual resultt run()
   {
-	  return run(goto_functions);
+    return run(goto_functions);
   }
   virtual resultt initialize()
   {
-	  return bmct::initialize();
+    return bmct::initialize();
   }
   virtual resultt step()
   {
-	  return step(goto_functions);
+    return step(goto_functions);
   }
 
 protected:
