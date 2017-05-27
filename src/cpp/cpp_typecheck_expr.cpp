@@ -2252,9 +2252,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       if(operand.type().id()!=ID_pointer &&
          operand.type()==argument.type().subtype())
       {
-        exprt tmp=address_of_exprt(operand, pointer_type(operand.type()));
+        address_of_exprt tmp(operand, pointer_type(operand.type()));
         tmp.add_source_location()=operand.source_location();
-        operand.swap(tmp);
+        operand=tmp;
       }
     }
   }
@@ -2666,9 +2666,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     else
     {
       assert(expr.op0().get_bool(ID_C_lvalue));
-      exprt address_of=
-        address_of_exprt(expr.op0(), pointer_type(expr.op0().type()));
-      expr.op0().swap(address_of);
+      expr.op0()=address_of_exprt(expr.op0());
     }
   }
 
