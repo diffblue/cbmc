@@ -142,10 +142,7 @@ codet cpp_typecheckt::cpp_destructor(
     assert(tmp_this.id()==ID_address_of
            && tmp_this.op0().id()=="new_object");
 
-    exprt address_of=
-      address_of_exprt(object, pointer_type(object.type()));
-
-    tmp_this.swap(address_of);
+    tmp_this=address_of_exprt(object, pointer_type(object.type()));
 
     new_code.swap(initializer);
   }

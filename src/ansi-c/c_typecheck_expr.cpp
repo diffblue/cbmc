@@ -834,11 +834,10 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 
     if(expr.type().id()==ID_code) // function designator
     { // special case: this is sugar for &f
-      exprt tmp(ID_address_of, pointer_type(expr.type()));
+      address_of_exprt tmp(expr, pointer_type(expr.type()));
       tmp.set("#implicit", true);
       tmp.add_source_location()=expr.source_location();
-      tmp.move_to_operands(expr);
-      expr.swap(tmp);
+      expr=tmp;
     }
   }
 }
@@ -1778,11 +1777,10 @@ void c_typecheck_baset::typecheck_expr_function_identifier(exprt &expr)
 {
   if(expr.type().id()==ID_code)
   {
-    exprt tmp(ID_address_of, pointer_type(expr.type()));
+    address_of_exprt tmp(expr, pointer_type(expr.type()));
     tmp.set(ID_C_implicit, true);
     tmp.add_source_location()=expr.source_location();
-    tmp.move_to_operands(expr);
-    expr.swap(tmp);
+    expr=tmp;
   }
 }
 
