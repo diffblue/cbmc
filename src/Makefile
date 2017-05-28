@@ -44,6 +44,22 @@ symex.dir: languages goto-programs.dir pointer-analysis.dir \
            goto-symex.dir linking.dir analyses.dir solvers.dir \
            path-symex.dir goto-instrument.dir
 
+clobber.dir: \
+  cpp.dir \
+  goto-programs.dir \
+  analyses.dir \
+  langapi.dir \
+  xmllang.dir \
+  assembler.dir \
+  solvers.dir \
+  java_bytecode.dir \
+  # Empty
+
+memory-models.dir: \
+  ansi-c.dir \
+  linking.dir \
+  # Empty
+
 # building for a particular directory
 
 $(patsubst %, %.dir, $(DIRS)):
