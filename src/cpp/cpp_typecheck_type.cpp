@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/simplify_expr.h>
 #include <util/c_types.h>
+#include <util/config.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -80,6 +81,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
   {
     // the pointer might have a qualifier, but do subtype first
     typecheck_type(type.subtype());
+
+    // we add a width, much like with integers
+    to_pointer_type(type).set_width(config.ansi_c.pointer_width);
 
     // Check if it is a pointer-to-member
     if(type.find("to-member").is_not_nil())
