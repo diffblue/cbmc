@@ -2866,6 +2866,9 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convertt goto_convert(symbol_table, message_handler);
 
   try
@@ -2876,20 +2879,20 @@ void goto_convert(
   catch(int)
   {
     goto_convert.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }
 
 /*******************************************************************\

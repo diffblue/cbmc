@@ -22,6 +22,11 @@ Function:
 
 bool typecheckt::typecheck_main()
 {
+  assert(message_handler);
+
+  const unsigned errors_before=
+    message_handler->get_message_count(messaget::M_ERROR);
+
   try
   {
     typecheck();
@@ -29,7 +34,7 @@ bool typecheckt::typecheck_main()
 
   catch(int)
   {
-    error_found=true;
+    error();
   }
 
   catch(const char *e)
@@ -42,5 +47,5 @@ bool typecheckt::typecheck_main()
     error() << e << eom;
   }
 
-  return error_found;
+  return message_handler->get_message_count(messaget::M_ERROR)!=errors_before;
 }

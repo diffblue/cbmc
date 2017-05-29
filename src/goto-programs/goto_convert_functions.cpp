@@ -330,6 +330,9 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
 
@@ -341,20 +344,20 @@ void goto_convert(
   catch(int)
   {
     goto_convert_functions.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }
 
 /*******************************************************************\
@@ -375,6 +378,9 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
 
@@ -386,18 +392,18 @@ void goto_convert(
   catch(int)
   {
     goto_convert_functions.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }

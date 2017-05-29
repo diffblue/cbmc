@@ -46,7 +46,7 @@ int armcc_modet::doit()
 
   unsigned int verbosity=1;
 
-  compilet compiler(cmdline);
+  compilet compiler(cmdline, message_handler, cmdline.isset("diag_error="));
 
   #if 0
   bool act_as_ld=

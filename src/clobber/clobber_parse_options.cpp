@@ -326,7 +326,7 @@ bool clobber_parse_optionst::get_goto_program(
 
       language->set_message_handler(get_message_handler());
 
-      status("Parsing", filename);
+      status() << "Parsing " << filename << eom;
 
       if(language->parse(infile, filename))
       {

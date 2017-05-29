@@ -121,6 +121,9 @@ bool compilet::doit()
     return true;
   }
 
+  const unsigned warnings_before=
+    get_message_handler().get_message_count(messaget::M_WARNING);
+
   if(source_files.size()>0)
     if(compile())
       return true;
@@ -133,7 +136,10 @@ bool compilet::doit()
       return true;
   }
 
-  return false;
+  return
+    warning_is_fatal &&
+    get_message_handler().get_message_count(messaget::M_WARNING)!=
+    warnings_before;
 }
 
 /*******************************************************************\
@@ -156,8 +162,8 @@ bool compilet::add_input_file(const std::string &file_name)
     std::ifstream in(file_name);
     if(!in)
     {
-      error() << "failed to open file `" << file_name << "'" << eom;
-      return false; // generously ignore
+      warning() << "failed to open file `" << file_name << "'" << eom;
+      return warning_is_fatal; // generously ignore unless -Werror
     }
   }
 
@@ -168,7 +174,7 @@ bool compilet::add_input_file(const std::string &file_name)
     // a file without extension; will ignore
     warning() << "input file `" << file_name
               << "' has no extension, not considered" << eom;
-    return false;
+    return warning_is_fatal;
   }
 
   std::string ext = file_name.substr(r+1, file_name.length());
@@ -329,7 +335,7 @@ bool compilet::find_library(const std::string &name)
       else if(is_elf_file(libname))
       {
         warning() << "Warning: Cannot read ELF library " << libname << eom;
-        return false;
+        return warning_is_fatal;
       }
     }
   }
@@ -383,7 +389,7 @@ Function: compilet::link
 bool compilet::link()
 {
   // "compile" hitherto uncompiled functions
-  print(8, "Compiling functions");
+  statistics() << "Compiling functions" << eom;
   convert_symbols(compiled_functions);
 
   // parse object files
@@ -409,7 +415,7 @@ bool compilet::link()
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
       return true;
 
     // entry_point may (should) add some more functions.
@@ -554,7 +560,7 @@ bool compilet::parse(const std::string &file_name)
 
   if(mode==PREPROCESS_ONLY)
   {
-    print(8, "Preprocessing: "+file_name);
+    statistics() << "Preprocessing: " << file_name << eom;
 
     std::ostream *os = &std::cout;
     std::ofstream ofs;
@@ -576,7 +582,7 @@ bool compilet::parse(const std::string &file_name)
   }
   else
   {
-    print(8, "Parsing: "+file_name);
+    statistics() << "Parsing: " << file_name << eom;
 
     if(language.parse(infile, file_name))
     {
@@ -608,7 +614,7 @@ bool compilet::parse_stdin()
 
   language.set_message_handler(get_message_handler());
 
-  print(8, "Parsing: (stdin)");
+  statistics() << "Parsing: (stdin)" << eom;
 
   if(mode==PREPROCESS_ONLY)
   {
@@ -752,11 +758,11 @@ Function: compilet::compilet
 
 \*******************************************************************/
 
-compilet::compilet(cmdlinet &_cmdline):
-  language_uit(_cmdline, ui_message_handler),
-  ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
+compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
+  language_uit(_cmdline, mh),
   ns(symbol_table),
-  cmdline(_cmdline)
+  cmdline(_cmdline),
+  warning_is_fatal(Werror)
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
@@ -842,7 +848,7 @@ Function: compilet::convert_symbols
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, dest, ui_message_handler);
+  goto_convert_functionst converter(symbol_table, dest, get_message_handler());
 
   // the compilation may add symbols!
 
@@ -872,7 +878,7 @@ void compilet::convert_symbols(goto_functionst &dest)
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {
-        print(9, "Compiling "+id2string(s_it->first));
+        debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first);
         s_it->second.value=exprt("compiled");
       }

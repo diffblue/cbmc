@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class message_handlert
 {
 public:
-  message_handlert():verbosity(10)
+  message_handlert():verbosity(10), message_count(10, 0)
   {
   }
 
@@ -30,6 +30,11 @@ public:
     int sequence_number,
     const source_locationt &location);
 
+  virtual void flush(unsigned level)
+  {
+    // no-op by default
+  }
+
   virtual ~message_handlert()
   {
   }
@@ -37,8 +42,17 @@ public:
   void set_verbosity(unsigned _verbosity) { verbosity=_verbosity; }
   unsigned get_verbosity() const { return verbosity; }
 
+  unsigned get_message_count(unsigned level) const
+  {
+    if(level>=message_count.size())
+      return 0;
+
+    return message_count[level];
+  }
+
 protected:
   unsigned verbosity;
+  std::vector<unsigned> message_count;
 };
 
 class null_message_handlert:public message_handlert
@@ -46,6 +60,7 @@ class null_message_handlert:public message_handlert
 public:
   virtual void print(unsigned level, const std::string &message)
   {
+    message_handlert::print(level, message);
   }
 
   virtual void print(
@@ -54,6 +69,7 @@ public:
     int sequence_number,
     const source_locationt &location)
   {
+    print(level, message);
   }
 };
 
@@ -65,13 +81,23 @@ public:
   }
 
   virtual void print(unsigned level, const std::string &message)
-  { out << message << '\n'; }
+  {
+    message_handlert::print(level, message);
+
+    if(verbosity>=level)
+      out << message << '\n';
+  }
+
+  virtual void flush(unsigned level)
+  {
+    out << std::flush;
+  }
 
 protected:
   std::ostream &out;
 };
 
-class message_clientt
+class messaget
 {
 public:
   // Standard message levels:
@@ -91,17 +117,9 @@ public:
     M_STATISTICS=8, M_PROGRESS=9, M_DEBUG=10
   };
 
-  virtual ~message_clientt();
-
-  virtual void set_message_handler(message_handlert &_message_handler);
-
-  message_clientt():message_handler(NULL)
+  virtual void set_message_handler(message_handlert &_message_handler)
   {
-  }
-
-  explicit message_clientt(message_handlert &_message_handler):
-    message_handler(&_message_handler)
-  {
+    message_handler=&_message_handler;
   }
 
   message_handlert &get_message_handler()
@@ -109,62 +127,27 @@ public:
     return *message_handler;
   }
 
-protected:
-  message_handlert *message_handler;
-};
-
-class messaget:public message_clientt
-{
-public:
   // constructors, destructor
 
   messaget():
+    message_handler(NULL),
     mstream(M_DEBUG, *this)
   {
   }
 
   messaget(const messaget &other):
-    message_clientt(other),
-    mstream(M_DEBUG, *this)
+    message_handler(other.message_handler),
+    mstream(other.mstream)
   {
   }
 
   explicit messaget(message_handlert &_message_handler):
-    message_clientt(_message_handler),
+    message_handler(&_message_handler),
     mstream(M_DEBUG, *this)
   {
   }
 
-  virtual ~messaget() { }
-
-  // old interface, will go away
-  void status(
-    const std::string &message,
-    const std::string &file)
-  {
-    source_locationt location;
-    location.set_file(file);
-    print(6, message, -1, location);
-  }
-
-  void error(
-    const std::string &message,
-    const std::string &file)
-  {
-    source_locationt location;
-    location.set_file(file);
-    print(1, message, -1, location);
-  }
-
-  virtual void print(unsigned level, const std::string &message);
-
-  virtual void print(
-    unsigned level,
-    const std::string &message,
-    int sequence_number, // -1: no sequence information
-    const source_locationt &location);
-
-  // New interface
+  virtual ~messaget();
 
   class mstreamt:public std::ostringstream
   {
@@ -174,6 +157,13 @@ public:
       messaget &_message):
       message_level(_message_level),
       message(_message)
+    {
+    }
+
+    mstreamt(const mstreamt &other):
+      message_level(other.message_level),
+      message(other.message),
+      source_location(other.source_location)
     {
     }
 
@@ -197,9 +187,17 @@ public:
 
   // Feeding 'eom' into the stream triggers
   // the printing of the message
-  static inline mstreamt &eom(mstreamt &m)
+  static mstreamt &eom(mstreamt &m)
   {
-    m.message.print(m.message_level, m.str(), -1, m.source_location);
+    if(m.message.message_handler)
+    {
+      m.message.message_handler->print(
+        m.message_level,
+        m.str(),
+        -1,
+        m.source_location);
+      m.message.message_handler->flush(m.message_level);
+    }
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
     m.source_location.clear();
@@ -207,52 +205,10 @@ public:
   }
 
   // in lieu of std::endl
-  static inline mstreamt &endl(mstreamt &m)
+  static mstreamt &endl(mstreamt &m)
   {
     static_cast<std::ostream &>(m) << std::endl;
     return m;
-  }
-
-  mstreamt &error()
-  {
-    mstream.message_level=M_ERROR;
-    return mstream;
-  }
-
-  mstreamt &warning()
-  {
-    mstream.message_level=M_WARNING;
-    return mstream;
-  }
-
-  mstreamt &result()
-  {
-    mstream.message_level=M_RESULT;
-    return mstream;
-  }
-
-  mstreamt &status()
-  {
-    mstream.message_level=M_STATUS;
-    return mstream;
-  }
-
-  mstreamt &statistics()
-  {
-    mstream.message_level=M_STATISTICS;
-    return mstream;
-  }
-
-  mstreamt &progress()
-  {
-    mstream.message_level=M_PROGRESS;
-    return mstream;
-  }
-
-  mstreamt &debug()
-  {
-    mstream.message_level=M_DEBUG;
-    return mstream;
   }
 
   mstreamt &get_mstream(unsigned message_level)
@@ -261,7 +217,43 @@ public:
     return mstream;
   }
 
+  mstreamt &error()
+  {
+    return get_mstream(M_ERROR);
+  }
+
+  mstreamt &warning()
+  {
+    return get_mstream(M_WARNING);
+  }
+
+  mstreamt &result()
+  {
+    return get_mstream(M_RESULT);
+  }
+
+  mstreamt &status()
+  {
+    return get_mstream(M_STATUS);
+  }
+
+  mstreamt &statistics()
+  {
+    return get_mstream(M_STATISTICS);
+  }
+
+  mstreamt &progress()
+  {
+    return get_mstream(M_PROGRESS);
+  }
+
+  mstreamt &debug()
+  {
+    return get_mstream(M_DEBUG);
+  }
+
 protected:
+  message_handlert *message_handler;
   mstreamt mstream;
 };
 
