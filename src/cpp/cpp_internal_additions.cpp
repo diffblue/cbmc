@@ -136,11 +136,20 @@ void cpp_internal_additions(std::ostream &out)
   {
     out << "extern \"C\" {" << '\n';
     out << c2cpp(gcc_builtin_headers_generic);
+    out << c2cpp(gcc_builtin_headers_math);
+    out << c2cpp(gcc_builtin_headers_mem_string);
+    out << c2cpp(gcc_builtin_headers_omp);
+    out << c2cpp(gcc_builtin_headers_tm);
+    out << c2cpp(gcc_builtin_headers_ubsan);
+    out << c2cpp(clang_builtin_headers);
 
      if(config.ansi_c.mode==configt::ansi_ct::flavourt::APPLE)
        out << "typedef double __float128;\n"; // clang doesn't do __float128
 
     out << c2cpp(gcc_builtin_headers_ia32);
+    out << c2cpp(gcc_builtin_headers_ia32_2);
+    out << c2cpp(gcc_builtin_headers_ia32_3);
+    out << c2cpp(gcc_builtin_headers_ia32_4);
     out << "}" << '\n';
   }
 
