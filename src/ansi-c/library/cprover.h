@@ -52,7 +52,7 @@ void CBMC_trace(int lvl, const char *event, ...);
 #endif
 
 // pointers
-//unsigned __CPROVER_POINTER_OBJECT(const void *p);
+unsigned __CPROVER_POINTER_OBJECT(const void *p);
 signed __CPROVER_POINTER_OFFSET(const void *p);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 #if 0
@@ -104,7 +104,8 @@ float __CPROVER_fabsf(float);
 // arrays
 //__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);
 void __CPROVER_array_copy(const void *dest, const void *src);
-//void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_replace(const void *dest, const void *src);
 
 #if 0
 // k-induction

@@ -204,6 +204,7 @@ protected:
   std::string convert_code_output(const codet &src, unsigned indent);
   std::string convert_code_array_set(const codet &src, unsigned indent);
   std::string convert_code_array_copy(const codet &src, unsigned indent);
+  std::string convert_code_array_replace(const codet &src, unsigned indent);
 
   virtual std::string convert_with_precedence(
     const exprt &src, unsigned &precedence);

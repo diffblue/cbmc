@@ -244,7 +244,11 @@ void ansi_c_internal_additions(std::string &code)
     // arrays
     // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
+    // overwrite all of *dest (possibly using nondet values), even
+    // if *src is smaller
     "void __CPROVER_array_copy(const void *dest, const void *src);\n"
+    // replace at most size-of-*src bytes in *dest
+    "void __CPROVER_array_replace(const void *dest, const void *src);\n"
     "void __CPROVER_array_set(const void *dest, ...);\n"
 
     // k-induction

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -13,8 +14,149 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/byte_operators.h>
 #include <util/namespace.h>
+#include <util/replace_symbol.h>
+#include <util/simplify_expr.h>
 
 #include "flatten_byte_operators.h"
+
+/*******************************************************************\
+
+Function: unpack_rec
+
+  Inputs:
+    src  object to unpack
+    little_endian  true, iff assumed endianness is little-endian
+    max_bytes  if not nil, use as upper bound of the number of bytes
+               to unpack
+    ns  namespace for type lookups
+
+ Outputs: array of bytes in the sequence found in memory
+
+ Purpose: rewrite an object into its individual bytes
+
+\*******************************************************************/
+
+static exprt unpack_rec(
+  const exprt &src,
+  bool little_endian,
+  const exprt &max_bytes,
+  const namespacet &ns,
+  bool unpack_byte_array=false)
+{
+  array_exprt array(
+    array_typet(unsignedbv_typet(8), from_integer(0, size_type())));
+
+  // endianness_mapt should be the point of reference for mapping out
+  // endianness, but we need to work on elements here instead of
+  // individual bits
+
+  const typet &type=ns.follow(src.type());
+
+  if(type.id()==ID_array)
+  {
+    const array_typet &array_type=to_array_type(type);
+    const typet &subtype=array_type.subtype();
+
+    mp_integer element_width=pointer_offset_bits(subtype, ns);
+    // this probably doesn't really matter
+    #if 0
+    if(element_width<=0)
+      throw "cannot unpack array with non-constant element width:\n"+
+        type.pretty();
+    else if(element_width%8!=0)
+      throw "cannot unpack array of non-byte aligned elements:\n"+
+        type.pretty();
+    #endif
+
+    if(!unpack_byte_array && element_width==8)
+      return src;
+
+    mp_integer num_elements;
+    if(to_integer(max_bytes, num_elements) &&
+       to_integer(array_type.size(), num_elements))
+      throw "cannot unpack array of non-const size:\n"+type.pretty();
+
+    // all array members will have the same structure; do this just
+    // once and then replace the dummy symbol by a suitable index
+    // expression in the loop below
+    symbol_exprt dummy(ID_C_incomplete, subtype);
+    exprt sub=unpack_rec(dummy, little_endian, max_bytes, ns, true);
+
+    for(mp_integer i=0; i<num_elements; ++i)
+    {
+      index_exprt index(src, from_integer(i, index_type()));
+      replace_symbolt replace;
+      replace.insert(ID_C_incomplete, index);
+
+      for(const auto &op : sub.operands())
+      {
+        exprt new_op=op;
+        replace(new_op);
+        simplify(new_op, ns);
+        array.copy_to_operands(new_op);
+      }
+    }
+  }
+  else if(type.id()==ID_struct)
+  {
+    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet::componentst &components=struct_type.components();
+
+    for(const auto &comp : components)
+    {
+      mp_integer element_width=pointer_offset_bits(comp.type(), ns);
+
+      // the next member would be misaligned, abort
+      if(element_width<=0 || element_width%8!=0)
+        throw "cannot unpack struct with non-byte aligned components:\n"+
+          struct_type.pretty();
+
+      member_exprt member(src, comp.get_name(), comp.type());
+      exprt sub=unpack_rec(member, little_endian, max_bytes, ns, true);
+
+      for(const auto& op : sub.operands())
+        array.copy_to_operands(op);
+    }
+  }
+  else if(type.id()!=ID_empty)
+  {
+    // a basic type; we turn that into logical right shift and
+    // extractbits while considering endianness
+    mp_integer bits=pointer_offset_bits(type, ns);
+    if(bits<0)
+    {
+      if(to_integer(max_bytes, bits))
+        throw "cannot unpack object of non-constant width:\n"+
+          src.pretty();
+      else
+        bits*=8;
+    }
+
+    // cast to generic bit-vector
+    typecast_exprt src_tc(src, unsignedbv_typet(integer2size_t(bits)));
+
+    for(mp_integer i=0; i<bits; i+=8)
+    {
+      lshr_exprt right_shift(src_tc, from_integer(i, index_type()));
+
+      extractbits_exprt extractbits(
+        right_shift,
+        from_integer(7, index_type()),
+        from_integer(0, index_type()),
+        unsignedbv_typet(8));
+
+      if(little_endian)
+        array.copy_to_operands(extractbits);
+      else
+        array.operands().insert(array.operands().begin(), extractbits);
+    }
+  }
+
+  to_array_type(array.type()).size()=
+    from_integer(array.operands().size(), size_type());
+
+  return array;
+}
 
 /*******************************************************************\
 
@@ -33,6 +175,51 @@ exprt flatten_byte_extract(
   const byte_extract_exprt &src,
   const namespacet &ns)
 {
+  // General notes about endianness and the bit-vector conversion:
+  // A single byte with value 0b10001000 is stored (in irept) as
+  // exactly this string literal, and its bit-vector encoding will be
+  // bvt bv={0,0,0,1,0,0,0,1}, i.e., bv[0]==0 and bv[7]==1
+  //
+  // A multi-byte value like x=256 would be:
+  // - little-endian storage: ((char*)&x)[0]==0, ((char*)&x)[1]==1
+  // - big-endian storage:    ((char*)&x)[0]==1, ((char*)&x)[1]==0
+  // - irept representation: 0000000100000000
+  // - bvt: {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
+  //         <... 8bits ...> <... 8bits ...>
+  //
+  // An array {0, 1} will be encoded as bvt bv={0,1}, i.e., bv[1]==1
+  // concatenation(0, 1) will yield a bvt bv={1,0}, i.e., bv[1]==0
+  //
+  // The semantics of byte_extract(endianness, op, offset, T) is:
+  // interpret ((char*)&op)+offset as the endianness-ordered storage
+  // of an object of type T at address ((char*)&op)+offset
+  // For some T x, byte_extract(endianness, x, 0, T) must yield x.
+  //
+  // byte_extract for a composite type T or an array will interpret
+  // the individual subtypes with suitable endianness; the overall
+  // order of components is not affected by endianness.
+  //
+  // Examples:
+  // unsigned char A[4];
+  // byte_extract_little_endian(A, 0, unsigned short) requests that
+  // A[0],A[1] be interpreted as the storage of an unsigned short with
+  // A[1] being the most-significant byte; byte_extract_big_endian for
+  // the same operands will select A[0] as the most-significant byte.
+  //
+  // int A[2] = {0x01020304,0xDEADBEEF}
+  // byte_extract_big_endian(A, 0, short) should yield 0x0102
+  // byte_extract_little_endian(A, 0, short) should yield 0x0304
+  // To obtain this we first compute byte arrays while taking into
+  // account endianness:
+  // big-endian byte representation: {01,02,03,04,DE,AB,BE,EF}
+  // little-endian byte representation: {04,03,02,01,EF,BE,AB,DE}
+  // We extract the relevant bytes starting from ((char*)A)+0:
+  // big-endian: {01,02}; little-endian: {04,03}
+  // Finally we place them in the appropriate byte order as indicated
+  // by endianness:
+  // big-endian: (short)concatenation(01,02)=0x0102
+  // little-endian: (short)concatenation(03,04)=0x0304
+
   assert(src.operands().size()==2);
 
   bool little_endian;
@@ -44,135 +231,133 @@ exprt flatten_byte_extract(
   else
     assert(false);
 
-  mp_integer size_bits=pointer_offset_bits(src.type(), ns);
-  if(size_bits<0)
-    throw "byte_extract flatting with non-constant size: "+src.pretty();
+  // determine an upper bound of the number of bytes we might need
+  exprt upper_bound=size_of_expr(src.type(), ns);
+  if(upper_bound.is_not_nil())
+    upper_bound=
+      simplify_expr(
+        plus_exprt(
+          upper_bound,
+          typecast_exprt(src.offset(), upper_bound.type())),
+        ns);
 
-  if(src.op0().type().id()==ID_array)
+  byte_extract_exprt unpacked(src);
+  unpacked.op()=
+    unpack_rec(src.op(), little_endian, upper_bound, ns);
+
+  const typet &type=ns.follow(src.type());
+
+  if(type.id()==ID_array)
   {
-    const exprt &root=src.op0();
-    const exprt &offset=src.op1();
-
-    const array_typet &array_type=to_array_type(root.type());
+    const array_typet &array_type=to_array_type(type);
     const typet &subtype=array_type.subtype();
 
     mp_integer element_width=pointer_offset_bits(subtype, ns);
-    if(element_width<0) // failed
-      throw "failed to flatten array with unknown element width";
-
-    mp_integer num_elements=
-      size_bits/element_width+((size_bits%element_width==0)?0:1);
-
-    const typet &offset_type=ns.follow(offset.type());
-
-    // byte-array?
-    if(element_width==8)
+    mp_integer num_elements;
+    // TODO: consider ways of dealing with arrays of unknown subtype
+    // size or with a subtype size that does not fit byte boundaries
+    if(element_width>0 && element_width%8==0 &&
+       to_integer(array_type.size(), num_elements))
     {
-      // get 'width'-many bytes, and concatenate
-      std::size_t width_bytes=integer2unsigned(num_elements);
-      exprt::operandst op;
-      op.reserve(width_bytes);
+      array_exprt array(array_type);
 
-      for(std::size_t i=0; i<width_bytes; i++)
-      {
-        // the most significant byte comes first in the concatenation!
-        std::size_t offset_int=
-          little_endian?(width_bytes-i-1):i;
-
-        plus_exprt offset_i(from_integer(offset_int, offset_type), offset);
-        index_exprt index_expr(root, offset_i);
-        op.push_back(index_expr);
-      }
-
-      // TODO this doesn't seem correct if size_bits%8!=0 as more
-      // bits than the original expression will be returned.
-      if(width_bytes==1)
-        return op.front();
-      else // width_bytes>=2
-      {
-        concatenation_exprt concatenation(src.type());
-        concatenation.operands().swap(op);
-        return concatenation;
-      }
-    }
-    else // non-byte array
-    {
-      // add an extra element as the access need not be aligned with
-      // element boundaries and could thus stretch over extra elements
-      ++num_elements;
-
-      assert(element_width!=0);
-
-      // compute new root and offset
-      concatenation_exprt concat(
-        unsignedbv_typet(integer2unsigned(element_width*num_elements)));
-
-      assert(element_width%8==0);
-      exprt first_index=
-        div_exprt(offset, from_integer(element_width/8, offset_type));
-
-      // byte extract will do the appropriate mapping, thus MSB comes
-      // last here (as opposed to the above, where no further byte
-      // extract is involved)
       for(mp_integer i=0; i<num_elements; ++i)
       {
-        // the most significant byte comes first in the concatenation!
-        mp_integer index_offset=
-          little_endian?(num_elements-i-1):i;
+        plus_exprt new_offset(
+          unpacked.offset(),
+          from_integer(i*element_width, unpacked.offset().type()));
 
-        plus_exprt index(first_index, from_integer(index_offset, offset_type));
-        concat.copy_to_operands(index_exprt(root, index));
+        byte_extract_exprt tmp(unpacked);
+        tmp.type()=subtype;
+        tmp.offset()=simplify_expr(new_offset, ns);
+
+        array.copy_to_operands(flatten_byte_extract(tmp, ns));
       }
 
-      // the new offset is offset%width
-      mod_exprt new_offset(offset,
-                           from_integer(element_width/8, offset_type));
-
-      // build new byte-extract expression
-      byte_extract_exprt tmp(src);
-      tmp.op()=concat;
-      tmp.offset()=new_offset;
-
-      return tmp;
+      return array;
     }
   }
-  else // non-array
+  else if(type.id()==ID_struct)
   {
-    mp_integer op0_bits=pointer_offset_bits(src.op0().type(), ns);
-    if(op0_bits<0)
-      throw "byte_extract flatting of non-constant source size: "+src.pretty();
+    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet::componentst &components=struct_type.components();
 
-    // We turn that into logical right shift and extractbits
+    bool failed=false;
+    struct_exprt s(struct_type);
 
-    const exprt &offset=src.op1();
-    const typet &offset_type=ns.follow(offset.type());
-
-    // adjust for endianness
-    exprt adjusted_offset;
-
-    if(little_endian)
-      adjusted_offset=offset;
-    else
+    for(const auto &comp : components)
     {
-      exprt width_constant=from_integer(op0_bits/8-1, offset_type);
-      adjusted_offset=minus_exprt(width_constant, offset);
+      mp_integer element_width=pointer_offset_bits(comp.type(), ns);
+
+      // the next member would be misaligned, abort
+      if(element_width<=0 || element_width%8!=0)
+      {
+        failed=true;
+        break;
+      }
+
+      plus_exprt new_offset(
+        unpacked.offset(),
+        typecast_exprt(
+          member_offset_expr(struct_type, comp.get_name(), ns),
+          unpacked.offset().type()));
+
+      byte_extract_exprt tmp(unpacked);
+      tmp.type()=comp.type();
+      tmp.offset()=simplify_expr(new_offset, ns);
     }
 
-    mult_exprt times_eight(adjusted_offset, from_integer(8, offset_type));
+    if(!failed)
+      return s;
+  }
 
-    // cast to generic bit-vector
-    std::size_t op0_width=integer2unsigned(op0_bits);
-    typecast_exprt src_op0_tc(src.op0(), bv_typet(op0_width));
-    lshr_exprt left_shift(src_op0_tc, times_eight);
+  const exprt &root=unpacked.op();
+  const exprt &offset=unpacked.offset();
 
-    extractbits_exprt extractbits;
+  const array_typet &array_type=to_array_type(root.type());
+  const typet &subtype=array_type.subtype();
 
-    extractbits.src()=left_shift;
-    extractbits.type()=src.type();
-    extractbits.upper()=from_integer(size_bits-1, offset_type);
-    extractbits.lower()=from_integer(0, offset_type);
+  assert(pointer_offset_bits(subtype, ns)==8);
 
-    return extractbits;
+  mp_integer size_bits=pointer_offset_bits(unpacked.type(), ns);
+  if(size_bits<0)
+  {
+    mp_integer op0_bits=pointer_offset_bits(unpacked.op().type(), ns);
+    if(op0_bits<0)
+      throw "byte_extract flatting with non-constant size:\n"+
+        unpacked.pretty();
+    else
+      size_bits=op0_bits;
+  }
+
+  mp_integer num_elements=
+    size_bits/8+((size_bits%8==0)?0:1);
+
+  const typet &offset_type=ns.follow(offset.type());
+
+  // get 'width'-many bytes, and concatenate
+  std::size_t width_bytes=integer2unsigned(num_elements);
+  exprt::operandst op;
+  op.reserve(width_bytes);
+
+  for(std::size_t i=0; i<width_bytes; i++)
+  {
+    // the most significant byte comes first in the concatenation!
+    std::size_t offset_int=
+      little_endian?(width_bytes-i-1):i;
+
+    plus_exprt offset_i(from_integer(offset_int, offset_type), offset);
+    index_exprt index_expr(root, offset_i);
+    op.push_back(index_expr);
+  }
+
+  if(width_bytes==1)
+    return simplify_expr(typecast_exprt(op.front(), src.type()), ns);
+  else // width_bytes>=2
+  {
+    concatenation_exprt concatenation(src.type());
+    concatenation.operands().swap(op);
+    return concatenation;
   }
 }
 

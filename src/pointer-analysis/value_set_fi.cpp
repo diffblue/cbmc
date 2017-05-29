@@ -1727,7 +1727,9 @@ void value_set_fit::apply_code(
   else if(statement==ID_fence)
   {
   }
-  else if(statement==ID_array_copy)
+  else if(statement==ID_array_copy ||
+          statement==ID_array_replace ||
+          statement==ID_array_set)
   {
   }
   else if(statement==ID_input || statement==ID_output)

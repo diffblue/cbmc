@@ -386,7 +386,7 @@ bool value_sett::eval_pointer_offset(
         if(mod && ptr_offset!=previous_offset)
           return false;
 
-        new_expr=from_integer(ptr_offset, index_type());
+        new_expr=from_integer(ptr_offset, expr.type());
         previous_offset=ptr_offset;
         mod=true;
       }
@@ -1820,6 +1820,9 @@ void value_sett::apply_code(
   {
   }
   else if(statement==ID_array_copy)
+  {
+  }
+  else if(statement==ID_array_replace)
   {
   }
   else if(statement==ID_assume)
