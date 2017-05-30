@@ -37,7 +37,7 @@ public:
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
-    throw_runtime_exceptions(_throw_runtime_exceptions),  
+    throw_runtime_exceptions(_throw_runtime_exceptions),
     lazy_methods(_lazy_methods)
   {
   }
@@ -109,6 +109,11 @@ public:
     const exprt &idx,
     const source_locationt &original_sloc);
 
+  codet throw_exception(
+    const exprt &cond,
+    const source_locationt &original_loc,
+    const irep_idt &exc_name);
+
   codet throw_array_access_exception(
     const exprt &arraystruct,
     const exprt &idx,
@@ -119,7 +124,7 @@ public:
     const source_locationt &original_sloc);
 
   codet throw_null_dereference_exception(
-    const exprt &expr,
+    exprt &expr,
     const source_locationt &original_sloc);
 
   codet throw_class_cast_exception(

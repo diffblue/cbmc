@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
+#include "java_object_factory.h"
+#include "java_root_class.h"
 #include "java_types.h"
 
 #include <limits>
@@ -569,6 +571,79 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
 
 /*******************************************************************\
 
+Function: throw_exception
+
+  Inputs: 
+
+ Outputs: 
+
+ Purpose: Creates a class stub for exc_name and generates a 
+          conditional GOTO such that exc_name is thrown when 
+          cond is met
+
+\*******************************************************************/
+
+codet java_bytecode_convert_methodt::throw_exception(
+  const exprt &cond,
+  const source_locationt &original_loc,
+  const irep_idt &exc_name)
+{
+  exprt exc;
+  code_blockt init_code;
+  const irep_idt &exc_obj_name=id2string(goto_functionst::entry_point())+
+    "::"+id2string(exc_name);
+
+  if(!symbol_table.has_symbol(exc_obj_name))
+  {
+    // for now, create a class stub
+    // TODO: model exceptions and use that model
+    class_typet class_type;
+    class_type.set_tag(exc_name);
+    class_type.set(ID_base_name, exc_name);
+    class_type.set(ID_incomplete_class, true);
+
+    // produce class symbol
+    symbolt exc_symbol;
+    exc_symbol.base_name=exc_name;
+    exc_symbol.pretty_name=exc_name;
+    exc_symbol.name="java::"+id2string(exc_name);
+    class_type.set(ID_name, exc_symbol.name);
+    exc_symbol.type=class_type;
+    exc_symbol.mode=ID_java;
+    exc_symbol.is_type=true;
+    symbol_table.add(exc_symbol);
+    // create the class identifier
+    java_root_class(exc_symbol);
+
+    // create the exception object
+    exc=object_factory(
+      pointer_typet(exc_symbol.type),
+      exc_name,
+      init_code,
+      false,
+      symbol_table,
+      max_array_length,
+      original_loc);
+  }
+  else
+    exc=symbol_table.lookup(exc_obj_name).symbol_expr();
+
+  side_effect_expr_throwt throw_expr;
+  throw_expr.add_source_location()=original_loc;
+  throw_expr.move_to_operands(exc);
+
+  code_ifthenelset if_code;
+  if_code.add_source_location()=original_loc;
+  if_code.cond()=cond;
+  if_code.then_case()=code_expressiont(throw_expr);
+
+  init_code.move_to_operands(if_code);
+
+  return init_code;
+}
+
+/*******************************************************************\
+
 Function: throw_array_access_exception
 
   Inputs: 
@@ -586,36 +661,15 @@ codet java_bytecode_convert_methodt::throw_array_access_exception(
   const exprt &idx,
   const source_locationt &original_loc)
 {
-  symbolt exc_symbol;
-  if(!symbol_table.has_symbol("ArrayIndexOutOfBoundsException"))
-  {
-    exc_symbol.is_static_lifetime=true;
-    exc_symbol.base_name="ArrayIndexOutOfBoundsException";
-    exc_symbol.name="ArrayIndexOutOfBoundsException";
-    exc_symbol.mode=ID_java;
-    exc_symbol.type=typet(ID_pointer, empty_typet());
-    symbol_table.add(exc_symbol);
-  }
-  else
-    exc_symbol=symbol_table.lookup("ArrayIndexOutOfBoundsException");
-
-  const symbol_exprt &exc=exc_symbol.symbol_expr();
-  side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_loc;
-  throw_expr.copy_to_operands(exc);
-
   const constant_exprt &zero=from_integer(0, java_int_type());
   const binary_relation_exprt lt_zero(idx, ID_lt, zero);
   const member_exprt length_field(array_struct, "length", java_int_type());
   const binary_relation_exprt ge_length(idx, ID_ge, length_field);
-  const and_exprt and_expr(lt_zero, ge_length);
+  const or_exprt or_expr(lt_zero, ge_length);
 
-  code_ifthenelset if_code;
-  if_code.add_source_location()=original_loc;
-  if_code.cond()=and_expr;
-  if_code.then_case()=code_expressiont(throw_expr);
-
-  return if_code;
+  return throw_exception(
+    or_expr,
+    original_loc, "java.lang.ArrayIndexOutOfBoundsException");
 }
 
 /*******************************************************************\
@@ -634,33 +688,12 @@ codet java_bytecode_convert_methodt::throw_array_length_exception(
   const exprt &length,
   const source_locationt &original_loc)
 {
-  symbolt exc_symbol;
-  if(!symbol_table.has_symbol("NegativeArraySizeException"))
-  {
-    exc_symbol.is_static_lifetime=true;
-    exc_symbol.base_name="NegativeArraySizeException";
-    exc_symbol.name="NegativeArraySizeException";
-    exc_symbol.mode=ID_java;
-    exc_symbol.type=typet(ID_pointer, empty_typet());
-    symbol_table.add(exc_symbol);
-  }
-  else
-    exc_symbol=symbol_table.lookup("NegativeArraySizeException");
-
-  const symbol_exprt &exc=exc_symbol.symbol_expr();
-  side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_loc;
-  throw_expr.copy_to_operands(exc);
-
   const constant_exprt &zero=from_integer(0, java_int_type());
-  const binary_relation_exprt ge_zero(length, ID_ge, zero);
+  const binary_relation_exprt less_zero(length, ID_lt, zero);
 
-  code_ifthenelset if_code;
-  if_code.add_source_location()=original_loc;
-  if_code.cond()=ge_zero;
-  if_code.then_case()=code_expressiont(throw_expr);
-
-  return if_code;
+  return throw_exception(
+    less_zero,
+    original_loc, "java.lang.NegativeArraySizeException");
 }
 
 /*******************************************************************\
@@ -677,36 +710,22 @@ Function: throw_null_dereference_exception
 \*******************************************************************/
 
 codet java_bytecode_convert_methodt::throw_null_dereference_exception(
-  const exprt &expr,
+  exprt &expr,
   const source_locationt &original_loc)
 {
-  symbolt exc_symbol;
-  if(!symbol_table.has_symbol("NullPointerException"))
-  {
-    exc_symbol.is_static_lifetime=true;
-    exc_symbol.base_name="NullPointerException";
-    exc_symbol.name="NullPointerException";
-    exc_symbol.mode=ID_java;
-    exc_symbol.type=typet(ID_pointer, empty_typet());
-    symbol_table.add(exc_symbol);
-  }
-  else
-    exc_symbol=symbol_table.lookup("NullPointerException");
+  empty_typet voidt;
+  pointer_typet voidptr(voidt);
 
-  const symbol_exprt &exc=exc_symbol.symbol_expr();
-  side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_loc;
-  throw_expr.copy_to_operands(exc);
+  if(expr.type()!=voidptr)
+    expr.make_typecast(voidptr);
 
   const equal_exprt equal_expr(
     expr,
-    null_pointer_exprt(pointer_typet(empty_typet())));
-  code_ifthenelset if_code;
-  if_code.add_source_location()=original_loc;
-  if_code.cond()=equal_expr;
-  if_code.then_case()=code_expressiont(throw_expr);
+    null_pointer_exprt(voidptr));
 
-  return if_code;
+  return throw_exception(
+    equal_expr,
+    original_loc, "java.lang.NullPointerException");
 }
 
 /*******************************************************************\
@@ -726,26 +745,6 @@ codet java_bytecode_convert_methodt::throw_class_cast_exception(
   const exprt &class2,
   const source_locationt &original_loc)
 {
-  // TODO: use std::move
-  symbolt exc_symbol;
-  if(!symbol_table.has_symbol("ClassCastException"))
-  {
-    exc_symbol.is_static_lifetime=true;
-    exc_symbol.base_name="ClassCastException";
-    exc_symbol.name="ClassCastException";
-    exc_symbol.mode=ID_java;
-    exc_symbol.type=typet(ID_pointer, empty_typet());
-    symbol_table.add(exc_symbol);
-  }
-  else
-    exc_symbol=symbol_table.lookup("ClassCastException");
-
-  const symbol_exprt &exc=exc_symbol.symbol_expr();
-
-  side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_loc;
-  throw_expr.copy_to_operands(exc);
-
   binary_predicate_exprt class_cast_check(
     class1, ID_java_instanceof, class2);
 
@@ -757,14 +756,12 @@ codet java_bytecode_convert_methodt::throw_class_cast_exception(
   notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
 
   // checkcast passes when the operand is null
-  and_exprt and_expr(op_not_null, class_cast_check);
+  and_exprt and_expr(op_not_null, not_exprt(class_cast_check));
 
-  code_ifthenelset if_code;
-  if_code.add_source_location()=original_loc;
-  if_code.cond()=and_expr;
-  if_code.then_case()=code_expressiont(throw_expr);
-
-  return if_code;
+  return throw_exception(
+    and_expr,
+    original_loc,
+    "ClassCastException");
 }
 
 /*******************************************************************\
@@ -1596,6 +1593,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // on stack to given type fails.
       // The stack isn't modified.
       assert(op.size()==1 && results.size()==1);
+
       if(throw_runtime_exceptions)
       {
         codet conditional_check=
@@ -1845,6 +1843,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const dereference_exprt element(data_plus_offset, element_type);
 
       c=code_blockt();
+
       codet bounds_check=throw_runtime_exceptions?
         throw_array_access_exception(deref, op[1], i_it->source_location):
         get_array_bounds_check(deref, op[1], i_it->source_location);
@@ -2333,6 +2332,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
+      if(throw_runtime_exceptions)
+      {
+        codet null_dereference_check=
+          throw_null_dereference_exception(
+            op[0],
+            i_it->source_location);
+        c=null_dereference_check;
+      }
       results[0]=java_bytecode_promotion(to_member(op[0], arg0));
     }
     else if(statement=="getstatic")
@@ -2360,6 +2367,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="putfield")
     {
       assert(op.size()==2 && results.size()==0);
+      if(throw_runtime_exceptions)
+      {
+        codet null_dereference_check=
+          throw_null_dereference_exception(
+            op[0],
+            i_it->source_location);
+        c=null_dereference_check;
+      }
       c=code_assignt(to_member(op[0], arg0), op[1]);
     }
     else if(statement=="putstatic")

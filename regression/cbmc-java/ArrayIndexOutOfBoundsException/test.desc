@@ -1,8 +1,9 @@
 CORE
-ArrayIndexOutOfBoundsException.class
+ArrayIndexOutOfBoundsExceptionTest.class
 --java-throw-runtime-exceptions
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^.*assertion at file ArrayIndexOutOfBoundsExceptionTest.java line 11 function.*: FAILURE$
+^VERIFICATION FAILED$
 --
 ^warning: ignoring
