@@ -1895,6 +1895,34 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
 
 /*******************************************************************\
 
+Function:
+    java_string_library_preprocesst::make_string_length_code
+
+  Inputs:
+    type - type of the function
+    loc - location in the source
+    symbol_table - symbol table
+
+ Outputs: Code corresponding to:
+           > return this->length
+
+ Purpose: Generates code for the String.length method
+
+\*******************************************************************/
+
+codet java_string_library_preprocesst::make_string_length_code(
+  const code_typet &type,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table)
+{
+  code_typet::parameterst params=type.parameters();
+  symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
+  dereference_exprt deref(arg_this, arg_this.type().subtype());
+  return code_returnt(get_length(deref, symbol_table));
+}
+
+/*******************************************************************\
+
 Function: java_string_library_preprocesst::code_for_function
 
   Inputs:
@@ -2094,9 +2122,14 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.lastIndexOf:(Ljava/lang/String;I)I"]=
       ID_cprover_string_last_index_of_func;
-  cprover_equivalent_to_java_function
+  conversion_table
     ["java::java.lang.String.length:()I"]=
-      ID_cprover_string_length_func;
+      std::bind(
+        &java_string_library_preprocesst::make_string_length_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   // Not supported "java.lang.String.matches"
   cprover_equivalent_to_java_function
     ["java::java.lang.String.offsetByCodePoints:(II)I"]=
@@ -2289,9 +2322,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
      "Ljava/lang/StringBuilder;"]=
       ID_cprover_string_insert_func;
   // Not supported "java.lang.StringBuilder.lastIndexOf"
-  cprover_equivalent_to_java_function
+  conversion_table
     ["java::java.lang.StringBuilder.length:()I"]=
-      ID_cprover_string_length_func;
+      conversion_table["java::java.lang.String.length:()I"];
   // Not supported "java.lang.StringBuilder.offsetByCodePoints"
   // Not supported "java.lang.StringBuilder.replace"
   // Not supported "java.lang.StringBuilder.reverse"
@@ -2416,9 +2449,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
      "Ljava/lang/StringBuffer;"]=
       ID_cprover_string_insert_func;
   // Not supported "java.lang.StringBuffer.lastIndexOf"
-  cprover_equivalent_to_java_function
+  conversion_table
     ["java::java.lang.StringBuffer.length:()I"]=
-      ID_cprover_string_length_func;
+      conversion_table["java::java.lang.String.length:()I"];
   // Not supported "java.lang.StringBuffer.offsetByCodePoints"
   // Not supported "java.lang.StringBuffer.replace"
   // Not supported "java.lang.StringBuffer.reverse"
@@ -2457,9 +2490,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
-  cprover_equivalent_to_java_function
+  conversion_table
     ["java::java.lang.CharSequence.length:()I"]=
-      ID_cprover_string_length_func;
+      conversion_table["java::java.lang.String.length:()I"];
 
   // Other libraries
   conversion_table
