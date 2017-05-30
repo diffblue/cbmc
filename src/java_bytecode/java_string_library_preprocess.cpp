@@ -2445,7 +2445,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_3);
   // Not supported "java.lang.StringBuffer.trimToSize"
 
-  // Other libraries
+  // CharSequence library
   cprover_equivalent_to_java_function
     ["java::java.lang.CharSequence.charAt:(I)C"]=
       ID_cprover_string_char_at_func;
@@ -2457,6 +2457,11 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
+  cprover_equivalent_to_java_function
+    ["java::java.lang.CharSequence.length:()I"]=
+      ID_cprover_string_length_func;
+
+  // Other libraries
   conversion_table
     ["java::java.lang.Float.toString:(F)Ljava/lang/String;"]=
       std::bind(
