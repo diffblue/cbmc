@@ -1558,6 +1558,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_blockt block;
       if(throw_runtime_exceptions)
       {
+        // throw NullPointerException if necessary
         codet null_dereference_check=
           throw_null_dereference_exception(
             op[0],
@@ -1566,6 +1567,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       else
       {
+        // add assertion
         const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
         const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
         const exprt not_equal_null(
@@ -1596,12 +1598,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       if(throw_runtime_exceptions)
       {
+        // throw ClassCastException
         codet conditional_check=
         throw_class_cast_exception(op[0], arg0, i_it->source_location);
         c=std::move(conditional_check);
       }
       else
       {
+        // add assertion
         binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
         code_assertt assert_class(check);
         assert_class.add_source_location().
@@ -2334,6 +2338,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.size()==1);
       if(throw_runtime_exceptions)
       {
+        // throw NullPointerException if necessary
         codet null_dereference_check=
           throw_null_dereference_exception(
             op[0],
@@ -2369,6 +2374,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==2 && results.size()==0);
       if(throw_runtime_exceptions)
       {
+        // throw NullPointerException if necessary
         codet null_dereference_check=
           throw_null_dereference_exception(
             op[0],
