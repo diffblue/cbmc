@@ -29,7 +29,7 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   safe_pointer<ci_lazy_methodst> lazy_methods,
-  const java_string_library_preprocesst &string_preprocess);
+  java_string_library_preprocesst &string_preprocess);
 
 inline void java_bytecode_convert_method(
   const symbolt &class_symbol,
@@ -37,7 +37,7 @@ inline void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  const java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess)
 {
   java_bytecode_convert_method(
     class_symbol,

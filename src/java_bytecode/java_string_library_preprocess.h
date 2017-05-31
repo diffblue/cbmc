@@ -50,6 +50,9 @@ public:
   bool is_known_string_type(irep_idt class_name);
 
 private:
+  // We forbid copies of the object by making the copy operator private.
+  java_string_library_preprocesst(const java_string_library_preprocesst &);
+
   static bool java_type_matches_tag(const typet &type, const std::string &tag);
   static bool is_java_string_pointer_type(const typet &type);
   static bool is_java_string_type(const typet &type);

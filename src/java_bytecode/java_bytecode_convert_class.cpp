@@ -37,7 +37,7 @@ public:
     size_t _max_array_length,
     lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode,
-    const java_string_library_preprocesst &_string_preprocess):
+    java_string_library_preprocesst &_string_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
@@ -72,7 +72,7 @@ protected:
   const size_t max_array_length;
   lazy_methodst &lazy_methods;
   lazy_methods_modet lazy_methods_mode;
-  java_string_library_preprocesst string_preprocess;
+  java_string_library_preprocesst &string_preprocess;
 
   // conversion
   void convert(const classt &c);
@@ -401,7 +401,7 @@ bool java_bytecode_convert_class(
   size_t max_array_length,
   lazy_methodst &lazy_methods,
   lazy_methods_modet lazy_methods_mode,
-  const java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
