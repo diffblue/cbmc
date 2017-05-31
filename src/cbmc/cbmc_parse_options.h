@@ -108,12 +108,11 @@ protected:
 
   void eval_verbosity();
 
-  // get any additional stuff before finalizing the goto program
-  virtual int get_modules(expr_listt &bmc_constraints)
-
   bool options_exclusive(const char *opt1, const char *opt2);
   bool options_inclusive(const char *opt1, const char *opt2);
 
+  // get any additional stuff before finalizing the goto program
+  virtual int get_modules(expr_listt &bmc_constraints)
   {
     return -1; // continue
   }
