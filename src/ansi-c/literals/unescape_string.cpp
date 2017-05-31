@@ -6,15 +6,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Conversion
-
 #include <cassert>
 #include <cctype>
 
 #include <util/unicode.h>
 
 #include "unescape_string.h"
+
+/*******************************************************************\
+
+Function: append_universal_char
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static void append_universal_char(
   unsigned int value,
@@ -28,12 +37,36 @@ static void append_universal_char(
   dest.append(utf8_value);
 }
 
+/*******************************************************************\
+
+Function: append_universal_char
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static void append_universal_char(
   unsigned int value,
   std::basic_string<unsigned int> &dest)
 {
   dest.push_back(value);
 }
+
+/*******************************************************************\
+
+Function: unescape_string_templ
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 template<typename T>
 std::basic_string<T> unescape_string_templ(const std::string &src)
@@ -148,16 +181,52 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
   return dest;
 }
 
+/*******************************************************************\
+
+Function: unescape_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string unescape_string(const std::string &src)
 {
   return unescape_string_templ<char>(src);
 }
+
+/*******************************************************************\
+
+Function: unescape_wide_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::basic_string<unsigned int> unescape_wide_string(
   const std::string &src)
 {
   return unescape_string_templ<unsigned int>(src);
 }
+
+/*******************************************************************\
+
+Function: hex_to_unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 {
@@ -180,6 +249,18 @@ unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 
   return value;
 }
+
+/*******************************************************************\
+
+Function: octal_to_unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned octal_to_unsigned(const char *octal, std::size_t digits)
 {
