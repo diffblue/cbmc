@@ -430,30 +430,6 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
       memory_model->set_message_handler(get_message_handler());
       (*memory_model)(equation);
     }
-  }
-  catch(std::string &error_str)
-  {
-    messaget message(get_message_handler());
-    message.error().source_location=symex().last_source_location;
-    message.error() << error_str << messaget::eom;
-
-    return safety_checkert::resultt::ERROR;
-  }
-
-  catch(const char *error_str)
-  {
-    messaget message(get_message_handler());
-    message.error().source_location=symex().last_source_location;
-    message.error() << error_str << messaget::eom;
-
-    return safety_checkert::resultt::ERROR;
-  }
-
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
-    return safety_checkert::resultt::ERROR;
-  }
 
   statistics() << "size of program expression: "
                << equation.SSA_steps.size()
@@ -512,6 +488,32 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
     return stop_on_fail(goto_functions, prop_conv);
   else
     return all_properties(goto_functions, prop_conv);
+  }
+  catch(std::string &error_str)
+    {
+      messaget message(get_message_handler());
+      message.error().source_location=symex().last_source_location;
+      message.error() << error_str << messaget::eom;
+
+      return safety_checkert::resultt::ERROR;
+    }
+
+    catch(const char *error_str)
+    {
+      messaget message(get_message_handler());
+      message.error().source_location=symex().last_source_location;
+      message.error() << error_str << messaget::eom;
+
+      return safety_checkert::resultt::ERROR;
+    }
+
+    catch(std::bad_alloc)
+    {
+      error() << "Out of memory" << eom;
+      return safety_checkert::resultt::ERROR;
+    }
+
+
 }
 
 
