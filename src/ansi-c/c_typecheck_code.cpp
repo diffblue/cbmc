@@ -901,7 +901,9 @@ void c_typecheck_baset::typecheck_return(codet &code)
 {
   if(code.operands().empty())
   {
-    if(follow(return_type).id()!=ID_empty)
+    if(follow(return_type).id()!=ID_empty &&
+       return_type.id()!=ID_constructor &&
+       return_type.id()!=ID_destructor)
     {
       // gcc doesn't actually complain, it just warns!
       // We'll put a zero here, which is dubious.
