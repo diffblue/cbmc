@@ -13,10 +13,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms that the returned value is either -1 or greater than from_index
-/// and the character at that position equals to c
-/// \par parameters: a string expression, a character expression and an integer
-///   expression
+/// Add axioms stating that the returned value is the index within str of the
+/// first occurence of c starting the search at from_index, or -1 if no such
+/// character occurs at or after position from_index.
+/// \param str: a string expression
+/// \param c: an expression representing a character
+/// \param from_index: an expression representing an index in the string
 /// \return a integer expression
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
@@ -317,6 +319,14 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   }
 }
 
+/// Add axioms stating that the returned value is the index within str of the
+/// last occurence of c starting the search backward at from_index, or -1 if no
+/// such character occurs at or before position from_index.
+/// \param str: a string expression
+/// \param c: an expression representing a character
+/// \param from_index: an expression representing an index in the string
+/// \return an integer expression representing the last index of c in str before
+///   or at from_index, or -1 if there is none
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
 {
