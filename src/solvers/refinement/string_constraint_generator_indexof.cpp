@@ -226,25 +226,59 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     binary_relation_exprt(from_index, ID_le, length_diff),
     from_index,
     length_diff);
-  string_not_contains_constraintt a4(
-    plus_exprt(offset, from_integer(1, index_type)),
-    from_index,
-    end_index,
-    from_integer(0, index_type),
-    substring.length(),
-    str,
-    substring);
-  axioms.push_back(a4);
 
-  string_not_contains_constraintt a5(
-    from_integer(0, index_type),
-    end_index,
-    not_exprt(contains),
-    from_integer(0, index_type),
-    substring.length(),
-    str,
-    substring);
-  axioms.push_back(a5);
+  if(!is_constant_string(substring))
+  {
+    string_not_contains_constraintt a4(
+      plus_exprt(offset, from_integer(1, index_type)),
+      from_index,
+      plus_exprt(end_index, from_integer(1, index_type)),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a4);
+
+    string_not_contains_constraintt a5(
+      from_integer(0, index_type),
+      plus_exprt(end_index, from_integer(1, index_type)),
+      not_exprt(contains),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a5);
+  }
+  else
+  {
+    // Unfold the existential quantifier as a disjunction in case of a constant
+    // a4 && a5 <=> a6:
+    //  forall n:[0, min(from_index,|str|-|substring|)].
+    //    !contains || n > offset =>
+    //       str[n]!=substring[0] || ... ||
+    //       str[n+|substring|-1]!=substring[|substring|-1]
+    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
+    mp_integer sub_length;
+    assert(!to_integer(substring.length(), sub_length));
+    exprt::operandst disjuncts;
+    for(mp_integer offset=0; offset<sub_length; ++offset)
+    {
+      exprt expr_offset=from_integer(offset, index_type);
+      plus_exprt shifted(expr_offset, qvar2);
+      disjuncts.push_back(
+        not_exprt(equal_exprt(str[shifted], substring[expr_offset])));
+    }
+
+    or_exprt premise(
+      not_exprt(contains), binary_relation_exprt(qvar, ID_gt, offset));
+    string_constraintt a6(
+      qvar2,
+      from_index,
+      plus_exprt(from_integer(1, index_type), end_index),
+      premise,
+      disjunction(disjuncts));
+    axioms.push_back(a6);
+  }
 
   return offset;
 }
