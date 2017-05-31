@@ -19,6 +19,7 @@ Date:   December 2016
 #include <util/symbol_table.h>
 
 #include "remove_exceptions.h"
+#include <analyses/uncaught_exceptions_analysis.h>
 
 class remove_exceptionst
 {
@@ -27,8 +28,11 @@ class remove_exceptionst
   typedef std::vector<catch_handlerst> stack_catcht;
 
 public:
-  explicit remove_exceptionst(symbol_tablet &_symbol_table):
-    symbol_table(_symbol_table)
+  explicit remove_exceptionst(
+    symbol_tablet &_symbol_table,
+    std::map<irep_idt, std::set<irep_idt>> &_exceptions_map):
+    symbol_table(_symbol_table),
+    exceptions_map(_exceptions_map)
   {
   }
 
@@ -37,6 +41,7 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
+  std::map<irep_idt, std::set<irep_idt>> &exceptions_map;
 
   void add_exceptional_returns(
     const goto_functionst::function_mapt::iterator &);
@@ -110,47 +115,67 @@ void remove_exceptionst::add_exceptional_returns(
     return;
   }
 
-  // We generate an exceptional return value for any function that has
-  // a throw or a function call. This can be improved by only considering
-  // function calls that may escape exceptions. However, this will
-  // require multiple passes.
-  bool add_exceptional_var=false;
+  // We generate an exceptional return value for any function that
+  // contains a throw or a function call that may escape exceptions.
   forall_goto_program_instructions(instr_it, goto_program)
-    if(instr_it->is_throw() || instr_it->is_function_call())
+  {
+    bool has_uncaught_exceptions=false;
+    if(instr_it->is_function_call())
     {
-      add_exceptional_var=true;
-      break;
+      const exprt &function_expr=
+        to_code_function_call(instr_it->code).function();
+      assert(function_expr.id()==ID_symbol);
+      const irep_idt &function_name=
+        to_symbol_expr(function_expr).get_identifier();
+      has_uncaught_exceptions=!exceptions_map[function_name].empty();
     }
 
-  if(add_exceptional_var)
-  {
-    // look up the function symbol
-    symbol_tablet::symbolst::iterator s_it=
-      symbol_table.symbols.find(function_id);
+    bool assertion_error=false;
+    if(instr_it->is_throw())
+    {
+      const exprt &exc =
+        uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
+      assertion_error =
+        id2string(uncaught_exceptions_domaint::get_exception_type(exc.type())).
+        find("java.lang.AssertionError")!=std::string::npos;
+    }
 
-    assert(s_it!=symbol_table.symbols.end());
+    // if we find a throw different from AssertionError or a function call
+    // that may escape exceptions, then we add an exceptional return
+    // variable
+    if((instr_it->is_throw() && !assertion_error)
+       || has_uncaught_exceptions)
+    {
+      // look up the function symbol
+      symbol_tablet::symbolst::iterator s_it=
+        symbol_table.symbols.find(function_id);
 
-    auxiliary_symbolt new_symbol;
-    new_symbol.is_static_lifetime=true;
-    new_symbol.module=function_symbol.module;
-    new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
-    new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
-    new_symbol.mode=function_symbol.mode;
-    new_symbol.type=typet(ID_pointer, empty_typet());
-    symbol_table.add(new_symbol);
+      assert(s_it!=symbol_table.symbols.end());
 
-    // initialize the exceptional return with NULL
-    symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
-    goto_programt::targett t_null=
-      goto_program.insert_before(goto_program.instructions.begin());
-    t_null->make_assignment();
-    t_null->source_location=
-      goto_program.instructions.begin()->source_location;
-    t_null->code=code_assignt(
-      lhs_expr_null,
-      rhs_expr_null);
-    t_null->function=function_id;
+      auxiliary_symbolt new_symbol;
+      new_symbol.is_static_lifetime=true;
+      new_symbol.module=function_symbol.module;
+      new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
+      new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
+      new_symbol.mode=function_symbol.mode;
+      new_symbol.type=typet(ID_pointer, empty_typet());
+      symbol_table.add(new_symbol);
+
+      // initialize the exceptional return with NULL
+      symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
+      null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+      goto_programt::targett t_null=
+        goto_program.insert_before(goto_program.instructions.begin());
+      t_null->make_assignment();
+      t_null->source_location=
+        goto_program.instructions.begin()->source_location;
+      t_null->code=code_assignt(
+        lhs_expr_null,
+        rhs_expr_null);
+      t_null->function=function_id;
+
+      break;
+    }
   }
 }
 
@@ -264,6 +289,18 @@ void remove_exceptionst::instrument_throw(
 {
   assert(instr_it->type==THROW);
 
+  const exprt &exc_expr=
+    uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
+  bool assertion_error=id2string(
+    uncaught_exceptions_domaint::get_exception_type(exc_expr.type())).
+    find("java.lang.AssertionError")!=std::string::npos;
+
+  // we don't count AssertionError (we couldn't catch it anyway
+  // and this may reduce the instrumentation considerably if the programmer
+  // used assertions)
+  if(assertion_error)
+    return;
+
   goto_programt &goto_program=func_it->second.body;
   const irep_idt &function_id=func_it->first;
 
@@ -322,11 +359,6 @@ void remove_exceptionst::instrument_throw(
     t_dead->function=instr_it->function;
   }
 
-  // replace "throw x;" by "f#exception_value=x;"
-  exprt exc_expr=instr_it->code;
-  while(exc_expr.id()!=ID_symbol && exc_expr.has_operands())
-    exc_expr=exc_expr.op0();
-
   // add the assignment with the appropriate cast
   code_assignt assignment(typecast_exprt(exc_thrown, exc_expr.type()),
                           exc_expr);
@@ -368,7 +400,8 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX))
+  if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX) &&
+     symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
   {
     // we may have an escaping exception
     const symbolt &callee_exc_symbol=
@@ -575,7 +608,10 @@ void remove_exceptions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_exceptionst remove_exceptions(symbol_table);
+  const namespacet ns(symbol_table);
+  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
+  uncaught_exceptions(goto_functions, ns, exceptions_map);
+  remove_exceptionst remove_exceptions(symbol_table, exceptions_map);
   remove_exceptions(goto_functions);
 }
 
@@ -593,6 +629,9 @@ Purpose: removes throws/CATCH-POP/CATCH-PUSH
 
 void remove_exceptions(goto_modelt &goto_model)
 {
-  remove_exceptionst remove_exceptions(goto_model.symbol_table);
+  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
+  remove_exceptionst remove_exceptions(
+    goto_model.symbol_table,
+    exceptions_map);
   remove_exceptions(goto_model.goto_functions);
 }
