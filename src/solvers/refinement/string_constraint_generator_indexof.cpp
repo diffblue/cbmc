@@ -13,12 +13,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 Function: string_constraint_generatort::add_axioms_for_index_of
 
-  Inputs: a string expression, a character expression and an integer expression
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
 
  Outputs: a integer expression
 
- Purpose: add axioms that the returned value is either -1 or greater than
-          from_index and the character at that position equals to c
+ Purpose: add axioms stating that the returned value is either:
+          -1 if the string does not contain c
+          an index greater than from_index such that the character of str at
+          that position equals c and is the first occurence after from_index.
 
 \*******************************************************************/
 
@@ -315,6 +320,24 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
 }
+
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of
+
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
+
+ Outputs: a integer expression
+
+ Purpose: add axioms stating that the returned value is either:
+          -1 if the string does not contain c
+          an index less than from_index such that the character of str at
+          that position equals c and is the last occurence before from_index.
+
+\*******************************************************************/
 
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
