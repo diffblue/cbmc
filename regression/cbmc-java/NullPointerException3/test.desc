@@ -1,0 +1,9 @@
+CORE
+Test.class
+
+^EXIT=10$
+^SIGNAL=0$
+^.*reference is null in \*a: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
