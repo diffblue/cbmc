@@ -1409,16 +1409,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
         symbol.type=arg0.type();
         symbol.value.make_nil();
         symbol.mode=ID_java;
-
         assign_parameter_names(
           to_code_type(symbol.type),
           symbol.name,
           symbol_table);
-
-        // The string refinement module may provide a definition for this
-        // function.
-        symbol.value=string_preprocess.code_for_function(
-          id, to_code_type(symbol.type), loc, symbol_table);
 
         symbol_table.add(symbol);
       }
