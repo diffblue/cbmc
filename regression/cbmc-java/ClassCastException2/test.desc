@@ -1,0 +1,9 @@
+CORE
+ClassCastExceptionTest.class
+
+^EXIT=10$
+^SIGNAL=0$
+^.*Dynamic cast check: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

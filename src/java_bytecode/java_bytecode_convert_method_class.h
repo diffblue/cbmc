@@ -32,10 +32,12 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
+    bool _throw_runtime_exceptions,
     safe_pointer<ci_lazy_methodst> _lazy_methods):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
+    throw_runtime_exceptions(_throw_runtime_exceptions),
     lazy_methods(_lazy_methods)
   {
   }
@@ -54,6 +56,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
+  const bool throw_runtime_exceptions;
   safe_pointer<ci_lazy_methodst> lazy_methods;
 
   irep_idt method_id;
@@ -106,7 +109,30 @@ public:
     const exprt &idx,
     const source_locationt &original_sloc);
 
-  // return corresponding reference of variable
+  codet throw_exception(
+    const exprt &cond,
+    const source_locationt &original_loc,
+    const irep_idt &exc_name);
+
+  codet throw_array_access_exception(
+    const exprt &arraystruct,
+    const exprt &idx,
+    const source_locationt &original_sloc);
+
+  codet throw_array_length_exception(
+    const exprt &length,
+    const source_locationt &original_sloc);
+
+  codet throw_null_dereference_exception(
+    exprt &expr,
+    const source_locationt &original_sloc);
+
+  codet throw_class_cast_exception(
+    const exprt &class1,
+    const exprt &class2,
+    const source_locationt &original_sloc);
+
+// return corresponding reference of variable
   const variablet &find_variable_for_slot(
     size_t address,
     variablest &var_list);
