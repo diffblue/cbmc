@@ -350,6 +350,16 @@ void goto_symext::phi_function(
   goto_state.level2_get_variables(variables);
   dest_state.level2.get_variables(variables);
 
+  guardt diff_guard;
+
+  if(!variables.empty())
+  {
+    diff_guard=goto_state.guard;
+
+    // this gets the diff between the guards
+    diff_guard-=dest_state.guard;
+  }
+
   for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator
       it=variables.begin();
       it!=variables.end();
@@ -417,12 +427,7 @@ void goto_symext::phi_function(
       rhs=dest_state_rhs;
     else
     {
-      guardt tmp_guard(goto_state.guard);
-
-      // this gets the diff between the guards
-      tmp_guard-=dest_state.guard;
-
-      rhs=if_exprt(tmp_guard.as_expr(), goto_state_rhs, dest_state_rhs);
+      rhs=if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
       do_simplify(rhs);
     }
 
