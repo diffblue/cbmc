@@ -335,7 +335,9 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              exprt lhs=dereference_exprt(ptr, type.subtype());
+              exprt lhs=
+                index_exprt(
+                  dereference_exprt(ptr, type), from_integer(0, index_type()));
               exprt rhs=side_effect_expr_nondett(type.subtype());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
@@ -1528,8 +1530,18 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[3]));
+    irep_idt description;
+    try
+    {
+      description="assertion "+id2string(get_string_constant(arguments[3]));
+    }
+    catch(int)
+    {
+      // we might be building newlib, where __assert_func is passed
+      // a pointer-typed symbol; the warning will still have been
+      // printed
+      description="assertion";
+    }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();

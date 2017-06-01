@@ -459,6 +459,11 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_gcc_asm_clobbered_register)
   {
   }
+  else if(expr.id()==ID_lshr || expr.id()==ID_ashr ||
+          expr.id()==ID_assign_lshr || expr.id()==ID_assign_ashr)
+  {
+    // already type checked
+  }
   else
   {
     err_location(expr);

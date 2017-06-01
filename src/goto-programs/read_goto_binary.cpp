@@ -289,7 +289,8 @@ static bool link_functions(
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols)
+  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols,
+  const replace_symbolt &object_type_updates)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
@@ -381,6 +382,16 @@ static bool link_functions(
     Forall_goto_functions(dest_it, dest_functions)
       rename_symbols_in_function(dest_it->second, macro_application);
 
+  if(!object_type_updates.expr_map.empty())
+  {
+    Forall_goto_functions(dest_it, dest_functions)
+      Forall_goto_program_instructions(iit, dest_it->second.body)
+      {
+        object_type_updates(iit->code);
+        object_type_updates(iit->guard);
+      }
+  }
+
   return false;
 }
 
@@ -427,9 +438,14 @@ bool read_object_and_link(
   if(linking.typecheck_main())
     return true;
 
-  if(link_functions(symbol_table, functions,
-                    temp_model.symbol_table, temp_model.goto_functions,
-                    linking.rename_symbol, weak_symbols))
+  if(link_functions(
+      symbol_table,
+      functions,
+      temp_model.symbol_table,
+      temp_model.goto_functions,
+      linking.rename_symbol,
+      weak_symbols,
+      linking.object_type_updates))
     return true;
 
   return false;

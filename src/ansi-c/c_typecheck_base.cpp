@@ -210,27 +210,6 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
   }
   else
   {
-    if(symbol.type.id()==ID_array &&
-       to_array_type(symbol.type).size().is_nil() &&
-       !symbol.is_type)
-    {
-      // Insert a new type symbol for the array.
-      // We do this because we want a convenient way
-      // of adjusting the size of the type later on.
-
-      type_symbolt new_symbol(symbol.type);
-      new_symbol.name=id2string(symbol.name)+"$type";
-      new_symbol.base_name=id2string(symbol.base_name)+"$type";
-      new_symbol.location=symbol.location;
-      new_symbol.mode=symbol.mode;
-      new_symbol.module=symbol.module;
-
-      symbol.type=symbol_typet(new_symbol.name);
-
-      symbolt *new_sp;
-      symbol_table.move(new_symbol, new_sp);
-    }
-
     // check the initializer
     do_initializer(symbol);
   }

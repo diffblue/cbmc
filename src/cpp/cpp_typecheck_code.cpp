@@ -45,6 +45,10 @@ void cpp_typecheckt::typecheck_code(codet &code)
           statement==ID_msc_if_not_exists)
   {
   }
+  else if(statement==ID_decl_block)
+  {
+    // type checked already
+  }
   else
     c_typecheck_baset::typecheck_code(code);
 }

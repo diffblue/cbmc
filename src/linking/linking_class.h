@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/rename_symbol.h>
+#include <util/replace_symbol.h>
 #include <util/typecheck.h>
 #include <util/std_expr.h>
 
@@ -31,6 +32,7 @@ public:
   virtual void typecheck();
 
   rename_symbolt rename_symbol;
+  replace_symbolt object_type_updates;
 
 protected:
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
