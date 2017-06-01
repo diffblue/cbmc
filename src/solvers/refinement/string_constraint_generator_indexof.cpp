@@ -13,12 +13,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 Function: string_constraint_generatort::add_axioms_for_index_of
 
-  Inputs: a string expression, a character expression and an integer expression
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
 
  Outputs: a integer expression
 
- Purpose: add axioms that the returned value is either -1 or greater than
-          from_index and the character at that position equals to c
+ Purpose: add axioms stating that the returned value is either:
+          -1 if the string does not contain c
+          an index greater than from_index such that the character of str at
+          that position equals c and is the first occurence after from_index.
 
 \*******************************************************************/
 
@@ -73,12 +78,17 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 
 Function: string_constraint_generatort::add_axioms_for_index_of_string
 
-  Inputs: two string expressions and an integer expression
+  Inputs:
+    str - a string expression
+    substring - a string expression
+    from_index - an expression representing an index in strings
 
  Outputs: a integer expression
 
- Purpose: add axioms stating that the returned value is either -1 or greater
-          than from_index and the string beggining there has prefix substring
+ Purpose: add axioms stating that the returned value is an index greater than
+          from_index such that str at that index starts with substring and is
+          the first occurence of substring in str after from_index,
+          or returned value is -1 if str does not contain substring.
 
 \*******************************************************************/
 
@@ -92,20 +102,24 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => |str|-|substring|>=offset>=from_index
-  // a2 : !contains => offset=-1
-  // a3 : forall 0<=witness<|substring|.
-  //        contains => str[witness+offset]=substring[witness]
+  // a1 : contains => from_index <= offset <= |str|-|substring|
+  // a2 : !contains <=> offset=-1
+  // a3 : forall n:[0,|substring|[.
+  //        contains => str[n+offset]=substring[n]
+  // a4 : forall n:[from_index,offset[.
+  //        contains => (exists m:[0,|substring|[. str[m+n]!=substring[m]])
+  // a5:  forall n:[from_index,|str|-|substring|[.
+  //        !contains => (exists m:[0,|substring|[. str[m+n]!=substring[m])
 
   implies_exprt a1(
     contains,
     and_exprt(
-      str.axiom_for_is_longer_than(plus_exprt_with_overflow_check(
-        substring.length(), offset)),
-      binary_relation_exprt(offset, ID_ge, from_index)));
+      binary_relation_exprt(from_index, ID_le, offset),
+      binary_relation_exprt(
+        offset, ID_le, minus_exprt(str.length(), substring.length()))));
   axioms.push_back(a1);
 
-  implies_exprt a2(
+  equal_exprt a2(
     not_exprt(contains),
     equal_exprt(offset, from_integer(-1, index_type)));
   axioms.push_back(a2);
@@ -118,8 +132,82 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     equal_exprt(str[plus_exprt(qvar, offset)], substring[qvar]));
   axioms.push_back(a3);
 
+  if(!is_constant_string(substring))
+  {
+    // string_not contains_constraintt are formula of the form:
+    // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
+    string_not_contains_constraintt a4(
+      from_index,
+      offset,
+      contains,
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a4);
+
+    string_not_contains_constraintt a5(
+      from_index,
+      minus_exprt(str.length(), substring.length()),
+      not_exprt(contains),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a5);
+  }
+  else
+  {
+    // Unfold the existential quantifier as a disjunction in case of a constant
+    // a4 && a5 <=> a6:
+    //  forall n:[from_index,|str|-|substring|].
+    //    !contains || n < offset =>
+    //       str[n]!=substring[0] || ... ||
+    //       str[n+|substring|-1]!=substring[|substring|-1]
+    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
+    mp_integer sub_length;
+    assert(!to_integer(substring.length(), sub_length));
+    exprt::operandst disjuncts;
+    for(mp_integer offset=0; offset<sub_length; ++offset)
+    {
+      exprt expr_offset=from_integer(offset, index_type);
+      plus_exprt shifted(expr_offset, qvar2);
+      disjuncts.push_back(
+        not_exprt(equal_exprt(str[shifted], substring[expr_offset])));
+    }
+
+    or_exprt premise(
+      not_exprt(contains), binary_relation_exprt(qvar, ID_lt, offset));
+    minus_exprt length_diff(str.length(), substring.length());
+    string_constraintt a6(
+      qvar2,
+      from_index,
+      plus_exprt(from_integer(1, index_type), length_diff),
+      premise,
+      disjunction(disjuncts));
+    axioms.push_back(a6);
+  }
+
   return offset;
 }
+
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of_string
+
+  Inputs:
+    str - a string expression
+    substring - a string expression
+    from_index - an expression representing an index in strings
+
+ Outputs: a integer expression
+
+ Purpose: add axioms stating that the returned value is an index less than
+          from_index such that str at that index starts with substring and is
+          the last occurence of substring in str before from_index,
+          or the returned value is -1 if str does not contain substring.
+
+\*******************************************************************/
 
 exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const string_exprt &str,
@@ -131,10 +219,16 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => |substring| >= length &&offset <= from_index
-  // a2 : !contains => offset=-1
-  // a3 : forall 0 <= witness<substring.length,
-  //        contains => str[witness+offset]=substring[witness]
+  // a1 : contains => |substring| >= length && offset <= from_index
+  // a2 : !contains <=> offset=-1
+  // a3 : forall n:[0, substring.length[,
+  //        contains => str[n+offset]=substring[n]
+  // a4 : forall n:[offset+1, min(from_index, |str| - |substring|)].
+  //        contains =>
+  //          (exists m:[0,|substring|[. str[m+n]!=substring[m]])
+  // a5:  forall n:[0, min(from_index, |str| - |substring|)].
+  //        !contains =>
+  //          (exists m:[0,|substring|[. str[m+n]!=substring[m])
 
   implies_exprt a1(
     contains,
@@ -144,7 +238,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
       binary_relation_exprt(offset, ID_le, from_index)));
   axioms.push_back(a1);
 
-  implies_exprt a2(
+  equal_exprt a2(
     not_exprt(contains),
     equal_exprt(offset, from_integer(-1, index_type)));
   axioms.push_back(a2);
@@ -153,6 +247,66 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   equal_exprt constr3(str[plus_exprt(qvar, offset)], substring[qvar]);
   string_constraintt a3(qvar, substring.length(), contains, constr3);
   axioms.push_back(a3);
+
+  // end_index is min(from_index, |str| - |substring|)
+  minus_exprt length_diff(str.length(), substring.length());
+  if_exprt end_index(
+    binary_relation_exprt(from_index, ID_le, length_diff),
+    from_index,
+    length_diff);
+
+  if(!is_constant_string(substring))
+  {
+    string_not_contains_constraintt a4(
+      plus_exprt(offset, from_integer(1, index_type)),
+      from_index,
+      plus_exprt(end_index, from_integer(1, index_type)),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a4);
+
+    string_not_contains_constraintt a5(
+      from_integer(0, index_type),
+      plus_exprt(end_index, from_integer(1, index_type)),
+      not_exprt(contains),
+      from_integer(0, index_type),
+      substring.length(),
+      str,
+      substring);
+    axioms.push_back(a5);
+  }
+  else
+  {
+    // Unfold the existential quantifier as a disjunction in case of a constant
+    // a4 && a5 <=> a6:
+    //  forall n:[0, min(from_index,|str|-|substring|)].
+    //    !contains || n > offset =>
+    //       str[n]!=substring[0] || ... ||
+    //       str[n+|substring|-1]!=substring[|substring|-1]
+    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
+    mp_integer sub_length;
+    assert(!to_integer(substring.length(), sub_length));
+    exprt::operandst disjuncts;
+    for(mp_integer offset=0; offset<sub_length; ++offset)
+    {
+      exprt expr_offset=from_integer(offset, index_type);
+      plus_exprt shifted(expr_offset, qvar2);
+      disjuncts.push_back(
+        not_exprt(equal_exprt(str[shifted], substring[expr_offset])));
+    }
+
+    or_exprt premise(
+      not_exprt(contains), binary_relation_exprt(qvar, ID_gt, offset));
+    string_constraintt a6(
+      qvar2,
+      from_index,
+      plus_exprt(from_integer(1, index_type), end_index),
+      premise,
+      disjunction(disjuncts));
+    axioms.push_back(a6);
+  }
 
   return offset;
 }
@@ -200,6 +354,24 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
 }
+
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of
+
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
+
+ Outputs: a integer expression
+
+ Purpose: add axioms stating that the returned value is either:
+          -1 if the string does not contain c
+          an index less than from_index such that the character of str at
+          that position equals c and is the last occurence before from_index.
+
+\*******************************************************************/
 
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)

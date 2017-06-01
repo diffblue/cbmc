@@ -32,11 +32,13 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    safe_pointer<ci_lazy_methodst> _lazy_methods):
+    safe_pointer<ci_lazy_methodst> _lazy_methods,
+    java_string_library_preprocesst &_string_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
-    lazy_methods(_lazy_methods)
+    lazy_methods(_lazy_methods),
+    string_preprocess(_string_preprocess)
   {
   }
 
@@ -59,6 +61,7 @@ protected:
   irep_idt method_id;
   irep_idt current_method;
   typet method_return_type;
+  java_string_library_preprocesst &string_preprocess;
 
 public:
   struct holet

@@ -138,6 +138,11 @@ private:
   string_exprt add_axioms_for_copy(const function_application_exprt &f);
   string_exprt add_axioms_for_concat(
     const string_exprt &s1, const string_exprt &s2);
+  string_exprt add_axioms_for_concat_substr(
+    const string_exprt &s1,
+    const string_exprt &s2,
+    const exprt &start_index,
+    const exprt &end_index);
   string_exprt add_axioms_for_concat(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_int(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_long(const function_application_exprt &f);
@@ -305,11 +310,14 @@ private:
     return args;
   }
 
+private:
+  // Helper functions
   exprt int_of_hex_char(const exprt &chr) const;
   exprt is_high_surrogate(const exprt &chr) const;
   exprt is_low_surrogate(const exprt &chr) const;
   exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
+  bool is_constant_string(const string_exprt &expr) const;
 };
 
 #endif
