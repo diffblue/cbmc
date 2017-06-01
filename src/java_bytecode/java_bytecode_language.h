@@ -52,6 +52,8 @@ public:
     symbol_tablet &context,
     const std::string &module) override;
 
+  void replace_string_methods(symbol_tablet &context);
+
   virtual bool final(
     symbol_tablet &context) override;
 
