@@ -642,7 +642,10 @@ void dump_ct::init_system_library_map()
     "pthread_rwlock_unlock", "pthread_rwlock_wrlock",
     "pthread_rwlockattr_destroy", "pthread_rwlockattr_getpshared",
     "pthread_rwlockattr_init", "pthread_rwlockattr_setpshared",
-    "pthread_self", "pthread_setspecific"
+    "pthread_self", "pthread_setspecific",
+    /* non-public struct types */
+    "tag-__pthread_internal_list", "tag-__pthread_mutex_s",
+    "pthread_mutex_t"
   };
   ADD_TO_SYSTEM_LIBRARY(pthread_syms, "pthread.h");
 
@@ -667,7 +670,7 @@ void dump_ct::init_system_library_map()
     "mkstemp", "mktemp", "perror", "printf", "putc", "putchar",
     "puts", "putw", "putwc", "putwchar", "remove", "rewind", "scanf",
     "setbuf", "setbuffer", "setlinebuf", "setvbuf", "snprintf",
-    "sprintf", "sscanf", "strerror", "swprintf", "sys_errlist",
+    "sprintf", "sscanf", "swprintf", "sys_errlist",
     "sys_nerr", "tempnam", "tmpfile", "tmpnam", "ungetc", "ungetwc",
     "vasprintf", "vfprintf", "vfscanf", "vfwprintf", "vprintf",
     "vscanf", "vsnprintf", "vsprintf", "vsscanf", "vswprintf",
@@ -703,9 +706,9 @@ void dump_ct::init_system_library_map()
   const char* time_syms[]=
   {
     "asctime", "asctime_r", "ctime", "ctime_r", "difftime", "gmtime",
-    "gmtime_r", "localtime", "localtime_r", "mktime",
+    "gmtime_r", "localtime", "localtime_r", "mktime", "strftime",
     /* non-public struct types */
-    "tag-timespec", "tag-timeval"
+    "tag-timespec", "tag-timeval", "tag-tm"
   };
   ADD_TO_SYSTEM_LIBRARY(time_syms, "time.h");
 
@@ -726,21 +729,27 @@ void dump_ct::init_system_library_map()
   // sys/select.h
   const char* sys_select_syms[]=
   {
-    "select"
+    "select",
+    /* non-public struct types */
+    "fd_set"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_select_syms, "sys/select.h");
 
   // sys/socket.h
   const char* sys_socket_syms[]=
   {
-    "accept", "bind", "connect"
+    "accept", "bind", "connect",
+    /* non-public struct types */
+    "tag-sockaddr"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_socket_syms, "sys/socket.h");
 
   // sys/stat.h
   const char* sys_stat_syms[]=
   {
-    "fstat", "lstat", "stat"
+    "fstat", "lstat", "stat",
+    /* non-public struct types */
+    "tag-stat"
   };
   ADD_TO_SYSTEM_LIBRARY(sys_stat_syms, "sys/stat.h");
 
