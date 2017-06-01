@@ -578,6 +578,19 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("print-internal-representation"))
+    {
+      for(auto const &pair : goto_functions.function_map)
+        for(auto const &ins : pair.second.body.instructions)
+        {
+          if(ins.code.is_not_nil())
+            status() << ins.code.pretty() << eom;
+          if(ins.guard.is_not_nil())
+            status() << "[guard] " << ins.guard.pretty() << eom;
+        }
+      return 0;
+    }
+
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
@@ -770,6 +783,7 @@ int goto_instrument_parse_optionst::doit()
     error() << "Out of memory" << eom;
     return 11;
   }
+// NOLINTNEXTLINE(readability/fn_size)
 }
 
 void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
@@ -1454,6 +1468,8 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --print-internal-representation\n" // NOLINTNEXTLINE(*)
+    "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
@@ -1481,7 +1497,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
-    " --undefined-function-is-assume-false\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     "\n"
     "Loop transformations:\n"
