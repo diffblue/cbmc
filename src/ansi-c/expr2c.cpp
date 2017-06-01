@@ -1841,10 +1841,12 @@ std::string expr2ct::convert_constant(
 
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
+      if(dest.find('.')==std::string::npos)
+        dest+=".0";
+
+      // ANSI-C: double is default; float/long-double require annotation
       if(src.type()==float_type())
         dest+='f';
-      else if(src.type()==double_type())
-        dest+=""; // ANSI-C: double is default
       else if(src.type()==long_double_type())
         dest+='l';
     }
