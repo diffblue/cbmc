@@ -5,8 +5,8 @@ main.c
 ^\*\* Used 4 iterations$
 ^Test suite:$
 ^a=\(\(signed int \*\*\)NULL\), tmp\$1=[^,]*, tmp\$2=[^,]*$
-^a=&tmp\$1!0, tmp\$1=\(\(signed int \*\)NULL\), tmp\$2=[^,]*$
-^a=&tmp\$1!0, tmp\$1=&tmp\$2!0, tmp\$2=([012356789][0-9]*|4[0-9]+)$
-^a=&tmp\$1!0, tmp\$1=&tmp\$2!0, tmp\$2=4$
+^a=&tmp\$1, tmp\$1=\(\(signed int \*\)NULL\), tmp\$2=[^,]*$
+^a=&tmp\$1, tmp\$1=&tmp\$2, tmp\$2=([012356789][0-9]*|4[0-9]+)$
+^a=&tmp\$1, tmp\$1=&tmp\$2, tmp\$2=4$
 --
 ^warning: ignoring
