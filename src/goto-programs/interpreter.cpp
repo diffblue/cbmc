@@ -1200,7 +1200,7 @@ Function: interpretert::get_size
  Outputs: Size of the given type
 
  Purpose: Retrieves the actual size of the provided structured type.
-          Unbounded objects get allocated 2^32 address space each
+          Unbounded objects get allocated 2^31 address space each
           (of a 2^64 sized space).
 
 \*******************************************************************/
@@ -1208,7 +1208,7 @@ Function: interpretert::get_size
 size_t interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
-    return 2ULL << 32ULL;
+    return 1ULL << 31ULL;
 
   if(type.id()==ID_struct)
   {
