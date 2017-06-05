@@ -211,8 +211,8 @@ private:
 
   // Add axioms corresponding to the String.lastIndexOf:(String;I) java function
   exprt add_axioms_for_last_index_of_string(
-    const string_exprt &str,
-    const string_exprt &substring,
+    const string_exprt &haystack,
+    const string_exprt &needle,
     const exprt &from_index);
 
   // Add axioms corresponding to the String.lastIndexOf:(CI) java function
