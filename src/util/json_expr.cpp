@@ -20,6 +20,8 @@ Author: Peter Schrammel
 #include "std_expr.h"
 #include "config.h"
 #include "identifier.h"
+#include "language.h"
+#include <langapi/mode.h>
 
 static exprt simplify_json_expr(
   const exprt &src,
@@ -229,37 +231,19 @@ json_objectt json(
         type.id()==ID_c_bit_field?type.subtype():
         type;
 
-      bool is_signed=underlying_type.id()==ID_signedbv;
+      languaget *lang;
+      if(mode==ID_unknown)
+        lang=get_default_language();
+      else
+      {
+        lang=get_language_from_mode(mode);
+        if(!lang)
+          lang=get_default_language();
+      }
 
-      if(mode==ID_C)
-      {
-        std::string sig=is_signed?"":"unsigned ";
-        if(width==config.ansi_c.char_width)
-          result["type"]=json_stringt(sig+"char");
-        else if(width==config.ansi_c.int_width)
-          result["type"]=json_stringt(sig+"int");
-        else if(width==config.ansi_c.short_int_width)
-          result["type"]=json_stringt(sig+"short int");
-        else if(width==config.ansi_c.long_int_width)
-          result["type"]=json_stringt(sig+"long int");
-        else if(width==config.ansi_c.long_long_int_width)
-          result["type"]=json_stringt(sig+"long long int");
-        else
-          assert(false && "unknown C type");
-      }
-      else if(mode==ID_java)
-      {
-        if(width==8 && is_signed)
-          result["type"]=json_stringt("byte");
-        else if(width==16 && is_signed)
-          result["type"]=json_stringt("short");
-        else if(width==16 && !is_signed)
-          result["type"]=json_stringt("char");
-        else if(width==32 && is_signed)
-          result["type"]=json_stringt("int");
-        else if(width==64 && is_signed)
-          result["type"]=json_stringt("long");
-      }
+      std::string type_string;
+      if(!lang->from_type(underlying_type, type_string, ns))
+        result["type"]=json_stringt(type_string);
 
       mp_integer i;
       if(!to_integer(expr, i))
