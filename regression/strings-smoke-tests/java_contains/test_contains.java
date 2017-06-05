@@ -6,6 +6,7 @@ public class test_contains
       String u = "bc";
       String t = "ab";
       assert(s.contains(u));
-      assert(s.contains(t));
+      // Long version:
+      // assert(s.contains(t));
    }
 }

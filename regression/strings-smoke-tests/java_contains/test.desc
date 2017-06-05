@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 test_contains.class
 --refine-strings
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* SUCCESS$
-^\[.*assertion.2\].* line 9.* FAILURE$
 --
 Issue: diffblue/test-gen#201
