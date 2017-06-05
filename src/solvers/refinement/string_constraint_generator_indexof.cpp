@@ -83,7 +83,8 @@ Function: string_constraint_generatort::add_axioms_for_index_of_string
     substring - a string expression
     from_index - an expression representing an index in strings
 
- Outputs: a integer expression
+ Outputs: an integer expression representing the first index of needle in
+          haystack after from_index, or -1 if there is none
 
  Purpose: add axioms stating that the returned value is an index greater than
           from_index such that haystack at that index starts with needle and
@@ -200,7 +201,8 @@ Function: string_constraint_generatort::add_axioms_for_last_index_of_string
     substring - a string expression
     from_index - an expression representing an index in strings
 
- Outputs: a integer expression
+ Outputs: an integer expression representing the last index of needle in
+          haystack after from_index, or -1 if there is none
 
  Purpose: add axioms stating that the returned value is an index less than
           from_index such that str at that index starts with substring and is
