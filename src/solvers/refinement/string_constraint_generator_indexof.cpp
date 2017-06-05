@@ -193,7 +193,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => |substring| >= length && offset <= from_index
+  // a1 : contains => offset <= from_index && offset <= |haystack| - |needle|
   // a2 : !contains <=> offset=-1
   // a3 : forall n:[0, substring.length[,
   //        contains => str[n+offset]=substring[n]
@@ -207,8 +207,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   implies_exprt a1(
     contains,
     and_exprt(
-      haystack.axiom_for_is_longer_than(
-        plus_exprt_with_overflow_check(needle.length(), offset)),
+      binary_relation_exprt(
+        offset, ID_le, minus_exprt(haystack.length(), needle.length())),
       binary_relation_exprt(offset, ID_le, from_index)));
   axioms.push_back(a1);
 
