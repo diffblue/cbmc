@@ -509,7 +509,17 @@ void java_object_factoryt::gen_nondet_init(
       create_dynamic_objects,
       NO_UPDATE_IN_PLACE);
 
-    if(assume_non_null)
+    // Determine whether the pointer can be null.
+    // In particular the array field of a String should not be null.
+    bool not_null=
+      assume_non_null ||
+      ((class_identifier=="java.lang.String" ||
+        class_identifier=="java.lang.StringBuilder" ||
+        class_identifier=="java.lang.StringBuffer" ||
+        class_identifier=="java.lang.CharSequence") &&
+       subtype.id()==ID_array);
+
+    if(not_null)
     {
       // Add the following code to assignments:
       // <expr> = <aoe>;
