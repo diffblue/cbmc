@@ -79,25 +79,25 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 Function: string_constraint_generatort::add_axioms_for_index_of_string
 
   Inputs:
-    str - a string expression
+    haystack - a string expression
     substring - a string expression
     from_index - an expression representing an index in strings
 
  Outputs: a integer expression
 
  Purpose: add axioms stating that the returned value is an index greater than
-          from_index such that str at that index starts with substring and is
-          the first occurence of substring in str after from_index,
-          or returned value is -1 if str does not contain substring.
+          from_index such that haystack at that index starts with needle and
+          is the first occurence of needle in haystack after from_index,
+          or returned value is -1 if haystack does not contain needle.
 
 \*******************************************************************/
 
 exprt string_constraint_generatort::add_axioms_for_index_of_string(
-  const string_exprt &str,
-  const string_exprt &substring,
+  const string_exprt &haystack,
+  const string_exprt &needle,
   const exprt &from_index)
 {
-  const typet &index_type=str.length().type();
+  const typet &index_type=haystack.length().type();
   symbol_exprt offset=fresh_exist_index("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_substring");
 
@@ -116,7 +116,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     and_exprt(
       binary_relation_exprt(from_index, ID_le, offset),
       binary_relation_exprt(
-        offset, ID_le, minus_exprt(str.length(), substring.length()))));
+        offset, ID_le, minus_exprt(haystack.length(), needle.length()))));
   axioms.push_back(a1);
 
   equal_exprt a2(
@@ -127,12 +127,12 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
   string_constraintt a3(
     qvar,
-    substring.length(),
+    needle.length(),
     contains,
-    equal_exprt(str[plus_exprt(qvar, offset)], substring[qvar]));
+    equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]));
   axioms.push_back(a3);
 
-  if(!is_constant_string(substring))
+  if(!is_constant_string(needle))
   {
     // string_not contains_constraintt are formula of the form:
     // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
@@ -141,19 +141,19 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
       offset,
       contains,
       from_integer(0, index_type),
-      substring.length(),
-      str,
-      substring);
+      needle.length(),
+      haystack,
+      needle);
     axioms.push_back(a4);
 
     string_not_contains_constraintt a5(
       from_index,
-      minus_exprt(str.length(), substring.length()),
+      minus_exprt(haystack.length(), needle.length()),
       not_exprt(contains),
       from_integer(0, index_type),
-      substring.length(),
-      str,
-      substring);
+      needle.length(),
+      haystack,
+      needle);
     axioms.push_back(a5);
   }
   else
@@ -166,19 +166,19 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     //       str[n+|substring|-1]!=substring[|substring|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
-    assert(!to_integer(substring.length(), sub_length));
+    assert(!to_integer(needle.length(), sub_length));
     exprt::operandst disjuncts;
     for(mp_integer offset=0; offset<sub_length; ++offset)
     {
       exprt expr_offset=from_integer(offset, index_type);
       plus_exprt shifted(expr_offset, qvar2);
       disjuncts.push_back(
-        not_exprt(equal_exprt(str[shifted], substring[expr_offset])));
+        not_exprt(equal_exprt(haystack[shifted], needle[expr_offset])));
     }
 
     or_exprt premise(
       not_exprt(contains), binary_relation_exprt(qvar, ID_lt, offset));
-    minus_exprt length_diff(str.length(), substring.length());
+    minus_exprt length_diff(haystack.length(), needle.length());
     string_constraintt a6(
       qvar2,
       from_index,
