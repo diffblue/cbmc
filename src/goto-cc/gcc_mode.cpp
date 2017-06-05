@@ -19,26 +19,37 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdio>
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <cstring>
 #include <numeric>
 #include <sstream>
 
+#include <json/json_parser.h>
+
+#include <util/expr.h>
+#include <util/c_types.h>
+#include <util/arith_tools.h>
 #include <util/string2int.h>
 #include <util/invariant.h>
 #include <util/tempdir.h>
+#include <util/tempfile.h>
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
+#include <util/replace_symbol.h>
+
+#include <goto-programs/read_goto_binary.h>
 
 #include <cbmc/version.h>
 
-#include "compile.h"
+#include "linker_script_merge.h"
 
 static std::string compiler_name(
   const cmdlinet &cmdline,
@@ -98,6 +109,7 @@ gcc_modet::gcc_modet(
   produce_hybrid_binary(_produce_hybrid_binary),
   act_as_ld(base_name=="ld" ||
             base_name.find("goto-ld")!=std::string::npos),
+  goto_binary_tmp_suffix(".goto-cc-saved"),
 
   // Keys are architectures specified in configt::set_arch().
   // Values are lists of GCC architectures that can be supplied as
@@ -837,7 +849,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
 
-int gcc_modet::gcc_hybrid_binary(const compilet &compiler)
+int gcc_modet::gcc_hybrid_binary(compilet &compiler)
 {
   {
     bool have_files=false;
@@ -891,17 +903,20 @@ int gcc_modet::gcc_hybrid_binary(const compilet &compiler)
           << " to generate hybrid binary" << eom;
 
   // save the goto-cc output files
+  std::list<std::string> goto_binaries;
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
       it!=output_files.end();
       it++)
   {
-    int result=rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    std::string bin_name=*it+goto_binary_tmp_suffix;
+    int result=rename(it->c_str(), bin_name.c_str());
     if(result!=0)
     {
       error() << "Rename failed: " << std::strerror(errno) << eom;
       return result;
     }
+    goto_binaries.push_back(bin_name);
   }
 
   std::string objcopy_cmd;
@@ -919,6 +934,18 @@ int gcc_modet::gcc_hybrid_binary(const compilet &compiler)
 
   int result=run_gcc(compiler);
 
+  if(result==0)
+  {
+    linker_script_merget ls_merge(
+        compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
+    const int fail=ls_merge.add_linker_script_definitions();
+    if(fail!=0)
+    {
+      error() << "Unable to merge linker script symbols" << eom;
+      return fail;
+    }
+  }
+
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
   for(std::list<std::string>::const_iterator
@@ -927,7 +954,7 @@ int gcc_modet::gcc_hybrid_binary(const compilet &compiler)
       it++)
   {
     debug() << "merging " << *it << eom;
-    std::string saved=*it+".goto-cc-saved";
+    std::string saved=*it+goto_binary_tmp_suffix;
 
     #ifdef __linux__
     if(result==0 && !cmdline.isset('c'))
