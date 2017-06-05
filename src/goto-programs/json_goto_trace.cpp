@@ -146,8 +146,13 @@ void convert(
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
         // Recovering the mode from the function
-        symbolt function_name=ns.lookup(source_location.get_function());
-        irep_idt mode=function_name.mode;
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
