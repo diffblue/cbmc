@@ -98,6 +98,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
 
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
+  class_type.set(ID_abstract, c.is_abstract);
   if(c.is_enum)
   {
     class_type.set(
