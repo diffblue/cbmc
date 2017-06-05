@@ -201,21 +201,15 @@ private:
     const exprt &from_index);
 
   // Add axioms corresponding to the String.indexOf:(String;I) java function
-  // TODO: the specifications are only partial:
-  // we add axioms stating that the returned value is either -1 or greater than
-  // from_index and the string beggining there has prefix substring
   exprt add_axioms_for_index_of_string(
     const string_exprt &haystack,
     const string_exprt &needle,
     const exprt &from_index);
 
   // Add axioms corresponding to the String.indexOf java functions
-  // TODO: the specifications are only partial for the ones that look for
-  // strings
   exprt add_axioms_for_index_of(const function_application_exprt &f);
 
   // Add axioms corresponding to the String.lastIndexOf:(String;I) java function
-  // TODO: the specifications are only partial
   exprt add_axioms_for_last_index_of_string(
     const string_exprt &str,
     const string_exprt &substring,
@@ -228,7 +222,6 @@ private:
     const exprt &from_index);
 
   // Add axioms corresponding to the String.lastIndexOf java functions
-  // TODO: the specifications is only partial
   exprt add_axioms_for_last_index_of(const function_application_exprt &f);
 
   // TODO: the specifications of these functions is only partial
