@@ -87,7 +87,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   // We add axioms:
   // a1 : contains ==> from_index <= offset <= |haystack|-|needle|
   // a2 : !contains <=> offset=-1
-  // a3 : forall n:[0,|substring|[.
+  // a3 : forall n:[0,|needle|[.
   //        contains ==> haystack[n+offset]=needle[n]
   // a4 : forall n:[from_index,offset[.
   //        contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
