@@ -20,10 +20,9 @@ Function: string_constraint_generatort::add_axioms_for_index_of
 
  Outputs: a integer expression
 
- Purpose: add axioms stating that the returned value is either:
-          -1 if the string does not contain c
-          an index greater than from_index such that the character of str at
-          that position equals c and is the first occurence after from_index.
+ Purpose: Add axioms stating that the returned value is the index within
+          str of the first occurence of c starting the search at from_index,
+          or -1 if no such character occurs at or after position from_index.
 
 \*******************************************************************/
 
@@ -80,16 +79,16 @@ Function: string_constraint_generatort::add_axioms_for_index_of_string
 
   Inputs:
     haystack - a string expression
-    substring - a string expression
+    needle - a string expression
     from_index - an expression representing an index in strings
 
  Outputs: an integer expression representing the first index of needle in
           haystack after from_index, or -1 if there is none
 
- Purpose: add axioms stating that the returned value is an index greater than
-          from_index such that haystack at that index starts with needle and
-          is the first occurence of needle in haystack after from_index,
-          or returned value is -1 if haystack does not contain needle.
+ Purpose: Add axioms stating that the returned value is the index within
+          haystack of the first occurence of needle starting the search at
+          from_index, or -1 if needle does not occur at or after position
+          from_index.
 
 \*******************************************************************/
 
@@ -197,17 +196,17 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 Function: string_constraint_generatort::add_axioms_for_last_index_of_string
 
   Inputs:
-    str - a string expression
-    substring - a string expression
+    haystack - a string expression
+    needle - a string expression
     from_index - an expression representing an index in strings
 
  Outputs: an integer expression representing the last index of needle in
           haystack after from_index, or -1 if there is none
 
- Purpose: add axioms stating that the returned value is an index less than
-          from_index such that str at that index starts with substring and is
-          the last occurence of substring in str before from_index,
-          or the returned value is -1 if str does not contain substring.
+ Purpose: Add axioms stating that the returned value is the index within
+          haystack of the last occurence of needle starting the search
+          backward at from_index (ie the index is smaller or equal to
+          from_index), or -1 if needle does not occur before from_index.
 
 \*******************************************************************/
 
@@ -368,10 +367,10 @@ Function: string_constraint_generatort::add_axioms_for_last_index_of
 
  Outputs: a integer expression
 
- Purpose: add axioms stating that the returned value is either:
-          -1 if the string does not contain c
-          an index less than from_index such that the character of str at
-          that position equals c and is the last occurence before from_index.
+ Purpose: Add axioms stating that the returned value is the index within
+          str of the last occurence of c starting the search backward at
+          from_index, or -1 if no such character occurs at or before
+          position from_index.
 
 \*******************************************************************/
 
