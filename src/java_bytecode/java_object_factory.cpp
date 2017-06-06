@@ -113,8 +113,9 @@ public:
     irep_idt class_identifier,
     bool skip_classid,
     bool create_dynamic_objects,
-    bool override=false,
-    const typet &override_type=empty_typet());
+    bool override,
+    const typet &override_type,
+    update_in_placet);
 
 private:
   void gen_nondet_pointer_init(
@@ -122,7 +123,8 @@ private:
     const exprt &expr,
     const irep_idt &class_identifier,
     bool create_dynamic_objects,
-    const pointer_typet &pointer_type);
+    const pointer_typet &pointer_type,
+    const update_in_placet &update_in_place);
 
   void gen_nondet_struct_init(
     code_blockt &assignments,
@@ -286,7 +288,9 @@ void java_object_factoryt::gen_pointer_target_init(
 
 /// Initialises a primitive or object tree rooted at `expr`, of type pointer. It
 /// allocates child objects as necessary and nondet-initialising their members,
-/// \param assignments - the code block we are building with
+/// or if MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated
+/// objects.
+/// \param assignemnts - the code block we are building with
 ///   initilisation code
 /// \param expr: lvalue expression to initialise
 /// \param class_identifier - the name of the class so we can identify
@@ -294,41 +298,79 @@ void java_object_factoryt::gen_pointer_target_init(
 /// \param create_dynamic_objects: if true, use malloc to allocate objects;
 ///   otherwise generate fresh static symbols.
 /// \param pointer_type - The type of the pointer we are initalising
+/// `update_in_place`: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
+///   generate a runtime nondet branch between the NO_ and MUST_ cases.
 void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt &assignments,
   const exprt &expr,
   const irep_idt &class_identifier,
   bool create_dynamic_objects,
-  const pointer_typet &pointer_type)
+  const pointer_typet &pointer_type,
+  const update_in_placet &update_in_place)
 {
   const typet &subtype=ns.follow(pointer_type.subtype());
-
   if(subtype.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(subtype);
-    const irep_idt struct_tag=struct_type.get_tag();
-    // set to null if found in recursion set and not a sub-type
-    if(recursion_set.find(struct_tag)!=recursion_set.end() &&
-       struct_tag==class_identifier)
+    const irep_idt &struct_tag=struct_type.get_tag();
+    // If this is a recursive type of some kind, set null.
+    if(!recursion_set.insert(struct_tag).second)
     {
-      assignments.copy_to_operands(
-        get_null_assignment(expr, pointer_type));
+      if(update_in_place==NO_UPDATE_IN_PLACE)
+      {
+        assignments.copy_to_operands(
+          get_null_assignment(expr, pointer_type));
+      }
+      // Otherwise leave it as it is.
       return;
     }
   }
+
+  code_blockt new_object_assignments;
+  code_blockt update_in_place_assignments;
+
+  if(update_in_place!=NO_UPDATE_IN_PLACE)
+  {
+    gen_pointer_target_init(
+      update_in_place_assignments,
+      expr,
+      subtype,
+      create_dynamic_objects,
+      MUST_UPDATE_IN_PLACE);
+  }
+
+  if(update_in_place==MUST_UPDATE_IN_PLACE)
+  {
+    assignments.append(update_in_place_assignments);
+    return;
+  }
+
+  // Otherwise we need code for the allocate-new-object case:
 
   code_blockt non_null_inst;
   gen_pointer_target_init(
     non_null_inst,
     expr,
     subtype,
-    create_dynamic_objects);
+    create_dynamic_objects,
+    NO_UPDATE_IN_PLACE);
 
-  if(assume_non_null)
+  // Determine whether the pointer can be null.
+  // In particular the array field of a String should not be null.
+  bool not_null=
+    assume_non_null ||
+    ((class_identifier=="java.lang.String" ||
+      class_identifier=="java.lang.StringBuilder" ||
+      class_identifier=="java.lang.StringBuffer" ||
+      class_identifier=="java.lang.CharSequence") &&
+     subtype.id()==ID_array);
+
+  if(not_null)
   {
     // Add the following code to assignments:
     // <expr> = <aoe>;
-    assignments.append(non_null_inst);
+    new_object_assignments.append(non_null_inst);
   }
   else
   {
@@ -348,17 +390,34 @@ void java_object_factoryt::gen_nondet_pointer_init(
     null_check.then_case()=set_null_inst;
     null_check.else_case()=non_null_inst;
 
-    assignments.add(null_check);
+    new_object_assignments.add(null_check);
+  }
+
+  // Similarly to above, maybe use a conditional if both the
+  // allocate-fresh and update-in-place cases are allowed:
+  if(update_in_place==NO_UPDATE_IN_PLACE)
+  {
+    assignments.append(new_object_assignments);
+  }
+  else
+  {
+    assert(update_in_place==MAY_UPDATE_IN_PLACE);
+
+    code_ifthenelset update_check;
+    update_check.cond()=side_effect_expr_nondett(bool_typet());
+    update_check.then_case()=update_in_place_assignments;
+    update_check.else_case()=new_object_assignments;
+
+    assignments.add(update_check);
   }
 }
 
-/// Initialises an object tree rooted at `expr`, allocating child objects as
-/// necessary and nondet-initialising their members.
-/// \param assignments: The code block to append the new
-///   instructions to
-/// \param expr: pointer-typed lvalue expression to initialise
-/// \param is_sub: If true, `expr` is a substructure of a larger object, which
-///   in Java necessarily means a base class. not match *expr (for example, expr
+/// Initialises a primitive or object tree rooted at `expr`, allocating child
+/// objects as necessary and nondet-initialising their members, or if
+/// MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated objects.
+/// \par parameters: `expr`: lvalue expression to initialise
+/// `is_sub`: If true, `expr` is a substructure of a larger object, which in
+///   Java necessarily means a base class. not match *expr (for example, expr
 ///   might be void*)
 /// \param class_identifier: clsid to initialise @java.lang.Object.
 ///   @class_identifier
@@ -376,49 +435,55 @@ void java_object_factoryt::gen_nondet_struct_init(
 {
   typedef struct_typet::componentst componentst;
 
-  const irep_idt struct_tag=struct_type.get_tag();
-
-  const componentst &components=struct_type.components();
-
-  if(!is_sub)
-    class_identifier=struct_tag;
-
-  recursion_set.insert(struct_tag);
-
-  for(const auto &component : components)
+  if(type.id()==ID_pointer)
   {
-    const typet &component_type=component.type();
-    irep_idt name=component.get_name();
+    // dereferenced type
+    const pointer_typet &pointer_type=to_pointer_type(type);
+    gen_nondet_pointer_init(
+      assignments,
+      expr,
+      class_identifier,
+      create_dynamic_objects,
+      NO_UPDATE_IN_PLACE);
 
-    member_exprt me(expr, name, component_type);
+    // Determine whether the pointer can be null.
+    // In particular the array field of a String should not be null.
+    bool not_null=
+      assume_non_null ||
+      ((class_identifier=="java.lang.String" ||
+        class_identifier=="java.lang.StringBuilder" ||
+        class_identifier=="java.lang.StringBuffer" ||
+        class_identifier=="java.lang.CharSequence") &&
+       subtype.id()==ID_array);
 
-    if(name=="@class_identifier")
+    if(not_null)
     {
-      irep_idt qualified_clsid="java::"+as_string(class_identifier);
-      constant_exprt ci(qualified_clsid, string_typet());
-      code_assignt code(me, ci);
-      code.add_source_location()=loc;
-      assignments.copy_to_operands(code);
-    }
-    else if(name=="@lock")
-    {
-      code_assignt code(me, from_integer(0, me.type()));
-      code.add_source_location()=loc;
-      assignments.copy_to_operands(code);
+      // Add the following code to assignments:
+      // <expr> = <aoe>;
+      new_object_assignments.append(non_null_inst);
     }
     else
     {
-      INVARIANT(!name.empty(), "Each component of a struct must have a name");
+      // Add the following code to assignments:
+      //           IF !NONDET(_Bool) THEN GOTO <label1>
+      //           <expr> = <null pointer>
+      //           GOTO <label2>
+      // <label1>: <expr> = &tmp$<temporary_counter>;
+      //           <code from recursive call to gen_nondet_init() with
+      //             tmp$<temporary_counter>>
+      // And the next line is labelled label2
+      auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-      bool _is_sub=name[0]=='@';
+      code_ifthenelset null_check;
+      null_check.cond()=side_effect_expr_nondett(bool_typet());
+      null_check.then_case()=set_null_inst;
+      null_check.else_case()=non_null_inst;
 
-      gen_nondet_init(
-        assignments,
-        me,
-        _is_sub,
-        class_identifier,
-        create_dynamic_objects);
+      new_object_assignments.add(null_check);
     }
+
+    if(update_in_place==MAY_UPDATE_IN_PLACE)
+      update_in_place_diamond.finish();
   }
 }
 
@@ -464,7 +529,8 @@ void java_object_factoryt::gen_nondet_init(
       expr,
       class_identifier,
       create_dynamic_objects,
-      pointer_type);
+      pointer_type,
+      update_in_place);
   }
   else if(type.id()==ID_struct)
   {
