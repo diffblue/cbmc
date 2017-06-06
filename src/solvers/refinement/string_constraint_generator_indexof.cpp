@@ -258,7 +258,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     //  forall n:[0, min(from_index,|haystack|-|needle|)].
     //    !contains || n > offset ==>
     //      haystack[n] != needle[0] || ... ||
-    //      haystack[n+|substring|-1] != needle[|substring|-1]
+    //      haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
     assert(!to_integer(needle.length(), sub_length));
@@ -275,7 +275,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
       not_exprt(contains), binary_relation_exprt(qvar2, ID_gt, offset));
     string_constraintt a6(
       qvar2,
-      from_index,
+      from_integer(0, index_type),
       plus_exprt(from_integer(1, index_type), end_index),
       premise,
       disjunction(disjuncts));
