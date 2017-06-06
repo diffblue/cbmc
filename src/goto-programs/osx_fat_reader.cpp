@@ -6,6 +6,9 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// Read Mach-O
+
 #include <cassert>
 #include <cstdlib>
 
@@ -14,18 +17,6 @@ Author:
 #ifdef __APPLE__
 #include <mach-o/fat.h>
 #endif
-
-/*******************************************************************\
-
-Function: is_osx_fat_magic
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool is_osx_fat_magic(char hdr[4])
 {
@@ -42,18 +33,6 @@ bool is_osx_fat_magic(char hdr[4])
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: osx_fat_readert::osx_fat_readert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 osx_fat_readert::osx_fat_readert(std::ifstream &in) :
   has_gb_arch(false)
@@ -93,18 +72,6 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
   }
 #endif
 }
-
-/*******************************************************************\
-
-Function: osx_fat_readert::extract_gb
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool osx_fat_readert::extract_gb(
   const std::string &source,

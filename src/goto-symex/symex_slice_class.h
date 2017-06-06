@@ -6,19 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Slicer for symex traces
+
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H
 #define CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H
 
 #include "symex_target_equation.h"
 #include "slice.h"
-
-/*******************************************************************\
-
-   Class: symex_slicet
-
- Purpose:
-
-\*******************************************************************/
 
 class symex_slicet
 {

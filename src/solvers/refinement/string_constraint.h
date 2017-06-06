@@ -10,6 +10,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Defines string constraints. These are formulas talking about strings.  We
+///   implemented two forms of constraints: `string_constraintt`  are formulas
+///   of the form $\forall univ_var \in [lb,ub[. prem => body$, and
+///   not_contains_constraintt of the form: $\forall x in [lb,ub[. p(x) =>
+///   \exists y in [lb,ub[. s1[x+y] != s2[y]$.
+
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_H
 

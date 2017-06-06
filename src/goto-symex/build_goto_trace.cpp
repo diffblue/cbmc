@@ -8,6 +8,9 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
 #include <cassert>
 
 #include <util/threeval.h>
@@ -20,18 +23,6 @@ Author: Daniel Kroening
 #include "partial_order_concurrency.h"
 
 #include "build_goto_trace.h"
-
-/*******************************************************************\
-
-Function: build_full_lhs_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
@@ -110,18 +101,6 @@ exprt build_full_lhs_rec(
   return src_original;
 }
 
-/*******************************************************************\
-
-Function: adjust_lhs_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt adjust_lhs_object(
   const prop_convt &prop_conv,
   const namespacet &ns,
@@ -129,18 +108,6 @@ exprt adjust_lhs_object(
 {
   return nil_exprt();
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,
@@ -315,18 +282,6 @@ void build_goto_trace(
   for(auto &s_it : goto_trace.steps)
     s_it.step_nr=++step_nr;
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,

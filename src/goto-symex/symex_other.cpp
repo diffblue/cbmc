@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -17,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::symex_other
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_other(
   const goto_functionst &goto_functions,

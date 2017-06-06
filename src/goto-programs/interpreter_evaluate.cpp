@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interpreter for GOTO Programs
+
 #include <cassert>
 #include <iostream>
 
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include "interpreter_class.h"
-
-/*******************************************************************\
-
-Function: interpretert::evaluate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interpretert::read(
   mp_integer address,
@@ -46,18 +37,6 @@ void interpretert::read(
     ++address;
   }
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interpretert::evaluate(
   const exprt &expr,
@@ -425,18 +404,6 @@ void interpretert::evaluate(
             << from_expr(ns, function->first, expr)
             << '\n';
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer interpretert::evaluate_address(const exprt &expr) const
 {

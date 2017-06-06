@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <ostream>
 
 #include "string2int.h"
 #include "xml.h"
-
-/*******************************************************************\
-
-Function: xmlt::clear
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void xmlt::clear()
 {
@@ -31,18 +20,6 @@ void xmlt::clear()
   elements.clear();
 }
 
-/*******************************************************************\
-
-Function: xmlt::swap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void xmlt::swap(xmlt &xml)
 {
   xml.data.swap(data);
@@ -50,18 +27,6 @@ void xmlt::swap(xmlt &xml)
   xml.elements.swap(elements);
   xml.name.swap(name);
 }
-
-/*******************************************************************\
-
-Function: xmlt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void xmlt::output(std::ostream &out, unsigned indent) const
 {
@@ -109,18 +74,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   out << '<' << '/' << name << '>' << "\n";
 }
 
-/*******************************************************************\
-
-Function: xmlt::escape
-
-  Inputs:
-
- Outputs:
-
- Purpose: escaping for XML elements
-
-\*******************************************************************/
-
+/// escaping for XML elements
 void xmlt::escape(const std::string &s, std::ostream &out)
 {
   for(const auto ch : s)
@@ -156,20 +110,8 @@ void xmlt::escape(const std::string &s, std::ostream &out)
   }
 }
 
-/*******************************************************************\
-
-Function: xmlt::escape_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose: escaping for XML attributes, assuming that
-          double quotes " are used consistently,
-          not single quotes
-
-\*******************************************************************/
-
+/// escaping for XML attributes, assuming that double quotes " are used
+/// consistently, not single quotes
 void xmlt::escape_attribute(const std::string &s, std::ostream &out)
 {
   for(const auto ch : s)
@@ -202,34 +144,10 @@ void xmlt::escape_attribute(const std::string &s, std::ostream &out)
   }
 }
 
-/*******************************************************************\
-
-Function: xmlt::do_indent
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void xmlt::do_indent(std::ostream &out, unsigned indent)
 {
   out << std::string(indent, ' ');
 }
-
-/*******************************************************************\
-
-Function: xmlt::find
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 xmlt::elementst::const_iterator xmlt::find(const std::string &name) const
 {
@@ -242,18 +160,6 @@ xmlt::elementst::const_iterator xmlt::find(const std::string &name) const
   return elements.end();
 }
 
-/*******************************************************************\
-
-Function: xmlt::find
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 xmlt::elementst::iterator xmlt::find(const std::string &name)
 {
   for(elementst::iterator it=elements.begin();
@@ -265,36 +171,12 @@ xmlt::elementst::iterator xmlt::find(const std::string &name)
   return elements.end();
 }
 
-/*******************************************************************\
-
-Function: xmlt::set_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void xmlt::set_attribute(
   const std::string &attribute,
   unsigned value)
 {
   set_attribute(attribute, std::to_string(value));
 }
-
-/*******************************************************************\
-
-Function: xmlt::set_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void xmlt::set_attribute(
   const std::string &attribute,
@@ -303,36 +185,12 @@ void xmlt::set_attribute(
   set_attribute(attribute, std::to_string(value));
 }
 
-/*******************************************************************\
-
-Function: xmlt::set_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void xmlt::set_attribute(
   const std::string &attribute,
   unsigned long long value)
 {
   set_attribute(attribute, std::to_string(value));
 }
-
-/*******************************************************************\
-
-Function: xmlt::set_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void xmlt::set_attribute(
   const std::string &attribute,
@@ -349,18 +207,9 @@ void xmlt::set_attribute(
   }
 }
 
-/*******************************************************************\
-
-Function: xmlt::unescape
-
-  Inputs: a string
-
- Outputs: the unescaped string
-
- Purpose: takes a string and unescapes any xml style escaped symbols
-
-\*******************************************************************/
-
+/// takes a string and unescapes any xml style escaped symbols
+/// \par parameters: a string
+/// \return the unescaped string
 std::string xmlt::unescape(const std::string &str)
 {
   std::string result("");

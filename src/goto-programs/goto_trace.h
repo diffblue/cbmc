@@ -8,6 +8,9 @@ Date: July 2005
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 

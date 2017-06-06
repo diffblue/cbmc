@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include <cassert>
 #include <algorithm>
 
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dirty.h>
 
 #include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::symex_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_goto(statet &state)
 {
@@ -206,18 +197,6 @@ void goto_symext::symex_goto(statet &state)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::symex_step_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::symex_step_goto(statet &state, bool taken)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -234,18 +213,6 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
 
   target.assumption(state.guard.as_expr(), guard, state.source);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::merge_gotos
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::merge_gotos(statet &state)
 {
@@ -271,18 +238,6 @@ void goto_symext::merge_gotos(statet &state)
   frame.goto_state_map.erase(state_map_it);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::merge_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::merge_goto(
   const statet::goto_statet &goto_state,
   statet &state)
@@ -303,18 +258,6 @@ void goto_symext::merge_goto(
   state.depth=std::min(state.depth, goto_state.depth);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::merge_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::merge_value_sets(
   const statet::goto_statet &src,
   statet &dest)
@@ -327,18 +270,6 @@ void goto_symext::merge_value_sets(
 
   dest.value_set.make_union(src.value_set);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::phi_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
@@ -446,18 +377,6 @@ void goto_symext::phi_function(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::loop_bound_exceeded
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::loop_bound_exceeded(
   statet &state,
   const exprt &guard)
@@ -496,18 +415,6 @@ void goto_symext::loop_bound_exceeded(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::get_unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_symext::get_unwind(
   const symex_targett::sourcet &source,

@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_bitwise
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_bitwise(const exprt &expr)
 {

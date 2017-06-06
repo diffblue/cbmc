@@ -6,23 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Misc Utilities
+
 #include "array_name.h"
 #include "expr.h"
 #include "namespace.h"
 #include "symbol.h"
 #include "ssa_expr.h"
-
-/*******************************************************************\
-
-Function: goto_checkt::array_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string array_name(
   const namespacet &ns,

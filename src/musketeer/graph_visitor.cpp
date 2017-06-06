@@ -6,23 +6,14 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// graph visitor for computing edges involved for fencing
+
 #include "fence_inserter.h"
 #include "graph_visitor.h"
 
 /* implemented: BTWN1, BTWN4 */
 #define BTWN1
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::graph_explore(
   event_grapht &egraph,
@@ -66,18 +57,6 @@ void const_graph_visitort::graph_explore(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::const_graph_explore(
   event_grapht &egraph,
   event_idt next,
@@ -118,18 +97,6 @@ void const_graph_visitort::const_graph_explore(
     }
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::graph_explore_BC(
   event_grapht &egraph,
@@ -193,18 +160,6 @@ void const_graph_visitort::graph_explore_BC(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::const_graph_explore_BC(
   event_grapht &egraph,
   event_idt next,
@@ -259,18 +214,6 @@ void const_graph_visitort::const_graph_explore_BC(
     }
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::graph_explore_AC(
   event_grapht &egraph,
@@ -332,18 +275,6 @@ void const_graph_visitort::graph_explore_AC(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::const_graph_explore_AC(
   event_grapht &egraph,
   event_idt next,
@@ -400,18 +331,6 @@ void const_graph_visitort::const_graph_explore_AC(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::PT(
   const edget &e,
   std::set<unsigned> &edges)
@@ -454,18 +373,8 @@ void const_graph_visitort::PT(
     edges.insert(fence_inserter.map_from_e[e]);
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: e in comWR /\ C_j (invisible variables)
-
- Outputs: e's in po /\ C (problem variables)
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: e in comWR /\ C_j (invisible variables)
+/// \return e's in po /\ C (problem variables)
 void const_graph_visitort::CT(
   const edget &edge,
   std::set<unsigned> &edges)
@@ -519,18 +428,8 @@ void const_graph_visitort::CT(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: e in comWR /\ C_j (invisible variables)
-
- Outputs: e's in poRW/\ C (problem variables)
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: e in comWR /\ C_j (invisible variables)
+/// \return e's in poRW/\ C (problem variables)
 void const_graph_visitort::CT_not_powr(
   const edget &edge,
   std::set<unsigned> &edges)

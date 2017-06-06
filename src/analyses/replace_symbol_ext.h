@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// Modified expression replacement for constant propagator
+
 #ifndef CPROVER_ANALYSES_REPLACE_SYMBOL_EXT_H
 #define CPROVER_ANALYSES_REPLACE_SYMBOL_EXT_H
 

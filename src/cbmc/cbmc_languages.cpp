@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Language Registration
+
 #include <langapi/mode.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -17,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "cbmc_parse_options.h"
-
-/*******************************************************************\
-
-Function: cbmc_parse_optionst::register_languages
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cbmc_parse_optionst::register_languages()
 {

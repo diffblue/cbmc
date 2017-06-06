@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <fstream>
 
 #include "language.h"
 #include "language_file.h"
-
-/*******************************************************************\
-
-Function: language_filet::language_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
@@ -30,35 +19,11 @@ language_filet::language_filet(const language_filet &rhs):
 {
 }
 
-/*******************************************************************\
-
-Function: language_filet::~language_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 language_filet::~language_filet()
 {
   if(language!=NULL)
     delete language;
 }
-
-/*******************************************************************\
-
-Function: language_filet::get_modules
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void language_filet::get_modules()
 {
@@ -72,36 +37,12 @@ void language_filet::convert_lazy_method(
   language->convert_lazy_method(id, symbol_table);
 }
 
-/*******************************************************************\
-
-Function: language_filest::show_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void language_filest::show_parse(std::ostream &out)
 {
   for(file_mapt::iterator it=file_map.begin();
       it!=file_map.end(); it++)
     it->second.language->show_parse(out);
 }
-
-/*******************************************************************\
-
-Function: language_filest::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::parse()
 {
@@ -135,18 +76,6 @@ bool language_filest::parse()
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck(symbol_tablet &symbol_table)
 {
@@ -222,18 +151,6 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
   return false;
 }
 
-/*******************************************************************\
-
-Function: language_filest::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool language_filest::final(
   symbol_tablet &symbol_table)
 {
@@ -250,18 +167,6 @@ bool language_filest::final(
   return false;
 }
 
-/*******************************************************************\
-
-Function: language_filest::interfaces
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool language_filest::interfaces(
   symbol_tablet &symbol_table)
 {
@@ -274,18 +179,6 @@ bool language_filest::interfaces(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
@@ -303,18 +196,6 @@ bool language_filest::typecheck_module(
 
   return typecheck_module(symbol_table, it->second);
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,

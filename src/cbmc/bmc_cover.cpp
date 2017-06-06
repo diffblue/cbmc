@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Test-Suite Generation with BMC
+
 #include <iostream>
 
 #include <util/time_stopping.h>
@@ -23,18 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 #include "bv_cbmc.h"
-
-/*******************************************************************\
-
-   Class: bmc_covert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 class bmc_covert:
   public cover_goalst::observert,
@@ -149,18 +140,6 @@ protected:
   bmct &bmc;
 };
 
-/*******************************************************************\
-
-Function: bmc_covert::satisfying_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmc_covert::satisfying_assignment()
 {
   tests.push_back(testt());
@@ -209,18 +188,6 @@ void bmc_covert::satisfying_assignment()
   show_goto_trace(std::cout, bmc.ns, test.goto_trace);
   #endif
 }
-
-/*******************************************************************\
-
-Function: bmc_covert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool bmc_covert::operator()()
 {
@@ -463,18 +430,7 @@ bool bmc_covert::operator()()
   return false;
 }
 
-/*******************************************************************\
-
-Function: bmct::cover
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
+/// Try to cover all goals
 bool bmct::cover(
   const goto_functionst &goto_functions,
   const optionst::value_listt &criteria)

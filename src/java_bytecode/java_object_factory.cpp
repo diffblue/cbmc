@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <unordered_set>
 #include <sstream>
 
@@ -26,18 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-/*******************************************************************\
-
-Function: new_tmp_symbol
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static symbolt &new_tmp_symbol(
   symbol_tablet &symbol_table,
   const source_locationt &loc,
@@ -53,18 +42,8 @@ static symbolt &new_tmp_symbol(
     symbol_table);
 }
 
-/*******************************************************************\
-
-Function: get_nondet_bool
-
- Inputs: Desired type (C_bool or plain bool)
-
- Outputs: nondet expr of that type
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Desired type (C_bool or plain bool)
+/// \return nondet expr of that type
 static exprt get_nondet_bool(const typet &type)
 {
   // We force this to 0 and 1 and won't consider
@@ -133,23 +112,11 @@ public:
     const typet &override_type=empty_typet());
 };
 
-/*******************************************************************\
-
-Function: java_object_factoryt::allocate_object
-
- Inputs:
-  assignments - The code block to add code to
-  target_expr - The expression which we are allocating a symbol for
-  allocate_type -
-  create_dynamic_objects - Whether to create a symbol with static
-                           lifetime or
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \param assignments: The code block to add code to
+/// \param target_expr: The expression which we are allocating a symbol for
+/// \param allocate_type:
+/// \param create_dynamic_objects: Whether to create a symbol with static
+///   lifetime or
 exprt java_object_factoryt::allocate_object(
   code_blockt &assignments,
   const exprt &target_expr,
@@ -219,20 +186,9 @@ exprt java_object_factoryt::allocate_object(
   }
 }
 
-/*******************************************************************\
-
-Function: java_object_factoryt::get_null_assignment
-
-  Inputs: `expr`: pointer-typed lvalue expression to initialise
-          `ptr_type`: pointer type to write
-
- Outputs:
-
- Purpose: Adds an instruction to `init_code` null-initialising
-          `expr`.
-
-\*******************************************************************/
-
+/// Adds an instruction to `init_code` null-initialising `expr`.
+/// \par parameters: `expr`: pointer-typed lvalue expression to initialise
+/// `ptr_type`: pointer type to write
 code_assignt java_object_factoryt::get_null_assignment(
   const exprt &expr,
   const pointer_typet &ptr_type)
@@ -243,29 +199,17 @@ code_assignt java_object_factoryt::get_null_assignment(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_object_factoryt::gen_pointer_target_init
-
-  Inputs: `expr`: pointer-typed lvalue expression to initialise
-          `target_type`: structure type to initialise, which may
-            not match *expr (for example, expr might be void*)
-          `create_dynamic_objects`: if true, use malloc to allocate
-            objects; otherwise generate fresh static symbols.
-          `update_in_place`:
-            NO_UPDATE_IN_PLACE: initialise `expr` from scratch
-            MUST_UPDATE_IN_PLACE: reinitialise an existing object
-            MAY_UPDATE_IN_PLACE: invalid input
-
- Outputs:
-
- Purpose: Initialises an object tree rooted at `expr`, allocating
-          child objects as necessary and nondet-initialising their
-          members, or if MUST_UPDATE_IN_PLACE is set, re-initialising
-          already-allocated objects.
-
-\*******************************************************************/
-
+/// Initialises an object tree rooted at `expr`, allocating child objects as
+/// necessary and nondet-initialising their members, or if MUST_UPDATE_IN_PLACE
+/// is set, re-initialising already-allocated objects.
+/// \par parameters: `expr`: pointer-typed lvalue expression to initialise
+/// `target_type`: structure type to initialise, which may not match *expr (for
+///   example, expr might be void*)
+/// `create_dynamic_objects`: if true, use malloc to allocate objects; otherwise
+///   generate fresh static symbols.
+/// `update_in_place`: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
+///   invalid input
 void java_object_factoryt::gen_pointer_target_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -306,30 +250,17 @@ void java_object_factoryt::gen_pointer_target_init(
   }
 }
 
-/*******************************************************************\
-
-Function: java_object_factoryt::gen_nondet_init
-
- Inputs:
-  expr - The expression which we are generating a non-determinate
-         value for
-  is_sub -
-  class_identifier -
-  create_dynamic_objects - If true, allocate variables on the heap
-  override - Ignore the LHS' real type. Used at the moment for
-             reference arrays, which are implemented as void*
-             arrays but should be init'd as their true type with
-             appropriate casts.
-  override_type - Type to use if ignoring the LHS' real type
-
- Outputs:
-
- Purpose: Creates a nondet for expr, including calling itself
-          recursively to make appropriate symbols to point to if
-          expr is a pointer or struct
-
-\*******************************************************************/
-
+/// Creates a nondet for expr, including calling itself recursively to make
+/// appropriate symbols to point to if expr is a pointer or struct
+/// \param expr: The expression which we are generating a non-determinate value
+///   for
+/// \param is_sub:
+/// \param class_identifier:
+/// \param create_dynamic_objects: If true, allocate variables on the heap
+/// \param override: Ignore the LHS' real type. Used at the moment for reference
+///   arrays, which are implemented as void* arrays but should be init'd as
+///   their true type with appropriate casts.
+/// \param override_type: Type to use if ignoring the LHS' real type
 void java_object_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -463,24 +394,15 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
-/*******************************************************************\
-
-Function: java_object_factoryt::allocate_nondet_length_array
-
- Inputs:  `lhs`, symbol to assign the new array structure
-          `max_length_expr`, maximum length of the new array
-            (minimum is fixed at zero for now)
-          `element_type`, actual element type of the array (the array
-            for all reference types will have void* type, but this
-            will be annotated as the true member type)
-
- Outputs: Appends instructions to `assignments`
-
- Purpose: Allocates a fresh array. Single-use herem at the moment, but
-          useful to keep as a separate function for downstream branches.
-
-\*******************************************************************/
-
+/// Allocates a fresh array. Single-use herem at the moment, but useful to keep
+/// as a separate function for downstream branches.
+/// \par parameters: `lhs`, symbol to assign the new array structure
+/// `max_length_expr`, maximum length of the new array (minimum is fixed at zero
+///   for now)
+/// `element_type`, actual element type of the array (the array for all
+///   reference types will have void* type, but this will be annotated as the
+///   true member type)
+/// \return Appends instructions to `assignments`
 void java_object_factoryt::allocate_nondet_length_array(
   code_blockt &assignments,
   const exprt &lhs,
@@ -517,20 +439,8 @@ void java_object_factoryt::allocate_nondet_length_array(
   assignments.copy_to_operands(assign);
 }
 
-/*******************************************************************\
-
-Function: java_object_factoryt::gen_nondet_array_init
-
- Inputs:
-
- Outputs:
-
- Purpose: create code to initialize a Java array with size
-          `max_nondet_array_length`, loop over elements and initialize
-          them
-
-\*******************************************************************/
-
+/// create code to initialize a Java array with size `max_nondet_array_length`,
+/// loop over elements and initialize them
 void java_object_factoryt::gen_nondet_array_init(
   code_blockt &assignments,
   const exprt &expr)
@@ -629,18 +539,6 @@ void java_object_factoryt::gen_nondet_array_init(
   assignments.move_to_operands(goto_head);
   assignments.move_to_operands(init_done_label);
 }
-
-/*******************************************************************\
-
-Function: object_factory
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt object_factory(
   const typet &type,

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
 #ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_STATE_H
 #define CPROVER_PATH_SYMEX_PATH_SYMEX_STATE_H
 

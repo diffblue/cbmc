@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -39,34 +42,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fault_localization.h"
 #include "bmc.h"
 
-/*******************************************************************\
-
-Function: bmct::do_unwind_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::do_unwind_module()
 {
   // this is a hook for hw-cbmc
 }
-
-/*******************************************************************\
-
-Function: bmct::error_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::error_trace()
 {
@@ -109,18 +88,7 @@ void bmct::error_trace()
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::output_graphml
-
-  Inputs:
-
- Outputs:
-
- Purpose: outputs witnesses in graphml format
-
-\*******************************************************************/
-
+/// outputs witnesses in graphml format
 void bmct::output_graphml(
   resultt result,
   const goto_functionst &goto_functions)
@@ -146,18 +114,6 @@ void bmct::output_graphml(
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::do_conversion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::do_conversion()
 {
   // convert HDL (hook for hw-cbmc)
@@ -177,18 +133,6 @@ void bmct::do_conversion()
       prop_conv.set_to_true(*it);
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::run_decision_procedure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
@@ -216,18 +160,6 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
   return dec_result;
 }
-
-/*******************************************************************\
-
-Function: bmct::report_success
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::report_success()
 {
@@ -257,18 +189,6 @@ void bmct::report_success()
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::report_failure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
@@ -296,18 +216,6 @@ void bmct::report_failure()
     break;
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::show_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::show_program()
 {
@@ -397,18 +305,6 @@ void bmct::show_program()
     }
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::run
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmct::run(
   const goto_functionst &goto_functions)
@@ -595,18 +491,6 @@ safety_checkert::resultt bmct::run(
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::decide
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 safety_checkert::resultt bmct::decide(
   const goto_functionst &goto_functions,
   prop_convt &prop_conv)
@@ -618,18 +502,6 @@ safety_checkert::resultt bmct::decide(
   else
     return all_properties(goto_functions, prop_conv);
 }
-
-/*******************************************************************\
-
-Function: bmct::stop_on_fail
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmct::stop_on_fail(
   const goto_functionst &goto_functions,
@@ -666,18 +538,6 @@ safety_checkert::resultt bmct::stop_on_fail(
     return resultt::ERROR;
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::setup_unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::setup_unwind()
 {

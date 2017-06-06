@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <iostream>
 
 #include <util/std_expr.h>

@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 
 #include "byte_operators.h"
 #include "config.h"
-
-/*******************************************************************\
-
-Function: byte_extract_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 irep_idt byte_extract_id()
 {
@@ -37,18 +26,6 @@ irep_idt byte_extract_id()
     assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: byte_update_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 irep_idt byte_update_id()
 {

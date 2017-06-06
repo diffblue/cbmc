@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Get a Goto Program
+
 #include <fstream>
 #include <iostream>
 
@@ -19,18 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
 #include "initialize_goto_model.h"
-
-/*******************************************************************\
-
-Function: initialize_goto_model
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool initialize_goto_model(
   goto_modelt &goto_model,

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Theory of Arrays with Extensionality
+
 #ifndef CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 #define CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 

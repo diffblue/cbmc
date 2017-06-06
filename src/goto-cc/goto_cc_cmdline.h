@@ -8,6 +8,9 @@ Date:   April 2010
 
 \*******************************************************************/
 
+/// \file
+/// Command line interpretation for goto-cc
+
 #ifndef CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
 #define CPROVER_GOTO_CC_GOTO_CC_CMDLINE_H
 

@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_if(const if_exprt &expr)
 {

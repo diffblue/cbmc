@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// String Abstraction
+
 #include <cstring>
 
 #include <util/pointer_predicates.h>
@@ -19,18 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_arithmetic.h"
 #include "string_abstraction.h"
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_wrap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool string_abstractiont::build_wrap(
   const exprt &object,
@@ -61,18 +52,6 @@ bool string_abstractiont::build_wrap(
   return false;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::is_ptr_string_struct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::is_ptr_string_struct(const typet &type) const
 {
   return type.id()==ID_pointer &&
@@ -84,18 +63,6 @@ static inline bool is_ptr_argument(const typet &type)
   return type.id()==ID_pointer;
 }
 
-/*******************************************************************\
-
-Function: string_abstraction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstraction(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
@@ -105,18 +72,6 @@ void string_abstraction(
   string_abstraction(dest);
 }
 
-/*******************************************************************\
-
-Function: string_abstraction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstraction(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
@@ -125,18 +80,6 @@ void string_abstraction(
   string_abstractiont string_abstraction(symbol_table, message_handler);
   string_abstraction(dest);
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::string_abstractiont
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 string_abstractiont::string_abstractiont(
   symbol_tablet &_symbol_table,
@@ -167,18 +110,6 @@ string_abstractiont::string_abstractiont(
   string_struct=s;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 typet string_abstractiont::build_type(whatt what)
 {
   typet type;
@@ -192,18 +123,6 @@ typet string_abstractiont::build_type(whatt what)
 
   return type;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::operator()(goto_functionst &dest)
 {
@@ -230,18 +149,6 @@ void string_abstractiont::operator()(goto_functionst &dest)
   }
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstractiont::operator()(goto_programt &dest)
 {
   abstract(dest);
@@ -251,18 +158,6 @@ void string_abstractiont::operator()(goto_programt &dest)
   dest.swap(initialization);
   initialization.clear();
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::add_str_arguments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::add_str_arguments(
     const irep_idt &name,
@@ -303,18 +198,6 @@ void string_abstractiont::add_str_arguments(
     symb_parameters.end(), str_args.begin(), str_args.end());
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::add_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstractiont::add_argument(
     code_typet::parameterst &str_args,
     const symbolt &fct_symbol,
@@ -343,18 +226,6 @@ void string_abstractiont::add_argument(
   symbol_table.move(new_symbol);
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::abstract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstractiont::abstract(goto_programt &dest)
 {
   locals.clear();
@@ -369,18 +240,6 @@ void string_abstractiont::abstract(goto_programt &dest)
   declare_define_locals(dest);
   locals.clear();
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::declare_define_locals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::declare_define_locals(goto_programt &dest)
 {
@@ -418,18 +277,6 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
   }
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::make_decl_and_def
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstractiont::make_decl_and_def(goto_programt &dest,
     goto_programt::targett ref_instr,
     const irep_idt &identifier,
@@ -464,18 +311,6 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
     assignment1->code.add_source_location()=ref_instr->source_location;
   }
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::make_val_or_dummy_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     goto_programt::targett ref_instr,
@@ -546,18 +381,6 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::add_dummy_symbol_and_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
     goto_programt &dest,
     goto_programt::targett ref_instr,
@@ -624,18 +447,6 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   return sym_expr;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::abstract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_programt::targett string_abstractiont::abstract(
   goto_programt &dest,
   goto_programt::targett it)
@@ -683,18 +494,6 @@ goto_programt::targett string_abstractiont::abstract(
   return it;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_programt::targett string_abstractiont::abstract_assign(
   goto_programt &dest,
   goto_programt::targett target)
@@ -721,18 +520,6 @@ goto_programt::targett string_abstractiont::abstract_assign(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::abstract_function_call(
   goto_programt &dest,
@@ -787,18 +574,6 @@ void string_abstractiont::abstract_function_call(
   arguments.insert(arguments.end(), str_args.begin(), str_args.end());
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::has_string_macros
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::has_string_macros(const exprt &expr)
 {
   if(expr.id()=="is_zero_string" ||
@@ -812,18 +587,6 @@ bool string_abstractiont::has_string_macros(const exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::replace_string_macros
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::replace_string_macros(
   exprt &expr,
@@ -852,18 +615,6 @@ void string_abstractiont::replace_string_macros(
     Forall_operands(it, expr)
       replace_string_macros(*it, lhs, source_location);
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt string_abstractiont::build(
   const exprt &pointer,
@@ -899,18 +650,6 @@ exprt string_abstractiont::build(
   return result;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_abstraction_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const typet &string_abstractiont::build_abstraction_type(const typet &type)
 {
   const typet &eff_type=ns.follow(type);
@@ -929,18 +668,6 @@ const typet &string_abstractiont::build_abstraction_type(const typet &type)
   return abstraction_types_map.insert(
       std::make_pair(eff_type, map_entry->second)).first->second;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_abstraction_type_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     const abstraction_types_mapt &known)
@@ -1006,18 +733,6 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
   return map_entry.first->second;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
 {
   const typet &abstract_type=build_abstraction_type(object.type());
@@ -1082,18 +797,6 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
   return true;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::build_if(const if_exprt &o_if,
     exprt &dest, bool write)
 {
@@ -1122,18 +825,6 @@ bool string_abstractiont::build_if(const if_exprt &o_if,
   return false;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::build_array(const array_exprt &object,
     exprt &dest, bool write)
 {
@@ -1157,18 +848,6 @@ bool string_abstractiont::build_array(const array_exprt &object,
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool string_abstractiont::build_pointer(const exprt &object,
     exprt &dest, bool write)
@@ -1202,18 +881,6 @@ bool string_abstractiont::build_pointer(const exprt &object,
   return true;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_unknown
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt string_abstractiont::build_unknown(whatt what, bool write)
 {
   typet type=build_type(what);
@@ -1237,18 +904,6 @@ exprt string_abstractiont::build_unknown(whatt what, bool write)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_unknown
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt string_abstractiont::build_unknown(const typet &type, bool write)
 {
@@ -1277,18 +932,6 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   return ns.lookup(identifier).symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::build_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 {
   const symbolt &symbol=ns.lookup(sym.get_identifier());
@@ -1315,18 +958,6 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_new_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void string_abstractiont::build_new_symbol(const symbolt &symbol,
     const irep_idt &identifier, const typet &type)
@@ -1358,18 +989,6 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
     initialization.instructions.erase(dummy_loc);
   }
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::build_symbol_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool string_abstractiont::build_symbol_constant(
   const mp_integer &zero_length,
@@ -1416,18 +1035,6 @@ bool string_abstractiont::build_symbol_constant(
   return false;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::move_lhs_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
 {
   if(lhs.id()==ID_minus)
@@ -1439,18 +1046,6 @@ void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
     lhs=rest;
   }
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_pointer_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 goto_programt::targett string_abstractiont::abstract_pointer_assign(
   goto_programt &dest,
@@ -1496,18 +1091,6 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
     return value_assignments(dest, target, new_lhs, new_rhs);
   }
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::abstract_char_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 goto_programt::targett string_abstractiont::abstract_char_assign(
   goto_programt &dest,
@@ -1570,18 +1153,6 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
   return target;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::char_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_programt::targett string_abstractiont::char_assign(
   goto_programt &dest,
   goto_programt::targett target,
@@ -1618,18 +1189,6 @@ goto_programt::targett string_abstractiont::char_assign(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::value_assignments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 goto_programt::targett string_abstractiont::value_assignments(
   goto_programt &dest,
@@ -1678,18 +1237,6 @@ goto_programt::targett string_abstractiont::value_assignments(
   return target;
 }
 
-/*******************************************************************\
-
-Function: string_abstractiont::value_assignments_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_programt::targett string_abstractiont::value_assignments_if(
   goto_programt &dest,
   goto_programt::targett target,
@@ -1727,18 +1274,6 @@ goto_programt::targett string_abstractiont::value_assignments_if(
 
   return last;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::value_assignments_string_struct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 goto_programt::targett string_abstractiont::value_assignments_string_struct(
     goto_programt &dest,
@@ -1785,18 +1320,6 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
 
   return last;
 }
-
-/*******************************************************************\
-
-Function: string_abstractiont::member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt string_abstractiont::member(const exprt &a, whatt what)
 {

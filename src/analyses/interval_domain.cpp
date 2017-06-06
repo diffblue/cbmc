@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interval Domain
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -15,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include "interval_domain.h"
-
-/*******************************************************************\
-
-Function: interval_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::output(
   std::ostream &out,
@@ -63,18 +54,6 @@ void interval_domaint::output(
     out << "\n";
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::transform(
   locationt from,
@@ -127,29 +106,18 @@ void interval_domaint::transform(
   }
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::join
-
-  Inputs: The interval domain, b, to join to this domain.
-
- Outputs: True if the join increases the set represented by *this,
-          False if there is no change.
-
- Purpose: Sets *this to the mathematical join between the two domains.
-          This can be thought of as an abstract version of union;
-          *this is increased so that it contains all of the values that
-          are represented by b as well as its original intervals.
-          The result is an overapproximation, for example:
-             "[0,1]".join("[3,4]") --> "[0,4]"
-          includes 2 which isn't in [0,1] or [3,4].
-
-          Join is used in several places, the most significant being
-          merge, which uses it to bring together two different paths
-          of analysis.
-
-\*******************************************************************/
-
+/// Sets *this to the mathematical join between the two domains. This can be
+/// thought of as an abstract version of union; *this is increased so that it
+/// contains all of the values that are represented by b as well as its original
+/// intervals. The result is an overapproximation, for example:
+/// "[0,1]".join("[3,4]") --> "[0,4]" includes 2 which isn't in [0,1] or [3,4].
+///
+///          Join is used in several places, the most significant being
+///          merge, which uses it to bring together two different paths
+///          of analysis.
+/// \par parameters: The interval domain, b, to join to this domain.
+/// \return True if the join increases the set represented by *this, False if
+///   there is no change.
 bool interval_domaint::join(
   const interval_domaint &b)
 {
@@ -208,35 +176,11 @@ bool interval_domaint::join(
   return result;
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void interval_domaint::assign(const code_assignt &code_assign)
 {
   havoc_rec(code_assign.lhs());
   assume_rec(code_assign.lhs(), ID_equal, code_assign.rhs());
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::havoc_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::havoc_rec(const exprt &lhs)
 {
@@ -259,18 +203,6 @@ void interval_domaint::havoc_rec(const exprt &lhs)
     havoc_rec(to_typecast_expr(lhs).op());
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &lhs, irep_idt id, const exprt &rhs)
@@ -386,36 +318,12 @@ void interval_domaint::assume_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void interval_domaint::assume(
   const exprt &cond,
   const namespacet &ns)
 {
   assume_rec(simplify_expr(cond, ns), false);
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &cond,
@@ -462,18 +370,6 @@ void interval_domaint::assume_rec(
         assume_rec(*it, true);
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::make_expression
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt interval_domaint::make_expression(const symbol_exprt &src) const
 {
@@ -537,19 +433,10 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
     return true_exprt();
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::simplify
-
-  Inputs: The expression to simplify.
-
- Outputs: A simplified version of the expression.
-
- Purpose: Uses the abstract state to simplify a given expression
-          using context-specific information.
-
-\*******************************************************************/
-
+/// Uses the abstract state to simplify a given expression using context-
+/// specific information.
+/// \par parameters: The expression to simplify.
+/// \return A simplified version of the expression.
 /*
  * This implementation is aimed at reducing assertions to true, particularly
  * range checks for arrays and other bounds checks.

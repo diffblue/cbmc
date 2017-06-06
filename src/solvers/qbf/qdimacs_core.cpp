@@ -6,22 +6,11 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
 #include "qdimacs_core.h"
-
-/*******************************************************************\
-
-Function: qdimacs_coret::simplify_extractbits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {

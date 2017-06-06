@@ -7,22 +7,15 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generates string constraints for string functions that return Boolean values
+
 #include <solvers/refinement/string_constraint_generator.h>
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_is_prefix
-
-  Inputs: a prefix string, a string and an integer offset
-
- Outputs: a Boolean expression
-
- Purpose: add axioms stating that the returned expression is true exactly
-          when the first string is a prefix of the second one, starting at
-          position offset
-
-\*******************************************************************/
-
+/// add axioms stating that the returned expression is true exactly when the
+/// first string is a prefix of the second one, starting at position offset
+/// \par parameters: a prefix string, a string and an integer offset
+/// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const string_exprt &prefix, const string_exprt &str, const exprt &offset)
 {
@@ -69,20 +62,12 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   return isprefix;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_is_prefix
-
-  Inputs: a function application with 2 or 3 arguments and a Boolean telling
-          whether the prefix is the second argument (when swap_arguments is
-          true) or the first argument
-
- Outputs: a Boolean expression
-
- Purpose: add axioms corresponding to the String.isPrefix java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.isPrefix java function
+/// \par parameters: a function application with 2 or 3 arguments and a Boolean
+///   telling
+/// whether the prefix is the second argument (when swap_arguments is
+/// true) or the first argument
+/// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt &f, bool swap_arguments)
 {
@@ -98,19 +83,10 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   return typecast_exprt(add_axioms_for_is_prefix(s0, s1, offset), f.type());
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_is_empty
-
-  Inputs: function application with a string argument
-
- Outputs: a Boolean expression
-
- Purpose: add axioms stating that the returned value is true exactly when
-          the argument string is empty
-
-\*******************************************************************/
-
+/// add axioms stating that the returned value is true exactly when the argument
+/// string is empty
+/// \par parameters: function application with a string argument
+/// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
 {
@@ -127,20 +103,12 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
   return typecast_exprt(is_empty, f.type());
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_is_suffix
-
-  Inputs: a function application with 2 or 3 arguments and a Boolean telling
-          whether the suffix is the second argument (when swap_arguments is
-          true) or the first argument
-
- Outputs: a Boolean expression
-
- Purpose: add axioms corresponding to the String.isSuffix java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.isSuffix java function
+/// \par parameters: a function application with 2 or 3 arguments and a Boolean
+///   telling
+/// whether the suffix is the second argument (when swap_arguments is
+/// true) or the first argument
+/// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const function_application_exprt &f, bool swap_arguments)
 {
@@ -189,18 +157,9 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   return tc_issuffix;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_contains
-
-  Inputs: function application with two string arguments
-
- Outputs: a Boolean expression
-
- Purpose: add axioms corresponding to the String.contains java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.contains java function
+/// \par parameters: function application with two string arguments
+/// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_contains(
   const function_application_exprt &f)
 {

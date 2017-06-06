@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <fstream>
 #include <iostream>
 
@@ -15,18 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cout_message.h"
 #include "ui_message.h"
 #include "cmdline.h"
-
-/*******************************************************************\
-
-Function: ui_message_handlert::ui_message_handlert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 ui_message_handlert::ui_message_handlert(
   uit __ui, const std::string &program):_ui(__ui)
@@ -60,18 +49,6 @@ ui_message_handlert::ui_message_handlert(
   }
 }
 
-/*******************************************************************\
-
-Function: ui_message_handlert::ui_message_handlert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 ui_message_handlert::ui_message_handlert(
   const class cmdlinet &cmdline,
   const std::string &program):
@@ -82,18 +59,6 @@ ui_message_handlert::ui_message_handlert(
     program)
 {
 }
-
-/*******************************************************************\
-
-Function: ui_message_handlert::~ui_message_handlert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 ui_message_handlert::~ui_message_handlert()
 {
@@ -112,18 +77,6 @@ ui_message_handlert::~ui_message_handlert()
   }
 }
 
-/*******************************************************************\
-
-Function: ui_message_handlert::level_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const char *ui_message_handlert::level_string(unsigned level)
 {
   if(level==1)
@@ -133,18 +86,6 @@ const char *ui_message_handlert::level_string(unsigned level)
   else
     return "STATUS-MESSAGE";
 }
-
-/*******************************************************************\
-
-Function: ui_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ui_message_handlert::print(
   unsigned level,
@@ -172,18 +113,6 @@ void ui_message_handlert::print(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: ui_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ui_message_handlert::print(
   unsigned level,
@@ -222,18 +151,6 @@ void ui_message_handlert::print(
   }
 }
 
-/*******************************************************************\
-
-Function: ui_message_handlert::ui_msg
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void ui_message_handlert::ui_msg(
   const std::string &type,
   const std::string &msg1,
@@ -255,18 +172,6 @@ void ui_message_handlert::ui_msg(
   }
 }
 
-/*******************************************************************\
-
-Function: ui_message_handlert::xml_ui_msg
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
@@ -286,18 +191,6 @@ void ui_message_handlert::xml_ui_msg(
   std::cout << result;
   std::cout << '\n';
 }
-
-/*******************************************************************\
-
-Function: ui_message_handlert::json_ui_msg
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ui_message_handlert::json_ui_msg(
   const std::string &type,
@@ -321,18 +214,6 @@ void ui_message_handlert::json_ui_msg(
   //  a trailing comma.
   std::cout << ",\n" << result;
 }
-
-/*******************************************************************\
-
-Function: ui_message_handlert::flush
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ui_message_handlert::flush(unsigned level)
 {

@@ -6,23 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Program Transformation
+
 #include <set>
 #include <stack>
 
 #include "remove_unreachable.h"
 
-/*******************************************************************\
-
-Function: remove_unreachable
-
-  Inputs:
-
- Outputs:
-
- Purpose: remove unreachable code
-
-\*******************************************************************/
-
+/// remove unreachable code
 void remove_unreachable(goto_programt &goto_program)
 {
   std::set<goto_programt::targett> reachable;
@@ -56,19 +48,10 @@ void remove_unreachable(goto_programt &goto_program)
   }
 }
 
-/*******************************************************************\
-
-Function: remove_unreachable
-
-  Inputs: The goto functions from which the unreachable functions are
-          to be removed.
-
- Outputs: None.
-
- Purpose: Removes unreachable instructions from all functions.
-
-\*******************************************************************/
-
+/// Removes unreachable instructions from all functions.
+/// \par parameters: The goto functions from which the unreachable functions are
+/// to be removed.
+/// \return None.
 void remove_unreachable(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)

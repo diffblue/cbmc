@@ -6,6 +6,9 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H
 

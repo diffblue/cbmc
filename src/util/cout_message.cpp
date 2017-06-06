@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #ifdef _WIN32
@@ -18,51 +19,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unicode.h"
 #include "cout_message.h"
 
-/*******************************************************************\
-
-Function: cout_message_handlert::cout_message_handlert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 cout_message_handlert::cout_message_handlert():
   stream_message_handlert(std::cout)
 {
 }
 
-/*******************************************************************\
-
-Function: cerr_message_handlert::cerr_message_handlert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 cerr_message_handlert::cerr_message_handlert():
   stream_message_handlert(std::cerr)
 {
 }
-
-/*******************************************************************\
-
-Function: consolte_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void console_message_handlert::print(
   unsigned level,
@@ -118,18 +83,6 @@ void console_message_handlert::print(
   #endif
 }
 
-/*******************************************************************\
-
-Function: console_message_handlert::flush
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void console_message_handlert::flush(unsigned level)
 {
   // We flush after messages of level 6 or lower.
@@ -143,18 +96,6 @@ void console_message_handlert::flush(unsigned level)
   else
     std::cerr << std::flush;
 }
-
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void gcc_message_handlert::print(
   unsigned level,
@@ -200,18 +141,6 @@ void gcc_message_handlert::print(
 
   print(level, dest);
 }
-
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void gcc_message_handlert::print(
   unsigned level,

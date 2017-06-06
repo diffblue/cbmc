@@ -6,20 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Remove Virtual Function (Method) Calls
+
 #include <util/prefix.h>
 #include <util/type_eq.h>
 
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 #include "remove_virtual_functions.h"
-
-/*******************************************************************\
-
-   Class: remove_virtual_functionst
-
- Purpose:
-
-\*******************************************************************/
 
 class remove_virtual_functionst
 {
@@ -67,18 +62,6 @@ protected:
     const irep_idt &component_name) const;
 };
 
-/*******************************************************************\
-
-Function: remove_virtual_functionst::remove_virtual_functionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 remove_virtual_functionst::remove_virtual_functionst(
   const symbol_tablet &_symbol_table,
   const goto_functionst &goto_functions):
@@ -87,18 +70,6 @@ remove_virtual_functionst::remove_virtual_functionst(
 {
   class_hierarchy(symbol_table);
 }
-
-/*******************************************************************\
-
-Function: remove_virtual_functionst::remove_virtual_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
@@ -231,28 +202,17 @@ void remove_virtual_functionst::remove_virtual_function(
   target->make_skip();
 }
 
-/*******************************************************************\
-
-Function: remove_virtual_functionst::get_child_functions_rec
-
-  Inputs: `this_id`: class name
-          `last_method_defn`: the most-derived parent of `this_id`
-             to define the requested function
-          `component_name`: name of the function searched for
-
- Outputs: `functions` is assigned a list of {class name, function symbol}
-          pairs indicating that if `this` is of the given class, then the
-          call will target the given function. Thus if A <: B <: C and A
-          and C provide overrides of `f` (but B does not),
-          get_child_functions_rec("C", C.f, "f") -> [{"C", C.f},
-                                                     {"B", C.f},
-                                                     {"A", A.f}]
-
- Purpose: Used by get_functions to track the most-derived parent that
-          provides an override of a given function.
-
-\*******************************************************************/
-
+/// Used by get_functions to track the most-derived parent that provides an
+/// override of a given function.
+/// \par parameters: `this_id`: class name
+/// `last_method_defn`: the most-derived parent of `this_id` to define the
+///   requested function
+/// `component_name`: name of the function searched for
+/// \return `functions` is assigned a list of {class name, function symbol}
+///   pairs indicating that if `this` is of the given class, then the call will
+///   target the given function. Thus if A <: B <: C and A and C provide
+///   overrides of `f` (but B does not), get_child_functions_rec("C", C.f, "f")
+///   -> [{"C", C.f}, {"B", C.f}, {"A", A.f}]
 void remove_virtual_functionst::get_child_functions_rec(
   const irep_idt &this_id,
   const symbol_exprt &last_method_defn,
@@ -289,18 +249,6 @@ void remove_virtual_functionst::get_child_functions_rec(
       visited);
   }
 }
-
-/*******************************************************************\
-
-Function: remove_virtual_functionst::get_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_virtual_functionst::get_functions(
   const exprt &function,
@@ -352,18 +300,6 @@ void remove_virtual_functionst::get_functions(
     functions.push_back(root_function);
 }
 
-/*******************************************************************\
-
-Function: remove_virtual_functionst::get_method
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
   const irep_idt &component_name) const
@@ -377,18 +313,6 @@ exprt remove_virtual_functionst::get_method(
 
   return symbol->symbol_expr();
 }
-
-/*******************************************************************\
-
-Function: remove_virtual_functionst::remove_virtual_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool remove_virtual_functionst::remove_virtual_functions(
   goto_programt &goto_program)
@@ -416,18 +340,6 @@ bool remove_virtual_functionst::remove_virtual_functions(
   return did_something;
 }
 
-/*******************************************************************\
-
-Function: remove_virtual_functionst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_virtual_functionst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
@@ -447,18 +359,6 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
     functions.compute_location_numbers();
 }
 
-/*******************************************************************\
-
-Function: remove_virtual_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_virtual_functions(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -468,18 +368,6 @@ void remove_virtual_functions(
 
   rvf(goto_functions);
 }
-
-/*******************************************************************\
-
-Function: remove_virtual_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_virtual_functions(goto_modelt &goto_model)
 {

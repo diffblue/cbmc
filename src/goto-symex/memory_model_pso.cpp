@@ -6,19 +6,10 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+/// \file
+/// Memory model for partial order concurrency
+
 #include "memory_model_pso.h"
-
-/*******************************************************************\
-
-Function: memory_model_psot::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void memory_model_psot::operator()(symex_target_equationt &equation)
 {
@@ -34,18 +25,6 @@ void memory_model_psot::operator()(symex_target_equationt &equation)
   from_read(equation);
 #endif
 }
-
-/*******************************************************************\
-
-Function: memory_model_psot::program_order_is_relaxed
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool memory_model_psot::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,

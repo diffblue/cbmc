@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAR File Reading
+
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
