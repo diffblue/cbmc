@@ -28,11 +28,11 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   symbol_exprt contains=fresh_boolean("contains_in_index_of");
 
   // We add axioms:
-  // a1 : -1 <= index<|str|
+  // a1 : -1 <= index < |str|
   // a2 : !contains <=> index=-1
-  // a3 : contains => from_index<=index&&str[index]=c
-  // a4 : forall n, from_index<=n<index. contains => str[n]!=c
-  // a5 : forall m, from_index<=n<|str|. !contains => str[m]!=c
+  // a3 : contains ==> from_index <= index && str[index] = c
+  // a4 : forall n, n:[from_index,index[. contains ==> str[n] != c
+  // a5 : forall m, n:[from_index,|str|[. !contains ==> str[m] != c
 
   exprt minus1=from_integer(-1, index_type);
   and_exprt a1(
@@ -85,14 +85,14 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => from_index <= offset <= |haystack|-|needle|
+  // a1 : contains ==> from_index <= offset <= |haystack|-|needle|
   // a2 : !contains <=> offset=-1
   // a3 : forall n:[0,|substring|[.
-  //        contains => haystack[n+offset]=needle[n]
+  //        contains ==> haystack[n+offset]=needle[n]
   // a4 : forall n:[from_index,offset[.
-  //        contains => (exists m:[0,|needle|[. haystack[m+n]!=needle[m]])
+  //        contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
   // a5:  forall n:[from_index,|haystack|-|needle|[.
-  //        !contains => (exists m:[0,|needle|[. haystack[m+n]!=needle[m])
+  //        !contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
     contains,
@@ -144,9 +144,9 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     // Unfold the existential quantifier as a disjunction in case of a constant
     // a4 && a5 <=> a6:
     //  forall n:[from_index,|haystack|-|needle|].
-    //    !contains || n < offset =>
-    //       haystack[n]!=needle[0] || ... ||
-    //       haystack[n+|needle|-1]!=needle[|needle|-1]
+    //    !contains || n < offset ==>
+    //       haystack[n] != needle[0] || ... ||
+    //       haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
     assert(!to_integer(needle.length(), sub_length));
@@ -193,16 +193,16 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains => offset <= from_index && offset <= |haystack| - |needle|
-  // a2 : !contains <=> offset=-1
+  // a1 : contains ==> offset <= from_index && offset <= |haystack| - |needle|
+  // a2 : !contains <=> offset = -1
   // a3 : forall n:[0, needle.length[,
-  //        contains => haystack[n+offset]=needle[n]
+  //        contains ==> haystack[n+offset] = needle[n]
   // a4 : forall n:[offset+1, min(from_index, |haystack| - |needle|)].
-  //        contains =>
-  //          (exists m:[0,|substring|[. haystack[m+n]!=needle[m]])
+  //        contains ==>
+  //          (exists m:[0,|substring|[. haystack[m+n] != needle[m]])
   // a5:  forall n:[0, min(from_index, |haystack| - |needle|)].
-  //        !contains =>
-  //          (exists m:[0,|substring|[. haystack[m+n]!=needle[m])
+  //        !contains ==>
+  //          (exists m:[0,|substring|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
     contains,
@@ -256,9 +256,9 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     // Unfold the existential quantifier as a disjunction in case of a constant
     // a4 && a5 <=> a6:
     //  forall n:[0, min(from_index,|haystack|-|needle|)].
-    //    !contains || n > offset =>
-    //       haystack[n]!=needle[0] || ... ||
-    //       haystack[n+|substring|-1]!=needle[|substring|-1]
+    //    !contains || n > offset ==>
+    //       haystack[n] != needle[0] || ... ||
+    //       haystack[n+|substring|-1] != needle[|substring|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
     assert(!to_integer(needle.length(), sub_length));
@@ -337,10 +337,10 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 
   // We add axioms:
   // a1 : -1 <= i <= from_index
-  // a2 : (i=-1 <=> !contains)
-  // a3 : (contains => i <= from_index &&s[i]=c)
-  // a4 : forall n. i+1 <= n < from_index +1 &&contains => s[n]!=c
-  // a5 : forall m. 0 <= m < from_index +1 &&!contains => s[m]!=c
+  // a2 : i = -1 <=> !contains
+  // a3 : contains ==> (i <= from_index && s[i] = c)
+  // a4 : forall n:[i+1, from_index+1[ && contains ==> s[n] != c
+  // a5 : forall m:[0, from_index+1[ && !contains ==> s[m] != c
 
   exprt index1=from_integer(1, index_type);
   exprt minus1=from_integer(-1, index_type);
