@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
+#include <cassert>
 #include <stack>
 
 #include "string2int.h"

@@ -645,7 +645,6 @@ bool compilet::parse_source(const std::string &file_name)
   return false;
 }
 
-
 /// constructor
 /// \return nothing
 compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):

@@ -95,7 +95,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "undefined_functions.h"
 #include "remove_function.h"
 
-
 void goto_instrument_parse_optionst::eval_verbosity()
 {
   unsigned int v=8;

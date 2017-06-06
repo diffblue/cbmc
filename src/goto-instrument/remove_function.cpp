@@ -23,7 +23,6 @@ Date: April 2017
 /// goto_functions  Input functions to be modified
 /// identifier  Function to be removed
 /// message_handler  Error/status output
-
 void remove_function(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,

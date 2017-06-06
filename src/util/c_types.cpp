@@ -18,7 +18,6 @@ bitvector_typet index_type()
   return signed_size_type();
 }
 
-
 /// return type of enum constants
 bitvector_typet enum_constant_type()
 {

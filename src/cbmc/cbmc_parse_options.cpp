@@ -449,7 +449,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       cmdline.get_value("symex-coverage-report"));
 }
 
-
 bool cbmc_parse_optionst::options_exclusive(const char *opt1, const char *opt2)
 {
   if(cmdline.isset(opt1) && cmdline.isset(opt2))

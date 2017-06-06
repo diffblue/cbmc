@@ -18,7 +18,6 @@ Date:   April 2017
 #include "remove_returns.h"
 #include "mm_io.h"
 
-
 void collect_deref_expr(
   const exprt &src,
   std::set<dereference_exprt> &dest)
