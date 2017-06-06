@@ -117,7 +117,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 
   if(!is_constant_string(needle))
   {
-    // string_not contains_constraintt are formula of the form:
+    // string_not contains_constraintt are formulas of the form:
     // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
     string_not_contains_constraintt a4(
       from_index,
