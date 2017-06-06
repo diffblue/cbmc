@@ -160,7 +160,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     }
 
     or_exprt premise(
-      not_exprt(contains), binary_relation_exprt(qvar, ID_lt, offset));
+      not_exprt(contains), binary_relation_exprt(qvar2, ID_lt, offset));
     minus_exprt length_diff(haystack.length(), needle.length());
     string_constraintt a6(
       qvar2,
