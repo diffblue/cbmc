@@ -10,15 +10,6 @@ Function = collections.namedtuple('Function',
 Class = collections.namedtuple('Class', ['name', 'purpose'])
 
 
-FILE_HEADER = """
-// Copyright 2001-2017,
-// Daniel Kroening (Computer Science Department, University of Oxford
-//   and Diffblue Ltd),
-// Edmund Clarke (Computer Science Department, Carnegie Mellon University),
-// DiffBlue Ltd.
-""".strip()
-
-
 def warn(message):
     """ Print a labelled message to stderr.  """
     sys.stderr.write('Warning: %s\n' % message)
@@ -96,7 +87,7 @@ class HeaderFormatter(GenericFormatter):
         subbed = self.whitespace_re.sub(' ', header.module)
         # The file directive must be followed by a newline in order to refer to
         # the current file
-        return self.indented_wrapper.fill('\\file\n%s' % subbed)
+        return '\\file\n' + self.indented_wrapper.fill(subbed)
 
     def is_block_valid(self, block):
         return has_field(block, 'Module')
@@ -204,10 +195,13 @@ def replace_block(
     """
     Replace an old-style documentation block with the doxygen equivalent
     """
-    block = Block({f.name: f.contents for f in parse_fields(block_contents)})
+    block = Block(
+            {f.name: f.contents for f in parse_fields(block_contents.group(1))})
 
     if header_formatter.is_block_valid(block):
-        return header_formatter.convert(header_from_block(block))
+        return '%s%s\n' % (
+                block_contents.group(0),
+                header_formatter.convert(header_from_block(block)))
 
     if class_formatter.is_block_valid(block):
         return class_formatter.convert(class_from_block(block))
@@ -216,7 +210,7 @@ def replace_block(
         return function_formatter.convert(function_from_block(block))
 
     warn('block in "%s" has unrecognised format:\n%s' %
-            (file, block_contents))
+            (file, block_contents.group(1)))
 
     return ''
 
@@ -236,14 +230,11 @@ def convert_file(file, inplace):
             r'^/\*+\\$(.*?)^\\\*+/$\s*', re.MULTILINE | re.DOTALL)
     new_contents = block_re.sub(
             lambda match: replace_block(
-                match.group(1),
+                match,
                 file,
                 header_formatter,
                 class_formatter,
                 function_formatter), contents)
-
-    if not re.search(FILE_HEADER, new_contents):
-        new_contents = FILE_HEADER + '\n\n' + new_contents
 
     if inplace:
         with open(file, 'w') as f:
