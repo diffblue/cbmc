@@ -233,8 +233,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   {
     string_not_contains_constraintt a4(
       plus_exprt(offset, from_integer(1, index_type)),
-      from_index,
       plus_exprt(end_index, from_integer(1, index_type)),
+      contains,
       from_integer(0, index_type),
       needle.length(),
       haystack,
