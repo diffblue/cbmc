@@ -145,8 +145,8 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     // a4 && a5 <=> a6:
     //  forall n:[from_index,|haystack|-|needle|].
     //    !contains || n < offset ==>
-    //       haystack[n] != needle[0] || ... ||
-    //       haystack[n+|needle|-1] != needle[|needle|-1]
+    //      haystack[n] != needle[0] || ... ||
+    //      haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
     assert(!to_integer(needle.length(), sub_length));
@@ -257,8 +257,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     // a4 && a5 <=> a6:
     //  forall n:[0, min(from_index,|haystack|-|needle|)].
     //    !contains || n > offset ==>
-    //       haystack[n] != needle[0] || ... ||
-    //       haystack[n+|substring|-1] != needle[|substring|-1]
+    //      haystack[n] != needle[0] || ... ||
+    //      haystack[n+|substring|-1] != needle[|substring|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
     assert(!to_integer(needle.length(), sub_length));
