@@ -201,7 +201,7 @@ Function: string_constraint_generatort::add_axioms_for_last_index_of_string
     from_index - an expression representing an index in strings
 
  Outputs: an integer expression representing the last index of needle in
-          haystack after from_index, or -1 if there is none
+          haystack before or at from_index, or -1 if there is none
 
  Purpose: Add axioms stating that the returned value is the index within
           haystack of the last occurence of needle starting the search
@@ -365,7 +365,8 @@ Function: string_constraint_generatort::add_axioms_for_last_index_of
     c - an expression representing a character
     from_index - an expression representing an index in the string
 
- Outputs: a integer expression
+ Outputs: an integer expression representing the last index of c in
+          str before or at from_index, or -1 if there is none
 
  Purpose: Add axioms stating that the returned value is the index within
           str of the last occurence of c starting the search backward at
