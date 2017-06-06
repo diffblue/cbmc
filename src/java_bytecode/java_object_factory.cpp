@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+#include <java_bytecode/get_concrete_class_at_random.h>
+
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -396,6 +398,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   {
     const struct_typet &struct_type=to_struct_type(subtype);
     const irep_idt &struct_tag=struct_type.get_tag();
+
     // If this is a recursive type of some kind, set null.
     if(!recursion_set.insert(struct_tag).second)
     {
@@ -854,12 +857,23 @@ exprt object_factory(
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
 
+  typet real_type=type;
+  if(type.id()==ID_pointer && type.subtype().id()==ID_symbol)
+  {
+    const pointer_typet &pointer_type=to_pointer_type(type);
+    const namespacet ns(symbol_table);
+    get_concrete_class_at_randomt get_concrete_class_at_random(ns);
+    const typet &resolved_type=
+      get_concrete_class_at_random(pointer_type);
+    real_type.subtype()=resolved_type;
+  }
+
   auxiliary_symbolt main_symbol;
   main_symbol.mode=ID_java;
   main_symbol.is_static_lifetime=false;
   main_symbol.name=identifier;
   main_symbol.base_name=base_name;
-  main_symbol.type=type;
+  main_symbol.type=real_type;
   main_symbol.location=loc;
 
   exprt object=main_symbol.symbol_expr();
@@ -871,7 +885,7 @@ exprt object_factory(
   std::vector<const symbolt *> symbols_created;
   symbols_created.push_back(main_symbol_ptr);
 
-  symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, type);
+  symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, real_type);
   aux_symbol.is_static_lifetime=true;
 
   java_object_factoryt state(
