@@ -272,7 +272,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     }
 
     or_exprt premise(
-      not_exprt(contains), binary_relation_exprt(qvar, ID_gt, offset));
+      not_exprt(contains), binary_relation_exprt(qvar2, ID_gt, offset));
     string_constraintt a6(
       qvar2,
       from_index,
