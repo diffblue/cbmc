@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Program Template
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
 

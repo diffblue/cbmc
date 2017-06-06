@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Conversion / Type Checking
+
 #include "java_bytecode_typecheck.h"
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_code(codet &code)
 {

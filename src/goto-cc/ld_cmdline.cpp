@@ -6,6 +6,9 @@ Author: Daniel Kroening, 2013
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object for the ld-like options
+
 #include <cassert>
 #include <iostream>
 
@@ -13,18 +16,9 @@ Author: Daniel Kroening, 2013
 
 #include "ld_cmdline.h"
 
-/*******************************************************************\
-
-Function: ld_cmdlinet::parse
-
-  Inputs: argument count, argument strings
-
- Outputs: none
-
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
-
+/// parses the commandline options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 const char *goto_ld_options_with_argument[]=
 {
   "--verbosity",

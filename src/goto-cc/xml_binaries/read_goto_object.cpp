@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Read goto object files.
+
 #include <xmllang/xml_parser.h>
 #include <util/namespace.h>
 #include <util/base_type.h>
@@ -22,19 +25,9 @@ Date: June 2006
 #include "xml_irep_hashing.h"
 #include "xml_symbol_hashing.h"
 
-/*******************************************************************\
-
-Function: read_goto_object
-
-  Inputs: input stream, symbol_table, functions
-
- Outputs: true on error, false otherwise
-
- Purpose: reads a goto object xml file back into a symbol and a
-          function table
-
-\*******************************************************************/
-
+/// reads a goto object xml file back into a symbol and a function table
+/// \par parameters: input stream, symbol_table, functions
+/// \return true on error, false otherwise
 bool read_goto_object(
   std::istream &in,
   const std::string &filename,

@@ -8,6 +8,9 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// List all unreachable instructions
+
 #include <sstream>
 
 #include <util/json.h>
@@ -22,18 +25,6 @@ Date: April 2016
 #include "unreachable_instructions.h"
 
 typedef std::map<unsigned, goto_programt::const_targett> dead_mapt;
-
-/*******************************************************************\
-
-Function: unreachable_instructions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void unreachable_instructions(
   const goto_programt &goto_program,
@@ -54,18 +45,6 @@ static void unreachable_instructions(
   }
 }
 
-/*******************************************************************\
-
-Function: all_unreachable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static void all_unreachable(
   const goto_programt &goto_program,
   dead_mapt &dest)
@@ -74,18 +53,6 @@ static void all_unreachable(
     if(!it->is_end_function())
       dest.insert(std::make_pair(it->location_number, it));
 }
-
-/*******************************************************************\
-
-Function: output_dead_plain
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void output_dead_plain(
   const namespacet &ns,
@@ -106,18 +73,6 @@ static void output_dead_plain(
       ++it)
     goto_program.output_instruction(ns, "", os, it->second);
 }
-
-/*******************************************************************\
-
-Function: add_to_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void add_to_json(
   const namespacet &ns,
@@ -166,18 +121,6 @@ static void add_to_json(
   }
 }
 
-/*******************************************************************\
-
-Function: unreachable_instructions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void unreachable_instructions(
   const goto_modelt &goto_model,
   const bool json,
@@ -221,18 +164,6 @@ void unreachable_instructions(
     os << json_result << '\n';
 }
 
-/*******************************************************************\
-
-Function: json_output_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static void json_output_function(
   const irep_idt &function,
   const source_locationt &first_location,
@@ -251,18 +182,6 @@ static void json_output_function(
   entry["last line"]=
     json_numbert(id2string(last_location.get_line()));
 }
-
-/*******************************************************************\
-
-Function: list_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void list_functions(
   const goto_modelt &goto_model,
@@ -328,18 +247,6 @@ static void list_functions(
     os << json_result << '\n';
 }
 
-/*******************************************************************\
-
-Function: unreachable_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void unreachable_functions(
   const goto_modelt &goto_model,
   const bool json,
@@ -347,18 +254,6 @@ void unreachable_functions(
 {
   list_functions(goto_model, json, os, true);
 }
-
-/*******************************************************************\
-
-Function: reachable_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void reachable_functions(
   const goto_modelt &goto_model,

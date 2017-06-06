@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Type Checking
+
 #include "ansi_c_typecheck.h"
-
-/*******************************************************************\
-
-Function: ansi_c_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_typecheckt::typecheck()
 {
@@ -32,18 +23,6 @@ void ansi_c_typecheckt::typecheck()
   }
 }
 
-/*******************************************************************\
-
-Function: ansi_c_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_typecheck(
   ansi_c_parse_treet &ansi_c_parse_tree,
   symbol_tablet &symbol_table,
@@ -54,18 +33,6 @@ bool ansi_c_typecheck(
     ansi_c_parse_tree, symbol_table, module, message_handler);
   return ansi_c_typecheck.typecheck_main();
 }
-
-/*******************************************************************\
-
-Function: ansi_c_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_typecheck(
   exprt &expr,

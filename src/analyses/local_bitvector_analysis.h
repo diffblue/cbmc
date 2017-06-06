@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Field-insensitive, location-sensitive bitvector analysis
+
 #ifndef CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
 #define CPROVER_ANALYSES_LOCAL_BITVECTOR_ANALYSIS_H
 
@@ -16,14 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "locals.h"
 #include "dirty.h"
 #include "local_cfg.h"
-
-/*******************************************************************\
-
-   Class: local_bitvector_analysist
-
- Purpose:
-
-\*******************************************************************/
 
 class local_bitvector_analysist
 {

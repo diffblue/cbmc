@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Taint Parser
+
 #ifndef CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
 #define CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
 

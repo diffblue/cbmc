@@ -8,24 +8,15 @@ Date:   April 2017
 
 \*******************************************************************/
 
+/// \file
+/// Perform Memory-mapped I/O instrumentation
+
 #include <util/pointer_predicates.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_expr.h>
 
 #include "remove_returns.h"
 #include "mm_io.h"
-
-/*******************************************************************\
-
-Function: collect_deref_expr
-
-Inputs:
-
-Outputs:
-
-Purpose: 
-
-\*******************************************************************/
 
 void collect_deref_expr(
   const exprt &src,
@@ -37,18 +28,6 @@ void collect_deref_expr(
   for(const auto & op : src.operands())
     collect_deref_expr(op, dest); // recursive call
 }
-
-/*******************************************************************\
-
-Function: mm_io
-
-Inputs:
-
-Outputs:
-
-Purpose: 
-
-\*******************************************************************/
 
 void mm_io(
   const exprt &mm_io_r,
@@ -124,18 +103,6 @@ void mm_io(
   }
 }
 
-/*******************************************************************\
-
-Function: mm_io
-
-Inputs:
-
-Outputs:
-
-Purpose: 
-
-\*******************************************************************/
-
 void mm_io(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -155,18 +122,6 @@ void mm_io(
   for(auto & f : goto_functions.function_map)
     mm_io(mm_io_r, mm_io_w, f.second, ns);
 }
-
-/*******************************************************************\
-
-Function: mm_io
-
-Inputs:
-
-Outputs:
-
-Purpose: 
-
-\*******************************************************************/
 
 void mm_io(goto_modelt &model)
 {

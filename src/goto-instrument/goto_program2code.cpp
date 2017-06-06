@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as C/C++ Source
+
 #include <sstream>
 
 #include <util/c_types.h>
@@ -18,18 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program2code.h"
 
-/*******************************************************************\
-
-Function: skip_typecast
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 static const exprt &skip_typecast(const exprt &expr)
 {
   if(expr.id()!=ID_typecast)
@@ -37,18 +28,6 @@ static const exprt &skip_typecast(const exprt &expr)
 
   return skip_typecast(to_typecast_expr(expr).op());
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::operator()
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::operator()()
 {
@@ -76,18 +55,6 @@ void goto_program2codet::operator()()
 
   cleanup_code(toplevel_block, ID_nil);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::build_loop_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::build_loop_map()
 {
@@ -125,18 +92,6 @@ void goto_program2codet::build_loop_map()
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::build_dead_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::build_dead_map()
 {
   dead_map.clear();
@@ -147,18 +102,6 @@ void goto_program2codet::build_dead_map()
       dead_map[to_code_dead(target->code).get_identifier()]=
         target->location_number;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::scan_for_varargs
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::scan_for_varargs()
 {
@@ -200,18 +143,6 @@ void goto_program2codet::scan_for_varargs()
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_instruction
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_instruction(
     goto_programt::const_targett target,
@@ -317,18 +248,6 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_labels
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::convert_labels(
     goto_programt::const_targett target,
     codet &dest)
@@ -371,18 +290,6 @@ void goto_program2codet::convert_labels(
     latest_block->copy_to_operands(code_skipt());
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_assign(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -397,18 +304,6 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign_varargs
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     goto_programt::const_targett target,
@@ -503,18 +398,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign_rec
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::convert_assign_rec(
     const code_assignt &assign,
     codet &dest)
@@ -537,18 +420,6 @@ void goto_program2codet::convert_assign_rec(
   else
     dest.copy_to_operands(assign);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_return
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_return(
     goto_programt::const_targett target,
@@ -579,18 +450,6 @@ goto_programt::const_targett goto_program2codet::convert_return(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_decl
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_decl(
     goto_programt::const_targett target,
@@ -654,18 +513,6 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_do_while
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_do_while(
     goto_programt::const_targett target,
     goto_programt::const_targett loop_end,
@@ -691,18 +538,6 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -725,18 +560,6 @@ goto_programt::const_targett goto_program2codet::convert_goto(
   else
     return convert_goto_goto(target, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_while
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_while(
     goto_programt::const_targett target,
@@ -836,18 +659,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::get_cases
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::get_cases(
   goto_programt::const_targett target,
@@ -951,18 +762,6 @@ goto_programt::const_targett goto_program2codet::get_cases(
   return cases_it;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::set_block_end_points
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 bool goto_program2codet::set_block_end_points(
   goto_programt::const_targett upper_bound,
   const cfg_dominatorst &dominators,
@@ -1012,18 +811,6 @@ bool goto_program2codet::set_block_end_points(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::remove_default
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 bool goto_program2codet::remove_default(
   const cfg_dominatorst &dominators,
@@ -1086,18 +873,6 @@ bool goto_program2codet::remove_default(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_switch
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_switch(
     goto_programt::const_targett target,
@@ -1278,18 +1053,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   return max_target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_if
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto_if(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -1365,18 +1128,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   dest.move_to_operands(i);
   return --target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_break_continue
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     goto_programt::const_targett target,
@@ -1466,18 +1217,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   return convert_goto_goto(target, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_goto
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto_goto(
   goto_programt::const_targett target,
   codet &dest)
@@ -1536,18 +1275,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_start_thread
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_start_thread(
     goto_programt::const_targett target,
@@ -1667,18 +1394,6 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   return thread_end;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_throw
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_throw(
     goto_programt::const_targett target,
     codet &dest)
@@ -1687,18 +1402,6 @@ goto_programt::const_targett goto_program2codet::convert_throw(
   assert(false);
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_catch
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_catch(
     goto_programt::const_targett target,
@@ -1709,18 +1412,6 @@ goto_programt::const_targett goto_program2codet::convert_catch(
   assert(false);
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::add_local_types
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::add_local_types(const typet &type)
 {
@@ -1776,18 +1467,6 @@ void goto_program2codet::add_local_types(const typet &type)
     add_local_types(type.subtype());
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_code(
     codet &code,
@@ -1876,18 +1555,6 @@ void goto_program2codet::cleanup_code(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_function_call
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::cleanup_function_call(
   const exprt &function,
   code_function_callt::argumentst &arguments)
@@ -1917,18 +1584,6 @@ void goto_program2codet::cleanup_function_call(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code_block
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_code_block(
     codet &code,
@@ -1983,18 +1638,6 @@ void goto_program2codet::cleanup_code_block(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::remove_const
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::remove_const(typet &type)
 {
   if(type.get_bool(ID_C_constant))
@@ -2029,18 +1672,6 @@ void goto_program2codet::remove_const(typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: has_labels
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 static bool has_labels(const codet &code)
 {
   if(code.get_statement()==ID_label)
@@ -2052,18 +1683,6 @@ static bool has_labels(const codet &code)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: move_label_ifthenelse
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 static bool move_label_ifthenelse(
     exprt &expr,
@@ -2089,18 +1708,6 @@ static bool move_label_ifthenelse(
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code_ifthenelse
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_code_ifthenelse(
   codet &code,
@@ -2197,18 +1804,6 @@ void goto_program2codet::cleanup_code_ifthenelse(
        to_code(i_t_e.then_case()).get_statement()==ID_skip))
     code=code_skipt();
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_expr
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 {

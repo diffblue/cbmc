@@ -8,6 +8,9 @@ Date: October 2012
 
 \*******************************************************************/
 
+/// \file
+/// Encoding for Threaded Goto Programs
+
 #include <util/std_expr.h>
 #include <util/find_symbols.h>
 #include <util/replace_symbol.h>
@@ -73,18 +76,6 @@ protected:
   thread_local_varst thread_local_vars;
 };
 
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::instrument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void concurrency_instrumentationt::instrument(exprt &expr)
 {
   std::set<exprt> symbols;
@@ -118,18 +109,6 @@ void concurrency_instrumentationt::instrument(exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::instrument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void concurrency_instrumentationt::instrument(
   goto_programt &goto_program,
   const is_threadedt &is_threaded)
@@ -157,18 +136,6 @@ void concurrency_instrumentationt::instrument(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::collect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void concurrency_instrumentationt::collect(const exprt &expr)
 {
@@ -212,18 +179,6 @@ void concurrency_instrumentationt::collect(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::collect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void concurrency_instrumentationt::collect(
   const goto_programt &goto_program,
   const is_threadedt &is_threaded)
@@ -242,34 +197,10 @@ void concurrency_instrumentationt::collect(
   }
 }
 
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::add_array_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void concurrency_instrumentationt::add_array_symbols()
 {
 //  for(
 }
-
-/*******************************************************************\
-
-Function: concurrency_instrumentationt::instrument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void concurrency_instrumentationt::instrument(
   goto_functionst &goto_functions)
@@ -288,18 +219,6 @@ void concurrency_instrumentationt::instrument(
   Forall_goto_functions(f_it, goto_functions)
     instrument(f_it->second.body, is_threaded);
 }
-
-/*******************************************************************\
-
-Function: concurrency
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void concurrency(
   value_setst &value_sets,

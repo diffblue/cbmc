@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// Expressions in JSON
+
 #include "namespace.h"
 #include "expr.h"
 #include "json.h"
@@ -16,18 +19,6 @@ Author: Peter Schrammel
 #include "config.h"
 
 #include "json_expr.h"
-
-/*******************************************************************\
-
-Function: json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 json_objectt json(const source_locationt &location)
 {
@@ -51,18 +42,6 @@ json_objectt json(const source_locationt &location)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 json_objectt json(
   const typet &type,
@@ -164,18 +143,6 @@ json_objectt json(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 json_objectt json(
   const exprt &expr,

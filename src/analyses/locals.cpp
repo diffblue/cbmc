@@ -8,21 +8,12 @@ Date: March 2013
 
 \*******************************************************************/
 
+/// \file
+/// Local variables
+
 #include <util/std_expr.h>
 
 #include "locals.h"
-
-/*******************************************************************\
-
-Function: localst::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void localst::build(const goto_functiont &goto_function)
 {
@@ -38,18 +29,6 @@ void localst::build(const goto_functiont &goto_function)
     locals_map[param.get_identifier()]=
       symbol_exprt(param.get_identifier(), param.type());
 }
-
-/*******************************************************************\
-
-Function: localst::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void localst::output(std::ostream &out) const
 {

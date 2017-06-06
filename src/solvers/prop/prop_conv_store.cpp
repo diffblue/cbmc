@@ -6,21 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 
 #include "prop_conv_store.h"
-
-/*******************************************************************\
-
-Function: prop_conv_storet::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_storet::set_to(const exprt &expr, bool value)
 {
@@ -29,18 +18,6 @@ void prop_conv_storet::set_to(const exprt &expr, bool value)
   constraint.expr=expr;
   constraint.value=value;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_storet::convert_rest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt prop_conv_storet::convert(const exprt &expr)
 {
@@ -53,18 +30,6 @@ literalt prop_conv_storet::convert(const exprt &expr)
   return constraint.literal;
 }
 
-/*******************************************************************\
-
-Function: prop_conv_storet::constraintst::replay
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void prop_conv_storet::constraintst::replay(prop_convt &dest) const
 {
   for(constraint_listt::const_iterator
@@ -74,18 +39,6 @@ void prop_conv_storet::constraintst::replay(prop_convt &dest) const
     it->replay(dest);
 }
 
-/*******************************************************************\
-
-Function: prop_conv_storet::constraintst::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void prop_conv_storet::constraintst::print(std::ostream &out) const
 {
   for(constraint_listt::const_iterator
@@ -94,18 +47,6 @@ void prop_conv_storet::constraintst::print(std::ostream &out) const
       it++)
     it->print(out);
 }
-
-/*******************************************************************\
-
-Function: prop_conv_storet::constraintt::replay
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_storet::constraintt::replay(prop_convt &dest) const
 {
@@ -123,18 +64,6 @@ void prop_conv_storet::constraintt::replay(prop_convt &dest) const
     assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: prop_conv_storet::constraintt::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_storet::constraintt::print(std::ostream &out) const
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Various predicates over pointers in programs
+
 #ifndef CPROVER_UTIL_POINTER_PREDICATES_H
 #define CPROVER_UTIL_POINTER_PREDICATES_H
 

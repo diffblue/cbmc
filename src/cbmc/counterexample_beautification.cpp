@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Counterexample Beautification using Incremental SAT
+
 #include <util/threeval.h>
 #include <util/arith_tools.h>
 #include <util/symbol.h>
@@ -15,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/literal_expr.h>
 
 #include "counterexample_beautification.h"
-
-/*******************************************************************\
-
-Function: counterexample_beautificationt::get_minimization_list
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void counterexample_beautificationt::get_minimization_list(
   prop_convt &prop_conv,
@@ -68,18 +59,6 @@ void counterexample_beautificationt::get_minimization_list(
   }
 }
 
-/*******************************************************************\
-
-Function: counterexample_beautificationt::get_failed_property
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 symex_target_equationt::SSA_stepst::const_iterator
 counterexample_beautificationt::get_failed_property(
   const prop_convt &prop_conv,
@@ -98,18 +77,6 @@ counterexample_beautificationt::get_failed_property(
   assert(false);
   return equation.SSA_steps.end();
 }
-
-/*******************************************************************\
-
-Function: counterexample_beautificationt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void counterexample_beautificationt::operator()(
   bv_cbmct &bv_cbmc,

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CNF Generation, via Tseitin
+
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -14,19 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cnf.h"
 // #define VERBOSE
 
-/*******************************************************************\
-
-Function: cnft::gate_and
-
-  Inputs: Two input signals to the AND gate, one output
-
- Outputs: Side effect: add clauses that encodes relation between
-          inputs/output via lcnf
-
- Purpose: Tseitin encoding of conjunction of two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of conjunction of two literals
+/// \par parameters: Two input signals to the AND gate, one output
+/// \return Side effect: add clauses that encodes relation between inputs/output
+///   via lcnf
 void cnft::gate_and(literalt a, literalt b, literalt o)
 {
   // a*b=c <==> (a + o')( b + o')(a'+b'+o)
@@ -48,18 +42,8 @@ void cnft::gate_and(literalt a, literalt b, literalt o)
   lcnf(lits);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_or
-
-  Inputs: Two input signals to the OR gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of disjunction of two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of disjunction of two literals
+/// \par parameters: Two input signals to the OR gate, one output
 void cnft::gate_or(literalt a, literalt b, literalt o)
 {
   // a+b=c <==> (a' + c)( b' + c)(a + b + c')
@@ -80,18 +64,8 @@ void cnft::gate_or(literalt a, literalt b, literalt o)
   lcnf(lits);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_xor
-
-  Inputs: Two input signals to the XOR gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of XOR of two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of XOR of two literals
+/// \par parameters: Two input signals to the XOR gate, one output
 void cnft::gate_xor(literalt a, literalt b, literalt o)
 {
   // a xor b = o <==> (a' + b' + o')
@@ -121,18 +95,8 @@ void cnft::gate_xor(literalt a, literalt b, literalt o)
   lcnf(lits);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_nand
-
-  Inputs: Two input signals to the NAND gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of NAND of two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of NAND of two literals
+/// \par parameters: Two input signals to the NAND gate, one output
 void cnft::gate_nand(literalt a, literalt b, literalt o)
 {
   // a Nand b = o <==> (a + o)( b + o)(a' + b' + o')
@@ -153,18 +117,8 @@ void cnft::gate_nand(literalt a, literalt b, literalt o)
   lcnf(lits);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_nor
-
-  Inputs: Two input signals to the NOR gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of NOR of two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of NOR of two literals
+/// \par parameters: Two input signals to the NOR gate, one output
 void cnft::gate_nor(literalt a, literalt b, literalt o)
 {
   // a Nor b = o <==> (a' + o')( b' + o')(a + b + o)
@@ -185,52 +139,23 @@ void cnft::gate_nor(literalt a, literalt b, literalt o)
   lcnf(lits);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_equal
-
-  Inputs: Two input signals to the EQUAL gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of equality between two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of equality between two literals
+/// \par parameters: Two input signals to the EQUAL gate, one output
 void cnft::gate_equal(literalt a, literalt b, literalt o)
 {
   gate_xor(a, b, !o);
 }
 
-/*******************************************************************\
-
-Function: cnft::gate_implies
-
-  Inputs: Two input signals to the IMPLIES gate, one output
-
- Outputs:
-
- Purpose: Tseitin encoding of implication between two literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of implication between two literals
+/// \par parameters: Two input signals to the IMPLIES gate, one output
 void cnft::gate_implies(literalt a, literalt b, literalt o)
 {
   gate_or(!a, b, o);
 }
 
-/*******************************************************************\
-
-Function: cnft::land
-
-  Inputs: Any number of inputs to the AND gate
-
- Outputs: Output signal of the AND gate as literal
-
- Purpose: Tseitin encoding of conjunction between multiple literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of conjunction between multiple literals
+/// \par parameters: Any number of inputs to the AND gate
+/// \return Output signal of the AND gate as literal
 literalt cnft::land(const bvt &bv)
 {
   if(bv.empty())
@@ -271,18 +196,9 @@ literalt cnft::land(const bvt &bv)
   return literal;
 }
 
-/*******************************************************************\
-
-Function: cnft::lor
-
-  Inputs: Any number of inputs to the OR gate
-
- Outputs: Output signal of the OR gate as literal
-
- Purpose: Tseitin encoding of disjunction between multiple literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of disjunction between multiple literals
+/// \par parameters: Any number of inputs to the OR gate
+/// \return Output signal of the OR gate as literal
 literalt cnft::lor(const bvt &bv)
 {
   if(bv.empty())
@@ -323,18 +239,9 @@ literalt cnft::lor(const bvt &bv)
   return literal;
 }
 
-/*******************************************************************\
-
-Function: cnft::lxor
-
-  Inputs: Any number of inputs to the XOR gate
-
- Outputs: Output signal of the XOR gate as literal
-
- Purpose: Tseitin encoding of XOR between multiple literals
-
-\*******************************************************************/
-
+/// Tseitin encoding of XOR between multiple literals
+/// \par parameters: Any number of inputs to the XOR gate
+/// \return Output signal of the XOR gate as literal
 literalt cnft::lxor(const bvt &bv)
 {
   if(bv.empty())
@@ -352,18 +259,8 @@ literalt cnft::lxor(const bvt &bv)
   return literal;
 }
 
-/*******************************************************************\
-
-Function: cnft::land
-
-  Inputs: Two inputs to the AND gate
-
- Outputs: Output signal of the AND gate as literal
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Two inputs to the AND gate
+/// \return Output signal of the AND gate as literal
 literalt cnft::land(literalt a, literalt b)
 {
   if(a.is_true() || b.is_false())
@@ -378,18 +275,8 @@ literalt cnft::land(literalt a, literalt b)
   return o;
 }
 
-/*******************************************************************\
-
-Function: cnft::lor
-
-  Inputs: Two inputs to the OR gate
-
- Outputs: Output signal of the OR gate as literal
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Two inputs to the OR gate
+/// \return Output signal of the OR gate as literal
 literalt cnft::lor(literalt a, literalt b)
 {
   if(a.is_false() || b.is_true())
@@ -404,18 +291,8 @@ literalt cnft::lor(literalt a, literalt b)
   return o;
 }
 
-/*******************************************************************\
-
-Function: cnft::lxor
-
-  Inputs: Two inputs to the XOR gate
-
- Outputs: Output signal of the XOR gate as literal
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Two inputs to the XOR gate
+/// \return Output signal of the XOR gate as literal
 literalt cnft::lxor(literalt a, literalt b)
 {
   if(a.is_false())
@@ -436,85 +313,29 @@ literalt cnft::lxor(literalt a, literalt b)
   return o;
 }
 
-/*******************************************************************\
-
-Function: cnft::lnand
-
-  Inputs: Two inputs to the NAND gate
-
- Outputs: Output signal of the NAND gate as literal
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Two inputs to the NAND gate
+/// \return Output signal of the NAND gate as literal
 literalt cnft::lnand(literalt a, literalt b)
 {
   return !land(a, b);
 }
 
-/*******************************************************************\
-
-Function: cnft::lnor
-
-  Inputs: Two inputs to the NOR gate
-
- Outputs: Output signal of the NOR gate as literal
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: Two inputs to the NOR gate
+/// \return Output signal of the NOR gate as literal
 literalt cnft::lnor(literalt a, literalt b)
 {
   return !lor(a, b);
 }
-
-/*******************************************************************\
-
-Function: cnft::lequal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt cnft::lequal(literalt a, literalt b)
 {
   return !lxor(a, b);
 }
 
-/*******************************************************************\
-
-Function: cnft::limplies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt cnft::limplies(literalt a, literalt b)
 {
   return lor(!a, b);
 }
-
-/*******************************************************************\
-
-Function: cnft::lselect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // Tino observed slow-downs up to 50% with OPTIMAL_COMPACT_ITE.
 
@@ -560,18 +381,8 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
   #endif
 }
 
-/*******************************************************************\
-
-Function: cnft::new_variable
-
-  Inputs:
-
- Outputs: New variable as literal
-
- Purpose: Generate a new variable and return it as a literal
-
-\*******************************************************************/
-
+/// Generate a new variable and return it as a literal
+/// \return New variable as literal
 literalt cnft::new_variable()
 {
   literalt l;
@@ -582,18 +393,9 @@ literalt cnft::new_variable()
   return l;
 }
 
-/*******************************************************************\
-
-Function: cnft::eliminate_duplicates
-
-  Inputs: set of literals given as vector
-
- Outputs: set of literals, duplicates removed
-
- Purpose: eliminate duplicates from given vector of literals
-
-\*******************************************************************/
-
+/// eliminate duplicates from given vector of literals
+/// \par parameters: set of literals given as vector
+/// \return set of literals, duplicates removed
 bvt cnft::eliminate_duplicates(const bvt &bv)
 {
   std::set<literalt> s;
@@ -608,19 +410,8 @@ bvt cnft::eliminate_duplicates(const bvt &bv)
   return dest;
 }
 
-/*******************************************************************\
-
-Function: cnft::process_clause
-
-  Inputs:
-
- Outputs:
-
- Purpose: filter 'true' from clause, eliminate duplicates,
-          recognise trivially satisfied clauses
-
-\*******************************************************************/
-
+/// filter 'true' from clause, eliminate duplicates, recognise trivially
+/// satisfied clauses
 bool cnft::process_clause(const bvt &bv, bvt &dest)
 {
   dest.clear();

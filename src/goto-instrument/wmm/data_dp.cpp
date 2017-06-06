@@ -8,23 +8,15 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// data dependencies
+
 #include <util/message.h>
 
 #include "data_dp.h"
 #include "abstract_event.h"
 
-/*******************************************************************\
-
-Function: data_dpt::dp_analysis
-
-  Inputs:
-
- Outputs:
-
- Purpose: insertion
-
-\*******************************************************************/
-
+/// insertion
 void data_dpt::dp_analysis(
   const datat &read,
   bool local_read,
@@ -66,18 +58,6 @@ void data_dpt::dp_analysis(
   }
 }
 
-/*******************************************************************\
-
-Function: data_dpt::dp_analysis
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void data_dpt::dp_analysis(
   const abstract_eventt &read,
   const abstract_eventt &write)
@@ -87,18 +67,7 @@ void data_dpt::dp_analysis(
   dp_analysis(d_read, read.local, d_write, write.local);
 }
 
-/*******************************************************************\
-
-Function: data_dpt::dp
-
-  Inputs:
-
- Outputs:
-
- Purpose: search in N^2
-
-\*******************************************************************/
-
+/// search in N^2
 bool data_dpt::dp(const abstract_eventt &e1, const abstract_eventt &e2) const
 {
   for(const_iterator it1=begin(); it1!=end(); ++it1)
@@ -143,18 +112,7 @@ bool data_dpt::dp(const abstract_eventt &e1, const abstract_eventt &e2) const
   return false;
 }
 
-/*******************************************************************\
-
-Function: data_dpt::dp_merge
-
-  Inputs:
-
- Outputs:
-
- Purpose:  merge in N^3
-
-\*******************************************************************/
-
+/// merge in N^3
 void data_dpt::dp_merge()
 {
   if(size()<2)
@@ -197,18 +155,6 @@ void data_dpt::dp_merge()
   /* repeat until classes are disjunct */
   dp_merge();
 }
-
-/*******************************************************************\
-
-Function: data_dpt::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void data_dpt::print(messaget &message)
 {

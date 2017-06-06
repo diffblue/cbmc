@@ -8,6 +8,9 @@ Date: January 2016
 
 \*******************************************************************/
 
+/// \file
+/// Skip over selected loops by adding gotos
+
 #ifndef CPROVER_GOTO_INSTRUMENT_SKIP_LOOPS_H
 #define CPROVER_GOTO_INSTRUMENT_SKIP_LOOPS_H
 

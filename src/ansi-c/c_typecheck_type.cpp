@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <unordered_set>
 
 #include <util/c_types.h>
@@ -22,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "padding.h"
 #include "type2name.h"
 #include "ansi_c_convert_type.h"
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
@@ -290,18 +281,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_custom_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_custom_type(typet &type)
 {
   // they all have a width
@@ -402,18 +381,6 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     assert(false);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_code_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   // the return type is still 'subtype()'
@@ -512,18 +479,6 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_array_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_array_type(array_typet &type)
 {
@@ -651,18 +606,6 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_vector_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 {
   exprt &size=type.size();
@@ -743,18 +686,6 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   type.size()=from_integer(s, signed_size_type());
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_compound_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
@@ -867,18 +798,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   type.swap(symbol_type);
   original_qualifiers.write(type);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_compound_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_compound_body(
   struct_union_typet &type)
@@ -1056,18 +975,6 @@ void c_typecheck_baset::typecheck_compound_body(
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::enum_constant_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 typet c_typecheck_baset::enum_constant_type(
   const mp_integer &min_value,
   const mp_integer &max_value) const
@@ -1099,18 +1006,6 @@ typet c_typecheck_baset::enum_constant_type(
       return signed_long_long_int_type();
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::enum_underlying_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet c_typecheck_baset::enum_underlying_type(
   const mp_integer &min_value,
@@ -1169,18 +1064,6 @@ typet c_typecheck_baset::enum_underlying_type(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_enum_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
@@ -1365,18 +1248,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   type.set(ID_identifier, identifier);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_enum_tag_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 {
   // It's just a tag.
@@ -1435,18 +1306,6 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   type.remove(ID_tag);
   type.set_identifier(identifier);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_bit_field_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 {
@@ -1528,18 +1387,6 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_typeof_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
   // save location
@@ -1576,18 +1423,6 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   type.add_source_location()=source_location;
   c_qualifiers.write(type);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_symbol_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_symbol_type(typet &type)
 {
@@ -1642,18 +1477,6 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     type=integer_typet();
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::adjust_function_parameter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {

@@ -6,22 +6,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <ostream>
 
 #include "cpp_id.h"
 #include "cpp_scope.h"
-
-/*******************************************************************\
-
-Function: cpp_idt::cpp_idt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 cpp_idt::cpp_idt():
   is_member(false),
@@ -35,18 +26,6 @@ cpp_idt::cpp_idt():
   parent(NULL)
 {
 }
-
-/*******************************************************************\
-
-Function: cpp_idt::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_idt::print(std::ostream &out, unsigned indent) const
 {
@@ -62,18 +41,6 @@ void cpp_idt::print(std::ostream &out, unsigned indent) const
     out << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_idt::print_fields
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
 {
@@ -129,35 +96,11 @@ void cpp_idt::print_fields(std::ostream &out, unsigned indent) const
   out << "  id_class=" << id_class << '\n';
 }
 
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::ostream &operator<<(std::ostream &out, const cpp_idt &cpp_id)
 {
   cpp_id.print(out, 0);
   return out;
 }
-
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
 {

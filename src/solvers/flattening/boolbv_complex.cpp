@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_complex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_complex(const exprt &expr)
 {
@@ -56,18 +45,6 @@ bvt boolbvt::convert_complex(const exprt &expr)
   return conversion_failed(expr);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_complex_real
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_complex_real(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
@@ -85,18 +62,6 @@ bvt boolbvt::convert_complex_real(const exprt &expr)
 
   return bv;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_complex_imag
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_complex_imag(const exprt &expr)
 {

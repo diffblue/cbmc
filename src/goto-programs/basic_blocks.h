@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Group Basic Blocks in Goto Program
+
 #ifndef CPROVER_GOTO_PROGRAMS_BASIC_BLOCKS_H
 #define CPROVER_GOTO_PROGRAMS_BASIC_BLOCKS_H
 

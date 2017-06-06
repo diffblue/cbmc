@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <unordered_set>
 
@@ -13,18 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_boolean
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_boolean(exprt &expr)
 {
@@ -198,18 +187,6 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_not
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_not(exprt &expr)
 {

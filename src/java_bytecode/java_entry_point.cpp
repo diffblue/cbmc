@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <algorithm>
 #include <set>
 #include <iostream>
@@ -32,18 +33,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
-
-/*******************************************************************\
-
-Function: create_initialize
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void create_initialize(symbol_tablet &symbol_table)
 {
@@ -84,18 +73,6 @@ static bool should_init_symbol(const symbolt &sym)
 
   return has_prefix(id2string(sym.name), "java::java.lang.String.Literal");
 }
-
-/*******************************************************************\
-
-Function: java_static_lifetime_init
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_static_lifetime_init(
   symbol_tablet &symbol_table,
@@ -174,18 +151,6 @@ void java_static_lifetime_init(
   }
 }
 
-/*******************************************************************\
-
-Function: java_build_arguments
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt::operandst java_build_arguments(
   const symbolt &function,
   code_blockt &init_code,
@@ -252,18 +217,6 @@ exprt::operandst java_build_arguments(
 
   return main_arguments;
 }
-
-/*******************************************************************\
-
-Function: java_record_outputs
-
- Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_record_outputs(
   const symbolt &function,
@@ -512,24 +465,14 @@ main_function_resultt get_main_symbol(
   return res;  // give up with error
 }
 
-/*******************************************************************\
-
-Function: java_entry_point
-
- Inputs:
-  symbol_table
-  main class
-  message_handler
-  assume_init_pointers_not_null - allow pointers in initialization code to be
-                                  null
-  max_nondet_array_length
-
- Outputs: true if error occurred on entry point search
-
- Purpose: find entry point and create initialization code for function
-
-\*******************************************************************/
-
+/// find entry point and create initialization code for function
+/// symbol_table
+/// main class
+/// message_handler
+/// \param assume_init_pointers_not_null: allow pointers in initialization code
+///   to be null
+/// max_nondet_array_length
+/// \return true if error occurred on entry point search
 bool java_entry_point(
   symbol_tablet &symbol_table,
   const irep_idt &main_class,

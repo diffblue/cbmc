@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_DPLIB_DPLIB_PROP_H
 #define CPROVER_SOLVERS_DPLIB_DPLIB_PROP_H
 

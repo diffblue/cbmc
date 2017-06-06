@@ -6,23 +6,14 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// Alignment Checks
+
 #include <util/pointer_offset_size.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
 
 #include "alignment_checks.h"
-
-/*******************************************************************\
-
-Function: print_struct_alignment_problems
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void print_struct_alignment_problems(
   const symbol_tablet &symbol_table,

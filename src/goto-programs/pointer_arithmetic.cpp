@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
 #include "pointer_arithmetic.h"
-
-/*******************************************************************\
-
-Function: pointer_arithmetict::pointer_arithmetict
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 pointer_arithmetict::pointer_arithmetict(const exprt &src)
 {
@@ -29,18 +18,6 @@ pointer_arithmetict::pointer_arithmetict(const exprt &src)
   offset.make_nil();
   read(src);
 }
-
-/*******************************************************************\
-
-Function: pointer_arithmetict::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void pointer_arithmetict::read(const exprt &src)
 {
@@ -87,18 +64,6 @@ void pointer_arithmetict::read(const exprt &src)
     make_pointer(src);
 }
 
-/*******************************************************************\
-
-Function: pointer_arithmetict::add_to_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void pointer_arithmetict::add_to_offset(const exprt &src)
 {
   if(offset.is_nil())
@@ -115,18 +80,6 @@ void pointer_arithmetict::add_to_offset(const exprt &src)
     offset=new_offset;
   }
 }
-
-/*******************************************************************\
-
-Function: pointer_arithmetict::make_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void pointer_arithmetict::make_pointer(const exprt &src)
 {

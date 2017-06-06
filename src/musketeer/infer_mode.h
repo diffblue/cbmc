@@ -6,6 +6,7 @@
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_MUSKETEER_INFER_MODE_H
 #define CPROVER_MUSKETEER_INFER_MODE_H
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Program Slicing
+
 #ifndef CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
 #define CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_CLASS_H
 
@@ -15,14 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/is_threaded.h>
 
 class slicing_criteriont;
-
-/*******************************************************************\
-
-   Class: reachability_slicert
-
- Purpose:
-
-\*******************************************************************/
 
 class reachability_slicert
 {

@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// Constant Propagation
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -15,18 +18,6 @@ Author: Peter Schrammel
 #include <util/simplify_expr.h>
 
 #include "constant_propagator.h"
-
-/*******************************************************************\
-
-Function: concatenate_array_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt concatenate_array_id(
 		const exprt &array, const exprt &index,
@@ -47,18 +38,6 @@ exprt concatenate_array_id(
   return new_expr;
 }
 
-/*******************************************************************\
-
-Function: concatenate_array_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt concatenate_array_id(
 		const exprt &array, const mp_integer &index,
 		const typet &type)
@@ -70,18 +49,6 @@ exprt concatenate_array_id(
 
   return new_expr;
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void constant_propagator_domaint::assign_rec(
   valuest &values,
@@ -153,18 +120,6 @@ void constant_propagator_domaint::assign_rec(
   }
 #endif
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void constant_propagator_domaint::transform(
   locationt from,
@@ -255,18 +210,7 @@ void constant_propagator_domaint::transform(
 }
 
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::two_way_propagate_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: handles equalities and conjunctions containing equalities
-
-\*******************************************************************/
-
+/// handles equalities and conjunctions containing equalities
 bool constant_propagator_domaint::two_way_propagate_rec(
   const exprt &expr,
   const namespacet &ns)
@@ -308,18 +252,6 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   return change;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void constant_propagator_domaint::assign(
   valuest &dest,
   const symbol_exprt &lhs,
@@ -331,19 +263,10 @@ void constant_propagator_domaint::assign(
   dest.set_to(lhs, rhs);
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::ai_simplify
-
-  Inputs: The condition to simplify and its namespace.
-
- Outputs: The simplified condition.
-
- Purpose: Simplify the condition given context-sensitive knowledge
-          from the abstract state.
-
-\*******************************************************************/
-
+/// Simplify the condition given context-sensitive knowledge from the abstract
+/// state.
+/// \par parameters: The condition to simplify and its namespace.
+/// \return The simplified condition.
 bool constant_propagator_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
@@ -353,18 +276,6 @@ bool constant_propagator_domaint::ai_simplify(
 
   return b;
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::is_array_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool constant_propagator_domaint::valuest::is_array_constant(const exprt &expr) const
 {
@@ -377,18 +288,6 @@ bool constant_propagator_domaint::valuest::is_array_constant(const exprt &expr) 
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::is_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
@@ -418,18 +317,6 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
   return true;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::is_constant_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool constant_propagator_domaint::valuest::is_constant_address_of(
   const exprt &expr) const
 {
@@ -449,18 +336,7 @@ bool constant_propagator_domaint::valuest::is_constant_address_of(
   return true;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::set_to_top
-
-  Inputs:
-
- Outputs:
-
- Purpose: Do not call this when iterating over replace_const.expr_map!
-
-\*******************************************************************/
-
+/// Do not call this when iterating over replace_const.expr_map!
 bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
 {
   bool result = false;
@@ -478,18 +354,6 @@ bool constant_propagator_domaint::valuest::set_to_top(const irep_idt &id)
   return result;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void constant_propagator_domaint::valuest::output(
   std::ostream &out,
   const namespacet &ns) const
@@ -504,18 +368,6 @@ void constant_propagator_domaint::valuest::output(
         << from_expr(ns, "", replace_pair.second) << '\n';
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void constant_propagator_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -524,18 +376,8 @@ void constant_propagator_domaint::output(
   values.output(out, ns);
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::merge
-
-  Inputs:
-
- Outputs: Return true if "this" has changed.
-
- Purpose: join
-
-\*******************************************************************/
-
+/// join
+/// \return Return true if "this" has changed.
 bool constant_propagator_domaint::valuest::merge(const valuest &src)
 {
   // nothing to do
@@ -580,18 +422,8 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
   return changed;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::valuest::meet
-
-  Inputs:
-
- Outputs: Return true if "this" has changed.
-
- Purpose: meet
-
-\*******************************************************************/
-
+/// meet
+/// \return Return true if "this" has changed.
 bool constant_propagator_domaint::valuest::meet(const valuest &src)
 {
   if(src.is_bottom || is_bottom)
@@ -623,18 +455,7 @@ bool constant_propagator_domaint::valuest::meet(const valuest &src)
   return changed;
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_domaint::merge
-
-  Inputs:
-
- Outputs: Return true if "this" has changed.
-
- Purpose:
-
-\*******************************************************************/
-
+/// \return Return true if "this" has changed.
 bool constant_propagator_domaint::merge(
   const constant_propagator_domaint &other,
   locationt from,
@@ -643,18 +464,6 @@ bool constant_propagator_domaint::merge(
   return values.merge(other.values);
 }
 
-/*******************************************************************\
-
-Function: constant_propagator_ait::replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void constant_propagator_ait::replace(
   goto_functionst &goto_functions,
   const namespacet &ns)
@@ -662,18 +471,6 @@ void constant_propagator_ait::replace(
   Forall_goto_functions(f_it, goto_functions)
     replace(f_it->second, ns);
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_ait::replace_array_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void constant_propagator_ait::replace_array_symbol(exprt &expr)
 {
@@ -690,18 +487,6 @@ void constant_propagator_ait::replace_array_symbol(exprt &expr)
   }
 
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_ait::replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void constant_propagator_ait::replace(
   goto_functionst::goto_functiont &goto_function,
@@ -754,18 +539,6 @@ void constant_propagator_ait::replace(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: constant_propagator_ait::replace_types_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void constant_propagator_ait::replace_types_rec(
   const replace_symbolt &replace_const,
