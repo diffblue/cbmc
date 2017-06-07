@@ -199,9 +199,12 @@ def replace_block(
             {f.name: f.contents for f in parse_fields(block_contents.group(1))})
 
     if header_formatter.is_block_valid(block):
-        return '%s%s\n' % (
-                block_contents.group(0),
-                header_formatter.convert(header_from_block(block)))
+        converted = header_formatter.convert(header_from_block(block))
+        if converted:
+            return '%s%s' % (
+                    block_contents.group(0),
+                    header_formatter.convert(header_from_block(block)) + '\n')
+        return block_contents.group(0)
 
     if class_formatter.is_block_valid(block):
         return class_formatter.convert(class_from_block(block))
