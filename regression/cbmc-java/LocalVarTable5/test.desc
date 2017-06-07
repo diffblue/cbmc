@@ -4,7 +4,7 @@ test.class
 dead anonlocal::1i
 dead anonlocal::2i
 dead anonlocal::3a
-dead new_tmp0
+dead new_tmp[0123456789]+
 ^EXIT=0$
 ^SIGNAL=0$
 --

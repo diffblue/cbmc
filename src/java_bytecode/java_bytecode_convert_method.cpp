@@ -1275,15 +1275,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
 
-      c=get_array_bounds_check(deref, op[1], i_it->source_location);
+      const exprt tmp_var=tmp_variable("stack_array_elem", element_type);
+      c=code_blockt();
+      c.copy_to_operands(
+        get_array_bounds_check(deref, op[1], i_it->source_location));
+      c.copy_to_operands(
+        code_assignt(tmp_var, java_bytecode_promotion(element)));
       c.add_source_location()=i_it->source_location;
-      results[0]=java_bytecode_promotion(element);
+      results[0]=tmp_var;
     }
     else if(statement==patternt("?load"))
     {
-      // load a value from a local variable
-      results[0]=
-        variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED);
+      const char char_type=statement[0];
+      const typet t=java_bytecode_promotion(java_type_from_char(char_type));
+
+      // create new stack variable to hold the value of the local variable
+      const exprt tmp_var=tmp_variable("stack_var", t);
+      c=code_assignt(
+        tmp_var,
+        variable(arg0, statement[0], i_it->address, CAST_AS_NEEDED));
+      results[0]=tmp_var;
     }
     else if(statement=="ldc" || statement=="ldc_w" ||
             statement=="ldc2" || statement=="ldc2_w")
@@ -1643,19 +1654,49 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="dup")
     {
       assert(op.size()==1 && results.size()==2);
-      results[0]=results[1]=op[0];
+      if(op[0].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[0];
+      results[1]=op[0];
     }
     else if(statement=="dup_x1")
     {
       assert(op.size()==2 && results.size()==3);
-      results[0]=op[1];
+      if(op[1].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup_x1", op[1].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[1]));
+        // op1 is value1, op0 is value2
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[1];
       results[1]=op[0];
       results[2]=op[1];
     }
     else if(statement=="dup_x2")
     {
       assert(op.size()==3 && results.size()==4);
-      results[0]=op[2];
+      if(op[2].id()!=ID_constant)
+      {
+        // create new stack variable
+        const exprt tmp_var=
+          tmp_variable("stack_dup_x2", op[2].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[2]));
+        // op2 is value1, op1 is value2, op0 is value3
+        results[0]=tmp_var;
+      }
+      else
+        results[0]=op[2];
       results[1]=op[0];
       results[2]=op[1];
       results[3]=op[2];
@@ -1667,11 +1708,29 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
-        op=pop(2);
+      {
+        op=pop(2); // op0 is value1 op1 is value2
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_1", op[0].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_2", op[1].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[0])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+        results.push_back(tmp_var1);
+        results.push_back(tmp_var2);
+      }
       else
+      {
         op=pop(1);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results.push_back(tmp_var);
+      }
 
-      results.insert(results.end(), op.begin(), op.end());
       results.insert(results.end(), op.begin(), op.end());
     }
     else if(statement=="dup2_x1")
@@ -1679,11 +1738,34 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
+      {
         op=pop(3);
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_x1_1", op[2].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_x1_2", op[1].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[2])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+        results.push_back(tmp_var2);
+        results.push_back(tmp_var1);
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[2])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[1])));
+      }
       else
+      {
         op=pop(2);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2_x1", op[1].type());
+        results.push_back(tmp_var);
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[1]));
+      }
 
-      results.insert(results.end(), op.begin()+1, op.end());
       results.insert(results.end(), op.begin(), op.end());
     }
     else if(statement=="dup2_x2")
@@ -1691,9 +1773,33 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(!stack.empty() && results.empty());
 
       if(get_bytecode_type_width(stack.back().type())==32)
+      {
         op=pop(2);
+        const exprt tmp_var1=
+          tmp_variable("stack_dup2_x2_1", op[1].type());
+        const exprt tmp_var2=
+          tmp_variable("stack_dup2_x2_2", op[0].type());
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[1])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[0])));
+        results.push_back(tmp_var2);
+        results.push_back(tmp_var1);
+        c=code_blockt();
+        c.copy_to_operands(
+          code_assignt(tmp_var1, java_bytecode_promotion(op[1])));
+        c.copy_to_operands(
+          code_assignt(tmp_var2, java_bytecode_promotion(op[0])));
+      }
       else
+      {
         op=pop(1);
+        const exprt tmp_var=
+          tmp_variable("stack_dup2_x2", op[0].type());
+        c=code_assignt(tmp_var, java_bytecode_promotion(op[0]));
+        results.push_back(tmp_var);
+      }
 
       assert(!stack.empty());
       exprt::operandst op2;
@@ -1718,7 +1824,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=java_bytecode_promotion(to_member(op[0], arg0));
+      // create a new stack variable to hold the value of the field
+      const exprt tmp_var=
+        tmp_variable("stack_field", java_bytecode_promotion(arg0.type()));
+      c=code_assignt(tmp_var, java_bytecode_promotion(to_member(op[0], arg0)));
+      results[0]=tmp_var;
     }
     else if(statement=="getstatic")
     {
@@ -1731,11 +1841,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
         lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
-      results[0]=java_bytecode_promotion(symbol_expr);
-
       // set $assertionDisabled to false
       if(field_name.find("$assertionsDisabled")!=std::string::npos)
+      {
         c=code_assignt(symbol_expr, false_exprt());
+        results[0]=java_bytecode_promotion(symbol_expr);
+      }
+      else
+      {
+        // create a new stack variable to hold the value of the field
+        const exprt tmp_var=tmp_variable(
+          "stack_static_field",
+          java_bytecode_promotion(arg0.type()));
+        c=code_assignt(tmp_var, symbol_expr);
+        results[0]=java_bytecode_promotion(tmp_var);
+      }
     }
     else if(statement=="putfield")
     {
