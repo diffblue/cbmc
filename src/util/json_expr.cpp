@@ -293,6 +293,8 @@ json_objectt json(
       mp_integer i;
       if(!to_integer(expr, i))
         result["data"]=json_stringt(integer2string(i));
+      else
+        assert(false && "could not convert data to integer");
     }
     else if(type.id()==ID_c_enum)
     {
@@ -304,6 +306,8 @@ json_objectt json(
       mp_integer i;
       if(!to_integer(expr, i))
         result["data"]=json_stringt(integer2string(i));
+      else
+        assert(false && "could not convert data to integer");
     }
     else if(type.id()==ID_c_enum_tag)
     {
