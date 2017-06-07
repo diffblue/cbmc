@@ -244,6 +244,8 @@ json_objectt json(
       std::string type_string;
       if(!lang->from_type(underlying_type, type_string, ns))
         result["type"]=json_stringt(type_string);
+      else
+        assert(false && "unknown type");
 
       mp_integer i;
       if(!to_integer(expr, i))
