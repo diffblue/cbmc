@@ -131,8 +131,10 @@ private:
     const exprt &expr,
     bool is_sub,
     irep_idt class_identifier,
+    bool skip_classid,
     bool create_dynamic_objects,
-    const struct_typet &struct_type);
+    const struct_typet &struct_type,
+    const update_in_placet &update_in_place);
 };
 
 /// \param assignments: The code block to add code to
@@ -412,6 +414,98 @@ void java_object_factoryt::gen_nondet_pointer_init(
   }
 }
 
+/// Initialises an object tree rooted at `expr`, allocating child objects as
+/// necessary and nondet-initialising their members, or if MUST_UPDATE_IN_PLACE
+/// is set, re-initialising already-allocated objects.
+/// \param assignments: The code block to append the new
+///   instructions to
+/// \param expr: pointer-typed lvalue expression to initialise
+/// \param is_sub: If true, `expr` is a substructure of a larger object, which
+///   in Java necessarily means a base class. not match *expr (for example, expr
+///   might be void*)
+/// \param class_identifier: clsid to initialise @java.lang.Object.
+///   @class_identifier
+/// \param skip_classid: if true, skip initialising @class_identifier
+/// \param create_dynamic_objects: if true, use malloc to allocate objects;
+///   otherwise generate fresh static symbols.
+/// \param struct_type - The type of the struct we are initalising
+/// \param update_in_place: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
+///   invalid input
+void java_object_factoryt::gen_nondet_struct_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  bool is_sub,
+  irep_idt class_identifier,
+  bool skip_classid,
+  bool create_dynamic_objects,
+  const struct_typet &struct_type,
+  const update_in_placet &update_in_place)
+{
+  typedef struct_typet::componentst componentst;
+  const irep_idt &struct_tag=struct_type.get_tag();
+
+  const componentst &components=struct_type.components();
+
+  if(!is_sub)
+    class_identifier=struct_tag;
+
+  for(const auto &component : components)
+  {
+    const typet &component_type=component.type();
+    irep_idt name=component.get_name();
+
+    member_exprt me(expr, name, component_type);
+
+    if(name=="@class_identifier")
+    {
+      if(update_in_place==MUST_UPDATE_IN_PLACE)
+        continue;
+
+      if(skip_classid)
+        continue;
+
+      irep_idt qualified_clsid="java::"+as_string(class_identifier);
+      constant_exprt ci(qualified_clsid, string_typet());
+      code_assignt code(me, ci);
+      code.add_source_location()=loc;
+      assignments.copy_to_operands(code);
+    }
+    else if(name=="@lock")
+    {
+      if(update_in_place==MUST_UPDATE_IN_PLACE)
+        continue;
+      code_assignt code(me, from_integer(0, me.type()));
+      code.add_source_location()=loc;
+      assignments.copy_to_operands(code);
+    }
+    else
+    {
+      assert(!name.empty());
+
+      bool _is_sub=name[0]=='@';
+
+      // MUST_UPDATE_IN_PLACE only applies to this object.
+      // If this is a pointer to another object, offer the chance
+      // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
+      update_in_placet substruct_in_place=
+        update_in_place==MUST_UPDATE_IN_PLACE && !_is_sub ?
+        MAY_UPDATE_IN_PLACE :
+        update_in_place;
+      gen_nondet_init(
+        assignments,
+        me,
+        _is_sub,
+        class_identifier,
+        false,
+        create_dynamic_objects,
+        false,
+        typet(),
+        substruct_in_place);
+    }
+  }
+}
+
 /// Initialises a primitive or object tree rooted at `expr`, allocating child
 /// objects as necessary and nondet-initialising their members, or if
 /// MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated objects.
@@ -534,14 +628,16 @@ void java_object_factoryt::gen_nondet_init(
   }
   else if(type.id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet struct_type=to_struct_type(type);
     gen_nondet_struct_init(
       assignments,
       expr,
       is_sub,
       class_identifier,
+      skip_classid,
       create_dynamic_objects,
-      struct_type);
+      struct_type,
+      update_in_place);
   }
   else
   {
