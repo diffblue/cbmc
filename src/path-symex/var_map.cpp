@@ -22,7 +22,7 @@ var_mapt::var_infot &var_mapt::operator()(
   const irep_idt &suffix,
   const typet &type)
 {
-  assert(symbol!=irep_idt());
+  assert(!symbol.empty());
 
   std::string full_identifier=
     id2string(symbol)+id2string(suffix);

@@ -699,7 +699,7 @@ void path_symext::function_call_rec(
         const code_typet::parametert &function_parameter=function_parameters[i];
         irep_idt identifier=function_parameter.get_identifier();
 
-        if(identifier==irep_idt())
+        if(identifier.empty())
           throw "function_call " + id2string(function_identifier)
               + " no identifier for function parameter";
 
