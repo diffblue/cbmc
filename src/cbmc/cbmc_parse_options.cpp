@@ -805,7 +805,15 @@ bool cbmc_parse_optionst::process_goto_program(
     if(cmdline.isset("full-slice"))
     {
       status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
+      try
+      {
+        full_slicer(goto_functions, ns);
+      }
+      catch(const char *error_msg)
+      {
+        error() << error_msg << eom;
+        return 1;
+      }
     }
 
     // checks don't know about adjusted float expressions
