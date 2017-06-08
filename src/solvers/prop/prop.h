@@ -108,6 +108,12 @@ public:
   // an incremental solver may remove any variables that aren't frozen
   virtual void set_frozen(literalt a) { }
 
+  // Resource limits:
+  virtual void set_time_limit_seconds(uint32_t lim)
+  {
+    warning() << "CPU limit ignored (not implemented)" << eom;
+  }
+
 protected:
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
