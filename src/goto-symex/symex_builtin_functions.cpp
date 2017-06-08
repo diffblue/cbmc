@@ -221,7 +221,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
 
   exprt rhs=zero_initializer(lhs.type(), code.source_location(), ns);
 
-  if(id!=irep_idt())
+  if(!id.empty())
   {
     // strip last name off id to get function name
     std::size_t pos=id2string(id).rfind("::");

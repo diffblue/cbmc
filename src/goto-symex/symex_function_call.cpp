@@ -62,7 +62,7 @@ void goto_symext::parameter_assignments(
 
     const irep_idt &identifier=parameter.get_identifier();
 
-    if(identifier==irep_idt())
+    if(identifier.empty())
       throw "no identifier for function parameter";
 
     const symbolt &symbol=ns.lookup(identifier);
