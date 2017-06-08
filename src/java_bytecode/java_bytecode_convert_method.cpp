@@ -2309,7 +2309,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     if(v.is_parameter)
       continue;
     // Skip anonymous variables:
-    if(v.symbol_expr.get_identifier()==irep_idt())
+    if(v.symbol_expr.get_identifier().empty())
       continue;
     auto &block=get_block_for_pcrange(
       root,
