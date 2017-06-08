@@ -257,8 +257,9 @@ typet string_data_type(symbol_tablet symbol_table)
 {
   symbolt sym=symbol_table.lookup("java::java.lang.String");
   typet concrete_type=sym.type;
-  // TODO: Check that this is indeed the 'length' field.
-  typet data_type=to_struct_type(concrete_type).components()[2].type();
+  struct_typet struct_type=to_struct_type(concrete_type);
+  std::size_t index=struct_type.component_number("data");
+  typet data_type=struct_type.components()[index].type();
   return data_type;
 }
 
@@ -292,17 +293,15 @@ void java_string_library_preprocesst::add_string_type(
     array_typet(java_char_type(), infinity_exprt(string_length_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
-  symbolt string_symbol;
-  string_symbol.name="java::"+id2string(class_name);
-  string_symbol.base_name=id2string(class_name);
-  string_symbol.pretty_name=id2string(class_name);
-  string_symbol.type=string_type;
-  string_symbol.is_type=true;
-
-  // Overwrite any pre-existing symbol in the table, e.g. created by
-  // a loaded model.
-  symbol_table.remove(string_symbol.name);
-  assert(!symbol_table.add(string_symbol));
+  std::string name="java::"+id2string(class_name);
+  symbolt tmp_string_symbol;
+  tmp_string_symbol.name=name;
+  symbolt *string_symbol;
+  symbol_table.move(tmp_string_symbol, string_symbol);
+  string_symbol->base_name=id2string(class_name);
+  string_symbol->pretty_name=id2string(class_name);
+  string_symbol->type=string_type;
+  string_symbol->is_type=true;
 }
 
 /// add a symbol in the table with static lifetime and name containing
