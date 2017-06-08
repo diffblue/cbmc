@@ -82,13 +82,8 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        if(step.full_lhs.is_not_nil())
-          full_lhs_string=from_expr(ns, identifier, step.full_lhs);
-
-#if 0
-        if(it.full_lhs_value.is_not_nil())
-          full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
-#endif
+        assert(step.full_lhs.is_not_nil());
+        full_lhs_string=from_expr(ns, identifier, step.full_lhs);
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -101,13 +96,13 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
-          if(step.full_lhs_value.is_not_nil())
-            full_lhs_value=json(step.full_lhs_value, ns, symbol->mode);
+          assert(step.full_lhs_value.is_not_nil());
+          full_lhs_value=json(step.full_lhs_value, ns, symbol->mode);
         }
         else
         {
-          if(step.full_lhs_value.is_not_nil())
-            full_lhs_value=json(step.full_lhs_value, ns);
+          assert(step.full_lhs_value.is_not_nil());
+          full_lhs_value=json(step.full_lhs_value, ns);
         }
 
         json_assignment["value"]=full_lhs_value;
