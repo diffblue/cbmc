@@ -71,7 +71,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     bool virtual_base = base_it->get_bool(ID_virtual);
     irep_idt class_access = base_it->get(ID_protection);
 
-    if(class_access==irep_idt())
+    if(class_access.empty())
       class_access = default_class_access;
 
     base_symbol_expr.id(ID_base);

@@ -571,7 +571,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   }
 
   for(const operator_entryt *e=operators;
-      e->id!=irep_idt();
+      !e->id.empty();
       e++)
     if(expr.id()==e->id)
     {
