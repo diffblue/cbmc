@@ -2322,7 +2322,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   {
     const exprt &new_expr=cache_result.first->second;
 
-    if(new_expr.id()==irep_idt())
+    if(new_expr.id().empty())
       return true; // no change
 
     expr=new_expr;
