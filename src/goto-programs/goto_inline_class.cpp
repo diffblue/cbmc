@@ -57,7 +57,7 @@ void goto_inlinet::parameter_assignments(
 
     const irep_idt &identifier=parameter.get_identifier();
 
-    if(identifier==irep_idt())
+    if(identifier.empty())
     {
       error().source_location=source_location;
       error() << "no identifier for function parameter" << eom;
@@ -182,7 +182,7 @@ void goto_inlinet::parameter_destruction(
 
     const irep_idt &identifier=parameter.get_identifier();
 
-    if(identifier==irep_idt())
+    if(identifier.empty())
     {
       error().source_location=source_location;
       error() << "no identifier for function parameter" << eom;
@@ -328,13 +328,13 @@ void replace_location(
 
   dest=new_location;
 
-  if(comment!=irep_idt())
+  if(!comment.empty())
     dest.set_comment(comment);
 
-  if(property_class!=irep_idt())
+  if(!property_class.empty())
     dest.set_property_class(property_class);
 
-  if(property_id!=irep_idt())
+  if(!property_id.empty())
     dest.set_property_id(property_id);
 }
 
