@@ -428,7 +428,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         irep_idt identifier=declaration.declarator().get_name();
 
         // abstract or not?
-        if(identifier==irep_idt())
+        if(identifier.empty())
         {
           // abstract
           parameter.add_source_location()=declaration.type().source_location();
@@ -550,7 +550,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     {
       // not a constant and not infinity
 
-      assert(current_symbol_id!=irep_idt());
+      assert(!current_symbol_id.empty());
 
       const symbolt &base_symbol=lookup(current_symbol_id);
 
@@ -862,7 +862,7 @@ void c_typecheck_baset::typecheck_compound_body(
   // scan for anonymous members, and name them
   for(auto &member : components)
   {
-    if(member.get_name()!=irep_idt())
+    if(!member.get_name().empty())
       continue;
 
     member.set_name("$anon"+std::to_string(anon_member_counter++));

@@ -110,7 +110,7 @@ static std::string type2name(
   if(!type.source_location().get_function().empty())
     result+='l';
 
-  if(type.id()==irep_idt())
+  if(type.id().empty())
     throw "empty type encountered";
   else if(type.id()==ID_empty)
     result+='V';

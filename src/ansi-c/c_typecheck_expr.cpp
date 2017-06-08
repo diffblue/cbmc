@@ -1522,7 +1522,7 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
   // copy method identifier
   const irep_idt &identifier=component.get(ID_C_identifier);
 
-  if(identifier!=irep_idt())
+  if(!identifier.empty())
     expr.set(ID_C_identifier, identifier);
 
   const irep_idt &access=component.get_access();

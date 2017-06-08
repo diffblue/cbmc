@@ -33,7 +33,7 @@ void ansi_c_declaratort::build(irept &src)
       t.make_nil();
       break;
     }
-    else if(t.id()==irep_idt() ||
+    else if(t.id().empty() ||
             t.is_nil())
     {
       assert(0);
