@@ -89,8 +89,8 @@ void remove_exceptionst::add_exceptional_returns(
   if(goto_program.empty())
     return;
 
-  // the entry function has already been added to the symbol table
-  // if you find it, initialise it
+  // some methods (e.g. the entry method) have already been added to
+  // the symbol table; if you find it, initialise it
   if(symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
   {
     const symbolt &symbol=

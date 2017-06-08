@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
+#include <goto-programs/remove_exceptions.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
@@ -1177,46 +1178,35 @@ codet java_bytecode_convert_methodt::convert_instructions(
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
 
-    // we throw away the first statement in an exception handler
-    // as we don't know if a function call had a normal or exceptional return
     auto it=method.exception_table.begin();
     for(; it!=method.exception_table.end(); ++it)
     {
       if(cur_pc==it->handler_pc)
       {
-        exprt exc_var=variable(
-          arg0, statement[0],
-          i_it->address,
-          NO_CAST);
-
-        // throw away the operands
-        pop_residue(bytecode_info.pop);
-
-        // add a CATCH-PUSH signaling a handler
-        side_effect_expr_catcht catch_handler_expr;
-        // pack the exception variable so that it can be used
-        // later for instrumentation
-        catch_handler_expr.get_sub().resize(1);
-        catch_handler_expr.get_sub()[0]=exc_var;
-
-        code_expressiont catch_handler(catch_handler_expr);
-        code_labelt newlabel(label(std::to_string(cur_pc)),
-                             code_blockt());
-
-        code_blockt label_block=to_code_block(newlabel.code());
-        code_blockt handler_block;
-        handler_block.move_to_operands(c);
-        handler_block.move_to_operands(catch_handler);
-        handler_block.move_to_operands(label_block);
-        c=handler_block;
-        break;
+        // at the beginning of a handler, clear the stack and
+        // push the corresponding exceptional return variable
+        stack.clear();
+        auxiliary_symbolt new_symbol;
+        new_symbol.is_static_lifetime=true;
+        int file_name_length=
+          id2string(method.source_location.get_file()).size();
+        // remove the file extension
+        const std::string &file_name=
+          id2string(method.source_location.get_file()).
+             substr(0, file_name_length-5);
+        // generate the name of the exceptional return variable
+        const std::string &exceptional_var_name=
+          "java::"+file_name+"."+
+          id2string(method.name)+":"+
+          id2string(method.signature)+
+          EXC_SUFFIX;
+        new_symbol.base_name=exceptional_var_name;
+        new_symbol.name=exceptional_var_name;
+        new_symbol.type=typet(ID_pointer, empty_typet());
+        new_symbol.mode=ID_java;
+        symbol_table.add(new_symbol);
+        stack.push_back(new_symbol.symbol_expr());
       }
-    }
-
-    if(it!=method.exception_table.end())
-    {
-      // go straight to the next statement
-      continue;
     }
 
     exprt::operandst op=pop(bytecode_info.pop);
@@ -2374,6 +2364,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[1]=op[0];
       results[0]=op[1];
     }
+    else if(statement=="nop")
+    {
+      c=code_skipt();
+    }
     else
     {
       c=codet(statement);
@@ -2500,9 +2494,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       address_mapt::iterator a_it2=address_map.find(address);
       assert(a_it2!=address_map.end());
 
-      // we don't worry about exception handlers as we don't load the
-      // operands from the stack anyway -- we keep explicit global
-      // exception variables
+      // clear the stack if this is an exception handler
       for(const auto &exception_row : method.exception_table)
       {
         if(address==exception_row.handler_pc)
@@ -2571,7 +2563,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
               c.copy_to_operands(*o_it);
         }
       }
-
       a_it2->second.stack=stack;
     }
   }

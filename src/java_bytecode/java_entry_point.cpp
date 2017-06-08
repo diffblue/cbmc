@@ -532,14 +532,17 @@ bool java_entry_point(
     call_main.lhs()=return_symbol.symbol_expr();
   }
 
-  // add the exceptional return value
-  auxiliary_symbolt exc_symbol;
-  exc_symbol.mode=ID_C;
-  exc_symbol.is_static_lifetime=false;
-  exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
-  exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
-  exc_symbol.type=java_reference_type(empty_typet());
-  symbol_table.add(exc_symbol);
+  if(!symbol_table.has_symbol(id2string(symbol.name)+EXC_SUFFIX))
+  {
+    // add the exceptional return value
+    auxiliary_symbolt exc_symbol;
+    exc_symbol.mode=ID_C;
+    exc_symbol.is_static_lifetime=false;
+    exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
+    exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
+    exc_symbol.type=java_reference_type(empty_typet());
+    symbol_table.add(exc_symbol);
+  }
 
   exprt::operandst main_arguments=
     java_build_arguments(
