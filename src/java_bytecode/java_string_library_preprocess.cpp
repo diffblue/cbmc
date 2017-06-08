@@ -1148,95 +1148,13 @@ codet java_string_library_preprocesst::
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-    make_string_builder_append_object_code
-
-  Inputs:
-    type - type of the function called
-    loc - location in the program
-    symbol_table - symbol table
-
- Outputs: code for the StringBuilder.append(Object) function:
-          > string1 = arguments[1].toString()
-          > string_expr1 = string_to_string_expr(string1)
-          > string_expr2 = concat(this, string_expr1)
-          > this = string_expr_to_string(string_expr2)
-          > return this
-
-\*******************************************************************/
-
-codet java_string_library_preprocesst::make_string_builder_append_object_code(
-  const code_typet &type,
-  const source_locationt &loc,
-  symbol_tablet &symbol_table)
-{
-  code_typet::parameterst params=type.parameters();
-  assert(params.size()==1);
-  exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
-
-  // Code to be returned
-  code_blockt code;
-
-  // String expression that will hold the result
-  string_exprt string_expr1=fresh_string_expr(loc, symbol_table, code);
-
-  exprt::operandst arguments=process_parameters(
-    type.parameters(), loc, symbol_table, code);
-  assert(arguments.size()==2);
-
-  // > string1 = arguments[1].toString()
-  exprt string1=fresh_string(this_obj.type(), loc, symbol_table);
-  code_function_callt fun_call;
-  fun_call.lhs()=string1;
-  // TODO: we should look in the symbol table for such a symbol
-  fun_call.function()=symbol_exprt(
-    "java::java.lang.Object.toString:()Ljava/lang/String;");
-  fun_call.arguments().push_back(arguments[1]);
-  code_typet fun_type;
-  fun_type.return_type()=string1.type();
-  fun_call.function().type()=fun_type;
-  code.add(fun_call);
-
-  // > string_expr1 = string_to_string_expr(string1)
-  code.add(code_assign_java_string_to_string_expr(
-    string_expr1, string1, symbol_table));
-
-  // > string_expr2 = concat(this, string1)
-  exprt::operandst concat_arguments(arguments);
-  concat_arguments[1]=string_expr1;
-  string_exprt string_expr2=string_expr_of_function_application(
-    ID_cprover_string_concat_func, concat_arguments, loc, symbol_table, code);
-
-  // > this = string_expr
-  code.add(code_assign_string_expr_to_java_string(
-    this_obj, string_expr2, symbol_table));
-
-  // > return this
-  code.add(code_returnt(this_obj));
-
-  return code;
-}
-
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_equals_code
-
-  Inputs:
-    type - type of the function call
-    loc - location in the program_invocation_name
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-    > string_expr1 = {this->length; *this->data}
-    > string_expr2 = {arg->length; *arg->data}
-    > return cprover_string_equal(string_expr1, string_expr2)
-
-  Purpose: Used to provide code for the Java String.equals(Object) function.
-
-\*******************************************************************/
-
+/// Used to provide code for the Java String.equals(Object) function.
+/// \param type: type of the function call
+/// \param loc: location in the program_invocation_name
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string_expr1 = {this->length; *this->data}
+///   > string_expr2 = {arg->length; *arg->data} > return
+///   cprover_string_equal(string_expr1, string_expr2)
 codet java_string_library_preprocesst::make_equals_function_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1257,99 +1175,10 @@ codet java_string_library_preprocesst::make_equals_function_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-    make_string_builder_append_float_code
-
-  Inputs:
-    type - type of the function call
-    loc - location in the program_invocation_name
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-          > string1 = arguments[1].toString()
-          > string_expr1 = string_to_string_expr(string1)
-          > string_expr2 = concat(this, string_expr1)
-          > this = string_expr_to_string(string_expr2)
-          > return this
-
-  Purpose: Used to provide code for the Java StringBuilder.append(F)
-           function.
-
-\*******************************************************************/
-
-codet java_string_library_preprocesst::make_string_builder_append_float_code(
-  const code_typet &type,
-  const source_locationt &loc,
-  symbol_tablet &symbol_table)
-{
-  code_typet::parameterst params=type.parameters();
-  assert(params.size()==1);
-  exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
-
-  // Getting types
-  typet length_type=string_length_type();
-
-  // Code to be returned
-  code_blockt code;
-
-  // String expression that will hold the result
-  refined_string_typet ref_type(length_type, java_char_type());
-  string_exprt string_expr1=fresh_string_expr(loc, symbol_table, code);
-
-  exprt::operandst arguments=process_parameters(
-    type.parameters(), loc, symbol_table, code);
-  assert(arguments.size()==2);
-
-  // > string1 = arguments[1].toString()
-  exprt string1=fresh_string(this_obj.type(), loc, symbol_table);
-  code_function_callt fun_call;
-  fun_call.lhs()=string1;
-  // TODO: we should look in the symbol table for such a symbol
-  fun_call.function()=symbol_exprt(
-    "java::java.lang.Float.toString:()Ljava/lang/String;");
-  fun_call.arguments().push_back(arguments[1]);
-  code_typet fun_type;
-  fun_type.return_type()=string1.type();
-  fun_call.function().type()=fun_type;
-  code.add(fun_call);
-
-  // > string_expr1 = string_to_string_expr(string1)
-  code.add(code_assign_java_string_to_string_expr(
-    string_expr1, string1, symbol_table));
-
-  // > string_expr2 = concat(this, string1)
-  exprt::operandst concat_arguments(arguments);
-  concat_arguments[1]=string_expr1;
-
-  string_exprt string_expr2=string_expr_of_function_application(
-    ID_cprover_string_concat_func, concat_arguments, loc, symbol_table, code);
-
-  // > this = string_expr
-  code.add(code_assign_string_expr_to_java_string(
-    this_obj, string_expr2, symbol_table));
-
-  // > return this
-  code.add(code_returnt(this_obj));
-
-  return code;
-}
-
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::string_literal
-
-  Inputs:
-    s - a string
-
- Outputs: an expression representing a Java string literal with the
-          given content.
-
- Purpose: construct a Java string literal from a constant string value
-
-\*******************************************************************/
-
+/// construct a Java string literal from a constant string value
+/// \param s: a string
+/// \return an expression representing a Java string literal with the given
+///   content.
 exprt java_string_library_preprocesst::string_literal(const std::string &s)
 {
   exprt string_literal(ID_java_string_literal);
@@ -2194,29 +2023,14 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_double_func;
-  conversion_table
-    ["java::java.lang.StringBuilder.append:(F)Ljava/lang/StringBuilder;"]=
-      std::bind(
-        &java_string_library_preprocesst::make_string_builder_append_float_code,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3);
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(I)Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_int_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(J)Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_long_func;
-
-  conversion_table["java::java.lang.StringBuilder.append:"
-                   "(Ljava/lang/Object;)Ljava/lang/StringBuilder;"]=
-    std::bind(
-      &java_string_library_preprocesst::make_string_builder_append_object_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3);
+  // Not supported: "java.lang.StringBuilder.append:"
+  //   "(F)Ljava/lang/StringBuilder;"
+  // Not supported: "java.lang.StringBuilder.append:(I)"
+  //   "Ljava/lang/StringBuilder;"
+  // Not supported: "java.lang.StringBuilder.append:(J)"
+  //   "Ljava/lang/StringBuilder;"
+  // Not supported: "java.lang.StringBuilder.append:"
+  //   "(Ljava/lang/Object;)Ljava/lang/StringBuilder;"
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(Ljava/lang/String;)"
       "Ljava/lang/StringBuilder;"]=
