@@ -15,6 +15,8 @@ Author: Peter Schrammel
 #include "std_expr.h"
 #include "config.h"
 #include "identifier.h"
+#include "language.h"
+#include <langapi/mode.h>
 
 #include "json_expr.h"
 
@@ -113,19 +115,26 @@ json_objectt json(const source_locationt &location)
 Function: json
 
   Inputs:
+    type - a type
+    ns - a namespace
+    mode - language in which the code was written;
+           for now ID_C and ID_java are supported
 
- Outputs:
+ Outputs: a json object
 
  Purpose:
+    Output a CBMC type in json.
+    The `mode` argument is used to correctly report types.
 
 \*******************************************************************/
 
 json_objectt json(
   const typet &type,
-  const namespacet &ns)
+  const namespacet &ns,
+  const irep_idt &mode)
 {
   if(type.id()==ID_symbol)
-    return json(ns.follow(type), ns);
+    return json(ns.follow(type), ns, mode);
 
   json_objectt result;
 
@@ -161,7 +170,7 @@ json_objectt json(
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
-    return json(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
+    return json(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns, mode);
   }
   else if(type.id()==ID_fixedbv)
   {
@@ -172,7 +181,7 @@ json_objectt json(
   else if(type.id()==ID_pointer)
   {
     result["name"]=json_stringt("pointer");
-    result["subtype"]=json(type.subtype(), ns);
+    result["subtype"]=json(type.subtype(), ns, mode);
   }
   else if(type.id()==ID_bool)
   {
@@ -181,13 +190,13 @@ json_objectt json(
   else if(type.id()==ID_array)
   {
     result["name"]=json_stringt("array");
-    result["subtype"]=json(type.subtype(), ns);
+    result["subtype"]=json(type.subtype(), ns, mode);
   }
   else if(type.id()==ID_vector)
   {
     result["name"]=json_stringt("vector");
-    result["subtype"]=json(type.subtype(), ns);
-    result["size"]=json(to_vector_type(type).size(), ns);
+    result["subtype"]=json(type.subtype(), ns, mode);
+    result["size"]=json(to_vector_type(type).size(), ns, mode);
   }
   else if(type.id()==ID_struct)
   {
@@ -199,7 +208,7 @@ json_objectt json(
     {
       json_objectt &e=members.push_back().make_object();
       e["name"]=json_stringt(id2string(component.get_name()));
-      e["type"]=json(component.type(), ns);
+      e["type"]=json(component.type(), ns, mode);
     }
   }
   else if(type.id()==ID_union)
@@ -212,7 +221,7 @@ json_objectt json(
     {
       json_objectt &e=members.push_back().make_object();
       e["name"]=json_stringt(id2string(component.get_name()));
-      e["type"]=json(component.type(), ns);
+      e["type"]=json(component.type(), ns, mode);
     }
   }
   else
@@ -226,16 +235,23 @@ json_objectt json(
 Function: json
 
   Inputs:
+    expr - an expression
+    ns - a namespace
+    mode - language in which the code was written;
+           for now ID_C and ID_java are supported
 
- Outputs:
+ Outputs: a json object
 
  Purpose:
+    Output a CBMC expression in json.
+    The mode is used to correctly report types.
 
 \*******************************************************************/
 
 json_objectt json(
   const exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  const irep_idt &mode)
 {
   json_objectt result;
 
@@ -258,42 +274,47 @@ json_objectt json(
         type.id()==ID_c_bit_field?type.subtype():
         type;
 
-      bool is_signed=underlying_type.id()==ID_signedbv;
+      languaget *lang;
+      if(mode==ID_unknown)
+        lang=get_default_language();
+      else
+      {
+        lang=get_language_from_mode(mode);
+        if(!lang)
+          lang=get_default_language();
+      }
 
-      std::string sig=is_signed?"":"unsigned ";
-
-      if(width==config.ansi_c.char_width)
-        result["c_type"]=json_stringt(sig+"char");
-      else if(width==config.ansi_c.int_width)
-        result["c_type"]=json_stringt(sig+"int");
-      else if(width==config.ansi_c.short_int_width)
-        result["c_type"]=json_stringt(sig+"short int");
-      else if(width==config.ansi_c.long_int_width)
-        result["c_type"]=json_stringt(sig+"long int");
-      else if(width==config.ansi_c.long_long_int_width)
-        result["c_type"]=json_stringt(sig+"long long int");
+      std::string type_string;
+      if(!lang->from_type(underlying_type, type_string, ns))
+        result["type"]=json_stringt(type_string);
+      else
+        assert(false && "unknown type");
 
       mp_integer i;
       if(!to_integer(expr, i))
         result["data"]=json_stringt(integer2string(i));
+      else
+        assert(false && "could not convert data to integer");
     }
     else if(type.id()==ID_c_enum)
     {
       result["name"]=json_stringt("integer");
       result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["width"]=json_numbert(type.subtype().get_string(ID_width));
-      result["c_type"]=json_stringt("enum");
+      result["type"]=json_stringt("enum");
 
       mp_integer i;
       if(!to_integer(expr, i))
         result["data"]=json_stringt(integer2string(i));
+      else
+        assert(false && "could not convert data to integer");
     }
     else if(type.id()==ID_c_enum_tag)
     {
       constant_exprt tmp;
       tmp.type()=ns.follow_tag(to_c_enum_tag_type(type));
-      tmp.set_value(constant_expr.get_value());
-      return json(tmp, ns);
+      tmp.set_value(to_constant_expr(expr).get_value());
+      return json(tmp, ns, mode);
     }
     else if(type.id()==ID_bv)
     {
@@ -342,7 +363,7 @@ json_objectt json(
     else if(type.id()==ID_c_bool)
     {
       result["name"]=json_stringt("integer");
-      result["c_type"]=json_stringt("_Bool");
+      result["type"]=json_stringt("_Bool");
       result["binary"]=json_stringt(expr.get_string(ID_value));
       mp_integer b;
       to_integer(to_constant_expr(expr), b);
@@ -369,7 +390,7 @@ json_objectt json(
     {
       json_objectt &e=elements.push_back().make_object();
       e["index"]=json_numbert(std::to_string(index));
-      e["value"]=json(*it, ns);
+      e["value"]=json(*it, ns, mode);
       index++;
     }
   }
@@ -388,7 +409,7 @@ json_objectt json(
       for(unsigned m=0; m<expr.operands().size(); m++)
       {
         json_objectt &e=members.push_back().make_object();
-        e["value"]=json(expr.operands()[m], ns);
+        e["value"]=json(expr.operands()[m], ns, mode);
         e["name"]=json_stringt(id2string(components[m].get_name()));
       }
     }
@@ -400,7 +421,7 @@ json_objectt json(
     assert(expr.operands().size()==1);
 
     json_objectt &e=result["member"].make_object();
-    e["value"]=json(expr.op0(), ns);
+    e["value"]=json(expr.op0(), ns, mode);
     e["name"]=json_stringt(id2string(to_union_expr(expr).get_component_name()));
   }
   else

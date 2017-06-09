@@ -92,16 +92,8 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        if(step.full_lhs.is_not_nil())
-          full_lhs_string=from_expr(ns, identifier, step.full_lhs);
-
-#if 0
-        if(it.full_lhs_value.is_not_nil())
-          full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
-#endif
-
-        if(step.full_lhs_value.is_not_nil())
-          full_lhs_value = json(step.full_lhs_value, ns);
+        assert(step.full_lhs.is_not_nil());
+        full_lhs_string=from_expr(ns, identifier, step.full_lhs);
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -114,6 +106,13 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
+          assert(step.full_lhs_value.is_not_nil());
+          full_lhs_value=json(step.full_lhs_value, ns, symbol->mode);
+        }
+        else
+        {
+          assert(step.full_lhs_value.is_not_nil());
+          full_lhs_value=json(step.full_lhs_value, ns);
         }
 
         json_assignment["value"]=full_lhs_value;
@@ -141,6 +140,14 @@ void convert(
         json_output["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -148,7 +155,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
