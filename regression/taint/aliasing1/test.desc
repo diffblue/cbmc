@@ -3,7 +3,7 @@ aliasing1.class
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$
-^file aliasing1.java line 10: There is a flow \(taint rule my_sink\)$
+^file aliasing1.java line 10( function .*)?: There is a flow \(taint rule my_sink\)$
 --
-^file aliasing1.java line 8: There is a flow \(taint rule my_sink\)$
+^file aliasing1.java line 8( function .*)?: There is a flow \(taint rule my_sink\)$
 ^warning: ignoring

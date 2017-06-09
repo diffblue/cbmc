@@ -3,7 +3,7 @@ basic1.class
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$
-^file basic1.java line 8: There is a T1 flow \(taint rule my_h1\)$
-^file basic1.java line 11: There is a T2 flow \(taint rule my_h2\)$
+^file basic1.java line 8( function .*)?: There is a T1 flow \(taint rule my_h1\)$
+^file basic1.java line 11( function .*)?: There is a T2 flow \(taint rule my_h2\)$
 --
 ^warning: ignoring
