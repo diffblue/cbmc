@@ -13,6 +13,32 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 #include <util/std_types.h>
 
+class java_class_typet:public class_typet
+{
+ public:
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
+  }
+};
+
+inline const java_class_typet &to_java_class_type(const typet &type)
+{
+  assert(type.id()==ID_struct);
+  return static_cast<const java_class_typet &>(type);
+}
+
+inline java_class_typet &to_java_class_type(typet &type)
+{
+  assert(type.id()==ID_struct);
+  return static_cast<java_class_typet &>(type);
+}
+
 typet java_int_type();
 typet java_long_type();
 typet java_short_type();
