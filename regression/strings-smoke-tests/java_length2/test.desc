@@ -1,0 +1,10 @@
+FUTURE
+test.class
+--refine-strings --function test.check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+This test currently fails because we do not handle the case where the argument
+'s' is null. This should be handled in the String model.
+The issue number for that is: diffblue/test-gen#500
