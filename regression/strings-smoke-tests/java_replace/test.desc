@@ -6,3 +6,5 @@ test_replace.class
 ^VERIFICATION SUCCESSFUL$
 --
 diffblue/test-gen#256
+This test is only effective with a model of
+java.lang.String.replace(LCharSequence; LCharSequence).
