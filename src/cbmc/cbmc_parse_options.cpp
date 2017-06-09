@@ -456,8 +456,6 @@ int cbmc_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
-  label_properties(goto_functions);
-
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
@@ -801,13 +799,6 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
 
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
-    }
-
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_functions, ns);
 
@@ -855,6 +846,23 @@ bool cbmc_parse_optionst::process_goto_program(
            goto_functions,
            get_message_handler()))
         return true;
+    }
+
+    // label the assertions
+    // This must be done after adding assertions and
+    // before using the argument of the "property" option.
+    // Do not re-label after using the property slicer because
+    // this would cause the property identifiers to change.
+    label_properties(goto_functions);
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      if(cmdline.isset("property"))
+        property_slicer(goto_functions, ns, cmdline.get_values("property"));
+      else
+        full_slicer(goto_functions, ns);
     }
 
     // remove skips
