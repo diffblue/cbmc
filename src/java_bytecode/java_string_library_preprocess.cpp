@@ -293,10 +293,9 @@ void java_string_library_preprocesst::add_string_type(
     array_typet(java_char_type(), infinity_exprt(string_length_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
-  std::string name="java::"+id2string(class_name);
   symbolt tmp_string_symbol;
-  tmp_string_symbol.name=name;
-  symbolt *string_symbol;
+  tmp_string_symbol.name="java::"+id2string(class_name);
+  symbolt *string_symbol=nullptr;
   symbol_table.move(tmp_string_symbol, string_symbol);
   string_symbol->base_name=id2string(class_name);
   string_symbol->pretty_name=id2string(class_name);
