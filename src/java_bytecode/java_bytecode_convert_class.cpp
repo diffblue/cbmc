@@ -90,7 +90,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
     return;
   }
 
-  class_typet class_type;
+  java_class_typet class_type;
 
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
@@ -101,6 +101,15 @@ void java_bytecode_convert_classt::convert(const classt &c)
       std::to_string(c.enum_elements+1));
     class_type.set(ID_enumeration, true);
   }
+
+  if(c.is_public)
+    class_type.set_access(ID_public);
+  else if(c.is_protected)
+    class_type.set_access(ID_protected);
+  else if(c.is_private)
+    class_type.set_access(ID_private);
+  else
+    class_type.set_access(ID_default);
 
   if(!c.extends.empty())
   {
