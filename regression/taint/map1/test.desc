@@ -1,8 +1,8 @@
-CORE
+KNOWNBUG
 map1.class
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$
-^file map1.java line 12: There is a flow \(taint rule my_sink\)$
+^file map1.java line 12( function .*)?: There is a flow \(taint rule my_sink\)$
 --
 ^warning: ignoring
