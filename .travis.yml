@@ -81,6 +81,35 @@ matrix:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
+    # Code Coverage - Ubuntu Linux with glibc using g++-5
+    - os: linux
+      sudo: false
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+            - libubsan0
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+        - ln -s /usr/bin/gcov-5 bin/gcov
+      # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
+      env: COMPILER=g++-5
+      install:
+        - COMMAND="make -C src minisat2-download" &&
+          eval ${PRE_COMMAND} ${COMMAND}
+        - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"--coverage\" LINKFLAGS=\"--coverage\" -j2" &&
+          eval ${PRE_COMMAND} ${COMMAND}
+      script:
+        - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
+          COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
+          eval ${PRE_COMMAND} ${COMMAND}
+      after_success:
+        - bash <(curl -s https://codecov.io/bash)
+
     # Ubuntu Linux with glibc using clang++-3.7
     - os: linux
       sudo: false
